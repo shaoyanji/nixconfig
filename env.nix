@@ -25,12 +25,12 @@
   	source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/nix-darwin/secrets/api.env";
     };
     # Macbook
-    "/Users/devji/Library/Application Support/sops/age/keys.txt" = {
+    "Library/Application Support/sops/age/keys.txt" = {
   	source = config.lib.file.mkOutOfStoreSymlink "/Volumes/FRITZ.NAS/External-USB3-0-01/documents/age-key.txt";
     };
     # Linux
-         "/home/devji/.config/sops/age/keys.txt" = {
-    source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/documents/age-key.txt";
+    ".config/sops/age/keys.txt" = {
+        source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/documents/age-key.txt";
     };
   };
 

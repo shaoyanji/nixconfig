@@ -21,11 +21,8 @@ in
       enable = true;
       plugins = [
         "git"
-        "eza"
-        "fzf"
         "aliases"
         "alias-finder"
-        "starship"
         "colored-man-pages"
         "vi-mode"
       ];
@@ -47,12 +44,10 @@ in
     # Configuration written to ~/.config/starship.toml
     settings = {
       # add_newline = false;
-
        character = {
          success_symbol = "[➜](bold green)";
          error_symbol = "[➜](bold red)";
        };
-
       # package.disabled = true;
     };
   };
@@ -60,11 +55,19 @@ in
     enable = true;
     nix-direnv.enable = true;
   };
+  programs.zoxide = {
+    enable = true;
+    options = [
+      "--cmd cd"
+        ];
+  };
+  programs.fzf.enable = true;
 
   home.packages = with pkgs;
   [
-      fzf
-      zoxide
+      zsh-forgit
+      zsh-fzf-history-search
+      zsh-fzf-tab
       bat
       eza
       starship

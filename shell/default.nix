@@ -1,20 +1,37 @@
 { config, pkgs, ... }:
 let 
   myAliases = { 
-      l="exa -lahF --color=auto --icons --sort=size --group-directories-first";
-      lss="exa -hF --color=auto --icons --sort=size --group-directories-first";
-      la="exa -ahF --color=auto --icons --sort=size --group-directories-first";
-      ls="exa -lhF --color=auto --icons --sort=Name --group-directories-first";
-      lst="exa -lahFT --color=auto --icons --sort=size --group-directories-first";
-      lt="exa -aT --icons --group-directories-first --color=auto --sort=size";
+      l="eza -lahF --color=auto --icons --sort=size --group-directories-first";
+      lss="eza -hF --color=auto --icons --sort=size --group-directories-first";
+      la="eza -ahF --color=auto --icons --sort=size --group-directories-first";
+      ls="eza -lhF --color=auto --icons --sort=Name --group-directories-first";
+      lst="eza -lahFT --color=auto --icons --sort=size --group-directories-first";
+      lt="eza -aT --icons --group-directories-first --color=auto --sort=size";
       cat="bat";
-
   };
 in
 {
-  
+  programs.zsh = {
+    enable = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+    enableCompletion = true;
+    shellAliases = myAliases;
+    oh-my-zsh = {
+      enable = true;
+      plugins = [
+        "git"
+        "eza"
+        "fzf"
+        "aliases"
+        "alias-finder"
+        "starship"
+        "colored-man-pages"
+        "vi-mode"
+      ];
+    };
+  };
   #  imports = [ ./shells/fish ];
-
   programs.bash = {
     enable = true;
     shellAliases = myAliases;
@@ -39,6 +56,11 @@ in
       # package.disabled = true;
     };
   };
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   home.packages = with pkgs;
   [
       fzf
@@ -46,14 +68,11 @@ in
       bat
       eza
       starship
-
       tgpt
-    
   ];
 
   home.file = {
-    # ".p10k.zsh".source = ./.p10k.zsh;
-    ".zshrc".source = ./.zshrc;
+    #    ".zshrc".source = ./.zshrc;
     ".tmux.conf".source = ./.tmux.conf;
 
     # # You can also set the file content immediately.
@@ -72,5 +91,4 @@ in
 
  home.sessionVariables = {
   };
-
 }

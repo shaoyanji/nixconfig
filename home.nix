@@ -25,10 +25,6 @@
 
   ];
 
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-  };
   programs.htop = {
     enable = true;
     settings = {

@@ -31,13 +31,9 @@ source "${ZINIT_HOME}/zinit.zsh"
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
 # Add in zsh plugins
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
 zinit light Aloxaf/fzf-tab
 
 # Add in snippets
-zinit snippet OMZP::git
 zinit snippet OMZP::sudo
 #zinit snippet OMZP::archlinux
 zinit snippet OMZP::aws
@@ -77,20 +73,11 @@ zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
-# Aliases
-alias ls='ls --color'
-alias vim='nvim'
-alias c='clear'
-
 # Shell integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
-eval $(thefuck --alias)
-eval $(thefuck --alias fk)
+eval "$(thefuck --alias)"
+eval "$(thefuck --alias fk)"
 
-alias ls="eza --icons=always"
-# CodeWhisperer post block. Keep at the bottom of this file.
-#
-#export $(cat $HOME/.zshenv)
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 

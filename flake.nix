@@ -44,7 +44,7 @@
 	casks = [
 		"arc"
 		"orbstack"
-	    #"spotube"
+	    #	"spotube"
 	    #	"keybase"
 	    #	"notion"
 	    #	"raycast"

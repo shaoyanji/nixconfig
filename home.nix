@@ -45,17 +45,13 @@
     cmus
     obsidian
 # utilities
-    thefuck
-    jq
-    ripgrep
-    fd
     glow
     fm
     wget
     entr
+    gum
     # mc
     # hyperfine
-    gum
 
   # base tools 
     # alacritty

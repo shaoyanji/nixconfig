@@ -21,6 +21,9 @@ in
       enable = true;
       plugins = [
         "git"
+        #"kubectl"
+        #"docker"
+        #"helm"
         "aliases"
         "alias-finder"
         "colored-man-pages"
@@ -64,7 +67,11 @@ in
   programs.fzf.enable = true;
 
   home.packages = with pkgs;
-  [
+    [
+      thefuck
+      jq
+      ripgrep
+      fd
       zsh-forgit
       zsh-fzf-history-search
       zsh-fzf-tab
@@ -72,7 +79,7 @@ in
       eza
       starship
       tgpt
-  ];
+    ];
 
   home.file = {
     #    ".zshrc".source = ./.zshrc;

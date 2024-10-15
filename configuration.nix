@@ -3,7 +3,6 @@
   imports = [
     #      inputs.sops-nix.nixosModules.sops
   ];
-  # Sops configuration ------------------------------------------------------------------------------
 
  # Nix configuration ------------------------------------------------------------------------------
   #
@@ -69,6 +68,4 @@
 
   # Add ability to used TouchID for sudo authentication
   security.pam.enableSudoTouchIdAuth = true;
-  
-
 }

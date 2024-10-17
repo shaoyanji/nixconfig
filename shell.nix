@@ -6,6 +6,7 @@
   pkgs.mkShell
 # pkgs.mkShellNoCC 
 {
+  
   packages = with pkgs; [
     cowsay
     lolcat
@@ -33,7 +34,7 @@
     hyperfine
     lf
   # aitools
-    ollama
+    #ollama
     #aichat
     tgpt
     #sops
@@ -57,7 +58,7 @@
    #   export SOPS_AGE_RECIPIENT="age1tsv2lurpjzyx9ng6hcc4dff23lvv7tqkyyxz5zlpx32egu2c9vfql9m008"
    eval "$(zoxide init bash)"
    eval "$(fzf --bash)"
-   eval "$(oh-my-posh init bash --config ~/.oh-my-posh/cat.omp.json)"
+   eval "$(oh-my-posh init bash --config ~/${pkgs.oh-my-posh}/share/oh-my-posh/themes/catppuccin.omp.json)"
    0file() { curl -F"file=@$1" https://envs.sh ; }
    0pb() { curl -F"file=@-;" https://envs.sh ; }
    0url() { curl -F"url=$1" https://envs.sh ; }

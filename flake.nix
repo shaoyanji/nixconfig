@@ -112,7 +112,7 @@
           home-manager.useUserPackages = true;
           home-manager.users.devji = import ./home.nix;
 	  home-manager.sharedModules = [
-	      	sops-nix.homeManagerModules.sops
+	      #  sops-nix.homeManagerModules.sops
 	    ];
 	  home-manager.extraSpecialArgs = { inherit inputs; }; # Pass inputs to homeManagerConfiguration
 	  # Optionally, use home-manager.extraSpecialArgs to pass

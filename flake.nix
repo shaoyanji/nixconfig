@@ -27,19 +27,22 @@
       environment.systemPackages = with pkgs;
 	[
 	  mkalias
+	    #	  python3
 	];
 
       homebrew = {
 	enable = true;
 	taps = [
-	    #"krtirtho/apps"
+	    # "gigalixir/brew"
+	    # "krtirtho/apps"
 	    #	"homebrew/cask-fonts"
 	    #	"dart-lang/dart"
 	    #	"homebrew/bundle"
 	    #	"homebrew/services"
 	];
 	brews = [
-	#	    "mas"
+	    # "mas"
+	    # "gigalixir"
 	];
 	casks = [
 		"arc"
@@ -98,6 +101,7 @@
       specialArgs = { inherit inputs; };
       modules = [
 	./configuration.nix 
+	  # sops-nix.nixosModules.sops
       	configuration 
 	nix-homebrew.darwinModules.nix-homebrew{
 	 nix-homebrew = {

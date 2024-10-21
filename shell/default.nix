@@ -7,7 +7,7 @@ let
       ls="eza -lhF --color=auto --icons --sort=Name --group-directories-first";
       lst="eza -lahFT --color=auto --icons --sort=size --group-directories-first";
       lt="eza -aT --icons --group-directories-first --color=auto --sort=size";
-      cat="bat";
+    #cat="bat";
   };
 in
 {

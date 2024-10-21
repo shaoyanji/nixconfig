@@ -1,9 +1,18 @@
 { pkgs, lib, config, inputs, ... }:
 {
-  imports = [
-    #      inputs.sops-nix.nixosModules.sops
-  ];
-
+  #imports = [ inputs.sops-nix.nixosModules.sops];
+  #sops = {
+  #  defaultSopsFile = ./secrets.yaml;
+  #  validateSopsFiles = false;
+  #  age = {
+  #    sshKeyPaths = ["/var/root/.ssh/id_ed25519"];
+  #    keyFile = "/var/lib/sops-nix/keys.txt";
+  #    generateKey = true;
+  #  };
+  #  secrets = {
+  #    local ={};
+  #  };
+  #};
  # Nix configuration ------------------------------------------------------------------------------
   #
   nix.settings = {

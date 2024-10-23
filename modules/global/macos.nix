@@ -15,6 +15,10 @@
 	    home = "/Users/devji";
 	  };
               # arguments to home.nix
-
+	nix-homebrew = {
+	  enable = true;
+	  enableRosetta = true;
+	  user = "devji";
+	 };
 }
 

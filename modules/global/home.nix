@@ -25,31 +25,17 @@
 
   ];
 
-  programs.htop = {
-    enable = true;
-    settings = {
-      show_program_path = true;
-      sort_key = "PERCENT_CPU";
-      sort_order = "DESCENDING";
-      hide_threads = false;
-      highlight_megabytes = false;
-      update_process_names = false;
-      count_cpus_from_zero = false;
-      color_scheme = "default";
-    };
-  };
-
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    cmus
+    #    cmus
     obsidian
 # utilities
-    glow
-    fm
-    wget
-    entr
-    gum
+    # glow
+    #fm
+    #wget
+    #entr
+    #gum
     # mc
     # hyperfine
 

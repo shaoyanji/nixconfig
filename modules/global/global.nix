@@ -1,7 +1,7 @@
 { pkgs, lib, config, inputs, ... }:
 {
   imports = [ 
-    ./lf
+    #    ./lf
     #inputs.sops-nix.nixosModules.sops
     ];
   #sops = {

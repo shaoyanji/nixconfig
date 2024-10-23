@@ -15,8 +15,7 @@
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, 
-		      home-manager, nixvim, sops-nix, ... }:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager, nixvim, sops-nix, ... }@inputs :
   let
     globalModules = [ 
       { 

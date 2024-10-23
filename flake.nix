@@ -18,117 +18,43 @@
   outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, 
 		      home-manager, nixvim, sops-nix, ... }:
   let
-    
-    configuration = { pkgs, config, ... }: {
-      # List packages installed in system profile. To search by name, run:
-      # $ nix-env -qaP | grep wget
-      nixpkgs.config.allowUnsupportedSystem = true;
-      nixpkgs.config.allowUnfree = true;
-      environment.systemPackages = with pkgs;
-	[
-	  mkalias
-	    #	  python3
-	];
-
-      homebrew = {
-	enable = true;
-	taps = [
-	    # "gigalixir/brew"
-	    # "krtirtho/apps"
-	    #	"homebrew/cask-fonts"
-	    #	"dart-lang/dart"
-	    #	"homebrew/bundle"
-	    #	"homebrew/services"
-	];
-	brews = [
-	    # "mas"
-	    # "gigalixir"
-	];
-	casks = [
-		"arc"
-		"orbstack"
-	    #	"spotube"
-	    #	"keybase"
-	    #	"notion"
-	    #	"raycast"
-	    #	"slack"
-	    #	"zoom"
-	    #
-	];
-	masApps = {
-	    #	"ISH" = 1436902243;
-	    #   "Steamlink" = 1246969117;
-	};
-	onActivation.cleanup = "zap";
-	onActivation.autoUpdate = true;
-	onActivation.upgrade = true;
-      };
-
-      system.activationScripts.applications.text = let
-  	env = pkgs.buildEnv {
-    	 name = "system-applications";
-    	 paths = config.environment.systemPackages;
-    	 pathsToLink = "/Applications";
-	};
-      in
-  	pkgs.lib.mkForce ''
-  	# Set up applications.
-  	echo "setting up /Applications..." >&2
-  	rm -rf /Applications/Nix\ Apps
-  	mkdir -p /Applications/Nix\ Apps
-  	find ${env}/Applications -maxdepth 1 -type l -exec readlink '{}' + |
-  	while read src; do
-    	 app_name=$(basename "$src")
-    	 echo "copying $src" >&2
-    	 ${pkgs.mkalias}/bin/mkalias "$src" "/Applications/Nix Apps/$app_name"
-  	done
-        '';
-      # Set Git commit hash for darwin-version.
-      system.configurationRevision = self.rev or self.dirtyRev or null;
-
-      # Used for backwards compatibility, please read the changelog before changing.
-      # $ darwin-rebuild changelog
-      system.stateVersion = 5;
-
-      # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "aarch64-darwin";
-    };
+    globalModules = [ 
+      { 
+        system.configurationRevision = self.rev or self.dirtyRev or null; 
+      }
+	./modules/global/global.nix 
+    ];
+    globalModulesNixos = globalModules ++ [ 
+      ./modules/global/nixos.nix
+      home-manager.nixosModules.default
+    ];
+    globalModulesMacos = globalModules ++ [ 
+	./modules/global/macos.nix
+	nix-homebrew.darwinModules.nix-homebrew
+   	home-manager.darwinModules.default
+    ];
   in
   {
+    nixosConfigurations = {
+      poseidon = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = globalModulesNixos
+          ++ [ ./hosts/poseidon/configuration.nix ];
+      };
+    };
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#
-    darwinConfigurations."matts-MacBook-Air" = nix-darwin.lib.darwinSystem {
-      specialArgs = { inherit inputs; };
-      modules = [
-	./configuration.nix 
-	  # sops-nix.nixosModules.sops
-      	configuration 
-	nix-homebrew.darwinModules.nix-homebrew{
-	 nix-homebrew = {
-	  enable = true;
-	  enableRosetta = true;
-	  user = "devji";
-	 };
-	}
-   	home-manager.darwinModules.home-manager
-	{
-	  home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.devji = import ./home.nix;
-	  home-manager.sharedModules = [
-	      #  sops-nix.homeManagerModules.sops
-	    ];
-	  home-manager.extraSpecialArgs = { inherit inputs; }; # Pass inputs to homeManagerConfiguration
-	  # Optionally, use home-manager.extraSpecialArgs to pass
-	  users.users.devji= {
-	    name = "devji";
-	    home = "/Users/devji";
-	  };
-              # arguments to home.nix
-        }
-      ];
+    darwinConfigurations={
+      cassini = nix-darwin.lib.darwinSystem {
+	system = "aarch64-darwin";
+	specialArgs = { inherit inputs; };
+	modules = globalModulesMacos ++ [ 
+	    ./hosts/cassini/configuration.nix
+	];
+      };
     };
+    
     # Expose the package set, including overlays, for convenience.
-    darwinPackages = self.darwinConfigurations."matts-MacBook-Air".pkgs;
+    darwinPackages = self.darwinConfigurations.cassini.pkgs;
   };
 }

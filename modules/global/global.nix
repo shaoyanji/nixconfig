@@ -1,21 +1,9 @@
 { pkgs, lib, config, inputs, ... }:
 {
   imports = [ 
-    #    ./lf
-    #inputs.sops-nix.nixosModules.sops
+
     ];
-  #sops = {
-  #  defaultSopsFile = ./secrets.yaml;
-  #  validateSopsFiles = false;
-  #  age = {
-  #    sshKeyPaths = ["/var/root/.ssh/id_ed25519"];
-  #    keyFile = "/var/lib/sops-nix/keys.txt";
-  #    generateKey = true;
-  #  };
-  #  secrets = {
-  #    local ={};
-  #  };
-  #};
+
  # Nix configuration ------------------------------------------------------------------------------
   #
   nix.settings = {
@@ -29,8 +17,6 @@
         "@admin"
       ];
   };
-
-  #  nix.configureBuildUsers = true;
 
   # Enable experimental nix command and flakes
   # nix.package = pkgs.nixUnstable;
@@ -52,17 +38,13 @@
 
   # https://github.com/nix-community/home-manager/issues/423
   environment.variables = {
-    #    TERMINFO_DIRS = "${pkgs.kitty.terminfo.outPath}/share/terminfo";
   };
-  programs.nix-index.enable = true;
+  #  programs.nix-index.enable = true;
 
   # Fonts
   fonts.packages = [
     (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
   ];
-      
- 
       nixpkgs.config.allowUnsupportedSystem = true;
       nixpkgs.config.allowUnfree = true;
- 
 }

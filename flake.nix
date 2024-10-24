@@ -37,6 +37,7 @@
     nixosConfigurations = {
       poseidon = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+	specialArgs = { inherit inputs; };
         modules = globalModulesNixos
           ++ [ ./hosts/poseidon/configuration.nix ];
       };
@@ -47,9 +48,7 @@
       cassini = nix-darwin.lib.darwinSystem {
 	system = "aarch64-darwin";
 	specialArgs = { inherit inputs; };
-	modules = globalModulesMacos ++ [ 
-	    ./hosts/cassini/configuration.nix
-	];
+	modules = globalModulesMacos ++ [ ./hosts/cassini/configuration.nix];
       };
     };
     

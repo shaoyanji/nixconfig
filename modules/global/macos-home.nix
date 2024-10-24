@@ -1,4 +1,4 @@
-{ config, pkgs, lib,  ... }:
+{ config, pkgs,  ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -13,37 +13,37 @@
   # You should not change this value, even if you update Home Manager. If you do
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
-  home.stateVersion = "24.11"; # Please read the comment before changing.
+  home.stateVersion = "24.05"; # Please read the comment before changing.
 
   imports = [ 
     ./lf
-    ./env.nix #fixing sops for nixos
+    ./wezterm
+    ./env.nix
     ./shell
-    ./nixvim #for nixos pending migration
-    ./sops-nixos.nix
-    ./browser/firefox.nix
+    ./nvim
+    #./nixvim
 
-  #] ++ lib.optionals stdenv.isDarwin [ ./nvim ./wezterm ./macos-sops.nix
   ];
-
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    cmus
+    #    cmus
     obsidian
 # utilities
-    glow
+    # glow
     #fm
     #wget
-    entr
-    gum
-    mc
-    hyperfine
+    #entr
+    #gum
+    # mc
+    # hyperfine
 
   # base tools 
     # alacritty
+    # tmux
     # m-cli	
+    # zed-editor
     # niv #nix package manager
   # dev tools
     #	xcbuild
@@ -70,7 +70,7 @@
     # large language model tools
         # aichat
         # mods
-         tgpt
+        # tgpt
         # ollama
     # database
         # duckdb
@@ -86,6 +86,7 @@
     #neovim
     #python3
     #htop
+    # tmux
     #gcc
     #  coreutils
     #eza
@@ -116,11 +117,11 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
-   ]  ++ lib.optionals stdenv.isDarwin [
+   ] ++ lib.optionals stdenv.isDarwin [
     cocoapods
     m-cli # useful macOS CLI commands
   ];
- # Home Manager is pretty good at managing dotfiles. The primary way to manage
+  # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in

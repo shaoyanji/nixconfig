@@ -4,6 +4,11 @@
 		toolbar = true;
 		bookmarks = [
 	{
+			name = "Youtube Proxy";
+			url = "https://inv.nadeko.net/";
+	}
+	{
+		
 		name = "Athena OS";
 		bookmarks = [
 			{

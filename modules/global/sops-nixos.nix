@@ -8,10 +8,9 @@ in
   imports = [ inputs.sops-nix.homeManagerModules.sops ];
   
   sops = {
-    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+    #age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
     #    age.keyFile = "$(getconf DARWIN_USER_TEMP_DIR)/age_keys.txt";
-    #age.keyFile = "$(XDG_RUNTIME_DIR)/secrets.d/age_keys.txt";
-    #age.sshKeyPaths = [ "${ssh_key_path}" ];
+    age.sshKeyPaths = [ "${ssh_key_path}" ];
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles=false;
     secrets= {

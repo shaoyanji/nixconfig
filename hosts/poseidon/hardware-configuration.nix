@@ -27,39 +27,11 @@
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
-  fileSystems."/mnt/w" = {
-    device = "192.168.178.4:/volume1/peachcable";
-    fsType = "nfs";
-    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=90" ];
-  };
- 
-  #fileSystems."/mnt/x" = {
-  #  device = "192.168.178.4:/Shared%20Library";
-  #  fsType = "nfs";
-  #  options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=90" ];
-  #};
-  #  environment.systemPackages = [pkgs.cifs-utils ];
-  #fileSystems."/mnt/y" = {
-  #   device = "//192.168.178.1/fritz.nas/External-USB3-0-01";
-  #  fsType = "cifs";
-    #fsType = "nfs";
-    #device = "192.168.178.1:/fritz.nas/External-USB3-0-01";
-    #    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=5" "username=jisifu" "password=wemetatnachtschicht" ];
-  #      options = let
-        # this line prevents hanging on network split
-  #        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s,devji,users,";
-  #    #  automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-
-  #  in ["${automount_opts},username:jisifu,password:wemetatnachtschicht,rw,noserverino,uid=${toString config.users.users.devji.uid},gid=${toString config.users.groups.users.gid}" ];
-    #     in ["${automount_opts},username:jisifu,password:wemetatnachtschicht,rw,noserverino,uid=1000,gid=100" ];
-  # };
-  #fileSystems."/mnt/z" = {
-  # device = "wetnose@192.168.178.4:/usbshare1";
-  # fsType = "nfs";
-  # options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=90" ];
-    #  };
-  
-
+#  fileSystems."/mnt/w" = {
+#    device = "192.168.178.4:/volume1/peachcable";
+#    fsType = "nfs";
+#    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=90" ];
+#  };
 
 
   swapDevices =

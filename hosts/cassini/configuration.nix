@@ -1,34 +1,9 @@
 { pkgs, lib, config, inputs, ... }:
 {
   imports = [ 
-    #inputs.sops-nix.nixosModules.sops
     ];
-  #sops = {
-  #  defaultSopsFile = ./secrets.yaml;
-  #  validateSopsFiles = false;
-  #  age = {
-  #    sshKeyPaths = ["/var/root/.ssh/id_ed25519"];
-  #    keyFile = "/var/lib/sops-nix/keys.txt";
-  #    generateKey = true;
-  #  };
-  #  secrets = {
-  #    local ={};
-  #  };
-  #};
  # Nix configuration ------------------------------------------------------------------------------
   #
-  nix.settings = {
-    substituters= [
-      "https://cache.nixos.org/"
-    ];
-    trusted-public-keys= [
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-    ];
-      trusted-users = [
-        "@admin"
-      ];
-  };
-
   nix.configureBuildUsers = true;
 
   # Enable experimental nix command and flakes
@@ -138,8 +113,4 @@
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
- 
-      nixpkgs.config.allowUnsupportedSystem = true;
-      nixpkgs.config.allowUnfree = true;
- 
 }

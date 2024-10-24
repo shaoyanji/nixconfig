@@ -4,7 +4,7 @@
 
 	  home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.users.devji = import ./home.nix;
+          home-manager.users.devji = import ./macos-home.nix; #staging point for ./home.nix commons
 	  home-manager.sharedModules = [
 	      #  sops-nix.homeManagerModules.sops
 	    ];

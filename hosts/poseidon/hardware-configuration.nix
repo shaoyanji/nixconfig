@@ -32,7 +32,17 @@
     fsType = "nfs";
     options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
   };
+  fileSystems."/mnt/y" = {
+    device = "//192.168.178.1/fritz.nas/External-USB3-0-01/";
+    fsType = "cifs";
+    options = let
+      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s,user,users";
 
+      in ["${automount_opts},noserverino,rw,username=jisifu"];
+    # or if you have specified `uid` and `gid` explicitly through NixOS configuration,
+    # you can refer to them rather than hard-coding the values:
+    # in ["${automount_opts},credentials=/etc/nixos/smb-secrets,uid=${toString config.users.users.<username>.uid},gid=${toString config.users.groups.<group>.gid}"];
+  };
 
   swapDevices =
     [ { device = "/dev/disk/by-uuid/30fa7541-b3db-442a-8450-105d555e4eba"; }

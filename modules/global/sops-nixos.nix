@@ -10,13 +10,14 @@ in
   sops = {
     age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
     #    age.keyFile = "$(getconf DARWIN_USER_TEMP_DIR)/age_keys.txt";
+    #age.keyFile = "$(XDG_RUNTIME_DIR)/secrets.d/age_keys.txt";
     #age.sshKeyPaths = [ "${ssh_key_path}" ];
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles=false;
     secrets= {
-        # "local/mb1/ssh/private-key"={
-        # path="%r/secrets.d/mb1_ed25519.txt";
-        # };
+         "local/ps1xp/ssh/private-key"={
+         path="%r/secrets.d/ps1xp_ed25519.txt";
+         };
     };
   };
   home.sessionVariables = {

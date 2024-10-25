@@ -3,9 +3,6 @@ let
   ssh_key_path = "${config.home.homeDirectory}/.ssh/id_ed25519";
   sec_yaml_path = ./secrets/secrets.yaml;
   SHELL_DECRYPT = "sec_yaml";
-  #  key_path ='' \$\{pkgs\.sops\}/bin/sops -d --extract '\["keyrepo"\]\["mac"\]' \./secrets/secrets\.yaml'';
-  ############  key_path = ''${pkgs.sops}/bin/sops -d --extract ./secrets/secrets.yaml '';
-  #  key_path ='' ${pkgs.sops}/bin/sops -d --extract "'"["keyrepo"]["mac"]"'" ./secrets/secrets.yaml'';
 in
 {
   imports = [ inputs.sops-nix.homeManagerModules.sops ];
@@ -18,11 +15,11 @@ in
     validateSopsFiles=false;
     secrets= {
        "local/mb1/ssh/private-key"={
-        #path= "${ssh_key_path}";
+          path= "${ssh_key_path}";
         #owner="root";
         #group="wheel";
         #mode="0440";
-          path="%r/secrets.d/mb1_ed25519.txt";
+        #  path="%r/secrets.d/mb1_ed25519.txt";
         };
     };
   };
@@ -43,7 +40,7 @@ in
       sudo ssh $(${pkgs.sops}/bin/sops -d --extract '["server"]["commands"]' ${sec_yaml_path} | ${pkgs.gum}/bin/gum choose) 
     '')
     (pkgs.writeShellScriptBin "reload_keys" ''
-      ${pkgs.sops}/bin/sops -d --extract '["local"]["mb1"]["ssh"]["private-key"]' ${sec_yaml_path} > "ssh_key_path"
+      ${pkgs.sops}/bin/sops -d --extract '["local"]["mb1"]["ssh"]["private-key"]' ${sec_yaml_path} > "${ssh_key_path}"
     '')
       
   ];

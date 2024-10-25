@@ -10,20 +10,21 @@
   packages = with pkgs; [
     cowsay
     lolcat
- # aitools
+# aitools
     #ollama
     #aichat
     tgpt
     #mods
-  # pdf workflow
-     pandoc
-     texlive.combined.scheme-small
-     pdfcpu
-     poppler_utils
-     wkhtmltopdf
+# pdf workflow
+    pandoc
+    texlive.combined.scheme-small
+    pdfcpu
+    poppler_utils
+    wkhtmltopdf
+    mupdf
   ];
   GREETING = "Hello, Nix!";
    shellHook = ''
    echo $GREETING | cowsay | lolcat
-   '';
+  '';
 }

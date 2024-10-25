@@ -17,13 +17,10 @@
 
   imports = [ 
     ./lf
-    ./env.nix #fixing sops for nixos
+    ./env.nix 
     ./shell
-    ./nixvim #for nixos pending migration
-    ./sops-nixos.nix
-    ./browser/firefox.nix
-
-  #] ++ lib.optionals stdenv.isDarwin [ ./nvim ./wezterm ./macos-sops.nix
+    #] ++ [ ./sops-nixos.nix ./nixvim ./browser/firefox.nix
+    ] ++ [ ./nvim ./wezterm ./sops.nix
   ];
 
 

@@ -21,16 +21,16 @@
       { 
         system.configurationRevision = self.rev or self.dirtyRev or null; 
       }
-	./modules/global/global.nix 
+      ./modules/global/global.nix 
     ];
     globalModulesNixos = globalModules ++ [ 
       ./modules/global/nixos.nix
       home-manager.nixosModules.default
     ];
     globalModulesMacos = globalModules ++ [ 
-	./modules/global/macos.nix
-	nix-homebrew.darwinModules.nix-homebrew
-   	home-manager.darwinModules.default
+      ./modules/global/macos.nix
+      nix-homebrew.darwinModules.nix-homebrew
+      home-manager.darwinModules.default
     ];
   in
   {

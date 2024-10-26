@@ -8,18 +8,13 @@ in
   imports = [ inputs.sops-nix.homeManagerModules.sops ];
   
   sops = {
-    #age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-    age.keyFile = "$(getconf DARWIN_USER_TEMP_DIR)/age_keys.txt";
-    #age.sshKeyPaths = [ "${ssh_key_path}" ];
+    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+    # age.sshKeyPaths = [ "${ssh_key_path}" ];
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles=false;
     secrets= {
        "local/mb1/ssh/private-key"={
           path= "${ssh_key_path}";
-        #owner="root";
-        #group="wheel";
-        #mode="0440";
-        #  path="%r/secrets.d/mb1_ed25519.txt";
         };
     };
   };

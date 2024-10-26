@@ -20,8 +20,8 @@
     ./env.nix 
     ./shell
     ./sops.nix
-    #] ++ [ ./nixvim ./browser/firefox.nix
-    ] ++ [ ./nvim ./wezterm 
+    ] ++ [ ./nixvim ./browser/firefox.nix
+    #    ] ++ [ ./nvim ./wezterm 
   ];
 
 

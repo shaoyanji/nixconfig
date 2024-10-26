@@ -1,7 +1,7 @@
 { config, pkgs, inputs, ... }:
 let
-  local_ssh_key= "local/mb1/ssh/private-key";
-  #local_ssh_key= "local/ps1xp/ssh/public-key";
+  #local_ssh_key= "local/mb1/ssh/private-key";
+  local_ssh_key= "local/ps1xp/ssh/private-key";
   ssh_key_path = "${config.home.homeDirectory}/.ssh/id_ed25519";
   age_key_path = "${config.home.homeDirectory}/.config/age/keys.txt";
 in
@@ -13,7 +13,7 @@ in
       keyFile = "${age_key_path}";
       generateKey = true;
     };
-    # age.sshKeyPaths = [ "${ssh_key_path}" ];
+    #    age.sshKeyPaths = [ "${ssh_key_path}" ];
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles=false;
     secrets= {
@@ -44,7 +44,6 @@ in
       sudo mount.cifs //burgernas/Shared\ Library /mnt/x -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
     '')
     (pkgs.writeShellScriptBin "testme" ''
-      ${pkgs.sops}/bin/sops -d --extract '["server"]["keyrepo"]["username"]' ${config.sops.defaultSopsFile}
     '')
       
   ];

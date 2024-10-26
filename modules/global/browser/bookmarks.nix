@@ -5,7 +5,7 @@
 		bookmarks = [
 	{
 			name = "Youtube Proxy";
-			url = "https://inv.nadeko.net/";
+			url = "https://invidious.catspeed.cc";
 	}
 	{
 		

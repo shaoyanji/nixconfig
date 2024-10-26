@@ -6,7 +6,7 @@ keys:
   - &devji age1tsv2lurpjzyx9ng6hcc4dff23lvv7tqkyyxz5zlpx32egu2c9vfql9m008
   - &servermb age1ywan3hwg4v306e3gk4sjzfvjfxru432kgr3xlmwu77nkhgsjmfuqr7lktd
   - &mbdevji age15ptau7jyv6kcwz39vcfzxpw95p97l5r7uywkcl5g83gqxuhh7q4saggagy
-  - &devjiposeidon age1ezs5s0mx7pcmv0cq6lhvxqtrgx9shrenpxuqyny3m52rg4a6vuxq9ucd7c
+  - &sopsposeidon age1q8ddd4upx3y5jjpvepxke9hrngremlu6nzfjqjscnjkuzz8n8y4sjxgty6
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -14,5 +14,5 @@ creation_rules:
       - *devji
       - *servermb
       - *mbdevji
-      - *devjiposeidon
+      - *sopsposeidon
       gpg:

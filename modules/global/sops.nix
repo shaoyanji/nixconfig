@@ -9,15 +9,15 @@ in
   imports = [ inputs.sops-nix.homeManagerModules.sops ];
   
   sops = {
-    age= {
+    age = {
       keyFile = "${age_key_path}";
       generateKey = true;
+      # sshKeyPaths = [ "${ssh_key_path}" ];
     };
-    #    age.sshKeyPaths = [ "${ssh_key_path}" ];
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles=false;
-    secrets= {
-      ${local_ssh_key} = {
+    secrets = {
+      "${local_ssh_key}"={ 
         path= "${ssh_key_path}";
       };
     };
@@ -25,6 +25,7 @@ in
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
+    cifs-utils
         sops
     #   yq
         yq-go
@@ -39,7 +40,7 @@ in
       sudo ssh $(${pkgs.sops}/bin/sops -d --extract '["server"]["commands"]' ${config.sops.defaultSopsFile} | ${pkgs.gum}/bin/gum choose) 
     '')
     (pkgs.writeShellScriptBin "mountnwd" ''
-      sudo mount.cifs //192.168.178.1/fritz.nas/External-USB3-0-01/ /mnt/y -o rw,noserverino,username=jisifu
+      sudo mount.cifs //192.168.178.1/fritz.nas/External-USB3-0-01/ /mnt/y -o rw,noserverino,username=jisifu 
       sudo mount.cifs //burgernas/usbshare1 /mnt/z -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
       sudo mount.cifs //burgernas/Shared\ Library /mnt/x -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
     '')

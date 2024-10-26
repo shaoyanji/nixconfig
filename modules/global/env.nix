@@ -6,7 +6,7 @@
   programs.git = {
     enable=true;
     userName="shaoyanji";
-    userEmail="jisifu@gmail.com";
+    userEmail="100967396+shaoyanji@users.noreply.github.com";
     extraConfig = {
       pull.rebase=false;
     };
@@ -14,12 +14,12 @@
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
-    #    sops #managed by sops module
+    #   sops #managed by sops module
     #   yq
-    #    yq-go#managed by sops module
-    #    pass
-    #    gnupg
-    #    age
+    #   yq-go#managed by sops module
+    #   pass
+    #   gnupg
+    #   age
   ];
   
   home.file={

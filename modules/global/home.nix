@@ -19,8 +19,9 @@
     ./lf
     ./env.nix 
     ./shell
-    #] ++ [ ./sops-nixos.nix ./nixvim ./browser/firefox.nix
-    ] ++ [ ./nvim ./wezterm ./sops.nix
+    ./sops.nix
+    #] ++ [ ./nixvim ./browser/firefox.nix
+    ] ++ [ ./nvim ./wezterm 
   ];
 
 

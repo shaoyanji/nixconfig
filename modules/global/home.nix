@@ -20,8 +20,8 @@
     ./env.nix 
     ./shell
     ./sops.nix
-    ] ++ [ ./nixvim ./browser/firefox.nix
-    #    ] ++ [ ./nvim ./wezterm 
+    # ] ++ [ ./nixvim ./browser/firefox.nix
+    ] ++ [ ./nvim ./wezterm 
   ];
 
 
@@ -117,6 +117,7 @@
    ]  ++ lib.optionals stdenv.isDarwin [
     cocoapods
     m-cli # useful macOS CLI commands
+    wezterm
   ];
  # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.

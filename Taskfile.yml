@@ -9,14 +9,24 @@ menu:
   - nixos-rebuild
   - darwin-rebuild
   - nwmount
+  - browse
   - edit
   - git-quick-push
+  - exit
+browse:
+  - browse-internet
+  - projects
   - exit
 edit:
   - edit-secrets
   - edit-sops
   - edit-sops-config
   - edit-home-manager
+  - exit
+update:
+  - update-flake
+  - update-sops
+  - exit
 tasks:
   default:
     cmds:
@@ -33,6 +43,15 @@ tasks:
       - sudo mount.cifs //192.168.178.1/fritz.nas/External-USB3-0-01/ /mnt/y -o rw,noserverino,username=jisifu 
       - sudo mount.cifs //burgernas/usbshare1 /mnt/z -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
       - sudo mount.cifs //burgernas/Shared\ Library /mnt/x -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
+  browse:
+    cmds:
+      - task $(cat Taskfile.yml | yq '.browse.[]' | gum choose )
+  browse-internet:
+    cmds:
+      - open https://duckduckgo.com
+  browse-projects:
+    cmds:
+      - open https://shaoyanji.github.io
   edit:
     cmds:
       - task $(cat Taskfile.yml | yq '.edit.[]' | gum choose )
@@ -42,6 +61,7 @@ tasks:
   edit-sops:
     cmds:
       - nvim .sops.yaml
+      - task updatekeys-sops
   edit-sops-config:
     cmds:
       - nvim ./modules/global/sops.nix
@@ -53,6 +73,15 @@ tasks:
       - git add .
       - 'git commit -m "chore: update"'
       - git push -u
+  update:
+    cmds:
+      - task $(cat Taskfile.yml | yq '.update.[]' | gum choose )
+  update-flake:
+    cmds:
+      - nix flake update
+  updatekeys-sops:
+    cmds:
+      - sops updatekeys ./modules/global/secrets/secrets.yaml
   exit:
     cmds:
       - exit

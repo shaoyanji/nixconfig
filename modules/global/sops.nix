@@ -1,7 +1,7 @@
 { config, pkgs, inputs, ... }:
 let
-  #local_ssh_key= "local/mb1/ssh/private-key";
-  local_ssh_key= "local/ps1xp/ssh/private-key";
+  local_ssh_key= "local/mb1/ssh/private-key";
+  #local_ssh_key= "local/ps1xp/ssh/private-key";
   ssh_key_path = "${config.home.homeDirectory}/.ssh/id_ed25519";
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 in
@@ -16,12 +16,12 @@ in
     };
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles=false;
-    secrets."${local_ssh_key}".path= "${ssh_key_path}";
+    secrets."${local_ssh_key}".path = "${ssh_key_path}";
   };
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
-    cifs-utils
+    #cifs-utils
     sops
     #   yq
     yq-go
@@ -41,6 +41,7 @@ in
       sudo mount.cifs //burgernas/Shared\ Library /mnt/x -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
     '')
     (pkgs.writeShellScriptBin "testme" ''
+
     '')
       
   ];

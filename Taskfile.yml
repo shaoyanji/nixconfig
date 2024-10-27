@@ -4,16 +4,24 @@ version: '3'
 
 vars:
   GREETING: Hello, World!
-  X_PATH: 
-  Y_PATH: 
-  Z_PATH: 
-  KEYREPO_PW:
 
 menu:
-   - nixos-rebuild
-   - darwin-rebuild
-   - nwmount
+  - nixos-rebuild
+  - darwin-rebuild
+  - nwmount
+  - edit
+  - git-quick-push
+  - exit
+edit:
+  - edit-secrets
+  - edit-sops
+  - edit-sops-config
+  - edit-home-manager
 tasks:
+  default:
+    cmds:
+      - task $(cat Taskfile.yml | yq '.menu.[]' | gum choose )
+    silent: true
   nixos-rebuild:
     cmds:
       - sudo nixos-rebuild switch --flake ~/nixconfig#
@@ -25,4 +33,26 @@ tasks:
       - sudo mount.cifs //192.168.178.1/fritz.nas/External-USB3-0-01/ /mnt/y -o rw,noserverino,username=jisifu 
       - sudo mount.cifs //burgernas/usbshare1 /mnt/z -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
       - sudo mount.cifs //burgernas/Shared\ Library /mnt/x -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
- 
+  edit:
+    cmds:
+      - task $(cat Taskfile.yml | yq '.edit.[]' | gum choose )
+  edit-secrets:
+    cmds:
+      - sops edit ./modules/global/secrets/secrets.yaml
+  edit-sops:
+    cmds:
+      - nvim .sops.yaml
+  edit-sops-config:
+    cmds:
+      - nvim ./modules/global/sops.nix
+  edit-home-manager:
+    cmds:
+      - nvim ./modules/global/home.nix
+  git-quick-push:
+    cmds:
+      - git add .
+      - 'git commit -m "chore: update"'
+      - git push -u
+  exit:
+    cmds:
+      - exit

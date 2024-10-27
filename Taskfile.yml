@@ -6,14 +6,18 @@ vars:
   GREETING: Hello, World!
 
 menu:
-  - nixos-rebuild
-  - darwin-rebuild
+  - rebuild
   - nwmount
   - browse
   - edit
   - git-quick-push
   - exit
+rebuild:
+  - nixos-rebuild
+  - darwin-rebuild
+  - exit
 browse:
+  - browse-notes
   - browse-internet
   - projects
   - exit
@@ -32,6 +36,9 @@ tasks:
     cmds:
       - task $(cat Taskfile.yml | yq '.menu.[]' | gum choose )
     silent: true
+  rebuild:
+    cmds:
+      - task $(cat Taskfile.yml | yq '.rebuild.[]' | gum choose )
   nixos-rebuild:
     cmds:
       - sudo nixos-rebuild switch --flake ~/nixconfig#
@@ -46,6 +53,9 @@ tasks:
   browse:
     cmds:
       - task $(cat Taskfile.yml | yq '.browse.[]' | gum choose )
+  browse-notes:
+    cmds:
+      - nvim ~/Documents/Obsidian-Git-Sync/
   browse-internet:
     cmds:
       - open https://duckduckgo.com

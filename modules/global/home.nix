@@ -36,12 +36,12 @@
     #wget
     entr
     gum
+    go-task
     mc
     hyperfine
 
   # base tools 
     # alacritty
-    # m-cli	
     # niv #nix package manager
   # dev tools
     #	xcbuild

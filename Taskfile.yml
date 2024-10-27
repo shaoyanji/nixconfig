@@ -1,0 +1,28 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+  X_PATH: 
+  Y_PATH: 
+  Z_PATH: 
+  KEYREPO_PW:
+
+menu:
+   - nixos-rebuild
+   - darwin-rebuild
+   - nwmount
+tasks:
+  nixos-rebuild:
+    cmds:
+      - sudo nixos-rebuild switch --flake ~/nixconfig#
+  darwin-rebuild:
+    cmds:
+      - darwin-rebuild switch --flake ~/.config/nix-darwin#
+  nwmount:
+    cmds:
+      - sudo mount.cifs //192.168.178.1/fritz.nas/External-USB3-0-01/ /mnt/y -o rw,noserverino,username=jisifu 
+      - sudo mount.cifs //burgernas/usbshare1 /mnt/z -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
+      - sudo mount.cifs //burgernas/Shared\ Library /mnt/x -o rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt
+ 

@@ -11,61 +11,102 @@ let
   };
 in
 {
-  programs.zsh = {
-    enable = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-    enableCompletion = true;
-    shellAliases = myAliases;
-    oh-my-zsh = {
-      enable = true;
-      plugins = [
-        "git"
-        #"kubectl"
-        #"docker"
-        #"helm"
-        "aliases"
-        "alias-finder"
-        "colored-man-pages"
-        "vi-mode"
-      ];
-    };
-  };
-  #  imports = [ ./shells/fish ];
-  programs.bash = {
-    enable = true;
-    shellAliases = myAliases;
-    bashrcExtra = ''
-    	source $HOME/.bash_aliases
-	eval "$(fzf --bash)"
-	eval "$(zoxide init bash)"
-        eval "$(starship init bash)"
-    '';
-  };
-  programs.starship = {
-    enable = true;
-    # Configuration written to ~/.config/starship.toml
-    settings = {
-      # add_newline = false;
-       character = {
-         success_symbol = "[➜](bold green)";
-         error_symbol = "[➜](bold red)";
-       };
-      # package.disabled = true;
-    };
-  };
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-  };
-  programs.zoxide = {
-    enable = true;
-    options = [
-      "--cmd cd"
-        ];
-  };
-  programs.fzf.enable = true;
+  programs={
+    nushell={
+      enable=true;
+      extraConfig = ''
+        let carapace_completer = {|spans|
+        carapace $spans.0 nushell $spans | from json
+        }
+        $env.config = {
+         show_banner: false,
+         history: {
+          max_size: 100_000 # Session has to be reloaded for this to take effect
+          sync_on_enter: true # Enable to share history between multiple sessions, else you have to close the session to write history to file
+          file_format: "sqlite" # "sqlite" or "plaintext"
+          isolation: false # only available with sqlite file_format. true enables history isolation, false disables it. true will allow the history to be isolated to the current session using up/down arrows. false will allow the history to be shared across all sessions.
+         }
+         completions: {
+         case_sensitive: false # case-sensitive completions
+         quick: true    # set to false to prevent auto-selecting completions
+         partial: true    # set to false to prevent partial filling of the prompt
+         algorithm: "fuzzy"    # prefix or fuzzy
+         external: {
+         # set to false to prevent nushell looking into $env.PATH to find more suggestions
+             enable: true 
+         # set to lower can improve completion performance at the cost of omitting some options
+             max_results: 100 
+             completer: $carapace_completer # check 'carapace_completer' 
+           }
+         }
 
+
+
+        } 
+        $env.PATH = ($env.PATH | 
+        split row (char esep) |
+        prepend /home/devji/.apps |
+        append /usr/bin/env
+        )
+        '';
+    };
+    carapace.enable = true;
+    carapace.enableNushellIntegration = true;
+    zsh = {
+      enable = true;
+      autosuggestion.enable = true;
+      syntaxHighlighting.enable = true;
+      enableCompletion = true;
+      shellAliases = myAliases;
+      oh-my-zsh = {
+        enable = true;
+        plugins = [
+          "git"
+          #"kubectl"
+          #"docker"
+          #"helm"
+          "aliases"
+          "alias-finder"
+          "colored-man-pages"
+          "vi-mode"
+        ];
+      };
+    };
+    #  imports = [ ./shells/fish ];
+    bash = {
+      enable = true;
+      shellAliases = myAliases;
+      bashrcExtra = ''
+      	source $HOME/.bash_aliases
+          eval "$(fzf --bash)"
+          eval "$(zoxide init bash)"
+          eval "$(starship init bash)"
+      '';
+    };
+    starship = {
+      enable = true;
+      # Configuration written to ~/.config/starship.toml
+      settings = {
+        # add_newline = false;
+         character = {
+           success_symbol = "[➜](bold green)";
+           error_symbol = "[➜](bold red)";
+         };
+        # package.disabled = true;
+      };
+    };
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+    zoxide = {
+      enable = true;
+      options = [
+        "--cmd cd"
+          ];
+    };
+    fzf.enable = true;
+  };
   home.packages = with pkgs;
     [
       thefuck
@@ -77,7 +118,6 @@ in
       zsh-fzf-tab
       bat
       eza
-      starship
       tgpt
     ];
 

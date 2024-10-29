@@ -26,6 +26,7 @@ edit:
   - edit-sops
   - edit-sops-config
   - edit-home-manager
+  - edit-shell-config
   - exit
 update:
   - update-flake
@@ -78,6 +79,9 @@ tasks:
   edit-home-manager:
     cmds:
       - nvim ./modules/global/home.nix
+  edit-shell-config:
+    cmds:
+      - nvim ./modules/global/shell/default.nix
   git-quick-push:
     cmds:
       - git add .

@@ -13,10 +13,23 @@
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    nuenv.url = "github:DeterminateSystems/nuenv";
+    nuenv.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager, nixvim, sops-nix, ... }@inputs :
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager, nixvim, sops-nix, nuenv, ... }@inputs :
   let
+    overlays = [ inputs.nuenv.overlays.default ];
+    systems= [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+    forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f {
+      inherit system;
+      pkgs = import nixpkgs { inherit overlays system; };
+    });
     globalModules = [ 
       { 
         system.configurationRevision = self.rev or self.dirtyRev or null; 

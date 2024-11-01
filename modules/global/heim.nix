@@ -3,8 +3,8 @@
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  #  home.username = "devji";
-  #  home.homeDirectory= "/Users/devji";
+  home.username = "devji";
+  home.homeDirectory= "/home/devji";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -19,7 +19,7 @@
     ./lf
     ./env.nix 
     ./shell
-    ./sops.nix
+    #    ./sops.nix
         ] ++ [ ./nixvim ./browser/firefox.nix
     #] ++ [ ./nvim ./wezterm 
   ];
@@ -29,7 +29,7 @@
   # environment.
   home.packages = with pkgs; [
     cmus
-    obsidian
+    #obsidian
 # utilities
     glow
     #fm
@@ -106,7 +106,7 @@
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
     # # fonts?
-    (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    #    (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
 
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your

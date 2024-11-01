@@ -33,18 +33,18 @@
   # Apps
   # `home-manager` currently has issues adding them to `~/Applications`
   # Issue: https://github.com/nix-community/home-manager/issues/1341
-  environment.systemPackages = with pkgs; [
-  ];
+  #  environment.systemPackages = with pkgs; [
+  #];
 
   # https://github.com/nix-community/home-manager/issues/423
-  environment.variables = {
-  };
+  #environment.variables = {
+  #};
   #  programs.nix-index.enable = true;
 
   # Fonts
-  fonts.packages = [
-    (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
-  ];
+  #fonts.packages = [
+  #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
+  #];
       nixpkgs.config.allowUnsupportedSystem = true;
       nixpkgs.config.allowUnfree = true;
 }

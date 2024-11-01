@@ -45,8 +45,18 @@
       nix-homebrew.darwinModules.nix-homebrew
       home-manager.darwinModules.default
     ];
+    globalModulesHome = globalModules ++ [ 
+      ./modules/global/heim.nix
+    ];
   in
   {
+    homeConfigurations = {
+      heim = home-manager.lib.homeManagerConfiguration {
+        extraSpecialArgs = { inherit inputs; };
+        pkgs = nixpkgs.legacyPackages."x86_64-linux";
+        modules = globalModulesHome ++ [] ;
+      };
+    };
     nixosConfigurations = {
       poseidon = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";

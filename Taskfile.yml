@@ -57,7 +57,7 @@ tasks:
       - task $(cat Taskfile.yml | yq '.browse.[]' | gum choose )
   browse-notes:
     cmds:
-      - nvim ~/Documents/Obsidian-Git-Sync/
+      - nvim ~/Documents/Obsidian-Git-Sync/quicknote.md
   browse-internet:
     cmds:
       - open https://duckduckgo.com

@@ -4,8 +4,17 @@
 		toolbar = true;
 		bookmarks = [
 	{
-			name = "Youtube Proxy";
+		name = "YT Proxy";
+		bookmarks = [
+			{
+			name = "inv";
+			url = "https://inv.nadeko.net/";
+			}
+			{
+			name = "catspeed";
 			url = "https://invidious.catspeed.cc";
+			}
+		];
 	}
 	{
 		

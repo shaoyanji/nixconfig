@@ -13,11 +13,20 @@
     supportedFilesystems = [ "nfs" ];
     kernelModules = [ "kvm-amd" "nfs" ];
   };
-  boot.extraModulePackages = [ ];
+  #  boot.extraModulePackages = [ ];
+  boot.extraModulePackages = with config.boot.kernelPackages;
+[ v4l2loopback.out ];
+boot.kernelModules = [
+  "v4l2loopback"
+];
+boot.extraModprobeConfig = ''
+  options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
+'';
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/292db143-7e80-45c4-b940-34d77e58b5c7";
       fsType = "ext4";
     };
+
   boot.initrd.luks.devices."luks-a03ed119-37a7-4609-aca5-679ba0eccddf".device = "/dev/disk/by-uuid/a03ed119-37a7-4609-aca5-679ba0eccddf";
   boot.initrd.luks.devices."luks-d8c4ffdb-dd14-4836-9e1b-6c400362987d".device = "/dev/disk/by-uuid/d8c4ffdb-dd14-4836-9e1b-6c400362987d";
 

@@ -128,6 +128,9 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
   #  wget
   kitty
   cifs-utils
+  ffmpeg
+  gphoto2
+  mpv
 #  nfs-utils
   ];
 

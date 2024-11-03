@@ -16,6 +16,7 @@
   home.stateVersion = "24.11"; # Please read the comment before changing.
 
   imports = [ 
+    ./hyprland.nix
     ./lf
     ./env.nix 
     ./shell
@@ -30,6 +31,10 @@
   home.packages = with pkgs; [
     cmus
     obsidian
+# nix formatting
+    #nixfmt-rfc-style
+    #alejandra
+    #nixpkgs-fmt
 # utilities
     glow
     #fm

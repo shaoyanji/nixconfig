@@ -10,8 +10,6 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       ./steam.nix
-      #            ./hyprland.nix
-      #      ./sops.nix
     ];
   nix.settings.experimental-features = [ "nix-command" "flakes"];
   # Bootloader.
@@ -57,17 +55,16 @@
     wayland.enable = true;
  };
  programs.hyprland = {
-   enable = true;
-   # set the flake package
-   package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-   # make sure to also set the portal package, so that they are in sync
-   portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    enable = true;
+    # set the flake package
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    # make sure to also set the portal package, so that they are in sync
+    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    xwayland.enable = true;
  };
 
   # Optional, hint Electron apps to use Wayland:
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
-
-
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -111,11 +108,6 @@
     ];
     #macbook access
     packages = with pkgs; [
-    dolphin
-    wofi
-    sway
-    waybar
-
     #  kdePackages.kate
     #  thunderbird
     ];

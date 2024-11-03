@@ -81,6 +81,24 @@
         # rust_analyzer = {
         #  enable = true;
         #}
+        nixd = {
+          enable = true;
+          settings = {
+            nixd = {
+              nixpkgs = {
+                expr = "import <nixpkgs> {}";
+              };
+              formatting = {
+                command = "${pkgs.alejandra}/bin/alejandra";
+              };
+              options = {
+                nixpkgs = {
+                  expr = "import <nixpkgs> {}";
+                };
+              };
+            };
+          };
+        };
         # ...etc. See `https://nix-community.github.io/nixvim/plugins/lsp` for a list of pre-configured LSPs
         #
         # Some languages (like typscript) have entire language plugins that can be useful:

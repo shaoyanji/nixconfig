@@ -19,13 +19,15 @@
     nuenv.url = "github:DeterminateSystems/nuenv";
     nuenv.inputs.nixpkgs.follows = "nixpkgs";
     hyprland.url = "github:hyprwm/Hyprland";
+    hyprland-plugins.url = "github:hyprwm/hyprland-plugins";
+    hyprland-plugins.inputs.hyprland.follows = "hyprland";
     hyprpaper = {
       url = "github:hyprwm/hyprpaper";
       inputs.hyprland.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager, nixvim, sops-nix, nuenv, hyprland, hyprpaper,... }@inputs :
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins, hyprpaper, ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];
     systems= [

@@ -26,7 +26,12 @@
     auto-optimise-store = true
     experimental-features = nix-command flakes
   '';
-
+  nix.nixPath = [
+    "nixpkgs=${pkgs.path}"
+  ];
+  environment.systemPackages = with pkgs; [
+    nixd
+  ];
   # Create /etc/bashrc that loads the nix-darwin environment.
   #programs.zsh.enable = true;
 

@@ -1,6 +1,7 @@
 { config, pkgs, inputs, ... }:
-
 {
+    imports = [
+    ];
     home-manager= {
         useGlobalPkgs = true;
         useUserPackages = true;

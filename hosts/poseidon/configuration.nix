@@ -10,14 +10,16 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       ./steam.nix
+      #            ./hyprland.nix
       #      ./sops.nix
     ];
-nix.settings.experimental-features = [ "nix-command" "flakes"];
+  nix.settings.experimental-features = [ "nix-command" "flakes"];
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   networking.hostName = "poseidon"; # Define your hostname.
 	#   networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  services.xserver.digimend.enable = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -49,17 +51,21 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
 # services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
- # services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-   services.displayManager.sddm = {
-      enable = true;
-      wayland.enable = true;
-    };
-#  programs.hyprland.enable = true; # enable Hyprland
-#  programs.hyprland.package = inputs.hyprland.packages."${pkgs.system}".hyprland;
+ #services.desktopManager.plasma6.enable = true;
+ services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+ };
+ programs.hyprland = {
+   enable = true;
+   # set the flake package
+   package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+   # make sure to also set the portal package, so that they are in sync
+   portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+ };
 
   # Optional, hint Electron apps to use Wayland:
- #  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
 
 
@@ -101,10 +107,15 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
     extraGroups = [ "networkmanager" "wheel" ];
     hashedPassword = "$6$.MwUydqIuXNoHXxy$8N0tM2mWOStiuDEkDw/wBCwg73PTKGY24G7huRi3gn0GJPW.o9d4eEseTmB7KXxlOtUG06fNgQwTmEkAYkS.a.";
     openssh.authorizedKeys.keys = [
-	"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
     ];
     #macbook access
     packages = with pkgs; [
+    dolphin
+    wofi
+    sway
+    waybar
+
     #  kdePackages.kate
     #  thunderbird
     ];
@@ -131,6 +142,7 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
   ffmpeg
   gphoto2
   mpv
+  config.boot.kernelPackages.digimend
 #  nfs-utils
   ];
 

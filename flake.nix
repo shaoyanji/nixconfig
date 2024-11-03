@@ -1,5 +1,8 @@
 {
-  description = "Working Darwin system flake using Determinate and SSL hack";
+  description = "
+  hyprland configuration
+  Working Darwin system flake using Determinate and SSL hack
+  ";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -15,9 +18,14 @@
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     nuenv.url = "github:DeterminateSystems/nuenv";
     nuenv.inputs.nixpkgs.follows = "nixpkgs";
+    hyprland.url = "github:hyprwm/Hyprland";
+    hyprpaper = {
+      url = "github:hyprwm/hyprpaper";
+      inputs.hyprland.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager, nixvim, sops-nix, nuenv, ... }@inputs :
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager, nixvim, sops-nix, nuenv, hyprland, hyprpaper,... }@inputs :
   let
     overlays = [ inputs.nuenv.overlays.default ];
     systems= [
@@ -71,7 +79,8 @@
       cassini = nix-darwin.lib.darwinSystem {
 	system = "aarch64-darwin";
 	specialArgs = { inherit inputs; };
-	modules = globalModulesMacos ++ [ ./hosts/cassini/configuration.nix];
+	modules = globalModulesMacos
+          ++ [ ./hosts/cassini/configuration.nix];
       };
     };
     

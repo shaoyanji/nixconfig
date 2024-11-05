@@ -55,7 +55,9 @@
       nix-homebrew.darwinModules.nix-homebrew
       home-manager.darwinModules.default
     ];
-    globalModulesHome = globalModules ++ [ 
+    globalModulesHome = 
+    #globalModules ++ 
+    [ 
       ./modules/global/heim.nix
     ];
   in

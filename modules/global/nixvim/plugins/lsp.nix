@@ -85,9 +85,6 @@
           enable = true;
           settings = {
             nixd = {
-              nixpkgs = {
-                expr = "import <nixpkgs> {}";
-              };
               formatting = {
                 command = "${pkgs.alejandra}/bin/alejandra";
               };
@@ -231,16 +228,16 @@
       #  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       #  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       # NOTE: This is done automatically by Nixvim when enabling cmp-nvim-lsp below is an example if you did want to add new capabilities
-      #capabilities = ''
-      #  capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-      #'';
+      capabilities = /*lua*/ ''
+        capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      '';
 
       # This function gets run when an LSP attaches to a particular buffer.
       #   That is to say, every time a new file is opened that is associated with
       #   an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
       #   function will be executred to configure the current buffer
       # NOTE: This is an example of an attribute that takes raw lua
-      onAttach = ''
+      onAttach = /*lua*/ ''
         -- NOTE: Remember that Lua is a real programming language, and as such it is possible
         -- to define small helper and utility functions so you don't have to repeat yourself.
         --

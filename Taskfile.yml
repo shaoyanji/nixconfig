@@ -15,6 +15,7 @@ menu:
 rebuild:
   - nixos-rebuild
   - darwin-rebuild
+  - home-manager
   - exit
 browse:
   - browse-notes
@@ -48,6 +49,9 @@ tasks:
   darwin-rebuild:
     cmds:
       - darwin-rebuild switch --flake ~/.config/nix-darwin#
+  home-manager:
+    cmds:
+      - home-manager switch --flake ~/nixconfig#heim
   nwmount:
     cmds:
       - sudo mount.cifs //192.168.178.1/fritz.nas/External-USB3-0-01/ /mnt/y -o rw,noserverino,username=jisifu 

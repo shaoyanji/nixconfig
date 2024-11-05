@@ -6,10 +6,17 @@
   pkgs.mkShell
 # pkgs.mkShellNoCC 
 {
-  
+  nativeBuildInputs = with pkgs; [
+  ];
   packages = with pkgs; [
     cowsay
     lolcat
+    (python310.withPackages (ps: with ps; [
+      flask
+      fuzzywuzzy
+      markdown2
+      python-dotenv
+    ]))
     #    oh-my-posh 
     fzf
     zoxide
@@ -28,8 +35,6 @@
 	    #	nodePackages.node2nix
 	    #	go
   # shell tools
-    # minimalistic jobby tools
-    helix
     fastfetch
     hyperfine
     lf
@@ -39,22 +44,12 @@
     tgpt
     #sops
     #mods
-  # pdf workflow
-     pandoc
-     texlive.combined.scheme-small
-    # tgpt
-     pdfcpu
-     poppler_utils
-    # wkhtmltopdf
   ];
   GREETING = "Hello, Nix!";
-   shellHook = ''
+   shellHook = /*bash*/ ''
    #zsh
-   export EDITOR='hx'
-   #  
    eval "$(zoxide init bash)"
    eval "$(fzf --bash)"
-   #   eval "$(oh-my-posh init bash --config ~/${pkgs.oh-my-posh}/share/oh-my-posh/themes/catppuccin.omp.json)"
    0file() { curl -F"file=@$1" https://envs.sh ; }
    0pb() { curl -F"file=@-;" https://envs.sh ; }
    0url() { curl -F"url=$1" https://envs.sh ; }

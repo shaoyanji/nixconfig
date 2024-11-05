@@ -1,51 +1,31 @@
 { config, pkgs, lib,  ... }:
 
 {
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
-  #  home.username = "devji";
-  #  home.homeDirectory= "/Users/devji";
-
-  # This value determines the Home Manager release that your configuration is
-  # compatible with. This helps avoid breakage when a new Home Manager release
-  # introduces backwards incompatible changes.
-  #
-  # You should not change this value, even if you update Home Manager. If you do
-  # want to update the value, then make sure to first check the Home Manager
-  # release notes.
-  home.stateVersion = "24.11"; # Please read the comment before changing.
-
   imports = [ 
-    #./hyprland.nix
-    ./lf
-    ./env.nix 
-    ./shell
-    ./sops.nix
-        ] ++ [ ./nixvim 
-    #./browser/firefox.nix
-    ] ++ [ ./wezterm 
-      #  ./nvim
+    ./home.nix
+    ./hyprland.nix
+        ] ++ [ ./nixvim ./browser/firefox.nix
   ];
 
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    cmus
-    obsidian
+    #cmus
+    #obsidian
 # nix formatting
     #nixfmt-rfc-style
     #alejandra
     #nixpkgs-fmt
 # utilities
-    glow
+    #glow
     #fm
     #wget
-    entr
-    gum
-    go-task
-    mc
-    hyperfine
+    #entr
+    #gum
+    #go-task
+    #mc
+    #hyperfine
 
   # base tools 
     # alacritty
@@ -75,7 +55,7 @@
     # large language model tools
         # aichat
         # mods
-         tgpt
+    #         tgpt
         # ollama
     # database
         # duckdb
@@ -113,7 +93,7 @@
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
     # # fonts?
-    (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    #(pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
 
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your
@@ -121,10 +101,10 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
-   ]  ++ lib.optionals stdenv.isDarwin [
-    cocoapods
-    m-cli # useful macOS CLI commands
-    wezterm
+    #]  ++ lib.optionals stdenv.isDarwin [
+    #cocoapods
+    #m-cli # useful macOS CLI commands
+    #wezterm
   ];
  # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -161,5 +141,5 @@
    };
 
   # Let Home Manager install and manage itself.
-    programs.home-manager.enable = true;
+  #  programs.home-manager.enable = true;
 }

@@ -35,7 +35,7 @@
     # Add your plugins to ./plugins/custom/plugins and import them below
      ./plugins/custom/plugins
      ./plugins/custom/plugins/supermaven.nix
-     ./plugins/custom/plugins/otter.nix
+    #     ./plugins/custom/plugins/otter.nix
   ];
 
   /*

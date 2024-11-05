@@ -33,7 +33,7 @@
         "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
       ];
       monitor = [
-        "eDP-1,disabled,auto,auto"
+        "eDP-1,preferred,auto,auto"
         "HDMI-1,preferred,auto,auto"
       ];
       general = {

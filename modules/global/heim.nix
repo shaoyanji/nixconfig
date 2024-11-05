@@ -19,7 +19,7 @@
     ./lf
     ./env.nix 
     ./shell
-    #    ./sops.nix
+    ./sops.nix
         ] ++ [ ./nixvim ./browser/firefox.nix
     #] ++ [ ./nvim ./wezterm 
   ];
@@ -28,6 +28,9 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    yq-go
+
+
     cmus
     #obsidian
 # utilities

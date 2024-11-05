@@ -19,7 +19,7 @@
     ./lf
     ./env.nix 
     ./shell
-    ./sops.nix
+#    ./sops.nix
         ] ++ [ ./nixvim ./browser/firefox.nix
     #] ++ [ ./nvim ./wezterm 
   ];

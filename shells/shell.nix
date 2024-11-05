@@ -52,10 +52,6 @@
    #zsh
    export EDITOR='hx'
    #  
-   #   alias loadapi='export $(sops -d $HOME/secrets/api.env)'
-   #   alias unloadapi='export $(cat $HOME/secrets/api.env)'
-   #   export SOPS_AGE_KEY_FILE="/Volumes/FRITZ.NAS/External-USB3-0-01/documents/age-key.txt"
-   #   export SOPS_AGE_RECIPIENT="age1tsv2lurpjzyx9ng6hcc4dff23lvv7tqkyyxz5zlpx32egu2c9vfql9m008"
    eval "$(zoxide init bash)"
    eval "$(fzf --bash)"
    #   eval "$(oh-my-posh init bash --config ~/${pkgs.oh-my-posh}/share/oh-my-posh/themes/catppuccin.omp.json)"

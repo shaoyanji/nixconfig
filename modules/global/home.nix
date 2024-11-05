@@ -16,13 +16,15 @@
   home.stateVersion = "24.11"; # Please read the comment before changing.
 
   imports = [ 
-    ./hyprland.nix
+    #./hyprland.nix
     ./lf
     ./env.nix 
     ./shell
     ./sops.nix
-        ] ++ [ ./nixvim ./browser/firefox.nix
-    #] ++ [ ./nvim ./wezterm 
+        ] ++ [ ./nixvim 
+    #./browser/firefox.nix
+    ] ++ [ ./wezterm 
+      #  ./nvim
   ];
 
 

@@ -22,6 +22,7 @@ browse:
   - projects
   - exit
 edit:
+  - edit-taskfile
   - edit-global
   - edit-secrets
   - edit-sops
@@ -57,7 +58,7 @@ tasks:
       - task $(cat Taskfile.yml | yq '.browse.[]' | gum choose )
   browse-notes:
     cmds:
-      - nvim ~/Documents/Obsidian-Git-Sync/quicknote.md
+      - $EDITOR ~/Documents/Obsidian-Git-Sync/quicknote.md
   browse-internet:
     cmds:
       - open https://duckduckgo.com
@@ -67,25 +68,28 @@ tasks:
   edit:
     cmds:
       - task $(cat Taskfile.yml | yq '.edit.[]' | gum choose )
+  edit-taskfile:
+    cmds:
+      - sops edit ./modules/global/secrets/Taskfile.yaml
   edit-global:
     cmds:
-      - nvim ./modules/global/global.nix
+      - $EDITOR ./modules/global/global.nix
   edit-secrets:
     cmds:
       - sops edit ./modules/global/secrets/secrets.yaml
   edit-sops:
     cmds:
-      - nvim .sops.yaml
+      - $EDITOR .sops.yaml
       - task updatekeys-sops
   edit-sops-config:
     cmds:
-      - nvim ./modules/global/sops.nix
+      - $EDITOR ./modules/global/sops.nix
   edit-home-manager:
     cmds:
-      - nvim ./modules/global/home.nix
+      - $EDITOR ./modules/global/home.nix
   edit-shell-config:
     cmds:
-      - nvim ./modules/global/shell/default.nix
+      - $EDITOR ./modules/global/shell/default.nix
   git-quick-push:
     cmds:
       - git add .

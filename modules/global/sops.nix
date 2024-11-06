@@ -1,7 +1,7 @@
 { config, pkgs, inputs, ... }:
 let
-  #local_ssh_key= "local/mb1/ssh/private-key";
-  local_ssh_key= "local/ps1xp/ssh/private-key";
+  local_ssh_key= "local/mb1/ssh/private-key";
+  #local_ssh_key= "local/ps1xp/ssh/private-key";
   ssh_key_path = "${config.home.homeDirectory}/.ssh/id_ed25519";
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   taskfile_path = ./secrets/Taskfile.yaml;
@@ -34,7 +34,7 @@ in
       sudo ssh $(${pkgs.sops}/bin/sops -d --extract '["server"]["commands"]' ${config.sops.defaultSopsFile} | ${pkgs.gum}/bin/gum choose) 
     '')
     (pkgs.writeShellApplication {
-      name = "taskfile";
+      name = "load-taskfile";
       runtimeInputs = [ pkgs.sops ];
       text = ''
         ${pkgs.sops}/bin/sops -d ${taskfile_path} > ./Taskfile.yml

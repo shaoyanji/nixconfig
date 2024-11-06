@@ -5,11 +5,11 @@
 #      vim-nix
       supermaven-nvim
     ];
-    extraConfigLuaPre =''
+    extraConfigLuaPre = /*lua*/ ''
       require("supermaven-nvim").setup({
         keymaps = {
-          accept_suggestion = "<Tab>",
-          clear_suggestion = "<C-]>",
+          accept_suggestion = "<C-CR>",
+          clear_suggestion = "<C-k>",
           accept_word = "<C-j>",
         },
         ignore_filetypes = { cpp = true }, -- or { "cpp", }

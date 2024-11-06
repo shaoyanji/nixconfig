@@ -34,7 +34,8 @@
       ];
       monitor = [
         "HDMI-1,preferred,auto,auto"
-        "eDP-1,disabled,auto,auto"
+        "eDP-1,preferred,auto,auto"
+        #"eDP-1,disabled,auto,auto"
       ];
       general = {
         gaps_in = 5;

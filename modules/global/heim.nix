@@ -19,7 +19,12 @@
     ./home.nix
     ./browser/firefox.nix
   ];
+  
+  nixpkgs.config.allowUnfree = true;
 
+  #nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+  #           "obsidian"
+  #         ];
 
   # The home.packages option allows you to install Nix packages into your
   # environment.

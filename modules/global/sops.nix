@@ -1,6 +1,6 @@
 { config, pkgs, inputs, ... }:
 let
-  local_ssh_key= "local/mb1/ssh/private-key";
+  #local_ssh_key= "local/mb1/ssh/private-key";
   #local_ssh_key= "local/ps1xp/ssh/private-key";
   #local_ssh_key= "local/bizmac/ssh/private-key";
   ssh_key_path = "${config.home.homeDirectory}/.ssh/id_ed25519";
@@ -18,7 +18,7 @@ in
     };
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles=false;
-    secrets."${local_ssh_key}".path = "${ssh_key_path}";
+    #secrets."${local_ssh_key}".path = "${ssh_key_path}";
   };
   home.sessionVariables = {
   };

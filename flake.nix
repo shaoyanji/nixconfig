@@ -72,18 +72,24 @@
     nixosConfigurations = {
       poseidon = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-	specialArgs = { inherit inputs; };
+	      specialArgs = { inherit inputs; };
         modules = globalModulesNixos
           ++ [ ./hosts/poseidon/configuration.nix ];
+      };
+      aceofspades = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+	      specialArgs = { inherit inputs; };
+        modules = globalModulesNixos
+          ++ [ ./hosts/aceofspades/configuration.nix ];
       };
     };
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#
     darwinConfigurations={
       cassini = nix-darwin.lib.darwinSystem {
-	system = "aarch64-darwin";
-	specialArgs = { inherit inputs; };
-	modules = globalModulesMacos
+	    system = "aarch64-darwin";
+	    specialArgs = { inherit inputs; };
+        modules = globalModulesMacos
           ++ [ ./hosts/cassini/configuration.nix];
       };
     };

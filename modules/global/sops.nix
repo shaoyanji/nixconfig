@@ -1,10 +1,10 @@
 { config, pkgs, inputs, ... }:
 let
-  #local_ssh_key= "local/mb1/ssh/private-key";
-  #local_ssh_key= "local/ps1xp/ssh/private-key";
-  local_ssh_key= "local/bizmac/ssh/private-key";
+  # local_ssh_key= "local/mb1/ssh/private-key";
+  # local_ssh_key= "local/ps1xp/ssh/private-key";
+  # local_ssh_key= "local/bizmac/ssh/private-key";
   # local_ssh_key= "local/aceofspades/ssh/private-key";
-  ssh_key_path = "${config.home.homeDirectory}/.ssh/id_ed25519";
+  # ssh_key_path = "${config.home.homeDirectory}/.ssh/id_ed25519";
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   taskfile_path = ./secrets/Taskfile.yaml;
 in

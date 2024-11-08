@@ -56,19 +56,20 @@
       nix-homebrew.darwinModules.nix-homebrew
       home-manager.darwinModules.default
     ];
-    globalModulesHome = 
-    #globalModules ++ 
-    [ 
-      ./modules/global/heim.nix
-    ];
   in
   {
     homeConfigurations = {
       heim = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
-        modules = globalModulesHome ++ [] ;
+        modules = [./modules/global/heim.nix] ;
       };
+      penguin = home-manager.lib.homeManagerConfiguration {
+        extraSpecialArgs = { inherit inputs; };
+        pkgs = nixpkgs.legacyPackages."x86_64-linux";
+        modules = [./modules/global/penguin.nix] ;
+      };
+
     };
     nixosConfigurations = {
       poseidon = nixpkgs.lib.nixosSystem {

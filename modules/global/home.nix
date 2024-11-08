@@ -23,6 +23,7 @@
     ./sops.nix
     ./nixvim 
     ./wezterm 
+    ./kitty
     # ./browser/firefox.nix
     # ./nvim
   ];

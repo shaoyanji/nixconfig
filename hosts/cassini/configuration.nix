@@ -60,7 +60,7 @@
       enable = true;
       taps = [
         #"gigalixir/brew"
-        "krtirtho/apps"
+        #"krtirtho/apps"
         #"homebrew/cask-fonts"
         #"dart-lang/dart"
         #"homebrew/bundle"
@@ -73,7 +73,7 @@
       casks = [
         "arc"
         "orbstack"
-        "spotube"
+          #"spotube"
           #"keybase"
           #"notion"
           #"raycast"

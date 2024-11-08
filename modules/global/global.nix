@@ -9,10 +9,6 @@
   nix = {
     gc = {
       automatic = true;
-      interval = {
-        Hour = 3;
-        Minute = 30;
-      };
       options = "--delete-older-than 10d";
     };
   };

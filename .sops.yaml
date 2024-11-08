@@ -9,6 +9,7 @@ keys:
   - &sopsposeidon age1ezs5s0mx7pcmv0cq6lhvxqtrgx9shrenpxuqyny3m52rg4a6vuxq9ucd7c
   - &sopsbizmac age10gx43rew42f7a2t0k4rgqz82yw8txym0p0wyrely3gwlavrlpe5snnjrln
   - &sopsacer age12yhcg6c7spluq7z0dsgduqfvvcqzyz0a5an3zsndecuc0h2w3ftseyzlad
+  - &pengsops age1cpkcemzhdkc5zmghdx63qv0km2t934raj6fs0ff7uftet00fh3qqjc8wq9
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -19,4 +20,5 @@ creation_rules:
       - *sopsposeidon
       - *sopsbizmac
       - *sopsacer
+      - *pengsops
       gpg:

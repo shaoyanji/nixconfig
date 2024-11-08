@@ -67,7 +67,6 @@
         #"homebrew/services"
       ];
       brews = [
-        "bitwarden-cli"
         # "mas"
         # "gigalixir"
       ];
@@ -77,7 +76,7 @@
           #"spotube"
           #"keybase"
           #"notion"
-          #"raycast"
+        "raycast"
           #"slack"
           #"zoom"
       ];

@@ -20,13 +20,3 @@ creation_rules:
       - *sopsbizmac
       - *sopsacer
       gpg:
-  - path_regex: src/[^/]+\.(yaml|json|env|ini)$
-    key_groups:
-    - age:
-      - *devji
-      - *mbdevji
-      - *sopsposeidon
-      - *sopsbizmac
-      - *sopsacer
-      gpg:
-

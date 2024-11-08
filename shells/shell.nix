@@ -16,7 +16,8 @@
     bat
     eza
     ripgrep
-    bitwarden-cli
+    #    bitwarden-cli # doesn't work on macOS
+    spotube
   # base tools 
 	# dev tools
 	    #	duckdb

@@ -10,7 +10,6 @@ wezterm.on("update-right-status", function(window, pane)
 end)
 
 return {
-	--	default_prog = { "C:\\Users\\Jisifu\\scoop\\shims\\nu" },
 	front_end = "WebGpu",
 	default_cursor_style = "BlinkingBlock",
 	color_scheme = "Poimandres",

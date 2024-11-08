@@ -70,7 +70,11 @@
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [./modules/global/penguin.nix] ;
       };
-
+      alarm = home-manager.lib.homeManagerConfiguration {
+        extraSpecialArgs = { inherit inputs; };
+        pkgs = nixpkgs.legacyPackages."aarch64-linux";
+        modules = [./modules/global/alarm.nix] ;
+      };
     };
     nixosConfigurations = {
       poseidon = nixpkgs.lib.nixosSystem {

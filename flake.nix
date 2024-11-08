@@ -23,7 +23,7 @@
     hyprland-plugins.inputs.hyprland.follows = "hyprland";
     hyprpaper = {
       url = "github:hyprwm/hyprpaper";
-      inputs.hyprland.follows = "nixpkgs";
+      inputs.hyprland.follows = "hyprland";
     };
   };
 

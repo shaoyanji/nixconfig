@@ -155,7 +155,6 @@
   #
   # or
   #
-  #  /etc/profiles/per-user/mattji/etc/profile.d/hm-session-vars.sh
   #
     home.sessionVariables = {
   #    EDITOR = "nvim";

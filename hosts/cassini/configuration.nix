@@ -73,6 +73,7 @@
       casks = [
         "arc"
         "orbstack"
+        "bitwarden-cli"
           #"spotube"
           #"keybase"
           #"notion"

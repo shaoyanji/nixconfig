@@ -16,6 +16,7 @@
     bat
     eza
     ripgrep
+    bitwarden-cli
   # base tools 
 	# dev tools
 	    #	duckdb
@@ -29,10 +30,10 @@
 	    #	go
   # shell tools
     # minimalistic jobby tools
-    helix
+    # helix
     fastfetch
     hyperfine
-    lf
+    #lf
   # aitools
     #ollama
     #aichat
@@ -40,17 +41,17 @@
     #sops
     #mods
   # pdf workflow
-     pandoc
-     texlive.combined.scheme-small
+    # pandoc
+    # texlive.combined.scheme-small
     # tgpt
-     pdfcpu
-     poppler_utils
+    # pdfcpu
+    # poppler_utils
     # wkhtmltopdf
   ];
   GREETING = "Hello, Nix!";
    shellHook = ''
    #zsh
-   export EDITOR='hx'
+   #   export EDITOR='hx'
    #  
    eval "$(zoxide init bash)"
    eval "$(fzf --bash)"

@@ -1,10 +1,11 @@
-{ config, pkgs, lib,  ... }:
+{ pkgs, ... }:
 
 {
   imports = [ 
     ./home.nix
     ./hyprland.nix
-        ] ++ [ ./nixvim ./browser/firefox.nix
+    ./nixvim 
+    ./browser/firefox.nix
   ];
 
 
@@ -12,7 +13,7 @@
   # environment.
   home.packages = with pkgs; [
     #cmus
-    #obsidian
+    obsidian
 # nix formatting
     #nixfmt-rfc-style
     #alejandra

@@ -33,7 +33,6 @@
   # environment.
   home.packages = with pkgs; [
     cmus
-    obsidian
 # nix formatting
     #nixfmt-rfc-style
     #alejandra
@@ -123,6 +122,7 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
    ]  ++ lib.optionals stdenv.isDarwin [
+    obsidian
     cocoapods
     m-cli # useful macOS CLI commands
     wezterm

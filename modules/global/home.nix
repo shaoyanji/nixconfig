@@ -1,4 +1,4 @@
-{ config, pkgs, lib,  ... }:
+{ pkgs, lib,  ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -16,15 +16,15 @@
   home.stateVersion = "24.11"; # Please read the comment before changing.
 
   imports = [ 
-    #./hyprland.nix
+    # ./hyprland.nix
     ./lf
     ./env.nix 
     ./shell
     ./sops.nix
-        ] ++ [ ./nixvim 
-    #./browser/firefox.nix
-    ] ++ [ ./wezterm 
-      #  ./nvim
+    ./nixvim 
+    ./wezterm 
+    # ./browser/firefox.nix
+    # ./nvim
   ];
 
 

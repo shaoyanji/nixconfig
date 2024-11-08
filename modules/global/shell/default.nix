@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 let 
   myAliases = { 
       l="eza -lahF --color=auto --icons --sort=size --group-directories-first";
@@ -127,7 +127,7 @@ in
 
     # # You can also set the file content immediately.
 
-     ".bash_aliases".text = ''
+     ".bash_aliases".text = /*bash*/''
       0file() { curl -F"file=@$1" https://envs.sh ; }
       0pb() { curl -F"file=@-;" https://envs.sh ; }
       0url() { curl -F"url=$1" https://envs.sh ; }

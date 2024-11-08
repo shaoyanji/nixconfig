@@ -8,46 +8,10 @@
 {
   
   packages = with pkgs; [
-    cowsay
     lolcat
-    #    oh-my-posh 
-    fzf
-    zoxide
-    bat
-    eza
-    ripgrep
-    #    bitwarden-cli # doesn't work on macOS
-    spotube
-  # base tools 
-	# dev tools
-	    #	duckdb
-	    #	xcbuild
-	    #	coreutils
-      #	wkhtmltopdf
-	# languages
-	    #	python3
-	    #	nodejs
-	    #	nodePackages.node2nix
-	    #	go
-  # shell tools
-    # minimalistic jobby tools
-    # helix
-    fastfetch
-    hyperfine
-    #lf
-  # aitools
-    #ollama
-    #aichat
-    tgpt
-    #sops
-    #mods
-  # pdf workflow
-    # pandoc
-    # texlive.combined.scheme-small
-    # tgpt
-    # pdfcpu
-    # poppler_utils
-    # wkhtmltopdf
+    cowsay
+    yarn
+    yarn2nix
   ];
   GREETING = "Hello, Nix!";
    shellHook = /*sh*/ ''

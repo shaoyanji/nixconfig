@@ -14,7 +14,6 @@
         Minute = 30;
       };
       options = "--delete-older-than 10d";
-      package = inputs.nix.packages.${pkgs.hostPlatform.system}.nix;
     };
   };
 

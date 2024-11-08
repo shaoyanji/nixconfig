@@ -50,13 +50,12 @@
     # wkhtmltopdf
   ];
   GREETING = "Hello, Nix!";
-   shellHook = ''
+   shellHook = /*sh*/ ''
    #zsh
    #   export EDITOR='hx'
    #  
    eval "$(zoxide init bash)"
    eval "$(fzf --bash)"
-   #   eval "$(oh-my-posh init bash --config ~/${pkgs.oh-my-posh}/share/oh-my-posh/themes/catppuccin.omp.json)"
    0file() { curl -F"file=@$1" https://envs.sh ; }
    0pb() { curl -F"file=@-;" https://envs.sh ; }
    0url() { curl -F"url=$1" https://envs.sh ; }

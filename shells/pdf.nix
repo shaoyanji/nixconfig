@@ -34,7 +34,7 @@
     sops
   ];
   GREETING = "Hello, Nix!";
-   shellHook = ''
+   shellHook = /*sh*/ ''
    echo $GREETING | cowsay | lolcat
    eval "$(task --completion bash)"
    nu

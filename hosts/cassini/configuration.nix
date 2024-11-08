@@ -67,13 +67,13 @@
         #"homebrew/services"
       ];
       brews = [
+        "bitwarden-cli"
         # "mas"
         # "gigalixir"
       ];
       casks = [
         "arc"
         "orbstack"
-        "bitwarden-cli"
           #"spotube"
           #"keybase"
           #"notion"

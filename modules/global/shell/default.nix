@@ -62,6 +62,7 @@ in
         enable = true;
         plugins = [
           "git"
+          "direnv"
           #"kubectl"
           #"docker"
           #"helm"

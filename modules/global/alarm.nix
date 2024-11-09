@@ -51,7 +51,7 @@
   #
   # or
   home.sessionVariables = {
-  #    EDITOR = "nvim";
+      EDITOR = "nvim";
    };
   programs.home-manager.enable = true;
 }

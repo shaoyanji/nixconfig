@@ -7,7 +7,7 @@
 
   imports = [
   ./lf
-  ./env
+  ./env.nix
   ./shell
   #./home.nix
   # ./browser/firefox.nix
@@ -51,7 +51,7 @@
   #
   # or
   home.sessionVariables = {
-  #    EDITOR = "nvim";
+      EDITOR = "nvim";
    };
   programs.home-manager.enable = true;
 }

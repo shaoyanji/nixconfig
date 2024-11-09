@@ -7,7 +7,7 @@
 
   imports = [
   ./lf
-  ./env
+  ./env.nix
   ./shell
   #./home.nix
   # ./browser/firefox.nix

@@ -10,6 +10,7 @@ keys:
   - &sopsbizmac age10gx43rew42f7a2t0k4rgqz82yw8txym0p0wyrely3gwlavrlpe5snnjrln
   - &sopsacer age12yhcg6c7spluq7z0dsgduqfvvcqzyz0a5an3zsndecuc0h2w3ftseyzlad
   - &pengsops age1cpkcemzhdkc5zmghdx63qv0km2t934raj6fs0ff7uftet00fh3qqjc8wq9
+  - &minyx age17k653l45u5tusxjhnacms8ltqm64kyqluetxfr0khsrj8clesgeqemr95d
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -21,4 +22,5 @@ creation_rules:
       - *sopsbizmac
       - *sopsacer
       - *pengsops
+      - *minyx
       gpg:

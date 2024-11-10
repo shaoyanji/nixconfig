@@ -103,7 +103,7 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
    ]  ++ lib.optionals stdenv.isDarwin [
-    obsidian
+      #    obsidian
     cocoapods
     m-cli # useful macOS CLI commands
     wezterm

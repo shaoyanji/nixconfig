@@ -73,6 +73,7 @@
       casks = [
         "arc"
         "orbstack"
+        "obsidian"
           #"spotube"
           #"keybase"
           #"notion"

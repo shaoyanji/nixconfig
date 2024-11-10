@@ -8,7 +8,7 @@
   wsl.enable = true;
   wsl.defaultUser = "devji";
   wsl.docker-desktop.enable = true;
-  wsl.useWindowDriver = true;
+  wsl.useWindowsDriver = true;
   virtualisation.docker.enable = true;
   users.users.devji.extraGroups = [ "docker" ];
 

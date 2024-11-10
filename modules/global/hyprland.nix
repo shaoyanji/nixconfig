@@ -92,16 +92,16 @@
         ];
       };
       "$mainMod" = "SUPER";
-      "$fileManager" = "${pkgs.dolphin}/bin/dolphin";
+      #      "$fileManager" = "${pkgs.dolphin}/bin/dolphin";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun";
       bind = [
-        "$mainMod, Q, exec, ${pkgs.kitty}/bin/kitty"
-        "$mainMod, C, killactive"
+        "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"
+        "$mainMod, W, killactive"
         "$mainMod, M, exit"
-        "$mainMod, V, togglefloating"
-        "$mainMod, R, exec, $menu"
+        "$mainMod, D, togglefloating"
+        "$mainMod, A, exec, $menu"
         "$mainMod, P, pseudo"
-        "$mainMod, W, togglesplit"
+        "$mainMod, E, togglesplit"
         "$mainMod, H,  movefocus, l"
         "$mainMod, J,  movefocus, d"
         "$mainMod, K,  movefocus, u"

@@ -10,11 +10,13 @@
     cowsay
     lolcat
 # aitools
+    spotube
     #aichat
     tgpt
     #mods
 # ui
     gum
+    pop
 # utilities
     zoxide
     fzf
@@ -30,7 +32,7 @@
     git
 # secrets management
     sops
-    bitwarden-cli
+    #    bitwarden-cli
 # editor
     neovim
   ];
@@ -57,5 +59,11 @@
    eval "$(task --completion bash)"
    eval "$(direnv hook bash)"
    eval "$(starship init bash)"
+curl https://raw.githubusercontent.com/shaoyanji/nixconfig/refs/heads/main/modules/global/secrets/secrets.yaml -o .temp.yaml
+   export RESEND_API_KEY=$(sops -d --extract '["RESEND"]["API"]["KEY"]' .temp.yaml)
+   export POP_SMTP_HOST=smtp.gmail.com
+   export POP_SMTP_PORT=587
+   export POP_SMTP_USERNAME=$(sops -d --extract '["POP"]["SMTP"]["USERNAME"]' .temp.yaml)
+   export POP_SMTP_PASSWORD=$(sops -d --extract '["POP"]["SMTP"]["PASSWORD"]' .temp.yaml)
   '';
 }

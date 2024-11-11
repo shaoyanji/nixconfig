@@ -12,6 +12,8 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     nix-homebrew.inputs.nixpkgs.follows = "nixpkgs";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nixvim.url = "github:nix-community/nixvim";
@@ -29,7 +31,7 @@
     #};
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,  ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,  ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];
     systems= [
@@ -88,6 +90,19 @@
         specialArgs = { inherit inputs; };
         modules = globalModulesNixos
           ++ [ ./hosts/aceofspades/configuration.nix ];
+      };
+      guckloch = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = globalModulesNixos
+          ++ [ ./hosts/guckloch/configuration.nix 
+            nixos-wsl.nixosModules.default
+              {
+                system.stateVersion = "24.05";
+                wsl.enable = true;
+              }
+            ];
+
       };
     };
     # Build darwin flake using:

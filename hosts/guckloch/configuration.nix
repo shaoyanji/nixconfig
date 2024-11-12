@@ -13,6 +13,7 @@
   users.users.devji.extraGroups = [ "docker" ];
 
   environment.systemPackages = with pkgs; [
+      devenv
   ];
 
   programs.nix-ld = {

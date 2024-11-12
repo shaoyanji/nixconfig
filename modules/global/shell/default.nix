@@ -78,10 +78,14 @@ in
       enable = true;
       shellAliases = myAliases;
       bashrcExtra = ''
-      	source $HOME/.bash_aliases
-          eval "$(fzf --bash)"
-          eval "$(zoxide init bash)"
-          eval "$(starship init bash)"
+        if [ "$(hostname)" = "lunarfall" ]; then
+          source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+        fi
+        source $HOME/.bash_aliases
+        eval "$(fzf --bash)"
+        eval "$(zoxide init bash)"
+        eval "$(starship init bash)"
+
       '';
     };
     starship = {

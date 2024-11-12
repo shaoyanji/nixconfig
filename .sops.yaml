@@ -12,6 +12,7 @@ keys:
   - &pengsops age1cpkcemzhdkc5zmghdx63qv0km2t934raj6fs0ff7uftet00fh3qqjc8wq9
   - &minyx age17k653l45u5tusxjhnacms8ltqm64kyqluetxfr0khsrj8clesgeqemr95d
   - &guckloch age1aq6fer9unde6xwjw587qzc6e6cfe4wlu2xvcah7vjqrkptkd7gtq69v38r
+  - &lunarfall age1wvrf6uclae5ald5uk5lvjyj9pgpc56tpy9vannv7wmy0s092850qk2mn0y
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -25,4 +26,5 @@ creation_rules:
       - *pengsops
       - *minyx
       - *guckloch
+      - *lunarfall
       gpg:

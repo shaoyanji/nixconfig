@@ -71,15 +71,15 @@
         # "gigalixir"
       ];
       casks = [
-        "arc"
-        "orbstack"
-        "obsidian"
-          #"spotube"
-          #"keybase"
-          #"notion"
-        "raycast"
-          #"slack"
-          #"zoom"
+      #  "arc"
+      #  "orbstack"
+      # "obsidian"
+        #"spotube"
+        #"keybase"
+        #"notion"
+      # "raycast"
+        #"slack"
+        #"zoom"
       ];
       masApps = {
         #   "ISH" = 1436902243;

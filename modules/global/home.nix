@@ -62,7 +62,7 @@
     # large language model tools
         # aichat
         # mods
-         tgpt
+    tgpt
         # ollama
     # database
         # duckdb

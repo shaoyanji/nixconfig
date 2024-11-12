@@ -15,6 +15,8 @@
     #mods
 # ui
     gum
+    just
+    pop
 # utilities
     zoxide
     fzf
@@ -33,6 +35,13 @@
     bitwarden-cli
 # editor
     neovim
+# extras
+    hugo
+# programming languages
+    go
+    python3
+    nim 
+    luajit
   ];
   GREETING = "Hello, Nix!";
    shellHook = ''

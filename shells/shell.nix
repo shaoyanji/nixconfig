@@ -10,7 +10,7 @@
     cowsay
     lolcat
 # aitools
-    spotube
+    #spotube
     #aichat
     tgpt
     #mods
@@ -32,7 +32,7 @@
     git
 # secrets management
     sops
-    # bitwarden-cli
+    bitwarden-cli
 # editor
     # neovim
 

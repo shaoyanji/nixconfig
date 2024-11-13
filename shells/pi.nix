@@ -67,5 +67,6 @@
    eval "$(task --completion bash)"
    eval "$(direnv hook bash)"
    eval "$(starship init bash)"
+   alias load-taskfile='sops -d ./modules/global/secrets/Taskfile.yaml>./Taskfile.yml'
   '';
 }

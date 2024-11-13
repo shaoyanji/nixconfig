@@ -15,6 +15,8 @@
   # environment.
   home.packages = with pkgs; [
     devenv
+    wl-clipboard
+
   ];
  # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -33,6 +35,5 @@
    home.sessionVariables = {
       XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
       PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH";
-
    };
 }

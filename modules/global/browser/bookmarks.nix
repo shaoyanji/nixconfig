@@ -14,6 +14,10 @@
 			name = "catspeed";
 			url = "https://invidious.catspeed.cc";
 			}
+			{
+			name ="fedinv";
+			url="https://invidious.nerdvpn.de/";
+			}
 		];
 	}
 	{

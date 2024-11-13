@@ -31,6 +31,7 @@
     nushell
     git
 # secrets management
+    age
     sops
     bitwarden-cli
 # editor

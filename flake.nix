@@ -77,6 +77,11 @@
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [./modules/global/alarm.nix] ;
       };
+	minyx = home-manager.lib.homeManagerConfiguration {
+	  extraSpecialArgs = { inherit inputs; };
+	  pkgs = nixpkgs.legacyPackages."aarch64-linux";
+	  modules = [./modules/global/minyx.nix] ;
+	};
 	lunarfall = home-manager.lib.homeManagerConfiguration {
 		extraSpecialArgs = { inherit inputs; };
 		pkgs = nixpkgs.legacyPackages. "aarch64-linux";

@@ -6,7 +6,7 @@
   programs.git = {
     enable=true;
     userName="shaoyanji";
-    userEmail="100967396+shaoyanji@users.noreply.github.com";
+    userEmail="matt@bountystash.com";
     extraConfig = {
       pull.rebase=false;
     };
@@ -14,6 +14,8 @@
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
+    lazygit
+    gh
     #   sops #managed by sops module
     #   yq
     #   yq-go#managed by sops module
@@ -25,5 +27,4 @@
   home.file={
     
   };
-
 }

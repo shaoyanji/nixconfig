@@ -73,7 +73,7 @@
           "quick,0.15,0,0.1,1"
         ];
         animation = [
-           "global, 1, 10, default"
+          "global, 1, 10, default"
           "border, 1, 5.39, easeOutQuint"
           "windows, 1, 4.79, easeOutQuint"
           "windowsIn, 1, 4.1, easeOutQuint, popin 87%"

@@ -71,13 +71,13 @@
         # "gigalixir"
       ];
       casks = [
-       "arc"
-       "orbstack"
-        #"obsidian"
+        "arc"
+        "orbstack"
+        "obsidian"
         #"spotube"
         #"keybase"
         #"notion"
-       "raycast"
+        "raycast"
         #"slack"
         #"zoom"
       ];

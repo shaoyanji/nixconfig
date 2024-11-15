@@ -14,7 +14,7 @@ in
   programs={
     nushell={
       enable=true;
-      extraConfig = ''
+      extraConfig = /*nu*/ ''
         let carapace_completer = {|spans|
         carapace $spans.0 nushell $spans | from json
         }
@@ -77,7 +77,7 @@ in
     bash = {
       enable = true;
       shellAliases = myAliases;
-      bashrcExtra = ''
+      bashrcExtra = /*bash*/ ''
         if [ "$(hostname)" = "lunarfall" ]; then
           source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
         fi
@@ -123,7 +123,6 @@ in
       zsh-fzf-tab
       bat
       eza
-      tgpt
     ];
 
   home.file = {

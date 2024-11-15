@@ -24,13 +24,12 @@ in
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
-    #cifs-utils
+    # cifs-utils
     sops
-    #   yq
     yq-go
-    #    pass
-    #    gnupg
-    #    age
+    # pass
+    # gnupg
+    # age
 
     (pkgs.writeShellScriptBin "loginssh" ''
       sudo ssh $(${pkgs.sops}/bin/sops -d --extract '["server"]["commands"]' ${config.sops.defaultSopsFile} | ${pkgs.gum}/bin/gum choose) 

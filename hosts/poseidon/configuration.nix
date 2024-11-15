@@ -16,7 +16,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   networking.hostName = "poseidon"; # Define your hostname.
-	#   networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   services.xserver.digimend.enable = true;
 
   # Configure network proxy if necessary
@@ -46,10 +46,10 @@
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
-# services.xserver.enable = true;
+  # services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
- #services.desktopManager.plasma6.enable = true;
+  #services.desktopManager.plasma6.enable = true;
  services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
@@ -106,10 +106,10 @@
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
     ];
-    #macbook access
+    # macbook access
     packages = with pkgs; [
-    #  kdePackages.kate
-    #  thunderbird
+    # kdePackages.kate
+    # thunderbird
     ];
   };
 
@@ -135,7 +135,7 @@
   gphoto2
   mpv
   config.boot.kernelPackages.digimend
-#  nfs-utils
+  # nfs-utils
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -150,13 +150,13 @@
 
   # Enable the OpenSSH daemon.
    services.openssh = {
-   	enable = true;
-	settings = {
-		X11Forwarding = true;
-		PermitRootLogin = "no";
-		PasswordAuthentication = false;
-	};
-	};
+    enable = true;
+    settings = {
+    X11Forwarding = true;
+    PermitRootLogin = "no";
+    PasswordAuthentication = false;
+    };
+   };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

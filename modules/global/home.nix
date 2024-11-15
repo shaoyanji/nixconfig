@@ -11,11 +11,9 @@
     ./nixvim 
     ./wezterm 
     ./kitty
-    # ./browser/firefox.nix
+    # ./browser/firefox.nix # issue with M1
     # ./nvim
   ];
-
-
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
@@ -25,73 +23,75 @@
     #alejandra
     #nixpkgs-fmt
 # utilities
+    mailsy
+    # charm-freeze
+    # pop
     glow
-    #fm
-    #wget
-    entr
+    # entr
     gum
     go-task
-    mc
+    yq-go
+    # just
+    # mc
     hyperfine
-
-  # base tools 
+# base tools 
     # alacritty
-    # niv #nix package manager
-  # dev tools
-    #	xcbuild
-    #	coreutils
-  # miscellaneous
-    #	pandoc
-    #	texlive.combined.scheme-small
-    #	wkhtmltopdf
-    # languages
-    #	python3
-    #	nodejs
-    #	go
-    #	rustup
-    #	gcc
-    #	clang
-    #	ruby
-    #	lua
-    #	luajit
-    #	moonscript
-    #	perl
-    #	php
-    #	quarto
-    #	ghostscript
-    # large language model tools
-        # aichat
-        # mods
+    # niv # nix package manager
+# dev tools
+    # xcbuild #for temporary build of homebrew
+    # coreutils
+# miscellaneous
+    # pandoc
+    # texlive.combined.scheme-small
+    # wkhtmltopdf # unstable
+# languages
+    # python3
+    # nodejs
+    # go
+    # rustup
+    # nim
+    # gcc
+    # clang
+    # ruby
+    # lua
+    # luajit
+    # moonscript
+    # perl
+    # php
+    # quarto
+    # ghostscript
+# large language model tools
+    # aichat
+    # mods
     tgpt
-        # ollama
-    # database
-        # duckdb
-        # pocketbase
-        # haskelkPackages.postgrest
-        # postgres
-        # 
+    # ollama
+# database
+    # duckdb
+    # pocketbase
+    # haskelkPackages.postgrest
+    # postgres
 # applications
-    #spotube # too many updates (better managed through homebrew)
+    # spotube # too many updates (better managed through homebrew)
     # niv
     # m-cli
-    #browsh
-    #neovim
-    #python3
-    #htop
-    #gcc
-    #  coreutils
-    #eza
-    #fd
-    #ripgrep
-    #bat
-    #fzf
-    #zoxide
-    #thefuck
-    #go
-    #docker
-    #pocketbase
-    #haskellPackages.postgrest
-    #zed-editor
+    # browsh
+    # neovim
+    # python3
+    # htop
+    # gcc
+    # coreutils
+    # eza
+    # fd
+    # ripgrep
+    # bat
+    # fzf
+    # zoxide
+    # thefuck
+    # go
+    # docker
+    # pocketbase
+    # haskellPackages.postgrest
+    # zed-editor
 
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
@@ -103,7 +103,7 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
    ]  ++ lib.optionals stdenv.isDarwin [
-      #    obsidian
+    # obsidian
     cocoapods
     m-cli # useful macOS CLI commands
     wezterm

@@ -30,6 +30,8 @@
     yq-go
     nushell
     git
+    charm-freeze
+    pandoc
 # secrets management
     age
     sops

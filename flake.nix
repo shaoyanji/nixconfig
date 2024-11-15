@@ -77,16 +77,16 @@
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [./modules/global/alarm.nix] ;
       };
-	minyx = home-manager.lib.homeManagerConfiguration {
-	  extraSpecialArgs = { inherit inputs; };
-	  pkgs = nixpkgs.legacyPackages."aarch64-linux";
-	  modules = [./modules/global/minyx.nix] ;
-	};
-	lunarfall = home-manager.lib.homeManagerConfiguration {
-		extraSpecialArgs = { inherit inputs; };
-		pkgs = nixpkgs.legacyPackages. "aarch64-linux";
-		modules = [./modules/global/lunarfall.nix] ;
-	};
+      minyx = home-manager.lib.homeManagerConfiguration {
+        extraSpecialArgs = { inherit inputs; };
+        pkgs = nixpkgs.legacyPackages."aarch64-linux";
+        modules = [./modules/global/minyx.nix] ;
+      };
+      lunarfall = home-manager.lib.homeManagerConfiguration {
+        extraSpecialArgs = { inherit inputs; };
+        pkgs = nixpkgs.legacyPackages. "aarch64-linux";
+        modules = [./modules/global/lunarfall.nix] ;
+      };
     };
     nixosConfigurations = {
       poseidon = nixpkgs.lib.nixosSystem {
@@ -106,12 +106,12 @@
         specialArgs = { inherit inputs; };
         modules = globalModulesNixos
           ++ [ ./hosts/guckloch/configuration.nix 
-            nixos-wsl.nixosModules.default
-              {
-                system.stateVersion = "24.05";
-                wsl.enable = true;
-              }
-            ];
+          nixos-wsl.nixosModules.default
+            {
+              system.stateVersion = "24.05";
+              wsl.enable = true;
+            }
+          ];
 
       };
     };

@@ -45,6 +45,7 @@
     btop
     htop
 # entertainment
+    # mpv
     # yt-dlp
     # cmus
     # spotube

@@ -158,7 +158,11 @@
     PasswordAuthentication = false;
     };
    };
-
+  
+  services.ollama = {
+    enable = true;
+    acceleration = "cuda";
+  };
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];

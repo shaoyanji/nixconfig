@@ -30,9 +30,12 @@
     #  url = "github:hyprwm/hyprpaper";
     #  inputs.hyprland.follows = "hyprland-plugins";
     #};
+    zen-browser.url = "github:MarceColl/zen-browser-flake";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,  ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,
+    zen-browser,
+    ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];
     systems= [

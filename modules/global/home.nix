@@ -25,6 +25,7 @@
     #alejandra
     #nixpkgs-fmt
 # utilities
+    htop
     mailsy
     # charm-freeze
     # pop

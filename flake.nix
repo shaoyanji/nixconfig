@@ -8,7 +8,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    #    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -32,7 +32,7 @@
     #};
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,  ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,  ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];
     systems= [
@@ -67,7 +67,7 @@
         extraSpecialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [./modules/global/heim.nix
-          chaotic.homeManagerModules.default
+            #chaotic.homeManagerModules.default
           ] ;
       };
       penguin = home-manager.lib.homeManagerConfiguration {
@@ -97,7 +97,7 @@
         specialArgs = { inherit inputs; };
         modules = globalModulesNixos
           ++ [ ./hosts/poseidon/configuration.nix 
-            chaotic.nixosModules.default
+              #chaotic.nixosModules.default
             ];
       };
       aceofspades = nixpkgs.lib.nixosSystem {

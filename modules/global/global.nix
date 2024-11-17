@@ -32,16 +32,17 @@
 
   # Enable experimental nix command and flakes
   # nix.package = pkgs.nixUnstable;
+  nix.optimise.automatic = true;
+  nix.optimise.dates = "weekly";
   nix.extraOptions = ''
-    auto-optimise-store = true
+    min-free = ${toString (100 * 1024 * 1024)}
+    max-free = ${toString (1024 * 1024 * 1024)}
     experimental-features = nix-command flakes
   '';
   nix.nixPath = [
     "nixpkgs=${pkgs.path}"
   ];
   environment.systemPackages = with pkgs; [
-    nixd
-    devenv
   ];
   # Create /etc/bashrc that loads the nix-darwin environment.
   #programs.zsh.enable = true;

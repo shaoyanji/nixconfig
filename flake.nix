@@ -8,6 +8,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -25,13 +26,13 @@
     hyprland.url = "github:hyprwm/hyprland";
     hyprland-plugins.url = "github:hyprwm/hyprland-plugins";
     hyprland-plugins.inputs.hyprland.follows = "hyprland";
-    #    hyprpaper = {
+    #  hyprpaper = {
     #  url = "github:hyprwm/hyprpaper";
     #  inputs.hyprland.follows = "hyprland-plugins";
     #};
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,  ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,  ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];
     systems= [
@@ -65,7 +66,9 @@
       heim = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
-        modules = [./modules/global/heim.nix] ;
+        modules = [./modules/global/heim.nix
+          chaotic.homeManagerModules.default
+          ] ;
       };
       penguin = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
@@ -78,7 +81,7 @@
         modules = [./modules/global/alarm.nix] ;
       };
       minyx = home-manager.lib.homeManagerConfiguration {
-        extraSpecialArgs = { inherit inputs; };
+        specialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [./modules/global/minyx.nix] ;
       };
@@ -93,7 +96,9 @@
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = globalModulesNixos
-          ++ [ ./hosts/poseidon/configuration.nix ];
+          ++ [ ./hosts/poseidon/configuration.nix 
+            chaotic.nixosModules.default
+            ];
       };
       aceofspades = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";

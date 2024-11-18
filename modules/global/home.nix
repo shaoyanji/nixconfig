@@ -20,6 +20,7 @@
     nixd
     devenv
     cmus
+    yt-dlp
 # nix formatting
     #nixfmt-rfc-style
     #alejandra

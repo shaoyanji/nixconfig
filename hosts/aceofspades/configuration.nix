@@ -143,7 +143,7 @@
 #  nfs-utils
   ];
 
-  hardware.opengl.extraPackages = [
+  hardware.graphics.extraPackages = [
     pkgs.mesa.opencl
   ];
   # Some programs need SUID wrappers, can be configured further or are

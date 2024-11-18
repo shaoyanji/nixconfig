@@ -84,9 +84,7 @@
    alias lt='eza -aT --icons --group-directories-first --color=auto --sort=size'
    alias cat='bat'
    alias grep='rg'
-
    echo $GREETING | cowsay | lolcat
 
-   alias youtube = 'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" $(wl-paste)'
   '';
 }

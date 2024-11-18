@@ -8,8 +8,6 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      #      ./nvidia.nix
-      #./steam.nix
     ];
   nix.settings.experimental-features = [ "nix-command" "flakes"];
   # Bootloader.
@@ -53,8 +51,8 @@
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
-# services.xserver.enable = true;
-
+  services.xserver.enable = true;
+  services.xserver.videoDrivers = [ "amdgpu" ];
   # Enable the KDE Plasma Desktop Environment.
  #services.desktopManager.plasma6.enable = true;
  services.displayManager.sddm = {
@@ -143,9 +141,11 @@
   mpv
   config.boot.kernelPackages.digimend
 #  nfs-utils
-  inputs.zen-browser.packages.${pkgs.system}.generic
   ];
 
+  hardware.opengl.extraPackages = [
+    pkgs.mesa.opencl
+  ];
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;

@@ -5,8 +5,8 @@
   
   programs.git = {
     enable=true;
-    userName="shaoyanji";
-    userEmail="matt@bountystash.com";
+    userName="Shao-yan (Matt) Ji";
+    userEmail="100967396+shaoyanji@users.noreply.github.com";
     extraConfig = {
       pull.rebase=false;
     };

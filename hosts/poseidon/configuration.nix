@@ -135,6 +135,7 @@
   gphoto2
   mpv
   config.boot.kernelPackages.digimend
+  inputs.zen-browser.packages.${pkgs.system}.specific
   # nfs-utils
   ];
 
@@ -157,7 +158,11 @@
     PasswordAuthentication = false;
     };
    };
-
+  
+  services.ollama = {
+    enable = true;
+    acceleration = "cuda";
+  };
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];

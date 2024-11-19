@@ -8,8 +8,6 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      #      ./nvidia.nix
-      #./steam.nix
     ];
   nix.settings.experimental-features = [ "nix-command" "flakes"];
   # Bootloader.
@@ -26,7 +24,6 @@
   networking.hostName = "aceofspades"; # Define your hostname.
 	#   networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   services.xserver.digimend.enable = true;
-
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -54,8 +51,8 @@
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
-# services.xserver.enable = true;
-
+  services.xserver.enable = true;
+  services.xserver.videoDrivers = [ "amdgpu" ];
   # Enable the KDE Plasma Desktop Environment.
  #services.desktopManager.plasma6.enable = true;
  services.displayManager.sddm = {
@@ -146,6 +143,9 @@
 #  nfs-utils
   ];
 
+  hardware.graphics.extraPackages = [
+    pkgs.mesa.opencl
+  ];
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;

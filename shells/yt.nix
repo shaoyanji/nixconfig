@@ -14,10 +14,11 @@
     tgpt
     #mods
 # ui
-    gum
-    pop
-    charm-freeze
+        #gum
+        #pop
+        #charm-freeze
 # utilities
+    yt-dlp
     zoxide
     fzf
     bat
@@ -28,9 +29,9 @@
     direnv
     go-task
     yq-go
-    nushell
+        #nushell
 # external
-    git
+        #git
 # workflow/languages
     # python
     # rust
@@ -50,8 +51,8 @@
     # cmus
     # spotube
 # secrets management
-    sops
-    bitwarden-cli
+        #    sops
+        #bitwarden-cli
     # gpg
     # age
     # pass
@@ -83,19 +84,7 @@
    alias lt='eza -aT --icons --group-directories-first --color=auto --sort=size'
    alias cat='bat'
    alias grep='rg'
-
    echo $GREETING | cowsay | lolcat
 
-   # secrets management
-   BW_SESSION="oB8LrP9CMoqGmlPPe89YhS8fghHQh+G/qmx1if2Qnr+aS+GuJRhTkFz+UFMc86ccPZ2L9nFJjP5FWF86XkeAGg=="
-   curl -s https://raw.githubusercontent.com/shaoyanji/nixconfig/refs/heads/main/modules/global/secrets/secrets.yaml -o .temp.yaml
-
-   # pop settings
-   export RESEND_API_KEY=$(sops -d --extract '["RESEND"]["API"]["KEY"]' .temp.yaml)
-   # export POP_SMTP_HOST=smtp.gmail.com
-   # export POP_SMTP_PORT=587
-   # export POP_SMTP_USERNAME=$(sops -d --extract '["POP"]["SMTP"]["USERNAME"]' .temp.yaml)
-   # export POP_SMTP_PASSWORD=$(sops -d --extract '["POP"]["SMTP"]["PASSWORD"]' .temp.yaml)
-   rm .temp.yaml
   '';
 }

@@ -2,12 +2,10 @@
 
 {
   imports = [ 
-    ./home.nix
+    ./heim.nix
     ./hyprland.nix
-    ./browser/firefox.nix
   ];
   home.packages = with pkgs; [
-    obsidian
   ];
   home.file = {
     # ".screenrc".source = dotfiles/screenrc;

@@ -18,6 +18,7 @@
   imports = [ 
     ./home.nix
     ./browser/firefox.nix
+    ./shell/nushell.nix
   ];
   
   nixpkgs.config.allowUnfree = true;

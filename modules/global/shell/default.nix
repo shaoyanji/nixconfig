@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{config, pkgs, ... }:
 let 
   myAliases = { 
       l="eza -lahF --color=auto --icons --sort=size --group-directories-first";
@@ -45,7 +45,7 @@ in
         } 
         $env.PATH = ($env.PATH | 
         split row (char esep) |
-        prepend /home/devji/.apps |
+        prepend /home/devji/.nix-profile/bin|
         append /usr/bin/env
         )
         '';
@@ -156,14 +156,31 @@ in
       zsh-fzf-tab
       bat
       eza
+      nushellPlugins.net
+      nushellPlugins.skim
+      nushellPlugins.dbus
+      nushellPlugins.query
+      nushellPlugins.units
+      nushellPlugins.gstat
+      nushellPlugins.formats
+      nushellPlugins.highlights
       nushellPlugins.polars
+      nu_scripts
     ];
-
   home.file = {
     #    ".zshrc".source = ./.zshrc;
     # ".tmux.conf".source = ./.tmux.conf;
-
+        #TODO: fix nushell plugin
     # # You can also set the file content immediately.
+        ".config/nushell/plugins/nu_plugin_net".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.net}/bin/nu_plugin_net";
+        ".config/nushell/plugins/nu_plugin_skim".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.skim}/bin/nu_plugin_skim";
+        ".config/nushell/plugins/nu_plugin_dbus".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.dbus}/bin/nu_plugin_dbus";
+        ".config/nushell/plugins/nu_plugin_query".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.query}/bin/nu_plugin_query";
+        ".config/nushell/plugins/nu_plugin_units".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.units}/bin/nu_plugin_units";
+        ".config/nushell/plugins/nu_plugin_gstat".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.gstat}/bin/nu_plugin_gstat";
+        ".config/nushell/plugins/nu_plugin_formats".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.formats}/bin/nu_plugin_formats";
+        ".config/nushell/plugins/nu_plugin_highlights".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.highlights}/bin/nu_plugin_highlights";
+        ".config/nushell/plugins/nu_plugin_polars".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.polars}/bin/nu_plugin_polars";
 
      ".bash_aliases".text = /*bash*/''
       0file() { curl -F"file=@$1" https://envs.sh ; }

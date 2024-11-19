@@ -156,6 +156,7 @@ in
       zsh-fzf-tab
       bat
       eza
+      nushellPlugins.polars
     ];
 
   home.file = {

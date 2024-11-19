@@ -163,7 +163,7 @@ in
       nushellPlugins.units
       nushellPlugins.gstat
       nushellPlugins.formats
-      nushellPlugins.highlights
+      nushellPlugins.highlight
       nushellPlugins.polars
       nu_scripts
     ];
@@ -179,7 +179,7 @@ in
         ".config/nushell/plugins/nu_plugin_units".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.units}/bin/nu_plugin_units";
         ".config/nushell/plugins/nu_plugin_gstat".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.gstat}/bin/nu_plugin_gstat";
         ".config/nushell/plugins/nu_plugin_formats".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.formats}/bin/nu_plugin_formats";
-        ".config/nushell/plugins/nu_plugin_highlights".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.highlights}/bin/nu_plugin_highlights";
+        ".config/nushell/plugins/nu_plugin_highlight".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.highlight}/bin/nu_plugin_highlight";
         ".config/nushell/plugins/nu_plugin_polars".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.polars}/bin/nu_plugin_polars";
 
      ".bash_aliases".text = /*bash*/''

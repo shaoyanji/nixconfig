@@ -22,6 +22,7 @@
     devenv
     cmus
     yt-dlp
+    mpv
 # nix formatting
     #nixfmt-rfc-style
     #alejandra

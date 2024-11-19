@@ -9,6 +9,7 @@
   nixpkgs.config = {
     allowUnfree = true;
     nvidia.acceptLicense = true;
+    cudaSupport = true; # Enables CUDA support
   };
 
   services.xserver.videoDrivers = [ "nvidia"];
@@ -44,12 +45,12 @@
         prime.sync.enable = lib.mkForce true;
       };
 
-    services.ollama = {
-      enable = true;
-      acceleration = "cuda";
-    };
+      #services.ollama = {
+      #  enable = true;
+      #  acceleration = "cuda";
+      #};
     # Nvidia Docker
-    virtualisation.docker.enableNvidia = true;
+      #virtualisation.docker.enableNvidia = true;
     # libnvidia-container does not support cgroups v2 (prior to 1.8.0)
     # https://github.com/NVIDIA/nvidia-docker/issues/1447
     };

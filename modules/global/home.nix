@@ -11,6 +11,7 @@
     ./nixvim 
     ./wezterm 
     ./kitty
+    ./shell/nushell.nix
     # ./browser/firefox.nix # issue with M1
     # ./nvim
   ];

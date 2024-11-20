@@ -43,12 +43,68 @@
   system.defaults = {
     dock.autohide = true;
     finder.FXPreferredViewStyle = "clmv";
+    finder.FXEnableExtensionChangeWarning = false;
     loginwindow.GuestEnabled = false;
     NSGlobalDomain.AppleICUForce24HourTime = true;
     NSGlobalDomain.AppleInterfaceStyle = "Dark";
     NSGlobalDomain.KeyRepeat = 2;
+    NSGlobalDomain.AppleKeyboardUIMode = 3;
+    NSGlobalDomain.ApplePressAndHoldEnabled = false;
+    CustomUserPreferences = {
+      NSGlobalDomain.WebKitDeveloperExtras = true;
+      AppleLanguages = (lib.mkForce (lib.mkDefault ["en-US"]));
+      ".GlobalPreferences" = {
+        AppleSpacesSwitchOnActivate = true;
+      };
+      "com.apple.finder" = {
+        AppleShowAllFiles = true;
+        AppleShowAllExtensions = true;
+        AppleShowAllFolders = true;
+        AppleShowAllLibraries = true;
+        AppleShowAllMountedVolumes = true;
+        AppleShowAllPackages = true;
+        AppleShowAllUsers = true;
+        "ShowPathbar" = true;
+        "SidebarIconSize" = 16;
+        "SortColumn" = "kMDItemFSCreationDate";
+        "SortDirection" = 0;
+        "ShowStatusBar" = true;
+        "ShowTabView" = true;
+        "ShowToolbar" = true;
+        "ShowSidebar" = true;
+        "NewWindowTarget" = "PfHm";
+        "NewWindowTargetPath" = "/Users/devji";
+        "NewWindowTargetPathIsVolume" = false;
+        "FXPreferredViewStyle" = "clmv";
+        ShowExternalHardDrivesOnDesktop = true;
+        ShowRemovableMediaOnDesktop = true;
+        ShowMountedServersOnDesktop = true;
+        ShowHardDrivesOnDesktop = true;
+        _FXSortFoldersFirst = true;
+        FXDefaultSearchScope = "SCcf";
+      };
+      "com.apple.desktopservices" = {
+        DSDontWriteNetworkStores = true;
+        DSDontWriteUSBStores = true;
+      };
+      "com.apple.spaces" = {
+        "spans-displays" = 0;
+      };
+      "com.apple.WindowManager" = {
+        EnableStandardWindowMenu = 0;
+        StandardHideDesktopIcons = 0;
+        HideDesktop = 0;
+        StandardManagerHideWidgets = 0;
+        StandardHideWidgets = 0;
+      };
+      "com.apple.ImageCapture" = {
+        disableHotPlug = true;
+      };
+      "com.apple.AdLib" = {
+        allowApplePersonalizedAdvertising = false;
+      };
+    };
   };
-
   # Keyboard
   system.keyboard.enableKeyMapping = true;
   system.keyboard.remapCapsLockToEscape = true;
@@ -110,7 +166,9 @@
         '';
       # Set Git commit hash for darwin-version.
       system.stateVersion = 5;
-
+      system.activationScripts.postActivation.text = ''
+        /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+  '';
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
 }

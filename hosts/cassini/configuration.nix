@@ -45,11 +45,27 @@
     finder.FXPreferredViewStyle = "clmv";
     finder.FXEnableExtensionChangeWarning = false;
     loginwindow.GuestEnabled = false;
-    NSGlobalDomain.AppleICUForce24HourTime = true;
-    NSGlobalDomain.AppleInterfaceStyle = "Dark";
-    NSGlobalDomain.KeyRepeat = 2;
-    NSGlobalDomain.AppleKeyboardUIMode = 3;
-    NSGlobalDomain.ApplePressAndHoldEnabled = false;
+    trackpad = {
+      Clicking = true;
+      TrackpadRightClick = true;
+      TrackpadThreeFingerDrag = true;
+    };
+    NSGlobalDomain = {
+      AppleICUForce24HourTime = true;
+      AppleInterfaceStyle = "Dark";
+      KeyRepeat = 2;
+      AppleKeyboardUIMode = 3;
+      ApplePressAndHoldEnabled = false;
+      "com.apple.swipescrolldirection" = true;
+      "com.apple.sound.beep.feedback" = 0;
+      NSAutomaticCapitalizationEnabled = false;
+      NSAutomaticDashSubstitutionEnabled = false;
+      NSAutomaticPeriodSubstitutionEnabled = false;
+      NSAutomaticQuoteSubstitutionEnabled = false;
+      NSAutomaticSpellingCorrectionEnabled = false;
+      NSNavPanelExpandedStateForSaveMode = true;
+      NSNavPanelExpandedStateForSaveMode2 = true;
+    };
     CustomUserPreferences = {
       NSGlobalDomain.WebKitDeveloperExtras = true;
       AppleLanguages = (lib.mkForce (lib.mkDefault ["en-US"]));

@@ -80,6 +80,8 @@
         #}
         rust_analyzer = {
           enable = true;
+          installCargo = true;
+          installRustc= true;
         };
         nixd = {
           enable = true;

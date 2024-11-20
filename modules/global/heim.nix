@@ -31,6 +31,7 @@
   # environment.
   home.packages = with pkgs; [
     go
+    tinygo
     obsidian
     wl-clipboard
 # system call monitoring

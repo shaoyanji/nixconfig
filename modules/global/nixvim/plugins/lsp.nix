@@ -72,15 +72,15 @@
         # clangd = {
         #  enable = true;
         #}
-        # gopls = {
-        #  enable = true;
-        #}
+        gopls = {
+          enable = true;
+        };
         # pyright = {
         #  enable = true;
         #}
-        # rust_analyzer = {
-        #  enable = true;
-        #}
+        rust_analyzer = {
+          enable = true;
+        };
         nixd = {
           enable = true;
           settings = {

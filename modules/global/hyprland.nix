@@ -162,5 +162,20 @@
       };
 
     };
+    extraConfig = ''
+      source = ~/.config/hypr/animations.conf
+      #source = ~/.config/hypr/keybinds.conf
+      source = ~/.config/hypr/windowrules.conf
+      source = ~/.config/hypr/themes/common.conf
+      source = ~/.config/hypr/themes/colors.conf
+      source = ~/.config/hypr/themes/theme.conf
+      source = ~/.config/hypr/monitors.conf
+      source = ~/.config/hypr/userprefs.conf
+    '';
+  };
+  home.packages = with pkgs; [
+    
+  ];
+  home.file={
   };
 }

@@ -12,7 +12,6 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     impermanence.url = "github:nix-community/impermanence";
-    impermanence.inputs.nixpkgs.follows = "nixpkgs";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -118,6 +117,18 @@
             (import ./hosts/disko.nix { device = "/dev/sda"; })
             ];
       };
+      staging = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = globalModulesNixos
+          ++ [ ./hosts/staging/configuration.nix 
+            chaotic.nixosModules.default
+            inputs.impermanence.nixosModules.default
+            inputs.disko.nixosModules.default
+            (import ./hosts/disko.nix { device = "/dev/sda"; })
+            ];
+      };
+
     aceofspades = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };

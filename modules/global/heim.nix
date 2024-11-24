@@ -20,7 +20,7 @@
     ./browser/firefox.nix
     ./shell/nushell.nix
     ./dev.nix
-    ./hyprland.nix
+    #    ./hyprland.nix # TODO: fix hyprland porting from arch
   ];
   
   nixpkgs.config.allowUnfree = true;

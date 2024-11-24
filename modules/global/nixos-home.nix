@@ -3,6 +3,8 @@
 {
   imports = [ 
     ./heim.nix
+    ./hyprland.nix
+    ./hypr
   ];
   home.packages = with pkgs; [
   ];

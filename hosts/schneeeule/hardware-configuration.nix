@@ -8,9 +8,11 @@
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "sr_mod" "sdhci" ];
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usb_storage" "sd_mod" "rtscx_pci_sdmmc" ];
   boot.initrd = {
-    kernelModules = [ "kvm-intel" ];
+    kernelModules = [ 
+    #"kvm-intel" 
+    ];
   };
   #  boot.extraModulePackages = [ ];
   boot.extraModulePackages = with config.boot.kernelPackages;

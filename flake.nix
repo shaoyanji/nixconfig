@@ -66,11 +66,11 @@
   in
   {
     homeConfigurations = {
-      heim = home-manager.lib.homeManagerConfiguration {
+      bizmac = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [./modules/global/heim.nix
-          chaotic.homeManagerModules.default
+        #  chaotic.homeManagerModules.default
           ] ;
       };
       penguin = home-manager.lib.homeManagerConfiguration {

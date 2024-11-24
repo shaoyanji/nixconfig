@@ -34,16 +34,16 @@
     obsidian
     wl-clipboard
 # system call monitoring
-        strace # system call monitoring
-        ltrace # library call monitoring
-        lsof # list open files
+    strace # system call monitoring
+    ltrace # library call monitoring
+    lsof # list open files
 
 # system tools
-        sysstat
-        lm_sensors # for `sensors` command
-        ethtool
-        pciutils # lspci
-        usbutils # lsusb
+    sysstat
+    lm_sensors # for `sensors` command
+    ethtool
+    pciutils # lspci
+    usbutils # lsusb
 
   ];
  # Home Manager is pretty good at managing dotfiles. The primary way to manage

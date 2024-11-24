@@ -155,10 +155,9 @@
     };
    };
   
-  services.ollama = {
-    enable = true;
-    acceleration = "cuda";
-  };
+  #services.ollama = {
+  #  enable = true;
+  #};
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];

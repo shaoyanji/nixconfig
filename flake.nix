@@ -113,8 +113,8 @@
         modules = globalModulesNixos
           ++ [ ./hosts/ares/configuration.nix 
             chaotic.nixosModules.default
-            impermanence.nixosModules.default
-            disko.nixosModules.default
+            inputs.impermanence.nixosModules.default
+            inputs.disko.nixosModules.default
             (import ./hosts/disko.nix { device = "/dev/sda"; })
             ];
       };

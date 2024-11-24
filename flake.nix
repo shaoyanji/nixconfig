@@ -117,11 +117,11 @@
             (import ./hosts/disko.nix { device = "/dev/sda"; })
             ];
       };
-      staging = nixpkgs.lib.nixosSystem {
+      schneeeule = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = globalModulesNixos
-          ++ [ ./hosts/staging/configuration.nix 
+          ++ [ ./hosts/schneeeule/configuration.nix 
             chaotic.nixosModules.default
             inputs.impermanence.nixosModules.default
             inputs.disko.nixosModules.default

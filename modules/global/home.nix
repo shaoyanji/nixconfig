@@ -44,7 +44,7 @@
     hyperfine
 # archives
     zip
-        #    xz
+    # xz
     unzip
     p7zip
 

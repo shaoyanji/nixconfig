@@ -20,6 +20,7 @@
     ./browser/firefox.nix
     ./shell/nushell.nix
     ./dev.nix
+    ./hyprland.nix
   ];
   
   nixpkgs.config.allowUnfree = true;

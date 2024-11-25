@@ -17,13 +17,14 @@
       ".ssh"
       ".local/share/keyrings"
       ".local/share/direnv"
+      ".supermaven"
       {
         directory = ".local/share/Steam";
         method = "symlink";
       }
     ];
     files = [
-      ".supermaven"
+      ".config/sops/age/keys.txt"
     ];
     allowOther = true;
   };

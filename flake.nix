@@ -61,8 +61,9 @@
       ./modules/global/nixos.nix
       home-manager.nixosModules.default
     ];
-    globalModulesImpermanence = globalModulesNixos ++ [
+    globalModulesImpermanence = globalModules ++ [
       ./modules/global/impermanence.nix
+      home-manager.nixosModules.default
       inputs.impermanence.nixosModules.default
       inputs.disko.nixosModules.default
     ];

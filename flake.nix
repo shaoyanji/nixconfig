@@ -61,6 +61,11 @@
       ./modules/global/nixos.nix
       home-manager.nixosModules.default
     ];
+    globalModulesImpermanence = globalModulesNixos ++ [
+      ./modules/global/impermanence.nix
+      inputs.impermanence.nixosModules.default
+      inputs.disko.nixosModules.default
+    ];
     globalModulesMacos = globalModules ++ [ 
       ./modules/global/macos.nix
       nix-homebrew.darwinModules.nix-homebrew
@@ -73,7 +78,6 @@
         extraSpecialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [./modules/global/heim.nix
-        #  chaotic.homeManagerModules.default
           ] ;
       };
       penguin = home-manager.lib.homeManagerConfiguration {
@@ -109,22 +113,18 @@
       ares = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
-        modules = globalModulesNixos
+        modules = globalModulesImpermanence
           ++ [ ./hosts/ares/configuration.nix 
             chaotic.nixosModules.default
-            inputs.impermanence.nixosModules.default
-            inputs.disko.nixosModules.default
             (import ./hosts/disko.nix { device = "/dev/sda"; })
             ];
       };
       schneeeule = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
-        modules = globalModulesNixos
+        modules = globalModulesImpermanence
           ++ [ ./hosts/schneeeule/configuration.nix 
             chaotic.nixosModules.default
-            inputs.impermanence.nixosModules.default
-            inputs.disko.nixosModules.default
             (import ./hosts/disko.nix { device = "/dev/sda"; })
             ];
       };

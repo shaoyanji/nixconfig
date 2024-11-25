@@ -131,7 +131,7 @@
   gphoto2
   mpv
   config.boot.kernelPackages.digimend
-  inputs.zen-browser.packages.${pkgs.system}.specific
+  firefox
   # nfs-utils
   ];
 

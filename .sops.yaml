@@ -21,7 +21,6 @@ creation_rules:
       - *servermb
       - *mbdevji
       - *sopsposeidon
-      - *sopsbizmac
       - *sopsacer
       - *pengsops
       - *minyx

@@ -6,6 +6,7 @@
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
+    gcc
     go
     tinygo
     rustc

@@ -109,6 +109,7 @@ in
     [
       thefuck
       jq
+      htmlq
       ripgrep
       fd
       zsh-forgit

@@ -29,7 +29,7 @@
     #alejandra
     #nixpkgs-fmt
 # utilities
-    htop
+    # htop
     mailsy
     # charm-freeze
     # pop
@@ -67,7 +67,7 @@
     gnutar
     gawk
     zstd
-    gnupg
+    # gnupg
 
 # nix related
 #

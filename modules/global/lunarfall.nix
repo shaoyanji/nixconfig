@@ -31,6 +31,6 @@
 
    home.sessionVariables = {
       XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
-      PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH";
+      PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH:$HOME/go/bin:$HOME/.cargo/bin";
    };
 }

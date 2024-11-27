@@ -11,12 +11,12 @@
     lolcat
 # aitools
     #aichat
-    tgpt
+#   tgpt
     #mods
 # ui
-    gum
-    just
-    pop
+#   gum
+#   just
+#   pop
 # utilities
     zoxide
     fzf
@@ -26,21 +26,22 @@
     lf
     starship
     direnv
-    go-task
-    yq-go
+#   go-task
+#   yq-go
     nushell
     git
-    charm-freeze
+#   charm-freeze
     pandoc
 # secrets management
     age
-    sops
+        #sops
     bitwarden-cli
 # editor
     neovim
 # extras
-    hugo
+#   hugo
 # programming languages
+    tinygo
     go
     python3
     nim 
@@ -70,5 +71,9 @@
    eval "$(direnv hook bash)"
    eval "$(starship init bash)"
    alias load-taskfile='sops -d ./modules/global/secrets/Taskfile.yaml>./Taskfile.yml'
+   export PATH="$PATH:$HOME/.local/bin"
+   export GOPATH="$HOME/go"
+   export PATH="$PATH:$GOPATH/bin"
+
   '';
 }

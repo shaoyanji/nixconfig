@@ -3,8 +3,8 @@
 #   pkgs = import nixpkgs { config = {}; overlays = []; };
 # in
 { pkgs ? import <nixpkgs> {} }:
-  pkgs.mkShell
-# pkgs.mkShellNoCC 
+#  pkgs.mkShell
+ pkgs.mkShellNoCC 
 {
   packages = with pkgs; [
     cowsay
@@ -18,44 +18,42 @@
 #   just
 #   pop
 # utilities
-    zoxide
-    fzf
+    #zoxide
+    #fzf
     bat
     ripgrep
     eza
     lf
-    starship
+   # starship
     direnv
 #   go-task
 #   yq-go
-    nushell
+#   nushell
     git
 #   charm-freeze
-    pandoc
+    # pandoc
 # secrets management
-    age
-        #sops
-    bitwarden-cli
+    #age
+    #sops
+#   bitwarden-cli
 # editor
-    neovim
+#    neovim
 # extras
 #   hugo
 # programming languages
     tinygo
     go
-    python3
-    nim 
-    luajit
+    #python3
+    #nim 
+    #luajit
   ];
   GREETING = "Hello, Nix!";
    shellHook = ''
-   eval "$(zoxide init bash)"
-   eval "$(fzf --bash)"
    0file() { curl -F"file=@$1" https://envs.sh ; }
    0pb() { curl -F"file=@-;" https://envs.sh ; }
    0url() { curl -F"url=$1" https://envs.sh ; }
    0short() { curl -F"shorten=$1" https://envs.sh ; }
-   BW_SESSION="oB8LrP9CMoqGmlPPe89YhS8fghHQh+G/qmx1if2Qnr+aS+GuJRhTkFz+UFMc86ccPZ2L9nFJjP5FWF86XkeAGg=="
+#   BW_SESSION="oB8LrP9CMoqGmlPPe89YhS8fghHQh+G/qmx1if2Qnr+aS+GuJRhTkFz+UFMc86ccPZ2L9nFJjP5FWF86XkeAGg=="
    alias l='eza -lahF --color=auto --icons --sort=size --group-directories-first'
    alias lss='eza -hF --color=auto --icons --sort=size --group-directories-first'
    alias la='eza -ahF --color=auto --icons --sort=size --group-directories-first'
@@ -65,15 +63,13 @@
    alias cat='bat'
    alias grep='rg'
  
-   EDITOR=nvim
+#   EDITOR=nvim
    echo $GREETING | cowsay | lolcat
-   eval "$(task --completion bash)"
    eval "$(direnv hook bash)"
    eval "$(starship init bash)"
+   eval "$(atuin init bash)"
    alias load-taskfile='sops -d ./modules/global/secrets/Taskfile.yaml>./Taskfile.yml'
-   export PATH="$PATH:$HOME/.local/bin"
-   export GOPATH="$HOME/go"
-   export PATH="$PATH:$GOPATH/bin"
+   export PATH="$HOME/aarch64bin:$PATH:$HOME/.local/bin:$HOME/go/bin"
 
   '';
 }

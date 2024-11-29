@@ -139,7 +139,7 @@
         #"homebrew/services"
       ];
       brews = [
-        # "mas"
+        "mas"
         # "gigalixir"
       ];
       casks = [
@@ -153,11 +153,11 @@
         #"slack"
         #"zoom"
       ];
-      masApps = {
-        Xcode = 497799835;
-        #   "ISH" = 1436902243;
-        #   "Steamlink" = 1246969117;
-      };
+    masApps = {
+      # Xcode = 497799835;
+      # "ISH" = 1436902243;
+      # "Steamlink" = 1246969117;
+    };
       onActivation.cleanup = "zap";
       onActivation.autoUpdate = true;
       onActivation.upgrade = true;

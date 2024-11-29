@@ -155,6 +155,7 @@
     cocoapods
     m-cli # useful macOS CLI commands
     wezterm
+    darwin.xcode_16_1 
   ];
   home.file = {
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in

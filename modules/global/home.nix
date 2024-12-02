@@ -19,12 +19,14 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    wget
     pop
     glow
     charm-freeze
     gum
     go-task
-    yq-go   nixd
+    yq-go
+    nixd
     devenv
     cmus
     yt-dlp

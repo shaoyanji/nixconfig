@@ -19,9 +19,9 @@
     #    "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/videos";
     ".local/.bin".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/bin-x86";
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/ollama";
-    ".config/.zen".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/zen";
-    ".config/mnt/x/dotfiles/btop".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/btop";
-    ".config/mnt/x/dotfiles/cmus".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/cmus";
+    ".zen".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/zen";
+    ".config/btop".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/btop";
+    ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/cmus";
   };
    home.sessionVariables = {
     #    PATH = "/nix/var/nix/profiles/default/bin:$HOME/.local/.bin/:$PATH";

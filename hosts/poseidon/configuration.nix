@@ -117,7 +117,6 @@
   cifs-utils
   ffmpeg
   gphoto2
-  mpv
   config.boot.kernelPackages.digimend
   inputs.zen-browser.packages.${pkgs.system}.specific
   # nfs-utils

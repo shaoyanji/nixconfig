@@ -19,7 +19,12 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    nixd
+    pop
+    glow
+    charm-freeze
+    gum
+    go-task
+    yq-go   nixd
     devenv
     cmus
     yt-dlp
@@ -31,14 +36,13 @@
 # utilities
     # htop
     mailsy
-    # charm-freeze
     # pop
-    glow
-    charm-freeze
+    # glow
+    # charm-freeze
     # entr
-    gum
-    go-task
-    yq-go
+    # gum
+    # go-task
+    # yq-go
     # just
     # mc
     hyperfine
@@ -76,7 +80,7 @@
     nix-output-monitor
 
 # productivity
-    hugo # static site generator
+    # hugo # static site generator
 
     btop  # replacement of htop/nmon
     iotop # io monitoring
@@ -111,7 +115,7 @@
 # large language model tools
     # aichat
     # mods
-    tgpt
+    # tgpt
     # ollama
 # database
     # duckdb
@@ -156,6 +160,7 @@
     m-cli # useful macOS CLI commands
     wezterm
     darwin.xcode_16_1 
+
   ];
   home.file = {
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in

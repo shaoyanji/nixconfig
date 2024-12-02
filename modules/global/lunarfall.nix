@@ -21,6 +21,15 @@
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/ollama";
     ".config/btop".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/btop";
     ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/cmus";
+    "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/documents/Obsidian-Git-Sync";
+    "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/documents/work";
+    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/books";
+    "Documents/projects".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/projects";
+    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/downloads";
+    "Music/music".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/music";
+    "Pictures/pics".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/pics";
+    "Videos/video".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/video";
+    ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/dotfiles/profiles.ini";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.

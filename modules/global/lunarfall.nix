@@ -29,7 +29,7 @@
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/music";
     "Pictures/pics".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/pics";
     "Videos/video".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/video";
-    ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/dotfiles/profiles.ini";
+    ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/profiles.ini";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.

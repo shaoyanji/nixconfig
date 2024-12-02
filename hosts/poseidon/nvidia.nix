@@ -1,8 +1,7 @@
-{config, lib, pkgs, ...}:{
+{config, lib, pkgs, ...}:
+{
   hardware.graphics = {
     enable = true;
-    #driSupport = true;
-    #driSupport32Bit = true;
     extraPackages = with pkgs; [ nvidia-vaapi-driver ];
   };
 
@@ -44,13 +43,8 @@
         prime.offload.enableOffloadCmd = lib.mkForce false;
         prime.sync.enable = lib.mkForce true;
       };
-
-      #services.ollama = {
-      #  enable = true;
-      #  acceleration = "cuda";
-      #};
     # Nvidia Docker
-      #virtualisation.docker.enableNvidia = true;
+    # virtualisation.docker.enableNvidia = true;
     # libnvidia-container does not support cgroups v2 (prior to 1.8.0)
     # https://github.com/NVIDIA/nvidia-docker/issues/1447
     };

@@ -18,63 +18,46 @@
 #   just
 #   pop
 # utilities
-    direnv
-    fd
-    zoxide
-    fzf
-    bat
-    ripgrep
-    eza
-    lf
+#    fd
+#    zoxide
+#    fzf
+#    bat
+#    ripgrep
+#    eza
+#    lf
 # starship
-    direnv
+#    direnv
 #   go-task
 #   yq-go
 #   nushell
-    git
+#    git
 #   charm-freeze
 #   pandoc
 # secrets management
     #age
     #sops
-    #bitwarden-cli
+#    bitwarden-cli
 # editor
-    neovim
+#    neovim
 # extras
 #   hugo
+#    yt-dlp
 # programming languages
-    tinygo
-    go
-    gcc
-    #python3
-    #nim
-    #luajit
-    #rustc
-    #cargo
+#    tinygo
+#    go
+#    gcc
+#    python3
+#    nim
+#    luajit
+#    rustc
+#    cargo
     #tcc
   ];
   GREETING = "Hello, Nix!";
    shellHook = ''
-   0file() { curl -F"file=@$1" https://envs.sh ; }
-   0pb() { curl -F"file=@-;" https://envs.sh ; }
-   0url() { curl -F"url=$1" https://envs.sh ; }
-   0short() { curl -F"shorten=$1" https://envs.sh ; }
-   #BW_SESSION="oB8LrP9CMoqGmlPPe89YhS8fghHQh+G/qmx1if2Qnr+aS+GuJRhTkFz+UFMc86ccPZ2L9nFJjP5FWF86XkeAGg=="
-   alias l='eza -lahF --color=auto --icons --sort=size --group-directories-first'
-   alias lss='eza -hF --color=auto --icons --sort=size --group-directories-first'
-   alias la='eza -ahF --color=auto --icons --sort=size --group-directories-first'
-   alias ls='eza -lhF --color=auto --icons --sort=Name --group-directories-first'
-   alias lst='eza -lahFT --color=auto --icons --sort=size --group-directories-first'
-   alias lt='eza -aT --icons --group-directories-first --color=auto --sort=size'
-   alias cat='bat'
-   alias grep='rg'
-   EDITOR=nvim
-   echo $GREETING | cowsay | lolcat
-   eval "$(direnv hook bash)"
-   eval "$(starship init bash)"
-   eval "$(fzf --bash)"
-   eval "$(zoxide init bash)"
-   alias load-taskfile='sops -d ./modules/global/secrets/Taskfile.yaml >./Taskfile.yml'
-   export PATH="$HOME/aarch64bin:$PATH:$HOME/.local/bin:$HOME/go/bin"
+  #BW_SESSION="oB8LrP9CMoqGmlPPe89YhS8fghHQh+G/qmx1if2Qnr+aS+GuJRhTkFz+UFMc86ccPZ2L9nFJjP5FWF86XkeAGg=="
+  EDITOR=nvim
+  echo $GREETING | cowsay | lolcat
+  alias load-taskfile='sops -d ./modules/global/secrets/Taskfile.yaml >./Taskfile.yml'
   '';
 }

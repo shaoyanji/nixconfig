@@ -19,26 +19,17 @@
   # plain files is through 'home.file'.
   home.file = {
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/ollama";
-    ".config/btop".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/btop";
-    ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/cmus";
-    "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/documents/Obsidian-Git-Sync";
-    "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/documents/work";
+    ".config/btop".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/dotfiles/btop";
+    ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/dotfiles/cmus";
+    "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/documents/Obsidian-Git-Sync";
+    "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/documents/work";
     "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/books";
     "Documents/projects".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/projects";
-    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/downloads";
+    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/downloads";
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/music";
     "Pictures/pics".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/pics";
     "Videos/video".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/video";
-    ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/dotfiles/profiles.ini";
-    # # Building this configuration will create a copy of 'dotfiles/screenrc' in
-    # # the Nix store. Activating the configuration will then make '~/.screenrc' a
-    # # symlink to the Nix store copy.
-    # ".screenrc".source = dotfiles/screenrc;
-   # # You can also set the file content immediately.
-    # ".gradle/gradle.properties".text = ''
-    #   org.gradle.console=verbose
-    #   org.gradle.daemon.idletimeout=3600
-    # '';
+    ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/dotfiles/profiles.ini";
   };
 
    home.sessionVariables = {

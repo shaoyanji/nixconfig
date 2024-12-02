@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs,config, ... }:
 
 {
   imports = [ 
@@ -18,6 +18,9 @@
  # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
+    ".ollama/models".source = config.lib.mkOutOfStoreSymlink "/mnt/x/ollama";
+    ".config/btop".source = config.lib.mkOutOfStoreSymlink "/mnt/x/dotfiles/btop";
+    ".config/cmus".source = config.lib.mkOutOfStoreSymlink "/mnt/x/dotfiles/cmus";
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.

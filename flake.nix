@@ -1,8 +1,11 @@
 {
   description = "
-  chromeos and arch home configuration
-  hyprland configuration
-  Working Darwin system flake using Determinate and SSL hack
+    ChromeOS and WSL (penguin + guckloch)
+    Linux + Nix (heim)
+    MacOS + Nix (cassini)
+    NixOS (poseidon, ares, schneeeule, aceofspades)
+    Asahi Linux (lunarfall)
+    Arch Pi (alarm)
   ";
 
   inputs = {
@@ -36,8 +39,8 @@
     zen-browser.url = "github:MarceColl/zen-browser-flake";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, nixvim, sops-nix, nuenv, hyprland,hyprland-plugins,
-    zen-browser,
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager,
+    chaotic,
     ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];
@@ -145,7 +148,6 @@
               wsl.enable = true;
             }
           ];
-
       };
     };
     darwinConfigurations={
@@ -156,7 +158,6 @@
           ++ [ ./hosts/cassini/configuration.nix];
       };
     };
-    
     # Expose the package set, including overlays, for convenience.
     darwinPackages = self.darwinConfigurations.cassini.pkgs;
   };

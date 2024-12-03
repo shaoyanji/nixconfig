@@ -5,7 +5,7 @@ My Nix Configurations for darwin, nixos, home-manager, and WSL (not yet).
 ## Installation
 
 ```bash
-git clone https://github.com/devjin0617/nixconfig.git
+git clone https://github.com/shaoyanji/nixconfig.git
 ```
 
 ## Usage
@@ -26,6 +26,12 @@ sudo nixos-rebuild switch --flake .#poseidon
 
 ```bash
 home-manager switch --flake .#heim
+```
+
+### WSL
+
+```bash
+sudo nixos-rebuild switch --flake .#guck-loch
 ```
 
 ### SOPS Configuration

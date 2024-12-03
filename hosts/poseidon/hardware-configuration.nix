@@ -14,14 +14,6 @@
     kernelModules = [ "kvm-amd" "nfs" ];
   };
   #  boot.extraModulePackages = [ ];
-  boot.extraModulePackages = with config.boot.kernelPackages;
-    [ v4l2loopback.out ];
-  boot.kernelModules = [
-    "v4l2loopback"
-  ];
-  boot.extraModprobeConfig = ''
-    options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
-  '';
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/292db143-7e80-45c4-b940-34d77e58b5c7";
       fsType = "ext4";

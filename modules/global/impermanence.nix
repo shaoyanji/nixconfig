@@ -10,7 +10,7 @@
 { 
   imports = [
     inputs.impermanence.nixosModules.home-manager.impermanence
-    ./nixos-home.nix
+    ../nixos-home.nix
   ];
 
   home.stateVersion = "24.11"; # Please read the comment before changing.

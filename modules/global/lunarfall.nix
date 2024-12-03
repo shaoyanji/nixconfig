@@ -2,7 +2,7 @@
 
 {
   imports = [ 
-    ../heim.nix
+    ./heim.nix
   ];
   
   nixpkgs.config.allowUnfree = true;
@@ -36,4 +36,5 @@
       XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
       PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH:$HOME/go/bin:$HOME/.cargo/bin";
    };
+   programs.home-manager.enable = true;
 }

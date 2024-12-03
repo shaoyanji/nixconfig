@@ -2,7 +2,7 @@
 
 {
   imports = [ 
-    ./heim.nix
+    ../heim.nix
   ];
   
   nixpkgs.config.allowUnfree = true;

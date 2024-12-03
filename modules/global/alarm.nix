@@ -6,9 +6,9 @@
   home.stateVersion = "24.11"; # Please read the comment before changing.
 
   imports = [
-  ./lf
-  ./env.nix
-  ./shell
+  ../lf
+  ../env.nix
+  ../shell
   #./home.nix
   # ./browser/firefox.nix
   ];

@@ -72,6 +72,10 @@
       nix-homebrew.darwinModules.nix-homebrew
       home-manager.darwinModules.default
     ];
+    globalModulesWSL = globalModules ++ [ 
+      ./modules/global/heim.nix
+      home-manager.nixosModules.default
+    ];
   in
   {
     homeConfigurations = {
@@ -124,7 +128,6 @@
             (import ./hosts/disko.nix { device = "/dev/sda"; })
             ];
       };
-
       aceofspades = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
@@ -134,7 +137,7 @@
       guckloch = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
-        modules = globalModulesNixos
+        modules = globalModulesWSL
           ++ [ ./hosts/guckloch/configuration.nix 
           nixos-wsl.nixosModules.default
             {
@@ -145,8 +148,6 @@
 
       };
     };
-    # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#
     darwinConfigurations={
       cassini = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";

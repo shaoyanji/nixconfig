@@ -75,7 +75,7 @@
   in
   {
     homeConfigurations = {
-      bizmac = home-manager.lib.homeManagerConfiguration {
+      heim = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [./modules/global/heim.nix
@@ -90,11 +90,6 @@
         extraSpecialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [./modules/global/alarm.nix] ;
-      };
-      minyx = home-manager.lib.homeManagerConfiguration {
-        specialArgs = { inherit inputs; };
-        pkgs = nixpkgs.legacyPackages."aarch64-linux";
-        modules = [./modules/global/minyx.nix] ;
       };
       lunarfall = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
@@ -130,7 +125,7 @@
             ];
       };
 
-    aceofspades = nixpkgs.lib.nixosSystem {
+      aceofspades = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = globalModulesNixos

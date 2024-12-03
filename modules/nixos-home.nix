@@ -2,7 +2,7 @@
 
 {
   imports = [ 
-    ./heim.nix
+    ./global/heim.nix
     ./hyprland.nix
     ./hypr
   ];

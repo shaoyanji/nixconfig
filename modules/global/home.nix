@@ -3,18 +3,18 @@
 {
   home.stateVersion = "24.11";
   imports = [ 
-    # ./hyprland.nix
-    ./lf
-    ./env.nix 
-    ./shell
-    ./sops.nix
-    ./nixvim 
-    ./wezterm 
-    ./kitty
-    ./shell/nushell.nix
-    ./dev.nix
-    # ./browser/firefox.nix # issue with M1
-    # ./nvim
+    # ../hyprland.nix
+    ../lf
+    ../env.nix 
+    ../shell
+    ../sops.nix
+    ../nixvim 
+    ../wezterm 
+    ../kitty
+    ../shell/nushell.nix
+    ../dev.nix
+    # ../browser/firefox.nix # issue with M1
+    # ../nvim
   ];
   # The home.packages option allows you to install Nix packages into your
   # environment.

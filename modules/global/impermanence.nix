@@ -25,10 +25,7 @@
                 ".ssh"
                 ".local/share/keyrings"
                 ".local/share/direnv"
-                ".supermaven"
                 ".config/direnv"
-                ".config/obsidian"
-                ".ollama"
                 {
                   directory = ".local/share/Steam";
                   method = "symlink";

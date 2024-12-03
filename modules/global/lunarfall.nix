@@ -3,6 +3,7 @@
 {
   imports = [ 
     ./heim.nix
+    ../nixoshmsymlinks.nix
   ];
   
   nixpkgs.config.allowUnfree = true;
@@ -18,18 +19,6 @@
  # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
-    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "/mnt/x/ollama";
-    ".config/btop".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/dotfiles/btop";
-    ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/dotfiles/cmus";
-    "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/documents/Obsidian-Git-Sync";
-    "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/documents/work";
-    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/books";
-    "Documents/projects".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/projects";
-    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/downloads";
-    "Music/music".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/music";
-    "Pictures/pics".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/pics";
-    "Videos/video".source = config.lib.file.mkOutOfStoreSymlink "/mnt/z/video";
-    ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "/mnt/y/dotfiles/profiles.ini";
   };
 
    home.sessionVariables = {

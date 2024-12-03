@@ -6,7 +6,13 @@
   home.stateVersion = "24.11"; # Please read the comment before changing.
 
   imports = [ 
-    ../home.nix
+    ../lf
+    ../env.nix 
+    ../shell
+    ../sops.nix
+    ../nixvim 
+    ../kitty
+    ../shell/nushell.nix
   ];
   
   nixpkgs.config.allowUnfree = true;
@@ -15,6 +21,9 @@
   # ];
 
   home.packages = with pkgs; [
+    gum
+    go-task
+    (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
   home.file = {
     # ".screenrc".source = dotfiles/screenrc;
@@ -33,4 +42,5 @@
    Environment="PATH=%h/.nix-profile/bin:/usr/local/sbin:/usr/local/bin:/usr/local/games:/usr/sbin:/usr/bin:/usr/games:/sbin:/bin"
    Environment="XDG_DATA_DIRS=%h/.nix-profile/share:%h/.local/share:%h/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share"
   '';
+  programs.home-manager.enable = true;
 }

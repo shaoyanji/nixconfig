@@ -146,6 +146,7 @@
         "arc"
         "orbstack"
         "obsidian"
+        "zen-browser"
         #"spotube"
         #"keybase"
         #"notion"
@@ -185,7 +186,7 @@
       system.stateVersion = 5;
       system.activationScripts.postActivation.text = ''
         /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
-  '';
+      '';
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
 }

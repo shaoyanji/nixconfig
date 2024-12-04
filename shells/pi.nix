@@ -56,8 +56,8 @@
   GREETING = "Hello, Nix!";
    shellHook = ''
   #BW_SESSION="oB8LrP9CMoqGmlPPe89YhS8fghHQh+G/qmx1if2Qnr+aS+GuJRhTkFz+UFMc86ccPZ2L9nFJjP5FWF86XkeAGg=="
-  EDITOR=nvim
   echo $GREETING | cowsay | lolcat
   alias load-taskfile='sops -d ./modules/global/secrets/Taskfile.yaml >./Taskfile.yml'
+  nu
   '';
 }

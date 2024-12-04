@@ -7,6 +7,7 @@
 let  
     routerNAS = "/Volumes/FRITZ.NAS/External-USB3-0-01";
     routerShared = "/Volumes/Shared Library";
+    wolfNAS = "/Volumes/usbshare2"
 in
 {
   home.stateVersion = "24.11";
@@ -24,10 +25,11 @@ in
   home.file = {
     "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
+    "Music/muzik".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music/";
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${routerShared}/ollama";
     "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${routerShared}/go/pkg";
     ".config/btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
-    ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
+      #    ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
   };
 
   home.sessionVariables = {

@@ -26,7 +26,7 @@ in
     "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
     "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
-    ".config/nix-darwin".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/configs/nixconfig";
+    ".config/nix-darwin".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
     "Music/muzik".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music/";
     "Movies/video".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video/";
     "Pictures/pics".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics/";

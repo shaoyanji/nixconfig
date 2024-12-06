@@ -9,6 +9,7 @@ in
     "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
     "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
+    "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents";
     "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
     "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents/books";
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";

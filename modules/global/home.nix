@@ -21,12 +21,8 @@
   # environment.
   home.packages = with pkgs; [
     wget
-    pop
-    glow
-    charm-freeze
     gum
     go-task
-    yq-go
     nixd
     devenv
     cmus
@@ -158,7 +154,9 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
    ]  ++ lib.optionals stdenv.isDarwin [
-    # obsidian
+    pop
+    glow
+    charm-freeze   # obsidian
     cocoapods
     m-cli # useful macOS CLI commands
     wezterm

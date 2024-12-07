@@ -1,6 +1,6 @@
 {inputs, config, pkgs, lib, ... }:
 {
-  #boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.extraModulePackages = with config.boot.kernelPackages;
     [ v4l2loopback.out ];
   boot.kernelModules = [
@@ -12,7 +12,7 @@
   nix.settings.experimental-features = [ "nix-command" "flakes"];
   nixpkgs.config.allowUnfree = true;
   services={
-    #    xserver.digimend.enable = true;
+    xserver.digimend.enable = true;
     displayManager.sddm = {
       enable = true;
       wayland.enable = true;
@@ -132,8 +132,8 @@
     kitty
     cifs-utils
     ffmpeg
-    #gphoto2
-    #    config.boot.kernelPackages.digimend
+    gphoto2
+    config.boot.kernelPackages.digimend
     # nfs-utils
   ];
 }

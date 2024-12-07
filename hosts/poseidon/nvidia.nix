@@ -12,13 +12,7 @@
   };
   #nixpkgs.config.allowBroken = true;
   services.xserver.videoDrivers = [ "nvidia"];
-  boot.kernelModules = [
-    "nvidia"
-    "nvidia_modeset"
-    "nvidia_uvm"
-    "nvidia_drm"
-    "i2c-nvidia_gpu"
-  ];
+  boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "i2c-nvidia_gpu" ];
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = false;

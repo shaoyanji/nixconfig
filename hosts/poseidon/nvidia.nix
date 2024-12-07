@@ -2,7 +2,7 @@
 {
   hardware.graphics = {
     enable = true;
-    extraPackages = with pkgs; [ nvidia-vaapi-driver ];
+    #extraPackages = with pkgs; [ nvidia-vaapi-driver ];
   };
 
   nixpkgs.config = {
@@ -10,7 +10,7 @@
     nvidia.acceptLicense = true;
     cudaSupport = true; # Enables CUDA support
   };
-
+  #nixpkgs.config.allowBroken = true;
   services.xserver.videoDrivers = [ "nvidia"];
   boot.kernelModules = [
     "nvidia"
@@ -38,7 +38,7 @@
     gaming.configuration = {
       system.nixos.tags = [ "gaming" ];
         hardware.nvidia = {
-        package = config.boot.kernelPackages.nvidiaPackages.stable;
+        package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
         prime.offload.enable = lib.mkForce false;
         prime.offload.enableOffloadCmd = lib.mkForce false;
         prime.sync.enable = lib.mkForce true;

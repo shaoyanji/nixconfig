@@ -4,7 +4,9 @@
     enable = true;
     #extraPackages = with pkgs; [ nvidia-vaapi-driver ];
   };
-
+  hardware.opengl = {
+    driSupport32Bit = true;
+  };
   nixpkgs.config = {
     allowUnfree = true;
     nvidia.acceptLicense = true;
@@ -12,14 +14,14 @@
   };
   #nixpkgs.config.allowBroken = true;
   services.xserver.videoDrivers = [ "nvidia"];
-  boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "i2c-nvidia_gpu" ];
+  #  boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "i2c-nvidia_gpu" ];
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = false;
     powerManagement.finegrained = false;
     open = false;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
     forceFullCompositionPipeline = true;
     prime = {
     offload.enable = true;
@@ -32,7 +34,8 @@
     gaming.configuration = {
       system.nixos.tags = [ "gaming" ];
         hardware.nvidia = {
-        package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
+        #        package = config.boot.kernelPackages.nvidiaPackages.stable;
+        package = config.boot.kernelPackages.nvidiaPackages.beta;
         prime.offload.enable = lib.mkForce false;
         prime.offload.enableOffloadCmd = lib.mkForce false;
         prime.sync.enable = lib.mkForce true;
@@ -42,5 +45,25 @@
     # libnvidia-container does not support cgroups v2 (prior to 1.8.0)
     # https://github.com/NVIDIA/nvidia-docker/issues/1447
     };
+  };
+  environment.systemPackages = with pkgs; [
+    protonup
+    #nvidia-docker
+    #nvidia-container-toolkit
+    #nvidia-modprobe
+    #nvidia-settings
+    #nvidia-smi
+    #nvidia-xconfig
+    #nvidia-cuda-toolkit
+    #nvidia-cuda-dev
+    #nvidia-cuda-doc
+    #nvidia-cuda-samples
+    #nvidia-opencl-icd
+    #nvidia-opencl-dev
+    #nvidia-opencl-doc
+  ];
+  environment.sessionVariables = {
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS =
+      "/home/devji/.steam/root/compatibilitytools.d";
   };
 }

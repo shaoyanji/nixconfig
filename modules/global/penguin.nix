@@ -21,7 +21,8 @@
   home.packages = with pkgs; [
     gum
     go-task
-    (pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];})
+    pkgs.nerd-fonts.jetbrains-mono
+    #(pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];})
   ];
   home.file = {
     # ".screenrc".source = dotfiles/screenrc;

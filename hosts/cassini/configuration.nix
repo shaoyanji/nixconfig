@@ -37,7 +37,7 @@
 
   # Fonts
   fonts.packages = [
-    (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
+    #(pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
   ];
       
   system.defaults = {

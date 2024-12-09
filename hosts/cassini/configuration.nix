@@ -36,9 +36,9 @@
   programs.nix-index.enable = true;
 
   # Fonts
-  #fonts.packages = [
-  #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
-  #];
+  fonts.packages = [
+    #(pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
+  ];
       
   system.defaults = {
     dock.autohide = true;

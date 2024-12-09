@@ -1,6 +1,6 @@
 {inputs, config, pkgs, lib, ... }:
 {
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
+  boot.initrd.postDeviceCommands = lib.mkAfter /*bash*/''
     mkdir /btrfs_tmp
     mount /dev/root_vg/root /btrfs_tmp
     if [[ -e /btrfs_tmp/root ]]; then

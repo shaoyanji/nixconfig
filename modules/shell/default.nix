@@ -54,7 +54,7 @@ in
         add_newline = false;
         command_timeout = 1300;
         scan_timeout = 50;
-        format= "$all$nix_shell$nodejs$lua$golang$rust$php$git_branch$git_commit$git_state$git_status\n$username$hostname$directory";
+        format= /*bash*/"$all$nix_shell$nodejs$lua$golang$rust$php$git_branch$git_commit$git_state$git_status\n$username$hostname$directory";
          character = {
            success_symbol = "[➜](bold green)";
            error_symbol = "[➜](bold red)";
@@ -77,7 +77,7 @@ in
   programs.tmux = {
     enable = true;
     terminal = "xterm-256color";
-    shell = "${pkgs.zsh}/bin/zsh";
+    shell = "zsh";
       #shortcut = "a";
     historyLimit = 100000;
     baseIndex = 1;

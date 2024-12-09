@@ -11,7 +11,7 @@ in
     "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
     "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents";
     "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
-    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents/books";
+    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/books";
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pictures";

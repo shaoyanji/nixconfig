@@ -2,7 +2,7 @@
 {
   hardware.graphics = {
     enable = true;
-    #extraPackages = with pkgs; [ nvidia-vaapi-driver ];
+    #    extraPackages = with pkgs; [ nvidia-vaapi-driver ];
   };
   hardware.opengl = {
     driSupport32Bit = true;
@@ -24,30 +24,33 @@
     package = config.boot.kernelPackages.nvidiaPackages.beta;
     forceFullCompositionPipeline = true;
     prime = {
-    offload.enable = true;
-    sync.enable = false;
-    nvidiaBusId = "PCI:1:0:0";
-    amdgpuBusId = "PCI:5:0:0";
+      offload.enable = true;
+      sync.enable = false;
+      nvidiaBusId = "PCI:1:0:0";
+      amdgpuBusId = "PCI:5:0:0";
   };
 };
   specialisation = {
     gaming.configuration = {
       system.nixos.tags = [ "gaming" ];
-        hardware.nvidia = {
-        #        package = config.boot.kernelPackages.nvidiaPackages.stable;
+      hardware.nvidia = {
+        # package = config.boot.kernelPackages.nvidiaPackages.stable;
         package = config.boot.kernelPackages.nvidiaPackages.beta;
-        prime.offload.enable = lib.mkForce false;
-        prime.offload.enableOffloadCmd = lib.mkForce false;
-        prime.sync.enable = lib.mkForce true;
+        prime = {
+          offload.enable = lib.mkForce false;
+          offload.enableOffloadCmd = lib.mkForce false;
+          sync.enable = lib.mkForce true;
+        };
       };
-    # Nvidia Docker
+    };
+  };
+  # Nvidia Docker
     # virtualisation.docker.enableNvidia = true;
     # libnvidia-container does not support cgroups v2 (prior to 1.8.0)
     # https://github.com/NVIDIA/nvidia-docker/issues/1447
-    };
-  };
+
   environment.systemPackages = with pkgs; [
-    protonup
+    #    protonup
     #nvidia-docker
     #nvidia-container-toolkit
     #nvidia-modprobe
@@ -63,7 +66,6 @@
     #nvidia-opencl-doc
   ];
   environment.sessionVariables = {
-    STEAM_EXTRA_COMPAT_TOOLS_PATHS =
-      "/home/devji/.steam/root/compatibilitytools.d";
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/devji/.steam/root/compatibilitytools.d";
   };
 }

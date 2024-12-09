@@ -25,9 +25,9 @@
   dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
   gamescopeSession.enable = true; # Enable Gamescope session support
-  extraCompatPackages = [ pkgs.proton-ge-bin ];
+    #  extraCompatPackages = [ pkgs.proton-ge-bin ];
   };
-
+  #environment.systemPackages = with pkgs; [mangohud protonup-qt lutris bottles heroic];
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
     "steam"
     "steam-original"

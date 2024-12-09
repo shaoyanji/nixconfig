@@ -31,17 +31,6 @@ in
     # gnupg
     # age
 
-    (pkgs.writeShellScriptBin "loginssh" ''
-      sudo ssh $(${pkgs.sops}/bin/sops -d --extract '["server"]["commands"]' ${config.sops.defaultSopsFile} | ${pkgs.gum}/bin/gum choose) 
-    '')
-    (pkgs.writeShellApplication {
-      name = "load-taskfile";
-      runtimeInputs = [ pkgs.sops ];
-      text = ''
-        ${pkgs.sops}/bin/sops -d ${taskfile_path} > ./Taskfile.yml
-      '';
-    })
-      
   ];
   
   home.file={

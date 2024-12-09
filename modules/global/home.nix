@@ -149,7 +149,7 @@
 
         #(pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     pkgs.nerd-fonts.jetbrains-mono
-
+    
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')

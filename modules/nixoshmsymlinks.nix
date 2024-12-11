@@ -15,7 +15,7 @@ in
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pictures";
-    "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/videos";
+    "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video";
     "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/go/pkg";
     ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/cargo/registry";
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/ollama";

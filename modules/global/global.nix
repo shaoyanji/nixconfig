@@ -63,9 +63,10 @@
   #  programs.nix-index.enable = true;
 
   # Fonts
-  #fonts.packages = [
+  fonts.packages = [
+    pkgs.nerd-fonts.jetbrains-mono
   #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
-  #];
+  ];
       nixpkgs.config.allowUnsupportedSystem = true;
       nixpkgs.config.allowUnfree = true;
 }

@@ -97,7 +97,7 @@
       home-manager.darwinModules.default
     ];
     globalModulesWSL = globalModules ++ [ 
-      ./modules/global/heim.nix
+      ./modules/global/wsl.nix
       home-manager.nixosModules.default
     ];
   in
@@ -164,10 +164,6 @@
         modules = globalModulesWSL
           ++ [ ./hosts/guckloch/configuration.nix 
           nixos-wsl.nixosModules.default
-            {
-              system.stateVersion = "24.05";
-              wsl.enable = true;
-            }
           ];
       };
     };

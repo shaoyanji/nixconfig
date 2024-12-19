@@ -160,7 +160,7 @@
     cocoapods
     m-cli # useful macOS CLI commands
     wezterm
-    # darwin.xcode_16_1 
+    darwin.xcode_16_1 
 
   ];
   home.file = {

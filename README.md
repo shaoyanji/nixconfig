@@ -10,28 +10,9 @@ git clone https://github.com/shaoyanji/nixconfig.git
 
 ## Usage
 
-### nix-darwin
-
 ```bash
-darwin-rebuild switch --flake .#cassini
-```
-
-### nixos
-
-```bash
-sudo nixos-rebuild switch --flake .#poseidon
-```
-
-### home-manager
-
-```bash
-home-manager switch --flake .#heim
-```
-
-### WSL
-
-```bash
-sudo nixos-rebuild switch --flake .#guck-loch
+sops -d modules/nixconfig/secrets/secrets.yaml > Taskfile.yml
+task
 ```
 
 ### SOPS Configuration

@@ -9,6 +9,10 @@
   ";
 
   inputs = {
+    #lix-module = {
+    #  url = "https://git.lix.systems/lix-project/nixos-module/archive/2.91.1-2.tar.gz";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #};
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
@@ -61,7 +65,8 @@
   };
 
   outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager,
-    chaotic,
+    chaotic, 
+    #lix-module,
     ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];
@@ -80,6 +85,7 @@
         system.configurationRevision = self.rev or self.dirtyRev or null; 
       }
       ./modules/global/global.nix 
+        #      lix-module.nixosModules.default
     ];
     globalModulesNixos = globalModules ++ [ 
       ./modules/global/nixos.nix

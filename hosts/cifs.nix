@@ -1,10 +1,10 @@
 {pkgs,configs,inputs,...}:
 {
-	fileSystems."/mnt/w" = {
-		device = "192.168.178.4:/volume1/peachcable";
-		fsType = "nfs";
-		options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
-	};
+	#fileSystems."/mnt/w" = {
+	#	device = "192.168.178.4:/volume1/peachcable";
+	#	fsType = "nfs";
+	#	options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
+	#};
 
 	fileSystems."/mnt/y" = {
 		device = "//192.168.178.1/fritz.nas/External-USB3-0-01/";

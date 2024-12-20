@@ -64,8 +64,7 @@
     zen-browser.url = "github:MarceColl/zen-browser-flake";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager,
-    chaotic, lix-module,
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, lix-module, sops-nix,
     ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];
@@ -89,6 +88,7 @@
       ./modules/global/nixos.nix
       home-manager.nixosModules.default
       lix-module.nixosModules.default
+      sops-nix.nixosModules.sops
     ];
     globalModulesImpermanence = globalModules ++ [
       ./modules/global/impermanence.nix

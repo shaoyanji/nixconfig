@@ -84,11 +84,11 @@
         system.configurationRevision = self.rev or self.dirtyRev or null; 
       }
       ./modules/global/global.nix 
-      lix-module.nixosModules.default
     ];
     globalModulesNixos = globalModules ++ [ 
       ./modules/global/nixos.nix
       home-manager.nixosModules.default
+      lix-module.nixosModules.default
     ];
     globalModulesImpermanence = globalModules ++ [
       ./modules/global/impermanence.nix
@@ -100,6 +100,7 @@
       ./modules/global/macos.nix
       nix-homebrew.darwinModules.nix-homebrew
       home-manager.darwinModules.default
+      lix-module.nixosModules.default
     ];
     globalModulesWSL = globalModules ++ [ 
       ./modules/global/wsl.nix

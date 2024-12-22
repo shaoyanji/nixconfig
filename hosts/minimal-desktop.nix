@@ -137,5 +137,9 @@
     #    config.boot.kernelPackages.digimend
     # nfs-utils
   ];
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    #libGL
+  ];
 }
 

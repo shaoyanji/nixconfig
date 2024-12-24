@@ -37,6 +37,7 @@ in
      ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/secrets/cloak/accounts.age";
     ".cloak/keys.txt".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/keys.txt";
       #    ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
+    ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
   };
 
   home.sessionVariables = {

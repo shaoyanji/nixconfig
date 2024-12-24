@@ -24,6 +24,6 @@ in
     ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/firefox";
     ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/secrets/cloak/accounts.age";
-    ".cloak/keys.txt".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/keys.txt";
+    ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/key.txt";
   };
 }

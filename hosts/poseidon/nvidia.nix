@@ -2,10 +2,8 @@
 {
   hardware.graphics = {
     enable = true;
+    enable32Bit = true;
     #    extraPackages = with pkgs; [ nvidia-vaapi-driver ];
-  };
-  hardware.opengl = {
-    driSupport32Bit = true;
   };
   nixpkgs.config = {
     allowUnfree = true;
@@ -21,7 +19,7 @@
     powerManagement.finegrained = false;
     open = false;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
     forceFullCompositionPipeline = true;
     prime = {
       offload.enable = true;
@@ -34,8 +32,8 @@
     gaming.configuration = {
       system.nixos.tags = [ "gaming" ];
       hardware.nvidia = {
-        # package = config.boot.kernelPackages.nvidiaPackages.stable;
-        package = config.boot.kernelPackages.nvidiaPackages.beta;
+        package = config.boot.kernelPackages.nvidiaPackages.stable;
+        #package = config.boot.kernelPackages.nvidiaPackages.beta;
         prime = {
           offload.enable = lib.mkForce false;
           offload.enableOffloadCmd = lib.mkForce false;

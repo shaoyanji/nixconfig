@@ -87,7 +87,7 @@
     globalModulesNixos = globalModules ++ [ 
       ./modules/global/nixos.nix
       home-manager.nixosModules.default
-      lix-module.nixosModules.default
+        #lix-module.nixosModules.default
       sops-nix.nixosModules.sops
     ];
     globalModulesImpermanence = globalModules ++ [
@@ -100,7 +100,6 @@
       ./modules/global/macos.nix
       nix-homebrew.darwinModules.nix-homebrew
       home-manager.darwinModules.default
-      lix-module.nixosModules.default
     ];
     globalModulesWSL = globalModules ++ [ 
       ./modules/global/wsl.nix

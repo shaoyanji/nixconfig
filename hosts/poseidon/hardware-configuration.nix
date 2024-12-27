@@ -28,12 +28,7 @@
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
-  fileSystems."/mnt/w" = {
-    device = "192.168.178.4:/volume1/peachcable";
-    fsType = "nfs";
-    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
-  };
-  swapDevices =
+ swapDevices =
     [ { device = "/dev/disk/by-uuid/30fa7541-b3db-442a-8450-105d555e4eba"; }
     ];
 

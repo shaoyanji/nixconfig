@@ -33,4 +33,14 @@
 			in
 			["${automount_opts},${reg_opts}"];
 	};
+	fileSystems."/mnt/v" = {
+		device = "//burgernas/usbshare1";
+		fsType = "cifs";
+		options = let
+			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+			reg_opts = "rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt,uid=$(id -u),gid=$(id -g)";
+			in
+			["${automount_opts},${reg_opts}"];
+	};
+
 }

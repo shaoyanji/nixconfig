@@ -1,4 +1,4 @@
-{pkgs,configs,inputs,...}:
+{pkgs,config,inputs,...}:
 {
 	#fileSystems."/mnt/w" = {
 	#	device = "192.168.178.4:/volume1/peachcable";
@@ -11,7 +11,7 @@
 		fsType = "cifs";
 		options = let
 			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-			reg_opts = "rw,noserverino,username=jisifu,uid=$(id -u),gid=$(id -g)";
+			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=$(id -u),gid=$(id -g)";
 			in
 			["${automount_opts},${reg_opts}"];
 	};
@@ -20,7 +20,7 @@
 		fsType = "cifs";
 		options = let
 			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-			reg_opts = "rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt,uid=$(id -u),gid=$(id -g)";
+			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=$(id -u),gid=$(id -g)";
 			in
 			["${automount_opts},${reg_opts}"];
 	};
@@ -29,7 +29,7 @@
 		fsType = "cifs";
 		options = let
 			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-			reg_opts = "rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt,uid=$(id -u),gid=$(id -g)";
+			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=$(id -u),gid=$(id -g)";
 			in
 			["${automount_opts},${reg_opts}"];
 	};
@@ -38,7 +38,7 @@
 		fsType = "cifs";
 		options = let
 			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-			reg_opts = "rw,noserverino,credentials=/mnt/y/documents/secrets/credentials.txt,uid=$(id -u),gid=$(id -g)";
+			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=$(id -u),gid=$(id -g)";
 			in
 			["${automount_opts},${reg_opts}"];
 	};

@@ -7,6 +7,7 @@ keys:
   - &servermb age1ywan3hwg4v306e3gk4sjzfvjfxru432kgr3xlmwu77nkhgsjmfuqr7lktd
   - &mbdevji age15ptau7jyv6kcwz39vcfzxpw95p97l5r7uywkcl5g83gqxuhh7q4saggagy
   - &sopsposeidon age1ezs5s0mx7pcmv0cq6lhvxqtrgx9shrenpxuqyny3m52rg4a6vuxq9ucd7c
+  - &hposeidon age10njuv5050y6wvxq0a9vpvxwrd4scr34cxrxmzz3cl8p7xwjydqhq358af6
   - &sopsacer age12yhcg6c7spluq7z0dsgduqfvvcqzyz0a5an3zsndecuc0h2w3ftseyzlad
   - &pengsops age1cpkcemzhdkc5zmghdx63qv0km2t934raj6fs0ff7uftet00fh3qqjc8wq9
   - &minyx age17k653l45u5tusxjhnacms8ltqm64kyqluetxfr0khsrj8clesgeqemr95d
@@ -23,6 +24,7 @@ creation_rules:
       - *servermb
       - *mbdevji
       - *sopsposeidon
+      - *hposeidon
       - *sopsacer
       - *pengsops
       - *minyx

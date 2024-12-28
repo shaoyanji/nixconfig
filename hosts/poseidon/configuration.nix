@@ -8,7 +8,7 @@
       ./steam.nix
       ../base-desktop-environment.nix
       ../minimal-desktop.nix
-      ../cifs.nix
+      #      ../cifs.nix
     ];
   sops.defaultSopsFile = ../../modules/secrets/secrets.yaml;
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];

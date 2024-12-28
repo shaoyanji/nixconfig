@@ -8,11 +8,11 @@
       ./steam.nix
       ../base-desktop-environment.nix
       ../minimal-desktop.nix
-      #    <sops-nix/modules/sops>
       #      ../cifs.nix
     ];
-  #sops.defaultSopsFile = ../../modules/secrets/secrets.nix;
-  #sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
+  sops.defaultSopsFile = ../../modules/secrets/secrets.yaml;
+  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
+  sops.secrets."server/localwd/credentials" = {};
   #TODO: finish the secrets ops.
   networking.hostName = "poseidon"; # Define your hostname.
   environment.systemPackages = with pkgs; [

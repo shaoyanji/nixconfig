@@ -17,7 +17,8 @@
   #TODO: finish the secrets ops.
   networking.hostName = "poseidon"; # Define your hostname.
   environment.systemPackages = with pkgs; [
-    inputs.zen-browser.packages.${pkgs.system}.specific
+    #    inputs.zen-browser.packages.${pkgs.system}.specific
   ];
+  services.flatpak.enable = true;
   system.stateVersion = "24.05"; # Did you read the comment?
 }

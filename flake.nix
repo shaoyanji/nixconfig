@@ -13,6 +13,10 @@
       url = "https://git.lix.systems/lix-project/nixos-module/archive/2.91.1-2.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    ghostty = {
+      url = "github:ghostty-org/ghostty";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
@@ -64,7 +68,7 @@
     #zen-browser.url = "github:0xc000022070/zen-browser-flake";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, lix-module, sops-nix,
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, lix-module, sops-nix, ghostty,
     ... }@inputs:
   let
     overlays = [ inputs.nuenv.overlays.default ];

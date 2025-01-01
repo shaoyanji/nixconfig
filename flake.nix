@@ -15,7 +15,6 @@
     };
     ghostty = {
       url = "github:ghostty-org/ghostty";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
@@ -91,8 +90,8 @@
     globalModulesNixos = globalModules ++ [ 
       ./modules/global/nixos.nix
       home-manager.nixosModules.default
-        #lix-module.nixosModules.default
       sops-nix.nixosModules.sops
+        #lix-module.nixosModules.default
     ];
     globalModulesImpermanence = globalModules ++ [
       ./modules/global/impermanence.nix

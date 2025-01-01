@@ -143,6 +143,7 @@
         # "gigalixir"
       ];
       casks = [
+        "ghostty"
         "arc"
         "orbstack"
         "obsidian"

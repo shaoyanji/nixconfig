@@ -32,7 +32,7 @@
     gaming.configuration = {
       system.nixos.tags = [ "gaming" ];
       hardware.nvidia = {
-        package = config.boot.kernelPackages.nvidiaPackages.stable;
+        #package = config.boot.kernelPackages.nvidiaPackages.stable;
         #package = config.boot.kernelPackages.nvidiaPackages.beta;
         prime = {
           offload.enable = lib.mkForce false;

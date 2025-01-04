@@ -24,7 +24,6 @@ in
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
-    # cifs-utils
     sops
     yq-go
     # pass

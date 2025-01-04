@@ -10,12 +10,15 @@
       ../minimal-desktop.nix
       #      ../cifs.nix
     ];
-  sops.defaultSopsFile = ../../modules/secrets/secrets.yaml;
-  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
-  sops.secrets."server/localwd/credentials" = {};
-  sops.secrets."server/keyrepo/credentials" = {};
-  #TODO: finish the secrets ops.
-  networking.hostName = "poseidon"; # Define your hostname.
+  sops = {
+    defaultSopsFile = ../../modules/secrets/secrets.yaml;
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
+    secrets = {
+      "server/localwd/credentials" = {};
+      "server/keyrepo/credentials" = {};
+    };
+  };
+    networking.hostName = "poseidon"; # Define your hostname.
   environment.systemPackages = with pkgs; [
     #    inputs.zen-browser.packages.${pkgs.system}.specific
   ];

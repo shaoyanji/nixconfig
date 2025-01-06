@@ -80,8 +80,8 @@ in
   programs.tmux = {
     enable = true;
     terminal = "xterm-256color";
-    shell = "zsh";
-      #shortcut = "a";
+    #shell = "zsh";
+    #shortcut = "a";
     historyLimit = 100000;
     baseIndex = 1;
     plugins = with pkgs.tmuxPlugins; [ 

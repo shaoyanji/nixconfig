@@ -13,7 +13,7 @@ in
     "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
     "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/books";
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
-    "Downloads/appimages".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/appimages";
+    "Applications".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/appimages";
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics";
     "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video";

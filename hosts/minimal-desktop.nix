@@ -93,10 +93,8 @@
 
   # Configure keymap in X11
   #enable bluetooth
-  hardware={
-    bluetooth.enable = true;
-    pulseaudio.enable = false;
-  };
+  hardware.bluetooth.enable = true;
+  services.pulseaudio.enable = false;
 
   security.rtkit.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -107,6 +105,7 @@
     hashedPassword = "$6$.MwUydqIuXNoHXxy$8N0tM2mWOStiuDEkDw/wBCwg73PTKGY24G7huRi3gn0GJPW.o9d4eEseTmB7KXxlOtUG06fNgQwTmEkAYkS.a.";
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKVYLgws2TgaYIsOmVmJeoJIu9F8lguBXi711Kv90jaM devji@poseidon"
     ];
     packages = with pkgs; [
     # kdePackages.kate

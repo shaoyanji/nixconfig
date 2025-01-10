@@ -23,7 +23,7 @@
     libreoffice
     hunspell
     hunspellDicts.en_US
-    inputs.zen-browser.packages.${pkgs.system}.specific
+    inputs.zen-browser.packages.${pkgs.system}.twilight
   ];
   system.stateVersion = "24.05"; # Did you read the comment?
 }

@@ -38,9 +38,6 @@ in
       enable = true;
       shellAliases = myAliases;
       bashrcExtra = /*bash*/ ''
-        if [ "$(hostname)" = "poseidon" ]; then
-          export PATH="$PATH:/mnt/x/bin-x86:/mnt/x/go/bin-x86"
-        fi
         if [ "$(hostname)" = "lunarfall" ]; then
           source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
         fi

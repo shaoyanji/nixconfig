@@ -8,7 +8,7 @@
       ./steam.nix
       ../base-desktop-environment.nix
       ../minimal-desktop.nix
-      #      ../cifs.nix
+      # ../cifs.nix
     ];
   sops = {
     defaultSopsFile = ../../modules/secrets/secrets.yaml;
@@ -20,6 +20,7 @@
   };
   networking.hostName = "poseidon"; # Define your hostname.
   environment.systemPackages = with pkgs; [
+    qutebrowser
     libreoffice
     hunspell
     hunspellDicts.en_US

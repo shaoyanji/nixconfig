@@ -138,7 +138,7 @@
     path = [ pkgs.flatpak ];
     script = ''
       flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-      flatpak install flathub io.github.zen_browser.zen
+      #  flatpak install flathub io.github.zen_browser.zen
     '';
   };
  
@@ -148,7 +148,7 @@
     cifs-utils
     ffmpeg
     gphoto2
-    #    config.boot.kernelPackages.digimend
+    # config.boot.kernelPackages.digimend
     # nfs-utils
   ];
   programs.nix-ld.enable = true;

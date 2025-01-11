@@ -1,4 +1,4 @@
-{ pkgs,config, ... }:
+{ pkgs, config, ... }:
 let
   routerNAS = "/mnt/y/";
   sharedNAS = "/mnt/x/";

@@ -8,9 +8,16 @@
   home.packages = with pkgs; [
     gcc
     go
-    tinygo
+    #tinygo
     rustc
     cargo
+    #lua
+    #luajit
+    #python3
+    #lua51Packages.moonscript
+    #nim
+    #wasmtime
+
   ];
   
   home.file={

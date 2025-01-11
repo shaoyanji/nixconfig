@@ -26,18 +26,18 @@ in
     "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
     "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents";
-    "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
-    ".config/nix-darwin".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
+    "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents/nixconfig";
+    ".config/nix-darwin".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/projects/repo/nixconfig";
     "Music/muzik".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music/";
-    "Movies/video".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video/";
+    "Movies/video".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/videos/";
     "Pictures/pics".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics/";
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/ollama";
     "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/go/pkg";
     ".config/btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
-     ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/secrets/cloak/accounts.age";
+    ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/secrets/cloak/accounts.age";
     ".cloak/keys.txt".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/keys.txt";
-      #    ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
-    ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
+    # ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
+    # ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
   };
 
   home.sessionVariables = {

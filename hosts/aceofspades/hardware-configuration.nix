@@ -24,12 +24,6 @@
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
-  
-  #  fileSystems."/mnt/w" = {
-  #  device = "192.168.178.4:/volume1/peachcable";
-  #  fsType = "nfs";
-  #  options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
-  #};
 
   swapDevices = [ {
     device = "/dev/disk/by-uuid/3c69bef5-ae37-4e72-a46b-3c9241391ebb";

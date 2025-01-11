@@ -6,25 +6,18 @@
   ];
   home.packages = with pkgs;[
     (pkgs.writers.writeBashBin "duck" {} /*bash*/ ''
-        YELLOW='\033[1;33m'
-        GREEN='\033[1;32m'
-        CYAN='\033[1;36m'
-        RESET='\033[0m'
-        
         # Check for required dependencies
         if ! command -v curl &>/dev/null; then
             echo "curl is required but not installed. Aborting."
             exit 1
         fi
-        
-        
         MODEL="claude-3-haiku-20240307"
         
         # Set up conversation file
         CONVERSATION_DB="$HOME/chatbot_conversation.db"
         if [[ ! -f "$CONVERSATION_DB" ]]; then
             # Create table if it doesn't exist
-            sqlite3 $CONVERSATION_DB <<EOF
+            ${pkgs.sqlite}/bin/sqlite3 $CONVERSATION_DB <<EOF
         CREATE TABLE conversation_history (
             id INTEGER PRIMARY KEY,
             user_input TEXT,
@@ -63,10 +56,10 @@
             else
                 # Print response
                 echo -e "Chatbot: $response"
-                echo -e "$response" > /dev/clipboard
-        #md2c /dev/clipboard
+                # echo -e "$response" > /dev/clipboard
+                # md2c /dev/clipboard
                 # Save conversation to SQLite database
-                sqlite3 $CONVERSATION_DB "INSERT INTO conversation_history (user_input, chatbot_response) VALUES ("'$input'", "'$response'");"
+                ${pkgs.sqlite}/bin/sqlite3 $CONVERSATION_DB "INSERT INTO conversation_history (user_input, chatbot_response) VALUES ("'$input'", "'$response'");"
             fi
         done
     '')

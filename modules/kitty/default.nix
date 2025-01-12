@@ -18,6 +18,8 @@
   #      include = "~/.config/kitty/theme.conf";
   #    };
   #  };
-  home.file.".config/kitty/kitty.conf".source = ./kitty.conf;
-  home.file.".config/kitty/current-theme.conf".source = ./current-theme.conf;
+  xdg.configFile={
+    "kitty/kitty.conf".source = ./kitty.conf;
+    "kitty/current-theme.conf".source = ./current-theme.conf;
+  };
 }

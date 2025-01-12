@@ -1,43 +1,41 @@
 { pkgs, ... }:
 
 {
-  home.username = "devji";
-  home.homeDirectory= "/home/devji";
-  home.stateVersion = "24.11"; # Please read the comment before changing.
-
   imports = [ 
     ./home.nix
     ../dev.nix
   ];
-  
-  nixpkgs.config.allowUnfree = true;
+  home = {
+    username = "devji";
+    homeDirectory= "/home/devji";
+    stateVersion = "24.11"; # Please read the comment before changing.
+    packages = with pkgs; [
+      obsidian
+      wl-clipboard
+#   system call monitoring
+      strace # system call monitoring
+      ltrace # library call monitoring
+      lsof # list open files
+#   system tools
+      sysstat
+      lm_sensors # for `sensors` command
+      ethtool
+      pciutils # lspci
+      usbutils # lsusb
+    ];
 
-  #nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-  #           "obsidian"
-  #         ];
+    file = {
+    };
 
-  home.packages = with pkgs; [
-    obsidian
-    wl-clipboard
-# system call monitoring
-    strace # system call monitoring
-    ltrace # library call monitoring
-    lsof # list open files
-
-# system tools
-    sysstat
-    lm_sensors # for `sensors` command
-    ethtool
-    pciutils # lspci
-    usbutils # lsusb
-
-  ];
-  home.file = {
+    sessionVariables = {
+    };
   };
-
-    home.sessionVariables = {
-   };
+ 
+  nixpkgs.config.allowUnfree = true;
+  # nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+  #   "obsidian"
+  # ];
 
   # Let Home Manager install and manage itself.
-    programs.home-manager.enable = true;
+  programs.home-manager.enable = true;
 }

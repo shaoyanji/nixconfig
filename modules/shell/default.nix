@@ -121,7 +121,8 @@ in
       eza
     ];
   home.file = {
-    #    ".zshrc".source = ./.zshrc;
+    # xdg.configFile."lf/icons".source = ./.lf-icons;
+    # ".zshrc".source = ./.zshrc;
     # ".tmux.conf".source = ./.tmux.conf;
         #TODO: fix nushell plugin
     # # You can also set the file content immediately.

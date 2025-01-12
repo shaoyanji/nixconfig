@@ -26,5 +26,8 @@
     hunspellDicts.en_US
     inputs.zen-browser.packages.${pkgs.system}.twilight
   ];
+  environment.variables = {
+
+  };
   system.stateVersion = "24.05"; # Did you read the comment?
 }

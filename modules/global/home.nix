@@ -26,6 +26,7 @@
     cmus
     yt-dlp
     mpv
+    sqlite
 # nix formatting
     #nixfmt-rfc-style
     #alejandra

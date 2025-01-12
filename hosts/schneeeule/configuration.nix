@@ -9,11 +9,11 @@
       ./steam.nix
       ../impermanence.nix
       ../base-desktop-environment.nix
-      ../minimal-desktop-environment.nix
+      ../minimal-desktop.nix
     ];
   networking.hostName = "schneeeule"; # Define your hostname.
   environment.systemPackages = with pkgs; [
-  inputs.zen-browser.packages.${pkgs.system}.specific
+  inputs.zen-browser.packages.${pkgs.system}.twilight
   ];
 
   fileSystems."/persist/data" = {

@@ -97,6 +97,8 @@ pkgs.mkShell
     #gitmoji-changelog
     #sparkly-cli
     #lowcharts
+    hare
+    haredoc
   ];
   GREETING = "Hello, Nix!";
   shellHook = ''

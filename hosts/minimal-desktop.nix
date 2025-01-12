@@ -1,7 +1,5 @@
 {inputs, config, pkgs, lib, ... }:
 {
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  #boot.kernelPackages = pkgs.linuxPackages_6_11;
   boot.extraModulePackages = with config.boot.kernelPackages;
     [ v4l2loopback.out ];
   boot.kernelModules = [

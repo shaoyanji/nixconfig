@@ -29,9 +29,8 @@
   };
   specialisation = {
     legacynvidia.configuration = {
-      system.nixos.tags = [ "legacynvidia" ];
+      system.nixos.tags = [ "Gaming" ];
       hardware.nvidia = {
-        package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
         prime.offload.enable = lib.mkForce false;
         prime.offload.enableOffloadCmd = lib.mkForce false;
         prime.sync.enable = lib.mkForce true;

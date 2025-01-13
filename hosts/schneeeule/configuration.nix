@@ -13,7 +13,8 @@
     ];
   networking.hostName = "schneeeule"; # Define your hostname.
   environment.systemPackages = with pkgs; [
-  inputs.zen-browser.packages.${pkgs.system}.twilight
+    qutebrowser
+    inputs.zen-browser.packages.${pkgs.system}.twilight
   ];
 
   fileSystems."/persist/data" = {

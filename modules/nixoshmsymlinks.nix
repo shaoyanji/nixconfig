@@ -25,7 +25,6 @@ in
     ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/secrets/cloak/accounts.age";
     ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/key.txt";
     # ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
-    "Taskfile.yml".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.sops}/bin/sops -d ./secrets/DE-Taskfile.yml";
   };
   xdg.configFile = {
     "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";

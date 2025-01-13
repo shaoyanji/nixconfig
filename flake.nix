@@ -125,7 +125,7 @@
       };
       lunarfall = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
-        pkgs = nixpkgs.legacyPackages. "aarch64-linux";
+        pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [./modules/global/lunarfall.nix] ;
       };
     };

@@ -60,9 +60,7 @@
     #};
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     #lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.91.1-2.tar.gz";
-    ghostty = {
-      url = "github:ghostty-org/ghostty";
-    };
+    ghostty.url = "github:ghostty-org/ghostty";
   };
 
   outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixos-wsl, home-manager, chaotic, sops-nix, 

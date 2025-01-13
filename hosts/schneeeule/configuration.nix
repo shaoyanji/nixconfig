@@ -10,7 +10,16 @@
       ../impermanence.nix
       ../base-desktop-environment.nix
       ../minimal-desktop.nix
+      inputs.sops-nix.nixosModules.sops
     ];
+  sops = {
+    defaultSopsFile = ../../modules/secrets/secrets.yaml;
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
+    secrets = {
+      "server/localwd/credentials" = {};
+      "server/keyrepo/credentials" = {};
+    };
+  };
   networking.hostName = "schneeeule"; # Define your hostname.
   environment.systemPackages = with pkgs; [
     qutebrowser

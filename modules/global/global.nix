@@ -4,8 +4,6 @@
 
     ];
 
- # Nix configuration ------------------------------------------------------------------------------
-  #
   nix = {
     gc = {
       automatic = true;
@@ -50,26 +48,12 @@
   ];
   environment.systemPackages = with pkgs; [
   ];
-  # Create /etc/bashrc that loads the nix-darwin environment.
-  #programs.zsh.enable = true;
-
-  # Auto upgrade nix package and the daemon service.
-  #  services.nix-daemon.enable = true;
-  # Apps
-  # `home-manager` currently has issues adding them to `~/Applications`
-  # Issue: https://github.com/nix-community/home-manager/issues/1341
-  #  environment.systemPackages = with pkgs; [
-  #];
-
-  # https://github.com/nix-community/home-manager/issues/423
-  #environment.variables = {
-  #};
+  
   #  programs.nix-index.enable = true;
 
   # Fonts
   fonts.packages = [
     pkgs.nerd-fonts.jetbrains-mono
-  #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
   ];
   nixpkgs.config.allowUnsupportedSystem = true;
   nixpkgs.config.allowUnfree = true;

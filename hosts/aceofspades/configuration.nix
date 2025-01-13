@@ -16,10 +16,10 @@
   };
   networking.hostName = "aceofspades"; # Define your hostname.
   services.xserver.videoDrivers = [ "amdgpu" ];
-  # Install firefox.
-  programs.firefox.enable = true;
 
   environment.systemPackages = with pkgs; [
+    qutebrowser
+    inputs.zen-browser.packages.${pkgs.system}.twilight
   ];
 
   hardware.graphics.extraPackages = [

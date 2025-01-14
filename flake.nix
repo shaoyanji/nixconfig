@@ -181,7 +181,7 @@
 #		       ];
 #		    extraSpecialArgs = { inherit inputs; }; # Pass inputs to homeManagerConfiguration
 #		};
-#	];
+	];
       };
 
       guckloch = nixpkgs.lib.nixosSystem {

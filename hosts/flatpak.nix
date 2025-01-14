@@ -8,6 +8,7 @@ let
   desiredFlatpaks = [
     # "org.mozilla.firefox"
     # "org.mozilla.thunderbird"
+    #  flatpak install flathub io.github.zen_browser.zen
   ];
 in
 {

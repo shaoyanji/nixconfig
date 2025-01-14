@@ -6,9 +6,6 @@
 pkgs.mkShell
 # pkgs.mkShellNoCC
 {
-  buildInputs = [
-    nixpkgs-fmt
-  ];
   packages = with pkgs; [
     cowsay
     lolcat
@@ -72,7 +69,7 @@ pkgs.mkShell
     gping
     #dua-cli
     speedtest-cli
-    dog
+    #dog
     buku
     ddgr
     khal
@@ -83,7 +80,7 @@ pkgs.mkShell
     tuir
     httpie
     lazygit
-    ngrok
+    #ngrok
     asciinema
     navi
     #transfer

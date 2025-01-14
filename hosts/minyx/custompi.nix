@@ -69,17 +69,20 @@ openssh.authorizedKeys.keys = [
 hashedPassword="$6$.MwUydqIuXNoHXxy$8N0tM2mWOStiuDEkDw/wBCwg73PTKGY24G7huRi3gn0GJPW.o9d4eEseTmB7KXxlOtUG06fNgQwTmEkAYkS.a."; 
 
 };
+
    environment.systemPackages = with pkgs; [
     neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     curl
     git
     wget
+    nixpkgs-fmt
+    cifs-utils
    ];
-#  fileSystems."/mnt/w" = {
-#    device = "192.168.178.4:/volume1/peachcable";
-#    fsType = "nfs";
-#    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
-#  };
+  fileSystems."/mnt/w" = {
+    device = "192.168.178.4:/volume1/peachcable";
+    fsType = "nfs";
+    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
+  };
   documentation.nixos.enable = false;
   boot.tmp.cleanOnBoot = true;
   # Configure basic SSH access

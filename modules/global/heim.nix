@@ -10,7 +10,7 @@
     homeDirectory= "/home/devji";
     stateVersion = "24.11"; # Please read the comment before changing.
     packages = with pkgs; [
-      obsidian
+#      obsidian
       wl-clipboard
 #   system call monitoring
       strace # system call monitoring

@@ -10,7 +10,7 @@
   ];
   home.file = {
   };
-   home.sessionVariables = {
-    #    PATH = "/nix/var/nix/profiles/default/bin:$HOME/.local/.bin/:$PATH";
-   };
+  home.sessionVariables = {
+  #    PATH = "/nix/var/nix/profiles/default/bin:$HOME/.local/.bin/:$PATH";
+  };
 }

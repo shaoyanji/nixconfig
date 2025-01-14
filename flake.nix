@@ -167,7 +167,7 @@
         modules = globalModules
           ++ [ ./hosts/minyx/configuration.nix
 	  	sops-nix.nixosModules.sops
-#		home-manager.nixosModules.default
+		home-manager.nixosModules.default
 #		home-manager= {
 #		    useGlobalPkgs = true;
 #		    useUserPackages = true;

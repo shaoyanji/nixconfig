@@ -4,6 +4,16 @@
     ./flatpak.nix
     ./nfs.nix
   ];
+  #  sops.secrets.my-password.neededForUsers = true;
+  sops = {
+    defaultSopsFile = ../modules/secrets/secrets.yaml;
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
+    secrets = {
+      "server/localwd/credentials" = {};
+      "server/keyrepo/credentials" = {};
+    };
+  };
+
   boot.extraModulePackages = with config.boot.kernelPackages;
     [ v4l2loopback.out ];
   boot.kernelModules = [
@@ -16,10 +26,6 @@
   nixpkgs.config.allowUnfree = true;
   services={
     #    xserver.digimend.enable = true;
-    displayManager.sddm = {
-      enable = true;
-      wayland.enable = true;
-    };
     xserver.xkb = {
       layout = "us";
       variant = "";
@@ -43,12 +49,9 @@
         PasswordAuthentication = false;
       };
     };
-  # Enable automatic login for the user.
-    displayManager.autoLogin={
-      enable = true;
-      user = "devji";
-    };
   };
+
+  security.sudo.wheelNeedsPassword = false;
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -81,17 +84,6 @@
   # Enable the KDE Plasma Desktop Environment.
   #services.desktopManager.plasma6.enable = true;
  
- programs.hyprland = {
-    enable = true;
-    # set the flake package
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    # make sure to also set the portal package, so that they are in sync
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-    xwayland.enable = true;
- };
-
-  # Optional, hint Electron apps to use Wayland:
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   # Configure keymap in X11
   #enable bluetooth
@@ -101,9 +93,10 @@
   security.rtkit.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.devji = {
+    home = "/home/devji";
     isNormalUser = true;
     description = "matt";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     hashedPassword = "$6$.MwUydqIuXNoHXxy$8N0tM2mWOStiuDEkDw/wBCwg73PTKGY24G7huRi3gn0GJPW.o9d4eEseTmB7KXxlOtUG06fNgQwTmEkAYkS.a.";
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
@@ -130,22 +123,16 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
-
- #  services.flatpak.enable = true;
-  #  systemd.services.flatpak-repo = {
-  #    wantedBy = [ "multi-user.target" ];
-  #    path = [ pkgs.flatpak ];
-  #    script = ''
-  #      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-  #      #  flatpak install flathub io.github.zen_browser.zen
-  #    '';
-  #  };
  
   environment.systemPackages = with pkgs; [
-    kitty
     cifs-utils
     ffmpeg
     gphoto2
+    curl
+    git
+    wget
+    nixpkgs-fmt
+    cifs-utils
     # config.boot.kernelPackages.digimend
     # nfs-utils
   ];

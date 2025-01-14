@@ -38,6 +38,7 @@
 
   # Enable experimental nix command and flakes
   # nix.package = pkgs.nixUnstable;
+  nix.package = pkgs.lix;
   nix.optimise.automatic = true;
   nix.extraOptions = ''
     min-free = ${toString (100 * 1024 * 1024)}
@@ -54,6 +55,7 @@
   # Fonts
   fonts.packages = [
     pkgs.nerd-fonts.jetbrains-mono
+  #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
   ];
   nixpkgs.config.allowUnsupportedSystem = true;
   nixpkgs.config.allowUnfree = true;

@@ -1,5 +1,9 @@
 {inputs, config, pkgs, lib, ... }:
 {
+  imports = [
+    ./flatpak.nix
+    ./nfs.nix
+  ];
   boot.extraModulePackages = with config.boot.kernelPackages;
     [ v4l2loopback.out ];
   boot.kernelModules = [
@@ -127,20 +131,15 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  fileSystems."/mnt/w" = {
-    device = "192.168.178.4:/volume1/peachcable";
-    fsType = "nfs";
-    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
-  };
-  services.flatpak.enable = true;
-  systemd.services.flatpak-repo = {
-    wantedBy = [ "multi-user.target" ];
-    path = [ pkgs.flatpak ];
-    script = ''
-      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-      #  flatpak install flathub io.github.zen_browser.zen
-    '';
-  };
+ #  services.flatpak.enable = true;
+  #  systemd.services.flatpak-repo = {
+  #    wantedBy = [ "multi-user.target" ];
+  #    path = [ pkgs.flatpak ];
+  #    script = ''
+  #      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  #      #  flatpak install flathub io.github.zen_browser.zen
+  #    '';
+  #  };
  
   environment.systemPackages = with pkgs; [
     kitty

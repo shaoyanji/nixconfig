@@ -11,6 +11,7 @@
     secrets = {
       "server/localwd/credentials" = {};
       "server/keyrepo/credentials" = {};
+      hashedPassword.neededForUsers = true;
     };
   };
 

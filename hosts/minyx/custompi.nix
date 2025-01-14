@@ -2,12 +2,21 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, ... }:
+{ inputs,config, lib, pkgs, ... }:
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+	inputs.sops-nix.nixosModules.sops
     ];
+  sops = {
+    defaultSopsFile = ../../modules/secrets/secrets.yaml;
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
+    secrets = {
+      "server/localwd/credentials" = {};
+      "server/keyrepo/credentials" = {};
+    };
+  };
 
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   # Enables the generation of /boot/extlinux/extlinux.conf

@@ -92,6 +92,7 @@
     globalModulesImpermanence = globalModules ++ [
       ./modules/global/impermanence.nix
       home-manager.nixosModules.default
+      sops-nix.nixosModules.sops
       inputs.impermanence.nixosModules.default
       inputs.disko.nixosModules.default
     ];

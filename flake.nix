@@ -110,8 +110,7 @@
       heim = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
-        modules = [./modules/global/heim.nix
-          ] ;
+        modules = [./modules/global/heim.nix] ;
       };
       penguin = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = { inherit inputs; };
@@ -162,6 +161,29 @@
         modules = globalModulesNixos
           ++ [ ./hosts/aceofspades/configuration.nix ];
       };
+      minyx = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        specialArgs = { inherit inputs; };
+        modules = globalModules
+          ++ [ ./hosts/minyx/configuration.nix
+	  	sops-nix.nixosModules.sops
+#		home-manager.nixosModules.default
+#		home-manager= {
+#		    useGlobalPkgs = true;
+#		    useUserPackages = true;
+#		    backupFileExtension= "hm-backup"; #for rebuild
+#		    users.devji =  import {imports = [ 
+#		    	./modules/global/heim.nix
+#		    	./modules/nixoshmsymlinks.nix
+#		    ];}; 
+#		    sharedModules = [
+#		       #  sops-nix.homeManagerModules.sops
+#		       ];
+#		    extraSpecialArgs = { inherit inputs; }; # Pass inputs to homeManagerConfiguration
+#		};
+#	];
+      };
+
       guckloch = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };

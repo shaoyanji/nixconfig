@@ -167,21 +167,9 @@
         specialArgs = { inherit inputs; };
         modules = globalModules
           ++ [ ./hosts/minyx/configuration.nix
+                ./modules/global/minyx.nix
 	  	sops-nix.nixosModules.sops
 		home-manager.nixosModules.default
-#		home-manager= {
-#		    useGlobalPkgs = true;
-#		    useUserPackages = true;
-#		    backupFileExtension= "hm-backup"; #for rebuild
-#		    users.devji =  import {imports = [ 
-#		    	./modules/global/heim.nix
-#		    	./modules/nixoshmsymlinks.nix
-#		    ];}; 
-#		    sharedModules = [
-#		       #  sops-nix.homeManagerModules.sops
-#		       ];
-#		    extraSpecialArgs = { inherit inputs; }; # Pass inputs to homeManagerConfiguration
-#		};
 	];
       };
 

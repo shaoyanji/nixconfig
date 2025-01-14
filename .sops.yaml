@@ -18,6 +18,7 @@ keys:
   - &leakynose age1s2vtxjp0hjrrjulx9qf2gejn9xkd5y4gu2m0wrxw5vqw7cf2ea3qkusze6
   - &schneeeulehost age1hxsrt6a23efmpnhqn0hhqhpeukf0tf3hk99y5vpff8vfrxknpumsgq7yd5
   - &acersops age15mzmhlt5hh5z94843e27rqev4955v3gkcwqacr4ueyxegzav94kqvz0c43
+  - &minyxhost age10tahcnw6m357gfmx4686q7qqkt5h7f3p7gvamhn0ds3wyfe35chsztfnwt
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -37,4 +38,5 @@ creation_rules:
       - *leakynose
       - *schneeeulehost
       - *acersops
+      - *minyxhost
       gpg:

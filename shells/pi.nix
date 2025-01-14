@@ -6,6 +6,9 @@
 pkgs.mkShell
 # pkgs.mkShellNoCC
 {
+  buildInputs = [
+    nixpkgs-fmt
+  ];
   packages = with pkgs; [
     cowsay
     lolcat

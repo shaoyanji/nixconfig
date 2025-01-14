@@ -65,6 +65,7 @@ openssh.authorizedKeys.keys = [
 	"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
 "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKVYLgws2TgaYIsOmVmJeoJIu9F8lguBXi711Kv90jaM devji@poseidon"
 "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOD4PopDAxzh1t4nNnDE/xiWLGYzopLRzZ7eBwd4hHza devji@schneeeule"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaSocp/bIkehFWy8I/H+g/46sWfnmj9s+Zx13dIjQct devji@lunarfall"
 ];
 hashedPassword="$6$.MwUydqIuXNoHXxy$8N0tM2mWOStiuDEkDw/wBCwg73PTKGY24G7huRi3gn0GJPW.o9d4eEseTmB7KXxlOtUG06fNgQwTmEkAYkS.a."; 
 
@@ -78,6 +79,7 @@ hashedPassword="$6$.MwUydqIuXNoHXxy$8N0tM2mWOStiuDEkDw/wBCwg73PTKGY24G7huRi3gn0G
     nixpkgs-fmt
     cifs-utils
    ];
+
   fileSystems."/mnt/w" = {
     device = "192.168.178.4:/volume1/peachcable";
     fsType = "nfs";

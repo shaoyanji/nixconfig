@@ -71,5 +71,4 @@
       enable = true;
       acceleration = "cuda";
     };
-
 }

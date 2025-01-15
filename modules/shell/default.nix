@@ -11,6 +11,8 @@ let
   };
 in
 {
+
+  imports = [ ./nushell.nix ];
   programs={
     zsh = {
       enable = true;
@@ -33,7 +35,6 @@ in
         ];
       };
     };
-    #  imports = [ ./shells/fish ];
     bash = {
       enable = true;
       shellAliases = myAliases;
@@ -121,11 +122,6 @@ in
       eza
     ];
   home.file = {
-    # xdg.configFile."lf/icons".source = ./.lf-icons;
-    # ".zshrc".source = ./.zshrc;
-    # ".tmux.conf".source = ./.tmux.conf;
-        #TODO: fix nushell plugin
-    # # You can also set the file content immediately.
      ".bash_aliases".text = /*bash*/''
       0file() { curl -F"file=@$1" https://envs.sh ; }
       0pb() { curl -F"file=@-;" https://envs.sh ; }

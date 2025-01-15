@@ -159,7 +159,21 @@
     m-cli # useful macOS CLI commands
     wezterm
     darwin.xcode_16_1 
-    ];
+    ]
+++ lib.optionals stdenv.isLinux [
+                  wl-clipboard
+#   system call monitoring
+      strace # system call monitoring
+      ltrace # library call monitoring
+      lsof # list open files
+#   system tools
+      sysstat
+      lm_sensors # for `sensors` command
+      ethtool
+      pciutils # lspci
+      usbutils # lsusb
+    ]
+    ;
   home.file = {
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a

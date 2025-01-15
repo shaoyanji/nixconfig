@@ -34,4 +34,10 @@
     DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1;
     DOTNET_MULTILEVEL_LOOKUP=0;
   };
+  home.sessionPath = [
+    "$HOME/.dotnet/tools"
+    "$HOME/.cargo/bin"
+    "$HOME/.local/bin"
+    "$HOME/go/bin"
+  ];
 }

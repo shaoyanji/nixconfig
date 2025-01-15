@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{lib, pkgs, config, ... }:
 let
   peachNAS = "/mnt/w/";
   routerNAS = "/mnt/y/";
@@ -32,4 +32,8 @@ in
     "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
   };
+  home.sessionPath = [ "${peachNAS}/bin-scripts" ]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64[ "${peachNAS}/bin-aarch64" "${peachNAS}/go/bin" "${peachNAS}/.cargo/bin"]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [ "${peachNAS}/bin-x86_64" "${peachNAS}/go/bin-x86" ]
+    ;
 }

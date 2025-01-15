@@ -4,14 +4,7 @@
   home.stateVersion = "24.11"; # Please read the comment before changing.
 
   imports = [
-    ../lf
-    ../env.nix
-    ../shell
-    ../sops.nix
-    ../nixvim
-    ../kitty
-    ../shell/nushell.nix
-    ../helix.nix
+    ./home.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -19,9 +12,6 @@
   # "obsidian"
   # ];
   home.packages = with pkgs; [
-    gum
-    go-task
-    pkgs.nerd-fonts.jetbrains-mono
     #(pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];})
   ];
   home.file = {

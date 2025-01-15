@@ -17,6 +17,7 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
     wget
     gum
     go-task
@@ -159,8 +160,7 @@
     m-cli # useful macOS CLI commands
     wezterm
     darwin.xcode_16_1 
-
-  ];
+    ] ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
   home.file = {
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a

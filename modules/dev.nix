@@ -20,7 +20,7 @@
     #hare
     #haredoc
     #zig
-    #dotnet-sdk
+    dotnet-sdk
     #dotnet-runtime
   ];
   

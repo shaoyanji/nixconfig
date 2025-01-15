@@ -17,7 +17,7 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
+    (pkgs.nerd-fonts.jetbrains-mono)
     wget
     gum
     go-task

@@ -1,5 +1,6 @@
 { pkgs, config, ... }:
 let
+  peachNAS = "/mnt/w/";
   routerNAS = "/mnt/y/";
   sharedNAS = "/mnt/x/";
   wolfNAS = "/mnt/z/";
@@ -13,17 +14,17 @@ in
     "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents";
     "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/books";
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
-    "Applications".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/appimages";
+    "Applications".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/appimages";
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics";
     "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video";
-    "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/go/pkg";
-    ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/.cargo/registry";
-    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/ollama";
+    "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/go/pkg";
+    ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/.cargo/registry";
+    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/ollama";
     # ".zen".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/zen";
     ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/firefox";
     ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/secrets/cloak/accounts.age";
-    ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/key.txt";
+    ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/security/key.txt";
     # ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
   };
   xdg.configFile = {

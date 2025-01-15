@@ -10,20 +10,12 @@
   ../env.nix
   ../shell
   #./home.nix
-  # ./browser/firefox.nix
   ];
   
   nixpkgs.config.allowUnfree = true;
-  #nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-  #           "obsidian"
-  #         ];
-
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
-  home.packages = with pkgs; [
+ home.packages = with pkgs; [
     neovim
   ];
- # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in

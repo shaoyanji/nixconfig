@@ -39,9 +39,9 @@ in
       enable = true;
       shellAliases = myAliases;
       bashrcExtra = /*bash*/ ''
-#        if [ "$(hostname)" = "lunarfall" ]; then
-#         source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-#       fi
+        if [ "$(hostname)" = "lunarfall" ]; then
+         source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+       fi
         source $HOME/.bash_aliases
         eval "$(fzf --bash)"
         eval "$(zoxide init bash)"

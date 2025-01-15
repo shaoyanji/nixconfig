@@ -37,16 +37,19 @@
   };
 
   # Enable experimental nix command and flakes
-  # nix.package = pkgs.nixUnstable;
-  nix.package = pkgs.lix;
-  nix.optimise.automatic = true;
-  nix.extraOptions = ''
-    min-free = ${toString (100 * 1024 * 1024)}
-    max-free = ${toString (1024 * 1024 * 1024)}
-  '';
-  nix.nixPath = [
-    "nixpkgs=${pkgs.path}"
-  ];
+  nix = {
+
+  # package = pkgs.nixUnstable;
+    package = pkgs.lix;
+    optimise.automatic = true;
+    extraOptions = ''
+      min-free = ${toString (100 * 1024 * 1024)}
+      max-free = ${toString (1024 * 1024 * 1024)}
+    '';
+    nixPath = [
+      "nixpkgs=${pkgs.path}"
+    ];
+  };
   environment.systemPackages = with pkgs; [
   ];
   

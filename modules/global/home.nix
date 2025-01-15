@@ -146,7 +146,7 @@
     # pkgs.hello
 
         #(pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-        (pkgs.nerd-fonts.jetbrains-mono)
+        #(pkgs.nerd-fonts.jetbrains-mono)
     
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
@@ -159,7 +159,7 @@
     m-cli # useful macOS CLI commands
     wezterm
     darwin.xcode_16_1 
-    ] ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+    ];
   home.file = {
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a

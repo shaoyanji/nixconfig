@@ -168,9 +168,9 @@
         modules = globalModules
           ++ [ ./hosts/minyx/configuration.nix
                 ./modules/global/minyx.nix
-	  	sops-nix.nixosModules.sops
-		home-manager.nixosModules.default
-	];
+                sops-nix.nixosModules.sops
+                home-manager.nixosModules.default
+        ];
       };
 
       guckloch = nixpkgs.lib.nixosSystem {

@@ -12,15 +12,16 @@
     rustc
     cargo
     #lua
-    #luajit
-    #python3
+    luajit
+    python3
     #lua51Packages.moonscript
     #nim
     #wasmtime
     #hare
     #haredoc
-    zig
-
+    #zig
+    #dotnet-sdk
+    #dotnet-runtime
   ];
   
   home.file={

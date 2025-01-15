@@ -3,6 +3,7 @@
   imports = [
     ./flatpak.nix
     ./nfs.nix
+    #    ../modules/nixos/lxc
   ];
   #  sops.secrets.my-password.neededForUsers = true;
   sops = {
@@ -139,5 +140,10 @@
   programs.nix-ld.libraries = with pkgs; [
     #libGL
   ];
+
+  #  programs.appimage = {
+  #  enable = true;
+  #  binfmt = true;
+  #};
 }
 

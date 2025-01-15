@@ -1,4 +1,7 @@
 { inputs,pkgs,config, ... }:
+let 
+    peachNAS = "/mnt/w/";
+in
 
 {
   imports = [ 
@@ -7,7 +10,6 @@
   ];
   nixpkgs.config.allowUnfree = true;
 
-  nix.package = pkgs.lix;
   #nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
   #           "obsidian"
   #         ];
@@ -26,6 +28,6 @@
     #      XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
     #  PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH:$HOME/go/bin:$HOME/.cargo/bin:$HOME/go/bin-aarch64";
    };
-  home.sessionPath = [ "$HOME/go/bin-aarch64" ];
+    home.sessionPath = [ "${peachNAS}/bin-aarch64" "${peachNAS}/go/bin" ];
    programs.home-manager.enable = true;
 }

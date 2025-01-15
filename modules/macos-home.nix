@@ -5,6 +5,7 @@
   ...
 }:
 let  
+    peachNAS = "/Volumes/peachcable";
     routerNAS = "/Volumes/FRITZ.NAS/External-USB3-0-01";
     sharedNAS = "/Volumes/Shared Library";
     wolfNAS = "/Volumes/usbshare2";
@@ -31,11 +32,11 @@ in
     "Music/muzik".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music/";
     "Movies/video".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/videos/";
     "Pictures/pics".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics/";
-    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/ollama";
-    "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/go/pkg";
+    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/ollama";
+    "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/go/pkg";
     ".config/btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
     ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/secrets/cloak/accounts.age";
-    ".cloak/keys.txt".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/keys.txt";
+    ".cloak/keys.txt".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/security/keys.txt";
     # ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     # ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
   };

@@ -10,7 +10,6 @@
     ../nixvim 
     ../wezterm 
     ../kitty
-    ../shell/nushell.nix
     # ../dev.nix
     ../helix.nix
     # ../scripts

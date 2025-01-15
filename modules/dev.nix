@@ -17,6 +17,9 @@
     #lua51Packages.moonscript
     #nim
     #wasmtime
+    #hare
+    #haredoc
+    zig
 
   ];
   

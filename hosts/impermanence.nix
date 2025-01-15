@@ -30,6 +30,7 @@
     hideMounts = true;
     directories = [
       "/etc/nixos"
+      #      "/etc/ssh" # for sops impermanence
       "/var/log"
       "/var/lib/bluetooth"
       "/var/lib/nixos"

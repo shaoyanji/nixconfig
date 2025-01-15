@@ -23,8 +23,6 @@
   boot.extraModprobeConfig = ''
     options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
   '';
-  nix.settings.experimental-features = [ "nix-command" "flakes"];
-  nixpkgs.config.allowUnfree = true;
   services={
     #    xserver.digimend.enable = true;
     xserver.xkb = {
@@ -98,7 +96,7 @@
     isNormalUser = true;
     description = "matt";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
-    hashedPassword = "$6$.MwUydqIuXNoHXxy$8N0tM2mWOStiuDEkDw/wBCwg73PTKGY24G7huRi3gn0GJPW.o9d4eEseTmB7KXxlOtUG06fNgQwTmEkAYkS.a.";
+    hashedPasswordFile = config.sops.secrets.hashedPassword.path;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKVYLgws2TgaYIsOmVmJeoJIu9F8lguBXi711Kv90jaM devji@poseidon"

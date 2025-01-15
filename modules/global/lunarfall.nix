@@ -7,6 +7,7 @@
   ];
   nixpkgs.config.allowUnfree = true;
 
+  nix.package = pkgs.lix;
   #nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
   #           "obsidian"
   #         ];

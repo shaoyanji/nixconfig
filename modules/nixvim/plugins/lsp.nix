@@ -72,6 +72,9 @@
         # clangd = {
         #  enable = true;
         #}
+        omnisharp = {
+          enable = true;
+        };
         gopls = {
           enable = true;
         };

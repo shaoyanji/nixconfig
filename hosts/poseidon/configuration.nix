@@ -7,6 +7,7 @@
       ./nvidia.nix
       ../common/steam.nix
       ../base-desktop-environment.nix
+      ../../modules/nixos/lxc
       # ../cifs.nix
     ];
   boot.kernelPackages = pkgs.linuxPackages_latest;

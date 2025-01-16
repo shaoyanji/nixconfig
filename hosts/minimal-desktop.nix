@@ -3,7 +3,6 @@
   imports = [
     ./flatpak.nix
     ./nfs.nix
-    # ../modules/nixos/lxc
   ];
   sops = {
     defaultSopsFile = ../modules/secrets/secrets.yaml;

@@ -37,5 +37,6 @@
     hunspell
     hunspellDicts.en_US
     inputs.ghostty.packages.x86_64-linux.default
+    inputs.zen-browser.packages.${pkgs.system}.twilight
   ];
 }

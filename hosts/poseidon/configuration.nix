@@ -5,7 +5,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./nvidia.nix
-      ./steam.nix
+      ../common/steam.nix
       ../base-desktop-environment.nix
       # ../cifs.nix
     ];

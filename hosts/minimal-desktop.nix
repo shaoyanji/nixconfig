@@ -3,9 +3,8 @@
   imports = [
     ./flatpak.nix
     ./nfs.nix
-    #    ../modules/nixos/lxc
+    # ../modules/nixos/lxc
   ];
-  #  sops.secrets.my-password.neededForUsers = true;
   sops = {
     defaultSopsFile = ../modules/secrets/secrets.yaml;
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
@@ -125,15 +124,14 @@
   # networking.firewall.enable = false;
  
   environment.systemPackages = with pkgs; [
-    cifs-utils
     ffmpeg
     gphoto2
     curl
     git
     wget
     nixpkgs-fmt
-    cifs-utils
     # config.boot.kernelPackages.digimend
+    cifs-utils
     # nfs-utils
   ];
   programs.nix-ld.enable = true;

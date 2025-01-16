@@ -19,11 +19,6 @@
       enable = true;
       user = "devji";
     };
-
-    ollama = {
-      enable = true;
-      acceleration = "cuda";
-    };
   };
   programs.hyprland = {
     enable = true;
@@ -41,5 +36,6 @@
     libreoffice
     hunspell
     hunspellDicts.en_US
+    inputs.ghostty.packages.x86_64-linux.default
   ];
 }

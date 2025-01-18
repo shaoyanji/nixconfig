@@ -2,8 +2,6 @@
   imports = [
     ./hyprland.nix
   ];
-  home.packages = with pkgs; [
-  ];
   xdg.configFile = {
     "hypr/animations.conf".source=./animations.conf;
     "hypr/monitors.conf".source=./monitors.conf;

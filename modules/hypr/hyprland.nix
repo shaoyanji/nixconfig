@@ -176,9 +176,4 @@
       source = ~/.config/hypr/userprefs.conf
     '';
   };
-  home.packages = with pkgs; [
-    
-  ];
-  home.file={
-  };
 }

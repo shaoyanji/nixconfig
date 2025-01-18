@@ -9,7 +9,6 @@
   ";
 
   inputs = {
-    
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
@@ -87,12 +86,11 @@
       ./modules/global/nixos.nix
       home-manager.nixosModules.default
       sops-nix.nixosModules.sops
+      chaotic.nixosModules.default
         #lix-module.nixosModules.default
     ];
-    globalModulesImpermanence = globalModules ++ [
+    globalModulesImpermanence = globalModulesNixos ++ [
       ./modules/global/impermanence.nix
-      home-manager.nixosModules.default
-      sops-nix.nixosModules.sops
       inputs.impermanence.nixosModules.default
       inputs.disko.nixosModules.default
     ];
@@ -101,8 +99,8 @@
       nix-homebrew.darwinModules.nix-homebrew
       home-manager.darwinModules.default
     ];
-    globalModulesWSL = globalModules ++ [ 
-      ./modules/global/wsl.nix
+    globalModulesMin = globalModules ++ [ 
+      ./modules/global/noDE.nix
       home-manager.nixosModules.default
     ];
   in
@@ -131,11 +129,10 @@
     };
     nixosConfigurations = {
       poseidon = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        system = forAllSystems;
         specialArgs = { inherit inputs; };
         modules = globalModulesNixos
           ++ [ ./hosts/poseidon/configuration.nix 
-            chaotic.nixosModules.default
             ];
       };
       ares = nixpkgs.lib.nixosSystem {
@@ -143,7 +140,6 @@
         specialArgs = { inherit inputs; };
         modules = globalModulesImpermanence
           ++ [ ./hosts/ares/configuration.nix 
-            chaotic.nixosModules.default
             (import ./hosts/disko.nix { device = "/dev/sda"; })
             ];
       };
@@ -152,7 +148,6 @@
         specialArgs = { inherit inputs; };
         modules = globalModulesImpermanence
           ++ [ ./hosts/schneeeule/configuration.nix 
-            chaotic.nixosModules.default
             (import ./hosts/disko.nix { device = "/dev/sda"; })
             ];
       };
@@ -165,20 +160,19 @@
       minyx = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         specialArgs = { inherit inputs; };
-        modules = globalModules
+        modules = globalModulesMin
           ++ [ ./hosts/minyx/configuration.nix
                 ./modules/global/minyx.nix
                 sops-nix.nixosModules.sops
-                home-manager.nixosModules.default
         ];
       };
 
       guckloch = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
-        modules = globalModulesWSL
+        modules = globalModulesMin
           ++ [ ./hosts/guckloch/configuration.nix 
-          nixos-wsl.nixosModules.default
+            nixos-wsl.nixosModules.default
           ];
       };
     };

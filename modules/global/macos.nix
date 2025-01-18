@@ -12,7 +12,7 @@
     extraSpecialArgs = { inherit inputs; }; # Pass inputs to homeManagerConfiguration
   # Optionally, use home-manager.extraSpecialArgs to pass
   };
-  users.users.devji= {
+  users.users.devji = {
     name = "devji";
     home = "/Users/devji";
   };

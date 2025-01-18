@@ -4,7 +4,12 @@
         useGlobalPkgs = true;
         useUserPackages = true;
         backupFileExtension= "hm-backup"; #for rebuild
-        users.devji =  import ../nixos-home.nix; 
+        users.devji =  {
+            imports = [ 
+                ./heim.nix
+                ../hypr
+            ];
+        }; 
         sharedModules = [
            #  sops-nix.homeManagerModules.sops
            ];

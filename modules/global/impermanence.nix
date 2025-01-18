@@ -10,7 +10,8 @@
           { 
             imports = [
               inputs.impermanence.nixosModules.home-manager.impermanence
-              ../nixos-home.nix
+              ./heim.nix
+              ../hypr
             ];
           
             home.stateVersion = "24.11"; # Please read the comment before changing.
@@ -26,6 +27,7 @@
                 ".local/share/keyrings"
                 ".local/share/direnv"
                 ".config/direnv"
+                ".zen"
                 {
                   directory = ".local/share/Steam";
                   method = "symlink";

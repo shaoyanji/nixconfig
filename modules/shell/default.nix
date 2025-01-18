@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let 
   myAliases = { 
       l="eza -lahF --color=auto --icons --sort=size --group-directories-first";
@@ -12,38 +12,17 @@ let
 in
 {
 
-  imports = [ ./nushell.nix ];
+  imports = [ ./nushell.nix 
+              ./zsh.nix
+              ./bash.nix
+              ./tmux.nix
+            ];
   programs={
     zsh = {
-      enable = true;
-      autosuggestion.enable = true;
-      syntaxHighlighting.enable = true;
-      enableCompletion = true;
       shellAliases = myAliases;
-      oh-my-zsh = {
-        enable = true;
-        plugins = [
-          "git"
-          "direnv"
-          #"kubectl"
-          #"docker"
-          #"helm"
-          "aliases"
-          "alias-finder"
-          "colored-man-pages"
-          "vi-mode"
-        ];
-      };
     };
     bash = {
-      enable = true;
       shellAliases = myAliases;
-      bashrcExtra = /*bash*/ ''
-        source $HOME/.bash_aliases
-        eval "$(fzf --bash)"
-        eval "$(zoxide init bash)"
-        eval "$(starship init bash)"
-      '';
     };
     starship = {
       enable = true;
@@ -68,42 +47,9 @@ in
       enable = true;
       options = [
         "--cmd cd"
-          ];
+      ];
     };
     fzf.enable = true;
-  };
-  programs.tmux = {
-    enable = true;
-    terminal = "xterm-256color";
-    #shell = "zsh";
-    #shortcut = "a";
-    historyLimit = 100000;
-    baseIndex = 1;
-    plugins = with pkgs.tmuxPlugins; [ 
-        yank
-        resurrect
-        continuum
-        tmux-fzf
-        vim-tmux-navigator
-        fzf-tmux-url
-        catppuccin
-        better-mouse-mode
-    ];
-    extraConfig = /*tmux*/ ''
-      set -g mouse on
-      bind h select-pane -L
-      bind j select-pane -D
-      bind k select-pane -U
-      bind l select-pane -R
-      bind | split-window -h -c "#{pane_current_path}"
-      bind - split-window -v -c "#{pane_current_path}"
-      bind c new-window -c "#{pane_current_path}"
-      set -g @catppuccin_flavours "mocha"
-      set -g @continuum-restore "on"
-      set -g @continuum-boot "on"
-      set -g @resurrect-strategy-nvim "session"
-      set -g @resurrect-capture-pane-contents "on"
-    '';
   };
   home.packages = with pkgs;
     [
@@ -119,16 +65,6 @@ in
       eza
     ];
   home.file = {
-     ".bash_aliases".text = /*bash*/''
-      0file() { curl -F"file=@$1" https://envs.sh ; }
-      0pb() { curl -F"file=@-;" https://envs.sh ; }
-      0url() { curl -F"url=$1" https://envs.sh ; }
-      0short() { curl -F"shorten=$1" https://envs.sh ; }
-    '';
-    # ".gradle/gradle.properties".text = ''
-    #   org.gradle.console=verbose
-    #   org.gradle.daemon.idletimeout=3600000
-    # '';
   };
 
  home.sessionVariables = {

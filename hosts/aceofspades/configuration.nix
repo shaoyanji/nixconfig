@@ -4,7 +4,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ../base-desktop-environment.nix
+      ../common/base-desktop-environment.nix
     ];
   boot.loader = {
     grub = {

@@ -7,8 +7,8 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       ../common/steam.nix
-      ../impermanence.nix
-      ../base-desktop-environment.nix
+      ../common/impermanence.nix
+      ../common/base-desktop-environment.nix
     ];
   networking.hostName = "schneeeule"; # Define your hostname.
   environment.systemPackages = with pkgs; [

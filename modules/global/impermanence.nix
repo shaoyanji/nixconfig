@@ -1,21 +1,8 @@
 { config, pkgs, inputs, ... }:
 {
-    home-manager= {
-        useGlobalPkgs = true;
-        useUserPackages = true;
-        backupFileExtension= "hm-backup"; #for rebuild
-        users.devji = 
-          { pkgs, inputs, ... }:
-
-          { 
             imports = [
-              inputs.impermanence.nixosModules.home-manager.impermanence
-              ./heim.nix
-              ../hypr
             ];
-          
             home.stateVersion = "24.11"; # Please read the comment before changing.
-          
             home.persistence."/persist/home" = {
               directories = [
                 "Downloads"
@@ -38,12 +25,5 @@
               ];
               allowOther = true;
             };
-          };
-        sharedModules = [
-           inputs.sops-nix.homeManagerModules.sops
-           ];
-        extraSpecialArgs = { inherit inputs; }; # Pass inputs to homeManagerConfiguration
-
-    };
 }
 

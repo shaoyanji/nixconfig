@@ -6,7 +6,7 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       ../common/steam.nix
-      ../base-desktop-environment.nix
+      ../common/base-desktop-environment.nix
       ../../modules/nixos/lxc
       # ../cifs.nix
     ];

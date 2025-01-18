@@ -4,8 +4,8 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ../impermanence.nix
-      ../base-desktop-environment.nix
+      ../common/impermanence.nix
+      ../common/base-desktop-environment.nix
     ];
   networking.hostName = "ares"; # Define your hostname.
   environment.systemPackages = with pkgs; [

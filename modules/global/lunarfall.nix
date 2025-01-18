@@ -1,7 +1,4 @@
 { inputs,pkgs,config, ... }:
-let 
-    peachNAS = "/mnt/w/";
-in
 
 {
   imports = [ 
@@ -28,6 +25,7 @@ in
     #      XDG_DATA_DIRS="$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
     #  PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH:$HOME/go/bin:$HOME/.cargo/bin:$HOME/go/bin-aarch64";
    };
-    home.sessionPath = [ "${peachNAS}/bin-aarch64" "${peachNAS}/go/bin" ];
+    home.sessionPath = [ 
+    ];
    programs.home-manager.enable = true;
 }

@@ -4,13 +4,14 @@
   imports = [ 
     ./home.nix
     ../dev.nix
+    ../nixoshmsymlinks.nix
   ];
   home = {
     username = "devji";
     homeDirectory= "/home/devji";
     stateVersion = "24.11"; # Please read the comment before changing.
     packages = with pkgs; [
-   ];
+    ];
 
     file = {
     };

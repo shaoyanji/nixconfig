@@ -129,7 +129,7 @@
     };
     nixosConfigurations = {
       poseidon = nixpkgs.lib.nixosSystem {
-        system = forAllSystems;
+        system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = globalModulesNixos
           ++ [ ./hosts/poseidon/configuration.nix 
@@ -158,7 +158,7 @@
           ++ [ ./hosts/aceofspades/configuration.nix ];
       };
       minyx = nixpkgs.lib.nixosSystem {
-        system = "aarch64-linux";
+        system = forAllSystems;
         specialArgs = { inherit inputs; };
         modules = globalModulesMin
           ++ [ ./hosts/minyx/configuration.nix

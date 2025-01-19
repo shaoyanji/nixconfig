@@ -4,7 +4,7 @@
     fsType = "nfs";
     options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
   };
-  #services.rpcbind.enable = true;
+  services.rpcbind.enable = true;
   #systemd.mount = [{
   #  type = "nfs";
   #  mountConfig = {

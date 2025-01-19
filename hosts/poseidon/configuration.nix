@@ -8,7 +8,6 @@
       ../common/steam.nix
       ../common/base-desktop-environment.nix
       ../../modules/nixos/lxc
-      # ../cifs.nix
     ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
     networking.hostName = "poseidon"; # Define your hostname.

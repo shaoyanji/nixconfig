@@ -8,18 +8,20 @@
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
-  boot.initrd = {
-    supportedFilesystems = [ "nfs" ];
+  boot = {
+    initrd = {
+      availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" ];
+      supportedFilesystems = [ "nfs" ];
+      kernelModules = [ "kvm-amd" "nfs" ];
+    };
     kernelModules = [ "kvm-amd" "nfs" ];
+    extraModulePackages = [ ];
   };
-  #  boot.extraModulePackages = [ ];
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/292db143-7e80-45c4-b940-34d77e58b5c7";
       fsType = "ext4";
     };
 
-  boot.initrd.luks.devices."luks-a03ed119-37a7-4609-aca5-679ba0eccddf".device = "/dev/disk/by-uuid/a03ed119-37a7-4609-aca5-679ba0eccddf";
   boot.initrd.luks.devices."luks-d8c4ffdb-dd14-4836-9e1b-6c400362987d".device = "/dev/disk/by-uuid/d8c4ffdb-dd14-4836-9e1b-6c400362987d";
 
   fileSystems."/boot" =

@@ -11,7 +11,7 @@
 		fsType = "cifs";
 		options = let
 			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=$(id -u),gid=$(id -g)";
+			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=1000,gid=1";
 			in
 			["${automount_opts},${reg_opts}"];
 	};
@@ -20,7 +20,7 @@
 		fsType = "cifs";
 		options = let
 			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=$(id -u),gid=$(id -g)";
+			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=1000,gid=1";
 			in
 			["${automount_opts},${reg_opts}"];
 	};
@@ -29,7 +29,7 @@
 		fsType = "cifs";
 		options = let
 			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=$(id -u),gid=$(id -g)";
+			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=1000,gid=1";
 			in
 			["${automount_opts},${reg_opts}"];
 	};
@@ -38,7 +38,7 @@
 		fsType = "cifs";
 		options = let
 			automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=$(id -u),gid=$(id -g)";
+			reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=1000,gid=1";
 			in
 			["${automount_opts},${reg_opts}"];
 	};

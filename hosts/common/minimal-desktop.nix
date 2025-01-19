@@ -3,6 +3,7 @@
   imports = [
     ./flatpak.nix
     ./nfs.nix
+    ./cifs.nix
   ];
   sops = {
     defaultSopsFile = ../../modules/secrets/secrets.yaml;
@@ -131,7 +132,7 @@
     nixpkgs-fmt
     # config.boot.kernelPackages.digimend
     cifs-utils
-    nfs-utils
+    #    nfs-utils
   ];
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [

@@ -1,5 +1,4 @@
 {pkgs, ...}: {
-
   programs.helix = {
     enable = true;
     settings = {
@@ -17,6 +16,11 @@
         formatter.command = "${pkgs.gopls}/bin/gopls";
       }
       {
+        name = "csharp";
+        auto-format = true;
+        formatter.command = "{omnisharp-rosalyn}/bin/OmniSharp";
+      }
+      {
         name = "nix";
         auto-format = true;
         formatter.command = "${pkgs.alejandra}/bin/alejandra";
@@ -29,5 +33,4 @@
       };
     };
   };
-
 }

@@ -15,14 +15,16 @@
     };
   };
 
-  boot.extraModulePackages = with config.boot.kernelPackages;
-    [ v4l2loopback.out ];
-  boot.kernelModules = [
-    "v4l2loopback"
-  ];
-  boot.extraModprobeConfig = ''
-    options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
-  '';
+  boot = {
+    extraModulePackages = with config.boot.kernelPackages;
+      [ v4l2loopback.out ];
+    kernelModules = [
+      "v4l2loopback"
+    ];
+    extraModprobeConfig = ''
+      options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
+    '';
+  };
   services={
     #    xserver.digimend.enable = true;
     xserver.xkb = {
@@ -95,7 +97,7 @@
     home = "/home/devji";
     isNormalUser = true;
     description = "matt";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "incus-admin" ];
     hashedPasswordFile = config.sops.secrets.hashedPassword.path;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"

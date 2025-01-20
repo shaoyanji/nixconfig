@@ -3,6 +3,7 @@
 {
   imports = [
     ./minimal-desktop.nix
+    ../../modules/nixos/lxc
   ];
   # Bootloader.
   boot.loader={
@@ -10,14 +11,16 @@
     efi.canTouchEfiVariables = true;
   };
   services={
-    displayManager.sddm = {
-      enable = true;
-      wayland.enable = true;
-    };
+    displayManager= {
+      sddm = {
+        enable = true;
+        wayland.enable = true;
+      };
   # Enable automatic login for the user.
-    displayManager.autoLogin={
-      enable = true;
-      user = "devji";
+      autoLogin={
+        enable = true;
+        user = "devji";
+      };
     };
   };
   programs.hyprland = {

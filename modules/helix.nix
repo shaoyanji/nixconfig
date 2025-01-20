@@ -18,7 +18,7 @@
       {
         name = "csharp";
         auto-format = true;
-        formatter.command = "{omnisharp-rosalyn}/bin/OmniSharp";
+        formatter.command = "${pkgs.omnisharp-roslyn}/bin/OmniSharp";
       }
       {
         name = "nix";

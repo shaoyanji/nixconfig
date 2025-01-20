@@ -34,8 +34,8 @@ in {
     "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
     "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     #    "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
-    "ghostty/config".text = ''
-      catppuccin-mocha
+    "ghostty/config".text = /*ini*/''
+      theme = catppuccin-mocha
       font-family = JetBrainsMono Nerd Font Mono
       font-size = 14
       background-opacity = 0.88888888

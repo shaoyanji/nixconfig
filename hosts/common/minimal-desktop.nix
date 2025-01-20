@@ -41,6 +41,7 @@
         PasswordAuthentication = false;
       };
     };
+    tailscale.enable = true;
   };
 
   security.sudo.wheelNeedsPassword = false;
@@ -50,7 +51,8 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
-
+  networking.nameservers = [ "100.100.100.100" "9.9.9.9" "149.112.112.112" ];
+  networking.search = [ "tailae24e.ts.net" ];
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 

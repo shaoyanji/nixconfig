@@ -1,16 +1,11 @@
 {pkgs, ...}: {
   home.username = "jisifu";
   home.homeDirectory = "/home/jisifu";
-  home.stateVersion = "24.11"; # Please read the comment before changing.
 
   imports = [
     ./home.nix
   ];
 
-  nixpkgs.config.allowUnfree = true;
-  # nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-  # "obsidian"
-  # ];
   home.packages = with pkgs; [
     #(pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];})
   ];

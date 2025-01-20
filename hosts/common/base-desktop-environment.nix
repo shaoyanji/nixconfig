@@ -18,10 +18,10 @@
     extraModprobeConfig = ''
       options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
     '';
-  };
-  boot.loader = {
+loader = {
     systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
+  };
   };
   services = {
     displayManager = {
@@ -35,6 +35,7 @@
         user = "devji";
       };
     };
+    tailscale.enable = true;
   };
   programs.hyprland = {
     enable = true;
@@ -50,4 +51,14 @@
     kitty
     inputs.ghostty.packages.x86_64-linux.default
   ];
+  programs.nix-ld.enable = true;
+  #programs.nix-ld.libraries = with pkgs; [
+  #libGL
+  #];
+
+  #  programs.appimage = {
+  #  enable = true;
+  #  binfmt = true;
+  #};
+
 }

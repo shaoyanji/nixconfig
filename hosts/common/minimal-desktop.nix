@@ -124,13 +124,4 @@
     cifs-utils
     #    nfs-utils
   ];
-  programs.nix-ld.enable = true;
-  #programs.nix-ld.libraries = with pkgs; [
-  #libGL
-  #];
-
-  #  programs.appimage = {
-  #  enable = true;
-  #  binfmt = true;
-  #};
 }

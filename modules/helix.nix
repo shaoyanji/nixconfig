@@ -16,7 +16,7 @@
         formatter.command = "${pkgs.gopls}/bin/gopls";
       }
       {
-        name = "csharp";
+        name = "c-sharp";
         auto-format = true;
         formatter.command = "${pkgs.omnisharp-roslyn}/bin/OmniSharp";
       }

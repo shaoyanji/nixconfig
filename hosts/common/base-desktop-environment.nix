@@ -35,7 +35,6 @@ loader = {
         user = "devji";
       };
     };
-    tailscale.enable = true;
   };
   programs.hyprland = {
     enable = true;

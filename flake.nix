@@ -89,9 +89,11 @@
       chaotic.nixosModules.default
         #lix-module.nixosModules.default
     ];
-    globalModulesImpermanence = globalModulesNixos ++ [
+    globalModulesImpermanence = globalModules ++ [
+      inputs.sops-nix.nixosModules.sops
       ./modules/global/impermanence.nix
-      inputs.impermanence.nixosModules.default
+      inputs.home-manager.nixosModules.default
+      inputs.impermanence.nixosModules.impermanence
       inputs.disko.nixosModules.default
     ];
     globalModulesMacos = globalModules ++ [ 
@@ -140,7 +142,7 @@
         specialArgs = { inherit inputs; };
         modules = globalModulesImpermanence
           ++ [ ./hosts/ares/configuration.nix 
-            (import ./hosts/disko.nix { device = "/dev/sda"; })
+            (import ./hosts/common/disko.nix { device = "/dev/sda"; })
             ];
       };
       schneeeule = nixpkgs.lib.nixosSystem {
@@ -148,7 +150,7 @@
         specialArgs = { inherit inputs; };
         modules = globalModulesImpermanence
           ++ [ ./hosts/schneeeule/configuration.nix 
-            (import ./hosts/disko.nix { device = "/dev/sda"; })
+            (import ./hosts/common/disko.nix { device = "/dev/sda"; })
             ];
       };
       aceofspades = nixpkgs.lib.nixosSystem {

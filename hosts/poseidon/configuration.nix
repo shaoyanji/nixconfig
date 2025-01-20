@@ -7,7 +7,6 @@
       ./nvidia.nix
       ../common/steam.nix
       ../common/base-desktop-environment.nix
-      ../../modules/nixos/lxc
     ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
     networking.hostName = "poseidon"; # Define your hostname.

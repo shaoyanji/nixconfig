@@ -1,31 +1,22 @@
-{inputs, config, pkgs, lib, ... }:
 {
+  config,
+  pkgs,
+  ...
+}: {
   imports = [
-    ./flatpak.nix
     ./nfs.nix
     ./cifs.nix
   ];
   sops = {
     defaultSopsFile = ../../modules/secrets/secrets.yaml;
-    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key"];
+    age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
     secrets = {
       "server/localwd/credentials" = {};
       "server/keyrepo/credentials" = {};
       hashedPassword.neededForUsers = true;
     };
   };
-
-  boot = {
-    extraModulePackages = with config.boot.kernelPackages;
-      [ v4l2loopback.out ];
-    kernelModules = [
-      "v4l2loopback"
-    ];
-    extraModprobeConfig = ''
-      options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
-    '';
-  };
-  services={
+  services = {
     #    xserver.digimend.enable = true;
     xserver.xkb = {
       layout = "us";
@@ -84,7 +75,6 @@
 
   # Enable the KDE Plasma Desktop Environment.
   #services.desktopManager.plasma6.enable = true;
- 
 
   # Configure keymap in X11
   #enable bluetooth
@@ -97,7 +87,7 @@
     home = "/home/devji";
     isNormalUser = true;
     description = "matt";
-    extraGroups = [ "networkmanager" "wheel" "docker" "incus-admin" ];
+    extraGroups = ["networkmanager" "wheel" "docker" "incus-admin"];
     hashedPasswordFile = config.sops.secrets.hashedPassword.path;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
@@ -105,10 +95,10 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOD4PopDAxzh1t4nNnDE/xiWLGYzopLRzZ7eBwd4hHza devji@schneeeule"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaSocp/bIkehFWy8I/H+g/46sWfnmj9s+Zx13dIjQct devji@lunarfall"
     ];
-    packages = with pkgs; [
+    #packages = with pkgs; [
     # kdePackages.kate
     # thunderbird
-    ];
+    #];
   };
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -124,10 +114,8 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
- 
+
   environment.systemPackages = with pkgs; [
-    ffmpeg
-    gphoto2
     curl
     git
     wget
@@ -137,13 +125,12 @@
     #    nfs-utils
   ];
   programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
-    #libGL
-  ];
+  #programs.nix-ld.libraries = with pkgs; [
+  #libGL
+  #];
 
   #  programs.appimage = {
   #  enable = true;
   #  binfmt = true;
   #};
 }
-

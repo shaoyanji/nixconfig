@@ -100,13 +100,13 @@
         home-manager.nixosModules.default
         sops-nix.nixosModules.sops
         chaotic.nixosModules.default
-        #lix-module.nixosModules.default
+        inputs.lix-module.nixosModules.default
       ];
     globalModulesImpermanence =
       globalModules
       ++ [
-        inputs.sops-nix.nixosModules.sops
         ./modules/global/impermanence.nix
+        inputs.sops-nix.nixosModules.sops
         inputs.home-manager.nixosModules.default
         inputs.impermanence.nixosModules.impermanence
         inputs.disko.nixosModules.default

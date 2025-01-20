@@ -33,7 +33,22 @@ in {
   xdg.configFile = {
     "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
     "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
-    "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
+    #    "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
+    "ghostty/config".text = ''
+      catppuccin-mocha
+      font-family = JetBrainsMono Nerd Font Mono
+      font-size = 14
+      background-opacity = 0.88888888
+      gtk-titlebar = false
+
+      keybind = ctrl+shift+'=new_split:right
+      keybind = ctrl+shift+enter=new_split:down
+      keybind = ctrl+enter=unbind
+      keybind = ctrl+'=toggle_fullscreen
+      keybind = ctrl+n=new_window
+
+      shell-integration = bash
+    '';
   };
   home.sessionPath =
     ["${peachNAS}/bin-scripts"]

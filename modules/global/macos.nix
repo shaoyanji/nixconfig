@@ -5,7 +5,12 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension= "hm-backup"; #for rebuild
-    users.devji = import ../macos-home.nix; #staging point for ./home.nix commons
+    users.devji = {
+      imports = [
+        ./home.nix
+        ../macos-home.nix
+      ];
+    }; #staging point for ./home.nix commons
     sharedModules = [
     #  sops-nix.homeManagerModules.sops
           ];

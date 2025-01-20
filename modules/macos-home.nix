@@ -11,10 +11,6 @@ let
     wolfNAS = "/Volumes/usbshare2";
 in
 {
-  imports = [
-    ./global/home.nix
-  ];
- 
   home.file = {
     "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
@@ -33,5 +29,4 @@ in
     # ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
   };
 
-  programs.home-manager.enable = true;
 }

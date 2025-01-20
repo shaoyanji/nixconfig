@@ -1,11 +1,14 @@
-{lib, pkgs, config, ... }:
-let
-  peachNAS = "/mnt/w/";
-  routerNAS = "/mnt/y/";
-  sharedNAS = "/mnt/x/";
-  wolfNAS = "/mnt/z/";
-in
 {
+  lib,
+  pkgs,
+  config,
+  ...
+}: let
+  peachNAS = "/mnt/w";
+  routerNAS = "/mnt/y";
+  sharedNAS = "/mnt/x";
+  wolfNAS = "/mnt/z";
+in {
   home.file = {
     "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
     "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
@@ -32,8 +35,8 @@ in
     "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
   };
-  home.sessionPath = [ "${peachNAS}bin-scripts" ]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64[ "${peachNAS}bin-aarch64" "${peachNAS}go/bin" "${peachNAS}.cargo/bin"]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [ "${peachNAS}bin-x86_64" "${peachNAS}go/bin-x86" ]
-    ;
+  home.sessionPath =
+    ["${peachNAS}/bin-scripts"]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${peachNAS}/bin-aarch64" "${peachNAS}/go/bin" "${peachNAS}/.cargo/bin"]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${peachNAS}/bin-x86" "${peachNAS}/go/bin-x86"];
 }

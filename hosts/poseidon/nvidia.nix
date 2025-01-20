@@ -1,7 +1,6 @@
-{config, lib, pkgs, ...}:
-{
+{config, ...}: {
   imports = [
-      ../common/nvidia.nix
+    ../common/nvidia.nix
   ];
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.stable;

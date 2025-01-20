@@ -2,7 +2,6 @@
   inputs,
   config,
   pkgs,
-  lib,
   ...
 }: {
   imports = [
@@ -48,15 +47,7 @@
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
-    ffmpeg
-    gphoto2
     kitty
-    qutebrowser
-    libreoffice
-    hunspell
-    hunspellDicts.en_US
     inputs.ghostty.packages.x86_64-linux.default
-    #inputs.zen-browser.packages.${pkgs.system}.twilight
-    inputs.zen-browser.packages.${pkgs.system}.default
   ];
 }

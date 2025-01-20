@@ -22,6 +22,7 @@
       "https://wezterm.cachix.org"
       "https://ghostty.cachix.org"
       "https://nix-gaming.cachix.org"
+      "https://cache.lix.systems"
     ];
     trusted-public-keys= [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
@@ -32,10 +33,11 @@
       "wezterm.cachix.org-1:kAbhjYUC9qvblTE+s7S+kl5XM1zVa4skO+E/1IDWdH0="
       "ghostty.cachix.org-1:QB389yTa6gTyneehvqG58y0WnHjQOqgnA+wBnpWWxns="
       "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
+      "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o="
     ];
-    #      trusted-users = [
-    #    "@admin"
-    #  ];
+    trusted-users = [
+      "@admin"
+    ];
   };
 
   # Enable experimental nix command and flakes

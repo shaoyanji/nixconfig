@@ -50,13 +50,10 @@
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
-  networking.networkmanager.enable = true;
-  specialisation = {
-    tailscale.configuration = {
-      services.tailscale.enable = true;
-      networking.nameservers = ["100.100.100.100" "100.68.238.108"];
-      networking.search = ["tailae24e.ts.net"];
-    };
+  networking = {
+    networkmanager.enable = true;
+    nameservers = ["100.100.100.100" "100.68.238.108"];
+    search = ["cloudforest-kardashev.ts.net"];
   };
   # Set your time zone.
   time.timeZone = "Europe/Berlin";

@@ -19,7 +19,6 @@
   home = {
     packages = with pkgs;
       [
-        wget
         gum
         go-task
         nixd
@@ -189,6 +188,9 @@
 
     sessionVariables = {
       #    EDITOR = "nvim";
+      GUM_CHOOSE_SELECTED_FOREGROUND=50;
+      GUM_CHOOSE_CURSOR_FOREGROUND=50;
+      GUM_CHOOSE_HEADER_FOREGROUND=30;
     };
   };
 

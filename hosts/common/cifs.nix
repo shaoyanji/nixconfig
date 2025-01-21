@@ -1,4 +1,6 @@
-{config, ...}: {
+{config, pkgs,...}: {
+
+  environment.systemPackages = [pkgs.cifs-utils];
   fileSystems."/mnt/y" = {
     device = "//fritz.box/fritz.nas/External-USB3-0-01/";
     fsType = "cifs";

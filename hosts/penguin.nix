@@ -1,31 +1,23 @@
 {...}: {
   imports = [
-    ./home.nix
+    ../modules/global/minimal.nix
   ];
   home = {
     username = "jisifu";
     homeDirectory = "/home/jisifu";
 
     #packages = with pkgs; [
-    #(pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];})
     #];
     file = {
-      # ".screenrc".source = dotfiles/screenrc;
-      # # You can also set the file content immediately.
-      # ".gradle/gradle.properties".text = ''
-      #   org.gradle.console=verbose
-      #   org.gradle.daemon.idletimeout=3600000
-      # '';
     };
 
     sessionVariables = {
-      #    EDITOR = "nvim";
     };
     sessionPath = [];
   };
   xdg.configFile."systemd/user/cros-garcon.service.d/override.conf".text =
     /*
-    toml
+    ini
     */
     ''
       [Service]

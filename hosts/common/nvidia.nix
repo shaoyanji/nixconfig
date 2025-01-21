@@ -31,6 +31,9 @@
   specialisation = {
     gaming.configuration = {
       system.nixos.tags = ["gaming"];
+      services.tailscale.enable = lib.mkForce false;
+      networking.nameservers = lib.mkDefault []; 
+      networking.search = lib.mkDefault [];
       hardware.nvidia = {
         #package = config.boot.kernelPackages.nvidiaPackages.stable;
         #package = config.boot.kernelPackages.nvidiaPackages.beta;

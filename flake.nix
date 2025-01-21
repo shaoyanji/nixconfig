@@ -126,26 +126,26 @@
       ];
   in {
     homeConfigurations = {
-      heim = home-manager.lib.homeManagerConfiguration {
+      default = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [./modules/global/heim.nix];
       };
-      penguin = home-manager.lib.homeManagerConfiguration {
+      jisifu = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
-        modules = [./modules/global/penguin.nix];
+        modules = [./hosts/penguin.nix];
       };
       alarm = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
-        modules = [./modules/global/alarm.nix];
+        modules = [./hosts/alarm.nix];
       };
-      lunarfall = home-manager.lib.homeManagerConfiguration {
+      devji = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [
-          ./modules/global/lunarfall.nix
+          ./hosts/lunarfall.nix
           inputs.lix-module.nixosModules.default
         ];
       };
@@ -188,7 +188,7 @@
           ++ [./hosts/aceofspades/configuration.nix];
       };
       minyx = nixpkgs.lib.nixosSystem {
-        system = forAllSystems;
+        system = "aarch64-linux";
         specialArgs = {inherit inputs;};
         modules =
           globalModulesMin

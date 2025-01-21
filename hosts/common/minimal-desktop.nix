@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: {
   imports = [
@@ -52,8 +53,14 @@
   # Enable networking
   networking = {
     networkmanager.enable = true;
-    nameservers = ["100.100.100.100" "100.68.238.108"];
-    search = ["cloudforest-kardashev.ts.net"];
+  };
+  specialisation = {
+    tailscale.configuration = {
+      system.nixos.tags = ["tailscale"];
+      services.tailscale.enable = true;
+      networking.nameservers = lib.mkDefault ["100.100.100.100" "100.68.238.108"];
+      networking.search = lib.mkDefault ["cloudforest-kardashev.ts.net"];
+    };
   };
   # Set your time zone.
   time.timeZone = "Europe/Berlin";

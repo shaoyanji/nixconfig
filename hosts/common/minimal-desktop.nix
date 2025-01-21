@@ -41,6 +41,7 @@
         PasswordAuthentication = false;
       };
     };
+    tailscale.enable = true;
   };
 
   security.sudo.wheelNeedsPassword = false;
@@ -53,7 +54,7 @@
   specialisation = {
     tailscale.configuration = {
       services.tailscale.enable = true;
-      networking.nameservers = ["100.100.100.100" "9.9.9.9" "149.112.112.112"];
+      networking.nameservers = ["100.100.100.100" "100.68.238.108"];
       networking.search = ["tailae24e.ts.net"];
     };
   };
@@ -127,7 +128,6 @@
     wget
     nixpkgs-fmt
     # config.boot.kernelPackages.digimend
-    cifs-utils
     #    nfs-utils
   ];
 }

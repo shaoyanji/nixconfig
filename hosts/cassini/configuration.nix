@@ -145,10 +145,9 @@
       casks = [
         "ghostty"
         "orbstack"
-        "obsidian"
+        #"obsidian"
         "zen-browser"
-        "raycast"
-        "tailscale"
+        #"raycast"
         #"arc"
         #"spotube"
         #"keybase"

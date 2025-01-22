@@ -144,14 +144,15 @@
       ];
       casks = [
         "ghostty"
-        "arc"
         "orbstack"
         "obsidian"
         "zen-browser"
+        "raycast"
+        "tailscale"
+        #"arc"
         #"spotube"
         #"keybase"
         #"notion"
-        "raycast"
         #"slack"
         #"zoom"
       ];

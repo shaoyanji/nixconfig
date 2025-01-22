@@ -14,7 +14,13 @@ git clone https://github.com/shaoyanji/nixconfig.git
 sops -d modules/nixconfig/secrets/secrets.yaml > Taskfile.yml
 task
 ```
-
+### MACOS rebuild from scratch
+Xcode install
+https://lix.systems/install/#on-any-other-linuxmacos-system
+nix run nix-darwin -- switch --flake github:shaoyanji/nixconfig#cassini
+m hostname cassini
+sops
+ln -s .config/sops Library/Application\ Support/sops
 ### SOPS Configuration
 
 ```bash

@@ -53,6 +53,9 @@
   # Enable networking
   networking = {
     networkmanager.enable = lib.mkDefault true;
+      nameservers = ["192.168.178.1"];
+      search = ["fritz.box"];
+ 
   };
   specialisation = {
     tailscale.configuration = {

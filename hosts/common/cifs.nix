@@ -2,7 +2,7 @@
 
   environment.systemPackages = [pkgs.cifs-utils];
   fileSystems."/mnt/y" = {
-    device = "//fritz.box/fritz.nas/External-USB3-0-01/";
+    device = "//192.168.178.1/fritz.nas/External-USB3-0-01/";
     fsType = "cifs";
     options = let
       automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";

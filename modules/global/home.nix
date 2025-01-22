@@ -158,8 +158,8 @@
         charm-freeze # obsidian
         cocoapods
         m-cli # useful macOS CLI commands
-        wezterm
-        darwin.xcode_16_1
+        #wezterm
+        # darwin.xcode_16_1
       ]
       ++ lib.optionals stdenv.isLinux [
         wl-clipboard

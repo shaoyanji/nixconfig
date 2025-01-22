@@ -53,8 +53,8 @@
   # Enable networking
   networking = {
     networkmanager.enable = lib.mkDefault true;
-      nameservers = ["192.168.178.1"];
-      search = ["fritz.box"];
+      nameservers = ["192.168.178.3" "100.68.238.108"];
+      search = ["fritz.box" "cloudforest-kardashev.ts.net"];
  
   };
   specialisation = {

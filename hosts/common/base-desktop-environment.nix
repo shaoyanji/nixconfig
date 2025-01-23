@@ -34,6 +34,7 @@ loader = {
         enable = true;
         user = "devji";
       };
+    #    xserver.digimend.enable = true;
     };
   };
   programs.hyprland = {
@@ -49,6 +50,7 @@ loader = {
   environment.systemPackages = with pkgs; [
     kitty
     inputs.ghostty.packages.x86_64-linux.default
+    # config.boot.kernelPackages.digimend
   ];
   programs.nix-ld.enable = true;
   #programs.nix-ld.libraries = with pkgs; [

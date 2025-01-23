@@ -53,8 +53,8 @@
   # Enable networking
   networking = {
     networkmanager.enable = lib.mkDefault true;
-      nameservers = ["192.168.178.3" "100.68.238.108"];
-      search = ["fritz.box" "cloudforest-kardashev.ts.net"];
+      nameservers = ["192.168.178.3" ];
+      search = ["fritz.box"];
  
   };
   specialisation = {
@@ -66,7 +66,6 @@
       };
       networking= {
         firewall = {
-          enable = true;
           trustedInterfaces = ["tailscale0"];
           allowedTCPPorts = [ 22 ];
           interfaces.tailscale0.allowedUDPPorts = [ config.services.tailscale.port ];

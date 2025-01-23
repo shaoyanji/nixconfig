@@ -8,6 +8,7 @@
     ./nfs.nix
     ./cifs.nix
   ];
+  boot.kernelPackages = pkgs.linuxPackages_cachyos;
   sops = {
     defaultSopsFile = ../../modules/secrets/secrets.yaml;
     age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
@@ -18,7 +19,10 @@
     };
   };
   services = {
-    #    xserver.digimend.enable = true;
+    scx={
+      enable = true;
+      package = pkgs.scx_git.full;
+    };
     xserver.xkb = {
       layout = "us";
       variant = "";
@@ -42,20 +46,24 @@
         PasswordAuthentication = false;
       };
     };
+
+  pulseaudio.enable = false;
     tailscale.enable = true;
   };
 
-  security.sudo.wheelNeedsPassword = false;
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
+  security={
+    sudo.wheelNeedsPassword = false;
+  rtkit.enable = true;
+  };
+  hardware.bluetooth.enable = true;
   # Enable networking
   networking = {
     networkmanager.enable = lib.mkDefault true;
       nameservers = ["192.168.178.3" ];
       search = ["fritz.box"];
- 
+   # Configure network proxy if necessary
+  # proxy.default = "http://user:password@proxy:port/";
+  # proxy.noProxy = "127.0.0.1,localhost,internal.domain";
   };
   specialisation = {
     tailscale.configuration = {
@@ -98,14 +106,10 @@
   #  services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
-  #services.desktopManager.plasma6.enable = true;
+  # services.desktopManager.plasma6.enable = true;
 
   # Configure keymap in X11
-  #enable bluetooth
-  hardware.bluetooth.enable = true;
-  services.pulseaudio.enable = false;
 
-  security.rtkit.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.devji = {
     home = "/home/devji";
@@ -144,7 +148,6 @@
     git
     wget
     nixpkgs-fmt
-    # config.boot.kernelPackages.digimend
     #    nfs-utils
   ];
 }

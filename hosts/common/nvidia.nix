@@ -28,6 +28,8 @@
       sync.enable = false;
     };
   };
+
+    hardware.nvidia-container-toolkit.enable = true;
   specialisation = {
     gaming.configuration = {
       system.nixos.tags = ["gaming"];
@@ -65,6 +67,8 @@
   #nvidia-opencl-icd
   #nvidia-opencl-dev
   #nvidia-opencl-doc
+  #proton-ge-custom
+  #mangohud-git
   #];
   environment.sessionVariables = {
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/devji/.steam/root/compatibilitytools.d";

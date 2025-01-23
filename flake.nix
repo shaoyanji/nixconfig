@@ -53,6 +53,10 @@
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
     };
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     #hyprpaper = {
     #  url = "github:hyprwm/hyprpaper";
     #  inputs.hyprland.follows = "hyprland-plugins";
@@ -74,6 +78,7 @@
     chaotic,
     sops-nix,
     lix-module,
+    nur,
     ...
   } @ inputs: let
     overlays = [inputs.nuenv.overlays.default];
@@ -94,6 +99,7 @@
         system.configurationRevision = self.rev or self.dirtyRev or null;
       }
       ./modules/global/global.nix
+      nur.modules.nixos.default
     ];
     globalModulesNixos =
       globalModules

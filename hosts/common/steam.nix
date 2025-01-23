@@ -1,4 +1,4 @@
-{ pkgs, config, nix-std, lib, ... }:
+{ pkgs, config, nix-std, lib,inputs, ... }:
 {
  programs.steam = {
   enable = true;
@@ -15,4 +15,27 @@
   ];
 programs.steam.gamescopeSession.enable = true;
 programs.gamemode.enable = true;
+   environment.systemPackages = with pkgs; [
+  #    protonup
+  #nvidia-docker
+  #nvidia-container-toolkit
+  #nvidia-modprobe
+  #nvidia-settings
+  #nvidia-smi
+  #nvidia-xconfig
+  #nvidia-cuda-toolkit
+  #nvidia-cuda-dev
+  #nvidia-cuda-doc
+  #nvidia-cuda-samples
+  #nvidia-opencl-icd
+  #nvidia-opencl-dev
+  #nvidia-opencl-doc
+  proton-ge-custom
+    #mangohud-git
+  ];
+  environment.sessionVariables = {
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/devji/.steam/root/compatibilitytools.d";
+  };
+
+
 }

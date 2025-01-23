@@ -69,9 +69,11 @@
     nix-homebrew,
     nixos-wsl,
     home-manager,
+    impermanence,
+    disko,
     chaotic,
     sops-nix,
-    # lix,
+    lix-module,
     ...
   } @ inputs: let
     overlays = [inputs.nuenv.overlays.default];
@@ -100,16 +102,18 @@
         home-manager.nixosModules.default
         sops-nix.nixosModules.sops
         chaotic.nixosModules.default
-        inputs.lix-module.nixosModules.default
+        lix-module.nixosModules.default
       ];
     globalModulesImpermanence =
       globalModules
       ++ [
         ./modules/global/impermanence.nix
-        inputs.sops-nix.nixosModules.sops
-        inputs.home-manager.nixosModules.default
-        inputs.impermanence.nixosModules.impermanence
-        inputs.disko.nixosModules.default
+        chaotic.nixosModules.default
+        lix-module.nixosModules.default
+        sops-nix.nixosModules.sops
+        home-manager.nixosModules.default
+        impermanence.nixosModules.impermanence
+        disko.nixosModules.default
       ];
     globalModulesMacos =
       globalModules

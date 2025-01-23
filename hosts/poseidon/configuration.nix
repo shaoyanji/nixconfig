@@ -8,12 +8,13 @@
       ../common/steam.nix
       ../common/base-desktop-environment.nix
     ];
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-    networking.hostName = "poseidon"; # Define your hostname.
-  environment.systemPackages = with pkgs; [
-  ];
-  environment.variables = {
-
-  };
-  system.stateVersion = "24.05"; # Did you read the comment?
+  networking.hostName = "poseidon"; # Define your hostname.
+  
+  #environment={
+  #systemPackages = with pkgs; [
+  #];
+  #variables = {
+  # };
+  #};
+  system.stateVersion = "25.05"; # Did you read the comment?
 }

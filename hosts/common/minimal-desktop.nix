@@ -59,7 +59,7 @@
   # Enable networking
   networking = {
     networkmanager.enable = lib.mkDefault true;
-      nameservers = ["192.168.178.3" ];
+      nameservers = ["192.168.178.1" ];
       search = ["fritz.box"];
    # Configure network proxy if necessary
   # proxy.default = "http://user:password@proxy:port/";

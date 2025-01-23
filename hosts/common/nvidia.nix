@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs,
   ...
 }: {
   hardware.graphics = {
@@ -52,30 +51,4 @@
   # libnvidia-container does not support cgroups v2 (prior to 1.8.0)
   # https://github.com/NVIDIA/nvidia-docker/issues/1447
 
-  # environment.systemPackages = with pkgs; [
-  #    protonup
-  #nvidia-docker
-  #nvidia-container-toolkit
-  #nvidia-modprobe
-  #nvidia-settings
-  #nvidia-smi
-  #nvidia-xconfig
-  #nvidia-cuda-toolkit
-  #nvidia-cuda-dev
-  #nvidia-cuda-doc
-  #nvidia-cuda-samples
-  #nvidia-opencl-icd
-  #nvidia-opencl-dev
-  #nvidia-opencl-doc
-  #proton-ge-custom
-  #mangohud-git
-  #];
-  environment.sessionVariables = {
-    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/devji/.steam/root/compatibilitytools.d";
-  };
-
-  #  services.ollama = {
-  #  enable = true;
-  #  acceleration = "cuda";
-  #};
 }

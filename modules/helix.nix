@@ -15,11 +15,11 @@
         auto-format = true;
         formatter.command = "${pkgs.gopls}/bin/gopls";
       }
-      {
-        name = "c-sharp";
-        auto-format = true;
-        formatter.command = "${pkgs.omnisharp-roslyn}/bin/OmniSharp";
-      }
+      #{
+      #  name = "c-sharp";
+      #  auto-format = true;
+      #  formatter.command = "${pkgs.omnisharp-roslyn}/bin/OmniSharp";
+      #}
       {
         name = "nix";
         auto-format = true;

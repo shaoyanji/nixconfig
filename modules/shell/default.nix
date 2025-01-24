@@ -12,7 +12,7 @@ let
 in
 {
 
-  imports = [ ./nushell.nix 
+  imports = [ #./nushell.nix # nushell not cached for darwin 
               ./zsh.nix
               ./bash.nix
               ./tmux.nix

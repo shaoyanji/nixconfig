@@ -19,6 +19,7 @@ keys:
   - &schneeeulehost age1hxsrt6a23efmpnhqn0hhqhpeukf0tf3hk99y5vpff8vfrxknpumsgq7yd5
   - &acersops age15mzmhlt5hh5z94843e27rqev4955v3gkcwqacr4ueyxegzav94kqvz0c43
   - &minyxhost age10tahcnw6m357gfmx4686q7qqkt5h7f3p7gvamhn0ds3wyfe35chsztfnwt
+  - &orb-cassini age15ptau7jyv6kcwz39vcfzxpw95p97l5r7uywkcl5g83gqxuhh7q4saggagy
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -39,4 +40,5 @@ creation_rules:
       - *schneeeulehost
       - *acersops
       - *minyxhost
+      - *orb-cassini
       gpg:

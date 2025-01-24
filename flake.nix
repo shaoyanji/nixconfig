@@ -137,7 +137,7 @@
     globalModulesWSL=
       globalModules
       ++ [
-        ./modules/global/noDE.nix
+          #        ./modules/global/noDE.nix
         home-manager.nixosModules.default
       ];
 
@@ -221,8 +221,8 @@
         modules =
           globalModulesOrb
           ++ [
-            ./hosts/orb-cassini/configuration.nix
-              # ./modules/global/minyx.nix
+            /etc/nixos/configuration.nix
+              #./hosts/orb-cassini/configuration.nix
               # sops-nix.nixosModules.sops
           ];
       };

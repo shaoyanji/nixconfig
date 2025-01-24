@@ -13,14 +13,12 @@
             home.homeDirectory = "/home/devji";
             programs.home-manager.enable = true;
             home.packages = with pkgs; [
-                task
-                fzf
-                gum
+                git
             ];
             home.file={
                 "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "/mnt/mac/Volumes/usbshare2/projects/repo/nixconfig";
             };
-
+            home.sessionPath = [ "/mnt/mac/Volumes/peachcable/bin-aarch64/" ];
             xdg.configFile = {
             };
         }; 

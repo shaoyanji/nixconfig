@@ -128,12 +128,19 @@
         nix-homebrew.darwinModules.nix-homebrew
         home-manager.darwinModules.default
       ];
-    globalModulesMin =
+    globalModulesOrb=
       globalModules
       ++ [
         ./modules/global/noDE.nix
         home-manager.nixosModules.default
       ];
+    globalModulesWSL=
+      globalModules
+      ++ [
+        ./modules/global/noDE.nix
+        home-manager.nixosModules.default
+      ];
+
   in {
     homeConfigurations = {
       default = home-manager.lib.homeManagerConfiguration {
@@ -201,19 +208,29 @@
         system = "aarch64-linux";
         specialArgs = {inherit inputs;};
         modules =
-          globalModulesMin
+                globalModules
           ++ [
             ./hosts/minyx/configuration.nix
             ./modules/global/minyx.nix
             sops-nix.nixosModules.sops
           ];
       };
-
+      orb-cassini = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        specialArgs = {inherit inputs;};
+        modules =
+          globalModulesOrb
+          ++ [
+            ./hosts/orb-cassini/configuration.nix
+              # ./modules/global/minyx.nix
+              # sops-nix.nixosModules.sops
+          ];
+      };
       guckloch = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules =
-          globalModulesMin
+          globalModulesWSL
           ++ [
             ./hosts/guckloch/configuration.nix
             nixos-wsl.nixosModules.default

@@ -9,7 +9,6 @@
     ../env.nix
     ../shell
     ../sops.nix
-    ../kitty
     ../helix.nix
   ];
   home = {

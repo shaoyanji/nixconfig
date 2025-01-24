@@ -14,7 +14,6 @@
         ./minimal.nix
         ../shell/nushell.nix
       ];
-      home.stateVersion = "25.05";
       home.username = "devji";
       home.homeDirectory = "/home/devji";
       home.packages = with pkgs; [

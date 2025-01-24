@@ -99,7 +99,6 @@
         system.configurationRevision = self.rev or self.dirtyRev or null;
       }
       ./modules/global/global.nix
-      nur.modules.nixos.default
     ];
     globalModulesNixos =
       globalModules
@@ -109,11 +108,13 @@
         sops-nix.nixosModules.sops
         chaotic.nixosModules.default
         lix-module.nixosModules.default
+        nur.modules.nixos.default
       ];
     globalModulesImpermanence =
       globalModules
       ++ [
         ./modules/global/impermanence.nix
+        nur.modules.nixos.default
         chaotic.nixosModules.default
         lix-module.nixosModules.default
         sops-nix.nixosModules.sops
@@ -137,7 +138,7 @@
     globalModulesWSL=
       globalModules
       ++ [
-          #        ./modules/global/noDE.nix
+        ./modules/global/noDE.nix
         home-manager.nixosModules.default
       ];
 
@@ -222,8 +223,6 @@
           globalModulesOrb
           ++ [
             /etc/nixos/configuration.nix
-              #./hosts/orb-cassini/configuration.nix
-              # sops-nix.nixosModules.sops
           ];
       };
       guckloch = nixpkgs.lib.nixosSystem {

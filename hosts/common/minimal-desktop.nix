@@ -5,10 +5,9 @@
   ...
 }: {
   imports = [
-    ./nfs.nix
-    ./cifs.nix
+    ./localmounts.nix
   ];
-  boot.kernelPackages = pkgs.latest.linuxPackages;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   sops = {
     defaultSopsFile = ../../modules/secrets/secrets.yaml;
     age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];

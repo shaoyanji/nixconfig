@@ -1,6 +1,29 @@
 {config, pkgs,...}: {
+systemd.timers."burgernas-unmound" = {
+  wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "22:59:00";
+      Unit = "burgernas-unmount.service";
+    };
+};
 
+systemd.services."burgernas-unmount" = {
+  script = ''
+    set -eu
+    ${pkgs.coreutils}/bin/umount /mnt/{v,w,x,z}
+  '';
+  serviceConfig = {
+    Type = "oneshot";
+    User = "root";
+  };
+};
   environment.systemPackages = [pkgs.cifs-utils];
+  fileSystems."/mnt/w" = {
+    device = "burgernas.fritz.box:/volume1/peachcable";
+    fsType = "nfs";
+    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
+  };
+
   fileSystems."/mnt/y" = {
     device = "//192.168.178.1/fritz.nas/External-USB3-0-01/";
     fsType = "cifs";

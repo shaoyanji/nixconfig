@@ -157,7 +157,7 @@
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [
-          ./hosts/lunarfall.nix
+          ./hosts/heim.nix
           inputs.lix-module.nixosModules.default
         ];
       };

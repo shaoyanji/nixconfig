@@ -5,7 +5,7 @@
 }: {
   imports = [
     ./home.nix
-    ../dev.nix
+    #../dev.nix
     ../nixoshmsymlinks.nix
     ../shell/nushell.nix
   ];
@@ -15,9 +15,9 @@
     packages = with pkgs; [
       inputs.zen-browser.packages.${pkgs.system}.default
       qutebrowser
-      libreoffice
-      hunspell
-      hunspellDicts.en_US
+      # libreoffice
+      # hunspell
+      # hunspellDicts.en_US
     ];
   };
 }

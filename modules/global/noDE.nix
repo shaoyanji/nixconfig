@@ -13,6 +13,7 @@
       imports = [
         ./minimal.nix
         ../shell/nushell.nix
+        ../helix.nix
       ];
       home.username = "devji";
       home.homeDirectory = "/home/devji";

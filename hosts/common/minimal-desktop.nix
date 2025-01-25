@@ -8,7 +8,7 @@
     ./nfs.nix
     ./cifs.nix
   ];
-  boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  boot.kernelPackages = pkgs.latest.linuxPackages;
   sops = {
     defaultSopsFile = ../../modules/secrets/secrets.yaml;
     age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];

@@ -129,13 +129,7 @@
         nix-homebrew.darwinModules.nix-homebrew
         home-manager.darwinModules.default
       ];
-    globalModulesOrb=
-      globalModules
-      ++ [
-        ./modules/global/noDE.nix
-        home-manager.nixosModules.default
-      ];
-    globalModulesWSL=
+    globalModulesContainers=
       globalModules
       ++ [
         ./modules/global/noDE.nix
@@ -220,7 +214,7 @@
         system = "aarch64-linux";
         specialArgs = {inherit inputs;};
         modules =
-          globalModulesOrb
+          globalModulesContainers
           ++ [
             /etc/nixos/configuration.nix
           ];
@@ -229,10 +223,19 @@
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules =
-          globalModulesWSL
+          globalModulesContainers
           ++ [
             ./hosts/guckloch/configuration.nix
             nixos-wsl.nixosModules.default
+          ];
+      };
+      coolbeans = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
+        modules =
+          globalModulesContainers
+          ++ [
+              /etc/nixos/configuration.nix
           ];
       };
     };

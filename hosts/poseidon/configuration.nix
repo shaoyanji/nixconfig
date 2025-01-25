@@ -8,8 +8,8 @@
       ../common/steam.nix
       ../common/base-desktop-environment.nix
     ];
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   networking.hostName = "poseidon"; # Define your hostname.
-  
   #environment={
   #systemPackages = with pkgs; [
   #];

@@ -26,7 +26,7 @@ ln -s .config/sops Library/Application\ Support/sops
 ```bash
 mkdir -p ~/.config/sops/age
 nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
-cat ~/.ssh/ssh_host_ed25519_key.pub | ssh-to-age
+nix-shell -p ssh-to-age --run "cat ~/.ssh/ssh_host_ed25519_key.pub | ssh-to-age"
 ```
 example sops.yaml from [sops-nix](https://github.com/Mic92/sops-nix):
 ```yaml
@@ -54,3 +54,7 @@ creation_rules:
 ```
 
 ## Portability and a small growing library of nix-shells included for development
+useful script for cleaning up after orbstack workspaces
+```
+find . -name "*.smbdelete*" -type f -delete
+```

@@ -138,7 +138,7 @@
 
   in {
     homeConfigurations = {
-      default = home-manager.lib.homeManagerConfiguration {
+      root = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [./modules/global/heim.nix];

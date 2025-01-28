@@ -22,9 +22,11 @@
                 "Documents"
                 "Videos"
                 ".ssh"
+                ".supermaven"
                 ".local/share/keyrings"
                 ".local/share/direnv"
                 ".config/direnv"
+                ".zen"
                 {
                   directory = ".local/share/Steam";
                   method = "symlink";

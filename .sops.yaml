@@ -21,7 +21,7 @@ keys:
   - &minyxhost age10tahcnw6m357gfmx4686q7qqkt5h7f3p7gvamhn0ds3wyfe35chsztfnwt
   - &orb-cassini age15ptau7jyv6kcwz39vcfzxpw95p97l5r7uywkcl5g83gqxuhh7q4saggagy
   - &acersopshost age15mzmhlt5hh5z94843e27rqev4955v3gkcwqacr4ueyxegzav94kqvz0c43
-  - &areshost age1jcfta7lc9anknrwqnmgf3u7rdmr23q2azqem7mgh0vlz6ac5w5lqz9qw96
+  - &areshost age1nqdx5a80wy6d3hjsldhhe5y4ltrfv3zr9m3cdrekcxha0hg7g5usxj482d
   - &alarm age1juyqqqcntxf5affyt4ukr2fyerw6mexw08w3y8tyqjkm27k3hd8qpax2y5
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$

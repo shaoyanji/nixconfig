@@ -6,11 +6,8 @@
     # be extended to other languages as well. That's why it's called
     # kickstart.nixvim and not kitchen-sink.nixvim ;)
     # https://nix-community.github.io/nixvim/plugins/dap/index.html
-    plugins.dap = {
-      enable = true;
-
         # Creates a beautiful debugger UI
-        dap-ui = {
+        plugins.dap-ui = {
           enable = true;
 
       settings = {
@@ -38,12 +35,7 @@
           };
         };
 
-        # Add your own debuggers here
-        dap-go = {
-          enable = true;
-        };
       };
-    };
 
     # https://nix-community.github.io/nixvim/keymaps/index.html
     keymaps = [

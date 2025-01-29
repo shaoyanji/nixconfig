@@ -64,6 +64,7 @@
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     ghostty.url = "github:ghostty-org/ghostty";
+    utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
@@ -79,6 +80,7 @@
     sops-nix,
     lix-module,
     nur,
+    utils,
     ...
   } @ inputs: let
     overlays = [inputs.nuenv.overlays.default];

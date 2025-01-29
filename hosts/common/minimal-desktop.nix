@@ -18,7 +18,7 @@
     };
   };
   services = {
-    scx={
+    scx = {
       enable = true;
       scheduler = "scx_rusty";
       package = pkgs.scx_git.full;
@@ -47,39 +47,39 @@
       };
     };
 
-  pulseaudio.enable = false;
+    pulseaudio.enable = false;
     tailscale.enable = true;
   };
 
-  security={
+  security = {
     sudo.wheelNeedsPassword = false;
-  rtkit.enable = true;
+    rtkit.enable = true;
   };
   hardware.bluetooth.enable = true;
   # Enable networking
   networking = {
-    networkmanager.enable = lib.mkDefault true;
-      nameservers = ["192.168.178.1" ];
-      search = ["fritz.box"];
-   # Configure network proxy if necessary
-  # proxy.default = "http://user:password@proxy:port/";
-  # proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+    networkmanager.enable = true;
+    nameservers = ["192.168.178.1" "192.168.178.3"];
+    search = ["fritz.box"];
+    # Configure network proxy if necessary
+    # proxy.default = "http://user:password@proxy:port/";
+    # proxy.noProxy = "127.0.0.1,localhost,internal.domain";
   };
   specialisation = {
     tailscale.configuration = {
       system.nixos.tags = ["tailscale"];
-      services.tailscale= {
+      services.tailscale = {
         enable = true;
         useRoutingFeatures = "client";
       };
-      networking= {
+      networking = {
         firewall = {
           trustedInterfaces = ["tailscale0"];
-          allowedTCPPorts = [ 22 ];
-          interfaces.tailscale0.allowedUDPPorts = [ config.services.tailscale.port ];
+          allowedTCPPorts = [22];
+          interfaces.tailscale0.allowedUDPPorts = [config.services.tailscale.port];
         };
-      nameservers = lib.mkDefault ["100.100.100.100" "100.68.238.108"];
-      search = lib.mkDefault ["cloudforest-kardashev.ts.net"];
+        nameservers = lib.mkDefault ["100.100.100.100" "100.68.238.108" "100.113.144.19"];
+        search = lib.mkDefault ["cloudforest-kardashev.ts.net"];
       };
     };
   };
@@ -121,7 +121,6 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKVYLgws2TgaYIsOmVmJeoJIu9F8lguBXi711Kv90jaM devji@poseidon"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOD4PopDAxzh1t4nNnDE/xiWLGYzopLRzZ7eBwd4hHza devji@schneeeule"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaSocp/bIkehFWy8I/H+g/46sWfnmj9s+Zx13dIjQct devji@lunarfall"
     ];
     #packages = with pkgs; [
     # kdePackages.kate
@@ -148,6 +147,5 @@
     git
     wget
     nixpkgs-fmt
-    #    nfs-utils
   ];
 }

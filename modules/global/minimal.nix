@@ -7,7 +7,7 @@
   imports = [
     ../lf
     ../env.nix
-    #../shell
+    ../shell
     ../sops.nix
     ../helix.nix
   ];

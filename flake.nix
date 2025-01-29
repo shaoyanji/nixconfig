@@ -156,7 +156,7 @@
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [
-          ./hosts/heim.nix
+          ./modules/global/heim.nix
           inputs.lix-module.nixosModules.default
         ];
       };

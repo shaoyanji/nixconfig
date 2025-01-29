@@ -13,24 +13,22 @@
       imports = [
         ./minimal.nix
         ../shell/nushell.nix
-        ../helix.nix
       ];
       home.username = "devji";
       home.homeDirectory = "/home/devji";
       home.packages = with pkgs; [
-        git
       ];
       home.file = {
       };
       xdg.configFile = {
       };
-   };
-   sharedModules = [
+    };
+    sharedModules = [
       #  sops-nix.homeManagerModules.sops
     ];
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
   };
-    environment.sessionVariables = {
-      EDITOR = "hx";
-    };
+  environment.sessionVariables = {
+    EDITOR = "hx";
+  };
 }

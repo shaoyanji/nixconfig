@@ -139,7 +139,7 @@
         #"homebrew/services"
       ];
       brews = [
-        "mas"
+        # "mas"
         # "gigalixir"
       ];
       casks = [
@@ -157,7 +157,7 @@
       ];
     masApps = {
       # Xcode = 497799835;
-      "ISH" = 1436902243;
+      # "ISH" = 1436902243;
       # "Steamlink" = 1246969117;
     };
       onActivation.cleanup = "zap";

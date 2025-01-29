@@ -129,13 +129,12 @@
         nix-homebrew.darwinModules.nix-homebrew
         home-manager.darwinModules.default
       ];
-    globalModulesContainers=
+    globalModulesContainers =
       globalModules
       ++ [
         ./modules/global/noDE.nix
         home-manager.nixosModules.default
       ];
-
   in {
     homeConfigurations = {
       root = home-manager.lib.homeManagerConfiguration {
@@ -203,7 +202,7 @@
         system = "aarch64-linux";
         specialArgs = {inherit inputs;};
         modules =
-                globalModules
+          globalModules
           ++ [
             ./hosts/minyx/configuration.nix
             ./modules/global/minyx.nix
@@ -216,6 +215,7 @@
         modules =
           globalModulesContainers
           ++ [
+            ./hosts/orb-cassini/custom.nix
             /etc/nixos/configuration.nix
           ];
       };
@@ -235,7 +235,7 @@
         modules =
           globalModulesContainers
           ++ [
-              /etc/nixos/configuration.nix
+            /etc/nixos/configuration.nix
           ];
       };
     };

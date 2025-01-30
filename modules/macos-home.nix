@@ -27,6 +27,8 @@ in
     ".cloak/keys.txt".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/security/keys.txt";
     # ".config/cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     # ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
+    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
+    "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/storage";
   };
 
 }

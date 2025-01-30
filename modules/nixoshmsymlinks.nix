@@ -17,6 +17,7 @@ in {
     "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents";
     "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/books";
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
+    "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/storage";
     "Applications".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/appimages";
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics";

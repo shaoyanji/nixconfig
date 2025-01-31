@@ -13,6 +13,7 @@
       "aarch64-linux"
     ];
     forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f system);
+    registryprefix="ghcr.io/shaoyanji/";
     imageName = "tgpt";
     imageTag = "latest";
     mkDockerImage = pkgs: targetSystem: let
@@ -21,25 +22,25 @@
         then "amd64"
         else "arm64";
       #          duckgpt = pkgs.callPackage ./official.nix {};
-      alpine = pkgs.dockerTools.pullImage {
-        imageName = "alpine";
-        imageDigest = "sha256:56fa17d2a7e7f168a043a2712e63aed1f8543aeafdcee47c58dcffe38ed51099";
-        hash = "sha256-C3TOcLa18BKeBfS5FSe0H6BALGA/zXSwSZstK+VaPyo=";
-        finalImageName = "alpine";
-        finalImageTag = "latest";
-      };
+      alpine = pkgs.dockerTools.pullImage{
+  imageName = "alpine";
+  imageDigest = "sha256:115729ec5cb049ba6359c3ab005ac742012d92bbaa5b8bc1a878f1e8f62c0cb8";
+  hash = "sha256-7E9mkUfYsv3Tzl99ggihTOFCqvcLB4/NsPyRUC1nqug=";
+  finalImageName = "alpine";
+  finalImageTag = "edge";
+};
     in
       pkgs.dockerTools.buildImage {
-        name = imageName;
+        name = "${registryprefix}${imageName}";
         tag = "${imageTag}-${archSuffix}";
         fromImage = alpine;
         copyToRoot = pkgs.buildEnv {
           name = "image-root";
-          paths = [pkgs.tgpt];
+          paths = [pkgs.tgpt pkgs.bashInteractive pkgs.busybox];
           pathsToLink = ["/bin"];
         };
         config = {
-          EntryPoint = ["/bin/sh"];
+          EntryPoint = ["/bin/bash"];
         };
       };
   in {

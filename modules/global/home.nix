@@ -23,8 +23,9 @@
         go-task
         nixd
         devenv
-        cmus
-        yt-dlp
+        #cmus
+        #yt-dlp
+        mupdf
         mpv
         sqlite
         ## nix formatting

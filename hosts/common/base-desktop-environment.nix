@@ -53,9 +53,10 @@
     # config.boot.kernelPackages.digimend
   ];
   programs.nix-ld.enable = true;
-  #programs.nix-ld.libraries = with pkgs; [
-  #libGL
-  #];
+  programs.nix-ld.libraries = with pkgs; [
+    #libGL
+    alsa-lib
+    ];
 
   #  programs.appimage = {
   #  enable = true;

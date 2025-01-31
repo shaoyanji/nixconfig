@@ -39,6 +39,8 @@
     ];
     trusted-users = [
       "@admin"
+      "@wheel"
+      "root"
     ];
   };
 

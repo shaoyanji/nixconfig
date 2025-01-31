@@ -2,3 +2,4 @@
 .devenv
 ._*
 .smbdelete*
+@eaDir*

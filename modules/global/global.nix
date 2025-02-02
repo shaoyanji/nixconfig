@@ -41,6 +41,7 @@
       "@admin"
       "@wheel"
       "root"
+      "nixremote"
     ];
   };
 

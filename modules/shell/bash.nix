@@ -4,9 +4,6 @@
       enable = true;
       bashrcExtra = /*bash*/ ''
         source $HOME/.bash_aliases
-        eval "$(fzf --bash)"
-        eval "$(zoxide init bash)"
-        eval "$(starship init bash)"
       '';
     };
   };

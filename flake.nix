@@ -209,6 +209,7 @@
             ./hosts/minyx/configuration.nix
 	    ./hosts/minyx/custompi.nix
             sops-nix.nixosModules.sops
+	    inputs.chaotic.nixosModules.default
           ];
       };
       orb-cassini = nixpkgs.lib.nixosSystem {

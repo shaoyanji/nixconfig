@@ -207,7 +207,7 @@
           globalModules
           ++ [
             ./hosts/minyx/configuration.nix
-            ./modules/global/minyx.nix
+	    ./hosts/minyx/custompi.nix
             sops-nix.nixosModules.sops
           ];
       };

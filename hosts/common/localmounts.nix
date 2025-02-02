@@ -1,5 +1,5 @@
 {config, pkgs,...}: {
-systemd.timers."burgernas-unmound" = {
+systemd.timers."burgernas-unmount" = {
   wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "22:59:00";
@@ -29,7 +29,7 @@ systemd.services."burgernas-unmount" = {
     fsType = "cifs";
     options = let
       automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=1000,gid=1";
+      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=$(id -u),gid=$(id -g)";
     in ["${automount_opts},${reg_opts}"];
   };
   fileSystems."/mnt/z" = {
@@ -37,7 +37,7 @@ systemd.services."burgernas-unmount" = {
     fsType = "cifs";
     options = let
       automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=1000,gid=1";
+      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=$(id -u),gid=$(id -g)";
     in ["${automount_opts},${reg_opts}"];
   };
   fileSystems."/mnt/x" = {
@@ -45,7 +45,7 @@ systemd.services."burgernas-unmount" = {
     fsType = "cifs";
     options = let
       automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=1000,gid=1";
+      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=$(id -u),gid=$(id -g)";
     in ["${automount_opts},${reg_opts}"];
   };
   fileSystems."/mnt/v" = {
@@ -53,7 +53,7 @@ systemd.services."burgernas-unmount" = {
     fsType = "cifs";
     options = let
       automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/localwd/credentials".path},uid=1000,gid=1";
+      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=$(id -u),gid=$(id -g)";
     in ["${automount_opts},${reg_opts}"];
   };
 }

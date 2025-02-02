@@ -6,13 +6,12 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ../commons/minimal-desktop.nix
+      ../common/minimal-desktop.nix
     ];
   # !!! Adding a swap file is optional, but strongly recommended!
   swapDevices = [{ device = "/swap"; }];
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   # Enables the generation of /boot/extlinux/extlinux.conf
-   boot.kernelPackages = pkgs.linuxPackages_latest;
   # Disable ZFS on kernel 6
   boot.supportedFilesystems = lib.mkForce [
     "vfat"
@@ -104,8 +103,8 @@ services.blocky = {
     };
 
     # Enabling WIFI
-    wireless.enable = true;
-    wireless.interfaces = [ "wlan0" ];
+#    wireless.enable = true;
+#    wireless.interfaces = [ "wlan0" ];
     # If you want to connect also via WIFI to your router
     # wireless.networks."SATRIA".psk = "wifipassword";
     # You can set default nameservers

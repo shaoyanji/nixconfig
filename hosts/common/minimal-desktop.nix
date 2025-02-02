@@ -17,7 +17,7 @@ in
   ];
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
-    binfmt.emulatedSystems = [ "aarch64-linux" ];
+    binfmt.emulatedSystems = [] ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["aarch64-linux"];
   };
   sops = {
     defaultSopsFile = ../../modules/secrets/secrets.yaml;

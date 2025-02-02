@@ -6,11 +6,10 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ../minimal-desktop.nix
+      ../commons/minimal-desktop.nix
     ];
   # !!! Adding a swap file is optional, but strongly recommended!
-  swapDevices = [{ device = "/swapfile"; size = 1024; }];
+  swapDevices = [{ device = "/swap"; }];
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   # Enables the generation of /boot/extlinux/extlinux.conf
    boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -35,6 +34,7 @@
 
    environment.systemPackages = with pkgs; [
     neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    helix
     bind
     kubectl
     kubernetes-helm
@@ -44,15 +44,39 @@
     nodejs
     docker-compose
    ];
+services.blocky = {
+  enable = true;
+
+  settings = {
+ ports.dns = 53; # Port for incoming DNS Queries.
+      upstreams.groups.default = [
+        "https://one.one.one.one/dns-query" # Using Cloudflare's DNS over HTTPS server for resolving queries.
+      ];
+      # For initially solving DoH/DoT Requests when no system Resolver is available.
+      bootstrapDns = {
+        upstream = "https://one.one.one.one/dns-query";
+        ips = [ "1.1.1.1" "1.0.0.1" ];
+      };
+      #Enable Blocking of certain domains.
+      blocking = {
+        denylists = {
+          #Adblocking
+          ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
+          #Another filter for blocking adult sites
+          adult = ["https://blocklistproject.github.io/Lists/porn.txt"];
+          #You can add additional categories
+        };
+        #Configure what block categories are used
+        clientGroupsBlock = {
+          default = [ "ads" ];
+          kids-ipad = ["ads" "adult"];
+        };
+      };   # anything from config.yml
+  };
+};
     services.dnsmasq = {
     enable = false;
-    settings.servers = [ "8.8.8.8" "8.8.4.4" "1.1.1.1" ];
-    settings.extraConfig = ''
-      address=/fenrir.test/192.168.100.6
-      address=/recalune.test/192.168.100.7
-      address=/eth.nixpi.test/192.168.100.3
-      address=/wlan.nixpi.test/192.168.100.4
-    '';
+    settings.servers = [ "9.9.9.9" "8.8.4.4" "1.1.1.1" ];
   };
     # WiFi
   hardware = {
@@ -66,7 +90,7 @@
       useDHCP = false;
       ipv4.addresses = [{
         # I used static IP over WLAN because I want to use it as local DNS resolver
-        address = "192.168.1.4";
+        address = "192.168.178.3";
         prefixLength = 24;
       }];
     };
@@ -100,6 +124,12 @@
   };
 
   documentation.nixos.enable = false;
-  boot.tmp.cleanOnBoot = true;
+ # boot.tmp.cleanOnBoot = true;
+  boot = {
+  tmp.useTmpfs = true;
+};
+systemd.services.nix-daemon = {
+  environment.TMPDIR = "/var/tmp";
+};
 }
 

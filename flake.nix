@@ -25,6 +25,7 @@
       url = "github:zhaofengli-wip/nix-homebrew";
       inputs.nixpkgs.follows = "nix-darwin";
     };
+    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/master";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -73,6 +74,7 @@
     nixpkgs,
     nix-homebrew,
     nixos-wsl,
+    raspberry-pi,
     home-manager,
     impermanence,
     disko,

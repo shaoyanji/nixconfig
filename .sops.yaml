@@ -13,7 +13,6 @@ keys:
   - &minyx age17k653l45u5tusxjhnacms8ltqm64kyqluetxfr0khsrj8clesgeqemr95d
   - &guckloch age1aq6fer9unde6xwjw587qzc6e6cfe4wlu2xvcah7vjqrkptkd7gtq69v38r
   - &lunarfall age1wvrf6uclae5ald5uk5lvjyj9pgpc56tpy9vannv7wmy0s092850qk2mn0y
-  - &ares age165pm2te09z0kzjwrvwcy9qdvycpqlqw2v7hxmv9u7tcy9w3ld3cq0nughq
   - &schneeeule age14wsec4ypsqzx075mxw6nen6htdm6tmsu3artlf4jas7jk02zmecsg7kseh
   - &leakynose age1s2vtxjp0hjrrjulx9qf2gejn9xkd5y4gu2m0wrxw5vqw7cf2ea3qkusze6
   - &schneeeulehost age103h35vrcud7a8mk0fzegzlyazq0qtsgggnzyxf4vf3z2qdspxgvs9zhdy5
@@ -21,8 +20,12 @@ keys:
   - &minyxhost age10tahcnw6m357gfmx4686q7qqkt5h7f3p7gvamhn0ds3wyfe35chsztfnwt
   - &orb-cassini age15ptau7jyv6kcwz39vcfzxpw95p97l5r7uywkcl5g83gqxuhh7q4saggagy
   - &acersopshost age15mzmhlt5hh5z94843e27rqev4955v3gkcwqacr4ueyxegzav94kqvz0c43
-  - &areshost age12wmg9wmatu5mlyjqs0afgdj4uu7m6flc05anmq0v0a3m50zhpswsyjhf7a
+  - &usbares age165pm2te09z0kzjwrvwcy9qdvycpqlqw2v7hxmv9u7tcy9w3ld3cq0nughq
+  - &usbareshost age12wmg9wmatu5mlyjqs0afgdj4uu7m6flc05anmq0v0a3m50zhpswsyjhf7a
   - &alarm age1juyqqqcntxf5affyt4ukr2fyerw6mexw08w3y8tyqjkm27k3hd8qpax2y5
+  - &ares age1nqdx5a80wy6d3hjsldhhe5y4ltrfv3zr9m3cdrekcxha0hg7g5usxj482d
+  - &areshost age12gezpwjwq0ln36gt22h3hp6v2tsf5df4sgrr7x4g57sa83dc6unsft55zx
+
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -47,4 +50,6 @@ creation_rules:
       - *acersopshost
       - *areshost
       - *alarm
+      - *usbares
+      - *usbareshost
       gpg:

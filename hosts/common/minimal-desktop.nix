@@ -10,6 +10,7 @@ let
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKVYLgws2TgaYIsOmVmJeoJIu9F8lguBXi711Kv90jaM devji@poseidon"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOD4PopDAxzh1t4nNnDE/xiWLGYzopLRzZ7eBwd4hHza devji@schneeeule"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKglnT7aVqb9CrFE0U/Y/ZFN8apH7urMXM2Sn9bJ23YV nixos@nixos"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHfnYbTF2d4ZA4+wKbXFL/UUJTcMqdLDhhAZZDP2KrPD devji@orb-cassini"
     ];
 in
 {
@@ -30,11 +31,7 @@ in
     };
   };
   services = {
-    scx = {
-      enable = true;
-      scheduler = "scx_rusty";
-      package = pkgs.scx_git.full;
-    };
+
     xserver.xkb = {
       layout = "us";
       variant = "";
@@ -71,8 +68,6 @@ in
   # Enable networking
   networking = {
     networkmanager.enable = true;
-    nameservers = ["192.168.178.1" "192.168.178.3"];
-    search = ["fritz.box"];
     # Configure network proxy if necessary
     # proxy.default = "http://user:password@proxy:port/";
     # proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -90,7 +85,7 @@ in
           allowedTCPPorts = [22];
           interfaces.tailscale0.allowedUDPPorts = [config.services.tailscale.port];
         };
-        nameservers = lib.mkDefault ["100.100.100.100" "100.68.238.108" "100.113.144.19" "100.75.100.67"];
+        nameservers = lib.mkDefault ["100.100.100.100" "100.68.238.108" "100.113.144.19" "100.75.100.67" "100.108.50.50"];
         search = lib.mkDefault ["cloudforest-kardashev.ts.net"];
       };
     };

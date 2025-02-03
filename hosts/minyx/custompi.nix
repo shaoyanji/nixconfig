@@ -31,6 +31,7 @@
   #   useXkbConfig = true; # use xkb.options in tty.
    };
 
+  services.scx.enable = lib.mkDefault false;
    environment.systemPackages = with pkgs; [
     neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     helix
@@ -42,6 +43,8 @@
     python3
     nodejs
     docker-compose
+    bluez
+    bluez-tools
    ];
 services.blocky = {
   enable = true;
@@ -73,12 +76,33 @@ services.blocky = {
       };   # anything from config.yml
   };
 };
-    services.dnsmasq = {
-    enable = false;
-    settings.servers = [ "9.9.9.9" "8.8.4.4" "1.1.1.1" ];
-  };
+  #    services.dnsmasq = {
+  #  enable = false;
+  #  settings.servers = [ "9.9.9.9" "8.8.4.4" "1.1.1.1" ];
+  #};
     # WiFi
+  #inputs.raspberry-pi-nix.board = "bcm2711";
   hardware = {
+    #    raspberry-pi.config.all = {
+    #      # as per exaple: https://github.com/nix-community/raspberry-pi-nix/blob/aaec735faf81ff05356d65c7408136d2c1522d34/example/default.nix#L17C11-L32C13
+    #      base-dt-params = {
+    #        BOOT_UART = {
+    #          value = 1;
+    #          enable = true;
+    #        };
+    #        uart_2ndstage = {
+    #          value = 1;
+    #          enable = true;
+    #        };
+    #      };
+    #      dt-overlays = {
+    #        disable-bt = {
+    #          enable = true;
+    #          params = { };
+    #        };
+    #      };
+    #    };
+    bluetooth.enable = true;
     enableRedistributableFirmware = true;
     firmware = [ pkgs.wireless-regdb ];
   };
@@ -94,12 +118,12 @@ services.blocky = {
       }];
     };
     interfaces.eth0 = {
-      useDHCP = true;
+      useDHCP = false;
       # I used DHCP because sometimes I disconnect the LAN cable
-      #ipv4.addresses = [{
-      #  address = "192.168.100.3";
-      #  prefixLength = 24;
-      #}];
+      ipv4.addresses = [{
+        address = "192.168.173.3";
+        prefixLength = 24;
+      }];
     };
 
     # Enabling WIFI
@@ -116,11 +140,11 @@ services.blocky = {
     # };
   };
   # forwarding
-  boot.kernel.sysctl = {
-    "net.ipv4.conf.all.forwarding" = true;
-    "net.ipv6.conf.all.forwarding" = true;
-    "net.ipv4.tcp_ecn" = true;
-  };
+  #boot.kernel.sysctl = {
+  #  "net.ipv4.conf.all.forwarding" = true;
+  #  "net.ipv6.conf.all.forwarding" = true;
+  #  "net.ipv4.tcp_ecn" = true;
+  #};
 
   documentation.nixos.enable = false;
  # boot.tmp.cleanOnBoot = true;

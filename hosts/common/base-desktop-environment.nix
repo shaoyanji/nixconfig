@@ -36,6 +36,11 @@
       };
     #    xserver.digimend.enable = true;
     };
+    scx = {
+      enable = true;
+      scheduler = "scx_rusty";
+      package = pkgs.scx_git.full;
+    };
   };
   programs.hyprland = {
     enable = true;

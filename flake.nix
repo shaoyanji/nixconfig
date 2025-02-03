@@ -25,7 +25,8 @@
       url = "github:zhaofengli-wip/nix-homebrew";
       inputs.nixpkgs.follows = "nix-darwin";
     };
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/master";
+        nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -74,7 +75,8 @@
     nixpkgs,
     nix-homebrew,
     nixos-wsl,
-    raspberry-pi,
+    nixos-hardware,
+    raspberry-pi-nix,
     home-manager,
     impermanence,
     disko,
@@ -182,6 +184,7 @@
           globalModulesImpermanence
           ++ [
             ./hosts/ares/configuration.nix
+              inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
             (import ./hosts/common/disko.nix {device = "/dev/sda";})
           ];
       };
@@ -212,6 +215,7 @@
 	    ./hosts/minyx/custompi.nix
             sops-nix.nixosModules.sops
 	    inputs.chaotic.nixosModules.default
+            inputs.nixos-hardware.nixosModules.raspberry-pi-3
           ];
       };
       orb-cassini = nixpkgs.lib.nixosSystem {

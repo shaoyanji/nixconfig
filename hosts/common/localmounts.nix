@@ -1,4 +1,12 @@
-{config, pkgs,...}: {
+{config, pkgs,...}:   let 
+    burgernas = "192.168.178.4";
+    fritznas = "192.168.178.1";
+    automount_opts = "x-systemd.automount,x-systemd.after=network-online.target,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=10s,x-systemd.mount-timeout=10s";
+    reg_opts = "rw,noserverino,uid=1000,gid=1";
+    cred_wolf="credentials=${config.sops.secrets."server/localwd/credentials".path}";
+    cred_fritz="credentials=${config.sops.secrets."server/keyrepo/credentials".path}";
+  in
+{
 systemd.timers."burgernas-unmount" = {
   wantedBy = [ "timers.target" ];
     timerConfig = {
@@ -19,41 +27,30 @@ systemd.services."burgernas-unmount" = {
 };
   environment.systemPackages = [pkgs.cifs-utils];
   fileSystems."/mnt/w" = {
-    device = "burgernas.fritz.box:/volume1/peachcable";
+    device = "${burgernas}:/volume1/peachcable";
     fsType = "nfs";
-    options = [ "x-systemd.automount" "noauto" "x-systemd.after=network-online.target" "x-systemd.mount-timeout=30" ];
+    options = [ "${automount_opts}" ];
   };
 
   fileSystems."/mnt/y" = {
-    device = "//192.168.178.1/fritz.nas/External-USB3-0-01/";
+    device = "//${fritznas}/fritz.nas/External-USB3-0-01/";
     fsType = "cifs";
-    options = let
-      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=1000,gid=1";
-    in ["${automount_opts},${reg_opts}"];
+    options = 
+    ["${automount_opts},${reg_opts},${cred_fritz}"];
   };
   fileSystems."/mnt/z" = {
-    device = "//burgernas/usbshare2";
+    device = "//${burgernas}/usbshare2";
     fsType = "cifs";
-    options = let
-      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=1000,gid=1";
-    in ["${automount_opts},${reg_opts}"];
+    options = ["${automount_opts},${reg_opts},${cred_wolf}"];
   };
   fileSystems."/mnt/x" = {
-    device = "//burgernas/Shared Library";
+    device = "//${burgernas}/Shared Library";
     fsType = "cifs";
-    options = let
-      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=1000,gid=1";
-    in ["${automount_opts},${reg_opts}"];
+    options = ["${automount_opts},${reg_opts},${cred_wolf}"];
   };
   fileSystems."/mnt/v" = {
-    device = "//burgernas/usbshare1";
+    device = "//${burgernas}/usbshare1";
     fsType = "cifs";
-    options = let
-      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      reg_opts = "rw,noserverino,credentials=${config.sops.secrets."server/keyrepo/credentials".path},uid=1000,gid=1";
-    in ["${automount_opts},${reg_opts}"];
+    options = ["${automount_opts},${reg_opts},${cred_wolf}"];
   };
 }

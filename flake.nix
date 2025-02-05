@@ -209,12 +209,12 @@
         system = "aarch64-linux";
         specialArgs = {inherit inputs;};
         modules =
-          globalModules
+          globalModulesContainers
           ++ [
             ./hosts/minyx/configuration.nix
-	    ./hosts/minyx/custompi.nix
+            ./hosts/minyx/custompi.nix
             sops-nix.nixosModules.sops
-	    inputs.chaotic.nixosModules.default
+            inputs.chaotic.nixosModules.default
             inputs.nixos-hardware.nixosModules.raspberry-pi-3
           ];
       };

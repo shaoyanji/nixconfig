@@ -30,7 +30,7 @@
     ];
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
   };
-#  environment.sessionVariables = {
-#    EDITOR = "hx";
-#  };
+  #  environment.sessionVariables = {
+  #    EDITOR = "hx";
+  #  };
 }

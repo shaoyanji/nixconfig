@@ -10,7 +10,7 @@
   wolfNAS = "/mnt/z";
 in {
   home.file = {
-    "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
+    #"nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
     "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
     "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
@@ -18,7 +18,7 @@ in {
     "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/books";
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
     "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/storage";
-    "Applications".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/appimages";
+    "Applications/appimages".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/appimages";
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics";
     "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video";
@@ -26,7 +26,7 @@ in {
     ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/.cargo/registry";
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/ollama";
     # ".zen".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/zen";
-    ".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/firefox";
+    #".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/firefox";
     ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/secrets/cloak/accounts.age";
     ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/security/key.txt";
     # ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
@@ -36,21 +36,25 @@ in {
     "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
     "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     #    "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
-    "ghostty/config".text = /*ini*/''
-      theme = catppuccin-mocha
-      font-family = JetBrainsMono Nerd Font Mono
-      font-size = 14
-      background-opacity = 0.88888888
-      gtk-titlebar = false
+    "ghostty/config".text =
+      /*
+      ini
+      */
+      ''
+        theme = catppuccin-mocha
+        font-family = JetBrainsMono Nerd Font Mono
+        font-size = 14
+        background-opacity = 0.88888888
+        gtk-titlebar = false
 
-      keybind = ctrl+shift+'=new_split:right
-      keybind = ctrl+shift+enter=new_split:down
-      keybind = ctrl+enter=unbind
-      keybind = ctrl+'=toggle_fullscreen
-      keybind = ctrl+n=new_window
+        keybind = ctrl+shift+'=new_split:right
+        keybind = ctrl+shift+enter=new_split:down
+        keybind = ctrl+enter=unbind
+        keybind = ctrl+'=toggle_fullscreen
+        keybind = ctrl+n=new_window
 
-      shell-integration = bash
-    '';
+        shell-integration = bash
+      '';
   };
   home.sessionPath =
     ["${peachNAS}/bin-scripts"]

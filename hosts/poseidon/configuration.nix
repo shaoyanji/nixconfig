@@ -6,8 +6,9 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       #../common/steam.nix
-      #      ../common/base-desktop-environment.nix
-      ../common/minimal-desktop.nix
+      ../common/base-desktop-environment.nix
+      #../common/minimal-desktop.nix
+      inputs.chaotic.nixosModules.default
     ];
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {
@@ -31,5 +32,5 @@
   #variables = {
   # };
   #};
-  system.stateVersion = "25.05"; # Did you read the comment?
+#  system.stateVersion = "25.05"; # Did you read the comment?
 }

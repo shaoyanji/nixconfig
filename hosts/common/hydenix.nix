@@ -12,7 +12,7 @@
 
   import = [<nixvim>.homeManagerModules.nixvim];
   # hardware config - sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
-  hardwareConfig = toString ./hosts/poseidon/hardware-configuration.nix;
+  hardwareConfig = toString ../poseidon/hardware-configuration.nix;
 
   # list of drivers to install in ./hosts/nixos/drivers.nix
   drivers = [
@@ -40,7 +40,7 @@
   */
   # list of nix modules to import in ./hosts/nixos/default.nix
   nixModules = [
-    (toString ./hosts/poseidon/configuration.nix)
+    (toString ../poseidon/configuration.nix)
 
     # in my-module.nix you can reference this userconfig
     ({
@@ -63,9 +63,9 @@
   ];
   # list of nix modules to import in ./lib/mkconfig.nix
   homeModules = [
-    (toString ./modules/global/minimal.nix)
-    (toString ./modules/nixoshmsymlinks.nix)
-    (toString ./modules/nixvim)
+    (toString ../../modules/global/minimal.nix)
+    (toString ../../modules/nixoshmsymlinks.nix)
+    (toString ../../modules/nixvim)
   ];
 
   hyde = rec {
@@ -85,7 +85,7 @@
     themes = [
       # -- Default themes
       # "Catppuccin Latte"
-      "Catppuccin Mocha"
+       "Catppuccin Mocha"
       # "Decay Green"
       # "Edge Runner"
       # "Frosted Glass"
@@ -107,9 +107,9 @@
       # "Edge Runner"
       # "Green Lush"
       # "Greenify"
-      # "Hack the Box"
+       "Hack the Box"
       # "Ice Age"
-      # "Mac OS"
+       "Mac OS"
       # "Monokai"
       # "Monterey Frost"
       # "One Dark"
@@ -118,12 +118,13 @@
       # "Pixel Dream"
       # "Rain Dark"
       # "Red Stone"
-      # "Rose Pine"
+       "Rose Pine"
       # "Scarlet Night"
       # "Sci-fi"
       # "Solarized Dark"
+       "Tokyo Night"
       # "Vanta Black"
-      # "Windows 11"
+       "Windows 11"
     ];
 
     # exactly the same as hyde.conf
@@ -150,6 +151,6 @@
     # 30gb minimum for one theme - 50gb for multiple themes - more for development and testing
     diskSize = 20000;
   };
-
+home-manager.backupFileExtension = "hyde";
   defaultPassword = "asdf";
 }

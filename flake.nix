@@ -67,6 +67,7 @@
     lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     ghostty.url = "github:ghostty-org/ghostty";
     utils.url = "github:numtide/flake-utils";
+    hydenix.url = "github:richen604/hydenix";
   };
 
   outputs = {
@@ -88,6 +89,16 @@
     ...
   } @ inputs: let
     overlays = [inputs.nuenv.overlays.default];
+    pkgs = import inputs.nixpkgs {
+        inherit systems;
+        config.allowUnfree = true;
+      };
+    hydenixConfig = inputs.hydenix.lib.mkConfig {
+        userConfig = import ./config.nix;
+        extraInputs = inputs;
+        # Pass user's pkgs to be used alongside hydenix's pkgs (eg. userPkgs.kitty)
+        extraPkgs = pkgs;
+    };
     systems = [
       "x86_64-linux"
       "aarch64-linux"
@@ -168,15 +179,23 @@
       };
     };
     nixosConfigurations = {
-      poseidon = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {inherit inputs;};
-        modules =
-          globalModulesNixos
-          ++ [
-            ./hosts/poseidon/configuration.nix
-          ];
-      };
+      poseidon = hydenixConfig.nixosConfiguration;
+
+        #${hydenixConfig.userConfig.host} = hydenixConfig.nixosConfiguration;
+        #packages."x86_64-linux" = {
+        #  default = hydenixConfig.nix-vm.config.system.build.vm; 
+        #};
+        #      poseidon = nixpkgs.lib.nixosSystem {
+        #        system = "x86_64-linux";
+        #        specialArgs = {inherit inputs;};
+        #        modules =
+        #          globalModulesContainers
+        #          ++ [
+        #            ./hosts/poseidon/configuration.nix
+        #            inputs.chaotic.nixosModules.default
+        #            inputs.sops-nix.nixosModules.sops
+        #          ];
+        #      };
       ares = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};

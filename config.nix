@@ -40,7 +40,6 @@
   */
   # list of nix modules to import in ./hosts/nixos/default.nix
   nixModules = [
-    (toString ./hosts/poseidon/nvidia.nix)
     (toString ./hosts/poseidon/configuration.nix)
 
     # in my-module.nix you can reference this userconfig
@@ -64,8 +63,9 @@
   ];
   # list of nix modules to import in ./lib/mkconfig.nix
   homeModules = [
-    (toString ./modules/nixvim)
     (toString ./modules/global/minimal.nix)
+    (toString ./modules/nixoshmsymlinks.nix)
+    (toString ./modules/nixvim)
   ];
 
   hyde = rec {

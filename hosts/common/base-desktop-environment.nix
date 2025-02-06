@@ -34,7 +34,7 @@
         enable = true;
         user = "devji";
       };
-    #    xserver.digimend.enable = true;
+      #    xserver.digimend.enable = true;
     };
     scx = {
       enable = true;
@@ -61,11 +61,10 @@
   programs.nix-ld.libraries = with pkgs; [
     #libGL
     alsa-lib
-    ];
+  ];
 
   #  programs.appimage = {
   #  enable = true;
   #  binfmt = true;
   #};
-
 }

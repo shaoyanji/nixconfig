@@ -151,5 +151,9 @@
     colorschemes.catpuccin.enable = true;
     plugins.lualine.enable = true;
   };
+  programs.neovim = {
+    enable = false;
+    defaultEditor = false;
+  };
   defaultPassword = "asdf";
 }

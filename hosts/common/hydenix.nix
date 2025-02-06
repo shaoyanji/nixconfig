@@ -10,7 +10,6 @@
   timezone = "Europe/Berlin";
   locale = "en_US.UTF-8";
 
-  import = [<nixvim>.homeManagerModules.nixvim];
   # hardware config - sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
   hardwareConfig = toString ../poseidon/hardware-configuration.nix;
 
@@ -51,13 +50,8 @@
       environment.systemPackages = with pkgs; [
         direnv
         carapace
-        fzf
-        zoxide
         cifs-utils
-        go-task
-        yq-go
         nfs-utils
-        gum
       ];
     })
   ];
@@ -147,11 +141,15 @@
     # 4 gb minimum
     memorySize = 4096;
     # 2 cores minimum
-    cores = 16;
+    cores = 2;
     # 30gb minimum for one theme - 50gb for multiple themes - more for development and testing
     diskSize = 20000;
   };
   home-manager.backupFileExtension = "hyde";
-  home-manager.programs.neovim.enable = false;
+  programs.nixvim = {
+    enable = true;
+    colorschemes.catpuccin.enable = true;
+    plugins.lualine.enable = true;
+  };
   defaultPassword = "asdf";
 }

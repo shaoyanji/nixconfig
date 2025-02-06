@@ -25,7 +25,7 @@
       url = "github:zhaofengli-wip/nix-homebrew";
       inputs.nixpkgs.follows = "nix-darwin";
     };
-        nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
@@ -90,14 +90,14 @@
   } @ inputs: let
     overlays = [inputs.nuenv.overlays.default];
     pkgs = import inputs.nixpkgs {
-        inherit systems;
-        config.allowUnfree = true;
-      };
+      inherit systems;
+      config.allowUnfree = true;
+    };
     hydenixConfig = inputs.hydenix.lib.mkConfig {
-        userConfig = import ./config.nix;
-        extraInputs = inputs;
-        # Pass user's pkgs to be used alongside hydenix's pkgs (eg. userPkgs.kitty)
-        extraPkgs = pkgs;
+      userConfig = import ./hosts/common/hydenix.nix;
+      extraInputs = inputs;
+      # Pass user's pkgs to be used alongside hydenix's pkgs (eg. userPkgs.kitty)
+      extraPkgs = pkgs;
     };
     systems = [
       "x86_64-linux"
@@ -181,21 +181,21 @@
     nixosConfigurations = {
       poseidon = hydenixConfig.nixosConfiguration;
 
-        #${hydenixConfig.userConfig.host} = hydenixConfig.nixosConfiguration;
-        #packages."x86_64-linux" = {
-        #  default = hydenixConfig.nix-vm.config.system.build.vm; 
-        #};
-        #      poseidon = nixpkgs.lib.nixosSystem {
-        #        system = "x86_64-linux";
-        #        specialArgs = {inherit inputs;};
-        #        modules =
-        #          globalModulesContainers
-        #          ++ [
-        #            ./hosts/poseidon/configuration.nix
-        #            inputs.chaotic.nixosModules.default
-        #            inputs.sops-nix.nixosModules.sops
-        #          ];
-        #      };
+      #${hydenixConfig.userConfig.host} = hydenixConfig.nixosConfiguration;
+      #packages."x86_64-linux" = {
+      #  default = hydenixConfig.nix-vm.config.system.build.vm;
+      #};
+      #      poseidon = nixpkgs.lib.nixosSystem {
+      #        system = "x86_64-linux";
+      #        specialArgs = {inherit inputs;};
+      #        modules =
+      #          globalModulesContainers
+      #          ++ [
+      #            ./hosts/poseidon/configuration.nix
+      #            inputs.chaotic.nixosModules.default
+      #            inputs.sops-nix.nixosModules.sops
+      #          ];
+      #      };
       ares = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
@@ -203,7 +203,7 @@
           globalModulesImpermanence
           ++ [
             ./hosts/ares/configuration.nix
-              inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
+            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
             (import ./hosts/common/disko.nix {device = "/dev/sda";})
           ];
       };

@@ -12,9 +12,6 @@
     users.devji = {
       imports = [
         ./minimal.nix
-        ../shell/nushell.nix
-        ../shell/tmux.nix
-        ../shell/bash.nix
       ];
       home.username = "devji";
       home.homeDirectory = "/home/devji";

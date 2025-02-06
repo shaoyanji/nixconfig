@@ -41,19 +41,19 @@ in {
       ini
       */
       ''
-        theme = catppuccin-mocha
-        font-family = JetBrainsMono Nerd Font Mono
-        font-size = 14
-        background-opacity = 0.88888888
-        gtk-titlebar = false
+                theme = catppuccin-mocha
+                font-family = JetBrainsMono Nerd Font Mono
+                font-size = 14
+                background-opacity = 0.88888888
+                gtk-titlebar = false
 
-        keybind = ctrl+shift+'=new_split:right
-        keybind = ctrl+shift+enter=new_split:down
-        keybind = ctrl+enter=unbind
-        keybind = ctrl+'=toggle_fullscreen
-        keybind = ctrl+n=new_window
+                keybind = ctrl+shift+'=new_split:right
+                keybind = ctrl+shift+enter=new_split:down
+                keybind = ctrl+enter=unbind
+                keybind = ctrl+'=toggle_fullscreen
+                keybind = ctrl+n=new_window
 
-        shell-integration = bash
+        #        shell-integration = bash
       '';
   };
   home.sessionPath =

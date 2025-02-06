@@ -15,14 +15,17 @@
     ../shell/nushell.nix
   ];
   home = {
-    packages =
+    packages = with pkgs;
       [
-        pkgs.gum
-        pkgs.go-task
-        pkgs.mailsy
+        gum
+        go-task
+        fzf
+        yq-go
+        zoxide
+        mailsy
       ]
-      ++ lib.optionals pkgs.stdenv.isLinux [
-        pkgs.wl-clipboard
+      ++ lib.optionals stdenv.isLinux [
+        wl-clipboard
       ];
     file = {};
 

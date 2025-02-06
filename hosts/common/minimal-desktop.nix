@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 let 
@@ -16,6 +17,7 @@ in
 {
   imports = [
     ./localmounts.nix
+    inputs.sops-nix.nixosModules.sops
   ];
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;

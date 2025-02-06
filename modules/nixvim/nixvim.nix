@@ -6,7 +6,7 @@
     # Uncomment if you are using the home-manager module
      inputs.nixvim.homeManagerModules.nixvim
     # Uncomment if you are using the nixos module
-    #inputs.nixvim.nixosModules.nixvim
+    # inputs.nixvim.nixosModules.nixvim
     # Uncomment if you are using the nix-darwin module
     # inputs.nixvim.nixDarwinModules.nixvim
 

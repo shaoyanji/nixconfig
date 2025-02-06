@@ -9,8 +9,9 @@
   */
     defaultPassword = "asdf";
   timezone = "Europe/Berlin";
-  locale = "en_US.utf-8";
+  locale = "en_US.UTF-8";
 
+import = [<nixvim>.homeManagerModules.nixvim];
   # hardware config - sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
   hardwareConfig = (toString ./hosts/poseidon/hardware-configuration.nix);
 
@@ -41,7 +42,7 @@
   # list of nix modules to import in ./hosts/nixos/default.nix
   nixModules = [
     (toString ./hosts/poseidon/nvidia.nix)
-    #(toString ./hosts/poseidon/configuration.nix)
+    (toString ./hosts/poseidon/configuration.nix)
     
     # in my-module.nix you can reference this userconfig
      ({ userconfig, pkgs, ... }: {
@@ -64,6 +65,7 @@
         (toString ./modules/env.nix)
         (toString ./modules/sops.nix)
         (toString ./modules/nixvim)
+        (toString ./modules/helix.nix)
   ];
 
   hyde = rec {

@@ -2,7 +2,6 @@
 {
   imports = [
     ./nixvim.nix
-
   ];
   home.packages = with pkgs; [
     markdownlint-cli

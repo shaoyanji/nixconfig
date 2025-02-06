@@ -3,7 +3,7 @@
   lib,
   ...
 }: {
-  home.stateVersion = "24.11";
+  #  home.stateVersion = "24.11";
   imports = [
     ../lf
     ../env.nix
@@ -12,14 +12,14 @@
     ../helix.nix
   ];
   home = {
-    packages = with pkgs;
+    packages =
       [
-        gum
-        go-task
-        mailsy
+        pkgs.gum
+        pkgs.go-task
+        pkgs.mailsy
       ]
-      ++ lib.optionals stdenv.isLinux [
-        wl-clipboard
+      ++ lib.optionals pkgs.stdenv.isLinux [
+        pkgs.wl-clipboard
       ];
     file = {};
 
@@ -29,8 +29,4 @@
       GUM_CHOOSE_HEADER_FOREGROUND = 30;
     };
   };
-
-  nixpkgs.config.allowUnfree = true;
-
-  programs.home-manager.enable = true;
 }

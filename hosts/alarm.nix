@@ -10,4 +10,6 @@
   home.packages = with pkgs; [
     neovim
   ];
+
+  programs.home-manager.enable = true;
 }

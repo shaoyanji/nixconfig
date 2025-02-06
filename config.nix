@@ -4,68 +4,68 @@
   gitEmail = "100967396+shaoyanji@users.noreply.github.com";
   host = "poseidon";
   /*
-    default password is required for sudo support in systems
-    !remember to use passwd to change the password!
+  default password is required for sudo support in systems
+  !remember to use passwd to change the password!
   */
-    defaultPassword = "asdf";
   timezone = "Europe/Berlin";
   locale = "en_US.UTF-8";
 
-import = [<nixvim>.homeManagerModules.nixvim];
+  import = [<nixvim>.homeManagerModules.nixvim];
   # hardware config - sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
-  hardwareConfig = (toString ./hosts/poseidon/hardware-configuration.nix);
+  hardwareConfig = toString ./hosts/poseidon/hardware-configuration.nix;
 
   # list of drivers to install in ./hosts/nixos/drivers.nix
   drivers = [
     #"amdgpu"
     #"intel"
-     "nvidia"
-     "amdcpu"
+    "nvidia"
+    "amdcpu"
     # "intel-old"
   ];
 
   /*
-    these will be imported after the default modules and override/merge any conflicting options
-    !its very possible to break hydenix by overriding options
-    eg:
-      # lets say hydenix has a default of:
-      {
-        services.openssh.enable = true;
-        environment.systempackages = [ pkgs.vim ];
-      }
-      # your module
-      {
-        services.openssh.enable = false;  #? this wins by default (last definition)
-        environment.systempackages = [ pkgs.git ];  #? this gets merged with hydenix
-      }
+  these will be imported after the default modules and override/merge any conflicting options
+  !its very possible to break hydenix by overriding options
+  eg:
+    # lets say hydenix has a default of:
+    {
+      services.openssh.enable = true;
+      environment.systempackages = [ pkgs.vim ];
+    }
+    # your module
+    {
+      services.openssh.enable = false;  #? this wins by default (last definition)
+      environment.systempackages = [ pkgs.git ];  #? this gets merged with hydenix
+    }
   */
   # list of nix modules to import in ./hosts/nixos/default.nix
   nixModules = [
     (toString ./hosts/poseidon/nvidia.nix)
     (toString ./hosts/poseidon/configuration.nix)
-    
+
     # in my-module.nix you can reference this userconfig
-     ({ userconfig, pkgs, ... }: {
-      environment.systemPackages = with pkgs;[ 
+    ({
+      userconfig,
+      pkgs,
+      ...
+    }: {
+      environment.systemPackages = with pkgs; [
         direnv
-	carapace
-	fzf
-	zoxide
-	cifs-utils
-	go-task
-	yq-go
-	nfs-utils
-	gum
+        carapace
+        fzf
+        zoxide
+        cifs-utils
+        go-task
+        yq-go
+        nfs-utils
+        gum
       ];
-     })
+    })
   ];
   # list of nix modules to import in ./lib/mkconfig.nix
   homeModules = [
-        (toString ./modules/lf)
-        (toString ./modules/env.nix)
-        (toString ./modules/sops.nix)
-        (toString ./modules/nixvim)
-        (toString ./modules/helix.nix)
+    (toString ./modules/nixvim)
+    (toString ./modules/global/minimal.nix)
   ];
 
   hyde = rec {
@@ -82,7 +82,7 @@ import = [<nixvim>.homeManagerModules.nixvim];
     activeTheme = "Catppuccin Mocha";
 
     # list of themes to choose from
-        themes = [
+    themes = [
       # -- Default themes
       # "Catppuccin Latte"
       "Catppuccin Mocha"
@@ -134,7 +134,7 @@ import = [<nixvim>.homeManagerModules.nixvim];
       wallAddCustomPath = "";
       enableWallDcol = 2;
       wallbashCustomCurve = "";
-      skip_wallbash = [ ];
+      skip_wallbash = [];
       themeSelect = 2;
       rofiStyle = 11;
       rofiScale = 9;
@@ -150,4 +150,6 @@ import = [<nixvim>.homeManagerModules.nixvim];
     # 30gb minimum for one theme - 50gb for multiple themes - more for development and testing
     diskSize = 20000;
   };
+
+  defaultPassword = "asdf";
 }

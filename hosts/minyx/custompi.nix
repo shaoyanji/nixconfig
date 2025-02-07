@@ -17,20 +17,20 @@
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   # Enables the generation of /boot/extlinux/extlinux.conf
   # Disable ZFS on kernel 6
-   boot = {
-kernelParams = ["cma=256M"];
-supportedFilesystems = lib.mkForce [
-    "vfat"
-    "xfs"
-    "cifs"
-    "ntfs"
-  ];
+  boot = {
+    kernelParams = ["cma=256M"];
+    supportedFilesystems = lib.mkForce [
+      "vfat"
+      "xfs"
+      "cifs"
+      "ntfs"
+    ];
     tmp.useTmpfs = true;
   };
   systemd.services.nix-daemon = {
     environment.TMPDIR = "/var/tmp";
   };
-   # A bunch of boot parameters needed for optimal runtime on RPi 3b+
+  # A bunch of boot parameters needed for optimal runtime on RPi 3b+
   networking.hostName = "minyx"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.

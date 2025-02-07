@@ -181,7 +181,8 @@
     nixosConfigurations = {
       poseidon = hydenixConfig.nixosConfiguration;
 
-      #${hydenixConfig.userConfig.host} = hydenixConfig.nixosConfiguration;
+      # ${hydenixConfig.userConfig.host} = hydenixConfig.nixosConfiguration;
+
       #packages."x86_64-linux" = {
       #  default = hydenixConfig.nix-vm.config.system.build.vm;
       #};

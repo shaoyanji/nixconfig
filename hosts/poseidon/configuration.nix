@@ -1,15 +1,19 @@
-{inputs, config, pkgs, lib, ... }:
-
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./nvidia.nix
-      #../common/steam.nix
-      ../common/base-desktop-environment.nix
-      #../common/minimal-desktop.nix
-      inputs.chaotic.nixosModules.default
-    ];
+  inputs,
+  config,
+  pkgs,
+  lib,
+  ...
+}: {
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ./nvidia.nix
+    ../common/steam.nix
+    ../common/base-desktop-environment.nix
+    #../common/minimal-desktop.nix
+    inputs.chaotic.nixosModules.default
+  ];
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {
     #extraModulePackages = with config.boot.kernelPackages; [v4l2loopback.out];
@@ -32,5 +36,5 @@
   #variables = {
   # };
   #};
-#  system.stateVersion = "25.05"; # Did you read the comment?
+  #  system.stateVersion = "25.05"; # Did you read the comment?
 }

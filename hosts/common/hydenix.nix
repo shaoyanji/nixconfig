@@ -146,11 +146,6 @@
     diskSize = 20000;
   };
   home-manager.backupFileExtension = "hyde";
-  programs.nixvim = {
-    enable = true;
-    colorschemes.catpuccin.enable = true;
-    plugins.lualine.enable = true;
-  };
   programs.neovim = {
     enable = false;
     defaultEditor = false;

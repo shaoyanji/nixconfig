@@ -3,7 +3,6 @@
   lib,
   ...
 }: {
-  #  home.stateVersion = "24.11";
   imports = [
     ../lf
     ../env.nix

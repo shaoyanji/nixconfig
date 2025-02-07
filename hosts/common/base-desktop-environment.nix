@@ -55,6 +55,16 @@
   environment.systemPackages = with pkgs; [
     kitty
     inputs.ghostty.packages.x86_64-linux.default
+    inputs.zen-browser.packages.${pkgs.system}.twilight
+    qutebrowser
+    lan-mouse_git
+    nix-top
+    #failed to build
+    # zed-editor-git
+    # yt-dlp-git
+    # libreoffice
+    # hunspell
+    # hunspellDicts.en_US
     # config.boot.kernelPackages.digimend
   ];
   programs.nix-ld.enable = true;

@@ -146,9 +146,5 @@
     diskSize = 20000;
   };
   home-manager.backupFileExtension = "hyde";
-  programs.neovim = {
-    enable = false;
-    defaultEditor = false;
-  };
   defaultPassword = "asdf";
 }

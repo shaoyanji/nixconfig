@@ -4,17 +4,15 @@
   lib,
   inputs,
   ...
-}:
-let 
+}: let
   localSubKeys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKVYLgws2TgaYIsOmVmJeoJIu9F8lguBXi711Kv90jaM devji@poseidon"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOD4PopDAxzh1t4nNnDE/xiWLGYzopLRzZ7eBwd4hHza devji@schneeeule"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKglnT7aVqb9CrFE0U/Y/ZFN8apH7urMXM2Sn9bJ23YV nixos@nixos"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHfnYbTF2d4ZA4+wKbXFL/UUJTcMqdLDhhAZZDP2KrPD devji@orb-cassini"
-    ];
-in
-{
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKVYLgws2TgaYIsOmVmJeoJIu9F8lguBXi711Kv90jaM devji@poseidon"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOD4PopDAxzh1t4nNnDE/xiWLGYzopLRzZ7eBwd4hHza devji@schneeeule"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKglnT7aVqb9CrFE0U/Y/ZFN8apH7urMXM2Sn9bJ23YV nixos@nixos"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHfnYbTF2d4ZA4+wKbXFL/UUJTcMqdLDhhAZZDP2KrPD devji@orb-cassini"
+  ];
+in {
   imports = [
     ./localmounts.nix
     inputs.sops-nix.nixosModules.sops
@@ -33,7 +31,6 @@ in
     };
   };
   services = {
-
     xserver.xkb = {
       layout = "us";
       variant = "";
@@ -77,8 +74,9 @@ in
     # proxy.noProxy = "127.0.0.1,localhost,internal.domain";
   };
   specialisation = {
-    tailscale.configuration = {
-      system.nixos.tags = ["tailscale"];
+    server.configuration = {
+      services.displayManager.sddm.enable = lib.mkForce false;
+      system.nixos.tags = ["server"];
       services.tailscale = {
         enable = true;
         useRoutingFeatures = "client";
@@ -134,30 +132,29 @@ in
     # thunderbird
     #];
   };
-  nix= {
+  nix = {
     sshServe = {
       enable = true;
       keys = localSubKeys;
     };
-    buildMachines = [ 
+    buildMachines = [
       {
-	 hostName = "poseidon";
-         protocol = "ssh-ng";
-	 # if the builder supports building for multiple architectures, 
-	 # replace the previous line by, e.g.
-	 systems = ["x86_64-linux" "aarch64-linux"];
-	 maxJobs = 12;
-	 speedFactor = 10;
-	 supportedFeatures = [ "nixos-test" "benchmark" "big-parallel" "kvm" ];
-	 mandatoryFeatures = [ ];
-	}
-    ] ;
+        hostName = "poseidon";
+        protocol = "ssh-ng";
+        # if the builder supports building for multiple architectures,
+        # replace the previous line by, e.g.
+        systems = ["x86_64-linux" "aarch64-linux"];
+        maxJobs = 12;
+        speedFactor = 10;
+        supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
+        mandatoryFeatures = [];
+      }
+    ];
     distributedBuilds = true;
     extraOptions = ''
       builders-use-substitutes = true
     '';
   };
-
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

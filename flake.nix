@@ -187,7 +187,7 @@
       #  default = hydenixConfig.nix-vm.config.system.build.vm;
       #};
       specialisation = {
-        server.configuration = {
+        reg.configuration = {
           poseidon = nixpkgs.lib.nixosSystem {
             system = "x86_64-linux";
             specialArgs = {inherit inputs;};

@@ -186,21 +186,17 @@
       #packages."x86_64-linux" = {
       #  default = hydenixConfig.nix-vm.config.system.build.vm;
       #};
-      specialisation = {
-        reg.configuration = {
-          poseidon = nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
-            specialArgs = {inherit inputs;};
-            modules =
-              globalModulesContainers
-              ++ [
-                ./hosts/poseidon/configuration.nix
-                inputs.chaotic.nixosModules.default
-                inputs.sops-nix.nixosModules.sops
-              ];
-          };
-        };
-      };
+      #    poseidon = lib.mkForce nixpkgs.lib.nixosSystem {
+      #      system = "x86_64-linux";
+      #      specialArgs = {inherit inputs;};
+      #      modules =
+      #        globalModulesContainers
+      #        ++ [
+      #          ./hosts/poseidon/configuration.nix
+      #          inputs.chaotic.nixosModules.default
+      #          inputs.sops-nix.nixosModules.sops
+      #        ];
+      #    };
       ares = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};

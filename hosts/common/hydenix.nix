@@ -146,5 +146,5 @@
     diskSize = 20000;
   };
   home-manager.backupFileExtension = "hyde";
-  defaultPassword = "asdf";
+  defaultPassword = "hydenix requires this but sops-nix collision makes errorz";
 }

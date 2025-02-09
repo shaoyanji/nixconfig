@@ -28,10 +28,10 @@
   #    fsType = "exfat"
   #  };
 
-  fileSystems."/nix" = {
-    device = "/dev/disk/by-uuid/0695-8114/nix";
-    fsType = "exfat";
-  };
+  #  fileSystems."/nix" = {
+  #    device = "/dev/disk/by-uuid/0695-8114/nix";
+  #    fsType = "exfat";
+  #  };
 
   #  fileSystems."/persist" =
   #  {

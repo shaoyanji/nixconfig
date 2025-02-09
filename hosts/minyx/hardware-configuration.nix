@@ -24,6 +24,26 @@
     fsType = "exfat"
   };
 
+  fileSystems."/persist" =
+  {
+    device = "/dev/disk/by-uuid/0695-8114/persist";
+    fsType = "exfat"
+  };
+  impermanence = {
+    enable = true;
+    path = /persist;
+    directories = [
+#      { directory = /var/www/${cfg.domainName}; }
+#      { directory = /var/lib/maubot; }
+#      { directory = /var/lib/fdroid; }
+#      { directory = config.mailserver.dkimKeyDirectory; }
+#      { directory = config.mailserver.mailDirectory; }
+      { directory = /home/devji; }
+      { directory = /root; }
+      { directory = /nix; }
+    ];
+  };
+
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

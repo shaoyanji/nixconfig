@@ -18,31 +18,38 @@
       fsType = "ext4";
     };
 
-  fileSystems."/nix" =
+  fileSystems."/mnt/hdd" =
   {
-    device = "/dev/disk/by-uuid/0695-8114/nix";
+    device = "/dev/disk/by-uuid/0695-8114";
     fsType = "exfat"
   };
 
-  fileSystems."/persist" =
-  {
-    device = "/dev/disk/by-uuid/0695-8114/persist";
-    fsType = "exfat"
-  };
-  impermanence = {
-    enable = true;
-    path = /persist;
-    directories = [
+#  fileSystems."/nix" =
+#  {
+#    device = "/dev/disk/by-uuid/0695-8114/nix";
+#    fsType = "exfat"
+#  };
+
+#  fileSystems."/persist" =
+#  {
+#    device = "/dev/disk/by-uuid/0695-8114/persist";
+#    fsType = "exfat"
+#  };
+#  impermanence = {
+#    enable = true;
+#    path = /persist;
+#    directories = [
 #      { directory = /var/www/${cfg.domainName}; }
 #      { directory = /var/lib/maubot; }
 #      { directory = /var/lib/fdroid; }
 #      { directory = config.mailserver.dkimKeyDirectory; }
 #      { directory = config.mailserver.mailDirectory; }
-      { directory = /home/devji; }
-      { directory = /root; }
-      { directory = /nix; }
-    ];
-  };
+
+#      { directory = /home/devji; }
+#      { directory = /root; }
+#      { directory = /nix; }
+#    ];
+#  };
 
   swapDevices = [ ];
 

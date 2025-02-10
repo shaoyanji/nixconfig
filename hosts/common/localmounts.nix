@@ -12,24 +12,24 @@
   cred_wolf = "credentials=${config.sops.secrets."server/localwd/credentials".path}";
   cred_fritz = "credentials=${config.sops.secrets."server/keyrepo/credentials".path}";
 in {
-  systemd.timers."burgernas-unmount" = {
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "22:59:00";
-      Unit = "burgernas-unmount.service";
-    };
-  };
+  #  systemd.timers."burgernas-unmount" = {
+  #    wantedBy = ["timers.target"];
+  #    timerConfig = {
+  #      OnCalendar = "22:59:00";
+  #      Unit = "burgernas-unmount.service";
+  #    };
+  #  };
 
-  systemd.services."burgernas-unmount" = {
-    script = ''
-      set -eu
-      ${pkgs.coreutils}/bin/umount /mnt/{v,w,x,z}
-    '';
-    serviceConfig = {
-      Type = "oneshot";
-      User = "root";
-    };
-  };
+  #  systemd.services."burgernas-unmount" = {
+  #    script = ''
+  #      set -eu
+  #      ${pkgs.coreutils}/bin/umount /mnt/{v,w,x,z}
+  #    '';
+  #    serviceConfig = {
+  #      Type = "oneshot";
+  #      User = "root";
+  #    };
+  #  };
   environment.systemPackages = [pkgs.cifs-utils];
   fileSystems."/Volumes/peachcable" = {
     device = "${burgernas_nfs}:/volume1/peachcable";

@@ -4,7 +4,7 @@
   config,
   ...
 }: let
-  peachNAS = "/mnt/w";
+  peachNAS = "/Volumes/peachcable";
   routerNAS = "/mnt/y";
   sharedNAS = "/mnt/x";
   wolfNAS = "/mnt/z";
@@ -14,14 +14,14 @@ in {
     # "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     # "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
     # "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
-    "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents";
-    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/books";
-    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
-    "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/storage";
+    #"Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents";
+    #"Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/books";
+    #"Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
+    #"Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/storage";
     "Applications/appimages".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/appimages";
-    "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
-    "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics";
-    "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video";
+    #"Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
+    #"Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics";
+    #"Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video";
     "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/go/pkg";
     ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/.cargo/registry";
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/ollama";
@@ -33,8 +33,8 @@ in {
     "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/hello";
   };
   xdg.configFile = {
-    "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
-    "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
+    #    "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
+    #    "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     #    "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
     "ghostty/config".text =
       /*

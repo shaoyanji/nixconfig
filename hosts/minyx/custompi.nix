@@ -44,7 +44,8 @@
 
   services.scx.enable = lib.mkDefault false;
   environment.systemPackages = with pkgs; [
-    neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    btop
     bind
     kubectl
     kubernetes-helm

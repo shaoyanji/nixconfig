@@ -22,6 +22,13 @@
     fsType = "ext4";
   };
 
+  fileSystems."/nix" = {
+    device = "/dev/disk/by-label/NIXER";
+    fsType = "ext4";
+    neededForBoot = true;
+    options = ["noatime"];
+  };
+
   #  fileSystems."/mnt/hdd" =
   #  {
   #    device = "/dev/disk/by-uuid/0695-8114";

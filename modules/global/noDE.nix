@@ -13,6 +13,7 @@
       home.stateVersion = "24.11";
       imports = [
         ./minimal.nix
+        ../nixoshmsymlinks.nix
       ];
       home.username = "devji";
       home.homeDirectory = "/home/devji";

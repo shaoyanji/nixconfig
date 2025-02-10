@@ -11,6 +11,7 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOD4PopDAxzh1t4nNnDE/xiWLGYzopLRzZ7eBwd4hHza devji@schneeeule"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKglnT7aVqb9CrFE0U/Y/ZFN8apH7urMXM2Sn9bJ23YV nixos@nixos"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHfnYbTF2d4ZA4+wKbXFL/UUJTcMqdLDhhAZZDP2KrPD devji@orb-cassini"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKubsmOU3nRDwO6gsqnYzORtUxvpwPDLNRAA/K99Xaqs devji@minyx"
   ];
 in {
   imports = [

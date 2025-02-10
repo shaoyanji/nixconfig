@@ -13,7 +13,9 @@
     ../common/minimal-desktop.nix
   ];
   # !!! Adding a swap file is optional, but strongly recommended!
-  swapDevices = [{device = "/swap";}];
+  swapDevices = [
+    #{device = "/swap";}
+  ];
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   # Enables the generation of /boot/extlinux/extlinux.conf
   # Disable ZFS on kernel 6

@@ -59,7 +59,7 @@
   homeModules = [
     (toString ../../modules/global/minimal.nix)
     (toString ../../modules/nixoshmsymlinks.nix)
-    (toString ../../modules/nixvim)
+    #    (toString ../../modules/nixvim)
   ];
 
   hyde = rec {

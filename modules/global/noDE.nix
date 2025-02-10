@@ -14,6 +14,7 @@
       imports = [
         ./minimal.nix
         ../nixoshmsymlinks.nix
+        ../nixvim
       ];
       home.username = "devji";
       home.homeDirectory = "/home/devji";

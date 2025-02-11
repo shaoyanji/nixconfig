@@ -30,7 +30,7 @@ in {
   #      User = "root";
   #    };
   #  };
-  environment.systemPackages = [pkgs.cifs-utils];
+  environment.systemPackages = [pkgs.cifs-utils pkgs.nfs-utils];
   fileSystems."/Volumes/peachcable" = {
     device = "${burgernas_nfs}:/volume1/peachcable";
     fsType = "nfs";
@@ -43,19 +43,19 @@ in {
   #    options =
   #    ["${automount_opts},${reg_opts},${cred_fritz}"];
   #  };
-  #fileSystems."/mnt/z" = {
-  #  device = "//${burgernas}/usbshare2";
-  #  fsType = "cifs";
-  #  options = ["${automount_opts},${reg_opts},${cred_wolf},${tailscale_opts}"];
-  #};
+  fileSystems."/Volumes/usbshare2" = {
+    device = "//${burgernas}/usbshare2";
+    fsType = "cifs";
+    options = ["${automount_opts},${reg_opts},${cred_wolf},${tailscale_opts}"];
+  };
   #fileSystems."/mnt/x" = {
   #  device = "//${burgernas}/Shared Library";
   #  fsType = "cifs";
   #  options = ["${automount_opts},${reg_opts},${cred_wolf},${tailscale_opts}"];
   #};
-  #fileSystems."/mnt/v" = {
-  #  device = "//${burgernas}/usbshare1";
-  #  fsType = "cifs";
-  #  options = ["${automount_opts},${reg_opts},${cred_wolf},${tailscale_opts}"];
-  #};
+  fileSystems."/Volumes/usbshare1" = {
+    device = "//${burgernas}/usbshare1";
+    fsType = "cifs";
+    options = ["${automount_opts},${reg_opts},${cred_wolf},${tailscale_opts}"];
+  };
 }

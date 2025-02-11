@@ -26,6 +26,7 @@
       "xfs"
       "cifs"
       "ntfs"
+      "nfs"
     ];
     tmp.useTmpfs = true;
   };
@@ -166,5 +167,5 @@
   #};
 
   documentation.nixos.enable = false;
-  # boot.tmp.cleanOnBoot = true;
+  boot.tmp.cleanOnBoot = true;
 }

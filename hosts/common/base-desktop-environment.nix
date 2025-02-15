@@ -11,13 +11,13 @@
   ];
   # Bootloader.
   boot = {
-    #extraModulePackages = with config.boot.kernelPackages; [v4l2loopback.out];
+    extraModulePackages = with config.boot.kernelPackages; [v4l2loopback];
     #kernelModules = [
     #  "v4l2loopback"
     #];
-    #extraModprobeConfig = ''
-    #  options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
-    #'';
+    extraModprobeConfig = ''
+      options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
+    '';
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
@@ -69,6 +69,13 @@
     libreoffice
     hunspell
     hunspellDicts.en_US
+    (pkgs.wrapOBS {
+      plugins = with pkgs.obs-studio-plugins; [
+        wlrobs
+        obs-backgroundremoval
+        obs-pipewire-audio-capture
+      ];
+    })
     # config.boot.kernelPackages.digimend
   ];
   programs.nix-ld.enable = true;

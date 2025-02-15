@@ -54,17 +54,17 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
     kitty
-    inputs.ghostty.packages.x86_64-linux.default
-    inputs.zen-browser.packages.${pkgs.system}.twilight
+    inputs.ghostty.packages.${stdenv.hostPlatform.system}.default
+    inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
     qutebrowser
     lan-mouse_git
     nix-top
     #failed to build
-    # zed-editor-git
-    # yt-dlp-git
-    # libreoffice
-    # hunspell
-    # hunspellDicts.en_US
+    zed-editor_git
+    yt-dlp_git
+    libreoffice
+    hunspell
+    hunspellDicts.en_US
     # config.boot.kernelPackages.digimend
   ];
   programs.nix-ld.enable = true;

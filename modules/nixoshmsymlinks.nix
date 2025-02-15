@@ -57,7 +57,7 @@ in {
       '';
   };
   home.sessionPath =
-    ["${peachNAS}/bin-scripts"]
+    ["${peachNAS}/bin-script"]
     ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${peachNAS}/bin-aarch64" "${peachNAS}/go/bin" "${peachNAS}/.cargo/bin"]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${peachNAS}/bin-x86" "${peachNAS}/go/bin-x86"];
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${peachNAS}/bin-x86" "${peachNAS}/go/bin-x86" "${peachNAS}/.cargo/bin-x86"];
 }

@@ -50,8 +50,6 @@
       environment.systemPackages = with pkgs; [
         direnv
         carapace
-        cifs-utils
-        nfs-utils
       ];
     })
   ];
@@ -101,9 +99,9 @@
       # "Edge Runner"
       # "Green Lush"
       # "Greenify"
-      "Hack the Box"
+      # "Hack the Box"
       # "Ice Age"
-      "Mac OS"
+      # "Mac OS"
       # "Monokai"
       # "Monterey Frost"
       # "One Dark"
@@ -112,13 +110,13 @@
       # "Pixel Dream"
       # "Rain Dark"
       # "Red Stone"
-      "Rose Pine"
+      # "Rose Pine"
       # "Scarlet Night"
       # "Sci-fi"
       # "Solarized Dark"
       "Tokyo Night"
       # "Vanta Black"
-      "Windows 11"
+      # "Windows 11"
     ];
 
     # exactly the same as hyde.conf
@@ -145,6 +143,5 @@
     # 30gb minimum for one theme - 50gb for multiple themes - more for development and testing
     diskSize = 20000;
   };
-  home-manager.backupFileExtension = "hyde";
   defaultPassword = "hydenix requires this but sops-nix collision makes errorz";
 }

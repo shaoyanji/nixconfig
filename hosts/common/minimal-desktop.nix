@@ -88,7 +88,7 @@ in {
           allowedTCPPorts = [22];
           interfaces.tailscale0.allowedUDPPorts = [config.services.tailscale.port];
         };
-        nameservers = lib.mkDefault ["100.100.100.100" "100.68.238.108" "100.113.144.19" "100.75.100.67" "100.108.50.50"];
+        nameservers = lib.mkDefault ["100.100.100.100"];
         search = lib.mkDefault ["cloudforest-kardashev.ts.net"];
       };
     };

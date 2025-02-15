@@ -41,6 +41,10 @@
       scheduler = "scx_rusty";
       package = pkgs.scx_git.full;
     };
+    ollama = {
+      enable = true;
+      acceleration = "cuda";
+    };
   };
   programs.hyprland = {
     enable = true;

@@ -22,6 +22,32 @@
         yq-go
         zoxide
         mailsy
+        awscli2
+        cloudflared
+        btop
+        ffmpeg
+        mupdf
+        mpv
+        nmap
+        tree
+        sqlite
+        hyperfine
+        zip
+        unzip
+        p7zip
+        mtr
+        iperf3
+        dnsutils
+        ldns
+        aria2
+        socat
+        ipcalc
+        strace
+        ltrace
+        lsof
+        sysstat
+        pciutils
+        usbutils
       ]
       ++ lib.optionals stdenv.isLinux [
         wl-clipboard

@@ -42,15 +42,15 @@
         aria2
         socat
         ipcalc
+      ]
+      ++ lib.optionals stdenv.isLinux [
+        wl-clipboard
         strace
         ltrace
         lsof
         sysstat
         pciutils
         usbutils
-      ]
-      ++ lib.optionals stdenv.isLinux [
-        wl-clipboard
       ];
     file = {};
 

@@ -61,7 +61,7 @@
   ];
 
   hyde = rec {
-    sddmTheme = "Candy"; # or "corners"
+    sddmTheme = "Corners"; # or "Candy"
 
     enable = true;
 
@@ -80,14 +80,14 @@
       "Catppuccin Mocha"
       # "Decay Green"
       # "Edge Runner"
-      # "Frosted Glass"
+      "Frosted Glass"
       # "Graphite Mono"
       # "Gruvbox Retro"
       # "Material Sakura"
       # "Nordic Blue"
-      # "Rose Pine"
+      "Rose Pine"
       # "Synth Wave"
-      # "Tokyo Night"
+      "Tokyo Night"
 
       # -- Themes from hyde-gallery
       # "Abyssal-Wave"
@@ -101,22 +101,20 @@
       # "Greenify"
       # "Hack the Box"
       # "Ice Age"
-      # "Mac OS"
-      # "Monokai"
-      # "Monterey Frost"
+      "Mac OS"
+      "Monokai"
+      "Monterey Frost"
       # "One Dark"
       # "Oxo Carbon"
       # "Paranoid Sweet"
       # "Pixel Dream"
       # "Rain Dark"
       # "Red Stone"
-      # "Rose Pine"
-      # "Scarlet Night"
+      "Scarlet Night"
       # "Sci-fi"
       # "Solarized Dark"
-      "Tokyo Night"
       # "Vanta Black"
-      # "Windows 11"
+      "Windows 11"
     ];
 
     # exactly the same as hyde.conf

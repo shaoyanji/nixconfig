@@ -61,7 +61,7 @@
   ];
 
   hyde = rec {
-    sddmTheme = "candy"; # or "corners"
+    sddmTheme = "Candy"; # or "corners"
 
     enable = true;
 

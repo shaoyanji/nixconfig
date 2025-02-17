@@ -25,6 +25,7 @@
         awscli2
         cloudflared
         btop
+        devenv
         ffmpeg
         mupdf
         mpv

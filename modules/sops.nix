@@ -26,7 +26,7 @@ in {
   };
   home = {
     sessionVariables = {
-      SOPS_EDITOR = hx;
+      SOPS_EDITOR = "hx";
     };
     packages = with pkgs; [
       sops

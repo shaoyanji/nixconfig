@@ -25,6 +25,7 @@
         awscli2
         cloudflared
         btop
+        direnv
         devenv
         nmap
         tree
@@ -40,6 +41,7 @@
         aria2
         socat
         ipcalc
+        ffmpeg
       ]
       ++ lib.optionals stdenv.isLinux [
         strace
@@ -50,13 +52,20 @@
         usbutils
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
-        ffmpeg
         mupdf
         mpv
-
         wl-clipboard
       ]
       ++ lib.optionals stdenv.hostPlatform.isAarch64 [
+        fastfetch
+        yt-dlp
+        age
+        pass
+        cmus
+        bitwarden-cli
+        glow
+        pop
+        charm-freeze
         viu
         wkhtmltopdf
         ghostscript
@@ -114,6 +123,11 @@
         #lowcharts
         hare
         haredoc
+        go
+        cargo
+        tinygo
+        wasmtime
+        luajit
       ];
     file = {};
 

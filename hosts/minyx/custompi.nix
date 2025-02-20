@@ -19,8 +19,12 @@
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   # Enables the generation of /boot/extlinux/extlinux.conf
   # Disable ZFS on kernel 6
+  #hardware.pulseaudio.enable = true;
   boot = {
-    kernelParams = ["cma=256M"];
+    kernelParams = [
+      "cma=256M"
+      "snd_bcm2835.enable_hdmi=1"
+    ];
     supportedFilesystems = lib.mkForce [
       "vfat"
       "xfs"

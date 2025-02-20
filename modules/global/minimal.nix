@@ -128,6 +128,7 @@
         tinygo
         wasmtime
         luajit
+        alsa-utils
       ];
     file = {};
 

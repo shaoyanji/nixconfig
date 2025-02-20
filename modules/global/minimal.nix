@@ -26,9 +26,6 @@
         cloudflared
         btop
         devenv
-        ffmpeg
-        mupdf
-        mpv
         nmap
         tree
         sqlite
@@ -45,13 +42,78 @@
         ipcalc
       ]
       ++ lib.optionals stdenv.isLinux [
-        wl-clipboard
         strace
         ltrace
         lsof
         sysstat
         pciutils
         usbutils
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+        ffmpeg
+        mupdf
+        mpv
+
+        wl-clipboard
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isAarch64 [
+        viu
+        wkhtmltopdf
+        ghostscript
+        texlive.combined.scheme-full
+        pandoc
+        mods
+        aichat
+        tgpt
+        jekyll
+        bundler
+        tldr
+        scc
+        diff-so-fancy
+        entr
+        exiftool
+        fdupes
+        most
+        procs
+        # rip
+        rsync
+        sd
+        tre
+        bandwhich
+        glances
+        gping
+        #dua-cli
+        speedtest-cli
+        #dog
+        buku
+        ddgr
+        khal
+        mutt
+        newsboat
+        rclone
+        #taskwarrior3
+        tuir
+        httpie
+        lazygit
+        #ngrok
+        asciinema
+        navi
+        #transfer
+        #surge #x86
+        epr
+        #meetup-cli
+        lynx
+        #obs
+        #hget
+        translate-shell
+        mc
+        entr
+        #gitmoji-cli
+        #gitmoji-changelog
+        #sparkly-cli
+        #lowcharts
+        hare
+        haredoc
       ];
     file = {};
 

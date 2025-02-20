@@ -40,6 +40,7 @@
   # list of nix modules to import in ./hosts/nixos/default.nix
   nixModules = [
     (toString ../poseidon/configuration.nix)
+    (toString ../../modules/global/global.nix)
 
     # in my-module.nix you can reference this userconfig
     ({

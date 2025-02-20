@@ -22,7 +22,12 @@ in {
     };
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles = false;
-    #secrets."${local_ssh_key}".path = "${ssh_key_path}";
+    secrets = {
+      "awscredentials".path = "${config.home.homeDirectory}/.aws/credentials";
+      "cfcertpem".path = "${config.home.homeDirectory}/.cloudflared/cert.pem";
+      #"${local_ssh_key}".path = "${ssh_key_path}";
+      #
+    };
   };
   home = {
     sessionVariables = {

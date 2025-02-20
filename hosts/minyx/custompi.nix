@@ -172,4 +172,10 @@
   documentation.nixos.enable = false;
   boot.tmp.cleanOnBoot = true;
   virtualisation.docker.enable = true;
+
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    #libGL
+    alsa-lib
+  ];
 }

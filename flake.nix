@@ -65,7 +65,7 @@
     #};
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
-    ghostty.url = "github:ghostty-org/ghostty";
+    #    ghostty.url = "github:ghostty-org/ghostty";
     utils.url = "github:numtide/flake-utils";
     hydenix.url = "github:richen604/hydenix";
   };
@@ -133,7 +133,7 @@
         ./modules/global/impermanence.nix
         nur.modules.nixos.default
         chaotic.nixosModules.default
-        lix-module.nixosModules.default
+        #lix-module.nixosModules.default
         sops-nix.nixosModules.sops
         home-manager.nixosModules.default
         impermanence.nixosModules.impermanence

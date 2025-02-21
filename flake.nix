@@ -196,6 +196,15 @@
             inputs.sops-nix.nixosModules.sops
           ];
       };
+      thinsandy = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
+        modules =
+          globalModules
+          ++ [
+            ./hosts/thinsandy/configuration.nix
+          ];
+      };
       ares = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};

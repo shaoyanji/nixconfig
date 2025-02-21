@@ -25,6 +25,8 @@ keys:
   - &alarm age1juyqqqcntxf5affyt4ukr2fyerw6mexw08w3y8tyqjkm27k3hd8qpax2y5
   - &ares age1nqdx5a80wy6d3hjsldhhe5y4ltrfv3zr9m3cdrekcxha0hg7g5usxj482d
   - &areshost age12gezpwjwq0ln36gt22h3hp6v2tsf5df4sgrr7x4g57sa83dc6unsft55zx
+  - &thinsandyhost age19w88cnnfhnx70dclxwt895nu2zfgz3gegqz00x2yqundk2e69syqkrujq5
+  - &thinsandy age1f2j6gg6pthe03uwnm4fnxajy2jl49xchrr45zp7l2wj7ghc9vs2szymk3t
 
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
@@ -52,4 +54,6 @@ creation_rules:
       - *alarm
       - *usbares
       - *usbareshost
+      - *thinsandyhost
+      - *thinsandy
       gpg:

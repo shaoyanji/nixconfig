@@ -42,10 +42,6 @@
       scheduler = "scx_rusty";
       package = pkgs.scx_git.full;
     };
-    ollama = {
-      enable = true;
-      acceleration = "cuda";
-    };
   };
   programs.hyprland = {
     enable = true;
@@ -59,7 +55,7 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
     kitty
-    inputs.ghostty.packages.${stdenv.hostPlatform.system}.default
+    ghostty
     inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
     qutebrowser
     lan-mouse_git

@@ -26,7 +26,8 @@ ln -s .config/sops Library/Application\ Support/sops
 ```bash
 mkdir -p ~/.config/sops/age
 nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
-nix-shell -p ssh-to-age --run "cat ~/.ssh/ssh_host_ed25519_key.pub | ssh-to-age"
+nix-shell -p ssh-to-age --run "cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age"
+nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age"   
 ```
 example sops.yaml from [sops-nix](https://github.com/Mic92/sops-nix):
 ```yaml

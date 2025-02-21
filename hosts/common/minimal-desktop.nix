@@ -31,6 +31,12 @@ in {
       hashedPassword.neededForUsers = true;
     };
   };
+
+  console = {
+    font = "Lat2-Terminus16";
+    keyMap = "us";
+    #   useXkbConfig = true; # use xkb.options in tty.
+  };
   services = {
     xserver.xkb = {
       layout = "us";
@@ -59,6 +65,12 @@ in {
     pulseaudio.enable = false;
     tailscale.enable = true;
   };
+
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    #libGL
+    alsa-lib
+  ];
 
   security = {
     sudo.wheelNeedsPassword = false;

@@ -58,5 +58,14 @@
     ];
   };
 
+  services = {
+    displayManager = {
+      sddm = {
+        enable = true;
+        wayland.enable = true;
+      };
+      # Enable automatic login for the user.
+    };
+  };
   programs.fuse.userAllowOther = true;
 }

@@ -203,6 +203,7 @@
           globalModules
           ++ [
             ./hosts/thinsandy/configuration.nix
+            sops-nix.nixosModules.sops
           ];
       };
       ares = nixpkgs.lib.nixosSystem {

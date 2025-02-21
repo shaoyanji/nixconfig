@@ -200,7 +200,7 @@
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules =
-          globalModules
+          globalModulesContainers
           ++ [
             ./hosts/thinsandy/configuration.nix
             sops-nix.nixosModules.sops

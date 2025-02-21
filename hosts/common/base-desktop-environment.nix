@@ -24,12 +24,6 @@
     };
   };
 
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "us";
-    #   useXkbConfig = true; # use xkb.options in tty.
-  };
-
   services = {
     displayManager = {
       #      sddm = {
@@ -85,12 +79,6 @@
     })
     # config.boot.kernelPackages.digimend
   ];
-  programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
-    #libGL
-    alsa-lib
-  ];
-
   #  programs.appimage = {
   #  enable = true;
   #  binfmt = true;

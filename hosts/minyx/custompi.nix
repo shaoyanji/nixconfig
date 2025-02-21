@@ -41,12 +41,6 @@
   networking.hostName = "minyx"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "us";
-    #   useXkbConfig = true; # use xkb.options in tty.
-  };
-
   services.scx.enable = lib.mkDefault false;
   environment.systemPackages = with pkgs; [
     #neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
@@ -172,10 +166,4 @@
   documentation.nixos.enable = false;
   boot.tmp.cleanOnBoot = true;
   virtualisation.docker.enable = true;
-
-  programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
-    #libGL
-    alsa-lib
-  ];
 }

@@ -79,4 +79,10 @@
   #  enable = true;
   #  binfmt = true;
   #};
+  #
+  # Fonts
+  fonts.packages = [
+    pkgs.nerd-fonts.jetbrains-mono
+    #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
+  ];
 }

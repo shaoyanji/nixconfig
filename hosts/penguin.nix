@@ -1,6 +1,7 @@
 {inputs, ...}: {
   imports = [
     ../modules/global/minimal.nix
+    ../modules/shell
   ];
   home = {
     username = "jisifu";

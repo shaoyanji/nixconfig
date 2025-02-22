@@ -1,4 +1,4 @@
-{...}: {
+{inputs, ...}: {
   imports = [
     ../modules/global/minimal.nix
   ];
@@ -6,6 +6,7 @@
     username = "jisifu";
     homeDirectory = "/home/jisifu";
 
+    stateVersion = "24.11";
     #packages = with pkgs; [
     #];
     file = {

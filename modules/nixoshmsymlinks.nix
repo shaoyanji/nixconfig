@@ -6,7 +6,7 @@
 }: let
   peachNAS = "/Volumes/peachcable";
   routerNAS = "/mnt/y";
-  sharedNAS = "/Volumes/Shared Library";
+  sharedNAS = "/Volumes/Shared Library/core";
   wolfNAS = "/Volumes/usbshare2";
 in {
   home.file = {
@@ -14,14 +14,14 @@ in {
     # "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     # "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
     # "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
-    "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/documents";
-    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/books";
-    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/downloads";
-    "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/storage";
+    "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/documents";
+    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/books";
+    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/downloads";
+    "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/storage";
     "Applications/appimages".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/appimages";
-    "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/music";
-    "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/pics";
-    "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/video";
+    "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/music";
+    "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/pics";
+    "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/video";
     "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/go/pkg";
     ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/.cargo/registry";
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/ollama";

@@ -246,7 +246,7 @@
             ./hosts/minyx/configuration.nix
             ./hosts/minyx/custompi.nix
             sops-nix.nixosModules.sops
-            inputs.chaotic.nixosModules.default
+            impermanence.nixosModules.impermanence
             inputs.nixos-hardware.nixosModules.raspberry-pi-3
           ];
       };

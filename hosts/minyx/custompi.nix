@@ -31,6 +31,7 @@
       "cifs"
       "ntfs"
       "nfs"
+      "f2fs"
     ];
     tmp.useTmpfs = true;
   };
@@ -166,4 +167,33 @@
   documentation.nixos.enable = false;
   boot.tmp.cleanOnBoot = true;
   virtualisation.docker.enable = true;
+
+  fileSystems."/etc/ssh".neededForBoot = true;
+  fileSystems."/nix/persist".neededForBoot = true;
+  environment.persistence."/nix/persist/system" = {
+    hideMounts = true;
+    directories = [
+      "/etc/nixos"
+      "/etc/ssh" # for sops impermanence
+      "/var/log"
+      "/var/lib/bluetooth"
+      "/var/lib/nixos"
+      "/var/lib/systemd/coredump"
+      "/var/lib/tailscale"
+      "/etc/NetworkManager/system-connections"
+      {
+        directory = "/var/lib/colord";
+        user = "colord";
+        group = "colord";
+        mode = "u=rwx,g=rx,o=";
+      }
+    ];
+    files = [
+      "/etc/machine-id"
+      {
+        file = "/var/keys/secret_file";
+        parentDirectory = {mode = "u=rwx,g=,o=";};
+      }
+    ];
+  };
 }

@@ -18,9 +18,37 @@
   boot.extraModulePackages = [];
 
   fileSystems."/" = {
+    #    device = "/dev/disk/by-uuid/44444444-4444-4444-8888-888888888888";
+    #    fsType = "ext4";
+    device = "none";
+    fsType = "tmpfs";
+    options = ["size=500M" "mode=755"];
+  };
+  fileSystems."/mnt/oldroot" = {
+    depends = [
+      # The mounts above have to be mounted in this given order
+    ];
     device = "/dev/disk/by-uuid/44444444-4444-4444-8888-888888888888";
     fsType = "ext4";
   };
+  fileSystems."/home/devji" = {
+    depends = [
+      # The mounts above have to be mounted in this given order
+      "/mnt/oldroot"
+    ];
+    device = "/mnt/oldroot/home/devji";
+    fsType = "none";
+    options = [
+      "bind"
+      "rw" # The filesystem hierarchy will be read-only when accessed from /mnt/aggregator/app1
+    ];
+  };
+
+  #  fileSystems."/home/devji" = {
+  #    device = "none";
+  #    fsType = "tmpfs"; # Can be stored on normal drive or on tmpfs as well
+  #    options = ["size=250M" "mode=777"];
+  #  };
 
   fileSystems."/nix" = {
     device = "/dev/disk/by-label/NIXER";
@@ -29,6 +57,18 @@
     options = ["noatime"];
   };
 
+  fileSystems."/nix/persist" = {
+    depends = [
+      # The mounts above have to be mounted in this given order
+      "/nix"
+    ];
+    device = "/nix/persist";
+    fsType = "none";
+    options = [
+      "bind"
+      "rw"
+    ];
+  };
   #  fileSystems."/mnt/hdd" =
   #  {
   #    device = "/dev/disk/by-uuid/0695-8114";

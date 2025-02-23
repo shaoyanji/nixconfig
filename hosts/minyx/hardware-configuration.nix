@@ -34,9 +34,9 @@
   fileSystems."/home/devji" = {
     depends = [
       # The mounts above have to be mounted in this given order
-      "/mnt/oldroot"
+      "/nix/persist"
     ];
-    device = "/mnt/oldroot/home/devji";
+    device = "/nix/persist/home/devji";
     fsType = "none";
     options = [
       "bind"

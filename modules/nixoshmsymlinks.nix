@@ -17,12 +17,12 @@ in {
     # "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
     "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/documents";
     "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/books";
-    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/downloads";
-    "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/storage";
+    "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/downloads";
+    "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/storage";
     "Applications/appimages".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/appimages";
-    "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/music";
-    "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/pics";
-    "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/video";
+    "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/music";
+    "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/pics";
+    "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/video";
     "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/go/pkg";
     ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/.cargo/registry";
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/ollama";

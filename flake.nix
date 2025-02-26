@@ -237,11 +237,11 @@
           globalModulesNixos
           ++ [./hosts/aceofspades/configuration.nix];
       };
-       ancientace= nixpkgs.lib.nixosSystem {
+      ancientace = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules =
-          globalModulesContainers
+          globalModulesNixos
           ++ [./hosts/ancientace/configuration.nix];
       };
       minyx = nixpkgs.lib.nixosSystem {

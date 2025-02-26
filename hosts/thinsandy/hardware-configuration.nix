@@ -61,6 +61,7 @@
     /export         192.168.178.0/24(rw,fsid=0,no_subtree_check)
         /export/data 192.168.178.0/24(rw,nohide,insecure,no_subtree_check)
   '';
+  networking.firewall.allowedTCPPorts = [2049];
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction

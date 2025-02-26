@@ -3,6 +3,7 @@
   pkgs,
   ...
 }: let
+  nixnas = "thinsandy.fritz.box";
   burgernas = "100.72.61.23";
   burgernas_nfs = "192.168.178.4";
   #    fritznas = "192.168.178.1";
@@ -39,6 +40,11 @@ in {
     options = ["${automount_opts}"];
   };
 
+  fileSystems."/Volumes/data" = {
+    device = "${nixnas}:/data";
+    fsType = "nfs";
+    options = ["${automount_opts}"];
+  };
   #  fileSystems."/mnt/y" = {
   #    device = "//${fritznas}/fritz.nas/External-USB3-0-01/";
   #    fsType = "cifs";

@@ -59,7 +59,7 @@
   services.nfs.server.enable = true;
   services.nfs.server.exports = ''
     /export 192.168.178.0/24(rw,fsid=0,no_subtree_check)
-    /export/data 192.168.178.0/24(rw,nohide,insecure,no_subtree_check)
+    /export/data 192.168.178.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
   '';
   networking.firewall.allowedTCPPorts = [2049];
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

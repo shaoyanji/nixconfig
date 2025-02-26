@@ -8,7 +8,7 @@
   burgernas_nfs = "192.168.178.4";
   #    fritznas = "192.168.178.1";
   automount_opts = "x-systemd.automount,x-systemd.after=network-online.target,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=10s,x-systemd.mount-timeout=10s";
-  reg_opts = "rw,noserverino,uid=1000,gid=1";
+  reg_opts = "rw,noserverino,uid=1000,gid=100";
   tailscale_opts = "x-systemd.requires=tailscaled.service";
   cred_wolf = "credentials=${config.sops.secrets."server/localwd/credentials".path}";
   cred_fritz = "credentials=${config.sops.secrets."server/keyrepo/credentials".path}";

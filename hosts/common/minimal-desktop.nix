@@ -93,7 +93,7 @@ in {
       system.nixos.tags = ["server"];
       services.tailscale = {
         enable = true;
-        useRoutingFeatures = "client";
+        useRoutingFeatures = lib.mkForce "client";
       };
       networking = {
         firewall = {

@@ -24,6 +24,8 @@
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   environment.systemPackages = with pkgs; [
     btrfs-progs
+    f2fs-tools
+    docker
   ];
 
   # Set your time zone.
@@ -101,5 +103,40 @@
   # and migrated your data accordingly.
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
+  #
+
+  services.blocky = {
+    enable = true;
+
+    settings = {
+      ports.dns = 53; # Port for incoming DNS Queries.
+      upstreams.groups.default = [
+        "https://one.one.one.one/dns-query" # Using Cloudflare's DNS over HTTPS server for resolving queries.
+      ];
+      # For initially solving DoH/DoT Requests when no system Resolver is available.
+      bootstrapDns = {
+        upstream = "https://one.one.one.one/dns-query";
+        ips = ["1.1.1.1" "1.0.0.1"];
+      };
+      #Enable Blocking of certain domains.
+      blocking = {
+        denylists = {
+          #Adblocking
+          ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
+          #Another filter for blocking adult sites
+          #adult = ["https://blocklistproject.github.io/Lists/porn.txt"];
+          #You can add additional categories
+        };
+        #Configure what block categories are used
+        clientGroupsBlock = {
+          default = ["ads"];
+          #kids-ipad = ["ads" "adult"];
+        };
+      }; # anything from config.yml
+    };
+  };
+
+  virtualisation.docker.enable = true;
+
   system.stateVersion = "24.11"; # Did you read the comment?
 }

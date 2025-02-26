@@ -4,7 +4,7 @@
   config,
   ...
 }: let
-  nixNAS = "Volumes/data";
+  nixNAS = "/Volumes/data";
   peachNAS = "/Volumes/peachcable";
   routerNAS = "/mnt/y";
   sharedNAS = "/Volumes/Shared Library/core";
@@ -59,6 +59,6 @@ in {
   };
   home.sessionPath =
     ["${nixNAS}/bin-script"]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${nixNAS}/bin-aarch64" "${nixNAS}/go/bin" "${nixNAS}/.cargo/bin"]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${nixNAS}/bin-x86" "${nixNAS}/go/bin-x86" "${nixNAS}/.cargo/bin-x86"];
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${nixNAS}/bin-aarch64" "${peachNAS}/go/bin" "${peachNAS}/.cargo/bin"]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${nixNAS}/bin-x86" "${peachNAS}/go/bin-x86" "${peachNAS}/.cargo/bin-x86"];
 }

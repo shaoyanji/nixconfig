@@ -56,11 +56,11 @@ in {
   #    fsType = "cifs";
   #    options = ["${automount_opts},${reg_opts},${cred_wolf},${tailscale_opts}"];
   #  };
-  #fileSystems."/mnt/x" = {
-  #  device = "//${burgernas}/Shared Library";
-  #  fsType = "cifs";
-  #  options = ["${automount_opts},${reg_opts},${cred_wolf},${tailscale_opts}"];
-  #};
+  fileSystems."/Volumes/shared" = {
+    device = "//${burgernas}/Shared Library";
+    fsType = "cifs";
+    options = ["${automount_opts},${reg_opts},${cred_wolf},${tailscale_opts}"];
+  };
   #  fileSystems."/Volumes/usbshare1" = {
   #    device = "//${burgernas}/usbshare1";
   #    fsType = "cifs";

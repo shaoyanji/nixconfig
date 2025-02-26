@@ -124,7 +124,7 @@
         home-manager.nixosModules.default
         sops-nix.nixosModules.sops
         chaotic.nixosModules.default
-        lix-module.nixosModules.default
+        #lix-module.nixosModules.default
         nur.modules.nixos.default
       ];
     globalModulesImpermanence =
@@ -236,6 +236,13 @@
         modules =
           globalModulesNixos
           ++ [./hosts/aceofspades/configuration.nix];
+      };
+       ancientace= nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
+        modules =
+          globalModulesContainers
+          ++ [./hosts/ancientace/configuration.nix];
       };
       minyx = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";

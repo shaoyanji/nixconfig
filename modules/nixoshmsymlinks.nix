@@ -4,6 +4,7 @@
   config,
   ...
 }: let
+  nixNAS = "Volumes/data";
   peachNAS = "/Volumes/peachcable";
   routerNAS = "/mnt/y";
   sharedNAS = "/Volumes/Shared Library/core";
@@ -14,11 +15,11 @@ in {
     # "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/Obsidian-Git-Sync";
     # "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/work";
     # "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/documents/nixconfig";
-    "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/documents";
-    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/books";
+    "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/documents";
+    "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/books";
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/downloads";
     "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/storage";
-    "Applications/appimages".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/appimages";
+    "Applications/appimages".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/appimages";
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/pics";
     "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/video";
@@ -27,10 +28,10 @@ in {
     ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/ollama";
     # ".zen".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/zen";
     #".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/firefox";
-    ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/security/accounts.age";
-    ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/security/key.txt";
+    ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/accounts.age";
+    ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/key.txt";
     # ".cloak/accounts".source = config.lib.file.mkOutOfStoreSymlink "${sharedNAS}/security/accounts";
-    "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/hello";
+    "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/hello";
   };
   xdg.configFile = {
     #    "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
@@ -57,7 +58,7 @@ in {
       '';
   };
   home.sessionPath =
-    ["${peachNAS}/bin-script"]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${peachNAS}/bin-aarch64" "${peachNAS}/go/bin" "${peachNAS}/.cargo/bin"]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${peachNAS}/bin-x86" "${peachNAS}/go/bin-x86" "${peachNAS}/.cargo/bin-x86"];
+    ["${nixNAS}/bin-script"]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${nixNAS}/bin-aarch64" "${nixNAS}/go/bin" "${nixNAS}/.cargo/bin"]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${nixNAS}/bin-x86" "${nixNAS}/go/bin-x86" "${nixNAS}/.cargo/bin-x86"];
 }

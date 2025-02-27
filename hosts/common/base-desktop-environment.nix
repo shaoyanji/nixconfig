@@ -73,6 +73,7 @@
         obs-pipewire-audio-capture
       ];
     })
+    alsa-utils
     # config.boot.kernelPackages.digimend
   ];
   #  programs.appimage = {

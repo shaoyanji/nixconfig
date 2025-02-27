@@ -6,11 +6,9 @@
   imports = [
     ../lf
     ../env.nix
-    #../shell
+    ../shell
     ../sops.nix
     ../helix.nix
-    ../shell/tmux.nix
-    ../shell/bash.nix
     ../shell/nushell.nix
   ];
   home = {

@@ -6,14 +6,39 @@
   imports = [
     ../lf
     ../env.nix
-    ../shell
+    #    ../shell
+    ../shell/tmux.nix
+    ../shell/bash.nix
     ../sops.nix
     ../helix.nix
     ../shell/nushell.nix
   ];
+  programs = {
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+    zoxide = {
+      enable = true;
+      options = [
+        "--cmd cd"
+      ];
+    };
+    fzf.enable = true;
+  };
   home = {
     packages = with pkgs;
       [
+        thefuck
+        jq
+        htmlq
+        ripgrep
+        fd
+        zsh-forgit
+        zsh-fzf-history-search
+        #zsh-fzf-tab
+        bat
+        eza
         gum
         go-task
         fzf

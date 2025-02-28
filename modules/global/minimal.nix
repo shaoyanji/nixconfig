@@ -29,6 +29,7 @@
   home = {
     packages = with pkgs;
       [
+        nix-output-monitor
         thefuck
         jq
         htmlq

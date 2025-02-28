@@ -41,6 +41,12 @@
       interval = "monthly";
       fileSystems = ["/"];
     };
+    k3s = {
+      enable = true;
+      role = "server"; # Or "agent" for worker only nodes
+      tokenFile = "${config.sops.secrets."local/k3s/token".path}";
+      serverAddr = "https://thinsandy.fritz.box:6443";
+    };
   };
   environment.systemPackages = with pkgs; [
     wget

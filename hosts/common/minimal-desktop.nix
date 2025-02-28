@@ -30,6 +30,7 @@ in {
     secrets = {
       "server/localwd/credentials" = {};
       "server/keyrepo/credentials" = {};
+      "local/k3s/token" = {};
       hashedPassword.neededForUsers = true;
     };
   };

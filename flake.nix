@@ -64,7 +64,7 @@
     #  inputs.hyprland.follows = "hyprland-plugins";
     #};
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
-    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
+    #    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     #    ghostty.url = "github:ghostty-org/ghostty";
     utils.url = "github:numtide/flake-utils";
     hydenix.url = "github:richen604/hydenix";
@@ -83,12 +83,10 @@
     disko,
     chaotic,
     sops-nix,
-    lix-module,
     nur,
     utils,
     ...
   } @ inputs: let
-    overlays = [inputs.nuenv.overlays.default];
     pkgs = import inputs.nixpkgs {
       inherit systems;
       config.allowUnfree = true;
@@ -102,15 +100,8 @@
     systems = [
       "x86_64-linux"
       "aarch64-linux"
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
-    forAllSystems = f:
-      nixpkgs.lib.genAttrs systems (system:
-        f {
-          inherit system;
-          pkgs = import nixpkgs {inherit overlays system;};
-        });
     globalModules = [
       {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -177,7 +168,6 @@
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [
           ./modules/global/heim.nix
-          inputs.lix-module.nixosModules.default
         ];
       };
     };
@@ -189,16 +179,6 @@
       #packages."x86_64-linux" = {
       #  default = hydenixConfig.nix-vm.config.system.build.vm;
       #};
-      poseidon2 = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {inherit inputs;};
-        modules =
-          globalModulesContainers
-          ++ [
-            ./hosts/poseidon/configuration.nix
-            inputs.sops-nix.nixosModules.sops
-          ];
-      };
       thinsandy = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};

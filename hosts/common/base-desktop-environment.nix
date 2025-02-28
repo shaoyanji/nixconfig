@@ -61,7 +61,6 @@
     qutebrowser
     lan-mouse_git
     nix-top
-    #failed to build
     zed-editor_git
     yt-dlp_git
     libreoffice

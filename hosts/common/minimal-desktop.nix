@@ -165,7 +165,8 @@ in {
         mandatoryFeatures = [];
       }
     ];
-    distributedBuilds = true;
+    # Switch for local development
+    #    distributedBuilds = true;
     extraOptions = ''
       builders-use-substitutes = true
     '';

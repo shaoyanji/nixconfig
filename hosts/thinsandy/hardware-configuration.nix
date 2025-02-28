@@ -60,7 +60,7 @@
   services.nfs.server.exports = ''
     /export 192.168.178.0/24(rw,fsid=0,no_subtree_check)
     /export/data 192.168.178.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
-    /export/data *.fritz.box(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
+    /export/data 100.66.146.18(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
   '';
   services.btrfs.autoScrub = {
     enable = true;

@@ -42,6 +42,7 @@
       "/var/lib/systemd/coredump"
       "/var/lib/tailscale"
       "/etc/NetworkManager/system-connections"
+      "/etc/rancher/k3s"
       {
         directory = "/var/lib/colord";
         user = "colord";

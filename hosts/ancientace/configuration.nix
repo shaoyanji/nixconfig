@@ -42,4 +42,5 @@
     btrfs-progs
     #    # config.boot.kernelPackages.digimend
   ];
+  zramSwap.enable = true;
 }

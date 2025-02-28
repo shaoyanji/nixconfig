@@ -30,11 +30,18 @@
   };
 
   networking.hostName = "poseidon"; # Define your hostname.
-  #environment={
-  #systemPackages = with pkgs; [
-  #];
-  #variables = {
-  # };
-  #};
+  environment = {
+    systemPackages = with pkgs; [
+      (pkgs.wrapOBS {
+        plugins = with pkgs.obs-studio-plugins; [
+          wlrobs
+          obs-backgroundremoval
+          obs-pipewire-audio-capture
+        ];
+      })
+    ];
+    #variables = {
+    # };
+  };
   system.stateVersion = "24.11"; # Did you read the comment?
 }

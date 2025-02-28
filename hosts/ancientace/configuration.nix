@@ -15,8 +15,8 @@
     efi.canTouchEfiVariables = lib.mkForce false;
     grub = {
       device = "/dev/sda";
-      enableCryptodisk = true;
-      useOSProber = true;
+      #      enableCryptodisk = true;
+      #      useOSProber = true;
       enable = true;
     };
   };
@@ -33,23 +33,13 @@
         enable = true;
         wayland.enable = true;
       };
-      # Enable automatic login for the user.
-      autoLogin = {
-        enable = true;
-        user = "devji";
-      };
       #    xserver.digimend.enable = true;
     };
   };
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
-    helix
-    vim
     wget
     git
     btrfs-progs
-    kitty
-    ghostty
     #    # config.boot.kernelPackages.digimend
   ];
 }

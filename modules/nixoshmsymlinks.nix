@@ -15,6 +15,7 @@ in {
     "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/Obsidian-Git-Sync";
     "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/work";
     "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/nixconfig";
+    "Documents/jobby".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/jobby";
     "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/documents";
     "Documents/books".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/books";
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/downloads";
@@ -23,9 +24,9 @@ in {
     "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/pics";
     "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/video";
-    "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/go/pkg";
-    ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/.cargo/registry";
-    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${peachNAS}/ollama";
+    "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/cache/go/pkg";
+    ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/cache/.cargo/registry";
+    ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/ollama";
     # ".zen".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/zen";
     #".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/firefox";
     ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/accounts.age";

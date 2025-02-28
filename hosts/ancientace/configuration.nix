@@ -35,6 +35,12 @@
       };
       #    xserver.digimend.enable = true;
     };
+
+    btrfs.autoScrub = {
+      enable = true;
+      interval = "monthly";
+      fileSystems = ["/"];
+    };
   };
   environment.systemPackages = with pkgs; [
     wget
@@ -42,5 +48,6 @@
     btrfs-progs
     #    # config.boot.kernelPackages.digimend
   ];
+
   zramSwap.enable = true;
 }

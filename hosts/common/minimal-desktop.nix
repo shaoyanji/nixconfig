@@ -13,6 +13,7 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKubsmOU3nRDwO6gsqnYzORtUxvpwPDLNRAA/K99Xaqs devji@minyx"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILFrpuKNvTGARCr6vacmyHRkjDnfEbdAp9+zWHTRRDD9 devji@thinsandy"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHVyGpjlVwKmhW9+t0iak1WuRov3xPZ/bTU3Y471Pmai wetnose@BurgerNAS"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOOv1lniY72qgt2QE64JB75G84b9qbqLYrSo+RQDUU0T devji@ancientace"
   ];
 in {
   imports = [
@@ -93,7 +94,7 @@ in {
       system.nixos.tags = ["server"];
       services.tailscale = {
         enable = true;
-        useRoutingFeatures = lib.mkForce "client";
+        useRoutingFeatures = lib.mkForce "server";
       };
       networking = {
         firewall = {

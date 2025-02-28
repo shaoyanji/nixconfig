@@ -158,6 +158,14 @@
   #  };
   #  services.tailscale.useRoutingFeatures = "server";
   virtualisation.docker.enable = true;
+
+  services.k3s = {
+    enable = true;
+    role = "server";
+    tokenFile = "${config.sops.secrets."local/k3s/token".path}";
+    clusterInit = true;
+  };
+
   #  services = {
   #    networkd-dispatcher = {
   #      enable = true;

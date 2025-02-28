@@ -93,7 +93,7 @@
         viu
         wkhtmltopdf
         ghostscript
-        texlive.combined.scheme-full
+        #        texlive.combined.scheme-full
         pandoc
         mods
         aichat

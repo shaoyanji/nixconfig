@@ -66,13 +66,6 @@
     libreoffice
     hunspell
     hunspellDicts.en_US
-    (pkgs.wrapOBS {
-      plugins = with pkgs.obs-studio-plugins; [
-        wlrobs
-        obs-backgroundremoval
-        obs-pipewire-audio-capture
-      ];
-    })
     alsa-utils
     # config.boot.kernelPackages.digimend
   ];

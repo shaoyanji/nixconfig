@@ -65,6 +65,12 @@
         wayland.enable = true;
       };
     };
+
+    btrfs.autoScrub = {
+      enable = true;
+      interval = "monthly";
+      fileSystems = ["/"];
+    };
   };
   programs.fuse.userAllowOther = true;
 }

@@ -1,6 +1,10 @@
-{ config, pkgs, lib, inputs, ... }:
-
 {
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}: {
   wayland.windowManager.hyprland = {
     enable = true;
     plugins = [
@@ -96,7 +100,7 @@
       };
       "$mainMod" = "SUPER";
       #      "$fileManager" = "${pkgs.dolphin}/bin/dolphin";
-      "$menu" = "${pkgs.wofi}/bin/wofi --show drun";
+      "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"
         "$mainMod, W, killactive"
@@ -163,7 +167,6 @@
         #psuedotile = true;
         preserve_split = true;
       };
-
     };
     extraConfig = ''
       source = ~/.config/hypr/animations.conf

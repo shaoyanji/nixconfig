@@ -8,6 +8,7 @@
     ./flatpak.nix
     ./minimal-desktop.nix
     ../../modules/nixos/lxc
+    ../../modules/nixos/k3s
   ];
   # Bootloader.
   boot = {
@@ -76,10 +77,10 @@
     alsa-utils
     # config.boot.kernelPackages.digimend
   ];
-  #  programs.appimage = {
-  #  enable = true;
-  #  binfmt = true;
-  #};
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
   #
   # Fonts
   fonts.packages = [

@@ -2,8 +2,8 @@
   services = {
     k3s = {
       enable = true;
-      #role = "agent";
-      role = "server"; # Or "agent" for worker only nodes
+      role = "agent";
+      #role = "server"; # Or "agent" for worker only nodes
       tokenFile = "${config.sops.secrets."local/k3s/token".path}";
       serverAddr = "https://thinsandy:6443";
       #serverAddr = "https://thinsandy.cloudforest-kardashev.ts.net:6443";

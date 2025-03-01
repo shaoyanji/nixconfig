@@ -43,6 +43,7 @@
       "/var/lib/tailscale"
       "/etc/NetworkManager/system-connections"
       "/etc/rancher/k3s"
+      "/var/lib/rancher"
       {
         directory = "/var/lib/colord";
         user = "colord";

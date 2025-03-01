@@ -16,7 +16,7 @@
   };
   nixpkgs.config.allowBroken = true;
 
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages;
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
     #package = config.boot.kernelPackages.nvidiaPackages.stable;

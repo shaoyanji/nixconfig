@@ -14,7 +14,7 @@
     #systemd-boot.enable = lib.mkForce false;
     #efi.canTouchEfiVariables = lib.mkForce false;
     #grub = {
-    device = "nodev";
+    #device = "nodev";
     #      enableCryptodisk = true;
     #      useOSProber = true;
     #  enable = true;
@@ -24,7 +24,7 @@
   #services.xserver.videoDrivers = ["amdgpu"];
 
   hardware.graphics.extraPackages = [
-    pkgs.mesa.opencl
+    #    pkgs.mesa.opencl
   ];
   system.stateVersion = "24.11"; # Did you read the comment?
   services = {

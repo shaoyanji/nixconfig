@@ -11,17 +11,17 @@
     ../common/base-desktop-environment.nix
   ];
   boot.loader = {
-    systemd-boot.enable = lib.mkForce false;
-    efi.canTouchEfiVariables = lib.mkForce false;
-    grub = {
-      device = "/dev/sda";
-      #      enableCryptodisk = true;
-      #      useOSProber = true;
-      enable = true;
-    };
+    #systemd-boot.enable = lib.mkForce false;
+    #efi.canTouchEfiVariables = lib.mkForce false;
+    #grub = {
+    device = "nodev";
+    #      enableCryptodisk = true;
+    #      useOSProber = true;
+    #  enable = true;
+    #};
   };
   networking.hostName = "ancientace"; # Define your hostname.
-  services.xserver.videoDrivers = ["amdgpu"];
+  #services.xserver.videoDrivers = ["amdgpu"];
 
   hardware.graphics.extraPackages = [
     pkgs.mesa.opencl

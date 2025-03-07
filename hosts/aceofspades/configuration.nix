@@ -8,14 +8,15 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../common/minimal-desktop.nix
+    ../common/base-desktop-environment.nix
   ];
   boot.loader = {
-    systemd-boot.enable = lib.mkDefault false;
+    systemd-boot.enable = lib.mkForce false;
+    efi.canTouchEfiVariables = lib.mkForce false;
     grub = {
       device = "/dev/sda";
-      enableCryptodisk = true;
-      useOSProber = true;
+      #      enableCryptodisk = true;
+      #      useOSProber = true;
       enable = true;
     };
   };
@@ -32,27 +33,11 @@
         enable = true;
         wayland.enable = true;
       };
-      # Enable automatic login for the user.
-      autoLogin = {
-        enable = true;
-        user = "devji";
-      };
       #    xserver.digimend.enable = true;
     };
   };
-  programs.hyprland = {
-    enable = true;
-    # set the flake package
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    # make sure to also set the portal package, so that they are in sync
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-    xwayland.enable = true;
-  };
-
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
-    kitty
-    ghostty
     # config.boot.kernelPackages.digimend
   ];
 }

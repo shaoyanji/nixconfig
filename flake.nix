@@ -196,7 +196,7 @@
           globalModulesImpermanence
           ++ [
             ./hosts/ares/configuration.nix
-            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
+            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t440p
             (import ./hosts/common/disko.nix {device = "/dev/sda";})
           ];
       };
@@ -222,7 +222,10 @@
         specialArgs = {inherit inputs;};
         modules =
           globalModulesNixos
-          ++ [./hosts/ancientace/configuration.nix];
+          ++ [
+            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
+            ./hosts/ancientace/configuration.nix
+          ];
       };
       minyx = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";

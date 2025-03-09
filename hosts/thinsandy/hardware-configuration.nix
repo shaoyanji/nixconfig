@@ -75,10 +75,10 @@
         #"use sendfile" = "yes";
         #"max protocol" = "smb2";
         # note: localhost is the ipv6 localhost ::1
-        "hosts allow" = "192.168.178.0 ";
-        "hosts deny" = "0.0.0.0/0";
-        "guest account" = "nobody";
-        "map to guest" = "bad user";
+        #"hosts allow" = "192.168.178.0 ";
+        #"hosts deny" = "0.0.0.0/0";
+        #"guest account" = "nobody";
+        #"map to guest" = "bad user";
       };
       "data" = {
         "path" = "/export/data";
@@ -87,7 +87,7 @@
         "guest ok" = "yes";
         "create mask" = "0644";
         "directory mask" = "0755";
-        "force user" = "devji";
+        #"force user" = "devji";
         #"force group" = "";
       };
       "private" = {
@@ -97,7 +97,7 @@
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
-        "force user" = "devji";
+        #"force user" = "devji";
         #"force group" = "";
       };
     };

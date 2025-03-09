@@ -64,7 +64,7 @@
   '';
   services.samba = {
     enable = true;
-  #  securityType = "user";
+    #  securityType = "user";
     openFirewall = true;
     settings = {
       global = {
@@ -100,7 +100,6 @@
         "force user" = "devji";
         #"force group" = "";
       };
-      shares.testshare
     };
   };
 
@@ -108,8 +107,8 @@
     enable = true;
     openFirewall = true;
   };
-  networking.firewall.allowedTCPPorts = [ 445 139 ];
-  networking.firewall.allowedUDPPorts = [ 137 138 ];
+  networking.firewall.allowedTCPPorts = [445 139];
+  networking.firewall.allowedUDPPorts = [137 138];
   networking.firewall.enable = true;
   networking.firewall.allowPing = true;
   services.btrfs.autoScrub = {

@@ -107,7 +107,7 @@
     enable = true;
     openFirewall = true;
   };
-  networking.firewall.allowedTCPPorts = [445 139];
+  networking.firewall.allowedTCPPorts = [445 139 2049];
   networking.firewall.allowedUDPPorts = [137 138];
   networking.firewall.enable = true;
   networking.firewall.allowPing = true;
@@ -117,7 +117,6 @@
     fileSystems = ["/"];
   };
 
-  networking.firewall.allowedTCPPorts = [2049];
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction

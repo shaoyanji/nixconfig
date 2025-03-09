@@ -56,6 +56,26 @@
     device = "/srv/data";
     options = ["bind"];
   };
+
+  fileSystems."/srv/public" = {
+    device = "/dev/disk/by-uuid/d3c13746-8d51-4fce-bf0e-655153229441";
+    fsType = "btrfs";
+    options = ["subvol=public" "noatime" "compress=zstd"];
+  };
+  fileSystems."/export/public" = {
+    device = "/srv/public";
+    options = ["bind"];
+  };
+
+  fileSystems."/srv/private" = {
+    device = "/dev/disk/by-uuid/d3c13746-8d51-4fce-bf0e-655153229441";
+    fsType = "btrfs";
+    options = ["subvol=private" "noatime" "compress=zstd"];
+  };
+  fileSystems."/export/private" = {
+    device = "/srv/private";
+    options = ["bind"];
+  };
   services.nfs.server.enable = true;
   services.nfs.server.exports = ''
     /export 192.168.178.0/24(rw,fsid=0,no_subtree_check)
@@ -97,8 +117,15 @@
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
-        #"force user" = "devji";
-        #"force group" = "";
+      };
+
+      "public" = {
+        "path" = "/export/public";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "create mask" = "0644";
+        "directory mask" = "0755";
       };
     };
   };

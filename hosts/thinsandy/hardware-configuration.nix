@@ -64,7 +64,7 @@
   '';
   services.samba = {
     enable = true;
-    securityType = "user";
+  #  securityType = "user";
     openFirewall = true;
     settings = {
       global = {
@@ -75,7 +75,7 @@
         #"use sendfile" = "yes";
         #"max protocol" = "smb2";
         # note: localhost is the ipv6 localhost ::1
-        "hosts allow" = "192.168.178.0 100.0.0.0";
+        "hosts allow" = "192.168.178.0 100.0.0.0 localhost";
         "hosts deny" = "0.0.0.0/0";
         "guest account" = "nobody";
         "map to guest" = "bad user";
@@ -84,11 +84,11 @@
         "path" = "/export/data";
         "browseable" = "yes";
         "read only" = "no";
-        "guest ok" = "no";
+        "guest ok" = "yes";
         "create mask" = "0644";
         "directory mask" = "0755";
         "force user" = "devji";
-        "force group" = "amburgerhof4";
+        #"force group" = "";
       };
       "private" = {
         "path" = "/export/private";
@@ -97,9 +97,10 @@
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
-        "force user" = "devji sandy";
-        "force group" = "amburgerhof4";
+        "force user" = "devji";
+        #"force group" = "";
       };
+      shares.testshare
     };
   };
 
@@ -107,7 +108,8 @@
     enable = true;
     openFirewall = true;
   };
-
+  networking.firewall.allowedTCPPorts = [ 445 139 ];
+  networking.firewall.allowedUDPPorts = [ 137 138 ];
   networking.firewall.enable = true;
   networking.firewall.allowPing = true;
   services.btrfs.autoScrub = {

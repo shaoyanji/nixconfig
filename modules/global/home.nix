@@ -80,7 +80,6 @@
         # hugo # static site generator
 
         btop # replacement of htop/nmon
-        iotop # io monitoring
         iftop # network monitoring
 
         ## base tools
@@ -164,6 +163,7 @@
       ]
       ++ lib.optionals stdenv.isLinux [
         wl-clipboard
+        iotop # io monitoring
         ##   system call monitoring
         strace # system call monitoring
         ltrace # library call monitoring

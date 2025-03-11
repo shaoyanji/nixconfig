@@ -31,7 +31,7 @@
   # `home-manager` currently has issues adding them to `~/Applications`
   # Issue: https://github.com/nix-community/home-manager/issues/1341
   environment.systemPackages = with pkgs; [
-    kitty
+    #    kitty
     terminal-notifier
     mkalias
   ];
@@ -133,7 +133,8 @@
   system.keyboard.remapCapsLockToEscape = true;
 
   # Add ability to used TouchID for sudo authentication
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.services.sudo_local.touchIdAuth = true;
+  #  security.pam.enableSudoTouchIdAuth = true;
 
   homebrew = {
     enable = true;

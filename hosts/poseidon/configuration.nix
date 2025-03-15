@@ -32,6 +32,7 @@
   networking.hostName = "poseidon"; # Define your hostname.
   environment = {
     systemPackages = with pkgs; [
+      btrfs-progs
       (pkgs.wrapOBS {
         plugins = with pkgs.obs-studio-plugins; [
           wlrobs

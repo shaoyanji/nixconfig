@@ -4,6 +4,7 @@
     ./hardware-configuration.nix
     ../common/impermanence.nix
     ../common/base-desktop-environment.nix
+    ../common/laptop.nix
   ];
   networking.hostName = "ares"; # Define your hostname.
   #environment.systemPackages = with pkgs; [

@@ -105,7 +105,7 @@
       entr
       gitmoji-cli
       #gitmoji-changelog
-      sparkly-cli
+      #sparkly-cli
       lowcharts
 
       #hare

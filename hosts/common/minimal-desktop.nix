@@ -151,6 +151,7 @@ in {
       #    ];
       #    dnsovertls = "true";
       #  };
+      powerManagement.powertop.enable = true;
       services.displayManager.sddm.enable = lib.mkForce false;
       system.nixos.tags = ["server"];
       services.tailscale = {

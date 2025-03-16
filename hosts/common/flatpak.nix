@@ -10,7 +10,8 @@
   desiredFlatpaks = [
     # "org.mozilla.firefox"
     # "org.mozilla.thunderbird"
-    #  flatpak install flathub io.github.zen_browser.zen
+    # "io.github.zen_browser.zen"
+    "io.freetubeapp.FreeTube"
   ];
 in {
   services.flatpak.enable = true;

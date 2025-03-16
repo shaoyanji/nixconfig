@@ -12,6 +12,7 @@
     ../common/steam.nix
     ../common/base-desktop-environment.nix
     #../common/minimal-desktop.nix
+    ../common/laptop.nix
     inputs.chaotic.nixosModules.default
   ];
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;

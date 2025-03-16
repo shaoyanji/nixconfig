@@ -12,6 +12,7 @@
     ../common/steam.nix
     ../common/impermanence.nix
     ../common/base-desktop-environment.nix
+    ../common/laptop.nix
   ];
   networking.hostName = "schneeeule"; # Define your hostname.
   environment.systemPackages = with pkgs; [

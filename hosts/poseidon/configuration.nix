@@ -116,6 +116,8 @@
       wasmtime
       luajit
       alsa-utils
+      sunshine
+      moonlight-qt
     ];
     #variables = {
     # };
@@ -140,6 +142,32 @@
   users.users.devji.extraGroups = ["libvirtd"];
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true; # enable copy and paste between host and guest
+
+  #sunshine
+
+  services.sunshine = {
+    enable = true;
+    autoStart = true;
+    capSysAdmin = true;
+    openFirewall = true;
+  };
+  services.avahi.publish.enable = true;
+  services.avahi.publish.userServices = true;
+
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [47984 47989 47990 48010];
+    allowedUDPPortRanges = [
+      {
+        from = 47998;
+        to = 48000;
+      }
+      {
+        from = 8000;
+        to = 8010;
+      }
+    ];
+  };
 
   system.stateVersion = "24.11"; # Did you read the comment?
 }

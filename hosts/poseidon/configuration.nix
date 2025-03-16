@@ -80,7 +80,6 @@
       bandwhich
       glances
       gping
-      dua-cli
       speedtest-cli
       dog
       buku

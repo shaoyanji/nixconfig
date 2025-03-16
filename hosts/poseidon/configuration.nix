@@ -121,5 +121,25 @@
     # };
   };
   services.transfer-sh.enable = true;
+
+  programs.virt-manager.enable = true;
+
+  users.groups.libvirtd.members = ["devji"];
+
+  virtualisation.libvirtd.enable = true;
+
+  virtualisation.spiceUSBRedirection.enable = true;
+
+  dconf.settings = {
+    "org/virt-manager/virt-manager/connections" = {
+      autoconnect = ["qemu:///system"];
+      uris = ["qemu:///system"];
+    };
+  };
+
+  users.users.devji.extraGroups = ["libvirtd"];
+  services.qemuGuest.enable = true;
+  services.spice-vdagentd.enable = true; # enable copy and paste between host and guest
+
   system.stateVersion = "24.11"; # Did you read the comment?
 }

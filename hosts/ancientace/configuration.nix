@@ -11,14 +11,14 @@
     ../common/base-desktop-environment.nix
   ];
   boot.loader = {
-    #systemd-boot.enable = lib.mkForce false;
-    #efi.canTouchEfiVariables = lib.mkForce false;
-    #grub = {
-    #device = "nodev";
-    #      enableCryptodisk = true;
-    #      useOSProber = true;
-    #  enable = true;
-    #};
+    systemd-boot.enable = lib.mkForce false;
+    efi.canTouchEfiVariables = lib.mkForce false;
+    grub = {
+      device = "nodev";
+      #      enableCryptodisk = true;
+      #      useOSProber = true;
+      enable = true;
+    };
   };
   networking.hostName = "ancientace"; # Define your hostname.
   #services.xserver.videoDrivers = ["amdgpu"];
@@ -44,6 +44,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    powertop
     btrfs-progs
     f2fs-tools
     #    # config.boot.kernelPackages.digimend

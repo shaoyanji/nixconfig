@@ -46,9 +46,7 @@
       dust
       lz4
       rclone
-      #howdoi
       yank
-      fig
       insect
       toot
       age

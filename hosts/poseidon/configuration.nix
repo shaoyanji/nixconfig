@@ -99,7 +99,6 @@
       surge #x86
 
       epr
-      meetup-cli
       lynx
       hget
       translate-shell

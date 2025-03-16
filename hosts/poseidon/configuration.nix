@@ -47,7 +47,6 @@
       lz4
       rclone
       yank
-      insect
       toot
       age
       pass

@@ -46,7 +46,7 @@
       dust
       lz4
       rclone
-      howdoi
+      #howdoi
       yank
       fig
       insect

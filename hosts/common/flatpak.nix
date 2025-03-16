@@ -1,6 +1,8 @@
-{ config, pkgs, ... }:
-
-let
+{
+  config,
+  pkgs,
+  ...
+}: let
   # We point directly to 'gnugrep' instead of 'grep'
   grep = pkgs.gnugrep;
 
@@ -10,8 +12,8 @@ let
     # "org.mozilla.thunderbird"
     #  flatpak install flathub io.github.zen_browser.zen
   ];
-in
-{
+in {
+  services.flatpak.enable = true;
   system.activationScripts.flatpakManagement = {
     text = ''
       # 2. Ensure the Flathub repo is added

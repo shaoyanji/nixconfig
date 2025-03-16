@@ -29,7 +29,7 @@
       efi.canTouchEfiVariables = true;
     };
   };
-
+  programs.thunderbird.enable = true;
   networking.hostName = "poseidon"; # Define your hostname.
   environment = {
     systemPackages = with pkgs; [

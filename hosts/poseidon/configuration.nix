@@ -81,7 +81,7 @@
       glances
       gping
       speedtest-cli
-      dog
+      #dog
       buku
       ddgr
       khal
@@ -106,7 +106,7 @@
       gitmoji-cli
       #gitmoji-changelog
       #sparkly-cli
-      lowcharts
+      #lowcharts
 
       #hare
       #haredoc

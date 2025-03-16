@@ -100,7 +100,6 @@
 
       epr
       lynx
-      hget
       translate-shell
       mc
       entr

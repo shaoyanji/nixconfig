@@ -11,8 +11,7 @@
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
-
-  boot.initrd.availableKernelModules = ["ehci_pci" "ahci" "firewire_ohci" "usbhid" "usb_storage" "sd_mod"];
+  boot.initrd.availableKernelModules = ["ehci_pci" "sr_mod" "sdhci_pci" "ahci" "firewire_ohci" "usbhid" "usb_storage" "sd_mod"];
 
   boot.initrd.supportedFilesystems = ["btrfs" "f2fs"];
   boot.initrd.kernelModules = ["dm-snapshot"];

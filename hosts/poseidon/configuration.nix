@@ -41,6 +41,89 @@
           obs-pipewire-audio-capture
         ];
       })
+      element-desktop
+      audacity
+      dust
+      lz4
+      radio-active
+      rclone
+      howdoi
+      yank
+      fig
+      insect
+      toot
+      age
+      pass
+      cmus
+      bitwarden-cli
+      glow
+      pop
+      charm-freeze
+      viu
+      #wkhtmltopdf
+      #ghostscript
+      #        texlive.combined.scheme-full
+      #pandoc
+      #mods
+      #aichat
+      #tgpt
+      #jekyll
+      #bundler
+      tldr
+      scc
+      diff-so-fancy
+      entr
+      exiftool
+      fdupes
+      most
+      procs
+      # rip
+      rsync
+      sd
+      tre
+      bandwhich
+      glances
+      gping
+      dua-cli
+      speedtest-cli
+      dog
+      buku
+      ddgr
+      khal
+      mutt
+      newsboat
+      rclone
+      taskwarrior3
+      tuir
+      httpie
+      lazygit
+      ngrok
+      asciinema
+      navi
+
+      transfer
+      surge #x86
+
+      epr
+      meetup-cli
+      lynx
+      hget
+      translate-shell
+      mc
+      entr
+      gitmoji-cli
+      gitmoji-changelog
+      sparkly-cli
+      lowcharts
+
+      #hare
+      #haredoc
+      #go
+      #cargo
+      #tinygo
+      wasmtime
+      luajit
+      alsa-utils
     ];
     #variables = {
     # };

@@ -30,6 +30,7 @@
     networkd-dispatcher
   ];
 
+  powerManagement.powertop.enable = true;
   virtualisation.docker.enable = true;
 
   services.k3s = {

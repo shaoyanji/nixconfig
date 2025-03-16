@@ -49,4 +49,5 @@
     f2fs-tools
     #    # config.boot.kernelPackages.digimend
   ];
+  services.thermald.enable = true;
 }

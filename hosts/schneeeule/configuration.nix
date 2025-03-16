@@ -67,5 +67,6 @@
     LC_NUMERIC = "de_DE.UTF-8";
     LC_TIME = "de_DE.UTF-8";
   };
+  services.thermald.enable = true;
   system.stateVersion = "24.11"; # Did you read the comment?
 }

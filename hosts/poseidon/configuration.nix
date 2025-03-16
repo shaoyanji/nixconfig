@@ -96,7 +96,6 @@
       asciinema
       navi
 
-      transfer
       surge #x86
 
       epr
@@ -123,5 +122,6 @@
     #variables = {
     # };
   };
+  services.transfer-sh.enable = true;
   system.stateVersion = "24.11"; # Did you read the comment?
 }

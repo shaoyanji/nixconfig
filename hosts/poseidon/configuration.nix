@@ -45,7 +45,6 @@
       audacity
       dust
       lz4
-      radio-active
       rclone
       howdoi
       yank

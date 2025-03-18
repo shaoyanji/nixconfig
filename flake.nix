@@ -179,6 +179,17 @@
       #packages."x86_64-linux" = {
       #  default = hydenixConfig.nix-vm.config.system.build.vm;
       #};
+      #
+      mtfuji = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
+        modules =
+          globalModulesContainers
+          ++ [
+            ./hosts/mtfuji/configuration.nix
+            sops-nix.nixosModules.sops
+          ];
+      };
       thinsandy = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};

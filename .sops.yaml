@@ -29,6 +29,8 @@ keys:
   - &thinsandy age1q6klnp8k9282fjxlweu5gmkxpt4pxzyumkk3q8hdeunz8w3ns40scn7q8a
   - &ancientacehost age1ageqwpdaf0zkkkc3xqf3qag577fm80cf8vqc5glkz6fqjjp7jpss8t590l
   - &ancientace age1pk08qp3exeaw8ky7vs3xtxsuw55g8nrsp8j8pj4xar8ynngv7q9qtywkkm
+  - &mtfuji age1m42fjadwpyva5dsphl5umjllqjqj6zefzg8ys9ctwqa00gjuqussfnzgrm
+  - &mtfujihost age15rlqjq7nzc0xnnq5z32ugkkg4dzhxjsg3hxstlh0gygq3rffcvlsfqruj0
 
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
@@ -60,4 +62,6 @@ creation_rules:
       - *thinsandy
       - *ancientace
       - *ancientacehost
+      - *mtfuji
+      - *mtfujihost
       gpg:

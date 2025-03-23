@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: let
-  nixnas = "100.73.225.35";
+  nixnas = "thinsandy.cloudforst-kardashev.ts.net";
   burgernas = "100.72.61.23";
   burgernas_nfs = "192.168.178.4";
   #fritznas = "192.168.178.90";

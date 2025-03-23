@@ -47,7 +47,7 @@ in {
   };
 
   fileSystems."/Volumes/fritz" = {
-    device = "//${fritznas}/";
+    device = "//${fritznas}/fritz.nas/FRITZ";
     fsType = "cifs";
     options = ["${automount_opts},${reg_opts},${cred_fritz}"];
   }; #  fileSystems."/mnt/y" = {

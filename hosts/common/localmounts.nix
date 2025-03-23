@@ -3,10 +3,10 @@
   pkgs,
   ...
 }: let
-  nixnas = "192.168.178.130";
+  nixnas = "100.73.225.35";
   burgernas = "100.72.61.23";
   burgernas_nfs = "192.168.178.4";
-  #    fritznas = "192.168.178.1";
+  #fritznas = "192.168.178.90";
   automount_opts = "x-systemd.automount,x-systemd.after=network-online.target,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=10s,x-systemd.mount-timeout=10s";
   reg_opts = "rw,noserverino,uid=1000,gid=100";
   tailscale_opts = "x-systemd.requires=tailscaled.service";
@@ -43,7 +43,7 @@ in {
   fileSystems."/Volumes/data" = {
     device = "${nixnas}:/data";
     fsType = "nfs";
-    options = ["${automount_opts}"];
+    options = ["${automount_opts},${tailscale_opts}"];
   };
   #  fileSystems."/mnt/y" = {
   #    device = "//${fritznas}/fritz.nas/External-USB3-0-01/";

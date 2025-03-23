@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: let
-  nixnas = "thinsandy.fritz.box";
+  nixnas = "thinsandy";
   burgernas = "100.72.61.23";
   burgernas_nfs = "192.168.178.4";
   #    fritznas = "192.168.178.1";

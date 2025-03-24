@@ -46,11 +46,11 @@ in {
     options = ["${automount_opts},${tailscale_opts}"];
   };
 
-  fileSystems."/Volumes/fritz" = {
-    device = "//${fritznas}/fritz.nas";
-    fsType = "cifs";
-    options = ["${automount_opts},${reg_opts},${cred_fritz}"];
-  }; #  fileSystems."/mnt/y" = {
+  #  fileSystems."/Volumes/fritz" = {
+  #    device = "//${fritznas}/fritz.nas";
+  #    fsType = "cifs";
+  #    options = ["${automount_opts},${reg_opts},${cred_fritz}"];
+  #  }; #  fileSystems."/mnt/y" = {
   #    device = "//${fritznas}/fritz.nas/External-USB3-0-01/";
   #    fsType = "cifs";
   #    options =

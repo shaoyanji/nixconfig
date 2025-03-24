@@ -8,7 +8,7 @@
     ./flatpak.nix
     ./minimal-desktop.nix
     ../../modules/nixos/lxc
-    ../../modules/nixos/k3s
+    #    ../../modules/nixos/k3s
   ];
   # Bootloader.
   boot = {

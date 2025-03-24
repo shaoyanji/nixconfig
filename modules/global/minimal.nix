@@ -12,6 +12,7 @@
     ../sops.nix
     ../helix.nix
     ../shell/nushell.nix
+    ../nixvim
   ];
   programs = {
     direnv = {

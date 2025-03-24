@@ -30,7 +30,7 @@ keys:
   - &ancientacehost age1ageqwpdaf0zkkkc3xqf3qag577fm80cf8vqc5glkz6fqjjp7jpss8t590l
   - &ancientace age1pk08qp3exeaw8ky7vs3xtxsuw55g8nrsp8j8pj4xar8ynngv7q9qtywkkm
   - &mtfuji age1cpped4xh57c2zrguv6y2sqy526lnpklmruw7leu50xxuclmux5askrhrry 
-  - &mtfujihost age1tgek4uvpjy2hls5uf80c4sxdshgwhj35fyrcervgefec9rwz05nq59cfew
+  - &mtfujihost age1tgek4uvpjy2hls5uf80c4sxdshgwhj35fyrcervgefec9rwz05nq59cfew 
 
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$

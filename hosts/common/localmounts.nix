@@ -43,7 +43,7 @@ in {
   fileSystems."/Volumes/data" = {
     device = "${nixnas}:/data";
     fsType = "nfs";
-    options = ["${automount_opts},${tailscale_opts}"];
+    options = ["${automount_opts}"];
   };
 
   #  fileSystems."/Volumes/fritz" = {

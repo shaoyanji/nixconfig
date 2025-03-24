@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: let
-  nixnas = "192.168.178.130";
+  nixnas = "192.168.178.17";
   burgernas = "100.72.61.23";
   burgernas_nfs = "192.168.178.4";
   fritznas = "192.168.178.90";

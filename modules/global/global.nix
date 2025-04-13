@@ -61,8 +61,8 @@
     ];
   };
 
-  programs.nix-index.enable = true;
-
+  #  programs.nix-index.enable = true;
+  #  programs.nix-index-database.comma.enable = true;
   #  nixpkgs.config.allowUnsupportedSystem = true;
   nixpkgs.config.allowUnfree = true;
 }

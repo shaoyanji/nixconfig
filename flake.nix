@@ -11,6 +11,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     disko = {
       url = "github:nix-community/disko";
@@ -87,15 +89,14 @@
     utils,
     ...
   } @ inputs: let
-    pkgs = import inputs.nixpkgs {
-      inherit systems;
-      config.allowUnfree = true;
-    };
-    hydenixConfig = inputs.hydenix.lib.mkConfig {
-      userConfig = import ./hosts/common/hydenix.nix;
-      extraInputs = inputs;
-      # Pass user's pkgs to be used alongside hydenix's pkgs (eg. userPkgs.kitty)
-      extraPkgs = pkgs;
+    hydenixConfig = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+      inherit (inputs.hydenix.lib) system;
+      specialArgs = {
+        inherit inputs;
+      };
+      modules = [
+        ./hosts/poseidon/configuration2.nix
+      ];
     };
     systems = [
       "x86_64-linux"
@@ -172,7 +173,7 @@
       };
     };
     nixosConfigurations = {
-      poseidon = hydenixConfig.nixosConfiguration;
+      "poseidon" = hydenixConfig;
 
       # ${hydenixConfig.userConfig.host} = hydenixConfig.nixosConfiguration;
 

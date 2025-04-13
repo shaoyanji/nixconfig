@@ -7,6 +7,7 @@
 }: {
   imports = [
     # Include the results of the hardware scan.
+    #    ./configuration2.nix
     ./hardware-configuration.nix
     ./nvidia.nix
     ../common/steam.nix
@@ -14,6 +15,7 @@
     #../common/minimal-desktop.nix
     ../common/laptop.nix
     inputs.chaotic.nixosModules.default
+    inputs.nix-index-database.nixosModules.nix-index
   ];
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {
@@ -131,7 +133,13 @@
   virtualisation.libvirtd.enable = true;
 
   virtualisation.spiceUSBRedirection.enable = true;
+  #android dev
 
+  programs.adb.enable = true;
+  users.users.devji.extraGroups = ["adbusers" "kvm" "libvirtd"];
+  services.udev.packages = [
+    pkgs.android-udev-rules
+  ];
   #  dconf.settings = {
   #    "org/virt-manager/virt-manager/connections" = {
   #      autoconnect = ["qemu:///system"];
@@ -139,7 +147,7 @@
   #    };
   #  };
 
-  users.users.devji.extraGroups = ["libvirtd"];
+  #  users.users.devji.extraGroups = ["libvirtd"];
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true; # enable copy and paste between host and guest
 
@@ -168,6 +176,4 @@
       }
     ];
   };
-
-  system.stateVersion = "24.11"; # Did you read the comment?
 }

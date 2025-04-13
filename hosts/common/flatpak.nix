@@ -11,7 +11,7 @@
     # "org.mozilla.firefox"
     # "org.mozilla.thunderbird"
     # "io.github.zen_browser.zen"
-    "io.freetubeapp.FreeTube"
+    #    "io.freetubeapp.FreeTube"
   ];
 in {
   services.flatpak.enable = true;

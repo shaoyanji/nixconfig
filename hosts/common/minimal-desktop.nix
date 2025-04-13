@@ -199,7 +199,7 @@ in {
     home = "/home/devji";
     isNormalUser = true;
     description = "matt";
-    extraGroups = ["networkmanager" "wheel" "docker" "incus-admin"];
+    extraGroups = ["networkmanager" "wheel" "docker" "incus-admin" "video"];
     hashedPasswordFile = config.sops.secrets.hashedPassword.path;
     openssh.authorizedKeys.keys = localSubKeys;
     #packages = with pkgs; [

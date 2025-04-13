@@ -28,9 +28,9 @@
   services = {
     displayManager = {
       #      sddm = {
-      #        enable = true;
-      #        wayland.enable = true;
-      #      };
+      #       enable = true;
+      #      wayland.enable = true;
+      #   };
       # Enable automatic login for the user.
       autoLogin = {
         enable = true;

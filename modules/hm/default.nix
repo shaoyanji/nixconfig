@@ -1,4 +1,4 @@
-{...}: {
+{lib, ...}: {
   imports = [
     ../nixoshmsymlinks.nix
     ../global/minimal.nix
@@ -10,15 +10,14 @@
     # pkgs.vscode - hydenix's vscode version
     # pkgs.userPkgs.vscode - your personal nixpkgs version
   ];
-
   # hydenix home-manager options go here
   hydenix.hm = {
     #! Important options
     enable = true;
-
+    /*
     #! Below are defaults
 
-    comma.enable = true; # useful nix tool to run software without installing it first
+    # comma.enable = lib.mkForce false; # useful nix tool to run software without installing it first
     dolphin.enable = true; # file manager
     editors = {
       enable = true; # enable editors module
@@ -61,11 +60,11 @@
       satty.enable = true; # enable satty screenshot annotation tool
       swappy.enable = false; # enable swappy screenshot editor
     };
-    wallpapers.enable = true; # enable wallpapers module
+    #wallpapers.enable = true; # enable wallpapers module
     shell = {
       enable = true; # enable shell module
       zsh.enable = true; # enable zsh shell
-      # configText = ""; # zsh config text
+      #configText = ""; # zsh config text
       bash.enable = false; # enable bash shell
       fish.enable = false; # enable fish shell
       pokego.enable = true; # enable Pokemon ASCII art scripts
@@ -81,7 +80,7 @@
     terminals = {
       enable = true; # enable terminals module
       kitty.enable = true; # enable kitty terminal
-      configText = ""; # kitty config text
+      #configText = ""; # kitty config text
     };
     theme = {
       enable = true; # enable theme module
@@ -94,5 +93,6 @@
     waybar.enable = true; # enable waybar module
     wlogout.enable = true; # enable wlogout module
     xdg.enable = true; # enable xdg module
+    */
   };
 }

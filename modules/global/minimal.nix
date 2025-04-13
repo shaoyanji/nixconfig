@@ -49,7 +49,7 @@
         zoxide
         mailsy
         awscli2
-        cloudflared
+        #cloudflared
         btop
         direnv
         devenv

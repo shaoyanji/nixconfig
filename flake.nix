@@ -229,16 +229,26 @@
           globalModulesNixos
           ++ [./hosts/aceofspades/configuration.nix];
       };
-      ancientace = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {inherit inputs;};
-        modules =
-          globalModulesNixos
-          ++ [
-            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
-            ./hosts/ancientace/configuration.nix
+      ancientace =
+        #nixpkgs.lib.nixosSystem {
+        inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+          inherit (inputs.hydenix.lib) system;
+          specialArgs = {
+            inherit inputs;
+          };
+          modules = [
+            ./hosts/ancientace/configuration2.nix
           ];
-      };
+        };
+      # system = "x86_64-linux";
+      #specialArgs = {inherit inputs;};
+      #modules =
+      #     globalModulesNixos
+      #    ++ [
+      #     inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
+      #    ./hosts/ancientace/configuration.nix
+      # ];
+      #};
       minyx = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         specialArgs = {inherit inputs;};

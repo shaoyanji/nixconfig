@@ -74,7 +74,7 @@ in {
     enable = true; # Enable the Hydenix module
 
     #! EDIT THESE VALUES
-    hostname = "poseidon"; # Change to your preferred hostname
+    hostname = "ancientace"; # Change to your preferred hostname
     timezone = "Europe/Berlin"; # Change to your timezone
     locale = "en_US.UTF-8"; # Change to your preferred locale
 

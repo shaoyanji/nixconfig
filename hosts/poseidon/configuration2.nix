@@ -105,7 +105,7 @@ in {
   #! EDIT THESE VALUES (must match users defined above)
   users.users.devji = {
     isNormalUser = true; # Regular user account
-    initialPassword = "1234"; # Default password (CHANGE THIS after first login with passwd)
+    #    initialPassword = "1234"; # Default password (CHANGE THIS after first login with passwd)
     extraGroups = [
       "wheel" # For sudo access
       "networkmanager" # For network management

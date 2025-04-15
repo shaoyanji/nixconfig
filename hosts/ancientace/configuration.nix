@@ -10,7 +10,13 @@
     ./hardware-configuration.nix
     ../common/base-desktop-environment.nix
     ../common/laptop.nix
+
+    inputs.chaotic.nixosModules.default
   ];
+  home-manager.users.devji.home.sessionVariables.EDITOR = lib.mkForce "nvim";
+  boot = {
+    kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+  };
   boot.loader = {
     systemd-boot.enable = lib.mkForce false;
     efi.canTouchEfiVariables = lib.mkForce false;
@@ -27,13 +33,13 @@
   hardware.graphics.extraPackages = [
     #    pkgs.mesa.opencl
   ];
-  system.stateVersion = "24.11"; # Did you read the comment?
+  #  system.stateVersion = "24.11"; # Did you read the comment?
   services = {
     displayManager = {
-      sddm = {
-        enable = true;
-        wayland.enable = true;
-      };
+      #     sddm = {
+      #      enable = true;
+      #     wayland.enable = true;
+      #  };
       #    xserver.digimend.enable = true;
     };
 

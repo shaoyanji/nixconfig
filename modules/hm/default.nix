@@ -2,6 +2,7 @@
   imports = [
     ../nixoshmsymlinks.nix
     ../global/minimal.nix
+    ../nixvim
     # ./example.nix - add your modules here
   ];
 

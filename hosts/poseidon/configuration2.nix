@@ -16,14 +16,11 @@
 in {
   # Set pkgs for hydenix globally, any file that imports pkgs will use this
   nixpkgs.pkgs = pkgs;
-
   imports = [
     inputs.hydenix.inputs.home-manager.nixosModules.home-manager
-    ./hardware-configuration.nix
     ./configuration.nix
     inputs.hydenix.lib.nixOsModules
     ../../modules/system
-    ./nvidia.nix
 
     # === GPU-specific configurations ===
 

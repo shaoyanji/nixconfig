@@ -2,7 +2,7 @@
   imports = [
     ../nixoshmsymlinks.nix
     ../global/minimal.nix
-    ../nixvim
+    #    ../nixvim
     # ./example.nix - add your modules here
   ];
 
@@ -15,11 +15,10 @@
   hydenix.hm = {
     #! Important options
     enable = true;
-    editors.neovim.enable = false;
     /*
     #! Below are defaults
 
-    # comma.enable = lib.mkForce false; # useful nix tool to run software without installing it first
+    # comma.enable = true; # useful nix tool to run software without installing it first
     dolphin.enable = true; # file manager
     editors = {
       enable = true; # enable editors module

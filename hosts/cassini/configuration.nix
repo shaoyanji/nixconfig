@@ -162,6 +162,7 @@
       #"notion"
       #"slack"
       #"zoom"
+      "freetube"
     ];
     masApps = {
       # Xcode = 497799835;

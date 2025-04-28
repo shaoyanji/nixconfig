@@ -15,7 +15,7 @@
   hydenix.hm = {
     #! Important options
     enable = true;
-    editors.neovim.enable = lib.mkForce false;
+    editors.neovim.enable = false;
     /*
     #! Below are defaults
 

@@ -15,7 +15,6 @@
   hydenix.hm = {
     #! Important options
     enable = true;
-    editors.neovim.enable = false;
     /*
     #! Below are defaults
 

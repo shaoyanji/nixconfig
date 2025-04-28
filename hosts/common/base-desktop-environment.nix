@@ -57,7 +57,7 @@
   environment.systemPackages = with pkgs; [
     kitty
     ghostty
-    inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight-official
+    inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
     qutebrowser
     lan-mouse_git
     nix-top

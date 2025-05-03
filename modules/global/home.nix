@@ -19,6 +19,8 @@
   home = {
     packages = with pkgs;
       [
+        duf
+        libation
         gum
         go-task
         nixd

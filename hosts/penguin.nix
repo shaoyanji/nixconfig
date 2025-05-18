@@ -1,8 +1,4 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: {
+{inputs, ...}: {
   imports = [
     ../modules/global/minimal.nix
     ../modules/shell
@@ -13,10 +9,6 @@
     homeDirectory = "/home/devji";
 
     stateVersion = "24.11";
-    packages = with pkgs; [
-      adb
-      fastboot
-    ];
     file = {
     };
 

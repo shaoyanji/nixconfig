@@ -68,6 +68,7 @@
         socat
         ipcalc
         ffmpeg
+        fastfetch
       ]
       ++ lib.optionals stdenv.isLinux [
         strace
@@ -83,7 +84,6 @@
         wl-clipboard
       ]
       ++ lib.optionals stdenv.hostPlatform.isAarch64 [
-        fastfetch
         yt-dlp
         age
         pass

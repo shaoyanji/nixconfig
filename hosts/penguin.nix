@@ -2,10 +2,11 @@
   imports = [
     ../modules/global/minimal.nix
     ../modules/shell
+    ../modules/nixvim
   ];
   home = {
-    username = "jisifu";
-    homeDirectory = "/home/jisifu";
+    username = "devji";
+    homeDirectory = "/home/devji";
 
     stateVersion = "24.11";
     #packages = with pkgs; [

@@ -151,7 +151,7 @@
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [./modules/global/heim.nix];
       };
-      jisifu = home-manager.lib.homeManagerConfiguration {
+      penguin = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."x86_64-linux";
         modules = [

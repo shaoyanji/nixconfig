@@ -9,8 +9,10 @@
     homeDirectory = "/home/devji";
 
     stateVersion = "24.11";
-    #packages = with pkgs; [
-    #];
+    packages = with pkgs; [
+      adb
+      fastboot
+    ];
     file = {
     };
 

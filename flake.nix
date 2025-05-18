@@ -9,7 +9,7 @@
   ";
 
   inputs = {
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
     nix-index-database.url = "github:nix-community/nix-index-database";
@@ -75,7 +75,7 @@
 
   outputs = {
     self,
-    determinate,
+    # determinate,
     nix-darwin,
     nixpkgs,
     nix-homebrew,

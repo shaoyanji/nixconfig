@@ -162,6 +162,7 @@
         m-cli # useful macOS CLI commands
         #wezterm
         # darwin.xcode_16_1
+        yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
         wl-clipboard

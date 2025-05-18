@@ -52,7 +52,7 @@ in {
     zoxide = {
       enable = true;
       options = [
-        "--cmd cd"
+        # "--cmd cd"
       ];
     };
     fzf.enable = true;

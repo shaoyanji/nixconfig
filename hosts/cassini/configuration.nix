@@ -46,7 +46,7 @@
   fonts.packages = [
     #(pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
   ];
-
+  system.primaryUser = "devji";
   system.defaults = {
     dock.autohide = true;
     finder.FXPreferredViewStyle = "clmv";

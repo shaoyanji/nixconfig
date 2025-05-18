@@ -154,7 +154,7 @@
       "ghostty"
       "orbstack"
       #"obsidian"
-      "zen-browser"
+      "zen"
       #"raycast"
       #"arc"
       #"spotube"

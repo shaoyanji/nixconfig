@@ -20,6 +20,13 @@
         formatter.command = "${pkgs.dprint}/bin/dprint";
         formatter.args = ["fmt" "--stdin" "md"];
       }
+
+      {
+        name = "yaml";
+        auto-format = true;
+        formatter.command = "${pkgs.dprint}/bin/dprint";
+        formatter.args = ["fmt" "--stdin" "yaml"];
+      }
       {
         name = "go";
         auto-format = true;

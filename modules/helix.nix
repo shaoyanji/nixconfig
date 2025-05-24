@@ -1,4 +1,8 @@
 {pkgs, ...}: {
+  home.packages = with pkgs; [
+    marksman
+    dprint
+  ];
   programs.helix = {
     enable = true;
     settings = {
@@ -10,6 +14,11 @@
       };
     };
     languages.language = [
+      {
+        name = "markdown";
+        auto-format = true;
+        formatter.command = "${pkgs.dprint}/bin/dprint";
+      }
       {
         name = "go";
         auto-format = true;

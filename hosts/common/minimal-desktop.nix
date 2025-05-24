@@ -10,7 +10,7 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOD4PopDAxzh1t4nNnDE/xiWLGYzopLRzZ7eBwd4hHza devji@schneeeule"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHfnYbTF2d4ZA4+wKbXFL/UUJTcMqdLDhhAZZDP2KrPD devji@orb-cassini"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILFrpuKNvTGARCr6vacmyHRkjDnfEbdAp9+zWHTRRDD9 devji@thinsandy"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHVyGpjlVwKmhW9+t0iak1WuRov3xPZ/bTU3Y471Pmai wetnose@BurgerNAS"
+    # "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHVyGpjlVwKmhW9+t0iak1WuRov3xPZ/bTU3Y471Pmai wetnose@BurgerNAS"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOOv1lniY72qgt2QE64JB75G84b9qbqLYrSo+RQDUU0T devji@ancientace"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFDl1/MsQfkmnAIvETZnLD+V+s9/o6EiRkzBMDbjhcVL devji@mtfuji"
   ];
@@ -21,7 +21,7 @@ in {
   ];
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
-    binfmt.emulatedSystems = [] ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["aarch64-linux"];
+    # binfmt.emulatedSystems = [] ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["aarch64-linux"];
   };
   sops = {
     defaultSopsFile = ../../modules/secrets/secrets.yaml;

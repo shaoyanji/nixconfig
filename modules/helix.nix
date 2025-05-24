@@ -18,7 +18,7 @@
         name = "markdown";
         auto-format = true;
         formatter.command = "${pkgs.dprint}/bin/dprint";
-        formatter.args = ["fmt","--stdin","md"];
+        formatter.args = ["fmt" "--stdin" "md"];
       }
       {
         name = "go";

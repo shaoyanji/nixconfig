@@ -12,6 +12,8 @@
   };
   home.packages = with pkgs; [
     gcc
+    gfortran
+    # tcc
     go
     #tinygo
     rustc
@@ -20,23 +22,23 @@
     luajit
     python3
     #lua51Packages.moonscript
-    nim
-    #wasmtime
+    # nim
+    wasmtime
     hare
     #haredoc
     #zig
-    dotnet-sdk
+    # dotnet-sdk
     #dotnet-runtime
   ];
 
   home.file = {
   };
   home.sessionVariables = {
-    DOTNET_ROOT = "${pkgs.dotnet-sdk}/share/dotnet";
-    DOTNET_CLI_TELEMETRY_OPTOUT = 1;
-    DOTNET_NOLOGO = 1;
-    DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1;
-    DOTNET_MULTILEVEL_LOOKUP = 0;
+    # DOTNET_ROOT = "${pkgs.dotnet-sdk}/share/dotnet";
+    # DOTNET_CLI_TELEMETRY_OPTOUT = 1;
+    # DOTNET_NOLOGO = 1;
+    # DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1;
+    # DOTNET_MULTILEVEL_LOOKUP = 0;
   };
   home.sessionPath = [
     "$HOME/.dotnet/tools"

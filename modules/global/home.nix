@@ -130,7 +130,7 @@
         # htop
         # gcc
         # coreutils
-        # eza
+        eza
         # fd
         # ripgrep
         # bat

@@ -25,6 +25,7 @@ in {
     secrets = {
       "awscredentials".path = "${config.home.homeDirectory}/.aws/credentials";
       "cfcertpem".path = "${config.home.homeDirectory}/.cloudflared/cert.pem";
+      "cloak.key".path = "${config.home.homeDirectory}/.cloak/key.txt";
       #"${local_ssh_key}".path = "${ssh_key_path}";
       #
     };

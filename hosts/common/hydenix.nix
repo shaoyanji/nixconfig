@@ -1,146 +1,115 @@
-{
-  username = "devji";
-  gitUser = "Shao-yan (Matt) Ji";
-  gitEmail = "100967396+shaoyanji@users.noreply.github.com";
-  host = "poseidon";
-  /*
-  default password is required for sudo support in systems
-  !remember to use passwd to change the password!
-  */
-  timezone = "Europe/Berlin";
-  locale = "en_US.UTF-8";
-
-  # hardware config - sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
-  hardwareConfig = toString ../poseidon/hardware-configuration.nix;
-
-  # list of drivers to install in ./hosts/nixos/drivers.nix
-  drivers = [
-    #"amdgpu"
-    #"intel"
-    "nvidia"
-    "amdcpu"
-    # "intel-old"
-  ];
-
-  /*
-  these will be imported after the default modules and override/merge any conflicting options
-  !its very possible to break hydenix by overriding options
-  eg:
-    # lets say hydenix has a default of:
-    {
-      services.openssh.enable = true;
-      environment.systempackages = [ pkgs.vim ];
-    }
-    # your module
-    {
-      services.openssh.enable = false;  #? this wins by default (last definition)
-      environment.systempackages = [ pkgs.git ];  #? this gets merged with hydenix
-    }
-  */
-  # list of nix modules to import in ./hosts/nixos/default.nix
-  nixModules = [
-    (toString ../poseidon/configuration.nix)
-    (toString ../../modules/global/global.nix)
-
-    # in my-module.nix you can reference this userconfig
-    ({
-      userconfig,
-      pkgs,
-      ...
-    }: {
-      environment.systemPackages = with pkgs; [
-        direnv
-        carapace
-      ];
-    })
-  ];
-  # list of nix modules to import in ./lib/mkconfig.nix
-  homeModules = [
-    (toString ../../modules/global/minimal.nix)
-    (toString ../../modules/nixoshmsymlinks.nix)
-    #(toString ../../modules/nixvim)
-  ];
-
-  hyde = rec {
-    sddmTheme = "Corners"; # or "Candy"
-
-    enable = true;
-
-    # wallbash config, sets extensions as active
-    wallbash = {
-      vscode = true;
-    };
-
-    # active theme, must be in themes list
-    activeTheme = "Catppuccin Mocha";
-
-    # list of themes to choose from
-    themes = [
-      # -- Default themes
-      # "Catppuccin Latte"
-      "Catppuccin Mocha"
-      # "Decay Green"
-      # "Edge Runner"
-      "Frosted Glass"
-      # "Graphite Mono"
-      # "Gruvbox Retro"
-      # "Material Sakura"
-      # "Nordic Blue"
-      "Rose Pine"
-      # "Synth Wave"
-      "Tokyo Night"
-
-      # -- Themes from hyde-gallery
-      # "Abyssal-Wave"
-      # "AbyssGreen"
-      # "Bad Blood"
-      # "Cat Latte"
-      # "Crimson Blade"
-      # "Dracula"
-      # "Edge Runner"
-      # "Green Lush"
-      # "Greenify"
-      # "Hack the Box"
-      # "Ice Age"
-      "Mac OS"
-      "Monokai"
-      "Monterey Frost"
-      # "One Dark"
-      # "Oxo Carbon"
-      # "Paranoid Sweet"
-      # "Pixel Dream"
-      # "Rain Dark"
-      # "Red Stone"
-      "Scarlet Night"
-      # "Sci-fi"
-      # "Solarized Dark"
-      # "Vanta Black"
-      "Windows 11"
+{inputs, ...}: let
+  # Package declaration
+  # ---------------------
+  pkgs = import inputs.hydenix.inputs.hydenix-nixpkgs {
+    inherit (inputs.hydenix.lib) system;
+    config.allowUnfree = true;
+    overlays = [
+      inputs.hydenix.lib.overlays
+      (final: prev: {
+        userPkgs = import inputs.nixpkgs {
+          config.allowUnfree = true;
+        };
+      })
     ];
+  };
+in {
+  # Set pkgs for hydenix globally, any file that imports pkgs will use this
+  nixpkgs.pkgs = pkgs;
+  imports = [
+    inputs.hydenix.inputs.home-manager.nixosModules.home-manager
+    # ./configuration.nix
+    inputs.hydenix.lib.nixOsModules
+    ../../modules/system
+    # === GPU-specific configurations ===
 
-    # exactly the same as hyde.conf
-    conf = {
-      hydeTheme = activeTheme;
-      wallFramerate = 144;
-      wallTransDuration = 0.4;
-      wallAddCustomPath = "";
-      enableWallDcol = 2;
-      wallbashCustomCurve = "";
-      skip_wallbash = [];
-      themeSelect = 2;
-      rofiStyle = 11;
-      rofiScale = 9;
-      wlogoutStyle = 1;
+    /*
+    For drivers, we are leveraging nixos-hardware
+    Most common drivers are below, but you can see more options here: https://github.com/NixOS/nixos-hardware
+    */
+
+    #! EDIT THIS SECTION
+    # For NVIDIA setups
+    # inputs.hydenix.inputs.nixos-hardware.nixosModules.common-gpu-nvidia
+
+    # For AMD setups
+    # inputs.hydenix.inputs.nixos-hardware.nixosModules.common-gpu-amd
+
+    # === CPU-specific configurations ===
+    # For AMD CPUs
+    # inputs.hydenix.inputs.nixos-hardware.nixosModules.common-cpu-amd
+
+    # For Intel CPUs
+    #inputs.hydenix.inputs.nixos-hardware.nixosModules.common-cpu-intel
+
+    # === Other common modules ===
+    inputs.hydenix.inputs.nixos-hardware.nixosModules.common-pc
+    inputs.hydenix.inputs.nixos-hardware.nixosModules.common-pc-ssd
+  ];
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = {
+      inherit inputs;
+    };
+
+    #! EDIT THIS USER (must match users defined below)
+    users."devji" = {...}: {
+      imports = [
+        inputs.hydenix.lib.homeModules
+        # Nix-index-database - for comma and command-not-found
+        inputs.nix-index-database.hmModules.nix-index
+        ../../modules/hm
+      ];
     };
   };
 
-  vm = {
-    # 4 gb minimum
-    memorySize = 4096;
-    # 2 cores minimum
-    cores = 2;
-    # 30gb minimum for one theme - 50gb for multiple themes - more for development and testing
-    diskSize = 20000;
+  # IMPORTANT: Customize the following values to match your preferences
+  hydenix = {
+    enable = true; # Enable the Hydenix module
+
+    #! EDIT THESE VALUES
+    # hostname = "poseidon"; # Change to your preferred hostname
+    timezone = "Europe/Berlin"; # Change to your timezone
+    locale = "en_US.UTF-8"; # Change to your preferred locale
+
+    /*
+    Optionally edit the below values, or leave to use hydenix defaults
+    visit ./modules/hm/default.nix for more options
+
+    audio.enable = true; # enable audio module
+    boot = {
+      enable = true; # enable boot module
+      useSystemdBoot = true; # disable for GRUB
+      grubTheme = pkgs.hydenix.grub-retroboot; # or pkgs.hydenix.grub-pochita
+      grubExtraConfig = ""; # additional GRUB configuration
+      kernelPackages = pkgs.linuxPackages_zen; # default zen kernel
+    };
+    gaming.enable = true; # enable gaming module
+    hardware.enable = true; # enable hardware module
+    network.enable = true; # enable network module
+    nix.enable = true; # enable nix module
+    sddm = {
+      enable = true; # enable sddm module
+      theme = pkgs.hydenix.sddm-candy; # or pkgs.hydenix.sddm-corners
+    };
+    system.enable = true; # enable system module
+    */
   };
-  defaultPassword = "hydenix requires this but sops-nix collision makes errorz";
+
+  #! EDIT THESE VALUES (must match users defined above)
+  users.users.devji = {
+    isNormalUser = true; # Regular user account
+    #    initialPassword = "1234"; # Default password (CHANGE THIS after first login with passwd)
+    extraGroups = [
+      "wheel" # For sudo access
+      "networkmanager" # For network management
+      "video" # For display/graphics access
+      # Add other groups as needed
+    ];
+    shell = pkgs.zsh; # Change if you prefer a different shell
+  };
+
+  system.stateVersion = "25.05";
 }

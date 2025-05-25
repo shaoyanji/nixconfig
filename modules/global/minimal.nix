@@ -47,6 +47,8 @@
         fzf
         yq-go
         zoxide
+        cloak
+        age
         mailsy
         awscli2
         cloudflared
@@ -85,7 +87,6 @@
       ]
       ++ lib.optionals stdenv.hostPlatform.isAarch64 [
         yt-dlp
-        age
         pass
         cmus
         bitwarden-cli

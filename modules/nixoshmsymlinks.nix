@@ -30,7 +30,8 @@ in {
     # ".zen".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/zen";
     #".mozilla/firefox/profiles.ini".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/firefox";
     ".cloak/accounts.age".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/accounts.age";
-    ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/key.txt";
+    #key for cloack migrated to sops
+    # ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/key.txt";
     "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/hello";
   };
   xdg.configFile = {
@@ -60,6 +61,6 @@ in {
   };
   home.sessionPath =
     ["${nixNAS}/bin-script"]
-#    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${nixNAS}/bin-aarch64"]
+    #    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${nixNAS}/bin-aarch64"]
     ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${nixNAS}/bin-x86"];
 }

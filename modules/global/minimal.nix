@@ -32,6 +32,7 @@
       [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
         nix-output-monitor
+        qrencode
         thefuck
         jq
         htmlq

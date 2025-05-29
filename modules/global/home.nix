@@ -19,6 +19,7 @@
   home = {
     packages = with pkgs;
       [
+        jp2a
         viu
         qrencode
         duf

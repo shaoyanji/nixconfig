@@ -165,6 +165,7 @@
       "freetube"
       "steam"
       "unnaturalscrollwheels"
+      "kitty"
     ];
     masApps = {
       # Xcode = 497799835;

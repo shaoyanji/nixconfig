@@ -19,6 +19,7 @@
   home = {
     packages = with pkgs;
       [
+        qrencode
         duf
         libation
         gum
@@ -123,7 +124,6 @@
         ## applications
         # spotube # too many updates (better managed through homebrew)
         # niv
-        # m-cli
         # browsh
         # neovim
         # python3
@@ -155,6 +155,7 @@
         # '')
       ]
       ++ lib.optionals stdenv.isDarwin [
+        # python3
         pop
         glow
         charm-freeze # obsidian

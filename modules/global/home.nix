@@ -19,6 +19,7 @@
   home = {
     packages = with pkgs;
       [
+        viu
         qrencode
         duf
         libation

@@ -13,12 +13,9 @@
     # "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHVyGpjlVwKmhW9+t0iak1WuRov3xPZ/bTU3Y471Pmai wetnose@BurgerNAS"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOOv1lniY72qgt2QE64JB75G84b9qbqLYrSo+RQDUU0T devji@ancientace"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFDl1/MsQfkmnAIvETZnLD+V+s9/o6EiRkzBMDbjhcVL devji@mtfuji"
-<<<<<<< HEAD
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFIzm1z4VPcKzuzSTOlVtE9C+kopHRK1mtncGsb5k6YH Shortcuts on iPhone-Bon-Ji0v1"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICW0tS7KTBySuE49gSHuqAK1Je+ODY+YGc81eTIvonFh Shortcuts on cassini"
-=======
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICi5cT/V0vDAwTQKtYAVRZR6BSEvNAfZX+M/3wDrd0nb dietpi@dietrichpimpernel"
->>>>>>> f846e65 (tidy: config update)
   ];
 in {
   imports = [

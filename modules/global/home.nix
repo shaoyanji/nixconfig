@@ -3,17 +3,18 @@
   lib,
   ...
 }: {
-  home.stateVersion = "24.11";
+  # home.stateVersion = "25.05";
   imports = [
-    ../lf
-    ../env.nix
+    ../global/minimal.nix
+    # ../lf
+    # ../env.nix
     ../shell
-    ../sops.nix
+    # ../sops.nix
     ../nixvim
     ../wezterm
     ../kitty
     # ../dev.nix
-    ../helix.nix
+    # ../helix.nix
     # ../scripts
   ];
   home = {
@@ -22,9 +23,8 @@
         jp2a
         viu
         qrencode
-        duf
+        # duf
         libation
-        gum
         go-task
         nixd
         devenv

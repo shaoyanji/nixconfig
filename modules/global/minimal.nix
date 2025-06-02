@@ -31,8 +31,10 @@
     packages = with pkgs;
       [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
+        graphviz
+        graph-easy
         nix-output-monitor
-        qrencode
+        # qrencode
         thefuck
         jq
         htmlq

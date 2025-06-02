@@ -28,9 +28,11 @@
     fzf.enable = true;
   };
   home = {
+    stateVersion = "25.05";
     packages = with pkgs;
       [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
+        duf
         graphviz
         graph-easy
         nix-output-monitor

@@ -10,7 +10,6 @@
     useUserPackages = true;
     backupFileExtension = "hm-backup"; #for rebuild
     users.devji = {
-      home.stateVersion = "24.11";
       imports = [
         ./minimal.nix
         ../nixoshmsymlinks.nix

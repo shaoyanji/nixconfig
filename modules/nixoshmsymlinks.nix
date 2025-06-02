@@ -5,10 +5,10 @@
   ...
 }: let
   nixNAS = "/Volumes/data";
-  peachNAS = "/Volumes/peachcable";
-  routerNAS = "/mnt/y";
-  sharedNAS = "/Volumes/Shared Library/core";
-  wolfNAS = "/Volumes/usbshare2";
+  # peachNAS = "/Volumes/peachcable";
+  # routerNAS = "/mnt/y";
+  # sharedNAS = "/Volumes/Shared Library/core";
+  # wolfNAS = "/Volumes/usbshare2";
 in {
   home.file = {
     #"nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";

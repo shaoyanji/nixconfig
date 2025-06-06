@@ -20,7 +20,6 @@
   home = {
     packages = with pkgs;
       [
-        jp2a
         viu
         qrencode
         # duf
@@ -168,6 +167,7 @@
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
+        jp2a
         wl-clipboard
         iotop # io monitoring
         ##   system call monitoring

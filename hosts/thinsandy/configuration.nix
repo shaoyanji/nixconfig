@@ -49,5 +49,5 @@
   #  networking.firewall.allowedUDPPorts = [
   #    8472 # k3s, flannel: required if using multi-node for inter-node networking
   #  ];
-  system.stateVersion = "24.11"; # Did you read the comment?
+  system.stateVersion = "25.05"; # Did you read the comment?
 }

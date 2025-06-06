@@ -3,18 +3,18 @@
   lib,
   ...
 }: {
-  home.stateVersion = "25.05";
+  # home.stateVersion = "25.05";
   imports = [
-    #../global/minimal.nix
-    ../lf
-    ../env.nix
+    ../global/minimal.nix
+    # ../lf
+    # ../env.nix
     ../shell
-    ../sops.nix
+    # ../sops.nix
     ../nixvim
     ../wezterm
     ../kitty
     # ../dev.nix
-    ../helix.nix
+    # ../helix.nix
     # ../scripts
   ];
   home = {
@@ -193,12 +193,12 @@
       # '';
     };
 
-    sessionVariables = {
-      #    EDITOR = "nvim";
-      GUM_CHOOSE_SELECTED_FOREGROUND = 50;
-      GUM_CHOOSE_CURSOR_FOREGROUND = 50;
-      GUM_CHOOSE_HEADER_FOREGROUND = 30;
-    };
+    # sessionVariables = {
+    #   #    EDITOR = "nvim";
+    #   GUM_CHOOSE_SELECTED_FOREGROUND = 50;
+    #   GUM_CHOOSE_CURSOR_FOREGROUND = 50;
+    #   GUM_CHOOSE_HEADER_FOREGROUND = 30;
+    # };
   };
 
   nixpkgs.config.allowUnfree = true;

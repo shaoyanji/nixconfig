@@ -58,7 +58,7 @@ in {
     fzf.enable = true;
   };
   home.packages = with pkgs; [
-    thefuck
+    # thefuck
     jq
     htmlq
     ripgrep

@@ -2,6 +2,7 @@
   home.packages = with pkgs; [
     marksman
     dprint
+    gopls
   ];
   programs.helix = {
     enable = true;

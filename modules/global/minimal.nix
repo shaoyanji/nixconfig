@@ -37,7 +37,7 @@
         graph-easy
         nix-output-monitor
         # qrencode
-        thefuck
+        # thefuck
         jq
         htmlq
         ripgrep

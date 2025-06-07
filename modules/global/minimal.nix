@@ -32,8 +32,11 @@
     packages = with pkgs;
       [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
-        mupdf
-        mpv
+        # mupdf
+        # mpv
+        nixd
+        viu
+        qrencode
         wl-clipboard
         duf
         graphviz
@@ -76,9 +79,60 @@
         ldns
         aria2
         socat
+        nmap
+        ipcalc
         ipcalc
         ffmpeg
         fastfetch
+        iftop
+
+        file
+        which
+        tree
+        gnused
+        gnutar
+        gawk
+        zstd
+
+        diff-so-fancy
+        entr
+        exiftool
+        fdupes
+        most
+        procs
+        rsync
+        sd
+        tre
+        bandwhich
+        glances
+        gping
+        speedtest-cli
+        buku
+        ddgr
+        khal
+        mutt
+        newsboat
+        rclone
+        tuir
+        httpie
+        lazygit
+        asciinema
+        navi
+        epr
+        lynx
+        translate-shell
+        mc
+      ]
+      ++ lib.optionals stdenv.isDarwin [
+        # python3
+        pop
+        glow
+        charm-freeze # obsidian
+        cocoapods
+        m-cli # useful macOS CLI commands
+        #wezterm
+        # darwin.xcode_16_1
+        yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
         strace

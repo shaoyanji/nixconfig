@@ -17,8 +17,42 @@
       ];
       home.username = "devji";
       home.homeDirectory = "/home/devji";
-      home.packages = with pkgs; [
-      ];
+      home.packages = with pkgs;
+        [
+        ]
+        ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+        ]
+        ++ lib.optionals stdenv.hostPlatform.isAarch64 [
+          # utilities for arm64 raspi
+          yt-dlp
+          pass
+          cmus
+          bitwarden-cli
+          glow
+          pop
+          charm-freeze
+          # viu
+          wkhtmltopdf
+          ghostscript
+          #        texlive.combined.scheme-full
+          pandoc
+          mods
+          aichat
+          tgpt
+          jekyll
+          bundler
+          tldr
+          scc
+
+          hare
+          haredoc
+          go
+          cargo
+          tinygo
+          wasmtime
+          luajit
+          alsa-utils
+        ];
       home.file = {
       };
       xdg.configFile = {

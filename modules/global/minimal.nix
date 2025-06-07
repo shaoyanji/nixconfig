@@ -34,11 +34,15 @@
         #        (pkgs.uutils-coreutils.override {prefix = "";})
         # mupdf
         # mpv
+        pop
+        glow
+        charm-freeze # obsidian
         nixd
         viu
         qrencode
         wl-clipboard
         duf
+        slides
         graphviz
         graph-easy
         nix-output-monitor
@@ -125,9 +129,6 @@
       ]
       ++ lib.optionals stdenv.isDarwin [
         # python3
-        pop
-        glow
-        charm-freeze # obsidian
         cocoapods
         m-cli # useful macOS CLI commands
         #wezterm

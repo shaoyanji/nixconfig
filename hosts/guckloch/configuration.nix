@@ -1,26 +1,29 @@
-{ nixos-wsl, home-manager, config, lib, pkgs, ... }:
-
 {
+  nixos-wsl,
+  home-manager,
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   imports = [
   ];
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
   wsl.enable = true;
   wsl.defaultUser = "devji";
   wsl.docker-desktop.enable = true;
   wsl.useWindowsDriver = true;
   virtualisation.docker.enable = true;
-  users.users.devji.extraGroups = [ "docker" ];
+  users.users.devji.extraGroups = ["docker"];
 
   environment.systemPackages = with pkgs; [
-      devenv
+    devenv
   ];
 
   programs.nix-ld = {
     enable = true;
     package = pkgs.nix-ld-rs;
   };
-  
-  system.stateVersion = "24.05";
 
+  system.stateVersion = "25.05";
 }
-

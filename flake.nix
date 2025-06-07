@@ -26,7 +26,7 @@
     };
     nix-homebrew = {
       url = "github:zhaofengli-wip/nix-homebrew";
-      inputs.nixpkgs.follows = "nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
@@ -80,31 +80,31 @@
     nixpkgs,
     nix-homebrew,
     nixos-wsl,
-    nixos-hardware,
-    raspberry-pi-nix,
+    # nixos-hardware,
+    # raspberry-pi-nix,
     home-manager,
     impermanence,
     disko,
     chaotic,
     sops-nix,
     nur,
-    utils,
+    # utils,
     ...
   } @ inputs: let
-    hydenixConfig = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-      inherit (inputs.hydenix.lib) system;
-      specialArgs = {
-        inherit inputs;
-      };
-      modules = [
-        ./hosts/poseidon/configuration2.nix
-      ];
-    };
-    systems = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "aarch64-darwin"
-    ];
+    # hydenixConfig = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+    #   inherit (inputs.hydenix.lib) system;
+    #   specialArgs = {
+    #     inherit inputs;
+    #   };
+    #   modules = [
+    #     ./hosts/poseidon/configuration2.nix
+    #   ];
+    # };
+    # systems = [
+    #   "x86_64-linux"
+    #   "aarch64-linux"
+    #   "aarch64-darwin"
+    # ];
     globalModules = [
       {
         system.configurationRevision = self.rev or self.dirtyRev or null;

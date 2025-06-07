@@ -24,9 +24,6 @@
         # usbutils
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
-        mupdf
-        mpv
-        wl-clipboard
       ]
       ++ lib.optionals stdenv.hostPlatform.isAarch64 [
         yt-dlp
@@ -101,4 +98,6 @@
         alsa-utils
       ];
   };
+
+  nixpkgs.config.allowUnfree = true;
 }

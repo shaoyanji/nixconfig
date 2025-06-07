@@ -32,6 +32,9 @@
     packages = with pkgs;
       [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
+        mupdf
+        mpv
+        wl-clipboard
         duf
         graphviz
         graph-easy

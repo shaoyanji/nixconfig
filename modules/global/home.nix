@@ -20,25 +20,25 @@
   home = {
     packages = with pkgs;
       [
-        viu
-        qrencode
+        # viu
+        # qrencode
         # duf
         libation
-        go-task
-        nixd
-        devenv
+        # go-task
+        # nixd
+        # devenv
         #cmus
         #yt-dlp
         mupdf
         mpv
-        sqlite
+        # sqlite
         ## nix formatting
         #nixfmt-rfc-style
         #alejandra
         #nixpkgs-fmt
         ## utilities
         # htop
-        mailsy
+        # mailsy
         # pop
         # glow
         # charm-freeze
@@ -48,43 +48,43 @@
         # yq-go
         # just
         # mc
-        hyperfine
+        # hyperfine
         ## archives
-        zip
+        # zip
         # xz
-        unzip
-        p7zip
+        # unzip
+        # p7zip
 
         # networking tools
-        mtr # A network diagnostic tool
-        iperf3
-        dnsutils # `dig` + `nslookup`
-        ldns # replacement of `dig`, it provide the command `drill`
-        aria2 # A lightweight multi-protocol & multi-source command-line download utility
-        socat # replacement of openbsd-netcat
-        nmap # A utility for network discovery and security auditing
-        ipcalc # it is a calculator for the IPv4/v6 addresses
+        # mtr # A network diagnostic tool
+        # iperf3
+        # dnsutils # `dig` + `nslookup`
+        # ldns # replacement of `dig`, it provide the command `drill`
+        # aria2 # A lightweight multi-protocol & multi-source command-line download utility
+        # socat # replacement of openbsd-netcat
+        # nmap # A utility for network discovery and security auditing
+        # ipcalc # it is a calculator for the IPv4/v6 addresses
 
         # misc
-        file
-        which
-        tree
-        gnused
-        gnutar
-        gawk
-        zstd
+        # file
+        # which
+        # tree
+        # gnused
+        # gnutar
+        # gawk
+        # zstd
         # gnupg
 
         ## nix related
         ## it provides the command `nom` works just like `nix`
         ## with more details log output
-        nix-output-monitor
+        # nix-output-monitor
 
         ## productivity
         # hugo # static site generator
 
-        btop # replacement of htop/nmon
-        iftop # network monitoring
+        # btop # replacement of htop/nmon
+        # iftop # network monitoring
 
         ## base tools
         # alacritty
@@ -131,7 +131,7 @@
         # htop
         # gcc
         # coreutils
-        eza
+        # eza
         # fd
         # ripgrep
         # bat
@@ -144,6 +144,48 @@
         # haskellPackages.postgrest
         # zed-editor
 
+        # diff-so-fancy
+        # entr
+        # exiftool
+        # fdupes
+        # most
+        # procs
+        # # rip
+        # rsync
+        # sd
+        # tre
+        # bandwhich
+        # glances
+        # gping
+        # #dua-cli
+        # speedtest-cli
+        # #dog
+        # buku
+        # ddgr
+        # khal
+        # mutt
+        # newsboat
+        # rclone
+        # #taskwarrior3
+        # tuir
+        # httpie
+        # lazygit
+        # #ngrok
+        # asciinema
+        # navi
+        # #transfer
+        # #surge #x86
+        # epr
+        # #meetup-cli
+        # lynx
+        # #obs
+        # #hget
+        # translate-shell
+        # mc
+        # #gitmoji-cli
+        # #gitmoji-changelog
+        # #sparkly-cli
+        # #lowcharts
         # # Adds the 'hello' command to your environment. It prints a friendly
         # # "Hello, world!" when run.
         # pkgs.hello
@@ -155,31 +197,20 @@
         #   echo "Hello, ${config.home.username}!"
         # '')
       ]
-      ++ lib.optionals stdenv.isDarwin [
-        # python3
-        pop
-        glow
-        charm-freeze # obsidian
-        cocoapods
-        m-cli # useful macOS CLI commands
-        #wezterm
-        # darwin.xcode_16_1
-        yt-dlp
-      ]
       ++ lib.optionals stdenv.isLinux [
         jp2a
         wl-clipboard
-        iotop # io monitoring
-        ##   system call monitoring
-        strace # system call monitoring
-        ltrace # library call monitoring
-        lsof # list open files
-        ##   system tools
-        sysstat
         lm_sensors # for `sensors` command
         ethtool
-        pciutils # lspci
-        usbutils # lsusb
+        iotop # io monitoring
+        ##   system call monitoring
+        # strace # system call monitoring
+        # ltrace # library call monitoring
+        # lsof # list open files
+        # ##   system tools
+        # sysstat
+        # pciutils # lspci
+        # usbutils # lsusb
       ];
     file = {
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in

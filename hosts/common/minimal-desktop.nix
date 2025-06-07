@@ -242,8 +242,8 @@ in {
           # "aarch64-linux"
         ];
 
-        maxJobs = 4;
-        speedFactor = 2;
+        maxJobs = 1;
+        speedFactor = 1;
         supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
         mandatoryFeatures = [];
       }

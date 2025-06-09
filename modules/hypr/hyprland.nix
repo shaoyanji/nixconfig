@@ -177,7 +177,7 @@
       source = ~/.config/hypr/themes/theme.conf
       source = ~/.config/hypr/monitors.conf
       source = ~/.config/hypr/userprefs.conf
-      set ecosystem:no_update_news
+      no_update_news = false
     '';
   };
 }

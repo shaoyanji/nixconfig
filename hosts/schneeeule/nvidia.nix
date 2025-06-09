@@ -8,7 +8,7 @@
     ../common/nvidia.nix
   ];
 
-  extraPackages = with pkgs; [nvidia-vaapi-driver];
+  # extraPackages = with pkgs; [nvidia-vaapi-driver];
   services.xserver.videoDrivers = ["intel"];
   nixpkgs.config = {
     allowUnfree = true;

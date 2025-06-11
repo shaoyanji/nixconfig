@@ -50,6 +50,7 @@
         # thefuck
         jq
         htmlq
+        tomlq
         ripgrep
         fd
         zsh-forgit
@@ -129,6 +130,7 @@
       ]
       ++ lib.optionals stdenv.isDarwin [
         # python3
+        wget
         cocoapods
         m-cli # useful macOS CLI commands
         #wezterm

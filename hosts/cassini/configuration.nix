@@ -65,7 +65,7 @@
       "box-drive"
       "obs"
       "libreoffice"
-      "microsoft-office"
+      "microsoft-excel"
     ];
     masApps = {
       # Xcode = 497799835;

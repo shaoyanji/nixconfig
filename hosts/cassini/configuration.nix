@@ -166,6 +166,7 @@
       "steam"
       "unnaturalscrollwheels"
       "kitty"
+      "container"
     ];
     masApps = {
       # Xcode = 497799835;

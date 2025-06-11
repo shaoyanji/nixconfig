@@ -66,6 +66,7 @@
       "obs"
       "libreoffice"
       "microsoft-excel"
+      "microsoft-teams"
     ];
     masApps = {
       # Xcode = 497799835;

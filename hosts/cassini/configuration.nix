@@ -41,30 +41,30 @@
     casks = [
       "ghostty"
       "orbstack"
-      #"obsidian"
+      "obsidian"
       "zen"
-      #"raycast"
+      "raycast"
       #"arc"
-      #"spotube"
       "keybase"
-      #"notion"
-      #"slack"
-      #"zoom"
+      "notion"
+      "slack"
+      "zoom"
       "freetube"
       "steam"
       "unnaturalscrollwheels"
       "kitty"
       "container"
-      # "logitech-g-hub"
-      # "logitech-camera-settings"
-      # "wezterm@nightly"
-      # "wine-stable"
-      # "zed"
-      # "google-drive"
-      "insync"
+      "logitech-g-hub"
+      "logitech-camera-settings"
+      "wezterm@nightly"
+      "wine-stable"
+      "zed"
+      "google-drive"
+      "dropbox"
+      "onedrive"
+      "box-drive"
       "obs"
       "libreoffice"
-      "mechvibes"
     ];
     masApps = {
       # Xcode = 497799835;
@@ -123,7 +123,10 @@
       NSAutomaticSpellingCorrectionEnabled = false;
       NSNavPanelExpandedStateForSaveMode = true;
       NSNavPanelExpandedStateForSaveMode2 = true;
+      NSWindowResizeTime = 0.001;
     };
+    CustomSystemPreferences."com.apple.Accessibility".ReduceMotionEnabled = 1;
+    universalaccess.reduceMotion = true;
     CustomUserPreferences = {
       NSGlobalDomain.WebKitDeveloperExtras = true;
       AppleLanguages = lib.mkForce (lib.mkDefault ["en-US"]);

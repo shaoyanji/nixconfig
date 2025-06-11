@@ -24,6 +24,57 @@
   # Create /etc/bashrc that loads the nix-darwin environment.
   programs.zsh.enable = true;
 
+  homebrew = {
+    enable = true;
+    taps = [
+      #"gigalixir/brew"
+      #"krtirtho/apps"
+      #"homebrew/cask-fonts"
+      #"dart-lang/dart"
+      #"homebrew/bundle"
+      #"homebrew/services"
+    ];
+    brews = [
+      # "mas"
+      # "gigalixir"
+    ];
+    casks = [
+      "ghostty"
+      "orbstack"
+      #"obsidian"
+      "zen"
+      #"raycast"
+      #"arc"
+      #"spotube"
+      "keybase"
+      #"notion"
+      #"slack"
+      #"zoom"
+      "freetube"
+      "steam"
+      "unnaturalscrollwheels"
+      "kitty"
+      "container"
+      # "logitech-g-hub"
+      # "logitech-camera-settings"
+      # "wezterm@nightly"
+      # "wine-stable"
+      # "zed"
+      # "google-drive"
+      "insync"
+      "obs"
+      "libreoffice"
+      "mechvibes"
+    ];
+    masApps = {
+      # Xcode = 497799835;
+      # "ISH" = 1436902243;
+      # "Steamlink" = 1246969117;
+    };
+    onActivation.cleanup = "zap";
+    onActivation.autoUpdate = true;
+    onActivation.upgrade = true;
+  };
   # Auto upgrade nix package and the daemon service.
   # services.nix-daemon.enable = true;
   # ^ Deprecation Notice Feb 20, 2025
@@ -136,47 +187,6 @@
   security.pam.services.sudo_local.touchIdAuth = true;
   #  security.pam.enableSudoTouchIdAuth = true;
 
-  homebrew = {
-    enable = true;
-    taps = [
-      #"gigalixir/brew"
-      #"krtirtho/apps"
-      #"homebrew/cask-fonts"
-      #"dart-lang/dart"
-      #"homebrew/bundle"
-      #"homebrew/services"
-    ];
-    brews = [
-      # "mas"
-      # "gigalixir"
-    ];
-    casks = [
-      "ghostty"
-      "orbstack"
-      #"obsidian"
-      "zen"
-      #"raycast"
-      #"arc"
-      #"spotube"
-      #"keybase"
-      #"notion"
-      #"slack"
-      #"zoom"
-      "freetube"
-      "steam"
-      "unnaturalscrollwheels"
-      "kitty"
-      "container"
-    ];
-    masApps = {
-      # Xcode = 497799835;
-      # "ISH" = 1436902243;
-      # "Steamlink" = 1246969117;
-    };
-    onActivation.cleanup = "zap";
-    onActivation.autoUpdate = true;
-    onActivation.upgrade = true;
-  };
   system.activationScripts.applications.text = let
     env = pkgs.buildEnv {
       name = "system-applications";

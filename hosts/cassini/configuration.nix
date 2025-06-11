@@ -57,7 +57,7 @@
       "logitech-g-hub"
       "logitech-camera-settings"
       "wezterm@nightly"
-      "wine-stable"
+      # "wine-stable"
       "zed"
       "google-drive"
       "dropbox"
@@ -65,6 +65,7 @@
       "box-drive"
       "obs"
       "libreoffice"
+      "microsoft-office"
     ];
     masApps = {
       # Xcode = 497799835;

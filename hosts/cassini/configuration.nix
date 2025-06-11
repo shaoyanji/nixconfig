@@ -68,7 +68,7 @@
       "microsoft-excel"
       "microsoft-teams"
       "rustdesk"
-      "sabaki"
+      # "sabaki"
       "warp"
     ];
     masApps = {

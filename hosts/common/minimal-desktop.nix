@@ -15,7 +15,7 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFDl1/MsQfkmnAIvETZnLD+V+s9/o6EiRkzBMDbjhcVL devji@mtfuji"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFIzm1z4VPcKzuzSTOlVtE9C+kopHRK1mtncGsb5k6YH Shortcuts on iPhone-Bon-Ji0v1"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICW0tS7KTBySuE49gSHuqAK1Je+ODY+YGc81eTIvonFh Shortcuts on cassini"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICi5cT/V0vDAwTQKtYAVRZR6BSEvNAfZX+M/3wDrd0nb dietpi@dietrichpimpernel"
+    # "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICi5cT/V0vDAwTQKtYAVRZR6BSEvNAfZX+M/3wDrd0nb dietpi@dietrichpimpernel"
     "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJB2LmOgmY+pLU/QGf0KZUoujlklRin7XJoPN0DFBSC4e6ivsH/Uaqa3pfmsOx8vUHef2492cnWUt5BFn7cJPrk="
   ];
 in {
@@ -59,8 +59,6 @@ in {
       # If you want to use JACK applications, uncomment this
       #jack.enable = true;
     };
-    #Touchpad support
-    libinput.enable = true;
     openssh = {
       enable = true;
       settings = {
@@ -219,21 +217,21 @@ in {
       keys = localSubKeys;
     };
     buildMachines = [
-      # {
-      #   hostName = "poseidon";
-      #   protocol = "ssh-ng";
-      #   # if the builder supports building for multiple architectures,
-      #   # replace the previous line by, e.g.
-      #   systems = [
-      #     "x86_64-linux"
-      #     # "aarch64-linux"
-      #   ];
+      {
+        hostName = "poseidon";
+        protocol = "ssh-ng";
+        # if the builder supports building for multiple architectures,
+        # replace the previous line by, e.g.
+        systems = [
+          "x86_64-linux"
+          # "aarch64-linux"
+        ];
 
-      #   maxJobs = 12;
-      #   speedFactor = 10;
-      #   supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
-      #   mandatoryFeatures = [];
-      # }
+        maxJobs = 12;
+        speedFactor = 10;
+        supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
+        mandatoryFeatures = [];
+      }
 
       {
         hostName = "thinsandy";
@@ -251,7 +249,7 @@ in {
         mandatoryFeatures = [];
       }
     ];
-    # Switch for local development
+    # Switch for local builds
     distributedBuilds = true;
     extraOptions = ''
       builders-use-substitutes = true

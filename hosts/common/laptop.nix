@@ -18,15 +18,20 @@
   #      STOP_CHARGE_THRESH_BAT0 = 80; # 80 and above it stops charging
   #    };
   #  };
-  services.auto-cpufreq.enable = true;
-  services.auto-cpufreq.settings = {
-    battery = {
-      governor = "powersave";
-      turbo = "never";
-    };
-    charger = {
-      governor = "performance";
-      turbo = "auto";
+  services = {
+    libinput.enable = true; #touchpad support
+    auto-cpufreq = {
+      enable = true;
+      settings = {
+        battery = {
+          governor = "powersave";
+          turbo = "never";
+        };
+        charger = {
+          governor = "performance";
+          turbo = "auto";
+        };
+      };
     };
   };
 

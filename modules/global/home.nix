@@ -199,7 +199,7 @@
       ]
       ++ lib.optionals stdenv.isLinux [
         jp2a # would not build in darwin
-        keybase
+        # keybase
         wl-clipboard
         lm_sensors # for `sensors` command
         ethtool

@@ -16,7 +16,7 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFIzm1z4VPcKzuzSTOlVtE9C+kopHRK1mtncGsb5k6YH Shortcuts on iPhone-Bon-Ji0v1"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICW0tS7KTBySuE49gSHuqAK1Je+ODY+YGc81eTIvonFh Shortcuts on cassini"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICi5cT/V0vDAwTQKtYAVRZR6BSEvNAfZX+M/3wDrd0nb dietpi@dietrichpimpernel"
-    # "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJB2LmOgmY+pLU/QGf0KZUoujlklRin7XJoPN0DFBSC4e6ivsH/Uaqa3pfmsOx8vUHef2492cnWUt5BFn7cJPrk="
+    "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJB2LmOgmY+pLU/QGf0KZUoujlklRin7XJoPN0DFBSC4e6ivsH/Uaqa3pfmsOx8vUHef2492cnWUt5BFn7cJPrk="
   ];
 in {
   imports = [

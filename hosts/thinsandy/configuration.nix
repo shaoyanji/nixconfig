@@ -32,8 +32,17 @@
   ];
 
   powerManagement.powertop.enable = true;
-  virtualisation.docker.enable = true;
-
+  virtualisation.docker = {
+    enable = true;
+    storageDriver = "btrfs";
+    rootless = {
+      enable = true;
+      setSocketVariable = true;
+    };
+    daemon.settings = {
+      # data-root = "/some-place/to-store-the-docker-data";
+    };
+  };
   #  services.k3s = {
   #    enable = true;
   #    role = "server";

@@ -95,7 +95,7 @@
       tuir
       httpie
       lazygit
-      ngrok
+      ngrok #unfree
       asciinema
       navi
 

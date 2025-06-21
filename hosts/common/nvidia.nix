@@ -12,6 +12,16 @@
   #nixpkgs.config.allowBroken = true;
   services.xserver.videoDrivers = ["nvidia"];
   #  boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "i2c-nvidia_gpu" ];
+  # nixpkgs.config.allowUnfreePredicate = pkg:
+  #   builtins.elem (lib.getName pkg) [
+  #     "nvidia-x11"
+  #     "cuda_cudart"
+  #     "libcublas"
+  #     "cuda_cccl"
+  #     "cuda_nvcc"
+  # "nvidia-settings"
+  # "nvidia-persistenced"
+  #   ];
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = false;

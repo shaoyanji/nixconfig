@@ -21,13 +21,13 @@
         formatter.command = "${pkgs.dprint}/bin/dprint";
         formatter.args = ["fmt" "--stdin" "md"];
       }
-      {
-        name = "qmlls";
-        formatter = {
-          command = "qmlls";
-          args = ["-E"];
-        };
-      }
+      # {
+      #   name = "qmlls";
+      #   formatter = {
+      #     command = "${pkgs.qmlls}/bin/qmlls";
+      #     args = ["-E"];
+      #   };
+      # }
 
       {
         name = "yaml";

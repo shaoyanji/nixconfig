@@ -13,6 +13,7 @@
   environment = {
     systemPackages = with pkgs; [
       inputs.quickshell.packages.${stdenv.hostPlatform.system}.default
+      uwsm
     ];
     #variables = {
     # };
@@ -53,7 +54,6 @@
 
   programs.fish.enable = true;
   programs.foot.enable = true;
-  programs.uwsm.enable = true;
   # i18n = {
   #   consoleFont = "Lat2-Terminus16";
   #   consoleKeyMap = lib.mkForce "sv-latin1";

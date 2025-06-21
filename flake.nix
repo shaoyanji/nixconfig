@@ -96,20 +96,6 @@
     # utils,
     ...
   } @ inputs: let
-    # hydenixConfig = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-    #   inherit (inputs.hydenix.lib) system;
-    #   specialArgs = {
-    #     inherit inputs;
-    #   };
-    #   modules = [
-    #     ./hosts/poseidon/configuration2.nix
-    #   ];
-    # };
-    # systems = [
-    #   "x86_64-linux"
-    #   "aarch64-linux"
-    #   "aarch64-darwin"
-    # ];
     globalModules = [
       {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -122,7 +108,7 @@
         ./modules/global/nixos.nix
         home-manager.nixosModules.default
         sops-nix.nixosModules.sops
-        chaotic.nixosModules.default
+        # chaotic.nixosModules.default
         #lix-module.nixosModules.default
         nur.modules.nixos.default
         #determinate.nixosModules.default
@@ -181,25 +167,23 @@
       };
     };
     nixosConfigurations = {
-      # "poseidon" = nixpkgs.lib.nixosSystem {
-      # system = "x86_64-linux";
-
       "poseidon" = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
         inherit (inputs.hydenix.lib) system;
-
         specialArgs = {inherit inputs;};
         modules =
           globalModules
           ++ [
-            # ./hosts/poseidon/configuration.nix
             ./hosts/poseidon/configuration2.nix
-            # ./hosts/poseidon/configuration3.nix
           ];
+        # "poseidon" = nixpkgs.lib.nixosSystem {
+        #   system = "x86_64-linux";
+        # specialArgs = {inherit inputs;};
+        #   modules =
+        #     globalModulesNixos
+        #     ++ [
+        #       ./hosts/poseidon/configuration3.nix
+        #     ];
       };
-
-      #packages."x86_64-linux" = {
-      #  default = hydenixConfig.nix-vm.config.system.build.vm;
-      #};
 
       mtfuji = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";

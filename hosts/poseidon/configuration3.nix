@@ -58,4 +58,11 @@
     consoleKeyMap = lib.mkForce "sv-latin1";
     defaultLocale = "en_US.UTF-8";
   };
+  services.xserver = {
+    enable = true;
+    layout = "se";
+    xkbOptions = "eurosign:e";
+
+    # Truncated the displayManager and desktopManager settings for brevity
+  };
 }

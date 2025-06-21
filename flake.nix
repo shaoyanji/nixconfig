@@ -71,6 +71,11 @@
     #    ghostty.url = "github:ghostty-org/ghostty";
     utils.url = "github:numtide/flake-utils";
     hydenix.url = "github:richen604/hydenix";
+    quickshell = {
+      # add ?ref=<tag> to track a tag
+      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -176,25 +181,25 @@
       };
     };
     nixosConfigurations = {
-      "poseidon" =
-        #hydenixConfig;
-        inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-          inherit (inputs.hydenix.lib) system;
-          specialArgs = {
-            inherit inputs;
-          };
-          modules =
-            globalModules
-            ++ [
-              ./hosts/poseidon/configuration2.nix
-            ];
-        };
-      # ${hydenixConfig.userConfig.host} = hydenixConfig.nixosConfiguration;
+      "poseidon" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+
+        # "poseidon" = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+        # inherit (inputs.hydenix.lib) system;
+
+        specialArgs = {inherit inputs;};
+        modules =
+          globalModules
+          ++ [
+            # ./hosts/poseidon/configuration2.nix
+            ./hosts/poseidon/configuration3.nix
+          ];
+      };
 
       #packages."x86_64-linux" = {
       #  default = hydenixConfig.nix-vm.config.system.build.vm;
       #};
-      #
+
       mtfuji = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};

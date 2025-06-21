@@ -18,7 +18,6 @@
     inputs.nix-index-database.nixosModules.nix-index
   ];
 
-  home-manager.users.devji.home.sessionVariables.EDITOR = lib.mkForce "hx";
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {
     #extraModulePackages = with config.boot.kernelPackages; [v4l2loopback.out];

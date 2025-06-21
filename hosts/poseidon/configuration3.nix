@@ -20,5 +20,21 @@
     # };
   };
 
-  programs.qt.enable = true;
+  qt.enable = true;
+
+  # nixpkgs.config.allowUnfreePredicate = pkg:
+  #   builtins.elem (lib.getName pkg) [
+  #     "steam"
+  #     "steam-original"
+  #     "steam-run"
+  #     "steam-unwrapped"
+  #     "nvidia-x11"
+  #     "cuda_cudart"
+  #     "libcublas"
+  #     "cuda_cccl"
+  #     "cuda_nvcc"
+  #     "nvidia-settings"
+  #     "nvidia-persistenced"
+  #     "ngrok"
+  #   ];
 }

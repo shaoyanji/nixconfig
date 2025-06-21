@@ -6,8 +6,6 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
-    #    ./configuration2.nix
     ./configuration.nix
   ];
 
@@ -55,4 +53,9 @@
 
   programs.fish.enable = true;
   programs.foot.enable = true;
+  i18n = {
+    consoleFont = "Lat2-Terminus16";
+    consoleKeyMap = lib.mkForce "sv-latin1";
+    defaultLocale = "en_US.UTF-8";
+  };
 }

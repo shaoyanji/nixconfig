@@ -103,9 +103,9 @@
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"
-        "$mainMod, W, killactive"
+        "$mainMod, Q, killactive"
         "$mainMod, M, exit"
-        "$mainMod, D, togglefloating"
+        "$mainMod, W, togglefloating"
         "$mainMod, A, exec, $menu"
         "$mainMod, P, pseudo"
         "$mainMod, E, togglesplit"

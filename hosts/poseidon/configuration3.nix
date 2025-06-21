@@ -22,7 +22,15 @@
 
   qt.enable = true;
 
-  # nixpkgs.config.allowUnfreePredicate = pkg:
+  services = {
+    displayManager = {
+      sddm = {
+        enable = true;
+        wayland.enable = true;
+      };
+      #    xserver.digimend.enable = true;
+    };
+  }; # nixpkgs.config.allowUnfreePredicate = pkg:
   #   builtins.elem (lib.getName pkg) [
   #     "steam"
   #     "steam-original"
@@ -44,4 +52,7 @@
     nvidia.acceptLicense = true;
     cudaSupport = true; # Enables CUDA support
   };
+
+  programs.fish.enable = true;
+  programs.foot.enable = true;
 }

@@ -42,7 +42,7 @@
       "/var/lib/systemd/coredump"
       "/var/lib/tailscale"
       "/etc/NetworkManager/system-connections"
-      "/var/lib/ollama"
+      "/var/lib/private/ollama"
       "/etc/rancher/k3s"
       "/var/lib/rancher"
       {

@@ -181,18 +181,19 @@
       };
     };
     nixosConfigurations = {
-      "poseidon" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+      # "poseidon" = nixpkgs.lib.nixosSystem {
+      # system = "x86_64-linux";
 
-        # "poseidon" = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-        # inherit (inputs.hydenix.lib) system;
+      "poseidon" = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+        inherit (inputs.hydenix.lib) system;
 
         specialArgs = {inherit inputs;};
         modules =
           globalModules
           ++ [
-            # ./hosts/poseidon/configuration2.nix
-            ./hosts/poseidon/configuration3.nix
+            # ./hosts/poseidon/configuration.nix
+            ./hosts/poseidon/configuration2.nix
+            # ./hosts/poseidon/configuration3.nix
           ];
       };
 

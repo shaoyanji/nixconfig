@@ -1,4 +1,8 @@
-{inputs, ...}: let
+{
+  inputs,
+  lib,
+  ...
+}: let
   # Package declaration
   # ---------------------
   pkgs = import inputs.hydenix.inputs.hydenix-nixpkgs {
@@ -49,6 +53,7 @@ in {
     # inputs.hydenix.inputs.nixos-hardware.nixosModules.common-pc-ssd
   ];
 
+  home-manager.users.devji.home.sessionVariables.EDITOR = lib.mkForce "hx";
   # home-manager = {
   #   useGlobalPkgs = true;
   #   useUserPackages = true;

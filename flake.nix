@@ -167,22 +167,22 @@
       };
     };
     nixosConfigurations = {
-      "poseidon" = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-        inherit (inputs.hydenix.lib) system;
+      # "poseidon" = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+      #   inherit (inputs.hydenix.lib) system;
+      #   specialArgs = {inherit inputs;};
+      #   modules =
+      #     globalModules
+      #     ++ [
+      #       ./hosts/poseidon/configuration2.nix
+      #     ];
+      "poseidon" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules =
-          globalModules
+          globalModulesNixos
           ++ [
-            ./hosts/poseidon/configuration2.nix
+            ./hosts/poseidon/configuration3.nix
           ];
-        # "poseidon" = nixpkgs.lib.nixosSystem {
-        #   system = "x86_64-linux";
-        #   specialArgs = {inherit inputs;};
-        #   modules =
-        #     globalModulesNixos
-        #     ++ [
-        #       ./hosts/poseidon/configuration3.nix
-        #     ];
       };
 
       mtfuji = nixpkgs.lib.nixosSystem {

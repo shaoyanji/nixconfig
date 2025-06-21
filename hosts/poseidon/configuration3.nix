@@ -62,6 +62,6 @@
   #   enable = true;
   #   layout = "se";
   #   xkbOptions = "eurosign:e";
-    # Truncated the displayManager and desktopManager settings for brevity
-  };
+  # Truncated the displayManager and desktopManager settings for brevity
+  # };
 }

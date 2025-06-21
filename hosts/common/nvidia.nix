@@ -4,11 +4,11 @@
     enable32Bit = true;
     #    extraPackages = with pkgs; [ nvidia-vaapi-driver ];
   };
-  #  nixpkgs.config = {
-  #  allowUnfree = true;
-  #  nvidia.acceptLicense = true;
-  #  cudaSupport = true; # Enables CUDA support
-  #};
+  # nixpkgs.config = {
+  #   allowUnfree = true;
+  #   nvidia.acceptLicense = true;
+  #   cudaSupport = true; # Enables CUDA support
+  # };
   #nixpkgs.config.allowBroken = true;
   services.xserver.videoDrivers = ["nvidia"];
   #  boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "i2c-nvidia_gpu" ];

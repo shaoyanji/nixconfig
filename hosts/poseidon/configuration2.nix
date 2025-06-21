@@ -23,8 +23,8 @@ in {
   imports = [
     # inputs.hydenix.inputs.home-manager.nixosModules.home-manager
     ../common/hydenix.nix
-    # ./configuration.nix
-    ./configuration3.nix
+    ./configuration.nix
+    # ./configuration3.nix
     # inputs.hydenix.lib.nixOsModules
     # ../../modules/system
 

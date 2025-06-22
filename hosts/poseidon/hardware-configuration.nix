@@ -38,6 +38,11 @@
     fsType = "btrfs";
     options = ["subvol=steam" "compress=zstd" "noatime"];
   };
+  fileSystems."/var/lib/private/ollama" = {
+    device = "/dev/disk/by-uuid/8991fddd-ea02-43a0-9d67-82a65d916bc0";
+    fsType = "btrfs";
+    options = ["subvol=ollama" "compress=zstd" "noatime"];
+  };
   swapDevices = [
     {device = "/dev/disk/by-uuid/30fa7541-b3db-442a-8450-105d555e4eba";}
   ];

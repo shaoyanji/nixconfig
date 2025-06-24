@@ -6,7 +6,7 @@
   ...
 }: {
   home.packages = with pkgs; [
-    dolphin
+    kdePackages.dolphin
   ];
 
   xdg.configFile = {

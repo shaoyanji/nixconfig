@@ -8,3 +8,4 @@ git:apply
 use github.com/xiaq/edit.elv/compl/go
 go:apply
 use github.com/zzamboni/elvish-modules/nix
+eval (zoxide init elvish | slurp)

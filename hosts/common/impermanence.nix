@@ -42,9 +42,14 @@
       "/var/lib/systemd/coredump"
       "/var/lib/tailscale"
       "/etc/NetworkManager/system-connections"
-      "/var/lib/private/ollama"
       "/etc/rancher/k3s"
       "/var/lib/rancher"
+
+      {
+        directory = "/var/lib/private/ollama";
+        user = "ollama";
+        mode = "u=rwx,g=,o=";
+      }
       {
         directory = "/var/lib/colord";
         user = "colord";

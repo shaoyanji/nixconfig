@@ -6,7 +6,6 @@
     ../common/base-desktop-environment.nix
     ../common/laptop.nix
   ];
-  services.thermald.enable = true;
   networking.hostName = "ares"; # Define your hostname.
   #environment.systemPackages = with pkgs; [
   #];

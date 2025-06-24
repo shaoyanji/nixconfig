@@ -5,6 +5,14 @@
   inputs,
   ...
 }: {
+  home.packages = with pkgs; [
+    dolphin
+  ];
+
+  xdg.configFile = {
+    "wofi/style.css".source = ./style.css;
+    "wofi/style.scss".source = ./style.scss;
+  };
   wayland.windowManager.hyprland = {
     enable = true;
     plugins = [
@@ -99,7 +107,7 @@
         ];
       };
       "$mainMod" = "SUPER";
-      #      "$fileManager" = "${pkgs.dolphin}/bin/dolphin";
+      "$fileManager" = "${pkgs.dolphin}/bin/dolphin";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"

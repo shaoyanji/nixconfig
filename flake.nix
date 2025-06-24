@@ -195,6 +195,17 @@
             sops-nix.nixosModules.sops
           ];
       };
+      applevalley = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
+        modules =
+          globalModulesContainers
+          ++ [
+            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
+            ./hosts/applevalley/configuration.nix
+            sops-nix.nixosModules.sops
+          ];
+      };
       thinsandy = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};

@@ -12,6 +12,7 @@
   xdg.configFile = {
     "wofi/style.css".source = ./style.css;
     "wofi/style.scss".source = ./style.scss;
+    ".kde-dark-kuroi.qss".source = ./kde-dark-kuroi.qss;
   };
   wayland.windowManager.hyprland = {
     enable = true;
@@ -107,7 +108,7 @@
         ];
       };
       "$mainMod" = "SUPER";
-      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ./kde-dark-kuroi.qss";
+      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ~/.config/kde-dark-kuroi.qss";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"

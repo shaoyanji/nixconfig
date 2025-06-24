@@ -107,7 +107,7 @@
         ];
       };
       "$mainMod" = "SUPER";
-      "$fileManager" = "${pkgs.dolphin}/bin/dolphin";
+      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"

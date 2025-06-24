@@ -31,6 +31,7 @@
           ".local/share/keyrings"
           ".local/share/direnv"
           ".config/direnv"
+          ".config/btop"
           ".zen"
           {
             directory = ".local/share/Steam";

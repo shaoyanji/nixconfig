@@ -108,7 +108,7 @@
         ];
       };
       "$mainMod" = "SUPER";
-      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ~/.config/kde-dark-kuroi.qss";
+      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ~/.config/.kde-dark-kuroi.qss";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"

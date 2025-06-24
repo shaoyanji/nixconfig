@@ -6,7 +6,7 @@
   ...
 }: {
   home.packages = with pkgs; [
-    kdePackages.dolphin
+    # kdePackages.dolphin
   ];
 
   xdg.configFile = {
@@ -107,7 +107,7 @@
         ];
       };
       "$mainMod" = "SUPER";
-      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin";
+      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ./kde-dark-kuroi.qss";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"
@@ -115,6 +115,7 @@
         "$mainMod, M, exit"
         "$mainMod, W, togglefloating"
         "$mainMod, A, exec, $menu"
+        "$mainMod, F, exec, $fileManager"
         "$mainMod, P, pseudo"
         "$mainMod, E, togglesplit"
         "$mainMod, H,  movefocus, l"

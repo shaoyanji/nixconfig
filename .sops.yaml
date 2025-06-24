@@ -32,6 +32,8 @@ keys:
   - &mtfuji age1cpped4xh57c2zrguv6y2sqy526lnpklmruw7leu50xxuclmux5askrhrry
   - &mtfujihost age1tgek4uvpjy2hls5uf80c4sxdshgwhj35fyrcervgefec9rwz05nq59cfew
   - &sandylaptop age160ke2yrkx3h34l8h8xhqktcwtwhsdzfcg7h3ca0gsl77hwzwv5rqwy0gwl
+  - &applevalleyhost age15rlqjq7nzc0xnnq5z32ugkkg4dzhxjsg3hxstlh0gygq3rffcvlsfqruj0
+  - &applevalley age1afuz306fl0vcp9lje6exyczwncnw5rklef3kq5d5mfmpy7f68ejsp99v69
 
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
@@ -66,4 +68,5 @@ creation_rules:
           - *mtfuji
           - *mtfujihost
           - *sandylaptop
+          - *applevalley
         gpg:

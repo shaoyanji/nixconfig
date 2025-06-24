@@ -32,6 +32,7 @@
           ".local/share/direnv"
           ".config/direnv"
           ".config/btop"
+          ".config/elvish/lib"
           ".zen"
           {
             directory = ".local/share/Steam";

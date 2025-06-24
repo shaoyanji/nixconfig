@@ -16,6 +16,7 @@
   ];
   networking.hostName = "schneeeule"; # Define your hostname.
   environment.systemPackages = with pkgs; [
+    # llama-cpp
   ];
 
   fileSystems."/persist/data" = {

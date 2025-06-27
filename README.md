@@ -5,65 +5,36 @@ My Nix Configurations for darwin, nixos, home-manager, and WSL (not yet).
 ## Installation
 
 ```bash
-git clone https://github.com/shaoyanji/nixconfig.git
+git clone github:shaoyanji/nixconfig.git
+git clone thinsandy:/x/nixconfig
 ```
 
 ## Usage
 
-
 ### MACOS rebuild from scratch
-```
+
+```bash
 Xcode install
-open https://lix.systems/install/#on-any-other-linuxmacos-system
-nix run nix-darwin -- switch --flake github:shaoyanji/nixconfig#cassini
 m hostname cassini
-sops
+nix run nix-darwin -- switch --flake github:shaoyanji/nixconfig#cassini
+# use sops script below
 ln -s .config/sops Library/Application\ Support/sops
 ```
+
 ### SOPS Configuration
+
+To add a new NixOS machine to the fleet:
 
 ```bash
 mkdir -p ~/.config/sops/age
-nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
 nix-shell -p ssh-to-age --run "cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age"
-nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age"
-```
-
-```bash
-sops -d modules/nixconfig/secrets/secrets.yaml > Taskfile.yml
-task
-```
-
-## Example sops.yaml from [sops-nix](https://github.com/Mic92/sops-nix):
-
-```yaml
-keys:
-  - &admin_alice 2504791468b153b8a3963cc97ba53d1919c5dfd4
-  - &admin_bob age12zlz6lvcdk6eqaewfylg35w0syh58sm7gh53q5vvn7hd7c6nngyseftjxl
-  - &server_azmidi 0fd60c8c3b664aceb1796ce02b318df330331003
-  - &server_nosaxa age1rgffpespcyjn0d8jglk7km9kfrfhdyev6camd3rck6pn8y47ze4sug23v3
-creation_rules:
-  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
-    key_groups:
-      - pgp:
-          - *admin_alice
-          - *server_azmidi
-        age:
-          - *admin_bob
-          - *server_nosaxa
-  - path_regex: secrets/azmidi/[^/]+\.(yaml|json|env|ini)$
-    key_groups:
-      - pgp:
-          - *admin_alice
-          - *server_azmidi
-        age:
-          - *admin_bob
-```
-
-## Portability and a small growing library of nix-shells included for development
-
-useful script for cleaning up after orbstack workspaces
-
-```
-find . -name "*.smbdelete*" -type f -delete
+export AGE=$(nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age")
+export HOST=$(hostname)
+yq -i '.keys += (env(AGE) | . anchor = env(HOST)) | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' .sops.yaml
+export AGE=$(export AGE=$(nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age")
+export USER=$(whoami)
+yq -i '.keys += (env(AGE) | . anchor = env(HOST)+env(USER)) | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' .sops.yaml
+git add .sops.yaml
+git commit -m "added $(hostname)"
+git push
 ```

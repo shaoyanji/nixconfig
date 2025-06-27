@@ -39,21 +39,22 @@
       "container"
       "logitech-g-hub"
       "wezterm@nightly"
-      # "logitech-camera-settings"
-      # "wine-stable"#d
-      # "zed"#d
-      "google-drive"
-      "dropbox"
-      "onedrive"
-      "box-drive"
-      # "obs"#d
       "libreoffice"
       "microsoft-excel"
       "microsoft-teams"
       "rustdesk"
-      # "sabaki" #deprecated
+      "google-drive"
+      "dropbox"
+      "onedrive"
+      "box-drive"
       "warp"
+      # "logitech-camera-settings"
+      # "wine-stable"#d
+      # "zed"#d
+      # "obs"#d
+      # "sabaki" #d
       # "colmap"
+      # "lagrange"
     ];
     masApps = {
       # Xcode = 497799835;

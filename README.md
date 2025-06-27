@@ -10,20 +10,16 @@ git clone https://github.com/shaoyanji/nixconfig.git
 
 ## Usage
 
-```bash
-sops -d modules/nixconfig/secrets/secrets.yaml > Taskfile.yml
-task
-```
 
 ### MACOS rebuild from scratch
-
+```
 Xcode install
-https://lix.systems/install/#on-any-other-linuxmacos-system
+open https://lix.systems/install/#on-any-other-linuxmacos-system
 nix run nix-darwin -- switch --flake github:shaoyanji/nixconfig#cassini
 m hostname cassini
 sops
 ln -s .config/sops Library/Application\ Support/sops
-
+```
 ### SOPS Configuration
 
 ```bash
@@ -33,7 +29,12 @@ nix-shell -p ssh-to-age --run "cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-ag
 nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age"
 ```
 
-example sops.yaml from [sops-nix](https://github.com/Mic92/sops-nix):
+```bash
+sops -d modules/nixconfig/secrets/secrets.yaml > Taskfile.yml
+task
+```
+
+## Example sops.yaml from [sops-nix](https://github.com/Mic92/sops-nix):
 
 ```yaml
 keys:

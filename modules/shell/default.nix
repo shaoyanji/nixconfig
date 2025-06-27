@@ -11,6 +11,7 @@
     lst = "eza -lahFT --color=auto --icons --sort=size --group-directories-first";
     lt = "eza -aT --icons --group-directories-first --color=auto --sort=size";
     cat = "bat";
+    tb = "nc termbin.com 9999";
   };
 in {
   imports = [

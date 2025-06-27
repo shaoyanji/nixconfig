@@ -1,5 +1,5 @@
 {
-  programs={
+  programs = {
     zsh = {
       enable = true;
       autosuggestion.enable = true;
@@ -18,10 +18,13 @@
           "colored-man-pages"
           "vi-mode"
         ];
+        initExtra = ''
+          source ~/.bash_aliases
+        '';
       };
     };
   };
 
- home.sessionVariables = {
+  home.sessionVariables = {
   };
 }

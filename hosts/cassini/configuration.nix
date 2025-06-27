@@ -51,16 +51,17 @@
       "onedrive"
       "box-drive"
       "warp"
+      "itsycal"
       "ollama-app"
       "kitty"
+      "lagrange"
+      # colmap
       #"arc"
       # "logitech-camera-settings"
       # "wine-stable"#d
       # "zed"#d
       # "obs"#d
       # "sabaki" #d
-      # "colmap"
-      # "lagrange"
     ];
     masApps = {
       # Xcode = 497799835;

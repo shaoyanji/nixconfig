@@ -20,6 +20,11 @@
     brews = [
       # "mas"
       # "gigalixir"
+      "tesseract"
+      "imagemagick"
+      "ghostscript"
+      "xpdf"
+      "gemini-cli"
     ];
     casks = [
       "ghostty"
@@ -46,6 +51,7 @@
       "onedrive"
       "box-drive"
       "warp"
+      "ollama-app"
       # "kitty"
       #"arc"
       # "logitech-camera-settings"

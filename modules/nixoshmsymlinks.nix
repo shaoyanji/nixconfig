@@ -21,7 +21,7 @@ in {
     "Downloads/downloads".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/downloads";
     "Downloads/storage".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/storage";
     "Applications/appimages".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/appimages";
-    "Music/music".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/music";
+    "Music/muzik".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/music";
     "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/pics";
     "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/video";
     "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/cache/go/pkg";

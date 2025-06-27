@@ -61,6 +61,9 @@ in {
   };
   home.sessionPath =
     ["${nixNAS}/bin-script"]
-    #    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 ["${nixNAS}/bin-aarch64"]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 [
+      # "${nixNAS}/bin-aarch64"
+      "/opt/homebrew/bin/"
+    ]
     ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["${nixNAS}/bin-x86"];
 }

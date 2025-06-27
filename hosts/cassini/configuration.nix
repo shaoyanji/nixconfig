@@ -27,7 +27,6 @@
       "obsidian"
       "zen"
       "raycast"
-      #"arc"
       "keybase"
       "notion"
       "slack"
@@ -35,7 +34,6 @@
       "freetube"
       "steam"
       "unnaturalscrollwheels"
-      "kitty"
       "container"
       "logitech-g-hub"
       "wezterm@nightly"
@@ -48,6 +46,8 @@
       "onedrive"
       "box-drive"
       "warp"
+      # "kitty"
+      #"arc"
       # "logitech-camera-settings"
       # "wine-stable"#d
       # "zed"#d
@@ -89,7 +89,7 @@
   # `home-manager` currently has issues adding them to `~/Applications`
   # Issue: https://github.com/nix-community/home-manager/issues/1341
   environment.systemPackages = with pkgs; [
-    #    kitty
+    kitty
     terminal-notifier
     mkalias
   ];

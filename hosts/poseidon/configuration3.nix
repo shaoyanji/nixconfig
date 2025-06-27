@@ -9,7 +9,6 @@
     ./configuration.nix
   ];
 
-  networking.hostName = "poseidon"; # Define your hostname.
   environment = {
     systemPackages = with pkgs; [
       inputs.quickshell.packages.${stdenv.hostPlatform.system}.default

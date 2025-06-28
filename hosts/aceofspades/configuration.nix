@@ -9,6 +9,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../common/base-desktop-environment.nix
+    inputs.chaotic.nixosModules.default
   ];
   boot.loader = {
     systemd-boot.enable = lib.mkForce false;
@@ -36,7 +37,7 @@
       #    xserver.digimend.enable = true;
     };
 
-    scx.enable = lib.mkForce false;
+    # scx.enable = lib.mkForce false;
   };
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [

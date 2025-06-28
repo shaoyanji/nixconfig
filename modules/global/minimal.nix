@@ -129,7 +129,11 @@
         mc
         broot
         hub
-        qalculate-qt
+        # qalculate-qt
+        ticker
+        md2pdf
+        # obsidian-export
+        #
         ots
       ]
       ++ lib.optionals stdenv.isDarwin [

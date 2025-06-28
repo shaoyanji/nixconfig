@@ -46,6 +46,7 @@ in {
     #   useXkbConfig = true; # use xkb.options in tty.
   };
   services = {
+    kubo.enable = true;
     keybase.enable = true;
     kbfs.enable = true;
     xserver.xkb = {

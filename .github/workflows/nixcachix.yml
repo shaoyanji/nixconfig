@@ -60,7 +60,7 @@ jobs:
     strategy:
       matrix:
         home:
-          - devji@penguin
+          - penguin
         os:
           - ubuntu-latest
           # - macos-latest

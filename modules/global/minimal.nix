@@ -130,11 +130,7 @@
         hub
         # qalculate-qt
         ticker
-        md2pdf
-
         obsidian-export
-
-        #
         ots
       ]
       ++ lib.optionals stdenv.isDarwin [
@@ -147,6 +143,8 @@
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
+        md2pdf
+
         strace
         ltrace
         lsof

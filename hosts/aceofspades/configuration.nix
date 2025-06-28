@@ -33,6 +33,7 @@
         enable = true;
         wayland.enable = true;
       };
+      scx.enable = lib.mkForce false;
       #    xserver.digimend.enable = true;
     };
   };

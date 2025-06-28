@@ -127,6 +127,10 @@
         lynx
         translate-shell
         mc
+        broot
+        hub
+        qalculate-qt
+        ots
       ]
       ++ lib.optionals stdenv.isDarwin [
         # python3

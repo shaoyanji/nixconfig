@@ -86,7 +86,6 @@
         socat
         nmap
         ipcalc
-        ipcalc
         ffmpeg
         fastfetch
         iftop
@@ -132,12 +131,14 @@
         # qalculate-qt
         ticker
         md2pdf
-        # obsidian-export
+
+        obsidian-export
+
         #
         ots
       ]
       ++ lib.optionals stdenv.isDarwin [
-        # python3
+        python3
         wget
         cocoapods
         m-cli # useful macOS CLI commands

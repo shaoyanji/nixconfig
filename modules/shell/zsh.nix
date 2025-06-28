@@ -18,9 +18,9 @@
           "colored-man-pages"
           "vi-mode"
         ];
-        initExtra = ''
-          source ~/.bash_aliases
-        '';
+        # initExtra = ''
+        # source ~/.bash_aliases
+        # '';
       };
     };
   };

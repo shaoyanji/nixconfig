@@ -33,9 +33,10 @@
         enable = true;
         wayland.enable = true;
       };
-      scx.enable = lib.mkForce false;
       #    xserver.digimend.enable = true;
     };
+
+    scx.enable = lib.mkForce false;
   };
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [

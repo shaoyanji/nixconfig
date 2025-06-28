@@ -273,7 +273,7 @@
           globalModulesContainers
           ++ [
             ./hosts/orb-cassini/custom.nix
-            /etc/nixos/configuration.nix
+            ./hosts/orb-cassini/configuration.nix
           ];
       };
       guckloch = nixpkgs.lib.nixosSystem {

@@ -49,7 +49,7 @@ jobs:
       # this is what uploads our builds to the cache (also makes our CI use the cache from previous runs)!
       - uses: cachix/cachix-action@v14
         with:
-          name: cything # replace with the name of your cachix cache
+          name: shaoyanji # replace with the name of your cachix cache
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
           useDaemon: false
           installCommand: nix profile install nixpkgs#cachix
@@ -85,7 +85,7 @@ jobs:
           persist-credentials: false
       - uses: cachix/cachix-action@v14
         with:
-          name: devji
+          name: shaoyanji
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
           useDaemon: false
           installCommand: nix profile install nixpkgs#cachix

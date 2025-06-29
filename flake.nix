@@ -158,9 +158,15 @@
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [./hosts/alarm.nix];
       };
-      devji = home-manager.lib.homeManagerConfiguration {
+      kali = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
+        modules = [./hosts/kali.nix];
+      };
+      devji = home-manager.lib.homeManagerConfiguration {
+        extraSpecialArgs = {inherit inputs;};
+        pkgs = nixpkgs.legacyPackages."x86_64-linux";
+        # pkgs = nixpkgs.legacyPackages."aarch64-linux";
         modules = [
           ./modules/global/heim.nix
         ];
@@ -274,6 +280,7 @@
           ++ [
             ./hosts/orb-cassini/custom.nix
             ./hosts/orb-cassini/configuration.nix
+            #/etc/nixos/configuration.nix
           ];
       };
       guckloch = nixpkgs.lib.nixosSystem {

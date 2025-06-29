@@ -19,6 +19,7 @@
     "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJB2LmOgmY+pLU/QGf0KZUoujlklRin7XJoPN0DFBSC4e6ivsH/Uaqa3pfmsOx8vUHef2492cnWUt5BFn7cJPrk="
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIZXtw+dZv/J1zRWjeyQS7NzLO53vjHfDRIBL5k1anMg jisifu@gmail.com"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ/yKF1l8oT/PotNGpPgUyBSQDG0xsJpsDP2UIXBxqkI devji@applevalley"
   ];
 in {
   imports = [

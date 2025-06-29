@@ -5,8 +5,9 @@ My Nix Configurations for darwin, nixos, home-manager, and WSL (not yet).
 ## Installation
 
 ```bash
-git clone github:shaoyanji/nixconfig.git
 git clone thinsandy:/x/nixconfig
+git clone https://$GITHUB_API_TOKEN@github.com/shaoyanji/nixconfig.git
+git clone git@github.com:/shaoyanji/nixconfig.git
 ```
 
 ## Usage
@@ -26,12 +27,13 @@ ln -s .config/sops Library/Application\ Support/sops
 To add a new NixOS machine to the fleet:
 
 ```bash
+cd nixconfig
 mkdir -p ~/.config/sops/age
-nix-shell -p ssh-to-age --run "cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age"
-export AGE=$(nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age")
+nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age" > ~/.config/sops/age/keys.txt
+export AGE=$(nix-shell -p ssh-to-age --run "cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age")
 export HOST=$(hostname)
 yq -i '.keys += (env(AGE) | . anchor = env(HOST)) | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' .sops.yaml
-export AGE=$(export AGE=$(nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age")
+export AGE=$(nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age")
 export USER=$(whoami)
 yq -i '.keys += (env(AGE) | . anchor = env(HOST)+env(USER)) | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' .sops.yaml
 git add .sops.yaml

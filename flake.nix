@@ -293,15 +293,15 @@
             nixos-wsl.nixosModules.default
           ];
       };
-      coolbeans = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {inherit inputs;};
-        modules =
-          globalModulesContainers
-          ++ [
-            /etc/nixos/configuration.nix
-          ];
-      };
+      #   coolbeans = nixpkgs.lib.nixosSystem {
+      #     system = "x86_64-linux";
+      #     specialArgs = {inherit inputs;};
+      #     modules =
+      #       globalModulesContainers
+      #       ++ [
+      #         /etc/nixos/configuration.nix
+      #       ];
+      #   };
     };
     darwinConfigurations = {
       cassini = nix-darwin.lib.darwinSystem {

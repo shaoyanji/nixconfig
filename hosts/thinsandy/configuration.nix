@@ -23,6 +23,7 @@
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   environment.systemPackages = with pkgs; [
+    go
     btrfs-progs
     f2fs-tools
     docker

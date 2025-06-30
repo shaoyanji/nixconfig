@@ -1,18 +1,20 @@
 name: nixcachix
 on:
-  workflow_dispatch:
-  push:
-  pull_request:
+  check_suite:
+    types: [completed]
+  # workflow_dispatch:
+  # push:
+  # pull_request:
 jobs:
   build-machines:
     strategy:
       matrix:
         machine:
           # hostname of your nixosSystem's
-          - poseidon
+          # - poseidon
           # - cassini
           - thinsandy
-          - schneeeule
+          # - schneeeule
           - mtfuji
           - ancientace
           - guckloch

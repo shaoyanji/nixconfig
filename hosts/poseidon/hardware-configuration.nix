@@ -20,6 +20,12 @@
     kernelModules = ["kvm-amd"];
     extraModulePackages = [];
   };
+
+  fileSystems."/nix" = {
+    device = "/dev/disk/by-uuid/8991fddd-ea02-43a0-9d67-82a65d916bc0";
+    fsType = "btrfs";
+    options = ["subvol=nix" "compress=zstd" "noatime"];
+  };
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/292db143-7e80-45c4-b940-34d77e58b5c7";
     fsType = "ext4";

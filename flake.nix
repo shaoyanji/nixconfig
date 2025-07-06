@@ -12,6 +12,7 @@
     # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
+    # nixpkgs-legacy.url = "github:NixOS/nixpkgs/nixos-24.05";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
@@ -83,6 +84,7 @@
     # determinate,
     nix-darwin,
     nixpkgs,
+    # nixpkgs-legacy,
     nix-homebrew,
     nixos-wsl,
     # nixos-hardware,
@@ -140,6 +142,11 @@
       ];
   in {
     homeConfigurations = {
+      verntil = home-manager.lib.homeManagerConfiguration {
+        extraSpecialArgs = {inherit inputs;};
+        pkgs = nixpkgs.legacyPackages."x86_64-linux";
+        modules = [./hosts/verntil.nix];
+      };
       root = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."x86_64-linux";

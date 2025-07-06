@@ -57,6 +57,7 @@ in {
       ];
     };
     fzf.enable = true;
+    fzf.enableBashIntegration = true;
   };
   home.packages = with pkgs; [
     # thefuck
@@ -70,6 +71,9 @@ in {
     bat
     eza
   ];
+  xdg.configFile = {
+    "starship.toml".source = ./starship.toml;
+  };
   home.file = {
   };
 

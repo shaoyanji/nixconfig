@@ -5,6 +5,7 @@ My Nix Configurations for darwin, nixos, home-manager, and WSL.
 ## Installation
 
 ```bash
+nixos-rebuild switch --flake github:/shaoyanji/nixconfig#$(hostname)
 git clone thinsandy:/x/nixconfig
 git clone https://$GITHUB_API_TOKEN@github.com/shaoyanji/nixconfig.git
 git clone git@github.com:/shaoyanji/nixconfig.git
@@ -17,8 +18,8 @@ cd nixconfig
 
 ```bash
 Xcode install
-m hostname cassini
-nix run nix-darwin -- switch --flake github:shaoyanji/nixconfig#cassini
+m hostname '$(hostname)'
+nix run nix-darwin -- switch --flake github:shaoyanji/nixconfig#$(hostname)
 # use sops script below
 ln -s .config/sops Library/Application\ Support/sops
 ```
@@ -43,6 +44,6 @@ git push
 
 ### Setting Up Home-Manager
 
-```
+```bash
 nix run home-manager/master -- switch --flake .#$(whoami)
 ```

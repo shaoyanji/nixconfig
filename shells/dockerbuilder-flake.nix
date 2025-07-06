@@ -13,7 +13,7 @@
       "aarch64-linux"
     ];
     forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f system);
-    registryprefix="ghcr.io/shaoyanji/";
+    registryprefix = "ghcr.io/shaoyanji/";
     imageName = "tgpt";
     imageTag = "latest";
     mkDockerImage = pkgs: targetSystem: let
@@ -22,13 +22,13 @@
         then "amd64"
         else "arm64";
       #          duckgpt = pkgs.callPackage ./official.nix {};
-      alpine = pkgs.dockerTools.pullImage{
-  imageName = "alpine";
-  imageDigest = "sha256:115729ec5cb049ba6359c3ab005ac742012d92bbaa5b8bc1a878f1e8f62c0cb8";
-  hash = "sha256-7E9mkUfYsv3Tzl99ggihTOFCqvcLB4/NsPyRUC1nqug=";
-  finalImageName = "alpine";
-  finalImageTag = "edge";
-};
+      alpine = pkgs.dockerTools.pullImage {
+        imageName = "alpine";
+        imageDigest = "sha256:115729ec5cb049ba6359c3ab005ac742012d92bbaa5b8bc1a878f1e8f62c0cb8";
+        hash = "sha256-7E9mkUfYsv3Tzl99ggihTOFCqvcLB4/NsPyRUC1nqug=";
+        finalImageName = "alpine";
+        finalImageTag = "edge";
+      };
     in
       pkgs.dockerTools.buildImage {
         name = "${registryprefix}${imageName}";

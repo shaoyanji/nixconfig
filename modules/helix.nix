@@ -3,6 +3,7 @@
     marksman
     dprint
     gopls
+    alejandra
   ];
   programs.helix = {
     enable = true;

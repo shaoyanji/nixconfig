@@ -125,8 +125,15 @@
     #variables = {
     # };
   };
-  services.transfer-sh.enable = true;
-
+  # services.transfer-sh = {
+  #   enable = true;
+  #   provider = "local";
+  #   settings = {
+  #     BASEDIR = "/var/lib/transfer.sh";
+  #     LISTENER = ":8080";
+  #     TLS_LISTENER_ONLY = false;
+  #   };
+  # };
   programs.virt-manager.enable = true;
 
   users.groups.libvirtd.members = ["devji"];

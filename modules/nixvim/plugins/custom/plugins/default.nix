@@ -70,29 +70,29 @@
 
             -- Optional, configure key mappings. These are the defaults. If you don't want to set any keymappings this
             -- way then set 'mappings = {}'.
-            mappings = {
-              -- Overrides the 'gf' mapping to work on markdown/wiki links within your vault.
-              ["gf"] = {
-                action = function()
-                  return require("obsidian").util.gf_passthrough()
-                end,
-                opts = { noremap = false, expr = true, buffer = true },
-              },
-              -- Toggle check-boxes.
-              ["<leader>ch"] = {
-                action = function()
-                  return require("obsidian").util.toggle_checkbox()
-                end,
-                opts = { buffer = true },
-              },
-              -- Smart action depending on context, either follow link or toggle checkbox.
-              ["<cr>"] = {
-                action = function()
-                  return require("obsidian").util.smart_action()
-                end,
-                opts = { buffer = true, expr = true },
-              }
-            },
+           -- mappings = {
+           --   -- Overrides the 'gf' mapping to work on markdown/wiki links within your vault.
+           --   ["gf"] = {
+           --     action = function()
+           --       return require("obsidian").util.gf_passthrough()
+           --     end,
+           --     opts = { noremap = false, expr = true, buffer = true },
+           --   },
+           --   -- Toggle check-boxes.
+           --   ["<leader>ch"] = {
+           --     action = function()
+           --       return require("obsidian").util.toggle_checkbox()
+           --     end,
+           --     opts = { buffer = true },
+           --   },
+           --   -- Smart action depending on context, either follow link or toggle checkbox.
+           --   ["<cr>"] = {
+           --     action = function()
+           --       return require("obsidian").util.smart_action()
+           --     end,
+           --     opts = { buffer = true, expr = true },
+           --   }
+           -- },
 
             -- Where to put new notes. Valid options are
             --  * "current_dir" - put new notes in same directory as the current buffer.
@@ -203,7 +203,7 @@
 
             -- Optional, set to true if you use the Obsidian Advanced URI plugin.
             -- https://github.com/Vinzent03/obsidian-advanced-uri
-            use_advanced_uri = false,
+            -- use_advanced_uri = false,
 
             -- Optional, set to true to force ':ObsidianOpen' to bring the app to the foreground.
             -- open_app_foreground = false,

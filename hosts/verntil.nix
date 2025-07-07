@@ -9,6 +9,7 @@
   home.homeDirectory = "/home/jisifu";
   home.stateVersion = "22.05";
   imports = [
+    ../modules/env.nix
     ../modules/lf
     ../modules/shell
     ../modules/helix.nix

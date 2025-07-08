@@ -4,6 +4,7 @@
     dprint
     gopls
     alejandra
+    nixd
   ];
   programs.helix = {
     enable = true;

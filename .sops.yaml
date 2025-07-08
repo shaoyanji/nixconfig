@@ -34,8 +34,13 @@ keys:
   - &sandylaptop age160ke2yrkx3h34l8h8xhqktcwtwhsdzfcg7h3ca0gsl77hwzwv5rqwy0gwl
   - &applevalleyhost age15rlqjq7nzc0xnnq5z32ugkkg4dzhxjsg3hxstlh0gygq3rffcvlsfqruj0
   - &applevalley age1afuz306fl0vcp9lje6exyczwncnw5rklef3kq5d5mfmpy7f68ejsp99v69
+  - &verntiljisifu age15y8n5rmwvtdyfm2r6qx5ru8dtldax7j4ef53nedex3qpf6lhd9zsx3e69j
 
 creation_rules:
+  - path_regex: secrets/server/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *verntiljisifu
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:

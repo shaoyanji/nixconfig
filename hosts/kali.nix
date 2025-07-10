@@ -1,13 +1,12 @@
 {pkgs, ...}: {
   home.username = "kali";
   home.homeDirectory = "/home/kali";
-  home.users.users.kali.shell = pkgs.zsh;
 
   imports = [
     # ../modules/global/minimal.nix
     ../modules/global/home.nix
   ];
-  # programs.starship.enable = true;
+  programs.starship.enable = true;
   home.packages = with pkgs; [
     lolcat
     figlet

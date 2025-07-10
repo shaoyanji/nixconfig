@@ -163,7 +163,11 @@
       alarm = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};
         pkgs = nixpkgs.legacyPackages."aarch64-linux";
-        modules = [./hosts/alarm.nix];
+        modules = [
+          ./hosts/alarm.nix
+
+          inputs.sops-nix.homeManagerModules.sops
+        ];
       };
       kali = home-manager.lib.homeManagerConfiguration {
         extraSpecialArgs = {inherit inputs;};

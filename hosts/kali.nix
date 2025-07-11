@@ -5,6 +5,7 @@
   imports = [
     # ../modules/global/minimal.nix
     ../modules/global/home.nix
+    ../modules/nixoshmsymlinks.nix
   ];
   programs.starship.enable = true;
   home.packages = with pkgs; [
@@ -19,7 +20,7 @@
     gobuster
     steghide
     pandoc
-    aircrack-ng
+    # aircrack-ng
     powershell
     secretscanner
     seclists

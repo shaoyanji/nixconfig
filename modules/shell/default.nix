@@ -10,7 +10,7 @@
     ls = "${pkgs.eza}/bin/eza -lhF --color=auto --icons --sort=Name --group-directories-first";
     lst = "${pkgs.eza}/bin/eza -lahFT --color=auto --icons --sort=size --group-directories-first";
     lt = "${pkgs.eza}/bin/eza -aT --icons --group-directories-first --color=auto --sort=size";
-    cat = "${pkgs.bat}/bin/bat";
+    cat = "${pkgs.bat}/bin/bat -p";
     tb = "nc termbin.com 9999";
   };
 in {

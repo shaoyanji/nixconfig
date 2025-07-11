@@ -4,13 +4,13 @@
   ...
 }: let
   myAliases = {
-    l = "eza -lahF --color=auto --icons --sort=size --group-directories-first";
-    lss = "eza -hF --color=auto --icons --sort=size --group-directories-first";
-    la = "eza -ahF --color=auto --icons --sort=size --group-directories-first";
-    ls = "eza -lhF --color=auto --icons --sort=Name --group-directories-first";
-    lst = "eza -lahFT --color=auto --icons --sort=size --group-directories-first";
-    lt = "eza -aT --icons --group-directories-first --color=auto --sort=size";
-    cat = "bat";
+    l = "${pkgs.eza}/bin/eza -lahF --color=auto --icons --sort=size --group-directories-first";
+    lss = "${pkgs.eza}/bin/eza -hF --color=auto --icons --sort=size --group-directories-first";
+    la = "${pkgs.eza}/bin/eza -ahF --color=auto --icons --sort=size --group-directories-first";
+    ls = "${pkgs.eza}/bin/eza -lhF --color=auto --icons --sort=Name --group-directories-first";
+    lst = "${pkgs.eza}/bin/eza -lahFT --color=auto --icons --sort=size --group-directories-first";
+    lt = "${pkgs.eza}/bin/eza -aT --icons --group-directories-first --color=auto --sort=size";
+    cat = "${pkgs.bat}/bin/bat";
     tb = "nc termbin.com 9999";
   };
 in {

@@ -34,6 +34,7 @@
         #        (pkgs.uutils-coreutils.override {prefix = "";})
         # mupdf
         # mpv
+        lowfi
         pop
         glow
         charm-freeze # obsidian

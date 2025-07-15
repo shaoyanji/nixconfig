@@ -7,7 +7,7 @@
     ./home.nix
     #../dev.nix
     ../nixoshmsymlinks.nix
-    ../shell/nushell.nix
+    # ../shell/nushell.nix
   ];
   home = {
     username = "devji";

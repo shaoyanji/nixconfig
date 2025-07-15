@@ -20,17 +20,17 @@
   home = {
     packages = with pkgs;
       [
+        libation
+        mupdf
+        mpv
         # viu
         # qrencode
         # duf
-        libation
         # go-task
         # nixd
         # devenv
         #cmus
         #yt-dlp
-        mupdf
-        mpv
         # sqlite
         ## nix formatting
         #nixfmt-rfc-style

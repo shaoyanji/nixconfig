@@ -24,7 +24,10 @@
     powershell
     secretscanner
     seclists
+    yt-dlp
   ];
-
+  home.sessionVariables = {
+    TERM = "xterm-256color";
+  };
   programs.home-manager.enable = true;
 }

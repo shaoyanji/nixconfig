@@ -39,7 +39,7 @@
       intel-media-driver # For Broadwell (2014) or newer processors. LIBVA_DRIVER_NAME=iHD
       # intel-vaapi-driver # For older processors. LIBVA_DRIVER_NAME=i965
       libva-vdpau-driver # Previously vaapiVdpau
-      intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
+      # intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
       # OpenCL support for intel CPUs before 12th gen
       # see: https://github.com/NixOS/nixpkgs/issues/356535
       intel-compute-runtime-legacy1

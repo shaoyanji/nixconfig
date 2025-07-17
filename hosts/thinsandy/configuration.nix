@@ -23,6 +23,10 @@
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   # 1. enable vaapi on OS-level
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "intel-ocl"
+    ];
   nixpkgs.config.packageOverrides = pkgs: {
     # Only set this if using intel-vaapi-driver
     intel-vaapi-driver = pkgs.intel-vaapi-driver.override {enableHybridCodec = true;};
@@ -41,7 +45,7 @@
       intel-compute-runtime-legacy1
       vpl-gpu-rt # QSV on 11th gen or newer
       intel-media-sdk # QSV up to 11th gen
-      # intel-ocl # OpenCL support
+      intel-ocl # OpenCL support
     ];
   };
 

@@ -3,7 +3,7 @@ on:
   check_suite:
     types: [completed]
   # workflow_dispatch:
-  # push:
+  push:
   # pull_request:
 jobs:
   build-machines:
@@ -11,10 +11,10 @@ jobs:
       matrix:
         machine:
           # hostname of your nixosSystem's
-          # - poseidon
+          - poseidon
           # - cassini
           - thinsandy
-          # - schneeeule
+          - schneeeule
           - mtfuji
           - ancientace
           - guckloch

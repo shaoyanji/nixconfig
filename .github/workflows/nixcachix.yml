@@ -63,6 +63,7 @@ jobs:
       matrix:
         home:
           - penguin
+          - verntil
         os:
           - ubuntu-latest
           # - macos-latest

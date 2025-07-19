@@ -80,6 +80,7 @@ in {
   programs.nix-ld.libraries = with pkgs; [
     #libGL
     alsa-lib
+    gmp #simplex-chat
   ];
 
   security = {

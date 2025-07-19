@@ -20,7 +20,6 @@
   home = {
     packages = with pkgs;
       [
-        libation
         mupdf
         mpv
         # viu
@@ -212,6 +211,9 @@
         # sysstat
         # pciutils # lspci
         # usbutils # lsusb
+      ]
+      ++ lib.optionals stdenv.isDarwin [
+        libation
       ];
     file = {
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in

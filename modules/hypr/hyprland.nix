@@ -7,6 +7,7 @@
 }: {
   home.packages = with pkgs; [
     # kdePackages.dolphin
+    (flameshot.override {enableWlrSupport = true;})
   ];
 
   xdg.configFile = {
@@ -112,6 +113,7 @@
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"
+        "$mainMod, S, exec, flameshot gui"
         "$mainMod, Q, killactive"
         "$mainMod, M, exit"
         "$mainMod, W, togglefloating"

@@ -1,0 +1,60 @@
+name: nixcachix
+on:
+  check_suite:
+    types: [completed]
+  # workflow_dispatch:
+  # push:
+  # pull_request:
+jobs:
+  build-machines:
+    strategy:
+      matrix:
+        machine:
+          # hostname of your nixosSystem's
+          # - poseidon
+          - cassini
+          # - thinsandy
+          # - schneeeule
+          # - mtfuji
+          # - ancientace
+          # - guckloch
+          # - minyx
+        os:
+          # - ubuntu-latest
+          # add others as you need
+          - macos-latest
+          # - ubuntu-24.04-arm
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      # you might need this if your build causes the runner to run out of disk space
+      - name: Maximize build disk space
+        uses: easimon/maximize-build-space@v10
+        with:
+          overprovision-lvm: true
+          swap-size-mb: 1024
+          remove-dotnet: "true"
+          remove-android: "true"
+          remove-haskell: "true"
+          remove-codeql: "true"
+          remove-docker-images: "true"
+          build-mount-path: /nix
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+
+      - name: Sync repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # this is what uploads our builds to the cache (also makes our CI use the cache from previous runs)!
+      - uses: cachix/cachix-action@v14
+        with:
+          name: shaoyanji # replace with the name of your cachix cache
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          useDaemon: false
+          installCommand: nix profile install nixpkgs#cachix
+
+      # this is equivalent to `nixos-rebuild build`
+      - run: nix build -L .#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel

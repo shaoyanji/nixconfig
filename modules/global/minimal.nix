@@ -145,7 +145,6 @@
       ]
       ++ lib.optionals stdenv.isLinux [
         md2pdf
-
         strace
         ltrace
         lsof

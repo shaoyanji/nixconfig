@@ -48,17 +48,11 @@
       audacity
       dust
       lz4
-      rclone
       yank
       toot
-      age
       pass
       cmus
       bitwarden-cli
-      glow
-      pop
-      charm-freeze
-      viu
       #wkhtmltopdf
       #ghostscript
       #        texlive.combined.scheme-full
@@ -70,42 +64,12 @@
       #bundler
       tldr
       scc
-      diff-so-fancy
-      entr
-      exiftool
-      fdupes
-      most
-      procs
-      # rip
-      rsync
-      sd
-      tre
-      bandwhich
-      glances
-      gping
-      speedtest-cli
       #dog
-      buku
-      ddgr
-      khal
-      mutt
-      newsboat
-      rclone
       taskwarrior3
       tuir
-      httpie
       lazygit
       ngrok #unfree
-      asciinema
-      navi
-
       surge #x86
-
-      epr
-      lynx
-      translate-shell
-      mc
-      entr
       gitmoji-cli
       #gitmoji-changelog
       #sparkly-cli

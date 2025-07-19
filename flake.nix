@@ -184,7 +184,7 @@
       };
     };
     nixosConfigurations = {
-      # "poseidon" = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+      # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
       #   inherit (inputs.hydenix.lib) system;
       #   specialArgs = {inherit inputs;};
       #   modules =
@@ -192,7 +192,7 @@
       #     ++ [
       #       ./hosts/poseidon/configuration2.nix
       #     ];
-      "poseidon" = nixpkgs.lib.nixosSystem {
+      poseidon = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules =

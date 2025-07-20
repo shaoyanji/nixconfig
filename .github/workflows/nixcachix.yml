@@ -48,7 +48,6 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
-          repository: shaoyanji/secrets
           token: "${{ secrets.GH_PAT }}"
 
       # this is what uploads our builds to the cache (also makes our CI use the cache from previous runs)!
@@ -90,7 +89,6 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
-          repository: shaoyanji/secrets
           token: "${{ secrets.GH_PAT }}"
       - uses: cachix/cachix-action@v14
         with:

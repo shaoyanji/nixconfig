@@ -57,7 +57,7 @@ jobs:
           installCommand: nix profile install nixpkgs#cachix
 
       # this is equivalent to `nixos-rebuild build`
-      - run: nix build -L .#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel
+      - run: nix build -L .?submodules=1#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel
   build-homes:
     strategy:
       matrix:
@@ -111,4 +111,4 @@ jobs:
           purge-primary-key: never
           # always save the cache
           save-always: true
-      - run: nix build -L .#homeConfigurations."${{ matrix.home }}".activationPackage
+      - run: nix build -L .?submodules=1#homeConfigurations."${{ matrix.home }}".activationPackage

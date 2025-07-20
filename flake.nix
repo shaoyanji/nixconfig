@@ -39,10 +39,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -77,6 +73,8 @@
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # kickstart-nixvim.url = "git+file:///home/devji/nixconfig/modules/kickstart.nixvim";
+    kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
   };
 
   outputs = {

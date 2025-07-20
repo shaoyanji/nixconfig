@@ -8,7 +8,6 @@
   imports = [
     ./configuration.nix
   ];
-
   environment = {
     systemPackages = with pkgs; [
       inputs.quickshell.packages.${stdenv.hostPlatform.system}.default

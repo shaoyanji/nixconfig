@@ -11,6 +11,7 @@
     lst = "${pkgs.eza}/bin/eza -lahFT --color=auto --icons --sort=size --group-directories-first";
     lt = "${pkgs.eza}/bin/eza -aT --icons --group-directories-first --color=auto --sort=size";
     cat = "${pkgs.bat}/bin/bat -p";
+    grep = "${pkgs.ripgrep}/bin/rg";
     tb = "nc termbin.com 9999";
   };
 in {

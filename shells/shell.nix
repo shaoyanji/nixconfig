@@ -66,23 +66,23 @@ pkgs.mkShell
 
   GREETING = "Hello, Nix!";
   shellHook = ''
-    eval "$(zoxide init bash)"
-    eval "$(fzf --bash)"
-    # eval "$(task --completion bash)"
-    eval "$(direnv hook bash)"
-    eval "$(starship init bash)"
+    eval "$(${pkgs.zoxide}/bin/zoxide init bash)"
+    eval "$(${pkgs.fzf}/bin/fzf --bash)"
+    eval "$(${pkgs.go-task}/bin/task --completion bash)"
+    eval "$(${pkgs.direnv}/bin/direnv hook bash)"
+    eval "$(${pkgs.starship}/bin/starship init bash)"
     0file() { curl -F"file=@$1" https://envs.sh ; }
     0pb() { curl -F"file=@-;" https://envs.sh ; }
     0url() { curl -F"url=$1" https://envs.sh ; }
     0short() { curl -F"shorten=$1" https://envs.sh ; }
-    alias l='eza -lahF --color=auto --icons --sort=size --group-directories-first'
-    alias lss='eza -hF --color=auto --icons --sort=size --group-directories-first'
-    alias la='eza -ahF --color=auto --icons --sort=size --group-directories-first'
-    alias ls='eza -lhF --color=auto --icons --sort=Name --group-directories-first'
-    alias lst='eza -lahFT --color=auto --icons --sort=size --group-directories-first'
-    alias lt='eza -aT --icons --group-directories-first --color=auto --sort=size'
-    alias cat='bat'
-    alias grep='rg'
+    alias l='${pkgs.eza}/bin/eza -lahF --color=auto --icons --sort=size --group-directories-first'
+    alias lss='${pkgs.eza}/bin/eza -hF --color=auto --icons --sort=size --group-directories-first'
+    alias la='${pkgs.eza}/bin/eza -ahF --color=auto --icons --sort=size --group-directories-first'
+    alias ls='${pkgs.eza}/bin/eza -lhF --color=auto --icons --sort=Name --group-directories-first'
+    alias lst='${pkgs.eza}/bin/eza -lahFT --color=auto --icons --sort=size --group-directories-first'
+    alias lt='${pkgs.eza}/bin/eza -aT --icons --group-directories-first --color=auto --sort=size'
+    alias cat='${pkgs.bat}/bin/bat -p'
+    alias grep='${pkgs.ripgrep}/bin/rg'
 
     echo $GREETING | cowsay | lolcat
 

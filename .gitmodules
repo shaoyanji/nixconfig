@@ -1,0 +1,6 @@
+[submodule "modules/kickstart.nixvim"]
+	path = modules/kickstart.nixvim
+	url = git@github.com:shaoyanji/kickstart.nixvim.git
+[submodule "modules/secrets"]
+	path = modules/secrets
+	url = git@github.com:shaoyanji/secrets.git

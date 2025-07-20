@@ -47,7 +47,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-          submodules: true
+          submodules: recursive
           repository: shaoyanji/secrets
           token: "${{ secrets.GH_PAT }}"
 
@@ -89,7 +89,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-          submodules: true
+          submodules: recursive
           repository: shaoyanji/secrets
           token: "${{ secrets.GH_PAT }}"
       - uses: cachix/cachix-action@v14

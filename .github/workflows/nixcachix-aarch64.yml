@@ -47,6 +47,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          submodules: true
+          token: ${{ secrets.GH_PAT }}
 
       # this is what uploads our builds to the cache (also makes our CI use the cache from previous runs)!
       - uses: cachix/cachix-action@v14
@@ -57,7 +59,7 @@ jobs:
           installCommand: nix profile install nixpkgs#cachix
 
       # this is equivalent to `nixos-rebuild build`
-      - run: nix build -L .#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel
+      - run: nix build -L .?submodules=1#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel
   build-homes:
     strategy:
       matrix:
@@ -88,6 +90,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          submodules: true
+          token: ${{ secrets.GH_PAT }}
       - uses: cachix/cachix-action@v14
         with:
           name: shaoyanji
@@ -111,4 +115,4 @@ jobs:
           purge-primary-key: never
           # always save the cache
           save-always: true
-      - run: nix build -L .#homeConfigurations."${{ matrix.home }}".activationPackage
+      - run: nix build -L .?submodules=1#homeConfigurations."${{ matrix.home }}".activationPackage

@@ -47,8 +47,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
+          submodules: recursive
+          repository: shaoyanji/secrets
+          token: "${{ secrets.GH_PAT }}"
 
       # this is what uploads our builds to the cache (also makes our CI use the cache from previous runs)!
       - uses: cachix/cachix-action@v14
@@ -90,8 +91,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
+          submodules: recursive
+          repository: shaoyanji/secrets
+          token: "${{ secrets.GH_PAT }}"
       - uses: cachix/cachix-action@v14
         with:
           name: shaoyanji

@@ -67,9 +67,9 @@ pkgs.mkShell
   shellHook = ''
     eval "$(${pkgs.zoxide}/bin/zoxide init bash)"
     eval "$(${pkgs.fzf}/bin/fzf --bash)"
-    # eval "$(task --completion bash)"
+    eval "$(${pkgs.go-task}/bin/task --completion bash)"
     eval "$(${pkgs.direnv}/bin/direnv hook bash)"
-    eval "$(starship init bash)"
+    eval "$(${pkgs.starship}/bin/starship init bash)"
     0file() { curl -F"file=@$1" https://envs.sh ; }
     0pb() { curl -F"file=@-;" https://envs.sh ; }
     0url() { curl -F"url=$1" https://envs.sh ; }
@@ -80,7 +80,7 @@ pkgs.mkShell
     alias ls='${pkgs.eza}/bin/eza -lhF --color=auto --icons --sort=Name --group-directories-first'
     alias lst='${pkgs.eza}/bin/eza -lahFT --color=auto --icons --sort=size --group-directories-first'
     alias lt='${pkgs.eza}/bin/eza -aT --icons --group-directories-first --color=auto --sort=size'
-    alias cat='${pkgs.bat}/bin/bat'
+    alias cat='${pkgs.bat}/bin/bat -p'
     alias grep='${pkgs.ripgrep}/bin/rg'
 
     echo $GREETING | cowsay | lolcat

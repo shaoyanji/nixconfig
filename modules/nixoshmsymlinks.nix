@@ -33,6 +33,7 @@ in {
     # key for cloak migrated to sops
     # ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/key.txt";
     "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/hello";
+    ".local/share/lowfi/chillhop.txt".source = ./dotfiles/lowfi/chillhop.txt;
   };
   xdg.configFile = {
     #    "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
@@ -57,7 +58,7 @@ in {
 
         #        shell-integration = bash
       '';
-    "elvish/rc.elv".source = ./shell/rc.elv;
+    "elvish/rc.elv".source = ./dotfiles/.config/elvish/rc.elv;
   };
   home.sessionPath =
     ["${nixNAS}/bin-script"]

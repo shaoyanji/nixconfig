@@ -3,12 +3,12 @@
     ./hyprland.nix
   ];
   xdg.configFile = {
-    "hypr/animations.conf".source = ./animations.conf;
-    "hypr/monitors.conf".source = ./monitors.conf;
-    "hypr/userprefs.conf".source = ./userprefs.conf;
-    "hypr/windowrules.conf".source = ./windowrules.conf;
-    "hypr/themes/colors.conf".source = ./themes/colors.conf;
-    "hypr/themes/common.conf".source = ./themes/common.conf;
-    "hypr/themes/theme.conf".source = ./themes/theme.conf;
+    "hypr/animations.conf".source = ../dotfiles/.config/hypr/animations.conf;
+    "hypr/monitors.conf".source = ../dotfiles/.config/hypr/monitors.conf;
+    "hypr/userprefs.conf".source = ../dotfiles/.config/hypr/userprefs.conf;
+    "hypr/windowrules.conf".source = ../dotfiles/.config/hypr/windowrules.conf;
+    "hypr/themes/colors.conf".source = ../dotfiles/.config/hypr/themes/colors.conf;
+    "hypr/themes/common.conf".source = ../dotfiles/.config/hypr/themes/common.conf;
+    "hypr/themes/theme.conf".source = ../dotfiles/.config/hypr/themes/theme.conf;
   };
 }

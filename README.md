@@ -5,17 +5,19 @@ My Nix Configurations for darwin, nixos, home-manager, and WSL.
 ## TODO
 
 -[ ] run `task update-sops`
--[ ] add submodule for secrets
+-[x] add submodule for secrets
 -[ ] make submodule tasks
+-[ ] markdown to taskfile generator
 
 ## Installation
 
 ```bash
-nixos-rebuild switch --flake github:/shaoyanji/nixconfig#$(hostname)
+nixos-rebuild switch --flake github:/shaoyanji/nixconfig?submodules=1#$(hostname)
 git clone thinsandy:/x/nixconfig
 git clone https://$GITHUB_API_TOKEN@github.com/shaoyanji/nixconfig.git
 git clone git@github.com:/shaoyanji/nixconfig.git
 cd nixconfig
+git submodule update --init --recursive
 ```
 
 ## Usage
@@ -43,13 +45,10 @@ yq -i '.keys += (env(AGE) | . anchor = env(HOST)) | .creation_rules[0].key_group
 export AGE=$(nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age")
 export USER=$(whoami)
 yq -i '.keys += (env(AGE) | . anchor = env(HOST)+env(USER)) | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' .sops.yaml
-git add .sops.yaml
-git commit -m "added $(hostname)"
-git push
 ```
 
 ### Setting Up Home-Manager
 
 ```bash
-nix run home-manager/master -- switch --flake .#$(whoami)
+nix run home-manager/master -- switch --flake .?submodules=1#$(whoami)
 ```

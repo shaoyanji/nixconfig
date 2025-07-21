@@ -3,7 +3,7 @@ on:
   check_suite:
     types: [completed]
   # workflow_dispatch:
-  # push:
+  push:
   # pull_request:
 jobs:
   build-machines:
@@ -59,4 +59,4 @@ jobs:
           installCommand: nix profile install nixpkgs#cachix
 
       # this is equivalent to `nixos-rebuild build`
-      - run: nix build -L .?submodules=1#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel
+      - run: nix build -L .?submodules=1#darwinConfigurations.${{ matrix.machine }}.config.system.build.toplevel

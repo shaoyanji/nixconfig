@@ -14,7 +14,7 @@
   };
 
   nix.settings = {
-    experimental-features = ["nix-command" "flakes"];
+    experimental-features = ["nix-command" "flakes" "pipe-operator"];
     substituters = [
       "https://cache.nixos.org/"
       "https://nix-community.cachix.org"

@@ -1,11 +1,10 @@
 {
   description = "
-    ChromeOS and WSL (penguin + guckloch)
     Linux + Nix (heim)
     MacOS + Nix (cassini)
-    NixOS (poseidon, ares, schneeeule, aceofspades, minyx)
-    Asahi Linux (lunarfall)
+    NixOS (poseidon, ares, schneeeule, aceofspades, minyx, ancientace)
     Arch Pi (alarm)
+    ChromeOS and WSL (penguin + guckloch)
   ";
 
   inputs = {

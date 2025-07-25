@@ -58,7 +58,7 @@ in {
 
         #        shell-integration = bash
       '';
-    "elvish/rc.elv".source = ./shell/rc.elv;
+    "elvish/rc.elv".source = ./dotfiles/.config/elvish/rc.elv;
   };
   home.sessionPath =
     ["${nixNAS}/bin-script"]

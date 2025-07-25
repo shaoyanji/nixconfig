@@ -1,6 +1,8 @@
-{ config, pkgs, ... }:
-
 {
+  config,
+  pkgs,
+  ...
+}: {
   #  programs.kitty = {
   #    enable = true;
   #    settings = {
@@ -18,8 +20,8 @@
   #      include = "~/.config/kitty/theme.conf";
   #    };
   #  };
-  xdg.configFile={
-    "kitty/kitty.conf".source = ./kitty.conf;
-    "kitty/current-theme.conf".source = ./current-theme.conf;
+  xdg.configFile = {
+    "kitty/kitty.conf".source = ../dotfiles/.config/kitty/kitty.conf;
+    "kitty/current-theme.conf".source = ../dotfiles/.config/kitty/current-theme.conf;
   };
 }

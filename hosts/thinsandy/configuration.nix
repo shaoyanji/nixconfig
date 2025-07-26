@@ -31,6 +31,34 @@
     # Only set this if using intel-vaapi-driver
     intel-vaapi-driver = pkgs.intel-vaapi-driver.override {enableHybridCodec = true;};
   };
+
+  services.sonarr = {
+    enable = true;
+    openFirewall = true;
+  };
+
+  services.readarr = {
+    enable = true;
+    openFirewall = true;
+  };
+  services.transmission = {
+    enable = true;
+    package = pkgs.transmission_4;
+  };
+  services.lidarr = {
+    enable = true;
+    openFirewall = true;
+  };
+
+  services.prowlarr = {
+    enable = true;
+    openFirewall = true;
+  };
+
+  services.radarr = {
+    enable = true;
+    openFirewall = true;
+  };
   systemd.services.jellyfin.environment.LIBVA_DRIVER_NAME = "iHD"; # Or "i965" if using older driver
   environment.sessionVariables = {LIBVA_DRIVER_NAME = "iHD";}; # Same here
   hardware.graphics = {

@@ -1616,11 +1616,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1753417538,
-        "narHash": "sha256-Z/MbHMjvHoC57sQS43/oLwzEQebT5ST8MRU8Zcb5428=",
+        "lastModified": 1753538182,
+        "narHash": "sha256-Cmzifg/FKeKwUPbj7yP48x49suWNg6f8CSK6FkqLo/o=",
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "d04bdc75b3d203b951ce00cbb6a7ab410ab110c6",
+        "rev": "215722fe39f6e016db624e5ce362b75a4860539d",
         "type": "github"
       },
       "original": {

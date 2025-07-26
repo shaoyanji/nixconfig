@@ -37,6 +37,11 @@
     options = ["subvol=nix" "compress=zstd" "noatime"];
   };
 
+  fileSystems."/var/lib/transmission" = {
+    device = "/dev/disk/by-uuid/e8622c5d-270e-47fa-a1ec-3aca0ef95d8e";
+    fsType = "btrfs";
+    options = ["subvol=transmission" "compress=zstd" "noatime"];
+  };
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/12CE-A600";
     fsType = "vfat";

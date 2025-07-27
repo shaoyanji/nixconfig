@@ -6,4 +6,4 @@
 	url = git@github.com:shaoyanji/secrets.git
 [submodule "modules/dotfiles"]
 	path = modules/dotfiles
-	url = git@github.com:/shaoyanji/.dotfiles
+	url = git@github.com:/shaoyanji/.dotfiles.git

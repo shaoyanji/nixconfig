@@ -55,6 +55,7 @@
       #   undo-last="reset HEAD~1";
       sbupdate = "submodule update --init --recursive";
       sbforfetch = "submodule foreach git fetch origin";
+      sbpull = "pull --recurse-submodules";
     };
   };
   home.sessionVariables = {

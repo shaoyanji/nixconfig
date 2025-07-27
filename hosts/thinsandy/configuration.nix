@@ -32,41 +32,43 @@
     intel-vaapi-driver = pkgs.intel-vaapi-driver.override {enableHybridCodec = true;};
   };
 
-  services.sonarr = {
-    enable = true;
-    openFirewall = true;
-  };
-
-  services.readarr = {
-    enable = true;
-    openFirewall = true;
-  };
-  services.transmission = {
-    enable = true; #Enable transmission daemon
-
-    package = pkgs.transmission_4;
-    openRPCPort = true; #Open firewall for RPC
-    settings = {
-      #Override default settings
-      rpc-bind-address = "0.0.0.0"; #Bind to own IP
-      rpc-whitelist = "127.0.0.1,10.0.0.1,100.66.146.18"; #Whitelist your remote machine (10.0.0.1 in this example)
-      download-dir = "/Volumes/data/arr";
-      # download-dir = "${config.services.transmission.home}/Downloads";
+  services = {
+    sonarr = {
+      enable = true;
+      openFirewall = true;
     };
-  };
-  services.lidarr = {
-    enable = true;
-    openFirewall = true;
-  };
 
-  services.prowlarr = {
-    enable = true;
-    openFirewall = true;
-  };
+    readarr = {
+      enable = true;
+      openFirewall = true;
+    };
+    transmission = {
+      enable = true; #Enable transmission daemon
 
-  services.radarr = {
-    enable = true;
-    openFirewall = true;
+      package = pkgs.transmission_4;
+      openRPCPort = true; #Open firewall for RPC
+      settings = {
+        #Override default settings
+        rpc-bind-address = "0.0.0.0"; #Bind to own IP
+        rpc-whitelist = "127.0.0.1,100.66.146.18,100.80.205.35,100.107.85.117,100.76.219.97,100.80.247.12,100.89.170.84,100.120.134.106";
+        download-dir = "/Volumes/data/arr";
+        # download-dir = "${config.services.transmission.home}/Downloads";
+      };
+    };
+    lidarr = {
+      enable = true;
+      openFirewall = true;
+    };
+
+    prowlarr = {
+      enable = true;
+      openFirewall = true;
+    };
+
+    radarr = {
+      enable = true;
+      openFirewall = true;
+    };
   };
   systemd.services.jellyfin.environment.LIBVA_DRIVER_NAME = "iHD"; # Or "i965" if using older driver
   environment.sessionVariables = {LIBVA_DRIVER_NAME = "iHD";}; # Same here

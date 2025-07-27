@@ -25,8 +25,11 @@
       "ghostscript"
       "xpdf"
       "gemini-cli"
+      "ipfs"
+      # "openssl@3.0"
     ];
     casks = [
+      "simplex"
       "ghostty"
       "orbstack"
       "obsidian"

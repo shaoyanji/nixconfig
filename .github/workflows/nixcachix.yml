@@ -16,7 +16,7 @@ jobs:
           - thinsandy
           # - schneeeule
           - mtfuji
-          - ancientace
+          # - ancientace
           - guckloch
           # - minyx
         os:

@@ -11,6 +11,7 @@
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
+    ghc
     gcc
     gfortran
     # tcc

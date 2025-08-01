@@ -93,6 +93,22 @@
         "type": "github"
       }
     },
+    "dotfiles": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1754080147,
+        "narHash": "sha256-vU33gcPnM+BJDwnX5lPxxUEbn2zzyMWAiX3fl6fFLGs=",
+        "owner": "shaoyanji",
+        "repo": ".dotfiles",
+        "rev": "6883a8d9573b823d8e0de91b60009c533b5fa080",
+        "type": "github"
+      },
+      "original": {
+        "owner": "shaoyanji",
+        "repo": ".dotfiles",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -1255,6 +1271,7 @@
       "inputs": {
         "chaotic": "chaotic",
         "disko": "disko",
+        "dotfiles": "dotfiles",
         "home-manager": "home-manager_2",
         "hydenix": "hydenix",
         "hyprland": "hyprland",
@@ -1272,6 +1289,7 @@
         "nur": "nur",
         "quickshell": "quickshell",
         "raspberry-pi-nix": "raspberry-pi-nix",
+        "secrets": "secrets",
         "sops-nix": "sops-nix",
         "utils": "utils",
         "zen-browser": "zen-browser"
@@ -1419,6 +1437,22 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "secrets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1754066555,
+        "narHash": "sha256-OCEjKHsmt8Yq71MYnLleKgdoUFqUvRtQZ+/wEWvAjEw=",
+        "owner": "shaoyanji",
+        "repo": "secrets",
+        "rev": "2772295f8b5c16fa36c782bebd2dfc8651b930ac",
+        "type": "github"
+      },
+      "original": {
+        "owner": "shaoyanji",
+        "repo": "secrets",
         "type": "github"
       }
     },

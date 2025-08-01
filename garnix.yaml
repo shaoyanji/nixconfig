@@ -4,6 +4,6 @@ builds:
   - '*.x86_64-linux.*'
   - defaultPackage.x86_64-linux
   - devShell.x86_64-linux
-  - ?submodules=1#homeConfigurations.*
-  - ?submodules=1#darwinConfigurations.*
-  - ?submodules=1#nixosConfigurations.*
+  - homeConfigurations.?submodules=1#*
+  - darwinConfigurations.?submodules=1#*
+  - nixosConfigurations.?submodules=1#*

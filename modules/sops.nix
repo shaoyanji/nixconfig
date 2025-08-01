@@ -34,9 +34,9 @@ in {
           github.com:
             users:
               shaoyanji:
-                oauth_token: "${config.sops.placeholder.gh_token}"
+                oauth_token: "${config.sops.placeholder.ghsudo}"
             git_protocol: ssh
-            oauth_token: "${config.sops.placeholder.gh_token}"
+            oauth_token: "${config.sops.placeholder.ghsudo}"
             user: shaoyanji
         '';
       "nix.conf".content = ''

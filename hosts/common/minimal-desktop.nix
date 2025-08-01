@@ -220,48 +220,48 @@ in {
     #];
   };
   nix = {
-    sshServe = {
-      enable = true;
-      keys = localSubKeys;
-    };
-    buildMachines = [
-      {
-        hostName = "poseidon.fritz.box";
-        protocol = "ssh-ng";
-        # if the builder supports building for multiple architectures,
-        # replace the previous line by, e.g.
-        systems = [
-          "x86_64-linux"
-          # "aarch64-linux"
-        ];
+    # sshServe = {
+    #   enable = true;
+    #   keys = localSubKeys;
+    # };
+    # buildMachines = [
+    #   {
+    #     hostName = "poseidon.fritz.box";
+    #     protocol = "ssh-ng";
+    #     # if the builder supports building for multiple architectures,
+    #     # replace the previous line by, e.g.
+    #     systems = [
+    #       "x86_64-linux"
+    #       # "aarch64-linux"
+    #     ];
 
-        maxJobs = 12;
-        speedFactor = 10;
-        supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
-        mandatoryFeatures = [];
-      }
+    #     maxJobs = 12;
+    #     speedFactor = 10;
+    #     supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
+    #     mandatoryFeatures = [];
+    #   }
 
-      {
-        hostName = "thinsandy.fritz.box";
-        protocol = "ssh-ng";
-        # if the builder supports building for multiple architectures,
-        # replace the previous line by, e.g.
-        systems = [
-          "x86_64-linux"
-          # "aarch64-linux"
-        ];
+    #   {
+    #     hostName = "thinsandy.fritz.box";
+    #     protocol = "ssh-ng";
+    #     # if the builder supports building for multiple architectures,
+    #     # replace the previous line by, e.g.
+    #     systems = [
+    #       "x86_64-linux"
+    #       # "aarch64-linux"
+    #     ];
 
-        maxJobs = 1;
-        speedFactor = 1;
-        supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
-        mandatoryFeatures = [];
-      }
-    ];
-    # Switch for local builds
-    distributedBuilds = true;
-    extraOptions = ''
-      builders-use-substitutes = true
-    '';
+    #     maxJobs = 1;
+    #     speedFactor = 1;
+    #     supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
+    #     mandatoryFeatures = [];
+    #   }
+    # ];
+    # # Switch for local builds
+    # distributedBuilds = true;
+    # extraOptions = ''
+    #   builders-use-substitutes = true
+    # '';
   };
 
   # Some programs need SUID wrappers, can be configured further or are

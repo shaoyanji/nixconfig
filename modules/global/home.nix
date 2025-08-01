@@ -1,22 +1,25 @@
 {
   pkgs,
   lib,
+  inputs,
   ...
 }: {
   # home.stateVersion = "25.05";
   imports = [
+    inputs.kickstart-nixvim.homeManagerModules.default
     ../global/minimal.nix
     # ../lf
     # ../env.nix
     ../shell
     # ../sops.nix
-    ../nixvim
+    # ../nixvim
     ../wezterm
     ../kitty
     # ../dev.nix
     # ../helix.nix
     # ../scripts
   ];
+  programs.nixvim.enable = true;
   home = {
     packages = with pkgs;
       [

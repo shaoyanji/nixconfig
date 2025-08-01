@@ -7,7 +7,10 @@
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   taskfile_path = ./secrets/Taskfile.yaml;
 in {
-  imports = [inputs.sops-nix.homeManagerModules.sops];
+  imports = [
+    inputs.sops-nix.homeManagerModules.sops
+    # inputs.secrets
+  ];
 
   sops = {
     age = {
@@ -15,13 +18,14 @@ in {
       generateKey = true;
       #sshKeyPaths = [ "${ssh_key_path}" ];
     };
+    # defaultSopsFile = "${inputs.secrets."secrets.yaml"}";
     defaultSopsFile = ./secrets/secrets.yaml;
     validateSopsFiles = false;
     secrets = {
       "awscredentials".path = "${config.home.homeDirectory}/.aws/credentials";
       "cfcertpem".path = "${config.home.homeDirectory}/.cloudflared/cert.pem";
       "cloak".path = "${config.home.homeDirectory}/.cloak/accounts";
-      "garnix" = {};
+      "garnixgh" = {};
       #"${local_ssh_key}".path = "${ssh_key_path}";
       #
     };
@@ -34,13 +38,13 @@ in {
           github.com:
             users:
               shaoyanji:
-                oauth_token: "${config.sops.placeholder.garnix}"
+                oauth_token: "${config.sops.placeholder.garnixgh}"
             git_protocol: ssh
-            oauth_token: "${config.sops.placeholder.garnix}"
+            oauth_token: "${config.sops.placeholder.garnixgh}"
             user: shaoyanji
         '';
       "nix.conf".content = ''
-        access-tokens = github.com=${config.sops.placeholder.garnix}
+        access-tokens = github.com=${config.sops.placeholder.garnixgh}
       '';
     };
   };

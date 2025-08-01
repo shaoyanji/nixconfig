@@ -40,7 +40,7 @@ in {
             user: shaoyanji
         '';
       "nix.conf".content = ''
-        access-tokens = github.com=${config.sops.placeholder."GITHUB/API/KEY"}
+        access-tokens = github.com=${config.sops.placeholder."ghsudo"}
       '';
     };
   };

@@ -198,6 +198,7 @@
           {
             garnix.server.enable = true;
           }
+          ./hosts/garnixMachine.nix
         ];
       };
       # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {

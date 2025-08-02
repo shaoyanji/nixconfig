@@ -9,6 +9,9 @@
     ./hardware-configuration.nix
     ../common/minimal-desktop.nix
   ];
+  nixpkgs.config.permittedInsecurePackages = [
+    "intel-media-sdk-23.2.2"
+  ]; #build issue on legacy NAS
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   # Use the GRUB 2 boot loader.
@@ -87,9 +90,6 @@
       intel-ocl # OpenCL support
     ];
   };
-  config.permittedInsecurePackages = [
-    "intel-media-sdk-23.2.2"
-  ]; #build issue on legacy NAS
   # 2. do not forget to enable jellyfin
   services.jellyfin = {
     enable = true;

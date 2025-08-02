@@ -1,0 +1,35 @@
+set drawbox
+set hidden
+set icons
+set ignorecase
+set preview
+
+cmd editor-open $$EDITOR $f
+cmd mkdir ${{
+  printf "Directory Name: "
+  read DIR
+  mkdir $DIR
+}}
+
+
+map . set hidden!
+map <enter> open
+# map V $cat --paging=always theme=gruvbox "$f"
+map V $cat "$f"
+map \"
+map \' mark-load
+map ` mark-load
+map c mkdir
+map ee editor-open
+map g/ /
+map gh cd
+map g~ cd
+map o
+
+
+
+
+
+# set cleaner /nix/store/p52j88mcxfl1vvnk8fbrpqxbz36bjrx4-clean.sh/bin/clean.sh
+# set previewer /nix/store/6i06nqilcwx01d16b42k22z629sagb2c-pv.sh/bin/pv.sh
+

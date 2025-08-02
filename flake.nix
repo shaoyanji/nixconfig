@@ -11,8 +11,6 @@
     # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
-    flake-utils.url = "github:numtide/flake-utils";
-
     garnix-lib = {
       url = "github:garnix-io/garnix-lib";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -106,7 +104,7 @@
       garnix-lib,
       # secrets,
       # utils,
-      flake-utils,
+      utils,
       ...
     }@inputs:
     let
@@ -145,9 +143,7 @@
         home-manager.nixosModules.default
       ];
     in
-    # build packages for frontend and backend for garnixMachine
-    # fixme: this is a hack to get the frontend working
-    flake-utils.lib.eachDefaultSystem
+    inputs.utils.lib.eachDefaultSystem
       (
         system:
         let
@@ -166,7 +162,21 @@
             ];
           };
         }
-      )
+      )//{
+      nixosConfigurations = {
+          garnixMachine = nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            modules = [
+              garnix-lib.nixosModules.garnix
+              {
+                _module.args = {
+                  self = inputs.self;
+                };
+                # garnix.server.enable = true;
+              }
+              ./hosts/garnixMachine.nix
+            ];
+          };      };
 
       {
         homeConfigurations = {
@@ -212,19 +222,6 @@
           };
         };
         nixosConfigurations = {
-          garnixMachine = nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
-            modules = [
-              garnix-lib.nixosModules.garnix
-              {
-                _module.args = {
-                  self = inputs.self;
-                };
-                # garnix.server.enable = true;
-              }
-              ./hosts/garnixMachine.nix
-            ];
-          };
           # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
           #   inherit (inputs.hydenix.lib) system;
           #   specialArgs = {inherit inputs;};

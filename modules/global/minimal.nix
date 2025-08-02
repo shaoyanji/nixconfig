@@ -128,7 +128,6 @@
         translate-shell
         mc
         broot
-        hub
         # qalculate-qt
         ticker
         obsidian-export
@@ -144,6 +143,7 @@
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
+        hub
         md2pdf
         strace
         ltrace

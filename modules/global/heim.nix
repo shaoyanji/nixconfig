@@ -4,11 +4,13 @@
   ...
 }: {
   imports = [
+    inputs.kickstart-nixvim.homeManagerModules.default
     ./home.nix
     #../dev.nix
     ../nixoshmsymlinks.nix
     # ../shell/nushell.nix
   ];
+  programs.nixvim.enable = true;
   home = {
     username = "devji";
     homeDirectory = "/home/devji";

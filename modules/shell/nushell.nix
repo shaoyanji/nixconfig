@@ -50,7 +50,7 @@
     carapace.enableNushellIntegration = true;
   };
   home.packages = with pkgs; [
-    nushellPlugins.net
+    # nushellPlugins.net
     nushellPlugins.skim
     nushellPlugins.dbus
     nushellPlugins.query

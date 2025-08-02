@@ -52,7 +52,7 @@
   home.packages = with pkgs; [
     # nushellPlugins.net
     nushellPlugins.skim
-    nushellPlugins.dbus
+    # nushellPlugins.dbus
     nushellPlugins.query
     nushellPlugins.units
     nushellPlugins.gstat

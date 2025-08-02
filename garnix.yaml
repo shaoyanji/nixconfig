@@ -10,6 +10,7 @@ builds:
     # - homeConfigurations.*
     # - darwinConfigurations.*
     # - nixosConfigurations.*
-    - darwinConfigurations.cassini
+    # - darwinConfigurations.cassini
     # - nixosConfigurations.thinsandy
+    - nixosConfigurations.orb-cassini
     - homeConfigurations.verntil

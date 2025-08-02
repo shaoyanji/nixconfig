@@ -1,16 +1,19 @@
 builds:
   exclude:
-    - nixosConfigurations.poseidon
+    - homeConfigurations.*
+    - darwinConfigurations.*
+    # - nixosConfigurations.*
   include:
-    # - "*.x86_64-linux.*"
-    # - "*.aarch64-darwin.*"
-    # - "*.aarch64-linux.*"
-    # - defaultPackage.x86_64-linux
-    # - devShell.x86_64-linux
+    - "*.x86_64-linux.*"
+    - "*.aarch64-darwin.*"
+    - "*.aarch64-linux.*"
+    - defaultPackage.x86_64-linux
+    - devShell.x86_64-linux
     # - homeConfigurations.*
     # - darwinConfigurations.*
-    # - nixosConfigurations.*
-    # - darwinConfigurations.cassini
-    # - nixosConfigurations.thinsandy
-    - nixosConfigurations.orb-cassini
-    - homeConfigurations.verntil
+    - nixosConfigurations.
+servers:
+  - configuration: garnixMachine
+    deployment:
+      type: on-branch
+      branch: prod

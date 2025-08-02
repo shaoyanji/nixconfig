@@ -21,7 +21,7 @@
       }
     ];
     extraConfig = {
-      init.defaultBranch = "master";
+      init.defaultBranch = lib.mkForce "master";
       pull.rebase = lib.mkForce true;
       push.autoSetupRemote = true;
     };

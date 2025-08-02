@@ -87,7 +87,9 @@
       intel-ocl # OpenCL support
     ];
   };
-
+  config.permittedInsecurePackages = [
+    "intel-media-sdk-23.2.2"
+  ]; #build issue on legacy NAS
   # 2. do not forget to enable jellyfin
   services.jellyfin = {
     enable = true;

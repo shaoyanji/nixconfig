@@ -73,7 +73,7 @@ in {
     eza
   ];
   xdg.configFile = {
-    "starship.toml".source = ../dotfiles/.config/starship.toml;
+    "starship.toml".source = ../config/starship.toml;
   };
   home.file = {
   };

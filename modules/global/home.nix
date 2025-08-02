@@ -216,7 +216,7 @@
         # usbutils # lsusb
       ]
       ++ lib.optionals stdenv.isDarwin [
-        libation
+        # libation
       ];
     file = {
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in

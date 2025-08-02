@@ -79,7 +79,7 @@ in {
     recommendedGzipSettings = true;
     virtualHosts."default" = {
       # Serving the frontend bundle by default.
-      locations."/".root = "${self.packages.${pkgs.system}.frontend-bundle}";
+      # locations."/".root = "${self.packages.${pkgs.system}.frontend-bundle}";
       # Proxying to the backend on /api.
       locations."/api".proxyPass = "http://localhost:${backendPort}/";
     };

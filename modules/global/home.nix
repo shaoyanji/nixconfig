@@ -6,7 +6,6 @@
 }: {
   # home.stateVersion = "25.05";
   imports = [
-    inputs.kickstart-nixvim.homeManagerModules.default
     ../global/minimal.nix
     # ../lf
     # ../env.nix
@@ -19,7 +18,6 @@
     # ../helix.nix
     # ../scripts
   ];
-  # programs.nixvim.enable = true;
   home = {
     packages = with pkgs;
       [

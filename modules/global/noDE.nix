@@ -13,8 +13,9 @@
       imports = [
         ./minimal.nix
         ../nixoshmsymlinks.nix
-        ../nixvim
+        inputs.kickstart-nixvim.homeManagerModules.default
       ];
+      programs.nixvim.enable = true;
       home.username = "devji";
       home.homeDirectory = "/home/devji";
       home.packages = with pkgs;

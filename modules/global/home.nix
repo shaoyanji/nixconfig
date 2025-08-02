@@ -7,7 +7,7 @@
   # home.stateVersion = "25.05";
   imports = [
     inputs.kickstart-nixvim.homeManagerModules.default
-    ../global/minimal.nix
+    # ../global/minimal.nix
     # ../lf
     # ../env.nix
     ../shell
@@ -216,7 +216,7 @@
         # usbutils # lsusb
       ]
       ++ lib.optionals stdenv.isDarwin [
-        # libation
+        libation
       ];
     file = {
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in

@@ -11,7 +11,7 @@ builds:
     - devShell.x86_64-linux
     # - homeConfigurations.*
     # - darwinConfigurations.*
-    # - nixosConfigurations.garnixMachine
+    - nixosConfigurations.garnixMachine
 servers:
   - configuration: garnixMachine
     deployment:

@@ -22,6 +22,7 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMEvIBjy85SIOMbk9WCY/jSrKiXcJ8aA4xqvMKC1b4aH jisifu@gmail.com"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ/yKF1l8oT/PotNGpPgUyBSQDG0xsJpsDP2UIXBxqkI devji@applevalley"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILafESrQ/gxr1Dh9KMmgNug6DCeENerx5xlH9cnUdTjm dietpi@dietzappy" # "ssh-rsa <YOUR_PUBLIC_SSH_KEY>"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN7lxoZFc1WcMQXyLWgUTpbm22QVf78fO7eVT1/03b/m devji@penguin"
   ];
   backendPort = "3000";
 in {

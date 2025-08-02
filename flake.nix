@@ -196,7 +196,8 @@
         modules = [
           garnix-lib.nixosModules.garnix
           {
-            garnix.server.enable = true;
+            _module.args = {self = inputs.self;};
+            # garnix.server.enable = true;
           }
           ./hosts/garnixMachine.nix
         ];

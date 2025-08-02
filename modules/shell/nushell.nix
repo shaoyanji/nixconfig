@@ -50,15 +50,15 @@
     carapace.enableNushellIntegration = true;
   };
   home.packages = with pkgs; [
-    nushellPlugins.net
-    nushellPlugins.skim
-    nushellPlugins.dbus
-    nushellPlugins.query
-    nushellPlugins.units
-    nushellPlugins.gstat
-    nushellPlugins.formats
-    nushellPlugins.highlight
-    nushellPlugins.polars
+    # nushellPlugins.net
+    # nushellPlugins.skim
+    # nushellPlugins.dbus
+    # nushellPlugins.query
+    # nushellPlugins.units
+    # nushellPlugins.gstat
+    # nushellPlugins.formats
+    # nushellPlugins.highlight
+    # nushellPlugins.polars
     #      nu_scripts
   ];
   xdg.configFile = {

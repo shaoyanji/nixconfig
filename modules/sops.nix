@@ -19,7 +19,7 @@ in {
       #sshKeyPaths = [ "${ssh_key_path}" ];
     };
     # defaultSopsFile = "${inputs.secrets."secrets.yaml"}";
-    defaultSopsFile = ./secrets/secrets.yaml;
+    defaultSopsFile = ./secrets.yaml;
     validateSopsFiles = false;
     secrets = {
       "awscredentials".path = "${config.home.homeDirectory}/.aws/credentials";
@@ -38,13 +38,13 @@ in {
           github.com:
             users:
               shaoyanji:
-                oauth_token: "${config.sops.placeholder.garnixgh}"
+                oauth_token: "${config.sops.placeholder.ghsudo}"
             git_protocol: ssh
-            oauth_token: "${config.sops.placeholder.garnixgh}"
+            oauth_token: "${config.sops.placeholder.ghsudo}"
             user: shaoyanji
         '';
       "nix.conf".content = ''
-        access-tokens = github.com=${config.sops.placeholder.garnixgh}
+        access-tokens = github.com=${config.sops.placeholder.ghsudo}
       '';
     };
   };

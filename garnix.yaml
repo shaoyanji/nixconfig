@@ -2,8 +2,10 @@ builds:
   exclude: []
   include:
     - "*.x86_64-linux.*"
+    - "*.aarch64-darwin.*"
+    - "*.aarch64-linux.*"
     - defaultPackage.x86_64-linux
     - devShell.x86_64-linux
-    - "*.?submodules=1?homeConfigurations.*"
-    - "*.?submodules=1?darwinConfigurations.*"
-    - "*.?submodules=1?nixosConfigurations.*"
+    - homeConfigurations.*
+    - darwinConfigurations.*
+    - nixosConfigurations.*

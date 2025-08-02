@@ -11,6 +11,10 @@
     # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
+    garnix-lib = {
+      url = "github:garnix-io/garnix-lib";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # nixpkgs-legacy.url = "github:NixOS/nixpkgs/nixos-24.05";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
@@ -96,6 +100,7 @@
     chaotic,
     sops-nix,
     nur,
+    garnix-lib,
     # secrets,
     # utils,
     ...
@@ -186,6 +191,15 @@
       };
     };
     nixosConfigurations = {
+      garnixMachine = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          garnix-lib.nixosModules.garnix
+          {
+            garnix.server.enable = true;
+          }
+        ];
+      };
       # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
       #   inherit (inputs.hydenix.lib) system;
       #   specialArgs = {inherit inputs;};

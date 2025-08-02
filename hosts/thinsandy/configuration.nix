@@ -9,9 +9,7 @@
     ./hardware-configuration.nix
     ../common/minimal-desktop.nix
   ];
-  nixpkgs.config.permittedInsecurePackages = [
-    "intel-media-sdk-23.2.2"
-  ]; #build issue on legacy NAS
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   # Use the GRUB 2 boot loader.
@@ -86,7 +84,7 @@
       # see: https://github.com/NixOS/nixpkgs/issues/356535
       intel-compute-runtime-legacy1
       vpl-gpu-rt # QSV on 11th gen or newer
-      intel-media-sdk # QSV up to 11th gen
+      # intel-media-sdk # QSV up to 11th gen #security
       intel-ocl # OpenCL support
     ];
   };

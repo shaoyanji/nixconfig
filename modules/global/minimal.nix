@@ -41,7 +41,6 @@
         nixd
         viu
         qrencode
-        wl-clipboard
         duf
         slides
         graphviz
@@ -143,6 +142,7 @@
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
+        wl-clipboard
         hub
         md2pdf
         strace

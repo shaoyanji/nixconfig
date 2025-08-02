@@ -11,5 +11,5 @@ builds:
     # - darwinConfigurations.*
     # - nixosConfigurations.*
     - darwinConfigurations.cassini
-    - nixosConfigurations.thinsandy
+    # - nixosConfigurations.thinsandy
     - homeConfigurations.verntil

@@ -1,1 +1,115 @@
-modules/secrets/.sops.yaml
+# This example uses YAML anchors which allows reuse of multiple keys
+# without having to repeat yourself.
+# Also see https://github.com/Mic92/dotfiles/blob/master/nixos/.sops.yaml
+# for a more complex example.
+keys:
+  - &devji age1tsv2lurpjzyx9ng6hcc4dff23lvv7tqkyyxz5zlpx32egu2c9vfql9m008
+  - &servermb age1ywan3hwg4v306e3gk4sjzfvjfxru432kgr3xlmwu77nkhgsjmfuqr7lktd
+  - &mbdevji age15ptau7jyv6kcwz39vcfzxpw95p97l5r7uywkcl5g83gqxuhh7q4saggagy
+  - &sopsposeidon age1ezs5s0mx7pcmv0cq6lhvxqtrgx9shrenpxuqyny3m52rg4a6vuxq9ucd7c
+  - &hposeidon age10njuv5050y6wvxq0a9vpvxwrd4scr34cxrxmzz3cl8p7xwjydqhq358af6
+  - &sopsacer age12yhcg6c7spluq7z0dsgduqfvvcqzyz0a5an3zsndecuc0h2w3ftseyzlad
+  - &pengsops age176w440q29gdaqa0pyp3wq0663ge9h3vvykhghc6drzx4qydguqasdjvev8
+  # - &minyx age1fer9mjcr3cdys3n8cywtuew2cdg4fz20srgn08rh4wfjezk7z4yq25dvd5
+  - &guckloch age1aq6fer9unde6xwjw587qzc6e6cfe4wlu2xvcah7vjqrkptkd7gtq69v38r
+  - &lunarfall age1wvrf6uclae5ald5uk5lvjyj9pgpc56tpy9vannv7wmy0s092850qk2mn0y
+  - &schneeeule age14wsec4ypsqzx075mxw6nen6htdm6tmsu3artlf4jas7jk02zmecsg7kseh
+  - &leakynose age1jykxrxauzv92xk0rscav5pd52dhzegzuxrha3c8unx2x7ktsm52s0tlfqk
+  - &schneeeulehost age103h35vrcud7a8mk0fzegzlyazq0qtsgggnzyxf4vf3z2qdspxgvs9zhdy5
+  - &acersops age15mzmhlt5hh5z94843e27rqev4955v3gkcwqacr4ueyxegzav94kqvz0c43
+  # - &minyxhost age15g3grw9k0mnpvst4r2yjdfhpa9sc66wrtl7gskypwpyzmffjvu2qhakyq9
+  - &orb-cassini age15ptau7jyv6kcwz39vcfzxpw95p97l5r7uywkcl5g83gqxuhh7q4saggagy
+  - &acersopshost age15mzmhlt5hh5z94843e27rqev4955v3gkcwqacr4ueyxegzav94kqvz0c43
+  # - &usbares age165pm2te09z0kzjwrvwcy9qdvycpqlqw2v7hxmv9u7tcy9w3ld3cq0nughq
+  # - &usbareshost age12wmg9wmatu5mlyjqs0afgdj4uu7m6flc05anmq0v0a3m50zhpswsyjhf7a
+  # - &alarm age1juyqqqcntxf5affyt4ukr2fyerw6mexw08w3y8tyqjkm27k3hd8qpax2y5
+  - &ares age1nqdx5a80wy6d3hjsldhhe5y4ltrfv3zr9m3cdrekcxha0hg7g5usxj482d
+  - &areshost age12gezpwjwq0ln36gt22h3hp6v2tsf5df4sgrr7x4g57sa83dc6unsft55zx
+  - &thinsandyhost age1fgrg9t27a39falklr9375p3q6hcrqm52rdges83zawzzpnev3cvq7fgfgm
+  - &thinsandy age1q6klnp8k9282fjxlweu5gmkxpt4pxzyumkk3q8hdeunz8w3ns40scn7q8a
+  - &ancientacehost age1ageqwpdaf0zkkkc3xqf3qag577fm80cf8vqc5glkz6fqjjp7jpss8t590l
+  - &ancientace age1pk08qp3exeaw8ky7vs3xtxsuw55g8nrsp8j8pj4xar8ynngv7q9qtywkkm
+  - &mtfuji age1cpped4xh57c2zrguv6y2sqy526lnpklmruw7leu50xxuclmux5askrhrry
+  - &mtfujihost age1tgek4uvpjy2hls5uf80c4sxdshgwhj35fyrcervgefec9rwz05nq59cfew
+  - &sandylaptop age160ke2yrkx3h34l8h8xhqktcwtwhsdzfcg7h3ca0gsl77hwzwv5rqwy0gwl
+  - &applevalleyhost age15rlqjq7nzc0xnnq5z32ugkkg4dzhxjsg3hxstlh0gygq3rffcvlsfqruj0
+  - &applevalley age1afuz306fl0vcp9lje6exyczwncnw5rklef3kq5d5mfmpy7f68ejsp99v69
+  - &verntiljisifu age15y8n5rmwvtdyfm2r6qx5ru8dtldax7j4ef53nedex3qpf6lhd9zsx3e69j
+  - &kali age16q43vrn59pwjfpuwygmqg98enu063dvveazrlr02zcf339wxj3qstsxywq
+
+creation_rules:
+  - path_regex: secrets/server/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *verntiljisifu
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *kali
+          - *devji
+          - *servermb
+          - *mbdevji
+          - *sopsposeidon
+          - *hposeidon
+          - *sopsacer
+          - *pengsops
+          # - *minyx
+          - *guckloch
+          - *lunarfall
+          - *ares
+          - *schneeeule
+          - *leakynose
+          - *schneeeulehost
+          - *acersops
+          # - *minyxhost
+          - *orb-cassini
+          - *acersopshost
+          - *areshost
+          # - *alarm
+          # - *usbares
+          # - *usbareshost
+          - *thinsandyhost
+          - *thinsandy
+          - *ancientace
+          - *ancientacehost
+          - *mtfuji
+          - *mtfujihost
+          - *sandylaptop
+          - *applevalleyhost
+          - *applevalley
+  - path_regex: /[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *kali
+          - *devji
+          - *servermb
+          - *mbdevji
+          - *sopsposeidon
+          - *hposeidon
+          - *sopsacer
+          - *pengsops
+          # - *minyx
+          - *guckloch
+          - *lunarfall
+          - *ares
+          - *schneeeule
+          - *leakynose
+          - *schneeeulehost
+          - *acersops
+          # - *minyxhost
+          - *orb-cassini
+          - *acersopshost
+          - *areshost
+          # - *alarm
+          # - *usbares
+          # - *usbareshost
+          - *thinsandyhost
+          - *thinsandy
+          - *ancientace
+          - *ancientacehost
+          - *mtfuji
+          - *mtfujihost
+          - *sandylaptop
+          - *applevalleyhost
+          - *applevalley
+        gpg:

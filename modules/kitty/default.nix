@@ -21,7 +21,7 @@
   #    };
   #  };
   xdg.configFile = {
-    "kitty/kitty.conf".source = ../dotfiles/.config/kitty/kitty.conf;
-    "kitty/current-theme.conf".source = ../dotfiles/.config/kitty/current-theme.conf;
+    "kitty/kitty.conf".source = ../config/kitty/kitty.conf;
+    "kitty/current-theme.conf".source = ../config/kitty/current-theme.conf;
   };
 }

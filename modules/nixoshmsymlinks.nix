@@ -69,6 +69,6 @@ in {
 
         #        shell-integration = bash
       '';
-    "elvish/rc.elv".source = ./dotfiles/.config/elvish/rc.elv;
+    "elvish/rc.elv".source = ./config/elvish/rc.elv;
   };
 }

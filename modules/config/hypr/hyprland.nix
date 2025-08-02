@@ -11,9 +11,9 @@
   ];
 
   xdg.configFile = {
-    "wofi/style.css".source = ../config/hypr/style.css;
-    "wofi/style.scss".source = ../config/hypr/style.scss;
-    ".kde-dark-kuroi.qss".source = ../config/hypr/kde-dark-kuroi.qss;
+    "wofi/style.css".source = ./style.css;
+    "wofi/style.scss".source = ./style.scss;
+    ".kde-dark-kuroi.qss".source = ./kde-dark-kuroi.qss;
   };
   wayland.windowManager.hyprland = {
     enable = true;

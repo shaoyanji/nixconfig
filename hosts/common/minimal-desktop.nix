@@ -33,7 +33,7 @@ in {
     # binfmt.emulatedSystems = [] ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 ["aarch64-linux"];
   };
   sops = {
-    defaultSopsFile = ../../modules/secrets/secrets.yaml;
+    defaultSopsFile = ../../modules/secrets.yaml;
     age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
     secrets = {
       "server/localwd/credentials" = {};

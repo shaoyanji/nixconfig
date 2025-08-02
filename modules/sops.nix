@@ -25,7 +25,7 @@ in {
       "awscredentials".path = "${config.home.homeDirectory}/.aws/credentials";
       "cfcertpem".path = "${config.home.homeDirectory}/.cloudflared/cert.pem";
       "cloak".path = "${config.home.homeDirectory}/.cloak/accounts";
-      "garnixgh" = {};
+      "ghsudo" = {};
       #"${local_ssh_key}".path = "${ssh_key_path}";
       #
     };

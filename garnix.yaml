@@ -1,17 +1,18 @@
 builds:
   exclude:
-    - homeConfigurations.*
-    - darwinConfigurations.*
+    # - homeConfigurations.*
+    # - darwinConfigurations.*
     # - nixosConfigurations.*
+    - nixosConfigurations.garnixMachine
   include:
-    - "*.x86_64-linux.*"
-    - "*.aarch64-darwin.*"
-    - "*.aarch64-linux.*"
-    - defaultPackage.x86_64-linux
+    # - "*.x86_64-linux.*"
+    # - "*.aarch64-darwin.*"
+    # - "*.aarch64-linux.*"
+    # - defaultPackage.x86_64-linux
     # - devShell.x86_64-linux
     # - homeConfigurations.*
     # - darwinConfigurations.*
-    - nixosConfigurations.garnixMachine
+    # - nixosConfigurations.garnixMachine
 servers:
   - configuration: garnixMachine
     deployment:

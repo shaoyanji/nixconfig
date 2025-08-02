@@ -35,6 +35,7 @@ in {
       # ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/key.txt";
       "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/hello";
       # ".local/share/lowfi/chillhop.txt".source = ./dotfiles/lowfi/chillhop.txt;
+      ".local/share/lowfi".source = config.lib.file.mkOutOfStoreSymlink ./config/lowfi;
     };
     sessionPath =
       ["${nixNAS}/bin-script"]

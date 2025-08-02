@@ -16,4 +16,4 @@ servers:
   - configuration: garnixMachine
     deployment:
       type: on-branch
-      branch: prod
+      branch: main

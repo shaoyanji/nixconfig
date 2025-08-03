@@ -13,8 +13,9 @@ builds:
     # - homeConfigurations.*
     # - darwinConfigurations.*
     # - nixosConfigurations.garnixMachine
-servers:
-  - configuration: garnixMachine
-    deployment:
-      type: on-branch
-      branch: main
+    - nixosConfigurations.poseidon
+# servers:
+#   - configuration: garnixMachine
+#     deployment:
+#       type: on-branch
+#       branch: main

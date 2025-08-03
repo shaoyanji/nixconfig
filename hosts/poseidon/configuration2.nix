@@ -54,7 +54,7 @@ in {
     # inputs.hydenix.inputs.nixos-hardware.nixosModules.common-pc-ssd
   ];
 
-  home-manager.users.devji.home.sessionVariables.EDITOR = lib.mkForce "hx";
+  # home-manager.users.devji.home.sessionVariables.EDITOR = lib.mkForce "hx";
   # home-manager = {
   #   useGlobalPkgs = true;
   #   useUserPackages = true;
@@ -107,17 +107,17 @@ in {
   };
 
   # #! EDIT THESE VALUES (must match users defined above)
-  users.users.devji = {
-    #   isNormalUser = true; # Regular user account
-    #   #    initialPassword = "1234"; # Default password (CHANGE THIS after first login with passwd)
-    #   extraGroups = [
-    #     "wheel" # For sudo access
-    #     "networkmanager" # For network management
-    #     "video" # For display/graphics access
-    #     # Add other groups as needed
-    #   ];
-    #   shell = pkgs.zsh; # Change if you prefer a different shell
-  };
+  # users.users.devji = {
+  #   isNormalUser = true; # Regular user account
+  #   #    initialPassword = "1234"; # Default password (CHANGE THIS after first login with passwd)
+  #   extraGroups = [
+  #     "wheel" # For sudo access
+  #     "networkmanager" # For network management
+  #     "video" # For display/graphics access
+  #     # Add other groups as needed
+  #   ];
+  #   shell = pkgs.zsh; # Change if you prefer a different shell
+  # };
 
   # system.stateVersion = "25.05";
 }

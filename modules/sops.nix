@@ -36,12 +36,12 @@ in {
         */
         ''
           github.com:
-            users:
-              shaoyanji:
-                oauth_token: "${config.sops.placeholder.ghsudo}"
-            git_protocol: ssh
-            oauth_token: "${config.sops.placeholder.ghsudo}"
-            user: shaoyanji
+                users:
+                    shaoyanji:
+                        oauth_token: ${config.sops.placeholder.ghsudo}
+                git_protocol: ssh
+                oauth_token: ${config.sops.placeholder.ghsudo}
+                user: shaoyanji
         '';
       "nix.conf".content = ''
         access-tokens = github.com=${config.sops.placeholder.ghsudo}

@@ -34,10 +34,12 @@
     };
     nix-homebrew = {
       url = "github:zhaofengli-wip/nix-homebrew";
-      # inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    # raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
+    nixos-hardware.inputs.nixpkgs.follows = "nixpkgs";
+    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
+    raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -93,7 +95,7 @@
     nix-homebrew,
     nixos-wsl,
     # nixos-hardware,
-    # raspberry-pi-nix,
+    raspberry-pi-nix,
     home-manager,
     impermanence,
     disko,

@@ -16,7 +16,7 @@
   };
 in {
   imports = [
-    #./nushell.nix # nushell not cached for darwin
+    ./nushell.nix
     ./zsh.nix
     ./bash.nix
     ./tmux.nix

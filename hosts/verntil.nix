@@ -24,7 +24,7 @@ in {
     ../modules/shell
     ../modules/helix.nix
     ../modules/nixvim
-    ../modules/shell/nushell.nix
+    # ../modules/shell/nushell.nix #included in shell now
   ];
   home.packages = with pkgs; [
     nix-index

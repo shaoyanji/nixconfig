@@ -37,7 +37,7 @@
       # inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
+    # raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -227,22 +227,22 @@
         };
       };
       nixosConfigurations = {
-        # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-        #   inherit (inputs.hydenix.lib) system;
-        #   specialArgs = {inherit inputs;};
-        #   modules =
-        #     globalModules
-        #     ++ [
-        #       ./hosts/poseidon/configuration2.nix
-        #     ];
-        poseidon = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+        poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+          inherit (inputs.hydenix.lib) system;
           specialArgs = {inherit inputs;};
           modules =
-            globalModulesNixos
+            globalModules
             ++ [
-              ./hosts/poseidon/configuration3.nix
+              ./hosts/poseidon/configuration2.nix
             ];
+          # poseidon = nixpkgs.lib.nixosSystem {
+          #   system = "x86_64-linux";
+          #   specialArgs = {inherit inputs;};
+          #   modules =
+          #     globalModulesNixos
+          #     ++ [
+          #       ./hosts/poseidon/configuration3.nix
+          #     ];
         };
 
         mtfuji = nixpkgs.lib.nixosSystem {

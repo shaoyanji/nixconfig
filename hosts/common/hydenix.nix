@@ -1,4 +1,8 @@
-{inputs, ...}: let
+{
+  lib,
+  inputs,
+  ...
+}: let
   # Package declaration
   # ---------------------
   pkgs = import inputs.hydenix.inputs.hydenix-nixpkgs {
@@ -20,7 +24,6 @@ in {
     inputs.hydenix.inputs.home-manager.nixosModules.home-manager
     # ./configuration.nix
     inputs.hydenix.lib.nixOsModules
-    ../../modules/system
     # === GPU-specific configurations ===
 
     /*
@@ -61,9 +64,12 @@ in {
         # Nix-index-database - for comma and command-not-found
         inputs.nix-index-database.homeModules.nix-index
         inputs.kickstart-nixvim.homeManagerModules.default
-        ../../modules/hm
+        ../../modules/nixoshmsymlinks.nix
+        ../../modules/global/minimal.nix
       ];
       programs.nixvim.enable = true;
+      hydenix.hm.enable = true;
+      hydenix.hm.editors.neovim = lib.mkForce false;
       home.packages = with pkgs; [
         obsidian
       ];

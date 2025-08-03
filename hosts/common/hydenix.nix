@@ -59,11 +59,11 @@ in {
       imports = [
         inputs.hydenix.lib.homeModules
         # Nix-index-database - for comma and command-not-found
-        inputs.nix-index-database.hmModules.nix-index
+        inputs.nix-index-database.homeModules.nix-index
         inputs.kickstart-nixvim.homeManagerModules.default
         ../../modules/hm
       ];
-      programs.kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
+      programs.nixvim.enable = true;
       home.packages = with pkgs; [
         obsidian
       ];

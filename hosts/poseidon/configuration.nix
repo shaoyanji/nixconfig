@@ -4,7 +4,8 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+{
   imports = [
     # Include the results of the hardware scan.
     #    ./configuration2.nix
@@ -17,7 +18,6 @@
     inputs.chaotic.nixosModules.default
     inputs.nix-index-database.nixosModules.nix-index
   ];
-
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {
     #extraModulePackages = with config.boot.kernelPackages; [v4l2loopback.out];
@@ -36,6 +36,7 @@
   networking.hostName = "poseidon"; # Define your hostname.
   environment = {
     systemPackages = with pkgs; [
+      # inputs.nur.legacyPackages."${system}".repos.charmbracelet.crush
       btrfs-progs
       (pkgs.wrapOBS {
         plugins = with pkgs.obs-studio-plugins; [
@@ -148,4 +149,7 @@
       }
     ];
   };
+}
+// {
+  # nixpkgs.config.allowUnfree = true;
 }

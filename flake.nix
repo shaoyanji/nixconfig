@@ -115,7 +115,6 @@
         system.configurationRevision = self.rev or self.dirtyRev or null;
       }
       ./modules/global/global.nix
-      nur.modules.nixos.default
     ];
     globalModulesNixos =
       globalModules
@@ -123,6 +122,7 @@
         ./modules/global/nixos.nix
         home-manager.nixosModules.default
         sops-nix.nixosModules.sops
+        nur.modules.nixos.default
         # chaotic.nixosModules.default
         #lix-module.nixosModules.default
         #determinate.nixosModules.default

@@ -34,8 +34,11 @@ in {
       # key for cloak migrated to sops
       # ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/key.txt";
       "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/hello";
-      # ".local/share/lowfi/chillhop.txt".source = ./config/lowfi/chillhop.txt;
-      ".local/share/lowfi".source = ./config/lowfi;
+      ".local/share/lowfi/chillhop.txt".source = pkgs.fetchurl {
+        url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/chillhop.txt";
+        hash = "sha256-ihvGNBwa4DD3CjKXvSlYttdSWTtFHwV53N3WUVQfgKo=";
+      };
+      # ".local/share/lowfi".source = ./config/lowfi;
       ".simplex".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/.simplex";
     };
     sessionPath =

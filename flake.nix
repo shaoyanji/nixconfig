@@ -74,7 +74,7 @@
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     #    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     #    ghostty.url = "github:ghostty-org/ghostty";
-    utils.url = "github:numtide/flake-utils";
+    flake-utils.url = "github:numtide/flake-utils";
     hydenix.url = "github:richen604/hydenix";
     quickshell = {
       # add ?ref=<tag> to track a tag
@@ -83,6 +83,10 @@
     };
     # kickstart-nixvim.url = "git+file:///home/devji/nixconfig/modules/kickstart.nixvim";
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
+    stormy = {
+      url = "github:ashish0kumar/stormy";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -103,8 +107,7 @@
     nur,
     garnix-lib,
     # secrets,
-    # utils,
-    utils,
+    flake-utils,
     ...
   } @ inputs: let
     globalModules = [
@@ -112,6 +115,7 @@
         system.configurationRevision = self.rev or self.dirtyRev or null;
       }
       ./modules/global/global.nix
+      nur.modules.nixos.default
     ];
     globalModulesNixos =
       globalModules
@@ -121,7 +125,6 @@
         sops-nix.nixosModules.sops
         # chaotic.nixosModules.default
         #lix-module.nixosModules.default
-        nur.modules.nixos.default
         #determinate.nixosModules.default
       ];
     globalModulesImpermanence =
@@ -150,7 +153,7 @@
         home-manager.nixosModules.default
       ];
   in
-    inputs.utils.lib.eachDefaultSystem
+    inputs.flake-utils.lib.eachDefaultSystem
     (
       system: let
         pkgs = import inputs.nixpkgs {inherit system;};

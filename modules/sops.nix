@@ -9,7 +9,6 @@
 in {
   imports = [
     inputs.sops-nix.homeManagerModules.sops
-    # inputs.secrets
   ];
 
   sops = {
@@ -22,14 +21,24 @@ in {
     defaultSopsFile = ./secrets.yaml;
     validateSopsFiles = false;
     secrets = {
-      "awscredentials".path = "${config.home.homeDirectory}/.aws/credentials";
       "cfcertpem".path = "${config.home.homeDirectory}/.cloudflared/cert.pem";
       "cloak".path = "${config.home.homeDirectory}/.cloak/accounts";
       "ghsudo" = {};
+      "aws/access/key/id" = {};
+      "aws/secret/access/key" = {};
       #"${local_ssh_key}".path = "${ssh_key_path}";
-      #
     };
     templates = {
+      "awscredentials".content =
+        /*
+        toml
+        */
+        ''
+          [default]
+          aws_access_key_id = ${config.sops.placeholder."aws/access/key/id"}
+          aws_secret_access_key = ${config.sops.placeholder."aws/secret/access/key"}
+        '';
+      # "accounts".content = ''${config.sops.placeholder."cloak2"}'';
       "hosts.yml".content =
         /*
         yaml
@@ -59,6 +68,7 @@ in {
       yq-go
     ];
     file = {
+      ".aws/credentials".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."awscredentials".path}";
     };
   };
 }

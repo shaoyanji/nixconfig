@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   lib,
   ...
@@ -34,6 +35,13 @@
         #        (pkgs.uutils-coreutils.override {prefix = "";})
         # mupdf
         # mpv
+        tgpt
+        aichat
+        mods
+        dufs
+        just
+        lux
+        gtree
         lowfi
         pop
         glow
@@ -46,7 +54,6 @@
         graphviz
         graph-easy
         nix-output-monitor
-        # qrencode
         # thefuck
         jq
         htmlq
@@ -151,6 +158,9 @@
         sysstat
         pciutils
         usbutils
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+        inputs.stormy.packages.x86_64-linux.stormy
       ];
     file = {};
 

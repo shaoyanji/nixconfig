@@ -4,11 +4,11 @@ My Nix Configurations for darwin, nixos, home-manager, and WSL.
 
 ## TODO
 
--[ ] run `task update-sops`
--[x] add submodule for secrets
--[ ] make submodule tasks
--[ ] markdown to taskfile generator
--[x] integrated dotfiles as a submodule
+- [ ] run `task update-sops`
+- [x] add submodule for secrets
+- [ ] make submodule tasks
+- [ ] markdown to taskfile generator
+- [x] integrated dotfiles as a submodule
 
 ## Installation
 

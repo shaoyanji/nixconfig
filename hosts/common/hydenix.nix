@@ -66,6 +66,7 @@ in {
         inputs.kickstart-nixvim.homeManagerModules.default
         ../../modules/nixoshmsymlinks.nix
         ../../modules/global/minimal.nix
+        ../../modules/shell/nushell.nix
       ];
       programs.nixvim.enable = true;
       hydenix.hm.enable = true;

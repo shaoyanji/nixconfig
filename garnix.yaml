@@ -5,7 +5,8 @@ builds:
     # - nixosConfigurations.*
     - nixosConfigurations.garnixMachine
   include:
-# - nixosConfigurations.poseidon
+    - nixosConfigurations.poseidon
+    - nixosConfigurations.thinsandy
 # - "*.x86_64-linux.*"
 # - "*.aarch64-darwin.*"
 # - "*.aarch64-linux.*"

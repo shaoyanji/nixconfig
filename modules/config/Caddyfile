@@ -1,0 +1,31 @@
+{
+admin off
+auto_https off
+order respond before reverse_proxy
+default_bind unix//home/{$USER}/.webserver.sock
+}
+
+(host) {
+@{args.0} host {args.0}-{$USER}.vern.cc
+}
+
+http://
+
+import host ping
+import host web
+import host reverse
+
+handle @ping {
+respond "PONG!"
+}
+
+handle @web {
+root * /home/{$USER}/public_html
+file_server
+}
+
+handle @reverse {
+reverse_proxy * :9000
+}
+
+respond "Nothing here!"

@@ -26,9 +26,20 @@ in {
       "ghsudo" = {};
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};
+      "openmeteo/api/key" = {};
       #"${local_ssh_key}".path = "${ssh_key_path}";
     };
     templates = {
+      "stormy.toml".content = ''
+        provider = "OpenMeteo"
+        api_key = '${config.sops.placeholder."openmeteo/api/key"}'
+        city = "Freiburg"
+        units = "metric"
+        showcityname = false
+        use_colors = true
+        live_mode = false
+        compact = false
+      '';
       "awscredentials".content =
         /*
         toml
@@ -57,8 +68,11 @@ in {
       '';
     };
   };
-  xdg.configFile."gh/hosts.yml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."hosts.yml".path}";
-  xdg.configFile."nix/nix.conf".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."nix.conf".path}";
+  xdg.configFile = {
+    "gh/hosts.yml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."hosts.yml".path}";
+    "nix/nix.conf".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."nix.conf".path}";
+    ".config/stormy/stormy.toml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."stormy.toml".path}";
+  };
   home = {
     sessionVariables = {
       SOPS_EDITOR = "hx";

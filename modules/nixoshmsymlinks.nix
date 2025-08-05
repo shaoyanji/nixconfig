@@ -34,9 +34,13 @@ in {
       # key for cloak migrated to sops
       # ".cloak/key.txt".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/security/key.txt";
       "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/hello";
-      ".local/share/lowfi/chillhop.txt".source = pkgs.fetchurl {
+      ".local/share/lowfi/chillhop.txt".source = builtins.fetchurl {
         url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/chillhop.txt";
-        hash = "sha256-ihvGNBwa4DD3CjKXvSlYttdSWTtFHwV53N3WUVQfgKo=";
+        sha256 = "sha256:1al03xa53mnxviwha7s57dcm5mxnb0lvv5rj1bvk1q0s3hscc6wa";
+      };
+      ".local/share/lowfi/synthboy.txt".source = builtins.fetchurl {
+        url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/synthboy.txt";
+        sha256 = "sha256:1v315rp5fxshgwq8zxavdprppbr00yash3xvks744yb38d6rsw76";
       };
       # ".local/share/lowfi".source = ./config/lowfi;
       ".simplex".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/.simplex";

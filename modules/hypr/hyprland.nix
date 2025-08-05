@@ -13,7 +13,10 @@
   xdg.configFile = {
     "wofi/style.css".source = ../config/hypr/style.css;
     "wofi/style.scss".source = ../config/hypr/style.scss;
-    ".kde-dark-kuroi.qss".source = ../config/hypr/kde-dark-kuroi.qss;
+    ".kde-dark-kuroi.qss".source = builtins.fetchurl {
+      url = "https://raw.githubusercontent.com/AniLeo/Kuroi/refs/heads/master/Kuroi%20(Dark)%20by%20Ani.qss";
+      sha256 = "sha256:0g5ijavf3wllw4d8m7h9b5v68fbil1waz0csb568ximk2n4qa0iy";
+    };
   };
   wayland.windowManager.hyprland = {
     enable = true;

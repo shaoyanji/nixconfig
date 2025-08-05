@@ -5,12 +5,12 @@ builds:
     # - nixosConfigurations.*
     - nixosConfigurations.garnixMachine
   include:
+    - defaultPackage.x86_64-linux
 # - nixosConfigurations.poseidon
 # - nixosConfigurations.thinsandy
 # - "*.x86_64-linux.*"
 # - "*.aarch64-darwin.*"
 # - "*.aarch64-linux.*"
-# - defaultPackage.x86_64-linux
 # - devShell.x86_64-linux
 # - homeConfigurations.*
 # - darwinConfigurations.*

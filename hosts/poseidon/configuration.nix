@@ -4,8 +4,7 @@
   pkgs,
   lib,
   ...
-}:
-{
+}: {
   imports = [
     # Include the results of the hardware scan.
     #    ./configuration2.nix
@@ -150,6 +149,10 @@
     ];
   };
 }
-// {
-  # nixpkgs.config.allowUnfree = true;
-}
+# // {
+#   nixpkgs.config.allowUnfreePredicate = pkg:
+#     builtins.elem (lib.getName pkg) [
+#       "crush"
+#     ]; # nixpkgs.config.allowUnfree = true;
+# }
+

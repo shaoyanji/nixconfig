@@ -73,7 +73,10 @@ in {
     eza
   ];
   xdg.configFile = {
-    "starship.toml".source = ../config/starship.toml;
+    "starship.toml".source = builtins.fetchurl {
+      url = "https://raw.githubusercontent.com/caelestia-dots/caelestia/refs/heads/main/starship.toml";
+      sha256 = "sha256:1041aqy6lzmj0jlmw00nhbn5vzidk9bqp818wxv4wqxb30887w9f";
+    };
   };
   home.file = {
   };

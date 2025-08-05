@@ -1,4 +1,4 @@
-{
+{pkgs, ...}: {
   programs = {
     zsh = {
       enable = true;
@@ -24,6 +24,11 @@
       };
     };
   };
+  home.packages = with pkgs; [
+    zsh-forgit
+    zsh-fzf-history-search
+    #zsh-fzf-tab
+  ];
 
   home.sessionVariables = {
   };

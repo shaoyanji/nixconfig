@@ -74,7 +74,7 @@
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     #    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     #    ghostty.url = "github:ghostty-org/ghostty";
-    flake-utils.url = "github:numtide/flake-utils";
+    utils.url = "github:numtide/flake-utils";
     hydenix.url = "github:richen604/hydenix";
     quickshell = {
       # add ?ref=<tag> to track a tag
@@ -107,7 +107,7 @@
     nur,
     garnix-lib,
     # secrets,
-    flake-utils,
+    utils,
     ...
   } @ inputs: let
     globalModules = [
@@ -153,7 +153,7 @@
         home-manager.nixosModules.default
       ];
   in
-    inputs.flake-utils.lib.eachDefaultSystem
+    inputs.utils.lib.eachDefaultSystem
     (
       system: let
         pkgs = import inputs.nixpkgs {inherit system;};

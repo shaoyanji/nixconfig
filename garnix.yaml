@@ -1,12 +1,13 @@
 builds:
   exclude:
-    # - homeConfigurations.*
-    # - darwinConfigurations.*
-    # - nixosConfigurations.*
-    - nixosConfigurations.garnixMachine
+  # - homeConfigurations.*
+  # - darwinConfigurations.*
+  # - nixosConfigurations.*
+  # - nixosConfigurations.garnixMachine
   include:
     - defaultPackage.x86_64-linux
     - nixosConfigurations.poseidon
+    - nixosConfigurations.garnixMachine
 # - nixosConfigurations.thinsandy
 # - "*.x86_64-linux.*"
 # - "*.aarch64-darwin.*"

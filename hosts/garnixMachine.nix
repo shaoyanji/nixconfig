@@ -5,11 +5,10 @@
   ...
 }: let
   # TODO: add your public ssh key here to be able to log into the deployed host (as user `me`).
-  sshKeys = [
+  sshKeys =
     builtins.filter
     (x: x != [])
-    (builtins.split "\n" (builtins.readFile ../modules/config/authorized_keys))
-  ];
+    (builtins.split "\n" (builtins.readFile ../modules/config/authorized_keys));
   backendPort = "3000";
 in {
   # This sets up networking and filesystems in a way that works with garnix

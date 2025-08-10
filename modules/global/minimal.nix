@@ -157,7 +157,7 @@
         usbutils
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
-        inputs.stormy.packages.x86_64-linux.stormy
+        # inputs.stormy.packages.x86_64-linux.stormy
       ];
     file = {};
 

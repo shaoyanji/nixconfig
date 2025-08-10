@@ -1,5 +1,5 @@
 builds:
-  exclude:
+  # exclude:
   # - homeConfigurations.*
   # - darwinConfigurations.*
   # - nixosConfigurations.*

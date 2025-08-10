@@ -83,10 +83,10 @@
     };
     # kickstart-nixvim.url = "git+file:///home/devji/nixconfig/modules/kickstart.nixvim";
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
-    stormy = {
-      url = "github:ashish0kumar/stormy";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # stormy = {
+    #   url = "github:ashish0kumar/stormy";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
 
   outputs = {

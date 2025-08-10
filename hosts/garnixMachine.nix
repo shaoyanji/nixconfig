@@ -8,7 +8,7 @@
   sshKeys = [
     builtins.filter
     (x: x != [])
-    (builtins.split "\n" (builtins.readFile ./nixconfig/modules/config/authorized_keys))
+    (builtins.split "\n" (builtins.readFile ../modules/config/authorized_keys))
   ];
   backendPort = "3000";
 in {

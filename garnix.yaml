@@ -6,7 +6,7 @@ builds:
     - nixosConfigurations.garnixMachine
   include:
     - defaultPackage.x86_64-linux
-# - nixosConfigurations.poseidon
+    - nixosConfigurations.poseidon
 # - nixosConfigurations.thinsandy
 # - "*.x86_64-linux.*"
 # - "*.aarch64-darwin.*"
@@ -15,8 +15,8 @@ builds:
 # - homeConfigurations.*
 # - darwinConfigurations.*
 # - nixosConfigurations.garnixMachine
-# servers:
-#   - configuration: garnixMachine
-#     deployment:
-#       type: on-branch
-#       branch: main
+servers:
+  - configuration: garnixMachine
+    deployment:
+      type: on-branch
+      branch: main

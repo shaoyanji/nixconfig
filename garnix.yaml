@@ -6,8 +6,8 @@ builds:
   include:
     # - defaultPackage.x86_64-linux
     # - nixosConfigurations.poseidon
-    # - nixosConfigurations.garnixMachine
-    - "*.x86_64-linux.*"
+    - nixosConfigurations.garnixMachine
+    # - "*.x86_64-linux.*"
 # - devShell.x86_64-linux
 # - nixosConfigurations.thinsandy
 # - "*.aarch64-darwin.*"

@@ -32,7 +32,7 @@
     # Only set this if using intel-vaapi-driver
     intel-vaapi-driver = pkgs.intel-vaapi-driver.override {enableHybridCodec = true;};
   };
-  user.users.immich.extraGroups = ["video" "render"];
+  users.users.immich.extraGroups = ["video" "render"];
   services = {
     immich = {
       enable = true;

@@ -46,11 +46,11 @@ in {
     options = ["${automount_opts}"];
   };
 
-  fileSystems."/Volumes/fritz" = {
-    device = "//${fritznas}/fritz.nas";
-    fsType = "cifs";
-    options = ["${automount_opts},${reg_opts},${cred_fritz}"];
-  };
+  # fileSystems."/Volumes/fritz" = {
+  #   device = "//${fritznas}/fritz.nas";
+  #   fsType = "cifs";
+  #   options = ["${automount_opts},${reg_opts},${cred_fritz}"];
+  # };
   # fileSystems."/mnt/y" = {
   #   device = "//${fritznas}/fritz.nas/";
   #   fsType = "cifs";

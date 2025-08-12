@@ -32,14 +32,14 @@
     # Only set this if using intel-vaapi-driver
     intel-vaapi-driver = pkgs.intel-vaapi-driver.override {enableHybridCodec = true;};
   };
-  users.users.immich.extraGroups = ["video" "render"];
+  # users.users.immich.extraGroups = ["video" "render"];
   services = {
-    immich = {
-      enable = true;
-      port = 2283;
-      accelerationDevices = null;
-      openFirewall = true;
-    };
+    # immich = {
+    #   enable = true;
+    #   port = 2283;
+    #   accelerationDevices = null;
+    #   openFirewall = true;
+    # };
     sonarr = {
       enable = true;
       openFirewall = true;

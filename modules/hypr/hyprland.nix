@@ -13,10 +13,10 @@
   xdg.configFile = {
     "wofi/style.css".source = ../config/hypr/style.css;
     "wofi/style.scss".source = ../config/hypr/style.scss;
-    ".kde-dark-kuroi.qss".source = builtins.fetchurl {
-      url = "https://raw.githubusercontent.com/AniLeo/Kuroi/refs/heads/master/Kuroi%20(Dark)%20by%20Ani.qss";
-      sha256 = "sha256:0g5ijavf3wllw4d8m7h9b5v68fbil1waz0csb568ximk2n4qa0iy";
-    };
+    # ".kde-dark-kuroi.qss".source = builtins.fetchurl {
+    #   url = "https://raw.githubusercontent.com/AniLeo/Kuroi/refs/heads/master/Kuroi%20(Dark)%20by%20Ani.qss";
+    #   sha256 = "sha256:0g5ijavf3wllw4d8m7h9b5v68fbil1waz0csb568ximk2n4qa0iy";
+    # };
   };
   wayland.windowManager.hyprland = {
     enable = true;
@@ -112,7 +112,8 @@
         ];
       };
       "$mainMod" = "SUPER";
-      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ~/.config/.kde-dark-kuroi.qss";
+      # "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ~/.config/.kde-dark-kuroi.qss";
+      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"
@@ -190,8 +191,6 @@
       source = ~/.config/hypr/themes/common.conf
       source = ~/.config/hypr/themes/colors.conf
       source = ~/.config/hypr/themes/theme.conf
-      source = ~/.config/hypr/monitors.conf
-      source = ~/.config/hypr/userprefs.conf
       ecosystem:no_update_news = true
     '';
   };

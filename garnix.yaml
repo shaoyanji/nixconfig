@@ -8,8 +8,8 @@ builds:
     # - nixosConfigurations.poseidon
     - nixosConfigurations.garnixMachine
     # - "*.x86_64-linux.*"
-# - devShell.x86_64-linux
-# - nixosConfigurations.thinsandy
+    # - devShell.x86_64-linux
+    - nixosConfigurations.thinsandy
 # - "*.aarch64-darwin.*"
 # - "*.aarch64-linux.*"
 # - homeConfigurations.*

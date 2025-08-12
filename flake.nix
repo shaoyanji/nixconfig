@@ -77,11 +77,16 @@
     #    ghostty.url = "github:ghostty-org/ghostty";
     flake-utils.url = "github:numtide/flake-utils";
     hydenix.url = "github:richen604/hydenix";
-    quickshell = {
-      # add ?ref=<tag> to track a tag
-      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+    # quickshell = {
+    #   # add ?ref=<tag> to track a tag
+    #   url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+    caelestia = {
+      url = "git+https://github.com/caelestia-dots/shell/";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     # kickstart-nixvim.url = "git+file:///home/devji/nixconfig/modules/kickstart.nixvim";
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
     # stormy = {
@@ -245,22 +250,22 @@
             ./hosts/garnixMachine.nix
           ];
         };
-        poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-          inherit (inputs.hydenix.lib) system;
+        # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+        #   inherit (inputs.hydenix.lib) system;
+        #   specialArgs = {inherit inputs;};
+        #   modules =
+        #     globalModules
+        #     ++ [
+        #       ./hosts/poseidon/configuration2.nix
+        #     ];
+        poseidon = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
           specialArgs = {inherit inputs;};
           modules =
-            globalModules
+            globalModulesNixos
             ++ [
-              ./hosts/poseidon/configuration2.nix
+              ./hosts/poseidon/configuration3.nix
             ];
-          # poseidon = nixpkgs.lib.nixosSystem {
-          #   system = "x86_64-linux";
-          #   specialArgs = {inherit inputs;};
-          #   modules =
-          #     globalModulesNixos
-          #     ++ [
-          #       ./hosts/poseidon/configuration3.nix
-          #     ];
         };
 
         mtfuji = nixpkgs.lib.nixosSystem {

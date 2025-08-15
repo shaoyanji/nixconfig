@@ -41,6 +41,10 @@ in {
     mailsy
     sqlite
     lynx
+    caddy
+    go
+    tinygo
+    yj
   ];
   home.sessionVariables = {
     GUM_CHOOSE_SELECTED_FOREGROUND = 50;

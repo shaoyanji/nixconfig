@@ -9,7 +9,8 @@ builds:
     - nixosConfigurations.garnixMachine
     # - "*.x86_64-linux.*"
     # - devShell.x86_64-linux
-    - nixosConfigurations.thinsandy
+    # - nixosConfigurations.thinsandy
+    - nixosConfigurations.ancientace
 # - "*.aarch64-darwin.*"
 # - "*.aarch64-linux.*"
 # - homeConfigurations.*

@@ -325,14 +325,19 @@
           specialArgs = {inherit inputs;};
           modules = globalModulesNixos ++ [./hosts/aceofspades/configuration.nix];
         };
-        ancientace = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-          inherit (inputs.hydenix.lib) system;
-          specialArgs = {
-            inherit inputs;
-          };
-          modules = [
-            ./hosts/ancientace/configuration2.nix
-          ];
+        # ancientace = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+        #   inherit (inputs.hydenix.lib) system;
+        #   specialArgs = {
+        #     inherit inputs;
+        #   };
+        #   modules = [
+        #     ./hosts/ancientace/configuration2.nix
+        #   ];
+        # };
+        ancientace = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {inherit inputs;};
+          modules = globalModulesNixos ++ [./hosts/ancientace/configuration3.nix];
         };
         minyx = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";

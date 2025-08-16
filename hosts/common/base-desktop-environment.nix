@@ -67,6 +67,7 @@
     hunspell
     hunspellDicts.en_US
     alsa-utils
+    obsidian
     # config.boot.kernelPackages.digimend
   ];
   programs.appimage = {

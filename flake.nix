@@ -11,31 +11,18 @@
     # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
-    garnix-lib = {
-      url = "github:garnix-io/garnix-lib";
-      # inputs.nixpkgs.follows = "nixpkgs";
-    };
+    garnix-lib.url = "github:garnix-io/garnix-lib";
     # nixpkgs-legacy.url = "github:NixOS/nixpkgs/nixos-24.05";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-    # secrets.url = "github:shaoyanji/secrets";
-    # dotfiles.url = "github:shaoyanji/.dotfiles";
-    # secrets.flake = false;
-    # dotfiles.flake = false;
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence.url = "github:nix-community/impermanence";
-    nix-darwin = {
-      url = "github:LnL7/nix-darwin";
-      # inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix-homebrew = {
-      url = "github:zhaofengli-wip/nix-homebrew";
-      # inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
     raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -55,10 +42,7 @@
       url = "github:DeterminateSystems/nuenv";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hyprland = {
-      url = "github:hyprwm/hyprland";
-      #  inputs.nixpkgs.follows = "nixpkgs";
-    };
+    hyprland.url = "github:hyprwm/hyprland";
     # hyprland-plugins = {
     #   url = "github:hyprwm/hyprland-plugins";
     #   inputs.hyprland.follows = "hyprland";
@@ -89,22 +73,14 @@
 
     # kickstart-nixvim.url = "git+file:///home/devji/nixconfig/modules/kickstart.nixvim";
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
-    # stormy = {
-    #   url = "github:ashish0kumar/stormy";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
   };
 
   outputs = {
     self,
-    # determinate,
     nix-darwin,
     nixpkgs,
-    # nixpkgs-legacy,
     nix-homebrew,
     nixos-wsl,
-    # nixos-hardware,
-    raspberry-pi-nix,
     home-manager,
     impermanence,
     disko,
@@ -112,8 +88,6 @@
     sops-nix,
     nur,
     garnix-lib,
-    # secrets,
-    flake-utils,
     ...
   } @ inputs: let
     globalModules = [
@@ -218,7 +192,6 @@
           pkgs = nixpkgs.legacyPackages."aarch64-linux";
           modules = [
             ./hosts/alarm.nix
-
             inputs.sops-nix.homeManagerModules.sops
           ];
         };

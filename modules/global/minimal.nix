@@ -135,6 +135,7 @@
         ticker
         obsidian-export
         ots
+        xq
       ]
       ++ lib.optionals stdenv.isDarwin [
         python3

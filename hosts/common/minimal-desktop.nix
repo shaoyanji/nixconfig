@@ -21,7 +21,6 @@ in {
     age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
     secrets = {
       # "server/localwd/credentials" = {};
-      "fritznas/password" = {};
       # "local/k3s/token" = {};
       hashedPassword.neededForUsers = true;
     };

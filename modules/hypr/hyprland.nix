@@ -13,10 +13,10 @@
   xdg.configFile = {
     "wofi/style.css".source = ../config/hypr/style.css;
     "wofi/style.scss".source = ../config/hypr/style.scss;
-    # ".kde-dark-kuroi.qss".source = builtins.fetchurl {
-    #   url = "https://raw.githubusercontent.com/AniLeo/Kuroi/refs/heads/master/Kuroi%20(Dark)%20by%20Ani.qss";
-    #   sha256 = "sha256:0g5ijavf3wllw4d8m7h9b5v68fbil1waz0csb568ximk2n4qa0iy";
-    # };
+    ".kde-dark-kuroi.qss".source = builtins.fetchurl {
+      url = "https://gist.githubusercontent.com/shaoyanji/b44bcb416a99f97984c183cba8418649/raw/a6b33108f403fe42d4667c217f4ccd4dc5b2a59d/kuroidark.qss";
+      sha256 = "sha256:0g5ijavf3wllw4d8m7h9b5v68fbil1waz0csb568ximk2n4qa0iy";
+    };
   };
   wayland.windowManager.hyprland = {
     enable = true;
@@ -112,8 +112,7 @@
         ];
       };
       "$mainMod" = "SUPER";
-      # "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ~/.config/.kde-dark-kuroi.qss";
-      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin";
+      "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ~/.config/.kde-dark-kuroi.qss";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"

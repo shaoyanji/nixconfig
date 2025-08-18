@@ -811,11 +811,11 @@
         "nixvim": "nixvim"
       },
       "locked": {
-        "lastModified": 1755552373,
-        "narHash": "sha256-HhqA9oWwl3ejGMc144M2KHoA4uXRqOMsJDHOcCkbhLE=",
+        "lastModified": 1755553724,
+        "narHash": "sha256-yHEUh4SaG8Tgnn7yq3GxbR/hDuiqtI0Y7A/Y/0W66X8=",
         "owner": "shaoyanji",
         "repo": "kickstart.nixvim",
-        "rev": "ee6224f34c713637d8d18009b975ecab8c61e1f6",
+        "rev": "90f50e4665413d027f975dd8b1606aeb70c88d98",
         "type": "github"
       },
       "original": {

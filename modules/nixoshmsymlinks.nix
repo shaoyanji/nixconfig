@@ -13,8 +13,8 @@ in {
   home = {
     file = {
       #"nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
-      "Documents/Obsidian-Git-Sync".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/Obsidian-Git-Sync";
-      "Documents/work".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/work";
+      "vaults/personal".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/Obsidian-Git-Sync";
+      "vaults/work".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/work";
       "Documents/nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/nixconfig";
       "Documents/jobby".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/jobby";
       "Documents/docs".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/documents";

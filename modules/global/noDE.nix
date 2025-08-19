@@ -21,7 +21,7 @@
       home.homeDirectory = "/home/devji";
       home.packages = with pkgs;
         [
-          markdownlint-markdownlint-cli
+          markdownlint-cli
         ]
         ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ]

@@ -14,8 +14,6 @@
     ../common/base-desktop-environment.nix
     #../common/minimal-desktop.nix
     ../common/laptop.nix
-    inputs.chaotic.nixosModules.default
-    inputs.nix-index-database.nixosModules.nix-index
   ];
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {

@@ -11,6 +11,14 @@
   # wolfNAS = "/Volumes/usbshare2";
 in {
   home = {
+    packages = [
+      (
+        pkgs.writers.writeBashBin "chillhop" {} ''
+          lowfi -t chillhop
+        ''
+      )
+    ];
+
     file = {
       #"nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
       "vaults/personal".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/Obsidian-Git-Sync";

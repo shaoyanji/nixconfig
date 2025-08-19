@@ -24,8 +24,8 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
-    raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
+    # raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
+    # raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -38,11 +38,11 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nuenv = {
-      url = "github:DeterminateSystems/nuenv";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    hyprland.url = "github:hyprwm/hyprland";
+    # nuenv = {
+    #   url = "github:DeterminateSystems/nuenv";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+    # hyprland.url = "github:hyprwm/hyprland";
     # hyprland-plugins = {
     #   url = "github:hyprwm/hyprland-plugins";
     #   inputs.hyprland.follows = "hyprland";
@@ -60,7 +60,7 @@
     #    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     #    ghostty.url = "github:ghostty-org/ghostty";
     flake-utils.url = "github:numtide/flake-utils";
-    hydenix.url = "github:richen604/hydenix";
+    # hydenix.url = "github:richen604/hydenix";
     # quickshell = {
     #   # add ?ref=<tag> to track a tag
     #   url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
@@ -73,6 +73,7 @@
 
     # kickstart-nixvim.url = "git+file:///home/devji/nixconfig/modules/kickstart.nixvim";
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
+    kickstart-nixvim.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {
@@ -103,7 +104,7 @@
         home-manager.nixosModules.default
         sops-nix.nixosModules.sops
         nur.modules.nixos.default
-        # chaotic.nixosModules.default
+        chaotic.nixosModules.default
         #lix-module.nixosModules.default
         #determinate.nixosModules.default
       ];

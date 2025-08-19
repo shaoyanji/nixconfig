@@ -14,12 +14,17 @@
   };
 
   nix.settings = {
-    experimental-features = ["nix-command" "flakes" "pipe-operator"];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+      # "pipe-operator"
+      "pipe-operators"
+    ];
     substituters = [
       "https://cache.nixos.org/"
       "https://nix-community.cachix.org"
       "https://chaotic-nyx.cachix.org/"
-      "https://hyprland.cachix.org"
+      # "https://hyprland.cachix.org"
       # "https://wezterm.cachix.org"
       #      "https://ghostty.cachix.org"
       "https://nix-gaming.cachix.org"
@@ -32,7 +37,7 @@
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "chaotic-nyx.cachix.org-1:HfnXSw4pj95iI/n17rIDy40agHj12WfF+Gqk6SonIT8="
-      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      # "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       # "wezterm.cachix.org-1:kAbhjYUC9qvblTE+s7S+kl5XM1zVa4skO+E/1IDWdH0="
       #      "ghostty.cachix.org-1:QB389yTa6gTyneehvqG58y0WnHjQOqgnA+wBnpWWxns="
       "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
@@ -44,15 +49,15 @@
     trusted-users = [
       "@admin"
       "@wheel"
-      "root"
-      "nixremote"
+      # "root"
+      # "nixremote"
     ];
   };
 
   # Enable experimental nix command and flakes
   nix = {
-    # package = pkgs.nixUnstable;
-    package = pkgs.lix;
+    package = pkgs.nixVersions.latest;
+    # package = pkgs.lix;
     optimise.automatic = true;
     extraOptions = ''
       min-free = ${toString (100 * 1024 * 1024)}

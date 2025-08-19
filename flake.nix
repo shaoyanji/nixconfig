@@ -78,6 +78,7 @@
 
   outputs = {
     self,
+    nix-index-database,
     nix-darwin,
     nixpkgs,
     nix-homebrew,
@@ -105,6 +106,7 @@
         sops-nix.nixosModules.sops
         nur.modules.nixos.default
         chaotic.nixosModules.default
+        nix-index-database.nixosModules.nix-index
         #lix-module.nixosModules.default
         #determinate.nixosModules.default
       ];
@@ -114,6 +116,7 @@
         ./modules/global/impermanence.nix
         nur.modules.nixos.default
         chaotic.nixosModules.default
+        nix-index-database.nixosModules.nix-index
         #lix-module.nixosModules.default
         sops-nix.nixosModules.sops
         home-manager.nixosModules.default
@@ -132,6 +135,7 @@
       ++ [
         ./modules/global/noDE.nix
         home-manager.nixosModules.default
+        nix-index-database.nixosModules.nix-index
       ];
   in
     inputs.flake-utils.lib.eachDefaultSystem

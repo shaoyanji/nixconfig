@@ -51,8 +51,8 @@
     cudaSupport = true; # Enables CUDA support
   };
 
-  programs.fish.enable = true;
-  programs.foot.enable = true;
+  # programs.fish.enable = true;
+  # programs.foot.enable = true;
   # i18n = {
   #   consoleFont = "Lat2-Terminus16";
   #   consoleKeyMap = lib.mkForce "sv-latin1";

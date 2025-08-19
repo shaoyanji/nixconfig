@@ -17,9 +17,12 @@ in {
     ../modules/lf
     ../modules/shell
     ../modules/helix.nix
-    ../modules/nixvim
+    inputs.kickstart-nixvim.homeManagerModules.default
+    # ../modules/nixvim
     # ../modules/shell/nushell.nix #included in shell now
   ];
+
+  programs.nixvim.enable = true;
   home.packages = with pkgs; [
     nix-index
     tgpt
@@ -45,6 +48,7 @@ in {
     go
     tinygo
     yj
+    gcc
   ];
   home.sessionVariables = {
     GUM_CHOOSE_SELECTED_FOREGROUND = 50;
@@ -57,6 +61,9 @@ in {
     "Caddyfile".source = config.lib.file.mkOutOfStoreSymlink ../modules/config/Caddyfile;
   };
 
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
   # sops = {
   #     age = {
   #       keyFile = "${age_key_path}";

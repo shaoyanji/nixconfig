@@ -12,6 +12,7 @@
     users.devji = {
       imports = [
         ./minimal.nix
+        ../shell
         ../nixoshmsymlinks.nix
         inputs.kickstart-nixvim.homeManagerModules.default
       ];
@@ -20,7 +21,7 @@
       home.homeDirectory = "/home/devji";
       home.packages = with pkgs;
         [
-          markdownlint-cli
+          markdownlint-markdownlint-cli
         ]
         ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ]

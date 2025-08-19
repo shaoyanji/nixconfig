@@ -23,6 +23,99 @@
   networking.hostName = "thinsandy"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  # services.unbound = {
+  #   enable = true;
+  #   settings = {
+  #     server = {
+  #       # When only using Unbound as DNS, make sure to replace 127.0.0.1 with your ip address
+  #       # When using Unbound in combination with pi-hole or Adguard, leave 127.0.0.1, and point Adguard to 127.0.0.1:PORT
+  #       interface = ["127.0.0.1"];
+  #       port = 5335;
+  #       access-control = ["127.0.0.1 allow"];
+  #       # Based on recommended settings in https://docs.pi-hole.net/guides/dns/unbound/#configure-unbound
+  #       harden-glue = true;
+  #       harden-dnssec-stripped = true;
+  #       use-caps-for-id = false;
+  #       prefetch = true;
+  #       edns-buffer-size = 1232;
+
+  #       # Custom settings
+  #       hide-identity = true;
+  #       hide-version = true;
+  #     };
+  #     forward-zone = [
+  #       # Example config with quad9
+  #       {
+  #         name = ".";
+  #         forward-addr = [
+  #           "9.9.9.9#dns.quad9.net"
+  #           "149.112.112.112#dns.quad9.net"
+  #         ];
+  #         forward-tls-upstream = true; # Protected DNS
+  #       }
+  #     ];
+  #   };
+  # };
+  # services.pihole-ftl.enable = true;
+  # services.pihole-web.enable = true;
+  # services.pihole-web.ports = ["80r" "443s"];
+  services.crab-hole.enable = true;
+  services.crab-hole.settings = {
+    #   api = {
+    #     admin_key = "1234";
+    #     listen = "127.0.0.1";
+    #     port = 8080;
+    #     show_doc = true;
+    #   };
+    blocklist = {
+      allow_list = [
+        # "file:///allowed.txt"
+      ];
+      include_subdomains = true;
+      lists = [
+        "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts"
+        "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt"
+        # "file:///blocked.txt"
+      ];
+    };
+    downstream = [
+      {
+        listen = "localhost";
+        port = 53;
+        #     port = 8080;
+        protocol = "udp";
+      }
+      #     {
+      #       certificate = "dns.example.com.crt";
+      #       dns_hostname = "dns.example.com";
+      #       key = "dns.example.com.key";
+      #       listen = "[::]";
+      #       port = 8055;
+      #       protocol = "https";
+      #       timeout_ms = 3000;
+      #     }
+    ];
+    upstream = {
+      name_servers = [
+        {
+          protocol = "tls";
+          socket_addr = "[2606:4700:4700::1111]:853";
+          tls_dns_name = "1dot1dot1dot1.cloudflare-dns.com";
+          trust_nx_responses = false;
+        }
+        {
+          protocol = "tls";
+          socket_addr = "1.1.1.1:853";
+
+          tls_dns_name = "1dot1dot1dot1.cloudflare-dns.com";
+          trust_nx_responses = false;
+        }
+      ];
+      options = {
+        validate = false;
+      };
+    };
+  };
   # 1. enable vaapi on OS-level
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
@@ -130,14 +223,15 @@
   #    tokenFile = "${config.sops.secrets."local/k3s/token".path}";
   #    clusterInit = true;
   #  };
-  #  networking.firewall.allowedTCPPorts = [
-  #    6443 # k3s: required so that pods can reach the API server (running on port 6443 by default)
-  #    #    2379 # k3s, etcd clients: required if using a "High Availability Embedded etcd" configuration
-  #    #    2380 # k3s, etcd peers: required if using a "High Availability Embedded etcd" configuration
-  #  ];
+  networking.firewall.allowedTCPPorts = [
+    #    6443 # k3s: required so that pods can reach the API server (running on port 6443 by default)
+    #    #    2379 # k3s, etcd clients: required if using a "High Availability Embedded etcd" configuration
+    #    #    2380 # k3s, etcd peers: required if using a "High Availability Embedded etcd" configuration
+  ];
 
-  #  networking.firewall.allowedUDPPorts = [
-  #    8472 # k3s, flannel: required if using multi-node for inter-node networking
-  #  ];
+  networking.firewall.allowedUDPPorts = [
+    #    8472 # k3s, flannel: required if using multi-node for inter-node networking
+    53
+  ];
   system.stateVersion = "25.05"; # Did you read the comment?
 }

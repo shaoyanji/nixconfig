@@ -17,6 +17,7 @@
     packages = with pkgs;
       [
         markdownlint-cli
+        gcc
       ]
       ++ lib.optionals stdenv.isLinux [
       ]
@@ -24,6 +25,9 @@
       ]
       ++ lib.optionals stdenv.hostPlatform.isAarch64 [
       ];
+    sessionVariables = {
+      EDITOR = "nvim";
+    };
   };
 
   # nixpkgs.config.allowUnfree = true;

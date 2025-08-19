@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   inputs,
   lib,
@@ -22,6 +21,8 @@
       home.packages = with pkgs;
         [
           markdownlint-cli
+        ]
+        ++ lib.optionals stdenv.isLinux [
         ]
         ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ]
@@ -66,7 +67,7 @@
     ];
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
   };
-  #  environment.sessionVariables = {
-  #  EDITOR = "hx";
-  #  };
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
 }

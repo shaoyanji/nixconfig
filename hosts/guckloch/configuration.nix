@@ -4,11 +4,14 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }: {
   imports = [
+    inputs.kickstart-nixvim.nixosModules.default
   ];
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  programs.nixvim.enable = true;
+  nix.settings.experimental-features = ["nix-command" "flakes" "pipe-operators"];
   wsl.enable = true;
   wsl.defaultUser = "devji";
   wsl.docker-desktop.enable = true;
@@ -17,7 +20,7 @@
   users.users.devji.extraGroups = ["docker"];
 
   environment.systemPackages = with pkgs; [
-    devenv
+    markdownlint-cli
   ];
 
   programs.nix-ld = {

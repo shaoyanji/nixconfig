@@ -18,13 +18,12 @@ in {
     ../modules/shell
     ../modules/helix.nix
     inputs.kickstart-nixvim.homeManagerModules.default
-    # ../modules/nixvim
-    # ../modules/shell/nushell.nix #included in shell now
   ];
 
   programs.nixvim.enable = true;
   home.packages = with pkgs; [
     nix-index
+    aichat
     tgpt
     go-task
     yq-go
@@ -49,6 +48,23 @@ in {
     tinygo
     yj
     gcc
+    pandoc
+    translate-shell
+    xq
+    comrak
+    cloak
+    hyperfine
+    fastfetch
+    asciinema
+    python3
+    md2pdf
+    ddgr
+    qrencode
+    wasmtime
+    gfortran
+    ghc
+    rustc
+    hare
   ];
   home.sessionVariables = {
     GUM_CHOOSE_SELECTED_FOREGROUND = 50;

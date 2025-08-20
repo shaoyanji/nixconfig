@@ -1,4 +1,8 @@
-{inputs, ...}: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   imports = [
     ../modules/global/minimal.nix
     ../modules/shell
@@ -12,8 +16,8 @@
     # stateVersion = "24.11";
     file = {
     };
-
     sessionVariables = {
+      EDITOR = "nvim";
     };
     sessionPath = [];
   };

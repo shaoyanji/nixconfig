@@ -44,7 +44,7 @@ in {
       "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/hello";
       ".local/share/lowfi/chillhop.txt".source = builtins.fetchurl {
         url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/chillhop.txt";
-        sha256 = "sha256:1al03xa53mnxviwha7s57dcm5mxnb0lvv5rj1bvk1q0s3hscc6wa";
+        sha256 = "sha256:061zi24m2rr25w4ba7mgxwr9m0aad1s1pp0jy18s05z5j1rdsbip";
       };
       ".local/share/lowfi/synthboy.txt".source = builtins.fetchurl {
         url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/synthboy.txt";

@@ -2,12 +2,13 @@
   imports = [
     ../modules/global/minimal.nix
     ../modules/shell
-    ../modules/nixvim
+    inputs.kickstart-nixvim.homeManagerModules.default
   ];
+  programs.nixvim.enable = true;
   home = {
     username = "devji";
     homeDirectory = "/home/devji";
-
+    packages = with pkgs; [markdownlint-cli];
     # stateVersion = "24.11";
     file = {
     };

@@ -37,13 +37,33 @@
            }
 
 
-
           }
           $env.PATH = ($env.PATH |
           split row (char esep) |
-          prepend /home/devji/.nix-profile/bin|
+          prepend ~/.nix-profile/bin|
           append /usr/bin/env
           )
+          source '${builtins.fetchurl {
+            url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/7936e7b15f594e40c2ff48dbba0095a1e026c39c/mataroa.nu";
+            sha256 = "1aqr46j84fb5nr890s43g038ga7rajvh7njsinqims5y0bdadr29";
+          }}'
+          source ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nix.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/modules/data_extraction/ultimate_extractor.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/modules/system/mod.nu
+
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/bitwarden-cli/bitwarden-cli-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/glow/glow-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/gh/gh-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/just/just-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/eza/eza-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/bat/bat-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/rg/rg-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/tar/tar-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/ssh/ssh-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/zoxide/zoxide-completions.nu
+          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/man/man-completions.nu
         '';
     };
     carapace.enable = true;
@@ -59,7 +79,7 @@
     nushellPlugins.formats
     nushellPlugins.highlight
     nushellPlugins.polars
-    #      nu_scripts
+    nu_scripts
   ];
   xdg.configFile = {
     # "nushell/plugins/nu_plugin_net".source = config.lib.file.mkOutOfStoreSymlink "${pkgs.nushellPlugins.net}/bin/nu_plugin_net";
@@ -80,4 +100,7 @@
 
   home.sessionVariables = {
   };
+  home.sessionPath = [
+    # "${pkgs.nu_scripts}/share/nu_scripts/modules/nix"
+  ];
 }

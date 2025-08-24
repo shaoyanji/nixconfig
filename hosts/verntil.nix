@@ -61,10 +61,10 @@ in {
     ddgr
     qrencode
     wasmtime
-    gfortran
     ghc
     rustc
     hare
+    ghostscript_headless
   ];
   home.sessionVariables = {
     GUM_CHOOSE_SELECTED_FOREGROUND = 50;

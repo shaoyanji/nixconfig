@@ -47,6 +47,10 @@
             url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/7936e7b15f594e40c2ff48dbba0095a1e026c39c/mataroa.nu";
             sha256 = "1aqr46j84fb5nr890s43g038ga7rajvh7njsinqims5y0bdadr29";
           }}'
+          source '${builtins.fetchurl {
+            url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/6d15967f3a052edad103449c7f8024cd4dab0618/llm.nu";
+            sha256 = "1p0gacad2sijv48lr8467x9ad9xnd5hh0xzd8pwgs9xyy59mg6h4";
+          }}'
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nix.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/data_extraction/ultimate_extractor.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/system/mod.nu

@@ -35,8 +35,6 @@
                completer: $carapace_completer # check 'carapace_completer'
              }
            }
-
-
           }
           $env.config.edit_mode = 'vi'
           $env.PATH = ($env.PATH |
@@ -44,6 +42,14 @@
           prepend ~/.nix-profile/bin|
           append /usr/bin/env
           )
+          source '${builtins.fetchurl {
+            url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/cb60ffee1b5dab08607db7523c0da506fa2c4dea/secrets.nu";
+            sha256 = "19nq2sl9xa8albd2fgii9n3syf88vgjgl0vrvvchq6vc6zcxrcip";
+          }}'
+          source '${builtins.fetchurl {
+            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/6679b0054d51c429e8f67b0fc09c8bb21bde20d3/utils.nu";
+            sha256 = "1jqql613gy8np80rj3jck91m4ihnflgkfwkl2a9psnk656yd083d";
+          }}'
           source '${builtins.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/f372b991e1d82a9792f332623766917d3117211c/mataroa.nu";
             sha256 = "10k8v57q7z5bkhq98rz4f2b9212jljq0c0hadiwpqri604xszjc7";
@@ -78,7 +84,7 @@
     # nushellPlugins.net
     # nushellPlugins.desktop_notifications
     # nushellPlugins.dbus
-    nushellPlugins.units
+    # nushellPlugins.units
     nushellPlugins.skim
     nushellPlugins.query
     nushellPlugins.gstat

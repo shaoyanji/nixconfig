@@ -76,7 +76,7 @@
   };
   home.packages = with pkgs; [
     nushellPlugins.net
-    nushellPlugins.desktop_notifications
+    # nushellPlugins.desktop_notifications
     nushellPlugins.dbus
     nushellPlugins.units
     nushellPlugins.skim

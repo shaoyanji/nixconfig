@@ -47,7 +47,7 @@
       dust
       lz4
       yank
-      toot
+      # toot
       pass
       cmus
       bitwarden-cli

@@ -12,6 +12,7 @@ builds:
     - nixosConfigurations.thinsandy
     # - nixosConfigurations.ancientace
     - homeConfigurations.penguin
+    - darwinConfigurations.*
 # - "*.aarch64-darwin.*"
 # - "*.aarch64-linux.*"
 # - homeConfigurations.*

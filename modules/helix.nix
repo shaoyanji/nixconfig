@@ -16,9 +16,7 @@
           tab-width = 4;
           unit = "    ";
         };
-        formatter = {
-          command = "${pkgs.shfmt}/bin/shfmt";
-        };
+        formatter.command = "${pkgs.shfmt}/bin/shfmt";
         auto-format = true;
       }
       {
@@ -44,7 +42,7 @@
         name = "toml";
         auto-format = true;
         formatter = {
-          command = "{pkgs.taplo}/bin/taplo";
+          command = "${pkgs.taplo}/bin/taplo";
           args = ["format" "-"];
         };
       }
@@ -65,6 +63,7 @@
       }
       {
         name = "lua";
+        auto-format = true;
         formatter = {
           command = "${pkgs.stylua}/bin/stylua";
           args = ["-"];

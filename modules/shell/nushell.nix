@@ -45,12 +45,12 @@
           append /usr/bin/env
           )
           source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/44d698ebf5a4b7f8970aee14dfb141a766519845/mataroa.nu";
-            sha256 = "0vm1dvk57a9n2q24qw46j6hzfrkznxn8pxhgdlnbwp8l66cypalp";
+            url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/f372b991e1d82a9792f332623766917d3117211c/mataroa.nu";
+            sha256 = "10k8v57q7z5bkhq98rz4f2b9212jljq0c0hadiwpqri604xszjc7";
           }}'
           source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/c45649e64e88c80ed8604be953add01f6bf3576f/llm.nu";
-            sha256 = "1lm815k7i78gvwfwallin8027mvrjnrzyfi3nkwh46dbzp95h031";
+            url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/97fd795a2433c67b156a5a49e4baaf81f64b8017/llm.nu";
+            sha256 = "1xbvjg6iy3fahmlhlr3msry5aiifksx32jga10hxhqc48q4vdnfw";
           }}'
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nix.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/data_extraction/ultimate_extractor.nu
@@ -75,11 +75,12 @@
     carapace.enableNushellIntegration = true;
   };
   home.packages = with pkgs; [
-    # nushellPlugins.net
+    nushellPlugins.net
+    nushellPlugins.desktop_notifications
+    nushellPlugins.dbus
+    nushellPlugins.units
     nushellPlugins.skim
-    # nushellPlugins.dbus
     nushellPlugins.query
-    # nushellPlugins.units
     nushellPlugins.gstat
     nushellPlugins.formats
     nushellPlugins.highlight

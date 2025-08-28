@@ -156,9 +156,9 @@
         sysstat
         pciutils
         usbutils
-        ghostscript_headless
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+        ghostscript_headless
         # inputs.stormy.packages.x86_64-linux.stormy
       ];
     file = {};

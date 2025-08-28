@@ -38,6 +38,7 @@
 
 
           }
+          $env.config.edit_mode = 'vi'
           $env.PATH = ($env.PATH |
           split row (char esep) |
           prepend ~/.nix-profile/bin|

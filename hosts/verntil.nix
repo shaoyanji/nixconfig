@@ -22,6 +22,7 @@ in {
 
   programs.nixvim.enable = true;
   home.packages = with pkgs; [
+    sops
     nix-index
     aichat
     tgpt

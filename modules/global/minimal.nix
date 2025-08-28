@@ -117,7 +117,7 @@
         speedtest-cli
         buku
         ddgr
-        khal
+        # khal
         mutt
         newsboat
         rclone

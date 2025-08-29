@@ -100,7 +100,7 @@
   # Issue: https://github.com/nix-community/home-manager/issues/1341
   environment.systemPackages = with pkgs; [
     # kitty
-    terminal-notifier
+    # terminal-notifier
     mkalias
   ];
 
@@ -143,7 +143,7 @@
       NSWindowResizeTime = 0.001;
     };
     CustomSystemPreferences."com.apple.Accessibility".ReduceMotionEnabled = 1;
-    universalaccess.reduceMotion = true;
+    # universalaccess.reduceMotion = true;
     CustomUserPreferences = {
       NSGlobalDomain.WebKitDeveloperExtras = true;
       AppleLanguages = lib.mkForce (lib.mkDefault ["en-US"]);

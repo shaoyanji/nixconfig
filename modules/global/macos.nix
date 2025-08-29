@@ -5,8 +5,9 @@
     backupFileExtension = "hm-backup"; #for rebuild
     users.devji = {
       imports = [
-        ./home.nix
-        ../nixoshmsymlinks.nix
+        # ./home.nix
+        # ../nixoshmsymlinks.nix
+        ./heim.nix
       ];
     }; #staging point for ./home.nix commons
     sharedModules = [

@@ -17,9 +17,7 @@
     # ../dev.nix
     # ../helix.nix
     # ../scripts
-    inputs.kickstart-nixvim.homeManagerModules.default
   ];
-  programs.nixvim.enable = true;
   home = {
     packages = with pkgs;
       [

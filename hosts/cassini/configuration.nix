@@ -6,10 +6,8 @@
   ...
 }: {
   imports = [
-    inputs.kickstart-nixvim.darwinModules.default
   ];
 
-  programs.nixvim.enable = true;
   homebrew = {
     enable = true;
     taps = [
@@ -104,7 +102,6 @@
   environment.systemPackages = with pkgs; [
     # kitty
     # terminal-notifier
-    markdownlint-cli
     mkalias
   ];
 

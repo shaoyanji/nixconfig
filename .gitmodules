@@ -1,4 +1,3 @@
 [submodule "modules/secrets"]
-	path = modules/secrets
 	url = git@github.com:shaoyanji/secrets.git
-
+	path = modules/secrets

@@ -43,12 +43,12 @@
           append /usr/bin/env
           )
           source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/cb60ffee1b5dab08607db7523c0da506fa2c4dea/secrets.nu";
-            sha256 = "19nq2sl9xa8albd2fgii9n3syf88vgjgl0vrvvchq6vc6zcxrcip";
+            url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/2e61cdbf1f277ff608346919b4faa1e4b495565b/secrets.nu";
+            sha256 = "15qhgi9p9y7smsl1w940lg0wdwsrj4xk6gl4jxdalp83vfahibz3";
           }}'
           source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/6679b0054d51c429e8f67b0fc09c8bb21bde20d3/utils.nu";
-            sha256 = "1jqql613gy8np80rj3jck91m4ihnflgkfwkl2a9psnk656yd083d";
+            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/9f084842ec32625b54e7737c3a3d5a2cb5a4fc08/utils.nu";
+            sha256 = "02z9d135nlsv1wn7njj5ih9ph4q7acnn9v1gsbc8p102mvf7iz6h";
           }}'
           source '${builtins.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/6475aa5b88f97715a3788ad9ddcd0f21c751b403/mataroa.nu";

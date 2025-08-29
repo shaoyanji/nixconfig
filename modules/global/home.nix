@@ -1,7 +1,6 @@
 {
   pkgs,
   lib,
-  inputs,
   ...
 }: {
   # home.stateVersion = "25.05";
@@ -17,13 +16,10 @@
     # ../dev.nix
     # ../helix.nix
     # ../scripts
-    inputs.kickstart-nixvim.homeManagerModules.default
   ];
-  programs.nixvim.enable = true;
   home = {
     packages = with pkgs;
       [
-        markdownlint-cli
         mupdf
         mpv
         # viu

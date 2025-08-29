@@ -17,10 +17,13 @@
     # ../dev.nix
     # ../helix.nix
     # ../scripts
+    inputs.kickstart-nixvim.homeManagerModules.default
   ];
+  programs.nixvim.enable = true;
   home = {
     packages = with pkgs;
       [
+        markdownlint-cli
         mupdf
         mpv
         # viu
@@ -228,12 +231,12 @@
       # '';
     };
 
-    # sessionVariables = {
-    #   #    EDITOR = "nvim";
-    #   GUM_CHOOSE_SELECTED_FOREGROUND = 50;
-    #   GUM_CHOOSE_CURSOR_FOREGROUND = 50;
-    #   GUM_CHOOSE_HEADER_FOREGROUND = 30;
-    # };
+    sessionVariables = {
+      EDITOR = "nvim";
+      #   GUM_CHOOSE_SELECTED_FOREGROUND = 50;
+      #   GUM_CHOOSE_CURSOR_FOREGROUND = 50;
+      #   GUM_CHOOSE_HEADER_FOREGROUND = 30;
+    };
   };
 
   # nixpkgs.config.allowUnfree = true;

@@ -2,14 +2,11 @@
   pkgs,
   lib,
   config,
-  inputs,
   ...
 }: {
   imports = [
-    inputs.kickstart-nixvim.darwinModules.default
   ];
 
-  programs.nixvim.enable = true;
   homebrew = {
     enable = true;
     taps = [

@@ -129,6 +129,7 @@
         ./modules/global/macos.nix
         nix-homebrew.darwinModules.nix-homebrew
         home-manager.darwinModules.default
+        sops-nix.darwinModules.sops
       ];
     globalModulesContainers =
       globalModules

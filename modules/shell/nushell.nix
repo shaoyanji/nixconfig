@@ -73,7 +73,7 @@
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/rg/rg-completions.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/tar/tar-completions.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/ssh/ssh-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/zoxide/zoxide-completions.nu
+          # source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/zoxide/zoxide-completions.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/man/man-completions.nu
         '';
     };

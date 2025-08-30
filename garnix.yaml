@@ -5,11 +5,11 @@ builds:
   # - nixosConfigurations.*
   include:
     # - defaultPackage.x86_64-linux
-    # - nixosConfigurations.poseidon
+    - nixosConfigurations.poseidon
     - nixosConfigurations.garnixMachine
     # - "*.x86_64-linux.*"
     # - devShell.x86_64-linux
-    # - nixosConfigurations.thinsandy
+    - nixosConfigurations.thinsandy
     # - nixosConfigurations.ancientace
     # - homeConfigurations.penguin
     - darwinConfigurations.*

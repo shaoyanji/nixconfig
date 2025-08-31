@@ -4,10 +4,10 @@
   inputs,
   ...
 }:
-## Please read the home-configuration.nix manpage for a list of all available options.
 let
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-in {
+in
+{
   home.username = "jisifu";
   home.homeDirectory = "/home/jisifu";
   home.stateVersion = "22.05";
@@ -73,7 +73,7 @@ in {
     GUM_CHOOSE_HEADER_FOREGROUND = 30;
     BROWSER = "lynx";
     SOPS_EDITOR = "hx";
-  }; # Let Home Manager install and manage itself.
+  };
   home.file = {
     "Caddyfile".source = config.lib.file.mkOutOfStoreSymlink ../modules/config/Caddyfile;
   };

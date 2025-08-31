@@ -5,7 +5,6 @@
 
   imports = [
     ../modules/global/minimal.nix
-    ../modules/nixvim
   ];
 
   home.packages = with pkgs; [

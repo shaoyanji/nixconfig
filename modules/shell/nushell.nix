@@ -50,11 +50,11 @@
             url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/92a166c5e461e0802fd1508349e8f7fb4b167884/utils.nu";
             sha256 = "0azfrvsijrjkc7gm0pc5q0bx6yqpajnml87zdg21yzah703f259a";
           }}'
-          source '${builtins.fetchurl {
+          source '${pkgs.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/68f91003d5afe6d2445f8a0e78d72555ce98adcd/mataroa.nu";
             hash = "sha256-3+/W6WTT9dIjLZSGGY93vH4/zSoLJ8tED1hcloFKGk0=";
           }}'
-          source '${builtins.fetchurl {
+          source '${pkgs.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/c7188d4068fc8b76c3e9513a7e7777a0c74b2886/llm.nu";
             hash = "sha256-ZEO6aTVtp1OObbRNKtsVXP0DLKPieCo7z/JG+wGSqC8=";
           }}'

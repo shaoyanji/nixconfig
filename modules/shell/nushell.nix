@@ -46,9 +46,9 @@
             url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/2e61cdbf1f277ff608346919b4faa1e4b495565b/secrets.nu";
             sha256 = "15qhgi9p9y7smsl1w940lg0wdwsrj4xk6gl4jxdalp83vfahibz3";
           }}'
-          source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/92a166c5e461e0802fd1508349e8f7fb4b167884/utils.nu";
-            sha256 = "0azfrvsijrjkc7gm0pc5q0bx6yqpajnml87zdg21yzah703f259a";
+          source '${pkgs.fetchurl {
+            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/fffc908de4f43070b24c76822fa1fe1f7c9a35d9/utils.nu";
+            hash = "sha256-C776JHQ1MEABzZPQEuxWq9iHYk1GbedizfHP4JYH+N0=";
           }}'
           source '${pkgs.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/68f91003d5afe6d2445f8a0e78d72555ce98adcd/mataroa.nu";

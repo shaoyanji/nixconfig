@@ -142,19 +142,19 @@
       enable = true;
       openFirewall = true;
     };
-    transmission = {
-      enable = true; #Enable transmission daemon
+    # transmission = {
+    #   enable = true; #Enable transmission daemon
 
-      package = pkgs.transmission_4;
-      openRPCPort = true; #Open firewall for RPC
-      settings = {
-        #Override default settings
-        rpc-bind-address = "0.0.0.0"; #Bind to own IP
-        rpc-whitelist = "127.0.0.1,100.66.146.18,100.80.205.35,100.107.85.117,100.76.219.97,100.80.247.12,100.89.170.84,100.120.134.106";
-        download-dir = "/Volumes/data/arr";
-        # download-dir = "${config.services.transmission.home}/Downloads";
-      };
-    };
+    #   package = pkgs.transmission_4;
+    #   openRPCPort = true; #Open firewall for RPC
+    #   settings = {
+    #     #Override default settings
+    #     rpc-bind-address = "0.0.0.0"; #Bind to own IP
+    #     rpc-whitelist = "127.0.0.1,100.66.146.18,100.80.205.35,100.107.85.117,100.76.219.97,100.80.247.12,100.89.170.84,100.120.134.106";
+    #     download-dir = "/Volumes/data/arr";
+    #     # download-dir = "${config.services.transmission.home}/Downloads";
+    #   };
+    # };
     lidarr = {
       enable = true;
       openFirewall = true;

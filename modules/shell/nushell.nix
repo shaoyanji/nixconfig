@@ -44,7 +44,7 @@
           )
           source '${builtins.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/secrets.nu";
-            sha256 = "sha256-NgbyR+dfcA7jgOHG3MiqCIau2jlNgwO/eBIyhZQmp2Y=";
+            sha256 = "sha256-+e0tFFu7oiZ3IXcm/yFClpHGm/zCYll1jHOu5/A7js8=";
           }}'
           source '${pkgs.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/utils.nu";

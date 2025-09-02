@@ -43,19 +43,19 @@
           append /usr/bin/env
           )
           source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/2e61cdbf1f277ff608346919b4faa1e4b495565b/secrets.nu";
-            sha256 = "15qhgi9p9y7smsl1w940lg0wdwsrj4xk6gl4jxdalp83vfahibz3";
+            url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/secrets.nu";
+            sha256 = "sha256-NgbyR+dfcA7jgOHG3MiqCIau2jlNgwO/eBIyhZQmp2Y=";
           }}'
           source '${pkgs.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/fffc908de4f43070b24c76822fa1fe1f7c9a35d9/utils.nu";
-            hash = "sha256-C776JHQ1MEABzZPQEuxWq9iHYk1GbedizfHP4JYH+N0=";
+            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/utils.nu";
+            hash = "sha256-n8DGGTfF1l4SBnZroAf+BrRxjmmacHTYN0MsgactFQw=";
           }}'
           source '${pkgs.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/68f91003d5afe6d2445f8a0e78d72555ce98adcd/mataroa.nu";
+            url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/mataroa.nu";
             hash = "sha256-3+/W6WTT9dIjLZSGGY93vH4/zSoLJ8tED1hcloFKGk0=";
           }}'
           source '${pkgs.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/c7188d4068fc8b76c3e9513a7e7777a0c74b2886/llm.nu";
+            url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/llm.nu";
             hash = "sha256-ZEO6aTVtp1OObbRNKtsVXP0DLKPieCo7z/JG+wGSqC8=";
           }}'
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nix.nu

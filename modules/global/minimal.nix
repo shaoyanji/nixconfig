@@ -156,6 +156,8 @@
         sysstat
         pciutils
         usbutils
+        graph-easy
+        gnuplot
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ghostscript_headless

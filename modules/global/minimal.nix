@@ -35,6 +35,8 @@
         #        (pkgs.uutils-coreutils.override {prefix = "";})
         # mupdf
         # mpv
+        a2ps
+        enscript
         tgpt
         aichat
         mods

@@ -37,6 +37,7 @@
         # mpv
         a2ps
         enscript
+        pdfcpu
         tgpt
         aichat
         mods

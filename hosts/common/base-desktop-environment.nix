@@ -2,8 +2,13 @@
   inputs,
   config,
   pkgs,
+  lib,
   ...
 }: {
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "obsidian"
+    ];
   imports = [
     ./flatpak.nix
     ./minimal-desktop.nix
@@ -70,6 +75,7 @@
     obsidian
     # config.boot.kernelPackages.digimend
   ];
+
   programs.appimage = {
     enable = true;
     binfmt = true;

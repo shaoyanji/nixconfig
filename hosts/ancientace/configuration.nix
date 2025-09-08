@@ -10,8 +10,6 @@
     ./hardware-configuration.nix
     ../common/base-desktop-environment.nix
     ../common/laptop.nix
-
-    inputs.chaotic.nixosModules.default
   ];
   home-manager.users.devji.home.sessionVariables.EDITOR = lib.mkForce "nvim";
   boot = {

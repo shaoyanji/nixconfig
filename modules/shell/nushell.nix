@@ -46,17 +46,17 @@
             url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/secrets.nu";
             sha256 = "sha256-+e0tFFu7oiZ3IXcm/yFClpHGm/zCYll1jHOu5/A7js8=";
           }}'
-          source '${pkgs.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/bdedefee39d58a5e171ecf8c55ea44b88224c82d/utils.nu";
-            hash = "sha256-wCi8LmR2Iqo9q58SvohbYEBQe1VPvJPTeW7g3WeqwPQ=";
+          source '${builtins.fetchurl {
+            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/080623c1bbefae16f394a2559cc5373ed98f4eee/utils.nu";
+            sha256 = "sha256:0rwd9xr41yy0wmf723p27kakyfgmgvffj35svi3knvnj20xrin31";
           }}'
           source '${pkgs.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/mataroa.nu";
             hash = "sha256-3+/W6WTT9dIjLZSGGY93vH4/zSoLJ8tED1hcloFKGk0=";
           }}'
-          source '${pkgs.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/llm.nu";
-            hash = "sha256-ZEO6aTVtp1OObbRNKtsVXP0DLKPieCo7z/JG+wGSqC8=";
+          source '${builtins.fetchurl {
+            url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/db4d1dda1d303882261e31cc4e12943e5ad455cb/llm.nu";
+            sha256 = "sha256:14wbll38xh2badpp5gi0f26wv392a6fpacf3bnag57cclf39zlmi";
           }}'
           source '${builtins.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/0087741c46a72944304cf2fa2b5745ca/raw/e2ca2968b3f720f454154e49671937a2d8428377/finance.nu";

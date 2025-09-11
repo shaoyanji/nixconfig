@@ -44,7 +44,7 @@
           )
           source '${builtins.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/2763e269576744deb954425b15a4711a466ba64f/secrets.nu";
-            sha256 = "sha:03kwkvwc6ag8cfwv2spm7ch2khsfp7qrvpvvhvwal7vhjf65s61b";
+            sha256 = "sha256:03kwkvwc6ag8cfwv2spm7ch2khsfp7qrvpvvhvwal7vhjf65s61b";
           }}'
           source '${builtins.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/2f8cc30d785c2def9a6533dc276b428db27bf5a8/utils.nu";

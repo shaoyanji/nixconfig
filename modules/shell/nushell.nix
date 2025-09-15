@@ -7,9 +7,7 @@
     nushell = {
       enable = true;
       extraConfig =
-        /*
-        nu
-        */
+        # nu
         ''
           let carapace_completer = {|spans|
           carapace $spans.0 nushell $spans | from json
@@ -42,30 +40,42 @@
           prepend ~/.nix-profile/bin|
           append /usr/bin/env
           )
-          source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/2763e269576744deb954425b15a4711a466ba64f/secrets.nu";
-            sha256 = "sha256:03kwkvwc6ag8cfwv2spm7ch2khsfp7qrvpvvhvwal7vhjf65s61b";
-          }}'
-          source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/2f8cc30d785c2def9a6533dc276b428db27bf5a8/utils.nu";
-            sha256 = "sha256:1iwhh1n2f0ksqclm6r9qig9vxjsxc4j9q8g0lc1vrjqfdrzjaicc";
-          }}'
-          source '${pkgs.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/mataroa.nu";
-            hash = "sha256-3+/W6WTT9dIjLZSGGY93vH4/zSoLJ8tED1hcloFKGk0=";
-          }}'
-          source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/db4d1dda1d303882261e31cc4e12943e5ad455cb/llm.nu";
-            sha256 = "sha256:14wbll38xh2badpp5gi0f26wv392a6fpacf3bnag57cclf39zlmi";
-          }}'
-          source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/0087741c46a72944304cf2fa2b5745ca/raw/e2ca2968b3f720f454154e49671937a2d8428377/finance.nu";
-            sha256 = "sha256:0c0pl1fpkwj1r1aqnz5l9b21ia0vdsqdr7yvgirca7b3xnvdmjf7";
-          }}'
-          source '${builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/2660542f4b2b83f3c540db8f25fc5059/raw/1f5bb82be0b4a094009aca01eee889b9fb136d31/pydb.nu";
-            sha256 = "sha256:1dv0m4z0p8vmdq4lhqry953hsy4pfvkfsn977jinn5l8p8c5sb2y";
-          }}'
+          source '${
+            builtins.fetchurl {
+              url = "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/2763e269576744deb954425b15a4711a466ba64f/secrets.nu";
+              sha256 = "sha256:03kwkvwc6ag8cfwv2spm7ch2khsfp7qrvpvvhvwal7vhjf65s61b";
+            }
+          }'
+          source '${
+            builtins.fetchurl {
+              url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/2f8cc30d785c2def9a6533dc276b428db27bf5a8/utils.nu";
+              sha256 = "sha256:1iwhh1n2f0ksqclm6r9qig9vxjsxc4j9q8g0lc1vrjqfdrzjaicc";
+            }
+          }'
+          source '${
+            pkgs.fetchurl {
+              url = "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/mataroa.nu";
+              hash = "sha256-3+/W6WTT9dIjLZSGGY93vH4/zSoLJ8tED1hcloFKGk0=";
+            }
+          }'
+          source '${
+            builtins.fetchurl {
+              url = "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/db4d1dda1d303882261e31cc4e12943e5ad455cb/llm.nu";
+              sha256 = "sha256:14wbll38xh2badpp5gi0f26wv392a6fpacf3bnag57cclf39zlmi";
+            }
+          }'
+          source '${
+            builtins.fetchurl {
+              url = "https://gist.githubusercontent.com/shaoyanji/0087741c46a72944304cf2fa2b5745ca/raw/e2ca2968b3f720f454154e49671937a2d8428377/finance.nu";
+              sha256 = "sha256:0c0pl1fpkwj1r1aqnz5l9b21ia0vdsqdr7yvgirca7b3xnvdmjf7";
+            }
+          }'
+          source '${
+            builtins.fetchurl {
+              url = "https://gist.githubusercontent.com/shaoyanji/2660542f4b2b83f3c540db8f25fc5059/raw/1f5bb82be0b4a094009aca01eee889b9fb136d31/pydb.nu";
+              sha256 = "sha256:1dv0m4z0p8vmdq4lhqry953hsy4pfvkfsn977jinn5l8p8c5sb2y";
+            }
+          }'
 
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nix.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/data_extraction/ultimate_extractor.nu
@@ -85,6 +95,14 @@
           # source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/zoxide/zoxide-completions.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/man/man-completions.nu
         '';
+      plugins = with pkgs.nushellPlugins; [
+        skim
+        query
+        gstat
+        formats
+        highlight
+        polars
+      ];
     };
     carapace.enable = true;
     carapace.enableNushellIntegration = true;
@@ -94,12 +112,12 @@
     # nushellPlugins.desktop_notifications
     # nushellPlugins.dbus
     # nushellPlugins.units
-    nushellPlugins.skim
-    nushellPlugins.query
-    nushellPlugins.gstat
-    nushellPlugins.formats
-    nushellPlugins.highlight
-    nushellPlugins.polars
+    # nushellPlugins.skim
+    # nushellPlugins.query
+    # nushellPlugins.gstat
+    # nushellPlugins.formats
+    # nushellPlugins.highlight
+    # nushellPlugins.polars
     nu_scripts
   ];
   xdg.configFile = {

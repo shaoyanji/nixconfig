@@ -17,6 +17,11 @@ in {
           lowfi -t chillhop
         ''
       )
+      (
+        pkgs.writers.writeBashBin "lofigirl" {} ''
+          lowfi -t lofigirl-new
+        ''
+      )
     ];
 
     file = {
@@ -45,6 +50,10 @@ in {
       ".local/share/lowfi/chillhop.txt".source = builtins.fetchurl {
         url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/chillhop.txt";
         sha256 = "sha256:0dil7aj1qx221zrbqgy35vd73g5lpgvhyyx6f8bhxmhvlyn3j9qx";
+      };
+      ".local/share/lowfi/lofigirl-new.txt".source = builtins.fetchurl {
+        url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/lofigirl-new.txt";
+        sha256 = "sha256:1s9gi7sxsfbvabm6apk0r9phns25f45vsdn9xqdc431gkrsg429s";
       };
       ".local/share/lowfi/synthboy.txt".source = builtins.fetchurl {
         url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/synthboy.txt";

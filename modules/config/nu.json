@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/secrets.nu",
+    "sha256": "sha256:03kwkvwc6ag8cfwv2spm7ch2khsfp7qrvpvvhvwal7vhjf65s61b"
+  },
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/utils.nu",
+    "sha256": "sha256:05fc7ji3m10vy005q71zlgq5rvhqam9hlwn4yfvv3ynm778g0l5l"
+  },
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/mataroa.nu",
+    "sha256": "sha256:1qjypd0nsy163rqc5r5y1j9qn82r0371n1ivjf1x34sc0pni4i27"
+  },
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/llm.nu",
+    "sha256": "sha256:07pjhlh96sbg6g7v96dnq8xqw4iqnac56w12fmng0rnm3a6pijsr"
+  },
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/0087741c46a72944304cf2fa2b5745ca/raw/finance.nu",
+    "sha256": "sha256:0c0pl1fpkwj1r1aqnz5l9b21ia0vdsqdr7yvgirca7b3xnvdmjf7"
+  },
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/2660542f4b2b83f3c540db8f25fc5059/raw/pydb.nu",
+    "sha256": "sha256:1dv0m4z0p8vmdq4lhqry953hsy4pfvkfsn977jinn5l8p8c5sb2y"
+  }
+]

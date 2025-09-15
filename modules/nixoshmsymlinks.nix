@@ -59,7 +59,7 @@ in {
         url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/synthboy.txt";
         sha256 = "sha256:1v315rp5fxshgwq8zxavdprppbr00yash3xvks744yb38d6rsw76";
       };
-      ".local/share/lowfi".source = ./config/lowfi;
+      # ".local/share/lowfi".source = ./config/lowfi;
       ".simplex".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/.simplex";
     };
     sessionPath =

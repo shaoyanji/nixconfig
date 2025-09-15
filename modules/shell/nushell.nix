@@ -48,8 +48,8 @@
           }'
           source '${
             builtins.fetchurl {
-              url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/2f8cc30d785c2def9a6533dc276b428db27bf5a8/utils.nu";
-              sha256 = "sha256:1iwhh1n2f0ksqclm6r9qig9vxjsxc4j9q8g0lc1vrjqfdrzjaicc";
+              url = "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/59e21380a1323d34ebdfb2e7274afce800515983/utils.nu";
+              sha256 = "sha256:05fc7ji3m10vy005q71zlgq5rvhqam9hlwn4yfvv3ynm778g0l5l";
             }
           }'
           source '${

@@ -52,7 +52,7 @@
         comodoro
         jwt-cli
         himalaya
-        neverest
+        # neverest #doesn't build on wsl or penguin
         totp-cli
         termshark
         gucci

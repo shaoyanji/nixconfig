@@ -27,6 +27,12 @@ in {
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};
       "openmeteo/api/key" = {};
+      # "todoist" = {
+      #   sopsFile = ./secrets.json;
+      #   mode = "0600";
+      #   key = "";
+      #   format = "json";
+      # };
       #"${local_ssh_key}".path = "${ssh_key_path}";
     };
     templates = {
@@ -72,6 +78,7 @@ in {
     "gh/hosts.yml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."hosts.yml".path}";
     "nix/nix.conf".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."nix.conf".path}";
     "stormy/stormy.toml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."stormy.toml".path}";
+    # "todoist/config.json".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.secrets."todoist".path}";
   };
   home = {
     sessionVariables = {

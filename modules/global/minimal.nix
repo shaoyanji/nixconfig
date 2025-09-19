@@ -37,7 +37,6 @@
         # mpv
         cook-cli
         goose-cli
-        cliphist
         supabase-cli
         turso-cli
         cloudflare-cli
@@ -184,6 +183,7 @@
         usbutils
         graph-easy
         gnuplot
+        cliphist
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ghostscript_headless

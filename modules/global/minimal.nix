@@ -35,6 +35,29 @@
         #        (pkgs.uutils-coreutils.override {prefix = "";})
         # mupdf
         # mpv
+        cook-cli
+        goose-cli
+        cliphist
+        supabase-cli
+        turso-cli
+        cloudflare-cli
+        bootdev-cli
+        todoist
+        go
+        wash-cli
+        ani-cli
+        starfetch
+        # rustfinity
+        # twitch-hls-client
+        neocities-cli
+        comodoro
+        jwt-cli
+        himalaya
+        neverest
+        totp-cli
+        termshark
+        gucci
+        #seclists
         a2ps
         enscript
         pdfcpu

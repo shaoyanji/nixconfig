@@ -22,7 +22,6 @@
       [
         mupdf
         mpv
-        eloquent
       ]
       ++ lib.optionals stdenv.isLinux [
         jp2a # would not build in darwin
@@ -30,6 +29,7 @@
         lm_sensors # for `sensors` command
         ethtool
         iotop # io monitoring
+        eloquent
       ]
       ++ lib.optionals stdenv.isDarwin [
         libation

@@ -34,8 +34,6 @@
       map (pkg: pkgs.${pkg}) (builtins.filter (line: !(pkgs.lib.hasPrefix "#" (pkgs.lib.trim line))) (builtins.filter (pkg: pkg != "") (pkgs.lib.splitString "\n" (builtins.readFile ./../../pkg.txt))))
       ++ [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
-        # mupdf
-        # mpv
         cook-cli
         goose-cli
         supabase-cli

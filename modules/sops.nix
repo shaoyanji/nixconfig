@@ -27,6 +27,7 @@ in {
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};
       "openmeteo/api/key" = {};
+      "neocities" = {};
       # "todoist" = {
       #   sopsFile = ./secrets.json;
       #   mode = "0600";
@@ -79,6 +80,7 @@ in {
     "nix/nix.conf".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."nix.conf".path}";
     "stormy/stormy.toml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."stormy.toml".path}";
     # "todoist/config.json".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.secrets."todoist".path}";
+    "neocities/config".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.secrets."neocities".path}";
   };
   home = {
     sessionVariables = {

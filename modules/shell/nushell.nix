@@ -35,10 +35,11 @@
            }
           }
           $env.config.edit_mode = 'vi'
-          $env.PATH = ($env.PATH |
-          split row (char esep) |
-          prepend ~/.nix-profile/bin|
-          append /usr/bin/env
+          $env.PATH = (
+            $env.PATH
+              | split row (char esep)
+              | prepend ~/.nix-profile/bin
+              | append /usr/bin/env
           )
           ${builtins.concatStringsSep "\n" (builtins.map (x: "source " + builtins.fetchurl x) (builtins.fromJSON (builtins.readFile ../config/nu.json)))}
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nix.nu

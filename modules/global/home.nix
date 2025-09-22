@@ -22,6 +22,7 @@
       [
         mupdf
         mpv
+        ani-cli
       ]
       ++ lib.optionals stdenv.isLinux [
         jp2a # would not build in darwin

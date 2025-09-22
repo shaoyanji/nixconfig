@@ -3,7 +3,18 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  # pkgstxt = map (pkg: pkgs.${pkg}) (builtins.filter (line: !(pkgs.lib.hasPrefix "#" (pkgs.lib.trim line))) (builtins.filter (pkg: pkg != "") (pkgs.lib.splitString "\n" (builtins.readFile ./../../pkg.txt))));
+  pkgstxt =
+    ./../../pkg.txt
+    |> builtins.readFile
+    |> pkgs.lib.splitString "\n"
+    |> builtins.filter (pkg: pkg != "")
+    |> builtins.filter (line:
+      !(pkgs.lib.trim line
+        |> pkgs.lib.hasPrefix "#"))
+    |> map (pkg: pkgs.${pkg});
+in {
   imports = [
     ../lf
     ../env.nix
@@ -15,23 +26,11 @@
     # ../shell/nushell.nix
     #    ../nixvim
   ];
-  programs = {
-    direnv = {
-      enable = true;
-      nix-direnv.enable = true;
-    };
-    zoxide = {
-      enable = true;
-      options = [
-        "--cmd cd"
-      ];
-    };
-    fzf.enable = true;
-  };
+
   home = {
     stateVersion = "25.05";
     packages = with pkgs;
-      map (pkg: pkgs.${pkg}) (builtins.filter (line: !(pkgs.lib.hasPrefix "#" (pkgs.lib.trim line))) (builtins.filter (pkg: pkg != "") (pkgs.lib.splitString "\n" (builtins.readFile ./../../pkg.txt))))
+      pkgstxt
       ++ [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
         cook-cli
@@ -43,7 +42,6 @@
         todoist
         go
         wash-cli
-        ani-cli
         starfetch
         # rustfinity
         # twitch-hls-client
@@ -195,5 +193,19 @@
       GUM_CHOOSE_CURSOR_FOREGROUND = 50;
       GUM_CHOOSE_HEADER_FOREGROUND = 30;
     };
+  };
+
+  programs = {
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+    zoxide = {
+      enable = true;
+      options = [
+        "--cmd cd"
+      ];
+    };
+    fzf.enable = true;
   };
 }

@@ -1,11 +1,11 @@
 [
   {
     "url": "https://gist.githubusercontent.com/shaoyanji/ff1dea2e1f0c3f988f8019d76b2f53c9/raw/secrets.nu",
-    "sha256": "sha256:03kwkvwc6ag8cfwv2spm7ch2khsfp7qrvpvvhvwal7vhjf65s61b"
+    "sha256": "sha256:0i04hwlf1yw8v50i3xmhvna2hjvvjrdz8kwygzjr0hr60sfrwi1z"
   },
   {
     "url": "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/utils.nu",
-    "sha256": "sha256:1bbc3h71pnc78050p7iblrjn37vyscm6adm97wbd55djl2cs949a"
+    "sha256": "sha256:07dp3lagzvygm75m77cvs0blxkxyvfcphlw4akgl361jw3lp02c5"
   },
   {
     "url": "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/mataroa.nu",
@@ -22,5 +22,13 @@
   {
     "url": "https://gist.githubusercontent.com/shaoyanji/2660542f4b2b83f3c540db8f25fc5059/raw/pydb.nu",
     "sha256": "sha256:1dv0m4z0p8vmdq4lhqry953hsy4pfvkfsn977jinn5l8p8c5sb2y"
+  },
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/d18e52a23f062b725cc0533cc6414d37/raw/de.nu",
+    "sha256": "sha256:1qik0x63hms4vqplh16zca45crr3bwsz9ax0y2fcvkrqhl9qvcrx"
+  },
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/4a333f439fb144bf1c89a3a3739406ef/raw/jobby.nu",
+    "sha256": "sha256:1hgbl0fq7w4cqqpykhbpm1nxkh87ni59qa8l34g3bxkiqa7x81fj"
   }
 ]

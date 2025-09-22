@@ -81,7 +81,9 @@
           size = 3;
           passes = 1;
           vibrancy = 0.1696;
+          special = true;
         };
+        dim_special = 0.3;
       };
       animations = {
         enabled = true;

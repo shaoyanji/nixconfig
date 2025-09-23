@@ -34,6 +34,7 @@
       ]
       ++ lib.optionals stdenv.isDarwin [
         libation
+        iina # ani-cli dependency
       ];
     file = {
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in

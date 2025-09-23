@@ -8,13 +8,14 @@
   sshKeys =
     builtins.filter
     (x: x != [])
-    (builtins.split "\n" (
-      builtins.readFile
-      builtins.fetchurl {
-        url = "https://gist.githubusercontent.com/shaoyanji/8e051ec6548dcf8cebf1cd3e4e668f7d/raw/authorized_keys";
-        sha256 = "sha256:1h32q73qiqgyxkwvxi58dxq5qvhbihaii1v1fawrv58k7mhm23m6";
-      }
-    ));
+    (builtins.split "\n"
+      (builtins.readFile
+        (
+          builtins.fetchurl {
+            url = "https://gist.githubusercontent.com/shaoyanji/8e051ec6548dcf8cebf1cd3e4e668f7d/raw/authorized_keys";
+            sha256 = "sha256:1h32q73qiqgyxkwvxi58dxq5qvhbihaii1v1fawrv58k7mhm23m6";
+          }
+        )));
   backendPort = "3000";
 in {
   # This sets up networking and filesystems in a way that works with garnix

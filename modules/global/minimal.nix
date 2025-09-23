@@ -4,16 +4,16 @@
   lib,
   ...
 }: let
-  # pkgstxt = map (pkg: pkgs.${pkg}) (builtins.filter (line: !(pkgs.lib.hasPrefix "#" (pkgs.lib.trim line))) (builtins.filter (pkg: pkg != "") (pkgs.lib.splitString "\n" (builtins.readFile ./../../pkg.txt))));
-  pkgstxt =
-    ./../../pkg.txt
-    |> builtins.readFile
-    |> pkgs.lib.splitString "\n"
-    |> builtins.filter (pkg: pkg != "")
-    |> builtins.filter (line:
-      !(pkgs.lib.trim line
-        |> pkgs.lib.hasPrefix "#"))
-    |> map (pkg: pkgs.${pkg});
+  pkgstxt = map (pkg: pkgs.${pkg}) (builtins.filter (line: !(pkgs.lib.hasPrefix "#" (pkgs.lib.trim line))) (builtins.filter (pkg: pkg != "") (pkgs.lib.splitString "\n" (builtins.readFile ./../../pkg.txt))));
+  # pkgstxt =
+  #   ./../../pkg.txt
+  #   |> builtins.readFile
+  #   |> pkgs.lib.splitString "\n"
+  #   |> builtins.filter (pkg: pkg != "")
+  #   |> builtins.filter (line:
+  #     !(pkgs.lib.trim line
+  #       |> pkgs.lib.hasPrefix "#"))
+  #   |> map (pkg: pkgs.${pkg});
 in {
   imports = [
     ../lf

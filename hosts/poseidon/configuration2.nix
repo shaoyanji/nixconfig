@@ -19,7 +19,7 @@
   };
 in {
   # Set pkgs for hydenix globally, any file that imports pkgs will use this
-  # nixpkgs.pkgs = pkgs;
+  nixpkgs.pkgs = pkgs;
   imports = [
     # inputs.hydenix.inputs.home-manager.nixosModules.home-manager
     ../common/hydenix.nix

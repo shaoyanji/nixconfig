@@ -82,9 +82,9 @@
       "steam-run"
     ];
 
-  nixpkgs.config = {
-    allowUnfree = true;
-    nvidia.acceptLicense = true;
-    cudaSupport = true; # Enables CUDA support
-  };
+  # nixpkgs.config = {
+  #   allowUnfree = true;
+  #   nvidia.acceptLicense = true;
+  #   cudaSupport = true; # Enables CUDA support
+  # };
 }

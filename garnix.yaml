@@ -6,14 +6,14 @@ builds:
   include:
     # - defaultPackage.x86_64-linux
     - nixosConfigurations.poseidon
+    - darwinConfigurations.*
     - nixosConfigurations.garnixMachine
     # - "*.x86_64-linux.*"
     # - devShell.x86_64-linux
     # - nixosConfigurations.thinsandy
     # - nixosConfigurations.ancientace
     # - homeConfigurations.penguin
-    # - darwinConfigurations.*
-    - "*.aarch64-darwin.*"
+    # - "*.aarch64-darwin.*"
     # - "*.aarch64-linux.*"
     # - homeConfigurations.*
     # - darwinConfigurations.*

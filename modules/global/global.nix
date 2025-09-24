@@ -73,14 +73,14 @@
   #  programs.nix-index-database.comma.enable = true;
   #  nixpkgs.config.allowUnsupportedSystem = true;
   # nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      "obsidian"
-      "steam"
-      "steam-original"
-      "steam-unwrapped"
-      "steam-run"
-    ];
+  # nixpkgs.config.allowUnfreePredicate = pkg:
+  #   builtins.elem (lib.getName pkg) [
+  #     "obsidian"
+  #     "steam"
+  #     "steam-original"
+  #     "steam-unwrapped"
+  #     "steam-run"
+  #   ];
 
   # nixpkgs.config = {
   #   allowUnfree = true;

@@ -24,6 +24,7 @@ in {
     # inputs.hydenix.inputs.home-manager.nixosModules.home-manager
     ../common/hydenix.nix
     ./configuration.nix
+    inputs.chaotic.nixosModules.default
     # ./configuration3.nix
     # inputs.hydenix.lib.nixOsModules
     # ../../modules/system

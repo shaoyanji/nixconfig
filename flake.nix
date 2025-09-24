@@ -60,7 +60,7 @@
     #    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     #    ghostty.url = "github:ghostty-org/ghostty";
     flake-utils.url = "github:numtide/flake-utils";
-    # hydenix.url = "github:richen604/hydenix";
+    hydenix.url = "github:richen604/hydenix";
     # quickshell = {
     #   # add ?ref=<tag> to track a tag
     #   url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";

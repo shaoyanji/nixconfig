@@ -109,7 +109,7 @@
   programs.adb.enable = true;
   users.users.devji.extraGroups = ["adbusers" "kvm" "libvirtd"];
   services.udev.packages = [
-    pkgs.android-udev-rules
+    # pkgs.android-udev-rules
   ];
   #  dconf.settings = {
   #    "org/virt-manager/virt-manager/connections" = {
@@ -119,10 +119,10 @@
   #  };
 
   #  users.users.devji.extraGroups = ["libvirtd"];
-  services.qemuGuest.enable = true;
-  services.spice-vdagentd.enable = true; # enable copy and paste between host and guest
+  # services.qemuGuest.enable = true;
+  # services.spice-vdagentd.enable = true; # enable copy and paste between host and guest
 
-  #sunshine
+  # SUNSHINE:
 
   services.sunshine = {
     enable = true;

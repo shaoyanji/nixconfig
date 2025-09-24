@@ -12,7 +12,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
     garnix-lib.url = "github:garnix-io/garnix-lib";
-    # nixpkgs-legacy.url = "github:NixOS/nixpkgs/nixos-24.05";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
@@ -24,8 +23,6 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    # raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix/v0.4.1";
-    # raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -38,40 +35,18 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # nuenv = {
-    #   url = "github:DeterminateSystems/nuenv";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-    # hyprland.url = "github:hyprwm/hyprland";
-    # hyprland-plugins = {
-    #   url = "github:hyprwm/hyprland-plugins";
-    #   inputs.hyprland.follows = "hyprland";
-    # };
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    #hyprpaper = {
-    #  url = "github:hyprwm/hyprpaper";
-    #  inputs.hyprland.follows = "hyprland-plugins";
-    #};
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
-    #    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
-    #    ghostty.url = "github:ghostty-org/ghostty";
     flake-utils.url = "github:numtide/flake-utils";
-    # hydenix.url = "github:richen604/hydenix";
-    # quickshell = {
-    #   # add ?ref=<tag> to track a tag
-    #   url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    hydenix.url = "github:richen604/hydenix";
     caelestia = {
       url = "git+https://github.com/caelestia-dots/shell/";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # kickstart-nixvim.url = "git+file:///home/devji/nixconfig/modules/kickstart.nixvim";
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
     kickstart-nixvim.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -213,22 +188,22 @@
             ./hosts/garnixMachine.nix
           ];
         };
-        # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-        #   inherit (inputs.hydenix.lib) system;
-        #   specialArgs = {inherit inputs;};
-        #   modules =
-        #     globalModules
-        #     ++ [
-        #       ./hosts/poseidon/configuration2.nix
-        #     ];
-        poseidon = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+        poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+          inherit (inputs.hydenix.lib) system;
           specialArgs = {inherit inputs;};
           modules =
-            globalModulesNixos
+            globalModules
             ++ [
-              ./hosts/poseidon/configuration3.nix
+              ./hosts/poseidon/configuration2.nix
             ];
+          # poseidon = nixpkgs.lib.nixosSystem {
+          #   system = "x86_64-linux";
+          #   specialArgs = {inherit inputs;};
+          #   modules =
+          #     globalModulesNixos
+          #     ++ [
+          #       ./hosts/poseidon/configuration3.nix
+          #     ];
         };
 
         mtfuji = nixpkgs.lib.nixosSystem {

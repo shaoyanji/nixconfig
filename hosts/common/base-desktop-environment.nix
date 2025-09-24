@@ -5,10 +5,10 @@
   lib,
   ...
 }: {
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      "obsidian"
-    ];
+  # nixpkgs.config.allowUnfreePredicate = pkg:
+  #   builtins.elem (lib.getName pkg) [
+  #     "obsidian"
+  #   ];
   imports = [
     ./flatpak.nix
     ./minimal-desktop.nix

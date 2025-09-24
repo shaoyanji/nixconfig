@@ -11,7 +11,7 @@
     #    ./configuration2.nix
     ./hardware-configuration.nix
     ./nvidia.nix
-    # ../common/steam.nix
+    ../common/steam.nix
     # ../common/base-desktop-environment.nix
     ../common/minimal-desktop.nix
     # ../common/laptop.nix
@@ -36,13 +36,13 @@
     systemPackages = with pkgs; [
       # inputs.nur.legacyPackages."${system}".repos.charmbracelet.crush
       btrfs-progs
-      # (pkgs.wrapOBS {
-      #   plugins = with pkgs.obs-studio-plugins; [
-      #     wlrobs
-      #     obs-backgroundremoval
-      #     obs-pipewire-audio-capture
-      #   ];
-      # })
+      (pkgs.wrapOBS {
+        plugins = with pkgs.obs-studio-plugins; [
+          wlrobs
+          obs-backgroundremoval
+          obs-pipewire-audio-capture
+        ];
+      })
       element-desktop
       audacity
       dust

@@ -19,8 +19,8 @@
   # "steam-original"
   # "steam-run"
   # ];
-  programs.steam.gamescopeSession.enable = true;
-  programs.gamemode.enable = true;
+  # programs.steam.gamescopeSession.enable = true;
+  # programs.gamemode.enable = true;
   environment.systemPackages = with pkgs; [
     #    protonup
     #nvidia-docker
@@ -36,7 +36,7 @@
     #nvidia-opencl-icd
     #nvidia-opencl-dev
     #nvidia-opencl-doc
-    proton-ge-custom
+    # proton-ge-custom
     #mangohud-git
   ];
   environment.sessionVariables = {

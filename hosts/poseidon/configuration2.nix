@@ -80,8 +80,8 @@ in {
 
     #! EDIT THESE VALUES
     hostname = "poseidon"; # Change to your preferred hostname
-    timezone = "Europe/Berlin"; # Change to your timezone
-    locale = "en_US.UTF-8"; # Change to your preferred locale
+    # timezone = "Europe/Berlin"; # Change to your timezone
+    # locale = "en_US.UTF-8"; # Change to your preferred locale
 
     #   /*
     #   Optionally edit the below values, or leave to use hydenix defaults
@@ -108,17 +108,17 @@ in {
   };
 
   # #! EDIT THESE VALUES (must match users defined above)
-  users.users.devji = {
-    isNormalUser = true; # Regular user account
-    #    initialPassword = "1234"; # Default password (CHANGE THIS after first login with passwd)
-    extraGroups = [
-      "wheel" # For sudo access
-      "networkmanager" # For network management
-      "video" # For display/graphics access
-      # Add other groups as needed
-    ];
-    shell = pkgs.zsh; # Change if you prefer a different shell
-  };
+  # users.users.devji = {
+  #   isNormalUser = true; # Regular user account
+  #   #    initialPassword = "1234"; # Default password (CHANGE THIS after first login with passwd)
+  #   extraGroups = [
+  #     "wheel" # For sudo access
+  #     "networkmanager" # For network management
+  #     "video" # For display/graphics access
+  #     # Add other groups as needed
+  #   ];
+  #   shell = pkgs.zsh; # Change if you prefer a different shell
+  # };
 
-  system.stateVersion = "25.05";
+  # system.stateVersion = "25.05";
 }

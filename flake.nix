@@ -56,7 +56,7 @@
     #  inputs.hyprland.follows = "hyprland-plugins";
     #};
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
-    zen-browser.    inputs.nixpkgs.follows = "nixpkgs";
+    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
     #    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     #    ghostty.url = "github:ghostty-org/ghostty";
     flake-utils.url = "github:numtide/flake-utils";

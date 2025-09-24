@@ -2,6 +2,7 @@
   imports = [
     ../common/nvidia.nix
   ];
+  services.xserver.videoDrivers = ["amdgpu"];
   hardware.nvidia = {
     open = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;

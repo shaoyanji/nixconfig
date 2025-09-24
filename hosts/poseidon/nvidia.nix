@@ -3,6 +3,7 @@
     ../common/nvidia.nix
   ];
   hardware.nvidia = {
+    open = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     prime = {
       nvidiaBusId = "PCI:1:0:0";

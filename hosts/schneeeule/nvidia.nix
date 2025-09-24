@@ -20,6 +20,7 @@
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages;
   # boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   hardware.nvidia = {
+    open = false;
     package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
     #package = config.boot.kernelPackages.nvidiaPackages.stable;
     prime = {

@@ -26,7 +26,7 @@
     modesetting.enable = true;
     powerManagement.enable = false;
     powerManagement.finegrained = false;
-    open = false;
+    # open = false;
     nvidiaSettings = true;
     forceFullCompositionPipeline = true;
     prime = {

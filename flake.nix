@@ -229,22 +229,23 @@
             ./hosts/garnixMachine.nix
           ];
         };
-        # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-        #   inherit (inputs.hydenix.lib) system;
-        #   specialArgs = {inherit inputs;};
-        #   modules =
-        #     globalModules
-        #     ++ [
-        #       ./hosts/poseidon/configuration2.nix
-        #     ];
-        poseidon = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+        poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+          inherit (inputs.hydenix.lib) system;
           specialArgs = {inherit inputs;};
           modules =
-            globalModulesNixos
+            globalModules
             ++ [
-              ./hosts/poseidon/configuration.nix
+              ./hosts/poseidon/configuration2.nix
             ];
+          # poseidon = nixpkgs.lib.nixosSystem {
+          #   system = "x86_64-linux";
+          #   specialArgs = {inherit inputs;};
+          #   modules =
+          #     globalModulesNixos
+          #     ++ [
+          #       ./hosts/poseidon/configuration.nix
+          #     ];
+          #
         };
 
         mtfuji = nixpkgs.lib.nixosSystem {

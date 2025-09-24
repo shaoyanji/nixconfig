@@ -243,7 +243,7 @@
           modules =
             globalModulesNixos
             ++ [
-              ./hosts/poseidon/configuration3.nix
+              ./hosts/poseidon/configuration.nix
             ];
         };
 

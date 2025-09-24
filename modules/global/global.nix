@@ -77,4 +77,10 @@
     builtins.elem (lib.getName pkg) [
       "obsidian"
     ];
+
+  nixpkgs.config = {
+    allowUnfree = true;
+    nvidia.acceptLicense = true;
+    cudaSupport = true; # Enables CUDA support
+  };
 }

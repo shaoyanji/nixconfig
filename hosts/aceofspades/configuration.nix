@@ -9,7 +9,6 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../common/base-desktop-environment.nix
-    inputs.chaotic.nixosModules.default
   ];
   boot.loader = {
     systemd-boot.enable = lib.mkForce false;

@@ -10,7 +10,7 @@
     #    ./configuration2.nix
     ./hardware-configuration.nix
     ./nvidia.nix
-    ../common/steam.nix
+    # ../common/steam.nix
     ../common/base-desktop-environment.nix
     #../common/minimal-desktop.nix
     ../common/laptop.nix

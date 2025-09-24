@@ -34,7 +34,7 @@ in {
       ++ [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
         cook-cli
-        # goose-cli
+        goose-cli
         supabase-cli
         turso-cli
         cloudflare-cli

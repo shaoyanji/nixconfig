@@ -82,4 +82,9 @@
     pkgs.nerd-fonts.jetbrains-mono
     #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
   ];
+
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "obsidian"
+    ];
 }

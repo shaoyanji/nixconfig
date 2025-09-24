@@ -23,7 +23,7 @@
     ));
 in {
   imports = [
-    ./specialization-server.nix
+    # ./specialization-server.nix
     ./localmounts.nix
     inputs.sops-nix.nixosModules.sops
   ];

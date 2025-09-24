@@ -5,7 +5,7 @@ builds:
   # - nixosConfigurations.*
   include:
     # - defaultPackage.x86_64-linux
-    - nixosConfigurations.poseidon
+    # - nixosConfigurations.poseidon
     # - darwinConfigurations.*
     - nixosConfigurations.garnixMachine
     # - "*.x86_64-linux.*"
@@ -15,9 +15,9 @@ builds:
     # - homeConfigurations.penguin
     # - "*.aarch64-darwin.*"
     # - "*.aarch64-linux.*"
-    - nixosConfigurations.*
-    - homeConfigurations.*
-    - darwinConfigurations.*
+    # - nixosConfigurations.*
+    # - homeConfigurations.*
+    # - darwinConfigurations.*
     - nixosConfigurations.garnixMachine
 servers:
   - configuration: garnixMachine

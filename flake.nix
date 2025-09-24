@@ -60,7 +60,7 @@
     #    lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.92.0.tar.gz";
     #    ghostty.url = "github:ghostty-org/ghostty";
     flake-utils.url = "github:numtide/flake-utils";
-    hydenix.url = "github:richen604/hydenix";
+    # hydenix.url = "github:richen604/hydenix";
     # quickshell = {
     #   # add ?ref=<tag> to track a tag
     #   url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
@@ -158,22 +158,6 @@
       }
     )
     // {
-      # nixosConfigurations = {
-      #   garnixMachine = nixpkgs.lib.nixosSystem {
-      #     system = "x86_64-linux";
-      #     modules = [
-      #       garnix-lib.nixosModules.garnix
-      #       {
-      #         _module.args = {
-      #           self = inputs.self;
-      #         };
-      #         # garnix.server.enable = true;
-      #       }
-      #       ./hosts/garnixMachine.nix
-      #     ];
-      #   };
-      # };
-
       homeConfigurations = {
         verntil = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
@@ -229,23 +213,22 @@
             ./hosts/garnixMachine.nix
           ];
         };
-        poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-          inherit (inputs.hydenix.lib) system;
+        # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+        #   inherit (inputs.hydenix.lib) system;
+        #   specialArgs = {inherit inputs;};
+        #   modules =
+        #     globalModules
+        #     ++ [
+        #       ./hosts/poseidon/configuration2.nix
+        #     ];
+        poseidon = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
           specialArgs = {inherit inputs;};
           modules =
-            globalModules
+            globalModulesNixos
             ++ [
-              ./hosts/poseidon/configuration2.nix
+              ./hosts/poseidon/configuration.nix
             ];
-          # poseidon = nixpkgs.lib.nixosSystem {
-          #   system = "x86_64-linux";
-          #   specialArgs = {inherit inputs;};
-          #   modules =
-          #     globalModulesNixos
-          #     ++ [
-          #       ./hosts/poseidon/configuration.nix
-          #     ];
-          #
         };
 
         mtfuji = nixpkgs.lib.nixosSystem {

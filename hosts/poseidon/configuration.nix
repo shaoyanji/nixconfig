@@ -12,9 +12,9 @@
     ./hardware-configuration.nix
     ./nvidia.nix
     ../common/steam.nix
-    # ../common/base-desktop-environment.nix
+    ../common/base-desktop-environment.nix
     ../common/minimal-desktop.nix
-    # ../common/laptop.nix
+    ../common/laptop.nix
   ];
   # boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {

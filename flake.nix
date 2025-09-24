@@ -42,7 +42,7 @@
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
-    hydenix.url = "github:richen604/hydenix";
+    # hydenix.url = "github:richen604/hydenix";
     caelestia = {
       url = "git+https://github.com/caelestia-dots/shell/";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -188,22 +188,22 @@
             ./hosts/garnixMachine.nix
           ];
         };
-        poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-          inherit (inputs.hydenix.lib) system;
+        # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
+        #   inherit (inputs.hydenix.lib) system;
+        #   specialArgs = {inherit inputs;};
+        #   modules =
+        #     globalModules
+        #     ++ [
+        #       ./hosts/poseidon/configuration2.nix
+        #     ];
+        poseidon = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
           specialArgs = {inherit inputs;};
           modules =
-            globalModules
+            globalModulesNixos
             ++ [
-              ./hosts/poseidon/configuration2.nix
+              ./hosts/poseidon/configuration3.nix
             ];
-          # poseidon = nixpkgs.lib.nixosSystem {
-          #   system = "x86_64-linux";
-          #   specialArgs = {inherit inputs;};
-          #   modules =
-          #     globalModulesNixos
-          #     ++ [
-          #       ./hosts/poseidon/configuration3.nix
-          #     ];
         };
 
         mtfuji = nixpkgs.lib.nixosSystem {

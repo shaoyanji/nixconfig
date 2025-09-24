@@ -36,25 +36,25 @@
   };
 
   hardware.nvidia-container-toolkit.enable = true;
-  specialisation = {
-    gaming.configuration = {
-      system.nixos.tags = ["gaming"];
-      #      services.tailscale.enable = lib.mkForce false;
-      networking.nameservers = lib.mkDefault [];
-      networking.search = lib.mkDefault [];
-      hardware.nvidia = {
-        #package = config.boot.kernelPackages.nvidiaPackages.stable;
-        #package = config.boot.kernelPackages.nvidiaPackages.beta;
-        prime = {
-          offload.enable = lib.mkForce false;
-          offload.enableOffloadCmd = lib.mkForce false;
-          sync.enable = lib.mkForce true;
-        };
-      };
-    };
-  };
+  # specialisation = {
+  #   gaming.configuration = {
+  #     system.nixos.tags = ["gaming"];
+  #     #      services.tailscale.enable = lib.mkForce false;
+  #     networking.nameservers = lib.mkDefault [];
+  #     networking.search = lib.mkDefault [];
+  #     hardware.nvidia = {
+  #       #package = config.boot.kernelPackages.nvidiaPackages.stable;
+  #       #package = config.boot.kernelPackages.nvidiaPackages.beta;
+  #       prime = {
+  #         offload.enable = lib.mkForce false;
+  #         offload.enableOffloadCmd = lib.mkForce false;
+  #         sync.enable = lib.mkForce true;
+  #       };
+  #     };
+  #   };
+  # };
   # Nvidia Docker
-  # virtualisation.docker.enableNvidia = true;
+  virtualisation.docker.enableNvidia = true;
   # libnvidia-container does not support cgroups v2 (prior to 1.8.0)
   # https://github.com/NVIDIA/nvidia-docker/issues/1447
 

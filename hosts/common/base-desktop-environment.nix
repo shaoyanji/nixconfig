@@ -78,9 +78,9 @@
   };
   #
   # Fonts
-  fonts.packages = [
-    pkgs.nerd-fonts.jetbrains-mono
-    #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; })
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; }) # 24.11
   ];
 
   nixpkgs.config.allowUnfreePredicate = pkg:

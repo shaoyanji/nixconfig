@@ -33,6 +33,8 @@ in {
       pkgstxt
       ++ [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
+        typst
+        tinymist
         cook-cli
         goose-cli
         supabase-cli

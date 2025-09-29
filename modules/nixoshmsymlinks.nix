@@ -55,10 +55,10 @@ in {
       #   url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/lofigirl-new.txt";
       #   sha256 = "sha256:1s9gi7sxsfbvabm6apk0r9phns25f45vsdn9xqdc431gkrsg429s";
       # };
-      ".local/share/lowfi/synthboy.txt".source = builtins.fetchurl {
-        url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/synthboy.txt";
-        sha256 = "sha256:1v315rp5fxshgwq8zxavdprppbr00yash3xvks744yb38d6rsw76";
-      };
+      # ".local/share/lowfi/synthboy.txt".source = builtins.fetchurl {
+      #   url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/synthboy.txt";
+      #   sha256 = "sha256:1v315rp5fxshgwq8zxavdprppbr00yash3xvks744yb38d6rsw76";
+      # };
       # ".local/share/lowfi".source = ./config/lowfi;
       ".simplex".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/.simplex";
     };

@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     marksman
-    # dprint
+    dprint
     gopls
     alejandra
     nixd
@@ -19,12 +19,12 @@
         formatter.command = "${pkgs.shfmt}/bin/shfmt";
         auto-format = true;
       }
-      # {
-      #   name = "markdown";
-      #   auto-format = true;
-      #   formatter.command = "${pkgs.dprint}/bin/dprint";
-      #   formatter.args = ["fmt" "--stdin" "md"];
-      # }
+      {
+        name = "markdown";
+        auto-format = true;
+        formatter.command = "${pkgs.dprint}/bin/dprint";
+        formatter.args = ["fmt" "--stdin" "md"];
+      }
       {
         name = "haskell";
         auto-format = true;
@@ -69,12 +69,12 @@
           args = ["-"];
         };
       }
-      # {
-      #   name = "yaml";
-      #   auto-format = true;
-      #   formatter.command = "${pkgs.dprint}/bin/dprint";
-      #   formatter.args = ["fmt" "--stdin" "yaml"];
-      # }
+      {
+        name = "yaml";
+        auto-format = true;
+        formatter.command = "${pkgs.dprint}/bin/dprint";
+        formatter.args = ["fmt" "--stdin" "yaml"];
+      }
       {
         name = "go";
         auto-format = true;

@@ -43,7 +43,6 @@ in {
         cloudflare-cli
         bootdev-cli
         todoist
-        go
         wash-cli
         starfetch
         # rustfinity
@@ -126,7 +125,6 @@ in {
         gnutar
         gawk
         zstd
-
         diff-so-fancy
         entr
         exiftool
@@ -172,9 +170,11 @@ in {
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
-        tuir
+        go
+        wasmtime
+        tinygo
+        scc
         lazygit
-        surge #x86
         gitmoji-cli
         tldr
         dust
@@ -198,6 +198,7 @@ in {
         cliphist
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+        surge #x86
         ghostscript_headless
         # inputs.stormy.packages.x86_64-linux.stormy
       ];

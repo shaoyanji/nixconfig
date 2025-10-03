@@ -33,6 +33,7 @@ in {
       pkgstxt
       ++ [
         #        (pkgs.uutils-coreutils.override {prefix = "";})
+        amfora
         typst
         tinymist
         cook-cli
@@ -69,7 +70,7 @@ in {
         lowfi
         pop
         glow
-        charm-freeze # obsidian
+        charm-freeze
         nixd
         viu
         qrencode
@@ -138,7 +139,7 @@ in {
         bandwhich
         glances
         gping
-        speedtest-cli
+        # speedtest-cli
         buku
         ddgr
         # khal
@@ -171,6 +172,19 @@ in {
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
+        tuir
+        lazygit
+        ngrok #unfree
+        surge #x86
+        gitmoji-cli
+        tldr
+        dust
+        lz4
+        yank
+        # toot
+        pass
+        cmus
+        bitwarden-cli
         wl-clipboard
         hub
         md2pdf

@@ -70,8 +70,38 @@
     alsa-utils
     obsidian
     # config.boot.kernelPackages.digimend
+
+    #wkhtmltopdf
+    #ghostscript
+    #        texlive.combined.scheme-full
+    #pandoc
+    #mods
+    #aichat
+    #tgpt
+    #jekyll
+    #bundler
+    # scc
+    #dog
+    # taskwarrior3
+
+    #gitmoji-changelog
+    #sparkly-cli
+    #lowcharts
+
+    #hare
+    #haredoc
+    #go
+    #cargo
+    #tinygo
+    # wasmtime
+    # luajit
+    alsa-utils
+    element-desktop
+    lagrange
+    lagrange-tui
   ];
 
+  programs.thunderbird.enable = true;
   programs.appimage = {
     enable = true;
     binfmt = true;

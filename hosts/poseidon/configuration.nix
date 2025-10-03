@@ -30,7 +30,6 @@
       efi.canTouchEfiVariables = true;
     };
   };
-  programs.thunderbird.enable = true;
   networking.hostName = "poseidon"; # Define your hostname.
   environment = {
     systemPackages = with pkgs; [
@@ -43,45 +42,7 @@
           obs-pipewire-audio-capture
         ];
       })
-      element-desktop
       audacity
-      dust
-      lz4
-      yank
-      # toot
-      pass
-      cmus
-      bitwarden-cli
-      #wkhtmltopdf
-      #ghostscript
-      #        texlive.combined.scheme-full
-      #pandoc
-      #mods
-      #aichat
-      #tgpt
-      #jekyll
-      #bundler
-      tldr
-      scc
-      #dog
-      taskwarrior3
-      tuir
-      lazygit
-      ngrok #unfree
-      surge #x86
-      gitmoji-cli
-      #gitmoji-changelog
-      #sparkly-cli
-      #lowcharts
-
-      #hare
-      #haredoc
-      #go
-      #cargo
-      #tinygo
-      wasmtime
-      luajit
-      alsa-utils
       sunshine
       moonlight-qt
     ];

@@ -174,7 +174,6 @@ in {
       ++ lib.optionals stdenv.isLinux [
         tuir
         lazygit
-        ngrok #unfree
         surge #x86
         gitmoji-cli
         tldr

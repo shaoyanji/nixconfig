@@ -99,6 +99,7 @@
     element-desktop
     lagrange
     lagrange-tui
+    ngrok #unfree
   ];
 
   programs.thunderbird.enable = true;
@@ -116,5 +117,6 @@
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
       "obsidian"
+      "ngrok"
     ];
 }

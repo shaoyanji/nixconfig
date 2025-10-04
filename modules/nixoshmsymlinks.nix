@@ -81,7 +81,6 @@ in {
       ini
       */
       ''
-                theme = catppuccin-mocha
                 font-family = JetBrainsMono Nerd Font Mono
                 font-size = 14
                 background-opacity = 0.88888888

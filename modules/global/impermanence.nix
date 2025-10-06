@@ -41,6 +41,7 @@
         ];
         files = [
           ".config/sops/age/keys.txt"
+          "nixconfig"
         ];
         allowOther = true;
       };

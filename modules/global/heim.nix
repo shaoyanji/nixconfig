@@ -16,8 +16,6 @@
     homeDirectory = "/home/devji";
     packages = with pkgs;
       [
-        markdownlint-cli
-        gcc
       ]
       ++ lib.optionals stdenv.isLinux [
       ]

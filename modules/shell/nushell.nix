@@ -48,7 +48,7 @@
           use ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nufetch.nu
           use ${pkgs.nu_scripts}/share/nu_scripts/modules/wc/wc.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/weather/get-weather.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-menus/zoxide-menu.nu
+          # source ${pkgs.nu_scripts}/share/nu_scripts/custom-menus/zoxide-menu.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/bitwarden-cli/bitwarden-cli-completions.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/glow/glow-completions.nu

@@ -25,12 +25,21 @@
         ani-cli
       ]
       ++ lib.optionals stdenv.isLinux [
+        markdownlint-cli
+        gcc
+        qalculate-qt
+        go
+        wasmtime
+        tinygo
+        scc
+        yank
+        gnuplot
+        cliphist
         jp2a # would not build in darwin
         wl-clipboard
         lm_sensors # for `sensors` command
         ethtool
         iotop # io monitoring
-        eloquent
       ]
       ++ lib.optionals stdenv.isDarwin [
         libation

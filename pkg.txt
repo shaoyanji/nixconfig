@@ -1,0 +1,8 @@
+# khal
+# speedtest-cli
+#        (pkgs.uutils-coreutils.override {prefix = "";})
+# rustfinity
+# twitch-hls-client
+# neverest #doesn't build on wsl or penguin
+# seclists
+# thefuck

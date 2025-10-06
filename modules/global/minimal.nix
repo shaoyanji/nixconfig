@@ -32,7 +32,6 @@ in {
     packages = with pkgs;
       pkgstxt
       ++ [
-        #        (pkgs.uutils-coreutils.override {prefix = "";})
         amfora
         typst
         tinymist
@@ -45,17 +44,13 @@ in {
         todoist
         wash-cli
         starfetch
-        # rustfinity
-        # twitch-hls-client
         neocities-cli
         comodoro
         jwt-cli
         himalaya
-        # neverest #doesn't build on wsl or penguin
         totp-cli
         termshark
         gucci
-        #seclists
         a2ps
         enscript
         pdfcpu
@@ -78,7 +73,6 @@ in {
         graphviz
         graph-easy
         nix-output-monitor
-        # thefuck
         jq
         htmlq
         tomlq
@@ -117,7 +111,6 @@ in {
         ffmpeg
         fastfetch
         iftop
-
         file
         which
         tree
@@ -137,10 +130,8 @@ in {
         bandwhich
         glances
         gping
-        # speedtest-cli
         buku
         ddgr
-        # khal
         mutt
         newsboat
         rclone
@@ -154,7 +145,6 @@ in {
         translate-shell
         mc
         broot
-        # qalculate-qt
         ticker
         obsidian-export
         ots
@@ -170,21 +160,15 @@ in {
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
-        go
-        wasmtime
-        tinygo
-        scc
         lazygit
         gitmoji-cli
         tldr
         dust
         lz4
-        yank
         # toot
         pass
         cmus
         bitwarden-cli
-        wl-clipboard
         hub
         md2pdf
         strace
@@ -194,8 +178,6 @@ in {
         pciutils
         usbutils
         graph-easy
-        gnuplot
-        cliphist
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         surge #x86

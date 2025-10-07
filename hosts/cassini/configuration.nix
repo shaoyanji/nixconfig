@@ -26,7 +26,7 @@
       "ghostscript"
       "xpdf"
       "gemini-cli"
-      "ipfs"
+      # "ipfs"
       "bitwarden-cli"
       # "openssl@3.0"
     ];

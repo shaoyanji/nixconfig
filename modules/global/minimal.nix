@@ -32,6 +32,8 @@ in {
     packages = with pkgs;
       pkgstxt
       ++ [
+        eget
+        minijinja
         amfora
         typst
         tinymist

@@ -76,6 +76,7 @@ in {
     #    "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
     #    "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     #    "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
+    # "nixpkgs/config.nix".source = ./config/pkgoverrides.nix;
     "ghostty/config".text =
       /*
       ini

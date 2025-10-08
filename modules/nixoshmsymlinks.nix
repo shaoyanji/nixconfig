@@ -76,7 +76,15 @@ in {
     #    "btop".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/btop";
     #    "cmus".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/cmus";
     #    "ghostty".source = config.lib.file.mkOutOfStoreSymlink "${routerNAS}/dotfiles/ghostty";
-    # "nixpkgs/config.nix".source = ./config/pkgoverrides.nix;
+    "nixpkgs/config.nix".text = ''
+      {
+        packageOverrides = pkgs: {
+          nur = import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/main.tar.gz") {
+            inherit pkgs;
+          };
+        };
+      }
+    '';
     "ghostty/config".text =
       /*
       ini

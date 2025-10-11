@@ -182,7 +182,7 @@ in {
         graph-easy
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
-        surge #x86
+        # surge #x86 Compatibility with CMake < 3.5 has been removed from CMake.
         ghostscript_headless
         # inputs.stormy.packages.x86_64-linux.stormy
       ];

@@ -12,11 +12,11 @@
 in {
   home = {
     packages = [
-      (
-        pkgs.writers.writeBashBin "chillhop" {} ''
-          lowfi -t chillhop
-        ''
-      )
+      # (
+      #   pkgs.writers.writeBashBin "chillhop" {} ''
+      #     lowfi -t chillhop
+      #   ''
+      # )
       # (
       #   pkgs.writers.writeBashBin "lofigirl" {} ''
       #     lowfi -t lofigirl-new

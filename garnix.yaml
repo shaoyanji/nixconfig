@@ -15,10 +15,9 @@ builds:
     # - homeConfigurations.penguin
     # - "*.aarch64-darwin.*"
     # - "*.aarch64-linux.*"
-    - nixosConfigurations.*
-    - homeConfigurations.*
-    - darwinConfigurations.*
-    - nixosConfigurations.garnixMachine
+    # - nixosConfigurations.*
+    # - homeConfigurations.*
+    # - darwinConfigurations.*
 servers:
   - configuration: garnixMachine
     deployment:

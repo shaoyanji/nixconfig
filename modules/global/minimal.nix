@@ -33,6 +33,7 @@ in {
       pkgstxt
       ++ [
         comrak
+        surge-cli #x86
         eget
         minijinja
         amfora
@@ -181,7 +182,6 @@ in {
         pciutils
         usbutils
         graph-easy
-        surge-cli
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ghostscript_headless

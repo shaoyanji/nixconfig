@@ -33,7 +33,7 @@ in {
       pkgstxt
       ++ [
         comrak
-        surge-cli #x86
+        surge-cli #x86 broken
         eget
         minijinja
         amfora

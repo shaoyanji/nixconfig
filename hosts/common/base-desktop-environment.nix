@@ -6,7 +6,7 @@
   ...
 }: {
   imports = [
-    ./flatpak.nix
+    # ./flatpak.nix
     ./minimal-desktop.nix
     ../../modules/nixos/lxc
     #    ../../modules/nixos/k3s

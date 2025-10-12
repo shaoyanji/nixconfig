@@ -8,7 +8,6 @@
 {
   imports = [
     # Include the results of the hardware scan.
-    #    ./configuration2.nix
     ./hardware-configuration.nix
     ./nvidia.nix
     ../common/steam.nix
@@ -16,7 +15,7 @@
     ../common/minimal-desktop.nix
     ../common/laptop.nix
   ];
-  # boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {
     #extraModulePackages = with config.boot.kernelPackages; [v4l2loopback.out];
     #kernelModules = [
@@ -65,9 +64,7 @@
   virtualisation.libvirtd.enable = true;
 
   virtualisation.spiceUSBRedirection.enable = true;
-  #android dev
-
-  programs.adb.enable = true;
+  # programs.adb.enable = true;
   users.users.devji.extraGroups = ["adbusers" "kvm" "libvirtd"];
   services.udev.packages = [
     # pkgs.android-udev-rules
@@ -112,6 +109,7 @@
 // {
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
-      "crush"
-    ]; # nixpkgs.config.allowUnfree = true;
+      # "crush"
+    ];
+  # nixpkgs.config.allowUnfree = true;
 }

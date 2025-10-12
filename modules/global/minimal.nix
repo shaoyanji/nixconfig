@@ -32,6 +32,9 @@ in {
     packages = with pkgs;
       pkgstxt
       ++ [
+        pastel
+        caligula
+        astroterm
         comrak
         surge-cli #x86 broken
         eget
@@ -164,6 +167,7 @@ in {
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
+        graph-easy
         lazygit
         gitmoji-cli
         tldr
@@ -181,7 +185,6 @@ in {
         sysstat
         pciutils
         usbutils
-        graph-easy
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ghostscript_headless

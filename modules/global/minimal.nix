@@ -35,6 +35,7 @@ in {
         pastel
         caligula
         astroterm
+        hyprpicker
         comrak
         surge-cli #x86 broken
         eget

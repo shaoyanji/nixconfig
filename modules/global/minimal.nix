@@ -35,7 +35,6 @@ in {
         pastel
         caligula
         astroterm
-        hyprpicker
         comrak
         surge-cli #x86 broken
         eget
@@ -168,6 +167,7 @@ in {
         yt-dlp
       ]
       ++ lib.optionals stdenv.isLinux [
+        hyprpicker
         graph-easy
         lazygit
         gitmoji-cli

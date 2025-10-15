@@ -5,7 +5,7 @@
   ...
 }: let
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-  taskfile_path = ./secrets/Taskfile.yaml;
+  # taskfile_path = ./secrets/Taskfile.yaml;
 in {
   imports = [
     inputs.sops-nix.homeManagerModules.sops

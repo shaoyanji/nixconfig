@@ -29,6 +29,8 @@
       # "ipfs"
       "bitwarden-cli"
       # "openssl@3.0"
+      "python"
+      "yt-dlp"
     ];
     casks = [
       "simplex"

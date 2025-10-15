@@ -4,7 +4,11 @@
   lib,
   ...
 }: let
-  pkgstxt = map (pkg: pkgs.${pkg}) (builtins.filter (line: !(pkgs.lib.hasPrefix "#" (pkgs.lib.trim line))) (builtins.filter (pkg: pkg != "") (pkgs.lib.splitString "\n" (builtins.readFile ./../../pkg.txt))));
+  pkgstxt = map (pkg: pkgs.${pkg}) (
+    builtins.filter (line: !(pkgs.lib.hasPrefix "#" (pkgs.lib.trim line))) (
+      builtins.filter (pkg: pkg != "") (pkgs.lib.splitString "\n" (builtins.readFile ./../../pkg.txt))
+    )
+  );
   # pkgstxt =
   #   ./../../pkg.txt
   #   |> builtins.readFile
@@ -32,12 +36,12 @@ in {
     packages = with pkgs;
       pkgstxt
       ++ [
+        # eget
         pastel
         caligula
         astroterm
         comrak
-        surge-cli #x86 broken
-        eget
+        surge-cli
         minijinja
         amfora
         typst

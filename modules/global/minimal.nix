@@ -37,6 +37,7 @@ in {
       pkgstxt
       ++ [
         # eget
+        poppler-utils
         pastel
         caligula
         astroterm

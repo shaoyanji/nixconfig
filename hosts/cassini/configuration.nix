@@ -33,7 +33,8 @@
       "yt-dlp"
     ];
     casks = [
-      "chatgpt-atlas"
+      # "chatgpt-atlas"
+      "helium-browser"
       "simplex"
       "ghostty"
       "orbstack"

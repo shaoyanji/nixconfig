@@ -48,7 +48,6 @@ in {
         typst
         tinymist
         cook-cli
-        goose-cli
         supabase-cli
         turso-cli
         cloudflare-cli
@@ -192,6 +191,7 @@ in {
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ghostscript_headless
+        goose-cli
         # inputs.stormy.packages.x86_64-linux.stormy
       ];
     file = {};

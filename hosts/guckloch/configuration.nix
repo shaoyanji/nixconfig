@@ -25,7 +25,7 @@
 
   programs.nix-ld = {
     enable = true;
-    package = pkgs.nix-ld-rs;
+    package = pkgs.nix-ld;
   };
 
   system.stateVersion = "25.05";

@@ -56,7 +56,7 @@ in {
         todoist
         wash-cli
         starfetch
-        neocities-cli
+        neocities
         comodoro
         jwt-cli
         himalaya

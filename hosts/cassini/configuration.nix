@@ -34,6 +34,7 @@
     ];
     casks = [
       # "chatgpt-atlas"
+      "anki"
       "helium-browser"
       "simplex"
       "ghostty"
@@ -50,7 +51,7 @@
       "container"
       "logitech-g-hub"
       "wezterm@nightly"
-      "libreoffice"
+      # "libreoffice"
       # "microsoft-excel"
       # "microsoft-teams"
       "rustdesk"

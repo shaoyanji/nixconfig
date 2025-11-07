@@ -31,6 +31,7 @@
       # "openssl@3.0"
       "python"
       "yt-dlp"
+      "html2markdown"
     ];
     casks = [
       # "chatgpt-atlas"

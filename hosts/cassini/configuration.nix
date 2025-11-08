@@ -30,6 +30,7 @@
       "bitwarden-cli"
       # "openssl@3.0"
       "python"
+      "uv"
       "yt-dlp"
       "html2markdown"
     ];

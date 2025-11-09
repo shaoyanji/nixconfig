@@ -38,6 +38,11 @@ in {
       pkgstxt
       ++ [
         # eget
+        mdq
+        zbar
+        multimarkdown
+        rendercv
+        markdown-anki-decks
         poppler-utils
         pastel
         caligula

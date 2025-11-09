@@ -193,6 +193,8 @@ in {
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ghostscript_headless
         goose-cli
+        anki-bin
+        uv
         # inputs.stormy.packages.x86_64-linux.stormy
       ];
     file = {};

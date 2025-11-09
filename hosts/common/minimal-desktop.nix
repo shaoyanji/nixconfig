@@ -75,14 +75,14 @@ in {
     tailscale.enable = true;
   };
 
-  # programs.nix-ld = {
-  #   enable = true;
-  #   libraries = with pkgs; [
-  #     #libGL
-  #     alsa-lib
-  #     gmp #simplex-chat
-  #   ];
-  # };
+  programs.nix-ld = {
+    enable = true;
+    #   libraries = with pkgs; [
+    #     #libGL
+    #     alsa-lib
+    #     gmp #simplex-chat
+    #   ];
+  };
   security = {
     sudo.wheelNeedsPassword = false;
     rtkit.enable = true;
@@ -203,6 +203,6 @@ in {
     wget
     nixpkgs-fmt
   ];
-
+  environment.localBinInPath = true;
   zramSwap.enable = true;
 }

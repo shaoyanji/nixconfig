@@ -41,7 +41,6 @@ in {
         mdq
         zbar
         multimarkdown
-        rendercv
         markdown-anki-decks
         poppler-utils
         pastel
@@ -200,6 +199,7 @@ in {
         goose-cli
         anki-bin
         uv
+        rendercv
         # inputs.stormy.packages.x86_64-linux.stormy
       ];
     file = {};

@@ -38,6 +38,7 @@ in {
       pkgstxt
       ++ [
         # eget
+        ytcast
         mdq
         zbar
         multimarkdown

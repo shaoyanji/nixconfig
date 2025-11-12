@@ -38,6 +38,7 @@ in {
       pkgstxt
       ++ [
         # eget
+        ytfzf
         mdq
         zbar
         multimarkdown

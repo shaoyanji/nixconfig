@@ -38,6 +38,7 @@ in {
       "Music/muzik".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/music";
       "Pictures/pictures".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/pics";
       "Videos/videos".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/video";
+      "Libation/Books".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/audiobooks/Books";
       "go/pkg".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/cache/go/pkg";
       ".cargo/registry".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/cache/.cargo/registry";
       ".ollama/models".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/ollama";

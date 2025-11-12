@@ -45,7 +45,7 @@
         iotop # io monitoring
       ]
       ++ lib.optionals stdenv.isDarwin [
-        # libation
+        libation
         iina # ani-cli dependency
       ];
     file = {

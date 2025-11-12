@@ -23,8 +23,11 @@
         mupdf
         mpv
         ani-cli
+        ytfzf
       ]
       ++ lib.optionals stdenv.isLinux [
+        anki-bin
+        hyprpicker
         markdownlint-cli
         gcc
         qalculate-qt
@@ -42,7 +45,7 @@
         iotop # io monitoring
       ]
       ++ lib.optionals stdenv.isDarwin [
-        libation
+        # libation
         iina # ani-cli dependency
       ];
     file = {

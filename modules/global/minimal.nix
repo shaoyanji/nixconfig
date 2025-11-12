@@ -38,7 +38,6 @@ in {
       pkgstxt
       ++ [
         # eget
-        ytfzf
         mdq
         zbar
         multimarkdown
@@ -175,7 +174,6 @@ in {
         # darwin.xcode_16_1
       ]
       ++ lib.optionals stdenv.isLinux [
-        hyprpicker
         graph-easy
         lazygit
         gitmoji-cli
@@ -198,7 +196,6 @@ in {
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ghostscript_headless
         goose-cli
-        anki-bin
         uv
         rendercv
         # inputs.stormy.packages.x86_64-linux.stormy

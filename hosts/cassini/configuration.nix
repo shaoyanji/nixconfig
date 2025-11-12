@@ -25,7 +25,7 @@
       "imagemagick"
       "ghostscript"
       "xpdf"
-      "gemini-cli"
+      # "gemini-cli"
       # "ipfs"
       "bitwarden-cli"
       # "openssl@3.0"

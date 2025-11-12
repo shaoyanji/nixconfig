@@ -111,6 +111,7 @@
     # kitty
     # terminal-notifier
     mkalias
+    libation
   ];
 
   # https://github.com/nix-community/home-manager/issues/423

@@ -23,9 +23,9 @@
         mupdf
         mpv
         ani-cli
-        ytfzf
       ]
       ++ lib.optionals stdenv.isLinux [
+        freetube
         anki-bin
         hyprpicker
         markdownlint-cli
@@ -46,6 +46,7 @@
       ]
       ++ lib.optionals stdenv.isDarwin [
         libation
+        ytfzf
         iina # ani-cli dependency
       ];
     file = {

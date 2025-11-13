@@ -13,6 +13,7 @@
   home.packages = with pkgs; [
     ghc
     gcc
+    scc
     gfortran
     # tcc
     go

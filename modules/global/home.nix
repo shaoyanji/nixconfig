@@ -29,12 +29,7 @@
         anki-bin
         hyprpicker
         markdownlint-cli
-        gcc
         qalculate-qt
-        go
-        wasmtime
-        tinygo
-        scc
         yank
         gnuplot
         cliphist
@@ -43,6 +38,11 @@
         lm_sensors # for `sensors` command
         ethtool
         iotop # io monitoring
+        go
+        gcc
+        wasmtime
+        tinygo
+        scc
       ]
       ++ lib.optionals stdenv.isDarwin [
         libation

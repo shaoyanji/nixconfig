@@ -38,6 +38,7 @@ in {
       pkgstxt
       ++ [
         # eget
+        todo-txt-cli
         ytcast
         mdq
         zbar

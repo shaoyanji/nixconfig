@@ -25,6 +25,7 @@
         ani-cli
       ]
       ++ lib.optionals stdenv.isLinux [
+        imv
         freetube
         anki-bin
         hyprpicker

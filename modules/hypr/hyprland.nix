@@ -117,10 +117,12 @@
       "$mainMod" = "SUPER";
       "$fileManager" = "${pkgs.kdePackages.dolphin}/bin/dolphin --stylesheet ~/.config/.kde-dark-kuroi.qss";
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
+      "$terminal" = "${pkgs.kitty}/bin/kitty";
       bind = [
-        "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"
+        "$mainMod, T, exec, $terminal"
         "$mainMod, S, exec, ${pkgs.hyprshot}/bin/hyprshot -m window"
         "$mainMod, R, exec, ${pkgs.hyprshot}/bin/hyprshot -m region"
+        "$mainMod, C, exec, $terminal --hold sh -c '${pkgs.wofi}/bin/wofi --dmenu | bash'"
         "$mainMod, Q, killactive"
         "$mainMod, M, exit"
         "$mainMod, W, togglefloating"

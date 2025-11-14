@@ -11,6 +11,7 @@
   homebrew = {
     enable = true;
     taps = [
+      "cablehead/tap"
       #"gigalixir/brew"
       #"krtirtho/apps"
       #"homebrew/cask-fonts"
@@ -33,6 +34,7 @@
       "uv"
       "yt-dlp"
       "html2markdown"
+      "cablehead/tap/cross-stream"
     ];
     casks = [
       # "chatgpt-atlas"

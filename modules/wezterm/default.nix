@@ -3,8 +3,8 @@
   ];
   home.file = {
     ".wezterm.lua".source = builtins.fetchurl {
-      url = "https://gist.githubusercontent.com/shaoyanji/48fff9824e79ceac6a07c67b05289dee/raw/10682f877a1832f8f08c89d4f07ac5427e607000/.wezterm.lua";
-      sha256 = "0crl3fdmnag112i38zz0pxqyyrvw1waq1yaq30vv4jmlw8zq1w4i";
+      url = "https://gist.githubusercontent.com/shaoyanji/48fff9824e79ceac6a07c67b05289dee/raw/.wezterm.lua";
+      sha256 = "1agjhyv428al1kz01rw2wz66w516pm7pxchvi5lz9kyw0qh7br9j";
     };
   };
   xdg.configFile = {

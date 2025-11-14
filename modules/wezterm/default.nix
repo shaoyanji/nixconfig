@@ -3,7 +3,7 @@
   ];
   home.file = {
     ".wezterm.lua".source = builtins.fetchurl {
-      url = "https://gist.githubusercontent.com/shaoyanji/48fff9824e79ceac6a07c67b05289dee/raw/.wezterm.lua";
+      url = "https://gist.githubusercontent.com/shaoyanji/48fff9824e79ceac6a07c67b05289dee/raw/7703acd1e06466ddc9e954688a52f7772de55ac0/.wezterm.lua";
       sha256 = "1agjhyv428al1kz01rw2wz66w516pm7pxchvi5lz9kyw0qh7br9j";
     };
   };

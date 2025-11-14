@@ -18,8 +18,8 @@
     experimental-features = [
       "nix-command"
       "flakes"
-      # "pipe-operator"
       "pipe-operators"
+      # "pipe-operator"
     ];
     substituters = [
       "https://cache.nixos.org/"

@@ -119,11 +119,12 @@
       "$menu" = "${pkgs.wofi}/bin/wofi --show drun -G --allow-images";
       bind = [
         "$mainMod, T, exec, ${pkgs.kitty}/bin/kitty"
-        "$mainMod, S, exec, ${pkgs.hyprshot} -m window"
+        "$mainMod, S, exec, ${pkgs.hyprshot}/bin/hyprshot -m window"
+        "$mainMod, R, exec, ${pkgs.hyprshot}/bin/hyprshot -m region"
         "$mainMod, Q, killactive"
         "$mainMod, M, exit"
         "$mainMod, W, togglefloating"
-        "$mainMod, A, exec, $menu"
+        "$mainMod, SPACE, exec, $menu"
         "$mainMod, F, exec, $fileManager"
         "$mainMod, P, pseudo"
         "$mainMod, E, togglesplit"

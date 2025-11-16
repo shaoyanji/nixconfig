@@ -10,20 +10,9 @@ jobs:
     strategy:
       matrix:
         machine:
-          # hostname of your nixosSystem's
-          # - poseidon
           - cassini
-          # - thinsandy
-          # - schneeeule
-          # - mtfuji
-          # - ancientace
-          # - guckloch
-          # - minyx
         os:
-          # - ubuntu-latest
-          # add others as you need
           - macos-latest
-          # - ubuntu-24.04-arm
 
     runs-on: ${{ matrix.os }}
     steps:

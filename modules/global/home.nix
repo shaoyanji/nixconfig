@@ -27,15 +27,11 @@
       ++ lib.optionals stdenv.isLinux [
         imv
         freetube
-        anki-bin
-        hyprpicker
         markdownlint-cli
         qalculate-qt
         yank
         gnuplot
-        cliphist
         jp2a # would not build in darwin
-        wl-clipboard
         lm_sensors # for `sensors` command
         ethtool
         iotop # io monitoring
@@ -44,6 +40,13 @@
         wasmtime
         tinygo
         scc
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+        anki-bin
+        hyprpicker
+        cliphist
+        markdown-anki-decks
+        wl-clipboard
       ]
       ++ lib.optionals stdenv.isDarwin [
         libation

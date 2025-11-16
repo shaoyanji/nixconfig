@@ -43,24 +43,16 @@ in {
         mdq
         zbar
         multimarkdown
-        markdown-anki-decks
         poppler-utils
         pastel
         caligula
         astroterm
         comrak
-        surge-cli
         minijinja
         amfora
         typst
         tinymist
-        cook-cli
-        supabase-cli
-        turso-cli
-        cloudflare-cli
-        bootdev-cli
         todoist
-        wash-cli
         starfetch
         neocities
         comodoro
@@ -199,6 +191,14 @@ in {
         ghostscript_headless
         goose-cli
         uv
+        qrrs
+        cook-cli
+        surge-cli
+        supabase-cli
+        turso-cli
+        cloudflare-cli
+        bootdev-cli
+        wash-cli
         rendercv
         # inputs.stormy.packages.x86_64-linux.stormy
       ];

@@ -50,7 +50,7 @@ in {
       "gokrazy/hello".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/hello";
       ".local/share/lowfi/chillhop.txt".source = builtins.fetchurl {
         url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/chillhop.txt";
-        sha256 = "sha256:0r6x15f09h8k2apxbpiplvwh44n4cfip9fac52y74vap7s8hw3ll";
+        sha256 = "sha256:0bfclgm5m9c0vvskk6svpv4fiprxcc0a37pw03908rvl7147m2hh";
       };
       # ".local/share/lowfi/lofigirl-new.txt".source = builtins.fetchurl {
       #   url = "https://raw.githubusercontent.com/talwat/lowfi/refs/heads/main/data/lofigirl-new.txt";

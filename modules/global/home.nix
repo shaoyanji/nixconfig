@@ -47,6 +47,7 @@
         cliphist
         markdown-anki-decks
         wl-clipboard
+        simplex-chat-desktop
       ]
       ++ lib.optionals stdenv.isDarwin [
         libation

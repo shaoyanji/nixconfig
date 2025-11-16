@@ -20,6 +20,7 @@
     };
     impermanence.url = "github:nix-community/impermanence";
     nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixos-wsl = {

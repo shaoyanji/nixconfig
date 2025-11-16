@@ -3,7 +3,6 @@
     Linux + Nix (heim)
     MacOS + Nix (cassini)
     NixOS (poseidon, ares, schneeeule, aceofspades, minyx, ancientace)
-    Arch Pi (alarm)
     ChromeOS and WSL (penguin + guckloch)
   ";
 

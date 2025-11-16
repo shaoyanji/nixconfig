@@ -23,7 +23,7 @@
     # aircrack-ng
     powershell
     secretscanner
-    seclists
+    # seclists
     yt-dlp
   ];
   home.sessionVariables = {

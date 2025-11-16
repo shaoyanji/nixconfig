@@ -29,14 +29,16 @@ in {
     ../sops.nix
     ../helix.nix
     # ../shell/nushell.nix
-    #    ../nixvim
+    inputs.kickstart-nixvim.homeManagerModules.default
   ];
 
+  programs.nixvim.enable = true;
   home = {
     stateVersion = "25.05";
     packages = with pkgs;
       pkgstxt
       ++ [
+        markdownlint-cli
         # eget
         todo-txt-cli
         ytcast

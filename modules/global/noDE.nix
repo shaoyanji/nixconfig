@@ -13,14 +13,11 @@
         ./minimal.nix
         ../shell
         ../nixoshmsymlinks.nix
-        inputs.kickstart-nixvim.homeManagerModules.default
       ];
-      programs.nixvim.enable = true;
       home.username = "devji";
       home.homeDirectory = "/home/devji";
       home.packages = with pkgs;
         [
-          markdownlint-cli
         ]
         ++ lib.optionals stdenv.isLinux [
         ]
@@ -43,18 +40,17 @@
           mods
           aichat
           tgpt
-          jekyll
-          bundler
+          # jekyll
+          # bundler
           tldr
-          scc
-
-          hare
-          haredoc
-          go
-          cargo
-          tinygo
-          wasmtime
-          luajit
+          # scc
+          # hare
+          # haredoc
+          # go
+          # cargo
+          # tinygo
+          # wasmtime
+          # luajit
           alsa-utils
         ];
       home.file = {

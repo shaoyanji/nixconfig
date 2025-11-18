@@ -4,18 +4,34 @@
   ...
 }: {
   imports = [
-    ../modules/global/minimal.nix
+    # ../modules/global/minimal.nix
     ../modules/shell
+    ../modules/env.nix
+    ../modules/nixoshmsymlinks.nix
+    ../modules/lf
+    ../modules/sops.nix
+    ../modules/scripts
+    ../modules/kitty
+    ../modules/helix.nix
   ];
   home = {
     username = "devji";
     homeDirectory = "/home/devji";
-    packages = with pkgs; [];
-    # stateVersion = "24.11";
+    packages = with pkgs; [
+      lowfi
+      duf
+      viu
+      gum
+      ytcast
+      go-task
+      cloak
+      btop
+    ];
+    stateVersion = "24.11";
     file = {
     };
     sessionVariables = {
-      EDITOR = "nvim";
+      EDITOR = "hx";
     };
     sessionPath = [];
   };

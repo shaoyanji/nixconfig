@@ -28,21 +28,12 @@
           yt-dlp
           pass
           cmus
-          bitwarden-cli
-          glow
-          pop
-          charm-freeze
-          # viu
           wkhtmltopdf
           ghostscript
           #        texlive.combined.scheme-full
           pandoc
-          mods
-          aichat
-          tgpt
           # jekyll
           # bundler
-          tldr
           # scc
           # hare
           # haredoc

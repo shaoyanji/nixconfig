@@ -12,17 +12,17 @@
     ../modules/sops.nix
     ../modules/scripts
     ../modules/kitty
-    ../modules/helix.nix
+    # ../modules/helix.nix
   ];
   home = {
     username = "devji";
     homeDirectory = "/home/devji";
     packages = with pkgs; [
+      helix
       lowfi
       duf
       viu
       gum
-      ytcast
       go-task
       cloak
       btop

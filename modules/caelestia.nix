@@ -1,9 +1,4 @@
-{inputs, ...}: {
-  imports = [
-    inputs.caelestia.packages
-  ];
-  home.packages = [
-  ];
+{...}: {
   programs.caelestia = {
     enable = true;
     systemd = {

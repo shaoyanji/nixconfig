@@ -38,6 +38,8 @@
     ];
     casks = [
       # "chatgpt-atlas"
+      "filo"
+      "white-rabbit"
       "anki"
       "helium-browser"
       "simplex"

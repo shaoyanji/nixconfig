@@ -4,6 +4,8 @@
   ...
 }: {
   import = [
+  ];
+  home.packages = [
     inputs.caelestia.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
   programs.caelestia = {

@@ -7,7 +7,6 @@
       imports = [
         ./home.nix
       ];
-      home.sessionVariables.EDITOR = "hx";
     }; #staging point for ./home.nix commons
     sharedModules = [
       #  sops-nix.homeManagerModules.sops

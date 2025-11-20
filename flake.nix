@@ -86,6 +86,7 @@
         nur.modules.nixos.default
         chaotic.nixosModules.default
         nix-index-database.nixosModules.nix-index
+        caelestia.packages
         #lix-module.nixosModules.default
         #determinate.nixosModules.default
       ];

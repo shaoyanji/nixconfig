@@ -27,7 +27,7 @@
     enable = true;
     settings = {
       user.name = lib.mkForce "Shao-yan (Matt) Ji";
-      user.email = lib.mkForce "100967396+shaoyanji@users.noreply.github.com";
+      user.email = lib.mkForce "e@mail.shaoyanji@is-a.dev";
       init.defaultBranch = lib.mkForce "master";
       pull.rebase = lib.mkForce true;
       push.autoSetupRemote = true;

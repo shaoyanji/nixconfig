@@ -20,6 +20,7 @@
   #   |> map (pkg: pkgs.${pkg});
 in {
   imports = [
+    ../nixoshmsymlinks.nix
     ../scripts
     ../lf
     ../env.nix

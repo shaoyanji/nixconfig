@@ -9,7 +9,7 @@
   inputs = {
     # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
+    # nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
     garnix-lib.url = "github:garnix-io/garnix-lib";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
@@ -19,9 +19,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence.url = "github:nix-community/impermanence";
-    nix-darwin.url = "github:LnL7/nix-darwin";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
@@ -41,14 +38,20 @@
     };
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils.url = "github:numtide/flake-utils";
-    # hydenix.url = "github:richen604/hydenix";
     caelestia = {
       url = "git+https://github.com/caelestia-dots/shell/";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
     kickstart-nixvim.inputs.nixpkgs.follows = "nixpkgs";
+    nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
 
   outputs = {
@@ -188,14 +191,6 @@
             ./hosts/garnixMachine.nix
           ];
         };
-        # poseidon = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-        #   inherit (inputs.hydenix.lib) system;
-        #   specialArgs = {inherit inputs;};
-        #   modules =
-        #     globalModules
-        #     ++ [
-        #       ./hosts/poseidon/configuration2.nix
-        #     ];
         poseidon = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = {inherit inputs;};

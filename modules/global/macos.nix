@@ -6,7 +6,6 @@
     users.devji = {
       imports = [
         ./home.nix
-        ../nixoshmsymlinks.nix
       ];
       home.sessionVariables.EDITOR = "hx";
     }; #staging point for ./home.nix commons

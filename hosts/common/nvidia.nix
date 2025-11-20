@@ -63,6 +63,9 @@
     acceleration = "cuda";
     host = "0.0.0.0";
     openFirewall = true;
+    environmentVariables = {
+      OLLAMA_ORIGINS = "moz-extension://*,chrome-extension://*,safari-web-extension://*";
+    };
     # models = "/Volumes/data/ollama";
   };
 }

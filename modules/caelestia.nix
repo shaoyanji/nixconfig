@@ -1,4 +1,7 @@
-{
+{inputs, ...}: {
+  import = [
+    inputs.caelestia.packages."x86_64-linux".default
+  ];
   programs.caelestia = {
     enable = true;
     systemd = {

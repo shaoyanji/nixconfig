@@ -68,6 +68,7 @@
     sops-nix,
     nur,
     garnix-lib,
+    caelestia,
     ...
   } @ inputs: let
     globalModules = [
@@ -89,15 +90,9 @@
         #determinate.nixosModules.default
       ];
     globalModulesImpermanence =
-      globalModules
+      globalModulesNixos
       ++ [
         ./modules/global/impermanence.nix
-        nur.modules.nixos.default
-        chaotic.nixosModules.default
-        nix-index-database.nixosModules.nix-index
-        #lix-module.nixosModules.default
-        sops-nix.nixosModules.sops
-        home-manager.nixosModules.default
         impermanence.nixosModules.impermanence
         disko.nixosModules.default
       ];

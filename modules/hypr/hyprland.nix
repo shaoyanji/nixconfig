@@ -5,12 +5,99 @@
   inputs,
   ...
 }: {
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-hyprland];
+  xdg.portal.configPackages = [pkgs.hyprland];
+  xdg.portal.config.common.default = ["hyprland"];
   home.packages = with pkgs; [
     # kdePackages.dolphin
     # (flameshot.override {enableWlrSupport = true;})
     hyprshot
   ];
 
+  programs.waybar = {
+    enable = true;
+    settings = {
+      mainBar = {
+        layer = "top";
+        output = ["*"];
+        position = "top";
+        mod = "dock";
+        height = 38;
+        exclusive = true;
+        passthrough = false;
+        # gtk-layer-shell = true;
+        reload_style_on_change = true;
+        include = [
+          # "$XDG_CONFIG_HOME/waybar/modules/*json*"
+          # "$XDG_CONFIG_HOME/waybar/includes/includes.json"
+        ];
+        modules-left = [
+          "group/pill#left1"
+          "group/pill#left2"
+        ];
+        "group/pill#left1" = {
+          orientation = "inherit";
+          modules = [
+            "cpu"
+          ];
+        };
+        "group/pill#left2" = {
+          orientation = "inherit";
+          modules = [
+            # "idle_inhibitor"
+            "memory"
+          ];
+        };
+        modules-center = [
+          "group/pill#center"
+        ];
+        "group/pill#center" = {
+          orientation = "inherit";
+          modules = [
+            "hyprland/workspaces"
+            "hyprland/window"
+          ];
+        };
+        modules-right = [
+          "group/pill#right1"
+          "group/pill#right2"
+          "group/pill#right3"
+        ];
+        "group/pill#right1" = {
+          orientation = "inherit";
+          modules = [
+            "backlight"
+            "network"
+            # "pulseaudio"
+            # "pulseaudio#microphone"
+            # "custom/updates"
+            # "custom/keybindhint"
+          ];
+        };
+        "group/pill#right2" = {
+          orientation = "inherit";
+          modules = [
+            "privacy"
+            "tray"
+            "battery"
+          ];
+        };
+        "group/pill#right3" = {
+          orientation = "inherit";
+          modules = [
+            "clock"
+            # "custom/wallchange"
+            # "custom/theme"
+            # "custom/wbar"
+            # "custom/cliphist"
+            # "custom/hyde-menu"
+            # "custom/power"
+          ];
+        };
+      };
+    };
+  };
   xdg.configFile = {
     "wofi/style.css".source = ../config/hypr/style.css;
     "wofi/style.scss".source = ../config/hypr/style.scss;
@@ -25,6 +112,12 @@
       #      inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
     ];
     settings = {
+      exec-once = [
+        "waybar"
+        # "pypr" # Exec Pyprland to have scratchpads
+        # "swww init" # Exec Swww to have wallpaper working
+        # "eww open bar" # Exec eww to have the bar working
+      ];
       master = {
         new_status = "master";
       };

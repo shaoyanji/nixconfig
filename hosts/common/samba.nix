@@ -45,8 +45,8 @@
       "public" = {
         "path" = "/export/public";
         "browseable" = "yes";
-        "read only" = "no";
-        "guest ok" = "no";
+        "read only" = "yes";
+        "guest ok" = "yes";
         "create mask" = "0644";
         "directory mask" = "0755";
       };

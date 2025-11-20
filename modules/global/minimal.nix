@@ -32,7 +32,19 @@ in {
     # ../shell/nushell.nix
     inputs.kickstart-nixvim.homeManagerModules.default
   ];
-
+  programs.aichat = {
+    enable = true;
+    settings = {
+      model = "groq:moonshotai/kimi-k2-instruct";
+      clients = [
+        {
+          type = "openai-compatible";
+          name = "groq";
+          api_base = "https://api.groq.com/openai/v1";
+        }
+      ];
+    };
+  };
   programs.nixvim.enable = true;
   home = {
     stateVersion = "25.05";

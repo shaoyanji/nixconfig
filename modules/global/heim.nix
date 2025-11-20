@@ -5,6 +5,7 @@
   ...
 }: {
   imports = [
+    ../zen.nix
     ./home.nix
     #../dev.nix
     # ../shell/nushell.nix

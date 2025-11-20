@@ -22,7 +22,30 @@
       line-numbers = true;
     };
   };
-
+  programs.gh = {
+    enable = true;
+    extensions = with pkgs; [
+      gh-s
+      # gh-i
+      gh-f
+      gh-eco
+      gh-cal
+      gh-notify
+      gh-markdown-preview
+      gh-skyline
+    ];
+    settings = {
+      git_protocol = "ssh";
+      editor = "nvim";
+      prompt = "enabled";
+      preferred_editor_prompt = "disabled";
+      pager = "bat";
+      aliases = {
+        co = "pr checkout";
+        pv = "pr view";
+      };
+    };
+  };
   programs.git = {
     enable = true;
     settings = {
@@ -64,7 +87,6 @@
   };
   home.packages = with pkgs; [
     lazygit
-    gh
     #   sops #managed by sops module
     #   yq
     #   yq-go#managed by sops module

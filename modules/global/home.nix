@@ -42,10 +42,10 @@
         scc
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
-        anki-bin
+        # anki-bin
+        # markdown-anki-decks
         hyprpicker
         cliphist
-        markdown-anki-decks
         wl-clipboard
         simplex-chat-desktop
       ]

@@ -11,6 +11,7 @@
     # ../shell/nushell.nix
   ];
   # programs.thunderbird.enable = true; # requires caching
+  # programs.anki.enable = true;
   programs.zen-browser = {
     enable = true;
     policies = {
@@ -40,6 +41,24 @@
         darkreader
         vimium
         web-clipper-obsidian
+        a11ycss
+        catppuccin-mocha-mauve
+        catppuccin-web-file-icons
+        consent-o-matic
+        copy-as-markdown
+        unpaywall
+        sponsorblock
+        offline-qr-code-generator
+        ipfs-companion
+        hacktools
+        # ghosttext
+        geminize
+        export-tabs-urls-and-titles
+        chatgptbox
+        brotab
+        aria2-integration
+        # single-file
+
         # wappalyzer
       ];
       # containersForce = true;
@@ -90,6 +109,7 @@
       [
       ]
       ++ lib.optionals stdenv.isLinux [
+        thunderbird-bin
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
       ]

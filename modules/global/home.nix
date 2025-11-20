@@ -53,7 +53,7 @@
         simplex-chat-desktop
       ]
       ++ lib.optionals stdenv.isDarwin [
-        libation
+        # libation
         ytfzf
         iina # ani-cli dependency
       ];

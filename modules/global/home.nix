@@ -5,10 +5,11 @@
 }: {
   # home.stateVersion = "25.05";
   imports = [
+    ../zen.nix
     ../global/minimal.nix
+    ../shell
     # ../lf
     # ../env.nix
-    ../shell
     # ../sops.nix
     # ../nixvim
     ../wezterm
@@ -17,6 +18,8 @@
     # ../helix.nix
     # ../scripts
   ];
+  # programs.thunderbird.enable = true; # requires caching
+  # programs.anki.enable = true;
   home = {
     packages = with pkgs;
       [
@@ -25,6 +28,7 @@
         ani-cli
       ]
       ++ lib.optionals stdenv.isLinux [
+        thunderbird-bin
         imv
         freetube
         markdownlint-cli
@@ -66,12 +70,8 @@
       # '';
     };
 
-    # sessionVariables = {
-    # EDITOR = "nvim";
-    #   GUM_CHOOSE_SELECTED_FOREGROUND = 50;
-    #   GUM_CHOOSE_CURSOR_FOREGROUND = 50;
-    #   GUM_CHOOSE_HEADER_FOREGROUND = 30;
-    # };
+    sessionVariables = {
+    };
   };
 
   # nixpkgs.config.allowUnfree = true;

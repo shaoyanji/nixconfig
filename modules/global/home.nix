@@ -23,10 +23,10 @@
     packages = with pkgs;
       [
         mupdf
-        mpv
         ani-cli
       ]
       ++ lib.optionals stdenv.isLinux [
+        mpv
         thunderbird-bin
         imv
         freetube

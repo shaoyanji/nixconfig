@@ -1,5 +1,6 @@
 {inputs, ...}: {
   imports = [
+    inputs.caelestia.packages
   ];
   home.packages = [
   ];

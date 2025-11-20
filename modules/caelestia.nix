@@ -1,6 +1,10 @@
-{inputs, ...}: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   import = [
-    inputs.caelestia.packages."x86_64-linux".default
+    inputs.caelestia.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
   programs.caelestia = {
     enable = true;

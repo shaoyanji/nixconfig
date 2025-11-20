@@ -68,7 +68,6 @@
     sops-nix,
     nur,
     garnix-lib,
-    caelestia,
     ...
   } @ inputs: let
     globalModules = [

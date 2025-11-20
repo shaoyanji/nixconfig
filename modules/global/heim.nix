@@ -7,6 +7,7 @@
   imports = [
     ../zen.nix
     ./home.nix
+    ../caelestia.nix
     #../dev.nix
     # ../shell/nushell.nix
   ];

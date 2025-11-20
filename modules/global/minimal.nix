@@ -29,22 +29,11 @@ in {
     ../shell/bash.nix
     ../sops.nix
     ../helix.nix
+    ../goodies.nix # aichat
     # ../shell/nushell.nix
     inputs.kickstart-nixvim.homeManagerModules.default
   ];
-  programs.aichat = {
-    enable = true;
-    settings = {
-      model = "groq:moonshotai/kimi-k2-instruct";
-      clients = [
-        {
-          type = "openai-compatible";
-          name = "groq";
-          api_base = "https://api.groq.com/openai/v1";
-        }
-      ];
-    };
-  };
+
   programs.nixvim.enable = true;
   home = {
     stateVersion = "25.05";
@@ -220,6 +209,7 @@ in {
     file = {};
 
     sessionVariables = {
+      EDITOR = "nvim";
       GUM_CHOOSE_SELECTED_FOREGROUND = 50;
       GUM_CHOOSE_CURSOR_FOREGROUND = 50;
       GUM_CHOOSE_HEADER_FOREGROUND = 30;

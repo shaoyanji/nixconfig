@@ -54,6 +54,5 @@
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
   };
   environment.sessionVariables = {
-    EDITOR = "nvim";
   };
 }

@@ -149,7 +149,6 @@ in {
         mutt
         newsboat
         rclone
-        tuir
         httpie
         lazygit
         asciinema
@@ -172,6 +171,7 @@ in {
         # darwin.xcode_16_1
       ]
       ++ lib.optionals stdenv.isLinux [
+        tuir
         graph-easy
         lazygit
         gitmoji-cli

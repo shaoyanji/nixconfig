@@ -35,6 +35,7 @@
       "yt-dlp"
       "html2markdown"
       "cablehead/tap/cross-stream"
+      "svgo"
     ];
     casks = [
       # "chatgpt-atlas"
@@ -60,7 +61,7 @@
       # "libreoffice"
       # "microsoft-excel"
       # "microsoft-teams"
-      "rustdesk"
+      # "rustdesk" # mismatch
       "google-drive"
       "dropbox"
       "onedrive"

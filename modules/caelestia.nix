@@ -1,10 +1,6 @@
-{
-  inputs,
-  config,
-  ...
-}: {
+{inputs, ...}: {
   imports = [
-    inputs.caelestia.packages.${config.pkgs.stdenv.hostPlatform.system}.default
+    inputs.caelestia.packages
   ];
   home.packages = [
   ];

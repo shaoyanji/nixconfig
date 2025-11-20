@@ -68,7 +68,6 @@
     sops-nix,
     nur,
     garnix-lib,
-    caelestia,
     ...
   } @ inputs: let
     globalModules = [
@@ -86,7 +85,6 @@
         nur.modules.nixos.default
         chaotic.nixosModules.default
         nix-index-database.nixosModules.nix-index
-        caelestia.homeManagerModules.default
         #lix-module.nixosModules.default
         #determinate.nixosModules.default
       ];

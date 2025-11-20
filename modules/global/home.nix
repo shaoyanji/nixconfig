@@ -5,7 +5,6 @@
 }: {
   # home.stateVersion = "25.05";
   imports = [
-    ../zen.nix
     ../global/minimal.nix
     ../shell
     # ../lf

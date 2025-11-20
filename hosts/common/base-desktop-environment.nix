@@ -9,7 +9,7 @@
     # ./flatpak.nix
     ./minimal-desktop.nix
     ../../modules/nixos/lxc
-    #    ../../modules/nixos/k3s
+    # ../../modules/nixos/k3s
   ];
   # Bootloader.
   boot = {
@@ -58,7 +58,7 @@
   environment.systemPackages = with pkgs; [
     kitty
     ghostty
-    inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
+    # inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
     qutebrowser
     lan-mouse_git
     nix-top
@@ -101,7 +101,6 @@
     ngrok #unfree
   ];
 
-  programs.thunderbird.enable = true;
   programs.appimage = {
     enable = true;
     binfmt = true;

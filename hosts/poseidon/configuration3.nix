@@ -11,14 +11,14 @@
   environment = {
     systemPackages = with pkgs; [
       # inputs.quickshell.packages.${stdenv.hostPlatform.system}.default
-      inputs.caelestia.packages.${stdenv.hostPlatform.system}.default
+      # inputs.caelestia.packages.${stdenv.hostPlatform.system}.default
       # uwsm
     ];
     #variables = {
     # };
   };
 
-  qt.enable = true;
+  # qt.enable = true;
 
   services = {
     displayManager = {
@@ -28,7 +28,8 @@
       };
       #    xserver.digimend.enable = true;
     };
-  }; # nixpkgs.config.allowUnfreePredicate = pkg:
+  };
+  # nixpkgs.config.allowUnfreePredicate = pkg:
   #   builtins.elem (lib.getName pkg) [
   #     "steam"
   #     "steam-original"

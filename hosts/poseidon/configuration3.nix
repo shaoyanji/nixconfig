@@ -11,7 +11,7 @@
   environment = {
     systemPackages = with pkgs; [
       # inputs.quickshell.packages.${stdenv.hostPlatform.system}.default
-      # inputs.caelestia.packages.${stdenv.hostPlatform.system}.default
+      inputs.caelestia.packages.${stdenv.hostPlatform.system}.default
       # uwsm
     ];
     #variables = {

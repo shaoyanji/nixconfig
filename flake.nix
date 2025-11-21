@@ -2,15 +2,16 @@
   description = "
     Linux + Nix (heim)
     MacOS + Nix (cassini)
-    NixOS (poseidon, ares, schneeeule, aceofspades, minyx, ancientace)
-    ChromeOS and WSL (penguin + guckloch)
+    NixOS (poseidon, ares, schneeeule, applevalley, mtfuji, ancientace)
+    NixOS HomeServer (thinsandy)
+    aarch64 hm (kali)
+    aarch NixOS (minyx)
+    ChromeOS (penguin)
+    WSL (guckloch)
   ";
 
   inputs = {
-    # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    # nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
-    garnix-lib.url = "github:garnix-io/garnix-lib";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
@@ -49,6 +50,7 @@
     };
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
     kickstart-nixvim.inputs.nixpkgs.follows = "nixpkgs";
+    garnix-lib.url = "github:garnix-io/garnix-lib";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -131,16 +133,6 @@
     )
     // {
       homeConfigurations = {
-        verntil = home-manager.lib.homeManagerConfiguration {
-          extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules = [./hosts/verntil.nix];
-        };
-        root = home-manager.lib.homeManagerConfiguration {
-          extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules = [./modules/global/heim.nix];
-        };
         penguin = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
           pkgs = nixpkgs.legacyPackages."x86_64-linux";
@@ -169,6 +161,11 @@
           modules = [
             ./modules/global/heim.nix
           ];
+        };
+        verntil = home-manager.lib.homeManagerConfiguration {
+          extraSpecialArgs = {inherit inputs;};
+          pkgs = nixpkgs.legacyPackages."x86_64-linux";
+          modules = [./hosts/verntil.nix];
         };
       };
       nixosConfigurations = {
@@ -266,6 +263,17 @@
           specialArgs = {inherit inputs;};
           modules = globalModulesNixos ++ [./hosts/ancientace/configuration3.nix];
         };
+
+        guckloch = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {inherit inputs;};
+          modules =
+            globalModulesContainers
+            ++ [
+              ./hosts/guckloch/configuration.nix
+              nixos-wsl.nixosModules.default
+            ];
+        };
         minyx = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
           specialArgs = {inherit inputs;};
@@ -279,27 +287,17 @@
               inputs.nixos-hardware.nixosModules.raspberry-pi-3
             ];
         };
-        orb-cassini = nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesContainers
-            ++ [
-              ./hosts/orb-cassini/custom.nix
-              ./hosts/orb-cassini/configuration.nix
-              #/etc/nixos/configuration.nix
-            ];
-        };
-        guckloch = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesContainers
-            ++ [
-              ./hosts/guckloch/configuration.nix
-              nixos-wsl.nixosModules.default
-            ];
-        };
+        # orb-cassini = nixpkgs.lib.nixosSystem {
+        #   system = "aarch64-linux";
+        #   specialArgs = {inherit inputs;};
+        #   modules =
+        #     globalModulesContainers
+        #     ++ [
+        #       ./hosts/orb-cassini/custom.nix
+        #       ./hosts/orb-cassini/configuration.nix
+        #       #/etc/nixos/configuration.nix
+        #     ];
+        # };
         #   coolbeans = nixpkgs.lib.nixosSystem {
         #     system = "x86_64-linux";
         #     specialArgs = {inherit inputs;};

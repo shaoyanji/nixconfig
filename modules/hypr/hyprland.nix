@@ -16,7 +16,7 @@
   ];
 
   programs.waybar = {
-    enable = true;
+    enable = false;
     settings = {
       mainBar = {
         layer = "top";
@@ -113,7 +113,8 @@
     ];
     settings = {
       exec-once = [
-        "waybar"
+        # "caelestia shell"
+        # "waybar"
         # "pypr" # Exec Pyprland to have scratchpads
         # "swww init" # Exec Swww to have wallpaper working
         # "eww open bar" # Exec eww to have the bar working

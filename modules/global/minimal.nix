@@ -24,7 +24,7 @@ in {
     ../scripts
     ../lf
     ../env.nix
-    #    ../shell
+    # ../shell
     ../shell/tmux.nix
     ../shell/bash.nix
     ../sops.nix
@@ -40,8 +40,10 @@ in {
     packages = with pkgs;
       pkgstxt
       ++ [
-        markdownlint-cli
         # eget
+        tesseract
+        pandoc
+        markdownlint-cli
         todo-txt-cli
         ytcast
         mdq
@@ -163,13 +165,6 @@ in {
         ots
         xq
       ]
-      ++ lib.optionals stdenv.isDarwin [
-        wget
-        cocoapods
-        m-cli # useful macOS CLI commands
-        #wezterm
-        # darwin.xcode_16_1
-      ]
       ++ lib.optionals stdenv.isLinux [
         tuir
         graph-easy
@@ -178,7 +173,6 @@ in {
         tldr
         dust
         lz4
-        # toot
         pass
         cmus
         bitwarden-cli
@@ -190,22 +184,11 @@ in {
         sysstat
         pciutils
         usbutils
-      ]
-      ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ghostscript_headless
-        goose-cli
-        uv
-        qrrs
-        cook-cli
-        surge-cli
-        supabase-cli
-        turso-cli
-        cloudflare-cli
-        bootdev-cli
-        wash-cli
-        rendercv
-        # inputs.stormy.packages.x86_64-linux.stormy
-      ];
+        # toot
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isx86_64 []
+      ++ lib.optionals stdenv.isDarwin [];
     file = {};
 
     sessionVariables = {

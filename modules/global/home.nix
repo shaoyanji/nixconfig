@@ -27,30 +27,30 @@
       ]
       ++ lib.optionals stdenv.isLinux [
         mpv
-        thunderbird-bin
         imv
-        freetube
         markdownlint-cli
-        qalculate-qt
         yank
         gnuplot
         jp2a # would not build in darwin
         lm_sensors # for `sensors` command
         ethtool
         iotop # io monitoring
-        go
-        gcc
-        wasmtime
-        tinygo
-        scc
-      ]
+              ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         # anki-bin
         # markdown-anki-decks
+        qalculate-qt
+        freetube
+        thunderbird-bin
         hyprpicker
         cliphist
         wl-clipboard
         simplex-chat-desktop
+go
+        gcc
+        wasmtime
+        tinygo
+        scc
       ]
       ++ lib.optionals stdenv.isDarwin [
         # libation

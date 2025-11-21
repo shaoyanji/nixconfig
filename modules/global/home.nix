@@ -28,8 +28,7 @@
       ++ lib.optionals stdenv.isLinux [
         mpv
         imv
-        markdownlint-cli
-        yank
+        # yank
         gnuplot
         jp2a # would not build in darwin
         lm_sensors # for `sensors` command
@@ -46,17 +45,32 @@
         cliphist
         wl-clipboard
         simplex-chat-desktop
-go
+        go
         gcc
         wasmtime
         tinygo
         scc
-      ]
+        goose-cli
+        uv
+        qrrs
+        cook-cli
+        surge-cli
+        supabase-cli
+        turso-cli
+        cloudflare-cli
+        bootdev-cli
+        wash-cli
+        rendercv      ]
       ++ lib.optionals stdenv.isDarwin [
         # libation
         ytfzf
         iina # ani-cli dependency
-      ];
+        wget
+        cocoapods
+        m-cli # useful macOS CLI commands
+        # wezterm
+        # darwin.xcode_16_1
+       ];
     file = {
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in
       # # the Nix store. Activating the configuration will then make '~/.screenrc' a

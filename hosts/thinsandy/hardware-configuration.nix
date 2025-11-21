@@ -64,6 +64,10 @@
     options = ["bind"];
   };
 
+  fileSystems."/var/lib/immich" = {
+    device = "/srv/public/immich";
+    options = ["bind"];
+  };
   fileSystems."/srv/public" = {
     device = "/dev/disk/by-uuid/d3c13746-8d51-4fce-bf0e-655153229441";
     fsType = "btrfs";

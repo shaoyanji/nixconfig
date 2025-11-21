@@ -1,9 +1,9 @@
 name: nixcachix
 on:
   check_suite:
-  types: [completed]
+    types: [completed]
   # workflow_dispatch:
-  push:
+    push:
   # pull_request:
 jobs:
   # build-machines:

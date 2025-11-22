@@ -12,7 +12,8 @@
     ../modules/sops.nix
     ../modules/scripts
     ../modules/kitty
-    ../modules/helix.nix
+    ../modules/goodies.nix
+    # ../modules/helix.nix
   ];
   home = {
     username = "devji";

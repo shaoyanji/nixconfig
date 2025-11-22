@@ -26,6 +26,7 @@
       go-task
       cloak
       btop
+      translate-shell
     ];
     stateVersion = "24.11";
     file = {

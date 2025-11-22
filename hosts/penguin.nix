@@ -18,6 +18,7 @@
     username = "devji";
     homeDirectory = "/home/devji";
     packages = with pkgs; [
+        nix-output-monitor
       helix
       lowfi
       duf

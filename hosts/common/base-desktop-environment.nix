@@ -44,14 +44,20 @@
       scheduler = "scx_rusty";
     };
   };
+  # security.polkit.enable = true; # polkit
+  # services.gnome.gnome-keyring.enable = true; # secret service
+  # security.pam.services.swaylock = {};
 
-  programs.hyprland = {
-    enable = true;
-    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    # portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-    portalPackage = pkgs.xdg-desktop-portal-hyprland;
-    xwayland.enable = true;
-  };
+  # programs.waybar.enable = true; # top bar
+
+  programs.niri.enable = true;
+  # programs.hyprland = {
+  #   enable = true;
+  #   # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+  #   # portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  #   portalPackage = pkgs.xdg-desktop-portal-hyprland;
+  #   xwayland.enable = true;
+  # };
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [

@@ -55,9 +55,7 @@
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
-    kitty
     # inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
-    qutebrowser
     lan-mouse_git
     nix-top
     # zed-editor_git
@@ -66,7 +64,6 @@
     hunspell
     hunspellDicts.en_US
     alsa-utils
-    obsidian
     # config.boot.kernelPackages.digimend
 
     #wkhtmltopdf

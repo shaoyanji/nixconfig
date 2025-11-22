@@ -28,6 +28,7 @@
       cloak
       btop
       translate-shell
+      helix
     ];
     stateVersion = "24.11";
     file = {

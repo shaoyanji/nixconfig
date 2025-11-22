@@ -1,12 +1,12 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
-    marksman
-    dprint
-    gopls
-    alejandra
-    nixd
-    kdePackages.qtdeclarative
-    ruff
+    # marksman
+    # dprint
+    # gopls
+    # alejandra
+    # nixd
+    # kdePackages.qtdeclarative
+    # ruff
   ];
   programs.helix = {
     languages.language = [

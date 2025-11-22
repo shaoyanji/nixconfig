@@ -56,7 +56,6 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
     kitty
-    ghostty
     # inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
     qutebrowser
     lan-mouse_git

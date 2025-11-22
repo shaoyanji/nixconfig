@@ -11,6 +11,24 @@
     #../dev.nix
     # ../shell/nushell.nix
   ];
+  programs ={
+    freetube = {
+      enable = true;
+      settings ={
+  allowDashAv1Formats = true;
+  checkForUpdates     = false;
+  defaultQuality      = "1080";
+  baseTheme           = "catppuccinMocha";
+};
+    };
+  };
+  services= {
+    cliphist.enable = true;
+    caffeine.enable=true;
+    dropbox.enable=true;
+    tailscale-systray.enable=true;
+
+  };
   home = {
     username = "devji";
     homeDirectory = "/home/devji";

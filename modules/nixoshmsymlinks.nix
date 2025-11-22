@@ -86,24 +86,24 @@ in {
         };
       }
     '';
-    "ghostty/config".text =
-      /*
-      ini
-      */
-      ''
-                font-family = JetBrainsMono Nerd Font Mono
-                font-size = 14
-                background-opacity = 0.88888888
-                gtk-titlebar = false
+    # "ghostty/config".text =
+    #   /*
+    #   ini
+    #   */
+    #   ''
+    #             font-family = JetBrainsMono Nerd Font Mono
+    #             font-size = 14
+    #             background-opacity = 0.88888888
+    #             gtk-titlebar = false
 
-                keybind = ctrl+shift+'=new_split:right
-                keybind = ctrl+shift+enter=new_split:down
-                keybind = ctrl+enter=unbind
-                keybind = ctrl+'=toggle_fullscreen
-                keybind = ctrl+n=new_window
+    #             keybind = ctrl+shift+'=new_split:right
+    #             keybind = ctrl+shift+enter=new_split:down
+    #             keybind = ctrl+enter=unbind
+    #             keybind = ctrl+'=toggle_fullscreen
+    #             keybind = ctrl+n=new_window
 
-        #        shell-integration = bash
-      '';
+    #     #        shell-integration = bash
+    #   '';
     "elvish/rc.elv".source = builtins.fetchurl {
       url = "https://gist.githubusercontent.com/shaoyanji/656406074a590a09e33755b88ac29d53/raw/rc.elv";
       sha256 = "0b0078sp6fyqygxz9hap7inhpnwz17s0vcpb4fgklzxa2h8kp194";

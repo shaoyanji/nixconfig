@@ -5,107 +5,14 @@
   inputs,
   ...
 }: {
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-hyprland];
-  xdg.portal.configPackages = [pkgs.hyprland];
-  xdg.portal.config.common.default = ["hyprland"];
+  imports = [
+    ./waybar.nix
+  ];
   home.packages = with pkgs; [
     # kdePackages.dolphin
     # (flameshot.override {enableWlrSupport = true;})
     hyprshot
   ];
-
-  programs.waybar = {
-    enable = false;
-    settings = {
-      mainBar = {
-        layer = "top";
-        output = ["*"];
-        position = "top";
-        mod = "dock";
-        height = 38;
-        exclusive = true;
-        passthrough = false;
-        # gtk-layer-shell = true;
-        reload_style_on_change = true;
-        include = [
-          # "$XDG_CONFIG_HOME/waybar/modules/*json*"
-          # "$XDG_CONFIG_HOME/waybar/includes/includes.json"
-        ];
-        modules-left = [
-          "group/pill#left1"
-          "group/pill#left2"
-        ];
-        "group/pill#left1" = {
-          orientation = "inherit";
-          modules = [
-            "cpu"
-          ];
-        };
-        "group/pill#left2" = {
-          orientation = "inherit";
-          modules = [
-            # "idle_inhibitor"
-            "memory"
-          ];
-        };
-        modules-center = [
-          "group/pill#center"
-        ];
-        "group/pill#center" = {
-          orientation = "inherit";
-          modules = [
-            "hyprland/workspaces"
-            "hyprland/window"
-          ];
-        };
-        modules-right = [
-          "group/pill#right1"
-          "group/pill#right2"
-          "group/pill#right3"
-        ];
-        "group/pill#right1" = {
-          orientation = "inherit";
-          modules = [
-            "backlight"
-            "network"
-            # "pulseaudio"
-            # "pulseaudio#microphone"
-            # "custom/updates"
-            # "custom/keybindhint"
-          ];
-        };
-        "group/pill#right2" = {
-          orientation = "inherit";
-          modules = [
-            "privacy"
-            "tray"
-            "battery"
-          ];
-        };
-        "group/pill#right3" = {
-          orientation = "inherit";
-          modules = [
-            "clock"
-            # "custom/wallchange"
-            # "custom/theme"
-            # "custom/wbar"
-            # "custom/cliphist"
-            # "custom/hyde-menu"
-            # "custom/power"
-          ];
-        };
-      };
-    };
-  };
-  xdg.configFile = {
-    "wofi/style.css".source = ../config/hypr/style.css;
-    "wofi/style.scss".source = ../config/hypr/style.scss;
-    ".kde-dark-kuroi.qss".source = builtins.fetchurl {
-      url = "https://gist.githubusercontent.com/shaoyanji/b44bcb416a99f97984c183cba8418649/raw/a6b33108f403fe42d4667c217f4ccd4dc5b2a59d/kuroidark.qss";
-      sha256 = "sha256:0g5ijavf3wllw4d8m7h9b5v68fbil1waz0csb568ximk2n4qa0iy";
-    };
-  };
   wayland.windowManager.hyprland = {
     enable = true;
     plugins = [
@@ -291,5 +198,19 @@
       source = ~/.config/hypr/themes/theme.conf
       ecosystem:no_update_news = true
     '';
+  };
+  xdg = {
+    portal.enable = true;
+    portal.extraPortals = [pkgs.xdg-desktop-portal-hyprland];
+    portal.configPackages = [pkgs.hyprland];
+    portal.config.common.default = ["hyprland"];
+    configFile = {
+      "wofi/style.css".source = ../config/hypr/style.css;
+      "wofi/style.scss".source = ../config/hypr/style.scss;
+      ".kde-dark-kuroi.qss".source = builtins.fetchurl {
+        url = "https://gist.githubusercontent.com/shaoyanji/b44bcb416a99f97984c183cba8418649/raw/a6b33108f403fe42d4667c217f4ccd4dc5b2a59d/kuroidark.qss";
+        sha256 = "sha256:0g5ijavf3wllw4d8m7h9b5v68fbil1waz0csb568ximk2n4qa0iy";
+      };
+    };
   };
 }

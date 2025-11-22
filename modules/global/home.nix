@@ -34,12 +34,11 @@
         lm_sensors # for `sensors` command
         ethtool
         iotop # io monitoring
-              ]
+      ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         # anki-bin
         # markdown-anki-decks
         qalculate-qt
-        freetube
         thunderbird-bin
         hyprpicker
         cliphist
@@ -60,7 +59,8 @@
         cloudflare-cli
         bootdev-cli
         wash-cli
-        rendercv      ]
+        rendercv
+      ]
       ++ lib.optionals stdenv.isDarwin [
         # libation
         ytfzf
@@ -70,7 +70,7 @@
         m-cli # useful macOS CLI commands
         # wezterm
         # darwin.xcode_16_1
-       ];
+      ];
     file = {
       # # Building this configuration will create a copy of 'dotfiles/screenrc' in
       # # the Nix store. Activating the configuration will then make '~/.screenrc' a

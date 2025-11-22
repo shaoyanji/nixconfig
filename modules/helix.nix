@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     # marksman
-    # dprint
+    dprint
     # gopls
     # alejandra
     # nixd

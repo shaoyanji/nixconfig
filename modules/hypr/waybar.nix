@@ -1,6 +1,6 @@
 {
   programs.waybar = {
-    enable = false;
+    enable = true;
     settings = {
       mainBar = {
         layer = "top";
@@ -10,7 +10,7 @@
         height = 38;
         exclusive = true;
         passthrough = false;
-        # gtk-layer-shell = true;
+        gtk-layer-shell = false;
         reload_style_on_change = true;
         include = [
           # "$XDG_CONFIG_HOME/waybar/modules/*json*"
@@ -39,8 +39,8 @@
         "group/pill#center" = {
           orientation = "inherit";
           modules = [
-            "hyprland/workspaces"
-            "hyprland/window"
+            # "hyprland/workspaces"
+            # "hyprland/window"
           ];
         };
         modules-right = [

@@ -7,15 +7,11 @@
   imports = [
     ../zen.nix
     ./home.nix
-    ../caelestia.nix
+    # ../caelestia.nix
     #../dev.nix
     # ../shell/nushell.nix
   ];
   programs = {
-    imv.enable = true;
-    himalaya = {
-      enable = true;
-    };
     kitty = {
       enable = true;
       themeFile = "tokyo_night_storm";
@@ -29,16 +25,57 @@
     onedrive.enable = true;
     obsidian = {
       enable = true;
-      # vaults = {
-      #   "personal" = {
-      #     enable = true;
-      #     target = "/vaults/personal";
-      #   };
-      #   "work" = {
-      #     enable = true;
-      #     target = "/vaults/work";
-      #   };
-      # };
+      defaultSettings = {
+        corePlugins = [
+          "backlink"
+          "bookmarks"
+          "canvas"
+          "command-palette"
+          "daily-notes"
+          "editor-status"
+          "file-explorer"
+          "file-recovery"
+          "global-search"
+          "graph"
+          "note-composer"
+          "outgoing-link"
+          "outline"
+          "page-preview"
+          "switcher"
+          "tag-pane"
+          "templates"
+          "word-count"
+        ];
+        # communityPlugins = [
+        #   "obsidian-git"
+        #   "obsidian-excalidraw-plugin"
+        #   "edit-gemini"
+        #   "table-editor-obsidian"
+        #   "dataview"
+        #   "qmd-as-md-obsidian"
+        #   "solve"
+        #   "smart-second-brain"
+        #   "obsidian-linter"
+        #   "obsidian-markdown-file-suffix"
+        #   "templater-obsidian"
+        #   "numerals"
+        #   "obsidian-vimrc-support"
+        # ];
+      };
+      vaults = {
+        #   "personal" = {
+        #     enable = true;
+        #     target = "/vaults/personal";
+        #   };
+        #   "work" = {
+        #     enable = true;
+        #     target = "/vaults/work";
+        #   };
+        "local" = {
+          enable = true;
+          target = "/Obsidian Vault";
+        };
+      };
     };
     ghostty = {
       enable = true;

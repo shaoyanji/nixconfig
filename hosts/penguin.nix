@@ -12,14 +12,13 @@
     ../modules/sops.nix
     ../modules/scripts
     ../modules/kitty
-    # ../modules/helix.nix
+    ../modules/helix.nix
   ];
   home = {
     username = "devji";
     homeDirectory = "/home/devji";
     packages = with pkgs; [
-        nix-output-monitor
-      helix
+      nix-output-monitor
       lowfi
       duf
       viu

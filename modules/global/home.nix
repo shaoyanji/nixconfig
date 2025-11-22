@@ -27,7 +27,6 @@
       ]
       ++ lib.optionals stdenv.isLinux [
         mpv
-        imv
         # yank
         gnuplot
         jp2a # would not build in darwin

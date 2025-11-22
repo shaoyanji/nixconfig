@@ -36,7 +36,7 @@
     ];
     settings = {
       git_protocol = "ssh";
-      editor = "nvim";
+      editor = "hx";
       prompt = "enabled";
       preferred_editor_prompt = "disabled";
       pager = "bat";

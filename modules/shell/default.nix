@@ -50,15 +50,21 @@ in {
     direnv = {
       enable = true;
       nix-direnv.enable = true;
+      enableNushellIntegration = true;
+      enableBashIntegration= true;
+
     };
     zoxide = {
       enable = true;
+      enableBashIntegration = true;
+      enableNushellIntegration = true;
       options = [
         # "--cmd cd"
       ];
     };
     fzf.enable = true;
     fzf.enableBashIntegration = true;
+    fzf.tmux.enableShellIntegration = true;
   };
   home.packages = with pkgs; [
     # thefuck

@@ -2,8 +2,9 @@
 {
   programs.tmux = {
     enable = true;
+    tmuxinator.enable = true;
     terminal = "xterm-256color";
-    #shell = "zsh";
+    shell = ${pkgs.nushell}/bin/nu;
     #shortcut = "a";
     historyLimit = 100000;
     baseIndex = 1;
@@ -17,8 +18,10 @@
         catppuccin
         better-mouse-mode
     ];
+    keyMode = "vi";
+    mouse = true;
+    
     extraConfig = /*tmux*/ ''
-      set -g mouse on
       bind h select-pane -L
       bind j select-pane -D
       bind k select-pane -U

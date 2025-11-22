@@ -62,6 +62,9 @@ in {
   };
   home.packages = with pkgs; [
     # thefuck
+    zoxide
+    direnv
+    fzf
     jq
     htmlq
     ripgrep

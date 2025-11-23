@@ -72,8 +72,8 @@
           highlight
           polars
         ]
-        ++ lib.optionals stdenv.isLinux [
-          dbus
+        ++ lib.optionals pkgs.stdenv.isLinux [
+          # dbus
           semver
           desktop_notifications
         ];

@@ -12,6 +12,8 @@
     # ../shell/nushell.nix
   ];
   programs = {
+    zed-editor = true;
+    anki.enable = true;
     quickshell.enable = true;
     element-desktop.enable = true;
     kitty = {

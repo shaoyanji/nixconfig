@@ -15,6 +15,7 @@
     ../modules/goodies.nix
     # ../modules/helix.nix
   ];
+  services.home-manager.autoExpire.enable = true;
   home = {
     username = "devji";
     homeDirectory = "/home/devji";

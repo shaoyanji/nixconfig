@@ -32,8 +32,17 @@
     obsidian = {
       enable = true;
       defaultSettings = {
+        app = {
+          alwaysUpdateLinks = true;
+          vimMode = true;
+        };
+        appearance = {
+          cssTheme = "Nier";
+          theme = "obsidian";
+        };
         corePlugins = [
           "backlink"
+          "bases"
           "bookmarks"
           "canvas"
           "command-palette"
@@ -47,25 +56,27 @@
           "outgoing-link"
           "outline"
           "page-preview"
+          "slides"
           "switcher"
           "tag-pane"
           "templates"
           "word-count"
+          "zk-prefixer"
         ];
         communityPlugins = [
-          "obsidian-git"
-          "obsidian-excalidraw-plugin"
-          "edit-gemini"
-          "table-editor-obsidian"
-          "dataview"
-          "qmd-as-md-obsidian"
-          "solve"
-          "smart-second-brain"
-          "obsidian-linter"
-          "obsidian-markdown-file-suffix"
-          "templater-obsidian"
-          "numerals"
-          "obsidian-vimrc-support"
+          # "obsidian-git"
+          # "obsidian-excalidraw-plugin"
+          # "edit-gemini"
+          # "table-editor-obsidian"
+          # "dataview"
+          # "qmd-as-md-obsidian"
+          # "solve"
+          # "smart-second-brain"
+          # "obsidian-linter"
+          # "obsidian-markdown-file-suffix"
+          # "templater-obsidian"
+          # "numerals"
+          # "obsidian-vimrc-support"
         ];
       };
       vaults = {
@@ -77,10 +88,10 @@
         #     enable = true;
         #     target = "/vaults/work";
         #   };
-        # "local" = {
-        #   enable = true;
-        #   target = "/Obsidian Vault";
-        # };
+        "local" = {
+          enable = true;
+          target = "/Obsidian Vault";
+        };
       };
     };
     ghostty = {
@@ -114,7 +125,7 @@
       };
       settings = {
         theme = "catppuccin-mocha";
-        font-size = 10;
+        font-size = 16;
         font-family = "JetBrainsMono Nerd Font Mono";
         background-opacity = 0.8;
         gtk-titlebar = false;

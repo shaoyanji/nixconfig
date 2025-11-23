@@ -4,7 +4,7 @@
     tmuxinator.enable = true;
     terminal = "xterm-kitty";
     shell = "${pkgs.nushell}/bin/nu";
-    shortcut = "a";
+    # shortcut = "a";
     historyLimit = 100000;
     baseIndex = 1;
     plugins = with pkgs.tmuxPlugins; [

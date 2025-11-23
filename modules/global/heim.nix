@@ -42,7 +42,7 @@
         };
         corePlugins = [
           "backlink"
-          "bases"
+          # "bases"
           "bookmarks"
           "canvas"
           "command-palette"

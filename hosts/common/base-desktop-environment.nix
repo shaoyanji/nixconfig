@@ -63,7 +63,7 @@
   environment.systemPackages = with pkgs; [
     # inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
     lan-mouse_git
-    nix-top
+    # nix-top
     # zed-editor_git
     yt-dlp_git
     libreoffice
@@ -71,7 +71,6 @@
     hunspellDicts.en_US
     alsa-utils
     # config.boot.kernelPackages.digimend
-
     #wkhtmltopdf
     #ghostscript
     #        texlive.combined.scheme-full
@@ -97,7 +96,6 @@
     # wasmtime
     # luajit
     alsa-utils
-    element-desktop
     lagrange
     ngrok #unfree
   ];

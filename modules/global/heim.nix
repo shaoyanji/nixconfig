@@ -12,6 +12,8 @@
     # ../shell/nushell.nix
   ];
   programs = {
+    quickshell.enable = true;
+    element-desktop.enable = true;
     kitty = {
       enable = true;
       themeFile = "tokyo_night_storm";

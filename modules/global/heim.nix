@@ -12,7 +12,7 @@
     # ../shell/nushell.nix
   ];
   programs = {
-    zed-editor = true;
+    zed-editor.enable = true;
     anki.enable = true;
     quickshell.enable = true;
     element-desktop.enable = true;

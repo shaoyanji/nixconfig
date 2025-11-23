@@ -77,10 +77,10 @@
         #     enable = true;
         #     target = "/vaults/work";
         #   };
-        "local" = {
-          enable = true;
-          target = "/Obsidian Vault";
-        };
+        # "local" = {
+        #   enable = true;
+        #   target = "/Obsidian Vault";
+        # };
       };
     };
     ghostty = {

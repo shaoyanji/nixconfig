@@ -62,14 +62,20 @@
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/ssh/ssh-completions.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/man/man-completions.nu
         '';
-      plugins = with pkgs.nushellPlugins; [
-        skim
-        query
-        gstat
-        formats
-        highlight
-        polars
-      ];
+      plugins = with pkgs.nushellPlugins;
+        [
+          skim
+          query
+          gstat
+          formats
+          highlight
+          polars
+        ]
+        ++ lib.optionals stdenv.isLinux [
+          dbus
+          semver
+          desktop_notifications
+        ];
     };
     carapace.enable = true;
     carapace.enableNushellIntegration = true;

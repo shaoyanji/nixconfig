@@ -72,12 +72,8 @@ in {
     direnv
     fzf
     jq
-    htmlq
     ripgrep
     fd
-    zsh-forgit
-    zsh-fzf-history-search
-    #zsh-fzf-tab
     bat
     eza
   ];

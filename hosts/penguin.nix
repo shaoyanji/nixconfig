@@ -11,13 +11,22 @@
     ../modules/lf
     ../modules/sops.nix
     ../modules/scripts
-    ../modules/kitty
-    ../modules/goodies.nix
+    # ../modules/kitty
+    # ../modules/goodies.nix
     # ../modules/helix.nix
   ];
+  programs.btop={
+    enable = true;
+    settings = {
+      color_theme = "tokyo-night.theme";
+      theme_background = false;
+      vim_keys=true;
+    };
+    };
   programs.wofi.enable = true;
   programs.kakoune.enable = true;
   programs.neovim.enable = true;
+  # programs.vim.enable = true;
   programs.go.enable = true;
   programs.go.telemetry.mode = "off";
   programs.uv = {
@@ -65,7 +74,6 @@
       gum
       go-task
       cloak
-      btop
       helix
       wl-clipboard
     ];
@@ -89,5 +97,4 @@
 
   services.home-manager.autoExpire.enable = true;
   programs.home-manager.enable = true;
-  programs.home-manager.backupFileExtension = "hm-backup"; #for rebuild
 }

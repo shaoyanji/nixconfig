@@ -7,26 +7,39 @@
 }: {
   imports = [
   ];
-
+  programs = {
+    uv = {
+      enable = true;
+      settings = {
+        python-downloads = "never";
+        python-preference = "only-system";
+        pip.index-url = "https://test.pypi.org/simple";
+      };
+    };
+    go = {
+      enable = true;
+      telemetry.mode = "off";
+    };
+  };
   home.sessionVariables = {
   };
   home.packages = with pkgs; [
-    ghc
-    gcc
-    scc
+    # ghc
+    # gcc
+    # scc
     gfortran
     # tcc
-    go
+    # go
     #tinygo
-    rustc
-    cargo
+    # rustc
+    # cargo
     #lua
-    luajit
-    python3
+    # luajit
+    # python3
     #lua51Packages.moonscript
     # nim
-    wasmtime
-    hare
+    # wasmtime
+    # hare
     #haredoc
     #zig
     # dotnet-sdk
@@ -45,7 +58,7 @@
   home.sessionPath = [
     "$HOME/.dotnet/tools"
     "$HOME/.cargo/bin"
-    "$HOME/.local/bin"
-    "$HOME/go/bin"
+    # "$HOME/.local/bin"
+    # "$HOME/go/bin"
   ];
 }

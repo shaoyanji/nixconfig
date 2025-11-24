@@ -40,7 +40,7 @@ in {
     packages = with pkgs;
       pkgstxt
       ++ [
-        # eget
+        aha
         tesseract
         pandoc
         markdownlint-cli
@@ -159,7 +159,6 @@ in {
         lynx
         translate-shell
         mc
-        broot
         ticker
         obsidian-export
         ots
@@ -211,5 +210,21 @@ in {
       ];
     };
     fzf.enable = true;
+  };
+
+  xdg.configFile = {
+    "nixpkgs/config.nix".text = ''
+      {
+        packageOverrides = pkgs: {
+          nur = import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/main.tar.gz") {
+            inherit pkgs;
+          };
+        };
+      }
+    '';
+    "elvish/rc.elv".source = builtins.fetchurl {
+      url = "https://gist.githubusercontent.com/shaoyanji/656406074a590a09e33755b88ac29d53/raw/rc.elv";
+      sha256 = "0b0078sp6fyqygxz9hap7inhpnwz17s0vcpb4fgklzxa2h8kp194";
+    };
   };
 }

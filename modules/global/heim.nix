@@ -8,29 +8,18 @@
     ../zen.nix
     ./home.nix
     # ../caelestia.nix
-    #../dev.nix
-    # ../shell/nushell.nix
+    ../hypr
+    ../hypr/waybar.nix
+    ../niri.nix
+    ../dev.nix
+    ../kitty
   ];
   programs = {
     zed-editor.enable = true;
     anki.enable = true;
-    quickshell.enable = true;
+    # quickshell.enable = true;
     element-desktop.enable = true;
-    kitty = {
-      enable = true;
-      themeFile = "tokyo_night_storm";
-      shellIntegration.enableBashIntegration = true;
-      settings = {
-        background_opacity = 0.6;
-        scrollback_lines = 10000;
-        enable_audio_bell = false;
-        update_check_interval = 0;
-      };
-      font = {
-        name = "JetBrainsMono Nerd Font";
-        size = 14;
-      };
-    };
+
     qutebrowser.enable = true;
     onedrive.enable = true;
     obsidian = {

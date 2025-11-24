@@ -23,25 +23,6 @@
         ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         ]
         ++ lib.optionals stdenv.hostPlatform.isAarch64 [
-          # utilities for arm64 raspi
-          yt-dlp
-          pass
-          cmus
-          wkhtmltopdf
-          ghostscript
-          #        texlive.combined.scheme-full
-          pandoc
-          # jekyll
-          # bundler
-          # scc
-          # hare
-          # haredoc
-          # go
-          # cargo
-          # tinygo
-          # wasmtime
-          # luajit
-          alsa-utils
         ];
       home.file = {
       };

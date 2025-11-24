@@ -16,10 +16,51 @@
     # ../modules/helix.nix
   ];
   services.home-manager.autoExpire.enable = true;
+  programs.wofi.enable = true;
+  programs.kakoune.enable = true;
+  programs.neovim.enable = true;
+  programs.go.enable = true;
+  programs.go.telemetry.mode = "off";
+    
+  programs.uv={
+    enable = true;
+    settings = {
+          python-downloads = "never";
+          python-preference = "only-system";
+          pip.index-url = "https://test.pypi.org/simple";
+        };
+  };
+  programs.mpv.enable = true;
+  programs.mpv.bindings = {
+            WHEEL_UP = "seek 10";
+            WHEEL_DOWN = "seek -10";
+            "Alt+0" = "set window-scale 0.5";
+          };
+  services.clipmenu.enable = true;
+  services.clipmenu.launcher= "wofi";
+
+  # programs.neovide.enable = true;
+  # programs.qutebrowser.enable = true;
+  # programs.quickshell.enable = true;
+  # programs.kitty.enable = true;
+  # programs.freetube.enable =true;
+  # programs.zed-editor.enable = true;
+  # services.way-displays.enable = true;
+  programs.translate-shell.enable = true;
+  programs.translate-shell.settings = 
+	{
+        verbose = true;
+        hl = "en";
+        tl = [
+          "zh"
+          "de"
+        ];
+      };
   home = {
     username = "devji";
     homeDirectory = "/home/devji";
     packages = with pkgs; [
+      ani-cli
       nix-output-monitor
       lowfi
       duf
@@ -28,8 +69,8 @@
       go-task
       cloak
       btop
-      translate-shell
       helix
+      wl-clipboard
     ];
     stateVersion = "24.11";
     file = {

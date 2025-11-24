@@ -12,13 +12,10 @@
     # ../sops.nix
     # ../nixvim
     ../wezterm
-    ../kitty
     # ../dev.nix
     # ../helix.nix
     # ../scripts
   ];
-  # programs.thunderbird.enable = true; # requires caching
-  # programs.anki.enable = true;
   home = {
     packages = with pkgs;
       [
@@ -43,13 +40,7 @@
         cliphist
         wl-clipboard
         simplex-chat-desktop
-        go
-        gcc
-        wasmtime
-        tinygo
-        scc
         goose-cli
-        uv
         qrrs
         cook-cli
         surge-cli
@@ -59,14 +50,15 @@
         bootdev-cli
         wash-cli
         rendercv
+        libation
       ]
       ++ lib.optionals stdenv.isDarwin [
-        # libation
         ytfzf
         iina # ani-cli dependency
         wget
         cocoapods
         m-cli # useful macOS CLI commands
+        # libation
         # wezterm
         # darwin.xcode_16_1
       ];

@@ -11,10 +11,7 @@
     users.devji = {
       imports = [
         inputs.impermanence.nixosModules.home-manager.impermanence
-        #./minimal.nix
-        #../nixoshmsymlinks.nix
         ./heim.nix
-        ../hypr
       ];
 
       home.stateVersion = "25.05"; # Please read the comment before changing.

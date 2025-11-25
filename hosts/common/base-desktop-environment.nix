@@ -122,5 +122,6 @@
       "ngrok"
       "dropbox"
       "firefox-bin"
+      "firefox-bin-unwrapped"
     ];
 }

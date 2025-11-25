@@ -121,5 +121,6 @@
       "obsidian"
       "ngrok"
       "dropbox"
+      "firefox-bin"
     ];
 }

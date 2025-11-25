@@ -120,5 +120,8 @@
     builtins.elem (lib.getName pkg) [
       "obsidian"
       "ngrok"
+      "dropbox"
+      "firefox-bin"
+      "firefox-bin-unwrapped"
     ];
 }

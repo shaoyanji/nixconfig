@@ -8,7 +8,7 @@
     ../zen.nix
     ./home.nix
     # ../caelestia.nix
-    ../hypr
+    # ../hypr
     ../hypr/waybar.nix
     ../niri.nix
     ../dev.nix

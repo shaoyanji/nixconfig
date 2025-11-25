@@ -51,6 +51,7 @@
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
     kickstart-nixvim.inputs.nixpkgs.follows = "nixpkgs";
     garnix-lib.url = "github:garnix-io/garnix-lib";
+    nixgl.url = "github:nix-community/nixGL";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -59,10 +60,7 @@
   outputs = {
     self,
     nix-index-database,
-    nix-darwin,
     nixpkgs,
-    nix-homebrew,
-    nixos-wsl,
     home-manager,
     impermanence,
     disko,
@@ -70,6 +68,10 @@
     sops-nix,
     nur,
     garnix-lib,
+    nixgl,
+    nix-darwin,
+    nix-homebrew,
+    nixos-wsl,
     ...
   } @ inputs: let
     globalModules = [
@@ -135,7 +137,11 @@
       homeConfigurations = {
         penguin = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
+          pkgs = import nixpkgs {
+            system = "x86_64-linux";
+            overlays = [nixgl.overlay];
+          };
+          # nixpkgs.legacyPackages."x86_64-linux";
           modules = [
             ./hosts/penguin.nix
             inputs.sops-nix.homeManagerModules.sops

@@ -1,5 +1,5 @@
 {
-config,
+  config,
   inputs,
   pkgs,
   ...
@@ -18,46 +18,27 @@ config,
     # ../modules/helix.nix
   ];
   programs.pay-respects.enable = true;
-
-
-programs.nix-your-shell.enable =true;
+  programs.nix-your-shell.enable = true;
   programs.atuin.enable = true;
-  accounts.email.accounts."jisifu"= {
-name = "jisifu";
-primary=true;
-address = "jisifu@gmail.com";
-realName = "Shao-yan (Matt) Ji";
-userName = "jisifu";
-himalaya.enable =true;
-
-};
-  programs.himalaya ={
-    enable =true;
-    # accounts.email.accounts.mkAccountConfig = {
-    #   notmuchEnabled=true;
-    #   email = "jisifu@gmail.com";
-    #   display-name = "Matt";
-    # };
-  };
   # services.imapnotify={enable=true;
   #   accounts.email.accounts."jisifu".himalaya.enable=true;
   # };
-  programs.btop={
+  programs.btop = {
     enable = true;
     settings = {
       color_theme = "tokyo-night.theme";
       theme_background = false;
-      vim_keys=true;
+      vim_keys = true;
     };
-    };
+  };
   programs.yt-dlp.enable = true;
   programs.yt-dlp.settings = {
-          embed-thumbnail = true;
-          embed-subs = true;
-          sub-langs = "en";
-          downloader = "aria2c";
-          downloader-args = "aria2c:'-c -x8 -s8 -k1M'";
-        };
+    embed-thumbnail = true;
+    embed-subs = true;
+    sub-langs = "en";
+    downloader = "aria2c";
+    downloader-args = "aria2c:'-c -x8 -s8 -k1M'";
+  };
   programs.wofi.enable = true;
   programs.kakoune.enable = true;
   programs.neovim.enable = true;
@@ -74,8 +55,8 @@ himalaya.enable =true;
   };
   programs.mpv.enable = true;
   programs.mpv.config = {
-    profile="fast";
-    hwdec="auto";
+    profile = "fast";
+    hwdec = "auto";
     force-window = true;
   };
   programs.mpv.bindings = {
@@ -93,7 +74,7 @@ himalaya.enable =true;
   # programs.freetube.enable =true;
   # programs.zed-editor.enable = true;
   # services.way-displays.enable = true;
-  # 
+  #
   programs.translate-shell.enable = true;
   programs.translate-shell.settings = {
     verbose = true;
@@ -125,7 +106,7 @@ himalaya.enable =true;
     };
     sessionVariables = {
       EDITOR = "hx";
-      invidious_instance="https://inv.perditum.com";
+      invidious_instance = "https://inv.perditum.com";
     };
     sessionPath = [];
   };

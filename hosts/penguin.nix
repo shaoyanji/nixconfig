@@ -17,13 +17,11 @@
     # ../modules/goodies.nix
     # ../modules/helix.nix
   ];
-  programs.pay-respects.enable = true;
-  programs.nix-your-shell.enable = true;
-  programs.atuin.enable = true;
-  # services.imapnotify={enable=true;
-  #   accounts.email.accounts."jisifu".himalaya.enable=true;
-  # };
-  programs.btop = {
+  programs ={ pay-respects.enable = true;
+  nix-your-shell.enable = true;
+  atuin.enable = true;
+  
+  btop = {
     enable = true;
     settings = {
       color_theme = "tokyo-night.theme";
@@ -31,21 +29,13 @@
       vim_keys = true;
     };
   };
-  programs.yt-dlp.enable = true;
-  programs.yt-dlp.settings = {
-    embed-thumbnail = true;
-    embed-subs = true;
-    sub-langs = "en";
-    downloader = "aria2c";
-    downloader-args = "aria2c:'-c -x8 -s8 -k1M'";
-  };
-  programs.wofi.enable = true;
-  programs.kakoune.enable = true;
-  programs.neovim.enable = true;
+ kakoune.enable = true;
+  neovim.enable = true;
   # programs.vim.enable = true;
-  programs.go.enable = true;
-  programs.go.telemetry.mode = "off";
-  programs.uv = {
+  programs.go ={enable = true;
+  telemetry.mode = "off";
+  };
+  uv = {
     enable = true;
     settings = {
       python-downloads = "never";
@@ -53,18 +43,28 @@
       pip.index-url = "https://test.pypi.org/simple";
     };
   };
-  programs.mpv.enable = true;
-  programs.mpv.config = {
+  programs.mpv={enable = true;
+  config = {
     profile = "fast";
     hwdec = "auto";
     force-window = true;
   };
-  programs.mpv.bindings = {
+  bindings = {
     WHEEL_UP = "seek 10";
     WHEEL_DOWN = "seek -10";
     "Alt+0" = "set window-scale 0.5";
-  };
-  # services.clipmenu.enable = true;
+  };};
+
+  yt-dlp = {enable = true;
+  settings = {
+    embed-thumbnail = true;
+    embed-subs = true;
+    sub-langs = "en";
+    downloader = "aria2c";
+    downloader-args = "aria2c:'-c -x8 -s8 -k1M'";
+  };};
+  wofi.enable = true;
+   # services.clipmenu.enable = true;
   # services.clipmenu.launcher = "wofi";
 
   # programs.neovide.enable = true;
@@ -75,15 +75,20 @@
   # programs.zed-editor.enable = true;
   # services.way-displays.enable = true;
   #
-  programs.translate-shell.enable = true;
-  programs.translate-shell.settings = {
+  translate-shell = {enable = true;
+  settings = {
     verbose = true;
     hl = "en";
     tl = [
       "zh"
       "de"
     ];
+  };};
   };
+
+# services.imapnotify={enable=true;
+  #   accounts.email.accounts."jisifu".himalaya.enable=true;
+  # }
   home = {
     username = "devji";
     homeDirectory = "/home/devji";
@@ -97,9 +102,9 @@
       go-task
       cloak
       helix
-      wl-clipboard
+      # wl-clipboard
       ytfzf
-      nixgl.nixGLIntel
+      # nixgl.nixGLIntel
     ];
     stateVersion = "24.11";
     file = {

@@ -7,7 +7,6 @@
 }: {
   imports = [
     ./waybar.nix
-    ../caelestia.nix
   ];
   home.packages = with pkgs; [
     # kdePackages.dolphin

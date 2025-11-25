@@ -120,5 +120,6 @@
     builtins.elem (lib.getName pkg) [
       "obsidian"
       "ngrok"
+      "dropbox"
     ];
 }

@@ -44,10 +44,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils.url = "github:numtide/flake-utils";
-    caelestia = {
-      url = "git+https://github.com/caelestia-dots/shell/";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # caelestia = {
+    #   url = "git+https://github.com/caelestia-dots/shell/";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
     kickstart-nixvim.url = "github:shaoyanji/kickstart.nixvim";
     kickstart-nixvim.inputs.nixpkgs.follows = "nixpkgs";
     garnix-lib.url = "github:garnix-io/garnix-lib";

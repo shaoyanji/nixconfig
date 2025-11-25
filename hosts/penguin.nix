@@ -12,45 +12,36 @@ config,
     ../modules/lf
     ../modules/sops.nix
     ../modules/scripts
+    ../modules/aria2.nix
     # ../modules/kitty
     # ../modules/goodies.nix
     # ../modules/helix.nix
   ];
-  programs.aria2 = {
-      enable = true;
-      settings = {
-        disk-cache = ''32M'';
-        file-allocation = ''falloc'';
-        continue = true;
-        max-concurrent-downloads = 10;
-        max-connection-per-server = 16;
-        min-split-size = ''10M'';
-        split = 5;
-        disable-ipv6 = true;
-        save-session-interval = 60;
-        #rpc-secret=;
-        rpc-listen-port = 6800;
-        rpc-allow-origin-all = true;
-        rpc-listen-all = true;
-        follow-torrent = true;
-        listen-port = 51413;
-        bt-max-peers = 100;
-        enable-dht = true;
-        enable-dht6 = true;
-        dht-listen-port = 6966;
-        enable-peer-exchange = true;
-        peer-id-prefix = "-TR2770-";
-        peer-agent = ''Transmission/2.77'';
-        user-agent = ''Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0'';
-        seed-ratio = 0;
-        bt-hash-check-seed = true;
-        bt-seed-unverified = true;
-        bt-save-metadata = false;
-        enable-rpc = true;
-        max-upload-limit = "50K";
-        ftp-pasv = true;
-      };
-    };
+  programs.pay-respects.enable = true;
+
+
+programs.nix-your-shell.enable =true;
+  programs.atuin.enable = true;
+  accounts.email.accounts."jisifu"= {
+name = "jisifu";
+primary=true;
+address = "jisifu@gmail.com";
+realName = "Shao-yan (Matt) Ji";
+userName = "jisifu";
+himalaya.enable =true;
+
+};
+  programs.himalaya ={
+    enable =true;
+    # accounts.email.accounts.mkAccountConfig = {
+    #   notmuchEnabled=true;
+    #   email = "jisifu@gmail.com";
+    #   display-name = "Matt";
+    # };
+  };
+  # services.imapnotify={enable=true;
+  #   accounts.email.accounts."jisifu".himalaya.enable=true;
+  # };
   programs.btop={
     enable = true;
     settings = {
@@ -92,8 +83,8 @@ config,
     WHEEL_DOWN = "seek -10";
     "Alt+0" = "set window-scale 0.5";
   };
-  services.clipmenu.enable = true;
-  services.clipmenu.launcher = "wofi";
+  # services.clipmenu.enable = true;
+  # services.clipmenu.launcher = "wofi";
 
   # programs.neovide.enable = true;
   # programs.qutebrowser.enable = true;
@@ -127,6 +118,7 @@ config,
       helix
       wl-clipboard
       ytfzf
+      nixgl.nixGLIntel
     ];
     stateVersion = "24.11";
     file = {

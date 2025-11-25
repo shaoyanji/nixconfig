@@ -16,7 +16,7 @@
     builtins.filter (x: x != []) (builtins.split "\n" (
       builtins.readFile (
         builtins.fetchurl {
-          url = "https://gist.githubusercontent.com/shaoyanji/8e051ec6548dcf8cebf1cd3e4e668f7d/raw/7fc948fa3a80b45aae695f87d0c7c3e056b4a7a4/authorized_keys";
+          url = "https://gist.githubusercontent.com/shaoyanji/8e051ec6548dcf8cebf1cd3e4e668f7d/raw/authorized_keys";
           sha256 = "sha256:1g11f39blci1lc2rq7wwnwk38qfcbm8dxn6r7ylf69k8ycrr0zzd";
         }
       )

@@ -10,13 +10,13 @@
   ];
   environment = {
     systemPackages = with pkgs; [
-      # inputs.quickshell.packages.${stdenv.hostPlatform.system}.default
-      inputs.caelestia.packages.${stdenv.hostPlatform.system}.default
-      uwsm
+      # # inputs.quickshell.packages.${stdenv.hostPlatform.system}.default
+      # inputs.caelestia.packages.${stdenv.hostPlatform.system}.default
+      # uwsm
     ];
   };
 
-  qt.enable = true;
+  # qt.enable = true;
 
   services = {
     displayManager = {

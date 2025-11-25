@@ -34,6 +34,7 @@ in {
     inputs.kickstart-nixvim.homeManagerModules.default
   ];
 
+programs.nix-your-shell.enable =true;
   programs.nixvim.enable = true;
   home = {
     stateVersion = "25.05";

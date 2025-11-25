@@ -31,8 +31,8 @@
   };
  kakoune.enable = true;
   neovim.enable = true;
-  # programs.vim.enable = true;
-  programs.go ={enable = true;
+  # vim.enable = true;
+  go ={enable = true;
   telemetry.mode = "off";
   };
   uv = {
@@ -43,7 +43,7 @@
       pip.index-url = "https://test.pypi.org/simple";
     };
   };
-  programs.mpv={enable = true;
+  mpv={enable = true;
   config = {
     profile = "fast";
     hwdec = "auto";
@@ -64,16 +64,12 @@
     downloader-args = "aria2c:'-c -x8 -s8 -k1M'";
   };};
   wofi.enable = true;
-   # services.clipmenu.enable = true;
-  # services.clipmenu.launcher = "wofi";
-
   # programs.neovide.enable = true;
   # programs.qutebrowser.enable = true;
   # programs.quickshell.enable = true;
   # programs.kitty.enable = true;
   # programs.freetube.enable =true;
   # programs.zed-editor.enable = true;
-  # services.way-displays.enable = true;
   #
   translate-shell = {enable = true;
   settings = {
@@ -85,7 +81,14 @@
     ];
   };};
   };
+services = {
+  
+  home-manager.autoExpire.enable = true;
+};
+  # services.clipmenu.enable = true;
+  # services.clipmenu.launcher = "wofi";
 
+  # services.way-displays.enable = true;
 # services.imapnotify={enable=true;
   #   accounts.email.accounts."jisifu".himalaya.enable=true;
   # }
@@ -125,6 +128,5 @@
       Environment="XDG_DATA_DIRS=%h/.nix-profile/share:%h/.local/share:%h/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share"
     '';
 
-  services.home-manager.autoExpire.enable = true;
   programs.home-manager.enable = true;
 }

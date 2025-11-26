@@ -26,4 +26,8 @@
   #   url = "https://raw.githubusercontent.com/YaLTeR/niri/refs/heads/main/resources/default-config.kdl";
   #   sha256 = "sha256:05bbav6xc8rx1fki49iv6y7grncp22afal6an31jjkqw2scq6bsd";
   # };
+  xdg.configFile."niri/config.kdl".source = builtins.fetchurl {
+    url = "https://gist.githubusercontent.com/shaoyanji/f675c27adaaac753b35af9141568b78b/raw/c545b19c872e0fc4051f0ead3c20928ce793b246/config.kdl";
+    sha256 = "sha256:0f2r9zr7xam1816ppm36cpzddgxbxm0b2l02vlpxl9vhargaq5ss";
+  };
 }

@@ -114,12 +114,10 @@
         home-manager.nixosModules.default
         nix-index-database.nixosModules.nix-index
       ];
-    globalModulesHome =
-      globalModules
-      ++ [
-        sops-nix.homeManagerModules.sops
-        nix-index-database.homeModules.nix-index
-      ];
+    globalModulesHome = [
+      sops-nix.homeManagerModules.sops
+      nix-index-database.homeModules.nix-index
+    ];
   in
     inputs.flake-utils.lib.eachDefaultSystem
     (

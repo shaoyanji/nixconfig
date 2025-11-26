@@ -114,6 +114,12 @@
         home-manager.nixosModules.default
         nix-index-database.nixosModules.nix-index
       ];
+    globalModulesHome =
+      globalModules
+      ++ [
+        sops-nix.homeManagerModules.sops
+        nix-index-database.homeModules.nix-index
+      ];
   in
     inputs.flake-utils.lib.eachDefaultSystem
     (
@@ -141,37 +147,49 @@
             system = "x86_64-linux";
             overlays = [nixgl.overlay];
           };
-          # nixpkgs.legacyPackages."x86_64-linux";
-          modules = [
-            ./hosts/penguin.nix
-            inputs.sops-nix.homeManagerModules.sops
-          ];
+          # pkgs = nixpkgs.legacyPackages."x86_64-linux";
+          modules =
+            globalModulesHome
+            ++ [
+              ./hosts/penguin.nix
+            ];
         };
         alarm = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
           pkgs = nixpkgs.legacyPackages."aarch64-linux";
-          modules = [
-            ./hosts/alarm.nix
-            inputs.sops-nix.homeManagerModules.sops
-          ];
+          modules =
+            globalModulesHome
+            ++ [
+              ./hosts/alarm.nix
+            ];
         };
         kali = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
           pkgs = nixpkgs.legacyPackages."aarch64-linux";
-          modules = [./hosts/kali.nix];
+          modules =
+            globalModulesHome
+            ++ [
+              ./hosts/kali.nix
+            ];
         };
         devji = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
           pkgs = nixpkgs.legacyPackages."x86_64-linux";
           # pkgs = nixpkgs.legacyPackages."aarch64-linux";
-          modules = [
-            ./modules/global/heim.nix
-          ];
+          modules =
+            globalModulesHome
+            ++ [
+              ./modules/global/heim.nix
+            ];
         };
         verntil = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
           pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules = [./hosts/verntil.nix];
+          modules =
+            globalModulesHome
+            ++ [
+              ./hosts/verntil.nix
+            ];
         };
       };
       nixosConfigurations = {

@@ -7,7 +7,6 @@ keys:
   - &sopsposeidon age1ezs5s0mx7pcmv0cq6lhvxqtrgx9shrenpxuqyny3m52rg4a6vuxq9ucd7c
   - &hposeidon age10njuv5050y6wvxq0a9vpvxwrd4scr34cxrxmzz3cl8p7xwjydqhq358af6
   - &sopsacer age12yhcg6c7spluq7z0dsgduqfvvcqzyz0a5an3zsndecuc0h2w3ftseyzlad
-  - &pengsops age176w440q29gdaqa0pyp3wq0663ge9h3vvykhghc6drzx4qydguqasdjvev8
   - &guckloch age1aq6fer9unde6xwjw587qzc6e6cfe4wlu2xvcah7vjqrkptkd7gtq69v38r
   - &schneeeule age14wsec4ypsqzx075mxw6nen6htdm6tmsu3artlf4jas7jk02zmecsg7kseh
   - &leakynose age1jykxrxauzv92xk0rscav5pd52dhzegzuxrha3c8unx2x7ktsm52s0tlfqk
@@ -26,7 +25,8 @@ keys:
   - &applevalleyhost age15rlqjq7nzc0xnnq5z32ugkkg4dzhxjsg3hxstlh0gygq3rffcvlsfqruj0
   - &applevalley age1afuz306fl0vcp9lje6exyczwncnw5rklef3kq5d5mfmpy7f68ejsp99v69
   - &kali age16q43vrn59pwjfpuwygmqg98enu063dvveazrlr02zcf339wxj3qstsxywq
-
+  - &penguin age1lxkrls0zrq24c3crg3ffpsllk30tu6amk5munfmfcw3rhev9ppvsatm0vh
+  
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -36,7 +36,6 @@ creation_rules:
           - *sopsposeidon
           - *hposeidon
           - *sopsacer
-          - *pengsops
           - *guckloch
           - *ares
           - *schneeeule
@@ -54,6 +53,7 @@ creation_rules:
           - *sandylaptop
           - *applevalleyhost
           - *applevalley
+          - *penguin
   - path_regex: /[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:
@@ -62,7 +62,6 @@ creation_rules:
           - *sopsposeidon
           - *hposeidon
           - *sopsacer
-          - *pengsops
           - *guckloch
           - *ares
           - *schneeeule
@@ -80,4 +79,5 @@ creation_rules:
           - *sandylaptop
           - *applevalleyhost
           - *applevalley
+          - *penguin
         gpg:

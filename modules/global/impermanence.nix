@@ -44,6 +44,8 @@
       };
     };
     sharedModules = [
+      inputs.kickstart-nixvim.homeManagerModules.default
+      inputs.nix-index-database.homeModules.nix-index
       inputs.sops-nix.homeManagerModules.sops
     ];
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration

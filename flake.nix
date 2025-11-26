@@ -83,7 +83,6 @@
     ];
     globalModulesNixos =
       globalModules
-      ++ globalModulesHome
       ++ [
         ./modules/global/nixos.nix
         home-manager.nixosModules.default

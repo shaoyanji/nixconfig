@@ -20,7 +20,6 @@
   #   |> map (pkg: pkgs.${pkg});
 in {
   imports = [
-    ../nixoshmsymlinks.nix
     ../scripts
     ../lf
     ../env.nix
@@ -31,11 +30,8 @@ in {
     ../helix.nix
     ../goodies.nix # aichat
     # ../shell/nushell.nix
-    inputs.kickstart-nixvim.homeManagerModules.default
   ];
 
-programs.nix-your-shell.enable =true;
-  programs.nixvim.enable = true;
   home = {
     stateVersion = "25.05";
     packages = with pkgs;
@@ -197,20 +193,6 @@ programs.nix-your-shell.enable =true;
       GUM_CHOOSE_CURSOR_FOREGROUND = 50;
       GUM_CHOOSE_HEADER_FOREGROUND = 30;
     };
-  };
-
-  programs = {
-    direnv = {
-      enable = true;
-      nix-direnv.enable = true;
-    };
-    zoxide = {
-      enable = true;
-      options = [
-        "--cmd cd"
-      ];
-    };
-    fzf.enable = true;
   };
 
   xdg.configFile = {

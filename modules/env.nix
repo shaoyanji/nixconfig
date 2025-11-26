@@ -6,7 +6,9 @@
   ...
 }: {
   imports = [
+    ./nixoshmsymlinks.nix
   ];
+  programs.nixvim.enable = true;
   home.activation.removeExistingGitConfig = lib.hm.dag.entryAfter ["checkLinkTargets"] ''
     rm -f ~/.gitconfig
   '';

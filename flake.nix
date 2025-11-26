@@ -72,6 +72,7 @@
     nix-darwin,
     nix-homebrew,
     nixos-wsl,
+    kickstart-nixvim,
     ...
   } @ inputs: let
     globalModules = [
@@ -82,6 +83,7 @@
     ];
     globalModulesNixos =
       globalModules
+      ++ globalModulesHome
       ++ [
         ./modules/global/nixos.nix
         home-manager.nixosModules.default
@@ -115,6 +117,7 @@
         nix-index-database.nixosModules.nix-index
       ];
     globalModulesHome = [
+      kickstart-nixvim.homeManagerModules.default
       sops-nix.homeManagerModules.sops
       nix-index-database.homeModules.nix-index
     ];

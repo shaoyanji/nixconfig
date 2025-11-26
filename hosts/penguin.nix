@@ -13,13 +13,15 @@
     ../modules/sops.nix
     ../modules/scripts
     ../modules/aria2.nix
+    ../modules/dev.nix
     # ../modules/kitty
     # ../modules/goodies.nix
     # ../modules/helix.nix
   ];
   programs = {
+    # nixvim.enable = true;
+
     pay-respects.enable = true;
-    nix-your-shell.enable = true;
     atuin.enable = true;
 
     btop = {
@@ -30,21 +32,10 @@
         vim_keys = true;
       };
     };
-    kakoune.enable = true;
-    neovim.enable = true;
+    # kakoune.enable = true;
+    # neovim.enable = true;
     # vim.enable = true;
-    go = {
-      enable = true;
-      telemetry.mode = "off";
-    };
-    uv = {
-      enable = true;
-      settings = {
-        python-downloads = "never";
-        python-preference = "only-system";
-        pip.index-url = "https://test.pypi.org/simple";
-      };
-    };
+
     mpv = {
       enable = true;
       config = {
@@ -69,7 +60,7 @@
         downloader-args = "aria2c:'-c -x8 -s8 -k1M'";
       };
     };
-    wofi.enable = true;
+    # wofi.enable = true;
     # programs.neovide.enable = true;
     # programs.qutebrowser.enable = true;
     # programs.quickshell.enable = true;
@@ -77,15 +68,43 @@
     # programs.freetube.enable =true;
     # programs.zed-editor.enable = true;
     #
-    translate-shell = {
+    helix = {
       enable = true;
+      languages.language = [
+        {
+          name = "bash";
+          indent = {
+            tab-width = 4;
+            unit = "    ";
+          };
+          formatter.command = "${pkgs.shfmt}/bin/shfmt";
+          auto-format = true;
+        }
+        {
+          name = "go";
+          auto-format = true;
+          formatter.command = "${pkgs.gopls}/bin/gopls";
+        }
+        {
+          name = "nix";
+          auto-format = true;
+          formatter.command = "${pkgs.alejandra}/bin/alejandra";
+        }
+      ];
+
       settings = {
-        verbose = true;
-        hl = "en";
-        tl = [
-          "zh"
-          "de"
-        ];
+        theme = "autumn_night_transparent";
+        editor.cursor-shape = {
+          normal = "block";
+          insert = "bar";
+          select = "underline";
+        };
+      };
+      themes = {
+        autumn_night_transparent = {
+          "inherits" = "autumn_night";
+          "ui.background" = {};
+        };
       };
     };
   };
@@ -103,15 +122,14 @@
     username = "devji";
     homeDirectory = "/home/devji";
     packages = with pkgs; [
+      totp-cli
       ani-cli
       nix-output-monitor
       lowfi
       duf
-      viu
       gum
       go-task
       cloak
-      helix
       # wl-clipboard
       ytfzf
       # nixgl.nixGLIntel

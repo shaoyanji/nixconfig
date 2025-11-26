@@ -5,43 +5,55 @@
   ...
 }: {
   programs = {
+    nix-your-shell.enable = true;
+    translate-shell = {
+      enable = true;
+      settings = {
+        verbose = true;
+        hl = "en";
+        tl = [
+          "zh"
+          "de"
+        ];
+      };
+    };
     gemini-cli = {
-      enable=true;
+      enable = true;
       settings = lib.literalExpression ''{"theme": "Default","vimMode": true,"preferredEditor": "nvim","autoAccept": true}'';
       defaultModel = "gemini-3-pro-preview";
       # defaultModel = "gemini-2.5-flash-lite";
       commands = {
         changelog = {
-            prompt =
-              ''
-              Your task is to parse the `<version>`, `<change_type>`, and `<message>` from their input and use the `write_file` tool to correctly update the `CHANGELOG.md` file.
-              '';
-            description = "Adds a new entry to the project's CHANGELOG.md file.";
-          };
-          "git/fix" = { # Becomes /git:fix
-            prompt = "Please analyze the staged git changes and provide a code fix for the issue described here: {{args}}.";
-            description = "Generates a fix for a given GitHub issue.";
-          };
-          };
-      context = lib.literalExpression ''{
-          GEMINI = '''
-            # Global Context
+          prompt = ''
+            Your task is to parse the `<version>`, `<change_type>`, and `<message>` from their input and use the `write_file` tool to correctly update the `CHANGELOG.md` file.
+          '';
+          description = "Adds a new entry to the project's CHANGELOG.md file.";
+        };
+        "git/fix" = {
+          # Becomes /git:fix
+          prompt = "Please analyze the staged git changes and provide a code fix for the issue described here: {{args}}.";
+          description = "Generates a fix for a given GitHub issue.";
+        };
+      };
+      context = lib.literalExpression ''        {
+                  GEMINI = '''
+                    # Global Context
 
-            You are a helpful AI assistant for software development.
+                    You are a helpful AI assistant for software development.
 
-            ## Coding Standards
+                    ## Coding Standards
 
-            - Follow consistent code style
-            - Write clear comments
-            - Test your changes
-          ''';
+                    - Follow consistent code style
+                    - Write clear comments
+                    - Test your changes
+                  ''';
 
-          AGENTS = ./path/to/agents.md;
+                  AGENTS = ./path/to/agents.md;
 
-          CONTEXT = '''
-            Additional context instructions here.
-            ''';'
-        }'';
+                  CONTEXT = '''
+                    Additional context instructions here.
+                    ''';'
+                }'';
     };
     # mods ={
     #   enable = true;

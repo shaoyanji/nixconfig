@@ -5,6 +5,7 @@
   ...
 }: {
   imports = [
+    ./unfree.nix
   ];
 
   nix = {
@@ -68,16 +69,6 @@
       "nixpkgs=${pkgs.path}"
     ];
   };
-
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      "obsidian"
-      "ngrok"
-      "dropbox"
-      "firefox-bin"
-      "firefox-bin-unwrapped"
-      "tabnine"
-    ];
   #  programs.nix-index.enable = true;
   #  programs.nix-index-database.comma.enable = true;
   #  nixpkgs.config.allowUnsupportedSystem = true;
@@ -91,9 +82,9 @@
   #     "steam-run"
   #   ];
 
-  # nixpkgs.config = {
-  #   allowUnfree = true;
-  #   nvidia.acceptLicense = true;
-  #   cudaSupport = true; # Enables CUDA support
-  # };
+  nixpkgs.config = {
+    allowUnfree = true;
+    #   nvidia.acceptLicense = true;
+    #   cudaSupport = true; # Enables CUDA support
+  };
 }

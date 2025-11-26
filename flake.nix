@@ -125,10 +125,10 @@
     inputs.flake-utils.lib.eachDefaultSystem
     (
       system: let
-        pkgs = import inputs.nixpkgs {inherit system;};
+        pkgs = import nixpkgs {inherit system;};
       in {
         packages = {
-          #           frontend-bundle = pkgs.callPackage ./frontend { self = inputs.self; };
+          # frontend-bundle = pkgs.callPackage ./frontend {self = inputs.self;};
           backend = pkgs.callPackage ./modules/server/go-backend {};
         };
         devShells.default = pkgs.mkShell {

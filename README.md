@@ -48,5 +48,20 @@ yq -i '.keys += (env(AGE) | . anchor = env(HOST)+env(USER)) | .creation_rules[0]
 ### Setting Up Home-Manager
 
 ```bash
-nix run home-manager/master -- switch --flake .?submodules=1#$(whoami)
+nix run home-manager/master -- switch --flake
+home-manager switch --flake .?submodules=1#$(hostname)
 ```
+
+put this in ```~/etc/nix/nix.conf```
+
+```ini
+experimental-features = nix-command flakes
+substituters = https://cache.nixos.org/ https://nix-community.cachix.org https://cache.garnix.io https://shaoyanji.cachix.org https://cache.nixos.org/
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0=
+```
+
+1. Generate SSH key
+2. Make Age equivalents
+3. Github credentials add SSH keys
+4. Add Sops.yaml
+5. sops updatekeys modules/secrets.yaml

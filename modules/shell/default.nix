@@ -17,7 +17,7 @@
 in {
   imports = [
     ./nushell.nix
-    ./zsh.nix
+    # ./zsh.nix
     ./bash.nix
     ./tmux.nix
   ];

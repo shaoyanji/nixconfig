@@ -112,6 +112,7 @@
       globalModules
       ++ [
         ./modules/global/noDE.nix
+        sops-nix.nixosModules.sops
         home-manager.nixosModules.default
         nix-index-database.nixosModules.nix-index
       ];
@@ -223,7 +224,6 @@
             globalModulesContainers
             ++ [
               ./hosts/mtfuji/configuration.nix
-              sops-nix.nixosModules.sops
             ];
         };
         applevalley = nixpkgs.lib.nixosSystem {
@@ -234,7 +234,6 @@
             ++ [
               inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
               ./hosts/applevalley/configuration.nix
-              sops-nix.nixosModules.sops
             ];
         };
         thinsandy = nixpkgs.lib.nixosSystem {
@@ -244,7 +243,6 @@
             globalModulesContainers
             ++ [
               ./hosts/thinsandy/configuration.nix
-              sops-nix.nixosModules.sops
             ];
         };
         ares = nixpkgs.lib.nixosSystem {
@@ -306,7 +304,6 @@
             ++ [
               ./hosts/minyx/configuration.nix
               ./hosts/minyx/custompi.nix
-              sops-nix.nixosModules.sops
               impermanence.nixosModules.impermanence
               inputs.nixos-hardware.nixosModules.raspberry-pi-3
             ];

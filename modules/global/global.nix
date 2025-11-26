@@ -69,6 +69,15 @@
     ];
   };
 
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "obsidian"
+      "ngrok"
+      "dropbox"
+      "firefox-bin"
+      "firefox-bin-unwrapped"
+      "tabnine"
+    ];
   #  programs.nix-index.enable = true;
   #  programs.nix-index-database.comma.enable = true;
   #  nixpkgs.config.allowUnsupportedSystem = true;

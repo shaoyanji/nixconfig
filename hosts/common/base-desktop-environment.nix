@@ -28,10 +28,10 @@
 
   services = {
     displayManager = {
-      #      sddm = {
-      #       enable = true;
-      #      wayland.enable = true;
-      #   };
+      # sddm = {
+      # enable = true;
+      # wayland.enable = true;
+      # };
       # Enable automatic login for the user.
       autoLogin = {
         enable = true;
@@ -61,10 +61,7 @@
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
-    # inputs.zen-browser.packages.${stdenv.hostPlatform.system}.twilight
     lan-mouse_git
-    # nix-top
-    # zed-editor_git
     yt-dlp_git
     libreoffice
     hunspell
@@ -109,19 +106,9 @@
       # missing libraries here, e.g.: `pkgs.libepoxy`
     ];
   };
-  #
   # Fonts
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; }) # 24.11
   ];
-
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      "obsidian"
-      "ngrok"
-      "dropbox"
-      "firefox-bin"
-      "firefox-bin-unwrapped"
-    ];
 }

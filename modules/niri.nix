@@ -18,6 +18,10 @@
     swaybg # wallpaper
     # firefox-bin
   ];
+  home.file."Pictures/Wallpapers/yqKnYa.jpg".source = builtins.fetchurl {
+    url = "https://envs.net/~jisifu/pics/yqKnYa.jpg";
+    sha256 = "sha256:0i5dc7680cx2g32manwy8smfiwg2g6h6kfrhpxlm2icxza3jdscs";
+  };
   # xdg.configFile."niri/config.kdl".source = builtins.fetchurl {
   #   url = "https://raw.githubusercontent.com/YaLTeR/niri/refs/heads/main/resources/default-config.kdl";
   #   sha256 = "sha256:05bbav6xc8rx1fki49iv6y7grncp22afal6an31jjkqw2scq6bsd";

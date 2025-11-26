@@ -205,4 +205,14 @@ in {
   ];
   environment.localBinInPath = true;
   zramSwap.enable = true;
+
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "obsidian"
+      "ngrok"
+      "dropbox"
+      "firefox-bin"
+      "firefox-bin-unwrapped"
+      "tabnine"
+    ];
 }

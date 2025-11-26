@@ -210,14 +210,4 @@ in {
       sha256 = "0b0078sp6fyqygxz9hap7inhpnwz17s0vcpb4fgklzxa2h8kp194";
     };
   };
-
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      "obsidian"
-      "ngrok"
-      "dropbox"
-      "firefox-bin"
-      "firefox-bin-unwrapped"
-      "tabnine"
-    ];
 }

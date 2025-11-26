@@ -4,8 +4,6 @@
   inputs,
   ...
 }: {
-  imports = [
-  ];
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -13,8 +11,6 @@
     users.devji = {
       imports = [
         ./heim.nix
-      ];
-      home.packages = with pkgs; [
       ];
     };
     sharedModules = [

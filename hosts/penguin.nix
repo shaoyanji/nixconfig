@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   inputs,
   pkgs,
   ...
@@ -8,7 +9,6 @@
     # ../modules/global/minimal.nix
     ../modules/shell
     ../modules/env.nix
-    ../modules/nixoshmsymlinks.nix
     ../modules/lf
     ../modules/sops.nix
     ../modules/scripts
@@ -36,30 +36,31 @@
     # neovim.enable = true;
     # vim.enable = true;
 
-    mpv = {
-      enable = true;
-      config = {
-        profile = "fast";
-        hwdec = "auto";
-        force-window = true;
-      };
-      bindings = {
-        WHEEL_UP = "seek 10";
-        WHEEL_DOWN = "seek -10";
-        "Alt+0" = "set window-scale 0.5";
-      };
-    };
+    # mpv = {
+    #   enable = true;
+    #   package = config.lib.nixGL.wrap pkgs.mpv;
+    #   config = {
+    #     profile = "fast";
+    #     hwdec = "auto";
+    #     force-window = true;
+    #   };
+    #   bindings = {
+    #     WHEEL_UP = "seek 10";
+    #     WHEEL_DOWN = "seek -10";
+    #     "Alt+0" = "set window-scale 0.5";
+    #   };
+    # };
 
-    yt-dlp = {
-      enable = true;
-      settings = {
-        embed-thumbnail = true;
-        embed-subs = true;
-        sub-langs = "en";
-        downloader = "aria2c";
-        downloader-args = "aria2c:'-c -x8 -s8 -k1M'";
-      };
-    };
+    # yt-dlp = {
+    #   enable = true;
+    #   settings = {
+    #     embed-thumbnail = true;
+    #     embed-subs = true;
+    #     sub-langs = "en";
+    #     downloader = "aria2c";
+    #     downloader-args = "aria2c:'-c -x8 -s8 -k1M'";
+    #   };
+    # };
     # wofi.enable = true;
     # programs.neovide.enable = true;
     # programs.qutebrowser.enable = true;
@@ -110,6 +111,8 @@
     };
   };
   services = {
+    kbfs.enable = true;
+    keybase.enable = true;
     home-manager.autoExpire.enable = true;
   };
   # services.clipmenu.enable = true;
@@ -132,6 +135,8 @@
       go-task
       glow
       cloak
+      ffmpeg
+      # yt-dlp
       # wl-clipboard
       ytfzf
       # nixgl.nixGLIntel
@@ -154,6 +159,8 @@
       Environment="PATH=%h/.nix-profile/bin:%h/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/local/games:/usr/sbin:/usr/bin:/usr/games:/sbin:/bin"
       Environment="XDG_DATA_DIRS=%h/.nix-profile/share:%h/.local/share:%h/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share"
     '';
-
+  # targets.genericLinux.nixGL = {
+  # packages = inputs.nixgl.packages;
+  # };
   programs.home-manager.enable = true;
 }

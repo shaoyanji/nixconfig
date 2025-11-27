@@ -383,11 +383,11 @@
         "nixvim": "nixvim"
       },
       "locked": {
-        "lastModified": 1764237931,
-        "narHash": "sha256-mHGp/O9THE6L+tvQWZtCkbbg5c53rq3FPIVXNH6uOdw=",
+        "lastModified": 1764259817,
+        "narHash": "sha256-jc0VX9aHQqtaNHk2A5Ri9OGjB7MfqO7ZNu279Kffhl0=",
         "owner": "shaoyanji",
         "repo": "kickstart.nixvim",
-        "rev": "9f0bf6fa3b423defa4f079bd533e710c82871e99",
+        "rev": "4a9bf31444d5941e8f2a29780d3799143edfcb97",
         "type": "github"
       },
       "original": {
@@ -623,11 +623,11 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1764148348,
-        "narHash": "sha256-C9UobzCvMaLwNtRaFrt26TA/SkQtcDhJFmlVQ6DPHyA=",
+        "lastModified": 1764238240,
+        "narHash": "sha256-7Znm3koZ4sF+O41Y7rJqf651BPEbjIUYF3r9H23GRGw=",
         "owner": "nix-community",
         "repo": "nixvim",
-        "rev": "7fe6951bf8c2719f437f74224adf3a2e875d6781",
+        "rev": "f1e07ba53abd0fb4872a365cba45562144ad6130",
         "type": "github"
       },
       "original": {

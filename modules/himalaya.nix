@@ -1,4 +1,4 @@
-{...}: {
+{config, ...}: {
   accounts.email.accounts = {
     "jisifu" = {
       name = "jisifu";
@@ -10,7 +10,8 @@
       imap.port = 993;
       smtp.host = "smtp.gmail.com";
       smtp.port = 465;
-      passwordCommand = "nu -c '( bw list items --session $env.BW_SESSION --url https://google.com | from json | get fields.0.0.value)'";
+      # passwordCommand = "nu -c '( bw list items --session $env.BW_SESSION --url https://google.com | from json | get fields.0.0.value)'";
+      passwordCommand = "cat ${config.sops.secrets.gmail.path}";
       signature.text = "Matt Ji";
       himalaya.enable = true;
     };
@@ -24,7 +25,7 @@
       imap.port = 993;
       smtp.host = "smtp.gmail.com";
       smtp.port = 465;
-      passwordCommand = "nu -c '( bw list items --session $env.BW_SESSION --url https://google.com | from json | get fields.0.0.value)'";
+      passwordCommand = "cat ${config.sops.secrets.gmail.path}";
       signature.text = "Matt Ji";
       himalaya.enable = true;
     };

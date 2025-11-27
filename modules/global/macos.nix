@@ -9,7 +9,8 @@
       ];
     }; #staging point for ./home.nix commons
     sharedModules = [
-      #  sops-nix.homeManagerModules.sops
+      inputs.sops-nix.homeManagerModules.sops
+      inputs.kickstart-nixvim.homeManagerModules.default
     ];
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
     # Optionally, use home-manager.extraSpecialArgs to pass

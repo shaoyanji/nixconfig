@@ -94,6 +94,7 @@
 
       settings = {
         theme = "autumn_night_transparent";
+        editor.line-number = "relative";
         editor.cursor-shape = {
           normal = "block";
           insert = "bar";

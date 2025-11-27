@@ -129,6 +129,7 @@
       duf
       gum
       go-task
+      glow
       cloak
       # wl-clipboard
       ytfzf

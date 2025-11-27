@@ -7,6 +7,7 @@
 }: {
   imports = [
     ./nixoshmsymlinks.nix
+    ./himalaya.nix
   ];
   programs.nixvim.enable = true;
   home.activation.removeExistingGitConfig = lib.hm.dag.entryAfter ["checkLinkTargets"] ''
@@ -38,7 +39,7 @@
     ];
     settings = {
       git_protocol = "ssh";
-      editor = "hx";
+      editor = "nvim";
       prompt = "enabled";
       preferred_editor_prompt = "disabled";
       pager = "bat";
@@ -52,7 +53,7 @@
     enable = true;
     settings = {
       user.name = lib.mkForce "Shao-yan (Matt) Ji";
-      user.email = lib.mkForce "e@mail.shaoyanji@is-a.dev";
+      user.email = lib.mkForce "github@mail.shaoyanji@is-a.dev";
       init.defaultBranch = lib.mkForce "master";
       pull.rebase = lib.mkForce true;
       push.autoSetupRemote = true;

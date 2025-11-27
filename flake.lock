@@ -383,11 +383,11 @@
         "nixvim": "nixvim"
       },
       "locked": {
-        "lastModified": 1764189834,
-        "narHash": "sha256-E9vugTwV53v3lL8L0DmERlBaEMZSq5208bI91JLEvRM=",
+        "lastModified": 1764237931,
+        "narHash": "sha256-mHGp/O9THE6L+tvQWZtCkbbg5c53rq3FPIVXNH6uOdw=",
         "owner": "shaoyanji",
         "repo": "kickstart.nixvim",
-        "rev": "5a82bfb6cb247827b8506a93261ca11c21b118a1",
+        "rev": "9f0bf6fa3b423defa4f079bd533e710c82871e99",
         "type": "github"
       },
       "original": {

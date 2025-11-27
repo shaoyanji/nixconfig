@@ -22,6 +22,7 @@ in {
       "cfcertpem".path = "${config.home.homeDirectory}/.cloudflared/cert.pem";
       "cloak".path = "${config.home.homeDirectory}/.cloak/accounts";
       "ghsudo" = {};
+      "gmail" = {};
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};
       "openmeteo/api/key" = {};

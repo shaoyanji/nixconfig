@@ -106,6 +106,7 @@
         ./modules/global/macos.nix
         nix-homebrew.darwinModules.nix-homebrew
         home-manager.darwinModules.default
+        kickstart-nixvim.homeManagerModules.default
         sops-nix.darwinModules.sops
       ];
     globalModulesContainers =

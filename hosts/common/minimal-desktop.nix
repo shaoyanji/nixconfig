@@ -15,7 +15,7 @@
     # |> builtins.filter (x: x != []);
     builtins.filter (x: x != []) (builtins.split "\n" (
       builtins.readFile (
-        builtins.fetchurl (builtins.fromJSON (builtins.readFile ../../config/ak.json))
+        builtins.fetchurl (builtins.fromJSON (builtins.readFile ../../modules/config/ak.json))
       )
     ));
 in {

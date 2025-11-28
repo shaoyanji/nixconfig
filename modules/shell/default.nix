@@ -136,9 +136,9 @@ in {
           style = "bold italic bright-blue";
           format = "([⎪$ahead_behind$staged$modified$untracked$renamed$deleted$conflicted$stashed⎥]($style))";
           conflicted = "[◪◦](italic bright-magenta)";
-          ahead = "[▴│[$${count}](bold white)│](italic green)";
-          behind = "[▿│[$${count}](bold white)│](italic red)";
-          diverged = "[◇ ▴┤[$${ahead_count}](regular white)│▿┤[$${behind_count}](regular white)│](italic bright-magenta)";
+          ahead = "[▴│[\${count}](bold white)│](italic green)";
+          behind = "[▿│[\${count}](bold white)│](italic red)";
+          diverged = "[◇ ▴┤[\${ahead_count}](regular white)│▿┤[\${behind_count}](regular white)│](italic bright-magenta)";
           untracked = "[◌◦](italic bright-yellow)";
           stashed = "[◃◈](italic white)";
           modified = "[●◦](italic yellow)";
@@ -148,7 +148,7 @@ in {
         };
         memory_usage = {
           symbol = "▪▫▪ ";
-          format = " mem [$${ram}( $${swap})]($style)";
+          format = " mem [\${ram}( \${swap})]($style)";
         };
         aws = {
           disabled = true;
@@ -157,9 +157,9 @@ in {
           symbol = "▲ ";
         };
         python = {
-          format = " [py](italic) [$${symbol}$${version}]($style)";
+          format = " [py](italic) [\${symbol}\${version}]($style)";
           symbol = "[⌉](bold bright-blue)⌊ ";
-          version_format = "$${raw}";
+          version_format = "\${raw}";
           style = "bold bright-yellow";
         };
         conda = {
@@ -179,14 +179,14 @@ in {
           unknown_msg = "[◌](bold dimmed ellow)";
         };
         lua = {
-          format = " [lua](italic) [$${symbol}$${version}]($style)";
-          version_format = "$${raw}";
+          format = " [lua](italic) [\${symbol}\${version}]($style)";
+          version_format = "\${raw}";
           symbol = "⨀ ";
           style = "bold bright-yellow";
         };
         nodejs = {
           format = " [node](italic) [◫ ($version)](bold bright-green)";
-          version_format = "$${raw}";
+          version_format = "\${raw}";
           detect_files = ["package-lock.json" "yarn.lock"];
           detect_folders = ["node_modules"];
           detect_extensions = [];

@@ -45,14 +45,26 @@ export USER=$(whoami)
 yq -i '.keys += (env(AGE) | . anchor = env(HOST)+env(USER)) | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' .sops.yaml
 ```
 
+### Installing Tailscale
+
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+```
+
+### Installing Nix
+
+```bash
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
+```
+
 ### Setting Up Home-Manager
 
 ```bash
 nix run home-manager/master -- switch --flake
-home-manager switch --flake .?submodules=1#$(hostname)
+home-manager switch --flake github:/shaoyanji/nixconfig?submodules=1#$(hostname)
 ```
 
-put this in ```~/etc/nix/nix.conf```
+put this in `~/etc/nix/nix.conf`
 
 ```ini
 experimental-features = nix-command flakes

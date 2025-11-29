@@ -207,9 +207,6 @@ in {
               inherit pkgs;
             };
           };
-          allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-               "tabnine"
-             ];
         }
       '';
     "elvish/rc.elv".source = builtins.fetchurl {

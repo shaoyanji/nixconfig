@@ -36,20 +36,20 @@
     # neovim.enable = true;
     # vim.enable = true;
 
-    # mpv = {
-    #   enable = true;
-    #   package = config.lib.nixGL.wrap pkgs.mpv;
-    #   config = {
-    #     profile = "fast";
-    #     hwdec = "auto";
-    #     force-window = true;
-    #   };
-    #   bindings = {
-    #     WHEEL_UP = "seek 10";
-    #     WHEEL_DOWN = "seek -10";
-    #     "Alt+0" = "set window-scale 0.5";
-    #   };
-    # };
+    mpv = {
+      enable = true;
+      #   package = config.lib.nixGL.wrap pkgs.mpv;
+      #   config = {
+      #     profile = "fast";
+      #     hwdec = "auto";
+      #     force-window = true;
+      #   };
+      #   bindings = {
+      #     WHEEL_UP = "seek 10";
+      #     WHEEL_DOWN = "seek -10";
+      #     "Alt+0" = "set window-scale 0.5";
+      #   };
+    };
 
     # yt-dlp = {
     #   enable = true;
@@ -127,7 +127,7 @@
     homeDirectory = "/home/devji";
     packages = with pkgs; [
       totp-cli
-      ani-cli
+      # ani-cli
       nix-output-monitor
       lowfi
       duf

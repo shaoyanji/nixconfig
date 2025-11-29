@@ -85,4 +85,14 @@
       };
     };
   };
+  home = {
+    packages = with pkgs; [
+      ytcast
+    ];
+    file = {
+    };
+    sessionVariables = {
+    };
+    sessionPath = [];
+  };
 }

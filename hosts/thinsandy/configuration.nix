@@ -59,6 +59,12 @@
   # services.pihole-ftl.enable = true;
   # services.pihole-web.enable = true;
   # services.pihole-web.ports = ["80r" "443s"];
+  services.stirling-pdf.enable = true;
+  services.stirling-pdf.environment = {
+    SERVER_HOST = "0.0.0.0";
+    SERVER_PORT = 7351;
+    INSTALL_BOOK_AND_ADVANCED_HTML_OPS = "true";
+  };
   services.plex = {
     enable = true;
     openFirewall = true;
@@ -245,6 +251,7 @@
   #    clusterInit = true;
   #  };
   networking.firewall.allowedTCPPorts = [
+    7351 #Stirling PDF
     #    6443 # k3s: required so that pods can reach the API server (running on port 6443 by default)
     #    #    2379 # k3s, etcd clients: required if using a "High Availability Embedded etcd" configuration
     #    #    2380 # k3s, etcd peers: required if using a "High Availability Embedded etcd" configuration

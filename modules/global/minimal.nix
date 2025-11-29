@@ -32,6 +32,7 @@ in {
     # ../shell/nushell.nix
   ];
 
+  programs.nixvim.enable = true;
   home = {
     stateVersion = "25.05";
     packages = with pkgs;

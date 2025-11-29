@@ -9,7 +9,7 @@
     ./nixoshmsymlinks.nix
     ./himalaya.nix
   ];
-  programs.nixvim.enable = true;
+  # programs.nixvim.enable = true;
   home.activation.removeExistingGitConfig = lib.hm.dag.entryAfter ["checkLinkTargets"] ''
     rm -f ~/.gitconfig
   '';

@@ -111,7 +111,7 @@
     };
   };
   services = {
-    kbfs.enable = true;
+    # kbfs.enable = true;
     keybase.enable = true;
     home-manager.autoExpire.enable = true;
   };

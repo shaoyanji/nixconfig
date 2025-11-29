@@ -107,8 +107,17 @@
     ];
   };
   # Fonts
-  fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-    #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; }) # 24.11
-  ];
+  fonts = {
+    enableDefaultFonts = true;
+    enableGhostscriptFonts = true;
+    fontconfig.defaultFonts = {
+      serif = ["Noto Serif"];
+      sansSerif = ["Noto Sans"];
+      monospace = ["JetBrainsMono Nerd Font"];
+    };
+    packages = with pkgs; [
+      nerd-fonts.jetbrains-mono
+      #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; }) # 24.11
+    ];
+  };
 }

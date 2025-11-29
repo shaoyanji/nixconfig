@@ -3,31 +3,60 @@
   home.homeDirectory = "/home/kali";
 
   imports = [
-    # ../modules/global/minimal.nix
-    ../modules/global/home.nix
-    ../modules/nixoshmsymlinks.nix
+    ../modules/env.nix
+    ../modules/shell/nushell.nix
+    ../modules/shell/tmux.nix
+    ../modules/shell/starship.nix
+    ../modules/global/minimal.nix
+    ../modules/helix.nix
+    # ../modules/global/home.nix
   ];
-  programs.starship.enable = true;
-  home.packages = with pkgs; [
-    lolcat
-    figlet
-    jp2a
-    graph-easy
-    graphviz
-    tgpt
-    comrak
-    go
-    gobuster
-    steghide
-    pandoc
-    # aircrack-ng
-    powershell
-    secretscanner
-    # seclists
-    yt-dlp
-  ];
-  home.sessionVariables = {
-    TERM = "xterm-256color";
+  home = {
+    packages = with pkgs; [
+      lolcat
+      figlet
+      jp2a
+      graph-easy
+      graphviz
+      tgpt
+      comrak
+      go
+      gobuster
+      steghide
+      pandoc
+      zoxide
+      # aircrack-ng
+      powershell
+      secretscanner
+      # seclists
+      yt-dlp
+      ytfzf
+      mpv
+    ];
+    stateVersion = "25.11";
+    sessionVariables = {
+      EDITOR = "hx";
+      invidious_instance = "https://inv.perditum.com";
+    };
+  };
+  programs = {
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+      enableBashIntegration = true;
+    };
+    zoxide = {
+      enable = true;
+      enableNushellIntegration = true;
+      options = [
+        # "--cmd cd"
+      ];
+    };
+    fzf.enable = true;
+    fzf.tmux.enableShellIntegration = true;
+    home.sessionVariables = {
+      TERM = "xterm-256color";
+    };
   };
   programs.home-manager.enable = true;
 }

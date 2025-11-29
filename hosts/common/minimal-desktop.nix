@@ -75,7 +75,7 @@ in {
     tailscale.enable = true;
     tailscale.useRoutingFeatures = "both";
     resolved.enable = true;
-    resolved.domains = ["~."];
+    resolved.domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
   };
 
   programs.nix-ld = {

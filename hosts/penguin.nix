@@ -36,20 +36,20 @@
     # neovim.enable = true;
     # vim.enable = true;
 
-    mpv = {
-      enable = true;
-      #   package = config.lib.nixGL.wrap pkgs.mpv;
-      #   config = {
-      #     profile = "fast";
-      #     hwdec = "auto";
-      #     force-window = true;
-      #   };
-      #   bindings = {
-      #     WHEEL_UP = "seek 10";
-      #     WHEEL_DOWN = "seek -10";
-      #     "Alt+0" = "set window-scale 0.5";
-      #   };
-    };
+    # mpv = {
+    # enable = true;
+    #   package = config.lib.nixGL.wrap pkgs.mpv;
+    #   config = {
+    #     profile = "fast";
+    #     hwdec = "auto";
+    #     force-window = true;
+    #   };
+    #   bindings = {
+    #     WHEEL_UP = "seek 10";
+    #     WHEEL_DOWN = "seek -10";
+    #     "Alt+0" = "set window-scale 0.5";
+    #   };
+    # };
 
     # yt-dlp = {
     #   enable = true;
@@ -135,10 +135,11 @@
       go-task
       glow
       cloak
-      ffmpeg
+      mpv
+      # ffmpeg
       # yt-dlp
       # wl-clipboard
-      ytfzf
+      # ytfzf
       # nixgl.nixGLIntel
     ];
     stateVersion = "24.11";

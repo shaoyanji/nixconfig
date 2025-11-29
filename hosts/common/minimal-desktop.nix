@@ -73,6 +73,9 @@ in {
     };
     pulseaudio.enable = false;
     tailscale.enable = true;
+    tailscale.useRoutingFeatures = "both";
+    resolved.enable = true;
+    resolved.domains = ["~."];
   };
 
   programs.nix-ld = {

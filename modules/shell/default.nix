@@ -13,6 +13,7 @@
     cat = "${pkgs.bat}/bin/bat -p";
     grep = "${pkgs.ripgrep}/bin/rg";
     tb = "nc termbin.com 9999";
+    ll = "ls -alF";
   };
 in {
   imports = [
@@ -46,6 +47,7 @@ in {
     fzf.enable = true;
     fzf.enableBashIntegration = true;
     fzf.tmux.enableShellIntegration = true;
+    ripgrep.enable = true;
   };
   home.packages = with pkgs; [
     zoxide

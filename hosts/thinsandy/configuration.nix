@@ -59,6 +59,11 @@
   # services.pihole-ftl.enable = true;
   # services.pihole-web.enable = true;
   # services.pihole-web.ports = ["80r" "443s"];
+  services.plex = {
+    enable = true;
+    openFirewall = true;
+    user = "devji";
+  };
   services.crab-hole.enable = true;
   services.crab-hole.settings = {
     #   api = {

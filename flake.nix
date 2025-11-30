@@ -120,6 +120,7 @@
       kickstart-nixvim.homeManagerModules.default
       sops-nix.homeManagerModules.sops
       nix-index-database.homeModules.nix-index
+      chaotic.homeManagerModules.default # IMPORTANT
     ];
   in
     inputs.flake-utils.lib.eachDefaultSystem (

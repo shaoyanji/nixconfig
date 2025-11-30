@@ -144,12 +144,6 @@
       homeConfigurations = {
         penguin = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
-          # pkgs = import nixpkgs {
-          # system = "x86_64-linux";
-          # overlays = [
-          # nixgl.overlay
-          # ];
-          # };
           pkgs = nixpkgs.legacyPackages."x86_64-linux";
           modules =
             globalModulesHome
@@ -173,25 +167,6 @@
             globalModulesHome
             ++ [
               ./hosts/kali.nix
-            ];
-        };
-        devji = home-manager.lib.homeManagerConfiguration {
-          extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          # pkgs = nixpkgs.legacyPackages."aarch64-linux";
-          modules =
-            globalModulesHome
-            ++ [
-              ./modules/global/home.nix
-            ];
-        };
-        verntil = home-manager.lib.homeManagerConfiguration {
-          extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules =
-            globalModulesHome
-            ++ [
-              ./hosts/verntil.nix
             ];
         };
       };

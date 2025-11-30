@@ -16,6 +16,7 @@
   home.packages = with pkgs; [
     xwayland-satellite # xwayland support
     swaybg # wallpaper
+    kando
     # firefox-bin
   ];
   home.file."Pictures/Wallpapers/yqKnYa.jpg".source = builtins.fetchurl {
@@ -27,7 +28,7 @@
   #   sha256 = "sha256:05bbav6xc8rx1fki49iv6y7grncp22afal6an31jjkqw2scq6bsd";
   # };
   xdg.configFile."niri/config.kdl".source = builtins.fetchurl {
-    url = "https://gist.githubusercontent.com/shaoyanji/f675c27adaaac753b35af9141568b78b/raw/c545b19c872e0fc4051f0ead3c20928ce793b246/config.kdl";
-    sha256 = "sha256:0f2r9zr7xam1816ppm36cpzddgxbxm0b2l02vlpxl9vhargaq5ss";
+    url = "https://gist.githubusercontent.com/shaoyanji/f675c27adaaac753b35af9141568b78b/raw/a8959b808456109a1e88b5bf2f9c5f1c44341d10/config.kdl";
+    sha256 = "sha256:16d54yw27h9an8ldnsvhcyn3zn1y60yikaap945nkidhgy06xcws";
   };
 }

@@ -1,5 +1,4 @@
 {
-  inputs,
   pkgs,
   lib,
   ...
@@ -189,7 +188,7 @@ in {
     file = {};
 
     sessionVariables = {
-      EDITOR = "nvim";
+      EDITOR = lib.mkDefault "nvim";
       GUM_CHOOSE_SELECTED_FOREGROUND = 50;
       GUM_CHOOSE_CURSOR_FOREGROUND = 50;
       GUM_CHOOSE_HEADER_FOREGROUND = 30;

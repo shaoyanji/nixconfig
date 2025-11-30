@@ -3,11 +3,9 @@
   pkgs,
   inputs,
   ...
-}:
-let
+}: let
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-in
-{
+in {
   home.username = "jisifu";
   home.homeDirectory = "/home/jisifu";
   home.stateVersion = "22.05";
@@ -17,10 +15,8 @@ in
     ../modules/lf
     ../modules/shell
     ../modules/helix.nix
-    inputs.kickstart-nixvim.homeManagerModules.default
   ];
 
-  programs.nixvim.enable = true;
   home.packages = with pkgs; [
     sops
     nix-index

@@ -23,6 +23,7 @@
         ani-cli
       ]
       ++ lib.optionals stdenv.isLinux [
+        audacity
         mpv
         # yank
         gnuplot

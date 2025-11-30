@@ -9,6 +9,7 @@
     # ruff
   ];
   programs.helix = {
+    package = pkgs.evil-helix;
     languages.language = [
       {
         name = "bash";

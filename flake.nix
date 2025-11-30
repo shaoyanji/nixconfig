@@ -182,7 +182,7 @@
           modules =
             globalModulesHome
             ++ [
-              ./modules/global/heim.nix
+              ./modules/global/home.nix
             ];
         };
         verntil = home-manager.lib.homeManagerConfiguration {

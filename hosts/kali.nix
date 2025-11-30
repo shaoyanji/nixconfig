@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   home.username = "kali";
   home.homeDirectory = "/home/kali";
 
@@ -33,7 +37,7 @@
       ytfzf
       mpv
     ];
-    stateVersion = "25.11";
+    stateVersion = lib.mkDefault "25.11";
     sessionVariables = {
       EDITOR = "hx";
       invidious_instance = "https://inv.perditum.com";

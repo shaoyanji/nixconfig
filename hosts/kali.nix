@@ -1,8 +1,4 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   home.username = "kali";
   home.homeDirectory = "/home/kali";
 

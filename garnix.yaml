@@ -11,12 +11,11 @@ builds:
     # - "*.x86_64-linux.*"
     # - devShell.x86_64-linux
     # - nixosConfigurations.thinsandy
-    # - nixosConfigurations.ancientace
     # - homeConfigurations.penguin
     # - "*.aarch64-darwin.*"
     # - "*.aarch64-linux.*"
-    # - nixosConfigurations.*
-    # - homeConfigurations.*
+    - nixosConfigurations.*
+    - homeConfigurations.*
     # - darwinConfigurations.*
 servers:
   - configuration: garnixMachine

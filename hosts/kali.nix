@@ -37,6 +37,7 @@
     sessionVariables = {
       EDITOR = "hx";
       invidious_instance = "https://inv.perditum.com";
+      TERM = "xterm-256color";
     };
   };
   programs = {
@@ -54,9 +55,6 @@
     };
     fzf.enable = true;
     fzf.tmux.enableShellIntegration = true;
-    home.sessionVariables = {
-      TERM = "xterm-256color";
-    };
   };
   programs.home-manager.enable = true;
 }

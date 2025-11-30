@@ -14,7 +14,7 @@ builds:
     # - homeConfigurations.penguin
     # - "*.aarch64-darwin.*"
     # - "*.aarch64-linux.*"
-    - nixosConfigurations.*
+    # - nixosConfigurations.*
     - homeConfigurations.*
     # - darwinConfigurations.*
 servers:

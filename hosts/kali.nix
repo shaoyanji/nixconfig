@@ -37,7 +37,7 @@
       ytfzf
       mpv
     ];
-    stateVersion = lib.mkDefault "25.11";
+    # stateVersion = lib.mkDefault "25.11";
     sessionVariables = {
       EDITOR = "hx";
       invidious_instance = "https://inv.perditum.com";

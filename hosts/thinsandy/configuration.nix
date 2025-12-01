@@ -59,6 +59,31 @@
   # services.pihole-ftl.enable = true;
   # services.pihole-web.enable = true;
   # services.pihole-web.ports = ["80r" "443s"];
+  services.home-assistant = {
+    enable = true;
+    extraComponents = [
+      # "no_ip"
+      # "lidarr"
+      # "sonarr"
+      # "radarr"
+      "jellyfin"
+      "plex"
+      "tailscale"
+      "fritzbox"
+      "pi_hole"
+      # "philips_js"
+      # "qrcode"
+      # "youtube"
+      "github"
+      "immich"
+      # "esphome"
+      "met"
+      "radio_browser"
+    ];
+    config = {
+      default_config = {};
+    };
+  };
   services.stirling-pdf.enable = true;
   services.stirling-pdf.environment = {
     SERVER_HOST = "0.0.0.0";
@@ -251,6 +276,7 @@
   #    clusterInit = true;
   #  };
   networking.firewall.allowedTCPPorts = [
+    8123 #HomeAssistant
     7351 #Stirling PDF
     #    6443 # k3s: required so that pods can reach the API server (running on port 6443 by default)
     #    #    2379 # k3s, etcd clients: required if using a "High Availability Embedded etcd" configuration

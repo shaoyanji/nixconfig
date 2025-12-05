@@ -17,6 +17,7 @@
       inputs.sops-nix.homeManagerModules.sops
       inputs.kickstart-nixvim.homeManagerModules.default
       inputs.nix-index-database.homeModules.nix-index
+      # inputs.niri.homeModules.niri
     ];
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
   };

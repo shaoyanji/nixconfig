@@ -55,6 +55,20 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    dgop = {
+      url = "github:AvengeMedia/dgop";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    dankMaterialShell = {
+      url = "github:AvengeMedia/DankMaterialShell";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.dgop.follows = "dgop";
+    };
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -90,6 +104,8 @@
         nur.modules.nixos.default
         chaotic.nixosModules.default
         nix-index-database.nixosModules.nix-index
+        inputs.niri.nixosModules.niri
+        inputs.dankMaterialShell.nixosModules.dankMaterialShell
         #lix-module.nixosModules.default
         #determinate.nixosModules.default
       ];

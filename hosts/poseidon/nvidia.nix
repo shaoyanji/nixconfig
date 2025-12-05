@@ -4,7 +4,7 @@
   ];
   services.xserver.videoDrivers = ["amdgpu"];
   hardware.nvidia = {
-    open = true;
+    # open = true;
     package = config.boot.kernelPackages.nvidiaPackages.beta;
     prime = {
       nvidiaBusId = "PCI:1:0:0";

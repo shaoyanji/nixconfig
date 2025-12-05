@@ -12,7 +12,7 @@
       imports = [
         ./heim.nix
       ];
-      home.programs.dankMaterialShell = {
+      programs.dankMaterialShell = {
         enable = true;
         systemd = {
           enable = true; # Systemd service for auto-start

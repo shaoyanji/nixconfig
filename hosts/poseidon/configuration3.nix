@@ -17,7 +17,24 @@
     #variables = {
     # };
   };
-
+  programs.dankMaterialShell = {
+    enable = true;
+    systemd = {
+      enable = true; # Systemd service for auto-start
+      restartIfChanged = true; # Auto-restart dms.service when dankMaterialShell changes
+    };
+    niri = {
+      enableKeybinds = true; # Automatic keybinding configuration
+      enableSpawn = true; # Auto-start DMS with niri
+    };
+    default.settings = {
+      theme = "dark";
+      dynamicTheming = true;
+      # Add any other settings here
+    };
+  };
+  systemd.user.services.niri-flake-polkit.enable = false;
+  # programs.dankMaterialShell.enable = true;
   # qt.enable = true;
 
   services = {

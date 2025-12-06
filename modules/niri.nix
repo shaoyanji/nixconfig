@@ -9,8 +9,9 @@
   #   colors.background = "ffffffff";
   # };
   # programs.firefox.enable = true;
-  programs.niri.settings.environment."NIXOS_OZONE_WL" = "1";
   programs.niri.settings = {
+    hotkey-overlay.skip-at-startup = true;
+    environment."NIXOS_OZONE_WL" = "1";
     input.focus-follows-mouse.enable = true;
     input.warp-mouse-to-focus.enable = true;
     layout.focus-ring.enable = false;
@@ -25,15 +26,20 @@
     # geometry-corner-radius = 12;
     # clip-to-geometry = true;
     # };
-    # window-rules."Kando Menu" = {
-    # matches."Kando Menu".title = {
-    # open-floating = true;
-    # border = "off";
-    # shadown = "off";
-    # };
-    # };
+    window-rules = [
+      # {
+      #   matches = {
+      #     "Kando Menu".title = {
+      #       open-floating = true;
+      #       border = "off";
+      #       shadow = "off";
+      #     };
+      #   };
+      # }
+    ];
     # prefer-no-csd = true;
     binds = {
+      "Mod+Shift+Slash".action.show-hotkey-overlay = [];
       "Mod+Print".action.screenshot-screen = {show-pointer = false;};
       "Mod+A".action.spawn = "fuzzel";
       "Mod+T".action.spawn-sh = "kitty -- tmux";
@@ -42,7 +48,10 @@
       "Mod+C".action.spawn-sh = "obsidian";
       "Mod+B".action.spawn-sh = "kando -m 'Kando Menu'";
 
-      "Mod+Return".action.spawn-sh = "kitty -- lf";
+      "Mod+W".action.toggle-window-floating = [];
+
+      # "Mod+Return".action.spawn-sh = "kitty -- lf";
+      "Mod+Return".action.toggle-overview = [];
       "Ctrl+Space".action.spawn-sh = "kando -m 'Kando Menu'";
 
       "Mod+H".action.focus-column-left = [];
@@ -124,7 +133,7 @@
     enableSystemSound = true; # System sound effects
     niri = {
       enableKeybinds = true; # Automatic keybinding configuration
-      enableSpawn = true; # Auto-start DMS with niri
+      # enableSpawn = true; # Auto-start DMS with niri
     };
     default.settings = {
       theme = "dark";

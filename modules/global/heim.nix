@@ -9,7 +9,7 @@
     ./home.nix
     # ../caelestia.nix
     # ../hypr
-    ../hypr/waybar.nix
+    # ../hypr/waybar.nix
     ../niri.nix
     ../dev.nix
     ../kitty

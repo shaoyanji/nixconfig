@@ -34,6 +34,7 @@
     # };
     # prefer-no-csd = true;
     binds = {
+      "Mod+Print".action.screenshot-screen = {show-pointer = false;};
       "Mod+A".action.spawn = "fuzzel";
       "Mod+T".action.spawn-sh = "kitty -- tmux";
 
@@ -44,15 +45,46 @@
       "Mod+Return".action.spawn-sh = "kitty -- lf";
       "Ctrl+Space".action.spawn-sh = "kando -m 'Kando Menu'";
 
-      # "Mod+H" = {
-      # action = "focus-column-left";
-      # hotkey-overlay.title = "Toggle Clipboard Manager";
-      # };
-      # "Mod+H".action.hotkey-overlay = "focus-column-left";
-      # "Mod+J".action.focus-window-down.enable = true;
-      # "Mod+K".action.focus-window-up.enable = true;
-      # "Mod+L".action.focus-column-right.enable = true;
+      "Mod+H".action.focus-column-left = [];
+      "Mod+J".action.focus-workspace-down = [];
+      "Mod+K".action.focus-workspace-up = [];
+      "Mod+L".action.focus-column-right = [];
 
+      "Mod+Shift+H".action.focus-monitor-left = [];
+      "Mod+Shift+J".action.focus-workspace-down = [];
+      "Mod+Shift+K".action.focus-workspace-up = [];
+      "Mod+Shift+L".action.focus-monitor-right = [];
+
+      "Mod+Ctrl+H".action.move-column-left = [];
+      "Mod+Ctrl+J".action.move-column-to-workspace-down = [];
+      "Mod+Ctrl+K".action.move-column-to-workspace-up = [];
+      "Mod+Ctrl+L".action.move-column-right = [];
+
+      "Mod+Ctrl+Shift+H".action.move-column-to-monitor-left = [];
+      "Mod+Ctrl+Shift+J".action.move-column-to-workspace-down = [];
+      "Mod+Ctrl+Shift+K".action.move-column-to-workspace-up = [];
+      "Mod+Ctrl+Shift+L".action.move-column-to-monitor-right = [];
+
+      "Mod+Q".action.close-window = [];
+      "Mod+Q".repeat = false;
+      "Mod+F".action.maximize-column = [];
+      "Mod+Shift+F".action.fullscreen-window = [];
+      "Mod+R".action.switch-preset-column-width = [];
+      # "Mod+Shift+R".action.switch-preset-window-height = [];
+      # "Mod+Comma".action.consume-window-into-column = [];
+      # "Mod+Period".action.expel-window-from-column = [];
+      "Mod+S".action.screenshot = [];
+      "Mod+WheelScrollDown".action.focus-workspace-down = [];
+      "Mod+WheelScrollUp".action.focus-workspace-up = [];
+      "Mod+Ctrl+WheelScrollDown".action.move-column-to-workspace-down = [];
+      "Mod+Ctrl+WheelScrollUp".action.move-column-to-workspace-up = [];
+
+      "Mod+WheelScrollDown".cooldown-ms = 150;
+      "Mod+WheelScrollUp".cooldown-ms = 150;
+      "Mod+Ctrl+WheelScrollDown".cooldown-ms = 150;
+      "Mod+Ctrl+WheelScrollUp".cooldown-ms = 150;
+
+      "Mod+0".action.focus-workspace-previous = [];
       "Mod+1".action.focus-workspace = 1;
       "Mod+2".action.focus-workspace = 2;
       "Mod+3".action.focus-workspace = 3;

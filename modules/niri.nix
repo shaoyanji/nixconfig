@@ -45,10 +45,14 @@
       "Mod+T".action.spawn-sh = "kitty -- tmux";
 
       "Mod+Z".action.spawn = "zen";
-      "Mod+C".action.spawn-sh = "obsidian";
+      "Mod+C".action.spawn-sh = "kitty -- task";
+      # "Mod+C".action.spawn-sh = "obsidian";
       "Mod+B".action.spawn-sh = "kando -m 'Kando Menu'";
 
       "Mod+W".action.toggle-window-floating = [];
+      "Mod+E".action.switch-focus-between-floating-and-tiling = [];
+      "Mod+BracketLeft".action.consume-or-expel-window-left = [];
+      "Mod+BracketRight".action.consume-or-expel-window-right = [];
 
       # "Mod+Return".action.spawn-sh = "kitty -- lf";
       "Mod+Return".action.toggle-overview = [];
@@ -82,6 +86,8 @@
       # "Mod+Shift+R".action.switch-preset-window-height = [];
       # "Mod+Comma".action.consume-window-into-column = [];
       # "Mod+Period".action.expel-window-from-column = [];
+      "Mod+U".action.focus-monitor-previous = [];
+      "Mod+I".action.focus-workspace-previous = [];
       "Mod+S".action.screenshot = [];
       "Mod+WheelScrollDown".action.focus-workspace-down = [];
       "Mod+WheelScrollUp".action.focus-workspace-up = [];
@@ -117,10 +123,10 @@
   };
   programs.dankMaterialShell = {
     enable = true;
-    systemd = {
-      enable = true; # Systemd service for auto-start
-      restartIfChanged = true; # Auto-restart dms.service when dankMaterialShell changes
-    };
+    # systemd = {
+    # enable = true; # Systemd service for auto-start
+    # restartIfChanged = true; # Auto-restart dms.service when dankMaterialShell changes
+    # };
     # Core features
     enableSystemMonitoring = true; # System monitoring widgets (dgop)
     enableClipboard = true; # Clipboard history manager
@@ -133,7 +139,7 @@
     enableSystemSound = true; # System sound effects
     niri = {
       enableKeybinds = true; # Automatic keybinding configuration
-      # enableSpawn = true; # Auto-start DMS with niri
+      enableSpawn = true; # Auto-start DMS with niri
     };
     default.settings = {
       theme = "dark";
@@ -142,7 +148,7 @@
     };
   };
   # programs.swaylock.enable = true; # Super+Alt+L in the default setting (screen locker)
-  services.mako.enable = true; # notification daemon
+  # services.mako.enable = true; # notification daemon
   # services.swayidle.enable = true; # idle management daemon
   # services.polkit-gnome.enable = true; # polkit
   home.packages = with pkgs; [

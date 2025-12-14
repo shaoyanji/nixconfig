@@ -37,6 +37,7 @@ in {
     packages = with pkgs;
       pkgstxt
       ++ [
+        http-nu
         aha
         tesseract
         pandoc

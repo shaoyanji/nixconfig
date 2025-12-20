@@ -121,7 +121,8 @@
       "Mod+Ctrl+9".action.move-column-to-workspace = 9;
     };
   };
-  programs.dankMaterialShell = {
+  programs.dms-shell = {
+    # programs.dankMaterialShell = {
     enable = true;
     # systemd = {
     # enable = true; # Systemd service for auto-start

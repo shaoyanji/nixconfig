@@ -18,8 +18,8 @@
       inputs.kickstart-nixvim.homeManagerModules.default
       inputs.nix-index-database.homeModules.nix-index
       # inputs.niri.homeModules.niri
-      inputs.dankMaterialShell.homeModules.dankMaterialShell.default
-      inputs.dankMaterialShell.homeModules.dankMaterialShell.niri
+      inputs.dms.homeModules.dankMaterialShell.default
+      inputs.dms.homeModules.dankMaterialShell.niri
     ];
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
   };

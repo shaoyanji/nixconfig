@@ -60,10 +60,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    dankMaterialShell = {
+    dms = {
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.dgop.follows = "dgop";
+      # inputs.dgop.follows = "dgop";
     };
     niri = {
       url = "github:sodiboo/niri-flake";
@@ -105,7 +105,7 @@
         chaotic.nixosModules.default
         nix-index-database.nixosModules.nix-index
         inputs.niri.nixosModules.niri
-        inputs.dankMaterialShell.nixosModules.dankMaterialShell
+        inputs.dms.nixosModules.dankMaterialShell
         #lix-module.nixosModules.default
         #determinate.nixosModules.default
       ];

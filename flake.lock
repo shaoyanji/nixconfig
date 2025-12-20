@@ -40,30 +40,6 @@
         "type": "github"
       }
     },
-    "dankMaterialShell": {
-      "inputs": {
-        "dgop": [
-          "dgop"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "quickshell": "quickshell"
-      },
-      "locked": {
-        "lastModified": 1766242681,
-        "narHash": "sha256-yiZxxOu9Way4MqjoFoFu9RW242do7c7/KXfVbYkibuA=",
-        "owner": "AvengeMedia",
-        "repo": "DankMaterialShell",
-        "rev": "dca07a70f8269e3cb598095cf0b22e65e1c72082",
-        "type": "github"
-      },
-      "original": {
-        "owner": "AvengeMedia",
-        "repo": "DankMaterialShell",
-        "type": "github"
-      }
-    },
     "dgop": {
       "inputs": {
         "nixpkgs": [
@@ -76,6 +52,27 @@
         "owner": "AvengeMedia",
         "repo": "dgop",
         "rev": "0ff697a4e3418966caa714c838fc73f1ef6ba59b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "dgop",
+        "type": "github"
+      }
+    },
+    "dgop_2": {
+      "inputs": {
+        "nixpkgs": [
+          "dms",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1762835999,
+        "narHash": "sha256-UykYGrGFOFTmDpKTLNxj1wvd1gbDG4TkqLNSbV0TYwk=",
+        "owner": "AvengeMedia",
+        "repo": "dgop",
+        "rev": "799301991cd5dcea9b64245f9d500dcc76615653",
         "type": "github"
       },
       "original": {
@@ -101,6 +98,28 @@
       "original": {
         "owner": "nix-community",
         "repo": "disko",
+        "type": "github"
+      }
+    },
+    "dms": {
+      "inputs": {
+        "dgop": "dgop_2",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "quickshell": "quickshell"
+      },
+      "locked": {
+        "lastModified": 1766242681,
+        "narHash": "sha256-yiZxxOu9Way4MqjoFoFu9RW242do7c7/KXfVbYkibuA=",
+        "owner": "AvengeMedia",
+        "repo": "DankMaterialShell",
+        "rev": "dca07a70f8269e3cb598095cf0b22e65e1c72082",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "DankMaterialShell",
         "type": "github"
       }
     },
@@ -677,7 +696,7 @@
     "quickshell": {
       "inputs": {
         "nixpkgs": [
-          "dankMaterialShell",
+          "dms",
           "nixpkgs"
         ]
       },
@@ -699,9 +718,9 @@
     "root": {
       "inputs": {
         "chaotic": "chaotic",
-        "dankMaterialShell": "dankMaterialShell",
         "dgop": "dgop",
         "disko": "disko",
+        "dms": "dms",
         "firefox-addons": "firefox-addons",
         "flake-utils": "flake-utils",
         "garnix-lib": "garnix-lib",

@@ -105,7 +105,7 @@
         chaotic.nixosModules.default
         nix-index-database.nixosModules.nix-index
         inputs.niri.nixosModules.niri
-        inputs.dms.nixosModules.dankMaterialShell
+        inputs.dms.nixosModules.dank-material-shell
         #lix-module.nixosModules.default
         #determinate.nixosModules.default
       ];

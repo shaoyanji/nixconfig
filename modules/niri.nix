@@ -122,7 +122,7 @@
     };
   };
   # programs.dms-shell = {
-  programs.dankMaterialShell = {
+  programs.dank-material-shell = {
     enable = true;
     # systemd = {
     # enable = true; # Systemd service for auto-start

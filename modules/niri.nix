@@ -44,7 +44,7 @@
       "Mod+A".action.spawn = "fuzzel";
       "Mod+T".action.spawn-sh = "kitty -- tmux";
 
-      "Mod+Z".action.spawn = "zen";
+      "Mod+Z".action.spawn = "zen-beta";
       "Mod+C".action.spawn-sh = "kitty -- task";
       # "Mod+C".action.spawn-sh = "obsidian";
       "Mod+B".action.spawn-sh = "kando -m 'Kando Menu'";

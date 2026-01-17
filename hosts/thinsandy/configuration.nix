@@ -59,6 +59,17 @@
   # services.pihole-ftl.enable = true;
   # services.pihole-web.enable = true;
   # services.pihole-web.ports = ["80r" "443s"];
+  services.anki-sync-server = {
+    enable = true;
+    address = "0.0.0.0";
+    openFirewall = true;
+    users = [
+      {
+        username = "bob";
+        password = "password";
+      }
+    ];
+  };
   services.home-assistant = {
     enable = true;
     extraComponents = [

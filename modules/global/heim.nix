@@ -17,7 +17,13 @@
   programs = {
     zed-editor.enable = true;
     zed-editor.package = pkgs.zed-editor-fhs_git;
-    anki.enable = true;
+    anki = {
+      enable = true;
+      sync = {
+        username = "bob";
+        url = "http://thinsandy.fritz.box:27701";
+      };
+    };
     # quickshell.enable = true;
     element-desktop.enable = true;
 

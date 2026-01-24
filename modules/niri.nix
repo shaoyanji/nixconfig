@@ -142,7 +142,7 @@
       enableKeybinds = true; # Automatic keybinding configuration
       enableSpawn = true; # Auto-start DMS with niri
     };
-    default.settings = {
+    settings = {
       theme = "dark";
       dynamicTheming = true;
       # Add any other settings here

@@ -40,26 +40,6 @@
         "type": "github"
       }
     },
-    "dgop": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1765838956,
-        "narHash": "sha256-A3a2ZfvjirX8VIdIPI+nAyukWs6vx4vet3fU0mpr7lU=",
-        "owner": "AvengeMedia",
-        "repo": "dgop",
-        "rev": "0ff697a4e3418966caa714c838fc73f1ef6ba59b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "AvengeMedia",
-        "repo": "dgop",
-        "type": "github"
-      }
-    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -88,11 +68,11 @@
         "quickshell": "quickshell"
       },
       "locked": {
-        "lastModified": 1767153830,
-        "narHash": "sha256-CP2T5tW4wEhDEkcltmO4Sob4WcLXjyFK/fpkldRh85c=",
+        "lastModified": 1769227824,
+        "narHash": "sha256-gSHuF84M9Gfuc0KZz3tpZ9wCtjf9JyVeSWxEtX8WZnY=",
         "owner": "AvengeMedia",
         "repo": "DankMaterialShell",
-        "rev": "621710bd86d9c7c523f65d2522a99e822adae84a",
+        "rev": "816819bf9ffed85de43a1bb8ad6cbdae33cededb",
         "type": "github"
       },
       "original": {
@@ -696,7 +676,6 @@
     "root": {
       "inputs": {
         "chaotic": "chaotic",
-        "dgop": "dgop",
         "disko": "disko",
         "dms": "dms",
         "firefox-addons": "firefox-addons",

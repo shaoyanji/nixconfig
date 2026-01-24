@@ -1,10 +1,14 @@
-{config, ...}: {
+{
+  config,
+  lib,
+  ...
+}: {
   imports = [
     ../common/nvidia.nix
   ];
-  services.xserver.videoDrivers = ["amdgpu"];
+  services.xserver.videoDrivers = ["amdgpu" "nvidia"];
   hardware.nvidia = {
-    # open = true;
+    open = lib.mkForce true;
     package = config.boot.kernelPackages.nvidiaPackages.beta;
     prime = {
       nvidiaBusId = "PCI:1:0:0";

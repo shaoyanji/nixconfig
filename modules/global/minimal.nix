@@ -160,7 +160,7 @@ in {
         ticker
         obsidian-export
         ots
-        xq
+        # xq
       ]
       ++ lib.optionals stdenv.isLinux [
         tuir

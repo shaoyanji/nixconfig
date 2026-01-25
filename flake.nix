@@ -14,7 +14,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    # chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -78,7 +78,7 @@
     home-manager,
     impermanence,
     disko,
-    chaotic,
+    # chaotic,
     sops-nix,
     nur,
     garnix-lib,
@@ -102,7 +102,7 @@
         home-manager.nixosModules.default
         sops-nix.nixosModules.sops
         nur.modules.nixos.default
-        chaotic.nixosModules.default
+        # chaotic.nixosModules.default
         nix-index-database.nixosModules.nix-index
         inputs.niri.nixosModules.niri
         inputs.dms.nixosModules.dank-material-shell
@@ -130,7 +130,7 @@
         ./modules/global/noDE.nix
         sops-nix.nixosModules.sops
         home-manager.nixosModules.default
-        chaotic.nixosModules.default
+        # chaotic.nixosModules.default
         nix-index-database.nixosModules.nix-index
       ];
     globalModulesHome = [

@@ -65,17 +65,18 @@
         '';
       plugins = with pkgs.nushellPlugins;
         [
-          skim
+          # skim
           query
           gstat
           formats
-          highlight
+          # highlight
           polars
         ]
         ++ lib.optionals pkgs.stdenv.isLinux [
+          # units
           # dbus
-          semver
-          desktop_notifications
+          # semver
+          # desktop_notifications
         ];
     };
     carapace.enable = true;

@@ -62,8 +62,10 @@
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
-    lan-mouse_git
-    yt-dlp_git
+    yt-dlp
+    lan-mouse
+    # lan-mouse_git
+    # yt-dlp_git
     inkscape
     libreoffice
     hunspell

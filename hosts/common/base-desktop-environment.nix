@@ -51,7 +51,7 @@
   # programs.waybar.enable = true; # top bar
 
   programs.niri.enable = true;
-  programs.niri.package = pkgs.niri_git;
+  # programs.niri.package = pkgs.niri_git;
   # programs.hyprland = {
   #   enable = true;
   #   # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;

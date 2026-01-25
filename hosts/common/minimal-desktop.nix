@@ -54,7 +54,27 @@ in {
       layout = "us";
       variant = "";
     };
-    printing.enable = true;
+    avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+      publish = {
+        enable = true;
+        userServices = true;
+      };
+    };
+    printing = {
+      enable = true;
+      listenAddresses = ["*:631"];
+      allowFrom = ["all"];
+      browsing = true;
+      defaultShared = true;
+      openFirewall = true;
+      drivers = [
+        pkgs.hplip
+        pkgs.hplipWithPlugin
+      ];
+    };
     pipewire = {
       enable = true;
       alsa.enable = true;

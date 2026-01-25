@@ -73,8 +73,9 @@
           polars
         ]
         ++ lib.optionals pkgs.stdenv.isLinux [
+          # units
           # dbus
-          semver
+          # semver
           # desktop_notifications
         ];
     };

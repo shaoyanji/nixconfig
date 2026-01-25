@@ -16,7 +16,7 @@
   ];
   programs = {
     zed-editor.enable = true;
-    zed-editor.package = pkgs.zed-editor-fhs_git;
+    # zed-editor.package = pkgs.zed-editor-fhs_git;
     anki = {
       enable = true;
       sync = {

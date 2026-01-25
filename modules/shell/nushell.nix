@@ -65,7 +65,7 @@
         '';
       plugins = with pkgs.nushellPlugins;
         [
-          # skim
+          skim
           query
           gstat
           formats
@@ -75,7 +75,7 @@
         ++ lib.optionals pkgs.stdenv.isLinux [
           # dbus
           semver
-          desktop_notifications
+          # desktop_notifications
         ];
     };
     carapace.enable = true;

@@ -69,7 +69,7 @@
           query
           gstat
           formats
-          highlight
+          # highlight
           polars
         ]
         ++ lib.optionals pkgs.stdenv.isLinux [

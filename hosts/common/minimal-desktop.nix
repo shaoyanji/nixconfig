@@ -75,7 +75,7 @@ in {
     tailscale.enable = true;
     tailscale.useRoutingFeatures = "both";
     resolved.enable = true;
-    resolved.domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
+    resolved.settings.Resolve.Domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
   };
 
   programs.nix-ld = {

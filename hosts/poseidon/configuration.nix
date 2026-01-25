@@ -15,9 +15,10 @@
     ../common/minimal-desktop.nix
     ../common/laptop.nix
   ];
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
   boot = {
     #extraModulePackages = with config.boot.kernelPackages; [v4l2loopback.out];
+    # kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
+    kernelPackages = lib.mkForce pkgs.linuxPackages_zen;
     kernelModules = [
       # "libwacom"
       #  "v4l2loopback"

@@ -10,7 +10,7 @@
     backupFileExtension = "hm-backup"; #for rebuild
     users.devji = {
       imports = [
-        inputs.impermanence.nixosModules.home-manager.impermanence
+        # inputs.impermanence.nixosModules.home-manager.impermanence
         ./heim.nix
       ];
 

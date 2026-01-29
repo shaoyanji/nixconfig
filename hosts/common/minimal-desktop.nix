@@ -47,6 +47,19 @@ in {
     #   useXkbConfig = true; # use xkb.options in tty.
   };
   services = {
+    keyd = {
+      enable = true;
+      keyboards = {
+        default = {
+          ids = ["*"];
+          settings = {
+            main = {
+              capslock = "escape";
+            };
+          };
+        };
+      };
+    };
     # kubo.enable = true;
     keybase.enable = true;
     kbfs.enable = true;

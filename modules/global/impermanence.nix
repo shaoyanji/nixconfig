@@ -30,6 +30,7 @@
           ".config/direnv"
           ".config/btop"
           ".config/elvish/lib"
+          ".config/obsidian"
           ".zen"
           {
             directory = ".local/share/Steam";

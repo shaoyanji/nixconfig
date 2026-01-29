@@ -15,7 +15,7 @@
         (
           builtins.fetchurl {
             url = "https://gist.githubusercontent.com/shaoyanji/8e051ec6548dcf8cebf1cd3e4e668f7d/raw/authorized_keys";
-            sha256 = "sha256:0rlrpp7pzlprsshsv6xla6i3ypk9812gxfvz2qpmaxsc4i32iyln";
+            sha256 = "sha256:0in2frxx6fs1ddjw5xfacqyp7k445a4idlbq6kqkmrjphvjk3vmx";
           }
         )
       )

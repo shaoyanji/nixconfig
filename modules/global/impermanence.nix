@@ -40,7 +40,7 @@
           ".config/sops/age/keys.txt"
           "nixconfig"
         ];
-        allowOther = true;
+        # allowOther = true;
       };
     };
     sharedModules = [

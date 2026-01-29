@@ -147,7 +147,6 @@ in {
         buku
         ddgr
         mutt
-        newsboat
         rclone
         httpie
         lazygit
@@ -163,6 +162,7 @@ in {
         # xq
       ]
       ++ lib.optionals stdenv.isLinux [
+        newsboat
         tuir
         graph-easy
         lazygit

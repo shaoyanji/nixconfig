@@ -168,7 +168,7 @@
   boot.tmp.cleanOnBoot = true;
   virtualisation.docker.enable = true;
 
-  fileSystems."/etc/ssh".neededForBoot = true;
+  # fileSystems."/etc/ssh".neededForBoot = true;
   fileSystems."/nix/persist".neededForBoot = true;
   environment.persistence."/nix/persist/system" = {
     hideMounts = true;

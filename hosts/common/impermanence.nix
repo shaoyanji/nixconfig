@@ -29,8 +29,9 @@
       umount /btrfs_tmp
     '';
 
-  # fileSystems."/etc/ssh".neededForBoot = true;
-  # fileSystems."/etc/ssh".device = ;
+  fileSystems."/etc/ssh".neededForBoot = true;
+  fileSystems."/etc/ssh".options = ["bind"];
+  fileSystems."/etc/ssh".device = "/persist/system/etc/ssh";
   fileSystems."/persist".neededForBoot = true;
   environment.persistence."/persist/system" = {
     hideMounts = true;

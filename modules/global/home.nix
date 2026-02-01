@@ -20,9 +20,10 @@
     packages = with pkgs;
       [
         mupdf
-        ani-cli
+        opencode
       ]
       ++ lib.optionals stdenv.isLinux [
+        ani-cli
         audacity
         mpv
         # yank

@@ -26,6 +26,7 @@
         ani-cli
         audacity
         mpv
+        ytfzf
         # yank
         gnuplot
         jp2a # would not build in darwin
@@ -55,7 +56,6 @@
         libation
       ]
       ++ lib.optionals stdenv.isDarwin [
-        ytfzf
         iina # ani-cli dependency
         wget
         cocoapods

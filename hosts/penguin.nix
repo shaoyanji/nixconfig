@@ -12,15 +12,14 @@
     ../modules/lf
     ../modules/sops.nix
     ../modules/scripts
-    ../modules/aria2.nix
-    ../modules/dev.nix
+    # ../modules/aria2.nix
+    # ../modules/dev.nix
     # ../modules/kitty
     # ../modules/goodies.nix
     # ../modules/helix.nix
   ];
   programs = {
-    # nixvim.enable = true;
-
+    nixvim.enable = true;
     pay-respects.enable = true;
     atuin.enable = true;
 
@@ -33,23 +32,23 @@
       };
     };
     # kakoune.enable = true;
-    # neovim.enable = true;
+    neovim.enable = true;
     # vim.enable = true;
 
-    # mpv = {
-    # enable = true;
-    #   package = config.lib.nixGL.wrap pkgs.mpv;
-    #   config = {
-    #     profile = "fast";
-    #     hwdec = "auto";
-    #     force-window = true;
-    #   };
-    #   bindings = {
-    #     WHEEL_UP = "seek 10";
-    #     WHEEL_DOWN = "seek -10";
-    #     "Alt+0" = "set window-scale 0.5";
-    #   };
-    # };
+    mpv = {
+    enable = true;
+      package = config.lib.nixGL.wrap pkgs.mpv;
+      config = {
+        profile = "fast";
+        hwdec = "auto";
+        force-window = true;
+      };
+      bindings = {
+        WHEEL_UP = "seek 10";
+        WHEEL_DOWN = "seek -10";
+        "Alt+0" = "set window-scale 0.5";
+      };
+    };
 
     # yt-dlp = {
     #   enable = true;
@@ -69,46 +68,48 @@
     # programs.freetube.enable =true;
     # programs.zed-editor.enable = true;
     #
-    helix = {
-      enable = true;
-      languages.language = [
-        {
-          name = "bash";
-          indent = {
-            tab-width = 4;
-            unit = "    ";
-          };
-          formatter.command = "${pkgs.shfmt}/bin/shfmt";
-          auto-format = true;
-        }
-        {
-          name = "go";
-          auto-format = true;
-          formatter.command = "${pkgs.gopls}/bin/gopls";
-        }
-        {
-          name = "nix";
-          auto-format = true;
-          formatter.command = "${pkgs.alejandra}/bin/alejandra";
-        }
-      ];
+    #   helix = {
+    #     package = pkgs.evil-helix;
+    #     enable = true;
+    #     languages.language = [
+    #       {
+    #         name = "bash";
+    #         indent = {
+    #           tab-width = 4;
+    #           unit = "    ";
+    #         };
+    #         formatter.command = "${pkgs.shfmt}/bin/shfmt";
+    #         auto-format = true;
+    #       }
+    #       {
+    #         name = "go";
+    #         auto-format = true;
+    #         formatter.command = "${pkgs.gopls}/bin/gopls";
+    #       }
+    #       {
+    #         name = "nix";
+    #         auto-format = true;
+    #         formatter.command = "${pkgs.alejandra}/bin/alejandra";
+    #       }
+    #     ];
 
-      settings = {
-        theme = "autumn_night_transparent";
-        editor.line-number = "relative";
-        editor.cursor-shape = {
-          normal = "block";
-          insert = "bar";
-          select = "underline";
-        };
-      };
-      themes = {
-        autumn_night_transparent = {
-          "inherits" = "autumn_night";
-          "ui.background" = {};
-        };
-      };
-    };
+    #     settings = {
+    #       theme = "autumn_night_transparent";
+    #       editor.default-yank-register = "+";
+    #       editor.line-number = "relative";
+    #       editor.cursor-shape = {
+    #         normal = "block";
+    #         insert = "bar";
+    #         select = "underline";
+    #       };
+    #     };
+    #     themes = {
+    #       autumn_night_transparent = {
+    #         "inherits" = "autumn_night";
+    #         "ui.background" = {};
+    #       };
+    #     };
+    #   };
   };
   services = {
     # kbfs.enable = true;
@@ -126,6 +127,7 @@
     username = "devji";
     homeDirectory = "/home/devji";
     packages = with pkgs; [
+      # mailsy
       totp-cli
       # ani-cli
       nix-output-monitor
@@ -135,21 +137,32 @@
       go-task
       glow
       cloak
-      mpv
+      # mpv
       # ffmpeg
       # yt-dlp
       # wl-clipboard
       # ytfzf
       # nixgl.nixGLIntel
+      typst
+      tinymist
+      pdfcpu
+      comrak
+      helix
+      # libnotify
     ];
     stateVersion = "24.11";
     file = {
-    };
+      ".local/share/fonts".source = config.lib.file.mkOutOfStoreSymlink "/Volumes/data/dotfiles/.local/share/fonts";    };
     sessionVariables = {
       EDITOR = "hx";
       invidious_instance = "https://inv.perditum.com";
+      # PATH = "$PATH:$HOME/.local/bin";
     };
-    sessionPath = [];
+#source "/home/devji/.openclaw/completions/openclaw.bash" 
+    sessionPath = [ 
+	"$HOME/.local/bin"
+	"$HOME/.npm-global/bin"
+	];
   };
   xdg.configFile."systemd/user/cros-garcon.service.d/override.conf".text =
     /*

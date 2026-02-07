@@ -5,6 +5,10 @@
   pkgs,
   ...
 }: {
+     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+             "objectbox-linux"
+           ];
+         
   imports = [
     # ../modules/global/minimal.nix
     ../modules/shell
@@ -32,7 +36,7 @@
       };
     };
     # kakoune.enable = true;
-    neovim.enable = true;
+    # neovim.enable = true;
     # vim.enable = true;
 
     mpv = {
@@ -148,6 +152,8 @@
       pdfcpu
       comrak
       helix
+      obs-cli
+      # bluebubbles
       # libnotify
     ];
     stateVersion = "24.11";
@@ -155,7 +161,7 @@
       ".local/share/fonts".source = config.lib.file.mkOutOfStoreSymlink "/Volumes/data/dotfiles/.local/share/fonts";    };
     sessionVariables = {
       EDITOR = "hx";
-      invidious_instance = "https://inv.perditum.com";
+      # invidious_instance = "https://inv.perditum.com";
       # PATH = "$PATH:$HOME/.local/bin";
     };
 #source "/home/devji/.openclaw/completions/openclaw.bash" 

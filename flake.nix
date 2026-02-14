@@ -69,6 +69,10 @@
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -87,6 +91,7 @@
     nix-homebrew,
     nixos-wsl,
     kickstart-nixvim,
+    microvm,
     ...
   } @ inputs: let
     globalModules = [
@@ -202,7 +207,7 @@
         };
         poseidon = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
+          specialArgs = {inherit inputs self;};
           modules =
             globalModulesNixos
             ++ [
@@ -321,6 +326,14 @@
         #         /etc/nixos/configuration.nix
         #       ];
         #   };
+        testvm = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {inherit inputs;};
+          modules = [
+            inputs.microvm.nixosModules.microvm
+            ./hosts/microvms/testvm.nix
+          ];
+        };
       };
       darwinConfigurations = {
         cassini = nix-darwin.lib.darwinSystem {

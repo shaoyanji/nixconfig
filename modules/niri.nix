@@ -9,6 +9,9 @@
   #   colors.background = "ffffffff";
   # };
   # programs.firefox.enable = true;
+  # programs.niriswitcher = {
+  # enable = true;
+  # };
   programs.niri.settings = {
     hotkey-overlay.skip-at-startup = true;
     environment."NIXOS_OZONE_WL" = "1";

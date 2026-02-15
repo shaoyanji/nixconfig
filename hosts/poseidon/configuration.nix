@@ -59,6 +59,13 @@
             source = "/home/devji/workspace";
             mountPoint = "/home/devji/workspace";
           }
+
+          {
+            proto = "virtiofs";
+            tag = "agents";
+            source = "/home/devji/.agents";
+            mountPoint = "/home/devji/.agents";
+          }
         ];
 
         microvm.volumes = [

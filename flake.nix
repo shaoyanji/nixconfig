@@ -102,42 +102,54 @@
     ];
     globalModulesNixos =
       globalModules
-      ++ [
-        ./modules/global/nixos.nix
-        home-manager.nixosModules.default
-        sops-nix.nixosModules.sops
-        nur.modules.nixos.default
-        # chaotic.nixosModules.default
-        nix-index-database.nixosModules.nix-index
-        inputs.niri.nixosModules.niri
-        inputs.dms.nixosModules.dank-material-shell
-        #lix-module.nixosModules.default
-        #determinate.nixosModules.default
-      ];
+      |> (mods:
+        mods
+        ++ [
+          ./modules/global/nixos.nix
+          home-manager.nixosModules.default
+          sops-nix.nixosModules.sops
+          nur.modules.nixos.default
+          # chaotic.nixosModules.default
+          nix-index-database.nixosModules.nix-index
+          inputs.niri.nixosModules.niri
+          inputs.dms.nixosModules.dank-material-shell
+          #lix-module.nixosModules.default
+          #determinate.nixosModules.default
+        ]);
+
     globalModulesImpermanence =
       globalModulesNixos
-      ++ [
-        ./modules/global/impermanence.nix
-        impermanence.nixosModules.impermanence
-        disko.nixosModules.default
-      ];
+      |> (mods:
+        mods
+        ++ [
+          ./modules/global/impermanence.nix
+          impermanence.nixosModules.impermanence
+          disko.nixosModules.default
+        ]);
+
     globalModulesMacos =
       globalModules
-      ++ [
-        ./modules/global/macos.nix
-        nix-homebrew.darwinModules.nix-homebrew
-        home-manager.darwinModules.default
-        sops-nix.darwinModules.sops
-      ];
+      |> (mods:
+        mods
+        ++ [
+          ./modules/global/macos.nix
+          nix-homebrew.darwinModules.nix-homebrew
+          home-manager.darwinModules.default
+          sops-nix.darwinModules.sops
+        ]);
+
     globalModulesContainers =
       globalModules
-      ++ [
-        ./modules/global/noDE.nix
-        sops-nix.nixosModules.sops
-        home-manager.nixosModules.default
-        # chaotic.nixosModules.default
-        nix-index-database.nixosModules.nix-index
-      ];
+      |> (mods:
+        mods
+        ++ [
+          ./modules/global/noDE.nix
+          sops-nix.nixosModules.sops
+          home-manager.nixosModules.default
+          # chaotic.nixosModules.default
+          nix-index-database.nixosModules.nix-index
+        ]);
+
     globalModulesHome = [
       kickstart-nixvim.homeManagerModules.default
       sops-nix.homeManagerModules.sops

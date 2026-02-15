@@ -59,6 +59,18 @@
   # services.pihole-ftl.enable = true;
   # services.pihole-web.enable = true;
   # services.pihole-web.ports = ["80r" "443s"];
+
+  services.ollama = {
+    enable = true;
+    # acceleration = "cuda";
+    host = "0.0.0.0";
+    openFirewall = true;
+    loadModels = ["minimax-m2.5:cloud" "glm-5:cloud" "qwen3-coder-next:cloud"];
+    # environmentVariables = {
+    # OLLAMA_ORIGINS = "moz-extension://*,chrome-extension://*,safari-web-extension://*";
+    # };
+    # models = "/Volumes/data/ollama";
+  };
   services.anki-sync-server = {
     enable = true;
     address = "0.0.0.0";
@@ -256,6 +268,8 @@
     openFirewall = true;
   };
   environment.systemPackages = with pkgs; [
+    opencode
+    ollama
     jellyfin
     jellyfin-web
     jellyfin-ffmpeg

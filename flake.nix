@@ -182,15 +182,15 @@
             ];
         };
 
-        devji = home-manager.lib.homeManagerConfiguration {
-          extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules =
-            globalModulesHome
-            ++ [
-              ./hosts/devji.nix
-            ];
-        };
+        # devji = home-manager.lib.homeManagerConfiguration {
+        #   extraSpecialArgs = {inherit inputs;};
+        #   pkgs = nixpkgs.legacyPackages."x86_64-linux";
+        #   modules =
+        #     globalModulesHome
+        #     ++ [
+        #       ./hosts/devji.nix
+        #     ];
+        # };
         kali = home-manager.lib.homeManagerConfiguration {
           extraSpecialArgs = {inherit inputs;};
           pkgs = nixpkgs.legacyPackages."aarch64-linux";

@@ -151,6 +151,7 @@
           wget
           go
           htop
+          kitty
           ollama
           opencode
         ];

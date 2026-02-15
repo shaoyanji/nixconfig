@@ -27,23 +27,23 @@
     # ghc
     # gcc
     # scc
-    gfortran
+    # gfortran
     # tcc
     # go
-    #tinygo
+    # tinygo
     # rustc
     # cargo
-    #lua
+    # lua
     # luajit
     # python3
-    #lua51Packages.moonscript
+    # lua51Packages.moonscript
     # nim
     # wasmtime
     # hare
-    #haredoc
-    #zig
+    # haredoc
+    # zig
     # dotnet-sdk
-    #dotnet-runtime
+    # dotnet-runtime
   ];
 
   home.file = {

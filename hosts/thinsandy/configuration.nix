@@ -65,7 +65,7 @@
     # acceleration = "cuda";
     host = "0.0.0.0";
     openFirewall = true;
-    loadModels = ["minimax-m2.5:cloud" "glm-5:cloud" "qwen3-coder-next:cloud"];
+    loadModels = ["minimax-m2.5:cloud" "glm-5:cloud" "qwen3-coder-next:cloud" "kimi-k2.5:cloud"];
     # environmentVariables = {
     # OLLAMA_ORIGINS = "moz-extension://*,chrome-extension://*,safari-web-extension://*";
     # };

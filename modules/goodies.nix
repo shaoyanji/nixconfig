@@ -80,18 +80,18 @@
         max-completion-tokens = 100;
         apis = {
           ollama = {
-            base-url = "http://localhost:11434/v1";
+            base-url = "http://localhost:11434";
             models = {
               "minimax-m2.5:cloud" = {
-                aliases = ["minimax-m2.5:cloud"];
+                # aliases = ["minimax-m2.5:cloud"];
                 max-input-chars = 650000;
               };
               "glm-5:cloud" = {
-                aliases = ["glm-5:cloud"];
+                # aliases = ["glm-5:cloud"];
                 max-input-chars = 650000;
               };
               "qwen3-coder-next:cloud" = {
-                aliases = ["qwen3-coder-next:cloud"];
+                # aliases = ["qwen3-coder-next:cloud"];
                 max-input-chars = 650000;
               };
             };

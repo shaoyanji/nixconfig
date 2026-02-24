@@ -152,7 +152,6 @@
           go
           htop
           kitty
-          ollama
           opencode
         ];
 

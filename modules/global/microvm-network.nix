@@ -3,9 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-
-{
+}: {
   options.microvm = {
     network = {
       enable = lib.mkOption {

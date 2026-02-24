@@ -6,6 +6,11 @@ My Nix Configurations for darwin, nixos, home-manager, and WSL.
 
 - [x] add submodule for secrets
 - [x] integrated dotfiles as a submodule
+- [x] microvm from stapelberger blogpost
+
+```bash
+sudo ip link set microbr up && sudo ip link set microvm1 master microbr
+```
 
 ## Installation
 

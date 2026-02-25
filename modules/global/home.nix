@@ -20,7 +20,6 @@
     packages = with pkgs;
       [
         mupdf
-        opencode
       ]
       ++ lib.optionals stdenv.isLinux [
         ani-cli

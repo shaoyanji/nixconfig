@@ -154,9 +154,7 @@
           curl
           wget
           go
-          htop
           kitty
-          opencode
         ];
 
         system.stateVersion = "25.05";

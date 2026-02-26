@@ -134,7 +134,7 @@
             PasswordAuthentication = false;
           };
         };
-
+        # programs.nix-ld.enable = true;
         users.users.devji = {
           isNormalUser = true;
           extraGroups = ["wheel" "networkmanager"];
@@ -153,8 +153,10 @@
           git
           curl
           wget
-          go
+          gcc
           kitty
+          jq
+          htmlq
         ];
 
         system.stateVersion = "25.05";

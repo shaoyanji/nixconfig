@@ -107,12 +107,13 @@
       default_config = {};
     };
   };
-  services.stirling-pdf.enable = true;
-  services.stirling-pdf.environment = {
-    SERVER_HOST = "0.0.0.0";
-    SERVER_PORT = 7351;
-    INSTALL_BOOK_AND_ADVANCED_HTML_OPS = "true";
-  };
+  # broken build feb 26
+  # services.stirling-pdf.enable = true;
+  # services.stirling-pdf.environment = {
+  #   SERVER_HOST = "0.0.0.0";
+  #   SERVER_PORT = 7351;
+  #   INSTALL_BOOK_AND_ADVANCED_HTML_OPS = "true";
+  # };
   services.plex = {
     enable = true;
     openFirewall = true;

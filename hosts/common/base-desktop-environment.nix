@@ -117,7 +117,7 @@
     fontconfig.defaultFonts = {
       # serif = ["Noto Serif"];
       # sansSerif = ["Noto Sans"];
-      monospace = ["JetBrainsMono Nerd Font"];
+      # monospace = ["JetBrainsMono Nerd Font"];
     };
     packages = with pkgs; [
       nerd-fonts.jetbrains-mono

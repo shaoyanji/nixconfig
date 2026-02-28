@@ -112,7 +112,7 @@
   };
   # Fonts
   fonts = {
-    enableDefaultPackages = true;
+    # enableDefaultPackages = true;
     enableGhostscriptFonts = true;
     fontconfig.defaultFonts = {
       # serif = ["Noto Serif"];

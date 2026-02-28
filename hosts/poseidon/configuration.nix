@@ -12,7 +12,7 @@
     ./hardware-configuration.nix
     ./nvidia.nix
     ../common/steam.nix
-    # ../common/base-desktop-environment.nix
+    ../common/base-desktop-environment.nix
     ../common/minimal-desktop.nix
     ../common/laptop.nix
     # Our custom microvm network module

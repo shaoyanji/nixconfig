@@ -62,15 +62,15 @@
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
-    # yt-dlp
-    # lan-mouse
+    yt-dlp
+    lan-mouse
     # # lan-mouse_git
     # # yt-dlp_git
-    # inkscape
+    inkscape
     # # libreoffice
-    # hunspell
-    # hunspellDicts.en_US
-    # alsa-utils
+    hunspell
+    hunspellDicts.en_US
+    alsa-utils
     # # config.boot.kernelPackages.digimend
     # #wkhtmltopdf
     # #ghostscript
@@ -97,8 +97,8 @@
     # # wasmtime
     # # luajit
     # alsa-utils
-    # lagrange
-    # ngrok #unfree
+    lagrange
+    ngrok #unfree
   ];
 
   programs.appimage = {
@@ -111,17 +111,17 @@
     ];
   };
   # Fonts
-  # fonts = {
-  #   enableDefaultPackages = true;
-  #   enableGhostscriptFonts = true;
-  #   fontconfig.defaultFonts = {
-  #     serif = ["Noto Serif"];
-  #     sansSerif = ["Noto Sans"];
-  #     monospace = ["JetBrainsMono Nerd Font"];
-  #   };
-  #   packages = with pkgs; [
-  #     # nerd-fonts.jetbrains-mono
-  #     #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; }) # 24.11
-  #   ];
-  # };
+  fonts = {
+    enableDefaultPackages = true;
+    enableGhostscriptFonts = true;
+    fontconfig.defaultFonts = {
+      serif = ["Noto Serif"];
+      sansSerif = ["Noto Sans"];
+      monospace = ["JetBrainsMono Nerd Font"];
+    };
+    packages = with pkgs; [
+      nerd-fonts.jetbrains-mono
+      #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; }) # 24.11
+    ];
+  };
 }

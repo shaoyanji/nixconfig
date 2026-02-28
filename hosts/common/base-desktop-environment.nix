@@ -67,7 +67,7 @@
     # lan-mouse_git
     # yt-dlp_git
     inkscape
-    libreoffice
+    # libreoffice
     hunspell
     hunspellDicts.en_US
     alsa-utils

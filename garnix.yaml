@@ -7,7 +7,7 @@ builds:
     # - defaultPackage.x86_64-linux
     # - nixosConfigurations.*
     # - nixosConfigurations.poseidon
-    - nixosConfigurations.garnixMachine
+    # - nixosConfigurations.garnixMachine
     # - "*.x86_64-linux.*"
     # - devShell.x86_64-linux
     # - nixosConfigurations.thinsandy

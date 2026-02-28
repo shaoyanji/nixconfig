@@ -8,7 +8,7 @@
   imports = [
     # ./flatpak.nix
     ./minimal-desktop.nix
-    # ../../modules/nixos/lxc
+    ../../modules/nixos/lxc
     # ../../modules/nixos/k3s
   ];
   # Bootloader.
@@ -62,43 +62,43 @@
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = with pkgs; [
-    yt-dlp
-    lan-mouse
-    # lan-mouse_git
-    # yt-dlp_git
-    inkscape
-    # libreoffice
-    hunspell
-    hunspellDicts.en_US
-    alsa-utils
-    # config.boot.kernelPackages.digimend
-    #wkhtmltopdf
-    #ghostscript
-    #        texlive.combined.scheme-full
-    #pandoc
-    #mods
-    #aichat
-    #tgpt
-    #jekyll
-    #bundler
-    # scc
-    #dog
-    # taskwarrior3
+    # yt-dlp
+    # lan-mouse
+    # # lan-mouse_git
+    # # yt-dlp_git
+    # inkscape
+    # # libreoffice
+    # hunspell
+    # hunspellDicts.en_US
+    # alsa-utils
+    # # config.boot.kernelPackages.digimend
+    # #wkhtmltopdf
+    # #ghostscript
+    # #        texlive.combined.scheme-full
+    # #pandoc
+    # #mods
+    # #aichat
+    # #tgpt
+    # #jekyll
+    # #bundler
+    # # scc
+    # #dog
+    # # taskwarrior3
 
-    #gitmoji-changelog
-    #sparkly-cli
-    #lowcharts
+    # #gitmoji-changelog
+    # #sparkly-cli
+    # #lowcharts
 
-    #hare
-    #haredoc
-    #go
-    #cargo
-    #tinygo
-    # wasmtime
-    # luajit
-    alsa-utils
-    lagrange
-    ngrok #unfree
+    # #hare
+    # #haredoc
+    # #go
+    # #cargo
+    # #tinygo
+    # # wasmtime
+    # # luajit
+    # alsa-utils
+    # lagrange
+    # ngrok #unfree
   ];
 
   programs.appimage = {
@@ -111,17 +111,17 @@
     ];
   };
   # Fonts
-  fonts = {
-    enableDefaultPackages = true;
-    enableGhostscriptFonts = true;
-    fontconfig.defaultFonts = {
-      serif = ["Noto Serif"];
-      sansSerif = ["Noto Sans"];
-      monospace = ["JetBrainsMono Nerd Font"];
-    };
-    packages = with pkgs; [
-      nerd-fonts.jetbrains-mono
-      #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; }) # 24.11
-    ];
-  };
+  # fonts = {
+  #   enableDefaultPackages = true;
+  #   enableGhostscriptFonts = true;
+  #   fontconfig.defaultFonts = {
+  #     serif = ["Noto Serif"];
+  #     sansSerif = ["Noto Sans"];
+  #     monospace = ["JetBrainsMono Nerd Font"];
+  #   };
+  #   packages = with pkgs; [
+  #     # nerd-fonts.jetbrains-mono
+  #     #  (pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; }) # 24.11
+  #   ];
+  # };
 }

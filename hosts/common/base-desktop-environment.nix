@@ -8,7 +8,7 @@
   imports = [
     # ./flatpak.nix
     ./minimal-desktop.nix
-    ../../modules/nixos/lxc
+    # ../../modules/nixos/lxc
     # ../../modules/nixos/k3s
   ];
   # Bootloader.
@@ -112,12 +112,12 @@
   };
   # Fonts
   fonts = {
-    # enableDefaultPackages = true;
+    enableDefaultPackages = true;
     enableGhostscriptFonts = true;
     fontconfig.defaultFonts = {
-      # serif = ["Noto Serif"];
-      # sansSerif = ["Noto Sans"];
-      # monospace = ["JetBrainsMono Nerd Font"];
+      serif = ["Noto Serif"];
+      sansSerif = ["Noto Sans"];
+      monospace = ["JetBrainsMono Nerd Font"];
     };
     packages = with pkgs; [
       nerd-fonts.jetbrains-mono

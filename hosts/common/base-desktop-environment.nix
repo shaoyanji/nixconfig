@@ -64,39 +64,39 @@
   environment.systemPackages = with pkgs; [
     yt-dlp
     lan-mouse
-    # lan-mouse_git
-    # yt-dlp_git
+    # # lan-mouse_git
+    # # yt-dlp_git
     inkscape
-    libreoffice
+    # # libreoffice
     hunspell
     hunspellDicts.en_US
     alsa-utils
-    # config.boot.kernelPackages.digimend
-    #wkhtmltopdf
-    #ghostscript
-    #        texlive.combined.scheme-full
-    #pandoc
-    #mods
-    #aichat
-    #tgpt
-    #jekyll
-    #bundler
-    # scc
-    #dog
-    # taskwarrior3
+    # # config.boot.kernelPackages.digimend
+    # #wkhtmltopdf
+    # #ghostscript
+    # #        texlive.combined.scheme-full
+    # #pandoc
+    # #mods
+    # #aichat
+    # #tgpt
+    # #jekyll
+    # #bundler
+    # # scc
+    # #dog
+    # # taskwarrior3
 
-    #gitmoji-changelog
-    #sparkly-cli
-    #lowcharts
+    # #gitmoji-changelog
+    # #sparkly-cli
+    # #lowcharts
 
-    #hare
-    #haredoc
-    #go
-    #cargo
-    #tinygo
-    # wasmtime
-    # luajit
-    alsa-utils
+    # #hare
+    # #haredoc
+    # #go
+    # #cargo
+    # #tinygo
+    # # wasmtime
+    # # luajit
+    # alsa-utils
     lagrange
     ngrok #unfree
   ];

@@ -51,7 +51,7 @@
         cloudflare-cli
         bootdev-cli
         wash-cli
-        rendercv
+        # rendercv #breaking in build feb-28
         libation
       ]
       ++ lib.optionals stdenv.isDarwin [

@@ -19,9 +19,14 @@
     };
     gemini-cli = {
       enable = true;
-      settings = lib.literalExpression ''{"theme": "Default","vimMode": true,"preferredEditor": "nvim","autoAccept": true,"security": {"auth": {"selectedType": "oauth-personal"}}}'';
+      settings = {
+        vimMode = true;
+        preferredEditor = "nvim";
+        autoAccept = true;
+        security = {auth = {selectedType = "oauth-personal";};};
+      };
       # defaultModel = "gemini-3-pro-preview";
-      defaultModel = "gemini-2.5-flash-lite";
+      defaultModel = "gemini-2.5-flash";
       commands = {
         changelog = {
           prompt = ''

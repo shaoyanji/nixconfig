@@ -73,6 +73,10 @@
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-openclaw = {
+      url = "github:openclaw/nix-openclaw";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -91,6 +95,7 @@
     nix-homebrew,
     nixos-wsl,
     kickstart-nixvim,
+    nix-openclaw,
     microvm,
     ...
   } @ inputs: let

@@ -2,12 +2,15 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }: {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../common/minimal-desktop.nix
+    inputs.nix-openclaw.nixosModules.openclaw-gateway
+    inputs.sops-nix.nixosModules.sops
   ];
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -20,16 +23,62 @@
   #boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
 
   networking.hostName = "mtfuji"; # Define your hostname.
+  nixpkgs.overlays = [
+    inputs.nix-openclaw.overlays.default
+  ];
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
   environment.systemPackages = with pkgs; [
     btrfs-progs
-    #  f2fs-tools
-    #  docker
-    #  ethtool
-    #  networkd-dispatcher
+    openclaw
+    nfs-utils
   ];
 
+  systemd.tmpfiles.rules = [
+    "d /srv/data/openclaw 0750 openclaw openclaw - -"
+  ];
+
+  fileSystems."/var/lib/openclaw/home" = {
+    device = "/srv/data/openclaw";
+    options = ["bind"];
+  };
+
+  services.openclaw-gateway = {
+    enable = true;
+    config = {
+      gateway = {
+        mode = "local";
+        # auth.token = "6c8a18065f0676ee763770a195c725c6ee44cc2c5604e10509a45ee3288b0ff6";
+      };
+    };
+    execStartPre = [
+      "${pkgs.coreutils}/bin/install -d -o openclaw -g openclaw -m 0750 /var/lib/openclaw"
+      "${pkgs.coreutils}/bin/install -o openclaw -g openclaw -m 0600 /etc/openclaw/openclaw.json /var/lib/openclaw/openclaw.json"
+    ];
+
+    environmentFiles = [
+      config.sops.secrets."openclaw".path
+    ];
+    environment = {
+      # OPENCLAW_CONFIG_PATH = "/var/lib/openclaw/openclaw.json";
+      # OPENCLAW_STATE_DIR = "/var/lib/openclaw";
+      OPENCLAW_NIX_MODE = "1";
+    };
+  };
+
+  environment.sessionVariables = {
+    OPENCLAW_NIX_MODE = "1";
+    # OPENCLAW_GATEWAY_TOKEN = "6c8a18065f0676ee763770a195c725c6ee44cc2c5604e10509a45ee3288b0ff6";
+  };
+
+  sops.secrets = {
+    openclaw = {
+      owner = "openclaw";
+      group = "openclaw";
+      mode = "0400";
+    };
+  };
   #powerManagement.powertop.enable = true;
   #virtualisation.docker.enable = true;
 

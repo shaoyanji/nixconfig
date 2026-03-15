@@ -153,7 +153,7 @@ in {
         asciinema
         navi
         epr
-        lynx
+        # lynx
         translate-shell
         mc
         ticker

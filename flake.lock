@@ -616,12 +616,8 @@
     },
     "nixpkgs_3": {
       "locked": {
-<<<<<<< HEAD
         "lastModified": 1772525000,
         "narHash": "sha256-M7kpjimt0jdEQzmin6ptszf8ev7TVzibyZNSLaLquMM=",
-=======
-        "lastModified": 1767364772,
-        "narHash": "sha256-fFUnEYMla8b7UKjijLnMe+oVFOz6HjijGGNS1l7dYaQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "16c7794d0a28b5a37904d55bcca36003b9109aaa",
@@ -638,7 +634,6 @@
       "locked": {
         "lastModified": 1772173633,
         "narHash": "sha256-MOH58F4AIbCkh6qlQcwMycyk5SWvsqnS/TCfnqDlpj4=",
->>>>>>> df90a84 (pretty stable soul openclaw on nix thinsandy only)
         "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "72b1d820cb0149b40a35aa077b4b6d60cd1b23c3",

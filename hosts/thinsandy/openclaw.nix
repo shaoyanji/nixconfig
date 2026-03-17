@@ -10,10 +10,24 @@
       models = {
         mode = "merge";
         providers = {
+          nvidia = {
+            baseUrl = "https://integrate.api.nvidia.com/v1";
+            api = "openai-completions";
+            models = [
+              {
+                id = "nvidia/openai/gpt-oss-20b";
+                name = "nvidia/openai/gpt-oss-20b";
+              }
+              {
+                id = "moonshotai/kimi-k2.5";
+                name = "moonshotai/kimi-k2.5";
+              }
+            ];
+          };
           ollama = {
             api = "ollama";
             apiKey = "ollama-local";
-            baseUrl = "http://127.0.0.1:11434/v1";
+            baseUrl = "http://127.0.0.1:11434";
             models = [
               {
                 id = "qwen3.5:cloud";
@@ -91,22 +105,62 @@
       };
       gateway.mode = "local";
       agents.defaults = {
+        compaction = {
+          reserveTokensFloor = 20000;
+          memoryFlush = {
+            enabled = true;
+            softThresholdTokens = 4000;
+            systemPrompt = "Session nearing compaction. Store durable memories now.";
+            prompt = "Write any lasting notes to memory/YYYY-MM-DD.md; reply with NO_REPLY if nothing to store.";
+          };
+        };
+        memorySearch = {
+          query = {
+            hybrid = {
+              enabled = true;
+              vectorWeight = 0.7;
+              textWeight = 0.3;
+              candidateMultiplier = 4;
+              #// Diversity: reduce redundant results
+              mmr = {
+                enabled = true; #    // default: false
+                lambda = 0.7; #       // 0 = max diversity, 1 = max relevance
+              };
+              # Recency: boost newer memories
+              temporalDecay = {
+                enabled = true; #   // default: false
+                halfLifeDays = 30; # // score halves every 30 days
+              };
+            };
+          };
+          provider = "gemini";
+          model = "gemini-embedding-2-preview";
+          outputDimensionality = 3072;
+          extraPaths = [
+          ];
+        };
         model = {
           primary = "openrouter/openrouter/hunter-alpha";
           fallbacks = [
-            "ollama/minimax-m2.5:cloud"
             "openai-codex/gpt-5.4"
+            "nvidia/openai/gpt-oss-20b"
+            "nvidia/openai/gpt-oss-120b"
+            "nvidia/moonshotai/kimi-k2.5"
+            "ollama/kimi-k2.5:cloud"
           ];
         };
 
         models = {
-          "openai-codex/gpt-5.4" = {alias = "Codex";};
+          "openrouter/openrouter/hunter-alpha" = {};
           "ollama/qwen3-coder-next:cloud" = {alias = "Qwen Coder";};
           "ollama/kimi-k2.5:cloud" = {alias = "Kimi";};
           "ollama/minimax-m2.5:cloud" = {alias = "MiniMax";};
           "ollama/glm-5:cloud" = {alias = "GLM";};
           "ollama/qwen3.5:cloud" = {alias = "Qwen";};
-          "openrouter/openrouter/hunter-alpha" = {};
+          "openai-codex/gpt-5.4" = {alias = "Codex";};
+          "nvidia/openai/gpt-oss-20b" = {};
+          "nvidia/openai/gpt-oss-120b" = {};
+          "nvidia/moonshotai/kimi-k2.5" = {};
         };
 
         heartbeat = {
@@ -116,8 +170,30 @@
           target = "none";
         };
       };
-      plugins.entries.google-gemini-cli-auth = {
-        enabled = true;
+      agents.list = [
+        {
+          id = "main";
+          tools.alsoAllow = ["lobster" "llm-task"];
+        }
+      ];
+      tools.alsoAllow = ["lobster" "llm-task"];
+      tools.web.search.provider = "brave";
+      tools.web.search."brave".mode = "llm-context";
+      tools.web.fetch = {
+        firecrawl = {
+          baseUrl = "https://api.firecrawl.dev";
+          onlyMainContent = true;
+          maxAgeMs = 172800000;
+          timeoutSeconds = 60;
+        };
+      };
+      # tools.web.search.provider = "firecrawl";
+      # tools.web.search."firecrawl".baseURL = "https://api.firecrawl.dev";
+
+      plugins.entries = {
+        google-gemini-cli-auth.enabled = true;
+        firecrawl.enabled = true;
+        llm-task.enabled = true;
       };
       channels.telegram = {
         dmPolicy = "allowlist";
@@ -125,7 +201,6 @@
         allowFrom = [8207284912];
       };
     };
-
     environmentFiles = [
       config.sops.secrets."openclaw".path
     ];

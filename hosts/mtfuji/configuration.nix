@@ -9,6 +9,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../common/minimal-desktop.nix
+    ../thinsandy/openclaw.nix
     inputs.nix-openclaw.nixosModules.openclaw-gateway
     inputs.sops-nix.nixosModules.sops
   ];
@@ -30,13 +31,67 @@
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   environment.systemPackages = with pkgs; [
+    uv
+    python313Packages.firecrawl-py
+    python313Packages.neo4j
     btrfs-progs
     openclaw
     nfs-utils
+    f2fs-tools
+    git
+    python3
+    go
+    nodejs
+    fzf
+    bat
+    delta
+    sqlite
+    httpie
+    yq
+    shellcheck
+    entr
+    jq
+    gnumake
+    rsync
+    age
+    tmux
+    file
+    # diff
+
+    yq # YAML/TOML/JSON processing
+    ddgr # DuckDuckGo search CLI (web search fallback)
+    bat # cat with syntax highlighting
+    fd # fast file finder
+    sqlite # database access
+    gh # GitHub CLI
+
+    # Nice to have
+    fzf # fuzzy finder (pairs well with fd/bat)
+    delta # better git diffs
+    httpie # friendly HTTP client for APIs
+    ncdu # disk usage explorer
+    tree # directory tree view
+    unzip # archive handling
+    xxd # hex dump
+    lsof # list open files
+    pv # pipe viewer (progress bars)
+    miller # mlr — CSV/JSON/log processing
+    glow # markdown renderer in terminal
+    sd # sed alternative (regex find/replace)
+    hyperfine # CLI benchmarking
+    tldr # simplified man pages
+    watch # run commands periodically
+
+    # Next
+    ripgrep
+    tmux
+    tokei
+    jq
+    tgpt
   ];
 
   systemd.tmpfiles.rules = [
-    "d /srv/data/openclaw 0750 openclaw openclaw - -"
+    # "d /srv/data/openclaw 0750 openclaw openclaw - -"
   ];
 
   fileSystems."/var/lib/openclaw/home" = {
@@ -45,39 +100,21 @@
   };
 
   services.openclaw-gateway = {
-    enable = true;
-    config = {
-      gateway = {
-        mode = "local";
-        # auth.token = "6c8a18065f0676ee763770a195c725c6ee44cc2c5604e10509a45ee3288b0ff6";
-      };
-    };
     execStartPre = [
-      "${pkgs.coreutils}/bin/install -d -o openclaw -g openclaw -m 0750 /var/lib/openclaw"
-      "${pkgs.coreutils}/bin/install -o openclaw -g openclaw -m 0600 /etc/openclaw/openclaw.json /var/lib/openclaw/openclaw.json"
+      # "${pkgs.coreutils}/bin/install -d -o openclaw -g openclaw -m 0750 /var/lib/openclaw"
+      # "${pkgs.coreutils}/bin/install -o openclaw -g openclaw -m 0600 /etc/openclaw/openclaw.json /var/lib/openclaw/openclaw.json"
     ];
-
-    environmentFiles = [
-      config.sops.secrets."openclaw".path
-    ];
-    environment = {
-      # OPENCLAW_CONFIG_PATH = "/var/lib/openclaw/openclaw.json";
-      # OPENCLAW_STATE_DIR = "/var/lib/openclaw";
-      OPENCLAW_NIX_MODE = "1";
-    };
   };
 
-  environment.sessionVariables = {
-    OPENCLAW_NIX_MODE = "1";
-    # OPENCLAW_GATEWAY_TOKEN = "6c8a18065f0676ee763770a195c725c6ee44cc2c5604e10509a45ee3288b0ff6";
-  };
-
-  sops.secrets = {
-    openclaw = {
-      owner = "openclaw";
-      group = "openclaw";
-      mode = "0400";
+  services.ollama = {
+    enable = true;
+    # acceleration = "cuda";
+    host = "0.0.0.0";
+    openFirewall = true;
+    environmentVariables = {
+      OLLAMA_ORIGINS = "moz-extension://*,chrome-extension://*,safari-web-extension://*";
     };
+    # models = "/Volumes/data/ollama";
   };
   #powerManagement.powertop.enable = true;
   #virtualisation.docker.enable = true;

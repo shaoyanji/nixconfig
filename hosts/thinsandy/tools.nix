@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   environment.systemPackages = with pkgs; [
     # Core
+    codex
     vim
     wget
     git
@@ -40,5 +41,14 @@
     tokei
     jq
     tgpt
+
+    uv
+    (python3.withPackages (ps:
+      with ps; [
+        neo4j
+        pytz
+        firecrawl-py
+        pydantic
+      ]))
   ];
 }

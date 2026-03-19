@@ -30,6 +30,7 @@
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
+  services.openclaw-gateway.config.channels.telegram.tokenFile = config.sops.secrets."morrow-telegram".path;
   environment.systemPackages = with pkgs; [
     uv
     python313Packages.firecrawl-py

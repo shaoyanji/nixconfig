@@ -19,6 +19,19 @@
                 name = "nvidia/openai/gpt-oss-20b";
               }
               {
+                id = "nvidia/openai/gpt-oss-120b";
+                name = "nvidia/openai/gpt-oss-120b";
+              }
+
+              {
+                id = "qwen/qwen3-coder-480b-a35b-instruct";
+                name = "qwen/qwen3-coder-480b-a35b-instruct";
+              }
+              {
+                id = "qwen/qwen3.5-122b-a10b";
+                name = "qwen/qwen3.5-122b-a10b";
+              }
+              {
                 id = "moonshotai/kimi-k2.5";
                 name = "moonshotai/kimi-k2.5";
               }
@@ -44,8 +57,8 @@
                 };
               }
               {
-                id = "minimax-m2.5:cloud";
-                name = "minimax-m2.5:cloud";
+                id = "minimax-m2.7:cloud";
+                name = "minimax-m2.7:cloud";
                 reasoning = true;
                 input = ["text"];
                 contextWindow = 204800;
@@ -140,27 +153,34 @@
           ];
         };
         model = {
-          primary = "openrouter/openrouter/hunter-alpha";
+          primary = "openrouter/nvidia/nemotron-3-super-120b-a12b:free";
           fallbacks = [
+            "openrouter/openrouter/free"
+            "nvidia/qwen/qwen3.5-122b-a10b"
             "openai-codex/gpt-5.4"
             "nvidia/openai/gpt-oss-20b"
             "nvidia/openai/gpt-oss-120b"
+            "nvidia/qwen/qwen3-coder-480b-a35b-instruct"
             "nvidia/moonshotai/kimi-k2.5"
             "ollama/kimi-k2.5:cloud"
+            "ollama/minimax-m2.7:cloud"
           ];
         };
 
         models = {
-          "openrouter/openrouter/hunter-alpha" = {};
+          "openrouter/openrouter/free" = {};
+          "openrouter/nvidia/nemotron-3-super-120b-a12b:free" = {};
           "ollama/qwen3-coder-next:cloud" = {alias = "Qwen Coder";};
           "ollama/kimi-k2.5:cloud" = {alias = "Kimi";};
-          "ollama/minimax-m2.5:cloud" = {alias = "MiniMax";};
+          "ollama/minimax-m2.7:cloud" = {alias = "MiniMax";};
           "ollama/glm-5:cloud" = {alias = "GLM";};
           "ollama/qwen3.5:cloud" = {alias = "Qwen";};
           "openai-codex/gpt-5.4" = {alias = "Codex";};
           "nvidia/openai/gpt-oss-20b" = {};
           "nvidia/openai/gpt-oss-120b" = {};
           "nvidia/moonshotai/kimi-k2.5" = {};
+          "nvidia/qwen/qwen3-coder-480b-a35b-instruct" = {};
+          "nvidia/qwen/qwen3.5-122b-a10b" = {};
         };
 
         heartbeat = {
@@ -189,15 +209,34 @@
       };
       # tools.web.search.provider = "firecrawl";
       # tools.web.search."firecrawl".baseURL = "https://api.firecrawl.dev";
-
+      plugins.enabled = true;
+      plugins.allow = [
+        "llm-task"
+        "ollama"
+        "vllm"
+        "telegram"
+        "open-prose"
+        # "diffs"
+        "lobster"
+        "acpx"
+        # "firecrawl"
+        "google-gemini-cli-auth"
+      ];
       plugins.entries = {
+        # firecrawl.enabled = true;
+        open-prose.enabled = true;
         google-gemini-cli-auth.enabled = true;
-        firecrawl.enabled = true;
         llm-task.enabled = true;
+        ollama.enabled = true;
+        acpx.enabled = true;
+        vllm.enabled = true;
+        telegram.enabled = true;
+        # diffs.enabled = true;
+        lobster.enabled = true;
       };
       channels.telegram = {
         dmPolicy = "allowlist";
-        tokenFile = config.sops.secrets."vanta-telegram".path;
+        # tokenFile = config.sops.secrets."vanta-telegram".path;
         allowFrom = [8207284912];
       };
     };
@@ -206,6 +245,8 @@
     ];
 
     environment = {
+      NODE_COMPILE_CACHE = "/tmp";
+      OPENCLAW_NO_RESPAWN = "1";
       OPENCLAW_NIX_MODE = "1";
     };
   };
@@ -218,6 +259,11 @@
     };
     telegram = {};
     vanta-telegram = {
+      owner = "openclaw";
+      group = "openclaw";
+      mode = "0400";
+    };
+    morrow-telegram = {
       owner = "openclaw";
       group = "openclaw";
       mode = "0400";

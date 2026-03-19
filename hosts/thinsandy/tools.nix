@@ -50,5 +50,6 @@
         firecrawl-py
         pydantic
       ]))
+    neo4j
   ];
 }

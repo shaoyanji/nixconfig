@@ -26,6 +26,7 @@
     inputs.nix-openclaw.overlays.default
   ];
 
+  services.openclaw-gateway.config.channels.telegram.tokenFile = config.sops.secrets."vanta-telegram".path;
   # Shared hard drive bind mount
   fileSystems."/var/lib/openclaw/.openclaw/workspace/share" = {
     device = "/srv/data/openclaw";

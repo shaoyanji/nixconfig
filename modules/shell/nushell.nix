@@ -76,7 +76,7 @@
           # units
           # dbus
           # semver
-          desktop_notifications
+          # desktop_notifications
         ];
     };
     carapace.enable = true;

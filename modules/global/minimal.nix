@@ -142,7 +142,6 @@ in {
         sd
         tre
         bandwhich
-        glances
         gping
         buku
         ddgr
@@ -184,7 +183,9 @@ in {
         ghostscript_headless
         # toot
       ]
-      ++ lib.optionals stdenv.hostPlatform.isx86_64 []
+      ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+        glances
+      ]
       ++ lib.optionals stdenv.isDarwin [];
     file = {};
 

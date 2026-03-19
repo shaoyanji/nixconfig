@@ -3,9 +3,7 @@
   pkgs,
   lib,
   ...
-}:
-
-{
+}: {
   microvm = {
     vcpu = 2;
     mem = 2048;
@@ -60,7 +58,7 @@
     wget
     vim
     htop
-    neofetch
+    fastfetch
   ];
 
   system.stateVersion = "25.05";

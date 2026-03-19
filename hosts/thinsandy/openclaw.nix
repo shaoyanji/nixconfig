@@ -155,15 +155,15 @@
         model = {
           primary = "openrouter/nvidia/nemotron-3-super-120b-a12b:free";
           fallbacks = [
-            "openrouter/openrouter/free"
             "nvidia/qwen/qwen3.5-122b-a10b"
-            "openai-codex/gpt-5.4"
             "nvidia/openai/gpt-oss-20b"
             "nvidia/openai/gpt-oss-120b"
             "nvidia/qwen/qwen3-coder-480b-a35b-instruct"
             "nvidia/moonshotai/kimi-k2.5"
-            "ollama/kimi-k2.5:cloud"
             "ollama/minimax-m2.7:cloud"
+            "ollama/kimi-k2.5:cloud"
+            "openai-codex/gpt-5.4"
+            "openrouter/openrouter/free"
           ];
         };
 

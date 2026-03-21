@@ -3,6 +3,7 @@
   lib,
   pkgs,
   inputs,
+  commonServicePath,
   ...
 }: {
   services.hermes-agent = {
@@ -18,7 +19,7 @@
     config = {
       model = {
         provider = "openrouter";
-        default = "openrouter/free";
+        default = "";
       };
       terminal = {
         backend = "local";
@@ -29,7 +30,7 @@
   };
 
   systemd.services.hermes-agent = {
-    path = with pkgs; [rsync git nodejs_22 ripgrep ffmpeg];
+    path = commonServicePath ++ (with pkgs; [rsync git nodejs_22 ripgrep ffmpeg]);
     preStart = ''
       install -d -m 0755 /var/lib/hermes/.hermes/skills
       install -d -m 0755 /var/lib/hermes/.hermes/optional-skills

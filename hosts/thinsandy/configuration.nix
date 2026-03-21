@@ -6,6 +6,8 @@
   ...
 }: let
   enableHermes = true;
+  enableOpenClaw = true;
+  enableNullClaw = true;
 in {
   imports =
     [
@@ -15,9 +17,14 @@ in {
       inputs.sops-nix.nixosModules.sops
       ./hardware.nix
       ./media-stack.nix
-      ./openclaw.nix
       ./tools.nix
       ./networking.nix
+    ]
+    ++ lib.optionals enableOpenClaw [
+      ./openclaw.nix
+    ]
+    ++ lib.optionals enableNullClaw [
+      ./nullclaw.nix
     ]
     ++ lib.optionals enableHermes [
       inputs.nix-hermes.nixosModules.hermes-agent
@@ -29,12 +36,13 @@ in {
 
   networking.hostName = "thinsandy";
   nixpkgs.overlays =
-    [
+    []
+    ++ lib.optionals enableOpenClaw [
       inputs.nix-openclaw.overlays.default
     ]
     ++ lib.optionals enableHermes [
       (final: prev: {
-        hermes-agent = final.callPackage ./pkgs/hermes-agent.nix {
+        hermes-agent = final.callPackage ../../pkgs/hermes-agent.nix {
           src = inputs.hermes-src;
           version = "main";
         };
@@ -49,6 +57,10 @@ in {
       options = ["bind"];
     };
 
+    "/var/lib/nullclaw/workspace/share" = {
+      device = "/srv/data/openclaw";
+      options = ["bind"];
+    };
     "/var/lib/hermes/workspace/share" = {
       device = "/srv/data/openclaw";
       options = ["bind"];

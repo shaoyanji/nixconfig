@@ -47,7 +47,7 @@ in {
         "NULLCLAW_HOME=/var/lib/nullclaw/.nullclaw"
         "NULLCLAW_WORKSPACE=/var/lib/nullclaw/workspace"
       ];
-      # EnvironmentFiles = [config.sops.secrets."nullclaw".path];
+      EnvironmentFile = [config.sops.secrets."nullclaw".path];
 
       NoNewPrivileges = true;
       PrivateTmp = true;
@@ -56,9 +56,9 @@ in {
       ReadWritePaths = ["/var/lib/nullclaw"];
     };
   };
-  # sops.secrets.nullclaw = {
-  #   owner = "nullclaw";
-  #   group = "nullclaw";
-  #   mode = "0400";
-  # };
+  sops.secrets.nullclaw = {
+    owner = "nullclaw";
+    group = "nullclaw";
+    mode = "0400";
+  };
 }

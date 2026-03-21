@@ -1,5 +1,5 @@
-{pkgs, ...}: {
-  environment.systemPackages = with pkgs; [
+{pkgs, ...}: let
+  commonTools = with pkgs; [
     # Core
     codex
     vim
@@ -42,6 +42,7 @@
     jq
     tgpt
 
+    # python and neo4j workflow
     uv
     (python3.withPackages (ps:
       with ps; [
@@ -51,5 +52,15 @@
         pydantic
       ]))
     neo4j
+
+    #
+    typst
+    #experiment
+    pup
+    htmlq
   ];
+in {
+  environment.systemPackages = commonTools;
+
+  _module.args.commonServicePath = commonTools;
 }

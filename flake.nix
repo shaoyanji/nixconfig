@@ -166,6 +166,7 @@
         packages = {
           # frontend-bundle = pkgs.callPackage ./frontend {self = inputs.self;};
           backend = pkgs.callPackage ./modules/server/go-backend {};
+          nullclaw = pkgs.callPackage ./pkgs/nullclaw.nix {};
         };
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = [

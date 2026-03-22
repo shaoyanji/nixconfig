@@ -16,7 +16,7 @@
     btrfs-progs
     f2fs-tools
     go
-    yq
+    yq-go
     ddgr
     bat
     fd

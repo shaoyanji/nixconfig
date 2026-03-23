@@ -3,7 +3,6 @@
   lib,
   pkgs,
   inputs,
-  commonServicePath,
   ...
 }: {
   services.hermes-agent = {
@@ -19,7 +18,7 @@
     config = {
       model = {
         provider = "openrouter";
-        default = "";
+        default = "nvidia/nemotron-3-super-120b-a12b:free";
       };
       terminal = {
         backend = "local";
@@ -30,7 +29,7 @@
   };
 
   systemd.services.hermes-agent = {
-    path = commonServicePath ++ (with pkgs; [rsync git nodejs_22 ripgrep ffmpeg]);
+    path = config.environment.systemPackages ++ (with pkgs; [rsync git nodejs_22 ripgrep ffmpeg]);
     preStart = ''
       install -d -m 0755 /var/lib/hermes/.hermes/skills
       install -d -m 0755 /var/lib/hermes/.hermes/optional-skills

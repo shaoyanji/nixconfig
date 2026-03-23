@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   researchPython = pkgs.python3.withPackages (ps:
     with ps; [
       neo4j
@@ -38,14 +42,15 @@
     tldr
     watch
     uv
-    researchPython
     neo4j
     typst
     pup
     htmlq
     go-task
+
+    (lib.hiPrio researchPython)
   ];
 in {
   environment.systemPackages = commonTools;
-  _module.args.commonServicePath = commonTools;
+  # _module.args.commonServicePath = commonTools;
 }

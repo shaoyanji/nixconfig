@@ -1,9 +1,6 @@
 {
   config,
-  lib,
   pkgs,
-  self,
-  commonServicePath,
   ...
 }: let
   nullclawPkg = pkgs.callPackage ../../pkgs/nullclaw.nix {};
@@ -29,7 +26,7 @@ in {
     after = ["network-online.target"];
     wants = ["network-online.target"];
     path =
-      commonServicePath
+      config.environment.systemPackages
       ++ (with pkgs; [
         curl
         cacert

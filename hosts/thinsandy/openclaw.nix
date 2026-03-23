@@ -2,17 +2,8 @@
   config,
   pkgs,
   lib,
-  commonServicePath,
   ...
-}: let
-  researchPython = pkgs.python3.withPackages (ps:
-    with ps; [
-      neo4j
-      pytz
-      firecrawl-py
-      pydantic
-    ]);
-in {
+}: {
   services.openclaw-gateway = {
     enable = true;
     config = {
@@ -259,12 +250,6 @@ in {
       OPENCLAW_NIX_MODE = "1";
     };
   };
-  systemd.services.openclaw-gateway.path =
-    commonServicePath
-    ++ [
-      pkgs.uv
-      researchPython
-    ];
   sops.secrets = {
     openclaw = {
       owner = "openclaw";

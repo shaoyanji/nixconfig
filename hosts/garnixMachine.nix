@@ -64,6 +64,12 @@ in {
     self.packages.${pkgs.system}.nullclaw
     pkgs.htop
     pkgs.tree
+    pkgs.jq
+    pkgs.curl
+    pkgs.cacert
+    pkgs.ddgr
+    pkgs.yq-go
+    pkgs.python3
   ];
 
   # HTTP ingress: Garnix terminates TLS and forwards HTTP to this host.
@@ -77,14 +83,14 @@ in {
     };
   };
   sops = {
-    defaultSopsFile = ./secrets/nullclaw-config.json;
+    defaultSopsFile = ../modules/secrets/nullclaw-config.json;
     defaultSopsFormat = "json";
 
     # Garnix server-side age key
     age.keyFile = "/var/garnix/keys/repo-key";
 
     secrets.nullclaw-config = {
-      sopsFile = ./secrets/nullclaw-config.json;
+      sopsFile = ../modules/secrets/nullclaw-config.json;
       format = "json";
       key = "";
       owner = "nullclaw";

@@ -13,13 +13,9 @@
 in {
   garnixMachine = mkNixosHost {
     system = "x86_64-linux";
+    specialArgs = {inherit inputs self;};
     modules = [
       inputs.garnix-lib.nixosModules.garnix
-      {
-        _module.args = {
-          self = inputs.self;
-        };
-      }
       ../hosts/garnixMachine.nix
     ];
   };

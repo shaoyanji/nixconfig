@@ -13,6 +13,9 @@
 
   commonTools = with pkgs; [
     codex
+    cowsay
+    figlet
+    graphviz
     vim
     wget
     git
@@ -41,13 +44,13 @@
     hyperfine
     tldr
     watch
-    uv
     neo4j
     typst
     pup
     htmlq
     go-task
 
+    uv
     (lib.hiPrio researchPython)
   ];
 in {

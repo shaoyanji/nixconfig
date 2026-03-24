@@ -82,3 +82,9 @@ trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDS
 3. Github credentials add SSH keys
 4. Add Sops.yaml
 5. sops updatekeys modules/secrets.yaml
+
+bootstrapping nullclaw
+
+```sh
+sudo -u nullclaw env   HOME=/var/lib/nullclaw   NULLCLAW_HOME=/var/lib/nullclaw/.nullclaw   NULLCLAW_WORKSPACE=/var/lib/nullclaw/workspace   /nix/store/.../bin/nullclaw onboard --interactive
+```

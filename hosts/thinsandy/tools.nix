@@ -49,6 +49,11 @@
     pup
     htmlq
     go-task
+    gnumake
+    shellcheck
+    entr
+    file
+    rsync
 
     uv
     (lib.hiPrio researchPython)

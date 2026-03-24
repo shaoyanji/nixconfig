@@ -34,6 +34,7 @@
         ];
 
         microvm.hypervisor = "cloud-hypervisor";
+        microvm.vsock.cid = 10;
         microvm.vcpu = 2;
         microvm.mem = 2048;
 

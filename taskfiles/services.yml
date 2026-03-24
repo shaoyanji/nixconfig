@@ -1,0 +1,171 @@
+version: "3"
+
+tasks:
+  services:rebuild:pre-hook:
+    desc: Pre-rebuild hook (reserved)
+    cmds: []
+
+  pre-hook-rebuild:
+    desc: Alias for services:rebuild:pre-hook
+    cmds:
+      - task services:rebuild:pre-hook
+
+  services:switch:*:
+    desc: Switch current host using a rebuild command (nixos|darwin)
+    vars:
+      OS: '{{index .MATCH 0}}'
+    cmds:
+      - sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:prehook && git commit -m "$(hostname) $({{.OS}}-rebuild list-generations | awk 'NR==2 {print $1, $2, $6; exit}')" && task dev:git:posthook
+
+  switch:*:
+    desc: Alias for services:switch:*
+    vars:
+      OS: '{{index .MATCH 0}}'
+    cmds:
+      - task services:switch:{{.OS}}
+
+  services:boot:*:
+    desc: "[destructive] Boot into next generation via rebuild command"
+    vars:
+      OS: '{{index .MATCH 0}}'
+    cmds:
+      - sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+
+  boot:*:
+    desc: Alias for services:boot:*
+    vars:
+      OS: '{{index .MATCH 0}}'
+    cmds:
+      - task services:boot:{{.OS}}
+
+  services:deploy:host:*:
+    desc: Deploy/rebuild a specific remote host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - nixos-rebuild switch --use-remote-sudo --target-host {{.HOST}} --fast --flake .?submodules=1#{{.HOST}} |& nom; task dev:git:prehook && git commit -m "nix-build was successful on {{.HOST}}" && task dev:git:posthook
+
+  prb:*:
+    desc: Alias for services:deploy:host:*
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - task services:deploy:host:{{.HOST}}
+
+  services:rebuild:nixos:
+    desc: Rebuild local NixOS host and refresh ~/Taskfile.yml
+    cmds:
+      - task services:rebuild:pre-hook
+      - task services:switch:nixos
+      - task infra:secrets:decrypt:detaskfile-home
+
+  nixos-rebuild:
+    desc: Alias for services:rebuild:nixos
+    cmds:
+      - task services:rebuild:nixos
+
+  services:rebuild:darwin:
+    desc: Rebuild local Darwin host and refresh ~/Taskfile.yml
+    cmds:
+      - task services:rebuild:pre-hook
+      - task services:switch:darwin
+      - task infra:secrets:decrypt:detaskfile-home
+
+  darwin-rebuild:
+    desc: Alias for services:rebuild:darwin
+    cmds:
+      - task services:rebuild:darwin
+
+  services:rebuild:home-manager:
+    desc: Rebuild local Home Manager profile and push build commit
+    cmds:
+      - task services:rebuild:pre-hook
+      - home-manager switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+      - task infra:secrets:decrypt:detaskfile-home
+
+  home-manager-switch:
+    desc: Alias for services:rebuild:home-manager
+    cmds:
+      - task services:rebuild:home-manager
+
+  services:rebuild:wsl:
+    desc: Rebuild WSL host configuration
+    cmds:
+      - task services:rebuild:pre-hook
+      - sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes |& nom; task dev:git:build-push
+
+  wsl-rebuild:
+    desc: Alias for services:rebuild:wsl
+    cmds:
+      - task services:rebuild:wsl
+
+  services:rebuild:orb:
+    desc: Rebuild OrbStack host configuration and refresh ~/Taskfile.yml
+    cmds:
+      - task services:rebuild:pre-hook
+      - sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure |& nom; task dev:git:build-push
+      - task infra:secrets:decrypt:detaskfile-home
+
+  orb-rebuild:
+    desc: Alias for services:rebuild:orb
+    cmds:
+      - task services:rebuild:orb
+
+  services:deploy:rpi:
+    desc: Deploy configured Raspberry Pi host
+    cmds:
+      - task services:deploy:host:{{.PI}}
+
+  push-rpi-rebuild:
+    desc: Alias for services:deploy:rpi
+    cmds:
+      - task services:deploy:rpi
+
+  services:deploy:thinsandy:
+    desc: Deploy thinsandy host
+    cmds:
+      - task services:deploy:host:thinsandy
+
+  push-thin-rebuild:
+    desc: Alias for services:deploy:thinsandy
+    cmds:
+      - task services:deploy:thinsandy
+
+  services:deploy:mtfuji:
+    desc: Deploy mtfuji host
+    cmds:
+      - task services:deploy:host:mtfuji
+
+  push-fuji-rebuild:
+    desc: Alias for services:deploy:mtfuji
+    cmds:
+      - task services:deploy:mtfuji
+
+  services:deploy:menu:
+    desc: Choose a deployment target
+    cmds:
+      - |
+        choice=$(printf '%s\n' push-rpi-rebuild push-thin-rebuild push-fuji-rebuild exit | gum choose)
+        task "$choice"
+
+  rebuild:
+    desc: Legacy rebuild menu
+    cmds:
+      - |
+        choice=$(printf '%s\n' nixos-rebuild darwin-rebuild home-manager-switch wsl-rebuild orb-rebuild push-rpi-rebuild push-thin-rebuild push-fuji-rebuild exit | gum choose)
+        task "$choice"
+
+  services:logs:host:*:
+    desc: "Tail journal logs for a host via ssh (default unit: go-backend)"
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      UNIT: '{{.UNIT | default "go-backend"}}'
+    cmds:
+      - ssh {{.HOST}} "journalctl -fu {{.UNIT}}"
+
+  services:logs:menu:
+    desc: Choose a logs target
+    cmds:
+      - |
+        host=$(printf '%s\n' {{.SERVER}} thinsandy mtfuji {{.PI}} exit | gum choose)
+        [ "$host" = "exit" ] || task services:logs:host:$host

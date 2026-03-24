@@ -1,0 +1,99 @@
+version: "3"
+
+tasks:
+  dev:git:quick-push:
+    desc: Commit/push config updates quickly
+    cmds:
+      - task dev:git:prehook
+      - 'git commit -m "tidy: config update from $(hostname)"'
+      - task dev:git:posthook
+
+  git-quick-push:
+    desc: Alias for dev:git:quick-push
+    cmds:
+      - task dev:git:quick-push
+
+  dev:git:build-push:
+    desc: Commit/push after successful build
+    cmds:
+      - task dev:git:prehook
+      - git commit -m "nix-build was successful on $(uname -a)"
+      - task dev:git:posthook
+
+  git-build-push:
+    desc: Alias for dev:git:build-push
+    cmds:
+      - task dev:git:build-push
+
+  dev:git:quick-pull:
+    desc: Pull with submodules and reload Taskfile
+    cmds:
+      - git pull --recurse-submodules
+      - task infra:load:taskfile
+
+  git-quick-pull:
+    desc: Alias for dev:git:quick-pull
+    cmds:
+      - task dev:git:quick-pull
+
+  dev:git:prehook:
+    desc: "[destructive] Refresh Taskfile.yml before commit"
+    cmds:
+      - rm ./Taskfile.yml
+      - git add .
+      - task infra:load:taskfile
+
+  git-prehook:
+    desc: Alias for dev:git:prehook
+    cmds:
+      - task dev:git:prehook
+
+  dev:git:posthook:
+    desc: Push current branch
+    cmds:
+      - git push
+
+  git-posthook:
+    desc: Alias for dev:git:posthook
+    cmds:
+      - task dev:git:posthook
+
+  dev:site:sync-verntil:
+    desc: Sync index.html to verntil host
+    vars:
+      NIXFLAKE: ./.config/home-manager/nixconfig
+    cmds:
+      - rsync -r index.html jisifu@vern.cc:~/public_html/index.html
+
+  verntil:
+    desc: Alias for dev:site:sync-verntil
+    cmds:
+      - task dev:site:sync-verntil
+
+  dev:flake:update-branch:
+    desc: "[destructive] Create/reset update branch and force-push flake.lock update"
+    cmds:
+      - git branch -D update || true
+      - git switch -c update
+      - nix flake update
+      - git add flake.lock
+      - git commit -s -m "flake update"
+      - git push -f
+      - git switch main
+
+  update-flake:
+    desc: Alias for dev:flake:update-branch
+    cmds:
+      - task dev:flake:update-branch
+
+  dev:flake:merge-update:
+    desc: "[destructive] Merge update branch into main and delete branch"
+    cmds:
+      - git switch main
+      - git merge update
+      - git branch -d update
+
+  upgrade-flake:
+    desc: Alias for dev:flake:merge-update
+    cmds:
+      - task dev:flake:merge-update

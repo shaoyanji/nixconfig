@@ -88,287 +88,38 @@
     };
   };
 
-  outputs = {
-    self,
-    nix-index-database,
-    nixpkgs,
-    home-manager,
-    impermanence,
-    disko,
-    # chaotic,
-    sops-nix,
-    nur,
-    garnix-lib,
-    # nixgl,
-    nix-darwin,
-    nix-homebrew,
-    nixos-wsl,
-    kickstart-nixvim,
-    nix-openclaw,
-    nix-hermes,
-    microvm,
-    ...
-  } @ inputs: let
-    globalModules = [
-      {
-        system.configurationRevision = self.rev or self.dirtyRev or null;
-      }
-      ./modules/global/global.nix
-    ];
-    globalModulesNixos =
-      globalModules
-      ++ [
-        ./modules/global/nixos.nix
-        home-manager.nixosModules.default
-        sops-nix.nixosModules.sops
-        nur.modules.nixos.default
-        # chaotic.nixosModules.default
-        nix-index-database.nixosModules.nix-index
-        inputs.niri.nixosModules.niri
-        inputs.dms.nixosModules.dank-material-shell
-        #lix-module.nixosModules.default
-        #determinate.nixosModules.default
-      ];
-    globalModulesImpermanence =
-      globalModulesNixos
-      ++ [
-        ./modules/global/impermanence.nix
-        impermanence.nixosModules.impermanence
-        disko.nixosModules.default
-      ];
-    globalModulesMacos =
-      globalModules
-      ++ [
-        ./modules/global/macos.nix
-        nix-homebrew.darwinModules.nix-homebrew
-        home-manager.darwinModules.default
-        sops-nix.darwinModules.sops
-      ];
-    globalModulesContainers =
-      globalModules
-      ++ [
-        ./modules/global/noDE.nix
-        sops-nix.nixosModules.sops
-        home-manager.nixosModules.default
-        # chaotic.nixosModules.default
-        nix-index-database.nixosModules.nix-index
-      ];
-    globalModulesHome = [
-      kickstart-nixvim.homeManagerModules.default
-      sops-nix.homeManagerModules.sops
-      nix-index-database.homeModules.nix-index
-    ];
-  in
-    inputs.flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = import nixpkgs {inherit system;};
-      in {
-        packages = {
-          # frontend-bundle = pkgs.callPackage ./frontend {self = inputs.self;};
-          backend = pkgs.callPackage ./modules/server/go-backend {};
-          nullclaw = pkgs.callPackage ./pkgs/nullclaw.nix {};
-        };
-        devShells.default = pkgs.mkShell {
-          nativeBuildInputs = [
-            pkgs.nodejs
-            pkgs.go
-            pkgs.gopls
-          ];
-        };
-      }
-    )
-    // {
-      homeConfigurations = {
-        penguin = home-manager.lib.homeManagerConfiguration {
-          extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules =
-            globalModulesHome
-            ++ [
-              ./hosts/penguin.nix
-            ];
-        };
-        alarm = home-manager.lib.homeManagerConfiguration {
-          extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."aarch64-linux";
-          modules =
-            globalModulesHome
-            ++ [
-              ./hosts/alarm.nix
-            ];
-        };
-
-        # devji = home-manager.lib.homeManagerConfiguration {
-        #   extraSpecialArgs = {inherit inputs;};
-        #   pkgs = nixpkgs.legacyPackages."x86_64-linux";
-        #   modules =
-        #     globalModulesHome
-        #     ++ [
-        #       ./hosts/devji.nix
-        #     ];
-        # };
-        kali = home-manager.lib.homeManagerConfiguration {
-          extraSpecialArgs = {inherit inputs;};
-          pkgs = nixpkgs.legacyPackages."aarch64-linux";
-          modules =
-            globalModulesHome
-            ++ [
-              ./hosts/kali.nix
-            ];
-        };
-      };
-      nixosConfigurations = {
-        garnixMachine = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            garnix-lib.nixosModules.garnix
-            {
-              _module.args = {
-                self = inputs.self;
-              };
-              # garnix.server.enable = true;
-            }
-            ./hosts/garnixMachine.nix
-          ];
-        };
-        poseidon = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs self;};
-          modules =
-            globalModulesNixos
-            ++ [
-              ./hosts/poseidon/configuration3.nix
-            ];
-        };
-
-        mtfuji = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesContainers
-            ++ [
-              ./hosts/mtfuji/configuration.nix
-            ];
-        };
-        applevalley = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesContainers
-            ++ [
-              inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
-              ./hosts/applevalley/configuration.nix
-            ];
-        };
-        thinsandy = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesContainers
-            ++ [
-              ./hosts/thinsandy/configuration.nix
-            ];
-        };
-        ares = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesImpermanence
-            ++ [
-              ./hosts/ares/configuration.nix
-              inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t440p
-              (import ./hosts/common/disko.nix {device = "/dev/sda";})
-            ];
-        };
-        schneeeule = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesImpermanence
-            ++ [
-              ./hosts/schneeeule/configuration.nix
-              (import ./hosts/common/disko.nix {device = "/dev/sda";})
-            ];
-        };
-        aceofspades = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules = globalModulesNixos ++ [./hosts/aceofspades/configuration.nix];
-        };
-        # ancientace = inputs.hydenix.inputs.hydenix-nixpkgs.lib.nixosSystem {
-        #   inherit (inputs.hydenix.lib) system;
-        #   specialArgs = {
-        #     inherit inputs;
-        #   };
-        #   modules = [
-        #     ./hosts/ancientace/configuration2.nix
-        #   ];
-        # };
-        ancientace = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules = globalModulesNixos ++ [./hosts/ancientace/configuration3.nix];
-        };
-
-        guckloch = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesContainers
-            ++ [
-              ./hosts/guckloch/configuration.nix
-              nixos-wsl.nixosModules.default
-            ];
-        };
-        minyx = nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";
-          specialArgs = {inherit inputs;};
-          modules =
-            globalModulesContainers
-            ++ [
-              ./hosts/minyx/configuration.nix
-              ./hosts/minyx/custompi.nix
-              impermanence.nixosModules.impermanence
-              inputs.nixos-hardware.nixosModules.raspberry-pi-3
-            ];
-        };
-        # orb-cassini = nixpkgs.lib.nixosSystem {
-        #   system = "aarch64-linux";
-        #   specialArgs = {inherit inputs;};
-        #   modules =
-        #     globalModulesContainers
-        #     ++ [
-        #       ./hosts/orb-cassini/custom.nix
-        #       ./hosts/orb-cassini/configuration.nix
-        #       #/etc/nixos/configuration.nix
-        #     ];
-        # };
-        #   coolbeans = nixpkgs.lib.nixosSystem {
-        #     system = "x86_64-linux";
-        #     specialArgs = {inherit inputs;};
-        #     modules =
-        #       globalModulesContainers
-        #       ++ [
-        #         /etc/nixos/configuration.nix
-        #       ];
-        #   };
-        testvm = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {inherit inputs;};
-          modules = [
-            inputs.microvm.nixosModules.microvm
-            ./hosts/microvms/testvm.nix
-          ];
-        };
-      };
-      darwinConfigurations = {
-        cassini = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          specialArgs = {inherit inputs;};
-          modules = globalModulesMacos ++ [./hosts/cassini/configuration.nix];
-        };
-      };
-      # Expose the package set, including overlays, for convenience.
-      darwinPackages = self.darwinConfigurations.cassini.pkgs;
+  outputs = {self, nixpkgs, ...} @ inputs: let
+    lib = nixpkgs.lib;
+    systems = import ./flake/systems.nix {flake-utils = inputs.flake-utils;};
+    pkgsFor = import ./flake/pkgs-for.nix {inherit nixpkgs;};
+    mkNixosHost = import ./lib/mk-nixos-host.nix {inherit nixpkgs;};
+    moduleSets = import ./flake/module-sets.nix {inherit inputs self;};
+  in {
+    packages = import ./flake/packages.nix {
+      inherit lib systems pkgsFor;
     };
+
+    checks = import ./flake/checks.nix {
+      inherit lib systems pkgsFor self;
+    };
+
+    devShells = import ./flake/devshells.nix {
+      inherit lib systems pkgsFor;
+    };
+
+    homeConfigurations = import ./flake/home-configurations.nix {
+      inherit inputs moduleSets nixpkgs;
+    };
+
+    nixosConfigurations = import ./flake/nixos-configurations.nix {
+      inherit inputs self mkNixosHost moduleSets;
+    };
+
+    darwinConfigurations = import ./flake/darwin-configurations.nix {
+      inherit inputs moduleSets;
+    };
+
+    # Expose the package set, including overlays, for convenience.
+    darwinPackages = self.darwinConfigurations.cassini.pkgs;
+  };
 }

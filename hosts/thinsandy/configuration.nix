@@ -15,20 +15,17 @@ in {
       ../common/minimal-desktop.nix
       inputs.nix-openclaw.nixosModules.openclaw-gateway
       inputs.sops-nix.nixosModules.sops
+      (import ../../modules/profiles/ai-host.nix {
+        withOpenclaw = true;
+        withHermes = true;
+      })
       ./hardware.nix
       ./media-stack.nix
       ./tools.nix
       ./networking.nix
     ]
-    ++ lib.optionals enableOpenClaw [
-      ./openclaw.nix
-    ]
-    ++ lib.optionals enableNullClaw [
-      ./nullclaw.nix
-    ]
     ++ lib.optionals enableHermes [
       inputs.nix-hermes.nixosModules.hermes-agent
-      ./hermes.nix
     ];
 
   boot.loader.systemd-boot.enable = true;
@@ -48,8 +45,39 @@ in {
         };
       })
     ];
-  services.openclaw-gateway.config.channels.telegram.tokenFile =
-    config.sops.secrets."vanta-telegram".path;
+  profiles.aiHost = {
+    enable = true;
+    openclaw.enable = enableOpenClaw;
+    nullclaw.enable = enableNullClaw;
+    hermes.enable = enableHermes;
+  };
+  aiServices = {
+    openclawGateway = {
+      enable = enableOpenClaw;
+      workspaceRoot = "/var/lib/openclaw";
+      environmentFile = config.sops.secrets."openclaw".path;
+      telegramTokenFile = config.sops.secrets."vanta-telegram".path;
+    };
+    nullclaw = {
+      host = "127.0.0.1";
+      port = 3001;
+      workspaceRoot = "/var/lib/nullclaw";
+      environmentFile = config.sops.secrets."nullclaw".path;
+    };
+    hermesAgent = {
+      enable = enableHermes;
+      package = pkgs.hermes-agent;
+      workspaceRoot = "/var/lib/hermes";
+      environmentFile = config.sops.secrets.hermes.path;
+    };
+  };
+  sops.secrets = lib.mkIf enableNullClaw {
+    nullclaw = {
+      owner = "nullclaw";
+      group = "nullclaw";
+      mode = "0400";
+    };
+  };
 
   fileSystems = {
     "/var/lib/openclaw/.openclaw/workspace/share" = {

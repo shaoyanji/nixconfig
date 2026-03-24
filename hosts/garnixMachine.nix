@@ -1,4 +1,6 @@
 {
+  inputs,
+  config,
   pkgs,
   self,
   ...
@@ -24,6 +26,7 @@ in {
   garnix.server.enable = true;
   imports = [
     (import ../modules/profiles/ai-host.nix {})
+    inputs.sops-nix.nixosModules.sops
   ];
   profiles.aiHost = {
     enable = true;
@@ -73,7 +76,29 @@ in {
       locations."/".proxyPass = "http://127.0.0.1:${toString nullclawPort}/";
     };
   };
+  sops = {
+    defaultSopsFile = ./secrets/nullclaw-config.json;
+    defaultSopsFormat = "json";
 
+    # Garnix server-side age key
+    age.keyFile = "/var/garnix/keys/repo-key";
+
+    secrets.nullclaw-config = {
+      sopsFile = ./secrets/nullclaw-config.json;
+      format = "json";
+      key = "";
+      owner = "nullclaw";
+      group = "nullclaw";
+      mode = "0400";
+    };
+  };
+
+  systemd.services.nullclaw.preStart = ''
+    install -d -m 0750 -o nullclaw -g nullclaw /var/lib/nullclaw/.nullclaw
+    install -m 0400 -o nullclaw -g nullclaw \
+      ${config.sops.secrets.nullclaw-config.path} \
+      /var/lib/nullclaw/.nullclaw/config.json
+  '';
   networking.firewall.allowedTCPPorts = [
     22
     80

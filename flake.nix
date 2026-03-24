@@ -9,7 +9,7 @@
     ChromeOS (penguin)
     WSL (guckloch)
   ";
-  inputs.self.submodules = true;
+  # inputs.self.submodules = true;
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-index-database.url = "github:nix-community/nix-index-database";

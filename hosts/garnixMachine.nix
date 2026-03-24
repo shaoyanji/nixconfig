@@ -83,14 +83,14 @@ in {
     };
   };
   sops = {
-    defaultSopsFile = ../modules/secrets/nullclaw-config.json;
+    defaultSopsFile = ../secrets/nullclaw-config.json;
     defaultSopsFormat = "json";
 
     # Garnix server-side age key
     age.keyFile = "/var/garnix/keys/repo-key";
 
     secrets.nullclaw-config = {
-      sopsFile = ../modules/secrets/nullclaw-config.json;
+      sopsFile = ../secrets/nullclaw-config.json;
       format = "json";
       key = "";
       owner = "nullclaw";

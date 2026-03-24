@@ -19,7 +19,7 @@
     # zed-editor.package = pkgs.zed-editor-fhs_git;
     anki = {
       enable = true;
-      sync = {
+      profiles."User 1".sync = {
         username = "bob";
         url = "http://thinsandy.fritz.box:27701";
       };

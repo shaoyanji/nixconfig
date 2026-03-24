@@ -9,11 +9,26 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../common/minimal-desktop.nix
-    ../thinsandy/nullclaw.nix
+    (import ../../modules/profiles/ai-host.nix {})
     # ../thinsandy/openclaw.nix
     # inputs.nix-openclaw.nixosModules.openclaw-gateway
     inputs.sops-nix.nixosModules.sops
   ];
+  profiles.aiHost = {
+    enable = true;
+    nullclaw.enable = true;
+  };
+  aiServices.nullclaw = {
+    host = "127.0.0.1";
+    port = 3001;
+    workspaceRoot = "/var/lib/nullclaw";
+    environmentFile = config.sops.secrets."nullclaw".path;
+  };
+  sops.secrets.nullclaw = {
+    owner = "nullclaw";
+    group = "nullclaw";
+    mode = "0400";
+  };
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   # Use the GRUB 2 boot loader.

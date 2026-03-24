@@ -5,8 +5,8 @@
     }
     ../modules/global/global.nix
   ];
-in {
-  globalModules = globalModules;
+in rec {
+  inherit globalModules;
   globalModulesNixos =
     globalModules
     ++ [

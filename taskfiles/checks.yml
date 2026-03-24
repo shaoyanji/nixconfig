@@ -1,0 +1,16 @@
+version: "3"
+
+tasks:
+  checks:quick:
+    desc: Run narrow repo checks
+    cmds:
+      - nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
+      - nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
+      - nix eval .#packages.x86_64-linux.backend.meta.mainProgram
+      - nix build .#checks.x86_64-linux.host-architecture -L
+
+  checks:status:
+    desc: Show task and git status
+    cmds:
+      - task --list-all
+      - git status --short

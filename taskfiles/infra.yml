@@ -1,0 +1,162 @@
+version: "3"
+
+tasks:
+  infra:load:menu:
+    desc: Choose a load action
+    cmds:
+      - |
+        choice=$(printf '%s\n' load-env load-taskfile exit | gum choose)
+        task "$choice"
+
+  load:
+    desc: Alias for infra:load:menu
+    cmds:
+      - task infra:load:menu
+
+  infra:load:env:
+    desc: Load common API env lines from encrypted env file
+    cmds:
+      - task infra:api:get:API
+      - task infra:api:get:POP
+      - task infra:api:get:TOKEN
+
+  load-env:
+    desc: Alias for infra:load:env
+    cmds:
+      - task infra:load:env
+
+  infra:load:taskfile:
+    desc: Decrypt operator Taskfile from secrets repo into local Taskfile.yml
+    cmds:
+      - scripts/task/sops-decrypt-to.sh "{{.SECRETS}}/{{.ENC_TASKFILE}}" "./Taskfile.yml"
+
+  load-taskfile:
+    desc: Alias for infra:load:taskfile
+    cmds:
+      - task infra:load:taskfile
+
+  infra:api:get:*:
+    desc: Print matching API key line from encrypted env file
+    vars:
+      API: '{{index .MATCH 0}}'
+    cmds:
+      - sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -o=shell . | grep {{.API}}
+
+  api:*:
+    desc: Alias for infra:api:get:*
+    vars:
+      API: '{{index .MATCH 0}}'
+    cmds:
+      - task infra:api:get:{{.API}}
+
+  infra:sops:get:*:
+    desc: Query secrets file and print matching value
+    vars:
+      QUERY: '{{index .MATCH 0}}'
+    cmds:
+      - sops -d {{.SECRETS}}/{{.ENC_SECRETS}} | yq -o=shell . | grep {{.QUERY}} | awk -F'=' '{print $2}'
+
+  sops:*:
+    desc: Alias for infra:sops:get:*
+    vars:
+      QUERY: '{{index .MATCH 0}}'
+    cmds:
+      - task infra:sops:get:{{.QUERY}}
+
+  infra:sops:fzf:
+    desc: Select env entries from encrypted env file
+    cmds:
+      - sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -o=shell . | fzf -m | awk '{ gsub(/\047/, ""); print }'
+
+  sopsfzf:
+    desc: Alias for infra:sops:fzf
+    cmds:
+      - task infra:sops:fzf
+
+  infra:secrets:edit:apikeys:
+    desc: Edit encrypted API keys and push to secrets repo
+    cmds:
+      - scripts/task/sops-edit-commit.sh "{{.SECRETS}}" "{{.ENC_ENVS}}" "taskfile - update"
+
+  edit-apikeys:
+    desc: Alias for infra:secrets:edit:apikeys
+    cmds:
+      - task infra:secrets:edit:apikeys
+
+  infra:secrets:edit:taskfile:
+    desc: Edit encrypted Taskfile and refresh local Taskfile.yml
+    cmds:
+      - scripts/task/sops-edit-commit.sh "{{.SECRETS}}" "{{.ENC_TASKFILE}}" "taskfile - update"
+      - task infra:load:taskfile
+
+  edit-taskfile:
+    desc: Alias for infra:secrets:edit:taskfile
+    cmds:
+      - task infra:secrets:edit:taskfile
+
+  infra:secrets:edit:detaskfile:
+    desc: Edit encrypted DE Taskfile and refresh ~/Taskfile.yml
+    cmds:
+      - scripts/task/sops-edit-commit.sh "{{.SECRETS}}" "{{.ENC_DETASKFILE}}" "detaskfile - update"
+      - scripts/task/sops-decrypt-to.sh "{{.SECRETS}}/{{.ENC_DETASKFILE}}" "$HOME/Taskfile.yml"
+
+  edit-nixos-home-task:
+    desc: Alias for infra:secrets:edit:detaskfile
+    cmds:
+      - task infra:secrets:edit:detaskfile
+
+  infra:secrets:edit:secrets:
+    desc: Edit encrypted secrets and sync local mirrored yaml
+    cmds:
+      - sops edit {{.SECRETS}}/{{.ENC_SECRETS}}
+      - rm {{.SECRETS}}.yaml && cp {{.SECRETS}}/{{.ENC_SECRETS}} {{.SECRETS}}.yaml
+      - cd {{.SECRETS}} && git add {{.ENC_SECRETS}} && git commit -m "secrets - update" && git push origin HEAD:master
+
+  edit-secrets:
+    desc: Alias for infra:secrets:edit:secrets
+    cmds:
+      - task infra:secrets:edit:secrets
+
+  infra:sops:update-keys:
+    desc: Rotate SOPS recipient keys and push secret repo changes
+    cmds:
+      - sops updatekeys {{.SECRETS}}/*.yaml
+      - sops updatekeys {{.SECRETS}}.yaml
+      - cd {{.SECRETS}} && git switch master && git add *.yaml .sops.yaml && git commit -m "updated sops keys" && git push
+
+  updatekeys-sops:
+    desc: Alias for infra:sops:update-keys
+    cmds:
+      - task infra:sops:update-keys
+
+  infra:secrets:decrypt:detaskfile-home:
+    internal: true
+    cmds:
+      - scripts/task/sops-decrypt-to.sh "{{.SECRETS}}/{{.ENC_DETASKFILE}}" "$HOME/Taskfile.yml"
+
+  infra:secrets:new:generate:
+    desc: Generate SSH + AGE keys for SOPS bootstrap
+    cmds:
+      - ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "{{.EMAIL}}"
+      - mkdir -p ~/.config/sops/age
+      - nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
+      - echo "&$(hostname) $(nix-shell -p ssh-to-age --run 'ssh-to-age < ~/.ssh/id_ed25519.pub')"
+      - echo "&$(hostname)host $(nix-shell -p ssh-to-age --run 'ssh-to-age < /etc/ssh/ssh_host_ed25519_key.pub')"
+
+  generate-secrets:
+    desc: Alias for infra:secrets:new:generate
+    cmds:
+      - task infra:secrets:new:generate
+
+  infra:secrets:new:copy-nas:
+    desc: Copy AGE key from NAS backup path
+    vars:
+      NAS_PATH: /Volumes/data/security/USB\ Copy_2024-11-24_131715
+    cmds:
+      - mkdir -p ~/.config/sops/age
+      - cp {{.NAS_PATH}}/age-key.txt ~/.config/sops/age/keys.txt
+
+  copy-nas-secrets:
+    desc: Alias for infra:secrets:new:copy-nas
+    cmds:
+      - task infra:secrets:new:copy-nas

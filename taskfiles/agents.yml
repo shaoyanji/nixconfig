@@ -1,0 +1,95 @@
+version: "3"
+
+tasks:
+  agents:menu:
+    desc: Interactive operator control plane menu
+    cmds:
+      - |
+        choice=$(printf '%s\n' rebuild edit-config update load browse new incus sudologinssh help status check deploy logs exit | gum choose)
+        task "$choice"
+
+  browse:
+    desc: Legacy browse menu
+    cmds:
+      - |
+        choice=$(printf '%s\n' browse-notes browse-internet browse-projects exit | gum choose)
+        task "$choice"
+
+  browse-notes:
+    desc: Open quick notes
+    cmds:
+      - $EDITOR ~/Documents/Obsidian-Git-Sync/quicknote.md
+
+  browse-internet:
+    desc: Open browser search
+    cmds:
+      - zen https://duckduckgo.com
+
+  browse-projects:
+    desc: Open projects page
+    cmds:
+      - zen https://shaoyanji.github.io
+
+  projects:
+    desc: Alias for browse-projects
+    cmds:
+      - task browse-projects
+
+  edit-config:
+    desc: Legacy edit-config menu
+    cmds:
+      - |
+        choice=$(printf '%s\n' edit-taskfile edit-nixos-home-task edit-apikeys edit-global edit-secrets edit-sops edit-sops-config edit-home-manager edit-shell-config exit | gum choose)
+        task "$choice"
+
+  edit-global:
+    desc: Edit global nix module
+    cmds:
+      - $EDITOR ./modules/global/global.nix
+
+  edit-sops:
+    desc: Edit .sops.yaml and update recipients
+    cmds:
+      - $EDITOR .sops.yaml
+      - task infra:sops:update-keys
+
+  edit-sops-config:
+    desc: Edit sops Nix module config
+    cmds:
+      - $EDITOR ./modules/sops.nix
+
+  edit-home-manager:
+    desc: Edit global home-manager module
+    cmds:
+      - $EDITOR ./modules/global/home.nix
+
+  edit-shell-config:
+    desc: Edit shell module defaults
+    cmds:
+      - $EDITOR ./modules/shell/default.nix
+
+  update:
+    desc: Legacy update menu
+    cmds:
+      - |
+        choice=$(printf '%s\n' git-quick-push git-quick-pull update-flake updatekeys-sops exit | gum choose)
+        task "$choice"
+
+  new:
+    desc: Legacy bootstrap menu
+    cmds:
+      - |
+        choice=$(printf '%s\n' generate-secrets copy-nas-secrets exit | gum choose)
+        task "$choice"
+
+  incus:
+    desc: Launch and attach to a temporary NixOS Incus container
+    cmds:
+      - sudo incus launch "images:nixos/unstable" nixos -c security.nesting=true
+      - sudo incus list
+      - sudo incus console nixos
+
+  sudologinssh:
+    desc: Run a sudo-login command from encrypted server command list
+    cmds:
+      - ssh $(sops -d --extract '["server"]["commands"]' {{.SECRETS}}/{{.ENC_SECRETS}} | gum choose)

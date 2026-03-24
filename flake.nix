@@ -88,38 +88,8 @@
     };
   };
 
-  outputs = {self, nixpkgs, ...} @ inputs: let
-    lib = nixpkgs.lib;
-    systems = import ./flake/systems.nix {flake-utils = inputs.flake-utils;};
-    pkgsFor = import ./flake/pkgs-for.nix {inherit nixpkgs;};
-    mkNixosHost = import ./lib/mk-nixos-host.nix {inherit nixpkgs;};
-    moduleSets = import ./flake/module-sets.nix {inherit inputs self;};
-  in {
-    packages = import ./flake/packages.nix {
-      inherit lib systems pkgsFor;
+  outputs = inputs @ {self, nixpkgs, ...}:
+    import ./flake/outputs.nix {
+      inherit inputs self nixpkgs;
     };
-
-    checks = import ./flake/checks.nix {
-      inherit lib systems pkgsFor self;
-    };
-
-    devShells = import ./flake/devshells.nix {
-      inherit lib systems pkgsFor;
-    };
-
-    homeConfigurations = import ./flake/home-configurations.nix {
-      inherit inputs moduleSets nixpkgs;
-    };
-
-    nixosConfigurations = import ./flake/nixos-configurations.nix {
-      inherit inputs self mkNixosHost moduleSets;
-    };
-
-    darwinConfigurations = import ./flake/darwin-configurations.nix {
-      inherit inputs moduleSets;
-    };
-
-    # Expose the package set, including overlays, for convenience.
-    darwinPackages = self.darwinConfigurations.cassini.pkgs;
-  };
 }

@@ -8,7 +8,7 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../common/base-desktop-environment.nix
+    ../../modules/profiles/base-desktop-environment.nix
   ];
   boot.loader = {
     systemd-boot.enable = lib.mkForce false;

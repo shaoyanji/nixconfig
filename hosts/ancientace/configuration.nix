@@ -8,8 +8,8 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../common/base-desktop-environment.nix
-    ../common/laptop.nix
+    ../../modules/profiles/base-desktop-environment.nix
+    ../../modules/profiles/laptop.nix
     ../../modules/global/microvm-network.nix
     inputs.microvm.nixosModules.host
   ];
@@ -234,10 +234,10 @@
   #  system.stateVersion = "24.11"; # Did you read the comment?
   services = {
     displayManager = {
-      #     sddm = {
-      #      enable = true;
-      #     wayland.enable = true;
-      #  };
+      sddm = {
+        enable = true;
+        wayland.enable = true;
+      };
       #    xserver.digimend.enable = true;
     };
 
@@ -254,4 +254,5 @@
     #    # config.boot.kernelPackages.digimend
   ];
   services.thermald.enable = true;
+  system.stateVersion = "25.11";
 }

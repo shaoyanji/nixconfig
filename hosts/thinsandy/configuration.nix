@@ -12,7 +12,7 @@ in {
   imports =
     [
       ./hardware-configuration.nix
-      ../common/minimal-desktop.nix
+      ../../modules/profiles/minimal-desktop.nix
       inputs.nix-openclaw.nixosModules.openclaw-gateway
       inputs.sops-nix.nixosModules.sops
       (import ../../modules/profiles/ai-host.nix {

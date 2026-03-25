@@ -13,6 +13,7 @@ tasks:
     desc: Run explicit AI host fleet contract checks
     cmds:
       - task checks:ai-host-manifest
+      - task checks:ai-host-waivers
       - nix build .#checks.x86_64-linux.ai-host-fleet-contract -L
 
   checks:ai-host-manifest:
@@ -22,9 +23,35 @@ tasks:
     cmds:
       - jq -e '.hosts | type == "object"' {{.MANIFEST}} >/dev/null
       - jq -e '.hosts | length > 0' {{.MANIFEST}} >/dev/null
+      - jq -e '.policyDefaults.maxValidationAgeSeconds | type == "number" and . > 0' {{.MANIFEST}} >/dev/null
+      - jq -e '.policyDefaults.maxDriftAgeSeconds | type == "number" and . > 0' {{.MANIFEST}} >/dev/null
       - jq -e '.hosts | to_entries[] | .value.validationTask | type == "string"' {{.MANIFEST}} >/dev/null
       - jq -e '.hosts | to_entries[] | .value.promotionGroup | type == "string"' {{.MANIFEST}} >/dev/null
       - jq -e '.hosts | to_entries[] | .value.hostClass | type == "string"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.nullclawMode | type == "string"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.deploymentStyle | type == "string"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.nullclawBind | type == "string"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.nullclawPort | type == "number"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.workspaceRoot | type == "string"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.services | type == "array"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.readablePaths | type == "array"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | ((.value.policy // {}) | type == "object")' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | ((.value.policy.maxValidationAgeSeconds // 1) | type == "number" and . > 0)' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | ((.value.policy.maxDriftAgeSeconds // 1) | type == "number" and . > 0)' {{.MANIFEST}} >/dev/null
+
+  checks:ai-host-waivers:
+    desc: Validate AI host warning waiver file structure
+    vars:
+      WAIVERS: ./taskfiles/ai-host-waivers.json
+    cmds:
+      - jq -e '.hosts | type == "object"' {{.WAIVERS}} >/dev/null
+      - jq -e 'all(.hosts | to_entries[]?; (.value | type == "array"))' {{.WAIVERS}} >/dev/null
+      - jq -e 'all(.hosts | to_entries[]? | .value[]?; (.severity // "warning") == "warning")' {{.WAIVERS}} >/dev/null
+      - jq -e 'all(.hosts | to_entries[]? | .value[]?; (.category | type == "string"))' {{.WAIVERS}} >/dev/null
+      - jq -e 'all(.hosts | to_entries[]? | .value[]?; (.check | type == "string"))' {{.WAIVERS}} >/dev/null
+      - jq -e 'all(.hosts | to_entries[]? | .value[]?; ((.expected // "") | type == "string"))' {{.WAIVERS}} >/dev/null
+      - jq -e 'all(.hosts | to_entries[]? | .value[]?; ((.reason // "") | type == "string"))' {{.WAIVERS}} >/dev/null
+      - jq -e 'all(.hosts | to_entries[]? | .value[]?; ((.expiresAt // "") | type == "string"))' {{.WAIVERS}} >/dev/null
 
   checks:nullclaw:smoke:*:
     desc: Smoke-check nullclaw deployment on a remote host

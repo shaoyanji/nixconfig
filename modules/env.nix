@@ -86,8 +86,6 @@
       }
     ];
   };
-  home.sessionVariables = {
-  };
   home.packages = with pkgs; [
     lazygit
     #   sops #managed by sops module
@@ -98,6 +96,4 @@
     #   age
   ];
 
-  home.file = {
-  };
 }

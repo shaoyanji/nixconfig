@@ -1,5 +1,6 @@
 {...}: {
   imports = [
-    ./user/ai/default.nix
+    ./bash.nix
+    ./tmux.nix
   ];
 }

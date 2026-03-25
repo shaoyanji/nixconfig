@@ -16,6 +16,56 @@
           if condition
           then true
           else builtins.throw "host-architecture check failed: ${message}";
+        nullclawFleetContract = {
+          garnixMachine = {
+            deploymentEnabled = true;
+            deploymentMode = "config-json";
+            listenHost = "127.0.0.1";
+            listenPort = 3001;
+            workspaceRoot = "/var/lib/nullclaw";
+            environmentFile = null;
+            configJsonSource = "/run/secrets/nullclaw-config";
+            nginxDefaultProxy = "http://127.0.0.1:3000/";
+          };
+          mtfuji = {
+            deploymentEnabled = true;
+            deploymentMode = "env-file";
+            listenHost = "127.0.0.1";
+            listenPort = 3001;
+            workspaceRoot = "/var/lib/nullclaw";
+            environmentFile = "/run/secrets/nullclaw";
+            configJsonSource = null;
+            nginxDefaultProxy = null;
+          };
+        };
+        checkNullclawFleetHost = host: expected: let
+          cfg = configs.${host}.config;
+        in
+          assertMsg (cfg.profiles.aiHost.enable) "${host} profiles.aiHost must be enabled"
+          && assertMsg (cfg.profiles.aiHost.nullclaw.enable) "${host} profiles.aiHost.nullclaw.enable must be true"
+          && assertMsg (cfg.aiServices.nullclaw.enable) "${host} aiServices.nullclaw.enable must be true"
+          && assertMsg (cfg.aiServices.nullclawDeployment.enable == expected.deploymentEnabled) "${host} nullclawDeployment.enable mismatch"
+          && assertMsg (cfg.aiServices.nullclawDeployment.mode == expected.deploymentMode) "${host} nullclawDeployment.mode mismatch"
+          && assertMsg (cfg.aiServices.nullclawDeployment.listenHost == expected.listenHost) "${host} nullclawDeployment.listenHost mismatch"
+          && assertMsg (cfg.aiServices.nullclawDeployment.listenPort == expected.listenPort) "${host} nullclawDeployment.listenPort mismatch"
+          && assertMsg (cfg.aiServices.nullclawDeployment.workspaceRoot == expected.workspaceRoot) "${host} nullclawDeployment.workspaceRoot mismatch"
+          && assertMsg (cfg.aiServices.nullclaw.environmentFile == expected.environmentFile) "${host} aiServices.nullclaw.environmentFile mismatch"
+          && assertMsg (cfg.aiServices.nullclawDeployment.configJsonSource == expected.configJsonSource) "${host} nullclawDeployment.configJsonSource mismatch"
+          && assertMsg (
+            if expected.configJsonSource != null
+            then lib.hasInfix expected.configJsonSource cfg.systemd.services.nullclaw.preStart
+            else true
+          ) "${host} nullclaw preStart missing expected configJsonSource"
+          && assertMsg (
+            if expected.configJsonSource != null
+            then lib.hasInfix "${expected.workspaceRoot}/.nullclaw/config.json" cfg.systemd.services.nullclaw.preStart
+            else true
+          ) "${host} nullclaw preStart missing expected config.json target"
+          && assertMsg (
+            if expected.nginxDefaultProxy != null
+            then cfg.services.nginx.virtualHosts.default.locations."/".proxyPass == expected.nginxDefaultProxy
+            else true
+          ) "${host} nginx default proxy mismatch";
         goBackendHosts = builtins.filter (
           host: configs.${host}.config.systemd.services ? go-backend
         ) (builtins.attrNames configs);
@@ -31,25 +81,15 @@
           assert assertMsg (configs.thinsandy.config.aiServices.hermesAgent.enable) "thinsandy hermes must be enabled";
           assert assertMsg (configs.thinsandy.config.services."hermes-agent".environmentFiles == ["/run/secrets/hermes"]) "thinsandy hermes environmentFiles must be [/run/secrets/hermes]";
 
-          assert assertMsg (configs.garnixMachine.config.aiServices.nullclaw.enable) "garnixMachine nullclaw must be enabled";
-          assert assertMsg (configs.garnixMachine.config.aiServices.nullclawDeployment.enable) "garnixMachine nullclawDeployment must be enabled";
-          assert assertMsg (configs.garnixMachine.config.aiServices.nullclawDeployment.listenHost == "127.0.0.1") "garnixMachine nullclawDeployment listenHost must be 127.0.0.1";
-          assert assertMsg (configs.garnixMachine.config.aiServices.nullclawDeployment.listenPort == 3001) "garnixMachine nullclawDeployment listenPort must be 3001";
-          assert assertMsg (configs.garnixMachine.config.aiServices.nullclawDeployment.workspaceRoot == "/var/lib/nullclaw") "garnixMachine nullclawDeployment workspaceRoot must be /var/lib/nullclaw";
-          assert assertMsg (configs.garnixMachine.config.aiServices.nullclawDeployment.configJsonSource == "/run/secrets/nullclaw-config") "garnixMachine nullclawDeployment configJsonSource must be /run/secrets/nullclaw-config";
-          assert assertMsg (lib.hasInfix "/run/secrets/nullclaw-config" configs.garnixMachine.config.systemd.services.nullclaw.preStart) "garnixMachine nullclaw preStart must stage /run/secrets/nullclaw-config";
-          assert assertMsg (lib.hasInfix "/var/lib/nullclaw/.nullclaw/config.json" configs.garnixMachine.config.systemd.services.nullclaw.preStart) "garnixMachine nullclaw preStart must stage /var/lib/nullclaw/.nullclaw/config.json";
-          assert assertMsg (configs.garnixMachine.config.services.nginx.virtualHosts.default.locations."/".proxyPass == "http://127.0.0.1:3000/") "garnixMachine nginx default proxy must target 127.0.0.1:3000";
-          assert assertMsg (configs.garnixMachine.config.aiServices.nullclaw.environmentFile == null) "garnixMachine nullclaw environmentFile must be null";
-
-          assert assertMsg (configs.mtfuji.config.aiServices.nullclaw.enable) "mtfuji nullclaw must be enabled";
-          assert assertMsg (configs.mtfuji.config.aiServices.nullclawDeployment.enable) "mtfuji nullclawDeployment must be enabled";
-          assert assertMsg (configs.mtfuji.config.aiServices.nullclawDeployment.listenHost == "127.0.0.1") "mtfuji nullclawDeployment listenHost must be 127.0.0.1";
-          assert assertMsg (configs.mtfuji.config.aiServices.nullclawDeployment.listenPort == 3001) "mtfuji nullclawDeployment listenPort must be 3001";
-          assert assertMsg (configs.mtfuji.config.aiServices.nullclawDeployment.workspaceRoot == "/var/lib/nullclaw") "mtfuji nullclawDeployment workspaceRoot must be /var/lib/nullclaw";
-          assert assertMsg (configs.mtfuji.config.aiServices.nullclaw.environmentFile == "/run/secrets/nullclaw") "mtfuji nullclaw environmentFile must be /run/secrets/nullclaw";
+          assert assertMsg (checkNullclawFleetHost "garnixMachine" nullclawFleetContract.garnixMachine) "garnixMachine nullclaw fleet contract mismatch";
+          assert assertMsg (checkNullclawFleetHost "mtfuji" nullclawFleetContract.mtfuji) "mtfuji nullclaw fleet contract mismatch";
 
           assert assertMsg (goBackendHosts == []) "services.go-backend unexpectedly enabled on: ${builtins.toString goBackendHosts}";
           pkgs.runCommand "host-architecture-checks" {} "touch $out";
+
+        ai-host-fleet-contract =
+          assert assertMsg (checkNullclawFleetHost "garnixMachine" nullclawFleetContract.garnixMachine) "garnixMachine nullclaw fleet contract mismatch";
+          assert assertMsg (checkNullclawFleetHost "mtfuji" nullclawFleetContract.mtfuji) "mtfuji nullclaw fleet contract mismatch";
+          pkgs.runCommand "ai-host-fleet-contract" {} "touch $out";
       }
   )

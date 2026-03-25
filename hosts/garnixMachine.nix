@@ -23,9 +23,8 @@
 
   nullclawPort = 3001;
   bountystashPort = 3000;
-
-  # Replace this before deploy.
-  bountystashDomain = "garnixMachine.main.nixconfig.shaoyanji.garnix.me";
+  nullclawLocalUpstream = "http://127.0.0.1:${toString nullclawPort}/";
+  bountystashLocalUpstream = "http://127.0.0.1:${toString bountystashPort}/";
 in {
   garnix.server.enable = true;
 
@@ -60,6 +59,7 @@ in {
 
   aiServices.nullclawDeployment = {
     enable = true;
+    mode = "config-json";
     listenHost = "127.0.0.1";
     listenPort = nullclawPort;
     workspaceRoot = "/var/lib/nullclaw";
@@ -130,13 +130,21 @@ in {
     recommendedGzipSettings = true;
 
     virtualHosts."default" = {
-      # locations."/" .proxyPass = "http://127.0.0.1:${toString nullclawPort}/";
-      # };
-      ## commented for dev purposes
-      # virtualHosts.${bountystashDomain} = {
-      locations."/" .proxyPass = "http://127.0.0.1:${toString bountystashPort}/";
+      # Public HTTP exposure is currently bountystash. Nullclaw remains local-only on 127.0.0.1:3001.
+      locations."/" .proxyPass = bountystashLocalUpstream;
     };
   };
+
+  assertions = [
+    {
+      assertion = nullclawLocalUpstream == "http://127.0.0.1:3001/";
+      message = "garnixMachine nullclaw local upstream is expected to stay on 127.0.0.1:3001";
+    }
+    {
+      assertion = config.services.nginx.virtualHosts.default.locations."/".proxyPass == bountystashLocalUpstream;
+      message = "garnixMachine default public nginx upstream is expected to target bountystash";
+    }
+  ];
   services.logrotate.settings.nginx.enable = false;
   networking.firewall.allowedTCPPorts = [
     22

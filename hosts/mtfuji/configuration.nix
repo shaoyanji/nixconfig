@@ -21,6 +21,7 @@
   };
   aiServices.nullclawDeployment = {
     enable = true;
+    mode = "env-file";
     listenHost = "127.0.0.1";
     listenPort = 3001;
     workspaceRoot = "/var/lib/nullclaw";

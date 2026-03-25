@@ -6,13 +6,20 @@ This pattern standardizes nullclaw deployment across hosts while keeping host-sp
 Shared module:
 - `modules/services/nullclaw-deployment.nix`
 
-Current hosts using the pattern:
+Machine-readable operator manifest:
+- `taskfiles/ai-host-manifest.json`
+
+Current hosts and classes:
 - `hosts/garnixMachine.nix`
+  - `hostClass = wrapper`, `promotionGroup = canary`
 - `hosts/mtfuji/configuration.nix`
+  - `hostClass = wrapper`, `promotionGroup = stable`
+- `hosts/thinsandy/configuration.nix`
+  - `hostClass = direct`, `promotionGroup = stable`
 
 ## What the Shared Module Does
 `aiServices.nullclawDeployment` wraps `aiServices.nullclaw` and provides:
-- explicit host input surface for bind/port/workspace/env file
+- explicit host input surface for bind/port/workspace + secret/config mode
 - optional staging of a runtime `config.json` into `workspaceRoot/.nullclaw`
 - a single place for fleet-safe nullclaw host wiring
 
@@ -23,13 +30,14 @@ It does not manage:
 
 ## Required Host Inputs
 When `aiServices.nullclawDeployment.enable = true`, set:
+- `mode` (`none` | `env-file` | `config-json`)
 - `listenHost`
 - `listenPort`
 - `workspaceRoot`
 
 Optional:
-- `environmentFile` (for env-based secrets)
-- `configJsonSource` (source file staged before start)
+- `environmentFile` (required only for `mode = "env-file"`)
+- `configJsonSource` (required only for `mode = "config-json"`)
 
 ## Add a New Machine
 1. Import the module in the host file:
@@ -50,6 +58,7 @@ Minimal host snippet:
 ```nix
 aiServices.nullclawDeployment = {
   enable = true;
+  mode = "env-file";
   listenHost = "127.0.0.1";
   listenPort = 3001;
   workspaceRoot = "/var/lib/nullclaw";
@@ -66,29 +75,69 @@ aiServices.nullclawDeployment = {
 4. Keep bind/port explicit per host (`listenHost`, `listenPort`) and verify with smoke checks.
 5. Run `task checks:quick` before deployment changes.
 
+## Deploy vs Promote
+- Deploy path (plan/apply/validate) does not imply promotion complete.
+- Promotion requires:
+  1. `task checks:fleet`
+  2. host validation success
+  3. evidence bundle successfully captured
+
 ## New-Machine Onboarding Checklist
 1. Import `modules/services/nullclaw-deployment.nix` in the host module.
 2. Enable nullclaw composition (`profiles.aiHost.nullclaw.enable = true` if using `profiles.aiHost`).
 3. Set `aiServices.nullclawDeployment` inputs: `enable`, `listenHost`, `listenPort`, `workspaceRoot`.
 4. Set host secret wiring:
-   - env-file pattern: set `environmentFile` and declare matching SOPS secret.
-   - config-file pattern: set `configJsonSource` and declare matching SOPS secret.
+   - env-file pattern: set `mode = "env-file"` + `environmentFile` and declare matching SOPS secret.
+   - config-file pattern: set `mode = "config-json"` + `configJsonSource` and declare matching SOPS secret.
 5. Keep host-only networking/storage explicit:
    - firewall/proxy rules
    - bind mounts/persistence paths
 6. Validate and deploy:
    - `task checks:quick`
-   - `task services:deploy:host:<host>`
-   - `task checks:nullclaw:smoke:<host> ...` (or host shortcut where available)
+   - `task services:plan:host:<host>`
+   - `task services:apply:host:<host>`
+   - `task services:validate:host:<host>`
+7. Promote (gated):
+   - `task services:promote:host:<host>`
+8. Optional git recording:
+   - `task services:record:host:<host>`
+
+## Evidence Flow
+Evidence root:
+- `evidence/ai-hosts/<host>/<timestamp>-<event>/`
+
+Evidence files:
+- `summary.json` (timestamp, git rev, flake ref, event, validation result)
+- `details.txt` (service status, socket checks, path readability checks, journal excerpt, nginx proxy expectation check when declared)
+
+Operator tasks:
+- Validate + evidence:
+  - `task services:evidence:validate:host:<host>`
+- Evidence only (no validation run):
+  - `task services:evidence:capture:host:<host> EVENT=<event> VALIDATION_RESULT=<pass|fail>`
+
+## Promotion Gates
+- Single host:
+  - `task services:promote:host:<host>`
+- Canary group:
+  - `task services:promote:canary`
+- Host class:
+  - `task services:promote:class:<wrapper|direct>`
+
+All promotion tasks require:
+- fleet check (`checks:fleet`)
+- successful host validation
+- successful evidence capture
 
 ## Rollback Checklist
 1. Roll back target host generation:
-   - `sudo nixos-rebuild switch --rollback`
-2. Verify service is healthy:
-   - `sudo systemctl status nullclaw`
-3. Re-run smoke checks:
-   - `task checks:nullclaw:smoke:<host> ...`
-4. Revert offending repo commit and redeploy when ready.
+   - `task services:rollback:apply:host:<host>`
+2. Validate and capture rollback evidence:
+   - `task services:evidence:rollback:host:<host>`
+3. One-shot rollback flow:
+   - `task services:rollback:host:<host>`
+4. Optional git recording remains manual:
+   - `task services:record:host:<host>`
 
 ## Top Failure Fingerprints
 1. `systemctl status nullclaw` shows restart loop.
@@ -106,3 +155,4 @@ aiServices.nullclawDeployment = {
 - No synthetic integration test spins up a VM; checks are eval-time plus host smoke checks.
 - Health endpoint path is host/service-version dependent, so smoke task keeps it optional.
 - The shared module assumes the service identity from `modules/services/nullclaw.nix` (`systemd.services.nullclaw`, user/group `nullclaw`).
+- Evidence capture requires local `jq` and remote host access for `ssh`, `systemctl`, `ss`, and `journalctl`.

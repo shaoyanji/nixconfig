@@ -1,95 +1,139 @@
 # Codex Handoff
 
 ## Purpose
-This file rehydrates the current repo refactor state for a fresh Codex session after context loss or session reset.
 
-## Repository goals
-- Refactor the NixOS flake into a more maintainable structure.
-- Preserve existing host behavior.
-- Make AI-related services reusable across hosts.
-- Keep Garnix host operation explicit and minimal.
-- Package non-flake projects cleanly under `pkgs/`.
+This file is the detailed handoff note for a fresh Codex session. It explains the current architectural direction, what has already been cleaned up, what behavior must remain stable, and what work is still open.
 
-## Architectural target
-- `modules/services/*` contains reusable service modules
-- `modules/profiles/*` contains composition profiles
-- `hosts/*` keeps host-only decisions:
-  - storage
-  - secrets
-  - overlays
-  - networking
-  - enablement
-- `pkgs/*` contains package build logic only
-- `flake.nix` should be thin orchestration
+## Repository Goals
 
-## Refactors already implemented
+- Improve maintainability of the flake without broad rewrites.
+- Preserve runtime behavior unless a task explicitly changes behavior.
+- Keep reusable service logic out of host files where possible.
+- Keep host-specific storage, secrets, overlays, networking, and final enablement in `hosts/*`.
+- Keep Garnix behavior explicit and minimal.
 
-### 1. Reusable AI service modules
+## Current Architecture
+
+Canonical structure:
+
+- `flake/*`: flake output wiring
+- `lib/*`: small construction helpers
+- `pkgs/*`: package definitions only
+- `modules/services/*`: reusable daemon/service modules
+- `modules/profiles/*`: reusable composition profiles
+- `modules/user/*`: Home Manager domains
+- `modules/roles/*`: higher-level user role composition
+- `hosts/*`: host entrypoints and host-local decisions
+
+Practical interpretation:
+
+- shared system composition belongs in `modules/profiles/*`
+- shared service behavior belongs in `modules/services/*`
+- host-local bridge names, storage paths, bind mounts, secrets, overlays, and network policy stay in host files
+
+## Refactors Already Landed
+
+### Flake Wiring Split
+
+The flake is already decomposed out of `flake.nix` into:
+
+- `flake/outputs.nix`
+- `flake/nixos-configurations.nix`
+- `flake/home-configurations.nix`
+- `flake/darwin-configurations.nix`
+- `flake/module-sets.nix`
+- `flake/packages.nix`
+- `flake/checks.nix`
+
+`flake.nix` is now mostly inputs plus a thin handoff to `flake/outputs.nix`.
+
+### Reusable AI Service Modules
+
+Implemented under `modules/services/*`:
+
+- `nullclaw.nix`
+- `nullclaw-deployment.nix`
+- `openclaw-gateway.nix`
+- `hermes-agent.nix`
+- `go-backend.nix`
+
+The core pattern is:
+
+- package first
+- reusable module second
+- host enablement last
+
+### AI Host Profile
+
 Implemented:
-- `modules/services/nullclaw.nix`
-- `modules/services/nullclaw-deployment.nix`
-- `modules/services/openclaw-gateway.nix`
-- `modules/services/hermes-agent.nix`
 
-Pattern:
-- option-driven
-- reusable across hosts
-- optional `environmentFile` where appropriate
-- optional `configJsonSource` staging for hosts that keep nullclaw config as a separate runtime file
-- host-specific bind mounts and storage remain host-local
-
-### 2. AI composition profile
-Implemented:
 - `modules/profiles/ai-host.nix`
 
-Intent:
-- compose reusable AI-related services
-- hosts import the profile and set host-specific values
-- no unrelated desktop/networking/server reshuffle
+Used to compose reusable AI services while keeping host-specific secret paths, bind mounts, reverse proxy policy, and persistence local to the host.
 
-### 3. Host constructor helper
+### Host Constructor Helper
+
 Implemented:
+
 - `lib/mk-nixos-host.nix`
 
-Intent:
-- reduce repeated `nixosSystem` boilerplate
-- preserve all `nixosConfigurations.*` names and behavior
+This reduces repeated `nixosSystem` boilerplate while preserving flake output names.
 
-### 4. Packaging extraction
-Implemented:
-- `pkgs/go-backend.nix`
-- `modules/services/go-backend.nix`
+### Shared Profile Extraction
 
-Intent:
-- package first
-- service second
-- no auto-enable on hosts
+Canonical shared profiles now live under `modules/profiles/*`, including:
 
-### 5. Eval-time architecture checks
-Implemented in:
-- `flake.nix`
+- `minimal-desktop.nix`
+- `base-desktop-environment.nix`
+- `laptop.nix`
+- `steam.nix`
+- `nvidia.nix`
+- `impermanence.nix`
 
-Checks include:
-- `thinsandy`:
-  - nullclaw enabled
-  - expected workspace root
-  - expected environment file
-  - openclaw enabled with expected environment file and Telegram token file
-  - hermes enabled with expected environment file
-- `garnixMachine`:
-  - nullclaw enabled
-  - nullclaw deployment wrapper enabled with `listenHost = 127.0.0.1`, `listenPort = 3001`, `workspaceRoot = /var/lib/nullclaw`
-  - nullclaw config staged from `/run/secrets/nullclaw-config` to `/var/lib/nullclaw/.nullclaw/config.json`
-  - nginx default proxy to `http://127.0.0.1:3000/`
-  - no required nullclaw `environmentFile`
-- `mtfuji`:
-  - nullclaw enabled with deployment wrapper and host-specific environment file
-- no host unexpectedly enables `go-backend`
+The corresponding `hosts/common/*` files are now compatibility wrappers.
 
-## Behavior that must remain preserved
+Active hosts have been switched over to canonical `modules/profiles/*` imports.
+
+### Historical Host Entry Cleanup
+
+For `poseidon` and `ancientace`:
+
+- active flake wiring now points directly at `configuration.nix`
+- `configuration2.nix` and `configuration3.nix` were reduced to explicit legacy wrappers
+
+This means the numbered files no longer carry live configuration deltas.
+
+### TestVM Consolidation
+
+`hosts/microvms/testvm.nix` now acts as the shared guest baseline for `testvm`-style microVM usage.
+
+Current pattern:
+
+- standalone `testvm` flake output imports `hosts/microvms/testvm.nix` with defaults
+- embedded `testvm` guests in `poseidon` and `ancientace` import the same file with host-specific arguments
+- host-local bridge/NAT wiring remains in the host
+- guest-specific common logic moved into the shared module
+
+Shared `testvm` baseline now covers:
+
+- guest VM shape (`vcpu`, `mem`, TAP interface, base shares, `/var` volume)
+- base guest user and SSH enablement
+- optional guest networkd configuration
+- optional writable store overlay and dev-oriented Nix defaults
+- optional authorized keys
+
+Host-local guest deltas remain where they should:
+
+- guest extra packages
+- host bridge/NAT policy
+- host external interface choice
+
+## Behavior That Must Remain Preserved
 
 ### thinsandy
+
 Must keep existing effective AI host behavior:
+
 - nullclaw enabled
 - openclaw enabled
 - hermes enabled
@@ -98,38 +142,53 @@ Must keep existing effective AI host behavior:
 - existing host-local bind mounts preserved
 
 ### garnixMachine
+
 Must remain a minimal nullclaw host:
+
 - nullclaw on `127.0.0.1:3001`
-- nullclaw config staged from secret file to `/var/lib/nullclaw/.nullclaw/config.json`
-- nginx currently proxies port 80 to bountystash on `127.0.0.1:3000`
+- config staged from `/run/secrets/nullclaw-config`
+- nginx default proxy to `http://127.0.0.1:3000/`
 - no accidental sops requirement
-- local state treated as ephemeral unless persistence is explicitly added
+- no accidental persistence assumptions
 
 ### mtfuji
-Must keep its existing host-specific nullclaw env-file/secret behavior.
 
-## Warning cleanup already applied
-Applied only as narrow warning cleanup:
-- renamed Anki HM options in `modules/global/heim.nix`
-- added `microvm.vsock.cid = 10;` for testvm microvm definitions in:
-  - `hosts/poseidon/configuration.nix`
-  - `hosts/ancientace/configuration.nix`
+Must keep its existing host-specific nullclaw env-file behavior.
 
-No unrelated reshuffling was done in that cleanup.
+### poseidon and ancientace
 
-## Validation lessons learned
-- Flake evaluation failed multiple times because newly created files were not tracked by Git.
-- Nix flakes only see Git-tracked files.
-- Always stage new files before evaluating.
-- `nix flake check -L` may pull in unrelated systems/configurations and produce warning noise.
+Must keep:
+
+- their current active canonical host entrypoints at `configuration.nix`
+- their embedded `testvm` guests
+- their current host-local bridge/NAT wiring
+
+## Validation Lessons
+
+- Flakes only see Git-tracked files.
+- Newly created files must be staged before flake evaluation.
 - Prefer narrow validation first.
+- `nix flake check -L` is broader and often noisier than needed for structural work.
 
-## Recommended validation flow
-Run these first:
+## Recommended Validation Flow
 
 ```bash
 git status --short
 nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
 nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
 nix eval .#packages.x86_64-linux.backend.meta.mainProgram
-nix build .#checks.x86_64-linux.host-architecture -L --show-trace
+nix build .#checks.x86_64-linux.host-architecture -L
+```
+
+## Current Known Notes
+
+- `garnixMachine` currently evaluates `networking.hostName` to `"nixos"`. This appears to be pre-existing and not introduced by the maintainability refactor.
+- `hosts/common/hydenix.nix` remains a legacy exception and has not yet been normalized into the newer architecture.
+- `hosts/common/disko.nix` is still host-adjacent and may be better left there unless reuse becomes clearer.
+
+## Good Next Tasks
+
+1. Reconcile the remaining legacy docs so they match the extracted profile structure.
+2. Decide whether the legacy wrapper files should remain indefinitely or be removed after an observation window.
+3. Extend shared `testvm` usage to any additional hosts that should consume the common guest baseline.
+4. Review whether any remaining `hosts/common/*` modules are truly canonicalizable or should stay host-local.

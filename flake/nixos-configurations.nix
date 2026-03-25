@@ -125,7 +125,13 @@ in {
     specialArgs = {inherit inputs;};
     modules = [
       inputs.microvm.nixosModules.microvm
-      ../hosts/microvms/testvm.nix
+      (import ../hosts/microvms/testvm.nix {})
+      ({pkgs, ...}: {
+        environment.systemPackages = with pkgs; [
+          vim
+          htop
+        ];
+      })
     ];
   };
 }

@@ -86,6 +86,10 @@
       url = "github:NousResearch/hermes-agent?submodules=1";
       flake = false;
     };
+    bountystash = {
+      url = "github:shaoyanji/bountystash";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {

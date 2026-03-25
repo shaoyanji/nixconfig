@@ -140,7 +140,7 @@ in {
       locations."/" .proxyPass = "http://127.0.0.1:${toString bountystashPort}/";
     };
   };
-
+  services.logrotate.settings.nginx.enable = false;
   networking.firewall.allowedTCPPorts = [
     22
     80

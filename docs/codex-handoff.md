@@ -27,6 +27,7 @@ This file rehydrates the current repo refactor state for a fresh Codex session a
 ### 1. Reusable AI service modules
 Implemented:
 - `modules/services/nullclaw.nix`
+- `modules/services/nullclaw-deployment.nix`
 - `modules/services/openclaw-gateway.nix`
 - `modules/services/hermes-agent.nix`
 
@@ -34,6 +35,7 @@ Pattern:
 - option-driven
 - reusable across hosts
 - optional `environmentFile` where appropriate
+- optional `configJsonSource` staging for hosts that keep nullclaw config as a separate runtime file
 - host-specific bind mounts and storage remain host-local
 
 ### 2. AI composition profile
@@ -76,10 +78,12 @@ Checks include:
   - hermes enabled with expected environment file
 - `garnixMachine`:
   - nullclaw enabled
-  - nginx proxy to `http://127.0.0.1:3001/`
+  - nullclaw deployment wrapper enabled with `listenHost = 127.0.0.1`, `listenPort = 3001`, `workspaceRoot = /var/lib/nullclaw`
+  - nullclaw config staged from `/run/secrets/nullclaw-config` to `/var/lib/nullclaw/.nullclaw/config.json`
+  - nginx default proxy to `http://127.0.0.1:3000/`
   - no required nullclaw `environmentFile`
 - `mtfuji`:
-  - nullclaw enabled with its host-specific environment file
+  - nullclaw enabled with deployment wrapper and host-specific environment file
 - no host unexpectedly enables `go-backend`
 
 ## Behavior that must remain preserved
@@ -96,7 +100,8 @@ Must keep existing effective AI host behavior:
 ### garnixMachine
 Must remain a minimal nullclaw host:
 - nullclaw on `127.0.0.1:3001`
-- nginx proxies port 80 to nullclaw
+- nullclaw config staged from secret file to `/var/lib/nullclaw/.nullclaw/config.json`
+- nginx currently proxies port 80 to bountystash on `127.0.0.1:3000`
 - no accidental sops requirement
 - local state treated as ephemeral unless persistence is explicitly added
 

@@ -113,7 +113,8 @@ in {
     wants = ["network-online.target"];
 
     environment = {
-      BOUNTYSTASH_ADDR = "127.0.0.1:${toString bountystashPort}";
+      PORT = toString bountystashPort;
+      # BOUNTYSTASH_ADDR = "127.0.0.1:${toString bountystashPort}";
     };
 
     serviceConfig = {

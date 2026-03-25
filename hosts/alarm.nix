@@ -4,7 +4,7 @@
   # home.stateVersion = "24.11"; # Please read the comment before changing.
 
   imports = [
-    ../modules/global/minimal.nix
+    ../modules/roles/minimal.nix
   ];
 
   home.packages = with pkgs; [

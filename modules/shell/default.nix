@@ -17,11 +17,10 @@
   };
 in {
   imports = [
+    ./base.nix
     ./starship.nix
     ./nushell.nix
     # ./zsh.nix
-    ./bash.nix
-    ./tmux.nix
   ];
   programs = {
     # zsh = {
@@ -59,15 +58,4 @@ in {
     bat
     eza
   ];
-  # xdg.configFile = {
-  #   "starship.toml".source = builtins.fetchurl {
-  #     url = "https://raw.githubusercontent.com/caelestia-dots/caelestia/refs/heads/main/starship.toml";
-  #     sha256 = "sha256:1041aqy6lzmj0jlmw00nhbn5vzidk9bqp818wxv4wqxb30887w9f";
-  #   };
-  # };
-  home.file = {
-  };
-
-  home.sessionVariables = {
-  };
 }

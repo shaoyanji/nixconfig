@@ -9,6 +9,9 @@ Shared module:
 Machine-readable operator manifest:
 - `taskfiles/ai-host-manifest.json`
 
+Operator waiver file (optional warning waivers only):
+- `taskfiles/ai-host-waivers.json`
+
 Current hosts and classes:
 - `hosts/garnixMachine.nix`
   - `hostClass = wrapper`, `promotionGroup = canary`
@@ -80,7 +83,11 @@ aiServices.nullclawDeployment = {
 - Promotion requires:
   1. `task checks:fleet`
   2. host validation success
-  3. evidence bundle successfully captured
+  3. drift audit success
+  4. freshness policy satisfied (validation/drift evidence age within manifest policy)
+  5. no blocking findings in latest validation/drift evidence
+  6. promotion receipt write
+  7. baseline pointer update
 
 ## New-Machine Onboarding Checklist
 1. Import `modules/services/nullclaw-deployment.nix` in the host module.
@@ -107,7 +114,8 @@ Evidence root:
 - `evidence/ai-hosts/<host>/<timestamp>-<event>/`
 
 Evidence files:
-- `summary.json` (timestamp, git rev, flake ref, event, validation result)
+- `summary.json` (normalized: `host`, `timestamp`, `event`, `result`, class/group, counts, key findings)
+- `findings.json` (normalized findings list with severity/category/check/status/expected/actual/message)
 - `details.txt` (service status, socket checks, path readability checks, journal excerpt, nginx proxy expectation check when declared)
 
 Operator tasks:
@@ -115,6 +123,94 @@ Operator tasks:
   - `task services:evidence:validate:host:<host>`
 - Evidence only (no validation run):
   - `task services:evidence:capture:host:<host> EVENT=<event> VALIDATION_RESULT=<pass|fail>`
+
+## Drift Audit Flow
+Drift evidence root:
+- `evidence/drift/<host>/<timestamp>-drift/`
+
+Drift evidence files:
+- `summary.json` (normalized: `host`, `timestamp`, `event=drift`, `result`, class/group, counts, key findings)
+- `findings.json` (categorized findings with severity and expected vs actual)
+- `details.txt` (human-readable findings + status/journal excerpts)
+
+Operator tasks:
+- Single host drift audit:
+  - `task services:drift:audit:host:<host>`
+- Canary drift audit:
+  - `task services:drift:audit:canary`
+- Class drift audit:
+  - `task services:drift:audit:class:<wrapper|direct>`
+
+Drift checks currently include:
+- manifest-declared service active state
+- manifest bind/port listener check
+- workspace path existence
+- manifest readable-path checks
+- nginx upstream expectation when declared
+- deployment-style inference from `systemctl cat nullclaw`
+
+## Promotion Receipts and Baseline
+Promotion receipt root:
+- `evidence/promotions/<host>/<timestamp>-promotion/`
+
+Promotion receipt files:
+- `receipt.json`
+- `details.txt`
+
+Promotion attempts always run finalize and emit a receipt. Failed promotions emit `result=fail` with `readiness_reason`.
+
+Per-host baseline pointer:
+- `evidence/promotions/<host>/baseline.json`
+
+`baseline.json` marks the promoted known-good evidence set for future comparisons.
+
+## Fleet Status Synthesis
+Status tasks (manifest + evidence only):
+- Fleet status:
+  - `task services:status:ai-hosts`
+- Single-host status:
+  - `task services:status:host:<host>`
+- Promotion-readiness view:
+  - `task services:status:promotion-readiness`
+- Delta view (latest good validation vs latest drift):
+  - `task services:status:delta:host:<host>`
+
+Status output now includes baseline presence (`BASELN`) and baseline update timestamp.
+Status output also includes baseline age in seconds (`B_AGE`).
+
+Promotion-readiness is currently:
+1. latest validation evidence exists and `result=pass`
+2. latest drift evidence exists and `result=pass`
+3. latest drift timestamp is not older than latest validation timestamp
+4. latest validation evidence age <= host policy `maxValidationAgeSeconds`
+5. latest drift evidence age <= host policy `maxDriftAgeSeconds`
+6. latest validation/drift evidence has zero blocking failures (severity `blocking`, with legacy `critical` treated as `blocking`)
+
+If only warning findings remain, host status is reported as `ready:with-warnings`.
+Warning waivers (if configured) are applied only to warning findings and never to blocking findings.
+
+Policy source:
+- `taskfiles/ai-host-manifest.json`
+  - top-level defaults: `policyDefaults.maxValidationAgeSeconds`, `policyDefaults.maxDriftAgeSeconds`
+  - optional host override: `.hosts.<host>.policy.maxValidationAgeSeconds`, `.hosts.<host>.policy.maxDriftAgeSeconds`
+
+## Failure Rehearsal Flow
+Supported safe rehearsal fingerprints:
+- `missing-readable-path`
+- `missing-listener`
+- `nullclaw-inactive`
+- `nginx-upstream-mismatch`
+
+Rehearsal command:
+- `task services:rehearse:nullclaw:host:<host> FINGERPRINT=<name>`
+
+Rehearsal behavior:
+1. capture baseline validation evidence
+2. run simulated drift audit for the fingerprint (expected to fail)
+3. capture post-recovery validation evidence
+4. run normal drift audit to confirm steady state
+
+These rehearsals are simulation-based checks against expectations; they do not mutate host config or stop services.
 
 ## Promotion Gates
 - Single host:
@@ -127,7 +223,34 @@ Operator tasks:
 All promotion tasks require:
 - fleet check (`checks:fleet`)
 - successful host validation
-- successful evidence capture
+- successful drift audit
+- successful promotion finalize step (`services:promote:finalize:host:*`)
+  - validation evidence exists and passes
+  - drift evidence exists and passes
+  - drift evidence is not older than validation evidence
+  - validation/drift evidence is fresh per manifest policy
+  - validation/drift evidence has zero blocking failures
+  - writes promotion receipt
+  - updates baseline pointer
+- promotion tasks remain separate from drift audits and rehearsals
+
+Promotion finalize writes a receipt even for failed attempts (`result=fail`) with a concrete `readiness_reason` (for example `validation-stale`, `drift-stale`, `validation-blocking-findings`).
+
+## Severity and Waivers
+Normalized severities:
+- `info`
+- `warning`
+- `blocking`
+
+Backward compatibility:
+- older evidence using `critical` is treated as `blocking` during readiness/promotion evaluation.
+
+Waivers are file-based and optional:
+- file: `taskfiles/ai-host-waivers.json`
+- scope: per-host warning findings only
+- matching keys: `category`, `check`, optional `expected`
+- optional fields: `reason`, `expiresAt`, `severity` (`warning` only)
+- waivers never override blocking findings
 
 ## Rollback Checklist
 1. Roll back target host generation:
@@ -156,3 +279,6 @@ All promotion tasks require:
 - Health endpoint path is host/service-version dependent, so smoke task keeps it optional.
 - The shared module assumes the service identity from `modules/services/nullclaw.nix` (`systemd.services.nullclaw`, user/group `nullclaw`).
 - Evidence capture requires local `jq` and remote host access for `ssh`, `systemctl`, `ss`, and `journalctl`.
+- Drift rehearsal fingerprints are expectation simulations, not destructive host fault injection.
+- Fleet status synthesis is evidence-driven; hosts without recent evidence are reported as not-ready/missing evidence.
+- Baseline-aware delta prefers promoted baseline when present; if missing, it falls back to latest good validation evidence.

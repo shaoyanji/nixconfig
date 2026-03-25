@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "host": "garnixMachine",
+  "timestamp": "2026-03-25T13:45:09Z",
+  "event": "promotion",
+  "result": "fail",
+  "readiness": "not-ready",
+  "readiness_reason": "no-validation-evidence",
+  "git_rev": "1c6f5def9569a30913169aa2916de989e7ae2469",
+  "flake_ref": ".?submodules=1#garnixMachine",
+  "promotion_group": "canary",
+  "host_class": "wrapper",
+  "manifest_path": "./taskfiles/ai-host-manifest.json",
+  "waivers_path": "./taskfiles/ai-host-waivers.json",
+  "freshness_policy": {
+    "max_validation_age_seconds": 86400,
+    "max_drift_age_seconds": 86400
+  },
+  "evidence_ages_seconds": {
+    "validation": 0,
+    "drift": 0
+  },
+  "finding_summary": {
+    "validation_blocking_failures": 0,
+    "drift_blocking_failures": 0,
+    "validation_warning_failures": 0,
+    "drift_warning_failures": 0,
+    "validation_waived_warning_failures": 0,
+    "drift_waived_warning_failures": 0,
+    "effective_warning_count": 0
+  },
+  "evidence_paths": {
+    "validation_summary": "",
+    "drift_summary": "",
+    "validation_findings": "",
+    "drift_findings": ""
+  },
+  "baseline_designation": "none",
+  "baseline_file": "./evidence/promotions/garnixMachine/baseline.json"
+}

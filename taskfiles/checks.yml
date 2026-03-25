@@ -9,6 +9,62 @@ tasks:
       - nix eval .#packages.x86_64-linux.backend.meta.mainProgram
       - nix build .#checks.x86_64-linux.host-architecture -L
 
+  checks:nullclaw:smoke:*:
+    desc: Smoke-check nullclaw deployment on a remote host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      SERVICE: '{{.SERVICE | default "nullclaw"}}'
+      PORT: '{{.PORT | default "3001"}}'
+      BIND: '{{.BIND | default "127.0.0.1"}}'
+      WORKSPACE_ROOT: '{{.WORKSPACE_ROOT | default "/var/lib/nullclaw"}}'
+      CONFIG_PATH: '{{.CONFIG_PATH | default ""}}'
+      SECRET_PATH: '{{.SECRET_PATH | default ""}}'
+      HEALTH_PATH: '{{.HEALTH_PATH | default ""}}'
+    cmds:
+      - |
+        ssh {{.HOST}} "set -euo pipefail; \
+          sudo systemctl is-active --quiet {{.SERVICE}}; \
+          sudo test -d {{.WORKSPACE_ROOT}}; \
+          sudo test -d {{.WORKSPACE_ROOT}}/.nullclaw; \
+          sudo test -d {{.WORKSPACE_ROOT}}/workspace; \
+          ss -ltnH | awk '{print \$4}' | grep -Fx '{{.BIND}}:{{.PORT}}' >/dev/null; \
+          if [ -n '{{.CONFIG_PATH}}' ]; then sudo test -r '{{.CONFIG_PATH}}'; fi; \
+          if [ -n '{{.SECRET_PATH}}' ]; then sudo test -r '{{.SECRET_PATH}}'; fi; \
+          if [ -n '{{.HEALTH_PATH}}' ]; then curl -fsS --max-time 5 'http://{{.BIND}}:{{.PORT}}{{.HEALTH_PATH}}' >/dev/null; fi"
+
+  checks:nullclaw:smoke:garnixMachine:
+    desc: Smoke-check garnixMachine nullclaw deployment (config-file staging pattern)
+    cmds:
+      - task checks:nullclaw:smoke:garnixMachine:generic
+
+  checks:nullclaw:smoke:garnixMachine:generic:
+    internal: true
+    vars:
+      HOST: garnixMachine
+      BIND: "127.0.0.1"
+      PORT: "3001"
+      WORKSPACE_ROOT: "/var/lib/nullclaw"
+      CONFIG_PATH: "/var/lib/nullclaw/.nullclaw/config.json"
+      SECRET_PATH: "/run/secrets/nullclaw-config"
+    cmds:
+      - task checks:nullclaw:smoke:{{.HOST}} BIND={{.BIND}} PORT={{.PORT}} WORKSPACE_ROOT={{.WORKSPACE_ROOT}} CONFIG_PATH={{.CONFIG_PATH}} SECRET_PATH={{.SECRET_PATH}}
+
+  checks:nullclaw:smoke:mtfuji:
+    desc: Smoke-check mtfuji nullclaw deployment (env-file pattern)
+    cmds:
+      - task checks:nullclaw:smoke:mtfuji:generic
+
+  checks:nullclaw:smoke:mtfuji:generic:
+    internal: true
+    vars:
+      HOST: mtfuji
+      BIND: "127.0.0.1"
+      PORT: "3001"
+      WORKSPACE_ROOT: "/var/lib/nullclaw"
+      SECRET_PATH: "/run/secrets/nullclaw"
+    cmds:
+      - task checks:nullclaw:smoke:{{.HOST}} BIND={{.BIND}} PORT={{.PORT}} WORKSPACE_ROOT={{.WORKSPACE_ROOT}} SECRET_PATH={{.SECRET_PATH}}
+
   checks:status:
     desc: Show task and git status
     cmds:

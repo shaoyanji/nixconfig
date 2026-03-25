@@ -10,6 +10,7 @@
            ];
          
   imports = [
+    ../modules/roles/portable-home.nix
     # ../modules/global/minimal.nix
     ../modules/shell
     ../modules/env.nix

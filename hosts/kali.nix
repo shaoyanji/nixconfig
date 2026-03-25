@@ -3,12 +3,9 @@
   home.homeDirectory = "/home/kali";
 
   imports = [
-    ../modules/env.nix
     ../modules/shell/nushell.nix
-    ../modules/shell/tmux.nix
     ../modules/shell/starship.nix
-    ../modules/global/minimal.nix
-    ../modules/helix.nix
+    ../modules/roles/minimal.nix
     # ../modules/global/home.nix
   ];
   home = {
@@ -16,15 +13,9 @@
       lolcat
       figlet
       jp2a
-      graph-easy
-      graphviz
-      tgpt
-      comrak
       go
       gobuster
       steghide
-      pandoc
-      zoxide
       # aircrack-ng
       powershell
       secretscanner

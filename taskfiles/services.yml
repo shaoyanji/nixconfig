@@ -93,6 +93,127 @@ tasks:
         scripts/task/ai-host-evidence.sh --host {{.HOST}} --event validate --manifest {{.MANIFEST}} --output-root {{.EVIDENCE_ROOT}} --validation-result "$result"
         [ "$result" = "pass" ]
 
+  services:drift:audit:host:*:
+    desc: Audit live host drift against AI host manifest and capture drift evidence
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+      DRIFT_ROOT: ./evidence/drift
+      REHEARSAL_FINGERPRINT: '{{.REHEARSAL_FINGERPRINT | default ""}}'
+    cmds:
+      - |
+        if [ -n "{{.REHEARSAL_FINGERPRINT}}" ]; then
+          scripts/task/ai-host-drift-audit.sh --host {{.HOST}} --manifest {{.MANIFEST}} --output-root {{.DRIFT_ROOT}} --rehearsal-fingerprint {{.REHEARSAL_FINGERPRINT}}
+        else
+          scripts/task/ai-host-drift-audit.sh --host {{.HOST}} --manifest {{.MANIFEST}} --output-root {{.DRIFT_ROOT}}
+        fi
+
+  services:drift:audit:canary:
+    desc: Audit drift for canary AI hosts
+    vars:
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+    cmds:
+      - |
+        set -euo pipefail
+        while IFS= read -r host; do
+          [ -z "$host" ] && continue
+          task services:drift:audit:host:$host
+        done < <(jq -r '.hosts | to_entries[] | select(.value.promotionGroup == "canary") | .key' {{.MANIFEST}})
+
+  services:drift:audit:class:*:
+    desc: Audit drift for all AI hosts in a class
+    vars:
+      CLASS: '{{index .MATCH 0}}'
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+    cmds:
+      - |
+        set -euo pipefail
+        while IFS= read -r host; do
+          [ -z "$host" ] && continue
+          task services:drift:audit:host:$host
+        done < <(jq -r --arg class "{{.CLASS}}" '.hosts | to_entries[] | select(.value.hostClass == $class) | .key' {{.MANIFEST}})
+
+  services:rehearse:nullclaw:host:*:
+    desc: Rehearse safe nullclaw failure fingerprint detection + recovery evidence flow
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      FINGERPRINT: '{{.FINGERPRINT | default "missing-readable-path"}}'
+    cmds:
+      - |
+        set -euo pipefail
+        case "{{.FINGERPRINT}}" in
+          missing-readable-path|missing-listener|nullclaw-inactive|nginx-upstream-mismatch) ;;
+          *)
+            echo "Unsupported fingerprint '{{.FINGERPRINT}}'"
+            exit 2
+            ;;
+        esac
+        task services:evidence:validate:host:{{.HOST}}
+        if task services:drift:audit:host:{{.HOST}} REHEARSAL_FINGERPRINT={{.FINGERPRINT}}; then
+          echo "Rehearsal expected a drift failure for fingerprint {{.FINGERPRINT}}, but audit passed"
+          exit 1
+        fi
+        task services:evidence:validate:host:{{.HOST}}
+        task services:drift:audit:host:{{.HOST}}
+
+  services:status:ai-hosts:
+    desc: Show synthesized AI host fleet status from manifest + evidence
+    vars:
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+      EVIDENCE_ROOT: ./evidence/ai-hosts
+      DRIFT_ROOT: ./evidence/drift
+      PROMOTIONS_ROOT: ./evidence/promotions
+      WAIVERS: ./taskfiles/ai-host-waivers.json
+    cmds:
+      - scripts/task/ai-host-status.sh --mode fleet --manifest {{.MANIFEST}} --evidence-root {{.EVIDENCE_ROOT}} --drift-root {{.DRIFT_ROOT}} --promotions-root {{.PROMOTIONS_ROOT}} --waivers {{.WAIVERS}}
+
+  services:status:host:*:
+    desc: Show synthesized status for a single AI host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+      EVIDENCE_ROOT: ./evidence/ai-hosts
+      DRIFT_ROOT: ./evidence/drift
+      PROMOTIONS_ROOT: ./evidence/promotions
+      WAIVERS: ./taskfiles/ai-host-waivers.json
+    cmds:
+      - scripts/task/ai-host-status.sh --mode host --host {{.HOST}} --manifest {{.MANIFEST}} --evidence-root {{.EVIDENCE_ROOT}} --drift-root {{.DRIFT_ROOT}} --promotions-root {{.PROMOTIONS_ROOT}} --waivers {{.WAIVERS}}
+
+  services:status:promotion-readiness:
+    desc: Show promotion-readiness across AI hosts
+    vars:
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+      EVIDENCE_ROOT: ./evidence/ai-hosts
+      DRIFT_ROOT: ./evidence/drift
+      PROMOTIONS_ROOT: ./evidence/promotions
+      WAIVERS: ./taskfiles/ai-host-waivers.json
+    cmds:
+      - scripts/task/ai-host-status.sh --mode readiness --manifest {{.MANIFEST}} --evidence-root {{.EVIDENCE_ROOT}} --drift-root {{.DRIFT_ROOT}} --promotions-root {{.PROMOTIONS_ROOT}} --waivers {{.WAIVERS}}
+
+  services:status:delta:host:*:
+    desc: Compare promoted baseline (or latest good validation fallback) vs latest drift and report newly introduced issues
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+      EVIDENCE_ROOT: ./evidence/ai-hosts
+      DRIFT_ROOT: ./evidence/drift
+      PROMOTIONS_ROOT: ./evidence/promotions
+      WAIVERS: ./taskfiles/ai-host-waivers.json
+    cmds:
+      - scripts/task/ai-host-status.sh --mode delta --host {{.HOST}} --manifest {{.MANIFEST}} --evidence-root {{.EVIDENCE_ROOT}} --drift-root {{.DRIFT_ROOT}} --promotions-root {{.PROMOTIONS_ROOT}} --waivers {{.WAIVERS}}
+
+  services:promote:finalize:host:*:
+    desc: Finalize host promotion with receipt + baseline update
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+      EVIDENCE_ROOT: ./evidence/ai-hosts
+      DRIFT_ROOT: ./evidence/drift
+      PROMOTIONS_ROOT: ./evidence/promotions
+      WAIVERS: ./taskfiles/ai-host-waivers.json
+    cmds:
+      - scripts/task/ai-host-promote.sh --host {{.HOST}} --manifest {{.MANIFEST}} --evidence-root {{.EVIDENCE_ROOT}} --drift-root {{.DRIFT_ROOT}} --promotions-root {{.PROMOTIONS_ROOT}} --waivers {{.WAIVERS}}
+
   services:record:host:*:
     desc: Record deployment outcome in git (manual/operator-triggered)
     vars:
@@ -143,12 +264,19 @@ tasks:
       - task services:validate:host:{{.HOST}}
 
   services:promote:host:*:
-    desc: Promote a single AI host (fleet checks + validate + evidence)
+    desc: Promote a single AI host (checks + validate + drift + receipt + baseline)
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
       - task checks:fleet
-      - task services:evidence:validate:host:{{.HOST}}
+      - |
+        set -euo pipefail
+        validate_rc=0
+        drift_rc=0
+        task services:evidence:validate:host:{{.HOST}} || validate_rc=$?
+        task services:drift:audit:host:{{.HOST}} || drift_rc=$?
+        task services:promote:finalize:host:{{.HOST}}
+        [ "$validate_rc" -eq 0 ] && [ "$drift_rc" -eq 0 ]
 
   services:promote:canary:
     desc: Promote canary AI hosts from manifest

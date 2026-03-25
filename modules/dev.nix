@@ -5,8 +5,6 @@
   inputs,
   ...
 }: {
-  imports = [
-  ];
   programs = {
     uv = {
       enable = true;
@@ -20,8 +18,6 @@
       enable = true;
       telemetry.mode = "off";
     };
-  };
-  home.sessionVariables = {
   };
   home.packages = with pkgs; [
     # ghc
@@ -46,8 +42,6 @@
     # dotnet-runtime
   ];
 
-  home.file = {
-  };
   home.sessionVariables = {
     # DOTNET_ROOT = "${pkgs.dotnet-sdk}/share/dotnet";
     # DOTNET_CLI_TELEMETRY_OPTOUT = 1;

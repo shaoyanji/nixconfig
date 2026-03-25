@@ -1,4 +1,8 @@
 {
+  "policyDefaults": {
+    "maxValidationAgeSeconds": 86400,
+    "maxDriftAgeSeconds": 86400
+  },
   "hosts": {
     "garnixMachine": {
       "hostClass": "wrapper",

@@ -9,6 +9,23 @@ tasks:
       - nix eval .#packages.x86_64-linux.backend.meta.mainProgram
       - nix build .#checks.x86_64-linux.host-architecture -L
 
+  checks:fleet:
+    desc: Run explicit AI host fleet contract checks
+    cmds:
+      - task checks:ai-host-manifest
+      - nix build .#checks.x86_64-linux.ai-host-fleet-contract -L
+
+  checks:ai-host-manifest:
+    desc: Validate AI host operator manifest structure
+    vars:
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+    cmds:
+      - jq -e '.hosts | type == "object"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | length > 0' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.validationTask | type == "string"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.promotionGroup | type == "string"' {{.MANIFEST}} >/dev/null
+      - jq -e '.hosts | to_entries[] | .value.hostClass | type == "string"' {{.MANIFEST}} >/dev/null
+
   checks:nullclaw:smoke:*:
     desc: Smoke-check nullclaw deployment on a remote host
     vars:
@@ -58,6 +75,22 @@ tasks:
     internal: true
     vars:
       HOST: mtfuji
+      BIND: "127.0.0.1"
+      PORT: "3001"
+      WORKSPACE_ROOT: "/var/lib/nullclaw"
+      SECRET_PATH: "/run/secrets/nullclaw"
+    cmds:
+      - task checks:nullclaw:smoke:{{.HOST}} BIND={{.BIND}} PORT={{.PORT}} WORKSPACE_ROOT={{.WORKSPACE_ROOT}} SECRET_PATH={{.SECRET_PATH}}
+
+  checks:nullclaw:smoke:thinsandy:
+    desc: Smoke-check thinsandy nullclaw deployment (direct env-file pattern)
+    cmds:
+      - task checks:nullclaw:smoke:thinsandy:generic
+
+  checks:nullclaw:smoke:thinsandy:generic:
+    internal: true
+    vars:
+      HOST: thinsandy
       BIND: "127.0.0.1"
       PORT: "3001"
       WORKSPACE_ROOT: "/var/lib/nullclaw"

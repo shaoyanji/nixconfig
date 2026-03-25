@@ -1,0 +1,64 @@
+{
+  "hosts": {
+    "garnixMachine": {
+      "hostClass": "wrapper",
+      "promotionGroup": "canary",
+      "nullclawMode": "config-json",
+      "validationTask": "checks:nullclaw:smoke:garnixMachine",
+      "exposureType": "public-nginx-bountystash-nullclaw-local",
+      "rollbackShape": "remote-nixos-rebuild-switch-rollback",
+      "deploymentStyle": "nullclaw-deployment-wrapper",
+      "nullclawBind": "127.0.0.1",
+      "nullclawPort": 3001,
+      "workspaceRoot": "/var/lib/nullclaw",
+      "services": [
+        "nullclaw",
+        "bountystash",
+        "nginx"
+      ],
+      "readablePaths": [
+        "/run/secrets/nullclaw-config",
+        "/var/lib/nullclaw/.nullclaw/config.json"
+      ],
+      "nginxExpectedProxyPass": "http://127.0.0.1:3000/"
+    },
+    "mtfuji": {
+      "hostClass": "wrapper",
+      "promotionGroup": "stable",
+      "nullclawMode": "env-file",
+      "validationTask": "checks:nullclaw:smoke:mtfuji",
+      "exposureType": "no-public-nginx-nullclaw-policy",
+      "rollbackShape": "remote-nixos-rebuild-switch-rollback",
+      "deploymentStyle": "nullclaw-deployment-wrapper",
+      "nullclawBind": "127.0.0.1",
+      "nullclawPort": 3001,
+      "workspaceRoot": "/var/lib/nullclaw",
+      "services": [
+        "nullclaw"
+      ],
+      "readablePaths": [
+        "/run/secrets/nullclaw"
+      ]
+    },
+    "thinsandy": {
+      "hostClass": "direct",
+      "promotionGroup": "stable",
+      "nullclawMode": "env-file",
+      "validationTask": "checks:nullclaw:smoke:thinsandy",
+      "exposureType": "host-specific-mixed-ai-services",
+      "rollbackShape": "remote-nixos-rebuild-switch-rollback",
+      "deploymentStyle": "direct-aiServices-nullclaw",
+      "nullclawBind": "127.0.0.1",
+      "nullclawPort": 3001,
+      "workspaceRoot": "/var/lib/nullclaw",
+      "services": [
+        "nullclaw",
+        "openclaw-gateway",
+        "hermes-agent"
+      ],
+      "readablePaths": [
+        "/run/secrets/nullclaw"
+      ]
+    }
+  }
+}

@@ -11,6 +11,20 @@ in {
 
   options.aiServices.nullclawDeployment = {
     enable = lib.mkEnableOption "Fleet-ready nullclaw host deployment wrapper";
+    mode = lib.mkOption {
+      type = lib.types.enum [
+        "none"
+        "env-file"
+        "config-json"
+      ];
+      default = "none";
+      description = ''
+        Secret/config mode for nullclaw deployment:
+        - none: no extra secret/config source is wired
+        - env-file: environmentFile must be set
+        - config-json: configJsonSource must be set and staged to <workspaceRoot>/.nullclaw/config.json
+      '';
+    };
 
     listenHost = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
@@ -62,17 +76,38 @@ in {
         assertion = cfg.workspaceRoot != null;
         message = "aiServices.nullclawDeployment.workspaceRoot must be set when enabled";
       }
+      {
+        assertion =
+          if cfg.mode == "env-file"
+          then cfg.environmentFile != null && cfg.configJsonSource == null
+          else true;
+        message = "aiServices.nullclawDeployment mode=env-file requires environmentFile and forbids configJsonSource";
+      }
+      {
+        assertion =
+          if cfg.mode == "config-json"
+          then cfg.configJsonSource != null && cfg.environmentFile == null
+          else true;
+        message = "aiServices.nullclawDeployment mode=config-json requires configJsonSource and forbids environmentFile";
+      }
+      {
+        assertion =
+          if cfg.mode == "none"
+          then cfg.environmentFile == null && cfg.configJsonSource == null
+          else true;
+        message = "aiServices.nullclawDeployment mode=none forbids environmentFile and configJsonSource";
+      }
     ];
 
     aiServices.nullclaw = {
-      enable = true;
-      host = cfg.listenHost;
-      port = cfg.listenPort;
-      workspaceRoot = cfg.workspaceRoot;
-      environmentFile = cfg.environmentFile;
+      enable = lib.mkForce true;
+      host = lib.mkForce cfg.listenHost;
+      port = lib.mkForce cfg.listenPort;
+      workspaceRoot = lib.mkForce cfg.workspaceRoot;
+      environmentFile = lib.mkForce cfg.environmentFile;
     };
 
-    systemd.services.nullclaw.preStart = lib.mkIf (cfg.configJsonSource != null) (lib.mkAfter ''
+    systemd.services.nullclaw.preStart = lib.mkIf (cfg.mode == "config-json") (lib.mkAfter ''
       install -d -m 0750 -o nullclaw -g nullclaw ${cfg.workspaceRoot}/.nullclaw
       install -m 0400 -o nullclaw -g nullclaw \
         ${cfg.configJsonSource} \

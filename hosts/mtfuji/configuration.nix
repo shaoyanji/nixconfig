@@ -10,6 +10,7 @@
     ./hardware-configuration.nix
     ../common/minimal-desktop.nix
     (import ../../modules/profiles/ai-host.nix {})
+    ../../modules/services/nullclaw-deployment.nix
     # ../thinsandy/openclaw.nix
     # inputs.nix-openclaw.nixosModules.openclaw-gateway
     inputs.sops-nix.nixosModules.sops
@@ -18,9 +19,10 @@
     enable = true;
     nullclaw.enable = true;
   };
-  aiServices.nullclaw = {
-    host = "127.0.0.1";
-    port = 3001;
+  aiServices.nullclawDeployment = {
+    enable = true;
+    listenHost = "127.0.0.1";
+    listenPort = 3001;
     workspaceRoot = "/var/lib/nullclaw";
     environmentFile = config.sops.secrets."nullclaw".path;
   };

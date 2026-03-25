@@ -31,6 +31,7 @@ in {
 
   imports = [
     (import ../modules/profiles/ai-host.nix {})
+    ../modules/services/nullclaw-deployment.nix
     inputs.sops-nix.nixosModules.sops
   ];
 
@@ -57,10 +58,12 @@ in {
 
   security.sudo.wheelNeedsPassword = false;
 
-  aiServices.nullclaw = {
-    host = "127.0.0.1";
-    port = nullclawPort;
+  aiServices.nullclawDeployment = {
+    enable = true;
+    listenHost = "127.0.0.1";
+    listenPort = nullclawPort;
     workspaceRoot = "/var/lib/nullclaw";
+    configJsonSource = config.sops.secrets.nullclaw-config.path;
   };
 
   environment.systemPackages = [
@@ -98,13 +101,6 @@ in {
       mode = "0400";
     };
   };
-
-  systemd.services.nullclaw.preStart = ''
-    install -d -m 0750 -o nullclaw -g nullclaw /var/lib/nullclaw/.nullclaw
-    install -m 0400 -o nullclaw -g nullclaw \
-      ${config.sops.secrets.nullclaw-config.path} \
-      /var/lib/nullclaw/.nullclaw/config.json
-  '';
 
   systemd.services.bountystash = {
     description = "Bountystash web app";

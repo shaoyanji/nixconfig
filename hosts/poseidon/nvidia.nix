@@ -4,7 +4,7 @@
   ...
 }: {
   imports = [
-    ../common/nvidia.nix
+    ../../modules/profiles/nvidia.nix
   ];
   services.xserver.videoDrivers = ["amdgpu" "nvidia"];
   hardware.nvidia = {

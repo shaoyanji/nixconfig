@@ -5,7 +5,7 @@
   ...
 }: {
   imports = [
-    ../common/nvidia.nix
+    ../../modules/profiles/nvidia.nix
   ];
 
   # extraPackages = with pkgs; [nvidia-vaapi-driver];

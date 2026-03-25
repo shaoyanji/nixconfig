@@ -26,7 +26,7 @@ in {
     modules =
       globalModulesNixos
       ++ [
-        ../hosts/poseidon/configuration3.nix
+        ../hosts/poseidon/configuration.nix
       ];
   };
 
@@ -93,7 +93,7 @@ in {
   ancientace = mkNixosHost {
     system = "x86_64-linux";
     specialArgs = {inherit inputs;};
-    modules = globalModulesNixos ++ [../hosts/ancientace/configuration3.nix];
+    modules = globalModulesNixos ++ [../hosts/ancientace/configuration.nix];
   };
 
   guckloch = mkNixosHost {

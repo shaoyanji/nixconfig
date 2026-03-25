@@ -11,10 +11,10 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia.nix
-    ../common/steam.nix
-    ../common/base-desktop-environment.nix
-    ../common/minimal-desktop.nix
-    ../common/laptop.nix
+    ../../modules/profiles/steam.nix
+    ../../modules/profiles/base-desktop-environment.nix
+    ../../modules/profiles/minimal-desktop.nix
+    ../../modules/profiles/laptop.nix
     # Our custom microvm network module
     ../../modules/global/microvm-network.nix
     inputs.microvm.nixosModules.host
@@ -270,6 +270,12 @@
   # };
   services.avahi.publish.enable = true;
   services.avahi.publish.userServices = true;
+  systemd.user.services.niri-flake-polkit.enable = false;
+
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
 
   networking.firewall = {
     enable = true;
@@ -287,6 +293,12 @@
   };
 }
 // {
+  system.stateVersion = "25.11";
+  nixpkgs.config = {
+    allowUnfree = true;
+    nvidia.acceptLicense = true;
+    cudaSupport = true;
+  };
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
       # "crush"

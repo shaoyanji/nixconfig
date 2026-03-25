@@ -8,7 +8,7 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../common/minimal-desktop.nix
+    ../../modules/profiles/minimal-desktop.nix
     (import ../../modules/profiles/ai-host.nix {})
     ../../modules/services/nullclaw-deployment.nix
     # ../thinsandy/openclaw.nix

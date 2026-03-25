@@ -7,8 +7,8 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../common/minimal-desktop.nix
-    ../common/laptop.nix
+    ../../modules/profiles/minimal-desktop.nix
+    ../../modules/profiles/laptop.nix
   ];
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

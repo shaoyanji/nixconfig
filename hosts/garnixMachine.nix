@@ -20,20 +20,25 @@
         )
       )
     );
+
   nullclawPort = 3001;
+  bountystashPort = 3000;
+
+  # Replace this before deploy.
+  bountystashDomain = "garnixMachine.main.nixconfig.shaoyanji.garnix.me";
 in {
-  # Garnix host baseline.
   garnix.server.enable = true;
+
   imports = [
     (import ../modules/profiles/ai-host.nix {})
     inputs.sops-nix.nixosModules.sops
   ];
+
   profiles.aiHost = {
     enable = true;
     nullclaw.enable = true;
   };
 
-  # Keep SSH access for operations/debugging.
   services.openssh = {
     enable = true;
     settings = {
@@ -49,15 +54,13 @@ in {
     extraGroups = ["wheel" "systemd-journal"];
     openssh.authorizedKeys.keys = sshKeys;
   };
+
   security.sudo.wheelNeedsPassword = false;
 
-  # Explicit state model for Garnix: runtime state is local/ephemeral unless
-  # external persistence is added and wired separately.
   aiServices.nullclaw = {
     host = "127.0.0.1";
     port = nullclawPort;
     workspaceRoot = "/var/lib/nullclaw";
-    # No environmentFile configured by default on Garnix.
   };
 
   environment.systemPackages = [
@@ -72,21 +75,10 @@ in {
     pkgs.python3
   ];
 
-  # HTTP ingress: Garnix terminates TLS and forwards HTTP to this host.
-  services.nginx = {
-    enable = true;
-    recommendedProxySettings = true;
-    recommendedOptimisation = true;
-    recommendedGzipSettings = true;
-    virtualHosts."default" = {
-      locations."/".proxyPass = "http://127.0.0.1:${toString nullclawPort}/";
-    };
-  };
   sops = {
     defaultSopsFile = ../secrets/nullclaw-config.json;
     defaultSopsFormat = "json";
 
-    # Garnix server-side age key
     age.keyFile = "/var/garnix/keys/repo-key";
 
     secrets.nullclaw-config = {
@@ -97,6 +89,14 @@ in {
       group = "nullclaw";
       mode = "0400";
     };
+
+    secrets.bountystash-env = {
+      sopsFile = ../secrets/bountystash.env;
+      format = "dotenv";
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
   };
 
   systemd.services.nullclaw.preStart = ''
@@ -105,6 +105,42 @@ in {
       ${config.sops.secrets.nullclaw-config.path} \
       /var/lib/nullclaw/.nullclaw/config.json
   '';
+
+  systemd.services.bountystash = {
+    description = "Bountystash web app";
+    wantedBy = ["multi-user.target"];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+
+    environment = {
+      BOUNTYSTASH_ADDR = "127.0.0.1:${toString bountystashPort}";
+    };
+
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${inputs.bountystash.packages.${pkgs.system}.default}/bin/web";
+      EnvironmentFile = config.sops.secrets.bountystash-env.path;
+      Restart = "on-failure";
+      RestartSec = "2s";
+      DynamicUser = true;
+    };
+  };
+
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    recommendedOptimisation = true;
+    recommendedGzipSettings = true;
+
+    virtualHosts."default" = {
+      # locations."/" .proxyPass = "http://127.0.0.1:${toString nullclawPort}/";
+      # };
+      ## commented for dev purposes
+      # virtualHosts.${bountystashDomain} = {
+      locations."/" .proxyPass = "http://127.0.0.1:${toString bountystashPort}/";
+    };
+  };
+
   networking.firewall.allowedTCPPorts = [
     22
     80

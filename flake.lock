@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "bountystash": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774394995,
+        "narHash": "sha256-Lgpk82SALWmiEHsAzK+FBPiLS2z1kDE0XZYqmnaIjWg=",
+        "owner": "shaoyanji",
+        "repo": "bountystash",
+        "rev": "f405b66d6ed260862f54e0b9bbfd0dec1d1bc404",
+        "type": "github"
+      },
+      "original": {
+        "owner": "shaoyanji",
+        "repo": "bountystash",
+        "type": "github"
+      }
+    },
     "brew-src": {
       "flake": false,
       "locked": {
@@ -770,6 +790,7 @@
     },
     "root": {
       "inputs": {
+        "bountystash": "bountystash",
         "disko": "disko",
         "dms": "dms",
         "firefox-addons": "firefox-addons",

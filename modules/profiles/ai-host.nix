@@ -7,6 +7,10 @@
   ...
 }: let
   cfg = config.profiles.aiHost;
+  hasNullclawDeployment = config.aiServices ? nullclawDeployment;
+  nullclawDeploymentEnabled =
+    hasNullclawDeployment
+    && config.aiServices.nullclawDeployment.enable;
 in {
   imports =
     [
@@ -38,9 +42,17 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    aiServices.nullclaw.enable = cfg.nullclaw.enable;
-  }
+  config =
+    lib.mkIf cfg.enable {
+      assertions = lib.optionals hasNullclawDeployment [
+        {
+          assertion = cfg.nullclaw.enable == nullclawDeploymentEnabled;
+          message = "profiles.aiHost.nullclaw.enable must match aiServices.nullclawDeployment.enable when nullclaw-deployment is imported";
+        }
+      ];
+
+      aiServices.nullclaw.enable = lib.mkDefault cfg.nullclaw.enable;
+    }
   // lib.optionalAttrs withOpenclaw {
     aiServices.openclawGateway.enable = cfg.openclaw.enable;
   }

@@ -29,7 +29,7 @@ keys:
   - &garnix age1uljtkrhrwtq9w5lfk75e9dpaclyysr9mjtprkpfjnd5s08wg9d6sx5g55w
 
 creation_rules:
-  - path_regex: secrets/.*\.json$
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:
           - *garnix

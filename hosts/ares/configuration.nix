@@ -2,9 +2,9 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../common/impermanence.nix
-    ../common/base-desktop-environment.nix
-    ../common/laptop.nix
+    ../../modules/profiles/impermanence.nix
+    ../../modules/profiles/base-desktop-environment.nix
+    ../../modules/profiles/laptop.nix
   ];
   networking.hostName = "ares"; # Define your hostname.
   #environment.systemPackages = with pkgs; [

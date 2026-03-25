@@ -9,10 +9,10 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia.nix
-    ../common/steam.nix
-    ../common/impermanence.nix
-    ../common/base-desktop-environment.nix
-    ../common/laptop.nix
+    ../../modules/profiles/steam.nix
+    ../../modules/profiles/impermanence.nix
+    ../../modules/profiles/base-desktop-environment.nix
+    ../../modules/profiles/laptop.nix
   ];
   networking.hostName = "schneeeule"; # Define your hostname.
   environment.systemPackages = with pkgs; [

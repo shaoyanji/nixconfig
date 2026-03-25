@@ -1,90 +1,187 @@
-# nixconfig - multi-device configurations
+# nixconfig
 
-My Nix Configurations for darwin, nixos, home-manager, and WSL.
+Multi-host Nix flake for:
 
-## TODO
+- NixOS
+- nix-darwin
+- Home Manager
+- WSL-style container hosts
 
-- [x] add submodule for secrets
-- [x] integrated dotfiles as a submodule
-- [x] microvm from stapelberger blogpost
+This repository is no longer just a bootstrap guide for adding a device. It is an actively structured fleet/configuration repo with reusable host profiles, reusable service modules, explicit host wiring, and narrow eval-time checks.
+
+## Current Direction
+
+The architecture intent is:
+
+- `modules/services/*`: reusable daemon and service logic
+- `modules/profiles/*`: reusable composition profiles
+- `hosts/*`: host identity, storage, secrets, overlays, networking, and final enablement
+- `pkgs/*`: package definitions only
+- `lib/*`: small flake/module helpers
+- `flake/*`: output wiring and flake orchestration
+
+The main refactor trend is to move shared logic out of `hosts/common/*` and into canonical modules under `modules/profiles/*` and `modules/services/*`, while keeping host-specific behavior in host files.
+
+## Flake Outputs
+
+Primary outputs:
+
+- `nixosConfigurations`
+- `darwinConfigurations`
+- `homeConfigurations`
+- `packages`
+- `checks`
+- `devShells`
+
+Current NixOS wiring is split out of `flake.nix` and assembled through [flake/outputs.nix](/home/devji/nixconfig/flake/outputs.nix), [flake/nixos-configurations.nix](/home/devji/nixconfig/flake/nixos-configurations.nix), and [flake/module-sets.nix](/home/devji/nixconfig/flake/module-sets.nix).
+
+## Repository Layout
+
+Important paths:
+
+- `flake.nix`: top-level flake inputs and output handoff
+- `flake/*`: output wiring
+- `hosts/*`: host entrypoints and host-local modules
+- `hosts/common/*`: mostly compatibility wrappers and host-local leftovers
+- `modules/profiles/*`: canonical reusable system profiles
+- `modules/services/*`: reusable service modules
+- `modules/user/*`: Home Manager domain modules
+- `modules/roles/*`: higher-level user role composition
+- `pkgs/*`: package build definitions
+- `docs/*`: architecture notes, fleet docs, and operator guidance
+
+## Notable Current Patterns
+
+### Shared Profiles
+
+Canonical reusable profiles now live under `modules/profiles/*`, including:
+
+- `minimal-desktop.nix`
+- `base-desktop-environment.nix`
+- `laptop.nix`
+- `steam.nix`
+- `nvidia.nix`
+- `impermanence.nix`
+- `ai-host.nix`
+
+Some legacy `hosts/common/*` files still exist, but the active hosts have been moved toward canonical profile imports.
+
+### AI Host Services
+
+Reusable AI service modules live under `modules/services/*`, including:
+
+- `nullclaw.nix`
+- `nullclaw-deployment.nix`
+- `openclaw-gateway.nix`
+- `hermes-agent.nix`
+- `go-backend.nix`
+
+The AI fleet pattern is documented in [docs/nullclaw-fleet-pattern.md](/home/devji/nixconfig/docs/nullclaw-fleet-pattern.md).
+
+### Host Constructor
+
+NixOS hosts are assembled through [lib/mk-nixos-host.nix](/home/devji/nixconfig/lib/mk-nixos-host.nix) to keep flake output wiring small and consistent.
+
+### Historical Host Files
+
+Some hosts still have older `configuration2.nix` and `configuration3.nix` paths. These are treated as legacy wrappers, not canonical active entrypoints.
+
+### Shared TestVM Guest
+
+[hosts/microvms/testvm.nix](/home/devji/nixconfig/hosts/microvms/testvm.nix) now acts as a shared `testvm` guest baseline.
+
+It is used in two ways:
+
+- as the standalone `testvm` flake output guest definition
+- as a shared guest import for embedded `testvm` microVMs inside larger hosts
+
+Host-local bridge, NAT, and external interface policy still stay in the host files.
+
+## Working With The Repo
+
+### Narrow Validation First
+
+Use the narrow validation flow before wider checks:
 
 ```bash
-sudo ip link set microbr up && sudo ip link set microvm1 master microbr
+git status --short
+nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
+nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
+nix eval .#packages.x86_64-linux.backend.meta.mainProgram
+nix build .#checks.x86_64-linux.host-architecture -L
 ```
 
-## Installation
+Why this matters:
+
+- flakes only see Git-tracked files
+- narrow evals catch structural breakage faster than `nix flake check`
+- wider checks may pull in unrelated systems and produce noise
+
+### Common Operations
+
+Inspect outputs:
 
 ```bash
-nixos-rebuild switch --flake github:/shaoyanji/nixconfig?submodules=1#$(hostname)
-git clone thinsandy:/x/nixconfig
-git clone https://$GITHUB_API_TOKEN@github.com/shaoyanji/nixconfig.git
-git clone git@github.com:/shaoyanji/nixconfig.git
-cd nixconfig
-git submodule update --init --recursive
+nix flake show
 ```
 
-## Usage
-
-### MACOS rebuild from scratch
+Switch local NixOS host:
 
 ```bash
-Xcode install
-m hostname '$(hostname)'
-nix run nix-darwin -- switch --flake github:shaoyanji/nixconfig#$(hostname)
-# use sops script below
-ln -s .config/sops Library/Application\ Support/sops
+sudo nixos-rebuild switch --flake .#$(hostname)
 ```
 
-### SOPS Configuration for NixOS
-
-To add a new NixOS machine to the fleet:
+Build a NixOS system without switching:
 
 ```bash
-mkdir -p ~/.config/sops/age
-nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
-export AGE=$(nix-shell -p ssh-to-age --run "cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age")
-export HOST=$(hostname)
-yq -i '.keys += (env(AGE) | . anchor = env(HOST)) | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' .sops.yaml
-export AGE=$(nix-shell -p ssh-to-age --run "cat ~/.ssh/id_ed25519.pub | ssh-to-age")
-export USER=$(whoami)
-yq -i '.keys += (env(AGE) | . anchor = env(HOST)+env(USER)) | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' .sops.yaml
+nix build .#nixosConfigurations.$(hostname).config.system.build.toplevel
 ```
 
-### Installing Tailscale
+Switch Darwin host:
 
 ```bash
-curl -fsSL https://tailscale.com/install.sh | sh
+nix run nix-darwin -- switch --flake .#cassini
 ```
 
-### Installing Nix
+Switch Home Manager standalone host:
 
 ```bash
-sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
+home-manager switch --flake .#penguin
 ```
 
-### Setting Up Home-Manager
+### Git and Flakes
 
-```bash
-nix run home-manager/master -- switch --flake
-home-manager switch --flake github:/shaoyanji/nixconfig?submodules=1#$(hostname)
-```
+If you create a new file that is referenced by the flake, it must be Git-tracked before evaluation. Otherwise Nix flakes will fail with a path-not-tracked error.
 
-put this in `~/etc/nix/nix.conf`
+## Documentation
 
-```ini
-experimental-features = nix-command flakes
-substituters = https://cache.nixos.org/ https://nix-community.cachix.org https://cache.garnix.io https://shaoyanji.cachix.org https://cache.nixos.org/
-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0=
-```
+Useful docs:
 
-1. Generate SSH key
-2. Make Age equivalents
-3. Github credentials add SSH keys
-4. Add Sops.yaml
-5. sops updatekeys modules/secrets.yaml
+- [docs/codex-handoff.md](/home/devji/nixconfig/docs/codex-handoff.md)
+- [docs/nullclaw-fleet-pattern.md](/home/devji/nixconfig/docs/nullclaw-fleet-pattern.md)
+- [docs/task-control-plane.md](/home/devji/nixconfig/docs/task-control-plane.md)
+- [docs/userland-module-map.md](/home/devji/nixconfig/docs/userland-module-map.md)
+- [docs/userland-package-ownership.md](/home/devji/nixconfig/docs/userland-package-ownership.md)
 
-bootstrapping nullclaw
+## Constraints
 
-```sh
-sudo -u nullclaw env   HOME=/var/lib/nullclaw   NULLCLAW_HOME=/var/lib/nullclaw/.nullclaw   NULLCLAW_WORKSPACE=/var/lib/nullclaw/workspace   /nix/store/.../bin/nullclaw onboard --interactive
-```
+When refactoring:
+
+- preserve runtime behavior first
+- avoid broad rewrites
+- do not edit secrets or encrypted payloads
+- package first, module second, host enablement last
+- keep host-local persistence, bind mounts, and storage layout host-specific unless reuse is obvious
+- keep Garnix assumptions explicit
+
+## Current Status
+
+The repo is in the middle of a conservative maintainability pass:
+
+- shared desktop-style host logic has been extracted into `modules/profiles/*`
+- active hosts are being pointed at canonical module paths
+- older numbered host entrypoints have been reduced to legacy wrappers
+- shared `testvm` guest logic has been consolidated into `hosts/microvms/testvm.nix`
+- AI service composition is already more mature than the older host-common structure
+
+For active next steps and handoff context, see [TODO.md](/home/devji/nixconfig/TODO.md).

@@ -6,7 +6,7 @@ vars:
   ENC_TASKFILE: Taskfile.yaml
   ENC_SECRETS: secrets.yaml
   ENC_ENVS: apikeys.yaml
-  SECRETS: ~/nixconfig/modules/secrets
+  SECRETS: modules/secrets
   PI: minyx
   SERVER: thinsandy
 

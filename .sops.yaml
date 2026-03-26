@@ -33,9 +33,6 @@ creation_rules:
     key_groups:
       - age:
           - *garnix
-  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
-    key_groups:
-      - age:
           - *kali
           - *devji
           - *sopsposeidon

@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Home",
+    "pages": [
+      {"label": "README", "src": "README.md", "slug": "/"}
+    ]
+  },
+  {
+    "title": "Repo routing",
+    "pages": [
+      {"label": "AGENTS", "src": "AGENTS.md", "slug": "/routing/agents/"},
+      {"label": "Agent guidance", "src": ".agents/README.md", "slug": "/routing/agents-index/"}
+    ]
+  },
+  {
+    "title": "Deploy",
+    "pages": [
+      {"label": "Deploy landing", "src": ".agents/deploy/README.md", "slug": "/deploy/"},
+      {"label": "AI hosts", "src": ".agents/deploy/ai-hosts.md", "slug": "/deploy/ai-hosts/"},
+      {"label": "Rollback", "src": ".agents/deploy/rollback.md", "slug": "/deploy/rollback/"},
+      {"label": "Promotion", "src": ".agents/deploy/promotion.md", "slug": "/deploy/promotion/"},
+      {"label": "Website guide", "src": ".agents/deploy/website.md", "slug": "/deploy/website/"},
+      {"label": "garnixMachine notes", "src": ".agents/deploy/hosts/garnixMachine.md", "slug": "/deploy/hosts/garnixMachine/"},
+      {"label": "mtfuji notes", "src": ".agents/deploy/hosts/mtfuji.md", "slug": "/deploy/hosts/mtfuji/"},
+      {"label": "thinsandy notes", "src": ".agents/deploy/hosts/thinsandy.md", "slug": "/deploy/hosts/thinsandy/"}
+    ]
+  },
+  {
+    "title": "Control plane",
+    "pages": [
+      {"label": "Task control plane", "src": "docs/task-control-plane.md", "slug": "/control/task-control-plane/"},
+      {"label": "Taskfile map", "src": "taskfiles/README.md", "slug": "/control/taskfiles/"}
+    ]
+  },
+  {
+    "title": "Supporting docs",
+    "pages": [
+      {"label": "Nullclaw fleet", "src": "docs/nullclaw-fleet-pattern.md", "slug": "/docs/nullclaw-fleet-pattern/"},
+      {"label": "Userland module map", "src": "docs/userland-module-map.md", "slug": "/docs/userland-module-map/"},
+      {"label": "Userland package ownership", "src": "docs/userland-package-ownership.md", "slug": "/docs/userland-package-ownership/"}
+    ]
+  },
+  {
+    "title": "Codex & maintenance",
+    "pages": [
+      {"label": "Codex handoff", "src": "docs/codex-handoff.md", "slug": "/codex-handoff/"},
+      {"label": "TODO", "src": "TODO.md", "slug": "/todo/"}
+    ]
+  }
+]

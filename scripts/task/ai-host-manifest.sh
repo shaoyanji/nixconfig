@@ -22,12 +22,26 @@ Commands:
 USAGE
 }
 
+error() {
+  echo "ai-host-manifest: $*" >&2
+}
+
 require_host() {
   local host="$1"
   if ! jq -e --arg host "$host" '.hosts[$host]' "$MANIFEST" >/dev/null; then
-    echo "Unknown host '$host'" >&2
+    error "Unknown host '$host'"
     exit 1
   fi
+}
+
+require_host_arg() {
+  if [ $# -lt 1 ]; then
+    error "Missing host argument for '$cmd'"
+    usage
+    exit 1
+  fi
+  host="$1"
+  require_host "$host"
 }
 
 print_items() {
@@ -78,12 +92,7 @@ case "$cmd" in
     done
     ;;
   show)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     class=$(jq -r --arg host "$host" '.hosts[$host].hostClass // "(none)"' "$MANIFEST")
     host_data=$(jq -r --arg host "$host" '.hosts[$host]' "$MANIFEST")
     promotion=$(jq -r '.promotionGroup // "(none)"' <<< "$host_data")
@@ -102,12 +111,7 @@ case "$cmd" in
     print_items "Paths" "$paths"
     ;;
   summary)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     host_data=$(jq -r --arg host "$host" '.hosts[$host]' "$MANIFEST")
     class=$(jq -r '.hostClass // "(none)"' <<< "$host_data")
     promotion=$(jq -r '.promotionGroup // "(none)"' <<< "$host_data")
@@ -139,12 +143,7 @@ case "$cmd" in
     print_task_block "$host" "Lifecycle tasks:"
     ;;
   services)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     services=$(jq -r --arg host "$host" '.hosts[$host].services[]?' "$MANIFEST")
     if [ -z "$services" ]; then
       echo "Services: (none defined)"
@@ -155,12 +154,7 @@ case "$cmd" in
     fi
     ;;
   paths)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     paths=$(jq -r --arg host "$host" '.hosts[$host].readablePaths[]?' "$MANIFEST")
     if [ -z "$paths" ]; then
       echo "Paths: (none listed)"
@@ -171,69 +165,35 @@ case "$cmd" in
     fi
     ;;
   validation-task)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     jq -r --arg host "$host" '.hosts[$host].validationTask // "(none)"' "$MANIFEST"
     ;;
   promotion-group)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     jq -r --arg host "$host" '.hosts[$host].promotionGroup // "(none)"' "$MANIFEST"
     ;;
   deploy-task)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     printf 'infra:deploy:host:%s\n' "$host"
     ;;
   logs-task)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     printf 'infra:logs:host:%s\n' "$host"
     ;;
   validate-task)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     printf 'services:validate:host:%s\n' "$host"
     ;;
   promote-task)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     printf 'services:promote:host:%s\n' "$host"
     ;;
   tasks)
-    if [ $# -lt 1 ]; then
-      usage
-      exit 1
-    fi
-    host="$1"
-    require_host "$host"
+    require_host_arg "$@"
     print_task_block "$host" "Tasks for $host:"
     ;;
   *)
+    error "Unknown command '$cmd'"
     usage
     exit 1
     ;;

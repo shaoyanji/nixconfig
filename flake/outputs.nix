@@ -9,7 +9,10 @@
   mkNixosHost = import ../lib/mk-nixos-host.nix {inherit nixpkgs;};
   moduleSets = import ./module-sets.nix {inherit inputs self;};
   hostInventory = import ./host-inventory.nix {inherit inputs moduleSets self;};
-in {
+  hostProjection = import ./host-projection.nix {inherit lib hostInventory;};
+  projectHosts = hostProjection.project;
+in
+{
   packages = import ./packages.nix {
     inherit lib systems pkgsFor;
   };
@@ -23,15 +26,15 @@ in {
   };
 
   homeConfigurations = import ./home-configurations.nix {
-    inherit lib inputs hostInventory nixpkgs;
+    inherit inputs nixpkgs projectHosts;
   };
 
   nixosConfigurations = import ./nixos-configurations.nix {
-    inherit lib mkNixosHost hostInventory;
+    inherit mkNixosHost projectHosts;
   };
 
   darwinConfigurations = import ./darwin-configurations.nix {
-    inherit lib inputs hostInventory;
+    inherit inputs projectHosts;
   };
 
   # Expose the package set, including overlays, for convenience.
@@ -39,4 +42,6 @@ in {
 
   docsSite = (pkgsFor "x86_64-linux").callPackage ../docs-site/default.nix {};
   docs-site = self.docsSite;
+
+  hostProjection = hostProjection;
 }

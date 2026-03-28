@@ -84,18 +84,8 @@ tasks:
 
   services:deploy:menu:
     desc: Choose a deployment target
-    vars:
-      MANIFEST: ./taskfiles/ai-host-manifest.json
     cmds:
-      - |
-        choice=$(
-          {
-            printf '%s\n' "services:deploy:host:{{.PI}}"
-            jq -r '.hosts | keys[] | "services:deploy:host:" + .' {{.MANIFEST}}
-            printf '%s\n' exit
-          } | awk '!seen[$0]++' | gum choose
-        )
-        [ "$choice" = "exit" ] || task "$choice"
+      - task infra:deploy:menu
 
   rebuild:
     desc: Legacy rebuild menu
@@ -115,15 +105,5 @@ tasks:
 
   services:logs:menu:
     desc: Choose a logs target
-    vars:
-      MANIFEST: ./taskfiles/ai-host-manifest.json
     cmds:
-      - |
-        host=$(
-          {
-            printf '%s\n' {{.PI}}
-            jq -r '.hosts | keys[]' {{.MANIFEST}}
-            printf '%s\n' exit
-          } | awk '!seen[$0]++' | gum choose
-        )
-        [ "$host" = "exit" ] || task services:logs:host:$host
+      - task infra:logs:menu

@@ -76,6 +76,7 @@ in {
 
   services.ollama = {
     enable = true;
+    # Keep Ollama local-first; this node is for constrained benchmark runs, not public serving.
     package = pkgs.ollama-cuda;
     host = "127.0.0.1";
     openFirewall = false;

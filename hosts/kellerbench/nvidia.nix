@@ -24,6 +24,7 @@
     open = false;
     nvidiaSettings = false;
     modesetting.enable = true;
+    # Keep the driver warm enough for repeatable CUDA startup without adding laptop/offload complexity.
     nvidiaPersistenced = true;
     powerManagement.enable = true;
     powerManagement.finegrained = false;

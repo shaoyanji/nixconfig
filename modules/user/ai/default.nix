@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   imports = [
+    ./codex.nix
     ./gemini-cli.nix
     ./mods.nix
     ./opencode.nix

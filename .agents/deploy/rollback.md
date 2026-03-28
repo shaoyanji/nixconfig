@@ -1,22 +1,15 @@
 # Rollback Routing
 
 ## Scope
-How rollback is executed and validated for host operations.
+Explain rollback in terms of the existing infra/ services tasks without creating new procedures.
 
-## Source Of Truth
-- Core rollback tasks: `taskfiles/services-core.yml`
-- AI host evidence tasks: `taskfiles/services-ai-hosts.yml`
-- AI host metadata: `taskfiles/ai-host-manifest.json`
+## Canonical tasks
+- Apply rollback over SSH: `infra:rollback:apply:host:*`.
+- Canonical rollback alias for hosts: `infra:rollback:host:*` (it just reruns the apply step).
+- Post-rollback validation and evidence still run via `services:validate:host:*` and `services:evidence:rollback:host:*`.
 
-## Canonical Task Surface
-- Apply rollback: `services:rollback:apply:host:*`
-- Rollback with post-validation evidence: `services:rollback:host:*`
-- Post-rollback evidence capture: `services:evidence:rollback:host:*`
+## Helper guidance
+Use `scripts/task/ai-host-manifest.sh logs-task <host>` or `task agents:hosts:tasks:<host>` to see the exact infra task name you need for any host.
 
-## Operational Notes
-- Rollback mechanism currently uses remote `nixos-rebuild switch --rollback` via SSH.
-- Post-rollback validation uses the same manifest-linked validation task resolution as normal validate flow.
-
-## What Not To Assume
-- Do not invent alternate rollback procedures in docs.
-- Do not treat evidence scripts as direct entrypoints when task wrappers exist.
+## What not to assume
+- There is no new rollback workflow in `.agents/*`; stick to the `infra`/`services` tasks defined in the Taskfiles.

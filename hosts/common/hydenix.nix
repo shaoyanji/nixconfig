@@ -65,10 +65,9 @@ in {
         inputs.nix-index-database.homeModules.nix-index
         inputs.kickstart-nixvim.homeManagerModules.default
         ../../modules/nixoshmsymlinks.nix
-        ../../modules/global/minimal.nix
+        ../../modules/roles/minimal.nix
         ../../modules/shell/nushell.nix
       ];
-      programs.nixvim.enable = true;
       hydenix.hm.enable = true;
       hydenix.hm.editors.neovim = lib.mkForce false;
       home.packages = with pkgs; [

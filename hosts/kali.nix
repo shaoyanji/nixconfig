@@ -6,7 +6,7 @@
     ../modules/shell/nushell.nix
     ../modules/shell/starship.nix
     ../modules/roles/minimal.nix
-    # ../modules/global/home.nix
+    # ../modules/roles/home.nix
   ];
   home = {
     packages = with pkgs; [

@@ -35,6 +35,9 @@
     - `programs.zoxide` (host integration/options)
     - `programs.fzf` (host shell UX settings)
     - host package intent list (`lolcat`, `figlet`, `jp2a`, `go`, `gobuster`, `steghide`, `powershell`, `secretscanner`, `yt-dlp`, `ytfzf`, `mpv`)
+- Removed redundant role-guaranteed declarations:
+  - `hosts/penguin.nix`: dropped explicit `programs.nixvim.enable = true` (already guaranteed by `roles/portable-home`)
+  - `hosts/common/hydenix.nix`: dropped explicit `programs.nixvim.enable = true` in HM user block (already guaranteed by `roles/minimal` -> `user/base`)
 
 ## Deferred
 - No aggressive package removals.

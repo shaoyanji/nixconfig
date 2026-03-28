@@ -59,9 +59,9 @@ tasks:
       - $EDITOR ./modules/sops.nix
 
   edit-home-manager:
-    desc: Edit global home-manager module
+    desc: Edit canonical home role module
     cmds:
-      - $EDITOR ./modules/global/home.nix
+      - $EDITOR ./modules/roles/home.nix
 
   edit-shell-config:
     desc: Edit shell module defaults

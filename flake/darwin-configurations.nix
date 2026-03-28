@@ -1,12 +1,11 @@
 {
+  lib,
   inputs,
-  moduleSets,
-}: let
-  inherit (moduleSets) globalModulesMacos;
-in {
-  cassini = inputs.nix-darwin.lib.darwinSystem {
-    system = "aarch64-darwin";
-    specialArgs = {inherit inputs;};
-    modules = globalModulesMacos ++ [../hosts/cassini/configuration.nix];
-  };
-}
+  hostInventory,
+}:
+lib.mapAttrs (_: host:
+  inputs.nix-darwin.lib.darwinSystem {
+    inherit (host) system modules;
+    specialArgs = host.specialArgs or {};
+  })
+(lib.filterAttrs (_: host: host.kind == "darwin") hostInventory)

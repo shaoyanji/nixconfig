@@ -1,49 +1,31 @@
 # AGENTS.md
 
-## Goals
-- Improve maintainability of this Nix flake.
-- Preserve runtime behavior unless a task explicitly changes behavior.
-- Prefer small, reviewable diffs over broad rewrites.
+## Repo Identity
+This repository is a Nix flake for host configurations, service profiles, and operator workflows.
 
-## Current architecture intent
-- `modules/services/*` = reusable daemon/service logic
-- `modules/profiles/*` = composition of services/profiles
-- `hosts/*` = host-specific identity, storage, networking, overlays, secrets
-- `pkgs/*` = packaging only
-- `lib/*` = small helpers for flake/module construction
-- `flake.nix` = thin orchestration and output wiring only
+## Routing Boundaries
+- `Taskfile.yml` and `taskfiles/*` are the executable control-plane truth.
+- `scripts/task/*` are helper implementation details used by task entries.
+- `taskfiles/ai-host-manifest.json` is operator metadata for AI hosts.
+- `.agents/*` is guidance and routing only. It is not execution truth.
 
-## Hard constraints
+## Deploy Work Routing
+- Start at `.agents/deploy/README.md` for deployment workflow routing.
+- Use `.agents/deploy/ai-hosts.md` for AI host deploy/validate/promote/drift/evidence flows.
+- Use `.agents/deploy/rollback.md` for rollback flow references.
+- Use `.agents/deploy/promotion.md` for promotion/readiness flow references.
+- Use `.agents/deploy/website.md` for website/static sync scope.
+- Use `.agents/deploy/hosts/*.md` only for host-specific operational exceptions.
+
+## Canonical File Surfaces
+- Task entrypoints: `Taskfile.yml`, `taskfiles/services-core.yml`, `taskfiles/services-ai-hosts.yml`, `taskfiles/services-legacy.yml`, `taskfiles/checks.yml`, `taskfiles/dev.yml`
+- AI host metadata: `taskfiles/ai-host-manifest.json`
+- Host declarations for flake outputs: `flake/host-inventory.nix`
+- Role/module canonical paths: `modules/roles/*`, `modules/user/*`, `modules/shell/*`
+
+## Operational Guardrails
+- Preserve runtime behavior unless explicitly changing behavior.
+- Prefer small, reviewable diffs.
 - Do not edit secrets or encrypted payloads.
-- Do not rename flake outputs unless explicitly asked.
-- Do not do broad rewrites when a focused patch will do.
-- Package first, module second, host enablement last.
-- Keep Garnix assumptions explicit; do not assume persistence.
-- Keep bind mounts and host-local storage layout host-specific unless clearly reusable.
-- Do not silently widen system support or evaluation scope.
-
-## Refactor style
-- Preserve behavior first.
-- One concern per patch.
-- Show exact files changed.
-- Explain why behavior is preserved.
-- List any newly created files that must be `git add`ed for flake evaluation.
-
-## Validation workflow
-After edits:
-1. `git status --short`
-2. `git add` any newly created files needed by flakes
-3. Run narrow validations first:
-   - `nix eval .#nixosConfigurations.thinsandy.config.networking.hostName`
-   - `nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName`
-   - `nix eval .#packages.x86_64-linux.backend.meta.mainProgram`
-   - `nix build .#checks.x86_64-linux.host-architecture -L`
-4. Only run broader checks after narrow checks are green.
-
-## Important note about flakes
-Nix flakes only see Git-tracked files. If a new file is created and not tracked, evaluation may fail with “Path ... is not tracked by Git”.
-
-## Current preferences
-- Prefer explicit system lists over broad `eachDefaultSystem` expansion where practical.
-- Keep evaluation scope as narrow as possible.
-- Avoid unrelated cleanup during structural refactors.
+- Do not move executable logic into `.agents/*`.
+- Do not treat `.agents/*` as a second source of truth.

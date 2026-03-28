@@ -8,6 +8,7 @@
   pkgsFor = import ./pkgs-for.nix {inherit nixpkgs;};
   mkNixosHost = import ../lib/mk-nixos-host.nix {inherit nixpkgs;};
   moduleSets = import ./module-sets.nix {inherit inputs self;};
+  hostInventory = import ./host-inventory.nix {inherit inputs moduleSets self;};
 in {
   packages = import ./packages.nix {
     inherit lib systems pkgsFor;
@@ -22,15 +23,15 @@ in {
   };
 
   homeConfigurations = import ./home-configurations.nix {
-    inherit inputs moduleSets nixpkgs;
+    inherit lib inputs hostInventory nixpkgs;
   };
 
   nixosConfigurations = import ./nixos-configurations.nix {
-    inherit inputs self mkNixosHost moduleSets;
+    inherit lib mkNixosHost hostInventory;
   };
 
   darwinConfigurations = import ./darwin-configurations.nix {
-    inherit inputs moduleSets;
+    inherit lib inputs hostInventory;
   };
 
   # Expose the package set, including overlays, for convenience.

@@ -5,9 +5,9 @@
     backupFileExtension = "hm-backup"; #for rebuild
     users.devji = {
       imports = [
-        ./home.nix
+        ../roles/home.nix
       ];
-    }; #staging point for ./home.nix commons
+    }; # staging point for roles/home.nix commons
     sharedModules = [
       inputs.sops-nix.homeManagerModules.sops
       inputs.kickstart-nixvim.homeManagerModules.default

@@ -38,3 +38,12 @@ This repository uses a small control-plane namespace policy so task names stay p
 ## Legacy Compatibility
 
 Legacy task names remain available as wrappers. New docs and scripts should prefer the canonical namespaced tasks so future additions do not drift back into mixed namespaces.
+
+## Services Layering
+
+`taskfiles/services.yml` is now a thin include layer split by concern:
+- `taskfiles/services-core.yml`: canonical service/deploy/rebuild/log flows
+- `taskfiles/services-ai-hosts.yml`: AI host evidence/drift/status/promotion workflows
+- `taskfiles/services-legacy.yml`: compatibility aliases and menus
+
+Operator menus that enumerate AI hosts now derive host lists from `taskfiles/ai-host-manifest.json` instead of hardcoded host names.

@@ -11,7 +11,7 @@
          
   imports = [
     ../modules/roles/portable-home.nix
-    # ../modules/global/minimal.nix
+    # ../modules/roles/minimal.nix
     ../modules/shell
     ../modules/env.nix
     ../modules/lf
@@ -24,7 +24,6 @@
     # ../modules/helix.nix
   ];
   programs = {
-    nixvim.enable = true;
     pay-respects.enable = true;
     atuin.enable = true;
 

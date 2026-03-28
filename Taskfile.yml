@@ -8,7 +8,6 @@ vars:
   ENC_ENVS: apikeys.yaml
   SECRETS: modules/secrets
   PI: minyx
-  SERVER: thinsandy
 
 includes:
   infra:

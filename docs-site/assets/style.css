@@ -1,0 +1,151 @@
+:root {
+  color-scheme: light;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background-color: #f9fbff;
+  color: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f4f6fb 0%, #eef2f7 100%);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+.nav {
+  padding: 32px 24px;
+  border-right: 1px solid rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.nav h2 {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.nav-link {
+  display: block;
+  margin: 10px 0;
+  color: #0f172a;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
+}
+
+.nav-link:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.nav-link.active {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+main {
+  padding: 40px 48px;
+}
+
+article {
+  max-width: 860px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+}
+
+header h1 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: rgba(15, 23, 42, 0.65);
+  margin-bottom: 18px;
+}
+
+article p {
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+article pre,
+article code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', monospace;
+}
+
+article pre {
+  overflow-x: auto;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 18px;
+  border-radius: 10px;
+}
+
+article code {
+  background: rgba(15, 23, 42, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+article h2,
+article h3,
+article h4,
+article h5 {
+  margin-top: 1.8rem;
+  margin-bottom: 0.8rem;
+  color: #0f172a;
+}
+
+article blockquote {
+  border-left: 4px solid #0f172a;
+  padding-left: 16px;
+  color: #0f172a;
+  opacity: 0.8;
+}
+
+article ul,
+article ol {
+  padding-left: 1.2rem;
+}
+
+article a {
+  color: #1d4ed8;
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .nav {
+    position: relative;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  }
+
+  main {
+    padding: 32px 24px;
+  }
+}

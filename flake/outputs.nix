@@ -36,4 +36,7 @@ in {
 
   # Expose the package set, including overlays, for convenience.
   darwinPackages = self.darwinConfigurations.cassini.pkgs;
+
+  docsSite = (pkgsFor "x86_64-linux").callPackage ../docs-site/default.nix {};
+  docs-site = self.docsSite;
 }

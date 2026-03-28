@@ -39,7 +39,7 @@ in {
   kellerbench = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs;};
+    specialArgs = {inherit inputs self;};
     modules = globalModulesContainers ++ [../hosts/kellerbench/configuration.nix];
   };
 
@@ -58,7 +58,7 @@ in {
   thinsandy = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs;};
+    specialArgs = {inherit inputs self;};
     modules = globalModulesContainers ++ [../hosts/thinsandy/configuration.nix];
   };
 

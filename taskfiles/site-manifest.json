@@ -1,0 +1,15 @@
+{
+  "defaultTarget": "docs",
+  "targets": {
+    "docs": {
+      "kind": "docs-site",
+      "description": "Rendered markdown docs site",
+      "buildCommand": "nix build .#docs-site",
+      "outputPath": "result",
+      "deployMethod": "rsync",
+      "deployTarget": "jisifu@vern.cc:~/public_html/",
+      "previewBind": "127.0.0.1",
+      "previewPort": 8000
+    }
+  }
+}

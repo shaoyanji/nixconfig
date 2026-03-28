@@ -5,7 +5,7 @@ tasks:
     desc: Validate a deployed host (uses host-specific smoke checks when wired)
     vars:
       HOST: '{{index .MATCH 0}}'
-      MANIFEST: ./taskfiles/ai-host-manifest.json
+      MANIFEST: ./ai-host-manifest.json
     cmds:
       - |
         validation_task=$(jq -r --arg host "{{.HOST}}" '.hosts[$host].validationTask // ""' {{.MANIFEST}})
@@ -35,8 +35,8 @@ tasks:
     desc: Validate after rollback and capture rollback evidence bundle
     vars:
       HOST: '{{index .MATCH 0}}'
-      MANIFEST: ./taskfiles/ai-host-manifest.json
-      EVIDENCE_ROOT: ./evidence/ai-hosts
+      MANIFEST: ./ai-host-manifest.json
+      EVIDENCE_ROOT: ../evidence/ai-hosts
     cmds:
       - |
         set -euo pipefail
@@ -44,7 +44,7 @@ tasks:
         if ! task services:validate:host:{{.HOST}}; then
           result="fail"
         fi
-        scripts/task/ai-host-evidence.sh --host {{.HOST}} --event rollback --manifest {{.MANIFEST}} --output-root {{.EVIDENCE_ROOT}} --validation-result "$result"
+        ../scripts/task/ai-host-evidence.sh --host {{.HOST}} --event rollback --manifest {{.MANIFEST}} --output-root {{.EVIDENCE_ROOT}} --validation-result "$result"
         [ "$result" = "pass" ]
 
   services:rollback:host:*:

@@ -105,6 +105,11 @@ policy_max_drift_age() {
   jq -r --arg host "$target_host" '.hosts[$host].policy.maxDriftAgeSeconds // .policyDefaults.maxDriftAgeSeconds // 86400' "$manifest"
 }
 
+host_availability() {
+  local target_host="$1"
+  jq -r --arg host "$target_host" '.hosts[$host].availability // "always-on"' "$manifest"
+}
+
 latest_summary_for_suffix() {
   local root="$1"
   local target_host="$2"
@@ -300,8 +305,15 @@ host_readiness() {
   max_validation_age="$(policy_max_validation_age "$target_host")"
   max_drift_age="$(policy_max_drift_age "$target_host")"
 
+  local availability
+  availability="$(host_availability "$target_host")"
+
   if [[ -z "$validate_summary" ]]; then
-    echo "not-ready:no-validation-evidence|0|0"
+    if [[ "$availability" == "on-demand" ]]; then
+      echo "standby:on-demand-no-validation|0|0"
+    else
+      echo "not-ready:no-validation-evidence|0|0"
+    fi
     return
   fi
 
@@ -316,7 +328,11 @@ host_readiness() {
   fi
 
   if [[ -z "$validate_age" || "$validate_age" -gt "$max_validation_age" ]]; then
-    echo "not-ready:validation-stale|0|0"
+    if [[ "$availability" == "on-demand" ]]; then
+      echo "standby:on-demand-validation-stale|0|0"
+    else
+      echo "not-ready:validation-stale|0|0"
+    fi
     return
   fi
 
@@ -332,7 +348,11 @@ host_readiness() {
   fi
 
   if [[ -z "$drift_summary" ]]; then
-    echo "not-ready:no-drift-evidence|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    if [[ "$availability" == "on-demand" ]]; then
+      echo "standby:on-demand-no-drift|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    else
+      echo "not-ready:no-drift-evidence|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    fi
     return
   fi
 
@@ -347,12 +367,20 @@ host_readiness() {
   fi
 
   if [[ -z "$drift_age" || "$drift_age" -gt "$max_drift_age" ]]; then
-    echo "not-ready:drift-stale|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    if [[ "$availability" == "on-demand" ]]; then
+      echo "standby:on-demand-drift-stale|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    else
+      echo "not-ready:drift-stale|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    fi
     return
   fi
 
   if [[ -n "$validate_ts" && -n "$drift_ts" && "$drift_ts" < "$validate_ts" ]]; then
-    echo "not-ready:drift-older-than-validation|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    if [[ "$availability" == "on-demand" ]]; then
+      echo "standby:on-demand-drift-older-than-validation|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    else
+      echo "not-ready:drift-older-than-validation|0|$(non_negative_subtract "$validate_warning" "$validate_waived")"
+    fi
     return
   fi
 

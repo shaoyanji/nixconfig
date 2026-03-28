@@ -1,0 +1,139 @@
+version: "3"
+
+tasks:
+  services:rebuild:pre-hook:
+    desc: Pre-rebuild hook (reserved)
+    cmds: []
+
+  services:switch:*:
+    desc: Switch current host using a rebuild command (nixos|darwin)
+    vars:
+      OS: '{{index .MATCH 0}}'
+    cmds:
+      - sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:prehook && git commit -m "$(hostname) $({{.OS}}-rebuild list-generations | awk 'NR==2 {print $1, $2, $6; exit}')" && task dev:git:posthook
+
+  services:boot:*:
+    desc: "[destructive] Boot into next generation via rebuild command"
+    vars:
+      OS: '{{index .MATCH 0}}'
+    cmds:
+      - sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+
+  services:plan:host:*:
+    desc: Build/evaluate a specific host closure (no apply)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - nix build .#nixosConfigurations.{{.HOST}}.config.system.build.toplevel -L
+
+  services:apply:host:*:
+    desc: Apply a specific remote host configuration (no git side effects)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - nixos-rebuild switch --use-remote-sudo --target-host {{.HOST}} --fast --flake .?submodules=1#{{.HOST}} |& nom
+
+  services:validate:host:*:
+    desc: Validate a deployed host (uses host-specific smoke checks when wired)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+    cmds:
+      - |
+        validation_task=$(jq -r --arg host "{{.HOST}}" '.hosts[$host].validationTask // ""' {{.MANIFEST}})
+        if [ -n "$validation_task" ] && [ "$validation_task" != "null" ]; then
+          task "$validation_task"
+        else
+          echo "No host-specific validation task wired for {{.HOST}}"
+        fi
+
+  services:record:host:*:
+    desc: Record deployment outcome in git (manual/operator-triggered)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - task dev:git:prehook
+      - git commit -m "nix-build was successful on {{.HOST}}"
+      - task dev:git:posthook
+
+  services:rollback:apply:host:*:
+    desc: Roll back a remote host to previous generation (apply only)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - ssh {{.HOST}} "sudo nixos-rebuild switch --rollback"
+
+  services:evidence:rollback:host:*:
+    desc: Validate after rollback and capture rollback evidence bundle
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+      EVIDENCE_ROOT: ./evidence/ai-hosts
+    cmds:
+      - |
+        set -euo pipefail
+        result="pass"
+        if ! task services:validate:host:{{.HOST}}; then
+          result="fail"
+        fi
+        scripts/task/ai-host-evidence.sh --host {{.HOST}} --event rollback --manifest {{.MANIFEST}} --output-root {{.EVIDENCE_ROOT}} --validation-result "$result"
+        [ "$result" = "pass" ]
+
+  services:rollback:host:*:
+    desc: Roll back host, re-validate, and capture rollback evidence
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - task services:rollback:apply:host:{{.HOST}}
+      - task services:evidence:rollback:host:{{.HOST}}
+
+  services:deploy:host:*:
+    desc: Plan + apply + validate a specific remote host (no git side effects)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - task services:plan:host:{{.HOST}}
+      - task services:apply:host:{{.HOST}}
+      - task services:validate:host:{{.HOST}}
+
+  services:rebuild:nixos:
+    desc: Rebuild local NixOS host and refresh ~/Taskfile.yml
+    cmds:
+      - task services:rebuild:pre-hook
+      - task services:switch:nixos
+      - task infra:secrets:decrypt:detaskfile-home
+
+  services:rebuild:darwin:
+    desc: Rebuild local Darwin host and refresh ~/Taskfile.yml
+    cmds:
+      - task services:rebuild:pre-hook
+      - task services:switch:darwin
+      - task infra:secrets:decrypt:detaskfile-home
+
+  services:rebuild:home-manager:
+    desc: Rebuild local Home Manager profile and push build commit
+    cmds:
+      - task services:rebuild:pre-hook
+      - home-manager switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+      - task infra:secrets:decrypt:detaskfile-home
+
+  services:rebuild:wsl:
+    desc: Rebuild WSL host configuration
+    cmds:
+      - task services:rebuild:pre-hook
+      - sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes |& nom; task dev:git:build-push
+
+  services:rebuild:orb:
+    desc: Rebuild OrbStack host configuration and refresh ~/Taskfile.yml
+    cmds:
+      - task services:rebuild:pre-hook
+      - sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure |& nom; task dev:git:build-push
+      - task infra:secrets:decrypt:detaskfile-home
+
+  services:logs:host:*:
+    desc: "Tail journal logs for a host via ssh (default unit: go-backend)"
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      UNIT: '{{.UNIT | default "go-backend"}}'
+    cmds:
+      - ssh {{.HOST}} "journalctl -fu {{.UNIT}}"

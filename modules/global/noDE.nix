@@ -10,7 +10,7 @@
     backupFileExtension = "hm-backup"; #for rebuild
     users.devji = {
       imports = [
-        ./minimal.nix
+        ../roles/minimal.nix
         ../shell
       ];
       home.username = "devji";

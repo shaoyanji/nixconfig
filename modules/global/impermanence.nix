@@ -11,7 +11,7 @@
     users.devji = {
       imports = [
         # inputs.impermanence.nixosModules.home-manager.impermanence
-        ./heim.nix
+        ../roles/heim.nix
       ];
 
       home.stateVersion = "25.05"; # Please read the comment before changing.

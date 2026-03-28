@@ -1,7 +1,7 @@
 {lib, ...}: {
   imports = [
     ../nixoshmsymlinks.nix
-    ../global/minimal.nix
+    ../roles/minimal.nix
     #    ../nixvim
     # ./example.nix - add your modules here
   ];

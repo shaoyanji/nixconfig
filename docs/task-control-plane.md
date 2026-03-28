@@ -22,10 +22,10 @@ This repository uses a small control-plane namespace policy so task names stay p
 
 ## Canonical surfaces
 
-- Host lifecycle/deploy/log flows live in `taskfiles/infra.yml` and expose the `infra:*` namespace.
-- AI evidence, drift, status, and promotion flows remain under `services:*` via `taskfiles/services-ai-hosts.yml`; the `services:validate:host:*` and related wrappers are routed through this file.
-- `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` keep the legacy `services:*` entrypoints but delegate almost all work back into the canonical namespaces.
-- Validation/check flows live in `taskfiles/checks.yml`; dev/git helpers (including the new flake-update helpers) live in `taskfiles/dev.yml`.
+- Host lifecycle/deploy/log flows live in `taskfiles/infra.yml` under the `infra:*` namespace.
+- AI evidence, drift, status, and promotion flows remain under `services:*` via `taskfiles/services-ai-hosts.yml`; the `services:validate:host:*` and related wrappers stay there for AI-host continuity.
+- `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` now only expose the minimal compatibility wrappers operators still need to reach the canonical AI-host/deploy flows.
+- Validation/check flows live in `taskfiles/checks.yml`; dev/git helpers (including the flake-update helpers) live in `taskfiles/dev.yml`.
 - Agent/operator helpers live in `taskfiles/agents.yml` and query `taskfiles/ai-host-manifest.json` for AI-host metadata.
 
 ## Controls
@@ -37,8 +37,8 @@ This repository uses a small control-plane namespace policy so task names stay p
 ## Services layering
 
 `taskfiles/services.yml` now only includes the split surfaces:
-- `taskfiles/services-core.yml` exposes the historical `services:*` host tasks while delegating the actual work to `infra:*` or the AI services files.
+- `taskfiles/services-core.yml` exposes the remaining `services:*` compatibility entrypoints for AI hosts and deploy aliases while routing work toward the canonical namespaces.
 - `taskfiles/services-ai-hosts.yml` remains the canonical home for AI evidence/drift/status/promotion flows.
-- `taskfiles/services-legacy.yml` holds the legacy convenience menus and aliases operators rely on.
+- `taskfiles/services-legacy.yml` holds the small set of legacy convenience menus and host deploy aliases that operators still reach for.
 
 Operator menus that list AI hosts now read `taskfiles/ai-host-manifest.json` via `scripts/task/ai-host-manifest.sh` instead of embedding host names directly.

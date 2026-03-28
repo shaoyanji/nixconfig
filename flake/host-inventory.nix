@@ -36,6 +36,13 @@ in {
     modules = globalModulesContainers ++ [../hosts/mtfuji/configuration.nix];
   };
 
+  kellerbench = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = {inherit inputs;};
+    modules = globalModulesContainers ++ [../hosts/kellerbench/configuration.nix];
+  };
+
   applevalley = {
     kind = "nixos";
     system = "x86_64-linux";

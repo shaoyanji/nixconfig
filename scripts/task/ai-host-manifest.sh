@@ -7,7 +7,7 @@ usage() {
   cat <<'USAGE'
 Usage: ai-host-manifest.sh <command> [host]
 Commands:
-  list                   List hosts with class, promotion group, and nullclaw mode
+  list                   List hosts with class, promotion group, availability, and nullclaw mode
   show <host>            Print manifest metadata for <host>
   summary <host>         Compact summary of key metadata and tasks
   services <host>        List services tied to <host>
@@ -84,11 +84,12 @@ case "$cmd" in
           .key,
           (.value.hostClass // "(none)"),
           (.value.promotionGroup // "(none)"),
+          (.value.availability // "always-on"),
           (.value.nullclawMode // "(none)")
         ]
       | @tsv
-    ' "$MANIFEST" | sort | while IFS=$'\t' read -r host class promo mode; do
-      printf '%-20s class=%-12s promo=%-10s mode=%s\n' "$host" "$class" "$promo" "$mode"
+    ' "$MANIFEST" | sort | while IFS=$'\t' read -r host class promo availability mode; do
+      printf '%-20s class=%-12s promo=%-10s avail=%-10s mode=%s\n' "$host" "$class" "$promo" "$availability" "$mode"
     done
     ;;
   show)
@@ -99,14 +100,22 @@ case "$cmd" in
     validation=$(jq -r '.validationTask // "(none)"' <<< "$host_data")
     deployment=$(jq -r '.deploymentStyle // "(none)"' <<< "$host_data")
     exposure=$(jq -r '.exposureType // "(none)"' <<< "$host_data")
+    availability=$(jq -r '.availability // "always-on"' <<< "$host_data")
+    power_policy=$(jq -r '.powerPolicy // "(none)"' <<< "$host_data")
+    role_note=$(jq -r '.roleNote // ""' <<< "$host_data")
     services=$(jq -r '.services[]?' <<< "$host_data")
     paths=$(jq -r '.readablePaths[]?' <<< "$host_data")
     echo "Host: $host"
     echo "  Class: $class"
     echo "  Promotion group: $promotion"
+    echo "  Availability: $availability"
+    echo "  Power policy: $power_policy"
     echo "  Validation task: $validation"
     echo "  Deployment style: $deployment"
     echo "  Exposure type: $exposure"
+    if [ -n "$role_note" ]; then
+      echo "  Role note: $role_note"
+    fi
     print_items "Services" "$services"
     print_items "Paths" "$paths"
     ;;
@@ -119,6 +128,9 @@ case "$cmd" in
     deployment=$(jq -r '.deploymentStyle // "(none)"' <<< "$host_data")
     exposure=$(jq -r '.exposureType // "(none)"' <<< "$host_data")
     rollback=$(jq -r '.rollbackShape // "(none)"' <<< "$host_data")
+    availability=$(jq -r '.availability // "always-on"' <<< "$host_data")
+    power_policy=$(jq -r '.powerPolicy // "(none)"' <<< "$host_data")
+    role_note=$(jq -r '.roleNote // ""' <<< "$host_data")
     nullclaw_mode=$(jq -r '.nullclawMode // "(none)"' <<< "$host_data")
     nullclaw_bind=$(jq -r '.nullclawBind // ""' <<< "$host_data")
     nullclaw_port=$(jq -r '.nullclawPort // ""' <<< "$host_data")
@@ -127,11 +139,16 @@ case "$cmd" in
     echo "Host summary: $host"
     echo "  Class: $class"
     echo "  Promotion group: $promotion"
+    echo "  Availability: $availability"
+    echo "  Power policy: $power_policy"
     echo "  Nullclaw mode: $nullclaw_mode"
     echo "  Validation task: $validation"
     echo "  Deployment style: $deployment"
     echo "  Exposure type: $exposure"
     echo "  Rollback shape: $rollback"
+    if [ -n "$role_note" ]; then
+      echo "  Role note: $role_note"
+    fi
     if [ -n "$nullclaw_bind" ]; then
       echo "  Nullclaw bind: $nullclaw_bind"
     fi

@@ -14,7 +14,7 @@
 in
 {
   packages = import ./packages.nix {
-    inherit lib systems pkgsFor;
+    inherit inputs lib systems pkgsFor;
   };
 
   checks = import ./checks.nix {

@@ -3,6 +3,7 @@
   lib,
   pkgs,
   inputs,
+  self,
   ...
 }: let
   enableHermes = true;
@@ -37,14 +38,7 @@ in {
     ++ lib.optionals enableOpenClaw [
       inputs.nix-openclaw.overlays.default
     ]
-    ++ lib.optionals enableHermes [
-      (final: prev: {
-        hermes-agent = final.callPackage ../../pkgs/hermes-agent.nix {
-          src = inputs.hermes-src;
-          version = "main";
-        };
-      })
-    ];
+    ;
   profiles.aiHost = {
     enable = true;
     openclaw.enable = enableOpenClaw;
@@ -66,7 +60,7 @@ in {
     };
     hermesAgent = {
       enable = enableHermes;
-      package = pkgs.hermes-agent;
+      package = self.packages.${pkgs.system}.hermes-agent;
       workspaceRoot = "/var/lib/hermes";
       environmentFile = config.sops.secrets.hermes.path;
     };

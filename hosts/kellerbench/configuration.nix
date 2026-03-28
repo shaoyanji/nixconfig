@@ -3,6 +3,7 @@
   lib,
   pkgs,
   inputs,
+  self,
   ...
 }: let
   enableHermes = true;
@@ -10,7 +11,7 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./nvidia.nix
-    (import ../../modules/profiles/ai-host.nix {withHermes = false;})
+    (import ../../modules/profiles/ai-host.nix {withHermes = true;})
     ../../modules/services/nullclaw-deployment.nix
     inputs.nix-hermes.nixosModules.hermes-agent
   ];
@@ -40,15 +41,6 @@ in {
     group = lib.mkForce "devji";
   };
 
-  nixpkgs.overlays = lib.optionals enableHermes [
-    (final: prev: {
-      hermes-agent = final.callPackage ../../pkgs/hermes-agent.nix {
-        src = inputs.hermes-src;
-        version = "main";
-      };
-    })
-  ];
-
   profiles.aiHost = {
     enable = true;
     nullclaw.enable = true;
@@ -66,7 +58,7 @@ in {
 
   aiServices.hermesAgent = {
     enable = enableHermes;
-    package = pkgs.hermes-agent;
+    package = self.packages.${pkgs.system}.hermes-agent;
     workspaceRoot = "/var/lib/hermes";
     environmentFile = config.sops.secrets.hermes.path;
   };

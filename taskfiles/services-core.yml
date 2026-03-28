@@ -6,32 +6,32 @@ tasks:
     cmds: []
 
   services:switch:*:
-    desc: Switch current host using a rebuild command (nixos|darwin)
+    desc: Alias for infra:switch:*
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
-      - sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:prehook && git commit -m "$(hostname) $({{.OS}}-rebuild list-generations | awk 'NR==2 {print $1, $2, $6; exit}')" && task dev:git:posthook
+      - task infra:switch:{{.OS}}
 
   services:boot:*:
-    desc: "[destructive] Boot into next generation via rebuild command"
+    desc: Alias for infra:boot:*
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
-      - sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+      - task infra:boot:{{.OS}}
 
   services:plan:host:*:
-    desc: Build/evaluate a specific host closure (no apply)
+    desc: Alias for infra:plan:host:*
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - nix build .#nixosConfigurations.{{.HOST}}.config.system.build.toplevel -L
+      - task infra:plan:host:{{.HOST}}
 
   services:apply:host:*:
-    desc: Apply a specific remote host configuration (no git side effects)
+    desc: Alias for infra:apply:host:*
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - nixos-rebuild switch --use-remote-sudo --target-host {{.HOST}} --fast --flake .?submodules=1#{{.HOST}} |& nom
+      - task infra:apply:host:{{.HOST}}
 
   services:validate:host:*:
     desc: Validate a deployed host (uses host-specific smoke checks when wired)
@@ -57,11 +57,11 @@ tasks:
       - task dev:git:posthook
 
   services:rollback:apply:host:*:
-    desc: Roll back a remote host to previous generation (apply only)
+    desc: Alias for infra:rollback:apply:host:*
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - ssh {{.HOST}} "sudo nixos-rebuild switch --rollback"
+      - task infra:rollback:apply:host:{{.HOST}}
 
   services:evidence:rollback:host:*:
     desc: Validate after rollback and capture rollback evidence bundle
@@ -84,7 +84,7 @@ tasks:
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - task services:rollback:apply:host:{{.HOST}}
+      - task infra:rollback:host:{{.HOST}}
       - task services:evidence:rollback:host:{{.HOST}}
 
   services:deploy:host:*:
@@ -92,48 +92,42 @@ tasks:
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - task services:plan:host:{{.HOST}}
-      - task services:apply:host:{{.HOST}}
-      - task services:validate:host:{{.HOST}}
+      - task infra:deploy:host:{{.HOST}}
 
   services:rebuild:nixos:
     desc: Rebuild local NixOS host and refresh ~/Taskfile.yml
     cmds:
       - task services:rebuild:pre-hook
-      - task services:switch:nixos
-      - task infra:secrets:decrypt:detaskfile-home
+      - task infra:rebuild:nixos
 
   services:rebuild:darwin:
     desc: Rebuild local Darwin host and refresh ~/Taskfile.yml
     cmds:
       - task services:rebuild:pre-hook
-      - task services:switch:darwin
-      - task infra:secrets:decrypt:detaskfile-home
+      - task infra:rebuild:darwin
 
   services:rebuild:home-manager:
     desc: Rebuild local Home Manager profile and push build commit
     cmds:
       - task services:rebuild:pre-hook
-      - home-manager switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
-      - task infra:secrets:decrypt:detaskfile-home
+      - task infra:rebuild:home-manager
 
   services:rebuild:wsl:
     desc: Rebuild WSL host configuration
     cmds:
       - task services:rebuild:pre-hook
-      - sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes |& nom; task dev:git:build-push
+      - task infra:rebuild:wsl
 
   services:rebuild:orb:
     desc: Rebuild OrbStack host configuration and refresh ~/Taskfile.yml
     cmds:
       - task services:rebuild:pre-hook
-      - sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure |& nom; task dev:git:build-push
-      - task infra:secrets:decrypt:detaskfile-home
+      - task infra:rebuild:orb
 
   services:logs:host:*:
-    desc: "Tail journal logs for a host via ssh (default unit: go-backend)"
+    desc: Alias for infra:logs:host:*
     vars:
       HOST: '{{index .MATCH 0}}'
       UNIT: '{{.UNIT | default "go-backend"}}'
     cmds:
-      - ssh {{.HOST}} "journalctl -fu {{.UNIT}}"
+      - task infra:logs:host:{{.HOST}} UNIT={{.UNIT}}

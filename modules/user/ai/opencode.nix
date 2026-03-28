@@ -14,7 +14,7 @@ in {
               _launch = true;
               name = "lfm2.5-thinking:latest";
             };
-            "minimax-m2.5:cloud" = {
+            "minimax-m2.7:cloud" = {
               _launch = true;
               name = "minimax-m2.5:cloud";
             };
@@ -42,12 +42,12 @@ in {
     };
     agents =
       lib.listToAttrs (map (agent: {
-          name = lib.removeSuffix ".md" (lib.last (lib.splitString "/" agent.url));
-          value = builtins.readFile (builtins.fetchurl {
-            url = agent.url;
-            sha256 = agent.sha256;
-          });
-        }) (builtins.fromJSON (builtins.readFile ../../config/agents.json)))
+        name = lib.removeSuffix ".md" (lib.last (lib.splitString "/" agent.url));
+        value = builtins.readFile (builtins.fetchurl {
+          url = agent.url;
+          sha256 = agent.sha256;
+        });
+      }) (builtins.fromJSON (builtins.readFile ../../config/agents.json)))
       // localAgents;
   };
 }

@@ -58,17 +58,63 @@ tasks:
     cmds:
       - task dev:git:posthook
 
-  dev:site:sync-verntil:
-    desc: Sync index.html to verntil host
-    vars:
-      NIXFLAKE: ./.config/home-manager/nixconfig
+  dev:site:list:
+    desc: List site deployment targets from manifest
     cmds:
-      - rsync -r index.html jisifu@vern.cc:~/public_html/index.html
+      - ./scripts/task/site-target.sh list
+
+  dev:site:show:*:
+    desc: Show manifest metadata for a site target
+    vars:
+      TARGET: '{{index .MATCH 0}}'
+    cmds:
+      - ./scripts/task/site-target.sh show {{.TARGET}}
+
+  dev:site:build:*:
+    desc: Build a site target from manifest
+    vars:
+      TARGET: '{{index .MATCH 0}}'
+    cmds:
+      - ./scripts/task/site-target.sh build {{.TARGET}}
+
+  dev:site:preview:*:
+    desc: Preview a site target from manifest
+    vars:
+      TARGET: '{{index .MATCH 0}}'
+    cmds:
+      - ./scripts/task/site-target.sh preview {{.TARGET}}
+
+  dev:site:deploy:*:
+    desc: Deploy a site target from manifest
+    vars:
+      TARGET: '{{index .MATCH 0}}'
+    cmds:
+      - ./scripts/task/site-target.sh deploy {{.TARGET}}
+
+  dev:site:build:
+    desc: Build the default site target from manifest
+    cmds:
+      - ./scripts/task/site-target.sh build
+
+  dev:site:preview:
+    desc: Preview the default site target from manifest
+    cmds:
+      - ./scripts/task/site-target.sh preview
+
+  dev:site:deploy:
+    desc: Deploy the default site target from manifest
+    cmds:
+      - ./scripts/task/site-target.sh deploy
+
+  dev:site:sync-verntil:
+    desc: Alias for dev:site:deploy
+    cmds:
+      - task dev:site:deploy
 
   verntil:
-    desc: Alias for dev:site:sync-verntil
+    desc: Alias for dev:site:deploy
     cmds:
-      - task dev:site:sync-verntil
+      - task dev:site:deploy
 
   dev:flake:update-branch:
     desc: "[destructive] Create/reset update branch and force-push flake.lock update"

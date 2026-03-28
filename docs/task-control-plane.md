@@ -18,7 +18,7 @@ This repository uses a small control-plane namespace policy so task names stay p
 - Put daemon and service lifecycle flows under `services:*`.
 - Put menus, grouped help, grouped status, and handoff helpers under `agents:*`.
 - Put validation under `checks:*`.
-- Put git, flake update, site sync, and local developer workflows under `dev:*`.
+- Put git, flake update, site/static target workflows, and local developer workflows under `dev:*`.
 
 ## Canonical surfaces
 

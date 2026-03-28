@@ -10,7 +10,7 @@
     backupFileExtension = "hm-backup"; #for rebuild
     users.devji = {
       imports = [
-        ./heim.nix
+        ../roles/heim.nix
       ];
     };
     sharedModules = [

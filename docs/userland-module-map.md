@@ -25,16 +25,11 @@ System/service modules and AI fleet operator workflows are unchanged in this pas
   - compositor + shell integration settings for Niri/DMS
 
 ## Compatibility Wrappers
-Old import paths remain valid and now forward to the new locations:
-- `modules/global/minimal.nix` -> `modules/roles/minimal.nix`
-- `modules/global/home.nix` -> `modules/roles/home.nix`
-- `modules/global/heim.nix` -> `modules/roles/heim.nix`
 - `modules/goodies.nix` -> `modules/user/ai/default.nix`
 - `modules/niri.nix` -> `modules/user/desktop/niri.nix`
 
-This keeps existing host/module imports stable during migration.
-
-Canonical role graph lives under `modules/roles/*`; `modules/global/{minimal,home,heim}.nix` are compatibility shims only.
+Canonical role graph now lives only under `modules/roles/*`.
+The temporary role wrappers at `modules/global/{minimal,home,heim}.nix` were removed after all in-repo imports were migrated.
 
 ## Ownership Summary
 - Shell/core CLI base stack:

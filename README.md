@@ -28,4 +28,4 @@ Canonically assembled from [`flake/outputs.nix`](/home/devji/nixconfig/flake/out
 - `docs/task-control-plane.md` for namespace policy.
 - `taskfiles/README.md` for the Taskfile ownership map.
 - `docs/codex-handoff.md` for Codex session guidance.
-- Build the styled static site with `nix build .#docs-site` and serve `result/index.html`.
+- Manage site targets with `task dev:site:list`; build/preview/deploy the default target with `task dev:site:build`, `task dev:site:preview`, and `task dev:site:deploy`.

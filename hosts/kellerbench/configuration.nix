@@ -10,7 +10,7 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./nvidia.nix
-    (import ../../modules/profiles/ai-host.nix {withHermes = true;})
+    (import ../../modules/profiles/ai-host.nix {withHermes = false;})
     ../../modules/services/nullclaw-deployment.nix
     inputs.nix-hermes.nixosModules.hermes-agent
   ];
@@ -40,15 +40,14 @@ in {
     group = lib.mkForce "devji";
   };
 
-  nixpkgs.overlays =
-    lib.optionals enableHermes [
-      (final: prev: {
-        hermes-agent = final.callPackage ../../pkgs/hermes-agent.nix {
-          src = inputs.hermes-src;
-          version = "main";
-        };
-      })
-    ];
+  nixpkgs.overlays = lib.optionals enableHermes [
+    (final: prev: {
+      hermes-agent = final.callPackage ../../pkgs/hermes-agent.nix {
+        src = inputs.hermes-src;
+        version = "main";
+      };
+    })
+  ];
 
   profiles.aiHost = {
     enable = true;

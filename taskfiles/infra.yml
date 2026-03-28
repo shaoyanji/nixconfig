@@ -160,3 +160,130 @@ tasks:
     desc: Alias for infra:secrets:new:copy-nas
     cmds:
       - task infra:secrets:new:copy-nas
+
+  infra:rebuild:pre-hook:
+    desc: Pre-rebuild hook (reserved)
+    cmds: []
+
+  infra:rebuild:nixos:
+    desc: Rebuild local NixOS host and refresh ~/Taskfile.yml
+    cmds:
+      - task infra:rebuild:pre-hook
+      - task infra:switch:nixos
+      - task infra:secrets:decrypt:detaskfile-home
+
+  infra:rebuild:darwin:
+    desc: Rebuild local Darwin host and refresh ~/Taskfile.yml
+    cmds:
+      - task infra:rebuild:pre-hook
+      - task infra:switch:darwin
+      - task infra:secrets:decrypt:detaskfile-home
+
+  infra:rebuild:home-manager:
+    desc: Rebuild local Home Manager profile and push build commit
+    cmds:
+      - task infra:rebuild:pre-hook
+      - home-manager switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+      - task infra:secrets:decrypt:detaskfile-home
+
+  infra:rebuild:wsl:
+    desc: Rebuild WSL host configuration
+    cmds:
+      - task infra:rebuild:pre-hook
+      - sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes |& nom; task dev:git:build-push
+
+  infra:rebuild:orb:
+    desc: Rebuild OrbStack host configuration and refresh ~/Taskfile.yml
+    cmds:
+      - task infra:rebuild:pre-hook
+      - sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure |& nom; task dev:git:build-push
+      - task infra:secrets:decrypt:detaskfile-home
+
+  infra:switch:*:
+    desc: Switch current host using a rebuild command (nixos|darwin)
+    vars:
+      OS: '{{index .MATCH 0}}'
+    cmds:
+      - sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:prehook && git commit -m "$(hostname) $({{.OS}}-rebuild list-generations | awk 'NR==2 {print $1, $2, $6; exit}')" && task dev:git:posthook
+
+  infra:boot:*:
+    desc: "[destructive] Boot into next generation via rebuild command"
+    vars:
+      OS: '{{index .MATCH 0}}'
+    cmds:
+      - sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+
+  infra:plan:host:*:
+    desc: Build/evaluate a specific host closure (no apply)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - nix build .#nixosConfigurations.{{.HOST}}.config.system.build.toplevel -L
+
+  infra:apply:host:*:
+    desc: Apply a specific remote host configuration (no git side effects)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - nixos-rebuild switch --use-remote-sudo --target-host {{.HOST}} --fast --flake .?submodules=1#{{.HOST}} |& nom
+
+  infra:deploy:host:*:
+    desc: Plan + apply + validate a specific remote host (no git side effects)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - task infra:plan:host:{{.HOST}}
+      - task infra:apply:host:{{.HOST}}
+      - task services:validate:host:{{.HOST}}
+
+  infra:rollback:apply:host:*:
+    desc: Roll back a remote host to previous generation (apply only)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - ssh {{.HOST}} "sudo nixos-rebuild switch --rollback"
+
+  infra:rollback:host:*:
+    desc: Roll back a remote host to the previous generation (apply-only canonical)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - task infra:rollback:apply:host:{{.HOST}}
+
+  infra:logs:host:*:
+    desc: "Tail journal logs for a host via ssh (default unit: go-backend)"
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      UNIT: '{{.UNIT | default "go-backend"}}'
+    cmds:
+      - ssh {{.HOST}} "journalctl -fu {{.UNIT}}"
+
+  infra:deploy:menu:
+    desc: Choose a deployment target
+    vars:
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+    cmds:
+      - |
+        choice=$(
+          {
+            printf '%s\n' "infra:deploy:host:{{.PI}}"
+            jq -r '.hosts | keys[] | "infra:deploy:host:" + .' {{.MANIFEST}}
+            printf '%s\n' exit
+          } | awk '!seen[$0]++' | gum choose
+        )
+        [ "$choice" = "exit" ] || task "$choice"
+
+  infra:logs:menu:
+    desc: Choose a logs target
+    vars:
+      MANIFEST: ./taskfiles/ai-host-manifest.json
+    cmds:
+      - |
+        host=$(
+          {
+            printf '%s\n' {{.PI}}
+            jq -r '.hosts | keys[]' {{.MANIFEST}}
+            printf '%s\n' exit
+          } | awk '!seen[$0]++' | gum choose
+        )
+        [ "$host" = "exit" ] || task infra:logs:host:$host

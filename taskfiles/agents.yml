@@ -8,6 +8,39 @@ tasks:
         choice=$(printf '%s\n' rebuild edit-config update load browse new incus sudologinssh help status check deploy logs exit | gum choose)
         task "$choice"
 
+  agents:hosts:list:
+    desc: List AI hosts described in the manifest
+    cmds:
+      - scripts/task/ai-host-manifest.sh list
+
+  agents:hosts:show:*:
+    desc: Show manifest metadata for a specific host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/ai-host-manifest.sh show {{.HOST}}
+
+  agents:hosts:services:*:
+    desc: List the service bundle for a host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/ai-host-manifest.sh services {{.HOST}}
+
+  agents:hosts:paths:*:
+    desc: List readable paths associated with a host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/ai-host-manifest.sh paths {{.HOST}}
+
+  agents:hosts:tasks:*:
+    desc: Show canonical lifecycle/validate/promote task names for a host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/ai-host-manifest.sh tasks {{.HOST}}
+
   browse:
     desc: Legacy browse menu
     cmds:

@@ -20,6 +20,13 @@ tasks:
     cmds:
       - scripts/task/ai-host-manifest.sh show {{.HOST}}
 
+  agents:hosts:summary:*:
+    desc: Show a compact manifest overview for a specific host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/ai-host-manifest.sh summary {{.HOST}}
+
   agents:hosts:services:*:
     desc: List the service bundle for a host
     vars:

@@ -1,31 +1,26 @@
 # AI Host Deployment
 
 ## Scope
-Routing guidance for AI host deploy, validation, evidence, drift, and promotion flows.
+Route AI host deploy, validate, evidence, drift, and promotion work to the existing manifest and taskfiles. Do not invent new flows; follow the namespaces described here.
 
-## Source Of Truth
-- Operator metadata: `taskfiles/ai-host-manifest.json`
-- Execution tasks: `taskfiles/services-core.yml`, `taskfiles/services-ai-hosts.yml`, `taskfiles/checks.yml`
-- Script implementation: `scripts/task/ai-host-*.sh`
+## Manifest truth
+- `taskfiles/ai-host-manifest.json` is the single source of AI host metadata.
+- Use `scripts/task/ai-host-manifest.sh` or `task agents:hosts:*` to answer host/service/promotion questions without editing JSON by hand.
 
-## Canonical Task Surface
-- Plan/apply/validate host: `services:plan:host:*`, `services:apply:host:*`, `services:validate:host:*`
-- Deploy wrapper: `services:deploy:host:*`
-- Evidence/drift/status: `services:evidence:*`, `services:drift:*`, `services:status:*`
-- Promotion: `services:promote:host:*`, `services:promote:canary`, `services:promote:class:*`
-- Fleet checks: `checks:fleet`
+## Canonical task surfaces
+- Host lifecycle (build/plan/apply/deploy/logs/rollback) belongs to `infra:*` (e.g., `infra:deploy:host:<host>`, `infra:logs:host:<host>`, `infra:rollback:host:<host>`).
+- AI-specific validation/evidence/promote/status flows stay under `services:*` (`services:validate:host:*`, `services:evidence:*`, `services:promote:*`, `services:status:*`).
+- Fleet checks such as `checks:fleet` and `checks:nullclaw:smoke:*` verify behavior after the canonical lifecycle commands run.
 
-## Promotion Groups
-Promotion group and host class are read from `taskfiles/ai-host-manifest.json`:
-- `promotionGroup` drives canary/stable fan-out tasks.
-- `hostClass` supports class-based batch operations.
+## Manifest-aware helpers
+The helper script lists hosts, services, readable paths, validation/promote tasks, and the canonical `infra` or `services` task names you need for a host (`deploy-task`, `logs-task`, `validate-task`, `promote-task`). Use `task agents:hosts:tasks:<host>` to see the derived names from the shell.
 
-## When To Read What
-- Need host list or validation task mapping: read manifest.
-- Need command flow or orchestration order: read taskfiles.
-- Need command implementation details: read scripts.
-- Need host nuance not obvious from manifest: read `.agents/deploy/hosts/*.md`.
+## Promotion groups
+The manifest exposes `promotionGroup` and `hostClass`. The group defines who appears in `services:promote:canary` vs `services:promote:class:*`; `hostClass` helps you reason about wrappers vs direct hosts.
 
-## What Not To Assume
-- Do not hardcode AI host lists outside manifest-backed flows.
-- Do not infer execution behavior from `.agents/*`; tasks remain authoritative.
+## Host exceptions
+When a host has operational nuance beyond the manifest, consult `.agents/deploy/hosts/<host>.md` before making assumptions. Otherwise, the manifest + helper + canonical tasks redirect all work.
+
+## What not to assume
+- Do not duplicate the manifest contents into `.agents/*`; point agents to the manifest or the helper script instead.
+- Do not treat `.agents/*` as a second runtime truth—only the Taskfiles execute workflows.

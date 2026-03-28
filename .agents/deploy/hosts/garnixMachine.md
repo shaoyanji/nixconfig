@@ -17,3 +17,6 @@ Operational differences for `garnixMachine` in AI host flows.
 - `taskfiles/ai-host-manifest.json`
 - `taskfiles/services-core.yml`
 - `taskfiles/services-ai-hosts.yml`
+
+## Manifest helper
+Use `scripts/task/ai-host-manifest.sh show garnixMachine` and `task agents:hosts:tasks:garnixMachine` when you need the canonical commands or manifest values for this host.

@@ -1,27 +1,16 @@
 # Promotion Routing
 
 ## Scope
-AI host promotion/readiness workflow routing.
+Route readiness, promotion, and evidence work for AI hosts to the existing `services:*` flows and manifest-assisted grouping.
 
-## Source Of Truth
-- Promotion/evidence/drift/status tasks: `taskfiles/services-ai-hosts.yml`
-- Fleet checks: `taskfiles/checks.yml`
-- Host metadata and promotion grouping: `taskfiles/ai-host-manifest.json`
+## Canonical tasks
+- Promote one host: `services:promote:host:*`.
+- Promotion batches: `services:promote:canary` and `services:promote:class:*` (manifest-driven grouping).
+- Finalize receipt/baseline: `services:promote:finalize:host:*`.
+- Readiness/status review: `services:status:promotion-readiness`, `services:status:ai-hosts`, `services:status:delta:host:*`.
 
-## Canonical Task Surface
-- Promote one host: `services:promote:host:*`
-- Promote canary batch: `services:promote:canary`
-- Promote class batch: `services:promote:class:*`
-- Finalize receipt/baseline update: `services:promote:finalize:host:*`
-- Readiness/status: `services:status:promotion-readiness`, `services:status:ai-hosts`, `services:status:delta:host:*`
+## Helper guidance
+Use `scripts/task/ai-host-manifest.sh promotion-group <host>` or `task agents:hosts:tasks:<host>` to understand which batch a host belongs to and the canonical promote task names.
 
-## Flow Summary
-- Run `checks:fleet`.
-- Capture validation evidence.
-- Run drift audit.
-- Finalize promotion receipt/baseline.
-- Use readiness/status tasks for operator review.
-
-## What Not To Assume
-- Do not bypass manifest-driven grouping for canary/class flows.
-- Do not duplicate promotion policy in `.agents/*`; taskfiles + manifest remain authoritative.
+## Manifest guidance
+Promotion groups and host classes live in `taskfiles/ai-host-manifest.json`. Do not duplicate or copy these into `.agents/*`; point people to the manifest or the helper instead.

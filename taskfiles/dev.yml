@@ -97,3 +97,13 @@ tasks:
     desc: Alias for dev:flake:merge-update
     cmds:
       - task dev:flake:merge-update
+
+  dev:flake:update:bountystash:
+    desc: Update only the bountystash flake input
+    cmds:
+      - nix flake update bountystash
+
+  update-bountystash:
+    desc: Alias for dev:flake:update:bountystash
+    cmds:
+      - task dev:flake:update:bountystash

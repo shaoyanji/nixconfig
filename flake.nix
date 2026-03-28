@@ -81,7 +81,6 @@
       url = "github:0xrsydn/nix-hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
     hermes-src = {
       url = "github:NousResearch/hermes-agent?submodules=1";
       flake = false;

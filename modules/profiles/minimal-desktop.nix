@@ -15,7 +15,6 @@
         })));
 in {
   imports = [
-    ../../hosts/common/localmounts.nix
     inputs.sops-nix.nixosModules.sops
   ];
 

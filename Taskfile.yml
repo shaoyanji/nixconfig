@@ -51,12 +51,12 @@ tasks:
   deploy:
     desc: Open deployment menu
     cmds:
-      - task services:deploy:menu
+      - task infra:deploy:menu
 
   logs:
     desc: Open logs menu
     cmds:
-      - task services:logs:menu
+      - task infra:logs:menu
 
   menu:
     desc: Open operator menu

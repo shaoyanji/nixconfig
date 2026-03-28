@@ -1,38 +1,6 @@
 version: "3"
 
 tasks:
-  services:rebuild:pre-hook:
-    desc: Pre-rebuild hook (reserved)
-    cmds: []
-
-  services:switch:*:
-    desc: Alias for infra:switch:*
-    vars:
-      OS: '{{index .MATCH 0}}'
-    cmds:
-      - task infra:switch:{{.OS}}
-
-  services:boot:*:
-    desc: Alias for infra:boot:*
-    vars:
-      OS: '{{index .MATCH 0}}'
-    cmds:
-      - task infra:boot:{{.OS}}
-
-  services:plan:host:*:
-    desc: Alias for infra:plan:host:*
-    vars:
-      HOST: '{{index .MATCH 0}}'
-    cmds:
-      - task infra:plan:host:{{.HOST}}
-
-  services:apply:host:*:
-    desc: Alias for infra:apply:host:*
-    vars:
-      HOST: '{{index .MATCH 0}}'
-    cmds:
-      - task infra:apply:host:{{.HOST}}
-
   services:validate:host:*:
     desc: Validate a deployed host (uses host-specific smoke checks when wired)
     vars:
@@ -93,36 +61,6 @@ tasks:
       HOST: '{{index .MATCH 0}}'
     cmds:
       - task infra:deploy:host:{{.HOST}}
-
-  services:rebuild:nixos:
-    desc: Rebuild local NixOS host and refresh ~/Taskfile.yml
-    cmds:
-      - task services:rebuild:pre-hook
-      - task infra:rebuild:nixos
-
-  services:rebuild:darwin:
-    desc: Rebuild local Darwin host and refresh ~/Taskfile.yml
-    cmds:
-      - task services:rebuild:pre-hook
-      - task infra:rebuild:darwin
-
-  services:rebuild:home-manager:
-    desc: Rebuild local Home Manager profile and push build commit
-    cmds:
-      - task services:rebuild:pre-hook
-      - task infra:rebuild:home-manager
-
-  services:rebuild:wsl:
-    desc: Rebuild WSL host configuration
-    cmds:
-      - task services:rebuild:pre-hook
-      - task infra:rebuild:wsl
-
-  services:rebuild:orb:
-    desc: Rebuild OrbStack host configuration and refresh ~/Taskfile.yml
-    cmds:
-      - task services:rebuild:pre-hook
-      - task infra:rebuild:orb
 
   services:logs:host:*:
     desc: Alias for infra:logs:host:*

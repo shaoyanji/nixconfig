@@ -83,7 +83,7 @@ tasks:
       - task services:deploy:mtfuji
 
   services:deploy:menu:
-    desc: Choose a deployment target
+    desc: Compatibility alias for infra:deploy:menu
     cmds:
       - task infra:deploy:menu
 
@@ -104,6 +104,6 @@ tasks:
         task "$choice"
 
   services:logs:menu:
-    desc: Choose a logs target
+    desc: Compatibility alias for infra:logs:menu
     cmds:
       - task infra:logs:menu

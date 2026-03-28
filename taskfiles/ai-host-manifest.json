@@ -63,6 +63,30 @@
       "readablePaths": [
         "/run/secrets/nullclaw"
       ]
+    },
+    "kellerbench": {
+      "hostClass": "wrapper",
+      "promotionGroup": "lab",
+      "availability": "on-demand",
+      "powerPolicy": "manual",
+      "roleNote": "Basement benchmark node for harness strategy/cold-start testing; optional GPU acceleration.",
+      "nullclawMode": "env-file",
+      "validationTask": "checks:nullclaw:smoke:kellerbench",
+      "exposureType": "local-only-loopback",
+      "rollbackShape": "remote-nixos-rebuild-switch-rollback",
+      "deploymentStyle": "nullclaw-deployment-wrapper",
+      "nullclawBind": "127.0.0.1",
+      "nullclawPort": 3001,
+      "workspaceRoot": "/var/lib/nullclaw",
+      "services": [
+        "nullclaw",
+        "ollama",
+        "hermes-agent"
+      ],
+      "readablePaths": [
+        "/run/secrets/nullclaw",
+        "/run/secrets/hermes"
+      ]
     }
   }
 }

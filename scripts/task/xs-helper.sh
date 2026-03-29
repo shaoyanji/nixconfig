@@ -20,6 +20,11 @@ LOCAL_SERVER_LOG="${LOCAL_ROOT}/xs-serve.log"
 
 SERVICE_STORE_PATH="${XS_HELPER_SERVICE_STORE_PATH:-/var/lib/xs/store}"
 SERVICE_ADDR="${XS_HELPER_SERVICE_ADDR:-$SERVICE_STORE_PATH}"
+SERVICE_USER="${XS_HELPER_SERVICE_USER:-xs}"
+SERVICE_UNIT_NAME="${XS_HELPER_SERVICE_UNIT_NAME:-xs}"
+SERVICE_USE_SUDO="${XS_HELPER_SERVICE_USE_SUDO:-1}"
+SERVICE_ARTIFACT_SEARCH_DEPTH="${XS_HELPER_ARTIFACT_SEARCH_DEPTH:-2000}"
+SERVICE_SUDO_WARNED=0
 
 PRODUCER="${XS_HELPER_PRODUCER:-xs-helper}"
 XS_BIN="${XS_BIN:-xs}"
@@ -57,11 +62,20 @@ Commands:
   topics                   list the most recent active topics
   show <topic>             render recent frames for a topic
   tail <topic>             follow a topic stream
+  raw <topic> [limit]      dump raw JSON frames for a topic (limit defaults to 200)
   start <topic>            emit a run.started frame
   artifact <topic> <file> [label]
                            hash and promote a file, emit an artifact.ready frame
   packet <topic> <artifact-id> <type> <text>
                            create a packet.emit event from the given artifact
+  get-artifact <artifact-id>
+                           look up artifact metadata by id
+  cat-artifact <artifact-id>
+                           stream the artifact body by id
+  doctor                   run quick health checks for local and service stores
+  service-status           inspect the live xs systemd unit and store status
+  service-show <topic>     render frames from the service store
+  service-tail <topic>     follow a topic stream from the service store
 EOF
 }
 
@@ -94,8 +108,8 @@ timestamp_iso() {
 }
 
 generate_id() {
-  if "$XS_BIN" scru128 >/dev/null 2>&1; then
-    "$XS_BIN" scru128
+  if run_xs scru128 >/dev/null 2>&1; then
+    run_xs scru128
   else
     date +"%s%N"
   fi
@@ -137,6 +151,25 @@ resolve_addr() {
   fi
 }
 
+service_exec() {
+  local -a cmd=("$@")
+  if [[ "$MODE" == "service" && "${SERVICE_USE_SUDO:-1}" != "0" && "$(id -u)" -ne 0 ]]; then
+    if command -v sudo >/dev/null 2>&1; then
+      sudo -u "$SERVICE_USER" env PATH="$PATH" "${cmd[@]}"
+      return
+    fi
+    if [[ "$SERVICE_SUDO_WARNED" -eq 0 ]]; then
+      printf 'warning: sudo not found; service mode may lack permissions\n' >&2
+      SERVICE_SUDO_WARNED=1
+    fi
+  fi
+  "${cmd[@]}"
+}
+
+run_xs() {
+  service_exec "$XS_BIN" "$@"
+}
+
 prepare_local_dirs() {
   if [[ "$MODE" == "service" ]]; then
     return
@@ -154,7 +187,7 @@ wait_for_xs() {
   local addr="$1"
   local attempt
   for attempt in 1 2 3 4 5 6 7 8 9 10; do
-    if "$XS_BIN" version "$addr" >/dev/null 2>&1; then
+    if run_xs version "$addr" >/dev/null 2>&1; then
       return 0
     fi
     sleep 0.2
@@ -171,7 +204,7 @@ ensure_local_server() {
   local addr
   addr="$(resolve_addr)"
   mkdir -p "$store" "$(resolve_cas)"
-  if "$XS_BIN" version "$addr" >/dev/null 2>&1; then
+  if run_xs version "$addr" >/dev/null 2>&1; then
     return
   fi
   rm -f "$addr"
@@ -184,9 +217,9 @@ append_event() {
   local body="$2"
   local meta="$3"
   if [[ -n "$meta" ]]; then
-    printf '%s\n' "$body" | "$XS_BIN" append "$(resolve_addr)" "$topic" --meta "$meta"
+    printf '%s\n' "$body" | run_xs append "$(resolve_addr)" "$topic" --meta "$meta"
   else
-    printf '%s\n' "$body" | "$XS_BIN" append "$(resolve_addr)" "$topic"
+    printf '%s\n' "$body" | run_xs append "$(resolve_addr)" "$topic"
   fi
 }
 
@@ -280,7 +313,171 @@ for line in sys.stdin:
     print(f"{ts:<24} {topic:<30} {summary}")
 PY
 )"
-  XS_HELPER_PRETTY_ADDR="$addr" XS_HELPER_PRETTY_BIN="$XS_BIN" python3 -u -c "$pretty_script"
+  XS_HELPER_PRETTY_ADDR="$addr" XS_HELPER_PRETTY_BIN="$XS_BIN" service_exec python3 -u -c "$pretty_script"
+}
+
+fetch_artifact_record() {
+  local artifact_id="$1"
+  local depth="${XS_HELPER_ARTIFACT_SEARCH_DEPTH:-2000}"
+  local artifact_search_script
+  artifact_search_script="$(cat <<'PY'
+import json
+import os
+import subprocess
+import sys
+
+ADDR = os.environ["XS_HELPER_ARTIFACT_ADDR"]
+XS_BIN = os.environ["XS_HELPER_ARTIFACT_BIN"]
+
+def fetch_hash_payload(hash_value):
+    if not hash_value:
+        return None
+    try:
+        result = subprocess.run(
+            [XS_BIN, "cas", ADDR, hash_value],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        return None
+    text = result.stdout.strip()
+    if not text:
+        return None
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {"value": text}
+
+def extract_payload(obj):
+    if isinstance(obj, str):
+        try:
+            return json.loads(obj)
+        except json.JSONDecodeError:
+            return {"value": obj}
+    if isinstance(obj, dict):
+        if "kind" in obj:
+            return obj
+        hash_payload = fetch_hash_payload(obj.get("hash"))
+        if hash_payload is not None:
+            return extract_payload(hash_payload)
+        if "content" in obj:
+            return extract_payload(obj["content"])
+        if "payload" in obj:
+            return extract_payload(obj["payload"])
+        if "body" in obj:
+            return extract_payload(obj["body"])
+        if "data" in obj:
+            return extract_payload(obj["data"])
+        return obj
+    return {}
+
+target = sys.argv[1]
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        frame = json.loads(line)
+    except json.JSONDecodeError:
+        continue
+    if not isinstance(frame, dict):
+        continue
+    payload = extract_payload(frame)
+    if not isinstance(payload, dict):
+        continue
+    if payload.get("artifact_id") != target:
+        continue
+    meta = frame.get("meta") or {}
+    topic = payload.get("topic") or frame.get("topic") or meta.get("topic")
+    print(json.dumps({
+        "topic": topic,
+        "payload": payload,
+        "meta": meta,
+        "frame": frame,
+    }))
+    sys.exit(0)
+sys.exit(2)
+PY
+)"
+  run_xs cat "$(resolve_addr)" --last "$depth" | \
+    XS_HELPER_ARTIFACT_ADDR="$(resolve_addr)" XS_HELPER_ARTIFACT_BIN="$XS_BIN" \
+    service_exec python3 -c "$artifact_search_script" "$artifact_id"
+}
+
+print_artifact_summary() {
+  local record="$1"
+  if [[ -z "$record" ]]; then
+    return
+  fi
+  local summary_script
+  summary_script="$(cat <<'PY'
+import json, sys
+
+data = json.load(sys.stdin)
+payload = data.get("payload") or {}
+meta = data.get("meta") or {}
+frame = data.get("frame") or {}
+
+fields = [
+    ("topic", data.get("topic") or payload.get("topic") or frame.get("topic")),
+    ("artifact_id", payload.get("artifact_id") or frame.get("artifact_id")),
+    ("label", payload.get("label")),
+    ("mime", payload.get("mime")),
+    ("sha256", payload.get("sha256")),
+    ("cas_path", payload.get("cas_path") or frame.get("cas_path")),
+    ("producer", payload.get("producer") or meta.get("producer")),
+    ("timestamp", payload.get("timestamp") or frame.get("timestamp")),
+]
+
+for key, value in fields:
+    if value not in (None, ""):
+        print(f"{key}: {value}")
+
+if meta:
+    extras = []
+    for key in ("type", "topic", "producer"):
+        if key in meta:
+            extras.append(f"{key}={meta[key]}")
+    if extras:
+        print("meta: " + " ".join(extras))
+PY
+  )"
+  printf '%s\n' "$record" | python3 -c "$summary_script"
+}
+
+extract_artifact_cas_path() {
+  local record="$1"
+  local cas_script
+  cas_script="$(cat <<'PY'
+import json, sys
+
+data = json.load(sys.stdin)
+payload = data.get("payload") or {}
+frame = data.get("frame") or {}
+
+for source in (payload, frame):
+    if isinstance(source, dict):
+        path = source.get("cas_path")
+        if path:
+            print(path)
+            sys.exit(0)
+sys.exit(1)
+PY
+  )"
+  printf '%s\n' "$record" | python3 -c "$cas_script"
+}
+
+cat_artifact_file() {
+  local path="$1"
+  if [[ -z "$path" ]]; then
+    fail "artifact path is empty"
+  fi
+  if [[ ! -e "$path" ]]; then
+    fail "artifact path missing: $path"
+  fi
+  service_exec cat "$path"
 }
 
 command_status() {
@@ -295,7 +492,7 @@ command_status() {
     printf 'server_log: %s\n' "$LOCAL_SERVER_LOG"
   fi
   if command -v "$XS_BIN" >/dev/null 2>&1; then
-    if "$XS_BIN" version "$addr" >/dev/null 2>&1; then
+    if run_xs version "$addr" >/dev/null 2>&1; then
       printf 'xs: reachable\n'
     else
       printf 'xs: unreachable (address=%s)\n' "$addr"
@@ -321,7 +518,7 @@ command_logs() {
   if [[ -n "$topic" ]]; then
     args+=("--topic" "$topic")
   fi
-  "$XS_BIN" cat "${args[@]}" | pretty_events "$(resolve_addr)"
+  run_xs cat "${args[@]}" | pretty_events "$(resolve_addr)"
 }
 
 command_topics() {
@@ -356,7 +553,7 @@ for topic in sorted(seen):
     print(topic)
 PY
 )"
-  "$XS_BIN" cat "$(resolve_addr)" --last 200 | python3 -c "$topics_script"
+  run_xs cat "$(resolve_addr)" --last 200 | python3 -c "$topics_script"
 }
 
 command_show() {
@@ -364,7 +561,7 @@ command_show() {
   ensure_local_server
   [[ $# -ge 1 ]] || fail 'show requires a topic'
   local topic="$(normalize_topic "$1")"
-  "$XS_BIN" cat "$(resolve_addr)" --topic "$topic" --last 50 | pretty_events "$(resolve_addr)"
+  run_xs cat "$(resolve_addr)" --topic "$topic" --last 50 | pretty_events "$(resolve_addr)"
 }
 
 command_tail() {
@@ -372,7 +569,7 @@ command_tail() {
   ensure_local_server
   [[ $# -ge 1 ]] || fail 'tail requires a topic'
   local topic="$(normalize_topic "$1")"
-  "$XS_BIN" cat "$(resolve_addr)" --topic "$topic" --follow | pretty_events "$(resolve_addr)"
+  run_xs cat "$(resolve_addr)" --topic "$topic" --follow | pretty_events "$(resolve_addr)"
 }
 
 command_start() {
@@ -512,6 +709,104 @@ PY
   printf 'packet.emit emitted for %s (packet_id=%s)\n' "$topic" "$packet_id"
 }
 
+command_doctor() {
+  ensure_xs
+  local saved_mode="$MODE"
+  printf '=== local doctor ===\n'
+  MODE="local"
+  ensure_local_server
+  command_status
+  command_topics
+  MODE="$saved_mode"
+  printf '\n=== service doctor ===\n'
+  command_service_status
+}
+
+command_service_status() {
+  ensure_xs
+  local prev_mode="$MODE"
+  MODE="service"
+  command_status
+  local service_addr
+  service_addr="$(resolve_addr)"
+  if command -v systemctl >/dev/null 2>&1; then
+    printf 'service unit: %s\n' "$SERVICE_UNIT_NAME"
+    systemctl --no-pager show -p ActiveState -p SubState -p MainPID "$SERVICE_UNIT_NAME" || true
+    systemctl --no-pager status "$SERVICE_UNIT_NAME" --lines=5 || true
+  else
+    printf 'systemctl: not available\n'
+  fi
+  local store_info
+  store_info=$(service_exec stat -c 'store: %n owner=%U:%G mode=%a' "$SERVICE_STORE_PATH" 2>/dev/null || true)
+  if [[ -n "$store_info" ]]; then
+    printf '%s\n' "$store_info"
+  else
+    printf 'store: %s (unreadable)\n' "$SERVICE_STORE_PATH"
+  fi
+  local socket_info
+  socket_info=$(service_exec stat -c 'socket: %n owner=%U:%G mode=%a' "$service_addr" 2>/dev/null || true)
+  if [[ -n "$socket_info" ]]; then
+    printf '%s\n' "$socket_info"
+  else
+    printf 'socket: %s (missing)\n' "$service_addr"
+  fi
+  MODE="$prev_mode"
+}
+
+command_service_show() {
+  local prev_mode="$MODE"
+  MODE="service"
+  command_show "$@"
+  MODE="$prev_mode"
+}
+
+command_service_tail() {
+  local prev_mode="$MODE"
+  MODE="service"
+  command_tail "$@"
+  MODE="$prev_mode"
+}
+
+command_raw() {
+  ensure_xs
+  ensure_local_server
+  [[ $# -ge 1 ]] || fail 'raw requires a topic'
+  local topic="${1}"
+  topic="$(normalize_topic "$topic")"
+  local limit=200
+  if [[ $# -gt 1 && "$2" =~ ^[0-9]+$ ]]; then
+    limit="$2"
+  fi
+  run_xs cat "$(resolve_addr)" --topic "$topic" --last "$limit"
+}
+
+command_get_artifact() {
+  ensure_xs
+  [[ $# -ge 1 ]] || fail 'get-artifact requires <artifact-id>'
+  local artifact_id="$1"
+  local record
+  if ! record="$(fetch_artifact_record "$artifact_id")"; then
+    fail "artifact not found: $artifact_id (search depth=${XS_HELPER_ARTIFACT_SEARCH_DEPTH:-2000})"
+  fi
+  print_artifact_summary "$record"
+}
+
+command_cat_artifact() {
+  ensure_xs
+  [[ $# -ge 1 ]] || fail 'cat-artifact requires <artifact-id>'
+  local artifact_id="$1"
+  local record
+  if ! record="$(fetch_artifact_record "$artifact_id")"; then
+    fail "artifact not found: $artifact_id (search depth=${XS_HELPER_ARTIFACT_SEARCH_DEPTH:-2000})"
+  fi
+  print_artifact_summary "$record"
+  local path
+  if ! path="$(extract_artifact_cas_path "$record")"; then
+    fail "artifact path could not be resolved for $artifact_id"
+  fi
+  cat_artifact_file "$path"
+}
+
 [[ $# -eq 0 ]] && usage && exit 0
 
 while [[ $# -gt 0 ]]; do
@@ -570,6 +865,27 @@ case "$COMMAND" in
     ;;
   packet)
     command_packet "$@"
+    ;;
+  doctor)
+    command_doctor
+    ;;
+  raw)
+    command_raw "$@"
+    ;;
+  get-artifact)
+    command_get_artifact "$@"
+    ;;
+  cat-artifact)
+    command_cat_artifact "$@"
+    ;;
+  service-status)
+    command_service_status
+    ;;
+  service-show)
+    command_service_show "$@"
+    ;;
+  service-tail)
+    command_service_tail "$@"
     ;;
   *)
     usage

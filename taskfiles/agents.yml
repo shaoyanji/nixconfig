@@ -133,3 +133,65 @@ tasks:
     desc: Run a sudo-login command from encrypted server command list
     cmds:
       - ssh $(sops -d --extract '["server"]["commands"]' {{.SECRETS}}/{{.ENC_SECRETS}} | gum choose)
+
+  agents:xs:status:
+    desc: Show xs-helper status for the local store
+    cmds:
+      - scripts/task/xs-helper.sh status
+
+  agents:xs:doctor:
+    desc: Run the xs-helper doctor check (local + service)
+    cmds:
+      - scripts/task/xs-helper.sh doctor
+
+  agents:xs:topics:
+    desc: List recent xs topics
+    cmds:
+      - scripts/task/xs-helper.sh topics
+
+  agents:xs:show:*:
+    desc: Show recent frames for a topic
+    vars:
+      TOPIC: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/xs-helper.sh show {{.TOPIC}}
+
+  agents:xs:tail:*:
+    desc: Follow a topic stream locally
+    vars:
+      TOPIC: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/xs-helper.sh tail {{.TOPIC}}
+
+  agents:xs:get-artifact:*:
+    desc: Lookup artifact metadata by ID
+    vars:
+      ARTIFACT: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/xs-helper.sh get-artifact {{.ARTIFACT}}
+
+  agents:xs:cat-artifact:*:
+    desc: Stream an artifact body by ID
+    vars:
+      ARTIFACT: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/xs-helper.sh cat-artifact {{.ARTIFACT}}
+
+  agents:xs:service:status:
+    desc: Inspect the live xs systemd service
+    cmds:
+      - scripts/task/xs-helper.sh service-status
+
+  agents:xs:service:show:*:
+    desc: Show frames from the service store
+    vars:
+      TOPIC: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/xs-helper.sh service-show {{.TOPIC}}
+
+  agents:xs:service:tail:*:
+    desc: Tail a service topic stream
+    vars:
+      TOPIC: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/xs-helper.sh service-tail {{.TOPIC}}

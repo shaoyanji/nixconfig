@@ -20,5 +20,6 @@
         version = "main";
       };
       nullclaw = pkgs.callPackage ../pkgs/nullclaw.nix {};
+      openfang = pkgs.callPackage ../pkgs/openfang.nix {};
     }
   )

@@ -9,11 +9,13 @@
   enableHermes = true;
   enableOpenClaw = true;
   enableNullClaw = true;
+  enableOpenFang = true;
 in {
   imports =
     [
       ./hardware-configuration.nix
       ../../modules/profiles/minimal-desktop.nix
+      ../../modules/services/openfang.nix
       inputs.nix-openclaw.nixosModules.openclaw-gateway
       inputs.sops-nix.nixosModules.sops
       (import ../../modules/profiles/ai-host.nix {
@@ -63,6 +65,15 @@ in {
       package = self.packages.${pkgs.system}.hermes-agent;
       workspaceRoot = "/var/lib/hermes";
       environmentFile = config.sops.secrets.hermes.path;
+    };
+    openfang = {
+      enable = enableOpenFang;
+      package = self.packages.${pkgs.system}.openfang;
+      workspaceRoot = "/var/lib/openfang";
+      # Experimental: keep startup inert until the operator adds env vars and
+      # completes a manual `openfang init` against the service HOME.
+      environmentFile = "/var/lib/openfang/.openfang/openfang.env";
+      requireEnvironmentFile = true;
     };
   };
   sops.secrets = lib.mkIf enableNullClaw {

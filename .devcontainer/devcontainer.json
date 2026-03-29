@@ -1,0 +1,23 @@
+{
+  "name": "nixconfig",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "codespace",
+  "updateRemoteUserUID": true,
+  "overrideCommand": false,
+  "waitFor": "postCreateCommand",
+  "postCreateCommand": "bash .devcontainer/bootstrap.sh post-create",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "jnoortheen.nix-ide",
+        "mkhl.direnv"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

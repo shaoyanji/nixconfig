@@ -6,11 +6,10 @@ builds:
   include:
     # - defaultPackage.x86_64-linux
     # - nixosConfigurations.*
-    - nixosConfigurations.kellerbench
     - nixosConfigurations.garnixMachine
     # - "*.x86_64-linux.*"
     # - devShell.x86_64-linux
-    # - nixosConfigurations.thinsandy
+    - nixosConfigurations.thinsandy
     # - homeConfigurations.penguin
     # - "*.aarch64-darwin.*"
     # - "*.aarch64-linux.*"

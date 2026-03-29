@@ -2,7 +2,7 @@
 
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
-ARG USERNAME=codespace
+ARG USERNAME=vscode
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \

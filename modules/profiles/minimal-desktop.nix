@@ -15,6 +15,7 @@
         })));
 in {
   imports = [
+    ./nas-client.nix
     inputs.sops-nix.nixosModules.sops
   ];
 

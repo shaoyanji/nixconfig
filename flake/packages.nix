@@ -7,6 +7,7 @@
   lib.genAttrs systems.default (
     system: let
       pkgs = pkgsFor system;
+      xsPkg = pkgs.callPackage ../pkgs/xs.nix {};
     in {
       backend = pkgs.callPackage ../pkgs/go-backend.nix {};
       hermes-agent = pkgs.callPackage ../pkgs/hermes-agent.nix {
@@ -21,6 +22,9 @@
       };
       nullclaw = pkgs.callPackage ../pkgs/nullclaw.nix {};
       openfang = pkgs.callPackage ../pkgs/openfang.nix {};
-      xs = pkgs.callPackage ../pkgs/xs.nix {};
+      xs = xsPkg;
+      xs-helper = pkgs.callPackage ../pkgs/xs-helper.nix {
+        xs = xsPkg;
+      };
     }
   )

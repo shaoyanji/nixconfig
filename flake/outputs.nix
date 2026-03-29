@@ -17,6 +17,13 @@ in
     inherit inputs lib systems pkgsFor;
   };
 
+  apps = lib.genAttrs systems.default (system: {
+    xs-helper = {
+      type = "app";
+      program = "${self.packages.${system}.xs-helper}/bin/xs-helper";
+    };
+  });
+
   checks = import ./checks.nix {
     inherit lib systems pkgsFor self;
   };

@@ -16,6 +16,7 @@ in {
       ./hardware-configuration.nix
       ../../modules/profiles/minimal-desktop.nix
       ../../modules/services/openfang.nix
+      ../../modules/services/xs.nix
       inputs.nix-openclaw.nixosModules.openclaw-gateway
       inputs.sops-nix.nixosModules.sops
       (import ../../modules/profiles/ai-host.nix {
@@ -74,6 +75,12 @@ in {
       # completes a manual `openfang init` against the service HOME.
       environmentFile = "/var/lib/openfang/.openfang/openfang.env";
       requireEnvironmentFile = true;
+    };
+    xs = {
+      enable = true;
+      package = self.packages.${pkgs.system}.xs;
+      workspaceRoot = "/var/lib/xs";
+      storePath = "/var/lib/xs/store";
     };
   };
   sops.secrets = lib.mkIf enableNullClaw {

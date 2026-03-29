@@ -21,5 +21,6 @@
       };
       nullclaw = pkgs.callPackage ../pkgs/nullclaw.nix {};
       openfang = pkgs.callPackage ../pkgs/openfang.nix {};
+      xs = inputs.xs.packages.${system}.default;
     }
   )

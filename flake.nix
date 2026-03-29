@@ -103,10 +103,6 @@
       url = "github:shaoyanji/bountystash";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    xs = {
-      url = "github:cablehead/xs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = inputs @ {

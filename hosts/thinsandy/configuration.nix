@@ -7,7 +7,7 @@
   ...
 }: let
   enableHermes = true;
-  enableOpenClaw = true;
+  enableOpenClaw = false;
   enableNullClaw = true;
   enableOpenFang = true;
 in {

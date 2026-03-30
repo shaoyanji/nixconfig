@@ -12,6 +12,26 @@
 
   home.packages = with pkgs;
     [
+      a2ps
+      amfora
+      astroterm
+      caligula
+      comodoro
+      enscript
+      gtree
+      gucci
+      jwt-cli
+      minijinja
+      multimarkdown
+      ots
+      starfetch
+      termshark
+      ticker
+      todo-txt-cli
+      ytcast
+      zbar
+      viu
+      neocities
       mupdf
     ]
     ++ lib.optionals stdenv.isLinux [

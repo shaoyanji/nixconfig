@@ -1,5 +1,4 @@
 {
-  self,
   pkgs,
   lib,
   ...
@@ -105,7 +104,7 @@
         obsidian-export
       ]
       ++ lib.optionals stdenv.isLinux [
-        self.packages.${pkgs.system}.qwen-code
+        qwen-code
         newsboat
         tuir
         gitmoji-cli

@@ -22,6 +22,12 @@ Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style containe
 
 Canonically assembled from [`flake/outputs.nix`](/home/devji/nixconfig/flake/outputs.nix) and [`lib/mk-nixos-host.nix`](/home/devji/nixconfig/lib/mk-nixos-host.nix).
 
+## Runtime helpers
+
+- The NAS client recovery profile now lives in `modules/profiles/nas-client.nix`, which automounts `/Volumes/data` from `thinsandy` for non-`thinsandy` hosts so the compatibility path stays available without relying on `hosts/common/localmounts.nix`.
+- The `xs` runtime and `xs-helper` CLI are packaged via the flake (`packages.*.xs` and `packages.*.xs-helper`) and surfaced through `scripts/task/xs-helper.sh` plus the `task agents:xs:*` wrappers for local/service mode interaction, artifact promotion/retrieval, and the contract/record/trace frames being captured in this repo.
+- The experimental devcontainer configuration was reverted; there is no current repo-provided devcontainer image, so use the Taskfiles, flake outputs, and hosted workflows directly.
+
 ## Docs
 
 - `AGENTS.md` + `.agents/README.md` for routing helpers.

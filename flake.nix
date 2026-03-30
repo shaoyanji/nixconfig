@@ -74,7 +74,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-openclaw = {
-      url = "github:openclaw/nix-openclaw/f40ededb24d5db62b8b1894b20d891b852dc9a20";
+      url = "github:openclaw/nix-openclaw";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-agent = {

@@ -32,7 +32,7 @@
       cliphist
       wl-clipboard
       simplex-chat-desktop
-      goose-cli
+      # goose-cli
       qrrs
       cook-cli
       surge-cli

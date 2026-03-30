@@ -26,7 +26,7 @@ This repository uses a small control-plane namespace policy so task names stay p
 - AI evidence, drift, status, and promotion flows remain under `services:*` via `taskfiles/services-ai-hosts.yml`; the `services:validate:host:*` and related wrappers stay there for AI-host continuity.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` now only expose the minimal compatibility wrappers operators still need to reach the canonical AI-host/deploy flows.
 - Validation/check flows live in `taskfiles/checks.yml`; dev/git helpers (including the flake-update helpers) live in `taskfiles/dev.yml`.
-- Agent/operator helpers live in `taskfiles/agents.yml` and query `taskfiles/ai-host-manifest.json` for AI-host metadata.
+- Agent/operator helpers live in `taskfiles/agents.yml` and query `taskfiles/ai-host-manifest.json` for AI-host metadata, including the `agents:xs:*` wrappers that drive `scripts/task/xs-helper.sh`.
 
 ## Controls
 - Prefer new `infra:*` names for any host-local deployments, rebuilds, or logs; the old `services:*` wrappers are retained only for compatibility.

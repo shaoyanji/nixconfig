@@ -68,6 +68,14 @@ Commands:
                            hash and promote a file, emit an artifact.ready frame
   packet <topic> <artifact-id> <type> <text>
                            create a packet.emit event from the given artifact
+  define-contract <topic> <file>
+                           normalize and emit a contract.define event (JSON input)
+  emit-record [--status fail] <topic> <file>
+                           normalize and emit record.append/fail events (JSON input)
+  show-record <record-id>  display record metadata
+  show-trace <topic>       filter trace.link events for a topic
+  link-trace <child-record-id> <parent-record-id>
+                           emit a trace.link event connecting two records
   get-artifact <artifact-id>
                            look up artifact metadata by id
   cat-artifact <artifact-id>
@@ -221,6 +229,10 @@ append_event() {
   else
     printf '%s\n' "$body" | run_xs append "$(resolve_addr)" "$topic"
   fi
+}
+
+schema_helper() {
+  XS_SCHEMA_ADDR="$(resolve_addr)" XS_SCHEMA_BIN="$XS_BIN" python3 "$SCRIPT_DIR/xs-schema.py" "$@"
 }
 
 pretty_events() {
@@ -709,6 +721,100 @@ PY
   printf 'packet.emit emitted for %s (packet_id=%s)\n' "$topic" "$packet_id"
 }
 
+command_define_contract() {
+  ensure_xs
+  ensure_local_server
+  (( $# >= 2 )) || fail 'define-contract requires <topic> <file>'
+  local topic
+  topic="$(normalize_topic "$1")"
+  local def_file
+  def_file="$2"
+  [[ -f "$def_file" ]] || fail "definition file not found: $def_file"
+  local timestamp
+  timestamp="$(timestamp_iso)"
+  local schema_event
+  schema_event="$(schema_helper define-contract --topic "$topic" --input "$def_file" --producer "$PRODUCER" --timestamp "$timestamp")"
+  append_event "$topic" "$schema_event" "{\"producer\":\"$PRODUCER\",\"type\":\"contract.define\"}"
+  local contract_id
+  contract_id="$(python3 -c 'import json,sys; print(json.loads(sys.stdin.read())["contract_id"])' <<< "$schema_event")"
+  printf 'contract.define emitted for %s (contract_id=%s)\n' "$topic" "$contract_id"
+}
+
+command_emit_record() {
+  ensure_xs
+  ensure_local_server
+  local status="append"
+  if [[ $# -gt 0 && "$1" == "--status" ]]; then
+    if [[ $# -lt 2 ]]; then
+      fail 'emit-record --status requires a value'
+    fi
+    status="$2"
+    if [[ "$status" != "fail" ]]; then
+      fail 'emit-record --status only supports fail'
+    fi
+    shift 2
+  fi
+  (( $# >= 2 )) || fail 'emit-record requires <topic> <file>'
+  local topic
+  topic="$(normalize_topic "$1")"
+  local record_file
+  record_file="$2"
+  [[ -f "$record_file" ]] || fail "record file not found: $record_file"
+  local timestamp
+  timestamp="$(timestamp_iso)"
+  local schema_event
+  schema_event="$(schema_helper emit-record --topic "$topic" --input "$record_file" --status "$status" --producer "$PRODUCER" --timestamp "$timestamp")"
+  local kind
+  if [[ "$status" == "fail" ]]; then
+    kind="record.fail"
+  else
+    kind="record.append"
+  fi
+  append_event "$topic" "$schema_event" "{\"producer\":\"$PRODUCER\",\"type\":\"$kind\"}"
+  local record_id
+  record_id="$(python3 -c 'import json,sys; print(json.loads(sys.stdin.read())["record_id"])' <<< "$schema_event")"
+  printf '%s emitted for %s (record_id=%s)\n' "$kind" "$topic" "$record_id"
+}
+
+command_show_record() {
+  ensure_xs
+  ensure_local_server
+  (( $# >= 1 )) || fail 'show-record requires <record-id>'
+  local record_id
+  record_id="$1"
+  run_xs cat "$(resolve_addr)" --last 400 | schema_helper show-record --record "$record_id"
+}
+
+command_show_trace() {
+  ensure_xs
+  ensure_local_server
+  (( $# >= 1 )) || fail 'show-trace requires <topic>'
+  local topic
+  topic="$(normalize_topic "$1")"
+  run_xs cat "$(resolve_addr)" --topic "$topic" --last 400 | schema_helper show-trace --topic "$topic"
+}
+
+command_link_trace() {
+  ensure_xs
+  ensure_local_server
+  (( $# >= 2 )) || fail 'link-trace requires <child-record-id> <parent-record-id>'
+  local child
+  child="$1"
+  local parent
+  parent="$2"
+  local topic
+  if ! topic="$(run_xs cat "$(resolve_addr)" --last 400 | schema_helper record-topic --record "$child")"; then
+    fail "could not determine topic for child record $child"
+  fi
+  topic="$(normalize_topic "$topic")"
+  local timestamp
+  timestamp="$(timestamp_iso)"
+  local schema_event
+  schema_event="$(schema_helper trace-link --topic "$topic" --child "$child" --parent "$parent" --producer "$PRODUCER" --timestamp "$timestamp")"
+  append_event "$topic" "$schema_event" "{\"producer\":\"$PRODUCER\",\"type\":\"trace.link\"}"
+  printf 'trace.link emitted for %s (child=%s parent=%s)\n' "$topic" "$child" "$parent"
+}
+
 command_doctor() {
   ensure_xs
   local saved_mode="$MODE"
@@ -865,6 +971,21 @@ case "$COMMAND" in
     ;;
   packet)
     command_packet "$@"
+    ;;
+  define-contract)
+    command_define_contract "$@"
+    ;;
+  emit-record)
+    command_emit_record "$@"
+    ;;
+  show-record)
+    command_show_record "$@"
+    ;;
+  show-trace)
+    command_show_trace "$@"
+    ;;
+  link-trace)
+    command_link_trace "$@"
     ;;
   doctor)
     command_doctor

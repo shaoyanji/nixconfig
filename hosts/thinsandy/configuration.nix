@@ -39,8 +39,7 @@ in {
     []
     ++ lib.optionals enableOpenClaw [
       inputs.nix-openclaw.overlays.default
-    ]
-    ;
+    ];
   profiles.aiHost = {
     enable = true;
     openclaw.enable = enableOpenClaw;
@@ -78,7 +77,7 @@ in {
   services.hermes-agent = {
     enable = enableHermes;
     package = inputs.hermes-agent.packages.${pkgs.system}.default.overrideAttrs (old: {
-      version = "0.5.0";
+      version = "0.6.0";
     });
     stateDir = "/var/lib/hermes";
     settings = {
@@ -90,9 +89,9 @@ in {
         backend = "local";
         timeout = 180;
       };
-      toolsets = [ "all" ];
+      toolsets = ["all"];
     };
-    environmentFiles = [ config.sops.secrets.hermes.path ];
+    environmentFiles = [config.sops.secrets.hermes.path];
   };
   sops.secrets = lib.mkMerge [
     (lib.mkIf enableNullClaw {

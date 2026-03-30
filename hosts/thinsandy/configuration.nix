@@ -77,6 +77,9 @@ in {
   };
   services.hermes-agent = {
     enable = enableHermes;
+    package = inputs.hermes-agent.packages.${pkgs.system}.default.overrideAttrs (old: {
+      version = "0.5.0";
+    });
     stateDir = "/var/lib/hermes";
     settings = {
       model = {

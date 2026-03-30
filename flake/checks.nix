@@ -78,7 +78,7 @@
           assert assertMsg (configs.thinsandy.config.aiServices.openclawGateway.enable) "thinsandy openclaw must be enabled";
           assert assertMsg (configs.thinsandy.config.services."openclaw-gateway".environmentFiles == ["/run/secrets/openclaw"]) "thinsandy openclaw environmentFiles must be [/run/secrets/openclaw]";
           assert assertMsg (configs.thinsandy.config.services."openclaw-gateway".config.channels.telegram.tokenFile == "/run/secrets/vanta-telegram") "thinsandy openclaw telegram tokenFile must be /run/secrets/vanta-telegram";
-          assert assertMsg (configs.thinsandy.config.aiServices.hermesAgent.enable) "thinsandy hermes must be enabled";
+          assert assertMsg (configs.thinsandy.config.services."hermes-agent".enable) "thinsandy hermes must be enabled";
           assert assertMsg (configs.thinsandy.config.services."hermes-agent".environmentFiles == ["/run/secrets/hermes"]) "thinsandy hermes environmentFiles must be [/run/secrets/hermes]";
 
           assert assertMsg (checkNullclawFleetHost "garnixMachine" nullclawFleetContract.garnixMachine) "garnixMachine nullclaw fleet contract mismatch";

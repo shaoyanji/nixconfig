@@ -77,8 +77,8 @@
       url = "github:openclaw/nix-openclaw/f40ededb24d5db62b8b1894b20d891b852dc9a20";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-hermes = {
-      url = "github:0xrsydn/nix-hermes-agent";
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     pyproject-nix = {
@@ -94,10 +94,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.pyproject-nix.follows = "pyproject-nix";
       inputs.uv2nix.follows = "uv2nix";
-    };
-    hermes-src = {
-      url = "github:NousResearch/hermes-agent?submodules=1";
-      flake = false;
     };
     bountystash = {
       url = "github:shaoyanji/bountystash";

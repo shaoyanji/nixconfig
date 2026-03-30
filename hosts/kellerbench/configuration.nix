@@ -11,9 +11,9 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./nvidia.nix
-    (import ../../modules/profiles/ai-host.nix {withHermes = true;})
+    (import ../../modules/profiles/ai-host.nix {})
     ../../modules/services/nullclaw-deployment.nix
-    inputs.nix-hermes.nixosModules.hermes-agent
+    inputs.hermes-agent.nixosModules.default
   ];
 
   networking.hostName = "kellerbench";
@@ -44,7 +44,6 @@ in {
   profiles.aiHost = {
     enable = true;
     nullclaw.enable = true;
-    hermes.enable = enableHermes;
   };
 
   aiServices.nullclawDeployment = {
@@ -56,14 +55,30 @@ in {
     environmentFile = config.sops.secrets.nullclaw.path;
   };
 
-  aiServices.hermesAgent = {
+  services.hermes-agent = {
     enable = enableHermes;
-    package = self.packages.${pkgs.system}.hermes-agent;
-    workspaceRoot = "/var/lib/hermes";
-    environmentFile = config.sops.secrets.hermes.path;
+    stateDir = "/var/lib/hermes";
+    settings = {
+      model = {
+        provider = "openrouter";
+        default = "nvidia/nemotron-3-super-120b-a12b:free";
+      };
+      terminal = {
+        backend = "local";
+        timeout = 180;
+      };
+      toolsets = [ "all" ];
+    };
+    environmentFiles = [ config.sops.secrets.hermes.path ];
   };
 
   sops.defaultSopsFile = ../../modules/secrets.yaml;
+
+  sops.secrets.hermes = {
+    owner = "hermes";
+    group = "hermes";
+    mode = "0400";
+  };
 
   services.ollama = {
     enable = true;

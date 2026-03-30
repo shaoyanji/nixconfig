@@ -21,7 +21,6 @@ in {
       inputs.sops-nix.nixosModules.sops
       (import ../../modules/profiles/ai-host.nix {
         withOpenclaw = true;
-        withHermes = true;
       })
       ./hardware.nix
       ./media-stack.nix
@@ -29,7 +28,7 @@ in {
       ./networking.nix
     ]
     ++ lib.optionals enableHermes [
-      inputs.nix-hermes.nixosModules.hermes-agent
+      inputs.hermes-agent.nixosModules.default
     ];
 
   boot.loader.systemd-boot.enable = true;
@@ -46,7 +45,6 @@ in {
     enable = true;
     openclaw.enable = enableOpenClaw;
     nullclaw.enable = enableNullClaw;
-    hermes.enable = enableHermes;
   };
   aiServices = {
     openclawGateway = {
@@ -60,12 +58,6 @@ in {
       port = 3001;
       workspaceRoot = "/var/lib/nullclaw";
       environmentFile = config.sops.secrets."nullclaw".path;
-    };
-    hermesAgent = {
-      enable = enableHermes;
-      package = self.packages.${pkgs.system}.hermes-agent;
-      workspaceRoot = "/var/lib/hermes";
-      environmentFile = config.sops.secrets.hermes.path;
     };
     openfang = {
       enable = enableOpenFang;
@@ -83,13 +75,38 @@ in {
       storePath = "/var/lib/xs/store";
     };
   };
-  sops.secrets = lib.mkIf enableNullClaw {
-    nullclaw = {
-      owner = "nullclaw";
-      group = "nullclaw";
-      mode = "0400";
+  services.hermes-agent = {
+    enable = enableHermes;
+    stateDir = "/var/lib/hermes";
+    settings = {
+      model = {
+        provider = "openrouter";
+        default = "nvidia/nemotron-3-super-120b-a12b:free";
+      };
+      terminal = {
+        backend = "local";
+        timeout = 180;
+      };
+      toolsets = [ "all" ];
     };
+    environmentFiles = [ config.sops.secrets.hermes.path ];
   };
+  sops.secrets = lib.mkMerge [
+    (lib.mkIf enableNullClaw {
+      nullclaw = {
+        owner = "nullclaw";
+        group = "nullclaw";
+        mode = "0400";
+      };
+    })
+    (lib.mkIf enableHermes {
+      hermes = {
+        owner = "hermes";
+        group = "hermes";
+        mode = "0400";
+      };
+    })
+  ];
 
   fileSystems = {
     "/var/lib/openclaw/.openclaw/workspace/share" = {

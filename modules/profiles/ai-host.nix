@@ -1,6 +1,5 @@
 {
   withOpenclaw ? false,
-  withHermes ? false,
 }: {
   config,
   lib,
@@ -19,9 +18,7 @@ in {
     ++ lib.optionals withOpenclaw [
       ../services/openclaw-gateway.nix
     ]
-    ++ lib.optionals withHermes [
-      ../services/hermes-agent.nix
-    ];
+    ;
 
   options.profiles.aiHost = {
     enable = lib.mkEnableOption "AI host service composition profile";
@@ -34,11 +31,6 @@ in {
       type = lib.types.bool;
       default = false;
       description = "Enable composed NullClaw service module.";
-    };
-    hermes.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable composed Hermes service module.";
     };
   };
 
@@ -53,10 +45,7 @@ in {
 
       aiServices.nullclaw.enable = lib.mkDefault cfg.nullclaw.enable;
     }
-  // lib.optionalAttrs withOpenclaw {
-    aiServices.openclawGateway.enable = cfg.openclaw.enable;
-  }
-  // lib.optionalAttrs withHermes {
-    aiServices.hermesAgent.enable = cfg.hermes.enable;
-  };
+    // lib.optionalAttrs withOpenclaw {
+      aiServices.openclawGateway.enable = cfg.openclaw.enable;
+    };
 }

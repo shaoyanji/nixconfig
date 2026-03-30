@@ -16,7 +16,7 @@ buildNpmPackage rec {
     hash = "sha256-eDNaEjHdW6Xr+YQNdNoASe4qqt9PeSojnUfVQROz5Cw=";
   };
 
-  npmDepsHash = lib.fakeHash;
+  npmDepsHash = "sha256-eGqLW0KStAXAEJRv5Ob/nJJRjIZVLNUBjIdokUrgwFw=";
   nativeBuildInputs = [makeWrapper];
 
   # Qwen's repo separates workspace build from final CLI bundle packaging.

@@ -195,3 +195,61 @@ tasks:
       TOPIC: '{{index .MATCH 0}}'
     cmds:
       - scripts/task/xs-helper.sh service-tail {{.TOPIC}}
+
+  # OAuth/session management for AI service users
+  agents:oauth:list:
+    desc: List known services and OAuth tools
+    cmds:
+      - scripts/task/service-oauth.sh list
+
+  agents:oauth:paths:*:
+    desc: Show auth file paths for a service
+    vars:
+      SERVICE: '{{index .MATCH 0}}'
+    cmds:
+      - scripts/task/service-oauth.sh paths {{.SERVICE}}
+
+  agents:oauth:status:*:*:
+    desc: Check OAuth status for a service/tool
+    vars:
+      SERVICE: '{{index .MATCH 0}}'
+      TOOL: '{{index .MATCH 1}}'
+    cmds:
+      - scripts/task/service-oauth.sh status {{.SERVICE}} {{.TOOL}}
+
+  agents:oauth:login:*:*:
+    desc: Run interactive OAuth login for a service/tool
+    vars:
+      SERVICE: '{{index .MATCH 0}}'
+      TOOL: '{{index .MATCH 1}}'
+    cmds:
+      - scripts/task/service-oauth.sh login {{.SERVICE}} {{.TOOL}}
+
+  agents:oauth:exec:*:*:
+    desc: Run tool command as service user (args after --)
+    vars:
+      SERVICE: '{{index .MATCH 0}}'
+      TOOL: '{{index .MATCH 1}}'
+    cmds:
+      - scripts/task/service-oauth.sh exec {{.SERVICE}} {{.TOOL}} -- {{.CLI_ARGS}}
+
+  # Static aliases for common combinations
+  agents:oauth:login:nullclaw:codex:
+    desc: Login to Codex as nullclaw service user
+    cmds:
+      - scripts/task/service-oauth.sh login nullclaw codex
+
+  agents:oauth:status:nullclaw:codex:
+    desc: Check Codex auth status for nullclaw service
+    cmds:
+      - scripts/task/service-oauth.sh status nullclaw codex
+
+  agents:oauth:login:openclaw:codex:
+    desc: Login to Codex as openclaw service user
+    cmds:
+      - scripts/task/service-oauth.sh login openclaw codex
+
+  agents:oauth:status:openclaw:codex:
+    desc: Check Codex auth status for openclaw service
+    cmds:
+      - scripts/task/service-oauth.sh status openclaw codex

@@ -4,6 +4,7 @@
   ...
 }: let
   cfg = config.aiServices.nullclawDeployment;
+  aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
 in {
   imports = [
     ./nullclaw.nix
@@ -60,7 +61,7 @@ in {
       example = "/run/secrets/nullclaw-config";
       description = "Optional source file copied to the runtime nullclaw config path before service start.";
     };
-  };
+  } // aiServicesMounts.mkMountOptions "nullclaw";
 
   config = lib.mkIf cfg.enable {
     assertions = [
@@ -105,6 +106,11 @@ in {
       port = lib.mkForce cfg.listenPort;
       workspaceRoot = lib.mkForce cfg.workspaceRoot;
       environmentFile = lib.mkForce cfg.environmentFile;
+      # Pass through mount options for shared context/auth/state
+      contextRoot = lib.mkIf (cfg.contextRoot != null) cfg.contextRoot;
+      sharedDefaultsFile = lib.mkIf (cfg.sharedDefaultsFile != null) cfg.sharedDefaultsFile;
+      sharedSecretFile = lib.mkIf (cfg.sharedSecretFile != null) cfg.sharedSecretFile;
+      stateDir = lib.mkIf (cfg.stateDir != null) cfg.stateDir;
     };
 
     systemd.services.nullclaw.preStart = lib.mkIf (cfg.mode == "config-json") (lib.mkAfter ''

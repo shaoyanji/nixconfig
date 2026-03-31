@@ -74,12 +74,13 @@
         "${cfg.stateDir}:${stateTarget}"
       ];
 
-      # Environment files in precedence order:
-      # 1. shared defaults (lowest priority)
-      # 2. shared secrets (middle priority)
-      # 3. service-specific env (highest priority - wins on conflict)
+      # Environment files in precedence order (later wins on conflict).
+      # Prefix with "-" to make optional (systemd won't fail if missing).
+      # 1. shared defaults (lowest priority) - optional
+      # 2. shared secrets (middle priority) - optional
+      # 3. service-specific env (highest priority) - added by caller
       EnvironmentFile =
-        lib.optionals (cfg.sharedDefaultsFile != null) [cfg.sharedDefaultsFile]
-        ++ lib.optionals (cfg.sharedSecretFile != null) [cfg.sharedSecretFile];
+        lib.optionals (cfg.sharedDefaultsFile != null) ["-${cfg.sharedDefaultsFile}"]
+        ++ lib.optionals (cfg.sharedSecretFile != null) ["-${cfg.sharedSecretFile}"];
     };
 }

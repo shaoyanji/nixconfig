@@ -304,7 +304,15 @@ in {
     ];
 
     # Mount shared context, auth, and per-service state
-    systemd.services.openclaw-gateway.serviceConfig =
-      aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
+    # Merge with upstream environmentFiles (service-specific has highest priority)
+    systemd.services.openclaw-gateway.serviceConfig = let
+      mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
+      sharedEnvFiles = mountConfig.EnvironmentFile or [];
+      # Upstream module sets services.openclaw-gateway.environmentFiles
+      serviceEnvFiles = config.services.openclaw-gateway.environmentFiles or [];
+      allEnvFiles = sharedEnvFiles ++ serviceEnvFiles;
+    in mountConfig // lib.optionalAttrs (allEnvFiles != []) {
+      EnvironmentFile = allEnvFiles;
+    };
   };
 }

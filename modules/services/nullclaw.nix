@@ -6,6 +6,7 @@
 }: let
   cfg = config.aiServices.nullclaw;
   nullclawPkg = pkgs.callPackage ../../pkgs/nullclaw.nix {};
+  aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
 in {
   options.aiServices.nullclaw = {
     enable = lib.mkEnableOption "NullClaw gateway service bundle";
@@ -30,7 +31,7 @@ in {
       example = "/run/secrets/nullclaw.env";
       description = "Optional EnvironmentFile for nullclaw service.";
     };
-  };
+  } // aiServicesMounts.mkMountOptions "nullclaw";
 
   config = lib.mkIf cfg.enable {
     users.groups.nullclaw = {};
@@ -59,7 +60,11 @@ in {
           curl
           cacert
         ]);
-      serviceConfig = {
+      serviceConfig = let
+        mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
+        sharedEnvFiles = mountConfig.EnvironmentFile or [];
+        allEnvFiles = sharedEnvFiles ++ lib.optionals (cfg.environmentFile != null) [cfg.environmentFile];
+      in {
         User = "nullclaw";
         Group = "nullclaw";
         WorkingDirectory = cfg.workspaceRoot;
@@ -78,8 +83,8 @@ in {
         ProtectSystem = "strict";
         ProtectHome = false;
         ReadWritePaths = [cfg.workspaceRoot];
-      } // lib.optionalAttrs (cfg.environmentFile != null) {
-        EnvironmentFile = [cfg.environmentFile];
+      } // mountConfig // lib.optionalAttrs (allEnvFiles != []) {
+        EnvironmentFile = allEnvFiles;
       };
     };
   };

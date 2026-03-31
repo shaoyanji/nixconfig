@@ -13,6 +13,7 @@ in {
     ./nvidia.nix
     (import ../../modules/profiles/ai-host.nix {})
     ../../modules/services/nullclaw-deployment.nix
+    ../../modules/services/ai-services-context.nix
     inputs.hermes-agent.nixosModules.default
   ];
 
@@ -46,13 +47,25 @@ in {
     nullclaw.enable = true;
   };
 
-  aiServices.nullclawDeployment = {
-    enable = true;
-    mode = "env-file";
-    listenHost = "127.0.0.1";
-    listenPort = 3001;
-    workspaceRoot = "/var/lib/nullclaw";
-    environmentFile = config.sops.secrets.nullclaw.path;
+  aiServices = {
+    # Enable shared context materialization
+    context = {
+      enable = true;
+      serviceNames = ["nullclaw" "hermes"];
+    };
+    nullclawDeployment = {
+      enable = true;
+      mode = "env-file";
+      listenHost = "127.0.0.1";
+      listenPort = 3001;
+      workspaceRoot = "/var/lib/nullclaw";
+      environmentFile = config.sops.secrets.nullclaw.path;
+      # Shared context/auth/state mounts (passed through to nullclaw module)
+      contextRoot = "/srv/data/ai-services/context";
+      sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
+      sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
+      stateDir = "/srv/data/ai-services/state/nullclaw";
+    };
   };
 
   services.hermes-agent = {
@@ -75,6 +88,21 @@ in {
     environmentFiles = [config.sops.secrets.hermes.path];
   };
 
+  # Host-level override for Hermes to mount shared context/state
+  systemd.services.hermes-agent.serviceConfig =
+    {
+      BindReadOnlyPaths = [
+        "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
+        "/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
+      ];
+      BindPaths = [
+        "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
+      ];
+      EnvironmentFile = [
+        "/srv/data/ai-services/defaults/shared.env"
+      ] ++ config.services.hermes-agent.environmentFiles;
+    };
+
   sops.defaultSopsFile = ../../modules/secrets.yaml;
 
   sops.secrets.hermes = {
@@ -95,6 +123,13 @@ in {
     owner = "nullclaw";
     group = "nullclaw";
     mode = "0400";
+  };
+
+  # Shared secrets for all AI services
+  sops.secrets.ai-services-shared-env = {
+    owner = "root";
+    group = "root";
+    mode = "0444";
   };
 
   environment.systemPackages = with pkgs; [

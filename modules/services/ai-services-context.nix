@@ -51,6 +51,19 @@ in {
       description = "List of service names to create state directories for.";
     };
 
+    stateOwners = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = {
+        openclaw = "openclaw";
+        nullclaw = "nullclaw";
+        hermes = "hermes";
+        xs = "xs";
+        openfang = "openfang";
+      };
+      example = {openclaw = "openclaw"; nullclaw = "nullclaw";};
+      description = "AttrSet mapping service name to user owner for state directory.";
+    };
+
     contextFiles = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [
@@ -66,7 +79,7 @@ in {
     system.activationScripts.ai-services-context = ''
       # Create context directory
       mkdir -p ${cfg.targetPath}
-      
+
       # Copy context files from repo
       ${lib.concatStringsSep "\n" (map (file: ''
         if [ -e "${cfg.sourcePath}/${file}" ]; then
@@ -74,12 +87,16 @@ in {
         fi
       '') cfg.contextFiles)}
 
-      # Create defaults directory
+      # Create defaults directory and shared.env if missing
       mkdir -p ${cfg.defaultsPath}
+      if [ ! -f "${cfg.defaultsFile}" ]; then
+        cp ${cfg.sourcePath}/modules/services/shared.env.example ${cfg.defaultsFile}
+      fi
 
-      # Create per-service state directories
+      # Create per-service state directories with correct ownership
       ${lib.concatStringsSep "\n" (map (name: ''
         mkdir -p ${cfg.stateRoot}/${name}
+        chown ${cfg.stateOwners.${name}}:${cfg.stateOwners.${name}} ${cfg.stateRoot}/${name}
         chmod 0750 ${cfg.stateRoot}/${name}
       '') cfg.serviceNames)}
     '';

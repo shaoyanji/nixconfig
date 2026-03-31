@@ -14,6 +14,7 @@ in {
     (import ../../modules/profiles/ai-host.nix {})
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/ai-services-context.nix
+    ../../modules/services/hermes-agent-local.nix
     inputs.hermes-agent.nixosModules.default
   ];
 
@@ -68,11 +69,8 @@ in {
     };
   };
 
-  services.hermes-agent = {
+  services.hermes-agent-local = {
     enable = enableHermes;
-    package = inputs.hermes-agent.packages.${pkgs.system}.default.overrideAttrs (old: {
-      version = "0.6.0";
-    });
     stateDir = "/var/lib/hermes";
     settings = {
       model = {
@@ -93,13 +91,13 @@ in {
     {
       BindReadOnlyPaths = [
         "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
-        "/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
+        "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
       ];
       BindPaths = [
         "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
       ];
       EnvironmentFile = [
-        "/srv/data/ai-services/defaults/shared.env"
+        "-/srv/data/ai-services/defaults/shared.env"
       ] ++ config.services.hermes-agent.environmentFiles;
     };
 

@@ -31,6 +31,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, AI-host
 - Need to update the `bountystash` flake input? use `dev:flake:update:bountystash`.
 - Legacy `services:*` aliases → `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml`.
 - Operator helpers and manifest lookups → `taskfiles/agents.yml`, `scripts/task/ai-host-manifest.sh`, and `scripts/task/site-target.sh`, including the `agents:xs:*` wrappers for `xs-helper`.
+- Service-user OAuth/session management → `taskfiles/agents.yml` (`agents:oauth:*`), implemented by `scripts/task/service-oauth.sh`.
 
 ## What not to assume
 - Don’t assume `Taskfile.yml` contains the lifecycle logic—open the individual taskfiles instead.

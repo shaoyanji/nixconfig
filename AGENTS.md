@@ -7,3 +7,5 @@ Use this document to orient yourself to the routing map; follow `docs/task-contr
 `.agents/*` is guidance-only and never replaces the Taskfile truth.
 
 Operator helpers now include the `agents:xs:*` wrappers (see `taskfiles/agents.yml`), which run `scripts/task/xs-helper.sh` against the local and service stores for artifact, contract, record, and trace work. NAS client recovery logic is living under `modules/profiles/nas-client.nix`, so storage/mount guidance should reference that profile rather than the old `hosts/common/localmounts.nix`.
+
+Service-user OAuth/session flows use the `agents:oauth:*` wrappers (`agents:oauth:list`, `agents:oauth:paths:<service>`, `agents:oauth:status:<service>:<tool>`, `agents:oauth:login:<service>:<tool>`, `agents:oauth:exec:<service>:<tool> -- <subcommand>`). These run `scripts/task/service-oauth.sh` with the correct `HOME` and `XDG_*` environment for each service user, so you do not need to remember raw `sudo -u ...` incantations.

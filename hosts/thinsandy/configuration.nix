@@ -83,7 +83,7 @@ in {
     settings = {
       model = {
         provider = "openrouter";
-        default = "nvidia/nemotron-3-super-120b-a12b:free";
+        default = "qwen/qwen3.6-plus-preview:free";
       };
       terminal = {
         backend = "local";
@@ -115,7 +115,10 @@ in {
       device = "/srv/data/openclaw";
       options = ["bind"];
     };
-
+    "/var/lib/openfang/.openfang/skills" = {
+      device = "/srv/data/openclaw/skills";
+      options = ["bind"];
+    };
     "/var/lib/nullclaw/workspace/share" = {
       device = "/srv/data/openclaw";
       options = ["bind"];

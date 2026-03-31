@@ -5,6 +5,7 @@
   ...
 }: let
   cfg = config.aiServices.openfang;
+  aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
 in {
   options.aiServices.openfang = {
     enable = lib.mkEnableOption "experimental OpenFang service bundle";
@@ -29,7 +30,7 @@ in {
       default = true;
       description = "Skip service startup unless the configured environment file exists.";
     };
-  };
+  } // aiServicesMounts.mkMountOptions "openfang";
 
   config = lib.mkIf cfg.enable {
     assertions = [
@@ -58,37 +59,39 @@ in {
       "d ${cfg.workspaceRoot}/.openfang/logs 0750 openfang openfang -"
     ];
 
-    systemd.services.openfang = {
+    systemd.services.openfang = let
+      mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
+      sharedEnvFiles = mountConfig.EnvironmentFile or [];
+      allEnvFiles = sharedEnvFiles ++ lib.optionals (cfg.environmentFile != null) [cfg.environmentFile];
+    in {
       description = "OpenFang Experimental Agent Runtime";
       wantedBy = ["multi-user.target"];
       after = ["network-online.target"];
       wants = ["network-online.target"];
-      unitConfig = lib.optionalAttrs (cfg.requireEnvironmentFile && cfg.environmentFile != null) {
-        ConditionPathExists = cfg.environmentFile;
+      unitConfig = lib.optionalAttrs (cfg.requireEnvironmentFile && allEnvFiles != []) {
+        ConditionPathExists = allEnvFiles;
       };
       path = config.environment.systemPackages ++ (with pkgs; [cacert]);
-      serviceConfig =
-        {
-          User = "openfang";
-          Group = "openfang";
-          WorkingDirectory = cfg.workspaceRoot;
-          ExecStart = "${cfg.package}/bin/openfang start";
-          Restart = "on-failure";
-          RestartSec = "10s";
+      serviceConfig = {
+        User = "openfang";
+        Group = "openfang";
+        WorkingDirectory = cfg.workspaceRoot;
+        ExecStart = "${cfg.package}/bin/openfang start";
+        Restart = "on-failure";
+        RestartSec = "10s";
 
-          Environment = [
-            "HOME=${cfg.workspaceRoot}"
-          ];
+        Environment = [
+          "HOME=${cfg.workspaceRoot}"
+        ];
 
-          NoNewPrivileges = true;
-          PrivateTmp = true;
-          ProtectSystem = "strict";
-          ProtectHome = false;
-          ReadWritePaths = [cfg.workspaceRoot];
-        }
-        // lib.optionalAttrs (cfg.environmentFile != null) {
-          EnvironmentFile = [cfg.environmentFile];
-        };
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        ProtectHome = false;
+        ReadWritePaths = [cfg.workspaceRoot];
+      } // mountConfig // lib.optionalAttrs (allEnvFiles != []) {
+        EnvironmentFile = allEnvFiles;
+      };
     };
   };
 }

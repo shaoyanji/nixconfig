@@ -5,6 +5,7 @@
   ...
 }: let
   cfg = config.aiServices.openclawGateway;
+  aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
 in {
   options.aiServices.openclawGateway = {
     enable = lib.mkEnableOption "OpenClaw gateway service bundle";
@@ -25,7 +26,7 @@ in {
       example = "/run/secrets/vanta-telegram";
       description = "Optional tokenFile path for openclaw telegram channel config.";
     };
-  };
+  } // aiServicesMounts.mkMountOptions "openclaw";
 
   config = lib.mkIf cfg.enable {
     services.openclaw-gateway = {
@@ -301,5 +302,9 @@ in {
     environment.systemPackages = with pkgs; [
       openclaw
     ];
+
+    # Mount shared context, auth, and per-service state
+    systemd.services.openclaw-gateway.serviceConfig =
+      aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
   };
 }

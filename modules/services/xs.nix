@@ -4,6 +4,7 @@
   ...
 }: let
   cfg = config.aiServices.xs;
+  aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
 in {
   options.aiServices.xs = {
     enable = lib.mkEnableOption "experimental xs event-store service";
@@ -22,7 +23,7 @@ in {
       default = "/var/lib/xs/store";
       description = "Persistent xs event-store path passed to `xs serve`.";
     };
-  };
+  } // aiServicesMounts.mkMountOptions "xs";
 
   config = lib.mkIf cfg.enable {
     assertions = [
@@ -58,7 +59,9 @@ in {
       wantedBy = ["multi-user.target"];
       after = ["network-online.target"];
       wants = ["network-online.target"];
-      serviceConfig = {
+      serviceConfig = let
+        mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
+      in {
         User = "xs";
         Group = "xs";
         WorkingDirectory = cfg.workspaceRoot;
@@ -76,7 +79,7 @@ in {
         ProtectSystem = "strict";
         ProtectHome = true;
         ReadWritePaths = [cfg.workspaceRoot];
-      };
+      } // mountConfig;
     };
   };
 }

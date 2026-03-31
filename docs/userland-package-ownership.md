@@ -1,8 +1,9 @@
 # Userland Package Ownership
 
 ## Current Owners
-- Portable shared baseline: `modules/roles/portable-home.nix`
-  - guarantees `shell/base` and `programs.nixvim.enable` for `penguin`, `alarm`, `kali`.
+- Portable shared baseline: `modules/roles/portable-home.nix` (used by `penguin`) and `modules/roles/minimal.nix` (used by `alarm`, `kali`)
+  - guarantees `shell/base` and `programs.nixvim.enable` across `penguin`, `alarm`, `kali`.
+  - `penguin` imports `portable-home.nix` directly; `alarm` and `kali` import `minimal.nix` which pulls the same baseline via `user/base`.
 - Base: `modules/user/base/default.nix`
   - General CLI/runtime utilities.
 - Shell base contract: `modules/shell/base.nix`

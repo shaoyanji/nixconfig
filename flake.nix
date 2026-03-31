@@ -1,14 +1,5 @@
 {
-  description = "
-    Linux + Nix (heim)
-    MacOS + Nix (cassini)
-    NixOS (poseidon, ares, schneeeule, applevalley, mtfuji, ancientace)
-    NixOS HomeServer (thinsandy)
-    aarch64 hm (kali)
-    aarch NixOS (minyx)
-    ChromeOS (penguin)
-    WSL (guckloch)
-  ";
+  description = "Personal Nix configuration: NixOS, nix-darwin, and Home Manager";
   # inputs.self.submodules = true;
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

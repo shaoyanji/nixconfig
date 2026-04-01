@@ -119,6 +119,7 @@ in {
     };
     environmentFiles = [
       config.sops.secrets.hermes.path
+      config.sops.secrets."ai-services-shared-env".path
     ];
   };
 

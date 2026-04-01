@@ -18,6 +18,7 @@
     stateVersion = "25.05";
     packages = with pkgs;
       [
+        geminicommit
         http-nu
         aha
         tesseract

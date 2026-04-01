@@ -60,13 +60,15 @@
   mkMountConfig = cfg: workspaceRoot: let
     contextTarget = "${workspaceRoot}/${cfg.contextMountPoint}";
     stateTarget = "${workspaceRoot}/${cfg.stateMountPoint}";
+    # Normalized path for shared defaults (avoid .. which systemd rejects)
+    sharedDefaultsTarget = "${workspaceRoot}/.ai-services/defaults/shared.env";
   in
     {
       # Bind-mount context read-only if configured
       BindReadOnlyPaths = lib.optionals (cfg.contextRoot != null) [
         "${cfg.contextRoot}:${contextTarget}"
       ] ++ lib.optionals (cfg.sharedDefaultsFile != null) [
-        "${cfg.sharedDefaultsFile}:${contextTarget}/../defaults/shared.env"
+        "${cfg.sharedDefaultsFile}:${sharedDefaultsTarget}"
       ];
 
       # Bind-mount state directory read-write if configured

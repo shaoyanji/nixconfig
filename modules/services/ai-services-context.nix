@@ -4,6 +4,25 @@
   ...
 }: let
   cfg = config.aiServices.context;
+
+  # Helper to check if a service is enabled
+  isServiceEnabled = name:
+    if name == "openclaw" then config.aiServices.openclawGateway.enable or false
+    else if name == "nullclaw" then config.aiServices.nullclaw.enable or false
+    else if name == "xs" then config.aiServices.xs.enable or false
+    else if name == "openfang" then config.aiServices.openfang.enable or false
+    else if name == "hermes" then config.services.hermes-agent-local.enable or false
+    else false;
+
+  # Filter serviceNames to only enabled services
+  enabledServices = lib.filter isServiceEnabled cfg.serviceNames;
+
+  # Generate state directory creation commands only for enabled services
+  stateDirCommands = lib.concatStringsSep "\n" (map (name: ''
+    mkdir -p ${cfg.stateRoot}/${name}
+    chown ${cfg.stateOwners.${name}}:${cfg.stateOwners.${name}} ${cfg.stateRoot}/${name}
+    chmod 0750 ${cfg.stateRoot}/${name}
+  '') enabledServices);
 in {
   options.aiServices.context = {
     enable = lib.mkEnableOption "AI services shared context materialization";
@@ -48,7 +67,7 @@ in {
     serviceNames = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = ["openclaw" "nullclaw" "hermes" "xs" "openfang"];
-      description = "List of service names to create state directories for.";
+      description = "List of service names to create state directories for (only enabled services will be created).";
     };
 
     stateOwners = lib.mkOption {
@@ -93,12 +112,8 @@ in {
         cp ${cfg.sourcePath}/modules/services/shared.env.example ${cfg.defaultsFile}
       fi
 
-      # Create per-service state directories with correct ownership
-      ${lib.concatStringsSep "\n" (map (name: ''
-        mkdir -p ${cfg.stateRoot}/${name}
-        chown ${cfg.stateOwners.${name}}:${cfg.stateOwners.${name}} ${cfg.stateRoot}/${name}
-        chmod 0750 ${cfg.stateRoot}/${name}
-      '') cfg.serviceNames)}
+      # Create per-service state directories with correct ownership (only for enabled services)
+      ${stateDirCommands}
     '';
   };
 }

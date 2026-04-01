@@ -9,7 +9,6 @@ lib.genAttrs systems.default (
     pkgs = pkgsFor system;
     xsPkg = pkgs.callPackage ../pkgs/xs.nix {};
   in {
-    backend = pkgs.callPackage ../pkgs/go-backend.nix {};
     nullclaw = pkgs.callPackage ../pkgs/nullclaw.nix {};
     openfang = pkgs.callPackage ../pkgs/openfang.nix {};
     qwen-code = pkgs.callPackage ../pkgs/qwen-code.nix {};

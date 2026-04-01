@@ -122,19 +122,20 @@ in {
 
   # Host-level override for Hermes to mount shared context/state
   # (upstream module does not support this natively)
-  systemd.services.hermes-agent.serviceConfig =
-    {
-      BindReadOnlyPaths = [
-        "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
-        "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
-      ];
-      BindPaths = [
-        "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
-      ];
-      EnvironmentFile = [
+  systemd.services.hermes-agent.serviceConfig = {
+    BindReadOnlyPaths = [
+      "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
+      "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
+    ];
+    BindPaths = [
+      "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
+    ];
+    EnvironmentFile =
+      [
         "-/srv/data/ai-services/defaults/shared.env"
-      ] ++ config.services.hermes-agent.environmentFiles;
-    };
+      ]
+      ++ config.services.hermes-agent.environmentFiles;
+  };
   sops.secrets = lib.mkMerge [
     (lib.mkIf enableNullClaw {
       nullclaw = {
@@ -166,7 +167,7 @@ in {
       options = ["bind"];
     };
     "/var/lib/openfang/.openfang/skills" = {
-      device = "/srv/data/openclaw/skills";
+      device = "/srv/data/openclaw/skills/legacy";
       options = ["bind"];
     };
     "/var/lib/nullclaw/workspace/share" = {

@@ -1,42 +1,23 @@
-# let
-#   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-#   pkgs = import nixpkgs { config = {}; overlays = []; };
-# in
-{ pkgs ? import <nixpkgs> {} }:
-  pkgs.mkShell
-# pkgs.mkShellNoCC 
-{
+# PDF tooling and typesetting shell
+{pkgs ? import <nixpkgs> {}}:
+let
+  common = pkgs.callPackage ./common-packages.nix {};
+  hooks = pkgs.callPackage ./shell-hooks.nix {};
+in
+pkgs.mkShell {
   packages = with pkgs; [
-    cowsay
-    lolcat
-# aitools
-    #ollama
-    #aichat
-    tgpt
-    #mods
-# pdf workflow
-    pandoc
-    texlive.combined.scheme-small
-    pdfcpu
-    poppler_utils
-    wkhtmltopdf
-    mupdf
-    ghostscript
-# ui
-    gum
-    viu
-# utilities
-    #yq
-    go-task
-    yq-go
-    nushell
-# secrets management
-    sops
+    common.greeting
+    common.ui
+    common.pdf
+    common.productivity
+    pkgs.viu
+    pkgs.nushell
   ];
+
   GREETING = "Hello, Nix!";
-   shellHook = /*sh*/ ''
-   echo $GREETING | cowsay | lolcat
-   eval "$(task --completion bash)"
-   nu
+  shellHook = ''
+    ${hooks.greeting}
+    eval "$(task --completion bash)"
+    ${hooks.nushell}
   '';
 }

@@ -1,22 +1,17 @@
-# let
-#   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-#   pkgs = import nixpkgs { config = {}; overlays = []; };
-# in
-{ pkgs ? import <nixpkgs> {} }:
-  pkgs.mkShell
-# pkgs.mkShellNoCC 
-{
-  nativeBuildInputs = with pkgs; [
-  ];
+# Flask Python development shell
+{pkgs ? import <nixpkgs> {}}:
+let
+  common = pkgs.callPackage ./common-packages.nix {};
+  hooks = pkgs.callPackage ./shell-hooks.nix {};
+in
+pkgs.mkShell {
   packages = with pkgs; [
-    (python310.withPackages (ps: with ps; [
-      flask
-      fuzzywuzzy
-      markdown2
-      python-dotenv
-    ]))
+    common.greeting
+    common.python-flask
   ];
-   shellHook = /*bash*/ ''
 
-   '';
+  GREETING = "Hello, Nix!";
+  shellHook = ''
+    ${hooks.greeting}
+  '';
 }

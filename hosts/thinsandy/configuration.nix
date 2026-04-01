@@ -106,10 +106,10 @@ in {
     stateDir = "/var/lib/hermes";
     settings = {
       model = {
-        # provider = "openrouter";
-        # default = "qwen/qwen3.6-plus-preview:free";
-        provider = "custom";
-        default = "qwen/qwen3-coder-480b-a35b-instruct";
+        provider = "openrouter";
+        default = "qwen/qwen3.6-plus-preview:free";
+        # provider = "custom";
+        # default = "qwen/qwen3-coder-480b-a35b-instruct";
       };
       terminal = {
         backend = "local";
@@ -117,7 +117,9 @@ in {
       };
       toolsets = ["all"];
     };
-    environmentFiles = [config.sops.secrets.hermes.path];
+    environmentFiles = [
+      config.sops.secrets.hermes.path
+    ];
   };
 
   # Host-level override for Hermes to mount shared context/state

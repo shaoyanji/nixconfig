@@ -12,6 +12,7 @@
     ]);
 
   commonTools = with pkgs; [
+    qwen-code
     codex
     cowsay
     figlet

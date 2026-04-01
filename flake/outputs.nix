@@ -29,7 +29,7 @@ in
   };
 
   devShells = import ./devshells.nix {
-    inherit lib systems pkgsFor;
+    inherit lib systems pkgsFor self;
   };
 
   homeConfigurations = import ./home-configurations.nix {

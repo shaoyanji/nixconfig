@@ -1,18 +1,17 @@
-# let
-#   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-#   pkgs = import nixpkgs { config = {}; overlays = []; };
-# in
-{ pkgs ? import <nixpkgs> {} }:
-  pkgs.mkShell
-# pkgs.mkShellNoCC
-{
-  nativeBuildInputs = with pkgs; [
-  ];
+# Jekyll static site development shell
+{pkgs ? import <nixpkgs> {}}:
+let
+  common = pkgs.callPackage ./common-packages.nix {};
+  hooks = pkgs.callPackage ./shell-hooks.nix {};
+in
+pkgs.mkShell {
   packages = with pkgs; [
-    jekyll
-    bundler
+    common.greeting
+    common.jekyll
   ];
-   shellHook = /*bash*/ ''
 
-   '';
+  GREETING = "Hello, Nix!";
+  shellHook = ''
+    ${hooks.greeting}
+  '';
 }

@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774876310,
-        "narHash": "sha256-ViuMKemSie/taMymmex1IcKUeLdVnnj/T6bv+eOR6fY=",
+        "lastModified": 1775061167,
+        "narHash": "sha256-v9So+jsMazsGY2JCrWp4gUxf4NFvh50FJKIduem0eBQ=",
         "owner": "shaoyanji",
         "repo": "bountystash",
-        "rev": "e26e00565f3d36d5b42693ed29c15914f0d67db9",
+        "rev": "111795c48b2f9042afb44d28eb7ba4ea9217a508",
         "type": "github"
       },
       "original": {

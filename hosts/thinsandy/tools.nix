@@ -12,6 +12,7 @@
     ]);
 
   commonTools = with pkgs; [
+    gemini-cli
     qwen-code
     codex
     cowsay

@@ -18,6 +18,7 @@
     stateVersion = "25.05";
     packages = with pkgs;
       [
+        pi-coding-agent
         geminicommit
         http-nu
         aha
@@ -30,7 +31,6 @@
         comrak
         typst
         tinymist
-        todoist
         totp-cli
         pdfcpu
         dufs

@@ -2,9 +2,8 @@
 
 ## Current Open Work
 
-1. Review whether `hosts/common/hydenix.nix` should remain a legacy exception or be isolated more explicitly.
-2. Consider whether `hosts/common/disko.nix` belongs under a more canonical module path, or whether it should stay host-adjacent because of storage sensitivity.
-3. Review `garnixMachine` host naming; `networking.hostName` still evaluates to `"nixos"`, which appears to predate the refactor.
+1. Consider whether `hosts/common/disko.nix` belongs under a more canonical module path, or whether it should stay host-adjacent because of storage sensitivity.
+2. Review `garnixMachine` host naming; `networking.hostName` still evaluates to `"nixos"`, which appears to predate the refactor.
 
 ## TestVM Follow-Up
 
@@ -24,5 +23,5 @@
 ## Immediate Next Reasonable Tasks
 
 1. Watch `hosts/common` for new wrapper-only detours and prefer canonical modules or shared profiles when possible.
-2. Review `hydenix` and `disko` as the remaining architecture exceptions.
+2. Review `disko` as the remaining architecture exception.
 3. Extend the shared `testvm` baseline only if another host genuinely needs it.

@@ -122,8 +122,9 @@ tasks:
       - git branch -D update || true
       - git switch -c update
       - nix flake update
-      - git add flake.lock
-      - git commit -s -m "flake update"
+      - task dev:flake:update-garnix
+      - git add flake.lock garnix.yaml
+      - git commit -s -m "flake update + garnix sync"
       - git push -f
       - git switch main
 
@@ -153,3 +154,37 @@ tasks:
     desc: Alias for dev:flake:update:bountystash
     cmds:
       - task dev:flake:update:bountystash
+
+  # Internal: Extract nixosConfigurations hostnames from flake
+  dev:flake:get-hosts:
+    internal: true
+    cmds:
+      - "nix eval --raw .#nixosConfigurations --apply 'hosts: builtins.concatStringsSep \"\\n\" (builtins.attrNames hosts)'"
+
+  # Internal: Update garnix.yaml with current nixosConfigurations
+  dev:flake:update-garnix:
+    internal: true
+    cmds:
+      - |
+        # Start with empty builds.include array
+        yq -i '.builds.include = []' garnix.yaml
+        # Add each host from flake
+        for host in $(task dev:flake:get-hosts); do
+          yq -i ".builds.include += [\"nixosConfigurations.$host\"]" garnix.yaml
+        done
+
+  dev:config:hash-update:
+    desc: Refresh sha256 checksums for all modules/config/*.json files
+    cmds:
+      - |
+        for f in modules/config/*.json; do
+          if [[ -f "$f" ]]; then
+            echo "Updating $f..."
+            nix-hash-update "$f"
+          fi
+        done
+
+  config-hash-update:
+    desc: Alias for dev:config:hash-update
+    cmds:
+      - task dev:config:hash-update

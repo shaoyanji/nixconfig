@@ -5,18 +5,9 @@
   pkgs,
   lib,
   ...
-}: let
-  testvmAuthorizedKeys =
-    builtins.filter
-    (x: x != [])
-    (builtins.split "\n"
-      (builtins.readFile
-        (builtins.fetchurl {
-          url = "https://gist.githubusercontent.com/shaoyanji/8e051ec6548dcf8cebf1cd3e4e668f7d/raw/authorized_keys";
-          sha256 = "sha256:0in2frxx6fs1ddjw5xfacqyp7k445a4idlbq6kqkmrjphvjk3vmx";
-        })));
-in {
+}: {
   imports = [
+    ../../modules/config/authorized-keys.nix
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia.nix
@@ -45,7 +36,7 @@ in {
             agentsSource = "/home/devji/.agents";
             configureNetworkd = true;
             useDevNixDefaults = true;
-            authorizedKeys = testvmAuthorizedKeys;
+            authorizedKeys = config.ssh.authorizedKeys.keys;
           })
         ];
         microvm.hypervisor = "cloud-hypervisor";

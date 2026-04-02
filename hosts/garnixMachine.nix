@@ -5,22 +5,6 @@
   self,
   ...
 }: let
-  sshKeys =
-    builtins.filter
-    (x: x != [])
-    (
-      builtins.split "\n"
-      (
-        builtins.readFile
-        (
-          builtins.fetchurl {
-            url = "https://gist.githubusercontent.com/shaoyanji/8e051ec6548dcf8cebf1cd3e4e668f7d/raw/authorized_keys";
-            sha256 = "sha256:0in2frxx6fs1ddjw5xfacqyp7k445a4idlbq6kqkmrjphvjk3vmx";
-          }
-        )
-      )
-    );
-
   nullclawPort = 3001;
   bountystashPort = 3000;
   nullclawLocalUpstream = "http://127.0.0.1:${toString nullclawPort}/";
@@ -28,9 +12,8 @@
 in {
   networking.hostName = "garnixMachine";
 
-  garnix.server.enable = true;
-
   imports = [
+    ../../modules/config/authorized-keys.nix
     (import ../modules/profiles/ai-host.nix {})
     ../modules/services/nullclaw-deployment.nix
     inputs.sops-nix.nixosModules.sops
@@ -54,7 +37,7 @@ in {
     isNormalUser = true;
     description = "devji";
     extraGroups = ["wheel" "systemd-journal"];
-    openssh.authorizedKeys.keys = sshKeys;
+    openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };
 
   security.sudo.wheelNeedsPassword = false;

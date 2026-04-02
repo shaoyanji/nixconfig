@@ -29,7 +29,7 @@ nix build .#checks.x86_64-linux.host-architecture -L
 ## Current known notes
 
 - `garnixMachine` still reports `networking.hostName = "nixos"`; that result predates the current refactor.
-- `hosts/common/hydenix.nix` and `hosts/common/disko.nix` remain intentional host-local exceptions.
+- `hosts/common/disko.nix` remains an intentional host-local exception.
 
 ## Next recommended tasks
 

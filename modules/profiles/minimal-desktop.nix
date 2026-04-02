@@ -3,18 +3,9 @@
   pkgs,
   inputs,
   ...
-}: let
-  localSubKeys =
-    builtins.filter
-    (x: x != [])
-    (builtins.split "\n"
-      (builtins.readFile
-        (builtins.fetchurl {
-          url = "https://gist.githubusercontent.com/shaoyanji/8e051ec6548dcf8cebf1cd3e4e668f7d/raw/authorized_keys";
-          sha256 = "sha256:0in2frxx6fs1ddjw5xfacqyp7k445a4idlbq6kqkmrjphvjk3vmx";
-        })));
-in {
+}: {
   imports = [
+    ../../modules/config/authorized-keys.nix
     ./nas-client.nix
     inputs.sops-nix.nixosModules.sops
   ];
@@ -131,7 +122,7 @@ in {
     description = "matt";
     extraGroups = ["networkmanager" "wheel" "docker" "incus-admin" "video"];
     hashedPasswordFile = config.sops.secrets.hashedPassword.path;
-    openssh.authorizedKeys.keys = localSubKeys;
+    openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };
 
   environment.systemPackages = with pkgs; [

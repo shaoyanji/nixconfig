@@ -26,6 +26,8 @@
   nullclawLocalUpstream = "http://127.0.0.1:${toString nullclawPort}/";
   bountystashLocalUpstream = "http://127.0.0.1:${toString bountystashPort}/";
 in {
+  networking.hostName = "garnixMachine";
+
   garnix.server.enable = true;
 
   imports = [

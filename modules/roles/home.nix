@@ -12,6 +12,7 @@
 
   home.packages = with pkgs;
     [
+      keypunch
       a2ps
       amfora
       astroterm

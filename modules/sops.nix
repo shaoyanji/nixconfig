@@ -27,6 +27,7 @@ in {
       "aws/secret/access/key" = {};
       "openmeteo/api/key" = {};
       "neocities" = {};
+      "gemini/api/key" = {};
       # "todoist" = {
       #   sopsFile = ./secrets.json;
       #   mode = "0600";
@@ -36,6 +37,26 @@ in {
       #"${local_ssh_key}".path = "${ssh_key_path}";
     };
     templates = {
+      "geminicommit".content = ''
+        [api]
+        baseurl = ""
+        key = '${config.sops.placeholder."gemini/api/key"}'
+        model = "gemini-2.5-flash"
+
+        [behavior]
+        auto_select = false
+        dry_run = false
+        no_confirm = false
+        no_verify = false
+        push = false
+        quiet = false
+        show_diff = false
+        stage_all = false
+
+        [commit]
+        language = "english"
+        max_length = 72
+      '';
       "stormy.toml".content = ''
         provider = "OpenMeteo"
         api_key = '${config.sops.placeholder."openmeteo/api/key"}'
@@ -78,6 +99,7 @@ in {
     "gh/hosts.yml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."hosts.yml".path}";
     "nix/nix.conf".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."nix.conf".path}";
     "stormy/stormy.toml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."stormy.toml".path}";
+    "geminicommit/config.toml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."geminicommit".path}";
     # "todoist/config.json".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.secrets."todoist".path}";
     "neocities/config".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.secrets."neocities".path}";
   };

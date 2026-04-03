@@ -2,6 +2,7 @@
   pkgs,
   inputs,
   lib,
+  config,
   ...
 }: {
   home-manager = {
@@ -21,6 +22,9 @@
       inputs.kickstart-nixvim.homeManagerModules.default
       inputs.nix-index-database.homeModules.nix-index
     ];
-    extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
+    extraSpecialArgs = {
+      inherit inputs;
+      hostName = config.networking.hostName;
+    };
   };
 }

@@ -5,6 +5,8 @@
   inputs,
   ...
 }: {
+  networking.hostName = "guckloch";
+
   wsl.enable = true;
   wsl.defaultUser = "devji";
   wsl.docker-desktop.enable = true;

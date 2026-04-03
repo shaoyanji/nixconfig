@@ -155,15 +155,13 @@ tasks:
     cmds:
       - task dev:flake:update:bountystash
 
-  # Internal: Extract nixosConfigurations hostnames from flake
+  # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
-    internal: true
     cmds:
       - "nix eval --raw .#nixosConfigurations --apply 'hosts: builtins.concatStringsSep \"\\n\" (builtins.attrNames hosts)'"
 
-  # Internal: Update garnix.yaml with current nixosConfigurations
+  # Update garnix.yaml with current nixosConfigurations
   dev:flake:update-garnix:
-    internal: true
     cmds:
       - |
         # Start with empty builds.include array

@@ -2,7 +2,20 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  readPkgList = path: let
+    lines = lib.pipe (builtins.readFile path) [
+      (lib.splitString "\n")
+      (map lib.strings.trim)
+      (builtins.filter (line: line != "" && !(lib.hasPrefix "#" line)))
+    ];
+  in
+    map (
+      name:
+        pkgs.${name} or (throw "Unknown package in ${toString path}: ${name}")
+    )
+    lines;
+in {
   imports = [
     ../../scripts
     ../../lf
@@ -17,7 +30,8 @@
   home = {
     stateVersion = "25.05";
     packages = with pkgs;
-      [
+      readPkgList ../../../pkg.txt
+      ++ [
         pi-coding-agent
         geminicommit
         http-nu

@@ -32,6 +32,7 @@ in {
     packages = with pkgs;
       readPkgList ../../../pkg.txt
       ++ [
+        gokrazy
         pi-coding-agent
         geminicommit
         http-nu

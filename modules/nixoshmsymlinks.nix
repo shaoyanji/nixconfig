@@ -2,10 +2,10 @@
   lib,
   pkgs,
   config,
-  hostName ? null,
   ...
 }: let
   nixNAS = "/Volumes/data";
+  hostName = config.networking.hostName or null;
   isGuckloch = hostName == "guckloch";
   cfg = config.nixoshmsymlinks;
 in {

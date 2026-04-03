@@ -4,19 +4,19 @@ builds:
   # - darwinConfigurations.*
   # - nixosConfigurations.*
   include:
-    # - defaultPackage.x86_64-linux
-    # - nixosConfigurations.*
+    - nixosConfigurations.aceofspades
+    - nixosConfigurations.ancientace
+    - nixosConfigurations.applevalley
+    - nixosConfigurations.ares
     - nixosConfigurations.garnixMachine
-    # - "*.x86_64-linux.*"
-    # - devShell.x86_64-linux
-    # - nixosConfigurations.thinsandy
-    # - nixosConfigurations.kellerbench
-    # - homeConfigurations.penguin
-    # - "*.aarch64-darwin.*"
-    # - "*.aarch64-linux.*"
-    # - nixosConfigurations.*
-    # - homeConfigurations.*
-    # - darwinConfigurations.*
+    - nixosConfigurations.guckloch
+    - nixosConfigurations.kellerbench
+    - nixosConfigurations.minyx
+    - nixosConfigurations.mtfuji
+    - nixosConfigurations.poseidon
+    - nixosConfigurations.schneeeule
+    - nixosConfigurations.testvm
+    - nixosConfigurations.thinsandy
 servers:
   - configuration: garnixMachine
     deployment:

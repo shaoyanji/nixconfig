@@ -53,7 +53,6 @@
       cliphist
       wl-clipboard
       simplex-chat-desktop
-      # goose-cli
       qrrs
       cook-cli
       surge-cli

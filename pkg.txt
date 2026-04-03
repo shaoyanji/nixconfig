@@ -9,3 +9,4 @@
 # broot
 # eget
 # todoist
+      goose-cli

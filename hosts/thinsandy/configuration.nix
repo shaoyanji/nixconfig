@@ -107,7 +107,7 @@ in {
     settings = {
       model = {
         provider = "openrouter";
-        default = "qwen/qwen3.6-plus-preview:free";
+        default = "qwen/qwen3.6-plus:free";
         # provider = "custom";
         # default = "qwen/qwen3-coder-480b-a35b-instruct";
       };

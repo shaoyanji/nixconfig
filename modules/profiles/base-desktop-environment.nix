@@ -39,7 +39,35 @@
     alsa-utils
     lagrange
     ngrok
+    kdePackages.dolphin
+    kdePackages.systemsettings
+    kdePackages.ffmpegthumbs
+    ffmpegthumbnailer
+    xdg-desktop-portal-gtk
+    kdePackages.xdg-desktop-portal-kde
   ];
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [
+      kdePackages.xdg-desktop-portal-kde
+      xdg-desktop-portal-gtk
+    ];
+    config.common = {
+      default = [ "kde" "gtk" ];
+      "org.freedesktop.impl.portal.FileChooser" = [ "kde" "gtk" ];
+    };
+    config.niri = {
+      default = [ "kde" "gtk" ];
+      "org.freedesktop.impl.portal.FileChooser" = [ "kde" "gtk" ];
+    };
+  };
+
+  environment.sessionVariables = {
+    QT_QPA_PLATFORM = "wayland";
+    QT_QPA_PLATFORMTHEME = "kde";
+    XDG_MENU_PREFIX = "plasma-";
+  };
 
   programs.appimage = {
     enable = true;

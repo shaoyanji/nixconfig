@@ -47,6 +47,8 @@ in {
 
   config = lib.mkIf cfg.enable {
     services.hermes-agent = {
+      # addToSystemPackages = true;
+      # container.enable = true;
       enable = true;
       package = cfg.package;
       stateDir = cfg.stateDir;

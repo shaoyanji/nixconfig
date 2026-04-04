@@ -12,7 +12,6 @@
 
   home.packages = with pkgs;
     [
-      keypunch
       a2ps
       amfora
       astroterm
@@ -39,7 +38,7 @@
       ani-cli
       audacity
       mpv
-      ytfzf
+      # ytfzf
       gnuplot
       jp2a
       lm_sensors
@@ -47,6 +46,7 @@
       iotop
     ]
     ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+      keypunch
       qalculate-qt
       thunderbird-bin
       hyprpicker

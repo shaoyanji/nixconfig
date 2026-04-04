@@ -9,7 +9,7 @@
   # Default version to work around upstream bug that auto-detects "0.1.0".
   # Update this version when you want to track a newer Hermes release.
   defaultHermesPackage = inputs.hermes-agent.packages.${pkgs.system}.default.overrideAttrs (old: {
-    version = "0.6.0";
+    version = "0.7.0";
   });
 in {
   options.services.hermes-agent-local = {
@@ -23,7 +23,7 @@ in {
           version = "0.7.0";
         })
       '';
-      description = "Hermes agent package. Defaults to version 0.6.0 to work around upstream version auto-detection bug. Update the default in modules/services/hermes-agent-local.nix to track newer releases.";
+      description = "Hermes agent package. Defaults to version 0.7.0 to work around upstream version auto-detection bug. Update the default in modules/services/hermes-agent-local.nix to track newer releases.";
     };
 
     stateDir = lib.mkOption {

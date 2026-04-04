@@ -29,6 +29,9 @@
         };
       };
       profiles."m4i7gl4m.default" = {
+        settings = {
+          "widget.use-xdg-desktop-portal.file-picker" = 1;
+        };
         extensions.packages = with inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system}; [
           ublock-origin
           raindropio

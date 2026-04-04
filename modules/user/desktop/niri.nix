@@ -1,5 +1,36 @@
 {pkgs, ...}: {
   programs.fuzzel.enable = true;
+
+  xdg.configFile."xdg-desktop-portal/niri-portals.conf".text = ''
+    [preferred]
+    org.freedesktop.impl.portal.FileChooser=kde;gtk;
+  '';
+
+  # KDE color scheme for portal file picker and other Qt/KDE apps
+  xdg.configFile."kdeglobals".text = ''
+    [General]
+    ColorScheme=CatppuccinFrappeBlue
+
+    [KDE]
+    contrast=4
+
+    [WM]
+    activeBackground=48, 52, 70
+    activeForeground=198, 208, 245
+    inactiveBackground=35, 38, 52
+    inactiveForeground=165, 173, 206
+  '';
+
+  # Kvantum Qt style config — catppuccin-frappe-blue theme
+  xdg.configFile."Kvantum/kvantum.kvconfig".text = ''
+    [General]
+    theme=catppuccin-frappe-blue
+  '';
+
+  home.sessionVariables = {
+    QT_STYLE_OVERRIDE = "kvantum";
+  };
+
   programs.niri.settings = {
     hotkey-overlay.skip-at-startup = true;
     environment."NIXOS_OZONE_WL" = "1";
@@ -7,7 +38,31 @@
     input.warp-mouse-to-focus.enable = true;
     layout.focus-ring.enable = false;
     layout.border = {};
-    window-rules = [];
+    window-rules = [
+      {
+        geometry-corner-radius = let
+          r = 12.0;
+        in {
+          top-left = r;
+          top-right = r;
+          bottom-left = r;
+          bottom-right = r;
+        };
+        clip-to-geometry = true;
+      }
+      {
+        matches = [
+          {app-id = "xdg-desktop-portal-gtk";}
+          {app-id = "org.freedesktop.impl.portal.desktop.gtk";}
+          {app-id = "xdg-desktop-portal-kde";}
+          {app-id = "org.freedesktop.impl.portal.desktop.kde";}
+        ];
+        border.enable = false;
+        open-floating = true;
+        default-column-width.proportion = 0.5;
+        default-window-height.proportion = 0.8;
+      }
+    ];
     binds = {
       "Mod+Shift+Slash".action.show-hotkey-overlay = [];
       "Mod+Print".action.screenshot-screen = {show-pointer = false;};
@@ -121,5 +176,7 @@
     xwayland-satellite
     swaybg
     kando
+    catppuccin-kde
+    catppuccin-kvantum
   ];
 }

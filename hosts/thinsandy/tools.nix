@@ -56,6 +56,7 @@
     entr
     file
     rsync
+    jq
 
     uv
     (lib.hiPrio researchPython)

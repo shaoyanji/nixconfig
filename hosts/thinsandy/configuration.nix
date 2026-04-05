@@ -117,7 +117,7 @@ in {
         timeout = 180;
       };
       toolsets = ["all"];
-      # memory.provider = "mem0";
+      memory.provider = "holographic";
     };
     environmentFiles = [
       config.sops.secrets.hermes.path

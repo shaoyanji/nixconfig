@@ -1,0 +1,7 @@
+{
+  ...
+}: {
+  imports = [
+    ./desktop-client.nix
+  ];
+}

@@ -3,7 +3,7 @@
   ...
 }: {
   imports = [
-    ./minimal-desktop.nix
+    ./desktop-client.nix
     ../nixos/lxc
   ];
 

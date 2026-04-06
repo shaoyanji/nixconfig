@@ -26,6 +26,7 @@ in {
       })
       ./hardware.nix
       ./media-stack.nix
+      ./dns.nix
       ./tools.nix
       ./networking.nix
     ]

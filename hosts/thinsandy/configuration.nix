@@ -14,7 +14,7 @@ in {
   imports =
     [
       ./hardware-configuration.nix
-      ../../modules/profiles/minimal-desktop.nix
+      ../../modules/profiles/base-node.nix
       ../../modules/services/openfang.nix
       ../../modules/services/xs.nix
       ../../modules/services/ai-services-context.nix

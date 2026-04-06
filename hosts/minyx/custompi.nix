@@ -10,7 +10,7 @@
 }: {
   imports = [
     # Include the results of the hardware scan.
-    ../../modules/profiles/minimal-desktop.nix
+    ../../modules/profiles/base-desktop.nix
   ];
   # !!! Adding a swap file is optional, but strongly recommended!
   swapDevices = [

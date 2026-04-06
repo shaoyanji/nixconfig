@@ -2,6 +2,6 @@
   ...
 }: {
   imports = [
-    ./base-node.nix
+    ./desktop-client.nix
   ];
 }

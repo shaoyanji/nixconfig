@@ -7,7 +7,8 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/profiles/minimal-desktop.nix
+    ../../modules/profiles/base-node.nix
+    ../../modules/profiles/desktop-client.nix
     ../../modules/profiles/laptop.nix
   ];
   boot.loader.systemd-boot.enable = true;

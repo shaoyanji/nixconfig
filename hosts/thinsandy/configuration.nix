@@ -9,7 +9,7 @@
   enableHermes = true;
   enableOpenClaw = false;
   enableNullClaw = true;
-  enableOpenFang = true;
+  enableOpenFang = false;
 in {
   imports =
     [

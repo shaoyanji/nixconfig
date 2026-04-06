@@ -28,8 +28,9 @@
       dns = {
         upstreams = ["127.0.0.1#5335"];
         listeningMode = "BIND";
-        interface = "tailscale0";
+        interface = "eno1";
       };
+      misc.dnsmasq_lines = ["interface=tailscale0"];
       webserver.api.cli_pw = true;
     };
   };
@@ -38,12 +39,8 @@
     enable = true;
     ports = [8080];
   };
-
-  networking.firewall = {
-    trustedInterfaces = ["tailscale0"];
-    interfaces.tailscale0 = {
-      allowedTCPPorts = [53];
-      allowedUDPPorts = [53];
-    };
+  networking.firewall.interfaces.eno1 = {
+    allowedUDPPorts = [53];
+    allowedTCPPorts = [53];
   };
 }

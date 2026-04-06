@@ -86,6 +86,8 @@
     git
     wget
     nixpkgs-fmt
+    nurl
+    python3
   ];
 
   environment.localBinInPath = true;

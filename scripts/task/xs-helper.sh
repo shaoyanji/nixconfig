@@ -28,6 +28,7 @@ SERVICE_SUDO_WARNED=0
 
 PRODUCER="${XS_HELPER_PRODUCER:-xs-helper}"
 XS_BIN="${XS_BIN:-xs}"
+XS_MATERIALIZER_BIN="${XS_MATERIALIZER_BIN:-xs-materializer}"
 if ! command -v "$XS_BIN" >/dev/null 2>&1 && [ -x "$REPO_ROOT/result/bin/xs" ]; then
   XS_BIN="$REPO_ROOT/result/bin/xs"
 fi
@@ -55,6 +56,7 @@ Env overrides:
   XS_HELPER_SERVICE_ADDR
   XS_HELPER_PRODUCER
   XS_BIN                     path to an xs binary (fallbacks to "xs" and repo result)
+  XS_MATERIALIZER_BIN        path to xs-materializer binary (default "xs-materializer")
 
 Commands:
   status                   show mode, paths, and whether xs is reachable
@@ -84,6 +86,9 @@ Commands:
   service-status           inspect the live xs systemd unit and store status
   service-show <topic>     render frames from the service store
   service-tail <topic>     follow a topic stream from the service store
+  materialize <topic> <target-id> [--last N] [--graph-revision REV]
+                           [--spec-id ID] [--spec-version VER] [--policy-profile PROFILE]
+                           build a task_view context pack from xs frames via Go materializer
 EOF
 }
 
@@ -188,6 +193,12 @@ prepare_local_dirs() {
 ensure_xs() {
   if ! command -v "$XS_BIN" >/dev/null 2>&1; then
     fail "xs binary '$XS_BIN' not found; set XS_BIN or install xs."
+  fi
+}
+
+ensure_materializer() {
+  if ! command -v "$XS_MATERIALIZER_BIN" >/dev/null 2>&1; then
+    fail "xs-materializer binary '$XS_MATERIALIZER_BIN' not found; set XS_MATERIALIZER_BIN or install xs-materializer."
   fi
 }
 
@@ -913,6 +924,79 @@ command_cat_artifact() {
   cat_artifact_file "$path"
 }
 
+command_materialize() {
+  ensure_xs
+  ensure_materializer
+  ensure_local_server
+  (( $# >= 2 )) || fail 'materialize requires <topic> <target-id> [--last N] [--graph-revision REV] [--spec-id ID] [--spec-version VER] [--policy-profile PROFILE]'
+
+  local topic
+  topic="$(normalize_topic "$1")"
+  local target_id
+  target_id="$2"
+  shift 2
+
+  local last=400
+  local graph_revision=""
+  local spec_id=""
+  local spec_version=""
+  local policy_profile=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --last)
+        [[ $# -ge 2 ]] || fail 'materialize --last requires a numeric value'
+        last="$2"
+        shift 2
+        ;;
+      --graph-revision)
+        [[ $# -ge 2 ]] || fail 'materialize --graph-revision requires a value'
+        graph_revision="$2"
+        shift 2
+        ;;
+      --spec-id)
+        [[ $# -ge 2 ]] || fail 'materialize --spec-id requires a value'
+        spec_id="$2"
+        shift 2
+        ;;
+      --spec-version)
+        [[ $# -ge 2 ]] || fail 'materialize --spec-version requires a value'
+        spec_version="$2"
+        shift 2
+        ;;
+      --policy-profile)
+        [[ $# -ge 2 ]] || fail 'materialize --policy-profile requires a value'
+        policy_profile="$2"
+        shift 2
+        ;;
+      *)
+        fail "materialize: unknown option '$1'"
+        ;;
+    esac
+  done
+
+  [[ "$last" =~ ^[0-9]+$ ]] || fail 'materialize --last must be numeric'
+
+  local -a materializer_args=(
+    --topic "$topic"
+    --target "$target_id"
+  )
+  if [[ -n "$graph_revision" ]]; then
+    materializer_args+=(--graph-revision "$graph_revision")
+  fi
+  if [[ -n "$spec_id" ]]; then
+    materializer_args+=(--spec-id "$spec_id")
+  fi
+  if [[ -n "$spec_version" ]]; then
+    materializer_args+=(--spec-version "$spec_version")
+  fi
+  if [[ -n "$policy_profile" ]]; then
+    materializer_args+=(--policy-profile "$policy_profile")
+  fi
+
+  run_xs cat "$(resolve_addr)" --topic "$topic" --last "$last" | service_exec "$XS_MATERIALIZER_BIN" "${materializer_args[@]}"
+}
+
 [[ $# -eq 0 ]] && usage && exit 0
 
 while [[ $# -gt 0 ]]; do
@@ -1007,6 +1091,9 @@ case "$COMMAND" in
     ;;
   service-tail)
     command_service_tail "$@"
+    ;;
+  materialize)
+    command_materialize "$@"
     ;;
   *)
     usage

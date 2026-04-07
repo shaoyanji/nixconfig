@@ -11,6 +11,7 @@
   python3,
   util-linux,
   xs,
+  xs-materializer,
 }:
 writeShellApplication {
   name = "xs-helper";
@@ -25,10 +26,12 @@ writeShellApplication {
     python3
     util-linux
     xs
+    xs-materializer
   ];
 
   text = ''
     export XS_BIN="${xs}/bin/xs"
+    export XS_MATERIALIZER_BIN="${xs-materializer}/bin/xs-materializer"
     exec ${bash}/bin/bash ${../scripts/task/xs-helper.sh} "$@"
   '';
 

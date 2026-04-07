@@ -67,6 +67,7 @@
 
   fileSystems."/var/lib/immich" = {
     device = "/srv/public/immich";
+    fsType = "btrfs";
     options = ["bind"];
   };
   fileSystems."/srv/public" = {

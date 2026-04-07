@@ -9,7 +9,7 @@ Operational differences for `garnixMachine` in AI host flows.
 - Exposure includes public nginx + bountystash shape.
 
 ## Operational Interpretation
-- Use standard host deploy flow (`services:deploy:host:garnixMachine`) when targeting this host directly.
+- Prefer canonical host deploy flow (`infra:deploy:host:garnixMachine`) when targeting this host directly (`services:deploy:host:garnixMachine` remains a compatibility alias).
 - Canary batch promotion/drift tasks include this host by manifest grouping.
 - Validation mapping is manifest-driven (`checks:nullclaw:smoke:garnixMachine`).
 

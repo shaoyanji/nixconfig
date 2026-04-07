@@ -6,7 +6,7 @@ tasks:
     cmds:
       - nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
       - nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
-      - nix eval .#packages.x86_64-linux.backend.meta.mainProgram
+      - nix eval .#packages.x86_64-linux.nullclaw.meta.mainProgram
       - nix build .#checks.x86_64-linux.host-architecture -L
 
   checks:fleet:

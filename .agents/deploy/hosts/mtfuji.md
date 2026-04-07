@@ -9,7 +9,7 @@ Operational differences for `mtfuji` in AI host flows.
 - Exposure type indicates no public nginx fronting for nullclaw policy path.
 
 ## Operational Interpretation
-- Use standard host deploy flow (`services:deploy:host:mtfuji`).
+- Prefer canonical host deploy flow (`infra:deploy:host:mtfuji`) (`services:deploy:host:mtfuji` remains a compatibility alias).
 - Promotion uses stable-group behavior unless explicitly targeted.
 - Validation mapping is manifest-driven (`checks:nullclaw:smoke:mtfuji`).
 

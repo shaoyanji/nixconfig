@@ -22,13 +22,13 @@ Recommended commands:
 git status --short
 nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
 nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
-nix eval .#packages.x86_64-linux.backend.meta.mainProgram
+nix eval .#packages.x86_64-linux.nullclaw.meta.mainProgram
 nix build .#checks.x86_64-linux.host-architecture -L
 ```
 
 ## Current known notes
 
-- `garnixMachine` still reports `networking.hostName = "nixos"`; that result predates the current refactor.
+- `garnixMachine` now evaluates to `networking.hostName = "garnixMachine"`; keep this stable unless an explicit host rename is intended.
 - `hosts/common/disko.nix` remains an intentional host-local exception.
 
 ## Next recommended tasks

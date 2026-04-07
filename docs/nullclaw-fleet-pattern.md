@@ -101,9 +101,10 @@ aiServices.nullclawDeployment = {
    - bind mounts/persistence paths
 6. Validate and deploy:
    - `task checks:quick`
-   - `task services:plan:host:<host>`
-   - `task services:apply:host:<host>`
+   - `task infra:plan:host:<host>`
+   - `task infra:apply:host:<host>`
    - `task services:validate:host:<host>`
+   - or one-shot: `task infra:deploy:host:<host>`
 7. Promote (gated):
    - `task services:promote:host:<host>`
 8. Optional git recording:

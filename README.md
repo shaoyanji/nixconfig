@@ -29,7 +29,6 @@ Canonically assembled from [`flake/outputs.nix`](/home/devji/nixconfig/flake/out
 - `xs-helper` remains the shell-first operator wrapper, while `xs-materializer` is the Go implementation used for `task_view` context-pack materialization. They are versioned in lockstep inside this repo: `pkgs/xs-helper.nix` wires the wrapper to the packaged `pkgs/xs-materializer.nix` output, and `scripts/task/xs-helper.sh materialize` now hydrates CAS-backed xs envelopes before piping normalized events into the materializer.
 - Direct `xs` usage is still the source-of-truth debugging path when validating stream shape or CAS retrieval behavior, but normal operator/fleet flows should go through the packaged wrapper/tasks instead of bespoke local build steps.
 - Service-user OAuth/session management uses `task agents:oauth:*` wrappers (e.g., `agents:oauth:login:nullclaw:codex`, `agents:oauth:exec:nullclaw:codex -- whoami`). The helper sets `HOME` and `XDG_*` correctly for each service user, so you do not need to remember raw `sudo -u ...` incantations.
-- Service-user OAuth/session management uses `task agents:oauth:*` wrappers (e.g., `agents:oauth:login:nullclaw:codex`, `agents:oauth:exec:nullclaw:codex -- whoami`). The helper sets `HOME` and `XDG_*` correctly for each service user, so you do not need to remember raw `sudo -u ...` incantations.
 - The experimental devcontainer configuration was reverted; there is no current repo-provided devcontainer image, so use the Taskfiles, flake outputs, and hosted workflows directly.
 
 ## Docs

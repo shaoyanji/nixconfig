@@ -29,6 +29,7 @@
   fileSystems."/etc/ssh".neededForBoot = true;
   fileSystems."/etc/ssh".options = ["bind"];
   fileSystems."/etc/ssh".device = "/persist/system/etc/ssh";
+  fileSystems."/etc/ssh".fsType = "btrfs";
   fileSystems."/persist".neededForBoot = true;
 
   environment.persistence."/persist/system" = {

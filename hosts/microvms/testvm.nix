@@ -86,6 +86,10 @@
   ];
 
   system.stateVersion = "25.05";
+
+  # The microvm module creates this entry for the ro-store virtiofs share
+  # but does not set fsType, which NixOS requires.
+  fileSystems."/nix/store".fsType = "virtiofs";
 }
 // lib.optionalAttrs configureNetworkd {
   networking.useNetworkd = true;

@@ -8,7 +8,8 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
   microvm = {
     vcpu = 2;
     mem = 2048;
@@ -81,6 +82,7 @@
     git
     curl
     wget
+    jq
   ];
 
   system.stateVersion = "25.05";

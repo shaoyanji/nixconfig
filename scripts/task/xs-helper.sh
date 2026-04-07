@@ -924,6 +924,89 @@ command_cat_artifact() {
   cat_artifact_file "$path"
 }
 
+stream_materialize_frames() {
+  local addr="$1"
+  local materialize_stream_script
+  materialize_stream_script="$(cat <<'PY'
+import json
+import os
+import subprocess
+import sys
+
+ADDR = os.environ["XS_HELPER_MATERIALIZE_ADDR"]
+XS_BIN = os.environ["XS_HELPER_MATERIALIZE_BIN"]
+
+def fetch_hash_payload(hash_value):
+    if not hash_value:
+        return None
+    try:
+        result = subprocess.run(
+            [XS_BIN, "cas", ADDR, hash_value],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        return None
+    text = result.stdout.strip()
+    if not text:
+        return None
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {"value": text}
+
+def extract_payload(obj):
+    if isinstance(obj, str):
+        try:
+            return json.loads(obj)
+        except json.JSONDecodeError:
+            return {"value": obj}
+    if isinstance(obj, dict):
+        if "kind" in obj:
+            return obj
+        hash_payload = fetch_hash_payload(obj.get("hash"))
+        if hash_payload is not None:
+            return extract_payload(hash_payload)
+        for key in ("content", "payload", "body", "data"):
+            if key in obj:
+                return extract_payload(obj[key])
+        return obj
+    return None
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        frame = json.loads(line)
+    except json.JSONDecodeError:
+        continue
+    if not isinstance(frame, dict):
+        continue
+    payload = extract_payload(frame)
+    meta = frame.get("meta")
+    if not isinstance(meta, dict):
+        meta = {}
+    event = {
+        "id": frame.get("id"),
+        "topic": frame.get("topic") or meta.get("topic"),
+        "timestamp": frame.get("timestamp") or frame.get("ts"),
+        "meta": meta,
+    }
+    if isinstance(payload, dict):
+        if not event["topic"]:
+            event["topic"] = payload.get("topic")
+        if not event["timestamp"]:
+            event["timestamp"] = payload.get("timestamp") or payload.get("ts")
+        event["content"] = payload
+    print(json.dumps(event, separators=(",", ":")))
+PY
+)"
+  XS_HELPER_MATERIALIZE_ADDR="$addr" XS_HELPER_MATERIALIZE_BIN="$XS_BIN" \
+    service_exec python3 -u -c "$materialize_stream_script"
+}
+
 command_materialize() {
   ensure_xs
   ensure_materializer
@@ -994,7 +1077,9 @@ command_materialize() {
     materializer_args+=(--policy-profile "$policy_profile")
   fi
 
-  run_xs cat "$(resolve_addr)" --topic "$topic" --last "$last" | service_exec "$XS_MATERIALIZER_BIN" "${materializer_args[@]}"
+  run_xs cat "$(resolve_addr)" --topic "$topic" --last "$last" | \
+    stream_materialize_frames "$(resolve_addr)" | \
+    service_exec "$XS_MATERIALIZER_BIN" "${materializer_args[@]}"
 }
 
 [[ $# -eq 0 ]] && usage && exit 0

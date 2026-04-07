@@ -145,10 +145,8 @@ func normalizeFrame(raw map[string]any) frame {
 			f.Topic = asString(meta["topic"])
 		}
 	}
-	if payload, ok := raw["payload"].(map[string]any); ok {
+	if payload := extractPayload(raw); len(payload) > 0 {
 		f.Payload = payload
-	} else if body, ok := raw["body"].(map[string]any); ok {
-		f.Payload = body
 	} else {
 		f.Payload = raw
 	}
@@ -196,10 +194,7 @@ func buildPack(topic, targetID, graphRevision, specID, specVersion, policyProfil
 				seenEventID[f.ID] = struct{}{}
 			}
 		}
-		kind := asString(f.Payload["kind"])
-		if kind == "" {
-			kind = asString(f.Meta["type"])
-		}
+		kind := inferKind(f)
 		if kind == "" {
 			kind = "unknown"
 		}
@@ -218,7 +213,7 @@ func buildPack(topic, targetID, graphRevision, specID, specVersion, policyProfil
 		case "packet.emit":
 			openQuestions = append(openQuestions, summary)
 		case "record.append":
-			nextActions = append(nextActions, summary)
+			nextActions = append(nextActions, summarizeRecordAction(f))
 		}
 	}
 
@@ -235,18 +230,18 @@ func buildPack(topic, targetID, graphRevision, specID, specVersion, policyProfil
 	}
 
 	objective := map[string]any{
-		"topic": topic,
+		"topic":     topic,
 		"target_id": targetID,
-		"summary": fmt.Sprintf("Materialized from xs stream with %d frames", len(frames)),
-		"kinds": kindCount,
+		"summary":   fmt.Sprintf("Materialized from xs stream with %d frames", len(frames)),
+		"kinds":     kindCount,
 	}
 
 	sections := map[string]any{
-		"objective": objective,
-		"current_state": currentState,
-		"constraints": constraints,
-		"active_risks": risks,
-		"next_actions": nextActions,
+		"objective":      objective,
+		"current_state":  currentState,
+		"constraints":    constraints,
+		"active_risks":   risks,
+		"next_actions":   nextActions,
 		"open_questions": openQuestions,
 	}
 
@@ -288,19 +283,19 @@ func buildPack(topic, targetID, graphRevision, specID, specVersion, policyProfil
 
 func summarizeFrame(f frame, kind string) string {
 	parts := []string{kind}
-	if v := asString(f.Payload["record_id"]); v != "" {
+	if v := firstString(f.Payload, "record_id", "rec"); v != "" {
 		parts = append(parts, "record="+v)
 	}
-	if v := asString(f.Payload["artifact_id"]); v != "" {
+	if v := firstString(f.Payload, "artifact_id"); v != "" {
 		parts = append(parts, "artifact="+v)
 	}
-	if v := asString(f.Payload["packet_type"]); v != "" {
+	if v := firstString(f.Payload, "packet_type"); v != "" {
 		parts = append(parts, "packet_type="+v)
 	}
-	if v := asString(f.Payload["contract_id"]); v != "" {
+	if v := firstString(f.Payload, "contract_id", "ctr"); v != "" {
 		parts = append(parts, "contract="+v)
 	}
-	if v := asString(f.Payload["content"]); v != "" {
+	if v := firstString(f.Payload, "content"); v != "" {
 		if len(v) > 120 {
 			v = v[:117] + "..."
 		}
@@ -310,6 +305,116 @@ func summarizeFrame(f frame, kind string) string {
 		parts = append(parts, "ts="+f.Timestamp)
 	}
 	return strings.Join(parts, " ")
+}
+
+func inferKind(f frame) string {
+	if v := firstString(f.Payload, "kind"); v != "" {
+		return v
+	}
+	if v := asString(f.Meta["type"]); v != "" {
+		return v
+	}
+	if v := asString(f.Payload["type"]); v != "" {
+		return v
+	}
+	if v := asString(f.Payload["event"]); v != "" {
+		return v
+	}
+	return ""
+}
+
+func summarizeRecordAction(f frame) string {
+	recordID := firstString(f.Payload, "record_id", "rec")
+	contractID := firstString(f.Payload, "contract_id", "ctr")
+	packetID := firstString(f.Payload, "packet_id", "pkt")
+
+	semantic := firstSemanticString(f.Payload, "action", "task", "summary", "title", "description", "content")
+	if semantic == "" {
+		if payload, ok := f.Payload["payload"].(map[string]any); ok {
+			semantic = firstSemanticString(payload, "action", "task", "summary", "title", "description", "content")
+		}
+	}
+	if semantic == "" {
+		if extras, ok := f.Payload["extras"].(map[string]any); ok {
+			semantic = firstSemanticString(extras, "action", "task", "summary", "title", "description", "content")
+		}
+	}
+	if semantic != "" {
+		if len(semantic) > 160 {
+			semantic = semantic[:157] + "..."
+		}
+		if recordID != "" {
+			return fmt.Sprintf("Apply record %s: %s", recordID, semantic)
+		}
+		return semantic
+	}
+
+	parts := make([]string, 0, 4)
+	if recordID != "" {
+		parts = append(parts, "record="+recordID)
+	}
+	if contractID != "" {
+		parts = append(parts, "contract="+contractID)
+	}
+	if packetID != "" {
+		parts = append(parts, "packet="+packetID)
+	}
+	if len(parts) == 0 {
+		return "Review appended record details"
+	}
+	return "Process appended " + strings.Join(parts, " ")
+}
+
+func firstString(m map[string]any, keys ...string) string {
+	for _, k := range keys {
+		if v := asString(m[k]); v != "" {
+			return v
+		}
+	}
+	return ""
+}
+
+func firstSemanticString(m map[string]any, keys ...string) string {
+	for _, k := range keys {
+		v := asString(m[k])
+		if v == "" {
+			continue
+		}
+		if strings.EqualFold(v, "append") || strings.EqualFold(v, "record.append") {
+			continue
+		}
+		return v
+	}
+	return ""
+}
+
+func extractPayload(v any) map[string]any {
+	switch x := v.(type) {
+	case map[string]any:
+		if _, ok := x["kind"]; ok {
+			return x
+		}
+		for _, k := range []string{"content", "payload", "body", "data"} {
+			if inner, ok := x[k]; ok {
+				if decoded := extractPayload(inner); len(decoded) > 0 {
+					return decoded
+				}
+			}
+		}
+		return x
+	case string:
+		s := strings.TrimSpace(x)
+		if s == "" {
+			return nil
+		}
+		var raw any
+		if err := json.Unmarshal([]byte(s), &raw); err != nil {
+			return map[string]any{"value": s}
+		}
+		return extractPayload(raw)
+	default:
+		return nil
+	}
 }
 
 func shortHash(s string) string {

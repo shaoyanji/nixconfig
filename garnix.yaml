@@ -4,8 +4,19 @@ builds:
   # - darwinConfigurations.*
   # - nixosConfigurations.*
   include:
+    - nixosConfigurations.aceofspades
+    - nixosConfigurations.ancientace
+    - nixosConfigurations.applevalley
+    - nixosConfigurations.ares
     - nixosConfigurations.garnixMachine
-    # - nixosConfigurations.*
+    - nixosConfigurations.guckloch
+    - nixosConfigurations.kellerbench
+    - nixosConfigurations.minyx
+    - nixosConfigurations.mtfuji
+    - nixosConfigurations.poseidon
+    - nixosConfigurations.schneeeule
+    - nixosConfigurations.testvm
+    - nixosConfigurations.thinsandy
 servers:
   - configuration: garnixMachine
     deployment:

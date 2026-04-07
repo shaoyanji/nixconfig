@@ -4,6 +4,9 @@
 .smbdelete*
 @eaDir*
 result
+result-*
 
 .codex
+.tmp/
+.tmp-xs-helper/
 tools/xs-materializer/xs-materializer

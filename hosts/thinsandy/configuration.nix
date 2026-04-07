@@ -186,18 +186,22 @@ in {
   fileSystems = {
     "/var/lib/openclaw/.openclaw/workspace/share" = {
       device = "/srv/data/openclaw";
+      fsType = "btrfs";
       options = ["bind"];
     };
     "/var/lib/openfang/.openfang/skills" = {
       device = "/srv/data/openclaw/skills/legacy";
+      fsType = "btrfs";
       options = ["bind"];
     };
     "/var/lib/nullclaw/workspace/share" = {
       device = "/srv/data/openclaw";
+      fsType = "btrfs";
       options = ["bind"];
     };
     "/var/lib/hermes/workspace/share" = {
       device = "/srv/data/openclaw";
+      fsType = "btrfs";
       options = ["bind"];
     };
   };

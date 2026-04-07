@@ -4,3 +4,6 @@
 .smbdelete*
 @eaDir*
 result
+
+.codex
+tools/xs-materializer/xs-materializer

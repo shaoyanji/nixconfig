@@ -196,6 +196,24 @@ tasks:
     cmds:
       - scripts/task/xs-helper.sh service-tail {{.TOPIC}}
 
+  agents:xs:materialize:*:*:
+    desc: Build a task_view context pack from local xs frames
+    vars:
+      TOPIC: '{{index .MATCH 0}}'
+      TARGET: '{{index .MATCH 1}}'
+      LAST: '{{.LAST | default 400}}'
+    cmds:
+      - scripts/task/xs-helper.sh materialize {{.TOPIC}} {{.TARGET}} --last {{.LAST}}
+
+  agents:xs:service:materialize:*:*:
+    desc: Build a task_view context pack from service xs frames
+    vars:
+      TOPIC: '{{index .MATCH 0}}'
+      TARGET: '{{index .MATCH 1}}'
+      LAST: '{{.LAST | default 400}}'
+    cmds:
+      - scripts/task/xs-helper.sh --service materialize {{.TOPIC}} {{.TARGET}} --last {{.LAST}}
+
   # OAuth/session management for AI service users
   agents:oauth:list:
     desc: List known services and OAuth tools

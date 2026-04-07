@@ -76,7 +76,10 @@
           assert assertMsg (configs.thinsandy.config.aiServices.nullclaw.environmentFile == "/run/secrets/nullclaw") "thinsandy nullclaw environmentFile must be /run/secrets/nullclaw";
 
           assert assertMsg (configs.thinsandy.config.services."hermes-agent".enable) "thinsandy hermes must be enabled";
-          assert assertMsg (configs.thinsandy.config.services."hermes-agent".environmentFiles == ["/run/secrets/hermes"]) "thinsandy hermes environmentFiles must be [/run/secrets/hermes]";
+          assert assertMsg (
+            configs.thinsandy.config.services."hermes-agent".environmentFiles
+            == ["/run/secrets/hermes" "/run/secrets/ai-services-shared-env"]
+          ) "thinsandy hermes environmentFiles must be [/run/secrets/hermes /run/secrets/ai-services-shared-env]";
 
           assert assertMsg (checkNullclawFleetHost "garnixMachine" nullclawFleetContract.garnixMachine) "garnixMachine nullclaw fleet contract mismatch";
           assert assertMsg (checkNullclawFleetHost "mtfuji" nullclawFleetContract.mtfuji) "mtfuji nullclaw fleet contract mismatch";

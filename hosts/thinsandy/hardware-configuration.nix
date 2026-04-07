@@ -61,6 +61,7 @@
   };
   fileSystems."/export/data" = {
     device = "/srv/data";
+    fsType = "btrfs";
     options = ["bind"];
   };
 
@@ -75,6 +76,7 @@
   };
   fileSystems."/export/public" = {
     device = "/srv/public";
+    fsType = "btrfs";
     options = ["bind"];
   };
 
@@ -85,6 +87,7 @@
   };
   fileSystems."/export/private" = {
     device = "/srv/private";
+    fsType = "btrfs";
     options = ["bind"];
   };
 

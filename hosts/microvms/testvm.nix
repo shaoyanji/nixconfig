@@ -103,6 +103,8 @@
 // lib.optionalAttrs useDevNixDefaults {
   microvm.writableStoreOverlay = "/nix/.rw-store";
 
+  fileSystems."/nix/store".fsType = "overlay";
+
   systemd.mounts = [
     {
       what = "store";

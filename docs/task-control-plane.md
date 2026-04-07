@@ -5,7 +5,7 @@ This repository uses a small control-plane namespace policy so task names stay p
 ## Groups
 
 - `infra`: host/deploy/rebuild/switch/boot operations
-- `services`: daemon/service lifecycle operations
+- `services`: AI-host validation/evidence/drift/promotion/status flows plus compatibility wrappers
 - `checks`: validation and narrow verification
 - `agents`: interactive/operator menus and handoff helpers
 - `dev`: git/build/local workflows
@@ -15,7 +15,7 @@ This repository uses a small control-plane namespace policy so task names stay p
 - Prefer namespaced tasks for any new canonical entrypoint.
 - Keep top-level tasks only for operator-facing entrypoints and legacy wrappers.
 - Put host rebuild and deployment flows under `infra:*`.
-- Put daemon and service lifecycle flows under `services:*`.
+- Put AI-host validation/evidence/drift/promotion/status flows (and compatibility wrappers) under `services:*`.
 - Put menus, grouped help, grouped status, and handoff helpers under `agents:*`.
 - Put validation under `checks:*`.
 - Put git, flake update, site/static target workflows, and local developer workflows under `dev:*`.

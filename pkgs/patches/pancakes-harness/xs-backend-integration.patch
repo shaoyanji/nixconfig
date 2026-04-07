@@ -1,0 +1,559 @@
+diff --git a/cmd/harness/main.go b/cmd/harness/main.go
+index 272129f..ceeb96a 100644
+--- a/cmd/harness/main.go
++++ b/cmd/harness/main.go
+@@ -35,6 +35,8 @@ const (
+ 	envSessionID       = "HARNESS_SESSION_ID"
+ 	envBranchID        = "HARNESS_BRANCH_ID"
+ 	envXSCommand       = "HARNESS_XS_COMMAND"
++	envXSAddr          = "HARNESS_XS_ADDR"
++	envXSTopicPrefix   = "HARNESS_XS_TOPIC_PREFIX"
+ 	envServeBind       = "HARNESS_SERVE_BIND"
+ 	envServePort       = "HARNESS_SERVE_PORT"
+ )
+@@ -57,10 +59,12 @@ type launcherConfig struct {
+ 	authHeader     string
+ 	authValue      string
+ 
+-	backendMode string
+-	xsCommand   string
+-	sessionID   string
+-	branchID    string
++	backendMode   string
++	xsCommand     string
++	xsAddr        string
++	xsTopicPrefix string
++	sessionID     string
++	branchID      string
+ }
+ 
+ type serveConfig struct {
+@@ -249,6 +253,8 @@ func parseLauncherFlags(args []string, getenv func(string) string) (parsedFlags,
+ 	sessionIDDefault := stringOrDefault(getenv(envSessionID), "demo")
+ 	branchIDDefault := stringOrDefault(getenv(envBranchID), "main")
+ 	xsCommandDefault := stringOrDefault(getenv(envXSCommand), "xs")
++	xsAddrDefault := strings.TrimSpace(getenv(envXSAddr))
++	xsTopicPrefixDefault := stringOrDefault(getenv(envXSTopicPrefix), "pancakes-harness")
+ 	serveBindDefault := stringOrDefault(getenv(envServeBind), "127.0.0.1")
+ 	servePortDefault, err := parseIntOrDefault(getenv(envServePort), 8080)
+ 	if err != nil {
+@@ -268,6 +274,8 @@ func parseLauncherFlags(args []string, getenv func(string) string) (parsedFlags,
+ 	modelTimeout := defaultTimeout
+ 	backendMode := backendModeDefault
+ 	xsCommand := xsCommandDefault
++	xsAddr := xsAddrDefault
++	xsTopicPrefix := xsTopicPrefixDefault
+ 	sessionID := sessionIDDefault
+ 	branchID := branchIDDefault
+ 	serveBind := serveBindDefault
+@@ -283,6 +291,8 @@ func parseLauncherFlags(args []string, getenv func(string) string) (parsedFlags,
+ 	fs.StringVar(&ollamaModel, "ollama-model", ollamaModelDefault, "Ollama model name")
+ 	fs.StringVar(&backendMode, "backend-mode", backendModeDefault, "backend mode: memory|xs")
+ 	fs.StringVar(&xsCommand, "xs-command", xsCommandDefault, "xs command path when backend-mode=xs")
++	fs.StringVar(&xsAddr, "xs-addr", xsAddrDefault, "xs socket/address path when backend-mode=xs")
++	fs.StringVar(&xsTopicPrefix, "xs-topic-prefix", xsTopicPrefixDefault, "topic prefix for xs backend streams")
+ 	fs.StringVar(&sessionID, "session-id", sessionIDDefault, "session id")
+ 	fs.StringVar(&branchID, "branch-id", branchIDDefault, "branch id")
+ 	fs.StringVar(&serveBind, "bind", serveBindDefault, "bind address (serve mode)")
+@@ -301,6 +311,8 @@ func parseLauncherFlags(args []string, getenv func(string) string) (parsedFlags,
+ 	ollamaEndpoint = strings.TrimSpace(ollamaEndpoint)
+ 	ollamaModel = strings.TrimSpace(ollamaModel)
+ 	xsCommand = strings.TrimSpace(xsCommand)
++	xsAddr = strings.TrimSpace(xsAddr)
++	xsTopicPrefix = strings.TrimSpace(xsTopicPrefix)
+ 	sessionID = strings.TrimSpace(sessionID)
+ 	branchID = strings.TrimSpace(branchID)
+ 
+@@ -336,6 +348,8 @@ func parseLauncherFlags(args []string, getenv func(string) string) (parsedFlags,
+ 			authValue:      authValue,
+ 			backendMode:    backendMode,
+ 			xsCommand:      xsCommand,
++			xsAddr:         xsAddr,
++			xsTopicPrefix:  xsTopicPrefix,
+ 			sessionID:      sessionID,
+ 			branchID:       branchID,
+ 		},
+@@ -368,7 +382,11 @@ func buildBackend(cfg launcherConfig) (backend.Backend, error) {
+ 	case "memory":
+ 		return backend.NewMemoryBackend(), nil
+ 	case "xs":
+-		return xs.NewAdapter(xs.Config{Command: cfg.xsCommand}), nil
++		return xs.NewAdapter(xs.Config{
++			Command:     cfg.xsCommand,
++			Addr:        cfg.xsAddr,
++			TopicPrefix: cfg.xsTopicPrefix,
++		}), nil
+ 	default:
+ 		return nil, fmt.Errorf("%w: %q", errUnsupportedBackend, cfg.backendMode)
+ 	}
+diff --git a/internal/backend/xs/adapter.go b/internal/backend/xs/adapter.go
+index 3991188..d221b10 100644
+--- a/internal/backend/xs/adapter.go
++++ b/internal/backend/xs/adapter.go
+@@ -1,21 +1,38 @@
+ package xs
+ 
+ import (
++	"bufio"
++	"bytes"
+ 	"context"
++	"encoding/base64"
++	"encoding/json"
+ 	"errors"
++	"fmt"
+ 	"os/exec"
++	"sort"
++	"strconv"
+ 	"strings"
+ 	"sync"
++	"time"
+ 
+ 	"pancakes-harness/internal/backend"
+ 	"pancakes-harness/internal/eventlog"
+ )
+ 
+ type Config struct {
+-	Command    string
+-	HealthArgs []string
++	Command     string
++	Addr        string
++	TopicPrefix string
++	ReadLimit   int
++	HealthArgs  []string
+ }
+ 
++const (
++	defaultTopicPrefix = "pancakes-harness"
++	defaultReadLimit   = 4000
++	blobKindStored     = "blob.store"
++)
++
+ type commandRunner func(ctx context.Context, command string, args ...string) ([]byte, error)
+ 
+ type Adapter struct {
+@@ -51,6 +68,37 @@ func NewAdapter(cfg Config, opts ...Option) *Adapter {
+ 	return a
+ }
+ 
++func (a *Adapter) useExternalStore() bool {
++	return strings.TrimSpace(a.cfg.Addr) != ""
++}
++
++func (a *Adapter) addr() string {
++	return strings.TrimSpace(a.cfg.Addr)
++}
++
++func (a *Adapter) topicPrefix() string {
++	prefix := strings.TrimSpace(a.cfg.TopicPrefix)
++	if prefix == "" {
++		return defaultTopicPrefix
++	}
++	return prefix
++}
++
++func (a *Adapter) readLimit() int {
++	if a.cfg.ReadLimit > 0 {
++		return a.cfg.ReadLimit
++	}
++	return defaultReadLimit
++}
++
++func (a *Adapter) sessionTopic(sessionID string) string {
++	return fmt.Sprintf("%s.session.%s", a.topicPrefix(), normalizeToken(sessionID))
++}
++
++func (a *Adapter) blobTopic(sessionID string) string {
++	return fmt.Sprintf("%s.blob.%s", a.topicPrefix(), normalizeToken(sessionID))
++}
++
+ func (a *Adapter) AppendEvent(ctx context.Context, e eventlog.Event) error {
+ 	select {
+ 	case <-ctx.Done():
+@@ -61,6 +109,44 @@ func (a *Adapter) AppendEvent(ctx context.Context, e eventlog.Event) error {
+ 		return backend.ErrInvalidEvent
+ 	}
+ 
++	if a.useExternalStore() {
++		if _, err := a.GetEventByID(ctx, e.SessionID, e.ID); err == nil {
++			return backend.ErrDuplicateEventID
++		} else if !errors.Is(err, backend.ErrEventNotFound) {
++			return err
++		}
++
++		payload := map[string]any{
++			"kind":            e.Kind,
++			"event_id":        e.ID,
++			"session_id":      e.SessionID,
++			"branch_id":       e.BranchID,
++			"parent_event_id": e.ParentEventID,
++			"refs":            e.Refs,
++			"meta":            e.Meta,
++			"blob_ref":        e.BlobRef,
++			"timestamp":       e.TS.UTC().Format(time.RFC3339Nano),
++		}
++		meta := map[string]string{
++			"producer":   "pancakes-harness",
++			"type":       e.Kind,
++			"session_id": e.SessionID,
++			"branch_id":  e.BranchID,
++		}
++		body, err := json.Marshal(payload)
++		if err != nil {
++			return err
++		}
++		metaJSON, err := json.Marshal(meta)
++		if err != nil {
++			return err
++		}
++		if _, err := a.runXSWithInput(ctx, append(body, '\n'), "append", a.addr(), a.sessionTopic(e.SessionID), "--meta", string(metaJSON)); err != nil {
++			return err
++		}
++		return nil
++	}
++
+ 	a.mu.Lock()
+ 	defer a.mu.Unlock()
+ 	if a.byID[e.SessionID] == nil {
+@@ -84,6 +170,32 @@ func (a *Adapter) AppendBlob(ctx context.Context, ref string, payload []byte) er
+ 	if ref == "" {
+ 		return backend.ErrBlobNotFound
+ 	}
++
++	if a.useExternalStore() {
++		if _, err := a.FetchBlob(ctx, ref); err == nil {
++			return backend.ErrDuplicateBlobRef
++		} else if !errors.Is(err, backend.ErrBlobNotFound) {
++			return err
++		}
++
++		sessionID := sessionFromBlobRef(ref)
++		entry := map[string]any{
++			"kind":       blobKindStored,
++			"blob_ref":   ref,
++			"session_id": sessionID,
++			"data_b64":   base64.StdEncoding.EncodeToString(payload),
++			"timestamp":  time.Now().UTC().Format(time.RFC3339Nano),
++		}
++		body, err := json.Marshal(entry)
++		if err != nil {
++			return err
++		}
++		if _, err := a.runXSWithInput(ctx, append(body, '\n'), "append", a.addr(), a.blobTopic(sessionID)); err != nil {
++			return err
++		}
++		return nil
++	}
++
+ 	a.mu.Lock()
+ 	defer a.mu.Unlock()
+ 	if _, exists := a.blobs[ref]; exists {
+@@ -99,6 +211,20 @@ func (a *Adapter) GetEventByID(ctx context.Context, sessionID, eventID string) (
+ 		return eventlog.Event{}, ctx.Err()
+ 	default:
+ 	}
++
++	if a.useExternalStore() {
++		events, err := a.ListEventsBySession(ctx, sessionID)
++		if err != nil {
++			return eventlog.Event{}, err
++		}
++		for _, e := range events {
++			if e.ID == eventID {
++				return e, nil
++			}
++		}
++		return eventlog.Event{}, backend.ErrEventNotFound
++	}
++
+ 	a.mu.RLock()
+ 	defer a.mu.RUnlock()
+ 	s, ok := a.byID[sessionID]
+@@ -118,6 +244,25 @@ func (a *Adapter) ListEventsBySession(ctx context.Context, sessionID string) ([]
+ 		return nil, ctx.Err()
+ 	default:
+ 	}
++
++	if a.useExternalStore() {
++		raw, err := a.runXS(ctx, "cat", a.addr(), "--topic", a.sessionTopic(sessionID), "--last", strconv.Itoa(a.readLimit()))
++		if err != nil {
++			return nil, err
++		}
++		events, err := a.decodeEvents(ctx, raw, sessionID)
++		if err != nil {
++			return nil, err
++		}
++		sort.Slice(events, func(i, j int) bool {
++			if events[i].TS.Equal(events[j].TS) {
++				return events[i].ID < events[j].ID
++			}
++			return events[i].TS.Before(events[j].TS)
++		})
++		return events, nil
++	}
++
+ 	a.mu.RLock()
+ 	defer a.mu.RUnlock()
+ 	stored := a.sessions[sessionID]
+@@ -156,6 +301,42 @@ func (a *Adapter) FetchBlob(ctx context.Context, ref string) ([]byte, error) {
+ 		return nil, ctx.Err()
+ 	default:
+ 	}
++
++	if a.useExternalStore() {
++		raw, err := a.runXS(ctx, "cat", a.addr(), "--topic", a.blobTopic(sessionFromBlobRef(ref)), "--last", strconv.Itoa(a.readLimit()))
++		if err != nil {
++			return nil, err
++		}
++		s := bufio.NewScanner(bytes.NewReader(raw))
++		s.Buffer(make([]byte, 0, 64*1024), 8*1024*1024)
++		last := ""
++		for s.Scan() {
++			line := strings.TrimSpace(s.Text())
++			if line == "" {
++				continue
++			}
++			var frame map[string]any
++			if err := json.Unmarshal([]byte(line), &frame); err != nil {
++				continue
++			}
++			payload := a.extractPayload(ctx, frame)
++			if payload == nil {
++				continue
++			}
++			if asString(payload["kind"]) == blobKindStored && asString(payload["blob_ref"]) == ref {
++				last = asString(payload["data_b64"])
++			}
++		}
++		if last == "" {
++			return nil, backend.ErrBlobNotFound
++		}
++		decoded, err := base64.StdEncoding.DecodeString(last)
++		if err != nil {
++			return nil, backend.ErrBlobNotFound
++		}
++		return decoded, nil
++	}
++
+ 	a.mu.RLock()
+ 	defer a.mu.RUnlock()
+ 	data, ok := a.blobs[ref]
+@@ -189,7 +370,11 @@ func (a *Adapter) HealthCheck(ctx context.Context) backend.HealthStatus {
+ 
+ 	args := a.cfg.HealthArgs
+ 	if len(args) == 0 {
+-		args = []string{"health"}
++		if a.useExternalStore() {
++			args = []string{"version", a.addr()}
++		} else {
++			args = []string{"health"}
++		}
+ 	}
+ 	out, err := a.runCmd(ctx, command, args...)
+ 	if err != nil {
+@@ -228,6 +413,140 @@ func (a *Adapter) ClearDiagnostics() {
+ 	a.diag = nil
+ }
+ 
++func (a *Adapter) runXS(ctx context.Context, args ...string) ([]byte, error) {
++	return a.runCmd(ctx, strings.TrimSpace(a.cfg.Command), args...)
++}
++
++func (a *Adapter) runXSWithInput(ctx context.Context, input []byte, args ...string) ([]byte, error) {
++	cmd := exec.CommandContext(ctx, strings.TrimSpace(a.cfg.Command), args...)
++	if len(input) > 0 {
++		cmd.Stdin = bytes.NewReader(input)
++	}
++	out, err := cmd.CombinedOutput()
++	if err != nil {
++		return out, errors.New(strings.TrimSpace(err.Error()))
++	}
++	return out, nil
++}
++
++func (a *Adapter) decodeEvents(ctx context.Context, raw []byte, sessionID string) ([]eventlog.Event, error) {
++	out := make([]eventlog.Event, 0, 64)
++	s := bufio.NewScanner(bytes.NewReader(raw))
++	s.Buffer(make([]byte, 0, 64*1024), 8*1024*1024)
++	for s.Scan() {
++		line := strings.TrimSpace(s.Text())
++		if line == "" {
++			continue
++		}
++		var frame map[string]any
++		if err := json.Unmarshal([]byte(line), &frame); err != nil {
++			continue
++		}
++		payload := a.extractPayload(ctx, frame)
++		if payload == nil {
++			continue
++		}
++		e, ok := payloadToEvent(payload)
++		if !ok {
++			continue
++		}
++		if e.SessionID != sessionID {
++			continue
++		}
++		out = append(out, e)
++	}
++	if err := s.Err(); err != nil {
++		return nil, err
++	}
++	return out, nil
++}
++
++func (a *Adapter) extractPayload(ctx context.Context, raw any) map[string]any {
++	switch v := raw.(type) {
++	case map[string]any:
++		if _, ok := v["kind"]; ok {
++			return v
++		}
++		if hash := asString(v["hash"]); hash != "" {
++			if payload := a.fetchCASPayload(ctx, hash); payload != nil {
++				return a.extractPayload(ctx, payload)
++			}
++		}
++		for _, key := range []string{"content", "payload", "body", "data"} {
++			if nested, ok := v[key]; ok {
++				if payload := a.extractPayload(ctx, nested); payload != nil {
++					return payload
++				}
++			}
++		}
++		return v
++	case string:
++		trimmed := strings.TrimSpace(v)
++		if trimmed == "" {
++			return nil
++		}
++		var out any
++		if err := json.Unmarshal([]byte(trimmed), &out); err != nil {
++			return map[string]any{"value": trimmed}
++		}
++		return a.extractPayload(ctx, out)
++	default:
++		return nil
++	}
++}
++
++func (a *Adapter) fetchCASPayload(ctx context.Context, hash string) map[string]any {
++	out, err := a.runXS(ctx, "cas", a.addr(), hash)
++	if err != nil {
++		return nil
++	}
++	text := strings.TrimSpace(string(out))
++	if text == "" {
++		return nil
++	}
++	var payload map[string]any
++	if err := json.Unmarshal([]byte(text), &payload); err == nil {
++		return payload
++	}
++	return map[string]any{"value": text}
++}
++
++func payloadToEvent(payload map[string]any) (eventlog.Event, bool) {
++	id := firstString(payload, "event_id", "id")
++	sessionID := firstString(payload, "session_id")
++	branchID := firstString(payload, "branch_id")
++	kind := firstString(payload, "kind")
++	timestamp := firstString(payload, "timestamp", "ts")
++	if id == "" || sessionID == "" || branchID == "" || kind == "" {
++		return eventlog.Event{}, false
++	}
++	ts, err := time.Parse(time.RFC3339Nano, timestamp)
++	if err != nil {
++		ts, err = time.Parse(time.RFC3339, timestamp)
++		if err != nil {
++			ts = time.Now().UTC()
++		}
++	}
++
++	meta := map[string]any{}
++	if m, ok := payload["meta"].(map[string]any); ok {
++		meta = m
++	}
++	refs := toStringSlice(payload["refs"])
++
++	return eventlog.Event{
++		ID:            id,
++		SessionID:     sessionID,
++		TS:            ts,
++		Kind:          kind,
++		BranchID:      branchID,
++		ParentEventID: firstString(payload, "parent_event_id"),
++		Refs:          refs,
++		Meta:          meta,
++		BlobRef:       firstString(payload, "blob_ref"),
++	}, true
++}
++
+ func defaultCommandRunner(ctx context.Context, command string, args ...string) ([]byte, error) {
+ 	cmd := exec.CommandContext(ctx, command, args...)
+ 	out, err := cmd.CombinedOutput()
+@@ -265,3 +584,65 @@ func cloneDiagnostics(in []backend.Diagnostic) []backend.Diagnostic {
+ 	}
+ 	return out
+ }
++
++func firstString(m map[string]any, keys ...string) string {
++	for _, key := range keys {
++		if value := asString(m[key]); value != "" {
++			return value
++		}
++	}
++	return ""
++}
++
++func toStringSlice(v any) []string {
++	items, ok := v.([]any)
++	if !ok {
++		return nil
++	}
++	out := make([]string, 0, len(items))
++	for _, item := range items {
++		if s := asString(item); s != "" {
++			out = append(out, s)
++		}
++	}
++	return out
++}
++
++func asString(v any) string {
++	s, ok := v.(string)
++	if !ok {
++		return ""
++	}
++	return strings.TrimSpace(s)
++}
++
++func sessionFromBlobRef(ref string) string {
++	const prefix = "blob://model/"
++	if !strings.HasPrefix(ref, prefix) {
++		return "global"
++	}
++	rest := strings.TrimPrefix(ref, prefix)
++	parts := strings.SplitN(rest, "/", 2)
++	if len(parts) == 0 || strings.TrimSpace(parts[0]) == "" {
++		return "global"
++	}
++	return parts[0]
++}
++
++func normalizeToken(v string) string {
++	v = strings.ToLower(strings.TrimSpace(v))
++	if v == "" {
++		return "default"
++	}
++	v = strings.Map(func(r rune) rune {
++		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-' || r == '_' || r == '.' {
++			return r
++		}
++		return '-'
++	}, v)
++	v = strings.Trim(v, "-.")
++	if v == "" {
++		return "default"
++	}
++	return v
++}

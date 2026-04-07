@@ -17,6 +17,7 @@ in {
       ../../modules/profiles/base-node.nix
       ../../modules/services/openfang.nix
       ../../modules/services/xs.nix
+      ../../modules/services/pancakes-harness.nix
       ../../modules/services/ai-services-context.nix
       ../../modules/services/hermes-agent-local.nix
       inputs.nix-openclaw.nixosModules.openclaw-gateway
@@ -52,7 +53,7 @@ in {
     # Enable shared context materialization
     context = {
       enable = true;
-      serviceNames = ["openclaw" "nullclaw" "hermes" "xs" "openfang"];
+      serviceNames = ["openclaw" "nullclaw" "hermes" "xs" "openfang" "pancakes-harness"];
     };
     openclawGateway = {
       enable = enableOpenClaw;
@@ -100,6 +101,21 @@ in {
       sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
       sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
       stateDir = "/srv/data/ai-services/state/xs";
+    };
+    pancakesHarness = {
+      enable = true;
+      package = self.packages.${pkgs.system}.pancakes-harness;
+      workspaceRoot = "/var/lib/pancakes-harness";
+      backendMode = "xs";
+      xsTopicPrefix = "pancakes-harness";
+      bind = "127.0.0.1";
+      port = 8080;
+      modelMode = "mock";
+      # Shared context/auth/state mounts
+      contextRoot = "/srv/data/ai-services/context";
+      sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
+      sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
+      stateDir = "/srv/data/ai-services/state/pancakes-harness";
     };
   };
   services.hermes-agent-local = {

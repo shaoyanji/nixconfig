@@ -9,7 +9,7 @@ Operational differences for `thinsandy` relative to wrapper-style AI hosts.
 - Deployment style is direct AI services + nullclaw.
 
 ## Operational Interpretation
-- Use standard host deploy flow (`services:deploy:host:thinsandy`) for apply/validate.
+- Prefer canonical host deploy flow (`infra:deploy:host:thinsandy`) for apply/validate (`services:deploy:host:thinsandy` remains a compatibility alias).
 - Promotion/drift/evidence still run through shared AI host task surfaces.
 - Validation mapping is manifest-driven (`checks:nullclaw:smoke:thinsandy`).
 

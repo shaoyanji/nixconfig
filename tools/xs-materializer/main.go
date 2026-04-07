@@ -214,13 +214,19 @@ func buildPack(topic, targetID, graphRevision, specID, specVersion, policyProfil
 			openQuestions = append(openQuestions, summary)
 		case "record.append":
 			nextActions = append(nextActions, summarizeRecordAction(f))
+		case "turn.user":
+			nextActions = append(nextActions, summarizeTurnAction(f))
+		case "tool.failure", "response.invalid_schema", "packet.rejected_budget":
+			risks = append(risks, summary)
+		case "consult.request.unresolved":
+			openQuestions = append(openQuestions, summary)
 		}
 	}
 
 	sort.Strings(eventIDs)
 
 	if len(nextActions) == 0 {
-		nextActions = append(nextActions, "No actionable record.append events captured yet")
+		nextActions = append(nextActions, "No actionable turn.user or record.append events captured yet")
 	}
 	if len(constraints) == 0 {
 		constraints = append(constraints, "No explicit contract.define constraints observed")
@@ -300,11 +306,34 @@ func summarizeFrame(f frame, kind string) string {
 			v = v[:117] + "..."
 		}
 		parts = append(parts, "content="+v)
+	} else if meta, ok := f.Payload["meta"].(map[string]any); ok {
+		if v := firstString(meta, "text", "summary", "error", "task_summary", "decision"); v != "" {
+			if len(v) > 120 {
+				v = v[:117] + "..."
+			}
+			parts = append(parts, "content="+v)
+		}
 	}
 	if f.Timestamp != "" {
 		parts = append(parts, "ts="+f.Timestamp)
 	}
 	return strings.Join(parts, " ")
+}
+
+func summarizeTurnAction(f frame) string {
+	content := firstString(f.Payload, "content")
+	if content == "" {
+		if meta, ok := f.Payload["meta"].(map[string]any); ok {
+			content = firstString(meta, "text", "task_summary")
+		}
+	}
+	if content == "" {
+		return "Respond to latest user turn"
+	}
+	if len(content) > 160 {
+		content = content[:157] + "..."
+	}
+	return "Respond to user turn: " + content
 }
 
 func inferKind(f frame) string {

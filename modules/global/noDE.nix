@@ -1,13 +1,8 @@
 {
-  pkgs,
   inputs,
-  lib,
   config,
   ...
 }: {
-  # Disable opencode for container/infrastructure hosts (thinsandy, mtfuji, etc.)
-  ai.opencode.enable = lib.mkDefault false;
-
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;

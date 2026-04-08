@@ -10,6 +10,7 @@
     ../user/desktop/niri.nix
     ../dev.nix
     ../kitty
+    ../wezterm
   ];
 
   programs = {

@@ -18,7 +18,7 @@ in {
               _launch = true;
               name = "minimax-m2.5:cloud";
             };
-            "glm-5:cloud" = {
+            "glm-5.1:cloud" = {
               _launch = true;
               name = "glm-5:cloud";
             };
@@ -33,7 +33,7 @@ in {
           };
         };
       };
-      theme = "tokyonight";
+      # theme = "tokyonight";
       formatter."alejandra" = {
         command = ["alejandra"];
         extensions = [".nix"];

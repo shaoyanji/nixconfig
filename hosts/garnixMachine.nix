@@ -10,7 +10,7 @@
   nullclawLocalUpstream = "http://127.0.0.1:${toString nullclawPort}/";
   bountystashLocalUpstream = "http://127.0.0.1:${toString bountystashPort}/";
 in {
-garnix.server.enable = true; 
+  garnix.server.enable = true;
   networking.hostName = "garnixMachine";
 
   imports = [
@@ -59,9 +59,6 @@ garnix.server.enable = true;
     pkgs.jq
     pkgs.curl
     pkgs.cacert
-    pkgs.ddgr
-    pkgs.yq-go
-    pkgs.python3
   ];
 
   sops = {

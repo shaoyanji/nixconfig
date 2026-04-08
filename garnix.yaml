@@ -5,7 +5,7 @@ builds:
   # - nixosConfigurations.*
   include:
     - nixosConfigurations.garnixMachine
-    # - nixosConfigurations.testvm
+    - nixosConfigurations.thinsandy
 servers:
   - configuration: garnixMachine
     deployment:

@@ -5,7 +5,8 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+{
   imports = [
     ../../modules/config/authorized-keys.nix
     # Include the results of the hardware scan.
@@ -18,7 +19,34 @@
     # Our custom microvm network module
     ../../modules/global/microvm-network.nix
     inputs.microvm.nixosModules.host
+
+    inputs.sops-nix.nixosModules.sops
+    ../../modules/services/nullclaw-deployment.nix
+    (import ../../modules/profiles/ai-host.nix {})
   ];
+
+  sops.secrets.nullclaw-config = {
+    sopsFile = ../../secrets/nullclaw-config.json;
+    format = "json";
+    key = "";
+    owner = "nullclaw";
+    group = "nullclaw";
+    mode = "0400";
+  };
+
+  profiles.aiHost = {
+    enable = true;
+    nullclaw.enable = true;
+  };
+
+  aiServices.nullclawDeployment = {
+    enable = true;
+    mode = "config-json";
+    listenHost = "127.0.0.1";
+    listenPort = 3001;
+    workspaceRoot = "/var/lib/nullclaw";
+    configJsonSource = config.sops.secrets.nullclaw-config.path;
+  };
 
   # Use microbr bridge for VMs
   microvm.network = {

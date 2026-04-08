@@ -5,11 +5,12 @@
 }:
 stdenvNoCC.mkDerivation rec {
   pname = "nullclaw";
-  version = "2026.4.4";
+  version = "2026.4.7";
 
   src = fetchurl {
     url = "https://github.com/nullclaw/nullclaw/releases/download/v${version}/nullclaw-linux-x86_64.bin";
-    sha256 = "sha256-bPwGHSNJFST7Ma3LX7sTharJEEiS8H1YIidpOPkBWLQ=";
+    # sha256 = lib.fakeSha256;
+    sha256 = "sha256-ebEb+qm75r9xGpOh7SKoqQGjoyQ44kYeoDtliHwrf1I=";
   };
 
   dontUnpack = true;

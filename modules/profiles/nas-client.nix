@@ -17,7 +17,7 @@ in
     environment.systemPackages = [pkgs.nfs-utils];
 
     fileSystems."/Volumes/data" = {
-      device = "thinsandy.fritz.box:/data";
+      device = "192.168.178.17:/data";
       fsType = "nfs";
       options = nasAutomountOptions;
     };

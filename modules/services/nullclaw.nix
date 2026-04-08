@@ -8,30 +8,32 @@
   nullclawPkg = pkgs.callPackage ../../pkgs/nullclaw.nix {};
   aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
 in {
-  options.aiServices.nullclaw = {
-    enable = lib.mkEnableOption "NullClaw gateway service bundle";
-    host = lib.mkOption {
-      type = lib.types.str;
-      default = "127.0.0.1";
-      description = "Listen host passed to `nullclaw gateway --host`.";
-    };
-    port = lib.mkOption {
-      type = lib.types.port;
-      default = 3001;
-      description = "Listen port passed to `nullclaw gateway --port`.";
-    };
-    workspaceRoot = lib.mkOption {
-      type = lib.types.str;
-      default = "/var/lib/nullclaw";
-      description = "Root path used for nullclaw HOME, state, and workspace.";
-    };
-    environmentFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "/run/secrets/nullclaw.env";
-      description = "Optional EnvironmentFile for nullclaw service.";
-    };
-  } // aiServicesMounts.mkMountOptions "nullclaw";
+  options.aiServices.nullclaw =
+    {
+      enable = lib.mkEnableOption "NullClaw gateway service bundle";
+      host = lib.mkOption {
+        type = lib.types.str;
+        default = "127.0.0.1";
+        description = "Listen host passed to `nullclaw gateway --host`.";
+      };
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 3001;
+        description = "Listen port passed to `nullclaw gateway --port`.";
+      };
+      workspaceRoot = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/lib/nullclaw";
+        description = "Root path used for nullclaw HOME, state, and workspace.";
+      };
+      environmentFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "/run/secrets/nullclaw.env";
+        description = "Optional EnvironmentFile for nullclaw service.";
+      };
+    }
+    // aiServicesMounts.mkMountOptions "nullclaw";
 
   config = lib.mkIf cfg.enable {
     users.groups.nullclaw = {};
@@ -59,33 +61,39 @@ in {
         ++ (with pkgs; [
           curl
           cacert
+          jq
+          yq-go
+          ddgr
         ]);
       serviceConfig = let
         mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
         sharedEnvFiles = mountConfig.EnvironmentFile or [];
         allEnvFiles = sharedEnvFiles ++ lib.optionals (cfg.environmentFile != null) [cfg.environmentFile];
-      in {
-        User = "nullclaw";
-        Group = "nullclaw";
-        WorkingDirectory = cfg.workspaceRoot;
-        ExecStart = "${nullclawPkg}/bin/nullclaw gateway --host ${cfg.host} --port ${toString cfg.port}";
-        Restart = "always";
-        RestartSec = "5s";
+      in
+        {
+          User = "nullclaw";
+          Group = "nullclaw";
+          WorkingDirectory = cfg.workspaceRoot;
+          ExecStart = "${nullclawPkg}/bin/nullclaw gateway --host ${cfg.host} --port ${toString cfg.port}";
+          Restart = "always";
+          RestartSec = "5s";
 
-        Environment = [
-          "HOME=${cfg.workspaceRoot}"
-          "NULLCLAW_HOME=${cfg.workspaceRoot}/.nullclaw"
-          "NULLCLAW_WORKSPACE=${cfg.workspaceRoot}/workspace"
-        ];
+          Environment = [
+            "HOME=${cfg.workspaceRoot}"
+            "NULLCLAW_HOME=${cfg.workspaceRoot}/.nullclaw"
+            "NULLCLAW_WORKSPACE=${cfg.workspaceRoot}/workspace"
+          ];
 
-        NoNewPrivileges = true;
-        PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = false;
-        ReadWritePaths = [cfg.workspaceRoot];
-      } // mountConfig // lib.optionalAttrs (allEnvFiles != []) {
-        EnvironmentFile = allEnvFiles;
-      };
+          NoNewPrivileges = true;
+          PrivateTmp = true;
+          ProtectSystem = "strict";
+          ProtectHome = false;
+          ReadWritePaths = [cfg.workspaceRoot];
+        }
+        // mountConfig
+        // lib.optionalAttrs (allEnvFiles != []) {
+          EnvironmentFile = allEnvFiles;
+        };
     };
   };
 }

@@ -13,11 +13,7 @@
   boot.initrd.kernelModules = [];
   boot.kernelModules = ["kvm-amd"];
   boot.extraModulePackages = [];
-  fileSystems."/var/lib/nullclaw" = {
-    device = "/dev/disk/by-uuid/3829936d-db07-4b77-b89a-46a2476578ce";
-    fsType = "btrfs";
-    options = ["subvol=nix/nullclaw" "compress=zstd" "noatime"];
-  };
+
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/308add6c-175e-4753-ad5b-30784c97ea67";
     fsType = "f2fs";

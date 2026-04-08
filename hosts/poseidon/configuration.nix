@@ -25,13 +25,10 @@
     (import ../../modules/profiles/ai-host.nix {})
   ];
 
-  sops.secrets.nullclaw-config = {
-    sopsFile = ../../secrets/nullclaw-config.json;
-    format = "json";
-    key = "";
-    owner = "nullclaw";
-    group = "nullclaw";
-    mode = "0400";
+  sops.secrets.ai-services-shared-env = {
+    owner = "root";
+    group = "root";
+    mode = "0444";
   };
 
   profiles.aiHost = {
@@ -41,11 +38,11 @@
 
   aiServices.nullclawDeployment = {
     enable = true;
-    mode = "config-json";
+    mode = "env-file";
     listenHost = "127.0.0.1";
     listenPort = 3001;
     workspaceRoot = "/var/lib/nullclaw";
-    configJsonSource = config.sops.secrets.nullclaw-config.path;
+    environmentFile = config.sops.secrets."ai-services-shared-env".path;
   };
 
   # Use microbr bridge for VMs

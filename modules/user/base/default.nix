@@ -33,8 +33,6 @@ in {
       readPkgList ../../../pkg.txt
       ++ [
         gokrazy
-        pi-coding-agent
-        geminicommit
         http-nu
         aha
         tesseract
@@ -120,7 +118,6 @@ in {
         obsidian-export
       ]
       ++ lib.optionals stdenv.isLinux [
-        qwen-code
         newsboat
         tuir
         gitmoji-cli

@@ -13,6 +13,7 @@
 in {
   imports =
     [
+      ../../modules/services/hermes-agent-local.nix
       ../../modules/services/openfang.nix
       ../../modules/services/xs.nix
       ../../modules/services/pancakes-harness.nix

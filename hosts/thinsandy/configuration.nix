@@ -123,11 +123,11 @@ in {
     stateDir = "/var/lib/hermes";
     settings = {
       model = {
-        provider = "openrouter";
-        default = "qwen/qwen3.6-plus:free";
-        context_length = 1000000;
-        # provider = "custom";
-        # default = "qwen/qwen3-coder-480b-a35b-instruct";
+        # provider = "openrouter";
+        # default = "qwen/qwen3.6-plus:free";
+        # context_length = 1000000;
+        provider = "custom";
+        default = "qwen/qwen3-coder-480b-a35b-instruct";
       };
       terminal = {
         backend = "local";

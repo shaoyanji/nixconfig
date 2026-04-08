@@ -7,9 +7,9 @@
   imports = [
     ./minimal.nix
     ../shell
-    ../wezterm
   ];
 
+  programs.nixvim.enable = true;
   home.packages = with pkgs;
     [
       a2ps
@@ -70,5 +70,8 @@
       m-cli
     ];
 
+  sessionVariables = {
+    EDITOR = lib.mkDefault "nvim";
+  };
   programs.home-manager.enable = true;
 }

@@ -7,7 +7,7 @@
   imports = [
     ./minimal.nix
     ../shell
-    ../user/ai/opencode.nixi # too bloated
+    ../user/ai/opencode.nix # too bloated
   ];
 
   programs.nixvim.enable = true;
@@ -71,7 +71,7 @@
       m-cli
     ];
 
-  sessionVariables = {
+  home.sessionVariables = {
     EDITOR = lib.mkDefault "nvim";
   };
   programs.home-manager.enable = true;

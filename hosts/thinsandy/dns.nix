@@ -29,10 +29,10 @@
         upstreams = ["127.0.0.1#5335"];
         # listeningMode = "LOCAL";
         listeningMode = "ALL";
-        # interface = "eno1";
+        interface = "eno1";
       };
       # misc.dnsmasq_lines = ["interface=tailscale0"];
-      webserver.api.cli_pw = true;
+      # webserver.api.cli_pw = true;
     };
   };
 

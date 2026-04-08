@@ -137,7 +137,7 @@ in {
       options = ["subvol=nix/nullclaw" "compress=zstd" "noatime"];
     };
     "/var/lib/nullclaw/workspace/share" = {
-      device = "/srv/data/openclaw";
+      device = "/Volumes/data/openclaw";
       fsType = "btrfs";
       options = ["bind"];
     };

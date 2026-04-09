@@ -123,8 +123,6 @@
         "guest ok" = "yes";
         "create mask" = "0644";
         "directory mask" = "0755";
-        #"force user" = "devji";
-        #"force group" = "";
       };
       "private" = {
         "path" = "/export/private";

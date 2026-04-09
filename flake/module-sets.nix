@@ -5,8 +5,22 @@
     }
     ../modules/global/global.nix
   ];
+  # Canonical home-manager sharedModules used by embedded (NixOS/macOS) configs.
+  hmSharedModules = [
+    inputs.sops-nix.homeManagerModules.sops
+    inputs.kickstart-nixvim.homeManagerModules.default
+    inputs.nix-index-database.homeModules.nix-index
+    inputs.dms.homeModules.dank-material-shell
+    inputs.dms.homeModules.niri
+  ];
+  # Minimal sharedModules for home-manager-only (standalone) configs.
+  hmSharedModulesHome = [
+    inputs.kickstart-nixvim.homeManagerModules.default
+    inputs.sops-nix.homeManagerModules.sops
+    inputs.nix-index-database.homeModules.nix-index
+  ];
 in rec {
-  inherit globalModules;
+  inherit globalModules hmSharedModules hmSharedModulesHome;
   globalModulesNixos =
     globalModules
     ++ [
@@ -41,9 +55,5 @@ in rec {
       inputs.home-manager.nixosModules.default
       inputs.nix-index-database.nixosModules.nix-index
     ];
-  globalModulesHome = [
-    inputs.kickstart-nixvim.homeManagerModules.default
-    inputs.sops-nix.homeManagerModules.sops
-    inputs.nix-index-database.homeModules.nix-index
-  ];
+  globalModulesHome = hmSharedModulesHome;
 }

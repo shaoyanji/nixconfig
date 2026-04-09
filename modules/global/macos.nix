@@ -1,3 +1,5 @@
+# macOS (nix-darwin) home-manager configuration.
+# Primary user constants: modules/global/user.nix
 {inputs, ...}: {
   home-manager = {
     useGlobalPkgs = true;

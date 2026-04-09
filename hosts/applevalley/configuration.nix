@@ -21,7 +21,7 @@
   # Define on which hard drive you want to install Grub.
   #boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
 
-  networking.hostName = "applevalley"; # Define your hostname.
+  networking.hostName = "applevalley";
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   environment.systemPackages = with pkgs; [
@@ -50,5 +50,5 @@
   # networking.firewall.allowedUDPPorts = [
   #   8472 # k3s, flannel: required if using multi-node for inter-node networking
   # ];
-  system.stateVersion = "24.11"; # Did you read the comment?
+  system.stateVersion = "24.11";
 }

@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   pkgs,
   lib,
@@ -9,37 +8,23 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../modules/profiles/base-desktop-environment.nix
+    (import ../../modules/profiles/grub-boot.nix {inherit lib; device = "/dev/sda";})
   ];
-  boot.loader = {
-    systemd-boot.enable = lib.mkForce false;
-    efi.canTouchEfiVariables = lib.mkForce false;
-    grub = {
-      device = "/dev/sda";
-      #      enableCryptodisk = true;
-      #      useOSProber = true;
-      enable = true;
-    };
-  };
-  networking.hostName = "aceofspades"; # Define your hostname.
+  networking.hostName = "aceofspades";
   services.xserver.videoDrivers = ["amdgpu"];
 
   hardware.graphics.extraPackages = [
     pkgs.mesa.opencl
   ];
-  system.stateVersion = "24.05"; # Did you read the comment?
+  system.stateVersion = "24.05";
   services = {
     displayManager = {
       sddm = {
         enable = true;
         wayland.enable = true;
       };
-      #    xserver.digimend.enable = true;
     };
-
-    # scx.enable = lib.mkForce false;
   };
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  environment.systemPackages = with pkgs; [
-    # config.boot.kernelPackages.digimend
-  ];
+  environment.systemPackages = with pkgs; [];
 }

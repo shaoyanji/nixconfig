@@ -1,26 +1,24 @@
+# NixOS home-manager embedded configuration.
+# Primary user constants: modules/global/user.nix
 {
   config,
   pkgs,
   inputs,
   ...
 }: {
+  imports = [
+    ./home-manager-shared.nix
+  ];
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    backupFileExtension = "hm-backup"; #for rebuild
+    backupFileExtension = "hm-backup";
     users.devji = {
       imports = [
         ../roles/heim.nix
       ];
     };
-    sharedModules = [
-      inputs.sops-nix.homeManagerModules.sops
-      inputs.kickstart-nixvim.homeManagerModules.default
-      inputs.nix-index-database.homeModules.nix-index
-      # inputs.niri.homeModules.niri
-      inputs.dms.homeModules.dank-material-shell
-      inputs.dms.homeModules.niri
-    ];
-    extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
+    extraSpecialArgs = {inherit inputs;};
   };
 }

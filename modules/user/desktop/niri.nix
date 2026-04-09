@@ -68,6 +68,7 @@
       "Mod+Print".action.screenshot-screen = {show-pointer = false;};
       "Mod+A".action.spawn = "fuzzel";
       "Mod+T".action.spawn-sh = "kitty -- tmux";
+      "Mod+Y".action.spawn = ["dms" "ipc" "tmux" "toggle"];
 
       "Mod+Z".action.spawn = "zen-beta";
       "Mod+C".action.spawn-sh = "kitty -- task";

@@ -13,24 +13,23 @@
     ../../modules/profiles/laptop.nix
     ../../modules/global/microvm-network.nix
     inputs.microvm.nixosModules.host
+    (import ../../modules/profiles/microvm-host.nix {
+      inherit pkgs;
+      natExternalInterface = "wlp3s0";
+    })
+    (import ../../modules/profiles/grub-boot.nix {inherit lib; device = "nodev";})
   ];
 
   services.ollama = {
     enable = true;
-    # acceleration = "cuda";
     host = "0.0.0.0";
     openFirewall = true;
     environmentVariables = {
       OLLAMA_ORIGINS = "moz-extension://*,chrome-extension://*,safari-web-extension://*";
     };
-    # models = "/Volumes/data/ollama";
   };
-  # Use microbr bridge for VMs
-  microvm.network = {
-    enable = true;
-    bridgeName = "microbr";
-    externalInterface = "eno1";
-  };
+
+  # microvm-host.nix provides microvm.network, bridge profile, NAT, and firewall.
   microvm.vms = {
     testvm = {
       config = {
@@ -57,73 +56,11 @@
     };
   };
 
-  # NetworkManager bridge configuration using NixOS options
-  networking.networkmanager.ensureProfiles.profiles = {
-    "microbr" = {
-      connection = {
-        id = "microbr";
-        type = "bridge";
-        interface-name = "microbr";
-        autoconnect = true;
-      };
-      bridge = {
-        stp = false;
-        forward-delay = 0;
-      };
-      ipv4 = {
-        method = "manual";
-        address1 = "192.168.83.1/24";
-      };
-      ipv6 = {
-        method = "disabled";
-      };
-    };
-  };
-
-  # Auto-add microvm* interfaces to microbr bridge
-  environment.etc."NetworkManager/dispatcher.d/10-microvm-bridge".text = ''
-    #!/usr/bin/env bash
-    INTERFACE="$1"
-    ACTION="$2"
-    if [[ "$ACTION" == "up" ]] && [[ "$INTERFACE" == microvm* ]]; then
-      sleep 1
-      if ! ${pkgs.iproute2}/bin/ip link show "$INTERFACE" | grep -q "master microbr"; then
-         ${pkgs.iproute2}/bin/ip link set "$INTERFACE" master microbr
-      fi
-    fi
-  '';
-  environment.etc."NetworkManager/dispatcher.d/10-microvm-bridge".mode = "0755";
-
-  # NAT for VM network - use wlp3s0 (WiFi) as external interface
-  networking.nat = {
-    enable = true;
-    internalInterfaces = ["microbr"];
-    externalInterface = "wlp3s0";
-  };
-  networking.firewall.trustedInterfaces = ["microbr"];
-  # end of microvm config
-
   home-manager.users.devji.home.sessionVariables.EDITOR = lib.mkForce "nvim";
-  boot = {
-    kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
-  };
-  boot.loader = {
-    systemd-boot.enable = lib.mkForce false;
-    efi.canTouchEfiVariables = lib.mkForce false;
-    grub = {
-      device = "nodev";
-      #      enableCryptodisk = true;
-      #      useOSProber = true;
-      enable = true;
-    };
-  };
-  networking.hostName = "ancientace"; # Define your hostname.
-  #services.xserver.videoDrivers = ["amdgpu"];
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+  networking.hostName = "ancientace";
 
-  hardware.graphics.extraPackages = [
-    #    pkgs.mesa.opencl
-  ];
-  #  system.stateVersion = "24.11"; # Did you read the comment?
+  hardware.graphics.extraPackages = [];
   services = {
     displayManager = {
       sddm = {

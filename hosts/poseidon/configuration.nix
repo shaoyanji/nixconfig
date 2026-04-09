@@ -23,6 +23,10 @@
     inputs.sops-nix.nixosModules.sops
     ../../modules/services/nullclaw-deployment.nix
     (import ../../modules/profiles/ai-host.nix {})
+    (import ../../modules/profiles/microvm-host.nix {
+      inherit pkgs;
+      natExternalInterface = "wlp4s0";
+    })
   ];
 
   sops.secrets.ai-services-shared-env = {
@@ -45,12 +49,7 @@
     environmentFile = config.sops.secrets."ai-services-shared-env".path;
   };
 
-  # Use microbr bridge for VMs
-  microvm.network = {
-    enable = true;
-    bridgeName = "microbr";
-    externalInterface = "eno1";
-  };
+  # Use microbr bridge for VMs (configured by microvm-host.nix)
   microvm.vms = {
     testvm = {
       config = {
@@ -77,67 +76,14 @@
     };
   };
   boot = {
-    #extraModulePackages = with config.boot.kernelPackages; [v4l2loopback.out];
-    # kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
     kernelPackages = lib.mkForce pkgs.linuxPackages_zen;
-    kernelModules = [
-      # "libwacom"
-      #  "v4l2loopback"
-    ];
-    #extraModprobeConfig = ''
-    #  options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
-    #'';
+    kernelModules = [];
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
   };
   networking.hostName = "poseidon";
-
-  # NetworkManager bridge configuration using NixOS options
-  networking.networkmanager.ensureProfiles.profiles = {
-    "microbr" = {
-      connection = {
-        id = "microbr";
-        type = "bridge";
-        interface-name = "microbr";
-        autoconnect = true;
-      };
-      bridge = {
-        stp = false;
-        forward-delay = 0;
-      };
-      ipv4 = {
-        method = "manual";
-        address1 = "192.168.83.1/24";
-      };
-      ipv6 = {
-        method = "disabled";
-      };
-    };
-  };
-
-  # Auto-add microvm* interfaces to microbr bridge
-  environment.etc."NetworkManager/dispatcher.d/10-microvm-bridge".text = ''
-    #!/usr/bin/env bash
-    INTERFACE="$1"
-    ACTION="$2"
-    if [[ "$ACTION" == "up" ]] && [[ "$INTERFACE" == microvm* ]]; then
-      sleep 1
-      if ! ${pkgs.iproute2}/bin/ip link show "$INTERFACE" | grep -q "master microbr"; then
-        ${pkgs.iproute2}/bin/ip link set "$INTERFACE" master microbr
-      fi
-    fi
-  '';
-  environment.etc."NetworkManager/dispatcher.d/10-microvm-bridge".mode = "0755";
-
-  # NAT for VM network - use wlp4s0 (WiFi) as external interface
-  networking.nat = {
-    enable = true;
-    internalInterfaces = ["microbr"];
-    externalInterface = "wlp4s0";
-  };
-  networking.firewall.trustedInterfaces = ["microbr"];
 
   environment = {
     systemPackages = with pkgs; [
@@ -153,37 +99,15 @@
       moonlight-qt
     ];
   };
-  # services.transfer-sh = {
 
   users.groups.libvirtd.members = ["devji"];
 
   virtualisation.libvirtd.enable = true;
 
   virtualisation.spiceUSBRedirection.enable = true;
-  # programs.adb.enable = true;
   users.users.devji.extraGroups = ["adbusers" "kvm" "libvirtd"];
-  services.udev.packages = [
-    # pkgs.android-udev-rules
-  ];
-  #  dconf.settings = {
-  #    "org/virt-manager/virt-manager/connections" = {
-  #      autoconnect = ["qemu:///system"];
-  #      uris = ["qemu:///system"];
-  #    };
-  #  };
+  services.udev.packages = [];
 
-  #  users.users.devji.extraGroups = ["libvirtd"];
-  # services.qemuGuest.enable = true;
-  # services.spice-vdagentd.enable = true; # enable copy and paste between host and guest
-
-  # SUNSHINE:
-
-  # services.sunshine = {
-  #   enable = true;
-  #   autoStart = true;
-  #   capSysAdmin = true;
-  #   openFirewall = true;
-  # };
   services.avahi.publish.enable = true;
   services.avahi.publish.userServices = true;
   systemd.user.services.niri-flake-polkit.enable = false;
@@ -211,13 +135,7 @@
 // {
   system.stateVersion = "25.11";
   nixpkgs.config = {
-    allowUnfree = true;
     nvidia.acceptLicense = true;
     cudaSupport = true;
   };
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      # "crush"
-    ];
-  # nixpkgs.config.allowUnfree = true;
 }

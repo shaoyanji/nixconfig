@@ -5,6 +5,7 @@ builds:
   # - nixosConfigurations.*
   include:
     - nixosConfigurations.garnixMachine
+    - nixosConfigurations.*
 servers:
   - configuration: garnixMachine
     deployment:

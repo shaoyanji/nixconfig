@@ -3,7 +3,6 @@
   lib,
   pkgs,
   inputs,
-  self,
   ...
 }: let
   enableHermes = true;
@@ -11,6 +10,7 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./nvidia.nix
+    ../../modules/profiles/base-node.nix
     (import ../../modules/profiles/ai-host.nix {})
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/ai-services-context.nix
@@ -19,29 +19,6 @@ in {
   ];
 
   networking.hostName = "kellerbench";
-
-  home-manager.users.devji.home = {
-    username = lib.mkForce "devji";
-    homeDirectory = lib.mkForce "/home/devji";
-  };
-
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  services.openssh = {
-    enable = true;
-    settings = {
-      PermitRootLogin = "no";
-      PasswordAuthentication = false;
-    };
-    openFirewall = true;
-  };
-
-  users.groups.devji = {};
-  users.users.devji = {
-    isNormalUser = lib.mkForce true;
-    group = lib.mkForce "devji";
-  };
 
   profiles.aiHost = {
     enable = true;
@@ -101,8 +78,6 @@ in {
       ] ++ config.services.hermes-agent.environmentFiles;
     };
 
-  sops.defaultSopsFile = ../../modules/secrets.yaml;
-
   sops.secrets.hermes = {
     owner = "hermes";
     group = "hermes";
@@ -111,7 +86,6 @@ in {
 
   services.ollama = {
     enable = true;
-    # Keep Ollama local-first; this node is for constrained benchmark runs, not public serving.
     package = pkgs.ollama-cuda;
     host = "127.0.0.1";
     openFirewall = false;
@@ -131,7 +105,6 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    curl
     jq
   ];
 

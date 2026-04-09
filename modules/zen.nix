@@ -102,5 +102,5 @@
         #
       };
     };
-  }; # nixpkgs.config.allowUnfree = true;
+  };
 }

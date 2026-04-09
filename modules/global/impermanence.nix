@@ -4,51 +4,36 @@
   inputs,
   ...
 }: {
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "hm-backup"; #for rebuild
-    users.devji = {
-      imports = [
-        # inputs.impermanence.nixosModules.home-manager.impermanence
-        ../roles/heim.nix
+  # Note: home-manager settings (useGlobalPkgs, sharedModules, etc.) are
+  # provided by globalModulesNixos → nixos.nix.  This module only adds
+  # impermanence persistence rules for the devji user.
+  home-manager.users.devji.home = {
+    stateVersion = "25.05";
+
+    persistence."/persist/home" = {
+      directories = [
+        "Downloads"
+        "Music"
+        "Pictures"
+        "Documents"
+        "Videos"
+        ".ssh"
+        ".supermaven"
+        ".local/share/keyrings"
+        ".local/share/direnv"
+        ".config/direnv"
+        ".config/btop"
+        ".config/elvish/lib"
+        ".config/obsidian"
+        ".zen"
+        {
+          directory = ".local/share/Steam";
+        }
       ];
-
-      home.stateVersion = "25.05"; # Please read the comment before changing.
-
-      home.persistence."/persist/home" = {
-        directories = [
-          "Downloads"
-          "Music"
-          "Pictures"
-          "Documents"
-          "Videos"
-          ".ssh"
-          ".supermaven"
-          ".local/share/keyrings"
-          ".local/share/direnv"
-          ".config/direnv"
-          ".config/btop"
-          ".config/elvish/lib"
-          ".config/obsidian"
-          ".zen"
-          {
-            directory = ".local/share/Steam";
-            # method = "symlink";
-          }
-        ];
-        files = [
-          ".config/sops/age/keys.txt"
-          "nixconfig"
-        ];
-        # allowOther = true;
-      };
+      files = [
+        ".config/sops/age/keys.txt"
+        "nixconfig"
+      ];
     };
-    sharedModules = [
-      # inputs.kickstart-nixvim.homeManagerModules.default
-      # inputs.nix-index-database.homeModules.nix-index
-      inputs.sops-nix.homeManagerModules.sops
-    ];
-    extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
   };
 }

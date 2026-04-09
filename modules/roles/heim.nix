@@ -1,3 +1,5 @@
+# devji user desktop/home preferences.
+# Primary user constants: modules/global/user.nix
 {
   lib,
   pkgs,

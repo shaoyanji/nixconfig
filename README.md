@@ -11,6 +11,19 @@ Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style containe
 - `pkgs/*`: package definitions.
 - `docs/*`: operator and architecture references.
 
+## Module chains
+
+Module chains compose as follows:
+
+```
+globalModulesNixos      → global → nixos → home-manager-shared → role:heim
+globalModulesImpermanence → globalModulesNixos → +impermanence module
+globalModulesContainers  → global → noDE (lean home-manager, no dms/niri)
+globalModulesMacos       → global → macos (nix-darwin, no dms/niri)
+```
+
+`base-node.nix` (profile) provides the common NixOS baseline: kernel packages, SSH, keyd, networkmanager, console, sops, user `devji`, common dev packages, and boot loader defaults (systemd-boot + EFI). Container and desktop hosts import it via `globalModulesContainers` or `desktop-client.nix`.
+
 ## Flake outputs
 
 - `nixosConfigurations`

@@ -4,10 +4,6 @@
   lib,
   ...
 }: {
-  imports = [
-    ./unfree.nix
-  ];
-
   nix = {
     gc = {
       automatic = true;
@@ -55,7 +51,5 @@
     ];
   };
 
-  nixpkgs.config = {
-    allowUnfree = true;
-  };
+  nixpkgs.config.allowUnfree = true;
 }

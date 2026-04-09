@@ -1,7 +1,0 @@
-{
-  ...
-}: {
-  imports = [
-    ./desktop-client.nix
-  ];
-}

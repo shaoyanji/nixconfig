@@ -20,9 +20,6 @@
     useRoutingFeatures = "both";
   };
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
   networking.hostName = "mtfuji";
 
   system.stateVersion = "25.05";

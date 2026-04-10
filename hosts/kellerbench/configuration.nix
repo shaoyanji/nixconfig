@@ -8,6 +8,10 @@
   enableHermes = true;
 in {
   imports = [
+    (import ../../modules/profiles/grub-boot.nix {
+      inherit lib;
+      device = "nodev";
+    })
     ./hardware-configuration.nix
     ./nvidia.nix
     ../../modules/profiles/base-node.nix
@@ -17,6 +21,10 @@ in {
     ../../modules/services/hermes-agent-local.nix
     inputs.hermes-agent.nixosModules.default
   ];
+
+  # boot.loader.grub.enable = lib.mkForce true;
+  # boot.loader.grub.device = lib.mkForce "/dev/sda";
+  # boot.loader.grub.useOSProber = lib.mkForce true;
 
   networking.hostName = "kellerbench";
 
@@ -64,19 +72,20 @@ in {
   };
 
   # Host-level override for Hermes to mount shared context/state
-  systemd.services.hermes-agent.serviceConfig =
-    {
-      BindReadOnlyPaths = [
-        "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
-        "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
-      ];
-      BindPaths = [
-        "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
-      ];
-      EnvironmentFile = [
+  systemd.services.hermes-agent.serviceConfig = {
+    BindReadOnlyPaths = [
+      "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
+      "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
+    ];
+    BindPaths = [
+      "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
+    ];
+    EnvironmentFile =
+      [
         "-/srv/data/ai-services/defaults/shared.env"
-      ] ++ config.services.hermes-agent.environmentFiles;
-    };
+      ]
+      ++ config.services.hermes-agent.environmentFiles;
+  };
 
   sops.secrets.hermes = {
     owner = "hermes";
@@ -108,5 +117,13 @@ in {
     jq
   ];
 
+  users.users.devji = {
+    isNormalUser = true;
+    description = "matt";
+    extraGroups = ["networkmanager" "wheel"];
+    packages = with pkgs; [];
+  };
+
+  services.openssh.enable = true;
   system.stateVersion = "25.05";
 }

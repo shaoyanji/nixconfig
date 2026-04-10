@@ -3,7 +3,9 @@
 #
 # NOTE: sharedModules intentionally do NOT import home-manager-shared.nix
 # because container hosts should not pull in dms/niri desktop modules.
-{
+let
+  user = import ./user.nix;
+in {
   inputs,
   config,
   ...
@@ -12,13 +14,13 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
-    users.devji = {
+    users.${user.name} = {
       imports = [
         ../roles/minimal.nix
         ../shell
       ];
-      home.username = "devji";
-      home.homeDirectory = "/home/devji";
+      home.username = user.name;
+      home.homeDirectory = user.home;
     };
     sharedModules = [
       inputs.sops-nix.homeManagerModules.sops

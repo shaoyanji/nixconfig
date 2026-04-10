@@ -6,12 +6,12 @@
 }: let
   nixNAS = "/Volumes/data";
   hostName = config.networking.hostName or null;
-  isGuckloch = hostName == "guckloch";
+  noSymlinkHosts = ["guckloch" "thinsandy"];
   cfg = config.nixoshmsymlinks;
 in {
   options.nixoshmsymlinks = {
     enable = lib.mkEnableOption "NAS-backed home directory symlinks" // {
-      default = !isGuckloch;
+      default = !(builtins.elem hostName noSymlinkHosts);
     };
   };
 

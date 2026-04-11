@@ -22,10 +22,6 @@ in {
     inputs.hermes-agent.nixosModules.default
   ];
 
-  # boot.loader.grub.enable = lib.mkForce true;
-  # boot.loader.grub.device = lib.mkForce "/dev/sda";
-  # boot.loader.grub.useOSProber = lib.mkForce true;
-
   networking.hostName = "kellerbench";
 
   profiles.aiHost = {
@@ -96,7 +92,7 @@ in {
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cuda;
-    host = "127.0.0.1";
+    host = "0.0.0.0";
     openFirewall = false;
   };
 

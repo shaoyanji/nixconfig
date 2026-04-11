@@ -15,9 +15,13 @@
   ];
 
   # Tailscale for mesh networking
-  services.tailscale = {
-    enable = true;
-    useRoutingFeatures = "both";
+  services = {
+    tailscale = {
+      enable = true;
+      useRoutingFeatures = "both";
+    };
+    resolved.enable = true;
+    resolved.settings.Resolve.Domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
   };
 
   networking.hostName = "mtfuji";

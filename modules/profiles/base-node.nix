@@ -9,6 +9,7 @@
   imports = [
     ../../modules/config/authorized-keys.nix
     inputs.sops-nix.nixosModules.sops
+    ./firewall-baseline.nix
   ];
 
   boot = {

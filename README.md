@@ -23,6 +23,22 @@ globalModulesMacos       → global → macos (nix-darwin, no dms/niri)
 ```
 
 `base-node.nix` (profile) provides the common NixOS baseline: kernel packages, SSH, keyd, networkmanager, console, sops, user `devji`, common dev packages, and boot loader defaults (systemd-boot + EFI). Container and desktop hosts import it via `globalModulesContainers` or `desktop-client.nix`.
+`base-node.nix` also imports `modules/profiles/firewall-baseline.nix`, which enables the firewall and only opens TCP/22 by default. Hosts should add service/interface-specific allowances explicitly.
+
+## Add a host
+
+1. Add a host module under `hosts/<name>/configuration.nix` (or `hosts/<name>.nix` for simple cases).
+2. Add hardware/storage modules as needed (for example `hardware-configuration.nix`, `disko.nix`, or profile imports).
+3. Register the host entry in `flake/host-inventory.nix` with:
+   - target platform (`system`)
+   - module chain (`globalModulesNixos`, `globalModulesImpermanence`, `globalModulesContainers`, etc.)
+   - host module path(s)
+4. Let `flake/host-projection.nix` project inventory data into outputs (no manual output wiring needed).
+5. Build/check through the Task control plane (`Taskfile.yml` + `taskfiles/*`) and then switch on the target host.
+
+## Pinning and updates
+
+`nixpkgs` and all inputs are pinned via `flake.lock`. Update intentionally with lockfile bumps (for example `nix flake update` or targeted input updates), then review and commit `flake.lock` with the corresponding config changes.
 
 ## Flake outputs
 

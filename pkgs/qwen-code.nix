@@ -7,15 +7,14 @@
 }:
 buildNpmPackage rec {
   pname = "qwen-code";
-  version = "0.13.2";
+  version = "0.14.3";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     rev = "v${version}";
-    hash = "sha256-eDNaEjHdW6Xr+YQNdNoASe4qqt9PeSojnUfVQROz5Cw=";
+    hash = "sha256-05hiad8aid4aw16py0rjz2mqzz0s54j71zn9r3vkpwxgjz0nbmj6=";
   };
-
   npmDepsHash = "sha256-eGqLW0KStAXAEJRv5Ob/nJJRjIZVLNUBjIdokUrgwFw=";
   nativeBuildInputs = [makeWrapper];
 

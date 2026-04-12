@@ -169,6 +169,8 @@ in {
       ]
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         glances # Cross-platform system monitor
+        nurl
+        python3
       ]
       ++ lib.optionals stdenv.isDarwin [];
 

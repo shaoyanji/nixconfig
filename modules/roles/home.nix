@@ -47,6 +47,7 @@
       iotop
     ]
     ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+      skills
       keypunch
       qalculate-qt
       thunderbird-bin

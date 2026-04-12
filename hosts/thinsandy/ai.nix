@@ -123,7 +123,7 @@ in {
         context_length = 260000;
         provider = "custom";
         # default = "qwen/qwen3.5-397b-a17b";
-        default = "minimax-m2.7";
+        default = "minimaxai/minimax-m2.7";
       };
       terminal = {
         backend = "local";

@@ -91,9 +91,13 @@
     git
     wget
     nixpkgs-fmt
-    nurl
-    python3
   ];
+
+  # Fixes TERM mismatches when SSHing from kitty/ghostty/xterm-kitty.
+  # Safe on desktops: kitty/ghostty override TERM themselves on launch.
+  environment.sessionVariables = {
+    TERM = "xterm-256color";
+  };
 
   environment.localBinInPath = true;
   zramSwap.enable = true;

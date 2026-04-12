@@ -5,11 +5,11 @@
 }:
 stdenvNoCC.mkDerivation rec {
   pname = "openfang";
-  version = "0.5.5";
+  version = "0.5.9";
 
   src = fetchurl {
     url = "https://github.com/RightNow-AI/openfang/releases/download/v${version}/openfang-x86_64-unknown-linux-gnu.tar.gz";
-    sha256 = "sha256-V9fhoZI+xXSzekzNr4PZ5WuecIbzVK5WaEiPeFcxqb0=";
+    sha256 = "sha256-ZDaGfTb3o9opWpitRTew0wbNwrusALxB+gK8wtqQZxI=";
   };
 
   dontUnpack = true;

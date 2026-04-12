@@ -120,9 +120,10 @@ in {
         # provider = "openrouter";
         # default = "nvidia/nemotron-3-super-120b-a12b:free";
         # context_length = 1000000;
-        context_length = 130000;
+        context_length = 260000;
         provider = "custom";
-        default = "qwen/qwen3.5-397b-a17b";
+        # default = "qwen/qwen3.5-397b-a17b";
+        default = "minimax-m2.7";
       };
       terminal = {
         backend = "local";

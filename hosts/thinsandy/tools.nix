@@ -12,6 +12,7 @@
     ]);
 
   commonTools = with pkgs; [
+    skills
     gemini-cli
     qwen-code
     codex

@@ -166,4 +166,7 @@ in {
     ];
     # models = "/Volumes/data/ollama";
   };
+  environment.systemPackages = with pkgs; [
+    skills
+  ];
 }

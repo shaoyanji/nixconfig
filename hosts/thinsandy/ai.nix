@@ -118,7 +118,7 @@ in {
     settings = {
       model = {
         # provider = "openrouter";
-        # default = "qwen/qwen3.6-plus:free";
+        # default = "nvidia/nemotron-3-super-120b-a12b:free";
         # context_length = 1000000;
         context_length = 130000;
         provider = "custom";

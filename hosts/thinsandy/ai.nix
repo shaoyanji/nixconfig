@@ -120,10 +120,12 @@ in {
         # provider = "openrouter";
         # default = "nvidia/nemotron-3-super-120b-a12b:free";
         # context_length = 1000000;
-        context_length = 260000;
-        provider = "custom";
+        # context_length = 260000;
+        # provider = "custom";
         # default = "qwen/qwen3.5-397b-a17b";
-        default = "minimaxai/minimax-m2.7";
+        # default = "minimaxai/minimax-m2.7";
+        provider = "nous";
+        default = "xiaomi/mimo-v2-pro";
       };
       terminal = {
         backend = "local";

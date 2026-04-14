@@ -8,13 +8,14 @@
 }: let
   enableNullClaw = true;
   enableOpenClaw = false;
-  enableHermes = false;
+  enableHermes = true;
   enableOpenFang = false;
   enableXS = false;
   enablePancakesHarness = false;
 in {
   imports =
     [
+      ../../modules/services/hermes-agent-local.nix
       ../../modules/services/nullclaw-deployment.nix
       ../../modules/services/xs.nix
       ../../modules/services/openfang.nix
@@ -51,6 +52,7 @@ in {
       workspaceRoot = "/var/lib/nullclaw";
       environmentFile = config.sops.secrets."nullclaw".path;
     };
+
     # nullclaw = {
     #   enable = enableNullClaw;
     #   host = "127.0.0.1";
@@ -100,6 +102,52 @@ in {
       sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
       stateDir = "/srv/data/ai-services/state/pancakes-harness";
     };
+  };
+
+  # --- Hermes Agent ---
+  services.hermes-agent-local = {
+    enable = enableHermes;
+    stateDir = "/var/lib/hermes";
+    settings = {
+      model = {
+        # provider = "openrouter";
+        # default = "nvidia/nemotron-3-super-120b-a12b:free";
+        # context_length = 1000000;
+        # context_length = 260000;
+        # provider = "custom";
+        # default = "qwen/qwen3.5-397b-a17b";
+        # default = "minimaxai/minimax-m2.7";
+        provider = "nous";
+        default = "xiaomi/mimo-v2-pro";
+      };
+      terminal = {
+        backend = "local";
+        timeout = 180;
+      };
+      toolsets = ["all"];
+      memory.provider = "holographic";
+    };
+    environmentFiles = [
+      config.sops.secrets.hermes.path
+      config.sops.secrets."ai-services-shared-env".path
+    ];
+  };
+
+  # Host-level override for Hermes to mount shared context/state
+  # (upstream module does not support this natively)
+  systemd.services.hermes-agent.serviceConfig = {
+    BindReadOnlyPaths = [
+      "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
+      "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
+    ];
+    BindPaths = [
+      "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
+    ];
+    EnvironmentFile =
+      [
+        "-/srv/data/ai-services/defaults/shared.env"
+      ]
+      ++ config.services.hermes-agent.environmentFiles;
   };
 
   # --- AI Services Secrets ---
@@ -168,5 +216,6 @@ in {
   };
   environment.systemPackages = with pkgs; [
     skills
+    go-task
   ];
 }

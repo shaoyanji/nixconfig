@@ -44,6 +44,10 @@ in {
 
   # --- AI Services Configuration ---
   aiServices = {
+    context = {
+      enable = true;
+      serviceNames = ["nullclaw" "hermes"];
+    };
     nullclawDeployment = {
       enable = true;
       mode = "env-file";
@@ -128,7 +132,7 @@ in {
       memory.provider = "holographic";
     };
     environmentFiles = [
-      config.sops.secrets.hermes.path
+      # config.sops.secrets.hermes.path
       config.sops.secrets."ai-services-shared-env".path
     ];
   };
@@ -160,11 +164,11 @@ in {
       };
     })
     (lib.mkIf enableHermes {
-      hermes = {
-        owner = "hermes";
-        group = "hermes";
-        mode = "0400";
-      };
+      # hermes = {
+      #   owner = "hermes";
+      #   group = "hermes";
+      #   mode = "0400";
+      # };
     })
     {
       # Shared secrets for all AI services (model API keys, etc.)
@@ -189,6 +193,12 @@ in {
       device = "/dev/disk/by-uuid/3829936d-db07-4b77-b89a-46a2476578ce";
       fsType = "btrfs";
       options = ["subvol=nix/ollama" "compress=zstd" "noatime"];
+    };
+
+    "/var/lib/hermes" = {
+      device = "/dev/disk/by-uuid/3829936d-db07-4b77-b89a-46a2476578ce";
+      fsType = "btrfs";
+      options = ["subvol=nix/hermes" "compress=zstd" "noatime"];
     };
 
     "/var/lib/nullclaw/workspace/share" = {

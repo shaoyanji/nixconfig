@@ -35,10 +35,7 @@ in {
 
   aiServices = {
     # Enable shared context materialization
-    context = {
-      enable = true;
-      serviceNames = ["nullclaw" "hermes"];
-    };
+    context.enable = true;
     nullclawDeployment = {
       enable = true;
       mode = "env-file";

@@ -25,6 +25,7 @@ in {
     inputs.nix-openclaw.nixosModules.openclaw-gateway
     inputs.hermes-agent.nixosModules.default
     ../../modules/profiles/hermes-defaults.nix
+    ../../modules/profiles/ollama-cloud-defaults.nix
     (import ../../modules/profiles/ai-host.nix {
       withOpenclaw = true;
     })
@@ -53,10 +54,7 @@ in {
 
   # --- AI Services Configuration ---
   aiServices = {
-    context = {
-      enable = true;
-      serviceNames = ["nullclaw" "hermes"];
-    };
+    context.enable = true;
     nullclawDeployment = {
       enable = true;
       mode = "env-file";
@@ -114,20 +112,7 @@ in {
     };
   };
 
-  # --- Ollama (AI model serving) ---
-  services.ollama = {
-    enable = true;
-    host = "0.0.0.0";
-    openFirewall = true;
-    loadModels = [
-      "gemma4:31b-cloud"
-      "minimax-m2.7:cloud"
-      "glm-5.1:cloud"
-      "qwen3-coder-next:cloud"
-      "kimi-k2.5:cloud"
-      "qwen3.5:cloud"
-    ];
-  };
+  services.ollama.enable = true;
 
   environment.systemPackages = with pkgs; [
     skills

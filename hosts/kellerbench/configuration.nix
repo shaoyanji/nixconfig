@@ -18,7 +18,6 @@ in {
     (import ../../modules/profiles/ai-host.nix {})
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/ai-services-context.nix
-    ../../modules/services/hermes-agent-local.nix
     inputs.hermes-agent.nixosModules.default
   ];
 
@@ -50,8 +49,9 @@ in {
     };
   };
 
-  services.hermes-agent-local = {
-    enable = enableHermes;
+  services.hermes-agent = lib.mkIf enableHermes {
+    enable = true;
+    package = inputs.hermes-agent.packages.${pkgs.system}.default;
     stateDir = "/var/lib/hermes";
     settings = {
       model = {

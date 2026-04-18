@@ -12,7 +12,7 @@
     else if name == "xs" then config.aiServices.xs.enable or false
     else if name == "openfang" then config.aiServices.openfang.enable or false
     else if name == "pancakes-harness" then (config.aiServices ? pancakesHarness) && (config.aiServices.pancakesHarness.enable or false)
-    else if name == "hermes" then config.services.hermes-agent-local.enable or false
+    else if name == "hermes" then config.services.hermes-agent.enable or false
     else false;
 
   # Filter serviceNames to only enabled services

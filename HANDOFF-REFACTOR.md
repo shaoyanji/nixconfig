@@ -1,99 +1,47 @@
 # Handoff: Nixconfig Systematic Refactoring
 
-**Date:** 2026-04-18
-**Branch:** main (at `ff3d252`)
+**Date:** 2026-04-18 (updated after rounds 1-2)
+**Branch:** main (at `c16eeee`)
 **Scope:** Deduplicate and modularize the nixconfig flake
 
 ## Context
 
-We just migrated `mtfuji`, `thinsandy`, and `kellerbench` from the local
+We migrated `mtfuji`, `thinsandy`, and `kellerbench` from the local
 `hermes-agent-local.nix` wrapper to the upstream `services.hermes-agent`
 module directly. This exposed a broader problem: the AI host configs are
 copy-paste heavy with no shared abstraction layer.
 
-## Current State
+## Progress
+
+### Round 1 — Hermes mount extraction (committed `8d67306`)
+
+- Deleted `modules/services/hermes-agent-local.nix` (dead code)
+- Created `modules/services/hermes-ai-mounts.nix` — `aiServices.hermesMounts.enable`
+- Added `mkHermesMountConfig` to `ai-services-mounts.nix` helper
+- Replaced hand-written systemd overrides in all 3 hosts
+
+### Round 2 — Shared secrets, mounts, hermes defaults (committed `c16eeee`)
+
+- Added `sops.secrets.nullclaw` to `nullclaw.nix` (removed from all 3 hosts)
+- Created `modules/services/ai-services-secrets.nix` — `aiServices.sharedSecrets.enable`
+- Created `modules/services/ai-services-shared-mounts.nix` — workspace-share bind mounts
+- Created `modules/profiles/hermes-defaults.nix` — shared settings as mkDefault
+- Removed duplicated sops.secrets, heres settings, and bind mounts from hosts
+
+### Current host sizes
 
 ```
 hosts/
-  mtfuji/ai.nix        (228 lines) — services + ai + ollama + sops + fs
-  thinsandy/ai.nix     (221 lines) — nearly identical to mtfuji
-  kellerbench/         (125 lines) — same pattern, fewer services
-modules/services/
-  hermes-agent-local.nix (59 lines) — DEAD CODE, no longer imported
-  ai-services-context.nix
-  nullclaw-deployment.nix
-  openclaw-gateway.nix
-  openfang.nix
-  xs.nix
-  pancakes-harness.nix
-flake/
-  checks.nix — has thinsandy-specific hermes assertions
+  mtfuji/ai.nix               151 lines (was 228, -34%)
+  thinsandy/ai.nix             148 lines (was 221, -33%)
+  kellerbench/configuration.nix 101 lines (was 125, -19%)
 ```
 
-## Identified Duplication
+## Remaining duplication (next session)
 
-### 1. systemd overrides — identical across ALL 3 hosts
+### 1. Shared mount options repeated per-service per-host (highest impact)
 
-Every host repeats this verbatim:
-
-```nix
-systemd.services.hermes-agent.serviceConfig = {
-  BindReadOnlyPaths = [
-    "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
-    "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
-  ];
-  BindPaths = [
-    "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
-  ];
-  EnvironmentFile =
-    [ "-/srv/data/ai-services/defaults/shared.env" ]
-    ++ config.services.hermes-agent.environmentFiles;
-};
-```
-
-→ Should be a shared module (e.g. `modules/services/hermes-ai-mounts.nix`)
-   or folded into a host profile like `profiles/ai-host.nix`.
-
-### 2. Hermes config — mtfuji and thinsandy are identical
-
-```nix
-services.hermes-agent = {
-  settings = {
-    model = { provider = "nous"; default = "xiaomi/mimo-v2-pro"; };
-    terminal = { backend = "local"; timeout = 180; };
-    toolsets = ["all"];
-    memory.provider = "holographic";
-  };
-  environmentFiles = [ ... shared env ... ];
-};
-```
-
-Kellerbench differs (openrouter model, no memory provider).
-
-→ Extract to a shared hermes profile module with per-host overrides.
-
-### 3. ai.nix mega-files — mtfuji and thinsandy are near-identical
-
-Both contain full definitions for:
-- nullclaw (deployment config)
-- openfang (with shared context/state mounts)
-- xs (with shared context/state mounts)
-- pancakes-harness (with shared context/state mounts)
-- sops.secrets (nullclaw, hermes, ai-services-shared-env)
-- fileSystems (bind mounts for workspace sharing)
-- ollama (with cloud models)
-- services.ollama.loadModels
-
-Only differences:
-- thinsandy has openclaw gateway config (mtfuji doesn't)
-- enable/disable flags differ per host
-- thinsandy has more fileSystems bind mounts
-
-→ These should be composable service modules, not monolithic ai.nix files.
-
-### 4. Shared context/state mount pattern
-
-Every AI service repeats this pattern:
+Every service config (openfang, xs, pancakesHarness) repeats this block:
 
 ```nix
 contextRoot = "/srv/data/ai-services/context";
@@ -102,84 +50,55 @@ sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
 stateDir = "/srv/data/ai-services/state/<service>";
 ```
 
-→ Already partially handled by `ai-services-context.nix` but still
-   copy-pasted in each service definition.
+These are identical across ALL hosts. The fix: set them as `mkDefault` in each
+service module's config. Hosts only override if they differ (none currently do).
 
-### 5. Dead code
+Per service module (openfang.nix, xs.nix, pancakes-harness.nix):
+```nix
+config = lib.mkIf cfg.enable {
+  aiServices.openfang = {
+    contextRoot = lib.mkDefault "/srv/data/ai-services/context";
+    sharedDefaultsFile = lib.mkDefault "/srv/data/ai-services/defaults/shared.env";
+    sharedSecretFile = lib.mkDefault (config.sops.secrets."ai-services-shared-env".path or null);
+    stateDir = lib.mkDefault "/srv/data/ai-services/state/openfang";
+  };
+  # ... existing config ...
+};
+```
 
-`modules/services/hermes-agent-local.nix` — 59 lines, zero imports.
-`flake/checks.nix` has thinsandy-specific hermes assertions that may need
-updating after the migration.
+Would cut ~12 lines per service per host. After this, openfang/xs/pancakesHarness
+blocks in host files shrink to just `enable` + host-specific values (package, etc).
 
-## Refactoring Plan
+### 2. Ollama cloud models identical on mtfuji/thinsandy
 
-### Phase 1: Clean up dead code
+Same 6-model loadModels list. Extract to a shared option or ai-host profile
+(`profiles.aiHost.ollama.cloudModels.enable`).
 
-- [ ] Delete `modules/services/hermes-agent-local.nix`
-- [ ] Verify `flake/checks.nix` assertions still pass (update if needed)
-- [ ] Run `nix eval` for all hosts to confirm no regressions
+### 3. ai-services-context serviceNames could be auto-derived
 
-### Phase 2: Extract hermes shared config
+Each host manually lists `serviceNames`. The module already checks which services
+are enabled — it could derive the list from `config.services.hermes-agent.enable`,
+`config.aiServices.nullclaw.enable`, etc. instead of requiring a manual list.
 
-- [ ] Create `modules/services/hermes-ai-mounts.nix`:
-  - The systemd BindPaths/BindReadOnlyPaths/EnvironmentFile override
-  - Enabled via an option like `services.hermes-agent.aiMounts.enable`
-  - Or simpler: a profile in `modules/profiles/hermes-ai-host.nix`
-- [ ] Create `modules/profiles/hermes-defaults.nix`:
-  - Shared settings (model, terminal, toolsets, memory)
-  - Shared environmentFiles pattern
-  - Per-host overrides via `mkOverride` or `mkDefault`
-- [ ] Remove duplicated systemd overrides from all 3 hosts
-- [ ] Remove duplicated settings from all 3 hosts
+### 4. Stale reference in NIX-REFERENCE.md
 
-### Phase 3: Modularize ai.nix mega-files
+Gotcha #6 references `hermes-agent-local` which was deleted in round 1.
+Minor cleanup.
 
-- [ ] Move per-service configs into their own module options:
-  - nullclaw deployment → already in `nullclaw-deployment.nix` ✓
-  - openfang config → already in `openfang.nix` ✓
-  - xs config → already in `xs.nix` ✓
-  - pancakes-harness → already in `pancakes-harness.nix` ✓
-- [ ] Host files should only contain enable flags + host-specific overrides
-- [ ] Extract sops.secrets to a shared secrets module
-- [ ] Extract fileSystems bind mounts to a shared mounts module
-- [ ] The goal: `hosts/mtfuji/ai.nix` shrinks from 228 → ~30 lines
+## Not worth extracting
 
-### Phase 4: Audit and deduplicate other hosts
+- Ollama service config (kellerbench uses cuda + no loadModels — too different)
+- btrfs fileSystems (device UUIDs are host-specific)
+- hermes secrets (host-specific: mtfuji skips it, thinsandy/kellerbench include it)
 
-- [ ] Check other hosts (poseidon, aceofspades, etc.) for similar patterns
-- [ ] `modules/profiles/ai-host.nix` — audit what it provides vs what's
-  duplicated in host ai.nix files
+## Target state
 
-### Phase 5: Validate
+mtfuji/thinsandy ai.nix at ~80-90 lines: just enable flags, host-specific
+overrides (package, ollama, btrfs), and the service modules provide all
+standard paths as defaults.
 
-- [ ] `nix eval` for all 3 AI hosts (mtfuji, thinsandy, kellerbench)
-- [ ] `nix eval` for any other hosts that might be affected
-- [ ] Verify `flake/checks.nix` passes
-- [ ] Deploy to one host first, verify service starts
+## Validation
 
-## Key Decisions Needed
-
-1. **Mount pattern**: Should BindPaths be an option on `services.hermes-agent`
-   (upstream contribution?) or a local profile module?
-2. **Shared hermes settings**: `mkDefault` per-host overrides vs.
-   dedicated profile module with explicit option merging.
-3. **ai.nix split**: Keep one `ai.nix` per host (slim) vs. move everything
-   to modules and have hosts just set enable flags.
-4. **Dead modules**: Delete `hermes-agent-local.nix` now or keep as
-   reference until refactoring is complete?
-
-## File Inventory
-
-Total: ~9,100 lines across ~130 .nix files.
-
-Files to modify:
-- `hosts/mtfuji/ai.nix` — slim down
-- `hosts/thinsandy/ai.nix` — slim down
-- `hosts/kellerbench/configuration.nix` — slim down
-- `flake/checks.nix` — update hermes assertions
-
-Files to create:
-- `modules/services/hermes-ai-mounts.nix` or `modules/profiles/hermes-ai.nix`
-
-Files to delete:
-- `modules/services/hermes-agent-local.nix`
+- `flake/checks.nix` assertions still pass (verified: checks reference
+  `services.hermes-agent.environmentFiles` which is unchanged)
+- Need `nix eval` for all 3 AI hosts to confirm after each round

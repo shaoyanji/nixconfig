@@ -25,7 +25,16 @@ in {
     };
   } // aiServicesMounts.mkMountOptions "xs";
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkMerge [
+    {
+      aiServices.xs = {
+        contextRoot = lib.mkDefault "/srv/data/ai-services/context";
+        sharedDefaultsFile = lib.mkDefault "/srv/data/ai-services/defaults/shared.env";
+        sharedSecretFile = lib.mkDefault (config.sops.secrets."ai-services-shared-env".path or null);
+        stateDir = lib.mkDefault "/srv/data/ai-services/state/xs";
+      };
+    }
+    (lib.mkIf cfg.enable {
     assertions = [
       {
         assertion = cfg.package != null;
@@ -81,5 +90,6 @@ in {
         ReadWritePaths = [cfg.workspaceRoot];
       } // mountConfig;
     };
-  };
+  })
+  ];
 }

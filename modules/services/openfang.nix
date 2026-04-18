@@ -32,7 +32,16 @@ in {
     };
   } // aiServicesMounts.mkMountOptions "openfang";
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkMerge [
+    {
+      aiServices.openfang = {
+        contextRoot = lib.mkDefault "/srv/data/ai-services/context";
+        sharedDefaultsFile = lib.mkDefault "/srv/data/ai-services/defaults/shared.env";
+        sharedSecretFile = lib.mkDefault (config.sops.secrets."ai-services-shared-env".path or null);
+        stateDir = lib.mkDefault "/srv/data/ai-services/state/openfang";
+      };
+    }
+    (lib.mkIf cfg.enable {
     assertions = [
       {
         assertion = cfg.package != null;
@@ -93,5 +102,6 @@ in {
         EnvironmentFile = allEnvFiles;
       };
     };
-  };
+  })
+  ];
 }

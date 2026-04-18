@@ -59,59 +59,34 @@ in {
     };
     openclawGateway = {
       enable = enableOpenClaw;
-      workspaceRoot = "/var/lib/openclaw";
       environmentFile = config.sops.secrets."openclaw".path;
       telegramTokenFile = config.sops.secrets."vanta-telegram".path;
-      contextRoot = "/srv/data/ai-services/context";
-      sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
-      sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
-      stateDir = "/srv/data/ai-services/state/openclaw";
     };
     nullclaw = {
       enable = enableNullClaw;
       host = "127.0.0.1";
       port = 3001;
-      workspaceRoot = "/var/lib/nullclaw";
       environmentFile = config.sops.secrets."nullclaw".path;
-      contextRoot = "/srv/data/ai-services/context";
-      sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
-      sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
-      stateDir = "/srv/data/ai-services/state/nullclaw";
     };
     openfang = {
       enable = enableOpenFang;
       package = self.packages.${pkgs.system}.openfang;
-      workspaceRoot = "/var/lib/openfang";
       environmentFile = "/var/lib/openfang/.openfang/openfang.env";
       requireEnvironmentFile = true;
-      contextRoot = "/srv/data/ai-services/context";
-      sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
-      sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
-      stateDir = "/srv/data/ai-services/state/openfang";
     };
     xs = {
       enable = true;
       package = self.packages.${pkgs.system}.xs;
-      workspaceRoot = "/var/lib/xs";
       storePath = "/var/lib/xs/store";
-      contextRoot = "/srv/data/ai-services/context";
-      sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
-      sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
-      stateDir = "/srv/data/ai-services/state/xs";
     };
     pancakesHarness = {
       enable = true;
       package = self.packages.${pkgs.system}.pancakes-harness;
-      workspaceRoot = "/var/lib/pancakes-harness";
       backendMode = "xs";
       xsTopicPrefix = "pancakes-harness";
       bind = "127.0.0.1";
       port = 8080;
       modelMode = "mock";
-      contextRoot = "/srv/data/ai-services/context";
-      sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
-      sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
-      stateDir = "/srv/data/ai-services/state/pancakes-harness";
     };
   };
 

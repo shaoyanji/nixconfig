@@ -46,11 +46,6 @@ in {
       listenPort = 3001;
       workspaceRoot = "/var/lib/nullclaw";
       environmentFile = config.sops.secrets.nullclaw.path;
-      # Shared context/auth/state mounts (passed through to nullclaw module)
-      contextRoot = "/srv/data/ai-services/context";
-      sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
-      sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
-      stateDir = "/srv/data/ai-services/state/nullclaw";
     };
   };
 

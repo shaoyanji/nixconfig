@@ -14,13 +14,17 @@ in {
               _launch = true;
               name = "lfm2.5-thinking:latest";
             };
+            "qwen3.6" = {
+              _launch = true;
+              name = "qwen3.6";
+            };
             "minimax-m2.7:cloud" = {
               _launch = true;
-              name = "minimax-m2.5:cloud";
+              name = "minimax-m2.7:cloud";
             };
             "glm-5.1:cloud" = {
               _launch = true;
-              name = "glm-5:cloud";
+              name = "glm-5.1:cloud";
             };
             "qwen3-coder-next:cloud" = {
               _launch = true;

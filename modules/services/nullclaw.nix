@@ -35,7 +35,16 @@ in {
     }
     // aiServicesMounts.mkMountOptions "nullclaw";
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkMerge [
+    {
+      aiServices.nullclaw = {
+        contextRoot = lib.mkDefault "/srv/data/ai-services/context";
+        sharedDefaultsFile = lib.mkDefault "/srv/data/ai-services/defaults/shared.env";
+        sharedSecretFile = lib.mkDefault (config.sops.secrets."ai-services-shared-env".path or null);
+        stateDir = lib.mkDefault "/srv/data/ai-services/state/nullclaw";
+      };
+    }
+    (lib.mkIf cfg.enable {
     sops.secrets.nullclaw = {
       owner = "nullclaw";
       group = "nullclaw";
@@ -101,5 +110,6 @@ in {
           EnvironmentFile = allEnvFiles;
         };
     };
-  };
+  })
+  ];
 }

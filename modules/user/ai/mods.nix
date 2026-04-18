@@ -3,7 +3,7 @@
     enable = true;
     settings = {
       default-api = "ollama";
-      default-model = "qwen3-coder-next:cloud";
+      default-model = "glm-5.1:cloud";
       mcp-timeout = "15s";
       format = false;
       roles = {"default" = [];};

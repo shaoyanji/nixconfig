@@ -36,6 +36,6 @@
       mods
     ]
     ++ lib.optionals stdenv.isLinux [
-      qwen-code
+      # qwen-code
     ];
 }

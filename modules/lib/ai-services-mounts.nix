@@ -96,13 +96,21 @@
   #     aiServicesMounts.mkHermesMountConfig cfg workspaceRoot
   #       config.services.hermes-agent.environmentFiles;
   mkHermesMountConfig = cfg: workspaceRoot: hermesEnvFiles: let
-    base = mkMountConfig cfg workspaceRoot;
-  in
-    base
-    // {
-      EnvironmentFile =
-        lib.optionals (cfg.sharedDefaultsFile != null) ["-${cfg.sharedDefaultsFile}"]
-        ++ lib.optionals (cfg.sharedSecretFile != null) ["-${cfg.sharedSecretFile}"]
-        ++ hermesEnvFiles;
-    };
+    contextTarget = "${workspaceRoot}/${cfg.contextMountPoint}";
+    stateTarget = "${workspaceRoot}/${cfg.stateMountPoint}";
+    sharedDefaultsTarget = "${workspaceRoot}/.ai-services/defaults/shared.env";
+  in {
+    BindReadOnlyPaths = lib.optionals (cfg.contextRoot != null) [
+      "${cfg.contextRoot}:${contextTarget}"
+    ] ++ lib.optionals (cfg.sharedDefaultsFile != null) [
+      "${cfg.sharedDefaultsFile}:${sharedDefaultsTarget}"
+    ];
+    BindPaths = lib.optionals (cfg.stateDir != null) [
+      "${cfg.stateDir}:${stateTarget}"
+    ];
+    EnvironmentFile =
+      lib.optionals (cfg.sharedDefaultsFile != null) ["-${cfg.sharedDefaultsFile}"]
+      ++ lib.optionals (cfg.sharedSecretFile != null) ["-${cfg.sharedSecretFile}"]
+      ++ hermesEnvFiles;
+  };
 }

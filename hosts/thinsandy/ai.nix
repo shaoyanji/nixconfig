@@ -11,21 +11,17 @@
   enableNullClaw = true;
   enableOpenFang = false;
 in {
-  imports =
-    [
-      ../../modules/services/hermes-agent-local.nix
-      ../../modules/services/openfang.nix
-      ../../modules/services/xs.nix
-      ../../modules/services/pancakes-harness.nix
-      ../../modules/services/ai-services-context.nix
-      inputs.nix-openclaw.nixosModules.openclaw-gateway
-      (import ../../modules/profiles/ai-host.nix {
-        withOpenclaw = true;
-      })
-    ]
-    ++ lib.optionals enableHermes [
-      inputs.hermes-agent.nixosModules.default
-    ];
+  imports = [
+    ../../modules/services/openfang.nix
+    ../../modules/services/xs.nix
+    ../../modules/services/pancakes-harness.nix
+    ../../modules/services/ai-services-context.nix
+    inputs.nix-openclaw.nixosModules.openclaw-gateway
+    inputs.hermes-agent.nixosModules.default
+    (import ../../modules/profiles/ai-host.nix {
+      withOpenclaw = true;
+    })
+  ];
 
   nixpkgs.overlays =
     []
@@ -112,8 +108,9 @@ in {
   };
 
   # --- Hermes Agent ---
-  services.hermes-agent-local = {
-    enable = enableHermes;
+  services.hermes-agent = lib.mkIf enableHermes {
+    enable = true;
+    package = inputs.hermes-agent.packages.${pkgs.system}.default;
     stateDir = "/var/lib/hermes";
     settings = {
       model = {

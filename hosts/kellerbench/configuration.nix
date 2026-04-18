@@ -16,6 +16,7 @@ in {
     ./nvidia.nix
     ../../modules/profiles/base-node.nix
     (import ../../modules/profiles/ai-host.nix {})
+    ../../modules/services/hermes-ai-mounts.nix
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/ai-services-context.nix
     inputs.hermes-agent.nixosModules.default
@@ -27,6 +28,8 @@ in {
     enable = true;
     nullclaw.enable = true;
   };
+
+  aiServices.hermesMounts.enable = enableHermes;
 
   aiServices = {
     # Enable shared context materialization
@@ -65,22 +68,6 @@ in {
       toolsets = ["all"];
     };
     environmentFiles = [config.sops.secrets.hermes.path];
-  };
-
-  # Host-level override for Hermes to mount shared context/state
-  systemd.services.hermes-agent.serviceConfig = {
-    BindReadOnlyPaths = [
-      "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
-      "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
-    ];
-    BindPaths = [
-      "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
-    ];
-    EnvironmentFile =
-      [
-        "-/srv/data/ai-services/defaults/shared.env"
-      ]
-      ++ config.services.hermes-agent.environmentFiles;
   };
 
   sops.secrets.hermes = {

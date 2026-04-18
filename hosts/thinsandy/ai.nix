@@ -12,6 +12,7 @@
   enableOpenFang = false;
 in {
   imports = [
+    ../../modules/services/hermes-ai-mounts.nix
     ../../modules/services/openfang.nix
     ../../modules/services/xs.nix
     ../../modules/services/pancakes-harness.nix
@@ -34,6 +35,8 @@ in {
     openclaw.enable = enableOpenClaw;
     nullclaw.enable = enableNullClaw;
   };
+
+  aiServices.hermesMounts.enable = enableHermes;
 
   # --- AI Services Configuration ---
   aiServices = {
@@ -135,23 +138,6 @@ in {
       config.sops.secrets.hermes.path
       config.sops.secrets."ai-services-shared-env".path
     ];
-  };
-
-  # Host-level override for Hermes to mount shared context/state
-  # (upstream module does not support this natively)
-  systemd.services.hermes-agent.serviceConfig = {
-    BindReadOnlyPaths = [
-      "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
-      "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
-    ];
-    BindPaths = [
-      "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state"
-    ];
-    EnvironmentFile =
-      [
-        "-/srv/data/ai-services/defaults/shared.env"
-      ]
-      ++ config.services.hermes-agent.environmentFiles;
   };
 
   # --- AI Services Secrets ---

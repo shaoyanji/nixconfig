@@ -192,6 +192,3 @@ sops.secrets = lib.mkMerge [
 
 5. **Option types must match across definitions** — if one module defines an option as
    `types.str` and another as `types.int`, eval fails.
-
-6. **`config.services.hermes-agent` vs `config.services.hermes-agent-local`** — these are
-   different option paths; the module system doesn't relate them.

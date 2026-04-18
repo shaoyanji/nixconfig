@@ -40,10 +40,7 @@ in {
         obsidian-export # Export Obsidian markdown notes
 
         # ── Image / Media / Graphics ──
-        tesseract # OCR engine
         exiftool # EXIF metadata reader/writer
-        ffmpeg # Audio/video processing
-        graphviz # Graph visualization
         graph-easy # ASCII/HTML/SVG graph renderer
         qrencode # QR code generator
         pastel # Color palette tool
@@ -71,7 +68,6 @@ in {
         mutt # Terminal email client
         rclone # Cloud storage sync
         rsync # Remote file sync
-        lux # Video downloader
 
         # ── Network / Diagnostics ──
         awscli2 # AWS CLI
@@ -101,7 +97,6 @@ in {
 
         # ── Shell / Productivity / Dev Tools ──
         asciinema # Terminal session recorder
-        devenv # Developer environments
         epr # E-book reader
         go-task # Task runner (Taskfile.yml)
         gokrazy # Go-based embedded Linux builder
@@ -110,7 +105,6 @@ in {
         markdownlint-cli # Markdown linter
         mdq # Markdown query tool
         nix-output-monitor # Pretty Nix output
-        nixd # Nix language server
         sd # sed alternative (find/replace)
         tomlq # TOML processor
         yq-go # YAML/JSON/XML processor
@@ -143,7 +137,6 @@ in {
         # ── Linux-only TUI Apps ──
         newsboat # RSS/Atom feed reader
         tuir # TUI for Reddit
-        cmus # Terminal music player
 
         # ── Linux-only Dev / Productivity ──
         dust # Disk usage analyzer
@@ -170,7 +163,6 @@ in {
       ++ lib.optionals stdenv.hostPlatform.isx86_64 [
         glances # Cross-platform system monitor
         nurl
-        python3
       ]
       ++ lib.optionals stdenv.isDarwin [];
 

@@ -85,4 +85,24 @@
         lib.optionals (cfg.sharedDefaultsFile != null) ["-${cfg.sharedDefaultsFile}"]
         ++ lib.optionals (cfg.sharedSecretFile != null) ["-${cfg.sharedSecretFile}"];
     };
+
+  # Hermes-specific: generates mount config AND merges hermes environmentFiles.
+  # Use this instead of mkMountConfig for hermes because the EnvironmentFile
+  # list must include the upstream module's environmentFiles (secrets, etc.)
+  # with shared defaults prepended.
+  #
+  # Usage:
+  #   systemd.services.hermes-agent.serviceConfig =
+  #     aiServicesMounts.mkHermesMountConfig cfg workspaceRoot
+  #       config.services.hermes-agent.environmentFiles;
+  mkHermesMountConfig = cfg: workspaceRoot: hermesEnvFiles: let
+    base = mkMountConfig cfg workspaceRoot;
+  in
+    base
+    // {
+      EnvironmentFile =
+        lib.optionals (cfg.sharedDefaultsFile != null) ["-${cfg.sharedDefaultsFile}"]
+        ++ lib.optionals (cfg.sharedSecretFile != null) ["-${cfg.sharedSecretFile}"]
+        ++ hermesEnvFiles;
+    };
 }

@@ -28,7 +28,16 @@ in {
     };
   } // aiServicesMounts.mkMountOptions "openclaw";
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkMerge [
+    {
+      aiServices.openclawGateway = {
+        contextRoot = lib.mkDefault "/srv/data/ai-services/context";
+        sharedDefaultsFile = lib.mkDefault "/srv/data/ai-services/defaults/shared.env";
+        sharedSecretFile = lib.mkDefault (config.sops.secrets."ai-services-shared-env".path or null);
+        stateDir = lib.mkDefault "/srv/data/ai-services/state/openclaw";
+      };
+    }
+    (lib.mkIf cfg.enable {
     services.openclaw-gateway = {
       enable = true;
       config = {
@@ -314,5 +323,6 @@ in {
     in mountConfig // lib.optionalAttrs (allEnvFiles != []) {
       EnvironmentFile = allEnvFiles;
     };
-  };
+  })
+  ];
 }

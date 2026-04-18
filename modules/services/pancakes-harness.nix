@@ -126,7 +126,16 @@ in {
     };
   } // aiServicesMounts.mkMountOptions "pancakes-harness";
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkMerge [
+    {
+      aiServices.pancakesHarness = {
+        contextRoot = lib.mkDefault "/srv/data/ai-services/context";
+        sharedDefaultsFile = lib.mkDefault "/srv/data/ai-services/defaults/shared.env";
+        sharedSecretFile = lib.mkDefault (config.sops.secrets."ai-services-shared-env".path or null);
+        stateDir = lib.mkDefault "/srv/data/ai-services/state/pancakes-harness";
+      };
+    }
+    (lib.mkIf cfg.enable {
     assertions = [
       {
         assertion = cfg.modelMode != "http" || cfg.modelEndpoint != "";
@@ -210,5 +219,6 @@ in {
         EnvironmentFile = allEnvFiles;
       };
     };
-  };
+  })
+  ];
 }

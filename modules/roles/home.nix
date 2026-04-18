@@ -13,6 +13,14 @@
   programs.nixvim.enable = true;
   home.packages = with pkgs;
     [
+      # ── Moved from base (too heavy for servers) ──
+      devenv # Developer environments (864 MB closure)
+      nixd # Nix language server (588 MB closure, pulls llvm)
+      ffmpeg # Audio/video processing (~1 GB closure)
+      tesseract # OCR engine (~1 GB closure)
+      graphviz # Graph visualization
+      pi-coding-agent # AI coding agent (515 MB closure)
+      python3 # Python interpreter
       a2ps
       amfora
       astroterm
@@ -38,6 +46,8 @@
     ++ lib.optionals stdenv.isLinux [
       ani-cli
       audacity
+      cmus # Terminal music player (~1 GB closure)
+      lux # Video downloader (~1 GB closure)
       mpv
       # ytfzf
       gnuplot

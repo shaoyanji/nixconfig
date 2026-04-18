@@ -50,13 +50,6 @@
         };
       }
       {
-        name = "qml";
-        formatter = {
-          command = "${pkgs.kdePackages.qtdeclarative}/bin/qmlls";
-          args = ["-E"];
-        };
-      }
-      {
         name = "lua";
         auto-format = true;
         formatter = {

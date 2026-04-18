@@ -29,7 +29,6 @@
 
   home.packages = with pkgs;
     [
-      pi-coding-agent
       geminicommit
       tgpt
       aichat

@@ -36,6 +36,12 @@ in {
     // aiServicesMounts.mkMountOptions "nullclaw";
 
   config = lib.mkIf cfg.enable {
+    sops.secrets.nullclaw = {
+      owner = "nullclaw";
+      group = "nullclaw";
+      mode = "0400";
+    };
+
     users.groups.nullclaw = {};
 
     users.users.nullclaw = {

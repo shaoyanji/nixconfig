@@ -13,12 +13,15 @@
 in {
   imports = [
     ../../modules/services/hermes-ai-mounts.nix
+    ../../modules/services/ai-services-secrets.nix
+    ../../modules/services/ai-services-shared-mounts.nix
     ../../modules/services/openfang.nix
     ../../modules/services/xs.nix
     ../../modules/services/pancakes-harness.nix
     ../../modules/services/ai-services-context.nix
     inputs.nix-openclaw.nixosModules.openclaw-gateway
     inputs.hermes-agent.nixosModules.default
+    ../../modules/profiles/hermes-defaults.nix
     (import ../../modules/profiles/ai-host.nix {
       withOpenclaw = true;
     })
@@ -37,10 +40,19 @@ in {
   };
 
   aiServices.hermesMounts.enable = enableHermes;
+  aiServices.sharedSecrets.enable = true;
+  aiServices.sharedMounts = {
+    enable = true;
+    source = "/srv/data/openclaw";
+    skillsSource = "/srv/data/openclaw/skills/legacy";
+    services.openclaw = enableOpenClaw;
+    services.nullclaw = enableNullClaw;
+    services.openfang = enableOpenFang;
+    services.hermes = enableHermes;
+  };
 
   # --- AI Services Configuration ---
   aiServices = {
-    # Enable shared context materialization
     context = {
       enable = true;
       serviceNames = ["openclaw" "nullclaw" "hermes" "xs" "openfang" "pancakes-harness"];
@@ -50,7 +62,6 @@ in {
       workspaceRoot = "/var/lib/openclaw";
       environmentFile = config.sops.secrets."openclaw".path;
       telegramTokenFile = config.sops.secrets."vanta-telegram".path;
-      # Shared context/auth/state mounts
       contextRoot = "/srv/data/ai-services/context";
       sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
       sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
@@ -62,7 +73,6 @@ in {
       port = 3001;
       workspaceRoot = "/var/lib/nullclaw";
       environmentFile = config.sops.secrets."nullclaw".path;
-      # Shared context/auth/state mounts
       contextRoot = "/srv/data/ai-services/context";
       sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
       sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
@@ -72,11 +82,8 @@ in {
       enable = enableOpenFang;
       package = self.packages.${pkgs.system}.openfang;
       workspaceRoot = "/var/lib/openfang";
-      # Experimental: keep startup inert until the operator adds env vars and
-      # completes a manual `openfang init` against the service HOME.
       environmentFile = "/var/lib/openfang/.openfang/openfang.env";
       requireEnvironmentFile = true;
-      # Shared context/auth/state mounts
       contextRoot = "/srv/data/ai-services/context";
       sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
       sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
@@ -87,7 +94,6 @@ in {
       package = self.packages.${pkgs.system}.xs;
       workspaceRoot = "/var/lib/xs";
       storePath = "/var/lib/xs/store";
-      # Shared context/auth/state mounts
       contextRoot = "/srv/data/ai-services/context";
       sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
       sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
@@ -102,7 +108,6 @@ in {
       bind = "127.0.0.1";
       port = 8080;
       modelMode = "mock";
-      # Shared context/auth/state mounts
       contextRoot = "/srv/data/ai-services/context";
       sharedDefaultsFile = "/srv/data/ai-services/defaults/shared.env";
       sharedSecretFile = config.sops.secrets."ai-services-shared-env".path or null;
@@ -113,81 +118,17 @@ in {
   # --- Hermes Agent ---
   services.hermes-agent = lib.mkIf enableHermes {
     enable = true;
-    package = inputs.hermes-agent.packages.${pkgs.system}.default;
-    stateDir = "/var/lib/hermes";
-    settings = {
-      model = {
-        # provider = "openrouter";
-        # default = "nvidia/nemotron-3-super-120b-a12b:free";
-        # context_length = 1000000;
-        # context_length = 260000;
-        # provider = "custom";
-        # default = "qwen/qwen3.5-397b-a17b";
-        # default = "minimaxai/minimax-m2.7";
-        provider = "nous";
-        default = "xiaomi/mimo-v2-pro";
-      };
-      terminal = {
-        backend = "local";
-        timeout = 180;
-      };
-      toolsets = ["all"];
-      memory.provider = "holographic";
-    };
     environmentFiles = [
       config.sops.secrets.hermes.path
       config.sops.secrets."ai-services-shared-env".path
     ];
   };
 
-  # --- AI Services Secrets ---
-  sops.secrets = lib.mkMerge [
-    (lib.mkIf enableNullClaw {
-      nullclaw = {
-        owner = "nullclaw";
-        group = "nullclaw";
-        mode = "0400";
-      };
-    })
-    (lib.mkIf enableHermes {
-      hermes = {
-        owner = "hermes";
-        group = "hermes";
-        mode = "0400";
-      };
-    })
-    {
-      # Shared secrets for all AI services (model API keys, etc.)
-      ai-services-shared-env = {
-        owner = "root";
-        group = "root";
-        mode = "0444";
-      };
-    }
-  ];
-
-  # --- AI Services Filesystem Mounts ---
-  fileSystems = {
-    "/var/lib/openclaw/.openclaw/workspace/share" = {
-      device = "/srv/data/openclaw";
-      fsType = "btrfs";
-      options = ["bind"];
-    };
-    "/var/lib/openfang/.openfang/skills" = {
-      device = "/srv/data/openclaw/skills/legacy";
-      fsType = "btrfs";
-      options = ["bind"];
-    };
-    "/var/lib/nullclaw/workspace/share" = {
-      device = "/srv/data/openclaw";
-      fsType = "btrfs";
-      options = ["bind"];
-    };
-    "/var/lib/hermes/workspace/share" = {
-      device = "/srv/data/openclaw";
-      fsType = "btrfs";
-      options = ["bind"];
-    };
+  # --- Hermes secrets (host-specific) ---
+  sops.secrets.hermes = {
+    owner = "hermes";
+    group = "hermes";
+    mode = "0400";
   };
 
   # --- Ollama (AI model serving) ---

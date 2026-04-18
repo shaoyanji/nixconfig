@@ -17,6 +17,7 @@ in {
     ../../modules/profiles/base-node.nix
     (import ../../modules/profiles/ai-host.nix {})
     ../../modules/services/hermes-ai-mounts.nix
+    ../../modules/services/ai-services-secrets.nix
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/ai-services-context.nix
     inputs.hermes-agent.nixosModules.default
@@ -30,6 +31,7 @@ in {
   };
 
   aiServices.hermesMounts.enable = enableHermes;
+  aiServices.sharedSecrets.enable = true;
 
   aiServices = {
     # Enable shared context materialization
@@ -81,19 +83,6 @@ in {
     package = pkgs.ollama-cuda;
     host = "0.0.0.0";
     openFirewall = false;
-  };
-
-  sops.secrets.nullclaw = {
-    owner = "nullclaw";
-    group = "nullclaw";
-    mode = "0400";
-  };
-
-  # Shared secrets for all AI services
-  sops.secrets.ai-services-shared-env = {
-    owner = "root";
-    group = "root";
-    mode = "0444";
   };
 
   environment.systemPackages = with pkgs; [

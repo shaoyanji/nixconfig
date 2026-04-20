@@ -7,7 +7,7 @@
   imports = [
     ./minimal.nix
     ../shell
-    ../user/ai/opencode.nix # too bloated
+    # ../user/ai/opencode.nix # too bloated
   ];
 
   programs.nixvim.enable = true;

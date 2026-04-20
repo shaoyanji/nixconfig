@@ -3,7 +3,7 @@
     enable = true;
     settings = {
       default-api = "ollama";
-      default-model = "glm-5.1:cloud";
+      default-model = "minimax-m2.7:cloud";
       mcp-timeout = "15s";
       format = false;
       roles = {"default" = [];};

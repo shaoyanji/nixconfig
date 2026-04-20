@@ -31,8 +31,8 @@
     [
       geminicommit
       tgpt
-      aichat
-      mods
+      # aichat
+      # mods
     ]
     ++ lib.optionals stdenv.isLinux [
       # qwen-code

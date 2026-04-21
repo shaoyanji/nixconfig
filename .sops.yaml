@@ -58,6 +58,8 @@ creation_rules:
           - *applevalleyhost
           - *applevalley
           - *penguin
+          - *kellerbenchhost
+          - *kellerbench
   - path_regex: /[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:

@@ -27,6 +27,8 @@ keys:
   - &kali age1cmnqfeym553nxncm8vgcuml5cxjg2kn525ezqgfqucutuc5heu9q0wsexz
   - &penguin age1lxkrls0zrq24c3crg3ffpsllk30tu6amk5munfmfcw3rhev9ppvsatm0vh
   - &garnix age1uljtkrhrwtq9w5lfk75e9dpaclyysr9mjtprkpfjnd5s08wg9d6sx5g55w
+  - &kellerbenchhost age1dpwa9pdgmgr7as0dz6688vwpuf9y9dmrrsjvzrq8avm0vnhsff8schdlgv
+  - &kellerbench age1dq9h7xwslw6dct6x6y4xx867vjk88xfutza6nyzavude3k7a7qsqvrwlnf
 
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
@@ -82,4 +84,6 @@ creation_rules:
           - *applevalleyhost
           - *applevalley
           - *penguin
+          - *kellerbenchhost
+          - *kellerbench
         gpg:

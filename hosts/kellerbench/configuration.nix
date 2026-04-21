@@ -5,7 +5,7 @@
   inputs,
   ...
 }: let
-  enableHermes = true;
+  enableHermes = false;
 in {
   imports = [
     (import ../../modules/profiles/grub-boot.nix {
@@ -27,7 +27,7 @@ in {
 
   profiles.aiHost = {
     enable = true;
-    nullclaw.enable = true;
+    nullclaw.enable = false;
   };
 
   aiServices.hermesMounts.enable = enableHermes;
@@ -37,7 +37,7 @@ in {
     # Enable shared context materialization
     context.enable = true;
     nullclawDeployment = {
-      enable = true;
+      enable = false;
       mode = "env-file";
       listenHost = "127.0.0.1";
       listenPort = 3001;
@@ -52,8 +52,8 @@ in {
     stateDir = "/var/lib/hermes";
     settings = {
       model = {
-        provider = "openrouter";
-        default = "nvidia/nemotron-3-super-120b-a12b:free";
+        provider = "ollama";
+        default = "qwen3.5:0.8b";
       };
       terminal = {
         backend = "local";
@@ -61,20 +61,26 @@ in {
       };
       toolsets = ["all"];
     };
-    environmentFiles = [config.sops.secrets.hermes.path];
+    environmentFiles = [
+      config.sops.secrets."ai-services-shared-env".path
+      # config.sops.secrets.hermes.path
+    ];
   };
 
-  sops.secrets.hermes = {
-    owner = "hermes";
-    group = "hermes";
-    mode = "0400";
-  };
-
+  # sops.secrets.hermes = {
+  #   owner = "hermes";
+  #   group = "hermes";
+  #   mode = "0400";
+  # };
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cuda;
     host = "0.0.0.0";
     openFirewall = false;
+    loadModels = [
+      # "qwen3.5:0.8b"
+      "nomic-embed-text:latest"
+    ];
   };
 
   environment.systemPackages = with pkgs; [

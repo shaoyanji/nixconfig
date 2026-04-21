@@ -6,6 +6,7 @@
   ...
 }: let
   enableHermes = false;
+  enableSteam = false;
 in {
   imports = [
     (import ../../modules/profiles/grub-boot.nix {
@@ -21,6 +22,8 @@ in {
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/ai-services-context.nix
     inputs.hermes-agent.nixosModules.default
+  ] ++ lib.optionals enableSteam [
+    ../../modules/profiles/steam.nix
   ];
 
   networking.hostName = "kellerbench";
@@ -29,6 +32,10 @@ in {
     enable = true;
     nullclaw.enable = false;
   };
+
+  # Steam needs 32-bit GL and X server for desktop gaming.
+  hardware.graphics.enable32Bit = lib.mkIf enableSteam true;
+  services.xserver.enable = lib.mkIf enableSteam (lib.mkForce true);
 
   aiServices.hermesMounts.enable = enableHermes;
   aiServices.sharedSecrets.enable = true;

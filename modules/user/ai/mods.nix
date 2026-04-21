@@ -3,7 +3,7 @@
     enable = true;
     settings = {
       default-api = "ollama";
-      default-model = "minimax-m2.7:cloud";
+      default-model = "kimi-k2.6:cloud";
       mcp-timeout = "15s";
       format = false;
       roles = {"default" = [];};
@@ -28,7 +28,7 @@
           models = {
             "minimax-m2.7:cloud".max-input-chars = 650000;
             "glm-5.1:cloud".max-input-chars = 650000;
-            "qwen3-coder-next:cloud".max-input-chars = 650000;
+            "kimi-k2.6:cloud".max-input-chars = 650000;
           };
         };
       };

@@ -6,7 +6,7 @@
   # This host is an on-demand benchmark node, so keep baseline PM explicit.
   powerManagement.enable = true;
 
-  services.xserver.enable = lib.mkForce false;
+  services.xserver.enable = lib.mkDefault false;
   services.xserver.videoDrivers = ["nvidia"];
 
   nixpkgs.config = {

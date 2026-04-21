@@ -15,7 +15,7 @@
         "minimax-m2.7:cloud"
         "glm-5.1:cloud"
         "qwen3-coder-next:cloud"
-        "kimi-k2.5:cloud"
+        "kimi-k2.6:cloud"
         "qwen3.5:cloud"
       ];
     };

@@ -127,6 +127,16 @@ in {
       ];
   };
 
+  sledgehammer = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = {inherit inputs self;};
+    modules = globalModulesContainers ++ [
+      ../hosts/sledgehammer/configuration.nix
+      inputs.disko.nixosModules.default
+    ];
+  };
+
   testvm = {
     kind = "nixos";
     system = "x86_64-linux";

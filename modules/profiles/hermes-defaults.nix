@@ -92,6 +92,9 @@
             api_key = "";
           };
         };
+        web = {
+          backend = "tavily";
+        };
         toolsets = ["all"];
         memory.provider = "holographic";
       };

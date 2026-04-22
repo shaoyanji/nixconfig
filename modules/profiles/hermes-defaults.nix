@@ -27,6 +27,70 @@
         terminal = {
           backend = "local";
           timeout = 180;
+          cwd = "/var/lib/hermes/workspace";
+        };
+        compression = {
+          enabled = true;
+          threshold = 0.5;
+          summary_provider = "openai";
+          summary_base_url = "https://aihubmix.com/v1";
+          summary_model = "gpt-4.1-free";
+        };
+        auxiliary = {
+          compression = {
+            provider = "openai";
+            base_url = "https://aihubmix.com/v1";
+            model = "gpt-4.1-free";
+            api_key = "";
+          };
+          embeddings = {
+            provider = "ollama";
+            base_url = "http://localhost:11434";
+            model = "all-minilm";
+            api_key = "";
+          };
+          vision = {
+            provider = "openai";
+            base_url = "https://aihubmix.com/v1";
+            model = "gpt-4.1-free";
+            api_key = "";
+          };
+          session_search = {
+            provider = "auto";
+            base_url = "";
+            model = "";
+            api_key = "";
+          };
+          web_extract = {
+            provider = "auto";
+            base_url = "";
+            model = "";
+            api_key = "";
+          };
+          skills_hub = {
+            provider = "auto";
+            base_url = "";
+            model = "";
+            api_key = "";
+          };
+          mcp = {
+            provider = "auto";
+            base_url = "";
+            model = "";
+            api_key = "";
+          };
+          flush_memories = {
+            provider = "auto";
+            base_url = "";
+            model = "";
+            api_key = "";
+          };
+          approval = {
+            provider = "auto";
+            base_url = "";
+            model = "";
+            api_key = "";
+          };
         };
         toolsets = ["all"];
         memory.provider = "holographic";

@@ -8,7 +8,7 @@
 }: let
   enableNullClaw = true;
   enableOpenClaw = false;
-  enableHermes = true;
+  enableHermes = false;
   enableOpenFang = false;
   enableXS = false;
   enablePancakesHarness = false;

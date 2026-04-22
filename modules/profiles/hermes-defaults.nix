@@ -19,7 +19,8 @@
       settings = lib.mkDefault {
         model = {
           provider = "nous";
-          default = "xiaomi/mimo-v2-pro";
+          default = "nvidia/nemotron-3-super-120b-a12b:free";
+          # default = "xiaomi/mimo-v2-pro";
         };
         terminal = {
           backend = "local";

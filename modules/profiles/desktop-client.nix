@@ -50,7 +50,7 @@
 
   # Required for non-Nix binaries/toolchains in daily desktop workflows.
   # Keep enabled here, but treat this as a compatibility tradeoff.
-  programs.nix-ld.enable = true;
+  programs.nix-ld.enable = false;
 
   security.rtkit.enable = true;
 

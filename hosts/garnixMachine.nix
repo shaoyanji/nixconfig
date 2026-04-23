@@ -15,7 +15,7 @@ in {
 
   imports = [
     ../modules/config/authorized-keys.nix
-    (import ../modules/profiles/ai-host.nix {})
+    ../modules/profiles/ai-host.nix
     ../modules/services/nullclaw-deployment.nix
     inputs.sops-nix.nixosModules.sops
   ];

@@ -14,9 +14,6 @@ Operational differences for `mtfuji` in AI host flows.
 - Validation mapping is manifest-driven (`checks:nullclaw:smoke:mtfuji`).
 
 ## Source References
-- `taskfiles/ai-host-manifest.json`
 - `taskfiles/services-core.yml`
-- `taskfiles/services-ai-hosts.yml`
 
 ## Manifest helper
-Use `scripts/task/ai-host-manifest.sh show mtfuji` and `task agents:hosts:tasks:mtfuji` when you need the canonical commands or manifest values for this host.

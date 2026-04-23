@@ -12,7 +12,6 @@
     ../user/desktop/niri.nix
     ../dev.nix
     ../kitty
-    ../wezterm
   ];
 
   programs = {
@@ -25,10 +24,10 @@
       };
     };
     element-desktop.enable = true;
-    qutebrowser.enable = true;
-    onedrive.enable = true;
+    # qutebrowser.enable = true;
+    # onedrive.enable = true;
     obsidian = {
-      enable = true;
+      # enable = true;
       defaultSettings = {
         app = {
           alwaysUpdateLinks = true;
@@ -125,7 +124,7 @@
   services = {
     cliphist.enable = true;
     caffeine.enable = true;
-    dropbox.enable = true;
+    # dropbox.enable = true;
     tailscale-systray.enable = true;
   };
 

@@ -7,10 +7,8 @@ Shared module:
 - `modules/services/nullclaw-deployment.nix`
 
 Machine-readable operator manifest:
-- `taskfiles/ai-host-manifest.json`
 
 Operator waiver file (optional warning waivers only):
-- `taskfiles/ai-host-waivers.json`
 
 Current hosts and classes:
 - `hosts/garnixMachine.nix`
@@ -191,7 +189,6 @@ If only warning findings remain, host status is reported as `ready:with-warnings
 Warning waivers (if configured) are applied only to warning findings and never to blocking findings.
 
 Policy source:
-- `taskfiles/ai-host-manifest.json`
   - top-level defaults: `policyDefaults.maxValidationAgeSeconds`, `policyDefaults.maxDriftAgeSeconds`
   - optional host override: `.hosts.<host>.policy.maxValidationAgeSeconds`, `.hosts.<host>.policy.maxDriftAgeSeconds`
 
@@ -247,7 +244,6 @@ Backward compatibility:
 - older evidence using `critical` is treated as `blocking` during readiness/promotion evaluation.
 
 Waivers are file-based and optional:
-- file: `taskfiles/ai-host-waivers.json`
 - scope: per-host warning findings only
 - matching keys: `category`, `check`, optional `expected`
 - optional fields: `reason`, `expiresAt`, `severity` (`warning` only)

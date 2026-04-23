@@ -89,15 +89,13 @@ tasks:
 
   rebuild:
     desc: Legacy rebuild menu
-    vars:
-      MANIFEST: ./taskfiles/ai-host-manifest.json
     cmds:
       - |
         choice=$(
           {
             printf '%s\n' nixos-rebuild darwin-rebuild home-manager-switch wsl-rebuild orb-rebuild
             printf '%s\n' "services:deploy:host:{{.PI}}"
-            jq -r '.hosts | keys[] | "services:deploy:host:" + .' {{.MANIFEST}}
+            printf '%s\n' services:deploy:host:garnixMachine services:deploy:host:mtfuji services:deploy:host:thinsandy services:deploy:host:kellerbench
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )

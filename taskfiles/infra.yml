@@ -260,14 +260,12 @@ tasks:
 
   infra:deploy:menu:
     desc: Choose a deployment target
-    vars:
-      MANIFEST: ./taskfiles/ai-host-manifest.json
     cmds:
       - |
         choice=$(
           {
             printf '%s\n' "infra:deploy:host:{{.PI}}"
-            jq -r '.hosts | keys[] | "infra:deploy:host:" + .' {{.MANIFEST}}
+            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:thinsandy infra:deploy:host:kellerbench
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )
@@ -275,14 +273,12 @@ tasks:
 
   infra:logs:menu:
     desc: Choose a logs target
-    vars:
-      MANIFEST: ./taskfiles/ai-host-manifest.json
     cmds:
       - |
         host=$(
           {
             printf '%s\n' {{.PI}}
-            jq -r '.hosts | keys[]' {{.MANIFEST}}
+            printf '%s\n' garnixMachine mtfuji thinsandy kellerbench
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )

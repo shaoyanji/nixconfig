@@ -87,25 +87,10 @@
           assert assertMsg (goBackendHosts == []) "services.go-backend unexpectedly enabled on: ${builtins.toString goBackendHosts}";
           pkgs.runCommand "host-architecture-checks" {} "touch $out";
 
-        ai-host-fleet-contract =
-          assert assertMsg (checkNullclawFleetHost "garnixMachine" nullclawFleetContract.garnixMachine) "garnixMachine nullclaw fleet contract mismatch";
-          assert assertMsg (checkNullclawFleetHost "mtfuji" nullclawFleetContract.mtfuji) "mtfuji nullclaw fleet contract mismatch";
-          pkgs.runCommand "ai-host-fleet-contract" {} "touch $out";
-
         docs-site =
           pkgs.runCommand "docs-site" {} ''
             mkdir -p "$out"
             ls "${self.docsSite}/index.html" > "$out/index.html"
-          '';
-
-        manifest-helper =
-          pkgs.runCommand "manifest-helper" {
-            buildInputs = [ pkgs.jq ];
-            src = ../.;
-          } ''
-            mkdir -p "$out"
-            bash "$src/scripts/task/ai-host-manifest.sh" list > "$out/hosts.txt"
-            test -s "$out/hosts.txt"
           '';
       }
   )

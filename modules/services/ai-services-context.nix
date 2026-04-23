@@ -7,10 +7,8 @@
 
   # Helper to check if a service is enabled
   isServiceEnabled = name:
-    if name == "openclaw" then config.aiServices.openclawGateway.enable or false
-    else if name == "nullclaw" then config.aiServices.nullclaw.enable or false
+    if name == "nullclaw" then config.aiServices.nullclaw.enable or false
     else if name == "xs" then config.aiServices.xs.enable or false
-    else if name == "openfang" then config.aiServices.openfang.enable or false
     else if name == "pancakes-harness" then (config.aiServices ? pancakesHarness) && (config.aiServices.pancakesHarness.enable or false)
     else if name == "hermes" then config.services.hermes-agent.enable or false
     else false;
@@ -67,21 +65,19 @@ in {
 
     serviceNames = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = ["openclaw" "nullclaw" "hermes" "xs" "openfang" "pancakes-harness"];
+      default = ["nullclaw" "hermes" "xs" "pancakes-harness"];
       description = "List of service names to create state directories for (only enabled services will be created).";
     };
 
     stateOwners = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
       default = {
-        openclaw = "openclaw";
         nullclaw = "nullclaw";
         hermes = "hermes";
         xs = "xs";
-        openfang = "openfang";
         pancakes-harness = "pancakes-harness";
       };
-      example = {openclaw = "openclaw"; nullclaw = "nullclaw";};
+      example = {nullclaw = "nullclaw"; hermes = "hermes";};
       description = "AttrSet mapping service name to user owner for state directory.";
     };
 

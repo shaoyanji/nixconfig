@@ -4,8 +4,6 @@
 Route AI host deploy, validate, evidence, drift, and promotion work to the existing manifest and taskfiles. Do not invent new flows; follow the namespaces described here.
 
 ## Manifest truth
-- `taskfiles/ai-host-manifest.json` is the single source of AI host metadata.
-- Use `scripts/task/ai-host-manifest.sh` or `task agents:hosts:*` to answer host/service/promotion questions without editing JSON by hand.
 
 ## Canonical task surfaces
 - Host lifecycle (build/plan/apply/deploy/logs/rollback) belongs to `infra:*` (e.g., `infra:deploy:host:<host>`, `infra:logs:host:<host>`, `infra:rollback:host:<host>`).

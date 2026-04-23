@@ -4,9 +4,6 @@ includes:
   services-core:
     taskfile: ./services-core.yml
     flatten: true
-  services-ai-hosts:
-    taskfile: ./services-ai-hosts.yml
-    flatten: true
   services-legacy:
     taskfile: ./services-legacy.yml
     flatten: true

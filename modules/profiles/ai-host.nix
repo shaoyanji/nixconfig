@@ -1,32 +1,16 @@
-{
-  withOpenclaw ? false,
-}: {
-  config,
-  lib,
-  ...
-}: let
+{ config, lib, ... }: let
   cfg = config.profiles.aiHost;
   hasNullclawDeployment = config.aiServices ? nullclawDeployment;
   nullclawDeploymentEnabled =
     hasNullclawDeployment
     && config.aiServices.nullclawDeployment.enable;
 in {
-  imports =
-    [
-      ../services/nullclaw.nix
-    ]
-    ++ lib.optionals withOpenclaw [
-      ../services/openclaw-gateway.nix
-    ]
-    ;
+  imports = [
+    ../services/nullclaw.nix
+  ];
 
   options.profiles.aiHost = {
     enable = lib.mkEnableOption "AI host service composition profile";
-    openclaw.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable composed OpenClaw service module.";
-    };
     nullclaw.enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -44,8 +28,5 @@ in {
       ];
 
       aiServices.nullclaw.enable = lib.mkDefault cfg.nullclaw.enable;
-    }
-    // lib.optionalAttrs withOpenclaw {
-      aiServices.openclawGateway.enable = cfg.openclaw.enable;
     };
 }

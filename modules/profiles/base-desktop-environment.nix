@@ -29,7 +29,13 @@
 
   programs.niri.enable = true;
 
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    QT_QPA_PLATFORM = "wayland";
+    QT_QPA_PLATFORMTHEME = "kde";
+    XDG_MENU_PREFIX = "plasma-";
+  };
+
   environment.systemPackages = with pkgs; [
     yt-dlp
     lan-mouse
@@ -39,12 +45,8 @@
     alsa-utils
     lagrange
     ngrok
-    kdePackages.dolphin
-    kdePackages.systemsettings
-    kdePackages.ffmpegthumbs
+    nautilus
     ffmpegthumbnailer
-    xdg-desktop-portal-gtk
-    kdePackages.xdg-desktop-portal-kde
   ];
 
   xdg.portal = {
@@ -63,25 +65,14 @@
     };
   };
 
-  environment.sessionVariables = {
-    QT_QPA_PLATFORM = "wayland";
-    QT_QPA_PLATFORMTHEME = "kde";
-    XDG_MENU_PREFIX = "plasma-";
-  };
-
   programs.appimage = {
     enable = true;
     binfmt = true;
   };
 
-  programs.appimage.package = pkgs.appimage-run.override {
-    extraPkgs = pkgs: [
-    ];
-  };
-
   fonts = {
     enableDefaultPackages = true;
-    enableGhostscriptFonts = true;
+    enableGhostscriptFonts = false;
     fontconfig.defaultFonts = {
       serif = ["Noto Serif"];
       sansSerif = ["Noto Sans"];

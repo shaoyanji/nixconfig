@@ -7,9 +7,7 @@
   ...
 }: let
   enableNullClaw = true;
-  enableOpenClaw = false;
   enableHermes = false;
-  enableOpenFang = false;
   enableXS = false;
   enablePancakesHarness = false;
 in {
@@ -19,27 +17,16 @@ in {
     ../../modules/services/ai-services-shared-mounts.nix
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/xs.nix
-    ../../modules/services/openfang.nix
     ../../modules/services/pancakes-harness.nix
     ../../modules/services/ai-services-context.nix
-    inputs.nix-openclaw.nixosModules.openclaw-gateway
     inputs.hermes-agent.nixosModules.default
     ../../modules/profiles/hermes-defaults.nix
     ../../modules/profiles/ollama-cloud-defaults.nix
-    (import ../../modules/profiles/ai-host.nix {
-      withOpenclaw = true;
-    })
+    ../../modules/profiles/ai-host.nix
   ];
-
-  nixpkgs.overlays =
-    []
-    ++ lib.optionals enableOpenClaw [
-      inputs.nix-openclaw.overlays.default
-    ];
 
   profiles.aiHost = {
     enable = true;
-    openclaw.enable = enableOpenClaw;
     nullclaw.enable = enableNullClaw;
   };
 
@@ -62,12 +49,6 @@ in {
       listenPort = 3001;
       workspaceRoot = "/var/lib/nullclaw";
       environmentFile = config.sops.secrets."nullclaw".path;
-    };
-    openfang = {
-      enable = enableOpenFang;
-      package = self.packages.${pkgs.system}.openfang;
-      environmentFile = "/var/lib/openfang/.openfang/openfang.env";
-      requireEnvironmentFile = true;
     };
     xs = {
       enable = enableXS;

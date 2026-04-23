@@ -19,17 +19,13 @@
 
   # Resolve workspaceRoot from each service's config
   workspaceRoots = {
-    openclaw = config.aiServices.openclawGateway.workspaceRoot or null;
     nullclaw = config.aiServices.nullclaw.workspaceRoot or null;
-    openfang = config.aiServices.openfang.workspaceRoot or null;
     hermes = config.services.hermes-agent.stateDir or null;
   };
 
   # Mount target paths relative to workspaceRoot
   mountTargets = {
-    openclaw = ".openclaw/workspace/share";
     nullclaw = "workspace/share";
-    openfang = ".openfang/skills";
     hermes = "workspace/share";
   };
 
@@ -61,28 +57,11 @@ in {
       description = "Source directory for workspace-share bind mounts.";
     };
 
-    skillsSource = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "/srv/data/openclaw/skills/legacy";
-      description = "Source directory for openfang skills bind mount (if different from source).";
-    };
-
     services = {
-      openclaw = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Mount openclaw workspace/share.";
-      };
       nullclaw = lib.mkOption {
         type = lib.types.bool;
         default = false;
         description = "Mount nullclaw workspace/share.";
-      };
-      openfang = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Mount openfang skills directory.";
       };
       hermes = lib.mkOption {
         type = lib.types.bool;
@@ -93,13 +72,6 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    fileSystems = generatedFileSystems
-      // lib.optionalAttrs (cfg.services.openfang or false && cfg.skillsSource != null) {
-        "${workspaceRoots.openfang}/.openfang/skills" = {
-          device = cfg.skillsSource;
-          fsType = "btrfs";
-          options = ["bind"];
-        };
-      };
+    fileSystems = generatedFileSystems;
   };
 }

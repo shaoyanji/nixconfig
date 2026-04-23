@@ -60,6 +60,10 @@ Canonically assembled from [`flake/outputs.nix`](/home/devji/nixconfig/flake/out
 - Service-user OAuth/session management uses `task agents:oauth:*` wrappers (e.g., `agents:oauth:login:nullclaw:codex`, `agents:oauth:exec:nullclaw:codex -- whoami`). The helper sets `HOME` and `XDG_*` correctly for each service user, so you do not need to remember raw `sudo -u ...` incantations.
 - The experimental devcontainer configuration was reverted; there is no current repo-provided devcontainer image, so use the Taskfiles, flake outputs, and hosted workflows directly.
 
+## Recent changes
+
+**2026-04-23 — Manifest and dead-code cleanup.** The AI-host manifest system (`taskfiles/ai-host-manifest.json`, `scripts/task/ai-host-*.sh`, and `taskfiles/services-ai-hosts.yml`) was removed. Host menus and validation tasks now use static host lists and direct smoke checks. The `modules/user/ai/` directory and `modules/goodies.nix` were also removed; nothing in active host configs imported them. See `AUDIT.md` for the full decision log.
+
 ## Docs
 
 - `AGENTS.md` + `.agents/README.md` for routing helpers.

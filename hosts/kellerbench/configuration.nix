@@ -16,7 +16,7 @@ in {
     ./hardware-configuration.nix
     ./nvidia.nix
     ../../modules/profiles/base-node.nix
-    (import ../../modules/profiles/ai-host.nix {})
+    ../../modules/profiles/ai-host.nix
     ../../modules/services/hermes-ai-mounts.nix
     ../../modules/services/ai-services-secrets.nix
     ../../modules/services/nullclaw-deployment.nix

@@ -6,6 +6,16 @@
   lib,
   ...
 }:
+let
+  obsConfig = {
+    enable = false;
+    plugins = with pkgs.obs-studio-plugins; [
+      wlrobs
+      obs-backgroundremoval
+      obs-pipewire-audio-capture
+    ];
+  };
+in
 {
   imports = [
     ../../modules/config/authorized-keys.nix
@@ -22,7 +32,7 @@
 
     inputs.sops-nix.nixosModules.sops
     ../../modules/services/nullclaw-deployment.nix
-    (import ../../modules/profiles/ai-host.nix {})
+    ../../modules/profiles/ai-host.nix
     (import ../../modules/profiles/microvm-host.nix {
       inherit pkgs;
       natExternalInterface = "wlp4s0";
@@ -88,28 +98,24 @@
   environment = {
     systemPackages = with pkgs; [
       btrfs-progs
-      (pkgs.wrapOBS {
-        plugins = with pkgs.obs-studio-plugins; [
-          wlrobs
-          obs-backgroundremoval
-          obs-pipewire-audio-capture
-        ];
-      })
-      sunshine
-      moonlight-qt
+    ]
+    ++ lib.optionals obsConfig.enable [
+      (pkgs.wrapOBS { plugins = obsConfig.plugins; })
+    ]
+    ++ [
+      # sunshine       # Disabled until sunshine setup is restored
+      # moonlight-qt
     ];
   };
 
-  users.groups.libvirtd.members = ["devji"];
-
-  virtualisation.libvirtd.enable = true;
-
-  virtualisation.spiceUSBRedirection.enable = true;
-  users.users.devji.extraGroups = ["adbusers" "kvm" "libvirtd"];
+  # users.groups.libvirtd.members = [ "devji" ];
+  # virtualisation.libvirtd.enable = true;
+  # virtualisation.spiceUSBRedirection.enable = true;
+  # users.users.devji.extraGroups = [ "adbusers" "kvm" "libvirtd" ];
   services.udev.packages = [];
 
-  services.avahi.publish.enable = true;
-  services.avahi.publish.userServices = true;
+  # services.avahi.publish.enable = true;
+  # services.avahi.publish.userServices = true;
   systemd.user.services.niri-flake-polkit.enable = false;
 
   services.displayManager.sddm = {
@@ -119,17 +125,12 @@
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [47984 47989 47990 48010];
-    allowedUDPPortRanges = [
-      {
-        from = 47998;
-        to = 48000;
-      }
-      {
-        from = 8000;
-        to = 8010;
-      }
-    ];
+    # Sunshine ports — re-enable when sunshine is active
+    # allowedTCPPorts = [ 47984 47989 47990 48010 ];
+    # allowedUDPPortRanges = [
+    #   { from = 47998; to = 48000; }
+    #   { from = 8000; to = 8010; }
+    # ];
   };
 }
 // {

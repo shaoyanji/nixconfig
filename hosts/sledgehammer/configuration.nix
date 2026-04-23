@@ -19,7 +19,7 @@
     enable = true;
     device = "nodev";
     efiSupport = true;
-    efiRemovable = true; # ESP lands on removable media
+    efiInstallAsRemovable = true; # ESP lands on removable media
   };
 
   # Headless: no desktop, no graphical anything.

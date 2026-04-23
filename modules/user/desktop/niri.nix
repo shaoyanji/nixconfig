@@ -145,11 +145,11 @@
 
   programs.dank-material-shell = {
     enable = true;
-    enableSystemMonitoring = true;
-    enableVPN = true;
-    enableDynamicTheming = true;
-    enableAudioWavelength = true;
-    enableCalendarEvents = true;
+    enableSystemMonitoring = false;
+    enableVPN = false;
+    enableDynamicTheming = false;
+    enableAudioWavelength = false;
+    enableCalendarEvents = false;
     niri = {
       enableKeybinds = true;
       enableSpawn = true;

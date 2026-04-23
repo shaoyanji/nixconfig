@@ -32,15 +32,15 @@
         compression = {
           enabled = true;
           threshold = 0.5;
-          summary_provider = "openai";
-          summary_base_url = "https://aihubmix.com/v1";
-          summary_model = "gpt-4.1-free";
+          summary_provider = "gemini";
+          summary_base_url = "";
+          summary_model = "gemini-2.5-flash";
         };
         auxiliary = {
           compression = {
-            provider = "openai";
-            base_url = "https://aihubmix.com/v1";
-            model = "gpt-4.1-free";
+            provider = "gemini";
+            base_url = "";
+            model = "gemini-2.5-flash";
             api_key = "";
           };
           embeddings = {

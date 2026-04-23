@@ -58,6 +58,7 @@
     file
     rsync
     jq
+    himalaya
 
     uv
     (lib.hiPrio researchPython)

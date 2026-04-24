@@ -26,9 +26,18 @@ in {
               _launch = true;
               name = "glm-5.1:cloud";
             };
-            "qwen3-coder-next:cloud" = {
+            "deepseek-v4-flash:cloud" = {
               _launch = true;
-              name = "qwen3-coder-next:cloud";
+              name = "deepseek-v4-flash:cloud";
+              limit = {
+                context = 1000000;
+                output = 327680;
+              };
+            };
+
+            "kimi-k2.6:cloud" = {
+              _launch = true;
+              name = "kimi-k2.6:cloud";
               limit = {
                 context = 262144;
                 output = 32768;

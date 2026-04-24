@@ -8,15 +8,13 @@
 }: {
   config = lib.mkIf (config.services.ollama.enable or false) {
     services.ollama = {
-      host = lib.mkDefault "0.0.0.0";
+      host = lib.mkDefault "127.0.0.1";
       openFirewall = lib.mkDefault true;
       loadModels = lib.mkDefault [
-        "gemma4:31b-cloud"
         "minimax-m2.7:cloud"
         "glm-5.1:cloud"
-        "qwen3-coder-next:cloud"
         "kimi-k2.6:cloud"
-        "qwen3.5:cloud"
+        "deepseek-v4-flash:cloud"
       ];
     };
   };

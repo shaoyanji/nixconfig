@@ -85,7 +85,7 @@ in {
 
         # ── Security / Encryption / Auth ──
         age # Simple, modern encryption
-        bitwarden-cli # Bitwarden password manager CLI
+        # bitwarden-cli # Bitwarden password manager CLI
         cloak # Encrypted secrets manager
         totp-cli # TOTP generator
 

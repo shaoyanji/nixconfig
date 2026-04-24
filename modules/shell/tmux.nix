@@ -2,7 +2,7 @@
   programs.tmux = {
     enable = true;
     tmuxinator.enable = true;
-    terminal = "xterm-kitty";
+    # terminal = "xterm-kitty";
     shell = "${pkgs.nushell}/bin/nu";
     # shortcut = "a";
     historyLimit = 100000;

@@ -20,7 +20,7 @@
         model = {
           provider = "nous";
           # default = "nvidia/nemotron-3-super-120b-a12b:free";
-          default = "minimax/minimax-m2.5:free";
+          default = "stepfun/step-3.5-flash";
           # default = "arcee-ai/trinity-large-preview:free";
           # provider = "openrouter";
         };

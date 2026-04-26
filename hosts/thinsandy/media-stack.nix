@@ -78,15 +78,29 @@
   services.home-assistant = {
     enable = true;
     extraComponents = [
+      "rest"
+      "command_line"
+      "todoist"
       "jellyfin"
       "plex"
-      "tailscale"
       "fritzbox"
-      "pi_hole"
       "github"
       "immich"
       "met"
-      "radio_browser"
+      "ipp"
+      # "icloud"
+      # "notion"
+      # "twitter"
+      # "telegram"
+      # "ollama"
+      # "foscam"
+      # "philips_js"
+      # "ecovacs"
+      # "onvif"
+      # "generic"
+      # "tailscale"
+      # "pi_hole"
+      # "radio_browser"
     ];
     config = {
       default_config = {};

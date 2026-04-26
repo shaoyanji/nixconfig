@@ -8,7 +8,7 @@
   imports = [
     # ./codex.nix
     # ./gemini-cli.nix
-    ./mods.nix
+    # ./mods.nix
     ./aichat.nix
     # ./opencode.nix
   ];

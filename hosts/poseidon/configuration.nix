@@ -31,6 +31,7 @@ in
     inputs.microvm.nixosModules.host
 
     inputs.sops-nix.nixosModules.sops
+    ../../modules/services/ai-services-secrets.nix
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/profiles/ai-host.nix
     (import ../../modules/profiles/microvm-host.nix {
@@ -39,11 +40,7 @@ in
     })
   ];
 
-  sops.secrets.ai-services-shared-env = {
-    owner = "root";
-    group = "root";
-    mode = "0444";
-  };
+  aiServices.sharedSecrets.enable = true;
 
   profiles.aiHost = {
     enable = true;

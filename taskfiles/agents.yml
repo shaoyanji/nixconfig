@@ -9,7 +9,7 @@ tasks:
         task "$choice"
 
   browse:
-    desc: Legacy browse menu
+    desc: "[deprecated] Legacy browse menu - use direct commands"
     cmds:
       - |
         choice=$(printf '%s\n' browse-notes browse-internet browse-projects exit | gum choose)
@@ -36,10 +36,10 @@ tasks:
       - task browse-projects
 
   edit-config:
-    desc: Legacy edit-config menu
+    desc: "[deprecated] Legacy edit-config menu - use infra:secrets:edit:* or direct file edits"
     cmds:
       - |
-        choice=$(printf '%s\n' edit-taskfile edit-nixos-home-task edit-apikeys edit-global edit-secrets edit-sops edit-sops-config edit-home-manager edit-shell-config exit | gum choose)
+        choice=$(printf '%s\n' infra:secrets:edit:taskfile infra:secrets:edit:detaskfile infra:secrets:edit:apikeys infra:secrets:edit:secrets edit-global edit-sops edit-sops-config edit-home-manager edit-shell-config exit | gum choose)
         task "$choice"
 
   edit-global:
@@ -69,17 +69,17 @@ tasks:
       - $EDITOR ./modules/shell/default.nix
 
   update:
-    desc: Legacy update menu
+    desc: "[deprecated] Legacy update menu - use dev:git:* or dev:flake:* directly"
     cmds:
       - |
-        choice=$(printf '%s\n' git-quick-push git-quick-pull update-flake updatekeys-sops exit | gum choose)
+        choice=$(printf '%s\n' dev:git:ai-commit-push dev:git:quick-pull dev:flake:update-branch infra:sops:update-keys exit | gum choose)
         task "$choice"
 
   new:
-    desc: Legacy bootstrap menu
+    desc: "[deprecated] Legacy bootstrap menu - use infra:secrets:new:* directly"
     cmds:
       - |
-        choice=$(printf '%s\n' generate-secrets copy-nas-secrets exit | gum choose)
+        choice=$(printf '%s\n' infra:secrets:new:generate infra:secrets:new:copy-nas exit | gum choose)
         task "$choice"
 
   incus:
@@ -210,24 +210,3 @@ tasks:
       TOOL: '{{index .MATCH 1}}'
     cmds:
       - scripts/task/service-oauth.sh exec {{.SERVICE}} {{.TOOL}} -- {{.CLI_ARGS}}
-
-  # Static aliases for common combinations
-  agents:oauth:login:nullclaw:codex:
-    desc: Login to Codex as nullclaw service user
-    cmds:
-      - scripts/task/service-oauth.sh login nullclaw codex
-
-  agents:oauth:status:nullclaw:codex:
-    desc: Check Codex auth status for nullclaw service
-    cmds:
-      - scripts/task/service-oauth.sh status nullclaw codex
-
-  agents:oauth:login:openclaw:codex:
-    desc: Login to Codex as openclaw service user
-    cmds:
-      - scripts/task/service-oauth.sh login openclaw codex
-
-  agents:oauth:status:openclaw:codex:
-    desc: Check Codex auth status for openclaw service
-    cmds:
-      - scripts/task/service-oauth.sh status openclaw codex

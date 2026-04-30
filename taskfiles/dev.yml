@@ -2,28 +2,63 @@ version: "3"
 
 tasks:
   dev:git:quick-push:
-    desc: Commit/push config updates quickly
+    desc: Commit/push config updates quickly using AI-generated commit messages
     cmds:
       - task dev:git:prehook
-      - 'git commit -m "tidy: config update from $(hostname)"'
-      - task dev:git:posthook
+      - |
+        if ! git diff --cached --quiet; then
+          gmc -a --yes
+          task dev:git:posthook
+        else
+          echo "No changes to commit"
+        fi
 
-  git-quick-push:
-    desc: Alias for dev:git:quick-push
+  dev:git:quick-push-safe:
+    desc: Commit/push with automatic stash handling using AI-generated commit messages
     cmds:
-      - task dev:git:quick-push
+      - |
+        if ! git diff --quiet || ! git diff --cached --quiet; then
+          echo "Stashing uncommitted changes..."
+          git stash push -m "auto-stash before quick-push"
+        fi
+      - task dev:git:prehook
+      - |
+        if ! git diff --cached --quiet; then
+          gmc -a --yes
+          task dev:git:posthook
+        else
+          echo "No changes to commit"
+        fi
+      - |
+        if git stash list | grep -q "auto-stash before quick-push"; then
+          echo "Restoring stashed changes..."
+          git stash pop
+        fi
 
   dev:git:build-push:
-    desc: Commit/push after successful build
+    desc: Commit/push after successful build using AI-generated commit messages
     cmds:
       - task dev:git:prehook
-      - git commit -m "nix-build was successful on $(uname -a)"
-      - task dev:git:posthook
+      - |
+        if ! git diff --cached --quiet; then
+          gmc -a -c "Successful build on $(uname -a)" --yes
+          task dev:git:posthook
+        else
+          echo "No changes to commit"
+        fi
 
-  git-build-push:
-    desc: Alias for dev:git:build-push
+  dev:git:ai-commit:
+    desc: Stage all tracked changes and generate AI commit message (interactive)
     cmds:
-      - task dev:git:build-push
+      - git add -u
+      - gmc -a
+
+  dev:git:ai-commit-push:
+    desc: Stage all tracked changes, generate AI commit message, and push
+    cmds:
+      - git add -u
+      - gmc -a --yes
+      - git push
 
   dev:git:quick-pull:
     desc: Pull with submodules and reload Taskfile
@@ -31,32 +66,37 @@ tasks:
       - git pull --recurse-submodules
       - task infra:load:taskfile
 
-  git-quick-pull:
-    desc: Alias for dev:git:quick-pull
-    cmds:
-      - task dev:git:quick-pull
-
   dev:git:prehook:
-    desc: "[destructive] Refresh Taskfile.yml before commit"
+    desc: Refresh Taskfile.yml from encrypted secrets before commit (stages changed files)
     cmds:
-      - rm ./Taskfile.yml
-      - git add .
       - task infra:load:taskfile
-
-  git-prehook:
-    desc: Alias for dev:git:prehook
-    cmds:
-      - task dev:git:prehook
+      - git add -u  # Only stage tracked files, not new untracked files
 
   dev:git:posthook:
-    desc: Push current branch
+    desc: Push current branch with error handling
     cmds:
-      - git push
+      - |
+        if ! git push; then
+          echo "Error: Git push failed"
+          exit 1
+        fi
 
-  git-posthook:
-    desc: Alias for dev:git:posthook
+  dev:git:status:
+    desc: Show detailed git status including stashed changes
     cmds:
-      - task dev:git:posthook
+      - echo "=== Current Branch ===" && git branch --show-current
+      - echo -e "\n=== Working Tree Status ===" && git status --short
+      - echo -e "\n=== Stashed Changes ===" && git stash list
+
+  dev:git:stash-push:
+    desc: Stash current changes with a message
+    cmds:
+      - git stash push -m "auto-stash before operation"
+
+  dev:git:stash-pop:
+    desc: Pop most recent stash
+    cmds:
+      - git stash pop
 
   dev:site:list:
     desc: List site deployment targets from manifest
@@ -106,54 +146,100 @@ tasks:
     cmds:
       - ./scripts/task/site-target.sh deploy
 
-  dev:site:sync-verntil:
-    desc: Alias for dev:site:deploy
-    cmds:
-      - task dev:site:deploy
-
-  verntil:
-    desc: Alias for dev:site:deploy
-    cmds:
-      - task dev:site:deploy
-
   dev:flake:update-branch:
-    desc: "[destructive] Create/reset update branch and force-push flake.lock update"
+    desc: "[destructive] Create/reset update branch and force-push flake.lock update (fetches main first)"
     cmds:
+      - |
+        # Ensure we're on main and up to date
+        git switch main 2>/dev/null || git checkout main
+        git pull --rebase origin main
+      - |
+        # Check if update branch exists remotely
+        if git fetch origin update 2>/dev/null; then
+          echo "Warning: Remote update branch exists, will be overwritten"
+        fi
       - git branch -D update || true
       - git switch -c update
       - nix flake update
       - task dev:flake:update-garnix
       - git add flake.lock garnix.yaml
-      - git commit -s -m "flake update + garnix sync"
-      - git push -f
+      - gmc -c "flake update and garnix sync" --yes
+      - git push -f origin update
       - git switch main
-
-  update-flake:
-    desc: Alias for dev:flake:update-branch
-    cmds:
-      - task dev:flake:update-branch
 
   dev:flake:merge-update:
-    desc: "[destructive] Merge update branch into main and delete branch"
+    desc: "[destructive] Merge update branch into main, push result, and delete branch"
     cmds:
+      - |
+        # Validate update branch exists
+        if ! git show-ref --verify --quiet refs/heads/update; then
+          echo "Error: update branch does not exist locally"
+          exit 1
+        fi
       - git switch main
-      - git merge update
+      - git pull --rebase origin main
+      - |
+        # Merge with explicit message
+        if git merge update --no-ff -m "Merge flake updates from update branch"; then
+          echo "Merge successful"
+        else
+          echo "Error: Merge failed - resolve conflicts manually"
+          exit 1
+        fi
+      - git push origin main
       - git branch -d update
+      - echo "Update branch merged and deleted"
 
-  upgrade-flake:
-    desc: Alias for dev:flake:merge-update
+  dev:flake:update-complete:
+    desc: "[destructive] Complete flake update workflow: create branch, update, merge to main, push (all in one)"
     cmds:
-      - task dev:flake:merge-update
+      - |
+        # Ensure we're on main and up to date
+        git switch main 2>/dev/null || git checkout main
+        git pull --rebase origin main
+      - |
+        # Check for uncommitted changes
+        if ! git diff --quiet || ! git diff --cached --quiet; then
+          echo "Error: Working tree has uncommitted changes"
+          echo "Commit or stash them first, or use dev:git:stash-push"
+          exit 1
+        fi
+      - |
+        # Check if update branch exists remotely
+        if git fetch origin update 2>/dev/null; then
+          echo "Warning: Remote update branch exists, will be overwritten"
+          read -p "Continue? (y/N) " -n 1 -r
+          echo
+          if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Aborted"
+            exit 1
+          fi
+        fi
+      - git branch -D update || true
+      - git switch -c update
+      - nix flake update
+      - task dev:flake:update-garnix
+      - git add flake.lock garnix.yaml
+      - gmc -c "flake update and garnix sync" --yes
+      - git push -f origin update
+      - git switch main
+      - git pull --rebase origin main
+      - |
+        # Merge with explicit message
+        if git merge update --no-ff -m "Merge flake updates from update branch"; then
+          echo "Merge successful"
+        else
+          echo "Error: Merge failed - resolve conflicts manually"
+          exit 1
+        fi
+      - git push origin main
+      - git branch -d update
+      - echo "Flake update completed successfully"
 
   dev:flake:update:bountystash:
     desc: Update only the bountystash flake input
     cmds:
       - nix flake update bountystash
-
-  update-bountystash:
-    desc: Alias for dev:flake:update:bountystash
-    cmds:
-      - task dev:flake:update:bountystash
 
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
@@ -178,11 +264,6 @@ tasks:
         for f in modules/config/*.json; do
           if [[ -f "$f" ]]; then
             echo "Updating $f..."
-            nix-hash-update "$f"
+            scripts/task/nix-hash-update.sh "$f"
           fi
         done
-
-  config-hash-update:
-    desc: Alias for dev:config:hash-update
-    cmds:
-      - task dev:config:hash-update

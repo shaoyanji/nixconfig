@@ -14,7 +14,18 @@
 
 ## Current Open Work
 
-1. Review `garnixMachine` host naming; `networking.hostName` still evaluates to `"nixos"`, which appears to predate the refactor.
+1. Documentation alignment completed (April 30, 2026) - All documentation now reflects simplified task control plane and current AI services state
+
+## Completed (April 30, 2026)
+
+- Documentation alignment to reflect current system state:
+  - Updated `AGENTS.md` to reflect current task routing
+  - Rewrote `docs/task-control-plane.md` for simplified task structure
+  - Updated `taskfiles/README.md` ownership map
+  - Updated `README.md` to remove outdated AI manifest/fleet references
+  - Simplified `docs/nullclaw-fleet-pattern.md` to remove evidence/drift/promotion flows
+  - Updated `AUDIT.md` to reflect completed cleanup
+  - Updated this file to reflect current work status
 
 ## TestVM Follow-Up
 

@@ -2,6 +2,10 @@
   pkgs,
   ...
 }: {
+  # Desktop client profile with NAS client dependency
+  # Note: nas-client.nix is imported unconditionally as it's a core dependency
+  # for desktop client functionality. To disable NAS mounts, configure
+  # profiles.nas-client.enable = false in nas-client.nix itself.
   imports = [
     ./base-node.nix
     ./nas-client.nix

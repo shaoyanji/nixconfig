@@ -1,10 +1,12 @@
 # General purpose shell with common utilities
 {pkgs ? import <nixpkgs> {}}:
 let
+  builder = pkgs.callPackage ./builder.nix {};
   common = pkgs.callPackage ./common-packages.nix {};
   hooks = pkgs.callPackage ./shell-hooks.nix {};
 in
-pkgs.mkShell {
+builder.mkDevShell {
+  name = "general";
   packages = with pkgs; [
     common.greeting
     common.core
@@ -15,10 +17,6 @@ pkgs.mkShell {
     pkgs.fastfetch
     pkgs.speedtest-cli
   ];
-
-  GREETING = "Hello, Nix!";
-  shellHook = ''
-    ${hooks.full}
-    ${hooks.greeting}
-  '';
+  greeting = "Hello, Nix!";
+  extraHooks = [hooks.full hooks.greeting];
 }

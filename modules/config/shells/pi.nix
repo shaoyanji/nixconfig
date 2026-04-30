@@ -1,17 +1,7 @@
 # Raspberry Pi/embedded development shell with extensive tooling
 {pkgs ? import <nixpkgs> {}}:
 let
+  builder = pkgs.callPackage ./builder.nix {};
   common = pkgs.callPackage ./common-packages.nix {};
-  hooks = pkgs.callPackage ./shell-hooks.nix {};
 in
-pkgs.mkShell {
-  packages = with pkgs; [
-    common.greeting
-    common.terminal-extras
-  ];
-
-  GREETING = "Hello, Nix!";
-  shellHook = ''
-    ${hooks.greeting}
-  '';
-}
+builder.mkMinimalShell [common.terminal-extras]

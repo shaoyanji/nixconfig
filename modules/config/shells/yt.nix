@@ -1,10 +1,12 @@
 # YouTube/media download and management shell
 {pkgs ? import <nixpkgs> {}}:
 let
+  builder = pkgs.callPackage ./builder.nix {};
   common = pkgs.callPackage ./common-packages.nix {};
   hooks = pkgs.callPackage ./shell-hooks.nix {};
 in
-pkgs.mkShell {
+builder.mkDevShell {
+  name = "yt";
   packages = with pkgs; [
     common.greeting
     common.core
@@ -13,10 +15,6 @@ pkgs.mkShell {
     common.media
     pkgs.htop
   ];
-
-  GREETING = "Hello, Nix!";
-  shellHook = ''
-    ${hooks.full}
-    ${hooks.greeting}
-  '';
+  greeting = "Hello, Nix!";
+  extraHooks = [hooks.full hooks.greeting];
 }

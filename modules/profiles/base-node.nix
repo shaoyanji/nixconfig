@@ -10,12 +10,11 @@
     ../../modules/config/authorized-keys.nix
     inputs.sops-nix.nixosModules.sops
     ./firewall-baseline.nix
+    ./boot.nix
   ];
 
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
-    loader.systemd-boot.enable = true;
-    loader.efi.canTouchEfiVariables = true;
   };
 
   sops = {

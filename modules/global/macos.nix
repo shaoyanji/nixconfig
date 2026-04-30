@@ -1,6 +1,10 @@
 # macOS (nix-darwin) home-manager configuration.
 # Primary user constants: modules/global/user.nix
 {inputs, ...}: {
+  imports = [
+    ./home-manager-shared.nix
+  ];
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -10,10 +14,6 @@
         ../roles/home.nix
       ];
     }; # staging point for roles/home.nix commons
-    sharedModules = [
-      inputs.sops-nix.homeManagerModules.sops
-      inputs.kickstart-nixvim.homeManagerModules.default
-    ];
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
     # Optionally, use home-manager.extraSpecialArgs to pass
   };

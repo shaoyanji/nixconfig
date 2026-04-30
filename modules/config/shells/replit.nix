@@ -1,18 +1,7 @@
 # Replit-style development shell
 {pkgs ? import <nixpkgs> {}}:
 let
+  builder = pkgs.callPackage ./builder.nix {};
   common = pkgs.callPackage ./common-packages.nix {};
-  hooks = pkgs.callPackage ./shell-hooks.nix {};
 in
-pkgs.mkShell {
-  packages = with pkgs; [
-    common.greeting
-    common.replit
-    common.editors
-  ];
-
-  GREETING = "Hello, Nix!";
-  shellHook = ''
-    ${hooks.greeting}
-  '';
-}
+builder.mkMinimalShell [common.replit common.editors]

@@ -8,8 +8,8 @@
     ./minimal.nix
     ../shell
     # ../user/ai/opencode.nix # too bloated
-    ./user/ai/codex.nix
-    ./user/ai/gemini-cli.nix
+    ../user/ai/codex.nix
+    ../user/ai/gemini-cli.nix
   ];
 
   programs.nix-your-shell.enable = true;

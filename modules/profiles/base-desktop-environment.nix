@@ -5,14 +5,8 @@
   imports = [
     ./desktop-client.nix
     ../nixos/lxc
+    ./boot.nix
   ];
-
-  boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
-  };
 
   services = {
     displayManager = {

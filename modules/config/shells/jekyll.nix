@@ -1,17 +1,11 @@
 # Jekyll static site development shell
 {pkgs ? import <nixpkgs> {}}:
 let
+  builder = pkgs.callPackage ./builder.nix {};
   common = pkgs.callPackage ./common-packages.nix {};
-  hooks = pkgs.callPackage ./shell-hooks.nix {};
 in
-pkgs.mkShell {
-  packages = with pkgs; [
-    common.greeting
-    common.jekyll
-  ];
-
-  GREETING = "Hello, Nix!";
-  shellHook = ''
-    ${hooks.greeting}
-  '';
+builder.mkPackageShell {
+  name = "jekyll";
+  package = common.jekyll;
+  greeting = "Hello, Jekyll!";
 }

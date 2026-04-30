@@ -1,86 +1,80 @@
 version: "3"
 
 tasks:
-  pre-hook-rebuild:
-    desc: Alias for services:rebuild:pre-hook
-    cmds:
-      - task services:rebuild:pre-hook
+  # Removed: pre-hook-rebuild (broken - services:rebuild:pre-hook doesn't exist)
+  # Use infra:rebuild:* directly instead
 
   switch:*:
-    desc: Alias for services:switch:*
+    desc: "[deprecated] Alias for infra:switch:*"
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
-      - task services:switch:{{.OS}}
+      - task infra:switch:{{.OS}}
 
   boot:*:
-    desc: Alias for services:boot:*
+    desc: "[deprecated] Alias for infra:boot:*"
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
-      - task services:boot:{{.OS}}
+      - task infra:boot:{{.OS}}
 
-  prb:*:
-    desc: Alias for services:deploy:host:*
-    vars:
-      HOST: '{{index .MATCH 0}}'
-    cmds:
-      - task services:deploy:host:{{.HOST}}
+  # Removed: prb:* (redundant - creates circular routing through services layer)
+  # Use infra:deploy:host:* directly instead
 
   nixos-rebuild:
-    desc: Alias for services:rebuild:nixos
+    desc: "[deprecated] Alias for infra:rebuild:nixos"
     cmds:
-      - task services:rebuild:nixos
+      - task infra:rebuild:nixos
 
   darwin-rebuild:
-    desc: Alias for services:rebuild:darwin
+    desc: "[deprecated] Alias for infra:rebuild:darwin"
     cmds:
-      - task services:rebuild:darwin
+      - task infra:rebuild:darwin
 
   home-manager-switch:
-    desc: Alias for services:rebuild:home-manager
+    desc: "[deprecated] Alias for infra:rebuild:home-manager"
     cmds:
-      - task services:rebuild:home-manager
+      - task infra:rebuild:home-manager
 
   wsl-rebuild:
-    desc: Alias for services:rebuild:wsl
+    desc: "[deprecated] Alias for infra:rebuild:wsl"
     cmds:
-      - task services:rebuild:wsl
+      - task infra:rebuild:wsl
 
   orb-rebuild:
-    desc: Alias for services:rebuild:orb
+    desc: "[deprecated] Alias for infra:rebuild:orb"
     cmds:
-      - task services:rebuild:orb
+      - task infra:rebuild:orb
 
   services:deploy:rpi:
     desc: Deploy configured Raspberry Pi host
     cmds:
-      - task services:deploy:host:{{.PI}}
+      - task infra:deploy:host:{{.PI}}
 
   push-rpi-rebuild:
-    desc: Alias for services:deploy:rpi
+    desc: "[deprecated] Alias for infra:deploy:host:{{.PI}}"
     cmds:
-      - task services:deploy:rpi
+      - task infra:deploy:host:{{.PI}}
 
   services:deploy:thinsandy:
     desc: Deploy thinsandy host
     cmds:
-      - task services:deploy:host:thinsandy
+      - task infra:deploy:host:thinsandy
 
   push-thin-rebuild:
-    desc: Alias for services:deploy:thinsandy
+    desc: "[deprecated] Alias for infra:deploy:host:thinsandy"
     cmds:
-      - task services:deploy:thinsandy
+      - task infra:deploy:host:thinsandy
 
   services:deploy:mtfuji:
     desc: Deploy mtfuji host
     cmds:
-      - task services:deploy:host:mtfuji
+      - task infra:deploy:host:mtfuji
 
   push-fuji-rebuild:
-    desc: Alias for services:deploy:mtfuji
+    desc: "[deprecated] Alias for infra:deploy:host:mtfuji"
     cmds:
-      - task services:deploy:mtfuji
+      - task infra:deploy:host:mtfuji
 
   services:deploy:menu:
     desc: Compatibility alias for infra:deploy:menu
@@ -88,14 +82,14 @@ tasks:
       - task infra:deploy:menu
 
   rebuild:
-    desc: Legacy rebuild menu
+    desc: "[deprecated] Legacy rebuild menu - use infra:rebuild:* or infra:deploy:* directly"
     cmds:
       - |
         choice=$(
           {
-            printf '%s\n' nixos-rebuild darwin-rebuild home-manager-switch wsl-rebuild orb-rebuild
-            printf '%s\n' "services:deploy:host:{{.PI}}"
-            printf '%s\n' services:deploy:host:garnixMachine services:deploy:host:mtfuji services:deploy:host:thinsandy services:deploy:host:kellerbench
+            printf '%s\n' infra:rebuild:nixos infra:rebuild:darwin infra:rebuild:home-manager infra:rebuild:wsl infra:rebuild:orb
+            printf '%s\n' "infra:deploy:host:{{.PI}}"
+            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:thinsandy infra:deploy:host:kellerbench
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )

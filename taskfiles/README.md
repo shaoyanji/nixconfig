@@ -1,21 +1,24 @@
 # Taskfile Map
 
 ## Scope
-Quick reference to who owns each taskfile and where to go for lifecycle, AI-host, and agent queries after the infra/services/agents cleanup.
+Quick reference to who owns each taskfile and where to go for lifecycle, deployment, and operator queries.
 
 ## Canonical ownership
-- `Taskfile.yml` is the entrypoint; it loads the shards and hosts only a few top-level helper menus (`deploy`, `logs`, `status`).
-- `taskfiles/infra.yml` is the canonical host lifecycle surface (`infra:*`).
-- `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` keep the legacy `services:*` compatibility wrappers while routing the work to the canonical namespaces.
+- `Taskfile.yml` is the entrypoint; it loads the shards and hosts top-level helper menus (`deploy`, `logs`, `status`, `menu`).
+- `taskfiles/infra.yml` is the canonical host lifecycle surface (`infra:*`) for plan/apply/deploy/rollback/logs and secrets management.
+- `taskfiles/agents.yml` holds operator helpers, xs runtime wrappers, and OAuth/session management.
+- `taskfiles/checks.yml` contains validation and smoke checks (primarily nullclaw deployment validation).
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
-- `taskfiles/agents.yml` holds operator helper wrappers and xs/oauth commands.
+- `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
 
 ## File-by-file map
-- `Taskfile.yml` – entrypoint/menus only.
-- `taskfiles/infra.yml` – host lifecycle/deploy/log flows.
-- `taskfiles/services-*` – compatibility wrappers and validation surfaces.
-- `taskfiles/dev.yml` – git/flake helpers plus site build/preview/deploy flows.
-- `taskfiles/agents.yml` – operator helpers, xs, and oauth wrappers.
+- `Taskfile.yml` – entrypoint with top-level menus
+- `taskfiles/infra.yml` – host lifecycle, secrets, SOPS operations
+- `taskfiles/agents.yml` – operator helpers, xs wrappers, OAuth management
+- `taskfiles/checks.yml` – validation and smoke checks
+- `taskfiles/dev.yml` – git workflows, flake updates, site deployment
+- `taskfiles/services-core.yml` – minimal compatibility wrappers
+- `taskfiles/services-legacy.yml` – deprecated aliases (marked `[deprecated]`)
 
 ## Truth boundaries
 - `taskfiles/site-manifest.json` is the site/static deployment metadata source; query it through `scripts/task/site-target.sh` or `dev:site:*` wrappers.
@@ -23,14 +26,13 @@ Quick reference to who owns each taskfile and where to go for lifecycle, AI-host
 - `AGENTS.md` and `.agents/*` document routing/guidance; they do not execute.
 
 ## Common "where to look"
-- Lifecycle/deploy/log flows → `taskfiles/infra.yml` (`infra:*`).
-- Host validation → `taskfiles/services-core.yml` (`services:validate:host:*`).
-- Flake/git helpers, site local preview/deploy, and `bountystash` updates → `taskfiles/dev.yml`.
-- Need to update the `bountystash` flake input? use `dev:flake:update:bountystash`.
-- Legacy `services:*` aliases → `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml`.
-- Operator helpers and xs lookups → `taskfiles/agents.yml` and `scripts/task/site-target.sh`, including the `agents:xs:*` wrappers for `xs-helper`.
-- Service-user OAuth/session management → `taskfiles/agents.yml` (`agents:oauth:*`), implemented by `scripts/task/service-oauth.sh`.
+- Host deployment/lifecycle → `taskfiles/infra.yml` (`infra:*`)
+- Operator helpers and xs/OAuth → `taskfiles/agents.yml` (`agents:xs:*`, `agents:oauth:*`)
+- Validation checks → `taskfiles/checks.yml` (`checks:*`)
+- Git/flake workflows, site deployment → `taskfiles/dev.yml` (`dev:*`)
+- Legacy compatibility → `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml`
 
 ## What not to assume
-- Don’t assume `Taskfile.yml` contains the lifecycle logic—open the individual taskfiles instead.
-- Don’t treat `.agents/*` as executable truth; tasks still live in the Taskfiles.
+- Don't assume `Taskfile.yml` contains the lifecycle logic—open the individual taskfiles instead.
+- Don't treat `.agents/*` as executable truth; tasks still live in the Taskfiles.
+- Don't use `services:*` tasks for new workflows; prefer canonical `infra:*` or `dev:*` namespaces.

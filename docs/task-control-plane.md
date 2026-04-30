@@ -1,41 +1,61 @@
 # Task Control Plane
 
-This repository uses a small control-plane namespace policy so task names stay predictable and easier to review.
+This repository uses a simplified task namespace for predictable operator workflows.
 
-## Groups
+## Current Namespace Structure
 
-- `infra`: host/deploy/rebuild/switch/boot operations
-- `services`: host validation and compatibility wrappers
-- `checks`: validation and narrow verification
-- `agents`: interactive/operator menus and handoff helpers
-- `dev`: git/build/local workflows
+- `infra:*`: Host lifecycle operations (plan/apply/deploy/rollback/logs), secrets management, SOPS operations
+- `agents:*`: Operator helpers, xs runtime wrappers, OAuth/session management for service users
+- `checks:*`: Validation and smoke checks (primarily nullclaw deployment validation)
+- `dev:*`: Git workflows, flake updates, site deployment, and local development tasks
+- `services:*`: Legacy compatibility wrappers (routes to `infra:*` tasks)
 
-## Naming Rules
+## Taskfile Organization
 
-- Prefer namespaced tasks for any new canonical entrypoint.
-- Keep top-level tasks only for operator-facing entrypoints and legacy wrappers.
-- Put host rebuild and deployment flows under `infra:*`.
-- Put host validation flows (and compatibility wrappers) under `services:*`.
-- Put menus, grouped help, grouped status, and handoff helpers under `agents:*`.
-- Put validation under `checks:*`.
-- Put git, flake update, site/static target workflows, and local developer workflows under `dev:*`.
+- `Taskfile.yml`: Main entrypoint with top-level menus (deploy, logs, status, menu)
+- `taskfiles/infra.yml`: Host lifecycle, secrets, SOPS operations
+- `taskfiles/agents.yml`: Operator helpers, xs wrappers, OAuth management
+- `taskfiles/checks.yml`: Validation and smoke checks
+- `taskfiles/dev.yml`: Git workflows, flake updates, site deployment
+- `taskfiles/services-core.yml`: Minimal compatibility wrappers
+- `taskfiles/services-legacy.yml`: Deprecated aliases (marked `[deprecated]`)
 
-## Canonical surfaces
+## Common Workflows
 
-- Host lifecycle/deploy/log flows live in `taskfiles/infra.yml` under the `infra:*` namespace.
-- Host validation lives under `services:*` via `taskfiles/services-core.yml`; the `services:validate:host:*` and related wrappers stay there for continuity.
-- `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` now only expose the minimal compatibility wrappers operators still need to reach the canonical deploy flows.
-- Validation/check flows live in `taskfiles/checks.yml`; dev/git helpers (including the flake-update helpers) live in `taskfiles/dev.yml`.
-- Agent/operator helpers live in `taskfiles/agents.yml`, including the `agents:xs:*` wrappers that drive `scripts/task/xs-helper.sh`.
+### Host Deployment
+```bash
+task infra:deploy:host:<host>    # Plan + apply + validate
+task infra:plan:host:<host>      # Build/evaluate only
+task infra:apply:host:<host>     # Apply configuration only
+```
 
-## Controls
-- Prefer new `infra:*` names for any host-local deployments, rebuilds, or logs; the old `services:*` wrappers are retained only for compatibility.
-- Keep menus and helper shells under `agents:*`.
-- Keep validation under `checks:*`.
-- Keep git/flake/local workflows under `dev:*`.
+### Local Rebuilds
+```bash
+task infra:rebuild:nixos         # Rebuild local NixOS host
+task infra:rebuild:darwin        # Rebuild local Darwin host
+task infra:rebuild:home-manager  # Rebuild Home Manager profile
+```
 
-## Services layering
+### Git & Flakes
+```bash
+task dev:git:quick-push          # Commit/push with AI-generated message
+task dev:flake:update-complete   # Complete flake update workflow
+task dev:flake:update:bountystash # Update single flake input
+```
 
-`taskfiles/services.yml` now only includes the split surfaces:
-- `taskfiles/services-core.yml` exposes the remaining `services:*` compatibility entrypoints and deploy aliases while routing work toward the canonical namespaces.
-- `taskfiles/services-legacy.yml` holds the small set of legacy convenience menus and host deploy aliases that operators still reach for.
+### Validation
+```bash
+task checks:quick                # Run narrow repo checks
+task checks:nullclaw:smoke:<host> # Smoke-check nullclaw deployment
+```
+
+### Operator Helpers
+```bash
+task agents:menu                 # Interactive operator menu
+task agents:xs:status            # Show xs-helper status
+task agents:oauth:list           # List known OAuth services
+```
+
+## Legacy Migration
+
+Many tasks in `services-legacy.yml` are marked `[deprecated]` and route to canonical `infra:*` or `dev:*` tasks. Prefer using the canonical namespaces directly for new workflows.

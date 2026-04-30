@@ -4,24 +4,20 @@
     "sha256": "sha256:1llzlmrczawn4qa1rmmlwrac0m3rgn90wx21jykn3vxrmjcysfg0"
   },
   {
-    "url": "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/utils.nu",
-    "sha256": "sha256:1k1j26809an72scmq8nbdd18dk49j1504ph6d2w9w9njhgslvb83"
+    "url": "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/llm.nu",
+    "sha256": "sha256:1kvn5ayi9vpc1hmb3li50siq2rmrimffghf6g6dkph29csifgqmh"
   },
   {
     "url": "https://gist.githubusercontent.com/shaoyanji/f20e99159064c24d5be6011cd7f8d8d1/raw/mataroa.nu",
     "sha256": "sha256:1f5x6jsngz21sh8vbjd785ak1lnslmmig468bsyjrg8sv9mgy47f"
   },
   {
-    "url": "https://gist.githubusercontent.com/shaoyanji/503e32b2c6d7e80168fcee405bd3b11d/raw/llm.nu",
-    "sha256": "sha256:1kvn5ayi9vpc1hmb3li50siq2rmrimffghf6g6dkph29csifgqmh"
+    "url": "https://gist.githubusercontent.com/shaoyanji/7440633c9c54a9604c8e53cd0e45651b/raw/utils.nu",
+    "sha256": "sha256:1k1j26809an72scmq8nbdd18dk49j1504ph6d2w9w9njhgslvb83"
   },
   {
     "url": "https://gist.githubusercontent.com/shaoyanji/0087741c46a72944304cf2fa2b5745ca/raw/finance.nu",
     "sha256": "sha256:0c0pl1fpkwj1r1aqnz5l9b21ia0vdsqdr7yvgirca7b3xnvdmjf7"
-  },
-  {
-    "url": "https://gist.githubusercontent.com/shaoyanji/5480756cac1bef5af76929fb1b6b32fa/raw/todoist.nu",
-    "sha256": "sha256:1a7ls7s8wj6vb5ch12bs79rhjj9xfcpc3308hhzd1lm3yrxp3k4z"
   },
   {
     "url": "https://gist.githubusercontent.com/shaoyanji/d18e52a23f062b725cc0533cc6414d37/raw/de.nu",
@@ -30,5 +26,9 @@
   {
     "url": "https://gist.githubusercontent.com/shaoyanji/4a333f439fb144bf1c89a3a3739406ef/raw/jobby.nu",
     "sha256": "sha256:1cdps1yzwj5564m0gpja40vc097w4ai07c3g6d22xznvwfg16c4l"
+  },
+  {
+    "url": "https://gist.githubusercontent.com/shaoyanji/5480756cac1bef5af76929fb1b6b32fa/raw/todoist.nu",
+    "sha256": "sha256:1a7ls7s8wj6vb5ch12bs79rhjj9xfcpc3308hhzd1lm3yrxp3k4z"
   }
 ]

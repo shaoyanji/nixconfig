@@ -48,7 +48,6 @@
           unpaywall
           sponsorblock
           offline-qr-code-generator
-          ipfs-companion
           hacktools
           # ghosttext
           geminize
@@ -59,6 +58,7 @@
           # single-file
 
           # wappalyzer
+          # ipfs-companion
         ];
         # containersForce = true;
         # containers = {

@@ -69,7 +69,7 @@ in {
 
     secrets.nullclaw-config = {
       sopsFile = ../secrets/nullclaw-config.json;
-      format = "json";
+      # format = "json";
       owner = "nullclaw";
       group = "nullclaw";
       mode = "0400";

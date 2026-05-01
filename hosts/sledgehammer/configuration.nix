@@ -23,6 +23,7 @@
       efiSupport = true;
       efiInstallAsRemovable = true; # ESP lands on removable media
     };
+    systemd-boot.enable = lib.mkForce false; # Using GRUB instead for removable media
   };
 
   # Headless: no desktop, no graphical anything.

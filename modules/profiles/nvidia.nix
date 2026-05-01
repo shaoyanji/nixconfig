@@ -13,6 +13,7 @@
     open = false;
     nvidiaSettings = true;
     forceFullCompositionPipeline = true;
+    nvidiaPersistenced = false; # Disabled due to nixpkgs bug with persistenced package
     prime = {
       offload.enable = true;
       sync.enable = false;

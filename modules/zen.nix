@@ -48,7 +48,7 @@
           unpaywall
           sponsorblock
           offline-qr-code-generator
-          ipfs-companion
+          # ipfs-companion
           hacktools
           # ghosttext
           geminize

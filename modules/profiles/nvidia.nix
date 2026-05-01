@@ -20,8 +20,8 @@
     };
   };
 
-  hardware.nvidia-container-toolkit.enable = true;
-  virtualisation.docker.enableNvidia = true;
+  # hardware.nvidia-container-toolkit.enable = true;
+  # virtualisation.docker.enableNvidia = true;
 
   services.ollama = {
     enable = true;

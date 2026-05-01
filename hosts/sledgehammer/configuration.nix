@@ -15,11 +15,15 @@
 
   networking.hostName = "sledgehammer";
 
-  boot.loader.grub = {
-    enable = true;
-    device = "nodev";
-    efiSupport = true;
-    efiInstallAsRemovable = true; # ESP lands on removable media
+  boot.loader = {
+    efi.canTouchEfiVariables = lib.mkForce false; # Required when using efiInstallAsRemovable
+    grub = {
+      enable = true;
+      device = "nodev";
+      efiSupport = true;
+      efiInstallAsRemovable = true; # ESP lands on removable media
+    };
+    systemd-boot.enable = lib.mkForce false; # Using GRUB instead for removable media
   };
 
   # Headless: no desktop, no graphical anything.
@@ -60,7 +64,7 @@
   services.openssh = {
     enable = true;
     settings = {
-      PermitRootLogin = "prohibit-password";
+      PermitRootLogin = lib.mkForce "prohibit-password";
       PasswordAuthentication = false;
     };
   };

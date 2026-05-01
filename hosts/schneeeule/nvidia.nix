@@ -19,7 +19,7 @@
   hardware.nvidia = {
     open = false;
     package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
-    nvidiaPersistenced = false; # Disabled due to nixpkgs bug with persistenced package
+    nvidiaPersistenced = true;
     prime = {
       nvidiaBusId = "PCI:9:0:0";
       intelBusId = "PCI:0:2:0";

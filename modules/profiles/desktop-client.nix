@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # Desktop client profile with NAS client dependency
   # Note: nas-client.nix is imported unconditionally as it's a core dependency
   # for desktop client functionality. To disable NAS mounts, configure
@@ -60,5 +57,9 @@
 
   hardware.bluetooth.enable = true;
 
-  users.users.devji.extraGroups = ["docker" "incus-admin" "video"];
+  users.users.devji.extraGroups = [
+    "docker"
+    # "incus-admin"
+    "video"
+  ];
 }

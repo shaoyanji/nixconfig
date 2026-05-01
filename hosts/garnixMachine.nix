@@ -5,9 +5,9 @@
   self,
   ...
 }: let
-  nullclawPort = 3001;
+  # nullclawPort = 3001;
   bountystashPort = 3000;
-  nullclawLocalUpstream = "http://127.0.0.1:${toString nullclawPort}/";
+  # nullclawLocalUpstream = "http://127.0.0.1:${toString nullclawPort}/";
   bountystashLocalUpstream = "http://127.0.0.1:${toString bountystashPort}/";
 in {
   garnix.server.enable = true;
@@ -15,15 +15,15 @@ in {
 
   imports = [
     ../modules/config/authorized-keys.nix
-    ../modules/profiles/ai-host.nix
-    ../modules/services/nullclaw-deployment.nix
+    # ../modules/profiles/ai-host.nix
+    # ../modules/services/nullclaw-deployment.nix
     inputs.sops-nix.nixosModules.sops
   ];
 
-  profiles.aiHost = {
-    enable = true;
-    nullclaw.enable = true;
-  };
+  # profiles.aiHost = {
+  # enable = true;
+  # nullclaw.enable = true;
+  # };
 
   services.openssh = {
     enable = true;
@@ -43,17 +43,17 @@ in {
 
   security.sudo.wheelNeedsPassword = false;
 
-  aiServices.nullclawDeployment = {
-    enable = true;
-    mode = "config-json";
-    listenHost = "127.0.0.1";
-    listenPort = nullclawPort;
-    workspaceRoot = "/var/lib/nullclaw";
-    configJsonSource = config.sops.secrets.nullclaw-config.path;
-  };
+  # aiServices.nullclawDeployment = {
+  #   enable = true;
+  #   mode = "config-json";
+  #   listenHost = "127.0.0.1";
+  #   listenPort = nullclawPort;
+  #   workspaceRoot = "/var/lib/nullclaw";
+  #   configJsonSource = config.sops.secrets.nullclaw-config.path;
+  # };
 
   environment.systemPackages = [
-    self.packages.${pkgs.system}.nullclaw
+    # self.packages.${pkgs.system}.nullclaw
     pkgs.htop
     pkgs.tree
     pkgs.jq
@@ -62,19 +62,18 @@ in {
   ];
 
   sops = {
-    defaultSopsFile = ../secrets/nullclaw-config.json;
-    defaultSopsFormat = "json";
+    # defaultSopsFile = ../modules/secrets.yaml;
+    # defaultSopsFormat = "json";
 
     age.keyFile = "/var/garnix/keys/repo-key";
 
-    secrets.nullclaw-config = {
-      sopsFile = ../secrets/nullclaw-config.json;
-      format = "json";
-      key = "";
-      owner = "nullclaw";
-      group = "nullclaw";
-      mode = "0400";
-    };
+    # secrets.nullclaw-config = {
+    #   sopsFile = ../secrets/nullclaw-config.json;
+    #   # format = "json";
+    #   owner = "nullclaw";
+    #   group = "nullclaw";
+    #   mode = "0400";
+    # };
 
     secrets.bountystash-env = {
       sopsFile = ../secrets/bountystash.env;
@@ -119,10 +118,10 @@ in {
   };
 
   assertions = [
-    {
-      assertion = nullclawLocalUpstream == "http://127.0.0.1:3001/";
-      message = "garnixMachine nullclaw local upstream is expected to stay on 127.0.0.1:3001";
-    }
+    # {
+    # assertion = nullclawLocalUpstream == "http://127.0.0.1:3001/";
+    # message = "garnixMachine nullclaw local upstream is expected to stay on 127.0.0.1:3001";
+    # }
     {
       assertion = config.services.nginx.virtualHosts.default.locations."/".proxyPass == bountystashLocalUpstream;
       message = "garnixMachine default public nginx upstream is expected to target bountystash";

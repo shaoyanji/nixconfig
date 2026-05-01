@@ -13,14 +13,15 @@
     open = false;
     nvidiaSettings = true;
     forceFullCompositionPipeline = true;
+
     prime = {
       offload.enable = true;
       sync.enable = false;
     };
   };
 
-  hardware.nvidia-container-toolkit.enable = true;
-  virtualisation.docker.enableNvidia = true;
+  # hardware.nvidia-container-toolkit.enable = true;
+  # virtualisation.docker.enableNvidia = true;
 
   services.ollama = {
     enable = true;

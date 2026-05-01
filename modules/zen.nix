@@ -56,7 +56,6 @@
           brotab
           aria2-integration
           # single-file
-
           # wappalyzer
           # ipfs-companion
         ];

@@ -19,7 +19,7 @@
   hardware.nvidia = {
     open = false;
     package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
-    nvidiaPersistenced = true;
+    nvidiaPersistenced = false;
     prime = {
       nvidiaBusId = "PCI:9:0:0";
       intelBusId = "PCI:0:2:0";

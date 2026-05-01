@@ -62,8 +62,8 @@ in {
   ];
 
   sops = {
-    defaultSopsFile = ../secrets/nullclaw-config.json;
-    defaultSopsFormat = "json";
+    defaultSopsFile = ../modules/secrets.yaml;
+    # defaultSopsFormat = "json";
 
     age.keyFile = "/var/garnix/keys/repo-key";
 

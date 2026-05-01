@@ -1,6 +1,6 @@
 {nixpkgs}: let
   overlays = [
-    (import ../overlays/nvidia-persistenced-fix.nix)
+    # nvidia-persistenced-fix.nix removed - persistenced disabled on all hosts
   ];
 in
   system: import nixpkgs {inherit system overlays;}

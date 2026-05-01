@@ -16,7 +16,7 @@
   networking.hostName = "sledgehammer";
 
   boot.loader = {
-    efi.canTouchEfiVariables = false; # Required when using efiInstallAsRemovable
+    efi.canTouchEfiVariables = lib.mkForce false; # Required when using efiInstallAsRemovable
     grub = {
       enable = true;
       device = "nodev";

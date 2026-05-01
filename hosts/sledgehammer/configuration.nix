@@ -15,11 +15,14 @@
 
   networking.hostName = "sledgehammer";
 
-  boot.loader.grub = {
-    enable = true;
-    device = "nodev";
-    efiSupport = true;
-    efiInstallAsRemovable = true; # ESP lands on removable media
+  boot.loader = {
+    efi.canTouchEfiVariables = false; # Required when using efiInstallAsRemovable
+    grub = {
+      enable = true;
+      device = "nodev";
+      efiSupport = true;
+      efiInstallAsRemovable = true; # ESP lands on removable media
+    };
   };
 
   # Headless: no desktop, no graphical anything.

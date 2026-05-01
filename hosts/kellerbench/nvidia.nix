@@ -25,7 +25,8 @@
     nvidiaSettings = false;
     modesetting.enable = true;
     # Keep the driver warm enough for repeatable CUDA startup without adding laptop/offload complexity.
-    nvidiaPersistenced = true;
+    # Disabled due to nixpkgs bug with persistenced package
+    nvidiaPersistenced = false;
     powerManagement.enable = true;
     powerManagement.finegrained = false;
   };

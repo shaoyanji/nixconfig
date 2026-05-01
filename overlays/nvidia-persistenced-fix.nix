@@ -5,7 +5,8 @@ final: prev: {
     makeFlags = old.makeFlags or [];
   }) // {
     persistenced = prev.nvidia_x11.persistenced.overrideAttrs (old: {
-      makeFlags = old.makeFlags or [];
+      # Override the broken makeFlags line that references nvidia_x11.makeFlags
+      makeFlags = [ "DATE=true" ];
     });
   };
 }

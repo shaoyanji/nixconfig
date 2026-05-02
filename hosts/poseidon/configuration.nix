@@ -7,6 +7,7 @@
   ...
 }:
 let
+  user = import ../../modules/global/user.nix;
   obsConfig = {
     enable = false;
     plugins = with pkgs.obs-studio-plugins; [
@@ -63,8 +64,8 @@ in
         imports = [
           inputs.microvm.nixosModules.microvm
           (import ../microvms/testvm.nix {
-            workspaceSource = "/home/devji/workspace";
-            agentsSource = "/home/devji/.agents";
+            workspaceSource = "${user.home}/workspace";
+            agentsSource = "${user.home}/.agents";
             configureNetworkd = true;
             useDevNixDefaults = true;
             authorizedKeys = config.ssh.authorizedKeys.keys;
@@ -123,7 +124,7 @@ in
   programs.dank-material-shell.greeter = {
     enable = true;
     compositor.name = "niri";
-    configHome = "/home/devji"; # Sync themes with user's DankMaterialShell config
+    configHome = user.home; # Sync themes with user's DankMaterialShell config
   };
 
   networking.firewall = {

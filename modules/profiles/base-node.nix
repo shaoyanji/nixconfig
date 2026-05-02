@@ -5,7 +5,11 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+let
+  user = import ../global/user.nix;
+in
+{
   imports = [
     ../../modules/config/authorized-keys.nix
     inputs.sops-nix.nixosModules.sops
@@ -76,8 +80,8 @@
     LC_TELEPHONE = "de_DE.UTF-8";
   };
 
-  users.users.devji = {
-    home = "/home/devji";
+  users.users.${user.name} = {
+    home = user.home;
     isNormalUser = true;
     description = "matt";
     extraGroups = ["networkmanager" "wheel"];

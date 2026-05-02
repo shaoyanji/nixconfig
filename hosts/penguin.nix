@@ -4,7 +4,11 @@
   inputs,
   pkgs,
   ...
-}: {
+}:
+let
+  user = import ../modules/global/user.nix;
+in
+{
   imports = [
     ../modules/roles/portable-home.nix
     ../modules/shell
@@ -46,8 +50,8 @@
     home-manager.autoExpire.enable = true;
   };
   home = {
-    username = "devji";
-    homeDirectory = "/home/devji";
+    username = user.name;
+    homeDirectory = user.home;
     packages = with pkgs; [
       totp-cli
       nix-output-monitor

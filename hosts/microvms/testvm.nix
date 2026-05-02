@@ -1,9 +1,10 @@
 {
-  workspaceSource ? "/home/devji/nixconfig/hosts/microvms/testvm",
+  workspaceSource ? null,
   agentsSource ? null,
   configureNetworkd ? false,
   useDevNixDefaults ? false,
   authorizedKeys ? [],
+  userHome ? "/home/devji",
 }: {
   lib,
   pkgs,
@@ -30,11 +31,13 @@
           source = "/nix/store";
           mountPoint = "/nix/.ro-store";
         }
+      ]
+      ++ lib.optionals (workspaceSource != null) [
         {
           proto = "virtiofs";
           tag = "workspace";
           source = workspaceSource;
-          mountPoint = "/home/devji/workspace";
+          mountPoint = "${userHome}/workspace";
         }
       ]
       ++ lib.optionals (agentsSource != null) [
@@ -42,7 +45,7 @@
           proto = "virtiofs";
           tag = "agents";
           source = agentsSource;
-          mountPoint = "/home/devji/.agents";
+          mountPoint = "${userHome}/.agents";
         }
       ];
 
@@ -72,6 +75,7 @@
   users.users.devji =
     {
       isNormalUser = true;
+      home = userHome;
       extraGroups = ["wheel" "networkmanager"];
     }
     // lib.optionalAttrs (authorizedKeys != []) {

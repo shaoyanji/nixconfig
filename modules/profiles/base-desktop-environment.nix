@@ -1,7 +1,11 @@
 {
   pkgs,
   ...
-}: {
+}:
+let
+  user = import ../global/user.nix;
+in
+{
   imports = [
     ./desktop-client.nix
     ../nixos/lxc
@@ -12,7 +16,7 @@
     displayManager = {
       autoLogin = {
         enable = true;
-        user = "devji";
+        user = user.name;
       };
     };
     scx = {

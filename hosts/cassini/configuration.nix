@@ -4,7 +4,11 @@
   config,
   inputs,
   ...
-}: {
+}:
+let
+  user = import ../../modules/global/user.nix;
+in
+{
   imports = [
   ];
 
@@ -72,7 +76,7 @@
   programs.nix-index.enable = true;
 
   fonts.packages = [];
-  system.primaryUser = "devji";
+  system.primaryUser = user.name;
   system.defaults = {
     dock.autohide = true;
     finder.FXPreferredViewStyle = "clmv";

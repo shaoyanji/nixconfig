@@ -4,7 +4,11 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+let
+  user = import ../global/user.nix;
+in
+{
   # Persona assembler for devji-specific desktop and personal preferences.
   imports = [
     ../zen.nix
@@ -129,7 +133,7 @@
   };
 
   home = {
-    username = "devji";
-    homeDirectory = "/home/devji";
+    username = user.name;
+    homeDirectory = user.home;
   };
 }

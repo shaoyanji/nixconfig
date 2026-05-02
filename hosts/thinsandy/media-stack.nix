@@ -3,7 +3,11 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+let
+  user = import ../../modules/global/user.nix;
+in
+{
   # --- Immich ---
   users.users.immich.extraGroups = ["video" "render"];
   services.immich = {
@@ -58,7 +62,7 @@
   services.plex = {
     enable = true;
     openFirewall = true;
-    user = "devji";
+    user = user.name;
   };
 
   # --- Anki sync ---

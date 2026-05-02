@@ -4,14 +4,18 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+let
+  user = import ../../modules/global/user.nix;
+in
+{
   networking.hostName = "guckloch";
 
   wsl.enable = true;
-  wsl.defaultUser = "devji";
+  wsl.defaultUser = user.name;
   wsl.docker-desktop.enable = true;
   wsl.useWindowsDriver = true;
-  users.users.devji.extraGroups = ["docker"];
+  users.users.${user.name}.extraGroups = ["docker"];
 
   environment.systemPackages = with pkgs; [
     markdownlint-cli

@@ -45,6 +45,9 @@
     pulseaudio.enable = false;
     tailscale.enable = true;
     tailscale.useRoutingFeatures = "both";
+    # Use thinsandy pi-hole (100.73.225.35) as DNS server via Tailscale
+    # This forces DNS to go through pi-hole even with MagicDNS enabled
+    tailscale.extraUpFlags = [ "--dns=100.73.225.35" "--accept-dns=true" ];
     resolved.enable = true;
     resolved.settings.Resolve.Domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
   };

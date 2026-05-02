@@ -23,6 +23,7 @@ in rec {
       inputs.nix-index-database.nixosModules.nix-index
       inputs.niri.nixosModules.niri
       inputs.dms.nixosModules.dank-material-shell
+      inputs.dms.nixosModules.greeter
     ];
   globalModulesImpermanence =
     globalModulesNixos

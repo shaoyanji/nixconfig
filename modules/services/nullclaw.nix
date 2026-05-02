@@ -39,9 +39,8 @@ in {
     {
       aiServices.nullclaw = {
         contextRoot = lib.mkDefault "/srv/data/ai-services/context";
-        sharedDefaultsFile = lib.mkDefault "/srv/data/ai-services/defaults/shared.env";
         sharedSecretFile = lib.mkDefault (config.sops.secrets."ai-services-shared-env".path or null);
-        stateDir = lib.mkDefault "/srv/data/ai-services/state/nullclaw";
+        stateDir = lib.mkDefault "${cfg.workspaceRoot}/.ai-services/state";
       };
     }
     (lib.mkIf cfg.enable {
@@ -64,6 +63,10 @@ in {
       "d ${cfg.workspaceRoot} 0750 nullclaw nullclaw -"
       "d ${cfg.workspaceRoot}/.nullclaw 0750 nullclaw nullclaw -"
       "d ${cfg.workspaceRoot}/workspace 0750 nullclaw nullclaw -"
+      "d ${cfg.workspaceRoot}/.ai-services 0750 nullclaw nullclaw -"
+      "d ${cfg.workspaceRoot}/.ai-services/defaults 0750 nullclaw nullclaw -"
+      "d ${cfg.workspaceRoot}/.ai-services/state 0750 nullclaw nullclaw -"
+      "f ${cfg.workspaceRoot}/.ai-services/defaults/shared.env 0640 nullclaw nullclaw -"
     ];
 
     systemd.services.nullclaw = {

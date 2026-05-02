@@ -3,7 +3,9 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, modulesPath, ... }:
-
+let
+  user = import ../../modules/global/user.nix;
+in
 {
   imports =
     [
@@ -15,7 +17,7 @@
       ./orbstack.nix
     ];
 
-  users.users.devji = {
+  users.users.${user.name} = {
     uid = 501;
     extraGroups = [ "wheel" ];
 
@@ -23,7 +25,7 @@
     isSystemUser = true;
     group = "users";
     createHome = true;
-    home = "/home/devji";
+    home = user.home;
     homeMode = "700";
     useDefaultShell = true;
   };

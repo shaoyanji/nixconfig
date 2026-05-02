@@ -4,7 +4,11 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+let
+  user = import ../../modules/global/user.nix;
+in
+{
   imports = [
     ../../modules/config/authorized-keys.nix
     # Include the results of the hardware scan.
@@ -36,8 +40,8 @@
         imports = [
           inputs.microvm.nixosModules.microvm
           (import ../microvms/testvm.nix {
-            workspaceSource = "/home/devji/workspace";
-            agentsSource = "/home/devji/.agents";
+            workspaceSource = "${user.home}/workspace";
+            agentsSource = "${user.home}/.agents";
             configureNetworkd = true;
             useDevNixDefaults = true;
             authorizedKeys = config.ssh.authorizedKeys.keys;

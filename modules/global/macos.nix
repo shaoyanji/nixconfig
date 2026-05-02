@@ -1,6 +1,10 @@
 # macOS (nix-darwin) home-manager configuration.
 # Primary user constants: modules/global/user.nix
-{inputs, ...}: {
+{inputs, ...}:
+let
+  user = import ../global/user.nix;
+in
+{
   imports = [
     ./home-manager-shared.nix
   ];
@@ -9,7 +13,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup"; #for rebuild
-    users.devji = {
+    users.${user.name} = {
       imports = [
         ../roles/home.nix
       ];
@@ -17,14 +21,14 @@
     extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
     # Optionally, use home-manager.extraSpecialArgs to pass
   };
-  users.users.devji = {
-    name = "devji";
-    home = "/Users/devji";
+  users.users.${user.name} = {
+    name = user.name;
+    home = "/Users/${user.name}";
   };
   # arguments to home.nix
   nix-homebrew = {
     enable = true;
     enableRosetta = true;
-    user = "devji";
+    user = user.name;
   };
 }

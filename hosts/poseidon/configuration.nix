@@ -116,8 +116,14 @@ in
   systemd.user.services.niri-flake-polkit.enable = false;
 
   services.displayManager.sddm = {
-    enable = true;
+    enable = false;
     wayland.enable = true;
+  };
+
+  programs.dank-material-shell.greeter = {
+    enable = true;
+    compositor.name = "niri";
+    configHome = "/home/devji"; # Sync themes with user's DankMaterialShell config
   };
 
   networking.firewall = {

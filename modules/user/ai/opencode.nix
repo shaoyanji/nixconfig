@@ -1,5 +1,9 @@
 {lib, ...}: let
-  localAgents = import ./agents.nix {inherit lib;};
+  localAgents = import ../ai/agents.nix {inherit lib;};
+  agentsJsonPath = ../../config/agents.json;
+  remoteAgentsList = if builtins.pathExists agentsJsonPath
+    then builtins.fromJSON (builtins.readFile agentsJsonPath)
+    else [];
 in {
   programs.opencode = {
     enable = true;
@@ -60,7 +64,7 @@ in {
           url = agent.url;
           sha256 = agent.sha256;
         });
-      }) (builtins.fromJSON (builtins.readFile ../../config/agents.json)))
+      }) remoteAgentsList)
       // localAgents;
   };
 }

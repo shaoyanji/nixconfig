@@ -13,9 +13,9 @@
 
   commonTools = with pkgs; [
     skills
-    gemini-cli
-    qwen-code
-    codex
+    # gemini-cli
+    # qwen-code
+    # codex
     cowsay
     figlet
     graphviz

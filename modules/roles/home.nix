@@ -7,7 +7,7 @@
   imports = [
     ./minimal.nix
     ../shell
-    # ../user/ai/opencode.nix # too bloated
+    ../user/ai/opencode.nix # too bloated
     ../user/ai/codex.nix
     ../user/ai/gemini-cli.nix
   ];
@@ -17,12 +17,12 @@
   home.packages = with pkgs;
     [
       # ── Moved from base (too heavy for servers) ──
+      pi-coding-agent # AI coding agent (515 MB closure)
       devenv # Developer environments (864 MB closure)
       nixd # Nix language server (588 MB closure, pulls llvm)
       ffmpeg # Audio/video processing (~1 GB closure)
       tesseract # OCR engine (~1 GB closure)
       graphviz # Graph visualization
-      pi-coding-agent # AI coding agent (515 MB closure)
       python3 # Python interpreter
       a2ps
       amfora

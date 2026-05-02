@@ -44,4 +44,9 @@
     allowedUDPPorts = [53];
     allowedTCPPorts = [53];
   };
+  # Allow DNS queries from Tailscale network
+  networking.firewall.interfaces.tailscale0 = {
+    allowedUDPPorts = [53];
+    allowedTCPPorts = [53];
+  };
 }

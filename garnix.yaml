@@ -4,8 +4,8 @@ builds:
   # - darwinConfigurations.*
   # - nixosConfigurations.*
   include:
-    - nixosConfigurations.poseidon
-    - nixosConfigurations.schneeeule
+# - nixosConfigurations.poseidon
+# - nixosConfigurations.schneeeule
 servers:
   - configuration: garnixMachine
     deployment:

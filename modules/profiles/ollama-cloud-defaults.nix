@@ -11,10 +11,12 @@
       host = lib.mkDefault "127.0.0.1";
       openFirewall = lib.mkDefault true;
       loadModels = lib.mkDefault [
+        "gemma4:cloud"
         "minimax-m2.7:cloud"
         "glm-5.1:cloud"
-        "kimi-k2.6:cloud"
-        "deepseek-v4-flash:cloud"
+        "qwen3-coder-next:cloud"
+        "kimi-k2.5:cloud"
+        "qwen3.5:cloud"
       ];
     };
   };

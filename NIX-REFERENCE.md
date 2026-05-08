@@ -114,7 +114,7 @@ lib.types.submodule {      # nested option set
 
 ### ai-services-mounts helper
 
-Every AI service (nullclaw, xs, openfang, pancakes-harness) uses this EXCEPT hermes:
+Every AI service (nullclaw, xs, pancakes-harness) uses this EXCEPT hermes:
 
 ```nix
 # In the module:

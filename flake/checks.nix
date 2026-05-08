@@ -70,6 +70,19 @@
           host: configs.${host}.config.systemd.services ? go-backend
         ) (builtins.attrNames configs);
       in {
+        host-eval-all =
+          let
+            hosts = builtins.attrNames configs;
+            # Force evaluation of each host's system build
+            evalHost = host: configs.${host}.config.system.build.toplevel;
+            # Collect all host derivations - if any fail to evaluate, the flake check will fail
+            hostDrvs = map evalHost hosts;
+          in
+            pkgs.runCommand "host-eval-all" { inherit hostDrvs; } ''
+              echo "All hosts evaluated successfully: ${builtins.toString hosts}"
+              touch $out
+            '';
+
         host-architecture =
           assert assertMsg (configs.thinsandy.config.aiServices.nullclaw.enable) "thinsandy nullclaw must be enabled";
           assert assertMsg (configs.thinsandy.config.aiServices.nullclaw.workspaceRoot == "/var/lib/nullclaw") "thinsandy nullclaw workspaceRoot must be /var/lib/nullclaw";

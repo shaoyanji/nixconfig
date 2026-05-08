@@ -1,14 +1,13 @@
 # Rollback Routing
 
 ## Scope
-Explain rollback in terms of the existing infra/ services tasks without creating new procedures.
+Explain rollback in terms of the existing `infra:*` tasks without creating new procedures.
 
 ## Canonical tasks
-- Apply rollback over SSH: `infra:rollback:apply:host:*`.
-- Canonical rollback alias for hosts: `infra:rollback:host:*` (it just reruns the apply step).
-- Post-rollback validation and evidence still run via `services:validate:host:*` and `services:evidence:rollback:host:*`.
-
-## Helper guidance
+- Apply rollback over SSH: `task infra:rollback:apply:host:<host>`
+- Canonical rollback alias: `task infra:rollback:host:<host>` (reruns apply step)
+- Post-rollback validation: `task checks:nullclaw:smoke:<host>` for nullclaw hosts
 
 ## What not to assume
-- There is no new rollback workflow in `.agents/*`; stick to the `infra`/`services` tasks defined in the Taskfiles.
+- `.agents/*` is not executable truth; only Taskfiles define workflows.
+- Prefer `infra:*` tasks over legacy `services:*` wrappers for rollbacks.

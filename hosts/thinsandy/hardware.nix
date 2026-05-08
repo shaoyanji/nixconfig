@@ -32,13 +32,5 @@
     enable = true;
     host = "0.0.0.0";
     openFirewall = true;
-    loadModels = [
-      "gemma4:cloud"
-      "minimax-m2.7:cloud"
-      "glm-5.1:cloud"
-      "qwen3-coder-next:cloud"
-      "kimi-k2.5:cloud"
-      "qwen3.5:cloud"
-    ];
   };
 }

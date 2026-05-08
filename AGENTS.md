@@ -7,12 +7,13 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
 `.agents/*` is guidance-only and never replaces the Taskfile truth.
 
 ## Task Namespace Summary
+See [Task Control Plane](docs/task-control-plane.md) for full namespace definitions and workflow examples.
 
-- `infra:*`: Host lifecycle operations (plan/apply/deploy/rollback/logs), secrets management, SOPS operations
-- `agents:*`: Operator helpers, xs runtime wrappers, and OAuth/session management for service users
-- `checks:*`: Validation and smoke checks (primarily nullclaw deployment validation)
-- `dev:*`: Git workflows, flake updates, site deployment, and local development tasks
-- `services:*`: Compatibility wrappers routing to canonical `infra:*` tasks (legacy layer)
+## Git Hooks Setup
+This repo includes pre-commit hooks in `.githooks/` to catch common issues:
+- `check-docs.sh`: Detects broken absolute paths in documentation
+
+To enable: `bash .git-hooks-setup.sh` (sets `core.hooksPath` to `.githooks/`)
 
 ## Key Operator Helpers
 

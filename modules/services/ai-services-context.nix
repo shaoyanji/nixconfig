@@ -13,8 +13,8 @@
     else if name == "hermes" then config.services.hermes-agent.enable or false
     else false;
 
-  # Filter serviceNames to only enabled services
-  enabledServices = lib.filter isServiceEnabled cfg.serviceNames;
+  # Auto-derive enabled services from config (no manual listing needed)
+  enabledServices = lib.filter isServiceEnabled ["nullclaw" "hermes" "xs" "pancakes-harness"];
 
   # Generate state directory creation commands only for enabled services
   stateDirCommands = lib.concatStringsSep "\n" (map (name: ''
@@ -61,12 +61,6 @@ in {
       type = lib.types.str;
       default = "/srv/data/ai-services/state";
       description = "Root path for per-service writable state directories.";
-    };
-
-    serviceNames = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = ["nullclaw" "hermes" "xs" "pancakes-harness"];
-      description = "List of service names to create state directories for (only enabled services will be created).";
     };
 
     stateOwners = lib.mkOption {

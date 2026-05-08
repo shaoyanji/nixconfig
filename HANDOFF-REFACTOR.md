@@ -41,7 +41,7 @@ hosts/
 
 ### 1. Shared mount options repeated per-service per-host (highest impact)
 
-Every service config (openfang, xs, pancakesHarness) repeats this block:
+Every service config (xs, pancakesHarness) repeats this block:
 
 ```nix
 contextRoot = "/srv/data/ai-services/context";
@@ -53,20 +53,20 @@ stateDir = "/srv/data/ai-services/state/<service>";
 These are identical across ALL hosts. The fix: set them as `mkDefault` in each
 service module's config. Hosts only override if they differ (none currently do).
 
-Per service module (openfang.nix, xs.nix, pancakes-harness.nix):
+Per service module (xs.nix, pancakes-harness.nix):
 ```nix
 config = lib.mkIf cfg.enable {
-  aiServices.openfang = {
+  aiServices.xs = {
     contextRoot = lib.mkDefault "/srv/data/ai-services/context";
     sharedDefaultsFile = lib.mkDefault "/srv/data/ai-services/defaults/shared.env";
     sharedSecretFile = lib.mkDefault (config.sops.secrets."ai-services-shared-env".path or null);
-    stateDir = lib.mkDefault "/srv/data/ai-services/state/openfang";
+    stateDir = lib.mkDefault "/srv/data/ai-services/state/xs";
   };
   # ... existing config ...
 };
 ```
 
-Would cut ~12 lines per service per host. After this, openfang/xs/pancakesHarness
+Would cut ~12 lines per service per host. After this, xs/pancakesHarness
 blocks in host files shrink to just `enable` + host-specific values (package, etc).
 
 ### 2. Ollama cloud models identical on mtfuji/thinsandy
@@ -79,11 +79,6 @@ Same 6-model loadModels list. Extract to a shared option or ai-host profile
 Each host manually lists `serviceNames`. The module already checks which services
 are enabled — it could derive the list from `config.services.hermes-agent.enable`,
 `config.aiServices.nullclaw.enable`, etc. instead of requiring a manual list.
-
-### 4. Stale reference in NIX-REFERENCE.md
-
-Gotcha #6 references `hermes-agent-local` which was deleted in round 1.
-Minor cleanup.
 
 ## Not worth extracting
 

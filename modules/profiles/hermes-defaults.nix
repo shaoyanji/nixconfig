@@ -20,8 +20,9 @@
         model = {
           provider = "nous";
           # default = "nvidia/nemotron-3-super-120b-a12b:free";
-          default = "arcee-ai/trinity-large-thinking";
           # default = "stepfun/step-3.5-flash";
+          default = "qwen/qwen3.6-plus";
+          # default = "arcee-ai/trinity-large-thinking";
           # default = "arcee-ai/trinity-large-preview:free";
           # provider = "openrouter";
         };

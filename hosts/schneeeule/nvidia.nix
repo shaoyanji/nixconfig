@@ -10,10 +10,7 @@
 
   # extraPackages = with pkgs; [nvidia-vaapi-driver];
   services.xserver.videoDrivers = ["intel"];
-  nixpkgs.config = {
-    nvidia.acceptLicense = true;
-    cudaSupport = true;
-  };
+  nixpkgs.config.nvidia.acceptLicense = true;
 
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages;
   hardware.nvidia = {

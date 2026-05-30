@@ -14,6 +14,7 @@
 }: {
   config = lib.mkIf (config.services.hermes-agent.enable or false) {
     services.hermes-agent = {
+      # extraDependencyGroups = ["messaging"]; # ← enables python-telegram-bot
       package = lib.mkDefault inputs.hermes-agent.packages.${pkgs.system}.default;
       stateDir = lib.mkDefault "/var/lib/hermes";
       settings = lib.mkDefault {

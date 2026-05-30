@@ -52,6 +52,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       # inputs.dgop.follows = "dgop";
     };
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     microvm = {
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -11,7 +11,6 @@ in
 {
   # Persona assembler for devji-specific desktop and personal preferences.
   imports = [
-    ../zen.nix
     ./home.nix
     ../user/desktop/niri.nix
     ../dev.nix

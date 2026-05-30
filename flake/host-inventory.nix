@@ -26,7 +26,10 @@ in {
     kind = "nixos";
     system = "x86_64-linux";
     specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/poseidon/configuration.nix];
+    modules = globalModulesNixos ++ [
+      inputs.dms.nixosModules.greeter
+      ../hosts/poseidon/configuration.nix
+    ];
   };
 
   mtfuji = {

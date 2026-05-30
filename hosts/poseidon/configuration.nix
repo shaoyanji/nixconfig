@@ -139,8 +139,5 @@ in
 }
 // {
   system.stateVersion = "25.11";
-  nixpkgs.config = {
-    nvidia.acceptLicense = true;
-    cudaSupport = true;
-  };
+  nixpkgs.config.nvidia.acceptLicense = true;
 }

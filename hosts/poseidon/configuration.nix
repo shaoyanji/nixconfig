@@ -114,8 +114,6 @@ in
 
   # services.avahi.publish.enable = true;
   # services.avahi.publish.userServices = true;
-  systemd.user.services.niri-flake-polkit.enable = false;
-
   services.displayManager.sddm = {
     enable = false;
     wayland.enable = true;

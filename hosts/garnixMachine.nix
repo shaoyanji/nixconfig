@@ -116,7 +116,10 @@ in {
       locations."/" .proxyPass = bountystashLocalUpstream;
     };
   };
-
+  services.dbus = {
+    enable = true;
+    implementation = "broker"; # or "dbus"
+  };
   assertions = [
     # {
     # assertion = nullclawLocalUpstream == "http://127.0.0.1:3001/";

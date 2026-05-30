@@ -13,7 +13,7 @@
   ];
 
   programs.nix-your-shell.enable = true;
-  # programs.nixvim.enable = true; # disabled due to CI eval OOM
+  programs.nixvim.enable = true; # disabled due to CI eval OOM
   home.packages = with pkgs;
     [
       # ── Moved from base (too heavy for servers) ──
@@ -85,7 +85,7 @@
     ];
 
   home.sessionVariables = {
-    # EDITOR = lib.mkDefault "nvim";
+    EDITOR = lib.mkDefault "nvim";
   };
   programs.home-manager.enable = true;
 }

@@ -10,7 +10,7 @@ builds:
     # - devShell.x86_64-linux
     # - "*.aarch64-darwin.*"
     # - "*.aarch64-linux.*"
-    # - nixosConfigurations.*
+    - nixosConfigurations.*
     # - homeConfigurations.*
     # - darwinConfigurations.*
 servers:

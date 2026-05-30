@@ -21,7 +21,6 @@ in rec {
       inputs.sops-nix.nixosModules.sops
       inputs.nix-index-database.nixosModules.nix-index
       inputs.dms.nixosModules.dank-material-shell
-      inputs.dms.nixosModules.greeter
     ];
   globalModulesImpermanence =
     globalModulesNixos

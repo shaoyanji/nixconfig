@@ -167,7 +167,7 @@
         ];
       };
     };
-    systemd.enable = true;
+    systemd.enable = false;
     # Don't manage settings.json — let DMS write its own at runtime
     settings = {};
   };

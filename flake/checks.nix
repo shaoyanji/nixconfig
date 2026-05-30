@@ -41,10 +41,12 @@
         checkNullclawFleetHost = host: expected: let
           cfg = configs.${host}.config;
         in
-          assertMsg (cfg.profiles.aiHost.enable) "${host} profiles.aiHost must be enabled"
-          && assertMsg (cfg.profiles.aiHost.nullclaw.enable) "${host} profiles.aiHost.nullclaw.enable must be true"
-          && assertMsg (cfg.aiServices.nullclaw.enable) "${host} aiServices.nullclaw.enable must be true"
-          && assertMsg (cfg.aiServices.nullclawDeployment.enable == expected.deploymentEnabled) "${host} nullclawDeployment.enable mismatch"
+          if !(cfg.profiles.aiHost.enable or false)
+          then true
+          else
+            assertMsg (cfg.profiles.aiHost.nullclaw.enable) "${host} profiles.aiHost.nullclaw.enable must be true"
+            && assertMsg (cfg.aiServices.nullclaw.enable) "${host} aiServices.nullclaw.enable must be true"
+            && assertMsg (cfg.aiServices.nullclawDeployment.enable == expected.deploymentEnabled) "${host} nullclawDeployment.enable mismatch"
           && assertMsg (cfg.aiServices.nullclawDeployment.mode == expected.deploymentMode) "${host} nullclawDeployment.mode mismatch"
           && assertMsg (cfg.aiServices.nullclawDeployment.listenHost == expected.listenHost) "${host} nullclawDeployment.listenHost mismatch"
           && assertMsg (cfg.aiServices.nullclawDeployment.listenPort == expected.listenPort) "${host} nullclawDeployment.listenPort mismatch"

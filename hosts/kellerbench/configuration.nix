@@ -7,6 +7,7 @@
 }: let
   enableHermes = false;
   enableSteam = false;
+  enableAmdGpu = true;
 in {
   imports = [
     (import ../../modules/profiles/grub-boot.nix {
@@ -14,7 +15,11 @@ in {
       device = "nodev";
     })
     ./hardware-configuration.nix
-    ./nvidia.nix
+  ] ++ lib.optionals enableAmdGpu [
+    ./amd-rx-5700-xt.nix
+  ] ++ lib.optionals (!enableAmdGpu) [
+    ./nvidia-gt-750-ti.nix
+  ] ++ [
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/ai-host.nix
     ../../modules/services/hermes-ai-mounts.nix
@@ -81,7 +86,7 @@ in {
   # };
   services.ollama = {
     enable = true;
-    package = pkgs.ollama-cuda;
+    package = if enableAmdGpu then pkgs.ollama-rocm else pkgs.ollama-cuda;
     host = "0.0.0.0";
     openFirewall = false;
     loadModels = [

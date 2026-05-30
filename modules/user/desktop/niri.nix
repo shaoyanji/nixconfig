@@ -167,10 +167,9 @@
         ];
       };
     };
-    settings = {
-      theme = "dark";
-      dynamicTheming = true;
-    };
+    systemd.enable = true;
+    # Don't manage settings.json — let DMS write its own at runtime
+    settings = {};
   };
 
   home.packages = with pkgs; [

@@ -118,7 +118,7 @@ in {
   };
   services.dbus = {
     enable = true;
-    implementation = "broker"; # or "dbus"
+    implementation = "dbus";
   };
   assertions = [
     # {

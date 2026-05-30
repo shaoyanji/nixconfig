@@ -51,7 +51,7 @@ in {
       storePath = "/var/lib/xs/store";
     };
     pancakesHarness = {
-      enable = true;
+      enable = false;
       package = self.packages.${pkgs.system}.pancakes-harness;
       backendMode = "xs";
       xsTopicPrefix = "pancakes-harness";

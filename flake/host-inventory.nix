@@ -5,6 +5,7 @@
 }: let
   inherit
     (moduleSets)
+    desktopModules
     globalModulesContainers
     globalModulesHome
     globalModulesImpermanence
@@ -26,7 +27,10 @@ in {
     kind = "nixos";
     system = "x86_64-linux";
     specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/poseidon/configuration.nix];
+    modules = globalModulesNixos ++ desktopModules ++ [
+      inputs.dms.nixosModules.greeter
+      ../hosts/poseidon/configuration.nix
+    ];
   };
 
   mtfuji = {
@@ -68,6 +72,7 @@ in {
     specialArgs = {inherit inputs self;};
     modules =
       globalModulesImpermanence
+      ++ desktopModules
       ++ [
         ../hosts/ares/configuration.nix
         inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t440p
@@ -81,6 +86,7 @@ in {
     specialArgs = {inherit inputs self;};
     modules =
       globalModulesImpermanence
+      ++ desktopModules
       ++ [
         ../hosts/schneeeule/configuration.nix
         (import ../hosts/common/disko.nix {device = "/dev/sda";})
@@ -91,14 +97,14 @@ in {
     kind = "nixos";
     system = "x86_64-linux";
     specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/aceofspades/configuration.nix];
+    modules = globalModulesNixos ++ desktopModules ++ [../hosts/aceofspades/configuration.nix];
   };
 
   ancientace = {
     kind = "nixos";
     system = "x86_64-linux";
     specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/ancientace/configuration.nix];
+    modules = globalModulesNixos ++ desktopModules ++ [../hosts/ancientace/configuration.nix];
   };
 
   guckloch = {

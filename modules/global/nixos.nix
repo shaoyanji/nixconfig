@@ -10,6 +10,10 @@
     ./home-manager-shared.nix
   ];
 
+  nixpkgs.overlays = [
+    (import ../../overlays/nushell-plugins-compat.nix)
+  ];
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;

@@ -19,7 +19,6 @@ in rec {
       ../modules/global/nixos.nix
       inputs.home-manager.nixosModules.default
       inputs.sops-nix.nixosModules.sops
-      inputs.nur.modules.nixos.default
       inputs.nix-index-database.nixosModules.nix-index
       inputs.niri.nixosModules.niri
       inputs.dms.nixosModules.dank-material-shell

@@ -114,6 +114,19 @@ in
 
   # services.avahi.publish.enable = true;
   # services.avahi.publish.userServices = true;
+  services.thermald.enable = true;
+
+  systemd.services.nvidia-power-limit = {
+    description = "Set NVIDIA GPU power limit to reduce thermals";
+    after = ["multi-user.target"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${config.boot.kernelPackages.nvidia_x11}/bin/nvidia-smi -pm 1
+      ${config.boot.kernelPackages.nvidia_x11}/bin/nvidia-smi -pl 55
+    '';
+  };
+
   services.displayManager.sddm = {
     enable = false;
     wayland.enable = true;

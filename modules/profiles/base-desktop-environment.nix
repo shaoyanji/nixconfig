@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   ...
 }:
 let
@@ -57,7 +58,7 @@ in
       default = [ "kde" "gtk" ];
       "org.freedesktop.impl.portal.FileChooser" = [ "kde" "gtk" ];
     };
-    config.niri = {
+    config.niri = lib.mkForce {
       default = [ "kde" "gtk" ];
       "org.freedesktop.impl.portal.FileChooser" = [ "kde" "gtk" ];
     };

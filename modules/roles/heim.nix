@@ -127,7 +127,6 @@ in
   services = {
     cliphist.enable = true;
     caffeine.enable = true;
-    # dropbox.enable = true;
     tailscale-systray.enable = true;
   };
 

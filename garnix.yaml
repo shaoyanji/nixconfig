@@ -1,11 +1,10 @@
 builds:
-  # exclude:
-  # - homeConfigurations.*
-  # - darwinConfigurations.*
-  # - nixosConfigurations.*
   include:
-    - nixosConfigurations.*
-# - nixosConfigurations.schneeeule
+    - nixosConfigurations.aceofspades
+    - nixosConfigurations.ancientace
+    - nixosConfigurations.ares
+    - nixosConfigurations.poseidon
+    - nixosConfigurations.schneeeule
 servers:
   - configuration: garnixMachine
     deployment:

@@ -8,7 +8,7 @@
     inputs.sops-nix.homeManagerModules.sops
     inputs.kickstart-nixvim.homeManagerModules.default
     inputs.nix-index-database.homeModules.nix-index
-    ../../modules/hm/niri.nix
+    inputs.niri.homeModules.niri
     inputs.dms.homeModules.dank-material-shell
     inputs.dms.homeModules.niri
   ];

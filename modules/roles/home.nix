@@ -7,13 +7,13 @@
   imports = [
     ./minimal.nix
     ../shell
-    ../user/ai/opencode.nix # too bloated
+    # ../user/ai/opencode.nix # too bloated
     ../user/ai/codex.nix
     ../user/ai/gemini-cli.nix
   ];
 
   programs.nix-your-shell.enable = true;
-  programs.nixvim.enable = true;
+  # programs.nixvim.enable = true; # disabled due to CI eval OOM
   home.packages = with pkgs;
     [
       # ── Moved from base (too heavy for servers) ──
@@ -23,7 +23,6 @@
       ffmpeg # Audio/video processing (~1 GB closure)
       tesseract # OCR engine (~1 GB closure)
       graphviz # Graph visualization
-      python3 # Python interpreter
       a2ps
       amfora
       astroterm
@@ -48,7 +47,7 @@
     ]
     ++ lib.optionals stdenv.isLinux [
       ani-cli
-      audacity
+      # audacity
       cmus # Terminal music player (~1 GB closure)
       lux # Video downloader (~1 GB closure)
       mpv
@@ -67,7 +66,7 @@
       hyprpicker
       cliphist
       wl-clipboard
-      simplex-chat-desktop
+      # simplex-chat-desktop
       qrrs
       cook-cli
       surge-cli
@@ -76,7 +75,7 @@
       cloudflare-cli
       bootdev-cli
       wash-cli
-      libation
+      # libation
     ]
     ++ lib.optionals stdenv.isDarwin [
       iina

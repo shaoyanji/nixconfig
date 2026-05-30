@@ -6,7 +6,7 @@
   self,
   ...
 }: let
-  enableHermes = true;
+  enableHermes = false;
   enableNullClaw = true;
 in {
   imports = [

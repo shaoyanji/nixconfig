@@ -20,7 +20,9 @@ in rec {
       inputs.home-manager.nixosModules.default
       inputs.sops-nix.nixosModules.sops
       inputs.nix-index-database.nixosModules.nix-index
+      inputs.niri.nixosModules.niri
       inputs.dms.nixosModules.dank-material-shell
+      inputs.dms.nixosModules.greeter
     ];
   globalModulesImpermanence =
     globalModulesNixos

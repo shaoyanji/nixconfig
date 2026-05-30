@@ -62,7 +62,7 @@
       skills
       keypunch
       qalculate-qt
-      thunderbird-bin
+      # thunderbird-bin
       hyprpicker
       cliphist
       wl-clipboard

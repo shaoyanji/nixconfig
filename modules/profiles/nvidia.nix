@@ -6,6 +6,10 @@
 
   services.xserver.videoDrivers = ["nvidia"];
 
+  environment.sessionVariables = {
+    LD_LIBRARY_PATH = ["/run/opengl-driver/lib"];
+  };
+
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = false;
@@ -13,7 +17,6 @@
     open = false;
     nvidiaSettings = true;
     forceFullCompositionPipeline = true;
-
     prime = {
       offload.enable = true;
       sync.enable = false;

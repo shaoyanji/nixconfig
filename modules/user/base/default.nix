@@ -48,7 +48,7 @@ in {
         # ── Terminal UI / TUI Apps ──
         btop # Resource monitor
         duf # Disk usage/free space viewer
-        dufs # Static file server with Web UI
+        # dufs # Static file server with Web UI
         fastfetch # System info fetcher
         glow # Markdown renderer for terminal
         gum # Shell scripting eye-candy

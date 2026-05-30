@@ -3,7 +3,7 @@
   buildNpmPackage,
   fetchFromGitHub,
   makeWrapper,
-  nodejs_20,
+  nodejs_22,
 }:
 buildNpmPackage rec {
   pname = "qwen-code";
@@ -13,9 +13,10 @@ buildNpmPackage rec {
     owner = "QwenLM";
     repo = "qwen-code";
     rev = "v${version}";
-    hash = "sha256-05hiad8aid4aw16py0rjz2mqzz0s54j71zn9r3vkpwxgjz0nbmj6=";
+    hash = "sha256-RtZlwZev8zv3yMn+cCQpGvyPq/gyA39N4Iq0qFBTERY=";
   };
-  npmDepsHash = "sha256-eGqLW0KStAXAEJRv5Ob/nJJRjIZVLNUBjIdokUrgwFw=";
+  npmDepsHash = "sha256-13YseUyf7l3XwdsE4cGlXRbpK0zeADC6sGniKoEgGzk=";
+  npmDepsFetcherVersion = 2;
   nativeBuildInputs = [makeWrapper];
 
   # Qwen's repo separates workspace build from final CLI bundle packaging.
@@ -35,7 +36,7 @@ buildNpmPackage rec {
     mkdir -p $out/lib/qwen-code $out/bin
     cp -r dist/* $out/lib/qwen-code/
 
-    makeWrapper ${nodejs_20}/bin/node $out/bin/qwen \
+    makeWrapper ${nodejs_22}/bin/node $out/bin/qwen \
       --add-flags "$out/lib/qwen-code/cli.js"
 
     runHook postInstall

@@ -65,7 +65,6 @@
         '';
       plugins = with pkgs.nushellPlugins;
         [
-          skim
           query
           gstat
           formats

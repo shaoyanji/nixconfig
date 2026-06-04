@@ -8,6 +8,7 @@ tasks:
       - nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
       - nix eval .#packages.x86_64-linux.nullclaw.meta.mainProgram
       - nix build .#checks.x86_64-linux.host-architecture -L
+      - task checks:nix:lint
 
   checks:nullclaw:smoke:*:
     desc: Smoke-check nullclaw deployment on a remote host
@@ -66,6 +67,17 @@ tasks:
           exit 0
         fi
         task checks:nullclaw:smoke:kellerbench SECRET_PATH={{.SECRET_PATH}}
+
+  checks:nix:lint:
+    desc: Run deadnix and statix on all nix files
+    cmds:
+      - nix-shell -p deadnix statix --run "deadnix --fail flake hosts modules pkgs overlays lib"
+      - nix-shell -p deadnix statix --run "statix check flake hosts modules pkgs lib"
+
+  checks:nix:format:
+    desc: Check Nix file formatting with alejandra (read-only)
+    cmds:
+      - nix-shell -p alejandra --run "alejandra --check flake hosts modules overlays pkgs lib"
 
   checks:status:
     desc: Show task and git status

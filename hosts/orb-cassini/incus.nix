@@ -1,3 +1,6 @@
+# DEPRECATED: Part of orb-cassini (see configuration.nix for context).
+# Retained as a reference only. Originally auto-generated incus guest config.
+
 {
   lib,
   config,

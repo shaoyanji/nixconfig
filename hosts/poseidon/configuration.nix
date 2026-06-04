@@ -19,19 +19,14 @@ let
 in
 {
   imports = [
-    ../../modules/config/authorized-keys.nix
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia.nix
     ../../modules/profiles/steam.nix
     ../../modules/profiles/base-desktop-environment.nix
-    ../../modules/profiles/minimal-desktop.nix
     ../../modules/profiles/laptop.nix
-    # Our custom microvm network module
-    ../../modules/global/microvm-network.nix
     inputs.microvm.nixosModules.host
 
-    inputs.sops-nix.nixosModules.sops
     ../../modules/services/ai-services-secrets.nix
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/profiles/ai-host.nix
@@ -86,10 +81,6 @@ in
   boot = {
     kernelPackages = lib.mkForce pkgs.linuxPackages;
     kernelModules = [];
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
   };
   networking.hostName = "poseidon";
 
@@ -136,8 +127,7 @@ in
     #   { from = 8000; to = 8010; }
     # ];
   };
-}
-// {
+
   system.stateVersion = "25.11";
   nixpkgs.config.nvidia.acceptLicense = true;
 }

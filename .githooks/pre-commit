@@ -1,0 +1,40 @@
+#!/bin/bash
+# Pre-commit hook: Run Nix linting and format checks on staged .nix files
+set -euo pipefail
+
+STAGED_NIX=$(git diff --cached --name-only --diff-filter=ACM | grep '\.nix$' || true)
+
+if [ -z "$STAGED_NIX" ]; then
+  exit 0
+fi
+
+echo "Checking staged Nix files..."
+
+# deadnix on staged files
+if command -v deadnix &>/dev/null; then
+  if ! deadnix --fail $STAGED_NIX 2>/dev/null; then
+    echo "deadnix: found dead code in staged files"
+    echo "  Run 'deadnix <file>' to see details"
+    exit 1
+  fi
+fi
+
+# statix on staged files
+if command -v statix &>/dev/null; then
+  if ! statix check $STAGED_NIX 2>/dev/null; then
+    echo "statix: found issues in staged files"
+    echo "  Run 'statix check <file>' to see details"
+    exit 1
+  fi
+fi
+
+# alejandra on staged files
+if command -v alejandra &>/dev/null; then
+  if ! alejandra --check $STAGED_NIX 2>&1; then
+    echo "alejandra: formatting issues in staged files"
+    echo "  Run 'alejandra <file>' or 'task dev:fmt' to fix"
+    exit 1
+  fi
+fi
+
+echo "Nix checks passed."

@@ -1,3 +1,6 @@
+# DEPRECATED: Part of orb-cassini (see configuration.nix for context).
+# Retained as a reference only.
+
 {pkgs, ...}: {
   services.tailscale.enable = true;
   #virtualisation.docker.rootless = {

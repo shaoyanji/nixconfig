@@ -172,6 +172,41 @@ tasks:
     cmds:
       - task infra:rollback:apply:host:{{.HOST}}
 
+  infra:store:gc:
+    desc: Run nix store GC to free unreachable store paths
+    cmds:
+      - sudo nix store gc
+
+  infra:store:optimise:
+    desc: Deduplicate identical store paths
+    cmds:
+      - sudo nix store optimise
+
+  infra:store:collect-garbage:
+    desc: Remove old system generations and their orphaned store paths
+    cmds:
+      - sudo nix-collect-garbage -d
+      - echo "Old generations removed"
+
+  infra:store:clean:
+    desc: Full store cleanup — collect garbage, gc, then optimise
+    cmds:
+      - task infra:store:collect-garbage
+      - task infra:store:gc
+      - task infra:store:optimise
+
+  infra:store:menu:
+    desc: Choose a store maintenance action
+    cmds:
+      - |
+        choice=$(
+          {
+            printf '%s\n' infra:store:clean infra:store:gc infra:store:optimise infra:store:collect-garbage
+            printf '%s\n' exit
+          } | gum choose
+        )
+        [ "$choice" = "exit" ] || task "$choice"
+
   infra:logs:host:*:
     desc: "Tail journal logs for a host via ssh (default unit: go-backend)"
     vars:

@@ -1,5 +1,10 @@
-{
-  config,
+# DEPRECATED: Standalone Home Manager config for user "jisifu".
+# Not registered in the flake, not imported by any active host.
+# Retained as a reference only. To reactivate, add it to
+# flake/host-inventory.nix under homeConfigurations.
+# Created: 2022 (stateVersion 22.05)   Deprecated: 2025
+
+{ config,
   pkgs,
   inputs,
   ...

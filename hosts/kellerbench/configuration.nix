@@ -99,13 +99,6 @@ in {
     jq
   ];
 
-  users.users.devji = {
-    isNormalUser = true;
-    description = "matt";
-    extraGroups = ["networkmanager" "wheel"];
-    packages = with pkgs; [];
-  };
-
   services.openssh.enable = true;
   system.stateVersion = "25.05";
 }

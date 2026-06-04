@@ -267,3 +267,55 @@ tasks:
             scripts/task/nix-hash-update.sh "$f"
           fi
         done
+
+  dev:fmt:
+    desc: Format all Nix files with alejandra in-place
+    cmds:
+      - nix-shell -p alejandra --run "alejandra flake/ hosts/ modules/ overlays/ pkgs/ lib/"
+
+  dev:pkgs:list:
+    desc: List all custom packages defined in the flake
+    cmds:
+      - nix eval --json '.#packages.x86_64-linux' --apply 'builtins.attrNames' 2>/dev/null | jq -r '.[]'
+
+  dev:pkgs:update:*:
+    desc: Update a custom package version/hash (e.g. dev:pkgs:update:nullclaw)
+    vars:
+      PKG: '{{index .MATCH 0}}'
+    cmds:
+      - nix-shell -p nix-update --run "nix-update --flake --commit --version=bump '.#{{.PKG}}'" || echo "Manual update needed — edit pkgs/{{.PKG}}.nix directly"
+
+  dev:pr:list:
+    desc: List open pull requests
+    cmds:
+      - gh pr list --state open --author "@me" 2>/dev/null || gh pr list --state open
+
+  dev:pr:create:
+    desc: Create a pull request from the current branch
+    cmds:
+      - |
+        branch=$(git branch --show-current)
+        if [ "$branch" = "main" ]; then
+          echo "On main branch — switch to a feature branch first"
+          exit 1
+        fi
+        gh pr create --fill --web
+
+  dev:pr:checkout:*:
+    desc: Checkout a pull request by number
+    vars:
+      PR: '{{index .MATCH 0}}'
+    cmds:
+      - gh pr checkout {{.PR}}
+
+  dev:pr:review:*:
+    desc: Review a pull request by number (opens in browser)
+    vars:
+      PR: '{{index .MATCH 0}}'
+    cmds:
+      - gh pr review {{.PR}} --approve || gh pr review {{.PR}}
+
+  dev:pr:status:
+    desc: Show CI status for the current branch
+    cmds:
+      - gh pr checks 2>/dev/null || echo "No open PR for this branch"

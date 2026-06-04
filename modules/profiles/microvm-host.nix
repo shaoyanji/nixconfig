@@ -13,55 +13,77 @@
   pkgs,
   ...
 }: {
-  # MicroVM module networking
-  microvm.network = {
-    enable = true;
-    bridgeName = "microbr";
-    externalInterface = microvmExternalInterface;
-  };
-
-  # NetworkManager bridge profile
-  networking.networkmanager.ensureProfiles.profiles = {
-    "microbr" = {
-      connection = {
-        id = "microbr";
-        type = "bridge";
-        interface-name = "microbr";
-        autoconnect = true;
-      };
-      bridge = {
-        stp = false;
-        forward-delay = 0;
-      };
-      ipv4 = {
-        method = "manual";
-        address1 = bridgeAddress;
-      };
-      ipv6 = {
-        method = "disabled";
-      };
+  lib,
+  ...
+}: {
+  options.microvm.network = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable microvm network bridge and NAT";
+    };
+    bridgeName = lib.mkOption {
+      type = lib.types.str;
+      default = "microbr";
+      description = "Bridge name to use for VMs";
+    };
+    externalInterface = lib.mkOption {
+      type = lib.types.str;
+      default = "eno1";
+      description = "External network interface to NAT through";
     };
   };
 
-  # Auto-add microvm* interfaces to microbr bridge
-  environment.etc."NetworkManager/dispatcher.d/10-microvm-bridge".text = ''
-    #!/usr/bin/env bash
-    INTERFACE="$1"
-    ACTION="$2"
-    if [[ "$ACTION" == "up" ]] && [[ "$INTERFACE" == microvm* ]]; then
-      sleep 1
-      if ! ${pkgs.iproute2}/bin/ip link show "$INTERFACE" | grep -q "master microbr"; then
-        ${pkgs.iproute2}/bin/ip link set "$INTERFACE" master microbr
-      fi
-    fi
-  '';
-  environment.etc."NetworkManager/dispatcher.d/10-microvm-bridge".mode = "0755";
+  config = {
+    microvm.network = {
+      enable = true;
+      bridgeName = "microbr";
+      externalInterface = microvmExternalInterface;
+    };
 
-  # NAT for VM network
-  networking.nat = {
-    enable = true;
-    internalInterfaces = ["microbr"];
-    externalInterface = natExternalInterface;
+    # NetworkManager bridge profile
+    networking.networkmanager.ensureProfiles.profiles = {
+      "microbr" = {
+        connection = {
+          id = "microbr";
+          type = "bridge";
+          interface-name = "microbr";
+          autoconnect = true;
+        };
+        bridge = {
+          stp = false;
+          forward-delay = 0;
+        };
+        ipv4 = {
+          method = "manual";
+          address1 = bridgeAddress;
+        };
+        ipv6 = {
+          method = "disabled";
+        };
+      };
+    };
+
+    # Auto-add microvm* interfaces to microbr bridge
+    environment.etc."NetworkManager/dispatcher.d/10-microvm-bridge".text = ''
+      #!/usr/bin/env bash
+      INTERFACE="$1"
+      ACTION="$2"
+      if [[ "$ACTION" == "up" ]] && [[ "$INTERFACE" == microvm* ]]; then
+        sleep 1
+        if ! ${pkgs.iproute2}/bin/ip link show "$INTERFACE" | grep -q "master microbr"; then
+          ${pkgs.iproute2}/bin/ip link set "$INTERFACE" master microbr
+        fi
+      fi
+    '';
+    environment.etc."NetworkManager/dispatcher.d/10-microvm-bridge".mode = "0755";
+
+    # NAT for VM network
+    networking.nat = {
+      enable = true;
+      internalInterfaces = ["microbr"];
+      externalInterface = natExternalInterface;
+    };
+    networking.firewall.trustedInterfaces = ["microbr"];
   };
-  networking.firewall.trustedInterfaces = ["microbr"];
 }

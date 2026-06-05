@@ -1,7 +1,8 @@
 {lib, ...}: let
   localAgents = import ../ai/agents.nix {inherit lib;};
   agentsJsonPath = ../../config/agents.json;
-  remoteAgentsList = if builtins.pathExists agentsJsonPath
+  remoteAgentsList =
+    if builtins.pathExists agentsJsonPath
     then builtins.fromJSON (builtins.readFile agentsJsonPath)
     else [];
 in {
@@ -14,34 +15,21 @@ in {
           npm = "@ai-sdk/openai-compatible";
           options.baseURL = "http://localhost:11434/v1";
           models = {
-            "lfm2.5-thinking:latest" = {
+            "gemma4:31bcloud" = {
               _launch = true;
-              name = "lfm2.5-thinking:latest";
+              name = "gemma4";
             };
-            "qwen3.6" = {
+            # "deepseek-v4-flash:cloud" = {
+            #   _launch = true;
+            #   name = "deepseek-v4-flash:cloud";
+            #   limit = {
+            #     context = 1000000;
+            #     output = 327680;
+            #   };
+            # };
+            "minimax-m3:cloud" = {
               _launch = true;
-              name = "qwen3.6";
-            };
-            "minimax-m2.7:cloud" = {
-              _launch = true;
-              name = "minimax-m2.7:cloud";
-            };
-            "glm-5.1:cloud" = {
-              _launch = true;
-              name = "glm-5.1:cloud";
-            };
-            "deepseek-v4-flash:cloud" = {
-              _launch = true;
-              name = "deepseek-v4-flash:cloud";
-              limit = {
-                context = 1000000;
-                output = 327680;
-              };
-            };
-
-            "kimi-k2.6:cloud" = {
-              _launch = true;
-              name = "kimi-k2.6:cloud";
+              name = "minimax-m3:cloud";
               limit = {
                 context = 262144;
                 output = 32768;
@@ -59,12 +47,13 @@ in {
     };
     agents =
       lib.listToAttrs (map (agent: {
-        name = lib.removeSuffix ".md" (lib.last (lib.splitString "/" agent.url));
-        value = builtins.readFile (builtins.fetchurl {
-          url = agent.url;
-          sha256 = agent.sha256;
-        });
-      }) remoteAgentsList)
+          name = lib.removeSuffix ".md" (lib.last (lib.splitString "/" agent.url));
+          value = builtins.readFile (builtins.fetchurl {
+            url = agent.url;
+            sha256 = agent.sha256;
+          });
+        })
+        remoteAgentsList)
       // localAgents;
   };
 }

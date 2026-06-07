@@ -6,11 +6,8 @@
 
 { config,
   pkgs,
-  inputs,
   ...
-}: let
-  age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-in {
+}: {
   home.username = "jisifu";
   home.homeDirectory = "/home/jisifu";
   home.stateVersion = "22.05";

@@ -1,8 +1,6 @@
 # NixOS home-manager embedded configuration.
 # Primary user constants: modules/global/user.nix
 {
-  config,
-  pkgs,
   inputs,
   ...
 }: {

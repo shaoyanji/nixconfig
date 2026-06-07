@@ -4,8 +4,7 @@
 # Remove the import line from base-desktop-environment.nix when dropping this.
 # Created: 2024   Deprecated: 2025
 
-{ config,
-  lib,
+{
   pkgs,
   ...
 }: {

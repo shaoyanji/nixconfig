@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   ...
 }: let
@@ -14,8 +13,8 @@
         builtins.readFile
         (
           builtins.fetchurl {
-            url = (builtins.elemAt keysConfig 0).url;
-            sha256 = (builtins.elemAt keysConfig 0).sha256;
+            inherit ((builtins.elemAt keysConfig 0)) url;
+            inherit ((builtins.elemAt keysConfig 0)) sha256;
           }
         )
       )

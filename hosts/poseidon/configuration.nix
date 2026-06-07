@@ -1,6 +1,5 @@
 {
   inputs,
-  self,
   config,
   pkgs,
   lib,
@@ -89,11 +88,7 @@ in
       btrfs-progs
     ]
     ++ lib.optionals obsConfig.enable [
-      (pkgs.wrapOBS { plugins = obsConfig.plugins; })
-    ]
-    ++ [
-      # sunshine       # Disabled until sunshine setup is restored
-      # moonlight-qt
+      (pkgs.wrapOBS { inherit (obsConfig) plugins; })
     ];
   };
 

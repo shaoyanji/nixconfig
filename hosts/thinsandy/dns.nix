@@ -1,4 +1,4 @@
-{...}: {
+_: {
   # Tailnet DNS should stay manually managed after deployment:
   # sudo tailscale up --accept-dns=false
   services.tailscale.enable = true;

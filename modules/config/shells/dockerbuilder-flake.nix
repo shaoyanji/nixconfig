@@ -4,15 +4,14 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
   }: let
-    lib = nixpkgs.lib;
+    inherit (nixpkgs) lib;
     supportedSystems = [
       "x86_64-linux"
       "aarch64-linux"
     ];
-    forEachSupportedSystem = f: lib.genAttrs supportedSystems (system: f system);
+    forEachSupportedSystem = f: lib.genAttrs supportedSystems f;
     registryprefix = "ghcr.io/shaoyanji/";
     imageName = "tgpt";
     imageTag = "latest";

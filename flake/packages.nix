@@ -1,8 +1,8 @@
 {
-  inputs,
   lib,
   systems,
   pkgsFor,
+  ...
 }:
 lib.genAttrs systems.default (
   system: let

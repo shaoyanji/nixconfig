@@ -7,9 +7,9 @@
   imports = [
     ./minimal.nix
     ../shell
-    # ../user/ai/opencode.nix # too bloated
+    ../user/ai/opencode.nix # too bloated
     ../user/ai/codex.nix
-    ../user/ai/gemini-cli.nix
+    ../user/ai/antigravity-cli.nix
   ];
 
   programs.nix-your-shell.enable = true;

@@ -7,9 +7,9 @@
 
   imports = [
     # ./codex.nix
-    # ./gemini-cli.nix
     # ./mods.nix
     ./aichat.nix
+    # ./antigravity-cli.nix
     # ./opencode.nix
   ];
   # ++ lib.optionals config.ai.opencode.enable [./opencode.nix];

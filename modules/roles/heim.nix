@@ -1,10 +1,6 @@
 # devji user desktop/home preferences.
 # Primary user constants: modules/global/user.nix
-{
-  lib,
-  pkgs,
-  ...
-}:
+_:
 let
   user = import ../global/user.nix;
 in

@@ -1,4 +1,4 @@
-{...}: {
+_: {
   programs.aichat = {
     enable = true;
     settings = {

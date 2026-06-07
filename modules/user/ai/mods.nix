@@ -1,4 +1,4 @@
-{...}: {
+_: {
   programs.mods = {
     enable = true;
     settings = {

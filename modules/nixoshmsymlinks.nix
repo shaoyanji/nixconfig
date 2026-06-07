@@ -44,10 +44,7 @@ in {
         # ".simplex".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/.simplex";
       };
       sessionPath =
-        [
-          # "${nixNAS}/bin-script"
-        ]
-        ++ lib.optionals pkgs.stdenv.hostPlatform.isAarch64 [
+        lib.optionals pkgs.stdenv.hostPlatform.isAarch64 [
           # "${nixNAS}/bin-aarch64"
         ]
         ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [

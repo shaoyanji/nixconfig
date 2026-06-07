@@ -14,13 +14,12 @@
 in {
   # Create a standardized development shell
   mkDevShell = {
-    name,
     packages,
     greeting ? "Hello, Nix!",
     extraHooks ? [],
   }:
     pkgs.mkShell {
-      packages = packages;
+      inherit packages;
       GREETING = greeting;
       shellHook = ''
         ${lib.concatStringsSep "\n" extraHooks}

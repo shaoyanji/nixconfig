@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  inputs,
   ...
 }: let
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";

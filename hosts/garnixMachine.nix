@@ -2,7 +2,6 @@
   inputs,
   config,
   pkgs,
-  self,
   ...
 }: let
   # nullclawPort = 3001;

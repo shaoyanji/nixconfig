@@ -1,8 +1,6 @@
 {
   config,
-  lib,
   pkgs,
-  inputs,
   self,
   ...
 }: let
@@ -12,15 +10,15 @@
   enablePancakesHarness = false;
 in {
   imports = [
-    ../../modules/services/hermes-ai-mounts.nix
+    # ../../modules/services/hermes-ai-mounts.nix
     ../../modules/services/ai-services-secrets.nix
     ../../modules/services/ai-services-shared-mounts.nix
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/xs.nix
     ../../modules/services/pancakes-harness.nix
     ../../modules/services/ai-services-context.nix
-    inputs.hermes-agent.nixosModules.default
-    ../../modules/profiles/hermes-defaults.nix
+    # inputs.hermes-agent.nixosModules.default
+    # ../../modules/profiles/hermes-defaults.nix
     ../../modules/profiles/ollama-cloud-defaults.nix
     ../../modules/profiles/ai-host.nix
   ];
@@ -30,7 +28,7 @@ in {
     nullclaw.enable = enableNullClaw;
   };
 
-  aiServices.hermesMounts.enable = enableHermes;
+  # aiServices.hermesMounts.enable = enableHermes;
   aiServices.sharedSecrets.enable = true;
   aiServices.sharedMounts = {
     enable = true;
@@ -67,12 +65,12 @@ in {
   };
 
   # --- Hermes Agent ---
-  services.hermes-agent = lib.mkIf enableHermes {
-    enable = true;
-    environmentFiles = [
-      config.sops.secrets."ai-services-shared-env".path
-    ];
-  };
+  # services.hermes-agent = lib.mkIf enableHermes {
+  #   enable = true;
+  #   environmentFiles = [
+  #     config.sops.secrets."ai-services-shared-env".path
+  #   ];
+  # };
 
   # --- AI Services Filesystem Mounts (host-specific only) ---
   fileSystems = {

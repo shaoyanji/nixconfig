@@ -1,4 +1,4 @@
-{lib, ...}: {
+_: {
   boot.initrd.systemd.services = {
     impermanence-root = {
       description = "Set up impermanence root subvolume";

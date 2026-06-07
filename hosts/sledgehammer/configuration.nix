@@ -2,10 +2,8 @@
 # Boots headless with everything needed to set up a new machine:
 # SOPS decrypt, SSH, git, age key tools, nixos-install.
 {
-  config,
   lib,
   pkgs,
-  inputs,
   ...
 }: {
   imports = [

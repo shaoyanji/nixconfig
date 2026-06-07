@@ -10,7 +10,7 @@
     if name == "nullclaw" then config.aiServices.nullclaw.enable or false
     else if name == "xs" then config.aiServices.xs.enable or false
     else if name == "pancakes-harness" then (config.aiServices ? pancakesHarness) && (config.aiServices.pancakesHarness.enable or false)
-    else if name == "hermes" then config.services.hermes-agent.enable or false
+    else if name == "hermes" then (config.services ? hermes-agent) && (config.services.hermes-agent.enable or false)
     else false;
 
   # Auto-derive enabled services from config (no manual listing needed)

@@ -1,9 +1,4 @@
-{
-  config,
-  pkgs,
-  inputs,
-  ...
-}: {
+_: {
   # Note: home-manager settings (useGlobalPkgs, sharedModules, etc.) are
   # provided by globalModulesNixos → nixos.nix.  This module only adds
   # impermanence persistence rules for the devji user.

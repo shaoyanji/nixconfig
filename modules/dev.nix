@@ -26,6 +26,7 @@
   };
   home.sessionPath = [
     "$HOME/.dotnet/tools"
+    "$HOME/go/bin"
     "$HOME/.cargo/bin"
   ];
 }

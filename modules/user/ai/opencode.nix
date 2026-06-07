@@ -49,8 +49,8 @@ in {
       lib.listToAttrs (map (agent: {
           name = lib.removeSuffix ".md" (lib.last (lib.splitString "/" agent.url));
           value = builtins.readFile (builtins.fetchurl {
-            url = agent.url;
-            sha256 = agent.sha256;
+            inherit (agent) url;
+            inherit (agent) sha256;
           });
         })
         remoteAgentsList)

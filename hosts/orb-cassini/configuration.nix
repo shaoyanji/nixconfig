@@ -3,7 +3,7 @@
 # and not imported by any active host. No longer used since migrating off OrbStack.
 # Created: 2025       Deprecated: 2026
 
-{ config, pkgs, modulesPath, ... }:
+{ modulesPath, ... }:
 let
   user = import ../../modules/global/user.nix;
 in
@@ -26,7 +26,7 @@ in
     isSystemUser = true;
     group = "users";
     createHome = true;
-    home = user.home;
+    inherit (user) home;
     homeMode = "700";
     useDefaultShell = true;
   };

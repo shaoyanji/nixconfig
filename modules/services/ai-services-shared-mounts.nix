@@ -20,7 +20,7 @@
   # Resolve workspaceRoot from each service's config
   workspaceRoots = {
     nullclaw = config.aiServices.nullclaw.workspaceRoot or null;
-    hermes = config.services.hermes-agent.stateDir or null;
+    hermes = if config.services ? hermes-agent then config.services.hermes-agent.stateDir or null else null;
   };
 
   # Mount target paths relative to workspaceRoot

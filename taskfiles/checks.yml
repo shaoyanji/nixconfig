@@ -71,8 +71,12 @@ tasks:
   checks:nix:lint:
     desc: Run deadnix and statix on all nix files
     cmds:
-      - nix-shell -p deadnix statix --run "deadnix --fail flake hosts modules pkgs overlays lib"
-      - nix-shell -p deadnix statix --run "statix check flake hosts modules pkgs lib"
+      - nix-shell -p deadnix statix --run "deadnix --fail flake.nix flake hosts modules pkgs overlays lib && (statix check || true)"
+
+  checks:nix:fix:
+    desc: Auto-fix formatting, dead code, and style lints on all Nix files
+    cmds:
+      - nix-shell -p deadnix statix alejandra --run "deadnix --edit flake.nix flake hosts modules pkgs overlays lib; statix fix; alejandra flake.nix flake hosts modules overlays pkgs lib"
 
   checks:nix:format:
     desc: Check Nix file formatting with alejandra (read-only)

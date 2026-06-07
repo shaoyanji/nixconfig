@@ -81,7 +81,7 @@ in
   };
 
   users.users.${user.name} = {
-    home = user.home;
+    inherit (user) home;
     isNormalUser = true;
     description = "matt";
     extraGroups = ["networkmanager" "wheel"];

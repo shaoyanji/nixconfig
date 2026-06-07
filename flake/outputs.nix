@@ -3,8 +3,8 @@
   self,
   nixpkgs,
 }: let
-  lib = nixpkgs.lib;
-  systems = import ./systems.nix {flake-utils = inputs.flake-utils;};
+  inherit (nixpkgs) lib;
+  systems = import ./systems.nix {inherit (inputs) flake-utils;};
   pkgsFor = import ./pkgs-for.nix {inherit nixpkgs;};
   mkNixosHost = import ../lib/mk-nixos-host.nix {inherit nixpkgs;};
   moduleSets = import ./module-sets.nix {inherit inputs self;};
@@ -50,5 +50,5 @@ in
   docsSite = (pkgsFor "x86_64-linux").callPackage ../docs-site/default.nix {};
   docs-site = self.docsSite;
 
-  hostProjection = hostProjection;
+  inherit hostProjection;
 }

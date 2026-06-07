@@ -22,7 +22,7 @@ in
     # Optionally, use home-manager.extraSpecialArgs to pass
   };
   users.users.${user.name} = {
-    name = user.name;
+    inherit (user) name;
     home = "/Users/${user.name}";
   };
   # arguments to home.nix

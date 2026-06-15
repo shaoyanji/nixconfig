@@ -33,6 +33,29 @@ tasks:
           if [ -n '{{.SECRET_PATH}}' ]; then sudo test -r '{{.SECRET_PATH}}'; fi; \
           if [ -n '{{.HEALTH_PATH}}' ]; then curl -fsS --max-time 5 'http://{{.BIND}}:{{.PORT}}{{.HEALTH_PATH}}' >/dev/null; fi"
 
+  checks:zeroclaw:smoke:*:
+    desc: Smoke-check zeroclaw deployment on a remote host
+    vars:
+      HOST: '{{index .MATCH 0}}'
+      SERVICE: '{{.SERVICE | default "zeroclaw"}}'
+      PORT: '{{.PORT | default "42617"}}'
+      BIND: '{{.BIND | default "127.0.0.1"}}'
+      WORKSPACE_ROOT: '{{.WORKSPACE_ROOT | default "/var/lib/zeroclaw"}}'
+      CONFIG_PATH: '{{.CONFIG_PATH | default ""}}'
+      SECRET_PATH: '{{.SECRET_PATH | default ""}}'
+      HEALTH_PATH: '{{.HEALTH_PATH | default ""}}'
+    cmds:
+      - |
+        ssh {{.HOST}} "set -euo pipefail; \
+          sudo systemctl is-active --quiet {{.SERVICE}}; \
+          sudo test -d {{.WORKSPACE_ROOT}}; \
+          sudo test -d {{.WORKSPACE_ROOT}}/.zeroclaw; \
+          sudo test -d {{.WORKSPACE_ROOT}}/workspace; \
+          ss -ltnH | awk '{print \$4}' | grep -Fx '{{.BIND}}:{{.PORT}}' >/dev/null; \
+          if [ -n '{{.CONFIG_PATH}}' ]; then sudo test -r '{{.CONFIG_PATH}}'; fi; \
+          if [ -n '{{.SECRET_PATH}}' ]; then sudo test -r '{{.SECRET_PATH}}'; fi; \
+          if [ -n '{{.HEALTH_PATH}}' ]; then curl -fsS --max-time 5 'http://{{.BIND}}:{{.PORT}}{{.HEALTH_PATH}}' >/dev/null; fi"
+
   checks:nullclaw:smoke:garnixMachine:
     desc: Smoke-check garnixMachine nullclaw deployment (config-file staging pattern)
     vars:

@@ -4,10 +4,10 @@ _: {
     settings = {
       colorScheme = "tokyo night";
       enableTelemetry = false;
-      preferredEditor = "hx";
-      vimMode = true;
-      autoAccept = true;
-      security = {auth = {selectedType = "oauth-personal";};};
+      # preferredEditor = "hx";
+      # vimMode = true;
+      # autoAccept = true;
+      # security = {auth = {selectedType = "oauth-personal";};};
     };
     # defaultModel = "gemini-2.5-flash";
     commands = {

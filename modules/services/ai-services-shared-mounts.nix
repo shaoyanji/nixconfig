@@ -20,12 +20,14 @@
   # Resolve workspaceRoot from each service's config
   workspaceRoots = {
     nullclaw = config.aiServices.nullclaw.workspaceRoot or null;
+    zeroclaw = if config.services ? zeroclaw then config.services.zeroclaw.instances.zeroclaw.dataDir or null else null;
     hermes = if config.services ? hermes-agent then config.services.hermes-agent.stateDir or null else null;
   };
 
   # Mount target paths relative to workspaceRoot
   mountTargets = {
     nullclaw = "workspace/share";
+    zeroclaw = "workspace/share";
     hermes = "workspace/share";
   };
 
@@ -62,6 +64,11 @@ in {
         type = lib.types.bool;
         default = false;
         description = "Mount nullclaw workspace/share.";
+      };
+      zeroclaw = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Mount zeroclaw workspace/share.";
       };
       hermes = lib.mkOption {
         type = lib.types.bool;

@@ -1,11 +1,13 @@
 {
   config,
   pkgs,
+  lib,
   self,
   ...
 }: let
   enableHermes = false;
-  enableNullClaw = true;
+  enableNullClaw = false;
+  enableZeroclaw = true;
 in {
   imports = [
     # ../../modules/services/hermes-ai-mounts.nix
@@ -17,12 +19,14 @@ in {
     # inputs.hermes-agent.nixosModules.default
     # ../../modules/profiles/hermes-defaults.nix
     ../../modules/profiles/ollama-cloud-defaults.nix
+    ../../modules/services/zeroclaw-deployment.nix
     ../../modules/profiles/ai-host.nix
   ];
 
   profiles.aiHost = {
     enable = true;
     nullclaw.enable = enableNullClaw;
+    zeroclaw.enable = enableZeroclaw;
   };
 
   # aiServices.hermesMounts.enable = enableHermes;
@@ -32,6 +36,52 @@ in {
     source = "/srv/data/openclaw";
     services.nullclaw = enableNullClaw;
     services.hermes = enableHermes;
+  };
+
+  # --- ZeroClaw ---
+  # thinsandy is the NAS host, so data is local — bind mount directly.
+  aiServices.zeroclawDeployment = {
+    enable = enableZeroclaw;
+    instanceName = "athena";
+    mode = "env-file";
+    listenHost = "127.0.0.1";
+    listenPort = 42617;
+    workspaceRoot = "/var/lib/zeroclaw-athena";
+    environmentFile = config.sops.secrets."ai-services-shared-env".path;
+    extraSystemPackages = with pkgs; [
+      curl
+      git
+      jq
+    ];
+    protectHome = "read-only";
+    bindReadOnlyPaths = {
+      "/var/lib/zeroclaw-athena/workspace/share" = "/srv/data/openclaw";
+    };
+  };
+
+  sops.secrets.athena-telegram = {
+    owner = "zeroclaw-athena";
+    group = "zeroclaw-athena";
+    mode = "0400";
+  };
+
+  sops.templates."zeroclaw-athena-env" = {
+    content = ''
+      TELEGRAM_BOT_TOKEN=${config.sops.placeholder."athena-telegram"}
+    '';
+  };
+
+  systemd.services."zeroclaw-athena".serviceConfig.EnvironmentFile = lib.mkAfter [
+    config.sops.templates."zeroclaw-athena-env".path
+  ];
+
+  services.zeroclaw.instances.athena.settings.channels.telegram = {
+    enabled = true;
+    bot_token = "$TELEGRAM_BOT_TOKEN";
+    allowed_users = [
+      "8522510655"
+      "8207284912"
+    ];
   };
 
   # --- AI Services Configuration ---

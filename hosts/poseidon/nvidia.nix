@@ -1,4 +1,5 @@
 {
+  pkgs,
   config,
   lib,
   ...
@@ -7,8 +8,8 @@
     ../../modules/profiles/nvidia.nix
   ];
   services.xserver.videoDrivers = [
-    "nvidia"
     "amdgpu"
+    "nvidia"
   ];
   hardware.nvidia = {
     open = lib.mkForce true;
@@ -16,9 +17,15 @@
     nvidiaPersistenced = lib.mkForce false;
     prime = {
       nvidiaBusId = "PCI:1:0:0";
-      amdgpuBusId = "PCI:5:0:0";
+      amdgpuBusId = "PCI:6:0:0";
     };
   };
 
-  boot.kernelParams = ["nvidia.NVreg_EnableGpuFirmware=0"];
+  services.ollama = {
+    # package = pkgs.ollama-cuda;
+    loadModels = lib.mkForce [
+      "lfm2.5:latest"
+    ];
+  };
+  # boot.kernelParams = ["nvidia.NVreg_EnableGpuFirmware=0"];
 }

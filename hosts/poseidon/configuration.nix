@@ -4,8 +4,7 @@
   pkgs,
   lib,
   ...
-}:
-let
+}: let
   user = import ../../modules/global/user.nix;
   obsConfig = {
     enable = false;
@@ -15,8 +14,7 @@ let
       obs-pipewire-audio-capture
     ];
   };
-in
-{
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -27,7 +25,7 @@ in
     inputs.microvm.nixosModules.host
 
     ../../modules/services/ai-services-secrets.nix
-    ../../modules/services/nullclaw-deployment.nix
+    ../../modules/services/zeroclaw-deployment.nix
     ../../modules/profiles/ai-host.nix
     (import ../../modules/profiles/microvm-host.nix {
       inherit pkgs;
@@ -39,16 +37,49 @@ in
 
   profiles.aiHost = {
     enable = true;
-    nullclaw.enable = true;
+    nullclaw.enable = false;
+    zeroclaw.enable = true;
   };
 
-  aiServices.nullclawDeployment = {
+  aiServices.zeroclawDeployment = {
     enable = true;
     mode = "env-file";
     listenHost = "127.0.0.1";
-    listenPort = 3001;
-    workspaceRoot = "/var/lib/nullclaw";
+    listenPort = 42617;
+    workspaceRoot = "/var/lib/zeroclaw";
     environmentFile = config.sops.secrets."ai-services-shared-env".path;
+    extraSystemPackages = with pkgs; [
+      curl
+      git
+      jq
+    ];
+    protectHome = "read-only";
+    # Mount shared NAS data into workspace (only on non-NAS hosts)
+    bindReadOnlyPaths = {
+      "${config.aiServices.zeroclawDeployment.workspaceRoot}/workspace/share" = "/Volumes/data/openclaw";
+    };
+  };
+
+  sops.secrets.poseidon-telegram = {
+    owner = "zeroclaw-zeroclaw";
+    group = "zeroclaw-zeroclaw";
+    mode = "0400";
+  };
+
+  sops.templates."zeroclaw-zeroclaw-env" = {
+    content = ''
+      TELEGRAM_BOT_TOKEN=${config.sops.placeholder."poseidon-telegram"}
+    '';
+  };
+
+  systemd.services."zeroclaw-zeroclaw".serviceConfig.EnvironmentFile = lib.mkAfter [
+    config.sops.templates."zeroclaw-zeroclaw-env".path
+  ];
+
+  services.zeroclaw.instances.zeroclaw.settings.channels.telegram = {
+    enabled = true;
+    bot_token = "$TELEGRAM_BOT_TOKEN";
+    allowed_users = ["8207284912"];
   };
 
   # Use microbr bridge for VMs (configured by microvm-host.nix)
@@ -84,12 +115,13 @@ in
   networking.hostName = "poseidon";
 
   environment = {
-    systemPackages = with pkgs; [
-      btrfs-progs
-    ]
-    ++ lib.optionals obsConfig.enable [
-      (pkgs.wrapOBS { inherit (obsConfig) plugins; })
-    ];
+    systemPackages = with pkgs;
+      [
+        btrfs-progs
+      ]
+      ++ lib.optionals obsConfig.enable [
+        (pkgs.wrapOBS {inherit (obsConfig) plugins;})
+      ];
   };
 
   # users.groups.libvirtd.members = [ "devji" ];
@@ -100,7 +132,6 @@ in
 
   # services.avahi.publish.enable = true;
   # services.avahi.publish.userServices = true;
-
 
   services.displayManager.sddm = {
     enable = false;

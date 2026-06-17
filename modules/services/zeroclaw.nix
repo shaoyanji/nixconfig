@@ -479,17 +479,26 @@ in {
     # created and the unit would then fail at `WorkingDirectory=/srv/...`.
     # tmpfiles handles arbitrary absolute paths uniformly.
     systemd.tmpfiles.settings."10-zeroclaw" =
-      mapAttrs' (
-        _: instanceCfg:
-          nameValuePair instanceCfg.dataDir {
-            d = {
-              mode = "0750";
-              user = instanceCfg.user;
-              group = instanceCfg.group;
-            };
-          }
-      )
-      cfg.instances;
+      lib.listToAttrs (
+        lib.flatten (
+          mapAttrsToList (_: instanceCfg: [
+            (nameValuePair instanceCfg.dataDir {
+              d = {
+                mode = "0750";
+                user = instanceCfg.user;
+                group = instanceCfg.group;
+              };
+            })
+            (nameValuePair "${instanceCfg.dataDir}/workspace" {
+              d = {
+                mode = "0750";
+                user = instanceCfg.user;
+                group = instanceCfg.group;
+              };
+            })
+          ]) cfg.instances
+        )
+      );
 
     # Eval-time guards so misconfiguration fails fast with a useful message.
     assertions = let

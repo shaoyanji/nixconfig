@@ -2,7 +2,7 @@ _: {
   programs.aichat = {
     enable = true;
     settings = {
-      model = "ollama:kimi-k2.6:cloud";
+      model = "ollama:minimax-m3:cloud";
       clients = [
         {
           type = "openai-compatible";

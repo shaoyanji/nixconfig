@@ -43,20 +43,31 @@ in {
 
   aiServices.zeroclawDeployment = {
     enable = true;
-    mode = "env-file";
     listenHost = "127.0.0.1";
     listenPort = 42617;
     workspaceRoot = "/var/lib/zeroclaw";
     environmentFile = config.sops.secrets."ai-services-shared-env".path;
+    extraEnvironmentFiles = [
+      config.sops.templates."zeroclaw-zeroclaw-env".path
+    ];
     extraSystemPackages = with pkgs; [
       curl
       git
       jq
+      skills
+      worktrunk
     ];
     protectHome = "read-only";
     # Mount shared NAS data into workspace (only on non-NAS hosts)
     bindReadOnlyPaths = {
       "${config.aiServices.zeroclawDeployment.workspaceRoot}/workspace/share" = "/Volumes/data/openclaw";
+    };
+    settings = {
+      channels.telegram = {
+        enabled = true;
+        bot_token = "$TELEGRAM_BOT_TOKEN";
+        allowed_users = ["8207284912"];
+      };
     };
   };
 
@@ -70,16 +81,6 @@ in {
     content = ''
       TELEGRAM_BOT_TOKEN=${config.sops.placeholder."poseidon-telegram"}
     '';
-  };
-
-  systemd.services."zeroclaw-zeroclaw".serviceConfig.EnvironmentFile = lib.mkAfter [
-    config.sops.templates."zeroclaw-zeroclaw-env".path
-  ];
-
-  services.zeroclaw.instances.zeroclaw.settings.channels.telegram = {
-    enabled = true;
-    bot_token = "$TELEGRAM_BOT_TOKEN";
-    allowed_users = ["8207284912"];
   };
 
   # Use microbr bridge for VMs (configured by microvm-host.nix)
@@ -100,10 +101,13 @@ in {
         microvm.vsock.cid = 10;
 
         environment.systemPackages = with pkgs; [
+          curl
+          git
+          jq
+          yq-go
           go
-          htop
-          kitty
-          opencode
+          skills
+          worktrunk
         ];
       };
     };

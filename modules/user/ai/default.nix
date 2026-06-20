@@ -30,6 +30,7 @@
     [
       geminicommit
       tgpt
+      crush
       # aichat
       # mods
     ]

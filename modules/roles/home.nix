@@ -17,6 +17,7 @@
   home.packages = with pkgs;
     [
       # ── Moved from base (too heavy for servers) ──
+      peertube-viewer
       pi-coding-agent # AI coding agent (515 MB closure)
       devenv # Developer environments (864 MB closure)
       nixd # Nix language server (588 MB closure, pulls llvm)
@@ -59,7 +60,7 @@
       iotop
     ]
     ++ lib.optionals stdenv.hostPlatform.isx86_64 [
-      skills
+      # skills
       keypunch
       qalculate-qt
       # thunderbird-bin

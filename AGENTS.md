@@ -4,10 +4,20 @@
 
 Use this document to orient yourself to the routing map; follow `taskfiles/README.md` for ownership and `.agents/README.md` for quick helper lookups.
 
-`.agents/*` is guidance-only and never replaces the Taskfile truth.
+`.agents/*` is guidance-only and never replaces the Taskfile truth. Each taskfile shard has a corresponding skill under `.agents/skills/<name>/SKILL.md` — see `.agents/README.md` for the full index.
 
 ## Task Namespace Summary
 See [Task Control Plane](docs/task-control-plane.md) for full namespace definitions and workflow examples.
+
+## Fast Reference
+
+| Namespace | What | Skill |
+|-----------|------|-------|
+| `infra:*` | Host lifecycle, secrets, SOPS | `.agents/skills/infra/SKILL.md` |
+| `agents:*` | Operator menu, xs, OAuth | `.agents/skills/agents/SKILL.md` |
+| `checks:*` | Validation, smoke checks, nix lint | `.agents/skills/checks/SKILL.md` |
+| `dev:*` | Git, flake, site, PRs, packages | `.agents/skills/dev/SKILL.md` |
+| `services:*` | Legacy wrappers (canonical: `infra:*`) | `.agents/skills/services/SKILL.md` |
 
 ## Git Hooks Setup
 This repo includes pre-commit hooks in `.githooks/` to catch common issues:

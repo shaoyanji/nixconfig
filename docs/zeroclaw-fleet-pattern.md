@@ -7,10 +7,11 @@ Shared module:
 - `modules/services/zeroclaw-deployment.nix`
 
 ## What the Shared Module Does
-`aiServices.zeroclawDeployment` wraps `aiServices.zeroclaw` and provides:
-- explicit host input surface for bind/port/workspace + secret/config mode
-- optional staging of a runtime `config.toml` into `workspaceRoot/.zeroclaw`
-- a single place for fleet-safe zeroclaw host wiring
+`aiServices.zeroclawDeployment` wraps `services.zeroclaw.instances.<name>` and provides:
+- explicit host input surface for bind/port/workspace
+- `environmentFile` + `extraEnvironmentFiles` for secrets
+- `settings` passthrough for ZeroClaw config
+- shared context/auth/state mounts via `ai-services-mounts.nix`
 
 It does not manage:
 - SOPS key material and encrypted payloads
@@ -19,14 +20,17 @@ It does not manage:
 
 ## Required Host Inputs
 When `aiServices.zeroclawDeployment.enable = true`, set:
-- `mode` (`none` | `env-file` | `config-toml`)
 - `listenHost`
 - `listenPort`
 - `workspaceRoot`
 
 Optional:
-- `environmentFile` (required only for `mode = "env-file"`)
-- `configTomlSource` (required only for `mode = "config-toml"`)
+- `environmentFile` — primary environment file (e.g. shared secrets)
+- `extraEnvironmentFiles` — additional env files for instance-specific secrets
+- `settings` — ZeroClaw config (providers, channels, etc.); use `$VAR` references for secrets
+- `extraSystemPackages` — packages added to the unit's PATH
+- `protectHome` — systemd ProtectHome= hardening
+- `bindReadOnlyPaths` — read-only bind-mounts (target = source)
 
 ## Add a New Machine
 1. Import the module in the host file:
@@ -36,7 +40,8 @@ Optional:
 3. Set host-local values:
    - listen host/port
    - workspace root
-   - secret source path(s)
+   - environment file path(s)
+   - settings (providers, channels, etc.)
 4. Keep host-only concerns in the host:
    - SOPS secret declarations
    - firewall/proxy rules
@@ -47,43 +52,16 @@ Minimal host snippet:
 ```nix
 aiServices.zeroclawDeployment = {
   enable = true;
-  mode = "env-file";
   listenHost = "127.0.0.1";
   listenPort = 42617;
   workspaceRoot = "/var/lib/zeroclaw";
   environmentFile = config.sops.secrets.zeroclaw.path;
-  # or:
-  # configTomlSource = config.sops.secrets.zeroclaw-config.path;
-};
-```
-
-## Deployment Modes
-
-### env-file mode
-Sets `environmentFile` for zeroclaw service. The secret file should contain key=value pairs.
-
-```nix
-aiServices.zeroclawDeployment = {
-  enable = true;
-  mode = "env-file";
-  listenHost = "127.0.0.1";
-  listenPort = 42617;
-  workspaceRoot = "/var/lib/zeroclaw";
-  environmentFile = config.sops.secrets.zeroclaw.path;
-};
-```
-
-### config-toml mode
-Stages a `config.toml` file into `${workspaceRoot}/.zeroclaw/config.toml` from the specified source.
-
-```nix
-aiServices.zeroclawDeployment = {
-  enable = true;
-  mode = "config-toml";
-  listenHost = "127.0.0.1";
-  listenPort = 42617;
-  workspaceRoot = "/var/lib/zeroclaw";
-  configTomlSource = config.sops.secrets.zeroclaw-config.path;
+  settings = {
+    channels.telegram = {
+      enabled = true;
+      bot_token = "$TELEGRAM_BOT_TOKEN";
+    };
+  };
 };
 ```
 
@@ -97,7 +75,8 @@ Similar to NullClaw, verify:
 
 ## Common Issues
 
-1. **Service restart loop**: Check for unreadable/invalid staged config file in config-toml mode
+1. **Service restart loop**: Check for missing env vars referenced in `settings`
 2. **Missing listener**: Verify `listenHost` and `listenPort` match expected values
 3. **Secret path errors**: Ensure SOPS secret declaration and key setup are correct
 4. **Missing workspace paths**: Check that persistence/filesystem assumptions are met
+5. **Unsubstituted `$VAR` in config.toml**: Verify the variable is defined in one of the unit's EnvironmentFile paths

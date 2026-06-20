@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  lib,
   self,
   ...
 }: let
@@ -43,19 +42,32 @@ in {
   aiServices.zeroclawDeployment = {
     enable = enableZeroclaw;
     instanceName = "athena";
-    mode = "env-file";
     listenHost = "127.0.0.1";
     listenPort = 42617;
     workspaceRoot = "/var/lib/zeroclaw-athena";
     environmentFile = config.sops.secrets."ai-services-shared-env".path;
+    extraEnvironmentFiles = [
+      config.sops.templates."zeroclaw-athena-env".path
+    ];
     extraSystemPackages = with pkgs; [
       curl
       git
       jq
+      skills
     ];
     protectHome = "read-only";
     bindReadOnlyPaths = {
       "/var/lib/zeroclaw-athena/workspace/share" = "/srv/data/openclaw";
+    };
+    settings = {
+      channels.telegram = {
+        enabled = true;
+        bot_token = "$TELEGRAM_BOT_TOKEN";
+        allowed_users = [
+          "8522510655"
+          "8207284912"
+        ];
+      };
     };
   };
 
@@ -71,19 +83,6 @@ in {
     '';
   };
 
-  systemd.services."zeroclaw-athena".serviceConfig.EnvironmentFile = lib.mkAfter [
-    config.sops.templates."zeroclaw-athena-env".path
-  ];
-
-  services.zeroclaw.instances.athena.settings.channels.telegram = {
-    enabled = true;
-    bot_token = "$TELEGRAM_BOT_TOKEN";
-    allowed_users = [
-      "8522510655"
-      "8207284912"
-    ];
-  };
-
   # --- AI Services Configuration ---
   aiServices = {
     context.enable = true;
@@ -94,7 +93,7 @@ in {
       environmentFile = config.sops.secrets."nullclaw".path;
     };
     xs = {
-      enable = true;
+      enable = false;
       package = self.packages.${pkgs.system}.xs;
       storePath = "/var/lib/xs/store";
     };

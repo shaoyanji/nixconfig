@@ -64,14 +64,21 @@
       }
     ];
     binds = {
-      "Mod+Shift+Slash".action.show-hotkey-overlay = [];
+      # "Mod+Shift+Slash".action.show-hotkey-overlay = [];
       "Mod+Print".action.screenshot-screen = {show-pointer = false;};
       "Mod+A".action.spawn = "fuzzel";
       "Mod+T".action.spawn-sh = "kitty -- tmux";
       "Mod+Y".action.spawn = ["dms" "ipc" "tmux" "toggle"];
+      "Mod+P".action.spawn = ["dms" "ipc" "notepad" "toggle"];
+      "Mod+V".action.spawn = ["dms" "ipc" "clipboard" "toggle"];
+      "Mod+Space".action.spawn = ["dms" "ipc" "spotlight-bar" "toggle"];
+      "Mod+N".action.spawn = ["dms" "ipc" "spotlight" "toggle"];
+      "Mod+M".action.spawn = ["dms" "ipc" "settings" "toggle"];
+      "Mod+Shift+Slash".action.spawn = ["dms" "ipc" "call" "keybinds" "toggle" "niri"];
 
       "Mod+Z".action.spawn = "zen-beta";
-      "Mod+C".action.spawn-sh = "kitty -- task";
+      # "Mod+C".action.spawn-sh = "kitty -- task";
+      "Mod+C".action.spawn-sh = "tmux display-popup task";
       "Mod+B".action.spawn-sh = "kando -m 'Kando Menu'";
 
       "Mod+W".action.toggle-window-floating = [];

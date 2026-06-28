@@ -5,7 +5,7 @@ _: {
   home-manager.users.devji.home = {
     stateVersion = "25.05";
 
-    persistence."/persist/home" = {
+    persistence."/persist" = {
       directories = [
         "Downloads"
         "Music"
@@ -17,17 +17,18 @@ _: {
         ".local/share/keyrings"
         ".local/share/direnv"
         ".config/direnv"
+        ".config/niri"
         ".config/btop"
         ".config/elvish/lib"
         ".config/obsidian"
         ".zen"
+        "nixconfig"
         {
           directory = ".local/share/Steam";
         }
       ];
       files = [
         ".config/sops/age/keys.txt"
-        "nixconfig"
       ];
     };
   };

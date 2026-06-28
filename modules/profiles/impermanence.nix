@@ -1,4 +1,6 @@
-_: {
+_: let
+  user = import ../global/user.nix;
+in {
   boot.initrd.systemd.services = {
     impermanence-root = {
       description = "Set up impermanence root subvolume";
@@ -76,7 +78,7 @@ _: {
 
   services = {
     displayManager.sddm = {
-      enable = true;
+      enable = false;
       wayland.enable = true;
     };
 
@@ -85,6 +87,12 @@ _: {
       interval = "monthly";
       fileSystems = ["/"];
     };
+  };
+
+  programs.dank-material-shell.greeter = {
+    enable = true;
+    compositor.name = "niri";
+    configHome = user.home;
   };
 
   programs.fuse.userAllowOther = true;

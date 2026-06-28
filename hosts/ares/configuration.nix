@@ -8,7 +8,7 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    alacritty
+    # alacritty
   ];
   networking.hostName = "ares";
   system.stateVersion = "25.05";

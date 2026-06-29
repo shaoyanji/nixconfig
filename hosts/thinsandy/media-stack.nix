@@ -49,6 +49,7 @@ in
   services.jellyfin = {
     enable = true;
     openFirewall = true;
+    dataDir = "/srv/private/jellyfin";
   };
 
   environment.systemPackages = with pkgs; [
@@ -62,6 +63,7 @@ in
     enable = true;
     openFirewall = true;
     user = user.name;
+    dataDir = "/srv/private/plex";
   };
 
   # --- Anki sync ---
@@ -80,6 +82,7 @@ in
   # --- Home Assistant ---
   services.home-assistant = {
     enable = true;
+    configDir = "/srv/private/home-assistant";
     extraComponents = [
       "rest"
       "command_line"

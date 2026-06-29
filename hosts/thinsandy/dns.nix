@@ -14,6 +14,12 @@ _: {
 
   services.pihole-ftl = {
     enable = true;
+    # Log containment: keep FTL.log lean and auto-purge old DB queries
+    queryLogDeleter = {
+      enable = true;
+      age = 31;
+      interval = "daily";
+    };
     lists = [
       {
         url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts";
@@ -26,10 +32,14 @@ _: {
     ];
     settings = {
       dns = {
+        queryLogging = true;
         upstreams = ["127.0.0.1#5335"];
         # listeningMode = "LOCAL";
         listeningMode = "ALL";
         interface = "eno1";
+      };
+      database = {
+        maxDBdays = 31;
       };
       # misc.dnsmasq_lines = ["interface=tailscale0"];
       # webserver.api.cli_pw = true;

@@ -91,6 +91,13 @@
     options = ["bind"];
   };
 
+  # Unified media mount for Plex / Jellyfin / Immich / *arr
+  fileSystems."/media" = {
+    device = "/export/data/media";
+    fsType = "none";
+    options = ["bind" "x-systemd.requires=srv-data.mount"];
+  };
+
   services.nfs.server.enable = true;
   services.nfs.server.exports = ''
     /export 192.168.178.0/24(rw,fsid=0,no_subtree_check)

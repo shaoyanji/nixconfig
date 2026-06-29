@@ -124,5 +124,8 @@ in {
   #   mode = "0400";
   # };
 
-  services.ollama.enable = true;
+  services.ollama = {
+    enable = true;
+    home = "/srv/data/ollama";
+  };
 }

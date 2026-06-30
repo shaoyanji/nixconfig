@@ -46,5 +46,11 @@ in rec {
       inputs.home-manager.nixosModules.default
       inputs.nix-index-database.nixosModules.nix-index
     ];
+  globalModulesDemo =
+    globalModules
+    ++ [
+      ../modules/global/demo.nix
+      inputs.home-manager.nixosModules.default
+    ];
   globalModulesHome = hmSharedModulesHome;
 }

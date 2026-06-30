@@ -17,7 +17,7 @@ in
     environment.systemPackages = [pkgs.nfs-utils];
 
     fileSystems."/Volumes/data" = {
-      device = "192.168.178.17:/data";
+      device = "192.168.3.25:/data";
       fsType = "nfs";
       options = nasAutomountOptions;
     };

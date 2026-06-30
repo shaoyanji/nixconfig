@@ -6,6 +6,7 @@
   inherit
     (moduleSets)
     globalModulesContainers
+    globalModulesDemo
     globalModulesHome
     globalModulesImpermanence
     globalModulesMacos
@@ -135,6 +136,13 @@ in {
       ../hosts/sledgehammer/configuration.nix
       inputs.disko.nixosModules.default
     ];
+  };
+
+  demo = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = {inherit inputs self;};
+    modules = globalModulesDemo ++ [../hosts/demo/configuration.nix];
   };
 
   testvm = {

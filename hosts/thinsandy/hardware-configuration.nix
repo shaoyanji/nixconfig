@@ -100,8 +100,8 @@
 
   services.nfs.server.enable = true;
   services.nfs.server.exports = ''
-    /export 192.168.178.0/24(rw,fsid=0,no_subtree_check)
-    /export/data 192.168.178.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
+    /export 192.168.3.0/24(rw,fsid=0,no_subtree_check)
+    /export/data 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
     /export/data 100.66.146.18(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
   '';
   services.samba = {
@@ -117,7 +117,7 @@
         #"use sendfile" = "yes";
         #"max protocol" = "smb2";
         # note: localhost is the ipv6 localhost ::1
-        #"hosts allow" = "192.168.178.0 ";
+        #"hosts allow" = "192.168.3.0 ";
         #"hosts deny" = "0.0.0.0/0";
         #"guest account" = "nobody";
         #"map to guest" = "bad user";

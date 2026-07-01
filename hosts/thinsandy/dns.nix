@@ -41,7 +41,7 @@ _: {
       database = {
         maxDBdays = 31;
       };
-      # misc.dnsmasq_lines = ["interface=tailscale0"];
+      misc.dnsmasq_lines = ["interface=tailscale0"];
       # webserver.api.cli_pw = true;
     };
   };

@@ -127,5 +127,13 @@ in {
   services.ollama = {
     enable = true;
     home = "/srv/data/ollama";
+    user = "ollama";
+    group = "ollama";
   };
+
+  # Pre-create the custom home path since StateDirectory only covers /var/lib/ollama.
+  # Static user avoids the traversal issue with DynamicUser ephemeral UIDs on Btrfs.
+  systemd.tmpfiles.rules = [
+    "d /srv/data/ollama 0755 ollama ollama -"
+  ];
 }

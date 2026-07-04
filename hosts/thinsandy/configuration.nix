@@ -43,8 +43,14 @@
     rpcHost = "127.0.0.1";
     rpcSecretFile = config.sops.templates."aria2-rpc-env".path;
     nginx.enable = true;
-    nginx.domain = "aria.cloudforest-kardashev.ts.net";
+    nginx.listenPort = 6801;
   };
+
+  networking.firewall.allowedTCPPorts = [
+    8123  # HomeAssistant
+    7351  # Stirling PDF
+    6801  # AriaNg web UI
+  ];
 
   system.stateVersion = "25.05";
 }

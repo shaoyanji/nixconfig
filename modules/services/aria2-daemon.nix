@@ -65,10 +65,10 @@ in {
       description = "Expose AriaNg + RPC proxy via nginx";
     };
 
-    nginx.domain = lib.mkOption {
-      type = lib.types.str;
-      default = "aria.local";
-      description = "Domain for the AriaNg web UI";
+    nginx.listenPort = lib.mkOption {
+      type = lib.types.port;
+      default = 8080;
+      description = "Port for AriaNg web UI";
     };
   };
 
@@ -145,10 +145,17 @@ in {
 
     services.nginx = lib.mkIf cfg.nginx.enable {
       enable = true;
-      virtualHosts.${cfg.nginx.domain} = {
+      virtualHosts.aria = {
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = cfg.nginx.listenPort;
+          }
+        ];
+        serverName = "_";
+        root = pkgs.ariang;
         locations."/" = {
-          root = pkgs.ariang;
-          index = "index.html";
+          tryFiles = "$uri $uri/ /index.html";
         };
         locations."/jsonrpc" = {
           proxyPass = "http://${cfg.rpcHost}:${builtins.toString cfg.rpcPort}/jsonrpc";

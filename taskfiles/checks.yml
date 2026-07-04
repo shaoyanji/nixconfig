@@ -6,6 +6,8 @@ tasks:
     cmds:
       - nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
       - nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
+      - nix eval .#nixosConfigurations.aristotle.config.networking.hostName
+      - nix eval .#nixosConfigurations.netbook.config.networking.hostName
       - nix eval .#packages.x86_64-linux.nullclaw.meta.mainProgram
       - nix build .#checks.x86_64-linux.host-architecture -L
       - task checks:nix:lint

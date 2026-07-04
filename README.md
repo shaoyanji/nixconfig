@@ -44,6 +44,18 @@ globalModulesMacos       → global → macos (nix-darwin, no dms/niri)
 4. Let `flake/host-projection.nix` project inventory data into outputs (no manual output wiring needed).
 5. Build/check through the Task control plane (`Taskfile.yml` + `taskfiles/*`) and then switch on the target host.
 
+## Disko install from a NixOS minimal ISO
+
+```bash
+# Boot the NixOS minimal ISO, fetch your flake, and partition:
+sudo nix run github:nix-community/disko -- --mode disko --flake /path/to/flake#hostname
+# Then install:
+sudo nixos-install --flake /path/to/flake#hostname
+# Reboot into the freshly partitioned system.
+```
+
+Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs` needed. Device paths are parameterised per-host (e.g. `disko.nix {device = "/dev/sda";}`).
+
 ## Supported Hosts
 
 | Host          | nullclaw | hermes-agent | ollama | xs | pancakes-harness |

@@ -88,6 +88,23 @@ in {
       ];
   };
 
+  aristotle = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = {inherit inputs self;};
+    modules = globalModulesNixos ++ [../hosts/aristotle/configuration.nix];
+  };
+
+  netbook = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = {inherit inputs self;};
+    modules = globalModulesContainers ++ [
+      ../hosts/netbook/configuration.nix
+      inputs.disko.nixosModules.default
+    ];
+  };
+
   aceofspades = {
     kind = "nixos";
     system = "x86_64-linux";

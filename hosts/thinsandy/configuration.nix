@@ -1,5 +1,6 @@
 {
   inputs,
+  config,
   ...
 }: {
   imports = [
@@ -24,10 +25,23 @@
     varCacheDevice = "/srv/private/var-cache";
   };
 
+  sops.secrets."aria2-rpc-secret" = {
+    owner = "aria2";
+    group = "aria2";
+    mode = "0400";
+  };
+
+  sops.templates."aria2-rpc-env" = {
+    content = ''
+      RPC_SECRET=${config.sops.placeholder."aria2-rpc-secret"}
+    '';
+  };
+
   services.aria2-daemon = {
     enable = true;
     downloadDir = "/srv/data/downloads";
     rpcHost = "127.0.0.1";
+    rpcSecretFile = config.sops.templates."aria2-rpc-env".path;
     nginx.enable = true;
     nginx.domain = "aria.cloudforest-kardashev.ts.net";
   };

@@ -1,69 +1,38 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }: let
-  researchPython = pkgs.python3.withPackages (ps:
-    with ps; [
-      neo4j
-      pytz
-      firecrawl-py
-      pydantic
-    ]);
-
-  commonTools = with pkgs; [
-    skills
-    # gemini-cli
-    # qwen-code
-    # codex
-    cowsay
-    figlet
-    graphviz
-    vim
-    wget
-    git
-    btop
-    btrfs-progs
-    f2fs-tools
+  inherit (lib) mkEnableOption mkIf;
+  cfg = config.services.thinsandyTools;
+  heavyTools = with pkgs; [
     go
-    yq-go
-    ddgr
-    bat
-    fd
-    sqlite
+    uv
     gh
-    fzf
-    delta
-    httpie
-    ncdu
-    tree
-    unzip
-    xxd
-    lsof
-    pv
-    miller
-    glow
-    sd
-    hyperfine
-    tldr
-    watch
     neo4j
     typst
-    pup
-    htmlq
-    go-task
-    gnumake
-    shellcheck
-    entr
-    file
-    rsync
-    jq
+    (pkgs.python3.withPackages (ps: with ps; [neo4j pytz firecrawl-py pydantic]))
+  ];
+  lightTools = with pkgs; [
+    skills
+    cowsay figlet graphviz
+    vim wget git btop
+    btrfs-progs f2fs-tools
+    yq-go ddgr bat fd sqlite
+    fzf delta httpie ncdu tree
+    unzip xxd lsof pv miller glow
+    sd hyperfine tldr watch
+    pup htmlq
+    gnumake shellcheck entr file rsync jq
     himalaya
-
-    uv
-    (lib.hiPrio researchPython)
   ];
 in {
-  environment.systemPackages = commonTools;
-  # _module.args.commonServicePath = commonTools;
+  options.services.thinsandyTools = {
+    enableHeavy = mkEnableOption "Heavy dev tools (go, uv, gh, neo4j, python research env)";
+  };
+
+  config = {
+    environment.systemPackages = lightTools ++ lib.optionals cfg.enableHeavy heavyTools;
+  };
 }

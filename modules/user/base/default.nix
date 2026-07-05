@@ -86,8 +86,7 @@ in {
         # ── Security / Encryption / Auth ──
         age # Simple, modern encryption
         # bitwarden-cli # Bitwarden password manager CLI
-        cloak # Encrypted secrets manager
-        totp-cli # TOTP generator
+        cloak # Encrypted secrets manager (TOTP generator)
 
         # ── Archive / Compression ──
         p7zip # 7-Zip archiver

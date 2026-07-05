@@ -51,7 +51,6 @@ in
     username = user.name;
     homeDirectory = user.home;
     packages = with pkgs; [
-      totp-cli
       nix-output-monitor
       lowfi
       duf

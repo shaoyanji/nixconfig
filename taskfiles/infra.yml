@@ -172,6 +172,61 @@ tasks:
     cmds:
       - task infra:rollback:apply:host:{{.HOST}}
 
+  infra:ssh:rotate-cert:
+    desc: Sign a fresh 1-week SSH certificate for the current user
+    cmds:
+      - |
+        if [ ! -f "$HOME/.ssh/user_ca_key" ]; then
+          echo "CA key not found. Run 'sops decrypt' or rebuild first."
+          exit 1
+        fi
+        ssh-keygen -s "$HOME/.ssh/user_ca_key" \
+          -I "$(whoami)@$(hostname)-$(date +%Y%m%d)" \
+          -n "devji" \
+          -V "+1w" \
+          "$HOME/.ssh/id_ed25519.pub"
+        echo "Certificate signed: $HOME/.ssh/id_ed25519-cert.pub (valid 1 week)"
+
+  infra:ssh:status:
+    desc: Show certificate validity and CA key presence
+    cmds:
+      - |
+        echo "=== CA Private Key ==="
+        if [ -f "$HOME/.ssh/user_ca_key" ]; then
+          echo "Present: $HOME/.ssh/user_ca_key"
+          ssh-keygen -l -f "$HOME/.ssh/user_ca_key" 2>/dev/null || true
+        else
+          echo "MISSING: $HOME/.ssh/user_ca_key"
+        fi
+        echo ""
+        echo "=== CA Public Key ==="
+        if [ -f "$HOME/.ssh/user_ca_key.pub" ]; then
+          cat "$HOME/.ssh/user_ca_key.pub"
+        else
+          echo "Not found"
+        fi
+        echo ""
+        echo "=== Current Certificate ==="
+        if [ -f "$HOME/.ssh/id_ed25519-cert.pub" ]; then
+          ssh-keygen -L -f "$HOME/.ssh/id_ed25519-cert.pub"
+        else
+          echo "No certificate found — run infra:ssh:rotate-cert"
+        fi
+
+  infra:ssh:add-workstation:
+    desc: Add a new workstation age key as recipient for the CA private key
+    vars:
+      AGE_KEY: '{{.AGE}}'
+    cmds:
+      - |
+        if [ -z "{{.AGE_KEY}}" ]; then
+          echo "Usage: task infra:ssh:add-workstation AGE=<age1abc123...>"
+          exit 1
+        fi
+        sops --rotate --add-age {{.AGE_KEY}} modules/ssh-ca-key.yaml
+        git add modules/ssh-ca-key.yaml
+        echo "Added {{.AGE_KEY}} as recipient. Commit and push when ready."
+
   infra:store:gc:
     desc: Run nix store GC to free unreachable store paths
     cmds:

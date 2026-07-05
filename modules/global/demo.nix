@@ -18,6 +18,7 @@ in {
       ];
       home.username = userName;
       home.homeDirectory = userHome;
+      home.stateVersion = config.system.stateVersion;
     };
     sharedModules = [
       inputs.kickstart-nixvim.homeManagerModules.default

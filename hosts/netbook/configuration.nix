@@ -1,7 +1,7 @@
 {config, pkgs, ...}: {
   imports = [
     ./hardware-configuration.nix
-    ./disko.nix {device = "/dev/mmcblk0";}
+    (import ./disko.nix {device = "/dev/mmcblk0";})
   ];
 
   boot.supportedFilesystems = ["f2fs" "nfs"];

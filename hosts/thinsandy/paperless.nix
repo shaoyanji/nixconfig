@@ -7,6 +7,11 @@
 with lib; let
   paperlessDataDir = "/srv/data/paperless";
 in {
+  imports = [
+    # Use local fork without tesseract override.apply to avoid uncached builds
+    ./paperless-fork.nix
+  ];
+
   services.paperless = {
     enable = true;
     address = "0.0.0.0";

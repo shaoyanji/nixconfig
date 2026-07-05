@@ -17,19 +17,18 @@ in {
     researchTools.enable = mkEnableOption "Heavy research Python env - neo4j, firecrawl (default: false)";
   };
 
-  config = {
-    imports = [
-      ../../modules/services/ai-services-secrets.nix
-      ../../modules/services/ai-services-shared-mounts.nix
-      ../../modules/services/ai-services-context.nix
-      ../../modules/profiles/ollama-cloud-defaults.nix
-      ../../modules/services/zeroclaw-deployment.nix
-      ../../modules/profiles/ai-host.nix
-    ]
-    ++ lib.optionals cfg.xs.enable [../../modules/services/xs.nix]
-    ++ lib.optionals cfg.pancakesHarness.enable [../../modules/services/pancakes-harness.nix];
+  imports = [
+    ../../modules/services/ai-services-secrets.nix
+    ../../modules/services/ai-services-shared-mounts.nix
+    ../../modules/services/ai-services-context.nix
+    ../../modules/profiles/ollama-cloud-defaults.nix
+    ../../modules/services/zeroclaw-deployment.nix
+    ../../modules/profiles/ai-host.nix
+    ../../modules/services/xs.nix
+    ../../modules/services/pancakes-harness.nix
+  ];
 
-    profiles.aiHost = {
+  config = {    profiles.aiHost = {
       enable = true;
       nullclaw.enable = cfg.nullclaw.enable;
       zeroclaw.enable = cfg.zeroclaw.enable;

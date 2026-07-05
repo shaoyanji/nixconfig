@@ -40,3 +40,14 @@ Host deployment flows use `infra:*` tasks directly:
 - `infra:rollback:host:<host>` - Roll back to previous generation
 
 See `.agents/deploy/README.md` for host-specific deployment notes.
+
+## Build-Avoidance Guidance
+
+Some services depend on packages that **build from source** (Maven, Go, etc.) and have no cached variant for overridden configurations. Common traps:
+
+| Module | Line | Issue | Mitigation |
+|--------|------|-------|------------|
+| `services.tika` (`search/tika.nix`) | 82 | `cfg.package.override { enableGui = false }` produces uncached hash → Maven build | Inline systemd unit with stock `pkgs.tika` |
+| `services.gotenberg` (`paperless.nix`) | — | Chromium stub at module level keeps ~300 MiB chromium out of closure | Configure `services.gotenberg.chromium.package` with stub |
+
+Before deploying any host that references `services.*` modules for Java (Maven/Gradle), Go, or Rust packages, verify the final derivation is in the binary cache (`nix build --dry-run`) rather than building locally. Unnecessary local builds of large dependency chains (Maven, Chromium, LLVM) can take 10-60+ minutes on a thin host.

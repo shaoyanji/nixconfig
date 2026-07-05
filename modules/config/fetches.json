@@ -1,0 +1,35 @@
+[
+  {
+    "key": "ariang",
+    "url": "https://github.com/mayswind/AriaNg/releases/download/1.3.14/AriaNg-1.3.14.zip",
+    "sha256": "0fdflqzw118kd3k3r4sd1x92sx93bjyamfdyjgci296p04f445m4",
+    "fetchType": "fetchzip",
+    "extraArgs": {
+      "stripRoot": false
+    }
+  },
+  {
+    "key": "lf-icons",
+    "url": "https://raw.githubusercontent.com/gokcehan/lf/refs/heads/master/etc/icons.example",
+    "sha256": "12cwy6kfa2wj7nzffaxn5bka21yjqa5sx38nzdhyg1dq0c6jnjkk",
+    "fetchType": "fetchurl"
+  },
+  {
+    "key": "wezterm-config",
+    "url": "https://gist.githubusercontent.com/shaoyanji/48fff9824e79ceac6a07c67b05289dee/raw/7703acd1e06466ddc9e954688a52f7772de55ac0/.wezterm.lua",
+    "sha256": "1agjhyv428al1kz01rw2wz66w516pm7pxchvi5lz9kyw0qh7br9j",
+    "fetchType": "fetchurl"
+  },
+  {
+    "key": "wezterm-mappings",
+    "url": "https://gist.githubusercontent.com/shaoyanji/f0ccea80f73f335cb3cbd46b5a0995e9/raw/3ab472b6575baf8b4f0b7619f1634911e313f87b/mappings.lua",
+    "sha256": "0z3gnjphkl720qrm2ji2zgdzynbpb6xq2yq4wj934f7v7ay1hkg3",
+    "fetchType": "fetchurl"
+  },
+  {
+    "key": "elvish-rc",
+    "url": "https://gist.githubusercontent.com/shaoyanji/656406074a590a09e33755b88ac29d53/raw/rc.elv",
+    "sha256": "0b0078sp6fyqygxz9hap7inhpnwz17s0vcpb4fgklzxa2h8kp194",
+    "fetchType": "fetchurl"
+  }
+]

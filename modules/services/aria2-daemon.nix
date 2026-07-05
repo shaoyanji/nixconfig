@@ -1,11 +1,13 @@
 # aria2-daemon — network RPC download service with AriaNg web UI.
 #
-# Runs aria2c as a systemd service with RPC enabled, stores downloads
-# on the NAS data volume, and exposes the RPC endpoint + AriaNg web UI
-# through nginx.
+# Delegates the daemon lifecycle to the native nixpkgs `services.aria2`
+# module and adds the nginx vhost for AriaNg + RPC reverse proxy.
 #
-# The RPC secret is loaded from an EnvironmentFile at runtime — never
+# The RPC secret is loaded via systemd LoadCredential at runtime — never
 # stored in the Nix store or command line.
+#
+# AriaNg is pulled as a pre-built release zip via fetchzip instead of
+# building from source via npm (which is fragile and breaks frequently).
 {
   config,
   lib,
@@ -13,6 +15,9 @@
   ...
 }: let
   cfg = config.services.aria2-daemon;
+
+  # Pre-built AriaNg static files — avoids npm build failures from nixpkgs.
+  ariang = (import ../../lib/fetches-extra.nix {inherit pkgs;}).fetch "ariang";
 in {
   options.services.aria2-daemon = {
     enable = lib.mkEnableOption "aria2 RPC download daemon";
@@ -50,7 +55,7 @@ in {
     rpcSecretFile = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
       default = null;
-      description = "EnvironmentFile containing RPC_SECRET=...";
+      description = "Path to a file containing the RPC secret (loaded via systemd LoadCredential)";
     };
 
     btListenPort = lib.mkOption {
@@ -73,76 +78,65 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    users.users.${cfg.user} = {
-      isSystemUser = true;
-      group = cfg.user;
-      home = cfg.downloadDir;
-      createHome = true;
-    };
-
-    users.groups.${cfg.user} = {};
-
-    systemd.tmpfiles.rules = [
-      "d ${cfg.downloadDir} 0755 ${cfg.user} ${cfg.user} -"
-      "f ${cfg.sessionFile} 0644 ${cfg.user} ${cfg.user}"
+    assertions = [
+      {
+        assertion = cfg.rpcSecretFile != null;
+        message = "services.aria2-daemon requires rpcSecretFile to be set (the native services.aria2 module mandates a secret file)";
+      }
     ];
 
-    systemd.services.aria2-daemon = {
-      description = "aria2 RPC download daemon";
-      after = ["network.target"];
-      wantedBy = ["multi-user.target"];
+    # Delegate daemon lifecycle to the native nixpkgs module.
+    services.aria2 = {
+      enable = true;
+      rpcSecretFile = cfg.rpcSecretFile;
+      openPorts = false; # We manage firewall separately via networking.firewall.
+      settings = {
+        dir = cfg.downloadDir;
+        "save-session" = cfg.sessionFile;
+        "rpc-listen-port" = cfg.rpcPort;
+        "listen-port" = [
+          {
+            from = cfg.btListenPort;
+            to = cfg.btListenPort;
+          }
+        ];
 
-      serviceConfig = {
-        Type = "exec";
-        User = cfg.user;
-        Group = cfg.user;
-        Restart = "on-failure";
-        RestartSec = 10;
-        StateDirectory = "aria2";
-        StateDirectoryMode = "0755";
-        ProtectHome = true;
-        ProtectSystem = "strict";
-        ReadWritePaths = [cfg.downloadDir (dirOf cfg.sessionFile)];
-        PrivateTmp = true;
-        NoNewPrivileges = true;
+        # Feature flags matching the original custom service.
+        "enable-dht" = true;
+        "enable-dht6" = true;
+        "enable-peer-exchange" = true;
+        "dht-listen-port" = cfg.btListenPort;
 
-        # Inject RPC secret from file at runtime, never on the command line.
-        EnvironmentFile = lib.mkIf (cfg.rpcSecretFile != null) cfg.rpcSecretFile;
-        ExecStart = let
-          flags = lib.cli.toGNUCommandLineShell {} {
-            enable-rpc = true;
-            "rpc-listen-port" = cfg.rpcPort;
-            "rpc-listen-all" = false;
-            "rpc-allow-origin-all" = true;
-            "listen-port" = cfg.btListenPort;
-            "dht-listen-port" = cfg.btListenPort;
-            enable-dht = true;
-            enable-dht6 = true;
-            enable-peer-exchange = true;
-            "peer-id-prefix" = "-TR2770-";
-            "peer-agent" = "Transmission/2.77";
-            "user-agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0";
-            continue = true;
-            "max-concurrent-downloads" = 10;
-            "max-connection-per-server" = 16;
-            "min-split-size" = "10M";
-            split = 5;
-            "disk-cache" = "32M";
-            "file-allocation" = "falloc";
-            "save-session-interval" = 60;
-            "input-file" = cfg.sessionFile;
-            "save-session" = cfg.sessionFile;
-            dir = cfg.downloadDir;
-            "seed-ratio" = 0;
-            "bt-hash-check-seed" = true;
-            "bt-seed-unverified" = true;
-            "max-upload-limit" = "50K";
-            disable-ipv6 = true;
-          };
-          secretFlag = lib.optionalString (cfg.rpcSecretFile != null) '' --rpc-secret="$RPC_SECRET"'';
-        in "${pkgs.bash}/bin/bash -c 'exec ${pkgs.aria2}/bin/aria2c ${flags}${secretFlag}'";
+        # Peer/client impersonation.
+        "peer-id-prefix" = "-TR2770-";
+        "peer-agent" = "Transmission/2.77";
+        "user-agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0";
+
+        # Download/performance tuning.
+        continue = true;
+        "max-concurrent-downloads" = 10;
+        "max-connection-per-server" = 16;
+        "min-split-size" = "10M";
+        split = 5;
+        "disk-cache" = "32M";
+        "file-allocation" = "falloc";
+        "save-session-interval" = 60;
+
+        # Seeding behavior.
+        "seed-ratio" = 0;
+        "bt-hash-check-seed" = true;
+        "bt-seed-unverified" = true;
+        "max-upload-limit" = "50K";
+
+        # RPC binding — localhost only, nginx reverse-proxies.
+        "rpc-listen-all" = false;
+        "rpc-allow-origin-all" = true;
+
+        disable-ipv6 = true;
+      };
     };
 
+    # Nginx vhost: serves AriaNg static UI and reverse-proxies /jsonrpc.
     services.nginx = lib.mkIf cfg.nginx.enable {
       enable = true;
       virtualHosts.aria = {
@@ -153,7 +147,7 @@ in {
           }
         ];
         serverName = "_";
-        root = pkgs.ariang;
+        root = ariang;
         locations."/" = {
           tryFiles = "$uri $uri/ /index.html";
         };

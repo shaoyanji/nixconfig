@@ -1,38 +1,29 @@
-_:{
-	
-    programs.aria2 = {
-      enable = true;
-      settings = {
-        disk-cache = ''32M'';
-        file-allocation = ''falloc'';
-        continue = true;
-        max-concurrent-downloads = 10;
-        max-connection-per-server = 16;
-        min-split-size = ''10M'';
-        split = 5;
-        disable-ipv6 = true;
-        save-session-interval = 60;
-        #rpc-secret=;
-        rpc-listen-port = 6800;
-        rpc-allow-origin-all = true;
-        rpc-listen-all = true;
-        follow-torrent = true;
-        listen-port = 51413;
-        bt-max-peers = 100;
-        enable-dht = true;
-        enable-dht6 = true;
-        dht-listen-port = 6966;
-        enable-peer-exchange = true;
-        peer-id-prefix = "-TR2770-";
-        peer-agent = ''Transmission/2.77'';
-        user-agent = ''Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0'';
-        seed-ratio = 0;
-        bt-hash-check-seed = true;
-        bt-seed-unverified = true;
-        bt-save-metadata = false;
-        enable-rpc = true;
-        max-upload-limit = "50K";
-        ftp-pasv = true;
-      };
+{pkgs, ...}: let
+  aria2Conf = pkgs.writeText "aria2.conf" ''
+    enable-rpc=true
+    rpc-listen-port=6800
+    rpc-listen-all=false
+    rpc-allow-origin-all=true
+  '';
+in {
+  home.packages = with pkgs; [aria2];
+
+  xdg.configFile."aria2/aria2.conf".source = aria2Conf;
+
+  # Local fallback daemon — no secret, listens on 127.0.0.1:6800 only.
+  # Useful when thinsandy is unreachable and for CLI scripting.
+  systemd.user.services.aria2 = {
+    Unit = {
+      Description = "aria2 RPC download daemon (local fallback)";
+      After = ["network.target"];
     };
+    Service = {
+      Type = "simple";
+      ExecStart = "${pkgs.aria2}/bin/aria2c --conf-path=${aria2Conf} --enable-rpc";
+      Restart = "on-failure";
+    };
+    Install = {
+      WantedBy = ["default.target"];
+    };
+  };
 }

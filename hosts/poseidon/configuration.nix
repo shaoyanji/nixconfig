@@ -35,6 +35,8 @@ in {
 
   aiServices.sharedSecrets.enable = true;
 
+  ssh.ca.enableClient = true;
+
   profiles.aiHost = {
     enable = true;
     nullclaw.enable = false;

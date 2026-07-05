@@ -34,6 +34,11 @@ in {
       #   format = "json";
       # };
       #"${local_ssh_key}".path = "${ssh_key_path}";
+      "ssh_user_ca_private_key" = {
+        sopsFile = ./ssh-ca-key.yaml;
+        path = "${config.home.homeDirectory}/.ssh/user_ca_key";
+        mode = "0600";
+      };
     };
     templates = {
       "geminicommit".content = ''

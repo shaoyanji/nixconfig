@@ -319,3 +319,62 @@ tasks:
     desc: Show CI status for the current branch
     cmds:
       - gh pr checks 2>/dev/null || echo "No open PR for this branch"
+
+  dev:cloak:edit:
+    desc: Edit the cloak accounts file via SOPS (navigate to the `cloak` key)
+    cmds:
+      - sops modules/secrets.yaml
+
+  dev:cloak:list:
+    desc: List all cloak accounts
+    cmds:
+      - |
+        sops -d {{.SECRETS}}/{{.ENC_SECRETS}} 2>/dev/null | yq '.cloak' | grep -E '^\[.*\]$' | tr -d '[]' \
+          || sops -d modules/secrets.yaml 2>/dev/null | yq '.cloak' | grep -E '^\[.*\]$' | tr -d '[]'
+
+  dev:cloak:view:
+    desc: Pick an account and view its TOTP
+    cmds:
+      - |
+        account=$(task dev:cloak:list | gum filter --placeholder "Select account..." --no-strict)
+        [ -n "$account" ] && cloak view "$account" || echo "No account selected"
+
+  dev:cloak:view:*:
+    desc: View TOTP for a specific account
+    vars:
+      ACCOUNT: '{{index .MATCH 0}}'
+    cmds:
+      - cloak view {{.ACCOUNT}}
+
+  dev:cloak:sync-bw:
+    desc: Import TOTP tokens from a Bitwarden unencrypted JSON export into cloak
+    cmds:
+      - |
+        bw_export="${1:-bitwarden_export.json}"
+        if [ ! -f "$bw_export" ]; then
+          echo "Error: Bitwarden export file not found: $bw_export"
+          echo "Usage: task dev:cloak:sync-bw -- ./bitwarden_export.json"
+          echo ""
+          echo "Export from Bitwarden: Settings → Export → Unencrypted JSON (.json)"
+          exit 1
+        fi
+      - |
+        echo "=== Current cloak accounts ==="
+        sops -d modules/secrets.yaml 2>/dev/null | yq '.cloak' | grep -E '^\[.*\]$' | tr -d '[]' || echo "(empty)"
+      - |
+        echo "=== Importing from $bw_export ==="
+        # Convert BW JSON to cloak TOML
+        cloak_toml=$(./scripts/bw-to-cloak.sh "$bw_export")
+        if [ -z "$cloak_toml" ]; then
+          echo "Error: No TOTP entries found in export"
+          exit 1
+        fi
+        echo "$cloak_toml"
+        echo ""
+        echo "Accounts found: $(echo "$cloak_toml" | grep -cE '^\[.*\]$')"
+        echo ""
+        echo "To apply: update cloak via sops:"
+        echo "  sops modules/secrets.yaml --extract '[\"cloak\"]'"
+        echo ""
+        echo "Then paste the TOML output above and save."
+        echo "After applying, run: task dev:cloak:list"

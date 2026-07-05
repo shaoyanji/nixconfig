@@ -27,10 +27,6 @@ in {
         TrustedUserCAKeys = "${pkgs.writeText "trusted-user-ca" caPublicKey}";
         RevokedKeys = mkIf (cfg.revokedKeysFile != null) cfg.revokedKeysFile;
       };
-
-      system.activationScripts.ssh-ca-perms = ''
-        chmod 644 ${config.services.openssh.settings.TrustedUserCAKeys}
-      '';
     })
 
     (mkIf cfg.enableClient {

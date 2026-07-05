@@ -258,7 +258,7 @@ tasks:
         done
 
   dev:config:hash-update:
-    desc: Refresh sha256 checksums for all modules/config/*.json files
+    desc: Refresh sha256 checksums for all modules/config/*.json files (nu.json, authorized-keys.json, fetches.json)
     cmds:
       - |
         for f in modules/config/*.json; do

@@ -10,6 +10,7 @@
     inputs.sops-nix.nixosModules.sops
     ./hardware.nix
     ./media-stack.nix
+    ./paperless.nix
     ./dns.nix
     ./tools.nix
     ./networking.nix
@@ -44,6 +45,7 @@
     8123  # HomeAssistant
     7351  # Stirling PDF
     6801  # AriaNg web UI
+    28981 # Paperless-ngx
   ];
 
   system.stateVersion = "25.05";

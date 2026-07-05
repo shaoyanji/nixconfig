@@ -80,7 +80,6 @@ in {
           aws_access_key_id = ${config.sops.placeholder."aws/access/key/id"}
           aws_secret_access_key = ${config.sops.placeholder."aws/secret/access/key"}
         '';
-      # "accounts".content = ''${config.sops.placeholder."cloak2"}'';
       "hosts.yml".content =
         /*
         yaml

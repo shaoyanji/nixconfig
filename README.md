@@ -82,7 +82,95 @@ Per-host quirks and exceptions: `.agents/deploy/hosts/*.md`
 
 Canonically assembled from [`flake/outputs.nix`](flake/outputs.nix) and [`lib/mk-nixos-host.nix`](lib/mk-nixos-host.nix).
 
-## Runtime helpers
+## Secrets & SSH CA
+
+Secrets use `sops-nix`. Two separate encrypted files:
+
+| File | Decryptors | Contents |
+|------|------------|----------|
+| `modules/secrets.yaml` | All hosts (via their `ssh_host_ed25519_key` age keys in `.sops.yaml`) | App secrets, `hashedPassword`, API keys |
+| `modules/ssh-ca-key.yaml` | Workstations only (`*devji`, `*sopsposeidon`) | SSH User CA private key |
+
+### SSH CA workflow
+
+Instead of managing per-host `authorized_keys`, servers trust a **single CA public key** embedded in `modules/ssh-ca.nix`. Workstations hold the CA private key (decrypted by sops-nix) and sign short-lived certificates.
+
+**As a workstation user, daily flow:**
+
+```bash
+# Sign a 1-week cert for yourself
+rotate-ssh-cert
+
+# That's it. All hosts that trust the CA accept this cert automatically.
+ssh thinsandy
+```
+
+The `rotate-ssh-cert` script is available on any host with `ssh.ca.enableClient = true`. The cert is cached in `~/.ssh/id_ed25519-cert.pub` and used automatically via `CertificateFile` in the SSH config.
+
+### Provisioning a new server
+
+1. Add entry to `flake/host-inventory.nix` with the appropriate module chain
+2. The host's age key (from `ssh_host_ed25519_key`) must already be in `.sops.yaml` for `hashedPassword` decryption — it is if you followed the existing `.sops.yaml` setup
+3. Build and deploy — `ssh.ca.enable = true` is inherited from `base-node.nix`, so the CA is trusted automatically
+4. SSH in using a certificate signed from your workstation
+
+No `.sops.yaml` changes needed. No `authorized_keys` updates. No per-host config changes.
+
+### Provisioning a new workstation
+
+A workstation is any machine you SSH *from* and sign certificates on. This includes a fresh laptop or a new home-manager-only machine.
+
+1. Build the flake on the new machine
+2. Add the machine's age public key as a recipient in `modules/ssh-ca-key.yaml`:
+
+   ```bash
+   sops --rotate --add-age <NEW_AGE_KEY> modules/ssh-ca-key.yaml
+   ```
+
+3. Commit and push the rekeyed file
+4. Rebuild on the new workstation — sops-nix places `~/.ssh/user_ca_key`
+5. Run `rotate-ssh-cert` to sign your first certificate
+
+### Bootstrap caveat
+
+The first SSH connection to a *bare-metal* machine (before NixOS is installed) is outside the CA model — you still use a USB installer, rescue ISO, or temporary password. The CA eliminates ongoing management once the host is in the fleet.
+
+### TOTP secrets with cloak
+
+TOTP tokens are managed via [cloak](https://github.com/evansmurithi/cloak) — a CLI OTP authenticator — with the accounts file encrypted in SOPS.
+
+**Viewing a TOTP:**
+
+```bash
+task dev:cloak:view          # pick from a list (gum filter)
+task dev:cloak:view:github   # or directly by name
+```
+
+**Editing TOTP accounts:**
+
+```bash
+task dev:cloak:edit          # opens the full SOPS file, navigate to the `cloak` key
+```
+
+**Importing from Bitwarden:**
+
+Export from Bitwarden (Settings → Export → Unencrypted JSON `.json`), then:
+
+```bash
+task dev:cloak:sync-bw -- ./bitwarden_export.json
+```
+
+This prints the TOML to pipe into `sops modules/secrets.yaml --extract '["cloak"]'`. The `scripts/bw-to-cloak.sh` converter is also usable standalone:
+
+```bash
+./scripts/bw-to-cloak.sh bitwarden_export.json > ~/.cloak/accounts
+```
+
+`totp-cli` was replaced by `cloak` — it covers the same use case with simpler TOML storage.
+
+### Removing authorized-keys legacy
+
+Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-keys.nix` / `authorized-keys.json` gist fetch in `base-node.nix` is dead weight — it falls back silently and can be removed at your leisure.
 
 - The NAS client recovery profile now lives in `modules/profiles/nas-client.nix`, which automounts `/Volumes/data` from `thinsandy` for non-`thinsandy` hosts so the compatibility path stays available without relying on `hosts/common/localmounts.nix`.
 - The `xs` runtime, `xs-helper` CLI, and `xs-materializer` binary are packaged via the flake (`packages.*.xs`, `packages.*.xs-helper`, and `packages.*.xs-materializer`). Fleet members should consume those packaged outputs rather than ad-hoc `go build` from the repo.

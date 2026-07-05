@@ -77,5 +77,11 @@ in {
     options = ["bind" "x-systemd.requires=systemd-tmpfiles-setup.service"];
   };
 
-  systemd.tmpfiles.rules = ["d ${paperlessDataDir} 0750 paperless paperless -"];
+  systemd.tmpfiles.rules = let
+    d = mode: user: group: path: "d ${path} ${mode} ${user} ${group} -";
+  in [
+    (d "0750" "paperless" "paperless" paperlessDataDir)
+    (d "0750" "paperless" "paperless" "${paperlessDataDir}/consume")
+    (d "0750" "paperless" "paperless" "${paperlessDataDir}/media")
+  ];
 }

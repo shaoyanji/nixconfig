@@ -12,6 +12,7 @@ in
 {
   imports = [
     ../../modules/config/authorized-keys.nix
+    ../../modules/ssh-ca.nix
     inputs.sops-nix.nixosModules.sops
     ./firewall-baseline.nix
     ./boot.nix
@@ -28,6 +29,8 @@ in
       hashedPassword.neededForUsers = true;
     };
   };
+
+  ssh.ca.enable = true;
 
   console = {
     font = "Lat2-Terminus16";

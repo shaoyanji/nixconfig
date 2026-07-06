@@ -7,7 +7,7 @@
 with lib;
 let
   cfg = config.ssh.ca;
-  caPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDi7mArveXiOL26h0j4qgEZB3gPV+x7un0SwKQD+mn2J SSH User CA @ poseidon 20260705";
+  caPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMhAN2tuJ4f8kCbCWehJL+fp5VYrTUQpn2ZWK9RC7XM1 SSH User CA @ aristotle 20260706";
 in {
   options.ssh.ca = {
     enable = mkEnableOption "SSH CA trust — accept certificates signed by the user CA";

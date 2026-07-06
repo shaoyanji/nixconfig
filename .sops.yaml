@@ -29,14 +29,15 @@ keys:
   - &garnix age1uljtkrhrwtq9w5lfk75e9dpaclyysr9mjtprkpfjnd5s08wg9d6sx5g55w
   - &kellerbenchhost age1dpwa9pdgmgr7as0dz6688vwpuf9y9dmrrsjvzrq8avm0vnhsff8schdlgv
   - &kellerbench age1dq9h7xwslw6dct6x6y4xx867vjk88xfutza6nyzavude3k7a7qsqvrwlnf
+  - &aristotle age1qazayya08femmfghysu03mx9t05ftj5gj0jq62gju3gaymkkedtqnp0x0f
+  - &aristotledevji age1srn0wh9f35xt3pt877wvvasp44ezrkftn99d64d0pc4xx54rqesqh6q0zm
 
 creation_rules:
-  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+  - path_regex: modules/.*\.(yaml|json|env|ini)$
     key_groups:
       - age:
-          - *garnix
-          - *kali
           - *devji
+          - *kali
           - *sopsposeidon
           - *hposeidon
           - *sopsacer
@@ -60,32 +61,9 @@ creation_rules:
           - *penguin
           - *kellerbenchhost
           - *kellerbench
+          - *aristotle
+          - *aristotledevji
   - path_regex: /[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:
-          - *kali
           - *devji
-          - *sopsposeidon
-          - *hposeidon
-          - *sopsacer
-          - *guckloch
-          - *ares
-          - *schneeeule
-          - *leakynose
-          - *schneeeulehost
-          - *acersops
-          - *acersopshost
-          - *areshost
-          - *thinsandyhost
-          - *thinsandy
-          - *ancientace
-          - *ancientacehost
-          - *mtfuji
-          - *mtfujihost
-          - *sandylaptop
-          - *applevalleyhost
-          - *applevalley
-          - *penguin
-          - *kellerbenchhost
-          - *kellerbench
-        gpg:

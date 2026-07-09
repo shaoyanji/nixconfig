@@ -1,13 +1,13 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, lib
+, ...
 }:
 let
   user = import ../../modules/global/user.nix;
 in
 {
   # --- Immich ---
-  users.users.immich.extraGroups = ["video" "render"];
+  users.users.immich.extraGroups = [ "video" "render" ];
   services.immich = {
     host = "0.0.0.0";
     enable = true;
@@ -16,6 +16,11 @@ in
     openFirewall = true;
     machine-learning.enable = false;
   };
+
+  systemd.services.immich-server.unitConfig.RequiresMountsFor = "/var/lib/immich";
+  systemd.services.immich-microservices.unitConfig.RequiresMountsFor = "/var/lib/immich";
+  systemd.services.immich-server.serviceConfig.PrivateMounts = lib.mkForce false;
+  systemd.services.immich-microservices.serviceConfig.PrivateMounts = lib.mkForce false;
 
   # --- *arr stack ---
   services.sonarr = {
@@ -94,22 +99,12 @@ in
       "immich"
       "met"
       "ipp"
-      # "icloud"
-      # "notion"
-      # "twitter"
-      # "telegram"
-      # "ollama"
-      # "foscam"
-      # "philips_js"
-      # "ecovacs"
-      # "onvif"
-      # "generic"
-      # "tailscale"
-      # "pi_hole"
-      # "radio_browser"
+    ];
+    extraPackages = ps: [
+      ps.androidtvremote2
     ];
     config = {
-      default_config = {};
+      default_config = { };
     };
   };
 }

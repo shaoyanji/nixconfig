@@ -1,12 +1,12 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 with lib; let
   paperlessDataDir = "/srv/data/paperless";
-in {
+in
+{
   imports = [
     # Use local fork without tesseract override.apply to avoid uncached builds
     ./paperless-fork.nix
@@ -36,8 +36,8 @@ in {
   # on the NixOS build farm — we just download the cached 105 MiB result.
   systemd.services.tika = {
     description = "Apache Tika Server";
-    wantedBy = ["multi-user.target"];
-    after = ["network.target"];
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${lib.getExe pkgs.tika} --host 127.0.0.1 --port 9998";
@@ -56,17 +56,18 @@ in {
     enable = true;
     chromium = {
       package =
-        pkgs.runCommand "chromium" {
-          pname = "chromium";
-          meta.mainProgram = "chromium";
-        } ''
+        pkgs.runCommand "chromium"
+          {
+            pname = "chromium";
+            meta.mainProgram = "chromium";
+          } ''
           mkdir -p $out/bin
           ln -s /dev/null $out/bin/chromium
         '';
       disableJavascript = true;
       disableRoutes = true;
     };
-    extraArgs = ["--chromium-allow-list=file:///tmp/.*"];
+    extraArgs = [ "--chromium-allow-list=file:///tmp/.*" ];
   };
 
   # Bind-mount /var/lib/paperless to the data drive so paperless
@@ -74,14 +75,16 @@ in {
   fileSystems."/var/lib/paperless" = {
     device = paperlessDataDir;
     fsType = "none";
-    options = ["bind" "x-systemd.requires=systemd-tmpfiles-setup.service"];
+    options = [ "bind" "x-systemd.requires=systemd-tmpfiles-setup.service" ];
   };
 
-  systemd.tmpfiles.rules = let
-    d = mode: user: group: path: "d ${path} ${mode} ${user} ${group} -";
-  in [
-    (d "0750" "paperless" "paperless" paperlessDataDir)
-    (d "0750" "paperless" "paperless" "${paperlessDataDir}/consume")
-    (d "0750" "paperless" "paperless" "${paperlessDataDir}/media")
-  ];
+  systemd.tmpfiles.rules =
+    let
+      d = mode: user: group: path: "d ${path} ${mode} ${user} ${group} -";
+    in
+    [
+      (d "0750" "paperless" "paperless" paperlessDataDir)
+      (d "0750" "paperless" "paperless" "${paperlessDataDir}/consume")
+      (d "0750" "paperless" "paperless" "${paperlessDataDir}/media")
+    ];
 }

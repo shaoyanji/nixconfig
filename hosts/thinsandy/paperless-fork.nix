@@ -2,12 +2,11 @@
 # The upstream module always overrides tesseract5 with language-specific languages
 # via cfg.package.apply, producing an uncached derivation that builds from source.
 # This fork removes the `apply` so the stock cached pkgs.paperless-ngx is used.
-{
-  config,
-  options,
-  pkgs,
-  lib,
-  ...
+{ config
+, options
+, pkgs
+, lib
+, ...
 }:
 let
   cfg = config.services.paperless;
@@ -41,15 +40,17 @@ let
   // lib.optionalAttrs (cfg.openMPThreadingWorkaround) {
     OMP_NUM_THREADS = "1";
   }
-  // (lib.mapAttrs (
-    _: s:
-    if (lib.isAttrs s || lib.isList s) then
-      builtins.toJSON s
-    else if lib.isBool s then
-      lib.boolToString s
-    else
-      toString s
-  ) cfg.settings);
+  // (lib.mapAttrs
+    (
+      _: s:
+        if (lib.isAttrs s || lib.isList s) then
+          builtins.toJSON s
+        else if lib.isBool s then
+          lib.boolToString s
+        else
+          toString s
+    )
+    cfg.settings);
 
   manage = pkgs.writeShellScriptBin "paperless-manage" ''
     set -o allexport # Export the following env vars
@@ -466,9 +467,10 @@ in
             User = cfg.user;
             ExecStart = "${cfg.package}/bin/celery --app paperless beat --loglevel INFO";
             Restart = "on-failure";
-            LoadCredential = lib.optionalString (
-              cfg.passwordFile != null
-            ) "PAPERLESS_ADMIN_PASSWORD:${cfg.passwordFile}";
+            LoadCredential = lib.optionalString
+              (
+                cfg.passwordFile != null
+              ) "PAPERLESS_ADMIN_PASSWORD:${cfg.passwordFile}";
             PrivateNetwork = cfg.database.createLocally; # defaultServiceConfig enables this by default, needs to be disabled for remote DBs
           };
           environment = env;

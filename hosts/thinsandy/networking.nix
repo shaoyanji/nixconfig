@@ -1,6 +1,5 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }: {
   # --- Networking tools ---
   environment.systemPackages = with pkgs; [
@@ -21,7 +20,7 @@
 
   # --- Firewall ---
   networking.firewall.allowedTCPPorts = [
-    8123  # HomeAssistant
-    7351  # Stirling PDF
+    8123 # HomeAssistant
+    7351 # Stirling PDF
   ];
 }

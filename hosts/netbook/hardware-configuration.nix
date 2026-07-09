@@ -9,7 +9,9 @@
     ];
 
   boot.initrd.availableKernelModules = [ "ahci" "xhci_pci" "usb_storage" "sd_mod" "sdhci_acpi" "rtsx_pci_sdmmc" ];
-  boot.initrd.kernelModules = [ ];
+  boot.initrd.kernelModules= ["crc32" "f2fs" ];
+  # boot.initrd.extraModules= ["crc32" "f2fs" ];
+  boot.initrd.includeDefaultModules = true;
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 

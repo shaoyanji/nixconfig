@@ -7,8 +7,8 @@ _: {
     enable = true;
     resolveLocalQueries = false;
     settings.server = {
-      interface = ["127.0.0.1@5335"];
-      access-control = ["127.0.0.0/8 allow"];
+      interface = [ "127.0.0.1@5335" ];
+      access-control = [ "127.0.0.0/8 allow" ];
     };
   };
 
@@ -33,7 +33,7 @@ _: {
     settings = {
       dns = {
         queryLogging = true;
-        upstreams = ["127.0.0.1#5335"];
+        upstreams = [ "127.0.0.1#5335" ];
         # listeningMode = "LOCAL";
         listeningMode = "ALL";
         interface = "eno1";
@@ -41,22 +41,22 @@ _: {
       database = {
         maxDBdays = 31;
       };
-      misc.dnsmasq_lines = ["interface=tailscale0"];
+      misc.dnsmasq_lines = [ "interface=tailscale0" ];
       # webserver.api.cli_pw = true;
     };
   };
 
   services.pihole-web = {
     enable = true;
-    ports = [8080];
+    ports = [ 8080 ];
   };
   networking.firewall.interfaces.eno1 = {
-    allowedUDPPorts = [53];
-    allowedTCPPorts = [53];
+    allowedUDPPorts = [ 53 ];
+    allowedTCPPorts = [ 53 ];
   };
   # Allow DNS queries from Tailscale network
   networking.firewall.interfaces.tailscale0 = {
-    allowedUDPPorts = [53];
-    allowedTCPPorts = [53];
+    allowedUDPPorts = [ 53 ];
+    allowedTCPPorts = [ 53 ];
   };
 }

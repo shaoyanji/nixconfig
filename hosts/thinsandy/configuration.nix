@@ -1,7 +1,6 @@
-{
-  inputs,
-  config,
-  ...
+{ inputs
+, config
+, ...
 }: {
   imports = [
     ./hardware-configuration.nix
@@ -42,9 +41,9 @@
   };
 
   networking.firewall.allowedTCPPorts = [
-    8123  # HomeAssistant
-    7351  # Stirling PDF
-    6801  # AriaNg web UI
+    8123 # HomeAssistant
+    7351 # Stirling PDF
+    6801 # AriaNg web UI
     28981 # Paperless-ngx
   ];
 

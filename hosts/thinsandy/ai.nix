@@ -1,13 +1,14 @@
-{
-  config,
-  pkgs,
-  self,
-  lib,
-  ...
-}: let
+{ config
+, pkgs
+, self
+, lib
+, ...
+}:
+let
   inherit (lib) mkEnableOption mkIf;
   cfg = config.ai.thinsandy;
-in {
+in
+{
   options.ai.thinsandy = {
     hermes.enable = mkEnableOption "Hermes agent (default: false)";
     nullclaw.enable = mkEnableOption "NullClaw agent (default: false)";
@@ -28,7 +29,8 @@ in {
     ../../modules/services/pancakes-harness.nix
   ];
 
-  config = {    profiles.aiHost = {
+  config = {
+    profiles.aiHost = {
       enable = true;
       nullclaw.enable = cfg.nullclaw.enable;
       zeroclaw.enable = cfg.zeroclaw.enable;
@@ -118,13 +120,21 @@ in {
       group = "ollama";
     };
 
+    systemd.services.ollama.unitConfig = {
+      RequiresMountsFor = "/srv/data/ollama";
+      After = [ "srv-data.mount" "systemd-tmpfiles-setup.service" ];
+    };
+
     systemd.tmpfiles.rules = [
       "d /srv/data/ollama 0755 ollama ollama -"
     ];
 
     environment.systemPackages = lib.optionals cfg.researchTools.enable [
       (pkgs.python3.withPackages (ps: with ps; [
-        neo4j pytz firecrawl-py pydantic
+        neo4j
+        pytz
+        firecrawl-py
+        pydantic
       ]))
     ];
   };

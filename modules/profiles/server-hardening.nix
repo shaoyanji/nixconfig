@@ -56,7 +56,6 @@ in
       ++ (optional (cfg.varCacheDevice != "") "d ${cfg.varCacheDevice} 0755 root root -")
       ++ [
         "d /run/lock 0755 root root -"
-        "d /run/lock/samba 0755 root root -"
         "d /etc/pihole 0700 pihole pihole -"
       ];
   };

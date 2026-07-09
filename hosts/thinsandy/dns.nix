@@ -3,6 +3,20 @@ _: {
   # sudo tailscale up --accept-dns=false
   services.tailscale.enable = true;
 
+  # Ensure tailscaled starts on boot with network ready
+  systemd.services.tailscaled = {
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+  };
+
+  # pihole-ftl references tailscale0 interface, must wait for tailscaled
+  systemd.services.pihole-ftl = {
+    after = [ "tailscaled.service" ];
+  };
+  systemd.services.pihole-ftl-setup = {
+    after = [ "tailscaled.service" ];
+  };
+
   services.unbound = {
     enable = true;
     resolveLocalQueries = false;

@@ -149,6 +149,10 @@
     };
   };
 
+  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+  systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+
   services.samba-wsdd = {
     enable = true;
     openFirewall = true;

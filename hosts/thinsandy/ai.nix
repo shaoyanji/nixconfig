@@ -1,14 +1,13 @@
-{ config
-, pkgs
-, self
-, lib
-, ...
-}:
-let
+{
+  config,
+  pkgs,
+  self,
+  lib,
+  ...
+}: let
   inherit (lib) mkEnableOption mkIf;
   cfg = config.ai.thinsandy;
-in
-{
+in {
   options.ai.thinsandy = {
     hermes.enable = mkEnableOption "Hermes agent (default: false)";
     nullclaw.enable = mkEnableOption "NullClaw agent (default: false)";
@@ -31,14 +30,14 @@ in
 
   config = {
     profiles.aiHost = {
-      enable = true;
+      enable = false;
       nullclaw.enable = cfg.nullclaw.enable;
       zeroclaw.enable = cfg.zeroclaw.enable;
     };
 
     aiServices.sharedSecrets.enable = true;
     aiServices.sharedMounts = {
-      enable = true;
+      enable = false;
       source = "/srv/data/openclaw";
       services.nullclaw = cfg.nullclaw.enable;
       services.hermes = cfg.hermes.enable;
@@ -85,18 +84,69 @@ in
         jq
         skills
       ];
-      protectHome = "read-only";
       bindReadOnlyPaths = {
         "/var/lib/zeroclaw-athena/workspace/share" = "/srv/data/openclaw";
       };
       settings = {
-        channels.telegram = {
-          enabled = true;
-          bot_token = "$TELEGRAM_BOT_TOKEN";
-          allowed_users = [
+        schema_version = 3;
+        peer_groups.telegram_default = {
+          agents = [];
+          channel = "telegram.default";
+          external_peers = [
             "8522510655"
             "8207284912"
           ];
+          ignore = [];
+          output_modality = "mirror";
+        };
+        channels.telegram.default = {
+          enabled = true;
+          bot_token = "$TELEGRAM_BOT_TOKEN";
+          approval_timeout_secs = 0;
+          draft_update_interval_ms = 2000;
+          mention_only = false;
+          stream_mode = "off";
+          interrupt_on_new_message = true;
+        };
+        providers.models = {
+          openrouter.default = {
+            api_key = "$OPENROUTER_API_KEY";
+            model = "tencent/hy3:free";
+          };
+          openai.default = {
+            api_key = "$OPENAI_API_KEY";
+            model = "gpt-4o";
+          };
+          gemini.default = {
+            api_key = "$GEMINI_API_KEY";
+            model = "gemini-2.5-pro-exp-03-25";
+          };
+          deepseek.default = {
+            api_key = "$DEEPSEEK_API_KEY";
+            model = "deepseek-chat";
+          };
+          groq.default = {
+            api_key = "$GROQ_API_KEY";
+            model = "llama-3.3-70b-versatile";
+          };
+        };
+        agents.athena = {
+          enabled = true;
+          channels = ["telegram.default"];
+          model_provider = "openrouter.default";
+          risk_profile = "default";
+          runtime_profile = "default";
+          memory.backend = "sqlite";
+        };
+        risk_profiles.default = {};
+        runtime_profiles.default = {};
+        onboard_state = {
+          quickstart_completed = true;
+          completed_sections = ["workspace" "model_providers" "channels" "agent"];
+        };
+        gateway = {
+          host = "0.0.0.0";
+          port = 42617;
         };
       };
     };
@@ -122,7 +172,7 @@ in
 
     systemd.services.ollama.unitConfig = {
       RequiresMountsFor = "/srv/data/ollama";
-      After = [ "srv-data.mount" "systemd-tmpfiles-setup.service" ];
+      After = ["srv-data.mount" "systemd-tmpfiles-setup.service"];
     };
 
     systemd.tmpfiles.rules = [
@@ -130,12 +180,13 @@ in
     ];
 
     environment.systemPackages = lib.optionals cfg.researchTools.enable [
-      (pkgs.python3.withPackages (ps: with ps; [
-        neo4j
-        pytz
-        firecrawl-py
-        pydantic
-      ]))
+      (pkgs.python3.withPackages (ps:
+        with ps; [
+          neo4j
+          pytz
+          firecrawl-py
+          pydantic
+        ]))
     ];
   };
 }

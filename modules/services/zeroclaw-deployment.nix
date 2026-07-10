@@ -130,8 +130,9 @@ in {
       mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
     in {
       serviceConfig = mountConfig
-        // optionalAttrs (cfg.extraEnvironmentFiles != []) {
-          EnvironmentFile = (mountConfig.EnvironmentFile or []) ++ cfg.extraEnvironmentFiles;
+        // {
+          EnvironmentFile = (mountConfig.EnvironmentFile or [])
+            ++ cfg.extraEnvironmentFiles;
         };
     };
   };

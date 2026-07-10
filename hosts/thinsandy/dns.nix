@@ -5,24 +5,24 @@ _: {
 
   # Ensure tailscaled starts on boot with network ready
   systemd.services.tailscaled = {
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
   };
 
   # pihole-ftl references tailscale0 interface, must wait for tailscaled
   systemd.services.pihole-ftl = {
-    after = [ "tailscaled.service" ];
+    after = ["tailscaled.service"];
   };
   systemd.services.pihole-ftl-setup = {
-    after = [ "tailscaled.service" ];
+    after = ["tailscaled.service"];
   };
 
   services.unbound = {
     enable = true;
     resolveLocalQueries = false;
     settings.server = {
-      interface = [ "127.0.0.1@5335" ];
-      access-control = [ "127.0.0.0/8 allow" ];
+      interface = ["127.0.0.1@5335"];
+      access-control = ["127.0.0.0/8 allow"];
     };
   };
 
@@ -31,7 +31,7 @@ _: {
     # Log containment: keep FTL.log lean and auto-purge old DB queries
     queryLogDeleter = {
       enable = true;
-      age = 31;
+      age = 7;
       interval = "daily";
     };
     lists = [
@@ -47,7 +47,7 @@ _: {
     settings = {
       dns = {
         queryLogging = true;
-        upstreams = [ "127.0.0.1#5335" ];
+        upstreams = ["127.0.0.1#5335"];
         # listeningMode = "LOCAL";
         listeningMode = "ALL";
         interface = "eno1";
@@ -55,22 +55,22 @@ _: {
       database = {
         maxDBdays = 31;
       };
-      misc.dnsmasq_lines = [ "interface=tailscale0" ];
+      misc.dnsmasq_lines = ["interface=tailscale0"];
       # webserver.api.cli_pw = true;
     };
   };
 
   services.pihole-web = {
     enable = true;
-    ports = [ 8080 ];
+    ports = [8080];
   };
   networking.firewall.interfaces.eno1 = {
-    allowedUDPPorts = [ 53 ];
-    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [53];
+    allowedTCPPorts = [53];
   };
   # Allow DNS queries from Tailscale network
   networking.firewall.interfaces.tailscale0 = {
-    allowedUDPPorts = [ 53 ];
-    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [53];
+    allowedTCPPorts = [53];
   };
 }

@@ -40,11 +40,14 @@
     nginx.listenPort = 6801;
   };
 
+  ai.thinsandy.zeroclaw.enable = true;
+
   networking.firewall.allowedTCPPorts = [
     8123 # HomeAssistant
     7351 # Stirling PDF
     6801 # AriaNg web UI
     28981 # Paperless-ngx
+    42617 # ZeroClaw dashboard
   ];
 
   system.stateVersion = "25.05";

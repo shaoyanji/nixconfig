@@ -40,11 +40,11 @@ in {
   profiles.aiHost = {
     enable = true;
     nullclaw.enable = false;
-    zeroclaw.enable = true;
+    zeroclaw.enable = false;
   };
 
   aiServices.zeroclawDeployment = {
-    enable = true;
+    enable = false;
     listenHost = "127.0.0.1";
     listenPort = 42617;
     workspaceRoot = "/var/lib/zeroclaw";

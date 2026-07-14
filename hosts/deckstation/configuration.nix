@@ -7,6 +7,7 @@
     ./amd-rx-5700-xt.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/steamos.nix
+    ../../modules/profiles/sunshine.nix
   ];
 
   networking.hostName = "deckstation";

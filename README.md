@@ -64,6 +64,9 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 | mtfuji        | yes      | no           | yes    | no  | no               |
 | garnixMachine | yes      | no           | no     | no  | no               |
 | kellerbench   | no       | no           | yes    | no  | no               |
+| deckstation   | no       | no           | no     | no  | no               |
+
+`deckstation` is a pure Steam install — no desktop environment, just greetd + tuigreet dropping into gamescope-session (Steam Big Picture). Uses `globalModulesContainers` so no dms/niri leaks in.
 
 Per-host quirks and exceptions: `.agents/deploy/hosts/*.md`
 

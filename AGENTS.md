@@ -62,6 +62,7 @@ modules/
     server-hardening.nix — Journald caps, tmp cleanup, /var bind-mount to data disk
     nas-client.nix — Automount /Volumes/data from thinsandy
     steamos.nix — Steam kiosk (greetd+tuigreet+gamescope-session, audio, 32-bit GL, Avahi)
+    sunshine.nix — GameStream/Moonlight server (Sunshine on LAN, video/render/input groups)
   services/        — Service modules
     aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)
     nullclaw-deployment.nix — nullclaw fleet deployment wrapper

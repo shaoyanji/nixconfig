@@ -44,6 +44,13 @@ in {
     modules = globalModulesContainers ++ [../hosts/kellerbench/configuration.nix];
   };
 
+  deckstation = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = {inherit inputs self;};
+    modules = globalModulesContainers ++ [../hosts/deckstation/configuration.nix];
+  };
+
   applevalley = {
     kind = "nixos";
     system = "x86_64-linux";

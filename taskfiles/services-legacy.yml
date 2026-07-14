@@ -89,7 +89,7 @@ tasks:
           {
             printf '%s\n' infra:rebuild:nixos infra:rebuild:darwin infra:rebuild:home-manager infra:rebuild:wsl infra:rebuild:orb
             printf '%s\n' "infra:deploy:host:{{.PI}}"
-            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:thinsandy infra:deploy:host:kellerbench
+            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:thinsandy infra:deploy:host:kellerbench infra:deploy:host:deckstation
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )

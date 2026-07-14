@@ -277,7 +277,7 @@ tasks:
         choice=$(
           {
             printf '%s\n' "infra:deploy:host:{{.PI}}"
-            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:thinsandy infra:deploy:host:kellerbench
+            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:thinsandy infra:deploy:host:kellerbench infra:deploy:host:deckstation
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )
@@ -290,7 +290,7 @@ tasks:
         host=$(
           {
             printf '%s\n' {{.PI}}
-            printf '%s\n' garnixMachine mtfuji thinsandy kellerbench
+            printf '%s\n' garnixMachine mtfuji thinsandy kellerbench deckstation
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )

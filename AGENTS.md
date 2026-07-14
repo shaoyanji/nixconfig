@@ -37,7 +37,7 @@ flake.nix → flake/outputs.nix (hub)
 |-------|-----------------|---------|
 | `globalModulesNixos` | global + nixos + home-manager-shared + sops + nix-index + dms (desktop) | poseidon, aristotle, aceofspades, ancientace |
 | `globalModulesImpermanence` | globalModulesNixos + impermanence + disko | ares, schneeeule |
-| `globalModulesContainers` | global + noDE + sops + home-manager + nix-index (no dms/niri desktop) | thinsandy, mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), netbook |
+| `globalModulesContainers` | global + noDE + sops + home-manager + nix-index (no dms/niri desktop) | thinsandy, mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), netbook, deckstation |
 | `globalModulesMacos` | global + macos + nix-homebrew + home-manager + sops | cassini (darwin) |
 | `globalModulesDemo` | global + demo + home-manager (no sops) | demo (NixOS demo VM) |
 | `globalModulesHome` | standalone HM sharedModules only | penguin, alarm, kali (standalone home-manager) |
@@ -61,6 +61,7 @@ modules/
     firewall-baseline.nix — Firewall on, only TCP/22 by default
     server-hardening.nix — Journald caps, tmp cleanup, /var bind-mount to data disk
     nas-client.nix — Automount /Volumes/data from thinsandy
+    steamos.nix — Steam kiosk (greetd+tuigreet+gamescope-session, audio, 32-bit GL, Avahi)
   services/        — Service modules
     aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)
     nullclaw-deployment.nix — nullclaw fleet deployment wrapper

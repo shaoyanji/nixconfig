@@ -4,7 +4,6 @@
   pkgs,
   ...
 }: let
-  enableSteam = false;
   enableAmdGpu = true;
 in {
   imports = [
@@ -20,13 +19,9 @@ in {
   ] ++ [
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/ai-host.nix
-    # ../../modules/services/hermes-ai-mounts.nix
     ../../modules/services/ai-services-secrets.nix
     ../../modules/services/nullclaw-deployment.nix
     ../../modules/services/ai-services-context.nix
-    # inputs.hermes-agent.nixosModules.default
-  ] ++ lib.optionals enableSteam [
-    ../../modules/profiles/steam.nix
   ];
 
   networking.hostName = "kellerbench";
@@ -36,11 +31,6 @@ in {
     nullclaw.enable = false;
   };
 
-  # Steam needs 32-bit GL and X server for desktop gaming.
-  hardware.graphics.enable32Bit = lib.mkIf enableSteam true;
-  services.xserver.enable = lib.mkIf enableSteam (lib.mkForce true);
-
-  # aiServices.hermesMounts.enable = enableHermes;
   aiServices.sharedSecrets.enable = true;
 
   aiServices = {
@@ -56,32 +46,6 @@ in {
     };
   };
 
-  # services.hermes-agent = lib.mkIf enableHermes {
-  #   enable = true;
-  #   package = inputs.hermes-agent.packages.${pkgs.system}.default;
-  #   stateDir = "/var/lib/hermes";
-  #   settings = {
-  #     model = {
-  #       provider = "ollama";
-  #       default = "qwen3.5:0.8b";
-  #     };
-  #     terminal = {
-  #       backend = "local";
-  #       timeout = 180;
-  #     };
-  #     toolsets = ["all"];
-  #   };
-  #   environmentFiles = [
-  #     config.sops.secrets."ai-services-shared-env".path
-  #     # config.sops.secrets.hermes.path
-  #   ];
-  # };
-
-  # sops.secrets.hermes = {
-  #   owner = "hermes";
-  #   group = "hermes";
-  #   mode = "0400";
-  # };
   services.ollama = {
     enable = true;
     package = if enableAmdGpu then pkgs.ollama-rocm else pkgs.ollama-cuda;

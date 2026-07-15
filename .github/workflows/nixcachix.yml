@@ -1,7 +1,7 @@
 name: nixcachix
 on:
-  check_suite:
-    types: [completed]
+  # check_suite:
+  # types: [completed]
   # workflow_dispatch:
   push:
   # pull_request:

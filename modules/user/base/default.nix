@@ -135,7 +135,7 @@ in {
       ++ lib.optionals stdenv.isLinux [
         # ── Linux-only TUI Apps ──
         newsboat # RSS/Atom feed reader
-        tuir # TUI for Reddit
+        # tuir # TUI for Reddit
 
         # ── Linux-only Dev / Productivity ──
         dust # Disk usage analyzer

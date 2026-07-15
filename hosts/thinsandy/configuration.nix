@@ -1,6 +1,7 @@
-{ inputs
-, config
-, ...
+{
+  inputs,
+  config,
+  ...
 }: {
   imports = [
     ./hardware-configuration.nix
@@ -34,13 +35,13 @@
   services.aria2-daemon = {
     enable = true;
     downloadDir = "/srv/data/downloads";
-    rpcHost = "127.0.0.1";
+    rpcHost = "0.0.0.0";
     rpcSecretFile = config.sops.secrets."aria2-rpc-secret".path;
     nginx.enable = true;
     nginx.listenPort = 6801;
   };
 
-  ai.thinsandy.zeroclaw.enable = true;
+  ai.thinsandy.zeroclaw.enable = false;
 
   networking.firewall.allowedTCPPorts = [
     8123 # HomeAssistant

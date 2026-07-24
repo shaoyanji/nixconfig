@@ -1,54 +1,71 @@
-{ config, pkgs, lib, ... }:
-
 {
-  # ... your other config ...
+  config,
+  pkgs,
+  lib,
+  ...
+}: {
+  imports = [
+    ./hardware-configuration.nix
+    ./hardware.nix
+    ../../modules/profiles/base-node.nix
+    ../../modules/profiles/server-hardening.nix
+    ../../modules/profiles/laptop.nix
+    ../../hosts/thinsandy/dns.nix
+    ../../hosts/thinsandy/media-stack.nix
+    ../../hosts/thinsandy/paperless.nix
+    ../../hosts/thinsandy/tools.nix
+    ../../hosts/thinsandy/networking.nix
+    ../../modules/services/aria2-daemon.nix
 
-  # Samba shares
+    # ... your imports ...
+  ];
+
+  # --- Samba Configuration ---
   services.samba = {
     enable = true;
     securityType = "user";
-    extraConfig = ''
-      workgroup = WORKGROUP
-      server string = ${config.networking.hostName}
-      netbios name = ${config.networking.hostName}
-      map to guest = bad user
-      guest account = nobody
-    '';
+    settings = {
+      global = {
+        workgroup = "WORKGROUP";
+        "server string" = config.networking.hostName;
+        "netbios name" = config.networking.hostName;
+        "map to guest" = "bad user";
+        "guest account" = "nobody";
+      };
+    };
+
     shares = {
-      "data" = {
-        "path" = "/export/data";
+      data = {
+        path = "/export/data";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
-        "valid users" = "immich root";
       };
-      "private" = {
-        "path" = "/export/private";
+      private = {
+        path = "/export/private";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
-        "valid users" = "immich root";
       };
-      "public" = {
-        "path" = "/export/public";
+      public = {
+        path = "/export/public";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
-        "valid users" = "immich root";
       };
     };
   };
 
   # Samba RuntimeDirectory fix
-  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
-  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
-  systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory = ["lock" "lock/samba"];
+  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory = ["lock" "lock/samba"];
+  systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = ["lock" "lock/samba"];
 
   # Samba WSDD
   services.samba-wsdd = {
@@ -68,18 +85,21 @@
     '';
   };
 
-  # BIND MOUNTS - THIS IS THE CRITICAL FIX
+  # Bind mounts for /export
   fileSystems."/export/data" = {
     device = "/srv/data";
-    options = [ "bind" ];
+    fsType = "none";
+    options = ["bind"];
   };
   fileSystems."/export/private" = {
     device = "/srv/private";
-    options = [ "bind" ];
+    fsType = "none";
+    options = ["bind"];
   };
   fileSystems."/export/public" = {
     device = "/srv/public";
-    options = [ "bind" ];
+    fsType = "none";
+    options = ["bind"];
   };
 
   # Ensure directories exist
@@ -91,21 +111,22 @@
     "d /export/data 0755 root root -"
     "d /export/private 0755 root root -"
     "d /export/public 0755 root root -"
+    "d /srv/private/jellyfin 0755 jellyfin jellyfin -" # RESTORED
   ];
 
   # Firewall
   networking.firewall = {
     enable = true;
     allowPing = true;
-    allowedTCPPorts = [ 445 139 2049 ];
-    allowedUDPPorts = [ 137 138 ];
+    allowedTCPPorts = [445 139 2049];
+    allowedUDPPorts = [137 138];
   };
 
-  # Btrfs auto-scrub
+  # Btrfs auto-scrub - RESTORED all filesystems
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
-    fileSystems = [ "/" ];
+    fileSystems = ["/" "/srv/data" "/srv/private" "/srv/public"];
   };
 
   # Networking
@@ -113,4 +134,7 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  # State version - RESTORED
+  system.stateVersion = "26.05";
 }

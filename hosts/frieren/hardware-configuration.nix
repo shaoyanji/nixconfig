@@ -51,6 +51,60 @@
     {device = "/dev/disk/by-uuid/68e7dbb7-22a2-4441-9cbd-b803199226b3";}
   ];
 
+  # --- Stage 1: 2TB drive physically migrated from thinsandy. ---
+  # /dev/sdb2 uuid e8622c5d-270e-47fa-a1ec-3aca0ef95d8e is the SAME UUID as
+  # thinsandy's data drive (see hosts/thinsandy/hardware-configuration.nix).
+  # Subvol layout is mirrored verbatim: data / public / private / transmission.
+  # /nix and /swap stay on the 1TB SSHD (sda3 / sda2) — no split-brain fix yet.
+  fileSystems."/srv/data" = {
+    device = "/dev/disk/by-uuid/e8622c5d-270e-47fa-a1ec-3aca0ef95d8e";
+    fsType = "btrfs";
+    options = ["subvol=data" "compress=zstd" "noatime"];
+  };
+  fileSystems."/srv/public" = {
+    device = "/dev/disk/by-uuid/e8622c5d-270e-47fa-a1ec-3aca0ef95d8e";
+    fsType = "btrfs";
+    options = ["subvol=public" "noatime" "compress=zstd"];
+  };
+  fileSystems."/srv/private" = {
+    device = "/dev/disk/by-uuid/e8622c5d-270e-47fa-a1ec-3aca0ef95d8e";
+    fsType = "btrfs";
+    options = ["subvol=private" "noatime" "compress=zstd"];
+  };
+  fileSystems."/var/lib/transmission" = {
+    device = "/dev/disk/by-uuid/e8622c5d-270e-47fa-a1ec-3aca0ef95d8e";
+    fsType = "btrfs";
+    options = ["subvol=transmission" "compress=zstd" "noatime"];
+  };
+
+  # Bind mounts — same shape as thinsandy/hardware-configuration.nix:
+  # NFS export roots + unified media path for Jellyfin/Plex/Immich.
+  fileSystems."/export/data" = {
+    device = "/srv/data";
+    fsType = "none";
+    options = ["bind"];
+  };
+  fileSystems."/export/public" = {
+    device = "/srv/public";
+    fsType = "none";
+    options = ["bind"];
+  };
+  fileSystems."/export/private" = {
+    device = "/srv/private";
+    fsType = "none";
+    options = ["bind"];
+  };
+  fileSystems."/media" = {
+    device = "/export/data/media";
+    fsType = "none";
+    options = ["bind" "x-systemd.requires=srv-data.mount"];
+  };
+  fileSystems."/var/lib/immich" = {
+    device = "/srv/public/immich";
+    fsType = "none";
+    options = ["bind" "x-systemd.requires=srv-public.mount"];
+  };
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

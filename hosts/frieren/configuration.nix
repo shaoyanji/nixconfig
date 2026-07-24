@@ -62,6 +62,19 @@
     28981 # Paperless-ngx
   ];
 
+  # --- Per-NIC overrides for thinsandy/dns.nix imports ---
+  # thinsandy pins pihole to eno1 + a tailscale0 dnsmasq line. Frieren's wired
+  # NIC is enp1s0 and tailscale0 only appears after `tailscale up`. Force the
+  # overrides so unit eval resolves against our real interfaces instead of
+  # thinsandy's, and add an enp1s0 firewall rule for DNS on frieren's NIC.
+  services.pihole-ftl.settings.dns.interface = lib.mkForce "enp1s0";
+  services.pihole-ftl.settings.misc.dnsmasq_lines = lib.mkForce [];
+  networking.firewall.interfaces.eno1 = lib.mkForce {};
+  networking.firewall.interfaces.enp1s0 = {
+    allowedUDPPorts = [ 53 ];
+    allowedTCPPorts = [ 53 ];
+  };
+
   # --- Laptop-as-server: lid-close behavior & low-power tuning ---
   # Don't suspend when the lid closes — this is a server.
   # consoleblank=60: kernel blanks the virtual console after 60s idle (saves backlight).

@@ -19,7 +19,30 @@
 
     # ... your imports ...
   ];
+  services.logind = {
+    lidSwitch = "ignore";
+    lidSwitchDocked = "ignore";
+    lidSwitchExternalPower = "ignore";
+  };
 
+  # Disable all forms of sleep
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowHybridSleep = "no";
+    AllowSuspendThenHibernate = "no";
+  };
+
+  # Disable automatic suspend when on battery
+  powerManagement = {
+    enable = true;
+    powerDownCommands = ""; # Disable power down commands
+    cpuFreqGovernor = "performance"; # Or "powersave" if you want
+  };
+
+  # --- Boot Settings (optional but recommended) ---
+  # Skip boot menu timeout (no keyboard needed)
+  boot.loader.grub.timeout = 0;
   # --- Samba Configuration ---
   services.samba = {
     enable = true;

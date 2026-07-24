@@ -204,6 +204,12 @@
       /export/data 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
       /export/private 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
       /export/public 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
+      # Tailnet (Tailscale CGNAT-style 100.64/10): all tailnet clients can mount
+      # /export/data. Thinsandy had /export/data 100.66.146.18(...) which pin-pinned a
+      # single tailnet IP — the wildcard here lets any Tailscale device read/write
+      # until you narrow it. Replace with frieren's specific Tailscale IP for
+      # tighter scoping once it's known: `tailscale ip -4` on frieren.
+      /export/data 100.64.0.0/10(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
     '';
   };
 

@@ -1,202 +1,62 @@
-# NAS server — migrating from thinsandy.
-# Stage: NAS-first (DNS, media, Paperless, tools, Docker, aria2).
-# AI services (ZeroClaw, NullClaw) stay on thinsandy for now.
-# NFS/Samba will be ported from thinsandy's hardware-configuration.nix
-# after the 2TB data drive is physically moved.
-{ config
-, lib
-, pkgs
-, ...
-}: {
-  imports = [
-    ./hardware-configuration.nix
-    ./hardware.nix
-    ../../modules/profiles/base-node.nix
-    ../../modules/profiles/server-hardening.nix
-    ../../modules/profiles/laptop.nix
-    ../../hosts/thinsandy/dns.nix
-    ../../hosts/thinsandy/media-stack.nix
-    ../../hosts/thinsandy/paperless.nix
-    ../../hosts/thinsandy/tools.nix
-    ../../hosts/thinsandy/networking.nix
-    ../../modules/services/aria2-daemon.nix
-  ];
+{ config, pkgs, lib, ... }:
 
-  networking.hostName = "frieren";
+{
+  # ... your other config ...
 
-  # Server hardening — journald caps, tmp cleanup, /var relocation.
-  # /srv/private paths will overlay correctly once the 2TB drive is mounted.
-  profiles.serverHardening = {
-    enable = true;
-    varLogDevice = "/srv/private/var-log";
-    varCacheDevice = "/srv/private/var-cache";
-  };
-
-  # --- SOPS secrets ---
-  # IMPORTANT: Before first deploy, add frieren's host SSH age key to .sops.yaml
-  #   ssh-to-age < /etc/ssh/ssh_host_ed25519_key.pub
-  # Then rekey secrets:
-  #   task infra:sops:update-keys
-
-  sops.secrets."aria2-rpc-secret" = {
-    owner = "aria2";
-    group = "aria2";
-    mode = "0400";
-  };
-
-  services.aria2-daemon = {
-    enable = true;
-    downloadDir = "/srv/data/downloads";
-    rpcHost = "0.0.0.0";
-    rpcSecretFile = config.sops.secrets."aria2-rpc-secret".path;
-    nginx.enable = true;
-    nginx.listenPort = 6801;
-  };
-
-  # --- Firewall (extends firewall-baseline from base-node) ---
-  networking.firewall.allowedTCPPorts = [
-    8123 # HomeAssistant
-    7351 # Stirling PDF
-    6801 # AriaNg web UI
-    28981 # Paperless-ngx
-    445  # SMB
-    139  # SMB NetBIOS session
-    2049 # NFS
-  ];
-  networking.firewall.allowedUDPPorts = [
-    137 # SMB NetBIOS name service
-    138 # SMB NetBIOS datagram
-  ];
-
-  # --- Per-NIC overrides for thinsandy/dns.nix imports ---
-  # thinsandy pins pihole to eno1 + a tailscale0 dnsmasq line. Frieren's wired
-  # NIC is enp1s0 and tailscale0 only appears after `tailscale up`. Force the
-  # overrides so unit eval resolves against our real interfaces instead of
-  # thinsandy's, and add an enp1s0 firewall rule for DNS on frieren's NIC.
-  services.pihole-ftl.settings.dns.interface = lib.mkForce "enp1s0";
-  services.pihole-ftl.settings.misc.dnsmasq_lines = lib.mkForce [];
-  networking.firewall.interfaces.eno1 = lib.mkForce {};
-  networking.firewall.interfaces.enp1s0 = {
-    allowedUDPPorts = [ 53 ];
-    allowedTCPPorts = [ 53 ];
-  };
-
-  # --- Laptop-as-server: lid-close behavior & low-power tuning ---
-  # Don't suspend when the lid closes — this is a server.
-  # consoleblank=60: kernel blanks the virtual console after 60s idle (saves backlight).
-  # auto-cpufreq (laptop.nix) and powertop (hardware.nix) handle CPU power states.
-  services.logind.settings.Login = {
-    HandleLidSwitch = "ignore";
-    HandleLidSwitchExternalPower = "ignore";
-    HandleLidSwitchDocked = "ignore";
-  };
-  boot.kernelParams = [ "consoleblank=60" ];
-
-  # --- TODO: After 2TB data drive migration from thinsandy ---
-  #
-  # Drive layout principle: OS stays on 1TB SSHD, services/data live on 2TB.
-  # /nix, /home, / (root), /boot, /.snapshots → already on 1TB SSHD (no changes).
-  # /srv/{data,public,private} → 2TB drive btrfs subvolumes (to be added).
-  #
-  # 1. Add btrfs subvolume mounts to hardware-configuration.nix:
-  #    /srv/data, /srv/public, /srv/private, /var/lib/transmission, /swap
-  #    (NOTE: /nix stays on the 1TB SSHD — no split-brain like thinsandy had)
-  #
-  # 2. Add bind mounts needed by media services (from thinsandy/hardware-configuration.nix):
-  #    /var/lib/immich → /srv/public/immich
-  #    /media → /export/data/media (unified Jellyfin/Plex path)
-  #    /export/data → /srv/data (NFS export root)
-  #    /export/public → /srv/public
-  #    /export/private → /srv/private
-  #
-  # 3. Port NFS exports + Samba config from thinsandy/hardware-configuration.nix.
-  #    Update NIC name (eno1 on thinsandy → check frieren's interface name).
-  #
-  # 4. Port samba-wsdd + btrfs autoScrub from thinsandy.
-  #
-  # 5. Add firewall ports: 445, 139, 2049 TCP; 137, 138 UDP
-  #
-  # 6. Service data directories on the 2TB drive (services will fail until mounted):
-  #    Jellyfin:  /srv/private/jellyfin
-  #    Plex:      /srv/private/plex
-  #    Home Asst: /srv/private/home-assistant
-  #    Paperless: /srv/data/paperless → bind to /var/lib/paperless
-  #    aria2:     /srv/data/downloads
-  #    Immich:    /srv/public/immich → bind to /var/lib/immich
-
-  # --- Tailscale: ensure daemon + `tailscale up` survive reboots ---
-  # thinsandy/dns.nix already sets services.tailscale.enable = true and orders
-  # tailscaled after network-online. Here we force-enable it at boot and add a
-  # one-shot tailscale-up service so reboots don't require manual re-auth.
-  # First-time interactive login still happens locally; afterwards
-  # /var/lib/tailscale/ caches the auth state.
-  systemd.services.tailscaled = {
-    wantedBy = lib.mkForce [ "multi-user.target" ];
-    after    = lib.mkForce [ "network-online.target" ];
-    wants    = lib.mkForce [ "network-online.target" ];
-  };
-  systemd.services.tailscale-up = {
-    wantedBy = [ "multi-user.target" ];
-    after    = [ "tailscaled.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.tailscale}/bin/tailscale up --accept-dns=false --operator=devji";
-    };
-  };
-
-  # --- NAS sharing: SMB + NFS + WSDD + btrfs autoScrub ---
-  # Mirrors the export shape that lives in hosts/thinsandy/hardware-configuration.nix
-  # on thinsandy. Frieren takes over the NAS role at 192.168.3.25 — keep share
-  # names identical so existing clients keep working without re-mount.
+  # Samba shares
   services.samba = {
     enable = true;
-    openFirewall = true;
-    settings = {
-      global = {
-        "workgroup" = "WORKGROUP";
-        "server string" = "frieren";
-        "netbios name" = "frieren";
-        "security" = "user";
-      };
+    securityType = "user";
+    extraConfig = ''
+      workgroup = WORKGROUP
+      server string = ${config.networking.hostName}
+      netbios name = ${config.networking.hostName}
+      map to guest = bad user
+      guest account = nobody
+    '';
+    shares = {
       "data" = {
-        path = "/export/data";
-        browseable = "yes";
+        "path" = "/export/data";
+        "browseable" = "yes";
         "read only" = "no";
-        "guest ok" = "yes";
+        "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
+        "valid users" = "immich root";
       };
       "private" = {
-        path = "/export/private";
-        browseable = "yes";
+        "path" = "/export/private";
+        "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
+        "valid users" = "immich root";
       };
       "public" = {
-        path = "/export/public";
-        browseable = "yes";
+        "path" = "/export/public";
+        "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
+        "valid users" = "immich root";
       };
     };
   };
 
-  # samba RuntimeDirectory lock-path fix — smbd/nmbd/winbindd need /run/lock/samba
-  # to exist before start. Mirrors thinsandy commit that fixed the post-reboot crash.
-  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory     = [ "lock" "lock/samba" ];
-  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory     = [ "lock" "lock/samba" ];
+  # Samba RuntimeDirectory fix
+  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
   systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
 
+  # Samba WSDD
   services.samba-wsdd = {
     enable = true;
     openFirewall = true;
   };
 
+  # NFS exports
   services.nfs.server = {
     enable = true;
     exports = ''
@@ -204,29 +64,53 @@
       /export/data 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
       /export/private 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
       /export/public 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
-      # Tailnet (Tailscale CGNAT-style 100.64/10): all tailnet clients can mount
-      # /export/data. Thinsandy had /export/data 100.66.146.18(...) which pin-pinned a
-      # single tailnet IP — the wildcard here lets any Tailscale device read/write
-      # until you narrow it. Replace with frieren's specific Tailscale IP for
-      # tighter scoping once it's known: `tailscale ip -4` on frieren.
       /export/data 100.64.0.0/10(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
     '';
   };
 
+  # BIND MOUNTS - THIS IS THE CRITICAL FIX
+  fileSystems."/export/data" = {
+    device = "/srv/data";
+    options = [ "bind" ];
+  };
+  fileSystems."/export/private" = {
+    device = "/srv/private";
+    options = [ "bind" ];
+  };
+  fileSystems."/export/public" = {
+    device = "/srv/public";
+    options = [ "bind" ];
+  };
+
+  # Ensure directories exist
+  systemd.tmpfiles.rules = [
+    "d /srv/data 0755 root root -"
+    "d /srv/private 0755 root root -"
+    "d /srv/public 0755 root root -"
+    "d /export 0755 root root -"
+    "d /export/data 0755 root root -"
+    "d /export/private 0755 root root -"
+    "d /export/public 0755 root root -"
+  ];
+
+  # Firewall
+  networking.firewall = {
+    enable = true;
+    allowPing = true;
+    allowedTCPPorts = [ 445 139 2049 ];
+    allowedUDPPorts = [ 137 138 ];
+  };
+
+  # Btrfs auto-scrub
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
-    fileSystems = [ "/" "/srv/data" "/srv/private" "/srv/public" ];
+    fileSystems = [ "/" ];
   };
 
-  # --- Jellyfin: ensure /srv/private/jellyfin exists pre-start ---
-  # nixpkgs sets WorkingDirectory = dataDir = /srv/private/jellyfin. If the
-  # @private btrfs subvol on the 2TB drive didn't ship with the jellyfin/ dir,
-  # chdir() at start fails with status 200/CHDIR. tmpfiles creates it
-  # idempotently before the unit activates.
-  systemd.tmpfiles.rules = [
-    "d /srv/private/jellyfin 0755 jellyfin jellyfin -"
-  ];
+  # Networking
+  networking.useDHCP = lib.mkDefault true;
 
-  system.stateVersion = "26.05";
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

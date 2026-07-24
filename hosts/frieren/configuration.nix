@@ -19,6 +19,23 @@
 
     # ... your imports ...
   ];
+  networking.hostName = "frieren";
+
+  sops.secrets."aria2-rpc-secret" = {
+    owner = "aria2";
+    group = "aria2";
+    mode = "0400";
+  };
+
+  services.aria2-daemon = {
+    enable = true;
+    downloadDir = "/srv/data/downloads";
+    rpcHost = "0.0.0.0";
+    rpcSecretFile = config.sops.secrets."aria2-rpc-secret".path;
+    nginx.enable = true;
+    nginx.listenPort = 6801;
+  };
+
   services.logind = {
     lidSwitch = "ignore";
     lidSwitchDocked = "ignore";
@@ -141,7 +158,17 @@
   networking.firewall = {
     enable = true;
     allowPing = true;
-    allowedTCPPorts = [445 139 2049];
+    allowedTCPPorts = [
+      445
+      139
+      2049
+
+      8123 # HomeAssistant
+      7351 # Stirling PDF
+      6801 # AriaNg web UI
+      28981 # Paperless-ngx
+      42617 # ZeroClaw dashboard
+    ];
     allowedUDPPorts = [137 138];
   };
 

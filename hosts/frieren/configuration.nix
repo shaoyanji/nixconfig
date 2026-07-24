@@ -54,12 +54,18 @@
   };
 
   # --- Firewall (extends firewall-baseline from base-node) ---
-  # NOTE: NFS (2049) + Samba (445,139,137,138) will be added after drive migration.
   networking.firewall.allowedTCPPorts = [
     8123 # HomeAssistant
     7351 # Stirling PDF
     6801 # AriaNg web UI
     28981 # Paperless-ngx
+    445  # SMB
+    139  # SMB NetBIOS session
+    2049 # NFS
+  ];
+  networking.firewall.allowedUDPPorts = [
+    137 # SMB NetBIOS name service
+    138 # SMB NetBIOS datagram
   ];
 
   # --- Per-NIC overrides for thinsandy/dns.nix imports ---
@@ -138,6 +144,83 @@
       ExecStart = "${pkgs.tailscale}/bin/tailscale up --accept-dns=false --operator=devji";
     };
   };
+
+  # --- NAS sharing: SMB + NFS + WSDD + btrfs autoScrub ---
+  # Mirrors the export shape that lives in hosts/thinsandy/hardware-configuration.nix
+  # on thinsandy. Frieren takes over the NAS role at 192.168.3.25 — keep share
+  # names identical so existing clients keep working without re-mount.
+  services.samba = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      global = {
+        "workgroup" = "WORKGROUP";
+        "server string" = "frieren";
+        "netbios name" = "frieren";
+        "security" = "user";
+      };
+      "data" = {
+        path = "/export/data";
+        browseable = "yes";
+        "read only" = "no";
+        "guest ok" = "yes";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+      };
+      "private" = {
+        path = "/export/private";
+        browseable = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+      };
+      "public" = {
+        path = "/export/public";
+        browseable = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+      };
+    };
+  };
+
+  # samba RuntimeDirectory lock-path fix — smbd/nmbd/winbindd need /run/lock/samba
+  # to exist before start. Mirrors thinsandy commit that fixed the post-reboot crash.
+  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory     = [ "lock" "lock/samba" ];
+  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory     = [ "lock" "lock/samba" ];
+  systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+
+  services.samba-wsdd = {
+    enable = true;
+    openFirewall = true;
+  };
+
+  services.nfs.server = {
+    enable = true;
+    exports = ''
+      /export 192.168.3.0/24(rw,fsid=0,no_subtree_check)
+      /export/data 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
+      /export/private 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
+      /export/public 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)
+    '';
+  };
+
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly";
+    fileSystems = [ "/" "/srv/data" "/srv/private" "/srv/public" ];
+  };
+
+  # --- Jellyfin: ensure /srv/private/jellyfin exists pre-start ---
+  # nixpkgs sets WorkingDirectory = dataDir = /srv/private/jellyfin. If the
+  # @private btrfs subvol on the 2TB drive didn't ship with the jellyfin/ dir,
+  # chdir() at start fails with status 200/CHDIR. tmpfiles creates it
+  # idempotently before the unit activates.
+  systemd.tmpfiles.rules = [
+    "d /srv/private/jellyfin 0755 jellyfin jellyfin -"
+  ];
 
   system.stateVersion = "26.05";
 }

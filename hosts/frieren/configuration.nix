@@ -1,160 +1,107 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-{
-  config,
-  lib,
-  pkgs,
-  ...
+# NAS server — migrating from thinsandy.
+# Stage: NAS-first (DNS, media, Paperless, tools, Docker, aria2).
+# AI services (ZeroClaw, NullClaw) stay on thinsandy for now.
+# NFS/Samba will be ported from thinsandy's hardware-configuration.nix
+# after the 2TB data drive is physically moved.
+{ config
+, ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ./hardware.nix
+    ../../modules/profiles/base-node.nix
+    ../../modules/profiles/server-hardening.nix
+    ../../modules/profiles/laptop.nix
+    ../../hosts/thinsandy/dns.nix
+    ../../hosts/thinsandy/media-stack.nix
+    ../../hosts/thinsandy/paperless.nix
+    ../../hosts/thinsandy/tools.nix
+    ../../hosts/thinsandy/networking.nix
+    ../../modules/services/aria2-daemon.nix
   ];
 
-  # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  networking.hostName = "frieren";
 
-  # Use latest kernel.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  # networking.hostName = "nixos"; # Define your hostname.
-
-  # Configure network connections interactively with nmcli or nmtui.
-  networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "Europe/Berlin";
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true; # use xkb.options in tty.
-  # };
-  hardware.opengl.enable = true;
-  hardware.opengl.extraPackages = with pkgs; [intel-media-driver intel-vaapi-driver];
-  hardware.bluetooth = {
+  # Server hardening — journald caps, tmp cleanup, /var relocation.
+  # /srv/private paths will overlay correctly once the 2TB drive is mounted.
+  profiles.serverHardening = {
     enable = true;
-    powerOnBoot = true;
+    varLogDevice = "/srv/private/var-log";
+    varCacheDevice = "/srv/private/var-cache";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-  # services.xserver.videoDrivers = ["modesetting"];
+  # --- SOPS secrets ---
+  # IMPORTANT: Before first deploy, add frieren's host SSH age key to .sops.yaml
+  #   ssh-to-age < /etc/ssh/ssh_host_ed25519_key.pub
+  # Then rekey secrets:
+  #   task infra:sops:update-keys
 
-  # services.greetd ={
-  #   enable = true;
-  #   settings = {
-  #     default_session = {
-  #       command = "${pkgs.niri}/bin/niri-session";
-  #     };
-  #   }
-  # ;};
+  sops.secrets."aria2-rpc-secret" = {
+    owner = "aria2";
+    group = "aria2";
+    mode = "0400";
+  };
 
-  services.getty.autologinUser = "devji";
-
-  # environment.shellInit = ''
-  # if [ "$(tty)" = "/dev/tty1" ] && [ -z "$WAYLAND_DISPLAY" ]; then exec niri-session fi
-  # '';
-
-  # environment.sessionVariables.GTK_IM_MODULE = "wayland";
-  # environment.sessionVariables.QT_IM_MODULE = "wayland";
-
-  # Configure keymap in X11
-  # services.xserver.xkb.layout = "us";
-  # services.xserver.xkb.options = "eurosign:e,caps:escape";
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound.
-  # services.pulseaudio.enable = true;
-  # OR
-  services.pipewire = {
+  services.aria2-daemon = {
     enable = true;
-    pulse.enable = true;
+    downloadDir = "/srv/data/downloads";
+    rpcHost = "0.0.0.0";
+    rpcSecretFile = config.sops.secrets."aria2-rpc-secret".path;
+    nginx.enable = true;
+    nginx.listenPort = 6801;
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.devji = {
-    isNormalUser = true;
-    extraGroups = ["wheel" "bluetooth" "network" "video" "render"]; # Enable ‘sudo’ for the user.
-    packages = with pkgs; [
-      #     tree
-    ];
-  };
-
-  # programs.firefox.enable = true;
-
-  # List packages installed in system profile.
-  # You can use https://search.nixos.org/ to find more packages (and options).
-  environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    wget
-    helix
-    git
-    curl
-    jq
-    fuzzel
-    alacritty
-    firefox
-    blueman
-    bluez
-    bluez-tools
+  # --- Firewall (extends firewall-baseline from base-node) ---
+  # NOTE: NFS (2049) + Samba (445,139,137,138) will be added after drive migration.
+  networking.firewall.allowedTCPPorts = [
+    8123 # HomeAssistant
+    7351 # Stirling PDF
+    6801 # AriaNg web UI
+    28981 # Paperless-ngx
   ];
-  programs.niri.enable = true;
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  # --- Laptop-as-server: lid-close behavior & low-power tuning ---
+  # Don't suspend when the lid closes — this is a server.
+  # consoleblank=60: kernel blanks the virtual console after 60s idle (saves backlight).
+  # auto-cpufreq (laptop.nix) and powertop (hardware.nix) handle CPU power states.
+  services.logind.settings.Login = {
+    HandleLidSwitch = "ignore";
+    HandleLidSwitchExternalPower = "ignore";
+    HandleLidSwitchDocked = "ignore";
+  };
+  boot.kernelParams = [ "consoleblank=60" ];
 
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
-  # This option defines the first version of NixOS you have installed on this particular machine,
-  # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
+  # --- TODO: After 2TB data drive migration from thinsandy ---
   #
-  # Most users should NEVER change this value after the initial install, for any reason,
-  # even if you've upgraded your system to a new NixOS release.
+  # Drive layout principle: OS stays on 1TB SSHD, services/data live on 2TB.
+  # /nix, /home, / (root), /boot, /.snapshots → already on 1TB SSHD (no changes).
+  # /srv/{data,public,private} → 2TB drive btrfs subvolumes (to be added).
   #
-  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
-  # so changing it will NOT upgrade your system - see https://nixos.org/manual/nixos/stable/#sec-upgrading for how
-  # to actually do that.
+  # 1. Add btrfs subvolume mounts to hardware-configuration.nix:
+  #    /srv/data, /srv/public, /srv/private, /var/lib/transmission, /swap
+  #    (NOTE: /nix stays on the 1TB SSHD — no split-brain like thinsandy had)
   #
-  # This value being lower than the current NixOS release does NOT mean your system is
-  # out of date, out of support, or vulnerable.
+  # 2. Add bind mounts needed by media services (from thinsandy/hardware-configuration.nix):
+  #    /var/lib/immich → /srv/public/immich
+  #    /media → /export/data/media (unified Jellyfin/Plex path)
+  #    /export/data → /srv/data (NFS export root)
+  #    /export/public → /srv/public
+  #    /export/private → /srv/private
   #
-  # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
-  # and migrated your data accordingly.
+  # 3. Port NFS exports + Samba config from thinsandy/hardware-configuration.nix.
+  #    Update NIC name (eno1 on thinsandy → check frieren's interface name).
   #
-  # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
-  system.stateVersion = "26.05"; # Did you read the comment?
-  # nixpkgs.config.allowUnfree = true;
+  # 4. Port samba-wsdd + btrfs autoScrub from thinsandy.
+  #
+  # 5. Add firewall ports: 445, 139, 2049 TCP; 137, 138 UDP
+  #
+  # 6. Service data directories on the 2TB drive (services will fail until mounted):
+  #    Jellyfin:  /srv/private/jellyfin
+  #    Plex:      /srv/private/plex
+  #    Home Asst: /srv/private/home-assistant
+  #    Paperless: /srv/data/paperless → bind to /var/lib/paperless
+  #    aria2:     /srv/data/downloads
+  #    Immich:    /srv/public/immich → bind to /var/lib/immich
+
+  system.stateVersion = "26.05";
 }

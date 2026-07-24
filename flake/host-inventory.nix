@@ -70,6 +70,13 @@ in {
     modules = globalModulesContainers ++ [../hosts/thinsandy/configuration.nix];
   };
 
+  frieren = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = {inherit inputs self;};
+    modules = globalModulesContainers ++ [../hosts/frieren/configuration.nix];
+  };
+
   ares = {
     kind = "nixos";
     system = "x86_64-linux";

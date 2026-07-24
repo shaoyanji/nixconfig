@@ -31,6 +31,8 @@ keys:
   - &kellerbench age1dq9h7xwslw6dct6x6y4xx867vjk88xfutza6nyzavude3k7a7qsqvrwlnf
   - &aristotle age1qazayya08femmfghysu03mx9t05ftj5gj0jq62gju3gaymkkedtqnp0x0f
   - &aristotledevji age1srn0wh9f35xt3pt877wvvasp44ezrkftn99d64d0pc4xx54rqesqh6q0zm
+  - &frierenhost age1njrjwpkuhxctx5nzfjjsg7dggazwsw9se6gpzta8wh52n343ngysepqt2k
+  - &frieren age1rt9xrc78y78p78da0vca0dz7vr3gf6g0vlzqss5e38mnjxkg4paqj4jxxl
 
 creation_rules:
   - path_regex: modules/.*\.(yaml|json|env|ini)$
@@ -63,6 +65,8 @@ creation_rules:
           - *kellerbench
           - *aristotle
           - *aristotledevji
+          - *frierenhost
+          - *frieren
   - path_regex: /[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:

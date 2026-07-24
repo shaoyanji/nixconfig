@@ -10,15 +10,15 @@ jobs:
     strategy:
       matrix:
         machine:
-          # hostname of your nixosSystem's
-          # - poseidon
-          # - cassini
-          - thinsandy
-          # - schneeeule
-          # - mtfuji
-          # - ancientace
-          # - guckloch
-          # - minyx
+        # hostname of your nixosSystem's
+        # - poseidon
+        # - cassini
+        # - thinsandy
+        # - schneeeule
+        # - mtfuji
+        # - ancientace
+        # - guckloch
+        # - minyx
         os:
           - ubuntu-latest
           # add others as you need

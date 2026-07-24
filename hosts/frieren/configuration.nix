@@ -4,6 +4,8 @@
 # NFS/Samba will be ported from thinsandy's hardware-configuration.nix
 # after the 2TB data drive is physically moved.
 { config
+, lib
+, pkgs
 , ...
 }: {
   imports = [
@@ -102,6 +104,27 @@
   #    Paperless: /srv/data/paperless → bind to /var/lib/paperless
   #    aria2:     /srv/data/downloads
   #    Immich:    /srv/public/immich → bind to /var/lib/immich
+
+  # --- Tailscale: ensure daemon + `tailscale up` survive reboots ---
+  # thinsandy/dns.nix already sets services.tailscale.enable = true and orders
+  # tailscaled after network-online. Here we force-enable it at boot and add a
+  # one-shot tailscale-up service so reboots don't require manual re-auth.
+  # First-time interactive login still happens locally; afterwards
+  # /var/lib/tailscale/ caches the auth state.
+  systemd.services.tailscaled = {
+    wantedBy = lib.mkForce [ "multi-user.target" ];
+    after    = lib.mkForce [ "network-online.target" ];
+    wants    = lib.mkForce [ "network-online.target" ];
+  };
+  systemd.services.tailscale-up = {
+    wantedBy = [ "multi-user.target" ];
+    after    = [ "tailscaled.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.tailscale}/bin/tailscale up --accept-dns=false --operator=devji";
+    };
+  };
 
   system.stateVersion = "26.05";
 }

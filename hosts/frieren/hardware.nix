@@ -14,7 +14,7 @@
       intel-vaapi-driver # i965 — legacy VA-API backend (hybrid codecs)
       libva-vdpau-driver # VDPAU → VA-API bridge
       vpl-gpu-rt # oneVPL runtime (Gen9+, H.264/HEVC/H.265)
-      intel-compute-runtime # OpenCL (Gen9.5 compatible, NOT legacy1)
+      intel-compute-runtime-legacy1 # OpenCL legacy (correct for Gen8-Gen11 i.e. KBL)
     ];
   };
 

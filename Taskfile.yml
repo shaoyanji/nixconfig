@@ -25,6 +25,9 @@ includes:
   dev:
     taskfile: ./taskfiles/dev.yml
     flatten: true
+  lifecycle:
+    taskfile: ./taskfiles/lifecycle.yml
+    flatten: true
 
 tasks:
   default:

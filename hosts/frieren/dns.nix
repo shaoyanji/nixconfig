@@ -50,7 +50,7 @@ _: {
         upstreams = ["127.0.0.1#5335"];
         # listeningMode = "LOCAL";
         listeningMode = "ALL";
-        interface = "eno1";
+        interface = "enp1s0";
       };
       database = {
         maxDBdays = 31;
@@ -64,7 +64,7 @@ _: {
     enable = true;
     ports = [8080];
   };
-  networking.firewall.interfaces.eno1 = {
+  networking.firewall.interfaces.enp1s0 = {
     allowedUDPPorts = [53];
     allowedTCPPorts = [53];
   };

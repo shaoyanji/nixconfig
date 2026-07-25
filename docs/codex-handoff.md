@@ -6,7 +6,8 @@ This is the hands-on orientation for a Codex session. Architecture specifics liv
 
 ## Behavior that must stay stable
 
-- **thinsandy** – keep nullclaw/openclaw/hermes enabled, and preserve the current secret paths, workspace roots, and host-local bind mounts.
+- **thinsandy** – AI services host (nullclaw/openclaw/hermes). NAS role moved to **frieren** (`192.168.3.25`). Preserve current secret paths, workspace roots, and host-local bind mounts.
+- **frieren** – fleet NAS server: Samba, NFS, Jellyfin, Paperless, DNS, media stack. Headless laptop (i5-8250U) with Intel QuickSync transcoding.
 - **garnixMachine** – continue as the minimal nullclaw host on `127.0.0.1:3001` with configs staged from `/run/secrets/nullclaw-config`, nginx proxying to `http://127.0.0.1:3000/`, and no SOPS or persistence assumptions.
 - **mtfuji** – retain the existing nullclaw env-file handling.
 - **poseidon & ancientace** – keep only `hosts/<host>/configuration.nix`, their embedded `testvm` guests, and existing bridge/NAT wiring.
@@ -20,6 +21,7 @@ Recommended commands:
 
 ```bash
 git status --short
+nix eval .#nixosConfigurations.frieren.config.networking.hostName
 nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
 nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
 nix eval .#packages.x86_64-linux.nullclaw.meta.mainProgram

@@ -60,7 +60,7 @@ modules/
     boot.nix       — Boot loader profile (systemd-boot/EFI defaults)
     firewall-baseline.nix — Firewall on, only TCP/22 by default
     server-hardening.nix — Journald caps, tmp cleanup, /var bind-mount to data disk
-    nas-client.nix — Automount /Volumes/data from thinsandy
+    nas-client.nix — Automount /Volumes/data from the NAS server (frieren)
     steamos.nix — Steam kiosk (greetd+tuigreet+gamescope-session, audio, 32-bit GL, Avahi)
     sunshine.nix — GameStream/Moonlight server (Sunshine on LAN, video/render/input groups)
   services/        — Service modules
@@ -233,7 +233,7 @@ Two separate encrypted files, decrypted via `sops-nix` using host age keys:
 ## CI Pipeline
 
 GitHub Actions in `.github/workflows/`:
-- `nixcachix.yml` — Builds `thinsandy` NixOS + `penguin` home-manager on `ubuntu-latest` via Cachix (`shaoyanji` cache)
+- `nixcachix.yml` — Builds `frieren` NixOS + `penguin` home-manager on `ubuntu-latest` via Cachix (`shaoyanji` cache)
 - `nixcachix-darwin.yml` — macOS builds
 - `nixcachix-aarch64.yml` — ARM builds
 

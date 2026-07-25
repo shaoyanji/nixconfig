@@ -63,13 +63,6 @@ in {
       ];
   };
 
-  thinsandy = {
-    kind = "nixos";
-    system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesContainers ++ [../hosts/thinsandy/configuration.nix];
-  };
-
   frieren = {
     kind = "nixos";
     system = "x86_64-linux";

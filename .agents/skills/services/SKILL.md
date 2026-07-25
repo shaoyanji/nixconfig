@@ -19,7 +19,7 @@ These wrappers route to canonical `infra:*`, `checks:*`, and `dev:*` tasks. Pref
 |------|-------------|
 | `services:deploy:host:<host>` | Plan + apply + validate (routes to `infra:deploy:host:<host>`) |
 | `services:deploy:rpi` | Deploy minyx (PI) host |
-| `services:deploy:thinsandy` | Deploy thinsandy host |
+
 | `services:deploy:mtfuji` | Deploy mtfuji host |
 | `services:deploy:menu` | Compatibility alias for `infra:deploy:menu` |
 
@@ -56,6 +56,6 @@ These wrappers route to canonical `infra:*`, `checks:*`, and `dev:*` tasks. Pref
 | `wsl-rebuild` | Alias for `infra:rebuild:wsl` |
 | `orb-rebuild` | Alias for `infra:rebuild:orb` |
 | `push-rpi-rebuild` | Alias for `infra:deploy:host:{{.PI}}` |
-| `push-thin-rebuild` | Alias for `infra:deploy:host:thinsandy` |
+
 | `push-fuji-rebuild` | Alias for `infra:deploy:host:mtfuji` |
 | `rebuild` | Deprecated rebuild menu |

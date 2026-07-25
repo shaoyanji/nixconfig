@@ -10,11 +10,11 @@
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/server-hardening.nix
     ../../modules/profiles/laptop.nix
-    ../../hosts/thinsandy/dns.nix
-    ../../hosts/thinsandy/media-stack.nix
-    ../../hosts/thinsandy/paperless.nix
-    ../../hosts/thinsandy/tools.nix
-    ../../hosts/thinsandy/networking.nix
+    ./dns.nix
+    ./media-stack.nix
+    ./paperless.nix
+    ./tools.nix
+    ./networking.nix
     ../../modules/services/aria2-daemon.nix
 
     # ... your imports ...
@@ -36,10 +36,60 @@
     nginx.listenPort = 6801;
   };
 
+  # --- Boot parameters for power saving ---
+  boot.kernelParams = [
+    "consoleblank=30"                # Blank console after 30s idle
+    "i915.enable_dc=2"               # DC5/DC6 deep power saving on i915
+    "i915.enable_psr=2"              # Panel Self-Refresh v2 (eDP power saving)
+    "i915.enable_guc=2"              # GuC submission + HuC loading (HEVC encoding)
+    "i915.enable_fbc=1"              # Frame Buffer Compression
+    "intel_idle.max_cstate=9"        # Allow deep C-states (C8-C9 for KBL)
+    "processor.max_cstate=9"         # Match intel_idle
+  ];
+
+  # --- Ensure ideapad_laptop kernel module is loaded for conservation mode ---
+  boot.kernelModules = [ "ideapad_laptop" ];
+
+  # --- Thermal management (controls fan curve on Intel) ---
+  services.thermald.enable = true;
+
   services.logind = {
     lidSwitch = "ignore";
     lidSwitchDocked = "ignore";
     lidSwitchExternalPower = "ignore";
+  };
+
+  # --- Override auto-cpufreq: even on charger, stay in powersave (server, not workstation) ---
+  services.auto-cpufreq.settings.charger = {
+    governor = "powersave";
+    turbo = "never";
+  };
+
+  # --- Turn off the internal display at boot (headless server) ---
+  systemd.services.frieren-headless = {
+    description = "Frieren headless server — turn off display and set GPU power saving";
+    after = [ "multi-user.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      # Turn off internal display backlight
+      for bl in /sys/class/backlight/*/brightness; do
+        [ -f "$bl" ] && echo 0 > "$bl" 2>/dev/null || true
+      done
+      # Put GPU into automatic power saving
+      echo auto > /sys/class/drm/card0/power/control 2>/dev/null || true
+      # Put PCI devices into auto power saving
+      for ctrl in /sys/class/drm/card0/*/power/control; do
+        [ -f "$ctrl" ] && echo auto > "$ctrl" 2>/dev/null || true
+      done
+      # Enable battery conservation mode (~60% charge limit, extends battery life)
+      for cons in /sys/bus/platform/drivers/ideapad_acpi/*/conservation_mode; do
+        [ -f "$cons" ] && echo 1 > "$cons" 2>/dev/null || true
+      done
+    '';
   };
 
   # Disable all forms of sleep
@@ -50,11 +100,11 @@
     AllowSuspendThenHibernate = "no";
   };
 
-  # Disable automatic suspend when on battery
+  # Disable automatic suspend
   powerManagement = {
     enable = true;
-    powerDownCommands = ""; # Disable power down commands
-    cpuFreqGovernor = "performance"; # Or "powersave" if you want
+    powerDownCommands = "";
+    cpuFreqGovernor = "powersave"; # 24/7 server, no need for performance governor
   };
 
   # --- Boot Settings (optional but recommended) ---

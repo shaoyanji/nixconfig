@@ -89,12 +89,6 @@ aiServices.nullclawDeployment = {
 
 ## Current Hosts
 
-### thinsandy
-- Mode: env-file
-- Listen: `127.0.0.1:3001`
-- Workspace: `/var/lib/nullclaw`
-- Full AI stack (nullclaw + hermes-agent + ollama + xs + pancakes-harness)
-
 ### mtfuji
 - Mode: env-file
 - Listen: `127.0.0.1:3001`
@@ -111,7 +105,6 @@ aiServices.nullclawDeployment = {
 
 Smoke checks are available via `task checks:nullclaw:smoke:<host>`:
 ```bash
-task checks:nullclaw:smoke:thinsandy
 task checks:nullclaw:smoke:mtfuji
 task checks:nullclaw:smoke:garnixMachine
 ```

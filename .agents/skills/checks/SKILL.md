@@ -20,7 +20,7 @@ Run validation and smoke checks for AI service deployments and Nix code quality.
 | `checks:nullclaw:smoke:<host>` | Smoke-check nullclaw via SSH (service, port, workspace, config, secret, health endpoint) |
 | `checks:nullclaw:smoke:garnixMachine` | Config-file staging pattern |
 | `checks:nullclaw:smoke:mtfuji` | Env-file pattern |
-| `checks:nullclaw:smoke:thinsandy` | Direct env-file pattern |
+
 | `checks:nullclaw:smoke:kellerbench` | On-demand host (unreachable = intentional power-off) |
 
 Default params: port `3001`, bind `127.0.0.1`, workspace `/var/lib/nullclaw`, service `nullclaw`.

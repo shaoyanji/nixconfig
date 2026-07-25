@@ -1,0 +1,121 @@
+version: "3"
+
+tasks:
+
+  # ── CI workflow management ──────────────────────────────────────
+
+  lifecycle:ci:enable-host:*:
+    desc: "Uncomment a host in the CI build matrix (.github/workflows/nixcachix.yml)"
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - |
+        file=".github/workflows/nixcachix.yml"
+        if grep -q "{{.HOST}}" "$file"; then
+          # Uncomment the host line (remove leading "# - " but keep the dash)
+          sed -i "/{{.HOST}}/s/^.*-.*{{.HOST}}/          - {{.HOST}}/" "$file"
+          echo "✅ Enabled {{.HOST}} in CI build matrix"
+        else
+          echo "Host {{.HOST}} not found in $file — add it manually under the 'machine:' key"
+          exit 1
+        fi
+
+  lifecycle:ci:disable-host:*:
+    desc: "Comment out a host in the CI build matrix (.github/workflows/nixcachix.yml)"
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - |
+        file=".github/workflows/nixcachix.yml"
+        if grep -q "{{.HOST}}" "$file"; then
+          # Comment out the host line
+          sed -i "/{{.HOST}}/s/^.*-.*{{.HOST}}/        # - {{.HOST}}/" "$file"
+          echo "✅ Disabled {{.HOST}} in CI build matrix"
+        else
+          echo "Host {{.HOST}} not found in $file — nothing to disable"
+        fi
+
+  lifecycle:ci:list:
+    desc: "Show which hosts are enabled vs commented out in the CI build matrix"
+    cmds:
+      - |
+        echo "=== CI Build Matrix (.github/workflows/nixcachix.yml) ==="
+        echo ""
+        echo "--- NixOS machines ---"
+        awk '/machine:/{found=1; next} found && /os:/{exit} found{print}' .github/workflows/nixcachix.yml
+        echo ""
+        echo "--- Home Manager ---"
+        awk '/home:/{found=1; next} found && /os:/{exit} found{print}' .github/workflows/nixcachix.yml
+
+  # ── Commissioning helpers ───────────────────────────────────────
+
+  lifecycle:commission:new-host:*:
+    desc: "Scaffold a new host directory and add it to host-inventory.nix"
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - |
+        if [ -d "hosts/{{.HOST}}" ]; then
+          echo "⚠️  hosts/{{.HOST}} already exists — aborting"
+          exit 1
+        fi
+        mkdir -p "hosts/{{.HOST}}"
+        echo "✅ Created hosts/{{.HOST}}/"
+        echo ""
+        echo "Next steps (see README.md → Host Lifecycle for details):"
+        echo ""
+        echo "  1. Create configuration.nix + copy hardware-configuration.nix from the host"
+        echo "  2. Register in flake/host-inventory.nix"
+        echo "  3. Add age key to .sops.yaml → task infra:sops:update-keys"
+        echo "  4. SSH in → ip link show → set NIC names"
+        echo "  5. Check nixos-hardware for pre-built profiles"
+        echo "  6. nix eval .#nixosConfigurations.{{.HOST}}.config.networking.hostName"
+        echo "  7. task lifecycle:ci:enable-host:{{.HOST}}"
+        echo "  8. task infra:plan:host:{{.HOST}}"
+        echo "  9. task infra:apply:host:{{.HOST}}"
+
+  # ── Decommissioning helpers ─────────────────────────────────────
+
+  lifecycle:decommission:audit:*:
+    desc: "Search for all references to a host across the repo"
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - |
+        echo "=== .nix files ==="
+        grep -rn "{{.HOST}}" . --include='*.nix' | grep -v flake.lock | grep -v result || echo "(none)"
+        echo ""
+        echo "=== .md files ==="
+        grep -rn "{{.HOST}}" . --include='*.md' | grep -v flake.lock | grep -v HANDOFF-REFACTOR | grep -v AUDIT || echo "(none)"
+        echo ""
+        echo "=== CI / YAML files ==="
+        grep -rn "{{.HOST}}" . --include='*.yml' --include='*.yaml' | grep -v flake.lock || echo "(none)"
+        echo ""
+        echo "=== Agent skills ==="
+        grep -rn "{{.HOST}}" .agents/skills/ --include='*.md' 2>/dev/null || echo "(none)"
+        echo ""
+        echo "=== Deploy docs ==="
+        ls -la ".agents/deploy/hosts/{{.HOST}}.md" 2>/dev/null && echo "⚠️  Deploy doc exists: .agents/deploy/hosts/{{.HOST}}.md" || echo "(none)"
+
+  lifecycle:decommission:clean:*:
+    desc: "Remove the most common stale references for a decommissioned host"
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - |
+        # CI workflow
+        task lifecycle:ci:disable-host:{{.HOST}}
+        echo ""
+        # Deploy doc
+        if [ -f ".agents/deploy/hosts/{{.HOST}}.md" ]; then
+          rm ".agents/deploy/hosts/{{.HOST}}.md"
+          echo "✅ Removed .agents/deploy/hosts/{{.HOST}}.md"
+        fi
+        echo ""
+        echo "✅ CI disabled, deploy doc removed (if it existed)."
+        echo ""
+        echo "Manual steps remaining:"
+        echo "  1. Remove {{.HOST}} from flake/host-inventory.nix"
+        echo "  2. rm -rf hosts/{{.HOST}}"
+        echo "  3. Check AGENTS.md, README.md, docs/ for stale references"
+        echo "  4. nix eval .#nixosConfigurations | grep {{.HOST}}  # should return nothing"

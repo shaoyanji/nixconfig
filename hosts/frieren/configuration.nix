@@ -38,17 +38,17 @@
 
   # --- Boot parameters for power saving ---
   boot.kernelParams = [
-    "consoleblank=30"                # Blank console after 30s idle
-    "i915.enable_dc=2"               # DC5/DC6 deep power saving on i915
-    "i915.enable_psr=2"              # Panel Self-Refresh v2 (eDP power saving)
-    "i915.enable_guc=2"              # GuC submission + HuC loading (HEVC encoding)
-    "i915.enable_fbc=1"              # Frame Buffer Compression
-    "intel_idle.max_cstate=9"        # Allow deep C-states (C8-C9 for KBL)
-    "processor.max_cstate=9"         # Match intel_idle
+    "consoleblank=30" # Blank console after 30s idle
+    "i915.enable_dc=2" # DC5/DC6 deep power saving on i915
+    "i915.enable_psr=2" # Panel Self-Refresh v2 (eDP power saving)
+    "i915.enable_guc=2" # GuC submission + HuC loading (HEVC encoding)
+    "i915.enable_fbc=1" # Frame Buffer Compression
+    "intel_idle.max_cstate=9" # Allow deep C-states (C8-C9 for KBL)
+    "processor.max_cstate=9" # Match intel_idle
   ];
 
   # --- Ensure ideapad_laptop kernel module is loaded for conservation mode ---
-  boot.kernelModules = [ "ideapad_laptop" ];
+  boot.kernelModules = ["ideapad_laptop"];
 
   # --- Thermal management (controls fan curve on Intel) ---
   services.thermald.enable = true;
@@ -61,15 +61,15 @@
 
   # --- Override auto-cpufreq: even on charger, stay in powersave (server, not workstation) ---
   services.auto-cpufreq.settings.charger = {
-    governor = "powersave";
-    turbo = "never";
+    governor = lib.mkDefault "powersave";
+    # turbo = "never";
   };
 
   # --- Turn off the internal display at boot (headless server) ---
   systemd.services.frieren-headless = {
     description = "Frieren headless server — turn off display and set GPU power saving";
-    after = [ "multi-user.target" ];
-    wantedBy = [ "multi-user.target" ];
+    after = ["multi-user.target"];
+    wantedBy = ["multi-user.target"];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;

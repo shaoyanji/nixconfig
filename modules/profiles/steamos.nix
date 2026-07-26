@@ -15,7 +15,7 @@
 #     Steam's embedded-compositor fallback that produced the
 #     `Creating headless backend` log line.
 #   - PipeWire audio (mandatory for game audio)
-#   - greetd + tuigreet login that drops the user into gamescope-session
+#   - greetd auto-login as devji into gamescope-session (no login prompt)
 #   - Avahi / mDNS for LAN game discovery + local network transfers
 #   - 32-bit graphics packages for legacy OpenGL games
 #   - All Steam network services (remotePlay, dedicatedServer,
@@ -189,15 +189,21 @@ in
   # the user lands back on the kernel TTY.
   services.seatd.enable = true;
 
-  # greetd + tuigreet: minimalist console-only login that drops the user
-  # directly into gamescope-session (Steam Big Picture). Exiting Big
-  # Picture returns the user to tuigreet.
+  # Auto-login directly into gamescope-session as devji. greetd runs
+  # default_session as the target user without showing a login prompt
+  # when user+command are both set, eliminating the tuigreet step
+  # entirely. After the Steam Big Picture session exits (or cage exits),
+  # greetd re-launches the same session, giving permanent auto-login
+  # behavior. To enable a tuigreet-based manual login instead, restore
+  # the user = "greeter" line + the
+  # ${pkgs.tuigreet}/bin/tuigreet --time --cmd gamescope-session command
+  # AND re-add the users.users.greeter/users.groups.greeter blocks below
+  # (kept commented as toggles for future re-enable).
   services.greetd = {
     enable = true;
     settings.default_session = {
-      # tuigreet auto-discovers wayland-sessions; --cmd runs after login.
-      command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd gamescope-session";
-      user = "greeter";
+      user = "devji";
+      command = "gamescope-session";
     };
   };
 
@@ -210,11 +216,13 @@ in
   # switched away from the `greeter` user to run gamescope-session.
   users.users.devji.extraGroups = [ "video" "render" "input" "seat" ];
 
-  users.users.greeter = {
-    isSystemUser = true;
-    group = "greeter";
-    home = "/var/empty";
-    description = "greetd greeter user";
-  };
-  users.groups.greeter = { };
+  # Disabled-block (autologin mode skips the tuigreet greeter; preserve
+  # as dormant toggle for future re-enable):
+  # users.users.greeter = {
+  #   isSystemUser = true;
+  #   group = "greeter";
+  #   home = "/var/empty";
+  #   description = "greetd greeter user";
+  # };
+  # users.groups.greeter = { };
 }

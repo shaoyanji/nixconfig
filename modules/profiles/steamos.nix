@@ -2,11 +2,18 @@
 #
 # Composes:
 #   - programs.steam (imported from ./steam.nix)
-#   - a gamescope-session wrapper auto-synthesized in this profile via
-#     pkgs.writeShellScriptBin (installed unconditionally; wins over any
-#     upstream-generated gamescope-session script when the host also disables
-#     programs.steam.gamescopeSession - kellerbench does this in its host
-#     config, see hosts/kellerbench/configuration.nix)
+#   - a kiosk-session wrapper (`cage + steam -gamepadui`) installed
+#     unconditionally via pkgs.writeShellScriptBin. Replaces the round-3
+#     gamescope-bypass wrapper because Steam Big Picture's PATH-detected
+#     gamescope launcher kept re-launching pkgs.gamescope (which crashes
+#     on Kepler+legacy_580). The wrapper binary name remains
+#     `gamescope-session` so greetd's --cmd resolution stays unchanged.
+#   - pkgs.cage (wlroots-based Wayland kiosk compositor). Opens
+#     /dev/dri/card0 via the nvidia_drm KMS stack that round 2 already
+#     wired up; does NOT require Vulkan for compositing. Steam runs as
+#     a Wayland CLIENT under cage (XWayland native); this bypasses
+#     Steam's embedded-compositor fallback that produced the
+#     `Creating headless backend` log line.
 #   - PipeWire audio (mandatory for game audio)
 #   - greetd + tuigreet login that drops the user into gamescope-session
 #   - Avahi / mDNS for LAN game discovery + local network transfers
@@ -40,39 +47,72 @@ let
   # line below is the Kepler bypass. Restoring `exec gamescope -e -- steam -gamepadui`
   # re-opts in to gamescope compositing on successor hardware.
   customGamescopeSession = pkgs.writeShellScriptBin "gamescope-session" ''
-    # Kepler / legacy_580 path: gamescope wlserver fails with
-    # `Creating headless backend` because the Vulkan ICD is incomplete
-    # (no VK_KHR_image_drm_format_modifier). Bypass gamescope entirely
-    # and launch Steam Big Picture directly. After this wrapper fires:
-    #   - greetd's --cmd gamescope-session resolves via PATH to *this* script.
-    #     The upstream-generated gamescope-session script (auto-installed by
-    #     programs.steam.gamescopeSession.enable=true in steam.nix) is
-    #     suppressed by a host-scoped mkForce in hosts/kellerbench/configuration.nix,
-    #     so PATH always hits us first.
-    #   - Steam Big Picture starts on top of services.xserver (XWayland
-    #     fallback if no native Wayland compositor is running).
-    # Future Kepler successor (Ampere / Blackwell): flip the wrapper body
-    # back to `exec ${pkgs.gamescope}/bin/gamescope -e -- steam -gamepadui`
-    # AND remove the host-scoped mkForce so upstream's gamescopeSession
-    # desktop entry returns.
+    # Kepler / legacy_580 path (round 5):
+    #
+    # Why we cannot stay on rounds 1-4: Steam Big Picture's
+    # PATH-detected gamescope launcher (a Steam internal heuristic, not
+    # the upstream-program-gamescopeSession desktop file) keeps finding
+    # `pkgs.gamescope` in PATH and re-launching it as a child. gamescope's
+    # wlserver then logs `Creating headless backend` and crashes because
+    # the legacy_580 Vulkan ICD is incomplete (no
+    # VK_KHR_image_drm_format_modifier) - even with nvidia_drm KMS up
+    # from round 2.
+    #
+    # Round-5 fix: drop `pkgs.gamescope` from the closure entirely (this
+    # profile) and use `cage` - a wlroots-based Wayland kiosk compositor
+    # that opens /dev/dri/card0 via nvidia_drm KMS WITHOUT requiring
+    # Vulkan for the compositor side (only mesa GL is needed).
+    #
+    # After this wrapper fires:
+    #   1. greetd's --cmd gamescope-session resolves via PATH to *this*
+    #      script. The upstream-generated gamescope-session script
+    #      (auto-installed by programs.steam.gamescopeSession.enable=true
+    #      in modules/profiles/steam.nix) is suppressed by a host-scoped
+    #      mkForce in hosts/kellerbench/configuration.nix so PATH always
+    #      hits us first.
+    #   2. cage -s starts, opens DRM/KMS on /dev/dri/card0, brings up a
+    #      wlroots Wayland server (wayland-0).
+    #   3. Steam -gamepadui runs as the single fullscreen Wayland app
+    #      under cage (Steam is XWayland-native; cage forwards it to
+    #      Wayland). Steam's own embedded-compositor fallback is bypassed
+    #      and the headless-backend wlroots fallback never fires.
+    #
+    # The `-s` flag on cage tells cage NOT to exit when Steam forks
+    # background helpers (SteamUpdate, SteamWebHelper); without `-s`
+    # cage would exit as soon as Steam's initial process forks.
+    #
+    # Fallback (round 6, if cage also fails): drop the wrapper
+    # entirely and run steam under X11 via `${pkgs.xorg.xinit}/bin/xinit
+    # "${pkgs.steam}/bin/steam -gamepadui" -- :0 vt1 -nolisten tcp` -
+    # services.xserver.enable = true is already set on kellerbench.
+    #
+    # Future Turing/Ampere/Blackwell successor with a modern Vulkan
+    # ICD: swap cage for gamescope, flipping the exec line below to
+    # `exec ${pkgs.gamescope}/bin/gamescope -e -- steam -gamepadui`
+    # AND restoring `programs.gamescope.enable = true` in this profile
+    # AND removing the host-scoped mkForce in
+    # hosts/kellerbench/configuration.nix.
     set -eu
     log=/tmp/gamescope-session.log
     {
-      echo "=== gamescope-session wrapper start $(date -Iseconds) ==="
+      echo "=== gamescope-session (cage-based) wrapper start $(date -Iseconds) ==="
       echo "    USER=$(id -un) UID=$(id -u)"
       echo "    WAYLAND_DISPLAY=''${WAYLAND_DISPLAY:-<unset>}"
       echo "    XDG_SESSION_TYPE=''${XDG_SESSION_TYPE:-<unset>}"
       echo "    DISPLAY=''${DISPLAY:-<unset>}"
+      echo "    Cage binary: ${pkgs.cage}/bin/cage"
       echo "    Steam binary: ${pkgs.steam}/bin/steam"
     } >>"$log" 2>&1
+    if [ ! -x ${pkgs.cage}/bin/cage ]; then
+      echo "    FATAL: cage binary missing or not executable" >>"$log"
+      exit 127
+    fi
     if [ ! -x ${pkgs.steam}/bin/steam ]; then
-      # No TTY-side UX for a 5s pause, so exit loudly and let the operator
-      # inspect /tmp/gamescope-session.log from another session.
       echo "    FATAL: steam binary missing or not executable" >>"$log"
       exit 127
     fi
-    echo "    exec ${pkgs.steam}/bin/steam -gamepadui" >>"$log"
-    exec ${pkgs.steam}/bin/steam -gamepadui
+    echo "    exec ${pkgs.cage}/bin/cage -s -- ${pkgs.steam}/bin/steam -gamepadui" >>"$log"
+    exec ${pkgs.cage}/bin/cage -s -- ${pkgs.steam}/bin/steam -gamepadui
   '';
 in
 {
@@ -89,12 +129,23 @@ in
   # below so Steam's NixOS module stops generating that competing wrapper.
   environment.systemPackages = [ customGamescopeSession ];
 
-  # gamescope binary is intentionally still installed (~50MB closure cost)
-  # so a future Kepler successor (Ampere / Blackwell) with a proper Vulkan
-  # ICD can re-opt-in to gamescope by flipping customGamescopeSession in
-  # this profile. Not removing it on this Kepler box keeps the door open
-  # for hardware upgrades without a profile rewrite.
-  programs.gamescope.enable = true;
+  # gamescope package is intentionally NOT installed on this Kepler
+  # profile (round 5). Cage is the Wayland kiosk compositor for Steam
+  # (-gamepadui). Removing pkgs.gamescope:
+  #   - prevents Steam Big Picture's PATH-detected gamescope-launcher
+  #     heuristic from finding the binary and re-forking it (this was
+  #     the cause of the `Creating headless backend` regression the
+  #     user reported after round 4). Steam cannot fork gamescope if
+  #     gamescope is not in the closure;
+  #   - slims the closure by ~50MB;
+  #   - eliminates the wlroots-keepalive error Steam was producing.
+  # Future Turing/Ampere/Blackwell successors with a modern Vulkan ICD
+  # can flip this back to `true` AND update the wrapper body in the
+  # `let` block above to
+  # `exec ${pkgs.gamescope}/bin/gamescope -e -- steam -gamepadui`
+  # AND remove the host-scoped mkForce in
+  # hosts/kellerbench/configuration.nix.
+  programs.gamescope.enable = false;
 
   # Note: `programs.steam.gamescopeSession.enable` is NOT overridden here.
   # That option (set to `true` in modules/profiles/steam.nix) generates a

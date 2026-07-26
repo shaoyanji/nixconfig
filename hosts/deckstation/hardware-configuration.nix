@@ -14,19 +14,19 @@
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-  ];
+  ];  # Replace with target `lspci -k` output.
+  boot.initrd.availableKernelModules = [];
+  boot.initrd.kernelModules = [];
+  boot.kernelModules = [];
+  boot.extraModulePackages = [];
 
-  # Replace with target `lspci -k` output.
-  boot.initrd.availableKernelModules = [ ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ ];
-  boot.extraModulePackages = [ ];
-
-  # Example ext4 root — replace device + fsType with `blkid` output.
-  # fileSystems."/" = {
-  #   device = "/dev/disk/by-label/nixos";
-  #   fsType = "ext4";
-  # };
+  # Evaluation-time placeholder so the flake checks cleanly. REPLACE
+  # device + fsType with the actual `blkid` output (and run
+  # `nixos-generate-config` on the target) before deploying.
+  fileSystems."/" = {
+    device = "/dev/disk/by-label/nixos";
+    fsType = "ext4";
+  };
 
   # swapDevices = [ ];
 

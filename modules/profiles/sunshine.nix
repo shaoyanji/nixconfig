@@ -20,10 +20,9 @@
 #
 # Usage:
 #   imports = [ ../../modules/profiles/sunshine.nix ];
-{
-  config,
-  lib,
-  ...
+{ config
+, lib
+, ...
 }: {
   services.sunshine = {
     enable = true;
@@ -39,4 +38,12 @@
     "render"
     "input"
   ];
+
+  # nixpkgs services.sunshine declares users.users.sunshine.group = "sunshine",
+  # so the group must exist on the host before the user can be created.
+  # Declaring it here as part of the profile keeps the option list
+  # symmetric across hosts that import this profile and avoids host-eval-all
+  # assertion failures on hosts where user/group creation ordering fights
+  # NixOS module-system priority (deckstation previously hit this).
+  users.groups.sunshine = { };
 }

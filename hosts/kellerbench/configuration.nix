@@ -23,21 +23,22 @@ in
     ]
     ++ [
       ../../modules/profiles/base-node.nix
-      ../../modules/profiles/ai-host.nix
-      # ../../modules/services/hermes-ai-mounts.nix
-      ../../modules/services/ai-services-secrets.nix
-      ../../modules/services/nullclaw-deployment.nix
-      ../../modules/services/ai-services-context.nix
-      # inputs.hermes-agent.nixosModules.default
+      # Sunshine GameStream/Moonlight server: Moonlight clients on the LAN
+      # launch/control games running under kellerbench. Composes on top of
+      # base-node + steamos (which provides the cage+steam stack Sunshine
+      # captures from). To disable Sunshine streaming while keeping the
+      # gaming rig functional, set enableSunshine = false in the host
+      # config and remove this import.
+      ../../modules/profiles/sunshine.nix
     ];
 
   networking.hostName = "kellerbench";
 
-  # X server is required by greetd so XWayland can host any legacy
-  # X11-only windows that gamescope/Steam spawn. No desktop environment
-  # is configured - greetd + tuigreet + gamescope-session is the entire
-  # user-facing UI. Gated on enableSteam so enableSteam=false stays
-  # headless.
+  # X server is required so XWayland can host any legacy X11-only windows
+  # that Steam spawns inside cage's Wayland surface. No desktop environment
+  # is configured - greetd auto-logs devji into gamescope-session (cage
+  # + steam -gamepadui) which is the entire user-facing UI. Gated on
+  # enableSteam so enableSteam=false stays headless.
   services.xserver.enable = enableSteam;
 
   # Round-4 kellerbench SteamOS-kiosk override:
@@ -55,26 +56,25 @@ in
   # mkForce priority 50 wins over steam.nix's plain assignment (priority 100).
   programs.steam.gamescopeSession.enable = lib.mkForce false;
 
-  profiles.aiHost = {
-    enable = true;
-    nullclaw.enable = false;
-  };
-
-  aiServices.sharedSecrets.enable = true;
-
-  aiServices = {
-    # Enable shared context materialization
-    context.enable = true;
-    nullclawDeployment = {
-      enable = false;
-      mode = "env-file";
-      listenHost = "127.0.0.1";
-      listenPort = 3001;
-      workspaceRoot = "/var/lib/nullclaw";
-      environmentFile = config.sops.secrets.nullclaw.path;
-    };
-  };
-
+  # Disabled-block (kellerbench decommissioned as AI workbench, now a
+  # gaming backup rig). Preserve as dormant toggle for future re-enable
+  # by uncommenting AND re-adding the AI imports to the imports list:
+  # profiles.aiHost = {
+  #   enable = true;
+  #   nullclaw.enable = false;
+  # };
+  # aiServices.sharedSecrets.enable = true;
+  # aiServices = {
+  #   context.enable = true;
+  #   nullclawDeployment = {
+  #     enable = false;
+  #     mode = "env-file";
+  #     listenHost = "127.0.0.1";
+  #     listenPort = 3001;
+  #     workspaceRoot = "/var/lib/nullclaw";
+  #     environmentFile = config.sops.secrets.nullclaw.path;
+  #   };
+  # };
   # services.ollama = {
   #   enable = true;
   #   # package = if enableAmdGpu then pkgs.ollama-rocm else pkgs.ollama-cuda;

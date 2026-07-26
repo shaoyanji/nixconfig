@@ -1,12 +1,9 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}: let
+{ config, lib, pkgs, ... }:
+let
   enableSteam = true;
   enableAmdGpu = false;
-in {
+in
+{
   imports =
     [
       (import ../../modules/profiles/grub-boot.nix {
@@ -21,6 +18,9 @@ in {
     ++ lib.optionals (!enableAmdGpu) [
       ./nvidia-gt-750-ti.nix
     ]
+    ++ lib.optionals enableSteam [
+      ../../modules/profiles/steamos.nix
+    ]
     ++ [
       ../../modules/profiles/base-node.nix
       ../../modules/profiles/ai-host.nix
@@ -29,12 +29,16 @@ in {
       ../../modules/services/nullclaw-deployment.nix
       ../../modules/services/ai-services-context.nix
       # inputs.hermes-agent.nixosModules.default
-    ]
-    ++ lib.optionals enableSteam [
-      ../../modules/profiles/steam.nix
     ];
 
   networking.hostName = "kellerbench";
+
+  # X server is required by greetd so XWayland can host any legacy
+  # X11-only windows that gamescope/Steam spawn. No desktop environment
+  # is configured - greetd + tuigreet + gamescope-session is the entire
+  # user-facing UI. Gated on enableSteam so enableSteam=false stays
+  # headless.
+  services.xserver.enable = enableSteam;
 
   profiles.aiHost = {
     enable = true;
@@ -67,9 +71,7 @@ in {
   #   ];
   # };
 
-  environment.systemPackages = with pkgs; [
-    jq
-  ];
+  environment.systemPackages = with pkgs; [ jq ];
 
   services.openssh.enable = true;
   system.stateVersion = "25.05";

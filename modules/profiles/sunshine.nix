@@ -30,20 +30,36 @@
     capSysAdmin = true;
   };
 
-  # Sunshine's runtime user has to read GPU buffers (capture) and inject
-  # gamepad/keyboard/mouse events over the stream. nixpkgs creates the
-  # user; we add the groups via extraGroups (lists union across modules).
-  users.users.sunshine.extraGroups = [
-    "video"
-    "render"
-    "input"
-  ];
+  # Pin note (nixpkgs 6cdc7fc76e8bf7fde9fa43a849fcaaa70e230dee):
+  # nixpkgs services.sunshine in this pin DOES NOT auto-declare the
+  # sunshine system user or group. Without the block below, importing
+  # this profile produces two failed assertions on a host:
+  #   - "Exactly one of users.users.sunshine.isSystemUser and
+  #      users.users.sunshine.isNormalUser must be set."
+  #   - "users.users.sunshine.group is unset. This used to default to
+  #      nogroup, but this is unsafe."
+  # Both surface as a toplevel build error (kellerbench system rebuild
+  # fails) and as host-eval-all assertion failures on multihost eval
+  # (which is what deckstation hit before the defensive group add).
+  #
+  # We declare the user as a daemon (long-lived background service, no
+  # login, no shell) which is the right shape for Sunshine. UID/GID
+  # auto-assigned by NixOS at activation (no fixed numbers needed;
+  # hard-coded ones would clash across hosts).
+  users.users.sunshine = {
+    isSystemUser = true;
+    group = "sunshine";
+    extraGroups = [
+      "video"  # KMS/DRM plane read for capture
+      "render" # GPU buffers for game stream frames
+      "input"  # inject gamepad/keyboard/mouse events over the stream
+    ];
+  };
 
-  # nixpkgs services.sunshine declares users.users.sunshine.group = "sunshine",
-  # so the group must exist on the host before the user can be created.
-  # Declaring it here as part of the profile keeps the option list
-  # symmetric across hosts that import this profile and avoids host-eval-all
-  # assertion failures on hosts where user/group creation ordering fights
-  # NixOS module-system priority (deckstation previously hit this).
+  # Sunshines user-group counterpart. Pinned in the round-6 fix to fix
+  # the deckstation host-eval-all failure. NixOS auto-picks a free
+  # GID; we deliberately do NOT hard-code one (would clash across
+  # hosts that import this profile in the same /etc/passwd context
+  # during a shared Docker build, etc).
   users.groups.sunshine = { };
 }

@@ -5,7 +5,7 @@
 }: let
   cfg = config.aiServices.zeroclawDeployment;
   aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
-  inherit (lib) mkIf mkOption types optionalAttrs;
+  inherit (lib) mkIf mkOption types;
 in {
   imports = [
     ./zeroclaw.nix

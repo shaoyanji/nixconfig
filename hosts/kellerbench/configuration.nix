@@ -40,6 +40,21 @@ in
   # headless.
   services.xserver.enable = enableSteam;
 
+  # Round-4 kellerbench SteamOS-kiosk override:
+  # modules/profiles/steamos.nix imports modules/profiles/steam.nix which
+  # sets programs.steam.gamescopeSession.enable = true. That nixpkgs option
+  # auto-installs a NixOS-module-level `gamescope-session` script which
+  # shadows our `customGamescopeSession` wrapper in PATH. On kellerbench
+  # (Kepler sm_30 + legacy_580) the shadow forces greetd's
+  # --cmd gamescope-session to fork the real gamescope binary, which
+  # segfaults because the legacy_580 Vulkan ICD is incomplete (gamescope's
+  # wlserver reports "Creating headless backend" then crashes).
+  # Disabling here is host-scoped (NOT in the shared steamos profile) so
+  # future Turing-class successors that import steamos.nix keep the
+  # upstream gamescopeSession feature without a profile rewrite.
+  # mkForce priority 50 wins over steam.nix's plain assignment (priority 100).
+  programs.steam.gamescopeSession.enable = lib.mkForce false;
+
   profiles.aiHost = {
     enable = true;
     nullclaw.enable = false;

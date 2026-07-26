@@ -1,7 +1,4 @@
 {
-  config,
-  pkgs,
-  lib,
   ...
 }: let
   user = import ../../modules/global/user.nix;

@@ -17,8 +17,7 @@
 #
 # Usage:
 #   imports = [ ../../modules/profiles/steamos.nix ];
-{ config
-, lib
+{ lib
 , pkgs
 , ...
 }:

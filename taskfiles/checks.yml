@@ -4,7 +4,7 @@ tasks:
   checks:quick:
     desc: Run narrow repo checks
     cmds:
-      - nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
+      # Note: thinsandy removed in "frieren: complete thinsandy decommission".
       - nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
       - nix eval .#nixosConfigurations.aristotle.config.networking.hostName
       - nix eval .#nixosConfigurations.netbook.config.networking.hostName
@@ -95,6 +95,13 @@ tasks:
 
   checks:nix:lint:
     desc: Run deadnix and statix on all nix files
+    # deadnix --fail enforces zero-unused-bindings; statix remains
+    # warn-only because its findings mix style preferences with
+    # structural smells. Review statix output, but do not block on it.
+    # The trailing `|| true` serves as belt-and-suspenders against
+    # statix crashes; deadnix failures already exit non-zero via the
+    # upstream `&&` and short-circuit before statix runs.
+    # Use `task checks:nix:fix` to autofix dead code on demand.
     cmds:
       - nix-shell -p deadnix statix --run "deadnix --fail flake.nix flake hosts modules pkgs overlays lib && (statix check || true)"
 

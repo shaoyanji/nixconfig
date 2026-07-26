@@ -20,11 +20,7 @@
 #
 # Usage:
 #   imports = [ ../../modules/profiles/sunshine.nix ];
-{
-  config,
-  lib,
-  ...
-}: {
+_: {
   services.sunshine = {
     enable = true;
     openFirewall = true;
@@ -33,10 +29,18 @@
 
   # Sunshine's runtime user has to read GPU buffers (capture) and inject
   # gamepad/keyboard/mouse events over the stream. nixpkgs creates the
-  # user; we add the groups via extraGroups (lists union across modules).
-  users.users.sunshine.extraGroups = [
-    "video"
-    "render"
-    "input"
-  ];
+  # user; we set isSystemUser + group + extraGroups so the NixOS
+  # users-groups assertion that requires both is satisfied (without
+  # this, deckstation eval fails with 'users.users.sunshine.group is
+  # unset'). extraGroups still unions across modules.
+  users.users.sunshine = {
+    isSystemUser = true;
+    group = "sunshine";
+    extraGroups = [
+      "video"
+      "render"
+      "input"
+    ];
+  };
+  users.groups.sunshine = { };
 }

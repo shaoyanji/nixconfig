@@ -42,7 +42,16 @@ let
   # never comes up at runtime, replace `default_session.command` with
   # `--cmd "${pkgs.steam}/bin/steam -gamepadui"` to drop gamescope.
   customGamescopeSession = pkgs.writeShellScriptBin "gamescope-session" ''
-    exec ${pkgs.gamescope}/bin/gamescope -e -- ${pkgs.steam}/bin/steam -gamepadui
+    # gamescope does not initialize on Kepler / legacy_580 (the wlserver
+    # reports `Creating headless backend` because the legacy_580 driver
+    # exposes only an incomplete Vulkan ICD). Bypass gamescope entirely
+    # and launch Steam Big Picture directly via Steam's own XWayland
+    # renderer, which runs under services.xserver and works without a
+    # dedicated Wayland compositor. The wrapper name is preserved so
+    # greetd's command line stays unchanged; only this wrapper's payload
+    # is altered. A future Kepler successor (Ampere / Blackwell) can
+    # re-opt-in to gamescope by restoring the gamescope-launch line here.
+    exec ${pkgs.steam}/bin/steam -gamepadui
   '';
 in
 {

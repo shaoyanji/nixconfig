@@ -85,6 +85,14 @@ in
     };
   };
 
+  # seatd: libseat backend for gamescope's wlroots-based wlserver.
+  # Without an enabled seatd, libseat falls through to systemd-logind
+  # or builtin, which intermittently fails to acquire a seat under
+  # greetd-launched Wayland sessions. The user-reported symptom is
+  # `wlserver: libseat backend ...` and gamescope never comes up, so
+  # the user lands back on the kernel TTY.
+  services.seatd.enable = true;
+
   # greetd + tuigreet: minimalist console-only login that drops the user
   # directly into gamescope-session (Steam Big Picture). Exiting Big
   # Picture returns the user to tuigreet.
@@ -97,11 +105,14 @@ in
     };
   };
 
-  # GPU device access — gamescope, Steam, and any XWayland app needs to open
-  # /dev/dri/renderD* (render group) and /dev/dri/card0 (video group).
+  # GPU + seatd device access — gamescope, Steam, and any XWayland app needs to open
+  # /dev/dri/renderD* (render group), /dev/dri/card0 (video group), /dev/input/event*
+  # (input group), and the seatd socket at /run/seatd.sock (seat group).
   # base-node.nix sets wheel + networkmanager; desktop-client.nix layers docker + video.
   # Steam-only hosts don't import desktop-client, so we add these here.
-  users.users.devji.extraGroups = [ "video" "render" ];
+  # `seat` group is required so devji can talk to libseat once greetd has
+  # switched away from the `greeter` user to run gamescope-session.
+  users.users.devji.extraGroups = [ "video" "render" "input" "seat" ];
 
   users.users.greeter = {
     isSystemUser = true;

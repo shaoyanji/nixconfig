@@ -74,10 +74,9 @@ in {
     kind = "nixos";
     system = "x86_64-linux";
     specialArgs = {inherit inputs self;};
-    # ares was a Lenovo T440p laptop until 2026-Q3; the SSD has been
-    # moved into a desktop case (i5-6500, 8GB, GTX 750 Ti Kepler dGPU).
-    # The T440p-specific nixos-hardware module is dropped here because
-    # Lenovo-specific fan curves / power management don't apply to
+    # ares is the T440p SSD moved into a desktop case (i5-6500 + GTX
+    # 750 Ti).  The T440p-specific nixos-hardware module is dropped
+    # because Lenovo fan curves / power management do not apply to
     # desktop boards.  Impermanence chain is kept because the btrfs
     # /persist layout on /dev/sda is unchanged.
     modules =

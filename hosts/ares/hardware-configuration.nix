@@ -8,7 +8,11 @@
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "sr_mod" "sdhci" ];
+  # Skylake (i5-6500) desktop case: USB is exposed solely via xHCI;
+  # legacy ehci_pci is no longer routed. sdhci dropped because the
+  # desktop case has no SD card slot. sd_mod/ahci/sr_mod/usbhid/
+  # usb_storage stay for SATA SSD + USB peripherals + optical.
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "sr_mod" ];
   boot.initrd = {
     kernelModules = [ "kvm-intel" ];
   };

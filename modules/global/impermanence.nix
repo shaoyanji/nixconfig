@@ -23,7 +23,6 @@ _: {
         ".config/obsidian"
         ".zen"
         "nixconfig"
-        ".steam"
         {
           directory = ".local/share/Steam";
         }

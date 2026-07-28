@@ -74,11 +74,16 @@ in {
     kind = "nixos";
     system = "x86_64-linux";
     specialArgs = {inherit inputs self;};
+    # ares was a Lenovo T440p laptop until 2026-Q3; the SSD has been
+    # moved into a desktop case (i5-6500, 8GB, GTX 750 Ti Kepler dGPU).
+    # The T440p-specific nixos-hardware module is dropped here because
+    # Lenovo-specific fan curves / power management don't apply to
+    # desktop boards.  Impermanence chain is kept because the btrfs
+    # /persist layout on /dev/sda is unchanged.
     modules =
       globalModulesImpermanence
       ++ [
         ../hosts/ares/configuration.nix
-        inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t440p
         (import ../hosts/common/disko.nix {device = "/dev/sda";})
       ];
   };

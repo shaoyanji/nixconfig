@@ -6,6 +6,7 @@
     ../../modules/profiles/impermanence.nix
     ../../modules/profiles/base-desktop-environment.nix
     ../../modules/profiles/laptop.nix
+    ../../modules/profiles/steam.nix
   ];
 
   environment.systemPackages = with pkgs; [

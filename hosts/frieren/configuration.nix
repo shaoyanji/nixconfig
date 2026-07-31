@@ -119,18 +119,15 @@ in {
   # --- Samba Configuration ---
   services.samba = {
     enable = true;
-    securityType = "user";
     settings = {
       global = {
+        security = "user";
         workgroup = "WORKGROUP";
         "server string" = config.networking.hostName;
         "netbios name" = config.networking.hostName;
         "map to guest" = "bad user";
         "guest account" = "nobody";
       };
-    };
-
-    shares = {
       data = {
         path = "/export/data";
         "browseable" = "yes";
@@ -138,6 +135,7 @@ in {
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
+        "force user" = "devji";
       };
       private = {
         path = "/export/private";
@@ -146,6 +144,7 @@ in {
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
+        "force user" = "devji";
       };
       public = {
         path = "/export/public";
@@ -154,6 +153,7 @@ in {
         "guest ok" = "no";
         "create mask" = "0644";
         "directory mask" = "0755";
+        "force user" = "devji";
       };
     };
   };
@@ -201,6 +201,7 @@ in {
   # Ensure directories exist
   systemd.tmpfiles.rules = [
     "d /srv/data 0755 root root -"
+    "d /srv/data/downloads 0775 aria2 users -"
     "d /srv/private 0755 root root -"
     "d /srv/public 0755 root root -"
     "d /export 0755 root root -"

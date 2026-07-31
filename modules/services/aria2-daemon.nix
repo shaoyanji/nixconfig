@@ -136,6 +136,11 @@ in {
       };
     };
 
+    # Ensure downloads are world-readable so NFS/SMB clients can access them.
+    # The native services.aria2 module already sets UMask=0022; we use mkDefault
+    # to avoid a conflict while still explicitly documenting the intent.
+    systemd.services.aria2.serviceConfig.UMask = lib.mkDefault "022";
+
     # Nginx vhost: serves AriaNg static UI and reverse-proxies /jsonrpc.
     services.nginx = lib.mkIf cfg.nginx.enable {
       enable = true;

@@ -37,6 +37,20 @@ in
   # mode).  Both compositors rely on XWayland for legacy app support.
   services.xserver.enable = true;
 
+  # --- Bluetooth (wireless controllers in Steam + niri) ---
+  hardware.bluetooth.enable = true;
+
+  # --- Wayland environment (workstation mode) ---
+  # Force Electron/Chromium and Qt apps to use native Wayland instead
+  # of falling back to X11/XWayland.  base-node.nix sets TERM; these
+  # are merged additively by the NixOS module system.
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    QT_QPA_PLATFORM = "wayland";
+    QT_QPA_PLATFORMTHEME = "kde";
+    XDG_MENU_PREFIX = "plasma-";
+  };
+
   # --- Niri compositor (workstation mode) ---
   # Installs the niri Wayland compositor and its session wrapper
   # (`niri-session`) at the NixOS level, which greetd uses as the

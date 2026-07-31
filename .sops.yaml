@@ -34,7 +34,7 @@ keys:
   - &frierenhost age1njrjwpkuhxctx5nzfjjsg7dggazwsw9se6gpzta8wh52n343ngysepqt2k
   - &frieren age1rt9xrc78y78p78da0vca0dz7vr3gf6g0vlzqss5e38mnjxkg4paqj4jxxl
   - &eisenhost age1vc6w2gjl8php5czvkep7p5lxwxrq4yhq0xr7c7f9c8ctzw07eamsdgl7th
-  # - &eisen <age-key>        # TODO: devji's user age key for eisen
+  - &eisen age1aa4qucm8ww00c7zshct635rt37nh3ucxgtg4aj3l42zzls7l054shhphg9
 
 creation_rules:
   - path_regex: modules/.*\.(yaml|json|env|ini)$
@@ -70,6 +70,7 @@ creation_rules:
           - *frierenhost
           - *frieren
           - *eisenhost
+          - *eisen
     key_groups:
       - age:
           - *devji

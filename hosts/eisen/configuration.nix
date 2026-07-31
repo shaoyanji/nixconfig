@@ -28,6 +28,7 @@ in
     ../../modules/profiles/steamos.nix
     ../../modules/profiles/sunshine.nix
     ../../modules/profiles/base-node.nix
+    ../../modules/profiles/nas-client.nix
   ];
 
   networking.hostName = "eisen";

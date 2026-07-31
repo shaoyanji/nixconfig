@@ -15,6 +15,9 @@
 # Future: 16 TB HDD (media library) + 1 TB SSD (Steam library).
 #         Add fileSystems entries and mount points when drives arrive.
 { config, pkgs, ... }:
+let
+  user = import ../../modules/global/user.nix;
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -74,12 +77,31 @@
   #   options = [ "defaults" "noatime" ];
   # };
 
-  # Power profile: Xeon E5-2673 v3 TDP is 120 W.  The CPU governor
-  # defaults to "powersave" which is fine for a streaming box (most
-  # heavy lifting is on the GPU).  If latency-sensitive workloads
-  # (competitive shooters at >120 fps) need more CPU responsiveness,
-  # switch to "performance" via:
-  #   powerManagement.cpuFreqGovernor = "performance";
+  # --- CPU governor: performance for low-latency 4K gaming ---
+  # The Xeon E5-2673 v3 defaults to powersave. For competitive Dota 2 at
+  # 4K with simultaneous Sunshine encoding, the CPU needs to ramp quickly.
+  # Cost is ~20 W extra at idle (120 W TDP chip, so mostly irrelevant).
+  powerManagement.cpuFreqGovernor = "performance";
+
+  # --- Steam shader cache on tmpfs (16 GB RAM disk) ---
+  # Dota 2 and other Vulkan/OpenGL titles compile shaders on first launch.
+  # Keeping the cache in RAM eliminates NVMe wear and reduces stutter from
+  # shader compilation during gameplay.  16 GB leaves 48 GB for page cache
+  # and active game data — more than enough for any single game.
+  fileSystems."${user.home}/.steam/steam/steamapps/shadercache" = {
+    device = "tmpfs";
+    fsType = "tmpfs";
+    options = [
+      "size=16G"
+      "mode=0755"
+      "uid=1000"
+      "gid=100"
+    ];
+  };
+
+  systemd.tmpfiles.rules = [
+    "d ${user.home}/.steam/steam/steamapps/shadercache 0755 devji users - -"
+  ];
 
   services.openssh.enable = true;
   system.stateVersion = "25.05";

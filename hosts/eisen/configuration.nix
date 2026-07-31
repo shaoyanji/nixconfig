@@ -111,21 +111,39 @@ in
     btop # prettier system monitor
   ];
 
-  # --- Placeholder: future /mnt/media (16 TB HDD) ---
-  # Uncomment and adjust when the drive is installed:
+  # --- Storage drives (commented out — uncomment after formatting) ---
+  #
+  # 16 TB HDD → /mnt/media (ext4, media library)
+  # 1 TB SSD  → /mnt/steam (btrfs+zstd, Steam library)
+  #
+  # Setup steps on eisen (SSH in):
+  #   1. Identify drives:  lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
+  #   2. Format HDD:       sudo mkfs.ext4 -L media /dev/sdX
+  #   3. Format SSD:       sudo mkfs.btrfs -L steam /dev/sdY
+  #   4. Get UUIDs:        lsblk -o NAME,UUID,LABEL
+  #   5. Fill in UUIDs below and uncomment both fileSystems blocks
+  #   6. Rebuild:          sudo nixos-rebuild switch --flake github:shaoyanji/nixconfig#eisen
+  #   7. Own the SSD:      sudo chown devji:users /mnt/steam
+  #   8. Add in Steam:     Settings → Storage → Add Drive → /mnt/steam
   #
   # fileSystems."/mnt/media" = {
-  #   device = "/dev/disk/by-uuid/<UUID>";
-  #   fsType = "ext4";  # or btrfs / xfs
-  #   options = [ "defaults" "noatime" ];
-  # };
-  #
-  # --- Placeholder: future /mnt/steam (1 TB SSD Steam library) ---
-  # fileSystems."/mnt/steam" = {
-  #   device = "/dev/disk/by-uuid/<UUID>";
+  #   device = "/dev/disk/by-uuid/<MEDIA_UUID>";
   #   fsType = "ext4";
   #   options = [ "defaults" "noatime" ];
   # };
+  #
+  # fileSystems."/mnt/steam" = {
+  #   device = "/dev/disk/by-uuid/<STEAM_UUID>";
+  #   fsType = "btrfs";
+  #   options = [ "compress=zstd" "noatime" "autodefrag" ];
+  # };
+  #
+  # # Uncomment these tmpfiles rules when uncommenting the mounts above:
+  # systemd.tmpfiles.rules = [
+  #   "d /mnt/media 0755 root root - -"
+  #   "d /mnt/steam 0755 root root - -"
+  #   "d /mnt/steam/SteamLibrary 0755 devji users - -"
+  # ];
 
   # --- CPU governor: performance for low-latency 4K gaming ---
   # The Xeon E5-2673 v3 defaults to powersave. For competitive Dota 2 at

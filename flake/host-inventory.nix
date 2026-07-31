@@ -67,7 +67,7 @@ in {
     kind = "nixos";
     system = "x86_64-linux";
     specialArgs = {inherit inputs self;};
-    modules = globalModulesContainers ++ [../hosts/frieren/configuration.nix];
+    modules = globalModulesNixos ++ [../hosts/frieren/configuration.nix];
   };
 
   ares = {

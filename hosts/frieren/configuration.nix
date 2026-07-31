@@ -3,21 +3,32 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  user = import ../../modules/global/user.nix;
+  dpmsOff = pkgs.writeShellScript "dpms-off" ''
+    for d in /sys/class/drm/card*-*/dpms; do
+      [ -w "$d" ] && printf 'Off\n' > "$d" 2>/dev/null || true
+    done
+  '';
+  dpmsOn = pkgs.writeShellScript "dpms-on" ''
+    for d in /sys/class/drm/card*-*/dpms; do
+      [ -w "$d" ] && printf 'On\n' > "$d" 2>/dev/null || true
+    done
+  '';
+in {
   imports = [
     ./hardware-configuration.nix
     ./hardware.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/server-hardening.nix
     ../../modules/profiles/laptop.nix
+    ../../modules/profiles/base-desktop-environment.nix
     ./dns.nix
     ./media-stack.nix
     ./paperless.nix
     ./tools.nix
     ./networking.nix
     ../../modules/services/aria2-daemon.nix
-
-    # ... your imports ...
   ];
   networking.hostName = "frieren";
 
@@ -36,9 +47,10 @@
     nginx.listenPort = 6801;
   };
 
-  # --- Boot parameters for power saving ---
+  # --- Boot parameters for GPU power saving ---
+  # consoleblank removed — display output is now active for the media center.
+  # i915 power saving params are still good for the iGPU even with active display.
   boot.kernelParams = [
-    "consoleblank=30" # Blank console after 30s idle
     "i915.enable_dc=2" # DC5/DC6 deep power saving on i915
     "i915.enable_psr=2" # Panel Self-Refresh v2 (eDP power saving)
     "i915.enable_guc=2" # GuC submission + HuC loading (HEVC encoding)
@@ -53,46 +65,42 @@
   # --- Thermal management (controls fan curve on Intel) ---
   services.thermald.enable = true;
 
+  # --- Display / compositor ---
+  services.displayManager.sddm = {
+    enable = false;
+    wayland.enable = true;
+  };
+
+  programs.dank-material-shell.greeter = {
+    enable = true;
+    compositor.name = "niri";
+    configHome = user.home; # Sync themes with user's DankMaterialShell config
+  };
+
+  # --- Screen idle management: DPMS off after 10 min inactivity, back on with input ---
+  # Runs as a system service (root) because /sys/class/drm/*/dpms requires root write.
+  # swayidle monitors input devices globally; dpms writes are harmless no-ops when no
+  # display is active.
+  systemd.services.dpms-idle = {
+    description = "DPMS screen blanking on idle";
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.swayidle}/bin/swayidle -w \
+        timeout 600 '${dpmsOff}' \
+        resume '${dpmsOn}'";
+      Restart = "on-failure";
+    };
+  };
+
+  # --- Logind: ignore lid switch (laptop-as-server), keep idle handling for DPMS ---
   services.logind = {
     lidSwitch = "ignore";
     lidSwitchDocked = "ignore";
     lidSwitchExternalPower = "ignore";
   };
 
-  # --- Override auto-cpufreq: even on charger, stay in powersave (server, not workstation) ---
-  services.auto-cpufreq.settings.charger = {
-    governor = lib.mkDefault "powersave";
-    # turbo = "never";
-  };
-
-  # --- Turn off the internal display at boot (headless server) ---
-  systemd.services.frieren-headless = {
-    description = "Frieren headless server — turn off display and set GPU power saving";
-    after = ["multi-user.target"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      # Turn off internal display backlight
-      for bl in /sys/class/backlight/*/brightness; do
-        [ -f "$bl" ] && echo 0 > "$bl" 2>/dev/null || true
-      done
-      # Put GPU into automatic power saving
-      echo auto > /sys/class/drm/card0/power/control 2>/dev/null || true
-      # Put PCI devices into auto power saving
-      for ctrl in /sys/class/drm/card0/*/power/control; do
-        [ -f "$ctrl" ] && echo auto > "$ctrl" 2>/dev/null || true
-      done
-      # Enable battery conservation mode (~60% charge limit, extends battery life)
-      for cons in /sys/bus/platform/drivers/ideapad_acpi/*/conservation_mode; do
-        [ -f "$cons" ] && echo 1 > "$cons" 2>/dev/null || true
-      done
-    '';
-  };
-
-  # Disable all forms of sleep
+  # --- Disable all forms of system sleep (server must stay up) ---
   systemd.sleep.settings.Sleep = {
     AllowSuspend = "no";
     AllowHibernation = "no";
@@ -100,16 +108,14 @@
     AllowSuspendThenHibernate = "no";
   };
 
-  # Disable automatic suspend
+  # --- Power management: auto-cpufreq handles governor switching ---
+  # Removed the charger → powersave override; laptop.nix defaults to
+  # performance on charger which is appropriate for 4K media center use.
   powerManagement = {
     enable = true;
     powerDownCommands = "";
-    cpuFreqGovernor = "powersave"; # 24/7 server, no need for performance governor
   };
 
-  # --- Boot Settings (optional but recommended) ---
-  # Skip boot menu timeout (no keyboard needed)
-  boot.loader.grub.timeout = 0;
   # --- Samba Configuration ---
   services.samba = {
     enable = true;

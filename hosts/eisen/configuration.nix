@@ -133,6 +133,17 @@ in
   # Cost is ~20 W extra at idle (120 W TDP chip, so mostly irrelevant).
   powerManagement.cpuFreqGovernor = "performance";
 
+  # --- scx_rusty CPU scheduler ---
+  # scx (sched_ext) rusty is a BPF-based scheduler optimized for
+  # interactive desktop responsiveness.  On a 12c/24t Xeon running both
+  # gaming (Steam/Sunshine) and workstation workloads (niri/kitty/dev),
+  # rusty keeps the foreground compositor and game threads responsive
+  # while background tasks (builds, ffmpeg) use the remaining cores.
+  services.scx = {
+    enable = true;
+    scheduler = "scx_rusty";
+  };
+
   # --- Steam shader cache on tmpfs (16 GB RAM disk) ---
   # Dota 2 and other Vulkan/OpenGL titles compile shaders on first launch.
   # Keeping the cache in RAM eliminates NVMe wear and reduces stutter from

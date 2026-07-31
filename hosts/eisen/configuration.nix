@@ -113,23 +113,29 @@ in
 
   # --- Storage drives (commented out — uncomment after formatting) ---
   #
-  # 16 TB HDD → /mnt/media (ext4, media library)
+  # 16 TB HDD → /mnt/media (btrfs+zstd, media library)
   # 1 TB SSD  → /mnt/steam (btrfs+zstd, Steam library)
+  #
+  # Both drives use btrfs with zstd compression.  Media files (video,
+  # audio, images) are already compressed and won't shrink much, but
+  # btrfs gives us snapshots, checksums, and scrubbing — same as the
+  # NVMe root.  The Steam SSD benefits from compression on game assets.
   #
   # Setup steps on eisen (SSH in):
   #   1. Identify drives:  lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
-  #   2. Format HDD:       sudo mkfs.ext4 -L media /dev/sdX
+  #   2. Format HDD:       sudo mkfs.btrfs -L media /dev/sdX
   #   3. Format SSD:       sudo mkfs.btrfs -L steam /dev/sdY
   #   4. Get UUIDs:        lsblk -o NAME,UUID,LABEL
   #   5. Fill in UUIDs below and uncomment both fileSystems blocks
-  #   6. Rebuild:          sudo nixos-rebuild switch --flake github:shaoyanji/nixconfig#eisen
-  #   7. Own the SSD:      sudo chown devji:users /mnt/steam
-  #   8. Add in Steam:     Settings → Storage → Add Drive → /mnt/steam
+  #   6. Add /mnt/media and /mnt/steam to autoScrub fileSystems below
+  #   7. Rebuild:          sudo nixos-rebuild switch --flake github:shaoyanji/nixconfig#eisen
+  #   8. Own the SSD:      sudo chown devji:users /mnt/steam
+  #   9. Add in Steam:     Settings → Storage → Add Drive → /mnt/steam
   #
   # fileSystems."/mnt/media" = {
   #   device = "/dev/disk/by-uuid/<MEDIA_UUID>";
-  #   fsType = "ext4";
-  #   options = [ "defaults" "noatime" ];
+  #   fsType = "btrfs";
+  #   options = [ "compress=zstd" "noatime" "autodefrag" ];
   # };
   #
   # fileSystems."/mnt/steam" = {
@@ -144,6 +150,20 @@ in
   #   "d /mnt/steam 0755 root root - -"
   #   "d /mnt/steam/SteamLibrary 0755 devji users - -"
   # ];
+
+  # --- Btrfs auto-scrub (monthly) ---
+  # The NVMe root has 5 subvolumes on btrfs.  Monthly scrub detects and
+  # repairs bit rot using checksums.  Add /mnt/media and /mnt/steam to
+  # the fileSystems list when those drives are uncommented above.
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly";
+    fileSystems = [
+      "/"
+      # "/mnt/media"
+      # "/mnt/steam"
+    ];
+  };
 
   # --- CPU governor: performance for low-latency 4K gaming ---
   # The Xeon E5-2673 v3 defaults to powersave. For competitive Dota 2 at

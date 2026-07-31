@@ -94,10 +94,10 @@ in {
   };
 
   # --- Logind: ignore lid switch (laptop-as-server), keep idle handling for DPMS ---
-  services.logind = {
-    lidSwitch = "ignore";
-    lidSwitchDocked = "ignore";
-    lidSwitchExternalPower = "ignore";
+  services.logind.settings.Login = {
+    HandleLidSwitch = "ignore";
+    HandleLidSwitchDocked = "ignore";
+    HandleLidSwitchExternalPower = "ignore";
   };
 
   # --- Disable all forms of system sleep (server must stay up) ---

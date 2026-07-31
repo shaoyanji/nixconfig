@@ -93,11 +93,11 @@ in {
     };
   };
 
-  # --- Logind: ignore lid switch (laptop-as-server), keep idle handling for DPMS ---
+  # --- Logind: lock on lid close (media center: blank screen but keep HDMI output active, server stays up)
   services.logind.settings.Login = {
-    HandleLidSwitch = "ignore";
+    HandleLidSwitch = "lock";
     HandleLidSwitchDocked = "ignore";
-    HandleLidSwitchExternalPower = "ignore";
+    HandleLidSwitchExternalPower = "lock";
   };
 
   # --- Disable all forms of system sleep (server must stay up) ---

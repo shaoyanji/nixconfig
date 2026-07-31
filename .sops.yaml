@@ -33,6 +33,8 @@ keys:
   - &aristotledevji age1srn0wh9f35xt3pt877wvvasp44ezrkftn99d64d0pc4xx54rqesqh6q0zm
   - &frierenhost age1njrjwpkuhxctx5nzfjjsg7dggazwsw9se6gpzta8wh52n343ngysepqt2k
   - &frieren age1rt9xrc78y78p78da0vca0dz7vr3gf6g0vlzqss5e38mnjxkg4paqj4jxxl
+  # - &eisenhost <age-key>   # TODO: ssh-to-age < /etc/ssh/ssh_host_ed25519_key.pub on eisen
+  # - &eisen <age-key>        # TODO: devji's user age key for eisen
 
 creation_rules:
   - path_regex: modules/.*\.(yaml|json|env|ini)$
@@ -67,7 +69,8 @@ creation_rules:
           - *aristotledevji
           - *frierenhost
           - *frieren
-  - path_regex: /[^/]+\.(yaml|json|env|ini)$
+          # - *eisenhost   # TODO: uncomment after adding age keys above
+          # - *eisen
     key_groups:
       - age:
           - *devji

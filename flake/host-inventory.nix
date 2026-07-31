@@ -52,12 +52,15 @@ in
     specialArgs = { inherit inputs self; };
     modules = globalModulesContainers ++ [ ../hosts/deckstation/configuration.nix ];
   };
-
   eisen = {
     kind = "nixos";
     system = "x86_64-linux";
     specialArgs = { inherit inputs self; };
-    modules = globalModulesContainers ++ [ ../hosts/eisen/configuration.nix ];
+    # globalModulesNixos (instead of globalModulesContainers) gives eisen
+    # the full role:heim desktop (niri, kitty, dev, zen) alongside the
+    # Steam kiosk session.  greetd handles dual-boot: Steam on startup,
+    # niri desktop when Steam exits.
+    modules = globalModulesNixos ++ [ ../hosts/eisen/configuration.nix ];
   };
 
   applevalley = {

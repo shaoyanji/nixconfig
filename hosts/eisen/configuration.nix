@@ -15,8 +15,8 @@
 #        RX 5700 VCN 2.0 handles H.264/H.265 encode for Sunshine
 #        streaming and ffmpeg transcoding workloads.
 #
-# Future: 16 TB HDD (media library) + 1 TB SSD (Steam library).
-#         Add fileSystems entries and mount points when drives arrive.
+# Storage: /mnt/steam = sda (931.5G HDD, btrfs+zstd) — Steam library, live.
+# Future:  16 TB HDD → /mnt/media (media library) when the drive arrives.
 { config, lib, pkgs, ... }:
 let
   user = import ../../modules/global/user.nix;
@@ -126,57 +126,47 @@ in
     btop # prettier system monitor
   ];
 
-  # --- Storage drives (commented out — uncomment after formatting) ---
+  # --- Storage drives ---
   #
-  # 16 TB HDD → /mnt/media (btrfs+zstd, media library)
-  # 1 TB SSD  → /mnt/steam (btrfs+zstd, Steam library)
+  # /mnt/steam: sda — 931.5G HDD (formerly the Proxmox install), formatted
+  # as a single btrfs partition labeled `steam` (btrfs+zstd).  Mounted
+  # by-label so no UUID needs tracking, with `nofail` so a missing label
+  # never blocks boot into emergency mode.  After first mount, own it once:
+  #   sudo chown devji:users /mnt/steam
+  # Then add it in Steam: Settings → Storage → Add Drive → /mnt/steam.
   #
-  # Both drives use btrfs with zstd compression.  Media files (video,
-  # audio, images) are already compressed and won't shrink much, but
-  # btrfs gives us snapshots, checksums, and scrubbing — same as the
-  # NVMe root.  The Steam SSD benefits from compression on game assets.
-  #
-  # Setup steps on eisen (SSH in):
-  #   1. Identify drives:  lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
-  #   2. Format HDD:       sudo mkfs.btrfs -L media /dev/sdX
-  #   3. Format SSD:       sudo mkfs.btrfs -L steam /dev/sdY
-  #   4. Get UUIDs:        lsblk -o NAME,UUID,LABEL
-  #   5. Fill in UUIDs below and uncomment both fileSystems blocks
-  #   6. Add /mnt/media and /mnt/steam to autoScrub fileSystems below
-  #   7. Rebuild:          sudo nixos-rebuild switch --flake github:shaoyanji/nixconfig#eisen
-  #   8. Own the SSD:      sudo chown devji:users /mnt/steam
-  #   9. Add in Steam:     Settings → Storage → Add Drive → /mnt/steam
+  # /mnt/media (FUTURE): 16 TB HDD → media library.  When the drive
+  # arrives: mkfs.btrfs -L media /dev/sdX, then uncomment the block
+  # below and add it to autoScrub.
   #
   # fileSystems."/mnt/media" = {
-  #   device = "/dev/disk/by-uuid/<MEDIA_UUID>";
+  #   device = "/dev/disk/by-label/media";
   #   fsType = "btrfs";
   #   options = [ "compress=zstd" "noatime" "autodefrag" ];
   # };
-  #
-  # fileSystems."/mnt/steam" = {
-  #   device = "/dev/disk/by-uuid/<STEAM_UUID>";
-  #   fsType = "btrfs";
-  #   options = [ "compress=zstd" "noatime" "autodefrag" ];
-  # };
-  #
-  # # Uncomment these tmpfiles rules when uncommenting the mounts above:
-  # systemd.tmpfiles.rules = [
-  #   "d /mnt/media 0755 root root - -"
-  #   "d /mnt/steam 0755 root root - -"
-  #   "d /mnt/steam/SteamLibrary 0755 devji users - -"
-  # ];
+
+  fileSystems."/mnt/steam" = {
+    device = "/dev/disk/by-label/steam";
+    fsType = "btrfs";
+    options = [ "compress=zstd" "noatime" "autodefrag" "nofail" ];
+  };
+
+  # tmpfs shadercache dir.  The /mnt/steam mountpoint is created by the
+  # mount unit itself; ownership is set once via chown after first mount.
+  systemd.tmpfiles.rules = [
+    "d ${user.home}/.steam/steam/steamapps/shadercache 0755 devji users - -"
+  ];
 
   # --- Btrfs auto-scrub (monthly) ---
-  # The NVMe root has 5 subvolumes on btrfs.  Monthly scrub detects and
-  # repairs bit rot using checksums.  Add /mnt/media and /mnt/steam to
-  # the fileSystems list when those drives are uncommented above.
+  # The NVMe root and the Steam library are btrfs.  Monthly scrub
+  # detects and repairs bit rot using checksums.  Add /mnt/media when
+  # that drive is provisioned.
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
     fileSystems = [
       "/"
-      # "/mnt/media"
-      # "/mnt/steam"
+      "/mnt/steam"
     ];
   };
 
@@ -212,10 +202,6 @@ in
       "gid=100"
     ];
   };
-
-  systemd.tmpfiles.rules = [
-    "d ${user.home}/.steam/steam/steamapps/shadercache 0755 devji users - -"
-  ];
 
   services.openssh.enable = true;
   system.stateVersion = "25.05";

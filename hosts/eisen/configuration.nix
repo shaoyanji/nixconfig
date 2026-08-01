@@ -1,4 +1,4 @@
-# eisen — Xeon E5-2673 v3 + RX 5700 + 64 GB RAM dual-role machine.
+# eisen — Xeon E5-2673 v3 + RX 5700 + 64 GB RAM Steam kiosk.
 #
 # Hardware:
 #   CPU:  Intel Xeon E5-2673 v3 (Haswell-EP, 12c/24t, no iGPU)
@@ -7,17 +7,21 @@
 #   SSD:  128 GB NVMe (BTRFS: @root, @nix, @persist, @log, @snapshots)
 #   Boot: UEFI (systemd-boot on /dev/disk/by-uuid/34F9-8033)
 #
-# Role:  Dual-specialization machine via greetd session switching.
-#        - Console mode (default): Steam Big Picture via cage, auto-login
-#          on boot.  Sunshine GameStream for Moonlight clients.
-#        - Workstation mode: exit Steam → niri desktop auto-launches
-#          with full role:heim tooling (kitty, zen, dev, AI agents).
-#        RX 5700 VCN 2.0 handles H.264/H.265 encode for Sunshine
-#        streaming and ffmpeg transcoding workloads.
+# Role:  Pure Steam Big Picture kiosk (headless 4K gaming console).
+#        greetd auto-logs devji into gamescope-session (cage + steam
+#        -gamepadui) on boot — the entire user-facing UI.  Sunshine
+#        GameStream for Moonlight clients.  RX 5700 VCN 2.0 handles
+#        H.264/H.265 encode for streaming and ffmpeg transcoding.
+#
+# NOTE:  The NixOS `specialisation.workstation` AND the greetd
+#        dual-session (initial_session/default_session) experiments both
+#        hung boot at graphical.target.  This is the known-good
+#        first-commit baseline: globalModulesContainers (noDE), no niri,
+#        no desktop modules in the closure.
 #
 # Storage: /mnt/steam = sda (931.5G HDD, btrfs+zstd) — Steam library, live.
 # Future:  16 TB HDD → /mnt/media (media library) when the drive arrives.
-{ config, lib, pkgs, ... }:
+{ pkgs, ... }:
 let
   user = import ../../modules/global/user.nix;
 in
@@ -34,72 +38,14 @@ in
   networking.hostName = "eisen";
 
   # X server is required so XWayland can host legacy X11-only windows
-  # that Steam spawns inside cage (console mode) and niri (workstation
-  # mode).  Both compositors rely on XWayland for legacy app support.
+  # that Steam spawns inside cage's Wayland surface.  No desktop
+  # environment is configured — greetd auto-logs devji into
+  # gamescope-session (cage + steam -gamepadui) which is the entire
+  # user-facing UI.
   services.xserver.enable = true;
 
-  # --- Bluetooth (wireless controllers in Steam + niri) ---
+  # --- Bluetooth (wireless controllers in Steam) ---
   hardware.bluetooth.enable = true;
-
-  # --- Wayland environment (workstation mode) ---
-  # Force Electron/Chromium and Qt apps to use native Wayland instead
-  # of falling back to X11/XWayland.  base-node.nix sets TERM; these
-  # are merged additively by the NixOS module system.
-  environment.sessionVariables = {
-    NIXOS_OZONE_WL = "1";
-    QT_QPA_PLATFORM = "wayland";
-    QT_QPA_PLATFORMTHEME = "kde";
-    XDG_MENU_PREFIX = "plasma-";
-  };
-
-  # --- Niri compositor (workstation mode) ---
-  # Installs the niri Wayland compositor and its session wrapper
-  # (`niri-session`) at the NixOS level, which greetd uses as the
-  # fallback session when Steam exits.  Home-manager config for niri
-  # (keybinds, theming, DMS integration) comes from role:heim via
-  # the globalModulesNixos module chain.
-  programs.niri.enable = true;
-
-  # --- XDG Desktop Portal (needed by niri for file dialogs, screenshots) ---
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [
-      kdePackages.xdg-desktop-portal-kde
-      xdg-desktop-portal-gtk
-    ];
-    config.common = {
-      default = [ "kde" "gtk" ];
-      "org.freedesktop.impl.portal.FileChooser" = [ "kde" "gtk" ];
-    };
-    config.niri = lib.mkForce {
-      default = [ "kde" "gtk" ];
-      "org.freedesktop.impl.portal.FileChooser" = [ "kde" "gtk" ];
-    };
-  };
-
-  # --- greetd dual-session: Steam kiosk → niri desktop ---
-  # Overrides steamos.nix's permanent auto-login.  greetd's
-  # `initial_session` runs once on boot (Steam Big Picture).  When
-  # Steam/cage exits, greetd falls back to `default_session` which
-  # launches a full niri desktop.  Exiting niri relaunches niri.
-  #
-  # To switch modes:
-  #   Console → Workstation: exit Steam Big Picture (Steam menu → Exit)
-  #   Workstation → Console: run `steam -gamepadui` from niri, or
-  #     `sudo systemctl restart greetd` to reboot the session stack.
-  services.greetd = {
-    enable = true;
-    settings = lib.mkForce {
-      initial_session = {
-        user = "devji";
-        command = "gamescope-session";
-      };
-      default_session = {
-        user = "devji";
-        command = "niri-session";
-      };
-    };
-  };
 
   # --- Tailscale mesh networking ---
   # Enables the eisen host on the tailnet so Moonlight clients can stream
@@ -175,17 +121,6 @@ in
   # 4K with simultaneous Sunshine encoding, the CPU needs to ramp quickly.
   # Cost is ~20 W extra at idle (120 W TDP chip, so mostly irrelevant).
   powerManagement.cpuFreqGovernor = "performance";
-
-  # --- scx_rusty CPU scheduler ---
-  # scx (sched_ext) rusty is a BPF-based scheduler optimized for
-  # interactive desktop responsiveness.  On a 12c/24t Xeon running both
-  # gaming (Steam/Sunshine) and workstation workloads (niri/kitty/dev),
-  # rusty keeps the foreground compositor and game threads responsive
-  # while background tasks (builds, ffmpeg) use the remaining cores.
-  services.scx = {
-    enable = true;
-    scheduler = "scx_rusty";
-  };
 
   # --- Steam shader cache on tmpfs (16 GB RAM disk) ---
   # Dota 2 and other Vulkan/OpenGL titles compile shaders on first launch.

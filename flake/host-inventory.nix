@@ -88,13 +88,19 @@ in
     system = "x86_64-linux";
     specialArgs = { inherit inputs self; };
     # ares is the T440p SSD moved into a desktop case (i5-6500 + GTX
-    # 750 Ti).  The T440p-specific nixos-hardware module is dropped
-    # because Lenovo fan curves / power management do not apply to
-    # desktop boards.  Impermanence chain is kept because the btrfs
-    # /persist layout on /dev/sda is unchanged.
+    # 750 Ti).  Converted to a Steam Big Picture kiosk (steamos.nix)
+    # mirroring eisen/kellerbench.  Uses the noDE containers chain +
+    # impermanence (root wiped each boot; devji home + /etc persisted
+    # to /persist).  The T440p-specific nixos-hardware module is
+    # dropped because Lenovo fan curves / power management do not
+    # apply to desktop boards.  The btrfs /persist layout on /dev/sda
+    # is unchanged (disko).
     modules =
-      globalModulesImpermanence
+      globalModulesContainers
       ++ [
+        inputs.impermanence.nixosModules.impermanence
+        inputs.disko.nixosModules.default
+        ../modules/global/impermanence.nix
         ../hosts/ares/configuration.nix
         (import ../hosts/common/disko.nix { device = "/dev/sda"; })
       ];

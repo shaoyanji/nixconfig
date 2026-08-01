@@ -23,5 +23,10 @@
   };
 
   # --- Power management (laptop-as-server, battery = built-in UPS) ---
-  powerManagement.powertop.enable = true;
+  # powertop is intentionally NOT enabled: its `--auto-tune` boot service
+  # enables USB autosuspend, which kills the Intel combo Bluetooth adapter
+  # (the classic powertop BT-killer) — frieren needs reliable BT input for
+  # the TV keyboard/mouse. `powerManagement.enable = true` (configuration.nix)
+  # already handles CPU frequency scaling. Re-add powertop only if you also
+  # add a udev rule exempting the BT USB device from autosuspend.
 }

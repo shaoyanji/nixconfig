@@ -81,8 +81,7 @@ let
     # background helpers (SteamUpdate, SteamWebHelper); without `-s`
     # cage would exit as soon as Steam's initial process forks.
     #
-    # Fallback (round 6, if cage also fails): drop the wrapper
-    # entirely and run steam under X11 via `${pkgs.xorg.xinit}/bin/xinit
+    # Fallback (round 6, if cage also fails): drop the wrapper    #    entirely and run steam under X11 via `${pkgs.xinit}/bin/xinit
     # "${pkgs.steam}/bin/steam -gamepadui" -- :0 vt1 -nolisten tcp` -
     # services.xserver.enable = true is already set on kellerbench.
     #

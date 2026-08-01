@@ -1,9 +1,9 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}: let
+{ config
+, pkgs
+, lib
+, ...
+}:
+let
   user = import ../../modules/global/user.nix;
   dpmsOff = pkgs.writeShellScript "dpms-off" ''
     for d in /sys/class/drm/card*-*/dpms; do
@@ -15,7 +15,19 @@
       [ -w "$d" ] && printf 'On\n' > "$d" 2>/dev/null || true
     done
   '';
-in {
+  # Belt-and-suspenders rfkill unblock: the Ideapad EC can boot with BT
+  # soft-blocked (Fn+F8 state persisted across reboots). The standalone
+  # `rfkill` binary no longer exists in this nixpkgs revision, so clear the
+  # sysfs attribute directly for bluetooth-type rfkill devices only.
+  unblockBtRfkill = pkgs.writeShellScript "unblock-bt-rfkill" ''
+    for f in /sys/class/rfkill/rfkill*/soft; do
+      [ -f "$f" ] || continue
+      type=''${f%/soft}/type
+      [ "$(cat "$type" 2>/dev/null)" = "bluetooth" ] && printf '0\n' > "$f" 2>/dev/null || true
+    done
+  '';
+in
+{
   imports = [
     ./hardware-configuration.nix
     ./hardware.nix
@@ -60,7 +72,35 @@ in {
   ];
 
   # --- Ensure ideapad_laptop kernel module is loaded for conservation mode ---
-  boot.kernelModules = ["ideapad_laptop"];
+  boot.kernelModules = [ "ideapad_laptop" ];
+
+  # --- Bluetooth (TV keyboard/mouse) ---
+  # Explicit at host level so the media center keeps BT input even if
+  # desktop-client defaults change. powerOnBoot + AutoEnable ensure the
+  # adapter re-powers after every boot/reboot.
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings.Policy.AutoEnable = "true";
+  }; # --- Bluetooth rfkill safeguard (belt-and-suspenders) ---
+  # The Ideapad EC (embedded controller) can boot with BT rfkill-blocked
+  # (Fn+F8 state persisted across reboots), which bluez config alone cannot
+  # override — bluetoothctl shows "No default controller available" despite
+  # the service running. `systemd-rfkill.service` restores the previously
+  # saved rfkill state at boot, so this unit runs AFTER it to guarantee our
+  # unblock wins. Only clears soft-blocks; a hard-block (EC hardware cutoff)
+  # still needs the Fn+F8 toggle — verify via `bluetoothctl list` / the
+  # /sys/class/rfkill/*/soft attributes if BT stays missing after reboot.
+  systemd.services.unblock-bluetooth = {
+    description = "Unblock Bluetooth rfkill at boot";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "systemd-rfkill.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${unblockBtRfkill}";
+      RemainAfterExit = true;
+    };
+  };
 
   # --- Thermal management (controls fan curve on Intel) ---
   services.thermald.enable = true;
@@ -83,7 +123,7 @@ in {
   # display is active.
   systemd.services.dpms-idle = {
     description = "DPMS screen blanking on idle";
-    wantedBy = ["multi-user.target"];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${pkgs.swayidle}/bin/swayidle -w \
@@ -159,9 +199,9 @@ in {
   };
 
   # Samba RuntimeDirectory fix
-  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory = ["lock" "lock/samba"];
-  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory = ["lock" "lock/samba"];
-  systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = ["lock" "lock/samba"];
+  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+  systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
 
   # Samba WSDD
   services.samba-wsdd = {
@@ -185,17 +225,17 @@ in {
   fileSystems."/export/data" = {
     device = "/srv/data";
     fsType = "none";
-    options = ["bind"];
+    options = [ "bind" ];
   };
   fileSystems."/export/private" = {
     device = "/srv/private";
     fsType = "none";
-    options = ["bind"];
+    options = [ "bind" ];
   };
   fileSystems."/export/public" = {
     device = "/srv/public";
     fsType = "none";
-    options = ["bind"];
+    options = [ "bind" ];
   };
 
   # Ensure directories exist
@@ -226,14 +266,14 @@ in {
       28981 # Paperless-ngx
       42617 # ZeroClaw dashboard
     ];
-    allowedUDPPorts = [137 138];
+    allowedUDPPorts = [ 137 138 ];
   };
 
   # Btrfs auto-scrub - RESTORED all filesystems
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
-    fileSystems = ["/" "/srv/data" "/srv/private" "/srv/public"];
+    fileSystems = [ "/" "/srv/data" "/srv/private" "/srv/public" ];
   };
 
   # Networking

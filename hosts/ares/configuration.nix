@@ -1,32 +1,53 @@
-{pkgs, ...}: {
+# ares — Steam Big Picture kiosk (i5-6500 Skylake + GTX 750 Ti).
+#
+# Hardware:
+#   CPU:  Intel i5-6500 (Skylake, 4c/4t)
+#   GPU:  NVIDIA GTX 750 Ti (Kepler sm_30, legacy_580 driver)
+#   Boot: UEFI (systemd-boot) — disko btrfs layout on /dev/sda
+#         (@root ephemeral, /persist + /nix subvolumes)
+#
+# Role:  Steam Big Picture kiosk mirroring eisen/kellerbench.  greetd
+#        auto-logs devji into gamescope-session (cage + steam
+#        -gamepadui) on boot — the entire user-facing UI.  Root is
+#        recreated each boot (impermanence); devji home + /etc are
+#        persisted to /persist.
+#
+# NOTE:  GTX 750 Ti is Kepler sm_30 — the same GPU as kellerbench.  The
+#        host-scoped programs.steam.gamescopeSession.enable = mkForce
+#        false override is REQUIRED: the upstream-generated
+#        gamescope-session script (from steam.nix) shadows our
+#        cage-based wrapper in steamos.nix and segfaults on the
+#        incomplete legacy_580 Vulkan ICD.  See
+#        hosts/kellerbench/configuration.nix for the full rationale.
+{ lib, ... }:
+{
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia-gt-750-ti.nix
+    # Impermanence root rotation + /persist/system persistence.
     ../../modules/profiles/impermanence.nix
-    ../../modules/profiles/base-desktop-environment.nix
-    ../../modules/profiles/laptop.nix
-    ../../modules/profiles/steam.nix
+    ../../modules/profiles/steamos.nix
+    ../../modules/profiles/base-node.nix
   ];
-
-  environment.systemPackages = with pkgs; [
-    # alacritty
-  ];
-
-  # X server is required so XWayland (Niri's fallback for X11-only apps)
-  # and the mkForce on services.xserver.videoDrivers = [ "nvidia" ]
-  # in nvidia-gt-750-ti.nix actually take effect on the desktop case.
-  # Neither base-desktop-environment.nix nor laptop.nix flips this on
-  # by default, so we set it host-scoped here for ares only.
-  services.xserver.enable = true;
-
-  # seatd is required so libseat (used by Niri/Smithay and any wlroots
-  # compositor) has a backend to talk to.  Without this, libseat falls
-  # through to systemd-logind which is not running for the user session
-  # under greetd auto-login paths, producing intermittent DRM lease
-  # failures (one symptom is the same black screen this rollback fixes).
-  services.seatd.enable = true;
 
   networking.hostName = "ares";
+
+  # X server is required so XWayland can host legacy X11-only windows
+  # that Steam spawns inside cage's Wayland surface.  No desktop
+  # environment is configured — greetd auto-logs devji into
+  # gamescope-session (cage + steam -gamepadui) which is the entire
+  # user-facing UI.
+  services.xserver.enable = true;
+
+  # Kepler sm_30 override — see NOTE at top.  mkForce priority 50 wins
+  # over steam.nix's plain assignment (priority 100).
+  programs.steam.gamescopeSession.enable = lib.mkForce false;
+
+  # noDE kiosk — the dms/niri greeter lives in
+  # modules/profiles/impermanence-greeter.nix which is intentionally NOT
+  # imported here (the dms option does not exist in the containers chain
+  # closure).
+
   system.stateVersion = "25.05";
 }

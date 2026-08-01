@@ -71,6 +71,3 @@ creation_rules:
           - *frieren
           - *eisenhost
           - *eisen
-    key_groups:
-      - age:
-          - *devji

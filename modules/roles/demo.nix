@@ -1,7 +1,6 @@
-{
-  pkgs,
-  lib,
-  ...
+{ pkgs
+, lib
+, ...
 }: {
   imports = [
     ../shell/base.nix
@@ -73,7 +72,7 @@
   programs.niri.settings = {
     input.focus-follows-mouse.enable = true;
     layout.focus-ring.enable = false;
-    layout.border = {};
+    layout.border = { };
 
     window-rules = [
       {
@@ -87,34 +86,39 @@
       }
     ];
 
-    binds = {
+    # The demo role defines its own complete keymap, but imports
+    # ../user/desktop/niri.nix (via this role) which also defines binds.
+    # niri's binds `action` is a uniq-typed path, so any overlapping key
+    # (e.g. "Mod+0") errors with "defined multiple times while it's
+    # expected to be unique".  mkForce makes the demo keymap win wholesale.
+    binds = lib.mkForce {
       "Mod+Return".action.spawn = "foot";
       "Mod+A".action.spawn = "fuzzel";
-      "Mod+Q".action.close-window = [];
+      "Mod+Q".action.close-window = [ ];
       "Mod+Q".repeat = false;
-      "Mod+F".action.maximize-column = [];
-      "Mod+Shift+F".action.fullscreen-window = [];
-      "Mod+R".action.switch-preset-column-width = [];
+      "Mod+F".action.maximize-column = [ ];
+      "Mod+Shift+F".action.fullscreen-window = [ ];
+      "Mod+R".action.switch-preset-column-width = [ ];
       "Mod+T".action.spawn-sh = "foot -- tmux";
-      "Mod+W".action.toggle-window-floating = [];
-      "Mod+S".action.screenshot = [];
-      "Mod+Print".action.screenshot-screen = {show-pointer = false;};
+      "Mod+W".action.toggle-window-floating = [ ];
+      "Mod+S".action.screenshot = [ ];
+      "Mod+Print".action.screenshot-screen = { show-pointer = false; };
       "Mod+Escape".action.spawn = "wlogout";
 
-      "Mod+H".action.focus-column-left = [];
-      "Mod+J".action.focus-workspace-down = [];
-      "Mod+K".action.focus-workspace-up = [];
-      "Mod+L".action.focus-column-right = [];
+      "Mod+H".action.focus-column-left = [ ];
+      "Mod+J".action.focus-workspace-down = [ ];
+      "Mod+K".action.focus-workspace-up = [ ];
+      "Mod+L".action.focus-column-right = [ ];
 
-      "Mod+Shift+H".action.move-column-left = [];
-      "Mod+Shift+J".action.move-workspace-down = [];
-      "Mod+Shift+K".action.move-workspace-up = [];
-      "Mod+Shift+L".action.move-column-right = [];
+      "Mod+Shift+H".action.move-column-left = [ ];
+      "Mod+Shift+J".action.move-workspace-down = [ ];
+      "Mod+Shift+K".action.move-workspace-up = [ ];
+      "Mod+Shift+L".action.move-column-right = [ ];
 
-      "Mod+Ctrl+H".action.move-column-to-workspace-down = [];
-      "Mod+Ctrl+J".action.move-column-to-workspace-up = [];
-      "Mod+Ctrl+K".action.move-column-to-workspace-down = [];
-      "Mod+Ctrl+L".action.move-column-to-workspace-up = [];
+      "Mod+Ctrl+H".action.move-column-to-workspace-down = [ ];
+      "Mod+Ctrl+J".action.move-column-to-workspace-up = [ ];
+      "Mod+Ctrl+K".action.move-column-to-workspace-down = [ ];
+      "Mod+Ctrl+L".action.move-column-to-workspace-up = [ ];
 
       "Mod+1".action.focus-workspace = 1;
       "Mod+2".action.focus-workspace = 2;
@@ -125,7 +129,7 @@
       "Mod+7".action.focus-workspace = 7;
       "Mod+8".action.focus-workspace = 8;
       "Mod+9".action.focus-workspace = 9;
-      "Mod+0".action.focus-workspace-previous = [];
+      "Mod+0".action.focus-workspace-previous = [ ];
 
       "Mod+Ctrl+1".action.move-column-to-workspace = 1;
       "Mod+Ctrl+2".action.move-column-to-workspace = 2;
@@ -137,9 +141,9 @@
       "Mod+Ctrl+8".action.move-column-to-workspace = 8;
       "Mod+Ctrl+9".action.move-column-to-workspace = 9;
 
-      "Mod+WheelScrollDown".action.focus-workspace-down = [];
+      "Mod+WheelScrollDown".action.focus-workspace-down = [ ];
       "Mod+WheelScrollDown".cooldown-ms = 150;
-      "Mod+WheelScrollUp".action.focus-workspace-up = [];
+      "Mod+WheelScrollUp".action.focus-workspace-up = [ ];
       "Mod+WheelScrollUp".cooldown-ms = 150;
     };
   };
@@ -169,7 +173,7 @@
       };
     };
     systemd.enable = false;
-    settings = {};
+    settings = { };
   };
 
 }

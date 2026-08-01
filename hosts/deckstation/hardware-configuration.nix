@@ -22,11 +22,14 @@
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
-  # Example ext4 root — replace device + fsType with `blkid` output.
-  # fileSystems."/" = {
-  #   device = "/dev/disk/by-label/nixos";
-  #   fsType = "ext4";
-  # };
+  # Placeholder root file system — REQUIRED for evaluation (host-eval-all).
+  # Replace device + fsType with the target machine's `blkid` output before
+  # the first deploy.  lib.mkDefault so a real nixos-generate-config output
+  # (plain assignment, higher priority) overrides this cleanly.
+  fileSystems."/" = lib.mkDefault {
+    device = "/dev/disk/by-label/nixos";
+    fsType = "ext4";
+  };
 
   # swapDevices = [ ];
 

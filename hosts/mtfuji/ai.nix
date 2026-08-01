@@ -1,14 +1,15 @@
-{
-  config,
-  pkgs,
-  self,
-  ...
-}: let
+{ config
+, pkgs
+, self
+, ...
+}:
+let
   enableNullClaw = true;
   enableHermes = false;
   enableXS = false;
   enablePancakesHarness = false;
-in {
+in
+{
   imports = [
     # ../../modules/services/hermes-ai-mounts.nix
     ../../modules/services/ai-services-secrets.nix
@@ -50,12 +51,12 @@ in {
     };
     xs = {
       enable = enableXS;
-      package = self.packages.${pkgs.system}.xs;
+      package = self.packages.${pkgs.stdenv.hostPlatform.system}.xs;
       storePath = "/var/lib/xs/store";
     };
     pancakesHarness = {
       enable = enablePancakesHarness;
-      package = self.packages.${pkgs.system}.pancakes-harness;
+      package = self.packages.${pkgs.stdenv.hostPlatform.system}.pancakes-harness;
       backendMode = "xs";
       xsTopicPrefix = "pancakes-harness";
       bind = "127.0.0.1";
@@ -77,17 +78,17 @@ in {
     "/var/lib/nullclaw" = {
       device = "/dev/disk/by-uuid/3829936d-db07-4b77-b89a-46a2476578ce";
       fsType = "btrfs";
-      options = ["subvol=nix/nullclaw" "compress=zstd" "noatime"];
+      options = [ "subvol=nix/nullclaw" "compress=zstd" "noatime" ];
     };
     "/var/lib/ollama" = {
       device = "/dev/disk/by-uuid/3829936d-db07-4b77-b89a-46a2476578ce";
       fsType = "btrfs";
-      options = ["subvol=nix/ollama" "compress=zstd" "noatime"];
+      options = [ "subvol=nix/ollama" "compress=zstd" "noatime" ];
     };
     "/var/lib/hermes" = {
       device = "/dev/disk/by-uuid/3829936d-db07-4b77-b89a-46a2476578ce";
       fsType = "btrfs";
-      options = ["subvol=nix/hermes" "compress=zstd" "noatime"];
+      options = [ "subvol=nix/hermes" "compress=zstd" "noatime" ];
     };
   };
 

@@ -1,14 +1,15 @@
-{
-  inputs,
-  config,
-  pkgs,
-  ...
-}: let
+{ inputs
+, config
+, pkgs
+, ...
+}:
+let
   # nullclawPort = 3001;
   bountystashPort = 3000;
   # nullclawLocalUpstream = "http://127.0.0.1:${toString nullclawPort}/";
   bountystashLocalUpstream = "http://127.0.0.1:${toString bountystashPort}/";
-in {
+in
+{
   garnix.server.enable = true;
   networking.hostName = "garnixMachine";
 
@@ -36,7 +37,7 @@ in {
   users.users.devji = {
     isNormalUser = true;
     description = "devji";
-    extraGroups = ["wheel" "systemd-journal"];
+    extraGroups = [ "wheel" "systemd-journal" ];
     openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };
 
@@ -52,7 +53,7 @@ in {
   # };
 
   environment.systemPackages = [
-    # self.packages.${pkgs.system}.nullclaw
+    # self.packages.${pkgs.stdenv.hostPlatform.system}.nullclaw
     pkgs.htop
     pkgs.tree
     pkgs.jq
@@ -85,9 +86,9 @@ in {
 
   systemd.services.bountystash = {
     description = "Bountystash web app";
-    wantedBy = ["multi-user.target"];
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
 
     environment = {
       PORT = toString bountystashPort;
@@ -96,7 +97,7 @@ in {
 
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${inputs.bountystash.packages.${pkgs.system}.default}/bin/web";
+      ExecStart = "${inputs.bountystash.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/web";
       EnvironmentFile = config.sops.secrets.bountystash-env.path;
       Restart = "on-failure";
       RestartSec = "2s";
@@ -138,5 +139,5 @@ in {
   system.stateVersion = "25.05";
   nixpkgs.hostPlatform = "x86_64-linux";
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }

@@ -1,12 +1,13 @@
-{
-  config,
-  lib,
-  ...
-}: let
+{ config
+, lib
+, ...
+}:
+let
   cfg = config.aiServices.zeroclawDeployment;
-  aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
+  aiServicesMounts = import ../lib/ai-services-mounts.nix { inherit lib; };
   inherit (lib) mkIf mkOption types optionalAttrs;
-in {
+in
+{
   imports = [
     ./zeroclaw.nix
   ];
@@ -50,8 +51,8 @@ in {
 
     extraEnvironmentFiles = mkOption {
       type = types.listOf types.str;
-      default = [];
-      example = ["/run/secrets/zeroclaw-telegram"];
+      default = [ ];
+      example = [ "/run/secrets/zeroclaw-telegram" ];
       description = ''
         Additional environment files appended with higher priority
         than environmentFile. Use for instance-specific secrets such
@@ -60,8 +61,10 @@ in {
     };
 
     settings = mkOption {
-      type = types.attrs;
-      default = {};
+      # types.attrs is deprecated in nixpkgs; attrsOf unspecified preserves
+      # the recursive-merge semantics with the modern type.
+      type = types.attrsOf types.unspecified;
+      default = { };
       example = {
         channels.telegram = {
           enabled = true;
@@ -82,19 +85,19 @@ in {
 
     extraSystemPackages = mkOption {
       type = types.listOf types.package;
-      default = [];
+      default = [ ];
       description = "Additional packages added to the unit's PATH.";
     };
 
     protectHome = mkOption {
-      type = types.either types.bool (types.enum ["read-only" "tmpfs"]);
+      type = types.either types.bool (types.enum [ "read-only" "tmpfs" ]);
       default = true;
       description = "ProtectHome= hardening for the systemd unit.";
     };
 
     bindReadOnlyPaths = mkOption {
       type = types.attrsOf types.path;
-      default = {};
+      default = { };
       description = "Read-only bind-mounts (target = source).";
     };
   } // aiServicesMounts.mkMountOptions "zeroclaw";
@@ -126,14 +129,16 @@ in {
     };
 
     # Mount shared context/auth/state + append extra env files
-    systemd.services."zeroclaw-${cfg.instanceName}" = let
-      mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
-    in {
-      serviceConfig = mountConfig
-        // {
-          EnvironmentFile = (mountConfig.EnvironmentFile or [])
+    systemd.services."zeroclaw-${cfg.instanceName}" =
+      let
+        mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
+      in
+      {
+        serviceConfig = mountConfig
+          // {
+          EnvironmentFile = (mountConfig.EnvironmentFile or [ ])
             ++ cfg.extraEnvironmentFiles;
         };
-    };
+      };
   };
 }

@@ -5,17 +5,16 @@
 #
 # Usage:
 #   imports = [ ../../modules/profiles/hermes-defaults.nix ];
-{
-  config,
-  lib,
-  pkgs,
-  inputs,
-  ...
+{ config
+, lib
+, pkgs
+, inputs
+, ...
 }: {
   config = lib.mkIf (config.services.hermes-agent.enable or false) {
     services.hermes-agent = {
       # extraDependencyGroups = ["messaging"]; # ← enables python-telegram-bot
-      package = lib.mkDefault inputs.hermes-agent.packages.${pkgs.system}.default;
+      package = lib.mkDefault inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
       stateDir = lib.mkDefault "/var/lib/hermes";
       settings = lib.mkDefault {
         model = {
@@ -98,7 +97,7 @@
         web = {
           backend = "tavily";
         };
-        toolsets = ["all"];
+        toolsets = [ "all" ];
         memory.provider = "holographic";
       };
     };

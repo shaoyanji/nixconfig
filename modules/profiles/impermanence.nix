@@ -1,12 +1,17 @@
-_: let
-  user = import ../global/user.nix;
-in {
+# NOTE: the dms/niri greeter used to live here but is now extracted to
+# ./impermanence-greeter.nix.  Even `lib.mkIf false` cannot define the
+# `programs.dank-material-shell` path on noDE hosts — the module system
+# walks config paths structurally and throws "option does not exist"
+# before mkIf conditions are evaluated.  Desktop hosts (dms in closure)
+# import ./impermanence-greeter.nix alongside this profile; noDE kiosks
+# (e.g. ares) import only this one.
+_: {
   boot.initrd.systemd.services = {
     impermanence-root = {
       description = "Set up impermanence root subvolume";
-      wantedBy = ["initrd.target"];
-      after = ["sysroot.mount"];
-      before = ["sysroot-rootfs.target"];
+      wantedBy = [ "initrd.target" ];
+      after = [ "sysroot.mount" ];
+      before = [ "sysroot-rootfs.target" ];
       unitConfig.DefaultDependencies = false;
       serviceConfig.Type = "oneshot";
       script = ''
@@ -37,7 +42,7 @@ in {
   };
 
   fileSystems."/etc/ssh".neededForBoot = true;
-  fileSystems."/etc/ssh".options = ["bind"];
+  fileSystems."/etc/ssh".options = [ "bind" ];
   fileSystems."/etc/ssh".device = "/persist/system/etc/ssh";
   fileSystems."/etc/ssh".fsType = "btrfs";
   fileSystems."/persist".neededForBoot = true;
@@ -71,7 +76,7 @@ in {
       "/etc/machine-id"
       {
         file = "/var/keys/secret_file";
-        parentDirectory = {mode = "u=rwx,g=,o=";};
+        parentDirectory = { mode = "u=rwx,g=,o="; };
       }
     ];
   };
@@ -85,14 +90,8 @@ in {
     btrfs.autoScrub = {
       enable = true;
       interval = "monthly";
-      fileSystems = ["/"];
+      fileSystems = [ "/" ];
     };
-  };
-
-  programs.dank-material-shell.greeter = {
-    enable = true;
-    compositor.name = "niri";
-    configHome = user.home;
   };
 
   programs.fuse.userAllowOther = true;

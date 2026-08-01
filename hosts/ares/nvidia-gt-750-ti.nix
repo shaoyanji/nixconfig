@@ -1,14 +1,14 @@
-{
-  config,
-  lib,
-  ...
+{ config
+, lib
+, ...
 }: {
   # ares desktop case hosts a GTX 750 Ti (Kepler sm_30) dGPU on /dev/sda,
   # paired with an i5-6500 Skylake mainboard.  Mirrors
   # hosts/kellerbench/nvidia-gt-750-ti.nix verbatim: same
   # nvidiaPackages.legacy_580 driver, same nvidia_drm KMS
-  # force-modprobe.  Pair with the dms-greeter / Niri (Smithay)
-  # compositor that consumes /dev/dri/card0 via seatd.
+  # force-modprobe.  Pair with the cage kiosk compositor from steamos.nix
+  # (greetd auto-logs devji into gamescope-session) that consumes
+  # /dev/dri/card0 via seatd.
   #
   # Group wiring below is co-located with the GPU profile so devji
   # can open /dev/dri/renderD* (render), /dev/dri/card0 (video), and
@@ -18,7 +18,7 @@
   # user lands on a black screen.
   powerManagement.enable = true;
 
-  services.xserver.videoDrivers = lib.mkForce ["modesetting" "nvidia"];
+  services.xserver.videoDrivers = lib.mkForce [ "modesetting" "nvidia" ];
 
   nixpkgs.config = {
     nvidia.acceptLicense = true;
@@ -54,7 +54,7 @@
   # lib.mkAfter (priority ~10) appends to the extraGroups list set by
   # base-node.nix without overriding its wheel/networkmanager
   # ownership; mkAfter on a list attribute merges additively.
-  users.users.devji.extraGroups = lib.mkAfter ["video" "render" "input"];
+  users.users.devji.extraGroups = lib.mkAfter [ "video" "render" "input" ];
 
   # Force nvidia_drm KMS on so any wlroots-based compositor (Niri,
   # gamescope, cage, sway, etc.) can grab the DRM device via seatd.

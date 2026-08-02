@@ -11,6 +11,12 @@ tasks:
       - nix eval .#packages.x86_64-linux.nullclaw.meta.mainProgram
       - nix build .#checks.x86_64-linux.host-architecture -L
       - task checks:nix:lint
+      - task checks:sops:drift
+
+  checks:sops:drift:
+    desc: Verify every sops file's embedded age recipients match .sops.yaml (catches un-rekeyed files)
+    cmds:
+      - bash scripts/task/sops-drift-check.sh
 
   checks:nullclaw:smoke:*:
     desc: Smoke-check nullclaw deployment on a remote host

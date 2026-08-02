@@ -5,16 +5,6 @@
 }:
 let
   user = import ../../modules/global/user.nix;
-  dpmsOff = pkgs.writeShellScript "dpms-off" ''
-    for d in /sys/class/drm/card*-*/dpms; do
-      [ -w "$d" ] && printf 'Off\n' > "$d" 2>/dev/null || true
-    done
-  '';
-  dpmsOn = pkgs.writeShellScript "dpms-on" ''
-    for d in /sys/class/drm/card*-*/dpms; do
-      [ -w "$d" ] && printf 'On\n' > "$d" 2>/dev/null || true
-    done
-  '';
   # Belt-and-suspenders rfkill unblock: the Ideapad EC can boot with BT
   # soft-blocked (Fn+F8 state persisted across reboots). The standalone
   # `rfkill` binary no longer exists in this nixpkgs revision, so clear the
@@ -117,21 +107,10 @@ in
     configHome = user.home; # Sync themes with user's DankMaterialShell config
   };
 
-  # --- Screen idle management: DPMS off after 10 min inactivity, back on with input ---
-  # Runs as a system service (root) because /sys/class/drm/*/dpms requires root write.
-  # swayidle monitors input devices globally; dpms writes are harmless no-ops when no
-  # display is active.
-  systemd.services.dpms-idle = {
-    description = "DPMS screen blanking on idle";
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${pkgs.swayidle}/bin/swayidle -w \
-        timeout 600 '${dpmsOff}' \
-        resume '${dpmsOn}'";
-      Restart = "on-failure";
-    };
-  };
+  # --- Screen idle management: swayidle runs as a user-level spawn-at-startup
+  # in the niri compositor config (modules/user/desktop/niri.nix), using niri
+  # IPC actions (power-off-monitors / power-on-monitors) instead of root-level
+  # /sys writes.  The compositor owns the DRM lease — DPMS must go through it.
 
   # --- Logind: lock on lid close (media center: blank screen but keep HDMI output active, server stays up)
   services.logind.settings.Login = {

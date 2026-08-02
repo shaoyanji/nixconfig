@@ -56,19 +56,27 @@ tasks:
       - scripts/task/sops-edit-commit.sh "{{.SECRETS}}" "{{.ENC_DETASKFILE}}" "detaskfile - update"
       - scripts/task/sops-decrypt-to.sh "{{.SECRETS}}/{{.ENC_DETASKFILE}}" "$HOME/Taskfile.yml"
 
+  infra:secrets:sync:
+    desc: Sync the mirrored secrets yaml in modules/ from the submodule (idempotent)
+    cmds:
+      - cp -f {{.SECRETS}}/{{.ENC_SECRETS}} {{.SECRETS}}.yaml
+      - echo "Synced {{.SECRETS}}/{{.ENC_SECRETS}} -> {{.SECRETS}}.yaml"
+
   infra:secrets:edit:secrets:
     desc: Edit encrypted secrets and sync local mirrored yaml
     cmds:
       - sops edit {{.SECRETS}}/{{.ENC_SECRETS}}
-      - rm {{.SECRETS}}.yaml && cp {{.SECRETS}}/{{.ENC_SECRETS}} {{.SECRETS}}.yaml
+      - task infra:secrets:sync
       - cd {{.SECRETS}} && git add {{.ENC_SECRETS}} && git commit -m "secrets - update" && git push origin HEAD:master
 
   infra:sops:update-keys:
-    desc: Rotate SOPS recipient keys and push secret repo changes
+    desc: Rotate SOPS recipient keys across ALL sops files, resync mirror, push secret repo changes
     cmds:
       - sops updatekeys {{.SECRETS}}/*.yaml
-      - sops updatekeys {{.SECRETS}}.yaml
+      - sops updatekeys modules/ssh-ca-key.yaml
+      - task infra:secrets:sync
       - cd {{.SECRETS}} && git switch master && git add *.yaml .sops.yaml && git commit -m "updated sops keys" && git push
+      - echo "Reminder — commit in the main repo too: modules/secrets.yaml, modules/ssh-ca-key.yaml, .sops.yaml"
 
   infra:secrets:decrypt:detaskfile-home:
     internal: true

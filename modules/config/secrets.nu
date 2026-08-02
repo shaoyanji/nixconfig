@@ -57,8 +57,13 @@ export-env {
   # Helper: true only when a REAL binary is on PATH.
   # `which` alone is fooled by externs declared in completion scripts
   # (e.g. bitwarden-cli-completions.nu declares `bw` with an empty path).
+  # We must also verify the resolved path exists on disk.
   def has_bin [name: string] {
-    (which $name | where path != "" | is-not-empty)
+    try {
+      let found = (which $name | where path != "" | first)
+      if $found == null { return false }
+      ($found.path | path exists)
+    } catch { false }
   }
 
   let sops_path  = $"($env.HOME)/nixconfig/modules/secrets/apikeys.yaml"

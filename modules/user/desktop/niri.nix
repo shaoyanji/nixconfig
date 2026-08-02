@@ -38,6 +38,19 @@
     input.warp-mouse-to-focus.enable = true;
     layout.focus-ring.enable = false;
     layout.border = {};
+
+    # swayidle manages DPMS via niri IPC (compositor owns the DRM lease).
+    # No root-level /sys writes — niri handles monitor power natively.
+    spawn-at-startup = [
+      {
+        command = [
+          "${pkgs.swayidle}/bin/swayidle"
+          "-w"
+          "timeout" "600" "${pkgs.niri}/bin/niri msg action power-off-monitors"
+          "resume" "${pkgs.niri}/bin/niri msg action power-on-monitors"
+        ];
+      }
+    ];
     window-rules = [
       {
         geometry-corner-radius = let

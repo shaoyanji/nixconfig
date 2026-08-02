@@ -6,6 +6,19 @@ on:
   push:
   # pull_request:
 jobs:
+  sops-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+      - name: Sync repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+          token: "${{ secrets.GH_PAT }}"
+      - name: Check sops recipient drift
+        run: bash scripts/task/sops-drift-check.sh
   build-machines:
     strategy:
       matrix:

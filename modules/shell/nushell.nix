@@ -39,6 +39,9 @@
               | prepend ~/.nix-profile/bin
               | append /usr/bin/env
           )
+          # secrets.nu lives in-repo now (was a sha256-pinned gist; too much
+          # friction for something so OS-integrated — see modules/config/secrets.nu)
+          source ${../config/secrets.nu}
           ${builtins.concatStringsSep "\n" (builtins.map (x: "source " + builtins.fetchurl x) (builtins.fromJSON (builtins.readFile ../config/nu.json)))}
           # source ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nix.nu
           source ${pkgs.nu_scripts}/share/nu_scripts/modules/data_extraction/ultimate_extractor.nu

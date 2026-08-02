@@ -11,7 +11,8 @@ Run validation and smoke checks for AI service deployments and Nix code quality.
 
 | Task | Description |
 |------|-------------|
-| `checks:quick` | Narrow repo health checks (eval hosts, build host-architecture, nix lint) |
+| `checks:quick` | Narrow repo health checks (eval hosts, build host-architecture, nix lint, sops drift) |
+| `checks:sops:drift` | Verify every sops file's embedded age recipients match `.sops.yaml` (catches un-rekeyed files before they break host activation) |
 
 ## Nullclaw smoke checks
 

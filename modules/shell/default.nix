@@ -44,6 +44,10 @@ in {
     };
     fzf.enable = true;
     fzf.enableBashIntegration = true;
+    # Nushell integration disabled: HM's nushell-fzf-integration.nu uses
+    # deprecated `str downcase` (nu 0.114) and spams a warning at every
+    # shell start. Re-enable once home-manager ships the fixed script.
+    fzf.enableNushellIntegration = false;
     fzf.tmux.enableShellIntegration = true;
     ripgrep.enable = true;
   };

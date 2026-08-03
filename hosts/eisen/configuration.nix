@@ -21,11 +21,9 @@
 #
 # Storage: /mnt/steam = sda (931.5G HDD, btrfs+zstd) — Steam library, live.
 # Future:  16 TB HDD → /mnt/media (media library) when the drive arrives.
-{ pkgs, ... }:
-let
+{pkgs, ...}: let
   user = import ../../modules/global/user.nix;
-in
-{
+in {
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
@@ -94,7 +92,13 @@ in
   fileSystems."/mnt/steam" = {
     device = "/dev/disk/by-label/steam";
     fsType = "btrfs";
-    options = [ "compress=zstd" "noatime" "autodefrag" "nofail" ];
+    options = ["compress=zstd" "noatime" "autodefrag" "nofail"];
+  };
+
+  fileSystems."/mnt/storage" = {
+    device = "/dev/disk/by-label/storage";
+    fsType = "btrfs";
+    options = ["compress=zstd" "noatime" "autodefrag" "nofail"];
   };
 
   # tmpfs shadercache dir.  The /mnt/steam mountpoint is created by the

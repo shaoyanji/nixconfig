@@ -1,10 +1,11 @@
 # scratch — Fujitsu ESPRIMO D556 mini tower (i5-6500 Skylake, 128 GB f2fs SSD).
 #
-# ⚠️ TODO(deploy): replace the two SCRATCH-* UUID placeholders below with the
-# real values from the machine before the first deploy:
-#   lsblk -f      # f2fs root UUID + vfat ESP UUID
-# or:
-#   blkid         # /dev/sda* partition UUIDs
+# UUIDs sourced from the original nixos-generate-config for this machine
+# (gist.github.com/shaoyanji/12006e57e885fc3864e9197826d69276):
+#   root = f2fs  by-uuid/6353b865-96ba-4ba9-8d2f-4f996862508e
+#   boot = ext4  by-uuid/c0f1f0cb-501a-4ce0-a5fc-006557662a4c
+# Note: /boot is ext4 (legacy BIOS + GRUB) — NOT a vfat ESP, so
+# systemd-boot is disabled and GRUB installs to the MBR (see configuration.nix).
 { config, lib, modulesPath, ... }:
 
 {
@@ -27,16 +28,20 @@
 
   fileSystems."/" =
     {
-      device = "/dev/disk/by-uuid/SCRATCH-F2FS-ROOT-UUID";
+      device = "/dev/disk/by-uuid/6353b865-96ba-4ba9-8d2f-4f996862508e";
       fsType = "f2fs";
-      options = [ "noatime" ];
+      options = [
+        "noatime"
+        "compress_algorithm=zstd"
+        "compress_chksum"
+        "background_gc=on"
+      ];
     };
 
   fileSystems."/boot" =
     {
-      device = "/dev/disk/by-uuid/SCRATCH-ESP-UUID";
-      fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
+      device = "/dev/disk/by-uuid/c0f1f0cb-501a-4ce0-a5fc-006557662a4c";
+      fsType = "ext4";
     };
 
   # zram only — no disk swap on the shaky SSD.

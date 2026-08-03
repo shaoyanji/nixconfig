@@ -22,15 +22,18 @@ in {
     ../../modules/profiles/steam.nix
     ../../modules/profiles/base-desktop-environment.nix
     ../../modules/profiles/laptop.nix
-    inputs.microvm.nixosModules.host
+    # microVM DISABLED (2026-08): testvm no longer runs on poseidon.
+    # Re-enable by uncommenting the microvm host module + microvm-host.nix
+    # profile import below and the microvm.vms block further down.
+    # inputs.microvm.nixosModules.host
 
     ../../modules/services/ai-services-secrets.nix
     ../../modules/services/zeroclaw-deployment.nix
     ../../modules/profiles/ai-host.nix
-    (import ../../modules/profiles/microvm-host.nix {
-      inherit pkgs;
-      natExternalInterface = "wlp4s0";
-    })
+    # (import ../../modules/profiles/microvm-host.nix {
+    #   inherit pkgs;
+    #   natExternalInterface = "wlp4s0";
+    # })
   ];
 
   aiServices.sharedSecrets.enable = true;
@@ -85,35 +88,37 @@ in {
     '';
   };
 
-  # Use microbr bridge for VMs (configured by microvm-host.nix)
-  microvm.vms = {
-    testvm = {
-      config = {
-        imports = [
-          inputs.microvm.nixosModules.microvm
-          (import ../microvms/testvm.nix {
-            workspaceSource = "${user.home}/workspace";
-            agentsSource = "${user.home}/.agents";
-            configureNetworkd = true;
-            useDevNixDefaults = true;
-            authorizedKeys = config.ssh.authorizedKeys.keys;
-          })
-        ];
-        microvm.hypervisor = "cloud-hypervisor";
-        microvm.vsock.cid = 10;
-
-        environment.systemPackages = with pkgs; [
-          curl
-          git
-          jq
-          yq-go
-          go
-          skills
-          worktrunk
-        ];
-      };
-    };
-  };
+  # --- microVM testvm DISABLED (2026-08): no longer runs on poseidon. ---
+  # Commented out for easy re-enable. The microbr bridge/NAT wiring is also
+  # commented out above (microvm.nixosModules.host + microvm-host.nix import).
+  # microvm.vms = {
+  #   testvm = {
+  #     config = {
+  #       imports = [
+  #         inputs.microvm.nixosModules.microvm
+  #         (import ../microvms/testvm.nix {
+  #           workspaceSource = "${user.home}/workspace";
+  #           agentsSource = "${user.home}/.agents";
+  #           configureNetworkd = true;
+  #           useDevNixDefaults = true;
+  #           authorizedKeys = config.ssh.authorizedKeys.keys;
+  #         })
+  #       ];
+  #       microvm.hypervisor = "cloud-hypervisor";
+  #       microvm.vsock.cid = 10;
+  #
+  #       environment.systemPackages = with pkgs; [
+  #         curl
+  #         git
+  #         jq
+  #         yq-go
+  #         go
+  #         skills
+  #         worktrunk
+  #       ];
+  #     };
+  #   };
+  # };
   boot = {
     kernelPackages = lib.mkForce pkgs.linuxPackages;
     kernelModules = [];

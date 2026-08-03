@@ -18,11 +18,14 @@
 #     shadercache all on tmpfs (8 GB RAM budget)
 #   - journald volatile (RAM only), core dumps disabled
 #   - weekly fstrim + noatime + gentle writeback sysctls
-{ config, lib, pkgs, ... }:
-let
-  user = import ../../modules/global/user.nix;
-in
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  user = import ../../modules/global/user.nix;
+in {
   imports = [
     ./hardware-configuration.nix
     ../../modules/profiles/base-node.nix
@@ -72,33 +75,33 @@ in
   fileSystems."/var/log" = {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=128M" "mode=0755" "nosuid" "nodev" ];
+    options = ["size=128M" "mode=0755" "nosuid" "nodev"];
   };
 
   fileSystems."/var/tmp" = {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=256M" "mode=1777" "nosuid" "nodev" ];
+    options = ["size=256M" "mode=1777" "nosuid" "nodev"];
   };
 
   fileSystems."/var/cache" = {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=256M" "mode=0755" "nosuid" "nodev" ];
+    options = ["size=256M" "mode=0755" "nosuid" "nodev"];
   };
 
   # User + Steam caches in RAM (devji uid=1000, users gid=100).
   fileSystems."${user.home}/.cache" = {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=512M" "mode=0755" "uid=1000" "gid=100" ];
+    options = ["size=512M" "mode=0755" "uid=1000" "gid=100"];
   };
 
-  fileSystems."${user.home}/.steam/steam/steamapps/shadercache" = {
-    device = "tmpfs";
-    fsType = "tmpfs";
-    options = [ "size=512M" "mode=0755" "uid=1000" "gid=100" ];
-  };
+  # fileSystems."${user.home}/.steam/steam/steamapps/shadercache" = {
+  #   device = "tmpfs";
+  #   fsType = "tmpfs";
+  #   options = [ "size=512M" "mode=0755" "uid=1000" "gid=100" ];
+  # };
 
   # Journals live in RAM only — nothing hits the f2fs SSD.
   services.journald = {

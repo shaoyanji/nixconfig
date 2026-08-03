@@ -31,6 +31,18 @@ in
 
   networking.hostName = "scratch";
 
+  # /boot is ext4 (legacy BIOS + GRUB) — NOT a vfat ESP, so systemd-boot
+  # cannot be used. base-node's boot.nix defaults to systemd-boot; override
+  # per the machine's original layout (gist 12006e57e885fc3864e9197826d69276).
+  profiles.boot = {
+    systemd-boot = false;
+    efi = false;
+  };
+  boot.loader.grub = {
+    enable = true;
+    device = "/dev/sda"; # legacy BIOS MBR install — adjust if the disk is not sda
+  };
+
   # X server is required so XWayland can host legacy X11-only windows
   # that Steam spawns inside cage's Wayland surface. No desktop
   # environment — greetd auto-logs devji into gamescope-session
@@ -112,11 +124,8 @@ in
   boot.consoleLogLevel = 3;
 
   # ── Nix store hygiene: small store = less SSD churn ──
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 14d";
-  };
+  # GC is inherited from the global nix settings (modules/global/global.nix,
+  # `--delete-older-than 10d`); no host-local GC override needed.
   nix.optimise.automatic = true;
 
   environment.systemPackages = with pkgs; [

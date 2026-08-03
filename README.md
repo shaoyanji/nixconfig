@@ -447,7 +447,9 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 
 ## Recent changes
 
-**Last updated: 2026-05-08**
+**Last updated: 2026-08-03**
+
+**2026-08-03 — Poseidon microVM disabled; frieren daily self-upgrade; scratch real disk UUIDs + GRUB; GC consolidation.** The `testvm` microVM on `poseidon` no longer runs — the microvm imports and the `microvm.vms` block in `hosts/poseidon/configuration.nix` are commented out for easy re-enable (microbr bridge/NAT profile included). `frieren` (the NAS) now self-upgrades every morning at 04:00 via the canonical `system.autoUpgrade` module (no hand-rolled timer): it stages `nixos-rebuild boot` from `github:shaoyanji/nixconfig#frieren` first, then reboots into the new generation only if kernel/initrd/kernel-modules changed (`allowReboot`, reached only after a successful boot), otherwise applies a live `switch`. Persistent timer catches up if the NAS was off. `scratch` got its real disk UUIDs from the original machine gist (f2fs root + ext4 /boot) and now boots with GRUB (legacy BIOS) instead of systemd-boot; its redundant 14-day GC was dropped in favour of the global 10-day GC. See `.agents/deploy/hosts/frieren.md` and `.agents/deploy/hosts/scratch.md`.
 
 **2026-04-30 — Task system consolidation.** Deprecated legacy task aliases and menus, directing users to new `infra:` and `dev:` prefixed tasks. Simplified `checks:nullclaw:smoke` tasks and enhanced `dev:git` tasks with AI commit integration.
 

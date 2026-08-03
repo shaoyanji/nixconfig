@@ -5,6 +5,7 @@
 
 ## TestVM Follow-Up
 1. Inventory every host that embeds or plans to embed `testvm`-style microVM wiring.
+   - poseidon's `testvm` microVM is **disabled** (2026-08): the microvm imports and `microvm.vms` block are commented out in `hosts/poseidon/configuration.nix` for easy re-enable.
 2. Extend the shared guest baseline only when host-local bridge/share differences stay small.
 3. Keep host-local bridge/NAT, bind mounts, persistence, and external interface choices in the host files.
 4. Decide whether the standalone `testvm` output should eventually move into `modules/profiles/*` or stay under `hosts/microvms/*`.

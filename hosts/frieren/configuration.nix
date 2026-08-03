@@ -34,6 +34,31 @@ in
   ];
   networking.hostName = "frieren";
 
+  # --- Daily self-upgrade (04:00) ---
+  # Canonical system.autoUpgrade module (no hand-rolled timer/script). Runs
+  # as root via nixos-upgrade.service — equivalent to
+  # `sudo nixos-rebuild boot --flake github:shaoyanji/nixconfig#frieren`.
+  # allowReboot gives the smart boot-vs-switch behaviour:
+  #   1. always `nixos-rebuild boot` first (stages the new generation, no
+  #      live activation)
+  #   2. if the new generation's kernel/initrd/kernel-modules differ from the
+  #      booted system → reboot into it (`shutdown -r +1`) — only reached
+  #      when the boot command exited 0
+  #   3. otherwise the kernel is unchanged → plain `nixos-rebuild switch`
+  #      activates the config live, no reboot needed
+  # The `github:` ref fetches the public repo tarball; modules/secrets.yaml is
+  # a tracked file in the main repo, so eval works without the private
+  # modules/secrets submodule. Persistent timer: if the NAS is off at 04:00,
+  # the upgrade runs on next boot. Reboots are allowed any time (no
+  # rebootWindow) — a 04:00 NAS reboot is acceptable.
+  system.autoUpgrade = {
+    enable = true;
+    flake = "github:shaoyanji/nixconfig#frieren";
+    dates = "04:00";
+    allowReboot = true;
+    persistent = true;
+  };
+
   sops.secrets."aria2-rpc-secret" = {
     owner = "aria2";
     group = "aria2";

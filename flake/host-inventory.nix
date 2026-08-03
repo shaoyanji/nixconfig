@@ -118,6 +118,18 @@ in
       ];
   };
 
+  scratch = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = { inherit inputs self; };
+    # Steam Remote Play client (cage + steam -gamepadui kiosk) on a
+    # Fujitsu ESPRIMO D556 (i5-6500, 8 GB RAM, 128 GB f2fs SSD).
+    # f2fs has no subvolumes so the btrfs impermanence module is NOT
+    # used — the host config puts every heavy-write dir on tmpfs
+    # (zram 100%, journald volatile, fstrim, noatime).
+    modules = globalModulesContainers ++ [ ../hosts/scratch/configuration.nix ];
+  };
+
   aristotle = {
     kind = "nixos";
     system = "x86_64-linux";

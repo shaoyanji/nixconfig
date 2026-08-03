@@ -327,6 +327,7 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 | mtfuji        | yes      | no           | yes    | no  | no               | AI host (nullclaw, ollama) |
 | garnixMachine | yes      | no           | no     | no  | no               | Minimal nullclaw (CI) |
 | kellerbench   | no       | no           | yes    | no  | no               | Ollama host |
+| scratch       | no       | no           | no     | no  | no               | Steam Remote Play client (cage + steam -gamepadui, tmpfs/zram IO diet) |
 | deckstation   | no       | no           | no     | no  | no               | Steam/gamescope kiosk |
 
 `deckstation` is a pure Steam install — no desktop environment, just greetd + tuigreet dropping into gamescope-session (Steam Big Picture). Uses `globalModulesContainers` so no dms/niri leaks in. Runs Sunshine GameStream/Moonlight host so any LAN client (phone, laptop, TV box) can launch the big screen remotely. Closure is minimalistic: ROCm/OpenCL compute packages are dropped from the AMD profile since Steam + gamescope only need Mesa + amdgpu.

@@ -1,4 +1,9 @@
 {pkgs, ...}: {
+  # Use nixpkgs' niri (cached on cache.nixos.org) instead of niri-flake's
+  # self-built niri-stable, which pins libdisplay-info_0_2 (removed from
+  # nixpkgs, upstream issue sodiboo/niri-flake#1851) and isn't in any cache.
+  programs.niri.package = pkgs.niri;
+
   programs.fuzzel.enable = true;
 
   xdg.configFile."xdg-desktop-portal/niri-portals.conf".text = ''

@@ -4,7 +4,7 @@ tasks:
   checks:quick:
     desc: Run narrow repo checks
     cmds:
-      - nix eval .#nixosConfigurations.thinsandy.config.networking.hostName
+      - nix eval .#nixosConfigurations.mtfuji.config.networking.hostName
       - nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
       - nix eval .#nixosConfigurations.aristotle.config.networking.hostName
       - nix eval .#nixosConfigurations.netbook.config.networking.hostName

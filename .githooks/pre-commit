@@ -28,11 +28,32 @@ if command -v statix &>/dev/null; then
   fi
 fi
 
-# alejandra on staged files
-if command -v alejandra &>/dev/null; then
-  if ! alejandra --check $STAGED_NIX 2>&1; then
-    echo "alejandra: formatting issues in staged files"
-    echo "  Run 'alejandra <file>' or 'task dev:fmt' to fix"
+# Formatting on staged files: accept EITHER alejandra or nixpkgs-fmt
+# style — the repo contains files formatted with both (e.g. hosts/ is
+# largely nixpkgs-fmt, dev:fmt runs alejandra). A file only fails when
+# it matches neither formatter.
+FORMATTERS=()
+command -v alejandra &>/dev/null && FORMATTERS+=(alejandra)
+command -v nixpkgs-fmt &>/dev/null && FORMATTERS+=(nixpkgs-fmt)
+
+if [ ${#FORMATTERS[@]} -gt 0 ]; then
+  NEEDS_FORMAT=()
+  for f in $STAGED_NIX; do
+    clean=0
+    for fmt in "${FORMATTERS[@]}"; do
+      if "$fmt" --check "$f" >/dev/null 2>&1; then
+        clean=1
+        break
+      fi
+    done
+    if [ "$clean" -eq 0 ]; then
+      NEEDS_FORMAT+=("$f")
+    fi
+  done
+  if [ ${#NEEDS_FORMAT[@]} -gt 0 ]; then
+    echo "formatting: staged files match neither alejandra nor nixpkgs-fmt:"
+    printf '  %s\n' "${NEEDS_FORMAT[@]}"
+    echo "  Run 'alejandra <file>' or 'nixpkgs-fmt <file>' to fix"
     exit 1
   fi
 fi

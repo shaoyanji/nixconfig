@@ -15,6 +15,11 @@ in
     ../modules/sops.nix
     ../modules/scripts
   ];
+  # Use the host's pkgs (with the nvim-treesitter-tmux overlay) inside nixvim
+  # instead of nixvim's own pinned nixpkgs, which dropped the `tmux` grammar
+  # that kickstart-nixvim's treesitter config still references.
+  programs.nixvim.nixpkgs.useGlobalPackages = true;
+
   programs = {
     pay-respects.enable = true;
     atuin.enable = true;

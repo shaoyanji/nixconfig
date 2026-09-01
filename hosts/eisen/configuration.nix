@@ -52,6 +52,16 @@ in {
     wayland.enable = true;
   };
 
+  # Autologin: boot straight into Steam Big Picture under gamescope-session so
+  # Steam Link / Moonlight work with zero interaction after power-on. greetd's
+  # initial_session (DMS greeter module) runs the resolved session; if it exits,
+  # greetd falls back to the DMS greeter login screen.
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = user.name;
+  };
+  services.displayManager.defaultSession = "steam";
+
   programs.dank-material-shell.greeter = {
     enable = true;
     compositor.name = "niri";

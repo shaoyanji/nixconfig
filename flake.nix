@@ -47,8 +47,12 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
 
+    # Track the `stable` branch — the greeter moved to a separate
+    # dank-greeter repo on master. The stable branch still ships
+    # `nixosModules.greeter` / `programs.dank-material-shell.greeter`,
+    # which is the documented API (danklinux.com/docs/dankgreeter).
     dms = {
-      url = "github:AvengeMedia/DankMaterialShell";
+      url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
       # inputs.dgop.follows = "dgop";
     };

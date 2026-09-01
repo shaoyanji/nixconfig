@@ -126,6 +126,15 @@ in
     wayland.enable = true;
   };
 
+  # Autologin: media-center display boots straight into the niri desktop (no
+  # login prompt on the TV). greetd's initial_session (DMS greeter module) runs
+  # the resolved session; if it exits, greetd falls back to the DMS greeter.
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = user.name;
+  };
+  services.displayManager.defaultSession = "niri";
+
   programs.dank-material-shell.greeter = {
     enable = true;
     compositor.name = "niri";

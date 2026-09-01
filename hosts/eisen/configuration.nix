@@ -1,4 +1,4 @@
-# eisen — Xeon E5-2673 v3 + RX 5700 + 64 GB RAM Steam kiosk.
+# eisen — Xeon E5-2673 v3 + RX 5700 + 64 GB RAM gaming desktop.
 #
 # Hardware:
 #   CPU:  Intel Xeon E5-2673 v3 (Haswell-EP, 12c/24t, no iGPU)
@@ -7,40 +7,64 @@
 #   SSD:  128 GB NVMe (BTRFS: @root, @nix, @persist, @log, @snapshots)
 #   Boot: UEFI (systemd-boot on /dev/disk/by-uuid/34F9-8033)
 #
-# Role:  Pure Steam Big Picture kiosk (headless 4K gaming console).
-#        greetd auto-logs devji into gamescope-session (cage + steam
-#        -gamepadui) on boot — the entire user-facing UI.  Sunshine
-#        GameStream for Moonlight clients.  RX 5700 VCN 2.0 handles
-#        H.264/H.265 encode for streaming and ffmpeg transcoding.
+# Role:  Full desktop (poseidon-style) with Steam gaming.
+#        niri compositor with DankMaterialShell greeter (DMS) provides the
+#        desktop; Steam runs under the upstream gamescope-session, which is
+#        safe on the RX 5700's modern Vulkan ICD (unlike kellerbench's
+#        Kepler card, where cage is required).  Sunshine GameStream for
+#        Moonlight clients.  RX 5700 VCN 2.0 handles H.264/H.265 encode for
+#        streaming and ffmpeg transcoding.
 #
-# NOTE:  The NixOS `specialisation.workstation` AND the greetd
-#        dual-session (initial_session/default_session) experiments both
-#        hung boot at graphical.target.  This is the known-good
-#        first-commit baseline: globalModulesContainers (noDE), no niri,
-#        no desktop modules in the closure.
+# History: previously a pure cage + steam -gamepadui kiosk (steamos.nix
+#          auto-login).  The specialisation AND greetd dual-session
+#          experiments both hung boot at graphical.target, so the DMS
+#          greeter path (as on poseidon) replaces greetd auto-login.
 #
 # Storage: /mnt/steam = sda (931.5G HDD, btrfs+zstd) — Steam library, live.
 # Future:  16 TB HDD → /mnt/media (media library) when the drive arrives.
-{pkgs, ...}: let
+{
+  inputs,
+  config,
+  pkgs,
+  lib,
+  ...
+}: let
   user = import ../../modules/global/user.nix;
 in {
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
-    ../../modules/profiles/steamos.nix
-    ../../modules/profiles/sunshine.nix
+    ../../modules/profiles/steam.nix
+    ../../modules/profiles/base-desktop-environment.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/nas-client.nix
+    ../../modules/profiles/sunshine.nix
   ];
 
   networking.hostName = "eisen";
 
-  # X server is required so XWayland can host legacy X11-only windows
-  # that Steam spawns inside cage's Wayland surface.  No desktop
-  # environment is configured — greetd auto-logs devji into
-  # gamescope-session (cage + steam -gamepadui) which is the entire
-  # user-facing UI.
-  services.xserver.enable = true;
+  # --- Desktop (poseidon-style): niri compositor + DankMaterialShell greeter ---
+  # The previous cage-kiosk specialisation and greetd dual-session experiments
+  # both hung boot at graphical.target, so the DMS greeter path (as on
+  # poseidon) is used instead of greetd auto-login.
+  services.displayManager.sddm = {
+    enable = false;
+    wayland.enable = true;
+  };
+
+  programs.dank-material-shell.greeter = {
+    enable = true;
+    compositor.name = "niri";
+    configHome = user.home; # Sync themes with user's DankMaterialShell config
+  };
+
+  # --- Steam under gamescope ---
+  # The RX 5700's modern Vulkan ICD fully supports gamescope's compositor
+  # (unlike kellerbench's Kepler + legacy_580 card, where gamescope's
+  # wlserver crashes with "Creating headless backend").  steam.nix enables
+  # programs.steam.gamescopeSession, so greetd/DMS can launch the upstream
+  # gamescope-session script directly.
+  programs.gamescope.enable = true;
 
   # --- Bluetooth (wireless controllers in Steam) ---
   hardware.bluetooth.enable = true;
@@ -119,12 +143,6 @@ in {
       "/mnt/steam"
     ];
   };
-
-  # --- CPU governor: performance for low-latency 4K gaming ---
-  # The Xeon E5-2673 v3 defaults to powersave. For competitive Dota 2 at
-  # 4K with simultaneous Sunshine encoding, the CPU needs to ramp quickly.
-  # Cost is ~20 W extra at idle (120 W TDP chip, so mostly irrelevant).
-  powerManagement.cpuFreqGovernor = "performance";
 
   # --- Steam shader cache on tmpfs (16 GB RAM disk) ---
   # Dota 2 and other Vulkan/OpenGL titles compile shaders on first launch.

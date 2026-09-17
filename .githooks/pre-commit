@@ -1,5 +1,14 @@
 #!/bin/bash
 # Pre-commit hook: Run Nix linting and format checks on staged .nix files
+#
+# Tooling is machine-independent: if a tool is missing from PATH it is
+# fetched via `nix build` from the nixpkgs revision pinned in flake.lock,
+# so every machine checks with identical versions (they follow lockfile
+# updates automatically). Without nix, the hook falls back to PATH-only;
+# deadnix/statix absent from both are skipped, while the formatters are
+# mandatory — if neither formatter can be resolved, the commit fails
+# closed instead of silently skipping the format check.
+
 set -euo pipefail
 
 STAGED_NIX=$(git diff --cached --name-only --diff-filter=ACM | grep '\.nix$' || true)
@@ -8,54 +17,105 @@ if [ -z "$STAGED_NIX" ]; then
   exit 0
 fi
 
+# ── Tool resolution ─────────────────────────────────────────────────────
+# 1. Already on PATH            → use it as-is.
+# 2. Missing, nix available     → `nix build` from the flake.lock-pinned
+#                                 nixpkgs revision (deterministic, cached
+#                                 after the first run).
+# 3. Nix unavailable / failed   → return nonzero (caller decides skip vs
+#                                 fail-closed).
+resolve_tool() {
+  local tool="$1" attr="$2" store_bin nixpkgs_rev
+  if command -v "$tool" &>/dev/null; then
+    command -v "$tool"
+    return 0
+  fi
+  if ! command -v nix &>/dev/null; then
+    return 1
+  fi
+  nixpkgs_rev=$(nix flake metadata --json . 2>/dev/null |
+    jq -r '.locks.nodes.nixpkgs.locked // empty
+           | select(.type == "github")
+           | "github:\(.owner)/\(.repo)/\(.rev)"') || return 1
+  [ -n "$nixpkgs_rev" ] || return 1
+  store_bin=$(nix build "${nixpkgs_rev}#${attr}" --no-link --print-out-paths 2>/dev/null | tail -1) || return 1
+  [ -n "$store_bin" ] && [ -x "${store_bin}/bin/${tool}" ] || return 1
+  echo "${store_bin}/bin/${tool}"
+}
+
+DEADNIX_BIN=$(resolve_tool deadnix deadnix) || DEADNIX_BIN=""
+STATIX_BIN=$(resolve_tool statix statix) || STATIX_BIN=""
+ALEJANDRA_BIN=$(resolve_tool alejandra alejandra) || ALEJANDRA_BIN=""
+NIXPKGS_FMT_BIN=$(resolve_tool nixpkgs-fmt nixpkgs-fmt) || NIXPKGS_FMT_BIN=""
+
 echo "Checking staged Nix files..."
 
-# deadnix on staged files
-if command -v deadnix &>/dev/null; then
-  if ! deadnix --fail $STAGED_NIX 2>/dev/null; then
+# deadnix on staged files (skipped when not resolvable)
+if [ -n "$DEADNIX_BIN" ]; then
+  if ! "$DEADNIX_BIN" --fail $STAGED_NIX 2>/dev/null; then
     echo "deadnix: found dead code in staged files"
     echo "  Run 'deadnix <file>' to see details"
     exit 1
   fi
+else
+  echo "deadnix: not found (skipped)"
 fi
 
-# statix on staged files
-if command -v statix &>/dev/null; then
-  if ! statix check $STAGED_NIX 2>/dev/null; then
-    echo "statix: found issues in staged files"
-    echo "  Run 'statix check <file>' to see details"
-    exit 1
-  fi
+# statix on staged files (skipped when not resolvable).
+# Invoked once per file: statix accepts only a single target, so a
+# multi-file invocation errors out regardless of content.
+# ADVISORY: statix's repeated-key warning (W20) fires on this repo's
+# house style (separate services.*/boot.*/home.* blocks), so it is
+# reported but never blocks the commit. deadnix and the formatters are
+# the hard gates.
+if [ -n "$STATIX_BIN" ]; then
+  for f in $STAGED_NIX; do
+    if ! "$STATIX_BIN" check "$f" 2>/dev/null; then
+      echo "statix (advisory): issues in $f — run 'statix check $f'"
+    fi
+  done
+else
+  echo "statix: not found (skipped)"
 fi
 
 # Formatting on staged files: accept EITHER alejandra or nixpkgs-fmt
 # style — the repo contains files formatted with both (e.g. hosts/ is
 # largely nixpkgs-fmt, dev:fmt runs alejandra). A file only fails when
-# it matches neither formatter.
+# it matches neither formatter. Formatters are RESOLVED, not optional:
+# with neither on PATH nor fetchable via nix, fail closed rather than
+# silently skipping the check.
 FORMATTERS=()
-command -v alejandra &>/dev/null && FORMATTERS+=(alejandra)
-command -v nixpkgs-fmt &>/dev/null && FORMATTERS+=(nixpkgs-fmt)
+if [ -n "$ALEJANDRA_BIN" ]; then FORMATTERS+=("$ALEJANDRA_BIN"); fi
+if [ -n "$NIXPKGS_FMT_BIN" ]; then FORMATTERS+=("$NIXPKGS_FMT_BIN"); fi
 
-if [ ${#FORMATTERS[@]} -gt 0 ]; then
-  NEEDS_FORMAT=()
-  for f in $STAGED_NIX; do
-    clean=0
-    for fmt in "${FORMATTERS[@]}"; do
-      if "$fmt" --check "$f" >/dev/null 2>&1; then
-        clean=1
-        break
-      fi
-    done
-    if [ "$clean" -eq 0 ]; then
-      NEEDS_FORMAT+=("$f")
+if [ ${#FORMATTERS[@]} -eq 0 ]; then
+  echo "formatting: neither alejandra nor nixpkgs-fmt is available"
+  echo "  (not on PATH, and the nix fetch failed or nix is not installed)"
+  echo "  Install nix or provide a formatter on PATH, then retry the commit."
+  exit 1
+fi
+
+NEEDS_FORMAT=()
+for f in $STAGED_NIX; do
+  clean=0
+  for fmt in "${FORMATTERS[@]}"; do
+    if "$fmt" --check "$f" >/dev/null 2>&1; then
+      clean=1
+      break
     fi
   done
-  if [ ${#NEEDS_FORMAT[@]} -gt 0 ]; then
-    echo "formatting: staged files match neither alejandra nor nixpkgs-fmt:"
-    printf '  %s\n' "${NEEDS_FORMAT[@]}"
-    echo "  Run 'alejandra <file>' or 'nixpkgs-fmt <file>' to fix"
-    exit 1
+  if [ "$clean" -eq 0 ]; then
+    NEEDS_FORMAT+=("$f")
   fi
+done
+
+if [ ${#NEEDS_FORMAT[@]} -gt 0 ]; then
+  echo "formatting: staged files match neither alejandra nor nixpkgs-fmt:"
+  printf '  %s\n' "${NEEDS_FORMAT[@]}"
+  echo "  Fix with one of:"
+  echo "    nix run nixpkgs#alejandra -- ${NEEDS_FORMAT[*]}"
+  echo "    nix run nixpkgs#nixpkgs-fmt -- ${NEEDS_FORMAT[*]}"
+  exit 1
 fi
 
 echo "Nix checks passed."

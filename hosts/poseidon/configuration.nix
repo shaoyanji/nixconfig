@@ -1,6 +1,4 @@
 {
-  inputs,
-  config,
   pkgs,
   lib,
   ...
@@ -26,68 +24,13 @@ in {
     # Re-enable by uncommenting the microvm host module + microvm-host.nix
     # profile import below and the microvm.vms block further down.
     # inputs.microvm.nixosModules.host
-
-    ../../modules/services/ai-services-secrets.nix
-    ../../modules/services/zeroclaw-deployment.nix
-    ../../modules/profiles/ai-host.nix
     # (import ../../modules/profiles/microvm-host.nix {
     #   inherit pkgs;
     #   natExternalInterface = "wlp4s0";
     # })
   ];
 
-  aiServices.sharedSecrets.enable = true;
-
   ssh.ca.enableClient = true;
-
-  profiles.aiHost = {
-    enable = true;
-    nullclaw.enable = false;
-    zeroclaw.enable = false;
-  };
-
-  aiServices.zeroclawDeployment = {
-    enable = false;
-    listenHost = "127.0.0.1";
-    listenPort = 42617;
-    workspaceRoot = "/var/lib/zeroclaw";
-    environmentFile = config.sops.secrets."ai-services-shared-env".path;
-    extraEnvironmentFiles = [
-      config.sops.templates."zeroclaw-zeroclaw-env".path
-    ];
-    extraSystemPackages = with pkgs; [
-      curl
-      git
-      jq
-      skills
-      worktrunk
-    ];
-    protectHome = "read-only";
-    # Mount shared NAS data into workspace (only on non-NAS hosts)
-    bindReadOnlyPaths = {
-      "${config.aiServices.zeroclawDeployment.workspaceRoot}/workspace/share" = "/Volumes/data/openclaw";
-    };
-    settings = {
-      channels.telegram = {
-        enabled = true;
-        bot_token = "$TELEGRAM_BOT_TOKEN";
-        allowed_users = ["8207284912"];
-      };
-    };
-  };
-
-  sops.secrets.poseidon-telegram = {
-    owner = "zeroclaw-zeroclaw";
-    group = "zeroclaw-zeroclaw";
-    mode = "0400";
-  };
-
-  sops.templates."zeroclaw-zeroclaw-env" = {
-    content = ''
-      TELEGRAM_BOT_TOKEN=${config.sops.placeholder."poseidon-telegram"}
-    '';
-  };
-
   # --- microVM testvm DISABLED (2026-08): no longer runs on poseidon. ---
   # Commented out for easy re-enable. The microbr bridge/NAT wiring is also
   # commented out above (microvm.nixosModules.host + microvm-host.nix import).

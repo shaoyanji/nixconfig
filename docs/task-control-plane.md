@@ -5,8 +5,8 @@ This repository uses a simplified task namespace for predictable operator workfl
 ## Current Namespace Structure
 
 - `infra:*`: Host lifecycle operations (plan/apply/deploy/rollback/logs), secrets management, SOPS operations
-- `agents:*`: Operator helpers, xs runtime wrappers, OAuth/session management for service users
-- `checks:*`: Validation and smoke checks (primarily nullclaw deployment validation)
+- `agents:*`: Operator helpers and legacy operator menus
+- `checks:*`: Validation and health checks (host evals, Nix lint/format, sops drift)
 - `dev:*`: Git workflows, flake updates, site deployment, and local development tasks
 - `services:*`: Legacy compatibility wrappers (routes to `infra:*` tasks)
 
@@ -46,14 +46,11 @@ task dev:flake:update:bountystash # Update single flake input
 ### Validation
 ```bash
 task checks:quick                # Run narrow repo checks
-task checks:nullclaw:smoke:<host> # Smoke-check nullclaw deployment
 ```
 
 ### Operator Helpers
 ```bash
 task agents:menu                 # Interactive operator menu
-task agents:xs:status            # Show xs-helper status
-task agents:oauth:list           # List known OAuth services
 ```
 
 ## Legacy Migration

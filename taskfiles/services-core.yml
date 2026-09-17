@@ -2,11 +2,11 @@ version: "3"
 
 tasks:
   services:validate:host:*:
-    desc: Validate a deployed host (nullclaw smoke check)
+    desc: Validate a deployed host (systemd overall state over ssh)
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - task checks:nullclaw:smoke:{{.HOST}}
+      - ssh {{.HOST}} "systemctl is-system-running"
 
   services:record:host:*:
     desc: Record deployment outcome in git (manual/operator-triggered)

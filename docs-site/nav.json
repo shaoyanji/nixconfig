@@ -33,7 +33,6 @@
   {
     "title": "Supporting docs",
     "pages": [
-      {"label": "Nullclaw fleet", "src": "docs/nullclaw-fleet-pattern.md", "slug": "/docs/nullclaw-fleet-pattern/"},
       {"label": "Userland module map", "src": "docs/userland-module-map.md", "slug": "/docs/userland-module-map/"},
       {"label": "Userland package ownership", "src": "docs/userland-package-ownership.md", "slug": "/docs/userland-package-ownership/"}
     ]

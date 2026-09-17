@@ -66,8 +66,6 @@ modules/
     sunshine.nix — GameStream/Moonlight server (Sunshine on LAN, video/render/input groups)
   services/        — Service modules
     aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)
-    nullclaw-deployment.nix — nullclaw fleet deployment wrapper
-    zeroclaw-deployment.nix — zeroclaw fleet deployment wrapper
   roles/           — User role assemblers
     minimal.nix    — Base user stack + AI
     heim.nix       — devji desktop preferences (niri, kitty, dev, zen)
@@ -87,12 +85,7 @@ modules/
 ### Packages (`pkgs/`)
 
 Custom packages built from the flake:
-- `nullclaw` — Pre-built binary fetch of nullclaw (Zig AI assistant)
-- `xs` — xs runtime
-- `xs-helper` — Shell-first operator wrapper (wraps xs + xs-materializer)
-- `xs-materializer` — Go context-pack materializer
-- `pancakes-harness` — Test harness
-- `qwen-code` — Qwen code assistant
+- (none — the agent-era packages were removed in 2026-09; see git history)
 
 ---
 
@@ -188,10 +181,6 @@ task dev:cloak:sync-bw -- ./export.json  # Import from Bitwarden export
 
 ```bash
 task agents:menu                 # Interactive operator control plane
-task agents:xs:status            # xs-helper status
-task agents:oauth:list           # List OAuth services
-task agents:oauth:login:<svc>:<user>  # OAuth login for service user
-task agents:oauth:exec:<svc>:<user> -- <cmd>  # Execute as service user
 ```
 
 ### Nix Raw Commands
@@ -200,7 +189,7 @@ task agents:oauth:exec:<svc>:<user> -- <cmd>  # Execute as service user
 nix build .#nixosConfigurations.<host>.config.system.build.toplevel          # Build host closure
 nix build .?submodules=1#nixosConfigurations.<host>.config.system.build.toplevel  # With submodules (CI)
 nix build .#checks.x86_64-linux.host-architecture -L                         # Run host checks
-nix build .#packages.x86_64-linux.nullclaw                                   # Build single package
+nix build .#checks.x86_64-linux.host-eval-frieren                        # Build a single check
 nix build .#devShells.x86_64-linux.default                                   # Enter dev shell
 nixpkgs-fmt <file>                                                           # Format Nix file
 nixpkgs-fmt --check <file>                                                   # Check formatting
@@ -313,8 +302,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 
 ## Key Operator Helpers
 
-- `agents:xs:*` wrappers run `scripts/task/xs-helper.sh` against local and service stores for artifact, contract, record, and trace work
-- `agents:oauth:*` wrappers run `scripts/task/service-oauth.sh` with correct `HOME` and `XDG_*` environment for each service user
+- `agents:menu` is the interactive operator control plane
 - NAS client recovery logic lives under `modules/profiles/nas-client.nix`
 
 ## Deployment Guidance
@@ -348,8 +336,6 @@ task dev:config:hash-update    # runs nix-hash-update.sh
 | `NIX-REFERENCE.md` | Nix patterns and gotchas used in this repo |
 | `docs/task-control-plane.md` | Task namespace policy and workflow examples |
 | `docs/codex-handoff.md` | Codex session orientation |
-| `docs/nullclaw-fleet-pattern.md` | Nullclaw deployment standardization |
-| `docs/zeroclaw-fleet-pattern.md` | Zeroclaw deployment standardization |
 | `docs/userland-module-map.md` | Userland module structure |
 | `docs/userland-package-ownership.md` | Package ownership and role wiring |
 | `taskfiles/README.md` | Taskfile ownership map |

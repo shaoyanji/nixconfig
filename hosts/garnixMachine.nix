@@ -1,29 +1,19 @@
-{ inputs
-, config
-, pkgs
-, ...
-}:
-let
-  # nullclawPort = 3001;
-  bountystashPort = 3000;
-  # nullclawLocalUpstream = "http://127.0.0.1:${toString nullclawPort}/";
-  bountystashLocalUpstream = "http://127.0.0.1:${toString bountystashPort}/";
-in
 {
+  inputs,
+  config,
+  pkgs,
+  ...
+}: let
+  bountystashPort = 3000;
+  bountystashLocalUpstream = "http://127.0.0.1:${toString bountystashPort}/";
+in {
   garnix.server.enable = true;
   networking.hostName = "garnixMachine";
 
   imports = [
     ../modules/config/authorized-keys.nix
-    # ../modules/profiles/ai-host.nix
-    # ../modules/services/nullclaw-deployment.nix
     inputs.sops-nix.nixosModules.sops
   ];
-
-  # profiles.aiHost = {
-  # enable = true;
-  # nullclaw.enable = true;
-  # };
 
   services.openssh = {
     enable = true;
@@ -37,23 +27,13 @@ in
   users.users.devji = {
     isNormalUser = true;
     description = "devji";
-    extraGroups = [ "wheel" "systemd-journal" ];
+    extraGroups = ["wheel" "systemd-journal"];
     openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };
 
   security.sudo.wheelNeedsPassword = false;
 
-  # aiServices.nullclawDeployment = {
-  #   enable = true;
-  #   mode = "config-json";
-  #   listenHost = "127.0.0.1";
-  #   listenPort = nullclawPort;
-  #   workspaceRoot = "/var/lib/nullclaw";
-  #   configJsonSource = config.sops.secrets.nullclaw-config.path;
-  # };
-
   environment.systemPackages = [
-    # self.packages.${pkgs.stdenv.hostPlatform.system}.nullclaw
     pkgs.htop
     pkgs.tree
     pkgs.jq
@@ -62,18 +42,7 @@ in
   ];
 
   sops = {
-    # defaultSopsFile = ../modules/secrets.yaml;
-    # defaultSopsFormat = "json";
-
     age.keyFile = "/var/garnix/keys/repo-key";
-
-    # secrets.nullclaw-config = {
-    #   sopsFile = ../secrets/nullclaw-config.json;
-    #   # format = "json";
-    #   owner = "nullclaw";
-    #   group = "nullclaw";
-    #   mode = "0400";
-    # };
 
     secrets.bountystash-env = {
       sopsFile = ../secrets/bountystash.env;
@@ -86,9 +55,9 @@ in
 
   systemd.services.bountystash = {
     description = "Bountystash web app";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
+    wantedBy = ["multi-user.target"];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
 
     environment = {
       PORT = toString bountystashPort;
@@ -112,7 +81,6 @@ in
     recommendedGzipSettings = true;
 
     virtualHosts."default" = {
-      # Public HTTP exposure is currently bountystash. Nullclaw remains local-only on 127.0.0.1:3001.
       locations."/" .proxyPass = bountystashLocalUpstream;
     };
   };
@@ -121,10 +89,6 @@ in
     implementation = "dbus";
   };
   assertions = [
-    # {
-    # assertion = nullclawLocalUpstream == "http://127.0.0.1:3001/";
-    # message = "garnixMachine nullclaw local upstream is expected to stay on 127.0.0.1:3001";
-    # }
     {
       assertion = config.services.nginx.virtualHosts.default.locations."/".proxyPass == bountystashLocalUpstream;
       message = "garnixMachine default public nginx upstream is expected to target bountystash";
@@ -139,5 +103,5 @@ in
   system.stateVersion = "25.05";
   nixpkgs.hostPlatform = "x86_64-linux";
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 }

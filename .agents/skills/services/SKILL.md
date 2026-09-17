@@ -11,7 +11,7 @@ These wrappers route to canonical `infra:*`, `checks:*`, and `dev:*` tasks. Pref
 
 | Task | Description |
 |------|-------------|
-| `services:validate:host:<host>` | Run nullclaw smoke check (routes to `checks:nullclaw:smoke:<host>`) |
+| `services:validate:host:<host>` | Check systemd overall state over SSH |
 
 ## Deploy
 

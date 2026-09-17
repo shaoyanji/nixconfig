@@ -279,7 +279,7 @@ tasks:
       - nix eval --json '.#packages.x86_64-linux' --apply 'builtins.attrNames' 2>/dev/null | jq -r '.[]'
 
   dev:pkgs:update:*:
-    desc: Update a custom package version/hash (e.g. dev:pkgs:update:nullclaw)
+    desc: Update a custom package version/hash (e.g. dev:pkgs:update:<name>)
     vars:
       PKG: '{{index .MATCH 0}}'
     cmds:

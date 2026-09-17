@@ -16,13 +16,11 @@
     "title": "Deploy",
     "pages": [
       {"label": "Deploy landing", "src": ".agents/deploy/README.md", "slug": "/deploy/"},
-      {"label": "AI hosts", "src": ".agents/deploy/ai-hosts.md", "slug": "/deploy/ai-hosts/"},
       {"label": "Rollback", "src": ".agents/deploy/rollback.md", "slug": "/deploy/rollback/"},
-      {"label": "Promotion", "src": ".agents/deploy/promotion.md", "slug": "/deploy/promotion/"},
       {"label": "Website guide", "src": ".agents/deploy/website.md", "slug": "/deploy/website/"},
-      {"label": "garnixMachine notes", "src": ".agents/deploy/hosts/garnixMachine.md", "slug": "/deploy/hosts/garnixMachine/"},
+      {"label": "frieren notes", "src": ".agents/deploy/hosts/frieren.md", "slug": "/deploy/hosts/frieren/"},
       {"label": "mtfuji notes", "src": ".agents/deploy/hosts/mtfuji.md", "slug": "/deploy/hosts/mtfuji/"},
-      {"label": "thinsandy notes", "src": ".agents/deploy/hosts/thinsandy.md", "slug": "/deploy/hosts/thinsandy/"}
+      {"label": "scratch notes", "src": ".agents/deploy/hosts/scratch.md", "slug": "/deploy/hosts/scratch/"}
     ]
   },
   {

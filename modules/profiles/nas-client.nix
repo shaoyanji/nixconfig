@@ -13,8 +13,9 @@ let
     "x-systemd.mount-timeout=15s"
   ];
 in
-# Skip NAS mount on both NAS hosts (the NAS doesn't mount itself).
-lib.mkIf (config.networking.hostName != "thinsandy" && config.networking.hostName != "frieren") {
+# Skip NAS mount on the NAS host itself (the NAS doesn't mount itself).
+  # (thinsandy, the previous NAS, was decommissioned — frieren is the NAS.)
+lib.mkIf (config.networking.hostName != "frieren") {
   environment.systemPackages = [ pkgs.nfs-utils ];
 
   fileSystems."/Volumes/data" = {

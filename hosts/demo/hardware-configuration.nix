@@ -7,7 +7,7 @@
     ../../modules/profiles/laptop.nix
   ];
 
-  # Placeholder root file system — REQUIRED for evaluation (host-eval-all).
+  # Placeholder root file system — REQUIRED for evaluation (host-eval checks).
   # Replace device + fsType with the target machine's `blkid` output before
   # deployment.  lib.mkDefault so a real nixos-generate-config output
   # (plain assignment, higher priority) overrides this cleanly.

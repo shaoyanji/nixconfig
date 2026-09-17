@@ -1,7 +1,6 @@
-{
-  lib,
-  pkgs,
-  ...
+{ lib
+, pkgs
+, ...
 }: {
   programs = {
     nushell = {
@@ -73,7 +72,7 @@
           # highlight
           polars
         ]
-        ++ lib.optionals pkgs.stdenv.isLinux [
+        ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
           # units
           # dbus
           # semver
@@ -86,10 +85,8 @@
   home.packages = with pkgs; [
     nu_scripts
   ];
-  xdg.configFile = {
-  };
-  home.sessionVariables = {
-  };
+  xdg.configFile = { };
+  home.sessionVariables = { };
   home.sessionPath = [
   ];
 }

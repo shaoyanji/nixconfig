@@ -1,10 +1,8 @@
 # devji user desktop/home preferences.
 # Primary user constants: modules/global/user.nix
-_:
-let
+_: let
   user = import ../global/user.nix;
-in
-{
+in {
   # Persona assembler for devji-specific desktop and personal preferences.
   imports = [
     ../zen.nix
@@ -20,7 +18,7 @@ in
       enable = true;
       profiles."User 1".sync = {
         username = "bob";
-        url = "http://thinsandy.fritz.box:27701";
+        url = "http://frieren.fritz.box:27701";
       };
     };
     element-desktop.enable = true;

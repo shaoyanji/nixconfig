@@ -7,8 +7,8 @@ This is the hands-on orientation for a Codex session. Architecture specifics liv
 ## Behavior that must stay stable
 
 - **frieren** – fleet NAS server and tailnet DNS (pi-hole): Samba, NFS, Jellyfin, Paperless, media stack. Headless laptop (i5-8250U) with Intel QuickSync transcoding. (Replaces the decommissioned thinsandy AI host.)
-- **garnixMachine** – continue as the minimal nullclaw host on `127.0.0.1:3001` with configs staged from `/run/secrets/nullclaw-config`, nginx proxying to `http://127.0.0.1:3000/`, and no SOPS or persistence assumptions.
-- **mtfuji** – retain the existing nullclaw env-file handling.
+- **garnixMachine** – minimal CI host (bountystash on `127.0.0.1:3000` behind nginx); no SOPS persistence assumptions.
+- **mtfuji** – decommissioned AI-host reference: ollama + data subvols only (agent-era modules removed 2026-09).
 - **poseidon & ancientace** – keep only `hosts/<host>/configuration.nix`, their embedded `testvm` guests, and existing bridge/NAT wiring.
 
 ## Validation guidance
@@ -23,7 +23,6 @@ git status --short
 nix eval .#nixosConfigurations.frieren.config.networking.hostName
 nix eval .#nixosConfigurations.mtfuji.config.networking.hostName
 nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
-nix eval .#packages.x86_64-linux.nullclaw.meta.mainProgram
 nix build .#checks.x86_64-linux.host-architecture -L
 ```
 

@@ -256,7 +256,7 @@ rm -rf hosts/<old-name>
 |----------|--------|
 | `.agents/deploy/hosts/<old-name>.md` | Delete — deploy notes for a host that no longer exists |
 | `.agents/skills/*/SKILL.md` | Remove any `<old-name>` from task tables (smoke checks, deploy aliases, etc.) |
-| `docs/nullclaw-fleet-pattern.md` (or similar) | Remove from Current Hosts lists and validation examples |
+| `docs/*fleet-pattern.md` (or similar) | Remove from Current Hosts lists and validation examples |
 | `docs/codex-handoff.md` | Remove or update if the old host was mentioned |
 | `.github/workflows/nixcachix.yml` | Disable via `task lifecycle:ci:disable-host:<old-name>` (comments it out) — or remove manually |
 | `AGENTS.md` | Update CI pipeline section, module chain tables if stale |
@@ -320,14 +320,13 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 
 ## Supported Hosts
 
-| Host          | nullclaw | hermes-agent | ollama | xs | pancakes-harness | Role |
-|---------------|----------|--------------|--------|-----|------------------|------|
-| frieren       | no       | no           | no     | no  | no               | ⭐ **NAS server** (Samba, NFS, Jellyfin, Paperless, DNS) |
-| mtfuji        | yes      | no           | yes    | no  | no               | AI host (nullclaw, ollama) |
-| garnixMachine | yes      | no           | no     | no  | no               | Minimal nullclaw (CI) |
-| kellerbench   | no       | no           | yes    | no  | no               | Ollama host |
-| scratch       | no       | no           | no     | no  | no               | Lightweight niri desktop (eisen-style, tmpfs/zram IO diet) |
-| deckstation   | no       | no           | no     | no  | no               | Steam/gamescope kiosk |
+| Host          | ollama | Role |
+|---------------|--------|------|
+| frieren       | no     | ⭐ **NAS server** (Samba, NFS, Jellyfin, Paperless, DNS) |
+| mtfuji        | yes    | Reference AI host (ollama; agent-era modules removed 2026-09) |
+| kellerbench   | no     | Gaming backup rig |
+| scratch       | no     | Lightweight niri desktop (eisen-style, tmpfs/zram IO diet) |
+| deckstation   | no     | Steam/gamescope kiosk |
 
 `deckstation` is a pure Steam install — no desktop environment, just greetd + tuigreet dropping into gamescope-session (Steam Big Picture). Uses `globalModulesContainers` so no dms/niri leaks in. Runs Sunshine GameStream/Moonlight host so any LAN client (phone, laptop, TV box) can launch the big screen remotely. Closure is minimalistic: ROCm/OpenCL compute packages are dropped from the AMD profile since Steam + gamescope only need Mesa + amdgpu.
 
@@ -438,10 +437,7 @@ This prints the TOML to pipe into `sops modules/secrets.yaml --extract '["cloak"
 Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-keys.nix` / `authorized-keys.json` gist fetch in `base-node.nix` is dead weight — it falls back silently and can be removed at your leisure.
 
 - The NAS client recovery profile now lives in `modules/profiles/nas-client.nix`, which automounts `/Volumes/data` from the NAS host (`frieren`, previously `thinsandy`) for non-NAS hosts so the compatibility path stays available without relying on `hosts/common/localmounts.nix`.
-- The `xs` runtime, `xs-helper` CLI, and `xs-materializer` binary are packaged via the flake (`packages.*.xs`, `packages.*.xs-helper`, and `packages.*.xs-materializer`). Fleet members should consume those packaged outputs rather than ad-hoc `go build` from the repo.
-- `xs-helper` remains the shell-first operator wrapper, while `xs-materializer` is the Go implementation used for `task_view` context-pack materialization. They are versioned in lockstep inside this repo: `pkgs/xs-helper.nix` wires the wrapper to the packaged `pkgs/xs-materializer.nix` output, and `scripts/task/xs-helper.sh materialize` now hydrates CAS-backed xs envelopes before piping normalized events into the materializer.
-- Direct `xs` usage is still the source-of-truth debugging path when validating stream shape or CAS retrieval behavior, but normal operator/fleet flows should go through the packaged wrapper/tasks instead of bespoke local build steps.
-- Service-user OAuth/session management uses `task agents:oauth:*` wrappers (e.g., `agents:oauth:login:nullclaw:codex`, `agents:oauth:exec:nullclaw:codex -- whoami`). The helper sets `HOME` and `XDG_*` correctly for each service user, so you do not need to remember raw `sudo -u ...` incantations.
+- The agent-era tooling (nullclaw, zeroclaw, hermes, xs, pancakes-harness, qwen-code and their modules/scripts/docs) was removed in 2026-09; the git history retains it if anything is ever needed again.
 - The experimental devcontainer configuration was reverted; there is no current repo-provided devcontainer image, so use the Taskfiles, flake outputs, and hosted workflows directly.
 
 ## Recent changes
@@ -453,6 +449,8 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 **2026-09-17 — verntil/orb-cassini host files removed; thinsandy references purged.** Orphaned `hosts/verntil.nix` and `hosts/orb-cassini/` (never registered in the host inventory) were deleted, and remaining live references to the long-decommissioned `thinsandy` were replaced with `frieren` (the current NAS): deploy/logs menus, nas-client skip-list, heim's anki sync URL, nixoshmsymlinks skip-list, pi-hole DNS comments, the stale `checks:nullclaw:smoke:thinsandy` task, and the thinsandy age keys in `.sops.yaml`. Historical migration notes (HANDOFF.md, AUDIT.md) intentionally keep their thinsandy mentions.
 
 **2026-08-03 — Poseidon microVM disabled; frieren daily self-upgrade; scratch real disk UUIDs + GRUB; GC consolidation.** The `testvm` microVM on `poseidon` no longer runs — the microvm imports and the `microvm.vms` block in `hosts/poseidon/configuration.nix` are commented out for easy re-enable (microbr bridge/NAT profile included). `frieren` (the NAS) now self-upgrades every morning at 04:00 via the canonical `system.autoUpgrade` module (no hand-rolled timer): it stages `nixos-rebuild boot` from `github:shaoyanji/nixconfig#frieren` first, then reboots into the new generation only if kernel/initrd/kernel-modules changed (`allowReboot`, reached only after a successful boot), otherwise applies a live `switch`. Persistent timer catches up if the NAS was off. `scratch` got its real disk UUIDs from the original machine gist (f2fs root + ext4 /boot) and now boots with GRUB (legacy BIOS) instead of systemd-boot; its redundant 14-day GC was dropped in favour of the global 10-day GC. See `.agents/deploy/hosts/frieren.md` and `.agents/deploy/hosts/scratch.md`.
+
+**2026-09-17 — Agent-era tooling removed.** All agent-era modules (`ai-host`, `hermes-defaults`, `ollama-cloud-defaults`, `nullclaw`/`zeroclaw` + deployment wrappers, `pancakes-harness`, `hermes-ai-mounts`, `ai-services-*`), packages (`nullclaw`, `pancakes-harness`, `qwen-code`, `xs`, `xs-helper`, `xs-materializer`), their scripts/taskfiles/smoke-checks, and the fleet-pattern docs were deleted. `hosts/mtfuji/ai.nix` now only mounts the ollama data subvols and enables ollama; poseidon/garnixMachine/kellerbench agent blocks are gone; the `nullclawFleetContract` check and the `xs-helper` app output were dropped. The tailscale DNS target moved from the decommissioned thinsandy pi-hole IP to frieren's `100.97.61.65`.
 
 **2026-04-30 — Task system consolidation.** Deprecated legacy task aliases and menus, directing users to new `infra:` and `dev:` prefixed tasks. Simplified `checks:nullclaw:smoke` tasks and enhanced `dev:git` tasks with AI commit integration.
 
@@ -468,7 +466,6 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 ### Deployment
 - `.agents/deploy/README.md` - Deploy routing and guardrails
 - `.agents/deploy/hosts/*.md` - Per-host deployment exceptions
-- `docs/nullclaw-fleet-pattern.md` - Nullclaw deployment standardization
 - `USB.md` - Sledgehammer live USB creation guide
 
 ### Development

@@ -18,13 +18,17 @@
   index = listToAttrs (map (e: {
       name = e.key;
       value = e;
-    }) entries);
+    })
+    entries);
 
   # Strip meta attrs so we can pass the rest to fetchurl/fetchzip directly.
-  stripMeta =
-    e:
+  stripMeta = e:
     builtins.removeAttrs e (metaKeys
-      ++ (if e ? extraArgs then attrNames e.extraArgs else []));
+      ++ (
+        if e ? extraArgs
+        then attrNames e.extraArgs
+        else []
+      ));
 in rec {
   # Return the raw registry entry for a key.
   entry = key: index.${key};
@@ -34,7 +38,9 @@ in rec {
     e = entry key;
     args = stripMeta e // {name = e.key;} // (e.extraArgs or {});
   in
-    if e.fetchType == "fetchzip" then pkgs.fetchzip args
-    else if e.fetchType == "fetchurl" then pkgs.fetchurl args
+    if e.fetchType == "fetchzip"
+    then pkgs.fetchzip args
+    else if e.fetchType == "fetchurl"
+    then pkgs.fetchurl args
     else throw "Unknown fetchType '${e.fetchType}' for key '${key}'";
 }

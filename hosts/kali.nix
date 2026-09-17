@@ -1,12 +1,10 @@
-{ pkgs, ... }:
-
+{pkgs, ...}:
 # Kali Home Manager profile
 # Targets: Raspberry Pi (aarch64) + OnePlus 6 NetHunter Pro (chroot aarch64)
 # Contract: mobile-first security starter pack. Everything here must build on
 # aarch64-linux and be useful without a GUI. Heavy tools (Ghidra, Burp,
 # full Metasploit) are intentionally omitted — they belong on a laptop or
 # dedicated x86 rig. Phone storage is tight; every package earns its place.
-
 {
   home.username = "kali";
   home.homeDirectory = "/home/kali";
@@ -82,7 +80,7 @@
     gdb
     strace
     ltrace
-    binutils          # objdump, strings, readelf
+    binutils # objdump, strings, readelf
 
     # === EXPLOITATION & CTF ===
     # pwntools — Python framework for exploit dev and CTF. Huge dependency tree
@@ -165,8 +163,8 @@
     headers = "curl -sI -o /dev/null -w '%{http_code} %{content_type} %{size_download}'";
 
     # Reverse engineering shortcuts
-    r2 = "rizin";            # Prefer rizin for daily RE; keep r2 for scripting
-    strings = "strings -a";  # Extract all strings, not just initialized data
+    r2 = "rizin"; # Prefer rizin for daily RE; keep r2 for scripting
+    strings = "strings -a"; # Extract all strings, not just initialized data
 
     # Steganography quick checks
     exif = "exiftool -a -u -g1";

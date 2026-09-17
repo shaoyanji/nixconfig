@@ -7,7 +7,10 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../modules/profiles/base-desktop-environment.nix
-    (import ../../modules/profiles/grub-boot.nix {inherit lib; device = "/dev/sda";})
+    (import ../../modules/profiles/grub-boot.nix {
+      inherit lib;
+      device = "/dev/sda";
+    })
   ];
   networking.hostName = "aceofspades";
   services.xserver.videoDrivers = ["amdgpu"];

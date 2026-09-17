@@ -65,7 +65,6 @@
   # Node.js/Yarn stack
   yarn = with pkgs; [
     yarn
-    yarn2nix
   ];
 
   # Media/download tools
@@ -83,12 +82,13 @@
   ];
 
   # Python with common packages (using default python3)
-  python-flask = pkgs.python3.withPackages (ps: with ps; [
-    flask
-    fuzzywuzzy
-    markdown2
-    python-dotenv
-  ]);
+  python-flask = pkgs.python3.withPackages (ps:
+    with ps; [
+      flask
+      fuzzywuzzy
+      markdown2
+      python-dotenv
+    ]);
 
   # Terminal extras
   terminal-extras = with pkgs; [

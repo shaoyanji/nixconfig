@@ -1,4 +1,8 @@
-{ config, lib, ... }: let
+{
+  config,
+  lib,
+  ...
+}: let
   cfg = config.profiles.aiHost;
   hasNullclawDeployment = config.aiServices ? nullclawDeployment;
   nullclawDeploymentEnabled =
@@ -28,23 +32,24 @@ in {
     };
   };
 
-  config =
-    lib.mkIf cfg.enable {
-      assertions = (lib.optionals hasNullclawDeployment [
+  config = lib.mkIf cfg.enable {
+    assertions =
+      (lib.optionals hasNullclawDeployment [
         {
           assertion = cfg.nullclaw.enable == nullclawDeploymentEnabled;
           message = "profiles.aiHost.nullclaw.enable must match aiServices.nullclawDeployment.enable when nullclaw-deployment is imported";
         }
-      ]) ++ (lib.optionals hasZeroclawDeployment [
+      ])
+      ++ (lib.optionals hasZeroclawDeployment [
         {
           assertion = cfg.zeroclaw.enable == zeroclawDeploymentEnabled;
           message = "profiles.aiHost.zeroclaw.enable must match aiServices.zeroclawDeployment.enable when zeroclaw-deployment is imported";
         }
       ]);
 
-      aiServices.nullclaw.enable = lib.mkDefault cfg.nullclaw.enable;
-      services.zeroclaw.instances = lib.mkIf (cfg.zeroclaw.enable && !zeroclawDeploymentEnabled) {
-        zeroclaw = {};
-      };
+    aiServices.nullclaw.enable = lib.mkDefault cfg.nullclaw.enable;
+    services.zeroclaw.instances = lib.mkIf (cfg.zeroclaw.enable && !zeroclawDeploymentEnabled) {
+      zeroclaw = {};
     };
+  };
 }

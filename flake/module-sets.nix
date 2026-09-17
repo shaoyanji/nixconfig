@@ -1,4 +1,7 @@
-{inputs, self}: let
+{
+  inputs,
+  self,
+}: let
   globalModules = [
     {
       system.configurationRevision = self.rev or self.dirtyRev or null;

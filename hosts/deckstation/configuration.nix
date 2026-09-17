@@ -1,7 +1,4 @@
-{
-  ...
-}:
-{
+{...}: {
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700-xt.nix

@@ -2,11 +2,9 @@
   pkgs,
   lib,
   ...
-}:
-let
+}: let
   user = import ../global/user.nix;
-in
-{
+in {
   imports = [
     ./desktop-client.nix
     ../nixos/lxc
@@ -55,12 +53,12 @@ in
       xdg-desktop-portal-gtk
     ];
     config.common = {
-      default = [ "kde" "gtk" ];
-      "org.freedesktop.impl.portal.FileChooser" = [ "kde" "gtk" ];
+      default = ["kde" "gtk"];
+      "org.freedesktop.impl.portal.FileChooser" = ["kde" "gtk"];
     };
     config.niri = lib.mkForce {
-      default = [ "kde" "gtk" ];
-      "org.freedesktop.impl.portal.FileChooser" = [ "kde" "gtk" ];
+      default = ["kde" "gtk"];
+      "org.freedesktop.impl.portal.FileChooser" = ["kde" "gtk"];
     };
   };
 

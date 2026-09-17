@@ -1,7 +1,4 @@
-{
-  lib,
-  ...
-}: {
+{lib, ...}: {
   # Baseline host firewall posture:
   # - enabled by default
   # - only SSH is open globally

@@ -10,58 +10,60 @@ in {
     ./nullclaw.nix
   ];
 
-  options.aiServices.nullclawDeployment = {
-    enable = lib.mkEnableOption "Fleet-ready nullclaw host deployment wrapper";
-    mode = lib.mkOption {
-      type = lib.types.enum [
-        "none"
-        "env-file"
-        "config-json"
-      ];
-      default = "none";
-      description = ''
-        Secret/config mode for nullclaw deployment:
-        - none: no extra secret/config source is wired
-        - env-file: environmentFile must be set
-        - config-json: configJsonSource must be set and staged to <workspaceRoot>/.nullclaw/config.json
-      '';
-    };
+  options.aiServices.nullclawDeployment =
+    {
+      enable = lib.mkEnableOption "Fleet-ready nullclaw host deployment wrapper";
+      mode = lib.mkOption {
+        type = lib.types.enum [
+          "none"
+          "env-file"
+          "config-json"
+        ];
+        default = "none";
+        description = ''
+          Secret/config mode for nullclaw deployment:
+          - none: no extra secret/config source is wired
+          - env-file: environmentFile must be set
+          - config-json: configJsonSource must be set and staged to <workspaceRoot>/.nullclaw/config.json
+        '';
+      };
 
-    listenHost = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "127.0.0.1";
-      description = "Host bind address passed to the nullclaw service.";
-    };
+      listenHost = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "127.0.0.1";
+        description = "Host bind address passed to the nullclaw service.";
+      };
 
-    listenPort = lib.mkOption {
-      type = lib.types.nullOr lib.types.port;
-      default = null;
-      example = 3001;
-      description = "Port passed to the nullclaw service.";
-    };
+      listenPort = lib.mkOption {
+        type = lib.types.nullOr lib.types.port;
+        default = null;
+        example = 3001;
+        description = "Port passed to the nullclaw service.";
+      };
 
-    workspaceRoot = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "/var/lib/nullclaw";
-      description = "State/workspace root for nullclaw.";
-    };
+      workspaceRoot = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "/var/lib/nullclaw";
+        description = "State/workspace root for nullclaw.";
+      };
 
-    environmentFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "/run/secrets/nullclaw";
-      description = "Optional environment file consumed by the nullclaw systemd unit.";
-    };
+      environmentFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "/run/secrets/nullclaw";
+        description = "Optional environment file consumed by the nullclaw systemd unit.";
+      };
 
-    configJsonSource = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "/run/secrets/nullclaw-config";
-      description = "Optional source file copied to the runtime nullclaw config path before service start.";
-    };
-  } // aiServicesMounts.mkMountOptions "nullclaw";
+      configJsonSource = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "/run/secrets/nullclaw-config";
+        description = "Optional source file copied to the runtime nullclaw config path before service start.";
+      };
+    }
+    // aiServicesMounts.mkMountOptions "nullclaw";
 
   config = lib.mkIf cfg.enable {
     assertions = [

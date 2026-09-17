@@ -1,71 +1,73 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
-{ config, lib, pkgs, ... }:
-
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Use the GRUB 2 boot loader.
- # boot.loader.grub.enable = true;
+  # boot.loader.grub.enable = true;
   # boot.loader.grub.efiSupport = true;
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
   # Define on which hard drive you want to install Grub.
   # boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
-boot.loader.systemd-boot.enable = true;
-boot.loader.efi.canTouchEfiVariables = false;
-boot.supportedFilesystems = ["f2fs" "nfs"];
-fileSystems = {
-  "/Volumes/data"= {
-    device = "192.168.3.25:/data";
-    fsType = "nfs";
-    options = ["noatime" "nfsvers=4" "rw" "x-systemd.automount" "x-systemd.idle-timeout=600"];
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = false;
+  boot.supportedFilesystems = ["f2fs" "nfs"];
+  fileSystems = {
+    "/Volumes/data" = {
+      device = "192.168.3.25:/data";
+      fsType = "nfs";
+      options = ["noatime" "nfsvers=4" "rw" "x-systemd.automount" "x-systemd.idle-timeout=600"];
     };
-};
+  };
 
-networking.firewall.allowedTCPPorts = [ 2049 ];
+  networking.firewall.allowedTCPPorts = [2049];
 
-boot.kernelParams = [
-  # "fsck.mode=skip"
-   # "nomodeset"
-   # "console=tty1"
-  # "quiet" "loglevel=3"
-];
-boot.kernel.sysctl = {
-  "vm.swappiness"=100;
-  "vm.vfs_cache_pressure" = 150;
-  "vm.dirty_ratio" = 10;
-  "vm.dirty_background_ratio"=5;
-};
-boot.consoleLogLevel = 3;
-nix.optimise.automatic = true;
-# nix.optimise.interval = "weekly";
-nix.gc = {
-  automatic = true;
-  persistent = true;
-  dates = "weekly";
-  # options = "--delete-older-than-30d";
-};
-services.journald.extraConfig = "SystemMaxUse=50M";
+  boot.kernelParams = [
+    # "fsck.mode=skip"
+    # "nomodeset"
+    # "console=tty1"
+    # "quiet" "loglevel=3"
+  ];
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 100;
+    "vm.vfs_cache_pressure" = 150;
+    "vm.dirty_ratio" = 10;
+    "vm.dirty_background_ratio" = 5;
+  };
+  boot.consoleLogLevel = 3;
+  nix.optimise.automatic = true;
+  # nix.optimise.interval = "weekly";
+  nix.gc = {
+    automatic = true;
+    persistent = true;
+    dates = "weekly";
+    # options = "--delete-older-than-30d";
+  };
+  services.journald.extraConfig = "SystemMaxUse=50M";
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
-zramSwap = {
-enable = true;
-memoryPercent = 100; algorithm = "lz4";
-};
-   networking.hostName = "netbook"; # Define your hostname.
+  zramSwap = {
+    enable = true;
+    memoryPercent = 100;
+    algorithm = "lz4";
+  };
+  networking.hostName = "netbook"; # Define your hostname.
 
   # Configure network connections interactively with nmcli or nmtui.
   networking.networkmanager.enable = true;
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
-# users.users.root.initialPassword = "nixos";
+  # users.users.root.initialPassword = "nixos";
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -80,9 +82,6 @@ memoryPercent = 100; algorithm = "lz4";
 
   # Enable the X11 windowing system.
   # services.xserver.enable = true;
-
-
-  
 
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
@@ -105,78 +104,75 @@ memoryPercent = 100; algorithm = "lz4";
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.devji = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = ["wheel"]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       tree
     ];
   };
 
-# programs.firefox.enable = true;
+  # programs.firefox.enable = true;
 
-programs.niri.enable = true;
+  programs.niri.enable = true;
 
-services.greetd = {
-  enable = true;
-  settings = {
-    default_session = {
-      command = "${config.programs.niri.package}/bin/niri-session";
-      user = "alice";
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${config.programs.niri.package}/bin/niri-session";
+        user = "alice";
+      };
     };
   };
-};
-systemd.user.services.niri.enableDefaultPath = false;
-security.polkit.enable = true; # polkit
-services.gnome.gnome-keyring.enable = true; # secret service
-security.pam.services.swaylock = {};
+  systemd.user.services.niri.enableDefaultPath = false;
+  security.polkit.enable = true; # polkit
+  services.gnome.gnome-keyring.enable = true; # secret service
+  security.pam.services.swaylock = {};
 
-# programs.waybar.enable = true; # top bar
-# services.displayManager.sddm.enable = true;
-# services.displayManager.sddm.wayland.enable = true;
-# services.displayManager.autoLogin = {
-# enable=true;
-# user="alice";
-  
-# };
+  # programs.waybar.enable = true; # top bar
+  # services.displayManager.sddm.enable = true;
+  # services.displayManager.sddm.wayland.enable = true;
+  # services.displayManager.autoLogin = {
+  # enable=true;
+  # user="alice";
 
-
-
+  # };
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
-   environment.systemPackages = with pkgs; [
-  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-git
-curl
-helix   
-  wget
-  waybar
-  alacritty
-  fuzzel
-  mako
-  swayidle
-  swaybg
-  nautilus
-  # crush
-  nixd
-  nixfmt
-  btop
-  fastfetch
-  # librewolf
-  firefox
-  tmux
-  lowfi
-  grim
-  wl-clipboard
-  imv
-  mpv
-  nushell
-  rsync
-  yt-dlp
-  yewtube
-  fzf
-  jq
-  gum
-      xwayland-satellite # xwayland support
+  environment.systemPackages = with pkgs; [
+    #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    git
+    curl
+    helix
+    wget
+    waybar
+    alacritty
+    fuzzel
+    mako
+    swayidle
+    swaybg
+    nautilus
+    # crush
+    nixd
+    nixfmt
+    btop
+    fastfetch
+    # librewolf
+    firefox
+    tmux
+    lowfi
+    grim
+    wl-clipboard
+    imv
+    mpv
+    nushell
+    rsync
+    yt-dlp
+    yewtube
+    fzf
+    jq
+    gum
+    xwayland-satellite # xwayland support
   ];
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
@@ -223,6 +219,4 @@ helix
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
-
 }
-

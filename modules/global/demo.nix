@@ -3,33 +3,34 @@
 let
   userName = "user";
   userHome = "/home/user";
-in {
-  inputs,
-  config,
-  ...
-}: {
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "hm-backup";
-    users.${userName} = {
-      imports = [
-        ../roles/demo.nix
+in
+  {
+    inputs,
+    config,
+    ...
+  }: {
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      backupFileExtension = "hm-backup";
+      users.${userName} = {
+        imports = [
+          ../roles/demo.nix
+        ];
+        home.username = userName;
+        home.homeDirectory = userHome;
+        home.stateVersion = config.system.stateVersion;
+      };
+      sharedModules = [
+        inputs.kickstart-nixvim.homeManagerModules.default
+        inputs.nix-index-database.homeModules.nix-index
+        inputs.niri.homeModules.niri
+        inputs.dms.homeModules.dank-material-shell
+        inputs.dms.homeModules.niri
       ];
-      home.username = userName;
-      home.homeDirectory = userHome;
-      home.stateVersion = config.system.stateVersion;
+      extraSpecialArgs = {
+        inherit inputs;
+        hostName = config.networking.hostName;
+      };
     };
-    sharedModules = [
-      inputs.kickstart-nixvim.homeManagerModules.default
-      inputs.nix-index-database.homeModules.nix-index
-      inputs.niri.homeModules.niri
-      inputs.dms.homeModules.dank-material-shell
-      inputs.dms.homeModules.niri
-    ];
-    extraSpecialArgs = {
-      inherit inputs;
-      hostName = config.networking.hostName;
-    };
-  };
-}
+  }

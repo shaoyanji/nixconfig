@@ -3,11 +3,7 @@
 # Still imported by base-desktop-environment.nix but produces zero config.
 # Remove the import line from base-desktop-environment.nix when dropping this.
 # Created: 2024   Deprecated: 2025
-
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   environment.systemPackages = with pkgs; [
     # incus
   ];

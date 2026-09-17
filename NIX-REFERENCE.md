@@ -17,9 +17,9 @@ lib.recursiveUpdate { a.x = 1; } { a.y = 2; }  # => { a.x = 1; a.y = 2; }
 The `//` operator is used extensively for systemd serviceConfig merging:
 ```nix
 serviceConfig = {
-  User = "hermes";
+  User = "svc";
   ExecStart = "...";
-} // mountConfig  # mountConfig adds BindPaths, BindReadOnlyPaths, EnvironmentFile
+} // extraConfig  # e.g. adds BindPaths, EnvironmentFile, etc.
   // lib.optionalAttrs (envFiles != []) { EnvironmentFile = envFiles; }
 ```
 
@@ -87,7 +87,7 @@ to any explicit definition.
   imports = lib.optionals withBar [ ./bar.nix ];
   # ...
 }
-# Usage in host: (import ../../modules/profiles/ai-host.nix { withOpenclaw = true; })
+# Usage in host: (import ../../modules/profiles/server-hardening.nix { withJournaldCaps = true; })
 ```
 
 ## Common Types
@@ -112,63 +112,18 @@ lib.types.submodule {      # nested option set
 
 ## Patterns in This Codebase
 
-### ai-services-mounts helper
-
-Every AI service (nullclaw, xs, pancakes-harness) uses this EXCEPT hermes:
-
-```nix
-# In the module:
-let
-  aiServicesMounts = import ../lib/ai-services-mounts.nix {inherit lib;};
-in {
-  options.aiServices.foo = {
-    enable = lib.mkEnableOption "Foo";
-    workspaceRoot = lib.mkOption { ... };
-  } // aiServicesMounts.mkMountOptions "foo";   # adds contextRoot, stateDir, etc.
-
-  config = lib.mkIf cfg.enable {
-    systemd.services.foo.serviceConfig = {
-      User = "foo";
-      ExecStart = "...";
-    } // aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot   # adds BindPaths, etc.
-      // lib.optionalAttrs (allEnvFiles != []) { EnvironmentFile = allEnvFiles; };
-  };
-}
-```
-
-The helper generates:
-- `BindReadOnlyPaths`: context + shared defaults
-- `BindPaths`: state directory
-- `EnvironmentFile`: shared defaults + shared secrets
-
-### Host-level hermes pattern (current, to be refactored)
-
-Currently each host manually does what the helper does:
-```nix
-# Each host repeats this verbatim:
-systemd.services.hermes-agent.serviceConfig = {
-  BindReadOnlyPaths = [
-    "/srv/data/ai-services/context:/var/lib/hermes/.ai-services/context"
-    "-/srv/data/ai-services/defaults/shared.env:/var/lib/hermes/.ai-services/defaults/shared.env"
-  ];
-  BindPaths = [ "/srv/data/ai-services/state/hermes:/var/lib/hermes/.ai-services/state" ];
-  EnvironmentFile = [ "-/srv/data/ai-services/defaults/shared.env" ]
-    ++ config.services.hermes-agent.environmentFiles;
-};
-```
-
 ### lib.mkMerge for sops.secrets
 
 ```nix
 sops.secrets = lib.mkMerge [
-  (lib.mkIf enableNullClaw {
-    nullclaw = { owner = "nullclaw"; group = "nullclaw"; mode = "0400"; };
+  (lib.mkIf enableServiceA {
+    service-a = { owner = "service-a"; group = "service-a"; mode = "0400"; };
   })
-  (lib.mkIf enableHermes {
-    hermes = { owner = "hermes"; group = "hermes"; mode = "0400"; };
+  (lib.mkIf enableServiceB {
+    service-b = { owner = "service-b"; group = "service-b"; mode = "0400"; };
   })
   {
-    ai-services-shared-env = { owner = "root"; group = "root"; mode = "0444"; };
+    shared-env = { owner = "root"; group = "root"; mode = "0444"; };
   }
 ];
 ```

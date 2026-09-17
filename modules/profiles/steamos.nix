@@ -26,12 +26,11 @@
 #
 # Usage:
 #   imports = [ ../../modules/profiles/steamos.nix ];
-{ config
-, lib
-, pkgs
-, ...
-}:
-let
+{
+  lib,
+  pkgs,
+  ...
+}: let
   # Synthesize the gamescope-session wrapper that greetd will exec. The wrapper
   # is installed unconditionally in environment.systemPackages below so it
   # ALWAYS wins the PATH lookup. Whether the wrapper actually calls gamescope
@@ -113,8 +112,7 @@ let
     echo "    exec ${pkgs.cage}/bin/cage -s -- ${pkgs.steam}/bin/steam -gamepadui" >>"$log"
     exec ${pkgs.cage}/bin/cage -s -- ${pkgs.steam}/bin/steam -gamepadui
   '';
-in
-{
+in {
   imports = [
     ./steam.nix
   ];
@@ -126,7 +124,7 @@ in
   # gamescope binary which segfaults on Kepler + legacy_580. We pair this with
   # the `programs.steam.gamescopeSession.enable = lib.mkForce false` override
   # below so Steam's NixOS module stops generating that competing wrapper.
-  environment.systemPackages = [ customGamescopeSession ];
+  environment.systemPackages = [customGamescopeSession];
 
   # gamescope package is intentionally NOT installed on this Kepler
   # profile (round 5). Cage is the Wayland kiosk compositor for Steam
@@ -213,7 +211,7 @@ in
   # Steam-only hosts don't import desktop-client, so we add these here.
   # `seat` group is required so devji can talk to libseat once greetd has
   # switched away from the `greeter` user to run gamescope-session.
-  users.users.devji.extraGroups = [ "video" "render" "input" "seat" ];
+  users.users.devji.extraGroups = ["video" "render" "input" "seat"];
 
   # Disabled-block (autologin mode skips the tuigreet greeter; preserve
   # as dormant toggle for future re-enable):

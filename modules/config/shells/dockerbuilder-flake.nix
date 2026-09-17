@@ -3,9 +3,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   };
 
-  outputs = {
-    nixpkgs,
-  }: let
+  outputs = {nixpkgs}: let
     inherit (nixpkgs) lib;
     supportedSystems = [
       "x86_64-linux"

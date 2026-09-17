@@ -51,8 +51,11 @@
         command = [
           "${pkgs.swayidle}/bin/swayidle"
           "-w"
-          "timeout" "600" "${pkgs.niri}/bin/niri msg action power-off-monitors"
-          "resume" "${pkgs.niri}/bin/niri msg action power-on-monitors"
+          "timeout"
+          "600"
+          "${pkgs.niri}/bin/niri msg action power-off-monitors"
+          "resume"
+          "${pkgs.niri}/bin/niri msg action power-on-monitors"
         ];
       }
     ];

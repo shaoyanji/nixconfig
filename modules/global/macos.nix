@@ -1,10 +1,8 @@
 # macOS (nix-darwin) home-manager configuration.
 # Primary user constants: modules/global/user.nix
-{inputs, ...}:
-let
+{inputs, ...}: let
   user = import ../global/user.nix;
-in
-{
+in {
   imports = [
     ./home-manager-shared.nix
   ];

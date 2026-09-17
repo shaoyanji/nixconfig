@@ -44,75 +44,75 @@ in {
       };
     }
     (lib.mkIf cfg.enable {
-    sops.secrets.nullclaw = {
-      owner = "nullclaw";
-      group = "nullclaw";
-      mode = "0400";
-    };
+      sops.secrets.nullclaw = {
+        owner = "nullclaw";
+        group = "nullclaw";
+        mode = "0400";
+      };
 
-    users.groups.nullclaw = {};
+      users.groups.nullclaw = {};
 
-    users.users.nullclaw = {
-      isSystemUser = true;
-      group = "nullclaw";
-      home = cfg.workspaceRoot;
-      createHome = true;
-    };
+      users.users.nullclaw = {
+        isSystemUser = true;
+        group = "nullclaw";
+        home = cfg.workspaceRoot;
+        createHome = true;
+      };
 
-    systemd.tmpfiles.rules = [
-      "d ${cfg.workspaceRoot} 0750 nullclaw nullclaw -"
-      "d ${cfg.workspaceRoot}/.nullclaw 0750 nullclaw nullclaw -"
-      "d ${cfg.workspaceRoot}/workspace 0750 nullclaw nullclaw -"
-      "d ${cfg.workspaceRoot}/.ai-services 0750 nullclaw nullclaw -"
-      "d ${cfg.workspaceRoot}/.ai-services/defaults 0750 nullclaw nullclaw -"
-      "d ${cfg.workspaceRoot}/.ai-services/state 0750 nullclaw nullclaw -"
-      "f ${cfg.workspaceRoot}/.ai-services/defaults/shared.env 0640 nullclaw nullclaw -"
-    ];
+      systemd.tmpfiles.rules = [
+        "d ${cfg.workspaceRoot} 0750 nullclaw nullclaw -"
+        "d ${cfg.workspaceRoot}/.nullclaw 0750 nullclaw nullclaw -"
+        "d ${cfg.workspaceRoot}/workspace 0750 nullclaw nullclaw -"
+        "d ${cfg.workspaceRoot}/.ai-services 0750 nullclaw nullclaw -"
+        "d ${cfg.workspaceRoot}/.ai-services/defaults 0750 nullclaw nullclaw -"
+        "d ${cfg.workspaceRoot}/.ai-services/state 0750 nullclaw nullclaw -"
+        "f ${cfg.workspaceRoot}/.ai-services/defaults/shared.env 0640 nullclaw nullclaw -"
+      ];
 
-    systemd.services.nullclaw = {
-      description = "NullClaw Gateway";
-      wantedBy = ["multi-user.target"];
-      after = ["network-online.target"];
-      wants = ["network-online.target"];
-      path =
-        config.environment.systemPackages
-        ++ (with pkgs; [
-          curl
-          cacert
-          jq
-          yq-go
-          ddgr
-        ]);
-      serviceConfig = let
-        mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
-        sharedEnvFiles = mountConfig.EnvironmentFile or [];
-        allEnvFiles = sharedEnvFiles ++ lib.optionals (cfg.environmentFile != null) [cfg.environmentFile];
-      in
-        {
-          User = "nullclaw";
-          Group = "nullclaw";
-          WorkingDirectory = cfg.workspaceRoot;
-          ExecStart = "${nullclawPkg}/bin/nullclaw gateway --host ${cfg.host} --port ${toString cfg.port}";
-          Restart = "always";
-          RestartSec = "5s";
+      systemd.services.nullclaw = {
+        description = "NullClaw Gateway";
+        wantedBy = ["multi-user.target"];
+        after = ["network-online.target"];
+        wants = ["network-online.target"];
+        path =
+          config.environment.systemPackages
+          ++ (with pkgs; [
+            curl
+            cacert
+            jq
+            yq-go
+            ddgr
+          ]);
+        serviceConfig = let
+          mountConfig = aiServicesMounts.mkMountConfig cfg cfg.workspaceRoot;
+          sharedEnvFiles = mountConfig.EnvironmentFile or [];
+          allEnvFiles = sharedEnvFiles ++ lib.optionals (cfg.environmentFile != null) [cfg.environmentFile];
+        in
+          {
+            User = "nullclaw";
+            Group = "nullclaw";
+            WorkingDirectory = cfg.workspaceRoot;
+            ExecStart = "${nullclawPkg}/bin/nullclaw gateway --host ${cfg.host} --port ${toString cfg.port}";
+            Restart = "always";
+            RestartSec = "5s";
 
-          Environment = [
-            "HOME=${cfg.workspaceRoot}"
-            "NULLCLAW_HOME=${cfg.workspaceRoot}/.nullclaw"
-            "NULLCLAW_WORKSPACE=${cfg.workspaceRoot}/workspace"
-          ];
+            Environment = [
+              "HOME=${cfg.workspaceRoot}"
+              "NULLCLAW_HOME=${cfg.workspaceRoot}/.nullclaw"
+              "NULLCLAW_WORKSPACE=${cfg.workspaceRoot}/workspace"
+            ];
 
-          NoNewPrivileges = true;
-          PrivateTmp = true;
-          ProtectSystem = "strict";
-          ProtectHome = false;
-          ReadWritePaths = [cfg.workspaceRoot];
-        }
-        // mountConfig
-        // lib.optionalAttrs (allEnvFiles != []) {
-          EnvironmentFile = allEnvFiles;
-        };
-    };
-  })
+            NoNewPrivileges = true;
+            PrivateTmp = true;
+            ProtectSystem = "strict";
+            ProtectHome = false;
+            ReadWritePaths = [cfg.workspaceRoot];
+          }
+          // mountConfig
+          // lib.optionalAttrs (allEnvFiles != []) {
+            EnvironmentFile = allEnvFiles;
+          };
+      };
+    })
   ];
 }

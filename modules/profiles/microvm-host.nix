@@ -12,10 +12,7 @@
   bridgeAddress ? "192.168.83.1/24",
   pkgs,
   ...
-}: {
-  lib,
-  ...
-}: {
+}: {lib, ...}: {
   options.microvm.network = {
     enable = lib.mkOption {
       type = lib.types.bool;

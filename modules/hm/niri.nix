@@ -1,4 +1,5 @@
-{lib, ...}: with lib; {
+{lib, ...}:
+with lib; {
   options.programs.niri = {
     enable = mkEnableOption "niri";
     package = mkOption {

@@ -1,9 +1,6 @@
 # NixOS home-manager embedded configuration.
 # Primary user constants: modules/global/user.nix
-{
-  inputs,
-  ...
-}: {
+{inputs, ...}: {
   imports = [
     ./home-manager-shared.nix
   ];

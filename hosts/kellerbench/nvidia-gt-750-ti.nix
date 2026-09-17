@@ -1,8 +1,4 @@
-{
-  config,
-  lib,
-  ...
-}: {
+{config, ...}: {
   # This host is an on-demand benchmark node, so keep baseline PM explicit.
   powerManagement.enable = true;
 

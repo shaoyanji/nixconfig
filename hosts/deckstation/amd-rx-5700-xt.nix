@@ -1,4 +1,4 @@
-{...}: {
+_: {
   services.xserver.videoDrivers = ["amdgpu"];
 
   # Minimal Mesa + amdgpu driver. enable32Bit is left to steamos.nix

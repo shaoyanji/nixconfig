@@ -1,4 +1,4 @@
-{...}: let
+_: let
   user = import ../../modules/global/user.nix;
 in {
   imports = [

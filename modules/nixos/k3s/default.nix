@@ -6,7 +6,7 @@
       #role = "server"; # Or "agent" for worker only nodes
       tokenFile = "${config.sops.secrets."local/k3s/token".path}";
       serverAddr = "https://k3s.local:6443";
-      #serverAddr = "https://thinsandy.cloudforest-kardashev.ts.net:6443";
+      #serverAddr = "https://frieren.cloudforest-kardashev.ts.net:6443";
     };
   };
 

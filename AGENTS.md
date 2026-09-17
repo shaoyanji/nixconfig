@@ -35,10 +35,10 @@ flake.nix → flake/outputs.nix (hub)
 
 | Chain | What it includes | Used by |
 |-------|-----------------|---------|
-| `globalModulesNixos` | global + nixos + home-manager-shared + sops + nix-index + dms (desktop) | poseidon, aristotle, aceofspades, ancientace |
+| `globalModulesNixos` | global + nixos + home-manager-shared + sops + nix-index + dms (desktop) | poseidon, aristotle, aceofspades, ancientace, eisen, frieren, scratch |
 | `globalModulesImpermanence` | globalModulesNixos + impermanence + disko | schneeeule |
 | containers + impermanence (ares) | globalModulesContainers + impermanence + disko | ares (Steam kiosk) |
-| `globalModulesContainers` | global + noDE + sops + home-manager + nix-index (no dms/niri desktop) | thinsandy, mtfuji, scratch, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), netbook, deckstation |
+| `globalModulesContainers` | global + noDE + sops + home-manager + nix-index (no dms/niri desktop) | mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), netbook, deckstation |
 | `globalModulesMacos` | global + macos + nix-homebrew + home-manager + sops | cassini (darwin) |
 | `globalModulesDemo` | global + demo + home-manager (no sops) | demo (NixOS demo VM) |
 | `globalModulesHome` | standalone HM sharedModules only | penguin, alarm, kali (standalone home-manager) |

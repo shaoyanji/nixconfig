@@ -79,13 +79,6 @@ tasks:
     cmds:
       - task checks:nullclaw:smoke:mtfuji SECRET_PATH={{.SECRET_PATH}}
 
-  checks:nullclaw:smoke:thinsandy:
-    desc: Smoke-check thinsandy nullclaw deployment (direct env-file pattern)
-    vars:
-      SECRET_PATH: "/run/secrets/nullclaw"
-    cmds:
-      - task checks:nullclaw:smoke:thinsandy SECRET_PATH={{.SECRET_PATH}}
-
   checks:nullclaw:smoke:kellerbench:
     desc: Smoke-check kellerbench nullclaw deployment (on-demand host semantics)
     vars:

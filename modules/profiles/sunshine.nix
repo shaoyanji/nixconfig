@@ -39,8 +39,9 @@
   #   - "users.users.sunshine.group is unset. This used to default to
   #      nogroup, but this is unsafe."
   # Both surface as a toplevel build error (kellerbench system rebuild
-  # fails) and as host-eval-all assertion failures on multihost eval
-  # (which is what deckstation hit before the defensive group add).
+  # fails) and as per-host evaluation check failures on multihost eval
+  # (checks.host-eval-<host>; this is what deckstation hit before the
+  # defensive group add).
   #
   # We declare the user as a daemon (long-lived background service, no
   # login, no shell) which is the right shape for Sunshine. UID/GID
@@ -50,14 +51,14 @@
     isSystemUser = true;
     group = "sunshine";
     extraGroups = [
-      "video"  # KMS/DRM plane read for capture
+      "video" # KMS/DRM plane read for capture
       "render" # GPU buffers for game stream frames
-      "input"  # inject gamepad/keyboard/mouse events over the stream
+      "input" # inject gamepad/keyboard/mouse events over the stream
     ];
   };
 
   # Sunshines user-group counterpart. Pinned in the round-6 fix to fix
-  # the deckstation host-eval-all failure. NixOS auto-picks a free
+  # the deckstation host-eval failure. NixOS auto-picks a free
   # GID; we deliberately do NOT hard-code one (would clash across
   # hosts that import this profile in the same /etc/passwd context
   # during a shared Docker build, etc).

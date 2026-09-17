@@ -1,8 +1,9 @@
-{
-  inputs,
-  moduleSets,
-  self,
-}: let
+{ inputs
+, moduleSets
+, self
+,
+}:
+let
   inherit
     (moduleSets)
     globalModulesContainers
@@ -12,11 +13,12 @@
     globalModulesMacos
     globalModulesNixos
     ;
-in {
+in
+{
   garnixMachine = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     modules = [
       inputs.garnix-lib.nixosModules.garnix
       ../hosts/garnixMachine.nix
@@ -26,34 +28,34 @@ in {
   poseidon = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/poseidon/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesNixos ++ [ ../hosts/poseidon/configuration.nix ];
   };
 
   mtfuji = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesContainers ++ [../hosts/mtfuji/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesContainers ++ [ ../hosts/mtfuji/configuration.nix ];
   };
 
   kellerbench = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesContainers ++ [../hosts/kellerbench/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesContainers ++ [ ../hosts/kellerbench/configuration.nix ];
   };
 
   deckstation = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesContainers ++ [../hosts/deckstation/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesContainers ++ [ ../hosts/deckstation/configuration.nix ];
   };
   eisen = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     # Upgraded from a cage-based Steam kiosk to a full desktop
     # (poseidon-style): globalModulesNixos brings in niri + DankMaterialShell
     # and the sops/nix-index HM modules.  Steam runs under the upstream
@@ -61,13 +63,13 @@ in {
     # kellerbench's Kepler card).  The previous cage-kiosk specialisation and
     # greetd dual-session experiments hung at graphical.target, so the DMS
     # greeter path (as on poseidon) is used instead of greetd auto-login.
-    modules = globalModulesNixos ++ [../hosts/eisen/configuration.nix];
+    modules = globalModulesNixos ++ [ ../hosts/eisen/configuration.nix ];
   };
 
   applevalley = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -79,14 +81,14 @@ in {
   frieren = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/frieren/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesNixos ++ [ ../hosts/frieren/configuration.nix ];
   };
 
   ares = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     # ares is the T440p SSD moved into a desktop case (i5-6500 + GTX
     # 750 Ti).  Converted to a Steam Big Picture kiosk (steamos.nix)
     # mirroring eisen/kellerbench.  Uses the noDE containers chain +
@@ -102,45 +104,47 @@ in {
         inputs.disko.nixosModules.default
         ../modules/global/impermanence.nix
         ../hosts/ares/configuration.nix
-        (import ../hosts/common/disko.nix {device = "/dev/sda";})
+        (import ../hosts/common/disko.nix { device = "/dev/sda"; })
       ];
   };
 
   schneeeule = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     modules =
       globalModulesImpermanence
       ++ [
         ../hosts/schneeeule/configuration.nix
-        (import ../hosts/common/disko.nix {device = "/dev/sda";})
+        (import ../hosts/common/disko.nix { device = "/dev/sda"; })
       ];
   };
 
   scratch = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    # Steam Remote Play client (cage + steam -gamepadui kiosk) on a
-    # Fujitsu ESPRIMO D556 (i5-6500, 8 GB RAM, 128 GB f2fs SSD).
+    specialArgs = { inherit inputs self; };
+    # Lightweight niri desktop (eisen-style) on a Fujitsu ESPRIMO D556
+    # (i5-6500, 8 GB RAM, 128 GB f2fs SSD). Formerly a Steam Remote
+    # Play kiosk; Steam dropped in the 2026-09 desktop conversion.
     # f2fs has no subvolumes so the btrfs impermanence module is NOT
     # used — the host config puts every heavy-write dir on tmpfs
-    # (zram 100%, journald volatile, fstrim, noatime).
-    modules = globalModulesContainers ++ [../hosts/scratch/configuration.nix];
+    # (zram 100%, journald volatile, fstrim, noatime).  Legacy BIOS
+    # boot: GRUB on /dev/sda, systemd-boot disabled.
+    modules = globalModulesNixos ++ [ ../hosts/scratch/configuration.nix ];
   };
 
   aristotle = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/aristotle/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesNixos ++ [ ../hosts/aristotle/configuration.nix ];
   };
 
   netbook = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -152,21 +156,21 @@ in {
   aceofspades = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/aceofspades/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesNixos ++ [ ../hosts/aceofspades/configuration.nix ];
   };
 
   ancientace = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesNixos ++ [../hosts/ancientace/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesNixos ++ [ ../hosts/ancientace/configuration.nix ];
   };
 
   guckloch = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -178,7 +182,7 @@ in {
   minyx = {
     kind = "nixos";
     system = "aarch64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -192,7 +196,7 @@ in {
   sledgehammer = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -204,18 +208,18 @@ in {
   demo = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesDemo ++ [../hosts/demo/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesDemo ++ [ ../hosts/demo/configuration.nix ];
   };
 
   testvm = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = {inherit inputs self;};
+    specialArgs = { inherit inputs self; };
     modules = [
       inputs.microvm.nixosModules.microvm
-      (import ../hosts/microvms/testvm.nix {})
-      ({pkgs, ...}: {
+      (import ../hosts/microvms/testvm.nix { })
+      ({ pkgs, ... }: {
         environment.systemPackages = with pkgs; [
           vim
           htop
@@ -227,28 +231,28 @@ in {
   penguin = {
     kind = "home";
     system = "x86_64-linux";
-    extraSpecialArgs = {inherit inputs self;};
-    modules = globalModulesHome ++ [../hosts/penguin.nix];
+    extraSpecialArgs = { inherit inputs self; };
+    modules = globalModulesHome ++ [ ../hosts/penguin.nix ];
   };
 
   alarm = {
     kind = "home";
     system = "aarch64-linux";
-    extraSpecialArgs = {inherit inputs self;};
-    modules = globalModulesHome ++ [../hosts/alarm.nix];
+    extraSpecialArgs = { inherit inputs self; };
+    modules = globalModulesHome ++ [ ../hosts/alarm.nix ];
   };
 
   kali = {
     kind = "home";
     system = "aarch64-linux";
-    extraSpecialArgs = {inherit inputs self;};
-    modules = globalModulesHome ++ [../hosts/kali.nix];
+    extraSpecialArgs = { inherit inputs self; };
+    modules = globalModulesHome ++ [ ../hosts/kali.nix ];
   };
 
   cassini = {
     kind = "darwin";
     system = "aarch64-darwin";
-    specialArgs = {inherit inputs self;};
-    modules = globalModulesMacos ++ [../hosts/cassini/configuration.nix];
+    specialArgs = { inherit inputs self; };
+    modules = globalModulesMacos ++ [ ../hosts/cassini/configuration.nix ];
   };
 }

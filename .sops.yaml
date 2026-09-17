@@ -15,8 +15,6 @@ keys:
   - &acersopshost age15mzmhlt5hh5z94843e27rqev4955v3gkcwqacr4ueyxegzav94kqvz0c43
   - &ares age1nqdx5a80wy6d3hjsldhhe5y4ltrfv3zr9m3cdrekcxha0hg7g5usxj482d
   - &areshost age12gezpwjwq0ln36gt22h3hp6v2tsf5df4sgrr7x4g57sa83dc6unsft55zx
-  - &thinsandyhost age1fgrg9t27a39falklr9375p3q6hcrqm52rdges83zawzzpnev3cvq7fgfgm
-  - &thinsandy age1q6klnp8k9282fjxlweu5gmkxpt4pxzyumkk3q8hdeunz8w3ns40scn7q8a
   - &ancientacehost age1ageqwpdaf0zkkkc3xqf3qag577fm80cf8vqc5glkz6fqjjp7jpss8t590l
   - &ancientace age1pk08qp3exeaw8ky7vs3xtxsuw55g8nrsp8j8pj4xar8ynngv7q9qtywkkm
   - &mtfuji age1cpped4xh57c2zrguv6y2sqy526lnpklmruw7leu50xxuclmux5askrhrry
@@ -53,8 +51,6 @@ creation_rules:
           - *acersops
           - *acersopshost
           - *areshost
-          - *thinsandyhost
-          - *thinsandy
           - *ancientace
           - *ancientacehost
           - *mtfuji

@@ -1,7 +1,4 @@
-{
-  lib,
-  ...
-}: let
+{lib, ...}: let
   # Load authorized keys from centralized config
   keysConfig = builtins.fromJSON (builtins.readFile ../config/authorized-keys.json);
   sshKeys =

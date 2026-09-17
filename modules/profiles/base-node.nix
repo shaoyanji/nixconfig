@@ -5,11 +5,9 @@
   pkgs,
   inputs,
   ...
-}:
-let
+}: let
   user = import ../global/user.nix;
-in
-{
+in {
   imports = [
     ../../modules/config/authorized-keys.nix
     ../../modules/ssh-ca.nix

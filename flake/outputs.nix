@@ -11,8 +11,7 @@
   hostInventory = import ./host-inventory.nix {inherit inputs moduleSets self;};
   hostProjection = import ./host-projection.nix {inherit lib hostInventory;};
   projectHosts = hostProjection.project;
-in
-{
+in {
   packages = import ./packages.nix {
     inherit inputs lib systems pkgsFor;
   };

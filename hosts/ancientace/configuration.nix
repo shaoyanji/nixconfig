@@ -4,11 +4,9 @@
   pkgs,
   lib,
   ...
-}:
-let
+}: let
   user = import ../../modules/global/user.nix;
-in
-{
+in {
   imports = [
     ../../modules/config/authorized-keys.nix
     # Include the results of the hardware scan.
@@ -21,7 +19,10 @@ in
       inherit pkgs;
       natExternalInterface = "wlp3s0";
     })
-    (import ../../modules/profiles/grub-boot.nix {inherit lib; device = "nodev";})
+    (import ../../modules/profiles/grub-boot.nix {
+      inherit lib;
+      device = "nodev";
+    })
   ];
 
   services.ollama = {

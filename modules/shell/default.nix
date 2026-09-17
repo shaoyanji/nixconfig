@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: let
+{pkgs, ...}: let
   myAliases = {
     l = "${pkgs.eza}/bin/eza -lahF --color=auto --icons --sort=size --group-directories-first";
     lss = "${pkgs.eza}/bin/eza -hF --color=auto --icons --sort=size --group-directories-first";

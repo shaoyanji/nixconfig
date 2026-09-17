@@ -1,11 +1,6 @@
-{
-  pkgs,
-  ...
-}:
-let
+{pkgs, ...}: let
   user = import ../../modules/global/user.nix;
-in
-{
+in {
   networking.hostName = "guckloch";
 
   wsl.enable = true;

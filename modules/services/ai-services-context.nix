@@ -7,10 +7,14 @@
 
   # Helper to check if a service is enabled
   isServiceEnabled = name:
-    if name == "nullclaw" then config.aiServices.nullclaw.enable or false
-    else if name == "xs" then config.aiServices.xs.enable or false
-    else if name == "pancakes-harness" then (config.aiServices ? pancakesHarness) && (config.aiServices.pancakesHarness.enable or false)
-    else if name == "hermes" then (config.services ? hermes-agent) && (config.services.hermes-agent.enable or false)
+    if name == "nullclaw"
+    then config.aiServices.nullclaw.enable or false
+    else if name == "xs"
+    then config.aiServices.xs.enable or false
+    else if name == "pancakes-harness"
+    then (config.aiServices ? pancakesHarness) && (config.aiServices.pancakesHarness.enable or false)
+    else if name == "hermes"
+    then (config.services ? hermes-agent) && (config.services.hermes-agent.enable or false)
     else false;
 
   # Auto-derive enabled services from config (no manual listing needed)
@@ -18,10 +22,11 @@
 
   # Generate state directory creation commands only for enabled services
   stateDirCommands = lib.concatStringsSep "\n" (map (name: ''
-    mkdir -p ${cfg.stateRoot}/${name}
-    chown ${cfg.stateOwners.${name}}:${cfg.stateOwners.${name}} ${cfg.stateRoot}/${name}
-    chmod 0750 ${cfg.stateRoot}/${name}
-  '') enabledServices);
+      mkdir -p ${cfg.stateRoot}/${name}
+      chown ${cfg.stateOwners.${name}}:${cfg.stateOwners.${name}} ${cfg.stateRoot}/${name}
+      chmod 0750 ${cfg.stateRoot}/${name}
+    '')
+    enabledServices);
 in {
   options.aiServices.context = {
     enable = lib.mkEnableOption "AI services shared context materialization";
@@ -71,7 +76,10 @@ in {
         xs = "xs";
         pancakes-harness = "pancakes-harness";
       };
-      example = {nullclaw = "nullclaw"; hermes = "hermes";};
+      example = {
+        nullclaw = "nullclaw";
+        hermes = "hermes";
+      };
       description = "AttrSet mapping service name to user owner for state directory.";
     };
 
@@ -93,10 +101,11 @@ in {
 
       # Copy context files from repo
       ${lib.concatStringsSep "\n" (map (file: ''
-        if [ -e "${cfg.sourcePath}/${file}" ]; then
-          cp -r "${cfg.sourcePath}/${file}" "${cfg.targetPath}/"
-        fi
-      '') cfg.contextFiles)}
+          if [ -e "${cfg.sourcePath}/${file}" ]; then
+            cp -r "${cfg.sourcePath}/${file}" "${cfg.targetPath}/"
+          fi
+        '')
+        cfg.contextFiles)}
 
       # Create defaults directory and shared.env if missing
       mkdir -p ${cfg.defaultsPath}

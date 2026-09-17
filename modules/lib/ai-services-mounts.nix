@@ -8,7 +8,6 @@
 #       systemd.services.myservice.serviceConfig = aiServicesMounts.mkMountConfig cfg;
 #     };
 #   }
-
 {lib}: {
   # Creates the standard set of mount options for an AI service.
   # serviceName should match the name used in aiServices.context.serviceNames.
@@ -62,29 +61,30 @@
     stateTarget = "${workspaceRoot}/${cfg.stateMountPoint}";
     # Normalized path for shared defaults (avoid .. which systemd rejects)
     sharedDefaultsTarget = "${workspaceRoot}/.ai-services/defaults/shared.env";
-  in
-    {
-      # Bind-mount context read-only if configured
-      BindReadOnlyPaths = lib.optionals (cfg.contextRoot != null) [
+  in {
+    # Bind-mount context read-only if configured
+    BindReadOnlyPaths =
+      lib.optionals (cfg.contextRoot != null) [
         "${cfg.contextRoot}:${contextTarget}"
-      ] ++ lib.optionals (cfg.sharedDefaultsFile != null) [
+      ]
+      ++ lib.optionals (cfg.sharedDefaultsFile != null) [
         "${cfg.sharedDefaultsFile}:${sharedDefaultsTarget}"
       ];
 
-      # Bind-mount state directory read-write if configured
-      BindPaths = lib.optionals (cfg.stateDir != null) [
-        "${cfg.stateDir}:${stateTarget}"
-      ];
+    # Bind-mount state directory read-write if configured
+    BindPaths = lib.optionals (cfg.stateDir != null) [
+      "${cfg.stateDir}:${stateTarget}"
+    ];
 
-      # Environment files in precedence order (later wins on conflict).
-      # Prefix with "-" to make optional (systemd won't fail if missing).
-      # 1. shared defaults (lowest priority) - optional
-      # 2. shared secrets (middle priority) - optional
-      # 3. service-specific env (highest priority) - added by caller
-      EnvironmentFile =
-        lib.optionals (cfg.sharedDefaultsFile != null) ["-${cfg.sharedDefaultsFile}"]
-        ++ lib.optionals (cfg.sharedSecretFile != null) ["-${cfg.sharedSecretFile}"];
-    };
+    # Environment files in precedence order (later wins on conflict).
+    # Prefix with "-" to make optional (systemd won't fail if missing).
+    # 1. shared defaults (lowest priority) - optional
+    # 2. shared secrets (middle priority) - optional
+    # 3. service-specific env (highest priority) - added by caller
+    EnvironmentFile =
+      lib.optionals (cfg.sharedDefaultsFile != null) ["-${cfg.sharedDefaultsFile}"]
+      ++ lib.optionals (cfg.sharedSecretFile != null) ["-${cfg.sharedSecretFile}"];
+  };
 
   # Hermes-specific: generates mount config AND merges hermes environmentFiles.
   # Use this instead of mkMountConfig for hermes because the EnvironmentFile
@@ -100,11 +100,13 @@
     stateTarget = "${workspaceRoot}/${cfg.stateMountPoint}";
     sharedDefaultsTarget = "${workspaceRoot}/.ai-services/defaults/shared.env";
   in {
-    BindReadOnlyPaths = lib.optionals (cfg.contextRoot != null) [
-      "${cfg.contextRoot}:${contextTarget}"
-    ] ++ lib.optionals (cfg.sharedDefaultsFile != null) [
-      "${cfg.sharedDefaultsFile}:${sharedDefaultsTarget}"
-    ];
+    BindReadOnlyPaths =
+      lib.optionals (cfg.contextRoot != null) [
+        "${cfg.contextRoot}:${contextTarget}"
+      ]
+      ++ lib.optionals (cfg.sharedDefaultsFile != null) [
+        "${cfg.sharedDefaultsFile}:${sharedDefaultsTarget}"
+      ];
     BindPaths = lib.optionals (cfg.stateDir != null) [
       "${cfg.stateDir}:${stateTarget}"
     ];

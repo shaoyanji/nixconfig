@@ -1,7 +1,6 @@
-{
-  pkgs,
-  lib,
-  ...
+{ pkgs
+, lib
+, ...
 }: {
   # Desktop/user app layer built on top of minimal.
   imports = [
@@ -46,7 +45,7 @@
       neocities
       mupdf
     ]
-    ++ lib.optionals stdenv.isLinux [
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
       ani-cli
       # audacity
       cmus # Terminal music player (~1 GB closure)
@@ -78,7 +77,7 @@
       wash-cli
       # libation
     ]
-    ++ lib.optionals stdenv.isDarwin [
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
       iina
       wget
       cocoapods

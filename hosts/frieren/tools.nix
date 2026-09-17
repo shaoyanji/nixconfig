@@ -5,7 +5,7 @@
 }:
 let
   inherit (lib) mkEnableOption mkIf;
-  cfg = config.services.thinsandyTools;
+  cfg = config.services.nasTools;
   heavyTools = with pkgs; [
     go
     uv
@@ -57,7 +57,7 @@ let
   ];
 in
 {
-  options.services.thinsandyTools = {
+  options.services.nasTools = {
     enableHeavy = mkEnableOption "Heavy dev tools (go, uv, gh, neo4j, python research env)";
   };
 

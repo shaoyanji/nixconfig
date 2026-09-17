@@ -83,7 +83,7 @@ in {
   # Enables the eisen host on the tailnet so Moonlight clients can stream
   # from outside the LAN (via Tailscale IPs / MagicDNS).  Routing features
   # are set to "both" so eisen can act as an exit node and subnet router
-  # if needed later.  DNS through the pi-hole at thinsandy (100.73.225.35)
+  # if needed later.  DNS through the pi-hole at frieren (100.73.225.35)
   # keeps ad-blocking consistent across the tailnet.
   services.tailscale = {
     enable = true;

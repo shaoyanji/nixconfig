@@ -76,7 +76,7 @@ tasks:
       - sops updatekeys modules/ssh-ca-key.yaml
       - task infra:secrets:sync
       - cd {{.SECRETS}} && git switch master && git add *.yaml .sops.yaml && git commit -m "updated sops keys" && git push
-      - echo "Reminder — commit in the main repo too: modules/secrets.yaml, modules/ssh-ca-key.yaml, .sops.yaml"
+      - 'echo "Reminder — commit in the main repo too: modules/secrets.yaml, modules/ssh-ca-key.yaml, .sops.yaml"'
 
   infra:secrets:decrypt:detaskfile-home:
     internal: true
@@ -285,7 +285,7 @@ tasks:
         choice=$(
           {
             printf '%s\n' "infra:deploy:host:{{.PI}}"
-            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:thinsandy infra:deploy:host:kellerbench infra:deploy:host:deckstation
+            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:frieren infra:deploy:host:kellerbench infra:deploy:host:deckstation
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )
@@ -298,7 +298,7 @@ tasks:
         host=$(
           {
             printf '%s\n' {{.PI}}
-            printf '%s\n' garnixMachine mtfuji thinsandy kellerbench deckstation
+            printf '%s\n' garnixMachine mtfuji frieren kellerbench deckstation
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )

@@ -60,7 +60,7 @@ Canonical surface for all host lifecycle, secrets, and store operations.
 
 ## Known hosts
 
-`minyx` (PI, default deploy target), `garnixMachine`, `mtfuji`, `thinsandy`, `kellerbench`, `guckloch` (WSL).
+`minyx` (PI, default deploy target), `garnixMachine`, `mtfuji`, `frieren`, `kellerbench`, `guckloch` (WSL).
 
 ## Menus
 

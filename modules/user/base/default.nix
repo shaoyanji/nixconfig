@@ -1,21 +1,24 @@
+{ pkgs
+, lib
+, ...
+}:
+let
+  readPkgList = path:
+    let
+      lines = lib.pipe (builtins.readFile path) [
+        (lib.splitString "\n")
+        (map lib.strings.trim)
+        (builtins.filter (line: line != "" && !(lib.hasPrefix "#" line)))
+      ];
+    in
+    map
+      (
+        name:
+          pkgs.${name} or (throw "Unknown package in ${toString path}: ${name}")
+      )
+      lines;
+in
 {
-  pkgs,
-  lib,
-  ...
-}: let
-  readPkgList = path: let
-    lines = lib.pipe (builtins.readFile path) [
-      (lib.splitString "\n")
-      (map lib.strings.trim)
-      (builtins.filter (line: line != "" && !(lib.hasPrefix "#" line)))
-    ];
-  in
-    map (
-      name:
-        pkgs.${name} or (throw "Unknown package in ${toString path}: ${name}")
-    )
-    lines;
-in {
   imports = [
     ../../scripts
     ../../lf
@@ -132,7 +135,7 @@ in {
         # ── Misc ──
         mailsy # Email utility
       ]
-      ++ lib.optionals stdenv.isLinux [
+      ++ lib.optionals stdenv.hostPlatform.isLinux [
         # ── Linux-only TUI Apps ──
         newsboat # RSS/Atom feed reader
         # tuir # TUI for Reddit
@@ -163,7 +166,7 @@ in {
         glances # Cross-platform system monitor
         nurl
       ]
-      ++ lib.optionals stdenv.isDarwin [];
+      ++ lib.optionals stdenv.hostPlatform.isDarwin [ ];
 
     sessionVariables = {
       EDITOR = "hx";

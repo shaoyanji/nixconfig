@@ -22,7 +22,7 @@
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
-  # Placeholder root file system — REQUIRED for evaluation (host-eval-all).
+  # Placeholder root file system — REQUIRED for evaluation (host-eval checks).
   # Replace device + fsType with the target machine's `blkid` output before
   # the first deploy.  lib.mkDefault so a real nixos-generate-config output
   # (plain assignment, higher priority) overrides this cleanly.

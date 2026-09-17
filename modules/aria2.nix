@@ -11,7 +11,7 @@ in {
   xdg.configFile."aria2/aria2.conf".source = aria2Conf;
 
   # Local fallback daemon — no secret, listens on 127.0.0.1:6800 only.
-  # Useful when thinsandy is unreachable and for CLI scripting.
+  # Useful when frieren (the NAS) is unreachable and for CLI scripting.
   systemd.user.services.aria2 = {
     Unit = {
       Description = "aria2 RPC download daemon (local fallback)";

@@ -323,11 +323,10 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 | Host          | nullclaw | hermes-agent | ollama | xs | pancakes-harness | Role |
 |---------------|----------|--------------|--------|-----|------------------|------|
 | frieren       | no       | no           | no     | no  | no               | ⭐ **NAS server** (Samba, NFS, Jellyfin, Paperless, DNS) |
-| thinsandy     | yes      | yes          | yes    | yes | yes              | AI services (nullclaw, hermes, ollama) |
 | mtfuji        | yes      | no           | yes    | no  | no               | AI host (nullclaw, ollama) |
 | garnixMachine | yes      | no           | no     | no  | no               | Minimal nullclaw (CI) |
 | kellerbench   | no       | no           | yes    | no  | no               | Ollama host |
-| scratch       | no       | no           | no     | no  | no               | Steam Remote Play client (cage + steam -gamepadui, tmpfs/zram IO diet) |
+| scratch       | no       | no           | no     | no  | no               | Lightweight niri desktop (eisen-style, tmpfs/zram IO diet) |
 | deckstation   | no       | no           | no     | no  | no               | Steam/gamescope kiosk |
 
 `deckstation` is a pure Steam install — no desktop environment, just greetd + tuigreet dropping into gamescope-session (Steam Big Picture). Uses `globalModulesContainers` so no dms/niri leaks in. Runs Sunshine GameStream/Moonlight host so any LAN client (phone, laptop, TV box) can launch the big screen remotely. Closure is minimalistic: ROCm/OpenCL compute packages are dropped from the AMD profile since Steam + gamescope only need Mesa + amdgpu.
@@ -369,7 +368,7 @@ Instead of managing per-host `authorized_keys`, servers trust a **single CA publ
 rotate-ssh-cert
 
 # That's it. All hosts that trust the CA accept this cert automatically.
-ssh frieren   # or ssh thinsandy for AI hosts
+ssh frieren   # or any other host that trusts the CA
 ```
 
 The `rotate-ssh-cert` script is available on any host with `ssh.ca.enableClient = true`. The cert is cached in `~/.ssh/id_ed25519-cert.pub` and used automatically via `CertificateFile` in the SSH config.
@@ -447,7 +446,11 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 
 ## Recent changes
 
-**Last updated: 2026-08-03**
+**Last updated: 2026-09-17**
+
+**2026-09-17 — scratch: Steam Remote Play kiosk converted to an eisen-style niri desktop.** The Fujitsu ESPRIMO D556 now runs the `globalModulesNixos` chain (niri + DankMaterialShell greeter, autoLogin, role:heim userland) via `base-desktop-environment.nix`; Steam, the cage kiosk wrapper and the greetd autologin are gone, while the tmpfs/zram IO diet (zram 100%, journald volatile, ~/.cache on tmpfs, fstrim, gentle writeback sysctls) is kept verbatim for the shaky f2fs SSD. Legacy BIOS boot with GRUB on /dev/sda is unchanged. See `.agents/deploy/hosts/scratch.md`.
+
+**2026-09-17 — verntil/orb-cassini host files removed; thinsandy references purged.** Orphaned `hosts/verntil.nix` and `hosts/orb-cassini/` (never registered in the host inventory) were deleted, and remaining live references to the long-decommissioned `thinsandy` were replaced with `frieren` (the current NAS): deploy/logs menus, nas-client skip-list, heim's anki sync URL, nixoshmsymlinks skip-list, pi-hole DNS comments, the stale `checks:nullclaw:smoke:thinsandy` task, and the thinsandy age keys in `.sops.yaml`. Historical migration notes (HANDOFF.md, AUDIT.md) intentionally keep their thinsandy mentions.
 
 **2026-08-03 — Poseidon microVM disabled; frieren daily self-upgrade; scratch real disk UUIDs + GRUB; GC consolidation.** The `testvm` microVM on `poseidon` no longer runs — the microvm imports and the `microvm.vms` block in `hosts/poseidon/configuration.nix` are commented out for easy re-enable (microbr bridge/NAT profile included). `frieren` (the NAS) now self-upgrades every morning at 04:00 via the canonical `system.autoUpgrade` module (no hand-rolled timer): it stages `nixos-rebuild boot` from `github:shaoyanji/nixconfig#frieren` first, then reboots into the new generation only if kernel/initrd/kernel-modules changed (`allowReboot`, reached only after a successful boot), otherwise applies a live `switch`. Persistent timer catches up if the NAS was off. `scratch` got its real disk UUIDs from the original machine gist (f2fs root + ext4 /boot) and now boots with GRUB (legacy BIOS) instead of systemd-boot; its redundant 14-day GC was dropped in favour of the global 10-day GC. See `.agents/deploy/hosts/frieren.md` and `.agents/deploy/hosts/scratch.md`.
 

@@ -22,13 +22,7 @@
 #
 # Storage: /mnt/steam = sda (931.5G HDD, btrfs+zstd) — Steam library, live.
 # Future:  16 TB HDD → /mnt/media (media library) when the drive arrives.
-{
-  inputs,
-  config,
-  pkgs,
-  lib,
-  ...
-}: let
+{pkgs, ...}: let
   user = import ../../modules/global/user.nix;
 in {
   imports = [
@@ -83,13 +77,13 @@ in {
   # Enables the eisen host on the tailnet so Moonlight clients can stream
   # from outside the LAN (via Tailscale IPs / MagicDNS).  Routing features
   # are set to "both" so eisen can act as an exit node and subnet router
-  # if needed later.  DNS through the pi-hole at frieren (100.73.225.35)
+  # if needed later.  DNS through the pi-hole at frieren (100.97.61.65)
   # keeps ad-blocking consistent across the tailnet.
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
     extraUpFlags = [
-      "--dns=100.73.225.35"
+      "--dns=100.97.61.65"
       "--accept-dns=true"
     ];
   };

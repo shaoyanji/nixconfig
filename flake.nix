@@ -64,10 +64,6 @@
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # hermes-agent = {
-    #   url = "github:NousResearch/hermes-agent";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
     bountystash = {
       url = "github:shaoyanji/bountystash";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -7,7 +7,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `Taskfile.yml` is the entrypoint; it loads the shards and hosts top-level helper menus (`deploy`, `logs`, `status`, `menu`).
 - `taskfiles/infra.yml` is the canonical host lifecycle surface (`infra:*`) for plan/apply/deploy/rollback/logs and secrets management.
 - `taskfiles/agents.yml` holds operator helpers, xs runtime wrappers, and OAuth/session management.
-- `taskfiles/checks.yml` contains validation and smoke checks (primarily nullclaw deployment validation).
+- `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift).
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
 
@@ -27,7 +27,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 
 ## Common "where to look"
 - Host deployment/lifecycle → `taskfiles/infra.yml` (`infra:*`)
-- Operator helpers and xs/OAuth → `taskfiles/agents.yml` (`agents:xs:*`, `agents:oauth:*`)
+- Operator helpers → `taskfiles/agents.yml` (`agents:menu`, legacy menus)
 - Validation checks → `taskfiles/checks.yml` (`checks:*`)
 - Git/flake workflows, site deployment → `taskfiles/dev.yml` (`dev:*`)
 - Legacy compatibility → `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml`

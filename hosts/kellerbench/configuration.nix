@@ -1,9 +1,11 @@
-{ config, lib, pkgs, ... }:
-let
+{
+  lib,
+  pkgs,
+  ...
+}: let
   enableSteam = true;
   enableAmdGpu = false;
-in
-{
+in {
   imports =
     [
       (import ../../modules/profiles/grub-boot.nix {
@@ -56,37 +58,7 @@ in
   # mkForce priority 50 wins over steam.nix's plain assignment (priority 100).
   programs.steam.gamescopeSession.enable = lib.mkForce false;
 
-  # Disabled-block (kellerbench decommissioned as AI workbench, now a
-  # gaming backup rig). Preserve as dormant toggle for future re-enable
-  # by uncommenting AND re-adding the AI imports to the imports list:
-  # profiles.aiHost = {
-  #   enable = true;
-  #   nullclaw.enable = false;
-  # };
-  # aiServices.sharedSecrets.enable = true;
-  # aiServices = {
-  #   context.enable = true;
-  #   nullclawDeployment = {
-  #     enable = false;
-  #     mode = "env-file";
-  #     listenHost = "127.0.0.1";
-  #     listenPort = 3001;
-  #     workspaceRoot = "/var/lib/nullclaw";
-  #     environmentFile = config.sops.secrets.nullclaw.path;
-  #   };
-  # };
-  # services.ollama = {
-  #   enable = true;
-  #   # package = if enableAmdGpu then pkgs.ollama-rocm else pkgs.ollama-cuda;
-  #   host = "0.0.0.0";
-  #   openFirewall = false;
-  #   loadModels = [
-  #     # "qwen3.5:0.8b"
-  #     "nomic-embed-text:latest"
-  #   ];
-  # };
-
-  environment.systemPackages = with pkgs; [ jq ];
+  environment.systemPackages = with pkgs; [jq];
 
   services.openssh.enable = true;
   system.stateVersion = "25.05";

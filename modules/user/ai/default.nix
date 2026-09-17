@@ -1,6 +1,7 @@
-{ lib
-, pkgs
-, ...
+{
+  lib,
+  pkgs,
+  ...
 }: {
   # options.ai.opencode.enable = lib.mkEnableOption "opencode" // {default = true;};
 
@@ -33,7 +34,5 @@
       # aichat
       # mods
     ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [
-      # qwen-code
-    ];
+    ++ lib.optionals stdenv.hostPlatform.isLinux [];
 }

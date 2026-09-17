@@ -20,7 +20,7 @@
 #
 # Usage:
 #   imports = [ ../../modules/profiles/sunshine.nix ];
-{...}: {
+_: {
   services.sunshine = {
     enable = true;
     openFirewall = true;

@@ -1,7 +1,5 @@
-{
-  pkgs,
-  lib,
-  ...
+{ pkgs
+, ...
 }: {
   imports = [
     ./hardware-configuration.nix
@@ -14,10 +12,10 @@
   users.users.user = {
     isNormalUser = true;
     description = "demo user";
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = [ "networkmanager" "wheel" ];
     # mkpasswd -m sha-512 "demo" is the default password for this travel image
     hashedPassword = "$6$demo$demo";
-    openssh.authorizedKeys.keys = [];
+    openssh.authorizedKeys.keys = [ ];
   };
 
   # Lightweight display manager for niri autologin
@@ -58,9 +56,9 @@
   fonts = {
     enableDefaultPackages = true;
     fontconfig.defaultFonts = {
-      serif = ["Noto Serif"];
-      sansSerif = ["Noto Sans"];
-      monospace = ["JetBrainsMono Nerd Font"];
+      serif = [ "Noto Serif" ];
+      sansSerif = [ "Noto Sans" ];
+      monospace = [ "JetBrainsMono Nerd Font" ];
     };
     packages = with pkgs; [
       nerd-fonts.jetbrains-mono
@@ -84,7 +82,7 @@
     enable = true;
     keyboards = {
       default = {
-        ids = ["*"];
+        ids = [ "*" ];
         settings = {
           main = {
             capslock = "escape";
@@ -112,3 +110,5 @@
 
   system.stateVersion = "25.05";
 }
+
+  

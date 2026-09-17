@@ -323,7 +323,7 @@ Host deployment flows use `infra:*` tasks directly. See `.agents/deploy/README.m
 
 ## Git Hooks Setup
 
-Pre-commit hooks in `.githooks/` catch broken documentation paths. Enable with:
+Pre-commit hooks in `.githooks/` run deadnix (hard gate), statix (advisory), and a formatting check accepting either alejandra or nixpkgs-fmt (hard gate). Tools missing from PATH are fetched via nix from the nixpkgs revision pinned in `flake.lock`, so the checks are machine-independent. Enable with:
 ```bash
 bash .git-hooks-setup.sh    # sets core.hooksPath to .githooks/
 ```

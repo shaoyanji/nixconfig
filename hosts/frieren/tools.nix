@@ -4,7 +4,7 @@
 , ...
 }:
 let
-  inherit (lib) mkEnableOption mkIf;
+  inherit (lib) mkEnableOption;
   cfg = config.services.nasTools;
   heavyTools = with pkgs; [
     go

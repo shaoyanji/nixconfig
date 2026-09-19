@@ -6,21 +6,20 @@
 #   Boot: UEFI (systemd-boot) — disko btrfs layout on /dev/sda
 #         (@root ephemeral, /persist + /nix subvolumes)
 #
-# Role:  Steam Big Picture kiosk mirroring eisen/kellerbench.  greetd
-#        auto-logs devji into gamescope-session (cage + steam
+# Role:  Steam Big Picture kiosk mirroring kellerbench/deckstation.  greetd
+#        auto-logs devji into gamescope-session (real gamescope + steam
 #        -gamepadui) on boot — the entire user-facing UI.  Root is
 #        recreated each boot (impermanence); devji home + /etc are
 #        persisted to /persist.
 #
 # NOTE:  GTX 750 Ti is Kepler sm_30 — the same GPU as kellerbench.  The
-#        host-scoped programs.steam.gamescopeSession.enable = mkForce
-#        false override is REQUIRED: the upstream-generated
-#        gamescope-session script (from steam.nix) shadows our
-#        cage-based wrapper in steamos.nix and segfaults on the
-#        incomplete legacy_580 Vulkan ICD.  See
-#        hosts/kellerbench/configuration.nix for the full rationale.
-{ lib, ... }:
-{
+#        old host-scoped programs.steam.gamescopeSession.enable = mkForce
+#        false override (which forced a cage-based wrapper) has been
+#        REMOVED: the original "Creating headless backend" crash was a
+#        misdiagnosis — Steam was just downloading its ~400 MB bootstrap.
+#        Real gamescope works on legacy_580 with nvidia_drm KMS enabled
+#        (see ./nvidia-gt-750-ti.nix).
+_: {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -34,15 +33,11 @@
   networking.hostName = "ares";
 
   # X server is required so XWayland can host legacy X11-only windows
-  # that Steam spawns inside cage's Wayland surface.  No desktop
+  # that Steam spawns inside gamescope's Wayland surface.  No desktop
   # environment is configured — greetd auto-logs devji into
-  # gamescope-session (cage + steam -gamepadui) which is the entire
-  # user-facing UI.
+  # gamescope-session (real gamescope + steam -gamepadui) which is the
+  # entire user-facing UI.
   services.xserver.enable = true;
-
-  # Kepler sm_30 override — see NOTE at top.  mkForce priority 50 wins
-  # over steam.nix's plain assignment (priority 100).
-  programs.steam.gamescopeSession.enable = lib.mkForce false;
 
   # noDE kiosk — the dms/niri greeter lives in
   # modules/profiles/impermanence-greeter.nix which is intentionally NOT

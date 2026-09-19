@@ -45,5 +45,10 @@
   boot.kernelParams = [
     "nvidia_drm.modeset=1"
     "nvidia_drm.fbdev=1"
+    # legacy_580 + gamescope quirk: the console framebuffer blanks after
+    # ~10 s without mouse/input activity (screen goes dark until input).
+    # consoleblank=0 disables the VT blank timer entirely; gamescope/Steam
+    # handle their own display sleep via DPMS.
+    "consoleblank=0"
   ];
 }

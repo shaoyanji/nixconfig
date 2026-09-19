@@ -62,7 +62,7 @@ modules/
     firewall-baseline.nix — Firewall on, only TCP/22 by default
     server-hardening.nix — Journald caps, tmp cleanup, /var bind-mount to data disk
     nas-client.nix — Automount /Volumes/data from the NAS server (frieren)
-    steamos.nix — Steam kiosk (greetd+tuigreet+gamescope-session, audio, 32-bit GL, Avahi)
+    steamos.nix — Steam kiosk (greetd autologin + upstream gamescope-session, audio, 32-bit GL, Avahi)
     sunshine.nix — GameStream/Moonlight server (Sunshine on LAN, video/render/input groups)
   services/        — Service modules
     aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)

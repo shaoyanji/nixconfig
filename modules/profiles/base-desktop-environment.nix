@@ -18,10 +18,16 @@ in {
         user = user.name;
       };
     };
-    scx = {
-      enable = true;
-      scheduler = "scx_rusty";
-    };
+  };
+
+  # OS keyring for secret-service clients (agy/Antigravity CLI auth tokens,
+  # plus any other libsecret users). Without it agy fails at every launch:
+  # "failed to retrieve token: secret keyring is locked" + DBUS warnings.
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services = {
+    login.enableGnomeKeyring = true;
+    greetd.enableGnomeKeyring = true; # no-op on hosts not using greetd
+    sddm.enableGnomeKeyring = true; # no-op on hosts not using sddm
   };
 
   programs.niri.enable = true;

@@ -9,7 +9,7 @@
     # ./codex.nix
     # ./mods.nix
     ./aichat.nix
-    # ./antigravity-cli.nix
+    ./antigravity-cli.nix
     # ./opencode.nix
   ];
   # ++ lib.optionals config.ai.opencode.enable [./opencode.nix];

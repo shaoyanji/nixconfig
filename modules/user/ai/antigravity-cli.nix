@@ -6,7 +6,7 @@ _: {
   programs.antigravity-cli = {
     enable = true;
     # Fast Gemini model, set via $GEMINI_MODEL (HM module behavior).
-    defaultModel = "gemini-3.7-flash";
+    defaultModel = "gemini-3.8-flash";
 
     settings = {
       # Display

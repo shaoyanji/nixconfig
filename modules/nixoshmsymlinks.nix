@@ -1,14 +1,15 @@
-{
-  lib,
-  pkgs,
-  config,
-  ...
-}: let
+{ lib
+, pkgs
+, config
+, ...
+}:
+let
   nixNAS = "/Volumes/data";
   hostName = config.networking.hostName or null;
-  noSymlinkHosts = ["guckloch"];
+  noSymlinkHosts = [ "guckloch" ];
   cfg = config.nixoshmsymlinks;
-in {
+in
+{
   options.nixoshmsymlinks = {
     enable =
       lib.mkEnableOption "NAS-backed home directory symlinks"
@@ -19,7 +20,7 @@ in {
 
   config = lib.mkIf cfg.enable {
     home = {
-      packages = [];
+      packages = [ ];
       file = {
         # "nixconfig".source = config.lib.file.mkOutOfStoreSymlink "${wolfNAS}/projects/repo/nixconfig";
         "vaults/personal".source = config.lib.file.mkOutOfStoreSymlink "${nixNAS}/Obsidian-Git-Sync";
@@ -52,7 +53,7 @@ in {
         ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
           # "${nixNAS}/bin-x86"
         ];
-      sessionVariables = {};
+      sessionVariables = { };
     };
   };
 }

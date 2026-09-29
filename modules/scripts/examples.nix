@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{ pkgs, ... }: {
   imports = [
     #    ./duckduck.nix
   ];
@@ -15,7 +15,7 @@
       ''
         hello
       '')
-    (pkgs.writers.writeBashBin "duck" {}
+    (pkgs.writers.writeBashBin "duck" { }
       /*
       bash
       */
@@ -77,7 +77,7 @@
             fi
         done
       '')
-    (pkgs.writers.writeLuaBin "duckduck" {}
+    (pkgs.writers.writeLuaBin "duckduck" { }
       /*
       lua
       */
@@ -137,7 +137,7 @@
             print("Failed to extract x-vqd-4 header")
         end
       '')
-    (pkgs.writers.writeRustBin "hellorust" {}
+    (pkgs.writers.writeRustBin "hellorust" { }
       /*
       rust
       */
@@ -146,49 +146,49 @@
             println!("hello world");
         }
       '')
-    (pkgs.writers.writeBashBin "hellobash" {}
+    (pkgs.writers.writeBashBin "hellobash" { }
       /*
       bash
       */
       ''
         echo "hello world"
       '')
-    (pkgs.writers.writeNimBin "hellonim" {}
+    (pkgs.writers.writeNimBin "hellonim" { }
       /*
       nim
       */
       ''
         echo "hello world"
       '')
-    (pkgs.writers.writeNuBin "hellonu" {}
+    (pkgs.writers.writeNuBin "hellonu" { }
       /*
       nu
       */
       ''
         echo "hello world"
       '')
-    (pkgs.writers.writeHaskellBin "hellohaskell" {}
+    (pkgs.writers.writeHaskellBin "hellohaskell" { }
       /*
       haskell
       */
       ''
         main = putStrLn "hello world"
       '')
-    (pkgs.writers.writeJSBin "hellojavascript" {}
+    (pkgs.writers.writeJSBin "hellojavascript" { }
       /*
       javascript
       */
       ''
         console.log("hello world");
       '')
-    (pkgs.writers.writeLuaBin "hellolua" {}
+    (pkgs.writers.writeLuaBin "hellolua" { }
       /*
       lua
       */
       ''
         print("hello world")
       '')
-    (pkgs.writers.writePython3Bin "hellopython" {}
+    (pkgs.writers.writePython3Bin "hellopython" { }
       /*
       python
       */
@@ -196,9 +196,7 @@
         print("hello world")
       '')
   ];
-  home.file = {
-  };
+  home.file = { };
 
-  home.sessionVariables = {
-  };
+  home.sessionVariables = { };
 }

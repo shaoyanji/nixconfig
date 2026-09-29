@@ -8,19 +8,21 @@
 #     greeting = "Hello, Flask!";
 #     extraHooks = [ hooks.greeting ];
 #   }
-{
-  pkgs,
-  lib,
-}: let
-  common = pkgs.callPackage ./common-packages.nix {};
-  hooks = pkgs.callPackage ./shell-hooks.nix {};
+{ pkgs
+, lib
+,
+}:
+let
+  common = pkgs.callPackage ./common-packages.nix { };
+  hooks = pkgs.callPackage ./shell-hooks.nix { };
 
-  mkDevShell = {
-    name ? "dev",
-    packages,
-    greeting ? "Hello, Nix!",
-    extraHooks ? [],
-  }:
+  mkDevShell =
+    { name ? "dev"
+    , packages
+    , greeting ? "Hello, Nix!"
+    , extraHooks ? [ ]
+    ,
+    }:
     pkgs.mkShell {
       inherit name packages;
       GREETING = greeting;
@@ -28,32 +30,34 @@
         ${lib.concatStringsSep "\n" extraHooks}
       '';
     };
-in {
+in
+{
   inherit mkDevShell;
 
   # Convenience functions for common shell patterns
   mkCoreShell = extraPackages:
     mkDevShell {
       name = "core";
-      packages = with pkgs; [common.core common.greeting] ++ extraPackages;
-      extraHooks = [hooks.full hooks.greeting];
+      packages = with pkgs; [ common.core common.greeting ] ++ extraPackages;
+      extraHooks = [ hooks.full hooks.greeting ];
     };
 
   mkMinimalShell = packages:
     mkDevShell {
       name = "minimal";
-      packages = with pkgs; [common.greeting] ++ packages;
-      extraHooks = [hooks.greeting];
+      packages = with pkgs; [ common.greeting ] ++ packages;
+      extraHooks = [ hooks.greeting ];
     };
 
-  mkPackageShell = {
-    name,
-    package,
-    greeting ? "Hello, Nix!",
-  }:
+  mkPackageShell =
+    { name
+    , package
+    , greeting ? "Hello, Nix!"
+    ,
+    }:
     mkDevShell {
       inherit name greeting;
-      packages = with pkgs; [common.greeting package];
-      extraHooks = [hooks.greeting];
+      packages = with pkgs; [ common.greeting package ];
+      extraHooks = [ hooks.greeting ];
     };
 }

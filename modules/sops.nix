@@ -1,12 +1,13 @@
-{
-  config,
-  pkgs,
-  ...
-}: let
+{ config
+, pkgs
+, ...
+}:
+let
   age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   # taskfile_path = ./secrets/Taskfile.yaml;
-in {
-  imports = [];
+in
+{
+  imports = [ ];
 
   sops = {
     age = {
@@ -20,13 +21,13 @@ in {
     secrets = {
       "cfcertpem".path = "${config.home.homeDirectory}/.cloudflared/cert.pem";
       "cloak".path = "${config.home.homeDirectory}/.cloak/accounts";
-      "ghsudo" = {};
-      "gmail" = {};
-      "aws/access/key/id" = {};
-      "aws/secret/access/key" = {};
-      "openmeteo/api/key" = {};
-      "neocities" = {};
-      "gemini/api/key" = {};
+      "ghsudo" = { };
+      "gmail" = { };
+      "aws/access/key/id" = { };
+      "aws/secret/access/key" = { };
+      "openmeteo/api/key" = { };
+      "neocities" = { };
+      "gemini/api/key" = { };
       # "todoist" = {
       #   sopsFile = ./secrets.json;
       #   mode = "0600";

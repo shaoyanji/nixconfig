@@ -4,12 +4,11 @@
 # specialArgs, etc.) can be added for all NixOS hosts in one place.
 #
 # Used by flake/nixos-configurations.nix via mkNixosHost.
-{nixpkgs}: {
-  system,
-  modules,
-  specialArgs ? {},
-  ...
-}:
+{ nixpkgs }: { system
+             , modules
+             , specialArgs ? { }
+             , ...
+             }:
 nixpkgs.lib.nixosSystem {
   inherit system modules specialArgs;
 }

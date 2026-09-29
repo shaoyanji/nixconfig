@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{ pkgs, ... }: {
   home.packages = with pkgs; [
     dprint
   ];
@@ -18,7 +18,7 @@
         name = "markdown";
         auto-format = true;
         formatter.command = "${pkgs.dprint}/bin/dprint";
-        formatter.args = ["fmt" "--stdin" "md"];
+        formatter.args = [ "fmt" "--stdin" "md" ];
       }
       {
         name = "haskell";
@@ -30,7 +30,7 @@
         formatter = {
           command = "${pkgs.gawk}/bin/awk";
           timeout = 5;
-          args = ["--file=/dev/stdin" "--pretty-print=/dev/stdout"];
+          args = [ "--file=/dev/stdin" "--pretty-print=/dev/stdout" ];
         };
       }
       {
@@ -38,7 +38,7 @@
         auto-format = true;
         formatter = {
           command = "${pkgs.taplo}/bin/taplo";
-          args = ["format" "-"];
+          args = [ "format" "-" ];
         };
       }
       {
@@ -46,7 +46,7 @@
         auto-format = true;
         formatter = {
           command = "${pkgs.ruff}/bin/ruff";
-          args = ["format" "--line-length" "88" "-"];
+          args = [ "format" "--line-length" "88" "-" ];
         };
       }
       {
@@ -54,14 +54,14 @@
         auto-format = true;
         formatter = {
           command = "${pkgs.stylua}/bin/stylua";
-          args = ["-"];
+          args = [ "-" ];
         };
       }
       {
         name = "yaml";
         auto-format = true;
         formatter.command = "${pkgs.dprint}/bin/dprint";
-        formatter.args = ["fmt" "--stdin" "yaml"];
+        formatter.args = [ "fmt" "--stdin" "yaml" ];
       }
       {
         name = "go";
@@ -88,7 +88,7 @@
     themes = {
       autumn_night_transparent = {
         "inherits" = "autumn_night";
-        "ui.background" = {};
+        "ui.background" = { };
       };
     };
   };

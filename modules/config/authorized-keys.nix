@@ -20,11 +20,14 @@ let
 
   # Repo-side extra keys. benutzer@bitlockerpremium is a Windows machine
   # (not a NixOS host) that SSHes into the fleet — appended here rather
-  # than in the gist so the repo is the reviewable source for it.
+  # than in the gist so the repo is the reviewable source for it. The
+  # second key is the Bitwarden-stored SSH key (no comment field on the
+  # key itself).
   sshKeys =
     fetchedKeys
     ++ [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPSf4l8am6ZRnUAXX0uinxFTW3IKm5zPFVGL8cn1/35h benutzer@bitlockerpremium"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA0PNF2ea41zmEcLNV+hk58py3LMxWjbsJV1CgO96T2I"
     ];
 in
 {

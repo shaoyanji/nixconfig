@@ -111,6 +111,7 @@ in
       "immich"
       "met"
       "ipp"
+      "mqtt"
     ];
     extraPackages = ps: [
       ps.androidtvremote2

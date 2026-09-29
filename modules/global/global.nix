@@ -38,6 +38,12 @@
       "@admin"
       "@wheel"
     ];
+    # nix.nixPath was renamed to nix.settings.nix-path; the old form
+    # emits a deprecation warning on every eval. Kept in this block:
+    # a second `nix = { settings... }` is a duplicate-attribute error.
+    nix-path = [
+      "nixpkgs=${pkgs.path}"
+    ];
   };
 
   nix = {
@@ -47,11 +53,6 @@
       min-free = ${toString (100 * 1024 * 1024)}
       max-free = ${toString (1024 * 1024 * 1024)}
     '';
-    # nix.nixPath was renamed to nix.settings.nix-path (nixpkgs 26.11);
-    # the old form emits a deprecation warning on every eval.
-    settings.nix-path = [
-      "nixpkgs=${pkgs.path}"
-    ];
   };
 
   nixpkgs.config.allowUnfree = true;

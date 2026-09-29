@@ -1,16 +1,18 @@
-{
-  lib,
-  systems,
-  pkgsFor,
-  self,
+{ lib
+, systems
+, pkgsFor
+, self
+,
 }:
 lib.genAttrs systems.default (
-  system: let
+  system:
+  let
     pkgs = pkgsFor system;
   in
-    if !(builtins.elem system systems.checks)
-    then {}
-    else let
+  if !(builtins.elem system systems.checks)
+  then { }
+  else
+    let
       configs = self.nixosConfigurations;
       assertMsg = condition: message:
         if condition
@@ -18,12 +20,12 @@ lib.genAttrs systems.default (
         else builtins.throw "host-architecture check failed: ${message}";
       goBackendHosts =
         builtins.filter
-        (
-          host: configs.${host}.config.systemd.services ? go-backend
-        )
-        (builtins.attrNames configs);
+          (
+            host: configs.${host}.config.systemd.services ? go-backend
+          )
+          (builtins.attrNames configs);
     in
-      # Per-host evaluation checks. Each check forces exactly ONE host's
+    # Per-host evaluation checks. Each check forces exactly ONE host's
       # toplevel at EVAL time (interpolating it into a string runs the
       # full module system for that host — assertions included), so
       # `nix build .#checks.<system>.host-eval-<host>` (or a plain `nix
@@ -41,23 +43,23 @@ lib.genAttrs systems.default (
       # no host closure is ever built or downloaded by these checks.
       # (deepSeq is deliberately NOT used: forcing a full NixOS toplevel
       # attrset exceeds the evaluator's call depth.)
-      builtins.listToAttrs
+    builtins.listToAttrs
       (map
         (host: {
           name = "host-eval-${host}";
-          value = pkgs.runCommand "host-eval-${host}" {} ''
+          value = pkgs.runCommand "host-eval-${host}" { } ''
             echo "host ${host} evaluated successfully: ${builtins.unsafeDiscardStringContext (toString configs.${host}.config.system.build.toplevel)}"
             touch $out
           '';
         })
         (builtins.attrNames configs))
       // {
-        host-architecture = assert assertMsg (goBackendHosts == []) "services.go-backend unexpectedly enabled on: ${builtins.toString goBackendHosts}";
-          pkgs.runCommand "host-architecture-checks" {} "touch $out";
+      host-architecture = assert assertMsg (goBackendHosts == [ ]) "services.go-backend unexpectedly enabled on: ${builtins.toString goBackendHosts}";
+        pkgs.runCommand "host-architecture-checks" { } "touch $out";
 
-        docs-site = pkgs.runCommand "docs-site" {} ''
-          mkdir -p "$out"
-          ls "${self.docsSite}/index.html" > "$out/index.html"
-        '';
-      }
+      docs-site = pkgs.runCommand "docs-site" { } ''
+        mkdir -p "$out"
+        ls "${self.docsSite}/index.html" > "$out/index.html"
+      '';
+    }
 )

@@ -1,15 +1,14 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }: {
   imports = [
     ../../modules/profiles/nvidia.nix
   ];
 
   # extraPackages = with pkgs; [nvidia-vaapi-driver];
-  services.xserver.videoDrivers = ["intel"];
+  services.xserver.videoDrivers = [ "intel" ];
   nixpkgs.config.nvidia.acceptLicense = true;
 
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages;

@@ -1,12 +1,14 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   aria2Conf = pkgs.writeText "aria2.conf" ''
     enable-rpc=true
     rpc-listen-port=6800
     rpc-listen-all=false
     rpc-allow-origin-all=true
   '';
-in {
-  home.packages = with pkgs; [aria2];
+in
+{
+  home.packages = with pkgs; [ aria2 ];
 
   xdg.configFile."aria2/aria2.conf".source = aria2Conf;
 
@@ -15,7 +17,7 @@ in {
   systemd.user.services.aria2 = {
     Unit = {
       Description = "aria2 RPC download daemon (local fallback)";
-      After = ["network.target"];
+      After = [ "network.target" ];
     };
     Service = {
       Type = "simple";
@@ -23,7 +25,7 @@ in {
       Restart = "on-failure";
     };
     Install = {
-      WantedBy = ["default.target"];
+      WantedBy = [ "default.target" ];
     };
   };
 }

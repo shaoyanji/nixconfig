@@ -1,10 +1,9 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-{
-  lib,
-  pkgs,
-  ...
+{ lib
+, pkgs
+, ...
 }: {
   imports = [
     # Include the results of the hardware scan.
@@ -65,20 +64,20 @@
       # For initially solving DoH/DoT Requests when no system Resolver is available.
       bootstrapDns = {
         upstream = "https://one.one.one.one/dns-query";
-        ips = ["1.1.1.1" "1.0.0.1"];
+        ips = [ "1.1.1.1" "1.0.0.1" ];
       };
       #Enable Blocking of certain domains.
       blocking = {
         denylists = {
           #Adblocking
-          ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
+          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
           #Another filter for blocking adult sites
           #adult = ["https://blocklistproject.github.io/Lists/porn.txt"];
           #You can add additional categories
         };
         #Configure what block categories are used
         clientGroupsBlock = {
-          default = ["ads"];
+          default = [ "ads" ];
           #kids-ipad = ["ads" "adult"];
         };
       }; # anything from config.yml
@@ -112,7 +111,7 @@
     #    };
     bluetooth.enable = true;
     enableRedistributableFirmware = true;
-    firmware = [pkgs.wireless-regdb];
+    firmware = [ pkgs.wireless-regdb ];
   };
   # Networking - no need to punch a hole through router firewall
   networking = {
@@ -190,7 +189,7 @@
       "/etc/machine-id"
       {
         file = "/var/keys/secret_file";
-        parentDirectory = {mode = "u=rwx,g=,o=";};
+        parentDirectory = { mode = "u=rwx,g=,o="; };
       }
     ];
   };

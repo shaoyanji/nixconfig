@@ -1,4 +1,4 @@
-{lib, ...}:
+{ lib, ... }:
 with lib; {
   options.programs.niri = {
     enable = mkEnableOption "niri";
@@ -8,7 +8,7 @@ with lib; {
     };
     settings = mkOption {
       type = types.anything;
-      default = {};
+      default = { };
     };
   };
 }

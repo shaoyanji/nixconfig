@@ -59,5 +59,5 @@ _: {
   # GID; we deliberately do NOT hard-code one (would clash across
   # hosts that import this profile in the same /etc/passwd context
   # during a shared Docker build, etc).
-  users.groups.sunshine = {};
+  users.groups.sunshine = { };
 }

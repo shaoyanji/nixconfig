@@ -1,22 +1,24 @@
-{
-  inputs,
-  self,
-  nixpkgs,
-}: let
+{ inputs
+, self
+, nixpkgs
+,
+}:
+let
   inherit (nixpkgs) lib;
-  systems = import ./systems.nix {inherit (inputs) flake-utils;};
-  pkgsFor = import ./pkgs-for.nix {inherit nixpkgs;};
-  mkNixosHost = import ../lib/mk-nixos-host.nix {inherit nixpkgs;};
-  moduleSets = import ./module-sets.nix {inherit inputs self;};
-  hostInventory = import ./host-inventory.nix {inherit inputs moduleSets self;};
-  hostProjection = import ./host-projection.nix {inherit lib hostInventory;};
+  systems = import ./systems.nix { inherit (inputs) flake-utils; };
+  pkgsFor = import ./pkgs-for.nix { inherit nixpkgs; };
+  mkNixosHost = import ../lib/mk-nixos-host.nix { inherit nixpkgs; };
+  moduleSets = import ./module-sets.nix { inherit inputs self; };
+  hostInventory = import ./host-inventory.nix { inherit inputs moduleSets self; };
+  hostProjection = import ./host-projection.nix { inherit lib hostInventory; };
   projectHosts = hostProjection.project;
-in {
+in
+{
   packages = import ./packages.nix {
     inherit inputs lib systems pkgsFor;
   };
 
-  apps = lib.genAttrs systems.default (_: {});
+  apps = lib.genAttrs systems.default (_: { });
 
   checks = import ./checks.nix {
     inherit lib systems pkgsFor self;
@@ -41,7 +43,7 @@ in {
   # Expose the package set, including overlays, for convenience.
   darwinPackages = self.darwinConfigurations.cassini.pkgs;
 
-  docsSite = (pkgsFor "x86_64-linux").callPackage ../docs-site/default.nix {};
+  docsSite = (pkgsFor "x86_64-linux").callPackage ../docs-site/default.nix { };
   docs-site = self.docsSite;
 
   inherit hostProjection;

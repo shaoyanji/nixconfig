@@ -7,7 +7,7 @@
 # hosts genuinely share the same disk topology.
 #
 # See TODO.md → "Things To Avoid" for the policy on storage layout merging.
-{device ? throw "Set this to your disk device, e.g. /dev/sda", ...}: {
+{ device ? throw "Set this to your disk device, e.g. /dev/sda", ... }: {
   disko.devices = {
     disk.main = {
       inherit device;
@@ -56,7 +56,7 @@
             size = "100%FREE";
             content = {
               type = "btrfs";
-              extraArgs = ["-f"];
+              extraArgs = [ "-f" ];
 
               subvolumes = {
                 "/root" = {
@@ -64,12 +64,12 @@
                 };
 
                 "/persist" = {
-                  mountOptions = ["subvol=persist" "noatime"];
+                  mountOptions = [ "subvol=persist" "noatime" ];
                   mountpoint = "/persist";
                 };
 
                 "/nix" = {
-                  mountOptions = ["subvol=nix" "noatime"];
+                  mountOptions = [ "subvol=nix" "noatime" ];
                   mountpoint = "/nix";
                 };
               };

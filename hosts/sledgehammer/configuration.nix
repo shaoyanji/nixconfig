@@ -1,13 +1,12 @@
 # Sledgehammer — NixOS USB stick for fleet provisioning.
 # Boots headless with everything needed to set up a new machine:
 # SOPS decrypt, SSH, git, age key tools, nixos-install.
-{
-  lib,
-  pkgs,
-  ...
+{ lib
+, pkgs
+, ...
 }: {
   imports = [
-    (import ./disko.nix {device = "/dev/sdb";})
+    (import ./disko.nix { device = "/dev/sdb"; })
     ../../modules/profiles/base-node.nix
   ];
 
@@ -70,7 +69,7 @@
   # SOPS — decrypt with host SSH key (pre-loaded on USB).
   sops = {
     defaultSopsFile = ../../modules/secrets.yaml;
-    age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   };
 
   system.stateVersion = "25.05";

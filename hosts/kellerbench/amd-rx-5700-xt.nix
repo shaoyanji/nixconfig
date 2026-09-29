@@ -1,5 +1,5 @@
-{pkgs, ...}: {
-  services.xserver.videoDrivers = ["amdgpu"];
+{ pkgs, ... }: {
+  services.xserver.videoDrivers = [ "amdgpu" ];
 
   hardware.graphics = {
     enable = true;
@@ -12,7 +12,7 @@
     rocmPackages.rocminfo
   ];
 
-  boot.kernelModules = ["amdgpu"];
+  boot.kernelModules = [ "amdgpu" ];
 
   environment.systemPackages = with pkgs; [
     rocmPackages.rocminfo

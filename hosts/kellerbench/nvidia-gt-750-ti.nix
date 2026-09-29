@@ -1,9 +1,9 @@
-{config, ...}: {
+{ config, ... }: {
   # This host is an on-demand benchmark node, so keep baseline PM explicit.
   powerManagement.enable = true;
 
   # services.xserver.enable = lib.mkDefault true;
-  services.xserver.videoDrivers = ["nvidia"];
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   nixpkgs.config = {
     nvidia.acceptLicense = true;

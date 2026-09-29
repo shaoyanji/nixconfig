@@ -1,4 +1,4 @@
-{lib, ...}: {
+{ lib, ... }: {
   # Baseline host firewall posture:
   # - enabled by default
   # - only SSH is open globally
@@ -6,6 +6,6 @@
   networking.firewall = {
     enable = lib.mkDefault true;
     allowPing = lib.mkDefault false;
-    allowedTCPPorts = lib.mkDefault [22];
+    allowedTCPPorts = lib.mkDefault [ 22 ];
   };
 }

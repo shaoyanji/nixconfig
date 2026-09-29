@@ -93,7 +93,7 @@ _: {
         style = "italic fg:bright-blue";
         truncation_symbol = "⋯";
         truncation_length = 11;
-        ignore_branches = ["main" "master"];
+        ignore_branches = [ "main" "master" ];
         only_attached = true;
       };
       git_metrics = {
@@ -161,9 +161,9 @@ _: {
       nodejs = {
         format = " [node](italic) [◫ ($version)](bold fg:bright-green)";
         version_format = "\${raw}";
-        detect_files = ["package-lock.json" "yarn.lock"];
-        detect_folders = ["node_modules"];
-        detect_extensions = [];
+        detect_files = [ "package-lock.json" "yarn.lock" ];
+        detect_folders = [ "node_modules" ];
+        detect_extensions = [ ];
       };
       # package.disabled = true;
     };

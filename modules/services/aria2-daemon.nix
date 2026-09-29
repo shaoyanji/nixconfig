@@ -8,17 +8,18 @@
 #
 # AriaNg is pulled as a pre-built release zip via fetchzip instead of
 # building from source via npm (which is fragile and breaks frequently).
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}: let
+{ config
+, lib
+, pkgs
+, ...
+}:
+let
   cfg = config.services.aria2-daemon;
 
   # Pre-built AriaNg static files — avoids npm build failures from nixpkgs.
-  ariang = (import ../../lib/fetches-extra.nix {inherit pkgs;}).fetch "ariang";
-in {
+  ariang = (import ../../lib/fetches-extra.nix { inherit pkgs; }).fetch "ariang";
+in
+{
   options.services.aria2-daemon = {
     enable = lib.mkEnableOption "aria2 RPC download daemon";
 

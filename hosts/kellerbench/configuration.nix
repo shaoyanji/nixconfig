@@ -1,11 +1,12 @@
-{
-  lib,
-  pkgs,
-  ...
-}: let
+{ lib
+, pkgs
+, ...
+}:
+let
   enableSteam = true;
   enableAmdGpu = false;
-in {
+in
+{
   imports =
     [
       (import ../../modules/profiles/grub-boot.nix {
@@ -43,7 +44,7 @@ in {
   # enableSteam so enableSteam=false stays headless.
   services.xserver.enable = enableSteam;
 
-  environment.systemPackages = with pkgs; [jq];
+  environment.systemPackages = with pkgs; [ jq ];
 
   services.openssh.enable = true;
   system.stateVersion = "25.05";

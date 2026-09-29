@@ -1,6 +1,5 @@
-{
-  lib,
-  systems,
-  ...
+{ lib
+, systems
+, ...
 }:
-lib.genAttrs systems.default (_: {})
+lib.genAttrs systems.default (_: { })

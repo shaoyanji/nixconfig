@@ -326,6 +326,8 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 | mtfuji        | yes    | Reference AI host (ollama; agent-era modules removed 2026-09) |
 | kellerbench   | no     | Gaming backup rig |
 | scratch       | no     | Lightweight niri desktop (eisen-style, tmpfs/zram IO diet) |
+| stark         | no     | Dell 3477 AIO Steam Big Picture desktop (MX110 Optimus, legacy_580 offload) |
+| fern          | no     | HP 15 laptop niri desktop (Ryzen 3 3250U, no Steam, autologin) |
 | deckstation   | no     | Steam/gamescope kiosk |
 
 `deckstation` is a pure Steam install — no desktop environment, just greetd + tuigreet dropping into gamescope-session (Steam Big Picture). Uses `globalModulesContainers` so no dms/niri leaks in. Runs Sunshine GameStream/Moonlight host so any LAN client (phone, laptop, TV box) can launch the big screen remotely. Closure is minimalistic: ROCm/OpenCL compute packages are dropped from the AMD profile since Steam + gamescope only need Mesa + amdgpu.
@@ -334,7 +336,7 @@ Per-host quirks and exceptions: `.agents/deploy/hosts/*.md`
 
 ## Pinning and updates
 
-`nixpkgs` and all inputs are pinned via `flake.lock`. Update intentionally with lockfile bumps (for example `nix flake update` or targeted input updates), then review and commit `flake.lock` with the corresponding config changes.
+`nixpkgs` and all inputs are pinned via `flake.lock`. Update intentionally with lockfile bumps (for example `nix flake update` or targeted input updates), then review and commit `flake.lock` with the corresponding config changes. Note that a root `nix flake update` only advances the root inputs — branch-following transitive pins (e.g. `impermanence/nixpkgs`, `dms/dank-qml-common`) can stay stale for months. Run `task dev:flake:update-transitive` (or check first with `task checks:flake:transitive`) to catch those.
 
 ## Flake outputs
 
@@ -442,7 +444,9 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 
 ## Recent changes
 
-**Last updated: 2026-09-17**
+**Last updated: 2026-09-29**
+
+**2026-09-29 — stark + fern hosts added; dank-greeter migration; transitive-input sweep.** Two new hosts joined the fleet: **stark** (Dell Inspiron 24 3477 AIO, i5-7200U + MX110 Pascal dGPU on `legacy_580` with PRIME render offload, eisen-style Steam Big Picture autologin, dual-disk disko with a 1 TB HDD Steam library) and **fern** (HP 15 laptop, Ryzen 3 3250U Vega 3, scratch-style niri desktop autologin, no Steam, single-disk disko). The greeter moved upstream from the dms flake to its own `dank-greeter` repo: all desktop hosts now use `inputs.dank-greeter.nixosModules.default` → `programs.dms-greeter` and `dms` is unpinned again. `globalModulesHome` gained `nixpkgs.config.allowUnfree` so standalone HM hosts (alarm/kali) eval like NixOS hosts do. A new task (`checks:flake:transitive` / `dev:flake:update-transitive`, backed by `scripts/task/flake-transitive-sweep.sh`) sweeps flake.lock transitive pins against upstream heads — a root `nix flake update` leaves those stale. `authorized-keys.nix` now appends two repo-side keys (bitlockerpremium Windows box + a Bitwarden key) to the fetched gist list.
 
 **2026-09-17 — scratch: Steam Remote Play kiosk converted to an eisen-style niri desktop.** The Fujitsu ESPRIMO D556 now runs the `globalModulesNixos` chain (niri + DankMaterialShell greeter, autoLogin, role:heim userland) via `base-desktop-environment.nix`; Steam, the cage kiosk wrapper and the greetd autologin are gone, while the tmpfs/zram IO diet (zram 100%, journald volatile, ~/.cache on tmpfs, fstrim, gentle writeback sysctls) is kept verbatim for the shaky f2fs SSD. Legacy BIOS boot with GRUB on /dev/sda is unchanged. See `.agents/deploy/hosts/scratch.md`.
 

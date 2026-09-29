@@ -106,7 +106,7 @@ in
   # Journals live in RAM only — nothing hits the f2fs SSD.
   services.journald = {
     storage = "volatile";
-    extraConfig = "SystemMaxUse=50M";
+    settings.Journal.SystemMaxUse = "50M";
   };
 
   # No core dumps written to disk.

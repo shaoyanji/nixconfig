@@ -128,6 +128,7 @@ task dev:git:quick-pull          # Pull with submodules, reload taskfile
 task dev:flake:update-complete   # Full flake update workflow
 task dev:flake:update:bountystash # Update single input
 task dev:flake:update-transitive # Update transitive inputs a root update misses
+task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 ```
 
 **Git pre/post hooks auto-run** — `dev:git:prehook` refreshes Taskfile.yml from encrypted secrets; `dev:git:posthook` pushes.
@@ -137,6 +138,7 @@ task dev:flake:update-transitive # Update transitive inputs a root update misses
 ```bash
 task checks:quick                # Quick eval + host-architecture check + nix lint
 task checks:flake:transitive     # Sweep transitive flake pins vs upstream (read-only)
+task checks:qmd:docs             # qmd repo-docs collection registered + index fresh
 nix eval .#nixosConfigurations.<host>.config.networking.hostName  # Quick eval check
 nix build .#checks.x86_64-linux.host-architecture -L              # Host architecture validation
 nix flake check                  # Full evaluation (slower, catches everything)

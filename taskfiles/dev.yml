@@ -246,6 +246,11 @@ tasks:
     cmds:
       - bash scripts/task/flake-transitive-sweep.sh update
 
+  dev:qmd:refresh:
+    desc: (Re)index this repo's markdown docs into the local qmd collection
+    cmds:
+      - bash scripts/task/qmd-docs-index.sh ensure
+
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
     cmds:

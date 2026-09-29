@@ -1,8 +1,23 @@
 {
   description = "Personal Nix configuration: NixOS, nix-darwin, and Home Manager";
+
+  # Prebuilt AI-agent packages from llm-agents.nix (crush, freebuff,
+  # qmd, qwen-code, ...). Cache hits only when our nixpkgs matches
+  # theirs — otherwise builds locally from source.
+  nixConfig = {
+    extra-substituters = [ "https://cache.numtide.com" ];
+    extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
+  };
   # inputs.self.submodules = true;
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # AI coding-agent packages, auto-updated daily upstream.
+    # follows is safe here: we track current nixpkgs-unstable, which is
+    # what the flake builds against (stable branches WILL break it).
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     # chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";

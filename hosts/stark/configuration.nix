@@ -6,9 +6,10 @@
 #         NVIDIA GeForce MX110 (Pascal GP108, sm_61) via PRIME render
 #         offload → legacy_580 driver (./nvidia-mx110.nix)
 #   RAM:  16 GB DDR4
-#   Disk: SK hynix SC311 SATA SSD (system, disko main = /dev/sda) +
+#   Disk: SK hynix SC311 SATA SSD (system, disko main = /dev/sdb —
+#         kernel enumerates the HDD first) +
 #         1 TB HDD (Steam library, btrfs → /mnt/steam, disko hdd =
-#         /dev/sdb)
+#         /dev/sda)
 #   Boot: UEFI (systemd-boot)
 #
 # Role:  Steam Big Picture on a full desktop chain (eisen-style):

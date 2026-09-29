@@ -8,6 +8,11 @@ let
       system.configurationRevision = self.rev or self.dirtyRev or null;
     }
     ../modules/global/global.nix
+    # llm-agents.nix: AI agent CLI packages under pkgs.llm-agents.<name>
+    # (crush, freebuff, qmd, qwen-code, ...). The shared-nixpkgs overlay
+    # builds them against OUR nixpkgs so deps are shared with the rest
+    # of the system; the numtide cache hits when revisions align.
+    { nixpkgs.overlays = [ inputs.llm-agents.overlays.shared-nixpkgs ]; }
   ];
   # Minimal sharedModules for home-manager-only (standalone) configs.
   hmSharedModulesHome = [
@@ -67,6 +72,9 @@ rec {
   globalModulesHome =
     hmSharedModulesHome
     ++ [
-      { nixpkgs.config.allowUnfree = true; }
+      {
+        nixpkgs.config.allowUnfree = true;
+        nixpkgs.overlays = [ inputs.llm-agents.overlays.shared-nixpkgs ];
+      }
     ];
 }

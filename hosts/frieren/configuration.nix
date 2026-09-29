@@ -276,13 +276,13 @@ in
       2049
 
       8123 # HomeAssistant
-      7351 # Stirling PDF
       6801 # AriaNg web UI
       28981 # Paperless-ngx
-      42617 # ZeroClaw dashboard
       3001 # Uptime-Kuma (ha-stack)
       6052 # ESPHome dashboard (ha-stack)
       8124 # Scrutiny SMART dashboard (infra-stack)
+      # 7351 moved next to the service: networking.nix (Stirling PDF)
+      # 42617 closed - ZeroClaw was removed in the 2026-09 teardown
     ];
     allowedUDPPorts = [ 137 138 ];
   };

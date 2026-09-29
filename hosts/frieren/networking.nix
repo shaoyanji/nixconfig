@@ -1,4 +1,5 @@
 { pkgs
+, lib
 , ...
 }: {
   # --- Networking tools ---
@@ -18,9 +19,15 @@
     };
   };
 
-  # --- Firewall ---
-  networking.firewall.allowedTCPPorts = [
-    8123 # HomeAssistant
-    7351 # Stirling PDF
-  ];
+  # --- Stirling PDF (re-enabled 2026-09-29) ---
+  # Port 7351 because the module default 8080 collides with pihole-web.
+  # Opened here (not in configuration.nix's firewall block) so the
+  # port lives next to the service that needs it.
+  services.stirling-pdf = {
+    enable = true;
+    environment = {
+      SERVER_PORT = "7351";
+    };
+  };
+  networking.firewall.allowedTCPPorts = lib.mkAfter [ 7351 ];
 }

@@ -1,11 +1,11 @@
-{
-  config,
-  lib,
-  ...
+{ config
+, lib
+, ...
 }:
 with lib; let
   cfg = config.profiles.serverHardening;
-in {
+in
+{
   options.profiles.serverHardening = {
     enable = mkEnableOption "Server hardening — journald caps, tmp cleanup, /var relocation";
 
@@ -24,11 +24,11 @@ in {
 
   config = mkIf cfg.enable {
     # 1. Cap systemd journal — the single highest-impact change for /var pressure
-    services.journald.extraConfig = ''
-      SystemMaxUse=300M
-      RuntimeMaxUse=200M
-      MaxRetentionSec=1week
-    '';
+    services.journald.settings.Journal = {
+      SystemMaxUse = "300M";
+      RuntimeMaxUse = "200M";
+      MaxRetentionSec = "1week";
+    };
 
     # 2. Wipe /tmp on every boot (no state survives in tmp)
     boot.tmp.cleanOnBoot = true;
@@ -38,14 +38,14 @@ in {
     fileSystems."/var/log" = mkIf (cfg.varLogDevice != "") {
       device = cfg.varLogDevice;
       fsType = "none";
-      options = ["bind" "x-systemd.requires=systemd-tmpfiles-setup.service"];
+      options = [ "bind" "x-systemd.requires=systemd-tmpfiles-setup.service" ];
     };
 
     # 4. Bind-mount /var/cache to the large data disk
     fileSystems."/var/cache" = mkIf (cfg.varCacheDevice != "") {
       device = cfg.varCacheDevice;
       fsType = "none";
-      options = ["bind" "x-systemd.requires=systemd-tmpfiles-setup.service"];
+      options = [ "bind" "x-systemd.requires=systemd-tmpfiles-setup.service" ];
     };
 
     # 5. Ensure target directories exist before the bind mount

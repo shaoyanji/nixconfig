@@ -1,10 +1,9 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-{
-  config,
-  pkgs,
-  ...
+{ config
+, pkgs
+, ...
 }: {
   imports = [
     # Include the results of the hardware scan.
@@ -20,16 +19,16 @@
   # boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = false;
-  boot.supportedFilesystems = ["f2fs" "nfs"];
+  boot.supportedFilesystems = [ "f2fs" "nfs" ];
   fileSystems = {
     "/Volumes/data" = {
       device = "192.168.3.25:/data";
       fsType = "nfs";
-      options = ["noatime" "nfsvers=4" "rw" "x-systemd.automount" "x-systemd.idle-timeout=600"];
+      options = [ "noatime" "nfsvers=4" "rw" "x-systemd.automount" "x-systemd.idle-timeout=600" ];
     };
   };
 
-  networking.firewall.allowedTCPPorts = [2049];
+  networking.firewall.allowedTCPPorts = [ 2049 ];
 
   boot.kernelParams = [
     # "fsck.mode=skip"
@@ -52,7 +51,7 @@
     dates = "weekly";
     # options = "--delete-older-than-30d";
   };
-  services.journald.extraConfig = "SystemMaxUse=50M";
+  services.journald.settings.Journal.SystemMaxUse = "50M";
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
   zramSwap = {
@@ -104,7 +103,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.devji = {
     isNormalUser = true;
-    extraGroups = ["wheel"]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       tree
     ];
@@ -126,7 +125,7 @@
   systemd.user.services.niri.enableDefaultPath = false;
   security.polkit.enable = true; # polkit
   services.gnome.gnome-keyring.enable = true; # secret service
-  security.pam.services.swaylock = {};
+  security.pam.services.swaylock = { };
 
   # programs.waybar.enable = true; # top bar
   # services.displayManager.sddm.enable = true;

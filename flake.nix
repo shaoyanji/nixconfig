@@ -47,14 +47,17 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
 
-    # Track the `stable` branch — the greeter moved to a separate
-    # dank-greeter repo on master. The stable branch still ships
-    # `nixosModules.greeter` / `programs.dank-material-shell.greeter`,
-    # which is the documented API (danklinux.com/docs/dankgreeter).
+    # The greeter lives in its own repo since 2026-09 (imported via
+    # module-sets as inputs.dank-greeter.nixosModules.default →
+    # programs.dms-greeter). See danklinux.com/docs/dankgreeter/nixos-flake.
     dms = {
       url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
       # inputs.dgop.follows = "dgop";
+    };
+    dank-greeter = {
+      url = "github:AvengeMedia/dank-greeter";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     niri = {
       url = "github:sodiboo/niri-flake";
@@ -70,11 +73,11 @@
     };
   };
 
-  outputs = inputs @ {
-    self,
-    nixpkgs,
-    ...
-  }:
+  outputs =
+    inputs @ { self
+    , nixpkgs
+    , ...
+    }:
     import ./flake/outputs.nix {
       inherit inputs self nixpkgs;
     };

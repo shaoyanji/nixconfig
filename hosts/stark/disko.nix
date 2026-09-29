@@ -1,9 +1,11 @@
 # Disk layout for stark (Dell Inspiron 24 3477 All-in-One).
 #
 # Dual-disk:
-#   main (default /dev/sda): SK hynix SC311 SATA SSD — system disk.
+#   main: SK hynix SC311 SATA SSD — system disk. The 3477's kernel
+#     enumerates the 1 TB HDD first, so the inventory passes the SSD as
+#     /dev/sdb (verify with lsblk -o NAME,SIZE,MODEL before disko).
 #     UEFI ESP + 8G swap + btrfs /root + /nix subvolumes (no LVM).
-#   hdd (default /dev/sdb): 1 TB HDD — dedicated Steam library,
+#   hdd: 1 TB HDD (/dev/sda) — dedicated Steam library,
 #     single btrfs partition mounted at /mnt/steam.
 #
 # Host-local on purpose: disk topology is host-specific (TODO.md →
@@ -13,7 +15,8 @@
 # does NOT run impermanence.
 #
 # WARNING: `disko` wipes BOTH disks. Verify with `lsblk` before
-# running the disko script — the SSD must be main, the 1 TB HDD hdd.
+# running the disko script — the SSD must be main (/dev/sdb), the
+# 1 TB HDD hdd (/dev/sda).
 { mainDevice ? throw "Set mainDevice to the system SSD, e.g. /dev/sda"
 , hddDevice ? throw "Set hddDevice to the 1 TB HDD, e.g. /dev/sdb"
 ,

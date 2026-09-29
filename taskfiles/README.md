@@ -7,7 +7,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `Taskfile.yml` is the entrypoint; it loads the shards and hosts top-level helper menus (`deploy`, `logs`, `status`, `menu`).
 - `taskfiles/infra.yml` is the canonical host lifecycle surface (`infra:*`) for plan/apply/deploy/rollback/logs and secrets management.
 - `taskfiles/agents.yml` holds operator helpers, xs runtime wrappers, and OAuth/session management.
-- `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift).
+- `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep).
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
 
@@ -15,7 +15,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `Taskfile.yml` – entrypoint with top-level menus
 - `taskfiles/infra.yml` – host lifecycle, secrets, SOPS operations
 - `taskfiles/agents.yml` – operator helpers, xs wrappers, OAuth management
-- `taskfiles/checks.yml` – validation and smoke checks
+- `taskfiles/checks.yml` – validation and smoke checks (incl. `checks:flake:transitive`)
 - `taskfiles/dev.yml` – git workflows, flake updates, site deployment
 - `taskfiles/services-core.yml` – minimal compatibility wrappers
 - `taskfiles/services-legacy.yml` – deprecated aliases (marked `[deprecated]`)

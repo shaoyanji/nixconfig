@@ -6,7 +6,7 @@ This repository uses a simplified task namespace for predictable operator workfl
 
 - `infra:*`: Host lifecycle operations (plan/apply/deploy/rollback/logs), secrets management, SOPS operations
 - `agents:*`: Operator helpers and legacy operator menus
-- `checks:*`: Validation and health checks (host evals, Nix lint/format, sops drift)
+- `checks:*`: Validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep)
 - `dev:*`: Git workflows, flake updates, site deployment, and local development tasks
 - `services:*`: Legacy compatibility wrappers (routes to `infra:*` tasks)
 
@@ -41,11 +41,13 @@ task infra:rebuild:home-manager  # Rebuild Home Manager profile
 task dev:git:quick-push          # Commit/push with AI-generated message
 task dev:flake:update-complete   # Complete flake update workflow
 task dev:flake:update:bountystash # Update single flake input
+task dev:flake:update-transitive # Advance transitive pins a root update misses
 ```
 
 ### Validation
 ```bash
 task checks:quick                # Run narrow repo checks
+task checks:flake:transitive     # Read-only transitive flake pin sweep (exit 1 on drift)
 ```
 
 ### Operator Helpers

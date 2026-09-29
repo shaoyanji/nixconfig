@@ -108,6 +108,33 @@ in
       ];
   };
 
+  stark = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = { inherit inputs self; };
+    # stark is a Dell Inspiron 24 3477 AIO (i5-7200U Kaby Lake-U, 16 GB
+    # RAM). Steam Big Picture desktop mirroring eisen: globalModulesNixos
+    # brings in niri + DankMaterialShell greeter + role:heim userland,
+    # autoLogin drops devji into the upstream gamescope-session (steam
+    # -gamepadui) with the DMS greeter as fallback. The MX110 (Pascal
+    # sm_61) dGPU needs the legacy_580 driver (final series for Pascal)
+    # and is muxless Optimus: PRIME render offload with the HD 620 iGPU
+    # driving the panel — games opt in via nvidia-offload %command%.
+    # Dual-disk disko: SATA SSD (/dev/sda) for the system + 1 TB HDD
+    # (/dev/sdb) as the btrfs Steam library at /mnt/steam. Persistent
+    # (no impermanence) — eisen-style.
+    modules =
+      globalModulesNixos
+      ++ [
+        inputs.disko.nixosModules.default
+        ../hosts/stark/configuration.nix
+        (import ../hosts/stark/disko.nix {
+          mainDevice = "/dev/sda";
+          hddDevice = "/dev/sdb";
+        })
+      ];
+  };
+
   schneeeule = {
     kind = "nixos";
     system = "x86_64-linux";

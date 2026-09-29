@@ -102,16 +102,11 @@ in
 
       nix = {
         distributedBuilds = true;
-        buildMachines = [
-          {
-            hostName = cfg.hostName;
-            systems = cfg.systems;
-            maxJobs = cfg.maxJobs;
-            speedFactor = cfg.speedFactor;
-            supportedFeatures = [ "benchmark" "big-parallel" ];
-            protocol = "ssh";
-          }
-        ];
+        buildMachines = [{
+          inherit (cfg) hostName systems maxJobs speedFactor;
+          supportedFeatures = [ "benchmark" "big-parallel" ];
+          protocol = "ssh";
+        }];
       };
     })
 

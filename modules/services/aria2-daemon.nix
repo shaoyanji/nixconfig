@@ -89,7 +89,7 @@ in
     # Delegate daemon lifecycle to the native nixpkgs module.
     services.aria2 = {
       enable = true;
-      rpcSecretFile = cfg.rpcSecretFile;
+      inherit (cfg) rpcSecretFile;
       openPorts = false; # We manage firewall separately via networking.firewall.
       settings = {
         dir = cfg.downloadDir;

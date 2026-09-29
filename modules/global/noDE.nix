@@ -29,7 +29,7 @@ in
     ];
     extraSpecialArgs = {
       inherit inputs;
-      hostName = config.networking.hostName;
+      inherit (config.networking) hostName;
     };
   };
 }

@@ -42,12 +42,14 @@ task dev:git:quick-push          # Commit/push with AI-generated message
 task dev:flake:update-complete   # Complete flake update workflow
 task dev:flake:update:bountystash # Update single flake input
 task dev:flake:update-transitive # Advance transitive pins a root update misses
+task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 ```
 
 ### Validation
 ```bash
 task checks:quick                # Run narrow repo checks
 task checks:flake:transitive     # Read-only transitive flake pin sweep (exit 1 on drift)
+task checks:qmd:docs             # qmd docs collection exists + index fresh
 ```
 
 ### Operator Helpers

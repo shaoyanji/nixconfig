@@ -1,6 +1,6 @@
 # AGENTS.md
 
-**Nixconfig** — Personal Nix flake managing NixOS, nix-darwin, and Home Manager across ~20 hosts.
+**Nixconfig** — Personal Nix flake managing NixOS, nix-darwin, and Home Manager across ~25 hosts.
 
 `Taskfile.yml` plus the `taskfiles/*` shards are the canonical entrypoint for every executable task.
 
@@ -35,13 +35,13 @@ flake.nix → flake/outputs.nix (hub)
 
 | Chain | What it includes | Used by |
 |-------|-----------------|---------|
-| `globalModulesNixos` | global + nixos + home-manager-shared + sops + nix-index + dms (desktop) | poseidon, aristotle, aceofspades, ancientace, eisen, frieren, scratch |
+| `globalModulesNixos` | global + nixos + home-manager-shared + sops + nix-index + dms + dank-greeter (desktop) | poseidon, aristotle, aceofspades, ancientace, eisen, frieren, scratch, stark, fern |
 | `globalModulesImpermanence` | globalModulesNixos + impermanence + disko | schneeeule |
 | containers + impermanence (ares) | globalModulesContainers + impermanence + disko | ares (Steam kiosk) |
 | `globalModulesContainers` | global + noDE + sops + home-manager + nix-index (no dms/niri desktop) | mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), netbook, deckstation |
 | `globalModulesMacos` | global + macos + nix-homebrew + home-manager + sops | cassini (darwin) |
 | `globalModulesDemo` | global + demo + home-manager (no sops) | demo (NixOS demo VM) |
-| `globalModulesHome` | standalone HM sharedModules only | penguin, alarm, kali (standalone home-manager) |
+| `globalModulesHome` | standalone HM sharedModules + allowUnfree | penguin, alarm, kali (standalone home-manager) |
 
 ### Module Layout
 
@@ -127,6 +127,7 @@ task dev:git:build-push          # AI commit after successful build
 task dev:git:quick-pull          # Pull with submodules, reload taskfile
 task dev:flake:update-complete   # Full flake update workflow
 task dev:flake:update:bountystash # Update single input
+task dev:flake:update-transitive # Update transitive inputs a root update misses
 ```
 
 **Git pre/post hooks auto-run** — `dev:git:prehook` refreshes Taskfile.yml from encrypted secrets; `dev:git:posthook` pushes.
@@ -135,6 +136,7 @@ task dev:flake:update:bountystash # Update single input
 
 ```bash
 task checks:quick                # Quick eval + host-architecture check + nix lint
+task checks:flake:transitive     # Sweep transitive flake pins vs upstream (read-only)
 nix eval .#nixosConfigurations.<host>.config.networking.hostName  # Quick eval check
 nix build .#checks.x86_64-linux.host-architecture -L              # Host architecture validation
 nix flake check                  # Full evaluation (slower, catches everything)

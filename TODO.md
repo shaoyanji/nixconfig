@@ -2,6 +2,20 @@
 
 ## Current Open Work
 1. Documentation alignment completed (April 30, 2026) - All documentation now reflects simplified task control plane and current AI services state. See [AUDIT.md](AUDIT.md) for full details.
+2. **nixbuild.net SSH key — BLOCKER before enabling remote builds.** Do NOT flip
+   `profiles.nixbuild-client.enable = true` on any dispatching host until the key
+   exists and is registered:
+   1. Generate it: `ssh-keygen -t ed25519 -f ~/.ssh/nixbuild` (no passphrase —
+      the nix daemon must use it unattended).
+   2. Register the PUBLIC key in the nixbuild.net console.
+   3. Add the PRIVATE key to sops: `task infra:secrets:edit:secrets` →
+      `nixbuild_ssh_key: |` (the profile decrypts it to `/root/.ssh/nixbuild`,
+      root:0600, and restarts nix-daemon — see
+      `modules/profiles/nixbuild-client.nix`).
+   4. Only now set `profiles.nixbuild-client.enable = true;` on the dispatching
+      host(s) and rebuild. Verify: `nix eval` of `config.nix.buildMachines`,
+      `ssh eu.nixbuild.net echo ok`, then `task dev:nixbuild:plan` and
+      `task dev:nixbuild:warm` (mind the 25 build-h/month free tier).
 
 ## TestVM Follow-Up
 1. Inventory every host that embeds or plans to embed `testvm`-style microVM wiring.

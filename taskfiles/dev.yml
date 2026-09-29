@@ -241,6 +241,11 @@ tasks:
     cmds:
       - nix flake update bountystash
 
+  dev:flake:update-transitive:
+    desc: "[destructive] Update transitive flake inputs a root 'nix flake update' misses (branch-following pins like impermanence/nixpkgs, dms/dank-qml-common)"
+    cmds:
+      - bash scripts/task/flake-transitive-sweep.sh update
+
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
     cmds:

@@ -30,6 +30,8 @@ in
     ./paperless.nix
     ./tools.nix
     ./networking.nix
+    ./ha-stack.nix
+    ./infra-stack.nix
     ../../modules/services/aria2-daemon.nix
   ];
   networking.hostName = "frieren";
@@ -278,6 +280,9 @@ in
       6801 # AriaNg web UI
       28981 # Paperless-ngx
       42617 # ZeroClaw dashboard
+      3001 # Uptime-Kuma (ha-stack)
+      6052 # ESPHome dashboard (ha-stack)
+      8124 # Scrutiny SMART dashboard (infra-stack)
     ];
     allowedUDPPorts = [ 137 138 ];
   };

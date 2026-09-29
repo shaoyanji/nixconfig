@@ -120,17 +120,18 @@ in
     # sm_61) dGPU needs the legacy_580 driver (final series for Pascal)
     # and is muxless Optimus: PRIME render offload with the HD 620 iGPU
     # driving the panel — games opt in via nvidia-offload %command%.
-    # Dual-disk disko: SATA SSD (/dev/sda) for the system + 1 TB HDD
-    # (/dev/sdb) as the btrfs Steam library at /mnt/steam. Persistent
-    # (no impermanence) — eisen-style.
+    # Dual-disk disko: SATA SSD (/dev/sdb — the kernel enumerates the
+    # 1 TB HDD first) for the system + 1 TB HDD (/dev/sda) as the btrfs
+    # Steam library at /mnt/steam. Persistent (no impermanence) —
+    # eisen-style.
     modules =
       globalModulesNixos
       ++ [
         inputs.disko.nixosModules.default
         ../hosts/stark/configuration.nix
         (import ../hosts/stark/disko.nix {
-          mainDevice = "/dev/sda";
-          hddDevice = "/dev/sdb";
+          mainDevice = "/dev/sdb";
+          hddDevice = "/dev/sda";
         })
       ];
   };

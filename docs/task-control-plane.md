@@ -42,6 +42,8 @@ task dev:git:quick-push          # Commit/push with AI-generated message
 task dev:flake:update-complete   # Complete flake update workflow
 task dev:flake:update:bountystash # Update single flake input
 task dev:flake:update-transitive # Advance transitive pins a root update misses
+task dev:nixbuild:plan           # Build/fetch gap report per host (read-only)
+task dev:nixbuild:warm           # Remote-builder warm + cachix push (nixbuild.net budget)
 task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 ```
 

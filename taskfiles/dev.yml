@@ -251,6 +251,16 @@ tasks:
     cmds:
       - bash scripts/task/qmd-docs-index.sh ensure
 
+  dev:nixbuild:plan:
+    desc: Report what would build/fetch for hosts against local substituters (read-only)
+    cmds:
+      - bash scripts/task/nixbuild-warm.sh plan {{.CLI_ARGS}}
+
+  dev:nixbuild:warm:
+    desc: "[destructive] Build host closures on the remote builder (nixbuild.net budget!) and push to Cachix"
+    cmds:
+      - bash scripts/task/nixbuild-warm.sh warm {{.CLI_ARGS}}
+
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
     cmds:
@@ -266,6 +276,16 @@ tasks:
         for host in $(task dev:flake:get-hosts); do
           yq -i ".builds.include += [\"nixosConfigurations.$host\"]" garnix.yaml
         done
+
+  dev:nixbuild:plan:
+    desc: Report what would build/fetch for hosts against local substituters (read-only)
+    cmds:
+      - bash scripts/task/nixbuild-warm.sh plan {{.CLI_ARGS}}
+
+  dev:nixbuild:warm:
+    desc: "[destructive] Build host closures on the remote builder (nixbuild.net budget!) and push to Cachix"
+    cmds:
+      - bash scripts/task/nixbuild-warm.sh warm {{.CLI_ARGS}}
 
   dev:config:hash-update:
     desc: Refresh sha256 checksums for all modules/config/*.json files (nu.json, authorized-keys.json, fetches.json)

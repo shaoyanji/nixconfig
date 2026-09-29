@@ -64,6 +64,7 @@ modules/
     nas-client.nix — Automount /Volumes/data from the NAS server (frieren)
     steamos.nix — Steam kiosk (greetd autologin + upstream gamescope-session, audio, 32-bit GL, Avahi)
     sunshine.nix — GameStream/Moonlight server (Sunshine on LAN, video/render/input groups)
+    nixbuild-client.nix — Optional nixbuild.net remote builder (distributedBuilds, off by default)
   services/        — Service modules
     aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)
   roles/           — User role assemblers
@@ -128,6 +129,8 @@ task dev:git:quick-pull          # Pull with submodules, reload taskfile
 task dev:flake:update-complete   # Full flake update workflow
 task dev:flake:update:bountystash # Update single input
 task dev:flake:update-transitive # Update transitive inputs a root update misses
+task dev:nixbuild:plan           # Report build/fetch gaps per host vs substituters
+task dev:nixbuild:warm           # Build gaps on remote builder + cachix push (budget!)
 task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 ```
 

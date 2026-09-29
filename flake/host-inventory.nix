@@ -135,6 +135,29 @@ in
       ];
   };
 
+  fern = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    specialArgs = { inherit inputs self; };
+    # fern is an HP 15 laptop (Ryzen 3 3250U Picasso, Vega 3 iGPU, 8 GB
+    # RAM). Lightweight niri desktop mirroring scratch: globalModulesNixos
+    # (niri + DankMaterialShell greeter via programs.dms-greeter +
+    # role:heim userland), autoLogin straight into niri as devji. NO
+    # Steam — deliberately not imported (contrast stark/eisen).
+    # modules/profiles/laptop.nix layers auto-cpufreq + libinput. Single-
+    # disk disko (ESP + 8G swap + btrfs /root,/nix); device argument
+    # below assumes the SSD enumerates as /dev/sda — verify with lsblk
+    # and flip to /dev/nvme0n1 BEFORE disko formats it. Persistent (no
+    # impermanence).
+    modules =
+      globalModulesNixos
+      ++ [
+        inputs.disko.nixosModules.default
+        ../hosts/fern/configuration.nix
+        (import ../hosts/fern/disko.nix { device = "/dev/sda"; })
+      ];
+  };
+
   schneeeule = {
     kind = "nixos";
     system = "x86_64-linux";

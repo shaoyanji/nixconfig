@@ -16,6 +16,19 @@
       host(s) and rebuild. Verify: `nix eval` of `config.nix.buildMachines`,
       `ssh eu.nixbuild.net echo ok`, then `task dev:nixbuild:plan` and
       `task dev:nixbuild:warm` (mind the 25 build-h/month free tier).
+3. **frieren follow-up queue** (from the 2026-09-29 service review):
+   - Add `services.postgresql.backup` (pg_dump) for Immich's DB and include
+     the dump dir in the restic job — `/var/lib/postgresql` is deliberately
+     excluded from `infra-stack.nix` (hot data-dir copies are not consistent).
+   - MQTT hardening: when real devices arrive, switch mosquitto from the
+     loopback-anonymous listener to an authenticated LAN listener with
+     passwordFile via sops (see `hosts/frieren/ha-stack.nix` header).
+   - restic hardening: move `/root/.restic-password` into sops and add an
+     offsite repository target (B2/rest-server) alongside the local one.
+   - When a Zigbee coordinator dongle is attached: set
+     `services.zigbee2mqtt.settings.serial.port` from `/dev/serial/by-id`.
+   - Cheap resilience win: battery-as-UPS sensor for frieren in HA via the
+     already-enabled `command_line` integration (`/sys/class/power_supply`).
 
 ## TestVM Follow-Up
 1. Inventory every host that embeds or plans to embed `testvm`-style microVM wiring.

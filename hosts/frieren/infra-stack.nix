@@ -13,8 +13,7 @@
 #   dirs are deliberately EXCLUDED: hot-copying a live data directory
 #   is not a consistent backup — add services.postgresql.backup
 #   (pg_dump) alongside before trusting DB restore points.
-{ ...
-}: {
+_: {
   # --- SMART monitoring ---
   services.smartd = {
     enable = true;

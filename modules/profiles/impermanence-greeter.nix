@@ -10,7 +10,7 @@ let
   user = import ../global/user.nix;
 in
 {
-  programs.dank-material-shell.greeter = {
+  programs.dms-greeter = {
     enable = true;
     compositor.name = "niri";
     configHome = user.home;

@@ -1,7 +1,8 @@
-{
-  inputs,
-  self,
-}: let
+{ inputs
+, self
+,
+}:
+let
   globalModules = [
     {
       system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -14,7 +15,8 @@
     inputs.sops-nix.homeManagerModules.sops
     inputs.nix-index-database.homeModules.nix-index
   ];
-in rec {
+in
+rec {
   inherit globalModules hmSharedModulesHome;
   globalModulesNixos =
     globalModules
@@ -24,7 +26,9 @@ in rec {
       inputs.sops-nix.nixosModules.sops
       inputs.nix-index-database.nixosModules.nix-index
       inputs.dms.nixosModules.dank-material-shell
-      inputs.dms.nixosModules.greeter
+      # Greeter split out of the dms flake into AvengeMedia/dank-greeter
+      # (2026-09): option is programs.dms-greeter now.
+      inputs.dank-greeter.nixosModules.default
     ];
   globalModulesImpermanence =
     globalModulesNixos
@@ -55,5 +59,14 @@ in rec {
       ../modules/global/demo.nix
       inputs.home-manager.nixosModules.default
     ];
-  globalModulesHome = hmSharedModulesHome;
+  # Standalone-home chain. These hosts build their own pkgs outside the
+  # NixOS module system, so modules/global/global.nix (which carries the
+  # repo-wide nixpkgs.config.allowUnfree = true policy) never applies.
+  # Restore the same policy here — without it the unfree antigravity-cli
+  # (pulled in via roles/minimal → user/ai) fails eval on alarm/kali.
+  globalModulesHome =
+    hmSharedModulesHome
+    ++ [
+      { nixpkgs.config.allowUnfree = true; }
+    ];
 }

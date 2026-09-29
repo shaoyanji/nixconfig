@@ -60,7 +60,7 @@ in
     wayland.enable = true;
   };
   services.displayManager.defaultSession = "niri";
-  programs.dank-material-shell.greeter = {
+  programs.dms-greeter = {
     enable = true;
     compositor.name = "niri";
     configHome = user.home; # Sync themes with user's DankMaterialShell config

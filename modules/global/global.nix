@@ -47,7 +47,9 @@
       min-free = ${toString (100 * 1024 * 1024)}
       max-free = ${toString (1024 * 1024 * 1024)}
     '';
-    nixPath = [
+    # nix.nixPath was renamed to nix.settings.nix-path (nixpkgs 26.11);
+    # the old form emits a deprecation warning on every eval.
+    settings.nix-path = [
       "nixpkgs=${pkgs.path}"
     ];
   };

@@ -7,6 +7,12 @@ let
 in
 {
   # --- Immich ---
+  # Machine learning re-enabled (2026-09-29): smart search + facial
+  # recognition. The onnxruntime build in nixpkgs does not ship the
+  # OpenVINO execution provider, so ML jobs run on CPU — acceptable for
+  # a personal library; the UHD 620 keeps serving Jellyfin/Plex
+  # transcodes. Models download from HuggingFace on first job into
+  # MACHINE_LEARNING_CACHE_FOLDER (/var/cache/immich, module default).
   users.users.immich.extraGroups = [ "video" "render" ];
   services.immich = {
     host = "0.0.0.0";
@@ -14,13 +20,19 @@ in
     port = 2283;
     accelerationDevices = null;
     openFirewall = true;
-    machine-learning.enable = false;
+    machine-learning.enable = true;
   };
 
+  # /var/lib/immich lives on the data pool — the module's shared
+  # serviceConfig sets PrivateMounts=true which masks it, so all three
+  # services get the override (ML reads the library for embeddings/
+  # facial recognition just like server/microservices).
   systemd.services.immich-server.unitConfig.RequiresMountsFor = "/var/lib/immich";
   systemd.services.immich-microservices.unitConfig.RequiresMountsFor = "/var/lib/immich";
+  systemd.services.immich-machine-learning.unitConfig.RequiresMountsFor = "/var/lib/immich";
   systemd.services.immich-server.serviceConfig.PrivateMounts = lib.mkForce false;
   systemd.services.immich-microservices.serviceConfig.PrivateMounts = lib.mkForce false;
+  systemd.services.immich-machine-learning.serviceConfig.PrivateMounts = lib.mkForce false;
 
   # --- *arr stack ---
   services.sonarr = {

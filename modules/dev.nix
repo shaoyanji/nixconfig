@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{ pkgs, ... }: {
   programs = {
     uv = {
       enable = true;
@@ -16,8 +16,7 @@
   home.packages = with pkgs; [
   ];
 
-  home.sessionVariables = {
-  };
+  home.sessionVariables = { };
   home.sessionPath = [
     "$HOME/.dotnet/tools"
     "$HOME/go/bin"

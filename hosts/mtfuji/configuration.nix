@@ -1,4 +1,4 @@
-{inputs, ...}: {
+{ inputs, ... }: {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -15,7 +15,7 @@
       useRoutingFeatures = "both";
     };
     resolved.enable = true;
-    resolved.settings.Resolve.Domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
+    resolved.settings.Resolve.Domains = [ "~.cloudforest-kardashev.ts.net" "~.fritz.box" "~." ];
   };
 
   networking.hostName = "mtfuji";

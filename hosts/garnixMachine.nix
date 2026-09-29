@@ -1,12 +1,13 @@
-{
-  inputs,
-  config,
-  pkgs,
-  ...
-}: let
+{ inputs
+, config
+, pkgs
+, ...
+}:
+let
   bountystashPort = 3000;
   bountystashLocalUpstream = "http://127.0.0.1:${toString bountystashPort}/";
-in {
+in
+{
   garnix.server.enable = true;
   networking.hostName = "garnixMachine";
 
@@ -27,7 +28,7 @@ in {
   users.users.devji = {
     isNormalUser = true;
     description = "devji";
-    extraGroups = ["wheel" "systemd-journal"];
+    extraGroups = [ "wheel" "systemd-journal" ];
     openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };
 
@@ -55,9 +56,9 @@ in {
 
   systemd.services.bountystash = {
     description = "Bountystash web app";
-    wantedBy = ["multi-user.target"];
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
 
     environment = {
       PORT = toString bountystashPort;
@@ -103,5 +104,5 @@ in {
   system.stateVersion = "25.05";
   nixpkgs.hostPlatform = "x86_64-linux";
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }

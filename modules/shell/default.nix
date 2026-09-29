@@ -1,4 +1,5 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   myAliases = {
     l = "${pkgs.eza}/bin/eza -lahF --color=auto --icons --sort=size --group-directories-first";
     lss = "${pkgs.eza}/bin/eza -hF --color=auto --icons --sort=size --group-directories-first";
@@ -11,7 +12,8 @@
     tb = "nc termbin.com 9999";
     ll = "ls -alF";
   };
-in {
+in
+{
   imports = [
     ./base.nix
     ./starship.nix

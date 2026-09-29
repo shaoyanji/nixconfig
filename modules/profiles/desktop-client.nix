@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{ pkgs, ... }: {
   # Desktop client profile with NAS client dependency
   # Note: nas-client.nix is imported unconditionally as it's a core dependency
   # for desktop client functionality. To disable NAS mounts, configure
@@ -26,8 +26,8 @@
     };
     printing = {
       enable = true;
-      listenAddresses = ["*:631"];
-      allowFrom = ["all"];
+      listenAddresses = [ "*:631" ];
+      allowFrom = [ "all" ];
       browsing = true;
       defaultShared = true;
       openFirewall = true;
@@ -47,9 +47,9 @@
     tailscale.useRoutingFeatures = "both";
     # Use the frieren pi-hole (100.97.61.65) as DNS server via Tailscale
     # This forces DNS to go through pi-hole even with MagicDNS enabled
-    tailscale.extraUpFlags = ["--dns=100.97.61.65" "--accept-dns=true"];
+    tailscale.extraUpFlags = [ "--dns=100.97.61.65" "--accept-dns=true" ];
     resolved.enable = true;
-    resolved.settings.Resolve.Domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
+    resolved.settings.Resolve.Domains = [ "~.cloudforest-kardashev.ts.net" "~.fritz.box" "~." ];
   };
 
   # Required for non-Nix binaries/toolchains in daily desktop workflows.

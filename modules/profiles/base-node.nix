@@ -1,13 +1,14 @@
 # Base node configuration for all NixOS hosts.
 # Primary user constants: modules/global/user.nix
-{
-  config,
-  pkgs,
-  inputs,
-  ...
-}: let
+{ config
+, pkgs
+, inputs
+, ...
+}:
+let
   user = import ../global/user.nix;
-in {
+in
+{
   imports = [
     ../../modules/config/authorized-keys.nix
     ../../modules/ssh-ca.nix
@@ -22,7 +23,7 @@ in {
 
   sops = {
     defaultSopsFile = ../../modules/secrets.yaml;
-    age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     secrets = {
       hashedPassword.neededForUsers = true;
     };
@@ -40,7 +41,7 @@ in {
       enable = true;
       keyboards = {
         default = {
-          ids = ["*"];
+          ids = [ "*" ];
           settings = {
             main = {
               capslock = "escape";
@@ -85,7 +86,7 @@ in {
     inherit (user) home;
     isNormalUser = true;
     description = "matt";
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = [ "networkmanager" "wheel" ];
     hashedPasswordFile = config.sops.secrets.hashedPassword.path;
     openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };

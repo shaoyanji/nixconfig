@@ -5,7 +5,7 @@ _: {
       vimMode = true;
       preferredEditor = "nvim";
       autoAccept = true;
-      security = {auth = {selectedType = "oauth-personal";};};
+      security = { auth = { selectedType = "oauth-personal"; }; };
     };
     defaultModel = "gemini-2.5-flash";
     commands = {

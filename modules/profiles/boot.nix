@@ -4,10 +4,9 @@
 #   imports = [ ../../modules/profiles/boot.nix ];
 #   profiles.boot.systemd-boot = true;
 #   profiles.boot.efi = true;
-{
-  config,
-  lib,
-  ...
+{ config
+, lib
+, ...
 }: {
   options.profiles.boot = {
     systemd-boot = lib.mkOption {

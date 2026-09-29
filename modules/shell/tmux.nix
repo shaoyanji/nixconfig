@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{ pkgs, ... }: {
   programs.tmux = {
     enable = true;
     tmuxinator.enable = true;
@@ -43,9 +43,7 @@
   };
   home.packages = with pkgs; [
   ];
-  home.file = {
-  };
+  home.file = { };
 
-  home.sessionVariables = {
-  };
+  home.sessionVariables = { };
 }

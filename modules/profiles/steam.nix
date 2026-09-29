@@ -1,6 +1,8 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   user = import ../global/user.nix;
-in {
+in
+{
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;

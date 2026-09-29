@@ -1,14 +1,13 @@
-{
-  lib,
-  pkgs,
-  ...
+{ lib
+, pkgs
+, ...
 }: {
   imports = [
     ./nixoshmsymlinks.nix
     ./himalaya.nix
   ];
   # programs.nixvim.enable = true;
-  home.activation.removeExistingGitConfig = lib.hm.dag.entryAfter ["checkLinkTargets"] ''
+  home.activation.removeExistingGitConfig = lib.hm.dag.entryAfter [ "checkLinkTargets" ] ''
     rm -f ~/.gitconfig
   '';
   programs.delta = {

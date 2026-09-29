@@ -299,9 +299,9 @@ tasks:
         done
 
   dev:fmt:
-    desc: Format all Nix files with alejandra in-place
+    desc: Format all Nix files with nixpkgs-fmt in-place (repo standard, same as CI/hooks)
     cmds:
-      - nix-shell -p alejandra --run "alejandra flake/ hosts/ modules/ overlays/ pkgs/ lib/"
+      - nix-shell -p nixpkgs-fmt --run "nixpkgs-fmt flake.nix flake hosts modules overlays pkgs lib"
 
   dev:pkgs:list:
     desc: List all custom packages defined in the flake

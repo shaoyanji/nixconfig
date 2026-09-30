@@ -74,7 +74,8 @@ in
   fileSystems."/var/lib/paperless" = {
     device = paperlessDataDir;
     fsType = "none";
-    options = [ "bind" "x-systemd.requires=systemd-tmpfiles-setup.service" ];
+    options = [ "bind" ];
+    depends = [ "/srv/data" ];
   };
 
   systemd.tmpfiles.rules =

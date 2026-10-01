@@ -66,6 +66,12 @@ in
 
   networking = {
     networkmanager.enable = true;
+    # Fleet hostname resolution: deploys, remote logs, and the harmonia
+    # cache URL all reference hosts by name. frieren has a static LAN IP
+    # (see profiles/nas-client.nix).
+    hosts = {
+      "192.168.3.25" = [ "frieren" ];
+    };
   };
 
   time.timeZone = "Europe/Berlin";

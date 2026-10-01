@@ -29,9 +29,24 @@ in
         The default reuses the repository's canonical top-level AGENTS.md content.
       '';
     };
+    enableAgentsDir = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Materialize .agents directory in the user's home directory.";
+    };
+
+    agentsDirTarget = lib.mkOption {
+      type = lib.types.str;
+      default = ".agents";
+      description = "Home-relative path where the agent guidance and skills directory is written.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     home.file.${cfg.target}.text = cfg.text;
+    home.file.${cfg.agentsDirTarget} = lib.mkIf cfg.enableAgentsDir {
+      source = ../../../.agents;
+      recursive = true;
+    };
   };
 }

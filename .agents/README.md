@@ -19,8 +19,16 @@ Each taskfile shard has a corresponding skill under `.agents/skills/<name>/SKILL
 - **Deploy guidance**: Start with `.agents/deploy/README.md`; per-host notes live in `.agents/deploy/hosts/*.md`.
 - **Task routing**: `AGENTS.md` provides the top-level task namespace summary.
 
+## Provenance and Home Initialization
+
+- **Home Entrypoint**: When working from `$HOME` (`~`), `~/Taskfile.yml` provides tautological access to all commands in `~/Documents/nixconfig/Taskfile.yml` with `dir: ~/Documents/nixconfig` and `flatten: true`.
+- **Repo Root**: `~/Documents/nixconfig` (symlink to `/Volumes/data/projects/nixconfig`).
+- **Guidance & Skills**: Materialized in `~/.agents/` via Home Manager (`modules/user/ai/codex.nix`).
+- **Canonical Manual**: `AGENTS.md` (and mirrored at `~/AGENTS.md`) is the unified manual for both agents and operators.
+
 ## Truth boundaries
 
 - `taskfiles/*.yml` are the **executable truth**.
-- `.agents/*` documents routing only — it never replaces the Taskfile.
+- `~/Taskfile.yml` forwards directly to `~/Documents/nixconfig/Taskfile.yml`.
+- `.agents/*` and `AGENTS.md` document routing, fleet matrix, and runbooks.
 - `scripts/task/*` are helper implementations, not entrypoints.

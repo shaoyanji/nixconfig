@@ -9,4 +9,7 @@ fi
 encrypted_file="$1"
 output_path="$2"
 
-sops -d "$encrypted_file" > "$output_path"
+tmp_file="$(mktemp "${output_path}.tmp.XXXXXX")"
+sops -d "$encrypted_file" > "$tmp_file"
+chmod 0600 "$tmp_file"
+mv -f "$tmp_file" "$output_path"

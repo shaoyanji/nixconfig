@@ -7,7 +7,7 @@ let
   inherit (nixpkgs) lib;
   systems = import ./systems.nix { inherit (inputs) flake-utils; };
   pkgsFor = import ./pkgs-for.nix { inherit nixpkgs; };
-  mkNixosHost = import ../lib/mk-nixos-host.nix { inherit nixpkgs; };
+  mkNixosHost = import ../lib/mk-nixos-host.nix { inherit nixpkgs inputs self; };
   moduleSets = import ./module-sets.nix { inherit inputs self; };
   hostInventory = import ./host-inventory.nix { inherit inputs moduleSets self; };
   hostProjection = import ./host-projection.nix { inherit lib hostInventory; };
@@ -33,11 +33,11 @@ in
   };
 
   nixosConfigurations = import ./nixos-configurations.nix {
-    inherit mkNixosHost projectHosts;
+    inherit mkNixosHost projectHosts inputs self;
   };
 
   darwinConfigurations = import ./darwin-configurations.nix {
-    inherit inputs projectHosts;
+    inherit inputs projectHosts self;
   };
 
   # Expose the package set, including overlays, for convenience.

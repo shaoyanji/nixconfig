@@ -51,6 +51,9 @@ in
     ngrok
     nautilus
     ffmpegthumbnailer
+    # fn-key helpers: niri binds spawn these on XF86 media/brightness keys
+    brightnessctl
+    playerctl
   ];
 
   xdg.portal = {

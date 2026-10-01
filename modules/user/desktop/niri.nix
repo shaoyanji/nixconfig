@@ -170,6 +170,23 @@
       "Mod+Ctrl+7".action.move-column-to-workspace = 7;
       "Mod+Ctrl+8".action.move-column-to-workspace = 8;
       "Mod+Ctrl+9".action.move-column-to-workspace = 9;
+
+      # fn-key combos: HP emits XF86 events nothing else consumes
+      # (niri has no default handling; DMS keybinds are disabled).
+      "XF86AudioRaiseVolume".action.spawn-sh =
+        "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+";
+      "XF86AudioLowerVolume".action.spawn-sh =
+        "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%-";
+      "XF86AudioMute".action.spawn-sh =
+        "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+      "XF86AudioMicMute".action.spawn-sh =
+        "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+      "XF86MonBrightnessUp".action.spawn-sh = "brightnessctl set +5%";
+      "XF86MonBrightnessDown".action.spawn-sh = "brightnessctl set 5%-";
+      "XF86AudioPlay".action.spawn = [ "playerctl" "play-pause" ];
+      "XF86AudioStop".action.spawn = [ "playerctl" "stop" ];
+      "XF86AudioNext".action.spawn = [ "playerctl" "next" ];
+      "XF86AudioPrev".action.spawn = [ "playerctl" "previous" ];
     };
   };
 

@@ -19,6 +19,9 @@ in
         ../roles/minimal.nix
         ../shell
       ];
+      # Headless container hosts: skip the AI CLI stack (crush, freebuff,
+      # qmd, agy, aichat, ...) to keep closures small.
+      profiles.ai.enable = false;
       home.username = user.name;
       home.homeDirectory = user.home;
     };

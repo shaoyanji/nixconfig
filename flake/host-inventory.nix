@@ -18,7 +18,6 @@ in
   garnixMachine = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = [
       inputs.garnix-lib.nixosModules.garnix
       ../hosts/garnixMachine.nix
@@ -28,34 +27,29 @@ in
   poseidon = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesNixos ++ [ ../hosts/poseidon/configuration.nix ];
   };
 
   mtfuji = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesContainers ++ [ ../hosts/mtfuji/configuration.nix ];
   };
 
   kellerbench = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesContainers ++ [ ../hosts/kellerbench/configuration.nix ];
   };
 
   deckstation = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesContainers ++ [ ../hosts/deckstation/configuration.nix ];
   };
   eisen = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     # Upgraded from a cage-based Steam kiosk to a full desktop
     # (poseidon-style): globalModulesNixos brings in niri + DankMaterialShell
     # and the sops/nix-index HM modules.  Steam runs under the upstream
@@ -69,7 +63,6 @@ in
   applevalley = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -81,14 +74,12 @@ in
   frieren = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesNixos ++ [ ../hosts/frieren/configuration.nix ];
   };
 
   ares = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     # ares is the T440p SSD moved into a desktop case (i5-6500 + GTX
     # 750 Ti).  Converted to a Steam Big Picture kiosk (steamos.nix)
     # mirroring eisen/kellerbench.  Uses the noDE containers chain +
@@ -111,7 +102,6 @@ in
   stark = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     # stark is a Dell Inspiron 24 3477 AIO (i5-7200U Kaby Lake-U, 16 GB
     # RAM). Steam Big Picture desktop mirroring eisen: globalModulesNixos
     # brings in niri + DankMaterialShell greeter + role:heim userland,
@@ -139,7 +129,6 @@ in
   fern = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     # fern is an HP 15 laptop (Ryzen 3 3250U Picasso, Vega 3 iGPU, 8 GB
     # RAM). Lightweight niri desktop mirroring scratch: globalModulesNixos
     # (niri + DankMaterialShell greeter via programs.dms-greeter +
@@ -162,7 +151,6 @@ in
   schneeeule = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules =
       globalModulesImpermanence
       ++ [
@@ -174,7 +162,6 @@ in
   scratch = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     # Lightweight niri desktop (eisen-style) on a Fujitsu ESPRIMO D556
     # (i5-6500, 8 GB RAM, 128 GB f2fs SSD). Formerly a Steam Remote
     # Play kiosk; Steam dropped in the 2026-09 desktop conversion.
@@ -188,14 +175,12 @@ in
   aristotle = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesNixos ++ [ ../hosts/aristotle/configuration.nix ];
   };
 
   netbook = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -207,21 +192,18 @@ in
   aceofspades = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesNixos ++ [ ../hosts/aceofspades/configuration.nix ];
   };
 
   ancientace = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesNixos ++ [ ../hosts/ancientace/configuration.nix ];
   };
 
   guckloch = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -233,7 +215,6 @@ in
   minyx = {
     kind = "nixos";
     system = "aarch64-linux";
-    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -247,7 +228,6 @@ in
   sledgehammer = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules =
       globalModulesContainers
       ++ [
@@ -259,14 +239,12 @@ in
   demo = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesDemo ++ [ ../hosts/demo/configuration.nix ];
   };
 
   testvm = {
     kind = "nixos";
     system = "x86_64-linux";
-    specialArgs = { inherit inputs self; };
     modules = [
       inputs.microvm.nixosModules.microvm
       (import ../hosts/microvms/testvm.nix { })
@@ -303,7 +281,6 @@ in
   cassini = {
     kind = "darwin";
     system = "aarch64-darwin";
-    specialArgs = { inherit inputs self; };
     modules = globalModulesMacos ++ [ ../hosts/cassini/configuration.nix ];
   };
 }

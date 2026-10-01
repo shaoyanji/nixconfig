@@ -79,7 +79,7 @@ tasks:
       - 'echo "Reminder — commit in the main repo too: modules/secrets.yaml, modules/ssh-ca-key.yaml, .sops.yaml"'
 
   infra:secrets:decrypt:detaskfile-home:
-    internal: true
+    desc: Decrypt DE Taskfile to ~/Taskfile.yml
     cmds:
       - scripts/task/sops-decrypt-to.sh "{{.SECRETS}}/{{.ENC_DETASKFILE}}" "$HOME/Taskfile.yml"
 
@@ -156,6 +156,48 @@ tasks:
       HOST: '{{index .MATCH 0}}'
     cmds:
       - nixos-rebuild switch --use-remote-sudo --target-host {{.HOST}} --fast --flake .?submodules=1#{{.HOST}} |& nom
+
+  infra:warm:cache:
+    desc: Build every fleet host closure locally so harmonia serves them at LAN speed (UPDATE=1 also refreshes flake.lock)
+    vars:
+      HOSTS: '{{.HOSTS | default "poseidon frieren eisen fern stark scratch schneeeule ares mtfuji kellerbench deckstation applevalley minyx guckloch netbook aristotle aceofspades ancientace"}}'
+      UPDATE: '{{.UPDATE | default "0"}}'
+    cmds:
+      - |
+        if [ "{{.UPDATE}}" = "1" ]; then
+          echo "==> refreshing flake.lock"
+          nix flake update --commit-lock-file
+        fi
+        # Run on the cache host (frieren): harmonia serves paths straight
+        # out of the local store, so every closure built here becomes an
+        # instant LAN cache hit for all other hosts.
+        fail=0
+        for h in {{.HOSTS}}; do
+          echo "==> warming: $h"
+          nix build ".#nixosConfigurations.$h.config.system.build.toplevel" -L || fail=1
+        done
+        exit $fail
+
+  infra:apply:fleet:
+    desc: Apply to many hosts in parallel (HOSTS="h1 h2", default = deployable NixOS fleet)
+    vars:
+      HOSTS: '{{.HOSTS | default "poseidon frieren eisen fern stark scratch schneeeule ares mtfuji kellerbench deckstation applevalley minyx guckloch netbook aristotle aceofspades ancientace"}}'
+    cmds:
+      - |
+        # Fan out one nixos-rebuild per host; each host builds locally on
+        # the dispatcher, so the nix daemon serialises the eval/build work
+        # while activation happens concurrently over SSH.
+        pids=""
+        for h in {{.HOSTS}}; do
+          echo "==> applying: $h"
+          (nixos-rebuild switch --use-remote-sudo --target-host "$h" --fast --flake ".?submodules=1#$h" |& nom) &
+          pids="$pids $!"
+        done
+        fail=0
+        for p in $pids; do
+          wait "$p" || fail=1
+        done
+        exit $fail
 
   infra:deploy:host:*:
     desc: Plan + apply + validate a specific remote host (no git side effects)

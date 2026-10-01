@@ -16,6 +16,27 @@ let
       [ "$(cat "$type" 2>/dev/null)" = "bluetooth" ] && printf '0\n' > "$f" 2>/dev/null || true
     done
   '';
+  # Fleet cache warmer: builds every NixOS host's toplevel from the pushed
+  # flake so harmonia serves the closures to the whole LAN at wire speed.
+  # Uses the same github: source as system.autoUpgrade (eval works without
+  # the secrets submodule because modules/secrets.yaml is tracked in the
+  # main repo). flake.lock refreshes stay manual:
+  # task infra:warm:cache UPDATE=1.
+  fleetWarmCache = pkgs.writeShellScript "fleet-warm-cache" ''
+    set -u
+    fail=0
+    for h in \
+      poseidon eisen fern stark scratch schneeeule ares \
+      mtfuji kellerbench deckstation applevalley minyx \
+      guckloch netbook aristotle aceofspades ancientace frieren
+    do
+      echo "==> warming: $h"
+      ${pkgs.nix}/bin/nix build \
+        "github:shaoyanji/nixconfig#nixosConfigurations.$h.config.system.build.toplevel" \
+        -L || fail=1
+    done
+    exit $fail
+  '';
 in
 {
   imports = [
@@ -33,8 +54,47 @@ in
     ./ha-stack.nix
     ./infra-stack.nix
     ../../modules/services/aria2-daemon.nix
+    ../../modules/services/harmonia.nix
+    ../../modules/profiles/nixbuild-client.nix
   ];
   networking.hostName = "frieren";
+
+  # Serve the fleet's LAN binary cache (see modules/services/harmonia.nix).
+  services.harmonia-fleet.enable = true;
+
+  # Offload the weekly fleet cache-warm builds (and any local builds) to
+  # nixbuild.net. Key: sops `nixbuild_ssh_key` → /root/.ssh/nixbuild
+  # (see modules/profiles/nixbuild-client.nix).
+  profiles.nixbuild-client.enable = true;
+
+  # Server-class host: pin the current nixpkgs LTS kernel instead of the
+  # latest-kernel default from profiles/base-node.nix.
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_12;
+
+  # --- Fleet cache warmer ---
+  # Weekly unattended build of all host closures (script defined above);
+  # see modules/services/harmonia.nix for why this keeps the LAN fast.
+  systemd.services.fleet-warm-cache = {
+    description = "Build all fleet host closures to warm the harmonia LAN cache";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${fleetWarmCache}";
+      # Weekly-ish job; give slow builds room.
+      TimeoutStartSec = "12h";
+      Nice = 10;
+      IOSchedulingClass = "idle";
+    };
+  };
+  systemd.timers.fleet-warm-cache = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "Sun, 03:30";
+      Persistent = true;
+      RandomizedDelaySec = "30min";
+    };
+  };
 
   # --- Daily self-upgrade (04:00) ---
   # Canonical system.autoUpgrade module (no hand-rolled timer/script). Runs

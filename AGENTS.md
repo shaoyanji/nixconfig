@@ -10,6 +10,25 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
 
 ---
 
+## Home Initialization & Tautological Control Plane
+
+When an AI agent or developer session initializes from the home directory (`$HOME` / `~`):
+
+1. **Repository Root & Provenance**:
+   - The canonical repository path is `~/Documents/nixconfig` (symlink to persistent NAS storage at `/Volumes/data/projects/nixconfig`).
+   - All Nix modules, flake definitions, secrets, and taskfiles originate from here.
+2. **Tautological Taskfile Control Plane**:
+   - `~/Taskfile.yml` includes `~/Documents/nixconfig/Taskfile.yml` with `dir: ~/Documents/nixconfig` and `flatten: true`.
+   - Running `task <cmd>` in `$HOME` (or `task -g <cmd>` globally) executes immediately against the repository with correct working directory context. Speculative path discovery or tool calls are unnecessary.
+3. **Agent Guidance & Skills Materialization**:
+   - Home Manager module `modules/user/ai/codex.nix` materializes `~/.agents/` (`~/.agents/skills/`, `~/.agents/deploy/`, `~/.agents/README.md`) directly into `$HOME`.
+   - The canonical operational manual is `AGENTS.md` (mirrored to `~/AGENTS.md`). Operational documentation and the agent manual are one and the same.
+4. **Secrets & SOPS State**:
+   - Encrypted secrets live in `modules/secrets.yaml` (mirrored from the private `modules/secrets/` submodule).
+   - Host and user age keys are registered in `.sops.yaml` and loaded from `~/.config/sops/age/keys.txt`.
+
+---
+
 ## Architecture Overview
 
 ### Flake Output Assembly
@@ -42,6 +61,37 @@ flake.nix → flake/outputs.nix (hub)
 | `globalModulesMacos` | global + macos + nix-homebrew + home-manager + sops | cassini (darwin) |
 | `globalModulesDemo` | global + demo + home-manager (no sops) | demo (NixOS demo VM) |
 | `globalModulesHome` | standalone HM sharedModules + allowUnfree | penguin, alarm, kali (standalone home-manager) |
+
+### Complete Client OS Fleet Inventory (`flake/host-inventory.nix`)
+
+| Host | Kind | System Arch | Role / Hardware Description | Primary Module Path | Storage Layout |
+|------|------|-------------|-----------------------------|---------------------|----------------|
+| `fern` | `nixos` | `x86_64-linux` | HP 15 laptop (Ryzen 3 3250U, Vega 3, 8GB), niri desktop, autologin, NAS client | `hosts/fern/configuration.nix` | NVMe `/dev/nvme0n1`, btrfs `/root`, `/nix` |
+| `stark` | `nixos` | `x86_64-linux` | Dell Inspiron 24 3477 AIO (i5-7200U, MX110 Optimus), gamescope-session + DMS | `hosts/stark/configuration.nix` | Dual-disk: `/dev/sdb` (SSD system), `/dev/sda` (HDD Steam lib) |
+| `eisen` | `nixos` | `x86_64-linux` | Desktop (RX 5700), niri desktop + gamescope-session kiosk | `hosts/eisen/configuration.nix` | Persistent |
+| `frieren` | `nixos` | `x86_64-linux` | HP EliteDesk 800 G2 NAS/server (ZFS `/Volumes/data`, auto-upgrade 04:00, Paperless, Syncthing, Tika) | `hosts/frieren/configuration.nix` | ZFS mirror |
+| `scratch` | `nixos` | `x86_64-linux` | Fujitsu ESPRIMO D556 (i5-6500, 8GB, f2fs SSD), niri desktop, tmpfs IO diet, GRUB BIOS | `hosts/scratch/configuration.nix` | f2fs `/dev/sda` (GRUB legacy BIOS) |
+| `poseidon` | `nixos` | `x86_64-linux` | Primary workstation (Ryzen 7 3700X, RTX 2070 Super), niri desktop | `hosts/poseidon/configuration.nix` | Persistent |
+| `schneeeule` | `nixos` | `x86_64-linux` | Desktop with impermanence (root wiped each boot, devji + /etc persisted to `/persist`) | `hosts/schneeeule/configuration.nix` | Disko `/dev/sda`, btrfs `/persist` |
+| `ares` | `nixos` | `x86_64-linux` | Steam Big Picture kiosk with impermanence (i5-6500, GTX 750 Ti) | `hosts/ares/configuration.nix` | Disko `/dev/sda`, btrfs `/persist` |
+| `mtfuji` | `nixos` | `x86_64-linux` | Headless container host (`globalModulesContainers`) | `hosts/mtfuji/configuration.nix` | Persistent |
+| `kellerbench` | `nixos` | `x86_64-linux` | Headless container host (GTX 750 Ti) | `hosts/kellerbench/configuration.nix` | Persistent |
+| `deckstation` | `nixos` | `x86_64-linux` | Headless container host (`globalModulesContainers`) | `hosts/deckstation/configuration.nix` | Persistent |
+| `applevalley` | `nixos` | `x86_64-linux` | Lenovo ThinkPad T420 container host | `hosts/applevalley/configuration.nix` | Persistent |
+| `minyx` | `nixos` | `aarch64-linux` | Raspberry Pi 3 (impermanence + custompi) | `hosts/minyx/configuration.nix` | SD card + impermanence |
+| `sledgehammer` | `nixos` | `x86_64-linux` | Live USB recovery system | `hosts/sledgehammer/configuration.nix` | USB disko |
+| `guckloch` | `nixos` | `x86_64-linux` | WSL2 NixOS container | `hosts/guckloch/configuration.nix` | WSL virtual disk |
+| `netbook` | `nixos` | `x86_64-linux` | Netbook container host | `hosts/netbook/configuration.nix` | Disko |
+| `aristotle` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/aristotle/configuration.nix` | Persistent |
+| `aceofspades` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/aceofspades/configuration.nix` | Persistent |
+| `ancientace` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/ancientace/configuration.nix` | Persistent |
+| `demo` | `nixos` | `x86_64-linux` | Demo VM (no sops) | `hosts/demo/configuration.nix` | VM |
+| `testvm` | `nixos` | `x86_64-linux` | MicroVM sandbox (`cloud-hypervisor`) | `hosts/microvms/testvm.nix` | Microvm |
+| `garnixMachine` | `nixos` | `x86_64-linux` | Garnix CI runner | `hosts/garnixMachine.nix` | Cloud |
+| `cassini` | `darwin` | `aarch64-darwin` | Apple Silicon macOS (nix-darwin + nix-homebrew) | `hosts/cassini/configuration.nix` | APFS |
+| `penguin` | `home` | `x86_64-linux` | Chromebook / Linux standalone Home Manager (`roles/portable-home`) | `hosts/penguin.nix` | User home |
+| `alarm` | `home` | `aarch64-linux` | Arch Linux ARM standalone Home Manager (`roles/minimal`) | `hosts/alarm.nix` | User home |
+| `kali` | `home` | `aarch64-linux` | Kali Linux ARM standalone Home Manager (`roles/minimal`) | `hosts/kali.nix` | User home |
 
 ### Module Layout
 
@@ -113,9 +163,56 @@ task infra:logs:host:<host>      # View remote journald logs
 ### Local Rebuilds
 
 ```bash
-task infra:rebuild:nixos         # sudo nixos-rebuild switch (local)
-task infra:rebuild:darwin        # darwin-rebuild switch (local)
-task infra:rebuild:home-manager  # home-manager switch (local)
+task infra:rebuild:nixos         # sudo nixos-rebuild switch (local) + refresh ~/Taskfile.yml
+task infra:rebuild:darwin        # darwin-rebuild switch (local) + refresh ~/Taskfile.yml
+task infra:rebuild:home-manager  # home-manager switch (local) + refresh ~/Taskfile.yml
+```
+
+### Client OS Maintenance & Debugging Runbooks
+
+#### 1. Dry Run & Evaluation
+Before deploying changes to any client OS, evaluate its configuration:
+```bash
+task infra:plan:host:<host>                                        # Dry-run evaluation and closure build
+nix eval .#nixosConfigurations.<host>.config.networking.hostName   # Fast eval smoke test
+```
+
+#### 2. Deploying Remote Hosts
+Apply configurations over SSH:
+```bash
+task infra:deploy:host:<host>    # Plan + apply + validate
+task infra:apply:host:<host>     # Apply closure directly
+```
+
+#### 3. Remote Log & Service Inspection
+Diagnose failing units or check live output:
+```bash
+task infra:logs:host:<host> UNIT=<unit>   # Tail journald for UNIT (defaults to go-backend)
+ssh <host> systemctl status <unit>        # Inspect unit status on remote host
+ssh <host> journalctl -b -p err           # View system errors from current boot
+```
+
+#### 4. Rollback Runbook
+If a deployment degrades a host:
+```bash
+task infra:rollback:host:<host>           # Roll back remote host generation
+# For local recovery:
+sudo nixos-rebuild --rollback switch      # Local NixOS rollback
+```
+
+#### 5. NAS Client Automount Recovery (fern & clients)
+If `/Volumes/data` fails to mount due to early-boot network timing (causing `StartLimitBurst` hit):
+```bash
+nas-recover                               # Canonical recovery tool
+# Or manually restart the automount unit:
+sudo systemctl restart Volumes-data.automount
+```
+
+#### 6. SOPS Secrets & Key Verification
+Verify decryption across all hosts and rotate recipient keys:
+```bash
+scripts/task/sops-drift-check.sh          # Verify all encrypted files decrypt cleanly
+task infra:sops:update-keys               # Rekey all files when .sops.yaml changes
 ```
 
 ### Git & Flake
@@ -146,6 +243,32 @@ nix eval .#nixosConfigurations.<host>.config.networking.hostName  # Quick eval c
 nix build .#checks.x86_64-linux.host-architecture -L              # Host architecture validation
 nix flake check                  # Full evaluation (slower, catches everything)
 task checks:nix:lint             # nixpkgs-fmt --check
+```
+
+#### Agent Verification Protocol (compute discipline)
+
+Verification must be proportional to the change — never eval as a ritual:
+
+1. **Eval only what the change touches.** One host per affected module chain is
+   enough:
+   - Host-local edit (`hosts/<name>/…`) → eval that host only.
+   - Edit to a chain module (`modules/global/*`, `modules/profiles/*`) → eval
+     one representative host per chain it feeds (e.g. `mtfuji` for containers,
+     `poseidon` for desktops, `frieren` for servers, `cassini` for darwin).
+   - Edit to `flake/` wiring → eval one host per kind (nixos, darwin, home).
+2. **Batch into ONE command.** Run all needed evals in a single `bash` call
+   (a `for` loop over hosts), not one tool call per eval. Count the evals
+   before running; if it's more hosts than the change can affect, trim.
+3. **Keyless environments (Codespaces, CI sandboxes, fresh clones).** Nix
+   evaluation never needs sops keys, age keys, or secret values — sops-nix
+   only declares file paths at eval time. Safe keyless checks:
+   `nix eval`, `nixpkgs-fmt --check`, `deadnix`, `statix check`.
+   NOT keyless (skip in Codespaces, they fail or hang without
+   `~/.config/sops/age/keys.txt` and SSH access):
+   `task checks:quick` (sops drift step), any `infra:*` secret/deploy task.
+4. **Never build without cause.** `nix eval` suffices for config validity;
+   reserve `nix build`/`infra:plan` for changes that alter the closure
+   (packages, kernels, services) and say so before running.
 ```
 
 ### Secrets & SOPS
@@ -244,7 +367,7 @@ CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodul
 
 ### Non-obvious patterns
 
-- **User constants**: `modules/global/user.nix` is the single source of truth for the primary user (`devji`). Import it with `let user = import ../global/user.nix;` — never hardcode `/home/devji` or the username.
+- **User constants**: `modules/global/user.nix` is the single source of truth for the primary user (`devji`). Import it with `let user = import ../global/user.nix;` — never hardcode user paths or the username.
 - **Attrset merging**: `//` is **shallow, right-biased** — `{ a.x = 1; } // { a.y = 2; }` loses `a.x`. Use `lib.recursiveUpdate` for deep merge. See `NIX-REFERENCE.md` for more.
 - **`lib.mkIf` / `lib.mkMerge`**: the standard conditional patterns. Also `lib.optionalAttrs` for conditional attrsets and `lib.optionals` for conditional list items.
 - **Option priorities**: `lib.mkDefault` vs `lib.mkForce` vs `lib.mkOverride` are used for option priority layering.

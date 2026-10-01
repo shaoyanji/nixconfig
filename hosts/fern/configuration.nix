@@ -47,6 +47,26 @@ in
     configHome = user.home; # Sync themes with user's DankMaterialShell config
   };
 
+  # This unit's Ryzen 3 3250U reports unreliable RDRAND (the kernel logs
+  # "RDRAND is not reliable on this platform; disabling"), so the
+  # prebuilt Antigravity CLI aborts in BoringSSL's CRNGT self-test on
+  # every invocation. OPENSSL_ia32cap=0 forces BoringSSL's portable
+  # (no-asm) crypto paths, which sidesteps the broken RDRAND; wrap the
+  # binary with it. Keep doInstallCheck=false since `agy --version`
+  # still aborts in the build sandbox where the wrapper env may race
+  # the self-test.
+  nixpkgs.overlays = [
+    (final: prev: {
+      antigravity-cli = prev.antigravity-cli.overrideAttrs (old: {
+        doInstallCheck = false;
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ final.makeWrapper ];
+        postInstall = (old.postInstall or "") + ''
+          wrapProgram "$out/bin/agy" --set OPENSSL_ia32cap "0:~0"
+        '';
+      });
+    })
+  ];
+
   # Vega 3 iGPU — Mesa/radeonsi; amdgpu drives it (modesetting by DRI3
   # under Wayland). Redistributable firmware covers the APU + laptop
   # WiFi/BT (HP 15 units ship Realtek/MediaTek/Intel cards).

@@ -37,7 +37,9 @@
       # ares forces config.cudaSupport = true and the override arg would
       # otherwise drag cudaPackages into every host closure.
       (pkgs.llm-agents.qmd.override { cudaSupport = false; })
-      pkgs.llm-agents.qwen-code # Apache-2.0, actively maintained (QwenLM)
+      # qwen-code — removed 2026-10: redundant with agy/crush on the 8 GB
+      # laptops (Node-based CLI with a ~1 GB closure); re-enable if needed.
+      # pkgs.llm-agents.qwen-code
       # hermes-agent — re-enable when wanted (Fryuni fork of the 2026-09
       # teardown; upstream packaging is maintained).
       # pkgs.llm-agents.hermes-agent

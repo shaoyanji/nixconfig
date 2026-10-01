@@ -35,6 +35,8 @@ keys:
   - &eisen age1aa4qucm8ww00c7zshct635rt37nh3ucxgtg4aj3l42zzls7l054shhphg9
   - &starkhost age1a7ylua5p4mdceccn0r3x76ku9fskvknt0tv22j5cdk5dtm24xeuqtyt9py
   - &stark age1w4rpn4dx44kgpc3766ayqrxca694xd9qd4qz8temjkx5qhr0zg2qm3kl4u
+  - &fernhost age1l2p2dth3qm0czqxrr7jrk7lz225mts4yl4807h3xaz5xtg3t0gqsrml6ny
+  - &fern age1k3jp4k3p87a2xsq2dgenv6zjlypzn889jkfkj04mvt7x04seyuzq4tv6mn
 
 creation_rules:
   - path_regex: modules/.*\.(yaml|json|env|ini)$
@@ -71,3 +73,5 @@ creation_rules:
           - *eisen
           - *starkhost
           - *stark
+          - *fernhost
+          - *fern

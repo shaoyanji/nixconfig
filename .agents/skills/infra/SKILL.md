@@ -88,7 +88,7 @@ All hosts configured in `flake/host-inventory.nix`:
 - `deckstation`: Headless container host.
 - `applevalley`: Lenovo ThinkPad T420 container host.
 - `sledgehammer`: Live USB recovery system.
-- `netbook`: Portable container host.
+- `netbook`: Independent NixOS 25.11 host (Celeron N3060, f2fs, niri desktop for alice, pinned channel).
 - `guckloch`: WSL2 NixOS container.
 
 ### Darwin & Standalone Home Manager

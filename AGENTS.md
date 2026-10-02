@@ -57,7 +57,7 @@ flake.nix → flake/outputs.nix (hub)
 | `globalModulesNixos` | global + nixos + home-manager-shared + sops + nix-index + dms + dank-greeter (desktop) | poseidon, aristotle, aceofspades, ancientace, eisen, frieren, scratch, stark, fern |
 | `globalModulesImpermanence` | globalModulesNixos + impermanence + disko | schneeeule |
 | containers + impermanence (ares) | globalModulesContainers + impermanence + disko | ares (Steam kiosk) |
-| `globalModulesContainers` | global + noDE + sops + home-manager + nix-index (no dms/niri desktop) | mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), netbook, deckstation |
+| `globalModulesContainers` | global + noDE + sops + home-manager + nix-index (no dms/niri desktop) | mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), deckstation |
 | `globalModulesMacos` | global + macos + nix-homebrew + home-manager + sops | cassini (darwin) |
 | `globalModulesDemo` | global + demo + home-manager (no sops) | demo (NixOS demo VM) |
 | `globalModulesHome` | standalone HM sharedModules + allowUnfree | penguin, alarm, kali (standalone home-manager) |
@@ -81,7 +81,7 @@ flake.nix → flake/outputs.nix (hub)
 | `minyx` | `nixos` | `aarch64-linux` | Raspberry Pi 3 (impermanence + custompi) | `hosts/minyx/configuration.nix` | SD card + impermanence |
 | `sledgehammer` | `nixos` | `x86_64-linux` | Live USB recovery system | `hosts/sledgehammer/configuration.nix` | USB disko |
 | `guckloch` | `nixos` | `x86_64-linux` | WSL2 NixOS container | `hosts/guckloch/configuration.nix` | WSL virtual disk |
-| `netbook` | `nixos` | `x86_64-linux` | Netbook container host | `hosts/netbook/configuration.nix` | Disko |
+| `netbook` | `nixos` | `x86_64-linux` | Independent NixOS 25.11 host (Celeron N3060, f2fs, niri desktop for alice, pinned 25.11 channel) | `hosts/netbook/configuration.nix` | f2fs `/`, vfat `/boot` |
 | `aristotle` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/aristotle/configuration.nix` | Persistent |
 | `aceofspades` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/aceofspades/configuration.nix` | Persistent |
 | `ancientace` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/ancientace/configuration.nix` | Persistent |

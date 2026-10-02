@@ -145,12 +145,24 @@ tasks:
     cmds:
       - sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
 
+  infra:plan:host:netbook:
+    desc: Dry-run netbook configuration remotely using its pinned 25.11 channel
+    cmds:
+      - rsync -avz hosts/netbook/configuration.nix hosts/netbook/hardware-configuration.nix root@netbook:/tmp/netbook-dry/
+      - ssh root@netbook "NIXOS_CONFIG=/tmp/netbook-dry/configuration.nix nixos-rebuild dry-build"
+
   infra:plan:host:*:
     desc: Build/evaluate a specific host closure (no apply)
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
       - nix build .#nixosConfigurations.{{.HOST}}.config.system.build.toplevel -L
+
+  infra:apply:host:netbook:
+    desc: Push configuration and switch netbook remotely using its pinned 25.11 channel
+    cmds:
+      - rsync -avz hosts/netbook/configuration.nix hosts/netbook/hardware-configuration.nix root@netbook:/etc/nixos/
+      - ssh root@netbook "nixos-rebuild switch"
 
   infra:apply:host:*:
     desc: Apply a specific remote host configuration (no git side effects)
@@ -162,7 +174,7 @@ tasks:
   infra:warm:cache:
     desc: Build every fleet host closure locally so harmonia serves them at LAN speed (UPDATE=1 also refreshes flake.lock)
     vars:
-      HOSTS: '{{.HOSTS | default "poseidon frieren eisen fern stark scratch schneeeule ares mtfuji kellerbench deckstation applevalley minyx guckloch netbook aristotle aceofspades ancientace"}}'
+      HOSTS: '{{.HOSTS | default "poseidon frieren eisen fern stark scratch schneeeule ares mtfuji kellerbench deckstation applevalley minyx guckloch aristotle aceofspades ancientace"}}'
       UPDATE: '{{.UPDATE | default "0"}}'
     cmds:
       - |
@@ -183,7 +195,7 @@ tasks:
   infra:apply:fleet:
     desc: Apply to many hosts in parallel (HOSTS="h1 h2", default = deployable NixOS fleet)
     vars:
-      HOSTS: '{{.HOSTS | default "poseidon frieren eisen fern stark scratch schneeeule ares mtfuji kellerbench deckstation applevalley minyx guckloch netbook aristotle aceofspades ancientace"}}'
+      HOSTS: '{{.HOSTS | default "poseidon frieren eisen fern stark scratch schneeeule ares mtfuji kellerbench deckstation applevalley minyx guckloch aristotle aceofspades ancientace"}}'
     cmds:
       - |
         # Fan out one nixos-rebuild per host; each host builds locally on
@@ -201,6 +213,12 @@ tasks:
         done
         exit $fail
 
+  infra:deploy:host:netbook:
+    desc: Push configuration, switch, and validate netbook remotely
+    cmds:
+      - task infra:apply:host:netbook
+      - ssh root@netbook "hostname && nixos-version"
+
   infra:deploy:host:*:
     desc: Plan + apply + validate a specific remote host (no git side effects)
     vars:
@@ -209,6 +227,11 @@ tasks:
       - task infra:plan:host:{{.HOST}}
       - task infra:apply:host:{{.HOST}}
       - task services:validate:host:{{.HOST}}
+
+  infra:rollback:host:netbook:
+    desc: Roll back netbook to previous generation remotely
+    cmds:
+      - ssh root@netbook "nixos-rebuild switch --rollback"
 
   infra:rollback:apply:host:*:
     desc: Roll back a remote host to previous generation (apply only)
@@ -313,6 +336,18 @@ tasks:
           } | gum choose
         )
         [ "$choice" = "exit" ] || task "$choice"
+
+  infra:logs:host:netbook:
+    desc: "Tail journal logs for netbook via ssh"
+    vars:
+      UNIT: '{{.UNIT | default ""}}'
+    cmds:
+      - |
+        if [ -n "{{.UNIT}}" ]; then
+          ssh root@netbook "journalctl -fu {{.UNIT}}"
+        else
+          ssh root@netbook "journalctl -f -n 50"
+        fi
 
   infra:logs:host:*:
     desc: "Tail journal logs for a host via ssh (default unit: go-backend)"

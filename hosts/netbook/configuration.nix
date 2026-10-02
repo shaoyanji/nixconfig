@@ -1,14 +1,15 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-{ config
-, pkgs
-, ...
-}: {
-  imports = [
-    # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-  ];
+
+{ config, pkgs, ... }:
+
+{
+  imports =
+    [
+      # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+    ];
 
   # Use the GRUB 2 boot loader.
   # boot.loader.grub.enable = true;
@@ -20,6 +21,10 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = false;
   boot.supportedFilesystems = [ "f2fs" "nfs" ];
+  hardware.enableRedistributableFirmware = true;
+  boot.loader.systemd-boot.configurationLimit = 10;
+  boot.tmp.cleanOnBoot = true;
+  services.fstrim.enable = true;
   fileSystems = {
     "/Volumes/data" = {
       device = "192.168.3.25:/data";
@@ -29,6 +34,7 @@
   };
 
   networking.firewall.allowedTCPPorts = [ 2049 ];
+  services.tailscale.enable = true;
 
   boot.kernelParams = [
     # "fsck.mode=skip"
@@ -49,16 +55,27 @@
     automatic = true;
     persistent = true;
     dates = "weekly";
-    # options = "--delete-older-than-30d";
+    options = "--delete-older-than-30d";
   };
-  services.journald.settings.Journal.SystemMaxUse = "50M";
+  nix.settings = {
+    auto-optimise-store = true;
+  };
+  services.journald.extraConfig = "SystemMaxUse=50M";
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
+
   zramSwap = {
+    priority = 100;
     enable = true;
     memoryPercent = 100;
     algorithm = "lz4";
   };
+  powerManagement.enable = true;
+  services.tlp.enable = true;
+  services.thermald.enable = true;
+  services.earlyoom.enable = true;
+  services.upower.enable = true;
+  services.libinput.enable = true;
   networking.hostName = "netbook"; # Define your hostname.
 
   # Configure network connections interactively with nmcli or nmtui.
@@ -82,6 +99,9 @@
   # Enable the X11 windowing system.
   # services.xserver.enable = true;
 
+
+
+
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
@@ -101,13 +121,19 @@
   # services.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.devji = {
+  users.users.alice = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHnNR7isgO8VDY76XzwyH3mOg1/DQo8dZgqQOfziw0DQ devji@nixos"
+    ];
     packages = with pkgs; [
       tree
     ];
   };
+
+  security.sudo.wheelNeedsPassword = false;
 
   # programs.firefox.enable = true;
 
@@ -135,7 +161,6 @@
   # user="alice";
 
   # };
-
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
@@ -144,7 +169,16 @@
     curl
     helix
     wget
+    uv
+    eget
     waybar
+    playerctl
+    brightnessctl
+    pavucontrol
+    swaylock
+    polkit_gnome
+    bibata-cursors
+    # quickshell
     alacritty
     fuzzel
     mako
@@ -163,18 +197,66 @@
     grim
     wl-clipboard
     imv
-    mpv
-    nushell
+    # mpv
+    # nushell
     rsync
-    yt-dlp
-    yewtube
+    mupdf
+    # freetube
+    # yt-dlp
+    # yewtube
     fzf
     jq
     gum
+    ripgrep
+    fd
+    bat
+    eza
+    zoxide
+    duf
+    tldr
+    unzip
+    zip
+    file
+    # youtubeSupport=false keeps mpv's wrapper from pinning the stale
+    # nixpkgs yt-dlp into its PATH; the current yt-dlp comes from
+    # /home/alice/.local/bin/yt-dlp (standalone binary, self-updates with
+    # `yt-dlp --update`).
+    (mpv.override { youtubeSupport = false; })
+    aria2
+    # ani-cli prefers curl-impersonate (hianime sits behind Cloudflare)
+    curl-impersonate
+    # VAAPI diagnostics (vainfo)
+    libva-utils
     xwayland-satellite # xwayland support
   ];
 
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    XCURSOR_THEME = "Bibata-Modern-Ice";
+    XCURSOR_SIZE = "24";
+  };
+
+  # Fonts for the desktop (bar icons, emoji).
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    noto-fonts-color-emoji
+  ];
+
+  # Bluetooth radio is present (hci0); enable the stack.
+  hardware.bluetooth.enable = true;
+
+  # VAAPI driver for the Gen8 iGPU (N3060): H.264 hardware decode for mpv.
+  hardware.graphics.extraPackages = [ pkgs.intel-vaapi-driver ];
+
+  # Run prebuilt, non-Nix dynamically linked binaries (tools dropped in
+  # ~/.local/bin, pip/venv wheels with C extensions, downloaded release
+  # tarballs) through nix-ld's loader. Extra libs can be added via
+  # programs.nix-ld.libraries if something complains about a missing .so.
+  programs.nix-ld.enable = true;
+
+  # Keep ~/.local/bin on PATH for the session and login shells.
+  environment.localBinInPath = true;
+
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -187,7 +269,12 @@
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    settings = {
+      TrustedUserCAKeys = "${pkgs.writeText "trusted-user-ca" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMhAN2tuJ4f8kCbCWehJL+fp5VYrTUQpn2ZWK9RC7XM1 SSH User CA @ aristotle 20260706\n"}";
+    };
+  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -218,4 +305,6 @@
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
+
 }
+

@@ -178,16 +178,10 @@ in
     modules = globalModulesNixos ++ [ ../hosts/aristotle/configuration.nix ];
   };
 
-  netbook = {
-    kind = "nixos";
-    system = "x86_64-linux";
-    modules =
-      globalModulesContainers
-      ++ [
-        ../hosts/netbook/configuration.nix
-        inputs.disko.nixosModules.default
-      ];
-  };
+  # Note: netbook is an independent NixOS 25.11 host (no flake, pinned 25.11 channel
+  # due to an upstream initrd bug on newer kernels). It is managed via remote fleet
+  # ops (task infra:apply:host:netbook) rather than flake closure projection.
+
 
   aceofspades = {
     kind = "nixos";

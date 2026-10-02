@@ -71,6 +71,7 @@ in
     # (see profiles/nas-client.nix).
     hosts = {
       "192.168.3.25" = [ "frieren" ];
+      "192.168.3.36" = [ "netbook" ];
     };
   };
 

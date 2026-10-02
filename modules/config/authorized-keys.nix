@@ -28,6 +28,7 @@ let
     ++ [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPSf4l8am6ZRnUAXX0uinxFTW3IKm5zPFVGL8cn1/35h benutzer@bitlockerpremium"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA0PNF2ea41zmEcLNV+hk58py3LMxWjbsJV1CgO96T2I"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC6Q+UiPCzp+dhUydXWiUrVw1jnohdsBMwieAiuINaww alice@netbook"
     ];
 in
 {

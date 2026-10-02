@@ -71,6 +71,14 @@ tasks:
     cmds:
       - task infra:load:taskfile
       - git add -u  # Only stage tracked files, not new untracked files
+      - |
+        if git diff --cached --name-only | grep -q '^\.sops\.yaml$'; then
+          echo "Notice: .sops.yaml is staged. Checking for recipient drift..."
+          if ! bash scripts/task/sops-drift-check.sh --repo-only >/dev/null 2>&1; then
+            echo -e "\033[1;33mWARNING: SOPS recipient drift detected! You modified .sops.yaml without re-keying.\033[0m"
+            echo -e "\033[1;33mRun 'task infra:sops:update-keys' to update recipients across all files before pushing.\033[0m"
+          fi
+        fi
 
   dev:git:posthook:
     desc: Push current branch with error handling

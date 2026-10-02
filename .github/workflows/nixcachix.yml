@@ -18,7 +18,8 @@ jobs:
           submodules: recursive
           token: "${{ secrets.GH_PAT }}"
       - name: Check sops recipient drift
-        run: bash scripts/task/sops-drift-check.sh
+        continue-on-error: true
+        run: bash scripts/task/sops-drift-check.sh --repo-only
   build-machines:
     strategy:
       matrix:

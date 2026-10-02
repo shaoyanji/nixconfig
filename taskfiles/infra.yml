@@ -72,11 +72,13 @@ tasks:
   infra:sops:update-keys:
     desc: Rotate SOPS recipient keys across ALL sops files, resync mirror, push secret repo changes
     cmds:
+      - cp -f .sops.yaml {{.SECRETS}}/.sops.yaml
       - sops updatekeys {{.SECRETS}}/*.yaml
       - sops updatekeys modules/ssh-ca-key.yaml
       - task infra:secrets:sync
-      - cd {{.SECRETS}} && git switch master && git add *.yaml .sops.yaml && git commit -m "updated sops keys" && git push
-      - 'echo "Reminder — commit in the main repo too: modules/secrets.yaml, modules/ssh-ca-key.yaml, .sops.yaml"'
+      - cd {{.SECRETS}} && git switch master && git add *.yaml .sops.yaml && git commit -m "updated sops keys" && git push origin HEAD:master
+      - git add {{.SECRETS}} modules/secrets.yaml modules/ssh-ca-key.yaml .sops.yaml
+      - 'echo "Updated and staged: {{.SECRETS}}, modules/secrets.yaml, modules/ssh-ca-key.yaml, .sops.yaml. Ready to commit in main repo."'
 
   infra:secrets:decrypt:detaskfile-home:
     desc: Decrypt DE Taskfile to ~/Taskfile.yml

@@ -1,4 +1,4 @@
-# stark — NVIDIA GeForce MX110 (Pascal GP108, sm_61) Optimus dGPU.
+# stark — NVIDIA GeForce MX110 (Maxwell GM108M, sm_50) Optimus dGPU.
 #
 # The Inspiron 24 3477 AIO is a muxless Optimus box: the 23.8" panel is
 # wired to the Intel HD 620 iGPU; the MX110 is a render-only device.
@@ -6,15 +6,16 @@
 #   - PRIME render OFFLOAD (not sync mode): the iGPU drives the desktop
 #     and the Steam/gamescope session; games opt into the dGPU with
 #     `nvidia-offload %command%` (Steam launch options) or prime-run.
-#   - MX110 is Pascal (sm_61): the 580 branch is the last driver series
-#     for Pascal → config.boot.kernelPackages.nvidiaPackages.legacy_580,
-#     same driver series as ares/kellerbench (GTX 750 Ti, sm_30). The
-#     open kernel module does NOT support Pascal → open = false.
+#   - MX110 is Maxwell GM108M (sm_50, rebadged GeForce 920MX): the 580 branch
+#     is the last driver series for Maxwell/Pascal →
+#     config.boot.kernelPackages.nvidiaPackages.legacy_580, same driver
+#     series as ares/kellerbench (GTX 750 Ti, sm_50/sm_30). The open kernel
+#     module does NOT support Maxwell → open = false.
 #   - cudaSupport stays OFF (unlike ares): nothing on this box needs
 #     CUDA and forcing it rebuilds large dependency trees (AGENTS.md
 #     build-avoidance traps) for no benefit.
 #
-# Bus IDs (verify on first boot with `lspci -nn | grep -Ei 'vga|3d'`):
+# Bus IDs (verified with `lspci -nn | grep -Ei 'vga|3d'`):
 #   Intel HD 620 → 00:02.0 → PCI:0:2:0
 #   MX110        → 01:00.0 → PCI:1:0:0
 #
@@ -45,8 +46,8 @@
     nvidiaPersistenced = false;
     modesetting.enable = true;
     powerManagement.enable = true;
-    # RTD3 runtime PM (finegrained) is supported on Pascal but kept off
-    # for kiosk robustness — the AIO is effectively always-on.
+    # RTD3 runtime PM (finegrained) is not supported on Maxwell GM108M
+    # (introduced on Turing/Ampere, partial on Pascal) — kept off.
     powerManagement.finegrained = false;
     prime = {
       offload = {

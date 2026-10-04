@@ -1,11 +1,11 @@
 # Disk layout for stark (Dell Inspiron 24 3477 All-in-One).
 #
 # Dual-disk:
-#   main: SK hynix SC311 SATA SSD — system disk. The 3477's kernel
-#     enumerates the 1 TB HDD first, so the inventory passes the SSD as
-#     /dev/sdb (verify with lsblk -o NAME,SIZE,MODEL before disko).
+#   main: SK hynix SC311 SATA SSD (128 GB) — system disk.
+#     Persistent ID: /dev/disk/by-id/ata-SK_hynix_SC311_SATA_128GB_MS83N428510303B5B
 #     UEFI ESP + 8G swap + btrfs /root + /nix subvolumes (no LVM).
-#   hdd: 1 TB HDD (/dev/sda) — dedicated Steam library,
+#   hdd: 1 TB HDD (Seagate ST1000LM035) — dedicated Steam library,
+#     Persistent ID: /dev/disk/by-id/ata-ST1000LM035-1RK172_WL14QR63
 #     single btrfs partition mounted at /mnt/steam.
 #
 # Host-local on purpose: disk topology is host-specific (TODO.md →
@@ -14,11 +14,11 @@
 # and /persist: stark is a persistent eisen-style Steam desktop and
 # does NOT run impermanence.
 #
-# WARNING: `disko` wipes BOTH disks. Verify with `lsblk` before
-# running the disko script — the SSD must be main (/dev/sdb), the
-# 1 TB HDD hdd (/dev/sda).
-{ mainDevice ? throw "Set mainDevice to the system SSD, e.g. /dev/sda"
-, hddDevice ? throw "Set hddDevice to the 1 TB HDD, e.g. /dev/sdb"
+# WARNING: `disko` wipes BOTH disks. Always use deterministic by-id paths
+# or verify with `lsblk` before running disko — SCSI drive letters (/dev/sdX)
+# can swap between boots.
+{ mainDevice ? "/dev/disk/by-id/ata-SK_hynix_SC311_SATA_128GB_MS83N428510303B5B"
+, hddDevice ? "/dev/disk/by-id/ata-ST1000LM035-1RK172_WL14QR63"
 ,
 }: {
   disko.devices = {

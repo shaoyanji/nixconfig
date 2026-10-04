@@ -106,22 +106,21 @@ in
     # RAM). Steam Big Picture desktop mirroring eisen: globalModulesNixos
     # brings in niri + DankMaterialShell greeter + role:heim userland,
     # autoLogin drops devji into the upstream gamescope-session (steam
-    # -gamepadui) with the DMS greeter as fallback. The MX110 (Pascal
-    # sm_61) dGPU needs the legacy_580 driver (final series for Pascal)
-    # and is muxless Optimus: PRIME render offload with the HD 620 iGPU
-    # driving the panel — games opt in via nvidia-offload %command%.
-    # Dual-disk disko: SATA SSD (/dev/sdb — the kernel enumerates the
-    # 1 TB HDD first) for the system + 1 TB HDD (/dev/sda) as the btrfs
-    # Steam library at /mnt/steam. Persistent (no impermanence) —
-    # eisen-style.
+    # -gamepadui) with the DMS greeter as fallback. The MX110 (Maxwell
+    # GM108M sm_50) dGPU needs the legacy_580 driver and is muxless
+    # Optimus: PRIME render offload with the HD 620 iGPU driving the panel —
+    # games opt in via nvidia-offload %command%.
+    # Dual-disk disko uses persistent by-id paths: SK hynix SATA SSD for
+    # system + 1 TB Seagate HDD as the btrfs Steam library at /mnt/steam.
+    # Persistent (no impermanence) — eisen-style.
     modules =
       globalModulesNixos
       ++ [
         inputs.disko.nixosModules.default
         ../hosts/stark/configuration.nix
         (import ../hosts/stark/disko.nix {
-          mainDevice = "/dev/sdb";
-          hddDevice = "/dev/sda";
+          mainDevice = "/dev/disk/by-id/ata-SK_hynix_SC311_SATA_128GB_MS83N428510303B5B";
+          hddDevice = "/dev/disk/by-id/ata-ST1000LM035-1RK172_WL14QR63";
         })
       ];
   };

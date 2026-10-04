@@ -3,13 +3,11 @@
 # Hardware:
 #   CPU:  Intel Core i5-7200U (Kaby Lake-U, 2c/4t, 15 W)
 #   GPU:  Intel HD 620 iGPU (drives the 23.8" 1080p panel) +
-#         NVIDIA GeForce MX110 (Pascal GP108, sm_61) via PRIME render
+#         NVIDIA GeForce MX110 (Maxwell GM108M, sm_50) via PRIME render
 #         offload → legacy_580 driver (./nvidia-mx110.nix)
 #   RAM:  16 GB DDR4
-#   Disk: SK hynix SC311 SATA SSD (system, disko main = /dev/sdb —
-#         kernel enumerates the HDD first) +
-#         1 TB HDD (Steam library, btrfs → /mnt/steam, disko hdd =
-#         /dev/sda)
+#   Disk: SK hynix SC311 SATA SSD (system, disko main) +
+#         1 TB HDD (Steam library, btrfs → /mnt/steam, disko hdd)
 #   Boot: UEFI (systemd-boot)
 #
 # Role:  Steam Big Picture on a full desktop chain (eisen-style):
@@ -77,8 +75,30 @@ in
   # Thermald — 15 W Kaby Lake-U in a sealed AIO chassis.
   services.thermald.enable = true;
 
-  # 16 GB RAM: no eisen-style tmpfs shadercache (that box has 64 GB) —
-  # Steam's shader cache stays on the btrfs HDD next to the library.
+  # --- Hardware Video Acceleration (Intel HD 620 QuickSync) ---
+  # Enables VAAPI hardware decode/encode for H.264, HEVC 8/10-bit, and VP9.
+  # Keeps video decode overhead off the 15 W dual-core CPU in Steam CEF and browsers.
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver # iHD driver for Kaby Lake Gen9 QuickSync
+      intel-vaapi-driver # i965 fallback
+      libva-vdpau-driver
+    ];
+  };
+
+  environment.sessionVariables = {
+    LIBVA_DRIVER_NAME = "iHD";
+  };
+
+  # --- Shader Cache on SSD ---
+  # With 16 GB RAM, stark avoids eisen's 16 GB tmpfs RAM disk. However,
+  # keeping shader caches on the 5400 RPM HDD (/mnt/steam) introduces
+  # severe random-read latency during game launches and level loads.
+  # Instead, shaders live on the SK hynix SATA SSD root filesystem.
+  systemd.tmpfiles.rules = [
+    "d ${user.home}/.local/share/Steam/steamapps/shadercache 0755 devji users - -"
+  ];
 
   # --- Btrfs auto-scrub (monthly) ---
   # The SSD root and the 1 TB Steam library are both btrfs. Monthly

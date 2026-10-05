@@ -56,6 +56,11 @@ tasks:
       - task: serv00:server:stop
       - task: serv00:server:start
 
+  serv00:status:
+    desc: Check Serv00 webserver process and test https://jisifu.serv00.net
+    cmds:
+      - task: serv00:server:status
+
   serv00:server:status:
     desc: Check Serv00 webserver process and test https://jisifu.serv00.net
     cmds:

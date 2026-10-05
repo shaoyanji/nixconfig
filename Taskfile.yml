@@ -87,6 +87,11 @@ tasks:
     cmds:
       - task agents:menu
 
+  wishlist:
+    desc: Open Wishlist interactive SSH directory
+    cmds:
+      - nix-shell -p wishlist --run wishlist
+
   exit:
     internal: true
     cmds:

@@ -15,6 +15,16 @@ tasks:
     cmds:
       - nix-shell -p wrangler --run "wrangler whoami"
 
+  bountystash:status:
+    desc: HTTP health check on production (bountystash.com) and preview endpoints
+    cmds:
+      - |
+        echo "=== Production (https://bountystash.com) ==="
+        curl -Is https://bountystash.com | head -n 6
+        echo ""
+        echo "=== Preview (https://preview.cv-resume-40q.pages.dev) ==="
+        curl -Is https://preview.cv-resume-40q.pages.dev | head -n 6
+
   bountystash:build:
     desc: Compile modern brutalist console & validate 14KB TCP envelope
     cmds:

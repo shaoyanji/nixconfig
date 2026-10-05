@@ -567,6 +567,7 @@ task dev:config:hash-update    # runs nix-hash-update.sh
 | `AGENTS.md` | This file — agent routing and codebase guide |
 | `NIX-REFERENCE.md` | Nix patterns and gotchas used in this repo |
 | `docs/task-control-plane.md` | Task namespace policy and workflow examples |
+| `docs/frieren-access.md` | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
 | `docs/codex-handoff.md` | Codex session orientation |
 | `docs/userland-module-map.md` | Userland module structure |
 | `docs/userland-package-ownership.md` | Package ownership and role wiring |

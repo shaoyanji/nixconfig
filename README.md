@@ -465,6 +465,7 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 ### Quick Reference
 - `AGENTS.md` - Agent routing helpers and task namespace summary
 - `docs/task-control-plane.md` - Task namespace policy and workflow examples
+- `docs/frieren-access.md` - frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports)
 - `taskfiles/README.md` - Taskfile ownership map and shard reference
 
 ### Deployment

@@ -1,0 +1,169 @@
+version: "3"
+
+vars:
+  ENVS_HOST: "envs.net"
+  ENVS_USER: "jisifu"
+  ENVS_ALIAS: "envs"
+  ENVS_DOMAIN: "jisifu.envs.net"
+  ENVS_WEB: "/home/jisifu/public_html"
+  ENVS_GEMINI: "/home/jisifu/public_gemini"
+  ENVS_GOPHER: "/home/jisifu/public_gopher"
+
+tasks:
+  envs:ssh:
+    desc: Open interactive SSH shell into Envs.net host
+    cmds:
+      - ssh {{.ENVS_ALIAS}}
+
+  envs:exec:
+    desc: Run command on Envs.net via SSH (agent-friendly)
+    cmds:
+      - ssh {{.ENVS_ALIAS}} -- {{.CLI_ARGS}}
+
+  envs:status:
+    desc: Health check on Envs.net website (https://jisifu.envs.net)
+    cmds:
+      - |
+        echo "=== HTTP Health Check (https://{{.ENVS_DOMAIN}}) ==="
+        curl -Is https://{{.ENVS_DOMAIN}} | head -n 8
+        echo ""
+        echo "=== Disk & Home Directory Usage ==="
+        ssh {{.ENVS_ALIAS}} "df -h /home/{{.ENVS_USER}}"
+
+  envs:build:
+    desc: Rebuild public_html JSON & routes from markdown sources
+    cmds:
+      - |
+        ssh {{.ENVS_ALIAS}} "
+          cd {{.ENVS_WEB}}
+          echo '=== Generating JSON ==='
+          php generate_json.php
+          echo '=== Validating Tags ==='
+          php validate_tags.php
+          echo '=== Exporting SRS ==='
+          php srs-export.php public/srs-cards.json
+          echo '=== Generating SPA routes ==='
+          php generate_routes.php
+          echo '=== Build Complete ==='
+        "
+
+  envs:validate:
+    desc: Validate HTML tag balance and equation schemas
+    cmds:
+      - |
+        ssh {{.ENVS_ALIAS}} "
+          cd {{.ENVS_WEB}}
+          php validate-equations.php
+          echo ''
+          php validate_tags.php
+        "
+
+  envs:test:
+    desc: Run test suite on public_html
+    cmds:
+      - |
+        ssh {{.ENVS_ALIAS}} "cd {{.ENVS_WEB}} && php test.php"
+
+  envs:push:
+    desc: Upload file to Envs.net (defaults to ~/public_html/)
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task envs:push -- <local_file> [remote_dest]"
+          echo "Example: task envs:push -- index.md public_html/content/home/"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="public_html/"
+        fi
+        echo "Pushing $SRC -> {{.ENVS_ALIAS}}:$DEST ..."
+        scp -r "$SRC" "{{.ENVS_ALIAS}}:$DEST"
+        echo "Transfer complete."
+
+  envs:pull:
+    desc: Download file from Envs.net (e.g. task envs:pull -- public_html/index.php [dest])
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task envs:pull -- <remote_file> [local_dest]"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="."
+        fi
+        echo "Pulling {{.ENVS_ALIAS}}:$SRC -> $DEST ..."
+        scp -r "{{.ENVS_ALIAS}}:$SRC" "$DEST"
+        echo "Transfer complete."
+
+  envs:info:
+    desc: Query Envs.net Debian system info, runtimes, and public_html git status
+    cmds:
+      - |
+        echo "=== System & OS ==="
+        ssh {{.ENVS_ALIAS}} "uname -a; cat /etc/os-release | grep PRETTY_NAME"
+        echo ""
+        echo "=== Installed Runtimes ==="
+        ssh {{.ENVS_ALIAS}} "php -v | head -n 1; node -v; python3 --version; go version 2>/dev/null || true"
+        echo ""
+        echo "=== Public Roots ==="
+        ssh {{.ENVS_ALIAS}} "ls -ld ~/public_html ~/public_gemini ~/public_gopher 2>/dev/null"
+        echo ""
+        echo "=== Git Status (public_html) ==="
+        ssh {{.ENVS_ALIAS}} "cd ~/public_html && git status -s 2>/dev/null || echo 'Not a git repo'"
+
+  envs:menu:
+    desc: Interactive Charmbracelet Gum / Wish menu for Envs.net host
+    cmds:
+      - |
+        action=$(printf '%s\n' \
+          "ssh: Connect to Envs.net shell" \
+          "status: Check https://{{.ENVS_DOMAIN}} health" \
+          "build: Rebuild public_html (generate JSON & SPA routes)" \
+          "validate: Validate equations and HTML tags" \
+          "info: System info, runtimes & git status" \
+          "push: Upload file to Envs.net (public_html/)" \
+          "pull: Download file from Envs.net" \
+          "wishlist: Open Wishlist SSH directory" \
+          "exit: Quit" | gum choose --header "🌐 Envs.net Pubnix Menu")
+
+        case "$action" in
+          "ssh"*)
+            task envs:ssh
+            ;;
+          "status"*)
+            task envs:status
+            ;;
+          "build"*)
+            task envs:build
+            ;;
+          "validate"*)
+            task envs:validate
+            ;;
+          "info"*)
+            task envs:info
+            ;;
+          "push"*)
+            filepath=$(gum input --placeholder "Path to local file to upload:")
+            if [ -n "$filepath" ]; then
+              task envs:push -- "$filepath"
+            fi
+            ;;
+          "pull"*)
+            remotepath=$(gum input --placeholder "Path to remote file on Envs.net:")
+            if [ -n "$remotepath" ]; then
+              task envs:pull -- "$remotepath"
+            fi
+            ;;
+          "wishlist"*)
+            nix-shell -p wishlist --run wishlist
+            ;;
+          *)
+            echo "Exited."
+            ;;
+        esac

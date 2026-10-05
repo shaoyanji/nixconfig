@@ -17,6 +17,11 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/agents.yml` – operator helpers, xs wrappers, OAuth management
 - `taskfiles/checks.yml` – validation and smoke checks (incl. `checks:flake:transitive`)
 - `taskfiles/dev.yml` – git workflows, flake updates, site deployment
+- `taskfiles/moto.yml` – Motorola Android (Termux) shell, file transfers, and Charmbracelet Wish/Gum menu
+- `taskfiles/serv00.yml` – Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle (jisifu.serv00.net), and Gum menu
+- `taskfiles/dragoncourt.yml` – Alwaysdata Debian hosting, PHP/Wasm webserver (dragoncourt.alwaysdata.net), and Gum menu
+- `taskfiles/envs.yml` – Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline (jisifu.envs.net), and Gum menu
+- `taskfiles/bountystash.yml` – Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment, and Gum menu
 - `taskfiles/services-core.yml` – minimal compatibility wrappers
 - `taskfiles/services-legacy.yml` – deprecated aliases (marked `[deprecated]`)
 
@@ -30,6 +35,11 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - Operator helpers → `taskfiles/agents.yml` (`agents:menu`, legacy menus)
 - Validation checks → `taskfiles/checks.yml` (`checks:*`)
 - Git/flake workflows, site deployment → `taskfiles/dev.yml` (`dev:*`)
+- Moto (Termux) operations & transfer → `taskfiles/moto.yml` (`moto:*`)
+- Serv00 FreeBSD hosting & webserver → `taskfiles/serv00.yml` (`serv00:*`)
+- Alwaysdata Debian hosting & webserver → `taskfiles/dragoncourt.yml` (`dragoncourt:*`)
+- Envs.net Debian hosting & webserver → `taskfiles/envs.yml` (`envs:*`)
+- Bountystash Console & Cloudflare Pages → `taskfiles/bountystash.yml` (`bountystash:*`)
 - Legacy compatibility → `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml`
 
 ## What not to assume

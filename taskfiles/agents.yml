@@ -5,8 +5,20 @@ tasks:
     desc: Interactive operator control plane menu
     cmds:
       - |
-        choice=$(printf '%s\n' rebuild edit-config update load browse new incus sudologinssh help status check deploy logs exit | gum choose)
-        task "$choice"
+        choice=$(printf '%s\n' bountystash envs dragoncourt serv00 moto rebuild edit-config update load browse new incus sudologinssh help status check deploy logs exit | gum choose)
+        if [ "$choice" = "moto" ]; then
+          task moto:menu
+        elif [ "$choice" = "serv00" ]; then
+          task serv00:menu
+        elif [ "$choice" = "dragoncourt" ]; then
+          task dragoncourt:menu
+        elif [ "$choice" = "envs" ]; then
+          task envs:menu
+        elif [ "$choice" = "bountystash" ]; then
+          task bountystash:menu
+        else
+          task "$choice"
+        fi
 
   browse:
     desc: "[deprecated] Legacy browse menu - use direct commands"

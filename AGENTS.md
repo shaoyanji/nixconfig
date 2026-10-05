@@ -485,6 +485,11 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 | `checks:*` | Validation, smoke checks, nix lint | `.agents/skills/checks/SKILL.md` |
 | `dev:*` | Git, flake, site, PRs, packages | `.agents/skills/dev/SKILL.md` |
 | `data:*` | NAS storage taxonomy, hygiene, permissions, media unindexing | `.agents/skills/data/SKILL.md` |
+| `moto:*` | Motorola Android (Termux) shell, file push/pull, Wish/Gum menu | `.agents/skills/moto/SKILL.md` |
+| `serv00:*` | Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle | `.agents/skills/serv00/SKILL.md` |
+| `dragoncourt:*` | Alwaysdata Debian hosting, PHP/Wasm webserver | `.agents/skills/dragoncourt/SKILL.md` |
+| `envs:*` | Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline | `.agents/skills/envs/SKILL.md` |
+| `bountystash:*` | Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment | `.agents/skills/bountystash/SKILL.md` |
 | `services:*` | Legacy wrappers (canonical: `infra:*`) | `.agents/skills/services/SKILL.md` |
 
 ---

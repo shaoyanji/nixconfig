@@ -1,4 +1,5 @@
-_: {
+{ lib, ... }:
+{
   # Tailnet DNS should stay manually managed after deployment:
   # sudo tailscale up --accept-dns=false
   services.tailscale.enable = true;
@@ -9,10 +10,32 @@ _: {
     wants = [ "network-online.target" ];
   };
 
+  # Serve the NAS web portal (pdf./photos./media.frieren.lan vhosts on
+  # nginx :80) and the 192.168.3.0/24 LAN to tailnet clients. Off-LAN
+  # devices resolve *.frieren.lan via the pi-hole (--dns=100.97.61.65 on
+  # desktop-client/eisen) and route here as a subnet router. Requires a
+  # one-time admin-console approval of the route. SNAT stays on so the
+  # browser-hostile services (Jellyfin device discovery, Paperless mail
+  # callbacks) see tailnet-sourced traffic. Applied via `tailscale set` at
+  # boot — survives without re-auth, unlike extraUpFlags.
+  # (useRoutingFeatures = "both" is inherited from desktop-client.nix.)
+  services.tailscale.extraSetFlags = [
+    "--advertise-routes=192.168.3.0/24"
+  ];
+
   # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively
-  services.resolved.extraConfig = ''
-    DNSStubListener=no
-  '';
+  # (services.resolved.extraConfig was removed upstream; use settings.Resolve)
+  services.resolved.settings.Resolve.DNSStubListener = "no";
+
+  # Point the host resolver at FTL instead of the router:
+  # /etc/resolv.conf -> systemd-resolved (uplink mode, stub off) -> FTL (127.0.0.1:53)
+  # -> unbound (127.0.0.1#5335). NetworkManager used to inject the router
+  # (192.168.3.1) from DHCP as resolved's per-link upstream, which leaked into
+  # /etc/resolv.conf; dns="none" stops NM managing DNS and the global upstream
+  # below routes resolved (and thus the host) through the local filtering stack.
+  # mkForce: nixpkgs' resolved module defaults this to "systemd-resolved".
+  networking.networkmanager.dns = lib.mkForce "none";
+  networking.nameservers = [ "127.0.0.1" "::1" ];
 
   # pihole-ftl references tailscale0 interface, must wait for tailscaled
   systemd.services.pihole-ftl = {

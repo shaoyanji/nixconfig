@@ -117,6 +117,60 @@ tasks:
         echo "=== Git Status (public_html) ==="
         ssh {{.ENVS_ALIAS}} "cd ~/public_html && git status -s 2>/dev/null || echo 'Not a git repo'"
 
+  envs:harden:
+    desc: Enforce secure permissions on Envs.net (~/.ssh, authorized_keys, public_html)
+    cmds:
+      - |
+        ssh {{.ENVS_ALIAS}} "
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/authorized_keys 2>/dev/null || true
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/*.key 2>/dev/null || true
+          chmod 644 ~/.ssh/*.pub 2>/dev/null || true
+          chmod 750 ~/public_html 2>/dev/null || true
+          echo '✅ Envs.net permissions hardened (SSH 700/600, public_html 750).'
+        "
+
+  envs:audit:
+    desc: Comprehensive health and security audit of Envs.net pubnix environment
+    cmds:
+      - |
+        echo "=== 1. System, Uptime & Active Users ==="
+        ssh {{.ENVS_ALIAS}} "uname -a; uptime; who | wc -l | sed 's/$/ active sessions/'"
+        echo ""
+        echo "=== 2. Disk Usage ==="
+        ssh {{.ENVS_ALIAS}} "df -h /home/{{.ENVS_USER}}"
+        echo ""
+        echo "=== 3. Web Service HTTP Status ==="
+        curl -Is https://{{.ENVS_DOMAIN}} | head -n 8
+        echo ""
+        echo "=== 4. Permissions Audit ==="
+        ssh {{.ENVS_ALIAS}} "ls -ld ~/.ssh ~/.ssh/* ~/public_html ~/public_gemini 2>/dev/null"
+        echo ""
+        echo "=== 5. Content Git Status ==="
+        ssh {{.ENVS_ALIAS}} "cd ~/public_html && git status -s 2>/dev/null || echo 'Not a git repo'"
+
+  envs:clean:
+    desc: Clean stale vim undo files (.un~) and temporary caches from home
+    cmds:
+      - |
+        ssh {{.ENVS_ALIAS}} "
+          echo 'Cleaning stale .un~ undo files...'
+          find ~ -maxdepth 2 -name '*.un~' -delete 2>/dev/null || true
+          echo 'Clean complete.'
+        "
+
+  envs:backup:
+    desc: Download compressed backup of public_html content and public_gemini
+    cmds:
+      - |
+        BACKUP_FILE="envs-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+        echo "Creating remote archive..."
+        ssh {{.ENVS_ALIAS}} "tar -czf ~/$BACKUP_FILE ~/public_html/content ~/public_gemini ~/public_gopher 2>/dev/null || true"
+        echo "Downloading $BACKUP_FILE..."
+        scp {{.ENVS_ALIAS}}:~/$BACKUP_FILE ./
+        ssh {{.ENVS_ALIAS}} "rm -f ~/$BACKUP_FILE"
+        echo "Backup saved locally to ./$BACKUP_FILE"
+
   envs:menu:
     desc: Interactive Charmbracelet Gum / Wish menu for Envs.net host
     cmds:
@@ -124,8 +178,12 @@ tasks:
         action=$(printf '%s\n' \
           "ssh: Connect to Envs.net shell" \
           "status: Check https://{{.ENVS_DOMAIN}} health" \
+          "audit: Security, quota & permissions audit" \
+          "harden: Enforce 700/600 permissions" \
           "build: Rebuild public_html (generate JSON & SPA routes)" \
           "validate: Validate equations and HTML tags" \
+          "backup: Download content & gemini backup tarball" \
+          "clean: Remove stale .un~ undo files" \
           "info: System info, runtimes & git status" \
           "push: Upload file to Envs.net (public_html/)" \
           "pull: Download file from Envs.net" \
@@ -138,6 +196,18 @@ tasks:
             ;;
           "status"*)
             task envs:status
+            ;;
+          "audit"*)
+            task envs:audit
+            ;;
+          "harden"*)
+            task envs:harden
+            ;;
+          "backup"*)
+            task envs:backup
+            ;;
+          "clean"*)
+            task envs:clean
             ;;
           "build"*)
             task envs:build

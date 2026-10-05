@@ -1,0 +1,142 @@
+version: "3"
+
+vars:
+  APPS_DIR: "/srv/data/projects/antigravity-application-workflow"
+  APPS_BIN: "{{.APPS_DIR}}/bin/appflow"
+  APPS_DATA: "{{.APPS_DIR}}/data/applications.json"
+
+tasks:
+  apps:list:
+    desc: List tracked job applications
+    cmds:
+      - "{{.APPS_BIN}} list {{.CLI_ARGS}}"
+
+  apps:search:
+    desc: Search applications by company, role, ID, or keywords
+    cmds:
+      - "{{.APPS_BIN}} search {{.CLI_ARGS}}"
+
+  apps:get:
+    desc: View full details of one application record
+    cmds:
+      - "{{.APPS_BIN}} get {{.CLI_ARGS}}"
+
+  apps:update:
+    desc: Update application status or notes (e.g. task apps:update -- <id> --status Applied)
+    cmds:
+      - "{{.APPS_BIN}} update {{.CLI_ARGS}}"
+
+  apps:overview:
+    desc: Pipeline summary - application counts per status
+    cmds:
+      - jq -r 'group_by(.status)[] | "\(.[0].status)\t\(length)"' "{{.APPS_DATA}}"
+
+  apps:emails:
+    desc: Run inbound Himalaya email radar and sync application statuses
+    cmds:
+      - "{{.APPS_BIN}} emails {{.CLI_ARGS}}"
+
+  apps:followups:
+    desc: View drafted recruiter follow-up notes (--copy <id> for clipboard)
+    cmds:
+      - "{{.APPS_BIN}} followups {{.CLI_ARGS}}"
+
+  apps:build:
+    desc: Compile Typst resumes/cover letters to dist/ (no args = --all)
+    cmds:
+      - "{{.APPS_BIN}} build {{.CLI_ARGS}}"
+
+  apps:audit:
+    desc: QA layout, page budget, and orphan line audit on dist/
+    cmds:
+      - "{{.APPS_BIN}} audit"
+
+  apps:query:
+    desc: Read-only SQL against applications.db (e.g. task apps:query -- "select ...")
+    cmds:
+      - "{{.APPS_BIN}} query {{.CLI_ARGS}}"
+
+  apps:sync:status:
+    desc: Check JSON <-> SQLite <-> GitHub synchronization state
+    cmds:
+      - "{{.APPS_BIN}} status"
+
+  apps:sync:push:
+    desc: Reconcile JSON (source of truth) into DB/CSV, commit data, push to GitHub
+    cmds:
+      - "{{.APPS_BIN}} push"
+
+  apps:sync:pull:
+    desc: Pull remote application changes from GitHub and reconcile locally
+    cmds:
+      - "{{.APPS_BIN}} pull"
+
+  apps:git:status:
+    desc: Raw git status of the antigravity-application-workflow checkout
+    cmds:
+      - git -C "{{.APPS_DIR}}" status -sb
+
+  apps:menu:
+    desc: Interactive Charmbracelet Gum menu for the job application workflow
+    cmds:
+      - |
+        action=$(printf '%s\n' \
+          "list: List tracked applications" \
+          "search: Search by company, role, ID, or keywords" \
+          "get: View one application record" \
+          "update: Update application status or notes" \
+          "overview: Pipeline counts per status" \
+          "emails: Inbound email radar + status sync" \
+          "followups: Recruiter follow-up notes" \
+          "build: Compile Typst documents to dist/" \
+          "audit: QA layout and page budget" \
+          "sync:status: JSON <-> DB <-> GitHub sync state" \
+          "sync:push: Reconcile + commit + push data" \
+          "sync:pull: Pull remote changes" \
+          "git:status: Raw git status" \
+          "exit: Quit" | gum choose --header "Job Applications (appflow)")
+
+        case "$action" in
+          "list"*)
+            task apps:list
+            ;;
+          "search"*)
+            task apps:search -- "$(gum input --placeholder 'search query')"
+            ;;
+          "get"*)
+            task apps:get -- "$(gum input --placeholder 'application id')"
+            ;;
+          "update"*)
+            task apps:update -- "$(gum input --placeholder 'id --status Applied')"
+            ;;
+          "overview"*)
+            task apps:overview
+            ;;
+          "emails"*)
+            task apps:emails
+            ;;
+          "followups"*)
+            task apps:followups
+            ;;
+          "build"*)
+            task apps:build
+            ;;
+          "audit"*)
+            task apps:audit
+            ;;
+          "sync:status"*)
+            task apps:sync:status
+            ;;
+          "sync:push"*)
+            task apps:sync:push
+            ;;
+          "sync:pull"*)
+            task apps:sync:pull
+            ;;
+          "git:status"*)
+            task apps:git:status
+            ;;
+          *)
+            echo "Exited."
+            ;;
+        esac

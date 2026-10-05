@@ -21,6 +21,10 @@ Control and manage the Alwaysdata Debian host (`ssh-dragoncourt.alwaysdata.net`)
 | `task dragoncourt:ssh` | Interactive SSH shell into Alwaysdata Debian host |
 | `task dragoncourt:exec -- "<cmd>"` | Execute command non-interactively on Alwaysdata (agent-friendly) |
 | `task dragoncourt:status` | Health check on `https://dragoncourt.alwaysdata.net` & disk usage |
+| `task dragoncourt:audit` | Comprehensive health, quota, web HTTP, and permissions audit |
+| `task dragoncourt:harden` | Enforce secure permissions (SSH 700/600, www 750) |
+| `task dragoncourt:logs` | Tail live Apache HTTP access/error logs from `~/admin/logs/sites/` |
+| `task dragoncourt:backup` | Download compressed tarball of Alwaysdata webroot (`~/www`) |
 | `task dragoncourt:build` | Re-render Comrak markdown templates in `~/www/` |
 | `task dragoncourt:push -- <local> [dest]` | Transfer local file/dir to Alwaysdata (defaults to `www/`) |
 | `task dragoncourt:pull -- <remote> [dest]` | Transfer remote file/dir from Alwaysdata to local machine |

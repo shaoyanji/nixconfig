@@ -1,0 +1,225 @@
+version: "3"
+
+vars:
+  SERV00_HOST: "s13.serv00.com"
+  SERV00_USER: "jisifu"
+  SERV00_ALIAS: "serv00"
+  SERV00_PORT: "49613"
+  SERV00_DOMAIN: "jisifu.serv00.net"
+
+tasks:
+  serv00:ssh:
+    desc: Open interactive SSH shell into Serv00 FreeBSD host
+    cmds:
+      - ssh {{.SERV00_ALIAS}}
+
+  serv00:exec:
+    desc: Run command on Serv00 via SSH (agent-friendly)
+    cmds:
+      - ssh {{.SERV00_ALIAS}} -- {{.CLI_ARGS}}
+
+  serv00:devil:
+    desc: Run Devil CLI command on Serv00 (e.g. task serv00:devil -- port list)
+    cmds:
+      - ssh {{.SERV00_ALIAS}} -- devil {{.CLI_ARGS}}
+
+  serv00:server:start:
+    desc: Start background webserver on port 49613 using FreeBSD daemon
+    cmds:
+      - |
+        ssh {{.SERV00_ALIAS}} "
+          if pgrep -f webserver >/dev/null; then
+            echo 'Webserver already running on port {{.SERV00_PORT}} (PID: \$(cat ~/webserver.pid 2>/dev/null)).'
+          else
+            /usr/sbin/daemon -f -r -p ~/webserver.pid -o ~/webserver.log ~/webserver
+            sleep 1
+            echo 'Webserver started on port {{.SERV00_PORT}} (PID: \$(cat ~/webserver.pid 2>/dev/null)).'
+          fi
+        "
+
+  serv00:server:stop:
+    desc: Stop background webserver on Serv00
+    cmds:
+      - |
+        ssh {{.SERV00_ALIAS}} "
+          if [ -f ~/webserver.pid ]; then
+            kill \$(cat ~/webserver.pid 2>/dev/null) 2>/dev/null || true
+            rm -f ~/webserver.pid
+          fi
+          pkill webserver 2>/dev/null || true
+          echo 'Webserver stopped.'
+        "
+
+  serv00:server:restart:
+    desc: Restart background webserver on Serv00
+    cmds:
+      - task: serv00:server:stop
+      - task: serv00:server:start
+
+  serv00:server:status:
+    desc: Check Serv00 webserver process and test https://jisifu.serv00.net
+    cmds:
+      - |
+        echo "=== Process & Port Status ==="
+        ssh {{.SERV00_ALIAS}} "ps aux | grep [w]ebserver || echo 'Process: NOT RUNNING'"
+        echo ""
+        echo "=== HTTP Health Check (https://{{.SERV00_DOMAIN}}) ==="
+        curl -Is https://{{.SERV00_DOMAIN}} | head -n 5
+
+  serv00:server:build:
+    desc: Rebuild webserver Go binary on Serv00
+    cmds:
+      - ssh {{.SERV00_ALIAS}} "go build -o webserver server.go && ls -lh webserver"
+
+  serv00:cron:enable:
+    desc: Install crontab keep-alive for webserver on Serv00
+    cmds:
+      - |
+        ssh {{.SERV00_ALIAS}} "
+          crontab -l 2>/dev/null | grep -v 'webserver' > /tmp/cron.tmp || true
+          echo '*/5 * * * * pgrep -f webserver >/dev/null || /usr/sbin/daemon -f -r -p /usr/home/{{.SERV00_USER}}/webserver.pid -o /usr/home/{{.SERV00_USER}}/webserver.log /usr/home/{{.SERV00_USER}}/webserver' >> /tmp/cron.tmp
+          echo '@reboot /usr/sbin/daemon -f -r -p /usr/home/{{.SERV00_USER}}/webserver.pid -o /usr/home/{{.SERV00_USER}}/webserver.log /usr/home/{{.SERV00_USER}}/webserver' >> /tmp/cron.tmp
+          crontab /tmp/cron.tmp && rm -f /tmp/cron.tmp
+          echo 'Keep-alive cron job installed:'
+          crontab -l
+        "
+
+  serv00:cron:disable:
+    desc: Remove keep-alive cron job from Serv00
+    cmds:
+      - |
+        ssh {{.SERV00_ALIAS}} "
+          crontab -l 2>/dev/null | grep -v 'webserver' > /tmp/cron.tmp || true
+          crontab /tmp/cron.tmp && rm -f /tmp/cron.tmp
+          echo 'Keep-alive cron job removed.'
+        "
+
+  serv00:ports:
+    desc: List reserved TCP/UDP ports via devil
+    cmds:
+      - ssh {{.SERV00_ALIAS}} "devil port list"
+
+  serv00:www:
+    desc: List web domains and proxy configurations via devil
+    cmds:
+      - ssh {{.SERV00_ALIAS}} "devil www list"
+
+  serv00:push:
+    desc: Upload file to Serv00 (e.g. task serv00:push -- myfile.html [dest])
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task serv00:push -- <local_file> [remote_dest]"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="~/"
+        fi
+        echo "Pushing $SRC -> {{.SERV00_ALIAS}}:$DEST ..."
+        scp -r "$SRC" "{{.SERV00_ALIAS}}:$DEST"
+        echo "Transfer complete."
+
+  serv00:pull:
+    desc: Download file from Serv00 (e.g. task serv00:pull -- remote.log [dest])
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task serv00:pull -- <remote_file> [local_dest]"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="."
+        fi
+        echo "Pulling {{.SERV00_ALIAS}}:$SRC -> $DEST ..."
+        scp -r "{{.SERV00_ALIAS}}:$SRC" "$DEST"
+        echo "Transfer complete."
+
+  serv00:info:
+    desc: Query Serv00 FreeBSD system health, quotas, and processes
+    cmds:
+      - |
+        echo "=== System Info ==="
+        ssh {{.SERV00_ALIAS}} "uname -a; uptime"
+        echo ""
+        echo "=== Account Quota & BinExec ==="
+        ssh {{.SERV00_ALIAS}} "devil binexec on >/dev/null; devil info 2>/dev/null || quota -v"
+        echo ""
+        echo "=== Running User Processes ==="
+        ssh {{.SERV00_ALIAS}} "ps aux | grep {{.SERV00_USER}}"
+
+  serv00:menu:
+    desc: Interactive Charmbracelet Gum / Wish menu for Serv00 FreeBSD host
+    cmds:
+      - |
+        action=$(printf '%s\n' \
+          "ssh: Connect to Serv00 shell" \
+          "status: Webserver status & HTTP check" \
+          "start: Start webserver (port {{.SERV00_PORT}})" \
+          "stop: Stop webserver" \
+          "restart: Restart webserver" \
+          "build: Rebuild Go webserver binary" \
+          "cron: Enable keep-alive cron job" \
+          "www: List devil WWW domains" \
+          "ports: List devil reserved ports" \
+          "info: System info & quota" \
+          "push: Upload file to Serv00" \
+          "pull: Download file from Serv00" \
+          "wishlist: Open Wishlist SSH directory" \
+          "exit: Quit" | gum choose --header "😈 Serv00 FreeBSD (jisifu.serv00.net) Menu")
+
+        case "$action" in
+          "ssh"*)
+            task serv00:ssh
+            ;;
+          "status"*)
+            task serv00:server:status
+            ;;
+          "start"*)
+            task serv00:server:start
+            ;;
+          "stop"*)
+            task serv00:server:stop
+            ;;
+          "restart"*)
+            task serv00:server:restart
+            ;;
+          "build"*)
+            task serv00:server:build
+            ;;
+          "cron"*)
+            task serv00:cron:enable
+            ;;
+          "www"*)
+            task serv00:www
+            ;;
+          "ports"*)
+            task serv00:ports
+            ;;
+          "info"*)
+            task serv00:info
+            ;;
+          "push"*)
+            filepath=$(gum input --placeholder "Path to local file to upload:")
+            if [ -n "$filepath" ]; then
+              task serv00:push -- "$filepath"
+            fi
+            ;;
+          "pull"*)
+            remotepath=$(gum input --placeholder "Path to remote file on Serv00:")
+            if [ -n "$remotepath" ]; then
+              task serv00:pull -- "$remotepath"
+            fi
+            ;;
+          "wishlist"*)
+            nix-shell -p wishlist --run wishlist
+            ;;
+          *)
+            echo "Exited."
+            ;;
+        esac

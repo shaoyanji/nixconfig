@@ -1,0 +1,131 @@
+version: "3"
+
+vars:
+  MOTO_HOST: "100.91.87.86"
+  MOTO_PORT: "8022"
+  MOTO_USER: "u0_301"
+  MOTO_ALIAS: "moto"
+
+tasks:
+  moto:ssh:
+    desc: Open interactive SSH shell into Termux on moto
+    cmds:
+      - ssh {{.MOTO_ALIAS}}
+
+  moto:exec:
+    desc: Run command on moto via SSH (agent-friendly)
+    cmds:
+      - ssh {{.MOTO_ALIAS}} -- {{.CLI_ARGS}}
+
+  moto:push:
+    desc: Transfer local file/folder to moto (defaults to Android Downloads)
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task moto:push -- <local_file> [remote_dest]"
+          echo "Example: task moto:push -- ~/document.pdf storage/downloads/"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="storage/downloads/"
+        fi
+        echo "Pushing $SRC -> {{.MOTO_ALIAS}}:$DEST ..."
+        scp -r "$SRC" "{{.MOTO_ALIAS}}:$DEST"
+        echo "Transfer complete."
+
+  moto:pull:
+    desc: Transfer remote file/folder from moto to local directory
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task moto:pull -- <remote_path> [local_dest]"
+          echo "Example: task moto:pull -- storage/dcim/photo.jpg ./"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="."
+        fi
+        echo "Pulling {{.MOTO_ALIAS}}:$SRC -> $DEST ..."
+        scp -r "{{.MOTO_ALIAS}}:$SRC" "$DEST"
+        echo "Transfer complete."
+
+  moto:info:
+    desc: Query moto system health, uptime, and storage
+    cmds:
+      - |
+        echo "=== Device & Uptime ==="
+        ssh {{.MOTO_ALIAS}} "uname -a; uptime"
+        echo ""
+        echo "=== Storage (/data) ==="
+        ssh {{.MOTO_ALIAS}} "df -h /data"
+        echo ""
+        echo "=== Termux Storage Shortcuts ==="
+        ssh {{.MOTO_ALIAS}} "ls -l ~/storage 2>/dev/null || true"
+
+  moto:obsidian:status:
+    desc: Check Obsidian git status on moto
+    cmds:
+      - ssh {{.MOTO_ALIAS}} "cd ~/storage/shared/my-obsidian-vault && git status --short"
+
+  moto:obsidian:sync:
+    desc: Pull latest Obsidian notes on moto
+    cmds:
+      - ssh {{.MOTO_ALIAS}} "cd ~/storage/shared/my-obsidian-vault && git pull --rebase"
+
+  moto:menu:
+    desc: Interactive Charmbracelet Gum / Wish menu for Moto operations
+    cmds:
+      - |
+        action=$(printf '%s\n' \
+          "ssh: Connect to Termux shell" \
+          "info: Device status & storage" \
+          "obsidian-status: Check Obsidian git" \
+          "obsidian-sync: Pull Obsidian git" \
+          "push: Upload file to phone" \
+          "pull: Download file from phone" \
+          "wishlist: Launch Wishlist SSH directory" \
+          "exit: Quit" | gum choose --header "📱 Moto (Termux) Control Menu")
+
+        case "$action" in
+          "ssh"*)
+            task moto:ssh
+            ;;
+          "info"*)
+            task moto:info
+            ;;
+          "obsidian-status"*)
+            task moto:obsidian:status
+            ;;
+          "obsidian-sync"*)
+            task moto:obsidian:sync
+            ;;
+          "push"*)
+            filepath=$(gum input --placeholder "Path to local file to upload:")
+            if [ -n "$filepath" ]; then
+              task moto:push -- "$filepath"
+            fi
+            ;;
+          "pull"*)
+            remotepath=$(gum input --placeholder "Path to remote file on moto:")
+            if [ -n "$remotepath" ]; then
+              task moto:pull -- "$remotepath"
+            fi
+            ;;
+          "wishlist"*)
+            task moto:wishlist
+            ;;
+          *)
+            echo "Exited."
+            ;;
+        esac
+
+  moto:wishlist:
+    desc: Open Charmbracelet Wishlist SSH directory
+    cmds:
+      - nix-shell -p wishlist --run wishlist

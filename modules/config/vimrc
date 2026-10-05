@@ -1,0 +1,182 @@
+" =============================================================================
+" Unified Canonical Vim Configuration (.vimrc)
+" Managed centrally via Nixconfig (modules/config/vimrc)
+" Compatible across FreeBSD (Serv00), Debian (Alwaysdata/Envs), macOS, Linux
+" =============================================================================
+
+" -----------------------------------------------------------------------------
+" 1. General & Performance
+" -----------------------------------------------------------------------------
+set nocompatible
+filetype plugin indent on
+syntax enable
+
+set encoding=utf-8
+set fileformats=unix,dos,mac
+
+" Performance & responsiveness
+set lazyredraw
+set hidden
+set history=1000
+set timeoutlen=500
+set ttimeoutlen=50
+
+" Bell & error signals
+set noerrorbells
+set novisualbell
+set t_vb=
+
+" Backspace & line navigation
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+" -----------------------------------------------------------------------------
+" 2. UI, Colors & Status Line
+" -----------------------------------------------------------------------------
+set number
+set ruler
+set showcmd
+set cmdheight=1
+set laststatus=2
+
+" Try clean dark colorscheme
+set background=dark
+try
+    colorscheme desert
+catch
+endtry
+
+" Built-in informative statusline (zero plugins required)
+function! HasPaste()
+    if &paste
+        return '[PASTE] '
+    endif
+    return ''
+endfunction
+
+set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ [%{&ff}/%Y]\ \ Line:\ %l/%L\ [%p%%]\ \ Col:\ %c
+
+" -----------------------------------------------------------------------------
+" 3. Search & Pattern Matching
+" -----------------------------------------------------------------------------
+set incsearch
+set hlsearch
+set ignorecase
+set smartcase
+set showmatch
+set mat=2
+
+" Leader key: Space
+let mapleader = " "
+let g:mapleader = " "
+
+" Clear search highlight with <leader><CR>
+nnoremap <silent> <leader><cr> :noh<cr>
+
+" -----------------------------------------------------------------------------
+" 4. Indentation & Filetypes
+" -----------------------------------------------------------------------------
+set expandtab
+set smarttab
+set shiftwidth=4
+set tabstop=4
+set softtabstop=4
+set autoindent
+set smartindent
+
+" 2-space indentation for structured data/markup/modern web
+autocmd FileType yaml,json,nix,markdown,html,css,javascript,typescript,toml setlocal shiftwidth=2 tabstop=2 softtabstop=2
+" 4-space indentation for systems code
+autocmd FileType go,python,php,sh,bash,c,cpp setlocal shiftwidth=4 tabstop=4 softtabstop=4
+
+" -----------------------------------------------------------------------------
+" 5. Files, Backup & Persistent Undo (Prevents .un~ and .swp pollution)
+" -----------------------------------------------------------------------------
+set nobackup
+set nowritebackup
+set noswapfile
+
+" Keep undo history isolated in ~/.vim/undo instead of current working directory
+if has("persistent_undo")
+    let s:undodir = expand("~/.vim/undo")
+    if !isdirectory(s:undodir)
+        call mkdir(s:undodir, "p", 0700)
+    endif
+    let &undodir = s:undodir
+    set undofile
+endif
+
+" -----------------------------------------------------------------------------
+" 6. Mouse & Clipboard
+" -----------------------------------------------------------------------------
+if has("mouse")
+    set mouse=a
+endif
+
+if has("clipboard")
+    try
+        set clipboard^=unnamedplus
+    catch
+        set clipboard^=unnamed
+    endtry
+endif
+
+" Fast toggle paste mode
+set pastetoggle=<F2>
+nnoremap <leader>pp :setlocal paste!<cr>
+
+" -----------------------------------------------------------------------------
+" 7. Window, Buffer & Tab Navigation
+" -----------------------------------------------------------------------------
+" Window navigation with Ctrl + hjkl
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Buffer navigation: next, prev, close
+nnoremap <leader>l :bnext<cr>
+nnoremap <leader>h :bprevious<cr>
+nnoremap <leader>bd :bdelete<cr>
+
+" Tab navigation
+nnoremap <leader>tn :tabnew<cr>
+nnoremap <leader>tc :tabclose<cr>
+nnoremap <leader>to :tabonly<cr>
+nnoremap <leader>tm :tabmove<cr>
+
+" -----------------------------------------------------------------------------
+" 8. Editing Helpers & Text Manipulation
+" -----------------------------------------------------------------------------
+" Remap 0 to first non-blank character
+nnoremap 0 ^
+
+" Move lines up and down with Alt-j / Alt-k
+nnoremap <M-j> :m .+1<cr>==
+nnoremap <M-k> :m .-2<cr>==
+vnoremap <M-j> :m '>+1<cr>gv=gv
+vnoremap <M-k> :m '<-2<cr>gv=gv
+
+" Return to last edit position on file open
+augroup RestoreCursor
+    autocmd!
+    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+augroup END
+
+" Strip trailing whitespace on save for code/text files
+function! CleanTrailingWhitespace()
+    let l:save = winsaveview()
+    keeppatterns %s/\s\+$//e
+    call winrestview(l:save)
+endfunction
+autocmd BufWritePre *.go,*.py,*.php,*.sh,*.js,*.ts,*.html,*.css,*.yaml,*.yml,*.md,*.txt call CleanTrailingWhitespace()
+
+" Remove Windows carriage return (^M)
+nnoremap <leader>m :%s/\r$//e<cr>
+
+" -----------------------------------------------------------------------------
+" 9. Prose & Spell Checking (Prose only, NOT global code)
+" -----------------------------------------------------------------------------
+set nospell
+autocmd FileType text,markdown,gitcommit setlocal spell
+nnoremap <leader>ss :setlocal spell!<cr>

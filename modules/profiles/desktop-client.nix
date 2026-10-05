@@ -48,6 +48,13 @@
     # Use the frieren pi-hole (100.97.61.65) as DNS server via Tailscale
     # This forces DNS to go through pi-hole even with MagicDNS enabled
     tailscale.extraUpFlags = [ "--dns=100.97.61.65" "--accept-dns=true" ];
+    # Accept the 192.168.3.0/24 subnet route frieren advertises so off-LAN
+    # clients reach the NAS (pdf.frieren.lan etc.). Declared via extraSetFlags
+    # because extraUpFlags only apply with authKeyFile (none of our hosts use
+    # one) — the boot-time `tailscale set` works on already-authenticated
+    # nodes. Tailscaled skips installing routes for subnets the machine is
+    # directly attached to, so LAN-resident hosts keep their native path.
+    tailscale.extraSetFlags = [ "--accept-routes=true" ];
     resolved.enable = true;
     resolved.settings.Resolve.Domains = [ "~.cloudforest-kardashev.ts.net" "~.fritz.box" "~." ];
   };

@@ -70,5 +70,13 @@
     home.sessionVariables = {
       AGY_CLI_DISABLE_AUTO_UPDATE = "true";
     };
+
+    # Antigravity standalone project fallback to avoid project store read failures
+    # when starting sessions without an explicit active workspace project.
+    home.file.".gemini/config/projects/outside-of-project.json".text = builtins.toJSON {
+      id = "outside-of-project";
+      name = "Outside of Project";
+      projectResources = { };
+    };
   };
 }

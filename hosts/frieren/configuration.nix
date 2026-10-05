@@ -53,6 +53,7 @@ in
     ./networking.nix
     ./ha-stack.nix
     ./infra-stack.nix
+    ./reverse-proxy.nix
     ../../modules/services/aria2-daemon.nix
     ../../modules/services/harmonia.nix
     ../../modules/profiles/nixbuild-client.nix
@@ -296,6 +297,13 @@ in
     '';
   };
 
+  # Universal path parity for fleet compatibility
+  fileSystems."/Volumes/data" = {
+    device = "/srv/data";
+    fsType = "none";
+    options = [ "bind" ];
+  };
+
   # Bind mounts for /export
   fileSystems."/export/data" = {
     device = "/srv/data";
@@ -315,6 +323,7 @@ in
 
   # Ensure directories exist
   systemd.tmpfiles.rules = [
+    "d /Volumes/data 0755 root root -"
     "d /srv/data 0755 root root -"
     "d /srv/data/downloads 0775 aria2 users -"
     "d /srv/private 0755 root root -"
@@ -325,6 +334,71 @@ in
     "d /export/public 0755 root root -"
     "d /srv/private/jellyfin 0755 jellyfin jellyfin -" # RESTORED
   ];
+
+  # Avahi / mDNS zero-conf service discovery across LAN
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+    publish = {
+      enable = true;
+      userServices = true;
+      addresses = true;
+      workstation = true;
+    };
+    extraServiceFiles = {
+      smb = ''
+        <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+        <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+        <service-group>
+          <name replace-wildcards="yes">frieren (Samba)</name>
+          <service>
+            <type>_smb._tcp</type>
+            <port>445</port>
+          </service>
+          <service>
+            <type>_device-info._tcp</type>
+            <port>0</port>
+            <txt-record>model=RackMac</txt-record>
+          </service>
+        </service-group>
+      '';
+      nfs = ''
+        <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+        <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+        <service-group>
+          <name replace-wildcards="yes">frieren (NFS)</name>
+          <service>
+            <type>_nfs._tcp</type>
+            <port>2049</port>
+            <txt-record>path=/export/data</txt-record>
+          </service>
+        </service-group>
+      '';
+      harmonia = ''
+        <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+        <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+        <service-group>
+          <name replace-wildcards="yes">frieren Nix Cache (Harmonia)</name>
+          <service>
+            <type>_nix-cache._tcp</type>
+            <port>5000</port>
+          </service>
+        </service-group>
+      '';
+      http = ''
+        <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+        <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+        <service-group>
+          <name replace-wildcards="yes">frieren Web Portal</name>
+          <service>
+            <type>_http._tcp</type>
+            <port>80</port>
+          </service>
+        </service-group>
+      '';
+    };
+  };
 
   # Firewall
   networking.firewall = {

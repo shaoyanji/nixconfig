@@ -62,6 +62,17 @@ in
   };
 
   config = {
-    environment.systemPackages = lightTools ++ lib.optionals cfg.enableHeavy heavyTools;
+    environment.systemPackages = lightTools ++ [ pkgs.plocate ] ++ lib.optionals cfg.enableHeavy heavyTools;
+
+    # --- Fast Filesystem Indexing (plocate) ---
+    services.locate = {
+      enable = true;
+      package = pkgs.plocate;
+      interval = "hourly";
+      localuser = "root";
+      pruneFS = [ "tmpfs" "proc" "sysfs" "devpts" ];
+      pruneNames = [ ".git" ".hg" ".svn" ".snapshots" ];
+      prunePaths = [ "/tmp" "/var/tmp" "/nix/store" "/.snapshots" ];
+    };
   };
 }

@@ -28,6 +28,9 @@ includes:
   lifecycle:
     taskfile: ./taskfiles/lifecycle.yml
     flatten: true
+  data:
+    taskfile: ./taskfiles/data.yml
+    flatten: true
 
 tasks:
   default:

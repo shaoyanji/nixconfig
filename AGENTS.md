@@ -489,6 +489,43 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 
 ---
 
+## qmd Search Operations
+
+Local hybrid search over markdown docs and notes via `qmd` (`pkgs.llm-agents.qmd`, installed fleet-wide). Two canonical collections:
+
+| Collection | Target Path | Content |
+|------------|-------------|---------|
+| `nixconfig` | `/srv/data/projects/nixconfig` (`~/Documents/nixconfig`) | This repo's documentation: README, AGENTS.md, runbooks, `docs/*`, `taskfiles/README.md` |
+| `vault` | `/Volumes/data/Obsidian-Git-Sync` (`~/vaults/personal`) | Personal Obsidian vault: zettels, schematics, notes |
+
+### Index lifecycle
+
+```bash
+task dev:qmd:refresh             # Register (if missing) and reindex both collections
+task dev:qmd:vault:refresh       # Reindex the Obsidian vault only
+task dev:qmd:docs:refresh        # Reindex nixconfig docs only
+task checks:qmd:docs             # Verify nixconfig collection registered + index fresh
+task checks:qmd:vault            # Verify vault collection registered + index fresh
+```
+
+The `checks:qmd:*` tasks exit 1 when a collection is missing or any `.md` file is newer than the index; run them after doc edits.
+
+### Querying
+
+```bash
+qmd search "impermanence disko" -c nixconfig   # repo docs only
+qmd search "zettel topic" -c vault             # vault only
+qmd search "query"                             # all collections
+qmd search "query" --json                      # agent-friendly output
+qmd get "#docid"                               # fetch a full document from search results
+qmd status                                     # index health and file counts
+qmd update                                     # incremental reindex (fast, BM25)
+```
+
+Prefer BM25 `qmd search` (instant); `qmd embed` (semantic vectors) is optional and slower. Prefer qmd over raw `grep` when locating concepts or runbooks across repo docs and the vault — it is ranked and collection-scoped.
+
+---
+
 ## Key Operator Helpers
 
 - `agents:menu` is the interactive operator control plane

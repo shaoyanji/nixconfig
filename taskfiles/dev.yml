@@ -255,9 +255,19 @@ tasks:
       - bash scripts/task/flake-transitive-sweep.sh update
 
   dev:qmd:refresh:
+    desc: (Re)index markdown docs (nixconfig repo and personal vault) into local qmd collections
+    cmds:
+      - bash scripts/task/qmd-docs-index.sh ensure all
+
+  dev:qmd:vault:refresh:
+    desc: (Re)index personal Obsidian vault into the local qmd collection
+    cmds:
+      - bash scripts/task/qmd-docs-index.sh ensure vault
+
+  dev:qmd:docs:refresh:
     desc: (Re)index this repo's markdown docs into the local qmd collection
     cmds:
-      - bash scripts/task/qmd-docs-index.sh ensure
+      - bash scripts/task/qmd-docs-index.sh ensure nixconfig
 
   dev:nixbuild:plan:
     desc: Report what would build/fetch for hosts against local substituters (read-only)
@@ -385,34 +395,8 @@ tasks:
       - cloak view {{.ACCOUNT}}
 
   dev:cloak:sync-bw:
-    desc: Import TOTP tokens from a Bitwarden unencrypted JSON export into cloak
+    desc: Automatically import and sync TOTP tokens from Bitwarden/Vaultwarden export into Cloak and SOPS
     cmds:
       - |
-        bw_export="${1:-bitwarden_export.json}"
-        if [ ! -f "$bw_export" ]; then
-          echo "Error: Bitwarden export file not found: $bw_export"
-          echo "Usage: task dev:cloak:sync-bw -- ./bitwarden_export.json"
-          echo ""
-          echo "Export from Bitwarden: Settings → Export → Unencrypted JSON (.json)"
-          exit 1
-        fi
-      - |
-        echo "=== Current cloak accounts ==="
-        sops -d modules/secrets.yaml 2>/dev/null | yq '.cloak' | grep -E '^\[.*\]$' | tr -d '[]' || echo "(empty)"
-      - |
-        echo "=== Importing from $bw_export ==="
-        # Convert BW JSON to cloak TOML
-        cloak_toml=$(./scripts/bw-to-cloak.sh "$bw_export")
-        if [ -z "$cloak_toml" ]; then
-          echo "Error: No TOTP entries found in export"
-          exit 1
-        fi
-        echo "$cloak_toml"
-        echo ""
-        echo "Accounts found: $(echo "$cloak_toml" | grep -cE '^\[.*\]$')"
-        echo ""
-        echo "To apply: update cloak via sops:"
-        echo "  sops modules/secrets.yaml --extract '[\"cloak\"]'"
-        echo ""
-        echo "Then paste the TOML output above and save."
-        echo "After applying, run: task dev:cloak:list"
+        bw_export="${1:-}"
+        ./scripts/bw-cloak-sync.sh ${bw_export:+"$bw_export"} --apply

@@ -20,7 +20,12 @@ tasks:
   checks:qmd:docs:
     desc: Check the nixconfig qmd docs collection exists and its index is fresh
     cmds:
-      - bash scripts/task/qmd-docs-index.sh check
+      - bash scripts/task/qmd-docs-index.sh check nixconfig
+
+  checks:qmd:vault:
+    desc: Check the Obsidian vault qmd collection exists and its index is fresh
+    cmds:
+      - bash scripts/task/qmd-docs-index.sh check vault
 
   checks:sops:drift:
     desc: Verify every sops file's embedded age recipients match .sops.yaml (catches un-rekeyed files)

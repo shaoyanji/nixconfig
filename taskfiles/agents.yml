@@ -5,7 +5,7 @@ tasks:
     desc: Interactive operator control plane menu
     cmds:
       - |
-        choice=$(printf '%s\n' bountystash envs dragoncourt serv00 moto rebuild edit-config update load browse new incus sudologinssh help status check deploy logs exit | gum choose)
+        choice=$(printf '%s\n' apps bountystash envs dragoncourt serv00 moto wishlist rebuild edit-config update load browse new incus sudologinssh help status check deploy logs exit | gum choose)
         if [ "$choice" = "moto" ]; then
           task moto:menu
         elif [ "$choice" = "serv00" ]; then
@@ -16,6 +16,10 @@ tasks:
           task envs:menu
         elif [ "$choice" = "bountystash" ]; then
           task bountystash:menu
+        elif [ "$choice" = "apps" ]; then
+          task apps:menu
+        elif [ "$choice" = "wishlist" ]; then
+          task wishlist
         else
           task "$choice"
         fi

@@ -10,6 +10,28 @@
       "deployTarget": "jisifu@vern.cc:~/public_html/",
       "previewBind": "127.0.0.1",
       "previewPort": 8000
+    },
+    "bountystash": {
+      "kind": "pages",
+      "description": "Bountystash 3D Spatial Systems Console (<14KB TCP budget)",
+      "buildCommand": "task bountystash:build",
+      "outputPath": "/Volumes/data/projects/bountystash-console/dist",
+      "previewBind": "127.0.0.1",
+      "previewPort": 3000
+    },
+    "dragoncourt": {
+      "kind": "apache-php",
+      "description": "Alwaysdata Debian web server (dragoncourt.alwaysdata.net)",
+      "buildCommand": "task dragoncourt:build",
+      "deployMethod": "rsync",
+      "deployTarget": "dragoncourt:~/www/"
+    },
+    "envs": {
+      "kind": "nginx-spa",
+      "description": "Envs.net Debian pubnix website (jisifu.envs.net)",
+      "buildCommand": "task envs:build",
+      "deployMethod": "rsync",
+      "deployTarget": "envs:~/public_html/"
     }
   }
 }

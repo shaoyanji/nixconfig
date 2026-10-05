@@ -55,6 +55,11 @@ tasks:
         scp -r "{{.MOTO_ALIAS}}:$SRC" "$DEST"
         echo "Transfer complete."
 
+  moto:status:
+    desc: Check moto device connection, uptime, and storage health
+    cmds:
+      - task: moto:info
+
   moto:info:
     desc: Query moto system health, uptime, and storage
     cmds:

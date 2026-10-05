@@ -106,6 +106,17 @@ tasks:
     cmds:
       - git stash pop
 
+  dev:vim:sync:
+    desc: Deploy canonical modules/config/vimrc to serv00, dragoncourt, and envs
+    cmds:
+      - |
+        for host in serv00 dragoncourt envs; do
+          echo "Syncing vimrc to $host..."
+          scp modules/config/vimrc "$host:~/.vimrc"
+          ssh "$host" "mkdir -p ~/.vim/undo && chmod 700 ~/.vim ~/.vim/undo && chmod 644 ~/.vimrc"
+        done
+        echo "✅ Unified vimrc deployed to all 3 remotes."
+
   dev:site:list:
     desc: List site deployment targets from manifest
     cmds:

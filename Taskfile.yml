@@ -31,6 +31,21 @@ includes:
   data:
     taskfile: ./taskfiles/data.yml
     flatten: true
+  moto:
+    taskfile: ./taskfiles/moto.yml
+    flatten: true
+  serv00:
+    taskfile: ./taskfiles/serv00.yml
+    flatten: true
+  dragoncourt:
+    taskfile: ./taskfiles/dragoncourt.yml
+    flatten: true
+  envs:
+    taskfile: ./taskfiles/envs.yml
+    flatten: true
+  bountystash:
+    taskfile: ./taskfiles/bountystash.yml
+    flatten: true
 
 tasks:
   default:

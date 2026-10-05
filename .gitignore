@@ -7,6 +7,7 @@ result
 result-*
 
 .codex
+.wrangler/
 .tmp/
 .tmp-xs-helper/
 tools/xs-materializer/xs-materializer

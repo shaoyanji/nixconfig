@@ -1,0 +1,139 @@
+version: "3"
+
+vars:
+  DRAGON_HOST: "ssh-dragoncourt.alwaysdata.net"
+  DRAGON_USER: "dragoncourt"
+  DRAGON_ALIAS: "dragoncourt"
+  DRAGON_DOMAIN: "dragoncourt.alwaysdata.net"
+  DRAGON_WWW: "/home/dragoncourt/www"
+
+tasks:
+  dragoncourt:ssh:
+    desc: Open interactive SSH shell into Alwaysdata host
+    cmds:
+      - ssh {{.DRAGON_ALIAS}}
+
+  dragoncourt:exec:
+    desc: Run command on Alwaysdata via SSH (agent-friendly)
+    cmds:
+      - ssh {{.DRAGON_ALIAS}} -- {{.CLI_ARGS}}
+
+  dragoncourt:status:
+    desc: Health check on Alwaysdata website (https://dragoncourt.alwaysdata.net)
+    cmds:
+      - |
+        echo "=== HTTP Health Check (https://{{.DRAGON_DOMAIN}}) ==="
+        curl -Is https://{{.DRAGON_DOMAIN}} | head -n 6
+        echo ""
+        echo "=== Disk & Home Directory Usage ==="
+        ssh {{.DRAGON_ALIAS}} "df -h /home/{{.DRAGON_USER}}"
+
+  dragoncourt:build:
+    desc: Rebuild static/Comrak templates in ~/www
+    cmds:
+      - |
+        ssh {{.DRAGON_ALIAS}} "
+          if [ -f {{.DRAGON_WWW}}/build.sh ]; then
+            cd {{.DRAGON_WWW}} && bash build.sh
+            echo 'Build script executed successfully.'
+          else
+            echo 'No build.sh found in {{.DRAGON_WWW}}.'
+          fi
+        "
+
+  dragoncourt:push:
+    desc: Upload file to Alwaysdata (defaults to ~/www/)
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task dragoncourt:push -- <local_file> [remote_dest]"
+          echo "Example: task dragoncourt:push -- index.md www/home/"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="www/"
+        fi
+        echo "Pushing $SRC -> {{.DRAGON_ALIAS}}:$DEST ..."
+        scp -r "$SRC" "{{.DRAGON_ALIAS}}:$DEST"
+        echo "Transfer complete."
+
+  dragoncourt:pull:
+    desc: Download file from Alwaysdata (e.g. task dragoncourt:pull -- www/index.php [dest])
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task dragoncourt:pull -- <remote_file> [local_dest]"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="."
+        fi
+        echo "Pulling {{.DRAGON_ALIAS}}:$SRC -> $DEST ..."
+        scp -r "{{.DRAGON_ALIAS}}:$SRC" "$DEST"
+        echo "Transfer complete."
+
+  dragoncourt:info:
+    desc: Query Alwaysdata Debian system info, PHP/Node/Go versions, and quota
+    cmds:
+      - |
+        echo "=== System & OS ==="
+        ssh {{.DRAGON_ALIAS}} "uname -a; cat /etc/os-release | grep PRETTY_NAME"
+        echo ""
+        echo "=== Installed Runtimes ==="
+        ssh {{.DRAGON_ALIAS}} "php -v | head -n 1; node -v; python3 --version; go version 2>/dev/null || true"
+        echo ""
+        echo "=== Webroot Files (www/) ==="
+        ssh {{.DRAGON_ALIAS}} "ls -lh ~/www"
+
+  dragoncourt:menu:
+    desc: Interactive Charmbracelet Gum / Wish menu for Alwaysdata host
+    cmds:
+      - |
+        action=$(printf '%s\n' \
+          "ssh: Connect to Alwaysdata shell" \
+          "status: Check https://{{.DRAGON_DOMAIN}} health" \
+          "build: Run build.sh in ~/www" \
+          "info: System info & runtimes" \
+          "push: Upload file to Alwaysdata (www/)" \
+          "pull: Download file from Alwaysdata" \
+          "wishlist: Open Wishlist SSH directory" \
+          "exit: Quit" | gum choose --header "🐉 Dragoncourt Alwaysdata Menu")
+
+        case "$action" in
+          "ssh"*)
+            task dragoncourt:ssh
+            ;;
+          "status"*)
+            task dragoncourt:status
+            ;;
+          "build"*)
+            task dragoncourt:build
+            ;;
+          "info"*)
+            task dragoncourt:info
+            ;;
+          "push"*)
+            filepath=$(gum input --placeholder "Path to local file to upload:")
+            if [ -n "$filepath" ]; then
+              task dragoncourt:push -- "$filepath"
+            fi
+            ;;
+          "pull"*)
+            remotepath=$(gum input --placeholder "Path to remote file on Alwaysdata:")
+            if [ -n "$remotepath" ]; then
+              task dragoncourt:pull -- "$remotepath"
+            fi
+            ;;
+          "wishlist"*)
+            nix-shell -p wishlist --run wishlist
+            ;;
+          *)
+            echo "Exited."
+            ;;
+        esac

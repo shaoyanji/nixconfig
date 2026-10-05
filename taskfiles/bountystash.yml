@@ -1,0 +1,124 @@
+version: "3"
+
+vars:
+  BOUNTY_DIR: "/Volumes/data/projects/bountystash-console"
+  PROJECT_NAME: "cv-resume"
+
+tasks:
+  bountystash:login:
+    desc: Authenticate Wrangler with Cloudflare via OAuth device flow
+    cmds:
+      - nix-shell -p wrangler --run "wrangler login --device"
+
+  bountystash:whoami:
+    desc: Display currently authenticated Cloudflare account
+    cmds:
+      - nix-shell -p wrangler --run "wrangler whoami"
+
+  bountystash:build:
+    desc: Compile modern brutalist console & validate 14KB TCP envelope
+    cmds:
+      - nix-shell -p nodejs --run "cd {{.BOUNTY_DIR}} && node scripts/build.js"
+
+  bountystash:preview:
+    desc: Launch zero-dependency local preview server on http://localhost:3000
+    cmds:
+      - nix-shell -p nodejs --run "cd {{.BOUNTY_DIR}} && npm run preview"
+
+  bountystash:dev:
+    desc: Local Cloudflare Edge emulation server via wrangler pages dev
+    cmds:
+      - task: bountystash:build
+      - nix-shell -p wrangler --run "cd {{.BOUNTY_DIR}} && wrangler pages dev dist"
+
+  bountystash:deploy:preview:
+    desc: Deploy preview branch to Cloudflare Pages (generates unique URL)
+    cmds:
+      - task: bountystash:build
+      - nix-shell -p wrangler --run "cd {{.BOUNTY_DIR}} && wrangler pages deploy dist --project-name={{.PROJECT_NAME}} --branch=preview"
+
+  bountystash:deploy:prod:
+    desc: Deploy live production to Cloudflare Pages (bountystash.com)
+    cmds:
+      - task: bountystash:build
+      - nix-shell -p wrangler --run "cd {{.BOUNTY_DIR}} && wrangler pages deploy dist --project-name={{.PROJECT_NAME}} --branch=main"
+
+  bountystash:projects:
+    desc: List all Cloudflare Pages projects in account
+    cmds:
+      - nix-shell -p wrangler --run "wrangler pages project list"
+
+  bountystash:git:pull:
+    desc: Pull latest design updates from GitHub (shaoyanji/bountystash-console)
+    cmds:
+      - git -C {{.BOUNTY_DIR}} pull --ff-only
+
+  bountystash:git:push:
+    desc: Push commits to GitHub (triggers interactive Cloudflare deploy nudge)
+    cmds:
+      - git -C {{.BOUNTY_DIR}} push origin main
+
+  bountystash:git:status:
+    desc: Check git status of local bountystash-console
+    cmds:
+      - git -C {{.BOUNTY_DIR}} status -s
+
+  bountystash:hook:install:
+    desc: Install git pre-push Cloudflare deploy nudge hook in bountystash-console
+    cmds:
+      - cp {{.BOUNTY_DIR}}/scripts/pre-push.sh {{.BOUNTY_DIR}}/.git/hooks/pre-push
+      - chmod +x {{.BOUNTY_DIR}}/.git/hooks/pre-push
+      - echo "Installed .git/hooks/pre-push successfully."
+
+  bountystash:menu:
+    desc: Interactive Charmbracelet Gum menu for Bountystash Console operations
+    cmds:
+      - |
+        action=$(printf '%s\n' \
+          "build: Compile 14KB brutalist console (dist/index.html)" \
+          "preview: Run zero-dependency local preview (port 3000)" \
+          "dev: Cloudflare Edge emulation (wrangler pages dev)" \
+          "deploy:preview: Deploy preview branch to Cloudflare Pages" \
+          "deploy:prod: Deploy live production to bountystash.com" \
+          "projects: List Cloudflare Pages projects" \
+          "git:pull: Pull updates from GitHub" \
+          "git:push: Push commits to GitHub (with Cloudflare nudge)" \
+          "whoami: Check Cloudflare authentication status" \
+          "login: Authenticate Wrangler via device OAuth" \
+          "exit: Quit" | gum choose --header "💰 Bountystash Console Control Plane")
+
+        case "$action" in
+          "build"*)
+            task bountystash:build
+            ;;
+          "preview"*)
+            task bountystash:preview
+            ;;
+          "dev"*)
+            task bountystash:dev
+            ;;
+          "deploy:preview"*)
+            task bountystash:deploy:preview
+            ;;
+          "deploy:prod"*)
+            task bountystash:deploy:prod
+            ;;
+          "projects"*)
+            task bountystash:projects
+            ;;
+          "git:pull"*)
+            task bountystash:git:pull
+            ;;
+          "git:push"*)
+            task bountystash:git:push
+            ;;
+          "whoami"*)
+            task bountystash:whoami
+            ;;
+          "login"*)
+            task bountystash:login
+            ;;
+          *)
+            echo "Exited."
+            ;;
+        esac

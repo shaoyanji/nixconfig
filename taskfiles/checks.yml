@@ -52,3 +52,22 @@ tasks:
     cmds:
       - task --list-all
       - git status --short
+
+  checks:remotes:
+    desc: Comprehensive security and health audit across all external remote servers (serv00, dragoncourt, envs)
+    cmds:
+      - echo "=========================================="
+      - echo ">>> [1/3] Serv00 FreeBSD Security & Health Audit <<<"
+      - echo "=========================================="
+      - task serv00:audit
+      - echo ""
+      - echo "=========================================="
+      - echo ">>> [2/3] Dragoncourt Alwaysdata Debian Audit <<<"
+      - echo "=========================================="
+      - task dragoncourt:audit
+      - echo ""
+      - echo "=========================================="
+      - echo ">>> [3/3] Envs.net Debian Pubnix Audit <<<"
+      - echo "=========================================="
+      - task envs:audit
+

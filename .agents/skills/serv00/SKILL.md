@@ -26,6 +26,11 @@ Control and manage the Serv00 FreeBSD host (`s13.serv00.com`), Devil CLI configu
 | `task serv00:server:stop` | Stop background webserver process |
 | `task serv00:server:restart` | Restart background webserver |
 | `task serv00:server:build` | Recompile `server.go` on FreeBSD using Go 1.24 |
+| `task serv00:audit` | Comprehensive health, limits, daemon and permissions audit |
+| `task serv00:harden` | Enforce strict permissions (domains 750, SSH 700/600, logs 600) |
+| `task serv00:limits` | Check resource quotas (RAM 512MB, processes, disk) via `devil info limits` |
+| `task serv00:logs` | Tail webserver supervisor log (`~/webserver.log`) |
+| `task serv00:backup` | Download compressed tarball of server code and domains |
 | `task serv00:cron:enable` | Install keep-alive cron job to ensure 24/7 webserver uptime |
 | `task serv00:cron:disable` | Remove keep-alive cron job |
 | `task serv00:ports` | List reserved TCP/UDP ports via `devil port list` |

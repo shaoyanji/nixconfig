@@ -23,6 +23,10 @@ Control and manage the Envs.net Debian pubnix host (`envs.net`) and web/gemini s
 | `task envs:ssh` | Interactive SSH shell into Envs.net host |
 | `task envs:exec -- "<cmd>"` | Execute command non-interactively on Envs.net (agent-friendly) |
 | `task envs:status` | Health check on `https://jisifu.envs.net` & disk usage |
+| `task envs:audit` | Comprehensive health, active sessions, web HTTP, and permissions audit |
+| `task envs:harden` | Enforce strict permissions on pubnix (SSH 700/600, public_html 750) |
+| `task envs:clean` | Clean stale vim undo files (`.un~`) and temporary caches |
+| `task envs:backup` | Download compressed tarball of markdown content and gemini capsules |
 | `task envs:build` | Rebuild JSON, validate tags, export SRS & generate SPA routes in `~/public_html` |
 | `task envs:validate` | Validate equation schemas and HTML tag balance |
 | `task envs:test` | Run PHP test suite (`test.php`) in `~/public_html` |

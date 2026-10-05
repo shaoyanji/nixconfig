@@ -91,6 +91,61 @@ tasks:
         echo "=== Webroot Files (www/) ==="
         ssh {{.DRAGON_ALIAS}} "ls -lh ~/www"
 
+  dragoncourt:harden:
+    desc: Enforce secure permissions on Alwaysdata (~/.ssh, ~/www, ~/.local/bin)
+    cmds:
+      - |
+        ssh {{.DRAGON_ALIAS}} "
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/authorized_keys 2>/dev/null || true
+          chmod 750 ~/www
+          chmod 750 ~/.local/bin 2>/dev/null || true
+          echo '✅ Alwaysdata permissions hardened (SSH 700/600, www 750).'
+        "
+
+  dragoncourt:audit:
+    desc: Comprehensive health and security audit of Alwaysdata host
+    cmds:
+      - |
+        echo "=== 1. System & Uptime ==="
+        ssh {{.DRAGON_ALIAS}} "uname -a; uptime"
+        echo ""
+        echo "=== 2. Disk Quota & Usage ==="
+        ssh {{.DRAGON_ALIAS}} "df -h /home/{{.DRAGON_USER}}"
+        echo ""
+        echo "=== 3. Web Service HTTP Status ==="
+        curl -Is https://{{.DRAGON_DOMAIN}} | head -n 8
+        echo ""
+        echo "=== 4. Permissions Audit ==="
+        ssh {{.DRAGON_ALIAS}} "ls -ld ~/.ssh ~/.ssh/* ~/www ~/.local/bin 2>/dev/null"
+
+  dragoncourt:logs:
+    desc: Tail live Apache HTTP access/error logs from ~/admin/logs/sites/
+    cmds:
+      - |
+        ssh {{.DRAGON_ALIAS}} "
+          YEAR=\$(date +%Y)
+          TODAY=\$(date +%Y-%m-%d)
+          LOGFILE=~/admin/logs/sites/\$YEAR/sites-\$TODAY.log
+          if [ -f \$LOGFILE ]; then
+            tail -n 50 -f \$LOGFILE
+          else
+            tail -n 50 -f \$(ls -t ~/admin/logs/sites/\$YEAR/sites-*.log 2>/dev/null | head -n 1)
+          fi
+        "
+
+  dragoncourt:backup:
+    desc: Download compressed backup of Alwaysdata webroot (~/www)
+    cmds:
+      - |
+        BACKUP_FILE="dragoncourt-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+        echo "Creating remote archive..."
+        ssh {{.DRAGON_ALIAS}} "tar -czf ~/$BACKUP_FILE --exclude='*.log' ~/www 2>/dev/null || true"
+        echo "Downloading $BACKUP_FILE..."
+        scp {{.DRAGON_ALIAS}}:~/$BACKUP_FILE ./
+        ssh {{.DRAGON_ALIAS}} "rm -f ~/$BACKUP_FILE"
+        echo "Backup saved locally to ./$BACKUP_FILE"
+
   dragoncourt:menu:
     desc: Interactive Charmbracelet Gum / Wish menu for Alwaysdata host
     cmds:
@@ -98,6 +153,10 @@ tasks:
         action=$(printf '%s\n' \
           "ssh: Connect to Alwaysdata shell" \
           "status: Check https://{{.DRAGON_DOMAIN}} health" \
+          "audit: Security, quota & permissions audit" \
+          "harden: Enforce 700/600 permissions" \
+          "logs: Tail live Apache HTTP logs" \
+          "backup: Download full ~/www backup tarball" \
           "build: Run build.sh in ~/www" \
           "info: System info & runtimes" \
           "push: Upload file to Alwaysdata (www/)" \
@@ -111,6 +170,18 @@ tasks:
             ;;
           "status"*)
             task dragoncourt:status
+            ;;
+          "audit"*)
+            task dragoncourt:audit
+            ;;
+          "harden"*)
+            task dragoncourt:harden
+            ;;
+          "logs"*)
+            task dragoncourt:logs
+            ;;
+          "backup"*)
+            task dragoncourt:backup
             ;;
           "build"*)
             task dragoncourt:build

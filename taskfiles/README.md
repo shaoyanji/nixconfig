@@ -22,6 +22,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/dragoncourt.yml` – Alwaysdata Debian hosting, PHP/Wasm webserver (dragoncourt.alwaysdata.net), and Gum menu
 - `taskfiles/envs.yml` – Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline (jisifu.envs.net), and Gum menu
 - `taskfiles/bountystash.yml` – Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment, and Gum menu
+- `taskfiles/apps.yml` – Job application workflow via `bin/appflow` (status updates, email radar, Typst builds, three-way sync, GitHub push/pull)
 - `taskfiles/services-core.yml` – minimal compatibility wrappers
 - `taskfiles/services-legacy.yml` – deprecated aliases (marked `[deprecated]`)
 
@@ -40,6 +41,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - Alwaysdata Debian hosting & webserver → `taskfiles/dragoncourt.yml` (`dragoncourt:*`)
 - Envs.net Debian hosting & webserver → `taskfiles/envs.yml` (`envs:*`)
 - Bountystash Console & Cloudflare Pages → `taskfiles/bountystash.yml` (`bountystash:*`)
+- Job application pipeline, email flow & sync → `taskfiles/apps.yml` (`apps:*`)
 - Legacy compatibility → `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml`
 
 ## What not to assume

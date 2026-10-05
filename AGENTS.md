@@ -490,6 +490,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 | `dragoncourt:*` | Alwaysdata Debian hosting, PHP/Wasm webserver | `.agents/skills/dragoncourt/SKILL.md` |
 | `envs:*` | Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline | `.agents/skills/envs/SKILL.md` |
 | `bountystash:*` | Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment | `.agents/skills/bountystash/SKILL.md` |
+| `apps:*` | Job application workflow (appflow): status updates, email flow, sync, builds | `.agents/skills/apps/SKILL.md` |
 | `services:*` | Legacy wrappers (canonical: `infra:*`) | `.agents/skills/services/SKILL.md` |
 
 ---

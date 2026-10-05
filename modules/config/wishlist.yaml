@@ -1,0 +1,39 @@
+endpoints:
+  - name: moto
+    hostname: 100.91.87.86
+    port: 8022
+    user: u0_301
+    desc: "Motorola Phone (Termux / Android)"
+
+  - name: frieren
+    hostname: 100.97.61.65
+    user: devji
+    desc: "Frieren NAS Server"
+
+  - name: netbook
+    hostname: 100.72.110.107
+    user: alice
+    desc: "Netbook"
+
+  - name: kali
+    hostname: 100.108.46.118
+    user: devji
+    desc: "Kali Linux ARM"
+
+  - name: serv00
+    hostname: s13.serv00.com
+    user: jisifu
+    port: 22
+    desc: "Serv00 FreeBSD Web Server (jisifu.serv00.net)"
+
+  - name: dragoncourt
+    hostname: ssh-dragoncourt.alwaysdata.net
+    user: dragoncourt
+    port: 22
+    desc: "Alwaysdata Debian Web Server (dragoncourt.alwaysdata.net)"
+
+  - name: envs
+    hostname: envs.net
+    user: jisifu
+    port: 22
+    desc: "Envs.net Debian Server (jisifu.envs.net)"

@@ -4,52 +4,67 @@ vars:
   APPS_DIR: "/srv/data/projects/antigravity-application-workflow"
   APPS_BIN: "{{.APPS_DIR}}/bin/appflow"
   APPS_DATA: "{{.APPS_DIR}}/data/applications.json"
+  # uv is configured with downloads=never on this fleet and python3 is not
+  # on the base PATH, so uv-backed appflow commands run inside a python3
+  # nix-shell (same pattern as taskfiles/bountystash.yml).
+  APPS_RUN: "nix-shell -p python3 --run"
 
 tasks:
   apps:list:
     desc: List tracked job applications
     cmds:
-      - "{{.APPS_BIN}} list {{.CLI_ARGS}}"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} list {{.CLI_ARGS}}\""
 
   apps:search:
     desc: Search applications by company, role, ID, or keywords
     cmds:
-      - "{{.APPS_BIN}} search {{.CLI_ARGS}}"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} search {{.CLI_ARGS}}\""
 
   apps:get:
     desc: View full details of one application record
     cmds:
-      - "{{.APPS_BIN}} get {{.CLI_ARGS}}"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} get {{.CLI_ARGS}}\""
 
   apps:update:
     desc: Update application status or notes (e.g. task apps:update -- <id> --status Applied)
     cmds:
-      - "{{.APPS_BIN}} update {{.CLI_ARGS}}"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} update {{.CLI_ARGS}}\""
 
   apps:overview:
-    desc: Pipeline summary - application counts per status
+    desc: Pipeline summary - coarse stage counts (Applied, Rejected, Interview, ...)
     cmds:
-      - jq -r 'group_by(.status)[] | "\(.[0].status)\t\(length)"' "{{.APPS_DATA}}"
+      - |
+        jq -r '
+          def stage:
+            if test("Interview|Trial|Warteliste") then "Interview/Pending"
+            elif test("^Rejected") then "Rejected"
+            elif test("^Applied") then "Applied"
+            elif test("^Lead|Rezi") then "Lead"
+            elif test("Screening|Follow-up Required") then "Screening"
+            elif test("Draft|packet|Packet|JD") then "Prep"
+            else "Other" end;
+          group_by(.status | stage)[] | "\(.[0].status | stage)\t\(length)"
+        ' "{{.APPS_DATA}}" | sort
 
   apps:emails:
     desc: Run inbound Himalaya email radar and sync application statuses
     cmds:
-      - "{{.APPS_BIN}} emails {{.CLI_ARGS}}"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} emails {{.CLI_ARGS}}\""
 
   apps:followups:
     desc: View drafted recruiter follow-up notes (--copy <id> for clipboard)
     cmds:
-      - "{{.APPS_BIN}} followups {{.CLI_ARGS}}"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} followups {{.CLI_ARGS}}\""
 
   apps:build:
     desc: Compile Typst resumes/cover letters to dist/ (no args = --all)
     cmds:
-      - "{{.APPS_BIN}} build {{.CLI_ARGS}}"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} build {{.CLI_ARGS}}\""
 
   apps:audit:
     desc: QA layout, page budget, and orphan line audit on dist/
     cmds:
-      - "{{.APPS_BIN}} audit"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} audit\""
 
   apps:query:
     desc: Read-only SQL against applications.db (e.g. task apps:query -- "select ...")
@@ -59,17 +74,17 @@ tasks:
   apps:sync:status:
     desc: Check JSON <-> SQLite <-> GitHub synchronization state
     cmds:
-      - "{{.APPS_BIN}} status"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} status\""
 
   apps:sync:push:
     desc: Reconcile JSON (source of truth) into DB/CSV, commit data, push to GitHub
     cmds:
-      - "{{.APPS_BIN}} push"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} push\""
 
   apps:sync:pull:
     desc: Pull remote application changes from GitHub and reconcile locally
     cmds:
-      - "{{.APPS_BIN}} pull"
+      - "{{.APPS_RUN}} \"{{.APPS_BIN}} pull\""
 
   apps:git:status:
     desc: Raw git status of the antigravity-application-workflow checkout

@@ -84,9 +84,26 @@ in
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
-    extraUpFlags = [
-      "--dns=100.97.61.65"
-      "--accept-dns=true"
+    # Accept DNS config pushed by the tailnet (pi-hole at frieren, once set
+    # as a global nameserver in the Tailscale admin console).  Declared via
+    # extraSetFlags because extraUpFlags only apply when authKeyFile is set
+    # (eisen authenticates interactively) — the boot-time `tailscale set`
+    # works on already-authenticated nodes.  The previous extraUpFlags entry
+    # "--dns=100.97.61.65" never applied: that flag does not exist on this
+    # tailscale version.
+    extraSetFlags = [ "--accept-dns=true" ];
+  };
+
+  # Pi-hole DNS via the tailnet: resolve through frieren's FTL (its
+  # 100.97.61.65 tailnet address) with the router as fallback so name
+  # resolution survives a frieren/tailnet outage.  Tradeoff: resolved
+  # queries all listed servers, so the router also answers when the pi-hole
+  # is up — ad-blocking is best-effort, not absolute.
+  services.resolved = {
+    enable = true;
+    settings.Resolve.DNS = [
+      "100.97.61.65"
+      "192.168.3.1"
     ];
   };
 

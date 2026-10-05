@@ -16,19 +16,17 @@
       host(s) and rebuild. Verify: `nix eval` of `config.nix.buildMachines`,
       `ssh eu.nixbuild.net echo ok`, then `task dev:nixbuild:plan` and
       `task dev:nixbuild:warm` (mind the 25 build-h/month free tier).
-3. **frieren follow-up queue** (from the 2026-09-29 service review):
-   - Add `services.postgresql.backup` (pg_dump) for Immich's DB and include
-     the dump dir in the restic job — `/var/lib/postgresql` is deliberately
-     excluded from `infra-stack.nix` (hot data-dir copies are not consistent).
-   - MQTT hardening: when real devices arrive, switch mosquitto from the
-     loopback-anonymous listener to an authenticated LAN listener with
-     passwordFile via sops (see `hosts/frieren/ha-stack.nix` header).
-   - restic hardening: move `/root/.restic-password` into sops and add an
-     offsite repository target (B2/rest-server) alongside the local one.
-   - When a Zigbee coordinator dongle is attached: set
-     `services.zigbee2mqtt.settings.serial.port` from `/dev/serial/by-id`.
-   - Cheap resilience win: battery-as-UPS sensor for frieren in HA via the
-     already-enabled `command_line` integration (`/sys/class/power_supply`).
+3. **frieren follow-up queue** (2026-10-05 updates):
+   - [x] **PostgreSQL automated backups**: Added `services.postgresqlBackup` for Immich's DB scheduled at 03:00 to `/srv/backup/postgresql` and added the dump directory to `services.restic.backups.frieren-local.paths` in `hosts/frieren/infra-stack.nix`.
+   - [x] **Cheap resilience win (Battery-as-UPS)**: Added `command_line` sensors to Home Assistant in `hosts/frieren/media-stack.nix` tracking `BAT0` capacity, charging status, and `ADP0` AC online status.
+   - [x] **Universal Path Parity (`/Volumes/data`)**: Added `/Volumes/data` bind mount to `/srv/data` in `hosts/frieren/configuration.nix`, fixing local broken `~/Documents/nixconfig` symlink and all Home Manager storage paths.
+   - [x] **Zero-conf LAN Discovery**: Configured `services.avahi` with `publish.enable = true` and `extraServiceFiles` for SMB, NFS, Harmonia cache, and Web portal so frieren appears automatically in macOS Finder and Linux file browsers.
+   - [x] **Unified Reverse Proxy & Local DNS**: Added `hosts/frieren/reverse-proxy.nix` with Nginx virtual hosts on port 80 for `*.frieren.lan` (`photos`, `docs`, `media`, `ha`, `cache`, `pdf`, `status`, `smart`, `aria`) with landing portal, mapped via Pi-hole dnsmasq wildcard in `hosts/frieren/dns.nix`.
+   - [x] **Automated Storage Indexing**: Added `services.locate` (`plocate`) in `hosts/frieren/tools.nix` for hourly fast filesystem indexing of `/srv/data`.
+   - [x] **24/7 Remote Operator Gateway**: Enabled `antigravity-cli remote-control` as a persistent user service (`antigravity-cli-daemon.service`) with user linger enabled for `devji`. Running 24/7 under instance name `frieren-lunar-rocket` on https://antigravity.google.com. Fixed headless authorization code stdin failure by injecting `SSH_CLIENT` environment markers for file-based token storage and creating `~/.gemini/config/projects/outside-of-project.json`.
+   - [ ] MQTT hardening: when real devices arrive, switch mosquitto from the loopback-anonymous listener to an authenticated LAN listener with passwordFile via sops (see `hosts/frieren/ha-stack.nix` header).
+   - [ ] restic hardening: move `/root/.restic-password` into sops and add an offsite repository target (B2/rest-server) alongside the local one.
+   - [ ] When a Zigbee coordinator dongle is attached: set `services.zigbee2mqtt.settings.serial.port` from `/dev/serial/by-id`.
 
 ## Fleet Optimizations (2026-10-01 review)
 1. [x] **Local binary cache on frieren.** Run `harmonia` (signed, port 5000)

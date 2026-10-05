@@ -228,10 +228,21 @@ task dev:flake:update:bountystash # Update single input
 task dev:flake:update-transitive # Update transitive inputs a root update misses
 task dev:nixbuild:plan           # Report build/fetch gaps per host vs substituters
 task dev:nixbuild:warm           # Build gaps on remote builder + cachix push (budget!)
-task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
+task dev:qmd:refresh             # (Re)index markdown docs (repo docs + personal vault) into qmd
+task dev:qmd:vault:refresh       # (Re)index personal Obsidian vault into qmd
 ```
 
 **Git pre/post hooks auto-run** — `dev:git:prehook` refreshes Taskfile.yml from encrypted secrets; `dev:git:posthook` pushes.
+
+### Data & Storage Lifecycle
+
+```bash
+task data:audit                  # Audit NAS storage taxonomy, permissions, media hygiene
+task data:clean:metadata         # Scan and remove macOS metadata artifacts (._*, .DS_Store)
+task data:clean:downloads        # Cleanup orphaned control files and empty staging dirs
+task data:protect:private        # Enforce 0700 permissions and .nomedia shields
+task data:index:refresh          # Refresh qmd docs and vault search indices
+```
 
 ### Validation
 
@@ -239,6 +250,7 @@ task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 task checks:quick                # Quick eval + host-architecture check + nix lint
 task checks:flake:transitive     # Sweep transitive flake pins vs upstream (read-only)
 task checks:qmd:docs             # qmd repo-docs collection registered + index fresh
+task checks:qmd:vault            # qmd Obsidian vault collection registered + index fresh
 nix eval .#nixosConfigurations.<host>.config.networking.hostName  # Quick eval check
 nix build .#checks.x86_64-linux.host-architecture -L              # Host architecture validation
 nix flake check                  # Full evaluation (slower, catches everything)
@@ -324,6 +336,52 @@ nix build .#devShells.x86_64-linux.default                                   # E
 nixpkgs-fmt <file>                                                           # Format Nix file
 nixpkgs-fmt --check <file>                                                   # Check formatting
 ```
+
+---
+
+## Network Storage Taxonomy & Media Server Architecture
+
+The persistent network storage is hosted on the primary 24/7 server `frieren` at `/srv/data` and mounted across the fleet at `/Volumes/data` via NFS (`modules/profiles/nas-client.nix`).
+
+### Canonical Storage Layout
+
+| Path (`/srv/data/` / `/Volumes/data/`) | Role & Purpose | Indexing & Access Policy |
+|---------------------------------------|----------------|--------------------------|
+| `arr/` | Movies and TV series | **Indexed by Jellyfin & Plex**. Strictly clean video containers (`.mkv`, `.mp4`). No archives, software installers, or ISOs. |
+| `media/` | Primary media library mirror | Legacy and direct media storage. |
+| `software/` | Software installers, desktop utilities, fonts, tools | **Unindexed**. Contains `software/torrents/` (software downloads moved out of `arr/`) shielded with `.nomedia` and `.plexignore` to prevent media scanner probe failures. |
+| `books/` | Books, papers, theses, comics | Unindexed by video media servers; indexed by document search (`qmd`). Organized into `programming/`, `philosophy/`, `ai/`, `science/`, `comics/`. |
+| `isos/` | Operating system images and installers | Linux (`arch`, `nixos`, `ubuntu`, `fedora`), appliances (`opnsense`, `openwrt`), and Raspberry Pi images. |
+| `german/` | Language learning materials | Organized into `books/`, `audio/`, and `notes/`. |
+| `devices/` | Device firmwares and recovery ROMs | Hardware payloads (e.g. OnePlus 6 recovery tools). |
+| `projects/` | Cloned git repositories and source projects | Active code checkouts (e.g. `nixconfig`, `bountystash-web`, `gpt2099.nu`). |
+| `bin-x86/`, `bin-aarch64/`, `bin-script/` | Lazily served standalone binaries & scripts | Accessible directly across the fleet over NFS/HTTP without building Nix derivations. |
+| `appimages/` | Lazily served AppImages | Portable Linux applications served across the network. |
+| `downloads/` | Active aria2 RPC staging directory | Permissions `0775 aria2:users`. Kept clean as an ephemeral staging area; finished downloads are sorted to their target taxonomy folder. |
+| `p/zhuomin` | User's father's archives | **Private**: Permissions strictly enforced at `0700 devji:users`. Preserved intact for private review. Shielded with `.nomedia`. |
+| `p/ppp` | User's private adult stash | **Private**: Permissions `0700 devji:users`. Fully shielded with `.nomedia` and `.plexignore` so Jellyfin/Plex do not scan it. |
+| `p/web` | Backward-compatibility symlink | Symlink pointing to `/srv/data/projects/bountystash-web`. |
+| `security/` | Credentials, recovery keys, certificates | **Restricted**: Permissions strictly `0700 devji:users` (`0600` for private files). Never exposed to network guests. |
+| `storage/` | Backward-compatibility symlink | Points to `.` (the data root) so legacy paths like `/Volumes/data/storage/...` resolve seamlessly. |
+
+### Media Server Isolation Rules
+
+- **Jellyfin and Plex libraries**: Point to `/srv/data/arr` and `/srv/data/media`.
+- **The Probe Failure Trap**: Media scanners invoke `ffprobe` on all files within indexed trees. When non-media files (e.g., Windows ISOs, Mathematica binaries, zip archives) exist in `arr/`, the scanner crashes with recurring probe exceptions.
+- **Enforcement**:
+  1. Only video and subtitle files (`.mkv`, `.mp4`, `.srt`, etc.) belong in `arr/`.
+  2. Software torrents and non-media data are isolated in `software/torrents/` or `books/`.
+  3. Directories that should never be indexed must contain `.nomedia` and `.plexignore` sentinel files.
+  4. Run `task data:audit` to verify media hygiene.
+
+### Security Directory & Key Fallback Architecture
+
+- **SOPS as Canonical Truth**: All primary secrets, API tokens, and user credentials reside in `modules/secrets.yaml` (and `modules/secrets/apikeys.yaml`).
+- **Cloak (TOTP)**: Fully integrated into `modules/secrets.yaml` under `.cloak`. Managed with `task dev:cloak:*`.
+- **Master Key (`id_ed25519`)**: Kept at `0600` inside `security/` (protected by `0700` directory permissions) and encrypted as `id_ed25519.age` using fleet age keys (`frieren`, `devji`, `poseidon`).
+- **Universal NuShell Fallback (`gist.nu`)**:
+  - Dynamically searches for `apikeys.yaml` in standard workspace locations (`~/Documents/nixconfig`, `/srv/data/nixconfig`) and decrypts via `sops`.
+  - Automatically discovers age identities (`~/.config/sops/age/keys.txt`, `~/.ssh/id_ed25519`, or local security keys) for transparent decryption.
 
 ---
 
@@ -426,6 +484,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 | `agents:*` | Operator menu, xs, OAuth | `.agents/skills/agents/SKILL.md` |
 | `checks:*` | Validation, smoke checks, nix lint | `.agents/skills/checks/SKILL.md` |
 | `dev:*` | Git, flake, site, PRs, packages | `.agents/skills/dev/SKILL.md` |
+| `data:*` | NAS storage taxonomy, hygiene, permissions, media unindexing | `.agents/skills/data/SKILL.md` |
 | `services:*` | Legacy wrappers (canonical: `infra:*`) | `.agents/skills/services/SKILL.md` |
 
 ---

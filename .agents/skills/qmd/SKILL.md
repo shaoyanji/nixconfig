@@ -35,39 +35,47 @@ command -v qmd                                               # present on hosts
 - Prefer `qmd search` (BM25 keyword). It is typically instant and is
   the default; embeddings (`qmd embed`) are optional and slower.
 
-## Setup
+## Canonical Collections
 
+The fleet maintains two primary collections:
+
+| Collection | Target Path | Description |
+|---|---|---|
+| `vault` | `/Volumes/data/Obsidian-Git-Sync` (`~/vaults/personal`) | Personal Obsidian vault: zettels, schematics, notes, and research. |
+| `nixconfig` | `/Volumes/data/projects/nixconfig` (`~/Documents/nixconfig`) | Nix flake documentation, host architecture, and runbooks. |
+
+Register or update both collections automatically:
 ```bash
-qmd collection add /path/to/notes --name notes --mask "**/*.md"
-qmd context add qmd://notes "Description of this collection"  # optional
+task dev:qmd:refresh        # register and reindex both collections
+task dev:qmd:vault:refresh  # reindex personal Obsidian vault only
+task dev:qmd:docs:refresh   # reindex nixconfig docs only
 ```
 
-## What it indexes
-
-- Markdown collections (`**/*.md` masks). Chunking is content-based,
-  not heading-based; messy Markdown is fine.
-- Not a replacement for code search — use code search for source trees.
+Verify index freshness:
+```bash
+task checks:qmd:docs        # check nixconfig collection index
+task checks:qmd:vault       # check Obsidian vault collection index
+```
 
 ## Common commands
 
 ```bash
-qmd search "query"             # default BM25
-qmd search "query" -c notes    # restrict to a collection
-qmd search "query" -n 10       # more results
-qmd search "query" --json      # agent-friendly output
-qmd search "query" --all --files --min-score 0.3
-qmd get "path/to/file.md"      # full document
-qmd get "#docid"               # by ID from search results
-qmd multi-get "a.md, b.md, #abc123" --json
-qmd status                     # index health
-qmd update                     # re-index changed files (fast)
-qmd embed                      # (re)compute embeddings for semantic search
+qmd search "query" -c vault       # search personal Obsidian vault (zettels/notes)
+qmd search "query" -c nixconfig   # search nixconfig documentation
+qmd search "query"                # search across all collections
+qmd search "query" -n 10          # return top 10 results
+qmd search "query" --json         # agent-friendly JSON output
+qmd get "path/to/file.md"         # read full document
+qmd get "#docid"                  # fetch document by ID from search results
+qmd status                        # show index health and file counts
+qmd update                        # re-index changed files (fast, BM25)
+qmd embed                         # compute embeddings for semantic vector search
 ```
 
 ## Keeping the index fresh
 
-`qmd update` is enough for BM25 freshness; run it after bulk edits or
-on a schedule (e.g. systemd user timer / cron `0 * * * * qmd update`).
+`qmd update` is enough for BM25 freshness; run it after editing notes or on a schedule.
+`task dev:qmd:refresh` ensures both collections are tracked and up to date.
 
 ## Models and cache
 

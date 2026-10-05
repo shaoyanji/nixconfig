@@ -46,6 +46,9 @@ includes:
   bountystash:
     taskfile: ./taskfiles/bountystash.yml
     flatten: true
+  apps:
+    taskfile: ./taskfiles/apps.yml
+    flatten: true
 
 tasks:
   default:

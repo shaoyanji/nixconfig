@@ -153,6 +153,61 @@ tasks:
         echo "=== Running User Processes ==="
         ssh {{.SERV00_ALIAS}} "ps aux | grep {{.SERV00_USER}}"
 
+  serv00:harden:
+    desc: Enforce secure permissions on Serv00 (~/.ssh, ~/domains, logs/pid)
+    cmds:
+      - |
+        ssh {{.SERV00_ALIAS}} "
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/authorized_keys ~/.ssh/id_ed25519 2>/dev/null || true
+          chmod 644 ~/.ssh/*.pub 2>/dev/null || true
+          chmod 750 ~/domains
+          chmod 600 ~/webserver.pid ~/webserver.log 2>/dev/null || true
+          chmod 755 ~/webserver 2>/dev/null || true
+          echo '✅ Serv00 permissions hardened (SSH 700/600, domains 750, logs 600).'
+        "
+
+  serv00:audit:
+    desc: Comprehensive health and security audit of Serv00 FreeBSD environment
+    cmds:
+      - |
+        echo "=== 1. System & Uptime ==="
+        ssh {{.SERV00_ALIAS}} "uname -a; uptime"
+        echo ""
+        echo "=== 2. Resource Utilization & Limits ==="
+        ssh {{.SERV00_ALIAS}} "devil info limits"
+        echo ""
+        echo "=== 3. Daemon Process Status ==="
+        ssh {{.SERV00_ALIAS}} "ps aux | grep -v '\[.*\]' | grep -E 'webserver|sshd'"
+        echo ""
+        echo "=== 4. Keepalive Crontab ==="
+        ssh {{.SERV00_ALIAS}} "crontab -l"
+        echo ""
+        echo "=== 5. File Permissions Audit ==="
+        ssh {{.SERV00_ALIAS}} "ls -ld ~/.ssh ~/.ssh/* ~/domains ~/webserver* 2>/dev/null"
+
+  serv00:limits:
+    desc: Display resource quotas (RAM, processes, disk) via devil info limits
+    cmds:
+      - ssh {{.SERV00_ALIAS}} "devil info limits"
+
+  serv00:logs:
+    desc: Tail webserver supervisor logs (~/webserver.log)
+    cmds:
+      - ssh {{.SERV00_ALIAS}} "tail -n 50 ~/webserver.log"
+
+  serv00:backup:
+    desc: Download compressed backup of webserver, source code, and configuration
+    cmds:
+      - |
+        BACKUP_FILE="serv00-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+        echo "Creating remote archive..."
+        ssh {{.SERV00_ALIAS}} "tar -czf ~/$BACKUP_FILE --exclude='*.log' ~/server.go ~/webserver ~/domains 2>/dev/null || true"
+        echo "Downloading $BACKUP_FILE..."
+        scp {{.SERV00_ALIAS}}:~/$BACKUP_FILE ./
+        ssh {{.SERV00_ALIAS}} "rm -f ~/$BACKUP_FILE"
+        echo "Backup saved locally to ./$BACKUP_FILE"
+
   serv00:menu:
     desc: Interactive Charmbracelet Gum / Wish menu for Serv00 FreeBSD host
     cmds:
@@ -160,9 +215,46 @@ tasks:
         action=$(printf '%s\n' \
           "ssh: Connect to Serv00 shell" \
           "status: Webserver status & HTTP check" \
+          "audit: Security, resource & permissions audit" \
+          "harden: Enforce 700/600 permissions" \
+          "limits: Display devil resource limits" \
+          "logs: Tail webserver log" \
           "start: Start webserver (port {{.SERV00_PORT}})" \
           "stop: Stop webserver" \
           "restart: Restart webserver" \
+          "backup: Download full backup tarball" \
+          "build: Rebuild Go webserver binary" \
+          "cron: Enable keep-alive cron job" \
+          "www: List devil WWW domains" \
+          "ports: List devil reserved ports" \
+          "info: System info & quota" \
+          "push: Upload file to Serv00" \
+          "pull: Download file from Serv00" \
+          "wishlist: Open Wishlist SSH directory" \
+          "exit: Quit" | gum choose --header "😈 Serv00 FreeBSD (jisifu.serv00.net) Menu")
+
+        case "$action" in
+          "ssh"*)
+            task serv00:ssh
+            ;;
+          "status"*)
+            task serv00:server:status
+            ;;
+          "audit"*)
+            task serv00:audit
+            ;;
+          "harden"*)
+            task serv00:harden
+            ;;
+          "limits"*)
+            task serv00:limits
+            ;;
+          "logs"*)
+            task serv00:logs
+            ;;
+          "backup"*)
+            task serv00:backup
+            ;;
           "build: Rebuild Go webserver binary" \
           "cron: Enable keep-alive cron job" \
           "www: List devil WWW domains" \

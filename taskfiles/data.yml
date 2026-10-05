@@ -1,0 +1,40 @@
+version: "3"
+
+vars:
+  VOLUMES_DATA: /Volumes/data
+
+tasks:
+  data:audit:
+    desc: Audit NAS storage taxonomy, permissions, media hygiene, and metadata
+    cmds:
+      - task -d {{.VOLUMES_DATA}} audit 2>/dev/null || bash scripts/task/data-ops.sh audit
+
+  data:clean:metadata:
+    desc: Scan and delete macOS metadata noise (._*, .DS_Store, @eaDir) across NAS storage
+    cmds:
+      - task -d {{.VOLUMES_DATA}} clean:metadata 2>/dev/null || bash scripts/task/data-ops.sh clean-metadata
+
+  data:clean:downloads:
+    desc: Audit downloads staging area and cleanup orphaned control files
+    cmds:
+      - task -d {{.VOLUMES_DATA}} clean:downloads 2>/dev/null || bash scripts/task/data-ops.sh clean-downloads
+
+  data:protect:private:
+    desc: Enforce 0700 permissions and media shields (.nomedia, .plexignore) on private folders
+    cmds:
+      - task -d {{.VOLUMES_DATA}} protect:private 2>/dev/null || bash scripts/task/data-ops.sh protect-private
+
+  data:cloak:sync:
+    desc: Automatically import and sync TOTP tokens from Bitwarden/Vaultwarden export
+    cmds:
+      - task -d {{.VOLUMES_DATA}} cloak:sync 2>/dev/null || bash scripts/bw-cloak-sync.sh --apply
+
+  data:status:
+    desc: Show quick NAS storage taxonomy overview
+    cmds:
+      - task data:audit
+
+  data:index:refresh:
+    desc: Refresh qmd documentation and vault search indices
+    cmds:
+      - task dev:qmd:refresh

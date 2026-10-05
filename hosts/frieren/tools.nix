@@ -69,7 +69,8 @@ in
       enable = true;
       package = pkgs.plocate;
       interval = "hourly";
-      localuser = "root";
+      # services.locate.localuser was removed upstream (findutils locate dropped);
+      # the plocate updatedb service runs as root regardless.
       pruneFS = [ "tmpfs" "proc" "sysfs" "devpts" ];
       pruneNames = [ ".git" ".hg" ".svn" ".snapshots" ];
       prunePaths = [ "/tmp" "/var/tmp" "/nix/store" "/.snapshots" ];

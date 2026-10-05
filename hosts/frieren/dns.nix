@@ -9,12 +9,18 @@ _: {
     wants = [ "network-online.target" ];
   };
 
+  # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively
+  services.resolved.extraConfig = ''
+    DNSStubListener=no
+  '';
+
   # pihole-ftl references tailscale0 interface, must wait for tailscaled
   systemd.services.pihole-ftl = {
     after = [ "tailscaled.service" ];
   };
   systemd.services.pihole-ftl-setup = {
-    after = [ "tailscaled.service" ];
+    after = [ "tailscaled.service" "pihole-ftl.service" ];
+    wants = [ "pihole-ftl.service" ];
   };
 
   services.unbound = {
@@ -55,7 +61,10 @@ _: {
       database = {
         maxDBdays = 31;
       };
-      misc.dnsmasq_lines = [ "interface=tailscale0" ];
+      misc.dnsmasq_lines = [
+        "interface=tailscale0"
+        "address=/frieren.lan/192.168.3.25"
+      ];
       # webserver.api.cli_pw = true;
     };
   };

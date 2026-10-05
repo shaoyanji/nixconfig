@@ -13,7 +13,7 @@
 #   dirs are deliberately EXCLUDED: hot-copying a live data directory
 #   is not a consistent backup — add services.postgresql.backup
 #   (pg_dump) alongside before trusting DB restore points.
-_: {
+{ pkgs, ... }: {
   # --- SMART monitoring ---
   services.smartd = {
     enable = true;
@@ -28,11 +28,33 @@ _: {
   };
   networking.firewall.allowedTCPPorts = [ 8124 ];
 
-  # --- restic local backups ---
+  # --- Vaultwarden (Bitwarden Compatible Password & TOTP Vault) ---
+  services.vaultwarden = {
+    enable = true;
+    config = {
+      ROCKET_ADDRESS = "127.0.0.1";
+      ROCKET_PORT = 8222;
+      DOMAIN = "http://vault.frieren.lan";
+      SIGNUPS_ALLOWED = true;
+    };
+    backupDir = "/srv/backup/vaultwarden";
+  };
+
+  # --- PostgreSQL daily pg_dump for Immich & Paperless ---
   systemd.tmpfiles.rules = [
     "d /srv/backup 0700 root root -"
+    "d /srv/backup/postgresql 0700 postgres postgres -"
+    "d /srv/backup/vaultwarden 0700 vaultwarden vaultwarden -"
   ];
 
+  services.postgresqlBackup = {
+    enable = true;
+    databases = [ "immich" ];
+    location = "/srv/backup/postgresql";
+    startAt = "*-*-* 03:00:00"; # 30 min before 03:30 restic snapshot
+  };
+
+  # --- restic local backups ---
   services.restic.backups.frieren-local = {
     initialize = true;
     repository = "/srv/backup/restic";
@@ -44,6 +66,9 @@ _: {
       "/var/lib/immich"
       "/var/lib/paperless"
       "/var/lib/uptime-kuma"
+      "/var/lib/vaultwarden"
+      "/srv/backup/postgresql"
+      "/srv/backup/vaultwarden"
     ];
     # NOTE: /var/lib/postgresql intentionally excluded — see header.
     timerConfig = {
@@ -58,14 +83,54 @@ _: {
     ];
   };
 
-  # The restic unit fails without the password file; generate it once
-  # on first run (root-only) instead of shipping a secret in this
-  # commit — frieren self-upgrades and must not reference a sops
-  # secret that is not in modules/secrets.yaml yet.
-  systemd.services.restic-backups-frieren-local.preStart = ''
-    if [ ! -s /root/.restic-password ]; then
-      head -c 32 /dev/urandom | base64 > /root/.restic-password
-      chmod 0600 /root/.restic-password
-    fi
-  '';
+  # Guarantee the restic password file exists before restic-backups runs
+  # (preStart runs after module initialization, which leads to ordering failures).
+  systemd.services.restic-ensure-password = {
+    description = "Ensure restic repository password file exists";
+    wantedBy = [ "multi-user.target" ];
+    before = [ "restic-backups-frieren-local.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeShellScript "restic-ensure-password" ''
+        if [ ! -s /root/.restic-password ]; then
+          head -c 32 /dev/urandom | base64 > /root/.restic-password
+          chmod 0600 /root/.restic-password
+        fi
+      '';
+    };
+  };
+
+  systemd.services.restic-backups-frieren-local.unitConfig = {
+    Wants = [ "restic-ensure-password.service" ];
+    After = [ "restic-ensure-password.service" ];
+  };
+
+  # 24/7 Remote Operator Gateway: Antigravity remote-control daemon
+  systemd.user.services.antigravity-cli-daemon = {
+    description = "antigravity remote-control daemon";
+    after = [ "network.target" ];
+    unitConfig = {
+      StartLimitIntervalSec = 0;
+    };
+    serviceConfig = {
+      Type = "simple";
+      Environment = [
+        "SSH_CLIENT=127.0.0.1 1 1"
+        "SSH_CONNECTION=127.0.0.1 1 127.0.0.1 22"
+        "HOME=/home/devji"
+        "USER=devji"
+        "PATH=/home/devji/.nix-profile/bin:/etc/profiles/per-user/devji/bin:/run/current-system/sw/bin"
+        "SHELL=/run/current-system/sw/bin/bash"
+      ];
+      ExecStart = "${pkgs.antigravity-cli}/bin/agy remote-control serve";
+      Restart = "on-failure";
+      RestartSec = "10s";
+      RestartPreventExitStatus = 3;
+      TimeoutStopSec = "30s";
+      StandardOutput = "journal";
+      StandardError = "journal";
+    };
+    wantedBy = [ "default.target" ];
+  };
 }

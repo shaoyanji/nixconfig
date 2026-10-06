@@ -1,6 +1,6 @@
-{ lib, ... }:
+{ pkgs, lib, ... }:
 let
-  landingPage = ''
+  landingPage = pkgs.writeTextDir "index.html" ''
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -170,16 +170,29 @@ in
     virtualHosts = {
       # Default portal / landing page
       "frieren.lan" = {
-        serverAliases = [ "nas.frieren.lan" "nas.lan" "frieren" ];
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        serverAliases = [
+          "nas.frieren.lan"
+          "nas.lan"
+          "frieren"
+        ];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
-          return = "200 '${landingPage}'";
-          extraConfig = "default_type text/html;";
+          root = landingPage;
         };
       };
 
       "photos.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:2283";
           proxyWebsockets = true;
@@ -187,7 +200,12 @@ in
       };
 
       "docs.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:28981";
           proxyWebsockets = true;
@@ -195,7 +213,12 @@ in
       };
 
       "media.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:8096";
           proxyWebsockets = true;
@@ -203,7 +226,12 @@ in
       };
 
       "ha.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:8123";
           proxyWebsockets = true;
@@ -211,14 +239,24 @@ in
       };
 
       "cache.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:5000";
         };
       };
 
       "pdf.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:7351";
           proxyWebsockets = true;
@@ -226,7 +264,12 @@ in
       };
 
       "status.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:3001";
           proxyWebsockets = true;
@@ -234,14 +277,24 @@ in
       };
 
       "smart.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:8124";
         };
       };
 
       "aria.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:6801";
           proxyWebsockets = true;
@@ -249,7 +302,12 @@ in
       };
 
       "vault.frieren.lan" = {
-        listen = [{ addr = "0.0.0.0"; port = 80; }];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:8222";
           proxyWebsockets = true;

@@ -1,7 +1,8 @@
-{ config
-, pkgs
-, lib
-, ...
+{
+  config,
+  pkgs,
+  lib,
+  ...
 }:
 let
   user = import ../../modules/global/user.nix;
@@ -54,6 +55,7 @@ in
     ./ha-stack.nix
     ./infra-stack.nix
     ./reverse-proxy.nix
+    ./iventoy.nix
     ../../modules/services/aria2-daemon.nix
     ../../modules/services/harmonia.nix
     ../../modules/profiles/nixbuild-client.nix
@@ -136,6 +138,15 @@ in
     nginx.enable = true;
     nginx.listenPort = 6801;
   };
+
+  # The home-manager persona (heim → zen → aria2.nix) ships a user-level
+  # aria2 RPC fallback on :6800. frieren runs the system services.aria2
+  # (rpc-secret via LoadCredential) — keep exactly ONE RPC on :6800 so the
+  # unauthenticated fallback can't shadow the secret-protected daemon.
+  home-manager.users.devji.programs.aria2-user-fallback.enable = false;
+
+  # Resurrected OpenClaw persona ("Vanta") for the hermes mainframe agent.
+  home-manager.users.devji.programs.hermes-user.enable = true;
 
   # --- Boot parameters for GPU power saving ---
   # consoleblank removed — display output is now active for the media center.
@@ -275,9 +286,18 @@ in
   };
 
   # Samba RuntimeDirectory fix
-  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
-  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
-  systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = [ "lock" "lock/samba" ];
+  systemd.services.samba-smbd.serviceConfig.RuntimeDirectory = [
+    "lock"
+    "lock/samba"
+  ];
+  systemd.services.samba-nmbd.serviceConfig.RuntimeDirectory = [
+    "lock"
+    "lock/samba"
+  ];
+  systemd.services.samba-winbindd.serviceConfig.RuntimeDirectory = [
+    "lock"
+    "lock/samba"
+  ];
 
   # Samba WSDD
   services.samba-wsdd = {
@@ -418,14 +438,22 @@ in
       # 7351 moved next to the service: networking.nix (Stirling PDF)
       # 42617 closed - ZeroClaw was removed in the 2026-09 teardown
     ];
-    allowedUDPPorts = [ 137 138 ];
+    allowedUDPPorts = [
+      137
+      138
+    ];
   };
 
   # Btrfs auto-scrub - RESTORED all filesystems
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
-    fileSystems = [ "/" "/srv/data" "/srv/private" "/srv/public" ];
+    fileSystems = [
+      "/"
+      "/srv/data"
+      "/srv/private"
+      "/srv/public"
+    ];
   };
 
   # Networking

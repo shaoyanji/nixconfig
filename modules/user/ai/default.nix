@@ -65,6 +65,10 @@
       pkgs.llm-agents.toon
       pkgs.llm-agents.pdfvision
       pkgs.llm-agents.parallel-cli
+      # agent-browser — headless Chrome automation CLI for agents (Vercel):
+      # snapshot-based element refs, compact text output. Needs chromium.
+      pkgs.llm-agents.agent-browser
+      pkgs.chromium
         # qwen-code — removed 2026-10: redundant with agy/crush on the 8 GB
         # laptops (Node-based CLI with a ~1 GB closure); re-enable if needed.
         # pkgs.llm-agents.qwen-code

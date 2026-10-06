@@ -433,7 +433,8 @@ in
       6801 # AriaNg web UI
       28981 # Paperless-ngx
       3001 # Uptime-Kuma (ha-stack)
-      6052 # ESPHome dashboard (ha-stack)
+      # 6052 closed — ESPHome removed 2026-10 (no devices; upstream dropped
+      # the built-in dashboard)
       8124 # Scrutiny SMART dashboard (infra-stack)
       # 7351 moved next to the service: networking.nix (Stirling PDF)
       # 42617 closed - ZeroClaw was removed in the 2026-09 teardown

@@ -15,7 +15,9 @@
 #   and the parked unit fail-looped ("No valid USB adapter found") for
 #   weeks. The old data lives on in /srv/private/zigbee2mqtt. Re-add via
 #   services.zigbee2mqtt (set settings.serial.port) if a dongle arrives.
-# esphome: device dashboard + flashing UI on 6052, LAN-exposed.
+# esphome: REMOVED 2026-10 — no ESP devices; esphome >= 2026.8 also removed
+#   its built-in dashboard upstream, so the unit fail-looped for a week.
+#   Re-add via services.esphome (or esphome-device-builder) if needed.
 # uptime-kuma: status dashboards on 3001, LAN-exposed (the module
 #   has no openFirewall option — the port is opened explicitly).
 { lib, ... }:
@@ -31,15 +33,6 @@
       }
     ];
   };
-
-  # --- ESPHome (device dashboard + flashing) ---
-  services.esphome = {
-    enable = true;
-    address = "0.0.0.0";
-    port = 6052;
-    openFirewall = true;
-  };
-  users.users.esphome.extraGroups = [ "dialout" ];
 
   # --- Uptime-Kuma (service status dashboards) ---
   services.uptime-kuma = {

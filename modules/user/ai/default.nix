@@ -1,7 +1,8 @@
-{ lib
-, pkgs
-, config
-, ...
+{
+  lib,
+  pkgs,
+  config,
+  ...
 }:
 {
   # Fleet-wide gate for AI CLI tooling. On by default (desktops, standalone
@@ -10,13 +11,18 @@
   # gate themselves on this option too, so they stay inert where it is off —
   # `or true` keeps them active in chains (roles/home.nix) that never import
   # this option declaration.
-  options.profiles.ai.enable = lib.mkEnableOption "AI agent CLI tooling" // { default = true; };
+  options.profiles.ai.enable = lib.mkEnableOption "AI agent CLI tooling" // {
+    default = true;
+  };
 
   imports = [
     # ./codex.nix
     # ./mods.nix
     ./aichat.nix
     ./antigravity-cli.nix
+    ./freebuff-remote.nix
+    ./zed-mcp.nix
+    ./hermes-user.nix
     # ./opencode.nix
   ];
 
@@ -35,16 +41,21 @@
 
     # AI agent CLIs from llm-agents.nix (overlay wired in module-sets:
     # pkgs.llm-agents.<name>; numtide cache via flake nixConfig).
-    home.packages = with pkgs;
+    home.packages =
+      with pkgs;
       [
         geminicommit
         tgpt
         pkgs.llm-agents.crush # Charmbracelet agent (MIT, source-built)
-        pkgs.llm-agents.freebuff # Codebuff community CLI
+        # freebuff — frieren-only since 2026-10: the mainframe runs the TUI,
+        # clients connect with freebuff-remote / freebuff-terminal (SSH).
         # qmd — local hybrid markdown/code search (tobi). CUDA gated off:
         # ares forces config.cudaSupport = true and the override arg would
         # otherwise drag cudaPackages into every host closure.
         (pkgs.llm-agents.qmd.override { cudaSupport = false; })
+        # dsh — DeepSeek harness CLI (llm-agents overlay). Fleet-wide client
+        # agent now that freebuff is mainframe-only.
+        pkgs.llm-agents.dsh
         # qwen-code — removed 2026-10: redundant with agy/crush on the 8 GB
         # laptops (Node-based CLI with a ~1 GB closure); re-enable if needed.
         # pkgs.llm-agents.qwen-code
@@ -59,4 +70,3 @@
       ++ lib.optionals stdenv.hostPlatform.isLinux [ ];
   };
 }
-

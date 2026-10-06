@@ -88,21 +88,62 @@
     ];
     binds = {
       # "Mod+Shift+Slash".action.show-hotkey-overlay = [];
-      "Mod+Print".action.screenshot-screen = { show-pointer = false; };
+      "Mod+Print".action.screenshot-screen = {
+        show-pointer = false;
+      };
       "Mod+A".action.spawn = "fuzzel";
       "Mod+T".action.spawn-sh = "kitty -- tmux";
-      "Mod+Y".action.spawn = [ "dms" "ipc" "tmux" "toggle" ];
-      "Mod+P".action.spawn = [ "dms" "ipc" "notepad" "toggle" ];
-      "Mod+V".action.spawn = [ "dms" "ipc" "clipboard" "toggle" ];
-      "Mod+Space".action.spawn = [ "dms" "ipc" "spotlight-bar" "toggle" ];
-      "Mod+N".action.spawn = [ "dms" "ipc" "spotlight" "toggle" ];
-      "Mod+M".action.spawn = [ "dms" "ipc" "settings" "toggle" ];
-      "Mod+Shift+Slash".action.spawn = [ "dms" "ipc" "call" "keybinds" "toggle" "niri" ];
+      "Mod+Y".action.spawn = [
+        "dms"
+        "ipc"
+        "tmux"
+        "toggle"
+      ];
+      "Mod+P".action.spawn = [
+        "dms"
+        "ipc"
+        "notepad"
+        "toggle"
+      ];
+      "Mod+V".action.spawn = [
+        "dms"
+        "ipc"
+        "clipboard"
+        "toggle"
+      ];
+      "Mod+Space".action.spawn = [
+        "dms"
+        "ipc"
+        "spotlight-bar"
+        "toggle"
+      ];
+      "Mod+N".action.spawn = [
+        "dms"
+        "ipc"
+        "spotlight"
+        "toggle"
+      ];
+      "Mod+M".action.spawn = [
+        "dms"
+        "ipc"
+        "settings"
+        "toggle"
+      ];
+      "Mod+Shift+Slash".action.spawn = [
+        "dms"
+        "ipc"
+        "call"
+        "keybinds"
+        "toggle"
+        "niri"
+      ];
 
       "Mod+Z".action.spawn = "zen-beta";
       # "Mod+C".action.spawn-sh = "kitty -- task";
       "Mod+C".action.spawn-sh = "tmux display-popup task";
       "Mod+B".action.spawn-sh = "kando -m 'Kando Menu'";
+      # Freebuff mainframe terminal on frieren (fleet AI coding session)
+      "Mod+Shift+B".action.spawn = "freebuff-terminal";
 
       "Mod+W".action.toggle-window-floating = [ ];
       "Mod+E".action.switch-focus-between-floating-and-tiling = [ ];
@@ -173,20 +214,28 @@
 
       # fn-key combos: HP emits XF86 events nothing else consumes
       # (niri has no default handling; DMS keybinds are disabled).
-      "XF86AudioRaiseVolume".action.spawn-sh =
-        "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+";
-      "XF86AudioLowerVolume".action.spawn-sh =
-        "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%-";
-      "XF86AudioMute".action.spawn-sh =
-        "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-      "XF86AudioMicMute".action.spawn-sh =
-        "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+      "XF86AudioRaiseVolume".action.spawn-sh = "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+";
+      "XF86AudioLowerVolume".action.spawn-sh = "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%-";
+      "XF86AudioMute".action.spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+      "XF86AudioMicMute".action.spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
       "XF86MonBrightnessUp".action.spawn-sh = "brightnessctl set +5%";
       "XF86MonBrightnessDown".action.spawn-sh = "brightnessctl set 5%-";
-      "XF86AudioPlay".action.spawn = [ "playerctl" "play-pause" ];
-      "XF86AudioStop".action.spawn = [ "playerctl" "stop" ];
-      "XF86AudioNext".action.spawn = [ "playerctl" "next" ];
-      "XF86AudioPrev".action.spawn = [ "playerctl" "previous" ];
+      "XF86AudioPlay".action.spawn = [
+        "playerctl"
+        "play-pause"
+      ];
+      "XF86AudioStop".action.spawn = [
+        "playerctl"
+        "stop"
+      ];
+      "XF86AudioNext".action.spawn = [
+        "playerctl"
+        "next"
+      ];
+      "XF86AudioPrev".action.spawn = [
+        "playerctl"
+        "previous"
+      ];
     };
   };
 

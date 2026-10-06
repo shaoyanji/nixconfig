@@ -35,14 +35,20 @@
   # below routes resolved (and thus the host) through the local filtering stack.
   # mkForce: nixpkgs' resolved module defaults this to "systemd-resolved".
   networking.networkmanager.dns = lib.mkForce "none";
-  networking.nameservers = [ "127.0.0.1" "::1" ];
+  networking.nameservers = [
+    "127.0.0.1"
+    "::1"
+  ];
 
   # pihole-ftl references tailscale0 interface, must wait for tailscaled
   systemd.services.pihole-ftl = {
     after = [ "tailscaled.service" ];
   };
   systemd.services.pihole-ftl-setup = {
-    after = [ "tailscaled.service" "pihole-ftl.service" ];
+    after = [
+      "tailscaled.service"
+      "pihole-ftl.service"
+    ];
     wants = [ "pihole-ftl.service" ];
   };
 
@@ -87,6 +93,19 @@
       misc.dnsmasq_lines = [
         "interface=tailscale0"
         "address=/frieren.lan/192.168.3.25"
+        # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
+        # Answer ONLY PXE clients on the LAN; never lease IPs — the FritzBox
+        # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode
+        # waits 2s for the real DHCP server's OFFER and only supplies the
+        # PXE boot options the router lacks.
+        "dhcp-range=192.168.3.25,proxy,255.255.255.0"
+        # /var/lib/misc is read-only on NixOS — without a writable lease file
+        # dnsmasq's DHCP subsystem aborts and UDP 67 never binds.
+        "dhcp-leasefile=/var/lib/pihole/dnsmasq.leases"
+        # Arch-specific boot file -> iVentoy's virtual loader names. The
+        # suffix (16000) must match iVentoy's HTTP PXE port.
+        "pxe-service=x86PC,\"Boot from network (BIOS)\",iventoy_loader_16000_bios,192.168.3.25"
+        "pxe-service=X86-64_EFI,\"Boot from network (UEFI)\",iventoy_loader_16000_uefi,192.168.3.25"
       ];
       # webserver.api.cli_pw = true;
     };
@@ -97,7 +116,11 @@
     ports = [ 8080 ];
   };
   networking.firewall.interfaces.enp1s0 = {
-    allowedUDPPorts = [ 53 ];
+    allowedUDPPorts = [
+      53
+      67 # DHCP-proxy replies to PXE clients (FritzBox still owns leases)
+      4011 # legacy BIOS ProxyDHCP
+    ];
     allowedTCPPorts = [ 53 ];
   };
   # Allow DNS queries from Tailscale network

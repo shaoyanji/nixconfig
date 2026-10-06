@@ -18,6 +18,12 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # MCP server packages + module framework (Zed context_servers pilot:
+    # github + nixos servers — see modules/user/ai/zed-mcp.nix).
+    mcp-servers-nix = {
+      url = "github:natsukium/mcp-servers-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     # chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
@@ -89,9 +95,10 @@
   };
 
   outputs =
-    inputs @ { self
-    , nixpkgs
-    , ...
+    inputs@{
+      self,
+      nixpkgs,
+      ...
     }:
     import ./flake/outputs.nix {
       inherit inputs self nixpkgs;

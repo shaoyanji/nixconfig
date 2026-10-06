@@ -13,7 +13,57 @@
 #   dirs are deliberately EXCLUDED: hot-copying a live data directory
 #   is not a consistent backup — add services.postgresql.backup
 #   (pg_dump) alongside before trusting DB restore points.
-{ pkgs, ... }: {
+{ pkgs, ... }:
+let
+  agyHandoffRunner = pkgs.writeShellScript "agy-handoff-runner" ''
+    set -euo pipefail
+
+    HANDOFF_FILE="/home/devji/HANDOFF.md"
+
+    if [ ! -f "$HANDOFF_FILE" ]; then
+      echo "No HANDOFF.md found in /home/devji. Skipping execution."
+      exit 0
+    fi
+
+    echo "=== [$(date)] Found $HANDOFF_FILE. Preparing execution... ==="
+    ARCHIVE_DIR="/home/devji/.agents/handoffs"
+    mkdir -p "$ARCHIVE_DIR"
+    ARCHIVE_COPY="$ARCHIVE_DIR/HANDOFF-$(date +%Y%m%d_%H%M%S).md"
+    cp "$HANDOFF_FILE" "$ARCHIVE_COPY"
+
+    echo "=== [$(date)] Running agy on $HANDOFF_FILE ==="
+    cd /home/devji
+    ${pkgs.antigravity-cli}/bin/agy --dangerously-skip-permissions -p "Please read HANDOFF.md in the current working directory and execute the plan." 2>&1 || true
+
+    echo "=== [$(date)] agy execution finished. Deleting $HANDOFF_FILE ==="
+    rm -f "$HANDOFF_FILE"
+    echo "=== [$(date)] Cleanup complete. Archived copy retained at $ARCHIVE_COPY ==="
+  '';
+
+  agySystemRunner = pkgs.writeShellScript "agy-system-runner" ''
+    set -euo pipefail
+
+    SYSTEM_FILE="/home/devji/SYSTEM.md"
+
+    if [ ! -f "$SYSTEM_FILE" ]; then
+      echo "No SYSTEM.md found in /home/devji. Skipping execution."
+      exit 0
+    fi
+
+    echo "=== [$(date)] Found $SYSTEM_FILE. Preparing execution... ==="
+    ARCHIVE_DIR="/home/devji/.agents/system"
+    mkdir -p "$ARCHIVE_DIR"
+    ARCHIVE_COPY="$ARCHIVE_DIR/SYSTEM-$(date +%Y%m%d_%H%M%S).md"
+    cp "$SYSTEM_FILE" "$ARCHIVE_COPY"
+
+    echo "=== [$(date)] Running agy to audit and refine $SYSTEM_FILE ==="
+    cd /home/devji
+    ${pkgs.antigravity-cli}/bin/agy --dangerously-skip-permissions -p "Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status." 2>&1 || true
+
+    echo "=== [$(date)] agy system maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
+  '';
+in
+{
   # --- SMART monitoring ---
   services.smartd = {
     enable = true;
@@ -42,7 +92,10 @@
 
   # --- PostgreSQL daily pg_dump for Immich & Paperless ---
   systemd.tmpfiles.rules = [
-    "d /srv/backup 0700 root root -"
+    # 0755 (not 0700): the vaultwarden and postgres service users must be
+    # able to TRAVERSE /srv/backup to reach their own 0700 subdirectories.
+    # With 0700 their backups failed with "Backup folder does not exist".
+    "d /srv/backup 0755 root root -"
     "d /srv/backup/postgresql 0700 postgres postgres -"
     "d /srv/backup/vaultwarden 0700 vaultwarden vaultwarden -"
   ];
@@ -132,5 +185,61 @@
       StandardError = "journal";
     };
     wantedBy = [ "default.target" ];
+  };
+
+  # Nightly Antigravity Handoff Runner (3:00 AM)
+  systemd.user.services.agy-nightly-handoff = {
+    description = "Run /home/devji/HANDOFF.md with Antigravity if present, then delete";
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      WorkingDirectory = "/home/devji";
+      Environment = [
+        "HOME=/home/devji"
+        "USER=devji"
+        "PATH=/home/devji/.nix-profile/bin:/etc/profiles/per-user/devji/bin:/run/current-system/sw/bin:/home/devji/.local/bin"
+        "SHELL=/run/current-system/sw/bin/bash"
+      ];
+      ExecStart = "${agyHandoffRunner}";
+      StandardOutput = "journal";
+      StandardError = "journal";
+    };
+  };
+
+  systemd.user.timers.agy-nightly-handoff = {
+    description = "Check and run /home/devji/HANDOFF.md nightly at 3 AM";
+    timerConfig = {
+      OnCalendar = "*-*-* 03:00:00";
+      Persistent = true;
+    };
+    wantedBy = [ "timers.target" ];
+  };
+
+  # Daily 5:00 AM Antigravity System Maintenance Runner (SYSTEM.md)
+  systemd.user.services.agy-nightly-system = {
+    description = "Run /home/devji/SYSTEM.md with Antigravity if present, then delete";
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      WorkingDirectory = "/home/devji";
+      Environment = [
+        "HOME=/home/devji"
+        "USER=devji"
+        "PATH=/home/devji/.nix-profile/bin:/etc/profiles/per-user/devji/bin:/run/current-system/sw/bin:/home/devji/.local/bin"
+        "SHELL=/run/current-system/sw/bin/bash"
+      ];
+      ExecStart = "${agySystemRunner}";
+      StandardOutput = "journal";
+      StandardError = "journal";
+    };
+  };
+
+  systemd.user.timers.agy-nightly-system = {
+    description = "Check and run /home/devji/SYSTEM.md daily at 5 AM";
+    timerConfig = {
+      OnCalendar = "*-*-* 05:00:00";
+      Persistent = true;
+    };
+    wantedBy = [ "timers.target" ];
   };
 }

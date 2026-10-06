@@ -53,9 +53,18 @@
         # ares forces config.cudaSupport = true and the override arg would
         # otherwise drag cudaPackages into every host closure.
         (pkgs.llm-agents.qmd.override { cudaSupport = false; })
-        # dsh — DeepSeek harness CLI (llm-agents overlay). Fleet-wide client
-        # agent now that freebuff is mainframe-only.
-        pkgs.llm-agents.dsh
+      # dsh — DeepSeek harness CLI (llm-agents overlay). Fleet-wide client
+      # agent now that freebuff is mainframe-only.
+      pkgs.llm-agents.dsh
+      # Fleet agent utility stack (2026-10):
+      #   ai-memory — persistent cross-agent memory (MCP + CLI; shared store)
+      #   toon — TOON format tooling (the old OpenClaw memory encoding)
+      #   pdfvision — PDF understanding/conversion for agent pipelines
+      #   parallel-cli — parallel task runner for batched agent work
+      pkgs.llm-agents.ai-memory
+      pkgs.llm-agents.toon
+      pkgs.llm-agents.pdfvision
+      pkgs.llm-agents.parallel-cli
         # qwen-code — removed 2026-10: redundant with agy/crush on the 8 GB
         # laptops (Node-based CLI with a ~1 GB closure); re-enable if needed.
         # pkgs.llm-agents.qwen-code

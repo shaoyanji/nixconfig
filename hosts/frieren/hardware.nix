@@ -29,4 +29,18 @@
   # the TV keyboard/mouse. `powerManagement.enable = true` (configuration.nix)
   # already handles CPU frequency scaling. Re-add powertop only if you also
   # add a udev rule exempting the BT USB device from autosuspend.
+
+  # D.4.0: Graceful shutdown on low battery (~5%).
+  # frieren is a laptop-as-server; its battery acts as a built-in UPS.
+  # When mains power is lost and the battery drops to 5%, UPower triggers
+  # a clean poweroff (systemctl poweroff), gracefully unmounting Btrfs
+  # and stopping services before power is completely lost.
+  services.upower = {
+    enable = true;
+    usePercentageForPolicy = true;
+    percentageLow = 15;
+    percentageCritical = 8;
+    percentageAction = 5;
+    criticalPowerAction = "PowerOff";
+  };
 }

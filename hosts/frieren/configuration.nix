@@ -32,7 +32,7 @@ let
       guckloch netbook aristotle aceofspades ancientace frieren
     do
       echo "==> warming: $h"
-      ${pkgs.nix}/bin/nix build \
+      ${pkgs.nix}/bin/nix --extra-experimental-features "nix-command flakes" build \
         "github:shaoyanji/nixconfig#nixosConfigurations.$h.config.system.build.toplevel" \
         -L || fail=1
     done
@@ -81,6 +81,11 @@ in
     description = "Build all fleet host closures to warm the harmonia LAN cache";
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
+    # Never fight the 04:00 autoUpgrade for RAM/IO/store-locks: warming 18 host
+    # closures takes hours, so a 03:30 start used to run straight through 04:00.
+    # systemd stops this oneshot when nixos-upgrade starts — the upgrade wins,
+    # and the warmer picks up again on the next weekly trigger.
+    unitConfig.Conflicts = [ "nixos-upgrade.service" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${fleetWarmCache}";
@@ -93,7 +98,10 @@ in
   systemd.timers.fleet-warm-cache = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "Sun, 03:30";
+      # 01:30 (was 03:30): start the multi-hour fleet warm well before the
+      # 03:00 agy runs and the 04:00 autoUpgrade so the Conflicts guard above
+      # rarely has to abort it mid-way.
+      OnCalendar = "Sun, 01:30";
       Persistent = true;
       RandomizedDelaySec = "30min";
     };
@@ -130,6 +138,14 @@ in
     mode = "0400";
   };
 
+  # E.3: Hermes agent secrets (telegram bot token, allowed users, timeout)
+  sops.secrets."hermes" = {
+    owner = "devji";
+    group = "users";
+    mode = "0400";
+    path = "/home/devji/.config/hermes/hermes.env";
+  };
+
   services.aria2-daemon = {
     enable = true;
     downloadDir = "/srv/data/downloads";
@@ -147,6 +163,10 @@ in
 
   # Resurrected OpenClaw persona ("Vanta") for the hermes mainframe agent.
   home-manager.users.devji.programs.hermes-user.enable = true;
+  home-manager.users.devji.home.sessionVariables = {
+    HERMES_CONFIG = "/home/devji/.hermes/config.yaml";
+    HERMES_ENV = "/home/devji/.config/hermes/hermes.env";
+  };
 
   # --- Boot parameters for GPU power saving ---
   # consoleblank removed — display output is now active for the media center.

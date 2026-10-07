@@ -62,6 +62,12 @@ in
   ];
   networking.hostName = "frieren";
 
+  # pihole-ftl 6.7.1 fails to compile at the current nixpkgs rev (-Werror on an
+  # unused variable) and has no binary substitute — see the overlay header.
+  nixpkgs.overlays = [
+    (import ../../overlays/pihole-ftl-werror.nix)
+  ];
+
   # Serve the fleet's LAN binary cache (see modules/services/harmonia.nix).
   services.harmonia-fleet.enable = true;
 

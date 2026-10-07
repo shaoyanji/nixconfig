@@ -215,6 +215,67 @@ scripts/task/sops-drift-check.sh          # Verify all encrypted files decrypt c
 task infra:sops:update-keys               # Rekey all files when .sops.yaml changes
 ```
 
+#### 7. frieren (NAS) Rebuild Topology — read this before rebuilding this host
+
+frieren is a laptop-class NAS (11 GiB RAM, 8 threads, btrfs). Its nightly
+window is already load-saturated; a rebuild started blind will look "stuck"
+and tempt you into a retry loop, which is the failure mode this section exists
+to prevent.
+
+**Nightly job matrix (all timers `Persistent = true`):**
+
+| Time | Unit | Source of truth |
+|------|------|-----------------|
+| 03:00 | `agy-nightly-handoff` (user) | executes `~/HANDOFF.md` via `agy`, then deletes it |
+| 03:00 | `postgresqlBackup-immich` | local |
+| 03:30 (+10m jitter) | `restic-backups-frieren-local` | local |
+| Sun 01:30 (+30m jitter) | `fleet-warm-cache` | **`github:shaoyanji/nixconfig`** — builds all 18 host closures |
+| 04:00 | `nixos-upgrade` (`system.autoUpgrade`) | **`github:shaoyanji/nixconfig#frieren`** |
+| 05:00 | `agy-nightly-system` (user) | executes `~/SYSTEM.md` via `agy` (mem peak ~4.2 GB) |
+
+**The origin-vs-local trap (this is the one that bites):**
+`system.autoUpgrade` builds from the **pushed GitHub flake**, not
+`/Volumes/data/projects/nixconfig`. Any local `nixos-rebuild switch` from a
+dirty tree is therefore **silently reverted by the next 04:00 run** unless the
+change is committed **and pushed**. A local switch that produced no new
+generation usually means exactly this. Confirm what the 04:00 run used:
+```bash
+journalctl -u nixos-upgrade -n 40 --no-pager | grep -E 'unpacking|new configuration'
+git -C /Volumes/data/projects/nixconfig rev-parse HEAD     # must match the unpacked rev
+```
+
+**Rebuild rules:**
+1. **At most one `nixos-rebuild` at a time.** Never retry-loop it — six
+   concurrent attempts is what caused the 2026-10-07 06:46 incident. If it
+   seems slow, *measure* progress (next point) before touching anything.
+2. **After a dirty `flake.lock` bump the closure is re-fetched, not rebuilt.**
+   A nixpkgs rev change invalidates every store hash, so expect a multi-GB
+   download (tens of minutes on this host). It is not hung. Watch it:
+   ```bash
+   find /nix/store -maxdepth 1 -newermt '-2 minutes' | wc -l   # >0 = progressing
+   ls -l /nix/var/nix/temproots/<nix-pid>                      # mtime advances
+   ```
+   Fat tail to expect: frieren's closure contains **`paperless-ngx` →
+   `python3.14-torch` + `triton-llvm` + `wandb` + `google-cloud-cpp`**
+   (`nix why-depends /run/current-system <torch-path>` to re-verify). Cheap
+   slimming levers here are worth more than any build tuning.
+3. **Do not rebuild in the 03:00–05:30 window** on this host. Also avoid
+   Sunday mornings while `fleet-warm-cache` is running.
+4. **Load average lies here.** It is dominated by D-state btrfs kworkers and
+   `kswapd0`, not CPU. Judge pressure with `free -h` + `vmstat 1 3` (look at
+   `si/so`, `wa`, and idle%) — CPU is often 60–90% idle at loadavg 8+.
+5. **A killed `nixos-rebuild` leaves an orphaned root `nix build`** that can
+   never switch anything but keeps ~2 GB resident. Before retrying:
+   ```bash
+   pgrep -af 'nix build .*nixosConfigurations'    # kill it if it is an orphan
+   ```
+6. **After a successful switch, verify state, not vibes:**
+   ```bash
+   readlink -f /run/current-system
+   nixos-rebuild list-generations | tail -3
+   systemctl --failed; systemctl --user --failed
+   ```
+
 ### Git & Flake
 
 ```bash

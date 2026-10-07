@@ -25,11 +25,10 @@
 #                         # compatible / OpenRouter / Anthropic ...)
 #   hermes memory setup   # optional external memory provider
 #   hermes status         # verify
-{
-  lib,
-  config,
-  pkgs,
-  ...
+{ lib
+, config
+, pkgs
+, ...
 }:
 let
   personaDir = ./hermes-persona;
@@ -70,7 +69,7 @@ in
         run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
       fi
       # Link .env to sops-managed hermes.env if present
-      if [ ! -e "$HOME/.hermes/.env" ]; then
+      if [ -L "$HOME/.hermes/.env" ] || [ ! -e "$HOME/.hermes/.env" ]; then
         if [ -f "$HOME/.config/hermes/hermes.env" ]; then
           run ln -sf "$HOME/.config/hermes/hermes.env" "$HOME/.hermes/.env"
         elif [ -f "/run/secrets/hermes" ]; then

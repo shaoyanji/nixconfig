@@ -1,0 +1,14 @@
+{
+  "name": "jev-ultrafast",
+  "version": "1.0.0",
+  "description": "Ultra-low-latency web browsing skill using TypeSafe Jev and Playwright",
+  "type": "module",
+  "main": "scripts/jev-runner.mjs",
+  "scripts": {
+    "start": "node scripts/jev-runner.mjs",
+    "test": "node scripts/smoke_test.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  }
+}

@@ -8,8 +8,10 @@
       userName = "jisifu";
       imap.host = "imap.gmail.com";
       imap.port = 993;
+      imap.authentication = "plain";
       smtp.host = "smtp.gmail.com";
       smtp.port = 465;
+      smtp.authentication = "plain";
       # passwordCommand = "nu -c '( bw list items --session $env.BW_SESSION --url https://google.com | from json | get fields.0.0.value)'";
       passwordCommand = "cat ${config.sops.secrets.gmail.path}";
       signature.text = "Matt Ji";
@@ -23,8 +25,10 @@
       userName = "jisifu";
       imap.host = "imap.gmail.com";
       imap.port = 993;
+      imap.authentication = "plain";
       smtp.host = "smtp.gmail.com";
       smtp.port = 465;
+      smtp.authentication = "plain";
       passwordCommand = "cat ${config.sops.secrets.gmail.path}";
       signature.text = "Matt Ji";
       himalaya.enable = true;

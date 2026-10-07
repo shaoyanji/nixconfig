@@ -5,6 +5,10 @@ in
 {
   networking.hostName = "guckloch";
 
+  imports = [
+    ../../modules/profiles/sshfs-nas-client.nix
+  ];
+
   wsl.enable = true;
   wsl.defaultUser = user.name;
   wsl.docker-desktop.enable = true;

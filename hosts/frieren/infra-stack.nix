@@ -19,6 +19,7 @@ let
     run_agent_cascade() {
       local prompt="$1"
 
+      # Tier 1: Antigravity CLI (Gemini)
       echo "=== [$(date)] Agent Cascade: Attempting Tier 1 (Antigravity CLI / agy) ==="
       if ${pkgs.antigravity-cli}/bin/agy --dangerously-skip-permissions -p "$prompt"; then
         echo "=== [$(date)] Agent Cascade: Tier 1 (agy) succeeded. ==="
@@ -26,15 +27,7 @@ let
       fi
       echo "=== [$(date)] WARN: agy failed (credit exhaustion, quota, or execution error). Attempting fallback... ===" >&2
 
-      # Source API keys from hermes.env if available (Groq, OpenRouter, Cerebras, DeepSeek)
-      if [ -f "/home/devji/.config/hermes/hermes.env" ]; then
-        set -a
-        # shellcheck disable=SC1091
-        source /home/devji/.config/hermes/hermes.env 2>/dev/null || true
-        set +a
-      fi
-
-      # Tier 2: Freebuff Headless (multi-session autonomous agent)
+      # Tier 2: Freebuff Headless (autonomous multi-session broker)
       if command -v freebuff-headless >/dev/null 2>&1 || [ -x "/home/devji/.local/bin/freebuff-headless" ]; then
         echo "=== [$(date)] Agent Cascade: Attempting Tier 2 (freebuff-headless) ==="
         local fb_bin
@@ -46,13 +39,34 @@ let
         echo "=== [$(date)] WARN: freebuff-headless failed. Attempting Tier 3 fallback... ===" >&2
       fi
 
-      # Tier 3: Crush CLI agent (Charmbracelet agent)
+      # Tier 3: Hermes Agent (Nous Research agent with ~/.hermes / hermes.env)
+      if command -v hermes >/dev/null 2>&1 || [ -x "/run/current-system/sw/bin/hermes" ]; then
+        echo "=== [$(date)] Agent Cascade: Attempting Tier 3 (hermes) ==="
+        local hermes_bin
+        hermes_bin="$(command -v hermes 2>/dev/null || echo "/run/current-system/sw/bin/hermes")"
+
+        # Source hermes API keys & env
+        if [ -f "/home/devji/.config/hermes/hermes.env" ]; then
+          set -a
+          # shellcheck disable=SC1091
+          source /home/devji/.config/hermes/hermes.env 2>/dev/null || true
+          set +a
+        fi
+
+        if "$hermes_bin" -q "$prompt" --oneshot; then
+          echo "=== [$(date)] Agent Cascade: Tier 3 (hermes) succeeded. ==="
+          return 0
+        fi
+        echo "=== [$(date)] WARN: hermes failed. Attempting Tier 4 fallback... ===" >&2
+      fi
+
+      # Tier 4: Crush CLI agent (Charmbracelet agent)
       if command -v crush >/dev/null 2>&1 || [ -x "/home/devji/.local/bin/crush" ]; then
-        echo "=== [$(date)] Agent Cascade: Attempting Tier 3 (crush) ==="
+        echo "=== [$(date)] Agent Cascade: Attempting Tier 4 (crush) ==="
         local crush_bin
         crush_bin="$(command -v crush 2>/dev/null || echo "/home/devji/.local/bin/crush")"
         if "$crush_bin" run --quiet "$prompt"; then
-          echo "=== [$(date)] Agent Cascade: Tier 3 (crush) succeeded. ==="
+          echo "=== [$(date)] Agent Cascade: Tier 4 (crush) succeeded. ==="
           return 0
         fi
         echo "=== [$(date)] WARN: crush failed. ===" >&2

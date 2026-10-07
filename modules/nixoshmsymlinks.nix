@@ -6,7 +6,7 @@
 let
   nixNAS = "/Volumes/data";
   hostName = config.networking.hostName or null;
-  noSymlinkHosts = [ "guckloch" ];
+  noSymlinkHosts = [ ];
   cfg = config.nixoshmsymlinks;
 in
 {

@@ -1,18 +1,20 @@
-{ lib
-, pkgs
-, config
-, ...
-}:
 {
+  lib,
+  pkgs,
+  config,
+  ...
+}: {
   # Fleet-wide gate for AI CLI tooling. On by default (desktops, standalone
   # homes); container/no-DE hosts set this to false to keep the closures
   # small on headless boxes. The leaf modules (aichat.nix, antigravity-cli.nix)
   # gate themselves on this option too, so they stay inert where it is off —
   # `or true` keeps them active in chains (roles/home.nix) that never import
   # this option declaration.
-  options.profiles.ai.enable = lib.mkEnableOption "AI agent CLI tooling" // {
-    default = true;
-  };
+  options.profiles.ai.enable =
+    lib.mkEnableOption "AI agent CLI tooling"
+    // {
+      default = true;
+    };
 
   imports = [
     # ./codex.nix
@@ -40,8 +42,7 @@
 
     # AI agent CLIs from llm-agents.nix (overlay wired in module-sets:
     # pkgs.llm-agents.<name>; numtide cache via flake nixConfig).
-    home.packages =
-      with pkgs;
+    home.packages = with pkgs;
       [
         geminicommit
         tgpt
@@ -54,7 +55,7 @@
         pkgs.llm-agents.qmd
         # dsh — DeepSeek harness CLI (llm-agents overlay). Fleet-wide client
         # agent now that freebuff is mainframe-only.
-        pkgs.llm-agents.dsh
+        # pkgs.llm-agents.dsh
         # Fleet agent utility stack (2026-10):
         #   ai-memory — persistent cross-agent memory (MCP + CLI; shared store)
         #   toon — TOON format tooling (the old OpenClaw memory encoding)
@@ -79,6 +80,6 @@
         # aichat
         # mods
       ]
-      ++ lib.optionals stdenv.hostPlatform.isLinux [ ];
+      ++ lib.optionals stdenv.hostPlatform.isLinux [];
   };
 }

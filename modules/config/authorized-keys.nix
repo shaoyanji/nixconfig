@@ -30,6 +30,7 @@ let
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA0PNF2ea41zmEcLNV+hk58py3LMxWjbsJV1CgO96T2I"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC6Q+UiPCzp+dhUydXWiUrVw1jnohdsBMwieAiuINaww alice@netbook"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILrvO+LslaA0+SWCvy46hUoVUifVjhtM8hXzoViIBebG u0_a301@moto-g35-5g"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFOS9RHGObNEmXWrmgry6j4NjepOYSC101CmdCtfxRVr devji@stark"
     ];
 in
 {

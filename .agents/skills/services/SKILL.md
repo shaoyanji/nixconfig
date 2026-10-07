@@ -1,6 +1,14 @@
 ---
 name: services
-description: Legacy compatibility wrappers routing to canonical infra:* and checks:* tasks. Includes validation, rollback, and host deploy aliases. Derived from taskfiles/services-core.yml and taskfiles/services-legacy.yml.
+description: "Legacy wrappers routing to canonical infra/checks/dev."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['services', 'legacy', 'infra', 'checks']
+    related_skills: []
 ---
 
 # services — Legacy Compatibility

@@ -1,6 +1,14 @@
 ---
 name: data
-description: NAS storage taxonomy, maintenance, hygiene, and privacy enforcement — audit, metadata cleanup, download staging, and private directory security. Derived from taskfiles/data.yml.
+description: "NAS storage taxonomy, hygiene, permissions."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['data', 'nas', 'storage', 'hygiene']
+    related_skills: []
 ---
 
 # data — NAS Storage Taxonomy & Hygiene

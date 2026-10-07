@@ -1,6 +1,14 @@
 ---
 name: checks
-description: Validation and health checks — host evals, Nix linting and formatting, sops drift, repo health checks. Derived from taskfiles/checks.yml.
+description: "Validation, Nix lint, sops drift, repo health."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['checks', 'validation', 'nix', 'sops']
+    related_skills: []
 ---
 
 # checks — Validation & Health Checks

@@ -1,10 +1,14 @@
+---
 name: officecli
-description: >-
-  Use this skill when an agent must read, edit, or create Microsoft Office
-  documents (.docx / .xlsx / .pptx) without Microsoft Office — OfficeCLI is
-  a single-binary suite purpose-built for AI agents, with a built-in MCP
-  server exposing all document operations. Primary fleet use: producing
-  DOCX résumés/cover letters in the antigravity-application-workflow.
+description: "Read, edit, create Office docs via OfficeCLI."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [office, documents, docx, xlsx, pptx]
+    related_skills: [pdfvision]
 ---
 
 # `officecli` — Office Suite for AI Agents

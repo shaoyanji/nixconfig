@@ -1,9 +1,14 @@
+---
 name: ai-memory
-description: >-
-  Use this skill to work with ai-memory — persistent, cross-agent memory
-  (wiki + SQLite + MCP server) shared between coding agents on this host.
-  Covers init, capture, wiki read/write/search, workstream handoffs, and
-  wiring agents to its MCP server.
+description: "Cross-agent memory via ai-memory (wiki + SQLite)."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [memory, ai-memory, sqlite, mcp]
+    related_skills: []
 ---
 
 # `ai-memory` — Shared Agent Memory Store

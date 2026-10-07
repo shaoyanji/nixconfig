@@ -21,6 +21,7 @@
     # ./mods.nix
     ./aichat.nix
     ./antigravity-cli.nix
+    ./skills
     ./freebuff-remote.nix
     ./zed-mcp.nix
     ./hermes-user.nix

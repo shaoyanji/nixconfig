@@ -1,9 +1,9 @@
 endpoints:
   - name: moto
-    hostname: 100.91.87.86
+    hostname: 100.75.49.73
     port: 8022
-    user: u0_301
-    desc: "Motorola Phone (Termux / Android)"
+    user: u0_a301
+    desc: "Motorola G35 Phone (Termux / Android)"
 
   - name: frieren
     hostname: 100.97.61.65

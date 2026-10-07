@@ -15,9 +15,9 @@ metadata:
 
 Control and interact with the Motorola Android phone running Termux over Tailscale.
 
-- **Host / IP**: `100.91.87.86` (Tailscale hostname `tailscale-termux`)
+- **Host / IP**: `100.75.49.73` (Tailscale hostname `moto-g35-5g`)
 - **Port**: `8022`
-- **User**: `u0_301` (Termux sandbox UID)
+- **User**: `u0_a301` (Termux sandbox UID)
 - **SSH Alias**: `moto` (defined in `~/.ssh/config`)
 
 ## Quick Tasks

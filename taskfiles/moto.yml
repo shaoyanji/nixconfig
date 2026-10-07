@@ -1,9 +1,9 @@
 version: "3"
 
 vars:
-  MOTO_HOST: "100.91.87.86"
+  MOTO_HOST: "100.75.49.73"
   MOTO_PORT: "8022"
-  MOTO_USER: "u0_301"
+  MOTO_USER: "u0_a301"
   MOTO_ALIAS: "moto"
 
 tasks:

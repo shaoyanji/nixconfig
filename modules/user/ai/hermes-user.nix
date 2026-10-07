@@ -60,6 +60,7 @@ in
           "AGENTS.md"
           "USER.md"
           "MEMORY.md"
+          "config.yaml"
         ]
       }
       # Greppable archive of the old agent's daily memory log (95 files,
@@ -67,6 +68,14 @@ in
       # in one place alongside the live ~/.hermes.
       if [ ! -e "$HOME/.hermes/openclaw-archive" ]; then
         run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
+      fi
+      # Link .env to sops-managed hermes.env if present
+      if [ ! -e "$HOME/.hermes/.env" ]; then
+        if [ -f "$HOME/.config/hermes/hermes.env" ]; then
+          run ln -sf "$HOME/.config/hermes/hermes.env" "$HOME/.hermes/.env"
+        elif [ -f "/run/secrets/hermes" ]; then
+          run ln -sf "/run/secrets/hermes" "$HOME/.hermes/.env"
+        fi
       fi
     '';
 

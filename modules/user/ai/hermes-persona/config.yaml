@@ -1,0 +1,8 @@
+# Hermes Agent Configuration (seeded from nixconfig hermes-user)
+# Persona: Vanta (resurrected OpenClaw persona)
+# Sensitive tokens (e.g. TELEGRAM_BOT_TOKEN) are loaded from ~/.hermes/.env (sops secret).
+terminal:
+  backend: local
+  timeout: 180
+telegram:
+  reactions: false

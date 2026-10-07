@@ -573,13 +573,12 @@ in
 
               if [[ $version != ${cfg.package.version} ]]; then
                 ${lib.getExe cfg.package} migrate
+                # mirror upstream's init-search-index service
+                # `--if-needed` makes this a fast no-op if the index is up-to-date,
+                # and automatically migrates when needed (e.g. with v2 -> v3 swapping from Whoosh to Tantivy)
+                ${lib.getExe cfg.package} document_index reindex --if-needed --no-progress-bar
                 echo ${cfg.package.version} > "$versionFile"
               fi
-
-              # mirror upstream's init-search-index service
-              # `--if-needed` makes this a fast no-op if the index is up-to-date,
-              # and automatically migrates when needed (e.g. with v2 -> v3 swapping from Whoosh to Tantivy)
-              ${lib.getExe cfg.package} document_index reindex --if-needed --no-progress-bar
 
             if ${lib.boolToString (cfg.passwordFile != null)} || [[ -n ''${PAPERLESS_ADMIN_PASSWORD-} ]]; then
               export PAPERLESS_ADMIN_USER="''${PAPERLESS_ADMIN_USER:-admin}"

@@ -88,4 +88,11 @@ in
       (d "0750" "paperless" "paperless" "${paperlessDataDir}/consume")
       (d "0750" "paperless" "paperless" "${paperlessDataDir}/media")
     ];
+
+  # Prevent NixOS rebuilds from restarting Paperless services on routine switch,
+  # saving CPU and disk I/O from unneeded Celery/Granian/Tantivy churn.
+  systemd.services.paperless-scheduler.restartIfChanged = false;
+  systemd.services.paperless-consumer.restartIfChanged = false;
+  systemd.services.paperless-web.restartIfChanged = false;
+  systemd.services.paperless-task-queue.restartIfChanged = false;
 }

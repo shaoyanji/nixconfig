@@ -3,7 +3,7 @@ version: "3"
 vars:
   EMAIL: e@mail.shaoyanji.is-a.dev
   ENC_DETASKFILE: DE-Taskfile.yaml
-  ENC_TASKFILE: Taskfile.yaml
+  ENC_TASKFILE: DE-Taskfile.yaml
   ENC_SECRETS: secrets.yaml
   ENC_ENVS: apikeys.yaml
   SECRETS: modules/secrets

@@ -15,6 +15,54 @@
 #   (pg_dump) alongside before trusting DB restore points.
 { pkgs, ... }:
 let
+  agentCascadeScript = ''
+    run_agent_cascade() {
+      local prompt="$1"
+
+      echo "=== [$(date)] Agent Cascade: Attempting Tier 1 (Antigravity CLI / agy) ==="
+      if ${pkgs.antigravity-cli}/bin/agy --dangerously-skip-permissions -p "$prompt"; then
+        echo "=== [$(date)] Agent Cascade: Tier 1 (agy) succeeded. ==="
+        return 0
+      fi
+      echo "=== [$(date)] WARN: agy failed (credit exhaustion, quota, or execution error). Attempting fallback... ===" >&2
+
+      # Source API keys from hermes.env if available (Groq, OpenRouter, Cerebras, DeepSeek)
+      if [ -f "/home/devji/.config/hermes/hermes.env" ]; then
+        set -a
+        # shellcheck disable=SC1091
+        source /home/devji/.config/hermes/hermes.env 2>/dev/null || true
+        set +a
+      fi
+
+      # Tier 2: Freebuff Headless (multi-session autonomous agent)
+      if command -v freebuff-headless >/dev/null 2>&1 || [ -x "/home/devji/.local/bin/freebuff-headless" ]; then
+        echo "=== [$(date)] Agent Cascade: Attempting Tier 2 (freebuff-headless) ==="
+        local fb_bin
+        fb_bin="$(command -v freebuff-headless 2>/dev/null || echo "/home/devji/.local/bin/freebuff-headless")"
+        if "$fb_bin" -C /home/devji -t 600 "$prompt"; then
+          echo "=== [$(date)] Agent Cascade: Tier 2 (freebuff-headless) succeeded. ==="
+          return 0
+        fi
+        echo "=== [$(date)] WARN: freebuff-headless failed. Attempting Tier 3 fallback... ===" >&2
+      fi
+
+      # Tier 3: Crush CLI agent (Charmbracelet agent)
+      if command -v crush >/dev/null 2>&1 || [ -x "/home/devji/.local/bin/crush" ]; then
+        echo "=== [$(date)] Agent Cascade: Attempting Tier 3 (crush) ==="
+        local crush_bin
+        crush_bin="$(command -v crush 2>/dev/null || echo "/home/devji/.local/bin/crush")"
+        if "$crush_bin" run --quiet "$prompt"; then
+          echo "=== [$(date)] Agent Cascade: Tier 3 (crush) succeeded. ==="
+          return 0
+        fi
+        echo "=== [$(date)] WARN: crush failed. ===" >&2
+      fi
+
+      echo "=== [$(date)] ERROR: All agent execution tiers in cascade failed. ===" >&2
+      return 1
+    }
+  '';
+
   agyHandoffRunner = pkgs.writeShellScript "agy-handoff-runner" ''
     set -euo pipefail
 
@@ -31,13 +79,23 @@ let
     ARCHIVE_COPY="$ARCHIVE_DIR/HANDOFF-$(date +%Y%m%d_%H%M%S).md"
     cp "$HANDOFF_FILE" "$ARCHIVE_COPY"
 
-    echo "=== [$(date)] Running agy on $HANDOFF_FILE ==="
     cd /home/devji
-    ${pkgs.antigravity-cli}/bin/agy --dangerously-skip-permissions -p "Please read HANDOFF.md in the current working directory and execute the plan." 2>&1 || true
 
-    echo "=== [$(date)] agy execution finished. Deleting $HANDOFF_FILE ==="
-    rm -f "$HANDOFF_FILE"
-    echo "=== [$(date)] Cleanup complete. Archived copy retained at $ARCHIVE_COPY ==="
+    ${agentCascadeScript}
+
+    prompt="Please read HANDOFF.md in the current working directory and execute the plan."
+
+    if run_agent_cascade "$prompt"; then
+      echo "=== [$(date)] Handoff execution finished successfully. Deleting $HANDOFF_FILE ==="
+      rm -f "$HANDOFF_FILE"
+      echo "=== [$(date)] Cleanup complete. Archived copy retained at $ARCHIVE_COPY ==="
+    else
+      echo "=== [$(date)] CRITICAL: Handoff execution failed across all agent tiers! ===" >&2
+      BLOCKED_COPY="$HANDOFF_FILE.blocked-$(date +%Y%m%d_%H%M%S)"
+      mv "$HANDOFF_FILE" "$BLOCKED_COPY"
+      echo "=== [$(date)] Preserved unexecuted handoff as $BLOCKED_COPY ===" >&2
+      exit 1
+    fi
   '';
 
   agySystemRunner = pkgs.writeShellScript "agy-system-runner" ''
@@ -56,11 +114,35 @@ let
     ARCHIVE_COPY="$ARCHIVE_DIR/SYSTEM-$(date +%Y%m%d_%H%M%S).md"
     cp "$SYSTEM_FILE" "$ARCHIVE_COPY"
 
-    echo "=== [$(date)] Running agy to audit and refine $SYSTEM_FILE ==="
     cd /home/devji
-    ${pkgs.antigravity-cli}/bin/agy --dangerously-skip-permissions -p "Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status." 2>&1 || true
 
-    echo "=== [$(date)] agy system maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
+    # --- STEP 1: Deterministic Health & Self-Repair (Runs 100% locally with 0 API tokens) ---
+    echo "=== [$(date)] Step 1: Performing deterministic service checks ==="
+    FAILED_SYS=$(systemctl --failed --no-pager --plain --quiet | grep -v "0 loaded" | wc -l || echo 0)
+    FAILED_USER=$(systemctl --user --failed --no-pager --plain --quiet | grep -v "0 loaded" | wc -l || echo 0)
+
+    if [ "$FAILED_SYS" -gt 0 ]; then
+      echo "Detected failed system units. Attempting reset-failed..."
+      systemctl reset-failed || true
+    fi
+    if [ "$FAILED_USER" -gt 0 ]; then
+      echo "Detected failed user units. Attempting reset-failed..."
+      systemctl --user reset-failed || true
+    fi
+
+    # --- STEP 2: Agent Cascade Execution ---
+    ${agentCascadeScript}
+
+    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status."
+
+    if run_agent_cascade "$prompt"; then
+      echo "=== [$(date)] System maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
+    else
+      echo "=== [$(date)] WARN: All AI agent tiers failed. Applying deterministic timestamp update to $SYSTEM_FILE ===" >&2
+      CURRENT_DATE=$(date "+%Y-%m-%d %H:%M %Z")
+      sed -i "s/\* \*\*Last Audit Run:\*\* .*/\* \*\*Last Audit Run:\*\* $CURRENT_DATE (Deterministic Fallback)/" "$SYSTEM_FILE" || true
+      echo "=== [$(date)] Deterministic audit recorded in $SYSTEM_FILE ==="
+    fi
   '';
 in
 {

@@ -1,6 +1,14 @@
 ---
 name: infra
-description: Host lifecycle operations — plan, apply, deploy, rollback, logs, secrets, SOPS, store maintenance, and local rebuilds. Derived from taskfiles/infra.yml.
+description: "Host lifecycle: plan, apply, deploy, rollback, logs."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['infra', 'host', 'lifecycle', 'deploy']
+    related_skills: []
 ---
 
 # infra — Host Lifecycle

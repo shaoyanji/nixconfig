@@ -1,9 +1,14 @@
+---
 name: toon
-description: >-
-  Use this skill for TOON (Token-Oriented Object Notation) conversions —
-  encoding/decoding JSON to the compact TOON format that the legacy OpenClaw
-  agent used for its mem0 memory tier, and that saves tokens when piping
-  large structured data through LLM context windows.
+description: "Encode/decode JSON to compact TOON for agent memory."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [toon, json, serialization, memory]
+    related_skills: []
 ---
 
 # `toon` — Token-Efficient JSON ↔ TOON Conversion

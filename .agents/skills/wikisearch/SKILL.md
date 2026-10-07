@@ -1,8 +1,14 @@
 ---
 name: wikisearch
-description: >-
-  Use this skill to query, search, and manage offline Wikipedia and any Kiwix-served
-  ZIM knowledge archives on frieren.lan using native BM25 ranking and Kiwix tools.
+description: "Offline Wikipedia/Kiwix BM25 search on frieren."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['wikisearch', 'kiwix', 'wikipedia', 'search']
+    related_skills: []
 ---
 
 # `wikisearch` — Universal Kiwix & Offline Wiki Search Runbook

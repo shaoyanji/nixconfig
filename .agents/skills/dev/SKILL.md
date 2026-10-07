@@ -1,6 +1,14 @@
 ---
 name: dev
-description: Development workflows — git operations, flake updates, site deployment, PR management, packages, and formatting. Derived from taskfiles/dev.yml.
+description: "Git, flake updates, site deploy, PRs, packages."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['dev', 'git', 'flake', 'site']
+    related_skills: []
 ---
 
 # dev — Development Workflows

@@ -1,8 +1,14 @@
 ---
 name: frieren-offload
-description: >-
-  Use this skill to offload compute-heavy, memory-intensive, or long-running Antigravity (agy)
-  agent tasks from this resource-constrained netbook to the powerful remote host frieren.lan.
+description: "Offload heavy agy tasks from netbook to frieren."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['frieren', 'offload', 'agy']
+    related_skills: []
 ---
 
 # Frieren Offload Runbook (Antigravity Remote Delegation)

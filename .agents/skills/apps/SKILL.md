@@ -1,6 +1,14 @@
 ---
 name: apps
-description: Job application workflow control (shaoyanji/antigravity-application-workflow via bin/appflow) - application status tracking and updates, inbound email radar with status sync, recruiter follow-ups, Typst document builds and QA, three-way JSON/SQLite/CSV sync, and GitHub push/pull. Derived from taskfiles/apps.yml.
+description: "Job application pipeline: status, emails, Typst docs."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['apps', 'job-application', 'workflow']
+    related_skills: []
 ---
 
 # apps — Job Application Workflow (appflow)

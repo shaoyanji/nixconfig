@@ -1,6 +1,14 @@
 ---
 name: agents
-description: Operator helpers — interactive menus, xs runtime wrappers (artifact/contract/record/trace), and OAuth/session management for service users. Derived from taskfiles/agents.yml.
+description: "Operator menus, xs runtime, OAuth/session management."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['agents', 'operators', 'xs']
+    related_skills: []
 ---
 
 # agents — Operator Helpers

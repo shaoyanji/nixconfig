@@ -1,6 +1,14 @@
 ---
 name: bountystash
-description: Bountystash Console management — modern brutalist 3D spatial systems console (<14KB TCP budget), local preview, and Cloudflare Pages deployments via Wrangler. Derived from taskfiles/bountystash.yml.
+description: "Bountystash Console & Cloudflare Pages control."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['bountystash', 'console', 'cloudflare']
+    related_skills: []
 ---
 
 # bountystash — Bountystash Console & Cloudflare Pages Control Plane

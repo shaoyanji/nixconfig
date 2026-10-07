@@ -1,9 +1,14 @@
+---
 name: pdfvision
-description: >-
-  Use this skill when an agent needs to read, extract, or convert PDF
-  documents — text extraction, quality-aware re-reads, term search with
-  bounding boxes, region rendering as image evidence, and a built-in MCP
-  server (`pdfvision mcp`) for editor/agent integration.
+description: "Read, extract, convert PDFs via pdfvision CLI."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [pdf, vision, documents, mcp]
+    related_skills: [officecli]
 ---
 
 # `pdfvision` — PDF Understanding for Agent Pipelines

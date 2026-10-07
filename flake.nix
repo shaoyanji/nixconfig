@@ -16,7 +16,6 @@
     # what the flake builds against (stable branches WILL break it).
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     # MCP server packages + module framework (Zed context_servers pilot:
     # github + nixos servers — see modules/user/ai/zed-mcp.nix).
@@ -95,10 +94,9 @@
   };
 
   outputs =
-    inputs@{
-      self,
-      nixpkgs,
-      ...
+    inputs@{ self
+    , nixpkgs
+    , ...
     }:
     import ./flake/outputs.nix {
       inherit inputs self nixpkgs;

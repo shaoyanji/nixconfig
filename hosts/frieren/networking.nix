@@ -27,6 +27,7 @@
     enable = true;
     environment = {
       SERVER_PORT = "7351";
+      SECURITY_ENABLELOGIN = "false";
     };
   };
   networking.firewall.allowedTCPPorts = lib.mkAfter [ 7351 ];

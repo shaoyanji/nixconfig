@@ -73,6 +73,9 @@
 
     # Antigravity standalone project fallback to avoid project store read failures
     # when starting sessions without an explicit active workspace project.
+    # Prevent Home Manager activation collisions when agy mutates settings.json at runtime
+    home.file.".gemini/antigravity-cli/settings.json".force = true;
+
     home.file.".gemini/config/projects/outside-of-project.json".text = builtins.toJSON {
       id = "outside-of-project";
       name = "Outside of Project";

@@ -552,6 +552,7 @@ in
             User = cfg.user;
             ExecStart = "${cfg.package}/bin/celery --app paperless beat --loglevel INFO";
             Restart = "on-failure";
+            TimeoutStartSec = "10m";
             LoadCredential = lib.optionalString
               (
                 cfg.passwordFile != null

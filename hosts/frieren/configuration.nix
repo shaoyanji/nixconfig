@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 let
   user = import ../../modules/global/user.nix;
@@ -145,11 +144,25 @@ in
   };
 
   # E.3: Hermes agent secrets (telegram bot token, allowed users, timeout)
+  # Combined with shared AI services secrets (API keys) via template.
   sops.secrets."hermes" = {
     owner = "devji";
     group = "users";
     mode = "0400";
+  };
+
+  sops.secrets."ai-services-shared-env" = {
+    owner = "devji";
+    group = "users";
+    mode = "0400";
+  };
+
+  sops.templates."hermes.env" = {
+    owner = "devji";
+    group = "users";
+    mode = "0400";
     path = "/home/devji/.config/hermes/hermes.env";
+    content = "${config.sops.placeholder."ai-services-shared-env"}${config.sops.placeholder."hermes"}";
   };
 
   services.aria2-daemon = {

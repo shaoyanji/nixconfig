@@ -1,8 +1,9 @@
 # hermes — Nous Research's self-improving agent, frieren user-space persona.
 #
-# Hermes (pkgs.llm-agents.hermes-agent, v2026.9.14) is installed ONLY on
-# frieren (the mainframe). This module seeds ~/.hermes with the resurrected
-# OpenClaw persona from /Volumes/data/openclaw (agent "Vanta", 2026-03/04),
+# Hermes (pkgs.llm-agents.hermes-agent) is installed ONLY on frieren (the
+# mainframe), as a host package — see hosts/frieren/tools.nix. This module
+# seeds ~/.hermes with the resurrected OpenClaw persona from
+# /Volumes/data/openclaw (agent "Vanta", 2026-03/04),
 # whose four runtime files map 1:1 onto Hermes' auto-injected context:
 #
 #   OpenClaw (old)   ->  Hermes (~/.hermes)   ->  Purpose
@@ -119,5 +120,59 @@ in
         '';
       })
     ];
+
+    # --- Messaging gateway (Telegram, Discord, …) ------------------------
+    # Declared here instead of leaving it to `hermes gateway install`, because
+    # that generator cannot produce a working unit under a Nix install: it bakes
+    # sys.executable — the bare nix interpreter — into ExecStart, and that
+    # interpreter has neither hermes_cli nor the gateway extras on sys.path, so
+    # the unit crash-loops with ModuleNotFoundError (seen 2026-10-07: restart
+    # counter 466). The llm-agents wrapper puts the entire dependency set on
+    # sys.path itself and exports HERMES_PYTHON for child processes, so
+    # ExecStart is just the wrapper.
+    #
+    # Do NOT run `hermes gateway install` on this host: it rewrites
+    # ~/.config/systemd/user/hermes-gateway.service and clobbers this unit.
+    #
+    # The generated unit's ExecStop/ExecStopPost hooks
+    # (`python -m gateway.systemd_stop_mark` / `gateway.cgroup_cleanup`) are
+    # deliberately omitted: they are `-`-prefixed (non-fatal) and only maintain
+    # a cosmetic stop marker in gateway_state.json, while llm-agents does not
+    # export the dependency-bearing interpreter they need. KillMode=mixed still
+    # tears the cgroup down on stop, and the gateway clears a stale marker on
+    # next start.
+    systemd.user.services.hermes-gateway = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+      Unit = {
+        Description = "Hermes Agent Gateway - Messaging Platform Integration";
+        After = [ "network-online.target" ];
+        Wants = [ "network-online.target" ];
+        # Hermes supervises its own restarts; never let systemd rate-limit it
+        # into a permanent stop.
+        StartLimitIntervalSec = 0;
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${pkgs.llm-agents.hermes-agent}/bin/hermes gateway run";
+        WorkingDirectory = "${config.home.homeDirectory}/.hermes";
+        Environment = [
+          "HERMES_HOME=${config.home.homeDirectory}/.hermes"
+          "HERMES_SUPERVISED_CHILD=1"
+          "HOME=${config.home.homeDirectory}"
+          "USER=${config.home.username}"
+          "PATH=${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
+        ];
+        Restart = "always";
+        RestartSec = 5;
+        RestartForceExitStatus = 75;
+        SuccessExitStatus = 75;
+        RestartPreventExitStatus = 78;
+        KillMode = "mixed";
+        KillSignal = "SIGTERM";
+        TimeoutStopSec = 70;
+        StandardOutput = "journal";
+        StandardError = "journal";
+      };
+      Install.WantedBy = [ "default.target" ];
+    };
   };
 }

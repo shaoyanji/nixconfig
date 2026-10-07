@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   user = import ../../modules/global/user.nix;
 in
@@ -7,13 +7,17 @@ in
 
   imports = [
     ../../modules/profiles/sshfs-nas-client.nix
+    ../../modules/config/authorized-keys.nix
   ];
 
   wsl.enable = true;
   wsl.defaultUser = user.name;
   wsl.docker-desktop.enable = true;
   wsl.useWindowsDriver = true;
-  users.users.${user.name}.extraGroups = [ "docker" ];
+  users.users.${user.name} = {
+    extraGroups = [ "docker" ];
+    openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
+  };
 
   environment.systemPackages = with pkgs; [
     markdownlint-cli

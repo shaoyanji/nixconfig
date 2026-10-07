@@ -1,9 +1,14 @@
+---
 name: parallel-cli
-description: >-
-  Use this skill for Parallel web intelligence from agents — AI web search,
-  deep research, URL extraction to clean markdown, entity discovery
-  (FindAll), continuous monitors, and task/monitor recall memory. Requires
-  one-time `parallel-cli login` (device OAuth) and prepaid balance.
+description: "AI web search, deep research, URL extraction."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [web, search, research, parallel]
+    related_skills: []
 ---
 
 # `parallel-cli` — Web Search / Research / Monitoring for Agents

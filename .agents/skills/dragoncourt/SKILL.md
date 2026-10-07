@@ -1,6 +1,14 @@
 ---
 name: dragoncourt
-description: Alwaysdata Debian hosting management — SSH access, PHP/Wasm webserver (dragoncourt.alwaysdata.net), Comrak template builds, and Charmbracelet Gum/Wish menu. Derived from taskfiles/dragoncourt.yml.
+description: "Alwaysdata Debian hosting: SSH, PHP/Wasm, Gum."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['dragoncourt', 'alwaysdata', 'debian']
+    related_skills: []
 ---
 
 # dragoncourt — Alwaysdata Hosting Control Plane

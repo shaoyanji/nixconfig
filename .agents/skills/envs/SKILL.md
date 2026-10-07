@@ -1,6 +1,14 @@
 ---
 name: envs
-description: Envs.net Debian hosting management — SSH access, public_html PHP/SPA website (jisifu.envs.net), Gemini/Gopher capsules, markdown rebuilds, and Charmbracelet Gum/Wish menu. Derived from taskfiles/envs.yml.
+description: "Envs.net Debian hosting: SSH, web, Gemini, Gopher."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['envs', 'alwaysdata', 'debian']
+    related_skills: []
 ---
 
 # envs — Envs.net Pubnix Control Plane

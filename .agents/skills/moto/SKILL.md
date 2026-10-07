@@ -1,6 +1,14 @@
 ---
 name: moto
-description: Motorola Android (Termux) operations — SSH access, non-interactive command execution, file push/pull, and Charmbracelet Wish/Gum interactive menus. Derived from taskfiles/moto.yml.
+description: "Motorola Android (Termux) over Tailscale."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['moto', 'android', 'termux', 'tailscale']
+    related_skills: []
 ---
 
 # moto — Motorola Android (Termux) Control Plane

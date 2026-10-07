@@ -1,6 +1,14 @@
 ---
 name: serv00
-description: Serv00 FreeBSD hosting management — SSH access, Devil CLI controls, webserver lifecycle (jisifu.serv00.net), and Charmbracelet Gum/Wish menu. Derived from taskfiles/serv00.yml.
+description: "Serv00 FreeBSD hosting: SSH, Devil CLI, webserver."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['serv00', 'freebsd', 'ssh', 'devil']
+    related_skills: []
 ---
 
 # serv00 — Serv00 FreeBSD Hosting Control Plane

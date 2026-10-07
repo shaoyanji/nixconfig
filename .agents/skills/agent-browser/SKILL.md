@@ -1,9 +1,14 @@
+---
 name: agent-browser
-description: >-
-  Use this skill when an agent must drive a real browser — headless Chrome
-  automation via Vercel's agent-browser CLI with snapshot-based element refs
-  (a11y tree, not DOM selectors), compact text output to save context, and a
-  headed mode for debugging. Requires chromium (installed alongside it).
+description: "Headless Chrome automation via agent-browser CLI."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [browser, chrome, automation, agent-browser]
+    related_skills: []
 ---
 
 # `agent-browser` — Headless Browser Automation for Agents

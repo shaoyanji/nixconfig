@@ -1,7 +1,14 @@
 ---
 name: qmd
-description: Local hybrid search for markdown notes and docs via the qmd CLI (nix-managed, pkgs.llm-agents.qmd). Use when searching notes, finding related content, or retrieving documents from indexed collections.
-homepage: https://github.com/tobi/qmd
+description: "Local hybrid search for markdown notes via qmd."
+version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: ['qmd', 'search', 'markdown', 'notes']
+    related_skills: []
 ---
 
 # qmd — Quick Markdown Search (nix-managed)

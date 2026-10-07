@@ -156,7 +156,7 @@ in
 
         # ── Linux-only System Diagnostics ──
         lsof # List open files
-        ltrace # Library call tracer
+        (ltrace.overrideAttrs (_: { doCheck = false; })) # Library call tracer
         pciutils # PCI bus utilities
         strace # System call tracer
         sysstat # System performance tools

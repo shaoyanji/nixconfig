@@ -1,5 +1,5 @@
 # Common shell hooks shared across devShells
-{ pkgs }: {
+{pkgs}: {
   # Basic hook with common tools initialization
   basic = ''
     eval "$(${pkgs.zoxide}/bin/zoxide init bash)"

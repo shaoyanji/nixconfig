@@ -1,5 +1,5 @@
 # Common package sets shared across devShells
-{ pkgs }: {
+{pkgs}: {
   # Core utilities - used by most shells
   core = with pkgs; [
     git

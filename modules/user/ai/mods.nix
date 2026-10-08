@@ -6,7 +6,7 @@ _: {
       default-model = "kimi-k2.6:cloud";
       mcp-timeout = "15s";
       format = false;
-      roles = { "default" = [ ]; };
+      roles = {"default" = [];};
       raw = false;
       quiet = false;
       temp = 1.0;

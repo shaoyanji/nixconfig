@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{pkgs, ...}:
 # Kali Home Manager profile
 # Targets: Raspberry Pi (aarch64) + OnePlus 6 NetHunter Pro (chroot aarch64)
 # Contract: mobile-first security starter pack. Everything here must build on

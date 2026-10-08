@@ -12,8 +12,7 @@
   pkgs,
   lib,
   ...
-}:
-{
+}: {
   imports = [
     ./hardware-configuration.nix
     ../../modules/profiles/base-node.nix
@@ -27,8 +26,8 @@
   networking.useDHCP = lib.mkDefault true;
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 ]; # SSH
-    allowedUDPPorts = [ 41641 ]; # Tailscale direct WireGuard port
+    allowedTCPPorts = [22]; # SSH
+    allowedUDPPorts = [41641]; # Tailscale direct WireGuard port
   };
 
   # Tailscale mesh networking & exit node capabilities

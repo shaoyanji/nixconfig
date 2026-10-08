@@ -1,10 +1,8 @@
 # devji user desktop/home preferences.
 # Primary user constants: modules/global/user.nix
-_:
-let
+_: let
   user = import ../global/user.nix;
-in
-{
+in {
   # Persona assembler for devji-specific desktop and personal preferences.
   imports = [
     ../zen.nix
@@ -59,7 +57,7 @@ in
           "word-count"
           "zk-prefixer"
         ];
-        communityPlugins = [ ];
+        communityPlugins = [];
       };
       vaults.local = {
         enable = true;

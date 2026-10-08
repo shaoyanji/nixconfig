@@ -17,10 +17,10 @@ _final: prev: {
     // {
       nvim-treesitter = prev.vimPlugins.nvim-treesitter.overrideAttrs (oldAttrs: {
         passthru =
-          (oldAttrs.passthru or { })
+          (oldAttrs.passthru or {})
           // {
             builtGrammars =
-              (oldAttrs.passthru.builtGrammars or { })
+              (oldAttrs.passthru.builtGrammars or {})
               // {
                 tmux = prev.tree-sitter.buildGrammar {
                   language = "tmux";

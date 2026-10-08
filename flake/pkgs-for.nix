@@ -1,5 +1,4 @@
-{ nixpkgs }:
-let
+{nixpkgs}: let
   overlays = [
     (import ../overlays/nvidia-persistenced-fix.nix)
     (import ../overlays/nushell-plugins-compat.nix)
@@ -8,4 +7,4 @@ let
     (import ../overlays/nvim-treesitter-tmux.nix)
   ];
 in
-system: import nixpkgs { inherit system overlays; }
+  system: import nixpkgs {inherit system overlays;}

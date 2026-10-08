@@ -9,11 +9,11 @@
 #     (only enabled on the cache host)
 #   - public key:  registered in modules/global/global.nix
 #     ("frieren.lan-1:...")
-{ config
-, lib
-, ...
-}:
 {
+  config,
+  lib,
+  ...
+}: {
   options.services.harmonia-fleet = {
     enable = lib.mkEnableOption "the LAN harmonia binary cache (serves /nix/store contents)";
     port = lib.mkOption {
@@ -24,11 +24,11 @@
   };
 
   config = lib.mkIf config.services.harmonia-fleet.enable {
-    sops.secrets.harmonia_signing_key = { };
+    sops.secrets.harmonia_signing_key = {};
 
     services.harmonia.cache = {
       enable = true;
-      signKeyPaths = [ config.sops.secrets.harmonia_signing_key.path ];
+      signKeyPaths = [config.sops.secrets.harmonia_signing_key.path];
       settings = {
         bind = "[::]:${toString config.services.harmonia-fleet.port}";
         # Advertised substituter priority; lower wins over cache.nixos.org
@@ -37,6 +37,6 @@
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ config.services.harmonia-fleet.port ];
+    networking.firewall.allowedTCPPorts = [config.services.harmonia-fleet.port];
   };
 }

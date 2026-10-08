@@ -2,9 +2,9 @@
   inputs,
   moduleSets,
   self,
-}:
-let
-  inherit (moduleSets)
+}: let
+  inherit
+    (moduleSets)
     globalModulesContainers
     globalModulesDemo
     globalModulesHome
@@ -12,8 +12,7 @@ let
     globalModulesMacos
     globalModulesNixos
     ;
-in
-{
+in {
   garnixMachine = {
     kind = "nixos";
     system = "x86_64-linux";
@@ -26,25 +25,25 @@ in
   poseidon = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [ ../hosts/poseidon/configuration.nix ];
+    modules = globalModulesNixos ++ [../hosts/poseidon/configuration.nix];
   };
 
   mtfuji = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [ ../hosts/mtfuji/configuration.nix ];
+    modules = globalModulesContainers ++ [../hosts/mtfuji/configuration.nix];
   };
 
   kellerbench = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [ ../hosts/kellerbench/configuration.nix ];
+    modules = globalModulesContainers ++ [../hosts/kellerbench/configuration.nix];
   };
 
   deckstation = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [ ../hosts/deckstation/configuration.nix ];
+    modules = globalModulesContainers ++ [../hosts/deckstation/configuration.nix];
   };
 
   # delphi — Oracle Cloud Always Free ARM64 headless server (offload worker,
@@ -52,7 +51,7 @@ in
   delphi = {
     kind = "nixos";
     system = "aarch64-linux";
-    modules = globalModulesContainers ++ [ ../hosts/delphi/configuration.nix ];
+    modules = globalModulesContainers ++ [../hosts/delphi/configuration.nix];
   };
   eisen = {
     kind = "nixos";
@@ -64,22 +63,24 @@ in
     # kellerbench's Kepler card).  The previous cage-kiosk specialisation and
     # greetd dual-session experiments hung at graphical.target, so the DMS
     # greeter path (as on poseidon) is used instead of greetd auto-login.
-    modules = globalModulesNixos ++ [ ../hosts/eisen/configuration.nix ];
+    modules = globalModulesNixos ++ [../hosts/eisen/configuration.nix];
   };
 
   applevalley = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [
-      inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
-      ../hosts/applevalley/configuration.nix
-    ];
+    modules =
+      globalModulesContainers
+      ++ [
+        inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
+        ../hosts/applevalley/configuration.nix
+      ];
   };
 
   frieren = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [ ../hosts/frieren/configuration.nix ];
+    modules = globalModulesNixos ++ [../hosts/frieren/configuration.nix];
   };
 
   ares = {
@@ -93,13 +94,15 @@ in
     # dropped because Lenovo fan curves / power management do not
     # apply to desktop boards.  The btrfs /persist layout on /dev/sda
     # is unchanged (disko).
-    modules = globalModulesContainers ++ [
-      inputs.impermanence.nixosModules.impermanence
-      inputs.disko.nixosModules.default
-      ../modules/global/impermanence.nix
-      ../hosts/ares/configuration.nix
-      (import ../hosts/common/disko.nix { device = "/dev/sda"; })
-    ];
+    modules =
+      globalModulesContainers
+      ++ [
+        inputs.impermanence.nixosModules.impermanence
+        inputs.disko.nixosModules.default
+        ../modules/global/impermanence.nix
+        ../hosts/ares/configuration.nix
+        (import ../hosts/common/disko.nix {device = "/dev/sda";})
+      ];
   };
 
   stark = {
@@ -116,14 +119,16 @@ in
     # Dual-disk disko uses persistent by-id paths: SK hynix SATA SSD for
     # system + 1 TB Seagate HDD as the btrfs Steam library at /mnt/steam.
     # Persistent (no impermanence) — eisen-style.
-    modules = globalModulesNixos ++ [
-      inputs.disko.nixosModules.default
-      ../hosts/stark/configuration.nix
-      (import ../hosts/stark/disko.nix {
-        mainDevice = "/dev/disk/by-id/ata-SK_hynix_SC311_SATA_128GB_MS83N428510303B5B";
-        hddDevice = "/dev/disk/by-id/ata-ST1000LM035-1RK172_WL14QR63";
-      })
-    ];
+    modules =
+      globalModulesNixos
+      ++ [
+        inputs.disko.nixosModules.default
+        ../hosts/stark/configuration.nix
+        (import ../hosts/stark/disko.nix {
+          mainDevice = "/dev/disk/by-id/ata-SK_hynix_SC311_SATA_128GB_MS83N428510303B5B";
+          hddDevice = "/dev/disk/by-id/ata-ST1000LM035-1RK172_WL14QR63";
+        })
+      ];
   };
 
   fern = {
@@ -139,20 +144,24 @@ in
     # NVMe (KIOXIA KBG40ZNV256G) so the device is /dev/nvme0n1; HP 15s-eq
     # units with a SATA M.2 enumerate as /dev/sda instead (verify with
     # lsblk BEFORE disko formats it). Persistent (no impermanence).
-    modules = globalModulesNixos ++ [
-      inputs.disko.nixosModules.default
-      ../hosts/fern/configuration.nix
-      (import ../hosts/fern/disko.nix { device = "/dev/nvme0n1"; })
-    ];
+    modules =
+      globalModulesNixos
+      ++ [
+        inputs.disko.nixosModules.default
+        ../hosts/fern/configuration.nix
+        (import ../hosts/fern/disko.nix {device = "/dev/nvme0n1";})
+      ];
   };
 
   schneeeule = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesImpermanence ++ [
-      ../hosts/schneeeule/configuration.nix
-      (import ../hosts/common/disko.nix { device = "/dev/sda"; })
-    ];
+    modules =
+      globalModulesImpermanence
+      ++ [
+        ../hosts/schneeeule/configuration.nix
+        (import ../hosts/common/disko.nix {device = "/dev/sda";})
+      ];
   };
 
   scratch = {
@@ -165,13 +174,13 @@ in
     # used — the host config puts every heavy-write dir on tmpfs
     # (zram 100%, journald volatile, fstrim, noatime).  Legacy BIOS
     # boot: GRUB on /dev/sda, systemd-boot disabled.
-    modules = globalModulesNixos ++ [ ../hosts/scratch/configuration.nix ];
+    modules = globalModulesNixos ++ [../hosts/scratch/configuration.nix];
   };
 
   aristotle = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [ ../hosts/aristotle/configuration.nix ];
+    modules = globalModulesNixos ++ [../hosts/aristotle/configuration.nix];
   };
 
   # Note: netbook is an independent NixOS 25.11 host (no flake, pinned 25.11 channel
@@ -181,48 +190,54 @@ in
   aceofspades = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [ ../hosts/aceofspades/configuration.nix ];
+    modules = globalModulesNixos ++ [../hosts/aceofspades/configuration.nix];
   };
 
   ancientace = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [ ../hosts/ancientace/configuration.nix ];
+    modules = globalModulesNixos ++ [../hosts/ancientace/configuration.nix];
   };
 
   guckloch = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [
-      ../hosts/guckloch/configuration.nix
-      inputs.nixos-wsl.nixosModules.default
-    ];
+    modules =
+      globalModulesContainers
+      ++ [
+        ../hosts/guckloch/configuration.nix
+        inputs.nixos-wsl.nixosModules.default
+      ];
   };
 
   minyx = {
     kind = "nixos";
     system = "aarch64-linux";
-    modules = globalModulesContainers ++ [
-      ../hosts/minyx/configuration.nix
-      ../hosts/minyx/custompi.nix
-      inputs.impermanence.nixosModules.impermanence
-      inputs.nixos-hardware.nixosModules.raspberry-pi-3
-    ];
+    modules =
+      globalModulesContainers
+      ++ [
+        ../hosts/minyx/configuration.nix
+        ../hosts/minyx/custompi.nix
+        inputs.impermanence.nixosModules.impermanence
+        inputs.nixos-hardware.nixosModules.raspberry-pi-3
+      ];
   };
 
   sledgehammer = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [
-      ../hosts/sledgehammer/configuration.nix
-      inputs.disko.nixosModules.default
-    ];
+    modules =
+      globalModulesContainers
+      ++ [
+        ../hosts/sledgehammer/configuration.nix
+        inputs.disko.nixosModules.default
+      ];
   };
 
   demo = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesDemo ++ [ ../hosts/demo/configuration.nix ];
+    modules = globalModulesDemo ++ [../hosts/demo/configuration.nix];
   };
 
   testvm = {
@@ -230,8 +245,8 @@ in
     system = "x86_64-linux";
     modules = [
       inputs.microvm.nixosModules.microvm
-      (import ../hosts/microvms/testvm.nix { })
-      ({ pkgs, ... }: {
+      (import ../hosts/microvms/testvm.nix {})
+      ({pkgs, ...}: {
         environment.systemPackages = with pkgs; [
           vim
           htop
@@ -243,27 +258,27 @@ in
   penguin = {
     kind = "home";
     system = "x86_64-linux";
-    extraSpecialArgs = { inherit inputs self; };
-    modules = globalModulesHome ++ [ ../hosts/penguin.nix ];
+    extraSpecialArgs = {inherit inputs self;};
+    modules = globalModulesHome ++ [../hosts/penguin.nix];
   };
 
   alarm = {
     kind = "home";
     system = "aarch64-linux";
-    extraSpecialArgs = { inherit inputs self; };
-    modules = globalModulesHome ++ [ ../hosts/alarm.nix ];
+    extraSpecialArgs = {inherit inputs self;};
+    modules = globalModulesHome ++ [../hosts/alarm.nix];
   };
 
   kali = {
     kind = "home";
     system = "aarch64-linux";
-    extraSpecialArgs = { inherit inputs self; };
-    modules = globalModulesHome ++ [ ../hosts/kali.nix ];
+    extraSpecialArgs = {inherit inputs self;};
+    modules = globalModulesHome ++ [../hosts/kali.nix];
   };
 
   cassini = {
     kind = "darwin";
     system = "aarch64-darwin";
-    modules = globalModulesMacos ++ [ ../hosts/cassini/configuration.nix ];
+    modules = globalModulesMacos ++ [../hosts/cassini/configuration.nix];
   };
 }

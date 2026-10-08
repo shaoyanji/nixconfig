@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   nix = {
     gc = {
       automatic = true;
@@ -36,7 +36,7 @@
       "@admin"
       "@wheel"
     ];
-    experimental-features = [ "nix-command" "flakes" "pipe-operators" ];
+    experimental-features = ["nix-command" "flakes" "pipe-operators"];
     # Pre-trust the fleet caches so flake-level nixConfig (the
     # extra-substituters in flake.nix) never triggers the interactive
     # "allow configuration setting" y/N prompt on any fleet host.

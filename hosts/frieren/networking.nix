@@ -1,6 +1,7 @@
-{ pkgs
-, lib
-, ...
+{
+  pkgs,
+  lib,
+  ...
 }: {
   # --- Networking tools ---
   environment.systemPackages = with pkgs; [
@@ -30,5 +31,5 @@
       SECURITY_ENABLELOGIN = "false";
     };
   };
-  networking.firewall.allowedTCPPorts = lib.mkAfter [ 7351 ];
+  networking.firewall.allowedTCPPorts = lib.mkAfter [7351];
 }

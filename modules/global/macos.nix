@@ -1,10 +1,8 @@
 # macOS (nix-darwin) home-manager configuration.
 # Primary user constants: modules/global/user.nix
-{ inputs, ... }:
-let
+{inputs, ...}: let
   user = import ../global/user.nix;
-in
-{
+in {
   imports = [
     ./home-manager-shared.nix
   ];
@@ -18,7 +16,7 @@ in
         ../roles/home.nix
       ];
     }; # staging point for roles/home.nix commons
-    extraSpecialArgs = { inherit inputs; }; # Pass inputs to homeManagerConfiguration
+    extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
     # Optionally, use home-manager.extraSpecialArgs to pass
   };
   users.users.${user.name} = {

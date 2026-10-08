@@ -5,11 +5,7 @@
 # nixos-anywhere provisioning of a fresh instance:
 #   nix run github:nix-community/nixos-anywhere -- \
 #     --flake .#delphi --disko hosts/delphi/disko.nix <target>
-{
-  device ? "/dev/sda",
-  ...
-}:
-{
+{device ? "/dev/sda", ...}: {
   disko.devices.disk.main = {
     inherit device;
     type = "disk";
@@ -35,7 +31,7 @@
             type = "filesystem";
             format = "ext4";
             mountpoint = "/";
-            mountOptions = [ "noatime" ];
+            mountOptions = ["noatime"];
           };
         };
       };

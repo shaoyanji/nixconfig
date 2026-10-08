@@ -1,14 +1,15 @@
-{ workspaceSource ? null
-, agentsSource ? null
-, configureNetworkd ? false
-, useDevNixDefaults ? false
-, authorizedKeys ? [ ]
-, userHome ? "/home/devji"
-,
-}: { lib
-   , pkgs
-   , ...
-   }:
+{
+  workspaceSource ? null,
+  agentsSource ? null,
+  configureNetworkd ? false,
+  useDevNixDefaults ? false,
+  authorizedKeys ? [],
+  userHome ? "/home/devji",
+}: {
+  lib,
+  pkgs,
+  ...
+}:
 {
   microvm = {
     vcpu = 2;
@@ -75,9 +76,9 @@
     {
       isNormalUser = true;
       home = userHome;
-      extraGroups = [ "wheel" "networkmanager" ];
+      extraGroups = ["wheel" "networkmanager"];
     }
-    // lib.optionalAttrs (authorizedKeys != [ ]) {
+    // lib.optionalAttrs (authorizedKeys != []) {
       openssh.authorizedKeys.keys = authorizedKeys;
     };
 
@@ -98,16 +99,16 @@
   networking.useNetworkd = true;
   networking.useDHCP = false;
   networking.tempAddresses = "disabled";
-  networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
+  networking.nameservers = ["8.8.8.8" "1.1.1.1"];
 
   systemd.network.enable = true;
   systemd.network.networks."10-e" = {
     matchConfig.Name = "e*";
-    addresses = [{ Address = "192.168.83.10/24"; }];
-    routes = [{ Gateway = "192.168.83.1"; }];
+    addresses = [{Address = "192.168.83.10/24";}];
+    routes = [{Gateway = "192.168.83.1";}];
   };
 }
-  // lib.optionalAttrs useDevNixDefaults {
+// lib.optionalAttrs useDevNixDefaults {
   microvm.writableStoreOverlay = "/nix/.rw-store";
 
   fileSystems."/nix/store" = {
@@ -130,12 +131,12 @@
   ];
 
   nix.settings = {
-    substituters = [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
+    substituters = ["https://cache.nixos.org" "https://nix-community.cachix.org"];
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
-    extra-experimental-features = [ "flakes" "nix-command" "pipe-operators" ];
+    extra-experimental-features = ["flakes" "nix-command" "pipe-operators"];
   };
 
   environment.sessionVariables.NIX_PATH = lib.mkForce "nixpkgs=flake:nixpkgs";

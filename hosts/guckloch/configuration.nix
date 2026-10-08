@@ -1,8 +1,10 @@
-{ pkgs, config, ... }:
-let
-  user = import ../../modules/global/user.nix;
-in
 {
+  pkgs,
+  config,
+  ...
+}: let
+  user = import ../../modules/global/user.nix;
+in {
   networking.hostName = "guckloch";
 
   imports = [
@@ -15,7 +17,7 @@ in
   wsl.docker-desktop.enable = true;
   wsl.useWindowsDriver = true;
   users.users.${user.name} = {
-    extraGroups = [ "docker" ];
+    extraGroups = ["docker"];
     openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };
 

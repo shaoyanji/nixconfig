@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs = {
     zsh = {
       enable = true;
@@ -30,5 +30,5 @@
     #zsh-fzf-tab
   ];
 
-  home.sessionVariables = { };
+  home.sessionVariables = {};
 }

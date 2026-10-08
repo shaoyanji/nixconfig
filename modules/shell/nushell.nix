@@ -1,6 +1,7 @@
-{ lib
-, pkgs
-, ...
+{
+  lib,
+  pkgs,
+  ...
 }: {
   programs = {
     nushell = {
@@ -85,8 +86,8 @@
   home.packages = with pkgs; [
     nu_scripts
   ];
-  xdg.configFile = { };
-  home.sessionVariables = { };
+  xdg.configFile = {};
+  home.sessionVariables = {};
   home.sessionPath = [
   ];
 }

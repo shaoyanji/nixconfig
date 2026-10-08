@@ -14,10 +14,8 @@
 #   MEMORY.md        ->  MEMORY.md            ->  memory policy
 #
 # Hermes reads these from $HERMES_HOME (default ~/.hermes) and injects them
-# into every chat turn (see --ignore-rules in hermes --help). The old daily
-# memory log (95 files in /Volumes/data/openclaw/memory/) is NOT auto-loaded
-# by Hermes; it stays as a greppable archive and can be curated into
-# MEMORY.md over time (hermes memory setup can also attach mem0/Honcho).
+# into every chat turn (see --ignore-rules in hermes --help). Managed
+# declaratively via home.file — always in sync with the source.
 #
 # First-run (interactive, NOT declarative — hermes stores model/API config
 # in ~/.hermes/config.yaml + .env):
@@ -26,15 +24,14 @@
 #                         # compatible / OpenRouter / Anthropic ...)
 #   hermes memory setup   # optional external memory provider
 #   hermes status         # verify
-{ lib
-, config
-, pkgs
-, ...
-}:
-let
-  personaDir = ./hermes-persona;
-in
 {
+  lib,
+  config,
+  pkgs,
+  ...
+}: let
+  personaDir = ./hermes-persona;
+in {
   options.programs.hermes-user.enable = lib.mkOption {
     type = lib.types.bool;
     default = false;
@@ -45,46 +42,29 @@ in
   };
 
   config = lib.mkIf (config.programs.hermes-user.enable && (config.profiles.ai.enable or true)) {
-    # Persona files are the user's live context — copy once on first
-    # activation, never overwrite runtime edits afterwards.
-    home.activation.hermesPersonaSeed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      run mkdir -p $HOME/.hermes
-      ${lib.concatMapStringsSep "\n"
-        (f: ''
-          if [ ! -e "$HOME/.hermes/${f}" ]; then
-            run install -m 0644 ${personaDir}/${f} $HOME/.hermes/${f}
-          fi
-        '')
-        [
-          "SOUL.md"
-          "AGENTS.md"
-          "USER.md"
-          "MEMORY.md"
-          "config.yaml"
-        ]
-      }
-      # Greppable archive of the old agent's daily memory log (95 files,
-      # 2026-02..04). Symlinked read-write so future curation edits land
-      # in one place alongside the live ~/.hermes.
-      if [ ! -e "$HOME/.hermes/openclaw-archive" ]; then
-        run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
-      fi
-      # Link .env to sops-managed hermes.env if present
-      if [ -L "$HOME/.hermes/.env" ] || [ ! -e "$HOME/.hermes/.env" ]; then
-        if [ -f "$HOME/.config/hermes/hermes.env" ]; then
-          run ln -sf "$HOME/.config/hermes/hermes.env" "$HOME/.hermes/.env"
-        elif [ -f "/run/secrets/hermes" ]; then
-          run ln -sf "/run/secrets/hermes" "$HOME/.hermes/.env"
-        fi
-      fi
-      # Sync ~/.agents/skills/ into hermes scan path so HM-deployed
-      # skills become visible automatically on activation.
-      if [ ! -e "$HOME/.hermes/skills/agents-sync" ]; then
-        run ln -sf "$HOME/.agents/skills" "$HOME/.hermes/skills/agents-sync"
-      fi
-    '';
+    # Persona files — declarative, always in sync with source.
+    home.file."SOUL.md".source = "${personaDir}/SOUL.md";
+    home.file."AGENTS.md".source = "${personaDir}/AGENTS.md";
+    home.file."USER.md".source = "${personaDir}/USER.md";
+    home.file."MEMORY.md".source = "${personaDir}/MEMORY.md";
+    home.file."config.yaml".source = "${personaDir}/config.yaml";
 
-    # Port of the old agent's handoff-restore discipline: hermes sessions
+    # Symlinks — directories/env links can't be expressed as
+    # declarative home.file targets; activation is the only way.
+    home.activation.hermesSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    home.file."AGENTS.md".source = "${personaDir}/AGENTS.md";
+    home.file."USER.md".source = "${personaDir}/USER.md";
+    home.file."MEMORY.md".source = "${personaDir}/MEMORY.md";
+    home.file."config.yaml".source = "${personaDir}/config.yaml";
+
+    # Symlinks — managed via activation (directories and env links
+    # can't be expressed as declarative home.file targets).
+    home.activation.hermesSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      run mkdir -p $HOME/.hermes
+      run ln -sf /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
+      run ln -sf ${config.home.homeDirectory}/.config/hermes/hermes.env $HOME/.hermes/.env
+      run ln -sf ${config.home.homeDirectory}/.agents/skills $HOME/.hermes/skills/agents-sync
+    '';
     # already capture scrollback; this helper restores the *operational*
     # state (persona pointers + latest archive savepoint) into a new chat.
     home.packages = [
@@ -146,11 +126,30 @@ in
     # export the dependency-bearing interpreter they need. KillMode=mixed still
     # tears the cgroup down on stop, and the gateway clears a stale marker on
     # next start.
+    # If `hermes gateway install` ran anyway, it writes a raw (non-store)
+    # unit over the declarative one and HM's checkLinkTargets then aborts
+    # the whole switch with "would be clobbered" (seen 2026-10-08 on the
+    # service file and its default.target.wants enable-symlink). Clear any
+    # non-store copy before the link check so the declarative unit wins.
+    home.activation.hermesGatewayUnitCleanup = lib.hm.dag.entryBefore ["checkLinkTargets"] ''
+      for f in \
+        "$HOME/.config/systemd/user/hermes-gateway.service" \
+        "$HOME/.config/systemd/user/default.target.wants/hermes-gateway.service"; do
+        if [ -e "$f" ]; then
+          target="$(readlink "$f" 2>/dev/null || true)"
+          case "$target" in
+            /nix/store/*) ;; # HM-managed, leave it
+            *) run rm -f "$f" ;; # generated by hermes gateway install
+          esac
+        fi
+      done
+    '';
+
     systemd.user.services.hermes-gateway = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
       Unit = {
         Description = "Hermes Agent Gateway - Messaging Platform Integration";
-        After = [ "network-online.target" ];
-        Wants = [ "network-online.target" ];
+        After = ["network-online.target"];
+        Wants = ["network-online.target"];
         # Hermes supervises its own restarts; never let systemd rate-limit it
         # into a permanent stop.
         StartLimitIntervalSec = 0;
@@ -164,7 +163,12 @@ in
           "HERMES_SUPERVISED_CHILD=1"
           "HOME=${config.home.homeDirectory}"
           "USER=${config.home.username}"
-          "PATH=${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
+          # /run/wrappers/bin MUST come first: it holds the setuid sudo
+          # wrapper. A pkgs.sudo pulled into ~/.nix-profile (e.g. via the
+          # hermes-agent dependency tree) is a plain store binary without
+          # setuid and makes child agents fail escalation with "sudo binary
+          # lacks setuid" (seen 2026-10-08).
+          "PATH=/run/wrappers/bin:${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
         ];
         Restart = "always";
         RestartSec = 5;
@@ -177,7 +181,7 @@ in
         StandardOutput = "journal";
         StandardError = "journal";
       };
-      Install.WantedBy = [ "default.target" ];
+      Install.WantedBy = ["default.target"];
     };
   };
 }

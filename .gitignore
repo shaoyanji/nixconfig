@@ -11,3 +11,5 @@ result-*
 .tmp/
 .tmp-xs-helper/
 tools/xs-materializer/xs-materializer
+__pycache__/
+*.pyc

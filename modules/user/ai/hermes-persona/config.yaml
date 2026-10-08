@@ -6,3 +6,16 @@ terminal:
   timeout: 180
 telegram:
   reactions: false
+tts:
+  primary: speechify
+  speechify:
+    api_key: sk_0xvtjp367rebejhsptj22vrsc3gvja22gcfmxygrw4d
+    endpoint: https://api.speechify.ai/v1/audio/stream
+    model: simba-3.2
+    voice_id: harper
+    options:
+      text_normalization: false
+  fallback_providers:
+    - provider: groq
+      model: qwen/qwen3.8-27b
+    - provider: edge

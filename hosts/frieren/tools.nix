@@ -3,8 +3,7 @@
   lib,
   config,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption;
   cfg = config.services.nasTools;
 
@@ -24,7 +23,7 @@ let
       # wikisearch: Universal search client for any Kiwix-served wiki or offline ZIM archive
       set -euo pipefail
 
-      KIWIX_DIR="''${KIWIX_DIR:-/home/devji/wikipedia-offline}"
+      KIWIX_DIR="''${KIWIX_DIR:-/var/lib/kiwix}"
       KIWIX_LIBRARY="''${KIWIX_LIBRARY:-$KIWIX_DIR/library.xml}"
       KIWIX_PORT="''${KIWIX_PORT:-8088}"
       KIWIX_HOST="''${KIWIX_HOST:-http://127.0.0.1:$KIWIX_PORT}"
@@ -45,7 +44,7 @@ let
         -h, --help            Show this help message
 
       Environment Variables:
-        KIWIX_DIR             Base directory for ZIM archives (default: /home/devji/wikipedia-offline)
+        KIWIX_DIR             Base directory for ZIM archives (default: /var/lib/kiwix)
         KIWIX_LIBRARY         Path to Kiwix library.xml (default: $KIWIX_DIR/library.xml)
         KIWIX_HOST            Kiwix HTTP host/port (default: http://127.0.0.1:8088)
 
@@ -82,7 +81,8 @@ let
 
       show_status() {
         echo "=== Kiwix Server Status ==="
-        if systemctl --user is-active kiwix-serve.service --quiet 2>/dev/null; then
+        # kiwix-serve is a SYSTEM service (services.kiwix-serve, kiwix.nix)
+        if systemctl is-active kiwix-serve.service --quiet 2>/dev/null; then
           echo "HTTP Server: Active on $KIWIX_HOST"
         else
           echo "HTTP Server: Inactive"
@@ -103,8 +103,27 @@ let
           return 0
         fi
 
-        # 2. Check in KIWIX_DIR by pattern
-        if [[ -n "$target" ]]; then
+        # 2. Declarative library (hosts/frieren/kiwix.nix): books are
+        #    /nix/store paths (world-readable) that kiwix-search can open
+        #    directly. Match -w targets against them first; with no target,
+        #    default to the first declared book (Wikipedia full archive).
+        if [[ -f "$KIWIX_LIBRARY" ]]; then
+          local lib_paths=""
+          lib_paths="$(grep -o 'path="[^"]*"' "$KIWIX_LIBRARY" 2>/dev/null | sed 's/^path="//; s/"$//' || true)"
+          if [[ -n "$lib_paths" ]]; then
+            if [[ -n "$target" ]]; then
+              matched="$(printf '%s\n' "$lib_paths" | grep -iF -- "$target" | head -n 1 || true)"
+            else
+              matched="$(printf '%s\n' "$lib_paths" | head -n 1 || true)"
+            fi
+            if [[ -n "$matched" && ! -f "$matched" ]]; then
+              matched=""
+            fi
+          fi
+        fi
+
+        # 3. Check in KIWIX_DIR by pattern (local-only archives, e.g. -w top)
+        if [[ -z "$matched" && -n "$target" ]]; then
           for f in "$KIWIX_DIR"/*"$target"*.zim; do
             if [[ -f "$f" && ! -f "$f.aria2" ]]; then
               matched="$f"
@@ -113,7 +132,7 @@ let
           done
         fi
 
-        # 3. If no target specified or not matched, select best available (preferring *all* over *mini* / *top*)
+        # 4. If still no match and no target, select best available (preferring *all* over *mini* / *top*)
         if [[ -z "$matched" && -z "$target" ]]; then
           for f in "$KIWIX_DIR"/*all*.zim; do
             if [[ -f "$f" && ! -f "$f.aria2" ]]; then
@@ -544,12 +563,13 @@ let
     neo4j
     typst
     (pkgs.python3.withPackages (
-      ps: with ps; [
-        neo4j
-        pytz
-        firecrawl-py
-        pydantic
-      ]
+      ps:
+        with ps; [
+          neo4j
+          pytz
+          firecrawl-py
+          pydantic
+        ]
     ))
   ];
 
@@ -602,15 +622,14 @@ let
     jq
     himalaya
   ];
-in
-{
+in {
   options.services.nasTools = {
     enableHeavy = mkEnableOption "Heavy dev tools (go, uv, gh, neo4j, python research env)";
   };
 
   config = {
     environment.systemPackages =
-      lightTools ++ [ pkgs.plocate ] ++ lib.optionals cfg.enableHeavy heavyTools;
+      lightTools ++ [pkgs.plocate] ++ lib.optionals cfg.enableHeavy heavyTools;
 
     # --- Fast Filesystem Indexing (plocate) ---
     services.locate = {

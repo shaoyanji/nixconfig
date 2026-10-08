@@ -311,7 +311,7 @@ in {
         };
       };
 
-      # Kiwix offline wiki reader (served by services.kiwix-serve, hosts/frieren/kiwix.nix)
+      # Kiwix offline wiki reader (served by services.kiwix-serve, modules/services/kiwix.nix)
       "wiki.frieren.lan" = {
         listen = [
           {

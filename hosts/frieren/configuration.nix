@@ -49,16 +49,16 @@ in {
     ./media-stack.nix
     ./paperless.nix
     ./tools.nix
-    ./kiwix.nix
-    ./paste.nix
     ./networking.nix
     ./firewall-scope.nix
-    ./ha-stack.nix
     ./infra-stack.nix
     ./reverse-proxy.nix
-    ./iventoy.nix
     ../../modules/services/aria2-daemon.nix
     ../../modules/services/harmonia.nix
+    ../../modules/services/home-assistant.nix
+    ../../modules/services/kiwix.nix
+    ../../modules/services/paste.nix
+    ../../modules/services/iventoy.nix
     ../../modules/profiles/nixbuild-client.nix
   ];
   networking.hostName = "frieren";
@@ -181,6 +181,9 @@ in {
     nginx.enable = true;
     nginx.listenPort = 6801;
   };
+
+  # Home Assistant IoT and device stack (modules/services/home-assistant.nix)
+  services.ha-stack.enable = true;
 
   # The home-manager persona (heim → zen → aria2.nix) ships a user-level
   # aria2 RPC fallback on :6800. frieren runs the system services.aria2

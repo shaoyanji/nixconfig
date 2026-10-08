@@ -576,6 +576,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 | `services:*` | Legacy wrappers (canonical: `infra:*`) | `.agents/skills/services/SKILL.md` |
 | `google-drive` | Google Drive OAuth setup, rclone, tailscale funnel | `.agents/skills/google-drive/SKILL.md` |
 | `antigravity` | Delegate coding to Antigravity CLI (Google's agent) with `--dangerously-skip-permissions` and `--jsonschema` | `.agents/skills/antigravity/SKILL.md` |
+| `crush` | Delegate coding to Crush CLI (Charm's agent) with `--yolo` and structured output | `.agents/skills/crush/SKILL.md` |
 
 ---
 

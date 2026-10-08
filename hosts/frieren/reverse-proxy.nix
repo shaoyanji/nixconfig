@@ -180,19 +180,43 @@ in {
     virtualHosts = {
       # Default portal / landing page
       "frieren.lan" = {
+        default = true;
         serverAliases = [
           "nas.frieren.lan"
           "nas.lan"
           "frieren"
+          "192.168.3.25"
+          "frieren.local"
         ];
         listen = [
           {
             addr = "0.0.0.0";
             port = 80;
+            extraParameters = ["default_server"];
           }
         ];
         locations."/" = {
           root = landingPage;
+        };
+        locations."~ ^/([a-z0-9]{8}(\\.[a-zA-Z0-9]+)?)$" = {
+          root = "/var/lib/paste";
+          extraConfig = ''
+            default_type text/plain;
+          '';
+        };
+        locations."/paste/" = {
+          alias = "/var/lib/paste/";
+          extraConfig = ''
+            autoindex off;
+            default_type text/plain;
+          '';
+        };
+        locations."/p/" = {
+          alias = "/var/lib/paste/";
+          extraConfig = ''
+            autoindex off;
+            default_type text/plain;
+          '';
         };
       };
 

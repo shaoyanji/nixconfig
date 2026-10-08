@@ -1,5 +1,4 @@
-{ pkgs, lib, ... }:
-let
+{pkgs, ...}: let
   landingPage = pkgs.writeTextDir "index.html" ''
     <!DOCTYPE html>
     <html lang="en">
@@ -125,6 +124,18 @@ let
           <div class="badge">aria.frieren.lan :6801</div>
         </a>
 
+        <a class="card" href="http://wiki.frieren.lan">
+          <div class="card-header"><span class="card-title">Kiwix</span></div>
+          <div class="card-desc">Offline Wikipedia & ArchWiki reader with full-text search.</div>
+          <div class="badge">wiki.frieren.lan :80</div>
+        </a>
+
+        <a class="card" href="http://paste.frieren.lan">
+          <div class="card-header"><span class="card-title">Paste Bin</span></div>
+          <div class="card-desc">LAN paste bin — upload via SSH (`pb` in ~/.local/bin), 30-day expiry.</div>
+          <div class="badge">paste.frieren.lan :80</div>
+        </a>
+
         <div class="section-title">Operations & Fleet Infrastructure</div>
 
         <a class="card" href="http://ha.frieren.lan">
@@ -160,8 +171,7 @@ let
     </body>
     </html>
   '';
-in
-{
+in {
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
@@ -301,6 +311,19 @@ in
         };
       };
 
+      # Kiwix offline wiki reader (served by services.kiwix-serve, hosts/frieren/kiwix.nix)
+      "wiki.frieren.lan" = {
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8088";
+        };
+      };
+
       "vault.frieren.lan" = {
         listen = [
           {
@@ -323,5 +346,5 @@ in
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 80 ];
+  networking.firewall.allowedTCPPorts = [80];
 }

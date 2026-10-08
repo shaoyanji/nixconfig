@@ -67,12 +67,12 @@ A helper tool is available in `~/.local/bin/agy-offload` (source: `scripts/agy-o
 
 | Subcommand | Description | Example |
 | :--- | :--- | :--- |
-| `start` | Dispatch a task inside a detached `tmux` session on `frieren` | `agy-offload start wiki-task ~/wikipedia-offline HANDOFF.md` |
+| `start` | Dispatch a task inside a detached `tmux` session on `frieren` | `agy-offload start wiki-task /var/lib/kiwix HANDOFF.md` |
 | `status` | List running `agy` processes and `tmux` sessions on `frieren` | `agy-offload status` |
-| `logs` | Tail or view the remote `agy.log` | `agy-offload logs ~/wikipedia-offline -f` |
+| `logs` | Tail or view the remote `agy.log` | `agy-offload logs /var/lib/kiwix -f` |
 | `attach` | Interactively connect to the remote `tmux` session | `agy-offload attach wiki-task` |
 | `kill` | Terminate a remote session | `agy-offload kill wiki-task` |
-| `pull` | Rsync finished files from `frieren` back to `netbook` | `agy-offload pull ~/wikipedia-offline/output ./local-dir` |
+| `pull` | Rsync finished files from `frieren` back to `netbook` | `agy-offload pull /var/lib/kiwix/output ./local-dir` |
 
 ---
 
@@ -154,7 +154,7 @@ ssh frieren.lan "tail -f ~/task-dir/agy.log"
 
 * **Always use `--dangerously-skip-permissions`:** Remote detached sessions have no TTY for interactive confirmation prompts. Any unapproved tool call would otherwise block execution indefinitely.
 * **Always run in `tmux`:** Running commands over raw SSH will terminate when the netbook closes or WiFi drops. `tmux` ensures persistence on `frieren`.
-* **Separate Task Directories:** Always give each offloaded job its own distinct directory (e.g. `~/wikipedia-offline`, `~/kernel-build`) so multiple agent jobs do not clobber `HANDOFF.md` or `agy.log`.
+* **Separate Task Directories:** Always give each offloaded job its own distinct directory (e.g. `/var/lib/kiwix`, `/var/lib/kernel-build`) so multiple agent jobs do not clobber `HANDOFF.md` or `agy.log`. Prefer `/var/lib/<job>` over `$HOME` — hardened system services (DynamicUser + ProtectHome) cannot read `/home`.
 
 ---
 

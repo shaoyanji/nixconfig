@@ -192,6 +192,24 @@ tasks:
         done
         exit $fail
 
+  infra:update:fleet:
+    desc: Full fleet update cycle — flake update, warm harmonia, then apply everywhere
+    summary: >
+      The canonical answer to "clients hit uncached builds after flake updates".
+      NVIDIA drivers (580/legacy etc.) are unfree and never on upstream caches,
+      so every fleet bump must be built ONCE on frieren (infra:warm:cache) and
+      let harmonia serve the closures at LAN speed before any client switches.
+    cmds:
+      - task infra:warm:cache UPDATE={{.UPDATE | default "1"}}
+      - task infra:apply:fleet
+
+  infra:cache:push:host:*:
+    desc: Push a host closure to harmonia from wherever it was built (nix copy, signed at serve time)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - nix copy --to http://192.168.3.25:5000?compress=true ".#nixosConfigurations.{{.HOST}}.config.system.build.toplevel"
+
   infra:apply:fleet:
     desc: Apply to many hosts in parallel (HOSTS="h1 h2", default = deployable NixOS fleet)
     vars:

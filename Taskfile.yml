@@ -1,20 +1,133 @@
 version: "3"
 vars:
+    # Control-plane vars consumed by taskfiles/* via {{.SECRETS}}/{{.ENC_*}}/
+    # {{.PI}}/{{.EMAIL}} — lost together with the menu tasks when c85a41d
+    # replaced this file (2026-10-08); restored verbatim. SECRETS is a
+    # DIRECTORY: tasks expand it as {{.SECRETS}}/{{.ENC_SECRETS}} etc.
+    EMAIL: e@mail.shaoyanji.is-a.dev
+    ENC_DETASKFILE: DE-Taskfile.yaml
+    ENC_TASKFILE: DE-Taskfile.yaml
+    ENC_SECRETS: secrets.yaml
+    ENC_ENVS: apikeys.yaml
+    SECRETS: modules/secrets
+    PI: minyx
+    # Personal/desktop vars used by this file's own tasks:
     NIX_CONFIG: ~/Documents/nixconfig
-    SECRETS: ~/Documents/nixconfig/modules/secrets/fullsecrets.yaml
     NIXNAS: /Volumes/data
     MNTW: /Volumes/peachcable
     MNTX: /Volumes/shared
 includes:
-    nixconfig:
-        taskfile: ~/Documents/nixconfig/Taskfile.yml
-        dir: ~/Documents/nixconfig
+    # Fleet taskfiles, flattened (task names are already namespaced:
+    # checks:*, infra:*, dev:*, …). Do NOT include this file itself —
+    # ~/Documents/nixconfig resolves back to this very file via the
+    # home-manager symlink chain, which made task load a include cycle
+    # ("include cycle detected … Taskfile.yml <--> Taskfile.yml", exit 110)
+    # and broke every root-level `task` run.
+    # services.yml flatten-includes services-core/legacy themselves — do not
+    # include those two here or every services:* task would be defined twice.
+    # dir: . keeps tasks in the repo root even when invoked via the
+    # ~/Taskfile.yml forwarder from $HOME.
+    agents:
+        taskfile: taskfiles/agents.yml
+        dir: .
+        flatten: true
+    apps:
+        taskfile: taskfiles/apps.yml
+        dir: .
+        flatten: true
+    bountystash:
+        taskfile: taskfiles/bountystash.yml
+        dir: .
+        flatten: true
+    checks:
+        taskfile: taskfiles/checks.yml
+        dir: .
+        flatten: true
+    data:
+        taskfile: taskfiles/data.yml
+        dir: .
+        flatten: true
+    dev:
+        taskfile: taskfiles/dev.yml
+        dir: .
+        flatten: true
+    dragoncourt:
+        taskfile: taskfiles/dragoncourt.yml
+        dir: .
+        flatten: true
+    envs:
+        taskfile: taskfiles/envs.yml
+        dir: .
+        flatten: true
+    infra:
+        taskfile: taskfiles/infra.yml
+        dir: .
+        flatten: true
+    lifecycle:
+        taskfile: taskfiles/lifecycle.yml
+        dir: .
+        flatten: true
+    moto:
+        taskfile: taskfiles/moto.yml
+        dir: .
+        flatten: true
+    serv00:
+        taskfile: taskfiles/serv00.yml
+        dir: .
+        flatten: true
+    services:
+        taskfile: taskfiles/services.yml
+        dir: .
         flatten: true
 tasks:
+    default:
+        desc: Show available operator commands
+        cmds:
+            - task help
+
+    help:
+        desc: List all tasks in the control plane
+        cmds:
+            - task --list-all
+
+    status:
+        desc: Show repo/operator status
+        cmds:
+            - git status --short
+            - echo "host=$(hostname)"
+
+    check:
+        desc: Run narrow validation checks
+        cmds:
+            - task checks:quick
+
+    deploy:
+        desc: Open deployment menu
+        cmds:
+            - task infra:deploy:menu
+
+    logs:
+        desc: Open logs menu
+        cmds:
+            - task infra:logs:menu
+
+    menu:
+        desc: Open operator menu (gum)
+        cmds:
+            - task agents:menu
+
+    exit:
+        internal: true
+        cmds:
+            - exit
+        silent: true
+
     load-env:
         desc: prints api keys with multi-selector
         cmds:
-            - export $(task -t ~/Documents/nixconfig/Taskfile.yml sopsfzf)
+            # sopsfzf alias was removed in 739b66e; infra:sops:fzf is its
+            # replacement (dumps apikeys.yaml as shell KEY=value, quotes stripped).
+            - export $(task infra:sops:fzf)
     llm:
         desc: uses aichat loading the necessary secrets
         vars:

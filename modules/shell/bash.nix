@@ -7,6 +7,19 @@
         bash
         */
         ''
+          # Autodetect Wayland and X11 display socket if unset (e.g. SSH / tmux sessions)
+          if [ -z "''${WAYLAND_DISPLAY:-}" ] && [ -n "''${XDG_RUNTIME_DIR:-}" ]; then
+            for sock in "$XDG_RUNTIME_DIR"/wayland-*; do
+              if [ -S "$sock" ]; then
+                export WAYLAND_DISPLAY="''${sock##*/}"
+                break
+              fi
+            done
+          fi
+          if [ -z "''${DISPLAY:-}" ] && [ -S "/tmp/.X11-unix/X0" ]; then
+            export DISPLAY=":0"
+          fi
+
           source $HOME/.bash_aliases
         '';
     };

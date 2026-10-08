@@ -58,6 +58,22 @@
           "${pkgs.niri}/bin/niri msg action power-on-monitors"
         ];
       }
+      # Fallback symlink: if niri binds to wayland-1 (e.g. after greetd autologin),
+      # symlink wayland-0 to wayland-1 so SSH sessions or tools defaulting to
+      # wayland-0 connect without error.
+      {
+        command = [
+          "${pkgs.bash}/bin/bash"
+          "-c"
+          ''
+            if [ -n "$WAYLAND_DISPLAY" ] && [ "$WAYLAND_DISPLAY" != "wayland-0" ] && [ -n "$XDG_RUNTIME_DIR" ]; then
+              if [ ! -e "$XDG_RUNTIME_DIR/wayland-0" ]; then
+                ln -sf "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" "$XDG_RUNTIME_DIR/wayland-0"
+              fi
+            fi
+          ''
+        ];
+      }
     ];
     window-rules = [
       {

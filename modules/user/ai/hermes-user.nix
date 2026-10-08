@@ -29,9 +29,7 @@
   config,
   pkgs,
   ...
-}: let
-  personaDir = ./hermes-persona;
-in {
+}: {
   options.programs.hermes-user.enable = lib.mkOption {
     type = lib.types.bool;
     default = false;

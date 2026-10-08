@@ -6,7 +6,6 @@
 # telemetry sensors.
 {
   config,
-  pkgs,
   lib,
   ...
 }: let
@@ -104,8 +103,7 @@ in {
   config = lib.mkIf cfg.enable {
     services.home-assistant = {
       enable = true;
-      inherit (cfg) configDir extraComponents extraPackages;
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) configDir extraComponents extraPackages openFirewall;
       config = {
         default_config = {};
         command_line = lib.mkIf cfg.telemetry.enable [

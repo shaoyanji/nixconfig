@@ -16,6 +16,4 @@ tts:
     options:
       text_normalization: false
   fallback_providers:
-    - provider: groq
-      model: qwen/qwen3.8-27b
     - provider: edge

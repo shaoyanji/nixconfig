@@ -30,7 +30,26 @@ nix build .#nixosConfigurations.<host>.pkgs.llm-agents.qmd   # build/refetch
 command -v qmd                                               # present on hosts
 ```
 
-## When to use (trigger phrases)
+## Memory hierarchy (decide by jev before acting)
+
+| Layer | Role | When used |
+|-------|------|-----------|
+| MEMORY.md | Boot — persists across sessions | Always loaded |
+| Vault | Fast working memory — offline, personal | First stop for context |
+| qmd wiki | Resource — docs, runbooks, codebase | Concept/location queries |
+| mem0 / supermemory | Deep consult — when vault + wiki insufficient | Decided by jev (min-prob 0.8, min-margin 0.15) |
+
+**Search order:** vault → wiki (qmd BM25) → mem0/supermemory (jev-decided) → web.
+
+## BM25 skill search workflow
+
+When unsure which skill to read, search the skills index before guessing:
+
+```bash
+qmd search "<skill topic>" -c skills --format json
+```
+
+Routes to jev if context is insufficient. Fewer tool calls, always context-rich.
 
 - "search my notes / docs / knowledge base"
 - "find related notes"

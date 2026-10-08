@@ -14,8 +14,8 @@
 #   MEMORY.md        ->  MEMORY.md            ->  memory policy
 #
 # Hermes reads these from $HERMES_HOME (default ~/.hermes) and injects them
-# into every chat turn (see --ignore-rules in hermes --help). Managed
-# declaratively via home.file — always in sync with the source.
+# into every chat turn (see --ignore-rules in hermes --help). Symlinked
+# to nixconfig source — runtime edits version-control themselves.
 #
 # First-run (interactive, NOT declarative — hermes stores model/API config
 # in ~/.hermes/config.yaml + .env):
@@ -42,20 +42,27 @@ in {
   };
 
   config = lib.mkIf (config.programs.hermes-user.enable && (config.profiles.ai.enable or true)) {
-    # Persona files — declarative, always in sync with source.
-    home.file."SOUL.md".source = "${personaDir}/SOUL.md";
-    home.file."AGENTS.md".source = "${personaDir}/AGENTS.md";
-    home.file."USER.md".source = "${personaDir}/USER.md";
-    home.file."MEMORY.md".source = "${personaDir}/MEMORY.md";
-    home.file."config.yaml".source = "${personaDir}/config.yaml";
-
-    # Symlinks — directories/env links can't be expressed as
-    # declarative home.file targets; activation is the only way.
-    home.activation.hermesSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    # Persona files — symlinked to nixconfig source.
+    # Runtime edits modify the repo directly (version controlled).
+    home.activation.hermesPersonaSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
       run mkdir -p $HOME/.hermes
-      run ln -sf /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
-      run ln -sf ${config.home.homeDirectory}/.config/hermes/hermes.env $HOME/.hermes/.env
-      run ln -sf ${config.home.homeDirectory}/.agents/skills $HOME/.hermes/skills/agents-sync
+      for f in SOUL.md AGENTS.md USER.md MEMORY.md config.yaml; do
+        rm -f "$HOME/.hermes/$f"
+        ln -s /Volumes/data/projects/nixconfig/modules/user/ai/hermes-persona/$f "$HOME/.hermes/$f"
+      done
+      if [ ! -e "$HOME/.hermes/openclaw-archive" ]; then
+        run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
+      fi
+      if [ -L "$HOME/.hermes/.env" ] || [ ! -e "$HOME/.hermes/.env" ]; then
+        if [ -f "$HOME/.config/hermes/hermes.env" ]; then
+          run ln -sf "$HOME/.config/hermes/hermes.env" "$HOME/.hermes/.env"
+        elif [ -f "/run/secrets/hermes" ]; then
+          run ln -sf "/run/secrets/hermes" "$HOME/.hermes/.env"
+        fi
+      fi
+      if [ ! -e "$HOME/.hermes/skills/agents-sync" ]; then
+        run ln -sf "$HOME/.agents/skills" "$HOME/.hermes/skills/agents-sync"
+      fi
     '';
 
     # Port of the old agent's handoff-restore discipline: hermes sessions

@@ -1,11 +1,22 @@
-# Hermes Agent Configuration (seeded from nixconfig hermes-user)
-# Persona: Vanta (resurrected OpenClaw persona)
-# Sensitive tokens (e.g. TELEGRAM_BOT_TOKEN) are loaded from ~/.hermes/.env (sops secret).
+# Hermes Agent Configuration — Vanta persona
+# Sensitive tokens (e.g. TELEGRAM_BOT_TOKEN) loaded from ~/.hermes/.env
 terminal:
   backend: local
   timeout: 180
 telegram:
   reactions: false
+model:
+  provider: nous
+  default: inclusionai/ling-3.0-flash-sante:free
+agent:
+  max_turns: 150
+display:
+  tool_progress: all
+fallback_providers:
+  - provider: openrouter
+    model: thinkingmachines/inkling:free
+  - provider: deepseek
+    model: deepseek-flash
 tts:
   primary: speechify
   speechify:
@@ -17,3 +28,30 @@ tts:
       text_normalization: false
   fallback_providers:
     - provider: edge
+stt:
+  enabled: true
+  provider: local
+  local:
+    model: base
+security:
+  tirith_enabled: false
+auxiliary:
+  title_generation:
+    model: nous/inclusionai/ling-3.0-flash-sante:free
+skills:
+  trusted_project_dirs:
+    - /Volumes/data/projects/nixconfig
+platforms:
+  telegram:
+    enabled: true
+    home_channel:
+      platform: telegram
+      chat_id: '8679391100'
+      name: Matt Ji
+      user_id: '8679391100'
+fallback:
+  min_switch_reset_seconds: 120
+  api_max_retries: 1
+onboarding:
+  seen:
+    busy_input_prompt: true

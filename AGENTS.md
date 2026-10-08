@@ -556,14 +556,30 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 
 ---
 
+## Memory hierarchy (jev decides escalation)
+
+| Layer | Role | When used |
+|-------|------|-----------|
+| MEMORY.md | Boot — persists across sessions | Always loaded |
+| Vault | Fast working memory — offline, personal | First stop for context |
+| qmd wiki | Resource — docs, runbooks, codebase | Concept/location queries |
+| mem0 / supermemory | Deep consult — when vault + wiki insufficient | Decided by jev (min-prob 0.8, min-margin 0.15) |
+
+Search order: vault → wiki (qmd BM25) → mem0/supermemory (jev-decided) → web.
+
+When unsure which skill to read, search the skills index first: `qmd search "<topic>" -c skills --format json`.
+
+---
+
 ## qmd Search Operations
 
-Local hybrid search over markdown docs and notes via `qmd` (`pkgs.llm-agents.qmd`, installed fleet-wide). Two canonical collections:
+Local hybrid search over markdown docs and notes via `qmd` (`pkgs.llm-agents.qmd`, installed fleet-wide). Three canonical collections:
 
 | Collection | Target Path | Content |
 |------------|-------------|---------|
 | `nixconfig` | `/srv/data/projects/nixconfig` (`~/Documents/nixconfig`) | This repo's documentation: README, AGENTS.md, runbooks, `docs/*`, `taskfiles/README.md` |
 | `vault` | `/Volumes/data/Obsidian-Git-Sync` (`~/vaults/personal`) | Personal Obsidian vault: zettels, schematics, notes |
+| `skills` | `~/.hermes/skills/` | Agent skills indexed for BM25 search |
 
 ### Index lifecycle
 

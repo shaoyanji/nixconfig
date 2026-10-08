@@ -81,7 +81,7 @@
 
       show_status() {
         echo "=== Kiwix Server Status ==="
-        # kiwix-serve is a SYSTEM service (services.kiwix-serve, kiwix.nix)
+        # kiwix-serve is a SYSTEM service (services.kiwix-serve, modules/services/kiwix.nix)
         if systemctl is-active kiwix-serve.service --quiet 2>/dev/null; then
           echo "HTTP Server: Active on $KIWIX_HOST"
         else
@@ -103,7 +103,7 @@
           return 0
         fi
 
-        # 2. Declarative library (hosts/frieren/kiwix.nix): books are
+        # 2. Declarative library (modules/services/kiwix.nix): books are
         #    /nix/store paths (world-readable) that kiwix-search can open
         #    directly. Match -w targets against them first; with no target,
         #    default to the first declared book (Wikipedia full archive).

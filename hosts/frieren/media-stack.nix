@@ -94,55 +94,5 @@ in {
       }
     ];
   };
-
-  # --- Home Assistant ---
-  services.home-assistant = {
-    enable = true;
-    configDir = "/srv/private/home-assistant";
-    extraComponents = [
-      "rest"
-      "command_line"
-      "todoist"
-      "jellyfin"
-      "plex"
-      "fritzbox"
-      "github"
-      "immich"
-      "met"
-      "ipp"
-      "mqtt"
-    ];
-    extraPackages = ps: [
-      ps.androidtvremote2
-    ];
-    config = {
-      default_config = {};
-      command_line = [
-        {
-          sensor = {
-            name = "frieren Battery Level";
-            command = "cat /sys/class/power_supply/BAT0/capacity";
-            unit_of_measurement = "%";
-            device_class = "battery";
-          };
-        }
-        {
-          sensor = {
-            name = "frieren Battery Status";
-            command = "cat /sys/class/power_supply/BAT0/status";
-            icon = "mdi:battery-charging";
-          };
-        }
-        {
-          binary_sensor = {
-            name = "frieren AC Connected";
-            command = "cat /sys/class/power_supply/ADP0/online";
-            payload_on = "1";
-            payload_off = "0";
-            device_class = "power";
-          };
-        }
-      ];
-    };
-  };
 }
+

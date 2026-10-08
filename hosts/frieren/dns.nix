@@ -22,9 +22,13 @@
     "--advertise-routes=192.168.3.0/24"
   ];
 
-  # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively
+  # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively,
+  # and route *.frieren.lan queries to the local Pi-hole stack.
   # (services.resolved.extraConfig was removed upstream; use settings.Resolve)
-  services.resolved.settings.Resolve.DNSStubListener = "no";
+  services.resolved.settings.Resolve = {
+    DNSStubListener = "no";
+    Domains = ["~frieren.lan"];
+  };
 
   # Point the host resolver at FTL instead of the router:
   # /etc/resolv.conf -> systemd-resolved (uplink mode, stub off) -> FTL (127.0.0.1:53)

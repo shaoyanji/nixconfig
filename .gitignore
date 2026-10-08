@@ -13,3 +13,4 @@ result-*
 tools/xs-materializer/xs-materializer
 __pycache__/
 *.pyc
+/MEMORY.md

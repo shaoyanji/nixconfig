@@ -20,7 +20,7 @@ Operational runbook and command reference for `pb`, the zero-configuration priva
 ## 1. System Overview & Architecture
 
 * **Host:** `frieren.lan` (`192.168.3.25`, Tailscale `100.97.61.65`).
-* **Module Definition:** Declaratively declared in `hosts/frieren/paste.nix`.
+* **Module Definition:** Declaratively declared in `modules/services/paste.nix`.
 * **CLI Wrapper:** Installed to `~/.local/bin/pb` via Home Manager.
 * **Storage Location:** `/var/lib/paste` on `frieren` (owned by `devji:users`, mode `0755`).
 * **Web Endpoint:** `http://paste.frieren.lan/<name>` (served via Nginx port 80).

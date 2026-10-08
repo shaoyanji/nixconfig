@@ -15,7 +15,7 @@
 # It is kept alive by the library derivation below; do NOT drop it from the
 # library attrset without also deleting the local copy at /var/lib/kiwix.
 {pkgs, ...}: let
-  user = import ../../modules/global/user.nix;
+  user = import ../global/user.nix;
   # Per-archive ZIM sources. fetchurl for small archives; store path for the
   # huge ones (imported via `nix store add-file` to avoid re-downloads).
   zims = {

@@ -12,7 +12,7 @@
 # DNS: covered by the dnsmasq wildcard (address=/frieren.lan/192.168.3.25);
 # firewall: port 80 already open via reverse-proxy.nix.
 {pkgs, ...}: let
-  user = import ../../modules/global/user.nix;
+  user = import ../global/user.nix;
 
   # writers.writeBashBin (fleet pattern, cf. modules/scripts/default.nix):
   # writeShellApplication would dispatch shellcheck to nixbuild.net where it

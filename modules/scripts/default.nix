@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   imports = [
     # ./examples.nix
   ];
@@ -6,19 +6,19 @@
     # Refresh checksums for URL-based config JSON files
     # Usage: nix-hash-update path/to/config.json
     (
-      pkgs.writers.writeBashBin "nvidia-offload" { }
-        /*
+      pkgs.writers.writeBashBin "nvidia-offload" {}
+      /*
       bash
-        */
-        ''
-          export __NV_PRIME_RENDER_OFFLOAD=1
-          export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
-          export __GLX_VENDOR_LIBRARY_NAME=nvidia
-          export __VK_LAYER_NV_optimus=NVIDIA_only
-          exec "$@"
-        ''
+      */
+      ''
+        export __NV_PRIME_RENDER_OFFLOAD=1
+        export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+        export __GLX_VENDOR_LIBRARY_NAME=nvidia
+        export __VK_LAYER_NV_optimus=NVIDIA_only
+        exec "$@"
+      ''
     )
-    (pkgs.writers.writeBashBin "nix-hash-update" { }
+    (pkgs.writers.writeBashBin "nix-hash-update" {}
       /*
       bash
       */
@@ -88,7 +88,7 @@
         echo "Updated $len entries in $config_file"
       '')
 
-    (pkgs.writers.writeBashBin "nixhash.sh" { }
+    (pkgs.writers.writeBashBin "nixhash.sh" {}
       /*
       bash
       */
@@ -105,7 +105,7 @@
         nix-hash --type sha256 --base32 --flat <(curl -so - $(cat))
       '')
 
-    (pkgs.writers.writeBashBin "ytsearch" { }
+    (pkgs.writers.writeBashBin "ytsearch" {}
       /*
       bash
       */
@@ -128,7 +128,7 @@
          | awk '{ print "https://www.youtube.com/watch?v="$NF }'
       '')
   ];
-  home.file = { };
+  home.file = {};
 
-  home.sessionVariables = { };
+  home.sessionVariables = {};
 }

@@ -1,4 +1,4 @@
-{ config, ... }: {
+{config, ...}: {
   accounts.email.accounts = {
     "jisifu" = {
       name = "jisifu";

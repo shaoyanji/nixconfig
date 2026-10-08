@@ -3,16 +3,14 @@
   lib,
   config,
   ...
-}:
-let
+}: let
   aria2Conf = pkgs.writeText "aria2.conf" ''
     enable-rpc=true
     rpc-listen-port=6800
     rpc-listen-all=false
     rpc-allow-origin-all=true
   '';
-in
-{
+in {
   # User-level fallback daemon for hosts without the system-wide
   # services.aria2 (e.g. laptops/desktops when the NAS is unreachable).
   # Disable on hosts that run the system aria2 daemon (frieren) so exactly
@@ -28,7 +26,7 @@ in
   };
 
   config = {
-    home.packages = with pkgs; [ aria2 ];
+    home.packages = with pkgs; [aria2];
 
     xdg.configFile."aria2/aria2.conf".source = aria2Conf;
 
@@ -37,7 +35,7 @@ in
     systemd.user.services.aria2 = lib.mkIf config.programs.aria2-user-fallback.enable {
       Unit = {
         Description = "aria2 RPC download daemon (local fallback)";
-        After = [ "network.target" ];
+        After = ["network.target"];
       };
       Service = {
         Type = "simple";
@@ -45,7 +43,7 @@ in
         Restart = "on-failure";
       };
       Install = {
-        WantedBy = [ "default.target" ];
+        WantedBy = ["default.target"];
       };
     };
   };

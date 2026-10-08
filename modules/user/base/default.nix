@@ -1,24 +1,22 @@
-{ pkgs
-, lib
-, ...
-}:
-let
-  readPkgList = path:
-    let
-      lines = lib.pipe (builtins.readFile path) [
-        (lib.splitString "\n")
-        (map lib.strings.trim)
-        (builtins.filter (line: line != "" && !(lib.hasPrefix "#" line)))
-      ];
-    in
-    map
-      (
-        name:
-          pkgs.${name} or (throw "Unknown package in ${toString path}: ${name}")
-      )
-      lines;
-in
 {
+  pkgs,
+  lib,
+  ...
+}: let
+  readPkgList = path: let
+    lines = lib.pipe (builtins.readFile path) [
+      (lib.splitString "\n")
+      (map lib.strings.trim)
+      (builtins.filter (line: line != "" && !(lib.hasPrefix "#" line)))
+    ];
+  in
+    map
+    (
+      name:
+        pkgs.${name} or (throw "Unknown package in ${toString path}: ${name}")
+    )
+    lines;
+in {
   imports = [
     ../../scripts
     ../../lf
@@ -156,7 +154,7 @@ in
 
         # ── Linux-only System Diagnostics ──
         lsof # List open files
-        (ltrace.overrideAttrs (_: { doCheck = false; })) # Library call tracer
+        (ltrace.overrideAttrs (_: {doCheck = false;})) # Library call tracer
         pciutils # PCI bus utilities
         strace # System call tracer
         sysstat # System performance tools
@@ -166,7 +164,7 @@ in
         glances # Cross-platform system monitor
         nurl
       ]
-      ++ lib.optionals stdenv.hostPlatform.isDarwin [ ];
+      ++ lib.optionals stdenv.hostPlatform.isDarwin [];
 
     sessionVariables = {
       EDITOR = "hx";

@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   # Desktop client profile with NAS client dependency
   # Note: nas-client.nix is imported unconditionally as it's a core dependency
   # for desktop client functionality. To disable NAS mounts, configure
@@ -26,8 +26,8 @@
     };
     printing = {
       enable = true;
-      listenAddresses = [ "*:631" ];
-      allowFrom = [ "all" ];
+      listenAddresses = ["*:631"];
+      allowFrom = ["all"];
       browsing = true;
       defaultShared = true;
       openFirewall = true;
@@ -61,7 +61,7 @@
       "--accept-routes=true"
     ];
     resolved.enable = true;
-    resolved.settings.Resolve.Domains = [ "~.cloudforest-kardashev.ts.net" "~.fritz.box" "~." ];
+    resolved.settings.Resolve.Domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
   };
 
   # Required for non-Nix binaries/toolchains in daily desktop workflows.

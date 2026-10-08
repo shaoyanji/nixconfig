@@ -1,11 +1,10 @@
-{ config
-, pkgs
-, ...
-}:
-let
-  user = import ../modules/global/user.nix;
-in
 {
+  config,
+  pkgs,
+  ...
+}: let
+  user = import ../modules/global/user.nix;
+in {
   imports = [
     ../modules/roles/portable-home.nix
     ../modules/shell

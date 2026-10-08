@@ -1,17 +1,16 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-let
-  cfg = config.services.go-backend;
-in
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.services.go-backend;
+in {
   options.services.go-backend = {
     enable = lib.mkEnableOption "Go backend service";
     package = lib.mkOption {
       type = lib.types.package;
-      default = pkgs.callPackage ../../pkgs/go-backend.nix { };
+      default = pkgs.callPackage ../../pkgs/go-backend.nix {};
       description = "Backend package to run.";
     };
     port = lib.mkOption {
@@ -26,7 +25,7 @@ in
     };
     environment = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
-      default = { };
+      default = {};
       description = "Additional environment variables for the backend service.";
     };
   };
@@ -34,9 +33,9 @@ in
   config = lib.mkIf cfg.enable {
     systemd.services.go-backend = {
       description = "Go backend";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
+      wantedBy = ["multi-user.target"];
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
       serviceConfig = {
         Type = "simple";
         DynamicUser = true;

@@ -1,11 +1,10 @@
-{ pkgs
-, lib
-, ...
-}:
-let
-  user = import ../../modules/global/user.nix;
-in
 {
+  pkgs,
+  lib,
+  ...
+}: let
+  user = import ../../modules/global/user.nix;
+in {
   imports = [
   ];
 
@@ -57,7 +56,7 @@ in
       "kitty"
       "lagrange"
     ];
-    masApps = { };
+    masApps = {};
     onActivation.cleanup = "zap";
     onActivation.autoUpdate = true;
     onActivation.upgrade = true;
@@ -69,10 +68,10 @@ in
     mkalias
   ];
 
-  environment.variables = { };
+  environment.variables = {};
   programs.nix-index.enable = true;
 
-  fonts.packages = [ ];
+  fonts.packages = [];
   system.primaryUser = user.name;
   system.defaults = {
     dock.autohide = true;
@@ -105,7 +104,7 @@ in
     # universalaccess.reduceMotion = true;
     CustomUserPreferences = {
       NSGlobalDomain.WebKitDeveloperExtras = true;
-      AppleLanguages = lib.mkForce (lib.mkDefault [ "en-US" ]);
+      AppleLanguages = lib.mkForce (lib.mkDefault ["en-US"]);
       ".GlobalPreferences" = {
         AppleSpacesSwitchOnActivate = true;
       };

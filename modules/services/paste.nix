@@ -79,12 +79,16 @@
     }
 
     clip() {
-      local name="''${1:-}"
+      local arg="''${1:-}"
+      if [[ -n "$arg" ]] && [[ -f "$arg" ]]; then
+        upload "$arg"
+        return
+      fi
       ensure_display
       if command -v wl-paste >/dev/null 2>&1 && wl-paste -n >/dev/null 2>&1; then
-        wl-paste | upload - "$name"
+        wl-paste | upload - "$arg"
       elif command -v xclip >/dev/null 2>&1; then
-        xclip -selection clipboard -o | upload - "$name"
+        xclip -selection clipboard -o | upload - "$arg"
       else
         echo "pb: nothing in clipboard or no clipboard utility found (wl-paste/xclip)" >&2
         exit 1

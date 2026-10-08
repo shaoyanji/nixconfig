@@ -2,29 +2,21 @@
 
 ## Current Open Work
 1. Documentation alignment completed (April 30, 2026) - All documentation now reflects simplified task control plane and current AI services state. See [AUDIT.md](AUDIT.md) for full details.
-2. **nixbuild.net SSH key — BLOCKER before enabling remote builds.** Do NOT flip
-   `profiles.nixbuild-client.enable = true` on any dispatching host until the key
-   exists and is registered:
-   1. Generate it: `ssh-keygen -t ed25519 -f ~/.ssh/nixbuild` (no passphrase —
-      the nix daemon must use it unattended).
-   2. Register the PUBLIC key in the nixbuild.net console.
-   3. Add the PRIVATE key to sops: `task infra:secrets:edit:secrets` →
-      `nixbuild_ssh_key: |` (the profile decrypts it to `/root/.ssh/nixbuild`,
-      root:0600, and restarts nix-daemon — see
-      `modules/profiles/nixbuild-client.nix`).
-   4. Only now set `profiles.nixbuild-client.enable = true;` on the dispatching
-      host(s) and rebuild. Verify: `nix eval` of `config.nix.buildMachines`,
-      `ssh eu.nixbuild.net echo ok`, then `task dev:nixbuild:plan` and
-      `task dev:nixbuild:warm` (mind the 25 build-h/month free tier).
-3. **frieren follow-up queue** (2026-10-05 updates):
+2. [x] **nixbuild.net SSH key**: Key deployed to sops (`nixbuild_ssh_key`) and registered with nixbuild.net console. Remote builder enabled on frieren via `profiles.nixbuild-client.enable = true` with store read/write and build permissions verified.
+3. **frieren follow-up queue** (2026-10-08 updates):
    - [x] **PostgreSQL automated backups**: Added `services.postgresqlBackup` for Immich's DB scheduled at 03:00 to `/srv/backup/postgresql` and added the dump directory to `services.restic.backups.frieren-local.paths` in `hosts/frieren/infra-stack.nix`.
    - [x] **Cheap resilience win (Battery-as-UPS)**: Added `command_line` sensors to Home Assistant in `hosts/frieren/media-stack.nix` tracking `BAT0` capacity, charging status, and `ADP0` AC online status.
    - [x] **Universal Path Parity (`/Volumes/data`)**: Added `/Volumes/data` bind mount to `/srv/data` in `hosts/frieren/configuration.nix`, fixing local broken `~/Documents/nixconfig` symlink and all Home Manager storage paths.
    - [x] **Zero-conf LAN Discovery**: Configured `services.avahi` with `publish.enable = true` and `extraServiceFiles` for SMB, NFS, Harmonia cache, and Web portal so frieren appears automatically in macOS Finder and Linux file browsers.
-   - [x] **Unified Reverse Proxy & Local DNS**: Added `hosts/frieren/reverse-proxy.nix` with Nginx virtual hosts on port 80 for `*.frieren.lan` (`photos`, `docs`, `media`, `ha`, `cache`, `pdf`, `status`, `smart`, `aria`) with landing portal, mapped via Pi-hole dnsmasq wildcard in `hosts/frieren/dns.nix`.
+   - [x] **Unified Reverse Proxy & Local DNS**: Added `hosts/frieren/reverse-proxy.nix` with Nginx virtual hosts on port 80 for `*.frieren.lan` (`photos`, `docs`, `media`, `ha`, `cache`, `pdf`, `status`, `smart`, `aria`, `wiki`, `paste`) with landing portal, mapped via Pi-hole dnsmasq wildcard in `hosts/frieren/dns.nix`.
    - [x] **Automated Storage Indexing**: Added `services.locate` (`plocate`) in `hosts/frieren/tools.nix` for hourly fast filesystem indexing of `/srv/data`.
-   - [x] **24/7 Remote Operator Gateway**: Enabled `antigravity-cli remote-control` as a persistent user service (`antigravity-cli-daemon.service`) with user linger enabled for `devji`. Running 24/7 under instance name `frieren-lunar-rocket` on https://antigravity.google.com. Fixed headless authorization code stdin failure by injecting `SSH_CLIENT` environment markers for file-based token storage and creating `~/.gemini/config/projects/outside-of-project.json`.
-   - [ ] MQTT hardening: when real devices arrive, switch mosquitto from the loopback-anonymous listener to an authenticated LAN listener with passwordFile via sops (see `hosts/frieren/ha-stack.nix` header).
+   - [x] **24/7 Remote Operator Gateway**: Enabled `antigravity-cli remote-control` as a persistent user service (`antigravity-cli-daemon.service`) with user linger enabled for `devji`. Running 24/7 under instance name `frieren-lunar-rocket` on https://antigravity.google.com.
+   - [x] **Declarative Kiwix Wiki Stack**: Replaced hand-rolled user units with declarative `modules/services/kiwix.nix` (native `services.kiwix-serve` on port 8088, reverse-proxied to `wiki.frieren.lan`). Reclaimed 52 GB duplicate ZIM storage.
+   - [x] **Reusable Service Modularization**: Extracted Home Assistant IoT stack (`modules/services/home-assistant.nix`), offline wiki (`modules/services/kiwix.nix`), fleet pastebin (`modules/services/paste.nix`), and iVentoy PXE server (`modules/services/iventoy.nix`) into `modules/services/`.
+   - [x] **Agent Skills Materialization**: Authored operational skills with complete runbooks in `.agents/skills/` (`home-assistant`, `paste`, `iventoy`, `wikisearch`, `stt`) and synced to user home `~/.agents/skills/`.
+   - [x] **Zero SOPS Drift**: Re-keyed all 6 secrets files; zero recipient or file drift.
+   - [x] **Lint-Gate & 100% Alejandra Compliance**: 0/181 tracked Nix files violate formatting; deadnix and statix clean.
+   - [ ] MQTT hardening: when real devices arrive, switch mosquitto from the loopback-anonymous listener to an authenticated LAN listener with passwordFile via sops (see `modules/services/home-assistant.nix`).
    - [ ] restic hardening: move `/root/.restic-password` into sops and add an offsite repository target (B2/rest-server) alongside the local one.
    - [ ] When a Zigbee coordinator dongle is attached: set `services.zigbee2mqtt.settings.serial.port` from `/dev/serial/by-id`.
 
@@ -126,6 +118,18 @@
 - Do not merge host-local storage layout into shared modules unless the reuse is clearly real.
 
 ## Immediate Next Reasonable Tasks
-1. Watch `hosts/common` for new wrapper-only detours and prefer canonical modules or shared profiles when possible.
-2. Review `disko` as the remaining architecture exception (documented with design comment).
-3. Extend the shared `testvm` baseline only if another host genuinely needs it.
+1. **Monitor Fleet Warm Cache & Rebuild Matrix**:
+   - Observe the weekly `fleet-warm-cache` timer (Sundays 01:30) and nightly `nixos-upgrade` (04:00) on frieren.
+   - Ensure disk capacity on `/nix/store` and `/srv/data` stays healthy; watch `find /nix/store -maxdepth 1 -newermt '-2 minutes'` when monitoring multi-GB closure updates.
+2. **Secondary Offsite Target for Restic**:
+   - Complement the local `/srv/backup/restic` target with a remote offsite target (Backblaze B2, rsync.net, or rest-server).
+   - Migrate `/root/.restic-password` from unmanaged disk state into sops-nix secret management.
+3. **Monitor nixbuild.net Remote Builder Budget**:
+   - Track build usage against the free tier (25 build-hours/month) using `task dev:nixbuild:plan`.
+4. **Mosquitto Authentication for LAN IoT Clients**:
+   - When physical ESPHome or Zigbee devices are deployed, configure an authenticated TCP/TLS listener on Mosquitto with user credentials in sops.
+5. **Transitive Flake Lock Maintenance**:
+   - Run `task dev:flake:update-transitive` when ready to advance drifted transitive flake inputs in batches.
+6. **Watch Module Cleanliness**:
+   - Maintain service separation in `modules/services/` and avoid accumulating host-local service forks.
+

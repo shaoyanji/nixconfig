@@ -69,7 +69,7 @@ flake.nix → flake/outputs.nix (hub)
 | `fern` | `nixos` | `x86_64-linux` | HP 15 laptop (Ryzen 3 3250U, Vega 3, 8GB), niri desktop, autologin, NAS client | `hosts/fern/configuration.nix` | NVMe `/dev/nvme0n1`, btrfs `/root`, `/nix` |
 | `stark` | `nixos` | `x86_64-linux` | Dell Inspiron 24 3477 AIO (i5-7200U, MX110 Optimus), gamescope-session + DMS | `hosts/stark/configuration.nix` | Dual-disk: SATA SSD (system), 1TB HDD (Steam lib) |
 | `eisen` | `nixos` | `x86_64-linux` | Desktop (RX 5700), niri desktop + gamescope-session kiosk | `hosts/eisen/configuration.nix` | Persistent |
-| `frieren` | `nixos` | `x86_64-linux` | HP EliteDesk 800 G2 NAS/server (ZFS `/Volumes/data`, auto-upgrade 04:00, Paperless, Syncthing, Tika) | `hosts/frieren/configuration.nix` | ZFS mirror |
+| `frieren` | `nixos` | `x86_64-linux` | Lenovo IdeaPad 320-15IKB NAS/server (btrfs `/srv/data`, auto-upgrade 04:00, Paperless, Syncthing, Tika) | `hosts/frieren/configuration.nix` | btrfs `/dev/sdb3` (`/`), `/dev/sda2` (`/srv/data`) |
 | `scratch` | `nixos` | `x86_64-linux` | Fujitsu ESPRIMO D556 (i5-6500, 8GB, f2fs SSD), niri desktop, tmpfs IO diet, GRUB BIOS | `hosts/scratch/configuration.nix` | f2fs `/dev/sda` (GRUB legacy BIOS) |
 | `poseidon` | `nixos` | `x86_64-linux` | Primary workstation (Ryzen 7 3700X, RTX 2070 Super), niri desktop | `hosts/poseidon/configuration.nix` | Persistent |
 | `schneeeule` | `nixos` | `x86_64-linux` | Desktop with impermanence (root wiped each boot, devji + /etc persisted to `/persist`) | `hosts/schneeeule/configuration.nix` | Disko `/dev/sda`, btrfs `/persist` |

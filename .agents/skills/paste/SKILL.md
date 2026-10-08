@@ -62,19 +62,28 @@ pb /tmp/summary.txt audit-2026-10-08.txt
 cat /etc/nginx/nginx.conf | pb - nginx-frieren.conf
 ```
 
-### D. List Active Pastes
+### D. Upload from Clipboard (`pb clip`)
+```bash
+# Upload system clipboard contents directly (supports Wayland & X11)
+pb clip
+
+# Upload clipboard with a custom name / extension
+pb clip snippet.py
+```
+
+### E. List Active Pastes
 ```bash
 pb list
 ```
 Displays all currently stored files in `/var/lib/paste` sorted by modification time.
 
-### E. Delete a Paste
+### F. Delete a Paste
 ```bash
 pb rm a1b2c3d4
 pb rm audit-2026-10-08.txt
 ```
 
-### F. Query URL for an Existing Name
+### G. Query URL for an Existing Name
 ```bash
 pb url a1b2c3d4
 # Outputs: http://paste.frieren.lan/a1b2c3d4

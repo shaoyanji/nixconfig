@@ -41,6 +41,7 @@
       pb [FILE [NAME]]    Upload a file (or stdin if FILE is -) under an
                           8-char random name (NAME overrides it).
       pb                  With piped stdin: upload stdin.
+      pb clip [NAME]      Upload current clipboard contents (or pb -c).
       pb list             List pastes on frieren.
       pb rm NAME          Delete a paste.
       pb url NAME         Print the URL for NAME.
@@ -61,6 +62,33 @@
       # Under pipefail, `head -c 8` exits once it has its bytes and tr
       # gets SIGPIPE (status 141) — expected, so mask the pipeline status.
       tr -dc a-z0-9 </dev/urandom | head -c 8 || :
+    }
+
+    ensure_display() {
+      if [ -z "''${WAYLAND_DISPLAY:-}" ] && [ -n "''${XDG_RUNTIME_DIR:-}" ]; then
+        for sock in "$XDG_RUNTIME_DIR"/wayland-*; do
+          if [ -S "$sock" ]; then
+            export WAYLAND_DISPLAY="''${sock##*/}"
+            break
+          fi
+        done
+      fi
+      if [ -z "''${DISPLAY:-}" ] && [ -S "/tmp/.X11-unix/X0" ]; then
+        export DISPLAY=":0"
+      fi
+    }
+
+    clip() {
+      local name="''${1:-}"
+      ensure_display
+      if command -v wl-paste >/dev/null 2>&1 && wl-paste -n >/dev/null 2>&1; then
+        wl-paste | upload - "$name"
+      elif command -v xclip >/dev/null 2>&1; then
+        xclip -selection clipboard -o | upload - "$name"
+      else
+        echo "pb: nothing in clipboard or no clipboard utility found (wl-paste/xclip)" >&2
+        exit 1
+      fi
     }
 
     upload() {
@@ -95,6 +123,7 @@
       url="$BASE_URL/$name"
       echo "$url"
       # Best-effort clipboard copy (Wayland then X11).
+      ensure_display
       if command -v wl-copy >/dev/null 2>&1; then
         printf '%s' "$url" | wl-copy >/dev/null 2>&1 || true
       elif command -v xclip >/dev/null 2>&1; then
@@ -120,6 +149,9 @@
         [[ ''${2:-} ]] || { echo "pb url NAME" >&2; exit 1; }
         valid_name "$2" || { echo "pb: invalid name: $2" >&2; exit 1; }
         echo "$BASE_URL/$2"
+        ;;
+      clip|-c|--clip)
+        clip "''${2:-}"
         ;;
       -)
         upload - "''${2:-}"

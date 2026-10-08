@@ -61,8 +61,6 @@ Uses `scripts/task/site-target.sh`. Source of truth: `taskfiles/site-manifest.js
 
 | Task | Description |
 |------|-------------|
-| `dev:pkgs:list` | List custom packages from flake |
-| `dev:pkgs:update:<pkg>` | Update package version/hash |
 | `dev:config:hash-update` | Refresh sha256 for config/*.json files |
 
 ## Pull requests

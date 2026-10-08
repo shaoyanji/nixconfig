@@ -133,10 +133,10 @@ modules/
   lib/             — Internal library functions
 ```
 
-### Packages (`pkgs/`)
+### Packages
 
 Custom packages built from the flake:
-- (none — the agent-era packages were removed in 2026-09; see git history)
+- (none — the `pkgs/` directory and agent-era packages were removed in 2026-09/10; the `packages` output is `{}`)
 
 ---
 
@@ -282,7 +282,11 @@ git -C /Volumes/data/projects/nixconfig rev-parse HEAD     # must match the unpa
   `services.kiwix-serve`): ZIMs are store paths / `fetchurl` entries, served on
   8088 and reverse-proxied at `http://wiki.frieren.lan`. Data lives in
   `/var/lib/kiwix` (NOT `$HOME` — DynamicUser + ProtectHome can't read
-  `/home`). Add a new wiki by adding a `fetchurl` entry (use `nurl <url>` for
+  `/home`); the big ZIMs live only as GC-rooted `/nix/store` paths and
+  `library.xml` is force-synced from the declarative copy by the
+  `kiwix-library` activation script (tmpfiles `C+` never overwrites — it left
+  a stale library until 2026-10-08). Add a new wiki by adding a `fetchurl`
+  entry (use `nurl <url>` for
   the hash) + a book entry in `kiwixLibrary`. Never hand-run `kiwix-manage`
   and never hand-roll units under `~/.config/systemd/user/` — they shadow the
   declarative ones (that shadowing broke the gateway on 2026-10-08).

@@ -8,7 +8,6 @@ Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style containe
 - `hosts/*`: host entrypoints plus local identity, storage, and networking.
 - `modules/profiles/*` and `modules/services/*`: canonical reusable host and service logic.
 - `modules/user/*`, `modules/roles/*`, and `modules/shell/*`: user and role commitments.
-- `pkgs/*`: package definitions.
 - `docs/*`: operator and architecture references.
 
 ## Quick Start
@@ -356,7 +355,7 @@ Secrets use `sops-nix`. Two separate encrypted files:
 | File | Decryptors | Contents |
 |------|------------|----------|
 | `modules/secrets.yaml` | All hosts (via their `ssh_host_ed25519_key` age keys in `.sops.yaml`) | App secrets, `hashedPassword`, API keys |
-| `modules/ssh-ca-key.yaml` | Workstations only (`*devji`, `*sopsposeidon`) | SSH User CA private key |
+| `modules/ssh-ca-key.yaml` | Full fleet (all age recipients in `.sops.yaml`; includes frieren since 2026-10-08) | SSH User CA private key |
 
 ### SSH CA workflow
 

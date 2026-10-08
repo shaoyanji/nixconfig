@@ -2,27 +2,65 @@ version: "3"
 
 tasks:
   agents:menu:
-    desc: Interactive operator control plane menu
+    desc: Interactive operator control plane menu (themed)
     cmds:
       - |
-        choice=$(printf '%s\n' apps bountystash envs dragoncourt serv00 moto wishlist rebuild edit-config update load browse new incus sudologinssh help status check deploy logs exit | gum choose)
-        if [ "$choice" = "moto" ]; then
-          task moto:menu
-        elif [ "$choice" = "serv00" ]; then
-          task serv00:menu
-        elif [ "$choice" = "dragoncourt" ]; then
-          task dragoncourt:menu
-        elif [ "$choice" = "envs" ]; then
-          task envs:menu
-        elif [ "$choice" = "bountystash" ]; then
-          task bountystash:menu
-        elif [ "$choice" = "apps" ]; then
-          task apps:menu
-        elif [ "$choice" = "wishlist" ]; then
-          task wishlist
-        else
-          task "$choice"
-        fi
+        choice=$(printf '%s\n' "ssh & remotes" projects ops config browse help exit | gum choose --header "Operator control plane")
+        case "$choice" in
+          "ssh & remotes") task agents:menu:ssh ;;
+          projects) task agents:menu:projects ;;
+          ops) task agents:menu:ops ;;
+          config) task agents:menu:config ;;
+          browse) task browse ;;
+          help) task help ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:ssh:
+    desc: "Theme: SSH & remote hosts"
+    cmds:
+      - |
+        choice=$(printf '%s\n' serv00 dragoncourt envs moto wishlist incus sudologinssh exit | gum choose --header "SSH & remote hosts")
+        case "$choice" in
+          serv00) task serv00:menu ;;
+          dragoncourt) task dragoncourt:menu ;;
+          envs) task envs:menu ;;
+          moto) task moto:menu ;;
+          wishlist|incus|sudologinssh) task "$choice" ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:projects:
+    desc: "Theme: apps & side projects"
+    cmds:
+      - |
+        choice=$(printf '%s\n' apps bountystash exit | gum choose --header "Apps & projects")
+        case "$choice" in
+          apps) task apps:menu ;;
+          bountystash) task bountystash:menu ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:ops:
+    desc: "Theme: system ops & maintenance"
+    cmds:
+      - |
+        choice=$(printf '%s\n' rebuild check status deploy logs update load exit | gum choose --header "System ops")
+        case "$choice" in
+          load) task infra:load:menu ;;   # was a dead bare `load` entry
+          rebuild|check|status|deploy|logs|update) task "$choice" ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:config:
+    desc: "Theme: configuration & secrets"
+    cmds:
+      - |
+        choice=$(printf '%s\n' edit-config new exit | gum choose --header "Configuration & secrets")
+        case "$choice" in
+          edit-config|new) task "$choice" ;;
+          exit) exit 0 ;;
+        esac
 
   browse:
     desc: "[deprecated] Legacy browse menu - use direct commands"

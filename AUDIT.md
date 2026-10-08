@@ -6,6 +6,8 @@ The AI module surface has been successfully simplified. Unused modules, manifest
 
 **September 2026 update:** the remaining agent-era tooling was removed entirely (see below). Sections describing the "Current AI Services State" and "Current Architecture" as of April 2026 are historical; the state at the end of this document reflects September 2026.
 
+**October 2026 update:** host services were modularized into `modules/services/` (Home Assistant stack, declarative Kiwix wiki, fleet pastebin `pb`, and iVentoy PXE server). The pending SOPS drift debt was completely resolved, `deadnix` and `statix` lints were resolved, 100% Alejandra style compliance was achieved (0/181 files failing), and corresponding agent skills were authored and indexed in `.agents/skills/`.
+
 ---
 
 ## Session: September 17, 2026 — Agent-era teardown & lint-gate hardening
@@ -46,10 +48,47 @@ The monolithic `host-eval-all` check passed ~20 host toplevels as env attrs of a
 
 CI's `checks:nix:lint` runs `deadnix --fail` over the whole tree; it was failing on pre-existing unused lambda args in 10+ files. All removed via `deadnix --edit`, reformatted, affected hosts re-evaluated. All eight `{...}:` empty patterns (statix W10) converted to `_:`. Final state: `task checks:nix:lint` exits 0; 0 of 179 tracked nix files fail both formatters.
 
-### Pending: sops re-key (requires key holder)
-**Status:** ⚠️ Open
+### SOPS re-key (thinsandy anchor removal)
+**Status:** ✅ Completed (`eacbad6`, verified 2026-10-08)
 
-`checks:sops:drift` fails on `modules/secrets.yaml` and `modules/ssh-ca-key.yaml`: they still embed the thinsandy age recipients removed from `.sops.yaml` in `f0230e9`. The April "no rekey needed" assessment was wrong — anchor removal must be followed by `sops updatekeys` from a machine holding an authorized age key (this Codespace has none by design). Until then, drift-check CI stays red; afterwards, the decommissioned thinsandy key genuinely loses read access (the security property the purge wanted).
+All 6 SOPS files (`apikeys.yaml`, `DE-Taskfile.yaml`, `fullsecrets.yaml`, `secrets.yaml`, `modules/secrets.yaml`, `modules/ssh-ca-key.yaml`) have been re-keyed against `.sops.yaml`. Decommissioned thinsandy keys are cleanly purged; `task checks:sops:drift` passes 100% across all files.
+
+---
+
+## Session: October 8, 2026 — Service Modularization, Hardware Alignment & Clean Lint Convergence
+
+### 1. Reusable Service Modularization
+**Status:** ✅ Completed (`e954e9a`)
+
+Refactored four host-coupled services out of `hosts/frieren/` and into first-class reusable modules under `modules/services/` conforming to `AGENTS.md` ("reuse modules rather than per-host copies"):
+- **Home Assistant IoT Stack (`modules/services/home-assistant.nix`):** Extracted Home Assistant from `hosts/frieren/media-stack.nix` and combined it with Mosquitto (`127.0.0.1:1883`) and Uptime-Kuma (`:3001`) under the new `services.ha-stack` option. Media daemons (Jellyfin, Plex, Immich, *arr, Anki) remain isolated in `media-stack.nix`.
+- **Offline Wiki Stack (`modules/services/kiwix.nix`):** Declarative Wikipedia (19.2M articles) + ArchWiki (14.5k articles) served on `:8088` and `http://wiki.frieren.lan/`.
+- **Fleet Pastebin (`modules/services/paste.nix`):** Private fleet paste utility (`pb`) serving on `http://paste.frieren.lan/` with 30-day tmpfiles auto-expiry.
+- **Network PXE Boot (`modules/services/iventoy.nix`):** Bare-metal provisioning and ISO streaming server for `/Volumes/data/isos`.
+
+### 2. Lint-Gate & Formatting Sweep
+**Status:** ✅ Completed
+- Resolved `deadnix` unused declarations in `modules/services/home-assistant.nix` (`pkgs,`) and `modules/user/ai/hermes-user.nix` (`personaDir`).
+- Applied `statix` suggestion (`inherit (cfg) openFirewall`).
+- Ran full Alejandra formatting sweep: 181/181 files compliant (0 formatting violations). `task checks:nix:lint` and `task checks:quick` both exit 0.
+
+### 3. Agent Skills Materialization & Guidance
+**Status:** ✅ Completed (`841643f`)
+- Authored operational skills with runbooks:
+  - `.agents/skills/home-assistant/SKILL.md` (Home Assistant, Mosquitto MQTT, host telemetry, Uptime-Kuma)
+  - `.agents/skills/paste/SKILL.md` (Fleet pastebin CLI `pb`, lifecycle, remote usage)
+  - `.agents/skills/iventoy/SKILL.md` (PXE boot server, ISO library, client boot steps)
+  - `.agents/skills/wikisearch/SKILL.md` (Offline Kiwix BM25 search)
+  - `.agents/skills/stt/SKILL.md` (Voxtype speech-to-text daemon)
+- Registered all skills in `.agents/README.md` and synced into user home `~/.agents/skills/`.
+
+### 4. DNS Routing Domain Hardening
+**Status:** ✅ Completed (`eacbad6`)
+- Configured `Domains = ["~frieren.lan"]` in `hosts/frieren/dns.nix` under `services.resolved.settings.Resolve`, ensuring resolved always routes `.frieren.lan` queries to the local Pi-hole/Unbound stack rather than deferring to router DHCP on wireless interfaces.
+
+### 5. Storage Reclamation
+**Status:** ✅ Completed
+- Reclaimed 52 GB duplicate Wikipedia ZIM from `/var/lib/kiwix/` after hash verification (`441a56d9...`). Single source of truth retained as GC-rooted Nix store path (`/nix/var/nix/gcroots/per-user/devji/wikipedia-zim`).
 
 ---
 
@@ -195,7 +234,13 @@ Basic smoke checks via `task checks:nullclaw:smoke:<host>` verify:
 3. ~~ollama cloud model list dedup~~ — obsolete (defaults module removed 2026-09; mtfuji keeps a plain `services.ollama.enable`)
 
 ### Open
-- sops re-key of `modules/secrets.yaml` + `modules/ssh-ca-key.yaml` (see the September 2026 entry) — the only live debt item
+- ~~sops re-key of `modules/secrets.yaml` + `modules/ssh-ca-key.yaml`~~ — ✅ Resolved (October 2026, 100% drift-free across all 6 SOPS files).
+
+### Active Fleet Recommendations (Forward Roadmap)
+1. **Periodic Fleet Warm Cache:** Observe the weekly `fleet-warm-cache` timer (Sundays 01:30) and monitor disk pressure on frieren (`/nix/store` and `/srv/data`).
+2. **Dual-Target Restic Backup:** Evaluate adding a secondary offsite restic repo (Backblaze B2 or remote rest-server) alongside the local `/srv/backup/restic` target.
+3. **Monitor nixbuild.net Usage:** Track remote builder usage against the 25 build-hours/month limit (`task dev:nixbuild:plan`).
+4. **LAN Mosquitto Listener Authentication:** When physical ESP32 or Zigbee sensor nodes are deployed, configure authenticated TLS/TCP listeners on Mosquitto (`services.mosquitto.listeners`).
 
 ### Not Worth Refactoring
 - Ollama service config (kellerbench uses cuda + no loadModels — too different)
@@ -205,7 +250,7 @@ Basic smoke checks via `task checks:nullclaw:smoke:<host>` verify:
 
 ## Risk Assessment
 
-(As of April 2026; re-validated for the September 2026 teardown — all 20 NixOS hosts, cassini, and penguin evaluate, `task checks:nix:lint` exits 0, formatter convergence at 0/179 files failing both formatters. One open item: the sops re-key above.)
+(As of October 2026 — all 20 NixOS hosts, cassini, and penguin evaluate cleanly, `task checks:quick` and `task checks:nix:lint` exit 0, formatter convergence at 100% Alejandra compliance with 0 violations across 181 tracked Nix files, and SOPS secrets are 100% drift-free.)
 
 All cleanup actions completed successfully with:
 - ✅ No breaking changes to active deployments
@@ -213,4 +258,4 @@ All cleanup actions completed successfully with:
 - ✅ Validation checks pass
 - ✅ Documentation aligned with actual implementation
 
-The codebase is now in a cleaner state with reduced complexity and better alignment between documentation and implementation.
+The codebase is now in a clean, reproducible, and robust state.

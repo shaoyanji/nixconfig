@@ -276,6 +276,27 @@ git -C /Volumes/data/projects/nixconfig rev-parse HEAD     # must match the unpa
    systemctl --failed; systemctl --user --failed
    ```
 
+### frieren wiki stack & cache-warm workflow (2026-10-08)
+
+- **Kiwix is declarative** (`hosts/frieren/kiwix.nix`, native
+  `services.kiwix-serve`): ZIMs are store paths / `fetchurl` entries, served on
+  8088 and reverse-proxied at `http://wiki.frieren.lan`. Data lives in
+  `/var/lib/kiwix` (NOT `$HOME` — DynamicUser + ProtectHome can't read
+  `/home`). Add a new wiki by adding a `fetchurl` entry (use `nurl <url>` for
+  the hash) + a book entry in `kiwixLibrary`. Never hand-run `kiwix-manage`
+  and never hand-roll units under `~/.config/systemd/user/` — they shadow the
+  declarative ones (that shadowing broke the gateway on 2026-10-08).
+- **Uncached fleet builds (NVIDIA 580 etc. are unfree, never upstream-cached):**
+  run `task infra:update:fleet` — flake update → `infra:warm:cache` (build all
+  host closures on frieren) → `infra:apply:fleet`. Closures built elsewhere:
+  `task infra:cache:push:host:<host>` pushes them into harmonia.
+- **hermes-gateway:** never run `hermes gateway install` on frieren; edit the
+  unit in `modules/user/ai/hermes-user.nix`. Full checklist in
+  `.agents/deploy/hosts/frieren.md`.
+- **SSH CA:** every host (incl. frieren) can sign certs — `ssh.ca.enableClient`
+  + `rotate-ssh-cert` (1-week user certs, CA key via sops-nix at
+  `~/.ssh/user_ca_key`).
+
 ### Git & Flake
 
 ```bash
@@ -453,7 +474,7 @@ Two separate encrypted files, decrypted via `sops-nix` using host age keys:
 | File | Decryptors | Contents |
 |------|------------|----------|
 | `modules/secrets.yaml` | All hosts (via `ssh_host_ed25519_key`) | App secrets, `hashedPassword`, API keys, TOTP |
-| `modules/ssh-ca-key.yaml` | Workstations only (`*devji`, `*sopsposeidon`) | SSH User CA private key |
+| `modules/ssh-ca-key.yaml` | Full fleet (all age recipients in `.sops.yaml`; includes frieren since 2026-10-08) | SSH User CA private key |
 
 **Key locations**:
 - `.sops.yaml` — age key registrations (each host maps its `ssh_host_ed25519_key` age pubkey)
@@ -553,6 +574,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 | `bountystash:*` | Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment | `.agents/skills/bountystash/SKILL.md` |
 | `apps:*` | Job application workflow (appflow): status updates, email flow, sync, builds | `.agents/skills/apps/SKILL.md` |
 | `services:*` | Legacy wrappers (canonical: `infra:*`) | `.agents/skills/services/SKILL.md` |
+| `google-drive` | Google Drive OAuth setup, rclone, tailscale funnel | `.agents/skills/google-drive/SKILL.md` |
 
 ---
 

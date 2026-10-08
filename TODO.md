@@ -72,8 +72,10 @@
    `boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_12` (the LTS
    track); desktops keep `linuxPackages_latest` from
    `modules/profiles/base-node.nix`.
-8. [x] **X11Forwarding off fleet-wide.** Removed from
-   `modules/profiles/base-node.nix` — no consumer was using X11 over SSH.
+8. [x] **X11Forwarding off fleet-wide.** Set to `false` in
+   `modules/profiles/base-node.nix` (it was re-introduced as `true` during a
+   settings refactor) alongside `KbdInteractiveAuthentication = false` — no
+   consumer was using X11 over SSH.
 9. [x] **Fleet cache-warmer on frieren.** Shipped as `task infra:warm:cache`
    (builds every host closure locally so harmonia serves them at LAN speed;
    `UPDATE=1` also refreshes `flake.lock` and commits) plus a weekly
@@ -82,6 +84,32 @@
    Note: LTS kernel pin reduces but does not remove reboots — keep
    `allowReboot = true` on frieren so 6.12.x security bumps still get
    applied at 04:00.
+10. [x] **Declarative kiwix wiki stack (2026-10-08).** Hand-rolled
+   `wikipedia-download.service` + `kiwix-serve.service` user units replaced by
+   `hosts/frieren/kiwix.nix` (native `services.kiwix-serve`, declarative
+   library, `http://wiki.frieren.lan` via nginx). Data at `/var/lib/kiwix`
+   (moved from `~/wikipedia-offline` — DynamicUser/ProtectHome can't read
+   `/home`); 52GB Wikipedia ZIM imported into the store (`nix store
+   add-file`, GC-rooted); ArchWiki added as `fetchurl`. The downloader was a
+   one-time bootstrap — removed; new wikis = `fetchurl` entries + `nurl`.
+11. [x] **hermes-gateway hardening (2026-10-08).** `hermesGatewayUnitCleanup`
+   activation step (hand-rolled unit shadowing aborted every switch),
+   `/run/wrappers/bin` first in the unit PATH (profile sudo lacked setuid →
+   agent escalation failures), interim unit drop-in removed. Full notes:
+   `.agents/deploy/hosts/frieren.md` Deploy Checklist.
+12. [x] **Hand-rolled unit purge + cache-warm chain (2026-10-08).**
+   `antigravity-cli-daemon` shadow removed (declarative `/etc/systemd/user`
+   unit took over), stale `agy-onetime-handoff-run.timer` + dangling wants
+   links deleted, `wikipedia-download`/`kiwix-serve` user units replaced.
+   New tasks: `infra:update:fleet` (update → warm → apply) and
+   `infra:cache:push:host:*` (nix copy into harmonia). Known issue: the
+   project-root `Taskfile.yml` shim had an include cycle via the
+   `~/Documents/nixconfig` HM-store symlink — **fixed** by flatten-includes
+   (do not include the root file itself); `task` with no `-t` works again.
+13. [x] **SSH CA client on frieren (2026-10-08).** `ssh.ca.enableClient =
+   true` (rotate-ssh-cert + CertificateFile); CA key was already deployed via
+   sops-nix; signing verified live. Stale "workstations only" notes in
+   AGENTS.md/README corrected to full-fleet.
 
 ## TestVM Follow-Up
 1. Inventory every host that embeds or plans to embed `testvm`-style microVM wiring.

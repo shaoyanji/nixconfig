@@ -86,3 +86,4 @@ Before deploying, always verify:
 5. **Use `--sandbox danger-full-access`** for building tasks — avoids sandbox break issues
 6. **Don't interfere** — monitor with `poll`/`log`, be patient with long-running tasks
 7. **Always clean up** — kill background processes, remove temp directories, and verify workspace hygiene
+8. **Never install via profile** — never use `npm install -g` or profile-based installations; use `nix shell` for on-demand binaries

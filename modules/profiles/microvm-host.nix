@@ -6,12 +6,13 @@
 #   natExternalInterface   - WiFi/Ethernet uplink for NAT (e.g. "wlp4s0")
 #   microvmExternalInterface - Uplink for microvm.network bridge (e.g. "eno1")
 #   bridgeAddress          - IPv4 address for the bridge (default "192.168.83.1/24")
-{ natExternalInterface ? throw "Set natExternalInterface to your uplink (e.g. wlp4s0)"
-, microvmExternalInterface ? "eno1"
-, bridgeAddress ? "192.168.83.1/24"
-, pkgs
-, ...
-}: { lib, ... }: {
+{
+  natExternalInterface ? throw "Set natExternalInterface to your uplink (e.g. wlp4s0)",
+  microvmExternalInterface ? "eno1",
+  bridgeAddress ? "192.168.83.1/24",
+  pkgs,
+  ...
+}: {lib, ...}: {
   options.microvm.network = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -77,9 +78,9 @@
     # NAT for VM network
     networking.nat = {
       enable = true;
-      internalInterfaces = [ "microbr" ];
+      internalInterfaces = ["microbr"];
       externalInterface = natExternalInterface;
     };
-    networking.firewall.trustedInterfaces = [ "microbr" ];
+    networking.firewall.trustedInterfaces = ["microbr"];
   };
 }

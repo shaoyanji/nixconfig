@@ -20,8 +20,7 @@
 #   Re-add via services.esphome (or esphome-device-builder) if needed.
 # uptime-kuma: status dashboards on 3001, LAN-exposed (the module
 #   has no openFirewall option — the port is opened explicitly).
-{ lib, ... }:
-{
+_: {
   # --- Mosquitto MQTT broker (loopback-only, anonymous) ---
   services.mosquitto = {
     enable = true;
@@ -42,5 +41,5 @@
     };
   };
   # The module has no openFirewall option.
-  networking.firewall.allowedTCPPorts = [ 3001 ];
+  networking.firewall.allowedTCPPorts = [3001];
 }

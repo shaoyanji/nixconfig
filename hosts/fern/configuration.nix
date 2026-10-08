@@ -14,13 +14,9 @@
 #        battery, performance on AC) + libinput for the touchpad.
 #
 # Storage: persistent btrfs (no impermanence), monthly scrub below.
-{ pkgs
-, ...
-}:
-let
+{pkgs, ...}: let
   user = import ../../modules/global/user.nix;
-in
-{
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -59,10 +55,12 @@ in
     (final: prev: {
       antigravity-cli = prev.antigravity-cli.overrideAttrs (old: {
         doInstallCheck = false;
-        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ final.makeWrapper ];
-        postInstall = (old.postInstall or "") + ''
-          wrapProgram "$out/bin/agy" --set OPENSSL_ia32cap "0:~0"
-        '';
+        nativeBuildInputs = (old.nativeBuildInputs or []) ++ [final.makeWrapper];
+        postInstall =
+          (old.postInstall or "")
+          + ''
+            wrapProgram "$out/bin/agy" --set OPENSSL_ia32cap "0:~0"
+          '';
       });
     })
   ];
@@ -70,7 +68,7 @@ in
   # Vega 3 iGPU — Mesa/radeonsi; amdgpu drives it (modesetting by DRI3
   # under Wayland). Redistributable firmware covers the APU + laptop
   # WiFi/BT (HP 15 units ship Realtek/MediaTek/Intel cards).
-  services.xserver.videoDrivers = [ "amdgpu" ];
+  services.xserver.videoDrivers = ["amdgpu"];
   hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
 
@@ -78,7 +76,7 @@ in
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
-    fileSystems = [ "/" ];
+    fileSystems = ["/"];
   };
 
   environment.systemPackages = with pkgs; [

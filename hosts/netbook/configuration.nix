@@ -1,15 +1,15 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
-{ config, pkgs, ... }:
-
 {
-  imports =
-    [
-      # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Use the GRUB 2 boot loader.
   # boot.loader.grub.enable = true;
@@ -20,7 +20,7 @@
   # boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = false;
-  boot.supportedFilesystems = [ "f2fs" "nfs" ];
+  boot.supportedFilesystems = ["f2fs" "nfs"];
   hardware.enableRedistributableFirmware = true;
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.tmp.cleanOnBoot = true;
@@ -29,11 +29,11 @@
     "/Volumes/data" = {
       device = "192.168.3.25:/data";
       fsType = "nfs";
-      options = [ "noatime" "nfsvers=4" "rw" "x-systemd.automount" "x-systemd.idle-timeout=600" ];
+      options = ["noatime" "nfsvers=4" "rw" "x-systemd.automount" "x-systemd.idle-timeout=600"];
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 2049 ];
+  networking.firewall.allowedTCPPorts = [2049];
   services.tailscale.enable = true;
 
   boot.kernelParams = [
@@ -99,9 +99,6 @@
   # Enable the X11 windowing system.
   # services.xserver.enable = true;
 
-
-
-
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
@@ -123,7 +120,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.alice = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = ["wheel"]; # Enable ‘sudo’ for the user.
 
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHnNR7isgO8VDY76XzwyH3mOg1/DQo8dZgqQOfziw0DQ devji@nixos"
@@ -151,7 +148,7 @@
   systemd.user.services.niri.enableDefaultPath = false;
   security.polkit.enable = true; # polkit
   services.gnome.gnome-keyring.enable = true; # secret service
-  security.pam.services.swaylock = { };
+  security.pam.services.swaylock = {};
 
   # programs.waybar.enable = true; # top bar
   # services.displayManager.sddm.enable = true;
@@ -221,7 +218,7 @@
     # nixpkgs yt-dlp into its PATH; the current yt-dlp comes from
     # /home/alice/.local/bin/yt-dlp (standalone binary, self-updates with
     # `yt-dlp --update`).
-    (mpv.override { youtubeSupport = false; })
+    (mpv.override {youtubeSupport = false;})
     aria2
     # ani-cli prefers curl-impersonate (hianime sits behind Cloudflare)
     curl-impersonate
@@ -246,7 +243,7 @@
   hardware.bluetooth.enable = true;
 
   # VAAPI driver for the Gen8 iGPU (N3060): H.264 hardware decode for mpv.
-  hardware.graphics.extraPackages = [ pkgs.intel-vaapi-driver ];
+  hardware.graphics.extraPackages = [pkgs.intel-vaapi-driver];
 
   # Run prebuilt, non-Nix dynamically linked binaries (tools dropped in
   # ~/.local/bin, pip/venv wheels with C extensions, downloaded release
@@ -256,7 +253,6 @@
 
   # Keep ~/.local/bin on PATH for the session and login shells.
   environment.localBinInPath = true;
-
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -305,6 +301,4 @@
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
-
 }
-

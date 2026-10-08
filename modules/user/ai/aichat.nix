@@ -1,8 +1,8 @@
-{ lib
-, config
-, ...
-}:
 {
+  lib,
+  config,
+  ...
+}: {
   # Gated by profiles.ai.enable (see ./default.nix). `or true` keeps this
   # module active in chains that don't declare the option.
   config = lib.mkIf (config.profiles.ai.enable or true) {

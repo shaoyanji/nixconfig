@@ -24,13 +24,9 @@
 #          Then add it in Steam: Settings → Storage → Add Drive →
 #          /mnt/steam. Games that benefit from the dGPU: right-click →
 #          Properties → Launch Options → `nvidia-offload %command%`.
-{ pkgs
-, ...
-}:
-let
+{pkgs, ...}: let
   user = import ../../modules/global/user.nix;
-in
-{
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix

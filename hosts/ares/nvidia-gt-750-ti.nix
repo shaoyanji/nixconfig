@@ -1,6 +1,7 @@
-{ config
-, lib
-, ...
+{
+  config,
+  lib,
+  ...
 }: {
   # ares desktop case hosts a GTX 750 Ti (Kepler sm_30) dGPU on /dev/sda,
   # paired with an i5-6500 Skylake mainboard.  Mirrors
@@ -18,7 +19,7 @@
   # user lands on a black screen.
   powerManagement.enable = true;
 
-  services.xserver.videoDrivers = lib.mkForce [ "modesetting" "nvidia" ];
+  services.xserver.videoDrivers = lib.mkForce ["modesetting" "nvidia"];
 
   nixpkgs.config = {
     nvidia.acceptLicense = true;
@@ -54,7 +55,7 @@
   # lib.mkAfter (priority ~10) appends to the extraGroups list set by
   # base-node.nix without overriding its wheel/networkmanager
   # ownership; mkAfter on a list attribute merges additively.
-  users.users.devji.extraGroups = lib.mkAfter [ "video" "render" "input" ];
+  users.users.devji.extraGroups = lib.mkAfter ["video" "render" "input"];
 
   # Force nvidia_drm KMS on so any wlroots-based compositor (Niri,
   # gamescope, cage, sway, etc.) can grab the DRM device via seatd.

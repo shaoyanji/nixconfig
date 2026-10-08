@@ -1,22 +1,21 @@
-{ lib, ... }:
-let
+{lib, ...}: let
   # Load authorized keys from centralized config
   keysConfig = builtins.fromJSON (builtins.readFile ../config/authorized-keys.json);
   fetchedKeys =
     builtins.filter
-      (x: x != [ ])
+    (x: x != [])
+    (
+      builtins.split "\n"
       (
-        builtins.split "\n"
-          (
-            builtins.readFile
-              (
-                builtins.fetchurl {
-                  inherit ((builtins.elemAt keysConfig 0)) url;
-                  inherit ((builtins.elemAt keysConfig 0)) sha256;
-                }
-              )
-          )
-      );
+        builtins.readFile
+        (
+          builtins.fetchurl {
+            inherit ((builtins.elemAt keysConfig 0)) url;
+            inherit ((builtins.elemAt keysConfig 0)) sha256;
+          }
+        )
+      )
+    );
 
   # Repo-side extra keys. benutzer@bitlockerpremium is a Windows machine
   # (not a NixOS host) that SSHes into the fleet — appended here rather
@@ -32,8 +31,7 @@ let
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILrvO+LslaA0+SWCvy46hUoVUifVjhtM8hXzoViIBebG u0_a301@moto-g35-5g"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFOS9RHGObNEmXWrmgry6j4NjepOYSC101CmdCtfxRVr devji@stark"
     ];
-in
-{
+in {
   options.ssh.authorizedKeys = {
     keys = lib.mkOption {
       type = lib.types.listOf lib.types.str;

@@ -2,11 +2,11 @@
 # Config schema per https://antigravity.google/docs/cli/reference/ (settings.json keys).
 # Settings land in ~/.gemini/antigravity-cli/settings.json (managed by home-manager);
 # auth tokens are stored in the OS keyring at first `agy` run, NOT in settings.json.
-{ lib
-, config
-, ...
-}:
 {
+  lib,
+  config,
+  ...
+}: {
   # Gated by profiles.ai.enable (see ./default.nix). `or true` keeps this
   # module active in chains that don't declare the option.
   config = lib.mkIf (config.profiles.ai.enable or true) {
@@ -79,7 +79,7 @@
     home.file.".gemini/config/projects/outside-of-project.json".text = builtins.toJSON {
       id = "outside-of-project";
       name = "Outside of Project";
-      projectResources = { };
+      projectResources = {};
     };
   };
 }

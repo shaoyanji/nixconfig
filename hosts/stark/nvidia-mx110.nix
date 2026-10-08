@@ -24,11 +24,12 @@
 # primary DRM device without pinning. If the panel ever stays dark,
 # pin WLR_DRM_DEVICES/AQ_DRM_DEVICES to
 # /dev/dri/by-path/pci-0000:00:02.0-card.
-{ config
-, lib
-, ...
+{
+  config,
+  lib,
+  ...
 }: {
-  services.xserver.videoDrivers = lib.mkForce [ "modesetting" "nvidia" ];
+  services.xserver.videoDrivers = lib.mkForce ["modesetting" "nvidia"];
 
   nixpkgs.config.nvidia.acceptLicense = true;
 
@@ -71,7 +72,7 @@
   # (which already grants video + docker). gamescope/niri need
   # /dev/dri/renderD* (render) and /dev/input/event* (input) under the
   # DMS greeter session.
-  users.users.devji.extraGroups = lib.mkAfter [ "render" "input" ];
+  users.users.devji.extraGroups = lib.mkAfter ["render" "input"];
 
   # nvidia_drm KMS on so Wayland compositors can lease the DRM device.
   # Same trio as ares/kellerbench (legacy_580 quirk): modeset=1 + fbdev=1

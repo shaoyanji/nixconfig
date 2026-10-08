@@ -24,8 +24,7 @@
   pkgs,
   lib,
   ...
-}:
-let
+}: let
   iventoy = pkgs.stdenv.mkDerivation {
     pname = "iventoy";
     version = "1.0.20";
@@ -60,9 +59,9 @@ let
 
     meta = with lib; {
       description = "iVentoy network PXE boot server (free edition)";
-      sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+      sourceProvenance = with sourceTypes; [binaryNativeCode];
       license = licenses.unfree;
-      platforms = [ "x86_64-linux" ];
+      platforms = ["x86_64-linux"];
       mainProgram = "iventoy";
     };
   };
@@ -96,12 +95,11 @@ let
       ln -s /Volumes/data/isos "$DST/iso"
     fi
   '';
-in
-{
+in {
   systemd.services.iventoy = {
     description = "iVentoy PXE boot server (ProxyDHCP for /Volumes/data/isos)";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
+    after = ["network.target"];
+    wantedBy = ["multi-user.target"];
 
     environment = {
       # Bundled libs resolve transitive deps (libglib -> bundled libiconv).

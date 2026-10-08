@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   # Use nixpkgs' niri (cached on cache.nixos.org) instead of niri-flake's
   # self-built niri-stable, which pins libdisplay-info_0_2 (removed from
   # nixpkgs, upstream issue sodiboo/niri-flake#1851) and isn't in any cache.
@@ -42,7 +42,7 @@
     input.focus-follows-mouse.enable = true;
     input.warp-mouse-to-focus.enable = true;
     layout.focus-ring.enable = false;
-    layout.border = { };
+    layout.border = {};
 
     # swayidle manages DPMS via niri IPC (compositor owns the DRM lease).
     # No root-level /sys writes — niri handles monitor power natively.
@@ -61,24 +61,22 @@
     ];
     window-rules = [
       {
-        geometry-corner-radius =
-          let
-            r = 12.0;
-          in
-          {
-            top-left = r;
-            top-right = r;
-            bottom-left = r;
-            bottom-right = r;
-          };
+        geometry-corner-radius = let
+          r = 12.0;
+        in {
+          top-left = r;
+          top-right = r;
+          bottom-left = r;
+          bottom-right = r;
+        };
         clip-to-geometry = true;
       }
       {
         matches = [
-          { app-id = "xdg-desktop-portal-gtk"; }
-          { app-id = "org.freedesktop.impl.portal.desktop.gtk"; }
-          { app-id = "xdg-desktop-portal-kde"; }
-          { app-id = "org.freedesktop.impl.portal.desktop.kde"; }
+          {app-id = "xdg-desktop-portal-gtk";}
+          {app-id = "org.freedesktop.impl.portal.desktop.gtk";}
+          {app-id = "xdg-desktop-portal-kde";}
+          {app-id = "org.freedesktop.impl.portal.desktop.kde";}
         ];
         border.enable = false;
         open-floating = true;
@@ -145,53 +143,53 @@
       # Freebuff mainframe terminal on frieren (fleet AI coding session)
       "Mod+Shift+B".action.spawn = "freebuff-terminal";
 
-      "Mod+W".action.toggle-window-floating = [ ];
-      "Mod+E".action.switch-focus-between-floating-and-tiling = [ ];
-      "Mod+BracketLeft".action.consume-or-expel-window-left = [ ];
-      "Mod+BracketRight".action.consume-or-expel-window-right = [ ];
+      "Mod+W".action.toggle-window-floating = [];
+      "Mod+E".action.switch-focus-between-floating-and-tiling = [];
+      "Mod+BracketLeft".action.consume-or-expel-window-left = [];
+      "Mod+BracketRight".action.consume-or-expel-window-right = [];
 
-      "Mod+Return".action.toggle-overview = [ ];
+      "Mod+Return".action.toggle-overview = [];
       "Ctrl+Space".action.spawn-sh = "kando -m 'Kando Menu'";
 
-      "Mod+H".action.focus-column-left = [ ];
-      "Mod+J".action.focus-workspace-down = [ ];
-      "Mod+K".action.focus-workspace-up = [ ];
-      "Mod+L".action.focus-column-right = [ ];
+      "Mod+H".action.focus-column-left = [];
+      "Mod+J".action.focus-workspace-down = [];
+      "Mod+K".action.focus-workspace-up = [];
+      "Mod+L".action.focus-column-right = [];
 
-      "Mod+Shift+H".action.focus-monitor-left = [ ];
-      "Mod+Shift+J".action.focus-workspace-down = [ ];
-      "Mod+Shift+K".action.focus-workspace-up = [ ];
-      "Mod+Shift+L".action.focus-monitor-right = [ ];
+      "Mod+Shift+H".action.focus-monitor-left = [];
+      "Mod+Shift+J".action.focus-workspace-down = [];
+      "Mod+Shift+K".action.focus-workspace-up = [];
+      "Mod+Shift+L".action.focus-monitor-right = [];
 
-      "Mod+Ctrl+H".action.move-column-left = [ ];
-      "Mod+Ctrl+J".action.move-column-to-workspace-down = [ ];
-      "Mod+Ctrl+K".action.move-column-to-workspace-up = [ ];
-      "Mod+Ctrl+L".action.move-column-right = [ ];
+      "Mod+Ctrl+H".action.move-column-left = [];
+      "Mod+Ctrl+J".action.move-column-to-workspace-down = [];
+      "Mod+Ctrl+K".action.move-column-to-workspace-up = [];
+      "Mod+Ctrl+L".action.move-column-right = [];
 
-      "Mod+Ctrl+Shift+H".action.move-column-to-monitor-left = [ ];
-      "Mod+Ctrl+Shift+J".action.move-column-to-workspace-down = [ ];
-      "Mod+Ctrl+Shift+K".action.move-column-to-workspace-up = [ ];
-      "Mod+Ctrl+Shift+L".action.move-column-to-monitor-right = [ ];
+      "Mod+Ctrl+Shift+H".action.move-column-to-monitor-left = [];
+      "Mod+Ctrl+Shift+J".action.move-column-to-workspace-down = [];
+      "Mod+Ctrl+Shift+K".action.move-column-to-workspace-up = [];
+      "Mod+Ctrl+Shift+L".action.move-column-to-monitor-right = [];
 
-      "Mod+Q".action.close-window = [ ];
+      "Mod+Q".action.close-window = [];
       "Mod+Q".repeat = false;
-      "Mod+F".action.maximize-column = [ ];
-      "Mod+Shift+F".action.fullscreen-window = [ ];
-      "Mod+R".action.switch-preset-column-width = [ ];
-      "Mod+U".action.focus-monitor-previous = [ ];
-      "Mod+I".action.focus-workspace-previous = [ ];
-      "Mod+S".action.screenshot = [ ];
-      "Mod+WheelScrollDown".action.focus-workspace-down = [ ];
-      "Mod+WheelScrollUp".action.focus-workspace-up = [ ];
-      "Mod+Ctrl+WheelScrollDown".action.move-column-to-workspace-down = [ ];
-      "Mod+Ctrl+WheelScrollUp".action.move-column-to-workspace-up = [ ];
+      "Mod+F".action.maximize-column = [];
+      "Mod+Shift+F".action.fullscreen-window = [];
+      "Mod+R".action.switch-preset-column-width = [];
+      "Mod+U".action.focus-monitor-previous = [];
+      "Mod+I".action.focus-workspace-previous = [];
+      "Mod+S".action.screenshot = [];
+      "Mod+WheelScrollDown".action.focus-workspace-down = [];
+      "Mod+WheelScrollUp".action.focus-workspace-up = [];
+      "Mod+Ctrl+WheelScrollDown".action.move-column-to-workspace-down = [];
+      "Mod+Ctrl+WheelScrollUp".action.move-column-to-workspace-up = [];
 
       "Mod+WheelScrollDown".cooldown-ms = 150;
       "Mod+WheelScrollUp".cooldown-ms = 150;
       "Mod+Ctrl+WheelScrollDown".cooldown-ms = 150;
       "Mod+Ctrl+WheelScrollUp".cooldown-ms = 150;
 
-      "Mod+0".action.focus-workspace-previous = [ ];
+      "Mod+0".action.focus-workspace-previous = [];
       "Mod+1".action.focus-workspace = 1;
       "Mod+2".action.focus-workspace = 2;
       "Mod+3".action.focus-workspace = 3;
@@ -265,7 +263,7 @@
     };
     systemd.enable = false;
     # Don't manage settings.json — let DMS write its own at runtime
-    settings = { };
+    settings = {};
   };
 
   home.packages = with pkgs; [

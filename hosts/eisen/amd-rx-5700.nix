@@ -11,9 +11,8 @@
 # - libva-utils ships vainfo for debugging the encode/decode surface list.
 # - No ROCm — Navi 10 has no CDNA compute silicon and ROCm support is
 #   experimental at best; this host targets gaming + media, not AI.
-{ pkgs, ... }:
-{
-  services.xserver.videoDrivers = [ "amdgpu" ];
+{pkgs, ...}: {
+  services.xserver.videoDrivers = ["amdgpu"];
 
   hardware.graphics = {
     enable = true;
@@ -27,7 +26,7 @@
   # VAAPI defaults to the radeonsi Gallium driver in mesa; no override
   # needed — auto-detection handles this correctly for AMD GPUs.
 
-  boot.kernelModules = [ "amdgpu" ];
+  boot.kernelModules = ["amdgpu"];
 
   # ffmpeg-full with hardware codec support for media workflows.
   # mesa provides the VAAPI/VDPAU backends at runtime (no separate

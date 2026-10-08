@@ -24,7 +24,7 @@
 #
 # Usage:
 #   imports = [ ../../modules/profiles/steamos.nix ];
-{ lib, ... }: {
+{lib, ...}: {
   imports = [
     ./steam.nix
   ];
@@ -82,5 +82,5 @@
   # Steam-only hosts don't import desktop-client, so we add these here.
   # `seat` group is required so devji can talk to libseat once greetd has
   # switched away from the `greeter` user to run gamescope-session.
-  users.users.devji.extraGroups = [ "video" "render" "input" "seat" ];
+  users.users.devji.extraGroups = ["video" "render" "input" "seat"];
 }

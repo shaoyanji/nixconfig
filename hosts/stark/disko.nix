@@ -17,9 +17,9 @@
 # WARNING: `disko` wipes BOTH disks. Always use deterministic by-id paths
 # or verify with `lsblk` before running disko — SCSI drive letters (/dev/sdX)
 # can swap between boots.
-{ mainDevice ? "/dev/disk/by-id/ata-SK_hynix_SC311_SATA_128GB_MS83N428510303B5B"
-, hddDevice ? "/dev/disk/by-id/ata-ST1000LM035-1RK172_WL14QR63"
-,
+{
+  mainDevice ? "/dev/disk/by-id/ata-SK_hynix_SC311_SATA_128GB_MS83N428510303B5B",
+  hddDevice ? "/dev/disk/by-id/ata-ST1000LM035-1RK172_WL14QR63",
 }: {
   disko.devices = {
     disk.main = {
@@ -36,7 +36,7 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
-              mountOptions = [ "fmask=0022" "dmask=0022" ];
+              mountOptions = ["fmask=0022" "dmask=0022"];
             };
           };
           swap = {
@@ -51,14 +51,14 @@
             size = "100%";
             content = {
               type = "btrfs";
-              extraArgs = [ "-f" ];
+              extraArgs = ["-f"];
               subvolumes = {
                 "/root" = {
                   mountpoint = "/";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = ["compress=zstd" "noatime"];
                 };
                 "/nix" = {
-                  mountOptions = [ "subvol=nix" "compress=zstd" "noatime" ];
+                  mountOptions = ["subvol=nix" "compress=zstd" "noatime"];
                   mountpoint = "/nix";
                 };
               };
@@ -79,9 +79,9 @@
             content = {
               type = "filesystem";
               format = "btrfs";
-              extraArgs = [ "-f" "-L" "steam" ];
+              extraArgs = ["-f" "-L" "steam"];
               mountpoint = "/mnt/steam";
-              mountOptions = [ "compress=zstd" "noatime" "autodefrag" ];
+              mountOptions = ["compress=zstd" "noatime" "autodefrag"];
             };
           };
         };

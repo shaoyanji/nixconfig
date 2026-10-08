@@ -5,15 +5,17 @@
 # set their own specialArgs in flake/host-inventory.nix get the default.
 #
 # Used by flake/nixos-configurations.nix via mkNixosHost.
-{ nixpkgs
-, inputs
-, self
-, ...
-}: { system
-   , modules
-   , specialArgs ? { inherit inputs self; }
-   , ...
-   }:
+{
+  nixpkgs,
+  inputs,
+  self,
+  ...
+}: {
+  system,
+  modules,
+  specialArgs ? {inherit inputs self;},
+  ...
+}:
 nixpkgs.lib.nixosSystem {
   inherit system modules specialArgs;
 }

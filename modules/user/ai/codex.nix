@@ -1,12 +1,11 @@
-{ config
-, lib
-, ...
-}:
-let
+{
+  config,
+  lib,
+  ...
+}: let
   cfg = config.ai.codex;
   defaultAgentsText = builtins.readFile ../../../AGENTS.md;
-in
-{
+in {
   options.ai.codex = {
     enable = lib.mkOption {
       type = lib.types.bool;

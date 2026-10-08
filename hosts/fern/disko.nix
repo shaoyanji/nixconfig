@@ -9,9 +9,7 @@
 # so hibernation stays possible) + btrfs /root + /nix subvolumes.
 # Host-local on purpose (TODO.md → "Things To Avoid": storage layouts
 # stay host-specific). Persistent desktop — no impermanence.
-{ device ? throw "Set this to the laptop SSD, e.g. /dev/sda or /dev/nvme0n1"
-,
-}: {
+{device ? throw "Set this to the laptop SSD, e.g. /dev/sda or /dev/nvme0n1"}: {
   disko.devices = {
     disk.main = {
       inherit device;
@@ -27,7 +25,7 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
-              mountOptions = [ "fmask=0022" "dmask=0022" ];
+              mountOptions = ["fmask=0022" "dmask=0022"];
             };
           };
           swap = {
@@ -42,14 +40,14 @@
             size = "100%";
             content = {
               type = "btrfs";
-              extraArgs = [ "-f" ];
+              extraArgs = ["-f"];
               subvolumes = {
                 "/root" = {
                   mountpoint = "/";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = ["compress=zstd" "noatime"];
                 };
                 "/nix" = {
-                  mountOptions = [ "subvol=nix" "compress=zstd" "noatime" ];
+                  mountOptions = ["subvol=nix" "compress=zstd" "noatime"];
                   mountpoint = "/nix";
                 };
               };

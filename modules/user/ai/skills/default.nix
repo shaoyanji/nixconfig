@@ -1,17 +1,12 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-let
+{lib, ...}: let
   skillsDir = ./.;
   # Scan all directories in this folder (excluding default.nix and hidden files)
-  skillEntries = lib.filterAttrs (name: type:
-    type == "directory" && name != "default.nix" && !(lib.hasPrefix "." name)
+  skillEntries = lib.filterAttrs (
+    name: type:
+      type == "directory" && name != "default.nix" && !(lib.hasPrefix "." name)
   ) (builtins.readDir skillsDir);
   skillNames = builtins.attrNames skillEntries;
-in
-{
+in {
   # Declaratively symlink skills into:
   # 1. ~/.agents/skills/<name> (workspace & local agent discovery)
   # 2. ~/.gemini/config/skills/<name> (Antigravity global skill discovery)
@@ -31,6 +26,7 @@ in
           recursive = true;
         };
       }
-    ]) skillNames
+    ])
+    skillNames
   );
 }

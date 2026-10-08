@@ -1,13 +1,12 @@
-{ inputs
-, config
-, pkgs
-, lib
-, ...
-}:
-let
-  user = import ../../modules/global/user.nix;
-in
 {
+  inputs,
+  config,
+  pkgs,
+  lib,
+  ...
+}: let
+  user = import ../../modules/global/user.nix;
+in {
   imports = [
     ../../modules/config/authorized-keys.nix
     # Include the results of the hardware scan.
@@ -66,7 +65,7 @@ in
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
   networking.hostName = "ancientace";
 
-  hardware.graphics.extraPackages = [ ];
+  hardware.graphics.extraPackages = [];
   services = {
     displayManager = {
       sddm = {
@@ -79,7 +78,7 @@ in
     btrfs.autoScrub = {
       enable = true;
       interval = "monthly";
-      fileSystems = [ "/" ];
+      fileSystems = ["/"];
     };
   };
 

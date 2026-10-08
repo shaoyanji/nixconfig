@@ -1,8 +1,7 @@
-{ inputs
-, self
-,
-}:
-let
+{
+  inputs,
+  self,
+}: let
   globalModules = [
     {
       system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -25,8 +24,7 @@ let
     inputs.sops-nix.homeManagerModules.sops
     inputs.nix-index-database.homeModules.nix-index
   ];
-in
-rec {
+in rec {
   inherit globalModules hmSharedModulesHome;
   globalModulesNixos =
     globalModules
@@ -79,7 +77,7 @@ rec {
     ++ [
       {
         nixpkgs.config.allowUnfree = true;
-        nixpkgs.overlays = [ inputs.llm-agents.overlays.shared-nixpkgs ];
+        nixpkgs.overlays = [inputs.llm-agents.overlays.shared-nixpkgs];
       }
     ];
 }

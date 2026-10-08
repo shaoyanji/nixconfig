@@ -1,13 +1,11 @@
-{ lib, ... }:
-let
-  localAgents = import ../ai/agents.nix { inherit lib; };
+{lib, ...}: let
+  localAgents = import ../ai/agents.nix {inherit lib;};
   agentsJsonPath = ../../config/agents.json;
   remoteAgentsList =
     if builtins.pathExists agentsJsonPath
     then builtins.fromJSON (builtins.readFile agentsJsonPath)
-    else [ ];
-in
-{
+    else [];
+in {
   programs.opencode = {
     enable = true;
     settings = {
@@ -42,22 +40,22 @@ in
       };
       # theme = "tokyonight";
       formatter."alejandra" = {
-        command = [ "alejandra" ];
-        extensions = [ ".nix" ];
+        command = ["alejandra"];
+        extensions = [".nix"];
       };
-      lsp.nixd.command = [ "nixd" ];
+      lsp.nixd.command = ["nixd"];
     };
     agents =
       lib.listToAttrs
-        (map
-          (agent: {
-            name = lib.removeSuffix ".md" (lib.last (lib.splitString "/" agent.url));
-            value = builtins.readFile (builtins.fetchurl {
-              inherit (agent) url;
-              inherit (agent) sha256;
-            });
-          })
-          remoteAgentsList)
+      (map
+        (agent: {
+          name = lib.removeSuffix ".md" (lib.last (lib.splitString "/" agent.url));
+          value = builtins.readFile (builtins.fetchurl {
+            inherit (agent) url;
+            inherit (agent) sha256;
+          });
+        })
+        remoteAgentsList)
       // localAgents;
   };
 }

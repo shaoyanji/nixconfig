@@ -1,6 +1,7 @@
-{ pkgs
-, lib
-, ...
+{
+  pkgs,
+  lib,
+  ...
 }: {
   imports = [
     # Include the results of the hardware scan.
@@ -12,7 +13,7 @@
     })
   ];
   networking.hostName = "aceofspades";
-  services.xserver.videoDrivers = [ "amdgpu" ];
+  services.xserver.videoDrivers = ["amdgpu"];
 
   hardware.graphics.extraPackages = [
     pkgs.mesa.opencl

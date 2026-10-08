@@ -21,14 +21,13 @@
 #     (8 GB RAM budget)
 #   - journald volatile (RAM only), core dumps disabled
 #   - weekly fstrim + noatime + gentle writeback sysctls
-{ lib
-, pkgs
-, ...
-}:
-let
-  user = import ../../modules/global/user.nix;
-in
 {
+  lib,
+  pkgs,
+  ...
+}: let
+  user = import ../../modules/global/user.nix;
+in {
   imports = [
     ./hardware-configuration.nix
     # Full desktop baseline (eisen/poseidon): niri + DMS greeter +
@@ -82,25 +81,25 @@ in
   fileSystems."${user.home}/.cache" = {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=512M" "mode=0755" "uid=1000" "gid=100" ];
+    options = ["size=512M" "mode=0755" "uid=1000" "gid=100"];
   };
 
   fileSystems."/var/log" = {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=128M" "mode=0755" "nosuid" "nodev" ];
+    options = ["size=128M" "mode=0755" "nosuid" "nodev"];
   };
 
   fileSystems."/var/tmp" = {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=256M" "mode=1777" "nosuid" "nodev" ];
+    options = ["size=256M" "mode=1777" "nosuid" "nodev"];
   };
 
   fileSystems."/var/cache" = {
     device = "tmpfs";
     fsType = "tmpfs";
-    options = [ "size=256M" "mode=0755" "nosuid" "nodev" ];
+    options = ["size=256M" "mode=0755" "nosuid" "nodev"];
   };
 
   # Journals live in RAM only — nothing hits the f2fs SSD.

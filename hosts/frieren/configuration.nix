@@ -1,9 +1,9 @@
-{ config
-, pkgs
-, lib
-, ...
-}:
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}: let
   user = import ../../modules/global/user.nix;
   # Belt-and-suspenders rfkill unblock: the Ideapad EC can boot with BT
   # soft-blocked (Fn+F8 state persisted across reboots). The standalone
@@ -37,8 +37,7 @@ let
     done
     exit $fail
   '';
-in
-{
+in {
   imports = [
     ./hardware-configuration.nix
     ./hardware.nix
@@ -50,7 +49,10 @@ in
     ./media-stack.nix
     ./paperless.nix
     ./tools.nix
+    ./kiwix.nix
+    ./paste.nix
     ./networking.nix
+    ./firewall-scope.nix
     ./ha-stack.nix
     ./infra-stack.nix
     ./reverse-proxy.nix
@@ -60,6 +62,12 @@ in
     ../../modules/profiles/nixbuild-client.nix
   ];
   networking.hostName = "frieren";
+
+  # Frieren signs SSH user certificates like the workstations (aristotle,
+  # poseidon): the CA private key is already deployed via sops-nix
+  # (modules/sops.nix → ~/.ssh/user_ca_key), so enable the client-cert
+  # config + rotate-ssh-cert helper here too.
+  ssh.ca.enableClient = true;
 
   # pihole-ftl 6.7.1 fails to compile at the current nixpkgs rev (-Werror on an
   # unused variable) and has no binary substitute — see the overlay header.
@@ -84,13 +92,13 @@ in
   # see modules/services/harmonia.nix for why this keeps the LAN fast.
   systemd.services.fleet-warm-cache = {
     description = "Build all fleet host closures to warm the harmonia LAN cache";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
     # Never fight the 04:00 autoUpgrade for RAM/IO/store-locks: warming 18 host
     # closures takes hours, so a 03:30 start used to run straight through 04:00.
     # systemd stops this oneshot when nixos-upgrade starts — the upgrade wins,
     # and the warmer picks up again on the next weekly trigger.
-    unitConfig.Conflicts = [ "nixos-upgrade.service" ];
+    unitConfig.Conflicts = ["nixos-upgrade.service"];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${fleetWarmCache}";
@@ -101,7 +109,7 @@ in
     };
   };
   systemd.timers.fleet-warm-cache = {
-    wantedBy = [ "timers.target" ];
+    wantedBy = ["timers.target"];
     timerConfig = {
       # 01:30 (was 03:30): start the multi-hour fleet warm well before the
       # 03:00 agy runs and the 04:00 autoUpgrade so the Conflicts guard above
@@ -200,7 +208,7 @@ in
   ];
 
   # --- Ensure ideapad_laptop kernel module is loaded for conservation mode ---
-  boot.kernelModules = [ "ideapad_laptop" ];
+  boot.kernelModules = ["ideapad_laptop"];
 
   # --- Bluetooth (TV keyboard/mouse) ---
   # Explicit at host level so the media center keeps BT input even if
@@ -221,8 +229,8 @@ in
   # /sys/class/rfkill/*/soft attributes if BT stays missing after reboot.
   systemd.services.unblock-bluetooth = {
     description = "Unblock Bluetooth rfkill at boot";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "systemd-rfkill.service" ];
+    wantedBy = ["multi-user.target"];
+    after = ["systemd-rfkill.service"];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${unblockBtRfkill}";
@@ -359,24 +367,24 @@ in
   fileSystems."/Volumes/data" = {
     device = "/srv/data";
     fsType = "none";
-    options = [ "bind" ];
+    options = ["bind"];
   };
 
   # Bind mounts for /export
   fileSystems."/export/data" = {
     device = "/srv/data";
     fsType = "none";
-    options = [ "bind" ];
+    options = ["bind"];
   };
   fileSystems."/export/private" = {
     device = "/srv/private";
     fsType = "none";
-    options = [ "bind" ];
+    options = ["bind"];
   };
   fileSystems."/export/public" = {
     device = "/srv/public";
     fsType = "none";
-    options = [ "bind" ];
+    options = ["bind"];
   };
 
   # Ensure directories exist
@@ -458,7 +466,11 @@ in
     };
   };
 
-  # Firewall
+  # Firewall — port-scoping lives in firewall-scope.nix: the global lists
+  # below (and every other module's contribution) are mkForce-overridden
+  # and re-applied per interface (enp1s0/wlp2s0/tailscale0 only), so docker0
+  # and friends cannot reach any service port. NEW ports must be added to
+  # firewall-scope.nix's explicit lists or they stay closed everywhere.
   networking.firewall = {
     enable = true;
     allowPing = true;

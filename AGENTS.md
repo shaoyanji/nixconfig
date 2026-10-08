@@ -670,7 +670,6 @@ task dev:config:hash-update    # runs nix-hash-update.sh
 | `docs/task-control-plane.md` | Task namespace policy and workflow examples |
 | `docs/frieren-access.md` | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
 | `docs/codex-handoff.md` | Codex session orientation |
-| `docs/userland-module-map.md` | Userland module structure |
 | `docs/userland-package-ownership.md` | Package ownership and role wiring |
 | `taskfiles/README.md` | Taskfile ownership map |
 | `USB.md` | Sledgehammer live USB creation |

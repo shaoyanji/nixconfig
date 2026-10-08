@@ -575,6 +575,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 | `apps:*` | Job application workflow (appflow): status updates, email flow, sync, builds | `.agents/skills/apps/SKILL.md` |
 | `services:*` | Legacy wrappers (canonical: `infra:*`) | `.agents/skills/services/SKILL.md` |
 | `google-drive` | Google Drive OAuth setup, rclone, tailscale funnel | `.agents/skills/google-drive/SKILL.md` |
+| `antigravity` | Delegate coding to Antigravity CLI (Google's agent) with `--dangerously-skip-permissions` and `--jsonschema` | `.agents/skills/antigravity/SKILL.md` |
 
 ---
 

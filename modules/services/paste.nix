@@ -181,6 +181,11 @@ in {
   ];
 
   services.nginx.virtualHosts."paste.frieren.lan" = {
+    serverAliases = [
+      "paste.lan"
+      "paste.frieren.local"
+      "paste.local"
+    ];
     listen = [
       {
         addr = "0.0.0.0";

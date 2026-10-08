@@ -1,8 +1,6 @@
 # Demo — travel netbook.
 # Do not import hardware scan; use generic laptop profile instead.
-{ lib
-, ...
-}: {
+{lib, ...}: {
   imports = [
     ../../modules/profiles/laptop.nix
   ];

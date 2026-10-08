@@ -13,8 +13,7 @@
 #   dirs are deliberately EXCLUDED: hot-copying a live data directory
 #   is not a consistent backup — add services.postgresql.backup
 #   (pg_dump) alongside before trusting DB restore points.
-{ pkgs, ... }:
-let
+{pkgs, ...}: let
   agentCascadeScript = ''
     run_agent_cascade() {
       local prompt="$1"
@@ -158,8 +157,7 @@ let
       echo "=== [$(date)] Deterministic audit recorded in $SYSTEM_FILE ==="
     fi
   '';
-in
-{
+in {
   # --- SMART monitoring ---
   services.smartd = {
     enable = true;
@@ -172,7 +170,7 @@ in
     collector.enable = true; # weekly metric collector (default timer)
     settings.web.listen.port = 8124;
   };
-  networking.firewall.allowedTCPPorts = [ 8124 ];
+  networking.firewall.allowedTCPPorts = [8124];
 
   # --- Vaultwarden (Bitwarden Compatible Password & TOTP Vault) ---
   services.vaultwarden = {
@@ -198,7 +196,7 @@ in
 
   services.postgresqlBackup = {
     enable = true;
-    databases = [ "immich" ];
+    databases = ["immich"];
     location = "/srv/backup/postgresql";
     startAt = "*-*-* 03:00:00"; # 30 min before 03:30 restic snapshot
   };
@@ -236,8 +234,8 @@ in
   # (preStart runs after module initialization, which leads to ordering failures).
   systemd.services.restic-ensure-password = {
     description = "Ensure restic repository password file exists";
-    wantedBy = [ "multi-user.target" ];
-    before = [ "restic-backups-frieren-local.service" ];
+    wantedBy = ["multi-user.target"];
+    before = ["restic-backups-frieren-local.service"];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -251,14 +249,14 @@ in
   };
 
   systemd.services.restic-backups-frieren-local.unitConfig = {
-    Wants = [ "restic-ensure-password.service" ];
-    After = [ "restic-ensure-password.service" ];
+    Wants = ["restic-ensure-password.service"];
+    After = ["restic-ensure-password.service"];
   };
 
   # 24/7 Remote Operator Gateway: Antigravity remote-control daemon
   systemd.user.services.antigravity-cli-daemon = {
     description = "antigravity remote-control daemon";
-    after = [ "network.target" ];
+    after = ["network.target"];
     unitConfig = {
       StartLimitIntervalSec = 0;
     };
@@ -280,13 +278,13 @@ in
       StandardOutput = "journal";
       StandardError = "journal";
     };
-    wantedBy = [ "default.target" ];
+    wantedBy = ["default.target"];
   };
 
   # Nightly Antigravity Handoff Runner (3:00 AM)
   systemd.user.services.agy-nightly-handoff = {
     description = "Run /home/devji/HANDOFF.md with Antigravity if present, then delete";
-    after = [ "network.target" ];
+    after = ["network.target"];
     serviceConfig = {
       Type = "oneshot";
       WorkingDirectory = "/home/devji";
@@ -308,13 +306,13 @@ in
       OnCalendar = "*-*-* 03:00:00";
       Persistent = true;
     };
-    wantedBy = [ "timers.target" ];
+    wantedBy = ["timers.target"];
   };
 
   # Daily 5:00 AM Antigravity System Maintenance Runner (SYSTEM.md)
   systemd.user.services.agy-nightly-system = {
     description = "Run /home/devji/SYSTEM.md with Antigravity if present, then delete";
-    after = [ "network.target" ];
+    after = ["network.target"];
     serviceConfig = {
       Type = "oneshot";
       WorkingDirectory = "/home/devji";
@@ -336,6 +334,6 @@ in
       OnCalendar = "*-*-* 05:00:00";
       Persistent = true;
     };
-    wantedBy = [ "timers.target" ];
+    wantedBy = ["timers.target"];
   };
 }

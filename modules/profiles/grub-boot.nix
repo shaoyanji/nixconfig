@@ -5,9 +5,10 @@
 # Parameters:
 #   device - GRUB target device (e.g. "/dev/sda" for BIOS, "nodev" for EFI GRUB)
 #   lib    - nixpkgs lib (required)
-{ device ? "/dev/sda"
-, lib
-, ...
+{
+  device ? "/dev/sda",
+  lib,
+  ...
 }: {
   boot.loader = {
     systemd-boot.enable = lib.mkForce false;

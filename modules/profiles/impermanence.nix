@@ -9,9 +9,9 @@ _: {
   boot.initrd.systemd.services = {
     impermanence-root = {
       description = "Set up impermanence root subvolume";
-      wantedBy = [ "initrd.target" ];
-      after = [ "sysroot.mount" ];
-      before = [ "sysroot-rootfs.target" ];
+      wantedBy = ["initrd.target"];
+      after = ["sysroot.mount"];
+      before = ["sysroot-rootfs.target"];
       unitConfig.DefaultDependencies = false;
       serviceConfig.Type = "oneshot";
       script = ''
@@ -42,7 +42,7 @@ _: {
   };
 
   fileSystems."/etc/ssh".neededForBoot = true;
-  fileSystems."/etc/ssh".options = [ "bind" ];
+  fileSystems."/etc/ssh".options = ["bind"];
   fileSystems."/etc/ssh".device = "/persist/system/etc/ssh";
   fileSystems."/etc/ssh".fsType = "btrfs";
   fileSystems."/persist".neededForBoot = true;
@@ -76,7 +76,7 @@ _: {
       "/etc/machine-id"
       {
         file = "/var/keys/secret_file";
-        parentDirectory = { mode = "u=rwx,g=,o="; };
+        parentDirectory = {mode = "u=rwx,g=,o=";};
       }
     ];
   };
@@ -90,7 +90,7 @@ _: {
     btrfs.autoScrub = {
       enable = true;
       interval = "monthly";
-      fileSystems = [ "/" ];
+      fileSystems = ["/"];
     };
   };
 

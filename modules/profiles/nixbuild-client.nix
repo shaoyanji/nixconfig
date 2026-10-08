@@ -34,14 +34,13 @@
 # nixbuild.net bills per build-second (free tier: 25 h/month). Pair
 # with task dev:nixbuild:warm to spend that budget warming
 # shaoyanji.cachix.org for the fleet.
-{ config
-, lib
-, ...
-}:
-let
-  cfg = config.profiles.nixbuild-client;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.profiles.nixbuild-client;
+in {
   options.profiles.nixbuild-client = {
     enable = lib.mkEnableOption "nixbuild.net distributed builds";
 
@@ -63,7 +62,7 @@ in
 
     systems = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "x86_64-linux" ];
+      default = ["x86_64-linux"];
       description = "Systems the builder supports";
     };
 
@@ -96,17 +95,19 @@ in
       '';
 
       programs.ssh.knownHosts.nixbuild = {
-        hostNames = [ cfg.hostName ];
+        hostNames = [cfg.hostName];
         publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM";
       };
 
       nix = {
         distributedBuilds = true;
-        buildMachines = [{
-          inherit (cfg) hostName systems maxJobs speedFactor;
-          supportedFeatures = [ "benchmark" "big-parallel" ];
-          protocol = "ssh";
-        }];
+        buildMachines = [
+          {
+            inherit (cfg) hostName systems maxJobs speedFactor;
+            supportedFeatures = ["benchmark" "big-parallel"];
+            protocol = "ssh";
+          }
+        ];
       };
     })
 
@@ -118,7 +119,7 @@ in
         path = cfg.sshKeyPath;
         owner = "root";
         mode = "0600";
-        restartUnits = [ "nix-daemon.service" ];
+        restartUnits = ["nix-daemon.service"];
       };
     })
   ];

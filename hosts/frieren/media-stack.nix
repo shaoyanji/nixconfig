@@ -1,11 +1,10 @@
-{ pkgs
-, lib
-, ...
-}:
-let
-  user = import ../../modules/global/user.nix;
-in
 {
+  pkgs,
+  lib,
+  ...
+}: let
+  user = import ../../modules/global/user.nix;
+in {
   # --- Immich ---
   # Machine learning re-enabled (2026-09-29): smart search + facial
   # recognition. The onnxruntime build in nixpkgs does not ship the
@@ -13,7 +12,7 @@ in
   # a personal library; the UHD 620 keeps serving Jellyfin/Plex
   # transcodes. Models download from HuggingFace on first job into
   # MACHINE_LEARNING_CACHE_FOLDER (/var/cache/immich, module default).
-  users.users.immich.extraGroups = [ "video" "render" ];
+  users.users.immich.extraGroups = ["video" "render"];
   services.immich = {
     host = "0.0.0.0";
     enable = true;
@@ -117,7 +116,7 @@ in
       ps.androidtvremote2
     ];
     config = {
-      default_config = { };
+      default_config = {};
       command_line = [
         {
           sensor = {

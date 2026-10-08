@@ -6,33 +6,34 @@
 let
   user = import ./user.nix;
 in
-{ inputs
-, config
-, ...
-}: {
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "hm-backup";
-    users.${user.name} = {
-      imports = [
-        ../roles/minimal.nix
-        ../shell
+  {
+    inputs,
+    config,
+    ...
+  }: {
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      backupFileExtension = "hm-backup";
+      users.${user.name} = {
+        imports = [
+          ../roles/minimal.nix
+          ../shell
+        ];
+        # Headless container hosts: skip the AI CLI stack (crush, freebuff,
+        # qmd, agy, aichat, ...) to keep closures small.
+        profiles.ai.enable = false;
+        home.username = user.name;
+        home.homeDirectory = user.home;
+      };
+      sharedModules = [
+        inputs.sops-nix.homeManagerModules.sops
+        inputs.kickstart-nixvim.homeManagerModules.default
+        inputs.nix-index-database.homeModules.nix-index
       ];
-      # Headless container hosts: skip the AI CLI stack (crush, freebuff,
-      # qmd, agy, aichat, ...) to keep closures small.
-      profiles.ai.enable = false;
-      home.username = user.name;
-      home.homeDirectory = user.home;
+      extraSpecialArgs = {
+        inherit inputs;
+        inherit (config.networking) hostName;
+      };
     };
-    sharedModules = [
-      inputs.sops-nix.homeManagerModules.sops
-      inputs.kickstart-nixvim.homeManagerModules.default
-      inputs.nix-index-database.homeModules.nix-index
-    ];
-    extraSpecialArgs = {
-      inherit inputs;
-      inherit (config.networking) hostName;
-    };
-  };
-}
+  }

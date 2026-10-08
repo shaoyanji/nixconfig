@@ -20,8 +20,7 @@
   lib,
   config,
   ...
-}:
-let
+}: let
   # flavor "zed" emits {"context_servers": {...}} matching Zed's schema.
   zedConfig = inputs.mcp-servers-nix.lib.mkConfig pkgs {
     programs.github.enable = true;
@@ -51,8 +50,7 @@ let
       echo "zed-mcp-merge: github + nixos context servers merged into $SETTINGS"
     '';
   };
-in
-{
+in {
   options.programs.zed-mcp.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
@@ -63,7 +61,7 @@ in
   };
 
   config = lib.mkIf (config.programs.zed-mcp.enable && (config.profiles.ai.enable or true)) {
-    home.packages = [ zed-mcp-merge ];
+    home.packages = [zed-mcp-merge];
 
     # Reproducible artifact — inspect it, diff it, or merge it manually:
     #   ~/.config/zed/mcp-servers-nix.json

@@ -3,8 +3,7 @@
   lib,
   config,
   ...
-}:
-let
+}: let
   # Layer 1 helper (fleet client integration): desktop launcher that opens
   # the persistent Freebuff tmux session on the frieren mainframe, using the
   # best available terminal emulator (kitty on fleet desktops, alacritty on
@@ -174,8 +173,7 @@ let
       fi
     '';
   };
-in
-{
+in {
   options.programs.freebuff-remote.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;

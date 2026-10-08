@@ -52,19 +52,13 @@ in {
     # Symlinks — directories/env links can't be expressed as
     # declarative home.file targets; activation is the only way.
     home.activation.hermesSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    home.file."AGENTS.md".source = "${personaDir}/AGENTS.md";
-    home.file."USER.md".source = "${personaDir}/USER.md";
-    home.file."MEMORY.md".source = "${personaDir}/MEMORY.md";
-    home.file."config.yaml".source = "${personaDir}/config.yaml";
-
-    # Symlinks — managed via activation (directories and env links
-    # can't be expressed as declarative home.file targets).
-    home.activation.hermesSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
       run mkdir -p $HOME/.hermes
       run ln -sf /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
       run ln -sf ${config.home.homeDirectory}/.config/hermes/hermes.env $HOME/.hermes/.env
       run ln -sf ${config.home.homeDirectory}/.agents/skills $HOME/.hermes/skills/agents-sync
     '';
+
+    # Port of the old agent's handoff-restore discipline: hermes sessions
     # already capture scrollback; this helper restores the *operational*
     # state (persona pointers + latest archive savepoint) into a new chat.
     home.packages = [

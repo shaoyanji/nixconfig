@@ -9,18 +9,21 @@
 # Adjust the kernel modules, fileSystems, and swapDevices entries for
 # the real hardware. The defaults below are empty so a missing
 # placeholder makes the failure obvious at evaluation time.
-{ config, lib, modulesPath, ... }:
-
 {
+  config,
+  lib,
+  modulesPath,
+  ...
+}: {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
   # Replace with target `lspci -k` output.
-  boot.initrd.availableKernelModules = [ ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ ];
-  boot.extraModulePackages = [ ];
+  boot.initrd.availableKernelModules = [];
+  boot.initrd.kernelModules = [];
+  boot.kernelModules = [];
+  boot.extraModulePackages = [];
 
   # Placeholder root file system — REQUIRED for evaluation (host-eval checks).
   # Replace device + fsType with the target machine's `blkid` output before

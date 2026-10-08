@@ -1,8 +1,8 @@
-{ pkgs
-, lib
-, ...
-}:
-let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   user = import ../../modules/global/user.nix;
   obsConfig = {
     enable = false;
@@ -12,8 +12,7 @@ let
       obs-pipewire-audio-capture
     ];
   };
-in
-{
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -65,7 +64,7 @@ in
   # };
   boot = {
     kernelPackages = lib.mkForce pkgs.linuxPackages;
-    kernelModules = [ ];
+    kernelModules = [];
   };
   networking.hostName = "poseidon";
 
@@ -75,7 +74,7 @@ in
         btrfs-progs
       ]
       ++ lib.optionals obsConfig.enable [
-        (pkgs.wrapOBS { inherit (obsConfig) plugins; })
+        (pkgs.wrapOBS {inherit (obsConfig) plugins;})
       ];
   };
 
@@ -83,7 +82,7 @@ in
   # virtualisation.libvirtd.enable = true;
   # virtualisation.spiceUSBRedirection.enable = true;
   # users.users.devji.extraGroups = [ "adbusers" "kvm" "libvirtd" ];
-  services.udev.packages = [ ];
+  services.udev.packages = [];
 
   # services.avahi.publish.enable = true;
   # services.avahi.publish.userServices = true;

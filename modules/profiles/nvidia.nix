@@ -4,10 +4,10 @@ _: {
     enable32Bit = true;
   };
 
-  services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.videoDrivers = ["nvidia"];
 
   environment.sessionVariables = {
-    LD_LIBRARY_PATH = [ "/run/opengl-driver/lib" ];
+    LD_LIBRARY_PATH = ["/run/opengl-driver/lib"];
   };
 
   hardware.nvidia = {

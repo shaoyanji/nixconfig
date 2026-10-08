@@ -23,8 +23,8 @@ A fast, low-overhead offline knowledge retrieval system using Kiwix and embedded
 * **Package Definition:** Defined via `pkgs.writeShellApplication` in `hosts/frieren/tools.nix` in `nixconfig`.
 * **Data Directory:** `/var/lib/kiwix/` (moved from `~/wikipedia-offline` 2026-10-08 — the native `services.kiwix-serve` module runs with DynamicUser + ProtectHome, which cannot read `/home`). Holds `library.xml`, metadata stamps, and supplementary local archives (e.g. `wikipedia_en_top_mini`); the full 52 GB Wikipedia ZIM and ArchWiki ZIM live **only** as GC-rooted `/nix/store` paths (local copy reclaimed 2026-10-08 — nix verified its hash at import).
 * **Library Manifest:** `/var/lib/kiwix/library.xml` (kept in sync from the declarative store copy by the `kiwix-library` activation script on every boot/switch — NOT tmpfiles, whose `C+` rule never overwrites an existing file)
-* **HTTP Daemon:** `kiwix-serve.service` (native NixOS `services.kiwix-serve`, declared in `hosts/frieren/kiwix.nix`) on port `8088` with `-M` auto-reload; nginx reverse proxy at `http://wiki.frieren.lan`.
-* **Library:** declarative — ZIMs are store paths / fetchurl entries in `hosts/frieren/kiwix.nix`; add a new wiki there (use `nurl <url>` for the hash), never via kiwix-manage.
+* **HTTP Daemon:** `kiwix-serve.service` (native NixOS `services.kiwix-serve`, declared in `modules/services/kiwix.nix`) on port `8088` with `-M` auto-reload; nginx reverse proxy at `http://wiki.frieren.lan`.
+* **Library:** declarative — ZIMs are store paths / fetchurl entries in `modules/services/kiwix.nix`; add a new wiki there (use `nurl <url>` for the hash), never via kiwix-manage.
 
 ---
 
@@ -84,7 +84,7 @@ wikisearch --status
 To expand the knowledge base with any new wiki (e.g. Wikivoyage, DevDocs, ArchWiki, StackExchange, PubMed):
 
 ### Step 1: Add the ZIM declaratively
-Add a `fetchurl` entry to `zims` in `hosts/frieren/kiwix.nix` (use `nurl <url>`
+Add a `fetchurl` entry to `zims` in `modules/services/kiwix.nix` (use `nurl <url>`
 for the hash) and add it to the `kiwix-manage`-equivalent book list in the
 `kiwixLibrary` writeText. Rebuild — `kiwix-manage` is no longer used manually.
 

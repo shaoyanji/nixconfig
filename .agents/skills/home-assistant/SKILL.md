@@ -20,7 +20,7 @@ Operational runbook and guidance for interacting with the Home Assistant service
 ## 1. System Overview & Topology
 
 * **Host:** `frieren.lan` (`192.168.3.25`, Tailscale `100.97.61.65`).
-* **Service Definition:** Declaratively defined in `hosts/frieren/media-stack.nix` and `hosts/frieren/ha-stack.nix`.
+* **Service Definition:** Declaratively defined in `modules/services/home-assistant.nix` (enabled via `services.ha-stack.enable = true;`).
 * **State & Data Directory:** `/srv/private/home-assistant` (persistent dataset on NAS pool).
 * **Configuration:** `/etc/home-assistant/configuration.yaml` (symlinked into the data directory by NixOS).
 * **Endpoints:**

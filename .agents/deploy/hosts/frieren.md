@@ -28,7 +28,7 @@ NAS server (Samba, NFS, Jellyfin, Paperless-ngx, Unbound DNS + Pi-hole, aria2) a
   anyway, the `hermesGatewayUnitCleanup` activation step removes the stray
   unit before the link check — just redeploy. If a deploy still fails with
   `would be clobbered`, check for other non-store files HM is asked to manage.
-- [ ] **Kiwix wiki stack is declarative** (`hosts/frieren/kiwix.nix`, served
+- [ ] **Kiwix wiki stack is declarative** (`modules/services/kiwix.nix`, served
   at `http://wiki.frieren.lan`, data in `/var/lib/kiwix`). Add new ZIMs there
   (`nurl` for hashes) — never `kiwix-manage` and never hand-rolled user units
   under `~/.config/systemd/user/` (they shadow the declarative ones).

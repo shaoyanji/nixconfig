@@ -20,7 +20,7 @@ Operational runbook and administration guide for `iVentoy`, the bare-metal netwo
 ## 1. System Overview & Architecture
 
 * **Host:** `frieren.lan` (`192.168.3.25`).
-* **Service Definition:** `hosts/frieren/iventoy.nix`.
+* **Service Definition:** `modules/services/iventoy.nix`.
 * **Systemd Unit:** `iventoy.service` (runs as a systemd service managing `/srv/iventoy/iventoy.sh -R start`).
 * **ISO Collection Root:** `/Volumes/data/isos` (symlinked to `/srv/iventoy/iso`).
 * **Runtime Directory:** `/srv/iventoy` (persisted config in `data/iventoy.dat`, logs in `log/log.txt`).

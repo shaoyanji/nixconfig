@@ -1,13 +1,10 @@
 {
   description = "Personal Nix configuration: NixOS, nix-darwin, and Home Manager";
 
-  # Prebuilt AI-agent packages from llm-agents.nix (crush, freebuff,
-  # qmd, qwen-code, ...). Cache hits only when our nixpkgs matches
-  # theirs — otherwise builds locally from source.
-  nixConfig = {
-    extra-substituters = [ "https://cache.numtide.com" ];
-    extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
-  };
+  # numtide cache (llm-agents.nix prebuilt packages) is configured at the
+  # daemon level in modules/global/global.nix — a flake-level nixConfig here
+  # is ignored for untrusted users and only produced
+  # "ignoring untrusted flake configuration setting" warnings.
   # inputs.self.submodules = true;
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -93,11 +90,11 @@
     };
   };
 
-  outputs =
-    inputs@{ self
-    , nixpkgs
-    , ...
-    }:
+  outputs = inputs @ {
+    self,
+    nixpkgs,
+    ...
+  }:
     import ./flake/outputs.nix {
       inherit inputs self nixpkgs;
     };

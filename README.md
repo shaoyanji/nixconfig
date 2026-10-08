@@ -476,7 +476,6 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 ### Development
 - `docs/codex-handoff.md` - Codex session orientation
 - `NIX-REFERENCE.md` - Nix patterns and gotchas used in this repo
-- `docs/userland-module-map.md` - Userland module structure and ownership
 - `docs/userland-package-ownership.md` - Package ownership and role wiring
 
 ### Historical

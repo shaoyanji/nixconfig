@@ -16,6 +16,4 @@ tts:
     options:
       text_normalization: false
   fallback_providers:
-    - provider: groq
-      model: canopylabs/orpheus-v1-english
     - provider: edge

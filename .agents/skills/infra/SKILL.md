@@ -80,7 +80,7 @@ All hosts configured in `flake/host-inventory.nix`:
 - `fern`: HP 15 laptop (Ryzen 3 3250U, Vega 3, NVMe `/dev/nvme0n1`), niri desktop, autologin, NAS client.
 - `stark`: Dell Inspiron 24 3477 AIO (i5-7200U, MX110 Optimus), gamescope-session + DMS greeter, dual-disk (`/dev/sdb` SSD, `/dev/sda` HDD).
 - `eisen`: Desktop (RX 5700), niri desktop + gamescope-session.
-- `frieren`: HP EliteDesk 800 G2 NAS/server (ZFS `/Volumes/data`, auto-upgrade 04:00, Prometheus, Syncthing, Paperless, Tika).
+- `frieren`: Lenovo IdeaPad 320-15IKB NAS/server (btrfs `/srv/data`, auto-upgrade 04:00, Prometheus, Syncthing, Paperless, Tika).
 - `scratch`: Fujitsu ESPRIMO D556 (i5-6500, f2fs SSD), niri desktop, tmpfs IO diet, GRUB legacy BIOS (`/dev/sda`).
 - `poseidon`: Workstation (Ryzen 7 3700X, RTX 2070 Super), niri desktop.
 - `aceofspades`, `ancientace`, `aristotle`: Desktop workstations.

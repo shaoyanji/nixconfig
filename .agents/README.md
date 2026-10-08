@@ -12,6 +12,17 @@ Each taskfile shard has a corresponding skill under `.agents/skills/<name>/SKILL
 | [`dev`](skills/dev/SKILL.md) | `taskfiles/dev.yml` | Git, flake, site, PRs, packages |
 | [`services`](skills/services/SKILL.md) | `taskfiles/services-core.yml`, `services-legacy.yml` | Legacy wrappers |
 
+## Specialized & Subsystem Skills
+
+| Skill | Scope |
+|-------|-------|
+| [`home-assistant`](skills/home-assistant/SKILL.md) | Home Assistant, Mosquitto MQTT, host telemetry sensors, and Uptime-Kuma on frieren |
+| [`paste`](skills/paste/SKILL.md) | Fleet paste bin (`pb`) for sharing files and logs over LAN/mesh (`paste.frieren.lan`) |
+| [`iventoy`](skills/iventoy/SKILL.md) | PXE boot management, ISO image library (`/Volumes/data/isos`), and bare-metal OS provisioning |
+| [`wikisearch`](skills/wikisearch/SKILL.md) | Offline Wikipedia and ArchWiki BM25 search via Kiwix (`wiki.frieren.lan`) |
+| [`frieren-offload`](skills/frieren-offload/SKILL.md) | Offload heavy agy tasks from netbook/workstations to frieren |
+| [`stt`](skills/stt/SKILL.md) | Speech-to-text via voxtype (numtide) daemon / headless transcription |
+
 ## Routing
 
 - **Tasks**: `Taskfile.yml` loads the `taskfiles/*` shards. Use `task --list-all` or `task help` to see namespaced entrypoints. See [Task Control Plane](docs/task-control-plane.md) for namespace policy and workflow examples.

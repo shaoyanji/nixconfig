@@ -248,7 +248,7 @@ tasks:
       - task infra:rollback:apply:host:{{.HOST}}
 
   infra:ssh:rotate-cert:
-    desc: Sign a fresh 1-week SSH certificate for the current user
+    desc: Sign a fresh 90-day SSH certificate for the current user
     cmds:
       - |
         if [ ! -f "$HOME/.ssh/user_ca_key" ]; then
@@ -258,9 +258,9 @@ tasks:
         ssh-keygen -s "$HOME/.ssh/user_ca_key" \
           -I "$(whoami)@$(hostname)-$(date +%Y%m%d)" \
           -n "devji" \
-          -V "+1w" \
+          -V "+90d" \
           "$HOME/.ssh/id_ed25519.pub"
-        echo "Certificate signed: $HOME/.ssh/id_ed25519-cert.pub (valid 1 week)"
+        echo "Certificate signed: $HOME/.ssh/id_ed25519-cert.pub (valid 90 days)"
 
   infra:ssh:status:
     desc: Show certificate validity and CA key presence

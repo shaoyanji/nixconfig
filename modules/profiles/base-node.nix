@@ -1,14 +1,13 @@
 # Base node configuration for all NixOS hosts.
 # Primary user constants: modules/global/user.nix
-{ config
-, pkgs
-, inputs
-, ...
-}:
-let
-  user = import ../global/user.nix;
-in
 {
+  config,
+  pkgs,
+  inputs,
+  ...
+}: let
+  user = import ../global/user.nix;
+in {
   imports = [
     ../../modules/config/authorized-keys.nix
     ../../modules/ssh-ca.nix
@@ -23,7 +22,7 @@ in
 
   sops = {
     defaultSopsFile = ../../modules/secrets.yaml;
-    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
     secrets = {
       hashedPassword.neededForUsers = true;
     };
@@ -41,7 +40,7 @@ in
       enable = true;
       keyboards = {
         default = {
-          ids = [ "*" ];
+          ids = ["*"];
           settings = {
             main = {
               capslock = "escape";
@@ -53,9 +52,12 @@ in
     openssh = {
       enable = true;
       settings = {
-        X11Forwarding = true;
+        X11Forwarding = false;
         PermitRootLogin = "no";
         PasswordAuthentication = false;
+        # sshd defaults this to yes; no host uses keyboard-interactive
+        # (PAM) auth, and leaving it on widens the auth surface for free.
+        KbdInteractiveAuthentication = false;
       };
     };
   };
@@ -70,8 +72,8 @@ in
     # cache URL all reference hosts by name. frieren has a static LAN IP
     # (see profiles/nas-client.nix).
     hosts = {
-      "192.168.3.25" = [ "frieren" ];
-      "192.168.3.36" = [ "netbook" ];
+      "192.168.3.25" = ["frieren"];
+      "192.168.3.36" = ["netbook"];
     };
   };
 
@@ -93,7 +95,7 @@ in
     inherit (user) home;
     isNormalUser = true;
     description = "matt";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = ["networkmanager" "wheel"];
     hashedPasswordFile = config.sops.secrets.hashedPassword.path;
     openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };

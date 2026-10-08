@@ -21,9 +21,10 @@ A fast, low-overhead offline knowledge retrieval system using Kiwix and embedded
 
 * **Host:** `frieren.lan` (serves the entire LAN and Tailscale mesh).
 * **Package Definition:** Defined via `pkgs.writeShellApplication` in `hosts/frieren/tools.nix` in `nixconfig`.
-* **Data Directory:** `/home/devji/wikipedia-offline/`
-* **Library Manifest:** `/home/devji/wikipedia-offline/library.xml`
-* **HTTP Daemon:** `kiwix-serve.service` running on port `8088` with `-M` auto-reload.
+* **Data Directory:** `/var/lib/kiwix/` (moved from `~/wikipedia-offline` 2026-10-08 — the native `services.kiwix-serve` module runs with DynamicUser + ProtectHome, which cannot read `/home`). Holds `library.xml`, metadata stamps, and supplementary local archives (e.g. `wikipedia_en_top_mini`); the full 52 GB Wikipedia ZIM and ArchWiki ZIM live **only** as GC-rooted `/nix/store` paths (local copy reclaimed 2026-10-08 — nix verified its hash at import).
+* **Library Manifest:** `/var/lib/kiwix/library.xml` (kept in sync from the declarative store copy by the `kiwix-library` activation script on every boot/switch — NOT tmpfiles, whose `C+` rule never overwrites an existing file)
+* **HTTP Daemon:** `kiwix-serve.service` (native NixOS `services.kiwix-serve`, declared in `hosts/frieren/kiwix.nix`) on port `8088` with `-M` auto-reload; nginx reverse proxy at `http://wiki.frieren.lan`.
+* **Library:** declarative — ZIMs are store paths / fetchurl entries in `hosts/frieren/kiwix.nix`; add a new wiki there (use `nurl <url>` for the hash), never via kiwix-manage.
 
 ---
 
@@ -31,23 +32,25 @@ A fast, low-overhead offline knowledge retrieval system using Kiwix and embedded
 
 `wikisearch` is a universal CLI client that queries any ZIM archive in the library or directory.
 
-### A. Full-Text BM25 Search
-Searches the default or primary archive (e.g. English Wikipedia full 50GB archive with 19.2M articles):
+### A. Full-Text Search
+Searches the primary archive — with no `-w`, `find_zim` resolves against the declarative library first, so the default is the full English Wikipedia (19.2M articles):
 ```bash
 wikisearch "quantum computing"
 wikisearch "James Webb Space Telescope"
 ```
 
 ### B. Targeting a Specific Wiki Archive (`-w`, `--wiki`)
-Any ZIM archive in the library or directory can be queried by name, title, or filename:
+Resolution order: declarative library paths (store ZIMs) → local files in
+`/var/lib/kiwix` → error. Match is a case-insensitive substring of the path:
 ```bash
-# Query the "Best of Wikipedia" (top 50k articles) archive
-wikisearch -w top "Alan Turing"
+# Full Wikipedia (library store path)
+wikisearch -w wikipedia "Alan Turing"
 
-# Query other wikis by substring (e.g. archlinux, stackoverflow, wiktionary, devdocs)
+# ArchWiki (library store path)
 wikisearch -w arch "systemd-boot"
-wikisearch -w stackoverflow "python list comprehension"
-wikisearch -w wiktionary "serendipity"
+
+# Local-only archive in /var/lib/kiwix
+wikisearch -w top "Alan Turing"
 ```
 
 ### C. List Available Archives (`-l`, `--list`)
@@ -80,26 +83,25 @@ wikisearch --status
 
 To expand the knowledge base with any new wiki (e.g. Wikivoyage, DevDocs, ArchWiki, StackExchange, PubMed):
 
-### Step 1: Download the ZIM Archive
-Choose an archive from [Kiwix Downloads](https://download.kiwix.org/zim/) and download with resume support via `aria2c`:
-```bash
-aria2c -c -s 8 -x 8 -d /home/devji/wikipedia-offline "https://download.kiwix.org/zim/other/<archive_name>.zim"
-```
+### Step 1: Add the ZIM declaratively
+Add a `fetchurl` entry to `zims` in `hosts/frieren/kiwix.nix` (use `nurl <url>`
+for the hash) and add it to the `kiwix-manage`-equivalent book list in the
+`kiwixLibrary` writeText. Rebuild — `kiwix-manage` is no longer used manually.
 
-### Step 2: Register in Kiwix Library
-```bash
-kiwix-manage /home/devji/wikipedia-offline/library.xml add /home/devji/wikipedia-offline/<archive_name>.zim
-```
+### Step 2: Add it to the declarative library
+Append a matching book entry to the `kiwixLibrary` writeText in the same file
+(id can be any unique UUID; `articleCount`/`size` are display-only). Never run
+`kiwix-manage` by hand — the declarative library.xml overwrites it.
 
 ### Step 3: Automatic Hot-Reload
 `kiwix-serve.service` runs with the `-M` flag, which watches `library.xml` and reloads immediately without restarting or dropping connections.
 
 ### Step 4: Verify and Query Immediately
 ```bash
-# Confirm the new wiki appears in the library:
+# Confirm both declared archives (Wikipedia + ArchWiki) are served:
 wikisearch --list
 
-# Query the new wiki:
+# Query the new wiki by name substring:
 wikisearch -w "<archive_keyword>" "<search query>"
 ```
 

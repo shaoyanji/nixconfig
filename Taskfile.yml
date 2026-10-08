@@ -1,99 +1,79 @@
 version: "3"
-
 vars:
-  EMAIL: e@mail.shaoyanji.is-a.dev
-  ENC_DETASKFILE: DE-Taskfile.yaml
-  ENC_TASKFILE: DE-Taskfile.yaml
-  ENC_SECRETS: secrets.yaml
-  ENC_ENVS: apikeys.yaml
-  SECRETS: modules/secrets
-  PI: minyx
-
+    NIX_CONFIG: ~/Documents/nixconfig
+    SECRETS: ~/Documents/nixconfig/modules/secrets/fullsecrets.yaml
+    NIXNAS: /Volumes/data
+    MNTW: /Volumes/peachcable
+    MNTX: /Volumes/shared
 includes:
-  infra:
-    taskfile: ./taskfiles/infra.yml
-    flatten: true
-  services:
-    taskfile: ./taskfiles/services.yml
-    flatten: true
-  checks:
-    taskfile: ./taskfiles/checks.yml
-    flatten: true
-  agents:
-    taskfile: ./taskfiles/agents.yml
-    flatten: true
-  dev:
-    taskfile: ./taskfiles/dev.yml
-    flatten: true
-  lifecycle:
-    taskfile: ./taskfiles/lifecycle.yml
-    flatten: true
-  data:
-    taskfile: ./taskfiles/data.yml
-    flatten: true
-  moto:
-    taskfile: ./taskfiles/moto.yml
-    flatten: true
-  serv00:
-    taskfile: ./taskfiles/serv00.yml
-    flatten: true
-  dragoncourt:
-    taskfile: ./taskfiles/dragoncourt.yml
-    flatten: true
-  envs:
-    taskfile: ./taskfiles/envs.yml
-    flatten: true
-  bountystash:
-    taskfile: ./taskfiles/bountystash.yml
-    flatten: true
-  apps:
-    taskfile: ./taskfiles/apps.yml
-    flatten: true
-
+    nixconfig:
+        taskfile: ~/Documents/nixconfig/Taskfile.yml
+        dir: ~/Documents/nixconfig
+        flatten: true
 tasks:
-  default:
-    desc: Show available operator commands
-    cmds:
-      - task help
-
-  help:
-    desc: List all tasks in the control plane
-    cmds:
-      - task --list-all
-
-  status:
-    desc: Show repo/operator status
-    cmds:
-      - git status --short
-      - echo "host=$(hostname)"
-
-  check:
-    desc: Run narrow validation checks
-    cmds:
-      - task checks:quick
-
-  deploy:
-    desc: Open deployment menu
-    cmds:
-      - task infra:deploy:menu
-
-  logs:
-    desc: Open logs menu
-    cmds:
-      - task infra:logs:menu
-
-  menu:
-    desc: Open operator menu
-    cmds:
-      - task agents:menu
-
-  wishlist:
-    desc: Open Wishlist interactive SSH directory
-    cmds:
-      - nix-shell -p wishlist --run wishlist
-
-  exit:
-    internal: true
-    cmds:
-      - exit
-    silent: true
+    load-env:
+        desc: prints api keys with multi-selector
+        cmds:
+            - export $(task -t ~/Documents/nixconfig/Taskfile.yml sopsfzf)
+    llm:
+        desc: uses aichat loading the necessary secrets
+        vars:
+            SECFOLDER: /Volumes/data/security/secrets
+        cmds:
+            - export $(age -d -i {{.SECFOLDER}}/key.txt {{.SECFOLDER}}/.env.age) && aichat
+    notes:
+        desc: opens up obsidian notes and does a sync afterwards
+        vars:
+            OBSIDIANNOTES: ~/Documents/Obsidian-Git-Sync
+        cmds:
+            - $EDITOR {{.OBSIDIANNOTES}}/notes.md
+            - task -t {{.OBSIDIANNOTES}}/Taskfile.yml
+    youtube-dl:
+        desc: downloads a youtube link from clipboard
+        vars:
+            VIDEOS: ~/Videos/videos
+        cmds:
+            - echo $(wl-paste) >> {{.VIDEOS}}/youtube-dl.txt
+            - task -t {{.VIDEOS}}/Taskfile.yml
+    cloak-otp:
+        desc: totp
+        cmds:
+            - command grep "\[" .cloak/accounts | fzf | tr -d '[]' | xargs cloak view
+    image:
+        desc: opens up an image with kitty
+        cmds:
+            - command ls $CWD | fzf | awk '{print $7}' | xargs kitty icat
+    appimage:
+        desc: opens up appimage from NAS
+        vars:
+            APPIMAGE: '{{.NIXNAS}}/appimages'
+        cmds:
+            - command ls {{.APPIMAGE}} | fzf | awk '{print "{{.APPIMAGE}}/"$1}' | xargs appimage-run
+    books:
+        desc: uses custom gutenberg script and downloads on nas
+        cmds:
+            - task -t {{.NIXNAS}}/gutenberg/Taskfile.yml
+    wishlist:
+        desc: access ssh on my tailscale
+        cmds:
+            - export $(sops -d ~/Documents/nixconfig/modules/secrets/apikeys.yaml | yq -o=shell . | grep TAILSCALE | awk '{ gsub(/\047/, ""); print }'); nix-shell -p wishlist --run "wishlist --tailscale.net=cloudforest-kardashev.ts.net --tailscale.client.id=$TAILSCALE_CLIENT_ID --tailscale.client.secret=$TAILSCALE_CLIENT_SECRET"
+    ytfzf:
+        desc: activates youtube from the terminal
+        cmds:
+            - invidious_instance='https://inv.perditum.com' ytfzf
+    kando:
+        desc: kando menu
+        cmds:
+            - kando -m "Kando Menu"
+    ytcast:
+        desc: casts to screen a search of youtube to TV
+        cmds:
+            - ytsearch "$(gum input)" | ytcast -p
+    kitty:
+        desc: opens up a kitty terminal in tmux
+        cmds:
+            - kitty tmux
+    tmux-reattach:
+        desc: reattaches tmux session
+        cmds:
+            - tmux attach

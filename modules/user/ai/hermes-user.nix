@@ -77,6 +77,11 @@ in
           run ln -sf "/run/secrets/hermes" "$HOME/.hermes/.env"
         fi
       fi
+      # Sync ~/.agents/skills/ into hermes scan path so HM-deployed
+      # skills become visible automatically on activation.
+      if [ ! -e "$HOME/.hermes/skills/agents-sync" ]; then
+        run ln -sf "$HOME/.agents/skills" "$HOME/.hermes/skills/agents-sync"
+      fi
     '';
 
     # Port of the old agent's handoff-restore discipline: hermes sessions

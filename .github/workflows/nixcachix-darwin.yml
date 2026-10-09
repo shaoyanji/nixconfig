@@ -1,37 +1,14 @@
 # DEACTIVATED: cassini is a preserved Darwin host (see inventory.toml).
-# Deactivated to conserve GitHub Actions macOS runner minutes and prevent failing CI runs.
-#
-# name: nixcachix-darwin
-# on:
-#   pull_request:
-# jobs:
-#   build-machines:
-#     strategy:
-#       matrix:
-#         machine:
-#           - cassini
-#         os:
-#           - macos-latest
-#
-#     runs-on: ${{ matrix.os }}
-#     steps:
-#       - name: Install Nix
-#         uses: cachix/install-nix-action@v30
-#
-#       - name: Sync repository
-#         uses: actions/checkout@v4
-#         with:
-#           persist-credentials: false
-#           submodules: recursive
-#           token: "${{ secrets.GH_PAT }}"
-#
-#       # this is what uploads our builds to the cache (also makes our CI use the cache from previous runs)!
-#       - uses: cachix/cachix-action@v14
-#         with:
-#           name: shaoyanji # replace with the name of your cachix cache
-#           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-#           useDaemon: false
-#           installCommand: nix profile install nixpkgs#cachix
-#
-#       # this is equivalent to `nixos-rebuild build`
-#       - run: nix build -L .?submodules=1#darwinConfigurations.${{ matrix.machine }}.config.system.build.toplevel
+# Deactivated to conserve GitHub Actions macOS runner minutes and prevent CI failures.
+# Kept as workflow_dispatch with if:false to satisfy workflow schema without triggering on push/PR.
+name: nixcachix-darwin
+on:
+  workflow_dispatch:
+
+jobs:
+  build-machines:
+    if: false
+    runs-on: macos-latest
+    steps:
+      - name: Deactivated
+        run: echo "cassini is a preserved host; workflow is deactivated."

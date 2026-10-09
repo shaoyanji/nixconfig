@@ -105,12 +105,10 @@
       if [ ! -e "$HOME/.hermes/openclaw-archive" ]; then
         run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
       fi
-      if [ -L "$HOME/.hermes/.env" ] || [ ! -e "$HOME/.hermes/.env" ]; then
-        if [ -f "$HOME/.config/hermes/hermes.env" ]; then
-          run ln -sf "$HOME/.config/hermes/hermes.env" "$HOME/.hermes/.env"
-        elif [ -f "/run/secrets/hermes" ]; then
-          run ln -sf "/run/secrets/hermes" "$HOME/.hermes/.env"
-        fi
+      # If .env is an obsolete symlink from the old ~/.config/hermes indirection, clean it up
+      # so sops-nix manages ~/.hermes/.env directly without indirection.
+      if [ -L "$HOME/.hermes/.env" ]; then
+        run rm -f "$HOME/.hermes/.env"
       fi
       if [ ! -e "$HOME/.hermes/skills/agents-sync" ]; then
         run ln -sf "$HOME/.agents/skills" "$HOME/.hermes/skills/agents-sync"

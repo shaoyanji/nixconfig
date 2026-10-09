@@ -22,8 +22,8 @@ in {
 
     envPath = lib.mkOption {
       type = lib.types.str;
-      default = "/home/devji/.config/hermes/hermes.env";
-      description = "Destination path for the assembled hermes.env file.";
+      default = "/home/devji/.hermes/.env";
+      description = "Destination path for the assembled hermes .env file.";
     };
 
     agentTimeout = lib.mkOption {
@@ -52,7 +52,7 @@ in {
       })
     ];
 
-    # 3. Assemble hermes.env via SOPS template
+    # 3. Assemble ~/.hermes/.env directly via SOPS template
     sops.templates."hermes.env" = {
       owner = "devji";
       group = "users";
@@ -63,11 +63,6 @@ in {
         HERMES_AGENT_TIMEOUT=${toString cfg.agentTimeout}
         ${lib.optionalString (cfg.telegramSecret != null) config.sops.placeholder."${cfg.telegramSecret}"}
       '';
-    };
-
-    environment.sessionVariables = {
-      HERMES_CONFIG = "/home/devji/.hermes/config.yaml";
-      HERMES_ENV = cfg.envPath;
     };
   };
 }

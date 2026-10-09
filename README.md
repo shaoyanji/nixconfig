@@ -256,7 +256,7 @@ rm -rf hosts/<old-name>
 | `.agents/deploy/hosts/<old-name>.md` | Delete — deploy notes for a host that no longer exists |
 | `.agents/skills/*/SKILL.md` | Remove any `<old-name>` from task tables (smoke checks, deploy aliases, etc.) |
 | `docs/*fleet-pattern.md` (or similar) | Remove from Current Hosts lists and validation examples |
-| `docs/codex-handoff.md` | Remove or update if the old host was mentioned |
+| `inventory.toml` | Update device status or mark preserved in inventory source of truth |
 | `.github/workflows/nixcachix.yml` | Disable via `task lifecycle:ci:disable-host:<old-name>` (comments it out) — or remove manually |
 | `AGENTS.md` | Update CI pipeline section, module chain tables if stale |
 | `HANDOFF.md` (if it exists for this migration) | Mark migration complete, update module paths |
@@ -463,6 +463,8 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 
 ### Quick Reference
 - `AGENTS.md` - Agent routing helpers and task namespace summary
+- `inventory.toml` - Canonical 31-device fleet inventory source of truth
+- `docs/fleet-inventory.md` - Fleet device catalog, hardware profiles, and roles
 - `docs/task-control-plane.md` - Task namespace policy and workflow examples
 - `docs/frieren-access.md` - frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports)
 - `taskfiles/README.md` - Taskfile ownership map and shard reference
@@ -470,16 +472,14 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 ### Deployment
 - `.agents/deploy/README.md` - Deploy routing and guardrails
 - `.agents/deploy/hosts/*.md` - Per-host deployment exceptions
-- `USB.md` - Sledgehammer live USB creation guide
+- `hosts/sledgehammer/USB.md` - Sledgehammer live USB creation guide
 
 ### Development
-- `docs/codex-handoff.md` - Codex session orientation
-- `NIX-REFERENCE.md` - Nix patterns and gotchas used in this repo
+- `.agents/fleet-matrix.md` - Compact fleet context matrix for LLMs
 - `docs/userland-package-ownership.md` - Package ownership and role wiring
 
 ### Historical
-- `AUDIT.md` - AI module cleanup audit (April 2026)
-- `HANDOFF-REFACTOR.md` - Refactoring progress (April 2026)
+- `AUDIT.md` - AI module cleanup audit (April/October 2026)
 - `TODO.md` - Current work tracking and completed tasks
 
 ### Site Management

@@ -1,0 +1,27 @@
+# Host System Context: {hostname}
+
+> **Target Identity**: {title}
+> **Status**: {status_badge} | **Kind**: `{kind}` | **Arch**: `{arch}` | **Nix Managed**: {is_nix_str}
+> **Role**: {role}
+> **Compute Tier**: `{compute_tier}`
+
+## Hardware Profile & Ground Truth
+- **Model**: {model}
+- **CPU**: {cpu}
+- **GPU**: {gpu}
+- **RAM**: {ram}
+- **Storage Layout**: {storage_layout}
+{extra_hardware}
+## Network & Access
+- **LAN IP**: {lan_ip}
+- **Tailscale**: {tailscale_info}
+- **SSH Alias**: `{ssh_alias}`
+{extra_network}
+## System Directive
+> {system_prompt_hint}
+
+## Allowed Workloads
+{allowed_tasks}
+
+## Strict Operational Constraints
+{constraints}

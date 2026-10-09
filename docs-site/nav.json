@@ -33,6 +33,7 @@
   {
     "title": "Supporting docs",
     "pages": [
+      {"label": "Fleet inventory", "src": "docs/fleet-inventory.md", "slug": "/docs/fleet-inventory/"},
       {"label": "Userland package ownership", "src": "docs/userland-package-ownership.md", "slug": "/docs/userland-package-ownership/"}
     ]
   },

@@ -22,6 +22,11 @@ tasks:
     cmds:
       - bash scripts/task/qmd-docs-index.sh check nixconfig
 
+  checks:inventory:sync:
+    desc: Verify documentation and LLM spec cards match inventory.toml
+    cmds:
+      - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --check"
+
   checks:qmd:vault:
     desc: Check the Obsidian vault qmd collection exists and its index is fresh
     cmds:

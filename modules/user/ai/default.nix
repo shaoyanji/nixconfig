@@ -80,6 +80,9 @@
         # pkgs.llm-agents.grok
         # aichat
         # mods
+        #
+        pkgs.llm-agents.crush
+        pkgs.llm-agents.reasonix
       ]
       ++ lib.optionals stdenv.hostPlatform.isLinux [];
   };

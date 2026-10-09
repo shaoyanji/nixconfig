@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{ lib, pkgs, ... }: {
   nix = {
     gc = {
       automatic = true;
@@ -36,7 +36,7 @@
       "@admin"
       "@wheel"
     ];
-    experimental-features = ["nix-command" "flakes" "pipe-operators"];
+    experimental-features = [ "nix-command" "flakes" "pipe-operators" ];
     # Pre-trust the fleet caches so flake-level nixConfig (the
     # extra-substituters in flake.nix) never triggers the interactive
     # "allow configuration setting" y/N prompt on any fleet host.
@@ -66,7 +66,22 @@
 
   nix = {
     package = pkgs.nixVersions.latest;
-    optimise.automatic = true;
+    optimise =
+      {
+        automatic = true;
+      }
+      // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+        dates = [ "*-*-01 03:45" ];
+      }
+      // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+        interval = [
+          {
+            Day = 1;
+            Hour = 3;
+            Minute = 45;
+          }
+        ];
+      };
     extraOptions = ''
       min-free = ${toString (100 * 1024 * 1024)}
       max-free = ${toString (1024 * 1024 * 1024)}

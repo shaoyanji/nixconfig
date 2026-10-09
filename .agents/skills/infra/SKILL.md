@@ -82,7 +82,7 @@ All hosts configured in `flake/host-inventory.nix`:
 - `eisen`: Desktop (RX 5700), niri desktop + gamescope-session.
 - `frieren`: Lenovo IdeaPad 320-15IKB NAS/server (btrfs `/srv/data`, auto-upgrade 04:00, Prometheus, Syncthing, Paperless, Tika).
 - `scratch`: Fujitsu ESPRIMO D556 (i5-6500, f2fs SSD), niri desktop, tmpfs IO diet, GRUB legacy BIOS (`/dev/sda`).
-- `poseidon`: Workstation (Ryzen 7 3700X, RTX 2070 Super), niri desktop.
+- `poseidon`: Laptop Workstation (Ryzen 7 Mobile, RTX 3050 Ti Laptop GPU), niri desktop.
 - `aceofspades`, `ancientace`, `aristotle`: Desktop workstations.
 
 ### NixOS Impermanence

@@ -2,6 +2,7 @@
 # Primary user constants: modules/global/user.nix
 {
   config,
+  lib,
   pkgs,
   inputs,
   ...
@@ -17,7 +18,7 @@ in {
   ];
 
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
   };
 
   sops = {

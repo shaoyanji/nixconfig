@@ -35,17 +35,20 @@ tasks:
           echo "Host {{.HOST}} not found in $file — nothing to disable"
         fi
 
-  lifecycle:ci:list:
-    desc: "Show which hosts are enabled vs commented out in the CI build matrix"
+  lifecycle:ci:plan:
+    desc: "Analyze git diff against origin/main to show affected hosts for CI"
     cmds:
-      - |
-        echo "=== CI Build Matrix (.github/workflows/nixcachix.yml) ==="
-        echo ""
-        echo "--- NixOS machines ---"
-        awk '/machine:/{found=1; next} found && /os:/{exit} found{print}' .github/workflows/nixcachix.yml
-        echo ""
-        echo "--- Home Manager ---"
-        awk '/home:/{found=1; next} found && /os:/{exit} found{print}' .github/workflows/nixcachix.yml
+      - nix-shell -p python3 --run "python3 scripts/ci/detect-affected-hosts.py"
+
+  lifecycle:ci:plan:worktree:
+    desc: "Analyze local uncommitted working tree changes for CI impact"
+    cmds:
+      - nix-shell -p python3 --run "python3 scripts/ci/detect-affected-hosts.py --working-tree"
+
+  lifecycle:ci:list:
+    desc: "Show active hosts evaluated by dynamic CI change detection"
+    cmds:
+      - nix-shell -p python3 --run "python3 scripts/ci/detect-affected-hosts.py"
 
   # ── Commissioning helpers ───────────────────────────────────────
 

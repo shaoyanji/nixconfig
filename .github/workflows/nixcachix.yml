@@ -56,6 +56,8 @@ jobs:
       - name: Detect affected hosts
         id: detect
         run: |
+          STRATEGY="${{ inputs.shared_strategy }}"
+          STRATEGY="${STRATEGY:-anchor}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.host }}" != "auto" ]; then
             if [ "${{ inputs.host }}" = "all" ]; then
               python3 scripts/ci/detect-affected-hosts.py --ci --commit-msg "[ci all]"
@@ -63,8 +65,7 @@ jobs:
               python3 scripts/ci/detect-affected-hosts.py --ci --commit-msg "[ci ${{ inputs.host }}]"
             fi
           else
-            python3 scripts/ci/detect-affected-hosts.py --ci \
-              --shared-strategy "${{ inputs.shared_strategy || 'anchor' }}"
+            python3 scripts/ci/detect-affected-hosts.py --ci --shared-strategy "$STRATEGY"
           fi
 
   build-machines:
@@ -76,7 +77,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Log Target
-        run: echo "Building machine ${{ matrix.machine }} (reason: ${{ needs.plan.outputs.reason }})"
+        run: |
+          echo "Building machine ${{ matrix.machine }}"
 
       - name: Maximize build disk space
         uses: easimon/maximize-build-space@v10

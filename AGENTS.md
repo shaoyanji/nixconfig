@@ -68,7 +68,7 @@ flake.nix → flake/outputs.nix (hub)
 
 | Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |
 |------|--------|-------------|------|---------------------------|-------------|----------------|
-| `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop, Sunshine Stream Server & Local MoE LLM Node (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots)... |
+| `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots)... |
 | `fern` | **Active** | `nixos` | `x86_64-linux` | Lightweight Daily-Driver Laptop (AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU) | `hosts/fern/configuration.nix` | /dev/nvme0n1 (disko: ESP + 8G swap + btrfs /root,/nix) |
 | `frieren` | **Active** | `nixos` | `x86_64-linux` | Central NAS Mainframe, 4K Media Center & Application Server (Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz) | `hosts/frieren/configuration.nix` | /dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots... |
 | `guckloch` | **Active** | `nixos` | `x86_64-linux` | Windows Subsystem for Linux (WSL2) Container (Host CPU, WSL2 Dynamic Allocation) | `hosts/guckloch/configuration.nix` | WSL2 root with SSHFS mount to /Volumes/data |

@@ -132,4 +132,9 @@
    - Run `task dev:flake:update-transitive` when ready to advance drifted transitive flake inputs in batches.
 6. **Watch Module Cleanliness**:
    - Maintain service separation in `modules/services/` and avoid accumulating host-local service forks.
+7. **TUI Menus for Declarative Fleet Control Knobs (`modules.toml`)**:
+   - Model after `task inventory` (`scripts/task/inventory-menu.sh`): Charm `gum` frontend paired with fast, native `yq` backend for zero-overhead in-place TOML edits.
+   - Design declarative control knob registry (e.g. `modules.toml` or similar schema) to manage optional roles, services, and profile flags fleet-wide or per-host without manual Nix file editing.
+   - Build dedicated Charm `gum` interactive menus for other fleet control knobs that the top-level operator control plane (`task menu`) currently lacks.
+   - Ensure all future TOML edits strictly preserve comments and structure via native `yq`, followed by validation and documentation synchronization gates.
 

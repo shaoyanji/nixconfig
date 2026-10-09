@@ -24,16 +24,18 @@ jobs:
     strategy:
       matrix:
         machine:
-        # hostname of your nixosSystem's
-        # - poseidon
-        # - cassini
-        # - thinsandy
           - frieren
-        # - schneeeule
-        # - mtfuji
-        # - ancientace
-        # - guckloch
-        # - minyx
+          # Active NixOS hosts (frieren enabled in CI; others build locally or via harmonia cache):
+          # - poseidon
+          # - eisen
+          # - fern
+          # - guckloch
+          # - kellerbench
+          # - netbook
+          # - scratch
+          # - stark
+          # Preserved hosts:
+          # - aceofspades, ancientace, applevalley, ares, aristotle, deckstation, demo, garnixMachine, minyx, mtfuji, schneeeule, sledgehammer
         os:
           - ubuntu-latest
           # add others as you need
@@ -75,57 +77,59 @@ jobs:
 
       # this is equivalent to `nixos-rebuild build`
       - run: nix build -L .?submodules=1#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel
-  build-homes:
-    strategy:
-      matrix:
-        home:
-          - penguin
-          # - verntil
-        os:
-          - ubuntu-latest
-          # - macos-latest
-    runs-on: ${{ matrix.os }}
-    continue-on-error: true
-    steps:
-      - name: Maximize build disk space
-        uses: easimon/maximize-build-space@v10
-        with:
-          overprovision-lvm: true
-          swap-size-mb: 1024
-          remove-dotnet: "true"
-          remove-android: "true"
-          remove-haskell: "true"
-          remove-codeql: "true"
-          remove-docker-images: "true"
-          build-mount-path: /nix
-      - uses: nixbuild/nix-quick-install-action@master
-      - name: Sync repository
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          submodules: recursive
-          token: "${{ secrets.GH_PAT }}"
-      - uses: cachix/cachix-action@v14
-        with:
-          name: shaoyanji
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-          useDaemon: false
-          installCommand: nix profile install nixpkgs#cachix
-      - name: Restore and cache Nix store
-        uses: nix-community/cache-nix-action@v5.1.0
-        with:
-          # restore and save a cache using this key
-          primary-key: nix-${{ runner.os }}-${{ matrix.home }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
-          # if there's no cache hit, restore a cache by this prefix
-          restore-prefixes-first-match: nix-${{ runner.os }}-${{ matrix.home }}-
-          # do purge caches
-          purge: true
-          # purge all versions of the cache
-          purge-prefixes: nix-${{ runner.os }}-
-          # created more than this number of seconds ago relative to the start of the `Post Restore` phase
-          purge-last-accessed: 86400
-          # except the version with the `primary-key`, if it exists
-          purge-primary-key: never
-          # always save the cache
-          save-always: true
-      - run: nix build -L .?submodules=1#homeConfigurations."${{ matrix.home }}".activationPackage
+
+  # build-homes:
+  #   # Deactivated: penguin is preserved; no active x86_64 standalone Home Manager configurations in fleet.
+  #   strategy:
+  #     matrix:
+  #       home:
+  #         # - penguin
+  #         # - verntil
+  #       os:
+  #         - ubuntu-latest
+  #         # - macos-latest
+  #   runs-on: ${{ matrix.os }}
+  #   continue-on-error: true
+  #   steps:
+  #     - name: Maximize build disk space
+  #       uses: easimon/maximize-build-space@v10
+  #       with:
+  #         overprovision-lvm: true
+  #         swap-size-mb: 1024
+  #         remove-dotnet: "true"
+  #         remove-android: "true"
+  #         remove-haskell: "true"
+  #         remove-codeql: "true"
+  #         remove-docker-images: "true"
+  #         build-mount-path: /nix
+  #     - uses: nixbuild/nix-quick-install-action@master
+  #     - name: Sync repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         persist-credentials: false
+  #         submodules: recursive
+  #         token: "${{ secrets.GH_PAT }}"
+  #     - uses: cachix/cachix-action@v14
+  #       with:
+  #         name: shaoyanji
+  #         authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+  #         useDaemon: false
+  #         installCommand: nix profile install nixpkgs#cachix
+  #     - name: Restore and cache Nix store
+  #       uses: nix-community/cache-nix-action@v5.1.0
+  #       with:
+  #         # restore and save a cache using this key
+  #         primary-key: nix-${{ runner.os }}-${{ matrix.home }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
+  #         # if there's no cache hit, restore a cache by this prefix
+  #         restore-prefixes-first-match: nix-${{ runner.os }}-${{ matrix.home }}-
+  #         # do purge caches
+  #         purge: true
+  #         # purge all versions of the cache
+  #         purge-prefixes: nix-${{ runner.os }}-
+  #         # created more than this number of seconds ago relative to the start of the `Post Restore` phase
+  #         purge-last-accessed: 86400
+  #         # except the version with the `primary-key`, if it exists
+  #         purge-primary-key: never
+  #         # always save the cache
+  #         save-always: true
+  #     - run: nix build -L .?submodules=1#homeConfigurations."${{ matrix.home }}".activationPackage

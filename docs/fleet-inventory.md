@@ -25,7 +25,7 @@
 | **`kali`** | `security` | Mobile Offensive Security Starter Pack | ARM64, 2 to 4 GB, Adreno / VideoCore | CLI / Terminal | Internal Flash / MicroSD |
 | **`kellerbench`** | `gaming-kiosk` | Headless GameStream & Benchmark Rig | Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti | Gamescope Session / Headless | SATA SSD |
 | **`netbook`** | `laptop` | Alice's Travel Netbook (Pinned NixOS 25.11) | Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400 | Niri + greetd | f2fs SSD |
-| **`poseidon`** | `workstation` | Primary High-Performance Laptop Workstation | AMD Ryzen 7 Mobile, 32 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU | Niri + DankMaterialShell greeter | NVMe SSD |
+| **`poseidon`** | `workstation` | Primary High-Performance Laptop Workstation | AMD Ryzen 7 Mobile, 16 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU | Niri + DankMaterialShell greeter | NVMe SSD |
 | **`scratch`** | `workstation` | I/O Diet Lightweight Workstation | Intel Core i5-6500, 8 GB DDR4, Intel HD Graphics 530 | Niri + DankMaterialShell greeter | 128 GB f2fs SSD (Shaky Disk - Strict I/O Diet) |
 | **`stark`** | `gaming-kiosk` | Living Room All-in-One Gaming Terminal | Intel Core i5-7200U, 16 GiB DDR4, Intel HD 620 | Gamescope Session (Steam Big Picture) / Niri + DMS | Dual-disk (SSD + HDD) |
 

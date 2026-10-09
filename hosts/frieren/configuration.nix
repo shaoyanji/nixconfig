@@ -149,26 +149,11 @@ in {
     mode = "0400";
   };
 
-  # E.3: Hermes agent secrets (telegram bot token, allowed users, timeout)
-  # Combined with shared AI services secrets (API keys) via template.
-  sops.secrets."hermes" = {
-    owner = "devji";
-    group = "users";
-    mode = "0400";
-  };
-
-  sops.secrets."ai-services-shared-env" = {
-    owner = "devji";
-    group = "users";
-    mode = "0400";
-  };
-
-  sops.templates."hermes.env" = {
-    owner = "devji";
-    group = "users";
-    mode = "0400";
-    path = "/home/devji/.config/hermes/hermes.env";
-    content = "${config.sops.placeholder."ai-services-shared-env"}${config.sops.placeholder."hermes"}";
+  # E.3: Hermes agent profile & isolated secrets (modules/profiles/hermes.nix)
+  # Host-specific Telegram bot token isolated to frieren to prevent multi-host polling conflicts.
+  profiles.hermes = {
+    enable = true;
+    telegramSecret = "hermes";
   };
 
   services.aria2-daemon = {
@@ -190,7 +175,10 @@ in {
   home-manager.users.devji.programs.aria2-user-fallback.enable = false;
 
   # Resurrected OpenClaw persona ("Vanta") for the hermes mainframe agent.
-  home-manager.users.devji.programs.hermes-user.enable = true;
+  home-manager.users.devji.programs.hermes-user = {
+    enable = true;
+    gateway.enable = true;
+  };
   home-manager.users.devji.home.sessionVariables = {
     HERMES_CONFIG = "/home/devji/.hermes/config.yaml";
     HERMES_ENV = "/home/devji/.config/hermes/hermes.env";

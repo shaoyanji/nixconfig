@@ -135,7 +135,7 @@ def generate_fleet_matrix_markdown(data):
         "- **Declarative Services**: Kiwix (/var/lib/kiwix) is strictly declarative; never hand-edit.",
         "",
         "### 2. Workstations & Kiosks (`poseidon`, `eisen`, `stark`, `kellerbench`)",
-        "- **GPU Drivers**: NVIDIA hosts (`poseidon`: RTX 2070 Super open; `stark`: MX110 legacy_580 offload; `kellerbench`: GTX 750 Ti legacy_580). AMD hosts (`eisen`: RX 5700 Navi 10 Mesa).",
+        "- **GPU Drivers**: NVIDIA hosts (`poseidon`: RTX 3050 Ti Laptop open; `stark`: MX110 legacy_580 offload; `kellerbench`: GTX 750 Ti legacy_580). AMD hosts (`eisen`: RX 5700 Navi 10 Mesa).",
         "- **UI Priority**: Keep interactive desktop smooth on `poseidon` during heavy inference.",
         "",
         "### 3. Lightweight Terminals (`fern`, `scratch`, `netbook`)",

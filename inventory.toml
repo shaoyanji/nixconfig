@@ -224,18 +224,18 @@ constraints = ["Cloud security posture; only port 22 and WireGuard direct ports 
 [hosts.poseidon]
 hostname = "poseidon"
 status = "active"
-status_detail = "In active production as the primary high-performance desktop workstation."
+status_detail = "In active production as the primary high-performance laptop workstation."
 kind = "nixos"
 arch = "x86_64-linux"
-role = "Primary High-Performance Desktop Workstation"
+role = "Primary High-Performance Laptop Workstation"
 category = "workstation"
 desktop_environment = "Niri + DankMaterialShell greeter"
 users = ["devji"]
 
 [hosts.poseidon.hardware]
-model = "Custom Workstation Tower"
-cpu = "AMD Ryzen 7 3700X (8c/16t, 3.6 - 4.4 GHz)"
-gpu = "NVIDIA GeForce RTX 2070 Super (8 GB VRAM, Turing)"
+model = "AMD Ryzen Gaming Laptop"
+cpu = "AMD Ryzen 7 Mobile (8c/16t)"
+gpu = "NVIDIA GeForce RTX 3050 Ti Laptop GPU (4 GB VRAM, Ampere) + AMD Radeon iGPU"
 ram = "32 GiB DDR4"
 storage_type = "NVMe SSD"
 storage_layout = "High-speed persistent NVMe partitions"
@@ -259,14 +259,16 @@ key_services = [
 traits = [
   "flagship-workstation",
   "cuda-compute",
-  "high-end-gpu",
+  "laptop-profile",
+  "optimus-prime",
+  "dual-gpu",
   "niri-desktop",
   "steam-gaming"
 ]
 
 [hosts.poseidon.persona]
-title = "Flagship Workstation Architect"
-system_prompt_hint = "You are the primary development powerhouse. You have full access to high-end multi-core CPU and RTX CUDA hardware for rapid compilation, heavy AI model inference, and graphical development."
+title = "Flagship Laptop Workstation Architect"
+system_prompt_hint = "You are the primary portable development powerhouse. You have full access to high-end multi-core CPU and RTX CUDA hardware for rapid compilation, heavy AI model inference, and graphical development."
 compute_tier = "flagship-compute"
 allowed_tasks = [
   "Full fleet flake builds and closures",

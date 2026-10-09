@@ -1,10 +1,21 @@
 name: nixcachix
 on:
-  # check_suite:
-  # types: [completed]
-  # workflow_dispatch:
   push:
-  # pull_request:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: "Host to build (or 'auto', 'all', or comma-separated names)"
+        required: false
+        default: "auto"
+      shared_strategy:
+        description: "Strategy when shared modules change (anchor=frieren, all=all active, none=host-only)"
+        type: choice
+        options:
+          - anchor
+          - all
+          - none
+        default: "anchor"
+
 jobs:
   sops-drift:
     runs-on: ubuntu-latest
@@ -20,31 +31,53 @@ jobs:
       - name: Check sops recipient drift
         continue-on-error: true
         run: bash scripts/task/sops-drift-check.sh --repo-only
-  build-machines:
-    strategy:
-      matrix:
-        machine:
-          - frieren
-          # Active NixOS hosts (frieren enabled in CI; others build locally or via harmonia cache):
-          # - poseidon
-          # - eisen
-          # - fern
-          # - guckloch
-          # - kellerbench
-          # - netbook
-          # - scratch
-          # - stark
-          # Preserved hosts:
-          # - aceofspades, ancientace, applevalley, ares, aristotle, deckstation, demo, garnixMachine, minyx, mtfuji, schneeeule, sledgehammer
-        os:
-          - ubuntu-latest
-          # add others as you need
-          # - macos-latest
-          # - ubuntu-24.04-arm
 
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      has_machines: ${{ steps.detect.outputs.has_machines }}
+      affected_hosts: ${{ steps.detect.outputs.affected_hosts }}
+      matrix: ${{ steps.detect.outputs.matrix }}
+      reason: ${{ steps.detect.outputs.reason }}
+    steps:
+      - name: Sync repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+          submodules: recursive
+          token: "${{ secrets.GH_PAT }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Detect affected hosts
+        id: detect
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.host }}" != "auto" ]; then
+            if [ "${{ inputs.host }}" = "all" ]; then
+              python3 scripts/ci/detect-affected-hosts.py --ci --commit-msg "[ci all]"
+            else
+              python3 scripts/ci/detect-affected-hosts.py --ci --commit-msg "[ci ${{ inputs.host }}]"
+            fi
+          else
+            python3 scripts/ci/detect-affected-hosts.py --ci \
+              --shared-strategy "${{ inputs.shared_strategy || 'anchor' }}"
+          fi
+
+  build-machines:
+    needs: plan
+    if: needs.plan.outputs.has_machines == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
-      # you might need this if your build causes the runner to run out of disk space
+      - name: Log Target
+        run: echo "Building machine ${{ matrix.machine }} (reason: ${{ needs.plan.outputs.reason }})"
+
       - name: Maximize build disk space
         uses: easimon/maximize-build-space@v10
         with:
@@ -67,69 +100,11 @@ jobs:
           submodules: recursive
           token: "${{ secrets.GH_PAT }}"
 
-      # this is what uploads our builds to the cache (also makes our CI use the cache from previous runs)!
       - uses: cachix/cachix-action@v14
         with:
-          name: shaoyanji # replace with the name of your cachix cache
+          name: shaoyanji
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
           useDaemon: false
           installCommand: nix profile install nixpkgs#cachix
 
-      # this is equivalent to `nixos-rebuild build`
       - run: nix build -L .?submodules=1#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel
-
-  # build-homes:
-  #   # Deactivated: penguin is preserved; no active x86_64 standalone Home Manager configurations in fleet.
-  #   strategy:
-  #     matrix:
-  #       home:
-  #         # - penguin
-  #         # - verntil
-  #       os:
-  #         - ubuntu-latest
-  #         # - macos-latest
-  #   runs-on: ${{ matrix.os }}
-  #   continue-on-error: true
-  #   steps:
-  #     - name: Maximize build disk space
-  #       uses: easimon/maximize-build-space@v10
-  #       with:
-  #         overprovision-lvm: true
-  #         swap-size-mb: 1024
-  #         remove-dotnet: "true"
-  #         remove-android: "true"
-  #         remove-haskell: "true"
-  #         remove-codeql: "true"
-  #         remove-docker-images: "true"
-  #         build-mount-path: /nix
-  #     - uses: nixbuild/nix-quick-install-action@master
-  #     - name: Sync repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         persist-credentials: false
-  #         submodules: recursive
-  #         token: "${{ secrets.GH_PAT }}"
-  #     - uses: cachix/cachix-action@v14
-  #       with:
-  #         name: shaoyanji
-  #         authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-  #         useDaemon: false
-  #         installCommand: nix profile install nixpkgs#cachix
-  #     - name: Restore and cache Nix store
-  #       uses: nix-community/cache-nix-action@v5.1.0
-  #       with:
-  #         # restore and save a cache using this key
-  #         primary-key: nix-${{ runner.os }}-${{ matrix.home }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
-  #         # if there's no cache hit, restore a cache by this prefix
-  #         restore-prefixes-first-match: nix-${{ runner.os }}-${{ matrix.home }}-
-  #         # do purge caches
-  #         purge: true
-  #         # purge all versions of the cache
-  #         purge-prefixes: nix-${{ runner.os }}-
-  #         # created more than this number of seconds ago relative to the start of the `Post Restore` phase
-  #         purge-last-accessed: 86400
-  #         # except the version with the `primary-key`, if it exists
-  #         purge-primary-key: never
-  #         # always save the cache
-  #         save-always: true
-  #     - run: nix build -L .?submodules=1#homeConfigurations."${{ matrix.home }}".activationPackage

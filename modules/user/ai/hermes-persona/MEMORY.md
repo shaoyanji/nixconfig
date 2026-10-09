@@ -202,10 +202,17 @@ Query: "Session from 2024-01-10"
 
 ---
 
-Wrapper binary for jev: `askjev` (shell wrapper at `~/.local/bin/askjev`, wraps `jev-decide classify --provider typesafe`). Real call returns `jev_called: true`, `transport: typesafe`. User-preferred openrouter model: `inception/mercury-decide:free` (not applied by askjev wrapper — call `jev-decide` directly for openrouter).
+## Persistent Boot Facts & Local Tooling
 
-Tips for making official skills with wrappers:
+Environment / tool facts (not user identity — see USER.md for persona/preferences):
+- CLI: `agy` at `/etc/profiles/per-user/devji/bin/agy` v1.2.16 (syntax: `--dangerously-skip-permissions --json-schema <path> --print='...' --mode plan --output-format json`).
+- Email: `himalaya` v2.0.0; account `jisifu` (Gmail) uses `JISIFU_APP_PASSWORD` env for IMAP auth.
+- `jev-decide`: `/home/devji/.local/bin/jev-decide`; provider `typesafe` (key in `~/.config/hermes/hermes.env`); model string `typesafe/jev-1.13`.
+- Mailbox mutation rule: never automatic; requires explicit authorization; criteria only define `archive`/`keep`/`review` (no `delete` judgment exists by default; deletion requires separate judgment and user confirmation).
+- Skill `jev-email-cleansing` (agents-sync) is the governing skill for this class: smoke-test, frozen/live samples, criteria JSON, no mailbox mutation without agreement.
+- Wrapper binary for jev: `askjev` (shell wrapper at `~/.local/bin/askjev`, wraps `jev-decide classify --provider typesafe`). Real call returns `jev_called: true`, `transport: typesafe`. User-preferred openrouter model: `inception/mercury-decide:free` (not applied by askjev wrapper — call `jev-decide` directly for openrouter).
 
+### Official Skills with Wrappers:
 1. The wrapper (`askjev`) loads keys from `~/.config/hermes/hermes.env`, exports `OPENROUTER_API_KEY` + `TYPESAFE_API_KEY`, builds a temp criteria JSON, then calls `jev-decide classify --provider typesafe --text "$QUESTION" --criteria`.
 2. To make an official skill with a wrapper: define `SKILL.md` with trigger/description; add a `scripts/` wrapper that validates inputs (check `--help` before invoking), loads env, builds evidence files (not strings), and calls the underlying binary with `--dry-run` first.
 3. Never invent invocation shapes — read the wrapper source (`cat /path/to/wrapper`) and the underlying binary's `--help` before writing the skill.

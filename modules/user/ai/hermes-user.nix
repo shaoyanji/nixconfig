@@ -44,10 +44,51 @@
     # Runtime edits modify the repo directly (version controlled).
     home.activation.hermesPersonaSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
       run mkdir -p $HOME/.hermes
-      for f in SOUL.md AGENTS.md USER.md MEMORY.md config.yaml; do
-        rm -f "$HOME/.hermes/$f"
-        ln -s /Volumes/data/projects/nixconfig/modules/user/ai/hermes-persona/$f "$HOME/.hermes/$f"
+      run mkdir -p $HOME/.hermes/memories
+
+      REPO_DIR="$HOME/Documents/nixconfig"
+      if [ -d "/Volumes/data/projects/nixconfig" ]; then
+        REPO_DIR="/Volumes/data/projects/nixconfig"
+      fi
+
+      HOST_NAME="$(hostname 2>/dev/null || cat /etc/hostname 2>/dev/null || echo "frieren")"
+
+      # Clean up misplaced files in $HOME from earlier experiments
+      for f in SOUL.md USER.md MEMORY.md config.yaml; do
+        if [ -L "$HOME/$f" ]; then
+          run rm -f "$HOME/$f"
+        fi
       done
+
+      # 1. Base Hermes runtime config & memories in ~/.hermes/
+      for f in config.yaml USER.md MEMORY.md; do
+        run rm -f "$HOME/.hermes/$f"
+        if [ -f "$REPO_DIR/modules/user/ai/hermes-persona/$f" ]; then
+          run ln -s "$REPO_DIR/modules/user/ai/hermes-persona/$f" "$HOME/.hermes/$f"
+        fi
+      done
+
+      # 2. Host-specific persona (SOUL.md) in ~/.hermes/
+      run rm -f "$HOME/.hermes/SOUL.md"
+      if [ -f "$REPO_DIR/modules/user/ai/personas/$HOST_NAME/SOUL.md" ]; then
+        run ln -s "$REPO_DIR/modules/user/ai/personas/$HOST_NAME/SOUL.md" "$HOME/.hermes/SOUL.md"
+      elif [ -f "$REPO_DIR/modules/user/ai/personas/default/SOUL.md" ]; then
+        run ln -s "$REPO_DIR/modules/user/ai/personas/default/SOUL.md" "$HOME/.hermes/SOUL.md"
+      elif [ -f "$REPO_DIR/modules/user/ai/hermes-persona/SOUL.md" ]; then
+        run ln -s "$REPO_DIR/modules/user/ai/hermes-persona/SOUL.md" "$HOME/.hermes/SOUL.md"
+      fi
+
+      # 3. Generate combined host fastfetch card + persona AGENTS.md -> $HOME/AGENTS.md
+      if [ -f "$REPO_DIR/scripts/task/compile-llm-specs.py" ]; then
+        ${pkgs.python3}/bin/python3 "$REPO_DIR/scripts/task/compile-llm-specs.py" --home-agents "$HOST_NAME" --output "$HOME/AGENTS.md" 2>/dev/null || true
+      fi
+
+      # 4. Mirror AGENTS.md into ~/.hermes/AGENTS.md for the systemd gateway daemon
+      run rm -f "$HOME/.hermes/AGENTS.md"
+      if [ -f "$HOME/AGENTS.md" ]; then
+        run ln -s "$HOME/AGENTS.md" "$HOME/.hermes/AGENTS.md"
+      fi
+
       if [ ! -e "$HOME/.hermes/openclaw-archive" ]; then
         run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
       fi

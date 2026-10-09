@@ -280,6 +280,21 @@ tasks:
     cmds:
       - bash scripts/task/qmd-docs-index.sh ensure nixconfig
 
+  dev:inventory:sync:
+    desc: Synchronize AGENTS.md, docs, and compile all LLM host spec cards from inventory.toml
+    cmds:
+      - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --sync-home"
+
+  dev:inventory:llm:
+    desc: Compile and render the LLM prompt context card for a specific host (HOST=name)
+    cmds:
+      - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --host {{.HOST | default "frieren"}}"
+
+  dev:inventory:home-agents:
+    desc: Compile and sync combined fastfetch host card + persona AGENTS.md to ~/AGENTS.md (HOST=name)
+    cmds:
+      - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --home-agents {{.HOST | default "frieren"}} --output ~/AGENTS.md"
+
   dev:nixbuild:plan:
     desc: Report what would build/fetch for hosts against local substituters (read-only)
     cmds:

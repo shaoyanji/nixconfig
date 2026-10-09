@@ -7,8 +7,8 @@
   imports = [
     ./minimal.nix
     ../shell
-    ../user/ai/opencode.nix # too bloated
-    ../user/ai/codex.nix
+    # ../user/ai/opencode.nix # too bloated
+    # ../user/ai/codex.nix
     ../user/ai/antigravity-cli.nix
   ];
 

@@ -64,34 +64,41 @@ flake.nix → flake/outputs.nix (hub)
 
 ### Complete Client OS Fleet Inventory (`flake/host-inventory.nix`)
 
-| Host | Kind | System Arch | Role / Hardware Description | Primary Module Path | Storage Layout |
-|------|------|-------------|-----------------------------|---------------------|----------------|
-| `fern` | `nixos` | `x86_64-linux` | HP 15 laptop (Ryzen 3 3250U, Vega 3, 8GB), niri desktop, autologin, NAS client | `hosts/fern/configuration.nix` | NVMe `/dev/nvme0n1`, btrfs `/root`, `/nix` |
-| `stark` | `nixos` | `x86_64-linux` | Dell Inspiron 24 3477 AIO (i5-7200U, MX110 Optimus), gamescope-session + DMS | `hosts/stark/configuration.nix` | Dual-disk: SATA SSD (system), 1TB HDD (Steam lib) |
-| `eisen` | `nixos` | `x86_64-linux` | Desktop (RX 5700), niri desktop + gamescope-session kiosk | `hosts/eisen/configuration.nix` | Persistent |
-| `frieren` | `nixos` | `x86_64-linux` | Lenovo IdeaPad 320-15IKB NAS/server (btrfs `/srv/data`, auto-upgrade 04:00, Paperless, Syncthing, Tika) | `hosts/frieren/configuration.nix` | btrfs `/dev/sdb3` (`/`), `/dev/sda2` (`/srv/data`) |
-| `scratch` | `nixos` | `x86_64-linux` | Fujitsu ESPRIMO D556 (i5-6500, 8GB, f2fs SSD), niri desktop, tmpfs IO diet, GRUB BIOS | `hosts/scratch/configuration.nix` | f2fs `/dev/sda` (GRUB legacy BIOS) |
-| `poseidon` | `nixos` | `x86_64-linux` | Primary workstation (Ryzen 7 3700X, RTX 2070 Super), niri desktop | `hosts/poseidon/configuration.nix` | Persistent |
-| `schneeeule` | `nixos` | `x86_64-linux` | Desktop with impermanence (root wiped each boot, devji + /etc persisted to `/persist`) | `hosts/schneeeule/configuration.nix` | Disko `/dev/sda`, btrfs `/persist` |
-| `ares` | `nixos` | `x86_64-linux` | Steam Big Picture kiosk with impermanence (i5-6500, GTX 750 Ti) | `hosts/ares/configuration.nix` | Disko `/dev/sda`, btrfs `/persist` |
-| `mtfuji` | `nixos` | `x86_64-linux` | Headless container host (`globalModulesContainers`) | `hosts/mtfuji/configuration.nix` | Persistent |
-| `kellerbench` | `nixos` | `x86_64-linux` | Headless container host (GTX 750 Ti) | `hosts/kellerbench/configuration.nix` | Persistent |
-| `deckstation` | `nixos` | `x86_64-linux` | Headless container host (`globalModulesContainers`) | `hosts/deckstation/configuration.nix` | Persistent |
-| `applevalley` | `nixos` | `x86_64-linux` | Lenovo ThinkPad T420 container host | `hosts/applevalley/configuration.nix` | Persistent |
-| `minyx` | `nixos` | `aarch64-linux` | Raspberry Pi 3 (impermanence + custompi) | `hosts/minyx/configuration.nix` | SD card + impermanence |
-| `sledgehammer` | `nixos` | `x86_64-linux` | Live USB recovery system | `hosts/sledgehammer/configuration.nix` | USB disko |
-| `guckloch` | `nixos` | `x86_64-linux` | WSL2 NixOS container | `hosts/guckloch/configuration.nix` | WSL virtual disk |
-| `netbook` | `nixos` | `x86_64-linux` | Independent NixOS 25.11 host (Celeron N3060, f2fs, niri desktop for alice, pinned 25.11 channel) | `hosts/netbook/configuration.nix` | f2fs `/`, vfat `/boot` |
-| `aristotle` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/aristotle/configuration.nix` | Persistent |
-| `aceofspades` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/aceofspades/configuration.nix` | Persistent |
-| `ancientace` | `nixos` | `x86_64-linux` | Desktop workstation (`globalModulesNixos`) | `hosts/ancientace/configuration.nix` | Persistent |
-| `demo` | `nixos` | `x86_64-linux` | Demo VM (no sops) | `hosts/demo/configuration.nix` | VM |
-| `testvm` | `nixos` | `x86_64-linux` | MicroVM sandbox (`cloud-hypervisor`) | `hosts/microvms/testvm.nix` | Microvm |
-| `garnixMachine` | `nixos` | `x86_64-linux` | Garnix CI runner | `hosts/garnixMachine.nix` | Cloud |
-| `cassini` | `darwin` | `aarch64-darwin` | Apple Silicon macOS (nix-darwin + nix-homebrew) | `hosts/cassini/configuration.nix` | APFS |
-| `penguin` | `home` | `x86_64-linux` | Chromebook / Linux standalone Home Manager (`roles/portable-home`) | `hosts/penguin.nix` | User home |
-| `alarm` | `home` | `aarch64-linux` | Arch Linux ARM standalone Home Manager (`roles/minimal`) | `hosts/alarm.nix` | User home |
-| `kali` | `home` | `aarch64-linux` | Kali Linux ARM standalone Home Manager (`roles/minimal`) | `hosts/kali.nix` | User home |
+> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) (31 total devices: 11 active Nix, 3 active non-Nix external, 1 WIP, 16 preserved).
+
+| Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |
+|------|--------|-------------|------|---------------------------|-------------|----------------|
+| `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop & Sunshine Stream Server (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 128GB NVMe SSD (btrfs @root, @nix, @persist) + 1TB HDD /mnt/st... |
+| `fern` | **Active** | `nixos` | `x86_64-linux` | Lightweight Daily-Driver Laptop (AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU) | `hosts/fern/configuration.nix` | /dev/nvme0n1 (disko: ESP + 8G swap + btrfs /root,/nix) |
+| `frieren` | **Active** | `nixos` | `x86_64-linux` | Central NAS Mainframe, 4K Media Center & Application Server (Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz) | `hosts/frieren/configuration.nix` | /dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots... |
+| `guckloch` | **Active** | `nixos` | `x86_64-linux` | Windows Subsystem for Linux (WSL2) Container (Host CPU, WSL2 Dynamic Allocation) | `hosts/guckloch/configuration.nix` | WSL2 root with SSHFS mount to /Volumes/data |
+| `kali` | **Active** | `home` | `aarch64-linux` | Mobile Offensive Security Starter Pack (ARM64, 2 to 4 GB, Adreno / VideoCore) | `hosts/kali.nix` | Tight mobile flash storage (/home/kali) |
+| `kellerbench` | **Active** | `nixos` | `x86_64-linux` | Headless GameStream & Benchmark Rig (Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti) | `hosts/kellerbench/configuration.nix` | GRUB legacy boot (nodev) |
+| `netbook` | **Active** | `nixos` | `x86_64-linux` | Alice's Travel Netbook (Pinned NixOS 25.11) (Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400) | `hosts/netbook/configuration.nix` | f2fs root, vfat /boot, systemd-boot |
+| `poseidon` | **Active** | `nixos` | `x86_64-linux` | Primary High-Performance Desktop Workstation (AMD Ryzen 7 3700X, 32 GiB DDR4, NVIDIA GeForce RTX 2070 Super) | `hosts/poseidon/configuration.nix` | High-speed persistent NVMe partitions |
+| `scratch` | **Active** | `nixos` | `x86_64-linux` | I/O Diet Lightweight Workstation (Intel Core i5-6500, 8 GB DDR4, Intel HD Graphics 530) | `hosts/scratch/configuration.nix` | Legacy BIOS + GRUB (ext4 /boot, f2fs /) |
+| `stark` | **Active** | `nixos` | `x86_64-linux` | Living Room All-in-One Gaming Terminal (Intel Core i5-7200U, 16 GiB DDR4, Intel HD 620) | `hosts/stark/configuration.nix` | SK hynix SC311 SATA SSD (system) + 1TB HDD /mnt/steam (btrfs+z... |
+| `dragoncourt` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Alwaysdata PHP/Wasm Web Hosting (Intel x86_64, Shared Hosting Quota) | `taskfiles/dragoncourt.yml` | /home/dragoncourt/www |
+| `envs` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Envs.net Multi-Protocol Pubnix Node (Intel Xeon, Shared Pubnix Quota) | `taskfiles/envs.yml` | /home/jisifu (public_html, public_gemini, public_gopher) |
+| `moto` | **Active** | **Non-Nix** (External) | `aarch64-linux` | Primary Mobile Smartphone (Android/Termux) (Unisoc T760 / Snapdragon, 4 to 8 GB RAM, Mali-G57) | `taskfiles/moto.yml` | Android storage (/storage/emulated/0) |
+| `serv00` | **Active** | **Non-Nix** (External) | `x86_64-freebsd` | FreeBSD Web Hosting & Daemon Node (Intel Xeon, 512 MB Process Memory Limit (devil info limits)) | `taskfiles/serv00.yml` | /home/jisifu |
+| `delphi` | *WIP (Not Live)* | `nixos` | `aarch64-linux` | Cloud Bastion, Tailscale Exit Node & ARM64 Build Offloader (Ampere Altra Neoverse N1, 24 GiB RAM) | `hosts/delphi/configuration.nix` | 200 GB ext4/btrfs boot disk |
+| `aceofspades` | Preserved | `nixos` | `x86_64-linux` | AMD Graphics Workstation (Intel Core, 16 GiB, AMD Radeon GPU) | `hosts/aceofspades/configuration.nix` | GRUB legacy boot on /dev/sda |
+| `alarm` | Preserved | `home` | `aarch64-linux` | Arch Linux ARM Standalone Home Manager (ARM64, 1 to 2 GB) | `hosts/alarm.nix` | User home directory /home/alarm |
+| `ancientace` | Preserved | `nixos` | `x86_64-linux` | Virtualization Host & Local Model Server (Intel multi-core, 16 GiB, Intel Graphics) | `hosts/ancientace/configuration.nix` | GRUB boot, microVM bridge network |
+| `applevalley` | Preserved | `nixos` | `x86_64-linux` | Legacy ThinkPad Container & Utility Host (Intel Core i5-2520M, 8 GiB DDR3, Intel HD Graphics 3000) | `hosts/applevalley/configuration.nix` | Persistent btrfs |
+| `ares` | Preserved | `nixos` | `x86_64-linux` | Steam Big Picture Kiosk with Impermanence (Intel Core i5-6500, 8 GiB DDR4, NVIDIA GeForce GTX 750 Ti) | `hosts/ares/configuration.nix` | /dev/sda (root ephemeral on boot, devji home + /etc persisted ... |
+| `aristotle` | Preserved | `nixos` | `x86_64-linux` | Standard Desktop Workstation (Intel 64-bit multi-core, 16 GiB DDR4, Intel / Integrated) | `hosts/aristotle/configuration.nix` | Persistent root with NFS /Volumes/data mount |
+| `cassini` | Preserved | `darwin` | `aarch64-darwin` | Apple Silicon macOS Workstation (Apple Silicon, Unified Memory (16, Apple Integrated Metal GPU) | `hosts/cassini/configuration.nix` | Encrypted APFS Macintosh HD |
+| `deckstation` | Preserved | `nixos` | `x86_64-linux` | High-End Steam Kiosk & Sunshine Host (Intel 64-bit multi-core, 16 GiB, AMD Radeon RX 5700 XT) | `hosts/deckstation/configuration.nix` | Persistent storage |
+| `demo` | Preserved | `nixos` | `x86_64-linux` | NixOS Demonstration VM (x86_64, 4 GiB) | `hosts/demo/configuration.nix` | Single partition, systemd-boot |
+| `garnixMachine` | Preserved | `nixos` | `x86_64-linux` | Garnix CI Runner & Bountystash Host (x86_64 Cloud vCPU, Cloud Allocated) | `hosts/garnixMachine.nix` | Standard Nix store |
+| `minyx` | Preserved | `nixos` | `aarch64-linux` | Raspberry Pi 3B+ Edge Node (Broadcom BCM2837B0, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV) | `hosts/minyx/configuration.nix` | SD card with extlinux bootloader and impermanence |
+| `mtfuji` | Preserved | `nixos` | `x86_64-linux` | Headless Container & AI Inference Host (AMD Ryzen 64-bit, 16 GiB DDR4) | `hosts/mtfuji/configuration.nix` | f2fs / + btrfs subvolume for /nix |
+| `penguin` | Preserved | `home` | `x86_64-linux` | Chromebook Linux Container (Crostini) (Intel x86_64, Shared with ChromeOS, VirtIO GPU with nixGL wrapper) | `hosts/penguin.nix` | User home directory |
+| `schneeeule` | Preserved | `nixos` | `x86_64-linux` | Impermanent Desktop Laptop (Intel 64-bit multi-core, 16 GiB, Intel iGPU + NVIDIA GeForce) | `hosts/schneeeule/configuration.nix` | /dev/sda (root erased on boot, persistent /persist, /persist/d... |
+| `sledgehammer` | Preserved | `nixos` | `x86_64-linux` | Fleet Provisioning & Disaster Recovery USB (Any x86_64 host, Host RAM) | `hosts/sledgehammer/configuration.nix` | GRUB removable media bootloader |
+| `testvm` | Preserved | `nixos` | `x86_64-linux` | MicroVM Sandbox (1-2 vCPU, 1 GiB) | `hosts/microvms/testvm.nix` | MicroVM disk image |
 
 ### Module Layout
 

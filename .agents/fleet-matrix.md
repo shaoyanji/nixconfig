@@ -20,7 +20,7 @@
 - **Declarative Services**: Kiwix (/var/lib/kiwix) is strictly declarative; never hand-edit.
 
 ### 2. Workstations & Kiosks (`poseidon`, `eisen`, `stark`, `kellerbench`)
-- **GPU Drivers**: NVIDIA hosts (`poseidon`: RTX 2070 Super open; `stark`: MX110 legacy_580 offload; `kellerbench`: GTX 750 Ti legacy_580). AMD hosts (`eisen`: RX 5700 Navi 10 Mesa).
+- **GPU Drivers**: NVIDIA hosts (`poseidon`: RTX 3050 Ti Laptop open; `stark`: MX110 legacy_580 offload; `kellerbench`: GTX 750 Ti legacy_580). AMD hosts (`eisen`: RX 5700 Navi 10 Mesa).
 - **UI Priority**: Keep interactive desktop smooth on `poseidon` during heavy inference.
 
 ### 3. Lightweight Terminals (`fern`, `scratch`, `netbook`)
@@ -64,7 +64,7 @@
 | ⚪ **`mtfuji`** | `preserved` | Yes | `x86_64-linux` | `container-compute` | AMD Ryzen 64-bit, 16 GiB DDR4 | Headless Container & AI Inference Host |
 | 🟢 **`netbook`** | `active` | Yes | `x86_64-linux` | `strictly-constrained-cpu` | Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400 | Alice's Travel Netbook (Pinned NixOS 25.11) |
 | ⚪ **`penguin`** | `preserved` | Yes | `x86_64-linux` | `container-client` | Intel x86_64, Shared with ChromeOS, VirtIO GPU with nixGL wrapper | Chromebook Linux Container (Crostini) |
-| 🟢 **`poseidon`** | `active` | Yes | `x86_64-linux` | `flagship-compute` | AMD Ryzen 7 3700X, 32 GiB DDR4, NVIDIA GeForce RTX 2070 Super | Primary High-Performance Desktop Workstation |
+| 🟢 **`poseidon`** | `active` | Yes | `x86_64-linux` | `flagship-compute` | AMD Ryzen 7 Mobile, 32 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU | Primary High-Performance Laptop Workstation |
 | ⚪ **`schneeeule`** | `preserved` | Yes | `x86_64-linux` | `standard-laptop` | Intel 64-bit multi-core, 16 GiB, Intel iGPU + NVIDIA GeForce | Impermanent Desktop Laptop |
 | 🟢 **`scratch`** | `active` | Yes | `x86_64-linux` | `lightweight-io-diet` | Intel Core i5-6500, 8 GB DDR4, Intel HD Graphics 530 | I/O Diet Lightweight Workstation |
 | 🟢 **`serv00`** | `active` | No (Ext) | `x86_64-freebsd` | `shared-freebsd-quota` | Intel Xeon, 512 MB Process Memory Limit (devil info limits) | FreeBSD Web Hosting & Daemon Node |

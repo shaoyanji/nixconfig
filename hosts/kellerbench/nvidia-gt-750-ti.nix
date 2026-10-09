@@ -1,4 +1,12 @@
-{config, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
+  # Freeze to 6.12 LTS kernel to avoid constant out-of-tree legacy_580 rebuilds
+  # and upstream kernel API breakages on the Kepler dGPU.
+  boot.kernelPackages = pkgs.linuxPackages_6_12;
+
   # This host is an on-demand benchmark node, so keep baseline PM explicit.
   powerManagement.enable = true;
 

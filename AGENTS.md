@@ -523,9 +523,9 @@ Two separate encrypted files, decrypted via `sops-nix` using host age keys:
 
 GitHub Actions in `.github/workflows/`:
 
-- `nixcachix.yml` — Builds `frieren` NixOS + `penguin` home-manager on `ubuntu-latest` via Cachix (`shaoyanji` cache)
-- `nixcachix-darwin.yml` — macOS builds
-- `nixcachix-aarch64.yml` — ARM builds
+- `nixcachix.yml` — Builds `frieren` NixOS on `ubuntu-latest` via Cachix (`shaoyanji` cache) and validates SOPS drift (`penguin` home-manager deactivated as preserved)
+- `nixcachix-darwin.yml` — macOS builds (deactivated: `cassini` is preserved)
+- `nixcachix-aarch64.yml` — ARM builds (builds `kali` home-manager on PRs; `minyx` deactivated as preserved)
 
 CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodule support).
 

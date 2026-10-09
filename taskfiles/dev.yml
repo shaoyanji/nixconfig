@@ -4,11 +4,11 @@ tasks:
   dev:git:quick-push:
     desc: Commit/push config updates quickly using AI-generated commit messages
     cmds:
-      - task dev:git:prehook
       - |
-        if ! git diff --cached --quiet; then
+        if ! git diff --quiet || ! git diff --cached --quiet; then
+          git add -u
           gmc -a --yes
-          task dev:git:posthook
+          git push
         else
           echo "No changes to commit"
         fi
@@ -21,11 +21,10 @@ tasks:
           echo "Stashing uncommitted changes..."
           git stash push -m "auto-stash before quick-push"
         fi
-      - task dev:git:prehook
       - |
         if ! git diff --cached --quiet; then
           gmc -a --yes
-          task dev:git:posthook
+          git push
         else
           echo "No changes to commit"
         fi
@@ -36,13 +35,12 @@ tasks:
         fi
 
   dev:git:build-push:
-    desc: Commit/push after successful build using AI-generated commit messages
+    desc: Commit tracked changes after a successful build using AI-generated commit messages
     cmds:
-      - task dev:git:prehook
       - |
-        if ! git diff --cached --quiet; then
+        if ! git diff --quiet || ! git diff --cached --quiet; then
+          git add -u
           gmc -a -c "Successful build on $(uname -a)" --yes
-          task dev:git:posthook
         else
           echo "No changes to commit"
         fi
@@ -61,15 +59,13 @@ tasks:
       - git push
 
   dev:git:quick-pull:
-    desc: Pull with submodules and reload Taskfile
+    desc: Pull with submodules
     cmds:
       - git pull --recurse-submodules
-      - task infra:load:taskfile
 
-  dev:git:prehook:
-    desc: Refresh Taskfile.yml from encrypted secrets before commit (stages changed files)
+  dev:git:stage:
+    desc: Stage tracked changes and warn on .sops.yaml recipient drift
     cmds:
-      - task infra:load:taskfile
       - git add -u  # Only stage tracked files, not new untracked files
       - |
         if git diff --cached --name-only | grep -q '^\.sops\.yaml$'; then
@@ -78,15 +74,6 @@ tasks:
             echo -e "\033[1;33mWARNING: SOPS recipient drift detected! You modified .sops.yaml without re-keying.\033[0m"
             echo -e "\033[1;33mRun 'task infra:sops:update-keys' to update recipients across all files before pushing.\033[0m"
           fi
-        fi
-
-  dev:git:posthook:
-    desc: Push current branch with error handling
-    cmds:
-      - |
-        if ! git push; then
-          echo "Error: Git push failed"
-          exit 1
         fi
 
   dev:git:status:

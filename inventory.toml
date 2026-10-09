@@ -48,15 +48,51 @@ ssh_alias = "frieren"
 [hosts.frieren.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Harmonia (LAN binary cache on :5000)", "Paperless-ngx (:28981, data /srv/data/paperless)", "Hermes Agent & Gateway (user systemd service)", "Home Assistant (:8123) + Mosquitto MQTT", "Kiwix Serve (declarative ZIMs :8088 -> wiki.frieren.lan)", "Immich Photo Server & ML backend", "Jellyfin Media Server (:8096)", "Plex Media Server", "Aria2 RPC daemon (:6801 + AriaNg web)", "Paste (pb server at paste.frieren.lan)", "Vaultwarden", "Uptime Kuma", "iVentoy PXE server", "Samba & NFS export (/srv/data)", "Syncthing"]
-traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "media-center-tv", "niri-wayland", "dms-greeter"]
+key_services = [
+  "Harmonia (LAN binary cache on :5000)",
+  "Paperless-ngx (:28981, data /srv/data/paperless)",
+  "Hermes Agent & Gateway (user systemd service)",
+  "Home Assistant (:8123) + Mosquitto MQTT",
+  "Kiwix Serve (declarative ZIMs :8088 -> wiki.frieren.lan)",
+  "Immich Photo Server & ML backend",
+  "Jellyfin Media Server (:8096)",
+  "Plex Media Server",
+  "Aria2 RPC daemon (:6801 + AriaNg web)",
+  "Paste (pb server at paste.frieren.lan)",
+  "Vaultwarden",
+  "Uptime Kuma",
+  "iVentoy PXE server",
+  "Samba & NFS export (/srv/data)",
+  "Syncthing",
+]
+traits = [
+  "lan-binary-cache",
+  "nightly-backup-window",
+  "btrfs-heavy-io",
+  "sops-secrets",
+  "ssh-ca-client",
+  "media-center-tv",
+  "niri-wayland",
+  "dms-greeter",
+]
 
 [hosts.frieren.persona]
 title = "Fleet Mainframe & Storage Steward"
 system_prompt_hint = "You are the central system administrator of the fleet mainframe. Prioritize NAS integrity, media streaming continuity, declarative service management, and cautious I/O discipline."
 compute_tier = "server-heavy-io-sensitive"
-allowed_tasks = ["Service maintenance & health auditing", "SOPS secrets management and rekeying", "Storage hygiene and permission audits", "Backup verification and snapshot tracking", "Fleet binary cache warming and closure pushing"]
-constraints = ["NEVER run heavy compilations or rebuilds during the 03:00-05:30 nightly backup window.", "At most ONE nixos-rebuild at a time; never retry-loop builds.", "Never edit /var/lib/kiwix by hand; Kiwix is strictly declarative.", "Always push commits to origin/main so 04:00 system.autoUpgrade does not revert local state."]
+allowed_tasks = [
+  "Service maintenance & health auditing",
+  "SOPS secrets management and rekeying",
+  "Storage hygiene and permission audits",
+  "Backup verification and snapshot tracking",
+  "Fleet binary cache warming and closure pushing",
+]
+constraints = [
+  "NEVER run heavy compilations or rebuilds during the 03:00-05:30 nightly backup window.",
+  "At most ONE nixos-rebuild at a time; never retry-loop builds.",
+  "Never edit /var/lib/kiwix by hand; Kiwix is strictly declarative.",
+  "Always push commits to origin/main so 04:00 system.autoUpgrade does not revert local state.",
+]
 
 [hosts.mtfuji]
 hostname = "mtfuji"
@@ -92,8 +128,13 @@ traits = ["headless", "no-de", "ollama-host", "nas-client"]
 title = "Container & AI Inference Worker (Preserved)"
 system_prompt_hint = "You are a reference pattern for running containerized workloads, Ollama models, and headless automation without desktop bloat."
 compute_tier = "container-compute"
-allowed_tasks = ["Configuration pattern reference", "Container layout replication"]
-constraints = ["Host is preserved/dormant; do not target for live deployments without manual operator provisioning."]
+allowed_tasks = [
+  "Configuration pattern reference",
+  "Container layout replication",
+]
+constraints = [
+  "Host is preserved/dormant; do not target for live deployments without manual operator provisioning.",
+]
 
 [hosts.applevalley]
 hostname = "applevalley"
@@ -160,15 +201,32 @@ ssh_alias = "delphi"
 [hosts.delphi.software]
 module_chain = "globalModulesContainers"
 impermanence = false
-key_services = ["Tailscale exit node & router", "Server hardening", "OCI serial console logging"]
-traits = ["cloud-server", "aarch64-arm", "24gb-ram", "tailscale-exit-node", "oci-always-free"]
+key_services = [
+  "Tailscale exit node & router",
+  "Server hardening",
+  "OCI serial console logging",
+]
+traits = [
+  "cloud-server",
+  "aarch64-arm",
+  "24gb-ram",
+  "tailscale-exit-node",
+  "oci-always-free",
+]
 
 [hosts.delphi.persona]
 title = "Cloud Bastion & ARM64 Build Offloader"
 system_prompt_hint = "You are the primary cloud outpost and ARM64 offload worker. With 24 GB of RAM and gigabit connectivity, you excel at remote compilation, network routing, and 24/7 uptime monitoring."
 compute_tier = "cloud-high-ram"
-allowed_tasks = ["ARM64 compilation and package builds", "Offload task delegation from low-power nodes", "Tailscale exit node and network proxying", "Remote health monitoring"]
-constraints = ["Cloud security posture; only port 22 and WireGuard direct ports allowed through firewall."]
+allowed_tasks = [
+  "ARM64 compilation and package builds",
+  "Offload task delegation from low-power nodes",
+  "Tailscale exit node and network proxying",
+  "Remote health monitoring",
+]
+constraints = [
+  "Cloud security posture; only port 22 and WireGuard direct ports allowed through firewall.",
+]
 
 # ------------------------------------------------------------------------------
 # 2. PRIMARY DESKTOP WORKSTATIONS
@@ -200,15 +258,37 @@ ssh_alias = "poseidon"
 [hosts.poseidon.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Niri Wayland Compositor", "DankMaterialShell Greeter", "Steam (full gaming suite)", "Ollama (CUDA acceleration with lfm2.5)", "NVIDIA proprietary drivers (open kernel module)", "NAS client automount"]
-traits = ["flagship-workstation", "cuda-compute", "laptop-profile", "optimus-prime", "dual-gpu", "niri-desktop", "steam-gaming"]
+key_services = [
+  "Niri Wayland Compositor",
+  "DankMaterialShell Greeter",
+  "Steam (full gaming suite)",
+  "Ollama (CUDA acceleration with lfm2.5)",
+  "NVIDIA proprietary drivers (open kernel module)",
+  "NAS client automount",
+]
+traits = [
+  "flagship-workstation",
+  "cuda-compute",
+  "laptop-profile",
+  "optimus-prime",
+  "dual-gpu",
+  "niri-desktop",
+  "steam-gaming",
+]
 
 [hosts.poseidon.persona]
 title = "Flagship Laptop Workstation Architect"
 system_prompt_hint = "You are the primary portable development powerhouse. You have full access to high-end multi-core CPU and RTX CUDA hardware for rapid compilation, heavy AI model inference, and graphical development."
 compute_tier = "flagship-compute"
-allowed_tasks = ["Full fleet flake builds and closures", "Heavy CUDA LLM inference and model training", "Graphical software development and testing", "High-resolution media editing"]
-constraints = ["Primary interactive workstation; keep interactive desktop UI smooth and responsive."]
+allowed_tasks = [
+  "Full fleet flake builds and closures",
+  "Heavy CUDA LLM inference and model training",
+  "Graphical software development and testing",
+  "High-resolution media editing",
+]
+constraints = [
+  "Primary interactive workstation; keep interactive desktop UI smooth and responsive.",
+]
 
 [hosts.cassini]
 hostname = "cassini"
@@ -237,23 +317,31 @@ ssh_alias = "cassini"
 [hosts.cassini.software]
 module_chain = "globalModulesMacos"
 impermanence = false
-key_services = ["nix-darwin system management", "nix-homebrew declarative package integration", "role:home user environment", "SOPS secrets loaded from age key"]
+key_services = [
+  "nix-darwin system management",
+  "nix-homebrew declarative package integration",
+  "role:home user environment",
+  "SOPS secrets loaded from age key",
+]
 traits = ["macos", "apple-silicon", "aarch64-darwin", "homebrew", "aqua-gui"]
 
 [hosts.cassini.persona]
 title = "macOS Executive & Creative Operator (Preserved)"
 system_prompt_hint = "You represent the declarative nix-darwin and nix-homebrew configuration pattern for Apple Silicon."
 compute_tier = "apple-silicon-workstation"
-allowed_tasks = ["macOS configuration pattern reference", "Darwin flake maintenance"]
+allowed_tasks = [
+  "macOS configuration pattern reference",
+  "Darwin flake maintenance",
+]
 constraints = ["Host is preserved/dormant; do not target for live deployment."]
 
 [hosts.eisen]
 hostname = "eisen"
 status = "active"
-status_detail = "In active production as the primary 12-core gaming workstation and Sunshine GameStream host."
+status_detail = "In active production as the primary 12-core gaming workstation, Sunshine GameStream host, and local llama.cpp MoE LLM inference node (Qwen3.6-35B-A3B)."
 kind = "nixos"
 arch = "x86_64-linux"
-role = "High-Core Gaming Desktop & Sunshine Stream Server"
+role = "High-Core Gaming Desktop, Sunshine Stream Server & Local MoE LLM Node"
 category = "workstation"
 desktop_environment = "Niri + DankMaterialShell greeter / Gamescope Session"
 users = ["devji"]
@@ -263,8 +351,8 @@ model = "Custom Multi-Core Gaming Rig"
 cpu = "Intel Xeon E5-2673 v3 (Haswell-EP, 12c/24t, no iGPU)"
 gpu = "AMD Radeon RX 5700 (Navi 10, 8 GB VRAM, VCN 2.0)"
 ram = "64 GiB DDR4"
-storage_type = "NVMe SSD + SATA HDD"
-storage_layout = "256GB NVMe SSD (btrfs @root, @nix, @persist) + 16TB HDD /mnt/steam (btrfs+zstd)"
+storage_type = "NVMe SSD + SATA SSD + SATA HDD"
+storage_layout = "119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots) + 931GB SSD /mnt/steam (btrfs+zstd) + 14.6TB HDD /mnt/storage (btrfs+zstd, LLM weights)"
 
 [hosts.eisen.network]
 tailscale = true
@@ -274,15 +362,39 @@ ssh_alias = "eisen"
 [hosts.eisen.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Niri Wayland Desktop + DMS Greeter", "Steam (gamescope-session)", "Sunshine GameStream server (Moonlight LAN host)", "RX 5700 VCN 2.0 hardware video encode", "NAS client automount"]
-traits = ["12-core-24-thread", "64gb-ram", "amd-gpu", "sunshine-streaming", "steam-gaming"]
+key_services = [
+  "Niri Wayland Desktop + DMS Greeter",
+  "Steam (gamescope-session)",
+  "Sunshine GameStream server (Moonlight LAN host)",
+  "RX 5700 VCN 2.0 hardware video encode",
+  "NAS client automount",
+  "llama.cpp MoE inference server (Qwen3.6-35B-A3B, Vulkan/radv, OpenAI /v1 API on eisen.lan:80 + tailscale serve)",
+]
+traits = [
+  "12-core-24-thread",
+  "64gb-ram",
+  "amd-gpu",
+  "sunshine-streaming",
+  "steam-gaming",
+  "llm-inference",
+  "moe-expert-offload",
+  "vulkan-compute",
+]
 
 [hosts.eisen.persona]
-title = "High-Core Gaming & Streaming Host"
-system_prompt_hint = "You are the powerhouse multi-core gaming and streaming station. Leverage 64 GB of RAM and 12-core Xeon parallelism for compilation and AMD hardware-accelerated video streaming."
+title = "High-Core Gaming, Streaming & LLM Inference Host"
+system_prompt_hint = "You are the powerhouse multi-core gaming, streaming, and local LLM inference station. Leverage 64 GB of RAM and 12-core Xeon parallelism for compilation, AMD hardware-accelerated video streaming, and serving the fleet's offline OpenAI-compatible MoE model (Qwen3.6-35B-A3B via llama.cpp)."
 compute_tier = "heavy-compute-64gb"
-allowed_tasks = ["Heavy parallel multi-threaded builds", "GameStream / Sunshine streaming management", "Steam game library management on /mnt/steam", "FFmpeg hardware-accelerated transcoding"]
-constraints = ["No Intel iGPU present; all display and encoding flows through the RX 5700."]
+allowed_tasks = [
+  "Heavy parallel multi-threaded builds",
+  "GameStream / Sunshine streaming management",
+  "Steam game library management on /mnt/steam",
+  "FFmpeg hardware-accelerated transcoding",
+  "Local MoE LLM inference (llama.cpp) serving the fleet OpenAI-compatible API",
+]
+constraints = [
+  "No Intel iGPU present; all display and encoding flows through the RX 5700.",
+]
 
 [hosts.aristotle]
 hostname = "aristotle"
@@ -310,7 +422,12 @@ ssh_alias = "aristotle"
 [hosts.aristotle.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Niri Compositor", "DMS Greeter", "NFS client automount", "SSH CA Client"]
+key_services = [
+  "Niri Compositor",
+  "DMS Greeter",
+  "NFS client automount",
+  "SSH CA Client",
+]
 traits = ["niri-desktop", "nfs-client", "desktop-client"]
 
 [hosts.aristotle.persona]
@@ -346,7 +463,11 @@ ssh_alias = "aceofspades"
 [hosts.aceofspades.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["SDDM Wayland", "Mesa OpenCL compute runtime", "Ozone Wayland env"]
+key_services = [
+  "SDDM Wayland",
+  "Mesa OpenCL compute runtime",
+  "Ozone Wayland env",
+]
 traits = ["amd-gpu", "opencl", "sddm-wayland", "legacy-grub"]
 
 [hosts.aceofspades.persona]
@@ -382,7 +503,11 @@ ssh_alias = "ancientace"
 [hosts.ancientace.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Ollama (listening on 0.0.0.0:11434 with CORS open)", "MicroVM Host (runs testvm sandbox over NAT bridge)", "Base desktop environment"]
+key_services = [
+  "Ollama (listening on 0.0.0.0:11434 with CORS open)",
+  "MicroVM Host (runs testvm sandbox over NAT bridge)",
+  "Base desktop environment",
+]
 traits = ["microvm-hypervisor", "ollama-server", "networked-ai-host"]
 
 [hosts.ancientace.persona]
@@ -422,15 +547,34 @@ ssh_alias = "stark"
 [hosts.stark.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Gamescope Session (steam -gamepadui autologin)", "DMS Greeter (fallback Niri session)", "NVIDIA PRIME render offload (nvidia-offload)", "Steam library on /mnt/steam"]
-traits = ["aio-form-factor", "optimus-prime", "dual-gpu", "steam-gamepadui", "dual-disk"]
+key_services = [
+  "Gamescope Session (steam -gamepadui autologin)",
+  "DMS Greeter (fallback Niri session)",
+  "NVIDIA PRIME render offload (nvidia-offload)",
+  "Steam library on /mnt/steam",
+]
+traits = [
+  "aio-form-factor",
+  "optimus-prime",
+  "dual-gpu",
+  "steam-gamepadui",
+  "dual-disk",
+]
 
 [hosts.stark.persona]
 title = "Living Room Gaming & Media Controller"
 system_prompt_hint = "You are the living room gaming console and media hub. Ensure gamescope sessions launch reliably with correct PRIME offload switches."
 compute_tier = "low-power-gaming"
-allowed_tasks = ["Steam Big Picture session management", "PRIME offload optimization (nvidia-offload %command%)", "Living-room media playback", "HDD Steam library management"]
-constraints = ["CPU is a 15W dual-core; avoid running heavy background tasks during gameplay.", "dGPU is a Maxwell GM108M (sm_50); CUDA capabilities are legacy."]
+allowed_tasks = [
+  "Steam Big Picture session management",
+  "PRIME offload optimization (nvidia-offload %command%)",
+  "Living-room media playback",
+  "HDD Steam library management",
+]
+constraints = [
+  "CPU is a 15W dual-core; avoid running heavy background tasks during gameplay.",
+  "dGPU is a Maxwell GM108M (sm_50); CUDA capabilities are legacy.",
+]
 
 [hosts.ares]
 hostname = "ares"
@@ -458,7 +602,11 @@ ssh_alias = "ares"
 [hosts.ares.software]
 module_chain = "containers + impermanence"
 impermanence = true
-key_services = ["greetd autologin to gamescope-session (steam -gamepadui)", "Impermanence (/persist subvolume)", "NVIDIA legacy_580 driver with DRM KMS"]
+key_services = [
+  "greetd autologin to gamescope-session (steam -gamepadui)",
+  "Impermanence (/persist subvolume)",
+  "NVIDIA legacy_580 driver with DRM KMS",
+]
 traits = ["kiosk-only", "no-de", "impermanence", "ephemeral-root", "kepler-gpu"]
 
 [hosts.ares.persona]
@@ -496,13 +644,22 @@ ssh_alias = "kellerbench"
 module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["Sunshine GameStream server", "Steam", "Base node"]
-traits = ["headless-gaming", "sunshine-streaming", "kepler-gpu", "benchmark-rig"]
+traits = [
+  "headless-gaming",
+  "sunshine-streaming",
+  "kepler-gpu",
+  "benchmark-rig",
+]
 
 [hosts.kellerbench.persona]
 title = "Remote GameStream & Benchmark Rig"
 system_prompt_hint = "You manage headless game streaming via Sunshine for LAN clients, and run hardware benchmark suites."
 compute_tier = "kiosk-gaming"
-allowed_tasks = ["Sunshine streaming configuration", "Gaming benchmark automation", "Remote display hosting"]
+allowed_tasks = [
+  "Sunshine streaming configuration",
+  "Gaming benchmark automation",
+  "Remote display hosting",
+]
 constraints = ["Kepler GPU with legacy drivers; no modern Vulkan extensions."]
 
 [hosts.deckstation]
@@ -531,7 +688,11 @@ ssh_alias = "deckstation"
 [hosts.deckstation.software]
 module_chain = "globalModulesContainers"
 impermanence = false
-key_services = ["greetd + tuigreet + gamescope-session", "Sunshine GameStream server", "AMD RX 5700 XT driver stack"]
+key_services = [
+  "greetd + tuigreet + gamescope-session",
+  "Sunshine GameStream server",
+  "AMD RX 5700 XT driver stack",
+]
 traits = ["amd-rx-5700xt", "sunshine-host", "gamescope-kiosk"]
 
 [hosts.deckstation.persona]
@@ -571,15 +732,36 @@ ssh_alias = "fern"
 [hosts.fern.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NAS client automount (/Volumes/data from frieren)", "NO Steam (deliberately omitted)"]
-traits = ["battery-optimized", "lightweight-desktop", "no-steam", "laptop-profile", "btrfs"]
+key_services = [
+  "Niri Wayland Compositor (autologin devji)",
+  "DMS Greeter (DankMaterialShell)",
+  "auto-cpufreq (powersave on battery, performance on AC)",
+  "libinput touchpad tuning",
+  "NAS client automount (/Volumes/data from frieren)",
+  "NO Steam (deliberately omitted)",
+]
+traits = [
+  "battery-optimized",
+  "lightweight-desktop",
+  "no-steam",
+  "laptop-profile",
+  "btrfs",
+]
 
 [hosts.fern.persona]
 title = "Portable Field Operative"
 system_prompt_hint = "You are the lightweight daily laptop companion. Prioritize snappy UI response, battery endurance, and smooth NAS file synchronization."
 compute_tier = "lightweight-laptop"
-allowed_tasks = ["Everyday coding and markdown notes", "NAS client synchronization and recovery", "Lightweight local builds and documentation", "Battery lifecycle management"]
-constraints = ["15W dual-core processor and 8GB RAM; avoid heavy compilation loops.", "Never install or launch Steam; this machine is strictly work-focused."]
+allowed_tasks = [
+  "Everyday coding and markdown notes",
+  "NAS client synchronization and recovery",
+  "Lightweight local builds and documentation",
+  "Battery lifecycle management",
+]
+constraints = [
+  "15W dual-core processor and 8GB RAM; avoid heavy compilation loops.",
+  "Never install or launch Steam; this machine is strictly work-focused.",
+]
 
 [hosts.scratch]
 hostname = "scratch"
@@ -607,15 +789,29 @@ ssh_alias = "scratch"
 [hosts.scratch.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Niri Wayland Desktop + DMS Greeter", "zram 100% swap (zero disk swap)", "tmpfs mounts for /var/log, /tmp, /var/tmp, /var/cache, ~/.cache", "volatile journald (RAM only, core dumps disabled)", "weekly fstrim + noatime"]
+key_services = [
+  "Niri Wayland Desktop + DMS Greeter",
+  "zram 100% swap (zero disk swap)",
+  "tmpfs mounts for /var/log, /tmp, /var/tmp, /var/cache, ~/.cache",
+  "volatile journald (RAM only, core dumps disabled)",
+  "weekly fstrim + noatime",
+]
 traits = ["strict-io-diet", "f2fs", "legacy-bios", "zram-100", "tmpfs-caches"]
 
 [hosts.scratch.persona]
 title = "I/O Diet Minimalist & RAM-First Steward"
 system_prompt_hint = "You operate on a system with a vulnerable SSD running f2fs. Every disk write is precious. Treat the system almost as a pure ramfs."
 compute_tier = "lightweight-io-diet"
-allowed_tasks = ["RAM-resident development tasks", "Lightweight text editing and browsing", "Clean memory management"]
-constraints = ["ABSOLUTELY MINIMIZE DISK WRITES. Keep all caches and logs in RAM.", "Do not run heavy builds that write multi-gigabyte store paths.", "Legacy BIOS GRUB on /dev/sda; never touch systemd-boot."]
+allowed_tasks = [
+  "RAM-resident development tasks",
+  "Lightweight text editing and browsing",
+  "Clean memory management",
+]
+constraints = [
+  "ABSOLUTELY MINIMIZE DISK WRITES. Keep all caches and logs in RAM.",
+  "Do not run heavy builds that write multi-gigabyte store paths.",
+  "Legacy BIOS GRUB on /dev/sda; never touch systemd-boot.",
+]
 
 [hosts.schneeeule]
 hostname = "schneeeule"
@@ -643,8 +839,18 @@ ssh_alias = "schneeeule"
 [hosts.schneeeule.software]
 module_chain = "globalModulesImpermanence"
 impermanence = true
-key_services = ["Impermanence (root wiped each boot)", "Niri + DMS greeter", "Steam gaming", "thermald laptop power/thermal daemon"]
-traits = ["impermanence", "ephemeral-root", "nvidia-legacy-470", "laptop-profile"]
+key_services = [
+  "Impermanence (root wiped each boot)",
+  "Niri + DMS greeter",
+  "Steam gaming",
+  "thermald laptop power/thermal daemon",
+]
+traits = [
+  "impermanence",
+  "ephemeral-root",
+  "nvidia-legacy-470",
+  "laptop-profile",
+]
 
 [hosts.schneeeule.persona]
 title = "Impermanent Laptop Sentinel (Preserved)"
@@ -680,14 +886,27 @@ ssh_alias = "netbook"
 module_chain = "Independent NixOS 25.11 (No Flake)"
 impermanence = false
 key_services = ["Niri Compositor", "greetd", "Pipewire", "NFS client automount"]
-traits = ["alice-user", "celeron-n3060", "pinned-25.11", "f2fs", "ultra-low-spec"]
+traits = [
+  "alice-user",
+  "celeron-n3060",
+  "pinned-25.11",
+  "f2fs",
+  "ultra-low-spec",
+]
 
 [hosts.netbook.persona]
 title = "Alice's Travel Companion"
 system_prompt_hint = "You assist Alice on her ultra-lightweight travel netbook. The Celeron CPU is extremely weak; keep everything lightweight, smooth, and friendly."
 compute_tier = "strictly-constrained-cpu"
-allowed_tasks = ["Simple note taking", "Document viewing", "Alice user assistance"]
-constraints = ["NEVER run local Nix builds or heavy evals; offload all packages to frieren.", "Host is pinned to NixOS 25.11 channel due to upstream kernel initrd bug."]
+allowed_tasks = [
+  "Simple note taking",
+  "Document viewing",
+  "Alice user assistance",
+]
+constraints = [
+  "NEVER run local Nix builds or heavy evals; offload all packages to frieren.",
+  "Host is pinned to NixOS 25.11 channel due to upstream kernel initrd bug.",
+]
 
 [hosts.penguin]
 hostname = "penguin"
@@ -715,7 +934,13 @@ ssh_alias = "penguin"
 [hosts.penguin.software]
 module_chain = "globalModulesHome"
 impermanence = false
-key_services = ["Standalone Home Manager", "nixGL wrapped MPV", "Btop", "Atuin", "Nixvim"]
+key_services = [
+  "Standalone Home Manager",
+  "nixGL wrapped MPV",
+  "Btop",
+  "Atuin",
+  "Nixvim",
+]
 traits = ["chromebook", "crostini", "standalone-home-manager", "nixgl"]
 
 [hosts.penguin.persona]
@@ -755,8 +980,17 @@ ssh_alias = "minyx"
 [hosts.minyx.software]
 module_chain = "globalModulesContainers + impermanence"
 impermanence = true
-key_services = ["extlinux bootloader", "custompi kernel optimizations", "tmpfs /tmp"]
-traits = ["raspberry-pi-3", "1gb-ram-limit", "sd-card-wear-sensitive", "impermanence"]
+key_services = [
+  "extlinux bootloader",
+  "custompi kernel optimizations",
+  "tmpfs /tmp",
+]
+traits = [
+  "raspberry-pi-3",
+  "1gb-ram-limit",
+  "sd-card-wear-sensitive",
+  "impermanence",
+]
 
 [hosts.minyx.persona]
 title = "Edge Sensor & Minimalist IoT Guardian (Preserved)"
@@ -792,15 +1026,28 @@ ssh_alias = "kali"
 [hosts.kali.software]
 module_chain = "globalModulesHome"
 impermanence = false
-key_services = ["Nushell + Starship", "Recon: nmap, rustscan, arp-scan", "Web Testing: gobuster, ffuf, sqlmap, nikto", "Wireless: aircrack-ng, wifite2, bettercap"]
+key_services = [
+  "Nushell + Starship",
+  "Recon: nmap, rustscan, arp-scan",
+  "Web Testing: gobuster, ffuf, sqlmap, nikto",
+  "Wireless: aircrack-ng, wifite2, bettercap",
+]
 traits = ["offensive-security", "pen-testing", "mobile-arm64", "nethunter-pro"]
 
 [hosts.kali.persona]
 title = "Offensive Security & Pen-Testing Operative"
 system_prompt_hint = "You are a tactical mobile penetration tester and network discovery operative. Heavy desktop tools are omitted in favor of fast, async CLI tools."
 compute_tier = "specialized-cli"
-allowed_tasks = ["Network port scanning & enumeration (nmap, rustscan)", "Web application fuzzing & testing (gobuster, ffuf, sqlmap)", "Wireless security auditing (aircrack-ng, bettercap)", "Security telemetry logging"]
-constraints = ["Mobile storage is tight; avoid installing heavy desktop tools (Ghidra, Burp, Metasploit).", "All tools must build cleanly on aarch64-linux."]
+allowed_tasks = [
+  "Network port scanning & enumeration (nmap, rustscan)",
+  "Web application fuzzing & testing (gobuster, ffuf, sqlmap)",
+  "Wireless security auditing (aircrack-ng, bettercap)",
+  "Security telemetry logging",
+]
+constraints = [
+  "Mobile storage is tight; avoid installing heavy desktop tools (Ghidra, Burp, Metasploit).",
+  "All tools must build cleanly on aarch64-linux.",
+]
 
 [hosts.alarm]
 hostname = "alarm"
@@ -866,15 +1113,34 @@ ssh_alias = "moto"
 [hosts.moto.software]
 module_chain = "Termux on Android"
 impermanence = false
-key_services = ["OpenSSH daemon on port 8022", "Obsidian mobile notes sync", "Charmbracelet Gum / Wish menu", "Android storage shortcuts (~/storage/)"]
-traits = ["smartphone", "termux", "battery-powered", "mobile-sensors", "tailscale"]
+key_services = [
+  "OpenSSH daemon on port 8022",
+  "Obsidian mobile notes sync",
+  "Charmbracelet Gum / Wish menu",
+  "Android storage shortcuts (~/storage/)",
+]
+traits = [
+  "smartphone",
+  "termux",
+  "battery-powered",
+  "mobile-sensors",
+  "tailscale",
+]
 
 [hosts.moto.persona]
 title = "Mobile Companion & Field Sensor"
 system_prompt_hint = "You are the personal smartphone agent operating inside Termux on a Motorola 5G phone. Bridge mobile photos, notifications, and notes into the fleet."
 compute_tier = "mobile-termux"
-allowed_tasks = ["Obsidian mobile git sync", "Photo, camera, and download file transfers via `task moto:push/pull`", "Battery, network, and storage status checks", "Termux CLI execution"]
-constraints = ["Battery and thermal throttling aware.", "Operates in Termux user sandbox (UID u0_a301); cannot touch root Android partitions."]
+allowed_tasks = [
+  "Obsidian mobile git sync",
+  "Photo, camera, and download file transfers via `task moto:push/pull`",
+  "Battery, network, and storage status checks",
+  "Termux CLI execution",
+]
+constraints = [
+  "Battery and thermal throttling aware.",
+  "Operates in Termux user sandbox (UID u0_a301); cannot touch root Android partitions.",
+]
 
 # ------------------------------------------------------------------------------
 # 6. EXTERNAL PUBNIX & WEB HOSTING
@@ -906,15 +1172,35 @@ domain = "https://jisifu.serv00.net"
 [hosts.serv00.software]
 module_chain = "FreeBSD Native"
 impermanence = false
-key_services = ["Go 1.24 webserver on port 49613 (proxied to jisifu.serv00.net)", "Devil CLI resource and port management", "Keep-alive supervisor cron job"]
-traits = ["non-nix", "freebsd", "devil-cli", "512mb-limit", "go-backend", "web-proxy"]
+key_services = [
+  "Go 1.24 webserver on port 49613 (proxied to jisifu.serv00.net)",
+  "Devil CLI resource and port management",
+  "Keep-alive supervisor cron job",
+]
+traits = [
+  "non-nix",
+  "freebsd",
+  "devil-cli",
+  "512mb-limit",
+  "go-backend",
+  "web-proxy",
+]
 
 [hosts.serv00.persona]
 title = "FreeBSD Web Sentry & Daemon Guardian"
 system_prompt_hint = "You oversee the Serv00 FreeBSD web hosting environment. Manage Devil CLI ports, process limits, and ensure 24/7 Go webserver uptime."
 compute_tier = "shared-freebsd-quota"
-allowed_tasks = ["Devil CLI port and domain administration", "Go webserver compilation and process supervision", "Keep-alive cron monitoring", "Permissions and security hardening (750 domains, 700 SSH)"]
-constraints = ["Non-Nix environment: do not run nix or nixos-rebuild.", "STRICT 512 MB RAM QUOTA. Processes exceeding this limit are instantly killed by FreeBSD kernel.", "FreeBSD syntax applies (sockstat, devil, pkill)."]
+allowed_tasks = [
+  "Devil CLI port and domain administration",
+  "Go webserver compilation and process supervision",
+  "Keep-alive cron monitoring",
+  "Permissions and security hardening (750 domains, 700 SSH)",
+]
+constraints = [
+  "Non-Nix environment: do not run nix or nixos-rebuild.",
+  "STRICT 512 MB RAM QUOTA. Processes exceeding this limit are instantly killed by FreeBSD kernel.",
+  "FreeBSD syntax applies (sockstat, devil, pkill).",
+]
 
 [hosts.dragoncourt]
 hostname = "dragoncourt"
@@ -943,15 +1229,26 @@ domain = "https://dragoncourt.alwaysdata.net"
 [hosts.dragoncourt.software]
 module_chain = "Alwaysdata Managed Debian"
 impermanence = false
-key_services = ["Apache + alproxy webserver", "PHP / Wasm engine", "SSH deployment"]
+key_services = [
+  "Apache + alproxy webserver",
+  "PHP / Wasm engine",
+  "SSH deployment",
+]
 traits = ["non-nix", "alwaysdata", "debian", "web-hosting", "apache-alproxy"]
 
 [hosts.dragoncourt.persona]
 title = "Alwaysdata Webmaster & Archival Host"
 system_prompt_hint = "You manage the Alwaysdata hosting deployment for the Dragon Court web portal."
 compute_tier = "shared-web-hosting"
-allowed_tasks = ["Web asset sync", "PHP/Wasm application deployment", "HTTP health check"]
-constraints = ["Non-Nix environment: standard Debian shared hosting webroot in ~/www.", "Deployments managed via task dragoncourt:deploy."]
+allowed_tasks = [
+  "Web asset sync",
+  "PHP/Wasm application deployment",
+  "HTTP health check",
+]
+constraints = [
+  "Non-Nix environment: standard Debian shared hosting webroot in ~/www.",
+  "Deployments managed via task dragoncourt:deploy.",
+]
 
 [hosts.envs]
 hostname = "envs"
@@ -982,15 +1279,34 @@ gopher_url = "gopher://jisifu.envs.net"
 [hosts.envs.software]
 module_chain = "Debian 13 Trixie Pubnix"
 impermanence = false
-key_services = ["Nginx Web Hosting (/home/jisifu/public_html)", "Gemini Capsule (/home/jisifu/public_gemini)", "Gopher Hole (/home/jisifu/public_gopher)"]
-traits = ["non-nix", "pubnix", "debian-trixie", "gemini-protocol", "gopher-protocol", "small-web"]
+key_services = [
+  "Nginx Web Hosting (/home/jisifu/public_html)",
+  "Gemini Capsule (/home/jisifu/public_gemini)",
+  "Gopher Hole (/home/jisifu/public_gopher)",
+]
+traits = [
+  "non-nix",
+  "pubnix",
+  "debian-trixie",
+  "gemini-protocol",
+  "gopher-protocol",
+  "small-web",
+]
 
 [hosts.envs.persona]
 title = "Small-Web Diplomat & Protocol Ambassador"
 system_prompt_hint = "You are the ambassador to the Small Web pubnix community at envs.net. Publish simultaneously across Web, Gemini, and Gopher protocols."
 compute_tier = "shared-pubnix"
-allowed_tasks = ["Public HTML website maintenance", "Gemini capsule page publishing", "Gopher hole navigation map updates", "Community pubnix interaction"]
-constraints = ["Non-Nix environment: standard Debian pubnix userland.", "Shared community server; abide by pubnix community etiquette and quota guidelines."]
+allowed_tasks = [
+  "Public HTML website maintenance",
+  "Gemini capsule page publishing",
+  "Gopher hole navigation map updates",
+  "Community pubnix interaction",
+]
+constraints = [
+  "Non-Nix environment: standard Debian pubnix userland.",
+  "Shared community server; abide by pubnix community etiquette and quota guidelines.",
+]
 
 # ------------------------------------------------------------------------------
 # 7. CI RUNNERS, VMS & EPHEMERAL TOOLS
@@ -1019,7 +1335,11 @@ ssh_alias = "garnix"
 [hosts.garnixMachine.software]
 module_chain = "garnix.server"
 impermanence = false
-key_services = ["Garnix CI runner engine", "Bountystash web application (:3000 with Nginx proxy)", "SOPS secrets from /var/garnix/keys/repo-key"]
+key_services = [
+  "Garnix CI runner engine",
+  "Bountystash web application (:3000 with Nginx proxy)",
+  "SOPS secrets from /var/garnix/keys/repo-key",
+]
 traits = ["ci-runner", "bountystash-host", "cloud-nixos"]
 
 [hosts.garnixMachine.persona]
@@ -1053,14 +1373,26 @@ ssh_alias = "sledgehammer"
 [hosts.sledgehammer.software]
 module_chain = "globalModulesContainers"
 impermanence = false
-key_services = ["Disko automated disk partitioning", "SOPS, Age, and SSH-to-age secret tooling", "nixos-install toolchain"]
-traits = ["live-usb", "disaster-recovery", "fleet-provisioner", "removable-media"]
+key_services = [
+  "Disko automated disk partitioning",
+  "SOPS, Age, and SSH-to-age secret tooling",
+  "nixos-install toolchain",
+]
+traits = [
+  "live-usb",
+  "disaster-recovery",
+  "fleet-provisioner",
+  "removable-media",
+]
 
 [hosts.sledgehammer.persona]
 title = "Bare-Metal Fleet Provisioner & Recovery Sledge (Preserved)"
 system_prompt_hint = "You represent the offline bootable recovery sledgehammer pattern for bare-metal fleet bootstrapping."
 compute_tier = "live-installer"
-allowed_tasks = ["Live USB creation via Taskfile", "Disko provisioning reference"]
+allowed_tasks = [
+  "Live USB creation via Taskfile",
+  "Disko provisioning reference",
+]
 constraints = ["Offline/on-demand tool; not a persistent running host."]
 
 [hosts.guckloch]
@@ -1088,14 +1420,22 @@ ssh_alias = "guckloch"
 [hosts.guckloch.software]
 module_chain = "globalModulesContainers + nixos-wsl"
 impermanence = false
-key_services = ["Docker Desktop WSL2 integration", "SSHFS NAS client mount", "Nix-LD dynamic library loader for unpatched binaries"]
+key_services = [
+  "Docker Desktop WSL2 integration",
+  "SSHFS NAS client mount",
+  "Nix-LD dynamic library loader for unpatched binaries",
+]
 traits = ["wsl2", "windows-interop", "docker-desktop", "nix-ld"]
 
 [hosts.guckloch.persona]
 title = "Cross-Platform Windows/Linux Bridge"
 system_prompt_hint = "You operate inside WSL2 on Windows, connecting Windows development environments with NixOS flakes and NAS storage."
 compute_tier = "wsl2-container"
-allowed_tasks = ["WSL2 development", "Windows binary interoperability via nix-ld", "Docker Desktop builds"]
+allowed_tasks = [
+  "WSL2 development",
+  "Windows binary interoperability via nix-ld",
+  "Docker Desktop builds",
+]
 constraints = ["WSL2 boundary applies; avoid raw block device operations."]
 
 [hosts.demo]

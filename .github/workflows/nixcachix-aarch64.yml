@@ -1,3 +1,6 @@
+# nixcachix-aarch64: ARM64 CI workflow for pull requests.
+# Note: build-machines (minyx) is deactivated because minyx is preserved.
+# Active host 'kali' (home-manager) is built under build-homes on ubuntu-24.04-arm.
 name: nixcachix
 on:
   pull_request:

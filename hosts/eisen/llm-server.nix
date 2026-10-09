@@ -225,7 +225,8 @@ in {
   #
   # On detection llama-swap is stopped outright rather than left holding a
   # half-starved model: that returns the model's RAM (21 GiB Qwen, 44 GiB
-  # Kolibri) and its ~2.65 GiB of VRAM to the game, and the API answers
+  # Kolibri) and, measured with Qwen resident, 5.4 GiB of the 8 GiB VRAM to the
+  # game, and the API answers
   # connection-refused until the game exits — an honest "yielded to gaming"
   # instead of a model quietly competing for VRAM.
   systemd.services."llama-swap-gaming-guard" = {

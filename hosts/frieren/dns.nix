@@ -110,6 +110,9 @@
       misc.dnsmasq_lines = [
         "interface=tailscale0"
         "address=/frieren.lan/192.168.3.25"
+        # eisen's local LLM API (llama.cpp OpenAI /v1) resolves to its stable
+        # tailnet address; LAN clients reach it over the tailnet.
+        "address=/eisen.lan/100.119.172.99"
         # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
         # Answer ONLY PXE clients on the LAN; never lease IPs — the FritzBox
         # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode

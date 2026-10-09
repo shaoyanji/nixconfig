@@ -21,12 +21,11 @@ Git, flake, site deployment, PR management, and package workflows.
 |------|-------------|
 | `dev:git:quick-push` | Commit/push with AI commit message (gmc) |
 | `dev:git:quick-push-safe` | Same with auto-stash/restore |
-| `dev:git:build-push` | Commit/push after successful build |
+| `dev:git:build-push` | Commit tracked changes after successful build (no push) |
 | `dev:git:ai-commit` | Stage tracked + interactive AI commit |
 | `dev:git:ai-commit-push` | Stage tracked + AI commit + push |
-| `dev:git:quick-pull` | Pull with submodules + reload Taskfile |
-| `dev:git:prehook` | Refresh Taskfile from secrets + stage |
-| `dev:git:posthook` | Push current branch (with error handling) |
+| `dev:git:quick-pull` | Pull with submodules |
+| `dev:git:stage` | Stage tracked changes + .sops.yaml drift warning |
 | `dev:git:status` | Show branch, status, stashed changes |
 | `dev:git:stash-push` | Stash with message |
 | `dev:git:stash-pop` | Pop most recent stash |

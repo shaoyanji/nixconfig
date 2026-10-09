@@ -13,9 +13,9 @@ tasks:
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - task dev:git:prehook
+      - task dev:git:stage
       - git commit -m "nix-build was successful on {{.HOST}}"
-      - task dev:git:posthook
+      - git push
 
   services:rollback:apply:host:*:
     desc: Alias for infra:rollback:apply:host:*

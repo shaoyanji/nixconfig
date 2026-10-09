@@ -21,7 +21,8 @@
   # (not a NixOS host) that SSHes into the fleet — appended here rather
   # than in the gist so the repo is the reviewable source for it. The
   # second key is the Bitwarden-stored SSH key (no comment field on the
-  # key itself).
+  # key itself). devji@eisen / devji@fern are the per-host user keys of the
+  # eisen and fern workstations.
   sshKeys =
     fetchedKeys
     ++ [
@@ -30,6 +31,8 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC6Q+UiPCzp+dhUydXWiUrVw1jnohdsBMwieAiuINaww alice@netbook"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILrvO+LslaA0+SWCvy46hUoVUifVjhtM8hXzoViIBebG u0_a301@moto-g35-5g"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFOS9RHGObNEmXWrmgry6j4NjepOYSC101CmdCtfxRVr devji@stark"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF1XL9TzXWLtNRoO/csE9BbcYsZChMUSZPnDtFIH0eVY devji@eisen"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMptCVdbDOaPovY/J7QOicHHjThJd7GOSSMFxZg7uh04 devji@fern"
     ];
 in {
   options.ssh.authorizedKeys = {

@@ -33,6 +33,7 @@ in {
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/nas-client.nix
     ../../modules/profiles/sunshine.nix
+    ./llm-server.nix
   ];
 
   networking.hostName = "eisen";
@@ -82,14 +83,11 @@ in {
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
-    # Accept DNS config pushed by the tailnet (pi-hole at frieren, once set
-    # as a global nameserver in the Tailscale admin console).  Declared via
-    # extraSetFlags because extraUpFlags only apply when authKeyFile is set
-    # (eisen authenticates interactively) — the boot-time `tailscale set`
-    # works on already-authenticated nodes.  The previous extraUpFlags entry
-    # "--dns=100.97.61.65" never applied: that flag does not exist on this
-    # tailscale version.
-    extraSetFlags = ["--accept-dns=true"];
+    # `--accept-dns=true` and `--accept-routes=true` are already declared by
+    # modules/profiles/desktop-client.nix (extraSetFlags is a merged list).
+    # Repeating `--accept-dns` here made tailscaled-set fail with "flag
+    # provided multiple times" once tailscale 1.102.5 began rejecting
+    # duplicate booleans, which aborted the whole `nixos-rebuild switch`.
   };
 
   # Pi-hole DNS via the tailnet: resolve through frieren's FTL (its

@@ -38,8 +38,9 @@ The primary architectural goal for `eisen` is **MoE Expert Offloading**:
 
 | Model Profile | Total Params | Active Params | Quant Size | Offload Strategy | Expected Speed | Strengths |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 🌟 **Qwen3.6-35B-A3B** | **35.0B** | **~3.0B active** | **22.5 GB** (`Q4_K_M`) | Hybrid Linear Attention + KV in 8GB VRAM; DDR4 for 35B pool | **35–55 tok/s** | **Primary Champion**: Flagship 2026 agentic coding, Thinking Preservation, 3B active compute |
 | **Phi-3.5-MoE-Instruct** | 41.9B (16 experts) | **6.6B active** (top-2) | 24.5 GB (`Q4_K_M`) | Attention + KV in VRAM, 12c Xeon for active FFNs | **22–32 tok/s** | Premier reasoning, code, math, 128k context |
-| **Qwen1.5-MoE-A2.7B** | 14.3B (60 experts) | **2.7B active** (top-4) | 9.2 GB (`Q4_K_M`) | High GPU layer offload into 8GB VRAM | **45–60 tok/s** | Extremely fast, great multilingual & chat |
+| **Qwen1.5-MoE-A2.7B** | 14.3B (60 experts) | **2.7B active** (top-4) | 9.2 GB (`Q4_K_M`) | High GPU layer offload into 8GB VRAM | **45–60 tok/s** | Lightweight predecessor, great chat |
 | **DeepSeek-V2-Lite-Chat**| 15.7B (64 experts) | **2.4B active** (top-6) | 10.1 GB (`Q4_K_M`) | Near-complete VRAM offload | **40–55 tok/s** | Multi-head latent attention (MLA), coding |
 | **Qwen2.5-Coder-32B** | 32.5B (Dense) | 32.5B (Dense) | 19.8 GB (`Q4_K_M`) | 14 layers in VRAM, 50 layers in DDR4 | **8–14 tok/s** | Dense baseline; exceptional coding quality |
 
@@ -55,7 +56,7 @@ Create a declarative profile in `hosts/eisen/llm-server.nix` (or `modules/servic
 
 let
   modelDir = "/mnt/storage/models";
-  defaultModel = "${modelDir}/qwen2.5-coder-32b-instruct-q4_k_m.gguf";
+  defaultModel = "${modelDir}/qwen3.6-35b-a3b-instruct-q4_k_m.gguf";
 in {
   # Build llama-cpp with Vulkan support for AMD Navi 10 (radv)
   services.llama-cpp = {
@@ -68,14 +69,14 @@ in {
     port = 8080;
     openFirewall = false; # Bound to Tailscale / LAN only
     extraFlags = [
-      "--n-gpu-layers" "14"
+      "--n-gpu-layers" "16"
       "--threads" "12"
-      "--ctx-size" "16384"
+      "--ctx-size" "32768"
       "--flash-attn"
       "--mlock"
       "--cont-batching"
       "--metrics"
-      "--alias" "qwen-32b"
+      "--alias" "qwen3.6-35b"
     ];
   };
 

@@ -24,11 +24,10 @@
 #                         # compatible / OpenRouter / Anthropic ...)
 #   hermes memory setup   # optional external memory provider
 #   hermes status         # verify
-{
-  lib,
-  config,
-  pkgs,
-  ...
+{ lib
+, config
+, pkgs
+, ...
 }: {
   options.programs.hermes-user = {
     enable = lib.mkOption {
@@ -55,7 +54,7 @@
   config = lib.mkIf (config.programs.hermes-user.enable && (config.profiles.ai.enable or true)) {
     # Persona files — symlinked to nixconfig source.
     # Runtime edits modify the repo directly (version controlled).
-    home.activation.hermesPersonaSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    home.activation.hermesPersonaSymlinks = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       run mkdir -p $HOME/.hermes
       run mkdir -p $HOME/.hermes/memories
 
@@ -105,12 +104,19 @@
       if [ ! -e "$HOME/.hermes/openclaw-archive" ]; then
         run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
       fi
-      # If .env is an obsolete symlink from the old ~/.config/hermes indirection, clean it up
-      # so sops-nix manages ~/.hermes/.env directly without indirection.
-      if [ -L "$HOME/.hermes/.env" ]; then
-        run rm -f "$HOME/.hermes/.env"
+      # Hermes reads credentials exclusively from $HERMES_HOME/.env
+      # (hermes_cli/config.py get_env_path). The sops template renders to
+      # ~/.config/hermes/hermes.env (modules/profiles/hermes.nix envPath), so
+      # bridge it here. Deleting this symlink on every switch is what broke
+      # the gateway on 2026-10-09: it started without TELEGRAM_BOT_TOKEN,
+      # exited 78, and RestartPreventExitStatus stopped systemd from
+      # retrying. Only bridge when the target exists and .env is absent —
+      # never clobber a real hermes-managed .env (auth flows write there).
+      if [ ! -e "$HOME/.hermes/.env" ] && [ -e "$HOME/.config/hermes/hermes.env" ]; then
+        run ln -s "$HOME/.config/hermes/hermes.env" "$HOME/.hermes/.env"
       fi
       if [ ! -e "$HOME/.hermes/skills/agents-sync" ]; then
+        run mkdir -p "$HOME/.hermes/skills"
         run ln -sf "$HOME/.agents/skills" "$HOME/.hermes/skills/agents-sync"
       fi
     '';
@@ -183,7 +189,7 @@
     # the whole switch with "would be clobbered" (seen 2026-10-08 on the
     # service file and its default.target.wants enable-symlink). Clear any
     # non-store copy before the link check so the declarative unit wins.
-    home.activation.hermesGatewayUnitCleanup = lib.hm.dag.entryBefore ["checkLinkTargets"] ''
+    home.activation.hermesGatewayUnitCleanup = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
       for f in \
         "$HOME/.config/systemd/user/hermes-gateway.service" \
         "$HOME/.config/systemd/user/default.target.wants/hermes-gateway.service"; do
@@ -204,8 +210,8 @@
     systemd.user.services.hermes-gateway = lib.mkIf (config.programs.hermes-user.gateway.enable && pkgs.stdenv.hostPlatform.isLinux) {
       Unit = {
         Description = "Hermes Agent Gateway - Messaging Platform Integration";
-        After = ["network-online.target"];
-        Wants = ["network-online.target"];
+        After = [ "network-online.target" ];
+        Wants = [ "network-online.target" ];
         # Hermes supervises its own restarts; never let systemd rate-limit it
         # into a permanent stop.
         StartLimitIntervalSec = 0;
@@ -237,7 +243,7 @@
         StandardOutput = "journal";
         StandardError = "journal";
       };
-      Install.WantedBy = ["default.target"];
+      Install.WantedBy = [ "default.target" ];
     };
   };
 }

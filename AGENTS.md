@@ -519,13 +519,24 @@ Two separate encrypted files, decrypted via `sops-nix` using host age keys:
 
 ---
 
-## CI Pipeline
+## CI Pipeline & Control Plane
 
 GitHub Actions in `.github/workflows/`:
 
-- `nixcachix.yml` — Builds `frieren` NixOS on `ubuntu-latest` via Cachix (`shaoyanji` cache) and validates SOPS drift (`penguin` home-manager deactivated as preserved)
+- `nixcachix.yml` — Dynamic change-detection matrix (`scripts/ci/detect-affected-hosts.py`):
+  - Inspects `git diff` against active NixOS hosts in `inventory.toml`.
+  - Documentation/meta changes (`*.md`, `docs/`, `taskfiles/`) skip runner allocation (0 builds).
+  - Host-specific changes (`hosts/<host>/**`) build only the affected host.
+  - Shared Nix modules (`modules/**`, `flake.lock`) anchor to `frieren` by default.
+  - Commit message overrides: `[skip ci]`, `[ci all]`, `[ci <host1,host2>]`.
+  - Manual dispatch: `task dev:ci:trigger:<host>` or via GitHub Actions UI.
 - `nixcachix-darwin.yml` — macOS builds (deactivated: `cassini` is preserved)
-- `nixcachix-aarch64.yml` — ARM builds (builds `kali` home-manager on PRs; `minyx` deactivated as preserved)
+- `nixcachix-aarch64.yml` — ARM builds (deactivated: `minyx` and `kali` are preserved)
+
+Operator control tasks:
+- `task dev:ci:plan` — Evaluate CI impact of unpushed commits against `origin/main`
+- `task dev:ci:plan:worktree` — Evaluate CI impact of current working tree changes
+- `task dev:ci:trigger:<host>` — Manually trigger CI build for `<host>` (or `all`)
 
 CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodule support).
 

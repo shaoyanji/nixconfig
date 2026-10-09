@@ -6,10 +6,10 @@
 ## Fleet Overview Statistics
 
 - **Total Registered Devices**: 31
-- **Active Production Nix Devices**: 9
+- **Active Production Nix Devices**: 10
 - **Active External Non-Nix Hosting**: 4 (`serv00`, `dragoncourt`, `envs`)
 - **Work-in-Progress (Not Live)**: 1 (`delphi`)
-- **Preserved Architecture Archetypes**: 17
+- **Preserved Architecture Archetypes**: 16
 - **Canonical Repository**: [https://github.com/shaoyanji/nixconfig](https://github.com/shaoyanji/nixconfig)
 
 ---
@@ -22,6 +22,7 @@
 | **`fern`** | `laptop` | Lightweight Daily-Driver Laptop | AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU | Niri + DankMaterialShell greeter | NVMe SSD |
 | **`frieren`** | `server-and-media-center` | Central NAS Mainframe, 4K Media Center & Application Server | Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz | niri (Wayland) via greetd/dms-greeter autologin (4K TV output) | Dual-disk btrfs (1TB SSD System + 2TB HDD Data Pool) |
 | **`guckloch`** | `container-host` | Windows Subsystem for Linux (WSL2) Container | Host CPU, WSL2 Dynamic Allocation | WSL2 Windows Integration | Virtual Hard Disk (vhdx) |
+| **`kali`** | `security` | Mobile Offensive Security Starter Pack | ARM64, 2 to 4 GB, Adreno / VideoCore | CLI / Terminal | Internal Flash / MicroSD |
 | **`kellerbench`** | `gaming-kiosk` | Headless GameStream & Benchmark Rig | Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti | Gamescope Session / Headless | SATA SSD |
 | **`netbook`** | `laptop` | Alice's Travel Netbook (Pinned NixOS 25.11) | Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400 | Niri + greetd | f2fs SSD |
 | **`poseidon`** | `workstation` | Primary High-Performance Laptop Workstation | AMD Ryzen 7 Mobile, 16 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU | Niri + DankMaterialShell greeter | NVMe SSD |
@@ -67,7 +68,6 @@ These hosts are not in active production but are preserved as architectural refe
 | **`deckstation`** | `gaming-kiosk` | High-End Steam Kiosk & Sunshine Host | Preserved for AMD RX 5700 XT gamescope kiosk and tuigreet configurations; not actively deployed. |
 | **`demo`** | `vm` | NixOS Demonstration VM | Preserved as a public demonstration and testing VM pattern with zero secrets; not actively deployed. |
 | **`garnixMachine`** | `cloud` | Garnix CI Runner & Bountystash Host | Preserved for Garnix CI runner configuration patterns; not actively deployed. |
-| **`kali`** | `security` | Mobile Offensive Security Starter Pack | Preserved for mobile offensive security standalone Home Manager reference; device currently uses a non-Home-Manager setup. |
 | **`minyx`** | `embedded` | Raspberry Pi 3B+ Edge Node | Preserved for Raspberry Pi 3B+ impermanent edge computing patterns; not actively deployed. |
 | **`mtfuji`** | `container-host` | Headless Container & AI Inference Host | Preserved for headless Ollama/container patterns and btrfs subvolume layout; not actively deployed. |
 | **`penguin`** | `laptop` | Chromebook Linux Container (Crostini) | Preserved for standalone Home Manager in ChromeOS Crostini container reference; not actively deployed. |
@@ -100,7 +100,7 @@ Each device defines an agent persona specifying its operational compute tier, al
 | 🟢 **`frieren`** | Fleet Mainframe & Storage Steward | `server-heavy-io-sensitive` | • Service maintenance & health auditing<br>• SOPS secrets management and rekeying<br>• Storage hygiene and permission audits<br>• Backup verification and snapshot tracking<br>• Fleet binary cache warming and closure pushing | ⚠ NEVER run heavy compilations or rebuilds during the 03:00-05:30 nightly backup window.<br>⚠ At most ONE nixos-rebuild at a time; never retry-loop builds.<br>⚠ Never edit /var/lib/kiwix by hand; Kiwix is strictly declarative.<br>⚠ Always push commits to origin/main so 04:00 system.autoUpgrade does not revert local state. |
 | ⚪ **`garnixMachine`** | Continuous Integration & Deployment Runner (Preserved) | `ci-cloud` | • Configuration pattern reference | ⚠ Preserved host; do not target for live deployment. |
 | 🟢 **`guckloch`** | Cross-Platform Windows/Linux Bridge | `wsl2-container` | • WSL2 development<br>• Windows binary interoperability via nix-ld<br>• Docker Desktop builds | ⚠ WSL2 boundary applies; avoid raw block device operations. |
-| ⚪ **`kali`** | Offensive Security & Pen-Testing Operative | `specialized-cli` | • Network port scanning & enumeration (nmap, rustscan)<br>• Web application fuzzing & testing (gobuster, ffuf, sqlmap)<br>• Wireless security auditing (aircrack-ng, bettercap)<br>• Security telemetry logging | ⚠ Mobile storage is tight; avoid installing heavy desktop tools (Ghidra, Burp, Metasploit).<br>⚠ All tools must build cleanly on aarch64-linux. |
+| 🟢 **`kali`** | Offensive Security & Pen-Testing Operative | `specialized-cli` | • Network port scanning & enumeration (nmap, rustscan)<br>• Web application fuzzing & testing (gobuster, ffuf, sqlmap)<br>• Wireless security auditing (aircrack-ng, bettercap)<br>• Security telemetry logging | ⚠ Mobile storage is tight; avoid installing heavy desktop tools (Ghidra, Burp, Metasploit).<br>⚠ All tools must build cleanly on aarch64-linux. |
 | 🟢 **`kellerbench`** | Remote GameStream & Benchmark Rig | `kiosk-gaming` | • Sunshine streaming configuration<br>• Gaming benchmark automation<br>• Remote display hosting | ⚠ Kepler GPU with legacy drivers; no modern Vulkan extensions. |
 | ⚪ **`minyx`** | Edge Sensor & Minimalist IoT Guardian (Preserved) | `strictly-constrained-1gb` | • Configuration pattern reference | ⚠ Preserved host; do not target for live deployment. |
 | 🌐 **`moto`** | Mobile Companion & Field Sensor | `mobile-termux` | • Obsidian mobile git sync<br>• Photo, camera, and download file transfers via `task moto:push/pull`<br>• Battery, network, and storage status checks<br>• Termux CLI execution | ⚠ Battery and thermal throttling aware.<br>⚠ Operates in Termux user sandbox (UID u0_a301); cannot touch root Android partitions. |

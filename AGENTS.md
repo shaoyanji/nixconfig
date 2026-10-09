@@ -72,6 +72,7 @@ flake.nix → flake/outputs.nix (hub)
 | `fern` | **Active** | `nixos` | `x86_64-linux` | Lightweight Daily-Driver Laptop (AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU) | `hosts/fern/configuration.nix` | /dev/nvme0n1 (disko: ESP + 8G swap + btrfs /root,/nix) |
 | `frieren` | **Active** | `nixos` | `x86_64-linux` | Central NAS Mainframe, 4K Media Center & Application Server (Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz) | `hosts/frieren/configuration.nix` | /dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots... |
 | `guckloch` | **Active** | `nixos` | `x86_64-linux` | Windows Subsystem for Linux (WSL2) Container (Host CPU, WSL2 Dynamic Allocation) | `hosts/guckloch/configuration.nix` | WSL2 root with SSHFS mount to /Volumes/data |
+| `kali` | **Active** | `home` | `aarch64-linux` | Mobile Offensive Security Starter Pack (ARM64, 2 to 4 GB, Adreno / VideoCore) | `hosts/kali.nix` | Tight mobile flash storage (/home/kali) |
 | `kellerbench` | **Active** | `nixos` | `x86_64-linux` | Headless GameStream & Benchmark Rig (Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti) | `hosts/kellerbench/configuration.nix` | GRUB legacy boot (nodev) |
 | `netbook` | **Active** | `nixos` | `x86_64-linux` | Alice's Travel Netbook (Pinned NixOS 25.11) (Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400) | `hosts/netbook/configuration.nix` | f2fs root, vfat /boot, systemd-boot |
 | `poseidon` | **Active** | `nixos` | `x86_64-linux` | Primary High-Performance Laptop Workstation (AMD Ryzen 7 Mobile, 16 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU) | `hosts/poseidon/configuration.nix` | High-speed persistent NVMe partitions |
@@ -92,7 +93,6 @@ flake.nix → flake/outputs.nix (hub)
 | `deckstation` | Preserved | `nixos` | `x86_64-linux` | High-End Steam Kiosk & Sunshine Host (Intel 64-bit multi-core, 16 GiB, AMD Radeon RX 5700 XT) | `hosts/deckstation/configuration.nix` | Persistent storage |
 | `demo` | Preserved | `nixos` | `x86_64-linux` | NixOS Demonstration VM (x86_64, 4 GiB) | `hosts/demo/configuration.nix` | Single partition, systemd-boot |
 | `garnixMachine` | Preserved | `nixos` | `x86_64-linux` | Garnix CI Runner & Bountystash Host (x86_64 Cloud vCPU, Cloud Allocated) | `hosts/garnixMachine.nix` | Standard Nix store |
-| `kali` | Preserved | `home` | `aarch64-linux` | Mobile Offensive Security Starter Pack (ARM64, 2 to 4 GB, Adreno / VideoCore) | `hosts/kali.nix` | Tight mobile flash storage (/home/kali) |
 | `minyx` | Preserved | `nixos` | `aarch64-linux` | Raspberry Pi 3B+ Edge Node (Broadcom BCM2837B0, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV) | `hosts/minyx/configuration.nix` | SD card with extlinux bootloader and impermanence |
 | `mtfuji` | Preserved | `nixos` | `x86_64-linux` | Headless Container & AI Inference Host (AMD Ryzen 64-bit, 16 GiB DDR4) | `hosts/mtfuji/configuration.nix` | f2fs / + btrfs subvolume for /nix |
 | `penguin` | Preserved | `home` | `x86_64-linux` | Chromebook Linux Container (Crostini) (Intel x86_64, Shared with ChromeOS, VirtIO GPU with nixGL wrapper) | `hosts/penguin.nix` | User home directory |
@@ -523,15 +523,17 @@ Two separate encrypted files, decrypted via `sops-nix` using host age keys:
 
 GitHub Actions in `.github/workflows/`:
 
-- `nixcachix.yml` — Dynamic change-detection matrix (`scripts/ci/detect-affected-hosts.py`):
-  - Inspects `git diff` against active NixOS hosts in `inventory.toml`.
+- `nixcachix.yml` — Unified multi-architecture dynamic change-detection pipeline (`scripts/ci/detect-affected-hosts.py`):
+  - Single canonical workflow replacing old separate Darwin/ARM files.
+  - Automatically maps fleet host metadata from `inventory.toml`:
+    - `arch` -> Runner OS (`x86_64-linux` -> `ubuntu-latest`, `aarch64-linux` -> `ubuntu-24.04-arm`, `aarch64-darwin` -> `macos-latest`).
+    - `kind` -> Flake attribute (`nixosConfigurations.*`, `darwinConfigurations.*`, `homeConfigurations.*`).
   - Documentation/meta changes (`*.md`, `docs/`, `taskfiles/`) skip runner allocation (0 builds).
-  - Host-specific changes (`hosts/<host>/**`) build only the affected host.
+  - Host-specific changes (`hosts/<host>/**`) build only the affected host on its target architecture.
   - Shared Nix modules (`modules/**`, `flake.lock`) anchor to `frieren` by default.
+  - Policy enforcement: Hosts with `ci = false` (e.g. unfree NVIDIA on `stark`/`kellerbench`) and dormant `status = "preserved"` hosts are automatically excluded.
   - Commit message overrides: `[skip ci]`, `[ci all]`, `[ci <host1,host2>]`.
   - Manual dispatch: `task dev:ci:trigger:<host>` or via GitHub Actions UI.
-- `nixcachix-darwin.yml` — macOS builds (deactivated: `cassini` is preserved)
-- `nixcachix-aarch64.yml` — ARM builds (deactivated: `minyx` and `kali` are preserved)
 
 Operator control tasks:
 - `task dev:ci:plan` — Evaluate CI impact of unpushed commits against `origin/main`

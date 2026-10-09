@@ -198,7 +198,8 @@ in {
         locations."/" = {
           root = landingPage;
         };
-        locations."~ ^/([a-z0-9]{8}(\\.[a-zA-Z0-9]+)?)$" = {
+        # Enclosed in literal quotes so nginxfmt does not mistake '{8}' for an nginx block
+        locations."\"~ ^/([a-z0-9]{8}(\\.[a-zA-Z0-9]+)?)$\"" = {
           root = "/var/lib/paste";
           extraConfig = ''
             default_type text/plain;

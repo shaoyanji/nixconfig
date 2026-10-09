@@ -11,7 +11,9 @@ sys.path  # no-op
 
 def load_env():
     env = dict(os.environ)
-    hp = os.path.expanduser("~/.config/hermes/hermes.env")
+    hp = os.path.expanduser("~/.hermes/.env")
+    if not os.path.exists(hp):
+        hp = os.path.expanduser("~/.config/hermes/hermes.env")
     if os.path.exists(hp):
         for line in open(hp, encoding="utf-8", errors="replace"):
             line = line.strip()

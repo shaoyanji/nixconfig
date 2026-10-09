@@ -179,10 +179,6 @@ in {
     enable = true;
     gateway.enable = true;
   };
-  home-manager.users.devji.home.sessionVariables = {
-    HERMES_CONFIG = "/home/devji/.hermes/config.yaml";
-    HERMES_ENV = "/home/devji/.config/hermes/hermes.env";
-  };
 
   # --- Boot parameters for GPU power saving ---
   # consoleblank removed — display output is now active for the media center.

@@ -15,6 +15,7 @@ in {
     inputs.sops-nix.nixosModules.sops
     ./firewall-baseline.nix
     ./boot.nix
+    ./hermes.nix
   ];
 
   boot = {

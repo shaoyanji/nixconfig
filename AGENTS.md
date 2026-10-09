@@ -68,14 +68,14 @@ flake.nix → flake/outputs.nix (hub)
 
 | Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |
 |------|--------|-------------|------|---------------------------|-------------|----------------|
-| `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop & Sunshine Stream Server (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 128GB NVMe SSD (btrfs @root, @nix, @persist) + 1TB HDD /mnt/st... |
+| `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop & Sunshine Stream Server (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 256GB NVMe SSD (btrfs @root, @nix, @persist) + 16TB HDD /mnt/s... |
 | `fern` | **Active** | `nixos` | `x86_64-linux` | Lightweight Daily-Driver Laptop (AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU) | `hosts/fern/configuration.nix` | /dev/nvme0n1 (disko: ESP + 8G swap + btrfs /root,/nix) |
 | `frieren` | **Active** | `nixos` | `x86_64-linux` | Central NAS Mainframe, 4K Media Center & Application Server (Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz) | `hosts/frieren/configuration.nix` | /dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots... |
 | `guckloch` | **Active** | `nixos` | `x86_64-linux` | Windows Subsystem for Linux (WSL2) Container (Host CPU, WSL2 Dynamic Allocation) | `hosts/guckloch/configuration.nix` | WSL2 root with SSHFS mount to /Volumes/data |
 | `kali` | **Active** | `home` | `aarch64-linux` | Mobile Offensive Security Starter Pack (ARM64, 2 to 4 GB, Adreno / VideoCore) | `hosts/kali.nix` | Tight mobile flash storage (/home/kali) |
 | `kellerbench` | **Active** | `nixos` | `x86_64-linux` | Headless GameStream & Benchmark Rig (Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti) | `hosts/kellerbench/configuration.nix` | GRUB legacy boot (nodev) |
 | `netbook` | **Active** | `nixos` | `x86_64-linux` | Alice's Travel Netbook (Pinned NixOS 25.11) (Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400) | `hosts/netbook/configuration.nix` | f2fs root, vfat /boot, systemd-boot |
-| `poseidon` | **Active** | `nixos` | `x86_64-linux` | Primary High-Performance Laptop Workstation (AMD Ryzen 7 Mobile, 32 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU) | `hosts/poseidon/configuration.nix` | High-speed persistent NVMe partitions |
+| `poseidon` | **Active** | `nixos` | `x86_64-linux` | Primary High-Performance Laptop Workstation (AMD Ryzen 7 Mobile, 16 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU) | `hosts/poseidon/configuration.nix` | High-speed persistent NVMe partitions |
 | `scratch` | **Active** | `nixos` | `x86_64-linux` | I/O Diet Lightweight Workstation (Intel Core i5-6500, 8 GB DDR4, Intel HD Graphics 530) | `hosts/scratch/configuration.nix` | Legacy BIOS + GRUB (ext4 /boot, f2fs /) |
 | `stark` | **Active** | `nixos` | `x86_64-linux` | Living Room All-in-One Gaming Terminal (Intel Core i5-7200U, 16 GiB DDR4, Intel HD 620) | `hosts/stark/configuration.nix` | SK hynix SC311 SATA SSD (system) + 1TB HDD /mnt/steam (btrfs+z... |
 | `dragoncourt` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Alwaysdata PHP/Wasm Web Hosting (Intel x86_64, Shared Hosting Quota) | `taskfiles/dragoncourt.yml` | /home/dragoncourt/www |

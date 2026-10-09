@@ -280,6 +280,11 @@ tasks:
     cmds:
       - bash scripts/task/qmd-docs-index.sh ensure nixconfig
 
+  dev:inventory:menu:
+    desc: Interactive Charmbracelet Gum TUI for fleet inventory.toml management (yq-backed)
+    cmds:
+      - bash scripts/task/inventory-menu.sh
+
   dev:inventory:sync:
     desc: Synchronize AGENTS.md, docs, and compile all LLM host spec cards from inventory.toml
     cmds:

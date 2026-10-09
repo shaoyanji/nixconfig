@@ -116,6 +116,16 @@ tasks:
         cmds:
             - task agents:menu
 
+    inventory:
+        desc: Open fleet inventory menu (gum)
+        cmds:
+            - task dev:inventory:menu
+
+    inventory:menu:
+        desc: Alias for dev:inventory:menu
+        cmds:
+            - task dev:inventory:menu
+
     exit:
         internal: true
         cmds:

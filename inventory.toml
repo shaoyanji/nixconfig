@@ -1020,8 +1020,8 @@ constraints = ["Preserved host; do not target for live deployment."]
 
 [hosts.kali]
 hostname = "kali"
-status = "active"
-status_detail = "In active production as a mobile offensive security and penetration testing toolkit."
+status = "preserved"
+status_detail = "Preserved for mobile offensive security standalone Home Manager reference; device currently uses a non-Home-Manager setup."
 kind = "home"
 arch = "aarch64-linux"
 role = "Mobile Offensive Security Starter Pack"

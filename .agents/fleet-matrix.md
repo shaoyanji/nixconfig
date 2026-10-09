@@ -57,7 +57,7 @@
 | 🟢 **`frieren`** | `active` | Yes | `x86_64-linux` | `server-heavy-io-sensitive` | Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz | Central NAS Mainframe, 4K Media Center & Application Server |
 | ⚪ **`garnixMachine`** | `preserved` | Yes | `x86_64-linux` | `ci-cloud` | x86_64 Cloud vCPU, Cloud Allocated | Garnix CI Runner & Bountystash Host |
 | 🟢 **`guckloch`** | `active` | Yes | `x86_64-linux` | `wsl2-container` | Host CPU, WSL2 Dynamic Allocation | Windows Subsystem for Linux (WSL2) Container |
-| 🟢 **`kali`** | `active` | Yes | `aarch64-linux` | `specialized-cli` | ARM64, 2 to 4 GB, Adreno / VideoCore | Mobile Offensive Security Starter Pack |
+| ⚪ **`kali`** | `preserved` | Yes | `aarch64-linux` | `specialized-cli` | ARM64, 2 to 4 GB, Adreno / VideoCore | Mobile Offensive Security Starter Pack |
 | 🟢 **`kellerbench`** | `active` | Yes | `x86_64-linux` | `kiosk-gaming` | Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti | Headless GameStream & Benchmark Rig |
 | ⚪ **`minyx`** | `preserved` | Yes | `aarch64-linux` | `strictly-constrained-1gb` | Broadcom BCM2837B0, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV | Raspberry Pi 3B+ Edge Node |
 | 🟢 **`moto`** | `active` | No (Ext) | `aarch64-linux` | `mobile-termux` | Unisoc T760 / Snapdragon, 4 to 8 GB RAM, Mali-G57 | Primary Mobile Smartphone (Android/Termux) |

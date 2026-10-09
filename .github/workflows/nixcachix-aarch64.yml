@@ -1,21 +1,13 @@
 # DEACTIVATED: ARM64 CI workflow (minyx preserved; kali switched to no-Home-Manager setup).
 # Deactivated to conserve GitHub Actions ARM runner minutes and prevent unnecessary CI runs.
-# Kept as workflow_dispatch with if:false to satisfy workflow schema without triggering on push/PR.
+# Kept as workflow_dispatch only; does not run on push or PR.
 name: nixcachix-aarch64
 on:
   workflow_dispatch:
 
 jobs:
-  build-machines:
-    if: false
-    runs-on: ubuntu-24.04-arm
+  deactivated:
+    runs-on: ubuntu-latest
     steps:
       - name: Deactivated
-        run: echo "ARM64 machine builds are deactivated."
-
-  build-homes:
-    if: false
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - name: Deactivated
-        run: echo "ARM64 home builds are deactivated."
+        run: echo "ARM64 CI is deactivated (minyx and kali are preserved)."

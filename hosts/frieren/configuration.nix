@@ -1,9 +1,9 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}: let
+{ config
+, pkgs
+, lib
+, ...
+}:
+let
   user = import ../../modules/global/user.nix;
   # Belt-and-suspenders rfkill unblock: the Ideapad EC can boot with BT
   # soft-blocked (Fn+F8 state persisted across reboots). The standalone
@@ -35,7 +35,8 @@
     done
     exit $fail
   '';
-in {
+in
+{
   imports = [
     ./hardware-configuration.nix
     ./hardware.nix
@@ -90,13 +91,13 @@ in {
   # see modules/services/harmonia.nix for why this keeps the LAN fast.
   systemd.services.fleet-warm-cache = {
     description = "Build all fleet host closures to warm the harmonia LAN cache";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
     # Never fight the 04:00 autoUpgrade for RAM/IO/store-locks: warming 18 host
     # closures takes hours, so a 03:30 start used to run straight through 04:00.
     # systemd stops this oneshot when nixos-upgrade starts — the upgrade wins,
     # and the warmer picks up again on the next weekly trigger.
-    unitConfig.Conflicts = ["nixos-upgrade.service"];
+    unitConfig.Conflicts = [ "nixos-upgrade.service" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${fleetWarmCache}";
@@ -107,7 +108,7 @@ in {
     };
   };
   systemd.timers.fleet-warm-cache = {
-    wantedBy = ["timers.target"];
+    wantedBy = [ "timers.target" ];
     timerConfig = {
       # 01:30 (was 03:30): start the multi-hour fleet warm well before the
       # 03:00 agy runs and the 04:00 autoUpgrade so the Conflicts guard above
@@ -178,6 +179,7 @@ in {
   home-manager.users.devji.programs.hermes-user = {
     enable = true;
     gateway.enable = true;
+    envFile = "/run/secrets/rendered/hermes.env";
   };
 
   # --- Boot parameters for GPU power saving ---
@@ -193,7 +195,7 @@ in {
   ];
 
   # --- Ensure ideapad_laptop kernel module is loaded for conservation mode ---
-  boot.kernelModules = ["ideapad_laptop"];
+  boot.kernelModules = [ "ideapad_laptop" ];
 
   # --- Bluetooth (TV keyboard/mouse) ---
   # Explicit at host level so the media center keeps BT input even if
@@ -214,8 +216,8 @@ in {
   # /sys/class/rfkill/*/soft attributes if BT stays missing after reboot.
   systemd.services.unblock-bluetooth = {
     description = "Unblock Bluetooth rfkill at boot";
-    wantedBy = ["multi-user.target"];
-    after = ["systemd-rfkill.service"];
+    wantedBy = [ "multi-user.target" ];
+    after = [ "systemd-rfkill.service" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${unblockBtRfkill}";
@@ -352,24 +354,24 @@ in {
   fileSystems."/Volumes/data" = {
     device = "/srv/data";
     fsType = "none";
-    options = ["bind"];
+    options = [ "bind" ];
   };
 
   # Bind mounts for /export
   fileSystems."/export/data" = {
     device = "/srv/data";
     fsType = "none";
-    options = ["bind"];
+    options = [ "bind" ];
   };
   fileSystems."/export/private" = {
     device = "/srv/private";
     fsType = "none";
-    options = ["bind"];
+    options = [ "bind" ];
   };
   fileSystems."/export/public" = {
     device = "/srv/public";
     fsType = "none";
-    options = ["bind"];
+    options = [ "bind" ];
   };
 
   # Ensure directories exist

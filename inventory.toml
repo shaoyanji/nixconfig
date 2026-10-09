@@ -775,6 +775,7 @@ role = "Mobile Offensive Security Starter Pack"
 category = "security"
 desktop_environment = "CLI / Terminal"
 users = ["kali"]
+ci = false
 
 [hosts.kali.hardware]
 model = "Raspberry Pi 4 / OnePlus 6 NetHunter Pro (Chroot)"

@@ -51,7 +51,7 @@
 | 🟡 **`delphi`** | `wip` | Yes | `aarch64-linux` | `cloud-high-ram` | Ampere Altra Neoverse N1, 24 GiB RAM | Cloud Bastion, Tailscale Exit Node & ARM64 Build Offloader |
 | ⚪ **`demo`** | `preserved` | Yes | `x86_64-linux` | `demo-sandbox` | x86_64, 4 GiB | NixOS Demonstration VM |
 | 🟢 **`dragoncourt`** | `active` | No (Ext) | `x86_64-linux` | `shared-web-hosting` | Intel x86_64, Shared Hosting Quota | Alwaysdata PHP/Wasm Web Hosting |
-| 🟢 **`eisen`** | `active` | Yes | `x86_64-linux` | `heavy-compute-64gb` | Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700 | High-Core Gaming Desktop, Sunshine Stream Server & Local MoE LLM Node |
+| 🟢 **`eisen`** | `active` | Yes | `x86_64-linux` | `heavy-compute-64gb` | Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700 | High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node |
 | 🟢 **`envs`** | `active` | No (Ext) | `x86_64-linux` | `shared-pubnix` | Intel Xeon, Shared Pubnix Quota | Envs.net Multi-Protocol Pubnix Node |
 | 🟢 **`fern`** | `active` | Yes | `x86_64-linux` | `lightweight-laptop` | AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU | Lightweight Daily-Driver Laptop |
 | 🟢 **`frieren`** | `active` | Yes | `x86_64-linux` | `server-heavy-io-sensitive` | Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz | Central NAS Mainframe, 4K Media Center & Application Server |

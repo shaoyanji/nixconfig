@@ -34,6 +34,7 @@ in {
     ../../modules/profiles/nas-client.nix
     ../../modules/profiles/sunshine.nix
     ./llm-server.nix
+    ./decision-models.nix
   ];
 
   networking.hostName = "eisen";

@@ -113,6 +113,9 @@
         # eisen's local LLM API (llama.cpp OpenAI /v1) resolves to its stable
         # tailnet address; LAN clients reach it over the tailnet.
         "address=/eisen.lan/100.119.172.99"
+        # Laya decision model (Jev-compatible /v1/systemone) on eisen; same
+        # tailnet address, exposed as its own nginx vhost on :80.
+        "address=/laya.lan/100.119.172.99"
         # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
         # Answer ONLY PXE clients on the LAN; never lease IPs — the FritzBox
         # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode

@@ -414,3 +414,24 @@ tasks:
       - |
         bw_export="${1:-}"
         ./scripts/bw-cloak-sync.sh ${bw_export:+"$bw_export"} --apply
+
+  # ── CI Control Plane ──────────────────────────────────────────
+
+  dev:ci:plan:
+    desc: Analyze git diff against origin/main to show affected hosts for CI
+    cmds:
+      - nix-shell -p python3 --run "python3 scripts/ci/detect-affected-hosts.py"
+
+  dev:ci:plan:worktree:
+    desc: Analyze local uncommitted working tree changes for CI impact
+    cmds:
+      - nix-shell -p python3 --run "python3 scripts/ci/detect-affected-hosts.py --working-tree"
+
+  dev:ci:trigger:*:
+    desc: Trigger remote GitHub Actions CI build for a host (e.g. task dev:ci:trigger:stark, all, auto)
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - gh workflow run nixcachix.yml -f host={{.HOST}}
+      - echo "Dispatched CI build for {{.HOST}}"
+

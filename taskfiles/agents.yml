@@ -5,8 +5,9 @@ tasks:
     desc: Interactive operator control plane menu (themed)
     cmds:
       - |
-        choice=$(printf '%s\n' "ssh & remotes" projects ops config browse help exit | gum choose --header "Operator control plane")
+        choice=$(printf '%s\n' inventory "ssh & remotes" projects ops config browse help exit | gum choose --header "Operator control plane")
         case "$choice" in
+          inventory) task dev:inventory:menu ;;
           "ssh & remotes") task agents:menu:ssh ;;
           projects) task agents:menu:projects ;;
           ops) task agents:menu:ops ;;

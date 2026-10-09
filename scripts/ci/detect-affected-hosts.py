@@ -61,8 +61,6 @@ SHARED_NIX_PATTERNS = [
     r"^hosts/common/",
 ]
 
-# Fallback exclusion for hosts requiring unfree NVIDIA drivers built on frieren/local
-DEFAULT_CI_EXCLUDED = {"stark", "kellerbench"}
 
 
 def get_flake_attr(kind, name):
@@ -84,7 +82,7 @@ def load_fleet_hosts():
             "os": "ubuntu-latest",
             "attr": "nixosConfigurations.frieren.config.system.build.toplevel"
         }
-        return {"frieren": fallback_host}, {"frieren": fallback_host}, DEFAULT_CI_EXCLUDED
+        return {"frieren": fallback_host}, {"frieren": fallback_host}, set()
 
     with open(INVENTORY_FILE, "rb") as f:
         inv = tomllib.load(f)
@@ -92,7 +90,7 @@ def load_fleet_hosts():
     hosts = inv.get("hosts", {})
     all_nix_hosts = {}
     active_hosts = {}
-    ci_excluded = set(DEFAULT_CI_EXCLUDED)
+    ci_excluded = set()
 
     for h, data in hosts.items():
         kind = data.get("kind", "")
@@ -114,7 +112,8 @@ def load_fleet_hosts():
 
         if data.get("status") == "active":
             active_hosts[h] = host_info
-            if data.get("ci") is False:
+            ci_val = data.get("ci")
+            if ci_val is False or (isinstance(ci_val, str) and ci_val.strip().lower() == "false"):
                 ci_excluded.add(h)
 
     return all_nix_hosts, active_hosts, ci_excluded
@@ -245,7 +244,7 @@ def analyze_changed_files(files, active_hosts, all_nix_hosts, ci_excluded, share
         return sorted(list(affected_hosts)), msg
 
     if skipped_policy:
-        return [], f"Changes detected for {', '.join(sorted(skipped_policy))}, but skipped per CI policy (unfree driver/ci=false)"
+        return [], f"Changes detected for {', '.join(sorted(skipped_policy))}, but skipped per CI policy (ci = false in inventory.toml)"
 
     return [], "All modified files are documentation, metadata, or non-building assets"
 
@@ -330,7 +329,7 @@ def main():
         excluded_active = [h for h in active_hosts if h in ci_excluded]
         if excluded_active:
             print(f"\nExcluded from CI by policy ({len(excluded_active)}):")
-            print(f"  {', '.join(excluded_active)} (unfree NVIDIA driver; built on frieren/local)")
+            print(f"  {', '.join(excluded_active)} (ci = false in inventory.toml)")
 
         untouched = [h for h in active_hosts if h not in targets and h not in ci_excluded]
         if untouched:

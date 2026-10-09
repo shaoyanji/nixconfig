@@ -78,9 +78,14 @@ jobs:
     steps:
       - name: Log Target
         run: |
-          echo "Building machine ${{ matrix.machine }}"
+          echo "Building machine: ${{ matrix.host }}"
+          echo "Kind: ${{ matrix.kind }}"
+          echo "Architecture: ${{ matrix.arch }}"
+          echo "Runner OS: ${{ matrix.os }}"
+          echo "Flake attribute: ${{ matrix.attr }}"
 
-      - name: Maximize build disk space
+      - name: Maximize build disk space (Linux only)
+        if: runner.os == 'Linux'
         uses: easimon/maximize-build-space@v10
         with:
           overprovision-lvm: true
@@ -109,4 +114,4 @@ jobs:
           useDaemon: false
           installCommand: nix profile install nixpkgs#cachix
 
-      - run: nix build -L .?submodules=1#nixosConfigurations.${{ matrix.machine }}.config.system.build.toplevel
+      - run: nix build -L .?submodules=1#${{ matrix.attr }}

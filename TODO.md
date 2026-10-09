@@ -137,4 +137,9 @@
    - Design declarative control knob registry (e.g. `modules.toml` or similar schema) to manage optional roles, services, and profile flags fleet-wide or per-host without manual Nix file editing.
    - Build dedicated Charm `gum` interactive menus for other fleet control knobs that the top-level operator control plane (`task menu`) currently lacks.
    - Ensure all future TOML edits strictly preserve comments and structure via native `yq`, followed by validation and documentation synchronization gates.
+8. **eisen Local MoE LLM Inference Engine (`llama.cpp` + 3B–7B Active MoE)**:
+   - Leverage 64 GiB DDR4 RAM + 12c/24t Xeon E5-2673 v3 + AMD RX 5700 (8 GiB VRAM) on `eisen`.
+   - Deploy native `services.llama-cpp` with Vulkan backend (`vulkanSupport = true`) instead of Ollama wrapper daemon.
+   - Target sparse MoE models (e.g. Phi-3.5-MoE with 6.6B active, Qwen1.5-MoE with 2.7B active) where the 8GB VRAM comfortably handles the 3B–7B active parameter working set and attention layers, while DDR4 holds the full 30B–45B expert pool.
+   - Expose OpenAI-compatible endpoint on `http://eisen:8080/v1` over Tailscale for fleet AI tools (`mods`, `aichat`, `opencode`). Detailed blueprint documented in `.agents/deploy/hosts/eisen.md`.
 

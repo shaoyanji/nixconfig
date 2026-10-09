@@ -338,10 +338,10 @@ constraints = ["Host is preserved/dormant; do not target for live deployment."]
 [hosts.eisen]
 hostname = "eisen"
 status = "active"
-status_detail = "In active production as the primary 12-core gaming workstation, Sunshine GameStream host, and local MoE LLM node: Qwen3.6-35B-A3B under llama-swap with DFlash2 speculative decoding, served as an OpenAI /v1 API at eisen.lan (LAN) and via tailscale serve (tailnet), and auto-yielding to Steam games."
+status_detail = "In active production as the primary 12-core gaming workstation, Sunshine GameStream host, and local MoE LLM node: Qwen3.6-35B-A3B under llama-swap with DFlash2 speculative decoding, served as an OpenAI /v1 API at eisen.lan (LAN) and via tailscale serve (tailnet), and auto-yielding to Steam games. Also serves Laya, a 421M CPU-only Jev-compatible decision model speaking POST /v1/systemone at laya.lan and tailscale serve :8443."
 kind = "nixos"
 arch = "x86_64-linux"
-role = "High-Core Gaming Desktop, Sunshine Stream Server & Local MoE LLM Node"
+role = "High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node"
 category = "workstation"
 desktop_environment = "Niri + DankMaterialShell greeter / Gamescope Session"
 users = ["devji"]
@@ -372,6 +372,7 @@ key_services = [
   "Qwen3.6-35B-A3B on Vulkan/radv llama.cpp with DFlash2 speculative decoding (+40% decode, measured) and expert tensors kept in CPU RAM",
   "llama-swap-gaming-guard: suspends the LLM while a Steam game runs, freeing ~21 GiB RAM + 5.4 GiB VRAM, and resumes on exit",
   "Kolibri-1 (78B A3B, German/English) weights staged at /mnt/storage/models but not loadable: stock llama.cpp lacks the kolibri1 architecture",
+  "Laya decision model (421M, CPU-only) on 127.0.0.1:8090 behind nginx on laya.lan:80 and tailscale serve :8443, exposing the Jev-compatible POST /v1/systemone (choice/score/noul) — holds no VRAM, so it keeps answering while a game runs",
 ]
 traits = [
   "12-core-24-thread",
@@ -385,11 +386,14 @@ traits = [
   "speculative-decoding",
   "game-aware-yield",
   "vulkan-compute",
+  "decision-model",
+  "jev-compatible",
+  "cpu-inference",
 ]
 
 [hosts.eisen.persona]
-title = "High-Core Gaming, Streaming & LLM Inference Host"
-system_prompt_hint = "You are the powerhouse multi-core gaming, streaming, and local LLM inference station. Leverage 64 GB of RAM and 12-core Xeon parallelism for compilation, AMD hardware-accelerated video streaming, and serving the fleet's offline OpenAI-compatible MoE model (Qwen3.6-35B-A3B via llama.cpp)."
+title = "High-Core Gaming, Streaming, LLM & Decision-Model Host"
+system_prompt_hint = "You are the powerhouse multi-core gaming, streaming, and local inference station. Leverage 64 GB of RAM and 12-core Xeon parallelism for compilation, AMD hardware-accelerated video streaming, serving the fleet's offline OpenAI-compatible MoE model (Qwen3.6-35B-A3B via llama.cpp), and answering typed decisions with the CPU-only Jev-compatible Laya model (POST /v1/systemone on laya.lan)."
 compute_tier = "heavy-compute-64gb"
 allowed_tasks = [
   "Heavy parallel multi-threaded builds",
@@ -397,11 +401,13 @@ allowed_tasks = [
   "Steam game library management on /mnt/steam",
   "FFmpeg hardware-accelerated transcoding",
   "Local MoE LLM inference (llama.cpp) serving the fleet OpenAI-compatible API",
+  "Typed decision queries via the CPU-only Laya model (Jev-compatible POST /v1/systemone)",
 ]
 constraints = [
   "No Intel iGPU present; all display and encoding flows through the RX 5700.",
   "While a model is loaded the LLM holds ~5.75 of 8 GiB VRAM and uses 12 of 24 threads; it auto-yields (llama-swap stops, API answers connection-refused) whenever a Steam game runs.",
   "First request after 15 min idle reloads a 21 GiB GGUF (about 2 minutes); do not set short client timeouts.",
+  "Laya is CPU-only and independent of the gaming guard, but it is not a Jev replacement: benchmark macro accuracy is 0.583 (Jev 0.966), so never let it gate a destructive decision unattended.",
 ]
 
 [hosts.aristotle]

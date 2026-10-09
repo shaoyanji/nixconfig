@@ -44,8 +44,13 @@
         local hermes_bin
         hermes_bin="$(command -v hermes 2>/dev/null || echo "/run/current-system/sw/bin/hermes")"
 
-        # Source hermes API keys & env
-        if [ -f "/home/devji/.config/hermes/hermes.env" ]; then
+        # Source hermes API keys & env directly from ~/.hermes/.env
+        if [ -f "/home/devji/.hermes/.env" ]; then
+          set -a
+          # shellcheck disable=SC1091
+          source /home/devji/.hermes/.env 2>/dev/null || true
+          set +a
+        elif [ -f "/home/devji/.config/hermes/hermes.env" ]; then
           set -a
           # shellcheck disable=SC1091
           source /home/devji/.config/hermes/hermes.env 2>/dev/null || true

@@ -151,7 +151,7 @@ It intentionally resolves to the **tailnet** IP, so the same name works on-LAN a
 
 ## Gaming Coexistence (auto-yield)
 
-eisen is a gaming desktop first, so `llama-swap-gaming-guard.service` **stops `llama-swap` while a Steam game is running** and restarts it when the game exits. That returns the model's RAM (21 GiB Qwen / 44 GiB Kolibri) and its ~2.65 GiB of VRAM to the game; while yielded, the API answers connection-refused rather than leaving a half-starved model fighting the game for VRAM.
+eisen is a gaming desktop first, so `llama-swap-gaming-guard.service` **stops `llama-swap` while a Steam game is running** and restarts it when the game exits. That returns the model's RAM (21 GiB Qwen / 44 GiB Kolibri) and, measured with Qwen loaded, **5,367 MiB of the 8 GiB VRAM** to the game — a model left resident would hold roughly two-thirds of the GPU while the game fights it for the rest. While yielded, the API answers connection-refused rather than that half-starved state.
 
 A game is detected as **any process whose executable lives under a Steam library's `steamapps/common/`** (covers native, Proton and SteamLinuxRuntime-container games alike). Gamescope and `gamescopereaper` are deliberately **not** used as signals — both run permanently here (the Steam tenfoot kiosk session), so they would suspend the LLM forever.
 
@@ -169,9 +169,13 @@ First real completions after the initial switch, all served through the declarat
 | Warm request, same model | **1.2–1.4 s** |
 | Steady-state decode, Qwen3.6-35B-A3B Q4_K_M | **12.7–13.8 tok/s** (18.0 with DFlash2) |
 | Prompt processing | 14–30 tok/s |
-| GPU VRAM in use while decoding | **2.65 GiB of 7.98 GiB** |
+| GPU VRAM in use while decoding | **5.75 GiB of 7.98 GiB** (2.65 GiB without the draft head) |
 
-Decoding is **CPU-bound, not VRAM-bound**: offload is clearly engaged (`--n-gpu-layers 99` leaves only 2.65 GiB resident), so the per-token cost is the sparse expert FFN reads from DDR4, not the GPU. Levers if more throughput is wanted, in order of effort: raise `--threads` toward 24, then relax `--override-tensor exps=CPU` so llama.cpp can keep the hottest experts in the ~5 GiB of VRAM headroom, then try a smaller quant. Treat any "35–55 tok/s" figure in older notes as unverified — the measured numbers above are the reference.
+Decoding is **CPU-bound, not VRAM-bound**: offload is engaged (5.75 GiB of 7.98 GiB resident with the draft head), so the per-token cost is the sparse expert FFN reads from DDR4, not the GPU. Remaining levers, in order of effort: raise `--threads` toward 24, or move to a smaller target quant.
+
+> **There is no spare VRAM to shift experts onto the GPU.** An earlier note suggested relaxing `--override-tensor exps=CPU` using ~5 GiB of headroom; that measurement (2.65 GiB) predated the DFlash2 draft head, which now claims most of the free VRAM. Only ~2.2 GiB is unallocated while decoding.
+
+Treat any "35–55 tok/s" figure in older notes as unverified — the measured numbers above are the reference.
 
 ---
 

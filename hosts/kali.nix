@@ -10,7 +10,7 @@
   home.homeDirectory = "/home/kali";
 
   imports = [
-    ../modules/shell/nushell.nix
+    # ../modules/shell/nushell.nix
     ../modules/shell/starship.nix
     ../modules/roles/minimal.nix
   ];

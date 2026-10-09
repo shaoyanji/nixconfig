@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
-detect-affected-hosts.py - Smart CI change detection based on git diff and inventory.toml.
+detect-affected-hosts.py - Multi-architecture CI change detection based on git diff & inventory.toml.
 
-Maps changed paths to affected active NixOS hosts to prevent frivolous CI builds.
+Maps changed paths to affected fleet hosts across all architectures and kinds (NixOS, Darwin, Home-Manager).
+Automatically routes each host to its corresponding GitHub Actions runner:
+  x86_64-linux   -> ubuntu-latest
+  aarch64-linux  -> ubuntu-24.04-arm
+  aarch64-darwin -> macos-latest
+
 Respects 'ci = false' in inventory.toml (e.g. unfree NVIDIA 580 on stark/kellerbench
 which are built on frieren NAS / local machines).
 
 Supports commit message directives:
   [skip ci] / [ci skip]       -> Skip all host builds
-  [ci all]                   -> Build all active NixOS hosts
+  [ci all]                   -> Build all active CI-eligible hosts
   [ci host1,host2]           -> Build specific active hosts (even if excluded by default)
 """
 
@@ -23,6 +28,13 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 INVENTORY_FILE = REPO_ROOT / "inventory.toml"
+
+RUNNER_MAP = {
+    "x86_64-linux": "ubuntu-latest",
+    "aarch64-linux": "ubuntu-24.04-arm",
+    "aarch64-darwin": "macos-latest",
+    "x86_64-darwin": "macos-13",
+}
 
 NON_BUILD_PATTERNS = [
     r"^\.agents/",
@@ -53,20 +65,59 @@ SHARED_NIX_PATTERNS = [
 DEFAULT_CI_EXCLUDED = {"stark", "kellerbench"}
 
 
-def load_nixos_hosts():
+def get_flake_attr(kind, name):
+    if kind == "nixos":
+        return f"nixosConfigurations.{name}.config.system.build.toplevel"
+    elif kind == "darwin":
+        return f"darwinConfigurations.{name}.config.system.build.toplevel"
+    elif kind == "home":
+        return f"homeConfigurations.{name}.activationPackage"
+    return None
+
+
+def load_fleet_hosts():
     if not INVENTORY_FILE.exists():
-        return ["frieren"], DEFAULT_CI_EXCLUDED
+        fallback_host = {
+            "host": "frieren",
+            "kind": "nixos",
+            "arch": "x86_64-linux",
+            "os": "ubuntu-latest",
+            "attr": "nixosConfigurations.frieren.config.system.build.toplevel"
+        }
+        return {"frieren": fallback_host}, {"frieren": fallback_host}, DEFAULT_CI_EXCLUDED
+
     with open(INVENTORY_FILE, "rb") as f:
         inv = tomllib.load(f)
+
     hosts = inv.get("hosts", {})
-    active = []
+    all_nix_hosts = {}
+    active_hosts = {}
     ci_excluded = set(DEFAULT_CI_EXCLUDED)
+
     for h, data in hosts.items():
-        if data.get("status") == "active" and data.get("kind") == "nixos":
-            active.append(h)
+        kind = data.get("kind", "")
+        if kind not in ["nixos", "darwin", "home"]:
+            continue
+
+        arch = data.get("arch", "x86_64-linux")
+        attr = get_flake_attr(kind, h)
+        runner_os = RUNNER_MAP.get(arch, "ubuntu-latest")
+
+        host_info = {
+            "host": h,
+            "kind": kind,
+            "arch": arch,
+            "os": runner_os,
+            "attr": attr,
+        }
+        all_nix_hosts[h] = host_info
+
+        if data.get("status") == "active":
+            active_hosts[h] = host_info
             if data.get("ci") is False:
                 ci_excluded.add(h)
-    return sorted(active), ci_excluded
+
+    return all_nix_hosts, active_hosts, ci_excluded
 
 
 def run_git_cmd(cmd):
@@ -90,7 +141,6 @@ def get_commit_message():
 
 def get_changed_files(base=None, head=None, working_tree=False):
     if working_tree:
-        # Check uncommitted working tree changes (staged + unstaged)
         out = run_git_cmd(["git", "status", "--porcelain"])
         files = []
         for line in out.splitlines():
@@ -125,7 +175,7 @@ def parse_commit_directives(msg, active_hosts):
         return [], "Skipped via commit message directive ([skip ci])"
 
     if re.search(r"\[ci all\]", msg, re.IGNORECASE):
-        return active_hosts, "Explicit [ci all] directive in commit message"
+        return sorted(list(active_hosts.keys())), "Explicit [ci all] directive in commit message"
 
     match = re.search(r"\[ci[:\s]+([a-zA-Z0-9_,\s-]+)\]", msg, re.IGNORECASE)
     if match:
@@ -137,11 +187,11 @@ def parse_commit_directives(msg, active_hosts):
     return None, None
 
 
-def analyze_changed_files(files, active_hosts, ci_excluded, shared_strategy="anchor", anchor_host="frieren"):
+def analyze_changed_files(files, active_hosts, all_nix_hosts, ci_excluded, shared_strategy="anchor", anchor_host="frieren"):
     if not files:
         return [], "No files changed"
 
-    host_regex = re.compile(r"^hosts/([^/]+)/")
+    host_regex = re.compile(r"^hosts/(?:([^/]+)/|([^/]+)\.nix$)")
     non_build_regexes = [re.compile(p) for p in NON_BUILD_PATTERNS]
     shared_regexes = [re.compile(p) for p in SHARED_NIX_PATTERNS]
 
@@ -150,14 +200,12 @@ def analyze_changed_files(files, active_hosts, ci_excluded, shared_strategy="anc
     has_shared_changes = False
 
     for f in files:
-        # 1. Non-building paths
         if any(r.search(f) for r in non_build_regexes):
             continue
 
-        # 2. Host-specific paths
         m = host_regex.match(f)
         if m:
-            host = m.group(1)
+            host = m.group(1) or m.group(2)
             if host in active_hosts:
                 if host in ci_excluded:
                     skipped_policy.add(host)
@@ -167,10 +215,10 @@ def analyze_changed_files(files, active_hosts, ci_excluded, shared_strategy="anc
             elif host == "common":
                 has_shared_changes = True
                 continue
-            else:
+            elif host in all_nix_hosts:
+                # Preserved host modified; ignore
                 continue
 
-        # 3. Shared Nix paths
         if any(r.search(f) for r in shared_regexes):
             has_shared_changes = True
             continue
@@ -179,9 +227,9 @@ def analyze_changed_files(files, active_hosts, ci_excluded, shared_strategy="anc
             has_shared_changes = True
 
     if has_shared_changes:
-        eligible_active = [h for h in active_hosts if h not in ci_excluded]
+        eligible_active = [h for h in active_hosts.keys() if h not in ci_excluded]
         if shared_strategy == "all":
-            return eligible_active, "Shared Nix modules modified (strategy: all CI-eligible active hosts)"
+            return sorted(eligible_active), "Shared Nix modules modified (strategy: all CI-eligible active hosts)"
         elif shared_strategy == "none":
             return sorted(list(affected_hosts)), "Shared Nix modules modified (strategy: none; host-specific only)"
         else:
@@ -203,7 +251,7 @@ def analyze_changed_files(files, active_hosts, ci_excluded, shared_strategy="anc
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Detect affected NixOS hosts for CI")
+    parser = argparse.ArgumentParser(description="Detect affected fleet hosts across all architectures for CI")
     parser.add_argument("--base", help="Git base ref (e.g. origin/main, HEAD~1)")
     parser.add_argument("--head", default="HEAD", help="Git head ref")
     parser.add_argument("--working-tree", action="store_true", help="Inspect local uncommitted changes")
@@ -218,7 +266,7 @@ def main():
 
     args = parser.parse_args()
 
-    active_hosts, ci_excluded = load_nixos_hosts()
+    all_nix_hosts, active_hosts, ci_excluded = load_fleet_hosts()
     commit_msg = args.commit_msg or get_commit_message()
 
     directed_hosts, directive_reason = parse_commit_directives(commit_msg, active_hosts)
@@ -231,16 +279,15 @@ def main():
         targets, reason = analyze_changed_files(
             files,
             active_hosts,
+            all_nix_hosts=all_nix_hosts,
             ci_excluded=ci_excluded,
             shared_strategy=args.shared_strategy,
             anchor_host=args.anchor_host
         )
 
     has_machines = len(targets) > 0
-    matrix = {
-        "machine": targets if targets else [],
-        "os": ["ubuntu-latest"]
-    }
+    matrix_include = [active_hosts[h] for h in targets if h in active_hosts]
+    matrix = {"include": matrix_include}
 
     if args.ci:
         gh_output = os.environ.get("GITHUB_OUTPUT")
@@ -270,16 +317,16 @@ def main():
     elif args.format == "names":
         print(" ".join(targets))
     else:
-        print("=== CI Affected Hosts Analysis ===")
+        print("=== Multi-Architecture CI Affected Hosts Analysis ===")
         print(f"Reason: {reason}")
         print(f"Changed files inspected: {len(files)}")
-        if targets:
-            print("\n🟢 Hosts to build:")
-            for t in targets:
-                print(f"  - {t}")
+        if matrix_include:
+            print("\n🟢 Targets to build:")
+            for item in matrix_include:
+                print(f"  - {item['host']:<12} [{item['kind']:<6} | {item['arch']:<14}] -> runner: {item['os']:<16} ({item['attr']})")
         else:
             print("\n⚪ No hosts affected (CI build will be skipped).")
-        
+
         excluded_active = [h for h in active_hosts if h in ci_excluded]
         if excluded_active:
             print(f"\nExcluded from CI by policy ({len(excluded_active)}):")

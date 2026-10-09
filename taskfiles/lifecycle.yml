@@ -86,7 +86,7 @@ tasks:
         grep -rn "{{.HOST}}" . --include='*.nix' | grep -v flake.lock | grep -v result || echo "(none)"
         echo ""
         echo "=== .md files ==="
-        grep -rn "{{.HOST}}" . --include='*.md' | grep -v flake.lock | grep -v HANDOFF-REFACTOR | grep -v AUDIT || echo "(none)"
+        grep -rn "{{.HOST}}" . --include='*.md' | grep -v flake.lock | grep -v AUDIT || echo "(none)"
         echo ""
         echo "=== CI / YAML files ==="
         grep -rn "{{.HOST}}" . --include='*.yml' --include='*.yaml' | grep -v flake.lock || echo "(none)"

@@ -473,7 +473,6 @@ def main():
             current_host = "frieren"
         home_agents_dest = Path.home() / "AGENTS.md"
         generate_home_agents(current_host, output_path=home_agents_dest, custom_tmpl=custom_tmpl)
-        return
 
     # Combined host card + persona AGENTS.md query
     if args.home_agents:

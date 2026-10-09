@@ -338,7 +338,7 @@ constraints = ["Host is preserved/dormant; do not target for live deployment."]
 [hosts.eisen]
 hostname = "eisen"
 status = "active"
-status_detail = "In active production as the primary 12-core gaming workstation, Sunshine GameStream host, and local llama.cpp MoE LLM inference node (Qwen3.6-35B-A3B)."
+status_detail = "In active production as the primary 12-core gaming workstation, Sunshine GameStream host, and local MoE LLM node: Qwen3.6-35B-A3B under llama-swap with DFlash2 speculative decoding, served as an OpenAI /v1 API at eisen.lan (LAN) and via tailscale serve (tailnet), and auto-yielding to Steam games."
 kind = "nixos"
 arch = "x86_64-linux"
 role = "High-Core Gaming Desktop, Sunshine Stream Server & Local MoE LLM Node"
@@ -368,7 +368,10 @@ key_services = [
   "Sunshine GameStream server (Moonlight LAN host)",
   "RX 5700 VCN 2.0 hardware video encode",
   "NAS client automount",
-  "llama.cpp MoE inference server (Qwen3.6-35B-A3B, Vulkan/radv, OpenAI /v1 API on eisen.lan:80 + tailscale serve)",
+  "llama-swap model router on :8080 (OpenAI /v1 via nginx on eisen.lan:80 and tailscale serve; model 'qwen' = qwen3.6-35b-a3b)",
+  "Qwen3.6-35B-A3B on Vulkan/radv llama.cpp with DFlash2 speculative decoding (+40% decode, measured) and expert tensors kept in CPU RAM",
+  "llama-swap-gaming-guard: suspends the LLM while a Steam game runs, freeing ~21 GiB RAM + 5.4 GiB VRAM, and resumes on exit",
+  "Kolibri-1 (78B A3B, German/English) weights staged at /mnt/storage/models but not loadable: stock llama.cpp lacks the kolibri1 architecture",
 ]
 traits = [
   "12-core-24-thread",
@@ -377,7 +380,10 @@ traits = [
   "sunshine-streaming",
   "steam-gaming",
   "llm-inference",
+  "llm-model-router",
   "moe-expert-offload",
+  "speculative-decoding",
+  "game-aware-yield",
   "vulkan-compute",
 ]
 
@@ -394,6 +400,8 @@ allowed_tasks = [
 ]
 constraints = [
   "No Intel iGPU present; all display and encoding flows through the RX 5700.",
+  "While a model is loaded the LLM holds ~5.75 of 8 GiB VRAM and uses 12 of 24 threads; it auto-yields (llama-swap stops, API answers connection-refused) whenever a Steam game runs.",
+  "First request after 15 min idle reloads a 21 GiB GGUF (about 2 minutes); do not set short client timeouts.",
 ]
 
 [hosts.aristotle]

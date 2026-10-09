@@ -49,6 +49,16 @@
         '';
       };
     };
+
+    envFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = ''
+        Absolute path to a dotenv file loaded into the gateway unit via
+        EnvironmentFile (e.g. the sops-rendered /run/secrets/rendered/hermes.env).
+        Null leaves credential loading entirely to hermes' own $HERMES_HOME/.env.
+      '';
+    };
   };
 
   config = lib.mkIf (config.programs.hermes-user.enable && (config.profiles.ai.enable or true)) {
@@ -220,6 +230,11 @@
         Type = "simple";
         ExecStart = "${pkgs.llm-agents.hermes-agent}/bin/hermes gateway run";
         WorkingDirectory = "${config.home.homeDirectory}/.hermes";
+        # Inject the sops-rendered credential file directly into the unit so
+        # the gateway never depends on the ~/.hermes/.env bridge symlink
+        # being present at start time. "-" tolerates a missing file.
+        EnvironmentFile = lib.mkIf (config.programs.hermes-user.envFile != null)
+          "-${config.programs.hermes-user.envFile}";
         Environment = [
           "HERMES_HOME=${config.home.homeDirectory}/.hermes"
           "HERMES_SUPERVISED_CHILD=1"

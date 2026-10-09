@@ -56,6 +56,31 @@ Shared per-model flags:
 - **`q8_0` KV cache + `--flash-attn on`** keep the attention working set inside 8 GiB.
 - **`--jinja`** is required for the models' tool-call / chat templates.
 
+### Speculative Decoding (Qwen only, measured)
+
+`qwen3.6-35b-a3b` runs with a **DFlash2** block-diffusion draft head (`aminya/Qwen3.6-35B-A3B-DFlash2-GGUF`, Q8_0, 570 MB) fully resident in VRAM:
+
+```
+--spec-draft-model /mnt/storage/models/Qwen3.6-35B-A3B-DFlash2-Q8_0.gguf
+--spec-type draft-dflash --spec-draft-n-max 7 --spec-draft-ngl 99
+```
+
+Same prompt, same base flags, 256-token generation, measured on eisen:
+
+| Speculation | tok/s | vs baseline |
+| :--- | ---: | ---: |
+| none (baseline) | 13.54 | — |
+| `draft-dflash` (README defaults) | 18.38 | **+36%** |
+| `draft-dflash` + `--spec-draft-ngl 99` | **19.02** | **+40%** |
+
+Draft acceptance 196/408 tokens (48%). Through the deployed API the same run measures **18.0 tok/s**, so the gain survives the llama-swap/nginx layer.
+
+What does **not** work here — recorded so it is not re-litigated:
+
+- **No small Qwen3 draft (0.6B/1.7B/4B) can be used.** Qwen3.6's tokenizer is **248,320** tokens vs Qwen3's ~152k, so llama.cpp refuses the pair (`tokenizer.json` 12,807,982 B / sha `5f9e4d49…` vs 11,422,654 B / sha `aeb13307…`). Qwen3.6-35B-A3B has no small dense sibling at all.
+- **n-gram speculation is a wash on this workload:** `ngram-simple` 13.79, `ngram-map-k4v` 13.52, `ngram-cache` 12.54 tok/s against a 13.76 baseline — free-form reasoning and code leave it nothing to copy.
+- **Kolibri-1 has no draft head**, so it runs at the plain baseline rate.
+
 ### Model Weights (fetched, not vendored)
 
 Both GGUFs live on the persistent `/mnt/storage` array and are fetched by two idempotent, resumable oneshot units:
@@ -64,6 +89,7 @@ Both GGUFs live on the persistent `/mnt/storage` array and are fetched by two id
 | :--- | :--- | ---: | :--- |
 | `eisen-llm-qwen` | `Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf` | 22,285,080,192 | `bartowski/Qwen_Qwen3.6-35B-A3B-GGUF` |
 | `eisen-llm-kolibri` | `Kolibri-1-Q4_K_M.gguf` | 47,454,113,472 | `Hob-forge/Kolibri-1-GGUF` |
+| `eisen-llm-dflash` | `Qwen3.6-35B-A3B-DFlash2-Q8_0.gguf` | 570,468,544 | `aminya/Qwen3.6-35B-A3B-DFlash2-GGUF` (Qwen's draft head) |
 
 Both use `unitConfig.ConditionPathExists = "!<file>"` and `curl -fL --retry 5 -C -` into `<file>.part`, then `mv` into place — so they no-op once the weights exist and resume a partial `.part` if interrupted. `llama-swap` is ordered `after`/`wants` both units plus `mnt-storage.mount`.
 
@@ -76,11 +102,30 @@ Both use `unitConfig.ConditionPathExists = "!<file>"` and `curl -fL --retry 5 -C
 | Model | Total / Active | Quant | Aliases | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | 🌟 **Qwen3.6-35B-A3B** | 35B / **~3B** | `Q4_K_M` (22.5 GB) | `qwen3.6-35b-a3b`, `qwen` | Primary champion: 2026 agentic coding/thinking-preservation MoE. Whole expert pool fits with ~40 GiB RAM to spare. |
-| **Aleph-Alpha Kolibri-1** | 78B / **3.46B** | `Q4_K_M` (44.2 GB) | `kolibri-1`, `kolibri`, `aleph` | German + English MoE (Apache 2.0, ctx up to 262144). Higher quality, tighter fit — needs the swap/TTL to free Qwen first. |
+| **Aleph-Alpha Kolibri-1** | 78B / **3.46B** | `Q4_K_M` (44.2 GB) | `kolibri-1`, `kolibri`, `aleph` | German + English MoE (Apache 2.0, ctx up to 262144). Wired up and installed, but **not yet loadable — see below**. |
 
 Larger Kolibri quants exist (`Q3_K_M` ≈ 37.5 GB, `Q5_K_M` split in two parts) but `Q4_K_M` is the best fit for 62 GiB alongside the OS and Steam.
 
 Also evaluated and rejected for this box: dense 32B (`Qwen2.5-Coder-32B`, ~8–14 tok/s — no active-parameter win), `Phi-3.5-MoE-Instruct` (6.6B active, worse RAM/speed tradeoff).
+
+### Kolibri-1 is blocked on llama.cpp, not on this configuration
+
+Weights, fetch unit, aliases and the llama-swap entry are all in place and correct, but **stock llama.cpp cannot load it**:
+
+```
+E llama_model_load: error loading model: unknown model architecture: 'kolibri1'
+```
+
+so a request for the `kolibri` alias fails with HTTP 500 in ~0.4 s (`llama-swap: upstream command exited prematurely`).
+
+This is an upstream gap, not a misconfiguration: the GGUF card states outright that stock llama.cpp does not support the `kolibri1` architecture yet and ships `kolibri1-llama.cpp.patch` (against upstream `836d571`); Ollama and LM Studio are in the same position. To enable it, build `llama-cpp` with that patch (an overlay/override carrying the patch), then re-test:
+
+```bash
+curl -s http://eisen.lan/v1/chat/completions -H 'Content-Type: application/json' \
+  -d '{"model":"kolibri","messages":[{"role":"user","content":"Sag hallo."}]}'
+```
+
+Until then use `qwen`. Note the 44 GiB Kolibri GGUF is already resident on `/mnt/storage` holding space for a model that cannot load yet — worth deleting if that space is needed before llama.cpp catches up.
 
 ---
 
@@ -104,6 +149,16 @@ It intentionally resolves to the **tailnet** IP, so the same name works on-LAN a
 
 ---
 
+## Gaming Coexistence (auto-yield)
+
+eisen is a gaming desktop first, so `llama-swap-gaming-guard.service` **stops `llama-swap` while a Steam game is running** and restarts it when the game exits. That returns the model's RAM (21 GiB Qwen / 44 GiB Kolibri) and its ~2.65 GiB of VRAM to the game; while yielded, the API answers connection-refused rather than leaving a half-starved model fighting the game for VRAM.
+
+A game is detected as **any process whose executable lives under a Steam library's `steamapps/common/`** (covers native, Proton and SteamLinuxRuntime-container games alike). Gamescope and `gamescopereaper` are deliberately **not** used as signals — both run permanently here (the Steam tenfoot kiosk session), so they would suspend the LLM forever.
+
+Verified on 2026-10-09: no false positive with Steam idle and the full game library installed, and a simulated game (a binary run from `steamapps/common/`) made the guard log `game detected - yielding, stopping llama-swap` and stop the unit within ~15 s, then resume it on exit.
+
+---
+
 ## Measured Performance (2026-10-09, generation 10)
 
 First real completions after the initial switch, all served through the declarative stack (llama-swap → nginx / tailscale serve):
@@ -112,7 +167,7 @@ First real completions after the initial switch, all served through the declarat
 | :--- | :--- |
 | Cold request (includes loading the 20.8 GiB GGUF) | **2m 00s** |
 | Warm request, same model | **1.2–1.4 s** |
-| Steady-state decode, Qwen3.6-35B-A3B Q4_K_M | **12.7–13.8 tok/s** |
+| Steady-state decode, Qwen3.6-35B-A3B Q4_K_M | **12.7–13.8 tok/s** (18.0 with DFlash2) |
 | Prompt processing | 14–30 tok/s |
 | GPU VRAM in use while decoding | **2.65 GiB of 7.98 GiB** |
 

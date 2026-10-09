@@ -49,6 +49,39 @@
     exit 1
   '';
 
+  # A Steam game is recognised by a process whose executable lives under a
+  # Steam library's steamapps/common/. See the unit below for why gamescope
+  # and gamescopereaper cannot be used as "is a game running" signals here.
+  gamingGuard = pkgs.writeShellScript "llama-swap-gaming-guard" ''
+    set -eu
+    gaming() {
+      local p t
+      for p in /proc/[0-9]*/exe; do
+        t=$(readlink "$p" 2>/dev/null) || continue
+        case "$t" in
+          */steamapps/common/*) return 0 ;;
+        esac
+      done
+      return 1
+    }
+
+    suspended=0
+    while true; do
+      if gaming; then
+        if [ "$suspended" = 0 ]; then
+          echo "game detected - yielding, stopping llama-swap"
+          systemctl stop llama-swap.service || true
+          suspended=1
+        fi
+      elif [ "$suspended" = 1 ]; then
+        echo "game exited - resuming llama-swap"
+        systemctl start llama-swap.service || true
+        suspended=0
+      fi
+      sleep 15
+    done
+  '';
+
   qwenName = "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf";
   qwenFile = "${modelDir}/${qwenName}";
   qwenUrl = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/${qwenName}";
@@ -61,12 +94,40 @@
   # supported compute path. Cached in the binary cache (no source build).
   llama = pkgs.llama-cpp.override {vulkanSupport = true;};
 
+  # DFlash2 speculative-decoding head for Qwen: a block-diffusion drafter
+  # trained for this exact target (vocab 248320, matching) that is verified by
+  # the target, so output distribution is unchanged. Measured on eisen on a
+  # 256-token generation: 13.5 -> 19.0 tok/s (+40%), 48% draft acceptance, head
+  # fully resident in VRAM. Kolibri-1 has no equivalent head, and borrowing one
+  # is impossible — Qwen3's 152k vocab does not match Qwen3.6's 248k, so a
+  # cross-family draft fails to load. n-gram speculation (`--spec-type
+  # ngram-*`) was also measured here and is a wash (12.5–13.8 tok/s), i.e. no
+  # self-repetition to exploit on this workload.
+  dflashName = "Qwen3.6-35B-A3B-DFlash2-Q8_0.gguf";
+  dflashFile = "${modelDir}/${dflashName}";
+  dflashUrl = "https://huggingface.co/aminya/Qwen3.6-35B-A3B-DFlash2-GGUF/resolve/main/${dflashName}";
+  dflashFlags = "--spec-draft-model ${dflashFile} --spec-type draft-dflash --spec-draft-n-max 7 --spec-draft-ngl 99";
+
   # llama-swap substitutes ${PORT} with a free port before exec'ing the server.
-  mkCmd = model: alias:
+  mkCmd = {
+    model,
+    alias,
+    spec ? "",
+  }:
     "${lib.getExe' llama "llama-server"} --host 127.0.0.1 --port \${PORT} "
     + "--model ${model} --alias ${alias} --threads 12 --ctx-size 32768 "
     + "--flash-attn on --jinja --metrics --n-gpu-layers 99 "
-    + "--override-tensor exps=CPU --cache-type-k q8_0 --cache-type-v q8_0";
+    + "--override-tensor exps=CPU --cache-type-k q8_0 --cache-type-v q8_0 "
+    + spec;
+
+  # NOTE — Kolibri-1 does not currently load: this nixpkgs' llama-cpp (0.5.0)
+  # reports "unknown model architecture: 'kolibri1'" and exits, so a request for
+  # the `kolibri` alias returns HTTP 500. The weights and the entry are kept
+  # because the wiring is correct and it will start working as soon as the
+  # pinned llama-cpp learns the architecture (or `llama` is overridden to a
+  # newer revision); re-test with:
+  #   curl -s $EP/v1/chat/completions -d '{"model":"kolibri",...}'
+  # See .agents/deploy/hosts/eisen.md for the evidence and the patch route.
 
   # Idempotent, resumable weight fetch — runs only when the GGUF is absent.
   mkFetch = {
@@ -103,17 +164,23 @@ in {
     file = kolibriFile;
     url = kolibriUrl;
   };
+  systemd.services."eisen-llm-dflash" = mkFetch {
+    file = dflashFile;
+    url = dflashUrl;
+  };
 
   # Weights and the storage mount must exist before llama-swap accepts traffic.
   systemd.services.llama-swap = {
     after = [
       "eisen-llm-qwen.service"
       "eisen-llm-kolibri.service"
+      "eisen-llm-dflash.service"
       "mnt-storage.mount"
     ];
     wants = [
       "eisen-llm-qwen.service"
       "eisen-llm-kolibri.service"
+      "eisen-llm-dflash.service"
     ];
   };
 
@@ -128,14 +195,48 @@ in {
       ttl = 900;
       models = {
         "qwen3.6-35b-a3b" = {
-          cmd = mkCmd qwenFile "qwen3.6-35b-a3b";
+          cmd = mkCmd {
+            model = qwenFile;
+            alias = "qwen3.6-35b-a3b";
+            spec = dflashFlags;
+          };
           aliases = ["qwen"];
         };
         "kolibri-1" = {
-          cmd = mkCmd kolibriFile "kolibri-1";
+          cmd = mkCmd {
+            model = kolibriFile;
+            alias = "kolibri-1";
+          };
           aliases = ["kolibri" "aleph"];
         };
       };
+    };
+  };
+
+  # --- Auto-yield to gaming ------------------------------------------------
+  #
+  # eisen is a gaming desktop first. Gamescope and gamescopereaper are ALWAYS
+  # running here (the Steam tenfoot kiosk session), so neither is a usable
+  # "is a game running" signal — using them would suspend the LLM permanently.
+  # The reliable signal is a process whose executable lives under a Steam
+  # library's steamapps/common/, which covers native, Proton and
+  # SteamLinuxRuntime-container games alike, and leaves the LLM alone when
+  # only Steam itself is idle in the background.
+  #
+  # On detection llama-swap is stopped outright rather than left holding a
+  # half-starved model: that returns the model's RAM (21 GiB Qwen, 44 GiB
+  # Kolibri) and its ~2.65 GiB of VRAM to the game, and the API answers
+  # connection-refused until the game exits — an honest "yielded to gaming"
+  # instead of a model quietly competing for VRAM.
+  systemd.services."llama-swap-gaming-guard" = {
+    description = "Suspend the LLM while a Steam game is running";
+    after = ["llama-swap.service"];
+    wantedBy = ["multi-user.target"];
+    path = [config.systemd.package pkgs.coreutils];
+    serviceConfig = {
+      ExecStart = gamingGuard;
+      Restart = "always";
+      RestartSec = 10;
     };
   };
 

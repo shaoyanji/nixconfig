@@ -174,7 +174,7 @@ tasks:
   infra:warm:cache:
     desc: Build every fleet host closure locally so harmonia serves them at LAN speed (UPDATE=1 also refreshes flake.lock)
     vars:
-      HOSTS: '{{.HOSTS | default "poseidon frieren eisen fern stark scratch schneeeule ares mtfuji kellerbench deckstation applevalley minyx guckloch aristotle aceofspades ancientace"}}'
+      HOSTS: '{{.HOSTS | default "frieren poseidon eisen fern stark scratch guckloch"}}'
       UPDATE: '{{.UPDATE | default "0"}}'
     cmds:
       - |
@@ -213,7 +213,7 @@ tasks:
   infra:apply:fleet:
     desc: Apply to many hosts in parallel (HOSTS="h1 h2", default = deployable NixOS fleet)
     vars:
-      HOSTS: '{{.HOSTS | default "poseidon frieren eisen fern stark scratch schneeeule ares mtfuji kellerbench deckstation applevalley minyx guckloch aristotle aceofspades ancientace"}}'
+      HOSTS: '{{.HOSTS | default "frieren poseidon eisen fern stark scratch guckloch"}}'
     cmds:
       - |
         # Fan out one nixos-rebuild per host; each host builds locally on

@@ -249,9 +249,10 @@ to prevent.
 | 03:00                   | `agy-nightly-handoff` (user)           | executes `~/HANDOFF.md` via `agy`, then deletes it             |
 | 03:00                   | `postgresqlBackup-immich`              | local                                                          |
 | 03:30 (+10m jitter)     | `restic-backups-frieren-local`         | local                                                          |
-| Sun 01:30 (+30m jitter) | `fleet-warm-cache`                     | **`github:shaoyanji/nixconfig`** — builds all 18 host closures |
+| Sun 01:30 (+30m jitter) | `fleet-warm-cache`                     | **`github:shaoyanji/nixconfig`** — builds 7 active host closures |
 | 04:00                   | `nixos-upgrade` (`system.autoUpgrade`) | **`github:shaoyanji/nixconfig#frieren`**                       |
 | 05:00                   | `agy-nightly-system` (user)            | executes `~/SYSTEM.md` via `agy` (mem peak ~4.2 GB)            |
+| Sun 06:00               | `nix-optimise`                         | weekly hardlink deduplication across live store paths          |
 
 **The origin-vs-local trap (this is the one that bites):**
 `system.autoUpgrade` builds from the **pushed GitHub flake**, not

@@ -71,14 +71,14 @@
         automatic = true;
       }
       // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-        dates = [ "*-*-01 03:45" ];
+        dates = [ "Sun 06:00" ];
       }
       // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
         interval = [
           {
-            Day = 1;
-            Hour = 3;
-            Minute = 45;
+            Weekday = 7;
+            Hour = 6;
+            Minute = 0;
           }
         ];
       };

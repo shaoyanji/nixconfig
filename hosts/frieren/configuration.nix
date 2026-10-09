@@ -26,9 +26,7 @@
     set -u
     fail=0
     for h in \
-      poseidon eisen fern stark scratch schneeeule ares \
-      mtfuji kellerbench deckstation applevalley minyx \
-      guckloch netbook aristotle aceofspades ancientace frieren
+      frieren poseidon eisen fern stark scratch guckloch
     do
       echo "==> warming: $h"
       ${pkgs.nix}/bin/nix --extra-experimental-features "nix-command flakes" build \

@@ -1,12 +1,16 @@
-{lib, ...}: {
+{ config
+, lib
+, pkgs
+, ...
+}: {
   # Tailnet DNS should stay manually managed after deployment:
   # sudo tailscale up --accept-dns=false
   services.tailscale.enable = true;
 
   # Ensure tailscaled starts on boot with network ready
   systemd.services.tailscaled = {
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
   };
 
   # Serve the NAS web portal (pdf./photos./media.frieren.lan vhosts on
@@ -27,7 +31,7 @@
   # (services.resolved.extraConfig was removed upstream; use settings.Resolve)
   services.resolved.settings.Resolve = {
     DNSStubListener = "no";
-    Domains = ["~frieren.lan"];
+    Domains = [ "~frieren.lan" ];
   };
 
   # Point the host resolver at FTL instead of the router:
@@ -45,22 +49,32 @@
 
   # pihole-ftl references tailscale0 interface, must wait for tailscaled
   systemd.services.pihole-ftl = {
-    after = ["tailscaled.service"];
+    after = [ "tailscaled.service" ];
   };
   systemd.services.pihole-ftl-setup = {
     after = [
       "tailscaled.service"
       "pihole-ftl.service"
     ];
-    wants = ["pihole-ftl.service"];
+    wants = [ "pihole-ftl.service" ];
+  };
+
+  # Work around upstream nixpkgs pihole-ftl queryLogDeleter systemd %s specifier expansion bug:
+  # Systemd expands '%s' to the user's shell (/run/current-system/sw/bin/bash).
+  # Use '%%s' so systemd passes a literal '%s' to sqlite3.
+  systemd.services.pihole-ftl-log-deleter = {
+    serviceConfig.ExecStart = lib.mkForce [
+      "${pkgs.coreutils}/bin/echo 'Deleting query logs older than 7 days'"
+      "${config.services.pihole-ftl.package}/bin/pihole-FTL sqlite3 '${config.services.pihole-ftl.settings.files.database}' 'DELETE FROM query_storage WHERE timestamp <= CAST(strftime('%%s', date('now', '-7 day')) AS INT); select changes() from query_storage limit 1'"
+    ];
   };
 
   services.unbound = {
     enable = true;
     resolveLocalQueries = false;
     settings.server = {
-      interface = ["127.0.0.1@5335"];
-      access-control = ["127.0.0.0/8 allow"];
+      interface = [ "127.0.0.1@5335" ];
+      access-control = [ "127.0.0.0/8 allow" ];
     };
   };
 
@@ -85,7 +99,7 @@
     settings = {
       dns = {
         queryLogging = true;
-        upstreams = ["127.0.0.1#5335"];
+        upstreams = [ "127.0.0.1#5335" ];
         # listeningMode = "LOCAL";
         listeningMode = "ALL";
         interface = "enp1s0";
@@ -116,7 +130,7 @@
 
   services.pihole-web = {
     enable = true;
-    ports = [8080];
+    ports = [ 8080 ];
   };
   networking.firewall.interfaces.enp1s0 = {
     allowedUDPPorts = [
@@ -124,11 +138,11 @@
       67 # DHCP-proxy replies to PXE clients (FritzBox still owns leases)
       4011 # legacy BIOS ProxyDHCP
     ];
-    allowedTCPPorts = [53];
+    allowedTCPPorts = [ 53 ];
   };
   # Allow DNS queries from Tailscale network
   networking.firewall.interfaces.tailscale0 = {
-    allowedUDPPorts = [53];
-    allowedTCPPorts = [53];
+    allowedUDPPorts = [ 53 ];
+    allowedTCPPorts = [ 53 ];
   };
 }

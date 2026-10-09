@@ -38,9 +38,8 @@
     ]
   },
   {
-    "title": "Codex & maintenance",
+    "title": "Maintenance",
     "pages": [
-      {"label": "Codex handoff", "src": "docs/codex-handoff.md", "slug": "/codex-handoff/"},
       {"label": "TODO", "src": "TODO.md", "slug": "/todo/"}
     ]
   }

@@ -21,8 +21,8 @@ When an AI agent or developer session initializes from the home directory (`$HOM
    - `~/Taskfile.yml` includes `~/Documents/nixconfig/Taskfile.yml` with `dir: ~/Documents/nixconfig` and `flatten: true`.
    - Running `task <cmd>` in `$HOME` (or `task -g <cmd>` globally) executes immediately against the repository with correct working directory context. Speculative path discovery or tool calls are unnecessary.
 3. **Agent Guidance & Skills Materialization**:
-   - Home Manager module `modules/user/ai/codex.nix` materializes `~/.agents/` (`~/.agents/skills/`, `~/.agents/deploy/`, `~/.agents/README.md`) directly into `$HOME`.
-   - The canonical operational manual is `AGENTS.md` (mirrored to `~/AGENTS.md`). Operational documentation and the agent manual are one and the same.
+   - `~/.agents/` (`~/.agents/skills/`, `~/.agents/deploy/`, `~/.agents/README.md`) provides guidance and skill shards.
+   - The canonical fleet operational manual is `AGENTS.md`. The local host system card + persona is compiled into `~/AGENTS.md` via `task dev:inventory:home-agents` (or `hermes-user.nix`).
 4. **Secrets & SOPS State**:
    - Encrypted secrets live in `modules/secrets.yaml` (mirrored from the private `modules/secrets/` submodule).
    - Host and user age keys are registered in `.sops.yaml` and loaded from `~/.config/sops/age/keys.txt`.
@@ -52,15 +52,15 @@ flake.nix → flake/outputs.nix (hub)
 
 ### Module Chains (defined in `flake/module-sets.nix`)
 
-| Chain | What it includes | Used by |
-|-------|-----------------|---------|
-| `globalModulesNixos` | global + nixos + home-manager-shared + sops + nix-index + dms + dank-greeter (desktop) | poseidon, aristotle, aceofspades, ancientace, eisen, frieren, scratch, stark, fern |
-| `globalModulesImpermanence` | globalModulesNixos + impermanence + disko | schneeeule |
-| containers + impermanence (ares) | globalModulesContainers + impermanence + disko | ares (Steam kiosk) |
-| `globalModulesContainers` | global + noDE + sops + home-manager + nix-index (no dms/niri desktop) | mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), deckstation |
-| `globalModulesMacos` | global + macos + nix-homebrew + home-manager + sops | cassini (darwin) |
-| `globalModulesDemo` | global + demo + home-manager (no sops) | demo (NixOS demo VM) |
-| `globalModulesHome` | standalone HM sharedModules + allowUnfree | penguin, alarm, kali (standalone home-manager) |
+| Chain                            | What it includes                                                                       | Used by                                                                            |
+| -------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `globalModulesNixos`             | global + nixos + home-manager-shared + sops + nix-index + dms + dank-greeter (desktop) | poseidon, aristotle, aceofspades, ancientace, eisen, frieren, scratch, stark, fern |
+| `globalModulesImpermanence`      | globalModulesNixos + impermanence + disko                                              | schneeeule                                                                         |
+| containers + impermanence (ares) | globalModulesContainers + impermanence + disko                                         | ares (Steam kiosk)                                                                 |
+| `globalModulesContainers`        | global + noDE + sops + home-manager + nix-index (no dms/niri desktop)                  | mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), deckstation |
+| `globalModulesMacos`             | global + macos + nix-homebrew + home-manager + sops                                    | cassini (darwin)                                                                   |
+| `globalModulesDemo`              | global + demo + home-manager (no sops)                                                 | demo (NixOS demo VM)                                                               |
+| `globalModulesHome`              | standalone HM sharedModules + allowUnfree                                              | penguin, alarm, kali (standalone home-manager)                                     |
 
 ### Complete Client OS Fleet Inventory (`flake/host-inventory.nix`)
 
@@ -143,6 +143,7 @@ modules/
 ### Packages
 
 Custom packages built from the flake:
+
 - (none — the `pkgs/` directory and agent-era packages were removed in 2026-09/10; the `packages` output is `{}`)
 
 ---
@@ -178,21 +179,27 @@ task infra:rebuild:home-manager  # home-manager switch (local) + refresh ~/Taskf
 ### Client OS Maintenance & Debugging Runbooks
 
 #### 1. Dry Run & Evaluation
+
 Before deploying changes to any client OS, evaluate its configuration:
+
 ```bash
 task infra:plan:host:<host>                                        # Dry-run evaluation and closure build
 nix eval .#nixosConfigurations.<host>.config.networking.hostName   # Fast eval smoke test
 ```
 
 #### 2. Deploying Remote Hosts
+
 Apply configurations over SSH:
+
 ```bash
 task infra:deploy:host:<host>    # Plan + apply + validate
 task infra:apply:host:<host>     # Apply closure directly
 ```
 
 #### 3. Remote Log & Service Inspection
+
 Diagnose failing units or check live output:
+
 ```bash
 task infra:logs:host:<host> UNIT=<unit>   # Tail journald for UNIT (defaults to go-backend)
 ssh <host> systemctl status <unit>        # Inspect unit status on remote host
@@ -200,7 +207,9 @@ ssh <host> journalctl -b -p err           # View system errors from current boot
 ```
 
 #### 4. Rollback Runbook
+
 If a deployment degrades a host:
+
 ```bash
 task infra:rollback:host:<host>           # Roll back remote host generation
 # For local recovery:
@@ -208,7 +217,9 @@ sudo nixos-rebuild --rollback switch      # Local NixOS rollback
 ```
 
 #### 5. NAS Client Automount Recovery (fern & clients)
+
 If `/Volumes/data` fails to mount due to early-boot network timing (causing `StartLimitBurst` hit):
+
 ```bash
 nas-recover                               # Canonical recovery tool
 # Or manually restart the automount unit:
@@ -216,7 +227,9 @@ sudo systemctl restart Volumes-data.automount
 ```
 
 #### 6. SOPS Secrets & Key Verification
+
 Verify decryption across all hosts and rotate recipient keys:
+
 ```bash
 scripts/task/sops-drift-check.sh          # Verify all encrypted files decrypt cleanly
 task infra:sops:update-keys               # Rekey all files when .sops.yaml changes
@@ -231,14 +244,14 @@ to prevent.
 
 **Nightly job matrix (all timers `Persistent = true`):**
 
-| Time | Unit | Source of truth |
-|------|------|-----------------|
-| 03:00 | `agy-nightly-handoff` (user) | executes `~/HANDOFF.md` via `agy`, then deletes it |
-| 03:00 | `postgresqlBackup-immich` | local |
-| 03:30 (+10m jitter) | `restic-backups-frieren-local` | local |
-| Sun 01:30 (+30m jitter) | `fleet-warm-cache` | **`github:shaoyanji/nixconfig`** — builds all 18 host closures |
-| 04:00 | `nixos-upgrade` (`system.autoUpgrade`) | **`github:shaoyanji/nixconfig#frieren`** |
-| 05:00 | `agy-nightly-system` (user) | executes `~/SYSTEM.md` via `agy` (mem peak ~4.2 GB) |
+| Time                    | Unit                                   | Source of truth                                                |
+| ----------------------- | -------------------------------------- | -------------------------------------------------------------- |
+| 03:00                   | `agy-nightly-handoff` (user)           | executes `~/HANDOFF.md` via `agy`, then deletes it             |
+| 03:00                   | `postgresqlBackup-immich`              | local                                                          |
+| 03:30 (+10m jitter)     | `restic-backups-frieren-local`         | local                                                          |
+| Sun 01:30 (+30m jitter) | `fleet-warm-cache`                     | **`github:shaoyanji/nixconfig`** — builds all 18 host closures |
+| 04:00                   | `nixos-upgrade` (`system.autoUpgrade`) | **`github:shaoyanji/nixconfig#frieren`**                       |
+| 05:00                   | `agy-nightly-system` (user)            | executes `~/SYSTEM.md` via `agy` (mem peak ~4.2 GB)            |
 
 **The origin-vs-local trap (this is the one that bites):**
 `system.autoUpgrade` builds from the **pushed GitHub flake**, not
@@ -246,15 +259,17 @@ to prevent.
 dirty tree is therefore **silently reverted by the next 04:00 run** unless the
 change is committed **and pushed**. A local switch that produced no new
 generation usually means exactly this. Confirm what the 04:00 run used:
+
 ```bash
 journalctl -u nixos-upgrade -n 40 --no-pager | grep -E 'unpacking|new configuration'
 git -C /Volumes/data/projects/nixconfig rev-parse HEAD     # must match the unpacked rev
 ```
 
 **Rebuild rules:**
+
 1. **At most one `nixos-rebuild` at a time.** Never retry-loop it — six
    concurrent attempts is what caused the 2026-10-07 06:46 incident. If it
-   seems slow, *measure* progress (next point) before touching anything.
+   seems slow, _measure_ progress (next point) before touching anything.
 2. **After a dirty `flake.lock` bump the closure is re-fetched, not rebuilt.**
    A nixpkgs rev change invalidates every store hash, so expect a multi-GB
    download (tens of minutes on this host). It is not hung. Watch it:
@@ -305,8 +320,8 @@ git -C /Volumes/data/projects/nixconfig rev-parse HEAD     # must match the unpa
   unit in `modules/user/ai/hermes-user.nix`. Full checklist in
   `.agents/deploy/hosts/frieren.md`.
 - **SSH CA:** every host (incl. frieren) can sign certs — `ssh.ca.enableClient`
-  + `rotate-ssh-cert` (1-week user certs, CA key via sops-nix at
-  `~/.ssh/user_ca_key`).
+  - `rotate-ssh-cert` (1-week user certs, CA key via sops-nix at
+    `~/.ssh/user_ca_key`).
 
 ### Git & Flake
 
@@ -374,8 +389,8 @@ Verification must be proportional to the change — never eval as a ritual:
 4. **Never build without cause.** `nix eval` suffices for config validity;
    reserve `nix build`/`infra:plan` for changes that alter the closure
    (packages, kernels, services) and say so before running.
-```
 
+````
 ### Secrets & SOPS
 
 ```bash
@@ -385,7 +400,7 @@ task infra:secrets:edit:taskfile # Edit encrypted Taskfile
 task infra:sops:get:*            # Query a secret value
 task infra:sops:fzf              # Select env entries interactively
 task infra:sops:update-keys      # Rotate SOPS recipient keys
-```
+````
 
 ### SMTP Auth
 
@@ -438,24 +453,24 @@ The persistent network storage is hosted on the primary 24/7 server `frieren` at
 
 ### Canonical Storage Layout
 
-| Path (`/srv/data/` / `/Volumes/data/`) | Role & Purpose | Indexing & Access Policy |
-|---------------------------------------|----------------|--------------------------|
-| `arr/` | Movies and TV series | **Indexed by Jellyfin & Plex**. Strictly clean video containers (`.mkv`, `.mp4`). No archives, software installers, or ISOs. |
-| `media/` | Primary media library mirror | Legacy and direct media storage. |
-| `software/` | Software installers, desktop utilities, fonts, tools | **Unindexed**. Contains `software/torrents/` (software downloads moved out of `arr/`) shielded with `.nomedia` and `.plexignore` to prevent media scanner probe failures. |
-| `books/` | Books, papers, theses, comics | Unindexed by video media servers; indexed by document search (`qmd`). Organized into `programming/`, `philosophy/`, `ai/`, `science/`, `comics/`. |
-| `isos/` | Operating system images and installers | Linux (`arch`, `nixos`, `ubuntu`, `fedora`), appliances (`opnsense`, `openwrt`), and Raspberry Pi images. |
-| `german/` | Language learning materials | Organized into `books/`, `audio/`, and `notes/`. |
-| `devices/` | Device firmwares and recovery ROMs | Hardware payloads (e.g. OnePlus 6 recovery tools). |
-| `projects/` | Cloned git repositories and source projects | Active code checkouts (e.g. `nixconfig`, `bountystash-web`, `gpt2099.nu`). |
-| `bin-x86/`, `bin-aarch64/`, `bin-script/` | Lazily served standalone binaries & scripts | Accessible directly across the fleet over NFS/HTTP without building Nix derivations. |
-| `appimages/` | Lazily served AppImages | Portable Linux applications served across the network. |
-| `downloads/` | Active aria2 RPC staging directory | Permissions `0775 aria2:users`. Kept clean as an ephemeral staging area; finished downloads are sorted to their target taxonomy folder. |
-| `p/zhuomin` | User's father's archives | **Private**: Permissions strictly enforced at `0700 devji:users`. Preserved intact for private review. Shielded with `.nomedia`. |
-| `p/ppp` | User's private adult stash | **Private**: Permissions `0700 devji:users`. Fully shielded with `.nomedia` and `.plexignore` so Jellyfin/Plex do not scan it. |
-| `p/web` | Backward-compatibility symlink | Symlink pointing to `/srv/data/projects/bountystash-web`. |
-| `security/` | Credentials, recovery keys, certificates | **Restricted**: Permissions strictly `0700 devji:users` (`0600` for private files). Never exposed to network guests. |
-| `storage/` | Backward-compatibility symlink | Points to `.` (the data root) so legacy paths like `/Volumes/data/storage/...` resolve seamlessly. |
+| Path (`/srv/data/` / `/Volumes/data/`)    | Role & Purpose                                       | Indexing & Access Policy                                                                                                                                                  |
+| ----------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `arr/`                                    | Movies and TV series                                 | **Indexed by Jellyfin & Plex**. Strictly clean video containers (`.mkv`, `.mp4`). No archives, software installers, or ISOs.                                              |
+| `media/`                                  | Primary media library mirror                         | Legacy and direct media storage.                                                                                                                                          |
+| `software/`                               | Software installers, desktop utilities, fonts, tools | **Unindexed**. Contains `software/torrents/` (software downloads moved out of `arr/`) shielded with `.nomedia` and `.plexignore` to prevent media scanner probe failures. |
+| `books/`                                  | Books, papers, theses, comics                        | Unindexed by video media servers; indexed by document search (`qmd`). Organized into `programming/`, `philosophy/`, `ai/`, `science/`, `comics/`.                         |
+| `isos/`                                   | Operating system images and installers               | Linux (`arch`, `nixos`, `ubuntu`, `fedora`), appliances (`opnsense`, `openwrt`), and Raspberry Pi images.                                                                 |
+| `german/`                                 | Language learning materials                          | Organized into `books/`, `audio/`, and `notes/`.                                                                                                                          |
+| `devices/`                                | Device firmwares and recovery ROMs                   | Hardware payloads (e.g. OnePlus 6 recovery tools).                                                                                                                        |
+| `projects/`                               | Cloned git repositories and source projects          | Active code checkouts (e.g. `nixconfig`, `bountystash-web`, `gpt2099.nu`).                                                                                                |
+| `bin-x86/`, `bin-aarch64/`, `bin-script/` | Lazily served standalone binaries & scripts          | Accessible directly across the fleet over NFS/HTTP without building Nix derivations.                                                                                      |
+| `appimages/`                              | Lazily served AppImages                              | Portable Linux applications served across the network.                                                                                                                    |
+| `downloads/`                              | Active aria2 RPC staging directory                   | Permissions `0775 aria2:users`. Kept clean as an ephemeral staging area; finished downloads are sorted to their target taxonomy folder.                                   |
+| `p/zhuomin`                               | User's archives                                      | **Private**: Permissions strictly enforced at `0700 devji:users`. Preserved intact for private review. Shielded with `.nomedia`.                                          |
+| `p/ppp`                                   | User's private stash                                 | **Private**: Permissions `0700 devji:users`. Fully shielded with `.nomedia` and `.plexignore` so Jellyfin/Plex do not scan it.                                            |
+| `p/web`                                   | Backward-compatibility symlink                       | Symlink pointing to `/srv/data/projects/bountystash-web`.                                                                                                                 |
+| `security/`                               | Credentials, recovery keys, certificates             | **Restricted**: Permissions strictly `0700 devji:users` (`0600` for private files). Never exposed to network guests.                                                      |
+| `storage/`                                | Backward-compatibility symlink                       | Points to `.` (the data root) so legacy paths like `/Volumes/data/storage/...` resolve seamlessly.                                                                        |
 
 ### Media Server Isolation Rules
 
@@ -482,17 +497,19 @@ The persistent network storage is hosted on the primary 24/7 server `frieren` at
 
 Two separate encrypted files, decrypted via `sops-nix` using host age keys:
 
-| File | Decryptors | Contents |
-|------|------------|----------|
-| `modules/secrets.yaml` | All hosts (via `ssh_host_ed25519_key`) | App secrets, `hashedPassword`, API keys, TOTP |
-| `modules/ssh-ca-key.yaml` | Full fleet (all age recipients in `.sops.yaml`; includes frieren since 2026-10-08) | SSH User CA private key |
+| File                      | Decryptors                                                                         | Contents                                      |
+| ------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------- |
+| `modules/secrets.yaml`    | All hosts (via `ssh_host_ed25519_key`)                                             | App secrets, `hashedPassword`, API keys, TOTP |
+| `modules/ssh-ca-key.yaml` | Full fleet (all age recipients in `.sops.yaml`; includes frieren since 2026-10-08) | SSH User CA private key                       |
 
 **Key locations**:
+
 - `.sops.yaml` — age key registrations (each host maps its `ssh_host_ed25519_key` age pubkey)
 - `modules/secrets/` — **git submodule** pointing to private `shaoyanji/secrets` repo (contains actual encrypted files)
 - `modules/secrets.yaml` — local symlink/mirror of the submodule's secrets.yaml
 
 **SSH CA workflow**:
+
 - Servers trust a single CA public key (`modules/ssh-ca.nix`)
 - Workstations sign 1-week certs via `rotate-ssh-cert` (uses `~/.ssh/user_ca_key` from sops-nix)
 - No `authorized_keys` management needed after CA setup
@@ -504,13 +521,12 @@ Two separate encrypted files, decrypted via `sops-nix` using host age keys:
 ## CI Pipeline
 
 GitHub Actions in `.github/workflows/`:
+
 - `nixcachix.yml` — Builds `frieren` NixOS + `penguin` home-manager on `ubuntu-latest` via Cachix (`shaoyanji` cache)
 - `nixcachix-darwin.yml` — macOS builds
 - `nixcachix-aarch64.yml` — ARM builds
 
 CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodule support).
-
-**garnix.io** config (`garnix.yaml`): currently only deploys the `garnixMachine` host, all builds commented out.
 
 ---
 
@@ -519,7 +535,7 @@ CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodul
 ### Non-obvious patterns
 
 - **User constants**: `modules/global/user.nix` is the single source of truth for the primary user (`devji`). Import it with `let user = import ../global/user.nix;` — never hardcode user paths or the username.
-- **Attrset merging**: `//` is **shallow, right-biased** — `{ a.x = 1; } // { a.y = 2; }` loses `a.x`. Use `lib.recursiveUpdate` for deep merge. See `NIX-REFERENCE.md` for more.
+- **Attrset merging**: `//` is **shallow, right-biased** — `{ a.x = 1; } // { a.y = 2; }` loses `a.x`. Use `lib.recursiveUpdate` for deep merge.
 - **`lib.mkIf` / `lib.mkMerge`**: the standard conditional patterns. Also `lib.optionalAttrs` for conditional attrsets and `lib.optionals` for conditional list items.
 - **Option priorities**: `lib.mkDefault` vs `lib.mkForce` vs `lib.mkOverride` are used for option priority layering.
 - **`profiles.boot` module**: boot options are accessed via `config.profiles.boot.systemd-boot` and `config.profiles.boot.efi` (not direct `boot.loader.*`).
@@ -528,10 +544,10 @@ CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodul
 
 Some packages build from source (Maven, Go, etc.) with no cached variant for overridden configurations:
 
-| Module | Issue | Mitigation |
-|--------|-------|------------|
-| `services.tika` (`search/tika.nix`) | `cfg.package.override { enableGui = false }` → Maven build | Inline systemd unit with stock `pkgs.tika` |
-| `services.gotenberg` (`paperless.nix`) | Chromium stub at module level keeps ~300 MiB chromium | Configure `services.gotenberg.chromium.package` with stub |
+| Module                                 | Issue                                                      | Mitigation                                                |
+| -------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------- |
+| `services.tika` (`search/tika.nix`)    | `cfg.package.override { enableGui = false }` → Maven build | Inline systemd unit with stock `pkgs.tika`                |
+| `services.gotenberg` (`paperless.nix`) | Chromium stub at module level keeps ~300 MiB chromium      | Configure `services.gotenberg.chromium.package` with stub |
 
 Before deploying a host referencing Java (Maven/Gradle), Go, or Rust packages, run `nix build --dry-run` to verify the closure is cached.
 
@@ -561,6 +577,7 @@ CI commands use `nix build -L .?submodules=1#...` — the `?submodules=1` is cri
 5. Build: `task infra:plan:host:<name>` or `nix build .#nixosConfigurations.<name>.config.system.build.toplevel`
 
 For provisioning a new server:
+
 - The host's age key (from `ssh_host_ed25519_key`) must already be in `.sops.yaml` for `hashedPassword` decryption
 - `ssh.ca.enable = true` is inherited from `base-node.nix`
 - SSH in using a cert from your workstation
@@ -571,33 +588,33 @@ For provisioning a new server:
 
 See [Task Control Plane](docs/task-control-plane.md) for full namespace definitions and workflow examples.
 
-| Namespace | What | Skill |
-|-----------|------|-------|
-| `infra:*` | Host lifecycle, secrets, SOPS | `.agents/skills/infra/SKILL.md` |
-| `agents:*` | Operator menu, xs, OAuth | `.agents/skills/agents/SKILL.md` |
-| `checks:*` | Validation, smoke checks, nix lint | `.agents/skills/checks/SKILL.md` |
-| `dev:*` | Git, flake, site, PRs, packages | `.agents/skills/dev/SKILL.md` |
-| `data:*` | NAS storage taxonomy, hygiene, permissions, media unindexing | `.agents/skills/data/SKILL.md` |
-| `moto:*` | Motorola Android (Termux) shell, file push/pull, Wish/Gum menu | `.agents/skills/moto/SKILL.md` |
-| `serv00:*` | Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle | `.agents/skills/serv00/SKILL.md` |
-| `dragoncourt:*` | Alwaysdata Debian hosting, PHP/Wasm webserver | `.agents/skills/dragoncourt/SKILL.md` |
-| `envs:*` | Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline | `.agents/skills/envs/SKILL.md` |
-| `bountystash:*` | Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment | `.agents/skills/bountystash/SKILL.md` |
-| `apps:*` | Job application workflow (appflow): status updates, email flow, sync, builds | `.agents/skills/apps/SKILL.md` |
-| `services:*` | Legacy wrappers (canonical: `infra:*`) | `.agents/skills/services/SKILL.md` |
-| `google-drive` | Google Drive OAuth setup, rclone, tailscale funnel | `.agents/skills/google-drive/SKILL.md` |
-| `antigravity` | Delegate coding to Antigravity CLI (Google's agent) with `--dangerously-skip-permissions` and `--jsonschema` | `.agents/skills/antigravity/SKILL.md` |
-| `crush` | Delegate coding to Crush CLI (Charm's agent) with `--yolo` and structured output | `.agents/skills/crush/SKILL.md` |
+| Namespace       | What                                                                                                         | Skill                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| `infra:*`       | Host lifecycle, secrets, SOPS                                                                                | `.agents/skills/infra/SKILL.md`        |
+| `agents:*`      | Operator menu, xs, OAuth                                                                                     | `.agents/skills/agents/SKILL.md`       |
+| `checks:*`      | Validation, smoke checks, nix lint                                                                           | `.agents/skills/checks/SKILL.md`       |
+| `dev:*`         | Git, flake, site, PRs, packages                                                                              | `.agents/skills/dev/SKILL.md`          |
+| `data:*`        | NAS storage taxonomy, hygiene, permissions, media unindexing                                                 | `.agents/skills/data/SKILL.md`         |
+| `moto:*`        | Motorola Android (Termux) shell, file push/pull, Wish/Gum menu                                               | `.agents/skills/moto/SKILL.md`         |
+| `serv00:*`      | Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle                                                       | `.agents/skills/serv00/SKILL.md`       |
+| `dragoncourt:*` | Alwaysdata Debian hosting, PHP/Wasm webserver                                                                | `.agents/skills/dragoncourt/SKILL.md`  |
+| `envs:*`        | Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline                                       | `.agents/skills/envs/SKILL.md`         |
+| `bountystash:*` | Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment                                | `.agents/skills/bountystash/SKILL.md`  |
+| `apps:*`        | Job application workflow (appflow): status updates, email flow, sync, builds                                 | `.agents/skills/apps/SKILL.md`         |
+| `services:*`    | Legacy wrappers (canonical: `infra:*`)                                                                       | `.agents/skills/services/SKILL.md`     |
+| `google-drive`  | Google Drive OAuth setup, rclone, tailscale funnel                                                           | `.agents/skills/google-drive/SKILL.md` |
+| `antigravity`   | Delegate coding to Antigravity CLI (Google's agent) with `--dangerously-skip-permissions` and `--jsonschema` | `.agents/skills/antigravity/SKILL.md`  |
+| `crush`         | Delegate coding to Crush CLI (Charm's agent) with `--yolo` and structured output                             | `.agents/skills/crush/SKILL.md`        |
 
 ---
 
 ## Memory hierarchy (jev decides escalation)
 
-| Layer | Role | When used |
-|-------|------|-----------|
-| MEMORY.md | Boot — persists across sessions | Always loaded |
-| Vault | Fast working memory — offline, personal | First stop for context |
-| qmd wiki | Resource — docs, runbooks, codebase | Concept/location queries |
+| Layer              | Role                                          | When used                                      |
+| ------------------ | --------------------------------------------- | ---------------------------------------------- |
+| MEMORY.md          | Boot — persists across sessions               | Always loaded                                  |
+| Vault              | Fast working memory — offline, personal       | First stop for context                         |
+| qmd wiki           | Resource — docs, runbooks, codebase           | Concept/location queries                       |
 | mem0 / supermemory | Deep consult — when vault + wiki insufficient | Decided by jev (min-prob 0.8, min-margin 0.15) |
 
 Search order: vault → wiki (qmd BM25) → mem0/supermemory (jev-decided) → web.
@@ -610,11 +627,11 @@ When unsure which skill to read, search the skills index first: `qmd search "<to
 
 Local hybrid search over markdown docs and notes via `qmd` (`pkgs.llm-agents.qmd`, installed fleet-wide). Three canonical collections:
 
-| Collection | Target Path | Content |
-|------------|-------------|---------|
+| Collection  | Target Path                                              | Content                                                                                 |
+| ----------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `nixconfig` | `/srv/data/projects/nixconfig` (`~/Documents/nixconfig`) | This repo's documentation: README, AGENTS.md, runbooks, `docs/*`, `taskfiles/README.md` |
-| `vault` | `/Volumes/data/Obsidian-Git-Sync` (`~/vaults/personal`) | Personal Obsidian vault: zettels, schematics, notes |
-| `skills` | `~/.hermes/skills/` | Agent skills indexed for BM25 search |
+| `vault`     | `/Volumes/data/Obsidian-Git-Sync` (`~/vaults/personal`)  | Personal Obsidian vault: zettels, schematics, notes                                     |
+| `skills`    | `~/.hermes/skills/`                                      | Agent skills indexed for BM25 search                                                    |
 
 ### Index lifecycle
 
@@ -656,6 +673,7 @@ Host deployment flows use `infra:*` tasks directly. See `.agents/deploy/README.m
 ## Git Hooks Setup
 
 Pre-commit hooks in `.githooks/` run deadnix (hard gate), statix (advisory), and a formatting check accepting either alejandra or nixpkgs-fmt (hard gate). Tools missing from PATH are fetched via nix from the nixpkgs revision pinned in `flake.lock`, so the checks are machine-independent. Enable with:
+
 ```bash
 bash .git-hooks-setup.sh    # sets core.hooksPath to .githooks/
 ```
@@ -667,23 +685,24 @@ Nix files use `nixpkgs-fmt`. The formatter is included in `base-node.nix` system
 ## External Package Registry
 
 External fetched dependencies are registered in `modules/config/fetches.json` and resolved through `lib/fetches-extra.nix`. Update hashes with:
+
 ```bash
 task dev:config:hash-update    # runs nix-hash-update.sh
 ```
 
 ## Documentation Map
 
-| File | Content |
-|------|---------|
-| `README.md` | Full repo documentation, architecture, all workflows |
-| `AGENTS.md` | This file — agent routing and codebase guide |
-| `NIX-REFERENCE.md` | Nix patterns and gotchas used in this repo |
-| `docs/task-control-plane.md` | Task namespace policy and workflow examples |
-| `docs/frieren-access.md` | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
-| `docs/codex-handoff.md` | Codex session orientation |
-| `docs/userland-package-ownership.md` | Package ownership and role wiring |
-| `taskfiles/README.md` | Taskfile ownership map |
-| `USB.md` | Sledgehammer live USB creation |
-| `AUDIT.md` | AI module cleanup audit |
-| `HANDOFF-REFACTOR.md` | Refactoring progress |
-| `TODO.md` | Current work tracking |
+| File                                 | Content                                                                |
+| ------------------------------------ | ---------------------------------------------------------------------- |
+| `README.md`                          | Full repo documentation, architecture, all workflows                   |
+| `AGENTS.md`                          | This file — canonical agent routing and codebase manual                |
+| `inventory.toml`                     | Canonical 31-device fleet inventory source of truth                    |
+| `docs/fleet-inventory.md`            | Fleet device catalog, hardware profiles, roles & operating disciplines |
+| `.agents/fleet-matrix.md`            | Compact fleet context matrix for LLMs and agent prompts                |
+| `docs/task-control-plane.md`         | Task namespace policy and workflow examples                            |
+| `docs/frieren-access.md`             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
+| `docs/userland-package-ownership.md` | Package ownership and role wiring                                      |
+| `taskfiles/README.md`                | Taskfile ownership map and shard reference                             |
+| `hosts/sledgehammer/USB.md`          | Sledgehammer live USB creation guide                                   |
+| `AUDIT.md`                           | AI module cleanup audit                                                |
+| `TODO.md`                            | Current work tracking and backlog                                      |

@@ -68,7 +68,7 @@ flake.nix → flake/outputs.nix (hub)
 
 | Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |
 |------|--------|-------------|------|---------------------------|-------------|----------------|
-| `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop & Sunshine Stream Server (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 256GB NVMe SSD (btrfs @root, @nix, @persist) + 16TB HDD /mnt/s... |
+| `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop, Sunshine Stream Server & Local MoE LLM Node (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots)... |
 | `fern` | **Active** | `nixos` | `x86_64-linux` | Lightweight Daily-Driver Laptop (AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU) | `hosts/fern/configuration.nix` | /dev/nvme0n1 (disko: ESP + 8G swap + btrfs /root,/nix) |
 | `frieren` | **Active** | `nixos` | `x86_64-linux` | Central NAS Mainframe, 4K Media Center & Application Server (Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz) | `hosts/frieren/configuration.nix` | /dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots... |
 | `guckloch` | **Active** | `nixos` | `x86_64-linux` | Windows Subsystem for Linux (WSL2) Container (Host CPU, WSL2 Dynamic Allocation) | `hosts/guckloch/configuration.nix` | WSL2 root with SSHFS mount to /Volumes/data |
@@ -331,7 +331,7 @@ task dev:git:quick-push          # Stage tracked, AI-commit, push
 task dev:git:ai-commit           # Stage + interactive AI commit
 task dev:git:ai-commit-push      # Stage + AI commit + push
 task dev:git:build-push          # AI commit after successful build
-task dev:git:quick-pull          # Pull with submodules, reload taskfile
+task dev:git:quick-pull          # Pull with submodules
 task dev:flake:update-complete   # Full flake update workflow
 task dev:flake:update:bountystash # Update single input
 task dev:flake:update-transitive # Update transitive inputs a root update misses
@@ -340,8 +340,6 @@ task dev:nixbuild:warm           # Build gaps on remote builder + cachix push (b
 task dev:qmd:refresh             # (Re)index markdown docs (repo docs + personal vault) into qmd
 task dev:qmd:vault:refresh       # (Re)index personal Obsidian vault into qmd
 ```
-
-**Git pre/post hooks auto-run** — `dev:git:prehook` refreshes Taskfile.yml from encrypted secrets; `dev:git:posthook` pushes.
 
 ### Data & Storage Lifecycle
 

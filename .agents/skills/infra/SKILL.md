@@ -53,7 +53,7 @@ Canonical surface for all host lifecycle, secrets, and store operations.
 | Task | Description |
 |------|-------------|
 | `infra:secrets:edit:apikeys` | Edit encrypted API keys |
-| `infra:secrets:edit:taskfile` | Edit encrypted Taskfile |
+| `infra:secrets:edit:taskfile` | Edit encrypted operator Taskfile (refreshes ~/Taskfile.yml) |
 | `infra:secrets:edit:detaskfile` | Edit encrypted DE Taskfile |
 | `infra:secrets:edit:secrets` | Edit encrypted secrets |
 | `infra:secrets:new:generate` | Generate SSH + AGE keys |
@@ -64,7 +64,6 @@ Canonical surface for all host lifecycle, secrets, and store operations.
 | `infra:sops:update-keys` | Rotate SOPS recipient keys |
 | `infra:api:get:<key>` | Print API key line from encrypted env |
 | `infra:load:env` | Load API env lines |
-| `infra:load:taskfile` | Decrypt operator Taskfile |
 
 ## Provenance and Initialization from $HOME
 

@@ -5,7 +5,7 @@ tasks:
     desc: Choose a load action
     cmds:
       - |
-        choice=$(printf '%s\n' infra:load:env infra:load:taskfile exit | gum choose)
+        choice=$(printf '%s\n' infra:load:env exit | gum choose)
         task "$choice"
 
   infra:load:env:
@@ -14,11 +14,6 @@ tasks:
       - task infra:api:get:API
       - task infra:api:get:POP
       - task infra:api:get:TOKEN
-
-  infra:load:taskfile:
-    desc: Decrypt operator Taskfile from secrets repo into local Taskfile.yml
-    cmds:
-      - scripts/task/sops-decrypt-to.sh "{{.SECRETS}}/{{.ENC_TASKFILE}}" "./Taskfile.yml"
 
   infra:api:get:*:
     desc: Print matching API key line from encrypted env file
@@ -45,10 +40,10 @@ tasks:
       - scripts/task/sops-edit-commit.sh "{{.SECRETS}}" "{{.ENC_ENVS}}" "taskfile - update"
 
   infra:secrets:edit:taskfile:
-    desc: Edit encrypted Taskfile and refresh local Taskfile.yml
+    desc: Edit encrypted operator Taskfile and refresh ~/Taskfile.yml
     cmds:
       - scripts/task/sops-edit-commit.sh "{{.SECRETS}}" "{{.ENC_TASKFILE}}" "taskfile - update"
-      - task infra:load:taskfile
+      - scripts/task/sops-decrypt-to.sh "{{.SECRETS}}/{{.ENC_TASKFILE}}" "$HOME/Taskfile.yml"
 
   infra:secrets:edit:detaskfile:
     desc: Edit encrypted DE Taskfile and refresh ~/Taskfile.yml
@@ -115,20 +110,20 @@ tasks:
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:rebuild:home-manager:
-    desc: Rebuild local Home Manager profile and push build commit
+    desc: Rebuild local Home Manager profile
     cmds:
-      - home-manager switch --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+      - home-manager switch --flake .?submodules=1#$(hostname) |& nom
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:rebuild:wsl:
     desc: Rebuild WSL host configuration
     cmds:
-      - sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes |& nom; task dev:git:build-push
+      - sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes |& nom
 
   infra:rebuild:orb:
     desc: Rebuild OrbStack host configuration and refresh ~/Taskfile.yml
     cmds:
-      - sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure |& nom; task dev:git:build-push
+      - sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure |& nom
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:switch:*:
@@ -143,7 +138,7 @@ tasks:
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
-      - sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) |& nom; task dev:git:build-push
+      - sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) |& nom
 
   infra:plan:host:netbook:
     desc: Dry-run netbook configuration remotely using its pinned 25.11 channel

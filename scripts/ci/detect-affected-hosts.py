@@ -3,10 +3,13 @@
 detect-affected-hosts.py - Smart CI change detection based on git diff and inventory.toml.
 
 Maps changed paths to affected active NixOS hosts to prevent frivolous CI builds.
+Respects 'ci = false' in inventory.toml (e.g. unfree NVIDIA 580 on stark/kellerbench
+which are built on frieren NAS / local machines).
+
 Supports commit message directives:
   [skip ci] / [ci skip]       -> Skip all host builds
   [ci all]                   -> Build all active NixOS hosts
-  [ci host1,host2]           -> Build specific active hosts
+  [ci host1,host2]           -> Build specific active hosts (even if excluded by default)
 """
 
 import argparse
@@ -46,17 +49,24 @@ SHARED_NIX_PATTERNS = [
     r"^hosts/common/",
 ]
 
+# Fallback exclusion for hosts requiring unfree NVIDIA drivers built on frieren/local
+DEFAULT_CI_EXCLUDED = {"stark", "kellerbench"}
 
-def load_active_nixos_hosts():
+
+def load_nixos_hosts():
     if not INVENTORY_FILE.exists():
-        return ["frieren"]
+        return ["frieren"], DEFAULT_CI_EXCLUDED
     with open(INVENTORY_FILE, "rb") as f:
         inv = tomllib.load(f)
     hosts = inv.get("hosts", {})
-    return sorted([
-        h for h, data in hosts.items()
-        if data.get("status") == "active" and data.get("kind") == "nixos"
-    ])
+    active = []
+    ci_excluded = set(DEFAULT_CI_EXCLUDED)
+    for h, data in hosts.items():
+        if data.get("status") == "active" and data.get("kind") == "nixos":
+            active.append(h)
+            if data.get("ci") is False:
+                ci_excluded.add(h)
+    return sorted(active), ci_excluded
 
 
 def run_git_cmd(cmd):
@@ -85,7 +95,6 @@ def get_changed_files(base=None, head=None, working_tree=False):
         files = []
         for line in out.splitlines():
             if line:
-                # Remove status prefix (e.g. " M file" or "?? file")
                 path = line[3:].strip()
                 if " -> " in path:
                     path = path.split(" -> ")[1].strip()
@@ -93,7 +102,6 @@ def get_changed_files(base=None, head=None, working_tree=False):
         return list(set(files))
 
     if not base:
-        # Check against origin/main or previous commit
         if run_git_cmd(["git", "rev-parse", "--verify", "origin/main"]):
             base = "origin/main"
         else:
@@ -102,10 +110,8 @@ def get_changed_files(base=None, head=None, working_tree=False):
     if not head:
         head = "HEAD"
 
-    # Compare base and head
     diff_out = run_git_cmd(["git", "diff", "--name-only", f"{base}...{head}"])
     if not diff_out and base != "HEAD~1":
-        # Fall back to single commit diff
         diff_out = run_git_cmd(["git", "diff", "--name-only", "HEAD~1...HEAD"])
 
     return [f.strip() for f in diff_out.splitlines() if f.strip()]
@@ -115,15 +121,12 @@ def parse_commit_directives(msg, active_hosts):
     if not msg:
         return None, None
 
-    # Check for skip flags
     if re.search(r"\[(skip ci|ci skip|no ci)\]", msg, re.IGNORECASE):
         return [], "Skipped via commit message directive ([skip ci])"
 
-    # Check for build all
     if re.search(r"\[ci all\]", msg, re.IGNORECASE):
         return active_hosts, "Explicit [ci all] directive in commit message"
 
-    # Check for specific hosts: [ci host1,host2] or [ci:host1,host2]
     match = re.search(r"\[ci[:\s]+([a-zA-Z0-9_,\s-]+)\]", msg, re.IGNORECASE)
     if match:
         requested = [h.strip() for h in match.group(1).split(",") if h.strip()]
@@ -134,7 +137,7 @@ def parse_commit_directives(msg, active_hosts):
     return None, None
 
 
-def analyze_changed_files(files, active_hosts, shared_strategy="anchor", anchor_host="frieren"):
+def analyze_changed_files(files, active_hosts, ci_excluded, shared_strategy="anchor", anchor_host="frieren"):
     if not files:
         return [], "No files changed"
 
@@ -143,53 +146,58 @@ def analyze_changed_files(files, active_hosts, shared_strategy="anchor", anchor_
     shared_regexes = [re.compile(p) for p in SHARED_NIX_PATTERNS]
 
     affected_hosts = set()
+    skipped_policy = set()
     has_shared_changes = False
-    unmatched_files = []
 
     for f in files:
-        # 1. Check non-building paths
+        # 1. Non-building paths
         if any(r.search(f) for r in non_build_regexes):
             continue
 
-        # 2. Check host-specific paths
+        # 2. Host-specific paths
         m = host_regex.match(f)
         if m:
             host = m.group(1)
             if host in active_hosts:
-                affected_hosts.add(host)
+                if host in ci_excluded:
+                    skipped_policy.add(host)
+                else:
+                    affected_hosts.add(host)
                 continue
             elif host == "common":
                 has_shared_changes = True
                 continue
             else:
-                # Preserved host or non-Nix host changed; does not trigger CI builds
                 continue
 
-        # 3. Check shared Nix paths
+        # 3. Shared Nix paths
         if any(r.search(f) for r in shared_regexes):
             has_shared_changes = True
             continue
 
-        # Any other Nix file (e.g. default.nix, shell.nix)
         if f.endswith(".nix"):
             has_shared_changes = True
-        else:
-            unmatched_files.append(f)
 
     if has_shared_changes:
+        eligible_active = [h for h in active_hosts if h not in ci_excluded]
         if shared_strategy == "all":
-            return active_hosts, "Shared Nix modules modified (strategy: all active hosts)"
+            return eligible_active, "Shared Nix modules modified (strategy: all CI-eligible active hosts)"
         elif shared_strategy == "none":
             return sorted(list(affected_hosts)), "Shared Nix modules modified (strategy: none; host-specific only)"
         else:
-            # Anchor strategy: build the anchor host (frieren) plus any host-specific changes
             targets = set(affected_hosts)
-            if anchor_host in active_hosts:
+            if anchor_host in eligible_active:
                 targets.add(anchor_host)
             return sorted(list(targets)), f"Shared Nix modules modified (strategy: anchor to {anchor_host})"
 
     if affected_hosts:
-        return sorted(list(affected_hosts)), f"Host-specific changes detected: {', '.join(sorted(affected_hosts))}"
+        msg = f"Host-specific changes detected: {', '.join(sorted(affected_hosts))}"
+        if skipped_policy:
+            msg += f" (excluded per CI policy: {', '.join(sorted(skipped_policy))})"
+        return sorted(list(affected_hosts)), msg
+
+    if skipped_policy:
+        return [], f"Changes detected for {', '.join(sorted(skipped_policy))}, but skipped per CI policy (unfree driver/ci=false)"
 
     return [], "All modified files are documentation, metadata, or non-building assets"
 
@@ -210,21 +218,20 @@ def main():
 
     args = parser.parse_args()
 
-    active_hosts = load_active_nixos_hosts()
+    active_hosts, ci_excluded = load_nixos_hosts()
     commit_msg = args.commit_msg or get_commit_message()
 
-    # 1. Check commit directives first
     directed_hosts, directive_reason = parse_commit_directives(commit_msg, active_hosts)
     if directed_hosts is not None:
         targets = directed_hosts
         reason = directive_reason
         files = []
     else:
-        # 2. Inspect changed files
         files = get_changed_files(base=args.base, head=args.head, working_tree=args.working_tree)
         targets, reason = analyze_changed_files(
             files,
             active_hosts,
+            ci_excluded=ci_excluded,
             shared_strategy=args.shared_strategy,
             anchor_host=args.anchor_host
         )
@@ -235,7 +242,6 @@ def main():
         "os": ["ubuntu-latest"]
     }
 
-    # CI Mode output
     if args.ci:
         gh_output = os.environ.get("GITHUB_OUTPUT")
         if gh_output and os.path.exists(gh_output):
@@ -252,11 +258,11 @@ def main():
         }, indent=2))
         return
 
-    # CLI Output formats
     if args.format == "json":
         print(json.dumps({
             "has_machines": has_machines,
             "affected_hosts": targets,
+            "ci_excluded_hosts": sorted(list(ci_excluded)),
             "matrix": matrix,
             "reason": reason,
             "changed_files_count": len(files)
@@ -264,7 +270,6 @@ def main():
     elif args.format == "names":
         print(" ".join(targets))
     else:
-        # Table / human readable
         print("=== CI Affected Hosts Analysis ===")
         print(f"Reason: {reason}")
         print(f"Changed files inspected: {len(files)}")
@@ -274,7 +279,13 @@ def main():
                 print(f"  - {t}")
         else:
             print("\n⚪ No hosts affected (CI build will be skipped).")
-        untouched = [h for h in active_hosts if h not in targets]
+        
+        excluded_active = [h for h in active_hosts if h in ci_excluded]
+        if excluded_active:
+            print(f"\nExcluded from CI by policy ({len(excluded_active)}):")
+            print(f"  {', '.join(excluded_active)} (unfree NVIDIA driver; built on frieren/local)")
+
+        untouched = [h for h in active_hosts if h not in targets and h not in ci_excluded]
         if untouched:
             print(f"\nUntouched active hosts ({len(untouched)}):")
             print(f"  {', '.join(untouched)}")

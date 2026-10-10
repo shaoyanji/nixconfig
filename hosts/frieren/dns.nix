@@ -1,7 +1,8 @@
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }: {
   # Tailnet DNS should stay manually managed after deployment:
   # sudo tailscale up --accept-dns=false
@@ -9,8 +10,8 @@
 
   # Ensure tailscaled starts on boot with network ready
   systemd.services.tailscaled = {
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
   };
 
   # Serve the NAS web portal (pdf./photos./media.frieren.lan vhosts on
@@ -31,7 +32,7 @@
   # (services.resolved.extraConfig was removed upstream; use settings.Resolve)
   services.resolved.settings.Resolve = {
     DNSStubListener = "no";
-    Domains = [ "~frieren.lan" ];
+    Domains = ["~frieren.lan"];
   };
 
   # Point the host resolver at FTL instead of the router:
@@ -49,14 +50,14 @@
 
   # pihole-ftl references tailscale0 interface, must wait for tailscaled
   systemd.services.pihole-ftl = {
-    after = [ "tailscaled.service" ];
+    after = ["tailscaled.service"];
   };
   systemd.services.pihole-ftl-setup = {
     after = [
       "tailscaled.service"
       "pihole-ftl.service"
     ];
-    wants = [ "pihole-ftl.service" ];
+    wants = ["pihole-ftl.service"];
   };
 
   # Work around upstream nixpkgs pihole-ftl queryLogDeleter systemd %s specifier expansion bug:
@@ -73,8 +74,8 @@
     enable = true;
     resolveLocalQueries = false;
     settings.server = {
-      interface = [ "127.0.0.1@5335" ];
-      access-control = [ "127.0.0.0/8 allow" ];
+      interface = ["127.0.0.1@5335"];
+      access-control = ["127.0.0.0/8 allow"];
     };
   };
 
@@ -99,7 +100,7 @@
     settings = {
       dns = {
         queryLogging = true;
-        upstreams = [ "127.0.0.1#5335" ];
+        upstreams = ["127.0.0.1#5335"];
         # listeningMode = "LOCAL";
         listeningMode = "ALL";
         interface = "enp1s0";
@@ -116,6 +117,9 @@
         # Laya decision model (Jev-compatible /v1/systemone) on eisen; same
         # tailnet address, exposed as its own nginx vhost on :80.
         "address=/laya.lan/100.119.172.99"
+        # Qwen3-TTS speech server on eisen (OpenAI-compatible /v1/audio/speech);
+        # nginx vhost on :80, tailscale serve :8444.
+        "address=/tts.lan/100.119.172.99"
         # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
         # Answer ONLY PXE clients on the LAN; never lease IPs — the FritzBox
         # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode
@@ -136,7 +140,7 @@
 
   services.pihole-web = {
     enable = true;
-    ports = [ 8080 ];
+    ports = [8080];
   };
   networking.firewall.interfaces.enp1s0 = {
     allowedUDPPorts = [
@@ -144,11 +148,11 @@
       67 # DHCP-proxy replies to PXE clients (FritzBox still owns leases)
       4011 # legacy BIOS ProxyDHCP
     ];
-    allowedTCPPorts = [ 53 ];
+    allowedTCPPorts = [53];
   };
   # Allow DNS queries from Tailscale network
   networking.firewall.interfaces.tailscale0 = {
-    allowedUDPPorts = [ 53 ];
-    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [53];
+    allowedTCPPorts = [53];
   };
 }

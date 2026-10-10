@@ -322,6 +322,23 @@ Watch a load with `journalctl -fu llama-swap`. If a model OOMs, lower `--n-gpu-l
 
 ---
 
+## Speech: Qwen3-TTS (`tts.lan`)
+
+Offline, OpenAI-compatible text-to-speech. Implementation: [`modules/services/qwen-tts.nix`](../../../modules/services/qwen-tts.nix); enablement + full command reference: [`hosts/eisen/TTS.md`](../../../hosts/eisen/TTS.md).
+
+- Runtime `ServeurpersoCom/qwentts.cpp` (MIT), built from source with `-DGGML_VULKAN=ON`, wrapped around its own OpenAI-compatible `tts-server` (no Python layer).
+- Weights `Serveurperso/Qwen3-TTS-GGUF` on `/mnt/storage/tts/models` (talker `qwen-talker-1.7b-customvoice-Q4_K_M.gguf` + codec `qwen-tokenizer-12hz-Q8_0.gguf`), fetched by idempotent oneshot units.
+- Loopback `127.0.0.1:8181` (no firewall entry) → `http://tts.lan/v1/audio/speech` (nginx `:80`) and `https://eisen.<tailnet>.ts.net:8444` (`tailscale serve`).
+
+```bash
+systemctl status qwen-tts
+curl http://127.0.0.1:8181/health
+curl -X POST http://127.0.0.1:8181/v1/audio/speech -H 'Content-Type: application/json' \
+  -d '{"input":"Hello from eisen","voice":"vivian","response_format":"wav"}' -o out.wav
+```
+
+**Before first build**, pin the runtime rev + hash in `modules/services/qwen-tts.nix` (the derivation ships `lib.fakeHash` so an unpinned build fails on purpose): `nix-prefetch-git --fetch-submodules https://github.com/ServeurpersoCom/qwentts.cpp.git`.
+
 ## Operational Notes
 
 - **Weights are not in the Nix store** — they are multi-GB files in `/mnt/storage/models`, fetched by the units above. Do not `nix-store --gc`-root them; they persist on the btrfs array.

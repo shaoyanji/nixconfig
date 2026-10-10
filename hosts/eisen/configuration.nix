@@ -33,6 +33,7 @@ in {
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/nas-client.nix
     ../../modules/profiles/sunshine.nix
+    ../../modules/services/qwen-tts.nix
     ./llm-server.nix
     ./decision-models.nix
   ];
@@ -178,6 +179,19 @@ in {
       "uid=1000"
       "gid=100"
     ];
+  };
+
+  # --- Offline Qwen3-TTS speech (OpenAI-compatible /v1/audio/speech) ---
+  # Built from source with a Vulkan backend (Navi 10 has no ROCm target).
+  # Weights on the data array; exposed as tts.lan (nginx :80) and tailscale
+  # serve :8444. See modules/services/qwen-tts.nix and hosts/eisen/TTS.md.
+  services.qwen-tts = {
+    enable = true;
+    port = 8181;
+    modelDir = "/mnt/storage/tts/models";
+    model = "qwen-talker-1.7b-customvoice-Q4_K_M.gguf";
+    codec = "qwen-tokenizer-12hz-Q8_0.gguf";
+    voice = "vivian";
   };
 
   services.openssh.enable = true;

@@ -106,7 +106,15 @@ in {
     curl
     git
     wget
-    nixpkgs-fmt
+    # Nix toolchain for scripts/task/nix-fmt.sh, the pre-commit hook and the
+    # watcher. alejandra replaced nixpkgs-fmt here deliberately: nixpkgs-fmt was
+    # the ONLY one of these on PATH, and it is not the repo's formatter — running
+    # it would rewrite ~170 of the 187 tracked .nix files. Shipping the real
+    # toolchain also means nix-fmt.sh takes its PATH branch and never has to
+    # `nix build` a formatter on first use.
+    alejandra
+    deadnix
+    statix
   ];
 
   # Fixes TERM mismatches when SSHing from kitty/ghostty/xterm-kitty.

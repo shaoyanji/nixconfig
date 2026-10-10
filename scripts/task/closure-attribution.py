@@ -24,29 +24,46 @@
 #      Exclusive bytes are the honest ceiling on removing that branch; SHARED
 #      bytes only come back when the LAST owner of each path goes.
 #
-# Usage:
-#   closure-attribution.py <closure-info-store-path> [--top N]
-#
-# Get the path with:
-#   bash scripts/task/closure-graph.sh json | jq -r .infoPath
-# or just run the wrapper task: dev:closure:attribution
+# Usage lives in the USAGE constant below, not in this comment. `--help` used to
+# read __doc__, which is None for a file whose header is a comment banner, and
+# crashed with an AttributeError; keeping one copy in code makes that impossible.
 #
 # Local store only (closureInfo builds locally), same as closure-graph.sh.
 # ==============================================================================
 
 import collections
+import os
 import re
 import sys
+
+USAGE = """CLOSURE ATTRIBUTION — who owns which bytes
+
+Usage:
+  closure-attribution.py <closure-info-store-path> [--top N]
+
+Splits a closure into bytes EXCLUSIVE to one owner, SHARED by several, and CORE
+(reached by no owner). Exclusive bytes are the ceiling on removing that owner;
+shared bytes come back only when the LAST owner of each path goes.
+
+Get the store path with:
+  bash scripts/task/closure-graph.sh json | jq -r .infoPath
+or just run the wrapper task: dev:closure:attribution
+"""
 
 
 def parse_args(argv):
     if len(argv) < 2 or argv[1] in ("-h", "--help"):
-        sys.stdout.write(__doc__.split("\n", 2)[2].lstrip("\n"))
+        sys.stdout.write(USAGE)
         raise SystemExit(0 if len(argv) > 1 else 2)
     info = argv[1].rstrip("/")
+    if not os.path.isdir(info):
+        sys.exit(f"error: not a closure-info directory: {info}")
     top = 22
     if "--top" in argv:
-        top = int(argv[argv.index("--top") + 1])
+        try:
+            top = int(argv[argv.index("--top") + 1])
+        except (IndexError, ValueError):
+            sys.exit("error: --top needs an integer")
     return info, top
 
 

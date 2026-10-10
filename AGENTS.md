@@ -339,6 +339,7 @@ task dev:nixbuild:plan           # Report build/fetch gaps per host vs substitut
 task dev:nixbuild:warm           # Build gaps on remote builder + cachix push (budget!)
 task dev:closure:menu            # Traversable closure explorer (gum TUI; subcommand after --)
 task dev:closure:reduce          # Closure reduction report: duplicate groups + every concrete copy
+task dev:closure:attribution     # Attribute closure bytes to owners (services, package farms)
 task dev:qmd:refresh             # (Re)index markdown docs (repo docs + personal vault) into qmd
 task dev:qmd:vault:refresh       # (Re)index personal Obsidian vault into qmd
 ```
@@ -889,6 +890,7 @@ task dev:config:hash-update    # runs nix-hash-update.sh
 | `inventory.toml`                     | Canonical 31-device fleet inventory source of truth                    |
 | `docs/fleet-inventory.md`            | Fleet device catalog, hardware profiles, roles & operating disciplines |
 | `docs/closure-reduction.md`          | Closure size levers, evidence chains, and the runtime/interactive/one-shot tiers |
+| `docs/closure-debloat.md`            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |
 | `.agents/fleet-matrix.md`            | Compact fleet context matrix for LLMs and agent prompts                |
 | `docs/task-control-plane.md`         | Task namespace policy and workflow examples                            |
 | `docs/frieren-access.md`             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |

@@ -44,8 +44,8 @@
     inetutils
     iproute2
 
-    # Nix tooling
-    nixpkgs-fmt
+    # Nix tooling. The formatter/linters (alejandra, deadnix, statix) come from
+    # base-node.nix — do not list them here as well.
     nix-output-monitor
     nvd # nix diff viewer
 

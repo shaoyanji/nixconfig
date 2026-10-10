@@ -3,6 +3,7 @@ version: "3"
 tasks:
   checks:quick:
     desc: Run narrow repo checks
+    aliases: [check]
     cmds:
       - nix eval .#nixosConfigurations.mtfuji.config.networking.hostName
       - nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
@@ -44,19 +45,134 @@ tasks:
       - bash scripts/task/sops-drift-check.sh
 
   checks:nix:lint:
-    desc: Run deadnix and statix on all nix files
+    desc: Run deadnix (hard gate) and statix (advisory) on all Nix files
+    summary: >
+      Routes through scripts/task/nix-fmt.sh — the single toolchain-resolution
+      path — with --tools deadnix,statix, so these are the flake.lock-pinned
+      versions the pre-commit gate uses, not a fresh `nix-shell -p` resolve.
+      deadnix fails the task; statix stays advisory (its W20 repeated-key
+      warning fires on the house style).
     cmds:
-      - nix-shell -p deadnix statix --run "deadnix --fail flake.nix flake hosts modules overlays lib && (statix check || true)"
+      - bash scripts/task/nix-fmt.sh --check --all --tools deadnix,statix
 
   checks:nix:fix:
-    desc: Auto-fix formatting, dead code, and style lints on all Nix files
+    desc: Auto-fix the Nix hard gates (deadnix + alejandra) on all Nix files
+    summary: >
+      Delegates to scripts/task/nix-fmt.sh, the single implementation shared with
+      checks:nix:watch, using the flake.lock-pinned toolchain (same versions as
+      the pre-commit gate), cached as GC-rooted links. Applies only the HARD
+      gates — the ones that would reject the commit. statix is advisory in this
+      repo and is deliberately never auto-applied; to write its suggestions run
+      `bash scripts/task/nix-fmt.sh --fix --all --tools deadnix,statix,alejandra`.
     cmds:
-      - nix-shell -p deadnix statix alejandra --run "deadnix --edit flake.nix flake hosts modules overlays lib; statix fix; alejandra flake.nix flake hosts modules overlays lib"
+      - bash scripts/task/nix-fmt.sh --fix --all
 
   checks:nix:format:
     desc: Check Nix file formatting with alejandra (read-only)
+    summary: >
+      Routes through scripts/task/nix-fmt.sh with --tools alejandra, so this
+      check and checks:nix:lint cannot resolve different tool versions. Writes
+      nothing; exits 1 listing every file that is not alejandra-formatted.
     cmds:
-      - nix-shell -p alejandra --run "alejandra --check flake hosts modules overlays lib"
+      - bash scripts/task/nix-fmt.sh --check --all --tools alejandra
+
+  checks:nix:watch:
+    desc: "watch: auto-format Nix files on save (deadnix + alejandra) — no manual tool calls"
+    summary: >
+      Long-running background hook, for agents and humans alike. Uses task's
+      watch flag over **/*.nix and formats only the files git reports as dirty,
+      so a save costs one file. Applies the HARD gates only — deadnix and
+      alejandra, the ones that would reject the commit — and deliberately not
+      statix, whose suggestions are advisory in this repo (W20 fires on the
+      house style). A watcher that silently rewrote style while you were editing
+      would be the wrong trade; statix findings are still reported by
+      `task checks:nix:lint`, and applying them is a deliberate opt-in.
+      Writes only when a file actually changes (the tools are idempotent,
+      verified), so it cannot re-trigger itself into a loop. No inputs; start it
+      once and leave it running. Toolchain comes from the flake.lock pin, i.e.
+      the same versions the commit gate will use.
+    watch: true
+    sources:
+      - "**/*.nix"
+    cmds:
+      - bash scripts/task/nix-fmt.sh --tools deadnix,alejandra
+
+  checks:nix:watch:status:
+    desc: Show whether the Nix watcher is running (pid + elapsed)
+    summary: >
+      Matches the watcher process exactly (cmdline `task checks:nix:watch`), so
+      it never confuses itself or a sibling task for the watcher.
+    cmds:
+      - |
+        pids=$(pgrep -f '^task checks:nix:watch$' 2>/dev/null || true)
+        if [ -z "$pids" ]; then
+          echo "checks:nix:watch: not running"
+        else
+          echo "checks:nix:watch: running"
+          ps -o pid,etime,args -p $(echo "$pids" | tr '\n' ',' | sed 's/,$//') 2>/dev/null || echo "$pids"
+        fi
+
+  checks:nix:watch:stop:
+    desc: Stop a running Nix watcher (kills the watcher, not your shell)
+    summary: >
+      Killing the shell that started the watcher does NOT stop it — the watcher
+      is a grandchild of that shell, so it keeps formatting the repo while
+      looking stopped (it once ran ~8 minutes unnoticed that way). This targets
+      the `task checks:nix:watch` process itself, waits for exit, then proves it
+      is gone rather than assuming the kill landed. Idempotent: with no watcher
+      running it reports that and exits 0.
+    cmds:
+      - |
+        pids=$(pgrep -f '^task checks:nix:watch$' 2>/dev/null || true)
+        if [ -z "$pids" ]; then
+          echo "checks:nix:watch: not running (nothing to stop)"
+          exit 0
+        fi
+        for pid in $pids; do
+          echo "stopping watcher pid $pid"
+          # Signalling MUST go through a real bash: task runs cmds in its own
+          # restricted shell interpreter, where `kill` is an
+          # "unsupported builtin" and would silently do nothing (it did).
+          # Do not suppress the error — a signal that does not land must be
+          # visible, and the verification below turns it into a failure.
+          if ! bash -c 'kill "$1"' _ "$pid"; then
+            echo "WARNING: could not signal pid $pid" >&2
+          fi
+        done
+        # Wait for exit, then verify instead of assuming the signal landed.
+        i=0
+        while [ "$i" -lt 50 ]; do
+          pgrep -f '^task checks:nix:watch$' >/dev/null 2>&1 || break
+          i=$((i + 1))
+          sleep 0.1
+        done
+        still=$(pgrep -f '^task checks:nix:watch$' 2>/dev/null || true)
+        if [ -n "$still" ]; then
+          echo "FAIL: watcher still running (pids: $(echo "$still" | tr '\n' ' '))" >&2
+          exit 1
+        fi
+        echo "checks:nix:watch: stopped (verified, no watcher process remains)"
+
+  checks:toml:lint:
+    desc: Validate that every tracked TOML file parses (yq) — the guard for yq-only TOML edits
+    summary: >
+      TOML is edited with `yq -i`, never by hand, and this proves the result
+      parses. Lists every file that no longer does and exits 1.
+    cmds:
+      - |
+        fail=0
+        count=0
+        for f in $(git ls-files '*.toml'); do
+          count=$((count + 1))
+          if ! yq '.' "$f" >/dev/null 2>&1; then
+            echo "INVALID TOML: $f" >&2
+            fail=1
+          fi
+        done
+        if [ "$fail" = 0 ]; then
+          echo "OK: $count tracked TOML file(s) parse"
+        fi
+        exit "$fail"
 
   checks:status:
     desc: Show task and git status

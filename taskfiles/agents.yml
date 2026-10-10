@@ -5,29 +5,71 @@ tasks:
     desc: Interactive operator control plane menu (themed)
     cmds:
       - |
-        choice=$(printf '%s\n' inventory "ssh & remotes" projects ops config browse help exit | gum choose --header "Operator control plane")
+        choice=$(printf '%s\n' inventory modules "ssh & remotes" projects ops config secrets browse help exit | gum choose --header "Operator control plane")
         case "$choice" in
           inventory) task dev:inventory:menu ;;
+          modules) task dev:modules:menu ;;
           "ssh & remotes") task agents:menu:ssh ;;
           projects) task agents:menu:projects ;;
           ops) task agents:menu:ops ;;
           config) task agents:menu:config ;;
+          secrets) task agents:menu:secrets ;;
           browse) task browse ;;
           help) task help ;;
           exit) exit 0 ;;
         esac
 
   agents:menu:ssh:
-    desc: "Theme: SSH & remote hosts"
+    desc: "Theme: SSH, remote hosts & diagnostics"
     cmds:
       - |
-        choice=$(printf '%s\n' serv00 dragoncourt envs moto wishlist incus sudologinssh exit | gum choose --header "SSH & remote hosts")
+        choice=$(printf '%s\n' "fleet-ssh" "diagnostics" serv00 dragoncourt envs moto wishlist incus sudologinssh exit | gum choose --header "SSH & remote hosts")
         case "$choice" in
+          "fleet-ssh") task agents:ssh:fleet ;;
+          diagnostics) task agents:menu:diagnostics ;;
           serv00) task serv00:menu ;;
           dragoncourt) task dragoncourt:menu ;;
           envs) task envs:menu ;;
           moto) task moto:menu ;;
           wishlist|incus|sudologinssh) task "$choice" ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:ssh:fleet:
+    desc: Interactive SSH picker across active fleet devices
+    cmds:
+      - |
+        selected=$(yq -r '.hosts | to_entries | .[] | select(.value.status == "active") |
+          [
+            .key,
+            .value.kind,
+            (.value.network.lan_ip // "dynamic"),
+            (if .value.network.tailscale then "tailscale" else "lan" end),
+            .value.role
+          ] | @tsv' inventory.toml | awk -F'\t' '{printf "%-14s [%-7s | %-15s | %-9s] %s\n", $1, $2, $3, $4, $5}' | gum filter --placeholder "Select active host to SSH...")
+        [ -z "$selected" ] && exit 0
+        host=$(echo "$selected" | awk '{print $1}')
+        echo "Connecting to $host..."
+        ssh "$host"
+
+  agents:menu:diagnostics:
+    desc: "Theme: Remote host & service diagnostics"
+    cmds:
+      - |
+        choice=$(printf '%s\n' "host-health" "external-audit" "cache-probe" "sops-drift" exit | gum choose --header "Remote host & service diagnostics")
+        case "$choice" in
+          "host-health")
+            selected=$(yq -r '.hosts | to_entries | .[] | select(.value.status == "active" and (.value.kind == "nixos" or .value.kind == "darwin")) | .key' inventory.toml | gum filter --placeholder "Select host for systemd probe...")
+            [ -z "$selected" ] && exit 0
+            echo "Probing $selected systemd status..."
+            ssh "$selected" "systemctl is-system-running; echo 'Failed units:'; systemctl --failed --no-pager"
+            ;;
+          "external-audit") task checks:remotes ;;
+          "cache-probe")
+            echo "Probing frieren LAN binary cache (:5000)..."
+            curl -sI http://192.168.3.25:5000/nix-cache-info || echo "Cache unreachable"
+            ;;
+          "sops-drift") task checks:sops:drift ;;
           exit) exit 0 ;;
         esac
 
@@ -43,23 +85,111 @@ tasks:
         esac
 
   agents:menu:ops:
-    desc: "Theme: system ops & maintenance"
+    desc: "Theme: system ops, maintenance & deployments"
     cmds:
       - |
-        choice=$(printf '%s\n' rebuild check status deploy logs update load exit | gum choose --header "System ops")
+        choice=$(printf '%s\n' rebuild check deploy logs store cache update status load-env exit | gum choose --header "System ops")
         case "$choice" in
-          load) task infra:load:menu ;;   # was a dead bare `load` entry
-          rebuild|check|status|deploy|logs|update) task "$choice" ;;
+          rebuild) task agents:menu:rebuild ;;
+          check) task agents:menu:check ;;
+          deploy) task infra:deploy:menu ;;
+          logs) task infra:logs:menu ;;
+          store) task infra:store:menu ;;
+          cache) task infra:warm:cache ;;
+          update) task infra:update:fleet ;;
+          status) task status ;;
+          load-env) task infra:load:menu ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:rebuild:
+    desc: Interactive system rebuild & switch picker
+    cmds:
+      - |
+        choice=$(printf '%s\n' "nixos-local" "darwin-local" "home-manager-local" "deploy-remote" "fleet-parallel" exit | gum choose --header "Rebuild & deployment options")
+        case "$choice" in
+          "nixos-local") task infra:rebuild:nixos ;;
+          "darwin-local") task infra:rebuild:darwin ;;
+          "home-manager-local") task infra:rebuild:home-manager ;;
+          "deploy-remote") task infra:deploy:menu ;;
+          "fleet-parallel") task infra:apply:fleet ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:check:
+    desc: Interactive repo validation and check picker
+    cmds:
+      - |
+        choice=$(printf '%s\n' "quick" "modules" "inventory" "architecture" "sops-drift" "nix-lint" "remotes" exit | gum choose --header "Validation checks")
+        case "$choice" in
+          quick) task checks:quick ;;
+          modules) task checks:modules:validate ;;
+          inventory) task checks:inventory:sync ;;
+          architecture) nix build .#checks.x86_64-linux.host-architecture -L ;;
+          "sops-drift") task checks:sops:drift ;;
+          "nix-lint") task checks:nix:lint ;;
+          remotes) task checks:remotes ;;
           exit) exit 0 ;;
         esac
 
   agents:menu:config:
-    desc: "Theme: configuration & secrets"
+    desc: "Theme: configuration & declarations"
     cmds:
       - |
-        choice=$(printf '%s\n' edit-config new exit | gum choose --header "Configuration & secrets")
+        choice=$(printf '%s\n' modules inventory secrets nix-modules ssh-ca exit | gum choose --header "Configuration & declarations")
         case "$choice" in
-          edit-config|new) task "$choice" ;;
+          modules) task dev:modules:menu ;;
+          inventory) task dev:inventory:menu ;;
+          secrets) task agents:menu:secrets ;;
+          nix-modules) task agents:menu:nix-modules ;;
+          ssh-ca) task agents:menu:ssh-ca ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:nix-modules:
+    desc: Jump to core Nix module in $EDITOR
+    cmds:
+      - |
+        choice=$(printf '%s\n' "global.nix" "nixos.nix" "home-role.nix" "shell.nix" "sops.nix" "flake.nix" exit | gum choose --header "Select Nix configuration to edit")
+        case "$choice" in
+          "global.nix") ${EDITOR:-nano} modules/global/global.nix ;;
+          "nixos.nix") ${EDITOR:-nano} modules/global/nixos.nix ;;
+          "home-role.nix") ${EDITOR:-nano} modules/roles/home.nix ;;
+          "shell.nix") ${EDITOR:-nano} modules/shell/default.nix ;;
+          "sops.nix") ${EDITOR:-nano} modules/sops.nix ;;
+          "flake.nix") ${EDITOR:-nano} flake.nix ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:ssh-ca:
+    desc: SSH Certificate Authority management
+    cmds:
+      - |
+        choice=$(printf '%s\n' "status" "rotate-cert" "add-workstation" exit | gum choose --header "SSH CA operations")
+        case "$choice" in
+          status) task infra:ssh:status ;;
+          "rotate-cert") task infra:ssh:rotate-cert ;;
+          "add-workstation")
+            age_key=$(gum input --placeholder "Enter recipient age key (age1...)")
+            [ -n "$age_key" ] && task infra:ssh:add-workstation AGE="$age_key"
+            ;;
+          exit) exit 0 ;;
+        esac
+
+  agents:menu:secrets:
+    desc: "Theme: SOPS encrypted secrets management"
+    cmds:
+      - |
+        choice=$(printf '%s\n' "edit-apikeys" "edit-secrets" "edit-taskfile" "edit-detaskfile" "sync-mirror" "check-drift" "update-keys" "new-key" exit | gum choose --header "SOPS Secrets management")
+        case "$choice" in
+          "edit-apikeys") task infra:secrets:edit:apikeys ;;
+          "edit-secrets") task infra:secrets:edit:secrets ;;
+          "edit-taskfile") task infra:secrets:edit:taskfile ;;
+          "edit-detaskfile") task infra:secrets:edit:detaskfile ;;
+          "sync-mirror") task infra:secrets:sync ;;
+          "check-drift") task checks:sops:drift ;;
+          "update-keys") task infra:sops:update-keys ;;
+          "new-key") task infra:secrets:new:generate ;;
           exit) exit 0 ;;
         esac
 
@@ -91,37 +221,9 @@ tasks:
       - task browse-projects
 
   edit-config:
-    desc: "[deprecated] Legacy edit-config menu - use infra:secrets:edit:* or direct file edits"
+    desc: "[deprecated] Legacy edit-config menu - use task agents:menu:config or direct file edits"
     cmds:
-      - |
-        choice=$(printf '%s\n' infra:secrets:edit:taskfile infra:secrets:edit:detaskfile infra:secrets:edit:apikeys infra:secrets:edit:secrets edit-global edit-sops edit-sops-config edit-home-manager edit-shell-config exit | gum choose)
-        task "$choice"
-
-  edit-global:
-    desc: Edit global nix module
-    cmds:
-      - $EDITOR ./modules/global/global.nix
-
-  edit-sops:
-    desc: Edit .sops.yaml and update recipients
-    cmds:
-      - $EDITOR .sops.yaml
-      - task infra:sops:update-keys
-
-  edit-sops-config:
-    desc: Edit sops Nix module config
-    cmds:
-      - $EDITOR ./modules/sops.nix
-
-  edit-home-manager:
-    desc: Edit canonical home role module
-    cmds:
-      - $EDITOR ./modules/roles/home.nix
-
-  edit-shell-config:
-    desc: Edit shell module defaults
-    cmds:
-      - $EDITOR ./modules/shell/default.nix
+      - task agents:menu:config
 
   update:
     desc: "[deprecated] Legacy update menu - use dev:git:* or dev:flake:* directly"
@@ -148,4 +250,3 @@ tasks:
     desc: Run a sudo-login command from encrypted server command list
     cmds:
       - ssh $(sops -d --extract '["server"]["commands"]' {{.SECRETS}}/{{.ENC_SECRETS}} | gum choose)
-

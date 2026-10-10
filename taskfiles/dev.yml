@@ -312,6 +312,72 @@ tasks:
     cmds:
       - bash scripts/task/nixbuild-warm.sh warm {{.CLI_ARGS}}
 
+  dev:closure:
+    desc: Closure subsystem breakdown (HOST=name|local, TARGET=store path; store-DB only)
+    cmds:
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} subsystems {{if .TARGET}}{{.TARGET}}{{end}}
+
+  dev:closure:size:
+    desc: Total closure size for a host or store path (HOST=name|local)
+    cmds:
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} size {{if .TARGET}}{{.TARGET}}{{end}}
+
+  dev:closure:top:
+    desc: Biggest contributors by own size (HOST=name, N=count, TARGET=store path)
+    cmds:
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} top {{.N | default "20"}} {{if .TARGET}}{{.TARGET}}{{end}}
+
+  dev:closure:graph:
+    desc: ASCII graph of a host's closure subsystem breakdown (HOST=name|local)
+    cmds:
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} graph {{if .TARGET}}{{.TARGET}}{{end}}
+
+  dev:closure:dot:
+    desc: Emit raw Graphviz DOT for a closure (HOST=name|local)
+    cmds:
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} dot {{if .TARGET}}{{.TARGET}}{{end}}
+
+  dev:closure:toml:
+    desc: Emit a 3-level closure TOML tree for handoff/agent reports (HOST=name, OUT=path)
+    cmds:
+      - mkdir -p docs/closures
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} toml > {{.OUT | default "docs/closures/local.toml"}}
+
+  dev:closure:tui:
+    desc: Interactive closure explorer — pick a host, then a view (gum)
+    cmds:
+      - bash scripts/task/closure-analysis.sh tui
+
+  dev:closure:native:
+    desc: Nix-native closure breakdown (prototype; HOST=label, ROOT=store path)
+    cmds:
+      - bash scripts/task/closure-graph.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if .ROOT}}--root {{.ROOT}}{{end}} subsystems
+
+  dev:closure:native:top:
+    desc: Nix-native biggest contributors by own size (N=count, ROOT=store path)
+    cmds:
+      - bash scripts/task/closure-graph.sh {{if .ROOT}}--root {{.ROOT}}{{end}} top {{.N | default "20"}}
+
+  dev:closure:native:graph:
+    desc: Nix-native closure subsystem graph as terminal ASCII art (HOST=label)
+    cmds:
+      - bash scripts/task/closure-graph.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if .ROOT}}--root {{.ROOT}}{{end}} graph
+
+  dev:closure:native:toml:
+    desc: Nix-native 3-level closure TOML tree (ROOT=store path)
+    cmds:
+      - bash scripts/task/closure-graph.sh {{if .ROOT}}--root {{.ROOT}}{{end}} toml
+
+  dev:closure:native:diff:
+    desc: "[gate] Verify the Nix-native closure graph matches closure-analysis.sh byte-for-byte"
+    cmds:
+      - bash scripts/task/closure-graph-diff.sh {{if .ROOT}}{{.ROOT}}{{end}}
+
+  dev:closure:diff:
+    desc: Closure size deltas between two store paths (FROM=old, TO=new)
+    cmds:
+      - bash scripts/task/closure-analysis.sh diff {{.FROM}} {{.TO | default "/run/current-system"}}
+
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
     cmds:
@@ -350,9 +416,14 @@ tasks:
         done
 
   dev:fmt:
-    desc: Format all Nix files with nixpkgs-fmt in-place (repo standard, same as CI/hooks)
+    desc: Format all Nix files in-place with alejandra (alias of checks:nix:fix)
+    summary: >
+      Delegates to scripts/task/nix-fmt.sh --fix --all, the single implementation
+      also behind checks:nix:fix and checks:nix:watch. alejandra is the repo's
+      canonical formatter; do NOT switch this to nixpkgs-fmt, which would rewrite
+      ~170 of the 187 tracked .nix files.
     cmds:
-      - nix-shell -p nixpkgs-fmt --run "nixpkgs-fmt flake.nix flake hosts modules overlays lib"
+      - bash scripts/task/nix-fmt.sh --fix --all
 
   dev:pr:list:
     desc: List open pull requests

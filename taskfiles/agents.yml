@@ -212,13 +212,9 @@ tasks:
 
   browse-projects:
     desc: Open projects page
+    aliases: [projects]
     cmds:
       - zen https://shaoyanji.github.io
-
-  projects:
-    desc: Alias for browse-projects
-    cmds:
-      - task browse-projects
 
   edit-config:
     desc: "[deprecated] Legacy edit-config menu - use task agents:menu:config or direct file edits"

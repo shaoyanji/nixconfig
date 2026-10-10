@@ -16,3 +16,7 @@ __pycache__/
 /MEMORY.md
 .agents/hosts/
 .task/
+# Generated closure report trees (regenerate: task dev:closure:toml)
+docs/closures/
+# Generated registry mirror (regenerate: task dev:modules:sync)
+docs/modules-registry.md

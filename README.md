@@ -14,20 +14,18 @@ Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style containe
 
 1. **Prerequisites**: NixOS/Darwin system with flakes enabled
 2. **Clone repo**: `git clone <repo-url> && cd nixconfig`
-3. **List tasks**: `task --list-all` to see all available tasks
+3. **List tasks**: `task --list-all`, or browse them interactively with `task menu`
 4. **Build a host**: `task infra:plan:host:frieren`
 5. **Deploy**: `task infra:deploy:host:frieren` (plan + apply + validate)
 
 ## Module chains
 
-Module chains compose as follows:
-
-```
-globalModulesNixos      → global → nixos → home-manager-shared → role:heim
-globalModulesImpermanence → globalModulesNixos → +impermanence module
-globalModulesContainers  → global → noDE (lean home-manager, no dms/niri)
-globalModulesMacos       → global → macos (nix-darwin, no dms/niri)
-```
+The chains themselves (`globalModulesNixos`, `globalModulesImpermanence`,
+`globalModulesContainers`, `globalModulesMacos`, `globalModulesHome`,
+`globalModulesDemo`) are defined in [`flake/module-sets.nix`](flake/module-sets.nix)
+and tabulated — with the hosts that use each — in
+[`AGENTS.md`](AGENTS.md) §Module Chains. That table is canonical, so it is not
+duplicated here.
 
 `base-node.nix` (profile) provides the common NixOS baseline: kernel packages, SSH, keyd, networkmanager, console, sops, user `devji`, common dev packages, and boot loader defaults (systemd-boot + EFI). Container and desktop hosts import it via `globalModulesContainers` or `desktop-client.nix`.
 `base-node.nix` also imports `modules/profiles/firewall-baseline.nix`, which enables the firewall and only opens TCP/22 by default. Hosts should add service/interface-specific allowances explicitly.
@@ -319,15 +317,12 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 
 ## Supported Hosts
 
-| Host          | ollama | Role |
-|---------------|--------|------|
-| frieren       | no     | ⭐ **NAS server** (Samba, NFS, Jellyfin, Paperless, DNS) |
-| mtfuji        | yes    | Reference AI host (ollama; agent-era modules removed 2026-09) |
-| kellerbench   | no     | Gaming backup rig |
-| scratch       | no     | Lightweight niri desktop (eisen-style, tmpfs/zram IO diet) |
-| stark         | no     | Dell 3477 AIO Steam Big Picture desktop (MX110 Optimus, legacy_580 offload) |
-| fern          | no     | HP 15 laptop niri desktop (Ryzen 3 3250U, no Steam, autologin) |
-| deckstation   | no     | Steam/gamescope kiosk |
+The fleet roster — 31 devices across NixOS, nix-darwin, standalone Home Manager,
+external non-Nix nodes, preserved and WIP machines — is defined once in
+[`inventory.toml`](inventory.toml), the machine-readable source of truth, and
+rendered for humans in [`docs/fleet-inventory.md`](docs/fleet-inventory.md).
+`task dev:inventory:sync` validates the two against each other, so the roster is
+deliberately **not** duplicated here.
 
 `deckstation` is a pure Steam install — no desktop environment, just greetd + tuigreet dropping into gamescope-session (Steam Big Picture). Uses `globalModulesContainers` so no dms/niri leaks in. Runs Sunshine GameStream/Moonlight host so any LAN client (phone, laptop, TV box) can launch the big screen remotely. Closure is minimalistic: ROCm/OpenCL compute packages are dropped from the AMD profile since Steam + gamescope only need Mesa + amdgpu.
 
@@ -339,23 +334,18 @@ Per-host quirks and exceptions: `.agents/deploy/hosts/*.md`
 
 ## Flake outputs
 
-- `nixosConfigurations`
-- `darwinConfigurations`
-- `homeConfigurations`
-- `packages`
-- `checks`
-- `devShells`
-
-Canonically assembled from [`flake/outputs.nix`](flake/outputs.nix) and [`lib/mk-nixos-host.nix`](lib/mk-nixos-host.nix).
+`nixosConfigurations`, `darwinConfigurations`, `homeConfigurations`, `packages`,
+`checks` and `devShells`, assembled from [`flake/outputs.nix`](flake/outputs.nix)
+via [`lib/mk-nixos-host.nix`](lib/mk-nixos-host.nix). The full assembly diagram and
+how inventory entries project into each output live in
+[`AGENTS.md`](AGENTS.md) §Flake Output Assembly.
 
 ## Secrets & SSH CA
 
-Secrets use `sops-nix`. Two separate encrypted files:
-
-| File | Decryptors | Contents |
-|------|------------|----------|
-| `modules/secrets.yaml` | All hosts (via their `ssh_host_ed25519_key` age keys in `.sops.yaml`) | App secrets, `hashedPassword`, API keys |
-| `modules/ssh-ca-key.yaml` | Full fleet (all age recipients in `.sops.yaml`; includes frieren since 2026-10-08) | SSH User CA private key |
+Secrets use `sops-nix`. The two encrypted files (`modules/secrets.yaml`,
+`modules/ssh-ca-key.yaml`) and their recipient sets are tabulated in
+[`AGENTS.md`](AGENTS.md) §Secrets Architecture — that table is canonical, so it
+is not duplicated here.
 
 ### SSH CA workflow
 

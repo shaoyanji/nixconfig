@@ -1,11 +1,14 @@
-{ stdenv, python3, python3Packages }:
-
+{
+  stdenv,
+  python3,
+  python3Packages,
+}:
 stdenv.mkDerivation {
   name = "nixconfig-docs-site";
   src = ../.;
-  nativeBuildInputs = [ python3 ];
-  buildInputs = [ python3Packages.markdown ];
-  phases = [ "buildPhase" "installPhase" ];
+  nativeBuildInputs = [python3];
+  buildInputs = [python3Packages.markdown];
+  phases = ["buildPhase" "installPhase"];
   buildPhase = ''
     mkdir -p docsite
     python3 $src/docs-site/generate.py --repo-root $src --out docsite

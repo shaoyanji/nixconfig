@@ -3,6 +3,13 @@
 # ==============================================================================
 # Canonical device, host, hardware, and agent persona registry for nixconfig.
 # Source of truth for fleet state, hardware, roles, and device-specific agent personas.
+#
+# `managed = true` marks a host as being in the active rotation: its closure is
+# warmed on the cache host and it is included in the fleet deploy defaults
+# (infra:warm:cache, infra:apply:fleet). It is opt-in and deliberately NOT
+# implied by `status = "active"` — a host can be registered and active without
+# being deployed or warmed regularly, since several are powered off for months
+# at a time and warming them would be pure cache churn.
 # ==============================================================================
 [metadata]
 title = "Fleet Device & Host Inventory"
@@ -22,6 +29,7 @@ preserved_devices = 16
 hostname = "frieren"
 status = "active"
 status_detail = "In active 24/7 production as the central fleet NAS and service host."
+managed = true
 kind = "nixos"
 arch = "x86_64-linux"
 role = "Central NAS Mainframe, 4K Media Center & Application Server"
@@ -235,6 +243,7 @@ constraints = [
 hostname = "poseidon"
 status = "active"
 status_detail = "In active production as the primary high-performance laptop workstation."
+managed = true
 kind = "nixos"
 arch = "x86_64-linux"
 role = "Primary High-Performance Laptop Workstation"
@@ -339,6 +348,7 @@ constraints = ["Host is preserved/dormant; do not target for live deployment."]
 hostname = "eisen"
 status = "active"
 status_detail = "In active production as the primary 12-core gaming workstation, Sunshine GameStream host, and local MoE LLM node: Qwen3.6-35B-A3B under llama-swap with DFlash2 speculative decoding, served as an OpenAI /v1 API at eisen.lan (LAN) and via tailscale serve (tailnet), and auto-yielding to Steam games. Also serves Laya, a 421M CPU-only Jev-compatible decision model speaking POST /v1/systemone at laya.lan and tailscale serve :8443."
+managed = true
 kind = "nixos"
 arch = "x86_64-linux"
 role = "High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node"
@@ -538,6 +548,7 @@ constraints = ["Preserved host; do not target for live deployment."]
 hostname = "stark"
 status = "active"
 status_detail = "In active production as the living room All-in-One Steam Big Picture terminal."
+managed = true
 ci = false
 kind = "nixos"
 arch = "x86_64-linux"
@@ -723,6 +734,7 @@ constraints = ["Preserved host; do not target for live deployment."]
 hostname = "fern"
 status = "active"
 status_detail = "In active production as the primary lightweight daily-driver laptop."
+managed = true
 kind = "nixos"
 arch = "x86_64-linux"
 role = "Lightweight Daily-Driver Laptop"
@@ -781,6 +793,7 @@ constraints = [
 hostname = "scratch"
 status = "active"
 status_detail = "In active production as a lightweight desktop operating under a strict I/O diet."
+managed = true
 kind = "nixos"
 arch = "x86_64-linux"
 role = "I/O Diet Lightweight Workstation"
@@ -1413,6 +1426,7 @@ constraints = ["Offline/on-demand tool; not a persistent running host."]
 hostname = "guckloch"
 status = "active"
 status_detail = "In active production as a WSL2 development subsystem on Windows."
+managed = true
 kind = "nixos"
 arch = "x86_64-linux"
 role = "Windows Subsystem for Linux (WSL2) Container"

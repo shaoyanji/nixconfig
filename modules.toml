@@ -1,0 +1,251 @@
+# ==============================================================================
+# FLEET MODULAR CONTROL KNOB REGISTRY (modules.toml)
+# ==============================================================================
+# Canonical declarative registry for system roles, optional profiles, and services.
+# Provides fast, native in-place updates via yq and the interactive TUI.
+# ==============================================================================
+[metadata]
+title = "Fleet Modular Control Knob Registry"
+description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
+version = "1.0.0"
+canonical_repo = "https://github.com/shaoyanji/nixconfig"
+total_knobs = 23
+
+# ------------------------------------------------------------------------------
+# 1. OPTIONAL PROFILES
+# ------------------------------------------------------------------------------
+[knobs.ai]
+name = "AI Agent Tooling"
+type = "profile"
+category = "ai"
+option = "profiles.ai.enable"
+path = "modules/user/ai/default.nix"
+description = "AI coding agent CLI tooling (mods, aichat, crush, freebuff, antigravity-cli)"
+default = false
+hosts = ["eisen", "poseidon", "fern", "stark", "scratch", "guckloch"]
+
+[knobs.sunshine]
+name = "Sunshine GameStream"
+type = "profile"
+category = "gaming"
+option = "services.sunshine.enable"
+path = "modules/profiles/sunshine.nix"
+description = "Sunshine GameStream/Moonlight host server for LAN/remote low-latency game streaming"
+default = false
+hosts = ["eisen", "kellerbench", "deckstation"]
+
+[knobs.steam]
+name = "Steam Gaming & Gamescope"
+type = "profile"
+category = "gaming"
+option = "programs.steam.enable"
+path = "modules/profiles/steam.nix"
+description = "Steam client with gamescope session support and hardware controller udev rules"
+default = false
+hosts = ["eisen", "kellerbench", "deckstation", "ares"]
+
+[knobs.steamos]
+name = "SteamOS Big Picture Kiosk"
+type = "profile"
+category = "gaming"
+option = "steamos.kiosk.enable"
+path = "modules/profiles/steamos.nix"
+description = "Dedicated Big Picture kiosk cage auto-login session"
+default = false
+hosts = ["ares"]
+
+[knobs.nixbuild]
+name = "nixbuild.net Remote Builder"
+type = "profile"
+category = "infrastructure"
+option = "profiles.nixbuild-client.enable"
+path = "modules/profiles/nixbuild-client.nix"
+description = "Offloads heavy x86_64/aarch64 Nix compilations to nixbuild.net cloud builders"
+default = false
+hosts = ["frieren"]
+
+[knobs.server-hardening]
+name = "Server Hardening"
+type = "profile"
+category = "security"
+option = "profiles.server-hardening.enable"
+path = "modules/profiles/server-hardening.nix"
+description = "Security baseline with journald caps, aggressive tmp cleanup, and audit logging"
+default = false
+hosts = ["frieren", "delphi"]
+
+[knobs.hermes]
+name = "Hermes Agent Gateway"
+type = "profile"
+category = "ai"
+option = "profiles.hermes.enable"
+path = "modules/profiles/hermes.nix"
+description = "Autonomous Hermes agent environment and isolated runtime permissions"
+default = false
+hosts = ["frieren"]
+
+[knobs.nas-client]
+name = "NAS Client Mounts"
+type = "profile"
+category = "storage"
+option = "profiles.nas-client.enable"
+path = "modules/profiles/nas-client.nix"
+description = "Direct NFS and Samba mounts to frieren NAS data pools"
+default = false
+hosts = ["eisen", "poseidon", "fern", "kellerbench", "deckstation", "ares"]
+
+[knobs.sshfs-nas-client]
+name = "SSHFS NAS Client Mounts"
+type = "profile"
+category = "storage"
+option = "profiles.sshfs-nas-client.enable"
+path = "modules/profiles/sshfs-nas-client.nix"
+description = "Encrypted userland SSHFS mounts to frieren for remote/Tailscale clients"
+default = false
+hosts = []
+
+[knobs.laptop]
+name = "Laptop Power Management"
+type = "profile"
+category = "hardware"
+option = "profiles.laptop.enable"
+path = "modules/profiles/laptop.nix"
+description = "Power saving tweaks (TLP / thermald / auto-cpufreq) for mobile nodes"
+default = false
+hosts = ["frieren", "poseidon", "fern", "applevalley"]
+
+[knobs.nvidia]
+name = "NVIDIA Proprietary Drivers"
+type = "profile"
+category = "hardware"
+option = "hardware.nvidia.modesetting.enable"
+path = "modules/profiles/nvidia.nix"
+description = "Proprietary NVIDIA graphics drivers (unfree, local builds on host)"
+default = false
+hosts = ["stark", "kellerbench"]
+
+[knobs.microvm-host]
+name = "MicroVM Virtualization Host"
+type = "profile"
+category = "virtualization"
+option = "microvm.host.enable"
+path = "modules/profiles/microvm-host.nix"
+description = "Hypervisor host for lightweight NixOS MicroVMs"
+default = false
+hosts = []
+
+[knobs.base-desktop]
+name = "Base Desktop Environment"
+type = "profile"
+category = "desktop"
+option = "profiles.desktop.enable"
+path = "modules/profiles/base-desktop-environment.nix"
+description = "Wayland niri compositor, DankMaterialShell greeter, and pipewire audio"
+default = false
+hosts = ["frieren", "poseidon", "eisen", "fern", "scratch"]
+
+[knobs.base-node]
+name = "Base Node Baseline"
+type = "profile"
+category = "system"
+option = "profiles.base-node.enable"
+path = "modules/profiles/base-node.nix"
+description = "Core system baseline: systemd, SSH, sudo, nix settings, and firewall baseline"
+default = true
+hosts = ["frieren", "poseidon", "eisen", "fern", "stark", "kellerbench", "deckstation", "ares", "delphi", "applevalley", "scratch", "minyx"]
+
+[knobs.impermanence]
+name = "Impermanence Root Rollback"
+type = "profile"
+category = "system"
+option = "environment.persistence.enable"
+path = "modules/profiles/impermanence.nix"
+description = "Erase-your-darlings root filesystem rollback on every boot"
+default = false
+hosts = ["ares", "garnixMachine"]
+
+# ------------------------------------------------------------------------------
+# 2. SYSTEM SERVICES
+# ------------------------------------------------------------------------------
+[knobs.harmonia]
+name = "Harmonia LAN Binary Cache"
+type = "service"
+category = "infrastructure"
+option = "services.harmonia.enable"
+path = "modules/services/harmonia.nix"
+description = "Serves local nix store closures over HTTP (:5000) for zero-latency LAN caching"
+default = false
+hosts = ["frieren"]
+
+[knobs.home-assistant]
+name = "Home Assistant & Mosquitto"
+type = "service"
+category = "iot"
+option = "services.home-assistant.enable"
+path = "modules/services/home-assistant.nix"
+description = "Home Assistant Core IoT dashboard (:8123) with Mosquitto MQTT message broker"
+default = false
+hosts = ["frieren"]
+
+[knobs.kiwix]
+name = "Kiwix Offline Wikipedia"
+type = "service"
+category = "knowledge"
+option = "services.kiwix-serve.enable"
+path = "modules/services/kiwix.nix"
+description = "Declarative Kiwix offline Wikipedia / ArchWiki server (:8088)"
+default = false
+hosts = ["frieren"]
+
+[knobs.paste]
+name = "Fleet Pastebin"
+type = "service"
+category = "infrastructure"
+option = "services.paste.enable"
+path = "modules/services/paste.nix"
+description = "Self-hosted pb pastebin service with private fleet pasta storage"
+default = false
+hosts = ["frieren"]
+
+[knobs.iventoy]
+name = "iVentoy Network PXE"
+type = "service"
+category = "infrastructure"
+option = "services.iventoy.enable"
+path = "modules/services/iventoy.nix"
+description = "PXE boot server for multi-ISO network installation across LAN"
+default = false
+hosts = ["frieren"]
+
+[knobs.aria2]
+name = "Aria2 RPC Download Daemon"
+type = "service"
+category = "downloads"
+option = "services.aria2-daemon.enable"
+path = "modules/services/aria2-daemon.nix"
+description = "Headless aria2 RPC daemon (:6801) with AriaNg web UI frontend"
+default = false
+hosts = ["frieren"]
+
+# ------------------------------------------------------------------------------
+# 3. SYSTEM ROLES
+# ------------------------------------------------------------------------------
+[knobs.role-heim]
+name = "Heim Full Workstation Role"
+type = "role"
+category = "roles"
+option = "roles.heim.enable"
+path = "modules/roles/heim.nix"
+description = "Full daily-driver developer workstation with GUI and user tooling"
+default = false
+hosts = ["poseidon", "fern"]
+
+[knobs.role-minimal]
+name = "Minimal Server Role"
+type = "role"
+category = "roles"
+option = "roles.minimal.enable"
+path = "modules/roles/minimal.nix"
+description = "Headless server role without desktop environments or heavy AI CLI tools"
+default = false
+hosts = ["delphi", "garnixMachine", "minyx", "kali", "alarm"]

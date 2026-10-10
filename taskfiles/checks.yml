@@ -11,6 +11,12 @@ tasks:
       - nix build .#checks.x86_64-linux.host-architecture -L
       - task checks:nix:lint
       - task checks:sops:drift
+      - task checks:modules:validate
+
+  checks:modules:validate:
+    desc: Verify modules.toml syntax and valid module paths on disk
+    cmds:
+      - bash scripts/task/modules-menu.sh validate
 
   checks:flake:transitive:
     desc: Sweep flake.lock transitive inputs against upstream heads (read-only; fails on drift)

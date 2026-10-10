@@ -126,6 +126,16 @@ tasks:
         cmds:
             - task dev:inventory:menu
 
+    modules:
+        desc: Open fleet control knobs menu (gum)
+        cmds:
+            - task dev:modules:menu
+
+    modules:menu:
+        desc: Alias for dev:modules:menu
+        cmds:
+            - task dev:modules:menu
+
     exit:
         internal: true
         cmds:

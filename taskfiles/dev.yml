@@ -287,6 +287,21 @@ tasks:
     cmds:
       - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --home-agents {{.HOST | default "frieren"}} --output ~/AGENTS.md"
 
+  dev:modules:menu:
+    desc: Interactive Charmbracelet Gum TUI for fleet modules.toml control knobs (yq-backed)
+    cmds:
+      - bash scripts/task/modules-menu.sh
+
+  dev:modules:sync:
+    desc: Synchronize docs/modules-registry.md from modules.toml
+    cmds:
+      - bash scripts/task/modules-menu.sh sync
+
+  dev:modules:validate:
+    desc: Validate modules.toml syntax and file paths
+    cmds:
+      - bash scripts/task/modules-menu.sh validate
+
   dev:nixbuild:plan:
     desc: Report what would build/fetch for hosts against local substituters (read-only)
     cmds:

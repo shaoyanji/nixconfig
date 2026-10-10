@@ -161,9 +161,12 @@ synthesises speech, this is the cleanest single removal after L1.
 etc/tmpfiles.d/graphics-driver.conf └── graphics-drivers └── intel-compute-runtime-legacy1-… └── intel-graphics-compiler-2.34.4
 ```
 
-An OpenCL/compute runtime reaching the closure through `hardware.graphics`. The
-frieren iGPU (Intel UHD 620) does not need the compute runtime to drive a
-display. Confirm with `task dev:closure:menu -- why intel-graphics-compiler`.
+An OpenCL/compute runtime reaching the closure through `hardware.graphics`.
+**Correction:** this one is deliberate, not accidental — `hosts/frieren/hardware.nix`
+adds it for Intel QuickSync, whose header comment calls the iGPU "excellent for 4K
+Jellyfin/Plex transcoding". Treat it as a trade-off decision, not a free win; see
+`docs/closure-debloat.md` §4 T1-5. Confirm with
+`task dev:closure:menu -- why intel-graphics-compiler`.
 
 ### L5 — `libreoffice` behind a single service · **1.5 GiB, candidate**
 

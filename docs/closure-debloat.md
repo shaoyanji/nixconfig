@@ -111,17 +111,27 @@ removes it.
 > via `import <nixpkgs>`, so it depends on this entry. Change one, change both.
 
 **T1-4 · `mbrola-voices` — 644.7 MiB.**
-`system-path └── speech-dispatcher └── mbrola └── mbrola-voices`. A full MBROLA
-voice set on a headless NAS. If nothing on frieren synthesises speech, this is the
-second-largest clean removal.
+`system-path └── speech-dispatcher └── mbrola └── mbrola-voices`. **Corrected
+attribution:** `nix-store -q --referrers` on speech-dispatcher names
+`zen-beta-1.23b`, both `electron-unwrapped` builds and `qtspeech` — it is the
+desktop browser stack's text-to-speech, not a NAS service. So this is *not* a
+free removal: it needs either an override of speech-dispatcher without MBROLA
+support or dropping the browser stack. Still 644.7 MiB for a voice set nothing on
+a headless server audibly uses.
 
-**T1-5 · `intel-compute-runtime-legacy1` / `intel-graphics-compiler` — 264.5 MiB.**
-Reaches the closure through `etc/tmpfiles.d/graphics-driver.conf └── graphics-drivers`.
-An OpenCL compute runtime, pulled for an iGPU that only needs to drive a display.
+**T1-5 · `intel-compute-runtime-legacy1` / `intel-graphics-compiler` — 264.5 MiB · RECLASSIFIED to Tier 2.**
+`etc/tmpfiles.d/graphics-driver.conf └── graphics-drivers`. **Correction:** this is
+NOT an accident. `hosts/frieren/hardware.nix` adds it deliberately —
+`intel-compute-runtime-legacy1 # OpenCL legacy (correct for Gen8-Gen11 i.e. KBL)`
+— under a header stating QuickSync is "excellent for 4K Jellyfin/Plex
+transcoding". Removing it trades 264.5 MiB for hardware-transcode capability,
+which is the host's purpose. It belongs with the Tier 2 service decisions, not
+with the free wins.
 
 **T1-6 · `hplip` via CUPS — ~70 MiB.** HP printer drivers, reached twice
-(`cups.service` 36.0 + `systemd-udevd` 36.4). If `services.printing` is on for no
-reason, both go.
+(`cups.service` 36.0 + `systemd-udevd` 36.4). CUPS arrives via
+`modules/profiles/desktop-client.nix` (`printing = {`), a shared desktop profile,
+so this needs a per-host override rather than an edit to that file.
 
 **T1-7 · Duplicate versions — up to 4.4 GiB (optimistic).** 675 groups still hold
 a redundant copy. The real yield is lower: the number assumes every group
@@ -132,8 +142,10 @@ and a daemon). Start with the ranked report, not the total.
 task dev:closure:menu -- reduce 20
 ```
 
-**Tier 1 subtotal: ~2.3 GiB of concrete, config-only savings** (703 + 260 + 399 +
-645 + 264 + 70 MiB), before the fuzzy duplicate work.
+**Tier 1 subtotal: ~2.0 GiB of concrete savings** (703 + 262 + 399 + 645 + 70 MiB),
+before the fuzzy duplicate work — and note two of those five need a mechanism
+beyond deleting a line: T1-4 needs a package override, T1-6 needs
+`services.printing` off. Only T1-1, T1-2 and T1-3 are single-line edits.
 
 ## 5. Tier 2 — service decisions (capability trade-offs)
 
@@ -201,7 +213,7 @@ GiB shared substrate does not move piecemeal:
 | Step | Projected total |
 | --- | --- |
 | Today | 33.8 GiB |
-| + Tier 1 (config-only) | **~31.5 GiB** |
+| + Tier 1 (config-only / override) | **~31.8 GiB** |
 | + Tier 1 and half of Tier 2 | **~29 GiB** |
 | + all of Tier 2 | **~27 GiB** (you just deleted a lot of services) |
 | + Tier 3 top 15 moved to `nix run` / devShells | **~23 GiB** |
@@ -226,5 +238,108 @@ of Tier 3 → the three JVM services → the `*arr` stack.
 - **A shared path listed twice is not waste.** The store dedupes; only *different
   versions* cost bytes, which is what the duplicate report measures.
 - **Evaluate only hosts `inventory.toml` calls `active`.**
-- **Nothing here is applied.** Tier 1 items were measured and traced, not changed;
-  only T1-1 has been removed, deployed and committed.
+- **Only T1-1 is applied.** It is removed, deployed as generation 81, committed
+  and pushed — so it survives the 04:00 autoUpgrade. Every other item in this plan
+  is measured and traced, not changed.
+
+## 9. Handoff
+
+### Status
+
+| | |
+| --- | --- |
+| **Done** | T1-1 duplicate Chromium, 703.2 MiB — removed, deployed (generation 81), pushed |
+| **Tooling** | `dev:closure:menu` (TUI + subcommands), `dev:closure:reduce`, `dev:closure:attribution`, `dev:closure:native:diff` parity gate |
+| **Docs** | `docs/closure-reduction.md` = tooling + evidence; this file = the plan |
+| **Not done** | everything below |
+
+### Work queue (ordered by value ÷ risk)
+
+**1 · T1-2 fonts — ~262 MiB · single-line edit.**
+`nerd-fonts.jetbrains-mono` is declared in
+`modules/profiles/base-desktop-environment.nix` (~line 88) — a **shared profile**,
+so a per-host override is the safe move, and the precedent already exists:
+`hosts/cassini/configuration.nix:74` sets `fonts.packages = []`. Keep
+`noto-fonts-cjk` only if CJK glyphs are actually rendered.
+Verify: `task dev:closure:menu -- why nerd-fonts-jetbrains-mono`, then re-measure
+the rebuilt toplevel.
+Accept: the font and `material-symbols` are absent from the new closure; terminals
+and the desktop still render.
+
+**2 · T1-3 `<nixpkgs>` source in `nix.conf` — ~399 MiB · single-line edit + coupling.**
+`modules/global/global.nix` (~line 66, `nix-path = [`) pins the nixpkgs **source
+tree** into the system closure. Replace with a flake ref or drop it.
+**Coupling:** `scripts/task/closure-graph.sh` resolves `<nixpkgs>` via
+`import <nixpkgs>` — change both together or the closure tooling breaks.
+Verify: `grep -n nix-path /etc/nix/nix.conf` after the switch, and
+`nix eval --impure --raw --expr '(import <nixpkgs> {}).lib.version'` to confirm
+`<nixpkgs>` still resolves (or is intentionally gone).
+
+**3 · T1-6 hplip via CUPS — ~70 MiB.**
+CUPS comes from `modules/profiles/desktop-client.nix` (`printing = {`), also a
+shared profile → per-host override. Verify: `unit-cups.service` and
+`unit-systemd-udevd.service` drop out of the attribution table.
+
+**4 · T1-4 `mbrola-voices` — 644.7 MiB · needs a mechanism, not a deletion.**
+Arrives via `speech-dispatcher`, which `nix-store -q --referrers` attributes to
+`zen-beta` + both `electron-unwrapped` builds + `qtspeech`. Either override
+speech-dispatcher without MBROLA support or decide the browser stack's TTS is
+worth 644.7 MiB on a headless NAS. Do not delete it blind — nothing obvious
+declares it.
+
+**5 · T1-7 duplicate versions — up to 4.4 GiB, optimistic.**
+`task dev:closure:menu -- reduce 20`, then `members <group>` for each candidate.
+A group is a candidate until a human confirms which copy is redundant.
+
+**6 · Tier 3, the Home Manager cohort — up to 4.3 GiB for the top 15.**
+Blocked on `flake/packages.nix` and `flake/apps` still being empty attrsets — with
+no `nix run` path, every tool must be installed to be reachable. Fill those, then
+drop the cohort from `home.packages` on hosts that do not run them continuously.
+Start with `qmd` (904.2 MiB) — investigate *why* a markdown search tool is nearly
+a gigabyte before deciding.
+
+**7 · Tier 2 — the service decisions.** Twelve services, 4.7 GiB of exclusive
+bytes. These are capability choices, not cleanup. Three of them are JVM document
+services (stirling-pdf, gotenberg, tika, ~1.4 GiB between them); Plex and Jellyfin
+coexist. Nothing here should be touched without the owner of the media stack
+agreeing.
+
+### Open questions a next pass should answer
+
+- Why is `qmd-2.8.3` **904.2 MiB** — the largest single Home Manager member?
+- Is `index-x86_64-linux` (**101.6 MiB**, the `nix-index` database) used? If
+  recursive `nix-locate` never runs, that is free.
+- Is `linux-firmware` (**809.5 MiB**) trimmable for this hardware, or is it all
+  required by the iGPU/WiFi/Bluetooth the host actually uses?
+- Does anything still need `<nixpkgs>` at runtime, or is T1-3 pure legacy?
+
+### Operational rules that bite on this host
+
+1. **Push or lose it.** `hosts/frieren/configuration.nix:140` is
+   `flake = "github:shaoyanji/nixconfig#frieren"` at `dates = "04:00"`. A local
+   switch from an unpushed tree is reverted by the next run. Commit **and** push.
+2. **One `nixos-rebuild` at a time.** Never retry-loop; measure progress instead.
+3. **Do not rebuild 03:00–05:30**, and avoid Sunday morning
+   (`fleet-warm-cache` runs Sun 01:30 with a 30 min jitter).
+4. **Evaluate only hosts `inventory.toml` calls `active`.** Preserved and WIP
+   hosts are not deployed and cannot regress.
+5. **Build store-only first:** `nix build --no-link .#nixosConfigurations.frieren.config.system.build.toplevel`,
+   measure it, then switch.
+6. **Compare set differences, not totals.** A rebuild rewrites `etc`,
+   `system-units` and `home-manager-*`, so a true 703 MiB removal reads as 701 MiB
+   net.
+7. **Nothing in Tier 1 needs a flake update.** `flake.lock` bumps re-fetch the
+   whole closure (tens of minutes here) and are not a debloat lever.
+
+### Verification recipe (use for every item)
+
+```bash
+nix build --no-link --print-out-paths --no-write-lock-file \
+  .#nixosConfigurations.frieren.config.system.build.toplevel > /tmp/new
+nix-store -q --requisites /run/current-system | sort > /tmp/old.txt
+nix-store -q --requisites "$(cat /tmp/new)" | sort > /tmp/new.txt
+comm -23 /tmp/old.txt /tmp/new.txt      # removed
+comm -13 /tmp/old.txt /tmp/new.txt      # added (config churn)
+task dev:closure:attribution            # recheck the owner table
+```
+Accept only when the removed set matches the intent and the added set is churn.

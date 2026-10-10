@@ -1,5 +1,16 @@
 version: "3"
 
+# Deprecated / compatibility names for the services:* layer.
+#
+# The rebuild aliases (nixos-rebuild, darwin-rebuild, home-manager-switch,
+# wsl-rebuild, orb-rebuild) are NOT declared here any more — they are `aliases:`
+# on the canonical infra:rebuild:* tasks. Same behaviour, but they no longer
+# register as separate entries in `task --list-all --json`, which is the
+# agent-facing contract.
+#
+# The wildcard wrappers below cannot become aliases: a Task alias is a plain
+# name and cannot carry a `*`, so these stay as tasks.
+
 tasks:
   # Removed: pre-hook-rebuild (broken - services:rebuild:pre-hook doesn't exist)
   # Use infra:rebuild:* directly instead
@@ -20,31 +31,6 @@ tasks:
 
   # Removed: prb:* (redundant - creates circular routing through services layer)
   # Use infra:deploy:host:* directly instead
-
-  nixos-rebuild:
-    desc: "[deprecated] Alias for infra:rebuild:nixos"
-    cmds:
-      - task infra:rebuild:nixos
-
-  darwin-rebuild:
-    desc: "[deprecated] Alias for infra:rebuild:darwin"
-    cmds:
-      - task infra:rebuild:darwin
-
-  home-manager-switch:
-    desc: "[deprecated] Alias for infra:rebuild:home-manager"
-    cmds:
-      - task infra:rebuild:home-manager
-
-  wsl-rebuild:
-    desc: "[deprecated] Alias for infra:rebuild:wsl"
-    cmds:
-      - task infra:rebuild:wsl
-
-  orb-rebuild:
-    desc: "[deprecated] Alias for infra:rebuild:orb"
-    cmds:
-      - task infra:rebuild:orb
 
   services:deploy:rpi:
     desc: Deploy configured Raspberry Pi host
@@ -71,6 +57,8 @@ tasks:
     cmds:
       - task infra:deploy:host:mtfuji
 
+  # Cannot be an alias: infra:deploy:host:mtfuji is matched by the
+  # infra:deploy:host:* wildcard, and a Task alias cannot carry a wildcard.
   push-fuji-rebuild:
     desc: "[deprecated] Alias for infra:deploy:host:mtfuji"
     cmds:

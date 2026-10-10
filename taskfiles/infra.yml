@@ -99,29 +99,34 @@ tasks:
 
   infra:rebuild:nixos:
     desc: Rebuild local NixOS host and refresh ~/Taskfile.yml
+    aliases: [nixos-rebuild]
     cmds:
       - task infra:switch:nixos
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:rebuild:darwin:
     desc: Rebuild local Darwin host and refresh ~/Taskfile.yml
+    aliases: [darwin-rebuild]
     cmds:
       - task infra:switch:darwin
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:rebuild:home-manager:
     desc: Rebuild local Home Manager profile
+    aliases: [home-manager-switch]
     cmds:
       - home-manager switch --flake .?submodules=1#$(hostname) |& nom
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:rebuild:wsl:
     desc: Rebuild WSL host configuration
+    aliases: [wsl-rebuild]
     cmds:
       - sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes |& nom
 
   infra:rebuild:orb:
     desc: Rebuild OrbStack host configuration and refresh ~/Taskfile.yml
+    aliases: [orb-rebuild]
     cmds:
       - sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure |& nom
       - task infra:secrets:decrypt:detaskfile-home
@@ -167,12 +172,24 @@ tasks:
       - nixos-rebuild switch --use-remote-sudo --target-host {{.HOST}} --fast --flake .?submodules=1#{{.HOST}} |& nom
 
   infra:warm:cache:
-    desc: Build every fleet host closure locally so harmonia serves them at LAN speed (UPDATE=1 also refreshes flake.lock)
+    desc: Build the managed host closures locally so harmonia serves them at LAN speed (HOSTS="a b" overrides; UPDATE=1 also refreshes flake.lock)
     vars:
-      HOSTS: '{{.HOSTS | default "frieren poseidon eisen fern stark scratch guckloch"}}'
+      # The set comes from inventory.toml, NOT from `status = "active"`: warming
+      # costs a full closure fetch/build on the cache host and the store is
+      # garbage-collected, so it is a deliberate per-host opt-in (`managed = true`).
+      # DERIVED must be declared BEFORE HOSTS — task resolves task vars in
+      # declaration order, so a later DERIVED resolves to nil and yields an
+      # empty HOSTS (a silent no-op).
+      DERIVED:
+        sh: yq -r '.hosts | to_entries | .[] | select(.value.managed == true and .value.status == "active") | .key' inventory.toml | tr '\n' ' '
+      HOSTS: '{{.HOSTS | default .DERIVED}}'
       UPDATE: '{{.UPDATE | default "0"}}'
     cmds:
       - |
+        if [ -z "{{.HOSTS}}" ]; then
+          echo "ERROR: no hosts to warm — inventory.toml has no 'managed = true' host (or is unreadable)." >&2
+          exit 1
+        fi
         if [ "{{.UPDATE}}" = "1" ]; then
           echo "==> refreshing flake.lock"
           nix flake update --commit-lock-file
@@ -206,11 +223,19 @@ tasks:
       - nix copy --to http://192.168.3.25:5000?compress=true ".#nixosConfigurations.{{.HOST}}.config.system.build.toplevel"
 
   infra:apply:fleet:
-    desc: Apply to many hosts in parallel (HOSTS="h1 h2", default = deployable NixOS fleet)
+    desc: Apply to many hosts in parallel (HOSTS="h1 h2"; default = inventory.toml hosts with managed = true)
     vars:
-      HOSTS: '{{.HOSTS | default "frieren poseidon eisen fern stark scratch guckloch"}}'
+      # The same deliberate, inventory-derived set as infra:warm:cache; DERIVED
+      # is declared before HOSTS for the reason noted there.
+      DERIVED:
+        sh: yq -r '.hosts | to_entries | .[] | select(.value.managed == true and .value.status == "active") | .key' inventory.toml | tr '\n' ' '
+      HOSTS: '{{.HOSTS | default .DERIVED}}'
     cmds:
       - |
+        if [ -z "{{.HOSTS}}" ]; then
+          echo "ERROR: no hosts to apply to — inventory.toml has no 'managed = true' host (or is unreadable)." >&2
+          exit 1
+        fi
         # Fan out one nixos-rebuild per host; each host builds locally on
         # the dispatcher, so the nix daemon serialises the eval/build work
         # while activation happens concurrently over SSH.

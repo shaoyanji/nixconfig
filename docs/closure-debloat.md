@@ -172,7 +172,13 @@ document/PDF services** (stirling-pdf, gotenberg, tika) costing ~1.4 GiB between
 them, and **Plex and Jellyfin coexist** (Jellyfin's cost is inside the shared
 substrate, Plex's 212.6 MiB is exclusive).
 
-**Tier 2 subtotal: up to ~4.7 GiB** — but only if the services go.
+To that total add **T1-5's `intel-compute-runtime-legacy1` at 264.5 MiB**, which was
+reclassified here from Tier 1 once `hosts/frieren/hardware.nix` turned out to add
+it deliberately for QuickSync. It is the same kind of decision as the rows above:
+264.5 MiB against the host's media-transcoding capability.
+
+**Tier 2 subtotal: up to ~5.0 GiB** (twelve services at ~4.7 GiB, plus the 264.5
+MiB compute runtime) — but only if the services go.
 
 ## 6. Tier 3 — the 9.4 GiB Home Manager profile
 
@@ -215,7 +221,7 @@ GiB shared substrate does not move piecemeal:
 | Today | 33.8 GiB |
 | + Tier 1 (config-only / override) | **~31.8 GiB** |
 | + Tier 1 and half of Tier 2 | **~29 GiB** |
-| + all of Tier 2 | **~27 GiB** (you just deleted a lot of services) |
+| + all of Tier 2 (~5.0 GiB) | **~27 GiB** (you just deleted a lot of services) |
 | + Tier 3 top 15 moved to `nix run` / devShells | **~23 GiB** |
 | **Practical floor as configured** | **~16–17 GiB** — kernel, systemd, glibc, Python, LLVM, GTK, firmware |
 

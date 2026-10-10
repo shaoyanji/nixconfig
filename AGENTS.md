@@ -351,6 +351,45 @@ task data:protect:private        # Enforce 0700 permissions and .nomedia shields
 task data:index:refresh          # Refresh qmd docs and vault search indices
 ```
 
+### Closure Analysis (store-DB, no eval)
+
+Cheap "what is actually in this system" analysis: it reads the store database via
+`nix path-info` instead of evaluating Nix — the fix for `checks:quick` having
+stopped being quick. Targets the local `/run/current-system` by default,
+`HOST=<name>` (SSH-resolves a remote host and reads *its* store DB), or an
+explicit store path.
+
+```bash
+task dev:closure:size HOST=<name>          # total size + path count
+task dev:closure HOST=<name>               # subsystem breakdown
+task dev:closure:top N=20 HOST=<name>      # biggest contributors by own size
+task dev:closure:graph HOST=<name>         # terminal ASCII graph (Graphviz -> graph-easy)
+task dev:closure:toml HOST=<name> OUT=...  # 3-level tree for handoff / agent reports
+task dev:closure:tui                       # interactive host + view picker
+task dev:closure:diff FROM=<old> TO=<new>  # closure deltas (module-reduction scoreboard)
+task dev:closure:native                    # same breakdown, computed natively by Nix (prototype)
+task dev:closure:native:diff               # [gate] Nix-native output == shell output, byte-for-byte
+```
+
+Backed by `scripts/task/closure-analysis.sh`. Generated report trees are **not
+tracked** (`docs/closures/` is gitignored) — they are point-in-time and stale
+after any rebuild. Regenerate on demand; use `dev:closure:diff` to compare
+generations.
+
+**Nix-native prototype.** `lib/closure-graph.nix` computes the same five views
+from Nix's own store graph (`pkgs.closureInfo` → `exportReferencesGraph`) instead
+of the store DB, and `scripts/task/closure-graph-diff.sh` proves parity — on
+frieren all five views are byte-identical for a 3949-path system closure, an
+older generation, and a 141-path package closure. Two things to know if you
+touch it:
+
+- `closureInfo` needs its roots *declared*. `builtins.storePath "/nix/store/…"`
+  for a live path, or a derivation attribute; a bare `/run/current-system`
+  symlink is not in the input closure and `exportReferencesGraph` refuses it.
+- It is **local-store only** (no `HOST=<name>`): `closureInfo` builds locally.
+
+Rationale and the eval-speed trade-off: `docs/control-plane-vision.md` §4/§6.
+
 ### Validation
 
 ```bash
@@ -361,7 +400,7 @@ task checks:qmd:vault            # qmd Obsidian vault collection registered + in
 nix eval .#nixosConfigurations.<host>.config.networking.hostName  # Quick eval check
 nix build .#checks.x86_64-linux.host-architecture -L              # Host architecture validation
 nix flake check                  # Full evaluation (slower, catches everything)
-task checks:nix:lint             # nixpkgs-fmt --check
+task checks:nix:lint             # deadnix (fail) + statix (advisory)
 ```
 
 #### Agent Verification Protocol (compute discipline)
@@ -381,7 +420,7 @@ Verification must be proportional to the change — never eval as a ritual:
 3. **Keyless environments (Codespaces, CI sandboxes, fresh clones).** Nix
    evaluation never needs sops keys, age keys, or secret values — sops-nix
    only declares file paths at eval time. Safe keyless checks:
-   `nix eval`, `nixpkgs-fmt --check`, `deadnix`, `statix check`.
+   `nix eval`, `alejandra --check`, `deadnix`, `statix check`.
    NOT keyless (skip in Codespaces, they fail or hang without
    `~/.config/sops/age/keys.txt` and SSH access):
    `task checks:quick` (sops drift step), any `infra:*` secret/deploy task.
@@ -440,8 +479,8 @@ nix build .?submodules=1#nixosConfigurations.<host>.config.system.build.toplevel
 nix build .#checks.x86_64-linux.host-architecture -L                         # Run host checks
 nix build .#checks.x86_64-linux.host-eval-frieren                        # Build a single check
 nix build .#devShells.x86_64-linux.default                                   # Enter dev shell
-nixpkgs-fmt <file>                                                           # Format Nix file
-nixpkgs-fmt --check <file>                                                   # Check formatting
+alejandra <file>                                                             # Format Nix file
+alejandra --check <file>                                                     # Check formatting
 ```
 
 ---
@@ -544,6 +583,26 @@ CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodul
 
 ## Nix Patterns & Gotchas
 
+### HARD RULE: never hand-edit TOML — use `yq`
+
+**TOML is edited and parsed with `yq`, never by text substitution.** This is not
+style: hand-editing `inventory.toml` in this repo produced unparseable TOML (a
+stray-indent anchor silently merged two lines), and it is not caught until
+something else reads the file. `yq -i` rewrites the AST, so it *cannot* emit a
+file that does not parse.
+
+```bash
+yq -i '.hosts.eisen.managed = true' inventory.toml   # write (AST-level, safe)
+yq '.hosts | to_entries | length' inventory.toml      # read (exit 1 on parse error)
+task checks:toml:lint                                 # prove EVERY tracked .toml parses
+```
+
+- Use `yq -i` for writes. Never `sed -i`, never an editor-style string replace.
+- After any TOML change — including one `yq` cannot express — run
+  `task checks:toml:lint`. It exits non-zero and names the offending file.
+- The same applies to JSON (`jq`) and YAML (`yq -p yaml -o yaml`); the rule is
+  "edit through the format's own tool", not "edit text that happens to be data".
+
 ### Non-obvious patterns
 
 - **User constants**: `modules/global/user.nix` is the single source of truth for the primary user (`devji`). Import it with `let user = import ../global/user.nix;` — never hardcode user paths or the username.
@@ -620,6 +679,27 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 
 ---
 
+## Taskfile as the Agent Contract
+
+The Taskfile is the **standalone machine contract** for this repo: an agent should
+be able to discover and drive the whole control plane from it, with no prose docs
+and no second manifest.
+
+- **Discovery is the API.** `task --list-all --json` (or `task menu:json`) returns
+  every task with its `desc`, `summary`, and aliases. Nothing is maintained twice.
+- **Contracts live in `summary`.** It is the only free-form field returned by
+  `--list-all --json`, so it carries what `desc` cannot: required vars, output
+  format, exit-code meaning, and whether the task is safe unattended. Check tasks
+  exit non-zero on drift, by convention.
+- **Never `internal: true`.** It hides the task from `--list-all --json` too, which
+  silently breaks the contract. To keep a task off the human CLI, drop its `desc`
+  and move the text into `summary` (detail in `docs/task-control-plane.md`).
+- **Parameters are vars with data-derived defaults.** `HOSTS=`, `ROOT=`, `N=` are
+  documented per task in `summary`. Defaults come from `inventory.toml` (via `yq`),
+  not from hardcoded lists — so adding a host is a data edit, not a Taskfile edit.
+- **Wildcards are not invocable.** `infra:plan:host:*` has no `.MATCH` to bind;
+  call the concrete name (`task infra:plan:host:poseidon`).
+
 ## Memory hierarchy (jev decides escalation)
 
 | Layer              | Role                                          | When used                                      |
@@ -676,6 +756,9 @@ Prefer BM25 `qmd search` (instant); `qmd embed` (semantic vectors) is optional a
 ## Key Operator Helpers
 
 - `agents:menu` is the interactive operator control plane
+- `task menu` is the whole-Taskfile gum TUI; `menu:list` / `menu:json` are its
+  machine surfaces. Never mark a task `internal: true` to hide it — that removes
+  it from `--list-all --json` too and breaks the agent endpoint.
 - NAS client recovery logic lives under `modules/profiles/nas-client.nix`
 
 ## Deployment Guidance
@@ -692,7 +775,100 @@ bash .git-hooks-setup.sh    # sets core.hooksPath to .githooks/
 
 ## Nixpkgs Formatting
 
-Nix files use `nixpkgs-fmt`. The formatter is included in `base-node.nix` system packages and dev shells. CI checks formatting via `task checks:nix:lint`.
+**alejandra is the canonical formatter** — every tracked `.nix` file is
+aljandra-clean, and `dev:fmt`, `checks:nix:fix` and the pre-commit hook all run
+it. The hook is a thin wrapper over `scripts/task/nix-fmt.sh`, so it uses the same
+versions and the same cache as the tasks and no longer accepts `nixpkgs-fmt`.
+**Never run `nixpkgs-fmt` repo-wide — it would rewrite ~170 of 187 files**, and it
+is no longer installed: `base-node.nix` ships `alejandra`, `deadnix` and `statix`
+instead, which also lets `nix-fmt.sh` take its PATH branch and skip the first-run
+`nix build`. `task checks:nix:lint` is the deadnix/statix pass, not a formatter
+check.
+
+`scripts/task/nix-fmt.sh` is the **single implementation** behind every Nix
+format/lint path, so the watcher can never use different tool versions than the
+gate that judges the commit:
+
+| Task | What |
+| :--- | :--- |
+| `task checks:nix:fix` | one-shot fix — the hard gates (deadnix + alejandra), all paths |
+| `task dev:fmt` | alias of `checks:nix:fix` |
+| `task checks:nix:lint` | **read-only gate** — deadnix (fails) + statix (advisory) |
+| `task checks:nix:format` | **read-only gate** — `alejandra --check` |
+| `task checks:nix:watch` | **the watch hook** — auto-formats on every save |
+| `task checks:toml:lint` | every tracked `.toml` parses (the `yq` rule's guard) |
+
+The script takes `--tools LIST` (a comma-separated subset of
+`deadnix,statix,alejandra`), which is how the read-only gates keep their exact
+tool sets — `checks:nix:lint` is deadnix+statix and `checks:nix:format` is
+aljandra — **without** introducing a second place that resolves tool versions.
+Add a new Nix tool task by passing `--tools`, never by calling
+`nix-shell -p alejandra` (or deadnix/statix) directly.
+
+The default tool set is the **hard gates, `deadnix` and `alejandra`** — the ones
+that make the commit fail. **statix is never auto-applied**: it is advisory here
+(its W20 warning fires on the house style, and the pre-commit hook never fixes
+with it), so it is only *reported* by `checks:nix:lint`. To write its suggestions
+deliberately, pass it by name:
+`bash scripts/task/nix-fmt.sh --fix --all --tools deadnix,statix,alejandra`.
+
+The toolchain resolves from the **nixpkgs revision pinned in `flake.lock`** — the
+same versions `.githooks/pre-commit` uses — and is cached as GC-rooted out-links
+under `~/.cache/nixconfig-nixfmt/`, so a save costs ~70 ms instead of re-resolving
+a shell. The pin is re-resolved when `flake.lock` changes.
+
+**Auto-format hook (no manual tool calls).** Start it once and leave it:
+
+```bash
+task checks:nix:watch
+```
+
+It watches `**/*.nix` via task's `watch` flag and formats only the files git
+reports as dirty, so a save touches one file. It writes only when a file actually
+changes — deadnix/statix/alejandra are idempotent (verified) — so it cannot
+re-trigger itself into a loop. Verified end to end: a misformatted file is fixed
+in under 1 s, and a pure indentation change is restored byte-identical.
+
+One caveat it reports rather than hides: **deadnix will not strip the last lambda
+argument**, so `{pkgs}: …` with an unused `pkgs` stays flagged. `--fix` re-verifies
+after writing and exits non-zero on residue the tools cannot rewrite, instead of
+claiming success on a tree the commit gate would still reject.
+
+#### Operating the watcher (read this before backgrounding it)
+
+| | |
+| :--- | :--- |
+| Start | `task checks:nix:watch` |
+| Status | `task checks:nix:watch:status` — pid + elapsed, or "not running" |
+| Stop | **`task checks:nix:watch:stop`** — signals the watcher by pid and verifies it exited (or Ctrl+C in the foreground) |
+| Watch interval | `interval: '500ms'` at the root of `Taskfile.yml` — coalesces a multi-file save into one run (task's default is 100ms and duplicate events were observed) |
+
+Three behaviours that bit us, all confirmed against
+[task's watch docs](https://taskfile.dev/docs/guide/watch):
+
+- **Stopping it is not "kill the shell that started it".** Watch mode is known to
+  leave children running, and the watcher is a *grandchild* of whatever launched
+  it — killing the launching shell left a live `task checks:nix:watch` formatting
+  the repo for ~8 minutes, and it looked stopped because the parent PID was gone.
+  Use `task checks:nix:watch:stop`: it matches the watcher cmdline exactly (so it
+  can never signal the shell that launched it, or its own shell), signals it,
+  waits, and **verifies** it is gone rather than assuming the signal landed. If
+  you must do it by hand, `pkill -x task` then check `pgrep -x task`.
+- **A task's `cmds` run in task's own restricted shell, not bash.** `kill` is an
+  "unsupported builtin" there and silently does nothing — the stop task looked
+  like it succeeded while the watcher kept running. Any builtin that is not plain
+  POSIX may be missing, so drop to a real shell for it:
+  `bash -c 'kill "$1"' _ "$pid"`.
+- **`--dry` does not suppress `watch: true`.** `task --dry checks:nix:watch` starts
+  a real watcher and blocks; it timed out a probe here. There is no dry run for a
+  watch task.
+- **`watch: true` only applies to CLI invocations.** Called from another task's
+  `cmds`/`deps` it does *not* start a watcher, so it cannot be pulled in as a
+  dependency and quietly hang a pipeline.
+
+`sources` drives both change detection *and* the up-to-date check. This task has
+no `generates`, so it re-runs on every change — correct for a formatter, and it
+writes nothing when there is nothing to change, which is what keeps it stable.
 
 ## External Package Registry
 

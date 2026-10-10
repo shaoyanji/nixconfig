@@ -1,4 +1,9 @@
 version: "3"
+# Watch mode: coalesce changes that land within 500ms so a multi-file save
+# triggers ONE run instead of several duplicate events (task's default is 100ms,
+# and duplicates were observed when a new file appeared). Only affects tasks
+# using watch/--watch — see checks:nix:watch.
+interval: '500ms'
 vars:
     # Control-plane vars consumed by taskfiles/* via {{.SECRETS}}/{{.ENC_*}}/
     # {{.PI}}/{{.EMAIL}} — lost together with the menu tasks when c85a41d
@@ -96,11 +101,6 @@ tasks:
             - git status --short
             - echo "host=$(hostname)"
 
-    check:
-        desc: Run narrow validation checks
-        cmds:
-            - task checks:quick
-
     deploy:
         desc: Open deployment menu
         cmds:
@@ -112,9 +112,24 @@ tasks:
             - task infra:logs:menu
 
     menu:
-        desc: Open operator menu (gum)
+        desc: Open the task control plane (gum TUI, human view)
         cmds:
-            - task agents:menu
+            - bash scripts/task/menu.sh human
+
+    menu:operator:
+        desc: Open the task control plane (gum TUI, machine-operator view)
+        cmds:
+            - bash scripts/task/menu.sh operator
+
+    menu:json:
+        desc: Print the whole task control plane as JSON (machine-readable)
+        cmds:
+            - bash scripts/task/menu.sh --json
+
+    menu:list:
+        desc: Print every task as a flat name<TAB>desc listing
+        cmds:
+            - bash scripts/task/menu.sh --list
 
     inventory:
         desc: Open fleet inventory menu (gum)

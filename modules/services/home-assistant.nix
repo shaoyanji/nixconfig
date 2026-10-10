@@ -4,14 +4,13 @@
 # Reusable NixOS module for hosting Home Assistant with a local loopback
 # MQTT broker (Mosquitto), Uptime-Kuma status dashboards, and system
 # telemetry sensors.
-{ config
-, lib
-, ...
-}:
-let
-  cfg = config.services.ha-stack;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.services.ha-stack;
+in {
   options.services.ha-stack = {
     enable = lib.mkEnableOption "Home Assistant IoT & device stack";
 
@@ -96,7 +95,7 @@ in
 
     extraPackages = lib.mkOption {
       type = lib.types.functionTo (lib.types.listOf lib.types.package);
-      default = ps: [ ps.androidtvremote2 ];
+      default = ps: [ps.androidtvremote2];
       description = "Extra Python packages for Home Assistant";
     };
   };
@@ -106,7 +105,7 @@ in
       enable = true;
       inherit (cfg) configDir extraComponents extraPackages;
       config = {
-        default_config = { };
+        default_config = {};
         command_line = lib.mkIf cfg.telemetry.enable [
           {
             sensor = {
@@ -156,7 +155,7 @@ in
       };
     };
     networking.firewall.allowedTCPPorts = lib.mkMerge [
-      (lib.mkIf cfg.openFirewall [ 8123 ])
+      (lib.mkIf cfg.openFirewall [8123])
       (lib.mkIf (cfg.uptime-kuma.enable && cfg.uptime-kuma.openFirewall) [
         cfg.uptime-kuma.port
       ])

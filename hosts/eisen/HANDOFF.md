@@ -67,3 +67,16 @@ https://eisen.<tailnet>.ts.net:8443/v1/systemone
 **Kev-4B was evaluated and rejected for this host**: it serves only on CUDA, ROCm or Apple MLX, and the RX 5700 (Navi 10 / gfx1010) is outside ROCm's support matrix with 8 GiB against Kev-4B's ~16 GiB floor. Its llama.cpp route is closed too — Kev is a LoRA adapter plus pointer head on Qwen3.5-4B-Base, not a merged model.
 
 > **Accuracy is not Jev's.** On the public 49-task / 869-case benchmark Jev scores 0.966 macro accuracy against Laya-base 0.583, and on large option sets the base checkpoints fall to ~0.43 where Jev holds 0.87. Do not let this gate a destructive decision on its own, and gate on `answer_confidence` fit on your own data — Laya's `confidence` is `1 - normalized entropy`, so a Jev cutoff does not transfer.
+
+---
+
+## Speech: Qwen3-TTS (`tts.lan`)
+
+Offline, OpenAI-compatible text-to-speech alongside the text endpoints, also on the RX 5700 via **Vulkan**. Implementation: [`modules/services/qwen-tts.nix`](../../modules/services/qwen-tts.nix); enablement + commands: [`hosts/eisen/TTS.md`](./TTS.md).
+
+```
+http://tts.lan/v1/audio/speech            (nginx :80 -> 127.0.0.1:8181)
+https://eisen.<tailnet>.ts.net:8444/…     (tailscale serve)
+```
+
+Runtime `ServeurpersoCom/qwentts.cpp` (C++17/GGML, MIT) built from source with `-DGGML_VULKAN=ON`; its own `tts-server` is wrapped (no Python). Weights `Serveurperso/Qwen3-TTS-GGUF` — `qwen-talker-1.7b-customvoice-Q4_K_M.gguf` + `qwen-tokenizer-12hz-Q8_0.gguf` on `/mnt/storage/tts/models`, fetched by idempotent oneshot units. Named voices: `vivian` (default), `serena`, `uncle_fu`, `ryan`, `aiden`, `ono_anna`, `sohee`, `eric`, `dylan`; zero-shot cloning registers via the runtime's voice registry. Loopback-only `:8181`, exposed through nginx and `tailscale serve` — never in the firewall.

@@ -373,6 +373,16 @@ tasks:
     cmds:
       - bash scripts/task/closure-graph-diff.sh {{if .ROOT}}{{.ROOT}}{{end}}
 
+  dev:closure:menu:
+    desc: Traversable closure explorer (gum TUI; subcommand after -- e.g. `task dev:closure:menu -- reduce 10`)
+    cmds:
+      - bash scripts/task/closure-menu.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if .ROOT}}--root {{.ROOT}}{{end}} {{.CLI_ARGS | default "menu"}}
+
+  dev:closure:reduce:
+    desc: Closure reduction report — duplicate groups with every concrete copy (N=groups, ROOT=store path)
+    cmds:
+      - bash scripts/task/closure-menu.sh {{if .ROOT}}--root {{.ROOT}}{{end}} reduce {{.N | default "10"}}
+
   dev:closure:diff:
     desc: Closure size deltas between two store paths (FROM=old, TO=new)
     cmds:

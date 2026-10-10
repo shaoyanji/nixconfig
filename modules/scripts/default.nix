@@ -3,21 +3,17 @@
     # ./examples.nix
   ];
   home.packages = with pkgs; [
+    # NOTE: `nvidia-offload` used to live here, which shipped it to EVERY host
+    # (``modules/user/base`` pulls in this directory). It is a PRIME render-offload
+    # wrapper, so it belongs only on the NVIDIA GPU hosts. Those hosts get the
+    # canonical wrapper directly from NixOS via
+    # `hardware.nvidia.prime.offload.enableOffloadCmd = true` (see
+    # ``modules/profiles/nvidia.nix`` and ``hosts/stark/nvidia-mx110.nix``) — it
+    # exports the same __NV_PRIME_RENDER_OFFLOAD / __GLX_VENDOR_LIBRARY_NAME /
+    # __VK_LAYER_NV_optimus variables. Do not re-add a global copy here.
+    #
     # Refresh checksums for URL-based config JSON files
     # Usage: nix-hash-update path/to/config.json
-    (
-      pkgs.writers.writeBashBin "nvidia-offload" {}
-      /*
-      bash
-      */
-      ''
-        export __NV_PRIME_RENDER_OFFLOAD=1
-        export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
-        export __GLX_VENDOR_LIBRARY_NAME=nvidia
-        export __VK_LAYER_NV_optimus=NVIDIA_only
-        exec "$@"
-      ''
-    )
     (pkgs.writers.writeBashBin "nix-hash-update" {}
       /*
       bash

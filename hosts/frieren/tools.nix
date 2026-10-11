@@ -582,6 +582,7 @@
     # hermes-agent — Fryuni fork of the 2026-09 teardown; lives on the
     # mainframe only (see fleet closure policy in ~/HANDOFF.md).
     pkgs.llm-agents.hermes-agent
+    simplex-chat
     skills
     cowsay
     figlet

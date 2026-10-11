@@ -12,6 +12,7 @@
     # from https://cache.numtide.com instead of compiling from source.
     {
       nixpkgs.overlays = [
+        (import ../overlays/simplex-chat.nix)
         (final: _prev: {
           llm-agents = inputs.llm-agents.packages.${final.stdenv.hostPlatform.system};
         })

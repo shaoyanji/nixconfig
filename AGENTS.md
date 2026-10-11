@@ -635,6 +635,70 @@ Before deploying a host referencing Java (Maven/Gradle), Go, or Rust packages, r
 
 CI commands use `nix build -L .?submodules=1#...` — the `?submodules=1` is critical for accessing the `modules/secrets` submodule. Local `nix build` without that flag works fine since the submodule is already checked out.
 
+### Autonomous Agent Operational Rules & Nix Environment Gotchas (Field Notes)
+
+When autonomous agents (`agy`, `hermes`, subagents) execute tool calls across NixOS hosts and WSL2, the pure/declarative nature of Nix introduces specific failure modes that do not exist in conventional FHS Linux distributions:
+
+#### 1. Non-Login SSH Shells Lack Ambient Profile PATH
+* **Failure Mode**: Running `ssh host 'python3 ...'` or `ssh host 'simplex-chat ...'` fails with `bash: line 1: command: not found` (exit code 127), even though the package is installed in `environment.systemPackages` or `home.packages`.
+* **Root Cause**: Non-interactive, non-login SSH sessions do not execute `/etc/profile` or Home Manager session scripts, so Nix store binaries in `/run/current-system/sw/bin` and `~/.nix-profile/bin` are absent from `PATH`.
+* **Fix**: Force a login shell via `ssh host 'bash -l -c "command"'`, invoke via full path (e.g. `/etc/profiles/per-user/<user>/bin/<binary>`), or run dynamically via `ssh host 'nix shell nixpkgs#<pkg> -c <bin>'`.
+
+#### 2. Python Package Composition in `nix shell` (`python3.withPackages`)
+* **Failure Mode**: Calling `nix shell nixpkgs#python3 nixpkgs#python3Packages.websockets -c python3 script.py` fails with `ModuleNotFoundError: No module named 'websockets'`.
+* **Root Cause**: In Nix, Python modules are not ambiently placed in a global `site-packages`. Providing `python3` and `python3Packages.foo` as separate packages in `nix shell` produces two distinct store paths; the Python interpreter does not know about the library.
+* **Fix**: Always compose dependencies explicitly via `withPackages`:
+  ```bash
+  nix shell --impure --expr 'let pkgs = import <nixpkgs> {}; in pkgs.python3.withPackages (ps: with ps; [ websockets requests ])' -c python3 script.py
+  ```
+  Declaratively, specify `(python3.withPackages (ps: with ps; [ ... ]))`.
+
+#### 3. Flakes Ignore Untracked Files (`git add -N` Trap)
+* **Failure Mode**: After creating a new Nix module or overlay (e.g. `modules/services/smp-server.nix`), running `nix build`, `nix eval`, or `nixos-rebuild` errors with `file does not exist` or evaluates stale code.
+* **Root Cause**: Nix Flakes evaluate strictly against the git staging index / tracked tree. Untracked working tree files are completely invisible to the Nix evaluator.
+* **Fix**: Always stage newly created files before invoking Nix:
+  ```bash
+  git add -N <path/to/new/file.nix>
+  ```
+
+#### 4. Stale SSH ControlMaster Multiplexing Sockets
+* **Failure Mode**: Remote `ssh <host>` commands hang indefinitely without output until cancelled or timed out.
+* **Root Cause**: `~/.ssh/config` enables `ControlMaster auto` with socket paths under `~/.ssh/sockets/%r@%h:%p`. If a previous SSH process or subagent terminated abruptly, a dead Unix socket remains, causing subsequent SSH calls to wait on a non-responsive master multiplexer.
+* **Fix**: For non-interactive agent commands, bypass ControlMaster by passing `-o ControlMaster=no`:
+  ```bash
+  ssh -o ControlMaster=no host 'command'
+  ```
+  Or purge stale master sockets: `rm -f ~/.ssh/sockets/*`.
+
+#### 5. Cross-Device Link / Permission Denied on Symlinked Secrets (`atomic_replace`)
+* **Failure Mode**: Application setup wizards (e.g. `hermes gateway setup`) crash with:
+  `OSError: [Errno 18] Invalid cross-device link: '/home/user/.app/.env.tmp' -> '/run/secrets/rendered/app.env'`
+  followed by `PermissionError: [Errno 13] Permission denied: '/run/secrets/rendered/app.env'`.
+* **Root Cause**: Tools like Python's `atomic_replace` write to a temporary file on disk (`/home/user/`) and execute `os.replace` to replace the target. If `target` is a symlink pointing to `/run/secrets/` (rendered on a `tmpfs` RAM disk with `0400` mode), `os.replace` fails across filesystem boundaries, and fallback copy fails due to read-only `0400` file permissions.
+* **Fix**: Never symlink mutable application configuration files (where self-managing CLIs write runtime tokens) directly into read-only `tmpfs` secrets. Decouple into an independent `0600` standalone file populated with secrets, or inject credentials via systemd `EnvironmentFile` directly.
+
+#### 6. Upstream FHS Binaries on NixOS (Dynamic Linker & Missing Subprocess Tools)
+* **Failure Mode**: Running raw upstream Linux binaries directly yields `/lib64/ld-linux-x86-64.so.2: No such file or directory`. Even with `autoPatchelfHook`, subprocess calls during `init` (e.g. calling `openssl` or `/bin/sh`) fail with exit code 127.
+* **Root Cause**: NixOS does not conform to the FHS filesystem layout (no `/lib64` or ambient `/bin/sh`).
+* **Fix**:
+  1. Package upstream binaries in overlays with `autoPatchelfHook` and complete `buildInputs` (`[ zlib openssl gmp stdenv.cc.cc.lib ]`).
+  2. For systemd services, explicitly provide runtime CLI dependencies via `systemd.services.<name>.path = with pkgs; [ openssl coreutils gnused bash ];`.
+
+#### 7. Strict Firewall Scoping Overrides Global `allowedTCPPorts`
+* **Failure Mode**: A service declares `networking.firewall.allowedTCPPorts = [ port ];` (or `openFirewall = true`), but the port remains unreachable and packets are silently dropped.
+* **Root Cause**: Hardened hosts (e.g. `hosts/frieren/firewall-scope.nix`) use `lib.mkForce` to clear global allowed ports and enforce strict per-interface scoping (`enp1s0`, `wlp2s0`, `tailscale0`) to prevent container bridge leaks (`docker0`).
+* **Fix**: On scoped hosts, always add new service ports to `scopedTCP` in `hosts/<host>/firewall-scope.nix` in addition to the service module's `openFirewall`.
+
+#### 8. Haskell / Haskeline Piped Stdin Crash (`System.Terminal.Platform: undefined`)
+* **Failure Mode**: Piping commands into terminal-oriented CLIs (like `simplex-chat`) via `printf "cmd\n" | simplex-chat` terminates immediately with `simplex-chat: Prelude.undefined ... System.Terminal.Platform`.
+* **Root Cause**: Interactive terminal frameworks expect a pseudo-terminal (TTY). Passing piped stdin into interactive loops invokes unhandled code paths in the terminal driver.
+* **Fix**: Use dedicated non-interactive execution flags (e.g. `simplex-chat -e "<cmd>"`) or communicate via daemon WebSocket / JSON-RPC APIs (`simplex-rpc.py`).
+
+#### 9. Remote Heredoc Backtick / Variable Expansion
+* **Failure Mode**: Running `ssh host 'bash -c "cat << EOF ... \`backticks\` ... $var ... EOF"'` produces syntax errors on remote or evaluates variables locally on the caller machine.
+* **Root Cause**: Double-quoted SSH strings and unquoted heredoc tags (`<< EOF`) expand variables and command substitutions before transmission.
+* **Fix**: Always quote heredocs (`<< 'EOF'`), write scripts to shared storage (`/Volumes/data/projects/...`), or pipe scripts into remote interpreters via stdin (`ssh host 'python3' < script.py`).
+
 ---
 
 ## Adding a New Host

@@ -45,6 +45,7 @@
     3001 # uptime-kuma (ha-stack.nix)
     3005
     5000 # harmonia LAN cache (modules/services/harmonia.nix)
+    5223 # simplex smp-server (modules/services/simplex-smp-server.nix)
     5357
     6801 # AriaNg (configuration.nix)
     7351 # Stirling PDF (networking.nix)

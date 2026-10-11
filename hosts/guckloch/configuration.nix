@@ -23,6 +23,7 @@ in {
 
   environment.systemPackages = with pkgs; [
     markdownlint-cli
+    simplex-chat
   ];
 
   programs.nix-ld.enable = true;

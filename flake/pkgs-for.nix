@@ -1,5 +1,6 @@
 {nixpkgs}: let
   overlays = [
+    (import ../overlays/simplex-chat.nix)
     (import ../overlays/nvidia-persistenced-fix.nix)
     (import ../overlays/nushell-plugins-compat.nix)
     # kickstart.nixvim treesitter.nix still references the tmux grammar

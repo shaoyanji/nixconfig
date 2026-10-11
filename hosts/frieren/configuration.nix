@@ -178,6 +178,7 @@ in {
   home-manager.users.devji.programs.hermes-user = {
     enable = true;
     gateway.enable = true;
+    simplex.daemon = true;
     envFile = "/run/secrets/rendered/hermes.env";
   };
 

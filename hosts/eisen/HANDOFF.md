@@ -80,3 +80,41 @@ https://eisen.<tailnet>.ts.net:8444/…     (tailscale serve)
 ```
 
 Runtime `ServeurpersoCom/qwentts.cpp` (C++17/GGML, MIT) built from source with `-DGGML_VULKAN=ON`; its own `tts-server` is wrapped (no Python). Weights `Serveurperso/Qwen3-TTS-GGUF` — `qwen-talker-1.7b-customvoice-Q4_K_M.gguf` + `qwen-tokenizer-12hz-Q8_0.gguf` on `/mnt/storage/tts/models`, fetched by idempotent oneshot units. Named voices: `vivian` (default), `serena`, `uncle_fu`, `ryan`, `aiden`, `ono_anna`, `sohee`, `eric`, `dylan`; zero-shot cloning registers via the runtime's voice registry. Loopback-only `:8181`, exposed through nginx and `tailscale serve` — never in the firewall.
+
+---
+
+## Visual Generation & Editing: Qwen-Image-2.1 (`image.lan`)
+
+Offline, OpenAI-compatible text-to-image generation and complex image editing (local inpainting, expanding, object extraction, and native RGBA transparency), tailored for Eisen's **Xeon E5-2673 v3 (12c/24t) + 62 GiB DDR4 + AMD Radeon RX 5700 (8 GiB VRAM, Vulkan/radv)**.
+
+```
+http://image.eisen.lan/v1/images/generations   (nginx :80 -> 127.0.0.1:8282)
+https://eisen.<tailnet>.ts.net:8445/v1/images… (tailscale serve)
+```
+
+### 1. Model Architecture & Selection
+* **Architecture**: Unified multimodal generative model pairing a **7B Single-Stream Diffusion Transformer (DiT)** (32 layers) with a **Qwen3-VL 8B text encoder** (~15B total parameter pipeline).
+* **Champion Checkpoint**: **`Qwen-Image-2.1-Turbo`** (October 2026 release).
+  - *Why Turbo*: Replaces the base model's 40-step diffusion loop with an accelerated **8-step denoising schedule** while retaining 2K resolution, multi-image identity reference conditioning (up to 10 images), and alpha transparency. Crucial for acceptable latency on Eisen's compute budget without high-end data-center GPUs.
+
+### 2. Compute & Memory Topology on Eisen
+* **RAM / VRAM Split**:
+  - Full FP16 weights require ~30 GiB. Quantized INT8 / INT4 weights (or Diffusers NF4 / GGUF) require ~9–12 GiB.
+  - **Xeon + 62 GiB DDR4**: Holds the text encoder (Qwen3-VL 8B) and primary tensor staging in RAM, keeping CPU memory pressure well within the 62 GiB boundary.
+  - **RX 5700 (8 GB GDDR6, Vulkan/radv)**: Navi 10 has no ROCm target, so compute offload utilizes Vulkan (`GGML_VULKAN` or DirectML/ZLUDA) with sequential layer offloading.
+* **Gaming Guard & Text LLM Coordination**:
+  - **GPU Contention**: Unlike Laya (which is pure CPU), Qwen-Image claims the RX 5700 GPU. It **must** integrate into `llama-swap-gaming-guard` to yield immediately when Steam Big Picture or Sunshine streaming activates.
+  - **Swapping with Qwen3.6-35B**: Because Qwen3.6-35B allocates the full 8 GB VRAM for non-expert tensors, concurrent GPU execution with Qwen-Image will trigger OOM. `services.llama-swap` or a unified model router must swap between text inference and image generation on demand.
+
+### 3. Storage & Deployment Paths
+* **Storage Location**: `/mnt/storage/image/models/` on the 14.6 TB btrfs array.
+* **Fetch Automation**: Idempotent systemd oneshot units (`eisen-image-models.service`) downloading model checkpoints via resumable `curl -C -` guarded by `ConditionPathExists`.
+* **Runtime Packaging**: Managed via a Python/uv venv under `/mnt/storage/image/venv` (or native C++/GGML wrapper when upstream GGML DiT support lands), with store-pinned Python and Vulkan libraries.
+
+### 4. Next-Session Activation Checklist (When Eisen Powers On)
+1. Verify network reachability: `ping -c 3 192.168.3.87` (or tailnet `100.119.172.99`).
+2. SSH to Eisen: `ssh eisen`.
+3. Check btrfs pool space: `df -h /mnt/storage`.
+4. Materialize `/mnt/storage/image/models` and test checkpoint download.
+5. Benchmark 8-step generation latency on RX 5700 Vulkan vs CPU 12-thread baseline.
+6. Wire reverse proxy and tailscale serve port `:8445`.

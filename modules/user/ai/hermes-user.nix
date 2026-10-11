@@ -45,9 +45,25 @@
         type = lib.types.bool;
         default = false;
         description = ''
-          Whether to enable the background messaging gateway daemon (Telegram/Discord).
+          Whether to enable the background messaging gateway daemon (Telegram/Discord/SimpleX).
           Disabled by default on client machines to avoid Telegram bot token polling conflicts.
         '';
+      };
+    };
+
+    simplex = {
+      daemon = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Whether to run simplex-chat as a background WebSocket daemon (port 5225)
+          for local Hermes gateway and multi-agent fleet integration.
+        '';
+      };
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 5225;
+        description = "Port for the simplex-chat WebSocket daemon.";
       };
     };
 
@@ -218,11 +234,29 @@
       done
     '';
 
+    systemd.user.services.simplex-chat = lib.mkIf (config.programs.hermes-user.simplex.daemon && pkgs.stdenv.hostPlatform.isLinux) {
+      Unit = {
+        Description = "SimpleX Chat WebSocket Daemon";
+        After = ["network-online.target"];
+        Wants = ["network-online.target"];
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${pkgs.simplex-chat}/bin/simplex-chat -p ${toString config.programs.hermes-user.simplex.port}";
+        WorkingDirectory = "${config.home.homeDirectory}";
+        Restart = "always";
+        RestartSec = 5;
+        StandardOutput = "journal";
+        StandardError = "journal";
+      };
+      Install.WantedBy = ["default.target"];
+    };
+
     systemd.user.services.hermes-gateway = lib.mkIf (config.programs.hermes-user.gateway.enable && pkgs.stdenv.hostPlatform.isLinux) {
       Unit = {
         Description = "Hermes Agent Gateway - Messaging Platform Integration";
-        After = ["network-online.target"];
-        Wants = ["network-online.target"];
+        After = ["network-online.target"] ++ lib.optional config.programs.hermes-user.simplex.daemon "simplex-chat.service";
+        Wants = ["network-online.target"] ++ lib.optional config.programs.hermes-user.simplex.daemon "simplex-chat.service";
         # Hermes supervises its own restarts; never let systemd rate-limit it
         # into a permanent stop.
         StartLimitIntervalSec = 0;

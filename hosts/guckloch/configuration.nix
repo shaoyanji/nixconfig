@@ -24,6 +24,11 @@ in {
   environment.systemPackages = with pkgs; [
     markdownlint-cli
     simplex-chat
+    (python3.withPackages (ps: with ps; [
+      websockets
+      requests
+      aiohttp
+    ]))
   ];
 
   programs.nix-ld.enable = true;

@@ -6,4 +6,5 @@
 }:
 lib.genAttrs systems.default (system: {
   simplex-chat = (pkgsFor system).simplex-chat;
+  smp-server = (pkgsFor system).smp-server;
 })

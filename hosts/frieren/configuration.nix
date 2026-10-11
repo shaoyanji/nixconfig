@@ -57,6 +57,7 @@ in {
     ../../modules/services/kiwix.nix
     ../../modules/services/paste.nix
     ../../modules/services/iventoy.nix
+    ../../modules/services/simplex-smp-server.nix
     ../../modules/profiles/nixbuild-client.nix
   ];
   networking.hostName = "frieren";
@@ -167,6 +168,14 @@ in {
 
   # Home Assistant IoT and device stack (modules/services/home-assistant.nix)
   services.ha-stack.enable = true;
+
+  # SimpleX Chat SMP relay server (modules/services/simplex-smp-server.nix)
+  services.simplex-smp-server = {
+    enable = true;
+    ip = "192.168.3.25";
+    tailscaleIp = "100.97.61.65";
+    port = 5223;
+  };
 
   # The home-manager persona (heim → zen → aria2.nix) ships a user-level
   # aria2 RPC fallback on :6800. frieren runs the system services.aria2

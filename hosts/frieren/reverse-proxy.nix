@@ -177,6 +177,11 @@ in {
     recommendedProxySettings = true;
     clientMaxBodySize = "50000M"; # Support multi-gigabyte video uploads to Immich/Paperless
 
+    appendHttpConfig = ''
+      proxy_headers_hash_max_size 1024;
+      proxy_headers_hash_bucket_size 128;
+    '';
+
     virtualHosts = {
       # Default portal / landing page
       "frieren.lan" = {

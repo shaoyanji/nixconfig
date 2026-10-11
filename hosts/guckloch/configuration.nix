@@ -31,6 +31,7 @@ in {
     zlib
     glib
     openssl
+    gmp # for simplex-chat
   ];
 
   home-manager.users.${user.name} = {

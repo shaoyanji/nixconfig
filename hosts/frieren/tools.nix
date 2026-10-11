@@ -583,6 +583,11 @@
     # mainframe only (see fleet closure policy in ~/HANDOFF.md).
     pkgs.llm-agents.hermes-agent
     simplex-chat
+    (python3.withPackages (ps: with ps; [
+      websockets
+      requests
+      aiohttp
+    ]))
     skills
     cowsay
     figlet

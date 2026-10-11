@@ -60,14 +60,16 @@
     wants = ["pihole-ftl.service"];
   };
 
-  # Work around upstream nixpkgs pihole-ftl queryLogDeleter systemd %s specifier expansion bug:
-  # Systemd expands '%s' to the user's shell (/run/current-system/sw/bin/bash).
-  # Use '%%s' so systemd passes a literal '%s' to sqlite3.
+  # Work around upstream nixpkgs pihole-ftl queryLogDeleter systemd %s and quote escaping quirks:
+  # Using writeShellScript ensures the SQL query is passed intact with proper quotes and without systemd specifier substitution.
   systemd.services.pihole-ftl-log-deleter = {
-    serviceConfig.ExecStart = lib.mkForce [
-      "${pkgs.coreutils}/bin/echo 'Deleting query logs older than 7 days'"
-      "${config.services.pihole-ftl.package}/bin/pihole-FTL sqlite3 '${config.services.pihole-ftl.settings.files.database}' 'DELETE FROM query_storage WHERE timestamp <= CAST(strftime('%%s', date('now', '-7 day')) AS INT); select changes() from query_storage limit 1'"
-    ];
+    serviceConfig.ExecStart = lib.mkForce (
+      pkgs.writeShellScript "pihole-ftl-log-delete" ''
+        echo "Deleting query logs older than 7 days"
+        exec ${config.services.pihole-ftl.package}/bin/pihole-FTL sqlite3 "${config.services.pihole-ftl.settings.files.database}" \
+          "DELETE FROM query_storage WHERE timestamp <= CAST(strftime('%s', date('now', '-7 day')) AS INT); SELECT changes() FROM query_storage LIMIT 1;"
+      ''
+    );
   };
 
   services.unbound = {

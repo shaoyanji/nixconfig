@@ -144,23 +144,83 @@ The remaining gap to a true *primitive* is the one §4 describes: passing
 `config.system.build.toplevel` straight in, so no store path is named by hand and
 no nixpkgs import is paid outside the flake's own evaluation.
 
+## 7. The Hyper-Minimal Static SPA via Aki (~270 B Hypermedia)
 
-## 7. Milestones (each independently useful)
+### The Concept
+While dynamic control actions (rebuilding, restarting units, SSE telemetry) eventually benefit from a runtime server (Go + Datastar in §5), **browsing, closure exploration, subsystem filtering, and doc traversal are read-only operations**.
+
+The research round into **[`vilgacx/aki`](https://github.com/vilgacx/aki)** reveals an ultra-minimal hypermedia primitive (~270 bytes minified) that completely eliminates the need for any runtime server or client framework for interactive exploration:
+```javascript
+window.onload = () => {
+  document.querySelectorAll('[url][fn]').forEach((element) => {
+    const attr = element.attributes;
+    element[attr.fn.value] = () => {
+      fetch(attr.url.value)
+        .then((response) => response.json())
+        .then((data) => {
+          Object.entries(data).forEach((ele) => {
+            Object.entries(ele[1]).forEach((chan) => {
+              document.querySelector(ele[0])[chan[0]] = chan[1];
+            });
+          });
+        });
+    };
+  });
+};
+```
+
+### Feasibility Proof: Nix as the Compiler of Effects
+1. **The Contract**: `aki` executes a declarative JSON payload targeting CSS selectors:
+   ```json
+   {
+     "#content-pane": {
+       "innerHTML": "<h2>speech-dispatcher (644.7 MiB)</h2><p>Referrers: zen-beta, electron</p>"
+     },
+     "#badge-tier": {
+       "className": "badge badge-prunable",
+       "textContent": "Tier 1: Prunable"
+     }
+   }
+   ```
+2. **Pure Nix Generation**: Nix generates both the shell and the entire universe of interactive transitions at build time:
+   ```nix
+   # Pure derivation emits index.html, aki.min.js, and static data/ slice files
+   pkgs.writeTextDir "site/data/closure/speech-dispatcher.json" (builtins.toJSON {
+     "#detail-view" = {
+       innerHTML = renderPackageDetail pkg;
+     };
+     "#active-breadcrumb" = {
+       textContent = pkg.pname;
+     };
+   })
+   ```
+3. **Exploration Without Daemons**:
+   - Every node in the closure tree or host in the inventory is rendered as:
+     `<button url="data/closure/${node.hash}.json" fn="onclick">${node.name}</button>`
+   - When clicked, `aki` fetches the static pre-compiled JSON slice and updates the DOM in place.
+   - One static `index.html` file can traverse an entire 3,900-node NixOS closure, switch between host inventories, and toggle subsystem views with zero server daemon, zero Node/Vite build steps, and zero client hydration overhead.
+4. **Hosting**: Serves directly from frieren's existing Nginx (`docs.frieren.lan`), GitHub Pages, or local filesystem viewing.
+
+---
+
+## 8. Milestones (each independently useful)
 
 1. **Nix renders static pages from data** — one derivation, `inventory.toml` +
    markdown → HTML. (Go builder is the pragmatic first cut; Nix-native is the goal.)
-2. **External manifest input** — move `site.toml` to its own repo, consume as a
+2. **Aki-powered static closure explorer** — build-time Nix compilation of `pkgs.closureInfo`
+   into an `aki.js` single-page tree browser (traversable closures & inventory via static JSON).
+3. **External manifest input** — move `site.toml` to its own repo, consume as a
    locked flake input; prove federation with a second consumer.
-3. **Eval budget** — measure full-tree eval; trial lazy trees (Determinate Nix)
+4. **Eval budget** — measure full-tree eval; trial lazy trees (Determinate Nix)
    and record the delta before committing to the upgrade.
-4. **Nix-native closure graph** — replace the shell traversal with a Nix
+5. **Nix-native closure graph** — replace the shell traversal with a Nix
    function; compare output to `closure-analysis.sh`.
-5. **Dynamic dashboard** — the Go + Datastar control plane over the compiled,
-   Nix-generated content.
+6. **Dynamic dashboard** — the Go + Datastar control plane over the compiled,
+   Nix-generated content for active execution / live toggles.
 
-## 8. Non-goals / guardrails
+## 9. Non-goals / guardrails
 
 - No per-request evaluation of the flake — that is the wall this vision respects.
-- No vendored web build chain (no Node/npm); Datastar is one fetched file.
+- No vendored web build chain (no Node/npm); `aki.js` is 270 bytes; Datastar is one fetched file.
 - No hand-maintained second source of truth — everything is a primitive.
 - Don't couple the vision to one Nix distribution; target the *capability*.

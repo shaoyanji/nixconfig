@@ -351,6 +351,22 @@ in {
   # NFS exports
   services.nfs.server = {
     enable = true;
+
+    # Non-dynamic port policy (HC-7). Only 2049 is declared in
+    # firewall-scope.nix: fleet clients mount NFSv4 (which needs no rpcbind),
+    # so the v3-only RPC services below are not reachable from the LAN and the
+    # interface scope stays their control. Pinning them is what makes that
+    # decision reviewable — before this they were drawn from
+    # net.ipv4.ip_local_port_range at every boot (a *different* set each time),
+    # which `task checks:ports` reported as DYNAMIC and could never be declared.
+    # Values follow the long-standing NFS firewall convention (statd 32765,
+    # lockd 32766) and sit just below the ephemeral range; mountd's port is its
+    # upstream default, named explicitly so a future nfs-utils default cannot
+    # move it silently.
+    mountdPort = 20048;
+    statdPort = 32765;
+    lockdPort = 32766;
+
     exports = ''
       /export 192.168.3.0/24(rw,fsid=0,no_subtree_check) 100.0.0.0/8(rw,fsid=0,no_subtree_check)
       /export/data 192.168.3.0/24(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash) 100.0.0.0/8(rw,async,no_wdelay,hide,crossmnt,no_subtree_check,insecure_locks,anonuid=1000,anongid=100,sec=sys,insecure,root_squash,all_squash)

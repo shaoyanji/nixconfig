@@ -23,9 +23,12 @@
 #   toml [TARGET]            nested tree (closure -> subsystem -> top packages)
 #                            for handoff / agent-to-agent reports
 #   diff A [B]               closure size deltas (B defaults to current-system)
+#   budget [TARGET]          check a host's closure against its declared budget
+#                            in closure-budgets.toml (HC-4); --all checks every
+#                            host that has an entry
 #   tui                      interactive: pick host, then pick a view
 #
-# Flags: --host NAME  --store URI  --refresh
+# Flags: --host NAME  --store URI  --refresh  --all
 # ==============================================================================
 
 set -euo pipefail
@@ -34,6 +37,7 @@ CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-closure"
 mkdir -p "$CACHE_DIR"
 
 REFRESH=0
+ALL=0
 HOST=""
 STORE_URI=""
 POS=()
@@ -44,7 +48,8 @@ while [ $# -gt 0 ]; do
     --store) STORE_URI="${2:?--store needs a value}"; shift 2 ;;
     --store=*) STORE_URI="${1#*=}"; shift ;;
     --refresh) REFRESH=1; shift ;;
-    --help | -h) sed -n '3,27p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --all) ALL=1; shift ;;
+    --help | -h) sed -n '3,31p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     --*) echo "unknown flag: $1" >&2; exit 2 ;;
     *) POS+=("$1"); shift ;;
   esac
@@ -191,6 +196,91 @@ do_toml() {
   rm -f "$tmp"
 }
 
+# --- HC-4: closure budgets ----------------------------------------------------
+# A "budget" is the sum of nar sizes of a host's closure — exactly what `size`
+# prints — read from closure-budgets.toml through yq (the repo's TOML tool). The
+# point is regression: the debloat work (docs/closure-reduction.md) has no way to
+# notice a closure quietly growing back.
+BUDGETS_FILE="${BUDGETS_FILE:-closure-budgets.toml}"
+
+budget_host() {
+  if [ -n "$HOST" ] && [ "$HOST" != "local" ]; then printf '%s' "$HOST"; else printf '%s' "$SELF_HOST"; fi
+}
+
+# bytes for a host, or empty when the host has no entry.
+budget_of() { yq -r ".hosts.\"$1\".bytes // \"\"" "$BUDGETS_FILE" 2>/dev/null; }
+
+budget_header() {
+  echo "=== closure budget — ${BUDGETS_FILE} ==="
+  printf '%-14s %14s %14s  %s\n' "host" "budget" "actual" "status"
+}
+
+# One table row. Returns 1 when the host is over budget — the failure this whole
+# subcommand exists to surface.
+budget_line() { # host actual-bytes
+  local h="$1" actual="$2" budget delta pct
+  budget="$(budget_of "$h")"
+  if [ -z "$budget" ] || [ "$budget" = "null" ]; then
+    printf '%-14s %14s %14s  NOT BUDGETED (add [hosts.%s] to %s)\n' \
+      "$h" "-" "$(human "$actual")" "$h" "$BUDGETS_FILE"
+    return 0
+  fi
+  delta=$((actual - budget))
+  if [ "$delta" -le 0 ]; then
+    printf '%-14s %14s %14s  OK (%s under)\n' \
+      "$h" "$(human "$budget")" "$(human "$actual")" "$(human "$((-delta))")"
+    return 0
+  fi
+  pct="$(awk -v d="$delta" -v b="$budget" 'BEGIN{printf "%.1f", (b?100*d/b:0)}')"
+  printf '%-14s %14s %14s  OVER by %s (%s%%)\n' \
+    "$h" "$(human "$budget")" "$(human "$actual")" "$(human "$delta")" "$pct"
+  return 1
+}
+
+# total narSize of a target read from a named store URI — used by --all, which
+# must read several hosts' store DBs in one run (the single-host path reuses the
+# globals set from --host and so goes through total_of).
+total_of_store() { # store-uri target
+  local uri="$1" t="$2" key cache
+  key="$(printf '%s|%s|json-v2' "$uri" "$t" | sha256sum | cut -c1-16)"
+  cache="$CACHE_DIR/$key.json"
+  if [ "$REFRESH" = 1 ] || [ ! -s "$cache" ]; then
+    if [ -n "$uri" ]; then
+      nix path-info --json --json-format 1 --store "$uri" --recursive "$t" >"$cache"
+    else
+      nix path-info --json --json-format 1 --recursive "$t" >"$cache"
+    fi
+  fi
+  jq -r 'to_entries[] | (.value.narSize // 0)' "$cache" | awk '{s+=$1} END{print s+0}'
+}
+
+do_budget() {
+  local actual
+  actual="$(total_of "$(target 1)")"
+  budget_header
+  budget_line "$(budget_host)" "$actual"
+}
+
+do_budget_all() {
+  local h t actual rc=0
+  budget_header
+  while IFS= read -r h; do
+    [ -n "$h" ] || continue
+    if [ "$h" = "$SELF_HOST" ]; then
+      actual="$(total_of "/run/current-system")"
+    else
+      t="$(ssh -o BatchMode=yes -o ConnectTimeout=6 "$h" 'readlink -f /run/current-system' 2>/dev/null || true)"
+      if [ -z "$t" ]; then
+        printf '%-14s %14s %14s  skipped (unreachable)\n' "$h" "-" "-"
+        continue
+      fi
+      actual="$(total_of_store "ssh://${h}" "$t")"
+    fi
+    budget_line "$h" "$actual" || rc=1
+  done < <(yq -r '.hosts | keys[]' "$BUDGETS_FILE")
+  return "$rc"
+}
+
 do_tui() {
   command -v gum >/dev/null 2>&1 || { echo "gum required for tui" >&2; exit 1; }
   local hosts
@@ -223,6 +313,11 @@ case "$CMD" in
     ;;
   dot) d="$CACHE_DIR/raw.$$.dot"; write_dot "$d" "$(target 1)"; cat "$d"; rm -f "$d" ;;
   toml) do_toml "$(target 1)" ;;
+  budget)
+    [ -f "$BUDGETS_FILE" ] || { echo "Error: '$BUDGETS_FILE' not found (run from the repo root, or set BUDGETS_FILE)." >&2; exit 2; }
+    command -v yq >/dev/null 2>&1 || { echo "Error: yq is required for budget lookups." >&2; exit 2; }
+    if [ "$ALL" = 1 ]; then do_budget_all || exit 1; else do_budget || exit 1; fi
+    ;;
   tui) do_tui ;;
   diff)
     A="${POS[1]:-}"; B="${POS[2]:-/run/current-system}"

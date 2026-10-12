@@ -65,6 +65,22 @@ tasks:
       - /run/wrappers/bin/sudo systemctl start restic-drill.service
       - /run/wrappers/bin/sudo journalctl -u restic-drill.service -n 50 --no-pager
 
+  checks:closure:budget:
+    desc: Fail when a host's closure exceeds its declared budget (HC-4)
+    summary: >
+      Compares each host's measured closure size against the `bytes` budget in
+      closure-budgets.toml. The measurement is the same store-DB sum dev:closure:size
+      prints (nix path-info, no eval), so the budget and the size view cannot disagree.
+      Exits non-zero when a host is over budget, so a closure that quietly grows back
+      fails the gate — the guard the debloat work (docs/closure-reduction.md) lacked.
+      Vars: HOST=<host> checks one host (default: the local machine); ALL=1 checks every
+      host with an entry; TARGET=<store path> checks a built-but-undeployed closure
+      against HOST's budget. A host with no entry is reported NOT BUDGETED and does not
+      fail; an unreachable host is skipped with a notice. Exit 0 = within budget,
+      1 = over budget, 2 = budgets file/tooling missing.
+    cmds:
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}{{.TARGET}}{{end}}
+
   checks:dns:failover:
     desc: Verify the DNS resolver group answers the wildcard zone and can fail over (HC-3)
     summary: >

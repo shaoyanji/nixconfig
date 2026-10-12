@@ -40,6 +40,10 @@ includes:
         taskfile: taskfiles/apps.yml
         dir: .
         flatten: true
+    bitlockerpremium:
+        taskfile: taskfiles/bitlockerpremium.yml
+        dir: .
+        flatten: true
     bountystash:
         taskfile: taskfiles/bountystash.yml
         dir: .

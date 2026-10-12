@@ -49,8 +49,12 @@ tasks:
           ] | @tsv' inventory.toml | awk -F'\t' '{printf "%-14s [%-7s | %-15s | %-9s] %s\n", $1, $2, $3, $4, $5}' | gum filter --placeholder "Select active host to SSH...")
         [ -z "$selected" ] && exit 0
         host=$(echo "$selected" | awk '{print $1}')
-        echo "Connecting to $host..."
-        ssh "$host"
+        # Use network.ssh_alias, not the inventory key: external hosts can need an
+        # explicit remote user (bitlockerpremium -> benutzer@bitlockerpremium).
+        # For every other active host the alias equals the key, so this is a no-op.
+        target=$(yq -r ".hosts[\"$host\"].network.ssh_alias // \"$host\"" inventory.toml)
+        echo "Connecting to $target..."
+        ssh "$target"
 
   agents:menu:diagnostics:
     desc: "Theme: Remote host & service diagnostics"

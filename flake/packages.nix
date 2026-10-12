@@ -4,7 +4,10 @@
   pkgsFor,
   ...
 }:
-lib.genAttrs systems.default (system: {
-  simplex-chat = (pkgsFor system).simplex-chat;
-  smp-server = (pkgsFor system).smp-server;
+lib.genAttrs systems.default (system: let
+  pkgs = pkgsFor system;
+in {
+  simplex-chat = pkgs.simplex-chat;
+  smp-server = pkgs.smp-server;
+  fleet-docs-site = import ../lib/aki-site.nix {inherit pkgs lib;};
 })

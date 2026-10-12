@@ -65,6 +65,23 @@ tasks:
       - /run/wrappers/bin/sudo systemctl start restic-drill.service
       - /run/wrappers/bin/sudo journalctl -u restic-drill.service -n 50 --no-pager
 
+  checks:dns:failover:
+    desc: Verify the DNS resolver group answers the wildcard zone and can fail over (HC-3)
+    summary: >
+      Reads profiles.dnsFailover from HOST (default frieren) — so the check cannot
+      drift from the declaration — digs the wildcard zone at every resolver in the
+      group, and probes a declared VRRP VIP for two answering MACs (split brain).
+      Exits 2 while the group has fewer than 2 members: that state proves the primary
+      answers but NOT that failover works, and is the current HC-3 gap until an
+      always-on secondary is provisioned (see docs/dns-failover.md). Exit 1 is a real
+      failure (a listed resolver did not answer, or the VIP answered from two MACs).
+      Probes a subdomain (NAME=, default hc3-check.<zone>), not the apex — the apex
+      can carry a local override, and a wildcard's job is subdomains.
+      Vars: HOST= (default frieren); RESOLVERS= / NAME= / EXPECT= / VIP= override the
+      declaration for ad-hoc runs; IFACE= scopes the arping probe.
+    cmds:
+      - HOST={{.HOST | default "frieren"}} RESOLVERS="{{.RESOLVERS | default ""}}" NAME="{{.NAME | default ""}}" IFACE={{.IFACE | default ""}} bash scripts/task/dns-failover-check.sh
+
   checks:qmd:vault:
     desc: Check the Obsidian vault qmd collection exists and its index is fresh
     cmds:

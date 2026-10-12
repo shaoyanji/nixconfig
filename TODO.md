@@ -111,8 +111,25 @@ as a `checks:*` task and optionally as a CI gate.
 budget table documented in `docs/closure-reduction.md`.
 - **Exit criteria:** `task checks:closure:budget` fails when a budget is exceeded and passes
 otherwise; result reproducible against `dev:closure:size`.
+- **Delivered (2026-10-12):** `closure-budgets.toml` holds a per-host `bytes` ceiling
+  (yq-read, guarded by `checks:toml:lint`); `closure-analysis.sh` gained a `budget` mode
+  with `--all`; wired as `checks:closure:budget` (gate) and `dev:closure:budget` (tool);
+  documented in `docs/closure-reduction.md` §7. Verified: exits 1 (task 201) when a host is
+  over budget and 0 when within, and the measurement shares `total_of` with
+  `dev:closure:size`, so the two views cannot disagree.
+- **Remaining:**
+  1. **Budgets exist only for measured hosts** (`frieren`). Add each host when it is next
+     online and measured — an invented number is worse than none.
+  2. **Not yet a CI gate.** Wiring it in needs a built toplevel (`TARGET=<store path>`) plus a
+     change to `.github/workflows/nixcachix.yml`; deliberately left as its own change.
+  3. **Tighten the ratchet.** +1% headroom (352.9 MiB) absorbs `flake.lock` drift but is larger
+     than the ~70 MiB Tier-1 font item, so that class of change will not trip it.
+  4. **The drift is already real:** the live frieren closure is back to 3949 paths / 34.5 GiB —
+     the pre-L1 figures — even though L1 is applied. The 33.8 GiB recorded post-L1 has been
+     given back by later changes; a ratchet set at 33.8 GiB would have flagged it.
 
 ## Fleet Optimizations (2026-10-01 review)
+
 1. [x] **Local binary cache on frieren.** Run `harmonia` (signed, port 5000)
    on the NAS so LAN hosts share store paths instead of each pulling from
    WAN caches. `modules/services/harmonia.nix` enabled in

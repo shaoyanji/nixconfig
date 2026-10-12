@@ -1,0 +1,31 @@
+# Closure budgets (HC-4) — the regression guard for the closure/debloat work.
+#
+# WHAT IS BUDGETED: a host's total closure size — the sum of every path's nar
+# size in `nix path-info --recursive /run/current-system`, i.e. exactly the value
+# `task dev:closure:size HOST=<host>` prints. It is NOT the on-disk size: hard
+# links and shared store paths make the real disk usage smaller than this sum.
+#
+# HOW IT IS CHECKED: `task checks:closure:budget` exits non-zero when a host's
+# measured closure exceeds its `bytes`. `HOST=<host>` checks one host; `ALL=1`
+# checks every host listed here. A host with no entry is reported as NOT BUDGETED
+# (never as a pass), and a host that cannot be reached is skipped with a notice.
+#
+# HOW TO SET A BUDGET: measure first, never guess —
+#     task dev:closure:size HOST=<host>
+# then set `bytes` to the measured value plus a small headroom (<= 1% is the
+# convention: enough to absorb a package's byte drift across a flake.lock bump,
+# small enough that a new package of consequence trips it). A budget is a
+# RATCHET — lower it as the debloat levers land (docs/closure-reduction.md) and
+# raise it only deliberately, in its own commit.
+#
+# Only hosts that have actually been measured carry a budget. A host is added
+# when it is next online and measured; an invented number is worse than none.
+[hosts.frieren]
+# Central NAS + service host — the fleet's reference closure and the host the
+# debloat work (docs/closure-reduction.md) is measured against.
+# Measured 2026-10-12, generation 83, via `task dev:closure:size`:
+#   37003869872 bytes = 34.5 GiB across 3949 paths
+# Budget = measured + 1% headroom.
+bytes = 37373908571
+measured_bytes = 37003869872
+measured_on = "2026-10-12"

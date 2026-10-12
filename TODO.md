@@ -20,6 +20,62 @@
    - [ ] restic hardening: move `/root/.restic-password` into sops and add an offsite repository target (B2/rest-server) alongside the local one.
    - [ ] When a Zigbee coordinator dongle is attached: set `services.zigbee2mqtt.settings.serial.port` from `/dev/serial/by-id`.
 
+## HANDOFF Promotion Candidates (2026-10-12)
+
+Staged from the 2026-10-12 brainstorm. These are **operational** work items for the running
+fleet (real gaps, not design studies), so they are written in HANDOFF shape and are ready to be
+lifted into `~/HANDOFF.md` as P-items. Each carries its own exit criteria. The exploratory halves
+(generalizations / per-service isolation) stay in `EXPERIMENTS.md`.
+
+### HC-1 — Single declarative exposure registry (`profiles.serviceExposure`)
+- **Why:** every exposed service is declared in **four** independently-maintained places — the
+global `allowedTCPPorts` (which `hosts/frieren/firewall-scope.nix` clears with `lib.mkForce`),
+the per-interface `scopedTCP`/`scopedUDP` lists, the nginx vhosts in
+`hosts/frieren/reverse-proxy.nix`, and the Pi-hole wildcard records in `hosts/frieren/dns.nix`.
+`firewall-scope.nix` itself warns "Keep in sync with the global contributions", and the live
+audit already found drift (stray 67/69/4011 from `dns.nix`/`iventoy.nix` leaking onto `enp1s0`).
+- **Deliverable:** a `profiles.serviceExposure` module where a service declares
+`expose = { port; lan = true; tailnet = true; proxy = { name, upstream }; dns = { name }; }` and the
+module *derives* all four surfaces — there is no second list to edit.
+- **Where:** new `modules/profiles/service-exposure.nix`; refactor
+`hosts/frieren/{firewall-scope,reverse-proxy,dns}.nix` to consume it.
+- **Exit criteria:** `task checks:ports` reports zero DEAD-HOLE / FIREWALL-ONLY drift for frieren;
+adding a service touches exactly one file; `nix eval` of the frieren config is unchanged.
+
+### HC-2 — Backup restore drill (`services.backupDrill`)
+- **Why:** `restic-backups-frieren-local` writes nightly to `/srv/backup/restic`, but **no restore
+has ever been exercised** — the backup is unproven. The password still lives at
+`/root/.restic-password` (unmanaged disk state) and there is no offsite target.
+- **Deliverable:** a scheduled `restic check --read-data-subset` + `restic restore --verify` of a
+sampled path into a scratch dir, with the result surfaced to the journal and (optionally) an
+HA/MQTT sensor; migrate the repo password into sops-nix.
+- **Where:** `hosts/frieren/infra-stack.nix` (alongside the existing restic block); a `checks:*`
+runbook.
+- **Exit criteria:** a documented restore proof on file; the `checks:*` task reproduces it;
+failure is loud (non-zero exit + journal).
+
+### HC-3 — DNS high availability (`profiles.dnsFailover`)
+- **Why:** frieren is the fleet's only resolver — it serves `*.frieren.lan`
+(`address=/frieren.lan/192.168.3.25`) and ad-blocking (`pihole-ftl` → `unbound` on
+`127.0.0.1#5335`) from one host. Losing frieren breaks name resolution for every client.
+- **Deliverable:** a second resolver on an always-on host with a declared primary/secondary
+(VRRP or a DHCP-distributed secondary), an assertion that prevents split-brain, and a documented
+failover test.
+- **Where:** new `modules/profiles/dns-failover.nix`; secondary on an always-on container host
+(candidate: `mtfuji`); `hosts/frieren/dns.nix` declares the primary role.
+- **Exit criteria:** in a test, stopping frieren's resolver still leaves clients resolving; `dig`
+against the secondary returns the wildcard record; runbook written.
+
+### HC-4 — Closure budget gate (`checks:closure:budget`)
+- **Why:** the Tier-1 debloat work (fonts, nix-path, printing, AI-stack gating) has no regression
+guard, so a closure can silently re-bloat. The store-DB closure tooling already exists.
+- **Deliverable:** a per-host byte budget that **exits non-zero** when a closure regresses, wired
+as a `checks:*` task and optionally as a CI gate.
+- **Where:** `scripts/task/closure-analysis.sh` (add a budget mode) + `taskfiles/{dev,checks}.yml`;
+budget table documented in `docs/closure-reduction.md`.
+- **Exit criteria:** `task checks:closure:budget` fails when a budget is exceeded and passes
+otherwise; result reproducible against `dev:closure:size`.
+
 ## Fleet Optimizations (2026-10-01 review)
 1. [x] **Local binary cache on frieren.** Run `harmonia` (signed, port 5000)
    on the NAS so LAN hosts share store paths instead of each pulling from

@@ -195,6 +195,64 @@
     fi
   '';
 in {
+  imports = [../../modules/services/fleet-monitors.nix];
+
+  # --- monitors as code (HC-6) ---
+  # Nothing was watched before this: Uptime-Kuma had 0 monitors and Kuma's own
+  # monitors cannot be declared (its HTTP API is read-only), so the list lives in
+  # the repo instead and gatus consumes it. Every endpoint probes loopback, so no
+  # firewall entry is needed and the UI is reached at monitors.frieren.lan through
+  # nginx (reverse-proxy.nix).
+  services.fleetMonitors = {
+    enable = true;
+    endpoints = [
+      {
+        name = "nginx portal";
+        url = "http://127.0.0.1:80";
+        group = "frieren";
+        conditions = ["[STATUS] < 400"];
+      }
+      {
+        name = "jellyfin";
+        url = "http://127.0.0.1:8096";
+        group = "frieren";
+        conditions = ["[STATUS] < 400"];
+      }
+      {
+        name = "immich";
+        url = "http://127.0.0.1:2283";
+        group = "frieren";
+        conditions = ["[STATUS] < 400"];
+      }
+      {
+        name = "paperless";
+        url = "http://127.0.0.1:28981";
+        group = "frieren";
+        conditions = ["[STATUS] < 400"];
+      }
+      {
+        name = "home assistant";
+        url = "http://127.0.0.1:8123";
+        group = "frieren";
+        conditions = ["[STATUS] < 400"];
+      }
+      {
+        name = "harmonia cache";
+        url = "http://127.0.0.1:5000";
+        group = "frieren";
+        conditions = ["[STATUS] < 400"];
+      }
+      # The clearest previously-unwatched failure mode: a connecting probe proves
+      # the resolver socket is up. A full resolution assertion needs a dns://
+      # endpoint (see TODO.md HC-6 remaining).
+      {
+        name = "dns (pihole-ftl)";
+        url = "tcp://127.0.0.1:53";
+        group = "dns";
+      }
+    ];
+  };
+
   # --- SMART monitoring ---
   services.smartd = {
     enable = true;

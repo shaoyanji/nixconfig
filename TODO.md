@@ -247,6 +247,12 @@ attached because they are the kernel's NFS `lockd`; `42513`/`59543` are `rpc.sta
   FIREWALL-ONLY drift for frieren") could only be reached once the *listeners* were fixed, which
   is this item. Adding a service still touches exactly one file.
 
+### HC-8 — Graceful Gamescope / DankMaterialShell session switching (`modules/profiles/steam.nix`)
+- **Why:** On Steam gaming & console hosts (`eisen`, `stark`, `deckstation`, `kellerbench`), users alternate between Steam Big Picture in Gamescope (Gaming Mode) and DankMaterialShell / Niri (Desktop Mode). In Gamescope, Steam Big Picture's "Switch to Desktop" button expects `/usr/bin/steamos-session-select` to handle the transition gracefully, but no switcher existed. Abrupt killing or uncoordinated restarts risked corrupted cloud saves, hanging gamescope compositors, and stuck greeters.
+- **Deliverable:** A dedicated `deck-session-switch` shellbin script in `modules/profiles/steam.nix`, symlinked/wrapped as `steamos-session-select` and accompanied by a standard `return-to-gamemode.desktop` FreeDesktop entry for DankMaterialShell application menus. Provides graceful `steam -shutdown` with cloud sync wait loop, clean `niri msg action quit --skip-confirmation`, target session state tracking in `~/.local/state/deck-session/target-session`, and coordinated greetd autologin reboot/restart.
+- **Where:** `modules/profiles/steam.nix` (exported to all Steam/Gamescope hosts).
+- **Delivered (2026-10-12, `9354712`):** `deck-session-switch`, `steamos-session-select`, and `return-to-gamemode.desktop` packaged via `pkgs.writeShellScriptBin` / `pkgs.makeDesktopItem` in `modules/profiles/steam.nix`. Supports `desktop`, `gamescope`, `--toggle`, and `--status`. Verified by `nix eval` across `eisen`, `stark`, `deckstation`, and `frieren`.
+
 ### Not promoted (kept as experiments) — and why
 
 Promotion needs a *real, currently-actionable* fleet gap. These are the near-misses, recorded so the

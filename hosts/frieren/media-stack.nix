@@ -4,6 +4,25 @@
   ...
 }: let
   user = import ../../modules/global/user.nix;
+
+  # DLNA is a first-party Jellyfin plugin (moved out of core in 10.9). nixpkgs
+  # offers neither a `services.jellyfin.plugins` option nor a plugin package, so
+  # the ABI-matched release is fetched and dropped into the persistent plugins
+  # dir by the activation script below. Bump `version` + `hash` together when the
+  # running Jellyfin's targetAbi advances; source of truth:
+  # https://repo.jellyfin.org/files/plugin/manifest.json
+  jellyfin-plugin-dlna =
+    pkgs.runCommand "jellyfin-plugin-dlna-14.0.0.0" {
+      nativeBuildInputs = [pkgs.unzip];
+    } ''
+      mkdir -p $out/DLNA_14.0.0.0
+      unzip -q ${
+        pkgs.fetchurl {
+          url = "https://repo.jellyfin.org/files/plugin/dlna/dlna_14.0.0.0.zip";
+          hash = "sha256-kf4oheol9tnvtcV+i47lWucJfSYZCKWv0U/z9er1chU=";
+        }
+      } -d $out/DLNA_14.0.0.0
+    '';
 in {
   # --- Immich ---
   # Machine learning re-enabled (2026-09-29): smart search + facial
@@ -67,6 +86,28 @@ in {
     openFirewall = true;
     dataDir = "/srv/private/jellyfin";
   };
+
+  # Jellyfin reads plugins only at startup and loads them from the persistent
+  # data pool (/srv/private is a btrfs subvolume), so the plugin survives
+  # rebuilds and the service is restarted whenever the pinned plugin changes.
+  systemd.tmpfiles.rules = [
+    "d /srv/private/jellyfin/plugins 0755 jellyfin jellyfin -"
+  ];
+
+  system.activationScripts.jellyfin-dlna = {
+    text = ''
+      plugins=/srv/private/jellyfin/plugins
+      if [ -d /srv/private/jellyfin ]; then
+        mkdir -p "$plugins"
+        rm -rf "$plugins"/DLNA_*
+        cp -r ${jellyfin-plugin-dlna}/DLNA_14.0.0.0 "$plugins"/DLNA_14.0.0.0
+        chown -R jellyfin:jellyfin "$plugins"/DLNA_14.0.0.0
+        chmod -R u=rwX,go=rX "$plugins"/DLNA_14.0.0.0
+      fi
+    '';
+  };
+
+  systemd.services.jellyfin.restartTriggers = [jellyfin-plugin-dlna];
 
   environment.systemPackages = with pkgs; [
     jellyfin

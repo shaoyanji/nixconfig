@@ -54,6 +54,17 @@ tasks:
     cmds:
       - HOST={{.HOST | default "frieren"}} IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh
 
+  checks:restic:drill:
+    desc: Verify frieren's restic repository and restore a sample (HC-2)
+    summary: >
+      Starts restic-drill.service and surfaces its journal; exits non-zero if the
+      drill did not complete. Proves the nightly backup is restorable, not just
+      present. Run on frieren (the host that owns /srv/backup/restic). The same
+      drill also runs unattended weekly via restic-drill.timer (Sun 06:30).
+    cmds:
+      - /run/wrappers/bin/sudo systemctl start restic-drill.service
+      - /run/wrappers/bin/sudo journalctl -u restic-drill.service -n 50 --no-pager
+
   checks:qmd:vault:
     desc: Check the Obsidian vault qmd collection exists and its index is fresh
     cmds:

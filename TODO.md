@@ -124,9 +124,87 @@ otherwise; result reproducible against `dev:closure:size`.
      change to `.github/workflows/nixcachix.yml`; deliberately left as its own change.
   3. **Tighten the ratchet.** +1% headroom (352.9 MiB) absorbs `flake.lock` drift but is larger
      than the ~70 MiB Tier-1 font item, so that class of change will not trip it.
-  4. **The drift is already real:** the live frieren closure is back to 3949 paths / 34.5 GiB —
-     the pre-L1 figures — even though L1 is applied. The 33.8 GiB recorded post-L1 has been
-     given back by later changes; a ratchet set at 33.8 GiB would have flagged it.
+  4. **The drift is already real, and it is a warning — not a blocker:** the live frieren closure
+     is back to 3949 paths / 34.5 GiB (the pre-L1 figures) even though L1 is applied, so the
+     33.8 GiB recorded post-L1 has been given back by later changes. The gate's job is to *surface*
+     that; it is not wired into CI, so it cannot block a merge, and nothing else here waits on the
+     drift being fixed.
+
+### HC-5 — Wire Home Assistant to its own broker, and make `extraComponents` honest
+- **Why:** `services.ha-stack` runs Mosquitto, but the broker has **neither publisher nor
+subscriber**: `mosquitto` is active with **0 clients on `:1883`**, `journalctl -u home-assistant |
+grep -ci mqtt` is **0**, and there is no `mqtt:` stanza in the rendered `configuration.yaml`. The
+`mqtt` entry in `extraComponents` installs a Python dependency and subscribes nothing. So the repo
+declares an MQTT stack that does not exist — and 7 of the 11 `extraComponents` entries are dormant
+(`rest`, `todoist`, `jellyfin`, `plex`, `fritzbox`, `immich`, `mqtt`) against 4 actually active.
+This is the live half of EXP-009 (`EXPERIMENTS.md`), it needs **no hardware**, and it is the
+precondition for EXP-007/008/014/015.
+- **Deliverable:** HA genuinely subscribed to the broker (with the YAML-stanza-vs-config-entry drift
+that EXP-009 flags as the open question, answered), plus `extraComponents` documented or renamed so
+it stops reading as "enabled components".
+- **Where:** `modules/services/home-assistant.nix`; evidence rows in `EXPERIMENTS.md` EXP-009.
+- **Exit criteria:** the journal shows an MQTT client connect for HA; a retained topic published
+with `mosquitto_pub` shows up as an HA entity; the option's real effect is documented (dependency
+vs. configured).
+
+### HC-6 — Monitors as code: watch something (`services.fleetMonitors`)
+- **Why:** Uptime-Kuma runs with **0 monitors** (`select count(*) from monitor` → `0`, verified
+2026-10-12), so **nothing in the fleet is actually watched** — not the 03:30 restic job, not the
+04:00 `system.autoUpgrade`, not DNS (`*.frieren.lan`) and not the nginx vhosts. The obvious
+declarative fix is blocked by the product, not by effort: Kuma **2.5.5**'s HTTP API is read-only
+(`GET /api/entry-page`, `GET /api/badge/:id/*`) with monitor CRUD only on Socket.IO, so monitors
+**cannot be declared** — a monitoring service that monitors nothing is the gap (EXP-008).
+- **Deliverable:** a config-file-driven monitor backend whose endpoint list is Nix state — `gatus`
+(5.37.0 in the pinned nixpkgs) is the declarable option; `prometheus-blackbox-exporter` is the
+alternative if probe semantics matter more than the UI. Probe `127.0.0.1:<port>` so **no**
+`firewall-scope.nix` change is needed. Kuma may keep the dashboard and badge endpoints.
+- **Where:** new `modules/services/fleet-monitors.nix`; a `checks:*`/runbook proving a down service
+is visible; `docs/`.
+- **Exit criteria:** every definition lives in the repo; a deliberately broken service appears as
+down **without manual DB access**; at least one monitor targets a failure mode that is unwatched
+today (restic timer, `nixos-upgrade`, DNS).
+
+### HC-7 — Close the ingress gaps `checks:ports` reports
+- **Why:** `task checks:ports` (verified 2026-10-12) reports five **DEAD-HOLE** ports — declared with
+nothing behind them (`631` after the CUPS debloat, `3005`, `8324`, `8920`, `32469`) — and thirteen
+**FIREWALL-ONLY** listeners that bind public addresses and are held back **only** by
+`firewall-scope.nix`'s interface scope (`111` rpcbind, `20048` mountd, `8080`/`8086` Pi-hole web,
+`10809` InfluxDB, `5355` LLMNR, and the **dynamic rpc/NFS ports** — a *different* set on each boot:
+`34737 36145 39781 42513 49597 59543 61199` now vs `38139 40769 42795 46357` recorded earlier).
+This is the exit criterion **HC-1 did not meet**: any loosening of that scope, or any host that
+lacks it, exposes them. The dynamic NFS port set is the proof that the interface scope is
+load-bearing (EXP-017, and the audit findings section of `EXPERIMENTS.md`).
+- **Deliverable:** prune the dead holes from the exposure registry, and bind-scope the public
+listeners to loopback (or to the one interface they actually need) so the firewall is **not** the
+sole control. NFS/Samba are the hard part — they need a concrete, non-dynamic port policy first.
+- **Where:** `hosts/frieren/firewall-scope.nix` (registry) + the owning modules
+(`nfs`, `immich`, `pihole-web`, `influxdb`, `iventoy`); `scripts/task/port-audit.sh` is the guard.
+- **Exit criteria:** `task checks:ports STRICT=1` reports **zero DEAD-HOLE and zero FIREWALL-ONLY**;
+every rebind verified with its own client; the counts reproducible from the merged firewall option.
+
+### Not promoted (kept as experiments) — and why
+
+Promotion needs a *real, currently-actionable* fleet gap. These are the near-misses, recorded so the
+decision is visible rather than forgotten:
+
+- **EXP-001/002/005/006 (fleetWifi / segmentation)** — the largest genuine gap (the FritzBox LAN is
+flat with no VLAN capability, so guests and future IoT share one trust domain with Vaultwarden,
+Immich, Paperless and the `p/` stores). Held back for one reason: **no AP has ever been started**,
+and the single-radio trade (AP vs. uplink) is unresolved. It needs a verification spike first — start
+an AP, measure throughput, test Pi-hole against a live AP interface. EXP-005's USB-tether island is
+the best-shaped variant (it sidesteps the radio trade entirely).
+- **EXP-016 (agentScheduler)** — worth promoting once one job is pinned: the argument is that
+hand-rolled units have twice shadowed declarative ones (kiwix, hermes). Held because the agent CLIs'
+flag surfaces move (that is why the `antigravity` and `crush` skills exist) and the guardrail
+semantics are undefined.
+- **EXP-014 (upsTelemetry)** — a real gap (the battery-as-UPS only *reports*; the other laptops expose
+`AC`/`ACAD`/`ADP1`, not `BAT0`; and `TODO.md:8` marking the frieren snippet "done" is the trap). It
+pays off once HC-5's bus exists, so it follows HC-5 rather than competing with it.
+- **EXP-015 (memoryPressure)** — frieren-local tuning whose own exit criteria require a *measurement*
+before it is a module; not a fleet-wide promotion.
+- **EXP-017 (serviceIsolation)** — the egress half of HC-7; intentionally last.
+- **EXP-003/004** — thin by design: EXP-003 trades against EXP-001/002, EXP-004 is the likeliest to be
+closed as novelty.
 
 ## Fleet Optimizations (2026-10-01 review)
 

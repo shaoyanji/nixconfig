@@ -65,6 +65,21 @@ tasks:
       - /run/wrappers/bin/sudo systemctl start restic-drill.service
       - /run/wrappers/bin/sudo journalctl -u restic-drill.service -n 50 --no-pager
 
+  checks:ha:mqtt:
+    desc: Report whether Home Assistant is actually subscribed to the MQTT broker (HC-5)
+    summary: >
+      Reads services.ha-stack from HOST (default frieren) and reports three facts from
+      authoritative sources: the broker is listening; HA has an mqtt entry in
+      <configDir>/.storage/core.config_entries; and the broker has an established client.
+      Exits 1 while the broker is up but HA is NOT wired — that is the open HC-5 gap and
+      the reason the check exists, so "MQTT stack declared but not wired" is a visible,
+      tracked state rather than an assumption. Exit 0 = wired (entry + live connection),
+      2 = not evaluable (stack disabled, broker down, nix eval failed). HA's MQTT
+      integration is config-entry only: a YAML 'mqtt:' stanza would raise
+      'yaml_setup_without_active_setup' and connect nothing.
+    cmds:
+      - HOST={{.HOST | default "frieren"}} bash scripts/task/ha-mqtt-check.sh
+
   checks:closure:budget:
     desc: Fail when a host's closure exceeds its declared budget (HC-4)
     summary: >

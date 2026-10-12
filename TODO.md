@@ -80,6 +80,27 @@ failover test.
 (candidate: `mtfuji`); `hosts/frieren/dns.nix` declares the primary role.
 - **Exit criteria:** in a test, stopping frieren's resolver still leaves clients resolving; `dig`
 against the secondary returns the wildcard record; runbook written.
+- **Delivered (2026-10-12):** `modules/profiles/dns-failover.nix` — a role-based
+  resolver (unbound + pihole-ftl core + wildcard zone + LAN firewall hole + optional
+  VRRP), with split-brain assertions (`virtualRouterId` required once `virtualIp` is
+  set; `primaryPriority` must exceed `secondaryPriority`). frieren now declares the
+  `primary` role from it (behaviour-preserving: firewall sets and pihole settings are
+  byte-identical). `task checks:dns:failover` + `scripts/task/dns-failover-check.sh`
+  verify the group, and `docs/dns-failover.md` is the runbook.
+- **Remaining (mechanism-complete, not yet redundant):**
+  1. **Provision the second resolver.** No always-on second NixOS host exists — every
+     other host is `preserved`/dormant or offline, and `mtfuji` (the design candidate)
+     is `preserved` with a "do not target for live deployment" constraint. The
+     secondary is a 3-line opt-in once a host is chosen; add its address to frieren's
+     `resolvers` so clients are handed both.
+  2. **Point clients at the group.** LAN clients come from the FritzBox (DHCP), so the
+     router must hand out both resolvers (or a VRRP `virtualIp` outside its pool) — a
+     manual router change, not Nix-owned.
+  3. **Lift the check out of exit 2.** `checks:dns:failover` exits 2 until the group has
+     ≥2 members; that is the honest "failover not evaluable" state, and the gate flips
+     to a real 0 only with (1).
+  4. **Optional VRRP.** The `virtualIp`/keepalived path evaluates (verified) but is
+     unused in production; it stays dormant until two resolvers exist.
 
 ### HC-4 — Closure budget gate (`checks:closure:budget`)
 - **Why:** the Tier-1 debloat work (fonts, nix-path, printing, AI-stack gating) has no regression

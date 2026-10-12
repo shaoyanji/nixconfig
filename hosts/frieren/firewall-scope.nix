@@ -1,95 +1,203 @@
-# Firewall scoping: every open service port is reachable ONLY on the LAN
-# NICs (enp1s0 wired, wlp2s0 wifi) and tailscale0 — not from docker0, a
-# container bridge, or any interface that appears later.
+# Firewall scoping: every open service port is reachable ONLY on the LAN NICs
+# (enp1s0 wired, wlp2s0 wifi) and tailscale0 — not from docker0, a container
+# bridge, or any interface that appears later.
 #
 # Why: NixOS's global `allowedTCPPorts`/`allowedUDPPorts` accepts are
 # interface-blind (live: `-A nixos-fw -p tcp --dport 22 -j nixos-fw-accept`),
 # so they also accept docker0 and anything else. This module empties the
-# global lists (mkForce) and re-applies the SAME ports per interface via
-# `networking.firewall.interfaces` (the pattern dns.nix already uses for
-# DNS/DHCP-proxy).
+# global lists (mkForce) and re-applies the ports per interface.
 #
-# FAILOUD RULE: the global lists still receive every module's contributions
-# (configuration.nix, reverse-proxy, iventoy, ha-stack, infra-stack,
-# networking.nix, `openFirewall = true` services, …) but they are overridden
-# here — a port that is only added to a global list stays CLOSED everywhere
-# (the service breaks loudly) until it is also added to the explicit lists
-# below. Auto-derivation from the option's `.definitions` was evaluated and
-# rejected: `.definitions` only keeps the winning (forced) definition, so
-# contributors cannot be read back after mkForce. Keep the two lists below
-# in sync when opening new ports.
+# The per-interface lists are derived by
+# `modules/profiles/service-exposure.nix` from the `profiles.serviceExposure`
+# registry below, so a service's exposure is declared once. `dns.nix` still
+# adds its own per-interface entries (53/67/4011) additively — the merge is
+# intentional, and `task checks:ports` remains the drift guard.
 #
-# Unaffected: lo + established/related replies (unconditional rules at the
-# top of nixos-fw), ICMP/allowPing, and dns.nix's extra per-interface
-# entries (they merge in additively). The chain's final refuse still drops
-# everything else — including NEW connections from docker0, which is the
-# point.
+# FAIL-CLOSED RULE: the mkForce on the global lists is absolute, so a port that
+# only reaches the globals (a service's `openFirewall = true`) stays CLOSED
+# everywhere on this host until it is declared in the registry below. Migrate a
+# service by adding its port here, not by removing the mkForce.
+#
+# Unaffected: lo + established/related replies (unconditional rules at the top
+# of nixos-fw), ICMP/allowPing, and dns.nix's per-interface entries (they merge
+# in additively). The chain's final refuse still drops everything else —
+# including NEW connections from docker0, which is the point.
 {lib, ...}: let
   scopedIfaces = [
     "enp1s0" # wired LAN
     "wlp2s0" # wifi LAN
     "tailscale0"
   ];
-
-  # Keep in sync with the global contributions (see FAILOUD RULE above).
-  # Source of truth for provenance: the per-service blocks that declare
-  # them (grep `allowedTCPPorts` / `openFirewall` across hosts/frieren/).
-  scopedTCP = [
-    22 # sshd
-    80 # nginx vhosts (reverse-proxy.nix)
-    139
-    445 # samba (configuration.nix)
-    631 # cups
-    2049 # nfs
-    2283 # immich
-    3001 # uptime-kuma (ha-stack.nix)
-    3005
-    5000 # harmonia LAN cache (modules/services/harmonia.nix)
-    5223 # simplex smp-server (modules/services/simplex-smp-server.nix)
-    5357
-    6801 # AriaNg (configuration.nix)
-    7351 # Stirling PDF (networking.nix)
-    7878
-    8088 # kiwix-serve (kiwix.nix, openFirewall)
-    8096 # jellyfin
-    8123 # Home Assistant (configuration.nix)
-    8124 # scrutiny (infra-stack.nix)
-    8324
-    8686
-    8787
-    8920
-    8989
-    9696
-    16000 # iVentoy HTTP PXE (iventoy.nix)
-    26000
-    27701
-    28981 # paperless-ngx (configuration.nix)
-    32400
-    32469
-  ];
-
-  scopedUDP = [
-    67
-    69 # dnsmasq/PXE (iventoy.nix, dns.nix)
-    137
-    138 # samba netbios (configuration.nix)
-    1900 # ssdp
-    3702 # ws-discovery
-    4011 # legacy BIOS ProxyDHCP (iventoy.nix)
-    5353 # avahi/mDNS
-    7359
-    32410
-    32412
-    32413
-    32414 # samsung/airplay-ish casts
-  ];
 in {
+  imports = [../../modules/profiles/service-exposure.nix];
+
+  # Every port frieren exposes on the scoped interfaces, declared once. Keys
+  # are named after the owning service where known; `tcp-<port>`/`udp-<port>`
+  # are ports whose owner is not recorded anywhere in the tree (kept verbatim
+  # from the previous hand-written list so no exposure changed).
+  profiles.serviceExposure = {
+    enable = true;
+    interfaces = scopedIfaces;
+    services = {
+      ssh = {port = 22;};
+      nginx = {port = 80;};
+      samba-netbios-ssn = {port = 139;};
+      samba-smb = {port = 445;};
+      cups = {port = 631;};
+      nfs = {port = 2049;};
+      immich = {
+        port = 2283;
+        proxy = {
+          name = "photos.frieren.lan";
+          websockets = true;
+        };
+      };
+      uptime-kuma = {
+        port = 3001;
+        proxy = {
+          name = "status.frieren.lan";
+          websockets = true;
+        };
+      };
+      tcp-3005 = {port = 3005;};
+      harmonia = {
+        port = 5000;
+        proxy = {
+          name = "cache.frieren.lan";
+        };
+      };
+      simplex-smp = {port = 5223;};
+      tcp-5357 = {port = 5357;};
+      ariang = {
+        port = 6801;
+        proxy = {
+          name = "aria.frieren.lan";
+          websockets = true;
+        };
+      };
+      stirling-pdf = {
+        port = 7351;
+        proxy = {
+          name = "pdf.frieren.lan";
+          websockets = true;
+        };
+      };
+      tcp-7878 = {port = 7878;};
+      kiwix = {
+        port = 8088;
+        proxy = {
+          name = "wiki.frieren.lan";
+        };
+      };
+      jellyfin = {
+        port = 8096;
+        proxy = {
+          name = "media.frieren.lan";
+          websockets = true;
+        };
+      };
+      home-assistant = {
+        port = 8123;
+        proxy = {
+          name = "ha.frieren.lan";
+          websockets = true;
+        };
+      };
+      scrutiny = {
+        port = 8124;
+        proxy = {
+          name = "smart.frieren.lan";
+        };
+      };
+      tcp-8324 = {port = 8324;};
+      tcp-8686 = {port = 8686;};
+      tcp-8787 = {port = 8787;};
+      tcp-8920 = {port = 8920;};
+      tcp-8989 = {port = 8989;};
+      tcp-9696 = {port = 9696;};
+      iventoy-http = {port = 16000;};
+      tcp-26000 = {port = 26000;};
+      tcp-27701 = {port = 27701;};
+      paperless = {
+        port = 28981;
+        proxy = {
+          name = "docs.frieren.lan";
+          websockets = true;
+        };
+      };
+      plex = {port = 32400;};
+      plex-dlna = {port = 32469;};
+
+      dnsmasq-pxe = {
+        port = 67;
+        tcp = false;
+        udp = true;
+      };
+      tftp = {
+        port = 69;
+        tcp = false;
+        udp = true;
+      };
+      samba-netbios-ns = {
+        port = 137;
+        tcp = false;
+        udp = true;
+      };
+      samba-netbios-dgm = {
+        port = 138;
+        tcp = false;
+        udp = true;
+      };
+      ssdp = {
+        port = 1900;
+        tcp = false;
+        udp = true;
+      };
+      ws-discovery = {
+        port = 3702;
+        tcp = false;
+        udp = true;
+      };
+      proxydhcp = {
+        port = 4011;
+        tcp = false;
+        udp = true;
+      };
+      mdns = {
+        port = 5353;
+        tcp = false;
+        udp = true;
+      };
+      udp-7359 = {
+        port = 7359;
+        tcp = false;
+        udp = true;
+      };
+      cast-32410 = {
+        port = 32410;
+        tcp = false;
+        udp = true;
+      };
+      cast-32412 = {
+        port = 32412;
+        tcp = false;
+        udp = true;
+      };
+      cast-32413 = {
+        port = 32413;
+        tcp = false;
+        udp = true;
+      };
+      cast-32414 = {
+        port = 32414;
+        tcp = false;
+        udp = true;
+      };
+    };
+  };
+
   networking.firewall = {
     allowedTCPPorts = lib.mkForce [];
     allowedUDPPorts = lib.mkForce [];
-    interfaces = lib.genAttrs scopedIfaces (_: {
-      allowedTCPPorts = scopedTCP;
-      allowedUDPPorts = scopedUDP;
-    });
   };
 }

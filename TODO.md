@@ -53,6 +53,21 @@ HA/MQTT sensor; migrate the repo password into sops-nix.
 runbook.
 - **Exit criteria:** a documented restore proof on file; the `checks:*` task reproduces it;
 failure is loud (non-zero exit + journal).
+- **Delivered (2026-10-12, `60451f0`):** `restic-drill.service` + `restic-drill.timer`
+  (Sun 06:30, `Persistent`, 15 min jitter) run `restic check` plus a sampled restore of
+  `/srv/private/home-assistant` into a scratch dir, asserting the extracted copy contains real
+  regular files (not the live `/etc` symlink, which `test -f` would resolve and prove nothing).
+  Reproducible on demand via `task checks:restic:drill`. Verified once against snapshot
+  `c3e0f078` (2102 files / 215 MiB); not yet exercised through the systemd unit (needs a switch).
+- **Remaining half:**
+  1. **Password to sops.** `/root/.restic-password` is unmanaged on-device state. The
+     `restic-ensure-password` oneshot generates it if absent, but a lost disk loses the key and
+     every snapshot becomes unreadable. Move it into `modules/secrets.yaml` and point
+     `services.restic.backups.frieren-local.passwordFile` — and the drill's
+     `RESTIC_PASSWORD_FILE` — at the sops-rendered path.
+  2. **Offsite target.** `/srv/backup/restic` is the same pool as the data it protects, so a
+     pool loss takes the source *and* the backup. Add a second repository (restic REST server on
+     an always-on host, or Backblaze B2) with its own credentials and retention policy.
 
 ### HC-3 — DNS high availability (`profiles.dnsFailover`)
 - **Why:** frieren is the fleet's only resolver — it serves `*.frieren.lan`

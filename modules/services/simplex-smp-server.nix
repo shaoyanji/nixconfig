@@ -45,6 +45,14 @@ in {
     };
     users.groups.smp = {};
 
+    systemd.tmpfiles.rules = [
+      "d /etc/opt 0755 root root -"
+      "d /etc/opt/simplex 0750 smp smp -"
+      "d /var/opt 0755 root root -"
+      "d /var/opt/simplex 0750 smp smp -"
+      "d /var/lib/simplex 0750 smp smp -"
+    ];
+
     systemd.services.smp-server = {
       description = "SimpleX SMP Server";
       wantedBy = ["multi-user.target"];
@@ -60,15 +68,12 @@ in {
       ];
 
       preStart = ''
-        mkdir -p /etc/opt/simplex /var/opt/simplex
-        chown -R smp:smp /etc/opt/simplex /var/opt/simplex /var/lib/simplex
-
         if [ ! -f /etc/opt/simplex/smp-server.ini ]; then
           echo "Initializing SimpleX SMP server..."
-          su -s /bin/sh smp -c "${cfg.package}/bin/smp-server init -y \
+          ${cfg.package}/bin/smp-server init -y \
             --ip ${cfg.ip} \
             --disable-web \
-            --no-password"
+            --no-password
 
           # Restrict listening port to configured port only (prevent colliding on 443 with nginx)
           sed -i 's/^port = .*/port = ${toString cfg.port}/' /etc/opt/simplex/smp-server.ini

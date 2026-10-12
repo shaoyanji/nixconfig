@@ -162,6 +162,12 @@
           <div class="badge">vault.frieren.lan :8222</div>
         </a>
 
+        <a class="card" href="http://fleet.frieren.lan">
+          <div class="card-header"><span class="card-title">Fleet Control Plane</span></div>
+          <div class="card-desc">Aki hypermedia static documentation, host inventory & Nix closure explorer.</div>
+          <div class="badge">fleet.frieren.lan :80</div>
+        </a>
+
         <a class="card" href="http://cache.frieren.lan">
           <div class="card-header"><span class="card-title">Harmonia</span></div>
           <div class="card-desc">Local LAN Nix binary cache serving signed packages at wire speed.</div>
@@ -371,6 +377,22 @@ in {
         };
         locations."/notifications/hub/negotiate" = {
           proxyPass = "http://127.0.0.1:8222";
+        };
+      };
+
+      "fleet.frieren.lan" = {
+        serverAliases = [
+          "control.frieren.lan"
+          "explorer.frieren.lan"
+        ];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
+        locations."/" = {
+          root = import ../../lib/aki-site.nix {inherit pkgs;};
         };
       };
     };

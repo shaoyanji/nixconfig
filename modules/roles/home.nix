@@ -85,6 +85,10 @@
       m-cli
     ];
 
+  home.sessionPath = lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+    "/run/wrappers/bin"
+  ];
+
   home.sessionVariables = {
     # EDITOR = lib.mkDefault "nvim";
   };

@@ -156,6 +156,12 @@
           <div class="badge">smart.frieren.lan :8124</div>
         </a>
 
+        <a class="card" href="http://monitors.frieren.lan">
+          <div class="card-header"><span class="card-title">Fleet Monitors</span></div>
+          <div class="card-desc">Config-declared health checks (gatus) — service, cache and DNS liveness.</div>
+          <div class="badge">monitors.frieren.lan :8181</div>
+        </a>
+
         <a class="card" href="http://vault.frieren.lan">
           <div class="card-header"><span class="card-title">Vaultwarden</span></div>
           <div class="card-desc">Bitwarden-compatible vault for passwords and 2FA TOTP authentication codes.</div>
@@ -265,6 +271,23 @@ in {
         ];
         locations."/" = {
           root = import ../../lib/aki-site.nix {inherit pkgs;};
+        };
+      };
+
+      # Monitors UI (gatus, HC-6). Written out here rather than through
+      # `profiles.serviceExposure`: the backend binds loopback, and a registry
+      # entry would also open its port on the LAN interface — a hole with only a
+      # loopback listener behind it is the REDUNDANT class `checks:ports` flags.
+      "monitors.frieren.lan" = {
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8181";
+          proxyWebsockets = true;
         };
       };
     };

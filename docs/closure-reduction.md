@@ -290,7 +290,47 @@ instead of by default.
    For L1 that meant one active host per chain it feeds — `frieren` (nixos) and
    `guckloch` (containers) plus `kali` (home). No active host is `darwin`
    (`cassini` is preserved), so that chain was correctly **not** checked.
-## 7. Non-goals
+## 7. Regression guard — closure budgets
+
+Every number above is a reduction; none of it is protected. `closure-budgets.toml` holds
+a per-host `bytes` ceiling and `task checks:closure:budget` compares it against the same
+store-DB sum `dev:closure:size` prints — the check and the size view share one
+implementation, so they cannot disagree — and **exits non-zero** when a host is over
+budget. A host with no entry is reported `NOT BUDGETED`, never as a pass.
+
+| Host | Budget (bytes) | Measured (2026-10-12) | Headroom | Set with |
+| --- | --- | --- | --- | --- |
+| `frieren` | `37373908571` | `37003869872` = 34.5 GiB, 3949 paths (gen 83) | +1% (352.9 MiB) | `task dev:closure:size` |
+
+That current measurement is worth reading against §2: the live closure is back to **3949
+paths / 34.5 GiB**, the *pre-L1* figures, even though L1 is still applied (the closure
+carries one Chromium, not two). The 33.8 GiB recorded after L1 has been given back by
+later changes — which is precisely the drift this guard exists to make visible instead of
+being discovered months later.
+
+Only **measured** hosts carry a budget — an invented number is worse than none, so a host
+is added when it is next online and measured (`task dev:closure:size HOST=<host>`). Budgets
+are a **ratchet**: the levers in §4 lower them, and raising one is a deliberate edit in its
+own commit.
+
+On the headroom, stated honestly: the +1% (352.9 MiB) absorbs byte drift from a
+`flake.lock` bump without hiding a lever of the size in §4 (703 MiB–5.1 GiB), but it *is*
+larger than the ~70 MiB Tier-1 font item in `docs/closure-debloat.md`. To make that class
+of change trip the gate, tighten the entry toward `measured` — the tolerance is the
+operator's choice, not a property of the tool.
+
+```bash
+task checks:closure:budget                 # the local host
+task checks:closure:budget HOST=frieren    # one host
+task checks:closure:budget ALL=1           # every host with an entry
+task checks:closure:budget HOST=frieren \
+  TARGET=/nix/store/<built-toplevel>       # a build, before it is deployed
+```
+
+Exit `0` = within budget, `1` = over budget, `2` = budgets file or `yq` missing. The file
+is TOML and guarded by `task checks:toml:lint` like every other tracked `.toml`.
+
+## 8. Non-goals
 
 - This does not propose deleting services to make numbers smaller. L5 is a
   question about a service's value, not a directive.

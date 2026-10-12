@@ -343,6 +343,11 @@ tasks:
       - mkdir -p docs/closures
       - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} toml > {{.OUT | default "docs/closures/local.toml"}}
 
+  dev:closure:budget:
+    desc: Compare a host's closure against its budget (HOST=name|local, ALL=1, TARGET=store path)
+    cmds:
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}{{.TARGET}}{{end}}
+
   dev:closure:tui:
     desc: Interactive closure explorer — pick a host, then a view (gum)
     cmds:

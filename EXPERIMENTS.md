@@ -503,6 +503,129 @@ the broker, and a real device pairing end to end.
 
 ---
 
+## EXP-014 — Battery-as-UPS as a real module (`services.upsTelemetry`)
+
+**Mode:** the telemetry that already exists, generalized from a frieren-shaped snippet into a module.
+**Status:** deployed on frieren only; the shape below is untested on other hosts.
+
+The `telemetry` option in `modules/services/home-assistant.nix` renders three `command_line` sensors
+hardcoded to one host's rails:
+
+```yaml
+command: cat /sys/class/power_supply/BAT0/capacity
+command: cat /sys/class/power_supply/BAT0/status
+command: cat /sys/class/power_supply/ADP0/online
+```
+
+That is correct for exactly one machine and wrong for the fleet: `fern`, `poseidon`, `schneeeule` and
+`netbook` are all laptops exposing the same `power_supply` class under different names (`AC`, `ACAD`,
+`ADP1`), and nothing anywhere *acts* on a low battery — the "UPS" only reports. `TODO.md` records the
+frieren version as done, which is precisely the trap: a host-shaped snippet marked complete.
+
+**Module shape.**
+
+```nix
+services.upsTelemetry = {
+  enable = true;
+  battery = "auto";            # or an explicit /sys/class/power_supply/<name>
+  criticalPercent = 5;
+  shutdownOnCritical = false;  # opt-in; requires a declared grace period
+  report = { mqtt = true; ha = true; };  # rides the EXP-007 bus
+};
+```
+
+**Why it is not prod.** Rail names differ per host and `auto` discovery is unproven; a failing critical
+reading that powers off the NAS is a footgun, so any shutdown path needs a dry-run and a grace period;
+and it is only useful fleet-wide once EXP-007's bus exists. Exit criteria: correct discovery on ≥2
+laptop hosts, a tested (dry-run) shutdown path, and readings visible in Home Assistant.
+
+---
+
+## EXP-015 — Memory-pressure management (`services.memoryPressure`)
+
+**Mode:** the same host under a different memory policy (zram + pressure-driven tuning) instead of more
+swap.
+**Status:** not started; the motivating evidence is already collected.
+
+frieren is the 24/7 box at ~11 GiB, and its own operational notes are explicit that load average is the
+wrong signal there — it is dominated by D-state btrfs kworkers and `kswapd0`, so pressure must be read
+with `free -h` + `vmstat 1 3` (`si/so`, `wa`, idle%). The nightly window (03:00–05:30) is already
+saturated, and adding swap does not help random I/O.
+
+**Module shape.**
+
+```nix
+services.memoryPressure = {
+  enable = true;
+  zram = { enable = true; percent = 25; algorithm = "zstd"; };
+  swappiness = 10;
+  pressureWatch = { warn = 70; critical = 90; };  # emits a metric (EXP-007)
+};
+```
+
+**Why it is not prod.** zram on a btrfs box with 8 threads competes with the very kworkers under study,
+so any benefit must be *measured* (before/after `vmstat`) rather than assumed; and the tuning belongs in
+`hosts/frieren/` until it is proven, not in a shared module. Exit criteria: a measured reduction in
+`si/so` at fixed load, with no regression inside the nightly backup window.
+
+---
+
+## EXP-016 — Agent scheduler as a module (`services.agentScheduler`)
+
+**Mode:** the existing ad-hoc autonomous jobs expressed as one declarative registry.
+**Status:** three runtimes already exist; none share a shape.
+
+The fleet runs autonomous jobs, each hand-wired: `agy-nightly-handoff` (03:00, executes `~/HANDOFF.md`),
+`agy-nightly-system` (05:00), the `hermes-gateway` user unit, and `antigravity-cli-daemon`. The repo has
+twice been bitten by hand-rolled units shadowing declarative ones — kiwix and hermes, both recorded in
+`.agents/deploy/hosts/frieren.md` — which is the entire argument for a single module.
+
+**Module shape.**
+
+```nix
+services.agentScheduler.jobs.nightly-handoff = {
+  schedule = "*-*-* 03:00:00";
+  agent = "agy";
+  workdir = "/srv/data/projects/nixconfig";
+  guardrails = ["no-push" "read-only-secrets"];
+  capture = "/var/log/agents/nightly-handoff.log";
+};
+```
+
+**Why it is not prod.** The agent CLIs (`agy`, `hermes`, `crush`) have unstable flag surfaces — the
+`antigravity` and `crush` skills exist because those flags moved — guardrail semantics are undefined,
+and a bad job running under user linger is a fleet-wide footgun. Exit criteria: one job migrated with
+identical behaviour, dry-run support, and per-job log capture.
+
+---
+
+## EXP-017 — Per-service network isolation (`profiles.serviceIsolation`)
+
+**Mode:** the *egress* half that `firewall-scope.nix` deliberately does not cover.
+**Status:** not started; intentionally the last of the four.
+
+`hosts/frieren/firewall-scope.nix` controls ingress — which ports reach the LAN, and only on
+`enp1s0`/`wlp2s0`/`tailscale0`. Nothing constrains what a compromised service can *reach out to*. A
+large set of services bind `0.0.0.0` (rpcbind/NFS, LLMNR, the Pi-hole web UI) behind that single ingress
+control, so the blast radius of any one of them is the whole host.
+
+**Module shape.**
+
+```nix
+profiles.serviceIsolation.services.aria2 = {
+  enable = true;
+  egress = { dns = true; internet = ["downloads.example"]; lan = []; };
+};
+```
+
+**Why it is not prod.** systemd `PrivateNetwork` / `NetworkNamespacePath` interacts with the
+`RequiresMountsFor` and `PrivateMounts` overrides already present in `media-stack.nix`; NFS and Samba
+depend on the host network; and the egress language has to be concrete before it is useful. Exit
+criteria: one non-critical service isolated with a tested egress allowance and no NixOS eval
+regressions.
+
+---
+
 ## Audit findings feeding these experiments
 
 The port audit below (`task checks:ports`) is the evidence that the segmentation arguments

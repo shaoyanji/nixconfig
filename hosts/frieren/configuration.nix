@@ -507,7 +507,22 @@ in {
   networking.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  # ============================================================================
+  # Closure Debloat Overrides (Tier 1 safe wins: T1-2, T1-6)
+  # ============================================================================
+  # T1-2: Prune ~262 MiB of nerd-fonts glyphs on media center display.
+  # Replaces the 228 MiB nerd-fonts.jetbrains-mono with standard jetbrains-mono (~3 MiB).
+  fonts = {
+    packages = lib.mkForce [pkgs.jetbrains-mono];
+    fontconfig.defaultFonts.monospace = lib.mkForce ["JetBrains Mono"];
+  };
+
+  # T1-6: Disable printing / HPLIP drivers (~70 MiB).
+  # frieren is a NAS / media center host and does not manage physical HP printers.
+  services.printing = {
+    enable = lib.mkForce false;
+    drivers = lib.mkForce [];
+  };
 
   # State version - RESTORED
   system.stateVersion = "26.05";

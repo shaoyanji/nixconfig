@@ -13,7 +13,39 @@
 #   dirs are deliberately EXCLUDED: hot-copying a live data directory
 #   is not a consistent backup — add services.postgresql.backup
 #   (pg_dump) alongside before trusting DB restore points.
-{pkgs, ...}: let
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}: let
+  # The backup whose repository the restore drill below verifies.
+  resticBackup = config.services.restic.backups.frieren-local;
+
+  # `restic check` validates repository structure/consistency; the sampled
+  # restore proves the data actually comes back. Fails loudly (non-zero exit)
+  # so a broken repo cannot pass silently. Used by restic-drill.service below.
+  resticDrill = pkgs.writeShellScript "restic-drill" ''
+    set -euo pipefail
+    export RESTIC_REPOSITORY=${lib.escapeShellArg (toString resticBackup.repository)}
+    export RESTIC_PASSWORD_FILE=${lib.escapeShellArg (toString resticBackup.passwordFile)}
+    restic=${pkgs.restic}/bin/restic
+
+    echo "== restic check (repository integrity) =="
+    "$restic" check
+
+    echo "== sampled restore (latest snapshot: /srv/private/home-assistant) =="
+    latest=$("$restic" snapshots latest --json | ${pkgs.jq}/bin/jq -r '.[0].short_id')
+    scratch=$(${pkgs.coreutils}/bin/mktemp -d /srv/backup/.restic-drill.XXXXXX)
+    trap '${pkgs.coreutils}/bin/rm -rf "$scratch"' EXIT
+    "$restic" restore "$latest" --target "$scratch" --include /srv/private/home-assistant
+    # Assert real restored content: configuration.yaml is an absolute symlink
+    # into /etc, so `test -f` would resolve the LIVE file and prove nothing.
+    test -d "$scratch/srv/private/home-assistant"
+    test -n "$(${pkgs.findutils}/bin/find "$scratch/srv/private/home-assistant" -type f -print -quit)"
+    echo "restic drill OK: restored a sample from snapshot $latest"
+  '';
+
   agentCascadeScript = ''
     run_agent_cascade() {
       local prompt="$1"
@@ -256,6 +288,29 @@ in {
   systemd.services.restic-backups-frieren-local.unitConfig = {
     Wants = ["restic-ensure-password.service"];
     After = ["restic-ensure-password.service"];
+  };
+
+  # --- restic restore drill ---
+  # A backup that is never restored is a hypothesis; the script (defined in the
+  # let block) runs `restic check` + a sampled restore. Runs weekly, outside the
+  # nightly backup window, and fails loudly into the journal.
+  systemd.services.restic-drill = {
+    description = "restic repository check + sampled restore drill";
+    path = [pkgs.coreutils pkgs.findutils];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = resticDrill;
+    };
+  };
+
+  systemd.timers.restic-drill = {
+    description = "Weekly restic restore drill";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "Sun *-*-* 06:30:00";
+      Persistent = true;
+      RandomizedDelaySec = "15min";
+    };
   };
 
   # 24/7 Remote Operator Gateway: Antigravity remote-control daemon

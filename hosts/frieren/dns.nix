@@ -4,6 +4,52 @@
   pkgs,
   ...
 }: {
+  imports = [../../modules/profiles/dns-failover.nix];
+
+  # --- primary resolver role (HC-3) -----------------------------------------
+  # The reusable resolver core — unbound + pihole-ftl's filtering config + the
+  # wildcard zone + the LAN firewall hole — lives in
+  # modules/profiles/dns-failover.nix. frieren is the fleet PRIMARY; host policy
+  # (extra address= records, the tailscale interface line, PXE proxyDHCP,
+  # blocklists, the web UI) stays here and is fed in.
+  #
+  # No `virtualIp` yet: frieren is the only resolver that exists, so failover is
+  # client-side via `resolvers` until an always-on secondary is provisioned.
+  # See docs/dns-failover.md for the secondary bring-up and the failover test.
+  profiles.dnsFailover = {
+    enable = true;
+    role = "primary";
+    lanInterface = "enp1s0";
+    zone = "frieren.lan";
+    zoneAddress = "192.168.3.25";
+    resolvers = ["192.168.3.25"];
+    extraDnsmasqLines = [
+      "interface=tailscale0"
+      # eisen's local LLM API (llama.cpp OpenAI /v1) resolves to its stable
+      # tailnet address; LAN clients reach it over the tailnet.
+      "address=/eisen.lan/100.119.172.99"
+      # Laya decision model (Jev-compatible /v1/systemone) on eisen; same
+      # tailnet address, exposed as its own nginx vhost on :80.
+      "address=/laya.lan/100.119.172.99"
+      # Qwen3-TTS speech server on eisen (OpenAI-compatible /v1/audio/speech);
+      # nginx vhost on :80, tailscale serve :8444.
+      "address=/tts.lan/100.119.172.99"
+      # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
+      # Answer ONLY PXE clients on the LAN; never lease IPs — the FritzBox
+      # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode
+      # waits 2s for the real DHCP server's OFFER and only supplies the
+      # PXE boot options the router lacks.
+      "dhcp-range=192.168.3.25,proxy,255.255.255.0"
+      # /var/lib/misc is read-only on NixOS — without a writable lease file
+      # dnsmasq's DHCP subsystem aborts and UDP 67 never binds.
+      "dhcp-leasefile=/var/lib/pihole/dnsmasq.leases"
+      # Arch-specific boot file -> iVentoy's virtual loader names. The
+      # suffix (16000) must match iVentoy's HTTP PXE port.
+      "pxe-service=x86PC,\"Boot from network (BIOS)\",iventoy_loader_16000_bios,192.168.3.25"
+      "pxe-service=X86-64_EFI,\"Boot from network (UEFI)\",iventoy_loader_16000_uefi,192.168.3.25"
+    ];
+  };
+
   # Tailnet DNS should stay manually managed after deployment:
   # sudo tailscale up --accept-dns=false
   services.tailscale.enable = true;
@@ -72,17 +118,10 @@
     );
   };
 
-  services.unbound = {
-    enable = true;
-    resolveLocalQueries = false;
-    settings.server = {
-      interface = ["127.0.0.1@5335"];
-      access-control = ["127.0.0.0/8 allow"];
-    };
-  };
-
+  # Host policy on top of the profile's resolver core: what to block and how
+  # long to keep logs. The `settings` block (dns/database/dnsmasq_lines) is
+  # owned by profiles.dnsFailover and must not be redefined here.
   services.pihole-ftl = {
-    enable = true;
     # Log containment: keep FTL.log lean and auto-purge old DB queries
     queryLogDeleter = {
       enable = true;
@@ -99,58 +138,21 @@
         description = "Disconnect tracking blocklist";
       }
     ];
-    settings = {
-      dns = {
-        queryLogging = true;
-        upstreams = ["127.0.0.1#5335"];
-        # listeningMode = "LOCAL";
-        listeningMode = "ALL";
-        interface = "enp1s0";
-      };
-      database = {
-        maxDBdays = 31;
-      };
-      misc.dnsmasq_lines = [
-        "interface=tailscale0"
-        "address=/frieren.lan/192.168.3.25"
-        # eisen's local LLM API (llama.cpp OpenAI /v1) resolves to its stable
-        # tailnet address; LAN clients reach it over the tailnet.
-        "address=/eisen.lan/100.119.172.99"
-        # Laya decision model (Jev-compatible /v1/systemone) on eisen; same
-        # tailnet address, exposed as its own nginx vhost on :80.
-        "address=/laya.lan/100.119.172.99"
-        # Qwen3-TTS speech server on eisen (OpenAI-compatible /v1/audio/speech);
-        # nginx vhost on :80, tailscale serve :8444.
-        "address=/tts.lan/100.119.172.99"
-        # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
-        # Answer ONLY PXE clients on the LAN; never lease IPs — the FritzBox
-        # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode
-        # waits 2s for the real DHCP server's OFFER and only supplies the
-        # PXE boot options the router lacks.
-        "dhcp-range=192.168.3.25,proxy,255.255.255.0"
-        # /var/lib/misc is read-only on NixOS — without a writable lease file
-        # dnsmasq's DHCP subsystem aborts and UDP 67 never binds.
-        "dhcp-leasefile=/var/lib/pihole/dnsmasq.leases"
-        # Arch-specific boot file -> iVentoy's virtual loader names. The
-        # suffix (16000) must match iVentoy's HTTP PXE port.
-        "pxe-service=x86PC,\"Boot from network (BIOS)\",iventoy_loader_16000_bios,192.168.3.25"
-        "pxe-service=X86-64_EFI,\"Boot from network (UEFI)\",iventoy_loader_16000_uefi,192.168.3.25"
-      ];
-      # webserver.api.cli_pw = true;
-    };
   };
 
   services.pihole-web = {
     enable = true;
     ports = [8080];
   };
+
+  # Port 53 on enp1s0 comes from profiles.dnsFailover; 67/4011 are the host's PXE
+  # proxyDHCP surface. tailscale0 is opened explicitly — the profile only opens
+  # the LAN interface.
   networking.firewall.interfaces.enp1s0 = {
     allowedUDPPorts = [
-      53
       67 # DHCP-proxy replies to PXE clients (FritzBox still owns leases)
       4011 # legacy BIOS ProxyDHCP
     ];
-    allowedTCPPorts = [53];
   };
   # Allow DNS queries from Tailscale network
   networking.firewall.interfaces.tailscale0 = {

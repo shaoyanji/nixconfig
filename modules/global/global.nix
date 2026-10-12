@@ -60,11 +60,11 @@
     # Keep dev-shell closures out of GC so shells don't re-download
     # everything after a collection sweep.
     keep-outputs = true;
-    # nix.nixPath was renamed to nix.settings.nix-path; the old form
-    # emits a deprecation warning on every eval. Kept in this block:
-    # a second `nix = { settings... }` is a duplicate-attribute error.
+    # Decouple the ~399 MiB store copy of nixpkgs source from system closure (T1-3).
+    # Using flake:nixpkgs allows legacy commands needing <nixpkgs> to resolve
+    # via the flake registry without copying the whole nixpkgs tree into the store.
     nix-path = [
-      "nixpkgs=${pkgs.path}"
+      "nixpkgs=flake:nixpkgs"
     ];
   };
 

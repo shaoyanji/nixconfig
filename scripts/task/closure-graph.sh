@@ -96,7 +96,8 @@ expr=$(
   cat <<'EOF'
 let
   env = builtins.getEnv;
-  pkgs = import <nixpkgs> { };
+  repoFlake = builtins.getFlake (env "CG_REPO_ROOT");
+  pkgs = repoFlake.inputs.nixpkgs.legacyPackages.${builtins.currentSystem} or (import <nixpkgs> { });
   cg = import (env "CG_REPO_ROOT" + "/lib/closure-graph.nix") { inherit (pkgs) lib; };
   g = cg.mkClosureGraph {
     inherit pkgs;

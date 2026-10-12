@@ -20,6 +20,12 @@
             export DISPLAY=":0"
           fi
 
+          # Ensure NixOS setuid wrapper path (/run/wrappers/bin) is present in PATH
+          # so sudo / su work seamlessly in non-login subshells and automated agent environments.
+          if [ -d /run/wrappers/bin ] && [[ ":$PATH:" != *":/run/wrappers/bin:"* ]]; then
+            export PATH="/run/wrappers/bin:$PATH"
+          fi
+
           source $HOME/.bash_aliases
         '';
     };

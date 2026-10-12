@@ -35,6 +35,11 @@ in {
   # are named after the owning service where known; `tcp-<port>`/`udp-<port>`
   # are ports whose owner is not recorded anywhere in the tree (kept verbatim
   # from the previous hand-written list so no exposure changed).
+  #
+  # Pruned 2026-10-12 (HC-7) — `task checks:ports` reported these as DEAD-HOLE
+  # (declared, no listener): 631 (CUPS, removed by the Tier-1 debloat), 3005,
+  # 8324 and 8920 (no owning service anywhere in the tree; 8920 is Jellyfin's
+  # HTTPS port, which this host does not serve), and 32469 (Plex DLNA, off).
   profiles.serviceExposure = {
     enable = true;
     interfaces = scopedIfaces;
@@ -43,7 +48,8 @@ in {
       nginx = {port = 80;};
       samba-netbios-ssn = {port = 139;};
       samba-smb = {port = 445;};
-      cups = {port = 631;};
+      # 631 (CUPS) pruned 2026-10-12 — nothing has listened on it since the
+      # Tier-1 printing debloat; it was a hole with no service behind it.
       nfs = {port = 2049;};
       immich = {
         port = 2283;
@@ -59,7 +65,6 @@ in {
           websockets = true;
         };
       };
-      tcp-3005 = {port = 3005;};
       harmonia = {
         port = 5000;
         proxy = {
@@ -109,10 +114,8 @@ in {
           name = "smart.frieren.lan";
         };
       };
-      tcp-8324 = {port = 8324;};
       tcp-8686 = {port = 8686;};
       tcp-8787 = {port = 8787;};
-      tcp-8920 = {port = 8920;};
       tcp-8989 = {port = 8989;};
       tcp-9696 = {port = 9696;};
       iventoy-http = {port = 16000;};
@@ -126,7 +129,8 @@ in {
         };
       };
       plex = {port = 32400;};
-      plex-dlna = {port = 32469;};
+      # 32469 (Plex DLNA) pruned 2026-10-12 — Plex's DLNA plugin is not
+      # enabled, so the port had no listener.
 
       dnsmasq-pxe = {
         port = 67;

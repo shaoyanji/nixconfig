@@ -76,8 +76,15 @@
   # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively,
   # and route *.frieren.lan queries to the local Pi-hole stack.
   # (services.resolved.extraConfig was removed upstream; use settings.Resolve)
+  #
+  # LLMNR off (HC-7): resolved's LLMNR responder is a fixed public listener on
+  # UDP 5355 with no LAN consumer — Avahi covers mDNS/multicast discovery here
+  # (services.avahi below) and the fleet resolves names via the Pi-hole stack.
+  # Leaving it on put a listener the firewall had to hold back; disabling it
+  # removes the listener instead of scoping it.
   services.resolved.settings.Resolve = {
     DNSStubListener = "no";
+    LLMNR = false;
     Domains = ["~frieren.lan"];
   };
 
@@ -140,9 +147,14 @@
     ];
   };
 
+  # Pi-hole admin UI. Bound to loopback (HC-7): the runbook's access path is a
+  # port-forward (`ssh -L 8080:localhost:8080 frieren` → http://localhost:8080/admin,
+  # docs/frieren-access.md), so the LAN hole on 8080 was never the intended way in.
+  # FTL's `webserver.port` accepts an interface prefix, which is how the bind is
+  # narrowed without a proxy.
   services.pihole-web = {
     enable = true;
-    ports = [8080];
+    ports = ["127.0.0.1:8080"];
   };
 
   # Port 53 on enp1s0 comes from profiles.dnsFailover; 67/4011 are the host's PXE

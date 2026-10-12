@@ -267,6 +267,15 @@ in {
   };
   networking.firewall.allowedTCPPorts = [8124];
 
+  # Scrutiny brings InfluxDB up with it (`services.scrutiny.influxdb.enable`
+  # defaults on), and InfluxDB's HTTP API then binds every interface on 8086.
+  # Scrutiny reads it over localhost, so narrow the bind instead of leaving a
+  # public listener the firewall has to hold back (HC-7). Nothing else in the
+  # tree queries this instance — checked: no `8086`/`influxdb` consumer outside
+  # this module, and the provisioner already targets localhost when the bind is
+  # not a wildcard.
+  services.influxdb2.settings.http-bind-address = "127.0.0.1:8086";
+
   # --- Vaultwarden (Bitwarden Compatible Password & TOTP Vault) ---
   services.vaultwarden = {
     enable = true;

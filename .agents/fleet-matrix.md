@@ -46,6 +46,7 @@
 | ⚪ **`applevalley`** | `preserved` | Yes | `x86_64-linux` | `lightweight-legacy` | Intel Core i5-2520M, 8 GiB DDR3, Intel HD Graphics 3000 | Legacy ThinkPad Container & Utility Host |
 | ⚪ **`ares`** | `preserved` | Yes | `x86_64-linux` | `kiosk-gaming` | Intel Core i5-6500, 8 GiB DDR4, NVIDIA GeForce GTX 750 Ti | Steam Big Picture Kiosk with Impermanence |
 | ⚪ **`aristotle`** | `preserved` | Yes | `x86_64-linux` | `standard-desktop` | Intel 64-bit multi-core, 16 GiB DDR4, Intel / Integrated | Standard Desktop Workstation |
+| 🟢 **`bitlockerpremium`** | `active` | No (Ext) | `x86_64-linux` | `mobile-windows-workstation` | Intel Core i5-10310U, 16 GB DDR4-3200 (2x 8 GB Samsung, dual channel), Intel UHD Graphics | Windows 11 Pro Workstation & Tailnet OpenSSH Endpoint |
 | ⚪ **`cassini`** | `preserved` | Yes | `aarch64-darwin` | `apple-silicon-workstation` | Apple Silicon, Unified Memory (16, Apple Integrated Metal GPU | Apple Silicon macOS Workstation |
 | ⚪ **`deckstation`** | `preserved` | Yes | `x86_64-linux` | `heavy-gaming` | Intel 64-bit multi-core, 16 GiB, AMD Radeon RX 5700 XT | High-End Steam Kiosk & Sunshine Host |
 | 🟡 **`delphi`** | `wip` | Yes | `aarch64-linux` | `cloud-high-ram` | Ampere Altra Neoverse N1, 24 GiB RAM | Cloud Bastion, Tailscale Exit Node & ARM64 Build Offloader |

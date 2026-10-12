@@ -1,0 +1,157 @@
+version: "3"
+# bitlockerpremium — Windows 11 Pro (HP EliteBook 830 G7) reached over Tailscale
+# OpenSSH. Registry entry: inventory.toml [hosts.bitlockerpremium].
+# Setup rationale + the RedirectionGuard/Scoop junction fix:
+#   vault zettel 20261012104800-windows-11-tailscale-openssh-and-nushell-junction-bypass
+#
+# Four things that shape every task in this shard:
+#   1. This is NOT a Nix host. There is no closure to build, warm, cache, or
+#      deploy — these tasks are ssh/scp wrappers only.
+#   2. The host name resolves through Tailscale MagicDNS on any tailnet node, so
+#      `benutzer@bitlockerpremium` needs no ~/.ssh/config alias. WIN_TARGET is
+#      spelled out because the local user (devji) is not the remote one.
+#   3. sshd's DefaultShell here is Windows PowerShell 5.1, so anything passed to
+#      bitlockerpremium:exec is PowerShell — not sh, not bash, not nu. `;` is a
+#      statement separator and `$` is a live PowerShell variable, so `$` must be
+#      escaped (`\$`) for the local shell. The one-liners below deliberately use
+#      no `$` at all where that is possible.
+#   4. WIN_OPTS carries `-o LogLevel=ERROR` to suppress the client's
+#      post-quantum-KEX warning banner (Windows OpenSSH advertises no PQ KEX
+#      yet). Real connection errors still surface.
+
+vars:
+  WIN_ALIAS: "bitlockerpremium"
+  WIN_USER: "benutzer"
+  WIN_TARGET: "benutzer@bitlockerpremium"
+  WIN_OPTS: "-o LogLevel=ERROR -o ConnectTimeout=10"
+  WIN_MODEL: "HP EliteBook 830 G7"
+  WIN_MAGICDNS: "bitlockerpremium.cloudforest-kardashev.ts.net"
+  WIN_TAILSCALE_IP: "100.81.170.87"
+  WIN_DEFAULT_DIR: "Downloads"
+
+tasks:
+  bitlockerpremium:ssh:
+    desc: Open interactive SSH shell into Windows 11 over Tailscale
+    cmds:
+      - ssh {{.WIN_OPTS}} {{.WIN_TARGET}}
+
+  bitlockerpremium:nu:
+    desc: Drop into Nushell on Windows (Scoop-managed, allocated a TTY)
+    cmds:
+      - ssh -t {{.WIN_OPTS}} {{.WIN_TARGET}} nu
+
+  bitlockerpremium:exec:
+    desc: Run a command on Windows via SSH (agent-friendly)
+    cmds:
+      - ssh {{.WIN_OPTS}} {{.WIN_TARGET}} -- {{.CLI_ARGS}}
+
+  bitlockerpremium:push:
+    desc: Transfer local file/folder to Windows (defaults to ~/Downloads)
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task bitlockerpremium:push -- <local_file> [remote_dest]"
+          echo "Example: task bitlockerpremium:push -- ~/report.pdf Downloads/"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="{{.WIN_DEFAULT_DIR}}/"
+        fi
+        echo "Pushing $SRC -> {{.WIN_TARGET}}:$DEST ..."
+        scp {{.WIN_OPTS}} -r "$SRC" "{{.WIN_TARGET}}:$DEST"
+        echo "Transfer complete."
+
+  bitlockerpremium:pull:
+    desc: Transfer remote file/folder from Windows to local directory
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "Usage: task bitlockerpremium:pull -- <remote_path> [local_dest]"
+          echo "Example: task bitlockerpremium:pull -- Downloads/report.pdf ./"
+          exit 1
+        fi
+        if [ -z "$DEST" ]; then
+          DEST="."
+        fi
+        echo "Pulling {{.WIN_TARGET}}:$SRC -> $DEST ..."
+        scp {{.WIN_OPTS}} -r "{{.WIN_TARGET}}:$SRC" "$DEST"
+        echo "Transfer complete."
+
+  bitlockerpremium:info:
+    desc: Query Windows host, OS build, CPU, RAM, disk, Tailscale, and shells
+    cmds:
+      - |
+        echo "=== Windows Host: {{.WIN_ALIAS}} — {{.WIN_MODEL}} ==="
+        echo ""
+        echo "--- Host, OS & Model ---"
+        ssh {{.WIN_OPTS}} {{.WIN_TARGET}} "hostname; (Get-CimInstance Win32_OperatingSystem).Caption; (Get-CimInstance Win32_OperatingSystem).Version; (Get-CimInstance Win32_ComputerSystem).Model"
+        echo ""
+        echo "--- CPU & Memory ---"
+        ssh {{.WIN_OPTS}} {{.WIN_TARGET}} "(Get-CimInstance Win32_Processor).Name; [string](Get-CimInstance Win32_Processor).NumberOfCores + 'C / ' + [string](Get-CimInstance Win32_Processor).NumberOfLogicalProcessors + 'T'; [string][math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory/1GB,1) + ' GiB RAM'"
+        echo ""
+        echo "--- System Disk ---"
+        ssh {{.WIN_OPTS}} {{.WIN_TARGET}} "'C: {0:N1} GiB free of {1:N1} GiB' -f ((Get-PSDrive C).Free/1GB), (((Get-PSDrive C).Used + (Get-PSDrive C).Free)/1GB)"
+        echo ""
+        echo "--- Uptime (last boot) ---"
+        ssh {{.WIN_OPTS}} {{.WIN_TARGET}} "(Get-CimInstance Win32_OperatingSystem).LastBootUpTime"
+        echo ""
+        echo "--- Tailscale ---"
+        ssh {{.WIN_OPTS}} {{.WIN_TARGET}} "tailscale ip -4"
+        echo "Tailscale IPv4: {{.WIN_TAILSCALE_IP}} / MagicDNS: {{.WIN_MAGICDNS}}"
+        echo ""
+        echo "--- Shells & Scoop ---"
+        ssh {{.WIN_OPTS}} {{.WIN_TARGET}} "nu --version; pwsh --version"
+
+  bitlockerpremium:menu:
+    desc: Interactive Charmbracelet Gum menu for Windows 11 operations
+    cmds:
+      - |
+        action=$(printf '%s\n' \
+          "ssh: Connect to Windows PowerShell (default shell)" \
+          "nu: Connect to Nushell" \
+          "info: Host, OS, CPU, disk & Tailscale status" \
+          "push: Upload file to Windows" \
+          "pull: Download file from Windows" \
+          "wishlist: Launch Wishlist SSH directory" \
+          "exit: Quit" | gum choose --header "🪟 bitlockerpremium (Windows 11) Control Menu")
+
+        case "$action" in
+          "ssh"*)
+            task bitlockerpremium:ssh
+            ;;
+          "nu"*)
+            task bitlockerpremium:nu
+            ;;
+          "info"*)
+            task bitlockerpremium:info
+            ;;
+          "push"*)
+            filepath=$(gum input --placeholder "Path to local file to upload:")
+            if [ -n "$filepath" ]; then
+              task bitlockerpremium:push -- "$filepath"
+            fi
+            ;;
+          "pull"*)
+            remotepath=$(gum input --placeholder "Path to remote file on Windows:")
+            if [ -n "$remotepath" ]; then
+              task bitlockerpremium:pull -- "$remotepath"
+            fi
+            ;;
+          "wishlist"*)
+            task bitlockerpremium:wishlist
+            ;;
+          *)
+            echo "Exited."
+            ;;
+        esac
+
+  bitlockerpremium:wishlist:
+    desc: Open Charmbracelet Wishlist SSH directory (tailnet hosts)
+    cmds:
+      - nix-shell -p wishlist --run wishlist

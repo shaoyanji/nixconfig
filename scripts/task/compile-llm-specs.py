@@ -180,7 +180,7 @@ def generate_fleet_matrix_markdown(data):
 
 def generate_agents_table(data):
     hosts = data.get("hosts", {})
-    # 4 distinct groups: Active Nix (11), Active External Non-Nix (3), WIP (1), Preserved (16)
+    # 4 distinct groups, rendered in this order: Active Nix, Active External Non-Nix, WIP, Preserved
     active_nix = [h for h, v in hosts.items() if v.get("status") == "active" and v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"])]
     active_ext = [h for h, v in hosts.items() if v.get("status") == "active" and not v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"])]
     wip_hosts = [h for h, v in hosts.items() if v.get("status") == "wip"]
@@ -197,10 +197,8 @@ def generate_agents_table(data):
     ]
 
     def get_module_path(h, info):
-        if h in ["serv00", "dragoncourt", "envs"]:
+        if h in ["serv00", "dragoncourt", "envs", "moto", "bitlockerpremium"]:
             return "taskfiles/" + h + ".yml"
-        if h == "moto":
-            return "taskfiles/moto.yml"
         if h in ["penguin", "alarm", "kali"]:
             return f"hosts/{h}.nix"
         if h == "garnixMachine":
@@ -262,7 +260,7 @@ def generate_agents_table(data):
 
     return "\n".join(lines)
 
-def update_agents_md(table_content):
+def update_agents_md(table_content, data):
     with open(AGENTS_MD, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -276,7 +274,21 @@ def update_agents_md(table_content):
     prefix = content.split(start_marker)[0] + start_marker + "\n\n"
     suffix = "\n\n" + end_marker + content.split(end_marker)[1]
 
-    note = "> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) (31 total devices: 11 active Nix, 3 active non-Nix external, 1 WIP, 16 preserved).\n\n"
+    # Counts are derived, not hardcoded: a hardcoded note silently went stale
+    # (it claimed 11 active Nix / 3 active external while the table it sat above
+    # listed 10 and 4). Adding a device must not require editing this string.
+    hosts = data.get("hosts", {})
+    meta = data.get("metadata", {})
+    total = meta.get("total_devices", len(hosts))
+    active_nix = sum(1 for v in hosts.values() if v.get("status") == "active" and v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"]))
+    active_ext = sum(1 for v in hosts.values() if v.get("status") == "active" and not v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"]))
+    wip = sum(1 for v in hosts.values() if v.get("status") == "wip")
+    preserved = sum(1 for v in hosts.values() if v.get("status") == "preserved")
+
+    note = (
+        "> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) "
+        f"({total} total devices: {active_nix} active Nix, {active_ext} active non-Nix external, {wip} WIP, {preserved} preserved).\n\n"
+    )
     return prefix + note + table_content + suffix
 
 def generate_docs_fleet_markdown(data):
@@ -298,7 +310,7 @@ def generate_docs_fleet_markdown(data):
         "",
         f"- **Total Registered Devices**: {meta.get('total_devices', len(hosts))}",
         f"- **Active Production Nix Devices**: {len(active_nix)}",
-        f"- **Active External Non-Nix Hosting**: {len(active_ext)} (`serv00`, `dragoncourt`, `envs`)",
+        f"- **Active External Non-Nix Hosting**: {len(active_ext)} ({', '.join(f'`{h}`' for h in sorted(active_ext))})",
         f"- **Work-in-Progress (Not Live)**: {len(wip_hosts)} (`delphi`)",
         f"- **Preserved Architecture Archetypes**: {len(preserved_hosts)}",
         f"- **Canonical Repository**: [{meta.get('canonical_repo', '')}]({meta.get('canonical_repo', '')})",
@@ -499,7 +511,7 @@ def main():
     # Check mode
     if args.check:
         drift = False
-        new_agents = update_agents_md(generate_agents_table(data))
+        new_agents = update_agents_md(generate_agents_table(data), data)
         with open(AGENTS_MD, "r", encoding="utf-8") as f:
             if f.read() != new_agents:
                 print("AGENTS.md has drifted from inventory.toml")
@@ -524,7 +536,7 @@ def main():
     # Sync / Compile
     # 1. Update AGENTS.md
     agents_table = generate_agents_table(data)
-    new_agents_md = update_agents_md(agents_table)
+    new_agents_md = update_agents_md(agents_table, data)
     if new_agents_md:
         with open(AGENTS_MD, "w", encoding="utf-8") as f:
             f.write(new_agents_md)

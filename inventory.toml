@@ -16,9 +16,9 @@ title = "Fleet Device & Host Inventory"
 description = "Canonical hardware, operational status, network, and agent persona registry for all fleet devices."
 version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_devices = 31
+total_devices = 32
 active_nix_devices = 10
-active_external_devices = 4
+active_external_devices = 5
 wip_devices = 1
 preserved_devices = 16
 
@@ -1533,3 +1533,49 @@ system_prompt_hint = "You represent an isolated microVM sandbox pattern used for
 compute_tier = "microvm-sandbox"
 allowed_tasks = ["Configuration pattern reference"]
 constraints = ["Preserved host; do not target for live deployment."]
+
+# ------------------------------------------------------------------------------
+# 8. WINDOWS WORKSTATIONS (NON-NIX)
+# ------------------------------------------------------------------------------
+[hosts.bitlockerpremium]
+hostname = "bitlockerpremium"
+status = "active"
+status_detail = "In active production as a non-Nix Windows 11 Pro workstation reachable over Tailscale OpenSSH (taskfiles/bitlockerpremium.yml)."
+kind = "external"
+is_nix = false
+system_type = "non-nix"
+arch = "x86_64-linux"
+role = "Windows 11 Pro Workstation & Tailnet OpenSSH Endpoint"
+category = "workstation"
+desktop_environment = "Windows 11 Explorer shell (Windows Terminal + Nushell/PowerShell 7)"
+users = ["benutzer"]
+
+[hosts.bitlockerpremium.hardware]
+model = "HP EliteBook 830 G7 Notebook PC"
+cpu = "Intel Core i5-10310U (Comet Lake, 4c/8t, up to 4.40 GHz)"
+gpu = "Intel UHD Graphics (Comet Lake GT2) + Dell D6000 DisplayLink dock"
+ram = "16 GB DDR4-3200 (2x 8 GB Samsung, dual channel)"
+display = "Samsung U28E590 (3840x2160 @ 60 Hz, 4K UHD via Dell D6000 dock)"
+storage_type = "NVMe SSD (NTFS, BitLocker-encrypted)"
+storage_layout = "256 GB WDC PC SN530 SDBPNPZ-256G-1006 (C: 235.9 GiB)"
+
+[hosts.bitlockerpremium.network]
+lan_ip = "192.168.3.29"
+tailscale = true
+tailscale_ip = "100.81.170.87"
+tailscale_hostname = "bitlockerpremium"
+ssh_alias = "benutzer@bitlockerpremium"
+domain = "bitlockerpremium.cloudforest-kardashev.ts.net"
+
+[hosts.bitlockerpremium.software]
+module_chain = "Windows 11 Pro 25H2 Native (Build 10.0.26200)"
+impermanence = false
+key_services = ["Windows OpenSSH sshd (TCP/22, firewall rule scoped to the Tailscale interface)", "Tailscale tailnet membership & MagicDNS (100.81.170.87)", "Scoop package manager (shims repointed to physical version dirs to clear RedirectionGuard)", "Nushell 0.116.1 and PowerShell 7.6.6 (Scoop-managed)"]
+traits = ["non-nix", "windows-11", "tailscale", "openssh", "scoop", "nushell", "bitlocker", "mobile-workstation"]
+
+[hosts.bitlockerpremium.persona]
+title = "Windows 11 Tailnet Workstation & Scoop Control Plane"
+system_prompt_hint = "You operate a Windows 11 Pro EliteBook over Tailscale OpenSSH. Drive it through taskfiles/bitlockerpremium.yml — Windows PowerShell is the remote default shell, Nushell is the interactive one."
+compute_tier = "mobile-windows-workstation"
+allowed_tasks = ["File transfers via `task bitlockerpremium:push/pull`", "PowerShell / Nushell command execution over SSH (`task bitlockerpremium:exec`)", "Host, OS build, disk, and Tailscale status checks", "Scoop package management"]
+constraints = ["Non-Nix environment: do not run nix, nixos-rebuild, or flake commands on this host.", "sshd's DefaultShell is Windows PowerShell 5.1, so remote commands are PowerShell syntax — not sh, bash, or Nushell.", "BitLocker-encrypted NTFS only; there is no Nix store, no impermanence, and no declarative generation."]

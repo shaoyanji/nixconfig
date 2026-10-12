@@ -64,7 +64,7 @@ flake.nix → flake/outputs.nix (hub)
 
 ### Complete Client OS Fleet Inventory (`flake/host-inventory.nix`)
 
-> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) (31 total devices: 11 active Nix, 3 active non-Nix external, 1 WIP, 16 preserved).
+> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) (32 total devices: 10 active Nix, 5 active non-Nix external, 1 WIP, 16 preserved).
 
 | Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |
 |------|--------|-------------|------|---------------------------|-------------|----------------|
@@ -78,6 +78,7 @@ flake.nix → flake/outputs.nix (hub)
 | `poseidon` | **Active** | `nixos` | `x86_64-linux` | Primary High-Performance Laptop Workstation (AMD Ryzen 7 Mobile, 16 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU) | `hosts/poseidon/configuration.nix` | High-speed persistent NVMe partitions |
 | `scratch` | **Active** | `nixos` | `x86_64-linux` | I/O Diet Lightweight Workstation (Intel Core i5-6500, 8 GB DDR4, Intel HD Graphics 530) | `hosts/scratch/configuration.nix` | Legacy BIOS + GRUB (ext4 /boot, f2fs /) |
 | `stark` | **Active** | `nixos` | `x86_64-linux` | Living Room All-in-One Gaming Terminal (Intel Core i5-7200U, 16 GiB DDR4, Intel HD 620) | `hosts/stark/configuration.nix` | SK hynix SC311 SATA SSD (system) + 1TB HDD /mnt/steam (btrfs+z... |
+| `bitlockerpremium` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Windows 11 Pro Workstation & Tailnet OpenSSH Endpoint (Intel Core i5-10310U, 16 GB DDR4-3200 (2x 8 GB Samsung, dual channel), Intel UHD Graphics) | `taskfiles/bitlockerpremium.yml` | 256 GB WDC PC SN530 SDBPNPZ-256G-1006 (C: 235.9 GiB) |
 | `dragoncourt` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Alwaysdata PHP/Wasm Web Hosting (Intel x86_64, Shared Hosting Quota) | `taskfiles/dragoncourt.yml` | /home/dragoncourt/www |
 | `envs` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Envs.net Multi-Protocol Pubnix Node (Intel Xeon, Shared Pubnix Quota) | `taskfiles/envs.yml` | /home/jisifu (public_html, public_gemini, public_gopher) |
 | `moto` | **Active** | **Non-Nix** (External) | `aarch64-linux` | Primary Mobile Smartphone (Android/Termux) (Unisoc T760 / Snapdragon, 4 to 8 GB RAM, Mali-G57) | `taskfiles/moto.yml` | Android storage (/storage/emulated/0) |

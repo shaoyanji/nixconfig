@@ -143,9 +143,23 @@ precondition for EXP-007/008/014/015.
 that EXP-009 flags as the open question, answered), plus `extraComponents` documented or renamed so
 it stops reading as "enabled components".
 - **Where:** `modules/services/home-assistant.nix`; evidence rows in `EXPERIMENTS.md` EXP-009.
-- **Exit criteria:** the journal shows an MQTT client connect for HA; a retained topic published
-with `mosquitto_pub` shows up as an HA entity; the option's real effect is documented (dependency
-vs. configured).
+- **Delivered (2026-10-12, `95452bb`):** the premise turned out to be wrong in a way worth
+  recording. MQTT in Home Assistant is **config-entry only**: in the pinned
+  `homeassistant-2026.9.4`, `components/mqtt/__init__.py` registers only publish/websocket
+  actions for a YAML stanza (and raises the `yaml_setup_without_active_setup` repair issue),
+  the broker comes from `entry.data[CONF_BROKER]` in `async_setup_entry()`, and
+  `config_flow.py` has no `async_step_import` — so no YAML and no `extraComponents` entry can
+  connect a broker. Hand-seeding `.storage/core.config_entries` was rejected for the same
+  reason Kuma's DB was: HA owns and rewrites that file. The delivered half is therefore the
+  honest one — the module header documents all of this, `extraComponents` is documented as
+  what it is (Python dependencies, not enabled components; 7 of 11 entries are dormant), and
+  `task checks:ha:mqtt` + `scripts/task/ha-mqtt-check.sh` make the gap testable: it currently
+  reports `broker listening yes / mqtt entry false / established 0` and exits non-zero.
+- **Remaining (not Nix-expressible):**
+  1. **The broker still has no publisher or subscriber.** The broker connection has to be
+     created through HA's config flow (or written by HA itself); a declarative module cannot
+     do it. EXP-014 (upsTelemetry) and the Zigbee/ESPHome work both wait on this.
+  2. `extraComponents` values are unvalidated strings — a typo fails at runtime, not at eval.
 
 ### HC-6 — Monitors as code: watch something (`services.fleetMonitors`)
 - **Why:** Uptime-Kuma runs with **0 monitors** (`select count(*) from monitor` → `0`, verified
@@ -160,16 +174,31 @@ alternative if probe semantics matter more than the UI. Probe `127.0.0.1:<port>`
 `firewall-scope.nix` change is needed. Kuma may keep the dashboard and badge endpoints.
 - **Where:** new `modules/services/fleet-monitors.nix`; a `checks:*`/runbook proving a down service
 is visible; `docs/`.
-- **Exit criteria:** every definition lives in the repo; a deliberately broken service appears as
-down **without manual DB access**; at least one monitor targets a failure mode that is unwatched
-today (restic timer, `nixos-upgrade`, DNS).
+- **Delivered (2026-10-12, `9ee6236`):** new `modules/services/fleet-monitors.nix`
+  (`services.fleetMonitors`) emits nixpkgs' `services.gatus`, so every definition is Nix state.
+  frieren watches seven endpoints — nginx:80, jellyfin:8096, immich:2283, paperless:28981,
+  home-assistant:8123, harmonia:5000 (with an HTTP status condition) and `tcp://127.0.0.1:53` —
+  all probed on loopback, so no `firewall-scope.nix` change and no new hole (8181, deliberately
+  not 8080, which Pi-hole uses). `monitors.frieren.lan` is an explicit vhost in
+  `reverse-proxy.nix` plus a landing-page card. Verified by eval: the gatus settings carry all
+  seven endpoints and 8181 appears in no interface firewall list.
+- **Remaining:**
+  1. **The failure modes named in the why are still unwatched.** The 03:30 restic job, the 04:00
+     `nixos-upgrade` and DNS resolution for `*.frieren.lan` are oneshot/timer units or a query,
+     not HTTP endpoints — watching them needs a small exporter or a push from the job itself.
+     The endpoint list is a start, not the set.
+  2. **Uptime-Kuma still runs with zero monitors.** Decide whether it stays as the dashboard
+     (and gatus is alert-only) or is retired now that the declarative monitor exists.
+  3. **Nothing is wired to a notifier.** A down service is visible in the UI and nowhere else —
+     no mail/push on transition, which is the actual point of a monitor.
 
 ### HC-7 — Close the ingress gaps `checks:ports` reports
 - **Why:** `task checks:ports` (verified 2026-10-12) reports five **DEAD-HOLE** ports — declared with
 nothing behind them (`631` after the CUPS debloat, `3005`, `8324`, `8920`, `32469`) — and thirteen
 **FIREWALL-ONLY** listeners that bind public addresses and are held back **only** by
 `firewall-scope.nix`'s interface scope (`111` rpcbind, `20048` mountd, `8080`/`8086` Pi-hole web,
-`10809` InfluxDB, `5355` LLMNR, and the **dynamic rpc/NFS ports** — a *different* set on each boot:
+`10809` (mis-attributed to InfluxDB in this list — see the correction below), `5355` LLMNR, and the
+**dynamic rpc/NFS ports** — a *different* set on each boot:
 `34737 36145 39781 42513 49597 59543 61199` now vs `38139 40769 42795 46357` recorded earlier).
 This is the exit criterion **HC-1 did not meet**: any loosening of that scope, or any host that
 lacks it, exposes them. The dynamic NFS port set is the proof that the interface scope is
@@ -179,8 +208,44 @@ listeners to loopback (or to the one interface they actually need) so the firewa
 sole control. NFS/Samba are the hard part — they need a concrete, non-dynamic port policy first.
 - **Where:** `hosts/frieren/firewall-scope.nix` (registry) + the owning modules
 (`nfs`, `immich`, `pihole-web`, `influxdb`, `iventoy`); `scripts/task/port-audit.sh` is the guard.
-- **Exit criteria:** `task checks:ports STRICT=1` reports **zero DEAD-HOLE and zero FIREWALL-ONLY**;
-every rebind verified with its own client; the counts reproducible from the merged firewall option.
+- **Owner map corrected (2026-10-12, read from `ss -tulnp` + the owning units):** `8080` is the
+Pi-hole web UI (not `8086`), `8086` is the InfluxDB that Scrutiny starts (nothing in the tree
+configures it), `10809` is a second iVentoy listener alongside the declared `26000` UI, and
+`34737` is an immich-internal listener, not a service port. `36145`/`39781` have no process
+attached because they are the kernel's NFS `lockd`; `42513`/`59543` are `rpc.statd`.
+- **Delivered (2026-10-12, `bec94db`):** the fixable half is closed. Five DEAD-HOLE ports
+  (`631` CUPS, `3005`, `8324`, `8920` Jellyfin-HTTPS, `32469` Plex DLNA) are pruned from the
+  exposure registry — none had an owning service left in the tree. NFS gained the non-dynamic
+  port policy the item asked for first: `mountdPort = 20048`, `statdPort = 32765`,
+  `lockdPort = 32766`, so the rpc/NFS surface stops being re-drawn every boot. LLMNR is off,
+  the Pi-hole web UI is bound to `127.0.0.1:8080` (its documented access path is an SSH
+  forward) and Scrutiny's InfluxDB to `127.0.0.1:8086`. `scripts/task/port-audit.sh` now
+  separates a `DYNAMIC` bucket (listeners on kernel-drawn ports — undeclarable by
+  construction, so failing on them would be an unsatisfiable gate), a documented `ACCEPTED`
+  list (each entry with a reason), and `STRICT=1` fails on `FIREWALL-ONLY` as well as
+  `DEAD-HOLE`. Verified: frieren evals with the new binds/pins, `STRICT=1` exits 0 against the
+  expected post-switch listener set (stubbed `ss`), and still exits 1 on a synthesised fixed
+  undeclared port.
+- **Remaining:**
+  1. **The rebinds need the next switch.** Nothing here is live yet (gen 83 is still running),
+     so "every rebind verified with its own client" is unproven: after the switch, check
+     `ss -tlnp` for the three loopback binds and the two pinned NFS ports, then run
+     `task checks:ports STRICT=1` (it is red until then, on `5355 8080 8086`).
+  2. **Five listeners still rely on the interface scope** and are recorded, not fixed, in the
+     audit's `ACCEPTED` list: `111` rpcbind, `20048` mountd, `32765` statd, `32766` lockd and
+     iVentoy's `10809`. Their NixOS modules expose no narrower bind address, and no intended
+     client reaches them from the LAN (fleet NFS mounts are v4, which needs none of them), so
+     declaring them would widen the firewall for nothing. Reviewed whenever that bucket changes.
+  3. **NFSv3 can probably be switched off entirely** — with v4-only clients, rpcbind/mountd/
+     statd/lockd have no consumer, and deleting them is the honest version of (2). It is a
+     fleet-breaks-if-wrong change (macOS/client v3 mounts would stop) and needs a maintenance
+     window with a real client test, so it is deliberately not part of this item.
+  4. **The truly dynamic listeners stay dynamic** (`34737` immich-internal, tailscaled's
+     peerapi on the tailnet address): no stable port to declare, so the interface scope is
+     their only control. That is EXP-017's problem — per-service isolation, not a firewall list.
+- **HC-1 note:** the registry landed in `a376893`, but its audit criterion ("zero DEAD-HOLE /
+  FIREWALL-ONLY drift for frieren") could only be reached once the *listeners* were fixed, which
+  is this item. Adding a service still touches exactly one file.
 
 ### Not promoted (kept as experiments) — and why
 

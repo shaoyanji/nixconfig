@@ -59,6 +59,24 @@ tasks:
     cmds:
       - HOST={{.HOST | default "frieren"}} IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh
 
+  checks:ssh:bitwarden:
+    desc: Log into a fleet host with the Bitwarden-vault SSH key and its CA certificate
+    summary: >
+      Unlocks the vault with bitwarden-cli, copies the SSH key to a 0600 temp file (removed on
+      exit), checks it is the key the certificate was signed for, then performs two real
+      handshakes: one with the certificate and one without it as a control, so a success cannot
+      be the static authorized_keys entry quietly doing the work. The certificate at
+      ~/.ssh/bitwarden-cert.pub is hand-signed and nothing renews it (`renew-ssh-cert` covers
+      only ~/.ssh/id_ed25519) — re-sign it when it expires.
+      NOT safe unattended: it prompts for the Bitwarden master password (or reuses BW_SESSION).
+      Vars: HOST= (default frieren), ITEM= (vault item name or id, required when the vault
+      holds more than one SSH key), PUBKEY=/CERT= (default ~/.ssh/bitwarden{,-cert.pub}),
+      PRIVATE_KEY= to skip the vault and test the handshake half alone.
+      Exits 1 when the certificate login fails, 2 when preflight fails (missing, expired or
+      mismatched certificate, or a vault item whose key is not the one the cert covers).
+    cmds:
+      - HOST={{.HOST | default "frieren"}} ITEM="{{.ITEM | default ""}}" nix-shell -p bitwarden-cli jq --run "bash scripts/task/bitwarden-ssh-test.sh"
+
   checks:restic:drill:
     desc: Verify frieren's restic repository and restore a sample (HC-2)
     summary: >

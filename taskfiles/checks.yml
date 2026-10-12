@@ -34,6 +34,26 @@ tasks:
     cmds:
       - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --check"
 
+  checks:ports:
+    desc: Diff frieren's declared firewall surface against its live listeners
+    summary: >
+      Reports four buckets — SERVED (declared and listening), DEAD-HOLE (declared with
+      nothing behind it), REDUNDANT (declared but loopback-bound, so the hole is
+      unusable), and FIREWALL-ONLY (a public listener permitted nowhere, i.e. the
+      firewall is the only control). The declared set comes from `nix eval` of the
+      merged networking.firewall.interfaces.<iface> option, so it accounts for every
+      module's contribution rather than a grep of the ones you remembered; the actual
+      set comes from `ss` with bind addresses preserved.
+      Prefer this over scanning the host from itself: traffic to a host's own address is
+      accepted by the `-i lo` rule before the interface-scoped rules are reached, so a
+      self-scan reports every local listener as LAN-reachable — exactly that error
+      produced a wrong open-port finding on 2026-10-12.
+      Vars: HOST= (default frieren), IFACE= (default enp1s0), STRICT=1 to exit 1 when dead
+      holes exist (default 0 = report only). Exits 2 when the host/interface cannot be
+      evaluated, so a typo cannot pass as a clean audit.
+    cmds:
+      - HOST={{.HOST | default "frieren"}} IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh
+
   checks:qmd:vault:
     desc: Check the Obsidian vault qmd collection exists and its index is fresh
     cmds:

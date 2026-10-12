@@ -5,9 +5,9 @@
 
 ## Fleet Overview Statistics
 
-- **Total Registered Devices**: 31
+- **Total Registered Devices**: 32
 - **Active Production Nix Devices**: 10
-- **Active External Non-Nix Hosting**: 4 (`serv00`, `dragoncourt`, `envs`)
+- **Active External Non-Nix Hosting**: 5 (`bitlockerpremium`, `dragoncourt`, `envs`, `moto`, `serv00`)
 - **Work-in-Progress (Not Live)**: 1 (`delphi`)
 - **Preserved Architecture Archetypes**: 16
 - **Canonical Repository**: [https://github.com/shaoyanji/nixconfig](https://github.com/shaoyanji/nixconfig)
@@ -37,6 +37,7 @@ These environments are not managed by Nix/NixOS. Operations are executed via ded
 
 | Host | Environment / OS | Role | Management | Memory Limit / Quota | Primary Services |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`bitlockerpremium`** | `x86_64-linux` | Windows 11 Pro Workstation & Tailnet OpenSSH Endpoint | `taskfiles/bitlockerpremium.yml` | 16 GB DDR4-3200 (2x 8 GB Samsung, dual channel) | Windows OpenSSH sshd (TCP/22, firewall rule scoped to the Tailscale interface), Tailscale tailnet membership & MagicDNS (100.81.170.87) |
 | **`dragoncourt`** | `x86_64-linux` | Alwaysdata PHP/Wasm Web Hosting | `taskfiles/dragoncourt.yml` | Shared Hosting Quota | Apache + alproxy webserver, PHP / Wasm engine |
 | **`envs`** | `x86_64-linux` | Envs.net Multi-Protocol Pubnix Node | `taskfiles/envs.yml` | Shared Pubnix Quota | Nginx Web Hosting (/home/jisifu/public_html), Gemini Capsule (/home/jisifu/public_gemini) |
 | **`moto`** | `aarch64-linux` | Primary Mobile Smartphone (Android/Termux) | `taskfiles/moto.yml` | 4 to 8 GB RAM | OpenSSH daemon on port 8022, Obsidian mobile notes sync |
@@ -89,6 +90,7 @@ Each device defines an agent persona specifying its operational compute tier, al
 | ⚪ **`applevalley`** | Vintage ThinkPad Utility Node (Preserved) | `lightweight-legacy` | • Configuration reference | ⚠ Preserved host; do not target for live deployment. |
 | ⚪ **`ares`** | Impermanent Arcade & Steam Kiosk (Preserved) | `kiosk-gaming` | • Configuration pattern reference | ⚠ Preserved host; do not target for live deployment. |
 | ⚪ **`aristotle`** | Philosophical Desktop Workstation (Preserved) | `standard-desktop` | • Configuration pattern reference | ⚠ Preserved host; do not target for live deployment. |
+| 🌐 **`bitlockerpremium`** | Windows 11 Tailnet Workstation & Scoop Control Plane | `mobile-windows-workstation` | • File transfers via `task bitlockerpremium:push/pull`<br>• PowerShell / Nushell command execution over SSH (`task bitlockerpremium:exec`)<br>• Host, OS build, disk, and Tailscale status checks<br>• Scoop package management | ⚠ Non-Nix environment: do not run nix, nixos-rebuild, or flake commands on this host.<br>⚠ sshd's DefaultShell is Windows PowerShell 5.1, so remote commands are PowerShell syntax — not sh, bash, or Nushell.<br>⚠ BitLocker-encrypted NTFS only; there is no Nix store, no impermanence, and no declarative generation. |
 | ⚪ **`cassini`** | macOS Executive & Creative Operator (Preserved) | `apple-silicon-workstation` | • macOS configuration pattern reference<br>• Darwin flake maintenance | ⚠ Host is preserved/dormant; do not target for live deployment. |
 | ⚪ **`deckstation`** | High-Performance Stream & Kiosk Station (Preserved) | `heavy-gaming` | • Configuration pattern reference | ⚠ Preserved host; do not target for live deployment. |
 | 🟡 **`delphi`** | Cloud Bastion & ARM64 Build Offloader | `cloud-high-ram` | • ARM64 compilation and package builds<br>• Offload task delegation from low-power nodes<br>• Tailscale exit node and network proxying<br>• Remote health monitoring | ⚠ Cloud security posture; only port 22 and WireGuard direct ports allowed through firewall. |

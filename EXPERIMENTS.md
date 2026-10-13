@@ -574,7 +574,9 @@ so any benefit must be *measured* (before/after `vmstat`) rather than assumed; a
 ## EXP-016 — Agent scheduler as a module (`services.agentScheduler`)
 
 **Mode:** the existing ad-hoc autonomous jobs expressed as one declarative registry.
-**Status:** three runtimes already exist; none share a shape.
+**Status:** **GRADUATED (2026-10-13, `f89228f`)**. Deployed in production as
+`modules/services/agent-scheduler.nix` (`services.agentScheduler`) on frieren (Generation 86),
+unifying nightly cron units with setuid sudo wrapper support and `flock` concurrency gating.
 
 The fleet runs autonomous jobs, each hand-wired: `agy-nightly-handoff` (03:00, executes `~/HANDOFF.md`),
 `agy-nightly-system` (05:00), the `hermes-gateway` user unit, and `antigravity-cli-daemon`. The repo has
@@ -686,6 +688,204 @@ Kaggle's June 2025 Acceptable Use Policy; notebook lifecycle is fundamentally no
 tokens on commercial endpoints (Cerebras/OpenRouter), a full week of Kaggle quota is worth ~$4.31. Exit
 criteria: an automated notebook launch script verified over Tailscale, a validated Hermes failover event
 when the notebook terminates, and authenticated endpoint tokens.
+
+---
+
+## EXP-019 — Declarative Gatus Alerting & Fleet Notifier Dispatcher (`services.fleetMonitors.alerting`)
+
+**Mode:** extend `services.fleetMonitors` with a declarative alerting block dispatching failure and resolution
+events to local/tailnet notifiers (SimpleX WebSocket RPC or Telegram bot) without external SaaS dependencies.
+**Status:** design study. Motivated by Gatus journal warnings: `alerting is not configured` (HC-6 in `HANDOFF.md`).
+
+**Use case.** frieren runs Gatus (`services.fleetMonitors`, loopback port 8181) monitoring 7 core endpoints
+(DNS, Nginx portal, Jellyfin, Immich, Paperless, Home Assistant, Harmonia cache). Currently, an endpoint
+failure is recorded only in Gatus's local SQLite/memory buffer; nobody is notified. When Pi-hole recursion fails
+or Jellyfin crashes, the outage remains silent until an operator manually checks `http://monitors.frieren.lan/`.
+Declarative alerting routes failure events directly to the local SimpleX `#Fleet` group or Telegram admin chat.
+
+**Module shape.** An opt-in `alerting` block inside `modules/services/fleet-monitors.nix`:
+
+```nix
+services.fleetMonitors.alerting = {
+  enable = true;
+  provider = "custom"; # enum: "custom" | "telegram" | "ntfy"
+  custom = {
+    url = "http://127.0.0.1:5225/api/v1/notify"; # local SimpleX client daemon webhook
+    method = "POST";
+    body = builtins.toJSON {
+      title = "[ALERT] [ENDPOINT_NAME]";
+      message = "[ENDPOINT_NAME] health check failed: [ALERT_DESCRIPTION] (HTTP [STATUS])";
+    };
+    headers = { "Content-Type" = "application/json"; };
+  };
+  defaultAlert = {
+    failureThreshold = 3;   # require 3 consecutive failures to avoid transient flaps
+    successThreshold = 2;   # require 2 consecutive successes to clear
+    sendOnResolved = true;
+  };
+};
+```
+
+**Evidence.** Gatus natively supports webhook, custom HTTP, Telegram, Discord, and script alert providers.
+On frieren, SimpleX client daemon runs locally on port 5225 (`simplex-chat.service`), and `smp-server` runs on
+port 5223. Both Telegram and SimpleX are already integrated in Hermes gateway state.
+
+**Why it is not prod.** Webhook payloads require strict JSON escaping and credential hygiene. If alerting is
+misconfigured with low thresholds, temporary service restarts during nightly `nixos-rebuild switch` will flood
+chat channels with false-positive alerts. Exit criteria: an endpoint failure triggered via intentional unit
+stop produces exactly one alert within 30 seconds, followed by a resolution notification upon unit restart,
+with zero alerts fired during normal auto-upgrades.
+
+---
+
+## EXP-020 — Declarative PostgreSQL Collation & Vacuum Maintenance Unit (`services.postgresMaintenance`)
+
+**Mode:** scheduled autonomous verification of PostgreSQL catalog collation tracking and index health,
+preventing silent index corruption following glibc upgrades.
+**Status:** design study. Motivated by the glibc 2.42 vs 2.44 collation mismatch discovered on Immich DB
+during the 2026-10-13 backup audit.
+
+**Use case.** NixOS glibc upgrades update the OS collation definition. When PostgreSQL detects that the system
+glibc collation differs from the database creation catalog version, it emits warnings during `pg_dump` backups
+and runs the risk of silent B-tree index corruption for locale-sorted text columns. Manually remembering to run
+`REINDEX` and `ALTER DATABASE ... REFRESH COLLATION VERSION` after major channel upgrades is fragile. A declarative
+maintenance unit evaluates `pg_collation_actual_version()` vs catalog `collversion`, executes `REINDEX CONCURRENTLY`,
+and schedules periodic `VACUUM ANALYZE`.
+
+**Module shape.**
+
+```nix
+services.postgresMaintenance = {
+  enable = true;
+  schedule = "Sun *-*-* 02:00:00"; # strictly outside 03:00-05:30 nightly backup window
+  databases = [ "immich" ];        # list of databases, or "all"
+  autoRefreshCollation = true;     # auto-refresh collation catalog when version drift is detected
+  reindexMode = "concurrently";    # "concurrently" | "standard"
+  vacuumAnalyze = true;
+  maxDuration = 1800;              # abort if maintenance exceeds 30 minutes
+};
+```
+
+**Evidence.** Verified on frieren (2026-10-13): `postgresqlBackup-immich.service` produced glibc 2.42 vs 2.44
+mismatch warnings. Executing `REINDEX DATABASE immich;` and `ALTER DATABASE immich REFRESH COLLATION VERSION;`
+eliminated the warning completely and brought backup duration to 3.4 seconds. Immich DB is 155 MB; full reindex
+took < 3 seconds.
+
+**Why it is not prod.** `REINDEX` acquires locks. If executed while Immich or Paperless is actively ingesting
+photos or documents, queries block and produce 504 gateway errors. Must run strictly outside the nightly backup
+window (03:00–05:30) and respect active PostgreSQL connections. Exit criteria: a unit that runs at 02:00 Sunday,
+verifies zero active client transactions, performs non-blocking index optimization, and records metric logs.
+
+---
+
+## EXP-021 — Fleet Binary Cache Pre-Warming & Closure Mirror (`services.fleetCacheWarmer`)
+
+**Mode:** background pre-population of frieren's Harmonia LAN cache (`http://192.168.3.25:5000`) for
+bandwidth-constrained or compute-constrained fleet nodes.
+**Status:** design study. Motivated by slow channel upgrade and build times on low-power edge nodes (`moto`, `minyx`).
+
+**Use case.** frieren serves as the fleet's Harmonia binary cache over LAN. However, Harmonia only serves paths
+already present in frieren's local `/nix/store`. Edge devices (laptops on Wi-Fi, low-power nodes) must fetch
+uncached paths from upstream `cache.nixos.org` over their own slow connections. frieren has a 1 Gbps wired
+uplink and idle compute. A declarative cache warmer evaluates target host flake configurations
+(`.#nixosConfigurations.<host>.config.system.build.toplevel`), queries `cache.nixos.org` during off-peak hours
+(01:00–02:30), and pulls missing store paths to frieren. When edge hosts subsequently run `nixos-rebuild`,
+they achieve 100% LAN cache hit rates at full gigabit wire speed.
+
+**Module shape.**
+
+```nix
+services.fleetCacheWarmer = {
+  enable = true;
+  schedule = "*-*-* 01:30:00";
+  targetHosts = [ "minyx" "moto" "deckstation" ];
+  flakeUri = "/srv/data/projects/nixconfig";
+  bandwidthLimit = "30M";          # prevent saturating WAN during streaming
+  keepGenerations = 2;             # limit cached history to prevent disk bloat
+};
+```
+
+**Evidence.** frieren already runs Harmonia on port 5000, and all fleet hosts declare `http://192.168.3.25:5000`
+in `nix.settings.substituters`. The top-level store paths for all fleet machines are evaluable on frieren via
+`nix eval .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath`.
+
+**Why it is not prod.** Downloading closures for other machines increases frieren's `/nix/store` size, threatening
+frieren's 34.9 GiB closure budget enforced by `closure-budgets.toml` unless those paths are specifically tagged
+or stored in a separate cache directory. Exit criteria: a dry-run test pulling `minyx` closure paths, followed
+by an edge-node build demonstrating 0 upstream downloads and no violation of frieren's local closure budget.
+
+---
+
+## EXP-022 — Declarative Btrfs Silent Corruption & Device Error Watchdog (`services.btrfsWatchdog`)
+
+**Mode:** continuous background monitoring of kernel Btrfs hardware error counters (`btrfs device stats`)
+across all mounted storage pools.
+**Status:** design study. Motivated by frieren's role as Storage Steward for 2TB of family photos, media, and docs.
+
+**Use case.** Btrfs calculates checksums on all data and metadata. When silent bit rot, cable degradation, or bad
+sectors occur during reads, Btrfs increments hardware counters (`corruption_errs`, `read_errs`, `flush_errs`).
+These errors do not generate filesystem panics unless uncorrectable; an operator may remain unaware of deteriorating
+storage media until files are irrecoverable. A lightweight watchdog unit inspects counters periodically and
+triggers immediate administrative notification upon any non-zero count.
+
+**Module shape.**
+
+```nix
+services.btrfsWatchdog = {
+  enable = true;
+  mounts = [ "/" "/Volumes/data" ];
+  interval = "hourly";
+  alertCommand = "${pkgs.systemd}/bin/systemd-cat -t btrfs-watchdog -p err";
+  failOnErrors = true;             # fail unit to trigger systemd OnFailure handler
+};
+```
+
+**Evidence.** Read-only check on frieren (2026-10-13): `btrfs device stats /Volumes/data` and `btrfs device stats /`
+complete in < 5ms with zero I/O overhead. Currently, all counters report `0` across both `/dev/sda2` (HDD) and
+`/dev/sdb3` (SSD).
+
+**Why it is not prod.** Needs robust error threshold filtering so transient unmounts or external USB drives do not
+produce alert storms. Exit criteria: hourly timer verified with 0 overhead; validated failure response on a loopback
+test image containing artificially injected corruption errors.
+
+---
+
+## EXP-023 — Kernel Memory-Pressure Tuning & Mainframe PSI Watchdog (`profiles.memoryPressure`)
+
+**Mode:** declarative Pressure Stall Information (PSI) monitoring and proactive cgroup memory containment for
+mixed mainframe workloads.
+**Status:** design study. Motivated by frieren's hardware constraint (11.47 GiB RAM, 8GB disk swap, 5.7GB zram).
+
+**Use case.** frieren concurrently hosts latency-sensitive streaming (Jellyfin 4K QuickSync), network routing
+(Pi-hole, Nginx, SimpleX SMP relay), and batch compute (Paperless OCR, Kiwix full-text indexing, nightly Restic drills,
+LLM agent runs). Under heavy parallel load, paging into the 8GB disk swap on `/dev/sda2` creates severe I/O stalls,
+driving memory PSI (`/proc/pressure/memory`) above 40% and inducing video playback dropouts before `systemd-oomd`
+triggers. A dedicated PSI profile configures memory pressure thresholds (`ManagedOOMMemoryPressure=kill`), sets
+`MemoryLow` protection for core services, and throttles batch worker slices.
+
+**Module shape.**
+
+```nix
+profiles.memoryPressure = {
+  enable = true;
+  protectedServices = [ "jellyfin" "pihole-ftl" "unbound" "nginx" "smp-server" ];
+  throttledSlices = [ "system-paperless.slice" "user-devji.slice" ];
+  psiThreshold = {
+    someLimit = "35%";             # memory pressure threshold over 10s window
+    action = "throttle";           # "throttle" | "kill" | "notify"
+  };
+  zramPriority = 100;
+  diskSwapPriority = 10;
+};
+```
+
+**Evidence.** Kernel PSI metrics are active on frieren (`/proc/pressure/memory`). Swap layout is verified at
+5.7GB zram (`/dev/zram0`, prio 100) and 8GB disk swap (`/dev/sdb2`, prio 10).
+
+**Why it is not prod.** Misconfigured memory limits can inadvertently kill active operator agent sessions or
+download jobs. Requires synthetic stress testing (`stress-ng`) under active 4K video transcoding to calibrate
+kill/throttle thresholds. Exit criteria: simulated memory surge throttles background OCR while Jellyfin sustains
+continuous 4K streaming without frame drops.
 
 ---
 

@@ -368,6 +368,20 @@ tasks:
           exit 1
         fi
 
+  checks:postgres:vector:
+    desc: Inspect PostgreSQL pgvector/vchord extension and table health in Immich DB (EXP-045)
+    summary: >
+      Invokes postgres-pgvector-audit to check vector extension versions, inspect
+      face_search and smart_search index sizes, and run page compaction vacuum drills.
+    cmds:
+      - |
+        if command -v postgres-pgvector-audit >/dev/null 2>&1; then
+          sudo -u postgres postgres-pgvector-audit
+        else
+          echo "postgres-pgvector-audit command not found in PATH" >&2
+          exit 1
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

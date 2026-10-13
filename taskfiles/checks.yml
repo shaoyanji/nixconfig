@@ -276,6 +276,19 @@ tasks:
         fi
         exit "$fail"
 
+  checks:btrfs:stats:
+    desc: Inspect Btrfs device error counters across root and data storage pools (EXP-022)
+    summary: >
+      Checks btrfs device stats across declared mounts (/ and /Volumes/data).
+      Fails if any device reports non-zero hardware read/write/flush/corruption errors.
+    cmds:
+      - |
+        if command -v btrfs-watchdog >/dev/null 2>&1; then
+          btrfs-watchdog
+        else
+          sudo btrfs device stats / && sudo btrfs device stats /Volumes/data
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

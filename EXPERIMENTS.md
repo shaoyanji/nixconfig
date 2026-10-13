@@ -820,7 +820,9 @@ by an edge-node build demonstrating 0 upstream downloads and no violation of fri
 
 **Mode:** continuous background monitoring of kernel Btrfs hardware error counters (`btrfs device stats`)
 across all mounted storage pools.
-**Status:** design study. Motivated by frieren's role as Storage Steward for 2TB of family photos, media, and docs.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/btrfs-watchdog.nix`
+(`services.btrfsWatchdog`) on frieren, monitoring root SSD (`/dev/sdb3`) and data HDD pool (`/dev/sda2`)
+hourly with zero performance overhead.
 
 **Use case.** Btrfs calculates checksums on all data and metadata. When silent bit rot, cable degradation, or bad
 sectors occur during reads, Btrfs increments hardware counters (`corruption_errs`, `read_errs`, `flush_errs`).

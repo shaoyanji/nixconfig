@@ -1124,7 +1124,10 @@ system power state.
 ## EXP-030 — Declarative SQLite WAL Checkpoint & Integrity Dispatcher (`services.sqliteMaintenance`)
 
 **Mode:** scheduled autonomous verification and write-ahead log (WAL) truncation for embedded fleet databases.
-**Status:** design study. Motivated by multi-megabyte WAL growth in Gatus, Pi-hole FTL, SimpleX SMP, and Hermes gateway.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/sqlite-maintenance.nix`
+(`services.sqliteMaintenance`) on frieren, performing scheduled non-blocking and truncating WAL checkpoints,
+`PRAGMA optimize`, and `PRAGMA quick_check` integrity verification across Pi-hole, Uptime-Kuma, Scrutiny, Sonarr,
+and SimpleX databases with strict UID/GID ownership preservation.
 
 **Use case.** frieren and fleet edge nodes run numerous lightweight services powered by SQLite with WAL mode enabled.
 Over time, high write concurrency (e.g. Gatus health checks every 60s, Pi-hole DNS query logs, SimpleX messaging)
@@ -1140,12 +1143,18 @@ services.sqliteMaintenance = {
   enable = true;
   schedule = "*-*-* 02:30:00";    # before 03:00 nightly backup window
   databases = [
-    "/var/lib/private/gatus/gatus.db"
-    "/home/devji/.hermes/gateway_state.db"
-    "/home/devji/.simplex/chats.db"
+    "/var/lib/pihole/pihole-FTL.db"
+    "/var/lib/pihole/gravity.db"
+    "/var/lib/private/uptime-kuma/kuma.db"
+    "/var/lib/private/scrutiny/scrutiny.db"
+    "/var/lib/sonarr/.config/NzbDrone/sonarr.db"
+    "/home/devji/.simplex/simplex_v1_agent.db"
+    "/home/devji/.simplex/simplex_v1_chat.db"
   ];
   checkpointMode = "truncate";    # "passive" | "restart" | "truncate"
+  runOptimize = true;
   runQuickCheck = true;
+  failOnCorruption = true;
 };
 ```
 
@@ -1293,6 +1302,191 @@ Running `find /nix/var/nix/gcroots/auto/ -xtype l` occasionally catches broken s
 **Why it is not prod.** Care must be taken not to purge active editor environments or running agent shell roots.
 Exit criteria: safe dry-run scan correctly identifies orphaned derivation roots, followed by an automated GC pass
 that recovers > 1 GiB without invalidating active project environments.
+
+---
+
+## EXP-035 — Autonomous ZRAM Compression & Swap Priority Balancer (`profiles.adaptiveZramSwap`)
+
+**Mode:** dynamic kernel sysctl memory tuning and zram compression sizing governed by real-time swap churn.
+**Status:** design study. Motivated by frieren's 11.47 GiB RAM hardware boundary and dual swap tiers (5.7GB zram vs 8GB HDD swap).
+
+**Use case.** frieren runs a two-tier swap architecture: in-memory zram (`/dev/zram0`, zstd, priority 100) and disk swap
+(`/dev/sdb3`, priority 10). When parallel batch jobs spike (Paperless document OCR, heavy agent planning passes, or bulk Immich
+ingestion), the memory allocator fills the 5.7 GiB zram buffer and overflows onto disk swap. Because `/dev/sda2` is an electromechanical
+HDD pool, paging out anonymous memory blocks triggers severe kernel I/O stalls (`wa%` reaching 25-40%), causing audio/video stutter
+on 4K Jellyfin playback. An adaptive balancer daemon monitors swap tier utilization: when zram reaches 75% capacity, it dynamically
+adjusts `vm.swappiness` from 60 down to 10 and increases zram compressed block device limits, confining transient memory spikes entirely
+to CPU-compressed memory and shielding the storage drives from paging contention.
+
+**Module shape.**
+
+```nix
+profiles.adaptiveZramSwap = {
+  enable = true;
+  maxZramPercent = 50;            # allow zram to expand dynamically up to 5.7 GiB
+  algorithm = "zstd";
+  fallbackDiskPriority = 10;
+  swappinessCeiling = 60;
+  swappinessFloor = 10;
+  throttleThresholdPercent = 80;  # lower swappiness when zram exceeds 80%
+};
+```
+
+**Evidence.** Ground truth on frieren: `swapon -s` confirms `/dev/zram0` (5.7 GiB, prio 100) and `/dev/sdb2` (8 GiB, prio 10).
+Current idle memory usage sits at ~4.9 GiB with 0 bytes paged to disk. `vm.swappiness` is currently set to kernel default 60.
+
+**Why it is not prod.** Dynamically modifying `vm.swappiness` via sysctl and resizing zram block devices at runtime requires testing
+under artificial memory exhaustion (`stress-ng --vm 2 --vm-bytes 4G`) to ensure kernel zram driver does not panic or trigger premature OOM.
+Exit criteria: synthetic memory surge cleanly compresses into zram with zero bytes leaked to HDD swap, maintaining Jellyfin 4K stream
+continuity with 0 dropped frames.
+
+---
+
+## EXP-036 — Declarative Encrypted DNS Upstream Multiplexer with Circuit-Breaking (`profiles.secureDnsUpstreams`)
+
+**Mode:** declarative DNS-over-TLS (DoT) and DNS-over-HTTPS (DoH) forwarder pool in Unbound with automated latency scoring and health failover.
+**Status:** design study. Motivated by eliminating unencrypted WAN DNS recursion and improving edge query latency.
+
+**Use case.** frieren runs Pi-hole FTL backed by Unbound on port 53. Currently, Unbound either performs full root iterative recursion
+or forwards plain UDP/TCP queries. Plain DNS queries to external providers are susceptible to ISP inspection, interception, and transient
+UDP packet drops. A declarative upstream multiplexer profile configures Unbound to query multiple authenticated DoT/DoH endpoints
+(Quad9 `9.9.9.9@853#dns.quad9.net`, Cloudflare `1.1.1.1@853#cloudflare-dns.com`, Mullvad) over TLS. The module includes an automated
+latency probe unit that measures round-trip handshake times every 6 hours, circuit-breaking degraded upstreams and prioritizing the fastest
+resolver without manual intervention.
+
+**Module shape.**
+
+```nix
+profiles.secureDnsUpstreams = {
+  enable = true;
+  protocol = "dot";               # "dot" (port 853) | "doh" (port 443)
+  upstreams = [
+    { name = "quad9-primary"; addr = "9.9.9.9"; port = 853; hostname = "dns.quad9.net"; }
+    { name = "cloudflare-primary"; addr = "1.1.1.1"; port = 853; hostname = "cloudflare-dns.com"; }
+    { name = "mullvad-primary"; addr = "194.242.2.3"; port = 853; hostname = "dns.mullvad.net"; }
+  ];
+  circuitBreakerLatencyMs = 120;  # disable upstreams with latency > 120ms
+  fallbackToRootIterative = true; # fall back to local root hints if all DoT providers fail
+};
+```
+
+**Evidence.** Unbound on frieren (`services.unbound`) is compiled with `libevent` and OpenSSL TLS support. Testing confirms port 853
+outbound TCP is permitted through the interface firewall scope.
+
+**Why it is not prod.** If TLS certificate validation fails during boot before system time is synchronized via NTP, Unbound will fail
+to resolve DNS, preventing NTP from synchronizing time (chicken-and-egg failure). Requires strict fallback to iterative root hints or
+hardcoded fallback addresses. Exit criteria: verified TLS-encrypted DNS resolution with < 25ms latency, validated failover to secondary
+provider during simulated upstream blackhole, and zero boot-time deadlocks.
+
+---
+
+## EXP-037 — Autonomous Btrfs Snapshot Retention & Capacity Ratchet (`services.snapshotRatchet`)
+
+**Mode:** multi-tier declarative Btrfs subvolume snapshot lifecycle manager with emergency capacity-driven space reclamation.
+**Status:** design study. Motivated by preventing ENOSPC conditions caused by heavy snapshot accumulation on `/dev/sda2` (2TB HDD) and `/dev/sdb3` (1TB SSD).
+
+**Use case.** frieren utilizes Btrfs subvolumes for `@root`, `@home`, `@snapshots`, and the 2TB data pool `/Volumes/data`. Automated snapshots
+protect against accidental file modification and ransomware. However, high-volume write activities (e.g. Immich video library additions,
+large Torrent transfers, or Paperless batch OCR) can quickly balloon snapshot exclusive block sizes (`btrfs qgroup show`). If available
+unallocated space falls below 5%, Btrfs refuses new writes and can lock into read-only mode. An autonomous snapshot ratchet daemon enforces
+strict retention windows (hourly: 24, daily: 7, weekly: 4), while continuously monitoring pool headroom: if free capacity drops below 10%,
+the ratchet progressively prunes the oldest daily/hourly snapshots until safe headroom (> 15%) is restored.
+
+**Module shape.**
+
+```nix
+services.snapshotRatchet = {
+  enable = true;
+  mounts = [ "/" "/Volumes/data" ];
+  retention = {
+    hourly = 24;
+    daily = 7;
+    weekly = 4;
+    monthly = 3;
+  };
+  headroomEmergencyThresholdPercent = 8;
+  targetHeadroomPercent = 15;
+  dryRun = false;
+  schedule = "*-*-* 01:00:00";    # before 03:00 backup window
+};
+```
+
+**Evidence.** Btrfs subvolume layout on frieren: `/dev/sdb3` SSD (923 GB) and `/dev/sda2` HDD (1.8 TB). Snapper and custom snapshot
+scripts create snapshots in `/.snapshots` and `/Volumes/data/.snapshots`.
+
+**Why it is not prod.** Uncontrolled snapshot deletion could accidentally delete recent restore points if threshold calculations confuse
+sparse allocations with real usage. Requires dry-run verification and assertions ensuring the latest snapshot is NEVER purged. Exit
+criteria: scheduled test on a test subvolume successfully retains declared generation counts, safely prunes excess snapshots upon
+simulated disk saturation, and logs a full audit trail.
+
+---
+
+## EXP-038 — Headless Paperless-ngx Document Ingestion Watchdog & Pipeline Health Probe (`services.paperlessWatchdog`)
+
+**Mode:** automated background inspection of document ingestion directories and asynchronous OCR worker queues.
+**Status:** design study. Motivated by avoiding silent pipeline deadlocks in `/srv/data/paperless/consume`.
+
+**Use case.** Paperless-ngx ingests documents scanned from network printers, mobile phones, and automated receipt scripts into its consume
+directory (`/srv/data/paperless/consume`). If an unreadable, corrupted, or password-protected PDF is dropped into the consume directory,
+or if Tesseract/Celery workers crash during OCR, files silently sit in the directory unprocessed. Because no desktop GUI runs on frieren's
+server session, operators do not notice ingestion stalls for days. A lightweight watchdog unit inspects `/srv/data/paperless/consume`
+every 30 minutes: files lingering > 20 minutes without modification trigger a Celery task queue probe, log a warning with the offending
+file name to journald, and emit an alert to `#Fleet`.
+
+**Module shape.**
+
+```nix
+services.paperlessWatchdog = {
+  enable = true;
+  consumeDir = "/srv/data/paperless/consume";
+  maxStallMinutes = 20;
+  interval = "30m";
+  checkCeleryWorker = true;
+  alertOnStalledFiles = true;
+};
+```
+
+**Evidence.** Paperless-ngx is active on frieren (`systemctl is-active paperless-consumer paperless-web`). The consume directory is
+located on the 2TB Btrfs data pool at `/srv/data/paperless/consume`.
+
+**Why it is not prod.** Large multi-gigabyte scanned TIFF/PDF uploads taking longer than 20 minutes over slow connections could trigger
+false-positive stall alerts. Requires checking file modification timestamps (`mtime`) and open file descriptors (`lsof` or `fuser`)
+to ensure active transfers are not flagged. Exit criteria: deliberate placement of an invalid test PDF in consume directory triggers an alert
+after exactly 20 minutes, while an actively streaming file is ignored.
+
+---
+
+## EXP-039 — Declarative Tailnet Subnet Router & Multicast DNS (mDNS) Reflector Gateway (`services.fleetMdnsReflector`)
+
+**Mode:** bridged mDNS service discovery across physical LAN interfaces (`enp1s0`) and the virtual Tailscale mesh (`tailscale0`).
+**Status:** design study. Motivated by providing zero-configuration service discovery (`.local` domains) for roaming fleet devices.
+
+**Use case.** When laptops (`minyx`, `stark`) and mobile phones roam outside the home network, they connect to frieren via Tailscale WireGuard.
+However, multicast DNS (mDNS, `224.0.0.251:5353`) and DNS-SD packets are link-local and do not route across point-to-point WireGuard VPN
+tunnels. As a result, roaming devices cannot automatically discover local services (Jellyfin media server, Home Assistant cast targets,
+Harmonia binary cache, Aki portal) using standard `.local` hostnames or ZeroConf discovery protocols. A declarative reflector gateway
+utilizes Avahi's reflector mode or a lightweight unicast mDNS repeater daemon, bridging service announcements between `enp1s0` and `tailscale0`
+with strict interface filtering to prevent multicast loops.
+
+**Module shape.**
+
+```nix
+services.fleetMdnsReflector = {
+  enable = true;
+  interfaces = [ "enp1s0" "tailscale0" ];
+  reflectAcrossTailnet = true;
+  allowedServices = [ "_http._tcp" "_jellyfin._tcp" "_home-assistant._tcp" ];
+  preventBroadcastStorms = true;
+};
+```
+
+**Evidence.** `avahi-daemon` is already running on frieren for LAN service discovery. Tailscale interface `tailscale0` is active and
+has IP `100.97.61.65`.
+
+**Why it is not prod.** Misconfigured mDNS reflectors on dual-homed machines can trigger packet amplification loops (multicast storm)
+that flood Wi-Fi interfaces and degrade network throughput. Requires strict duplicate-detection filters and packet TTL clamping. Exit
+criteria: a remote laptop connected exclusively via Tailscale successfully resolves `frieren.local` and auto-discovers the Jellyfin
+server without manually specifying an IP address.
 
 ---
 

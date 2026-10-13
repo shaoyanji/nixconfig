@@ -203,6 +203,7 @@ in {
     ../../modules/services/btrfs-watchdog.nix
     ../../modules/services/uds-static-bridge.nix
     ../../modules/services/ups-simulation-drill.nix
+    ../../modules/services/sqlite-maintenance.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -461,5 +462,25 @@ in {
     enable = true;
     minHealthPercent = 60;
     criticalPercent = 5;
+  };
+
+  # Declarative SQLite WAL checkpoint & integrity dispatcher (EXP-030)
+  # Compacts WAL files and verifies integrity across embedded fleet databases before backup window.
+  services.sqliteMaintenance = {
+    enable = true;
+    schedule = "*-*-* 02:30:00";
+    databases = [
+      "/var/lib/pihole/pihole-FTL.db"
+      "/var/lib/pihole/gravity.db"
+      "/var/lib/private/uptime-kuma/kuma.db"
+      "/var/lib/private/scrutiny/scrutiny.db"
+      "/var/lib/sonarr/.config/NzbDrone/sonarr.db"
+      "/home/devji/.simplex/simplex_v1_agent.db"
+      "/home/devji/.simplex/simplex_v1_chat.db"
+    ];
+    checkpointMode = "truncate";
+    runOptimize = true;
+    runQuickCheck = true;
+    failOnCorruption = true;
   };
 }

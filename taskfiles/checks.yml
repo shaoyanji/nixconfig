@@ -584,6 +584,26 @@ tasks:
           python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py paperless-ocr
         fi
 
+  checks:decision:smart:
+    desc: Run Smartd & Scrutiny predictive HDD failure and snapshot arbiter check (EXP-083)
+    cmds:
+      - |
+        if systemone-ensemble disk-smart --help >/dev/null 2>&1; then
+          systemone-ensemble disk-smart
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py disk-smart
+        fi
+
+  checks:decision:vuln:
+    desc: Run Flake input transitive vulnerability scanner & patch proposer check (EXP-097)
+    cmds:
+      - |
+        if systemone-ensemble vuln-proposer --help >/dev/null 2>&1; then
+          systemone-ensemble vuln-proposer
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py vuln-proposer
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

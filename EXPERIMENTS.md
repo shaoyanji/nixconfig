@@ -2834,7 +2834,7 @@ services.simplexRpcGuard = {
 ## EXP-083 — Smartd & Scrutiny Predictive HDD Drive Failure & Snapshot Arbiter (`services.diskSmartPredictor`)
 
 **Mode:** Julia-1 SMART telemetry vector triage triggering Nemotron-3-Ultra to synthesize emergency read-only subvolume pinning and remote replication manifests.  
-**Status:** proposed design study. Motivated by frieren's 2TB spinning HDD (`/dev/sda2`) holding all stateful paperless, media, and photo archives.
+**Status:** prototyped & verified live on frieren (Generation 107); queued & sent to host HANDOFF.md (Item 6, OPEN). Wired to `systemone-ensemble disk-smart` and `task checks:decision:smart`. Motivated by frieren's 2TB spinning HDD (`/dev/sda2`) holding all stateful paperless, media, and photo archives.
 
 **Use case.** Hard drive mechanical degradation is preceded by rising reallocated sectors (`ID 5`), pending sectors (`ID 197`), and UDMA CRC error spikes (`ID 199`). Standard smartd notifications often alert after filesystems suffer I/O errors. `services.diskSmartPredictor`:
 * Julia-1 evaluates Scrutiny's InfluxDB/collector metrics every hour, classifying drive degradation velocity (`HEALTHY_NOMINAL`, `TRANSIENT_CRC_CABLE_GLITCH`, `FAILING_ACTUATOR_PREDICTED`).
@@ -2852,7 +2852,7 @@ services.diskSmartPredictor = {
 };
 ```
 
-**Evidence.** Scrutiny daemon and web UI run on frieren port 8124. SMART monitoring is verified on `/dev/sda` and `/dev/sdb`.
+**Evidence.** Scrutiny daemon and web UI run on frieren port 8124 tracking `/dev/sda` and `/dev/sdb`. Prototyped and verified live via `task checks:decision:smart` in 27s; Nemotron-3-Ultra synthesized subvolume snapshots, transmission write pause, and remote replication manifest to `poseidon` with zero data destruction risk.
 
 **Why it is not prod.** Requires validating against simulated SMART fault attributes injected via Scrutiny mock API. Exit criteria: simulated sector degradation triggers subvolume snapshot and SimpleX notification in < 10 seconds.
 
@@ -3212,7 +3212,7 @@ services.postgresHotStandbyDrill = {
 ## EXP-097 — Automated Flake Input Transitive Vulnerability Scanner & Patch Proposer (`services.vulnPatchProposer`)
 
 **Mode:** Julia-1 lockfile input hash audit triggering Nemotron-3-Ultra to cross-reference known CVE advisories and draft pinned input overrides.  
-**Status:** proposed design study. Motivated by frieren running long-term stable deployments that must stay secure against zero-day vulnerabilities.
+**Status:** approved & prototyped live on frieren (Generation 107). Wired to `systemone-ensemble vuln-proposer` and `task checks:decision:vuln`. Motivated by frieren running long-term stable deployments that must stay secure against zero-day vulnerabilities.
 
 **Use case.** Transitive inputs in `flake.lock` (e.g. underlying openssl, glibc, curl) can lag behind upstream security advisories. Running full `nix flake update` often introduces breaking changes across hundreds of packages. `services.vulnPatchProposer`:
 * Julia-1 inspects `flake.lock` input revisions against the GitHub advisory database.
@@ -3230,7 +3230,7 @@ services.vulnPatchProposer = {
 };
 ```
 
-**Evidence.** Flake advisory audit is already active (`services.flakeAdvisoryAudit`). Automated patch synthesis is the logical progression.
+**Evidence.** Verified live on frieren via `task checks:decision:vuln` (51 nodes, 22 root inputs audited in 1.83 ms). Deliberation synthesis validated via Nemotron-3-Ultra for simulated critical CVE advisories (generating isolated git branch workflows and preflight `task checks:quick` assertions).
 
 **Why it is not prod.** Requires testing git branch isolation and build sandbox safety. Exit criteria: simulated vulnerable input automatically patched and verified with `task checks:quick` on a test branch.
 

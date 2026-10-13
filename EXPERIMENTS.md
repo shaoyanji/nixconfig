@@ -2194,6 +2194,153 @@ services.offlineKnowledgeCatalog = {
 
 ---
 
+## EXP-060 — Autonomous Alert Escalation & Metric Noise Suppression Engine (`services.alertDecisionEscalator`)
+
+**Mode:** non-autoregressive decision classification (Julia-1 144M) over Gatus probe time-series, ping latencies, and service error states to differentiate transient blips from genuine outages.  
+**Status:** design study & architectural specification. Motivated by resolving HC-6 (`Alerting is not configured` in Gatus) while eliminating flappy alarm fatigue.
+
+**Use case.** `services.fleetMonitors` (Gatus on `:8181`) probes 7 internal and reverse-proxied endpoints every 30 seconds. On standard rule-based monitors, a single 150ms WiFi latency fluctuation or temporary DNS recursion stall triggers false-positive paging notifications. `services.alertDecisionEscalator` hooks into Gatus's event bus and webhook endpoint, ingesting a rolling 5-minute sliding window of probe results (status codes, response latency vectors, local system load, and Btrfs I/O contention). Julia-1 evaluates the multivariate window in < 0.3 ms on CPU, computing calibrated outage probability distributions:
+* `TRANSIENT_NETWORK_JITTER` (confidence > 0.80): suppressed silently; logged for trend telemetry.
+* `DEPENDENCY_CHAIN_FAILURE` (e.g. Unbound down causing Pi-hole and Nginx failures): root-cause collapsed into a single parent alert.
+* `CONFIRMED_SERVICE_OUTAGE` (confidence > 0.85): formats an actionable Markdown diagnostic report and delivers it immediately to the SimpleX `#Fleet` chat group via `simplex-admin`.
+
+**Module shape.**
+
+```nix
+services.alertDecisionEscalator = {
+  enable = true;
+  model = "julia-1"; # 144M mmBERT non-autoregressive decision classifier
+  confidenceThreshold = 0.85;
+  gatusWebhookPort = 8182;
+  slidingWindowSeconds = 300;
+  destinationSimpleXGroup = "#Fleet";
+  suppressTransientJitter = true;
+};
+```
+
+**Evidence.** Gatus is active on port 8181 and reverse-proxied at `http://monitors.frieren.lan/`. Current log reports `Alerting is not configured`. Julia-1 decision latency on frieren is benchmarked at 0.235 ms, enabling sub-millisecond evaluation of incoming Gatus webhooks without consuming background CPU cycles.
+
+**Why it is not prod.** Requires tuning probability calibration against intentional chaos injection (e.g. killing Unbound or simulating packet drops on `enp1s0`). Exit criteria: 10 simulated transient network drops result in 0 operator alerts, while a killed Nginx process triggers an actionable SimpleX alert in < 5 seconds.
+
+---
+
+## EXP-061 — Predictive Spinning HDD I/O & Media Streaming Quality-of-Service Governor (`services.diskQosGovernor`)
+
+**Mode:** Julia-1 classification of disk queue depth, Btrfs commit latencies, and Jellyfin playback states to dynamically throttle background torrent and download I/O.  
+**Status:** design study & architectural specification. Motivated by frieren's storage architecture: 1TB fast SSD root vs 2TB spinning HDD data pool where 4K media streaming and Transmission downloads collide.
+
+**Use case.** Frieren drives a Philips 65" 4K TV via Jellyfin / niri compositor. The 2TB HDD (`/dev/sda2`, mounted at `/Volumes/data`) hosts both the 4K media library (`/Volumes/data/media`) and the Transmission/Aria2 download trees (`/Volumes/data/transmission`). When active torrents perform random-write chunk flushing at 30 MB/s, HDD actuator head thrashing introduces read latency spikes exceeding 450 ms, causing audio sync loss and video stutter during high-bitrate 4K HEVC playback. `services.diskQosGovernor` samples `/sys/block/sda/stat`, Btrfs transaction commit latency, and Jellyfin active play session counts every 10 seconds. Julia-1 evaluates the tuple into calibrated operational states:
+1. `IDLE_HOST_BURST`: 0 active media streams, disk read queue nominal → Transmission/Aria2 uncapped.
+2. `STREAMING_PRIORITY`: 1+ active media sessions detected → transmission upload/download capped to 2.5 MB/s, Btrfs commit interval relaxed to 60s, IO nice priority set to `idle` (`ionice -c 3`).
+3. `CRITICAL_IO_CONTENTION`: HDD seek latency > 250 ms during video playback → download daemon writes paused completely in-memory until media buffer drains.
+
+**Module shape.**
+
+```nix
+services.diskQosGovernor = {
+  enable = true;
+  monitoredDisk = "/dev/sda";
+  mediaService = "jellyfin";
+  throttleUnits = [ "transmission.service" "aria2.service" ];
+  evaluationInterval = 10; # seconds
+  maxSeekLatencyMs = 150;
+};
+```
+
+**Evidence.** `btrfs filesystem usage /Volumes/data` shows single 1.05 TiB allocated data pool. Transmission and Aria2 currently operate with uncoordinated write buffers. Julia-1's 144M model evaluates the 10-second metric vector in 0.2 ms on CPU, generating zero thermal overhead.
+
+**Why it is not prod.** Requires verifying that Transmission peer connections are not dropped during temporary pause intervals. Exit criteria: concurrent 40 MB/s download torrent and 65 Mbps 4K Jellyfin playback stream exhibits zero dropped frames and < 50ms read latency over a 30-minute playback test.
+
+---
+
+## EXP-062 — Autonomous Paperless Ingestion Pipeline Healer & Quarantine Dispatcher (`services.paperlessSmartTriage`)
+
+**Mode:** Julia-1 classification of document parsing errors, OCR tracebacks, and MIME signatures in `/var/lib/paperless/consume` to triage and unstick document ingestion pipelines.  
+**Status:** design study & architectural specification. Motivated by EXP-038 finding a 0-byte ghost PDF stalled since 2016 without operator visibility.
+
+**Use case.** Paperless-ngx ingests scanned invoices, receipts, and multi-page technical documents. When an incoming file is corrupted (e.g. truncated upload, 0-byte scanner artifact), password-encrypted, or contains malformed PostScript font tables, the `paperless-consumer` and Apache Tika daemons can enter retry loops or stall the queue worker. `services.paperlessSmartTriage` watches `/var/lib/paperless/consume` and worker journal logs. Upon detection of a failure or timeout (> 60s), Julia-1 evaluates the file header, MIME magic, byte entropy, and Python worker exception traceback across its 8k token context window, classifying the document:
+* `CORRUPTED_ZERO_BYTE_ARTIFACT`: moved to `/Volumes/data/paperless/quarantine/corrupted/` with descriptive tombstone metadata.
+* `ENCRYPTED_PASSWORD_REQUIRED`: moved to quarantine; dispatches a SimpleX notification prompting the operator to provide an unlock secret.
+* `UNSUPPORTED_LANGUAGE_SCAN`: queues document for off-peak OCR with auxiliary language packs (e.g. `tesseract-ocr-jpn`).
+* `MALFORMED_POSTSCRIPT_REPAIRABLE`: invokes `pdftoppm` / `gs` rasterization pass to synthesize a clean PDF and returns it to the ingestion queue.
+
+**Module shape.**
+
+```nix
+services.paperlessSmartTriage = {
+  enable = true;
+  consumeDir = "/var/lib/paperless/consume";
+  quarantineDir = "/Volumes/data/paperless/quarantine";
+  autoRepairMalformed = true;
+  notificationEndpoint = "simplex";
+};
+```
+
+**Evidence.** `task checks:paperless:watchdog` successfully isolated `sandra_0228_japanese pigs.pdf` lingering in consume staging. The Paperless stack consists of 4 distinct units (`consumer`, `web`, `task-queue`, `tika`). Julia-1's mmBERT classifier easily absorbs full Tika stack traces (< 3,000 tokens) in a single pass.
+
+**Why it is not prod.** Document sanitization via Ghostscript must be audited to guarantee no sensitive invoice numbers or metadata are altered during rasterization. Exit criteria: pipeline automatically unblocks 5 intentionally malformed/corrupted PDFs injected into `/var/lib/paperless/consume` within 15 seconds with 0 service crashes.
+
+---
+
+## EXP-063 — Anomaly-Gated PostgreSQL Vacuum & Vector Index Maintenance Dispatcher (`services.postgresSmartVacuum`)
+
+**Mode:** Julia-1 non-autoregressive decision classification of `pg_stat_user_tables`, pgvector index bloat, and system I/O load to trigger dynamic vacuuming and reindexing.  
+**Status:** design study & architectural specification. Motivated by EXP-020 (Immich collation reindex) and EXP-045 (pgvector/vchord index health) where rigid cron schedules either run unnecessarily or miss high-churn bloat.
+
+**Use case.** Immich DB hosts facial recognition vectors (`vector` v0.8.7) and deep image embeddings (`vchord` v1.1.1) alongside Paperless metadata. Standard PostgreSQL autovacuum is conservative and causes background I/O spikes during busy periods, while static nightly cron vacuums run even when zero dead tuples exist. `services.postgresSmartVacuum` queries `pg_stat_user_tables`, index dead-leaf page ratios, and active query latency distributions every 30 minutes. Julia-1 evaluates the tabular database scorecard:
+* `NOMINAL_HEALTH` (dead tuple ratio < 5%, vector search latency < 12ms): no action, zero disk I/O.
+* `TRANSACTION_CONCURRENT_MAINTENANCE`: dead tuples between 10–25% → runs non-blocking `VACUUM ANALYZE` on affected tables only.
+* `VECTOR_INDEX_DEGRADATION`: vector distance query latency degraded by > 2.5× → schedules concurrent `REINDEX INDEX CONCURRENTLY` strictly during the 01:00–02:30 off-peak pre-backup window.
+
+**Module shape.**
+
+```nix
+services.postgresSmartVacuum = {
+  enable = true;
+  databases = [ "immich" "paperless" ];
+  deadTupleThreshold = 0.15;
+  respectBackupWindow = true; # strictly avoid 03:00-05:30
+  checkInterval = "30m";
+};
+```
+
+**Evidence.** PostgreSQL vector audit drill (`postgres-pgvector-audit.service`) proved that page compaction reclaimed 15 allocated vector pages on Immich DB. Database collation catalog is currently clean (glibc 2.44).
+
+**Why it is not prod.** Concurrent reindexing requires sufficient temporary disk space on `/dev/sda2`. Exit criteria: simulated dead-tuple injection on 10,000 vector rows triggers a surgical `VACUUM ANALYZE` within 30 minutes, restoring query latency without interfering with Immich mobile client sync.
+
+---
+
+## EXP-064 — Inter-Host SimpleX Agent Message Priority & Intent Classifier (`services.simplexMessageClassifier`)
+
+**Mode:** Julia-1 message triage and routing integrated into the local SimpleX SMP WebSocket bridge (`simplex-chat`).  
+**Status:** design study & architectural specification. Motivated by managing inter-agent fleet coordination (`frieren`, `poseidon`, `guckloch`, `eisen`) without human notification spam.
+
+**Use case.** SimpleX Chat is deployed fleet-wide as the encrypted inter-agent bus. As autonomous hosts collaborate (e.g. frieren warming binary caches for poseidon, nightly backup notifications, task triage updates), agents exchange dozens of messages daily in `#Fleet`. Without semantic classification, human operators receive push notifications for every routine heartbeat and backup status line. `services.simplexMessageClassifier` acts as an inline message gateway between the local WebSocket RPC daemon (`:5225`) and the agent ingestion runtime. Julia-1 processes each incoming decrypted message across its 8k token context window, outputting structured classification tags:
+1. `FLEET_HEARTBEAT_STATUS`: silent logging in `/var/log/simplex/agent-mesh.log`.
+2. `BACKGROUND_CLOSURE_WARMED`: appended to daily summary digest.
+3. `CRITICAL_SECURITY_INCIDENT` / `HARDWARE_FAULT`: immediate high-priority push alert formatted with severity header, targeted host, and suggested remediation runbook.
+
+**Module shape.**
+
+```nix
+services.simplexMessageClassifier = {
+  enable = true;
+  model = "julia-1";
+  listenPort = 5225;
+  monitoredGroups = [ "#Fleet" ];
+  priorityThresholds = {
+    silent = 0.40;
+    digest = 0.70;
+    immediateAlert = 0.85;
+  };
+};
+```
+
+**Evidence.** SimpleX SMP server is active on `*:5223` and client daemon is running on port 5225. `#Fleet` group currently connects frieren, devji, and guckloch. Python WebSocket client `simplex-rpc.py` communicates cleanly with the daemon in sub-millisecond roundtrips.
+
+**Why it is not prod.** Requires end-to-end testing with simulated agent messages from poseidon and frieren to verify zero message loss or classification stalls. Exit criteria: 100 test messages across varied fleet scenarios categorized with 100% precision and < 5ms processing latency per message.
+
+---
 
 ## Audit findings feeding these experiments
 

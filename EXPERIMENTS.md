@@ -1709,7 +1709,9 @@ Exit criteria: scheduled unit benchmarks vector recall, verifies index integrity
 ## EXP-046 — Declarative SSH Bastion & Inactive Session Reaper (`services.fleetSessionReaper`)
 
 **Mode:** background sweeping and termination of orphaned, abandoned, or broken SSH sessions and lingering agent pipes.
-**Status:** design study. Motivated by preventing pty leak and lingering background processes from remote connections.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/fleet-session-reaper.nix`
+(`services.fleetSessionReaper`) on frieren, running hourly to sweep abandoned session scopes and remote SSH
+sessions idle > 4 hours, rigorously preserving multiplexers (`tmux`, `screen`, `agy`, `weechat`) and local console seats.
 
 **Use case.** Fleet administrators and remote autonomous agents connect to frieren over LAN and Tailscale SSH. Transient network
 drops, sleeping laptops, or killed terminal tabs often leave SSH child processes, agent child subprocesses, and pty allocations
@@ -2001,6 +2003,40 @@ Flake evaluation across all hosts is supported natively.
 **Why it is not prod.** Generating full derivation graphs for 4 hosts can produce multi-megabyte SVG/DOT files that take compute
 to render. Requires caching and delta generation. Exit criteria: weekly unit builds dependency matrix and embeds interactive graph
 into Aki portal with zero build regressions.
+
+---
+
+## EXP-055 — Declarative InfluxDB Retention & Metrics Aggregation Compaction Drill (`services.metricsRetentionDrill`)
+
+**Mode:** scheduled retention validation and TSM shard compaction for time-series telemetry storage.
+**Status:** design study. Motivated by preventing time-series disk bloat and slow historical dashboard queries.
+
+**Use case.** frieren runs InfluxDB (`:8086`) storing system performance counters, disk I/O metrics, and Home Assistant sensor
+histories. Over months of 24/7 logging, high-resolution metric data accretes rapidly across Btrfs storage pools, causing multi-gigabyte
+TSM shard directories and slow query responses for historical dashboard graphs. A declarative retention policy reconciles measurement
+retention rules (raw 1-second metrics retained 7 days, 1-minute downsampled rollups retained 90 days), compacts cold TSM shards, and
+validates continuous query execution outside peak hours, maintaining tight storage footprints.
+
+**Module shape.**
+
+```nix
+services.metricsRetentionDrill = {
+  enable = true;
+  schedule = "Sun *-*-* 03:45:00"; # strictly outside backup window
+  influxEndpoint = "http://127.0.0.1:8086";
+  retentionPolicies = {
+    "autogen" = "168h"; # 7 days for high-resolution counters
+    "downsampled" = "2160h"; # 90 days for rollups
+  };
+  compactColdShards = true;
+};
+```
+
+**Evidence.** InfluxDB is active on frieren (`systemctl is-active influxdb`). Data directory `/var/lib/influxdb` contains WAL and TSM shards.
+
+**Why it is not prod.** TSM shard compaction generates intensive disk writes. Must run with low I/O priority (`ionice -c 3`) and assert
+zero concurrent backup tasks. Exit criteria: scheduled unit validates retention policies, compacts shards in < 15 seconds, and frees
+at least 15% TSM storage with 0 query errors.
 
 ---
 

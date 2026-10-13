@@ -207,6 +207,7 @@ in {
     ../../modules/services/paperless-watchdog.nix
     ../../modules/services/kiwix-watchdog.nix
     ../../modules/services/postgres-pgvector-audit.nix
+    ../../modules/services/fleet-session-reaper.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -519,5 +520,16 @@ in {
     runVacuum = true;
     reindex = false;
     schedule = "Sun *-*-* 02:15:00"; # strictly before 03:00 backup window
+  };
+
+  # Declarative SSH bastion & inactive session reaper (EXP-046)
+  # Sweeps orphaned session scopes and idle remote SSH sessions (> 4h) while preserving tmux/screen/agy.
+  services.fleetSessionReaper = {
+    enable = true;
+    maxIdleHours = 4;
+    ignoredUsers = [];
+    preserveMultiplexers = true;
+    dryRun = false;
+    schedule = "hourly";
   };
 }

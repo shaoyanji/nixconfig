@@ -1086,7 +1086,9 @@ discovers PMTU to all reachable fleet nodes, and logs recommendations without mu
 ## EXP-029 — Hardware UPS Clean-Poweroff Simulation Drill & Telemetry Daemon (`services.upsSimulationDrill`)
 
 **Mode:** non-destructive autonomous discharge modeling and shutdown drill for frieren's internal battery UPS.
-**Status:** design study. Motivated by verifying UPower clean poweroff without actually cutting wall power.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/ups-simulation-drill.nix`
+(`services.upsSimulationDrill`) on frieren (Generation 89), verifying Lenovo battery health (72%), runtime
+modeling (6.35 hours under 1.97 W power draw), and UPower 5% clean poweroff assertions.
 
 **Use case.** frieren relies on its internal Lenovo L16M2PB1 battery as a hardware UPS with a UPower 5% emergency
 poweroff threshold. Because frieren runs 24/7 as the fleet mainframe and storage steward, an unhandled battery
@@ -1116,6 +1118,183 @@ UPower is active on frieren (`systemctl is-active upower`).
 to a production server. Must be strictly dry-run by default with multiple guard assertions. Exit criteria: a monthly
 drill runs, calculates battery degradation metrics, tests UPower hook syntax, and reports 100% pass without touching
 system power state.
+
+---
+
+## EXP-030 — Declarative SQLite WAL Checkpoint & Integrity Dispatcher (`services.sqliteMaintenance`)
+
+**Mode:** scheduled autonomous verification and write-ahead log (WAL) truncation for embedded fleet databases.
+**Status:** design study. Motivated by multi-megabyte WAL growth in Gatus, Pi-hole FTL, SimpleX SMP, and Hermes gateway.
+
+**Use case.** frieren and fleet edge nodes run numerous lightweight services powered by SQLite with WAL mode enabled.
+Over time, high write concurrency (e.g. Gatus health checks every 60s, Pi-hole DNS query logs, SimpleX messaging)
+causes WAL files (`.db-wal`) to accrete, leading to memory-mapped fragmentation and degrading query latency from
+microseconds to tens of milliseconds. A declarative maintenance module executes non-blocking `PRAGMA wal_checkpoint(PASSIVE);`
+and `PRAGMA optimize;` during low-traffic hours, verifying database integrity (`PRAGMA quick_check;`) and alerting
+on corruption before backups run.
+
+**Module shape.**
+
+```nix
+services.sqliteMaintenance = {
+  enable = true;
+  schedule = "*-*-* 02:30:00";    # before 03:00 nightly backup window
+  databases = [
+    "/var/lib/private/gatus/gatus.db"
+    "/home/devji/.hermes/gateway_state.db"
+    "/home/devji/.simplex/chats.db"
+  ];
+  checkpointMode = "truncate";    # "passive" | "restart" | "truncate"
+  runQuickCheck = true;
+};
+```
+
+**Evidence.** Gatus operates on SQLite at `/var/lib/private/gatus/`; SimpleX daemon operates on SQLite databases
+in `~/.simplex/`. File inspection confirms WAL files frequently hover between 5 MiB and 40 MiB when checkpoints
+are left to default SQLite thresholds.
+
+**Why it is not prod.** Running `TRUNCATE` checkpoints can briefly lock writers if a reader transaction is open.
+Requires testing each service under active write load to ensure zero transaction errors. Exit criteria: scheduled
+unit runs against declared databases, successfully truncates WAL files to 0 bytes, passes `quick_check`, and logs
+zero service disruptions.
+
+---
+
+## EXP-031 — Declarative Nginx Rate-Limiting & Anti-Brute-Force Jail (`profiles.nginxSecurityJail`)
+
+**Mode:** stateless in-memory connection throttling and burst protection for authenticated web endpoints.
+**Status:** design study. Motivated by hardening Vaultwarden, Immich, and Aki control portal against LAN brute-force.
+
+**Use case.** frieren exposes Vaultwarden (:8222) and administrative portals on LAN and Tailscale. While the
+firewall interface scope restricts WAN ingress, any device on the local network (e.g. IoT devices or guest laptops)
+could attempt high-frequency credential stuffing or DoS queries. Traditional `fail2ban` parses text logs and mutates
+stateful `iptables` rules, violating NixOS declarative purity. Nginx's built-in `limit_req_zone` and `limit_conn_zone`
+provide pure, stateless, declarative in-memory rate limiting with zero kernel firewall mutation:
+- Memory-efficient binary IP hashing (10m zone stores ~160,000 unique IP states).
+- Configurable burst buffers with `nodelay` for legitimate operators.
+- Returns HTTP 429 Too Many Requests to abusive callers instantly.
+
+**Module shape.**
+
+```nix
+profiles.nginxSecurityJail = {
+  enable = true;
+  zones = {
+    auth = { rate = "5r/m"; burst = 10; nodelay = true; };
+    api = { rate = "30r/s"; burst = 50; nodelay = true; };
+  };
+  protectedVhosts = [ "vault.frieren.lan" "photos.frieren.lan" ];
+};
+```
+
+**Evidence.** Nginx on frieren is compiled with the `http_limit_req_module` and `http_limit_conn_module`.
+Testing confirms Nginx handles rate enforcement with < 1 µs overhead per request.
+
+**Why it is not prod.** Miscalibrated burst limits on Immich or Vaultwarden can break batch mobile sync (e.g.
+uploading 50 photos simultaneously from a phone companion app). Exit criteria: Vaultwarden login endpoints
+block after 10 rapid failed attempts while Immich photo background uploads continue uninterrupted.
+
+---
+
+## EXP-032 — Intelligent Btrfs Metadata Rebalance & Space-Reclamation Dispatcher (`services.btrfsAutoRebalance`)
+
+**Mode:** conditional, threshold-driven Btrfs block group balancing for high-churn storage pools.
+**Status:** design study. Motivated by preventing ENOSPC errors on the 2TB HDD data pool (`/dev/sda2`).
+
+**Use case.** frieren's 2TB HDD data pool hosts high-churn workloads: Transmission torrents, Immich media uploads,
+Paperless document conversions, and nightly Restic backup snapshots. Over months of heavy write/delete activity,
+Btrfs allocates dedicated 1 GiB data and metadata chunks that become sparsely populated. This fragmentation causes
+Btrfs to return `No space left on device` (ENOSPC) during large writes even when hundreds of gigabytes of disk
+space are reported free. An autonomous rebalance module monitors unallocated raw chunk ratios via `btrfs filesystem usage`:
+only when unallocated space drops below 10% does it invoke filtered balances (`-dusage=10`, `-musage=10`).
+
+**Module shape.**
+
+```nix
+services.btrfsAutoRebalance = {
+  enable = true;
+  mounts = [ "/Volumes/data" ];
+  schedule = "Sun *-*-* 01:00:00"; # strictly outside 03:00-05:30 backup window
+  unallocatedThresholdPercent = 10;
+  dataUsageFilter = 15;
+  metadataUsageFilter = 20;
+};
+```
+
+**Evidence.** `sudo btrfs filesystem usage /Volumes/data` shows that `/dev/sda2` currently has 800 GiB unallocated.
+Rebalancing full drives causes severe I/O thrashing; filtered balancing (`-dusage=10`) takes only ~45 seconds.
+
+**Why it is not prod.** Btrfs balance operations must NEVER overlap with active nightly backups (03:00–05:30) or
+media streaming, as balance holds filesystem transaction locks. Exit criteria: threshold evaluation correctly skips
+healthy filesystems and safely compacts sparse chunks on test filesystems without I/O regressions.
+
+---
+
+## EXP-033 — Autonomous WireGuard Mesh Rekeying & Ephemeral Session Rotation (`profiles.wireguardRekey`)
+
+**Mode:** declarative key generation and automated session rotation for inter-host Tailscale/WireGuard peers.
+**Status:** design study. Motivated by zero-trust fleet posture across long-running mainframe nodes.
+
+**Use case.** Fleet nodes communicate across physical boundaries (frieren, moto, eisen, stark) using Tailscale
+WireGuard mesh encryption. While WireGuard natively rotates 1-minute transport session keys in-band, the static
+host identity keypairs remain static indefinitely. In high-security environments, periodic identity key rotation
+ensures forward secrecy against long-term key compromise. A declarative rekeying profile coordinates with SOPS
+and age recipients, automatically generating ephemeral WireGuard keys, validating peer reachability, and gracefully
+retiring old keys.
+
+**Module shape.**
+
+```nix
+profiles.wireguardRekey = {
+  enable = true;
+  interval = "monthly";
+  interface = "tailscale0";
+  backupOldKeys = true;
+  verifyPingPeer = "100.81.170.87"; # bitlockerpremium
+};
+```
+
+**Evidence.** Tailscale CLI natively supports `--authkey` renewal and local key generation via `tailscale cert`
+and WireGuard tools (`wg genkey`).
+
+**Why it is not prod.** Rotating host identity keys on an active mainframe can cause transient network isolation
+if peer coordination fails. Exit criteria: successful key rotation demonstrated between two test fleet nodes with
+zero connection drops on active SSH sessions.
+
+---
+
+## EXP-034 — Autonomous Nix Store Derivation GC Root Ratchet (`services.gcRootPruner`)
+
+**Mode:** background sweeping and pruning of orphaned auto-roots and direnv gcroots in `/nix/var/nix/gcroots`.
+**Status:** design study. Motivated by enforcing frieren's 34.9 GiB closure budget ceiling (`closure-budgets.toml`).
+
+**Use case.** Active local development, temporary agent evaluations, and Direnv environments create symlinks in
+`/nix/var/nix/gcroots/auto/`. These auto-roots pin old derivations and build dependencies permanently in `/nix/store`,
+causing `nix-collect-garbage` to skip them. Over weeks, dead build closures accrete, threatening frieren's 34.9 GiB
+closure budget. An autonomous ratchet daemon scans `/nix/var/nix/gcroots/auto/` and per-user roots, detects broken
+symlinks or targets untouched for > 14 days, unlinks them, and verifies that frieren stays under budget.
+
+**Module shape.**
+
+```nix
+services.gcRootPruner = {
+  enable = true;
+  schedule = "weekly";
+  maxRootAgeDays = 14;
+  dryRun = false;
+  closureBudgetCeiling = "34.9G";
+  targetHost = "frieren";
+};
+```
+
+**Evidence.** `ls -la /nix/var/nix/gcroots/auto/` reveals symlinks pointing to old development workspaces.
+Running `find /nix/var/nix/gcroots/auto/ -xtype l` occasionally catches broken symlinks that confuse GC statistics.
+
+**Why it is not prod.** Care must be taken not to purge active editor environments or running agent shell roots.
+Exit criteria: safe dry-run scan correctly identifies orphaned derivation roots, followed by an automated GC pass
+that recovers > 1 GiB without invalidating active project environments.
+
+---
 
 ---
 

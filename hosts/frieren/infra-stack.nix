@@ -202,6 +202,7 @@ in {
     ../../modules/services/agent-scheduler.nix
     ../../modules/services/btrfs-watchdog.nix
     ../../modules/services/uds-static-bridge.nix
+    ../../modules/services/ups-simulation-drill.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -452,5 +453,13 @@ in {
   services.udsStaticBridge = {
     enable = true;
     socketPath = "/run/uds-docs/docs.sock";
+  };
+
+  # Hardware UPS simulation drill and battery telemetry (EXP-029)
+  # Inspects Lenovo battery health, runtime modeling, and UPower clean poweroff thresholds.
+  services.upsSimulationDrill = {
+    enable = true;
+    minHealthPercent = 60;
+    criticalPercent = 5;
   };
 }

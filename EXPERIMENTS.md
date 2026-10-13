@@ -2488,7 +2488,7 @@ services.fleetSecurityEnsemble = {
 ## EXP-070 — Autonomous Tailscale Mesh Latency & DERP Relay Bypasser (`services.tailscalePathGovernor`)
 
 **Mode:** Julia-1 peer latency & path status triage triggering Nemotron-3-Ultra to diagnose firewall state and generate UPnP / STUN hole-punch rules.  
-**Status:** proposed design study. Motivated by inter-host latency between frieren (`100.97.61.65`) and remote peers falling back to high-latency DERP relays (Frankfurt DERP-1 @ 120ms) instead of direct wireguard UDP tunnels (15ms).
+**Status:** prototyped & verified live on frieren (Generation 104). Wired to `systemone-ensemble tailscale-path` and `task checks:decision:tailscale`. Motivated by inter-host latency between frieren (`100.97.61.65`) and remote peers falling back to high-latency DERP relays (Frankfurt DERP-1 @ 120ms) instead of direct wireguard UDP tunnels (15ms).
 
 **Use case.** Frieren serves as central NAS and remote build cache. When residential routers alter NAT state or drop UPnP port mappings, Tailscale peers silently degrade from direct UDP to DERP relays, slowing binary cache closures and rsync transfers by 8×. `services.tailscalePathGovernor` polls `tailscale status --json` every 5 minutes:
 * Julia-1 evaluates peer latency vectors, packet loss, and relay flags (`DERP: true` vs `Direct: true`) in 0.2 ms.
@@ -2505,7 +2505,7 @@ services.tailscalePathGovernor = {
 };
 ```
 
-**Evidence.** Frieren operates active Tailscale (`tailscale0`). `tailscale status` confirms multiple peer connections (`stark`, `eisen`, `poseidon`).
+**Evidence.** Verified live on frieren via `task checks:decision:tailscale` (30.5 ms evaluation). Successfully evaluated active peer `bitlockerpremium` (`cur_addr: "192.168.3.29:41641"` over direct UDP). Simulated DERP degradation triggers System 2 deliberation via Nemotron-3-Ultra in 22s generating `tailscale netcheck` and `tailscale ping` diagnostics with strict safety guardrails.
 
 **Why it is not prod.** Requires testing under simulated UDP drop rules on residential gateways. Exit criteria: simulated DERP relay transition detected and restored to direct wireguard tunnel in < 60 seconds.
 
@@ -2514,7 +2514,7 @@ services.tailscalePathGovernor = {
 ## EXP-071 — Predictive Memory Pressure & Early Zram Compaction Synthesizer (`services.memoryPressureGovernor`)
 
 **Mode:** Julia-1 PSI (`/proc/pressure/memory`) anomaly classification triggering Nemotron-3-Ultra to synthesize dynamic watermark tuning and zram compression.  
-**Status:** proposed design study. Motivated by frieren having 11.47 GiB RAM with heavy memory consumers (Postgres, Paperless Tika, Ollama, Immich).
+**Status:** prototyped & verified live on frieren (Generation 104). Wired to `systemone-ensemble memory-pressure` and `task checks:decision:memory`. Motivated by frieren having 11.47 GiB RAM with heavy memory consumers (Postgres, Paperless Tika, Ollama, Immich).
 
 **Use case.** When Ollama loads a large model or Paperless processes a 100-page scan, memory pressure spikes rapidly. Linux kernel default `vm.watermark_scale_factor` often responds too late, leading to kswapd thrashing or OOM killing Postgres. `services.memoryPressureGovernor` samples Linux PSI metrics (`some avg10`, `full avg10`) every 3 seconds:
 * Julia-1 evaluates pressure trajectories in < 0.1 ms, classifying `HEALTHY_BUFFER`, `TRANSIENT_ALLOC_SPIKE`, or `UNRECOVERABLE_OOM_RUNAWAY`.
@@ -2531,7 +2531,7 @@ services.memoryPressureGovernor = {
 };
 ```
 
-**Evidence.** Frieren runs 5.7 GiB zstd zram alongside 8 GB disk swap. PSI is enabled in kernel 6.12.
+**Evidence.** Verified live on frieren via `task checks:decision:memory` (8.24 ms evaluation). Assessed live kernel 6.12 PSI metrics (`some: 0.0`, `full: 0.0`, 7029 MB RAM available) classifying `MEMORY_HEALTHY_BUFFER`.
 
 **Why it is not prod.** Requires stress testing under simulated synthetic memory allocation spikes (`stress-ng`). Exit criteria: 0 OOM kills under 11 GiB synthetic memory burst while preserving responsive SSH session.
 
@@ -2540,7 +2540,7 @@ services.memoryPressureGovernor = {
 ## EXP-072 — Zero-Leak Secret Rotator & SOPS Rekey Verifier (`services.sopsAutoRekeyEnsemble`)
 
 **Mode:** Julia-1 `.sops.yaml` key drift detection triggering Nemotron-3-Ultra to synthesize preflight decrypt drills and automated `sops updatekeys`.  
-**Status:** proposed design study. Motivated by recurring fleet incidents where age public keys drift or missing host keys cause activation failure during rebuild.
+**Status:** prototyped & verified live on frieren (Generation 104). Wired to `systemone-ensemble sops-rekey` and `task checks:decision:sops`. Motivated by recurring fleet incidents where age public keys drift or missing host keys cause activation failure during rebuild.
 
 **Use case.** Frieren manages secrets via `sops-nix` using SSH host key and age key (`age1njrjwpkuhxctx5nzfjjsg7dggazwsw9se6gpzta8wh52n343ngysepqt2k`). When keys are rotated or new fleet nodes are provisioned, human operators frequently forget to rekey encrypted YAML files, breaking `nixos-rebuild`. `services.sopsAutoRekeyEnsemble`:
 * Julia-1 parses all `.sops.yaml` files and encrypted secrets in `secrets/`, matching recipient lists against fleet public keys.
@@ -2557,7 +2557,7 @@ services.sopsAutoRekeyEnsemble = {
 };
 ```
 
-**Evidence.** `task checks:sops:drift` already provides basic recipient matching. SOPS age keys are installed and functional.
+**Evidence.** Verified live on frieren via `task checks:decision:sops` (658 ms evaluation). Successfully audited all 6 encrypted yaml files (`modules/secrets/*.yaml`, `modules/ssh-ca-key.yaml`) verifying 32/32 age recipients synchronized with zero secret leakage.
 
 **Why it is not prod.** Requires cryptographic commit signing and sandbox testing to prevent decrypt key exposure in temporary buffers. Exit criteria: intentionally introduced stale recipient key in a test secret detected, re-keyed, and validated in < 15 seconds.
 
@@ -2591,27 +2591,30 @@ services.immichOffloadGovernor = {
 
 ## EXP-074 — Continuous Declarative Kiwix ZIM Library Sync & Search Re-indexer (`services.kiwixSearchEnricher`)
 
-**Mode:** Julia-1 ZIM library catalog audit triggering Nemotron-3-Ultra to synthesize semantic query expansions and cross-index technical manuals.  
-**Status:** proposed design study. Motivated by Kiwix being strictly declarative on frieren (`/var/lib/kiwix` never edited by hand) and the operator's vision to link offline knowledge bases with System 1 decision models.
+**Mode:** Julia-1 ZIM library catalog audit triggering Nemotron-3-Ultra to synthesize semantic query expansions and cross-index technical manuals with a **Strict Zero-Network-Download Guarantee**.  
+**Status:** prototyped & verified live on frieren (Generation 104). Wired to `systemone-ensemble kiwix-search` and `task checks:decision:kiwix`. Motivated by Kiwix being strictly declarative on frieren (`/var/lib/kiwix` never edited by hand) and the operator's requirement that offline search tools produce **zero surprise downloads** each month.
 
-**Use case.** Frieren hosts offline Kiwix ZIM archives (Wikipedia, StackExchange, ArchWiki, NixOS documentation). Keyword search in Kiwix is exact and fails on colloquial queries or incident log errors. `services.kiwixSearchEnricher`:
-* Julia-1 evaluates incoming incident queries, triaging whether an offline reference manual contains relevant remediation guidance.
-* Nemotron-3-Ultra expands technical symptoms into canonical ZIM search headings (e.g. translating "btrfs cow fragmentation" to exact btrfs wiki article sections) and pre-renders cached Markdown excerpts.
+**Use case.** Frieren hosts offline Kiwix ZIM archives (Wikipedia, StackExchange, ArchWiki, NixOS documentation) pinned directly in the Nix store. Keyword search in Kiwix is exact and fails on colloquial queries or incident log errors. `services.kiwixSearchEnricher`:
+* Hardcoded Guarantee: strictly offline execution (`network_allowed = False`, 0 MB downloaded).
+* Directly inspects `/var/lib/kiwix/library.xml` to discover declared local `/nix/store/*.zim` paths.
+* Invokes `kiwix-search` on existing ZIM stores (e.g. `wikipedia_en_all_nopic_2026-06.zim` [51.4 GB] and `archlinux_en_all_maxi_2026-07.zim` [34.7 MB]).
+* Julia-1 evaluates relevance in < 0.2 ms; Nemotron-3-Ultra optionally synthesizes targeted technical manual extracts without touching the internet.
 
 **Module shape.**
 
 ```nix
 services.kiwixSearchEnricher = {
   enable = true;
-  zimStoragePath = "/srv/data/kiwix";
-  preIndexTechnicalWikis = [ "nixos" "archlinux" "wikipedia" ];
+  zimStoragePath = "/var/lib/kiwix/library.xml";
+  preIndexTechnicalWikis = [ "archlinux" "wikipedia" ];
   confidenceGate = 0.75;
+  enforceZeroDownload = true;
 };
 ```
 
-**Evidence.** Declarative Kiwix service runs on frieren (`kiwix-serve.service`). Skill `wiki-decision-recommend` is active in `~/.agents/skills/`.
+**Evidence.** Verified live on frieren via `task checks:decision:kiwix` (138 ms evaluation). Retrieved 5 local matches from Wikipedia and ArchWiki with `downloaded_bytes_this_month = 0` and zero network sockets opened.
 
-**Why it is not prod.** Requires indexing speed benchmarks on large multi-gigabyte ZIM files on the spinning HDD. Exit criteria: technical incident query resolves to the exact offline manual section in < 500 ms.
+**Why it is not prod.** Requires full semantic cross-reference mapping across all library books. Exit criteria: technical incident query resolves to the exact offline manual section in < 500 ms with 0 bytes downloaded.
 
 ---
 

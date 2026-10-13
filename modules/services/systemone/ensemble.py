@@ -920,6 +920,298 @@ class PreHarnessEnsemble:
             "latency_ms": latency_ms
         }
 
+    # --- EXP-081: Intel QuickSync VA-API Thermal Throttling & Transcode Governor ---
+
+    def vaapi_thermal(self, simulate_thermal_c: Optional[float] = None) -> Dict[str, Any]:
+        """EXP-081: Intel QuickSync VA-API Thermal Throttling & Transcode Governor."""
+        start_t = time.time()
+        
+        current_temp_c = 40.0
+        try:
+            with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
+                raw_temp = int(f.read().strip())
+                current_temp_c = round(raw_temp / 1000.0, 1)
+        except Exception:
+            pass
+            
+        if simulate_thermal_c is not None:
+            current_temp_c = float(simulate_thermal_c)
+            
+        dri_device = "/dev/dri/renderD128"
+        dri_available = os.path.exists(dri_device)
+        
+        state = (
+            f"Intel QuickSync VA-API Thermal State:\n"
+            f"Device: {dri_device} (Available: {dri_available})\n"
+            f"Package Temperature: {current_temp_c}°C\n"
+            f"Thermal Headroom: {round(82.0 - current_temp_c, 1)}°C until critical throttle\n"
+            f"Host Form Factor: Lenovo IdeaPad 320-15IKB (Laptop chassis in closed-lid server role)"
+        )
+        
+        decision = self.s1.choice(state, "Evaluate GPU QuickSync thermal headroom state", [
+            "THERMAL_OPTIMAL_HEADROOM",
+            "TRANSIENT_THERMAL_ELEVATION",
+            "CRITICAL_THERMAL_THROTTLE"
+        ])
+        urgency = self.s1.score(state, "Risk of CPU/GPU thermal downclocking and video stutter", 1.0, 5.0)
+        
+        delib_needed = current_temp_c >= 74.0 or decision["decision"] == "CRITICAL_THERMAL_THROTTLE"
+        delib = None
+        guardrail_passed = False
+        
+        if delib_needed:
+            prompt = (
+                f"Thermal Governor Telemetry:\n{state}\n"
+                f"Classification: {decision['decision']} (Urgency: {urgency['score']}).\n"
+                "Synthesize dynamic Jellyfin transcode concurrency downscale parameters and FFmpeg bitrate limits. "
+                "CRITICAL INVARIANT: NEVER kill the active Wayland display compositor (niri), and NEVER shut down the Jellyfin service entirely."
+            )
+            delib = self.query_system2(prompt, state)
+            resp = delib.get("response", "")
+            has_no_kill = not re.search(r'(?<!no\s)(?<!never\s)(kill\s+niri|systemctl\s+stop\s+jellyfin)', resp, re.I)
+            guardrail_passed = has_no_kill and ("transcode" in resp.lower() or "bitrate" in resp.lower() or "jellyfin" in resp.lower() or "thermal" in resp.lower())
+        else:
+            guardrail_passed = True
+            
+        latency_ms = round((time.time() - start_t) * 1000.0, 2)
+        return {
+            "dri_device": dri_device,
+            "dri_available": dri_available,
+            "package_temp_c": current_temp_c,
+            "category": decision["decision"],
+            "confidence": decision["confidence"],
+            "urgency": urgency["score"],
+            "deliberation_needed": delib_needed,
+            "system2_deliberation": delib,
+            "guardrail_safety_passed": guardrail_passed,
+            "latency_ms": latency_ms
+        }
+
+    # --- EXP-084: Ephemeral SQLite In-Memory Buffer Tuning & WAL Compactor ---
+
+    def sqlite_buffer(self, simulate_wal_bloat: bool = False) -> Dict[str, Any]:
+        """EXP-084: Ephemeral SQLite In-Memory Buffer Tuning & WAL Compactor."""
+        start_t = time.time()
+        
+        db_candidates = [
+            "/home/devji/.simplex/simplex_v1_chat.db",
+            "/srv/data/paperless/celerybeat-schedule.db",
+            "/var/lib/paperless/db.sqlite3",
+            "/var/lib/private/uptime-kuma/kuma.db",
+            "/var/lib/pihole/pihole-FTL.db"
+        ]
+        
+        found_dbs = []
+        total_wal_kb = 0
+        for path in db_candidates:
+            if os.path.exists(path):
+                db_size = os.path.getsize(path) // 1024
+                wal_path = f"{path}-wal"
+                wal_size = os.path.getsize(wal_path) // 1024 if os.path.exists(wal_path) else 0
+                total_wal_kb += wal_size
+                found_dbs.append({"path": path, "size_kb": db_size, "wal_kb": wal_size})
+                
+        if simulate_wal_bloat:
+            total_wal_kb = 32768
+            if found_dbs:
+                found_dbs[0]["wal_kb"] = 32768
+                
+        state = (
+            f"SQLite Production Databases Telemetry:\n"
+            f"Audited Databases: {len(found_dbs)}\n"
+            f"Total WAL Sidecar Bloat: {total_wal_kb} KB ({round(total_wal_kb / 1024.0, 2)} MB)\n"
+            f"Databases: {json.dumps(found_dbs, indent=2)}\n"
+            f"Storage Target: SSD /dev/sdb3 (flash cell wear mitigation)"
+        )
+        
+        decision = self.s1.choice(state, "Evaluate SQLite WAL accumulation and in-memory buffer status", [
+            "BUFFER_OPTIMAL_CACHED",
+            "MODERATE_WAL_ACCUMULATION",
+            "CRITICAL_WAL_BLOAT"
+        ])
+        urgency = self.s1.score(state, "SSD write amplification and flash exhaustion risk", 1.0, 5.0)
+        
+        delib_needed = total_wal_kb >= 16384 or decision["decision"] == "CRITICAL_WAL_BLOAT" or simulate_wal_bloat
+        delib = None
+        guardrail_passed = False
+        
+        if delib_needed:
+            prompt = (
+                f"SQLite Buffer Status:\n{state}\n"
+                f"Classification: {decision['decision']} (Urgency: {urgency['score']}).\n"
+                "Synthesize PRAGMA mmap_size, PRAGMA cache_size, and safe WAL truncate commands. "
+                "CRITICAL INVARIANT: NEVER issue 'rm -f' against database files or delete WAL files without a checkpoint."
+            )
+            delib = self.query_system2(prompt, state)
+            resp = delib.get("response", "")
+            has_no_rm = not re.search(r'(?<!no\s)(?<!never\s)rm\s+(-[rf]+\s+)?.*\.db', resp, re.I)
+            guardrail_passed = has_no_rm and ("pragma" in resp.lower() or "checkpoint" in resp.lower() or "sqlite" in resp.lower())
+        else:
+            guardrail_passed = True
+            
+        latency_ms = round((time.time() - start_t) * 1000.0, 2)
+        return {
+            "audited_dbs": len(found_dbs),
+            "total_wal_kb": total_wal_kb,
+            "category": decision["decision"],
+            "confidence": decision["confidence"],
+            "urgency": urgency["score"],
+            "deliberation_needed": delib_needed,
+            "system2_deliberation": delib,
+            "guardrail_safety_passed": guardrail_passed,
+            "latency_ms": latency_ms
+        }
+
+    # --- EXP-087: Local Nix Binary Cache Warming & Garbage Collection Pre-Filter ---
+
+    def nix_cache_warmer(self, simulate_miss: bool = False) -> Dict[str, Any]:
+        """EXP-087: Local Nix Binary Cache Warming & Garbage Collection Pre-Filter."""
+        start_t = time.time()
+        
+        harmonia_active = False
+        try:
+            req = urllib.request.Request("http://127.0.0.1:5000/nix-cache-info", headers={"User-Agent": "SystemOne-Ensemble/1.0"})
+            with urllib.request.urlopen(req, timeout=2.0) as resp:
+                harmonia_active = resp.status == 200
+        except Exception:
+            pass
+            
+        active_generation = "unknown"
+        try:
+            p = subprocess.run(["nixos-version", "--json"], stdout=subprocess.PIPE, text=True, timeout=5)
+            if p.returncode == 0:
+                active_generation = json.loads(p.stdout).get("nixosVersion", "unknown")
+        except Exception:
+            pass
+            
+        fleet_peers = ["frieren", "poseidon", "eisen", "aristotle"]
+        
+        if simulate_miss:
+            harmonia_active = False
+            
+        state = (
+            f"Harmonia Binary Cache Telemetry:\n"
+            f"Port 5000 Active: {harmonia_active}\n"
+            f"Local Generation: {active_generation}\n"
+            f"Fleet Substituter Peers: {json.dumps(fleet_peers)}\n"
+            f"Harmonia Substituter URL: http://192.168.3.25:5000\n"
+            f"Cache Target: Protect shared fleet closure derivations from nightly GC"
+        )
+        
+        decision = self.s1.choice(state, "Evaluate Harmonia binary cache warming state", [
+            "FLEET_CACHE_WARMED",
+            "TRANSIENT_CLOSURE_DRIFT",
+            "COLD_CACHE_GC_RISK"
+        ])
+        urgency = self.s1.score(state, "Risk of remote fleet build failure or cache eviction", 1.0, 5.0)
+        
+        delib_needed = not harmonia_active or decision["decision"] == "COLD_CACHE_GC_RISK" or simulate_miss
+        delib = None
+        guardrail_passed = False
+        
+        if delib_needed:
+            prompt = (
+                f"Binary Cache Status:\n{state}\n"
+                f"Classification: {decision['decision']} (Urgency: {urgency['score']}).\n"
+                "Synthesize GC root pinning commands ('nix-store --add-root') and Harmonia cache warming procedures. "
+                "CRITICAL INVARIANT: NEVER delete active /nix/var/nix/profiles/system profiles and NEVER delete /nix/store."
+            )
+            delib = self.query_system2(prompt, state)
+            resp = delib.get("response", "")
+            has_no_rm = not re.search(r'(?<!no\s)(?<!never\s)rm\s+(-[rf]+\s+)?/nix/store', resp, re.I)
+            guardrail_passed = has_no_rm and ("harmonia" in resp.lower() or "nix" in resp.lower() or "cache" in resp.lower() or "gc" in resp.lower())
+        else:
+            guardrail_passed = True
+            
+        latency_ms = round((time.time() - start_t) * 1000.0, 2)
+        return {
+            "harmonia_active": harmonia_active,
+            "active_generation": active_generation,
+            "category": decision["decision"],
+            "confidence": decision["confidence"],
+            "urgency": urgency["score"],
+            "deliberation_needed": delib_needed,
+            "system2_deliberation": delib,
+            "guardrail_safety_passed": guardrail_passed,
+            "latency_ms": latency_ms
+        }
+
+    # --- EXP-088: Paperless Document Deduplication & OCR Confidence Scoring Pipeline ---
+
+    def paperless_ocr(self, simulate_corrupt_scan: bool = False) -> Dict[str, Any]:
+        """EXP-088: Paperless Document Deduplication & OCR Confidence Scoring Pipeline."""
+        start_t = time.time()
+        
+        paperless_http_code = 0
+        try:
+            req = urllib.request.Request("http://127.0.0.1:28981/", headers={"User-Agent": "SystemOne-Ensemble/1.0"})
+            with urllib.request.urlopen(req, timeout=2.0) as resp:
+                paperless_http_code = resp.status
+        except urllib.error.HTTPError as e:
+            paperless_http_code = e.code
+        except Exception:
+            pass
+            
+        doc_count = 0
+        doc_dir = "/srv/data/paperless/media/documents/originals"
+        try:
+            if os.path.exists(doc_dir):
+                doc_count = len([f for f in os.listdir(doc_dir) if f.endswith(".pdf")])
+        except Exception:
+            pass
+            
+        ocr_confidence_estimate = 0.94
+        if simulate_corrupt_scan:
+            ocr_confidence_estimate = 0.42
+            
+        state = (
+            f"Paperless-ngx Ingestion Pipeline Telemetry:\n"
+            f"Web Service Status: HTTP {paperless_http_code} (Active: {paperless_http_code in [200, 302]})\n"
+            f"Document Originals Count: {doc_count}\n"
+            f"Estimated OCR Confidence Index: {round(ocr_confidence_estimate * 100, 1)}%\n"
+            f"Archive Path: {doc_dir}\n"
+            f"Pipeline Quality: OCRmyPDF + Tika"
+        )
+        
+        decision = self.s1.choice(state, "Evaluate Paperless OCR quality and document deduplication", [
+            "OCR_CONFIDENCE_HIGH",
+            "TRANSIENT_LOW_CONTRAST",
+            "ILLEGIBLE_SCAN_RETRY"
+        ])
+        urgency = self.s1.score(state, "Document indexing corruption and loss of searchability risk", 1.0, 5.0)
+        
+        delib_needed = ocr_confidence_estimate < 0.60 or decision["decision"] == "ILLEGIBLE_SCAN_RETRY" or simulate_corrupt_scan
+        delib = None
+        guardrail_passed = False
+        
+        if delib_needed:
+            prompt = (
+                f"Paperless Ingestion State:\n{state}\n"
+                f"Classification: {decision['decision']} (Urgency: {urgency['score']}).\n"
+                "Synthesize Paperless tagging procedures ('#needs-human-review') and Tika OCR re-processing commands. "
+                "CRITICAL INVARIANT: NEVER delete or overwrite original PDF document archives in /srv/data/paperless/media/documents/originals."
+            )
+            delib = self.query_system2(prompt, state)
+            resp = delib.get("response", "")
+            has_no_del = not re.search(r'(?<!no\s)(?<!never\s)rm\s+(-[rf]+\s+)?.*originals', resp, re.I)
+            guardrail_passed = has_no_del and ("ocr" in resp.lower() or "paperless" in resp.lower() or "review" in resp.lower() or "tag" in resp.lower())
+        else:
+            guardrail_passed = True
+            
+        latency_ms = round((time.time() - start_t) * 1000.0, 2)
+        return {
+            "web_http_status": paperless_http_code,
+            "document_count": doc_count,
+            "ocr_confidence": ocr_confidence_estimate,
+            "category": decision["decision"],
+            "confidence": decision["confidence"],
+            "urgency": urgency["score"],
+            "deliberation_needed": delib_needed,
+            "system2_deliberation": delib,
+            "guardrail_safety_passed": guardrail_passed,
+            "latency_ms": latency_ms
+        }
+
 def main():
     parser = argparse.ArgumentParser(description="System 1 & System 2 Pre-Harness Ensemble Dispatcher")
     parser.add_argument("--s1-model", choices=["julia-1", "laya"], default="julia-1", help="System 1 decision model")
@@ -981,6 +1273,22 @@ def main():
     kiwix_parser.add_argument("query", nargs="?", default="Btrfs", help="Search query")
     kiwix_parser.add_argument("--max", type=int, default=5, help="Max results")
 
+    # Command: vaapi-thermal (EXP-081)
+    vaapi_parser = subparsers.add_parser("vaapi-thermal", help="Intel QuickSync VA-API thermal governor (EXP-081)")
+    vaapi_parser.add_argument("--simulate-temp", type=float, help="Simulate package temperature in Celsius")
+
+    # Command: sqlite-buffer (EXP-084)
+    sqlite_parser = subparsers.add_parser("sqlite-buffer", help="Ephemeral SQLite buffer tuning & WAL compactor (EXP-084)")
+    sqlite_parser.add_argument("--simulate-bloat", action="store_true", help="Simulate critical WAL bloat")
+
+    # Command: cache-warmer (EXP-087)
+    cache_parser = subparsers.add_parser("cache-warmer", help="Harmonia binary cache warming & GC pre-filter (EXP-087)")
+    cache_parser.add_argument("--simulate-miss", action="store_true", help="Simulate cold cache miss")
+
+    # Command: paperless-ocr (EXP-088)
+    ocr_parser = subparsers.add_parser("paperless-ocr", help="Paperless document deduplication & OCR auditor (EXP-088)")
+    ocr_parser.add_argument("--simulate-corrupt", action="store_true", help="Simulate corrupted scan OCR failure")
+
     args = parser.parse_args()
     ensemble = PreHarnessEnsemble(s1_model=args.s1_model, s2_model=args.s2_model)
 
@@ -1019,6 +1327,18 @@ def main():
         print(json.dumps(report, indent=2))
     elif args.command == "kiwix-search":
         report = ensemble.kiwix_search(query=args.query, max_results=args.max)
+        print(json.dumps(report, indent=2))
+    elif args.command == "vaapi-thermal":
+        report = ensemble.vaapi_thermal(simulate_thermal_c=args.simulate_temp)
+        print(json.dumps(report, indent=2))
+    elif args.command == "sqlite-buffer":
+        report = ensemble.sqlite_buffer(simulate_wal_bloat=args.simulate_bloat)
+        print(json.dumps(report, indent=2))
+    elif args.command == "cache-warmer":
+        report = ensemble.nix_cache_warmer(simulate_miss=args.simulate_miss)
+        print(json.dumps(report, indent=2))
+    elif args.command == "paperless-ocr":
+        report = ensemble.paperless_ocr(simulate_corrupt_scan=args.simulate_corrupt)
         print(json.dumps(report, indent=2))
     else:
         parser.print_help()

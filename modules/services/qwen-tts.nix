@@ -44,8 +44,8 @@
 
     src = pkgs.fetchgit {
       url = "https://github.com/ServeurpersoCom/qwentts.cpp.git";
-      rev = "0000000000000000000000000000000000000000";
-      hash = lib.fakeHash;
+      rev = "01b6127c2aabbb890e416af96f8c512d898440cb";
+      hash = "sha256-scZD8RxeJ+Wk1+94REnKQ6YFTLoN3L1+dymIqy9HAvg=";
       # Vendors ggml; without this the build has no ggml sources.
       fetchSubmodules = true;
     };

@@ -140,26 +140,17 @@
       echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
       systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" > "$TRIAGE_REPORT" || true
       OPEN_ITEMS=$(grep -o '"status": "OPEN"' "$TRIAGE_REPORT" | wc -l || echo 0)
-      echo "System One Handoff Triage: Found $OPEN_ITEMS open strategic item(s)."
-      if [ "$OPEN_ITEMS" -eq 0 ]; then
-        echo "=== [$(date)] All handoff queue items are verified or completed. Quota conserved. ==="
-        exit 0
-      fi
+      echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found). Triage report saved to $TRIAGE_REPORT."
     fi
 
     ${agentCascadeScript}
 
-    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available at /tmp/systemone-handoff-triage.json ($OPEN_ITEMS open items)."
+    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available at /tmp/systemone-handoff-triage.json ($OPEN_ITEMS open items). The intent is to provide live execution guidance without replacing or deleting the markdown files."
 
     if run_agent_cascade "$prompt"; then
-      echo "=== [$(date)] Handoff execution finished successfully. Deleting $HANDOFF_FILE ==="
-      rm -f "$HANDOFF_FILE"
-      echo "=== [$(date)] Cleanup complete. Archived copy retained at $ARCHIVE_COPY ==="
+      echo "=== [$(date)] Handoff execution finished successfully. Preserved $HANDOFF_FILE in-place. ==="
     else
-      echo "=== [$(date)] CRITICAL: Handoff execution failed across all agent tiers! ===" >&2
-      BLOCKED_COPY="$HANDOFF_FILE.blocked-$(date +%Y%m%d_%H%M%S)"
-      mv "$HANDOFF_FILE" "$BLOCKED_COPY"
-      echo "=== [$(date)] Preserved unexecuted handoff as $BLOCKED_COPY ===" >&2
+      echo "=== [$(date)] CRITICAL: Handoff execution encountered errors across agent tiers. Preserved $HANDOFF_FILE for inspection. ===" >&2
       exit 1
     fi
   '';
@@ -603,13 +594,13 @@ in {
     installCli = true;
   };
 
-  # Ollama Local AI & Cloud Model Proxy Service (revived / dormant by default)
-  # When enabled, connects to state & model repository on HDD data pool (/Volumes/data/ollama)
-  # services.ollama = {
-  #   enable = true;
-  #   home = "/Volumes/data/ollama";
-  #   models = "/Volumes/data/ollama/models";
-  #   host = "0.0.0.0";
-  #   openFirewall = false;
-  # };
+  # Ollama Local AI & Cloud Model Proxy Service (revived on frieren)
+  # Connects to state & model repository on HDD data pool (/Volumes/data/ollama)
+  services.ollama = {
+    enable = true;
+    home = "/Volumes/data/ollama";
+    modelsDir = "/Volumes/data/ollama/models";
+    host = "0.0.0.0";
+    openFirewall = false;
+  };
 }

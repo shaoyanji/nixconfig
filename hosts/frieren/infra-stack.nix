@@ -29,6 +29,8 @@
     set -euo pipefail
     export RESTIC_REPOSITORY=${lib.escapeShellArg (toString resticBackup.repository)}
     export RESTIC_PASSWORD_FILE=${lib.escapeShellArg (toString resticBackup.passwordFile)}
+    export HOME=/root
+    export XDG_CACHE_HOME=/tmp/restic-drill-cache
     restic=${pkgs.restic}/bin/restic
 
     echo "== restic check (repository integrity) =="
@@ -249,6 +251,7 @@ in {
         name = "dns (pihole-ftl)";
         url = "tcp://127.0.0.1:53";
         group = "dns";
+        conditions = ["[CONNECTED] == true"];
       }
     ];
   };

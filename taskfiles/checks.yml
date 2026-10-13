@@ -452,7 +452,7 @@ tasks:
         fi
 
   checks:decision:ensemble:
-    desc: Run System 1 & System 2 Pre-Harness Ensemble audit across 10 core services
+    desc: Run System 1 & System 2 Pre-Harness Ensemble audit across 10 core services (EXP-065)
     summary: >
       Evaluates 10 core subsystems using Julia-1 reflex triage and conditionally triggers
       Nemotron-3-Ultra deliberation via Ollama when anomalies are detected.
@@ -462,6 +462,46 @@ tasks:
           systemone-ensemble audit-all
         else
           python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py audit-all
+        fi
+
+  checks:decision:reconcile:
+    desc: Run Nix flake self-healing & AST patch preflight ensemble check (EXP-066)
+    cmds:
+      - |
+        if systemone-ensemble reconcile --help >/dev/null 2>&1; then
+          systemone-ensemble reconcile
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py reconcile
+        fi
+
+  checks:decision:storage:
+    desc: Run predictive Btrfs storage prognosis & rebalance synthesis check (EXP-067)
+    cmds:
+      - |
+        if systemone-ensemble storage-prognosis --help >/dev/null 2>&1; then
+          systemone-ensemble storage-prognosis
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py storage-prognosis
+        fi
+
+  checks:decision:media:
+    desc: Run multi-modal media metadata indexing & Kodi/Jellyfin NFO enricher check (EXP-068)
+    cmds:
+      - |
+        if systemone-ensemble media-enrich --help >/dev/null 2>&1; then
+          systemone-ensemble media-enrich
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py media-enrich
+        fi
+
+  checks:decision:security:
+    desc: Run zero-trust fleet telemetry anomaly & drop-rule synthesis check (EXP-069)
+    cmds:
+      - |
+        if systemone-ensemble fleet-security --help >/dev/null 2>&1; then
+          systemone-ensemble fleet-security
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py fleet-security
         fi
 
   checks:status:

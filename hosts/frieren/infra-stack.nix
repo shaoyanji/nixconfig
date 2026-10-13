@@ -133,9 +133,23 @@
 
     cd /home/devji
 
+    # --- System One Decision Triage Preflight (Julia-1 & Laya) ---
+    TRIAGE_REPORT="/tmp/systemone-handoff-triage.json"
+    OPEN_ITEMS=0
+    if command -v systemone-decision >/dev/null 2>&1; then
+      echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
+      systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" > "$TRIAGE_REPORT" || true
+      OPEN_ITEMS=$(grep -o '"status": "OPEN"' "$TRIAGE_REPORT" | wc -l || echo 0)
+      echo "System One Handoff Triage: Found $OPEN_ITEMS open strategic item(s)."
+      if [ "$OPEN_ITEMS" -eq 0 ]; then
+        echo "=== [$(date)] All handoff queue items are verified or completed. Quota conserved. ==="
+        exit 0
+      fi
+    fi
+
     ${agentCascadeScript}
 
-    prompt="Please read HANDOFF.md in the current working directory and execute the plan."
+    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available at /tmp/systemone-handoff-triage.json ($OPEN_ITEMS open items)."
 
     if run_agent_cascade "$prompt"; then
       echo "=== [$(date)] Handoff execution finished successfully. Deleting $HANDOFF_FILE ==="
@@ -182,10 +196,20 @@
       systemctl --user reset-failed || true
     fi
 
-    # --- STEP 2: Agent Cascade Execution ---
+    # --- STEP 2: System One Decision Triage (Julia-1 & Laya) ---
+    echo "=== [$(date)] Step 2: Running System One Decision Triage (Julia-1) ==="
+    TRIAGE_REPORT="/tmp/systemone-system-triage.json"
+    TIER1_COUNT=0
+    if command -v systemone-decision >/dev/null 2>&1; then
+      systemone-decision --model julia-1 triage-system "$SYSTEM_FILE" > "$TRIAGE_REPORT" || true
+      TIER1_COUNT=$(grep -o '"protocol": "TIER_1_IMMEDIATE_REPAIR"' "$TRIAGE_REPORT" | wc -l || echo 0)
+      echo "System One System Triage: Evaluated scorecard with $TIER1_COUNT potential TIER 1 immediate repair item(s)."
+    fi
+
+    # --- STEP 3: Agent Cascade Execution ---
     ${agentCascadeScript}
 
-    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status."
+    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status. System One decision pre-triage is available at /tmp/systemone-system-triage.json ($TIER1_COUNT immediate items flagged)."
 
     if run_agent_cascade "$prompt"; then
       echo "=== [$(date)] System maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
@@ -578,4 +602,14 @@ in {
     defaultModel = "julia-1";
     installCli = true;
   };
+
+  # Ollama Local AI & Cloud Model Proxy Service (revived / dormant by default)
+  # When enabled, connects to state & model repository on HDD data pool (/Volumes/data/ollama)
+  # services.ollama = {
+  #   enable = true;
+  #   home = "/Volumes/data/ollama";
+  #   models = "/Volumes/data/ollama/models";
+  #   host = "0.0.0.0";
+  #   openFirewall = false;
+  # };
 }

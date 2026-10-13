@@ -3290,6 +3290,51 @@ services.oomEarlyWarning = {
 
 ---
 
+## EXP-100 — Declarative Consolidated Fleet Governor & Self-Repair Orchestrator (`services.fleetGovernor`)
+
+**Mode:** Julia-1 (144M) and Laya (421M) Kelly-gated consensus reflex tier triggering deterministic runtime auto-repair actions and automatic strategic handoff.  
+**Status:** **GRADUATED & DEPLOYED (2026-10-13)**. Deployed in production as `modules/services/fleet-governor.nix` (`services.fleetGovernor`) on frieren, consolidating 7 fragmented watchdog daemons (`btrfs-watchdog`, `sqlite-maintenance`, `paperless-watchdog`, `kiwix-watchdog`, `postgres-pgvector-audit`, `flake-advisory-audit`, `tls-cert-watchdog`) into a single hourly self-repair governor.
+
+**Use case.** Proliferation of monitoring-only daemons created scheduler sprawl without executing actual runtime repairs. `services.fleetGovernor`:
+* Evaluates all fleet subsystems (SQLite WAL, QuickSync thermals, Btrfs I/O errors, Paperless ingestion, Kiwix health, PSI memory, Flake security) in **~25 ms** on CPU using Julia-1 + Laya in series.
+* Employs the Kelly consensus criterion ($K = P - \frac{1-P}{b}$): when dual models agree and $K > 0$, auto-routes directly to deterministic runtime fixes (`PRAGMA wal_checkpoint(TRUNCATE)`, powersave thermal downclocking, emergency read-only snapshots, ghost PDF quarantine).
+* Consumes **0 System 2 LLM tokens**, preserving 100% of the weekly Nemotron quota.
+* Automatically writes un-remediated or ambiguous anomalies directly to `/home/devji/HANDOFF.md` for Antigravity's scheduled nightly runs.
+
+**Module shape.**
+
+```nix
+services.fleetGovernor = {
+  enable = true;
+  schedule = "hourly";
+  autoRepair = true;
+  allowSystem2 = false; # strictly preserves weekly quota
+};
+```
+
+**Evidence.** Verified live in systemd (`fleet-governor.service` ran in 776 ms wall clock time, 392 ms CPU time, 20.9 MB RAM). All 7 individual watchdog timers stopped and replaced.
+
+---
+
+## EXP-101 — Structured JSON Schema Harness & Sandboxed Tool Dispatcher for System 2 (`services.nemotronSchemaHarness`)
+
+**Mode:** Grammar-constrained JSON Schema decoding via Ollama (`format: "json"`) mapping Nemotron deliberation into sandboxed operational primitives.  
+**Status:** prototyped & benchmarked live on frieren. Motivated by eliminating slow (85s) open-ended markdown generation and preventing unvetted shell execution.
+
+**Use case.** Standard LLM deliberation outputs conversational prose and unconstrained bash blocks requiring brittle regex safety checks. `services.nemotronSchemaHarness`:
+* Constrains Ollama's `format` parameter to a typed JSON schema with an enum of permitted operational primitives (`btrfs_snapshot_ro`, `systemctl_stop`, `systemctl_restart`, `quarantine_ingest`, `throttle_cgroup`).
+* Cuts evaluated tokens from 1,536 tokens down to 492 tokens (**68% token reduction**), cutting output tokens by **85%**.
+* Routes actions through a hardcoded Python allowlist dispatcher: destructive commands (`rm -rf`, `mkfs`, killing `niri`/`jellyfin`) are structurally impossible because they do not exist in the schema.
+* Extracts typed `handoff_brief` string and appends directly to `/home/devji/HANDOFF.md` for scheduled agent digestion.
+
+**Benchmark Ground Truth:**
+* Freeform Markdown baseline: 1,536 tokens, 85.5s latency, brittle regex parsing.
+* Schema-constrained harness: 492 tokens, 54.8s latency (1,356 chars internal thinking), 100% machine-executable typed JSON.
+
+**Why it is not prod.** Requires tuning thinking token allocation and testing non-thinking cloud models to drop latency under 5 seconds. Exit criteria: emergency incident resolved via schema tool dispatch in < 10 seconds.
+
+---
+
 ## Audit findings feeding these experiments
 
 The port audit below (`task checks:ports`) is the evidence that the segmentation arguments

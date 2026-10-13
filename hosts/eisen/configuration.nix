@@ -107,6 +107,12 @@ in {
     ];
   };
 
+  # --- Wake-on-LAN (WOL) ---
+  # Enables Wake-on-LAN on enp9s0 (Realtek GbE at 192.168.3.91, MAC 00:e0:22:1c:bb:ed).
+  # systemd-udevd generates linkConfig.WakeOnLan = "magic" so the NIC stays powered in
+  # standby (+5VSB) listening for magic packets from Steam Link or other LAN devices.
+  networking.interfaces.enp9s0.wakeOnLan.enable = true;
+
   # --- 4K transcoding tooling ---
   # ffmpeg-full is in amd-rx-5700.nix for VAAPI-accelerated encode/decode.
   # When Jellyfin is deployed, add jellyfin-ffmpeg for its bundled codecs.
@@ -115,6 +121,7 @@ in {
     jq # JSON wrangling
     htop # system monitor
     btop # prettier system monitor
+    ethtool # NIC diagnostics and WOL verification
   ];
 
   # --- Storage drives ---

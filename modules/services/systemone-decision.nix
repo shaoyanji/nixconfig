@@ -8,14 +8,23 @@
 }: let
   cfg = config.services.systemoneDecision;
 
-  engineScript = ./systemone/engine.py;
+  systemoneSrc = ./systemone;
 
   # Standalone CLI package wrapping python3 and the decision engine
   systemoneDecisionPkg = pkgs.writeShellApplication {
     name = "systemone-decision";
     runtimeInputs = [pkgs.python3];
     text = ''
-      exec python3 "${engineScript}" "$@"
+      exec python3 "${systemoneSrc}/engine.py" "$@"
+    '';
+  };
+
+  # Ensemble CLI package wrapping System 1 (Julia-1) + System 2 (Nemotron-3-Ultra) Pre-Harness
+  systemoneEnsemblePkg = pkgs.writeShellApplication {
+    name = "systemone-ensemble";
+    runtimeInputs = [pkgs.python3];
+    text = ''
+      exec python3 "${systemoneSrc}/ensemble.py" "$@"
     '';
   };
 in {
@@ -28,6 +37,12 @@ in {
       description = "The systemone-decision CLI wrapper package.";
     };
 
+    ensemblePackage = lib.mkOption {
+      type = lib.types.package;
+      default = systemoneEnsemblePkg;
+      description = "The systemone-ensemble pre-harness CLI wrapper package.";
+    };
+
     defaultModel = lib.mkOption {
       type = lib.types.enum ["julia-1" "laya"];
       default = "julia-1";
@@ -37,13 +52,14 @@ in {
     installCli = lib.mkOption {
       type = lib.types.bool;
       default = true;
-      description = "Whether to install systemone-decision into system environment packages.";
+      description = "Whether to install decision and ensemble CLIs into system environment packages.";
     };
   };
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages = lib.mkIf cfg.installCli [
       cfg.package
+      cfg.ensemblePackage
     ];
   };
 }

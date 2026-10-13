@@ -2342,6 +2342,149 @@ services.simplexMessageClassifier = {
 
 ---
 
+## EXP-065 — Declarative System 1 & System 2 Pre-Harness Diagnostic Ensemble (`services.systemEnsemblePreHarness`)
+
+**Mode:** Closed-loop reflex + deliberation ensemble: Julia-1 (144M) sub-millisecond anomaly detection triggering Ollama's `nemotron-3-ultra:cloud` to synthesize verified remediation runbooks before human escalation.  
+**Status:** prototype implemented & CLI verified (`systemone-ensemble`). Motivated by creating robust, pre-harness service intelligence that accounts for unanticipated edge cases without manual operator intervention.
+
+**Use case.** Standard microservice watchdogs rely on simple static heuristics (e.g. exit codes, grep matching). When complex, non-obvious failures emerge (e.g. Btrfs cow fragmentation contending with 4K media streaming, memory-constrained database dead-tuple spikes, or subtle TLS handshake renegotiation stalls), simple regex rules fail to diagnose the root cause. Because raw LLMs in Ollama lack autonomous execution harnesses, `services.systemEnsemblePreHarness` provides a deterministic wrapper:
+1. **System 1 Reflex Tier (Julia-1 144M / Laya 421M):** Continuously samples 10 core service vectors (Gatus, Paperless, Btrfs, Postgres, SimpleX, Restic, QuickSync, Sessions, Flake, Disk QoS) in < 6 ms total CPU time.
+2. **Threshold-Gated Pre-Harness Trigger:** If an anomaly or failure is classified with urgency >= 3.5, the pre-harness extracts the exact failure signature, hardware constraints, and journal logs.
+3. **System 2 Deliberation Tier (`nemotron-3-ultra:cloud`):** Ollama is queried over a guarded, schema-enforced API (`num_predict: 512`, `temperature: 0.2`, 90s timeout). Nemotron-3-Ultra's deep thinking mode synthesizes a 2-sentence root cause and immediate recovery command.
+4. **Execution & Delivery:** The pre-harness validates the suggested action against system safety invariants and dispatches a verified diagnostic card to SimpleX `#Fleet` or archives it for the 03:00/05:00 nightly agent cascade.
+
+**Module shape.**
+
+```nix
+services.systemEnsemblePreHarness = {
+  enable = true;
+  reflexModel = "julia-1"; # 144M mmBERT
+  deliberationModel = "nemotron-3-ultra:cloud";
+  ollamaEndpoint = "http://127.0.0.1:11434";
+  deliberationThreshold = 3.5;
+  timeoutSeconds = 90;
+  destinationAlert = "simplex:#Fleet";
+};
+```
+
+**Evidence.** Verified live on frieren (`systemone-ensemble audit-all` triaged all 10 services in 5.43 ms; `systemone-ensemble deliberate` successfully diagnosed a 450ms Btrfs commit contention in 6.36s, returning exact `commit=120,nodatacow` remediation).
+
+**Why it is not prod.** Requires stress testing under simulated network outages to verify deterministic fallback when cloud models are temporarily unreachable. Exit criteria: 10 injected multi-service fault scenarios successfully produce structured root-cause cards with 0 unhandled python exceptions.
+
+---
+
+## EXP-066 — Autonomous NixOS Flake Regression Self-Healing & Rollback Ensemble (`services.nixAutoReconcileEnsemble`)
+
+**Mode:** Julia-1 preflight compiler error triage triggering Nemotron-3-Ultra precision Nix AST patch synthesis with `nix-preflight-editor` validation.  
+**Status:** design study & architectural specification. Motivated by unattended 04:00 `system.autoUpgrade` where upstream flake deprecations break builds and revert local state.
+
+**Use case.** During nightly flake upgrades, package renames or option deprecations (e.g. `services.ollama.models` -> `services.ollama.modelsDir`) can break `nixos-rebuild switch`. Unattended machines either freeze on the old generation or abort. `services.nixAutoReconcileEnsemble` wraps the auto-upgrade pipeline:
+* When evaluation errors occur, Julia-1 evaluates the Nix stack trace in < 1 ms, categorizing the failure into: `SYNTAX_TYPO`, `OPTION_RENAMED_UPSTREAM`, `PACKAGE_REMOVED`, or `COMPLEX_DEPENDENCY_CYCLE`.
+* If classified as `OPTION_RENAMED_UPSTREAM` or `SYNTAX_TYPO`, Nemotron-3-Ultra inspects the AST context around the offending line and generates a targeted diff.
+* The pre-harness validates the patch with `nix-preflight.sh verify <file>`, tests evaluation in isolation, and commits the fix to git before re-triggering the build. If verification fails, it initiates an immediate clean rollback.
+
+**Module shape.**
+
+```nix
+services.nixAutoReconcileEnsemble = {
+  enable = true;
+  flakePath = /Volumes/data/projects/nixconfig;
+  autoHealTiers = [ "OPTION_RENAMED_UPSTREAM" "SYNTAX_TYPO" ];
+  maxPatchAttempts = 2;
+  preflightValidator = "nix-preflight.sh";
+};
+```
+
+**Evidence.** `nix-preflight-editor` skill and `systemone-decision` runtime are active system-wide. `nemotron-3-ultra:cloud` is proven capable of generating clean Nix syntax without multiline delimiter traps.
+
+**Why it is not prod.** Self-modifying configuration repositories require cryptographic commit signing and strict sandbox isolation to prevent runaway git loops. Exit criteria: intentionally renamed option in test branch is detected, patched, verified by `nix-preflight.sh`, and switched in < 60 seconds with zero operator intervention.
+
+---
+
+## EXP-067 — Predictive Storage Failure Prognosis & Automated Btrfs Rebalance Synthesis (`services.storagePrognosisEnsemble`)
+
+**Mode:** Julia-1 SMART attribute and NCQ timeout classification triggering Nemotron-3-Ultra to generate workload-aware Btrfs balance filters and scrub schedules.  
+**Status:** design study & architectural specification. Motivated by frieren's laptop-as-server 2TB HDD pool (`/dev/sda2`) where uncoordinated Btrfs rebalances freeze media streaming for hours.
+
+**Use case.** Btrfs data allocation on `/dev/sda2` allocates large 1GB block groups (`Data,single: 98% Used`). When metadata space fragments, write operations stall even when 800 GiB unallocated space remains. Standard automated `btrfs balance start` commands rewrite tens of gigabytes of chunks indiscriminately, thrashing HDD actuators. `services.storagePrognosisEnsemble` monitors block group usage and SATA bus latency every 30 minutes:
+* Julia-1 detects block group fragmentation and evaluates media streaming activity.
+* If rebalancing is required, Nemotron-3-Ultra dynamically synthesizes the minimal effective balance filter (e.g. `btrfs balance start -dusage=5 -musage=10 /Volumes/data`) tailored specifically to avoid touching active torrent or media chunks.
+* The pre-harness pauses background balance operations instantly if Jellyfin or Plex starts a 4K streaming session.
+
+**Module shape.**
+
+```nix
+services.storagePrognosisEnsemble = {
+  enable = true;
+  mountPoint = "/Volumes/data";
+  maxConcurrentLatencyMs = 120;
+  preemptOnMediaStream = true;
+  checkInterval = "30m";
+};
+```
+
+**Evidence.** `/dev/sda2` is currently operating with 4 clean subvolumes after ghost cleanup (3.08 GiB metadata DUP). Julia-1 evaluates Btrfs chunk allocation in 0.3 ms.
+
+**Why it is not prod.** Requires testing balance preemption under heavy torrent write loads. Exit criteria: simulated fragmented block group is rebalanced in < 10 minutes with seek latencies held strictly under 120 ms during concurrent 4K playback.
+
+---
+
+## EXP-068 — Multi-Modal Audio/Visual Media Indexing & Semantic Metadata Enricher (`services.mediaSemanticEnricher`)
+
+**Mode:** Julia-1 local codec & audio layout classification triggering Nemotron-3-Ultra to synthesize rich NFO metadata, chapter markers, and subtitles for unindexed recordings.  
+**Status:** design study & architectural specification. Motivated by frieren's 4K media stack where foreign films or untagged recordings lack proper Jellyfin metadata.
+
+**Use case.** When rare films, home recordings, or foreign broadcasts are dropped into `/Volumes/data/media/`, TMDb scrapers frequently fail or misidentify titles. `services.mediaSemanticEnricher` runs as an inotify scanner:
+* Julia-1 inspects `ffprobe` stream metadata, audio track languages, and container tags in 0.2 ms, classifying whether the file has ambiguous identity.
+* If unindexed, the pre-harness extracts OCR subtitle snippets, chapter timecodes, and audio transcript fragments (via local Whisper or embedded subs).
+* Nemotron-3-Ultra correlates the forensic text, deduces the true movie title/year/plot, and generates an authoritative Jellyfin `.nfo` XML file and chapter index.
+
+**Module shape.**
+
+```nix
+services.mediaSemanticEnricher = {
+  enable = true;
+  mediaDirectory = "/Volumes/data/media";
+  metadataFormat = "kodi-nfo";
+  autoGenerateChapters = true;
+  confidenceThreshold = 0.85;
+};
+```
+
+**Evidence.** Jellyfin 12.1 is active on `:8096`. QuickSync VA-API is verified functional. Media storage is co-located on `/Volumes/data`.
+
+**Why it is not prod.** Scraper accuracy must be benchmarked on non-English media titles to prevent incorrect NFO generation. Exit criteria: 20 intentionally misnamed video files correctly tagged with complete `.nfo` metadata and chapter cues in < 2 minutes.
+
+---
+
+## EXP-069 — Zero-Trust Fleet Telemetry Anomaly & Lateral Movement Classifier (`services.fleetSecurityEnsemble`)
+
+**Mode:** Julia-1 network packet & authentication log triage paired with Nemotron-3-Ultra incident forensics and interface-scoped iptables drop-rule synthesis.  
+**Status:** design study & architectural specification. Motivated by frieren hosting public reverse proxies, SSH CA certificates, and Tailscale mesh routing.
+
+**Use case.** Frieren is the storage mainframe and ingress node of the fleet, exposed to LAN, Tailscale (`100.97.61.65`), and reverse-proxied services. Standard fail2ban rules match simple regexes and are blind to multi-protocol lateral probing (e.g. repeated failed Pi-hole DNS requests followed by SMB/NFS probes). `services.fleetSecurityEnsemble` watches systemd journal logs across sshd, nginx, smp-server, and nfs:
+* Julia-1 ingests log lines in streaming micro-batches, classifying attack vectors in < 0.2 ms: `NORMAL_LAN_BROADCAST`, `BENIGN_AUTH_RETRY`, `CREDENTIAL_STUFFING`, or `LATERAL_PORT_SCAN`.
+* If a high-confidence threat is classified, Nemotron-3-Ultra conducts forensic analysis across the IP's multi-service footprint and generates a surgically targeted, interface-scoped `iptables` or `nftables` rule (protecting trusted Tailscale peers while dropping malicious LAN/WAN IPs).
+* The pre-harness verifies the rule syntax, asserts that management ports and localhost remain accessible, and alerts `#Fleet`.
+
+**Module shape.**
+
+```nix
+services.fleetSecurityEnsemble = {
+  enable = true;
+  monitoredServices = [ "sshd" "nginx" "smp-server" ];
+  threatThreshold = 0.88;
+  autoMitigateIptables = true;
+  alertDestination = "simplex:#Fleet";
+};
+```
+
+**Evidence.** Firewall scoping (`hosts/frieren/firewall-scope.nix`) already enforces strict per-interface isolation. `task checks:ports` proves 0 unmanaged listener holes.
+
+**Why it is not prod.** Requires testing with simulated LAN port scans to verify zero false-positive drops against legitimate fleet members (`poseidon`, `eisen`, `stark`). Exit criteria: simulated brute-force attack isolated and dropped within 3 seconds while legitimate SSH CA certificate connections remain unaffected.
+
+---
+
 ## Audit findings feeding these experiments
 
 The port audit below (`task checks:ports`) is the evidence that the segmentation arguments

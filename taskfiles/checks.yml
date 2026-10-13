@@ -382,6 +382,20 @@ tasks:
           exit 1
         fi
 
+  checks:sessions:reaper:
+    desc: Inspect and sweep inactive SSH bastion sessions while preserving multiplexers (EXP-046)
+    summary: >
+      Invokes fleet-session-reaper to audit user login sessions, detect abandoned scopes
+      and idle remote SSH connections, and terminate stale sessions cleanly.
+    cmds:
+      - |
+        if command -v fleet-session-reaper >/dev/null 2>&1; then
+          sudo fleet-session-reaper
+        else
+          echo "fleet-session-reaper command not found in PATH" >&2
+          exit 1
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

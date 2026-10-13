@@ -1672,7 +1672,10 @@ runs in < 45 seconds, successfully detects known test CVEs, and reports 0 false 
 ## EXP-045 — Autonomous PostgreSQL Vector / Chord Indexing Health & Vacuum Drill (`services.postgresPgvectorAudit`)
 
 **Mode:** scheduled inspection of PostgreSQL vector extensions (`vector`, `vchord`) and HNSW/IVFFlat index bloat.
-**Status:** design study. Motivated by Immich image embedding search acceleration and preventing vector index bloat.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/postgres-pgvector-audit.nix`
+(`services.postgresPgvectorAudit`) on frieren, inspecting `face_search` and `smart_search` vector tables in Immich DB,
+asserting `vector` (v0.8.7) and `vchord` (v1.1.1) extensions, and running `VACUUM (VERBOSE, ANALYZE)` to trigger `vchord`
+index page compaction and prevent embedding graph fragmentation.
 
 **Use case.** frieren hosts the fleet's Immich instance, which uses PostgreSQL with `pgvector` / `vchord` extensions
 to store and query high-dimensional CLIP image embeddings. High-dimensional vector indexes (HNSW, IVFFlat) suffer from
@@ -1686,11 +1689,11 @@ embedding similarity recall, ensuring sub-50ms photo search across 50,000+ image
 ```nix
 services.postgresPgvectorAudit = {
   enable = true;
+  database = "immich";
+  vectorTables = [ "face_search" "smart_search" ];
+  runVacuum = true;
+  reindex = false;
   schedule = "Sun *-*-* 02:15:00"; # strictly before 03:00 backup window
-  databases = [ "immich" ];
-  maxIndexBloatPercent = 25;
-  reindexMode = "concurrently";
-  benchmarkQueryCount = 10;
 };
 ```
 
@@ -1834,6 +1837,170 @@ deployed and operational in `~/.agents/skills/simplex-admin/`.
 **Why it is not prod.** Unrestricted command dispatching between autonomous agents introduces privilege escalation risks if an edge
 node is compromised. Requires cryptographic command whitelisting and strict argument sandboxing. Exit criteria: successful automated
 ping and telemetry dispatch between frieren and a secondary node over SimpleX with 0 human intervention and full signature verification.
+
+---
+
+## EXP-050 — Autonomous Nginx SSL/TLS Certificate Expiry & OCSP Stapling Watchdog (`services.tlsCertWatchdog`)
+
+**Mode:** scheduled background validation of SSL/TLS certificate expiration dates and OCSP responses across virtual hosts.
+**Status:** design study. Motivated by preventing certificate expiration from breaking background mobile client sync (Vaultwarden, Immich).
+
+**Use case.** frieren terminates TLS for local reverse proxies (Vaultwarden `:8222`, Aki portal `:80/443`, monitors) and serves
+services on the Tailscale mesh (`frieren.lan`). While ACME or certificates run in the background, renewal failures, transient DNS
+validation timeouts, or clock skew can silently let certificates expire. Because server services run headlessly without browser
+interactions, expired certs go unnoticed until mobile apps (Bitwarden sync, Immich backup) fail with TLS handshake errors.
+A declarative watchdog unit runs every 12 hours: it probes declared virtual hosts and local cert files (`/srv/private/` or `/var/lib/acme`),
+asserts remaining valid days (> 14 days), tests OCSP stapling responses, and raises administrative alerts on approaching expiration.
+
+**Module shape.**
+
+```nix
+services.tlsCertWatchdog = {
+  enable = true;
+  endpoints = [
+    "https://vault.frieren.lan"
+    "https://monitors.frieren.lan"
+  ];
+  certFiles = [ "/var/lib/acme/vault.frieren.lan/cert.pem" ];
+  warnDays = 14;
+  criticalDays = 5;
+  schedule = "00/12:00:00";
+};
+```
+
+**Evidence.** Nginx is active on frieren. `openssl x509 -enddate -noout -in <cert>` and `curl -vI https://...` provide immediate,
+deterministic certificate parsing without external network dependencies.
+
+**Why it is not prod.** Probing local HTTPS endpoints requires resolving hostnames via local DNS and handling self-signed certificates
+gracefully without spurious warnings. Exit criteria: scheduled unit tests declared certificates, accurately flags a simulated 5-day
+expiring certificate, and completes in < 500ms with zero production interference.
+
+---
+
+## EXP-051 — Declarative Host Thermals & Dynamic Fan Curve Governor (`services.thermalGovernor`)
+
+**Mode:** real-time core temperature telemetry from sysfs (`/sys/class/thermal`) and predictive throttling under sustained 4K encoding.
+**Status:** design study. Motivated by preventing thermal throttling dropouts on the Lenovo IdeaPad 320 laptop-as-server hardware.
+
+**Use case.** frieren runs 24/7 on laptop hardware (Lenovo ideapad 320-15IKB, Intel Core i5-8250U). Under sustained multi-hour FFmpeg
+transcodes, Paperless batch OCR, or local Nix rebuilds, CPU thermals can reach 75–80°C. If the single laptop fan cannot dissipate heat,
+the CPU throttles its clock down to 800 MHz, inducing audio/video playback stutter on 4K Jellyfin output. A lightweight governor daemon
+monitors thermal zones (`/sys/class/thermal/thermal_zone*/temp`): when temperatures exceed 72°C, it modulates Intel P-state energy
+performance preferences (`/sys/devices/system/cpu/cpu*/power/energy_perf_bias`) to drop CPU package wattage from 15W to 10W, preventing
+thermal throttling spikes while maintaining smooth media playback.
+
+**Module shape.**
+
+```nix
+services.thermalGovernor = {
+  enable = true;
+  highTempCelsius = 72;
+  criticalTempCelsius = 80;
+  throttleAction = "bias-power";   # "bias-power" | "cap-frequency" | "nice-batch"
+  pollIntervalSec = 30;
+  logMetrics = true;
+};
+```
+
+**Evidence.** Sysfs thermals are readable on frieren (`cat /sys/class/thermal/thermal_zone0/temp` reports ~34°C during idle).
+Intel Core i5-8250U supports hardware P-state energy performance bias.
+
+**Why it is not prod.** Aggressive thermal capping could unnecessarily throttle legitimate fast builds when ambient temperatures
+are low. Requires calibrating hysteresis margins so governor does not oscillate every few seconds. Exit criteria: simulated CPU load
+(`stress-ng --cpu 4`) smoothly lowers energy performance bias when 72°C is crossed, capping thermals without dropping clock below 1.6 GHz.
+
+---
+
+## EXP-052 — Autonomous ZRAM Decompression Latency & Memory Reclamation Drill (`services.zramPerfDrill`)
+
+**Mode:** periodic synthetic memory compression/decompression benchmark verifying zram throughput on Linux 6.12.
+**Status:** design study. Motivated by ensuring CPU-compressed memory operates faster than NVMe storage.
+
+**Use case.** frieren allocates 5.7 GiB to `/dev/zram0` using zstd compression. As the system runs for weeks across diverse memory
+churn (PostgreSQL, Paperless, Gatus, agent processes), kernel memory allocator fragmentation or CPU lock contention can degrade
+zram throughput below expected performance levels. A monthly drill runs non-destructive, isolated memory compression benchmarks:
+it writes and reads a 64 MB synthetic memory pattern to `/dev/zram0`, calculates compression ratio and read/write bandwidth, asserts
+throughput > 3.0 GB/s, and verifies zero kernel page allocation failures, proving zram memory health.
+
+**Module shape.**
+
+```nix
+services.zramPerfDrill = {
+  enable = true;
+  schedule = "monthly";
+  benchmarkSizeMb = 64;
+  minThroughputGbps = 3.0;
+  maxLatencyMs = 25;
+  notifyOnDegradation = true;
+};
+```
+
+**Evidence.** `/dev/zram0` is active on frieren (`swapon -s` shows 5.7 GiB, prio 100). Kernel 6.12 implements multi-stream zstd
+compression algorithms.
+
+**Why it is not prod.** Generating synthetic memory churn must never trigger memory eviction or OOM on production services. Must
+verify sufficient free RAM headroom (> 2 GiB) before running the drill. Exit criteria: monthly drill completes in < 3 seconds,
+reports > 3.5 GB/s memory throughput, and exits cleanly with zero page leaks.
+
+---
+
+## EXP-053 — Declarative Pi-hole Gravity Sync & Adlist Drift Reconciliation (`services.gravitySync`)
+
+**Mode:** automated reconciliation of blocklist definitions, whitelist domains, and gravity database optimization.
+**Status:** design study. Motivated by preventing stale blocklists and DNS recursion timeouts.
+
+**Use case.** Pi-hole FTL runs on port 53. Gravity updates (`pihole -g`) update domain blocklists weekly. When upstream adlist URLs
+return HTTP 404 or transient timeouts, Gravity drops existing lists or accretes stale domain hashes. A declarative reconciliation
+module checks adlist HTTP availability, runs gravity updates outside peak hours, and verifies that recursive query latency stays < 15ms.
+
+**Module shape.**
+
+```nix
+services.gravitySync = {
+  enable = true;
+  schedule = "Sun *-*-* 03:15:00"; # strictly outside 03:00 backup window
+  adlists = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
+  verifyDnsLatency = true;
+  maxLatencyMs = 25;
+};
+```
+
+**Evidence.** Pi-hole gravity database is `/var/lib/pihole/gravity.db` (8.7 MB, 87,000+ domains). `task checks:dns:failover`
+verifies local resolution.
+
+**Why it is not prod.** Gravity database rebuild acquires database locks on `gravity.db`, which can briefly stall DNS lookups for LAN
+devices. Must run during the quietest night hour and verify fast post-rebuild DNS query response. Exit criteria: scheduled unit
+reconciles adlists, runs Gravity rebuild, and confirms sub-10ms DNS resolution on `127.0.0.1:53`.
+
+---
+
+## EXP-054 — Declarative Automated Flake Input Dependency Graph & Security Vulnerability Matrix (`services.flakeMatrixReport`)
+
+**Mode:** autonomous derivation tree graphing and CVE impact matrix visualization for the Aki fleet portal.
+**Status:** design study. Motivated by creating an offline visual control plane for fleet package closures.
+
+**Use case.** frieren compiles the Aki fleet documentation hypermedia tree (`lib/aki-site.nix`) over UDS socket. Incorporating an
+automated dependency graph generator that visualizes all fleet host closures and evaluates CVE vulnerabilities creates an offline,
+interactive visual control plane for fleet health.
+
+**Module shape.**
+
+```nix
+services.flakeMatrixReport = {
+  enable = true;
+  schedule = "weekly";
+  outputDir = "/srv/data/projects/nixconfig/docs/matrix";
+  targetHosts = [ "frieren" "minyx" "eisen" "stark" ];
+  generateGraph = true;
+};
+```
+
+**Evidence.** `lib/aki-site.nix` is already compiled into `/nix/store` and served over `unix:/run/uds-docs/docs.sock`.
+Flake evaluation across all hosts is supported natively.
+
+**Why it is not prod.** Generating full derivation graphs for 4 hosts can produce multi-megabyte SVG/DOT files that take compute
+to render. Requires caching and delta generation. Exit criteria: weekly unit builds dependency matrix and embeds interactive graph
+into Aki portal with zero build regressions.
 
 ---
 

@@ -206,6 +206,7 @@ in {
     ../../modules/services/sqlite-maintenance.nix
     ../../modules/services/paperless-watchdog.nix
     ../../modules/services/kiwix-watchdog.nix
+    ../../modules/services/postgres-pgvector-audit.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -507,5 +508,16 @@ in {
     testQueries = ["NixOS" "Btrfs" "Linux"];
     schedule = "daily";
     failOnSearchError = true;
+  };
+
+  # Declarative PostgreSQL vector (pgvector/vchord) indexing health & vacuum drill (EXP-045)
+  # Inspects face_search and smart_search vector tables in Immich DB and runs page compaction vacuum.
+  services.postgresPgvectorAudit = {
+    enable = true;
+    database = "immich";
+    vectorTables = ["face_search" "smart_search"];
+    runVacuum = true;
+    reindex = false;
+    schedule = "Sun *-*-* 02:15:00"; # strictly before 03:00 backup window
   };
 }

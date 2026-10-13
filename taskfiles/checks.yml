@@ -353,6 +353,21 @@ tasks:
           exit 1
         fi
 
+  checks:kiwix:watchdog:
+    desc: Verify Kiwix offline knowledge library and benchmark search responsiveness (EXP-040)
+    summary: >
+      Invokes kiwix-watchdog to check kiwix-serve operational status, verify physical
+      readability of declared ZIM archives in library.xml, and benchmark search response
+      latency across sample queries (NixOS, Btrfs, Linux).
+    cmds:
+      - |
+        if command -v kiwix-watchdog >/dev/null 2>&1; then
+          kiwix-watchdog
+        else
+          echo "kiwix-watchdog command not found in PATH" >&2
+          exit 1
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

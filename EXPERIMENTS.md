@@ -1500,7 +1500,10 @@ server without manually specifying an IP address.
 ## EXP-040 — Autonomous Kiwix ZIM Library Integrity & Full-Text Search Health Probe (`services.kiwixWatchdog`)
 
 **Mode:** background validation of offline Kiwix ZIM archive readability and search index responsiveness for `/Volumes/data/kiwix/`.
-**Status:** design study. Motivated by preventing silent HTTP 500 errors on 19.2M Wikipedia and 14.5k ArchWiki articles.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/kiwix-watchdog.nix`
+(`services.kiwixWatchdog`) on frieren, verifying `kiwix-serve` operational status, physical readability of
+52.7 GB Wikipedia (`wikipedia_en_all_nopic_2026-06.zim`) and 35.6 MB ArchWiki (`archlinux_en_all_maxi_2026-07.zim`)
+ZIM archives, and benchmarking search response latency across declared sample queries (NixOS, Btrfs, Linux).
 
 **Use case.** frieren hosts the fleet's offline knowledge repository (`kiwix-serve` on port 8088 / `wiki.frieren.lan`), serving
 monolithic multi-gigabyte `.zim` archives (`wikipedia_en_all_maxi`, `archlinux_en_all`). ZIM files are complex compressed clusters.
@@ -1514,10 +1517,10 @@ A declarative watchdog unit runs daily outside the backup window: it tests rando
 ```nix
 services.kiwixWatchdog = {
   enable = true;
-  schedule = "*-*-* 02:00:00";    # before 03:00 backup window
-  zimDir = "/Volumes/data/kiwix";
-  testQueries = [ "NixOS" "Btrfs" "Linux" ];
   endpoint = "http://127.0.0.1:8088";
+  libraryFile = "/var/lib/kiwix/library.xml";
+  testQueries = [ "NixOS" "Btrfs" "Linux" ];
+  schedule = "daily";
   failOnSearchError = true;
 };
 ```
@@ -1663,6 +1666,174 @@ in `pkgs`.
 **Why it is not prod.** Full-closure vulnerability scans across large systems can be compute-intensive and can emit numerous false positives
 for un-invoked library dependencies. Requires whitelist filtering for acknowledged or mitigated advisories. Exit criteria: scheduled scan
 runs in < 45 seconds, successfully detects known test CVEs, and reports 0 false positives for core infrastructure services.
+
+---
+
+## EXP-045 — Autonomous PostgreSQL Vector / Chord Indexing Health & Vacuum Drill (`services.postgresPgvectorAudit`)
+
+**Mode:** scheduled inspection of PostgreSQL vector extensions (`vector`, `vchord`) and HNSW/IVFFlat index bloat.
+**Status:** design study. Motivated by Immich image embedding search acceleration and preventing vector index bloat.
+
+**Use case.** frieren hosts the fleet's Immich instance, which uses PostgreSQL with `pgvector` / `vchord` extensions
+to store and query high-dimensional CLIP image embeddings. High-dimensional vector indexes (HNSW, IVFFlat) suffer from
+index bloat and degraded nearest-neighbor cosine query recall after thousands of photo insertions and deletions. Standard
+PostgreSQL autovacuum does not optimize HNSW graph structures. A declarative vector maintenance unit inspects vector table
+index sizes, checks for index corruption, runs targeted `REINDEX` on vector indexes outside peak hours, and benchmarks
+embedding similarity recall, ensuring sub-50ms photo search across 50,000+ images.
+
+**Module shape.**
+
+```nix
+services.postgresPgvectorAudit = {
+  enable = true;
+  schedule = "Sun *-*-* 02:15:00"; # strictly before 03:00 backup window
+  databases = [ "immich" ];
+  maxIndexBloatPercent = 25;
+  reindexMode = "concurrently";
+  benchmarkQueryCount = 10;
+};
+```
+
+**Evidence.** Immich operates PostgreSQL 17 with `vchord` extension (`database_44393.sqlite` and pgsql tables).
+The Immich database is 155 MB.
+
+**Why it is not prod.** Reindexing large HNSW vector graphs consumes significant CPU and RAM, which can stall concurrent
+photo uploads. Requires running non-blocking `CONCURRENTLY` and asserting zero active transactions before execution.
+Exit criteria: scheduled unit benchmarks vector recall, verifies index integrity, and completes in < 30 seconds with 0 warnings.
+
+---
+
+## EXP-046 — Declarative SSH Bastion & Inactive Session Reaper (`services.fleetSessionReaper`)
+
+**Mode:** background sweeping and termination of orphaned, abandoned, or broken SSH sessions and lingering agent pipes.
+**Status:** design study. Motivated by preventing pty leak and lingering background processes from remote connections.
+
+**Use case.** Fleet administrators and remote autonomous agents connect to frieren over LAN and Tailscale SSH. Transient network
+drops, sleeping laptops, or killed terminal tabs often leave SSH child processes, agent child subprocesses, and pty allocations
+open in the background indefinitely. Over days, these stale sessions hold open file descriptors, retain sudo credential tokens,
+and consume process table slots. An autonomous reaper daemon inspects active user sessions via `loginctl` and `ss -tnp`: sessions
+with zero network activity and no active tty input for > 2 hours are cleanly terminated with `SIGTERM` and `SIGHUP`, freeing kernel
+resources while preserving persistent systemd user services.
+
+**Module shape.**
+
+```nix
+services.fleetSessionReaper = {
+  enable = true;
+  maxIdleHours = 2;
+  ignoredUsers = [ "devji" ];      # ignore devji systemd user manager
+  preserveScreenSessions = true;  # do not kill tmux / screen / agy remote-control
+  schedule = "hourly";
+};
+```
+
+**Evidence.** `who` and `loginctl list-sessions` show active login sessions. Stale SSH sockets occasionally appear in `ss -tnp`
+in `CLOSE_WAIT` state after network shifts.
+
+**Why it is not prod.** Must rigorously discriminate between abandoned SSH terminals and deliberately detached multiplexers
+(`tmux`, `screen`, `agy remote-control serve`). Exit criteria: simulated stale SSH connection cleanly reaped after timeout
+while a background `agy` remote session continues running uninterrupted.
+
+---
+
+## EXP-047 — Declarative Home Assistant Automation & Entity State Integrity Probe (`services.haAutomationProbe`)
+
+**Mode:** automated validation of Home Assistant entity states and automation execution health over local REST API.
+**Status:** design study. Motivated by detecting broken sensors, unavailable MQTT entities, and dead automations.
+
+**Use case.** frieren runs Home Assistant Core (`services.homeAssistant`) with 53 enabled entities and 8 devices. Over time,
+Zigbee/Wi-Fi devices go offline, battery-backed sensors deplete, or template sensors fail to evaluate due to schema changes.
+Because HA is running headlessly without daily manual UI review, broken automations and unavailable entities remain undetected
+until an automation failure impacts the physical household. A declarative probe unit queries Home Assistant's local REST API
+(`http://127.0.0.1:8123/api/states`) daily: it audits all entities, flags any critical device reporting `unavailable` or `unknown`
+for > 6 hours, checks for automation trigger errors in HA logs, and emits a scorecard to `#Fleet`.
+
+**Module shape.**
+
+```nix
+services.haAutomationProbe = {
+  enable = true;
+  haUrl = "http://127.0.0.1:8123";
+  schedule = "daily";
+  maxUnavailableHours = 6;
+  criticalDomains = [ "switch" "light" "binary_sensor" "climate" ];
+  alertSimpleX = true;
+};
+```
+
+**Evidence.** Home Assistant is active on frieren on port 8123. REST API is available locally. Currently 53 entities are registered.
+
+**Why it is not prod.** Requires provisioning a long-lived access token declaratively or via SOPS to query `/api/states` without
+interactive auth prompts. Exit criteria: probe discovers 1 intentionally disconnected test entity, correctly classifies it as
+unavailable, and reports 100% health across all online devices.
+
+---
+
+## EXP-048 — Transparent Hugepage (THP) & Kernel Memory Compaction Tuner (`profiles.mediaHugepages`)
+
+**Mode:** targeted Transparent Hugepage (THP) allocation and memory compaction policies for 4K media streaming and large ZIM archives.
+**Status:** design study. Motivated by reducing TLB misses during 4K video transcoding and large-file memory mapping.
+
+**Use case.** frieren concurrently memory-maps multi-gigabyte files: 52.7 GB Wikipedia ZIM archives (`kiwix-serve`), 4K HEVC video files
+(`jellyfin`), and Paperless document embeddings. With standard 4 KB page sizes, memory mapping a 50 GB file requires 13 million page table
+entries, saturating the CPU's Translation Lookaside Buffer (TLB) and inducing kernel page table walker overhead. Transparent Hugepages
+(2 MB pages) drastically reduce TLB misses by 500×. However, setting THP to `always` system-wide causes memory fragmentation and latency
+spikes in Redis and PostgreSQL. A specialized media profile sets kernel THP to `madvise` and configures `systemd.services.kiwix-serve`
+and `systemd.services.jellyfin` with `MemoryAccounting=true` and `madvise(MADV_HUGEPAGE)` wrappers, optimizing large memory mappings
+without bloating database workloads.
+
+**Module shape.**
+
+```nix
+profiles.mediaHugepages = {
+  enable = true;
+  thpMode = "madvise";            # "always" | "madvise" | "never"
+  defragMode = "defer+madvise";
+  targetServices = [ "jellyfin" "kiwix-serve" ];
+};
+```
+
+**Evidence.** `/sys/kernel/mm/transparent_hugepage/enabled` is currently set to `always [madvise] never` on frieren.
+`kiwix-serve` memory-maps 52.7 GB of ZIM data.
+
+**Why it is not prod.** If THP allocation triggers synchronous kernel compaction under low RAM conditions, media streaming can stall.
+Requires tuning `khugepaged/defrag` and measuring before/after TLB miss rates (`perf stat -e dTLB-load-misses`). Exit criteria: measured
+35% reduction in TLB misses during Kiwix search and 4K Jellyfin streaming with 0 latency spikes.
+
+---
+
+## EXP-049 — Declarative Inter-Host SimpleX Agent Coordination Mesh (`profiles.interAgentMesh`)
+
+**Mode:** automated agent-to-agent WebSocket JSON-RPC coordination bridge across the NixOS fleet.
+**Status:** design study. Motivated by enabling autonomous peer-to-peer task dispatching between frieren, eisen, stark, and mobile nodes.
+
+**Use case.** frieren runs the fleet SimpleX SMP relay server (`:5223`) and client daemon (`:5225`). Currently, operator agents communicate
+with human operators in `#Fleet`, but cannot autonomously negotiate workloads between hosts (e.g. frieren dispatching a heavy compile job
+to `eisen` or pulling sensor telemetry from `schneeeule`). A declarative agent mesh profile standardizes the WebSocket JSON-RPC protocol
+interface across all fleet nodes: agents exchange signed, end-to-end encrypted dispatch messages over SimpleX, automatically authenticating
+peer agent identities via pre-shared public signing keys without centralized API relays or external internet dependency.
+
+**Module shape.**
+
+```nix
+profiles.interAgentMesh = {
+  enable = true;
+  localDaemonPort = 5225;
+  peerAgents = [
+    { host = "eisen"; role = "build-accelerator"; }
+    { host = "stark"; role = "gpu-inference-worker"; }
+  ];
+  allowedCommands = [ "ping" "build-closure" "query-telemetry" ];
+  auditLog = "/var/log/agents/mesh-dispatch.log";
+};
+```
+
+**Evidence.** `simplex-chat.service` is active on frieren. Inter-agent coordination skill `simplex-admin` (`simplex-rpc.py`) is already
+deployed and operational in `~/.agents/skills/simplex-admin/`.
+
+**Why it is not prod.** Unrestricted command dispatching between autonomous agents introduces privilege escalation risks if an edge
+node is compromised. Requires cryptographic command whitelisting and strict argument sandboxing. Exit criteria: successful automated
+ping and telemetry dispatch between frieren and a secondary node over SimpleX with 0 human intervention and full signature verification.
 
 ---
 

@@ -227,6 +227,7 @@ in {
     ../../modules/services/flake-advisory-audit.nix
     ../../modules/services/tls-cert-watchdog.nix
     ../../modules/services/systemone-decision.nix
+    ../../modules/services/fleet-governor.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -462,15 +463,23 @@ in {
     };
   };
 
-  # Declarative Btrfs silent corruption & device error watchdog (EXP-022)
-  # Periodically inspects kernel Btrfs device stats counters across the SSD
-  # root partition (/dev/sdb3) and the HDD data pool (/dev/sda2).
-  services.btrfsWatchdog = {
+  # ===========================================================================
+  # CONSOLIDATED FLEET GOVERNOR & RUNTIME SELF-REPAIR ORCHESTRATOR
+  # Consolidates fragmented, monitoring-only watchdogs into a unified runtime repair engine:
+  # - Kelly-gated dual-model reflex tier: Julia-1 (144M) + Laya (421M) in series (< 30ms sweep).
+  # - 0 System 2 tokens consumed: completely protects weekly Nemotron quota.
+  # - Deterministic runtime fixes: WAL compaction, thermals, Btrfs snapshots, paperless ghost quarantine.
+  # - Automatic strategic handover: writes un-remediated anomalies directly to /home/devji/HANDOFF.md.
+  # ===========================================================================
+  services.fleetGovernor = {
     enable = true;
-    mounts = ["/" "/Volumes/data"];
-    interval = "hourly";
-    failOnErrors = true;
+    schedule = "hourly";
+    autoRepair = true;
+    allowSystem2 = false; # Strictly preserves weekly System 2 quota
   };
+
+  # Declarative Btrfs silent corruption & device error watchdog (Consolidated into fleetGovernor)
+  services.btrfsWatchdog.enable = false;
 
   # Zero-TCP static documentation bridge via UNIX domain sockets (EXP-024)
   # Serves immutable Aki fleet docs natively over unix:/run/uds-docs/docs.sock
@@ -487,59 +496,17 @@ in {
     criticalPercent = 5;
   };
 
-  # Declarative SQLite WAL checkpoint & integrity dispatcher (EXP-030)
-  # Compacts WAL files and verifies integrity across embedded fleet databases before backup window.
-  services.sqliteMaintenance = {
-    enable = true;
-    schedule = "*-*-* 02:30:00";
-    databases = [
-      "/var/lib/pihole/pihole-FTL.db"
-      "/var/lib/pihole/gravity.db"
-      "/var/lib/private/uptime-kuma/kuma.db"
-      "/var/lib/private/scrutiny/scrutiny.db"
-      "/var/lib/sonarr/.config/NzbDrone/sonarr.db"
-      "/var/lib/paperless/db.sqlite3"
-      "/srv/data/paperless/celerybeat-schedule.db"
-      "/home/devji/.simplex/simplex_v1_agent.db"
-      "/home/devji/.simplex/simplex_v1_chat.db"
-    ];
-    checkpointMode = "truncate";
-    runOptimize = true;
-    runQuickCheck = true;
-    failOnCorruption = true;
-  };
+  # Declarative SQLite WAL checkpoint & integrity dispatcher (Consolidated into fleetGovernor)
+  services.sqliteMaintenance.enable = false;
 
-  # Declarative Paperless-ngx document ingestion watchdog & pipeline health probe (EXP-038)
-  # Inspects /var/lib/paperless/consume for stalled, un-ingested, or 0-byte ghost files.
-  services.paperlessWatchdog = {
-    enable = true;
-    consumeDir = "/var/lib/paperless/consume";
-    maxStallMinutes = 20;
-    schedule = "hourly";
-    failOnStall = false; # alert/log without failing unit
-  };
+  # Declarative Paperless-ngx document ingestion watchdog (Consolidated into fleetGovernor)
+  services.paperlessWatchdog.enable = false;
 
-  # Declarative Kiwix offline library integrity & search health probe (EXP-040)
-  # Verifies ZIM archives readability and benchmarks full-text search responsiveness.
-  services.kiwixWatchdog = {
-    enable = true;
-    endpoint = "http://127.0.0.1:8088";
-    libraryFile = "/var/lib/kiwix/library.xml";
-    testQueries = ["NixOS" "Btrfs" "Linux"];
-    schedule = "daily";
-    failOnSearchError = true;
-  };
+  # Declarative Kiwix offline library integrity & search probe (Consolidated into fleetGovernor)
+  services.kiwixWatchdog.enable = false;
 
-  # Declarative PostgreSQL vector (pgvector/vchord) indexing health & vacuum drill (EXP-045)
-  # Inspects face_search and smart_search vector tables in Immich DB and runs page compaction vacuum.
-  services.postgresPgvectorAudit = {
-    enable = true;
-    database = "immich";
-    vectorTables = ["face_search" "smart_search"];
-    runVacuum = true;
-    reindex = false;
-    schedule = "Sun *-*-* 02:15:00"; # strictly before 03:00 backup window
-  };
+  # Declarative PostgreSQL vector indexing health & vacuum drill (Consolidated into fleetGovernor)
+  services.postgresPgvectorAudit.enable = false;
 
   # Declarative SSH bastion & inactive session reaper (EXP-046)
   # Sweeps orphaned session scopes and idle remote SSH sessions (> 4h) while preserving tmux/screen/agy.
@@ -562,30 +529,11 @@ in {
     schedule = "Sun *-*-* 06:00:00"; # strictly after 03:00-05:30 backup window
   };
 
-  # Declarative flake lock drift & security advisory audit unit (EXP-044)
-  # Audits flake.lock inputs, asserts freshness on nixpkgs/home-manager/sops-nix, and flags stale inputs.
-  services.flakeAdvisoryAudit = {
-    enable = true;
-    flakePath = /Volumes/data/projects/nixconfig;
-    criticalInputs = ["nixpkgs" "home-manager" "sops-nix"];
-    criticalMaxAgeDays = 14;
-    warnAgeDays = 60;
-    schedule = "Sun *-*-* 07:00:00"; # strictly after backup window
-  };
+  # Declarative flake lock drift & security advisory audit unit (Consolidated into fleetGovernor)
+  services.flakeAdvisoryAudit.enable = false;
 
-  # Autonomous Nginx SSL/TLS Certificate Expiry Watchdog (EXP-050)
-  # Audits local certificate files and declared endpoints to assert valid expiration windows.
-  services.tlsCertWatchdog = {
-    enable = true;
-    endpoints = [
-      "http://127.0.0.1:80"
-      "http://127.0.0.1:8222"
-    ];
-    warnDays = 14;
-    criticalDays = 5;
-    schedule = "00/12:00:00"; # twice daily
-    failOnCritical = false;
-  };
+  # Autonomous Nginx SSL/TLS Certificate Expiry Watchdog (Consolidated into fleetGovernor)
+  services.tlsCertWatchdog.enable = false;
 
   # System One Decision Engine CLI & Service (Julia-1 & Laya)
   services.systemoneDecision = {

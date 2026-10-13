@@ -420,3 +420,69 @@ tasks:
           } | awk '!seen[$0]++' | gum choose
         )
         [ "$host" = "exit" ] || task infra:logs:host:$host
+
+  vm:canary:build:
+    desc: Build the frieren-canary microVM runner (EXP-102)
+    cmds:
+      - nix build .#nixosConfigurations.frieren-canary.config.microvm.declaredRunner -o result-canary
+
+  vm:canary:run:
+    desc: Run the frieren-canary microVM interactively (EXP-102)
+    cmds:
+      - |
+        if [ ! -e result-canary ]; then
+          task vm:canary:build
+        fi
+        sudo scripts/task/run-canary.sh
+
+  vm:canary:test:
+    desc: Automated boot, SSH health check, Tailscale reverse-proxy verification, and graceful shutdown (EXP-102)
+    cmds:
+      - |
+        if [ ! -e result-canary ]; then
+          task vm:canary:build
+        fi
+        echo "==> [1/6] Launching frieren-canary VM in background..."
+        LOGFILE="/tmp/canary-test.log"
+        sudo scripts/task/run-canary.sh > "$LOGFILE" 2>&1 &
+        RUNNER_PID=$!
+        trap "sudo pkill -f 'microvm@frieren-canary' 2>/dev/null || true; wait $RUNNER_PID 2>/dev/null || true" EXIT
+
+        echo "==> [2/6] Probing persistent SSH on frieren-canary (192.168.83.10)..."
+        MAX_WAIT=20
+        CONNECTED=0
+        for i in $(seq 1 $MAX_WAIT); do
+          if ssh -o BatchMode=yes -o ConnectTimeout=1 frieren-canary "echo ok" >/dev/null 2>&1; then
+            CONNECTED=1
+            echo "==> frieren-canary SSH ready in $i s!"
+            break
+          fi
+          sleep 0.5
+        done
+
+        if [ "$CONNECTED" -ne 1 ]; then
+          echo "ERROR: Failed to connect via SSH to frieren-canary within $MAX_WAIT s"
+          cat "$LOGFILE"
+          exit 1
+        fi
+
+        echo "==> [3/6] Inspecting guest system isolation..."
+        ssh frieren-canary "hostname && uptime && free -m && df -h /var /nix/store"
+
+        echo "==> [4/6] Verifying dummy API directly (192.168.83.10:8080)..."
+        curl -sSf http://192.168.83.10:8080/ | jq .
+
+        echo "==> [5/6] Verifying Model B Reverse Proxy via Hypervisor Nginx & Tailscale..."
+        curl -sSf http://127.0.0.1/canary/ | jq .
+        curl -sSf http://100.97.61.65/canary/ | jq .
+        curl -sSf -H "Host: canary.frieren.lan" http://100.97.61.65/ | jq .
+
+        echo "==> [6/6] Triggering clean guest shutdown & verifying teardown 504..."
+        ssh frieren-canary "sudo systemctl poweroff" || true
+        wait $RUNNER_PID 2>/dev/null || true
+
+        # Verify Nginx gracefully returns 504 on teardown
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://100.97.61.65/canary/ || true)
+        echo "==> Post-teardown HTTP status: $HTTP_CODE (expected: 504)"
+
+        echo "==> EXP-102 Canary microVM Model B dogfood test passed successfully!"

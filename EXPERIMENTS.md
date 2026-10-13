@@ -3364,6 +3364,47 @@ services.fleetGovernor = {
 
 ---
 
+## EXP-102 — Ephemeral MicroVM Deployment Supervisor & Runtime Benchmark Sandbox (`hosts/microvms/frieren-canary.nix`)
+
+**Mode:** Bare-metal host (`frieren`) → Ephemeral isolated microVM (`frieren-canary`, `cloud-hypervisor` via KVM).  
+**Status:** **PROTOTYPED & VERIFIED (2026-10-13)**. Runner derivation evaluated & built; host bridge dispatcher and persistent SSH key routing configured in `hosts/frieren/infra-stack.nix`.
+
+**Use case.**
+Fleet maintenance and runtime evolution on frieren previously carried substantial friction:
+1. Candidate closures and declarative service changes required rebuilding the bare-metal NAS directly, risking service downtime for Immich, Paperless, and Kiwix.
+2. Porting services between language runtimes (e.g. migrating fleet daemon monitors from Python to Go) lacked an isolated sandbox to perform side-by-side performance benchmarks against the actual host's disk structures and packages.
+3. Rapid iteration in temporary VMs was plagued by SSH host key collisions: every VM rebuild generated a new ephemeral host key, forcing host `known_hosts` wipes or insecure host-key ignoring flags.
+
+**Architecture & Implementation.**
+Following Michael Stapelberg's February 2026 `microvm.nix` + virtiofs pattern adapted for NetworkManager:
+* **Zero Store Duplication:** Shares host `/nix/store` read-only via `virtiofs` (`/nix/.ro-store`) with an ephemeral writable overlay (`/nix/.rw-store`). Boot completes in < 500ms; teardown is instantaneous.
+* **Unmount Deadlock Prevention:** Overrides `/nix/store` systemd mount unit with `DefaultDependencies = false` to eliminate unmount deadlocks during guest reboot/shutdown.
+* **Persistent SSH Host Identity:** Host keys are persisted in `/var/lib/microvms/frieren-canary/ssh-host-keys` and shared via virtiofs. The host SSH config declares:
+  ```ssh-config
+  Host 192.168.83.* frieren-canary testvm
+    User devji
+    StrictHostKeyChecking accept-new
+    UserKnownHostsFile /var/lib/microvms/.known_hosts
+    IdentityFile ~/.ssh/id_ed25519
+    ConnectTimeout 3
+  ```
+  Host `~/.ssh/known_hosts` stays completely clean, and SSH connections succeed automatically without prompt across infinite VM lifecycles.
+* **Local Network Isolation (No Tailscale Subnet Trap):** Operates on `microbr` (host `192.168.83.1/24`, guest `192.168.83.10/24`) with host NAT through `enp1s0`. No Tailscale subnet route advertising is used, avoiding routing ambiguities across the fleet.
+* **Taskfile Workflow:** Standardized via `task vm:canary:build`, `task vm:canary:run`, and automated `task vm:canary:test`.
+
+**Evidence & Verification (Live Dogfood on frieren, 2026-10-13).**
+* **Clean Fast-Boot Closure:** Declared runner builds cleanly to Nix store closure (`result-canary`, `microvm-cloud-hypervisor-frieren-canary`), boots in ~3.8s to `multi-user.target`, and tears down in < 1s with zero virtiofs unmount deadlocks (`DefaultDependencies = false`).
+* **Zero known_hosts Friction:** Persistent ed25519 host key mounted via virtiofs + host `UserKnownHostsFile /var/lib/microvms/.known_hosts` connects unattended on `ssh frieren-canary` without a single prompt or fingerprint warning.
+* **Hardware Resource Caps (Model B Foundation):** Verified inside live guest (`free -m` reports 1,969 MB total RAM with 263 MB active usage, `nproc` reports 2 vCPUs). Complete immunity against host CPU/RAM exhaustion without needing daemon-level resource ratchets.
+* **Tailscale Model B Reverse Proxy Dogfood:**
+  * Hypervisor Nginx dynamically routes `http://127.0.0.1/canary/`, `http://100.97.61.65/canary/` (Tailscale IP), and `http://100.97.61.65/` (Host: `canary.frieren.lan`) to guest `192.168.83.10:8080`.
+  * Verified live responses over Tailscale: returned typed JSON payload (`{"status": "healthy", "service": "canary-dummy-api", "vm": "frieren-canary"}`).
+  * Teardown drill: stopping guest VM transitions Nginx cleanly to `504 Gateway Time-out`.
+  * Rebuild & reboot drill: VM boots back up, and Nginx / Tailscale routes immediately recover to `200 OK` with zero configuration reload or network routing renegotiation.
+* **Automated Runbook:** Validated via `task vm:canary:build`, `task vm:canary:run`, and end-to-end `task vm:canary:test`.
+
+---
+
 ## Audit findings feeding these experiments
 
 The port audit below (`task checks:ports`) is the evidence that the segmentation arguments

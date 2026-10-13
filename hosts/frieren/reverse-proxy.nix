@@ -236,6 +236,15 @@ in {
             default_type text/plain;
           '';
         };
+        # EXP-102: Canary MicroVM Reverse Proxy Dogfood (Model B)
+        # Exposes dummy API from frieren-canary (192.168.83.10:8080) through hypervisor Nginx
+        locations."/canary/" = {
+          proxyPass = "http://192.168.83.10:8080/";
+          extraConfig = ''
+            proxy_connect_timeout 2s;
+            proxy_read_timeout 5s;
+          '';
+        };
       };
 
       "vault.frieren.lan" = {
@@ -288,6 +297,26 @@ in {
         locations."/" = {
           proxyPass = "http://127.0.0.1:8181";
           proxyWebsockets = true;
+        };
+      };
+
+      # EXP-102: Canary MicroVM Dedicated Virtual Host (Model B Dogfood)
+      "canary.frieren.lan" = {
+        serverAliases = [
+          "canary"
+        ];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
+        locations."/" = {
+          proxyPass = "http://192.168.83.10:8080/";
+          extraConfig = ''
+            proxy_connect_timeout 2s;
+            proxy_read_timeout 5s;
+          '';
         };
       };
     };

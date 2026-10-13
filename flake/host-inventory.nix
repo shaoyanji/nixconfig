@@ -255,6 +255,15 @@ in {
     ];
   };
 
+  frieren-canary = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    modules = [
+      inputs.microvm.nixosModules.microvm
+      ../hosts/microvms/frieren-canary.nix
+    ];
+  };
+
   penguin = {
     kind = "home";
     system = "x86_64-linux";

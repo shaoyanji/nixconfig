@@ -2142,9 +2142,9 @@ services.decisionWikiRecommend = {
 ## EXP-059 — Additional Offline ZIM Knowledge Base Catalog & Storage Provisioning (`services.offlineKnowledgeCatalog`)
 
 **Mode:** declarative curation, store packaging, and storage capacity provisioning for developer and sysadmin `.zim` archives.  
-**Status:** design study & knowledge base catalog recommendation. Motivated by achieving complete network-isolated technical recall for autonomous agents.
+**Status:** queued & sent to host `HANDOFF.md` (Item 3, `OPEN`). Motivated by achieving complete network-isolated technical recall for autonomous agents.
 
-**Use case.** frieren currently hosts 51.45 GB Wikipedia (`wikipedia_en_all_nopic_2026-06.zim`) and 34.76 MB ArchWiki (`archlinux_en_all_maxi_2026-07.zim`). While comprehensive for encyclopedic queries and Arch Linux sysadmin tasks, autonomous agents lack offline references for programming language syntax, web standards, and developer Q&A when WAN connectivity drops. Adding curated, high-density technical ZIM archives to `/Volumes/data` (`/dev/sda2`, 800 GiB free space) provides complete offline self-sufficiency:
+**Use case.** frieren currently hosts 51.45 GB Wikipedia (`wikipedia_en_all_nopic_2026-06.zim`), 283 MB Best of Wikipedia (`wikipedia_en_top_mini_2026-09.zim`), and 34.76 MB ArchWiki (`archlinux_en_all_maxi_2026-07.zim`). While comprehensive for encyclopedic queries and Arch Linux sysadmin tasks, autonomous agents lack offline references for programming language syntax, web standards, and developer Q&A when WAN connectivity drops. Adding curated, high-density technical ZIM archives to `/Volumes/data` (`/dev/sda2`, 800 GiB free space) provides complete offline self-sufficiency:
 1. **Stack Overflow Top Questions (`stackoverflow.com_en_top_*.zim` ~4.5–6.0 GB):** ~500k top voted and accepted developer solutions across Python, Nix, C, SQL, and Linux.
 2. **Server Fault All Questions (`serverfault.com_en_all_*.zim` ~1.8–2.2 GB):** Dedicated Linux sysadmin, Btrfs storage, systemd, and server networking reference.
 3. **MDN Web Docs (`mdn_en_all_*.zim` ~1.5–2.0 GB):** Definitive documentation for HTML5, CSS3, JavaScript/ES6+, WebSockets, and HTTP/TLS protocols.
@@ -2190,7 +2190,7 @@ services.offlineKnowledgeCatalog = {
 
 **Evidence.** `/Volumes/data` HDD storage pool has 800 GiB available (58% used of 1.9 TiB). `kiwix-serve -M` hot-reloads `/var/lib/kiwix/library.xml` without daemon restarts.
 
-**Why it is not prod.** Downloading 17 GB over WAN must be metered or imported manually to prevent bandwidth saturation during peak hours. Exit criteria: selected high-priority ZIM archives imported via `nix store add-file` or `fetchurl`, verified in `library.xml`, and indexed by `wikisearch` with zero storage warnings.
+**Why it is not prod.** Transferred to host strategic queue in `HANDOFF.md` (Item 3, `OPEN`) with calibrated priority 3.21/5.0 via Julia-1. Awaits scheduled 03:00 `agy-nightly-handoff.service` runner for declarative retrieval and store ingestion into `modules/services/kiwix.nix` without saturating peak-hour bandwidth. Exit criteria: selected high-priority ZIM archives imported via `nix store add-file` or `fetchurl`, verified in `library.xml`, and indexed by `wikisearch` with zero storage warnings.
 
 ---
 
@@ -2747,6 +2747,276 @@ services.fleetAgentBroker = {
 **Evidence.** Fleet SSH aliases (`frieren`, `poseidon`, `eisen`) and SimpleX agent groups are fully operational. Fleet binary cache warming is proven.
 
 **Why it is not prod.** Requires verifying mutual cryptographic agent authentication to prevent unauthenticated remote execution. Exit criteria: simulated heavy build task automatically offloaded from frieren to poseidon and returned as a pre-built store path in < 3 minutes.
+
+---
+
+## EXP-080 — Autonomous Btrfs Metadata Allocation Balancing & ENOSPC Preemptor (`services.btrfsMetaBalancer`)
+
+**Mode:** Julia-1 Btrfs unallocated chunk ratio triage triggering Nemotron-3-Ultra to calculate compact balance filters and synthesize targeted `btrfs balance start -musage=...` runs.  
+**Status:** proposed design study. Motivated by Btrfs filesystems failing with fatal `ENOSPC` errors even with 100+ GB free space when metadata chunk allocation becomes fragmented into 1GB blocks.
+
+**Use case.** On frieren's 1TB SSD root pool (`/dev/sdb3`), heavy Nix builds and SQLite write churn frequently allocate 1GB metadata chunks that remain mostly empty, exhausting unallocated raw drive space. Standard blanket balance commands (`btrfs balance start /`) thrash SSD write cycles and lock up I/O for 20 minutes. `services.btrfsMetaBalancer`:
+* Julia-1 samples `btrfs filesystem df --raw /` and `/sys/fs/btrfs/*/allocation` every 6 hours.
+* If metadata allocated ratio diverges from used ratio (> 40% empty allocation), Nemotron-3-Ultra calculates the minimal balance filter (`-musage=10`, `-musage=20`) and synthesizes a rate-limited maintenance window during low I/O periods (e.g. 02:00, strictly before the 03:00 backup window).
+
+**Module shape.**
+
+```nix
+services.btrfsMetaBalancer = {
+  enable = true;
+  mounts = [ "/" "/Volumes/data" ];
+  emptyChunkThresholdPercent = 40;
+  maxUsageFilter = 20;
+  schedule = "02:00:00";
+};
+```
+
+**Evidence.** Frieren runs root, home, and nix on Btrfs (`/dev/sdb3`). `task checks:btrfs:stats` already tracks device errors; metadata allocation monitoring is the missing prevention layer.
+
+**Why it is not prod.** Requires stress-testing balance execution while compiling large derivations in `/nix/store` to assert zero filesystem lockup. Exit criteria: simulated metadata fragmentation recovered with 0 dropped disk I/O requests.
+
+---
+
+## EXP-081 — Intel QuickSync VA-API Thermal Throttling & Transcode Governor (`services.vaapiThermalGovernor`)
+
+**Mode:** Julia-1 thermal package temperature and render load triage triggering Nemotron-3-Ultra to adjust Jellyfin transcode concurrency and video downscale profiles.  
+**Status:** proposed design study. Motivated by frieren (laptop form-factor) driving 4K 60Hz video playback on a 65" TV while operating in a closed-lid server environment.
+
+**Use case.** Frieren's Intel UHD Graphics 620 handles 4K HEVC/H.264 hardware decoding via QuickSync VA-API (`/dev/dri/renderD128`). During concurrent remote Jellyfin streams and local playback, CPU/GPU package temperatures can surge past 82°C, triggering aggressive thermal throttling (dropping CPU clock from 3.4 GHz to 800 MHz) and causing UI compositor stutter on niri. `services.vaapiThermalGovernor`:
+* Julia-1 evaluates CPU thermals (`/sys/class/thermal/thermal_zone0/temp`) and GPU render node load in < 0.1 ms every 15 seconds.
+* When temperature exceeds 74°C, Nemotron-3-Ultra dynamically limits Jellyfin transcode bitrate via API or switches video profiles to direct stream, keeping temperatures in the safe 65–72°C bracket.
+
+**Module shape.**
+
+```nix
+services.vaapiThermalGovernor = {
+  enable = true;
+  driDevice = "/dev/dri/renderD128";
+  warnThermalC = 74;
+  criticalThermalC = 80;
+  jellyfinApiEndpoint = "http://127.0.0.1:8096";
+};
+```
+
+**Evidence.** Intel UHD 620 VA-API drivers (`intel-media-driver`) are active on frieren. Philips 4K 65" TV is driven via HDMI.
+
+**Why it is not prod.** Requires calibrating thermal response times against sustained 4K 10-bit HEVC transcode loads. Exit criteria: 2 concurrent 4K streams maintain chassis thermals below 75°C without frame drops.
+
+---
+
+## EXP-082 — Zero-Trust SimpleX Agent Command Sanitizer & JSON-RPC Access Control Gateway (`services.simplexRpcGuard`)
+
+**Mode:** Julia-1 intent classification and semantic boundary verification over incoming SimpleX WebSocket messages before routing to fleet execution handlers.  
+**Status:** proposed design study. Motivated by fleet-wide autonomous agents coordinating over SimpleX chat where unstructured messages must not execute unchecked shell commands.
+
+**Use case.** SimpleX Chat is frieren's declarative communication fabric (`simplex-admin` skill). Remote agents on `poseidon` or `eisen` can submit maintenance requests to `#Fleet`. Directly executing command strings exposed to agent chat creates an arbitrary code execution vulnerability. `services.simplexRpcGuard`:
+* Julia-1 classifies message payload intent in < 0.2 ms into `SAFE_READ_QUERY`, `DECLARATIVE_MAINTENANCE_RPC`, or `UNTRUSTED_ARBITRARY_SHELL`.
+* Safe queries route to predetermined Taskfile commands (`task checks:...`); dangerous or ambiguous commands require cryptographic HMAC confirmation from the operator's personal SimpleX identity.
+
+**Module shape.**
+
+```nix
+services.simplexRpcGuard = {
+  enable = true;
+  group = "#Fleet";
+  allowedRpcTasks = [ "checks:quick" "checks:ports" "checks:decision:triage" ];
+  operatorFingerprint = "age1njrjwpkuhxctx5nzfjjsg7dggazwsw9se6gpzta8wh52n343ngysepqt2k";
+  confidenceGate = 0.90;
+};
+```
+
+**Evidence.** SimpleX SMP server and local CLI are running on frieren. `simplex-admin` skill is active.
+
+**Why it is not prod.** Requires adversarial prompt injection testing across diverse chat payloads. Exit criteria: 100 fuzz tests and simulated prompt injections blocked with 0 unauthorized command executions.
+
+---
+
+## EXP-083 — Smartd & Scrutiny Predictive HDD Drive Failure & Snapshot Arbiter (`services.diskSmartPredictor`)
+
+**Mode:** Julia-1 SMART telemetry vector triage triggering Nemotron-3-Ultra to synthesize emergency read-only subvolume pinning and remote replication manifests.  
+**Status:** proposed design study. Motivated by frieren's 2TB spinning HDD (`/dev/sda2`) holding all stateful paperless, media, and photo archives.
+
+**Use case.** Hard drive mechanical degradation is preceded by rising reallocated sectors (`ID 5`), pending sectors (`ID 197`), and UDMA CRC error spikes (`ID 199`). Standard smartd notifications often alert after filesystems suffer I/O errors. `services.diskSmartPredictor`:
+* Julia-1 evaluates Scrutiny's InfluxDB/collector metrics every hour, classifying drive degradation velocity (`HEALTHY_NOMINAL`, `TRANSIENT_CRC_CABLE_GLITCH`, `FAILING_ACTUATOR_PREDICTED`).
+* If severe mechanical degradation is classified, Nemotron-3-Ultra immediately synthesizes a protective snapshot of all active Btrfs subvolumes (`btrfs subvolume snapshot -r /Volumes/data/@...`), halts non-critical torrent writes, and dispatches a high-priority replication job to remote fleet storage.
+
+**Module shape.**
+
+```nix
+services.diskSmartPredictor = {
+  enable = true;
+  device = "/dev/sda";
+  scrutinyEndpoint = "http://127.0.0.1:8124";
+  autoSnapshotOnDegradation = true;
+  remoteReplicationPeer = "poseidon";
+};
+```
+
+**Evidence.** Scrutiny daemon and web UI run on frieren port 8124. SMART monitoring is verified on `/dev/sda` and `/dev/sdb`.
+
+**Why it is not prod.** Requires validating against simulated SMART fault attributes injected via Scrutiny mock API. Exit criteria: simulated sector degradation triggers subvolume snapshot and SimpleX notification in < 10 seconds.
+
+---
+
+## EXP-084 — Ephemeral SQLite In-Memory Buffer Tuning & WAL Compactor (`services.sqliteMemoryBuffer`)
+
+**Mode:** Julia-1 query frequency and WAL growth trajectory classification dynamically tuning `PRAGMA mmap_size`, `PRAGMA cache_size`, and checkpoint cadence across fleet SQLite instances.  
+**Status:** proposed design study. Motivated by 9 active production SQLite databases on frieren generating continuous small random writes on SSD.
+
+**Use case.** Services like Pi-hole FTL, Paperless CeleryBeat, and Uptime-Kuma write small telemetry rows hundreds of times per minute. Default SQLite configurations flush to disk frequently, contributing to flash cell write exhaustion on `/dev/sdb3`. `services.sqliteMemoryBuffer`:
+* Julia-1 samples database WAL sizes and transaction rates every 30 minutes.
+* During high-frequency query bursts, it dynamically applies `PRAGMA mmap_size = 268435456` (256 MB memory map) and `PRAGMA synchronous = NORMAL`, batching disk commits while guaranteeing zero corruption across power cuts.
+
+**Module shape.**
+
+```nix
+services.sqliteMemoryBuffer = {
+  enable = true;
+  databases = [
+    "/etc/pihole/pihole-FTL.db"
+    "/var/lib/paperless/db.sqlite3"
+    "/home/devji/.simplex/simplex_v1_chat.db"
+  ];
+  targetMmapSizeMb = 256;
+  checkpointThresholdMb = 16;
+};
+```
+
+**Evidence.** `services.sqliteMaintenance` is already active in Generation 90/91 running nightly checkpointing. Memory buffer tuning optimizes daytime operation.
+
+**Why it is not prod.** Requires power-cut simulation drills to assert that `synchronous = NORMAL` never causes database corruption during sudden battery-loss events. Exit criteria: 0 database errors across 50 simulated unexpected process terminations.
+
+---
+
+## EXP-085 — Declarative Transmission VPN Kill-Switch & Leak Auditing Ensemble (`services.torrentVpnAuditor`)
+
+**Mode:** Julia-1 routing table and namespace isolation auditing asserting that BitTorrent traffic strictly egresses through VPN tunnels with zero plaintext leakage onto `enp1s0`.  
+**Status:** proposed design study. Motivated by privacy guarantees on residential FritzBox network (`192.168.3.25`).
+
+**Use case.** Transmission daemon operates on frieren for ISO and media downloads. When a VPN tunnel resets or reconnects, misconfigured network stacks can fall back to the default gateway (`192.168.3.1`), exposing the public WAN IP. `services.torrentVpnAuditor`:
+* Julia-1 samples `ip route show` and active socket endpoints for `transmission-daemon` every 60 seconds.
+* If any torrent socket binds outside the designated VPN network namespace or interface, Nemotron-3-Ultra synthesizes an immediate nftables drop rule and suspends the systemd unit until VPN health is verified.
+
+**Module shape.**
+
+```nix
+services.torrentVpnAuditor = {
+  enable = true;
+  vpnInterface = "wg-vpn0";
+  monitoredServices = [ "transmission.service" ];
+  enforceKillSwitch = true;
+};
+```
+
+**Evidence.** `transmission-daemon` is active on frieren. Network routing is managed via NetworkManager and static systemd routes.
+
+**Why it is not prod.** Requires testing against intentional VPN interface tear-downs. Exit criteria: killed VPN interface results in 0 packets emitted out `enp1s0` within 100 ms.
+
+---
+
+## EXP-086 — Automated Uptime-Kuma to Declarative Gatus Monitor Synchronization Bridge (`services.kumaToGatusSync`)
+
+**Mode:** Julia-1 schema translation reading Uptime-Kuma SQLite database and synthesizing declarative `services.fleetMonitors.endpoints` NixOS attribute sets.  
+**Status:** proposed design study. Motivated by resolving EXP-008 (Uptime-Kuma is imperative/undeclared) while preserving operator UI flexibility.
+
+**Use case.** Human operators frequently add ad-hoc monitors in Uptime-Kuma's web UI (`:3001`), but these monitors are stored exclusively in SQLite and lost upon state resets or absent from declarative git manifests. `services.kumaToGatusSync`:
+* Periodically reads `/var/lib/private/uptime-kuma/kuma.db` via read-only SQLite URI.
+* Julia-1 validates monitor URL formats, interval constraints, and expected HTTP status codes.
+* Synthesizes a clean Nix file (`hosts/frieren/generated-monitors.nix`) that feeds into `services.fleetMonitors`, bringing imperatively created monitors into version-controlled git declarations.
+
+**Module shape.**
+
+```nix
+services.kumaToGatusSync = {
+  enable = true;
+  kumaDbPath = "/var/lib/private/uptime-kuma/kuma.db";
+  outputNixPath = "/Volumes/data/projects/nixconfig/hosts/frieren/generated-monitors.nix";
+  syncInterval = "daily";
+};
+```
+
+**Evidence.** Uptime-Kuma is running on port 3001 and Gatus is active on port 8181.
+
+**Why it is not prod.** Requires diff verification against existing Gatus endpoints to avoid duplicating probe traffic. Exit criteria: UI-created monitor in Uptime-Kuma rendered to valid Nix syntax verified by `nix-instantiate --parse`.
+
+---
+
+## EXP-087 — Local Nix Binary Cache Warming & Garbage Collection Pre-Filter (`services.nixCacheWarmer`)
+
+**Mode:** Julia-1 derivation tree analysis predicting fleet closure requirements and caching critical paths in Harmonia before running nightly garbage collection.  
+**Status:** proposed design study. Motivated by frieren acting as the local Harmonia binary cache (`http://192.168.3.25:5000`) for all other fleet hosts (`poseidon`, `eisen`, `aristotle`).
+
+**Use case.** When frieren runs `nix-collect-garbage`, it prunes unreferenced store paths on SSD to free disk space. However, secondary fleet laptops frequently request those exact store paths hours later during remote rebuilds, forcing slow recompilations from scratch. `services.nixCacheWarmer`:
+* Julia-1 inspects `harmonia` access logs and fleet host flake definitions.
+* Creates GC roots (`/nix/var/nix/gcroots/fleet-cache/`) for paths shared across active fleet configurations, protecting them from garbage collection while pruning truly dead single-host derivations.
+
+**Module shape.**
+
+```nix
+services.nixCacheWarmer = {
+  enable = true;
+  fleetFlake = "/Volumes/data/projects/nixconfig";
+  fleetHosts = [ "frieren" "poseidon" "eisen" "aristotle" ];
+  gcRootRetentionDays = 14;
+};
+```
+
+**Evidence.** Harmonia is active on frieren port 5000 and declared in `nix.settings.substituters`.
+
+**Why it is not prod.** Requires storage budget assertions in `closure-budgets.toml` so GC root retention does not fill SSD `/dev/sdb3`. Exit criteria: 0 cache misses on secondary hosts after frieren GC run.
+
+---
+
+## EXP-088 — Paperless Document Deduplication & OCR Confidence Scoring Pipeline (`services.paperlessOcrAuditor`)
+
+**Mode:** Julia-1 document text density and OCR confidence triage on newly ingested PDFs triggering Nemotron-3-Ultra to synthesize metadata tags and flag illegible scans.  
+**Status:** proposed design study. Motivated by Paperless-ngx on frieren receiving hundreds of historical utility bills, taxes, and medical documents.
+
+**Use case.** Paperless-ngx ingests scanned documents via Tika and OCRmyPDF. Some low-contrast scans result in garbage text tokens or repeated identical documents uploaded from mobile scanners. `services.paperlessOcrAuditor`:
+* Ingests newly processed document JSON metadata from Paperless REST API.
+* Julia-1 computes OCR token confidence and document semantic embeddings in < 0.2 ms.
+* If OCR confidence is low (< 0.60) or document is a duplicate hash of an existing archive, Nemotron-3-Ultra automatically attaches tag `#needs-human-review` or `#duplicate-candidate`, keeping the document library organized.
+
+**Module shape.**
+
+```nix
+services.paperlessOcrAuditor = {
+  enable = true;
+  paperlessApi = "http://127.0.0.1:28981";
+  minOcrConfidence = 0.60;
+  autoTagDuplicates = true;
+};
+```
+
+**Evidence.** Paperless-ngx is active with PostgreSQL backend on frieren.
+
+**Why it is not prod.** Requires Paperless API token integration and testing against edge-case PDF formats. Exit criteria: 50 test documents accurately classified into clean vs degraded OCR tags with 0 false positives.
+
+---
+
+## EXP-089 — Fleet-Wide Tailscale Subnet Router & Multicast DNS (mDNS) Gateway (`services.fleetMdnsReflector`)
+
+**Mode:** Julia-1 interface traffic and broadcast domain classification gating selective avahi mDNS reflection across Tailscale tunnels.  
+**Status:** proposed design study. Motivated by seamless cross-device discovery between residential LAN devices and roaming Tailscale nodes.
+
+**Use case.** Frieren is connected to both physical LAN (`enp1s0`, `192.168.3.25`) and the fleet mesh (`tailscale0`). When devices are away from home on 5G/WAN, standard mDNS (Avahi/Bonjour) does not cross the Layer 3 Tailscale boundary, making local media casts (AirPlay/Chromecast) and `.frieren.lan` service discovery fail. `services.fleetMdnsReflector`:
+* Julia-1 monitors local Avahi service announcements and Tailscale peer states.
+* Selectively reflects designated service records (HTTP, AirPlay, SSH) onto the Tailscale interface using unicast DNS pointers, providing transparent LAN-like service discovery everywhere in the world.
+
+**Module shape.**
+
+```nix
+services.fleetMdnsReflector = {
+  enable = true;
+  lanInterface = "enp1s0";
+  tailscaleInterface = "tailscale0";
+  reflectedServices = [ "_http._tcp" "_ssh._tcp" "_airplay._tcp" ];
+};
+```
+
+**Evidence.** Avahi daemon and Tailscale are active on frieren. Dual-homed network configuration is documented in `AGENTS.md`.
+
+**Why it is not prod.** Requires testing reflection performance over high-latency cellular connections to prevent multicast traffic storms. Exit criteria: mobile phone on cellular Tailscale discovers `frieren.lan` services in < 2 seconds.
 
 ---
 

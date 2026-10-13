@@ -604,6 +604,16 @@ tasks:
           python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py vuln-proposer
         fi
 
+  checks:decision:govern:
+    desc: Run consolidated Fleet Governor with Kelly dual-model consensus & auto-repair gate
+    cmds:
+      - |
+        if systemone-ensemble govern --help >/dev/null 2>&1; then
+          systemone-ensemble govern
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py govern
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

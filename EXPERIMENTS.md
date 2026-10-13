@@ -1571,7 +1571,10 @@ playback session starts in Jellyfin, sustaining 0 dropped frames.
 ## EXP-042 — Declarative PostgreSQL Logical Backup Verification Drill (`services.postgresBackupDrill`)
 
 **Mode:** non-destructive automated test restoration of nightly `pg_dump` snapshots in an ephemeral PostgreSQL cluster.
-**Status:** design study. Motivated by proving database recoverability before disaster strikes.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/postgres-backup-drill.nix`
+(`services.postgresBackupDrill`) on frieren, running weekly (Sun 06:00 CEST) outside the nightly backup window,
+spinning up an isolated tmpfs PostgreSQL cluster on private UNIX sockets, restoring `/srv/backup/postgresql/immich.sql.gz`,
+and asserting table counts (71 tables verified) and entity counts (`asset`, `user`, `face_search`, `smart_search`).
 
 **Use case.** frieren runs nightly `postgresqlBackup-immich.service` at 03:00, writing SQL dumps to `/srv/backup/postgresql`.
 While `pg_dump` exits with code 0 and collation catalogs are aligned (EXP-020), a backup that has never been restored is merely a hypothesis.
@@ -2037,6 +2040,39 @@ services.metricsRetentionDrill = {
 **Why it is not prod.** TSM shard compaction generates intensive disk writes. Must run with low I/O priority (`ionice -c 3`) and assert
 zero concurrent backup tasks. Exit criteria: scheduled unit validates retention policies, compacts shards in < 15 seconds, and frees
 at least 15% TSM storage with 0 query errors.
+
+---
+
+## EXP-056 — Declarative Paperless OCR Language Pack & Model Drift Reconciler (`services.paperlessOcrAudit`)
+
+**Mode:** scheduled validation of Tesseract language traineddata models and OCR accuracy across document ingestion queues.
+**Status:** design study. Motivated by preventing silent OCR fallback to lossy ASCII recognition on foreign-language documents.
+
+**Use case.** frieren processes scanned physical documents and PDFs using Paperless-ngx and Tesseract OCR (`tesseract`).
+Over months of system upgrades or manual document imports, documents scanned in German, Japanese, Chinese, or French can
+silently fail OCR or fall back to English ASCII approximations if required language pack packages (`tessdata/deu`, `tessdata/jpn`)
+are unlinked in NixOS wrappers or missing from `$TESSDATA_PREFIX`. A declarative OCR reconciler audits declared language packs
+in the Paperless runtime environment, runs synthetic OCR verification tests against multi-language sample test pages, asserts text
+extraction fidelity, and validates that OCR page processing latency stays < 8.0 seconds per page without stalling Celery workers.
+
+**Module shape.**
+
+```nix
+services.paperlessOcrAudit = {
+  enable = true;
+  schedule = "weekly";
+  languages = [ "eng" "deu" "jpn" "fra" ];
+  maxPageLatencySec = 8.0;
+  testSampleDir = "/srv/data/projects/nixconfig/tests/ocr-samples";
+  alertOnMissingModel = true;
+};
+```
+
+**Evidence.** Paperless-ngx is active on frieren (`paperless-consumer`, `paperless-web`). Tesseract is mapped in Paperless's environment.
+
+**Why it is not prod.** Generating test OCR recognition runs consumes CPU cycles. Must run during off-peak hours and test compact
+synthetic snippets. Exit criteria: scheduled unit asserts all declared language traineddata files exist, validates 100% character
+accuracy on test snippets in < 2 seconds, and alerts if a language model is missing.
 
 ---
 

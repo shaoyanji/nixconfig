@@ -351,8 +351,9 @@ tree; and it makes the broker load-bearing without yet having authentication. Ex
 ## EXP-008 — Monitors as code: `gatus` instead of Nix-declared Uptime-Kuma
 
 **Mode:** swap the *source of truth for monitor definitions* without changing the monitoring job.
-**Status:** not started. It replaces a plan that is not merely unimplemented but **unimplementable** as
-stated.
+**Status:** **GRADUATED (2026-10-13, `9ee6236`/`0d6dbff`)**. Deployed in production as
+`modules/services/fleet-monitors.nix` (`services.fleetMonitors`); live on frieren loopback port
+8181 and reverse-proxied at `monitors.frieren.lan` with all seven core endpoints reporting green.
 
 **Motivating observation.** Uptime-Kuma runs on `:3001` and has **0 monitors** after ~8 hours of uptime:
 
@@ -623,6 +624,68 @@ profiles.serviceIsolation.services.aria2 = {
 depend on the host network; and the egress language has to be concrete before it is useful. Exit
 criteria: one non-critical service isolated with a tested egress allowance and no NixOS eval
 regressions.
+
+---
+
+## EXP-018 — Ephemeral Remote GPU/TPU Acceleration for Host Agents (`profiles.ai.remoteInference`)
+
+**Mode:** dynamic remote inference bridge pairing local host agents (Hermes, crush) with ephemeral cloud
+accelerators (Kaggle TPU VM v3-8 / RunPod / Colab) over an ephemeral Tailscale mesh node (`tailscale0`),
+with automatic fallback to hosted APIs.
+**Status:** design study. Motivated by the analysis of cloud inference economics and agent prefill limits
+(see [Investigation: Kaggle 32GB VRAM vs TPU vs Hosted](#investigation-kaggle-32gb-vram-vs-tpu-vs-hosted)).
+
+**Use case.** Running strong reasoning and coding models (e.g. Qwen 2.5/3 27B/32B) locally on frieren (4c/8t,
+Intel UHD 620, 11 GiB RAM) is impossible without quantization down to unusable precision and single-digit
+token speeds. Offloading inference to ephemeral cloud notebook accelerators (e.g. Kaggle's 30 free GPU/TPU
+hours/week) provides burst compute for heavy agent planning sessions.
+
+**The engineering analysis — what breaks in tutorial implementations:**
+Tutorials frequently promote pairing Kaggle's dual Nvidia Tesla T4 GPUs (2× 16GB = 32GB VRAM) with Ollama
+and a Cloudflare quick tunnel (`trycloudflare.com`). Ground-truth measurement reveals three fatal defects:
+1. **Layer split penalty:** Qwen 27B at 4-bit (~17 GB) exceeds one T4's 15.3 GiB usable VRAM. Ollama splits
+   layers across both cards. Generation becomes an alternating relay race rather than parallel execution:
+   memory bandwidth is capped at 320 GB/s, yielding only 16–18 tokens/sec.
+2. **Prefill stall vs Cloudflare 100s timeout:** Agent harnesses (Hermes, Claude Code) send massive system
+   prompts and context history (15,000–30,000 tokens). On T4 compute (65 TFLOPS), prefill runs at ~325
+   tokens/sec. A 30k token prompt takes **92 seconds of prefill silence**. Cloudflare Quick Tunnels enforce
+   an unconfigurable **100-second request timeout** on the free tier, killing agent requests with HTTP 524.
+3. **Ephemeral URL drift & ToS:** Kaggle notebooks die on 20 min idle or 12h runtime; each restart takes
+   15–30 min and issues a new random URL. Furthermore, unauthenticated Ollama over public quick tunnels
+   violates Kaggle ToS and exposes an open endpoint to internet scanning.
+
+**The architectural alternative: Kaggle TPU VM v3-8 + Tailscale:**
+- **Accelerator:** Kaggle's free tier includes `TPU VM v3-8` (8 TPU chips, 16GB HBM each = **128 GB HBM**,
+  800 GB/s per chip). With vLLM (>= 0.28.0) supporting Qwen attention via `Kaggle TPU Lab`, Qwen 27B runs
+  at full FP16/BF16 (55.6 GB, 262k context):
+  - Generation: ~130 tokens/sec (8× faster than dual T4).
+  - Prefill: ~10,300 tokens/sec (30× faster); a 30k prompt prefills in 3s instead of 92s.
+- **Networking:** Ephemeral Tailscale auth key (`tailscale up --authkey=... --hostname=kaggle-vllm`).
+  Eliminates Cloudflare tunnels entirely: zero public exposure, no 100-second timeout, and a stable
+  tailnet hostname (`http://kaggle-vllm:8000/v1`).
+
+**Module shape.** A profile that configures Hermes and local CLI agents to probe the tailnet endpoint with
+instant fallback to commercial hosted APIs (OpenRouter / Nous) when the notebook is offline:
+
+```nix
+profiles.ai.remoteInference = {
+  enable = true;
+  endpoint = "http://kaggle-vllm.frieren.lan:8000/v1"; # or tailnet IP/hostname
+  model = "Qwen/Qwen2.5-Coder-32B-Instruct";
+  apiKeyFile = config.sops.secrets.remote_llm_key.path;
+  timeout = 300;
+  fallbackProviders = [
+    { provider = "openrouter"; model = "qwen/qwen-2.5-coder-32b-instruct"; }
+    { provider = "nous"; model = "inclusionai/ling-3.0-flash-sante:free"; }
+  ];
+};
+```
+
+**Why it is not prod.** Running headless daemon tunnels on free-tier Kaggle accounts is a gray area under
+Kaggle's June 2025 Acceptable Use Policy; notebook lifecycle is fundamentally non-durable; and at $1.49 / 1M
+tokens on commercial endpoints (Cerebras/OpenRouter), a full week of Kaggle quota is worth ~$4.31. Exit
+criteria: an automated notebook launch script verified over Tailscale, a validated Hermes failover event
+when the notebook terminates, and authenticated endpoint tokens.
 
 ---
 

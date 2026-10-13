@@ -323,6 +323,21 @@ tasks:
           cat /sys/class/power_supply/BAT0/capacity
         fi
 
+  checks:sqlite:maintenance:
+    desc: Execute SQLite WAL checkpoint, optimization, and integrity checks across fleet databases (EXP-030)
+    summary: >
+      Invokes sqlite-maintenance to verify database integrity (PRAGMA quick_check),
+      run query planner statistics optimization (PRAGMA optimize), and truncate
+      or checkpoint write-ahead logs across declared SQLite databases.
+    cmds:
+      - |
+        if command -v sqlite-maintenance >/dev/null 2>&1; then
+          sudo sqlite-maintenance
+        else
+          echo "sqlite-maintenance command not found in PATH" >&2
+          exit 1
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

@@ -309,6 +309,20 @@ tasks:
           exit 1
         fi
 
+  checks:ups:drill:
+    desc: Execute the non-destructive hardware UPS simulation drill and battery telemetry (EXP-029)
+    summary: >
+      Inspects frieren's battery sysfs metrics (/sys/class/power_supply/BAT0), calculates degradation,
+      models discharge runtime under active load, and verifies UPower clean poweroff thresholds.
+    cmds:
+      - |
+        if command -v ups-drill >/dev/null 2>&1; then
+          ups-drill
+        else
+          echo "ups-drill command not found in PATH; falling back to direct sysfs read"
+          cat /sys/class/power_supply/BAT0/capacity
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

@@ -544,6 +544,46 @@ tasks:
           python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py kiwix-search
         fi
 
+  checks:decision:thermal:
+    desc: Run Intel QuickSync VA-API thermal governor pre-harness check (EXP-081)
+    cmds:
+      - |
+        if systemone-ensemble vaapi-thermal --help >/dev/null 2>&1; then
+          systemone-ensemble vaapi-thermal
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py vaapi-thermal
+        fi
+
+  checks:decision:sqlite:
+    desc: Run ephemeral SQLite in-memory buffer tuning & WAL compactor check (EXP-084)
+    cmds:
+      - |
+        if systemone-ensemble sqlite-buffer --help >/dev/null 2>&1; then
+          systemone-ensemble sqlite-buffer
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py sqlite-buffer
+        fi
+
+  checks:decision:cache:
+    desc: Run Harmonia binary cache warming & GC pre-filter check (EXP-087)
+    cmds:
+      - |
+        if systemone-ensemble cache-warmer --help >/dev/null 2>&1; then
+          systemone-ensemble cache-warmer
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py cache-warmer
+        fi
+
+  checks:decision:ocr:
+    desc: Run Paperless document deduplication & OCR confidence scoring check (EXP-088)
+    cmds:
+      - |
+        if systemone-ensemble paperless-ocr --help >/dev/null 2>&1; then
+          systemone-ensemble paperless-ocr
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py paperless-ocr
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

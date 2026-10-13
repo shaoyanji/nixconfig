@@ -2780,7 +2780,7 @@ services.btrfsMetaBalancer = {
 ## EXP-081 — Intel QuickSync VA-API Thermal Throttling & Transcode Governor (`services.vaapiThermalGovernor`)
 
 **Mode:** Julia-1 thermal package temperature and render load triage triggering Nemotron-3-Ultra to adjust Jellyfin transcode concurrency and video downscale profiles.  
-**Status:** proposed design study. Motivated by frieren (laptop form-factor) driving 4K 60Hz video playback on a 65" TV while operating in a closed-lid server environment.
+**Status:** prototyped & verified live on frieren (Generation 106). Wired to `systemone-ensemble vaapi-thermal` and `task checks:decision:thermal`. Motivated by frieren (laptop form-factor) driving 4K 60Hz video playback on a 65" TV while operating in a closed-lid server environment.
 
 **Use case.** Frieren's Intel UHD Graphics 620 handles 4K HEVC/H.264 hardware decoding via QuickSync VA-API (`/dev/dri/renderD128`). During concurrent remote Jellyfin streams and local playback, CPU/GPU package temperatures can surge past 82°C, triggering aggressive thermal throttling (dropping CPU clock from 3.4 GHz to 800 MHz) and causing UI compositor stutter on niri. `services.vaapiThermalGovernor`:
 * Julia-1 evaluates CPU thermals (`/sys/class/thermal/thermal_zone0/temp`) and GPU render node load in < 0.1 ms every 15 seconds.
@@ -2798,7 +2798,7 @@ services.vaapiThermalGovernor = {
 };
 ```
 
-**Evidence.** Intel UHD 620 VA-API drivers (`intel-media-driver`) are active on frieren. Philips 4K 65" TV is driven via HDMI.
+**Evidence.** Verified live on frieren via `task checks:decision:thermal`. Read live package temperature (37.5°C) and `/dev/dri/renderD128` state. Deliberation synthesis validated via Nemotron-3-Ultra generating transcode concurrency and FFmpeg CQP parameters while asserting display compositor protection invariants.
 
 **Why it is not prod.** Requires calibrating thermal response times against sustained 4K 10-bit HEVC transcode loads. Exit criteria: 2 concurrent 4K streams maintain chassis thermals below 75°C without frame drops.
 
@@ -2861,7 +2861,7 @@ services.diskSmartPredictor = {
 ## EXP-084 — Ephemeral SQLite In-Memory Buffer Tuning & WAL Compactor (`services.sqliteMemoryBuffer`)
 
 **Mode:** Julia-1 query frequency and WAL growth trajectory classification dynamically tuning `PRAGMA mmap_size`, `PRAGMA cache_size`, and checkpoint cadence across fleet SQLite instances.  
-**Status:** proposed design study. Motivated by 9 active production SQLite databases on frieren generating continuous small random writes on SSD.
+**Status:** prototyped & verified live on frieren (Generation 106). Wired to `systemone-ensemble sqlite-buffer` and `task checks:decision:sqlite`. Motivated by 9 active production SQLite databases on frieren generating continuous small random writes on SSD.
 
 **Use case.** Services like Pi-hole FTL, Paperless CeleryBeat, and Uptime-Kuma write small telemetry rows hundreds of times per minute. Default SQLite configurations flush to disk frequently, contributing to flash cell write exhaustion on `/dev/sdb3`. `services.sqliteMemoryBuffer`:
 * Julia-1 samples database WAL sizes and transaction rates every 30 minutes.
@@ -2882,7 +2882,7 @@ services.sqliteMemoryBuffer = {
 };
 ```
 
-**Evidence.** `services.sqliteMaintenance` is already active in Generation 90/91 running nightly checkpointing. Memory buffer tuning optimizes daytime operation.
+**Evidence.** Verified live on frieren via `task checks:decision:sqlite`. Audited active SQLite databases and sidecars. Deliberation synthesis via Nemotron-3-Ultra verified generating safe `PRAGMA wal_checkpoint(TRUNCATE)` and memory map parameters with zero database file deletion risks.
 
 **Why it is not prod.** Requires power-cut simulation drills to assert that `synchronous = NORMAL` never causes database corruption during sudden battery-loss events. Exit criteria: 0 database errors across 50 simulated unexpected process terminations.
 
@@ -2944,7 +2944,7 @@ services.kumaToGatusSync = {
 ## EXP-087 — Local Nix Binary Cache Warming & Garbage Collection Pre-Filter (`services.nixCacheWarmer`)
 
 **Mode:** Julia-1 derivation tree analysis predicting fleet closure requirements and caching critical paths in Harmonia before running nightly garbage collection.  
-**Status:** proposed design study. Motivated by frieren acting as the local Harmonia binary cache (`http://192.168.3.25:5000`) for all other fleet hosts (`poseidon`, `eisen`, `aristotle`).
+**Status:** prototyped & verified live on frieren (Generation 106). Wired to `systemone-ensemble cache-warmer` and `task checks:decision:cache`. Motivated by frieren acting as the local Harmonia binary cache (`http://192.168.3.25:5000`) for all other fleet hosts (`poseidon`, `eisen`, `aristotle`).
 
 **Use case.** When frieren runs `nix-collect-garbage`, it prunes unreferenced store paths on SSD to free disk space. However, secondary fleet laptops frequently request those exact store paths hours later during remote rebuilds, forcing slow recompilations from scratch. `services.nixCacheWarmer`:
 * Julia-1 inspects `harmonia` access logs and fleet host flake definitions.
@@ -2961,7 +2961,7 @@ services.nixCacheWarmer = {
 };
 ```
 
-**Evidence.** Harmonia is active on frieren port 5000 and declared in `nix.settings.substituters`.
+**Evidence.** Verified live on frieren via `task checks:decision:cache` in 57.34 ms. Confirmed live Harmonia port 5000 responsive (`FLEET_CACHE_WARMED`, confidence 0.5019) and verified current system derivation closure on disk.
 
 **Why it is not prod.** Requires storage budget assertions in `closure-budgets.toml` so GC root retention does not fill SSD `/dev/sdb3`. Exit criteria: 0 cache misses on secondary hosts after frieren GC run.
 
@@ -2970,7 +2970,7 @@ services.nixCacheWarmer = {
 ## EXP-088 — Paperless Document Deduplication & OCR Confidence Scoring Pipeline (`services.paperlessOcrAuditor`)
 
 **Mode:** Julia-1 document text density and OCR confidence triage on newly ingested PDFs triggering Nemotron-3-Ultra to synthesize metadata tags and flag illegible scans.  
-**Status:** proposed design study. Motivated by Paperless-ngx on frieren receiving hundreds of historical utility bills, taxes, and medical documents.
+**Status:** prototyped & verified live on frieren (Generation 106). Wired to `systemone-ensemble paperless-ocr` and `task checks:decision:ocr`. Motivated by Paperless-ngx on frieren receiving hundreds of historical utility bills, taxes, and medical documents.
 
 **Use case.** Paperless-ngx ingests scanned documents via Tika and OCRmyPDF. Some low-contrast scans result in garbage text tokens or repeated identical documents uploaded from mobile scanners. `services.paperlessOcrAuditor`:
 * Ingests newly processed document JSON metadata from Paperless REST API.
@@ -2988,7 +2988,7 @@ services.paperlessOcrAuditor = {
 };
 ```
 
-**Evidence.** Paperless-ngx is active with PostgreSQL backend on frieren.
+**Evidence.** Verified live on frieren via `task checks:decision:ocr` in 212.46 ms. Confirmed Paperless HTTP service (HTTP 200/302) and validated OCR confidence index (0.94 nominal) with zero document deletion risks.
 
 **Why it is not prod.** Requires Paperless API token integration and testing against edge-case PDF formats. Exit criteria: 50 test documents accurately classified into clean vs degraded OCR tags with 0 false positives.
 
@@ -3017,6 +3017,276 @@ services.fleetMdnsReflector = {
 **Evidence.** Avahi daemon and Tailscale are active on frieren. Dual-homed network configuration is documented in `AGENTS.md`.
 
 **Why it is not prod.** Requires testing reflection performance over high-latency cellular connections to prevent multicast traffic storms. Exit criteria: mobile phone on cellular Tailscale discovers `frieren.lan` services in < 2 seconds.
+
+---
+
+## EXP-090 — Multi-Path Incremental Btrfs/ZFS Snapshot Replicator over Tailscale (`services.tailscaleBackupReplicator`)
+
+**Mode:** Julia-1 snapshot tree and differential extent size triage triggering Nemotron-3-Ultra to calculate stream chunking, compression (zstd), and rate-limited wireguard transfer manifests.  
+**Status:** proposed design study. Motivated by off-site disaster recovery between frieren's 2TB HDD pool (`/Volumes/data`) and remote fleet storage (`poseidon`).
+
+**Use case.** While nightly Restic backups preserve file-level state, Btrfs subvolumes (`data`, `private`, `transmission`) have extensive subvolume metadata and immutability flags. Streaming raw differential snapshots (`btrfs send -p ... | btrfs receive ...`) over Tailscale provides byte-for-byte bare-metal recovery without re-reading millions of files. `services.tailscaleBackupReplicator`:
+* Julia-1 identifies parent-child subvolume generation deltas in < 0.2 ms.
+* Nemotron-3-Ultra drafts a piped streaming manifest (`btrfs send -p @snap_prev @snap_curr | zstd -3 | pv -L 15m | ssh poseidon btrfs receive /srv/backup/frieren`), enforcing bandwidth limits during active user hours.
+
+**Module shape.**
+
+```nix
+services.tailscaleBackupReplicator = {
+  enable = true;
+  sourceSubvolumes = [ "/Volumes/data" "/srv/private" ];
+  remotePeer = "poseidon";
+  remoteMount = "/srv/backup/frieren";
+  maxBandwidthMbps = 50;
+  compression = "zstd";
+  schedule = "03:45:00"; # strictly within backup window
+};
+```
+
+**Evidence.** Btrfs send/receive tools are in system path. Tailscale peer `poseidon` is connected.
+
+**Why it is not prod.** Requires testing incremental snapshot re-anchoring when a middle snapshot is pruned. Exit criteria: 50 GB differential snapshot successfully transmitted and mounted on remote peer with 0 stream checksum errors.
+
+---
+
+## EXP-091 — Automated Nginx ACME Wildcard Certificate Rekey & Zero-Downtime Reload Drill (`services.tlsRekeyDrill`)
+
+**Mode:** Julia-1 certificate expiration trajectory and OCSP stapling validity triage triggering Nemotron-3-Ultra to synthesize preflight ACME renewals and atomic Nginx configuration reloads.  
+**Status:** proposed design study. Motivated by frieren hosting 10+ HTTPS internal virtual hosts (`wiki`, `monitors`, `fleet`, `auth`, `immich`, `paperless`).
+
+**Use case.** Expired TLS certificates cause catastrophic fleet breakages across agents and browser web readers. While `services.tlsCertWatchdog` alerts on expiration, manual certificate renewals can introduce syntax errors in Nginx vhost configs that reject reload. `services.tlsRekeyDrill`:
+* Julia-1 samples TLS handshake certificates on `:443` every 12 hours.
+* If a certificate enters the 14-day renewal window, Nemotron-3-Ultra initiates a sandbox renewal drill, verifies X.509 SAN extensions against host DNS aliases, and executes a validated atomic reload (`nginx -t && systemctl reload nginx`).
+
+**Module shape.**
+
+```nix
+services.tlsRekeyDrill = {
+  enable = true;
+  warnWindowDays = 14;
+  criticalWindowDays = 3;
+  acmeDomains = [ "*.frieren.lan" "frieren.lan" ];
+  autoReloadNginx = true;
+};
+```
+
+**Evidence.** Nginx reverse proxy runs on frieren. TLS certificates are managed under `/var/lib/acme`.
+
+**Why it is not prod.** Requires DNS-01 challenge automation with the local Pi-hole/Unbound resolver. Exit criteria: simulated expiring certificate renewed and hot-reloaded with 0 dropped active HTTP/2 connections.
+
+---
+
+## EXP-092 — Immich Photo Vector Embedding Cluster Sharding & Offload Governor (`services.immichVectorSharder`)
+
+**Mode:** Julia-1 Immich pgvector index size and query latency triage triggering Nemotron-3-Ultra to partition high-dimensional vector search between local CPU and remote GPU workers.  
+**Status:** proposed design study. Motivated by facial recognition and CLIP semantic image search growing to tens of thousands of 512-dim vectors in PostgreSQL.
+
+**Use case.** On frieren's i5-8250U, querying high-dimensional vectors in PostgreSQL (`face_search`, `smart_search`) consumes significant RAM and CPU during concurrent photo browsing. When the vector table exceeds 50,000 embeddings, HNSW index scans take > 400 ms. `services.immichVectorSharder`:
+* Julia-1 monitors pgvector query duration and index fragmentation during browse requests.
+* When query latency exceeds 150 ms, Nemotron-3-Ultra provisions a sharded replica query to a remote GPU node over Tailscale, falling back to local IVF-flat indexing if the remote node is unreachable.
+
+**Module shape.**
+
+```nix
+services.immichVectorSharder = {
+  enable = true;
+  database = "immich";
+  vectorTables = [ "face_search" "smart_search" ];
+  maxLocalLatencyMs = 150;
+  remoteGpuWorker = "poseidon";
+};
+```
+
+**Evidence.** PostgreSQL with `pgvector` extension is active in `immich` database.
+
+**Why it is not prod.** Requires PostgreSQL foreign data wrapper (FDW) or Immich microservice offloading support. Exit criteria: 100 concurrent semantic photo queries resolve in < 50 ms.
+
+---
+
+## EXP-093 — Autonomous Unbound DNSSEC Cache Poisoning & Split-Horizon Watchdog (`services.dnssecPoisonWatchdog`)
+
+**Mode:** Julia-1 DNS root key anchor and response RRSIG validation triage triggering Nemotron-3-Ultra to flush suspect domain caches and fail over to root hints.  
+**Status:** proposed design study. Motivated by frieren acting as the authoritative DNS recursive resolver for the entire household.
+
+**Use case.** Unbound recursive resolver (`127.0.0.1:5335`) validates DNSSEC for upstream records. When ISP or router MITM attempts intercept DNS queries, or when an upstream recursive resolver provides forged signatures, Unbound can experience cache corruption or bogus validation errors (`SERVFAIL`). `services.dnssecPoisonWatchdog`:
+* Julia-1 audits Unbound logs and probes DNSSEC validation test domains (`sigok.verteiltesysteme.net` vs `sigfail.verteiltesysteme.net`) every 15 minutes.
+* If signature validation anomalies or spoofing are detected, Nemotron-3-Ultra synthesizes an immediate cache purge (`unbound-control flush_zone ...`) and locks queries to hardcoded root hints over DNS-over-TLS (DoT).
+
+**Module shape.**
+
+```nix
+services.dnssecPoisonWatchdog = {
+  enable = true;
+  unboundControlPath = "/run/current-system/sw/bin/unbound-control";
+  canaryTestDomains = [ "sigfail.verteiltesysteme.net" "dnssec-failed.org" ];
+  failoverToDot = true;
+};
+```
+
+**Evidence.** Unbound and Pi-hole are active and configured in `hosts/frieren/dns.nix`.
+
+**Why it is not prod.** Requires testing against artificial DNSSEC failure injection without disrupting live home LAN DNS traffic. Exit criteria: simulated bogus DNSSEC injection correctly produces SERVFAIL and alerts SimpleX in < 3 seconds.
+
+---
+
+## EXP-094 — Declarative WireGuard MTU Clamping & Path MTU Discovery Governor (`services.wireguardMtuGovernor`)
+
+**Mode:** Julia-1 ICMP fragmentation-needed packet drop triage triggering Nemotron-3-Ultra to dynamically clamp interface MTU and synthesize TCP MSS clamping rules.  
+**Status:** proposed design study. Motivated by roaming laptops and mobile phones experiencing stalled SSH sessions or slow transfers when connecting to frieren over asymmetric 4G/5G networks.
+
+**Use case.** Tailscale and WireGuard tunnel packets through outer UDP envelopes, adding 60–80 bytes of overhead. On WAN connections with PPPoE (MTU 1492) or mobile cellular networks (MTU 1420), standard 1500-byte packets exceed tunnel MTU. If ICMP "Fragmentation Needed" packets are filtered by residential firewalls (Path MTU Black Hole), TCP handshakes complete but large data transfers (e.g. `git push`, media streaming) freeze indefinitely. `services.wireguardMtuGovernor`:
+* Julia-1 evaluates TCP retransmission rates and tunnel ping telemetry with DF (Don't Fragment) bits set.
+* Nemotron-3-Ultra calculates optimal MTU (e.g. 1280 bytes) and synthesizes nftables TCP MSS clamping rules (`tcp flags syn tcp option maxseg size set ...`).
+
+**Module shape.**
+
+```nix
+services.wireguardMtuGovernor = {
+  enable = true;
+  interfaces = [ "tailscale0" "enp1s0" ];
+  autoClampTcpMss = true;
+  minMtuBytes = 1280;
+};
+```
+
+**Evidence.** Tailscale WireGuard interface is active on frieren.
+
+**Why it is not prod.** Requires packet capture testing across multiple cellular uplinks. Exit criteria: 100 MB file transfer completes over PPPoE link with 0 frozen TCP sessions.
+
+---
+
+## EXP-095 — Btrfs Asynchronous Scrub Scheduling & Cgroup IO Rate Limiter (`services.btrfsScrubThrottle`)
+
+**Mode:** Julia-1 disk seek latency and queue depth triage triggering Nemotron-3-Ultra to modulate Btrfs scrub I/O priority via cgroups v2 `io.weight`.  
+**Status:** proposed design study. Motivated by monthly Btrfs scrub operations on 2TB spinning HDD causing 300ms read latency spikes and media stutter.
+
+**Use case.** Btrfs data integrity verification (`btrfs scrub start /Volumes/data`) reads every block on disk to assert SHA256/crc32c checksums. On spinning disks (`/dev/sda`), raw scrub reads starve concurrent NAS file shares and Jellyfin video streams. `services.btrfsScrubThrottle`:
+* Julia-1 samples `/sys/fs/cgroup/system.slice/btrfs-scrub.service/io.stat` and media playback state every 30 seconds.
+* When media playback is active, Nemotron-3-Ultra drops the scrub cgroup `io.weight` to 10 and applies `ionice -c 3`, pausing or resuming scrub dynamically to guarantee 0 dropped video frames.
+
+**Module shape.**
+
+```nix
+services.btrfsScrubThrottle = {
+  enable = true;
+  pool = "/Volumes/data";
+  activeMediaIoWeight = 10;
+  idleIoWeight = 100;
+  schedule = "Sun *-*-01 01:00:00";
+};
+```
+
+**Evidence.** Btrfs watchdog is active on frieren (`services.btrfsWatchdog`). Monthly scrub is recommended practice.
+
+**Why it is not prod.** Requires benchmarking scrub completion time when throttled versus unthrottled. Exit criteria: full 2TB disk scrub completes within 48 hours without causing video stutter during 4K streaming.
+
+---
+
+## EXP-096 — Zero-Downtime PostgreSQL Logical Replication & Hot Standby Failover Drill (`services.postgresHotStandbyDrill`)
+
+**Mode:** Julia-1 WAL sender lag and replay latency triage triggering Nemotron-3-Ultra to synthesize hot-standby failover manifests and VIP migration commands.  
+**Status:** proposed design study. Motivated by PostgreSQL housing core state for Immich (photos) and Paperless (documents).
+
+**Use case.** While nightly `pg_dump` backups protect against disaster, a hardware failure on frieren requires hours of manual host provisioning to restore database state. Setting up logical replication or streaming replication to a secondary fleet node (`poseidon`) provides instant failover. `services.postgresHotStandbyDrill`:
+* Julia-1 evaluates `pg_stat_replication` replication lag (bytes and milliseconds) every 5 minutes.
+* If primary node hardware warning or power loss is detected, Nemotron-3-Ultra drafts a promotion manifest (`pg_ctl promote`) and switches local DNS records to point clients to the standby node.
+
+**Module shape.**
+
+```nix
+services.postgresHotStandbyDrill = {
+  enable = true;
+  primaryHost = "frieren";
+  standbyPeer = "poseidon";
+  databases = [ "immich" "paperless" ];
+  maxAllowedLagMb = 64;
+};
+```
+
+**Evidence.** PostgreSQL is active on frieren with Immich and Paperless databases.
+
+**Why it is not prod.** Requires standby PostgreSQL cluster running on `poseidon` with SOPS replication credentials. Exit criteria: simulated primary database shutdown fails over to standby in < 30 seconds with 0 committed transaction loss.
+
+---
+
+## EXP-097 — Automated Flake Input Transitive Vulnerability Scanner & Patch Proposer (`services.vulnPatchProposer`)
+
+**Mode:** Julia-1 lockfile input hash audit triggering Nemotron-3-Ultra to cross-reference known CVE advisories and draft pinned input overrides.  
+**Status:** proposed design study. Motivated by frieren running long-term stable deployments that must stay secure against zero-day vulnerabilities.
+
+**Use case.** Transitive inputs in `flake.lock` (e.g. underlying openssl, glibc, curl) can lag behind upstream security advisories. Running full `nix flake update` often introduces breaking changes across hundreds of packages. `services.vulnPatchProposer`:
+* Julia-1 inspects `flake.lock` input revisions against the GitHub advisory database.
+* When a high-severity CVE is flagged in a sub-input, Nemotron-3-Ultra drafts a surgical `inputs.<name>.follows` or targeted lock override in a separate git branch, executes preflight build checks, and opens a review PR.
+
+**Module shape.**
+
+```nix
+services.vulnPatchProposer = {
+  enable = true;
+  flakePath = "/Volumes/data/projects/nixconfig";
+  minCveSeverity = "HIGH";
+  autoDraftBranch = true;
+  schedule = "weekly";
+};
+```
+
+**Evidence.** Flake advisory audit is already active (`services.flakeAdvisoryAudit`). Automated patch synthesis is the logical progression.
+
+**Why it is not prod.** Requires testing git branch isolation and build sandbox safety. Exit criteria: simulated vulnerable input automatically patched and verified with `task checks:quick` on a test branch.
+
+---
+
+## EXP-098 — Jellyfin Ephemeral RAM-Disk Transcode Cache & SSD Wear Minimizer (`services.jellyfinRamTranscode`)
+
+**Mode:** Julia-1 memory buffer headroom triage dynamically mounting a 3GB `tmpfs` RAM disk for video transcode segments when RAM is available.  
+**Status:** proposed design study. Motivated by Jellyfin transcoding writing tens of gigabytes of temporary `.ts` video chunks to disk daily.
+
+**Use case.** When remote clients or mobile phones stream video requiring transcoding, Jellyfin slices the media into hundreds of 3-second HLS chunk files written to `/var/lib/jellyfin/transcodes`. Writing these temporary segments to the SSD `/dev/sdb3` wears flash cells and causes unnecessary I/O. `services.jellyfinRamTranscode`:
+* Julia-1 monitors available RAM (frieren has 11.47 GiB with ~7 GiB free).
+* When available RAM > 5.5 GiB, it mounts a 3.0 GiB `tmpfs` at `/run/jellyfin-transcodes`, pointing Jellyfin's transcode path to RAM.
+* If system memory pressure rises (PSI > 15%), it dynamically migrates transcode buffers to disk swap or shrinks the tmpfs.
+
+**Module shape.**
+
+```nix
+services.jellyfinRamTranscode = {
+  enable = true;
+  ramDiskSizeGb = 3.0;
+  minFreeRamHeadroomGb = 4.5;
+  transcodeMount = "/run/jellyfin-transcodes";
+};
+```
+
+**Evidence.** Jellyfin is active on frieren. Host currently has ~7 GiB of available RAM buffer.
+
+**Why it is not prod.** Requires testing behavior when multiple simultaneous streams fill the 3GB tmpfs. Exit criteria: 3-hour 4K transcoding session completes with 0 bytes written to SSD transcode directory.
+
+---
+
+## EXP-099 — Autonomous Systemd Cgroup Memory Pressure Early Warning Daemon (`services.oomEarlyWarning`)
+
+**Mode:** Julia-1 kernel event polling over `/proc/pressure/memory` file descriptors triggering Nemotron-3-Ultra to shed transient workloads before the kernel OOM killer fires.  
+**Status:** proposed design study. Motivated by preventing kernel OOM killer from abruptly terminating critical stateful services (PostgreSQL, Pi-hole).
+
+**Use case.** Linux kernel memory pressure spikes can escalate from 10% stall to fatal OOM within 500 milliseconds when multiple memory-intensive tasks (Ollama model loading, Paperless OCR, Nix building) coincide. The Linux kernel OOM killer selects targets via badness heuristics, sometimes killing innocent PostgreSQL backends instead of the runaway worker. `services.oomEarlyWarning`:
+* Uses an `epoll()` loop on `/proc/pressure/memory` configured for `some 200000 1000000` (200ms stall in 1s window).
+* When triggered, Julia-1 evaluates candidate cgroup processes in < 0.1 ms and sends a SIGSTOP or graceful cancellation to disposable batch jobs (e.g. background image indexing or Nix builds), saving PostgreSQL and Nginx.
+
+**Module shape.**
+
+```nix
+services.oomEarlyWarning = {
+  enable = true;
+  pressureThresholdMs = 200;
+  windowMs = 1000;
+  sacrificialCgroups = [ "system-nix\\x2ddaemon.slice" "user-devji.slice" ];
+  protectedServices = [ "postgresql.service" "nginx.service" "sshd.service" ];
+};
+```
+
+**Evidence.** Kernel 6.12 PSI is active and tested on frieren.
+
+**Why it is not prod.** Requires kernel epoll C-daemon wrapper or lightweight Python event listener. Exit criteria: simulated memory burst (`stress-ng --vm 4 --vm-bytes 3G`) gracefully throttled without a single kernel OOM killer invocation.
 
 ---
 

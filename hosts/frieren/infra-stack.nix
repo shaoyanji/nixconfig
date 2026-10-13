@@ -213,6 +213,11 @@
   '';
 in {
   imports = [
+    (import ../../modules/profiles/microvm-host.nix {
+      inherit pkgs;
+      natExternalInterface = "enp1s0";
+      bridgeAddress = "192.168.83.1/24";
+    })
     ../../modules/services/fleet-monitors.nix
     ../../modules/services/agent-scheduler.nix
     ../../modules/services/btrfs-watchdog.nix
@@ -551,4 +556,31 @@ in {
     host = "0.0.0.0";
     openFirewall = false;
   };
+
+  # Ephemeral MicroVM Sandbox SSH Client Configuration (EXP-102)
+  # Eliminates known_hosts collisions and prompts for ephemeral test VMs
+  programs.ssh.extraConfig = ''
+    Host frieren-canary
+      HostName 192.168.83.10
+      User devji
+      StrictHostKeyChecking accept-new
+      UserKnownHostsFile /var/lib/microvms/.known_hosts
+      IdentityFile ~/.ssh/id_ed25519
+      ConnectTimeout 3
+
+    Host 192.168.83.* testvm
+      User devji
+      StrictHostKeyChecking accept-new
+      UserKnownHostsFile /var/lib/microvms/.known_hosts
+      IdentityFile ~/.ssh/id_ed25519
+      ConnectTimeout 3
+  '';
+
+  # User and permissions for MicroVM tap interfaces & KVM access
+  users.users.microvm = {
+    isSystemUser = true;
+    group = "kvm";
+    description = "MicroVM runner daemon user";
+  };
+  users.users.devji.extraGroups = ["kvm"];
 }

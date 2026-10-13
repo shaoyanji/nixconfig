@@ -204,6 +204,7 @@ in {
     ../../modules/services/uds-static-bridge.nix
     ../../modules/services/ups-simulation-drill.nix
     ../../modules/services/sqlite-maintenance.nix
+    ../../modules/services/paperless-watchdog.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -475,6 +476,8 @@ in {
       "/var/lib/private/uptime-kuma/kuma.db"
       "/var/lib/private/scrutiny/scrutiny.db"
       "/var/lib/sonarr/.config/NzbDrone/sonarr.db"
+      "/var/lib/paperless/db.sqlite3"
+      "/srv/data/paperless/celerybeat-schedule.db"
       "/home/devji/.simplex/simplex_v1_agent.db"
       "/home/devji/.simplex/simplex_v1_chat.db"
     ];
@@ -482,5 +485,15 @@ in {
     runOptimize = true;
     runQuickCheck = true;
     failOnCorruption = true;
+  };
+
+  # Declarative Paperless-ngx document ingestion watchdog & pipeline health probe (EXP-038)
+  # Inspects /var/lib/paperless/consume for stalled, un-ingested, or 0-byte ghost files.
+  services.paperlessWatchdog = {
+    enable = true;
+    consumeDir = "/var/lib/paperless/consume";
+    maxStallMinutes = 20;
+    schedule = "hourly";
+    failOnStall = false; # alert/log without failing unit
   };
 }

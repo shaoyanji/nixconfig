@@ -209,6 +209,7 @@ in {
     ../../modules/services/postgres-pgvector-audit.nix
     ../../modules/services/fleet-session-reaper.nix
     ../../modules/services/postgres-backup-drill.nix
+    ../../modules/services/flake-advisory-audit.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -542,5 +543,16 @@ in {
     databases = ["immich"];
     assertMinimumTables = 20;
     schedule = "Sun *-*-* 06:00:00"; # strictly after 03:00-05:30 backup window
+  };
+
+  # Declarative flake lock drift & security advisory audit unit (EXP-044)
+  # Audits flake.lock inputs, asserts freshness on nixpkgs/home-manager/sops-nix, and flags stale inputs.
+  services.flakeAdvisoryAudit = {
+    enable = true;
+    flakePath = /Volumes/data/projects/nixconfig;
+    criticalInputs = ["nixpkgs" "home-manager" "sops-nix"];
+    criticalMaxAgeDays = 14;
+    warnAgeDays = 60;
+    schedule = "Sun *-*-* 07:00:00"; # strictly after backup window
   };
 }

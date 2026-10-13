@@ -410,6 +410,20 @@ tasks:
           exit 1
         fi
 
+  checks:flake:advisory:
+    desc: Audit flake.lock inputs freshness, drift, and security staleness (EXP-044)
+    summary: >
+      Invokes flake-advisory-audit to audit locked flake dependencies, assert freshness
+      on critical security inputs (nixpkgs, home-manager, sops-nix), and flag stale pins.
+    cmds:
+      - |
+        if command -v flake-advisory-audit >/dev/null 2>&1; then
+          flake-advisory-audit
+        else
+          echo "flake-advisory-audit command not found in PATH" >&2
+          exit 1
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

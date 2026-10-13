@@ -504,6 +504,46 @@ tasks:
           python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py fleet-security
         fi
 
+  checks:decision:tailscale:
+    desc: Run Tailscale mesh latency & DERP bypasser pre-harness check (EXP-070)
+    cmds:
+      - |
+        if systemone-ensemble tailscale-path --help >/dev/null 2>&1; then
+          systemone-ensemble tailscale-path
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py tailscale-path
+        fi
+
+  checks:decision:memory:
+    desc: Run predictive memory PSI & zram compaction pre-harness check (EXP-071)
+    cmds:
+      - |
+        if systemone-ensemble memory-pressure --help >/dev/null 2>&1; then
+          systemone-ensemble memory-pressure
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py memory-pressure
+        fi
+
+  checks:decision:sops:
+    desc: Run zero-leak secret rotator & SOPS rekey verifier pre-harness check (EXP-072)
+    cmds:
+      - |
+        if systemone-ensemble sops-rekey --help >/dev/null 2>&1; then
+          systemone-ensemble sops-rekey
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py sops-rekey
+        fi
+
+  checks:decision:kiwix:
+    desc: Run offline Kiwix ZIM search with 0-byte download guarantee (EXP-074)
+    cmds:
+      - |
+        if systemone-ensemble kiwix-search --help >/dev/null 2>&1; then
+          systemone-ensemble kiwix-search
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py kiwix-search
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

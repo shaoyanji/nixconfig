@@ -203,22 +203,54 @@ window.onload = () => {
 
 ---
 
-## 8. Milestones (each independently useful)
+## 8. Scale Migration to Resource-Managed MicroVM Services (Model B)
+
+A fundamental tension on `frieren` has been the explosion of bare-metal background daemons (watchdogs, audits, scrapers, vector indexers, and services) competing for limited host RAM (11.5 GB) and I/O. Traditionally, mitigating this required building complex System 0/1/2 polling daemons and memory governors to prevent host starvation.
+
+**The Model B Paradigm Shift:**
+Instead of polling and managing processes on bare metal, services are progressively migrated into dedicated, resource-capped MicroVMs (`cloud-hypervisor` via `microvm.nix` and `virtiofs`):
+
+1. **Kernel-Enforced Resource Capping:**
+   - Every service or cluster runs inside an isolated microVM with strict vCPU and memory ceilings (e.g. 2 vCPUs, 2048 MB RAM).
+   - CPU contention and memory pressure are arrested at the hypervisor barrier; runaway workloads cannot starve bare-metal NAS storage (`btrfs`), video streaming (`jellyfin`), or host networking.
+   - Daemons no longer need proactive polling loops to monitor memory pressure—the hypervisor boundary enforces it statically.
+
+2. **Zero-Copy Nix Store Sharing over Virtiofs:**
+   - Guest MicroVMs share the host's `/nix/store` read-only via `virtiofs` (`ro-store`) with a minimal copy-on-write overlay (`/nix/.rw-store`).
+   - Disk consumption is negligible (< 10 MB overlay overhead per instance), eliminating the heavy disk duplication of traditional full-system VMs or duplicate Docker image layers.
+   - Boot latency is sub-4 seconds; teardown is instantaneous and free of unmount deadlocks (`DefaultDependencies = false`).
+
+3. **Hypervisor Ingress & Tailscale Subnet Continuity:**
+   - Services inside the MicroVM bind internal virtual interfaces on the host bridge (`microbr` on `192.168.83.1/24`).
+   - The bare-metal host's Nginx acts as the single reverse proxy ingress point, mapping virtual hosts and paths (e.g. `service.frieren.lan` or `/service/`) to guest IPs.
+   - Remote clients access these services transparently over Tailscale (`100.97.61.65` or MagicDNS), with zero requirement for fragile Tailscale subnet route advertising.
+   - **Teardown Resiliency:** If a MicroVM is stopped or rebuilt, Nginx cleanly returns `504 Gateway Time-out`. Upon VM boot, connections immediately and automatically restore with zero reload or route flap.
+
+4. **Phased Migration Roadmap:**
+   - **Phase 1 (Canary Sandbox - Complete):** Validated in EXP-102 via `frieren-canary` with automated boot, persistent SSH key recognition, and dummy service Tailscale verification.
+   - **Phase 2 (Auxiliary & Non-Stateful Services):** Migrate standalone services such as Kiwix offline library, Gatus monitoring backend, Paperless worker queues, and isolated HTTP bridges into microVMs.
+   - **Phase 3 (Consolidated Fleet Workloads):** Transition heavy, memory-bursting workloads (e.g. Immich ML inference, local AI helpers) into bounded VM containers while keeping primary storage datasets on the host Btrfs pools.
+
+---
+
+## 9. Milestones (each independently useful)
 
 1. **Nix renders static pages from data** — one derivation, `inventory.toml` +
    markdown → HTML. (Go builder is the pragmatic first cut; Nix-native is the goal.)
 2. **Aki-powered static closure explorer** — build-time Nix compilation of `pkgs.closureInfo`
    into an `aki.js` single-page tree browser (traversable closures & inventory via static JSON).
-3. **External manifest input** — move `site.toml` to its own repo, consume as a
+3. **MicroVM Service Sandbox (Model B Dogfood)** — verified in EXP-102: zero-copy virtiofs store,
+   persistent SSH host key recognition, and Nginx reverse-proxy ingress over Tailscale.
+4. **External manifest input** — move `site.toml` to its own repo, consume as a
    locked flake input; prove federation with a second consumer.
-4. **Eval budget** — measure full-tree eval; trial lazy trees (Determinate Nix)
+5. **Eval budget** — measure full-tree eval; trial lazy trees (Determinate Nix)
    and record the delta before committing to the upgrade.
-5. **Nix-native closure graph** — replace the shell traversal with a Nix
+6. **Nix-native closure graph** — replace the shell traversal with a Nix
    function; compare output to `closure-analysis.sh`.
-6. **Dynamic dashboard** — the Go + Datastar control plane over the compiled,
+7. **Dynamic dashboard** — the Go + Datastar control plane over the compiled,
    Nix-generated content for active execution / live toggles.
 
-## 9. Non-goals / guardrails
+## 10. Non-goals / guardrails
 
 - No per-request evaluation of the flake — that is the wall this vision respects.
 - No vendored web build chain (no Node/npm); `aki.js` is 270 bytes; Datastar is one fetched file.

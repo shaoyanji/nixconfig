@@ -451,6 +451,19 @@ tasks:
           python3 /Volumes/data/projects/nixconfig/modules/services/systemone/engine.py --model julia-1 triage-system /home/devji/SYSTEM.md
         fi
 
+  checks:decision:ensemble:
+    desc: Run System 1 & System 2 Pre-Harness Ensemble audit across 10 core services
+    summary: >
+      Evaluates 10 core subsystems using Julia-1 reflex triage and conditionally triggers
+      Nemotron-3-Ultra deliberation via Ollama when anomalies are detected.
+    cmds:
+      - |
+        if command -v systemone-ensemble >/dev/null 2>&1; then
+          systemone-ensemble audit-all
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py audit-all
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

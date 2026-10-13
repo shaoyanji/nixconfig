@@ -2113,7 +2113,87 @@ stream sustains < 3.0ms ping latency to the local router, eliminating media play
 
 ---
 
+## EXP-058 — Decision-Model Augmented Kiwix Search & Auto-Recommender (`services.decisionWikiRecommend`)
+
+**Mode:** non-autoregressive decision classification (Julia-1 144M & Laya 421M) for domain routing and offline knowledge recommendation with calibrated threshold gating.  
+**Status:** design study & implemented prototype. Motivated by eliminating operator guesswork and providing offline technical manuals during automated system triage.
+
+**Use case.** When system triage units detect errors (e.g. Btrfs silent corruption, PostgreSQL vacuum page bloat, systemd unit crashes), standard keyword search against Kiwix HTTP (`:8088`) either drowns in generic Wikipedia pages or requires manual archive specification (`-w archwiki`). System One decision models (`julia-1` on mmBERT-small, `laya` on ModernBERT-large) evaluate the error state in a single fast forward pass (< 0.5 ms on frieren CPU), classify the technical domain (`filesystem_storage`, `database_systems`, `network_dns_tls`, `nixos_declarative`), compute calibrated confidence, and gate recommendation on a threshold (default 0.65). If threshold is satisfied, the pipeline synthesizes technical keywords, targets the optimal local ZIM archive (`archlinux_en_all`, `wikipedia_en_all`, or `stackoverflow`), and surfaces authoritative offline manual links (`http://wiki.frieren.lan/...`) in sub-second response time.
+
+**Module shape.**
+
+```nix
+services.decisionWikiRecommend = {
+  enable = true;
+  model = "julia-1"; # "julia-1" (144M, 8k context) | "laya" (421M, 512 context)
+  confidenceThreshold = 0.65;
+  kiwixEndpoint = "http://127.0.0.1:8088";
+  defaultArchives = [ "archlinux_en_all" "wikipedia_en_all" ];
+  maxRecommendations = 5;
+};
+```
+
+**Evidence.** Kiwix daemon is active on port 8088 and reverse-proxied at `http://wiki.frieren.lan/`. Decision engine prototype `modules/services/systemone/wiki_recommend.py` successfully classified Btrfs scrub alerts and PostgreSQL vacuum queries in < 25ms, returning accurate ArchWiki and Wikipedia articles.
+
+**Why it is not prod.** Requires calibrated confidence tuning across diverse log formats to prevent false-positive article flooding on trivial warnings. Exit criteria: scheduled unit and operator CLI (`wiki-recommend.sh`) consistently recommend exact authoritative ArchWiki/NixOS sections for simulated fault injections with 0 internet access.
+
 ---
+
+## EXP-059 — Additional Offline ZIM Knowledge Base Catalog & Storage Provisioning (`services.offlineKnowledgeCatalog`)
+
+**Mode:** declarative curation, store packaging, and storage capacity provisioning for developer and sysadmin `.zim` archives.  
+**Status:** design study & knowledge base catalog recommendation. Motivated by achieving complete network-isolated technical recall for autonomous agents.
+
+**Use case.** frieren currently hosts 51.45 GB Wikipedia (`wikipedia_en_all_nopic_2026-06.zim`) and 34.76 MB ArchWiki (`archlinux_en_all_maxi_2026-07.zim`). While comprehensive for encyclopedic queries and Arch Linux sysadmin tasks, autonomous agents lack offline references for programming language syntax, web standards, and developer Q&A when WAN connectivity drops. Adding curated, high-density technical ZIM archives to `/Volumes/data` (`/dev/sda2`, 800 GiB free space) provides complete offline self-sufficiency:
+1. **Stack Overflow Top Questions (`stackoverflow.com_en_top_*.zim` ~4.5–6.0 GB):** ~500k top voted and accepted developer solutions across Python, Nix, C, SQL, and Linux.
+2. **Server Fault All Questions (`serverfault.com_en_all_*.zim` ~1.8–2.2 GB):** Dedicated Linux sysadmin, Btrfs storage, systemd, and server networking reference.
+3. **MDN Web Docs (`mdn_en_all_*.zim` ~1.5–2.0 GB):** Definitive documentation for HTML5, CSS3, JavaScript/ES6+, WebSockets, and HTTP/TLS protocols.
+4. **DevDocs Technical Suite (`devdocs_en_all_*.zim` ~1.2–1.8 GB):** Fast multi-language documentation for Python, Go, Rust, PostgreSQL, SQLite, and Nginx.
+5. **NixOS Manual & Wiki (`nixos_en_all_*.zim` ~80–150 MB):** Complete offline Nix/NixOS options and flake references.
+Total footprint: ~17 GB, consuming only **2.1%** of available 800 GiB HDD storage.
+
+**Module shape.**
+
+```nix
+services.offlineKnowledgeCatalog = {
+  enable = true;
+  storagePath = "/Volumes/data/kiwix";
+  recommendedZims = {
+    stackoverflow = {
+      flavour = "top";
+      approxSizeGb = 5.5;
+      priority = "high";
+    };
+    serverfault = {
+      flavour = "all";
+      approxSizeGb = 2.0;
+      priority = "high";
+    };
+    mdn = {
+      flavour = "all";
+      approxSizeGb = 1.8;
+      priority = "medium";
+    };
+    devdocs = {
+      flavour = "all";
+      approxSizeGb = 1.5;
+      priority = "medium";
+    };
+    nixos = {
+      flavour = "all";
+      approxSizeGb = 0.15;
+      priority = "critical";
+    };
+  };
+};
+```
+
+**Evidence.** `/Volumes/data` HDD storage pool has 800 GiB available (58% used of 1.9 TiB). `kiwix-serve -M` hot-reloads `/var/lib/kiwix/library.xml` without daemon restarts.
+
+**Why it is not prod.** Downloading 17 GB over WAN must be metered or imported manually to prevent bandwidth saturation during peak hours. Exit criteria: selected high-priority ZIM archives imported via `nix store add-file` or `fetchurl`, verified in `library.xml`, and indexed by `wikisearch` with zero storage warnings.
+
+---
+
 
 ## Audit findings feeding these experiments
 

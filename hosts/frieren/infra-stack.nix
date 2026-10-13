@@ -210,6 +210,8 @@ in {
     ../../modules/services/fleet-session-reaper.nix
     ../../modules/services/postgres-backup-drill.nix
     ../../modules/services/flake-advisory-audit.nix
+    ../../modules/services/tls-cert-watchdog.nix
+    ../../modules/services/systemone-decision.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -554,5 +556,26 @@ in {
     criticalMaxAgeDays = 14;
     warnAgeDays = 60;
     schedule = "Sun *-*-* 07:00:00"; # strictly after backup window
+  };
+
+  # Autonomous Nginx SSL/TLS Certificate Expiry Watchdog (EXP-050)
+  # Audits local certificate files and declared endpoints to assert valid expiration windows.
+  services.tlsCertWatchdog = {
+    enable = true;
+    endpoints = [
+      "http://127.0.0.1:80"
+      "http://127.0.0.1:8222"
+    ];
+    warnDays = 14;
+    criticalDays = 5;
+    schedule = "00/12:00:00"; # twice daily
+    failOnCritical = false;
+  };
+
+  # System One Decision Engine CLI & Service (Julia-1 & Laya)
+  services.systemoneDecision = {
+    enable = true;
+    defaultModel = "julia-1";
+    installCli = true;
   };
 }

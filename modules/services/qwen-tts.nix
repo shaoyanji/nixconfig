@@ -72,9 +72,12 @@
     # Upstream has no install target for the CLIs; place them explicitly.
     installPhase = ''
       runHook preInstall
-      install -Dm755 build/qwen-tts -t $out/bin
-      install -Dm755 build/tts-server -t $out/bin
-      install -Dm755 build/qwen-codec -t $out/bin
+      install -Dm755 qwen-tts -t $out/bin
+      install -Dm755 tts-server -t $out/bin
+      install -Dm755 qwen-codec -t $out/bin
+      install -Dm755 quantize -t $out/bin
+      mkdir -p $out/lib
+      cp -d libggml* $out/lib/ 2>/dev/null || true
       runHook postInstall
     '';
 

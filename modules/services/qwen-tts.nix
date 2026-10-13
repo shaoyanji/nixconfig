@@ -67,6 +67,9 @@
       "-DCMAKE_BUILD_TYPE=Release"
       "-DGGML_VULKAN=ON"
       "-DQWEN_SHARED=OFF"
+      "-DCMAKE_SKIP_BUILD_RPATH=ON"
+      "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON"
+      "-DCMAKE_INSTALL_RPATH=${placeholder "out"}/lib"
     ];
 
     # Upstream has no install target for the CLIs; place them explicitly.
@@ -79,6 +82,14 @@
       mkdir -p $out/lib
       cp -d libggml* $out/lib/ 2>/dev/null || true
       runHook postInstall
+    '';
+
+    preFixup = ''
+      for f in $out/bin/* $out/lib/*; do
+        if [ -f "$f" ] && [ -x "$f" ]; then
+          patchelf --shrink-rpath --allowed-rpath-prefixes "/nix/store" "$f" 2>/dev/null || true
+        fi
+      done
     '';
 
     meta = {

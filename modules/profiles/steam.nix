@@ -170,6 +170,10 @@ in {
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
     gamescopeSession.enable = true;
+    extraPackages = with pkgs; [
+      psmisc
+      pulseaudio
+    ];
   };
 
   programs.gamemode.enable = true;
@@ -178,6 +182,8 @@ in {
     deckSessionSwitch
     steamosSessionSelect
     returnToGamemodeDesktop
+    pkgs.psmisc
+    pkgs.pulseaudio
   ];
 
   environment.sessionVariables = {

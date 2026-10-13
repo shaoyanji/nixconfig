@@ -205,6 +205,7 @@ in {
     ../../modules/services/ups-simulation-drill.nix
     ../../modules/services/sqlite-maintenance.nix
     ../../modules/services/paperless-watchdog.nix
+    ../../modules/services/kiwix-watchdog.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -495,5 +496,16 @@ in {
     maxStallMinutes = 20;
     schedule = "hourly";
     failOnStall = false; # alert/log without failing unit
+  };
+
+  # Declarative Kiwix offline library integrity & search health probe (EXP-040)
+  # Verifies ZIM archives readability and benchmarks full-text search responsiveness.
+  services.kiwixWatchdog = {
+    enable = true;
+    endpoint = "http://127.0.0.1:8088";
+    libraryFile = "/var/lib/kiwix/library.xml";
+    testQueries = ["NixOS" "Btrfs" "Linux"];
+    schedule = "daily";
+    failOnSearchError = true;
   };
 }

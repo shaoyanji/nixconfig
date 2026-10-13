@@ -200,6 +200,7 @@ in {
   imports = [
     ../../modules/services/fleet-monitors.nix
     ../../modules/services/agent-scheduler.nix
+    ../../modules/services/btrfs-watchdog.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -433,5 +434,15 @@ in {
         workingDirectory = "/home/devji";
       };
     };
+  };
+
+  # Declarative Btrfs silent corruption & device error watchdog (EXP-022)
+  # Periodically inspects kernel Btrfs device stats counters across the SSD
+  # root partition (/dev/sdb3) and the HDD data pool (/dev/sda2).
+  services.btrfsWatchdog = {
+    enable = true;
+    mounts = ["/" "/Volumes/data"];
+    interval = "hourly";
+    failOnErrors = true;
   };
 }

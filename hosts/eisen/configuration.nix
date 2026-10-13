@@ -22,7 +22,7 @@
 #
 # Storage: /mnt/steam = sda (931.5G HDD, btrfs+zstd) — Steam library, live.
 # Future:  16 TB HDD → /mnt/media (media library) when the drive arrives.
-{pkgs, ...}: let
+{pkgs, lib, ...}: let
   user = import ../../modules/global/user.nix;
 in {
   imports = [
@@ -85,11 +85,13 @@ in {
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
-    # `--accept-dns=true` and `--accept-routes=true` are already declared by
-    # modules/profiles/desktop-client.nix (extraSetFlags is a merged list).
-    # Repeating `--accept-dns` here made tailscaled-set fail with "flag
-    # provided multiple times" once tailscale 1.102.5 began rejecting
-    # duplicate booleans, which aborted the whole `nixos-rebuild switch`.
+    # eisen is physically on 192.168.3.0/24 (LAN). Accepting the tailnet's
+    # advertised 192.168.3.0/24 subnet route causes table 52 to hijack all
+    # direct LAN traffic (e.g. Steam Link at 192.168.3.48), breaking local streaming.
+    extraSetFlags = lib.mkForce [
+      "--accept-dns=true"
+      "--accept-routes=false"
+    ];
   };
 
   # Pi-hole DNS via the tailnet: resolve through frieren's FTL (its

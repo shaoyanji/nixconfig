@@ -26,6 +26,13 @@ import resource
 import argparse
 from typing import Dict, List, Any, Optional, Tuple
 
+# Stopwords filtered during semantic keyword alignment
+STOPWORDS = {
+    "a", "an", "and", "are", "as", "at", "be", "by", "for", "from",
+    "has", "he", "in", "is", "it", "its", "of", "on", "or", "that",
+    "the", "to", "was", "were", "will", "with"
+}
+
 # Architecture Profiles
 PROFILES = {
     "julia-1": {
@@ -75,7 +82,7 @@ class DecisionEngine:
 
     def _hash_embed(self, text: str, dim: int = 128) -> List[float]:
         """Deterministic lightweight feature projection for offline semantic scoring."""
-        tokens = re.findall(r"\w+", text.lower())
+        tokens = re.findall(r"[a-zA-Z0-9]+", text.lower())
         vec = [0.0] * dim
         for i, token in enumerate(tokens):
             h = int(hashlib.sha256(token.encode("utf-8")).hexdigest(), 16)
@@ -98,12 +105,14 @@ class DecisionEngine:
             options = options[:self.profile["max_options"]]
 
         state_emb = self._hash_embed(f"{state}\nQuestion: {question}")
+        state_tokens = set(re.findall(r"[a-zA-Z0-9]+", state.lower()))
         scores = []
         for opt in options:
             opt_emb = self._hash_embed(opt)
             sim = self._cosine_similarity(state_emb, opt_emb)
             # Add semantic bias based on keyword match
-            kw_match = sum(1 for w in opt.lower().split() if w in state.lower())
+            opt_words = opt.lower().replace("_", " ").replace("-", " ").split()
+            kw_match = sum(1 for w in opt_words if w not in STOPWORDS and w in state_tokens)
             scores.append(sim * 2.5 + kw_match * 0.4)
 
         probs = softmax(scores, self.temperature)

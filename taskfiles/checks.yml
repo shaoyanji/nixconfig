@@ -424,6 +424,33 @@ tasks:
           exit 1
         fi
 
+  checks:tls:watchdog:
+    desc: Audit Nginx SSL/TLS certificate expiration and endpoint validity (EXP-050)
+    summary: >
+      Invokes tls-cert-watchdog to inspect local certificate files and declared HTTPS
+      endpoints, asserting remaining valid days against warning and critical thresholds.
+    cmds:
+      - |
+        if command -v tls-cert-watchdog >/dev/null 2>&1; then
+          tls-cert-watchdog
+        else
+          echo "tls-cert-watchdog command not found in PATH" >&2
+          exit 1
+        fi
+
+  checks:decision:triage:
+    desc: Run System One decision triage on SYSTEM.md and HANDOFF.md (Julia-1 & Laya)
+    summary: >
+      Invokes systemone-decision to evaluate system scorecard health and strategic
+      queue priorities using non-autoregressive decision models.
+    cmds:
+      - |
+        if command -v systemone-decision >/dev/null 2>&1; then
+          systemone-decision --model julia-1 triage-system /home/devji/SYSTEM.md
+        else
+          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/engine.py --model julia-1 triage-system /home/devji/SYSTEM.md
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

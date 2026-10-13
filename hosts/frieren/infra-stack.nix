@@ -208,6 +208,7 @@ in {
     ../../modules/services/kiwix-watchdog.nix
     ../../modules/services/postgres-pgvector-audit.nix
     ../../modules/services/fleet-session-reaper.nix
+    ../../modules/services/postgres-backup-drill.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -531,5 +532,15 @@ in {
     preserveMultiplexers = true;
     dryRun = false;
     schedule = "hourly";
+  };
+
+  # Declarative PostgreSQL logical backup verification drill (EXP-042)
+  # Ephemerally restores nightly pg_dump snapshots to verify recoverability and row counts.
+  services.postgresBackupDrill = {
+    enable = true;
+    backupDir = "/srv/backup/postgresql";
+    databases = ["immich"];
+    assertMinimumTables = 20;
+    schedule = "Sun *-*-* 06:00:00"; # strictly after 03:00-05:30 backup window
   };
 }

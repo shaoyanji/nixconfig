@@ -1641,8 +1641,11 @@ with zero bytes leaked onto `enp1s0`.
 
 ## EXP-044 — Declarative Flake Lock Drift & Security Advisory Audit Unit (`services.flakeAdvisoryAudit`)
 
-**Mode:** scheduled background audit of `flake.lock` package pins against known CVE vulnerability advisories.
-**Status:** design study. Motivated by proactive security posture across 24/7 internet-exposed mainframe services.
+**Mode:** scheduled background audit of `flake.lock` package pins against known CVE vulnerability advisories and staleness ceilings.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/flake-advisory-audit.nix`
+(`services.flakeAdvisoryAudit`) on frieren, running weekly outside the backup window, inspecting all 22 flake
+inputs, asserting strict freshness (< 14 days) on critical security pins (`nixpkgs`, `home-manager`, `sops-nix`),
+and categorizing archival/stale inputs with 0 blocking errors.
 
 **Use case.** frieren serves as the fleet mainframe, exposing services to the local LAN and Tailscale mesh. While NixOS guarantees
 declarative reproducibility, pinned package versions in `flake.lock` gradually accrete known security vulnerabilities between channel
@@ -2073,6 +2076,40 @@ services.paperlessOcrAudit = {
 **Why it is not prod.** Generating test OCR recognition runs consumes CPU cycles. Must run during off-peak hours and test compact
 synthetic snippets. Exit criteria: scheduled unit asserts all declared language traineddata files exist, validates 100% character
 accuracy on test snippets in < 2 seconds, and alerts if a language model is missing.
+
+---
+
+## EXP-057 — Declarative Linux Kernel TCP BBRv3 & Bufferbloat Mitigation Tuner (`profiles.networkBufferbloatTuner`)
+
+**Mode:** kernel socket buffer optimization, Fair Queuing (`fq`) packet scheduling, and BBR congestion control on 1 GbE wired interface.
+**Status:** design study. Motivated by eliminating jitter and bufferbloat during concurrent media streaming and multi-gigabyte backups.
+
+**Use case.** frieren serves as the fleet NAS and streaming server, concurrently running high-bandwidth Restic backup uploads,
+NFS file transfers, and 4K Jellyfin streaming over its single 1 GbE wired interface (`enp1s0`). Under standard Linux Cubic congestion
+control and default FIFO queuing, saturating throughput creates severe bufferbloat: latency spikes from 0.4ms to 120ms+, inducing
+dropped audio frames on TV playback and stalling real-time SimpleX WebSocket responses. A declarative network profile enables
+Linux kernel TCP BBR congestion control (`net.ipv4.tcp_congestion_control = "bbr"`), applies Fair Queuing (`net.core.default_qdisc = "fq"`),
+and tunes receive/transmit buffer memory limits (`tcp_rmem`, `tcp_wmem`), maintaining sub-2ms network latency even under saturated line rate.
+
+**Module shape.**
+
+```nix
+profiles.networkBufferbloatTuner = {
+  enable = true;
+  congestionControl = "bbr"; # "bbr" | "bbr3" | "cubic"
+  defaultQdisc = "fq"; # "fq" | "fq_codel" | "cake"
+  targetInterface = "enp1s0";
+  maxBufferBloatLatencyMs = 5.0;
+  benchmarkOnActivation = true;
+};
+```
+
+**Evidence.** Kernel 6.12 is running on frieren. `sysctl net.ipv4.tcp_congestion_control` is currently `cubic`.
+`sysctl net.core.default_qdisc` is currently `fq_codel`.
+
+**Why it is not prod.** Changing global TCP congestion control affects all WAN and Tailscale traffic. Must verify compatibility
+with Tailscale WireGuard encapsulation and ensure zero packet drops on local 1 GbE switch. Exit criteria: sustained 940 Mbps iperf3
+stream sustains < 3.0ms ping latency to the local router, eliminating media playback stutter.
 
 ---
 

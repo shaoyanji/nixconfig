@@ -197,7 +197,10 @@
     fi
   '';
 in {
-  imports = [../../modules/services/fleet-monitors.nix];
+  imports = [
+    ../../modules/services/fleet-monitors.nix
+    ../../modules/services/agent-scheduler.nix
+  ];
 
   # --- monitors as code (HC-6) ---
   # Nothing was watched before this: Uptime-Kuma had 0 monitors and Kuma's own
@@ -411,59 +414,24 @@ in {
     wantedBy = ["default.target"];
   };
 
-  # Nightly Antigravity Handoff Runner (3:00 AM)
-  systemd.user.services.agy-nightly-handoff = {
-    description = "Run /home/devji/HANDOFF.md with Antigravity if present, then delete";
-    after = ["network.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      WorkingDirectory = "/home/devji";
-      Environment = [
-        "HOME=/home/devji"
-        "USER=devji"
-        "PATH=/home/devji/.nix-profile/bin:/etc/profiles/per-user/devji/bin:/run/current-system/sw/bin:/home/devji/.local/bin"
-        "SHELL=/run/current-system/sw/bin/bash"
-      ];
-      ExecStart = "${agyHandoffRunner}";
-      StandardOutput = "journal";
-      StandardError = "journal";
+  # Declarative Agent Scheduler (EXP-016)
+  services.agentScheduler = {
+    enable = true;
+    jobs = {
+      agy-nightly-handoff = {
+        name = "agy-nightly-handoff";
+        description = "Run /home/devji/HANDOFF.md with Antigravity if present, then delete";
+        schedule = "*-*-* 03:00:00";
+        command = agyHandoffRunner;
+        workingDirectory = "/home/devji";
+      };
+      agy-nightly-system = {
+        name = "agy-nightly-system";
+        description = "Run /home/devji/SYSTEM.md with Antigravity if present, then delete";
+        schedule = "*-*-* 05:00:00";
+        command = agySystemRunner;
+        workingDirectory = "/home/devji";
+      };
     };
-  };
-
-  systemd.user.timers.agy-nightly-handoff = {
-    description = "Check and run /home/devji/HANDOFF.md nightly at 3 AM";
-    timerConfig = {
-      OnCalendar = "*-*-* 03:00:00";
-      Persistent = true;
-    };
-    wantedBy = ["timers.target"];
-  };
-
-  # Daily 5:00 AM Antigravity System Maintenance Runner (SYSTEM.md)
-  systemd.user.services.agy-nightly-system = {
-    description = "Run /home/devji/SYSTEM.md with Antigravity if present, then delete";
-    after = ["network.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      WorkingDirectory = "/home/devji";
-      Environment = [
-        "HOME=/home/devji"
-        "USER=devji"
-        "PATH=/home/devji/.nix-profile/bin:/etc/profiles/per-user/devji/bin:/run/current-system/sw/bin:/home/devji/.local/bin"
-        "SHELL=/run/current-system/sw/bin/bash"
-      ];
-      ExecStart = "${agySystemRunner}";
-      StandardOutput = "journal";
-      StandardError = "journal";
-    };
-  };
-
-  systemd.user.timers.agy-nightly-system = {
-    description = "Check and run /home/devji/SYSTEM.md daily at 5 AM";
-    timerConfig = {
-      OnCalendar = "*-*-* 05:00:00";
-      Persistent = true;
-    };
-    wantedBy = ["timers.target"];
   };
 }

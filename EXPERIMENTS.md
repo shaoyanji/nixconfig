@@ -1424,7 +1424,10 @@ simulated disk saturation, and logs a full audit trail.
 ## EXP-038 — Headless Paperless-ngx Document Ingestion Watchdog & Pipeline Health Probe (`services.paperlessWatchdog`)
 
 **Mode:** automated background inspection of document ingestion directories and asynchronous OCR worker queues.
-**Status:** design study. Motivated by avoiding silent pipeline deadlocks in `/srv/data/paperless/consume`.
+**Status:** **GRADUATED (2026-10-13)**. Deployed in production as `modules/services/paperless-watchdog.nix`
+(`services.paperlessWatchdog`) on frieren, inspecting `/var/lib/paperless/consume` hourly, detecting stalled,
+un-ingested, or empty 0-byte ghost PDFs, and verifying operational health across `paperless-consumer`, `paperless-web`,
+and `paperless-task-queue`.
 
 **Use case.** Paperless-ngx ingests documents scanned from network printers, mobile phones, and automated receipt scripts into its consume
 directory (`/srv/data/paperless/consume`). If an unreadable, corrupted, or password-protected PDF is dropped into the consume directory,
@@ -1438,11 +1441,15 @@ file name to journald, and emit an alert to `#Fleet`.
 ```nix
 services.paperlessWatchdog = {
   enable = true;
-  consumeDir = "/srv/data/paperless/consume";
+  consumeDir = "/var/lib/paperless/consume";
   maxStallMinutes = 20;
-  interval = "30m";
-  checkCeleryWorker = true;
-  alertOnStalledFiles = true;
+  schedule = "hourly";
+  checkServices = [
+    "paperless-consumer"
+    "paperless-web"
+    "paperless-task-queue"
+  ];
+  failOnStall = false;
 };
 ```
 
@@ -1487,6 +1494,175 @@ has IP `100.97.61.65`.
 that flood Wi-Fi interfaces and degrade network throughput. Requires strict duplicate-detection filters and packet TTL clamping. Exit
 criteria: a remote laptop connected exclusively via Tailscale successfully resolves `frieren.local` and auto-discovers the Jellyfin
 server without manually specifying an IP address.
+
+---
+
+## EXP-040 — Autonomous Kiwix ZIM Library Integrity & Full-Text Search Health Probe (`services.kiwixWatchdog`)
+
+**Mode:** background validation of offline Kiwix ZIM archive readability and search index responsiveness for `/Volumes/data/kiwix/`.
+**Status:** design study. Motivated by preventing silent HTTP 500 errors on 19.2M Wikipedia and 14.5k ArchWiki articles.
+
+**Use case.** frieren hosts the fleet's offline knowledge repository (`kiwix-serve` on port 8088 / `wiki.frieren.lan`), serving
+monolithic multi-gigabyte `.zim` archives (`wikipedia_en_all_maxi`, `archlinux_en_all`). ZIM files are complex compressed clusters.
+When Btrfs silent corruption occurs or incomplete downloads land in `/Volumes/data/kiwix`, `kiwix-serve` continues running as an active
+systemd service, but individual article queries and full-text searches fail with internal server errors or empty search results.
+A declarative watchdog unit runs daily outside the backup window: it tests random article lookups, verifies HTTP 200 responses from
+`wiki.frieren.lan`, and performs benchmark queries against `wikisearch` (`wikisearch-nix`), ensuring knowledge availability during network blackouts.
+
+**Module shape.**
+
+```nix
+services.kiwixWatchdog = {
+  enable = true;
+  schedule = "*-*-* 02:00:00";    # before 03:00 backup window
+  zimDir = "/Volumes/data/kiwix";
+  testQueries = [ "NixOS" "Btrfs" "Linux" ];
+  endpoint = "http://127.0.0.1:8088";
+  failOnSearchError = true;
+};
+```
+
+**Evidence.** `kiwix-serve` is active on frieren (`systemctl is-active kiwix-serve`). Archives are located in `/Volumes/data/kiwix/`.
+The Aki portal and dashboard link to `wiki.frieren.lan`.
+
+**Why it is not prod.** Full-text indexing queries across a 100 GB ZIM archive can induce heavy random disk reads on `/dev/sda2` (2TB HDD)
+if un-cached. Probes must be rate-limited and pinned to small sampled queries. Exit criteria: scheduled unit verifies HTTP 200 and valid
+HTML search payloads across 3 sample terms in < 1.5 seconds, failing cleanly if a corrupted ZIM stub is introduced.
+
+---
+
+## EXP-041 — Declarative Jellyfin Hardware Transcoding Priority & Throttle Manager (`services.jellyfinGpuGovernor`)
+
+**Mode:** dynamic nice/cgroup I/O throttling and QuickSync concurrency limits during parallel batch jobs.
+**Status:** design study. Motivated by avoiding GPU/disk contention during 4K TV video playback.
+
+**Use case.** frieren is connected directly to a Philips 65" 4K TV over HDMI (`3840x2160 @ 30 Hz`) and serves Jellyfin media streams
+via Intel UHD 620 QuickSync hardware transcoding (`/dev/dri/renderD128`). Concurrently, frieren runs heavy background batch compute:
+Paperless OCR, Immich face recognition, Kiwix full-text search indexing, and LLM agent planning sessions. When batch workers spin up,
+memory bus bandwidth and GPU execution units become saturated, inducing video playback stutter and dropped frames on the living room display.
+A GPU governor monitors active Jellyfin playback sessions via the Jellyfin local REST API: when an active transcode or direct playback session
+is detected, the governor dynamically lowers batch service cgroup weights (`CPUWeight=10`, `IOWeight=10`) and throttles background FFmpeg jobs.
+
+**Module shape.**
+
+```nix
+services.jellyfinGpuGovernor = {
+  enable = true;
+  jellyfinUrl = "http://127.0.0.1:8096";
+  throttledServices = [ "paperless-task-queue" "immich-machine-learning" ];
+  idleCpuWeight = 10;
+  activePlaybackPriority = "realtime";
+  pollIntervalSec = 15;
+};
+```
+
+**Evidence.** `/dev/dri/renderD128` is actively mapped in `media-stack.nix`. Jellyfin runs on port 8096. Hardware profile: Intel UHD 620
+(Kaby Lake R, 24 EUs).
+
+**Why it is not prod.** Polling the Jellyfin API every 15 seconds requires handling authentication tokens and transient service restarts
+without spamming error logs. Exit criteria: simulated Paperless OCR load (`tesseract`) automatically yields CPU/GPU slices when a 4K
+playback session starts in Jellyfin, sustaining 0 dropped frames.
+
+---
+
+## EXP-042 — Declarative PostgreSQL Logical Backup Verification Drill (`services.postgresBackupDrill`)
+
+**Mode:** non-destructive automated test restoration of nightly `pg_dump` snapshots in an ephemeral PostgreSQL cluster.
+**Status:** design study. Motivated by proving database recoverability before disaster strikes.
+
+**Use case.** frieren runs nightly `postgresqlBackup-immich.service` at 03:00, writing SQL dumps to `/srv/backup/postgresql`.
+While `pg_dump` exits with code 0 and collation catalogs are aligned (EXP-020), a backup that has never been restored is merely a hypothesis.
+Corrupted dump files, missing PostgreSQL extensions (e.g. `vector` / `vchord`), or schema version incompatibilities can cause `pg_restore`
+to fail during real disaster recovery. A declarative drill unit spins up a temporary, isolated PostgreSQL instance inside a private tmpfs mount,
+restores the latest `immich` dump, asserts row counts across core tables (`assets`, `users`), runs `REINDEX`, and unmounts the tmpfs instance,
+proving recoverability weekly.
+
+**Module shape.**
+
+```nix
+services.postgresBackupDrill = {
+  enable = true;
+  schedule = "Sun *-*-* 06:00:00"; # after 03:00-05:30 backup window
+  backupDir = "/srv/backup/postgresql";
+  databases = [ "immich" ];
+  assertMinimumTables = 20;
+  maxRuntimeMinutes = 10;
+};
+```
+
+**Evidence.** Verified on frieren (2026-10-13): `postgresqlBackup-immich.service` completed in 3.4 seconds (155 MB database).
+NixOS provides `pkgs.postgresql_17` to spin up ephemeral cluster directories via `initdb`.
+
+**Why it is not prod.** Running a secondary PostgreSQL instance requires allocating ephemeral TCP ports or isolated UNIX sockets, and must
+be strictly bounded in memory so it does not compete with production services. Exit criteria: weekly drill restores the 155 MB Immich dump into
+tmpfs in < 20 seconds, verifies table counts, and cleans up with zero traces left on disk.
+
+---
+
+## EXP-043 — Autonomous Network Namespace Sandboxing for Headless Torrents (`profiles.transmissionVpnJail`)
+
+**Mode:** deterministic network namespace binding routing Transmission traffic exclusively through WireGuard with kill-switch assertions.
+**Status:** design study. Motivated by preventing accidental IP leakage during open-source ISO distribution and media transfers.
+
+**Use case.** Transmission daemon runs on frieren for background Linux ISO distribution and media downloading. Currently, it binds host
+network interfaces under ingress firewall filtering. In privacy-conscious architectures, torrent traffic must route exclusively through an
+isolated encrypted WireGuard VPN tunnel with an absolute kill-switch: if the VPN interface drops, traffic must drop rather than spilling
+onto the plain ISP network uplink. A dedicated profile constructs a dedicated Linux network namespace (`netns: transmission`), binds the
+Transmission daemon strictly inside the namespace, and routes default gateway traffic over the VPN interface with zero possibility of host leakage.
+
+**Module shape.**
+
+```nix
+profiles.transmissionVpnJail = {
+  enable = true;
+  namespaceName = "vpn-jail";
+  wireguardConfigFile = config.sops.secrets.vpn_wireguard_conf.path;
+  allowLanPeerDiscovery = false;
+  killSwitch = true;
+  forwardedPort = 51413;
+};
+```
+
+**Evidence.** Transmission daemon runs on frieren under `transmission.service`. Kernel network namespaces (`ip netns`) are natively
+supported in Linux 6.12+.
+
+**Why it is not prod.** Requires provisioning a commercial VPN WireGuard peer config, SOPS secret keying, and handling inter-namespace
+communication so local web UIs (e.g. `http://transmission.frieren.lan/`) can still communicate with the daemon inside the namespace.
+Exit criteria: Transmission runs entirely within `netns`, external IP matches VPN egress, and pulling the VPN link instantly stalls downloads
+with zero bytes leaked onto `enp1s0`.
+
+---
+
+## EXP-044 — Declarative Flake Lock Drift & Security Advisory Audit Unit (`services.flakeAdvisoryAudit`)
+
+**Mode:** scheduled background audit of `flake.lock` package pins against known CVE vulnerability advisories.
+**Status:** design study. Motivated by proactive security posture across 24/7 internet-exposed mainframe services.
+
+**Use case.** frieren serves as the fleet mainframe, exposing services to the local LAN and Tailscale mesh. While NixOS guarantees
+declarative reproducibility, pinned package versions in `flake.lock` gradually accrete known security vulnerabilities between channel
+upgrades. A declarative advisory audit module evaluates locked flake inputs against the Nixpkgs security advisory database or `vulnix` weekly:
+it categorizes findings by CVSS score, highlights CVEs affecting exposed network services (Nginx, Pi-hole FTL, SimpleX SMP, Vaultwarden),
+and posts an audit summary to `#Fleet`.
+
+**Module shape.**
+
+```nix
+services.flakeAdvisoryAudit = {
+  enable = true;
+  schedule = "Sun *-*-* 05:45:00"; # outside backup window
+  flakeUri = "/srv/data/projects/nixconfig";
+  minCvssScore = 7.0;             # report High and Critical only
+  targetHosts = [ "frieren" ];
+  notifySimpleX = true;
+};
+```
+
+**Evidence.** frieren's flake lock is located at `/srv/data/projects/nixconfig/flake.lock`. `vulnix` and `nix-eval-jobs` are available
+in `pkgs`.
+
+**Why it is not prod.** Full-closure vulnerability scans across large systems can be compute-intensive and can emit numerous false positives
+for un-invoked library dependencies. Requires whitelist filtering for acknowledged or mitigated advisories. Exit criteria: scheduled scan
+runs in < 45 seconds, successfully detects known test CVEs, and reports 0 false positives for core infrastructure services.
 
 ---
 

@@ -201,6 +201,7 @@ in {
     ../../modules/services/fleet-monitors.nix
     ../../modules/services/agent-scheduler.nix
     ../../modules/services/btrfs-watchdog.nix
+    ../../modules/services/uds-static-bridge.nix
   ];
 
   # --- monitors as code (HC-6) ---
@@ -444,5 +445,12 @@ in {
     mounts = ["/" "/Volumes/data"];
     interval = "hourly";
     failOnErrors = true;
+  };
+
+  # Zero-TCP static documentation bridge via UNIX domain sockets (EXP-024)
+  # Serves immutable Aki fleet docs natively over unix:/run/uds-docs/docs.sock
+  services.udsStaticBridge = {
+    enable = true;
+    socketPath = "/run/uds-docs/docs.sock";
   };
 }

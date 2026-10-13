@@ -289,6 +289,26 @@ tasks:
           sudo btrfs device stats / && sudo btrfs device stats /Volumes/data
         fi
 
+  checks:uds:docs:
+    desc: Verify the zero-TCP static documentation bridge over UNIX domain socket (EXP-024)
+    summary: >
+      Sends an HTTP request over unix:/run/uds-docs/docs.sock using curl --unix-socket.
+      Probes the Nix-store compiled Aki documentation site with zero TCP overhead and reports response timing.
+    cmds:
+      - |
+        if [ ! -S /run/uds-docs/docs.sock ]; then
+          echo "FAIL: Socket /run/uds-docs/docs.sock does not exist or is not a socket" >&2
+          exit 1
+        fi
+        TIME=$(curl -s -o /dev/null -w "%{time_total}" --unix-socket /run/uds-docs/docs.sock http://localhost/ || true)
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" --unix-socket /run/uds-docs/docs.sock http://localhost/ || true)
+        if [ "$STATUS" = "200" ]; then
+          echo "PASS: Zero-TCP static documentation bridge active at unix:/run/uds-docs/docs.sock (HTTP $STATUS, latency: $TIME s)"
+        else
+          echo "FAIL: Unexpected HTTP status $STATUS from unix:/run/uds-docs/docs.sock" >&2
+          exit 1
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

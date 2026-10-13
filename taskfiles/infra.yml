@@ -486,3 +486,33 @@ tasks:
         echo "==> Post-teardown HTTP status: $HTTP_CODE (expected: 504)"
 
         echo "==> EXP-102 Canary microVM Model B dogfood test passed successfully!"
+
+  vm:canary:ssh:
+    desc: Open interactive SSH shell into frieren-canary microVM
+    cmds:
+      - |
+        if ! ssh -o BatchMode=yes -o ConnectTimeout=1 frieren-canary "true" >/dev/null 2>&1; then
+          echo "Error: frieren-canary is not responding to SSH. Launch it with: task vm:canary:run" >&2
+          exit 1
+        fi
+        ssh -t frieren-canary "bash -l"
+
+  vm:canary:agent:
+    desc: Execute subzeroclaw agent task inside frieren-canary microVM (e.g. task vm:canary:agent -- "prompt")
+    cmds:
+      - |
+        if ! ssh -o BatchMode=yes -o ConnectTimeout=1 frieren-canary "true" >/dev/null 2>&1; then
+          echo "Error: frieren-canary is not responding to SSH. Launch it with: task vm:canary:run" >&2
+          exit 1
+        fi
+        ssh -t frieren-canary subzeroclaw {{if .CLI_ARGS}}{{.CLI_ARGS | q}}{{else}}"echo Hello World from inside the MicroVM sandbox"{{end}}
+
+  vm:canary:stop:
+    desc: Gracefully shut down frieren-canary microVM
+    cmds:
+      - |
+        echo "==> Shutting down frieren-canary microVM..."
+        ssh -o BatchMode=yes -o ConnectTimeout=2 frieren-canary "sudo systemctl poweroff" 2>/dev/null || true
+        sleep 1
+        sudo pkill -f 'microvm@frieren-canary' 2>/dev/null || true
+        echo "==> Canary microVM stopped."

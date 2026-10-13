@@ -338,6 +338,21 @@ tasks:
           exit 1
         fi
 
+  checks:paperless:watchdog:
+    desc: Inspect Paperless-ngx document ingestion queue and pipeline health (EXP-038)
+    summary: >
+      Invokes paperless-watchdog to check operational status across all Paperless
+      systemd services and inspect /var/lib/paperless/consume for stalled, un-ingested,
+      or empty ghost files older than the threshold.
+    cmds:
+      - |
+        if command -v paperless-watchdog >/dev/null 2>&1; then
+          sudo paperless-watchdog
+        else
+          echo "paperless-watchdog command not found in PATH" >&2
+          exit 1
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

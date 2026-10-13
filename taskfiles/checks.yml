@@ -396,6 +396,20 @@ tasks:
           exit 1
         fi
 
+  checks:postgres:drill:
+    desc: Non-destructive ephemeral PostgreSQL logical backup restore drill (EXP-042)
+    summary: >
+      Invokes postgres-backup-drill to spin up an isolated tmpfs cluster, restore
+      nightly pg_dump snapshots, and verify table schema counts and entity integrity.
+    cmds:
+      - |
+        if command -v postgres-backup-drill >/dev/null 2>&1; then
+          sudo -u postgres postgres-backup-drill
+        else
+          echo "postgres-backup-drill command not found in PATH" >&2
+          exit 1
+        fi
+
   checks:status:
     desc: Show task and git status
     cmds:

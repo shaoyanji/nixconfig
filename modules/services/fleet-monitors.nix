@@ -26,10 +26,16 @@
 }: let
   cfg = config.services.fleetMonitors;
 
-  # Conditions are emitted only when the caller sets them. gatus applies a
-  # type-appropriate default per scheme (e.g. `[CONNECTED] == true` for `tcp://`),
-  # and inventing placeholder conditions here is exactly how a generated config
-  # fails validation at service start.
+  # gatus requires at least one condition per endpoint. If none are specified,
+  # supply type-appropriate defaults based on the URL scheme.
+  defaultConditions = url:
+    if lib.hasPrefix "tcp://" url then
+      ["[CONNECTED] == true"]
+    else if lib.hasPrefix "icmp://" url then
+      ["[CONNECTED] == true"]
+    else
+      ["[STATUS] < 400"];
+
   toEndpoint = e:
     {
       inherit (e) name url;
@@ -37,9 +43,12 @@
         if e.interval != null
         then e.interval
         else cfg.interval;
+      conditions =
+        if e.conditions != null
+        then e.conditions
+        else defaultConditions e.url;
     }
-    // lib.optionalAttrs (e.group != null) {inherit (e) group;}
-    // lib.optionalAttrs (e.conditions != null) {inherit (e) conditions;};
+    // lib.optionalAttrs (e.group != null) {inherit (e) group;};
 in {
   options.services.fleetMonitors = {
     enable = lib.mkEnableOption "config-declared fleet monitors (gatus backend)";

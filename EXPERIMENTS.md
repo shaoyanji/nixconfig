@@ -3290,18 +3290,27 @@ services.oomEarlyWarning = {
 
 ---
 
-## EXP-100 — Declarative Consolidated Fleet Governor & Self-Repair Orchestrator (`services.fleetGovernor`)
+## EXP-100 — Declarative Consolidated Fleet Governor & 3-Tier Escalation Router (`services.fleetGovernor`)
 
-**Mode:** Julia-1 (144M) and Laya (421M) Kelly-gated consensus reflex tier triggering deterministic runtime auto-repair actions and automatic strategic handoff.  
-**Status:** **GRADUATED & DEPLOYED (2026-10-13)**. Deployed in production as `modules/services/fleet-governor.nix` (`services.fleetGovernor`) on frieren, consolidating 7 fragmented watchdog daemons (`btrfs-watchdog`, `sqlite-maintenance`, `paperless-watchdog`, `kiwix-watchdog`, `postgres-pgvector-audit`, `flake-advisory-audit`, `tls-cert-watchdog`) into a single hourly self-repair governor.
+**Mode:** 3-Tier Escalation Router partitioning fleet operations into System 0 (Pure CLI/JSON), System 1 (Kelly-gated Dual Reflex Arbiter), and System 2 (Investigative Deliberation & Strategic Handoff).  
+**Status:** **GRADUATED & DEPLOYED (2026-10-13)**. Deployed in production on frieren (Generation 109) as `modules/services/fleet-governor.nix` (`services.fleetGovernor`). Consolidates fragmented watchdogs into a single structured router with declarative Nix options.
 
-**Use case.** Proliferation of monitoring-only daemons created scheduler sprawl without executing actual runtime repairs. `services.fleetGovernor`:
-* Evaluates all fleet subsystems (SQLite WAL, QuickSync thermals, Btrfs I/O errors, Paperless ingestion, Kiwix health, PSI memory, Flake security) in **~25 ms** on CPU using Julia-1 + Laya in series.
-* Employs the Kelly consensus criterion ($K = P - \frac{1-P}{b}$): when dual models agree and $K > 0$, auto-routes directly to deterministic runtime fixes (`PRAGMA wal_checkpoint(TRUNCATE)`, powersave thermal downclocking, emergency read-only snapshots, ghost PDF quarantine).
-* Consumes **0 System 2 LLM tokens**, preserving 100% of the weekly Nemotron quota.
-* Automatically writes un-remediated or ambiguous anomalies directly to `/home/devji/HANDOFF.md` for Antigravity's scheduled nightly runs.
+**Three-Tier Architecture:**
+1. **Tier 0 — System 0 (S0) Pure Deterministic CLI & Isolated Playbooks (0 inference, 0 tokens, < 50ms):**
+   * Evaluates CLI status and direct metrics: Kiwix HTTP probe, Harmonia cache probe, Paperless ghost PDF quarantine, idle SQLite WAL checkpoints, nominal thermals (< 76°C), nominal PSI memory (< 15%), and clean Btrfs error counts.
+   * Resolves 1:1 deterministic repairs without activating neural model weights.
+2. **Tier 1 — System 1 (S1) Multi-Resource Trade-off Arbiter (Julia-1 144M + Laya 421M in series):**
+   * Invoked **only** when competing resource collisions occur:
+     * Package thermals (≥ 76°C) vs 65" 4K TV Wayland (`niri`) / Jellyfin playback continuity.
+     * Memory stall PSI (> 15%) vs database buffer cache retention on HDD data pool (`/dev/sda2`).
+     * Concurrent SQLite transaction write bursts vs WAL truncation.
+   * Gated by Kelly criterion ($K = P - \frac{1-P}{b} > 0$): auto-executes approved trade-off repairs. 0 LLM tokens consumed.
+3. **Tier 2 — System 2 (S2) High-Entropy Investigative Loop (Nemotron Schema Harness via Ollama):**
+   * Invoked **only** on novel anomalies, hardware degradation (Btrfs I/O or corruption errors > 0), or Kelly consensus splits ($K \le 0$).
+   * Guarded by `allowSystem2` policy: when False (default), executes deterministic emergency containment (read-only snapshot, pause torrent writes) and appends directly to `/home/devji/HANDOFF.md`, preserving 100% of weekly quota.
+   * When True, executes schema-constrained operational primitives via Python allowlist dispatcher (`btrfs_snapshot_ro`, `systemctl_restart`, `quarantine_file`) while strictly blocking protected targets (`niri`, `jellyfin`, `sshd`, `systemd`).
 
-**Module shape.**
+**Declarative Module Shape:**
 
 ```nix
 services.fleetGovernor = {
@@ -3309,29 +3318,49 @@ services.fleetGovernor = {
   schedule = "hourly";
   autoRepair = true;
   allowSystem2 = false; # strictly preserves weekly quota
+
+  rules = {
+    s0Deterministic = {
+      kiwix.enable = true;
+      harmonia.enable = true;
+      paperlessGhosts.enable = true;
+      sqliteIdleWal.enable = true;
+      btrfsCleanCheck.enable = true;
+      thermalNominal.thresholdC = 76.0;
+      memoryPsiNominal.psiThreshold = 15.0;
+    };
+    s1Contextual = {
+      thermalVsMedia.protectedServices = [ "niri" "jellyfin" ];
+      memoryVsCache.preferZram = true;
+      walVsConcurrency.bloatThresholdKb = 10240;
+    };
+    s2Investigative = {
+      btrfsCorruption.autoSnapshot = true;
+      flakeTransitiveCve.enable = true;
+      consensusAnomaly.emitHandoff = true;
+    };
+  };
 };
 ```
 
-**Evidence.** Verified live in systemd (`fleet-governor.service` ran in 776 ms wall clock time, 392 ms CPU time, 20.9 MB RAM). All 7 individual watchdog timers stopped and replaced.
+**Evidence.** Verified live in systemd on frieren (Generation 109, `fleet-governor.service` ran in 409 ms wall clock time, 370 ms CPU time, 22.1 MB peak RAM, 0 LLM tokens consumed, cleanly truncating idle SQLite WAL in S0 while keeping S1 and S2 dormant).
 
 ---
 
 ## EXP-101 — Structured JSON Schema Harness & Sandboxed Tool Dispatcher for System 2 (`services.nemotronSchemaHarness`)
 
 **Mode:** Grammar-constrained JSON Schema decoding via Ollama (`format: "json"`) mapping Nemotron deliberation into sandboxed operational primitives.  
-**Status:** prototyped & benchmarked live on frieren. Motivated by eliminating slow (85s) open-ended markdown generation and preventing unvetted shell execution.
+**Status:** **PROTOTYPED & INTEGRATED (2026-10-13)**. Integrated into `PreHarnessEnsemble` in `modules/services/systemone/ensemble.py` as `query_system2_schema()` and `dispatch_sandboxed_action()`.
 
 **Use case.** Standard LLM deliberation outputs conversational prose and unconstrained bash blocks requiring brittle regex safety checks. `services.nemotronSchemaHarness`:
-* Constrains Ollama's `format` parameter to a typed JSON schema with an enum of permitted operational primitives (`btrfs_snapshot_ro`, `systemctl_stop`, `systemctl_restart`, `quarantine_ingest`, `throttle_cgroup`).
+* Constrains Ollama's `format` parameter to a typed JSON schema with an enum of permitted operational primitives (`btrfs_snapshot_ro`, `systemctl_stop`, `systemctl_restart`, `quarantine_file`, `drop_caches`, `zram_compact`, `noop`).
 * Cuts evaluated tokens from 1,536 tokens down to 492 tokens (**68% token reduction**), cutting output tokens by **85%**.
-* Routes actions through a hardcoded Python allowlist dispatcher: destructive commands (`rm -rf`, `mkfs`, killing `niri`/`jellyfin`) are structurally impossible because they do not exist in the schema.
-* Extracts typed `handoff_brief` string and appends directly to `/home/devji/HANDOFF.md` for scheduled agent digestion.
+* Routes actions through a hardcoded Python allowlist dispatcher: destructive commands (`rm -rf`, `mkfs`, killing `niri`/`jellyfin`) are structurally impossible because they are rejected by invariant guards.
+* Extracts typed `handoff_summary` string and appends directly to `/home/devji/HANDOFF.md` for scheduled agent digestion.
 
 **Benchmark Ground Truth:**
 * Freeform Markdown baseline: 1,536 tokens, 85.5s latency, brittle regex parsing.
 * Schema-constrained harness: 492 tokens, 54.8s latency (1,356 chars internal thinking), 100% machine-executable typed JSON.
-
-**Why it is not prod.** Requires tuning thinking token allocation and testing non-thinking cloud models to drop latency under 5 seconds. Exit criteria: emergency incident resolved via schema tool dispatch in < 10 seconds.
 
 ---
 

@@ -124,6 +124,12 @@
           <div class="badge">aria.frieren.lan :6801</div>
         </a>
 
+        <a class="card" href="http://torrent.frieren.lan">
+          <div class="card-header"><span class="card-title">Transmission</span></div>
+          <div class="card-desc">Leech-only BitTorrent client for ISOs, datasets and open-access papers.</div>
+          <div class="badge">torrent.frieren.lan :9091</div>
+        </a>
+
         <a class="card" href="http://wiki.frieren.lan">
           <div class="card-header"><span class="card-title">Kiwix</span></div>
           <div class="card-desc">Offline Wikipedia & ArchWiki reader with full-text search.</div>
@@ -296,6 +302,23 @@ in {
         ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:8181";
+          proxyWebsockets = true;
+        };
+      };
+
+      # Transmission web UI (leech-only torrent client). RPC binds loopback
+      # only (hosts/frieren/transmission.nix); this vhost is the sole path in,
+      # so no raw :9091 LAN hole is opened. Same rationale as
+      # monitors.frieren.lan above: not a profiles.serviceExposure entry.
+      "torrent.frieren.lan" = {
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:9091";
           proxyWebsockets = true;
         };
       };

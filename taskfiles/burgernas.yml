@@ -1,0 +1,145 @@
+version: "3"
+
+vars:
+  BURGERNAS_ALIAS: "burgernas"
+  BURGERNAS_IP: "192.168.3.92"
+  BURGERNAS_MAC: "90:09:D0:06:C1:EE"
+  BURGERNAS_RESTIC_REPO: "sftp:devji@192.168.3.92:/volume1/backup/frieren/restic"
+  BURGERNAS_TX_SETTINGS: "/volume1/@appdata/transmission/settings.json"
+
+tasks:
+  burgernas:ssh:
+    desc: Open an interactive SSH shell on BurgerNAS (DS220j cold vault)
+    cmds:
+      - ssh {{.BURGERNAS_ALIAS}}
+
+  burgernas:exec:
+    desc: Run a command on BurgerNAS over SSH (agent-friendly)
+    cmds:
+      - ssh {{.BURGERNAS_ALIAS}} -- {{.CLI_ARGS}}
+
+  burgernas:push:
+    desc: Copy a local file/folder to BurgerNAS (defaults to home tmp)
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        [ -n "$SRC" ] || { echo "Usage: task burgernas:push -- <local> [remote_dest]"; exit 1; }
+        [ -n "$DEST" ] || DEST="tmp/"
+        scp -r "$SRC" "{{.BURGERNAS_ALIAS}}:$DEST"
+
+  burgernas:pull:
+    desc: Copy a remote file/folder from BurgerNAS to local (defaults to .)
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        [ -n "$SRC" ] || { echo "Usage: task burgernas:pull -- <remote> [local_dest]"; exit 1; }
+        [ -n "$DEST" ] || DEST="."
+        scp -r "{{.BURGERNAS_ALIAS}}:$SRC" "$DEST"
+
+  burgernas:wol:
+    desc: Wake BurgerNAS via Wake-on-LAN (magic packet to its eth0 MAC)
+    cmds:
+      - wakeonlan {{.BURGERNAS_MAC}}
+
+  burgernas:online:
+    desc: Wait for BurgerNAS SSH to come up after a WoL wake (timeout 120s)
+    cmds:
+      - |
+        for i in $(seq 1 60); do
+          if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/{{.BURGERNAS_IP}}/22' 2>/dev/null; then
+            echo "BurgerNAS SSH up after $((i * 2))s"; exit 0
+          fi
+          sleep 2
+        done
+        echo "ERROR: BurgerNAS did not come online within 120s" >&2; exit 1
+
+  burgernas:poweroff:
+    desc: Cleanly power off BurgerNAS (arms WoL, then powers off)
+    cmds:
+      - |
+        ssh {{.BURGERNAS_ALIAS}} 'sudo /bin/ethtool -s eth0 wol g 2>/dev/null || true; sudo /sbin/poweroff'
+
+  burgernas:status:
+    desc: BurgerNAS health — system, memory, storage, WoL and Transmission
+    cmds:
+      - |
+        echo "=== System ==="
+        ssh {{.BURGERNAS_ALIAS}} 'uname -a; uptime'
+        echo; echo "=== Memory / Swap ==="
+        ssh {{.BURGERNAS_ALIAS}} 'free -m'
+        echo; echo "=== Storage (/volume1) ==="
+        ssh {{.BURGERNAS_ALIAS}} 'df -h /volume1'
+        echo; echo "=== Wake-on-LAN ==="
+        ssh {{.BURGERNAS_ALIAS}} 'sudo -n /bin/ethtool eth0 | grep -i wake'
+        echo; echo "=== Transmission ==="
+        ssh {{.BURGERNAS_ALIAS}} 'sudo -n /bin/systemctl is-active pkgctl-transmission.service'
+
+  burgernas:info:
+    desc: BurgerNAS DSM build, shared folders and the restic repo target
+    cmds:
+      - |
+        echo "=== DSM ==="
+        ssh {{.BURGERNAS_ALIAS}} 'head -6 /etc/VERSION'
+        echo; echo "=== Shared folders ==="
+        ssh {{.BURGERNAS_ALIAS}} 'ls /volume1'
+        echo; echo "=== restic repo ==="
+        ssh {{.BURGERNAS_ALIAS}} 'ls -la /volume1/backup/frieren/restic'
+
+  burgernas:transmission:status:
+    desc: Show BurgerNAS Transmission state and the leech-only settings keys
+    cmds:
+      - |
+        ssh {{.BURGERNAS_ALIAS}} 'echo unit=$(sudo -n /bin/systemctl is-active pkgctl-transmission.service)'
+        ssh {{.BURGERNAS_ALIAS}} 'grep -E "\"(ratio-limit|ratio-limit-enabled|idle-seeding-limit|speed-limit-up|upload-slots-per-torrent|dht-enabled|pex-enabled|lpd-enabled|port-forwarding-enabled|encryption)\"" {{.BURGERNAS_TX_SETTINGS}}'
+
+  burgernas:transmission:leech:
+    desc: Apply the shared leech-only Transmission policy (needs the ~/nas credential)
+    cmds:
+      - bash scripts/task/burgernas-transmission-leech.sh
+
+  burgernas:backup:seed:
+    desc: "[frieren root] Wake BurgerNAS and run the restic seed via the systemd unit"
+    cmds:
+      - |
+        sudo systemctl start restic-backups-frieren-burgernas.service
+        echo "Started. Tail with: sudo journalctl -u restic-backups-frieren-burgernas.service -f"
+
+  burgernas:snapshot:
+    desc: "[frieren root] List snapshots in the BurgerNAS restic repository"
+    cmds:
+      - |
+        sudo RESTIC_PASSWORD_FILE=/run/secrets/restic-password restic \
+          -r {{.BURGERNAS_RESTIC_REPO}} \
+          -o sftp.command="ssh {{.BURGERNAS_ALIAS}} /usr/local/bin/sftp-server" \
+          snapshots
+
+  burgernas:menu:
+    desc: Interactive menu for BurgerNAS operations (gum)
+    cmds:
+      - |
+        action=$(printf '%s\n' \
+          "status" \
+          "info" \
+          "wake (WoL)" \
+          "poweroff" \
+          "transmission status" \
+          "transmission apply leech-only" \
+          "restic seed (frieren root)" \
+          "restic snapshots (frieren root)" \
+          "ssh" \
+          | gum filter --header "BurgerNAS ❯")
+        case "$action" in
+          "status") task burgernas:status ;;
+          "info") task burgernas:info ;;
+          "wake (WoL)") task burgernas:wol ;;
+          "poweroff") task burgernas:poweroff ;;
+          "transmission status") task burgernas:transmission:status ;;
+          "transmission apply leech-only") task burgernas:transmission:leech ;;
+          "restic seed (frieren root)") task burgernas:backup:seed ;;
+          "restic snapshots (frieren root)") task burgernas:snapshot ;;
+          "ssh") task burgernas:ssh ;;
+        esac

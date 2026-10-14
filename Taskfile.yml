@@ -48,6 +48,10 @@ includes:
         taskfile: taskfiles/bountystash.yml
         dir: .
         flatten: true
+    burgernas:
+        taskfile: taskfiles/burgernas.yml
+        dir: .
+        flatten: true
     checks:
         taskfile: taskfiles/checks.yml
         dir: .

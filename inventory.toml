@@ -1579,3 +1579,70 @@ system_prompt_hint = "You operate a Windows 11 Pro EliteBook over Tailscale Open
 compute_tier = "mobile-windows-workstation"
 allowed_tasks = ["File transfers via `task bitlockerpremium:push/pull`", "PowerShell / Nushell command execution over SSH (`task bitlockerpremium:exec`)", "Host, OS build, disk, and Tailscale status checks", "Scoop package management"]
 constraints = ["Non-Nix environment: do not run nix, nixos-rebuild, or flake commands on this host.", "sshd's DefaultShell is Windows PowerShell 5.1, so remote commands are PowerShell syntax — not sh, bash, or Nushell.", "BitLocker-encrypted NTFS only; there is no Nix store, no impermanence, and no declarative generation."]
+
+# ------------------------------------------------------------------------------
+# 9. STORAGE / COLD VAULT (NON-NIX)
+# ------------------------------------------------------------------------------
+[hosts.burgernas]
+hostname = "burgernas"
+status = "active"
+status_detail = "In active production as a non-Nix Synology DSM 7.4.1 cold-vault backup target (DS220j), woken by WoL for frieren's restic pushes and powered off daily at 22:45."
+kind = "external"
+is_nix = false
+system_type = "non-nix"
+arch = "aarch64-linux"
+role = "Cold Vault Storage Extension & Secondary Backup Target"
+category = "storage"
+desktop_environment = "headless"
+users = ["devji"]
+
+[hosts.burgernas.hardware]
+model = "Synology DiskStation DS220j"
+cpu = "Realtek RTD1296 (4x Cortex-A53 @ 1.40 GHz)"
+ram = "512 MiB DDR4 (soldered, non-expandable) + 2 GiB on-disk swap"
+storage_type = "2x 3.5\" SATA HDD (SHR / RAID-1 mirror)"
+storage_layout = "/volume1 (5.4 TiB pool, ~4.5 TiB free); restic target /volume1/backup/frieren/restic"
+
+[hosts.burgernas.network]
+lan_ip = "192.168.3.92"
+tailscale = true
+tailscale_ip = "100.72.61.23"
+tailscale_hostname = "burgernas"
+ssh_alias = "burgernas"
+domain = "https://192.168.3.92:5001"
+
+[hosts.burgernas.software]
+module_chain = "Synology DSM 7.4.1 (native, non-Nix)"
+impermanence = false
+key_services = [
+  "SFTP receiver for frieren's restic repo (/volume1/backup/frieren/restic)",
+  "Transmission 4.1.3 (SynoCommunity, leech-only torrent client on :9091)",
+  "Wake-on-LAN on eth0 (MAC 90:09:D0:06:C1:EE) + daily 22:45 power-off",
+]
+traits = [
+  "non-nix",
+  "synology-dsm",
+  "cold-vault",
+  "wol",
+  "sftp-backup-target",
+  "low-power",
+  "arm64",
+  "512mb",
+]
+
+[hosts.burgernas.persona]
+title = "Cold Vault Storage Extension & Backup Guardian"
+system_prompt_hint = "You operate the DS220j cold vault. Frieren is the backup controller: keep the device powered off, wake it via WoL for scheduled restic pushes, and never write imperative cron jobs or ad-hoc scripts on the device."
+compute_tier = "storage-cold-constrained-arm"
+allowed_tasks = [
+  "SFTP/rsync backup receiving from frieren",
+  "Wake-on-LAN and clean power-off orchestration",
+  "Storage hygiene and quota inspection",
+  "Leech-only torrent ingest (Transmission)",
+]
+constraints = [
+  "Non-Nix environment: do not run nix or nixos-rebuild.",
+  "STRICT 512 MiB RAM ceiling — never run heavy compilers, browsers, containers, or full AI agent runtimes.",
+  "Do NOT write imperative cron jobs or ad-hoc scripts; frieren is the backup controller.",
+  "WoL must stay armed (eth0) so the 03:35 backup window can wake the device.",
+]

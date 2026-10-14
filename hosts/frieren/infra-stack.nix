@@ -420,9 +420,14 @@ in {
       ${pkgs.wakeonlan}/bin/wakeonlan 90:09:D0:06:C1:EE || true
 
       echo "Waiting for BurgerNAS SSH (192.168.3.92:22) to become reachable..."
+      # NOTE: this runs inside the restic unit, whose PATH carries openssh and
+      # coreutils but NOT `bash`. A bare `bash -c` here fails silently (exit
+      # 127) and reports the NAS offline even when it is up — that was the
+      # 2026-10-14 seed failure. Invoke bash by absolute path. The DS220j cold
+      # boot (WOL -> sshd) can take ~3-4 min, so wait up to 300s.
       ONLINE=0
-      for i in $(seq 1 60); do
-        if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
+      for i in $(seq 1 150); do
+        if timeout 3 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
           echo "BurgerNAS SSH port 22 open after $((i * 2))s."
           ONLINE=1
           break
@@ -431,17 +436,61 @@ in {
       done
 
       if [ "$ONLINE" -ne 1 ]; then
-        echo "ERROR: BurgerNAS failed to come online via WOL within 120s" >&2
+        echo "ERROR: BurgerNAS failed to come online via WOL within 300s" >&2
         exit 1
       fi
 
       sleep 3
     '';
     backupCleanupCommand = ''
-      # Ensure WOL is armed on eth0 and cleanly power off BurgerNAS
-      echo "=== [$(date)] Backup run finished. Arming WOL and issuing poweroff to BurgerNAS ==="
-      ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o BatchMode=yes devji@192.168.3.92 "sudo /sbin/ethtool -s eth0 wol g 2>/dev/null || true; sudo /sbin/poweroff" || true
+      # Re-arm Wake-on-LAN but do NOT power off here. BurgerNAS is left running
+      # after a backup and switched off by the daily `burgernas-poweroff` timer
+      # (22:45) so a long manual seed or a follow-up isn't cut short mid-run.
+      # WoL stays armed so the next 03:35 window can wake the box again.
+      echo "=== [$(date)] Backup run finished. Re-arming BurgerNAS WoL (no poweroff). ==="
+      ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o BatchMode=yes devji@192.168.3.92 "sudo /bin/ethtool -s eth0 wol g 2>/dev/null || true" || true
     '';
+  };
+
+  # --- BurgerNAS daily power-off safety net (22:45) ---
+  # BurgerNAS is a cold vault (normally ~0 W off, woken by WoL for the Sunday
+  # 03:35 backup). Since the backup no longer powers it off, this timer is the
+  # single owner of "shut the vault down": every day at 22:45 it powers the NAS
+  # off if it is online, so a forgotten manual session can't burn power all
+  # night. It is a no-op when the NAS is already off. WoL stays armed, so the
+  # 03:35 job still wakes it for the 3-5 am window.
+  systemd.services.burgernas-poweroff = {
+    description = "Power off BurgerNAS if online (daily safety net)";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = pkgs.writeShellScript "burgernas-poweroff" ''
+        set -u
+        NAS=devji@192.168.3.92
+        KEY=/root/.ssh/id_ed25519
+        SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
+        # Only act when the NAS is up — a nightly error when it is already off
+        # would be pure noise. NB: this unit's PATH has coreutils but NOT
+        # `bash`, so use the absolute bash (a bare `bash -c` fails silently and
+        # the check would always report the NAS offline).
+        if ! timeout 5 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
+          echo "BurgerNAS offline; nothing to power off."
+          exit 0
+        fi
+        echo "BurgerNAS online at $(date -Is); arming WoL and powering off."
+        $SSH "$NAS" "sudo /bin/ethtool -s eth0 wol g 2>/dev/null || true; sudo /sbin/poweroff" || true
+      '';
+    };
+  };
+
+  systemd.timers.burgernas-poweroff = {
+    description = "Daily BurgerNAS power-off safety net (22:45)";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "*-*-* 22:45:00";
+      Persistent = true;
+    };
   };
 
   # --- restic restore drill ---

@@ -25,7 +25,12 @@ Operate BurgerNAS, the fleet's secondary cold backup vault and storage extension
   SOPS-managed — rendered from `sops.secrets."burgernas-sudo-password"`
   (`modules/secrets.yaml`) by frieren's config; do not hand-edit it.
 
-## RoleCold vault: normally powered **off** (~0 W). Frieren is the *controller* — it wakes the NAS via Wake-on-LAN for the Sunday 03:35 restic push and the NAS powers itself off daily at **22:45**. Never write imperative cron jobs or ad-hoc scripts on the device (see its `~/AGENTS.md`).
+## Role
+
+Cold vault: normally powered **off** (~0 W). Frieren is the *controller* — it
+wakes the NAS via Wake-on-LAN for the Sunday 03:35 restic push and the NAS powers
+itself off daily at **22:45**. Never write imperative cron jobs or ad-hoc scripts
+on the device (see its `~/AGENTS.md`).
 
 **State (2026-10-14):** the frieren restic baseline seed is **complete and verified** (`ce946da9`; `restic check` clean, sampled restore matched the source), and the legacy `/volume1/Shared Library/core/Sandy` plaintext copy was removed. On-device `restic` 0.19.1 (SynoCommunity) is available for local restores, and `aria2` 1.37.0 + AriaNg 1.3.7 (RPC `:6800`, UI `/ariang/`) run alongside Transmission.
 

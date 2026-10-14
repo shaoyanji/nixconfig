@@ -2,8 +2,56 @@
 
 > **Scope:** Multi-Host Declarative Fleet Configuration (`shaoyanji/nixconfig`)  
 > **Target Fleet:** `frieren` (NAS / Media Mainframe), `poseidon` (Workstation), `eisen` (Living Room Kiosk), `stark` (AIO Kiosk), `fern`, `scratch`, `guckloch`, `delphi`, `garnixMachine`  
-> **Updated:** 2026-10-13 21:15 CEST  
+> **Updated:** 2026-10-14 13:50 CEST
 > **Status:** Production Active (NixOS 26.11)
+
+---
+
+## 🚨 2026-10-14 Incident — `frieren` DNS outage (LAN unanswered + unbound SERVFAIL)
+
+**Symptom.** LAN clients got **no answer** from `192.168.3.25:53` (UDP timeout,
+TCP accepted-then-EOF); `frieren` itself **SERVFAILed external names** while
+`*.frieren.lan` still resolved. The gateway hands out `192.168.3.25` as the
+resolver, so LAN name resolution was down.
+
+**Two independent faults, both on `frieren`:**
+
+1. **dnsmasq excluded the LAN interface — CODE BUG, FIXED.**
+   `services.pihole-ftl` set `dns.interface = "enp1s0"` together with
+   `listeningMode = "ALL"`, and Pi-hole v6 **ignores `dns.interface` under `ALL`**.
+   The generated `/etc/pihole/dnsmasq.conf` therefore carried only
+   `interface=tailscale0` (from the host's `extraDnsmasqLines`) — and **any**
+   `interface=` line switches dnsmasq to interface-restricted listening, so
+   `enp1s0` was dropped and client queries never reached dnsmasq (verified: the
+   NAS's probe query is **absent** from `/var/log/pihole/pihole.log`).
+   *Fix:* `modules/profiles/dns-failover.nix` now always emits
+   `interface=${cfg.lanInterface}` in `misc.dnsmasq_lines`. Live-applied on
+   `frieren` by adding `"interface=enp1s0"` to `/etc/pihole/pihole.toml`
+   (backup `/root/pihole.toml.bak-*`).
+
+2. **`unbound` recursed over IPv6 with no IPv6 uplink — CODE BUG, FIXED.**
+   The running `unbound` (`127.0.0.1#5335`) SERVFAILed external names — at first
+   domain-specific (`example.com` OK, `github.com` SERVFAIL even with `+cd`),
+   then everything. A foreground `unbound -d` on a spare port showed the cause in
+   one line: it sent *every* root query to the **IPv6** root servers
+   (`sending to target: <.> 2001:503:c27::2#53` → `module_event_noreply`) — the
+   host has **no IPv6 route**, so each reply is a no-reply and recursion never
+   completes. Direct IPv4 to the roots and authoritative servers worked fine,
+   which is why it initially looked like "the network is fine".
+   *Fix:* `do-ip6 = false` in `modules/profiles/dns-failover.nix`
+   (`services.unbound.settings.server`). Live-applied on `frieren` by replacing
+   the `/etc/unbound/unbound.conf` store symlink with a real file carrying
+   `do-ip6: no`; the public-resolver upstream stopgap was reverted.
+   **Verified:** host, `unbound`, `pihole-ftl` and the LAN client (BurgerNAS) all
+   resolve again.
+
+**⚠ Follow-ups**
+- `do-ip6 = false` is in the module now; the live override on `frieren` is
+  regenerated from it on the next rebuild.
+- Add a resolver health check (`gatus` / `checks:dns:failover`) so a future
+  resolver outage is detected automatically instead of by a human.
+- Treat `do-ip4`/`do-ip6` as explicit, documented resolver-host policy rather
+  than relying on unbound's IPv6-on-by-default.
 
 ---
 

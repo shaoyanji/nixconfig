@@ -45,6 +45,7 @@ in {
     ../../modules/profiles/base-desktop-environment.nix
     ./dns.nix
     ./media-stack.nix
+    ./transmission.nix
     ./paperless.nix
     ./tools.nix
     ./networking.nix

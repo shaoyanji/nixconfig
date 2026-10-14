@@ -17,7 +17,7 @@
    - [x] **Zero SOPS Drift**: Re-keyed all 6 secrets files; zero recipient or file drift.
    - [x] **Lint-Gate & 100% Alejandra Compliance**: 0/181 tracked Nix files violate formatting; deadnix and statix clean.
    - [ ] MQTT hardening: when real devices arrive, switch mosquitto from the loopback-anonymous listener to an authenticated LAN listener with passwordFile via sops (see `modules/services/home-assistant.nix`).
-   - [ ] restic hardening: move `/root/.restic-password` into sops and add an offsite repository target (B2/rest-server) alongside the local one.
+   - [x] **restic hardening**: moved `/root/.restic-password` into sops (`modules/secrets.yaml` -> `/run/secrets/restic-password`) and added secondary cold vault repository target on BurgerNAS via SFTP with Wake-on-LAN and poweroff hooks.
    - [ ] When a Zigbee coordinator dongle is attached: set `services.zigbee2mqtt.settings.serial.port` from `/dev/serial/by-id`.
 
 ## HANDOFF Promotion Candidates (2026-10-12)
@@ -59,15 +59,9 @@ failure is loud (non-zero exit + journal).
   regular files (not the live `/etc` symlink, which `test -f` would resolve and prove nothing).
   Reproducible on demand via `task checks:restic:drill`. Verified once against snapshot
   `c3e0f078` (2102 files / 215 MiB); not yet exercised through the systemd unit (needs a switch).
-- **Remaining half:**
-  1. **Password to sops.** `/root/.restic-password` is unmanaged on-device state. The
-     `restic-ensure-password` oneshot generates it if absent, but a lost disk loses the key and
-     every snapshot becomes unreadable. Move it into `modules/secrets.yaml` and point
-     `services.restic.backups.frieren-local.passwordFile` — and the drill's
-     `RESTIC_PASSWORD_FILE` — at the sops-rendered path.
-  2. **Offsite target.** `/srv/backup/restic` is the same pool as the data it protects, so a
-     pool loss takes the source *and* the backup. Add a second repository (restic REST server on
-     an always-on host, or Backblaze B2) with its own credentials and retention policy.
+- **Delivered (2026-10-14):**
+  1. **Password to sops.** Moved `/root/.restic-password` into `modules/secrets.yaml` (`sops.secrets.restic-password`) and pointed `services.restic.backups.frieren-local.passwordFile`, `frieren-burgernas.passwordFile`, and `resticDrill` to `/run/secrets/restic-password`. Eliminated the imperative `restic-ensure-password` oneshot.
+  2. **Secondary/Off-host target.** Added `services.restic.backups.frieren-burgernas` pushing to BurgerNAS (DS220j, 4.5TB RAID) via SFTP with automated Wake-on-LAN wake and poweroff hooks.
 
 ### HC-3 — DNS high availability (`profiles.dnsFailover`)
 - **Why:** frieren is the fleet's only resolver — it serves `*.frieren.lan`

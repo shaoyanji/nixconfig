@@ -48,6 +48,10 @@
     echo "restic drill OK: restored a sample from snapshot $latest"
   '';
 
+  burgernasSftp = pkgs.writeShellScript "burgernas-sftp" ''
+    exec ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new devji@192.168.3.92 /usr/local/bin/sftp-server "$@"
+  '';
+
   agentCascadeScript = ''
     run_agent_cascade() {
       local prompt="$1"
@@ -373,12 +377,77 @@ in {
     ];
   };
 
+  # --- restic cold vault backup to BurgerNAS ---
+  # Wakes BurgerNAS via WOL every Sunday at 03:35 (after local pg_dump & restic-local),
+  # pushes encrypted & deduplicated snapshots of Sandy, user documents, and stateful databases,
+  # and cleanly powers down BurgerNAS upon completion.
+  services.restic.backups.frieren-burgernas = {
+    initialize = true;
+    repository = "sftp:devji@192.168.3.92:/volume1/backup/frieren/restic";
+    passwordFile = "/root/.restic-password";
+    extraOptions = [
+      "sftp.command=${burgernasSftp}"
+    ];
+    paths = [
+      "/srv/private/Sandy"
+      "/srv/data/documents"
+      "/srv/data/projects"
+      "/srv/data/security"
+      "/srv/backup/postgresql"
+      "/srv/backup/vaultwarden"
+      "/var/lib/immich"
+      "/var/lib/paperless"
+      "/srv/private/home-assistant"
+      "/srv/private/zigbee2mqtt"
+    ];
+    timerConfig = {
+      OnCalendar = "Sun *-*-* 03:35:00";
+      Persistent = true;
+    };
+    pruneOpts = [
+      "--keep-weekly 4"
+      "--keep-monthly 6"
+      "--keep-yearly 2"
+    ];
+    backupPrepareCommand = ''
+      # Wake BurgerNAS via WOL (MAC: 90:09:D0:06:C1:EE) and wait for SSH
+      echo "=== [$(date)] Waking BurgerNAS (90:09:D0:06:C1:EE) via Wake-on-LAN ==="
+      ${pkgs.wakeonlan}/bin/wakeonlan 90:09:D0:06:C1:EE || true
+
+      echo "Waiting for BurgerNAS SSH (192.168.3.92:22) to become reachable..."
+      ONLINE=0
+      for i in $(seq 1 60); do
+        if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
+          echo "BurgerNAS SSH port 22 open after $((i * 2))s."
+          ONLINE=1
+          break
+        fi
+        sleep 2
+      done
+
+      if [ "$ONLINE" -ne 1 ]; then
+        echo "ERROR: BurgerNAS failed to come online via WOL within 120s" >&2
+        exit 1
+      fi
+
+      sleep 3
+    '';
+    backupCleanupCommand = ''
+      # Cleanly power off BurgerNAS to return it to ~0W standby
+      echo "=== [$(date)] Backup run finished. Issuing poweroff to BurgerNAS ==="
+      ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o BatchMode=yes devji@192.168.3.92 "sudo /sbin/poweroff" || true
+    '';
+  };
+
   # Guarantee the restic password file exists before restic-backups runs
   # (preStart runs after module initialization, which leads to ordering failures).
   systemd.services.restic-ensure-password = {
     description = "Ensure restic repository password file exists";
     wantedBy = ["multi-user.target"];
-    before = ["restic-backups-frieren-local.service"];
+    before = [
+      "restic-backups-frieren-local.service"
+      "restic-backups-frieren-burgernas.service"
+    ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -392,6 +461,11 @@ in {
   };
 
   systemd.services.restic-backups-frieren-local.unitConfig = {
+    Wants = ["restic-ensure-password.service"];
+    After = ["restic-ensure-password.service"];
+  };
+
+  systemd.services.restic-backups-frieren-burgernas.unitConfig = {
     Wants = ["restic-ensure-password.service"];
     After = ["restic-ensure-password.service"];
   };

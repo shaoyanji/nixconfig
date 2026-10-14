@@ -168,6 +168,12 @@ in {
       settings.server = {
         interface = ["127.0.0.1@5335"];
         access-control = ["127.0.0.0/8 allow"];
+        # The resolver hosts have no IPv6 uplink. With IPv6 enabled (the
+        # default) unbound sends its recursion to the IPv6 root servers, gets
+        # `module_event_noreply` for every one (the kernel has no route), and
+        # SERVFAILs the lookup — the 2026-10-14 frieren outage. Recurse over
+        # IPv4 only; AAAA records still resolve fine.
+        do-ip6 = false;
       };
     };
 
@@ -181,7 +187,17 @@ in {
           interface = cfg.lanInterface;
         };
         database.maxDBdays = 31;
-        misc.dnsmasq_lines = ["address=/${cfg.zone}/${cfg.zoneAddress}"] ++ cfg.extraDnsmasqLines;
+        # The LAN interface MUST be listed explicitly. Any dnsmasq `interface=`
+        # line switches it to interface-restricted listening, and
+        # `listeningMode = "ALL"` makes pihole-FTL ignore `dns.interface` — so a
+        # host whose `extraDnsmasqLines` only adds `interface=tailscale0` stops
+        # answering the LAN entirely (the 2026-10-14 frieren DNS outage).
+        misc.dnsmasq_lines =
+          [
+            "interface=${cfg.lanInterface}"
+            "address=/${cfg.zone}/${cfg.zoneAddress}"
+          ]
+          ++ cfg.extraDnsmasqLines;
       };
     };
 

@@ -21,7 +21,9 @@ Operate BurgerNAS, the fleet's secondary cold backup vault and storage extension
 - **SSH alias**: `burgernas` (user `devji`)
 - **Web UI**: `https://192.168.3.92:5001/`
 - **restic target**: `sftp:devji@192.168.3.92:/volume1/backup/frieren/restic`
-- **Credential**: NAS sudo password is read from `~/nas` (devji)
+- **Credential**: NAS sudo password is read from `/run/secrets/nas` (devji). That file is
+  SOPS-managed — rendered from `sops.secrets."burgernas-sudo-password"`
+  (`modules/secrets.yaml`) by frieren's config; do not hand-edit it.
 
 ## Role
 
@@ -42,7 +44,7 @@ on the device (see its `~/AGENTS.md`).
 | `task burgernas:online` | Wait for SSH after a wake (120s) |
 | `task burgernas:poweroff` | Arm WoL and cleanly power off |
 | `task burgernas:transmission:status` | Transmission state + leech-only keys |
-| `task burgernas:transmission:leech` | Apply the shared leech-only policy (needs `~/nas`) |
+| `task burgernas:transmission:leech` | Apply the shared leech-only policy (needs `/run/secrets/nas`) |
 | `task burgernas:backup:seed` | `[frieren root]` Start the restic seed systemd unit |
 | `task burgernas:snapshot` | `[frieren root]` List repository snapshots |
 | `task burgernas:menu` | Interactive gum menu |
@@ -55,7 +57,7 @@ on the device (see its `~/AGENTS.md`).
 - ⚠ **Frieren is the backup controller** — no imperative cron/rsync on the NAS.
 - ⚠ **Keep WoL armed** on `eth0` so the backup window can wake it.
 - Power ops use devji's passwordless sudo (`/sbin/poweroff`, `/bin/ethtool`,
-  `/bin/systemctl`); writing `settings.json` needs the `~/nas` password.
+  `/bin/systemctl`); writing `settings.json` needs the `/run/secrets/nas` password.
 
 ## Remote `task -t`
 

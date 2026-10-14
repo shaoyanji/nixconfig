@@ -151,6 +151,17 @@ in {
     mode = "0400";
   };
 
+  # BurgerNAS sudo password for the `task burgernas:*` tooling (WoL, poweroff,
+  # transmission leech policy). Loaded from SOPS (modules/secrets.yaml key
+  # `burgernas-sudo-password`) and rendered to /run/secrets/nas — the path the
+  # scripts read. Owned by devji because they run unprivileged; no home-dir copy.
+  sops.secrets."burgernas-sudo-password" = {
+    owner = "devji";
+    group = "users";
+    mode = "0400";
+    path = "/run/secrets/nas";
+  };
+
   # E.3: Hermes agent profile & isolated secrets (modules/profiles/hermes.nix)
   # Host-specific Telegram bot token isolated to frieren to prevent multi-host polling conflicts.
   profiles.hermes = {

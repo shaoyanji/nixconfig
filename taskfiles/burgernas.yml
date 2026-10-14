@@ -97,7 +97,7 @@ tasks:
         ssh {{.BURGERNAS_ALIAS}} 'grep -E "\"(ratio-limit|ratio-limit-enabled|idle-seeding-limit|speed-limit-up|upload-slots-per-torrent|dht-enabled|pex-enabled|lpd-enabled|port-forwarding-enabled|encryption)\"" {{.BURGERNAS_TX_SETTINGS}}'
 
   burgernas:transmission:leech:
-    desc: Apply the shared leech-only Transmission policy (needs the ~/nas credential)
+    desc: Apply the shared leech-only Transmission policy (needs the /run/secrets/nas credential)
     cmds:
       - bash scripts/task/burgernas-transmission-leech.sh
 

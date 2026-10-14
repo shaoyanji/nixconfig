@@ -4,13 +4,16 @@
 # /volume1/@appdata/transmission/settings.json and are owned by
 # `sc-transmission`, so applying them needs root on the NAS.
 #
-# The NAS sudo password is read from $HOME/nas (devji's NAS credential). The
-# only NAS-side writes are the settings file plus a timestamped backup under
+# The NAS sudo password is read from /run/secrets/nas. That file is rendered
+# from SOPS (`sops.secrets."burgernas-sudo-password"` in
+# hosts/frieren/configuration.nix, key `burgernas-sudo-password` in
+# modules/secrets.yaml) — do not create it by hand; rotate via sops. The only
+# NAS-side writes are the settings file plus a timestamped backup under
 # /root; the daemon is stopped first so its shutdown save cannot clobber ours.
 set -euo pipefail
 
 ALIAS="${BURGERNAS_ALIAS:-burgernas}"
-CRED="${HOME}/nas"
+CRED="/run/secrets/nas"
 REMOTE_SETTINGS=/volume1/@appdata/transmission/settings.json
 
 if [ ! -f "$CRED" ]; then

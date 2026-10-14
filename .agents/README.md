@@ -18,7 +18,7 @@ Each taskfile shard has a corresponding skill under `.agents/skills/<name>/SKILL
 |-------|-------|
 | [`home-assistant`](skills/home-assistant/SKILL.md) | Home Assistant, Mosquitto MQTT, host telemetry sensors, and Uptime-Kuma on frieren |
 | [`paste`](skills/paste/SKILL.md) | Fleet paste bin (`pb`) for sharing files and logs over LAN/mesh (`paste.frieren.lan`) |
-| [`burgernas`](skills/burgernas/SKILL.md) | Synology DS220j cold vault (BurgerNAS, `taskfiles/burgernas.yml`): WoL power, restic backup target, leech-only Transmission |
+| [`burgernas`](skills/burgernas/SKILL.md) | Synology DS220j cold vault (BurgerNAS, `taskfiles/burgernas.yml`): WoL power, restic backup target, leech-only Transmission, aria2/AriaNg, sops-managed sudo credential |
 | [`iventoy`](skills/iventoy/SKILL.md) | PXE boot management, ISO image library (`/Volumes/data/isos`), and bare-metal OS provisioning |
 | [`wikisearch`](skills/wikisearch/SKILL.md) | Offline Wikipedia and ArchWiki BM25 search via Kiwix (`wiki.frieren.lan`) |
 | [`frieren-offload`](skills/frieren-offload/SKILL.md) | Offload heavy agy tasks from netbook/workstations to frieren |

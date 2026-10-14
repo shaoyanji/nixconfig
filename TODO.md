@@ -62,6 +62,7 @@ failure is loud (non-zero exit + journal).
 - **Delivered (2026-10-14):**
   1. **Password to sops.** Moved `/root/.restic-password` into `modules/secrets.yaml` (`sops.secrets.restic-password`) and pointed `services.restic.backups.frieren-local.passwordFile`, `frieren-burgernas.passwordFile`, and `resticDrill` to `/run/secrets/restic-password`. Eliminated the imperative `restic-ensure-password` oneshot.
   2. **Secondary/Off-host target.** Added `services.restic.backups.frieren-burgernas` pushing to BurgerNAS (DS220j, 4.5TB RAID) via SFTP with automated Wake-on-LAN wake and poweroff hooks.
+  3. **BurgerNAS baseline + credential (2026-10-14).** Baseline seed verified (`restic check` clean, sampled restore matched) and the legacy `core/Sandy` plaintext copy retired; the NAS sudo credential moved to sops (`sops.secrets."burgernas-sudo-password"` → `/run/secrets/nas`), replacing the hand-placed `~/nas`.
 
 ### HC-3 — DNS high availability (`profiles.dnsFailover`)
 - **Why:** frieren is the fleet's only resolver — it serves `*.frieren.lan`

@@ -348,11 +348,16 @@ in {
     startAt = "*-*-* 03:00:00"; # 30 min before 03:30 restic snapshot
   };
 
+  # --- restic secrets (SOPS managed, rendered to /run/secrets/restic-password) ---
+  sops.secrets.restic-password = {
+    mode = "0400";
+  };
+
   # --- restic local backups ---
   services.restic.backups.frieren-local = {
     initialize = true;
     repository = "/srv/backup/restic";
-    passwordFile = "/root/.restic-password";
+    passwordFile = config.sops.secrets.restic-password.path;
     paths = [
       "/srv/private/home-assistant"
       "/srv/private/plex"
@@ -384,7 +389,7 @@ in {
   services.restic.backups.frieren-burgernas = {
     initialize = true;
     repository = "sftp:devji@192.168.3.92:/volume1/backup/frieren/restic";
-    passwordFile = "/root/.restic-password";
+    passwordFile = config.sops.secrets.restic-password.path;
     extraOptions = [
       "sftp.command=${burgernasSftp}"
     ];
@@ -437,37 +442,6 @@ in {
       echo "=== [$(date)] Backup run finished. Issuing poweroff to BurgerNAS ==="
       ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o BatchMode=yes devji@192.168.3.92 "sudo /sbin/poweroff" || true
     '';
-  };
-
-  # Guarantee the restic password file exists before restic-backups runs
-  # (preStart runs after module initialization, which leads to ordering failures).
-  systemd.services.restic-ensure-password = {
-    description = "Ensure restic repository password file exists";
-    wantedBy = ["multi-user.target"];
-    before = [
-      "restic-backups-frieren-local.service"
-      "restic-backups-frieren-burgernas.service"
-    ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = pkgs.writeShellScript "restic-ensure-password" ''
-        if [ ! -s /root/.restic-password ]; then
-          head -c 32 /dev/urandom | base64 > /root/.restic-password
-          chmod 0600 /root/.restic-password
-        fi
-      '';
-    };
-  };
-
-  systemd.services.restic-backups-frieren-local.unitConfig = {
-    Wants = ["restic-ensure-password.service"];
-    After = ["restic-ensure-password.service"];
-  };
-
-  systemd.services.restic-backups-frieren-burgernas.unitConfig = {
-    Wants = ["restic-ensure-password.service"];
-    After = ["restic-ensure-password.service"];
   };
 
   # --- restic restore drill ---

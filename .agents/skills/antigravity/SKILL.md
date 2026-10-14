@@ -7,6 +7,7 @@ license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
+  default_model: "gemini-4-argon"
     tags: [Coding-Agent, Antigravity, Google, AI-Agent, Delegation]
     related_skills: [claude-code, hermes-agent]
 ---

@@ -438,9 +438,9 @@ in {
       sleep 3
     '';
     backupCleanupCommand = ''
-      # Cleanly power off BurgerNAS to return it to ~0W standby
-      echo "=== [$(date)] Backup run finished. Issuing poweroff to BurgerNAS ==="
-      ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o BatchMode=yes devji@192.168.3.92 "sudo /sbin/poweroff" || true
+      # Ensure WOL is armed on eth0 and cleanly power off BurgerNAS
+      echo "=== [$(date)] Backup run finished. Arming WOL and issuing poweroff to BurgerNAS ==="
+      ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o BatchMode=yes devji@192.168.3.92 "sudo /sbin/ethtool -s eth0 wol g 2>/dev/null || true; sudo /sbin/poweroff" || true
     '';
   };
 

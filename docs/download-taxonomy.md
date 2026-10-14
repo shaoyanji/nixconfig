@@ -14,6 +14,7 @@ for its kind.** Nothing is downloaded straight into a media-scanner-indexed tree
 | `aria2` (RPC + AriaNg) | `frieren` | `/srv/data/downloads` | Mode `0775 aria2:users`. HTTP/FTP/magnet/metalink. |
 | `transmission-daemon` | `frieren` | `/srv/data/downloads` | Leech-only (see `hosts/frieren/transmission.nix`); seeds nothing. |
 | `transmission-daemon` | `BurgerNAS` (DS220j) | `/volume1/downloads/complete` | NAS-local pool; offloads bulk ISO/dataset torrents off frieren's SSD. |
+| `aria2` (RPC + AriaNg) | `BurgerNAS` (DS220j) | `/volume1/downloads/complete` | Second ingest door on the NAS — aria2 RPC `:6800`, AriaNg UI at `/ariang/` (CORS enabled for the browser). |
 
 `/srv/data/downloads` is deliberately **not** indexed by Jellyfin/Plex and
 carries no `.nomedia` marker of its own; it is ephemeral and expected to be

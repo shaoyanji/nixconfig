@@ -5,6 +5,7 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }: {
   # Gated by profiles.ai.enable (see ./default.nix). `or true` keeps this
@@ -12,6 +13,7 @@
   config = lib.mkIf (config.profiles.ai.enable or true) {
     programs.antigravity-cli = {
       enable = true;
+      package = pkgs.llm-agents.antigravity-cli;
       # Fast Gemini model, set via $GEMINI_MODEL (HM module behavior).
       defaultModel = "gemini-3.8-flash";
 

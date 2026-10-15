@@ -76,6 +76,7 @@
   # (useRoutingFeatures = "both" is inherited from desktop-client.nix.)
   services.tailscale.extraSetFlags = [
     "--advertise-routes=192.168.3.0/24"
+    "--ssh=true"
   ];
 
   # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively,

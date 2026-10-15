@@ -15,7 +15,7 @@
     backupFileExtension = "hm-backup";
     users.devji = {
       imports = [
-        ../roles/heim.nix
+        ../roles/home.nix
       ];
     };
     extraSpecialArgs = {inherit inputs;};

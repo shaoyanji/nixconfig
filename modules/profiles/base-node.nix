@@ -82,8 +82,11 @@ in {
     # (see profiles/nas-client.nix).
     hosts = {
       "192.168.3.25" = ["frieren"];
-      "192.168.3.36" = ["netbook"];
+      # "192.168.3.36" = ["netbook"];
+      "192.168.3.23" = ["fern"];
       "192.168.3.48" = ["steamlink"];
+      "192.168.3.92" = ["burgernas"];
+      "192.168.3.91" = ["eisen"];
     };
   };
 

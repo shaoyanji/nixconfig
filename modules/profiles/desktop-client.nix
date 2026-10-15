@@ -61,7 +61,7 @@
       "--accept-routes=true"
     ];
     resolved.enable = true;
-    resolved.settings.Resolve.Domains = ["~lan" "~frieren.lan" "~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
+    resolved.settings.Resolve.Domains = ["~lan" "~frieren.lan"];
   };
 
   # Keybase's GUI writes ~/.config/autostart/keybase_autostart.desktop the first

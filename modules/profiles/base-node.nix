@@ -32,6 +32,13 @@ in {
 
   ssh.ca.enable = true;
 
+  # Trust the frieren LAN CA (modules/config/tls/frieren-lan-ca.pem) so
+  # https://*.frieren.lan sites (vault, ha) validate on every NixOS host;
+  # Firefox-family browsers additionally need the policy in modules/zen.nix.
+  security.pki.certificates = [
+    (builtins.readFile ../config/tls/frieren-lan-ca.pem)
+  ];
+
   console = {
     font = "Lat2-Terminus16";
     keyMap = "us";

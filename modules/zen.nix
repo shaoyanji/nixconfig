@@ -11,6 +11,10 @@
     zen-browser = {
       enable = true;
       policies = {
+        # Firefox-family browsers keep their own NSS trust store and ignore
+        # the system one; this makes zen trust the frieren LAN CA so
+        # https://*.frieren.lan works without per-profile overrides.
+        Certificates.Install = ["${./config/tls/frieren-lan-ca.pem}"];
         AutofillAddressEnabled = true;
         AutofillCreditCardEnabled = false;
         DisableAppUpdate = true;

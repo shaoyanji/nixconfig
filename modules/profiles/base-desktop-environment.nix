@@ -45,14 +45,8 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    yt-dlp
-    lan-mouse
-    inkscape
-    hunspell
-    hunspellDicts.en_US
+    # Audio & Desktop file management
     alsa-utils
-    lagrange
-    ngrok
     nautilus
     ffmpegthumbnailer
     # fn-key helpers: niri binds spawn these on XF86 media/brightness keys

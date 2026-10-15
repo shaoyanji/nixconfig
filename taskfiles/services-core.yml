@@ -14,7 +14,30 @@ tasks:
       HOST: '{{index .MATCH 0}}'
       TARGET: '{{.TARGET | default .HOST}}'
     cmds:
-      - ssh {{.TARGET}} "systemctl is-system-running"
+      - |
+        state=$(ssh {{.TARGET}} "systemctl is-system-running 2>/dev/null || true")
+        echo "Host {{.HOST}} systemd state: $state"
+        case "$state" in
+          running)
+            exit 0
+            ;;
+          degraded)
+            echo "WARNING: Host {{.HOST}} is running in degraded state. Failed units:" >&2
+            ssh {{.TARGET}} "systemctl --failed --no-pager" >&2 || true
+            exit 0
+            ;;
+          starting)
+            echo "Host {{.HOST}} is still starting up; waiting 5s..."
+            sleep 5
+            state=$(ssh {{.TARGET}} "systemctl is-system-running 2>/dev/null || true")
+            echo "Host {{.HOST}} systemd state: $state"
+            [ "$state" = "running" ] || [ "$state" = "degraded" ]
+            ;;
+          *)
+            echo "ERROR: Host {{.HOST}} systemd state is unhealthy: $state" >&2
+            exit 1
+            ;;
+        esac
 
   services:record:host:*:
     desc: Record deployment outcome in git (manual/operator-triggered)

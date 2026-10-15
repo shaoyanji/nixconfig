@@ -116,6 +116,7 @@ action="${ACTION:-switch}"
 unit="activate-$(printf '%s' "$host" | tr -c 'a-zA-Z0-9' '-')-$(date +%s)"
 remote="$(cat <<REMOTE
 set -euo pipefail
+export PATH="/run/current-system/sw/bin:/run/current-system/sw/sbin:\$PATH"
 NIX=/run/current-system/sw/bin/nix
 NIXENV=/run/current-system/sw/bin/nix-env
 CACHE='$cache'
@@ -131,7 +132,11 @@ echo "== registering generation =="
 "\$NIXENV" -p /nix/var/nix/profiles/system --set "\$TOP"
 echo "== activating (\$ACTION) =="
 "\$TOP/bin/switch-to-configuration" "\$ACTION"
-echo "== COMPLETED (\$ACTION): \$(readlink -f /run/current-system) =="
+if [ "\$ACTION" = "boot" ]; then
+  echo "== COMPLETED (boot stage): default boot profile is \$(readlink -f /nix/var/nix/profiles/system) (reboot required to activate) =="
+else
+  echo "== COMPLETED (switch): current system is \$(readlink -f /run/current-system) =="
+fi
 REMOTE
 )"
 

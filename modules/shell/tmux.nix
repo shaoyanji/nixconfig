@@ -39,6 +39,12 @@
         set -g @continuum-boot "on"
         set -g @resurrect-strategy-nvim "session"
         set -g @resurrect-capture-pane-contents "on"
+
+        # Debloat/hide tmux titlebar and status bar (toggle with prefix + S)
+        set -g status off
+        set -g set-titles off
+        set -g pane-border-status off
+        bind S set -g status
       '';
   };
   home.packages = with pkgs; [

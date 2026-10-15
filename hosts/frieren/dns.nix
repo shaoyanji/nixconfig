@@ -13,9 +13,14 @@
   # (extra address= records, the tailscale interface line, PXE proxyDHCP,
   # blocklists, the web UI) stays here and is fed in.
   #
-  # No `virtualIp` yet: frieren is the only resolver that exists, so failover is
-  # client-side via `resolvers` until an always-on secondary is provisioned.
-  # See docs/dns-failover.md for the secondary bring-up and the failover test.
+  # No `virtualIp` yet: failover is client-side via `resolvers` until a
+  # floating address is worth the router/client change. fern runs the matching
+  # `role = "secondary"` stack (hosts/fern/configuration.nix) with the same
+  # zone/zoneAddress, so a client that falls back gets identical answers.
+  #
+  # fern's own address is deliberately NOT listed: it is DHCP, so it belongs in
+  # the router's DHCP reservation (or a tailnet name), never as a literal here.
+  # See docs/dns-failover.md for the failover test.
   profiles.dnsFailover = {
     enable = true;
     role = "primary";

@@ -35,6 +35,8 @@ Ride-along: tailscale DNS via pi-hole moved from the decommissioned thinsandy IP
 
 The monolithic `host-eval-all` check passed ~20 host toplevels as env attrs of a single `runCommand` and kept getting OOM-killed (this machine reproduced it 3×). Replaced with 22 per-host `host-eval-<host>` derivations: each forces exactly one host's module-system eval by interpolating the toplevel into the echoed message and strips the context (`unsafeDiscardStringContext`), so the derivation is a trivial echo and CI/garnix can parallelise. Rejected designs: `deepSeq toplevel` (blows eval call depth) and `test -e ${toplevel}` in the builder (string context would build the host closure).
 
+**Superseded 2026-10-15.** Splitting per host fixed CI (parallel runners) but not the local path, because those derivations lived in `checks.<system>` and `nix flake check`/`task checks:quick` force every attribute of that output in ONE process — the same 23 evaluations, now measured at 6078.5 MiB peak and SIGKILLed (exit 137), plus `flake check`'s own validation of `nixosConfigurations`. Toplevel forcing was also the costly half. Current design: `checks.<system>` forces no host at all (registry + attr names only), and the per-host gate moved to its own `hostChecks.<arch>.<host>` output, which forces the module system and every assertion (13.16 s / 720 MiB for frieren) but not the system derivation graph. See AGENTS.md § "never run `nix flake check` on a small host".
+
 ### Pre-commit hook hardening
 **Status:** ✅ Completed (`cecb93f`, `c97c904`)
 

@@ -115,3 +115,15 @@ jobs:
           installCommand: nix profile install nixpkgs#cachix
 
       - run: nix build -L .?submodules=1#${{ matrix.attr }}
+
+      # Per-host eval gate: module system + every assertion + the compiled
+      # inventory.toml record, one host per runner (~13 s, ~700 MiB). This is the
+      # half of `nix flake check` that is safe to run per host — running the whole
+      # flake check instead forces all 23 configurations in one process and was
+      # measured at 6078.5 MiB peak / SIGKILL 137 on the NAS. Previously this
+      # assertion (services.go-backend must be enabled by no host) was reachable
+      # only from `nix flake check` and `task checks:quick`, neither of which CI
+      # ran, so it was not actually enforced automatically.
+      - name: Per-host eval + assertion gate
+        if: matrix.kind == 'nixos'
+        run: nix build -L .?submodules=1#hostChecks.${{ matrix.arch }}.${{ matrix.host }}

@@ -188,7 +188,7 @@ in {
   services.llama-swap = {
     enable = true;
     listenAddress = "0.0.0.0";
-    port = port;
+    inherit port;
     settings = {
       healthCheckTimeout = 600;
       # Unload an idle model so the next swap has the RAM to load the other.

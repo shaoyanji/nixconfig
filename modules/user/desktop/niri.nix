@@ -155,7 +155,13 @@
       "Mod+Z".action.spawn = "zen-beta";
       # "Mod+C".action.spawn-sh = "kitty -- task";
       "Mod+C".action.spawn-sh = "tmux display-popup task";
-      "Mod+B".action.spawn-sh = "kando -m 'Kando Menu'";
+      # Kando `-m/--menu` selects a menu by NAME. Kando 3.0.0's shipped
+      # menus.json only defines "Example Menu" (shortcutID `example-menu`),
+      # so `kando -m 'Kando Menu'` matched nothing and the bind opened no menu
+      # on any host without a hand-made "Kando Menu". Launch without a name:
+      # kando shows its default menu, so the bind cannot go dead on a name
+      # mismatch. (Use `-m '<name>'` only when that menu is provisioned.)
+      "Mod+B".action.spawn-sh = "kando";
       # Freebuff mainframe terminal on frieren (fleet AI coding session)
       "Mod+Shift+B".action.spawn = "freebuff-terminal";
 
@@ -165,7 +171,7 @@
       "Mod+BracketRight".action.consume-or-expel-window-right = [];
 
       "Mod+Return".action.toggle-overview = [];
-      "Ctrl+Space".action.spawn-sh = "kando -m 'Kando Menu'";
+      "Ctrl+Space".action.spawn-sh = "kando";
 
       "Mod+H".action.focus-column-left = [];
       "Mod+J".action.focus-workspace-down = [];

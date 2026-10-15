@@ -69,7 +69,11 @@ command -v yq >/dev/null 2>&1 || {
 
 # The host that is allowed to build: it is the one serving the cache.
 builder="$(yq -r '.metadata.builder_host // "frieren"' "$INVENTORY")"
-cache_url="$(yq -r '.metadata.cache_url // ""' "$INVENTORY")"
+# Falls back to the fleet's harmonia address: `yq -i` rewrites all of inventory.toml
+# (a 622-line diff), so the metadata key could not be added without destroying the
+# file's formatting. Env CACHE= overrides either way.
+cache_url="$(yq -r '.metadata.cache_url // ""' "$INVENTORY" 2>/dev/null || true)"
+[ -n "$cache_url" ] || cache_url="http://192.168.3.25:5000"
 self="$(hostname)"
 
 # Where the closure is expected to be substitutable from. Probing the LAN cache
@@ -95,13 +99,14 @@ host_status() {
   yq -r ".hosts.\"$1\".status // \"absent\"" "$INVENTORY" 2>/dev/null || echo absent
 }
 
-# A path is substitutable when the cache can hand out its narinfo. One bounded
-# HTTP request — no ssh, no daemon, no auth.
+# A path is substitutable when the cache can hand it out. Query with nix's own
+# store protocol rather than curl: harmonia answers a raw <hash>.narinfo request
+# with 404 even for paths it serves (measured 2026-10-15), so a curl-based gate
+# reports false failures. No ssh, no daemon, no auth involved either way.
 served_by_cache() {
   local path="$1"
   [ -n "$check_store" ] || return 1
-  local base="${path##*/}"
-  curl -fsS --max-time 5 -o /dev/null "$check_store/$base.narinfo"
+  nix path-info --store "$check_store" "$path" >/dev/null 2>&1
 }
 
 # Derivations no substituter can serve, i.e. what would be COMPILED. Same parse

@@ -172,26 +172,28 @@ tasks:
       - ssh root@netbook "nixos-rebuild switch"
 
   infra:apply:host:*:
-    desc: Apply a specific remote host configuration (no git side effects)
+    desc: Activate ONE active host by pulling its closure from the LAN cache
     summary: >
-      Switches the NixOS host <host> over the transport TARGET, which defaults to
-      the host name — i.e. whatever your ssh config resolves it to. Pass
-      TARGET=user@<lan-ip> to deploy over the LAN when the tailnet path needs
-      interactive auth (Tailscale SSH can demand a browser check, which silently
-      blocks an unattended run). The transport is a parameter rather than an
-      assumption baked into the task, so the step composes with any reachable
-      route. INTENDED FOR ONE HOST — for the fleet use infra:apply:fleet.
-      Vars: TARGET= (default: <host>).
+      The fast unattended deploy path: the TARGET pulls the closure from harmonia
+      over HTTP (parallel, resumable) and switches itself, instead of the caller
+      pushing it over ssh with `nixos-rebuild --target-host`. Measured
+      2026-10-15: ~130-150 paths/min pulling vs 18 paths/min pushing — the
+      difference between a couple of minutes and ~30 for a full delta.
+      Preconditions are checked, not assumed: the host must be ACTIVE in
+      inventory.toml and the closure must already be servable by the cache (warm
+      it on the builder with infra:warm:cache HOSTS=<host>). The gate fails loudly
+      rather than letting the switch quietly compile on the target.
+      No ssh prompt is ever opened — BatchMode + ConnectTimeout, and activation
+      runs detached in a transient systemd unit, so a long transfer cannot be
+      killed by a dropped connection. INTENDED FOR ONE HOST; the fleet is
+      infra:apply:fleet on a schedule.
+      Vars: TARGET= (default <host>), CACHE= (default: inventory metadata or the
+      fleet harmonia address).
     vars:
       HOST: '{{index .MATCH 0}}'
       TARGET: '{{.TARGET | default .HOST}}'
     cmds:
-      # Report the build-routing state first (read-only, cache-based, no ssh) so
-      # a switch that is about to compile locally says so up front. Best-effort:
-      # a roaming host must still be able to apply. The gate is
-      # `task checks:build:route`.
-      - bash scripts/task/warm-host.sh --check --best-effort {{.HOST}}
-      - nixos-rebuild switch --use-remote-sudo --target-host {{.TARGET}} --fast --flake .?submodules=1#{{.HOST}} |& nom
+      - bash scripts/task/activate-host.sh {{.HOST}} {{.TARGET}}
 
   infra:warm:cache:
     desc: Build the managed host closures locally so harmonia serves them at LAN speed (HOSTS="a b" overrides; UPDATE=1 also refreshes flake.lock)
@@ -298,26 +300,29 @@ tasks:
       - ssh root@netbook "hostname && nixos-version"
 
   infra:deploy:host:*:
-    desc: Plan + apply + validate ONE intended host (no git side effects)
+    desc: Deploy ONE intended host — gate, activate from the cache, then validate
     summary: >
-      The intended deploy path for a single host — plan, switch, then prove the
-      host came up (`systemctl is-system-running`). Deliberately NOT fleet-wide:
-      fleet builds belong on the schedule (`fleet-warm-cache`), and a fleet-wide
-      push is `infra:apply:fleet`. Use this when one host is needed now.
-      It gates on build routing first (`checks:build:route`, read-only and
-      cache-based): if the closure is not yet substitutable the deploy fails
-      instead of silently turning into a 30-minute compile on a laptop. The gate
-      passes trivially when run from the builder, which is where closures are
-      supposed to be built.
-      Vars: TARGET= (default: <host>) — see infra:apply:host:* for why the
-      transport is a parameter.
+      The intended deploy path for a single host, and deliberately not fleet-wide:
+      fleet builds belong on the schedule (`fleet-warm-cache`), a fleet push is
+      `infra:apply:fleet`, and a host needed NOW gets this.
+
+      Order matters and is the whole point: the build-routing gate runs first
+      (`checks:build:route`, read-only, cache-based, no ssh) so a closure that is
+      not yet servable fails the deploy instead of silently turning into a
+      30-minute compile. Then the target pulls the closure from the cache and
+      switches (see infra:apply:host:*), and finally `services:validate` proves the
+      host came up.
+
+      Note on hashes: the warmed closure must match the tree being deployed. A
+      commit changes the flake source hash and therefore the toplevel, so commit
+      first, then warm, then deploy — otherwise the cache serves a stale path.
+      Vars: TARGET= (default <host>), CACHE=.
     vars:
       HOST: '{{index .MATCH 0}}'
       TARGET: '{{.TARGET | default .HOST}}'
     cmds:
       - bash scripts/task/warm-host.sh --check {{.HOST}}
-      - task infra:plan:host:{{.HOST}}
-      - task infra:apply:host:{{.HOST}} TARGET={{.TARGET}}
+      - bash scripts/task/activate-host.sh {{.HOST}} {{.TARGET}}
       - task services:validate:host:{{.HOST}} TARGET={{.TARGET}}
 
   infra:rollback:host:netbook:

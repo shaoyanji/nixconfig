@@ -7,6 +7,7 @@
   imports = [
     ./minimal.nix
     ../shell
+    ../dev.nix
     # ../user/ai/opencode.nix # too bloated
     # ../user/ai/codex.nix
     ../user/ai/antigravity-cli.nix
@@ -17,12 +18,11 @@
   home.packages = with pkgs;
     [
       # ── Moved from base (too heavy for servers) ──
-      peertube-viewer
-      pi-coding-agent # AI coding agent (515 MB closure)
-      devenv # Developer environments (864 MB closure)
-      nixd # Nix language server (588 MB closure, pulls llvm)
+      # peertube-viewer
+      # pi-coding-agent # AI coding agent (515 MB closure)
+      # devenv & nixd — tiered in dev.nix under profiles.dev.tier == "full"
       ffmpeg # Audio/video processing (~1 GB closure)
-      tesseract # OCR engine (~1 GB closure)
+      # tesseract # OCR engine (~1 GB closure)
       graphviz # Graph visualization
       a2ps
       amfora
@@ -68,13 +68,7 @@
       wl-clipboard
       # simplex-chat-desktop
       qrrs
-      cook-cli
-      surge-cli
-      supabase-cli
-      turso-cli
-      cloudflare-cli
-      bootdev-cli
-      wash-cli
+      # Cloud CLIs (cook, surge, supabase, turso, cloudflare, bootdev, wash) — tiered in dev.nix
       # libation
     ]
     ++ lib.optionals stdenv.hostPlatform.isDarwin [

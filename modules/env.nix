@@ -1,21 +1,48 @@
 {
   lib,
   pkgs,
+  config,
+  osConfig ? {},
   ...
-}: {
+}: let
+  hostName = osConfig.networking.hostName or (config.networking.hostName or "");
+  invHost =
+    if hostName != ""
+    then (osConfig.fleet.inventory.hosts.${hostName} or (config.fleet.inventory.hosts.${hostName} or null))
+    else null;
+  category = invHost.category or "";
+
+  # On laptops and compact screens (e.g. 14" 1600x900 or 1080p),
+  # side-by-side diffs compress columns and cause awkward line wrapping.
+  # Workstations and widescreen setups default to side-by-side.
+  isLaptop =
+    category == "laptop"
+    || builtins.elem hostName ["aristotle" "fern" "scratch" "netbook" "thinsandy"];
+  defaultSideBySide = !isLaptop;
+in {
   imports = [
     ./nixoshmsymlinks.nix
     ./himalaya.nix
   ];
-  # programs.nixvim.enable = true;
-  home.activation.removeExistingGitConfig = lib.hm.dag.entryAfter ["checkLinkTargets"] ''
-    rm -f ~/.gitconfig
-  '';
+
+  options.profiles.git = {
+    deltaSideBySide = lib.mkOption {
+      type = lib.types.bool;
+      default = defaultSideBySide;
+      description = "Enable side-by-side diff display in delta. Defaults to false on laptops to avoid column cramping.";
+    };
+  };
+
+  config = {
+    # programs.nixvim.enable = true;
+    home.activation.removeExistingGitConfig = lib.hm.dag.entryAfter ["checkLinkTargets"] ''
+      rm -f ~/.gitconfig
+    '';
   programs.delta = {
     enableGitIntegration = true;
     enable = true;
     options = {
-      side-by-side = true;
+      side-by-side = config.profiles.git.deltaSideBySide;
       use-fancy-line-numbers = true;
       highlight-renames = true;
       highlight-old-new-lines = true;
@@ -84,13 +111,14 @@
       }
     ];
   };
-  home.packages = with pkgs; [
-    lazygit
-    #   sops #managed by sops module
-    #   yq
-    #   yq-go#managed by sops module
-    #   pass
-    #   gnupg
-    #   age
-  ];
+    home.packages = with pkgs; [
+      lazygit
+      #   sops #managed by sops module
+      #   yq
+      #   yq-go#managed by sops module
+      #   pass
+      #   gnupg
+      #   age
+    ];
+  };
 }

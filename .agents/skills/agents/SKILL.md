@@ -54,3 +54,13 @@ Sub-commands accessible from menu: `rebuild`, `edit-config`, `update`, `load`, `
 | `sudologinssh` | Run sudo-login from encrypted command list |
 
 All OAuth tasks run `scripts/task/service-oauth.sh`.
+
+## Verification discipline (always-on)
+
+When identity, host, or runtime state is questioned — verify with concrete commands before asserting anything. Never speculate about which host you are on, which user runs the session, or which environment applies.
+
+- Run `hostname`, `fastfetch`, `whoami`, or equivalent live probes first.
+- Confirm evidence (command output) before stating identity/state.
+- If wrong: state plainly what was missed, name it, fix course — no theatrical apology, no defensive preamble. The user corrected style directly ("this is a total shitshow"); honor that by being brief and factual.
+
+Pitfall: asserting host/persona without running the probe produces a trust-break; the user will force verification and treat the session as unreliable. The command output is the ground truth — treat it as binding.

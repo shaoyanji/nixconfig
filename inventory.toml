@@ -17,10 +17,10 @@ description = "Canonical hardware, operational status, network, and agent person
 version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
 total_devices = 34
-active_nix_devices = 10
+active_nix_devices = 11
 active_external_devices = 6
 wip_devices = 1
-preserved_devices = 17
+preserved_devices = 16
 
 # ------------------------------------------------------------------------------
 # 1. CORE SERVERS & INFRASTRUCTURE
@@ -298,39 +298,52 @@ constraints = ["No Intel iGPU present; all display and encoding flows through th
 
 [hosts.aristotle]
 hostname = "aristotle"
-status = "preserved"
-status_detail = "Preserved for standard Niri desktop workstation patterns; not actively deployed."
+status = "active"
+status_detail = "In active production on LAN as a lightweight ThinkPad T440 mobile laptop workstation."
+managed = true
 kind = "nixos"
 arch = "x86_64-linux"
-role = "Standard Desktop Workstation"
-category = "workstation"
+role = "ThinkPad T440 Mobile Laptop Workstation"
+category = "laptop"
 desktop_environment = "Niri + DankMaterialShell greeter"
 users = ["devji"]
+notes = [
+  "Lenovo ThinkPad T440 (20B7S06N00) laptop: lightweight Niri Wayland desktop via programs.dms-greeter autologin as devji.",
+  "Intel Core i5-4300U (Haswell-ULT, 2c/4t, 15W), Intel HD Graphics 4400, 8 GiB DDR3L, 3.8 GiB zram swap.",
+  "Storage: 59.6GB Innodisk M.2 (S42) 3ME4 SSD (/dev/sda2 btrfs @root, @home, @nix; /dev/sda1 550MB vfat /boot) + NFS /Volumes/data mount from frieren.",
+  "Network: Dual-NIC LAN with enp0s25 wired (192.168.3.32, MAC 28:d2:44:61:0a:38) and wlp3s0 Wi-Fi (192.168.3.93, MAC 7c:7a:91:1b:47:02). Tailscale enabled on 100.110.54.71. DNS directed to frieren Pi-hole on 192.168.3.25.",
+  "Power: Dual-battery ThinkPad Power Bridge system (BAT0 45N1111 internal, BAT1 45N1127 external)."
+]
 
 [hosts.aristotle.hardware]
-model = "Desktop Workstation"
-cpu = "Intel 64-bit multi-core"
-gpu = "Intel / Integrated"
-ram = "16 GiB DDR4"
-storage_type = "SATA / NVMe SSD"
-storage_layout = "Persistent root with NFS /Volumes/data mount"
+model = "Lenovo ThinkPad T440 (20B7S06N00)"
+cpu = "Intel Core i5-4300U (Haswell-ULT, 2c/4t, 1.90 GHz base / 2.90 GHz turbo, 15 W)"
+gpu = "Intel HD Graphics 4400 (Haswell-ULT Integrated)"
+ram = "8 GiB DDR3L + 3.8 GiB zram swap"
+display = "14.0\" 1600x900 LCD (eDP-1)"
+battery = "Dual-battery Power Bridge (BAT0 45N1111 internal + BAT1 45N1127 external)"
+storage_type = "SATA M.2 SSD"
+storage_layout = "59.6GB Innodisk M.2 (S42) 3ME4 SSD (/dev/sda2 btrfs @root, @home, @nix; /dev/sda1 550MB vfat /boot) + NFS /Volumes/data mount"
 
 [hosts.aristotle.network]
+lan_ip = "192.168.3.32"
 tailscale = true
+tailscale_hostname = "aristotle"
+tailscale_ip = "100.110.54.71"
 ssh_alias = "aristotle"
 
 [hosts.aristotle.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Niri Compositor", "DMS Greeter", "NFS client automount", "SSH CA Client"]
-traits = ["niri-desktop", "nfs-client", "desktop-client"]
+key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NFS client automount (/Volumes/data from frieren)", "SSH CA Client"]
+traits = ["thinkpad-t440", "laptop-profile", "niri-desktop", "nfs-client", "battery-optimized", "btrfs"]
 
 [hosts.aristotle.persona]
-title = "Philosophical Desktop Workstation (Preserved)"
-system_prompt_hint = "You represent the baseline desktop pattern for Niri + DMS greeter."
-compute_tier = "standard-desktop"
-allowed_tasks = ["Configuration pattern reference"]
-constraints = ["Preserved host; do not target for live deployment."]
+title = "Philosophical ThinkPad T440 Mobile Workstation"
+system_prompt_hint = "You are the ThinkPad T440 mobile laptop companion. Prioritize energy-conscious operation, snappy Niri Wayland workflows, and seamless LAN NAS integration."
+compute_tier = "lightweight-laptop"
+allowed_tasks = ["Everyday coding and markdown notes", "NFS synchronization with NAS", "Lightweight desktop productivity", "Battery lifecycle management"]
+constraints = ["15W dual-core Haswell i5-4300U processor and 8GB RAM; avoid heavy compilation loops. Always substitute closures from frieren LAN cache."]
 
 [hosts.aceofspades]
 hostname = "aceofspades"

@@ -31,138 +31,70 @@ in {
     packages = with pkgs;
       readPkgList ../../../pkg.txt
       ++ [
-        # ── PDF / Document Processing ──
-        pandoc # Universal document converter
-        pdfcpu # PDF processing toolkit
-        poppler-utils # PDF utilities (pdftotext, pdfinfo, etc.)
-        typst # Modern typesetting system
-        tinymist # Typst language server
-        comrak # CommonMark-compliant Markdown renderer
-        obsidian-export # Export Obsidian markdown notes
-
-        # ── Image / Media / Graphics ──
-        exiftool # EXIF metadata reader/writer
-        graph-easy # ASCII/HTML/SVG graph renderer
-        qrencode # QR code generator
-        pastel # Color palette tool
-
-        # ── Terminal UI / TUI Apps ──
+        # ── Sysadmin Resource & Performance Monitoring ──
         btop # Resource monitor
         duf # Disk usage/free space viewer
-        # dufs # Static file server with Web UI
         fastfetch # System info fetcher
-        glow # Markdown renderer for terminal
-        gum # Shell scripting eye-candy
-        lowfi # Lo-fi music player
-        most # Advanced pager
-        navi # Interactive cheatsheet tool
-        pop # Terminal email client
-        procs # ps replacement
-        slides # Terminal presentation tool
-        tre # Tree viewer with syntax highlighting
-        charm-freeze # Code block image generator
+        procs # Modern ps replacement
 
-        # ── File / Data Transfer ──
-        aria2 # Download utility
-        httpie # User-friendly HTTP client
-        http-nu # HTTP client for Nushell
-        mutt # Terminal email client
-        rclone # Cloud storage sync
-        rsync # Remote file sync
+        # ── File & Remote Data Transfer ──
+        aria2 # Multi-protocol download utility
+        rclone # Cloud/remote storage sync
+        rsync # Fast incremental remote file copy
 
-        # ── Network / Diagnostics ──
-        awscli2 # AWS CLI
+        # ── Network Diagnostics & Infrastructure ──
         bandwhich # Terminal bandwidth monitor
-        cloudflared # Cloudflare tunnel client
         dnsutils # DNS utilities (dig, nslookup)
-        gping # Ping with graph
+        gping # Graphical interactive ping
         iftop # Network bandwidth monitor
-        ipcalc # IP address calculator
-        iperf3 # Network bandwidth measurement
-        ldns # DNS library utilities
-        mtr # Network diagnostic (traceroute + ping)
-        nmap # Network scanner
-        socat # Bidirectional data relay
+        ipcalc # IPv4/IPv6 subnet calculator
+        iperf3 # Network throughput tester
+        ldns # Fast DNS resolver & drill tool
+        mtr # Combined traceroute & ping diagnostic
+        nmap # Network port scanner & security audit
+        socat # Multipurpose bidirectional relay
 
-        # ── Security / Encryption / Auth ──
-        age # Simple, modern encryption
-        # bitwarden-cli # Bitwarden password manager CLI
-        cloak # Encrypted secrets manager (TOTP generator)
+        # ── Secrets, Encryption & Security ──
+        age # Modern simple file encryption
+        cloak # Command-line TOTP / 2FA secrets generator
 
-        # ── Archive / Compression ──
+        # ── Archive & Compression Formats ──
+        lz4 # Extremely fast compression
         p7zip # 7-Zip archiver
-        unzip # ZIP extraction
-        zip # ZIP compression
-        zstd # Zstandard compression
+        unzip # Standard ZIP extractor
+        zip # Standard ZIP archiver
+        zstd # Modern real-time compression (Zstandard)
 
-        # ── Shell / Productivity / Dev Tools ──
-        asciinema # Terminal session recorder
-        epr # E-book reader
-        go-task # Task runner (Taskfile.yml)
-        gokrazy # Go-based embedded Linux builder
-        htmlq # HTML query (like jq for HTML)
-        just # Command runner (Make-like)
-        markdownlint-cli # Markdown linter
-        mdq # Markdown query tool
-        nix-output-monitor # Pretty Nix output
-        sd # sed alternative (find/replace)
-        tomlq # TOML processor
-        yq-go # YAML/JSON/XML processor
+        # ── Automation, Task Runners & Scripting ──
+        go-task # Taskfile runner (task)
+        gum # Modern shell eye-candy / interactive TUI (used by fleet task scripts)
+        just # Modern command runner
+        nix-output-monitor # Enhanced nix-build progress output (nom)
+        sd # Intuitive regex search & replace
+        tomlq # TOML stream parser
+        yq-go # YAML/JSON processor
 
-        # ── Search / Bookmarks ──
-        buku # Bookmark manager
-        ddgr # DuckDuckGo from terminal
-        fdupes # Duplicate file finder
-        hyperfine # Benchmarking tool
+        # ── Core Unix Administration Utilities ──
+        entr # Event-driven command execution on file change
+        file # File type inspection
+        gawk # GNU pattern scanning language
+        gnused # GNU stream editor
+        gnutar # GNU tar tape archiver
+        tree # Hierarchical directory visualizer
+        which # Path discovery for binaries
 
-        # ── Core Unix Utilities ──
-        aha # ANSI to HTML converter
-        diff-so-fancy # Better git diff output
-        entr # Run commands on file changes
-        file # File type detection
-        gawk # GNU awk
-        gnused # GNU sed
-        gnutar # GNU tar
-        mc # Midnight Commander file manager
-        tree # Directory tree viewer
-        which # Locate executables
-
-        # ── Databases ──
-        sqlite # SQLite database
-
-        # ── Misc ──
-        mailsy # Email utility
+        # ── Databases & Persistent Stores ──
+        sqlite # Embedded relational database engine
       ]
       ++ lib.optionals stdenv.hostPlatform.isLinux [
-        # ── Linux-only TUI Apps ──
-        newsboat # RSS/Atom feed reader
-        # tuir # TUI for Reddit
-
-        # ── Linux-only Dev / Productivity ──
-        dust # Disk usage analyzer
-        gitmoji-cli # Gitmoji CLI
-        hub # GitHub CLI wrapper
+        # ── Linux System Diagnostics & Hardware ──
+        lsof # List open files & network sockets
         pass # Standard Unix password manager
-        tldr # Simplified man pages
-
-        # ── Linux-only Compression ──
-        lz4 # Fast compression algorithm
-
-        # ── Linux-only Document Processing ──
-        md2pdf # Markdown to PDF converter
-        ghostscript_headless # PostScript/PDF interpreter
-
-        # ── Linux-only System Diagnostics ──
-        lsof # List open files
-        (ltrace.overrideAttrs (_: {doCheck = false;})) # Library call tracer
-        pciutils # PCI bus utilities
-        strace # System call tracer
-        sysstat # System performance tools
-        usbutils # USB device utilities
-      ]
-      ++ lib.optionals stdenv.hostPlatform.isx86_64 [
-        glances # Cross-platform system monitor
-        nurl
+        pciutils # PCI bus inspection (lspci)
+        strace # Kernel system call tracer
+        sysstat # System performance & accounting (sar, iostat)
+        tldr # Practical command manual pages
+        usbutils # USB bus inspection (lsusb)
       ]
       ++ lib.optionals stdenv.hostPlatform.isDarwin [];
 

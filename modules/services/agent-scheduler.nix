@@ -89,7 +89,7 @@ in {
   config = lib.mkIf cfg.enable {
     systemd.user.services = lib.mapAttrs' (_: job:
       lib.nameValuePair job.name {
-        description = job.description;
+        inherit (job) description;
         after = ["network.target"];
         serviceConfig = {
           Type = "oneshot";
@@ -108,19 +108,21 @@ in {
           StandardError = "journal";
         };
       })
-      (lib.filterAttrs (_: j: j.enable) cfg.jobs);
+    (lib.filterAttrs (_: j: j.enable) cfg.jobs);
 
     systemd.user.timers = lib.mapAttrs' (_: job:
       lib.nameValuePair job.name {
         description = "Timer for ${job.description}";
-        timerConfig = {
-          OnCalendar = job.schedule;
-          Persistent = job.persistent;
-        } // lib.optionalAttrs (job.randomizedDelaySec != null) {
-          RandomizedDelaySec = job.randomizedDelaySec;
-        };
+        timerConfig =
+          {
+            OnCalendar = job.schedule;
+            Persistent = job.persistent;
+          }
+          // lib.optionalAttrs (job.randomizedDelaySec != null) {
+            RandomizedDelaySec = job.randomizedDelaySec;
+          };
         wantedBy = ["timers.target"];
       })
-      (lib.filterAttrs (_: j: j.enable) cfg.jobs);
+    (lib.filterAttrs (_: j: j.enable) cfg.jobs);
   };
 }

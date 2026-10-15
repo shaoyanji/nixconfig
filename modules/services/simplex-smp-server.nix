@@ -84,9 +84,9 @@ in {
           fi
 
           ${lib.optionalString (cfg.tailscaleIp != null) ''
-            # If tailscaleIp is defined, advertise both LAN and Tailscale IPs in transport host
-            sed -i 's/^host = .*/host = ${cfg.ip},${cfg.tailscaleIp}/' /etc/opt/simplex/smp-server.ini
-          ''}
+          # If tailscaleIp is defined, advertise both LAN and Tailscale IPs in transport host
+          sed -i 's/^host = .*/host = ${cfg.ip},${cfg.tailscaleIp}/' /etc/opt/simplex/smp-server.ini
+        ''}
         fi
       '';
 

@@ -10,8 +10,8 @@ final: _prev: {
 
     dontUnpack = true;
 
-    nativeBuildInputs = [ final.autoPatchelfHook ];
-    buildInputs = [ final.zlib final.openssl final.gmp final.stdenv.cc.cc.lib ];
+    nativeBuildInputs = [final.autoPatchelfHook];
+    buildInputs = [final.zlib final.openssl final.gmp final.stdenv.cc.cc.lib];
 
     installPhase = ''
       install -Dm755 $src $out/bin/simplex-chat
@@ -37,8 +37,8 @@ final: _prev: {
 
     dontUnpack = true;
 
-    nativeBuildInputs = [ final.autoPatchelfHook ];
-    buildInputs = [ final.zlib final.openssl final.gmp final.stdenv.cc.cc.lib ];
+    nativeBuildInputs = [final.autoPatchelfHook];
+    buildInputs = [final.zlib final.openssl final.gmp final.stdenv.cc.cc.lib];
 
     installPhase = ''
       install -Dm755 $src $out/bin/smp-server

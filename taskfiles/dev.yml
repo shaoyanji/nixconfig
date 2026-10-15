@@ -287,6 +287,35 @@ tasks:
     cmds:
       - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --home-agents {{.HOST | default "frieren"}} --output ~/AGENTS.md"
 
+  dev:inventory:json:
+    desc: Print the compiled inventory as pretty JSON (schema-checked, derived counts)
+    summary: >
+      Builds packages.<system>.inventory-json from the single parse in lib/inventory.nix.
+      Consume THIS rather than re-parsing inventory.toml with yq: it is already validated,
+      defaults-normalised, and carries the derived counts, so no consumer can disagree
+      with another. Store-cached — repeat calls cost nothing.
+    cmds:
+      - nix build --no-link --print-out-paths .#packages.x86_64-linux.inventory-json | xargs cat
+
+  dev:inventory:feed:
+    desc: Print the compiled agent feed for every Nix host
+    summary: >
+      Builds packages.<system>.fleet-feed: role, status, persona hint, compute tier,
+      hardware, traits, key services and notes for every Nix host, generated from the
+      compiled registry. This is where host commentary is meant to live (inventory.toml
+      `notes`) instead of as comments in Nix.
+    cmds:
+      - nix build --no-link --print-out-paths .#packages.x86_64-linux.fleet-feed | xargs cat
+
+  dev:inventory:host:
+    desc: Print one host's compiled inventory record (HOST=name)
+    summary: >
+      Reads self.inventory — parsed once at flake level — so this evaluates NO host
+      configuration. The fast path for scripts that today shell out to `yq`. Fails
+      loudly on an unknown host rather than printing null.
+    cmds:
+      - nix eval --json .#inventory.hosts.{{.HOST | default "frieren"}}
+
   dev:modules:menu:
     desc: Interactive Charmbracelet Gum TUI for fleet modules.toml control knobs (yq-backed)
     cmds:

@@ -10,7 +10,7 @@
   deckSessionSwitch = pkgs.writeShellScriptBin "deck-session-switch" ''
     set -euo pipefail
 
-    export PATH="${lib.makeBinPath (with pkgs; [ procps coreutils gnugrep systemd ])}:\$PATH"
+    export PATH="${lib.makeBinPath (with pkgs; [procps coreutils gnugrep systemd])}:\$PATH"
 
     STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/deck-session"
     STATE_FILE="$STATE_DIR/target-session"

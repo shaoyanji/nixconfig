@@ -29,12 +29,11 @@
   # gatus requires at least one condition per endpoint. If none are specified,
   # supply type-appropriate defaults based on the URL scheme.
   defaultConditions = url:
-    if lib.hasPrefix "tcp://" url then
-      ["[CONNECTED] == true"]
-    else if lib.hasPrefix "icmp://" url then
-      ["[CONNECTED] == true"]
-    else
-      ["[STATUS] < 400"];
+    if lib.hasPrefix "tcp://" url
+    then ["[CONNECTED] == true"]
+    else if lib.hasPrefix "icmp://" url
+    then ["[CONNECTED] == true"]
+    else ["[STATUS] < 400"];
 
   toEndpoint = e:
     {

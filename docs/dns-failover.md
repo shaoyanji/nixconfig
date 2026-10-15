@@ -39,20 +39,33 @@ profiles.dnsFailover = {
   lanInterface = "enp1s0";
   zone = "frieren.lan";
   zoneAddress = "192.168.3.25";
-  resolvers = ["192.168.3.25"];  # one member today — no failover yet
+  resolvers = ["192.168.3.25"];
   extraDnsmasqLines = [ ... ];
 };
 ```
 
-`virtualIp` is **null**: frieren is the only resolver that exists, so failover is
-client-side (a client given the whole `resolvers` list retries the next one). There is
-nothing to float a VIP onto and nothing that would answer if frieren vanished.
+**fern is now the second member**: `hosts/fern/configuration.nix` declares the same
+stack as `role = "secondary"` (its own `lanInterface = "wlo1"`), answering the same
+`frieren.lan` wildcard and the same upstream chain (`127.0.0.1#5335` unbound), so a
+client that falls back gets identical answers.
 
-**No always-on second NixOS host is currently online** (every other fleet host is
-`preserved`/dormant or offline — `mtfuji`, the design candidate, is `preserved` and its
-own inventory entry says not to target it for live deployment). HC-3 is therefore
-**mechanism-complete but not yet redundant**: the module, the primary declaration and
-the verification tooling exist; the second member awaits a host.
+`virtualIp` is still **null**, so failover is **client-side**: nothing floats, and
+clients must be handed both resolvers (FritzBox DHCP secondary, or a client's
+`networking.nameservers`). There is no VIP to answer if a node dies silently.
+
+### fern's address is deliberately NOT in `resolvers`
+
+fern's LAN address is **DHCP**, so it is not written anywhere in the flake: it belongs
+in the router's DHCP reservation (or a tailnet name), not as a literal. Consequence to
+expect: `checks:dns:failover` reads the group from frieren's declaration, so while fern
+is still an unlisted member the check reports the **exit 2 "cannot be evaluated"**
+state it always has. That is correct, not a regression — it becomes a real two-member
+group once fern's address is reserved and listed.
+
+frieren's own `192.168.3.25` is likewise a reservation rather than a Nix-static address
+(`networking.interfaces` is empty and `useDHCP` is true), which is why it is the only
+address the fleet hardcodes: it is the NAS and the subnet router, and every
+`*.frieren.lan` record points at it.
 
 ## Bringing up a secondary
 

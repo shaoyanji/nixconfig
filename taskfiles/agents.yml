@@ -124,12 +124,16 @@ tasks:
     desc: Interactive repo validation and check picker
     cmds:
       - |
-        choice=$(printf '%s\n' "quick" "modules" "inventory" "architecture" "sops-drift" "nix-lint" "remotes" exit | gum choose --header "Validation checks")
+        choice=$(printf '%s\n' "quick" "modules" "inventory" "host" "hosts" "sops-drift" "nix-lint" "remotes" exit | gum choose --header "Validation checks")
         case "$choice" in
           quick) task checks:quick ;;
           modules) task checks:modules:validate ;;
           inventory) task checks:inventory:sync ;;
-          architecture) nix build .#checks.x86_64-linux.host-architecture -L ;;
+          # Per-host eval + assertion gate, one host at a time (the fleet-wide
+          # `host-architecture` check this replaced evaluated all 23 hosts in one
+          # process and was SIGKILLed at 6078 MiB).
+          host) task checks:host HOST="$(gum input --header 'Host name' --value "${HOST:-frieren}")" ;;
+          hosts) task checks:hosts ;;
           "sops-drift") task checks:sops:drift ;;
           "nix-lint") task checks:nix:lint ;;
           remotes) task checks:remotes ;;

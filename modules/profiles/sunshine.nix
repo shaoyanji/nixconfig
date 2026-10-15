@@ -37,7 +37,7 @@ _: {
   #      nogroup, but this is unsafe."
   # Both surface as a toplevel build error (kellerbench system rebuild
   # fails) and as per-host evaluation check failures on multihost eval
-  # (checks.host-eval-<host>; this is what deckstation hit before the
+  # (hostChecks.<arch>.<host>; this is what deckstation hit before the
   # defensive group add).
   #
   # We declare the user as a daemon (long-lived background service, no
@@ -55,7 +55,7 @@ _: {
   };
 
   # Sunshines user-group counterpart. Pinned in the round-6 fix to fix
-  # the deckstation host-eval failure. NixOS auto-picks a free
+  # the deckstation per-host check failure. NixOS auto-picks a free
   # GID; we deliberately do NOT hard-code one (would clash across
   # hosts that import this profile in the same /etc/passwd context
   # during a shared Docker build, etc).

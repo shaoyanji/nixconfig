@@ -51,7 +51,7 @@ in {
           }
         ];
         locations."/" = {
-          root = cfg.root;
+          inherit (cfg) root;
           extraConfig = ''
             # Zero-TCP IPC headers
             add_header X-Bridge-Transport "UNIX-Domain-Socket" always;

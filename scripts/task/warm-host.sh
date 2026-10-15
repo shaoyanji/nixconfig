@@ -106,7 +106,10 @@ host_status() {
 served_by_cache() {
   local path="$1"
   [ -n "$check_store" ] || return 1
-  nix path-info --store "$check_store" "$path" >/dev/null 2>&1
+  # narinfo-cache-negative-ttl 0: nix caches 404 narinfo answers for 1h, so a
+  # path queried before it was built would keep "missing" after the build —
+  # the verify step must always ask the cache fresh.
+  nix path-info --store "$check_store" --option narinfo-cache-negative-ttl 0 "$path" >/dev/null 2>&1
 }
 
 # Derivations no substituter can serve, i.e. what would be COMPILED.

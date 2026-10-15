@@ -22,6 +22,16 @@
 #    `--no-check-sigs`. Its narinfo is trusted because it is the fleet's own LAN
 #    cache over a trusted network — assert that here rather than assume it.
 #
+# 4. **systemd-run nulls the service's stdin.** Without --pipe, `bash -s` reads
+#    an empty script, exits 0 instantly, and the unit reports success while
+#    nothing happened — the deploy silently did not deploy. --pipe forwards the
+#    piped script from ssh through sudo into the unit.
+# 5. **Negative narinfo caching poisons a freshly warmed cache.** Nix caches
+#    404 narinfo answers for 1h (narinfo-cache-negative-ttl). A target that
+#    pulled before the closure was warmed keeps "not finding" the path even
+#    after it is served, and the caller-side gate does the same. All cache
+#    queries here disable that cache so they always ask harmonia fresh.
+#
 # ssh is used, but ONLY bounded and non-interactive: BatchMode + ConnectTimeout,
 # piping a script to `sudo bash -s`. It cannot prompt, so it cannot hang the way
 # Tailscale SSH's browser check hung an unattended run for 5 minutes.
@@ -32,7 +42,11 @@
 #   activate-host.sh --check <host>         report only: is the closure servable?
 #
 # Env: CACHE=<url> (default: inventory metadata.cache_url)
-# Exit: 0 = activated; 1 = gate failed or activation failed; 2 = usage/config error.
+#      WAIT=<seconds> poll the target for the activation result after starting
+#      the unit (default 600; 0 disables and returns right after the start).
+# Exit: 0 = activated; 1 = gate failed, activation failed, or WAIT timeout
+#       (activation itself keeps running detached on that timeout);
+#       2 = usage/config error.
 set -euo pipefail
 
 usage() {
@@ -83,7 +97,7 @@ top="$(nix eval --raw "$attr.outPath" 2>/dev/null || true)"
 # answers that request with 404 while serving the path perfectly well over the
 # store API (measured 2026-10-15 on both a warm and a cold path — the curl test
 # gave false failures). `nix path-info --store` is the authoritative answer.
-if ! nix path-info --store "$cache" "$top" >/dev/null 2>&1; then
+if ! nix path-info --store "$cache" --option narinfo-cache-negative-ttl 0 "$top" >/dev/null 2>&1; then
   echo "activate [$host] GATE FAILED — $cache does not serve $top" >&2
   echo "  warm it on the builder first: task infra:warm:cache HOSTS=$host" >&2
   exit 1
@@ -109,7 +123,7 @@ if [ "\$(readlink -f /run/current-system)" = "\$TOP" ]; then
   exit 0
 fi
 echo "== pulling closure from \$CACHE (HTTP, parallel, resumable) =="
-"\$NIX" copy --from "\$CACHE" --no-check-sigs "\$TOP"
+"\$NIX" copy --from "\$CACHE" --no-check-sigs --option narinfo-cache-negative-ttl 0 "\$TOP"
 echo "== registering generation =="
 "\$NIXENV" -p /nix/var/nix/profiles/system --set "\$TOP"
 echo "== activating =="
@@ -123,7 +137,49 @@ echo "activate [$host] running on $target (unit $unit); progress: ssh $target jo
 # so the copy survives a dropped connection.
 printf '%s\n' "$remote" |
   ssh -o BatchMode=yes -o ConnectTimeout=10 -o ControlMaster=no "$target" \
-    "sudo systemd-run --collect --unit='$unit' --description='activate $host from $cache' --property=Type=oneshot bash -s"
+    "sudo systemd-run --collect --pipe --unit='$unit' --description='activate $host from $cache' --property=Type=oneshot bash -s"
 
-echo "activate [$host] started. Completion signal:"
+# Report a real outcome. The unit runs detached, but the caller should not be
+# left with only "started" — the 2026-10-15 incident was exactly that: the unit
+# exited 0 without executing anything and the deploy silently did not deploy.
+# Poll until the target reports the expected toplevel (success), the unit
+# reports failure, or WAIT seconds pass (activation continues detached).
+wait="${WAIT:-600}"
+if [ "$wait" = "0" ]; then
+  echo "activate [$host] started (WAIT=0, not polling). Completion signal:"
+  echo "  ssh $target 'readlink -f /run/current-system'   # expect $top"
+  exit 0
+fi
+
+ssh_opts="-o BatchMode=yes -o ConnectTimeout=10 -o ControlMaster=no"
+deadline=$((SECONDS + wait))
+while [ "$SECONDS" -lt "$deadline" ]; do
+  sleep 5
+  read -r cur state <<<"$(ssh $ssh_opts "$target" "readlink -f /run/current-system; systemctl show -p ActiveState --value '$unit' 2>/dev/null || true")" || true
+  if [ "$cur" = "$top" ]; then
+    echo "activate [$host] SUCCESS — $target is on $top"
+    exit 0
+  fi
+  if [ "$state" = "failed" ]; then
+    echo "activate [$host] FAILED on $target — unit journal:" >&2
+    ssh $ssh_opts "$target" "journalctl -u '$unit' --no-pager | tail -30" >&2 || true
+    exit 1
+  fi
+  if [ "$state" = "inactive" ] || [ "$state" = "not-found" ] || [ "$state" = "" ]; then
+    # --collect removes a finished unit within seconds; give the switch one
+    # poll to land the symlink before concluding failure.
+    sleep 5
+    cur="$(ssh $ssh_opts "$target" "readlink -f /run/current-system")" || cur=""
+    if [ "$cur" = "$top" ]; then
+      echo "activate [$host] SUCCESS — $target is on $top"
+      exit 0
+    fi
+    echo "activate [$host] FAILED on $target — unit finished but the target is still on $cur. Unit journal:" >&2
+    ssh $ssh_opts "$target" "journalctl -u '$unit' --no-pager | tail -30" >&2 || true
+    exit 1
+  fi
+done
+
+echo "activate [$host] TIMEOUT after ${wait}s — activation continues detached on $target. Check:"
 echo "  ssh $target 'readlink -f /run/current-system'   # expect $top"
+exit 1

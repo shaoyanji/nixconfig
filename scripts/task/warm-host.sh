@@ -109,10 +109,17 @@ served_by_cache() {
   nix path-info --store "$check_store" "$path" >/dev/null 2>&1
 }
 
-# Derivations no substituter can serve, i.e. what would be COMPILED. Same parse
-# as nixbuild-warm.sh; `grep -c` exits 1 on no match, hence the || true.
+# Derivations no substituter can serve, i.e. what would be COMPILED.
+#
+# `--builders ""` is not decoration: frieren has eu.nixbuild.net configured as a
+# distributed builder (/etc/nix/machines) and nixbuild.net bills PER BUILD-SECOND
+# against a 25 h/month free tier. A gate that could dispatch a build is a gate
+# that can spend that budget — which is exactly what happened on 2026-10-15, when
+# a `--check` that called `nix build --print-out-paths` (instead of --dry-run)
+# dispatched full closures to the remote builder. With builders disabled here, a
+# check CANNOT build even if a future edit drops the --dry-run.
 pending_count() {
-  nix build "$1" --dry-run 2>&1 | grep -c 'will be built' || true
+  nix build "$1" --dry-run --builders "" 2>&1 | grep -c 'will be built' || true
 }
 
 is_builder=0

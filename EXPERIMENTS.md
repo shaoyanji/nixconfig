@@ -3405,6 +3405,274 @@ Following Michael Stapelberg's February 2026 `microvm.nix` + virtiofs pattern ad
 
 ---
 
+## EXP-103 — NAS Path Governor: LAN-first mount with a verified tailnet fallback (`profiles.nasClient`)
+
+**Mode:** fstab automount on the LAN address (`192.168.3.25:/data`) plus a governor oneshot that probes, verifies, and falls back to the tailnet address (`100.97.61.65:/data`).  
+**Status:** **DELIVERED (2026-10-14, `modules/profiles/nas-client.nix`)**. Reboot-level behaviour still unverified — see below.
+
+**Use case.** fern boots faster than its WiFi. At 22:02:55 an autofs access triggered `mount.nfs` two seconds before `wlo1` had an IPv4 route, so the kernel answered `Network is unreachable` and `Volumes-data.mount` failed with status 32. The old `nas-mount-recovery` could not help: `systemctl restart Volumes-data.automount` re-arms the automount *without mounting or checking anything*, so the failed access was never retried and the share stayed dead until some later stray access. The same path must also work when the laptop is not on the LAN at all (hotel WiFi), without leaving an NFS client that blocks the kernel.
+
+**What landed.**
+* The fstab entry stays the LAN fast path — systemd-tracked, `x-systemd.automount`, 60 s idle unmount — but now mounts `soft,timeo=100,retrans=2` instead of the implicit `hard`: a server that vanishes produces a prompt EIO instead of an uninterruptible process.
+* `Volumes-data.mount` carries `OnFailure=nas-path-governor.service`, so a failed access hands the problem over immediately.
+* The governor probes port 2049, triggers the automount, **polls the mount table until the mount is real** (an access-triggered mount completes *after* the triggering call returns — a single immediate check reports "no mount"), falls back to the tailnet address when the LAN is unreachable, re-homes to the LAN when it returns, retries ×6 at boot / ×1 on the timer and on NetworkManager dispatcher events, and exits 0 when nothing is reachable (an offline laptop must not fail a unit on every boot).
+* `nix-gc` now waits for the governor and prunes GC roots that point into an absent NAS. A `result` symlink from a build run inside `/Volumes/data` registers an auto-GC-root *on the network path*; `nix-gc` stats it, the stat triggers the automount, and an unreachable NAS turned the entire GC run into exit 1 at every boot (`error: getting status of "/Volumes/data/projects/nixconfig/result": Host is down`). The guard runs as `ExecStartPre` with absolute tool paths, because nix-gc's own `PATH` carries no `findmnt`.
+
+**Evidence (live on fern, 2026-10-14).** Four branches driven against the real host: LAN reachable → mounted from LAN; LAN unreachable → mounted over tailnet (`100.97.61.65:/data`, contents readable); LAN back → tailnet mount unmounted, re-mounted from LAN; nothing reachable → no mount, unit exit 0. The GC guard verified under a bare `PATH` in both states (silent when mounted, prunes when not).
+
+**Why it is not fully prod yet.** The boot path itself has not been exercised: it needs a switch plus two reboots with a green `Volumes-data.mount` and a green `nix-gc`. The `soft`-vs-`hard` write semantics on a flaky link are also unproven. Exit criteria: two clean reboots, then a deliberate write-interruption test confirming `soft` fails loudly rather than corrupting silently.
+
+---
+
+## EXP-104 — Resolver independence for clients (`profiles.dnsClient`)
+
+**Mode:** client-side resolver policy — a declared fallback upstream alongside the handed-out one, so a single resolver host is not also a single point of failure for *clients*.
+
+**Status:** not started; the failure is measured, not hypothetical.
+
+**Use case.** fern's resolver chain is `fern → FritzBox 192.168.3.1 → frieren 192.168.3.25`. That the router forwards to frieren is provable from the fleet itself: `dig @192.168.3.1 docs.frieren.lan` answers `192.168.3.25`. While frieren's resolver SERVFAILed on 2026-10-14, **everything** on fern failed to resolve — including `cache.nixos.org`, which is why "I can't nixos build" and "DNS" were the same incident. Nothing on the client had a second opinion.
+
+**Module shape.**
+
+```nix
+profiles.dnsClient = {
+  enable = true;
+  preferred = [ "192.168.3.25" ];   # pihole + ad-blocking when it is up
+  fallback = [ "9.9.9.9" "1.1.1.1" ]; # keeps the laptop online when it is not
+};
+```
+
+**Evidence.** `resolvectl status wlo1` on fern reports a single DNS server (`192.168.3.1`); `dig @192.168.3.25` and `dig @192.168.3.1` both fail together when frieren's resolver stops.
+
+**Why it is not prod.** A public fallback bypasses ad-blocking and the `*.frieren.lan` wildcard for the window it is used, so the order and the failure detection have to be deliberate. Exit criteria: with frieren's resolver stopped, clients still resolve public names; `*.frieren.lan` still answers once frieren is back; `checks:dns:failover` reports the group honestly.
+
+---
+
+## EXP-105 — Resolver health probe and gate (`checks:dns:resolver-health`)
+
+**Mode:** monitor the resolver as a *service*, not as a config — a probe that fails when the resolver stops answering, wired into the existing Gatus deployment and the `checks:*` gate family.
+
+**Status:** not started; it is an explicitly listed follow-up of the 2026-10-14 incident in `HANDOFF.md` ("Add a resolver health check (gatus / checks:dns:failover) so a future resolver outage is detected automatically instead of by a human").
+
+**Use case.** The 2026-10-14 outage was found by a human noticing the internet was broken. Two independent faults were live simultaneously (unbound recursing over IPv6 with no IPv6 uplink, and dnsmasq dropping LAN queries after a lone `interface=` line), and both were invisible until someone tried to resolve a name.
+
+**Module shape.**
+
+```nix
+services.fleetMonitors.probes.dns = {
+  primary = "192.168.3.25";
+  internal = "photos.frieren.lan"; # wildcard zone, not the apex override
+  external = "cache.nixos.org";
+};
+```
+
+**Evidence.** `scripts/task/dns-failover-check.sh` already probes the group (a subdomain, not the apex, because the apex carries a local `127.0.0.1` override); it exits 2 while the group has one member. The missing half is *continuous* monitoring, which EXP-008's graduated Gatus deployment can host directly.
+
+**Why it is not prod.** Needs a probe that distinguishes "resolver down" from "WAN down" (two probes: internal name + external name), and HC-6's alerting is still unconfigured (`alerting is not configured` in the Gatus journal). Exit criteria: stopping `pihole-ftl` on frieren flips a monitor red within one interval and produces an alert; restoring it flips green.
+
+---
+
+## EXP-106 — Make `network-online.target` honest on WiFi (`services.wifiBringupGuard`)
+
+**Mode:** fix a D-Bus activation race so that "online" means "a route exists", and assert it.
+
+**Status:** root cause identified from the journal, fix not implemented.
+
+**Use case.** fern's boot journal shows the failure twice over, and it is the *cause* of EXP-103's symptom, not a coincidence:
+
+```
+dbus-broker-launch: Ignoring duplicate name 'fi.w1.wpa_supplicant1' in service file
+  '.../wpa_supplicant-2.12/share/dbus-1/system-services/fi.w1.wpa_supplicant1.service'
+NetworkManager: <error> device (wlo1): Couldn't initialize supplicant interface:
+  Failed to D-Bus activate wpa_supplicant service
+```
+
+Two D-Bus service files claim the same name, so the broker drops one, D-Bus activation of `wpa_supplicant` fails, and `NetworkManager` starts the WiFi device late. `network-online.target` was nevertheless reached at 22:02:53 — before `wlo1` had an address — so every unit ordered after it (the NAS mount, and `nix-gc` via its GC root on the NAS) was told the network was ready when it was not.
+
+**Deliverable.** Find both providers of `fi.w1.wpa_supplicant1.service` in the closure and remove the duplicate (or order NetworkManager after `wpa_supplicant.service` explicitly), plus a check that asserts a default route exists when `network-online.target` is reached.
+
+**Evidence.** `journalctl -b` on fern, both the 2026-10-09 boot (`Name owner lost`) and the 2026-10-14 boot (`Failed to D-Bus activate wpa_supplicant service`).
+
+**Why it is not prod.** Touching WiFi bring-up on a laptop is easy to get wrong in a way that only shows up when the machine is away from home. Exit criteria: three reboot cycles with no duplicate-name warning, a route present at `network-online.target`, and no `Volumes-data.mount` failure without the governor's help.
+
+---
+
+## EXP-107 — Build-routing guard: never build a host closure on a non-builder (`checks:build:route`)
+
+**Mode:** a rule plus a gate — heavy closures are built by CI or the remote builder, never on a 2-core laptop.
+
+**Status:** rule agreed and demonstrated, not yet wired into `AGENTS.md`/skills.
+
+**Use case.** `nixos-rebuild build --flake .#fern` was started on fern and pushed its load average to ~9.4 on a 2-core/4-thread machine before it was killed; the same closure was built on a GitHub runner and pushed to cachix in **6m53s** (`gh workflow run nixcachix.yml -f host=fern`, run `38634182649`, `build-machines (fern, nixos, x86_64-linux, ubuntu-latest …) success`). After the warm run, a local rebuild on fern is substitution-only.
+
+**Deliverable.** A documented rule ("if the host is not a builder, warm it through CI/`dev:nixbuild:warm` first") in `AGENTS.md` and the `dev` skill, plus a `checks:*` gate that reads `inventory.toml`'s `compute_tier`/`allowed_tasks` and fails when a build is attempted on a tier whose `allowed_tasks` excludes heavy compilation.
+
+**Evidence.** fern's `inventory.toml` entry restricts it to "Lightweight local builds and documentation" with the constraint "15W dual-core processor and 8GB RAM; avoid heavy compilation loops" — the constraint existed, the tooling did not enforce it. The CI workflow already maps host → runner arch from `inventory.toml` and already pushes to cachix.
+
+**Why it is not prod.** The gate needs a reliable way to detect "this is a heavy build" without evaluating the whole closure (the flake attribute plus a change-since-last-warm signal is the cheap heuristic). Exit criteria: `task checks:build:route HOST=fern` exits non-zero when fern would build an unwarmed closure, and passes after the CI warm.
+
+---
+
+## EXP-108 — One command that answers "can this host build?" (`checks:host:prebuild`)
+
+**Mode:** a preflight that checks the *inputs* of a build instead of running it: resolver, default route, each substituter's `nix-cache-info`, disk headroom, and whether the repo path itself lives on a network share.
+
+**Status:** not started; written from the 2026-10-14 debugging session, where every one of those inputs had to be tested by hand.
+
+**Use case.** "I can't nixos build" had four distinct causes on one machine in one evening: a resolver outage (frieren), a boot-race mount failure (NFS), a store path that is only reachable through that mount (`/Volumes/data/projects/nixconfig` is fern's repo), and a failed `nix-gc` that shared the same root cause. A single command that names the broken leg would have replaced the entire investigation.
+
+**Deliverable.**
+
+```nix
+# nixos-rebuild's problem is never "nix"; it is the preconditions.
+```
+
+**Evidence.** `curl https://cache.nixos.org/nix-cache-info` (200), `curl http://192.168.3.25:5000/nix-cache-info` (200), `nix build nixpkgs#hello` (ok), `findmnt -T /Volumes/data`, `resolvectl status`, and `df` are all cheap and were all needed.
+
+**Why it is not prod.** Needs to be honest about *which* failure matters (a dead substituter is survivable, a dead resolver is not) and must not itself trigger the NAS automount as a side effect of probing. Exit criteria: it exits non-zero naming exactly one leg on a host with that leg broken, and exits 0 within a second on a healthy host.
+
+---
+
+## EXP-109 — GC-root hygiene and store-growth reporting (`services.gcRootAudit`)
+
+**Mode:** scheduled audit of `/nix/var/nix/gcroots`, `/nix/var/nix/profiles`, and per-host store growth, with network-path roots called out as first-class citizens.
+
+**Status:** partially mitigated (EXP-103's `ExecStartPre` guard stops `nix-gc` from dying), the audit itself not started. fern's `nix-gc.service` is in `failed` state on the current generation.
+
+**Use case.** fern's GC failed at every boot for a reason that has nothing to do with garbage: a root on an NFS path. Roots on network paths are a *structural* fragility of this fleet's design (the canonical repo lives on the NAS and builds are run from it), and nothing reports them until the GC unit turns red.
+
+**Evidence.** `find /nix/var/nix/gcroots/auto -lname '*Volumes*'` on fern found `…/zsaq3lrb6m1hgx6gwrzmr1w9g36q0bb7 -> /Volumes/data/projects/nixconfig/result`; `journalctl -u nix-gc.service` shows `error: getting status of "/Volumes/data/projects/nixconfig/result": Host is down` → `0 store paths deleted`. EXP-034 (`gcRootPruner`) and HC-4's budget table are the natural homes for the reporting half.
+
+**Why it is not prod.** Deleting a root is only safe when its filesystem is genuinely absent, and "absent" must be proven from the mount table rather than by touching the path (touching it triggers the automount — the trap in EXP-103). Exit criteria: a report that lists network-path roots, superseded generations, and reclaimable bytes per host, with a non-zero exit only on unbounded growth.
+
+---
+
+## EXP-110 — Close HC-4: per-host closure budgets and a CI gate
+
+**Mode:** finish the shipped-but-incomplete budget ratchet — budgets for every *measured* host, and a CI gate instead of a local-only task.
+
+**Status:** mechanism delivered 2026-10-12 (`closure-budgets.toml`, `checks:closure:budget`); the remaining items are explicitly listed as open in `TODO.md`.
+
+**Use case.** A budget that exists for one host and runs nowhere automatically is a measurement, not a guard. The drift is already real (frieren back to 3949 paths / 34.5 GiB after Tier-1 debloat), and CI builds every affected host already, so the gate has a natural trigger.
+
+**Evidence.** `TODO.md` HC-4 "Remaining": budgets exist only for `frieren`; not wired into `.github/workflows/nixcachix.yml`; +1% headroom is larger than the ~70 MiB font item it was meant to catch.
+
+**Why it is not prod.** A CI gate needs a built toplevel (the workflow has one) and a decision on whether it blocks a merge or annotates it. Exit criteria: `checks:closure:budget --all` passes for measured hosts, fails on a synthetic regression, and the workflow reports it.
+
+---
+
+## EXP-111 — Close HC-2: exercise the backup restore drill through its unit
+
+**Mode:** run the delivered `restic-drill` service end to end, publish the proof, and make failure loud.
+
+**Status:** drill delivered 2026-10-12/14 (password in sops, BurgerNAS offsite target added); **never exercised through the systemd unit** — `TODO.md` says so explicitly.
+
+**Use case.** A backup that has never been restored is a hypothesis. The drill was verified once by hand against snapshot `c3e0f078` (2102 files / 215 MiB), which proves the *logic* and not the *schedule*: the timer path, the `Persistent` catch-up after a missed window, the sops-rendered password path, and the failure surface are all still untested.
+
+**Evidence.** `systemctl start restic-drill` has not been run on the host that owns the unit; `restic-drill.timer` (Sun 06:30, `Persistent`, 15 min jitter) has not fired.
+
+**Why it is not prod.** Restore drills consume disk and I/O inside the nightly window that EXP-103's host is already saturated by (see the frieren rebuild rules in `AGENTS.md`). Exit criteria: one green `systemctl start restic-drill` with a documented restore proof on file, plus a red run on an intentionally wrong password to prove failure is loud.
+
+---
+
+## EXP-112 — Close HC-5: give the broker a publish/subscribe pair
+
+**Mode:** wire Home Assistant to the Mosquitto instance the stack already runs, and make `extraComponents` honest.
+
+**Status:** not started; audited as a live defect (`TODO.md` HC-5: "the broker has neither publisher nor subscriber").
+
+**Use case.** `services.ha-stack` runs a broker with 0 clients on `:1883`, and the HA instance has no `mqtt:` configuration. Meanwhile the battery-as-UPS telemetry that motivates EXP-7/EXP-9 is already being produced. The bus exists and nothing uses it — so any future device integration starts from an unproven foundation.
+
+**Evidence.** `ss -tnp | grep -c ':1883'` → 0; `journalctl -u mosquitto` → idle DB flushes only; `journalctl -u home-assistant | grep -ci mqtt` → 0; `/srv/private/home-assistant/configuration.yaml` has no `mqtt:` stanza while `.storage/core.config_entries` lists only non-MQTT domains.
+
+**Why it is not prod.** The broker still runs a loopback-anonymous listener; hardening it (authenticated listener + sops password) before there is a first client is the right order. Exit criteria: HA publishes and subscribes over the broker (`ss` shows the client, HA logs the connection), with authenticated credentials from sops and no anonymous listener.
+
+---
+
+## EXP-113 — Close EXP-107: a builder-first warm path with no ssh in it
+
+**Mode:** one read-only gate + one builder-side warm, both asking the *binary cache* instead of the network.
+
+**Status:** implemented (`scripts/task/warm-host.sh`, `infra:warm:host:<h>`, `checks:build:route`);
+GAP path still unexercised.
+
+**Use case.** EXP-107 declared the rule — *burn CPU on builders, not on the machine that asked for the
+config* — and left the enforcement open. Two gaps made the rule unenforceable in practice:
+
+1. **Nothing could answer "is this closure substitutable?" cheaply.** The only honest test was a
+   build, and `nixos-rebuild` on a 15 W host is the thing the rule forbids.
+2. **The obvious implementation hangs.** A pre-switch hook that reaches the builder over ssh can block
+   on interactive auth. Tailscale SSH added a browser check on `fern`; an unattended run sat on it for
+   **5 minutes** with no output and no failure. A hook that can hang is worse than no hook.
+
+**Design.** Every question is asked of harmonia over plain HTTP with a timeout:
+
+- **Readiness** = `curl -fsS --max-time 5 <cache>/<hash>.narinfo` succeeds. One bounded request;
+  no ssh, no daemon, no auth, nothing to block on.
+- **The gap** = `nix build <attr> --dry-run | grep -c 'will be built'` — the derivations no
+  substituter can serve, i.e. exactly what wouold be compiled.
+- **Warming** happens only where it is allowed: `warm-host.sh` refuses on a non-builder and prints the
+  command to run on `frieren`, rather than saturating the machine that asked.
+
+**Evidence.** `task checks:build:route` on the builder → `READY`, exit 0. `nix path-info --store
+http://192.168.3.25:5000 <fern toplevel>` returns the path, and `nix build <it> --dry-run
+--substituters http://192.168.3.25:5000` reports nothing to build — i.e. fern substitutes instead of
+compiling.
+
+**Bugs this experiment produced, both worth keeping in mind.**
+- The first version `ssh`-ed to the builder for the platform check. **Deleted.** No ssh in an
+  unattended path.
+- `--check` called `nix build --print-out-paths`, which *starts a build* — a read-only gate that
+  launched a full stark compile and hung for 400 s. Now `nix eval --raw "<attr>.outPath"`, which
+  forces the output path without building. A check that can build is not a check.
+
+**Why it is not prod.** The GAP branch (a host whose closure is not warm → exit 1) and the non-builder
+refusal branch are written but unexercised; the READY branch is verified.
+
+---
+
+## EXP-114 — The eval-granularity defect: why "all green" meant nothing
+
+**Mode:** post-mortem on a verification habit, with a reproducible counter-example.
+
+**Status:** cause identified; `AGENTS.md` verification protocol rewritten accordingly.
+
+**Finding.** `AGENTS.md` prescribed `nix eval .#nixosConfigurations.<host>.config.networking.hostName`
+as the "quick eval smoke test". That forces **one option** and type-checks nothing else, so it cannot
+fail on a bad value anywhere else in the module tree. Paired with *"Never build without cause"*, the
+practical result was: cheap per-option evals run ritually (proving nothing) and the build that would
+have caught a real error never run.
+
+**Counter-example.** This is the exact error that survived evals "passing" on four hosts and only
+surfaced when a build forced the real toplevel:
+
+```
+error: A definition for option `networking.networkmanager.dispatcherScripts."[definition 1-entry 1]".type'
+is not of type `one of "basic", "pre-down", "pre-up"'. Definition value: "up"
+```
+
+`nas-client.nix` set `dispatcherScripts.*.type = "up"`/`"down"`. Those are NetworkManager *event*
+names; the NixOS option only accepts `basic`, `pre-up`, `pre-down` (upstream's own example filters the
+event from `$2` inside a `basic` hook). It was a hard eval failure for every host on the desktop chain.
+
+**Fix — the phased model now in `AGENTS.md`:**
+
+- **Pre-build:** `nix eval --raw .#nixosConfigurations.<h>.config.system.build.toplevel.drvPath`
+  instantiates the *whole* config — every option type — in seconds. Scoped to the hosts the change
+  reaches, batched into one bash loop; whole-system sweeps are for wiring changes, not habit.
+- **Build:** once the closure changes, the build is the test — on the builder, never on the target.
+- **Size:** `dev:closure:top|size|reduce` are build *preparation* (what is big, what will be fetched),
+  not verification. They read the store DB and prove nothing.
+
+> eval to catch a config error · build to prove a closure · size to plan a build
+
+**Why it is not prod.** The habit, not the tool, was the defect; no gate enforces "did you force the
+toplevel". `checks:quick` still runs four single-option evals — the cheapest available improvement
+would be to make it force those four toplevels instead, which the phase model permits because it is
+still seconds per host.
+
+---
+
 ## Audit findings feeding these experiments
 
 The port audit below (`task checks:ports`) is the evidence that the segmentation arguments

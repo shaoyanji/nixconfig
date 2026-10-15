@@ -96,3 +96,54 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
 * **DNS Failover:** Secondary resolver hardware node pending declaration in `profiles.dnsFailover.resolvers`.
 * **SOPS Secrets Management:** 32 recipient keys synchronized across all 6 SOPS files (`task checks:sops:drift` clean).
 * **Nightly Auto-Upgrade Window:** 03:00 - 05:30 nightly backup window strictly observed; all commits pushed to `origin/main`.
+
+---
+
+## 2026-10-15 Session — build routing, eval granularity, fern
+
+### 5. [x] EXP-113 — builder-first warm path with no ssh (`scripts/task/warm-host.sh`)
+* **Status:** `IMPLEMENTED; GAP branch unexercised`, uncommitted.
+* **What:** `task infra:warm:host:<h>` builds on the builder and verifies harmonia serves
+  the result; `task checks:build:route` is the read-only gate (EXP-107's enforcement).
+  Readiness is one bounded HTTP request (`<cache>/<hash>.narinfo`), so it **cannot hang**.
+* **Two defects it produced and fixed:** the first version `ssh`-ed to the builder
+  (**deleted** — Tailscale SSH's browser check hung an unattended run 5 min), and
+  `--check` used `nix build --print-out-paths`, which *starts a build* — it launched a
+  full stark compile and hung 400 s. Now `nix eval --raw "<attr>.outPath"`.
+
+### 6. [x] EXP-114 — the eval-granularity defect
+* **Status:** `CAUSE IDENTIFIED; AGENTS.md protocol rewritten`, uncommitted.
+* **Finding:** `AGENTS.md` prescribed `nix eval …config.networking.hostName` as the
+  "quick eval smoke test". It forces **one option** and type-checks nothing else. A real
+  hard failure survived it on four hosts:
+  `networking.networkmanager.dispatcherScripts.*.type = "up"` — invalid; upstream accepts
+  only `basic`, `pre-up`, `pre-down`. Fixed in `modules/profiles/nas-client.nix` as one
+  `basic` hook filtering `$2`; verified by forcing the full toplevel for 7 hosts.
+* **Now documented:** eval the **whole toplevel** pre-build, build to prove a closure
+  (on the builder), and treat `dev:closure:top|size|reduce` as build *preparation*.
+
+### 7. fern — deployed out of schedule, 2026-10-15
+* **State:** `nixos-rebuild switch` run from frieren via `infra:deploy:host:fern`
+  (transport `devji@192.168.3.23` — the tailnet path needs interactive auth). fern was
+  on `…-nixos-system-fern-26.11.20260928.f45c6f0`, a week behind; the switch was copying
+  ~2539 paths.
+* **Boot-path verification is still missing (rec 6 in
+  `docs/fleet-operations-recommendations.md`).**
+
+### 8. Open: fern has no DankMaterialShell bar
+* DMS **is** running (`dms … run` + `quickshell`), niri is running, 0 failed units —
+  but `~/.config/DankMaterialShell/` **does not exist** (only
+  `~/.local/state/DankMaterialShell/session.json`). DMS 1.6.2 expects
+  `CONFIG_DIR/DankMaterialShell/settings.json`. The module comment says *"Don't manage
+  settings.json — let DMS write its own at runtime"*; on the 20260928 generation it never
+  did. **Next:** compare against a host whose bar works (frieren/poseidon/scratch) on the
+  same chain, over the LAN IP.
+
+### 9. Uncommitted working tree
+`modules/profiles/nas-client.nix`, `modules/profiles/desktop-client.nix`,
+`scripts/task/warm-host.sh` (new), `taskfiles/infra.yml`, `taskfiles/checks.yml`,
+`taskfiles/services-core.yml`, `AGENTS.md`, `EXPERIMENTS.md` (EXP-113/114),
+`docs/fleet-operations-recommendations.md` (new).
+* **Gate:** `task checks:nix:format` fails on 12 files that **also fail at HEAD**
+  (pre-existing, none of these) — it is a hard commit gate, so `task checks:nix:fix`
+  is required before committing.

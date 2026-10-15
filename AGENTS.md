@@ -185,8 +185,11 @@ task infra:rebuild:home-manager  # home-manager switch (local) + refresh ~/Taskf
 Before deploying changes to any client OS, evaluate its configuration:
 
 ```bash
-task infra:plan:host:<host>                                        # Dry-run evaluation and closure build
-nix eval .#nixosConfigurations.<host>.config.networking.hostName   # Fast eval smoke test
+task infra:plan:host:<host>   # build/substitute the closure (no apply)
+nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath
+#   ^ instantiates the WHOLE config — every option type — in seconds.
+#     Do NOT use `.config.networking.hostName`: that forces one option and
+#     type-checks nothing else (see the Agent Verification Protocol below).
 ```
 
 #### 2. Deploying Remote Hosts
@@ -402,7 +405,7 @@ task checks:quick                # Quick eval + host-architecture check + nix li
 task checks:flake:transitive     # Sweep transitive flake pins vs upstream (read-only)
 task checks:qmd:docs             # qmd repo-docs collection registered + index fresh
 task checks:qmd:vault            # qmd Obsidian vault collection registered + index fresh
-nix eval .#nixosConfigurations.<host>.config.networking.hostName  # Quick eval check
+nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath  # full-config check (all option types)
 nix build .#checks.x86_64-linux.host-architecture -L              # Host architecture validation
 nix flake check                  # Full evaluation (slower, catches everything)
 task checks:nix:lint             # deadnix (fail) + statix (advisory)
@@ -410,28 +413,86 @@ task checks:nix:lint             # deadnix (fail) + statix (advisory)
 
 #### Agent Verification Protocol (compute discipline)
 
-Verification must be proportional to the change — never eval as a ritual:
+Verification is **phased, and each phase has exactly one job.** Confusing the
+phases is what produces both failure modes at once: cheap per-option evals run as
+ritual (proving nothing) while the build that would have caught the error is
+never run.
 
-1. **Eval only what the change touches.** One host per affected module chain is
-   enough:
-   - Host-local edit (`hosts/<name>/…`) → eval that host only.
-   - Edit to a chain module (`modules/global/*`, `modules/profiles/*`) → eval
-     one representative host per chain it feeds (e.g. `mtfuji` for containers,
-     `poseidon` for desktops, `frieren` for servers, `cassini` for darwin).
-   - Edit to `flake/` wiring → eval one host per kind (nixos, darwin, home).
-2. **Batch into ONE command.** Run all needed evals in a single `bash` call
-   (a `for` loop over hosts), not one tool call per eval. Count the evals
-   before running; if it's more hosts than the change can affect, trim.
-3. **Keyless environments (Codespaces, CI sandboxes, fresh clones).** Nix
-   evaluation never needs sops keys, age keys, or secret values — sops-nix
-   only declares file paths at eval time. Safe keyless checks:
-   `nix eval`, `alejandra --check`, `deadnix`, `statix check`.
-   NOT keyless (skip in Codespaces, they fail or hang without
-   `~/.config/sops/age/keys.txt` and SSH access):
-   `task checks:quick` (sops drift step), any `infra:*` secret/deploy task.
-4. **Never build without cause.** `nix eval` suffices for config validity;
-   reserve `nix build`/`infra:plan` for changes that alter the closure
-   (packages, kernels, services) and say so before running.
+**Phase 1 — Pre-build: force the WHOLE toplevel, not one option.**
+`nix eval .#nixosConfigurations.<host>.config.networking.hostName` forces a single
+option and type-checks nothing else — it is not a config check. Real example:
+`networking.networkmanager.dispatcherScripts.*.type = "up"` is **invalid**
+(upstream accepts only `basic`, `pre-up`, `pre-down`); it "passed" that smoke test
+on four hosts and only exploded when a build forced the real toplevel.
+
+```bash
+nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath
+```
+
+This instantiates the entire configuration — every module, every option type — in
+seconds, and is the cheapest thing that can actually fail on a bad option value.
+
+- **Scope to what the change reaches, never the fleet:** host-local edit → that
+  host; chain module (`modules/global/*`, `modules/profiles/*`, `modules/roles/*`)
+  → one representative host per chain affected; `flake/` wiring → one host per
+  kind (nixos, darwin, home).
+- **Batch into ONE bash loop**, not one tool call per host.
+- **A whole-system sweep is for wiring changes, not a habit.** Eval a whole system
+  sparingly; eval the closure you changed often.
+- **Keyless environments (Codespaces, CI sandboxes, fresh clones).** Evaluation
+  never needs sops keys, age keys or secret values — sops-nix only declares file
+  paths at eval time. Safe: `nix eval`, `alejandra --check`, `deadnix`,
+  `statix check`. NOT keyless: `task checks:quick` (sops drift step), any
+  `infra:*` secret/deploy task.
+
+**Phase 2 — Build: the build IS the test.** Once a change alters the closure,
+evaluation is no longer evidence. Build it — never on the target host:
+
+```bash
+task infra:warm:host:<host>      # build on the builder; verify the cache serves it
+task checks:build:route          # read-only: would THIS host have to compile?
+task infra:deploy:host:<host>    # ONE intended host: gate → plan → apply → validate
+```
+
+Fleet-wide building is a **schedule**, not an ad-hoc action (`fleet-warm-cache`
+runs weekly on `frieren`). A host that is needed now is deployed out of schedule
+with `infra:deploy:host:<host>` — one intended host, never the fleet.
+
+**Phase 3 — Size/shape analysis is build preparation, not verification.**
+`dev:closure:top`, `dev:closure:size`, `dev:closure:reduce` answer *"what is big,
+what will be fetched, what is duplicated"* — questions you ask to decide **how** to
+build. They read the store DB and verify nothing. Use them before a build; never
+in place of one.
+
+> **eval to catch a config error · build to prove a closure · size to plan a
+> build.** Never build without cause — but never mistake an eval for one.
+
+**Never put ssh in an unattended path.** A pre-switch hook that opens ssh can
+block on an interactive auth prompt: Tailscale SSH added a browser check on `fern`
+and silently hung an unattended run for 5 minutes. Use the LAN address
+(`TARGET=user@<lan-ip>`) or, better, ask a question the binary cache can answer
+over plain HTTP with a timeout (`scripts/task/warm-host.sh` does exactly this).
+
+**When a build IS needed, never run it *on* the target host — warm it
+elsewhere first.** A `nixos-rebuild build --flake .#<host>` executed on a
+   lightweight host saturates it (measured: load ~9.4 on fern's 2c/4t, killed
+   after 30 min), while the same closure built on a CI runner and pushed to
+   cachix took **6m53s** and left the host a substitution-only rebuild. The
+   constraint is already declared per host in `inventory.toml`
+   (`compute_tier`, `allowed_tasks`) — e.g. fern: *"15W dual-core processor and
+   8GB RAM; avoid heavy compilation loops"*. Burn CPU on builders, not on the
+   machine that asked for the config.
+   - **Preferred — CI** (free, already wired, maps host→runner arch from
+     `inventory.toml` and pushes to the `shaoyanji` cache):
+     `task dev:ci:trigger:<host>` (= `gh workflow run nixcachix.yml -f host=<host>`).
+   - **Or the remote builder** (nixbuild.net free tier = 25 build-hours/month,
+     so budget it): `task dev:nixbuild:plan` to report the gaps, then
+     `task dev:nixbuild:warm` (builds with `--max-jobs 0`, pushing to cachix).
+   - **Verify the warm landed** before touching the host:
+     `task checks:build:route` must report READY (it asks the cache directly,
+     over HTTP, with no ssh) — `task dev:nixbuild:plan` is the nixbuild.net view.
+   - This is EXP-107/EXP-113 in `EXPERIMENTS.md`; the enforcement gate is
+     `task checks:build:route`, implemented by `scripts/task/warm-host.sh`.
 
 ````
 ### Secrets & SOPS

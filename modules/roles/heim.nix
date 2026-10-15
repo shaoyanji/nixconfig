@@ -1,7 +1,13 @@
 # devji user desktop/home preferences.
 # Primary user constants: modules/global/user.nix
-_: let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   user = import ../global/user.nix;
+  graphicsTier = config.profiles.graphics.tier or "medium";
 in {
   # Persona assembler for devji-specific desktop and personal preferences.
   imports = [
@@ -14,7 +20,8 @@ in {
   ];
 
   programs = {
-    zed-editor.enable = true;
+    # Gate GPU-heavy Zed editor on hardware tier (GPUI/Vulkan unstable on legacy Haswell/low tier)
+    zed-editor.enable = lib.mkDefault (graphicsTier != "low");
     anki = {
       enable = true;
       profiles."User 1".sync = {
@@ -112,9 +119,16 @@ in {
     freetube = {
       enable = true;
       settings = {
-        allowDashAv1Formats = true;
+        # Disable DASH AV1 on low-tier iGPUs (e.g. Haswell HD 4400) to prevent 100% CPU lockups
+        allowDashAv1Formats = graphicsTier != "low";
         checkForUpdates = false;
-        defaultQuality = "1080";
+        # Scope default streaming resolution to hardware capability
+        defaultQuality =
+          if graphicsTier == "low"
+          then "720"
+          else if graphicsTier == "high"
+          then "1440"
+          else "1080";
         baseTheme = "catppuccinMocha";
       };
     };

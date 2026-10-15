@@ -201,6 +201,13 @@ in {
         default_type text/plain;
       '';
     };
+    # The bare root has no index file, so nginx answered it with a bare 403 —
+    # which read as "the paste bin is broken". Answer the exact root with a
+    # usage hint instead; actual pastes are /<name> and keep being served above.
+    locations."= /".extraConfig = ''
+      default_type text/plain;
+      return 200 "pb — fleet paste bin.\nUpload: pipe stdin or pass a file to 'pb' (see ~/.local/bin/pb).\nPastes are served at /<name>, e.g. http://paste.frieren.lan/ab12cd34\n";
+    '';
   };
 
   home-manager.users.${user.name}.home.file.".local/bin/pb" = {

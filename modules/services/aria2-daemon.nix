@@ -18,6 +18,36 @@
 
   # Pre-built AriaNg static files — avoids npm build failures from nixpkgs.
   ariang = (import ../../lib/fetches-extra.nix {inherit pkgs;}).fetch "ariang";
+
+  # Bootstrap config rendered into the served site at runtime: pre-seeds the
+  # AriaNg RPC connection (host/port from the browser's location, secret
+  # base64-encoded as AriaNg's getCurrentRpcSecret expects). The placeholder
+  # is replaced by ariang-site.service from the sops-rendered secret file.
+  # Storage facts read from the bundled minified source: AriaNg persists its
+  # settings via angular-local-storage (setPrefix("AriaNg")) under the key
+  # "Options", i.e. localStorage "AriaNg.Options", with the RPC fields held
+  # DIRECTLY on that object (rpcAlias/rpcHost/rpcPort/secret base64) plus an
+  # extendRpcServers array — there is no "AriaNgSettings"/rpcList key.
+  ariangConfigTemplate = pkgs.writeText "ariang-config.js" ''
+    // Managed: rendered by ariang-site.service — edits are overwritten.
+    // Pre-seeds the AriaNg RPC connection to this vhost's /jsonrpc proxy.
+    (function () {
+      var KEY = 'AriaNg.Options', raw = localStorage.getItem(KEY), s = null;
+      try { s = JSON.parse(raw || '{}'); } catch (e) { s = null; }
+      // angular-local-storage may double-encode; unwrap a string result.
+      if (typeof s === 'string') { try { s = JSON.parse(s); } catch (e) { s = null; } }
+      if (!s || typeof s !== 'object') { s = {}; }
+      s.rpcAlias = s.rpcAlias || 'frieren aria2';
+      s.rpcHost = location.hostname;
+      s.rpcPort = String(location.port || '80');
+      s.rpcInterface = 'jsonrpc';
+      s.protocol = 'http';
+      s.httpMethod = 'POST';
+      s.secret = '__ARIA2_RPC_SECRET_B64__';
+      if (!Array.isArray(s.extendRpcServers)) s.extendRpcServers = [];
+      localStorage.setItem(KEY, JSON.stringify(s));
+    })();
+  '';
 in {
   options.services.aria2-daemon = {
     enable = lib.mkEnableOption "aria2 RPC download daemon";
@@ -68,6 +98,18 @@ in {
       type = lib.types.bool;
       default = false;
       description = "Expose AriaNg + RPC proxy via nginx";
+    };
+
+    nginx.rpcSecretFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = ''
+        Path to the RPC secret readable by the nginx user (typically a second
+        sops render of the same key with owner nginx). When set, /jsonrpc is
+        handled by an njs handler that injects the token server-side, so the
+        AriaNg UI needs no per-browser secret entry. When null, /jsonrpc is
+        proxied raw and callers must send the token themselves.
+      '';
     };
 
     nginx.listenPort = lib.mkOption {
@@ -141,6 +183,52 @@ in {
     # to avoid a conflict while still explicitly documenting the intent.
     systemd.services.aria2.serviceConfig.UMask = lib.mkDefault "022";
 
+    # Runtime-rendered AriaNg site. The static build cannot know the RPC secret
+    # (it must never enter the Nix store), and AriaNg reads its RPC settings
+    # from browser localStorage — a fresh browser sees an unconfigured UI
+    # ("not hooked to anything"). This oneshot copies the static build to
+    # /var/lib/ariang-site, injects a <script src="config.js"> loader, and
+    # renders config.js from the sops-rendered RPC secret (base64-encoded, the
+    # form AriaNg's getCurrentRpcSecret decodes). The secret is therefore
+    # readable by any client that can reach the LAN vhost — the same
+    # trusted-LAN tradeoff as the anonymous MQTT listener and the unsigned
+    # harmonia narinfo.
+    systemd.services.ariang-site = lib.mkIf cfg.nginx.enable {
+      description = "Render the AriaNg site with the aria2 RPC bootstrap config";
+      before = ["nginx.service"];
+      # Re-render when the static build or the bootstrap template changes;
+      # a oneshot otherwise never re-runs across switches (the state dir
+      # keeps serving the stale copy).
+      restartTriggers = [ariang ariangConfigTemplate];
+      path = with pkgs; [coreutils gnused];
+      serviceConfig = {
+        Type = "oneshot";
+        # Stay "active (exited)" after rendering: switch-to-configuration only
+        # restarts units that are active, so without this a changed unit file
+        # would never re-render the site across switches.
+        RemainAfterExit = true;
+        StateDirectory = "ariang-site";
+        LoadCredential = "rpcsecret:${cfg.rpcSecretFile}";
+      };
+      script = ''
+        set -euo pipefail
+        site="$STATE_DIRECTORY"
+        rm -rf "$site.tmp"
+        cp -rT ${ariang} "$site.tmp"
+        chmod -R u+w "$site.tmp"
+        sed -i 's#</head>#<script src="config.js"></script></head>#' "$site.tmp/index.html"
+        secret_b64="$(base64 -w0 "$CREDENTIALS_DIRECTORY/rpcsecret")"
+        sed "s#__ARIA2_RPC_SECRET_B64__#$secret_b64#" ${ariangConfigTemplate} > "$site.tmp/config.js"
+        rm -rf "$site"
+        mv "$site.tmp" "$site"
+      '';
+    };
+
+    systemd.services.nginx = lib.mkIf cfg.nginx.enable {
+      requires = ["ariang-site.service"];
+      after = ["ariang-site.service"];
+    };
+
     # Nginx vhost: serves AriaNg static UI and reverse-proxies /jsonrpc.
     services.nginx = lib.mkIf cfg.nginx.enable {
       enable = true;
@@ -152,9 +240,15 @@ in {
           }
         ];
         serverName = "_";
-        root = ariang;
+        root = "/var/lib/ariang-site";
         locations."/" = {
           tryFiles = "$uri $uri/ /index.html";
+        };
+        locations."= /config.js" = {
+          priority = 50;
+          extraConfig = ''
+            add_header Cache-Control "no-store";
+          '';
         };
         locations."/jsonrpc" = {
           proxyPass = "http://${cfg.rpcHost}:${builtins.toString cfg.rpcPort}/jsonrpc";

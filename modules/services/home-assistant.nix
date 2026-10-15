@@ -143,6 +143,13 @@ in {
       inherit (cfg) configDir extraComponents extraPackages;
       config = {
         default_config = {};
+        # Reverse-proxied via nginx (ha.frieren.lan vhost from the service
+        # exposure registry). Without a trusted proxy HA rejects every proxied
+        # request with "400: Bad Request" (host header not in trusted_domains).
+        http = {
+          use_x_forwarded_for = true;
+          trusted_proxies = ["127.0.0.1" "::1"];
+        };
         command_line = lib.mkIf cfg.telemetry.enable [
           {
             sensor = {

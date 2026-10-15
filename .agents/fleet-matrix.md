@@ -45,7 +45,7 @@
 | ⚪ **`ancientace`** | `preserved` | Yes | `x86_64-linux` | `standard-desktop` | Intel multi-core, 16 GiB, Intel Graphics | Virtualization Host & Local Model Server |
 | ⚪ **`applevalley`** | `preserved` | Yes | `x86_64-linux` | `lightweight-legacy` | Intel Core i5-2520M, 8 GiB DDR3, Intel HD Graphics 3000 | Legacy ThinkPad Container & Utility Host |
 | ⚪ **`ares`** | `preserved` | Yes | `x86_64-linux` | `kiosk-gaming` | Intel Core i5-6500, 8 GiB DDR4, NVIDIA GeForce GTX 750 Ti | Steam Big Picture Kiosk with Impermanence |
-| ⚪ **`aristotle`** | `preserved` | Yes | `x86_64-linux` | `standard-desktop` | Intel 64-bit multi-core, 16 GiB DDR4, Intel / Integrated | Standard Desktop Workstation |
+| 🟢 **`aristotle`** | `active` | Yes | `x86_64-linux` | `lightweight-laptop` | Intel Core i5-4300U, 8 GiB DDR3L, Intel HD Graphics 4400 | ThinkPad T440 Mobile Laptop Workstation |
 | 🟢 **`bitlockerpremium`** | `active` | No (Ext) | `x86_64-linux` | `mobile-windows-workstation` | Intel Core i5-10310U, 16 GB DDR4-3200 (2x 8 GB Samsung, dual channel), Intel UHD Graphics | Windows 11 Pro Workstation & Tailnet OpenSSH Endpoint |
 | 🟢 **`burgernas`** | `active` | No (Ext) | `aarch64-linux` | `storage-cold-constrained-arm` | Realtek RTD1296, 512 MiB DDR4 (soldered, non-expandable) | Cold Vault Storage Extension & Secondary Backup Target |
 | ⚪ **`cassini`** | `preserved` | Yes | `aarch64-darwin` | `apple-silicon-workstation` | Apple Silicon, Unified Memory (16, Apple Integrated Metal GPU | Apple Silicon macOS Workstation |
@@ -57,6 +57,7 @@
 | 🟢 **`envs`** | `active` | No (Ext) | `x86_64-linux` | `shared-pubnix` | Intel Xeon, Shared Pubnix Quota | Envs.net Multi-Protocol Pubnix Node |
 | 🟢 **`fern`** | `active` | Yes | `x86_64-linux` | `lightweight-laptop` | AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU | Lightweight Daily-Driver Laptop |
 | 🟢 **`frieren`** | `active` | Yes | `x86_64-linux` | `server-heavy-io-sensitive` | Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz | Central NAS Mainframe, 4K Media Center & Application Server |
+| ⚪ **`frieren-canary`** | `preserved` | Yes | `x86_64-linux` | `standard` | host-provided vCPU, host-provided | Frieren Canary MicroVM (closure smoke test) |
 | ⚪ **`garnixMachine`** | `preserved` | Yes | `x86_64-linux` | `ci-cloud` | x86_64 Cloud vCPU, Cloud Allocated | Garnix CI Runner & Bountystash Host |
 | 🟢 **`guckloch`** | `active` | Yes | `x86_64-linux` | `wsl2-container` | Host CPU, WSL2 Dynamic Allocation | Windows Subsystem for Linux (WSL2) Container |
 | 🟢 **`kali`** | `active` | Yes | `aarch64-linux` | `specialized-cli` | ARM64, 2 to 4 GB, Adreno / VideoCore | Mobile Offensive Security Starter Pack |

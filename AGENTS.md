@@ -64,10 +64,11 @@ flake.nix → flake/outputs.nix (hub)
 
 ### Complete Client OS Fleet Inventory (`flake/host-inventory.nix`)
 
-> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml), compiled into typed data by [`lib/inventory.nix`](file:///home/devji/Documents/nixconfig/lib/inventory.nix) and enforced by `checks.<system>.inventory-{schema,hosts}` (see [`docs/inventory-schema.md`](file:///home/devji/Documents/nixconfig/docs/inventory-schema.md)). **Fleet counts are DERIVED — never write them here.** Read them with `task dev:inventory:json` or `nix eval .#inventory.derived`.
+> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) (34 total devices: 11 active Nix, 6 active non-Nix external, 1 WIP, 16 preserved).
 
 | Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |
 |------|--------|-------------|------|---------------------------|-------------|----------------|
+| `aristotle` | **Active** | `nixos` | `x86_64-linux` | ThinkPad T440 Mobile Laptop Workstation (Intel Core i5-4300U, 8 GiB DDR3L, Intel HD Graphics 4400) | `hosts/aristotle/configuration.nix` | 59.6GB Innodisk M.2 (S42) 3ME4 SSD (/dev/sda2 btrfs @root, @ho... |
 | `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots)... |
 | `fern` | **Active** | `nixos` | `x86_64-linux` | Lightweight Daily-Driver Laptop (AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU) | `hosts/fern/configuration.nix` | /dev/nvme0n1 (disko: ESP + 8G swap + btrfs /root,/nix) |
 | `frieren` | **Active** | `nixos` | `x86_64-linux` | Central NAS Mainframe, 4K Media Center & Application Server (Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz) | `hosts/frieren/configuration.nix` | /dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots... |
@@ -79,7 +80,7 @@ flake.nix → flake/outputs.nix (hub)
 | `scratch` | **Active** | `nixos` | `x86_64-linux` | I/O Diet Lightweight Workstation (Intel Core i5-6500, 8 GB DDR4, Intel HD Graphics 530) | `hosts/scratch/configuration.nix` | Legacy BIOS + GRUB (ext4 /boot, f2fs /) |
 | `stark` | **Active** | `nixos` | `x86_64-linux` | Living Room All-in-One Gaming Terminal (Intel Core i5-7200U, 16 GiB DDR4, Intel HD 620) | `hosts/stark/configuration.nix` | SK hynix SC311 SATA SSD (system) + 1TB HDD /mnt/steam (btrfs+z... |
 | `bitlockerpremium` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Windows 11 Pro Workstation & Tailnet OpenSSH Endpoint (Intel Core i5-10310U, 16 GB DDR4-3200 (2x 8 GB Samsung, dual channel), Intel UHD Graphics) | `taskfiles/bitlockerpremium.yml` | 256 GB WDC PC SN530 SDBPNPZ-256G-1006 (C: 235.9 GiB) |
-| `burgernas` | **Active** | **Non-Nix** (External) | `aarch64-linux` | Cold Vault Storage Extension & Secondary Backup Target (Realtek RTD1296, 512 MiB DDR4 (soldered, non-expandable)) | `taskfiles/burgernas.yml` | /volume1 (5.4 TiB pool, ~4.9 TiB free); restic target /volume1/backup/frieren/restic |
+| `burgernas` | **Active** | **Non-Nix** (External) | `aarch64-linux` | Cold Vault Storage Extension & Secondary Backup Target (Realtek RTD1296, 512 MiB DDR4 (soldered, non-expandable)) | `hosts/burgernas/configuration.nix` | /volume1 (5.4 TiB pool, ~4.9 TiB free); restic target /volume1... |
 | `dragoncourt` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Alwaysdata PHP/Wasm Web Hosting (Intel x86_64, Shared Hosting Quota) | `taskfiles/dragoncourt.yml` | /home/dragoncourt/www |
 | `envs` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Envs.net Multi-Protocol Pubnix Node (Intel Xeon, Shared Pubnix Quota) | `taskfiles/envs.yml` | /home/jisifu (public_html, public_gemini, public_gopher) |
 | `moto` | **Active** | **Non-Nix** (External) | `aarch64-linux` | Primary Mobile Smartphone (Android/Termux) (Unisoc T760 / Snapdragon, 4 to 8 GB RAM, Mali-G57) | `taskfiles/moto.yml` | Android storage (/storage/emulated/0) |
@@ -90,10 +91,10 @@ flake.nix → flake/outputs.nix (hub)
 | `ancientace` | Preserved | `nixos` | `x86_64-linux` | Virtualization Host & Local Model Server (Intel multi-core, 16 GiB, Intel Graphics) | `hosts/ancientace/configuration.nix` | GRUB boot, microVM bridge network |
 | `applevalley` | Preserved | `nixos` | `x86_64-linux` | Legacy ThinkPad Container & Utility Host (Intel Core i5-2520M, 8 GiB DDR3, Intel HD Graphics 3000) | `hosts/applevalley/configuration.nix` | Persistent btrfs |
 | `ares` | Preserved | `nixos` | `x86_64-linux` | Steam Big Picture Kiosk with Impermanence (Intel Core i5-6500, 8 GiB DDR4, NVIDIA GeForce GTX 750 Ti) | `hosts/ares/configuration.nix` | /dev/sda (root ephemeral on boot, devji home + /etc persisted ... |
-| `aristotle` | Preserved | `nixos` | `x86_64-linux` | Standard Desktop Workstation (Intel 64-bit multi-core, 16 GiB DDR4, Intel / Integrated) | `hosts/aristotle/configuration.nix` | Persistent root with NFS /Volumes/data mount |
 | `cassini` | Preserved | `darwin` | `aarch64-darwin` | Apple Silicon macOS Workstation (Apple Silicon, Unified Memory (16, Apple Integrated Metal GPU) | `hosts/cassini/configuration.nix` | Encrypted APFS Macintosh HD |
 | `deckstation` | Preserved | `nixos` | `x86_64-linux` | High-End Steam Kiosk & Sunshine Host (Intel 64-bit multi-core, 16 GiB, AMD Radeon RX 5700 XT) | `hosts/deckstation/configuration.nix` | Persistent storage |
 | `demo` | Preserved | `nixos` | `x86_64-linux` | NixOS Demonstration VM (x86_64, 4 GiB) | `hosts/demo/configuration.nix` | Single partition, systemd-boot |
+| `frieren-canary` | Preserved | `nixos` | `x86_64-linux` | Frieren Canary MicroVM (closure smoke test) (host-provided vCPU, host-provided) | `hosts/frieren-canary/configuration.nix` | microvm disk image |
 | `garnixMachine` | Preserved | `nixos` | `x86_64-linux` | Garnix CI Runner & Bountystash Host (x86_64 Cloud vCPU, Cloud Allocated) | `hosts/garnixMachine.nix` | Standard Nix store |
 | `minyx` | Preserved | `nixos` | `aarch64-linux` | Raspberry Pi 3B+ Edge Node (Broadcom BCM2837B0, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV) | `hosts/minyx/configuration.nix` | SD card with extlinux bootloader and impermanence |
 | `mtfuji` | Preserved | `nixos` | `x86_64-linux` | Headless Container & AI Inference Host (AMD Ryzen 64-bit, 16 GiB DDR4) | `hosts/mtfuji/configuration.nix` | f2fs / + btrfs subvolume for /nix |

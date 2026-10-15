@@ -1,0 +1,273 @@
+# Fleet inventory: schema + compiler for `inventory.toml`.
+#
+# inventory.toml is the canonical device registry (hardware, network, persona,
+# status) for every device the fleet knows about, including non-Nix ones. This
+# module turns it into *compiled* data:
+#
+#   * Parse ONCE with pure `builtins.fromTOML` — no IFD, no `yq`, no shell, no
+#     per-host re-parse. The result is a plain attrset of scalars, so handing it
+#     to every host as a module argument costs one shared thunk.
+#   * Validate against an explicit schema. Unknown keys are errors (no
+#     `freeformType`), so a typo in inventory.toml fails evaluation instead of
+#     silently disappearing. Types are declared, so `managed = "yes"` is a hard
+#     error rather than a truthy string.
+#   * Derive what used to be hand-maintained prose. The device counts and the
+#     "is this host built by the flake" fact are COMPUTED; where inventory.toml
+#     still declares a copy, `issues` reports the disagreement instead of
+#     letting it drift silently.
+#
+# Consumers (`flake/checks.nix`, `flake/packages.nix`, every host's
+# `config.fleet.inventory`) read the compiled result. See docs/inventory-schema.md.
+{
+  lib,
+  src ? ../inventory.toml,
+}: let
+  inherit (lib) mkOption types;
+
+  raw = builtins.fromTOML (builtins.readFile src);
+
+  # Shorthands: every field is optional with an empty default, so a host only
+  # states what it knows and the compiled record is uniform.
+  str = default:
+    mkOption {
+      type = types.str;
+      inherit default;
+    };
+  bool = default:
+    mkOption {
+      type = types.bool;
+      inherit default;
+    };
+  strs = mkOption {
+    type = types.listOf types.str;
+    default = [];
+  };
+
+  hardwareModule = {
+    options = {
+      model = str "";
+      cpu = str "";
+      gpu = str "";
+      ram = str "";
+      display = str "";
+      battery = str "";
+      storage_type = str "";
+      storage_layout = str "";
+    };
+  };
+
+  networkModule = {
+    options = {
+      lan_ip = str "";
+      tailscale_ip = str "";
+      domain = str "";
+      ssh_alias = str "";
+      tailscale_hostname = str "";
+      gemini_url = str "";
+      gopher_url = str "";
+      tailscale = bool false;
+    };
+  };
+
+  softwareModule = {
+    options = {
+      module_chain = str "";
+      impermanence = bool false;
+      key_services = strs;
+      traits = strs;
+    };
+  };
+
+  personaModule = {
+    options = {
+      title = str "";
+      system_prompt_hint = str "";
+      compute_tier = str "";
+      allowed_tasks = strs;
+      constraints = strs;
+    };
+  };
+
+  hostModule = {name, ...}: {
+    options = {
+      # Defaults to the attribute key, so `[hosts.fern]` needs no `hostname`.
+      hostname = str name;
+      kind = mkOption {type = types.enum ["nixos" "darwin" "home" "external"];};
+      arch = mkOption {type = types.str;};
+      status = mkOption {type = types.enum ["active" "preserved" "wip"];};
+      status_detail = str "";
+      role = str "";
+      category = str "";
+      desktop_environment = str "";
+      users = strs;
+      # "Produced by this flake." Implied false for `kind = "external"`; set
+      # false explicitly for a real host deliberately outside the flake
+      # (netbook: pinned 25.11 channel, applied by remote fleet ops). This
+      # replaces the prose note that used to carry the same fact.
+      flake = bool true;
+      managed = bool false;
+      ci = bool true;
+      # Declared only where it adds information; `derived.isNix` is the truth
+      # and any declared value must AGREE with it or it is reported in `issues`.
+      is_nix = mkOption {
+        type = types.nullOr types.bool;
+        default = null;
+      };
+      system_type = str "";
+      # Free-form operational commentary. This is the home for what used to be
+      # long Nix comments: it is compiled, searchable and shipped in the feed.
+      notes = strs;
+      hardware = mkOption {
+        type = types.submodule hardwareModule;
+        default = {};
+      };
+      network = mkOption {
+        type = types.submodule networkModule;
+        default = {};
+      };
+      software = mkOption {
+        type = types.submodule softwareModule;
+        default = {};
+      };
+      persona = mkOption {
+        type = types.submodule personaModule;
+        default = {};
+      };
+    };
+  };
+
+  metadataModule = {
+    options = {
+      title = str "";
+      description = str "";
+      version = str "";
+      canonical_repo = str "";
+      # Declared copies. These are derived facts; `issues` reports any host
+      # addition that was not reflected here, so the file cannot drift.
+      total_devices = mkOption {
+        type = types.int;
+        default = 0;
+      };
+      active_nix_devices = mkOption {
+        type = types.int;
+        default = 0;
+      };
+      active_external_devices = mkOption {
+        type = types.int;
+        default = 0;
+      };
+      wip_devices = mkOption {
+        type = types.int;
+        default = 0;
+      };
+      preserved_devices = mkOption {
+        type = types.int;
+        default = 0;
+      };
+    };
+  };
+
+  # Type errors (unknown keys, wrong types) surface here, when `config` is
+  # forced — which every consumer does.
+  evaluated = lib.evalModules {
+    modules = [
+      {
+        options = {
+          metadata = mkOption {type = types.submodule metadataModule;};
+          hosts = mkOption {type = types.attrsOf (types.submodule hostModule);};
+        };
+        config = {
+          metadata = raw.metadata or {};
+          hosts = raw.hosts or {};
+        };
+      }
+    ];
+  };
+
+  hosts = evaluated.config.hosts;
+  metadata = evaluated.config.metadata;
+  names = lib.attrNames hosts;
+
+  isNixHost = host: host.kind != "external";
+
+  nixHosts = lib.filterAttrs (_: isNixHost) hosts;
+  externalHosts = lib.filterAttrs (_: host: !isNixHost host) hosts;
+
+  count = pred: lib.length (lib.filter pred (lib.attrValues hosts));
+
+  # The single source of truth for fleet size and composition.
+  derived = {
+    total = lib.length names;
+    active = count (h: h.status == "active");
+    activeNix = count (h: h.status == "active" && isNixHost h);
+    activeExternal = count (h: h.status == "active" && !isNixHost h);
+    wip = count (h: h.status == "wip");
+    preserved = count (h: h.status == "preserved");
+    nix = lib.length (lib.attrNames nixHosts);
+    external = lib.length (lib.attrNames externalHosts);
+  };
+
+  declaredCounts = {
+    total_devices = derived.total;
+    active_nix_devices = derived.activeNix;
+    active_external_devices = derived.activeExternal;
+    wip_devices = derived.wip;
+    preserved_devices = derived.preserved;
+  };
+
+  # Every way inventory.toml can disagree with itself. Empty = clean; check
+  # `checks.<system>.inventory-schema` turns a non-empty list into a failure.
+  # `flatten`, not `concatLists`: each `mapAttrsToList` yields a list OF lists of
+  # `lib.optional` results, so a single `concatLists` would leave `[ ]` elements
+  # behind and `ok` would be false with no real problem.
+  issues = lib.flatten [
+    (lib.mapAttrsToList
+      (key: expected:
+        lib.optional (metadata.${key} != expected)
+        "metadata.${key} declares ${toString metadata.${key}} but inventory.toml now derives ${toString expected}; run `task dev:inventory:sync`")
+      declaredCounts)
+    (lib.mapAttrsToList
+      (name: host:
+        lib.optional
+        (host.is_nix != null && host.is_nix != isNixHost host)
+        "hosts.${name}: is_nix = ${lib.boolToString host.is_nix} contradicts kind = ${host.kind}")
+      hosts)
+    (lib.mapAttrsToList
+      (name: host:
+        lib.optional
+        (host.system_type == "non-nix" && isNixHost host)
+        "hosts.${name}: system_type = non-nix contradicts kind = ${host.kind}")
+      hosts)
+    (lib.mapAttrsToList
+      (name: host:
+        lib.optional
+        (host.status == "active" && host.kind == "external" && host.managed)
+        "hosts.${name}: a non-Nix device cannot be `managed` (managed = fleet deploy/warm rotation)")
+      hosts)
+  ];
+
+  compiled = {
+    metadata = metadata // declaredCounts;
+    inherit hosts derived;
+  };
+in
+  compiled
+  // {
+    inherit
+      names
+      nixHosts
+      externalHosts
+      derived
+      issues
+      ;
+    # True when the file is internally consistent. Checks assert this.
+    ok = issues == [];
+    # Every Nix-kind host the flake is expected to build. The coverage check
+    # compares this against the flake's own output set.
+    flakeHosts = lib.filterAttrs (_: h: isNixHost h && h.flake) hosts;
+    # Per-host lookup that fails loudly rather than returning null.
+    host = name: hosts.${name} or (throw "inventory: no such host '${name}' in ${toString src}");
+    # The compiled artifact: pretty-printed by `packages.<system>.inventory-json`,
+    # consumed by agents instead of re-parsing TOML with yq.
+    json = builtins.toJSON compiled;
+  }

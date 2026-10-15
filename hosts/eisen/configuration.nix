@@ -22,7 +22,11 @@
 #
 # Storage: /mnt/steam = sda (931.5G HDD, btrfs+zstd) — Steam library, live.
 # Future:  16 TB HDD → /mnt/media (media library) when the drive arrives.
-{pkgs, lib, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   user = import ../../modules/global/user.nix;
 in {
   imports = [

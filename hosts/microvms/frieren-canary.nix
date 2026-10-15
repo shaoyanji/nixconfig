@@ -137,33 +137,33 @@ in {
   # Seed SubZeroClaw agent configuration, skills, and self-modifying workspace
   system.activationScripts.subzeroclawSetup = {
     text = ''
-      mkdir -p /home/devji/.subzeroclaw/skills /home/devji/.subzeroclaw/logs /home/devji/workspace/subzeroclaw
-      if [ ! -f /home/devji/.subzeroclaw/config ]; then
-        cat << 'EOF' > /home/devji/.subzeroclaw/config
-api_key  = "none"
-endpoint = "http://192.168.83.1:11434/v1/chat/completions"
-request_extra = {"model":"nemotron-3-ultra:cloud"}
-skills_dir = "/home/devji/.subzeroclaw/skills"
-log_dir    = "/home/devji/.subzeroclaw/logs"
-EOF
-      fi
+            mkdir -p /home/devji/.subzeroclaw/skills /home/devji/.subzeroclaw/logs /home/devji/workspace/subzeroclaw
+            if [ ! -f /home/devji/.subzeroclaw/config ]; then
+              cat << 'EOF' > /home/devji/.subzeroclaw/config
+      api_key  = "none"
+      endpoint = "http://192.168.83.1:11434/v1/chat/completions"
+      request_extra = {"model":"nemotron-3-ultra:cloud"}
+      skills_dir = "/home/devji/.subzeroclaw/skills"
+      log_dir    = "/home/devji/.subzeroclaw/logs"
+      EOF
+            fi
 
-      if [ ! -f /home/devji/.subzeroclaw/skills/sandbox.md ]; then
-        cat << 'EOF' > /home/devji/.subzeroclaw/skills/sandbox.md
-# Sandboxed Agent in NixOS MicroVM
-You are an autonomous agent running inside an isolated NixOS Cloud-Hypervisor MicroVM.
-Use the shell tool to run commands, inspect the environment, edit code, and compile software.
-Your workspace contains the source code of this agent harness at `/home/devji/workspace/subzeroclaw`.
-You are free to explore, create files, write scripts, or modify your own C source code.
-EOF
-      fi
+            if [ ! -f /home/devji/.subzeroclaw/skills/sandbox.md ]; then
+              cat << 'EOF' > /home/devji/.subzeroclaw/skills/sandbox.md
+      # Sandboxed Agent in NixOS MicroVM
+      You are an autonomous agent running inside an isolated NixOS Cloud-Hypervisor MicroVM.
+      Use the shell tool to run commands, inspect the environment, edit code, and compile software.
+      Your workspace contains the source code of this agent harness at `/home/devji/workspace/subzeroclaw`.
+      You are free to explore, create files, write scripts, or modify your own C source code.
+      EOF
+            fi
 
-      if [ ! -f /home/devji/workspace/subzeroclaw/Makefile ]; then
-        cp -r ${subzeroclaw}/share/subzeroclaw/* /home/devji/workspace/subzeroclaw/ 2>/dev/null || true
-        chmod -R u+rw /home/devji/workspace/subzeroclaw/ 2>/dev/null || true
-      fi
+            if [ ! -f /home/devji/workspace/subzeroclaw/Makefile ]; then
+              cp -r ${subzeroclaw}/share/subzeroclaw/* /home/devji/workspace/subzeroclaw/ 2>/dev/null || true
+              chmod -R u+rw /home/devji/workspace/subzeroclaw/ 2>/dev/null || true
+            fi
 
-      chown -R devji:users /home/devji/.subzeroclaw /home/devji/workspace 2>/dev/null || true
+            chown -R devji:users /home/devji/.subzeroclaw /home/devji/workspace 2>/dev/null || true
     '';
   };
 

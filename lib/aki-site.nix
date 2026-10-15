@@ -348,13 +348,12 @@
   hostKeys = builtins.attrNames (inventory.hosts or {});
   activeHosts = builtins.filter (h: (inventory.hosts.${h}.status or "") == "active") hostKeys;
 
-  hostSidebarButtons =
-    lib.concatStringsSep "\n" (
-      map (
-        h: ''<button class="side-btn" url="data/host-${h}.json">${h} (${inventory.hosts.${h}.kind or "nix"})</button>''
-      )
-      activeHosts
-    );
+  hostSidebarButtons = lib.concatStringsSep "\n" (
+    map (
+      h: ''<button class="side-btn" url="data/host-${h}.json">${h} (${inventory.hosts.${h}.kind or "nix"})</button>''
+    )
+    activeHosts
+  );
 
   inventoryJson = builtins.toJSON {
     "#breadcrumbs" = {textContent = "fleet / inventory";};
@@ -672,10 +671,12 @@
   };
 
   # Individual JSON files for active hosts
-  hostJsonFiles = map (h: {
-    name = "data/host-${h}.json";
-    file = pkgs.writeText "host-${h}.json" (mkHostJson h);
-  }) activeHosts;
+  hostJsonFiles =
+    map (h: {
+      name = "data/host-${h}.json";
+      file = pkgs.writeText "host-${h}.json" (mkHostJson h);
+    })
+    activeHosts;
 in
   pkgs.runCommand "fleet-docs-site" {
     meta = {

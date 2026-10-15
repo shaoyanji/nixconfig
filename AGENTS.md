@@ -64,7 +64,7 @@ flake.nix → flake/outputs.nix (hub)
 
 ### Complete Client OS Fleet Inventory (`flake/host-inventory.nix`)
 
-> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) (32 total devices: 10 active Nix, 6 active non-Nix external, 1 WIP, 16 preserved).
+> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml), compiled into typed data by [`lib/inventory.nix`](file:///home/devji/Documents/nixconfig/lib/inventory.nix) and enforced by `checks.<system>.inventory-{schema,hosts}` (see [`docs/inventory-schema.md`](file:///home/devji/Documents/nixconfig/docs/inventory-schema.md)). **Fleet counts are DERIVED — never write them here.** Read them with `task dev:inventory:json` or `nix eval .#inventory.derived`.
 
 | Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |
 |------|--------|-------------|------|---------------------------|-------------|----------------|
@@ -401,15 +401,83 @@ Rationale and the eval-speed trade-off: `docs/control-plane-vision.md` §4/§6.
 ### Validation
 
 ```bash
-task checks:quick                # Quick eval + host-architecture check + nix lint
+task checks:quick                # Bounded: cheap inventory checks, one host eval each, lint
+task checks:host:HOST=<host>     # [gate] ONE host (name required): module system + assertions + registry
+task checks:hosts:HOSTS="a b"    # [gate] a NAMED set, one at a time — no default, never the fleet
+task checks:flake                # [gate] run `nix flake check` only on a machine that can hold it
 task checks:flake:transitive     # Sweep transitive flake pins vs upstream (read-only)
 task checks:qmd:docs             # qmd repo-docs collection registered + index fresh
 task checks:qmd:vault            # qmd Obsidian vault collection registered + index fresh
-nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath  # full-config check (all option types)
-nix build .#checks.x86_64-linux.host-architecture -L              # Host architecture validation
-nix flake check                  # Full evaluation (slower, catches everything)
+nix build .#hostChecks.x86_64-linux.<host> -L                     # ONE host gate (~13 s, ~700 MiB)
+nix eval .#inventory.hosts.<host>.role                            # Compiled registry (0.15 s, no host eval)
+nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath  # full-config check, ONE host
+#   ^ this one instantiates the whole system derivation graph (>120 s here, and the
+#     reason the old fleet-wide host-eval checks were fatal). ONE host per invocation.
 task checks:nix:lint             # deadnix (fail) + statix (advisory)
 ```
+
+#### HARD RULE: never run `nix flake check` on a small host
+
+`nix flake check` evaluates **every flake output**, not just `checks.<system>` — its own
+progress output says so:
+
+```
+checking flake output 'nixosConfigurations'...
+checking NixOS configuration 'nixosConfigurations.ares'...
+checking NixOS configuration 'nixosConfigurations.testvm'...
+```
+
+On frieren (11 GiB RAM, ~5 GiB already swapped) that is 23 NixOS evaluations inside **one**
+process. Measured 2026-10-15:
+
+| command | wall | peak RSS | result |
+| :--- | ---: | ---: | :--- |
+| `nix flake check` | **339.78 s** | **6078.5 MiB** | SIGKILL, exit **137** |
+| `nix build .#hostChecks.x86_64-linux.frieren` | 13.16 s | 720.0 MiB | ok, 2035 assertions |
+| `nix build .#hostChecks.x86_64-linux.mtfuji` | 11.42 s | 645.5 MiB | ok, 1620 assertions |
+| `nix eval .#inventory.hosts.fern.role` | 0.15 s | 47.1 MiB | ok (no host eval) |
+
+After the kill the host sat at **62 % sustained IO-stall** (PSI `full avg10`) with 5.4 GiB
+swapped. A crashed agent cannot repair the host it crashed, so:
+
+- **Memory is O(hosts forced in one process).** One host per invocation, always.
+- `nix flake check` is gated behind `task checks:flake`, which **refuses below 16384 MiB
+  of `MemTotal`** and points at the bounded gates.
+- **No task in this repo defaults to the fleet, and that is a rule, not a gap.**
+  `checks:host:HOST=<host>` takes exactly one host and the name is required;
+  `checks:hosts:HOSTS="a b"` takes a named set and **refuses to run without one**.
+  An earlier revision of this work shipped a `checks:hosts` defaulting to all 21 x86_64
+  hosts and a `checks:hosts:all` that swept 27 — the same footgun, serialized, and handed
+  to every agent that reads the contract. A default is what an agent runs. Do not
+  reintroduce a default host set.
+- **The fleet is CI's job.** `.github/workflows/nixcachix.yml` maps affected hosts to
+  runners, so each host gets its own machine: `nix build .#nixosConfigurations.<host>`
+  plus `.#hostChecks.<arch>.<host>`. That is where "check every host" belongs.
+- `MODE=eval` makes `checks:host` **arch-independent** (it evaluates the config instead
+  of building it), which is the only way to check an aarch64 or darwin host from an
+  x86_64 machine: `task checks:host HOST=penguin MODE=eval` (2.7 s, 452 MiB).
+
+**Two hosts currently fail the per-host gate.** Reproduce either without touching the
+fleet (each is one host, and nothing is built in eval mode):
+
+```bash
+task checks:host HOST=minyx MODE=eval     # aarch64 — evaluated, no arm builder needed
+task checks:host HOST=cassini MODE=eval   # darwin
+```
+
+Both are pre-existing (the gate is new, and the only thing that would have caught them
+before, `nix flake check`, was never runnable here) and both are dormant `preserved`
+hosts:
+
+| host | failure | fix |
+| :--- | :--- | :--- |
+| `minyx` | The config does not evaluate at all: `boot.kernelPackages` is defined both in `modules/profiles/base-node.nix` and in `nixos-hardware/raspberry-pi/3`. | Make one of them `lib.mkDefault` — the rpi3 kernel is the right one for a Pi 3B+, so `base-node.nix` should yield. That module is shared by ~21 hosts, so it is a deliberate change, not a drive-by. |
+| `cassini` | A home-manager assertion fails: `xdg.desktopEntries` is a **Linux-only** module and `modules/user/ai/freebuff-remote.nix` sets it on this darwin host. | Gate that module to `pkgs.stdenv.isLinux`, or disable `programs.freebuff-remote` on darwin. |
+- Every bounded run goes through `scripts/task/oom-guard.sh`, which polls
+  `/proc/vmstat oom_kill`, memory/io PSI and `MemAvailable` **every 10 s** and kills the
+  run on pressure instead of letting it take the host down. It measures the whole
+  **process group**: sampling only the direct child reported a 4.9 MiB peak for a run
+  that actually took a 6 GiB grandchild to the OOM killer.
 
 #### Agent Verification Protocol (compute discipline)
 
@@ -429,9 +497,22 @@ on four hosts and only exploded when a build forced the real toplevel.
 nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath
 ```
 
-This instantiates the entire configuration — every module, every option type — in
-seconds, and is the cheapest thing that can actually fail on a bad option value.
+This instantiates the entire configuration — every module, every option type — and
+is the cheapest thing that can actually fail on a bad option value. It is also the
+heaviest eval there is: it walks the whole system derivation graph, measured at
+**>120 s with unbounded wall clock on frieren** once ~5 GiB was swapped. It is
+O(hosts) in memory, which is exactly why running it for 23 hosts in one process
+(the old `host-eval-*` checks inside `checks.<system>`) ended in a SIGKILL.
 
+- **Cheaper first.** `nix build .#hostChecks.<system>.<host>` runs the module system
+  and every assertion — the same conditions the toplevel asserts — for 13.16 s /
+  720 MiB (frieren) and catches the option-conflict / bad-value / policy class
+  without instantiating the closure. Reach for the `.drvPath` force when the change
+  is about derivation-level wiring, not option values.
+- **Budget it, and run it under the guard.**
+  `bash scripts/task/oom-guard.sh --timeout 180 -- nix eval --raw …` kills the run on
+  10 s OOM/PSI polling instead of dragging the host into swap death. Use
+  `--timeout 3` for the leaf registry reads (`.#inventory.*`), which cost 0.15 s.
 - **Scope to what the change reaches, never the fleet:** host-local edit → that
   host; chain module (`modules/global/*`, `modules/profiles/*`, `modules/roles/*`)
   → one representative host per chain affected; `flake/` wiring → one host per
@@ -561,8 +642,8 @@ task agents:menu                 # Interactive operator control plane
 ```bash
 nix build .#nixosConfigurations.<host>.config.system.build.toplevel          # Build host closure
 nix build .?submodules=1#nixosConfigurations.<host>.config.system.build.toplevel  # With submodules (CI)
-nix build .#checks.x86_64-linux.host-architecture -L                         # Run host checks
-nix build .#checks.x86_64-linux.host-eval-frieren                        # Build a single check
+nix build .#hostChecks.x86_64-linux.frieren                                  # ONE host eval gate (~700 MiB)
+bash scripts/task/oom-guard.sh --timeout 3 -- nix eval --raw .#inventory.hosts.fern.role  # leaf read, no host eval
 nix build .#devShells.x86_64-linux.default                                   # Enter dev shell
 alejandra <file>                                                             # Format Nix file
 alejandra --check <file>                                                     # Check formatting
@@ -668,25 +749,68 @@ CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodul
 
 ## Nix Patterns & Gotchas
 
-### HARD RULE: never hand-edit TOML — use `yq`
+### HARD RULE: never hand-edit TOML — edit through a format-aware tool
 
-**TOML is edited and parsed with `yq`, never by text substitution.** This is not
+**TOML is edited with a TOML AST editor, never by text substitution.** This is not
 style: hand-editing `inventory.toml` in this repo produced unparseable TOML (a
 stray-indent anchor silently merged two lines), and it is not caught until
-something else reads the file. `yq -i` rewrites the AST, so it *cannot* emit a
-file that does not parse.
+something else reads the file.
+
+**yq chooses the parser from the PATH'S EXTENSION, and that is the real trap.**
+`yq -i '<expr>' some.toml` is correct. Hand the same expression a path that does
+not end in `.toml` — a temp copy called `/tmp/inv.test` — and yq falls back to
+YAML, reads `[metadata]` as a YAML flow sequence, and dies with
+`Error: cannot index array with 'metadata'` while writing nothing. Verified both
+ways on this repo's file. Keep the `.toml` extension on every path you give yq,
+or pass `-p toml -o toml` explicitly (as `scripts/task/modules-menu.sh` does).
+
+> A previous revision of this section claimed `yq -i` was simply broken on TOML.
+> That was a bad test using a non-`.toml` temp filename, **not** a yq defect —
+> `scripts/task/inventory-menu.sh`'s `yq -i` writes work correctly. Do not
+> "fix" it again on that basis.
+
+Separately: yq's TOML *output* collapses multi-line arrays, so **any** yq write
+reformats `inventory.toml` (expect a large cosmetic diff). That is formatting,
+not data loss; the values survive.
+
+**A second silent no-op, found 2026-10-15: `yq -i -f script.yq file.toml` ignores
+the script.** It exits 0, rewrites the file — so `git diff` shows a big diff — and
+applies *nothing*: the script is dropped, leaving the identity transform, which is
+exactly why it looks like it worked. The identical program with the flags in the
+other order, `yq --from-file script.yq -i file.toml`, applies correctly. Both
+verified on `inventory.toml` with yq v4.54.1. Prefer an inline expression; if you
+need a script file, put `--from-file` **before** `-i`, and then verify the *effect*
+— `git diff` is not proof, because the array collapse above produces diff noise even
+when nothing was applied. The evidence that counts is the compiled result:
+`nix eval --raw .#inventory.json` before and after, diffed.
 
 ```bash
-yq -i '.hosts.eisen.managed = true' inventory.toml   # write (AST-level, safe)
-yq '.hosts | to_entries | length' inventory.toml      # read (exit 1 on parse error)
+# Read (safe; exits 1 on a parse error)
+yq '.hosts | to_entries | length' inventory.toml
+
+# Value write (AST-level). The path MUST end in .toml:
+yq -i '.hosts.eisen.managed = true' inventory.toml
+
+# Explicit about the format — use this in scripts, where a path may be a temp file:
+yq -p toml -o toml -i '.hosts.eisen.managed = true' inventory.toml
+
+# Surgical, format- AND comment-preserving (no array reflow) via tomlkit:
+nix shell --impure --expr 'let pkgs = import (builtins.getFlake "nixpkgs").outPath {}; in pkgs.python3.withPackages (ps: [ps.tomlkit])' \
+  -c python3 -c 'import tomlkit; d=tomlkit.parse(open("inventory.toml").read()); d["hosts"]["eisen"]["managed"]=True; open("inventory.toml","w").write(tomlkit.dumps(d))'
+
 task checks:toml:lint                                 # prove EVERY tracked .toml parses
 ```
 
-- Use `yq -i` for writes. Never `sed -i`, never an editor-style string replace.
-- After any TOML change — including one `yq` cannot express — run
+- Keep the `.toml` extension on yq paths, or pass `-p toml -o toml`. Never
+  `sed -i`, never an editor-style string replace.
+- After any TOML change — including one the tools cannot express — run
   `task checks:toml:lint`. It exits non-zero and names the offending file.
 - The same applies to JSON (`jq`) and YAML (`yq -p yaml -o yaml`); the rule is
-  "edit through the format's own tool", not "edit text that happens to be data".
+  "edit through a format-aware tool", not "edit text that happens to be data".
+- **Better: do not edit at all.** `inventory.toml` is compiled to typed data by
+  `lib/inventory.nix`; read it with `task dev:inventory:json` (or
+  `nix eval .#inventory…`) instead of re-parsing TOML with yq. See
+  `docs/inventory-schema.md`.
 
 ### Non-obvious patterns
 
@@ -780,6 +904,11 @@ When autonomous agents (`agy`, `hermes`, subagents) execute tool calls across Ni
 * **Failure Mode**: Running `ssh host 'bash -c "cat << EOF ... \`backticks\` ... $var ... EOF"'` produces syntax errors on remote or evaluates variables locally on the caller machine.
 * **Root Cause**: Double-quoted SSH strings and unquoted heredoc tags (`<< EOF`) expand variables and command substitutions before transmission.
 * **Fix**: Always quote heredocs (`<< 'EOF'`), write scripts to shared storage (`/Volumes/data/projects/...`), or pipe scripts into remote interpreters via stdin (`ssh host 'python3' < script.py`).
+
+#### 10. Negative Narinfo Cache Makes a Freshly Warmed Cache Look Empty
+* **Failure Mode**: A target stuck pulling from harmonia before its closure was warmed keeps failing with `path is not valid` / `don't know how to build these paths` even *after* the builder finishes `infra:warm:cache` — a raw HTTP fetch of the `.narinfo` returns 200 (signed), yet every `nix path-info --store` / `nix copy --from` still reports the path missing. `warm-host.sh`'s post-build verification can false-fail the same way.
+* **Root Cause**: Nix caches negative (404) narinfo lookups for **1 hour** (`narinfo-cache-negative-ttl`, in-process plus the user's on-disk `~/.cache/nix/binary-cache-v6.sqlite`). Any query that ran during the gap — the target's stuck pull, the builder's own pre-build gate — poisons the answer for the full TTL, on both the target and the builder.
+* **Fix**: Disable the negative cache on every cache-serving check and every pull of a just-warmed path: `--option narinfo-cache-negative-ttl 0`. `scripts/task/activate-host.sh` (gate + remote `nix copy`) and `scripts/task/warm-host.sh` (`served_by_cache`) already do this. One-off: `nix path-info --store http://192.168.3.25:5000 --option narinfo-cache-negative-ttl 0 <path>`.
 
 ---
 
@@ -1033,7 +1162,8 @@ task dev:config:hash-update    # runs nix-hash-update.sh
 | ------------------------------------ | ---------------------------------------------------------------------- |
 | `README.md`                          | Full repo documentation, architecture, all workflows                   |
 | `AGENTS.md`                          | This file — canonical agent routing and codebase manual                |
-| `inventory.toml`                     | Canonical 31-device fleet inventory source of truth                    |
+| `inventory.toml`                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
+| `docs/inventory-schema.md`           | Inventory schema, compiled artifacts, and the automatic checks          |
 | `docs/fleet-inventory.md`            | Fleet device catalog, hardware profiles, roles & operating disciplines |
 | `docs/closure-reduction.md`          | Closure size levers, evidence chains, and the runtime/interactive/one-shot tiers |
 | `docs/closure-debloat.md`            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |

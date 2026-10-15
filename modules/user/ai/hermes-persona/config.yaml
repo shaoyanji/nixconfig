@@ -11,6 +11,7 @@ model:
 agent:
   max_turns: 150
 display:
+  interface: cli
   tool_progress: all
 fallback_providers:
   - provider: openrouter
@@ -55,3 +56,8 @@ fallback:
 onboarding:
   seen:
     busy_input_prompt: true
+telemetry:
+  shared_metrics:
+    enabled: false
+    send: false
+    offer_version: 2

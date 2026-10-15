@@ -40,6 +40,7 @@ in {
     ./hardware-configuration.nix
     ./hardware.nix
     ../../modules/profiles/base-node.nix
+    ../../modules/profiles/hermes.nix
     ../../modules/profiles/server-hardening.nix
     ../../modules/profiles/laptop.nix
     ../../modules/profiles/base-desktop-environment.nix

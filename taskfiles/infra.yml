@@ -146,7 +146,7 @@ tasks:
       - sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) |& nom
 
   infra:boot:*:
-    desc: "[destructive] Boot into next generation via rebuild command"
+    desc: "[safe stage] Stage next generation in bootloader via rebuild command (reboot to activate)"
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
@@ -265,31 +265,30 @@ tasks:
       - nix copy --to http://192.168.3.25:5000?compress=true ".#nixosConfigurations.{{.HOST}}.config.system.build.toplevel"
 
   infra:apply:fleet:
-    desc: Apply to many hosts in parallel (HOSTS="h1 h2"; default = inventory.toml hosts with managed = true)
+    desc: Sequentially activate managed hosts from the LAN binary cache (HOSTS="h1 h2"; default = managed active hosts)
+    summary: >
+      Applies the warmed closure to each managed active host sequentially via
+      scripts/task/activate-host.sh. Each target pulls its closure directly from
+      harmonia at LAN speed over HTTP, avoiding nix-daemon OOM spikes and the
+      slow SSH push bottlenecks of nixos-rebuild --target-host.
+      Vars: HOSTS=, ACTION= (default "switch"; use "boot" for major library upgrades).
     vars:
       # The same deliberate, inventory-derived set as infra:warm:cache; DERIVED
       # is declared before HOSTS for the reason noted there.
       DERIVED:
         sh: yq -r '.hosts | to_entries | .[] | select(.value.managed == true and .value.status == "active") | .key' inventory.toml | tr '\n' ' '
       HOSTS: '{{.HOSTS | default .DERIVED}}'
+      ACTION: '{{.ACTION | default "switch"}}'
     cmds:
       - |
         if [ -z "{{.HOSTS}}" ]; then
           echo "ERROR: no hosts to apply to — inventory.toml has no 'managed = true' host (or is unreadable)." >&2
           exit 1
         fi
-        # Fan out one nixos-rebuild per host; each host builds locally on
-        # the dispatcher, so the nix daemon serialises the eval/build work
-        # while activation happens concurrently over SSH.
-        pids=""
-        for h in {{.HOSTS}}; do
-          echo "==> applying: $h"
-          (nixos-rebuild switch --use-remote-sudo --target-host "$h" --fast --flake ".?submodules=1#$h" |& nom) &
-          pids="$pids $!"
-        done
         fail=0
-        for p in $pids; do
-          wait "$p" || fail=1
+        for h in {{.HOSTS}}; do
+          echo "==> activating host: $h (action: {{.ACTION}})"
+          ACTION="{{.ACTION}}" bash scripts/task/activate-host.sh "$h" || fail=1
         done
         exit $fail
 

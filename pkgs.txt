@@ -1,1 +1,84 @@
-pkg.txt
+# ==============================================================================
+# REMOVED USERLAND BLOAT & REFERENCE PACKAGES (pkgs.txt)
+# ==============================================================================
+# Packages removed from modules/user/base/default.nix to keep the base layer
+# lightweight and focused strictly on fleet sysadmin & core Unix utilities.
+#
+# Lines prefixed with '#' are ignored by readPkgList in modules/user/base/default.nix.
+# To temporarily restore a package for a user environment, uncomment its line below.
+# ==============================================================================
+
+# ── Document & Typesetting Bloat (~3+ GB closure) ──
+# pandoc                 # Universal document converter (pulls GHC / Haskell runtime ~1.5 GB)
+# typst                  # Modern typesetting engine
+# tinymist               # Typst language server
+# ghostscript_headless   # PostScript & PDF rasterizer (~500 MB closure)
+# md2pdf                 # Markdown to PDF converter
+# obsidian-export        # Obsidian notes export CLI
+# comrak                 # CommonMark parser
+# pdfcpu                 # PDF processing toolkit
+# poppler-utils          # PDF extraction utilities (pdftotext, pdfinfo)
+
+# ── Cloud Infrastructure & Heavy SDKs (~1+ GB closure) ──
+# awscli2                # AWS Command Line Interface (Python SDK bundle ~1 GB)
+# cloudflared            # Cloudflare Tunnel client (managed via system service if needed)
+# gokrazy                # Go-based appliance builder
+
+# ── Media, Graphics & Color Tools ──
+# exiftool               # EXIF image metadata reader/writer (Perl runtime)
+# graph-easy             # ASCII/HTML/SVG graph renderer
+# pastel                 # Color palette manipulation CLI
+# qrencode               # QR code generator CLI
+
+# ── Terminal UI, Presentation & Novelty Apps ──
+# asciinema              # Terminal session recorder
+# charm-freeze           # Code screenshot generator
+# epr                    # Terminal epub reader
+# glow                   # Terminal markdown renderer
+# lowfi                  # Lo-fi terminal music stream player
+# most                   # Extended pager
+# navi                   # Interactive terminal cheatsheet
+# slides                 # Terminal presentation tool
+# tre                    # Tree alternative with editor aliasing
+
+# ── Mail & HTTP Clients (curl / elvish / nushell already provide HTTP) ──
+# httpie                 # User-friendly Python HTTP client
+# http-nu                # Nushell HTTP client
+# mailsy                 # Temporary disposable email CLI
+# mutt                   # Interactive terminal mail client
+# pop                    # Terminal email client
+
+# ── Bookmarks, Search & Web Scrapers ──
+# buku                   # Terminal bookmark manager
+# ddgr                   # DuckDuckGo terminal search
+# newsboat               # Terminal RSS / Atom feed reader
+
+# ── Benchmarking & Duplicate Finders ──
+# fdupes                 # Duplicate file detector
+# hyperfine              # Command-line benchmarking tool
+
+# ── Redundant Shell & Diff Tools (subsumed by delta / lf / git / gh) ──
+# aha                    # ANSI to HTML converter
+# diff-so-fancy          # Legacy diff highlighter (delta is declarative standard)
+# dust                   # Disk usage tree (duf and btop are standard)
+# gitmoji-cli            # Interactive git commit emoji tool
+# glances                # Python system monitor (btop is standard)
+# htmlq                  # HTML query utility
+# hub                    # Legacy GitHub CLI (gh is standard)
+# markdownlint-cli       # Markdown style linter
+# mc                     # Midnight Commander (lf is standard)
+# mdq                    # Markdown query tool
+# nurl                   # Nix fetcher URL generator
+
+# ── Legacy / Preserved Package Graveyard ──
+# broot
+# eget
+# goose-cli
+# khal
+# neverest
+# rustfinity
+# seclists
+# speedtest-cli
+# thefuck
+# todoist
+# twitch-hls-client

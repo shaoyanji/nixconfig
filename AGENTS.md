@@ -467,6 +467,25 @@ in place of one.
 > **eval to catch a config error · build to prove a closure · size to plan a
 > build.** Never build without cause — but never mistake an eval for one.
 
+**A check must not be able to spend build budget.** `frieren` configures
+`eu.nixbuild.net` as a distributed builder (`/etc/nix/machines`), and nixbuild.net
+bills **per build-second** against a 25 h/month free tier — so any `nix build`
+that reaches a missing derivation spends money, wherever it is run from. Two
+rules follow:
+
+- **Never call `nix build` in a check/gate path.** `nix build --dry-run` does not
+  build, but it is one edit away from not being a dry run — on 2026-10-15 a
+  `--check` that used `nix build --print-out-paths` dispatched full closures (incl.
+  stark's NVIDIA closure) to the remote builder and consumed the month's budget.
+  Prefer `nix eval --raw "<attr>.outPath"` (forces the path, builds nothing) plus
+  `nix path-info --store <cache> <path>` (asks the cache).
+- **If a check must shell out to nix build, pass `--builders ""`** so it cannot
+  dispatch even if the dry-run flag is lost. `scripts/task/warm-host.sh` does this
+  in `pending_count()`.
+
+Budget is spent deliberately, by `task dev:nixbuild:warm` — never as a side effect
+of looking.
+
 **Never put ssh in an unattended path.** A pre-switch hook that opens ssh can
 block on an interactive auth prompt: Tailscale SSH added a browser check on `fern`
 and silently hung an unattended run for 5 minutes. Use the LAN address

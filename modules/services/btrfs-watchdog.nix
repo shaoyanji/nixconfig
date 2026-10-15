@@ -27,29 +27,30 @@
     echo "=== [$(date '+%Y-%m-%d %H:%M:%S')] Starting Btrfs device error watchdog audit ==="
 
     ${lib.concatMapStringsSep "\n" (mount: ''
-      if [ -d "${mount}" ]; then
-        if btrfs filesystem df "${mount}" >/dev/null 2>&1; then
-          echo "Inspecting Btrfs mount: ${mount}..."
-          CHECKED_COUNT=$((CHECKED_COUNT + 1))
-          
-          STATS=$(btrfs device stats "${mount}" 2>&1 || true)
-          echo "$STATS"
+        if [ -d "${mount}" ]; then
+          if btrfs filesystem df "${mount}" >/dev/null 2>&1; then
+            echo "Inspecting Btrfs mount: ${mount}..."
+            CHECKED_COUNT=$((CHECKED_COUNT + 1))
 
-          # Parse any non-zero errors (format: [/dev/sda2].corruption_errs  0)
-          ERR_LINES=$(echo "$STATS" | awk '$2 > 0 {print $0}')
-          if [ -n "$ERR_LINES" ]; then
-            echo "ERROR: Hardware or corruption errors detected on ${mount}!" >&2
-            echo "$ERR_LINES" >&2
-            ERR_SUM=$(echo "$STATS" | awk '{sum += $2} END {print sum}')
-            TOTAL_ERRORS=$((TOTAL_ERRORS + ERR_SUM))
+            STATS=$(btrfs device stats "${mount}" 2>&1 || true)
+            echo "$STATS"
+
+            # Parse any non-zero errors (format: [/dev/sda2].corruption_errs  0)
+            ERR_LINES=$(echo "$STATS" | awk '$2 > 0 {print $0}')
+            if [ -n "$ERR_LINES" ]; then
+              echo "ERROR: Hardware or corruption errors detected on ${mount}!" >&2
+              echo "$ERR_LINES" >&2
+              ERR_SUM=$(echo "$STATS" | awk '{sum += $2} END {print sum}')
+              TOTAL_ERRORS=$((TOTAL_ERRORS + ERR_SUM))
+            fi
+          else
+            echo "Skipping ${mount}: not recognized as an active Btrfs filesystem."
           fi
         else
-          echo "Skipping ${mount}: not recognized as an active Btrfs filesystem."
+          echo "Skipping ${mount}: directory does not exist."
         fi
-      else
-        echo "Skipping ${mount}: directory does not exist."
-      fi
-    '') cfg.mounts}
+      '')
+      cfg.mounts}
 
     if [ "$CHECKED_COUNT" -eq 0 ]; then
       echo "WARNING: No valid Btrfs mount points were checked!" >&2

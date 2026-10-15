@@ -107,67 +107,191 @@ in {
     rules = {
       s0Deterministic = {
         kiwix = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "Direct S0 HTTP probe & restart for Kiwix offline knowledge."; };
-          endpoint = lib.mkOption { type = lib.types.str; default = "http://127.0.0.1:8088"; description = "Kiwix endpoint URL."; };
-          service = lib.mkOption { type = lib.types.str; default = "kiwix-serve"; description = "Target systemd service."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Direct S0 HTTP probe & restart for Kiwix offline knowledge.";
+          };
+          endpoint = lib.mkOption {
+            type = lib.types.str;
+            default = "http://127.0.0.1:8088";
+            description = "Kiwix endpoint URL.";
+          };
+          service = lib.mkOption {
+            type = lib.types.str;
+            default = "kiwix-serve";
+            description = "Target systemd service.";
+          };
         };
         harmonia = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "Direct S0 HTTP probe for Harmonia binary cache."; };
-          endpoint = lib.mkOption { type = lib.types.str; default = "http://127.0.0.1:5000/nix-cache-info"; description = "Harmonia cache endpoint URL."; };
-          service = lib.mkOption { type = lib.types.str; default = "harmonia"; description = "Target systemd service."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Direct S0 HTTP probe for Harmonia binary cache.";
+          };
+          endpoint = lib.mkOption {
+            type = lib.types.str;
+            default = "http://127.0.0.1:5000/nix-cache-info";
+            description = "Harmonia cache endpoint URL.";
+          };
+          service = lib.mkOption {
+            type = lib.types.str;
+            default = "harmonia";
+            description = "Target systemd service.";
+          };
         };
         paperlessGhosts = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "Direct S0 quarantine for stalled 0-byte ghost PDFs."; };
-          consumeDir = lib.mkOption { type = lib.types.str; default = "/var/lib/paperless/consume"; description = "Paperless consume directory."; };
-          quarantineAgeSec = lib.mkOption { type = lib.types.int; default = 1800; description = "Age in seconds to consider stalled."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Direct S0 quarantine for stalled 0-byte ghost PDFs.";
+          };
+          consumeDir = lib.mkOption {
+            type = lib.types.str;
+            default = "/var/lib/paperless/consume";
+            description = "Paperless consume directory.";
+          };
+          quarantineAgeSec = lib.mkOption {
+            type = lib.types.int;
+            default = 1800;
+            description = "Age in seconds to consider stalled.";
+          };
         };
         sqliteIdleWal = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "Direct S0 WAL checkpoint when database is idle."; };
-          walThresholdKb = lib.mkOption { type = lib.types.int; default = 1024; description = "WAL bloat threshold in KB."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Direct S0 WAL checkpoint when database is idle.";
+          };
+          walThresholdKb = lib.mkOption {
+            type = lib.types.int;
+            default = 1024;
+            description = "WAL bloat threshold in KB.";
+          };
         };
         btrfsCleanCheck = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "Direct S0 clean check on Btrfs device error counts."; };
-          mountPoint = lib.mkOption { type = lib.types.str; default = "/Volumes/data"; description = "Btrfs filesystem mount point."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Direct S0 clean check on Btrfs device error counts.";
+          };
+          mountPoint = lib.mkOption {
+            type = lib.types.str;
+            default = "/Volumes/data";
+            description = "Btrfs filesystem mount point.";
+          };
         };
         thermalNominal = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "Direct S0 thermal headroom check."; };
-          thresholdC = lib.mkOption { type = lib.types.float; default = 76.0; description = "Package temperature threshold in Celsius."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Direct S0 thermal headroom check.";
+          };
+          thresholdC = lib.mkOption {
+            type = lib.types.float;
+            default = 76.0;
+            description = "Package temperature threshold in Celsius.";
+          };
         };
         memoryPsiNominal = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "Direct S0 kernel memory PSI check."; };
-          psiThreshold = lib.mkOption { type = lib.types.float; default = 15.0; description = "Memory PSI avg10 stall percentage threshold."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Direct S0 kernel memory PSI check.";
+          };
+          psiThreshold = lib.mkOption {
+            type = lib.types.float;
+            default = 15.0;
+            description = "Memory PSI avg10 stall percentage threshold.";
+          };
         };
       };
 
       s1Contextual = {
         thermalVsMedia = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "S1 Kelly arbitration: Thermals vs 4K TV / Jellyfin playback continuity."; };
-          protectedServices = lib.mkOption { type = lib.types.listOf lib.types.str; default = [ "niri" "jellyfin" ]; description = "Protected display / media services."; };
-          maxEmergencyTempC = lib.mkOption { type = lib.types.float; default = 84.0; description = "Critical temperature overriding stream continuity."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "S1 Kelly arbitration: Thermals vs 4K TV / Jellyfin playback continuity.";
+          };
+          protectedServices = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = ["niri" "jellyfin"];
+            description = "Protected display / media services.";
+          };
+          maxEmergencyTempC = lib.mkOption {
+            type = lib.types.float;
+            default = 84.0;
+            description = "Critical temperature overriding stream continuity.";
+          };
         };
         memoryVsCache = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "S1 Kelly arbitration: Memory PSI vs database pagecache retention."; };
-          preferZram = lib.mkOption { type = lib.types.bool; default = true; description = "Prefer zram compaction over dropping DB pagecache."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "S1 Kelly arbitration: Memory PSI vs database pagecache retention.";
+          };
+          preferZram = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Prefer zram compaction over dropping DB pagecache.";
+          };
         };
         walVsConcurrency = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "S1 Kelly arbitration: Active write concurrency vs WAL truncation."; };
-          bloatThresholdKb = lib.mkOption { type = lib.types.int; default = 10240; description = "WAL threshold in KB for active contention."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "S1 Kelly arbitration: Active write concurrency vs WAL truncation.";
+          };
+          bloatThresholdKb = lib.mkOption {
+            type = lib.types.int;
+            default = 10240;
+            description = "WAL threshold in KB for active contention.";
+          };
         };
       };
 
       s2Investigative = {
         btrfsCorruption = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "S2 escalation on non-zero Btrfs device corruption/IO errors."; };
-          autoSnapshot = lib.mkOption { type = lib.types.bool; default = true; description = "Create emergency read-only snapshot before repair."; };
-          stopServices = lib.mkOption { type = lib.types.listOf lib.types.str; default = [ "transmission-daemon" ]; description = "Services to pause during corruption."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "S2 escalation on non-zero Btrfs device corruption/IO errors.";
+          };
+          autoSnapshot = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Create emergency read-only snapshot before repair.";
+          };
+          stopServices = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = ["transmission-daemon"];
+            description = "Services to pause during corruption.";
+          };
         };
         flakeTransitiveCve = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "S2 escalation on critical transitive flake CVE advisory."; };
-          flakePath = lib.mkOption { type = lib.types.str; default = "/Volumes/data/projects/nixconfig"; description = "Target flake path."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "S2 escalation on critical transitive flake CVE advisory.";
+          };
+          flakePath = lib.mkOption {
+            type = lib.types.str;
+            default = "/Volumes/data/projects/nixconfig";
+            description = "Target flake path.";
+          };
         };
         consensusAnomaly = {
-          enable = lib.mkOption { type = lib.types.bool; default = true; description = "S2 escalation when Julia-1 and Laya split on critical anomaly."; };
-          emitHandoff = lib.mkOption { type = lib.types.bool; default = true; description = "Append findings directly to /home/devji/HANDOFF.md."; };
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "S2 escalation when Julia-1 and Laya split on critical anomaly.";
+          };
+          emitHandoff = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Append findings directly to /home/devji/HANDOFF.md.";
+          };
         };
       };
     };
@@ -203,7 +327,7 @@ in {
             if [ "${toString cfg.allowSystem2}" = "1" ]; then
               FLAGS="$FLAGS --allow-s2"
             fi
-            
+
             if command -v systemone-ensemble >/dev/null 2>&1; then
               systemone-ensemble govern $FLAGS
             else

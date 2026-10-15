@@ -11,15 +11,23 @@
     globalModulesImpermanence
     globalModulesMacos
     globalModulesNixos
+    # The microVM hosts below build their own module list instead of using a
+    # global chain, so they take the inventory injection explicitly. Without it
+    # they have no `config.fleet.inventory`; `checks.<system>.inventory-modules`
+    # catches that structurally (no host evaluation) and
+    # `task checks:host:HOST=<host>` catches it behaviourally.
+    inventoryModules
     ;
 in {
   garnixMachine = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = [
-      inputs.garnix-lib.nixosModules.garnix
-      ../hosts/garnixMachine.nix
-    ];
+    modules =
+      inventoryModules
+      ++ [
+        inputs.garnix-lib.nixosModules.garnix
+        ../hosts/garnixMachine.nix
+      ];
   };
 
   poseidon = {
@@ -46,8 +54,8 @@ in {
     modules = globalModulesContainers ++ [../hosts/deckstation/configuration.nix];
   };
 
-  # delphi — Oracle Cloud Always Free ARM64 headless server (offload worker,
-  # Tailscale exit node / external bastion). See hosts/delphi/configuration.nix.
+  # Role/hardware/history are COMPILED, not commented: inventory.toml
+  # `[hosts.delphi] notes`, surfaced by `task dev:inventory:feed`.
   delphi = {
     kind = "nixos";
     system = "aarch64-linux";
@@ -56,13 +64,8 @@ in {
   eisen = {
     kind = "nixos";
     system = "x86_64-linux";
-    # Upgraded from a cage-based Steam kiosk to a full desktop
-    # (poseidon-style): globalModulesNixos brings in niri + DankMaterialShell
-    # and the sops/nix-index HM modules.  Steam runs under the upstream
-    # gamescope-session (safe on the RX 5700's modern Vulkan ICD, unlike
-    # kellerbench's Kepler card).  The previous cage-kiosk specialisation and
-    # greetd dual-session experiments hung at graphical.target, so the DMS
-    # greeter path (as on poseidon) is used instead of greetd auto-login.
+    # Role/hardware/history are COMPILED, not commented: inventory.toml
+    # `[hosts.eisen] notes`, surfaced by `task dev:inventory:feed`.
     modules = globalModulesNixos ++ [../hosts/eisen/configuration.nix];
   };
 
@@ -86,14 +89,8 @@ in {
   ares = {
     kind = "nixos";
     system = "x86_64-linux";
-    # ares is the T440p SSD moved into a desktop case (i5-6500 + GTX
-    # 750 Ti).  Converted to a Steam Big Picture kiosk (steamos.nix)
-    # mirroring eisen/kellerbench.  Uses the noDE containers chain +
-    # impermanence (root wiped each boot; devji home + /etc persisted
-    # to /persist).  The T440p-specific nixos-hardware module is
-    # dropped because Lenovo fan curves / power management do not
-    # apply to desktop boards.  The btrfs /persist layout on /dev/sda
-    # is unchanged (disko).
+    # Role/hardware/history are COMPILED, not commented: inventory.toml
+    # `[hosts.ares] notes`, surfaced by `task dev:inventory:feed`.
     modules =
       globalModulesContainers
       ++ [
@@ -108,17 +105,8 @@ in {
   stark = {
     kind = "nixos";
     system = "x86_64-linux";
-    # stark is a Dell Inspiron 24 3477 AIO (i5-7200U Kaby Lake-U, 16 GB
-    # RAM). Steam Big Picture desktop mirroring eisen: globalModulesNixos
-    # brings in niri + DankMaterialShell greeter + role:heim userland,
-    # autoLogin drops devji into the upstream gamescope-session (steam
-    # -gamepadui) with the DMS greeter as fallback. The MX110 (Maxwell
-    # GM108M sm_50) dGPU needs the legacy_580 driver and is muxless
-    # Optimus: PRIME render offload with the HD 620 iGPU driving the panel —
-    # games opt in via nvidia-offload %command%.
-    # Dual-disk disko uses persistent by-id paths: SK hynix SATA SSD for
-    # system + 1 TB Seagate HDD as the btrfs Steam library at /mnt/steam.
-    # Persistent (no impermanence) — eisen-style.
+    # Role/hardware/history are COMPILED, not commented: inventory.toml
+    # `[hosts.stark] notes`, surfaced by `task dev:inventory:feed`.
     modules =
       globalModulesNixos
       ++ [
@@ -134,16 +122,8 @@ in {
   fern = {
     kind = "nixos";
     system = "x86_64-linux";
-    # fern is an HP 15 laptop (Ryzen 3 3250U Picasso, Vega 3 iGPU, 8 GB
-    # RAM). Lightweight niri desktop mirroring scratch: globalModulesNixos
-    # (niri + DankMaterialShell greeter via programs.dms-greeter +
-    # role:heim userland), autoLogin straight into niri as devji. NO
-    # Steam — deliberately not imported (contrast stark/eisen).
-    # modules/profiles/laptop.nix layers auto-cpufreq + libinput. Single-
-    # disk disko (ESP + 8G swap + btrfs /root,/nix). This unit's SSD is
-    # NVMe (KIOXIA KBG40ZNV256G) so the device is /dev/nvme0n1; HP 15s-eq
-    # units with a SATA M.2 enumerate as /dev/sda instead (verify with
-    # lsblk BEFORE disko formats it). Persistent (no impermanence).
+    # Role/hardware/history are COMPILED, not commented: inventory.toml
+    # `[hosts.fern] notes`, surfaced by `task dev:inventory:feed`.
     modules =
       globalModulesNixos
       ++ [
@@ -167,13 +147,8 @@ in {
   scratch = {
     kind = "nixos";
     system = "x86_64-linux";
-    # Lightweight niri desktop (eisen-style) on a Fujitsu ESPRIMO D556
-    # (i5-6500, 8 GB RAM, 128 GB f2fs SSD). Formerly a Steam Remote
-    # Play kiosk; Steam dropped in the 2026-09 desktop conversion.
-    # f2fs has no subvolumes so the btrfs impermanence module is NOT
-    # used — the host config puts every heavy-write dir on tmpfs
-    # (zram 100%, journald volatile, fstrim, noatime).  Legacy BIOS
-    # boot: GRUB on /dev/sda, systemd-boot disabled.
+    # Role/hardware/history are COMPILED, not commented: inventory.toml
+    # `[hosts.scratch] notes`, surfaced by `task dev:inventory:feed`.
     modules = globalModulesNixos ++ [../hosts/scratch/configuration.nix];
   };
 
@@ -183,9 +158,10 @@ in {
     modules = globalModulesNixos ++ [../hosts/aristotle/configuration.nix];
   };
 
-  # Note: netbook is an independent NixOS 25.11 host (no flake, pinned 25.11 channel
-  # due to an upstream initrd bug on newer kernels). It is managed via remote fleet
-  # ops (task infra:apply:host:netbook) rather than flake closure projection.
+  # netbook is deliberately absent from this registry, and that fact is COMPILED
+  # rather than commented: inventory.toml carries `[hosts.netbook] flake = false`
+  # plus the reason in its `notes`. `checks.<system>.inventory-hosts` fails if this
+  # registry and inventory.toml ever disagree.
 
   aceofspades = {
     kind = "nixos";
@@ -243,25 +219,29 @@ in {
   testvm = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = [
-      inputs.microvm.nixosModules.microvm
-      (import ../hosts/microvms/testvm.nix {})
-      ({pkgs, ...}: {
-        environment.systemPackages = with pkgs; [
-          vim
-          htop
-        ];
-      })
-    ];
+    modules =
+      inventoryModules
+      ++ [
+        inputs.microvm.nixosModules.microvm
+        (import ../hosts/microvms/testvm.nix {})
+        ({pkgs, ...}: {
+          environment.systemPackages = with pkgs; [
+            vim
+            htop
+          ];
+        })
+      ];
   };
 
   frieren-canary = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = [
-      inputs.microvm.nixosModules.microvm
-      ../hosts/microvms/frieren-canary.nix
-    ];
+    modules =
+      inventoryModules
+      ++ [
+        inputs.microvm.nixosModules.microvm
+        ../hosts/microvms/frieren-canary.nix
+      ];
   };
 
   penguin = {

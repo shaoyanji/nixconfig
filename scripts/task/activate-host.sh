@@ -109,35 +109,38 @@ if [ "$mode" = "check" ]; then
   exit 0
 fi
 
+action="${ACTION:-switch}"
+
 # The activation program, executed ON the target under sudo. Values are baked in
 # so nothing depends on the target's environment.
-unit="activate-$(printf '%s' "$host" | tr -c 'a-zA-Z0-9' '-')"
+unit="activate-$(printf '%s' "$host" | tr -c 'a-zA-Z0-9' '-')-$(date +%s)"
 remote="$(cat <<REMOTE
 set -euo pipefail
 NIX=/run/current-system/sw/bin/nix
 NIXENV=/run/current-system/sw/bin/nix-env
 CACHE='$cache'
 TOP='$top'
+ACTION='$action'
 if [ "\$(readlink -f /run/current-system)" = "\$TOP" ]; then
   echo "already on \$TOP — nothing to do"
   exit 0
 fi
 echo "== pulling closure from \$CACHE (HTTP, parallel, resumable) =="
-"\$NIX" copy --from "\$CACHE" --no-check-sigs --option narinfo-cache-negative-ttl 0 "\$TOP"
+"\$NIX" copy --from "\$CACHE" --no-check-sigs --option narinfo-cache-negative-ttl 0 --option trusted-substituters "\$CACHE" "\$TOP"
 echo "== registering generation =="
 "\$NIXENV" -p /nix/var/nix/profiles/system --set "\$TOP"
-echo "== activating =="
-"\$TOP/bin/switch-to-configuration" switch
-echo "== ACTIVATED: \$(readlink -f /run/current-system) =="
+echo "== activating (\$ACTION) =="
+"\$TOP/bin/switch-to-configuration" "\$ACTION"
+echo "== COMPLETED (\$ACTION): \$(readlink -f /run/current-system) =="
 REMOTE
 )"
 
-echo "activate [$host] running on $target (unit $unit); progress: ssh $target journalctl -u $unit"
+echo "activate [$host] running on $target (unit $unit, action $action); progress: ssh $target journalctl -u $unit"
 # Detached so a 20-minute transfer cannot be killed by the caller's session, and
-# so the copy survives a dropped connection.
+# so the copy survives a dropped connection. No --collect so journal/exit state is retained for diagnosis.
 printf '%s\n' "$remote" |
   ssh -o BatchMode=yes -o ConnectTimeout=10 -o ControlMaster=no "$target" \
-    "sudo systemd-run --collect --pipe --unit='$unit' --description='activate $host from $cache' --property=Type=oneshot bash -s"
+    "sudo systemd-run --pipe --unit='$unit' --description='activate $host from $cache' --property=Type=oneshot bash -s"
 
 # Report a real outcome. The unit runs detached, but the caller should not be
 # left with only "started" — the 2026-10-15 incident was exactly that: the unit
@@ -155,23 +158,37 @@ ssh_opts="-o BatchMode=yes -o ConnectTimeout=10 -o ControlMaster=no"
 deadline=$((SECONDS + wait))
 while [ "$SECONDS" -lt "$deadline" ]; do
   sleep 5
-  read -r cur state <<<"$(ssh $ssh_opts "$target" "readlink -f /run/current-system; systemctl show -p ActiveState --value '$unit' 2>/dev/null || true")" || true
-  if [ "$cur" = "$top" ]; then
+  out="$(ssh $ssh_opts "$target" "readlink -f /run/current-system; systemctl show -p ActiveState --value '$unit' 2>/dev/null || true")" || out=""
+  cur="$(printf '%s\n' "$out" | sed -n '1p')"
+  state="$(printf '%s\n' "$out" | sed -n '2p')"
+
+  if [ "$action" = "boot" ]; then
+    boot_link="$(ssh $ssh_opts "$target" "readlink -f /nix/var/nix/profiles/system 2>/dev/null || true")"
+    if [ "$boot_link" = "$top" ] && [ "$state" = "inactive" ]; then
+      echo "activate [$host] SUCCESS (boot stage) — $target default boot profile is $top"
+      exit 0
+    fi
+  elif [ "$cur" = "$top" ]; then
     echo "activate [$host] SUCCESS — $target is on $top"
     exit 0
   fi
+
   if [ "$state" = "failed" ]; then
     echo "activate [$host] FAILED on $target — unit journal:" >&2
     ssh $ssh_opts "$target" "journalctl -u '$unit' --no-pager | tail -30" >&2 || true
     exit 1
   fi
-  if [ "$state" = "inactive" ] || [ "$state" = "not-found" ] || [ "$state" = "" ]; then
-    # --collect removes a finished unit within seconds; give the switch one
-    # poll to land the symlink before concluding failure.
-    sleep 5
-    cur="$(ssh $ssh_opts "$target" "readlink -f /run/current-system")" || cur=""
+
+  if [ "$state" = "inactive" ] || [ "$state" = "not-found" ]; then
+    sleep 3
+    cur="$(ssh $ssh_opts "$target" "readlink -f /run/current-system 2>/dev/null || true")"
     if [ "$cur" = "$top" ]; then
       echo "activate [$host] SUCCESS — $target is on $top"
+      exit 0
+    fi
+    boot_link="$(ssh $ssh_opts "$target" "readlink -f /nix/var/nix/profiles/system 2>/dev/null || true")"
+    if [ "$action" = "boot" ] && [ "$boot_link" = "$top" ]; then
+      echo "activate [$host] SUCCESS (boot stage) — $target default boot profile is $top"
       exit 0
     fi
     echo "activate [$host] FAILED on $target — unit finished but the target is still on $cur. Unit journal:" >&2

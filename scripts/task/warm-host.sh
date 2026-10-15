@@ -183,7 +183,7 @@ for h in "${hosts[@]}"; do
   fi
 
   echo "warm [$h] building on $builder (the builder; allowed)"
-  nix build "$attr" -L
+  nix build "$attr" -L --max-jobs "${MAX_JOBS:-2}"
 
   if [ "${NO_VERIFY:-0}" = "1" ]; then
     continue

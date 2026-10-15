@@ -151,6 +151,17 @@ in {
     mode = "0400";
   };
 
+  # LAN TLS wildcard (*.frieren.lan) leaf key; the matching cert is committed
+  # at modules/config/tls/frieren-lan-wildcard.pem and the signing CA at
+  # modules/config/tls/frieren-lan-ca.pem (trusted fleet-wide via
+  # security.pki in modules/profiles/base-node.nix). The nginx unit runs as
+  # User=nginx (CAP_NET_BIND_SERVICE), so the key must be nginx-readable.
+  sops.secrets."tls-frieren-wildcard-key" = {
+    owner = "nginx";
+    group = "nginx";
+    mode = "0400";
+  };
+
   # BurgerNAS sudo password for the `task burgernas:*` tooling (WoL, poweroff,
   # transmission leech policy). Loaded from SOPS (modules/secrets.yaml key
   # `burgernas-sudo-password`) and rendered to /run/secrets/nas — the path the

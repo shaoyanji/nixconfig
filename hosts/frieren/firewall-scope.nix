@@ -46,6 +46,7 @@ in {
     services = {
       ssh = {port = 22;};
       nginx = {port = 80;};
+      nginx-https = {port = 443;};
       samba-netbios-ssn = {port = 139;};
       samba-smb = {port = 445;};
       # 631 (CUPS) pruned 2026-10-12 — nothing has listened on it since the

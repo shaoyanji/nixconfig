@@ -65,6 +65,11 @@
       rpc-port = 9091;
       rpc-authentication-required = false;
       rpc-whitelist-enabled = false;
+      # Transmission 4 enables the host-header whitelist by default with an
+      # EMPTY list, so every request whose Host is not `localhost` gets 421
+      # Misdirected Request — which is what the torrent.frieren.lan vhost sent.
+      # The RPC is loopback-only and has no auth, so the host check adds nothing.
+      rpc-host-whitelist-enabled = false;
     };
   };
 

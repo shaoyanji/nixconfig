@@ -28,6 +28,7 @@
   lib,
   config,
   pkgs,
+  osConfig ? {},
   ...
 }: {
   options.programs.hermes-user = {
@@ -78,19 +79,25 @@
     };
   };
 
-  config = lib.mkIf (config.programs.hermes-user.enable && (config.profiles.ai.enable or true)) {
+  config = lib.mkIf (config.programs.hermes-user.enable && ((osConfig.networking.hostName or "") == "frieren") && (config.profiles.ai.enable or true)) {
     # Persona files — symlinked to nixconfig source.
     # Runtime edits modify the repo directly (version controlled).
     home.activation.hermesPersonaSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      HOST_NAME="$(cat /etc/hostname 2>/dev/null || hostname 2>/dev/null || echo "frieren")"
+      if [ "$HOST_NAME" != "frieren" ]; then
+        echo "hermes-user: skipping activation on non-frieren host ($HOST_NAME)"
+        exit 0
+      fi
+
       run mkdir -p $HOME/.hermes
       run mkdir -p $HOME/.hermes/memories
 
       REPO_DIR="$HOME/Documents/nixconfig"
-      if [ -d "/Volumes/data/projects/nixconfig" ]; then
+      if [ ! -d "$REPO_DIR/.git" ] && [ -d "/Volumes/data/projects/nixconfig/.git" ]; then
         REPO_DIR="/Volumes/data/projects/nixconfig"
+      elif [ ! -d "$REPO_DIR/.git" ] && [ -d "$HOME/nixconfig/.git" ]; then
+        REPO_DIR="$HOME/nixconfig"
       fi
-
-      HOST_NAME="$(hostname 2>/dev/null || cat /etc/hostname 2>/dev/null || echo "frieren")"
 
       # Clean up misplaced files in $HOME from earlier experiments
       for f in SOUL.md USER.md MEMORY.md config.yaml; do

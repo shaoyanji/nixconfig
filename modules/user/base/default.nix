@@ -29,7 +29,7 @@ in {
   home = {
     stateVersion = "25.05";
     packages = with pkgs;
-      readPkgList ../../../pkg.txt
+      readPkgList ../../../pkgs.txt
       ++ [
         # ── Sysadmin Resource & Performance Monitoring ──
         btop # Resource monitor

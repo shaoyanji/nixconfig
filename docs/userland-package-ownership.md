@@ -42,5 +42,5 @@
 ## Deferred
 - No aggressive package removals.
 - No changes to host-specific packages that are not clear duplicates in the effective stack.
-- `pkg.txt` remains in repo as a legacy reference file but is no longer ingested by base.
+- `pkgs.txt` contains the catalog of removed bloat and reference packages (commented out).
 - Observation-window result: experimental bucket removed with no re-homing required during eval validation.

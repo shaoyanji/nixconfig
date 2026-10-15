@@ -19,7 +19,7 @@ in {
       enable = true;
       profiles."User 1".sync = {
         username = "bob";
-        url = "http://frieren.fritz.box:27701";
+        url = "http://frieren.lan:27701";
       };
     };
     element-desktop.enable = true;

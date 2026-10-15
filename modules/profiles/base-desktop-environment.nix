@@ -30,6 +30,11 @@ in {
     sddm.enableGnomeKeyring = true; # no-op on hosts not using sddm
   };
 
+  hardware.graphics = {
+    enable = lib.mkDefault true;
+    enable32Bit = lib.mkDefault pkgs.stdenv.hostPlatform.isx86_64;
+  };
+
   programs.niri.enable = true;
 
   environment.sessionVariables = {

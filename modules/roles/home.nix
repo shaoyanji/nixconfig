@@ -50,8 +50,7 @@
       ani-cli
       # audacity
       cmus # Terminal music player (~1 GB closure)
-      lux # Video downloader (~1 GB closure)
-      mpv
+      # mpv — declaratively managed with hardware tiers via programs.mpv in multimedia.nix
       # ytfzf
       gnuplot
       jp2a

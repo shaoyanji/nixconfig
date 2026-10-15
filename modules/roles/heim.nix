@@ -8,6 +8,7 @@ in {
     ../zen.nix
     ./home.nix
     ../user/desktop/niri.nix
+    ../user/desktop/multimedia.nix
     ../dev.nix
     ../kitty
   ];

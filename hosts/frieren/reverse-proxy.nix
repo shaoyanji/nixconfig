@@ -1,4 +1,15 @@
 {pkgs, ...}: let
+  # LAN wildcard TLS: private CA (modules/config/tls/frieren-lan-ca.pem,
+  # trusted fleet-wide via security.pki) signs *.frieren.lan; the leaf key is
+  # sops-rendered at /run/secrets/tls-frieren-wildcard-key. Bitwarden clients
+  # refuse plain HTTP, so vault (and HA) must be served over TLS.
+  # Direct path (NO toString): the store snapshot must keep its string
+  # context so the pem lands in the system closure — with toString the
+  # referenced file can be absent at activation time and nginx fails with
+  # "cannot load certificate".
+  tlsCertificate = ../../modules/config/tls/frieren-lan-wildcard.pem;
+  tlsCertificateKey = "/run/secrets/tls-frieren-wildcard-key";
+
   landingPage = pkgs.writeTextDir "index.html" ''
     <!DOCTYPE html>
     <html lang="en">
@@ -144,10 +155,10 @@
 
         <div class="section-title">Operations & Fleet Infrastructure</div>
 
-        <a class="card" href="http://ha.frieren.lan">
+        <a class="card" href="https://ha.frieren.lan">
           <div class="card-header"><span class="card-title">Home Assistant</span></div>
           <div class="card-desc">Home automation hub, Zigbee/ESPHome control, and server battery telemetry.</div>
-          <div class="badge">ha.frieren.lan :8123</div>
+          <div class="badge">ha.frieren.lan :443</div>
         </a>
 
         <a class="card" href="http://status.frieren.lan">
@@ -168,10 +179,10 @@
           <div class="badge">monitors.frieren.lan :8181</div>
         </a>
 
-        <a class="card" href="http://vault.frieren.lan">
+        <a class="card" href="https://vault.frieren.lan">
           <div class="card-header"><span class="card-title">Vaultwarden</span></div>
           <div class="card-desc">Bitwarden-compatible vault for passwords and 2FA TOTP authentication codes.</div>
-          <div class="badge">vault.frieren.lan :8222</div>
+          <div class="badge">vault.frieren.lan :443</div>
         </a>
 
         <a class="card" href="http://fleet.frieren.lan">
@@ -254,12 +265,22 @@ in {
       };
 
       "vault.frieren.lan" = {
+        # addSSL is what makes the module emit ssl_certificate/ssl_certificate_key
+        # for the ssl listen entry — a bare `listen … ssl` does not.
+        addSSL = true;
         listen = [
           {
             addr = "0.0.0.0";
             port = 80;
           }
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
         ];
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
         locations."/" = {
           proxyPass = "http://127.0.0.1:8222";
           proxyWebsockets = true;
@@ -270,6 +291,29 @@ in {
         };
         locations."/notifications/hub/negotiate" = {
           proxyPass = "http://127.0.0.1:8222";
+        };
+      };
+
+      # Home Assistant over TLS (web UI, companion apps and webhooks all want
+      # a secure context). The backend binds 0.0.0.0:8123; this vhost is the
+      # name-routed front end (raw :8123 stays open on the LAN as well).
+      "ha.frieren.lan" = {
+        # See the vault vhost: addSSL is required for the ssl_certificate
+        # directive; the service-exposure registry additionally contributes the
+        # plain-HTTP :80 listener for this same vhost.
+        addSSL = true;
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
+        ];
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8123";
+          proxyWebsockets = true;
         };
       };
 
@@ -345,5 +389,5 @@ in {
     };
   };
 
-  networking.firewall.allowedTCPPorts = [80];
+  networking.firewall.allowedTCPPorts = [80 443];
 }

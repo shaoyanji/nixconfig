@@ -320,9 +320,10 @@ tasks:
     vars:
       HOST: '{{index .MATCH 0}}'
       TARGET: '{{.TARGET | default .HOST}}'
+      ACTION: '{{.ACTION | default "switch"}}'
     cmds:
       - bash scripts/task/warm-host.sh --check {{.HOST}}
-      - bash scripts/task/activate-host.sh {{.HOST}} {{.TARGET}}
+      - ACTION={{.ACTION}} bash scripts/task/activate-host.sh {{.HOST}} {{.TARGET}}
       - task services:validate:host:{{.HOST}} TARGET={{.TARGET}}
 
   infra:rollback:host:netbook:

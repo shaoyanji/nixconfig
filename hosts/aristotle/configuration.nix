@@ -20,6 +20,10 @@ in {
   networking.firewall.allowedTCPPorts = [2049];
   networking.hostName = "aristotle";
 
+  # Fleet DNS to Pi-hole on frieren (192.168.3.25)
+  networking.nameservers = ["192.168.3.25"];
+  networking.networkmanager.insertNameservers = ["192.168.3.25"];
+
   services.displayManager.sddm = {
     enable = false;
     wayland.enable = true;

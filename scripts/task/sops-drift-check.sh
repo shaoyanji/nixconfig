@@ -134,6 +134,28 @@ for file in $candidates; do
   fi
 done
 
+# Mirror-vs-submodule content drift: modules/secrets.yaml is a local mirror of
+# the canonical private submodule file modules/secrets/secrets.yaml (see
+# AGENTS.md "Secrets Architecture"). The two are edited by different entry
+# points, and a key added to only one (2026-10-15: TLS keys landed in the
+# mirror, the submodule went unpushed) decrypts on the dev machine but breaks
+# on every host once the mirror is regenerated from the submodule. Recipient
+# checks above cannot see this — compare the decrypted plaintexts.
+MIRROR="modules/secrets.yaml"
+SUBMODULE="modules/secrets/secrets.yaml"
+if [ -f "$MIRROR" ] && [ -f "$SUBMODULE" ] && command -v sops >/dev/null 2>&1; then
+  if sops -d "$MIRROR" 2>/dev/null | diff - <(sops -d "$SUBMODULE" 2>/dev/null) >/dev/null; then
+    echo "OK   $MIRROR matches its submodule source ($SUBMODULE)"
+  else
+    fail=1
+    echo "FAIL $MIRROR and $SUBMODULE decrypt to different content."
+    echo "     A secret landed in one file but not the other. Reconcile with:"
+    echo "       sops set <file> '[\"<key>\"]' '<json value>'   (for each drifting key)"
+    echo "     then verify: diff <(sops -d $MIRROR) <(sops -d $SUBMODULE)"
+  fi
+  checked=$((checked + 1))
+fi
+
 if [ "$checked" -eq 0 ]; then
   echo "ERROR: no sops-encrypted files found to check" >&2
   exit 2

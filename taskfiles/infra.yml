@@ -133,9 +133,16 @@ tasks:
 
   infra:switch:*:
     desc: Switch current host using a rebuild command (nixos|darwin)
+    summary: >
+      Reports the build-routing state before switching (read-only, cache-based,
+      no ssh) so it is visible up front whether this host will substitute or
+      compile. Best-effort on purpose: a roaming host must still be able to
+      switch. Home/darwin hosts skip the report. The gate that actually fails is
+      `task checks:build:route`.
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
+      - bash scripts/task/warm-host.sh --check --best-effort "$(hostname)"
       - sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) |& nom
 
   infra:boot:*:
@@ -166,10 +173,25 @@ tasks:
 
   infra:apply:host:*:
     desc: Apply a specific remote host configuration (no git side effects)
+    summary: >
+      Switches the NixOS host <host> over the transport TARGET, which defaults to
+      the host name — i.e. whatever your ssh config resolves it to. Pass
+      TARGET=user@<lan-ip> to deploy over the LAN when the tailnet path needs
+      interactive auth (Tailscale SSH can demand a browser check, which silently
+      blocks an unattended run). The transport is a parameter rather than an
+      assumption baked into the task, so the step composes with any reachable
+      route. INTENDED FOR ONE HOST — for the fleet use infra:apply:fleet.
+      Vars: TARGET= (default: <host>).
     vars:
       HOST: '{{index .MATCH 0}}'
+      TARGET: '{{.TARGET | default .HOST}}'
     cmds:
-      - nixos-rebuild switch --use-remote-sudo --target-host {{.HOST}} --fast --flake .?submodules=1#{{.HOST}} |& nom
+      # Report the build-routing state first (read-only, cache-based, no ssh) so
+      # a switch that is about to compile locally says so up front. Best-effort:
+      # a roaming host must still be able to apply. The gate is
+      # `task checks:build:route`.
+      - bash scripts/task/warm-host.sh --check --best-effort {{.HOST}}
+      - nixos-rebuild switch --use-remote-sudo --target-host {{.TARGET}} --fast --flake .?submodules=1#{{.HOST}} |& nom
 
   infra:warm:cache:
     desc: Build the managed host closures locally so harmonia serves them at LAN speed (HOSTS="a b" overrides; UPDATE=1 also refreshes flake.lock)
@@ -203,6 +225,24 @@ tasks:
           nix build ".#nixosConfigurations.$h.config.system.build.toplevel" -L || fail=1
         done
         exit $fail
+
+  infra:warm:host:*:
+    desc: Make one host's closure substitutable — builds on the builder, verifies the cache serves it
+    summary: >
+      Run this ON THE BUILDER (inventory.toml metadata.builder_host, else frieren).
+      It builds <host>'s closure from the LOCAL tree — so uncommitted edits are
+      covered, which neither CI (pushed branch) nor the weekly fleet-warm-cache
+      (github: ref) can do — then verifies the LAN cache actually serves the
+      result. On any other host it refuses and prints the right command rather
+      than compiling on a machine that cannot afford it. Performs no ssh: the
+      verification is one bounded HTTP request, so it cannot hang on an
+      interactive auth prompt.
+      Env: CACHE=<url> checks a different substituter, NO_VERIFY=1 skips the check.
+      Exit 1 = derivations remain (a switch would compile them locally).
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - bash scripts/task/warm-host.sh {{.HOST}}
 
   infra:update:fleet:
     desc: Full fleet update cycle — flake update, warm harmonia, then apply everywhere
@@ -258,13 +298,27 @@ tasks:
       - ssh root@netbook "hostname && nixos-version"
 
   infra:deploy:host:*:
-    desc: Plan + apply + validate a specific remote host (no git side effects)
+    desc: Plan + apply + validate ONE intended host (no git side effects)
+    summary: >
+      The intended deploy path for a single host — plan, switch, then prove the
+      host came up (`systemctl is-system-running`). Deliberately NOT fleet-wide:
+      fleet builds belong on the schedule (`fleet-warm-cache`), and a fleet-wide
+      push is `infra:apply:fleet`. Use this when one host is needed now.
+      It gates on build routing first (`checks:build:route`, read-only and
+      cache-based): if the closure is not yet substitutable the deploy fails
+      instead of silently turning into a 30-minute compile on a laptop. The gate
+      passes trivially when run from the builder, which is where closures are
+      supposed to be built.
+      Vars: TARGET= (default: <host>) — see infra:apply:host:* for why the
+      transport is a parameter.
     vars:
       HOST: '{{index .MATCH 0}}'
+      TARGET: '{{.TARGET | default .HOST}}'
     cmds:
+      - bash scripts/task/warm-host.sh --check {{.HOST}}
       - task infra:plan:host:{{.HOST}}
-      - task infra:apply:host:{{.HOST}}
-      - task services:validate:host:{{.HOST}}
+      - task infra:apply:host:{{.HOST}} TARGET={{.TARGET}}
+      - task services:validate:host:{{.HOST}} TARGET={{.TARGET}}
 
   infra:rollback:host:netbook:
     desc: Roll back netbook to previous generation remotely

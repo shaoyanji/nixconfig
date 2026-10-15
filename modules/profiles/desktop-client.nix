@@ -64,6 +64,25 @@
     resolved.settings.Resolve.Domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
   };
 
+  # Keybase's GUI writes ~/.config/autostart/keybase_autostart.desktop the first
+  # time it runs. Its Exec is `env KEYBASE_AUTOSTART=1 run_keybase`, and
+  # `run_keybase` ships only with keybase-gui. With services.keybase/kbfs above
+  # already running Keybase as user services, that entry is a duplicate that can
+  # only fail: fern logged `env: 'run_keybase': No such file or directory`
+  # (exit 127) on every login, leaving a permanently failed user unit.
+  # Drop the entry while `run_keybase` is absent; if the GUI is ever installed
+  # the entry is valid and this leaves it alone. Keybase's sentinel
+  # (~/.config/keybase/autostart_created) stops it being rewritten meanwhile.
+  system.activationScripts.removeBrokenKeybaseAutostart = ''
+    for autostart in /home/*/.config/autostart/keybase_autostart.desktop; do
+      [ -e "$autostart" ] || continue
+      if ! command -v run_keybase >/dev/null 2>&1 && ! ls /etc/profiles/per-user/*/bin/run_keybase >/dev/null 2>&1; then
+        echo "removing dead Keybase autostart entry: $autostart"
+        rm -f "$autostart"
+      fi
+    done
+  '';
+
   # Required for non-Nix binaries/toolchains in daily desktop workflows.
   # Keep enabled here, but treat this as a compatibility tradeoff.
   programs.nix-ld.enable = false;

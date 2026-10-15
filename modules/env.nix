@@ -19,6 +19,7 @@
     category == "laptop"
     || builtins.elem hostName ["aristotle" "fern" "scratch" "netbook" "thinsandy"];
   defaultSideBySide = !isLaptop;
+  user = import ./global/user.nix;
 in {
   imports = [
     ./nixoshmsymlinks.nix
@@ -77,8 +78,8 @@ in {
   programs.git = {
     enable = true;
     settings = {
-      user.name = lib.mkForce "Shao-yan (Matt) Ji";
-      user.email = lib.mkForce "github@mail.shaoyanji@is-a.dev";
+      user.name = lib.mkForce user.realName;
+      user.email = lib.mkForce user.githubEmail;
       init.defaultBranch = lib.mkForce "master";
       pull.rebase = lib.mkForce true;
       push.autoSetupRemote = true;

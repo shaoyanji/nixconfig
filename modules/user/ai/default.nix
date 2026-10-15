@@ -46,7 +46,6 @@ in {
     ./skills
     ./freebuff-remote.nix
     ./zed-mcp.nix
-    ./hermes-user.nix
     # ./opencode.nix
   ];
 

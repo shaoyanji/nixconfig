@@ -2,19 +2,41 @@
   lib,
   pkgs,
   config,
+  osConfig ? {},
   ...
-}: {
-  # Fleet-wide gate for AI CLI tooling. On by default (desktops, standalone
-  # homes); container/no-DE hosts set this to false to keep the closures
-  # small on headless boxes. The leaf modules (aichat.nix, antigravity-cli.nix)
-  # gate themselves on this option too, so they stay inert where it is off —
-  # `or true` keeps them active in chains (roles/home.nix) that never import
-  # this option declaration.
-  options.profiles.ai.enable =
-    lib.mkEnableOption "AI agent CLI tooling"
-    // {
-      default = true;
+}: let
+  hostName = osConfig.networking.hostName or (config.networking.hostName or "");
+  # By default, only the central mainframe (frieren), AI/compute workstation (eisen),
+  # and flagship workstation (poseidon) receive the heavy multi-agent suite.
+  # Lightweight mobile laptops (aristotle, fern) and other clients default to "light".
+  defaultTier =
+    if builtins.elem hostName ["frieren" "eisen" "poseidon"]
+    then "full"
+    else "light";
+in {
+  # Fleet-wide gate and tiering for AI CLI tooling.
+  # "light" keeps closures small on mobile laptops by excluding heavy Chromium-bundled
+  # agents (agent-browser), local vector indexers (qmd), and batched runners.
+  options.profiles.ai = {
+    enable =
+      lib.mkEnableOption "AI agent CLI tooling"
+      // {
+        default = true;
+      };
+
+    tier = lib.mkOption {
+      type = lib.types.enum ["none" "light" "full"];
+      default = defaultTier;
+      description = ''
+        AI agent tooling tier:
+        - "none": disables AI tools entirely.
+        - "light": lightweight client tools (antigravity-cli, geminicommit, tgpt, aichat).
+                   Excludes heavy agent-browser (700MB Chromium), qmd embeddings, and batched runner daemons.
+        - "full": complete fleet agent suite (crush, qmd, agent-browser, ai-memory, toon,
+                  pdfvision, parallel-cli, reasonix). Default for frieren, eisen, poseidon.
+      '';
     };
+  };
 
   imports = [
     # ./codex.nix
@@ -28,7 +50,7 @@
     # ./opencode.nix
   ];
 
-  config = lib.mkIf config.profiles.ai.enable {
+  config = lib.mkIf (config.profiles.ai.enable && config.profiles.ai.tier != "none") {
     programs.translate-shell = {
       enable = true;
       settings = {
@@ -44,48 +66,21 @@
     # AI agent CLIs from llm-agents.nix (overlay wired in module-sets:
     # pkgs.llm-agents.<name>; numtide cache via flake nixConfig).
     home.packages = with pkgs;
+      # Base light tools (installed for both "light" and "full" tiers)
       [
         geminicommit
         tgpt
+      ]
+      # Heavy agent suite — ONLY installed when tier == "full"
+      # Keeps ~2+ GB and bundled Chromium off light mobile clients like aristotle
+      ++ lib.optionals (config.profiles.ai.tier == "full") [
         pkgs.llm-agents.crush # Charmbracelet agent (MIT, source-built)
-        # freebuff — frieren-only since 2026-10: the mainframe runs the TUI,
-        # clients connect with freebuff-remote / freebuff-terminal (SSH).
-        # qmd — local hybrid markdown/code search (tobi). CUDA gated off:
-        # ares forces config.cudaSupport = true and the override arg would
-        # otherwise drag cudaPackages into every host closure.
-        pkgs.llm-agents.qmd
-        # dsh — DeepSeek harness CLI (llm-agents overlay). Fleet-wide client
-        # agent now that freebuff is mainframe-only.
-        # pkgs.llm-agents.dsh
-        # Fleet agent utility stack (2026-10):
-        #   ai-memory — persistent cross-agent memory (MCP + CLI; shared store)
-        #   toon — TOON format tooling (the old OpenClaw memory encoding)
-        #   pdfvision — PDF understanding/conversion for agent pipelines
-        #   parallel-cli — parallel task runner for batched agent work
-        pkgs.llm-agents.ai-memory
-        pkgs.llm-agents.toon
-        pkgs.llm-agents.pdfvision
-        pkgs.llm-agents.parallel-cli
-        # agent-browser — headless Chrome automation CLI for agents (Vercel):
-        # snapshot-based element refs, compact text output. It carries its own
-        # pinned chromium in its store references (verified with
-        # `nix-store -q --references`), so do NOT add pkgs.chromium here.
-        # Adding it put a SECOND full Chromium build in every host's closure for
-        # nothing — 703.1 MiB, traced to home-manager-path by
-        # `dev:closure:menu -- why chromium-unwrapped` and removed 2026-10-10.
-        pkgs.llm-agents.agent-browser
-        # qwen-code — removed 2026-10: redundant with agy/crush on the 8 GB
-        # laptops (Node-based CLI with a ~1 GB closure); re-enable if needed.
-        # pkgs.llm-agents.qwen-code
-        # hermes-agent — re-enable when wanted (Fryuni fork of the 2026-09
-        # teardown; upstream packaging is maintained).
-        # pkgs.llm-agents.hermes-agent
-        # grok — xAI CLI, closed binary; keep commented.
-        # pkgs.llm-agents.grok
-        # aichat
-        # mods
-        #
-        pkgs.llm-agents.crush
+        pkgs.llm-agents.qmd # local hybrid markdown/code search
+        pkgs.llm-agents.ai-memory # persistent cross-agent memory
+        pkgs.llm-agents.toon # TOON format tooling
+        pkgs.llm-agents.pdfvision # PDF understanding/conversion
+        pkgs.llm-agents.parallel-cli # parallel task runner for batched agent work
+        pkgs.llm-agents.agent-browser # headless Chrome automation CLI (bundles Chromium ~700MB)
         pkgs.llm-agents.reasonix
       ]
       ++ lib.optionals stdenv.hostPlatform.isLinux [];

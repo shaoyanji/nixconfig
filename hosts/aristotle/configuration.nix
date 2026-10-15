@@ -1,4 +1,4 @@
-{lib, ...}: let
+{lib, pkgs, ...}: let
   user = import ../../modules/global/user.nix;
 in {
   imports = [
@@ -21,6 +21,19 @@ in {
   networking.firewall.allowPing = true;
   networking.firewall.allowedTCPPorts = [2049];
   networking.hostName = "aristotle";
+
+  # Hardware video acceleration for Intel HD Graphics 4400 (Haswell Gen 7.5).
+  # Uses legacy i965 intel-vaapi-driver (modern intel-media-driver iHD only supports Gen 8+ / Broadwell+).
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-vaapi-driver
+      libvdpau-va-gl
+    ];
+  };
+  environment.sessionVariables = {
+    LIBVA_DRIVER_NAME = "i965";
+  };
 
   # Tailscale: disable accepting subnet routes on Aristotle to preserve native LAN routing
   # (prevents table 52 from hijacking direct LAN traffic and causing asymmetric routing drops, matching fern and eisen)

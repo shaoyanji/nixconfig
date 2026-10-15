@@ -19,6 +19,20 @@ tasks:
     cmds:
       - bash scripts/task/modules-menu.sh validate
 
+  checks:build:route:
+    desc: "[gate] This host must not compile its own closure — report derivations that would build locally (EXP-107)"
+    summary: >
+      Read-only build-routing gate. Counts the derivations of the local host's
+      closure (HOSTS="a b" to check others) that no substituter can serve, i.e.
+      the ones a `nixos-rebuild` would COMPILE on this machine. Exits 1 when the
+      caller is not the fleet builder and gaps remain: burn CPU on the builder,
+      then let harmonia serve the closure. On the builder itself gaps are
+      reported but allowed (exit 0) — that host is where they are supposed to be
+      built. Prints the exact fix (`task infra:warm:host:<h>`).
+      Vars: HOSTS="a b" (default: the local hostname).
+    cmds:
+      - bash scripts/task/warm-host.sh --check {{.HOSTS | default ""}}
+
   checks:flake:transitive:
     desc: Sweep flake.lock transitive inputs against upstream heads (read-only; fails on drift)
     cmds:

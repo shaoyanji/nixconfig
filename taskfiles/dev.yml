@@ -538,7 +538,8 @@ tasks:
       - cloak view {{.ACCOUNT}}
 
   dev:cloak:sync-bw:
-    desc: Automatically import and sync TOTP tokens from Bitwarden/Vaultwarden export into Cloak and SOPS
+    desc: Automatically import and sync TOTP tokens from Bitwarden/Vaultwarden export or accounts TOML into Cloak and SOPS
+    aliases: [dev:cloak:sync]
     cmds:
       - |
         bw_export="${1:-}"

@@ -36,7 +36,7 @@ in {
       enableBashIntegration = true;
       enableNushellIntegration = true;
       options = [
-        # "--cmd cd"
+        "--cmd cd"
       ];
     };
     fzf.enable = true;

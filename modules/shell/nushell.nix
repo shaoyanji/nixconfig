@@ -6,65 +6,74 @@
   programs = {
     nushell = {
       enable = true;
-      extraConfig =
-        # nu
-        ''
-          let carapace_completer = {|spans|
+
+      # Stage 1: env.nu — executed first for PATH & session environment
+      extraEnv = ''
+        $env.PATH = (
+          $env.PATH
+            | split row (char esep)
+            | prepend ~/.nix-profile/bin
+            | append /usr/bin/env
+        )
+
+        # In-memory cached secrets loader (sub-millisecond warm starts)
+        source ${../config/secrets.nu}
+      '';
+
+      # Stage 2: config.nu — executed second for UI, completions, hooks, modules
+      extraConfig = ''
+        let carapace_completer = {|spans|
           carapace $spans.0 nushell $spans | from json
-          }
-          $env.config = {
-           show_banner: false,
-           history: {
-            max_size: 100_000 # Session has to be reloaded for this to take effect
-            sync_on_enter: true # Enable to share history between multiple sessions, else you have to close the session to write history to file
-            file_format: "sqlite" # "sqlite" or "plaintext"
-            isolation: false # only available with sqlite file_format. true enables history isolation, false disables it. true will allow the history to be isolated to the current session using up/down arrows. false will allow the history to be shared across all sessions.
-           }
-           completions: {
-           case_sensitive: false # case-sensitive completions
-           quick: true    # set to false to prevent auto-selecting completions
-           partial: true    # set to false to prevent partial filling of the prompt
-           algorithm: "fuzzy"    # prefix or fuzzy
-           external: {
-               enable: true
-               max_results: 100
-               completer: $carapace_completer # check 'carapace_completer'
-             }
-           }
-          }
-          $env.config.edit_mode = 'vi'
-          $env.PATH = (
-            $env.PATH
-              | split row (char esep)
-              | prepend ~/.nix-profile/bin
-              | append /usr/bin/env
-          )
-          # secrets.nu lives in-repo now (was a sha256-pinned gist; too much
-          # friction for something so OS-integrated — see modules/config/secrets.nu)
-          source ${../config/secrets.nu}
-          ${builtins.concatStringsSep "\n" (builtins.map (x: "source " + builtins.fetchurl x) (builtins.fromJSON (builtins.readFile ../config/nu.json)))}
-          # source ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nix.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/modules/data_extraction/ultimate_extractor.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/modules/system/mod.nu
+        }
 
+        $env.config = {
+          show_banner: false
+          edit_mode: 'vi'
+          history: {
+            max_size: 100_000
+            sync_on_enter: true
+            file_format: "sqlite"
+            isolation: false
+          }
+          completions: {
+            case_sensitive: false
+            quick: true
+            partial: true
+            algorithm: "fuzzy"
+            external: {
+              enable: true
+              max_results: 100
+              completer: $carapace_completer
+            }
+          }
+        }
 
-          use ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nufetch.nu
-          use ${pkgs.nu_scripts}/share/nu_scripts/modules/wc/wc.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/modules/weather/get-weather.nu
-          # source ${pkgs.nu_scripts}/share/nu_scripts/custom-menus/zoxide-menu.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/bitwarden-cli/bitwarden-cli-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/glow/glow-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/gh/gh-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/git/git-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/just/just-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/eza/eza-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/bat/bat-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/rg/rg-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/tar/tar-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/ssh/ssh-completions.nu
-          source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/man/man-completions.nu
-        '';
+        # User workflow modules (tracked in git under modules/config/nu/)
+        source ${../config/nu/llm.nu}
+        source ${../config/nu/mataroa.nu}
+        source ${../config/nu/utils.nu}
+        source ${../config/nu/finance.nu}
+        source ${../config/nu/de.nu}
+        source ${../config/nu/jobby.nu}
+        source ${../config/nu/todoist.nu}
+
+        # System & extraction modules
+        source ${pkgs.nu_scripts}/share/nu_scripts/modules/data_extraction/ultimate_extractor.nu
+        source ${pkgs.nu_scripts}/share/nu_scripts/modules/system/mod.nu
+        use ${pkgs.nu_scripts}/share/nu_scripts/modules/nix/nufetch.nu
+        use ${pkgs.nu_scripts}/share/nu_scripts/modules/wc/wc.nu
+        source ${pkgs.nu_scripts}/share/nu_scripts/modules/weather/get-weather.nu
+
+        # High-value custom completions (Carapace handles git, gh, ssh, tar, rg, bat, eza, just, man)
+        source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu
+
+        # Optional unmanaged local overrides
+        let local_nu = $"($env.HOME)/.config/nushell/local.nu"
+        if ($local_nu | path exists) {
+          source $local_nu
+        }
+      '';
+
       plugins = with pkgs.nushellPlugins;
         [
           query
@@ -80,14 +89,18 @@
           # desktop_notifications
         ];
     };
-    carapace.enable = true;
-    carapace.enableNushellIntegration = true;
+
+    carapace = {
+      enable = true;
+      enableNushellIntegration = true;
+    };
   };
+
   home.packages = with pkgs; [
     nu_scripts
   ];
+
   xdg.configFile = {};
   home.sessionVariables = {};
-  home.sessionPath = [
-  ];
+  home.sessionPath = [];
 }

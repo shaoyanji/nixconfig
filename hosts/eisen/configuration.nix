@@ -38,6 +38,7 @@ in {
     ../../modules/profiles/nas-client.nix
     ../../modules/profiles/sunshine.nix
     ../../modules/services/qwen-tts.nix
+    ../../modules/services/llm-decision-router.nix
     ./llm-server.nix
     ./decision-models.nix
   ];
@@ -127,7 +128,14 @@ in {
     htop # system monitor
     btop # prettier system monitor
     ethtool # NIC diagnostics and WOL verification
+    aider-chat # AI pair programming terminal CLI
   ];
+
+  # --- LLM and Decision Model Router (SubZeroClaw / Jev bridge) ---
+  services.llm-decision-router = {
+    enable = true;
+    port = 8000;
+  };
 
   # --- Storage drives ---
   #

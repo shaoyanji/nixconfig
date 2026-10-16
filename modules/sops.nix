@@ -1,17 +1,24 @@
 {
   config,
+  lib,
   pkgs,
+  osConfig ? null,
   ...
 }: let
-  age_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-  # taskfile_path = ./secrets/Taskfile.yaml;
+  isFrieren = (osConfig != null && osConfig.networking.hostName or "" == "frieren");
+  tpm_key_path = "${config.home.homeDirectory}/.config/sops/age/tpm-identity.txt";
+  default_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 in {
   imports = [];
 
   sops = {
     age = {
-      keyFile = "${age_key_path}";
-      generateKey = true;
+      keyFile = lib.mkDefault (
+        if isFrieren
+        then tpm_key_path
+        else default_key_path
+      );
+      generateKey = lib.mkDefault (!isFrieren);
       #sshKeyPaths = [ "${ssh_key_path}" ];
     };
     # defaultSopsFile = "${inputs.secrets."secrets.yaml"}";
@@ -113,7 +120,7 @@ in {
     packages = with pkgs; [
       sops
       yq-go
-    ];
+    ] ++ lib.optional isFrieren pkgs.age-plugin-tpm;
     file = {
       ".aws/credentials".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."awscredentials".path}";
     };

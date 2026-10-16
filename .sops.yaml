@@ -37,6 +37,7 @@ keys:
   - &stark age1w4rpn4dx44kgpc3766ayqrxca694xd9qd4qz8temjkx5qhr0zg2qm3kl4u
   - &fernhost age1l2p2dth3qm0czqxrr7jrk7lz225mts4yl4807h3xaz5xtg3t0gqsrml6ny
   - &fern age1k3jp4k3p87a2xsq2dgenv6zjlypzn889jkfkj04mvt7x04seyuzq4tv6mn
+  - &tpmfrieren age1tag1qd42em4jfvxlxkvz8zrmrynxmdvl4q4pgj5keqn2ldujzngzn2e2vk4hfzp
 
 creation_rules:
   - path_regex: modules/.*\.(yaml|json|env|ini)$
@@ -75,3 +76,4 @@ creation_rules:
           - *stark
           - *fernhost
           - *fern
+          - *tpmfrieren

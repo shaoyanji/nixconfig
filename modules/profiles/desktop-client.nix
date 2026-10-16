@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   # Desktop client profile with NAS client dependency
   # Note: nas-client.nix is imported unconditionally as it's a core dependency
   # for desktop client functionality. To disable NAS mounts, configure
@@ -13,6 +13,12 @@
     enable = true;
     userAllowOther = true;
   };
+
+  # Upstream nixpkgs sets PrivateTmp = true in services.kbfs, which places the unit
+  # in an unprivileged private mount namespace where setuid fusermount fails (EPERM)
+  # and isolates any mounts from the rest of the user session. Disable PrivateTmp to
+  # allow persistent user-visible FUSE mounting.
+  systemd.user.services.kbfs.serviceConfig.PrivateTmp = lib.mkForce false;
 
   services = {
     keybase.enable = true;

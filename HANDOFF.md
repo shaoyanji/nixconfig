@@ -181,4 +181,11 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
   - Executed initial live rsync transferring 256 MB compressed across 46+ static binaries; verified parity on BurgerNAS.
   - Deployed to NixOS Generation 132 (`l3kaaf3j1vprkmlsgla9dclsahdsgcrn`) and verified live systemd execution in 2.2s.
 
+### 14. [x] Tmux Status Bar Restoration & Kitty Window Title Bar Removal (`d355727`, Generation 133)
+* **Status:** `COMMITTED, PUSHED & LIVE VERIFIED`
+* **What:** Reverted mistaken tmux statusbar debloat lines (`set -g status off`, `set -g set-titles off`, `set -g pane-border-status off`) in `modules/shell/tmux.nix` that disabled tmux's status line and Catppuccin theme.
+* **Kitty Title Bar:** Added `hide_window_decorations = "yes"` to `programs.kitty.settings` in [`modules/kitty/default.nix`](file:///Volumes/data/projects/nixconfig/modules/kitty/default.nix) to hide Kitty's top GUI window title bar.
+* **Verification:** Switched cleanly to NixOS Generation 133 (`px28k7jav07j5jymrrf9mp1161lx1lgb`), verified `hide_window_decorations yes` in `~/.config/kitty/kitty.conf`, and verified `status on` in tmux.
+
+
 

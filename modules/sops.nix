@@ -5,7 +5,10 @@
   osConfig ? null,
   ...
 }: let
-  isFrieren = (osConfig != null && osConfig.networking.hostName or "" == "frieren");
+  # Hosts with initialized and registered TPM 2.0 identities
+  # (frieren is active; add "fern" once fern's tpm-identity.txt is generated & registered)
+  tpmHosts = ["frieren"];
+  useTpm = (osConfig != null && builtins.elem (osConfig.networking.hostName or "") tpmHosts);
   tpm_key_path = "${config.home.homeDirectory}/.config/sops/age/tpm-identity.txt";
   default_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 in {
@@ -14,11 +17,11 @@ in {
   sops = {
     age = {
       keyFile = lib.mkDefault (
-        if isFrieren
+        if useTpm
         then tpm_key_path
         else default_key_path
       );
-      generateKey = lib.mkDefault (!isFrieren);
+      generateKey = lib.mkDefault (!useTpm);
       #sshKeyPaths = [ "${ssh_key_path}" ];
     };
     # defaultSopsFile = "${inputs.secrets."secrets.yaml"}";
@@ -120,7 +123,7 @@ in {
     packages = with pkgs; [
       sops
       yq-go
-    ] ++ lib.optional isFrieren pkgs.age-plugin-tpm;
+    ] ++ lib.optional useTpm pkgs.age-plugin-tpm;
     file = {
       ".aws/credentials".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."awscredentials".path}";
     };

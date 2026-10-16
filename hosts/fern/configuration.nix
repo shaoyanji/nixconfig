@@ -116,8 +116,17 @@ in {
     fileSystems = ["/"];
   };
 
+  # --- TPM 2.0 subsystem ---
+  security.tpm2 = {
+    enable = true;
+    tctiEnvironment.enable = true;
+  };
+  users.users.devji.extraGroups = ["tss"];
+
   environment.systemPackages = with pkgs; [
     btop # system monitor
+    age-plugin-tpm
+    tpm2-tools
   ];
 
   system.stateVersion = "26.05";

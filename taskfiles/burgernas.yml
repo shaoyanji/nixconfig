@@ -43,7 +43,7 @@ tasks:
   burgernas:wol:
     desc: Wake BurgerNAS via Wake-on-LAN (magic packet to its eth0 MAC)
     cmds:
-      - wakeonlan {{.BURGERNAS_MAC}}
+      - wakeonlan -i 192.168.3.255 {{.BURGERNAS_MAC}} || wakeonlan {{.BURGERNAS_MAC}}
 
   burgernas:online:
     desc: Wait for BurgerNAS SSH to come up after a WoL wake (timeout 120s)

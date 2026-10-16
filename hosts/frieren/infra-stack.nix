@@ -417,6 +417,7 @@ in {
     backupPrepareCommand = ''
       # Wake BurgerNAS via WOL (MAC: 90:09:D0:06:C1:EE) and wait for SSH
       echo "=== [$(date)] Waking BurgerNAS (90:09:D0:06:C1:EE) via Wake-on-LAN ==="
+      ${pkgs.wakeonlan}/bin/wakeonlan -i 192.168.3.255 90:09:D0:06:C1:EE || true
       ${pkgs.wakeonlan}/bin/wakeonlan 90:09:D0:06:C1:EE || true
 
       echo "Waiting for BurgerNAS SSH (192.168.3.92:22) to become reachable..."

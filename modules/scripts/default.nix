@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   imports = [
+    ./pb.nix
     # ./examples.nix
   ];
   home.packages = with pkgs; [

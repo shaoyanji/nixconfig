@@ -545,6 +545,13 @@ tasks:
         bw_export="${1:-}"
         ./scripts/bw-cloak-sync.sh ${bw_export:+"$bw_export"} --apply
 
+  dev:cloak:export-age:
+    desc: Export and encrypt active SOPS Cloak accounts directly to an age-encrypted file (default /Volumes/data/security/accounts.age)
+    cmds:
+      - |
+        target="${1:-/Volumes/data/security/accounts.age}"
+        ./scripts/bw-cloak-sync.sh --export-age "$target"
+
   # ── CI Control Plane ──────────────────────────────────────────
 
   dev:ci:plan:

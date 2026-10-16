@@ -480,6 +480,49 @@ in {
     };
   };
 
+  # --- BurgerNAS static aarch64 binary sync (weekly Sunday 03:32) ---
+  # Synchronizes static compiled ARM64 binaries (/Volumes/data/bin-aarch64/)
+  # to BurgerNAS (/volume1/Shared Library/bin-aarch64/) during its 03:25-04:00 window.
+  systemd.services.burgernas-bin-sync = {
+    description = "Weekly sync of static aarch64 binaries to BurgerNAS";
+    after = ["network-online.target" "restic-backups-frieren-burgernas.service"];
+    wants = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "devji";
+      Group = "users";
+      ExecStart = pkgs.writeShellScript "burgernas-bin-sync" ''
+        set -eu
+        SRC="/Volumes/data/bin-aarch64/"
+        DEST="devji@192.168.3.92:/volume1/Shared Library/bin-aarch64/"
+        KEY="/home/devji/.ssh/id_ed25519"
+        SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
+
+        # Verify BurgerNAS is online before attempting rsync
+        if ! timeout 5 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
+          echo "BurgerNAS offline; skipping binary sync."
+          exit 0
+        fi
+
+        echo "=== [$(date -Is)] Synchronizing $SRC to BurgerNAS ==="
+        ${pkgs.rsync}/bin/rsync -avz --delete \
+          --rsync-path=/usr/bin/rsync \
+          -e "$SSH" \
+          "$SRC" "$DEST"
+        echo "=== [$(date -Is)] Binary sync finished successfully. ==="
+      '';
+    };
+  };
+
+  systemd.timers.burgernas-bin-sync = {
+    description = "Weekly sync of static aarch64 binaries to BurgerNAS";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "Sun *-*-* 03:32:00";
+      Persistent = true;
+    };
+  };
+
   # --- restic restore drill ---
   # A backup that is never restored is a hypothesis; the script (defined in the
   # let block) runs `restic check` + a sampled restore. Runs weekly, outside the

@@ -117,6 +117,14 @@ tasks:
           -o sftp.command="ssh {{.BURGERNAS_ALIAS}} /usr/local/bin/sftp-server" \
           snapshots
 
+  burgernas:bin:sync:
+    desc: Synchronize static aarch64 binaries from frieren to BurgerNAS
+    cmds:
+      - |
+        rsync -avz --delete --rsync-path=/usr/bin/rsync \
+          -e "ssh -o BatchMode=yes" \
+          /Volumes/data/bin-aarch64/ burgernas:"/volume1/Shared Library/bin-aarch64/"
+
   burgernas:menu:
     desc: Interactive menu for BurgerNAS operations (gum)
     cmds:
@@ -128,6 +136,7 @@ tasks:
           "poweroff" \
           "transmission status" \
           "transmission apply leech-only" \
+          "bin sync (static aarch64)" \
           "restic seed (frieren root)" \
           "restic snapshots (frieren root)" \
           "ssh" \
@@ -139,6 +148,7 @@ tasks:
           "poweroff") task burgernas:poweroff ;;
           "transmission status") task burgernas:transmission:status ;;
           "transmission apply leech-only") task burgernas:transmission:leech ;;
+          "bin sync (static aarch64)") task burgernas:bin:sync ;;
           "restic seed (frieren root)") task burgernas:backup:seed ;;
           "restic snapshots (frieren root)") task burgernas:snapshot ;;
           "ssh") task burgernas:ssh ;;

@@ -96,3 +96,31 @@
 # thefuck
 # todoist
 # twitch-hls-client
+# ── Desktop & CLI Utilities (debloated from home.nix) ──
+# a2ps                   # Any-to-PostScript converter
+# amfora                 # Terminal Gemini / text browser
+# ani-cli                # Anime streaming CLI
+# astroterm              # Terminal star map / planetarium
+# caligula               # Disk imaging CLI
+# cmus                   # Terminal music player (~1 GB closure)
+# comodoro               # Pomodoro timer CLI
+# enscript               # ASCII to PostScript converter
+# gnuplot                # Scientific plotting utility
+# graphviz               # Graph visualization tool
+# gtree                  # Directory tree tool
+# gucci                  # CLI templating tool
+# jp2a                   # JPEG to ASCII converter
+# jwt-cli                # JSON Web Token inspector
+# keypunch               # Keypress visualizer
+# minijinja              # Minimal Jinja CLI
+# multimarkdown          # Extended Markdown processor
+# neocities              # Neocities web hosting CLI
+# ots                    # One-time secret sharing CLI
+# qalculate-qt           # Qalculate GUI calculator
+# qrrs                   # QR code generator/scanner
+# starfetch              # Constellation fetch tool
+# termshark              # Terminal UI for tshark/wireshark
+# ticker                 # Terminal stock ticker
+# todo-txt-cli           # Todo.txt command line interface
+# ytcast                 # Cast YouTube videos to TV/device
+# zbar                   # Barcode and QR code reader

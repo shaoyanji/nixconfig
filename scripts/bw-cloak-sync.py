@@ -108,6 +108,50 @@ def extract_entries_from_json(json_data):
     return results
 
 
+def extract_entries_from_toml(content: str):
+    """Extract TOTP entries from existing Cloak TOML format."""
+    results = []
+    current_section = None
+    sec_key = None
+    sec_algo = "SHA1"
+
+    for line in content.splitlines():
+        line = line.strip()
+        if line.startswith("[") and line.endswith("]"):
+            if current_section and sec_key:
+                results.append({
+                    "original_name": current_section,
+                    "slug": clean_slug(current_section),
+                    "secret": sec_key,
+                    "algorithm": sec_algo,
+                    "digits": "6",
+                    "period": "30",
+                })
+            current_section = line[1:-1].strip()
+            sec_key = None
+            sec_algo = "SHA1"
+        elif "=" in line and current_section:
+            k, v = line.split("=", 1)
+            k = k.strip().lower()
+            v = v.strip().strip('"').strip("'")
+            if k == "key":
+                sec_key = v.upper()
+            elif k == "hash_function":
+                sec_algo = v.upper()
+
+    if current_section and sec_key:
+        results.append({
+            "original_name": current_section,
+            "slug": clean_slug(current_section),
+            "secret": sec_key,
+            "algorithm": sec_algo,
+            "digits": "6",
+            "period": "30",
+        })
+
+    return results
+
+
 def load_existing_sops_cloak(secrets_file):
     """Read existing .cloak TOML section from SOPS."""
     try:
@@ -170,17 +214,20 @@ def main():
     input_file = args.export_file
     if not input_file:
         # Default auto-discovery in security directory
-        candidates = [
-            "/srv/data/security/bitwarden_authenticator_export_20250805190720.json",
-            "/Volumes/data/security/bitwarden_authenticator_export_20250805190720.json",
-        ]
-        # Also check for newest export in security/
-        sec_dir = "/srv/data/security" if os.path.isdir("/srv/data/security") else "/Volumes/data/security"
-        if os.path.isdir(sec_dir):
-            exports = [os.path.join(sec_dir, f) for f in os.listdir(sec_dir) if "bitwarden" in f.lower() and f.endswith(".json")]
-            if exports:
-                exports.sort(key=os.path.getmtime, reverse=True)
-                candidates.insert(0, exports[0])
+        candidates = []
+        for sdir in ["/srv/data/security", "/Volumes/data/security"]:
+            if os.path.isdir(sdir):
+                # Check for authenticator/bitwarden exports
+                json_files = [
+                    os.path.join(sdir, f) for f in os.listdir(sdir)
+                    if f.endswith(".json") and any(k in f.lower() for k in ["authenticator", "bitwarden", "vaultwarden"])
+                ]
+                if json_files:
+                    json_files.sort(key=os.path.getmtime, reverse=True)
+                    candidates.extend(json_files)
+                acc_file = os.path.join(sdir, "accounts")
+                if os.path.isfile(acc_file):
+                    candidates.append(acc_file)
 
         for c in candidates:
             if os.path.isfile(c):
@@ -188,19 +235,37 @@ def main():
                 break
 
     if not input_file or not os.path.isfile(input_file):
-        print(f"Error: Bitwarden export file not found. Specify path as argument.", file=sys.stderr)
+        print(f"Error: TOTP export or accounts file not found. Specify path as argument.", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Reading Bitwarden export from: {input_file}")
+    print(f"Reading TOTP source from: {input_file}")
     with open(input_file, "r", encoding="utf-8") as f:
+        file_content = f.read()
+
+    extracted = []
+    if input_file.endswith(".json"):
         try:
-            raw_data = json.load(f)
+            raw_data = json.loads(file_content)
+            extracted = extract_entries_from_json(raw_data)
         except Exception as e:
             print(f"Error parsing JSON from {input_file}: {e}", file=sys.stderr)
             sys.exit(1)
 
-    extracted = extract_entries_from_json(raw_data)
-    print(f"Discovered {len(extracted)} TOTP entries in export.")
+        if not extracted:
+            print(f"Warning: Discovered 0 TOTP entries in {input_file} (export may be empty or encrypted).", file=sys.stderr)
+            # Check for fallback accounts file in candidate dirs
+            for sdir in ["/srv/data/security", "/Volumes/data/security"]:
+                fallback_acc = os.path.join(sdir, "accounts")
+                if os.path.isfile(fallback_acc) and fallback_acc != input_file:
+                    print(f"Falling back to existing Cloak accounts file: {fallback_acc}")
+                    with open(fallback_acc, "r", encoding="utf-8") as ff:
+                        extracted = extract_entries_from_toml(ff.read())
+                    break
+    else:
+        # TOML format (like /Volumes/data/security/accounts)
+        extracted = extract_entries_from_toml(file_content)
+
+    print(f"Discovered {len(extracted)} TOTP entries in source.")
 
     existing_accounts, raw_toml = load_existing_sops_cloak(SECRETS_FILE)
     print(f"Existing Cloak accounts in SOPS: {len(existing_accounts)}")

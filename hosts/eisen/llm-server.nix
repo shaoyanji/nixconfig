@@ -130,17 +130,18 @@
   dflashFlags = "--spec-draft-model ${dflashFile} --spec-type draft-dflash --spec-draft-n-max 7 --spec-draft-ngl 99";
 
   # llama-swap substitutes ${PORT} with a free port before exec'ing the server.
+  # --reasoning-format none preserves standard OpenAI delta.content streaming
+  # and prevents stripping thinking tokens into null delta.content.
+  # --parallel 1 dedicates the full context pool and RAM bandwidth to the active prompt.
   mkCmd = {
     model,
     alias,
     spec ? "",
-    moeCacheMib ? 0,
   }:
     "${lib.getExe' llama "llama-server"} --host 127.0.0.1 --port \${PORT} "
-    + "--model ${model} --alias ${alias} --threads 12 --ctx-size 32768 "
-    + "--flash-attn on --jinja --metrics --n-gpu-layers 99 "
+    + "--model ${model} --alias ${alias} --threads 12 --parallel 1 --ctx-size 32768 "
+    + "--flash-attn on --jinja --metrics --reasoning-format none --n-gpu-layers 99 "
     + "--override-tensor exps=CPU --cache-type-k q8_0 --cache-type-v q8_0 "
-    + (lib.optionalString (moeCacheMib > 0) "--moe-cache-mib ${toString moeCacheMib} ")
     + spec;
 
   # NOTE — Kolibri-1 does not currently load: this nixpkgs' llama-cpp (0.5.0)
@@ -229,7 +230,6 @@ in {
             model = qwenFile;
             alias = "qwen3.6-35b-a3b";
             spec = dflashFlags;
-            moeCacheMib = 1536;
           };
           aliases = ["qwen"];
         };

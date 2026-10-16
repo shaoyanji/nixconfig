@@ -152,6 +152,46 @@ def extract_entries_from_toml(content: str):
     return results
 
 
+def decrypt_age_payload(file_path: str = None, raw_bytes: bytes = None) -> str:
+    """Decrypt an age-encrypted file or payload in-memory without writing to disk."""
+    key_candidates = [
+        os.path.expanduser("~/.config/sops/age/keys.txt"),
+        "/Volumes/data/security/secrets/sops/age/keys.txt",
+        "/srv/data/security/secrets/sops/age/keys.txt",
+        "/Volumes/data/security/secrets/key.txt",
+        "/srv/data/security/secrets/key.txt",
+        "/Volumes/data/security/secrets/USB Copy_2024-11-24_131715/age-key.txt",
+        os.path.expanduser("~/.ssh/id_ed25519"),
+    ]
+
+    for k in key_candidates:
+        if os.path.isfile(k):
+            try:
+                cmd = ["age", "-d", "-i", k]
+                if file_path:
+                    cmd.append(file_path)
+                    proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                else:
+                    proc = subprocess.run(cmd, input=raw_bytes, capture_output=True, text=True, check=True)
+                if proc.stdout.strip():
+                    return proc.stdout
+            except subprocess.CalledProcessError:
+                continue
+
+    # Fallback to default age -d
+    try:
+        cmd = ["age", "-d"]
+        if file_path:
+            cmd.append(file_path)
+            proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        else:
+            proc = subprocess.run(cmd, input=raw_bytes, capture_output=True, text=True, check=True)
+        return proc.stdout
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Unable to decrypt age payload with available keys: {e.stderr.strip()}", file=sys.stderr)
+        sys.exit(1)
+
+
 def load_existing_sops_cloak(secrets_file):
     """Read existing .cloak TOML section from SOPS."""
     try:
@@ -204,20 +244,54 @@ def to_toml_string(accounts_dict):
 
 def main():
     parser = argparse.ArgumentParser(description="Synchronize Bitwarden/Vaultwarden TOTP export with Cloak / SOPS.")
-    parser.add_argument("export_file", nargs="?", default="", help="Path to bitwarden_authenticator_export.json")
+    parser.add_argument("export_file", nargs="?", default="", help="Path to JSON export, accounts.age, or '-' for stdin")
     parser.add_argument("--apply", action="store_true", help="Apply merged cloak config directly to modules/secrets.yaml via SOPS")
     parser.add_argument("--print", action="store_true", help="Print resulting cloak TOML to stdout")
     parser.add_argument("--diff", action="store_true", help="Show accounts added or updated")
+    parser.add_argument("--export-age", nargs="?", const="/Volumes/data/security/accounts.age", help="Export existing SOPS cloak accounts to age-encrypted file")
 
     args = parser.parse_args()
 
+    existing_accounts, raw_toml = load_existing_sops_cloak(SECRETS_FILE)
+
+    if args.export_age:
+        out_file = args.export_age
+        print(f"Exporting {len(existing_accounts)} Cloak accounts from SOPS into encrypted file: {out_file}...")
+        recipients = [
+            "age1tsv2lurpjzyx9ng6hcc4dff23lvv7tqkyyxz5zlpx32egu2c9vfql9m008",  # devji
+            "age1rt9xrc78y78p78da0vca0dz7vr3gf6g0vlzqss5e38mnjxkg4paqj4jxxl",  # frieren
+        ]
+        age_cmd = ["age"]
+        for r in recipients:
+            age_cmd.extend(["-r", r])
+        age_cmd.extend(["-o", out_file])
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)
+            subprocess.run(age_cmd, input=raw_toml.encode("utf-8"), check=True)
+            os.chmod(out_file, 0o600)
+            print(f"✓ Successfully exported and encrypted {out_file} (multi-recipient devji + frieren, 0 plaintext on disk).")
+            return
+        except Exception as e:
+            print(f"Error exporting encrypted age file: {e}", file=sys.stderr)
+            sys.exit(1)
+
     input_file = args.export_file
+    if not input_file and not sys.stdin.isatty():
+        input_file = "-"
+
     if not input_file:
-        # Default auto-discovery in security directory
+        # Default auto-discovery in security directory: prefer encrypted .age first!
         candidates = []
         for sdir in ["/srv/data/security", "/Volumes/data/security"]:
             if os.path.isdir(sdir):
-                # Check for authenticator/bitwarden exports
+                # 1. Encrypted files (.age)
+                age_files = [
+                    os.path.join(sdir, f) for f in os.listdir(sdir)
+                    if f.endswith(".age") and any(k in f.lower() for k in ["account", "authenticator", "bitwarden"])
+                ]
+                candidates.extend(age_files)
+
+                # 2. Plaintext exports/accounts if present
                 json_files = [
                     os.path.join(sdir, f) for f in os.listdir(sdir)
                     if f.endswith(".json") and any(k in f.lower() for k in ["authenticator", "bitwarden", "vaultwarden"])
@@ -234,40 +308,63 @@ def main():
                 input_file = c
                 break
 
-    if not input_file or not os.path.isfile(input_file):
-        print(f"Error: TOTP export or accounts file not found. Specify path as argument.", file=sys.stderr)
+    if input_file == "-":
+        print("Reading TOTP source from stdin (memory-only pipeline)...")
+        file_content = sys.stdin.read()
+    elif not input_file or not os.path.isfile(input_file):
+        print(f"Error: TOTP export, accounts.age, or accounts file not found. Specify path or '-' for stdin.", file=sys.stderr)
         sys.exit(1)
+    elif input_file.endswith(".age"):
+        print(f"Reading age-encrypted source from: {input_file}")
+        file_content = decrypt_age_payload(file_path=input_file)
+    else:
+        print(f"Reading TOTP source from: {input_file}")
+        with open(input_file, "r", encoding="utf-8") as f:
+            file_content = f.read()
 
-    print(f"Reading TOTP source from: {input_file}")
-    with open(input_file, "r", encoding="utf-8") as f:
-        file_content = f.read()
+    # If stream begins with age envelope
+    if file_content.startswith("age-encryption.org/v1"):
+        print("Detected age-encrypted stream. Decrypting in-memory...")
+        file_content = decrypt_age_payload(raw_bytes=file_content.encode("utf-8"))
 
     extracted = []
-    if input_file.endswith(".json"):
+    trimmed = file_content.strip()
+    if trimmed.startswith("{") or (input_file != "-" and input_file.endswith(".json")):
         try:
             raw_data = json.loads(file_content)
+            if isinstance(raw_data, dict) and raw_data.get("encrypted") is True:
+                print("Error: Detected password-encrypted Bitwarden vault export.", file=sys.stderr)
+                print("Hint: To import directly in-memory without plaintext files on disk, run:", file=sys.stderr)
+                print("  bw export --format json | task dev:cloak:sync -", file=sys.stderr)
+                sys.exit(1)
             extracted = extract_entries_from_json(raw_data)
         except Exception as e:
-            print(f"Error parsing JSON from {input_file}: {e}", file=sys.stderr)
+            print(f"Error parsing JSON from source: {e}", file=sys.stderr)
             sys.exit(1)
 
-        if not extracted:
-            print(f"Warning: Discovered 0 TOTP entries in {input_file} (export may be empty or encrypted).", file=sys.stderr)
-            # Check for fallback accounts file in candidate dirs
+        if not extracted and input_file != "-":
+            print(f"Warning: Discovered 0 TOTP entries in {input_file} (export may be empty).", file=sys.stderr)
+            # Check for fallback accounts/accounts.age file in candidate dirs
             for sdir in ["/srv/data/security", "/Volumes/data/security"]:
-                fallback_acc = os.path.join(sdir, "accounts")
-                if os.path.isfile(fallback_acc) and fallback_acc != input_file:
-                    print(f"Falling back to existing Cloak accounts file: {fallback_acc}")
-                    with open(fallback_acc, "r", encoding="utf-8") as ff:
-                        extracted = extract_entries_from_toml(ff.read())
+                for fallback_candidate in ["accounts.age", "accounts"]:
+                    f_path = os.path.join(sdir, fallback_candidate)
+                    if os.path.isfile(f_path) and f_path != input_file:
+                        print(f"Falling back to existing Cloak source: {f_path}")
+                        if f_path.endswith(".age"):
+                            f_content = decrypt_age_payload(file_path=f_path)
+                        else:
+                            with open(f_path, "r", encoding="utf-8") as ff:
+                                f_content = ff.read()
+                        extracted = extract_entries_from_toml(f_content)
+                        if extracted:
+                            break
+                if extracted:
                     break
     else:
-        # TOML format (like /Volumes/data/security/accounts)
+        # TOML format (like accounts or accounts.age)
         extracted = extract_entries_from_toml(file_content)
 
     print(f"Discovered {len(extracted)} TOTP entries in source.")
-
-    existing_accounts, raw_toml = load_existing_sops_cloak(SECRETS_FILE)
     print(f"Existing Cloak accounts in SOPS: {len(existing_accounts)}")
 
     # Map known aliases and existing accounts by key

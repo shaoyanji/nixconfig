@@ -66,12 +66,6 @@
 
         # High-value custom completions (Carapace handles git, gh, ssh, tar, rg, bat, eza, just, man)
         source ${pkgs.nu_scripts}/share/nu_scripts/custom-completions/nix/nix-completions.nu
-
-        # Optional unmanaged local overrides
-        let local_nu = $"($env.HOME)/.config/nushell/local.nu"
-        if ($local_nu | path exists) {
-          source $local_nu
-        }
       '';
 
       plugins = with pkgs.nushellPlugins;

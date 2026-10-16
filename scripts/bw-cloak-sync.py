@@ -155,6 +155,7 @@ def extract_entries_from_toml(content: str):
 def decrypt_age_payload(file_path: str = None, raw_bytes: bytes = None) -> str:
     """Decrypt an age-encrypted file or payload in-memory without writing to disk."""
     key_candidates = [
+        os.path.expanduser("~/.config/sops/age/tpm-identity.txt"),
         os.path.expanduser("~/.config/sops/age/keys.txt"),
         "/Volumes/data/security/secrets/sops/age/keys.txt",
         "/srv/data/security/secrets/sops/age/keys.txt",
@@ -192,11 +193,26 @@ def decrypt_age_payload(file_path: str = None, raw_bytes: bytes = None) -> str:
         sys.exit(1)
 
 
+def get_sops_env():
+    """Resolve environment for sops commands, prioritizing tpm-identity.txt if present."""
+    env = dict(os.environ)
+    if not env.get("SOPS_AGE_KEY_FILE"):
+        for candidate in [
+            os.path.expanduser("~/.config/sops/age/tpm-identity.txt"),
+            os.path.expanduser("~/.config/sops/age/keys.txt"),
+        ]:
+            if os.path.isfile(candidate):
+                env["SOPS_AGE_KEY_FILE"] = candidate
+                break
+    return env
+
+
 def load_existing_sops_cloak(secrets_file):
     """Read existing .cloak TOML section from SOPS."""
     try:
         out = subprocess.check_output(
             ["sops", "-d", secrets_file],
+            env=get_sops_env(),
             stderr=subprocess.DEVNULL
         ).decode("utf-8")
         yq_proc = subprocess.run(
@@ -440,13 +456,13 @@ def main():
 
             # Decrypt existing secrets.yaml to temporary file in modules/
             with open(tmp_yaml, "w") as yf:
-                subprocess.run(["sops", "-d", SECRETS_FILE], stdout=yf, check=True)
+                subprocess.run(["sops", "-d", SECRETS_FILE], env=get_sops_env(), stdout=yf, check=True)
 
             # Update .cloak block using Go yq load_str
             subprocess.run(["yq", "e", f'.cloak = load_str("{tmp_toml}")', "-i", tmp_yaml], check=True)
 
             # Re-encrypt with sops in place
-            subprocess.run(["sops", "-e", "-i", tmp_yaml], cwd=REPO_ROOT, check=True)
+            subprocess.run(["sops", "-e", "-i", tmp_yaml], env=get_sops_env(), cwd=REPO_ROOT, check=True)
 
             # Atomically replace secrets.yaml
             os.replace(tmp_yaml, SECRETS_FILE)

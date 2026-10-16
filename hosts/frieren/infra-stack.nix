@@ -480,7 +480,7 @@ in {
           exit 0
         fi
         echo "BurgerNAS online at $(date -Is); arming WoL and powering off."
-        $SSH "$NAS" "sudo /bin/ethtool -s eth0 wol g 2>/dev/null || true; sudo /sbin/poweroff" || true
+        $SSH "$NAS" "sudo /bin/ethtool -s eth0 wol g 2>/dev/null || true; sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff" || true
       '';
     };
   };

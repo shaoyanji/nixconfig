@@ -383,9 +383,9 @@ in {
   };
 
   # --- restic cold vault backup to BurgerNAS ---
-  # Wakes BurgerNAS via WOL every Sunday at 03:35 (after local pg_dump & restic-local),
-  # pushes encrypted & deduplicated snapshots of Sandy, user documents, and stateful databases,
-  # and cleanly powers down BurgerNAS upon completion.
+  # Pushes encrypted & deduplicated snapshots of Sandy, user documents, and stateful databases
+  # to BurgerNAS during its daily scheduled uptime window (DSM hardware RTC powers on at 03:25, shuts off at 04:00).
+  # Frieren acts as the push client so BurgerNAS (512MB RAM) only runs sftp-server and avoids OOM.
   services.restic.backups.frieren-burgernas = {
     initialize = true;
     repository = "sftp:devji@192.168.3.92:/volume1/backup/frieren/restic";
@@ -406,28 +406,22 @@ in {
       "/srv/private/zigbee2mqtt"
     ];
     timerConfig = {
-      OnCalendar = "Sun *-*-* 03:35:00";
+      OnCalendar = "*-*-* 03:28:00";
       Persistent = true;
     };
     pruneOpts = [
+      "--keep-daily 7"
       "--keep-weekly 4"
       "--keep-monthly 6"
       "--keep-yearly 2"
     ];
     backupPrepareCommand = ''
-      # Wake BurgerNAS via WOL (MAC: 90:09:D0:06:C1:EE) and wait for SSH
-      echo "=== [$(date)] Waking BurgerNAS (90:09:D0:06:C1:EE) via Wake-on-LAN ==="
-      ${pkgs.wakeonlan}/bin/wakeonlan -i 192.168.3.255 90:09:D0:06:C1:EE || true
-      ${pkgs.wakeonlan}/bin/wakeonlan 90:09:D0:06:C1:EE || true
-
+      # Verify BurgerNAS is reachable within its daily 03:25-04:00 DSM power window
       echo "Waiting for BurgerNAS SSH (192.168.3.92:22) to become reachable..."
       # NOTE: this runs inside the restic unit, whose PATH carries openssh and
-      # coreutils but NOT `bash`. A bare `bash -c` here fails silently (exit
-      # 127) and reports the NAS offline even when it is up — that was the
-      # 2026-10-14 seed failure. Invoke bash by absolute path. The DS220j cold
-      # boot (WOL -> sshd) can take ~3-4 min, so wait up to 300s.
+      # coreutils but NOT `bash`. Invoke bash by absolute path.
       ONLINE=0
-      for i in $(seq 1 150); do
+      for i in $(seq 1 60); do
         if timeout 3 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
           echo "BurgerNAS SSH port 22 open after $((i * 2))s."
           ONLINE=1
@@ -437,29 +431,21 @@ in {
       done
 
       if [ "$ONLINE" -ne 1 ]; then
-        echo "ERROR: BurgerNAS failed to come online via WOL within 300s" >&2
+        echo "ERROR: BurgerNAS SSH unreachable within 120s (DSM scheduled power-on at 03:25 missed?)" >&2
         exit 1
       fi
 
-      sleep 3
+      sleep 2
     '';
     backupCleanupCommand = ''
-      # Re-arm Wake-on-LAN but do NOT power off here. BurgerNAS is left running
-      # after a backup and switched off by the daily `burgernas-poweroff` timer
-      # (22:45) so a long manual seed or a follow-up isn't cut short mid-run.
-      # WoL stays armed so the next 03:35 window can wake the box again.
-      echo "=== [$(date)] Backup run finished. Re-arming BurgerNAS WoL (no poweroff). ==="
-      ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o BatchMode=yes devji@192.168.3.92 "sudo /bin/ethtool -s eth0 wol g 2>/dev/null || true" || true
+      echo "=== [$(date)] BurgerNAS backup finished. NAS will shut down at DSM scheduled 04:00. ==="
     '';
   };
 
   # --- BurgerNAS daily power-off safety net (22:45) ---
-  # BurgerNAS is a cold vault (normally ~0 W off, woken by WoL for the Sunday
-  # 03:35 backup). Since the backup no longer powers it off, this timer is the
-  # single owner of "shut the vault down": every day at 22:45 it powers the NAS
-  # off if it is online, so a forgotten manual session can't burn power all
-  # night. It is a no-op when the NAS is already off. WoL stays armed, so the
-  # 03:35 job still wakes it for the 3-5 am window.
+  # BurgerNAS shuts down at 04:00 daily via DSM's internal power schedule.
+  # This timer serves as an auxiliary safety net at 22:45 to power off the NAS
+  # if a manual session was forgotten during the day.
   systemd.services.burgernas-poweroff = {
     description = "Power off BurgerNAS if online (daily safety net)";
     after = ["network-online.target"];
@@ -479,8 +465,8 @@ in {
           echo "BurgerNAS offline; nothing to power off."
           exit 0
         fi
-        echo "BurgerNAS online at $(date -Is); arming WoL and powering off."
-        $SSH "$NAS" "sudo /bin/ethtool -s eth0 wol g 2>/dev/null || true; sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff" || true
+        echo "BurgerNAS online at $(date -Is); powering off cleanly."
+        $SSH "$NAS" "sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff" || true
       '';
     };
   };

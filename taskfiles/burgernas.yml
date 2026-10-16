@@ -58,10 +58,10 @@ tasks:
         echo "ERROR: BurgerNAS did not come online within 120s" >&2; exit 1
 
   burgernas:poweroff:
-    desc: Cleanly power off BurgerNAS (arms WoL, then powers off)
+    desc: Cleanly power off BurgerNAS (via synopoweroff)
     cmds:
       - |
-        ssh {{.BURGERNAS_ALIAS}} 'sudo /bin/ethtool -s eth0 wol g 2>/dev/null || true; sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff'
+        ssh {{.BURGERNAS_ALIAS}} 'sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff'
 
   burgernas:status:
     desc: BurgerNAS health — system, memory, storage, WoL and Transmission

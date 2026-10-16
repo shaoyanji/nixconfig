@@ -163,5 +163,11 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
   - Directed WoL broadcasts to `192.168.3.255:9` instead of global `255.255.255.255:9` to prevent packet drops over multi-homed interfaces.
   - Replaced raw `/sbin/poweroff` with `sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff` to ensure Synology hardware sleep leaves the Realtek RTL8111H PHY in standby listening mode.
   - Added `pkgs.wakeonlan` to Frieren `environment.systemPackages` for CLI / task execution.
-  - Confirmed DS220j restic SFTP repository (`devji@192.168.3.92:/volume1/backup/frieren/restic`) has 2 verified snapshots intact (818.5 GiB seed).
+### 12. [x] BurgerNAS WoL Removal & Daily 03:28 Window Alignment (`5b7253a`, Generation 131)
+* **Status:** `COMMITTED, PUSHED & ACTIVE`
+* **What:** Operator configured Synology DSM Control Panel power schedule to turn on BurgerNAS daily at 03:25 AM and shut down at 04:00 AM.
+* **Architecture:**
+  - Removed Wake-on-LAN hooks completely from `hosts/frieren/infra-stack.nix` and `taskfiles/burgernas.yml`.
+  - Re-timed `services.restic.backups.frieren-burgernas.timer` to run daily at 03:28:00 (`*-*-* 03:28:00`), 3 minutes after DSM boot.
+  - Retained Frieren push model over SFTP: BurgerNAS's 512 MB RAM ceiling would immediately cause OOM if restic pull were run on the NAS; Frieren push keeps BurgerNAS memory footprint to < 10 MB (OpenSSH `sftp-server`), verified stable during live pack repacking.
 

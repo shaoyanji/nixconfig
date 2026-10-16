@@ -8,7 +8,6 @@
     docker
     ethtool
     networkd-dispatcher
-    wakeonlan
   ];
 
   # --- Docker ---

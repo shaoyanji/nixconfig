@@ -8,6 +8,12 @@
     ./nas-client.nix
   ];
 
+  # Enable FUSE so kbfsfuse can call /run/wrappers/bin/fusermount
+  programs.fuse = {
+    enable = true;
+    userAllowOther = true;
+  };
+
   services = {
     keybase.enable = true;
     kbfs.enable = true;

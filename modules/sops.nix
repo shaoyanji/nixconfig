@@ -118,6 +118,10 @@ in {
   home = {
     sessionVariables = {
       SOPS_EDITOR = "hx";
+      SOPS_AGE_KEY_FILE =
+        if useTpm
+        then tpm_key_path
+        else default_key_path;
     };
     packages = with pkgs; [
       sops

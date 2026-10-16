@@ -171,3 +171,14 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
   - Re-timed `services.restic.backups.frieren-burgernas.timer` to run daily at 03:28:00 (`*-*-* 03:28:00`), 3 minutes after DSM boot.
   - Retained Frieren push model over SFTP: BurgerNAS's 512 MB RAM ceiling would immediately cause OOM if restic pull were run on the NAS; Frieren push keeps BurgerNAS memory footprint to < 10 MB (OpenSSH `sftp-server`), verified stable during live pack repacking.
 
+### 13. [x] BurgerNAS Static aarch64 Binary Sync Deployment (`10ff65e`, Generation 132)
+* **Status:** `COMMITTED, PUSHED & LIVE VERIFIED`
+* **What:** Operator requested weekly synchronization of static compiled ARM64 binaries between Frieren's `/Volumes/data/bin-aarch64/` and BurgerNAS's `/volume1/Shared Library/bin-aarch64/`.
+* **Implementation:**
+  - Declared `systemd.services.burgernas-bin-sync` and `systemd.timers.burgernas-bin-sync` in [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix), running as `devji:users` on Sundays at 03:32 CEST (`Sun *-*-* 03:32:00`), timed after daily restic push finishes and within the 03:25–04:00 DSM uptime window.
+  - Rsync command utilizes `--rsync-path=/usr/bin/rsync` to bypass Synology DSM's restricted non-login shell wrapper, with `--delete`, `-avz`, and clean path quoting for spaces.
+  - Added interactive task `task burgernas:bin:sync` to [`taskfiles/burgernas.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/burgernas.yml) and registered in `task burgernas:menu`.
+  - Executed initial live rsync transferring 256 MB compressed across 46+ static binaries; verified parity on BurgerNAS.
+  - Deployed to NixOS Generation 132 (`l3kaaf3j1vprkmlsgla9dclsahdsgcrn`) and verified live systemd execution in 2.2s.
+
+

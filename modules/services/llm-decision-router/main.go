@@ -80,6 +80,39 @@ func main() {
 	// Chat completions & models -> proxy to local llama-swap
 	mux.HandleFunc("/v1/chat/completions", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[CHAT] %s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
+
+		if r.Method == http.MethodPost && r.Body != nil {
+			bodyBytes, err := io.ReadAll(r.Body)
+			if err == nil && len(bodyBytes) > 0 {
+				var req map[string]interface{}
+				if err := json.Unmarshal(bodyBytes, &req); err == nil {
+					modified := false
+
+					// Normalize policy:auto or missing model to local default
+					if m, ok := req["model"].(string); !ok || m == "" || strings.HasPrefix(m, "policy:") {
+						req["model"] = "qwen3.6-35b-a3b"
+						modified = true
+					}
+
+					// Strip response_format if present to prevent llama-server sampler crash with <think> reasoning tokens
+					if _, hasFormat := req["response_format"]; hasFormat {
+						delete(req, "response_format")
+						modified = true
+					}
+
+					if modified {
+						newBytes, err := json.Marshal(req)
+						if err == nil {
+							bodyBytes = newBytes
+						}
+					}
+				}
+				r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+				r.ContentLength = int64(len(bodyBytes))
+				r.Header.Set("Content-Length", fmt.Sprintf("%d", len(bodyBytes)))
+			}
+		}
+
 		llmProxy.ServeHTTP(w, r)
 	})
 

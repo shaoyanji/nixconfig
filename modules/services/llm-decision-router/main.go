@@ -17,6 +17,91 @@ import (
 	"time"
 )
 
+type contextKey string
+
+const contextKeyWantedJSON contextKey = "wanted_json"
+
+func normalizeMessages(rawMsgs []interface{}) []interface{} {
+	var systemParts []string
+	var nonSystemMsgs []map[string]interface{}
+
+	for _, item := range rawMsgs {
+		msgMap, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		role, _ := msgMap["role"].(string)
+		content, _ := msgMap["content"].(string)
+
+		if role == "system" {
+			if strings.TrimSpace(content) != "" {
+				systemParts = append(systemParts, content)
+			}
+		} else {
+			nonSystemMsgs = append(nonSystemMsgs, msgMap)
+		}
+	}
+
+	var result []interface{}
+	if len(systemParts) > 0 {
+		mergedSystem := strings.Join(systemParts, "\n\n")
+		result = append(result, map[string]interface{}{
+			"role":    "system",
+			"content": mergedSystem,
+		})
+	}
+
+	for _, m := range nonSystemMsgs {
+		result = append(result, m)
+	}
+
+	return result
+}
+
+func cleanResponseContent(content string, requestedJSON bool) string {
+	// 1. Strip <think>...</think> reasoning traces
+	for {
+		startIdx := strings.Index(content, "<think>")
+		if startIdx == -1 {
+			break
+		}
+		endIdx := strings.Index(content, "</think>")
+		if endIdx == -1 {
+			content = content[:startIdx]
+			break
+		}
+		content = content[:startIdx] + content[endIdx+len("</think>"):]
+	}
+	content = strings.TrimSpace(content)
+
+	// 2. If client asked for JSON or model enclosed output in markdown code blocks
+	if requestedJSON || strings.HasPrefix(content, "```") {
+		// Strip markdown code fences ```json ... ``` or ``` ... ```
+		if strings.HasPrefix(content, "```") {
+			if firstLineEnd := strings.Index(content, "\n"); firstLineEnd != -1 {
+				content = content[firstLineEnd+1:]
+			}
+			if lastFence := strings.LastIndex(content, "```"); lastFence != -1 {
+				content = content[:lastFence]
+			}
+			content = strings.TrimSpace(content)
+		}
+
+		// Extract first valid JSON object { ... }
+		startBrace := strings.Index(content, "{")
+		endBrace := strings.LastIndex(content, "}")
+		if startBrace != -1 && endBrace != -1 && endBrace > startBrace {
+			candidate := content[startBrace : endBrace+1]
+			var js json.RawMessage
+			if json.Unmarshal([]byte(candidate), &js) == nil {
+				content = candidate
+			}
+		}
+	}
+
+	return content
+}
+
 type Config struct {
 	BindAddr             string
 	LLMUpstreamURL       string
@@ -58,6 +143,54 @@ func main() {
 		req.Host = llmURL.Host
 	}
 
+	llmProxy.ModifyResponse = func(resp *http.Response) error {
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			log.Printf("[CHAT-ERROR] upstream %s returned %d: %s", resp.Request.URL.Path, resp.StatusCode, string(body))
+			resp.Body = io.NopCloser(bytes.NewReader(body))
+			return nil
+		}
+
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		var chatResp map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &chatResp); err == nil {
+			modified := false
+			if choices, ok := chatResp["choices"].([]interface{}); ok && len(choices) > 0 {
+				if firstChoice, ok := choices[0].(map[string]interface{}); ok {
+					if msg, ok := firstChoice["message"].(map[string]interface{}); ok {
+						if content, ok := msg["content"].(string); ok {
+							reqWantedJSON := false
+							if val, ok := resp.Request.Context().Value(contextKeyWantedJSON).(bool); ok {
+								reqWantedJSON = val
+							}
+							cleaned := cleanResponseContent(content, reqWantedJSON)
+							if cleaned != content {
+								msg["content"] = cleaned
+								modified = true
+							}
+						}
+					}
+				}
+			}
+
+			if modified {
+				newBytes, err := json.Marshal(chatResp)
+				if err == nil {
+					bodyBytes = newBytes
+				}
+			}
+		}
+
+		resp.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+		resp.ContentLength = int64(len(bodyBytes))
+		resp.Header.Set("Content-Length", fmt.Sprintf("%d", len(bodyBytes)))
+		return nil
+	}
+
 	httpClient := &http.Client{
 		Timeout: 25 * time.Second,
 	}
@@ -81,6 +214,7 @@ func main() {
 	mux.HandleFunc("/v1/chat/completions", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[CHAT] %s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
 
+		wantedJSON := false
 		if r.Method == http.MethodPost && r.Body != nil {
 			bodyBytes, err := io.ReadAll(r.Body)
 			if err == nil && len(bodyBytes) > 0 {
@@ -96,7 +230,16 @@ func main() {
 
 					// Strip response_format if present to prevent llama-server sampler crash with <think> reasoning tokens
 					if _, hasFormat := req["response_format"]; hasFormat {
+						wantedJSON = true
 						delete(req, "response_format")
+						modified = true
+					}
+
+					// Consolidate multiple system messages into a single system message at the beginning
+					// This prevents llama-server Jinja exceptions ("System message must be at the beginning")
+					if msgs, ok := req["messages"].([]interface{}); ok && len(msgs) > 0 {
+						normalized := normalizeMessages(msgs)
+						req["messages"] = normalized
 						modified = true
 					}
 
@@ -113,6 +256,7 @@ func main() {
 			}
 		}
 
+		r = r.WithContext(context.WithValue(r.Context(), contextKeyWantedJSON, wantedJSON))
 		llmProxy.ServeHTTP(w, r)
 	})
 

@@ -43,4 +43,18 @@
     percentageAction = 5;
     criticalPowerAction = "PowerOff";
   };
+
+  # --- TPM 2.0 (Intel PTT hardware cryptoprocessor) ---
+  security.tpm2 = {
+    enable = true;
+    tctiEnvironment.enable = true;
+  };
+
+  # Allow devji direct access to the TPM resource manager (/dev/tpmrm0)
+  users.users.devji.extraGroups = ["tss"];
+
+  environment.systemPackages = with pkgs; [
+    age-plugin-tpm
+    tpm2-tools
+  ];
 }

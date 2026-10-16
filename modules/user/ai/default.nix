@@ -45,6 +45,7 @@ in {
     ./antigravity-cli.nix
     ./skills
     ./freebuff-remote.nix
+    ./mainframe-remotes.nix
     ./zed-mcp.nix
     # ./opencode.nix
   ];

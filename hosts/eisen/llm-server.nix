@@ -90,9 +90,30 @@
   kolibriFile = "${modelDir}/${kolibriName}";
   kolibriUrl = "https://huggingface.co/Hob-forge/Kolibri-1-GGUF/resolve/main/${kolibriName}";
 
-  # Vulkan (radv) build — RX 5700 (Navi 10) has no ROCm/CDNA; Vulkan is the
-  # supported compute path. Cached in the binary cache (no source build).
-  llama = pkgs.llama-cpp.override {vulkanSupport = true;};
+  # Vulkan (radv) build pinned to 0.7.0 (release v0.7.0 / build 11669 / commit 620d222).
+  # RX 5700 (Navi 10) uses the Vulkan backend; dynamic CPU dispatch provides AVX2 for Haswell-EP.
+  # The web UI is disabled in CMake to eliminate Node.js/npm dependencies during headless server builds.
+  llama = (pkgs.llama-cpp.override {vulkanSupport = true;}).overrideAttrs (old: rec {
+    version = "0.7.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "ggml-org";
+      repo = "llama.cpp";
+      tag = "v${version}";
+      hash = "sha256-pEDYgI3AMTU+cekvRX7NNt5wddznydQSNuerswvEpsA=";
+    };
+    npmDeps = null;
+    npmDepsHash = null;
+    preConfigure = "";
+    nativeBuildInputs = lib.filter (p: p != pkgs.nodejs_latest && p != pkgs.npmHooks.npmConfigHook) old.nativeBuildInputs;
+    cmakeFlags =
+      (lib.filter (flag: !(lib.hasPrefix "-DLLAMA_BUILD_NUMBER=" flag || lib.hasPrefix "-DLLAMA_BUILD_COMMIT=" flag)) old.cmakeFlags)
+      ++ [
+        "-DLLAMA_BUILD_NUMBER=11669"
+        "-DLLAMA_BUILD_COMMIT=620d222"
+        "-DLLAMA_BUILD_UI=OFF"
+        "-DLLAMA_USE_PREBUILT_UI=OFF"
+      ];
+  });
 
   # DFlash2 speculative-decoding head for Qwen: a block-diffusion drafter
   # trained for this exact target (vocab 248320, matching) that is verified by
@@ -113,11 +134,13 @@
     model,
     alias,
     spec ? "",
+    moeCacheMib ? 0,
   }:
     "${lib.getExe' llama "llama-server"} --host 127.0.0.1 --port \${PORT} "
     + "--model ${model} --alias ${alias} --threads 12 --ctx-size 32768 "
     + "--flash-attn on --jinja --metrics --n-gpu-layers 99 "
     + "--override-tensor exps=CPU --cache-type-k q8_0 --cache-type-v q8_0 "
+    + (lib.optionalString (moeCacheMib > 0) "--moe-cache-mib ${toString moeCacheMib} ")
     + spec;
 
   # NOTE — Kolibri-1 does not currently load: this nixpkgs' llama-cpp (0.5.0)
@@ -151,6 +174,13 @@
     };
   };
 in {
+  imports = [
+    ../../modules/profiles/nixbuild-client.nix
+  ];
+
+  # Remote builder client for nixbuild.net (enables distributed builds initiated from eisen in the basement)
+  profiles.nixbuild-client.enable = true;
+
   # Model weight repository on the persistent storage array.
   systemd.tmpfiles.rules = [
     "d ${modelDir} 0755 devji users - -"
@@ -199,6 +229,7 @@ in {
             model = qwenFile;
             alias = "qwen3.6-35b-a3b";
             spec = dflashFlags;
+            moeCacheMib = 1536;
           };
           aliases = ["qwen"];
         };

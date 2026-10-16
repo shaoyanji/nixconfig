@@ -147,3 +147,21 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
 * **Gate:** `task checks:nix:format` fails on 12 files that **also fail at HEAD**
   (pre-existing, none of these) — it is a hard commit gate, so `task checks:nix:fix`
   is required before committing.
+
+---
+
+## 2026-10-16 Session — pb fleet distribution, burgernas WoL & standby power
+
+### 10. [x] Fleet-Wide `pb` Utility Module Extraction (`modules/scripts/pb.nix`, `49da8a6`)
+* **Status:** `COMMITTED, PUSHED & TESTED`
+* **What:** Extracted the `pb` bash wrapper script out of the server-only module `modules/services/paste.nix` into a new declarative script module [`modules/scripts/pb.nix`](file:///Volumes/data/projects/nixconfig/modules/scripts/pb.nix).
+* **Scope:** Included in `modules/scripts/default.nix`, which is inherited across all fleet desktop, container, and standalone hosts. Tested live on `fern`: uploaded test paste to `http://paste.frieren.lan/test-from-fern.txt`, verified curl fetch, and deleted with `pb rm`.
+
+### 11. [x] BurgerNAS WoL Subnet Broadcast & Clean DSM Standby (`49da8a6`, `8ae4376`, `78feec3`)
+* **Status:** `COMMITTED, PUSHED & STANDBY VERIFIED`
+* **What:** Remediation for Wake-on-LAN backup failures on the DS220j cold vault:
+  - Directed WoL broadcasts to `192.168.3.255:9` instead of global `255.255.255.255:9` to prevent packet drops over multi-homed interfaces.
+  - Replaced raw `/sbin/poweroff` with `sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff` to ensure Synology hardware sleep leaves the Realtek RTL8111H PHY in standby listening mode.
+  - Added `pkgs.wakeonlan` to Frieren `environment.systemPackages` for CLI / task execution.
+  - Confirmed DS220j restic SFTP repository (`devji@192.168.3.92:/volume1/backup/frieren/restic`) has 2 verified snapshots intact (818.5 GiB seed).
+

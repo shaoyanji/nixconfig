@@ -34,20 +34,10 @@
             fi
           fi
 
-          # Ensure zoxide is initialized with --cmd cd
-          if command -v zoxide >/dev/null 2>&1; then
-            eval "$(zoxide init bash --cmd cd)"
-          fi
-
           if [ -f "$HOME/.bash_aliases" ]; then
             source "$HOME/.bash_aliases"
           fi
         '';
-    };
-    zoxide = {
-      enable = true;
-      enableBashIntegration = true;
-      options = ["--cmd cd"];
     };
   };
   home.file = {

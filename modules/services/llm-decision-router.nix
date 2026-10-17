@@ -79,7 +79,9 @@ in {
       ];
       wants = [
         "llama-swap.service"
-        "laya-serve.service"
+        # Deliberately NOT laya-serve: wanting it would start Laya at boot
+        # and defeat on-demand. The router falls back to Laya via the socket
+        # when TypeSafe is unreachable; a request through it activates Laya.
       ];
       wantedBy = ["multi-user.target"];
       serviceConfig = {

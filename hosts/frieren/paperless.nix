@@ -25,6 +25,21 @@ in {
       PAPERLESS_GOTENBERG_ENABLED = true;
       PAPERLESS_GOTENBERG_ENDPOINT = "http://127.0.0.1:3000";
     };
+
+    # Restore upstream's tesseract language narrowing, which this host's fork
+    # of the paperless module drops to stay on a cached package. Stock
+    # tesseract5 defaults to `languages.all` (every OCR language, one 1,015 MiB
+    # FOD) while this instance only ever asks for deu+eng. Upstream derives the
+    # list from PAPERLESS_OCR_LANGUAGE and always adds equ/osd/eng (tesseract
+    # fails to build without eng).
+    # Cost: paperless-ngx + ocrmypdf are re-wrapped against the narrowed
+    # tesseract, so the first build is not substitutable — one build for ~1 GiB
+    # of permanent closure.
+    package = pkgs.paperless-ngx.override {
+      tesseract5 = pkgs.tesseract5.override {
+        enableLanguages = ["eng" "deu" "osd" "equ"];
+      };
+    };
   };
 
   # --- Tika ---

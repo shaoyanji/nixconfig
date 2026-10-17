@@ -7,7 +7,7 @@
 }: let
   # Hosts with initialized and registered TPM 2.0 identities
   tpmHosts = ["frieren" "fern"];
-  useTpm = (osConfig != null && builtins.elem (osConfig.networking.hostName or "") tpmHosts);
+  useTpm = osConfig != null && builtins.elem (osConfig.networking.hostName or "") tpmHosts;
   tpm_key_path = "${config.home.homeDirectory}/.config/sops/age/tpm-identity.txt";
   default_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 in {
@@ -123,10 +123,12 @@ in {
         then tpm_key_path
         else default_key_path;
     };
-    packages = with pkgs; [
-      sops
-      yq-go
-    ] ++ lib.optional useTpm pkgs.age-plugin-tpm;
+    packages = with pkgs;
+      [
+        sops
+        yq-go
+      ]
+      ++ lib.optional useTpm pkgs.age-plugin-tpm;
     file = {
       ".aws/credentials".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."awscredentials".path}";
     };

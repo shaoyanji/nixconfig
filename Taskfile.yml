@@ -94,14 +94,128 @@ includes:
         flatten: true
 tasks:
     default:
-        desc: Show available operator commands
+        desc: Show the operator map (intent -> canonical task)
         cmds:
             - task help
 
+    # `help` is the discoverability surface, and it is deliberately NOT
+    # `task --list-all`: 373 namespaced task names is a wall, not a map, and
+    # the question that actually gets asked is "which task answers THIS".
+    # The map below is static (no yq, no nix, no network) so it can never be
+    # slow or stale-by-evaluation; the namespace index underneath it is
+    # computed from the live task list, so a new shard shows up on its own.
+    # All 373 remain one command away: `task --list-all`, or `task find:<word>`.
     help:
-        desc: List all tasks in the control plane
+        desc: Operator map — intent -> canonical task, plus a live namespace index
+        summary: >
+          Prints the curated map of intents to tasks, then counts tasks per
+          namespace from `task --list-all --json`. Static text + one jq pass:
+          no nix evaluation, no build, no network. `task --list-all` is still
+          the unfiltered list; `task find:<word>` greps it.
         cmds:
-            - task --list-all
+            - |
+              cat <<'MAP'
+              NIXCONFIG CONTROL PLANE — start from the intent, not from a task name
+
+                task help              this map
+                task find:<word>       search task names + descriptions
+                task --list-all        every task, unfiltered
+                task menu              gum TUI (human)  ·  task menu:operator (agent view)
+
+              WHAT NEEDS DOING (cheap, read-only, no config evaluated)
+                task status                    git state + hostname                     free
+                task checks:tasks              task graph: dup keys, dangling refs      free
+                task checks:build:route        would THIS host have to compile?         HTTP only
+                task checks:ports              declarations vs live listeners           free, local
+                task checks:dns:failover       resolver group answers + can fail over    LAN probes
+
+              REPO HYGIENE  (proves no host config — that is `checks:host`)
+                task checks:quick              inventory checks + lint + sops drift      bounded, no host eval
+                task checks:inventory:compiled inventory.toml vs flake host set          store-cached
+                task checks:nix:lint           deadnix (hard) + statix (advisory)
+                task checks:nix:format         alejandra --check, read-only
+                task checks:sops:drift         age recipients match .sops.yaml
+
+              HOST CONFIG  (phased: eval -> build -> size; see AGENTS.md)
+                task checks:host HOST=<h>      modules + ALL assertions, ONE host      ~13 s / 720 MiB
+                task checks:host HOST=<h> MODE=eval   arch-independent, for aarch64/darwin
+                task checks:hosts HOSTS="a b"  a NAMED set, one at a time (no default!)
+                task checks:flake             refuses below 16 GiB — do not "improve" this
+
+              HOST FACTS  (never evaluate a config to answer these)
+                task dev:inventory:host HOST=<h>  compiled record, no host eval          ~0.15 s
+                task dev:inventory:json           whole registry, schema-checked         store-cached
+                task dev:inventory:feed           every host, agent-facing digest       store-cached
+                task dev:flake:get-hosts          host NAMES only, no config forced     ~2.4 s
+
+              DEPLOY / BUILD  (one intended host at a time)
+                task infra:plan:host:<h>       build/substitute the closure, no apply
+                task infra:deploy:host:<h>     plan -> apply -> validate
+                task infra:apply:host:<h>      apply the closure
+                task infra:rollback:host:<h>   roll back + validate
+                task infra:warm:host:<h>       build on the BUILDER, verify the cache serves it
+                task dev:nixbuild:plan         what would build/fetch (read-only)
+
+              LOCAL REBUILDS
+                task infra:rebuild:nixos       sudo nixos-rebuild switch (local)
+                task infra:rebuild:home-manager
+                task infra:rebuild:darwin
+
+              CLOSURE SIZE  (build PREPARATION — proves nothing)
+                task dev:closure:size HOST=<h>     total size
+                task dev:closure:top HOST=<h>      biggest contributors
+                task dev:closure:reduce ROOT=<p>   duplicate groups
+
+              DOCS  (pages + site nav generated from the compiled metadata)
+                task docs:build                markdown + nav from .#docs         no repo writes
+                task docs:site                 HTML site from the same derivation  result-docsite/
+                task docs:sync                 refresh docs/generated/ copies
+                task checks:docs:sync          prove the copies match the build
+
+              CANARY MICROVM (EXP-102)
+                task vm:canary:build           build the cloud-hypervisor runner
+                task vm:canary:run             boot it
+                task vm:canary:test            boot -> ssh -> proxy verify -> stop
+
+              SECRETS
+                task infra:sops:fzf            dump apikeys.yaml as KEY=value
+                task infra:secrets:edit:apikeys
+
+              COST RULE: eval to catch a config error · build to prove a closure ·
+              size to plan a build. Nothing here defaults to the whole fleet —
+              `nix flake check` on this NAS was measured at 339.78 s / 6078.5 MiB / SIGKILL 137.
+              MAP
+            - |
+              echo
+              echo "NAMESPACES (live, from task --list-all --json)"
+              task --list-all --json \
+                | jq -r '
+                    ([.tasks[].name | select(contains(":")) | split(":")[0]]
+                      | group_by(.) | map("\(.[0])\t\(length)") | .[]),
+                    ("(root)" + "\t" + ([.tasks[].name | select(contains(":") | not)] | length | tostring))' \
+                | sort -t$'\t' -k2,2nr \
+                | awk -F'\t' '{printf "  %-20s %3s tasks\n", $1, $2}'
+        silent: true
+
+    # Cheap task search, for when the map is not specific enough. Reads the
+    # same JSON the map does: no shard is executed, no nix evaluation happens.
+    find:*:
+        desc: Search task names + descriptions (e.g. `task find:dns`)
+        summary: >
+          Case-insensitive substring match over every task name and description
+          in the control plane (`task --list-all --json` + jq). Read-only and
+          cheap; use it before reading a taskfile by hand.
+        cmds:
+            - |
+              q='{{index .MATCH 0}}'
+              task --list-all --json \
+                | jq -r --arg q "$q" '
+                    .tasks[]
+                    | select((.name | ascii_downcase | contains($q | ascii_downcase))
+                             or ((.desc // "") | ascii_downcase | contains($q | ascii_downcase)))
+                    | "\(.name)\t\(.desc // "")"' \
+                | sort
+        silent: true
 
     status:
         desc: Show repo/operator status

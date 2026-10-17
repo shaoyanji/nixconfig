@@ -130,16 +130,7 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
 * **Boot-path verification is still missing (rec 6 in
   `docs/fleet-operations-recommendations.md`).**
 
-### 8. Open: fern has no DankMaterialShell bar
-* DMS **is** running (`dms … run` + `quickshell`), niri is running, 0 failed units —
-  but `~/.config/DankMaterialShell/` **does not exist** (only
-  `~/.local/state/DankMaterialShell/session.json`). DMS 1.6.2 expects
-  `CONFIG_DIR/DankMaterialShell/settings.json`. The module comment says *"Don't manage
-  settings.json — let DMS write its own at runtime"*; on the 20260928 generation it never
-  did. **Next:** compare against a host whose bar works (frieren/poseidon/scratch) on the
-  same chain, over the LAN IP.
-
-### 9. Uncommitted working tree
+### 8. Uncommitted working tree
 `modules/profiles/nas-client.nix`, `modules/profiles/desktop-client.nix`,
 `scripts/task/warm-host.sh` (new), `taskfiles/infra.yml`, `taskfiles/checks.yml`,
 `taskfiles/services-core.yml`, `AGENTS.md`, `EXPERIMENTS.md` (EXP-113/114),

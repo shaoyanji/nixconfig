@@ -62,7 +62,7 @@ in {
     };
 
     home.packages = with pkgs;
-      # Base lightweight developer utilities (available on all tiers)
+    # Base lightweight developer utilities (available on all tiers)
       [
         jq
         lazygit

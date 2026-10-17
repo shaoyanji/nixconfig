@@ -19,7 +19,8 @@ Run validation and health checks for host configs and Nix code quality.
 
 | Task | Description |
 |------|-------------|
-| `checks:quick` | Bounded repo health checks (cheap inventory checks, one host eval each, nix lint, sops drift) |
+| `checks:quick` | Bounded repo HYGIENE: compiled inventory checks, task-graph integrity, nix lint, sops drift, modules.toml. **Evaluates no host config** — for that use `checks:host` |
+| `checks:tasks` | Task-graph gate: duplicate task keys (YAML drops the first silently) and dangling `task X` references (names + aliases, wildcards expanded) |
 | `checks:host:HOST=<host>` | **Per-host gate:** module system + all assertions + compiled `inventory.toml`, one host (~13 s, ~700 MiB) under the OOM watchdog |
 | `checks:hosts HOSTS="a b"` | A **named set**, ONE AT A TIME, fresh process + watchdog each. `HOSTS` is required — there is no default and no fleet sweep, by design |
 | `checks:host HOST=… MODE=eval` | One host, **evaluated** rather than built — arch-independent, and the way to check an aarch64 or darwin host from x86_64 |
@@ -43,7 +44,7 @@ one process); use `task checks:hosts` (sequential) and wrap anything heavy in
 
 ### experimental-features global wiring
 
-Enable `nix-command` / `flakes` / `pipe-operators` in `modules/global/global.nix` under `nix.settings` — NOT the flake `nixConfig` block (that is for substituters/trusted keys only; `experimental-features` is a daemon-level setting). Validate after editing with `nix eval .#nixosConfigurations.<host>.config.networking.hostName --extra-experimental-features "nix-command flakes"`.
+Enable `nix-command` / `flakes` / `pipe-operators` in `modules/global/global.nix` under `nix.settings` — NOT the flake `nixConfig` block (that is for substituters/trusted keys only; `experimental-features` is a daemon-level setting). Validate after editing with `nix-instantiate --parse modules/global/global.nix` (0.03 s, syntax) and then `task checks:host HOST=<a host on that chain>` (module system + every assertion, ~13 s / 720 MiB). Do **not** validate with `nix eval .#nixosConfigurations.<host>.config.networking.hostName`: it forces one option and type-checks nothing else (EXP-114).
 
 Pitfall: `nix.settings` uses shallow attrset merge (`//`), so a host-level `experimental-features = [...]` **replaces** the global list entirely. The legacy `extra-experimental-features` key is a separate attrset entry that appends — both can coexist on the same host. Check hosts that override `experimental-features` (e.g. `garnixMachine`, `testvm`) after changing the global default.
 

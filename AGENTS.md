@@ -252,12 +252,13 @@ to prevent.
 
 | Time                    | Unit                                   | Source of truth                                                |
 | ----------------------- | -------------------------------------- | -------------------------------------------------------------- |
-| 03:00                   | `agy-nightly-handoff` (user)           | executes `~/HANDOFF.md` via `agy`, then deletes it             |
+| 03:00                   | `agy-nightly-handoff` (user)           | Action-gated `~/HANDOFF.md` via Julia-1; executes cascade only on promotion candidates or on-demand (`task checks:audit:handoff`) |
 | 03:00                   | `postgresqlBackup-immich`              | local                                                          |
+| 03:28                   | `restic-backups-frieren-burgernas`     | daily SFTP push within DSM 03:25–04:00 power window            |
 | 03:30 (+10m jitter)     | `restic-backups-frieren-local`         | local                                                          |
 | Sun 01:30 (+30m jitter) | `fleet-warm-cache`                     | **`github:shaoyanji/nixconfig`** — builds 7 active host closures |
 | 04:00                   | `nixos-upgrade` (`system.autoUpgrade`) | **`github:shaoyanji/nixconfig#frieren`**                       |
-| 05:00                   | `agy-nightly-system` (user)            | executes `~/SYSTEM.md` via `agy` (mem peak ~4.2 GB)            |
+| 05:00 (Daily) / Sun     | `agy-nightly-system` (user)            | Trigger-gated `~/SYSTEM.md`: Mon-Sat quiet reflex (bypasses LLM if nominal), Sunday comprehensive scorecard, or on-demand (`task checks:audit:system`) |
 | Sun 06:00               | `nix-optimise`                         | weekly hardlink deduplication across live store paths          |
 
 **The origin-vs-local trap (this is the one that bites):**

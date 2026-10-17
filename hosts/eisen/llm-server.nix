@@ -271,6 +271,11 @@ in {
     file = bonsaiFile;
     url = bonsaiUrl;
   };
+  systemd.services."eisen-llm-kev" = mkFetch {
+    file = kevFile;
+    url = kevUrl;
+  };
+
   systemd.services."eisen-llm-dflash" = mkFetch {
     file = dflashFile;
     url = dflashUrl;
@@ -322,7 +327,14 @@ in {
           };
           aliases = ["kolibri" "aleph"];
         };
-        # Bonsai 2 27B (dense ternary, PTQ1_0) on the PrismML fork.
+        # Kev-4B (decision model, /v1/systemone) — GGUF from ggml-org.
+  # Source is a LoRA adapter + pointer head (jaredpalmer/kev-4b); this is
+  # the merged/converted GGUF that llama.cpp serves natively (build 11669+).
+  # Q8_0 is the recommended quant for decision models. Apache-2.0.
+  kevFile = "${modelDir}/Kev-4B-Q8_0.gguf";
+  kevUrl = "https://huggingface.co/ggml-org/Kev-4B-GGUF/resolve/main/Kev-4B-Q8_0.gguf";
+
+  # Bonsai 2 27B (dense ternary, PTQ1_0) on the PrismML fork.
         # No exps=CPU (dense, no experts), no DFlash (vocab/arch mismatch).
         # Verify weights after fetch: 5,946,648,928 bytes,
         # sha256 53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3.

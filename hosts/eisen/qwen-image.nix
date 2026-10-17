@@ -39,7 +39,7 @@ let
       owner = "leejet";
       repo = "stable-diffusion.cpp";
       rev = "f0aac524d3f29140e60ba78f3cfb16d6acea87db";
-      sha256 = lib.fakeHash;
+      sha256 = "sha256-cOtMVv1f213Zt6B2p2Umu2VaiF4oMGyrPY2TdeFckRY=";
     };
     cmakeFlags = (old.cmakeFlags or []) ++ [ "-DSD_VULKAN=ON" ];
   });

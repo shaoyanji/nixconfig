@@ -1,12 +1,15 @@
 # eisen — offline MoE LLM inference (native llama.cpp, Vulkan/radv).
 #
-# Two MoE models share one OpenAI-compatible endpoint via llama-swap, which
-# starts/stops a llama-server per model on demand (they cannot co-reside in
-# 62 GiB RAM: Qwen ~21 GiB + Kolibri ~44 GiB > 62 GiB).
+# Three models share one OpenAI-compatible endpoint via llama-swap, which
+# starts/stops a llama-server per model on demand (Qwen ~21 GiB + Kolibri
+# ~44 GiB cannot co-reside in 62 GiB RAM; Bonsai ~6 GiB fits RAM beside
+# Qwen but not VRAM, so it swaps like the others).
 #
 #   * qwen3.6-35b-a3b — Qwen3.6-35B-A3B, 35B total / ~3B active (Q4_K_M).
 #   * kolibri-1       — Aleph-Alpha Kolibri-1, 78B total / 3.46B active,
 #                       German+English (Q4_K_M).
+#   * bonsai-2-27b    — PrismML Ternary Bonsai 2, 27B dense ternary (PTQ1_0),
+#                       served by the PrismML fork of llama.cpp (Vulkan).
 #
 # Blueprint: ~/HANDOFF.md §3 and .agents/deploy/hosts/eisen.md.
 #
@@ -90,6 +93,10 @@
   kolibriFile = "${modelDir}/${kolibriName}";
   kolibriUrl = "https://huggingface.co/Hob-forge/Kolibri-1-GGUF/resolve/main/${kolibriName}";
 
+  bonsaiName = "Ternary-Bonsai-2-27B-PTQ1_0.gguf";
+  bonsaiFile = "${modelDir}/${bonsaiName}";
+  bonsaiUrl = "https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/resolve/main/${bonsaiName}";
+
   # Vulkan (radv) build pinned to 0.7.0 (release v0.7.0 / build 11669 / commit 620d222).
   # RX 5700 (Navi 10) uses the Vulkan backend; dynamic CPU dispatch provides AVX2 for Haswell-EP.
   # The web UI is disabled in CMake to eliminate Node.js/npm dependencies during headless server builds.
@@ -115,6 +122,34 @@
       ];
   });
 
+  # PrismML fork of llama.cpp, pinned to the #238 merge commit (3ae4f51,
+  # 2026-09-21) — the merge the PrismML known-issues page ties to the
+  # Vulkan ternary fixes. Serves Bonsai only; Qwen/Kolibri stay on `llama` above. Same
+  # override pattern (Vulkan, no web-UI npm step), plus
+  # -DLLAMA_BUILD_TESTS=OFF (community-reported mandatory for this fork).
+  llamaPrism = (pkgs.llama-cpp.override {vulkanSupport = true;}).overrideAttrs (old: rec {
+    version = "prism-3ae4f51";
+    src = pkgs.fetchFromGitHub {
+      owner = "PrismML-Eng";
+      repo = "llama.cpp";
+      rev = "3ae4f51087d8d9292eda16ee00cec54e798ea576";
+      hash = "sha256-oS04cLZ8Zft5HIOyGO9zVCsGs7g67c+i1a2rDVtRfaY=";
+    };
+    npmDeps = null;
+    npmDepsHash = null;
+    preConfigure = "";
+    nativeBuildInputs = lib.filter (p: p != pkgs.nodejs_latest && p != pkgs.npmHooks.npmConfigHook) old.nativeBuildInputs;
+    cmakeFlags =
+      (lib.filter (flag: !(lib.hasPrefix "-DLLAMA_BUILD_NUMBER=" flag || lib.hasPrefix "-DLLAMA_BUILD_COMMIT=" flag)) old.cmakeFlags)
+      ++ [
+        "-DLLAMA_BUILD_COMMIT=3ae4f51"
+        "-DLLAMA_BUILD_UI=OFF"
+        "-DLLAMA_USE_PREBUILT_UI=OFF"
+        "-DGGML_VULKAN=ON"
+        "-DLLAMA_BUILD_TESTS=OFF"
+      ];
+  });
+
   # DFlash2 speculative-decoding head for Qwen: a block-diffusion drafter
   # trained for this exact target (vocab 248320, matching) that is verified by
   # the target, so output distribution is unchanged. Measured on eisen on a
@@ -137,11 +172,15 @@
     model,
     alias,
     spec ? "",
+    binary ? llama,
+    ctxSize ? 32768,
+    experts ? true,
   }:
-    "${lib.getExe' llama "llama-server"} --host 127.0.0.1 --port \${PORT} "
-    + "--model ${model} --alias ${alias} --threads 12 --parallel 1 --ctx-size 32768 "
+    "${lib.getExe' binary "llama-server"} --host 127.0.0.1 --port \${PORT} "
+    + "--model ${model} --alias ${alias} --threads 12 --parallel 1 --ctx-size ${toString ctxSize} "
     + "--flash-attn on --jinja --metrics --reasoning-format none --n-gpu-layers 99 "
-    + "--override-tensor exps=CPU --cache-type-k q8_0 --cache-type-v q8_0 "
+    + (lib.optionalString experts "--override-tensor exps=CPU ")
+    + "--cache-type-k q8_0 --cache-type-v q8_0 "
     + spec;
 
   # NOTE — Kolibri-1 does not currently load: this nixpkgs' llama-cpp (0.5.0)
@@ -195,6 +234,10 @@ in {
     file = kolibriFile;
     url = kolibriUrl;
   };
+  systemd.services."eisen-llm-bonsai" = mkFetch {
+    file = bonsaiFile;
+    url = bonsaiUrl;
+  };
   systemd.services."eisen-llm-dflash" = mkFetch {
     file = dflashFile;
     url = dflashUrl;
@@ -205,12 +248,14 @@ in {
     after = [
       "eisen-llm-qwen.service"
       "eisen-llm-kolibri.service"
+      "eisen-llm-bonsai.service"
       "eisen-llm-dflash.service"
       "mnt-storage.mount"
     ];
     wants = [
       "eisen-llm-qwen.service"
       "eisen-llm-kolibri.service"
+      "eisen-llm-bonsai.service"
       "eisen-llm-dflash.service"
     ];
   };
@@ -239,6 +284,21 @@ in {
             alias = "kolibri-1";
           };
           aliases = ["kolibri" "aleph"];
+        };
+        # Bonsai 2 27B (dense ternary, PTQ1_0) on the PrismML fork.
+        # No exps=CPU (dense, no experts), no DFlash (vocab/arch mismatch).
+        # Verify weights after fetch: 5,946,648,928 bytes,
+        # sha256 53107f53aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3.
+        "bonsai-2-27b" = {
+          cmd = mkCmd {
+            model = bonsaiFile;
+            alias = "bonsai-2-27b";
+            binary = llamaPrism;
+            ctxSize = 16384;
+            experts = false;
+            spec = "--reasoning-effort medium";
+          };
+          aliases = ["bonsai"];
         };
       };
     };

@@ -130,7 +130,12 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
 * **Boot-path verification is still missing (rec 6 in
   `docs/fleet-operations-recommendations.md`).**
 
-### 8. Uncommitted working tree
+### 8. Uncommitted working tree *(historical — resolved 2026-10-17)*
+> **Resolved:** the tree is clean and every file below is committed. The 12
+> formatting failures noted here are gone: `task checks:nix:format` reports
+> 218/218 clean. See the 2026-10-17 session at the end for how the tree was
+> reconciled with a rewritten `origin/main`.
+
 `modules/profiles/nas-client.nix`, `modules/profiles/desktop-client.nix`,
 `scripts/task/warm-host.sh` (new), `taskfiles/infra.yml`, `taskfiles/checks.yml`,
 `taskfiles/services-core.yml`, `AGENTS.md`, `EXPERIMENTS.md` (EXP-113/114),
@@ -177,6 +182,92 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
 * **What:** Reverted mistaken tmux statusbar debloat lines (`set -g status off`, `set -g set-titles off`, `set -g pane-border-status off`) in `modules/shell/tmux.nix` that disabled tmux's status line and Catppuccin theme.
 * **Kitty Title Bar:** Added `hide_window_decorations = "yes"` to `programs.kitty.settings` in [`modules/kitty/default.nix`](file:///Volumes/data/projects/nixconfig/modules/kitty/default.nix) to hide Kitty's top GUI window title bar.
 * **Verification:** Switched cleanly to NixOS Generation 133 (`px28k7jav07j5jymrrf9mp1161lx1lgb`), verified `hide_window_decorations yes` in `~/.config/kitty/kitty.conf`, and verified `status on` in tmux.
+
+---
+
+## 2026-10-17 Session — lineage reconciliation, LF hygiene, and what a push runs
+
+### 15. [x] `main` reconciled with the rewritten `origin/main` (`7a9b2c70`, `507b8b51`, `5e5aab79`, `c0afd727`)
+* **Status:** `COMMITTED (local), NOT PUSHED` — the old tip is tagged
+  `pre-integration` (`7e90cd5a`).
+* **The shape of the problem:** `git merge-base HEAD origin/main` returns
+  **nothing**. The rotated-key purge rewrote every hash on the remote, so the two
+  lineages share content but no history; a plain `git merge` conflicts on
+  almost every path. The reconciliation is therefore a **union**, not a merge:
+  `7a9b2c70` joins both lineages as parents (`origin/main` `e520abc` +
+  our `7e90cd5a`). **Do not `git pull` / `rebase` / `reset` on this branch**;
+  fetch, inspect, apply on top.
+* **The defect worth remembering:** the first union (`7a9b2c70`) was built as
+  *`origin/main`'s tree + our uncommitted delta (77 paths)*, which silently
+  dropped everything our lineage had **committed** and the rewritten remote
+  lacked — the six `c811602` skills, `hosts/eisen/{qwen-image-server,
+  parakeet-server,parakeet-transcribe}.py`, `main_test.go`, the
+  `gpu_busy`/`GPU_LOCK_FILE`/429 path in `llm-decision-router/main.go`, and
+  `go.mod` 1.23. It was caught by a file count (`452` vs `458`), not by a gate:
+  **`git ls-tree -r --name-only <commit> | wc -l` is the cheap test that a union
+  did not lose a whole class of content.** `507b8b51` rebuilds from our tree and
+  keeps the remote-only files as additions; `git diff --stat 7e90cd5a main` is
+  now a short, reviewable list.
+* **Two files genuinely come from the remote lineage**, because ours are worse:
+  `.gitignore` (CRLF) and `modules/user/ai/skills/jev-ultrafast/scripts/env_helper.js`
+  (ours carried `env.TYPESAFE_API_KEY=REDACTED` purge residue that breaks the key
+  mapping). Note the CRLF was *cosmetic*: git strips the trailing CR when
+  matching ignore patterns, so no path was ever mis-ignored.
+* **Recovery refs if anyone needs the old state:** tag `pre-integration`,
+  tag `archive/kolibri-orphan-8493d4d7` (an unreachable duplicate of the merged
+  Kolibri work, pinned so `git gc` cannot drop it — its content is already in
+  `main`), and `.task/backup/p-repo-eaa11f0-2026-10-17/` (uncommitted work from
+  the separate clone `/Volumes/data/p/repo/nixconfig`, patch verified with
+  `git apply --check` against a clean extraction of `eaa11f0`).
+
+### 16. [x] LF-only line endings and a `.gitattributes` pin (`5e5aab79`)
+* `.gitignore` carried 9 CRLF lines inherited from an old checkout; normalised to
+  LF (`git diff --ignore-cr-at-eol` is empty, so it was byte-only) and pinned
+  with `* text=auto eol=lf`. No tracked file contains CR today and
+  `git add --renormalize --dry-run` is empty, so nothing renormalises later.
+
+### 17. Gate note — `checks:qmd:docs` goes stale on any markdown change
+* The local qmd index is compared against the tree, so after a merge or a doc
+  commit the gate fails `STALE`. Remedy is the gate's own message:
+  `task dev:qmd:docs:refresh` (local collection only). Verified green after
+  refreshing; `checks:docs:sync` and `checks:inventory:sync` are unaffected.
+
+### 18. What a `git push` runs — and it is not frieren
+* `.github/workflows/nixcachix.yml` triggers `on: push` (any branch) and
+  `workflow_dispatch`. Every job is GitHub-hosted: `runs-on: ubuntu-latest` for
+  `sops-drift` and `plan`, and `runs-on: ${{ matrix.os }}` (ubuntu/macOS) for the
+  per-host `build-machines` matrix.
+* **Nothing executes on this host.** There is no self-hosted runner
+  (no `actions-runner` unit or directory, no `runs-on: self-hosted` anywhere),
+  no local forge (the only `:3000` listener is paperless' gotenberg), and this
+  clone has **no installed git hooks** (`core.hooksPath` unset, samples only) —
+  the repo's `pre-push` installer task belongs to `bountystash-console`, not
+  here. So a push cannot trigger a hook that rebuilds or switches frieren.
+* CI consequences to expect: affected hosts are detected from the diff, each is
+  built and eval-gated on GitHub's runners, and results go to the **Cachix cache
+  `shaoyanji`** — *not* to frieren's harmonia. The workflow contains no
+  `deploy`/`ssh` step, so deploys stay manual (`infra:warm:host:*` →
+  `infra:deploy:host:*`).
+
+### 19. Open after 2026-10-17
+* **Push** `main` (fast-forward ahead of `origin/main`; no force needed) — not
+  done, awaiting the operator.
+* `chore/deadnix-cleanup` and `picobot/pipe-operator-refactor` are the only local
+  branches **not** merged into `main`.
+* `/Volumes/data/openclaw/{nixconfig,projects/nixconfig}` are sibling clones owned
+  by `vaultwarden:influxdb2`, unreadable as `devji`; each has files that are not
+  in `main` (62 and 70 respectively), so someone with read rights should
+  inventory them before assuming nothing was lost.
+* frieren's committed closure baseline (`32104328080`, 29.9 GiB) is the **pre-cut**
+  measurement: deploy the debloat cuts, then `task dev:closure:budget:adopt` to
+  re-baseline rather than predicting the new size.
+* From the Eisen side (the reply that prompted the audit above): the **canary
+  microVM test has still not been run**, and Eisen's shutdown stays gated on the
+  canary test, the microVM operating docs and the final Eisen HANDOFF — the last
+  two landed in `c0afd727` (`hosts/microvms/README.md`, `hosts/eisen/HANDOFF.md`).
+  The running Eisen system is activated from the pre-merge commits: do not rebuild
+  it from `main` until that is confirmed, since the live closures are the good
+  state.
 
 
 

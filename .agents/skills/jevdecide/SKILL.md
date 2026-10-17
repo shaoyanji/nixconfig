@@ -25,7 +25,6 @@ metadata first** and escalates to message bodies **only** for mail Jev is unsure
 ## Key setup (once per shell)
 ```sh
 set -a; . "$HOME/.config/hermes/hermes.env"; set +a
-export TYPESAFE_API_KEY=REDACTED
 ```
 
 ## Criteria file (write once)

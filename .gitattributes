@@ -1,0 +1,5 @@
+# LF everywhere, detected per file so binaries are untouched. The .gitignore
+# arrived with CRLF line endings from an old checkout; git strips the CR when
+# matching ignore patterns, so nothing was mis-ignored, but mixed endings show
+# up as phantom changes in diffs and as byte noise for every other tool.
+* text=auto eol=lf

@@ -316,6 +316,9 @@ in {
             model = kolibriFile;
             alias = "kolibri-1";
             binary = llamaKolibri;
+            # Low reasoning effort: Kolibri's default think is long (a "hi"
+            # cost 352 output tokens, mostly <think>). Keep answers short.
+            spec = "--reasoning-effort low";
           };
           aliases = ["kolibri" "aleph"];
         };

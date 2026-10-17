@@ -95,34 +95,98 @@ in
     url = "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/main/mmproj-Qwen3VL-8B-Instruct-F16.gguf";
   };
 
-  # --- Image service: OpenAI-compatible /v1/images/generations ------------
-  # Stdlib-HTTP wrapper (qwen-image-server.py) translating the request into
-  # an sd-cli invocation (Turbo: --sigmas qwen-image-2.1-turbo --steps 8
-  # --cfg-scale 1.0 --sampling-method euler --offload-to-cpu). The wrapper
-  # serializes generations (one at a time). sd-cli loads the weights per
-  # request, so the wrapper itself is lightweight and starts at boot.
-  # VRAM split: the encoder runs on CPU (one-shot text encode), the DiT on
-  # GPU (the 8-step denoising loop), the VAE on CPU (one-shot decode) —
-  # --offload-to-cpu lets sd.cpp place what doesn't fit in 8 GB VRAM.
+  # --- Image service: persistent sd-server + socket activation + idle-stop
+  # The wrapper (qwen-image-server.py) is the front-end on :8282. systemd
+  # holds the port (qwen-image.socket); the first connection starts the
+  # service, whose wrapper takes over systemd's listening FD. On first
+  # request it unloads llama-swap (claiming the GPU, 429 if a generation
+  # is running) and spawns sd-server (persistent, :8283) with the fixed
+  # Turbo defaults (--steps 8 --cfg-scale 1.0 --sampling-method euler
+  # --sigmas <Turbo 9-value list>). The weights stay loaded across
+  # generations, so the HDD cold load is paid once per session, not per
+  # image. While sd-server holds the GPU the wrapper writes
+  # RUNTIME_DIRECTORY/active; the LLM router checks it and 429s chat
+  # generations (LLM wins by not starting, not by killing).
+  # The idle timer stops the service after 900 s with no request, killing
+  # sd-server and freeing the GPU. The socket stays listening, so the next
+  # request wakes it again. Nothing may `want` qwen-image — nginx and
+  # tailscale-serve-image deliberately do not — or boot would pull it up
+  # and defeat on-demand.
+  systemd.sockets."qwen-image" = {
+    description = "Qwen-Image socket (on-demand activation)";
+    wantedBy = ["sockets.target"];
+    socketConfig = {
+      ListenStream = "127.0.0.1:${toString port}";
+      Accept = false;
+    };
+  };
+
   systemd.services."qwen-image" = {
     description = "Qwen-Image-2.1-Turbo image server (OpenAI-compatible, :8282)";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    requires = ["qwen-image.socket"];
+    # No wantedBy: the socket activates this on first connection.
     serviceConfig = {
       ExecStart = "${pkgs.python3}/bin/python ${./qwen-image-server.py}";
       Environment = [
         "PORT=${toString port}"
-        "SD_CLI=${lib.getExe' sdCpp "sd-cli"}"
+        "SD_SERVER=${lib.getExe' sdCpp "sd-server"}"
+        "SD_PORT=8283"
         "DIT=${imageDir}/qwen-image-2.1-turbo-Q8_0.gguf"
         "ENCODER=${imageDir}/Qwen3VL-8B-Instruct-Q4_K_M.gguf"
         "VAE=${imageDir}/qwen_image_2.1_vae_bf16.safetensors"
         "MMPROJ=${imageDir}/mmproj-Qwen3VL-8B-Instruct-F16.gguf"
+        "LLAMA_SWAP=http://127.0.0.1:8080"
       ];
       Restart = "on-failure";
       RestartSec = "5s";
+      # First request's cold load (HDD, ~12 GB) can take minutes.
+      TimeoutStartSec = 600;
+      # Holds the active lock + last-request record the idle timer reads.
+      RuntimeDirectory = "qwen-image";
       DynamicUser = true;
       PrivateTmp = true;
+    };
+  };
+
+  # --- Idle stop: free the GPU after 900 s with no request -----------------
+  # Same pattern as laya-serve-idle: the timer fires every 5 min; the
+  # oneshot stops the service when no request has been served within
+  # idleTimeout. The socket stays listening, so the next connection
+  # re-activates the service. A stop racing a just-arrived request fails
+  # that one request cleanly (502 at the caller), and the next request
+  # wakes the image server again.
+  systemd.services."qwen-image-idle" = {
+    description = "Stop Qwen-Image if idle past the timeout";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = pkgs.writeShellScript "qwen-image-idle-check" ''
+        set -eu
+        systemctl=${config.systemd.package}/bin/systemctl
+        if ! "$systemctl" -q is-active qwen-image.service; then
+          exit 0
+        fi
+        last="/run/qwen-image/last-request"
+        if [ ! -f "$last" ]; then
+          exit 0
+        fi
+        now=$(${pkgs.coreutils}/bin/date +%s)
+        mtime=$(${pkgs.coreutils}/bin/stat -c %Y "$last")
+        if [ $((now - mtime)) -ge 900 ]; then
+          "$systemctl" stop qwen-image.service
+        fi
+      '';
+    };
+  };
+
+  systemd.timers."qwen-image-idle" = {
+    description = "Stop Qwen-Image after the idle timeout";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnBootSec = "5min";
+      OnUnitActiveSec = "5min";
+      Unit = "qwen-image-idle.service";
     };
   };
 

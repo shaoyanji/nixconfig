@@ -1,4 +1,8 @@
-{lib, pkgs, ...}: let
+{
+  lib,
+  pkgs,
+  ...
+}: let
   user = import ../../modules/global/user.nix;
 in {
   imports = [

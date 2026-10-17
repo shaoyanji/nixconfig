@@ -103,7 +103,11 @@ in {
           "LAYA_ENDPOINT=${cfg.layaEndpoint}"
           "DEFAULT_DECISION_MODEL=${cfg.defaultDecisionModel}"
           "DEFAULT_MODEL=${cfg.defaultModel}"
-          "FALLBACK_TO_LOCAL=${if cfg.fallbackToLocal then "true" else "false"}"
+          "FALLBACK_TO_LOCAL=${
+            if cfg.fallbackToLocal
+            then "true"
+            else "false"
+          }"
         ];
       };
     };

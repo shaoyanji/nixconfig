@@ -1,4 +1,8 @@
-{pkgs, lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   # Desktop client profile with NAS client dependency
   # Note: nas-client.nix is imported unconditionally as it's a core dependency
   # for desktop client functionality. To disable NAS mounts, configure

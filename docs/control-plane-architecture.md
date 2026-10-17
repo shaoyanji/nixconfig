@@ -1,7 +1,16 @@
 # Control Plane — Site & Dashboard Architecture (redesign)
 
-> **Status:** design proposal (not yet implemented). Supersedes the
-> `docs-site/` Python generator.
+> **Status:** partly implemented (2026-10-17); the Go/Datastar runtime below is
+> still a proposal.
+>
+> **What already landed:** the compiled-data half. `lib/docs.nix` generates the
+> fleet inventory, modules registry and per-host pages from the compiled
+> `.#inventory` and `modules.toml`, and emits the site **nav as a Nix value** —
+> so there is no hand-written `nav.json` any more, and `docs/site.toml` is no
+> longer needed for that job. `nix build .#docs` is the source of truth;
+> `task docs:sync` refreshes `docs/generated/`; `checks:docs:sync` proves the
+> copy matches. The Python generator remains only as the markdown→HTML step
+> (section 4's "Retire generate.py" is still open).
 > **Companion vision:** [`control-plane-vision.md`](./control-plane-vision.md)
 > (why the end state is shaped this way — Nix-as-generator, federated
 > manifests, and the evaluation-speed wall).
@@ -13,12 +22,13 @@
 
 ## 1. What this replaces, and why
 
-Today's `docs-site/` is `python3 + python3Packages.markdown` + a hand-written
-`nav.json` + `generate.py`. It works, but it is the wrong shape for where this
-is going:
+Today's `docs-site/` is `python3 + python3Packages.markdown` + `generate.py`,
+reading a nav that is now **emitted by `lib/docs.nix`** (it used to be a
+hand-written `docs-site/nav.json`). The data half is fixed; what remains wrong
+for the end state is the rendering/runtime half:
 
-- It is a **separate pipeline** from the data it renders (nav is hand-maintained,
-  content is copied per-file).
+- The nav is no longer hand-maintained, but markdown→HTML still happens in
+  Python at build time instead of the Go builder described below.
 - It cannot serve **dynamic** content — no task controls, no live closure graphs.
 - Python is the wrong rendering dependency for something meant to grow into a
   runtime control plane.
@@ -50,7 +60,7 @@ Everything the site shows is derived from these. No secondary copies.
 | `flake.lock` | data | input/version pages |
 | closure TOML (`task dev:closure:toml`) | data | closure graphs & size tables |
 | `docs/**/*.md`, `README.md`, `AGENTS.md`, `.agents/**/*.md` | markdown | wiki content |
-| `docs/site.toml` *(new)* | data | nav/sections/config — replaces hand-written `nav.json` |
+| `lib/docs.nix` | Nix | nav/sections manifest + generated pages — **this replaced `nav.json`; `site.toml` is no longer required** |
 
 Nix is the compiler: a single function `mkSite` in `lib/` takes these and returns
 a store path. `docs/site.toml` declares the nav so the manifest is data, not code.

@@ -320,8 +320,9 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 The fleet roster — 31 devices across NixOS, nix-darwin, standalone Home Manager,
 external non-Nix nodes, preserved and WIP machines — is defined once in
 [`inventory.toml`](inventory.toml), the machine-readable source of truth, and
-rendered for humans in [`docs/fleet-inventory.md`](docs/fleet-inventory.md).
-`task dev:inventory:sync` validates the two against each other, so the roster is
+rendered for humans in [`docs/generated/fleet-inventory.md`](docs/generated/fleet-inventory.md)
+(built by `lib/docs.nix`; refresh with `task docs:sync`, verify with
+`task checks:docs:sync`). Neither copy is hand-maintained, so the roster is
 deliberately **not** duplicated here.
 
 `deckstation` is a pure Steam install — no desktop environment, just greetd + tuigreet dropping into gamescope-session (Steam Big Picture). Uses `globalModulesContainers` so no dms/niri leaks in. Runs Sunshine GameStream/Moonlight host so any LAN client (phone, laptop, TV box) can launch the big screen remotely. Closure is minimalistic: ROCm/OpenCL compute packages are dropped from the AMD profile since Steam + gamescope only need Mesa + amdgpu.
@@ -454,7 +455,9 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 ### Quick Reference
 - `AGENTS.md` - Agent routing helpers and task namespace summary
 - `inventory.toml` - Canonical 31-device fleet inventory source of truth
-- `docs/fleet-inventory.md` - Fleet device catalog, hardware profiles, and roles
+- `docs/generated/fleet-inventory.md` - Fleet catalog + per-host pages, built by `lib/docs.nix`
+- `docs/generated/modules-registry.md` - Knob registry, built by `lib/docs.nix`
+- `docs-site/` - HTML docs site (`nix build .#docs-site`), pages from `.#docs`
 - `docs/task-control-plane.md` - Task namespace policy and workflow examples
 - `docs/frieren-access.md` - frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports)
 - `taskfiles/README.md` - Taskfile ownership map and shard reference

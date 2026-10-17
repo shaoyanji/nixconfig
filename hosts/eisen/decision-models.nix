@@ -182,7 +182,7 @@
 
       if __name__ == "__main__":
           main()
-      '';
+    '';
   };
 
   # Idle check for the laya-serve-idle timer: stop the service when no request

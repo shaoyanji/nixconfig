@@ -66,7 +66,7 @@ in {
     # AI agent CLIs from llm-agents.nix (overlay wired in module-sets:
     # pkgs.llm-agents.<name>; numtide cache via flake nixConfig).
     home.packages = with pkgs;
-      # Base light tools (installed for both "light" and "full" tiers)
+    # Base light tools (installed for both "light" and "full" tiers)
       [
         geminicommit
         tgpt

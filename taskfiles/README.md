@@ -15,8 +15,8 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `Taskfile.yml` – entrypoint with top-level menus
 - `taskfiles/infra.yml` – host lifecycle, secrets, SOPS operations
 - `taskfiles/agents.yml` – operator helpers, xs wrappers, OAuth management
-- `taskfiles/checks.yml` – validation and smoke checks (incl. `checks:flake:transitive`)
-- `taskfiles/dev.yml` – git workflows, flake updates, site deployment
+- `taskfiles/checks.yml` – validation and smoke checks (incl. `checks:tasks` task-graph gate, `checks:host`, `checks:flake:transitive`)
+- `taskfiles/dev.yml` – git workflows, flake updates, site deployment, and the generated docs pipeline (`docs:build` / `docs:site` / `docs:sync`)
 - `taskfiles/moto.yml` – Motorola Android (Termux) shell, file transfers, and Charmbracelet Wish/Gum menu
 - `taskfiles/serv00.yml` – Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle (jisifu.serv00.net), and Gum menu
 - `taskfiles/dragoncourt.yml` – Alwaysdata Debian hosting, PHP/Wasm webserver (dragoncourt.alwaysdata.net), and Gum menu
@@ -30,6 +30,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 
 ## Truth boundaries
 - `taskfiles/site-manifest.json` is the site/static deployment metadata source; query it through `scripts/task/site-target.sh` or `dev:site:*` wrappers.
+- `lib/docs.nix` owns every generated doc page and the docs-site nav: pages come from the compiled `.#inventory` and `modules.toml`, `nix build .#docs` is the source of truth, and `docs/generated/` is its git-tracked copy (`task docs:sync`, gate `checks:docs:sync`).
 - `scripts/task/*` are helper implementations only.
 - `AGENTS.md` and `.agents/*` document routing/guidance; they do not execute.
 

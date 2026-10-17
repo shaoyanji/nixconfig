@@ -6,9 +6,11 @@
 
   programs.fuzzel.enable = true;
 
+  # GTK portal only (see modules/profiles/base-desktop-environment.nix): the
+  # KDE portal stack cost ~466 MiB for a file chooser Nautilus already covers.
   xdg.configFile."xdg-desktop-portal/niri-portals.conf".text = ''
     [preferred]
-    org.freedesktop.impl.portal.FileChooser=kde;gtk;
+    org.freedesktop.impl.portal.FileChooser=gtk;
   '';
 
   # KDE color scheme for portal file picker and other Qt/KDE apps
@@ -88,11 +90,10 @@
         clip-to-geometry = true;
       }
       {
+        # GTK portal only — the KDE portal is not installed any more.
         matches = [
           {app-id = "xdg-desktop-portal-gtk";}
           {app-id = "org.freedesktop.impl.portal.desktop.gtk";}
-          {app-id = "xdg-desktop-portal-kde";}
-          {app-id = "org.freedesktop.impl.portal.desktop.kde";}
         ];
         border.enable = false;
         open-floating = true;

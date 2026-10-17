@@ -293,31 +293,38 @@ instead of by default.
 ## 7. Regression guard — closure budgets
 
 Every number above is a reduction; none of it is protected. `closure-budgets.toml` holds
-a per-host `bytes` ceiling and `task checks:closure:budget` compares it against the same
-store-DB sum `dev:closure:size` prints — the check and the size view share one
-implementation, so they cannot disagree — and **exits non-zero** when a host is over
-budget. A host with no entry is reported `NOT BUDGETED`, never as a pass.
+a per-host **baseline** and `task checks:closure:budget` compares the derived budget
+against the same store-DB sum `dev:closure:size` prints — the check and the size view
+share one implementation, so they cannot disagree — and **exits non-zero** when a host is
+over budget. A host with no entry is reported `NOT BUDGETED`, never as a pass.
 
-| Host | Budget (bytes) | Measured (2026-10-12) | Headroom | Set with |
+The budget is computed, not typed:
+
+```
+budget = baseline_bytes × (1 + headroom_pct/100)
+```
+
+`baseline_bytes` is a *measurement* written by `task dev:closure:budget:adopt`, which
+records it in the managed `# >>> baseline` block at the bottom of the file. That is the
+whole ratchet: debloat → deploy → adopt → the smaller closure is now the ceiling. Nothing
+is hand-maintained, so a stale number cannot quietly make the gate meaningless. It did:
+a hand-written `37373908571` (34.9 GiB) ceiling sat **5.0 GiB** above a real 29.9 GiB
+closure, and the gate stayed green through every drift.
+
+| Host | Baseline (measured) | Headroom | Budget | Set with |
 | --- | --- | --- | --- | --- |
-| `frieren` | `37373908571` | `37003869872` = 34.5 GiB, 3949 paths (gen 83) | +1% (352.9 MiB) | `task dev:closure:size` |
+| `frieren` | `32104328080` = 29.9 GiB | +1.0% (306.2 MiB) | 30.2 GiB | `task dev:closure:budget:adopt` (2026-10-17) |
 
-That current measurement is worth reading against §2: the live closure is back to **3949
-paths / 34.5 GiB**, the *pre-L1* figures, even though L1 is still applied (the closure
-carries one Chromium, not two). The 33.8 GiB recorded after L1 has been given back by
-later changes — which is precisely the drift this guard exists to make visible instead of
-being discovered months later.
+Only **measured** hosts carry a baseline — an invented number is worse than none, so a host
+is added when it is next online and measured. Adoption measures the *local* machine, so a
+remote host joins the file when the command runs there (`ssh <host> task
+dev:closure:budget:adopt`) or its baseline is committed from that host's report; adopting
+one host never drops another's baseline, because the managed block is merged, not rewritten.
 
-Only **measured** hosts carry a budget — an invented number is worse than none, so a host
-is added when it is next online and measured (`task dev:closure:size HOST=<host>`). Budgets
-are a **ratchet**: the levers in §4 lower them, and raising one is a deliberate edit in its
-own commit.
-
-On the headroom, stated honestly: the +1% (352.9 MiB) absorbs byte drift from a
-`flake.lock` bump without hiding a lever of the size in §4 (703 MiB–5.1 GiB), but it *is*
-larger than the ~70 MiB Tier-1 font item in `docs/closure-debloat.md`. To make that class
-of change trip the gate, tighten the entry toward `measured` — the tolerance is the
-operator's choice, not a property of the tool.
+Adjustment knobs, in precedence order: an explicit `bytes` pin under `[hosts.<h>]` wins;
+then `baseline × headroom_pct` (per-host, falling back to `[defaults]`); then
+`HEADROOM_PCT=<n>` in the environment, which overrides *every* headroom for one run —
+useful to ask "would a zero-tolerance gate catch today's drift?" without editing the file.
 
 ```bash
 task checks:closure:budget                 # the local host
@@ -325,7 +332,16 @@ task checks:closure:budget HOST=frieren    # one host
 task checks:closure:budget ALL=1           # every host with an entry
 task checks:closure:budget HOST=frieren \
   TARGET=/nix/store/<built-toplevel>       # a build, before it is deployed
+
+task dev:closure:budget                    # same table, outside the checks group
+task dev:closure:budget:adopt              # re-baseline this host to its measured closure
 ```
+
+Every row prints its *basis* (`pin`, `base+1.0%`, …) next to the numbers, so a budget is
+auditable without opening the TOML: a pin and a baseline-plus-headroom ceiling are different
+promises, and the table says which one it measured against. `dev:closure:budget` shares the
+implementation with the gate, so it also exits non-zero when a host is over — the verdict is
+the same, it is simply reachable by name from `task --list`'s closure group.
 
 Exit `0` = within budget, `1` = over budget, `2` = budgets file or `yq` missing. The file
 is TOML and guarded by `task checks:toml:lint` like every other tracked `.toml`.

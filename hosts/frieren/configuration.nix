@@ -249,16 +249,20 @@ in {
         AutoEnable = "true";
         ControllerMode = "dual";
         FastConnectable = "true";
+        JustWorksRepairing = "always";
       };
       Policy = {
         AutoEnable = "true";
+        ReconnectAttempts = "0";
+        ReconnectIntervals = "1, 2, 4, 8, 16, 32, 64";
       };
     };
   };
 
-  # Automatically unblock Bluetooth rfkill whenever an adapter is plugged in or detected
+  # Automatically unblock Bluetooth rfkill and disable USB autosuspend on btusb adapters
   services.udev.extraRules = ''
     SUBSYSTEM=="rfkill", ATTR{type}=="bluetooth", ATTR{soft}="0"
+    ACTION=="add", SUBSYSTEM=="usb", DRIVERS=="btusb", ATTR{power/control}="on"
   ''; # --- Bluetooth rfkill safeguard (belt-and-suspenders) ---
   # The Ideapad EC (embedded controller) can boot with BT rfkill-blocked
   # (Fn+F8 state persisted across reboots), which bluez config alone cannot

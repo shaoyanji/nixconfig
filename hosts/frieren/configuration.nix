@@ -244,8 +244,22 @@ in {
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-    settings.Policy.AutoEnable = "true";
-  }; # --- Bluetooth rfkill safeguard (belt-and-suspenders) ---
+    settings = {
+      General = {
+        AutoEnable = "true";
+        ControllerMode = "dual";
+        FastConnectable = "true";
+      };
+      Policy = {
+        AutoEnable = "true";
+      };
+    };
+  };
+
+  # Automatically unblock Bluetooth rfkill whenever an adapter is plugged in or detected
+  services.udev.extraRules = ''
+    SUBSYSTEM=="rfkill", ATTR{type}=="bluetooth", ATTR{soft}="0"
+  ''; # --- Bluetooth rfkill safeguard (belt-and-suspenders) ---
   # The Ideapad EC (embedded controller) can boot with BT rfkill-blocked
   # (Fn+F8 state persisted across reboots), which bluez config alone cannot
   # override — bluetoothctl shows "No default controller available" despite

@@ -43,7 +43,7 @@ let
       repo = "stable-diffusion.cpp";
       rev = "f0aac524d3f29140e60ba78f3cfb16d6acea87db";
       fetchSubmodules = true;
-      sha256 = lib.fakeHash;
+      sha256 = "sha256-8Kjey4MaifK/GDEJ3dyamCmPq7AdtAxf+Zid6CKXFvQ=";
     };
   });
 

@@ -42,6 +42,7 @@ in {
     ./llm-server.nix
     ./parakeet.nix
     ./decision-models.nix
+    ./qwen-image.nix
   ];
 
   networking.hostName = "eisen";

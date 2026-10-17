@@ -29,7 +29,7 @@ Operational runbook and tooling for delegating heavy, memory-intensive, or long-
   * Hardware: Multi-core x86_64 workstation / server.
   * Storage: >860 GiB available on `/home/devji`.
   * Role: Always-on high-compute host.
-  * Installed Tooling: `agy` (v1.2.9), `uv`, `nix`, `aria2c`, `tmux`.
+  * Installed Tooling: `agy` (installed version), `uv`, `nix`, `aria2c`, `tmux`.
 
 **Key Benefit:** Decoupled execution. Once dispatched, the netbook lid can be closed or disconnected without interrupting the remote agent.
 

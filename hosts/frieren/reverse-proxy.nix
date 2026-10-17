@@ -262,6 +262,27 @@ in {
             proxy_read_timeout 5s;
           '';
         };
+
+        # SubZeroClaw-in-microVM: expose Eisen's decision router to the
+        # bridged subnet (Model B). The canary (192.168.83.10) talks only to
+        # the host (192.168.83.1); frieren proxies /eisen/ to Eisen's nginx
+        # /router/ (which strips to /v1/... on the router). The Host is
+        # forced to eisen.lan so Eisen's nginx matches its eisen.lan vhost
+        # (the canary's original Host, 192.168.83.1, would miss it).
+        # Isolation: the runner (SubZeroClaw, in the microVM) is on a
+        # different host from the model (Eisen); they connect only via this
+        # endpoint. The microVM has no direct LAN access to Eisen.
+        locations."/eisen/" = {
+          proxyPass = "http://192.168.3.87/router/";
+          extraConfig = ''
+            proxy_set_header Host "eisen.lan";
+            proxy_buffering off;
+            proxy_cache off;
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+            client_max_body_size 0;
+          '';
+        };
       };
 
       "vault.frieren.lan" = {

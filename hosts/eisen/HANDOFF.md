@@ -3,54 +3,94 @@
 Detailed architecture specification for running local MoE LLMs on Eisen's Xeon E5-2673 v3 (12c/24t) + 62 GiB DDR4 + AMD Radeon RX 5700 (8 GiB VRAM, **Vulkan/radv** — Navi 10 has no ROCm target).
 
 **Canonical Documentation**: [`.agents/deploy/hosts/eisen.md`](file:///home/devji/Documents/nixconfig/.agents/deploy/hosts/eisen.md)
-**Implementation**: [`hosts/eisen/llm-server.nix`](file:///home/devji/Documents/nixconfig/hosts/eisen/llm-server.nix) (generative LLM), [`hosts/eisen/decision-models.nix`](file:///home/devji/Documents/nixconfig/hosts/eisen/decision-models.nix) (Laya)
+**Implementation**: [`hosts/eisen/llm-server.nix`](file:///home/devji/Documents/nixconfig/hosts/eisen/llm-server.nix) (generative LLM), [`hosts/eisen/decision-models.nix`](file:///home/devji/Documents/nixconfig/hosts/eisen/decision-models.nix) (Laya), [`modules/services/llm-decision-router.nix`](file:///home/devji/Documents/nixconfig/modules/services/llm-decision-router.nix) (router)
+
+Updated **2026-10-17**. Merged to main: kolibri, parakeet, serving, bonsai-apply, skills-audit. Main tip `8fc3596` (kolibri `--reasoning-effort low` + Kev-4B fetch unit + scope fix). The old `laya-HANDOFF.md` (a 2026-10-09 verification checklist for a superseded Laya deployment — it still listed Kolibri as blocked and "no hosted Jev") was deleted; the current Laya state is in this doc.
 
 ---
 
 ## Serving Topology
 
-One OpenAI-compatible endpoint, two MoE models, swapped on demand by `services.llama-swap` (they cannot co-reside: ~21 GiB + ~44 GiB > 62 GiB RAM).
+One OpenAI-compatible endpoint, **three** models, swapped on demand by `services.llama-swap` (they cannot co-reside: ~21 GiB + ~44 GiB + ~6 GiB = ~71 GiB > 62 GiB RAM).
 
 ```
+SubZeroClaw ──> router :8000 (llm-decision-router)
+                    ├─ /v1/chat/completions ──> llama-swap :8080 ──> llama-server (one child per model, ${PORT})
+                    └─ /v1/decisions ──> TypeSafe Jev (cloud, 25s) ──> fallback: local Laya :8090
+
 http://eisen.lan/v1                       (nginx :80 -> 127.0.0.1:8080)
 https://eisen.<tailnet>.ts.net/v1         (services.tailscale.serve tcp:443)
 http://eisen:8080/v1                      (llama-swap on 0.0.0.0)
-        └─> llama-swap :8080 ──> llama-server (one child per model, ${PORT})
 ```
 
-`eisen.lan` resolves to the **tailnet IP** (`100.119.172.99`) via frieren's pi-hole (`hosts/frieren/dns.nix`), so the same name works on and off LAN. `ttl = 900` unloads an idle model so the other can load; `healthCheckTimeout = 600` tolerates multi-minute first loads off btrfs.
-
-Engine: `pkgs.llama-cpp.override { vulkanSupport = true; }`, shared flags `--threads 12 --ctx-size 32768 --flash-attn on --jinja --metrics --n-gpu-layers 99 --override-tensor exps=CPU --cache-type-k q8_0 --cache-type-v q8_0`.
+`eisen.lan` resolves to the **tailnet IP** (`100.119.172.99`) via frieren's pi-hole (`hosts/frieren/dns.nix`), so the same name works on and off LAN. `ttl = 900` unloads an idle model so another can load; `healthCheckTimeout = 600` tolerates multi-minute first loads off btrfs.
 
 ---
 
-## Models
+## Models (three, one at a time)
 
-### Primary Champion: Qwen3.6-35B-A3B (`qwen`)
-* **Architecture**: 35B total parameters, **~3B active per token** (`A3B`), Gated DeltaNet / linear attention + sparse MoE.
-* **Quantization**: `Q4_K_M` — 22,285,080,192 B (~20.8 GiB) from `bartowski/Qwen_Qwen3.6-35B-A3B-GGUF`.
-* **Hardware allocation**:
-  - **RX 5700 (8 GB GDDR6)**: all non-expert tensors (`--n-gpu-layers 99`) — attention, norms, embeddings, router/gate — plus the q8_0 KV cache under flash-attn.
-  - **Xeon + 62 GiB DDR4**: the full expert pool (`--override-tensor exps=CPU`, ~21 GiB), leaving ~40 GiB for Steam/Sunshine.
-* **Engine**: native `llama-server` via llama-swap — no Ollama daemon in the path.
+| Model | Aliases | Total / active | Quant | Weights | Engine (llama.cpp variant) | Speed |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Kolibri-1** (default) | `kolibri`, `aleph` | 78B / 3.46B | Q4_K_M, 44.2 GiB | `Kolibri-1-Q4_K_M.gguf` | upstream `836d571` + Hob-forge kolibri1 patch | 14.1 tok/s (bench) |
+| Qwen3.6-35B-A3B | `qwen` | 35B / ~3B | Q4_K_M, ~21 GiB + DFlash2 drafter | `Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf` | stock `0.7.0` (nixpkgs) | 13.5→19.0 tok/s |
+| Bonsai-2-27B | `bonsai` | 27B ternary | PTQ1_0, 5.9 GiB | `Ternary-Bonsai-2-27B-PTQ1_0.gguf` | PrismML fork `3ae4f51` (ternary) | 2.5 tok/s smoke (first gen) |
 
-### Alternative: Aleph-Alpha Kolibri-1 (`kolibri` / `aleph`)
-* **Architecture**: 78B total, **3.46B active**, German + English, Apache 2.0, context up to 262144.
-* **Quantization**: `Q4_K_M` — 47,454,113,472 B (~44.2 GiB) from `Hob-forge/Kolibri-1-GGUF`.
-* Tighter fit: requests for it trigger a swap that unloads Qwen first.
+Shared flags: `--threads 12 --parallel 1 --flash-attn on --jinja --metrics --n-gpu-layers 99 --override-tensor exps=CPU --cache-type-k q8_0 --cache-type-v q8_0`. Bonsai: ctx 16384, `--reasoning-effort medium`. Kolibri + Qwen: ctx 32768. Kolibri also runs `--reasoning-effort low` (`ee61bb1`): a "just say hi" went from 383 output tokens / 57s to 254 / 46s. Kolibri still thinks ~254 tokens for "hi" — 46s is roughly the floor with Kolibri + low effort. If SubZeroClaw needs to be snappy, that's the Qwen argument (shorter think, faster).
 
-Weights live on the 14.6 TB `/mnt/storage` btrfs array at `/mnt/storage/models/*.gguf`, kept in place by the idempotent `eisen-llm-qwen` / `eisen-llm-kolibri` fetch units (`ConditionPathExists` + resumable `curl -C -`). They are **not** Nix store paths — never hand-run `llama-server` or Ollama on this host.
+Weights live on the 14.6 TB `/mnt/storage` btrfs array at `/mnt/storage/models/*.gguf`, kept in place by idempotent fetch units (`ConditionPathExists` + resumable `curl -C -`). They are **not** Nix store paths — never hand-run `llama-server` or Ollama on this host. The gaming guard stops llama-swap when a Steam game runs (frees VRAM).
+
+**Bonsai bench pending**: a proper `llama-bench` + PQ2_0 bench (the 2.5 tok/s was a 38-token first-gen smoke sample). **Kolibri caveat**: the patch is community code (Seraphiel102 / Hob-forge); treat Kolibri output as "loads and talks", not numerically verified against Aleph Alpha.
+
+### Why three llama.cpp builds (not one)
+
+One build cannot serve all three **today** — each model needs a different llama.cpp variant:
+
+- **Bonsai** needs the PrismML fork: ternary TQ1 weights + ternary kernels. Upstream llama.cpp has no ternary support.
+- **Kolibri** needs the Hob-forge kolibri1 patch: the `kolibri1` architecture is not upstream. Stock llama.cpp errors `unknown arch 'kolibri1'`.
+- **Qwen** works on stock upstream llama.cpp (Qwen3 MoE is upstream-supported).
+
+Serving is one-at-a-time (llama-swap swaps) because RAM forbids all three loaded (71 > 62 GiB). Kolibri + Qwen alone = 65 > 62.
+
+**Recommendation**: keep the three builds (Nix-managed, disk only). Do **not** merge the Kolibri patch + Prism ternary into one fork — a maintenance trap (you'd own a fork and re-merge on every upstream update, and the patches come from different projects). The lever for fewer builds is dropping a model (e.g. if Kolibri proves strictly better than Qwen, drop Qwen), not merging forks. If upstream ever merges `kolibri1` + ternary, one build would work — not now.
 
 ---
 
-## Decision Models: Laya (`laya.lan`)
+## Switching models
 
-Alongside the generative endpoint, eisen serves **Laya** — a 421M "System One" decision model that answers typed questions about one document in a single forward pass and returns no text. It speaks the same `POST /v1/systemone` contract as TypeSafe's hosted Jev, so a Jev client works by changing the base URL. This fleet has no hosted Jev, so it is the offline stand-in.
+**Per-request** — set `"model"` in the chat-completions body to `kolibri-1` (or `kolibri` / `aleph`), `qwen3.6-35b-a3b` (or `qwen`), or `bonsai-2-27b` (or `bonsai`). Aliases work. llama-swap swaps (unloads the current model, loads the requested one).
 
+**Default** — for requests with no model, or a `policy:`-prefixed model, the router uses `services.llm-decision-router.defaultModel` (Nix option, default `qwen3.6-35b-a3b`; Eisen sets `kolibri-1` in `hosts/eisen/configuration.nix`). Change it there + rebuild/activate. For the direct binary (see Router), restart it with `DEFAULT_MODEL=<model>`.
+
+**SubZeroClaw** follows the default: its `~/.subzeroclaw/config` sends `request_extra = {"model":"policy:auto", ...}`, so the router normalizes it to the Nix default. To pin SubZeroClaw to a specific model, set `request_extra`'s `model` to that model's id — but the default is the intended path; keep it on `policy:auto`.
+
+**Check which model is loaded**:
+
+```bash
+curl -s http://127.0.0.1:8080/v1/models   # status: running / unloaded per model
 ```
-http://laya.lan/v1/systemone            (nginx :80 -> 127.0.0.1:8090)
-https://eisen.<tailnet>.ts.net:8443/v1/systemone
-```
+
+**Cold-load times** (approx, off btrfs): Kolibri ~4–5 min, Qwen ~2–3 min, Bonsai ~1 min. A request during a swap waits (llama-swap queues it) or times out: router 110s timeout, SubZeroClaw `--max-time 120`. Switching to a cold model can therefore exceed SubZeroClaw's cap — **pre-warm the model first** (send a request for it, wait for it to load) before running SubZeroClaw. The router does not return a "model loading" 503; fail-fast + retry is the current behavior.
+
+**Concurrency**: one generation slot (router, `--parallel 1` upstream). A second concurrent generation gets `429 {"error":{"code":"llm_busy","message":"LLM generation slot busy; retry later"}}`. A disconnected client frees the slot (slot fix, `76bab63`) — no more 90s slot holds from a dead client.
+
+---
+
+## Router (`llm-decision-router`)
+
+Go binary, port 8000, env-only config. Routes chat → llama-swap, decisions → Jev (cloud, 25s) → Laya fallback.
+
+- **Slot fix** (`76bab63`): releases the generation slot on client disconnect (watcher goroutine + `sync.Once`), so a dead client can't hold the slot while the upstream is stuck.
+- **Default model** (`b7fc8af`): `DEFAULT_MODEL` env / `services.llm-decision-router.defaultModel` Nix option (Eisen: `kolibri-1`). The chat handler normalizes missing / `policy:` models to the default.
+- **Static build**: Nix `buildGoModule` has `env.CGO_ENABLED = 0` (verified 2026-10-17: the Nix-built binary is statically linked, 7.3 MB). The remote builder does **not** run the full C chain for the router. Direct build: `CGO_ENABLED=0 go build`.
+- **Current state (2026-10-17)**: the router runs as a **direct binary** (`/tmp/llm-decision-router`, user unit `llm-router-direct.service`, env `DEFAULT_MODEL=kolibri-1`), **not** the Nix system service (which is stopped). The binary is in `/tmp` (ephemeral — it will not survive an Eisen reboot). The Nix declaration (service + package) is in the flake (module + Eisen config) but the service is stopped; the separate-flake declaration is deferred. To restore the Nix service: stop the direct binary first, then `sudo systemctl start llm-decision-router.service` — both can't hold :8000.
+
+---
+
+## Decision Models: Jev (cloud) + Laya (local fallback)
+
+SubZeroClaw's decisions go to the router's `/v1/decisions` → TypeSafe Jev (cloud, `DEFAULT_DECISION_MODEL=jev-latest`, 25s timeout) with fallback to local Laya on Jev failure. The router forwards the client's auth to Jev (it does not hold the key itself).
+
+**Laya** — a 421M "System One" decision model that answers typed questions about one document in a single forward pass and returns no text. It speaks the same `POST /v1/systemone` contract as TypeSafe's hosted Jev, so a Jev client works by changing the base URL.
 
 | | |
 | :--- | :--- |
@@ -59,27 +99,34 @@ https://eisen.<tailnet>.ts.net:8443/v1/systemone
 | Measured | 4 questions over a 274-token state: **0.43 s** (12 threads), 0.56 s (8), 0.98 s (4); 3-state batch **0.25 s**; RSS ~3.5 GiB |
 | Preloaded | `english` + `multilingual`; `typed-decisions` stays lazy (`LAYA_AUTO_TASK=1`) |
 | Package | `laya 0.4.1` in a uv venv at `/mnt/storage/decision/laya` |
+| Serving | **On-demand** via socket activation (`laya-serve.socket`); idle-stop after 900s of no served requests (`laya-serve-idle.timer`, fires every 5 min). It wakes on the first decision request. Idle-stop after 900s is configured but **not yet directly verified** (still pending). |
 
-**It needs no gaming guard** and is deliberately excluded from `llama-swap-gaming-guard`: it touches no VRAM, and the calls are short enough that a running game never starves. It also co-resides with Qwen rather than competing for the 62 GiB — which is what would make a **qwen + laya offline tandem** possible on this one box.
+**First-request 502 (working behavior, not a bug)**: after idle, Laya's cold start can exceed the router's 25s decision timeout, so the first decision 502s. SubZeroClaw retries and succeeds (Laya is warm by then). Do not "fix" this by lengthening the timeout — fail-fast + retry returns faster than waiting for the full load.
 
-`laya` is not in nixpkgs, so `eisen-laya-bootstrap.service` builds the venv once with uv onto `/mnt/storage` and marks it ready only on success (self-healing: a deleted venv or a half-finished install is retried on the next boot). Python and libstdc++ come from the store and are referenced by the system closure, so the venv's shebangs point at store paths that can never be collected out from under it. The bootstrap overrides the fleet's uv index — `modules/dev.nix` points `pip.index-url` at `test.pypi.org`, which carries no real releases.
+**It needs no gaming guard** and is deliberately excluded from `llama-swap-gaming-guard`: it touches no VRAM, and the calls are short enough that a running game never starves.
 
-**Kev-4B was evaluated and rejected for this host**: it serves only on CUDA, ROCm or Apple MLX, and the RX 5700 (Navi 10 / gfx1010) is outside ROCm's support matrix with 8 GiB against Kev-4B's ~16 GiB floor. Its llama.cpp route is closed too — Kev is a LoRA adapter plus pointer head on Qwen3.5-4B-Base, not a merged model.
+`laya` is not in nixpkgs, so the bootstrap unit builds the venv once with uv onto `/mnt/storage` and marks it ready only on success (self-healing: a deleted venv or a half-finished install is retried on the next boot). Python and libstdc++ come from the store and are referenced by the system closure, so the venv's shebangs point at store paths that can never be collected out from under it. The bootstrap overrides the fleet's uv index — `modules/dev.nix` points `pip.index-url` at `test.pypi.org`, which carries no real releases.
+
+**Known tension (flagged, not yet resolved with Joiu)**: Laya runs via a uv venv on `/mnt/storage`, which conflicts with the Nix-only rule (everything declarative in Nix). The code/services are Nix-declared; the venv is the exception.
+
+**Kev-4B — being tested (2026-10-17, supersedes the earlier rejection).** The earlier "rejected" note (CUDA/ROCm/MLX-only, LoRA-only) is obsolete: the merged/converted GGUF at `ggml-org/Kev-4B-GGUF` (Apache-2.0) serves natively in stock llama.cpp 0.7.0 (build 11669+) via `POST /v1/systemone` (decision support landed in build 11361). Fetch unit `eisen-llm-kev` pulls `Kev-4B-Q8_0.gguf` (~4.2 GB) into `/mnt/storage/models/` (download in progress 2026-10-17 ~12:05). Plan: run it as its **own llama-server** (own port, e.g. :8092 — NOT via llama-swap, which would evict generative models; Kev-4B ~4 GB co-resides fine in 62 GB RAM) + router fallback for >500-token decision inputs (Laya's limit). **Correction to the earlier "8,192 tokens / 16x Laya" figure**: that came from the **Kev-0.8b** card, not Kev-4B. Kev-4B's GGUF declares a 262,144-token context, but its **validated decision context is not published** — test on your own long inputs before trusting it. Publisher metrics (unverified): transfer-v4 0.838, breadth-v1 0.69, hard-v1 0.803, devtools-v1 0.756.
 
 > **Accuracy is not Jev's.** On the public 49-task / 869-case benchmark Jev scores 0.966 macro accuracy against Laya-base 0.583, and on large option sets the base checkpoints fall to ~0.43 where Jev holds 0.87. Do not let this gate a destructive decision on its own, and gate on `answer_confidence` fit on your own data — Laya's `confidence` is `1 - normalized entropy`, so a Jev cutoff does not transfer.
 
 ---
 
-## Speech: Qwen3-TTS (`tts.lan`)
+## Speech: Parakeet (STT) + Qwen3-TTS
 
-Offline, OpenAI-compatible text-to-speech alongside the text endpoints, also on the RX 5700 via **Vulkan**. Implementation: [`modules/services/qwen-tts.nix`](../../modules/services/qwen-tts.nix); enablement + commands: [`hosts/eisen/TTS.md`](./TTS.md).
+**Parakeet Redux (STT)** — service `parakeet-stt` on 127.0.0.1:8091, nginx merges `/stt/` into the `eisen.lan` vhost (`http://eisen.lan/stt/transcribe`, 600s timeouts, 25 MB cap). **Endpoint contract: POST `/transcribe` takes RAW audio bytes in the request body** (multipart fails — ffmpeg chokes on the MIME body). Weights in `/mnt/storage/parakeet` (six mkFetch units, NOT the store). Code: `hosts/eisen/parakeet.nix` + vendored `parakeet-transcribe.py` (community eschmidbauer/parakeet-redux-onnx export, NOT Moondream-official) + `parakeet-server.py` (stdlib HTTP). CPU-only (RX 5700 has no ROCm, ONNX has no Vulkan path). Real-speech test passed (exact transcription of "The quick brown fox jumps over the lazy dog.", 2.64s). Parakeet gets its own endpoint (not llama-swap — it execs llama-server, Parakeet is ONNX).
+
+**Qwen3-TTS** (`tts.lan`) — offline, OpenAI-compatible text-to-speech alongside the text endpoints, also on the RX 5700 via **Vulkan**. Implementation: [`modules/services/qwen-tts.nix`](../../modules/services/qwen-tts.nix); enablement + commands: [`hosts/eisen/TTS.md`](./TTS.md).
 
 ```
 http://tts.lan/v1/audio/speech            (nginx :80 -> 127.0.0.1:8181)
 https://eisen.<tailnet>.ts.net:8444/…     (tailscale serve)
 ```
 
-Runtime `ServeurpersoCom/qwentts.cpp` (C++17/GGML, MIT) built from source with `-DGGML_VULKAN=ON`; its own `tts-server` is wrapped (no Python). Weights `Serveurperso/Qwen3-TTS-GGUF` — `qwen-talker-1.7b-customvoice-Q4_K_M.gguf` + `qwen-tokenizer-12hz-Q8_0.gguf` on `/mnt/storage/tts/models`, fetched by idempotent oneshot units. Named voices: `vivian` (default), `serena`, `uncle_fu`, `ryan`, `aiden`, `ono_anna`, `sohee`, `eric`, `dylan`; zero-shot cloning registers via the runtime's voice registry. Loopback-only `:8181`, exposed through nginx and `tailscale serve` — never in the firewall.
+Runtime `ServeurpersoCom/qwentts.cpp` (C++17/GGML, MIT) built from source with `-DGGML_VULKAN=ON`; its own `tts-server` is wrapped (no Python). Weights `Serveurperso/Qwen3-TTS-GGUF` — `qwen-talker-1.7b-customvoice-Q4_K_M.gguf` + `qwen-tokenizer-12hz-Q8_0.gguf` on `/mnt/storage/tts/models`, fetched by idempotent oneshot units. Named voices: `vivian` (default), `serena`, `uncle_fu`, `ryan`, `aiden`, `ono_anna`, `sohee`, `eric`, `dylan`; zero-shot cloning registers via the runtime's voice registry. Loopback-only `:8181`, exposed through nginx and `tailscale serve` — never in the firewall. Note: `default` is not a valid speaker (errors `unknown speaker 'default'`) — use `aiden`.
 
 ---
 
@@ -108,13 +155,45 @@ https://eisen.<tailnet>.ts.net:8445/v1/images… (tailscale serve)
 
 ### 3. Storage & Deployment Paths
 * **Storage Location**: `/mnt/storage/image/models/` on the 14.6 TB btrfs array.
-* **Fetch Automation**: Idempotent systemd oneshot units (`eisen-image-models.service`) downloading model checkpoints via resumable `curl -C -` guarded by `ConditionPathExists`.
-* **Runtime Packaging**: Managed via a Python/uv venv under `/mnt/storage/image/venv` (or native C++/GGML wrapper when upstream GGML DiT support lands), with store-pinned Python and Vulkan libraries.
+* **Fetch Automation**: Idempotent systemd oneshot units (`eisen-image-dit/-encoder/-vae/-mmproj`, committed `5201794`) downloading model checkpoints via resumable `curl -C -` guarded by `ConditionPathExists`. **Downloads DONE 2026-10-17 ~11:49** (all 4 files final, ~14.1 GB: DiT Turbo Q8_0 7.12 GiB, encoder Q4_K_M 4.68 GiB, VAE bf16 0.63 GiB, mmproj F16 1.08 GiB) into `/mnt/storage/image/models/`.
+* **Runtime**: **stable-diffusion.cpp** (leejet, CPU/Vulkan, no CUDA needed). nixpkgs has `stable-diffusion-cpp`, but its pinned commit (`656a135`, 2026-09-18) **predates Qwen-Image 2.1 support** (~Sep 23) — so the flake must **override the src to a newer post-Sep-23 commit** (reusing nixpkgs' derivation: CMake + ggml + Vulkan). `llm-agents.nix` (numtide flake input) does **not** carry stable-diffusion.cpp. **Two traps (flagged before building the service)**: (1) Turbo schedule/CFG — sd.cpp CLI defaults are 20 steps / CFG 6.0; a Turbo GGUF alone does NOT make sd.cpp use Turbo's 8-step / CFG ~1 schedule, so the service must set the schedule/CFG **explicitly** and the first test generation must verify it actually ran 8 steps at CFG ~1. (2) VRAM fit — weights ≈ 14.6 GB vs RX 5700's 8 GB VRAM; the encoder (and/or part of the DiT) must live on CPU / be swapped. First test measures peak VRAM + time at 1024×1024 before any endpoint promise. **License flag**: Turbo is **Qwen Research License (research/eval only, non-commercial)**; the base Qwen-Image-2.1 (Apache-2.0) is the alternative if the license matters.
 
-### 4. Next-Session Activation Checklist (When Eisen Powers On)
-1. Verify network reachability: `ping -c 3 192.168.3.87` (or tailnet `100.119.172.99`).
-2. SSH to Eisen: `ssh eisen`.
-3. Check btrfs pool space: `df -h /mnt/storage`.
-4. Materialize `/mnt/storage/image/models` and test checkpoint download.
-5. Benchmark 8-step generation latency on RX 5700 Vulkan vs CPU 12-thread baseline.
-6. Wire reverse proxy and tailscale serve port `:8445`.
+### 4. Status (2026-10-17)
+- Downloads: DONE (see §3). sd.cpp pin (nixpkgs override to a post-Sep-23 commit): pending.
+- Service + endpoint (`image.lan` nginx:80 → :8282, tailscale serve:8445, OpenAI-compatible `/v1/images/generations`): pending. sd.cpp's own server OpenAI-compatibility is NOT verified — the Parakeet-style stdlib-HTTP wrapper translating to the sd.cpp CLI is the fallback.
+- First test generation (with the schedule/CFG + offload plan): pending.
+- Benchmark 8-step generation latency on RX 5700 Vulkan vs CPU 12-thread baseline: pending (first test measures peak VRAM + time at 1024×1024).
+
+---
+
+## `.agents/skills/` — audit recommendations (2026-10-17)
+
+Audit of all 32 skills in `.agents/skills/` (read-only, report `~/workspace/skills-audit-2026-10-17.md`). **Counts: 16 KEEP / 15 REWRITE / 1 MERGE.** These are **recommendations, not done work** — the rewrites below are proposals, not applied changes.
+
+**Already done + merged (2026-10-17):**
+- `jevdecide`: live `TYPESAFE_API_KEY` deleted + history purged (key rotated by Joiu). Non-REDACTED key count = 0 in every commit touching the file on all branches.
+- `agy` version pin removed from skills (7 mentions → "installed version"; Nix-side effective pin is the `llm-agents` flake-lock rev).
+- `google-drive` skill deleted entirely (Joiu's call).
+
+**REWRITE (13 remaining):** `antigravity` (malformed frontmatter, stale agy 1.2.16 vs installed 1.3.5, every example bakes in `--dangerously-skip-permissions`), `frieren-offload` (core tool `agy-offload` doesn't exist, nightly runners auto-delete `~/HANDOFF.md`/`~/SYSTEM.md`), `crush` (calls nonexistent `terminal()`/`process()`, `--yolo` default contradicts its own warning), `agents` (3/4 sections Legacy with no working invocation, `service-oauth.sh` doesn't exist), `ai-memory` (stale layout — live v3.0.0 uses `~/.local/share/ai-memory`, `:49374`), `home-assistant` (§5 points at `media-stack.nix`, real module is `modules/services/home-assistant.nix`), `bountystash` (pre-push hook asks about the wrong project `cv-resume`), `qmd` (references a `skills` collection that isn't registered + a `jev` skill that doesn't exist), `simplex-admin` (L169 contradicts L97 on the allowlist format, `SIMPLEX_AUTO_ACCEPT` defaults true with no warning), `toon` (`--no-coerce` doesn't exist — real flag `--no-strict`; §2 is a dead macOS path), `officecli` (stub — binary missing, `pkgs.llm-agents.officecli` has zero hits; REWRITE-or-DELETE), `moto` (`moto` SSH alias not defined in `~/.ssh/config` on Eisen), `iventoy` (§4A lists ISO subdirs that don't exist in `/Volumes/data/isos`).
+
+**MERGE (1):** `services` → `infra` (every row routes to `infra:*`/`checks:*`/`dev:*`; fold the alias table into `infra/SKILL.md`, delete `services`). Only hard merge. Redundancy map: `reasonix`/`crush`/`antigravity`/`frieren-offload` overlap on delegation (discriminators first, no bulk merge); `envs`/`dragoncourt`/`serv00` share hosting shape but different hosts (keep per-host split); `wikisearch`/`qmd`/`parallel-cli` are adjacent search (routing lines, no merge); `reasonix`+`stt` duplicate the same `command -v` → `nix shell github:numtide/llm-agents.nix#X` fallback block (extract to one shared snippet).
+
+**Cross-cutting (5 patterns):**
+1. **No confirmation policy for destructive actions** (dominant defect). `data:clean:*` deletes, `dev` push/merge/deploy, `dragoncourt`/`envs` push/harden, `serv00` harden/stop/cron-disable, `simplex-admin` sends, `wikisearch` rebuild, `infra` deploy/rollback/GC, `ai-memory reset`, `apps:sync:push`, `bountystash:deploy:prod`, `paste` `pb rm`, `moto:obsidian:sync`, `jevdecide` Trash move — nearly all ungated. `crush` (`--yolo`) and `frieren-offload` (`--dangerously-skip-permissions`) normalize bypassing the prompt. **Fix: one shared rule — confirm before delete / overwrite / send / deploy / push / stop / restart — stated at each destructive step, not delegated to Taskfiles.**
+2. **Phantom dependencies** — skills cite binaries/paths/tasks/skills that don't exist (`jev-decide`, `jev`/`email` skills, `officecli` package, `moto` `~/.ssh/config`, `qmd` `skills` collection, `agents` `service-oauth.sh`, `ai-memory` paths, `frieren-offload` `agy-offload`, `antigravity` HANDOFF.md, `toon` archive path, `crush` `terminal()`/`process()`). Fix: a verification gate before a skill ships — every cited binary/path/task must resolve.
+3. **Secrets in the wrong place** — live key in `jevdecide` (done); secrets on shell command lines (`google-drive` `client_secret`, `stt` API key); missing token hygiene (`home-assistant`). Fix: secrets only from files/env, never on command lines or in repo files.
+4. **Single-session leakage + copy-paste drift** — `antigravity`'s email-cleansing job, `agents`' anecdote, `burgernas`' dated state, `envs`' `alwaysdata` tag, agy version three ways (1.2.9 / 1.2.16 / installed 1.3.5), `home-assistant` §1 vs §5 disagreeing on the defining file. Fix: session/job details go to runbooks, not SKILL.md; single source of truth for versions/paths.
+5. **Missing trigger/routing, unstated host scope, frontmatter rot** — no "runs on: X" line (`wikisearch` frieren-only, `simplex-admin` frieren daemon, `apps` `/srv/data` path); overlapping triggers with no discriminator; `related_skills` pointing at nonexistent skills, malformed YAML (`antigravity`), inconsistent frontmatter. Fix: every skill gets first-lines "runs on / use when / pick me over" header; validate frontmatter + cross-refs in a check task.
+
+**KEEP (16, with minor fixes noted in the audit report):** `agent-browser`, `apps`, `burgernas`, `checks`, `data`, `dev`, `dragoncourt`, `envs`, `infra`, `parallel-cli`, `paste`, `pdfvision`, `reasonix`, `serv00`, `stt`, `wikisearch`.
+
+---
+
+## Known state / caveats
+
+- **Eisen's SSH tunnel drops frequently** (broken pipes). Keep SSH calls short; run long jobs via `systemd-run --user` (survives disconnects; `nohup` / `setsid` / `disown` do **not** — Tailscale SSH kills the whole session's processes on disconnect). Never detect a build by `pgrep -f "nixos-rebuild …"` (the pattern self-matches the remote bash wrapper); poll a done-file marker.
+- Eisen enforces Tailscale SSH (extra approval per session). `sudo -n` works.
+- **Rebuild + activate**: `nixos-rebuild test` builds; if activation fails on polkit over SSH ("requires interactive authentication"), activate the built closure directly: `sudo -n /nix/store/<hash>-nixos-system-eisen-.../bin/switch-to-configuration test`. Use `test`, not `switch` (boot entry unchanged) unless you intend to change the boot entry.
+- **Two checkouts on Eisen**: the working repo is `~/Documents/nixconfig` (main `8fc3596`, all merges + fixes). The `~/nixconfig` checkout is behind (`e520abc`, pre-merge). Push to origin, then pull in `~/nixconfig`.
+- **Follow-ups (not gating)**: Bonsai `llama-bench` + PQ2_0 bench. Router test hardening (defer-close + longer timeout for the Nix sandbox) for the later separate flake. Router Nix declaration in a separate flake (deferred by Joiu).

@@ -40,7 +40,9 @@ in {
     ../../modules/services/qwen-tts.nix
     ../../modules/services/llm-decision-router.nix
     ./llm-server.nix
+    ./parakeet.nix
     ./decision-models.nix
+    ./qwen-image.nix
   ];
 
   networking.hostName = "eisen";
@@ -135,6 +137,7 @@ in {
   services.llm-decision-router = {
     enable = true;
     port = 8000;
+    defaultModel = "kolibri-1";
   };
 
   # --- Storage drives ---

@@ -18,5 +18,5 @@ __pycache__/
 .task/
 # Generated closure report trees (regenerate: task dev:closure:toml)
 docs/closures/
-# Registry mirror is now a tracked pointer to docs/generated/modules-registry.md
-# (built by lib/docs.nix; refresh with `task docs:sync`).
+# Generated registry mirror (regenerate: task dev:modules:sync)
+docs/modules-registry.md

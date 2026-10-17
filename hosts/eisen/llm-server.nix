@@ -288,7 +288,7 @@ in {
         # Bonsai 2 27B (dense ternary, PTQ1_0) on the PrismML fork.
         # No exps=CPU (dense, no experts), no DFlash (vocab/arch mismatch).
         # Verify weights after fetch: 5,946,648,928 bytes,
-        # sha256 53107f53aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3.
+        # sha256 53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3.
         "bonsai-2-27b" = {
           cmd = mkCmd {
             model = bonsaiFile;

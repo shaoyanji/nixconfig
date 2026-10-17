@@ -144,7 +144,11 @@ def _start_sd_server():
                 "--offload-to-cpu",
             ],
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            # stderr -> the wrapper's stderr -> the journal, so a
+            # failed sd-server start is visible in journalctl -u qwen-image.
+            # (DEVNULL hid the /dev/dri denial that caused the cold-load
+            # timeouts.)
+            stderr=sys.stderr,
         )
     deadline = time.time() + SD_START_TIMEOUT
     while time.time() < deadline:

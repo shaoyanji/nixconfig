@@ -6,7 +6,9 @@
   nixConfig = {
     extra-substituters = [
       "https://cache.numtide.com"
+      "http://100.97.61.65:5000"
       "http://192.168.3.25:5000"
+      "http://192.168.3.98:5000"
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="

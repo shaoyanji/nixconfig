@@ -64,6 +64,13 @@ in {
   ];
   networking.hostName = "frieren";
 
+  # nixpkgs enables speechd for any graphical desktop
+  # (services/misc/graphical-desktop.nix: `services.speechd.enable =
+  # lib.mkDefault true`). On this NAS it only buys speech-dispatcher → mbrola →
+  # mbrola-voices, measured 2026-10-17 at ~650 MiB. A plain `false` beats the
+  # mkDefault; nothing in the repo or the desktop setup uses a speech daemon.
+  services.speechd.enable = false;
+
   # Frieren signs SSH user certificates like the workstations (aristotle,
   # poseidon): the CA private key is already deployed via sops-nix
   # (modules/sops.nix → ~/.ssh/user_ca_key), so enable the client-cert

@@ -1165,7 +1165,9 @@ task dev:config:hash-update    # runs nix-hash-update.sh
 | `AGENTS.md`                          | This file — canonical agent routing and codebase manual                |
 | `inventory.toml`                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
 | `docs/inventory-schema.md`           | Inventory schema, compiled artifacts, and the automatic checks          |
-| `docs/fleet-inventory.md`            | Fleet device catalog, hardware profiles, roles & operating disciplines |
+| `docs/generated/fleet-inventory.md`  | Fleet catalog + per-host pages, built from `inventory.toml` by `lib/docs.nix` (`task docs:sync`) |
+| `docs/generated/modules-registry.md` | Knob registry, built from `modules.toml` by `lib/docs.nix`             |
+| `docs-site/`                         | HTML site; page list + generated pages come from `nix build .#docs`   |
 | `docs/closure-reduction.md`          | Closure size levers, evidence chains, and the runtime/interactive/one-shot tiers |
 | `docs/closure-debloat.md`            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |
 | `.agents/fleet-matrix.md`            | Compact fleet context matrix for LLMs and agent prompts                |

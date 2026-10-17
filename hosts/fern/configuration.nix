@@ -20,7 +20,6 @@
 # stable handle is its tailnet name (`fern`) / tailnet address, or a DHCP
 # reservation made on the router.
 {
-  config,
   pkgs,
   lib,
   ...

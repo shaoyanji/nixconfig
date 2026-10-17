@@ -23,12 +23,17 @@
 #   toml [TARGET]            nested tree (closure -> subsystem -> top packages)
 #                            for handoff / agent-to-agent reports
 #   diff A [B]               closure size deltas (B defaults to current-system)
-#   budget [TARGET]          check a host's closure against its declared budget
+#   budget [TARGET]          check a host's closure against its DYNAMIC budget
+#                            (baseline × (1 + headroom), or an absolute pin)
 #                            in closure-budgets.toml (HC-4); --all checks every
 #                            host that has an entry
+#   adopt                    measure the LOCAL host and rewrite the managed
+#                            baseline block in closure-budgets.toml (the ratchet)
 #   tui                      interactive: pick host, then pick a view
 #
 # Flags: --host NAME  --store URI  --refresh  --all
+# Env:   HEADROOM_PCT=<n>   one-off headroom for a budget check
+#        BUDGETS_FILE=<p>   alternate budget file (default closure-budgets.toml)
 # ==============================================================================
 
 set -euo pipefail
@@ -83,18 +88,35 @@ host_label() { if [ -n "$REMOTE_TARGET" ]; then printf '%s' "$HOST"; else printf
 # invalidates old caches instead of silently serving stale-shaped data.
 cache_key() { printf '%s|%s|json-v2' "$STORE_URI" "$1" | sha256sum | cut -c1-16; }
 
+# Resolve a LOCAL root symlink before it becomes a cache key. The default
+# target is /run/current-system, which is the SAME string on every generation;
+# hashing it unresolved pinned the cache to the first generation ever measured,
+# so `dev:closure:*` silently described a week-old system (measured 2026-10-17:
+# cached report said 3949 paths / 34.5 GiB while the live closure was 3229
+# paths). A remote store URI is left untouched — its target is the remote path.
+resolve_target() {
+  local t="$1"
+  if [ -z "$STORE_URI" ] && [ -e "$t" ]; then
+    readlink -f "$t" 2>/dev/null || printf '%s' "$t"
+  else
+    printf '%s' "$t"
+  fi
+}
+
 load_json() {
-  local key cache
-  key="$(cache_key "$1")"
+  local key cache t
+  t="$(resolve_target "$1")"
+  key="$(cache_key "$t")"
   cache="$CACHE_DIR/$key.json"
-  if [ "$REFRESH" = 1 ] || [ ! -s "$cache" ]; then nix path-info "${NIX_ARGS[@]}" --recursive "$1" >"$cache"; fi
+  if [ "$REFRESH" = 1 ] || [ ! -s "$cache" ]; then nix path-info "${NIX_ARGS[@]}" --recursive "$t" >"$cache"; fi
   printf '%s' "$cache"
 }
 # path<TAB>narSize<TAB>closureSize
 entries() {
-  local key
-  key="$(cache_key "$1")"
-  load_json "$1" >/dev/null
+  local key t
+  t="$(resolve_target "$1")"
+  key="$(cache_key "$t")"
+  load_json "$t" >/dev/null
   jq -r 'to_entries[] | [.key, (.value.narSize // 0), (.value.closureSize // 0)] | @tsv' "$CACHE_DIR/$key.json"
 }
 total_of() { entries "$1" | awk -F'\t' '{s+=$2} END{print s+0}'; }
@@ -117,7 +139,15 @@ subsystem_of() {
     *font* | *noto* | *dejavu* | *freetype*) echo "fonts" ;;
     *ffmpeg* | *gstreamer* | *gst-* | *libav*) echo "media" ;;
     *jdk* | *jre* | *maven* | *gradle*) echo "java" ;;
-    *torch* | *transformers* | *llama* | *onnx*) echo "ai" ;;
+    *torch* | *transformers* | *llama* | *onnx* | *triton*) echo "ai" ;;
+    # Attribution buckets added 2026-10-17, after they held the largest single
+    # items in the frieren closure and were all landing in `other`: tessdata
+    # `all` (1.0 GiB), libreoffice (1.5 GiB), electron pairs (0.7 GiB),
+    # chromium/zen browsers (1.1 GiB).
+    *tesseract* | *tessdata*) echo "ocr" ;;
+    *libreoffice* | *onlyoffice*) echo "office" ;;
+    *electron*) echo "electron" ;;
+    *chromium* | *firefox* | *zen-*) echo "browser" ;;
     nixos-system-* | *nix-2* | *nixos-*) echo "nix" ;;
     *) echo "other" ;;
   esac
@@ -207,34 +237,114 @@ budget_host() {
   if [ -n "$HOST" ] && [ "$HOST" != "local" ]; then printf '%s' "$HOST"; else printf '%s' "$SELF_HOST"; fi
 }
 
-# bytes for a host, or empty when the host has no entry.
-budget_of() { yq -r ".hosts.\"$1\".bytes // \"\"" "$BUDGETS_FILE" 2>/dev/null; }
+# Headroom policy: HEADROOM_PCT env > [hosts.<h>.headroom_pct] > [defaults].
+default_pct() { yq -r '.defaults.headroom_pct // 1.0' "$BUDGETS_FILE" 2>/dev/null || echo 1.0; }
+
+budget_pct() { # host -> percent
+  local h="$1" pct
+  if [ -n "${HEADROOM_PCT:-}" ]; then
+    printf '%s' "$HEADROOM_PCT"
+    return
+  fi
+  pct="$(yq -r ".hosts.\"$h\".headroom_pct // \"\"" "$BUDGETS_FILE" 2>/dev/null)"
+  if [ -z "$pct" ] || [ "$pct" = "null" ]; then pct="$(default_pct)"; fi
+  printf '%s' "$pct"
+}
+
+budget_baseline() { yq -r ".hosts.\"$1\".baseline.bytes // \"\"" "$BUDGETS_FILE" 2>/dev/null; }
+
+# budget spec for a host as "bytes<TAB>basis"; empty when the host has neither a
+# pin nor an adopted baseline. The basis column is what makes the number
+# auditable: a pin and a base+% ceiling are different promises.
+budget_spec() { # host
+  local h="$1" pin base pct
+  pin="$(yq -r ".hosts.\"$h\".bytes // \"\"" "$BUDGETS_FILE" 2>/dev/null)"
+  if [ -n "$pin" ] && [ "$pin" != "null" ]; then
+    printf '%s\tpin\n' "$pin"
+    return
+  fi
+  base="$(budget_baseline "$h")"
+  if [ -z "$base" ] || [ "$base" = "null" ]; then return 0; fi
+  pct="$(budget_pct "$h")"
+  printf '%s\tbase+%s%%\n' "$(awk -v b="$base" -v p="$pct" 'BEGIN{printf "%d", b*(1+p/100)}')" "$pct"
+}
 
 budget_header() {
-  echo "=== closure budget — ${BUDGETS_FILE} ==="
-  printf '%-14s %14s %14s  %s\n' "host" "budget" "actual" "status"
+  echo "=== closure budget — ${BUDGETS_FILE} (dynamic: baseline × (1 + headroom)) ==="
+  printf '%-14s %12s %12s  %-12s  %s\n' "host" "budget" "actual" "basis" "status"
 }
 
 # One table row. Returns 1 when the host is over budget — the failure this whole
 # subcommand exists to surface.
 budget_line() { # host actual-bytes
-  local h="$1" actual="$2" budget delta pct
-  budget="$(budget_of "$h")"
-  if [ -z "$budget" ] || [ "$budget" = "null" ]; then
-    printf '%-14s %14s %14s  NOT BUDGETED (add [hosts.%s] to %s)\n' \
-      "$h" "-" "$(human "$actual")" "$h" "$BUDGETS_FILE"
+  local h="$1" actual="$2" spec budget basis delta pct
+  spec="$(budget_spec "$h")"
+  if [ -z "$spec" ]; then
+    printf '%-14s %12s %12s  %-12s  %s\n' \
+      "$h" "-" "$(human "$actual")" "-" "NOT BUDGETED (task dev:closure:budget:adopt HOST=$h)"
     return 0
   fi
+  IFS=$'\t' read -r budget basis <<<"$spec"
   delta=$((actual - budget))
   if [ "$delta" -le 0 ]; then
-    printf '%-14s %14s %14s  OK (%s under)\n' \
-      "$h" "$(human "$budget")" "$(human "$actual")" "$(human "$((-delta))")"
+    printf '%-14s %12s %12s  %-12s  %s\n' \
+      "$h" "$(human "$budget")" "$(human "$actual")" "$basis" "OK ($(human "$((-delta))") under)"
     return 0
   fi
   pct="$(awk -v d="$delta" -v b="$budget" 'BEGIN{printf "%.1f", (b?100*d/b:0)}')"
-  printf '%-14s %14s %14s  OVER by %s (%s%%)\n' \
-    "$h" "$(human "$budget")" "$(human "$actual")" "$(human "$delta")" "$pct"
+  printf '%-14s %12s %12s  %-12s  %s\n' \
+    "$h" "$(human "$budget")" "$(human "$actual")" "$basis" "OVER by $(human "$delta") (${pct}%)"
   return 1
+}
+
+# Adopt the local host's measured closure as its new baseline. The measurement is
+# written into the managed block, so this file's policy/comments survive.
+do_budget_adopt() {
+  local h actual on block merged
+  h="$(budget_host)"
+  if [ "$h" != "$SELF_HOST" ] && [ "$h" != "local" ]; then
+    echo "adopt measures the LOCAL closure only (got '$h'); run it on $h" >&2
+    exit 2
+  fi
+  [ -f "$BUDGETS_FILE" ] || { echo "missing $BUDGETS_FILE" >&2; exit 2; }
+  actual="$(total_of "$(target 1)")"
+  on="$(date +%F)"
+  block="$(mktemp)"
+  merged="$(mktemp)"
+  {
+    yq -r '.hosts | to_entries[] | select(.value.baseline.bytes) | [.key, .value.baseline.bytes, (.value.baseline.measured_on // "")] | @tsv' "$BUDGETS_FILE"
+    printf '%s\t%s\t%s\n' "$h" "$actual" "$on"
+  } | awk -F'\t' '!seen[$1]++' | sort -k1,1 |
+    while IFS=$'\t' read -r host bytes date; do
+      printf '[hosts.%s.baseline]\nbytes = %s\nmeasured_on = "%s"\n\n' "$host" "$bytes" "$date"
+    done > "$block"
+  # Splice the managed block; append it when the markers are not there yet.
+  BLOCK="$block" awk '
+    /^# >>> baseline/ {
+      print
+      while ((getline line < ENVIRON["BLOCK"]) > 0) print line
+      print "# <<< baseline"
+      skipping = 1
+      drop = 0
+      next
+    }
+    /^# <<< baseline/ { skipping = 0; next }
+    skipping { next }
+    # A stray [hosts.<h>.baseline] table outside the managed block would be a
+    # duplicate definition once the block carries that host; the block owns
+    # baselines, so drop the stray table (its values were merged above).
+    /^\[hosts\.[A-Za-z0-9:_-]+\.baseline\]/ { drop = 1; next }
+    drop && /^\[/ { drop = 0 }
+    drop { next }
+    { print }
+  ' "$BUDGETS_FILE" > "$merged"
+  if ! grep -q '^# >>> baseline' "$merged"; then
+    { echo; echo '# >>> baseline (managed by `task dev:closure:budget:adopt` — do not edit)'; cat "$block"; echo '# <<< baseline'; } >> "$merged"
+  fi
+  mv "$merged" "$BUDGETS_FILE"
+  rm -f "$block"
+  echo "adopted $h baseline: $(human "$actual") ($actual bytes) on $on"
+  do_budget
 }
 
 # total narSize of a target read from a named store URI — used by --all, which
@@ -313,6 +423,11 @@ case "$CMD" in
     ;;
   dot) d="$CACHE_DIR/raw.$$.dot"; write_dot "$d" "$(target 1)"; cat "$d"; rm -f "$d" ;;
   toml) do_toml "$(target 1)" ;;
+  adopt)
+    [ -f "$BUDGETS_FILE" ] || { echo "Error: '$BUDGETS_FILE' not found (run from the repo root, or set BUDGETS_FILE)." >&2; exit 2; }
+    command -v yq >/dev/null 2>&1 || { echo "Error: yq is required for budget updates." >&2; exit 2; }
+    do_budget_adopt
+    ;;
   budget)
     [ -f "$BUDGETS_FILE" ] || { echo "Error: '$BUDGETS_FILE' not found (run from the repo root, or set BUDGETS_FILE)." >&2; exit 2; }
     command -v yq >/dev/null 2>&1 || { echo "Error: yq is required for budget lookups." >&2; exit 2; }

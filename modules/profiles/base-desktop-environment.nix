@@ -54,19 +54,24 @@ in {
     playerctl
   ];
 
+  # GTK portal only. The KDE portal was here for its file chooser, but it pulls
+  # the whole KDE/Qt portal stack — and through libksysguard, qtwebengine
+  # (measured 2026-10-17: 466 MiB on frieren, more with the rest of KDE).
+  # Nautilus is the file manager on this profile, so the GTK chooser is the
+  # intended one; the KDE portal never had to be installed to keep Qt apps
+  # themed (that is QT_QPA_PLATFORMTHEME, still set above).
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
-      kdePackages.xdg-desktop-portal-kde
       xdg-desktop-portal-gtk
     ];
     config.common = {
-      default = ["kde" "gtk"];
-      "org.freedesktop.impl.portal.FileChooser" = ["kde" "gtk"];
+      default = ["gtk"];
+      "org.freedesktop.impl.portal.FileChooser" = ["gtk"];
     };
     config.niri = lib.mkForce {
-      default = ["kde" "gtk"];
-      "org.freedesktop.impl.portal.FileChooser" = ["kde" "gtk"];
+      default = ["gtk"];
+      "org.freedesktop.impl.portal.FileChooser" = ["gtk"];
     };
   };
 

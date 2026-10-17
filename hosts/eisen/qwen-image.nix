@@ -22,8 +22,12 @@
 # ways in, so there is no firewall allowance for it. (image.eisen.lan is
 # NOT wired — frieren's pi-hole only maps eisen.lan itself, not subdomains;
 # the /images/ merge into eisen.lan avoids a frieren DNS change.)
-{ config, lib, pkgs, ... }:
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   imageDir = "/mnt/storage/image/models";
   port = 8282;
 
@@ -36,7 +40,7 @@ let
   # via .override (adds the Vulkan buildInputs + SD_VULKAN=ON; nixpkgs
   # defaults to CPU-only). sha256 is fakeHash — the build error prints the
   # correct hash for the submodule-inclusive fetch; update it and rebuild.
-  sdCpp = (pkgs.stable-diffusion-cpp.override { vulkanSupport = true; }).overrideAttrs (_old: {
+  sdCpp = (pkgs.stable-diffusion-cpp.override {vulkanSupport = true;}).overrideAttrs (_old: {
     version = "2026-10-17-f0aac52";
     src = pkgs.fetchFromGitHub {
       owner = "leejet";
@@ -54,8 +58,8 @@ let
     url,
   }: {
     description = "Fetch ${file} if missing";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
     unitConfig.ConditionPathExists = "!${file}";
     serviceConfig = {
       Type = "oneshot";
@@ -69,8 +73,7 @@ let
       '';
     };
   };
-in
-{
+in {
   systemd.tmpfiles.rules = [
     "d ${imageDir} 0755 devji users - -"
   ];
@@ -222,9 +225,9 @@ in
       "tailscaled.service"
       "tailscaled-autoconnect.service"
     ];
-    wants = [ "tailscaled.service" ];
-    wantedBy = [ "multi-user.target" ];
-    partOf = [ "tailscaled.service" ];
+    wants = ["tailscaled.service"];
+    wantedBy = ["multi-user.target"];
+    partOf = ["tailscaled.service"];
     unitConfig = {
       StartLimitIntervalSec = 300;
       StartLimitBurst = 30;

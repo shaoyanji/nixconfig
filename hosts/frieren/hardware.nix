@@ -9,6 +9,12 @@
 
   hardware.graphics = {
     enable = true;
+    # This box is a NAS/media server with an Intel iGPU — no Steam, no Wine,
+    # no 32-bit games. Leaving the base-desktop default (true on x86_64) pulls
+    # a second mesa AND a second llvm-21.1.8-lib for graphics-drivers-32bit:
+    # measured 2026-10-17 at ~812 MiB of the frieren closure. A plain value
+    # beats the profile's `lib.mkDefault`.
+    enable32Bit = false;
     extraPackages = with pkgs; [
       intel-media-driver # iHD — modern QuickSync driver
       intel-vaapi-driver # i965 — legacy VA-API backend (hybrid codecs)

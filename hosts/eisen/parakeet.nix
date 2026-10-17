@@ -17,7 +17,6 @@
 #   * LAN:   http://eisen.lan/stt/transcribe   (nginx :80 -> 127.0.0.1:8091)
 #   * Direct: http://eisen:8091/transcribe     (loopback only; no firewall port)
 {
-  config,
   lib,
   pkgs,
   ...
@@ -72,7 +71,7 @@
 
   # The service binary: vendored pipeline + HTTP wrapper assembled into one
   # derivation, launched with the Nix-packaged interpreter.
-  parakeetApp = pkgs.runCommand "parakeet-stt-1.0" { } ''
+  parakeetApp = pkgs.runCommand "parakeet-stt-1.0" {} ''
     mkdir -p $out/bin $out/lib/parakeet_stt
     cp ${./parakeet-transcribe.py} $out/lib/parakeet_stt/transcribe.py
     cp ${./parakeet-server.py} $out/lib/parakeet_stt/server.py
@@ -83,40 +82,44 @@
     EOF
     chmod +x $out/bin/parakeet-server
   '';
-in
-{
+in {
   # Model weight repository on the persistent storage array.
   systemd.tmpfiles.rules = [
     "d ${modelDir} 0755 devji users - -"
   ];
 
-  systemd.services = lib.listToAttrs (
-    map (
-      f:
-      lib.nameValuePair "eisen-parakeet-${f}" (mkFetch {
-        file = "${modelDir}/${f}";
-        url = "${hfBase}/${f}";
-      })
-    ) parakeetFiles
-  ) // {
-    parakeet-stt = {
-    description = "Parakeet Redux speech-to-text (ONNX, CPU-only)";
-    after = fetchUnits ++ [
-      "mnt-storage.mount"
-      "network-online.target"
-    ];
-    wants = fetchUnits ++ [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
-    # ffmpeg on PATH for decoding non-wav audio (read_audio in the pipeline).
-    path = [ pkgs.ffmpeg ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${parakeetApp}/bin/parakeet-server --model-dir ${modelDir} --bind 127.0.0.1 --port ${toString port} --threads 8";
-      Restart = "always";
-      RestartSec = 5;
+  systemd.services =
+    lib.listToAttrs (
+      map (
+        f:
+          lib.nameValuePair "eisen-parakeet-${f}" (mkFetch {
+            file = "${modelDir}/${f}";
+            url = "${hfBase}/${f}";
+          })
+      )
+      parakeetFiles
+    )
+    // {
+      parakeet-stt = {
+        description = "Parakeet Redux speech-to-text (ONNX, CPU-only)";
+        after =
+          fetchUnits
+          ++ [
+            "mnt-storage.mount"
+            "network-online.target"
+          ];
+        wants = fetchUnits ++ ["network-online.target"];
+        wantedBy = ["multi-user.target"];
+        # ffmpeg on PATH for decoding non-wav audio (read_audio in the pipeline).
+        path = [pkgs.ffmpeg];
+        serviceConfig = {
+          Type = "simple";
+          ExecStart = "${parakeetApp}/bin/parakeet-server --model-dir ${modelDir} --bind 127.0.0.1 --port ${toString port} --threads 8";
+          Restart = "always";
+          RestartSec = 5;
+        };
+      };
     };
-    };
-  };
 
   # --- LAN: http://eisen.lan/stt/* (nginx :80 -> 127.0.0.1:8091) -----------
   # Merges into the eisen.lan vhost declared in llm-server.nix; the /stt/

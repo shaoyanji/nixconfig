@@ -1,31 +1,110 @@
 version: "3"
 
 tasks:
+  # HONEST SCOPE. This task used to end with four
+  # `nix eval .#nixosConfigurations.<h>.config.networking.hostName` lines. Those
+  # forced ONE option and type-checked nothing else, so they could not fail on
+  # the class of error that actually happens (EXP-114: an invalid
+  # `networkmanager.dispatcherScripts.*.type = "up"` "passed" that smoke test on
+  # four hosts and only surfaced in a build). Four nix processes, zero proof —
+  # removed rather than replaced with whole-toplevel forces, which on this 11 GiB
+  # host were measured at >120 s with swap and are O(hosts) in memory. The config
+  # gate is `checks:host` (all assertions, one host, ~13 s / 720 MiB).
   checks:quick:
-    desc: Run narrow repo checks (bounded — never forces a fleet-wide eval)
+    desc: Run narrow repo checks (repo HYGIENE — evaluates no host config)
     aliases: [check]
     summary: >
-      Bounded by construction. The first line builds the CHEAP checks — registry
-      consistency, flake coverage and module injection — which read the compiled
-      registry and flake attr NAMES, so they force no host configuration (~50 MiB).
-      The evals that follow force ONE host each, in separate nix processes, so peak
-      memory is one host (~200 MiB), not the fleet.
+      Bounded by construction: the inventory checks read the compiled registry and
+      flake attr NAMES (~50 MiB), then task-graph integrity, nix lint, sops drift
+      and modules.toml validation run locally. NO nixosConfiguration is forced, by
+      design — this task answers "is the repo internally consistent", NOT "does
+      host X evaluate".
+      For config: `task checks:host HOST=<h>` (module system + every assertion,
+      ~13 s / 720 MiB). For a named set: `task checks:hosts HOSTS="a b"`.
       Do NOT "improve" this into `nix flake check`: that evaluates every flake
       output, including all 23 nixosConfigurations, in a single process — measured
       2026-10-15 at 339.78 s / 6078.5 MiB peak / SIGKILL exit 137, leaving this
       11 GiB host at 62 % IO-stall with 5.4 GiB swapped. `task checks:flake`
-      refuses it on machines this small. The per-host gate is `task
-      checks:host:HOST=<host>`; the fleet is CI's job, and there is deliberately no
-      task in this repo whose default is every host.
+      refuses it on machines this small, and there is deliberately no task in this
+      repo whose default is every host.
     cmds:
       - nix build --no-link .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules
-      - nix eval .#nixosConfigurations.mtfuji.config.networking.hostName
-      - nix eval .#nixosConfigurations.garnixMachine.config.networking.hostName
-      - nix eval .#nixosConfigurations.aristotle.config.networking.hostName
-      - nix eval .#nixosConfigurations.frieren.config.networking.hostName
+      - task checks:tasks
       - task checks:nix:lint
       - task checks:sops:drift
       - task checks:modules:validate
+
+  checks:tasks:
+    desc: "[gate] Task graph integrity: duplicate task keys and dangling `task X` references"
+    summary: >
+      Static contract check over Taskfile.yml + taskfiles/*.yml, covering the two
+      failure classes `task --list-all` cannot report:
+
+      1. DUPLICATE task keys. YAML keeps the LAST definition and silently discards
+         the first, so a whole edit can vanish while every command still exits 0.
+         (Found on 2026-10-17: dev:nixbuild:plan and dev:nixbuild:warm were each
+         defined twice in taskfiles/dev.yml.)
+      2. DANGLING references. A `task foo:bar` line whose target was renamed or
+         never existed stays invisible until that line runs.
+
+      Resolution is against `task --list-all --json` names AND aliases, with
+      wildcard tasks (`infra:deploy:host:*`) expanded, so a concrete
+      `task infra:deploy:host:fern` is valid. Cheap: yq + grep + jq, no nix
+      evaluation, no network. Exit 0 = clean, 1 = duplicate or dangling.
+    cmds:
+      - |
+        set -uo pipefail
+        fail=0
+
+        echo "== duplicate task keys (YAML keeps the last, drops the first) =="
+        dupes=$(for f in Taskfile.yml taskfiles/*.yml; do
+          awk '
+            /^tasks:[[:space:]]*$/ { in_tasks = 1; base = -1; next }
+            in_tasks && /^[^[:space:]]/ { in_tasks = 0 }
+            in_tasks && /^[[:space:]]+[A-Za-z0-9:_*-]+:[[:space:]]*$/ {
+              indent = index($0, $1) - 1
+              if (base < 0) base = indent          # task keys sit at one indent
+              if (indent != base) next             # skips cmds:/vars: and prose
+              key = $1; sub(/:$/, "", key)
+              print FILENAME "\t" key
+            }
+          ' "$f"
+        done | sort | uniq -d)
+        if [ -n "$dupes" ]; then
+          printf '%s\n' "$dupes" | awk -F'\t' '{print "  DUPLICATE  " $1 "  " $2}'
+          fail=1
+        else
+          echo "  ok"
+        fi
+
+        echo "== dangling task references (from cmds) =="
+        work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
+        task --list-all --json \
+          | jq -r '.tasks[] | (.name), (.aliases[]?)' | sort -u > "$work/universe"
+        # Only a command POSITION counts: line start, or after $( && || ; |.
+        # Prose such as "duplicate task keys" inside an echo is not a reference.
+        yq -r '.tasks[].cmds[]?' Taskfile.yml taskfiles/*.yml 2>/dev/null \
+          | grep -oE '(^|&&|\|\||;|\$\()[[:space:]]*task [A-Za-z0-9:_*-]+' \
+          | sed 's/.*task //' | sort -u > "$work/refs"
+        # one ERE per wildcard task so a concrete invocation can match it
+        alt=$(grep -F '*' "$work/universe" | sed 's/\*/.*/g' | paste -sd'|' - 2>/dev/null || true)
+        missing=0
+        while IFS= read -r ref; do
+          [ -z "$ref" ] && continue
+          case "$ref" in
+            *[A-Z]*) continue ;;             # <PLACEHOLDER> in prose/echo
+            *: ) continue ;;                 # templated, e.g. host:<h>
+            -*) continue ;;                  # flags caught by the regex
+          esac
+          grep -qxF -- "$ref" "$work/universe" && continue
+          if [ -n "$alt" ] && printf '%s\n' "$ref" | grep -qE "^($alt)$"; then continue; fi
+          echo "  MISSING    $ref"
+          missing=$((missing + 1))
+        done < "$work/refs"
+        if [ "$missing" -eq 0 ]; then echo "  ok"; else fail=1; fi
+
+        exit "$fail"
+    silent: true
 
   checks:host:
     desc: "[gate] Evaluate ONE host: module system + assertions + compiled inventory (HOST=name)"
@@ -228,11 +307,16 @@ tasks:
       - HOST={{.HOST | default "frieren"}} bash scripts/task/ha-mqtt-check.sh
 
   checks:closure:budget:
-    desc: Fail when a host's closure exceeds its declared budget (HC-4)
+    desc: Fail when a host's closure exceeds its dynamic budget (HC-4)
     summary: >
-      Compares each host's measured closure size against the `bytes` budget in
-      closure-budgets.toml. The measurement is the same store-DB sum dev:closure:size
-      prints (nix path-info, no eval), so the budget and the size view cannot disagree.
+      Compares each host's measured closure size against its budget in
+      closure-budgets.toml, where budget = baseline_bytes × (1 + headroom_pct/100)
+      unless a host pins an absolute `bytes`. The basis is printed per row
+      (`base+1.0%` or `pin`) so a passing check cannot hide which promise it
+      measured against. Baselines are adopted, never typed:
+      `task dev:closure:budget:adopt HOST=<h>` after an intentional cut.
+      The measurement is the same store-DB sum dev:closure:size prints (nix
+      path-info, no eval), so the budget and the size view cannot disagree.
       Exits non-zero when a host is over budget, so a closure that quietly grows back
       fails the gate — the guard the debloat work (docs/closure-reduction.md) lacked.
       Vars: HOST=<host> checks one host (default: the local machine); ALL=1 checks every
@@ -269,6 +353,22 @@ tasks:
     desc: Verify every sops file's embedded age recipients match .sops.yaml (catches un-rekeyed files)
     cmds:
       - bash scripts/task/sops-drift-check.sh
+
+  checks:docs:sync:
+    desc: "[gate] Fail if docs/generated/ differs from `nix build .#docs`"
+    summary: >
+      The generated docs (fleet inventory, modules registry, per-host pages) are
+      built from the compiled metadata, so the checked-in copy is a cache, not a
+      source of truth. This compares docs/generated/ byte-for-byte against the
+      build output and exits 1 on any difference — edit inventory.toml or
+      lib/docs.nix, then run `task docs:sync`, never the markdown.
+      Uses --no-link: no GC root, no repo mutation, no build of the site.
+    cmds:
+      - |
+        set -euo pipefail
+        out=$(nix build --no-link --print-out-paths .#docs)
+        diff -ru "$out/docs/generated" docs/generated
+        echo "docs/generated/ matches the build"
 
   checks:nix:lint:
     desc: Run deadnix (hard gate) and statix (advisory) on all Nix files

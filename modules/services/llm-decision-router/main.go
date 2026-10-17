@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -191,9 +192,19 @@ func (g *llmGateway) serveChat(w http.ResponseWriter, r *http.Request, wantedJSO
 			"LLM generation slot busy; retry later")
 		return
 	}
-	defer g.release()
+	// Release exactly once, even if the upstream proxy blocks past
+	// client disconnect: a dead client must not hold the single slot
+	// until the upstream answers or the 110s timeout fires (observed:
+	// a disconnected SubZeroClaw held the slot ~90s, 429ing its retry).
+	var once sync.Once
+	release := func() { once.Do(g.release) }
+	defer release()
 	ctx, cancel := context.WithTimeout(r.Context(), g.timeout)
 	defer cancel()
+	go func() {
+		<-ctx.Done()
+		release()
+	}()
 	r = r.WithContext(context.WithValue(ctx, contextKeyWantedJSON, wantedJSON))
 	g.proxy.ServeHTTP(w, r)
 }

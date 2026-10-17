@@ -52,6 +52,12 @@
     wantedBy = ["multi-user.target"];
   };
 
+  # Disable USB autosuspend for btusb: kernel 6.12 defaults enable_autosuspend=Y,
+  # which aggressively powers down BT adapters after 2s and drops connection to MX Keys/Master.
+  boot.extraModprobeConfig = ''
+    options btusb enable_autosuspend=n
+  '';
+
   # --- Power management (laptop-as-server, battery = built-in UPS) ---
   # powertop is intentionally NOT enabled: its `--auto-tune` boot service
   # enables USB autosuspend, which kills the Intel combo Bluetooth adapter

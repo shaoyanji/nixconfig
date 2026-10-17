@@ -50,7 +50,7 @@ RUNTIME_DIR = os.environ.get("RUNTIME_DIRECTORY", "/run/qwen-image")
 ACTIVE_FILE = os.path.join(RUNTIME_DIR, "active")
 LAST_REQUEST_FILE = os.path.join(RUNTIME_DIR, "last-request")
 GEN_TIMEOUT = 900  # s; a warm Turbo gen is ~1-2 min, cold load is separate
-SD_START_TIMEOUT = 600  # s; the HDD cold load (12 GB) on first request
+SD_START_TIMEOUT = 900  # s; the HDD cold load (12 GB) is ~10-12 min
 
 # Turbo sigma schedule (9 values = 8 steps), from the sd.cpp docs.
 TURBO_SIGMAS = "1.0,0.978453,0.95418,0.926626,0.89508,0.845148,0.704534,0.414568,0.0"
@@ -115,34 +115,37 @@ def _unload_llama_swap():
 
 
 def _start_sd_server():
-    """Start the sd-server child (if not running) and wait for readiness."""
+    """Start the sd-server child (if not running) and wait for readiness.
+
+    A child that is alive but not yet healthy is still in its cold load —
+    NEVER terminate it (a previous bug killed the nearly-loaded child on
+    every request, so no request ever saw a healthy sd-server). Only
+    spawn a new child if there is none or the old one died. If the wait
+    times out, the child keeps loading; the next request will find it
+    ready (or wait for the remainder).
+    """
     global _sd_proc
     if _sd_proc is not None and _sd_proc.poll() is None and _sd_healthy():
         return True
-    # If a stale child lingers, kill it before starting a fresh one.
-    if _sd_proc is not None and _sd_proc.poll() is None:
-        _sd_proc.terminate()
-        try:
-            _sd_proc.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            _sd_proc.kill()
-    _sd_proc = subprocess.Popen(
-        [
-            SD_SERVER,
-            "--listen-ip", "127.0.0.1",
-            "--listen-port", str(SD_PORT),
-            "--diffusion-model", DIT,
-            "--vae", VAE,
-            "--llm", ENCODER,
-            "--sigmas", TURBO_SIGMAS,
-            "--steps", "8",
-            "--cfg-scale", "1.0",
-            "--sampling-method", "euler",
-            "--offload-to-cpu",
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    if _sd_proc is None or _sd_proc.poll() is not None:
+        # No child, or the old one died — start a fresh one.
+        _sd_proc = subprocess.Popen(
+            [
+                SD_SERVER,
+                "--listen-ip", "127.0.0.1",
+                "--listen-port", str(SD_PORT),
+                "--diffusion-model", DIT,
+                "--vae", VAE,
+                "--llm", ENCODER,
+                "--sigmas", TURBO_SIGMAS,
+                "--steps", "8",
+                "--cfg-scale", "1.0",
+                "--sampling-method", "euler",
+                "--offload-to-cpu",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
     deadline = time.time() + SD_START_TIMEOUT
     while time.time() < deadline:
         if _sd_proc.poll() is not None:
@@ -151,6 +154,7 @@ def _start_sd_server():
             _write_active()
             return True
         time.sleep(5)
+    # Timed out waiting, but the child is still loading — leave it alone.
     return False
 
 

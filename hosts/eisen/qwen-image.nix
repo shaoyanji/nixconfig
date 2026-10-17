@@ -36,7 +36,7 @@ let
   # via .override (adds the Vulkan buildInputs + SD_VULKAN=ON; nixpkgs
   # defaults to CPU-only). sha256 is fakeHash — the build error prints the
   # correct hash for the submodule-inclusive fetch; update it and rebuild.
-  sdCpp = (pkgs.stable-diffusion-cpp.override { vulkanSupport = true; }).overrideAttrs (old: {
+  sdCpp = (pkgs.stable-diffusion-cpp.override { vulkanSupport = true; }).overrideAttrs (_old: {
     version = "2026-10-17-f0aac52";
     src = pkgs.fetchFromGitHub {
       owner = "leejet";
@@ -145,6 +145,15 @@ in
       TimeoutStartSec = 600;
       # Holds the active lock + last-request record the idle timer reads.
       RuntimeDirectory = "qwen-image";
+      # sd-server needs the GPU (Vulkan via /dev/dri). DynamicUser's
+      # default device policy denies it, so sd-server hangs/fails and
+      # never becomes healthy (the manual run as devji worked because
+      # devji has /dev/dri). Allow the DRI nodes explicitly.
+      PrivateDevices = false;
+      DeviceAllow = [
+        "/dev/dri/renderD128 rw"
+        "/dev/dri/card0 rw"
+      ];
       DynamicUser = true;
       PrivateTmp = true;
     };

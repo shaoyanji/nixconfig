@@ -25,6 +25,15 @@
 # 8090 stays bound to loopback; nginx and `tailscale serve` are the only ways
 # in, so there is no firewall allowance for it.
 #
+# On-demand: laya-serve is NOT started at boot. systemd holds :8090
+# (laya-serve.socket); the first connection activates the service, whose
+# wrapper hands systemd's socket to uvicorn (laya.serve.main binds its own
+# port and cannot take a passed FD). A timer stops the service after 15 min
+# with no served request, freeing the ~3.5 GiB RSS; the socket keeps
+# listening, so the next request wakes it again. Nothing may `want`
+# laya-serve — the router and tailscale-serve-laya deliberately do not — or
+# boot would pull it up and defeat on-demand.
+#
 # No API key, matching the LLM endpoint: the LAN and the tailnet are the trust
 # boundary. Set LAYA_API_KEY (via sops) to require `Authorization: Bearer`.
 #
@@ -85,6 +94,117 @@
     done
     echo "tailscaled backend not Running after 120s" >&2
     exit 1
+  '';
+
+  # Idle timeout for on-demand Laya (seconds). Matches llama-swap's ttl, so
+  # the two serving paths go quiet on the same cadence.
+  idleTimeout = 900;
+
+  # Socket-activation wrapper for laya-serve.
+  #
+  # laya.serve.main() binds host:port itself and cannot take systemd's passed
+  # socket, so this wrapper replicates it with one addition: when systemd
+  # socket-activates the service (LISTEN_FDS >= 1), the pre-bound socket is
+  # handed to uvicorn as fd 3 instead of binding :8090 again (which would fail
+  # with EADDRINUSE — systemd already holds the listen socket).
+  #
+  # It also records the last served request (excluding /health) in
+  # $RUNTIME_DIRECTORY/last-request; the idle timer uses its mtime to stop the
+  # service after idleTimeout. The file is touched at startup too, so a service
+  # that has not served yet is never stopped as "idle".
+  layaWrapper = pkgs.writeTextFile {
+    name = "laya-serve-wrapper";
+    executable = true;
+    destination = "/bin/laya-serve-wrapper";
+    text = ''
+      #!${venv}/bin/python
+      import os
+      import socket
+
+      import uvicorn
+      from uvicorn.protocols.http.auto import AutoHTTPProtocol
+
+
+      class NoDelayHTTPProtocol(AutoHTTPProtocol):
+          # Mirrors laya.serve.main: asyncio only sets TCP_NODELAY when the
+          # accepted socket reports IPPROTO_TCP; on macOS/Windows it reports 0,
+          # so Nagle delays small responses (uvicorn #620).
+          def connection_made(self, transport):
+              sock = transport.get_extra_info("socket")
+              if sock is not None and sock.family in (socket.AF_INET, socket.AF_INET6):
+                  try:
+                      sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+                  except OSError:
+                      pass  # a latency hint, never a reason to drop the connection
+              super().connection_made(transport)
+
+
+      def _touch(path):
+          try:
+              with open(path, "a"):
+                  pass
+          except OSError:
+              pass
+
+
+      def main():
+          from laya.serve import create_app
+
+          runtime_dir = os.environ.get("RUNTIME_DIRECTORY", "/run/laya-serve")
+          last_request = os.path.join(runtime_dir, "last-request")
+          _touch(last_request)
+
+          app = create_app()
+
+          @app.middleware("http")
+          async def _record_request(request, call_next):
+              # Health probes are not use: a monitoring poll must not keep the
+              # service alive past the idle timeout.
+              if request.url.path != "/health":
+                  _touch(last_request)
+              return await call_next(request)
+
+          kwargs = {
+              "log_level": os.environ.get("LAYA_LOG_LEVEL", "info"),
+              "http": NoDelayHTTPProtocol,
+          }
+          if int(os.environ.get("LISTEN_FDS", "0")) >= 1:
+              # systemd passed the listening socket as fd 3 (Accept=no).
+              uvicorn.run(app, fd=3, **kwargs)
+          else:
+              uvicorn.run(
+                  app,
+                  host=os.environ.get("LAYA_HOST", "0.0.0.0"),
+                  port=int(os.environ.get("LAYA_PORT", "8000")),
+                  **kwargs,
+              )
+
+
+      if __name__ == "__main__":
+          main()
+      '';
+  };
+
+  # Idle check for the laya-serve-idle timer: stop the service when no request
+  # has been served within idleTimeout. The socket stays listening, so the
+  # next connection re-activates the service. A stop racing a just-arrived
+  # request fails that one request cleanly (502 at the caller), and the next
+  # request wakes Laya again.
+  layaIdleCheck = pkgs.writeShellScript "laya-serve-idle-check" ''
+    set -eu
+    systemctl=${config.systemd.package}/bin/systemctl
+    if ! "$systemctl" -q is-active laya-serve.service; then
+      exit 0
+    fi
+    last="/run/laya-serve/last-request"
+    if [ ! -f "$last" ]; then
+      exit 0
+    fi
+    now=$(${pkgs.coreutils}/bin/date +%s)
+    mtime=$(${pkgs.coreutils}/bin/stat -c %Y "$last")
+    if [ $((now - mtime)) -ge ${toString idleTimeout} ]; then
+      "$systemctl" stop laya-serve.service
+    fi
   '';
 
   bootstrap = pkgs.writeShellScript "eisen-laya-bootstrap" ''
@@ -152,13 +272,31 @@ in {
     };
   };
 
-  # --- The decision-model server -------------------------------------------
+  # --- The decision-model server: on-demand via socket activation -----------
+  # laya-serve is NOT started at boot. systemd holds :8090 (laya-serve.socket);
+  # the first connection activates the service, whose wrapper hands systemd's
+  # socket to uvicorn. The idle timer stops the service after idleTimeout with
+  # no served request, freeing the ~3.5 GiB RSS; the socket keeps listening,
+  # so the next request wakes it again. Nothing may `want` laya-serve — the
+  # router and tailscale-serve-laya deliberately do not — or boot would pull
+  # it up and defeat on-demand. Cold start (model load) is on the first
+  # request's path; the router's 25 s decision timeout may 502 that one
+  # request — measure cold-start latency during activation testing.
+  systemd.sockets."laya-serve" = {
+    description = "Laya decision model socket (on-demand activation)";
+    wantedBy = ["sockets.target"];
+    socketConfig = {
+      ListenStream = "127.0.0.1:${toString port}";
+      Accept = false;
+    };
+  };
+
   systemd.services."laya-serve" = {
     description = "Laya decision model (Jev-compatible /v1/systemone)";
     after = ["eisen-laya-bootstrap.service" "mnt-storage.mount"];
     wants = ["eisen-laya-bootstrap.service"];
-    requires = ["mnt-storage.mount"];
-    wantedBy = ["multi-user.target"];
+    requires = ["mnt-storage.mount" "laya-serve.socket"];
+    # No wantedBy: the socket activates this on first connection.
     environment = {
       LAYA_HOST = "127.0.0.1";
       LAYA_PORT = toString port;
@@ -183,11 +321,32 @@ in {
       Type = "exec";
       User = user.name;
       WorkingDirectory = root;
-      ExecStart = "${venv}/bin/laya-serve";
+      ExecStart = "${layaWrapper}/bin/laya-serve-wrapper";
       Restart = "always";
       RestartSec = 5;
       # First boot downloads ~1.5 GiB of checkpoints from the Hub.
       TimeoutStartSec = 600;
+      # Holds the last-request record the idle timer reads.
+      RuntimeDirectory = "laya-serve";
+    };
+  };
+
+  # --- Idle stop: free the ~3.5 GiB after idleTimeout with no request -------
+  systemd.services."laya-serve-idle" = {
+    description = "Stop Laya if idle past the timeout";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = layaIdleCheck;
+    };
+  };
+
+  systemd.timers."laya-serve-idle" = {
+    description = "Stop Laya after the idle timeout";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnBootSec = "5min";
+      OnUnitActiveSec = "5min";
+      Unit = "laya-serve-idle.service";
     };
   };
 
@@ -229,7 +388,9 @@ in {
     ];
     wants = [
       "tailscaled.service"
-      "laya-serve.service"
+      # Deliberately NOT laya-serve: wanting it would start Laya at boot and
+      # defeat on-demand. `tailscale serve` proxies to :8090 regardless; a
+      # request through it activates Laya via the socket.
     ];
     wantedBy = ["multi-user.target"];
     partOf = ["tailscaled.service"];

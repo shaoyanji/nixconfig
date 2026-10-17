@@ -150,6 +150,43 @@
       ];
   });
 
+  # Kolibri-1: Aleph-Alpha Kolibri-1 arch support via the Hob-forge patch
+  # (kolibri1-llama.cpp.patch, 4-patch series by Seraphiel102, 2026-10-03:
+  # SIGMOID_LOGIT_ADD expert gating + kolibri1 arch registration + model
+  # impl + converter bits) against upstream commit 836d571 (2026-10-03).
+  # Stock llama.cpp lacks the `kolibri1` architecture and exits with
+  # "unknown model architecture: 'kolibri1'". Serves Kolibri only. Same
+  # override pattern (Vulkan, no web-UI npm step). The patch also touches
+  # conversion/ + gguf-py/ (converter, not compiled) and
+  # tests/test-llama-archs.cpp.
+  llamaKolibri = (pkgs.llama-cpp.override {vulkanSupport = true;}).overrideAttrs (old: rec {
+    version = "kolibri-836d571";
+    src = pkgs.fetchFromGitHub {
+      owner = "ggml-org";
+      repo = "llama.cpp";
+      rev = "836d57176dc699a726c55418e4f96b8ca628e1bf";
+      hash = "sha256-JhlwSNvYpG/HGzc+YXjy1pEC1t2iL2K2gR0Uhtoa7Do=";
+    };
+    patches = [
+      (pkgs.fetchpatch {
+        url = "https://huggingface.co/Hob-forge/Kolibri-1-GGUF/resolve/main/kolibri1-llama.cpp.patch";
+        hash = "sha256-65Swaq5XYxpnXbsNYk4sPcVtOBchDx87miwucWBKQrA=";
+      })
+    ];
+    npmDeps = null;
+    npmDepsHash = null;
+    preConfigure = "";
+    nativeBuildInputs = lib.filter (p: p != pkgs.nodejs_latest && p != pkgs.npmHooks.npmConfigHook) old.nativeBuildInputs;
+    cmakeFlags =
+      (lib.filter (flag: !(lib.hasPrefix "-DLLAMA_BUILD_NUMBER=" flag || lib.hasPrefix "-DLLAMA_BUILD_COMMIT=" flag)) old.cmakeFlags)
+      ++ [
+        "-DLLAMA_BUILD_COMMIT=836d571"
+        "-DLLAMA_BUILD_UI=OFF"
+        "-DLLAMA_USE_PREBUILT_UI=OFF"
+        "-DGGML_VULKAN=ON"
+      ];
+  });
+
   # DFlash2 speculative-decoding head for Qwen: a block-diffusion drafter
   # trained for this exact target (vocab 248320, matching) that is verified by
   # the target, so output distribution is unchanged. Measured on eisen on a
@@ -183,14 +220,10 @@
     + "--cache-type-k q8_0 --cache-type-v q8_0 "
     + spec;
 
-  # NOTE — Kolibri-1 does not currently load: this nixpkgs' llama-cpp (0.5.0)
-  # reports "unknown model architecture: 'kolibri1'" and exits, so a request for
-  # the `kolibri` alias returns HTTP 500. The weights and the entry are kept
-  # because the wiring is correct and it will start working as soon as the
-  # pinned llama-cpp learns the architecture (or `llama` is overridden to a
-  # newer revision); re-test with:
+  # Kolibri-1 loads via `llamaKolibri` (patched llama.cpp, Hob-forge patch);
+  # the stock binary exits with "unknown model architecture: 'kolibri1'".
+  # Re-test with:
   #   curl -s $EP/v1/chat/completions -d '{"model":"kolibri",...}'
-  # See .agents/deploy/hosts/eisen.md for the evidence and the patch route.
 
   # Idempotent, resumable weight fetch — runs only when the GGUF is absent.
   mkFetch = {
@@ -282,6 +315,7 @@ in {
           cmd = mkCmd {
             model = kolibriFile;
             alias = "kolibri-1";
+            binary = llamaKolibri;
           };
           aliases = ["kolibri" "aleph"];
         };

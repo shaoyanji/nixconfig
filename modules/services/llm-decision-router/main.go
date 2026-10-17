@@ -118,6 +118,86 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
+// llmGateway serializes generative requests and bounds them.
+//
+// llama-server runs --parallel 1, so a second concurrent request would
+// only queue behind the first. SubZeroClaw's curl caps each request at
+// 120 s and retries twice, so a queued request times out, gets retried
+// behind the orphaned generation, and the queue cascades (Oct 16: repeated
+// `http: proxy error: context canceled`, 6-min stall). Fail fast with 429
+// instead: subzeroclaw is a dynamic task agent, not a long runtime loop —
+// a task that cannot complete within bounds should fail cleanly, not loop.
+//
+// The request context is derived from the incoming request and never
+// detached, so a client disconnect still cancels the upstream generation.
+const (
+	llmProxyTimeout = 110 * time.Second // just under the client's 120 s cap
+)
+
+type llmGateway struct {
+	proxy   *httputil.ReverseProxy
+	slot    chan struct{} // capacity 1: one generation at a time
+	timeout time.Duration
+}
+
+func newLLMGateway(proxy *httputil.ReverseProxy, timeout time.Duration) *llmGateway {
+	return &llmGateway{proxy: proxy, slot: make(chan struct{}, 1), timeout: timeout}
+}
+
+// tryAcquire takes the single generation slot, non-blocking.
+func (g *llmGateway) tryAcquire() bool {
+	select {
+	case g.slot <- struct{}{}:
+		return true
+	default:
+		return false
+	}
+}
+
+func (g *llmGateway) release() { <-g.slot }
+
+// writeJSONError writes an OpenAI-shaped error envelope so clients can parse
+// the failure instead of seeing a killed connection.
+func writeJSONError(w http.ResponseWriter, status int, code, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"error": map[string]interface{}{
+			"message": message,
+			"type":    code,
+			"code":    code,
+		},
+	})
+}
+
+// llmErrorHandler replaces ReverseProxy's default (plain-text 502): a timed-out
+// upstream returns a parseable 504, and a client disconnect just logs.
+func llmErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
+	if r.Context().Err() == context.DeadlineExceeded {
+		log.Printf("[CHAT-TIMEOUT] upstream did not answer within %v", llmProxyTimeout)
+		writeJSONError(w, http.StatusGatewayTimeout, "upstream_timeout",
+			fmt.Sprintf("LLM upstream timed out after %v", llmProxyTimeout))
+		return
+	}
+	log.Printf("[CHAT-ERROR] proxy error: %v", err)
+	writeJSONError(w, http.StatusBadGateway, "upstream_error", "LLM upstream error")
+}
+
+// serveChat enforces the slot + timeout, then proxies.
+func (g *llmGateway) serveChat(w http.ResponseWriter, r *http.Request, wantedJSON bool) {
+	if !g.tryAcquire() {
+		log.Printf("[CHAT-BUSY] rejecting %s: generation slot busy", r.URL.Path)
+		writeJSONError(w, http.StatusTooManyRequests, "llm_busy",
+			"LLM generation slot busy; retry later")
+		return
+	}
+	defer g.release()
+	ctx, cancel := context.WithTimeout(r.Context(), g.timeout)
+	defer cancel()
+	r = r.WithContext(context.WithValue(ctx, contextKeyWantedJSON, wantedJSON))
+	g.proxy.ServeHTTP(w, r)
+}
+
 func main() {
 	port := getEnv("PORT", "8000")
 	bind := getEnv("BIND", "127.0.0.1")
@@ -137,6 +217,8 @@ func main() {
 	}
 
 	llmProxy := httputil.NewSingleHostReverseProxy(llmURL)
+	llmProxy.ErrorHandler = llmErrorHandler
+	gateway := newLLMGateway(llmProxy, llmProxyTimeout)
 	originalDirector := llmProxy.Director
 	llmProxy.Director = func(req *http.Request) {
 		originalDirector(req)
@@ -256,8 +338,7 @@ func main() {
 			}
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), contextKeyWantedJSON, wantedJSON))
-		llmProxy.ServeHTTP(w, r)
+		gateway.serveChat(w, r, wantedJSON)
 	})
 
 	mux.HandleFunc("/v1/models", func(w http.ResponseWriter, r *http.Request) {

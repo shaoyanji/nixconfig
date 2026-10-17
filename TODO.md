@@ -111,24 +111,31 @@ lifted into `~/HANDOFF.md` as P-items. Each carries its own exit criteria. The e
   budget table documented in `docs/closure-reduction.md`.
 - **Exit criteria:** `task checks:closure:budget` fails when a budget is exceeded and passes
   otherwise; result reproducible against `dev:closure:size`.
-- **Delivered (2026-10-12):** `closure-budgets.toml` holds a per-host `bytes` ceiling
-  (yq-read, guarded by `checks:toml:lint`); `closure-analysis.sh` gained a `budget` mode
-  with `--all`; wired as `checks:closure:budget` (gate) and `dev:closure:budget` (tool);
-  documented in `docs/closure-reduction.md` §7. Verified: exits 1 (task 201) when a host is
-  over budget and 0 when within, and the measurement shares `total_of` with
-  `dev:closure:size`, so the two views cannot disagree.
+- **Delivered (2026-10-12, revised 2026-10-17):** `closure-budgets.toml` holds **policy only**
+  (~48 lines of comments, `[defaults]`, per-host `headroom_pct` / optional `bytes` pin, guarded
+  by `checks:toml:lint`); the budget is computed as `baseline_bytes × (1 + headroom_pct/100)`
+  from a **managed `# >>> baseline` block** that `task dev:closure:budget:adopt` rewrites after
+  a measurement. No byte count is hand-maintained, so the gate cannot go stale the way the
+  original `37373908571` (34.9 GiB) ceiling did. `closure-analysis.sh` gained `budget` (with
+  `--all`) and `adopt` modes, wired as `checks:closure:budget` (gate), `dev:closure:budget`
+  (same table, outside the checks group) and `dev:closure:budget:adopt`; framed in
+  `docs/closure-reduction.md` §7. `HEADROOM_PCT=<n>` overrides headroom for one run and a
+  `bytes` pin overrides baseline+headroom, in that order of precedence.
+- **Also fixed here:** the closure measurement was pinned to `/run/current-system` before
+  `readlink -f`, so every cached report after the first generation returned the **same**
+  numbers — the reported 34.5 GiB / 3949 paths was a stale cache hit, not drift. With the
+  key fixed the real frieren closure is **29.9 GiB / 3229 paths**, baseline adopted
+  `32104328080` bytes (2026-10-17), budget 30.2 GiB with +1.0% (306.2 MiB) headroom.
 - **Remaining:**
   1. **Budgets exist only for measured hosts** (`frieren`). Add each host when it is next
-     online and measured — an invented number is worse than none.
+     online and measured — an invented number is worse than none. Adoption is local-only by
+     design: run it on the host (`ssh <host> task dev:closure:budget:adopt`).
   2. **Not yet a CI gate.** Wiring it in needs a built toplevel (`TARGET=<store path>`) plus a
      change to `.github/workflows/nixcachix.yml`; deliberately left as its own change.
-  3. **Tighten the ratchet.** +1% headroom (352.9 MiB) absorbs `flake.lock` drift but is larger
-     than the ~70 MiB Tier-1 font item, so that class of change will not trip it.
-  4. **The drift is already real, and it is a warning — not a blocker:** the live frieren closure
-     is back to 3949 paths / 34.5 GiB (the pre-L1 figures) even though L1 is applied, so the
-     33.8 GiB recorded post-L1 has been given back by later changes. The gate's job is to _surface_
-     that; it is not wired into CI, so it cannot block a merge, and nothing else here waits on the
-     drift being fixed.
+  3. **Headroom is a policy choice, and it is now one knob.** +1.0% (306.2 MiB) absorbs
+     `flake.lock` drift but is larger than the ~70 MiB Tier-1 font item, so that class of change
+     will not trip it; set `headroom_pct` per host (or `HEADROOM_PCT=0` for one run) to tighten
+     without editing any byte count.
 
 ### HC-5 — Wire Home Assistant to its own broker, and make `extraComponents` honest
 

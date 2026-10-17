@@ -12,7 +12,6 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 INVENTORY_FILE = REPO_ROOT / "inventory.toml"
 AGENTS_MD = REPO_ROOT / "AGENTS.md"
-DOCS_FLEET_MD = REPO_ROOT / "docs" / "fleet-inventory.md"
 AGENTS_HOSTS_DIR = REPO_ROOT / ".agents" / "hosts"
 AGENTS_FLEET_MD = REPO_ROOT / ".agents" / "fleet-matrix.md"
 DEFAULT_TEMPLATE_PATH = REPO_ROOT / ".agents" / "templates" / "host-card.tmpl"
@@ -292,142 +291,16 @@ def update_agents_md(table_content, data):
     return prefix + note + table_content + suffix
 
 def generate_docs_fleet_markdown(data):
-    meta = data.get("metadata", {})
-    hosts = data.get("hosts", {})
+    """Retired — docs/fleet-inventory.md is built by lib/docs.nix.
 
-    active_nix = {h: v for h, v in hosts.items() if v.get("status") == "active" and v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"])}
-    active_ext = {h: v for h, v in hosts.items() if v.get("status") == "active" and not v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"])}
-    wip_hosts = {h: v for h, v in hosts.items() if v.get("status") == "wip"}
-    preserved_hosts = {h: v for h, v in hosts.items() if v.get("status") == "preserved"}
-
-    doc = [
-        "# Fleet Device & Host Inventory",
-        "",
-        "> Canonical device, hardware, operational status, and agent persona registry for `nixconfig`.",
-        "> Source of truth: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml).",
-        "",
-        "## Fleet Overview Statistics",
-        "",
-        f"- **Total Registered Devices**: {meta.get('total_devices', len(hosts))}",
-        f"- **Active Production Nix Devices**: {len(active_nix)}",
-        f"- **Active External Non-Nix Hosting**: {len(active_ext)} ({', '.join(f'`{h}`' for h in sorted(active_ext))})",
-        f"- **Work-in-Progress (Not Live)**: {len(wip_hosts)} (`delphi`)",
-        f"- **Preserved Architecture Archetypes**: {len(preserved_hosts)}",
-        f"- **Canonical Repository**: [{meta.get('canonical_repo', '')}]({meta.get('canonical_repo', '')})",
-        "",
-        "---",
-        "",
-        "## 1. Active Production Nix Fleet (11 Devices)",
-        "",
-        "| Host | Category | Role | Hardware Summary | Desktop / Environment | Storage |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- |"
-    ]
-
-    for h, info in sorted(active_nix.items()):
-        cat = info.get("category", "")
-        role = info.get("role", "")
-        hw = info.get("hardware", {})
-        cpu = hw.get("cpu", "").split("(")[0].strip()
-        ram = hw.get("ram", "").split("+")[0].strip()
-        gpu = hw.get("gpu", "")
-        hw_summary = f"{cpu}, {ram}"
-        if gpu and gpu not in ["Integrated", "Integrated / Headless", "None"]:
-            hw_summary += f", {gpu.split('(')[0].strip()}"
-        de = info.get("desktop_environment", "headless")
-        storage = hw.get("storage_type", "")
-        doc.append(f"| **`{h}`** | `{cat}` | {role} | {hw_summary} | {de} | {storage} |")
-
-    doc.extend([
-        "",
-        "---",
-        "",
-        "## 2. Active External Non-Nix Hosting (3 Devices)",
-        "",
-        "These environments are not managed by Nix/NixOS. Operations are executed via dedicated taskfiles and SSH commands.",
-        "",
-        "| Host | Environment / OS | Role | Management | Memory Limit / Quota | Primary Services |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- |"
-    ])
-
-    for h, info in sorted(active_ext.items()):
-        arch = info.get("arch", "")
-        role = info.get("role", "")
-        hw = info.get("hardware", {})
-        ram = hw.get("ram", "")
-        taskfile = f"`taskfiles/{h}.yml`"
-        services = ", ".join(info.get("software", {}).get("key_services", [])[:2])
-        doc.append(f"| **`{h}`** | `{arch}` | {role} | {taskfile} | {ram} | {services} |")
-
-    doc.extend([
-        "",
-        "---",
-        "",
-        "## 3. Work-in-Progress Outposts (1 Device)",
-        "",
-        "| Host | Status | Role | Cloud Shape / Hardware | Target Responsibilities |",
-        "| :--- | :--- | :--- | :--- | :--- |"
-    ])
-
-    for h, info in sorted(wip_hosts.items()):
-        role = info.get("role", "")
-        hw = info.get("hardware", {})
-        cpu = hw.get("cpu", "")
-        ram = hw.get("ram", "")
-        persona = info.get("persona", {})
-        tasks = ", ".join(persona.get("allowed_tasks", [])[:3])
-        doc.append(f"| **`{h}`** | *WIP (Not Live)* | {role} | {cpu}, {ram} | {tasks} |")
-
-    doc.extend([
-        "",
-        "---",
-        "",
-        "## 4. Preserved Archetypes & Configurations (16 Devices)",
-        "",
-        "These hosts are not in active production but are preserved as architectural reference patterns and test configurations.",
-        "",
-        "| Host | Category | Architectural Role | Pattern Preserved / Reference Value |",
-        "| :--- | :--- | :--- | :--- |"
-    ])
-
-    for h, info in sorted(preserved_hosts.items()):
-        cat = info.get("category", "")
-        role = info.get("role", "")
-        detail = info.get("status_detail", "")
-        doc.append(f"| **`{h}`** | `{cat}` | {role} | {detail} |")
-
-    doc.extend([
-        "",
-        "---",
-        "",
-        "## 5. Device-Specific Agent Personas",
-        "",
-        "Each device defines an agent persona specifying its operational compute tier, allowed tasks, and strict constraints.",
-        "",
-        "| Host | Persona Title | Compute Tier | Allowed Workloads | Operational Constraints |",
-        "| :--- | :--- | :--- | :--- | :--- |"
-    ])
-
-    for h, info in sorted(hosts.items()):
-        persona = info.get("persona", {})
-        title = persona.get("title", "")
-        tier = persona.get("compute_tier", "")
-        tasks = "<br>".join(f"• {t}" for t in persona.get("allowed_tasks", []))
-        constraints = "<br>".join(f"⚠ {c}" for c in persona.get("constraints", []))
-        st = info.get("status", "active")
-        is_nix = info.get("is_nix", info.get("kind") in ["nixos", "darwin", "home"])
-        if st == "active" and is_nix:
-            status_flag = "🟢"
-        elif st == "active" and not is_nix:
-            status_flag = "🌐"
-        elif st == "wip":
-            status_flag = "🟡"
-        else:
-            status_flag = "⚪"
-        doc.append(f"| {status_flag} **`{h}`** | {title} | `{tier}` | {tasks} | {constraints} |")
-
-    doc.append("")
-    return "\n".join(doc)
-
+    The hand-rolled table here duplicated inventory.toml and drifted from it
+    (it reported 3 external devices while the registry had 6). Kept as a loud
+    guard so a stale caller cannot resurrect a second generator: the Nix
+    pipeline owns the page and `task docs:sync` refreshes the checked-in copy.
+    """
+    raise SystemExit(
+        "docs/fleet-inventory.md is generated by lib/docs.nix; run `task docs:sync`"
+    )
 def generate_home_agents(host, output_path=None, custom_tmpl=None):
     data = load_inventory()
     hosts = data.get("hosts", {})
@@ -517,10 +390,9 @@ def main():
                 print("AGENTS.md has drifted from inventory.toml")
                 drift = True
 
-        new_docs_fleet = generate_docs_fleet_markdown(data)
-        if not DOCS_FLEET_MD.exists() or DOCS_FLEET_MD.read_text(encoding="utf-8") != new_docs_fleet:
-            print("docs/fleet-inventory.md has drifted from inventory.toml")
-            drift = True
+        # docs/fleet-inventory.md is no longer checked here: it is built from the
+        # same compiled registry by lib/docs.nix and verified by
+        # `task checks:docs:sync` (byte comparison against `nix build .#docs`).
 
         new_fleet_matrix = generate_fleet_matrix_markdown(data)
         if not AGENTS_FLEET_MD.exists() or AGENTS_FLEET_MD.read_text(encoding="utf-8") != new_fleet_matrix:
@@ -542,21 +414,15 @@ def main():
             f.write(new_agents_md)
         print(f"Updated {AGENTS_MD}")
 
-    # 2. Update docs/fleet-inventory.md
-    docs_fleet_md = generate_docs_fleet_markdown(data)
-    DOCS_FLEET_MD.parent.mkdir(parents=True, exist_ok=True)
-    with open(DOCS_FLEET_MD, "w", encoding="utf-8") as f:
-        f.write(docs_fleet_md)
-    print(f"Updated {DOCS_FLEET_MD}")
-
-    # 3. Update .agents/fleet-matrix.md
+    # 2. Update .agents/fleet-matrix.md
+    #    (docs/fleet-inventory.md is built by lib/docs.nix — run `task docs:sync`)
     fleet_matrix = generate_fleet_matrix_markdown(data)
     AGENTS_FLEET_MD.parent.mkdir(parents=True, exist_ok=True)
     with open(AGENTS_FLEET_MD, "w", encoding="utf-8") as f:
         f.write(fleet_matrix)
     print(f"Updated {AGENTS_FLEET_MD}")
 
-    # 4. Optional: compile per-host markdown cards on demand
+    # 3. Optional: compile per-host markdown cards on demand
     if args.compile_hosts:
         AGENTS_HOSTS_DIR.mkdir(parents=True, exist_ok=True)
         for h, info in hosts.items():

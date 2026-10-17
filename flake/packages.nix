@@ -44,7 +44,9 @@ lib.genAttrs systems.default (system: let
 in {
   inherit (pkgs) simplex-chat;
   inherit (pkgs) smp-server;
-  fleet-docs-site = import ../lib/aki-site.nix {inherit pkgs lib;};
+  # Aki explorer site: fed the COMPILED registry, so its host matrix cannot
+  # disagree with the hosts or with the markdown docs built from the same value.
+  fleet-docs-site = import ../lib/aki-site.nix {inherit pkgs lib inventory;};
 
   # --- compiled inventory artifacts ---------------------------------------
   # Both are generated from the ONE parse in lib/inventory.nix, so they cannot

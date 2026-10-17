@@ -3,7 +3,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }: let
   cfg = config.profiles.hermes;

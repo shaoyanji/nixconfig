@@ -273,9 +273,15 @@ tasks:
       - bash scripts/task/inventory-menu.sh
 
   dev:inventory:sync:
-    desc: Synchronize AGENTS.md, docs, and compile all LLM host spec cards from inventory.toml
+    desc: Synchronize AGENTS.md + fleet matrix (LLM cards), then refresh docs/generated/
+    summary: >
+      Two owners, run together: compile-llm-specs.py owns AGENTS.md and
+      .agents/fleet-matrix.md (LLM cards), and lib/docs.nix owns every generated
+      doc page — `task docs:sync` copies the latter out of `nix build .#docs`.
+      Neither writes a second copy of the fleet table any more.
     cmds:
       - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --sync-home"
+      - task docs:sync
 
   dev:inventory:llm:
     desc: Compile and render the LLM prompt context card for a specific host (HOST=name)
@@ -322,7 +328,11 @@ tasks:
       - bash scripts/task/modules-menu.sh
 
   dev:modules:sync:
-    desc: Synchronize docs/modules-registry.md from modules.toml
+    desc: Refresh the generated modules registry (delegates to `task docs:sync`)
+    summary: >
+      The knob table is no longer produced by modules-menu.sh: lib/docs.nix builds
+      it from modules.toml (with the fleet inventory and per-host pages), and
+      `task docs:sync` copies `nix build .#docs` into docs/generated/.
     cmds:
       - bash scripts/task/modules-menu.sh sync
 
@@ -330,16 +340,6 @@ tasks:
     desc: Validate modules.toml syntax and file paths
     cmds:
       - bash scripts/task/modules-menu.sh validate
-
-  dev:nixbuild:plan:
-    desc: Report what would build/fetch for hosts against local substituters (read-only)
-    cmds:
-      - bash scripts/task/nixbuild-warm.sh plan {{.CLI_ARGS}}
-
-  dev:nixbuild:warm:
-    desc: "[destructive] Build host closures on the remote builder (nixbuild.net budget!) and push to Cachix"
-    cmds:
-      - bash scripts/task/nixbuild-warm.sh warm {{.CLI_ARGS}}
 
   dev:closure:
     desc: Closure subsystem breakdown (HOST=name|local, TARGET=store path; store-DB only)
@@ -373,9 +373,26 @@ tasks:
       - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} toml > {{.OUT | default "docs/closures/local.toml"}}
 
   dev:closure:budget:
-    desc: Compare a host's closure against its budget (HOST=name|local, ALL=1, TARGET=store path)
+    desc: Compare a host's closure against its dynamic budget (HOST=name|local, ALL=1, TARGET=store path)
+    summary: >
+      budget = baseline_bytes × (1 + headroom_pct/100), or an absolute `bytes`
+      pin. The baseline is measured, not typed: adopt it with
+      `task dev:closure:budget:adopt HOST=<h>`. HEADROOM_PCT=<n> overrides the
+      file's headroom for one run (e.g. HEADROOM_PCT=0 to see the raw baseline).
     cmds:
       - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}{{.TARGET}}{{end}}
+
+  dev:closure:budget:adopt:
+    desc: Adopt the measured local closure as HOST's new baseline (dynamic budget ratchet)
+    summary: >
+      Measures the LOCAL host's deployed closure and rewrites the managed
+      `# >>> baseline` block in closure-budgets.toml; policy (headroom_pct,
+      absolute `bytes` pins, comments) is preserved. Run it after every
+      intentional cut — that is the ratchet that makes the budget meaningful.
+      HOST must be this machine (default: local); remote hosts are measured by
+      `dev:closure:budget ALL=1` but adopted from that host.
+    cmds:
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} adopt
 
   dev:closure:tui:
     desc: Interactive closure explorer — pick a host, then a view (gum)
@@ -431,11 +448,18 @@ tasks:
 
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
+    desc: Print every nixosConfigurations host name (attr names only — no config forced)
+    summary: >
+      The cheap answer to "which hosts exist": `builtins.attrNames` over the flake's
+      nixosConfigurations forces NO host configuration. Measured 2026-10-17 on
+      frieren: 2.42 s cold, 0.08 s on a warm eval cache. For host FACTS prefer
+      `dev:inventory:host` (compiled registry, also no host eval).
     cmds:
       - "nix eval --raw .#nixosConfigurations --apply 'hosts: builtins.concatStringsSep \"\\n\" (builtins.attrNames hosts)'"
 
   # Update garnix.yaml with current nixosConfigurations
   dev:flake:update-garnix:
+    desc: Rewrite garnix.yaml builds.include from the current nixosConfigurations host set
     cmds:
       - |
         # Start with empty builds.include array
@@ -444,6 +468,48 @@ tasks:
         for host in $(task dev:flake:get-hosts); do
           yq -i ".builds.include += [\"nixosConfigurations.$host\"]" garnix.yaml
         done
+
+  # --- docs: generated from the compiled metadata (lib/docs.nix) ------------
+  # The pages and the site nav are Nix values built from `.#inventory` and
+  # modules.toml, so they cannot drift from the hosts/knobs they describe.
+  # `.#docs` is the source of truth; docs/generated/ is its git-tracked copy.
+  docs:build:
+    desc: Build the generated docs tree + nav from compiled metadata (nix build .#docs)
+    summary: >
+      Prints the store path of the generated docs: fleet-inventory.md,
+      modules-registry.md, hosts/<h>.md and nav.json (the site manifest).
+      Nothing in the repo is written — `docs:sync` copies it into
+      docs/generated/ for git readers.
+    cmds:
+      - nix build --no-link --print-out-paths .#docs
+
+  docs:site:
+    desc: Build the HTML documentation site from the generated docs (nix build .#docs-site)
+    summary: >
+      Renders the page list in `.#docs/nav.json` (a Nix value, not nav.json in the
+      repo) over the hand-written + generated markdown. Result linked at
+      ./result-docsite.
+    cmds:
+      - nix build .#docs-site -o result-docsite
+
+  docs:sync:
+    desc: Refresh docs/generated/ from `nix build .#docs` (checked-in copies, DO-NOT-EDIT)
+    summary: >
+      Replaces docs/generated/ with the exact bytes of the build output. The
+      generated pages carry a "do not edit" banner; editing them in the repo is
+      pointless because `checks:docs:sync` compares the copy against the build.
+    cmds:
+      - |
+        set -euo pipefail
+        out=$(nix build --no-link --print-out-paths .#docs)
+        # Store paths are read-only; cp -r copies those modes, so a previous sync
+        # leaves directories that cannot be removed. Make them writable first.
+        chmod -R u+w docs/generated 2>/dev/null || true
+        rm -rf docs/generated
+        mkdir -p docs/generated
+        cp -r "$out/docs/generated/." docs/generated/
+        chmod -R u+w docs/generated
+        echo "synced docs/generated/ ($(find docs/generated -name '*.md' | wc -l) pages)"
 
   dev:nixbuild:plan:
     desc: Report what would build/fetch for hosts against local substituters (read-only)

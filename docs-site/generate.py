@@ -7,11 +7,12 @@ from pathlib import Path
 
 from markdown import Markdown
 
-NAV_PATH = Path(__file__).with_name("nav.json")
 STYLE_PATH = Path(__file__).with_name("assets") / "style.css"
 
-def load_nav():
-    with open(NAV_PATH, encoding="utf-8") as f:
+
+def load_nav(path):
+    """Read the page manifest emitted by lib/docs.nix (never a repo-side copy)."""
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 def normalize_base_url(base_url):
@@ -135,21 +136,41 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", required=True)
     parser.add_argument("--out", required=True)
+    parser.add_argument(
+        "--nav",
+        required=True,
+        help="nav.json emitted by lib/docs.nix (nix build .#docs)",
+    )
+    parser.add_argument(
+        "--generated-root",
+        default=None,
+        help="Docs build output; generated pages are resolved here before --repo-root",
+    )
     parser.add_argument("--base-url", default="/", help="Base URL for generated links")
     args = parser.parse_args()
 
     repo_root = Path(args.repo_root)
+    generated_root = Path(args.generated_root) if args.generated_root else None
     output_root = Path(args.out)
     output_root.mkdir(parents=True, exist_ok=True)
     base_url = normalize_base_url(args.base_url)
 
-    nav = load_nav()
+    nav = load_nav(args.nav)
     slug_map = build_slug_map(nav)
     style = STYLE_PATH.read_text(encoding="utf-8")
 
     for section in nav:
         for page in section["pages"]:
-            source = repo_root / page["src"]
+            # Generated pages live in the docs derivation; hand-written pages in
+            # the repo. Check the build output first so a stale repo copy can
+            # never be served instead of the generated one.
+            source = None
+            if generated_root is not None:
+                candidate = generated_root / page["src"]
+                if candidate.exists():
+                    source = candidate
+            if source is None:
+                source = repo_root / page["src"]
             if not source.exists():
                 raise SystemExit(f"Missing source document: {source}")
             raw = source.read_text(encoding="utf-8")

@@ -62,6 +62,12 @@ in {
       description = "Default model identifier sent to TypeSafe Jev if unspecified.";
     };
 
+    defaultModel = lib.mkOption {
+      type = lib.types.str;
+      default = "qwen3.6-35b-a3b";
+      description = "Default generative model for chat completions when the request omits a model or uses a policy: prefix. SubZeroClaw follows this default.";
+    };
+
     fallbackToLocal = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -79,7 +85,9 @@ in {
       ];
       wants = [
         "llama-swap.service"
-        "laya-serve.service"
+        # Deliberately NOT laya-serve: wanting it would start Laya at boot
+        # and defeat on-demand. The router falls back to Laya via the socket
+        # when TypeSafe is unreachable; a request through it activates Laya.
       ];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
@@ -94,7 +102,12 @@ in {
           "TYPESAFE_ENDPOINT=${cfg.typesafeEndpoint}"
           "LAYA_ENDPOINT=${cfg.layaEndpoint}"
           "DEFAULT_DECISION_MODEL=${cfg.defaultDecisionModel}"
-          "FALLBACK_TO_LOCAL=${if cfg.fallbackToLocal then "true" else "false"}"
+          "DEFAULT_MODEL=${cfg.defaultModel}"
+          "FALLBACK_TO_LOCAL=${
+            if cfg.fallbackToLocal
+            then "true"
+            else "false"
+          }"
         ];
       };
     };

@@ -49,7 +49,9 @@ task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 
 ### Validation
 ```bash
-task checks:quick                # Run narrow repo checks
+task checks:quick                # Narrow repo HYGIENE (no host config evaluated)
+task checks:tasks                # Task graph: duplicate keys + dangling references
+task checks:host HOST=<host>     # ONE host: module system + every assertion
 task checks:flake:transitive     # Read-only transitive flake pin sweep (exit 1 on drift)
 task checks:qmd:docs             # qmd docs collection exists + index fresh
 ```

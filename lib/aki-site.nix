@@ -9,13 +9,21 @@
 {
   pkgs,
   lib ? pkgs.lib,
+  # Compiled registry from lib/inventory.nix (flake output `inventory`). Callers
+  # in the flake pass it so this site cannot disagree with the hosts about a
+  # host's kind/status/role; the TOML fallback exists only for a standalone
+  # `nix-build lib/aki-site.nix` and is NOT defaults-normalised.
+  inventory ? null,
 }: let
-  # Canonical fleet inventory parsed natively by Nix
   inventoryFile = ../inventory.toml;
-  inventory =
+  rawInventory =
     if builtins.pathExists inventoryFile
     then builtins.fromTOML (builtins.readFile inventoryFile)
     else {hosts = {};};
+  inv =
+    if inventory != null
+    then inventory
+    else rawInventory;
 
   # Aki hypermedia driver with delegated click listener for dynamic DOM mutations
   akiJs = ''
@@ -345,12 +353,12 @@
   };
 
   # Host list for sidebar
-  hostKeys = builtins.attrNames (inventory.hosts or {});
-  activeHosts = builtins.filter (h: (inventory.hosts.${h}.status or "") == "active") hostKeys;
+  hostKeys = builtins.attrNames (inv.hosts or {});
+  activeHosts = builtins.filter (h: (inv.hosts.${h}.status or "") == "active") hostKeys;
 
   hostSidebarButtons = lib.concatStringsSep "\n" (
     map (
-      h: ''<button class="side-btn" url="data/host-${h}.json">${h} (${inventory.hosts.${h}.kind or "nix"})</button>''
+      h: ''<button class="side-btn" url="data/host-${h}.json">${h} (${inv.hosts.${h}.kind or "nix"})</button>''
     )
     activeHosts
   );
@@ -377,7 +385,7 @@
           <tbody>
             ${lib.concatStringsSep "\n" (
           map (h: let
-            info = inventory.hosts.${h};
+            info = inv.hosts.${h};
           in ''
             <tr>
               <td><strong><button class="side-btn" style="padding:0; border:none; color:var(--heading); cursor:pointer;" url="data/host-${h}.json">${h}</button></strong></td>
@@ -401,7 +409,7 @@
 
   # Individual host pages
   mkHostJson = h: let
-    info = inventory.hosts.${h} or {};
+    info = inv.hosts.${h} or {};
     hw = info.hardware or {};
     net = info.network or {};
   in

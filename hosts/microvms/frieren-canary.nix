@@ -138,15 +138,22 @@ in {
   system.activationScripts.subzeroclawSetup = {
     text = ''
             mkdir -p /home/devji/.subzeroclaw/skills /home/devji/.subzeroclaw/logs /home/devji/workspace/subzeroclaw
-            if [ ! -f /home/devji/.subzeroclaw/config ]; then
-              cat << 'EOF' > /home/devji/.subzeroclaw/config
+            # SubZeroClaw config: written unconditionally (the canary is
+            # ephemeral; the config is managed, not user-owned). The runner
+            # (SubZeroClaw, in this microVM) talks only to the host
+            # (192.168.83.1); frieren's nginx /eisen/ proxies to Eisen's
+            # decision router (via Eisen's nginx /router/). The model is
+            # policy:auto, so the router uses its Nix default (Kolibri).
+            # api_key "none": the router forwards it to Jev; Jev rejects it
+            # and the router falls back to Laya (fine for the hi test). For
+            # real Jev decisions, set the real key via a secret (never here).
+            cat << 'EOF' > /home/devji/.subzeroclaw/config
       api_key  = "none"
-      endpoint = "http://192.168.83.1:11434/v1/chat/completions"
-      request_extra = {"model":"nemotron-3-ultra:cloud"}
+      endpoint = "http://192.168.83.1/eisen/v1/chat/completions"
+      request_extra = {"model":"policy:auto"}
       skills_dir = "/home/devji/.subzeroclaw/skills"
       log_dir    = "/home/devji/.subzeroclaw/logs"
       EOF
-            fi
 
             if [ ! -f /home/devji/.subzeroclaw/skills/sandbox.md ]; then
               cat << 'EOF' > /home/devji/.subzeroclaw/skills/sandbox.md

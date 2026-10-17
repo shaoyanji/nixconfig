@@ -409,6 +409,25 @@ in {
     };
   };
 
+  # --- Router: http://eisen.lan/router/* -> 127.0.0.1:8000 ----------------
+  # Exposes the decision router on :80 (loopback-only otherwise) so LAN /
+  # bridged-subnet clients (e.g. the frieren-canary microVM, via frieren's
+  # /eisen/ proxy) can reach it. The /router/ prefix is stripped by the
+  # trailing slash, so the router sees /v1/chat/completions + /v1/decisions.
+  # Same pattern as parakeet /stt/.
+  services.nginx.virtualHosts."eisen.lan".locations."/router/" = {
+    proxyPass = "http://127.0.0.1:${toString config.services.llm-decision-router.port}/";
+    proxyWebsockets = false;
+    extraConfig = ''
+      proxy_buffering off;
+      proxy_cache off;
+      # A generation can run to the router's 110s cap + cold-load queueing.
+      proxy_read_timeout 3600s;
+      proxy_send_timeout 3600s;
+      client_max_body_size 0;
+    '';
+  };
+
   # --- Tailnet: https://eisen.<tailnet>.ts.net/v1 (classic node serve) ---
   #
   # This is the primary tailnet exposure. `tailscale serve --bg` is the only

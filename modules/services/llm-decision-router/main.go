@@ -109,6 +109,7 @@ type Config struct {
 	TypeSafeEndpoint     string
 	LayaEndpoint         string
 	DefaultDecisionModel string
+	DefaultModel         string
 	FallbackToLocal      bool
 }
 
@@ -219,6 +220,7 @@ func main() {
 		TypeSafeEndpoint:     getEnv("TYPESAFE_ENDPOINT", "https://api.typesafe.ai/v1/systemone"),
 		LayaEndpoint:         getEnv("LAYA_ENDPOINT", "http://127.0.0.1:8090/v1/systemone"),
 		DefaultDecisionModel: getEnv("DEFAULT_DECISION_MODEL", "jev-latest"),
+		DefaultModel:         getEnv("DEFAULT_MODEL", "qwen3.6-35b-a3b"),
 		FallbackToLocal:      getEnv("FALLBACK_TO_LOCAL", "true") == "true",
 	}
 
@@ -317,7 +319,7 @@ func main() {
 
 					// Normalize policy:auto or missing model to local default
 					if m, ok := req["model"].(string); !ok || m == "" || strings.HasPrefix(m, "policy:") {
-						req["model"] = "qwen3.6-35b-a3b"
+						req["model"] = cfg.DefaultModel
 						modified = true
 					}
 

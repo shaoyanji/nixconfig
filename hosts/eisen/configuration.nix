@@ -136,6 +136,7 @@ in {
   services.llm-decision-router = {
     enable = true;
     port = 8000;
+    defaultModel = "kolibri-1";
   };
 
   # --- Storage drives ---

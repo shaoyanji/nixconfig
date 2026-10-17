@@ -62,6 +62,12 @@ in {
       description = "Default model identifier sent to TypeSafe Jev if unspecified.";
     };
 
+    defaultModel = lib.mkOption {
+      type = lib.types.str;
+      default = "qwen3.6-35b-a3b";
+      description = "Default generative model for chat completions when the request omits a model or uses a policy: prefix. SubZeroClaw follows this default.";
+    };
+
     fallbackToLocal = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -96,6 +102,7 @@ in {
           "TYPESAFE_ENDPOINT=${cfg.typesafeEndpoint}"
           "LAYA_ENDPOINT=${cfg.layaEndpoint}"
           "DEFAULT_DECISION_MODEL=${cfg.defaultDecisionModel}"
+          "DEFAULT_MODEL=${cfg.defaultModel}"
           "FALLBACK_TO_LOCAL=${if cfg.fallbackToLocal then "true" else "false"}"
         ];
       };

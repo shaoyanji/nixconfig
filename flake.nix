@@ -1,11 +1,18 @@
 {
   description = "Personal Nix configuration: NixOS, nix-darwin, and Home Manager";
 
-  # numtide cache (llm-agents.nix prebuilt packages) is configured at the
-  # daemon level in modules/global/global.nix — a flake-level nixConfig here
-  # is ignored for untrusted users and only produced
-  # "ignoring untrusted flake configuration setting" warnings.
-  # inputs.self.submodules = true;
+  # Prebuilt packages and LAN caches: ensure any flake evaluation carries
+  # the binary caches for llm-agents.nix and local store transfers.
+  nixConfig = {
+    extra-substituters = [
+      "https://cache.numtide.com"
+      "http://192.168.3.25:5000"
+    ];
+    extra-trusted-public-keys = [
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      "frieren.lan-1:BUg+1UmfYlF0XCbC0+ZyWQOY1DpQJhj/wa2q76NTFOg="
+    ];
+  };
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     # AI coding-agent packages, auto-updated daily upstream.

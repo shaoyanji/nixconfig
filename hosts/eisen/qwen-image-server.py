@@ -93,8 +93,12 @@ def _http_json(method, url, body=None, timeout=30):
 
 
 def _sd_healthy():
+    # sd-server has NO /health endpoint (it 404s). /v1/models (api.md)
+    # returns the sd-cpp-local model once the server is up — that is
+    # the readiness check. (The wrapper's own /health on :8282 is
+    # separate and stays as-is.)
     try:
-        status, _ = _http_json("GET", f"http://127.0.0.1:{SD_PORT}/health", timeout=5)
+        status, _ = _http_json("GET", f"http://127.0.0.1:{SD_PORT}/v1/models", timeout=5)
         return status == 200
     except Exception:
         return False

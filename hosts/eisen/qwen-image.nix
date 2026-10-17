@@ -31,17 +31,20 @@ let
   # nixpkgs' stable-diffusion-cpp pins 656a135 (2026-09-18), which predates
   # sd.cpp's day-0 Qwen-Image 2.1 support (2026-09-20). Override the src to
   # f0aac52 (2026-10-17 master) and keep nixpkgs' build (CMake + ggml +
-  # Vulkan). sha256 is fakeHash on first write — the build error prints the
-  # correct hash; update it and rebuild.
-  sdCpp = pkgs.stable-diffusion-cpp.overrideAttrs (old: {
+  # Vulkan). fetchSubmodules=true is REQUIRED (ggml is a submodule; without
+  # it cmake/ggml.cmake fails on get_target_property). vulkanSupport=true
+  # via .override (adds the Vulkan buildInputs + SD_VULKAN=ON; nixpkgs
+  # defaults to CPU-only). sha256 is fakeHash — the build error prints the
+  # correct hash for the submodule-inclusive fetch; update it and rebuild.
+  sdCpp = (pkgs.stable-diffusion-cpp.override { vulkanSupport = true; }).overrideAttrs (old: {
     version = "2026-10-17-f0aac52";
     src = pkgs.fetchFromGitHub {
       owner = "leejet";
       repo = "stable-diffusion.cpp";
       rev = "f0aac524d3f29140e60ba78f3cfb16d6acea87db";
-      sha256 = "sha256-cOtMVv1f213Zt6B2p2Umu2VaiF4oMGyrPY2TdeFckRY=";
+      fetchSubmodules = true;
+      sha256 = lib.fakeHash;
     };
-    cmakeFlags = (old.cmakeFlags or []) ++ [ "-DSD_VULKAN=ON" ];
   });
 
   # Idempotent, resumable weight fetch — runs only when the file is absent.

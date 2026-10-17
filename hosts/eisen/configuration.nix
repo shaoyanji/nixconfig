@@ -40,6 +40,7 @@ in {
     ../../modules/services/qwen-tts.nix
     ../../modules/services/llm-decision-router.nix
     ./llm-server.nix
+    ./parakeet.nix
     ./decision-models.nix
   ];
 

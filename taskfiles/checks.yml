@@ -865,3 +865,26 @@ tasks:
       - echo "=========================================="
       - task envs:audit
 
+  checks:audit:system:
+    desc: Trigger comprehensive system health audit on SYSTEM.md on-demand (FORCE_RUN=1)
+    summary: >
+      Forces an immediate full agent cascade audit on /home/devji/SYSTEM.md, bypassing
+      the weekday quiet nominal gate to evaluate regressions and update the scorecard.
+    cmds:
+      - systemctl --user set-environment FORCE_RUN=1
+      - systemctl --user start agy-nightly-system.service
+      - systemctl --user unset-environment FORCE_RUN
+      - journalctl --user -u agy-nightly-system.service -n 30 --no-pager
+
+  checks:audit:handoff:
+    desc: Trigger strategic handoff execution on HANDOFF.md on-demand (FORCE_RUN=1)
+    summary: >
+      Forces an immediate full agent cascade execution on /home/devji/HANDOFF.md,
+      evaluating open queue items and executing autonomous promotion candidates.
+    cmds:
+      - systemctl --user set-environment FORCE_RUN=1
+      - systemctl --user start agy-nightly-handoff.service
+      - systemctl --user unset-environment FORCE_RUN
+      - journalctl --user -u agy-nightly-handoff.service -n 30 --no-pager
+
+

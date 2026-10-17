@@ -140,16 +140,24 @@
     # --- System One Decision Triage Preflight (Julia-1 & Laya) ---
     TRIAGE_REPORT="/tmp/systemone-handoff-triage.json"
     OPEN_ITEMS=0
+    ACTIONABLE_COUNT=0
     if command -v systemone-decision >/dev/null 2>&1; then
       echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
       systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" > "$TRIAGE_REPORT" || true
       OPEN_ITEMS=$(grep -o '"status": "OPEN"' "$TRIAGE_REPORT" | wc -l || echo 0)
-      echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found). Triage report saved to $TRIAGE_REPORT."
+      ACTIONABLE_COUNT=$(grep -o '"category": "AUTONOMOUS_PROMOTION_CANDIDATE"' "$TRIAGE_REPORT" | wc -l || echo 0)
+      echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found, $ACTIONABLE_COUNT actionable autonomous candidates)."
+    fi
+
+    # --- Trigger Gate: Only invoke heavy LLM cascade if on-demand or actionable tasks exist ---
+    if [ "''${FORCE_RUN:-0}" != "1" ] && [ "''${1:-}" != "--force" ] && [ "$ACTIONABLE_COUNT" -eq 0 ]; then
+      echo "=== [$(date)] Handoff Gate: No actionable autonomous promotion candidates ($OPEN_ITEMS items remain blocked on hardware or documented gaps). Skipping LLM agent cascade. ==="
+      exit 0
     fi
 
     ${agentCascadeScript}
 
-    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available at /tmp/systemone-handoff-triage.json ($OPEN_ITEMS open items). The intent is to provide live execution guidance without replacing or deleting the markdown files."
+    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available at /tmp/systemone-handoff-triage.json ($OPEN_ITEMS open items, $ACTIONABLE_COUNT actionable). The intent is to provide live execution guidance without replacing or deleting the markdown files."
 
     if run_agent_cascade "$prompt"; then
       echo "=== [$(date)] Handoff execution finished successfully. Preserved $HANDOFF_FILE in-place. ==="
@@ -191,6 +199,13 @@
       systemctl --user reset-failed || true
     fi
 
+    BTRFS_ERRS=$(btrfs device stats / 2>/dev/null | awk '{s+=$2} END {print s}' || echo 0)
+    BACKUP_FAILS=$(systemctl is-failed postgresqlBackup-immich.service restic-backups-frieren-local.service restic-backups-frieren-burgernas.service backup-vaultwarden.service 2>/dev/null | grep failed | wc -l || echo 0)
+    UPGRADE_FAILED=0
+    if systemctl is-failed nixos-upgrade.service >/dev/null 2>&1; then
+      UPGRADE_FAILED=1
+    fi
+
     # --- STEP 2: System One Decision Triage (Julia-1 & Laya) ---
     echo "=== [$(date)] Step 2: Running System One Decision Triage (Julia-1) ==="
     TRIAGE_REPORT="/tmp/systemone-system-triage.json"
@@ -201,10 +216,52 @@
       echo "System One System Triage: Evaluated scorecard with $TIER1_COUNT potential TIER 1 immediate repair item(s)."
     fi
 
-    # --- STEP 3: Agent Cascade Execution ---
+    # --- STEP 3: Trigger Decision Gate ---
+    # Trigger conditions for running full AI agent cascade:
+    # 1. Scheduled weekly comprehensive audit (Sunday, date +%u == 7)
+    # 2. Or manual on-demand trigger (FORCE_RUN=1 or argument --force)
+    # 3. Or an active failure / regression detected:
+    #    - FAILED_SYS > 0 or FAILED_USER > 0
+    #    - BTRFS_ERRS > 0
+    #    - BACKUP_FAILS > 0
+    #    - UPGRADE_FAILED > 0
+    DAY_OF_WEEK=$(date +%u) # 1=Mon, ..., 7=Sun
+    SHOULD_RUN_CASCADE=0
+    RUN_REASON=""
+
+    if [ "''${FORCE_RUN:-0}" = "1" ] || [ "''${1:-}" = "--force" ]; then
+      SHOULD_RUN_CASCADE=1
+      RUN_REASON="Manual on-demand trigger (--force / FORCE_RUN=1)"
+    elif [ "$DAY_OF_WEEK" -eq 7 ]; then
+      SHOULD_RUN_CASCADE=1
+      RUN_REASON="Scheduled weekly comprehensive audit (Sunday)"
+    elif [ "$FAILED_SYS" -gt 0 ] || [ "$FAILED_USER" -gt 0 ]; then
+      SHOULD_RUN_CASCADE=1
+      RUN_REASON="Active failed systemd units detected (sys: $FAILED_SYS, user: $FAILED_USER)"
+    elif [ "$BTRFS_ERRS" -gt 0 ]; then
+      SHOULD_RUN_CASCADE=1
+      RUN_REASON="Btrfs device I/O or corruption errors detected ($BTRFS_ERRS errors)"
+    elif [ "$BACKUP_FAILS" -gt 0 ]; then
+      SHOULD_RUN_CASCADE=1
+      RUN_REASON="Nightly backup service failure detected ($BACKUP_FAILS units failed)"
+    elif [ "$UPGRADE_FAILED" -gt 0 ]; then
+      SHOULD_RUN_CASCADE=1
+      RUN_REASON="NixOS autoUpgrade failure detected"
+    fi
+
+    if [ "$SHOULD_RUN_CASCADE" -eq 0 ]; then
+      echo "=== [$(date)] Quiet Reflex Gate: System is 100% nominal (0 failed units, 0 Btrfs errors, all backups clean). Preserving AI tokens. ==="
+      CURRENT_DATE=$(date "+%Y-%m-%d %H:%M %Z")
+      sed -i "s/\* \*\*Last Audit Run:\*\* .*/\* \*\*Last Audit Run:\*\* $CURRENT_DATE (Quiet Nominal Gate - 0 errors, AI tokens preserved)/" "$SYSTEM_FILE" || true
+      echo "Recorded quiet nominal audit in $SYSTEM_FILE."
+      exit 0
+    fi
+
+    # --- STEP 4: Agent Cascade Execution ---
+    echo "=== [$(date)] Step 4: Trigger active ($RUN_REASON). Invoking Agent Cascade ==="
     ${agentCascadeScript}
 
-    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status. System One decision pre-triage is available at /tmp/systemone-system-triage.json ($TIER1_COUNT immediate items flagged)."
+    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status. System One decision pre-triage is available at /tmp/systemone-system-triage.json ($TIER1_COUNT immediate items flagged). Audit trigger reason: $RUN_REASON."
 
     if run_agent_cascade "$prompt"; then
       echo "=== [$(date)] System maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
@@ -580,14 +637,14 @@ in {
     jobs = {
       agy-nightly-handoff = {
         name = "agy-nightly-handoff";
-        description = "Run /home/devji/HANDOFF.md with Antigravity if present, then delete";
+        description = "Action-gated handoff runner (runs only on autonomous promotion candidates or manual trigger)";
         schedule = "*-*-* 03:00:00";
         command = agyHandoffRunner;
         workingDirectory = "/home/devji";
       };
       agy-nightly-system = {
         name = "agy-nightly-system";
-        description = "Run /home/devji/SYSTEM.md with Antigravity if present, then delete";
+        description = "Trigger-gated system health audit (Mon-Sat quiet reflex, Sunday comprehensive scorecard)";
         schedule = "*-*-* 05:00:00";
         command = agySystemRunner;
         workingDirectory = "/home/devji";

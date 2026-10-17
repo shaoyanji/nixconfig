@@ -146,6 +146,19 @@ func newLLMGateway(proxy *httputil.ReverseProxy, timeout time.Duration) *llmGate
 	return &llmGateway{proxy: proxy, slot: make(chan struct{}, 1), timeout: timeout}
 }
 
+// gpuBusy reports whether the image server currently holds the GPU.
+// It writes GPU_LOCK_FILE (/run/qwen-image/active, via systemd
+// RuntimeDirectory) while sd-server's weights are loaded. A chat generation
+// that starts then would make llama-swap load Qwen into a full GPU.
+func gpuBusy() bool {
+    lock := os.Getenv("GPU_LOCK_FILE")
+    if lock == "" {
+        lock = "/run/qwen-image/active"
+    }
+    _, err := os.Stat(lock)
+    return err == nil
+}
+
 // tryAcquire takes the single generation slot, non-blocking.
 func (g *llmGateway) tryAcquire() bool {
 	select {
@@ -187,6 +200,12 @@ func llmErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 
 // serveChat enforces the slot + timeout, then proxies.
 func (g *llmGateway) serveChat(w http.ResponseWriter, r *http.Request, wantedJSON bool) {
+	if gpuBusy() {
+		log.Printf("[CHAT-BUSY] rejecting %s: GPU held by image server", r.URL.Path)
+		writeJSONError(w, http.StatusTooManyRequests, "gpu_busy",
+			"GPU busy (image server active); retry later")
+		return
+	}
 	if !g.tryAcquire() {
 		log.Printf("[CHAT-BUSY] rejecting %s: generation slot busy", r.URL.Path)
 		writeJSONError(w, http.StatusTooManyRequests, "llm_busy",

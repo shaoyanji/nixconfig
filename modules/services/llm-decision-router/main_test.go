@@ -208,3 +208,58 @@ func TestCleanResponseContent(t *testing.T) {
 		t.Errorf("Test 2 failed. Expected %q, got %q", expected2, out)
 	}
 }
+
+// TestSlotReleasedOnDisconnectWithStuckUpstream: the upstream ignores
+// cancellation and blocks (as llama-swap can when its own backend is
+// stuck). Cancelling the client must still free the slot, so a second
+// request does not 429 while the first handler is still blocked.
+func TestSlotReleasedOnDisconnectWithStuckUpstream(t *testing.T) {
+	entered := make(chan struct{})
+	release := make(chan struct{})
+	var calls atomic.Int32
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if calls.Add(1) == 1 {
+			close(entered)
+			// Ignore r.Context().Done(): the upstream is stuck.
+			<-release
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"choices":[]}`))
+	}))
+	defer upstream.Close()
+
+	gateway := testGateway(upstream, 5*time.Second)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		req := httptest.NewRequestWithContext(ctx, http.MethodPost, "/v1/chat/completions",
+			strings.NewReader(`{"model":"qwen3.6-35b-a3b"}`))
+		rec := httptest.NewRecorder()
+		gateway.serveChat(rec, req, false)
+	}()
+
+	<-entered // upstream has the request; the slot is held
+	cancel() // client disconnects; upstream stays stuck (release still open)
+
+	// The slot must already be free, even though handler 1 is blocked.
+	req2 := httptest.NewRequest(http.MethodPost, "/v1/chat/completions",
+		strings.NewReader(`{"model":"qwen3.6-35b-a3b"}`))
+	rec2 := httptest.NewRecorder()
+	done2 := make(chan struct{})
+	go func() {
+		defer close(done2)
+		gateway.serveChat(rec2, req2, false)
+	}()
+	select {
+	case <-done2:
+		if rec2.Code == http.StatusTooManyRequests {
+			t.Fatalf("second request: expected slot freed on disconnect, got 429")
+		}
+		if rec2.Code != http.StatusOK {
+			t.Fatalf("second request: expected 200, got %d", rec2.Code)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatalf("second request did not complete (slot still held after disconnect)")
+	}
+	close(release) // let the stuck upstream return; handler 1 exits
+}

@@ -30,6 +30,8 @@
     resolvers = ["192.168.3.25"];
     extraDnsmasqLines = [
       "interface=tailscale0"
+      "interface=wlp2s0"
+      "interface=enp0s20f0u2u1i5"
       # eisen's local LLM API (llama.cpp OpenAI /v1) resolves to its stable
       # tailnet address; LAN clients reach it over the tailnet.
       "address=/eisen.lan/100.119.172.99"
@@ -174,6 +176,15 @@
   };
   # Allow DNS queries from Tailscale network
   networking.firewall.interfaces.tailscale0 = {
+    allowedUDPPorts = [53];
+    allowedTCPPorts = [53];
+  };
+  # Allow DNS queries during failover on Wi-Fi and USB-C dock
+  networking.firewall.interfaces.wlp2s0 = {
+    allowedUDPPorts = [53];
+    allowedTCPPorts = [53];
+  };
+  networking.firewall.interfaces.enp0s20f0u2u1i5 = {
     allowedUDPPorts = [53];
     allowedTCPPorts = [53];
   };

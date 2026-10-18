@@ -111,78 +111,83 @@
         sys.exit(1)
   '';
 
-  audibleBatchLiberation = pkgs.writeShellScript "audible-batch-liberation" ''
-    set -euo pipefail
+  makeAudibleBatchLiberation = {
+    name,
+    timeoutSecs,
+    limitBooks ? 50,
+    windowDesc,
+  }:
+    pkgs.writeShellScript name ''
+      set -euo pipefail
 
-    echo "=== [$(date)] Starting Scheduled Phased Audible Liberation ==="
+      echo "=== [$(date)] Starting Scheduled Phased Audible Liberation (${windowDesc}) ==="
 
-    # 1. Storage safety guard (require at least 250 GB available on /srv/data)
-    AVAIL_GB=$(${pkgs.coreutils}/bin/df -BG /srv/data | ${pkgs.gawk}/bin/awk "NR==2 {gsub(/G/,\"\"); print \$4}")
-    echo "Available storage on /srv/data: ''${AVAIL_GB} GB"
+      # 1. Storage safety guard (require at least 250 GB available on /srv/data)
+      AVAIL_GB=$(${pkgs.coreutils}/bin/df -BG /srv/data | ${pkgs.gawk}/bin/awk "NR==2 {gsub(/G/,\"\"); print \$4}")
+      echo "Available storage on /srv/data: ''${AVAIL_GB} GB"
 
-    MIN_HEADROOM_GB=250
-    if [ "$AVAIL_GB" -lt "$MIN_HEADROOM_GB" ]; then
-      MSG="⚠️ [Audible Liberation Skipped] Storage headroom too low (''${AVAIL_GB} GB free < ''${MIN_HEADROOM_GB} GB threshold). Pausing liberation."
-      echo "$MSG" >&2
-      SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
-      if [ ! -f "$SIMPLEX_RPC" ]; then
-        SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
+      MIN_HEADROOM_GB=250
+      if [ "$AVAIL_GB" -lt "$MIN_HEADROOM_GB" ]; then
+        MSG="⚠️ [Audible Liberation Skipped] Storage headroom too low (''${AVAIL_GB} GB free < ''${MIN_HEADROOM_GB} GB threshold). Pausing liberation."
+        echo "$MSG" >&2
+        SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
+        if [ ! -f "$SIMPLEX_RPC" ]; then
+          SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
+        fi
+        if [ -f "$SIMPLEX_RPC" ]; then
+          ${pkgs.python3}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$MSG" || true
+        fi
+        exit 0
       fi
-      if [ -f "$SIMPLEX_RPC" ]; then
-        ${pkgs.python3}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$MSG" || true
-      fi
-      exit 0
-    fi
 
-    # 2. Hard timeout enforcement:
-    # Maximum 170 minutes (10,200s) ensures it terminates cleanly before 02:55, well ahead of 03:00 backup window
-    TIMEOUT_SECS=10200
-    LIBATION_BIN="${pkgs.libation}/bin/libationcli"
+      # 2. Hard timeout enforcement:
+      TIMEOUT_SECS=${toString timeoutSecs}
+      LIBATION_BIN="${pkgs.libation}/bin/libationcli"
 
-    echo "Executing: $LIBATION_BIN liberate --limit-books 50"
-    BATCH_START_TIME=$(${pkgs.coreutils}/bin/date +%s)
-    PRE_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
+      echo "Executing: $LIBATION_BIN liberate --limit-books ${toString limitBooks}"
+      BATCH_START_TIME=$(${pkgs.coreutils}/bin/date +%s)
+      PRE_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
 
-    # Run with timeout and TERM signal
-    ${pkgs.coreutils}/bin/timeout --preserve-status -s TERM "$TIMEOUT_SECS" "$LIBATION_BIN" liberate --limit-books 50 || {
-      EXIT_CODE=$?
-      if [ "$EXIT_CODE" -eq 124 ] || [ "$EXIT_CODE" -eq 143 ]; then
-        echo "=== [$(date)] Hit 02:50 cutoff timer; stopped gracefully before 03:00 backup window ==="
-      else
-        echo "=== [$(date)] libationcli exited with code $EXIT_CODE ==="
-      fi
-    }
+      # Run with timeout and TERM signal
+      ${pkgs.coreutils}/bin/timeout --preserve-status -s TERM "$TIMEOUT_SECS" "$LIBATION_BIN" liberate --limit-books ${toString limitBooks} || {
+        EXIT_CODE=$?
+        if [ "$EXIT_CODE" -eq 124 ] || [ "$EXIT_CODE" -eq 143 ]; then
+          echo "=== [$(date)] Hit window cutoff timer (${windowDesc}); stopped gracefully ==="
+        else
+          echo "=== [$(date)] libationcli exited with code $EXIT_CODE ==="
+        fi
+      }
 
-    BATCH_END_TIME=$(${pkgs.coreutils}/bin/date +%s)
-    DURATION_MINS=$(( (BATCH_END_TIME - BATCH_START_TIME) / 60 ))
-    POST_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
-    NEW_BOOKS=$(( POST_COUNT - PRE_COUNT ))
-    NEW_AVAIL_GB=$(${pkgs.coreutils}/bin/df -BG /srv/data | ${pkgs.gawk}/bin/awk "NR==2 {gsub(/G/,\"\"); print \$4}")
+      BATCH_END_TIME=$(${pkgs.coreutils}/bin/date +%s)
+      DURATION_MINS=$(( (BATCH_END_TIME - BATCH_START_TIME) / 60 ))
+      POST_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
+      NEW_BOOKS=$(( POST_COUNT - PRE_COUNT ))
+      NEW_AVAIL_GB=$(${pkgs.coreutils}/bin/df -BG /srv/data | ${pkgs.gawk}/bin/awk "NR==2 {gsub(/G/,\"\"); print \$4}")
 
-    REPORT="📚 [Audible Batch Liberation Complete]
+      REPORT="📚 [Audible Batch Liberation - ${windowDesc}]
 Batch Duration: ''${DURATION_MINS}m
 New Books Converted: ''${NEW_BOOKS}
 Total Library Size: ''${POST_COUNT} books
 Remaining Free Space: ''${NEW_AVAIL_GB} GB"
 
-    echo "$REPORT"
+      echo "$REPORT"
 
-    # 3. Post-batch Audiobookshelf notification / library check
-    if ${pkgs.curl}/bin/curl -s -f http://127.0.0.1:13378/healthcheck >/dev/null 2>&1; then
-      echo "Audiobookshelf is healthy on port 13378."
-    fi
+      # 3. Post-batch Audiobookshelf notification / library check
+      if ${pkgs.curl}/bin/curl -s -f http://127.0.0.1:13378/healthcheck >/dev/null 2>&1; then
+        echo "Audiobookshelf is healthy on port 13378."
+      fi
 
-    # 4. Dispatch status report to SimpleX #Fleet
-    SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
-    if [ ! -f "$SIMPLEX_RPC" ]; then
-      SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
-    fi
-    if [ -f "$SIMPLEX_RPC" ]; then
-      ${pkgs.python3}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$REPORT" || true
-    fi
+      # 4. Dispatch status report to SimpleX #Fleet
+      SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
+      if [ ! -f "$SIMPLEX_RPC" ]; then
+        SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
+      fi
+      if [ -f "$SIMPLEX_RPC" ]; then
+        ${pkgs.python3}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$REPORT" || true
+      fi
 
-    echo "=== [$(date)] Phased Audible Liberation Batch Finished Successfully ==="
-  '';
+      echo "=== [$(date)] Phased Audible Liberation Batch Finished Successfully ==="
+    '';
 
   agentCascadeScript = ''
     run_agent_cascade() {
@@ -800,15 +805,32 @@ in {
         command = agySystemRunner;
         workingDirectory = "/home/devji";
       };
-      # PAUSED per user request ("ppause dl actions please")
-      # audible-phased-liberation = {
-      #   name = "audible-phased-liberation";
-      #   description = "Scheduled phased batch Audible audiobook liberation (00:00-02:50 CEST, 50 books limit)";
-      #   schedule = "*-*-* 00:00:00";
-      #   command = audibleBatchLiberation;
-      #   workingDirectory = "/home/devji";
-      #   lockFile = "/tmp/audible-liberation.lock";
-      # };
+      audible-daytime-liberation = {
+        name = "audible-daytime-liberation";
+        description = "Special daytime batch Audible liberation (11:30-13:00 CEST, 50 books max, 85m timeout)";
+        schedule = "2026-10-18 11:30:00";
+        command = makeAudibleBatchLiberation {
+          name = "audible-daytime-liberation";
+          timeoutSecs = 5100; # 85 min, hard cutoff at 12:55 before 13:00
+          limitBooks = 50;
+          windowDesc = "Daytime 11:30-13:00 CEST";
+        };
+        workingDirectory = "/home/devji";
+        lockFile = "/tmp/audible-liberation.lock";
+      };
+      audible-phased-liberation = {
+        name = "audible-phased-liberation";
+        description = "Scheduled nightly batch Audible liberation (00:00-02:50 CEST, 50 books max, 170m timeout)";
+        schedule = "*-*-* 00:00:00";
+        command = makeAudibleBatchLiberation {
+          name = "audible-nightly-liberation";
+          timeoutSecs = 10200; # 170 min, hard cutoff at 02:50 before 03:00 backup window
+          limitBooks = 50;
+          windowDesc = "Nightly 00:00-02:50 CEST";
+        };
+        workingDirectory = "/home/devji";
+        lockFile = "/tmp/audible-liberation.lock";
+      };
     };
   };
 

@@ -687,3 +687,37 @@
 
 
 
+
+### 47. [x] Daytime Liberation Verification, SimpleX Notification Fix & 50 GB Batch Execution (2026-10-18 15:40 CEST)
+* **Status:** `COMPLETED & ACTIVE IN BACKGROUND` (Commits `8270192c`, `9181b07b`, System Generation 144)
+* **Context & Audit Findings:**
+  1. **Previous Daytime Run (11:30 CEST):** Verified via journal logs that between 11:30 and 12:29 CEST, **50 audiobooks were liberated cleanly** into `/srv/data/audiobooks/Books/` (library expanded from 89 to 139 `.m4b` files). The user believed nothing was done because the desktop experienced zero lag and the completion notification failed silently due to `${pkgs.python3}` lacking the `websockets` library.
+  2. **Notification Fix:** Updated `makeAudibleBatchLiberation` to use `pkgs.python3.withPackages (ps: [ps.websockets])` when calling `simplex-rpc.py`. Live-tested message delivery to `#Fleet` (item ID 42 and 43 succeeded).
+  3. **Uncapped Governor ("Let it Rip"):** Per operator directive, removed `CPUQuota = "250%"` and adjusted process nice level to `nice = 10` with `IOSchedulingClass = "best-effort"`. This permits ffmpeg and Libation to utilize all 8 CPU threads without artificial throttling while preserving responsiveness for desktop tasks.
+  4. **Immediate 50 GB Batch Run:**
+     - Deployed `/home/devji/.local/bin/audible-batch-immediate-50gb.sh` running `libationcli liberate --limit-gb 50` under the `/tmp/audible-liberation.lock` mutex.
+     - Launched under transient systemd unit `audible-immediate-50gb.service`.
+     - Dispatched start notification directly to SimpleX `#Fleet` with live library stats.
+     - Completion report with duration, newly converted books, and remaining storage will dispatch automatically to `#Fleet` upon finish.
+
+### 48. [x] Aria2 RPC Network Architecture, Tailscale Routing & Mobile Endpoint Resolution (2026-10-18 15:45 CEST)
+* **Status:** `RESOLVED & VERIFIED` (Endpoint & Secret Documented for Mobile Clients)
+* **Analysis & Root Cause:**
+  1. **Why `frieren.cloudforest-kardashev.ts.net` opens Home Assistant:**
+     - `frieren.cloudforest-kardashev.ts.net` resolves to Frieren's Tailscale IP (`100.97.61.65`).
+     - Connecting over HTTPS (port 443) hits Nginx. Nginx has two SSL vhosts (`ha.frieren.lan` and `vault.frieren.lan`).
+     - In Nginx, if no `server_name` explicitly matches the incoming TLS SNI/Host header, Nginx falls back to the **default SSL virtual host**, which is `ha.frieren.lan` (Home Assistant).
+  2. **Why Port 6800 Fails:**
+     - The underlying `aria2c` process is intentionally bound to `127.0.0.1:6800` only (`rpc-listen-all = false` in `modules/services/aria2-daemon.nix`).
+     - Port 6800 is blocked on all external network interfaces (wired LAN, Wi-Fi, Tailscale) by the scoped firewall (`firewall-scope.nix`).
+  3. **Why Port 6801 Failed for Mobile Apps:**
+     - Port 6801 is open on all interfaces, but it is served via **plain HTTP** (NOT HTTPS/TLS). Mobile apps attempting TLS/HTTPS connection fail the SSL handshake.
+     - The JSON-RPC endpoint is hosted at the path `/jsonrpc` (not `/`).
+     - Aria2 requires token authentication via the SOPS secret (`/run/secrets/aria2-rpc-secret`). Without the token, the server returns HTTP 400 Unauthorized.
+* **Exact Mobile App Configuration Settings:**
+  - **Host / IP:** `frieren.cloudforest-kardashev.ts.net` (or `100.97.61.65` over Tailscale; `192.168.3.25` on LAN)
+  - **Port:** `6801`
+  - **SSL / HTTPS / TLS:** **OFF** (Must be plain HTTP or `ws://`)
+  - **Path:** `/jsonrpc`
+  - **Secret Token:** `aee7876dfd8bd6e78cbdae89363b3a0ddae26103`
+  - **Alternative (Mobile Browser):** Navigate to `http://frieren.cloudforest-kardashev.ts.net:6801` or `http://100.97.61.65:6801` to use AriaNg web UI directly with automatic token pre-authentication.

@@ -114,9 +114,27 @@
   makeAudibleBatchLiberation = {
     name,
     timeoutSecs,
-    limitBooks ? 50,
+    limitBooks ? null,
+    limitGb ? null,
     windowDesc,
+    nice ? 10,
+    ionice ? null,
   }:
+    let
+      limitArg =
+        if limitGb != null
+        then "--limit-gb ${toString limitGb}"
+        else if limitBooks != null
+        then "--limit-books ${toString limitBooks}"
+        else "--limit-books 50";
+      priorityPrefix =
+        if nice != null && ionice != null
+        then "${pkgs.coreutils}/bin/nice -n ${toString nice} ${pkgs.util-linux}/bin/ionice -c ${toString ionice}"
+        else if nice != null
+        then "${pkgs.coreutils}/bin/nice -n ${toString nice}"
+        else "";
+      pythonWithWebsockets = pkgs.python3.withPackages (ps: [ps.websockets]);
+    in
     pkgs.writeShellScript name ''
       set -euo pipefail
 
@@ -135,7 +153,7 @@
           SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
         fi
         if [ -f "$SIMPLEX_RPC" ]; then
-          ${pkgs.python3}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$MSG" || true
+          ${pythonWithWebsockets}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$MSG" || true
         fi
         exit 0
       fi
@@ -144,15 +162,13 @@
       TIMEOUT_SECS=${toString timeoutSecs}
       LIBATION_BIN="${pkgs.libation}/bin/libationcli"
 
-      echo "Executing: $LIBATION_BIN liberate --limit-books ${toString limitBooks}"
+      echo "Executing: $LIBATION_BIN liberate ${limitArg}"
       BATCH_START_TIME=$(${pkgs.coreutils}/bin/date +%s)
       PRE_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
 
-      # Run with lowest CPU priority (nice 19) and idle IO priority (ionice -c 3)
-      # to guarantee zero starvation of the desktop compositor (niri), audio, and display wake.
-      ${pkgs.coreutils}/bin/nice -n 19 ${pkgs.util-linux}/bin/ionice -c 3 \
+      ${priorityPrefix} \
         ${pkgs.coreutils}/bin/timeout --preserve-status -s TERM "$TIMEOUT_SECS" \
-        "$LIBATION_BIN" liberate --limit-books ${toString limitBooks} || {
+        "$LIBATION_BIN" liberate ${limitArg} || {
         EXIT_CODE=$?
         if [ "$EXIT_CODE" -eq 124 ] || [ "$EXIT_CODE" -eq 143 ]; then
           echo "=== [$(date)] Hit window cutoff timer (${windowDesc}); stopped gracefully ==="
@@ -186,7 +202,7 @@ Remaining Free Space: ''${NEW_AVAIL_GB} GB"
         SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
       fi
       if [ -f "$SIMPLEX_RPC" ]; then
-        ${pkgs.python3}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$REPORT" || true
+        ${pythonWithWebsockets}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$REPORT" || true
       fi
 
       echo "=== [$(date)] Phased Audible Liberation Batch Finished Successfully ==="
@@ -808,41 +824,21 @@ in {
         command = agySystemRunner;
         workingDirectory = "/home/devji";
       };
-      audible-daytime-liberation = {
-        name = "audible-daytime-liberation";
-        description = "Special daytime batch Audible liberation (11:30-13:00 CEST, 50 books max, 85m timeout)";
-        schedule = "2026-10-18 11:30:00";
-        command = makeAudibleBatchLiberation {
-          name = "audible-daytime-liberation";
-          timeoutSecs = 5100; # 85 min, hard cutoff at 12:55 before 13:00
-          limitBooks = 50;
-          windowDesc = "Daytime 11:30-13:00 CEST";
-        };
-        workingDirectory = "/home/devji";
-        lockFile = "/tmp/audible-liberation.lock";
-        nice = 19;
-        ioSchedulingClass = "idle";
-        cpuQuota = "250%"; # Caps at 2.5 cores (out of 8), preserving 5.5 cores for 4K desktop compositor & NAS
-        cpuWeight = 20;
-        ioWeight = 20;
-      };
       audible-phased-liberation = {
         name = "audible-phased-liberation";
-        description = "Scheduled nightly batch Audible liberation (00:00-02:50 CEST, 50 books max, 170m timeout)";
+        description = "Scheduled nightly batch Audible liberation (00:00-02:50 CEST, 50 GB limit, 170m timeout)";
         schedule = "*-*-* 00:00:00";
         command = makeAudibleBatchLiberation {
           name = "audible-nightly-liberation";
           timeoutSecs = 10200; # 170 min, hard cutoff at 02:50 before 03:00 backup window
-          limitBooks = 50;
+          limitGb = 50;
           windowDesc = "Nightly 00:00-02:50 CEST";
+          nice = 10;
         };
         workingDirectory = "/home/devji";
         lockFile = "/tmp/audible-liberation.lock";
-        nice = 19;
-        ioSchedulingClass = "idle";
-        cpuQuota = "250%"; # Caps at 2.5 cores (out of 8), preserving 5.5 cores for 4K desktop compositor & NAS
-        cpuWeight = 20;
-        ioWeight = 20;
+        nice = 10;
+        ioSchedulingClass = "best-effort";
       };
     };
   };

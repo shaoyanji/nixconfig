@@ -123,6 +123,12 @@
           <div class="badge">media.frieren.lan :8096</div>
         </a>
 
+        <a class="card" href="http://audiobooks.frieren.lan">
+          <div class="card-header"><span class="card-title">Audiobookshelf</span></div>
+          <div class="card-desc">Self-hosted audiobook & podcast streamer with playback sync and mobile apps.</div>
+          <div class="badge">audiobooks.frieren.lan :13378</div>
+        </a>
+
         <a class="card" href="http://pdf.frieren.lan">
           <div class="card-header"><span class="card-title">Stirling PDF</span></div>
           <div class="card-desc">Local PDF editing, merging, splitting, OCR, and conversion suite.</div>
@@ -404,6 +410,28 @@ in {
           extraConfig = ''
             proxy_connect_timeout 2s;
             proxy_read_timeout 5s;
+          '';
+        };
+      };
+
+      # Audiobookshelf web UI & streaming API
+      "audiobooks.frieren.lan" = {
+        serverAliases = [
+          "audiobookshelf.frieren.lan"
+          "books.frieren.lan"
+          "audiobooks"
+        ];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:13378";
+          proxyWebsockets = true;
+          extraConfig = ''
+            client_max_body_size 500M;
           '';
         };
       };

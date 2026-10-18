@@ -54,6 +54,7 @@
 
   fleetGatusReport = pkgs.writers.writePython3Bin "fleet-gatus-report" {
     libraries = [pkgs.python3Packages.websockets];
+    flakeIgnore = ["E501" "E302" "E305" "E203" "W503"];
   } ''
     import asyncio
     import json
@@ -799,14 +800,15 @@ in {
         command = agySystemRunner;
         workingDirectory = "/home/devji";
       };
-      audible-phased-liberation = {
-        name = "audible-phased-liberation";
-        description = "Scheduled phased batch Audible audiobook liberation (00:00-02:50 CEST, 50 books limit)";
-        schedule = "*-*-* 00:00:00";
-        command = audibleBatchLiberation;
-        workingDirectory = "/home/devji";
-        lockFile = "/tmp/audible-liberation.lock";
-      };
+      # PAUSED per user request ("ppause dl actions please")
+      # audible-phased-liberation = {
+      #   name = "audible-phased-liberation";
+      #   description = "Scheduled phased batch Audible audiobook liberation (00:00-02:50 CEST, 50 books limit)";
+      #   schedule = "*-*-* 00:00:00";
+      #   command = audibleBatchLiberation;
+      #   workingDirectory = "/home/devji";
+      #   lockFile = "/tmp/audible-liberation.lock";
+      # };
     };
   };
 

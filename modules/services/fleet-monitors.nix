@@ -29,6 +29,7 @@
 
   alertBridge = pkgs.writers.writePython3Bin "fleet-alert-bridge" {
     libraries = [pkgs.python3Packages.websockets];
+    flakeIgnore = ["E501" "E302" "E305" "E203" "W503"];
   } ''
     import asyncio
     import http.server

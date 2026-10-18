@@ -721,3 +721,12 @@
   - **Path:** `/jsonrpc`
   - **Secret Token:** `aee7876dfd8bd6e78cbdae89363b3a0ddae26103`
   - **Alternative (Mobile Browser):** Navigate to `http://frieren.cloudforest-kardashev.ts.net:6801` or `http://100.97.61.65:6801` to use AriaNg web UI directly with automatic token pre-authentication.
+
+### 49. [x] Published Mobile Aria2c Tailscale Guide to Envs.net Gemini Capsule (2026-10-18 15:55 CEST)
+* **Status:** `COMPLETED & LIVE ON GEMINI`
+* **Capsule URL:** `gemini://envs.net/~jisifu/aria2c-mobile-anywhere-settings-and-tailscale-rpc.gmi`
+* **Actions Taken:**
+  - Authored a comprehensive Gemtext (`.gmi`) guide explaining the reverse proxy architecture, port 6800 loopback binding vs port 6801 proxy, the port 443 default host trap (Home Assistant SNI fallback), plain HTTP requirements, and exact mobile client settings.
+  - Uploaded to `/home/jisifu/public_gemini/` on `envs.net` via SSH (`envs`).
+  - Executed `python3 update_gmi_links.py` to regenerate the link index in `index.gmi`.
+  - Verified live over the Gemini protocol (port 1965 TLS, returned `20 text/gemini`).

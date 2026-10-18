@@ -833,7 +833,7 @@ in {
           timeoutSecs = 10200; # 170 min, hard cutoff at 02:50 before 03:00 backup window
           limitGb = 50;
           windowDesc = "Nightly 00:00-02:50 CEST";
-          nice = 10;
+          nice = null;
         };
         workingDirectory = "/home/devji";
         lockFile = "/tmp/audible-liberation.lock";

@@ -660,5 +660,30 @@
     1. **Primary Recommendation:** Keep `192.168.3.25` on `enp1s0` as the dedicated LAN server backbone. Unplug the redundant Ethernet cable from the USB-C docking station (or assign it metric 200) to eliminate asymmetric routing.
     2. **Optional Inbound Wi-Fi Failover:** If physical cable unplug protection is required, implement a declarative NetworkManager dispatcher script to re-bind `192.168.3.25/24` to `wlp2s0` with gratuitous ARP (`arping -A`) and listen on all interfaces in Pi-hole.
 
+### 46. [x] Network Route Metric Inversion Fix, Declarative Inbound Wi-Fi Failover & USB Autosuspend Prevention (2026-10-18 11:20 CEST)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `08582d50`, Generation 142 Booted)
+* **Context & Motivation:** Operator selected Option B (correct routing metrics to prefer primary wired connection) and Option 2 (declarative inbound Wi-Fi failover with gratuitous ARP), and requested committing and pushing the `hardware.nix` DisplayLink / USB autosuspend changes.
+* **Actions Taken:**
+  1. **Option B (Metric Hierarchy Resolved):**
+     - Configured `enp1s0` (`192.168.3.25`) with route metric `50` (primary default route).
+     - Configured USB-C dock Ethernet (`enp0s20f0u2u1i5`) with route metric `150` (secondary route).
+     - Wi-Fi (`wlp2s0`) remains at metric `600` (tertiary route).
+     - Live verified via `ip route`: `enp1s0` is strictly primary for all outbound internet and local `192.168.3.0/24` subnet traffic, eliminating the previous asymmetric routing bug.
+  2. **Option 2 (Inbound Wi-Fi Failover Deployed):**
+     - Declared NetworkManager dispatcher script `/etc/NetworkManager/dispatcher.d/03userscript0001` in [`hosts/frieren/networking.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/networking.nix).
+     - When `enp1s0` drops link (`down` / `pre-down`): automatically floats `192.168.3.25/24` to `wlp2s0` (`wlp2s0:vip`) and broadcasts gratuitous ARP packets via `arping -c 3 -U -I wlp2s0 192.168.3.25`.
+     - When `enp1s0` restores link (`up`): immediately removes the secondary IP from `wlp2s0` and restores `192.168.3.25` exclusively to `enp1s0` with gratuitous ARP.
+     - Declared Pi-hole listening interfaces in [`hosts/frieren/dns.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/dns.nix): added `interface=wlp2s0` and `interface=enp0s20f0u2u1i5` to `extraDnsmasqLines` and opened port 53 (TCP/UDP) on both interfaces.
+     - Extended [`hosts/frieren/firewall-scope.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/firewall-scope.nix) to include `enp0s20f0u2u1i5` in `scopedIfaces`.
+  3. **USB Autosuspend & DisplayLink Dock Fixes (`hardware.nix`):**
+     - Added `boot.kernelParams = ["usbcore.autosuspend=-1"];` to prevent kernel 6.12 from powering down DisplayLink DL-6950 ASIC and external USB 3.0 hubs after 2s.
+     - Added udev rules in `services.udev.extraRules` disabling autosuspend for vendor IDs `17e9` (DisplayLink), `05e3` (Genesys Logic USB hub), and `06c4` (BizLink dock). Triggered live via `udevadm control --reload && udevadm trigger`.
+  4. **Live Verification:**
+     - Switched cleanly to configuration `/nix/store/08zb0yib9chllbjnhfvy7qdz5rahvd5m-nixos-system-frieren-26.11.20261005.aa48d34`.
+     - Live routing verified: `default via 192.168.3.1 dev enp1s0 metric 50` > `dock metric 150` > `wifi metric 600`.
+     - Pi-hole verified active and answering queries for `frieren.lan`.
+     - Pushed commit `08582d50` to `origin/main`.
+
+
 
 

@@ -269,5 +269,23 @@ To maintain clean separation of concerns across the fleet, two distinct handoff 
   it from `main` until that is confirmed, since the live closures are the good
   state.
 
+### 20. [x] Fleet Monitoring 5AM SimpleX Alerting, Alpine Kiwix ZIM & Libation Audiobooks Audit (2026-10-18)
+* **Fleet Monitoring 5AM SimpleX Report & Alerting Bridge (HC-6, Commit `c6679a44`):**
+  - Integrated `fleetGatusReport` into `agySystemRunner` (`hosts/frieren/infra-stack.nix`). Every morning at 05:00 CEST, Gatus endpoint statuses are queried, formatted into a 7-endpoint scorecard, and delivered to `#Fleet` on SimpleX Chat via WebSocket RPC (`ws://127.0.0.1:5225`). Tested live (message item 41 delivered).
+  - Wired degradation directly to the System One reflex gate: service failure trips `SHOULD_RUN_CASCADE=1` to invoke autonomous repair.
+  - Added declarative alerting in `modules/services/fleet-monitors.nix` with loopback custom webhook bridge (`fleet-alert-bridge` on port 5226) that forwards realtime downtime alerts to `#Fleet` on SimpleX, resolving HC-6.
+* **Kiwix ZIM Knowledge Base Catalog Expansion (EXP-059, Commit `c6679a44`):**
+  - Ingested `alpinelinux_en_all_maxi_2026-07.zim` (62 MB, SRI `sha256-LRkanai/3keuUFFk0Hahh1EwcL+SKY/g6qvfuqmB3fE=`) into `modules/services/kiwix.nix` and `kiwixLibrary`.
+  - Cataloged heavy sysadmin archives (Server Fault 1.63 GB, Unix & Linux Stack Exchange 1.31 GB, Stack Overflow Top 500k 5.5 GB) for off-peak ingestion during scheduled 03:00 maintenance window.
+* **Home Assistant Core Network Infrastructure Device Integration:**
+  - Provisioned 10 local network devices into Home Assistant via native Ping integration with custom friendly names and MDI icons (192.168.3.1 router, .7 printer, .8 vacuum, .11/.13/.15/.17/.21 mesh APs, .18/.19 powerline adapters).
+  - Loaded pending Zeroconf flow for HP LaserJet M15w (192.168.3.6) into native IPP integration.
+* **Audible Liberation Audiobooks Download & NAS Serving Audit:**
+  - Audited `LibationContext.db`: 2,318 audiobooks cataloged.
+  - 63 audiobooks (89 `.m4b` files) converted in `/srv/data/audiobooks/Books/` (46 GB). 0 errors recorded. Interrupted at 05:00 CEST restart (partial download of `The Laws of Human Nature`, 266 MB, preserved in `.inprogress/`).
+  - **Storage Warning:** 2,318 audiobooks require **~1.69 TB of storage**. Available space on `/srv/data` (`/dev/sda2`) is **842 GB**. Unrestricted full liberation will exhaust the 2TB HDD, crashing PostgreSQL, Immich, and backups.
+  - **Recommendation:** Implement phased batch liberation (100–150 books per batch, keeping >= 300 GB headroom) and deploy `services.audiobookshelf` (port 13378) or map `/srv/data/audiobooks/Books` as a "Books" library in Jellyfin.
+
+
 
 

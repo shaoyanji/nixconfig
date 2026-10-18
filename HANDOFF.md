@@ -763,3 +763,22 @@
      - Verified `fc-match monospace` and `fc-match "JetBrainsMono NFM"` cleanly resolve to `JetBrainsMonoNerdFontMono-Regular.ttf`.
      - Verified `~/.config/kitty/kitty.conf` on disk reflects `font_family JetBrainsMono NFM`.
      - Pushed commit `2ce56dc3` to `origin/main`.
+
+### 52. [x] Frieren Kitchen Workstation Setup, GUI Debloat & Unified Kando Configuration (2026-10-19 01:10 CEST)
+* **Status:** `COMPLETED & VERIFIED`
+* **Physical Hardware & Display Migration:**
+  - `frieren` moved from living room 4K TV to the kitchen as a combined light workstation and fleet server.
+  - Connected to Dell D6000 Universal Dock (DisplayLink DL-6950) driving an external Samsung U28E590 28" 4K monitor (`3840x2160 @ 60 Hz`, 1.5x scale in Niri compositor).
+  - Internal laptop display (`eDP-1`) is disabled in favor of the external 4K monitor.
+  - Dedicated Gigabit Ethernet on `enp1s0` (`192.168.3.25`) stays active for 24/7 server workloads, allowing the Dell dock to be safely unplugged/plugged for other laptops without causing server downtime or network disruption.
+* **GUI Debloat:**
+  - Disabled `element-desktop` (`element-desktop.enable = false;` in [`modules/roles/home.nix`](file:///Volumes/data/projects/nixconfig/modules/roles/home.nix)), shedding unused Electron runtime and memory footprint.
+  - Confirmed `ghostty` terminal emulator disabled (commented out in [`modules/roles/home.nix`](file:///Volumes/data/projects/nixconfig/modules/roles/home.nix)), standardizing on Kitty as the single GPU-accelerated terminal.
+* **Keybase FUSE User Permissions & Mount Verification:**
+  - Verified `keybase.service` and `kbfs.service` are active and running on `frieren`.
+  - Confirmed `/home/devji/keybase` (`private`, `public`, `team`) is mounted via FUSE.
+  - Confirmed `modules/profiles/desktop-client.nix` properly declares `programs.fuse.userAllowOther = true;` and `systemd.user.services.kbfs.serviceConfig.PrivateTmp = lib.mkForce false;`, while `modules/profiles/nas-client.nix` prevents self-mounting loopback deadlocks (`config.networking.hostName != "frieren"`).
+* **Unified Out-of-Store Kando Configuration:**
+  - Seeded [`modules/config/kando/menus.json`](file:///Volumes/data/projects/nixconfig/modules/config/kando/menus.json) in `nixconfig`.
+  - Configured out-of-store symlinks in [`modules/user/desktop/niri.nix`](file:///Volumes/data/projects/nixconfig/modules/user/desktop/niri.nix) mapping `~/.config/kando/menus.json` and `~/.config/kando/menu.json` to `${config.home.homeDirectory}/Documents/nixconfig/modules/config/kando/menus.json`.
+  - In-GUI menu changes now sync directly into the git repository for seamless propagation across all DMS hosts.

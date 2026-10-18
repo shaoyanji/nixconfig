@@ -32,17 +32,17 @@ status_detail = "In active 24/7 production as the central fleet NAS and service 
 managed = true
 kind = "nixos"
 arch = "x86_64-linux"
-role = "Central NAS Mainframe, 4K Media Center & Application Server"
-category = "server-and-media-center"
-desktop_environment = "niri (Wayland) via greetd/dms-greeter autologin (4K TV output)"
+role = "Central NAS Mainframe, Kitchen Light Workstation & Fleet Server"
+category = "server-and-workstation"
+desktop_environment = "niri (Wayland) via greetd/dms-greeter autologin (Dell D6000 Dock to Samsung 4K Display)"
 users = ["devji"]
 
 [hosts.frieren.hardware]
-model = "Lenovo ideapad 320-15IKB (Type 81BG, Laptop-as-Server & Media Center)"
+model = "Lenovo ideapad 320-15IKB (Type 81BG, Laptop-as-Server & Kitchen Workstation)"
 cpu = "Intel Core i5-8250U (Kaby Lake R, 4c/8t, 1.60 GHz base / 3.40 GHz turbo)"
 gpu = "Intel UHD Graphics 620 @ 1.10 GHz (QuickSync VA-API H.264/HEVC/H.265 4K)"
 ram = "11.47 GiB DDR4 (4GB soldered + 8GB SO-DIMM) + 13.73 GiB swap (8GB disk + 5.7GB zram)"
-display = "Philips PHL068D 65\" 4K TV (3840x2160 @ 30 Hz, 2x scaling, HDMI)"
+display = "Samsung U28E590 28\" 4K Monitor (3840x2160 @ 60 Hz, 1.5x scaling via Dell D6000 DisplayLink Dock)"
 battery = "Lenovo L16M2PB1 (acts as hardware UPS with UPower 5% clean poweroff)"
 storage_type = "Dual-disk btrfs (1TB SSD System + 2TB HDD Data Pool)"
 storage_layout = "/dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots, docker), /dev/sda2 (2TB HDD: 1.8TB btrfs data pool for /srv/data, /Volumes/data, Paperless, Immich, Media, Transmission)"
@@ -57,7 +57,7 @@ ssh_alias = "frieren"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Harmonia (LAN binary cache on :5000)", "Paperless-ngx (:28981, data /srv/data/paperless)", "Hermes Agent & Gateway (user systemd service)", "Home Assistant (:8123) + Mosquitto MQTT", "Kiwix Serve (declarative ZIMs :8088 -> wiki.frieren.lan)", "Immich Photo Server & ML backend", "Jellyfin Media Server (:8096)", "Plex Media Server", "Aria2 RPC daemon (:6801 + AriaNg web)", "Paste (pb server at paste.frieren.lan)", "Vaultwarden", "Uptime Kuma", "iVentoy PXE server", "Samba & NFS export (/srv/data)", "Syncthing"]
-traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "media-center-tv", "niri-wayland", "dms-greeter"]
+traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter"]
 
 [hosts.frieren.persona]
 title = "Fleet Mainframe & Storage Steward"

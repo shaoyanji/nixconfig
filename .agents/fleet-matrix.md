@@ -56,7 +56,7 @@
 | 🟢 **`eisen`** | `active` | Yes | `x86_64-linux` | `heavy-compute-64gb` | Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700 | High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node |
 | 🟢 **`envs`** | `active` | No (Ext) | `x86_64-linux` | `shared-pubnix` | Intel Xeon, Shared Pubnix Quota | Envs.net Multi-Protocol Pubnix Node |
 | 🟢 **`fern`** | `active` | Yes | `x86_64-linux` | `lightweight-laptop` | AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU | Lightweight Daily-Driver Laptop |
-| 🟢 **`frieren`** | `active` | Yes | `x86_64-linux` | `server-heavy-io-sensitive` | Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz | Central NAS Mainframe, 4K Media Center & Application Server |
+| 🟢 **`frieren`** | `active` | Yes | `x86_64-linux` | `server-heavy-io-sensitive` | Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz | Central NAS Mainframe, Kitchen Light Workstation & Fleet Server |
 | ⚪ **`frieren-canary`** | `preserved` | Yes | `x86_64-linux` | `standard` | host-provided vCPU, host-provided | Frieren Canary MicroVM (closure smoke test) |
 | ⚪ **`garnixMachine`** | `preserved` | Yes | `x86_64-linux` | `ci-cloud` | x86_64 Cloud vCPU, Cloud Allocated | Garnix CI Runner & Bountystash Host |
 | 🟢 **`guckloch`** | `active` | Yes | `x86_64-linux` | `wsl2-container` | Host CPU, WSL2 Dynamic Allocation | Windows Subsystem for Linux (WSL2) Container |

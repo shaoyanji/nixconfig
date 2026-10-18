@@ -40,6 +40,14 @@
       url = "https://download.kiwix.org/zim/other/archlinux_en_all_maxi_2026-07.zim";
       hash = "sha256-w99VEBCpU9LBc6+NZaWWp85DSn+gdxdBvIAP7sytGUI";
     };
+
+    # Nurl form:
+    #   nurl https://download.kiwix.org/zim/other/alpinelinux_en_all_maxi_2026-07.zim
+    #   → sha256-LRkanai/3keuUFFk0Hahh1EwcL+SKY/g6qvfuqmB3fE=
+    alpinelinux = pkgs.fetchurl {
+      url = "https://download.kiwix.org/zim/other/alpinelinux_en_all_maxi_2026-07.zim";
+      hash = "sha256-LRkanai/3keuUFFk0Hahh1EwcL+SKY/g6qvfuqmB3fE=";
+    };
   };
 
   # library.xml written directly (NOT via kiwix-manage): kiwix-manage reads
@@ -54,6 +62,7 @@
       <book id="c22094d0-6ad1-6360-36b7-dab953595143" path="${zims.wikipedia}" title="Wikipedia" description="The free encyclopedia" language="eng" creator="Wikipedia" publisher="openZIM" name="wikipedia_en_all" flavour="nopic" tags="wikipedia;_category:wikipedia;_pictures:no;_videos:no;_details:yes;_ftindex:yes" date="2026-06-17" articleCount="19191219" mediaCount="515775" size="51455768" />
       <book id="9da28041-e531-d51f-6963-b34339ad454c" path="${zims.wikipediaTop}" title="Best of Wikipedia" description="A selection of the best 50,000 Wikipedia articles" language="eng" creator="Wikipedia" publisher="openZIM" name="wikipedia_en_top" flavour="mini" tags="wikipedia;_category:wikipedia;_pictures:no;_videos:no;_details:no;_ftindex:yes" date="2026-09-14" articleCount="703608" mediaCount="1907" size="289900" />
       <book id="431f20f7-58c7-87d4-8f68-eaa4462478bc" path="${zims.archwiki}" title="ArchWiki" description="Arch Linux documentation" language="eng" creator="Archlinux" publisher="openZIM" name="archlinux_en_all" flavour="maxi" tags="Linux distro;archlinux;_category:other;_pictures:yes;_videos:no;_details:yes;_ftindex:yes" date="2026-07-23" articleCount="14497" mediaCount="8" size="34767" />
+      <book id="d8150207-a8f4-213d-e587-6298ab930cf8" path="${zims.alpinelinux}" title="Alpine Linux Wiki" description="Alpine Linux is a security-oriented, lightweight Linux distribution" language="eng" creator="Alpinelinux" publisher="openZIM" name="alpinelinux_en_all" flavour="maxi" tags="Linux distro;alpinelinux;_pictures:yes;_videos:no;_details:yes;_ftindex:yes" date="2026-07-20" articleCount="1022" mediaCount="77" size="3024" />
     </library>
   '';
 in {

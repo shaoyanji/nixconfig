@@ -52,6 +52,64 @@
     exec ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new devji@192.168.3.92 /usr/local/bin/sftp-server "$@"
   '';
 
+  fleetGatusReport = pkgs.writers.writePython3Bin "fleet-gatus-report" {
+    libraries = [pkgs.python3Packages.websockets];
+  } ''
+    import asyncio
+    import json
+    import sys
+    import urllib.request
+    import uuid
+    import websockets
+
+    endpoint = "http://127.0.0.1:8181/api/v1/endpoints/statuses"
+    try:
+        req = urllib.request.Request(endpoint, headers={"User-Agent": "FleetGatusReporter/1.0"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode())
+    except Exception as e:
+        msg = "⚠️ [Fleet Monitoring Alert - 05:00 AM] Gatus API unreachable at %s: %s\nHost: frieren (192.168.3.25)" % (endpoint, str(e))
+        print("FAILED: 1")
+        print(msg)
+        sys.exit(1)
+
+    total = len(data)
+    failed = [d for d in data if not d.get("results", [{}])[-1].get("success", False)]
+    if failed:
+        header = "🚨 [Fleet Monitoring ALERT - 05:00 AM] %d of %d services DEGRADED." % (len(failed), total)
+    else:
+        header = "📊 [Fleet Monitoring Scorecard - 05:00 AM] All %d services NOMINAL." % total
+
+    lines = [header, "Host: frieren (192.168.3.25)"]
+    for d in data:
+        name = d.get("name")
+        group = d.get("group", "fleet")
+        res = d.get("results", [{}])[-1]
+        status = "UP" if res.get("success") else "DOWN"
+        dur_ms = round(res.get("duration", 0) / 1000000.0, 1)
+        lines.append("• %s (%s): %s (%.1f ms)" % (name, group, status, dur_ms))
+
+    report = "\n".join(lines)
+    print("FAILED: %d" % len(failed))
+    print(report)
+
+    async def send_to_simplex():
+        corr_id = str(uuid.uuid4())[:8]
+        rpc_req = {"corrId": corr_id, "cmd": "#Fleet " + report}
+        async with websockets.connect("ws://127.0.0.1:5225") as ws:
+            await ws.send(json.dumps(rpc_req))
+            await asyncio.wait_for(ws.recv(), timeout=5.0)
+
+    try:
+        asyncio.run(send_to_simplex())
+        print("Report dispatched to SimpleX #Fleet.")
+    except Exception as e:
+        sys.stderr.write("WARN: Failed to deliver 5AM report to SimpleX #Fleet: %s\n" % str(e))
+
+    if failed:
+        sys.exit(1)
+  '';
+
   agentCascadeScript = ''
     run_agent_cascade() {
       local prompt="$1"
@@ -206,6 +264,14 @@
       UPGRADE_FAILED=1
     fi
 
+    # --- STEP 1b: Gatus Fleet Monitoring & 5:00 AM SimpleX Dispatch ---
+    echo "=== [$(date)] Step 1b: Running Gatus 5:00 AM fleet scorecard & SimpleX dispatch ==="
+    GATUS_DOWN=0
+    if ! ${fleetGatusReport}/bin/fleet-gatus-report; then
+      echo "=== [$(date)] Gatus fleet monitor reported service failure(s) ==="
+      GATUS_DOWN=1
+    fi
+
     # --- STEP 2: System One Decision Triage (Julia-1 & Laya) ---
     echo "=== [$(date)] Step 2: Running System One Decision Triage (Julia-1) ==="
     TRIAGE_REPORT="/tmp/systemone-system-triage.json"
@@ -225,6 +291,7 @@
     #    - BTRFS_ERRS > 0
     #    - BACKUP_FAILS > 0
     #    - UPGRADE_FAILED > 0
+    #    - GATUS_DOWN > 0
     DAY_OF_WEEK=$(date +%u) # 1=Mon, ..., 7=Sun
     SHOULD_RUN_CASCADE=0
     RUN_REASON=""
@@ -247,6 +314,9 @@
     elif [ "$UPGRADE_FAILED" -gt 0 ]; then
       SHOULD_RUN_CASCADE=1
       RUN_REASON="NixOS autoUpgrade failure detected"
+    elif [ "$GATUS_DOWN" -gt 0 ]; then
+      SHOULD_RUN_CASCADE=1
+      RUN_REASON="Gatus fleet monitor alert: service failure detected during 05:00 AM audit"
     fi
 
     if [ "$SHOULD_RUN_CASCADE" -eq 0 ]; then

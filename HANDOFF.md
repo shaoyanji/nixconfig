@@ -730,3 +730,20 @@
   - Uploaded to `/home/jisifu/public_gemini/` on `envs.net` via SSH (`envs`).
   - Executed `python3 update_gmi_links.py` to regenerate the link index in `index.gmi`.
   - Verified live over the Gemini protocol (port 1965 TLS, returned `20 text/gemini`).
+
+### 50. [x] Audible Library Podcasting Cleanup & Midnight Batch Status Audit (2026-10-19 00:10 CEST)
+* **Status:** `COMPLETED & 100% LIBERATED` (203 Books Liberated, 229 M4Bs on Disk, Audiobookshelf Active)
+* **Context & Audit Findings:**
+  1. **Podcasts Stripped & Library Trimmed:** The original 2,318 library entries were bloated by hundreds of short podcast episodes. After stripping podcasts, `LibationContext.db` contains exactly **222 audiobooks**.
+  2. **Liberation Completion:**
+     - **203 books** have `BookStatus = 1` (Fully liberated and converted).
+     - **229 `.m4b` files** reside in `/srv/data/audiobooks/Books/` (including multi-part editions).
+     - **19 remaining titles** are flagged `AbsentFromLastScan = 1` (Audible reports `No Ownership information` or `Customer is not part of any plans` / Plus catalog no longer active).
+     - Across the last 24 hours, Libation successfully downloaded **564 titles** (49.6 GB in the afternoon run alone).
+  3. **Midnight Batch Execution:**
+     - The timer `audible-phased-liberation.timer` was stopped at 20:46 CEST during manual library maintenance, which prevented the automatic 00:00:00 trigger.
+     - Re-armed and started the timer. The batch ran immediately, confirmed that all valid books in the library are already processed (`New Books Converted: 0`), and cleanly dispatched the status report to `#Fleet` on SimpleX Chat.
+     - Next scheduled nightly run: `Tue 2026-10-20 00:00:00 CEST`.
+  4. **Media Serving & Headroom:**
+     - Audiobookshelf is healthy on `http://127.0.0.1:13378` (and `http://audiobooks.frieren.lan`).
+     - Available storage on `/srv/data`: **782 GB free** (comfortably above the 250 GB minimum headroom threshold).

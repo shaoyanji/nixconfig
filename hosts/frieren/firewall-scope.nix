@@ -25,6 +25,7 @@
 {lib, ...}: let
   scopedIfaces = [
     "enp1s0" # wired LAN
+    "enp0s20f0u2u1i5" # USB-C dock wired LAN
     "wlp2s0" # wifi LAN
     "tailscale0"
   ];

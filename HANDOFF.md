@@ -633,5 +633,32 @@
        - `audible-phased-liberation.timer`: Next trigger `Mon 2026-10-19 00:00:00 CEST` (~14h left).
      - Pushed commit `8b3414d3` to `origin/main`.
 
+### 45. [x] Audible Liberation Resource Governor & 3-Interface Network Architecture Investigation (2026-10-18 11:05 CEST)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `90cd71fe`, CGroup Limits Enforced)
+* **Part 1: Conversion Tax & Desktop Freeze Remediation:**
+  - **Root Cause Analysis:** During unthrottled liberation, Libation's child `ffmpeg` spawned 8 concurrent worker threads (saturating 100% of the i5-8250U's 4c/8t CPU) while writing multi-gigabyte M4B streams to `/srv/data` (`/dev/sda2`, mechanical spinning HDD). The resulting disk I/O queue thrashing pushed the kernel into dirty-page sync D-state stalls, starving the Wayland compositor (`niri`), `dbus-broker`, and `greetd`. This rendered the 65" 4K display unresponsive to keyboard/mouse wake events.
+  - **Remediation Implemented:**
+    1. **Process Priority (`nice 19`):** Prepend `nice -n 19` to `libationcli` execution, forcing CPU scheduling to yield instantly to any interactive thread.
+    2. **I/O Class (`ionice -c 3`):** Configured idle I/O scheduling class (`idle`), guaranteeing disk read/write requests pause whenever any other process requires disk I/O on `/srv/data`.
+    3. **Declarative Systemd CGroup Quotas (`modules/services/agent-scheduler.nix`):** Extended `services.agentScheduler` to support `nice`, `ioSchedulingClass`, `cpuQuota`, `cpuWeight`, and `ioWeight`.
+    4. **CPU Quota Ceiling (`CPUQuota = 250%`):** Capped total aggregate execution across all worker threads to 2.5 cores maximum (out of 8), guaranteeing at least **5.5 CPU cores remain 100% free** for 4K desktop compositing, video decoding, input handling, and NAS services.
+    5. **CGroup Proportional Weights:** Configured `CPUWeight = 20` and `IOWeight = 20` (out of 1000).
+    6. **Live Verification:** Verified via `systemctl --user show audible-daytime-liberation.service`: `CPUWeight=20`, `CPUQuotaPerSecUSec=2.500000s`, `IOWeight=20`, `Nice=19`, `IOSchedulingClass=3`.
+* **Part 2: 3-Interface Network Investigation & Failover Analysis:**
+  - **Interface Ground Truth:**
+    1. `enp1s0` (Built-in PCI-E 1Gbps): MAC `54:e1:ad:d5:ec:ff`, static IP `192.168.3.25/24`, route metric `101`.
+    2. `enp0s20f0u2u1i5` (USB-C Dock 1Gbps): MAC `9c:eb:e8:d2:ea:bc`, DHCP IP `192.168.3.253/24`, route metric `100`.
+    3. `wlp2s0` (Intel Wi-Fi AC 3165): MAC `e4:70:b8:5a:3d:81`, DHCP IP `192.168.3.98/24` (SSID "Obi LAN Kenobi"), route metric `600`.
+  - **Critical Discovery (Outbound Routing Asymmetry):**
+    - NetworkManager assigned route metric 100 to the USB-C dock (`enp0s20f0u2u1i5`) and metric 101 to built-in Ethernet (`enp1s0`).
+    - Consequently, all outbound connections initiated by Frieren (567 MB TX recorded) have been exiting via the USB-C dock as `192.168.3.253`, while inbound service traffic arrives on `enp1s0` (`192.168.3.25`).
+    - Furthermore, `enp0s20f0u2u1i5` is NOT declared in `firewall-scope.nix`, so incoming connections to `.253` are dropped by iptables.
+  - **Failover Status:**
+    - **Outbound (Internet access from Frieren):** Automatic failover works via kernel route metrics (100 -> 101 -> 600). If both Ethernet cables are unplugged, outbound traffic seamlessly fails over to Wi-Fi (`wlp2s0`). When Ethernet is reconnected, NetworkManager detects carrier and restores Ethernet priority immediately.
+    - **Inbound (LAN Services & DNS):** **No transparent failover exists.** If `enp1s0` is unplugged, `192.168.3.25` is unreachable because Wi-Fi holds `.98` and the USB-C dock holds `.253`. Furthermore, `pihole-FTL` is restricted to `interface=enp1s0` and `interface=tailscale0`, so DNS fails for all LAN clients if `enp1s0` is unplugged.
+  - **Architectural Recommendations:**
+    1. **Primary Recommendation:** Keep `192.168.3.25` on `enp1s0` as the dedicated LAN server backbone. Unplug the redundant Ethernet cable from the USB-C docking station (or assign it metric 200) to eliminate asymmetric routing.
+    2. **Optional Inbound Wi-Fi Failover:** If physical cable unplug protection is required, implement a declarative NetworkManager dispatcher script to re-bind `192.168.3.25/24` to `wlp2s0` with gratuitous ARP (`arping -A`) and listen on all interfaces in Pi-hole.
+
 
 

@@ -73,6 +73,42 @@
         default = null;
         description = "Optional jitter delay for the timer.";
       };
+
+      nice = lib.mkOption {
+        type = lib.types.nullOr lib.types.int;
+        default = null;
+        description = "Optional process nice priority (-20 to 19).";
+      };
+
+      ioSchedulingClass = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional IO scheduling class (idle, best-effort, realtime).";
+      };
+
+      cpuQuota = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional CPUQuota limit (e.g. '250%').";
+      };
+
+      cpuWeight = lib.mkOption {
+        type = lib.types.nullOr lib.types.int;
+        default = null;
+        description = "Optional CPUWeight (1-10000).";
+      };
+
+      ioWeight = lib.mkOption {
+        type = lib.types.nullOr lib.types.int;
+        default = null;
+        description = "Optional IOWeight (1-10000).";
+      };
+
+      extraServiceConfig = lib.mkOption {
+        type = lib.types.attrsOf lib.types.anything;
+        default = {};
+        description = "Extra systemd serviceConfig attributes.";
+      };
     };
   });
 in {
@@ -91,22 +127,29 @@ in {
       lib.nameValuePair job.name {
         inherit (job) description;
         after = ["network.target"];
-        serviceConfig = {
-          Type = "oneshot";
-          WorkingDirectory = job.workingDirectory;
-          Environment = [
-            "HOME=${user.home}"
-            "USER=${user.name}"
-            "PATH=/run/wrappers/bin:${user.home}/.nix-profile/bin:/etc/profiles/per-user/${user.name}/bin:/run/current-system/sw/bin:${user.home}/.local/bin"
-            "SHELL=/run/current-system/sw/bin/bash"
-          ];
-          ExecStart =
-            if job.lockFile != null
-            then "${pkgs.util-linux}/bin/flock -w 60 ${job.lockFile} ${job.command}"
-            else "${job.command}";
-          StandardOutput = "journal";
-          StandardError = "journal";
-        };
+        serviceConfig =
+          {
+            Type = "oneshot";
+            WorkingDirectory = job.workingDirectory;
+            Environment = [
+              "HOME=${user.home}"
+              "USER=${user.name}"
+              "PATH=/run/wrappers/bin:${user.home}/.nix-profile/bin:/etc/profiles/per-user/${user.name}/bin:/run/current-system/sw/bin:${user.home}/.local/bin"
+              "SHELL=/run/current-system/sw/bin/bash"
+            ];
+            ExecStart =
+              if job.lockFile != null
+              then "${pkgs.util-linux}/bin/flock -w 60 ${job.lockFile} ${job.command}"
+              else "${job.command}";
+            StandardOutput = "journal";
+            StandardError = "journal";
+          }
+          // lib.optionalAttrs (job.nice != null) {Nice = job.nice;}
+          // lib.optionalAttrs (job.ioSchedulingClass != null) {IOSchedulingClass = job.ioSchedulingClass;}
+          // lib.optionalAttrs (job.cpuQuota != null) {CPUQuota = job.cpuQuota;}
+          // lib.optionalAttrs (job.cpuWeight != null) {CPUWeight = job.cpuWeight;}
+          // lib.optionalAttrs (job.ioWeight != null) {IOWeight = job.ioWeight;}
+          // job.extraServiceConfig;
       })
     (lib.filterAttrs (_: j: j.enable) cfg.jobs);
 

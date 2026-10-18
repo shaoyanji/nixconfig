@@ -148,8 +148,11 @@
       BATCH_START_TIME=$(${pkgs.coreutils}/bin/date +%s)
       PRE_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
 
-      # Run with timeout and TERM signal
-      ${pkgs.coreutils}/bin/timeout --preserve-status -s TERM "$TIMEOUT_SECS" "$LIBATION_BIN" liberate --limit-books ${toString limitBooks} || {
+      # Run with lowest CPU priority (nice 19) and idle IO priority (ionice -c 3)
+      # to guarantee zero starvation of the desktop compositor (niri), audio, and display wake.
+      ${pkgs.coreutils}/bin/nice -n 19 ${pkgs.util-linux}/bin/ionice -c 3 \
+        ${pkgs.coreutils}/bin/timeout --preserve-status -s TERM "$TIMEOUT_SECS" \
+        "$LIBATION_BIN" liberate --limit-books ${toString limitBooks} || {
         EXIT_CODE=$?
         if [ "$EXIT_CODE" -eq 124 ] || [ "$EXIT_CODE" -eq 143 ]; then
           echo "=== [$(date)] Hit window cutoff timer (${windowDesc}); stopped gracefully ==="
@@ -817,6 +820,11 @@ in {
         };
         workingDirectory = "/home/devji";
         lockFile = "/tmp/audible-liberation.lock";
+        nice = 19;
+        ioSchedulingClass = "idle";
+        cpuQuota = "250%"; # Caps at 2.5 cores (out of 8), preserving 5.5 cores for 4K desktop compositor & NAS
+        cpuWeight = 20;
+        ioWeight = 20;
       };
       audible-phased-liberation = {
         name = "audible-phased-liberation";
@@ -830,6 +838,11 @@ in {
         };
         workingDirectory = "/home/devji";
         lockFile = "/tmp/audible-liberation.lock";
+        nice = 19;
+        ioSchedulingClass = "idle";
+        cpuQuota = "250%"; # Caps at 2.5 cores (out of 8), preserving 5.5 cores for 4K desktop compositor & NAS
+        cpuWeight = 20;
+        ioWeight = 20;
       };
     };
   };

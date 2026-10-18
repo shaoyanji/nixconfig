@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   # Use nixpkgs' niri (cached on cache.nixos.org) instead of niri-flake's
   # self-built niri-stable, which pins libdisplay-info_0_2 (removed from
   # nixpkgs, upstream issue sodiboo/niri-flake#1851) and isn't in any cache.
@@ -33,6 +37,13 @@
     [General]
     theme=catppuccin-frappe-blue
   '';
+
+  # Unified Kando menu config: symlinked out-of-store directly to the nixconfig
+  # repository so in-GUI menu edits sync across all DMS devices via git.
+  xdg.configFile."kando/menus.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Documents/nixconfig/modules/config/kando/menus.json";
+  xdg.configFile."kando/menu.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Documents/nixconfig/modules/config/kando/menus.json";
 
   home.sessionVariables = {
     QT_STYLE_OVERRIDE = "kvantum";

@@ -166,6 +166,15 @@ in {
     dataDir = "/srv/private/plex";
   };
 
+  # --- Audiobookshelf (self-hosted audiobook & podcast server) ---
+  services.audiobookshelf = {
+    enable = true;
+    port = 13378;
+    host = "0.0.0.0";
+    openFirewall = true;
+  };
+  users.users.audiobookshelf.extraGroups = ["users"];
+
   # --- Anki sync ---
   services.anki-sync-server = {
     enable = true;

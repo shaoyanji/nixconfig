@@ -613,4 +613,25 @@
      - Verified `fleet-alert-bridge.service` active under `systemd --user`.
      - Pushed all commits (`30b0883e`, `11473410`, `0b052408`) to `origin/main`.
 
+### 44. [x] Audible Phased Liberation Unpaused with Daytime (11:30–13:00) & Nightly (00:00–02:50) Timers (2026-10-18 09:24 CEST)
+* **Status:** `COMPLETED & LIVE ARMED` (Commit `8b3414d3`, Timers Active)
+* **Context & Motivation:** Operator unpaused download actions and requested a managed daytime run between 11:30 AM and 1:00 PM for today, followed by the regular nightly window (00:00–03:00 CEST).
+* **Actions Taken:**
+  1. **Download Managers Unpaused:** Issued `aria2.unpauseAll` via RPC and `transmission-remote -t all --start` for BitTorrent.
+  2. **Parametric Liberation Script:** Refactored `makeAudibleBatchLiberation` generator in [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) to support custom timeouts, batch limits, and window descriptions while preserving the strict 250 GB storage headroom safety guard and SimpleX `#Fleet` status dispatch.
+  3. **Daytime Scheduler Arming:** Declared `audible-daytime-liberation` in `services.agentScheduler.jobs`:
+     - Scheduled for `2026-10-18 11:30:00` (runs today at 11:30 CEST).
+     - 85-minute hard timeout (`timeoutSecs = 5100`): guaranteed cutoff at 12:55 CEST before 13:00 (1:00 PM).
+     - Mutex lock `/tmp/audible-liberation.lock` to prevent any concurrency collisions.
+  4. **Nightly Scheduler Arming:** Declared `audible-phased-liberation` in `services.agentScheduler.jobs`:
+     - Scheduled for `*-*-* 00:00:00` (next run tonight at 00:00 CEST).
+     - 170-minute hard timeout (`timeoutSecs = 10200`): guaranteed cutoff at 02:50 CEST, preserving the 03:00–05:30 nightly backup and maintenance window.
+  5. **Live Verification:**
+     - Switched cleanly to configuration `/nix/store/v4xgkmxx36lamrvpzgfdfnm81gpriyq2-nixos-system-frieren-26.11.20261005.aa48d34`.
+     - Verified with `systemctl --user list-timers`:
+       - `audible-daytime-liberation.timer`: Next trigger `Sun 2026-10-18 11:30:00 CEST` (~2h left).
+       - `audible-phased-liberation.timer`: Next trigger `Mon 2026-10-19 00:00:00 CEST` (~14h left).
+     - Pushed commit `8b3414d3` to `origin/main`.
+
+
 

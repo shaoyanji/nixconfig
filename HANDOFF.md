@@ -747,3 +747,19 @@
   4. **Media Serving & Headroom:**
      - Audiobookshelf is healthy on `http://127.0.0.1:13378` (and `http://audiobooks.frieren.lan`).
      - Available storage on `/srv/data`: **782 GB free** (comfortably above the 250 GB minimum headroom threshold).
+
+### 51. [x] Kitty Font Configuration & JetBrainsMono NFM Restoration for LF Ligatures (2026-10-19 00:44 CEST)
+* **Status:** `COMPLETED & LIVE APPLIED` (Commit `2ce56dc3`, Generation 146)
+* **Problem & Root Cause:**
+  1. The user noted that `kitty.conf` had `JetBrains Mono Nerd Font`, but `lf` icons and ligatures in `lfrc` were failing to render properly.
+  2. Inspection revealed two compounding causes:
+     - **Font Name Variant:** Kitty was set to `JetBrainsMono Nerd Font` (the proportional 2-cell Nerd Font variant), which causes cell-width mismatch and text truncation when terminal utilities like `lf` output single-cell icons followed by text.
+     - **Debloat Override Stripping Fonts:** In [`hosts/frieren/configuration.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/configuration.nix), a prior closure debloat pass (`T1-2`) had executed `fonts.packages = lib.mkForce [pkgs.jetbrains-mono];`. This forced standard JetBrains Mono (which contains zero Nerd Font glyphs), removing `nerd-fonts.jetbrains-mono` entirely from Frieren's fontconfig cache.
+* **Remediations Executed:**
+  1. **Removed `T1-2` Font Override:** Dropped the `fonts = { ... }` block from [`hosts/frieren/configuration.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/configuration.nix), restoring the full [`nerd-fonts.jetbrains-mono`](file:///nix/store/qgc50l260ghg5kq501c246vbj1fxmmx9-nerd-fonts-jetbrains-mono-3.5.0+2.304) package declared in [`modules/profiles/base-desktop-environment.nix`](file:///Volumes/data/projects/nixconfig/modules/profiles/base-desktop-environment.nix).
+  2. **Configured Monospace Font Hierarchy:** Set `fontconfig.defaultFonts.monospace = ["JetBrainsMono Nerd Font Mono" "JetBrainsMono NFM"];` in [`base-desktop-environment.nix`](file:///Volumes/data/projects/nixconfig/modules/profiles/base-desktop-environment.nix).
+  3. **Configured Kitty:** Updated [`modules/kitty/default.nix`](file:///Volumes/data/projects/nixconfig/modules/kitty/default.nix) to `font.name = "JetBrainsMono NFM";`.
+  4. **Verification:**
+     - Verified `fc-match monospace` and `fc-match "JetBrainsMono NFM"` cleanly resolve to `JetBrainsMonoNerdFontMono-Regular.ttf`.
+     - Verified `~/.config/kitty/kitty.conf` on disk reflects `font_family JetBrainsMono NFM`.
+     - Pushed commit `2ce56dc3` to `origin/main`.

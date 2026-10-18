@@ -11,7 +11,7 @@ _: {
       hide_window_decorations = "yes";
     };
     font = {
-      name = "JetBrainsMono Nerd Font";
+      name = "JetBrainsMono NFM";
       size = 14;
     };
   };

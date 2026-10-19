@@ -42,6 +42,7 @@ task ops:health            # exit 1 = degraded; reasons printed
 task ops:ledger            # what was observed (JSONL)
 task ops:ledger:toon       # same window, token-cheap
 task ops:skills            # compiled skill index
+task ops:kg                # structure: hosts x skills x docs ("what touches X")
 ```
 
 A green socket is not a successful job. `nixos-upgrade` can exit 0 with no new

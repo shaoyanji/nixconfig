@@ -53,13 +53,22 @@ ai-memory (deep, jev-gated). Do not start at an LLM.
 
 ## 3. Structural search: the graph, not grep
 
-`.#knowledgeGraph` compiles nodes (hosts, skills, docs) and edges (mentions,
-tagged, documents) from the same files the fleet uses:
+`.#knowledgeGraph` compiles nodes (hosts, skills, docs, tags) and edges
+(`mentions` from docs/skills, `tagged` from skills) out of the files themselves:
 
 ```bash
-nix eval --json .#knowledgeGraph --apply 'g: g.edges' | jq '.[] | select(.from=="frieren")'
+task ops:kg                                    # stats + top-connected nodes
+task ops:kg:host HOST=frieren                  # docs and skills that mention it
+nix eval --json .#knowledgeGraph.graph --apply 'g: g.edges' \
+  | jq -r '.[] | select(.from=="doc:MANUAL.md") | .to'
 nix eval --raw .#knowledgeGraph.cypher | head -40   # optional Neo4j import
 ```
+
+The value is **one hop from a name to its context**: `ops:kg:host HOST=frieren`
+lists every doc and skill that names the host, without `grep` and without
+reading them. Counts are printed live, never stored. Note that `from` is
+only ever a doc (`doc:<path>`) or a skill (`skill:<name>`); hosts and tags are
+only `to` ends, so filtering on `from=="frieren"` matches nothing.
 
 Use it to answer *"what touches X"* — a question BM25 is bad at. Use `qmd` for
 *"where is this explained"*, which a graph is bad at.

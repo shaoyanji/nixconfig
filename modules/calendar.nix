@@ -4,7 +4,13 @@
   lib,
   ...
 }: let
-  user = import ./global/user.nix;
+  getGoogleClientId = pkgs.writeShellScript "google-client-id" ''
+    ${pkgs.python3}/bin/python3 -c "import configparser; cfg=configparser.ConfigParser(); cfg.read('${config.home.homeDirectory}/.config/rclone/rclone.conf'); print(cfg.get('gdrive','client_id'))"
+  '';
+
+  getGoogleClientSecret = pkgs.writeShellScript "google-client-secret" ''
+    ${pkgs.python3}/bin/python3 -c "import configparser; cfg=configparser.ConfigParser(); cfg.read('${config.home.homeDirectory}/.config/rclone/rclone.conf'); print(cfg.get('gdrive','client_secret'))"
+  '';
 
   calendarNotify = pkgs.writeShellApplication {
     name = "calendar-notify";
@@ -62,12 +68,12 @@ in {
       enable = true;
       collections = ["from a" "from b"];
       metadata = ["color" "displayname"];
+      tokenFile = "${config.xdg.configHome}/vdirsyncer/google_token";
+      clientIdCommand = ["${getGoogleClientId}"];
+      clientSecretCommand = ["${getGoogleClientSecret}"];
     };
     remote = {
-      type = "caldav";
-      url = "https://apidata.googleusercontent.com/caldav/v2/${user.email}/user";
-      userName = user.email;
-      passwordCommand = ["cat" config.sops.secrets.gmail.path];
+      type = "google_calendar";
     };
     local = {
       type = "filesystem";

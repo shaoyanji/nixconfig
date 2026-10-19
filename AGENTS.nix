@@ -583,23 +583,29 @@
       '';
     };
     open-kolibri-thread-bench = {
-      title = "Benchmark the Kolibri thread bump before keeping it";
-      kind = "open";
-      status = "OPEN";
-      priority = "P3";
+      title = "Kolibri thread split, measured";
+      kind = "experiment";
+      status = "DELIVERED";
       date = "2026-10-19";
-      summary = "Kolibri-1 now starts with 24 threads instead of 12; nothing measured whether that helps on this CPU.";
+      summary = "24 SMT threads lose 8% on generation (9.17 -> 8.42 t/s) but win 36% on prompt (47.41 -> 64.70); the server now splits generation (12) from batch (24).";
       refs = {
         hosts = ["eisen"];
         modules = ["hosts/eisen/llm-server.nix"];
         docs = [".agents/deploy/hosts/eisen.md"];
       };
       body = ''
-        `mkCmd` takes a per-model `threads` (default 12); Kolibri passes 24, Qwen and Bonsai stay at 12. The flag
-        alone is not a speedup claim.
+        Measured 2026-10-19 on the patched `llamaKolibri` build:
+        `llama-bench -m /mnt/storage/models/Kolibri-1-Q4_K_M.gguf -t 12 -t 24 -p 256 -n 128 -r 3 -ngl 99 -ot exps=CPU`.
+        The GPU had no DRM node, so this is the CPU path the service currently uses.
 
-        Exit: `llama-bench -m /mnt/storage/models/Kolibri-1-Q4_K_M.gguf -t 12 -t 24 -p 0 -n 32` on the patched
-        build, with prompt and generation tokens/s recorded in the deploy note. If 24 loses, revert the flag.
+        | threads | pp256 t/s | tg128 t/s |
+        | ---: | ---: | ---: |
+        | 12 | 47.41 ± 10.11 | 9.17 ± 0.34 |
+        | 24 | 64.70 ± 0.27 | 8.42 ± 0.13 |
+
+        Generation is memory-bandwidth bound and loses with SMT; prompt processing gains.
+        `mkCmd` now takes `threads` (generation) and `threadsBatch` (prompt); Kolibri runs 12/24.
+        Re-measure if the GPU returns: Vulkan attention would change the CPU pressure.
       '';
     };
     arch-measurements = {

@@ -450,6 +450,11 @@ back on. `05:00.0` re-enumerated, `amdgpu` initialised, `/dev/dri/card1` +
 
 ## Operational Notes
 
+- **Build and eval eisen ON eisen, over ssh** (`ssh eisen 'bash -l -c …'`, repo at
+  `/Volumes/data/projects/nixconfig`): 24 threads, 59 GiB free, and `inventory.toml`
+  allows heavy parallel builds on this host. Never route its closure through frieren
+  (11 GiB live NAS with nightly jobs) — the 2026-10-19 attempt to warm there was the
+  wrong call even though the heavy derivations were dispatched to nixbuild.net.
 - **Weights are not in the Nix store** — they are multi-GB files in `/mnt/storage/models`, fetched by the units above. Do not `nix-store --gc`-root them; they persist on the btrfs array.
 - **Do not hand-run `llama-server` or Ollama** on this host — the declarative `llama-swap` owns `:8080`, and a stray process will make swap failures look like config bugs. The same applies to `laya-serve` on `:8090`.
 - **Rebuilds on this host exit 4 and that is not your change.** `home-manager-devji.service` fails because *user*-scope `sops-nix` cannot decrypt (`0 successful groups required, got 0`) — a pre-existing condition since the 2026-09-29 boot. The system generation still switches; verify with `readlink -f /run/current-system` and `systemctl --failed` rather than trusting the exit status.

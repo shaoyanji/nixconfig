@@ -649,9 +649,38 @@
           with CI. 2.97 removes `ssh://` store URIs, which
           `scripts/task/closure-analysis.sh` uses for every `HOST=` read.
 
-        Remaining action: `nix flake update nixpkgs` (or the scheduled
-        `dev:flake:update-complete`) followed by a rebuild. Determinate Nix stays a
-        possible single-host experiment (eisen), never a fleet default.
+        Ruling (owner, 2026-10-19): land it as a full flake update, not a `nix.package`
+        pin. A new Nix binary invalidates the store paths anyway, so the fleet should
+        move to one nixpkgs instead of sitting on two.
+      '';
+    };
+    open-flake-bump-2-35-3 = {
+      title = "Full flake update staged: nixpkgs f20cd90 brings Nix 2.35.3";
+      kind = "open";
+      status = "OPEN";
+      priority = "P1";
+      date = "2026-10-19";
+      summary = "A rehearsed lock (9 inputs moved, nixpkgs 2026-10-05 -> 2026-10-16) resolves nixVersions.latest to 2.35.3 and passes hostChecks.eisen with 1992 assertions. Staged on eisen, uncommitted pending a window.";
+      refs = {
+        hosts = ["eisen"];
+        modules = ["modules/global/global.nix"];
+        docs = [".agents/deploy/hosts/eisen.md"];
+      };
+      body = ''
+        Rehearsed on eisen (24c/59 GiB, the repo worktree at `/tmp/nixconfig-upd`), never
+        on frieren: `nix flake update` moved 9 inputs (nixpkgs `aa48d347` -> `f20cd90e`,
+        nix-darwin, sops-nix, nixos-hardware, nix-index-database, mux, microvm,
+        zen-browser).
+
+        Result: `nixVersions.latest` = 2.35.3 (12.9 s leaf eval incl. the input fetch),
+        and `nix build .#hostChecks.x86_64-linux.eisen --builders ""` passes 1992
+        assertions in 42.5 s. No remote builder was reachable from that command, so the
+        rehearsal could not spend nixbuild.net budget.
+
+        Landing it is: copy `/tmp/nixconfig-upd/flake.lock` from eisen over the repo's
+        lock, run `task checks:host HOST=<one per chain> MODE=eval`, commit, then let
+        `fleet-warm-cache` absorb the closure delta. Held only because the owner has not
+        picked the window; nothing else blocks it.
       '';
     };
     open-kolibri-thread-bench = {

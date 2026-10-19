@@ -25,6 +25,7 @@ in {
   imports = [
     ./nixoshmsymlinks.nix
     ./himalaya.nix
+    ./calendar.nix
   ];
 
   options.profiles.git = {

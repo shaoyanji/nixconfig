@@ -585,10 +585,10 @@
     open-eisen-gpu-off-bus = {
       title = "eisen's RX 5700 is off the PCIe bus";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P1";
       date = "2026-10-19";
-      summary = "The RX 5700 is absent from firmware enumeration (no /dev/dri), so greetd and gamescope cannot start. Not the build and not OOM: the card dropped between poweroffs. Recovery is physical.";
+      summary = "The RX 5700 dropped off the PCIe bus between poweroffs (no /dev/dri, no firmware enumeration). Fixed by a PSU cold cycle: 05:00.0 re-enumerated, greetd and gamescope are back. Not the build, not OOM.";
       refs = {
         hosts = ["eisen"];
         modules = ["hosts/eisen/configuration.nix"];
@@ -610,8 +610,48 @@
         `Width x0` / `PresDet-`. Recovery is physical — power off at the PSU (standby
         keeps the rail latched), check the 8-pin PCIe power, reseat the card.
 
+        Resolved 2026-10-19 16:43 by that cold cycle: `05:00.0` re-enumerated, amdgpu
+        initialised, `/dev/dri/card1` returned, greetd started gamescope and Steam.
+
         After it returns, greetd starts automatically; re-run the Kolibri benchmark,
         because `--n-gpu-layers 99` was inert (llvmpipe only) while the card was gone.
+      '';
+    };
+    nix-binary-upgrade-2026-10 = {
+      title = "Nix binary upgrade: stay upstream, move the pin to 2.35.3+";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P1";
+      date = "2026-10-19";
+      summary = "The fleet's Nix 2.35.2 is affected by the 2026-10-13 local-root advisory. Fix is a nixpkgs bump to 2.35.3 (cached on all three arches), not a fork: Determinate Nix and Lix are rejected for fleet-wide use with reasons.";
+      refs = {
+        modules = ["modules/global/global.nix"];
+        docs = [".agents/deploy/hosts/eisen.md"];
+      };
+      body = ''
+        Nix 2.35.2 — what the pinned nixpkgs (`47addd76`, 2026-10-05) ships through
+        `nix.package = nixVersions.latest` — is affected by the 2026-10-13 advisory: a
+        heap out-of-bounds write while evaluating untrusted expressions, store-path
+        repair tampering and a macOS Seatbelt escape, chainable to local root. Fixed in
+        upstream 2.35.3 / Lix 2.95.4. `nix-2.35.3` is already on cache.nixos.org for
+        x86_64-linux, aarch64-linux and aarch64-darwin, so the upgrade compiles nothing.
+
+        Decision: stay upstream and move the pin to >= 2.35.3. Rejected alternatives:
+
+        - Determinate Nix 3.23.3 (2026-10-16, LGPL-2.1, based on 2.35.3) fixes the
+          advisory and adds parallel evaluation, lazy trees, `nix ps` and OTel tracing.
+          Rejected for the fleet: NixOS installs it through its own module/ISO,
+          `determinate-nixd` upgrades imperatively and owns `/etc/nix/nix.conf`, and its
+          nix-eval-jobs is a separate fork — three things that fight a declarative fleet
+          whose flake pin is the rollback unit.
+        - Lix: nixpkgs still carries 2.95.3 (pre-fix), and 2.96 accepts flakes upstream
+          cannot evaluate (flake validation change) — a one-way door for a repo shared
+          with CI. 2.97 removes `ssh://` store URIs, which
+          `scripts/task/closure-analysis.sh` uses for every `HOST=` read.
+
+        Remaining action: `nix flake update nixpkgs` (or the scheduled
+        `dev:flake:update-complete`) followed by a rebuild. Determinate Nix stays a
+        possible single-host experiment (eisen), never a fleet default.
       '';
     };
     open-kolibri-thread-bench = {
@@ -637,7 +677,8 @@
 
         Generation is memory-bandwidth bound and loses with SMT; prompt processing gains.
         `mkCmd` now takes `threads` (generation) and `threadsBatch` (prompt); Kolibri runs 12/24.
-        Re-measure if the GPU returns: Vulkan attention would change the CPU pressure.
+        The GPU returned on 2026-10-19 16:43 (RADV NAVI10, Mesa 26.2.4), so 12/24 is a
+        CPU-only result: re-run before treating it as the GPU-path optimum.
       '';
     };
     arch-measurements = {

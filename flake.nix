@@ -6,21 +6,26 @@
   nixConfig = {
     extra-substituters = [
       "https://cache.numtide.com"
+      # Determinate Nix's own cache. Its CLI is not on cache.nixos.org, so
+      # without this every CI/build of a fleet host compiles 54 derivations
+      # (boost, wasmtime, libgit2) instead of fetching DN.
+      "https://install.determinate.systems"
       "http://100.97.61.65:5000"
       "http://192.168.3.25:5000"
       "http://192.168.3.98:5000"
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
       "frieren.lan-1:BUg+1UmfYlF0XCbC0+ZyWQOY1DpQJhj/wa2q76NTFOg="
     ];
   };
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    # Determinate Nix — imported by hosts/eisen/determinate-nix.nix only (trial,
-    # 2026-10-19). Do NOT make its nixpkgs follow ours: the DN CLI and
-    # determinate-nixd come from its own locked inputs and must stay upstream-
-    # compatible with the Nix it distributes.
+    # Determinate Nix — imported by modules/global/determinate-nix.nix, which
+    # every NixOS chain carries since 2026-10-19. Do NOT make its nixpkgs
+    # follow ours: the DN CLI and determinate-nixd come from its own locked
+    # inputs and must stay upstream-compatible with the Nix it distributes.
     determinate.url = "github:DeterminateSystems/determinate";
     # AI coding-agent packages, auto-updated daily upstream.
     # follows is safe here: we track current nixpkgs-unstable, which is

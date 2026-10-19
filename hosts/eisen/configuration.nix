@@ -32,7 +32,6 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
-    ./determinate-nix.nix
     ../../modules/profiles/steam.nix
     ../../modules/profiles/base-desktop-environment.nix
     ../../modules/profiles/base-node.nix

@@ -620,10 +620,10 @@
     nix-binary-upgrade-2026-10 = {
       title = "Nix binary upgrade: stay upstream, move the pin to 2.35.3+";
       kind = "decision";
-      status = "ACCEPTED";
+      status = "SUPERSEDED";
       priority = "P1";
       date = "2026-10-19";
-      summary = "The fleet's Nix 2.35.2 is affected by the 2026-10-13 local-root advisory. Fix is a nixpkgs bump to 2.35.3 (cached on all three arches), not a fork: Determinate Nix and Lix are rejected for fleet-wide use with reasons.";
+      summary = "The fleet's Nix 2.35.2 was affected by the 2026-10-13 local-root advisory; the pin moved to 2.35.3. Its 'no Determinate Nix fleet-wide' clause was superseded the same day by decision-determinate-nix-fleet.";
       refs = {
         modules = ["modules/global/global.nix"];
         docs = [".agents/deploy/hosts/eisen.md"];
@@ -652,6 +652,13 @@
         Ruling (owner, 2026-10-19): land it as a full flake update, not a `nix.package`
         pin. A new Nix binary invalidates the store paths anyway, so the fleet should
         move to one nixpkgs instead of sitting on two.
+
+        Superseded 2026-10-19: the pin did move (nixpkgs `f20cd90e`, Nix 2.35.3), and
+        the 'stay upstream' half stands — but the Determinate Nix rejection did not
+        survive its own trial. eisen ran DN 3.23.3 for a session with a 0-build switch
+        and a generation rollback, which is the two things the paragraph above said
+        were disqualifying. The fleet-wide ruling is now
+        `decision-determinate-nix-fleet`.
       '';
     };
     open-flake-bump-2-35-3 = {
@@ -684,31 +691,81 @@
         `fleet-warm-cache` absorbs the closure delta on its weekly run.
       '';
     };
+    decision-determinate-nix-fleet = {
+      title = "Determinate Nix fleet-wide (reverses the 2026-10-19 rejection)";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P1";
+      date = "2026-10-19";
+      summary = "Every NixOS chain imports one Determinate Nix module: one Nix binary fleet-wide, switch by generation, DN's cache pre-trusted so nothing compiles. Supersedes the 'stay upstream' half of nix-binary-upgrade-2026-10.";
+      refs = {
+        modules = [
+          "modules/global/determinate-nix.nix"
+          "modules/global/global.nix"
+          "flake/module-sets.nix"
+          "flake.nix"
+        ];
+        docs = [".agents/deploy/README.md"];
+      };
+      links = ["exp-determinate-nix-trial" "nix-binary-upgrade-2026-10"];
+      body = ''
+        The 2026-10-19 rejection named three disqualifiers: an imperative upgrader,
+        ownership of `/etc/nix/nix.conf`, and a forked nix-eval-jobs. The trial refuted
+        the ones that mattered operationally: `nix.package` stays declarative (DN's
+        module sets it), our settings land in `nix.custom.conf` rather than being
+        dropped, and rollback is `nixos-rebuild --rollback switch` because the store
+        format is unchanged. The remaining fork is not on any fleet path.
+
+        Shape: `modules/global/determinate-nix.nix` is imported by
+        `globalModulesNixos`, `globalModulesContainers` and `globalModulesDemo` — the
+        three NixOS chains — and by nothing else. `globalModulesImpermanence` inherits
+        it through `globalModulesNixos`.
+
+        Three things the module has to hold, each a trap found on eisen:
+        - `nix.package`: DN defines it at priority 100, so a plain fleet definition is
+          a conflict. `global.nix` uses `mkDefault`; DN wins, and a host can still opt
+          out by defining it at normal priority.
+        - `nix.registry.nixpkgs`: DN points it at FlakeHub weekly with `exact = true`.
+          `to` is forced back to this flake's pin, because the pin is the rollback
+          unit and must not drift under a rebuild.
+        - `install.determinate.systems`: DN is not on cache.nixos.org. The key is in
+          the module AND in the flake's `nixConfig`, so CI and the builder substitute
+          DN instead of compiling 54 derivations.
+
+        Out of scope by design: microVMs (`testvm`, `frieren-canary`) and
+        `garnixMachine` build their own module lists, and the darwin/home chains are
+        not NixOS hosts. Bootstrap: the first switch that adds DN must pass
+        `--option substituters https://install.determinate.systems` on the command
+        line, because the module's setting is only live after activation.
+      '';
+    };
     exp-determinate-nix-trial = {
-      title = "Determinate Nix live on eisen";
+      title = "Determinate Nix proven on eisen, then promoted fleet-wide";
       kind = "experiment";
       status = "DELIVERED";
       priority = "P3";
       date = "2026-10-19";
-      summary = "eisen switched 2026-10-19: `nix --version` is Determinate Nix 3.23.3 (2.35.3), nix-daemon runs determinate-nixd, and the Qwen endpoint answers 200 on stock llama.cpp 0.6.0 (substituted). Kolibri/Bonsai are dormant.";
+      summary = "eisen switched 2026-10-19: `nix --version` is Determinate Nix 3.23.3 (2.35.3), nix-daemon runs determinate-nixd, and the Qwen endpoint answers 200 on stock llama.cpp 0.6.0 (substituted). The module left this host for modules/global.";
       refs = {
         hosts = ["eisen"];
         modules = [
           "modules/global/global.nix"
-          "hosts/eisen/determinate-nix.nix"
+          "modules/global/determinate-nix.nix"
         ];
         docs = [".agents/deploy/hosts/eisen.md"];
       };
+      links = ["decision-determinate-nix-fleet"];
       body = ''
-        Without the priority fix the trial is a trap: the module sets `nix.package` at
-        `lib.mkOverride 750`, which the old plain definition (priority 100) beat, so DN's
-        daemon config would apply while the upstream binary stayed. `global.nix` now sets
-        it with `lib.mkDefault`, which 750 beats.
+        Without the priority fix the trial is a trap, and not for the reason first
+        recorded: DN defines `nix.package` at the normal priority (100), so the old plain
+        fleet definition collided with it instead of being overridden. `global.nix` now
+        sets the fleet value with `lib.mkDefault`, so DN's definition wins and a host can
+        still take it back by defining `nix.package` normally.
 
         Evaluated on eisen: `nix.package` = determinate-nix-3.23.3, `nix-daemon` ExecStart
         = `determinate-nixd daemon`, `/etc/nix/nix.conf` retargeted to `nix.custom.conf`,
         and `nix.registry.nixpkgs.to` forced back to nixpkgs `f20cd90e` because the module
-        otherwise repoints it at FlakeHub weekly. guckloch still resolves nix-2.35.3.
+        otherwise repoints it at FlakeHub weekly (mkOverride 750, `exact = true`).
 
         Switched 2026-10-19 18:47 (generation 26.11.20261016.f20cd90): nix is
         `Determinate Nix 3.23.3` on 2.35.3, `nix-daemon` ExecStart is determinate-nixd,

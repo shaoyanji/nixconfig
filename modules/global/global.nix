@@ -69,10 +69,10 @@
   };
 
   nix = {
-    # mkDefault, not a plain definition: the Determinate Nix module sets
-    # `nix.package` at `lib.mkOverride 750`, which a default-priority (100)
-    # definition would beat — leaving DN's config in place with the upstream
-    # binary. A host that imports that module must therefore be able to win.
+    # mkDefault, not a plain definition: the Determinate Nix module
+    # (modules/global/determinate-nix.nix) defines `nix.package` at the normal
+    # priority (100), so a plain fleet definition is a definition CONFLICT —
+    # not a pick. mkDefault makes the fleet value the fallback DN overrides.
     package = lib.mkDefault pkgs.nixVersions.latest;
     optimise =
       {

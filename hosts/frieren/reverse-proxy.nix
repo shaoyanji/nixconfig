@@ -361,6 +361,12 @@ in {
           "control.frieren.lan"
           "explorer.frieren.lan"
         ];
+        # `addSSL` is what makes the module EMIT ssl_certificate/_key. A manual
+        # `listen ... ssl = true` alone declared the listener without the pair,
+        # and nginx refused to start: `no "ssl_certificate" is defined for the
+        # "listen ... ssl" directive`. Same requirement as the vault and ha
+        # vhosts above.
+        addSSL = true;
         listen = [
           {
             addr = "0.0.0.0";
@@ -385,8 +391,16 @@ in {
             add_header Cache-Control "public, max-age=3600, stale-while-revalidate=86400" always;
           '';
         };
-        # Content-hashed immutable static assets (Gap B)
-        locations."~* \\.[a-f0-9]{8}\\.(?:css|js)$" = {
+        # Content-hashed immutable static assets (Gap B).
+        #
+        # The eight hex digits are spelled out instead of `{8}`: a brace
+        # quantifier in a location key came out of the config generator SPLIT
+        # across lines (`location ~* \.[a-f0-9] { / 8 / }`), which nginx rejects
+        # with `unexpected "}"` and the whole site 502s. Verified on generation
+        # 100 (2026-10-19): with `{8}` the switch restarts nginx into a crash
+        # loop; the equivalent class below generates one valid line. The match
+        # is identical — exactly eight hex characters before the extension.
+        locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
           root = import ../../lib/aki-site.nix {inherit pkgs;};
           extraConfig = ''
             gzip_static on;

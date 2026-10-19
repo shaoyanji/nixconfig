@@ -72,8 +72,15 @@ in {
           '';
         };
 
-        # Content-hashed immutable static assets (Gap B)
-        locations."~* \\.[a-f0-9]{8}\\.(?:css|js)$" = {
+        # Content-hashed immutable static assets (Gap B).
+        #
+        # Eight explicit hex classes instead of the `{8}` quantifier: a brace in
+        # a location key is emitted by the config generator split across lines
+        # (`location ~* \.[a-f0-9] { / 8 / }`), nginx then reports
+        # `unexpected "}"`, and this unit's vhost takes the whole server down
+        # with it. Same match, one line. See the twin fix in
+        # hosts/frieren/reverse-proxy.nix.
+        locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
           inherit (cfg) root;
           extraConfig = ''
             gzip_static on;

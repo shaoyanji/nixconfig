@@ -366,7 +366,14 @@ in {
             addr = "0.0.0.0";
             port = 80;
           }
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
         ];
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
         locations."/" = {
           root = import ../../lib/aki-site.nix {inherit pkgs;};
           extraConfig = ''
@@ -376,6 +383,24 @@ in {
             open_file_cache_min_uses 1;
             open_file_cache_errors on;
             add_header Cache-Control "public, max-age=3600, stale-while-revalidate=86400" always;
+          '';
+        };
+        # Content-hashed immutable static assets (Gap B)
+        locations."~* \\.[a-f0-9]{8}\\.(?:css|js)$" = {
+          root = import ../../lib/aki-site.nix {inherit pkgs;};
+          extraConfig = ''
+            gzip_static on;
+            open_file_cache max=1000 inactive=300s;
+            open_file_cache_valid 3600s;
+            add_header Cache-Control "public, max-age=31536000, immutable" always;
+          '';
+        };
+        # Live mainframe telemetry (Gap A)
+        locations."= /data/live.json" = {
+          alias = "/run/uds-docs/live.json";
+          extraConfig = ''
+            default_type application/json;
+            add_header Cache-Control "no-cache, no-store, must-revalidate" always;
           '';
         };
       };

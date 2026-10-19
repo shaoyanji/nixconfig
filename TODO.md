@@ -47,8 +47,17 @@
       transition, green on recovery, no new service or port.
 - [ ] **Semantic search, if it earns its keep.** `qmd embed` is optional; only
       enable after BM25 misses are measured, not assumed.
-- [ ] **Graph query cookbook**: add 5 real `jq` recipes to the
+- [x] **Graph query cookbook**: add 5 real `jq` recipes to the
       `knowledge-base` skill (what touches X, orphan docs, skills with no host).
+      Done 2026-10-19 — every block is the literal command, run against the live
+      graph: orphan docs 0, skills no doc mentions 15/43 (exact-token matching
+      and a doc set of 21, not rot).
+- [ ] **Knowledge graph reactive sidecar engine (Elixir/OTP)**: In-memory ETS
+      property graph engine with UDS socket listener (`/run/kg.sock`), initial
+      bootstrap from `knowledge-graph.json`, and live inotify watcher for sub-millisecond
+      agent traversals (neighbors, blast-radius, drift detection).
+      Exit: `curl --unix-socket /run/kg.sock http://localhost/query?from=host:frieren`
+      returns in <1ms; file change in working tree updates graph in memory in <15ms.
 
 ## P3 — hygiene and maintenance
 

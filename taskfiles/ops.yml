@@ -125,6 +125,22 @@ tasks:
     cmds:
       - bash scripts/task/kg-query.sh stats --top {{.TOP | default 12}}
 
+  ops:kg:sidecar:
+    desc: Manage or query the in-memory Elixir reactive Knowledge Graph sidecar
+    summary: >
+      Controls the sub-millisecond in-memory ETS graph sidecar listening on unix:$XDG_RUNTIME_DIR/kg.sock.
+      Commands: start, stop, restart, status (default), node ID=<node>, neighbors ID=<node> [DEPTH=N], blast-radius ID=<node>, search Q=<term>.
+    cmds:
+      - bash scripts/task/kg-sidecar.sh {{.CMD | default "status"}} {{.ID | default .Q | default ""}} {{.DEPTH | default ""}}
+
+  ops:kg:blast:
+    desc: Calculate transitive blast radius and impact analysis for an entity
+    summary: >
+      Computes the full reverse dependency chain for a node (who depends on or mentions this entity).
+      Instant in-memory traversal via the Elixir sidecar engine (< 1ms).
+    cmds:
+      - bash scripts/task/kg-sidecar.sh blast-radius {{.ID | default .TARGET}}
+
   # --- the explicit query surface -------------------------------------------
   # Six fixed traversals, the jq analogue of a Cypher MATCH. A caller that knows
   # which question it is asking uses these directly; `ops:ask` is sugar in front

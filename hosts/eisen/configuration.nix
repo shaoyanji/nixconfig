@@ -83,6 +83,12 @@ in {
   # --- Bluetooth (wireless controllers in Steam) ---
   hardware.bluetooth.enable = true;
 
+  # Local builds are legitimate on this host (12c/24t, "Heavy parallel
+  # multi-threaded builds" in inventory), but 24 concurrent C++ compiles on a
+  # 62 GiB box OOM-kill the desktop session. Cap the daemon and leave headroom
+  # for greetd/gamescope and a loaded LLM model.
+  nix.settings.max-jobs = 8;
+
   # --- Tailscale mesh networking ---
   # Enables the eisen host on the tailnet so Moonlight clients can stream
   # from outside the LAN (via Tailscale IPs / MagicDNS).  Routing features

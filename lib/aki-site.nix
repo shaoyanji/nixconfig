@@ -713,4 +713,7 @@ in
     ${lib.concatStringsSep "\n" (
       map (hj: "cp ${hj.file} $out/${hj.name}") hostJsonFiles
     )}
+
+    # Pre-compress static assets for Nginx gzip_static (zero runtime CPU)
+    gzip -9k $out/index.html $out/aki.min.js $out/style.css $out/data/*.json
   ''

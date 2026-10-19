@@ -4,6 +4,8 @@
   lib,
   ...
 }: let
+  user = import ./global/user.nix;
+
   getGoogleClientId = pkgs.writeShellScript "google-client-id" ''
     ${pkgs.python3}/bin/python3 -c "import configparser; cfg=configparser.ConfigParser(); cfg.read('${config.home.homeDirectory}/.config/rclone/rclone.conf'); print(cfg.get('gdrive','client_id'))"
   '';
@@ -60,6 +62,7 @@ in {
 
   accounts.calendar.accounts."google" = {
     primary = true;
+    primaryCollection = user.email;
     khal = {
       enable = true;
       type = "discover";

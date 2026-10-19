@@ -21,7 +21,8 @@ tasks:
     summary: >
       Bounded by construction: the inventory checks read the compiled registry and
       flake attr NAMES (~50 MiB), then task-graph integrity, the knowledge-graph
-      gate, nix lint, sops drift and modules.toml validation run locally. NO
+      gate, the sidecar's native-parity gate, nix lint, sops drift and
+      modules.toml validation run locally. NO
       nixosConfiguration is forced, by design — this task answers "is the repo
       internally consistent", NOT "does host X evaluate". The graph gate
       (`checks:kg`) evaluates the projection, not a host config: one nix eval
@@ -38,6 +39,7 @@ tasks:
       - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets
       - task checks:tasks
       - task checks:kg
+      - task checks:kg:native
       - task checks:nix:lint
       - task checks:sops:drift
       - task checks:modules:validate
@@ -174,10 +176,14 @@ tasks:
       keeps its centre; (3) interface — unknown id exits 1 (404, not 200 OK),
       missing argument exits 2, and a multi-word term arrives intact (it was
       truncated to its first word at two layers, both with exit 0);
-      (4) lifecycle — start waits for readiness, stop removes the socket.
+      (4) six-pattern parity — `kg-query.sh` answers every pattern from this
+      socket when it is live and from jq when KG_NO_SIDECAR=1 is set; the gate
+      compares both, byte for byte, because a fast path that answers differently
+      is a second source of truth with better latency; (5) lifecycle — start
+      waits for readiness, stop removes the socket.
       Cost: 2-4 s, one boot. Deliberately NOT part of checks:quick or the
       pre-commit hook: checks:kg is ~1 s of jq, this starts a BEAM. Run it when
-      tools/kg-engine/** or scripts/task/kg-sidecar.sh changes; KG_GRAPH skips
+      tools/kg-engine/**, kg-query.sh or kg-sidecar.sh changes; KG_GRAPH skips
       the graph resolution. Exit 0 = clean, 1 = drift.
     cmds:
       - bash scripts/task/kg-sidecar-check.sh
@@ -186,15 +192,23 @@ tasks:
     desc: "[gate] Cold native graph build: median under 20 ms, zero subprocess, parity"
     summary: >
       scripts/task/kg-native-check.sh — the number this project kept quoting as
-      "~100 ms" now has a gate. Runs the engine's `--build-only` mode RUNS=7
-      times, takes the MEDIAN (a single sample on the NAS-mounted repo is
-      dominated by read jitter — p90 is ~1.2x the median), and fails above
-      BUDGET_MS (default 20). Also asserts (a) KGEngine.Native contains no
-      subprocess primitive, statically — a fallback that shells out to nix
-      cannot pass, and (b) the native node/edge counts equal the compiled
-      projection, so speed cannot be bought with a smaller graph. Measured
-      2026-10-19 on frieren: median 14.6 ms, p90 17.4 ms for 225 nodes / 387
-      edges, no nix process. Cost: ~8 s (7 interpreter boots).
+      "~100 ms" now has a gate, and it is the gate that decides whether the
+      sidecar may keep its own graph builder. Runs `--build-only` RUNS=7 times,
+      takes the MEDIAN (a single sample on the NAS-mounted repo is dominated by
+      read jitter — p90 is ~1.2x the median), and fails above BUDGET_MS (default
+      20). Also asserts (a) KGEngine.Native contains no subprocess primitive,
+      statically — a fallback that shells out to nix cannot pass, and (b) the
+      native node/edge counts equal the compiled projection, so speed cannot be
+      bought with a smaller graph.
+
+      This is NOT decorative. The projection widened from 22 to 35 doc nodes and
+      the native builder kept enumerating only `docs/*.md`: every sidecar query
+      served 226/394 while the compiled graph said 239/539, and because the gate
+      ran nowhere automatic the drift was invisible. It is part of checks:quick
+      now, and the sidecar's DEFAULT graph source is the compiled projection —
+      `--native` is the parity experiment, not the query path.
+      Measured 2026-10-19 (this host): median 10.8 ms, p90 12.1 ms, max 12.7 ms
+      for 239 nodes / 539 edges; whole gate ~1.2 s.
     cmds:
       - bash scripts/task/kg-native-check.sh
 

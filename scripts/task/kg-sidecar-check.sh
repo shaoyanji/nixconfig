@@ -119,6 +119,30 @@ encoded="$("$SIDE" search 'a&b=c d' | jq -r '.query')"
 [ "$encoded" = 'a&b=c d' ] && ok "reserved characters survive encoding" ||
   bad "reserved characters mangled: '$encoded'"
 
+say "six-pattern parity with the jq surface"
+# kg-query.sh prefers this socket; KG_NO_SIDECAR=1 forces its jq path. Both must
+# answer byte-identically for every pattern, or the fast path becomes a second,
+# quieter source of truth — the exact failure this gate exists to catch. Names
+# are derived from the graph, not typed, so this keeps working after a rename.
+QF="$REPO/scripts/task/kg-query.sh"
+seed_skill="$(jq -r '[.edges[] | select(.to | startswith("skill:")) | .to]
+  | group_by(.) | sort_by(-length) | last | .[0] // "" | sub("^skill:"; "")' "$G")"
+seed_doc="$(jq -r '[.nodes[] | select(.type == "doc")][0].id // "" | sub("^doc:"; "")' "$G")"
+seed_tag="$(jq -r '[.nodes[] | select(.type == "tag")][0].id // "" | sub("^tag:"; "")' "$G")"
+
+for spec in "host ${seed_host:-}" "skill ${seed_skill:-}" "doc ${seed_doc:-}" "tag ${seed_tag:-}" "comention ${seed_host:-}" "stats "; do
+  set -- $spec
+  pattern="$1"
+  name="${2:-}"
+  got="$(KG_NO_SIDECAR=0 bash "$QF" "$pattern" ${name:+"$name"} --json 2>&1)" || true
+  want="$(KG_NO_SIDECAR=1 bash "$QF" "$pattern" ${name:+"$name"} --json 2>&1)" || true
+  if [ "$got" = "$want" ]; then
+    ok "pattern $pattern ${name:-<none>} matches the jq answer"
+  else
+    bad "pattern $pattern ${name:-<none>} differs from the jq answer"
+  fi
+done
+
 say "shutdown"
 if "$SIDE" stop >/dev/null 2>&1; then ok "stop exits 0"; else bad "stop failed"; fi
 if [ -S "${KG_SOCKET:-${XDG_RUNTIME_DIR:-/tmp}/kg.sock}" ]; then

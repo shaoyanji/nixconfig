@@ -24,6 +24,15 @@
 #   --top N  stats only: list the N nodes with the most outbound edges
 #   --min N  comention only: drop hosts sharing fewer than N documents (default 1)
 #   KG_GRAPH=<path>  use an existing graph JSON instead of evaluating
+#   KG_NO_SIDECAR=1  force the jq path (the parity gate compares the two)
+#
+# Fast path: when a sidecar socket is live, the question is answered from its
+# in-memory graph (`/pattern`) instead of resolving the graph and running jq —
+# 28 ms vs 476 ms on a dirty tree, 17x. Both paths return the same bytes for the
+# same question; `checks:kg:sidecar` asserts that for all six patterns, so the
+# fast path cannot become a second, quieter answer. An unknown node is NOT
+# answered on the fast path: it falls through to the jq path so the typo exit
+# code and its suggestions keep exactly one implementation.
 #
 # Exit: 0 = answer (possibly empty); 1 = graph unavailable; 2 = usage, or the
 # named node does not exist. "Empty" and "typo" are deliberately different exit
@@ -66,11 +75,9 @@ for pair in "TOP=$TOP" "MIN=$MIN"; do
 done
 
 # --- graph ------------------------------------------------------------------
-# Same caching rule as kg-ask.sh: a clean tree reuses the revision-keyed JSON, a
-# The resolver lives in lib/kg-graph.sh: one cache rule shared by all four kg:*
-# scripts, instead of a copy per script that can drift (see that file).
-. "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
-GRAPH="$(kg_graph_path)" || exit 1
+# Resolution is DEFERRED until the fast path misses (below). It is the expensive
+# half on a dirty tree — the cache is deliberately bypassed there — so a live
+# sidecar answering the same question should not pay for it first.
 
 # --- name normalisation -----------------------------------------------------
 # Accept `frieren` or `host:frieren`, `docs/x.md` or `doc:docs/x.md`. The node
@@ -137,19 +144,16 @@ case "$PATTERN" in
   host)
     require_name host
     ID="$(node_id host "$NAME")"
-    check_exists "$ID" "$NAME"
     JQ='[.edges[] | select(.to == $a) | .from] | unique | sort'
     ;;
   doc)
     require_name doc
     ID="$(node_id doc "$NAME")"
-    check_exists "$ID" "$NAME"
     JQ='[.edges[] | select(.from == $a) | .to] | unique | sort'
     ;;
   skill)
     require_name skill
     ID="$(node_id skill "$NAME")"
-    check_exists "$ID" "$NAME"
     # Inbound mentions AND outbound tags: "everything connected to the skill",
     # the same promise ops:kg:host makes for hosts.
     JQ='[(.edges[] | select(.to == $a) | .from),
@@ -158,13 +162,11 @@ case "$PATTERN" in
   tag)
     require_name tag
     ID="$(node_id tag "$NAME")"
-    check_exists "$ID" "$NAME"
     JQ='[.edges[] | select(.to == $a) | .from] | unique | sort'
     ;;
   comention)
     require_name comention
     ID="$(node_id host "$NAME")"
-    check_exists "$ID" "$NAME"
     # Two hops without a join operator: the docs that name this host, then every
     # OTHER host those same docs name. This is the one pattern a single-hop
     # index cannot answer, and the reason it is worth having at all.
@@ -200,6 +202,54 @@ case "$PATTERN" in
     exit 2
     ;;
 esac
+
+# --- fast path --------------------------------------------------------------
+# A live sidecar already holds the compiled projection, so the same question is
+# one socket round-trip instead of a graph resolution plus jq. Consulted only
+# when it ANSWERS (no `.error`): an unknown node falls through to the jq path so
+# the typo contract and its suggestions stay in one implementation, and
+# KG_NO_SIDECAR=1 forces the jq path for the parity gate in checks:kg:sidecar.
+SOCKET="${KG_SOCKET:-${XDG_RUNTIME_DIR:-/tmp}/kg.sock}"
+# KG_GRAPH means "answer about THIS graph", so the socket (which holds whichever
+# graph it was started with) is never consulted — that is what keeps checks:kg
+# deterministic instead of path-dependent.
+if [ -z "${KG_GRAPH:-}" ] && [ "${KG_NO_SIDECAR:-0}" != 1 ] && [ -S "$SOCKET" ]; then
+  fast="$(curl -sS -m 5 --unix-socket "$SOCKET" \
+    "http://localhost/pattern?p=${PATTERN}&name=$(jq -rn --arg s "${ID:-}" '$s | @uri')&min=${MIN}&top=${TOP}" \
+    2>/dev/null)" || fast=""
+
+  if [ -n "$fast" ] && ! jq -e 'has("error")' >/dev/null 2>&1 <<<"$fast"; then
+    # Rebuild the envelope in the documented key order. The engine's encoder
+    # sorts keys and `stats --top` carries a `top` sibling, so a raw passthrough
+    # would differ from the jq path byte-for-byte even with identical answers.
+    if [ "$JSON" = 1 ]; then
+      if [ "$PATTERN" = "stats" ]; then
+        # The counts object is re-ordered too: the engine's encoder sorts keys,
+        # and the jq path emits them in a fixed order.
+        jq -c '.results[0] as $r | {pattern: .pattern, arg: .arg, count: .count, results: [{nodes: $r.nodes, hosts: $r.hosts, skills: $r.skills, docs: $r.docs, tags: $r.tags, edges: $r.edges}]}' <<<"$fast"
+      else
+        jq -c '{pattern: .pattern, arg: .arg, count: .count, results: .results}' <<<"$fast"
+      fi
+      exit 0
+    fi
+    if [ "$PATTERN" = "stats" ]; then
+      jq -r '.results[0] | "nodes: \(.hosts) hosts, \(.skills) skills, \(.docs) docs, \(.tags) tags; edges: \(.edges)"' <<<"$fast"
+      if jq -e '(.top // []) | length > 0' >/dev/null 2>&1 <<<"$fast"; then
+        jq -r '.top[] | "\(.n)\t\(.id)"' <<<"$fast" | column -t -s$'\t'
+      fi
+      exit 0
+    fi
+    jq -r '.results[] | if type == "object" then [.id, (.shared | tostring)] | @tsv else . end' <<<"$fast" |
+      if [ "$PATTERN" = "comention" ]; then column -t -s$'\t'; else cat; fi
+    exit 0
+  fi
+fi
+
+# --- graph (only reached when the fast path could not answer) ----------------
+. "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
+GRAPH="$(kg_graph_path)" || exit 1
+
+if [ -n "${ID:-}" ]; then check_exists "$ID" "$NAME"; fi
 
 RESULT="$(jq -c --arg a "${ID:-}" --argjson min "$MIN" "$JQ" "$GRAPH")"
 

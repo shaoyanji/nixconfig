@@ -8,7 +8,7 @@
 # the sidecar can never serve a graph the jq surface would disagree with.
 #
 # Commands:
-#   start          Start the daemon and WAIT until it answers (exit 1 if not)
+#   start [--native]  Start the daemon and WAIT until it answers (exit 1 if not)
 #   stop           Stop the daemon and verify it exited
 #   restart        stop, then start
 #   status         /stats — node/edge counts, engine, server-side latency
@@ -24,9 +24,19 @@
 #
 # Env: KG_SOCKET   socket path (default $XDG_RUNTIME_DIR/kg.sock)
 #      KG_GRAPH    graph JSON to load (skips evaluation; same as the jq surface)
-#      KG_ELIXIR   elixir binary; default: $PATH, else the store path if already
-#                  present. Never builds — an absent interpreter is an error, not
-#                  a compiler job (ops tasks must not spend build budget).
+#      KG_SOURCE   `compiled` (default) or `native` — see below
+#      KG_ELIXIR   elixir binary; default: $PATH (a `nix develop` shell), else
+#                  the store path, else a substitution of nixpkgs#elixir. Never a
+#                  remote builder: `--builders ""` keeps this inside the free
+#                  tier, and an ops task must not dispatch a build.
+#
+# The graph source defaults to the COMPILED projection (lib/knowledge-graph.nix,
+# resolved and cached by lib/kg-graph.sh), so the socket and the jq surface can
+# never disagree: one projection, one implementation. `--native` (or
+# KG_SOURCE=native) selects the in-engine builder instead — it exists to prove
+# the two agree in `checks:kg:native`, and it is the reason that gate must run:
+# when the projection widened to 35 docs, native kept serving 22 and every query
+# was quietly short 13 documents until parity was measured.
 #
 # Exit: 0 = answered (including an empty answer); 1 = sidecar/graph unavailable;
 #       2 = usage. Errors from the engine carry a real HTTP status (400/404), so
@@ -43,6 +53,19 @@ ENGINE_SCRIPT="${REPO}/tools/kg-engine/kg_engine.exs"
 
 cmd="${1:-status}"
 [ "$#" -gt 0 ] && shift || true
+
+# `--native` is the only flag any subcommand takes: it asks for the in-engine
+# builder instead of the compiled projection. Stripped here so the subcommands
+# below see their own arguments unchanged.
+source="${KG_SOURCE:-compiled}"
+rest=()
+for arg in "$@"; do
+  case "$arg" in
+    --native) source=native ;;
+    *) rest+=("$arg") ;;
+  esac
+done
+if [ "${#rest[@]}" -gt 0 ]; then set -- "${rest[@]}"; else set --; fi
 
 . "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
 
@@ -70,7 +93,19 @@ resolve_elixir() {
   # --print-out-paths` prints the STORE DIRECTORY, so the binary is /bin/elixir
   # inside it — handing the directory to `setsid nohup` fails with EACCES.
   local out
+  # Already in the store (a previous run, or the devshell's environment): reuse
+  # it, so a warm machine never invokes nix at all. `--offline` makes this a pure
+  # lookup that fails fast instead of reaching the network.
+  local out
   out="$(nix build --no-link --offline --builders "" --print-out-paths nixpkgs#beamPackages.elixir 2>/dev/null | head -1)"
+  if [ -z "$out" ]; then
+    # Not present yet: SUBSTITUTE it. Elixir is on cache.nixos.org, so this is a
+    # download; `--builders ""` is what stops a miss from becoming a build on
+    # someone's bill. `nix develop` in the repo does the same thing repeatedly,
+    # off the same store path.
+    say "elixir not in the store; substituting nixpkgs#beamPackages.elixir (one-off)"
+    out="$(nix build --no-link --builders "" --print-out-paths nixpkgs#beamPackages.elixir 2>/dev/null | head -1)"
+  fi
   [ -n "$out" ] && printf '%s' "$out/bin/elixir"
   return 0
 }
@@ -106,9 +141,13 @@ start_daemon() {
   if [ -n "${KG_GRAPH:-}" ]; then
     graph_args=(--file "$KG_GRAPH")
     graph_desc="file $KG_GRAPH"
-  else
+  elif [ "$source" = native ]; then
     graph_args=(--native)
-    graph_desc="native (no nix)"
+    graph_desc="native (in-engine builder; parity mode)"
+  else
+    graph="$(kg_graph_path)" || return 1
+    graph_args=(--file "$graph")
+    graph_desc="compiled projection $graph"
   fi
 
   rm -f "$SOCKET" "$PIDFILE"

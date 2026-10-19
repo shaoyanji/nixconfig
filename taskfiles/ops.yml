@@ -131,14 +131,28 @@ tasks:
       Controls the in-memory ETS graph sidecar on unix:$XDG_RUNTIME_DIR/kg.sock.
       Commands: start, stop, restart, status (default), node ID=<node>,
       neighbors ID=<node> [DEPTH=N], blast-radius ID=<node>, search Q=<term>.
+      The graph is the COMPILED projection (lib/knowledge-graph.nix), resolved
+      and cached by lib/kg-graph.sh: the socket and the jq surface cannot
+      disagree. `--native` asks the engine for its own builder instead — that is
+      the parity experiment `checks:kg:native` measures, not the query path;
+      when the projection widened to 35 docs the native builder kept serving the
+      old 22 and quietly answered short.
+      Interpreter: `elixir` from PATH (the repo's devshell / `.envrc`), else the
+      store, else a one-off substitution of nixpkgs#beamPackages.elixir — never a
+      remote build.
       `start` waits until the daemon answers (exit 1 if not); `stop` waits for it
       to exit. Queries auto-start it. Arguments are percent-encoded and quoted at
       the task layer, so Q="two words" stays one term — it used to reach the
       engine as "two" with exit 0.
       Engine errors carry real HTTP status: 400 missing param, 404 unknown node,
       so a typo is not an empty answer.
-      Latency, stated honestly: 0.2-0.9 ms server-side warm, 12 ms on the first
-      call after boot, ~20 ms per curl, 260-310 ms end-to-end through `task`.
+      Latency, measured 2026-10-19 on this host and stated honestly: 58 us
+      server-side warm; 36-50 ms per query through the script (process + curl);
+      114-125 ms end-to-end through `task`, almost all of it task's own startup.
+      For comparison the jq surface is ~113 ms on a clean tree (graph cached by
+      revision) and ~530 ms on a dirty one (cache deliberately bypassed), so the
+      sidecar's real win is repeated queries and the multi-hop verbs nix has no
+      equivalent for - not a single one-shot lookup.
     cmds:
       - 'bash scripts/task/kg-sidecar.sh "{{.CMD | default "status"}}" "{{.ID | default .Q | default ""}}" "{{.DEPTH | default ""}}"'
 
@@ -147,7 +161,10 @@ tasks:
     summary: >
       Reverse walk over inbound edges: who depends on or mentions TARGET (any
       node id: host:frieren, skill:qmd, tag:nix, doc:docs/x.md). Server-side
-      traversal is 0.3-0.9 ms; the task wrapper adds ~300 ms. Usage: TARGET=<id>.
+      traversal is ~60 us; ~114 ms end-to-end through `task`, which is task's
+      startup, not the walk. Usage: TARGET=<id>.
+      This is the one traversal the jq patterns do not answer: "who transitively
+      depends on X" is a reverse closure, not a scan.
     cmds:
       - 'bash scripts/task/kg-sidecar.sh blast-radius "{{.ID | default .TARGET}}"'
 

@@ -65,6 +65,9 @@ in rec {
     globalModules
     ++ [
       ../modules/global/nixos.nix
+      # Determinate Nix: one Nix binary for every NixOS host (rollback = the
+      # generation). See the module header for the priority and registry traps.
+      ../modules/global/determinate-nix.nix
       inputs.home-manager.nixosModules.default
       inputs.sops-nix.nixosModules.sops
       inputs.nix-index-database.nixosModules.nix-index
@@ -92,6 +95,7 @@ in rec {
     globalModules
     ++ [
       ../modules/global/noDE.nix
+      ../modules/global/determinate-nix.nix
       inputs.sops-nix.nixosModules.sops
       inputs.home-manager.nixosModules.default
       inputs.nix-index-database.nixosModules.nix-index
@@ -100,6 +104,7 @@ in rec {
     globalModules
     ++ [
       ../modules/global/demo.nix
+      ../modules/global/determinate-nix.nix
       inputs.home-manager.nixosModules.default
     ];
   # Standalone-home chain. These hosts build their own pkgs outside the

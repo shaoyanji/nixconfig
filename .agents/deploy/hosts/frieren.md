@@ -33,6 +33,34 @@ NAS server (Samba, NFS, Jellyfin, Paperless-ngx, Unbound DNS + Pi-hole, aria2) a
   (`nurl` for hashes) — never `kiwix-manage` and never hand-rolled user units
   under `~/.config/systemd/user/` (they shadow the declarative ones).
 
+## nginx activations fail *after* the switch — preflight the config instead (2026-10-19)
+
+Two separate defects made `nginx.service` restart into a crash loop on
+2026-10-19, each one AFTER the system had switched (so the rollback is
+`/nix/var/nix/profiles/system-<N>-link/bin/switch-to-configuration switch`, not
+`nixos-rebuild --rollback`, which needs a channel):
+
+1. **`{8}` in a location key** was emitted as `location ~* \.[a-f0-9] {` +
+   `8` + `}` — nginx: `unexpected "}"`. Both occurrences
+   (`hosts/frieren/reverse-proxy.nix`, `modules/services/uds-static-bridge.nix`)
+   now spell the eight hex digits out. Any future regex location must either
+   avoid a brace quantifier or quote the regex, as the `~ "^/([a-z0-9]{8}…)"`
+   vhost already does.
+2. **`listen … ssl = true` without `addSSL = true`** declares the TLS listener
+   but the module never emits `ssl_certificate` — nginx: `no "ssl_certificate"
+   is defined`. Set `addSSL` on any vhost that listens on 443.
+
+Preflight before switching — this catches both, and costs one toplevel build:
+
+```bash
+nix build --builders "" .#nixosConfigurations.frieren.config.system.build.toplevel -o /tmp/frieren-next
+CONF=$(readlink -f /tmp/frieren-next/etc/nginx/nginx.conf)
+sudo /nix/store/*-nginx-1*/bin/nginx -t -c "$CONF"   # want: "syntax is ok"
+```
+
+A pid-file error (`/run/nginx/nginx.pid`) after `syntax is ok` is expected when
+run outside systemd; a syntax or `ssl_certificate` error is real.
+
 ## Operational Interpretation
 - Prefer the canonical host deploy flow (`infra:deploy:host:frieren`).
 - After the daily autoUpgrade lands, `infra:deploy:host:frieren` is still fine for immediate/manual deploys — the timer just catches drift the next morning.

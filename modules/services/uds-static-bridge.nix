@@ -13,7 +13,13 @@
   ...
 }: let
   cfg = config.services.udsStaticBridge;
-  akiDocs = import ../../lib/aki-site.nix {inherit pkgs;};
+  # Same site, same evaluated inputs as the HTTP vhost: the compiled registry and
+  # this host's own name, so the served bytes cannot disagree with nginx's copy.
+  akiDocs = import ../../lib/aki-site.nix {
+    inherit pkgs;
+    inventory = config.fleet.inventory;
+    host = config.networking.hostName;
+  };
 in {
   options.services.udsStaticBridge = {
     enable = lib.mkEnableOption "declarative zero-TCP static documentation bridge via UNIX domain sockets";

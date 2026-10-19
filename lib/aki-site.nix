@@ -1,20 +1,37 @@
 # ==============================================================================
-# lib/aki-site.nix — Aki-Powered Nix-Native Static Documentation & Closure Explorer
+# lib/aki-site.nix — the fleet site, as a project of evaluated data
 # ==============================================================================
 # An ultra-minimal hypermedia site (~270 B aki JS primitive) generated natively
-# by Nix at build time. Emits index.html, aki.min.js, style.css, and static JSON
-# slice transitions for instant, zero-daemon exploration of host inventories,
-# closure attribution graphs, and debloat milestones.
+# by Nix at build time: index.html, aki.min.js, style.css, and static JSON slices
+# for zero-daemon exploration of hosts, notes, closures, and the knowledge graph.
+#
+# HARD RULE — no typed facts. Every figure, path, service, size and status this
+# site prints is an INTERPOLATION of an evaluated value:
+#
+#   inventory.toml          (compiled by lib/inventory.nix)  hosts, counts, roles
+#   closure-budgets.toml    (measured by the adopt task)     closure baselines
+#   .agents/skills/**       (compiled by lib/skills.nix)     skill notes
+#   living docs + docs/*.md (compiled by lib/knowledge-graph.nix)
+#   the note files themselves (rendered into their own slices)
+#
+# The 2026-10-19 revision still claimed "Generation 82", "33.8 GiB", "3,946
+# store paths" and a port table months after each value had changed: literals
+# outlive the config they describe. So the rule is structural — if a value has
+# no source of truth, it is not rendered at all, and anything that does have one
+# is written as ${toString ...} over that source.
 # ==============================================================================
 {
   pkgs,
   lib ? pkgs.lib,
-  # Compiled registry from lib/inventory.nix (flake output `inventory`). Callers
-  # in the flake pass it so this site cannot disagree with the hosts about a
-  # host's kind/status/role; the TOML fallback exists only for a standalone
-  # `nix-build lib/aki-site.nix` and is NOT defaults-normalised.
+  # Compiled registry from lib/inventory.nix (flake output `inventory`). The
+  # flake AND every host pass it, so this site cannot disagree with the hosts
+  # about a host's kind/status/role; the TOML fallback exists only for a
+  # standalone `nix-build lib/aki-site.nix` and is NOT defaults-normalised.
   inventory ? null,
+  # Host that serves the site, for the status badge. `null` makes no claim.
+  host ? null,
 }: let
+  root = ../.;
   inventoryFile = ../inventory.toml;
   rawInventory =
     if builtins.pathExists inventoryFile
@@ -30,6 +47,128 @@
     inherit lib skills;
     inventory = inv;
   };
+
+  # --- the evaluated model ---------------------------------------------------
+  hosts = inv.hosts or {};
+  hostNames = builtins.attrNames hosts;
+  hostValues = lib.attrValues hosts;
+
+  # Counts are filtered out of the registry here, not read from a `derived`
+  # block and not typed: the registry's own derived block is computed upstream
+  # by lib/inventory.nix, but recomputing keeps the site correct even in the
+  # standalone TOML fallback.
+  totalHosts = builtins.length hostNames;
+  countWhere = p: builtins.length (lib.filter p hostValues);
+  externalCount = countWhere (h: (h.kind or "") == "external");
+  nixHostCount = totalHosts - externalCount;
+  activeNix = countWhere (h: (h.status or "") == "active" && (h.kind or "") != "external");
+  activeExternal = countWhere (h: (h.status or "") == "active" && (h.kind or "") == "external");
+  activeTotal = activeNix + activeExternal;
+  wipCount = countWhere (h: (h.status or "") == "wip");
+  preservedCount = countWhere (h: (h.status or "") == "preserved");
+
+  byStatus =
+    lib.foldl'
+    (acc: h:
+      acc
+      // {
+        "${h.status or "unknown"}" = (acc.${h.status or "unknown"} or 0) + 1;
+      })
+    {}
+    (lib.attrValues hosts);
+
+  byKind =
+    lib.foldl'
+    (acc: h:
+      acc
+      // {
+        "${h.kind or "unknown"}" = (acc.${h.kind or "unknown"} or 0) + 1;
+      })
+    {}
+    (lib.attrValues hosts);
+
+  archCount =
+    lib.foldl'
+    (acc: h: let
+      a = h.arch or "unknown";
+    in
+      acc // {"${a}" = (acc.${a} or 0) + 1;})
+    {}
+    (lib.attrValues hosts);
+
+  # Services are the ones the registry declares per host; nothing is invented.
+  serviceNames = lib.unique (lib.concatMap (h: h.software.key_services or []) (lib.attrValues hosts));
+  serviceCount = builtins.length serviceNames;
+
+  # --- closure budgets: measured, never typed --------------------------------
+  # `[hosts.<h>.baseline] bytes/measured_on` is rewritten by
+  # `task dev:closure:budget:adopt`; `headroom_pct` and an optional absolute
+  # `bytes` pin are policy. The site shows baseline and the derived budget.
+  budgets = builtins.fromTOML (builtins.readFile ../closure-budgets.toml);
+  budgetHosts = budgets.hosts or {};
+  # `or` only rescues a missing attribute, not a missing parent, so each level is
+  # defaulted on its own — a file with no [defaults] must still render.
+  defaultHeadroom = (budgets.defaults or {}).headroom_pct or 0;
+
+  budgetRow = name: let
+    b = budgetHosts.${name};
+    baseline = (b.baseline or {}).bytes or null;
+    headroom = b.headroom_pct or defaultHeadroom;
+    pinned = b.bytes or null;
+    bytes =
+      if pinned != null
+      then pinned
+      else if baseline != null
+      then baseline * (1.0 + headroom / 100.0)
+      else null;
+  in {
+    inherit name baseline headroom pinned bytes;
+    measuredOn = (b.baseline or {}).measured_on or "—";
+  };
+
+  budgetRows = lib.filter (r: r.bytes != null) (map budgetRow (builtins.attrNames budgetHosts));
+  budgetNames = map (r: r.name) budgetRows;
+  unbudgeted = lib.filter (n: !(builtins.elem n budgetNames)) hostNames;
+
+  maxBudget =
+    lib.foldl' (a: r:
+      if r.bytes > a
+      then r.bytes
+      else a)
+    0
+    budgetRows;
+  totalBudget = lib.foldl' (a: r: a + r.bytes) 0 budgetRows;
+
+  # One decimal formatter for every figure the site prints. Nix has no printf,
+  # and `toString` on a float keeps six decimals ("30.100000 GiB"), so the integer
+  # and its tenth are split arithmetically instead of formatted.
+  fmtTenths = v: let
+    tenths = builtins.floor (v * 10.0 + 0.5);
+    whole = tenths / 10;
+    frac = tenths - whole * 10;
+  in "${toString whole}.${toString frac}";
+
+  fmtGiB = bytes: "${fmtTenths (bytes / 1073741824.0)} GiB";
+  fmtPct = v: "${fmtTenths v}%";
+
+  graphStats = kg.graph.stats;
+  nodeCount = builtins.length kg.graph.nodes;
+  edgeCount = builtins.length kg.graph.edges;
+
+  # The host that serves this site, resolved from the registry rather than
+  # named in the markup.
+  hostStatus =
+    if host != null && hosts ? ${host}
+    then hosts.${host}.status or "unknown"
+    else "";
+  hostBadge =
+    if hostStatus != ""
+    then "${host}: ${hostStatus}"
+    else "registry: ${toString totalHosts} devices";
+  badgeClass =
+    if hostStatus == "active"
+    then "badge-green"
+    else "badge-blue";
 
   # Aki hypermedia driver with delegated click listener for dynamic DOM mutations
   akiJs = ''
@@ -819,6 +958,39 @@
       margin: 0.75rem 0;
       border: 1px solid var(--border);
     }
+    /* A note's own markdown, rendered at build time into its slice. */
+    .note {
+      margin: 1rem 0;
+      padding: 0.25rem 1rem;
+      border-left: 3px solid var(--accent);
+      background: var(--bg);
+      max-width: 78ch;
+    }
+    .note h1 {
+      font-size: 1.35rem;
+      margin: 0.75rem 0 0.5rem;
+    }
+    .note h2 {
+      font-size: 1.15rem;
+      margin: 1rem 0 0.5rem;
+    }
+    .note h3 {
+      font-size: 1rem;
+      margin: 1rem 0 0.4rem;
+    }
+    .note p,
+    .note li {
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+    .note ul,
+    .note ol {
+      padding-left: 1.25rem;
+    }
+    .note table {
+      font-size: 0.85rem;
+    }
   '';
 
   # Asset fingerprinting hashes for immutable caching (Gap B)
@@ -829,6 +1001,81 @@
   jsFileName = "aki.${jsHash}.min.js";
   kgFileName = "kg.${kgHash}.min.js";
 
+  # One navigation list, rendered by the shell and restored by every transition
+  # that replaced the sidebar (a slice only swaps the selectors it names).
+  sidebarButtons = ''
+    <button class="side-btn nav-active" url="data/overview.json">Mainframe Summary</button>
+    <button class="side-btn" url="data/inventory.json">Host Matrix</button>
+    <button class="side-btn" url="data/kg.json">Knowledge Graph</button>
+    <button class="side-btn" url="data/notes.json">Notes</button>
+    <button class="side-btn" url="data/closures.json">Closure Budgets</button>
+  '';
+
+  # The overview body is a single expression because it is rendered twice: as
+  # the no-JS initial document and as the `data/overview.json` transition. Two
+  # copies is how the old page drifted from the data it claimed to describe.
+  overviewBody = ''
+    <h2>Fleet Overview</h2>
+    <p style="margin: 0.75rem 0; color: var(--text-muted);">
+      Every figure below is evaluated at build time from
+      <code>inventory.toml</code>, <code>closure-budgets.toml</code>,
+      <code>.agents/skills/*/SKILL.md</code> and the living documents. Nothing on
+      this page is typed by hand.
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>Fleet Registry</h4>
+        <p><strong>${toString totalHosts} devices</strong></p>
+        <p><small style="color: var(--text-muted);">${toString activeTotal} active &middot; ${toString preservedCount} preserved &middot; ${toString wipCount} WIP</small></p>
+        <p><small style="color: var(--green);">${toString nixHostCount} Nix &middot; ${toString externalCount} external</small></p>
+      </div>
+      <div class="card">
+        <h4>Knowledge Projection</h4>
+        <p><strong>${toString nodeCount} nodes &middot; ${toString edgeCount} edges</strong></p>
+        <p><small style="color: var(--text-muted);">${toString graphStats.hosts} hosts &middot; ${toString graphStats.skills} skills &middot; ${toString graphStats.docs} docs</small></p>
+        <p><small style="color: var(--heading);">${toString (builtins.length noteEntries)} notes readable in-site</small></p>
+      </div>
+      <div class="card">
+        <h4>Closure Budgets</h4>
+        <p><strong>${toString (builtins.length budgetRows)} measured ${
+      if builtins.length budgetRows == 1
+      then "baseline"
+      else "baselines"
+    }</strong></p>
+        <p><small style="color: var(--text-muted);">${fmtGiB totalBudget} total allowed</small></p>
+        <p><small style="color: var(--heading);">largest: ${fmtGiB maxBudget}</small></p>
+      </div>
+      <div class="card">
+        <h4>Declared Services</h4>
+        <p><strong>${toString serviceCount} key services</strong></p>
+        <p><small style="color: var(--text-muted);">from the registry's per-host software declarations</small></p>
+        <p><small style="color: var(--yellow, #e0af68);">${toString (builtins.length unbudgeted)} hosts without a baseline</small></p>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--heading);">Distribution</h3>
+    <table>
+      <thead><tr><th>Kind</th><th>Status</th><th>Architecture</th><th>Devices</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>${lib.concatMapStringsSep ", " (k: "${k} (${toString byKind.${k}})") (lib.attrNames byKind)}</td>
+          <td>${lib.concatMapStringsSep ", " (s: "${s} (${toString byStatus.${s}})") (lib.attrNames byStatus)}</td>
+          <td>${lib.concatMapStringsSep ", " (a: "${a} (${toString archCount.${a}})") (lib.attrNames archCount)}</td>
+          <td><strong>${toString totalHosts}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">Where to look</h3>
+    <p>
+      <button class="tab-btn" url="data/inventory.json">Fleet Inventory</button>
+      <button class="tab-btn" url="data/kg.json">Knowledge Graph</button>
+      <button class="tab-btn" url="data/notes.json">Notes</button>
+      <button class="tab-btn" url="data/closures.json">Closure Budgets</button>
+    </p>
+  '';
+
   # Top-level shell
   indexHtml = ''
     <!DOCTYPE html>
@@ -836,7 +1083,7 @@
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Fleet Control Plane & Closure Explorer</title>
+      <title>Fleet Control Plane &mdash; ${toString totalHosts} devices</title>
       <link rel="stylesheet" href="${cssFileName}">
       <script src="${jsFileName}" defer></script>
       <script src="${kgFileName}" defer></script>
@@ -845,10 +1092,10 @@
       <header>
         <div class="brand">
           <h1>Fleet Control Plane</h1>
-          <span id="live-status-badge" class="badge badge-green">🟢 frieren: Active Production</span>
+          <span id="live-status-badge" class="badge ${badgeClass}">${hostBadge}</span>
         </div>
         <div>
-          <span class="badge badge-blue">Aki Hypermedia</span>
+          <span class="badge badge-blue">${toString nodeCount} nodes &middot; ${toString edgeCount} edges</span>
         </div>
       </header>
 
@@ -856,9 +1103,8 @@
         <button class="tab-btn nav-active" url="data/overview.json">Overview</button>
         <button class="tab-btn" url="data/inventory.json">Fleet Inventory</button>
         <button class="tab-btn" url="data/kg.json">Knowledge Graph</button>
-        <button class="tab-btn" url="data/closure.json">Closure Graph</button>
-        <button class="tab-btn" url="data/debloat.json">Debloat Playbook</button>
-        <button class="tab-btn" url="data/services.json">Services & Ingress</button>
+        <button class="tab-btn" url="data/notes.json">Notes</button>
+        <button class="tab-btn" url="data/closures.json">Closure Budgets</button>
       </nav>
 
       <div id="breadcrumbs">fleet / overview</div>
@@ -867,47 +1113,12 @@
         <aside>
           <div id="sidebar-title"><h3>Navigation</h3></div>
           <div id="sidebar-pane" class="side-list">
-            <button class="side-btn nav-active" url="data/overview.json">Mainframe Summary</button>
-            <button class="side-btn" url="data/inventory.json">Host Matrix</button>
-            <button class="side-btn" url="data/kg.json">Knowledge Graph</button>
-            <button class="side-btn" url="data/closure.json">Closure Rollup</button>
-            <button class="side-btn" url="data/debloat.json">Debloat Status</button>
-            <button class="side-btn" url="data/services.json">Port Map</button>
+            ${sidebarButtons}
           </div>
         </aside>
 
         <main id="detail-pane">
-          <h2>Fleet Mainframe & Storage Steward</h2>
-          <p style="margin: 0.75rem 0; color: var(--text-muted);">
-            Welcome to the Nix-native Fleet Control Plane and Static Closure Explorer.
-            Driven entirely by pre-compiled hypermedia transitions with zero server daemons.
-          </p>
-
-          <div class="card-grid">
-            <div class="card">
-              <h4>System Generation</h4>
-              <p>Generation 82 booted & nominal</p>
-              <p><small style="color: var(--green);">Auto-upgrade active (04:00 daily)</small></p>
-            </div>
-            <div class="card">
-              <h4>Closure Footprint</h4>
-              <p>33.8 GiB total (3,946 store paths)</p>
-              <p><small style="color: var(--text-muted);">Debloat roadmap targeting ~16-17 GiB floor</small></p>
-            </div>
-            <div class="card">
-              <h4>Storage Health</h4>
-              <p>1TB NVMe SSD + 2TB NAS HDD pool</p>
-              <p><small style="color: var(--green);">0 Btrfs errors; SMART nominal (34°C)</small></p>
-            </div>
-            <div class="card">
-              <h4>Mesh & Gateways</h4>
-              <p>SimpleX Mesh & SMP Relay active</p>
-              <p><small style="color: var(--heading);">Hermes gateway connected to Telegram</small></p>
-            </div>
-          </div>
-
-          <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">Quick Navigation</h3>
-          <p>Click any tab above to explore fleet hosts, dive into derivation closure trees, or view the debloat execution playbook.</p>
+          ${overviewBody}
         </main>
       </div>
     </body>
@@ -917,48 +1128,21 @@
   # JSON Slices
   overviewJson = builtins.toJSON {
     "#breadcrumbs" = {textContent = "fleet / overview";};
-    "#detail-pane" = {
-      innerHTML = ''
-        <h2>Fleet Mainframe & Storage Steward</h2>
-        <p style="margin: 0.75rem 0; color: var(--text-muted);">
-          Welcome to the Nix-native Fleet Control Plane and Static Closure Explorer.
-          Driven entirely by pre-compiled hypermedia transitions with zero server daemons.
-        </p>
-        <div class="card-grid">
-          <div class="card">
-            <h4>System Generation</h4>
-            <p>Generation 82 booted & nominal</p>
-            <p><small style="color: var(--green);">Auto-upgrade active (04:00 daily)</small></p>
-          </div>
-          <div class="card">
-            <h4>Closure Footprint</h4>
-            <p>33.8 GiB total (3,946 store paths)</p>
-            <p><small style="color: var(--text-muted);">Debloat roadmap targeting ~16-17 GiB floor</small></p>
-          </div>
-          <div class="card">
-            <h4>Storage Health</h4>
-            <p>1TB NVMe SSD + 2TB NAS HDD pool</p>
-            <p><small style="color: var(--green);">0 Btrfs errors; SMART nominal (34°C)</small></p>
-          </div>
-          <div class="card">
-            <h4>Mesh & Gateways</h4>
-            <p>SimpleX Mesh & SMP Relay active</p>
-            <p><small style="color: var(--heading);">Hermes gateway connected to Telegram</small></p>
-          </div>
-        </div>
-      '';
-    };
+    "#detail-pane" = {innerHTML = overviewBody;};
+    "#sidebar-pane" = {innerHTML = sidebarButtons;};
   };
 
   # Host list for sidebar
-  hostKeys = builtins.attrNames (inv.hosts or {});
-  activeHosts = builtins.filter (h: (inv.hosts.${h}.status or "") == "active") hostKeys;
+  hostKeys = hostNames;
 
+  # Every registered host, ordered as the registry orders them. The old list was
+  # `status == active` only, which silently hid preserved and WIP machines that
+  # the registry still describes.
   hostSidebarButtons = lib.concatStringsSep "\n" (
     map (
-      h: ''<button class="side-btn" url="data/host-${h}.json">${h} (${inv.hosts.${h}.kind or "nix"})</button>''
+      h: ''<button class="side-btn" url="data/host-${h}.json">${h} (${hosts.${h}.kind or "unknown"})</button>''
     )
-    activeHosts
+    hostKeys
   );
 
   inventoryJson = builtins.toJSON {
@@ -968,7 +1152,9 @@
       innerHTML = ''
         <h2>Fleet Device & Host Inventory</h2>
         <p style="margin: 0.75rem 0; color: var(--text-muted);">
-          Canonical registry of active production devices, compute tiers, and roles.
+          ${toString totalHosts} registered devices: ${toString activeTotal} active,
+          ${toString wipCount} WIP, ${toString preservedCount} preserved &middot;
+          ${toString nixHostCount} Nix, ${toString externalCount} external.
         </p>
         <table>
           <thead>
@@ -983,7 +1169,7 @@
           <tbody>
             ${lib.concatStringsSep "\n" (
           map (h: let
-            info = inv.hosts.${h};
+            info = hosts.${h};
           in ''
             <tr>
               <td><strong><button class="side-btn" style="padding:0; border:none; color:var(--heading); cursor:pointer;" url="data/host-${h}.json">${h}</button></strong></td>
@@ -992,12 +1178,12 @@
               then "badge-green"
               else "badge-yellow"
             }">${info.status}</span></td>
-              <td>${info.kind or "nix"}</td>
-              <td><code>${info.arch or "x86_64-linux"}</code></td>
-              <td>${info.role or "N/A"}</td>
+              <td>${info.kind or "unknown"}</td>
+              <td><code>${info.arch or "unknown"}</code></td>
+              <td>${info.role or "—"}</td>
             </tr>
           '')
-          activeHosts
+          hostKeys
         )}
           </tbody>
         </table>
@@ -1006,270 +1192,270 @@
   };
 
   # Individual host pages
+  # A field the registry does not carry is OMITTED, not filled with a invented
+  # default ("Generic", "DHCP", "Integrated" were all typed prose). Empty string
+  # is the compiled schema's "unknown", so it is also the row's absence.
+  mkHostRow = label: value:
+    lib.optionalString (value != "") ''<tr><th>${label}</th><td>${value}</td></tr>'';
+
   mkHostJson = h: let
-    info = inv.hosts.${h} or {};
+    info = hosts.${h};
     hw = info.hardware or {};
     net = info.network or {};
+    sw = info.software or {};
+    persona = info.persona or {};
+    budget = lib.findFirst (r: r.name == h) null budgetRows;
+    graphNode = lib.findFirst (n: n.id == "host:${h}") null kg.graph.nodes;
+
+    hardRows =
+      mkHostRow "Model" (escH (hw.model or ""))
+      + mkHostRow "CPU" (escH (hw.cpu or ""))
+      + mkHostRow "GPU" (escH (hw.gpu or ""))
+      + mkHostRow "RAM" (escH (hw.ram or ""))
+      + mkHostRow "Storage" (escH (hw.storage_type or ""))
+      + mkHostRow "Layout" (escH (hw.storage_layout or ""))
+      + mkHostRow "Display" (escH (hw.display or ""))
+      + mkHostRow "Battery" (escH (hw.battery or ""));
+
+    netRows =
+      mkHostRow "LAN IP" (escH (net.lan_ip or ""))
+      + mkHostRow "Tailscale" (escH (net.tailscale_ip or ""))
+      + mkHostRow "Domain" (escH (net.domain or ""))
+      + mkHostRow "SSH alias" (escH (net.ssh_alias or ""))
+      + mkHostRow "Tailscale" (
+        if net.tailscale or false
+        then "enabled"
+        else ""
+      )
+      + mkHostRow "Gemini" (escH (net.gemini_url or ""))
+      + mkHostRow "Gopher" (escH (net.gopher_url or ""));
+
+    swRows =
+      mkHostRow "Boot" (escH (sw.module_chain or ""))
+      + mkHostRow "Impermanence" (
+        if sw.impermanence or false
+        then "enabled"
+        else ""
+      )
+      + mkHostRow "Services" (escH (lib.concatStringsSep ", " (sw.key_services or [])))
+      + mkHostRow "Traits" (escH (lib.concatStringsSep ", " (sw.traits or [])))
+      + mkHostRow "Compute tier" (escH (persona.compute_tier or ""))
+      + mkHostRow "Constraints" (escH (lib.concatStringsSep "; " (persona.constraints or [])));
+
+    budgetBlock = lib.optionalString (budget != null) ''
+      <h3 style="margin-top: 1.25rem; margin-bottom: 0.5rem; color: var(--heading);">Closure Budget</h3>
+      <table>
+        <tbody>
+          <tr><th>Baseline</th><td>${
+        if budget.baseline == null
+        then "not recorded"
+        else "${fmtGiB budget.baseline} (${toString budget.baseline} B)"
+      }</td></tr>
+          <tr><th>Headroom</th><td>${fmtPct budget.headroom}</td></tr>
+          <tr><th>Budget</th><td><strong>${fmtGiB budget.bytes}</strong></td></tr>
+          <tr><th>Measured</th><td>${escH budget.measuredOn}</td></tr>
+        </tbody>
+      </table>
+    '';
+
+    statusBadge =
+      if (info.status or "") == "active"
+      then "badge-green"
+      else if (info.status or "") == "wip"
+      then "badge-blue"
+      else "badge-yellow";
   in
     builtins.toJSON {
       "#breadcrumbs" = {textContent = "fleet / inventory / ${h}";};
       "#detail-pane" = {
         innerHTML = ''
-          <h2>${h} — ${info.role or "Fleet Host"}</h2>
-          <p style="margin: 0.5rem 0 1rem 0;"><span class="badge ${
-            if (info.status or "") == "active"
-            then "badge-green"
-            else "badge-yellow"
-          }">${info.status or "active"}</span> &bull; <code>${info.kind or "nixos"}</code> &bull; <code>${info.arch or "x86_64-linux"}</code></p>
+          <h2>${h} — ${escH (info.role or "registered device")}</h2>
+          <p style="margin: 0.5rem 0 1rem 0;"><span class="badge ${statusBadge}">${info.status or "unknown"}</span> &bull; <code>${info.kind or "unknown"}</code> &bull; <code>${info.arch or "unknown"}</code>${
+            lib.optionalString (info.flake or false) " &bull; built by this flake"
+          }</p>
 
           <div class="card-grid">
             <div class="card">
-              <h4>Hardware Profile</h4>
-              <p><strong>Model:</strong> ${hw.model or "Generic"}</p>
-              <p><strong>CPU:</strong> ${hw.cpu or "x86_64"}</p>
-              <p><strong>RAM:</strong> ${hw.ram or "N/A"}</p>
-              <p><strong>GPU:</strong> ${hw.gpu or "Integrated"}</p>
+              <h4>Hardware</h4>
+              ${
+            if hardRows == ""
+            then "<p><small>not recorded</small></p>"
+            else "<table><tbody>" + hardRows + "</tbody></table>"
+          }
             </div>
             <div class="card">
-              <h4>Network & Access</h4>
-              <p><strong>LAN IP:</strong> ${net.lan_ip or "DHCP"}</p>
-              <p><strong>Tailscale:</strong> ${
-            if net.tailscale or false
-            then "Enabled"
-            else "Disabled"
-          }</p>
-              <p><strong>SSH Alias:</strong> <code>${net.ssh_alias or h}</code></p>
+              <h4>Network &amp; software</h4>
+              ${
+            if netRows + swRows == ""
+            then "<p><small>not recorded</small></p>"
+            else "<table><tbody>" + netRows + swRows + "</tbody></table>"
+          }
             </div>
           </div>
 
-          <h3 style="margin-top: 1.25rem; margin-bottom: 0.5rem; color: var(--heading);">Status Detail</h3>
-          <p style="color: var(--text);">${info.status_detail or "Operational."}</p>
+          ${
+            lib.optionalString ((info.status_detail or "") != "")
+            ''<h3 style="margin-top: 1.25rem; margin-bottom: 0.5rem; color: var(--heading);">Status detail</h3><p>${escH info.status_detail}</p>''
+          }
+
+          ${
+            lib.optionalString ((info.notes or []) != [])
+            ''<h3 style="margin-top: 1.25rem; margin-bottom: 0.5rem; color: var(--heading);">Operator notes</h3><ul>${lib.concatMapStringsSep "" (n: "<li>${escH n}</li>") info.notes}</ul>''
+          }
+
+          ${budgetBlock}
+
+          <p style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            ${lib.optionalString (graphNode != null) ''<button class="tab-btn" url="${sliceForId "host:${h}"}">Knowledge-graph slice</button>''}
+            <button class="tab-btn" url="data/closures.json">All budgets</button>
+            <button class="tab-btn" url="data/inventory.json">&larr; Inventory</button>
+          </p>
         '';
       };
     };
 
-  # Closure attribution page
-  closureJson = builtins.toJSON {
-    "#breadcrumbs" = {textContent = "fleet / closure";};
-    "#sidebar-pane" = {
-      innerHTML = ''
-        <button class="side-btn nav-active" url="data/closure.json">Attribution Rollup</button>
-        <button class="side-btn" url="data/debloat.json">Debloat Playbook</button>
-      '';
-    };
+  # Closure budgets — the only closure figures this site may print.
+  #
+  # The attribution rollup and the debloat playbook that used to live here were
+  # hand-written byte splits ("15.4 GiB exclusive (46%)", "~703 MiB") about one
+  # generation of one host. They could not be reproduced from the repository and
+  # were wrong within a week. `closure-budgets.toml` is the closure document that
+  # a MEASUREMENT rewrites (`task dev:closure:budget:adopt`), so it is the one
+  # rendered: baseline, headroom, derived budget, and the date taken.
+  closureRows = lib.sort (a: b: a.bytes > b.bytes) budgetRows;
+
+  closuresJson = builtins.toJSON {
+    "#breadcrumbs" = {textContent = "fleet / closure-budgets";};
+    "#sidebar-pane" = {innerHTML = sidebarButtons;};
     "#detail-pane" = {
       innerHTML = ''
-        <h2>Closure Attribution & Subsystem Rollup</h2>
+        <h2>Closure Budgets</h2>
         <p style="margin: 0.75rem 0; color: var(--text-muted);">
-          Measured on <strong>frieren</strong> generation 81/82 over 3,946 Nix store paths.
+          Baseline bytes are measured on the host and written into
+          <code>closure-budgets.toml</code> by
+          <code>task dev:closure:budget:adopt</code>. The budget is
+          <code>baseline &times; (1 + headroom)</code>, computed here — never
+          entered. A host with no row has never been measured, and the site says
+          so instead of guessing.
         </p>
 
         <div class="card-grid">
           <div class="card">
-            <h4>Exclusive Bytes</h4>
-            <p><strong>15.4 GiB (46%)</strong></p>
-            <p><small style="color: var(--text-muted);">Reachable from exactly 1 owner; reclaimed when that owner goes.</small></p>
+            <h4>Measured hosts</h4>
+            <p><strong>${toString (builtins.length closureRows)} of ${toString totalHosts}</strong></p>
+            <p><small style="color: var(--text-muted);">${toString (builtins.length unbudgeted)} without a baseline</small></p>
           </div>
           <div class="card">
-            <h4>Shared Substrate</h4>
-            <p><strong>16.2 GiB (48%)</strong></p>
-            <p><small style="color: var(--text-muted);">Shared across 2+ owners (glibc, Python, LLVM, Mesa, GTK).</small></p>
+            <h4>Total allowed</h4>
+            <p><strong>${fmtGiB totalBudget}</strong></p>
+            <p><small style="color: var(--text-muted);">sum of every derived budget</small></p>
           </div>
           <div class="card">
-            <h4>Core Subsystem</h4>
-            <p><strong>2.2 GiB (6%)</strong></p>
-            <p><small style="color: var(--text-muted);">Kernel, initrd, firmware (809 MiB), fonts (262 MiB).</small></p>
+            <h4>Largest budget</h4>
+            <p><strong>${fmtGiB maxBudget}</strong></p>
+            <p><small style="color: var(--text-muted);">${
+          if closureRows == []
+          then "no measured host"
+          else (builtins.head closureRows).name
+        }</small></p>
           </div>
         </div>
 
-        <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--heading);">Top Owners by Exclusive Bytes</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Owner Service / Target</th>
-              <th>Exclusive Size</th>
-              <th>Major Components</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>home-manager-devji</code></td>
-              <td>9.4 GiB</td>
-              <td>qmd (904 MiB), chromium (703 MiB), zen-browser (400 MiB)</td>
-            </tr>
-            <tr>
-              <td><code>stirling-pdf.service</code></td>
-              <td>1,008 MiB</td>
-              <td>openjdk-25 (655 MiB), stirling-pdf (348 MiB)</td>
-            </tr>
-            <tr>
-              <td><code>home-assistant.service</code></td>
-              <td>929 MiB</td>
-              <td>homeassistant core, frontend (270 MiB), botocore</td>
-            </tr>
-            <tr>
-              <td><code>immich</code> (server + ML)</td>
-              <td>790 MiB</td>
-              <td>immich server, openvino (141 MiB), onnxruntime</td>
-            </tr>
-            <tr>
-              <td><code>uptime-kuma.service</code></td>
-              <td>380 MiB</td>
-              <td>npm-deps, uptime-kuma</td>
-            </tr>
-            <tr>
-              <td><code>readarr.service</code></td>
-              <td>301 MiB</td>
-              <td>readarr, dotnet-runtime</td>
-            </tr>
-            <tr>
-              <td><code>plex.service</code></td>
-              <td>213 MiB</td>
-              <td>plexmediaserver</td>
-            </tr>
-          </tbody>
-        </table>
+        ${
+          if closureRows == []
+          then ''
+            <p style="margin-top: 1.5rem;">No host has a measured baseline yet.</p>
+          ''
+          else ''
+            <table style="margin-top: 1.5rem;">
+              <thead>
+                <tr><th>Host</th><th>Baseline</th><th>Headroom</th><th>Budget</th><th>Measured</th></tr>
+              </thead>
+              <tbody>
+                ${lib.concatMapStringsSep "\n" (r: ''
+                <tr>
+                  <td><button class="side-btn" style="padding:0;border:none;color:var(--heading);cursor:pointer;" url="data/host-${r.name}.json">${r.name}</button></td>
+                  <td>${
+                  if r.baseline == null
+                  then "—"
+                  else fmtGiB r.baseline
+                }</td>
+                  <td>${fmtPct r.headroom}${lib.optionalString (r.pinned != null) " (pinned)"}</td>
+                  <td><strong>${fmtGiB r.bytes}</strong></td>
+                  <td>${escH r.measuredOn}</td>
+                </tr>
+              '')
+              closureRows}
+              </tbody>
+            </table>
+          ''
+        }
+
+        ${
+          if unbudgeted == []
+          then ""
+          else ''
+            <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">No measured baseline</h3>
+            <p>${lib.concatStringsSep ", " (map (n: ''<code>${n}</code>'') unbudgeted)}</p>
+          ''
+        }
       '';
     };
   };
 
-  # Debloat playbook page
-  debloatJson = builtins.toJSON {
-    "#breadcrumbs" = {textContent = "fleet / debloat";};
+  # Notes index — every doc and skill the graph knows, by how often it is cited.
+  # Opening a row is an ordinary transition to that note's slice, which carries
+  # the rendered note itself (see noteEntries / the build step below).
+  noteIndex = lib.sort (
+    a: b: a.degree > b.degree || (a.degree == b.degree && a.label < b.label)
+  ) (map (n: n // {degree = degree.${n.id} or 0;}) noteNodes);
+
+  uncitedNotes = lib.filter (n: n.degree == 0) noteIndex;
+
+  notesJson = builtins.toJSON {
+    "#breadcrumbs" = {textContent = "fleet / notes";};
+    "#sidebar-pane" = {innerHTML = sidebarButtons;};
     "#detail-pane" = {
       innerHTML = ''
-        <h2>Closure Debloat Playbook (33.8 GiB &rarr; ~16-17 GiB)</h2>
+        <h2>Notes &amp; Skills</h2>
         <p style="margin: 0.75rem 0; color: var(--text-muted);">
-          Safe tier 1 configuration wins and structural debloat milestones.
+          ${toString (builtins.length noteIndex)} notes compiled by
+          <code>lib/knowledge-graph.nix</code> from living documents and
+          <code>.agents/skills/*/SKILL.md</code>. Each opens as a static slice that
+          contains the note's own text — the site reads the file at build time,
+          so there is no repository link to rot and no second copy to drift.
         </p>
 
-        <table>
+        <div class="card-grid">
+          <div class="card">
+            <h4>Documents</h4>
+            <p><strong>${toString (builtins.length docNodes)}</strong></p>
+          </div>
+          <div class="card">
+            <h4>Skills</h4>
+            <p><strong>${toString (builtins.length skillNodes)}</strong></p>
+          </div>
+          <div class="card">
+            <h4>Uncited</h4>
+            <p><strong>${toString (builtins.length uncitedNotes)}</strong></p>
+            <p><small style="color: var(--text-muted);">mentioned by no other node</small></p>
+          </div>
+        </div>
+
+        <table style="margin-top: 1.5rem;">
           <thead>
-            <tr>
-              <th>Item</th>
-              <th>Target</th>
-              <th>Savings</th>
-              <th>Status</th>
-              <th>Action / Implementation</th>
-            </tr>
+            <tr><th>Note</th><th>Type</th><th>Path</th><th>Mentions</th></tr>
           </thead>
           <tbody>
+            ${lib.concatMapStringsSep "\n" (n: ''
             <tr>
-              <td><strong>T1-1</strong></td>
-              <td>Chromium Deduplication</td>
-              <td>~703 MiB</td>
-              <td><span class="badge badge-green">Reclaimed</span></td>
-              <td>Removed duplicate chromium from home packages in Gen 81.</td>
+              <td><button class="side-btn" style="padding:0;border:none;color:var(--heading);cursor:pointer;text-align:left;" url="${sliceRel n}">${escH n.label}</button></td>
+              <td>${escH n.type}</td>
+              <td><code>${escH (n.path or "")}</code></td>
+              <td>${toString n.degree}</td>
             </tr>
-            <tr>
-              <td><strong>T1-2</strong></td>
-              <td>JetBrains Mono Font Pruning</td>
-              <td>~262 MiB</td>
-              <td><span class="badge badge-green">Applied</span></td>
-              <td>Replaced 228 MiB nerd-fonts with upstream jetbrains-mono (~3 MiB).</td>
-            </tr>
-            <tr>
-              <td><strong>T1-3</strong></td>
-              <td>nixpkgs Store Decoupling</td>
-              <td>~399 MiB</td>
-              <td><span class="badge badge-green">Applied</span></td>
-              <td>Decoupled <code>pkgs.path</code> in nix-path &rarr; <code>flake:nixpkgs</code>.</td>
-            </tr>
-            <tr>
-              <td><strong>T1-6</strong></td>
-              <td>CUPS & HPLIP Print Drivers</td>
-              <td>~70 MiB</td>
-              <td><span class="badge badge-green">Applied</span></td>
-              <td>Disabled <code>services.printing</code> and drivers on headless NAS.</td>
-            </tr>
-            <tr>
-              <td><strong>T1-4</strong></td>
-              <td>MBROLA Speech Dispatcher</td>
-              <td>~645 MiB</td>
-              <td><span class="badge badge-yellow">Evaluating</span></td>
-              <td>Requires package override for desktop browser TTS.</td>
-            </tr>
-            <tr>
-              <td><strong>Sudo PATH</strong></td>
-              <td>Non-Login /run/wrappers/bin</td>
-              <td>Quality</td>
-              <td><span class="badge badge-green">Resolved</span></td>
-              <td>Exported in bashrcExtra and home.sessionPath for seamless sudo.</td>
-            </tr>
-          </tbody>
-        </table>
-      '';
-    };
-  };
-
-  # Services & Ingress page
-  servicesJson = builtins.toJSON {
-    "#breadcrumbs" = {textContent = "fleet / services";};
-    "#detail-pane" = {
-      innerHTML = ''
-        <h2>Active Ingress & Production Ports</h2>
-        <p style="margin: 0.75rem 0; color: var(--text-muted);">
-          Declarative service catalog hosted on frieren (<code>192.168.3.25</code>).
-        </p>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Port</th>
-              <th>Protocol</th>
-              <th>Service</th>
-              <th>Scope & Function</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>80 / 443</code></td>
-              <td>HTTP/HTTPS</td>
-              <td>Nginx Reverse Proxy</td>
-              <td>LAN & Tailnet ingress with SSL termination</td>
-            </tr>
-            <tr>
-              <td><code>53 / 5335</code></td>
-              <td>DNS</td>
-              <td>Pi-hole FTL / Unbound</td>
-              <td>Recursive DNS caching and LAN ad-blocking</td>
-            </tr>
-            <tr>
-              <td><code>5223</code></td>
-              <td>ED25519 TLS</td>
-              <td>smp-server</td>
-              <td>SimpleX Chat fleet messaging relay server</td>
-            </tr>
-            <tr>
-              <td><code>5225</code></td>
-              <td>WebSocket</td>
-              <td>simplex-chat</td>
-              <td>SimpleX Chat daemon (Hermes / devji / guckloch)</td>
-            </tr>
-            <tr>
-              <td><code>6800 / 6801</code></td>
-              <td>RPC / HTTP</td>
-              <td>aria2 / AriaNg</td>
-              <td>Declarative download daemon and web dashboard</td>
-            </tr>
-            <tr>
-              <td><code>8088</code></td>
-              <td>HTTP</td>
-              <td>Kiwix Offline Wiki</td>
-              <td>19.2M Wikipedia & 14.5k ArchWiki offline articles</td>
-            </tr>
-            <tr>
-              <td><code>8123</code></td>
-              <td>HTTP</td>
-              <td>Home Assistant</td>
-              <td>Smart home automation platform</td>
-            </tr>
-            <tr>
-              <td><code>26000</code></td>
-              <td>HTTP / PXE</td>
-              <td>iVentoy</td>
-              <td>Network PXE multi-ISO boot server</td>
-            </tr>
+          '')
+          noteIndex}
           </tbody>
         </table>
       '';
@@ -1283,7 +1469,8 @@
       innerHTML = ''
         <button class="side-btn nav-active" url="data/kg.json">Graph Overview</button>
         <button class="side-btn" url="data/inventory.json">Host Matrix</button>
-        <button class="side-btn" url="data/closure.json">Closure Rollup</button>
+        <button class="side-btn" url="data/notes.json">Notes</button>
+        <button class="side-btn" url="data/closures.json">Closure Budgets</button>
       '';
     };
     "#detail-pane" = {
@@ -1391,6 +1578,47 @@
     ty = builtins.head sep;
   in "data/kg/${ty}-${nodeSlug id}.json";
 
+  # Doc and skill nodes carry their own text into their slice. The note is read
+  # from the repository at evaluation time, shipped as data next to the slice,
+  # and rendered by the build step below — so "open the note" is a transition
+  # inside the site, not a link to a forge that may have moved the file (the old
+  # page hardcoded one such URL, and it was the only way to reach any note).
+  docNodes = builtins.filter (n: n.type == "doc") kg.graph.nodes;
+  skillNodes = builtins.filter (n: n.type == "skill") kg.graph.nodes;
+  noteNodes = docNodes ++ skillNodes;
+  # A skill node's `path` is its directory (`.agents/skills/<name>`); its note is
+  # the SKILL.md inside it. `lib/knowledge-graph.nix` deliberately projects the
+  # directory because that is how agents discover a skill.
+  noteFile = n:
+    if n.type == "skill"
+    then "${n.path}/SKILL.md"
+    else n.path;
+
+  # Skills (and some docs) open with a YAML frontmatter fence. It is metadata for
+  # agent discovery, already compiled by lib/skills.nix; rendering it would print
+  # the frontmatter as body text. Drop everything through the closing `---`.
+  stripFrontmatter = text: let
+    lines = lib.splitString "\n" text;
+    rest = builtins.tail lines;
+    close =
+      lib.findFirst (
+        i: builtins.elemAt rest i == "---"
+      )
+      null (lib.range 0 (builtins.length rest - 1));
+  in
+    if builtins.length lines > 1 && builtins.head lines == "---" && close != null
+    then lib.concatStringsSep "\n" (lib.drop (close + 1) rest)
+    else text;
+
+  noteEntries =
+    map
+    (n: {
+      slice = sliceRel n;
+      path = noteFile n;
+      text = stripFrontmatter (builtins.readFile (root + "/${noteFile n}"));
+    })
+    (builtins.filter (n: n ? path) noteNodes);
+
   # Degree and incident edges computed once here rather than in the browser:
   # the slice a click lands on must already contain its neighbours, because the
   # page it navigates to is fetched, not computed.
@@ -1470,16 +1698,24 @@
         + "</p>";
 
     # Real navigation targets, so a slice is not a dead end: the host inventory
-    # page for an active host, the repository blob for a doc or skill.
+    # page for a registered host, the notes index for a note. No external URL is
+    # hardcoded — the site's own state is the whole destination set.
     onward = let
       hostPage =
-        lib.optionalString (n.type == "host" && builtins.elem n.label activeHosts)
+        lib.optionalString (n.type == "host" && builtins.elem n.label hostNames)
         ''<button class="tab-btn" url="data/host-${n.label}.json">Inventory page</button>'';
-      blob =
+      notesPage =
         lib.optionalString (n.type == "doc" || n.type == "skill")
-        ''<a class="tab-btn" style="text-decoration:none;" href="https://github.com/shaoyanji/nixconfig/blob/main/${n.path or ""}">Source</a>'';
+        ''<button class="tab-btn" url="data/notes.json">All notes</button>'';
     in
-      hostPage + blob;
+      hostPage + notesPage;
+
+    # The placeholder is filled by the build step (scripts/task inject-notes.py)
+    # with the note rendered from markdown; leaving it unreplaced is caught by
+    # `task checks:kg:canvas`, so a note can never silently render empty.
+    noteBody = lib.optionalString ((n.type == "doc" || n.type == "skill") && (n ? path)) ''
+      <div class="note"><!--KG_NOTE--></div>
+    '';
 
     # Values are HTML fragments already (escaped here, once), so the row
     # renderer above never re-escapes or double-escapes a path.
@@ -1507,6 +1743,8 @@
             </tbody>
           </table>
 
+          ${noteBody}
+
           <h3 style="margin-top: 1.25rem; color: var(--heading);">This node mentions (${toString (builtins.length outward)})</h3>
           ${links outward}
 
@@ -1528,26 +1766,68 @@
     })
     kg.graph.nodes;
 
-  # Fallback live telemetry (Gap A)
+  # Live telemetry is OPTIONAL and is written by the host at runtime. The static
+  # fallback therefore carries only facts this build knows: which host serves
+  # the site and that these values are unknown. `null` is the honest value — the
+  # old file invented "generation: booted", "uptime: nominal", "load: 0.0",
+  # which the page then displayed as if measured.
   fallbackLiveJson = builtins.toJSON {
-    hostname = "frieren";
-    generation = "booted";
-    uptime = "nominal";
-    load = "0.0";
-    memory = {
-      used_mb = 0;
-      total_mb = 0;
-    };
-    timestamp = "static-build";
+    hostname =
+      if host != null
+      then host
+      else "";
+    generation = null;
+    uptime = null;
+    load = null;
+    memory = null;
+    timestamp = null;
   };
 
-  # Individual JSON files for active hosts
+  # One slice per registered host, not only the active ones: a preserved or WIP
+  # host is still described by the registry and still reachable from the graph.
   hostJsonFiles =
     map (h: {
       name = "data/host-${h}.json";
       file = pkgs.writeText "host-${h}.json" (mkHostJson h);
     })
-    activeHosts;
+    hostKeys;
+
+  # Notes are markdown; rendering is a build-time job, so the build needs a
+  # markdown renderer and the manifest of (slice, path, text) that Nix already
+  # assembled. Both are inputs here, never a second parser written in JS.
+  noteRenderer = pkgs.python3.withPackages (ps: [ps.markdown]);
+  noteManifest = pkgs.writeText "note-manifest.json" (builtins.toJSON noteEntries);
+  injectNotes = pkgs.writeText "inject-notes.py" ''
+    import json, os, sys
+
+    import markdown
+
+    out, manifest = sys.argv[1], sys.argv[2]
+    entries = json.load(open(manifest))
+    for e in entries:
+        target = os.path.join(out, e["slice"])
+        with open(target) as fh:
+            slice_ = json.load(fh)
+        pane = slice_["#detail-pane"]["innerHTML"]
+        html = markdown.markdown(
+            e["text"],
+            extensions=["tables", "fenced_code", "sane_lists"],
+            output_format="html5",
+        )
+        if "<!--KG_NOTE-->" not in pane:
+            # A note whose slice does not offer the placeholder is a schema
+            # mismatch; failing the build is better than shipping a dead page.
+            sys.exit("no note placeholder in " + e["slice"])
+        slice_["#detail-pane"]["innerHTML"] = pane.replace("<!--KG_NOTE-->", html, 1)
+        with open(target, "w") as fh:
+            json.dump(slice_, fh)
+    print("rendered %d notes" % len(entries))
+  '';
+  # `import markdown` lives in this interpreter's environment, so the renderer
+  # is invoked through it rather than through the build's own python3.
+  injectNotesCmd = ''
+    ${noteRenderer}/bin/python3 ${injectNotes} $out ${noteManifest}
+  '';
 in
   pkgs.runCommand "fleet-docs-site" {
     meta = {
@@ -1579,9 +1859,8 @@ in
     cp ${pkgs.writeText "overview.json" overviewJson} $out/data/overview.json
     cp ${pkgs.writeText "inventory.json" inventoryJson} $out/data/inventory.json
     cp ${pkgs.writeText "kg.json" kgJson} $out/data/kg.json
-    cp ${pkgs.writeText "closure.json" closureJson} $out/data/closure.json
-    cp ${pkgs.writeText "debloat.json" debloatJson} $out/data/debloat.json
-    cp ${pkgs.writeText "services.json" servicesJson} $out/data/services.json
+    cp ${pkgs.writeText "notes.json" notesJson} $out/data/notes.json
+    cp ${pkgs.writeText "closures.json" closuresJson} $out/data/closures.json
     cp ${pkgs.writeText "live.json" fallbackLiveJson} $out/data/live.json
     cp ${pkgs.writeText "kg-graph.json" kgGraphJson} $out/data/kg-graph.json
 
@@ -1592,6 +1871,13 @@ in
     ${lib.concatStringsSep "\n" (
       map (s: "cp ${s.file} $out/${s.name}") kgSliceFiles
     )}
+
+    # `cp` from the store yields read-only files; the slice needs to be rewritten
+    # in place to carry its note.
+    chmod -R u+w $out/data
+
+    # Bake each note's own text into its slice (markdown -> HTML at build time).
+    ${injectNotesCmd}
 
     # Pre-compress static assets for Nginx gzip_static (zero runtime CPU)
     gzip -9k $out/index.html $out/*.js $out/*.css $out/data/*.json $out/data/kg/*.json

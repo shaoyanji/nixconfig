@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   # LAN wildcard TLS: private CA (modules/config/tls/frieren-lan-ca.pem,
   # trusted fleet-wide via security.pki) signs *.frieren.lan; the leaf key is
   # sops-rendered at /run/secrets/tls-frieren-wildcard-key. Bitwarden clients
@@ -381,7 +385,14 @@ in {
         sslCertificate = tlsCertificate;
         sslCertificateKey = tlsCertificateKey;
         locations."/" = {
-          root = import ../../lib/aki-site.nix {inherit pkgs;};
+          # The compiled registry and this host's own name are passed in: the site
+          # renders the same evaluated data the host enforces, and its status
+          # badge is read from the registry instead of being typed into markup.
+          root = import ../../lib/aki-site.nix {
+            inherit pkgs;
+            inventory = config.fleet.inventory;
+            host = config.networking.hostName;
+          };
           extraConfig = ''
             gzip_static on;
             open_file_cache max=1000 inactive=300s;
@@ -401,7 +412,11 @@ in {
         # loop; the equivalent class below generates one valid line. The match
         # is identical — exactly eight hex characters before the extension.
         locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
-          root = import ../../lib/aki-site.nix {inherit pkgs;};
+          root = import ../../lib/aki-site.nix {
+            inherit pkgs;
+            inventory = config.fleet.inventory;
+            host = config.networking.hostName;
+          };
           extraConfig = ''
             gzip_static on;
             open_file_cache max=1000 inactive=300s;

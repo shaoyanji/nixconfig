@@ -96,10 +96,17 @@ not an error: `modules/` and `flake/` are not graph nodes, and closures are the
 tool for those. `checks:kg:sidecar` is the parity gate — it fails if the engine's
 graph, answers or error codes disagree with the compiled projection.
 
-**See the graph.** `http://fleet.frieren.lan` → *Knowledge Graph* renders the
+**Read the note, don't leave the site.** `http://fleet.frieren.lan` → *Notes*
+lists every doc and skill by how often the graph cites it; clicking one opens its
+slice, which contains **that note's own markdown rendered at build time** (the
+file is read during evaluation, so there is no forge URL to rot). The
+*Knowledge Graph* opens the same slice from a node, and its host slices link to
+the inventory page.
+
+**See the graph.** *Knowledge Graph* renders the
 projection as a force-directed canvas: pan, wheel zoom, hover to inspect, click
-any node to open its static slice (neighbours, and a link to the host inventory
-page or the source file). Type in the search box to narrow by label or id, and
+any node to open its static slice (note text where there is one, neighbours, and
+the inventory page for a host). Type in the search box to narrow by label or id, and
 toggle the per-type chips (host/skill/doc/tag) to filter — the counter follows
 the set the renderer uses. Hovering a node, or searching, lights it and its
 neighbours while dimming the rest. The filter lives in the URL
@@ -109,6 +116,14 @@ no daemon. The
 definition lives in `lib/aki-site.nix`; `task checks:kg:canvas` proves it by
 driving headless Chrome through the click, and `task checks:kg:native` holds the
 cold bootstrap to **median < 20 ms** with no `nix` subprocess.
+
+**Nothing on the site is typed.** Overview counts, inventory rows, notes and the
+closure budgets page are all `${...}` over evaluated data (`inventory.toml` via
+`lib/inventory.nix`, `closure-budgets.toml`, the compiled graph) — a figure with
+no source of truth is not rendered at all. That is why the site has no "closure
+attribution" or "debloat playbook" page any more: both were prose about one
+generation. `task checks:kg:canvas` recomputes every budget figure from the file
+and refuses a slice whose note does not match its source.
 
 Every pattern takes **`FORMAT=json`** and returns the same envelope:
 `{pattern, arg, count, results}` — `results` is a list of ids, except `comention`

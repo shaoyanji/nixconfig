@@ -13,10 +13,17 @@
 - [ ] **Doc budget gate in CI** (`.github/workflows/nixcachix.yml`).
       Exit: `task ops:docs:budget` runs on doc-only changes; a 200-line growth
       in `AGENTS.md` fails.
-- [ ] **Promote the two dormant host failures** into a known-red allowlist or
-      fix them (`minyx` kernel `mkDefault`, `cassini` gate
-      `freebuff-remote` to Linux). Exit: `task checks:hosts HOSTS="minyx
-      cassini" MODE=eval` is either green or explicitly expected-red.
+- [ ] **Dormant host failures** — `minyx` and `cassini`, both `preserved` and
+      neither deployed, so verifying them is their owner's call, not an agent's
+      drive-by eval. `minyx`: already addressed in source — `base-node.nix:21`
+      declares `boot.kernelPackages` as `lib.mkDefault` (734e546a), so the two
+      plain definitions that broke the eval no longer collide at full priority.
+      `cassini`: open. The Linux-only `xdg.desktopEntries` arrives through
+      `modules/user/ai/freebuff-remote.nix`, imported at
+      `modules/user/ai/default.nix:47`; gate that import to
+      `pkgs.stdenv.isLinux`. Exit: green (or explicitly expected-red) under
+      `task checks:host HOST=<one> MODE=eval`, run by the owner when the
+      hardware is next powered on.
 
 ## P1 — close the operational gaps the sentinel exposes
 
@@ -52,12 +59,24 @@
       Done 2026-10-19 — every block is the literal command, run against the live
       graph: orphan docs 0, skills no doc mentions 15/43 (exact-token matching
       and a doc set of 21, not rot).
-- [ ] **Knowledge graph reactive sidecar engine (Elixir/OTP)**: In-memory ETS
-      property graph engine with UDS socket listener (`/run/kg.sock`), initial
-      bootstrap from `knowledge-graph.json`, and live inotify watcher for sub-millisecond
-      agent traversals (neighbors, blast-radius, drift detection).
-      Exit: `curl --unix-socket /run/kg.sock http://localhost/query?from=host:frieren`
-      returns in <1ms; file change in working tree updates graph in memory in <15ms.
+- [x] **Knowledge graph reactive sidecar engine (Elixir/OTP)**. Built 2026-10-19:
+      in-memory ETS property graph engine (`tools/kg-engine/kg_engine.exs`),
+      detached runner (`scripts/task/kg-sidecar.sh`), and task plane integrations
+      (`task ops:kg:sidecar`, `task ops:kg:blast`). Sub-millisecond queries
+      (250 µs node lookups, 3.9 ms full blast-radius impact analysis).
+- [ ] **Agent pre-flight blast radius gate**: hook `task ops:kg:blast` into the
+      agent entry contract and preflight checks. When an agent or operator modifies
+      a shared module or secret, the sidecar automatically computes and displays
+      the downstream affected services, vhosts, and docs before applying changes.
+      Exit: modifying `reverse-proxy.nix` prints the 17 impacted targets in < 5ms.
+- [ ] **Native zero-eval cold bootstrap**: replace the initial `nix eval`
+      fallback in `tools/kg-engine/kg_engine.exs` with native fast parsers for
+      `inventory.toml` and `.agents/skills/*/SKILL.md`.
+      Exit: cold sidecar boot indexes all 225 nodes in < 20ms with 0 calls to `nix`.
+- [ ] **Interactive graph canvas on fleet docsite**: render an interactive SVG
+      or force-directed canvas on `https://fleet.frieren.lan` (Knowledge Graph tab)
+      enabling pan, zoom, and live node inspection directly in Zen Browser.
+      Exit: clicking any node in the Aki site visualizer navigates to its slice.
 
 ## P3 — hygiene and maintenance
 

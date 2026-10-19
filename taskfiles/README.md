@@ -10,6 +10,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep).
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
+- `taskfiles/ops.yml` owns observation and the context plane: `ops:health`, `ops:ledger[:toon]`, `ops:sentinel:*`, `ops:skills*`, `ops:kg*`, `ops:docs:budget`, `ops:bench:evals`. These read a live system or a compiled artifact; they are not build gates.
 
 ## File-by-file map
 - `Taskfile.yml` – entrypoint with top-level menus
@@ -25,6 +26,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/burgernas.yml` – Synology DS220j cold vault (BurgerNAS): WoL power, restic backup target, leech-only Transmission, aria2/AriaNg, and Gum menu
 - `taskfiles/apps.yml` – Job application workflow via `bin/appflow` (status updates, email radar, Typst builds, three-way sync, GitHub push/pull)
 - `taskfiles/bitlockerpremium.yml` – Windows 11 Pro (HP EliteBook 830 G7) over Tailscale OpenSSH, Scoop/Nushell shells, file transfers, and Gum menu
+- `taskfiles/ops.yml` – sentinel/ledger, compiled skill index, knowledge graph, document budgets, eval benchmarks
 - `taskfiles/services-core.yml` – minimal compatibility wrappers
 - `taskfiles/services-legacy.yml` – deprecated aliases (marked `[deprecated]`)
 
@@ -38,6 +40,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - Host deployment/lifecycle → `taskfiles/infra.yml` (`infra:*`)
 - Operator helpers → `taskfiles/agents.yml` (`agents:menu`, legacy menus)
 - Validation checks → `taskfiles/checks.yml` (`checks:*`)
+- Observation, skills, knowledge graph → `taskfiles/ops.yml` (`ops:*`)
 - Git/flake workflows, site deployment → `taskfiles/dev.yml` (`dev:*`)
 - Moto (Termux) operations & transfer → `taskfiles/moto.yml` (`moto:*`)
 - Serv00 FreeBSD hosting & webserver → `taskfiles/serv00.yml` (`serv00:*`)

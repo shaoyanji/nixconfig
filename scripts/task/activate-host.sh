@@ -42,6 +42,12 @@
 #   activate-host.sh --check <host>         report only: is the closure servable?
 #
 # Env: CACHE=<url> (default: inventory metadata.cache_url)
+#      TOP=<store path> reuse an already-resolved toplevel instead of evaluating
+#      `.#nixosConfigurations.<host>.config.system.build.toplevel` again.
+#      infra:deploy:host:* passes the path its gate just resolved
+#      (`warm-host.sh --check --emit-path`), so a deploy evaluates the toplevel
+#      ONCE. The path is still gated against the cache here, so a stale or
+#      foreign TOP fails exactly like a cold closure.
 #      WAIT=<seconds> poll the target for the activation result after starting
 #      the unit (default 600; 0 disables and returns right after the start).
 # Exit: 0 = activated; 1 = gate failed, activation failed, or WAIT timeout
@@ -78,16 +84,38 @@ command -v yq >/dev/null 2>&1 || { echo "yq required" >&2; exit 2; }
 cache="${CACHE:-$(yq -r '.metadata.cache_url // ""' "$INVENTORY" 2>/dev/null || true)}"
 [ -n "$cache" ] || cache="http://192.168.3.25:5000"
 
-# Active hosts only: routing a dormant/preserved host is pointless churn.
+# Active hosts only. A preserved/dormant host is not part of the deploy surface:
+# evaluating its config is how a known-broken preserved host (cassini: a
+# homeDirectory conflict that predates any of this) gets mistaken for a
+# regression, and deploying it is not a normal operation.
+#
+# This is a WARNING-level gate, not a failure: naming a preserved host sets off
+# no build, no cache query, no ssh, and exits 0 with the reason. Reviving one is
+# deliberate, so it takes an explicit ALLOW_PRESERVED=1.
 status="$(yq -r ".hosts.\"$host\".status // \"absent\"" "$INVENTORY" 2>/dev/null || echo absent)"
 if [ "$status" != "active" ]; then
-  echo "activate [$host] SKIP — not an active host (inventory status: $status)"
-  exit 0
+  echo "activate [$host] WARNING — inventory status is '$status', not 'active'." >&2
+  echo "         Preserved/dormant hosts are not deployed; nothing was evaluated," >&2
+  echo "         copied or switched. To revive $host deliberately:" >&2
+  echo "         ALLOW_PRESERVED=1 task infra:apply:host:$host" >&2
+  [ "${ALLOW_PRESERVED:-0}" = "1" ] || exit 0
+  echo "activate [$host] WARNING — proceeding anyway (ALLOW_PRESERVED=1, status '$status')" >&2
 fi
 
 # Resolve the target store path HERE (NixOS toplevel output path, no build).
+# TOP= skips the evaluation: the caller already forced it and this would be a
+# second whole-toplevel eval of the same attrset for the same answer.
 attr=".#nixosConfigurations.$host.config.system.build.toplevel"
-top="$(nix eval --raw "$attr.outPath" 2>/dev/null || true)"
+if [ -n "${TOP:-}" ]; then
+  top="$TOP"
+  case "$top" in
+    /nix/store/*) ;;
+    *) echo "activate [$host] TOP must be a /nix/store path, got '$top'" >&2; exit 2 ;;
+  esac
+  echo "activate [$host] using caller-resolved toplevel $top"
+else
+  top="$(nix eval --raw "$attr.outPath" 2>/dev/null || true)"
+fi
 [ -n "$top" ] || { echo "activate [$host] cannot evaluate $attr" >&2; exit 1; }
 
 # The closure must already be servable; otherwise this is not a deploy, it is a

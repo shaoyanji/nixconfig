@@ -4,6 +4,7 @@
   pkgsFor,
   self,
   hostInventory,
+  skillsCtl,
 }:
 # CHEAP CHECKS ONLY — `checks.<system>` MUST NOT force a host configuration.
 #
@@ -108,6 +109,59 @@ lib.genAttrs systems.default (
             these hosts have NO compiled-inventory module injected, so they have no
             config.fleet.inventory (add moduleSets.inventoryModules to their list in
             flake/host-inventory.nix): ${builtins.toString notInjected}
+          '';
+
+      # --- the skill tree is a schema, not a folder of prose -----------------
+      # Hard errors only: name/dir mismatch, missing or oversized description,
+      # missing body heading, >400 lines. Optional frontmatter is normalised by
+      # lib/skills.nix and reported as a warning (the warning list is printed
+      # here too, so the gate output is the audit, not a separate task).
+      skills-schema =
+        if !skillsCtl.ok
+        then
+          builtins.throw ''
+            .agents/skills violates the skill schema (lib/skills.nix):
+              ${lib.concatStringsSep "\n  " skillsCtl.issues}
+          ''
+        else
+          pkgs.runCommand "skills-schema" {} ''
+            echo "agent skills OK: ${toString skillsCtl.index.count} skills"
+            ${lib.concatMapStrings (w: ''                echo "WARN ${w}"
+              '')
+              skillsCtl.warnings}
+            touch $out
+          '';
+
+      # --- living documents have budgets (SCHEMA.md §2) ---------------------
+      # Pure eval: counts lines of tracked files, builds nothing, needs no
+      # host. This is the flake-hook half of `task ops:docs:budget`; the task
+      # is the human view, this is the gate CI can run on a doc-only change.
+      docs-budget = let
+        root = ./..;
+        count = f: builtins.length (lib.splitString "\n" (builtins.readFile (root + "/${f}")));
+        limits = {
+          "AGENTS.md" = 1200;
+          "MANUAL.md" = 1200;
+          "ARCHITECTURE.md" = 600;
+          "AUDIT.md" = 150;
+          "TODO.md" = 150;
+          "HANDOFF.md" = 150;
+        };
+        over =
+          lib.filter (name: count name > limits.${name})
+          (builtins.attrNames limits);
+      in
+        if over != []
+        then
+          builtins.throw ''
+            living documents exceed their SCHEMA.md budget:
+              ${lib.concatStringsSep "\n  " (map (n: "${n}: ${toString (count n)} > ${toString limits.${n}}") over)}
+            Move detail to docs/ and leave a pointer; do not raise the budget.
+          ''
+        else
+          pkgs.runCommand "docs-budget" {} ''
+            echo "living documents within budget: ${toString (builtins.length (builtins.attrNames limits))} files"
+            touch $out
           '';
 
       docs-site = pkgs.runCommand "docs-site" {} ''

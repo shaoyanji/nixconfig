@@ -1,0 +1,200 @@
+version: "3"
+
+# Observation and context-plane tasks.
+#
+# Why a separate shard instead of checks.yml: a *check* must be able to fail a
+# build and should not need a running system. These tasks read the live sentinel
+# ledger, the compiled skill index, or the graph projection — they report on a
+# machine, they do not build one.
+
+tasks:
+  ops:health:
+    desc: Gate on the fleet sentinel verdict (exit 1 when degraded)
+    summary: >
+      Reads /var/lib/fleet-sentinel/www/health.txt and, on degradation, prints
+      every reason from status.json. Exit 0 = ok, 1 = degraded or no sentinel.
+      Cheap and local: no nix, no network. This is the closed-loop gate a
+      scheduler or an agent runs before doing work.
+    cmds:
+      - |
+        f=/var/lib/fleet-sentinel/www/health.txt
+        if [ ! -r "$f" ]; then
+          echo "sentinel: no health file at $f (fleet-sentinel not enabled/running?)"
+          exit 1
+        fi
+        state="$(cat "$f")"
+        if [ "$state" = "ok" ]; then
+          echo "sentinel: ok"
+          exit 0
+        fi
+        echo "sentinel: $state"
+        jq -r '.reasons[]?' /var/lib/fleet-sentinel/www/status.json 2>/dev/null || true
+        exit 1
+
+  ops:sentinel:run:
+    desc: Force one sentinel collection now
+    summary: >
+      Runs fleet-sentinel.service synchronously (oneshot). Writes a ledger line,
+      refreshes status.json and health.txt. Use after changing a watched unit;
+      do not loop it (the timer already runs every 15 minutes).
+    cmds:
+      - sudo systemctl start fleet-sentinel.service
+      - task ops:health
+
+  ops:sentinel:status:
+    desc: Show sentinel timer, last run, and dashboard URL
+    summary: >
+      systemctl status + list-timers for fleet-sentinel, then the current
+      status.json summary. Read-only. The dashboard is
+      http://sentinel.frieren.lan/ (LAN) or the same path via the default vhost.
+    cmds:
+      - systemctl status fleet-sentinel.service --no-pager -n 5 || true
+      - systemctl list-timers fleet-sentinel.timer --no-pager || true
+      - jq -c '{ts,state,reasons,generation_age_h,disk_pct,psi}' /var/lib/fleet-sentinel/www/status.json 2>/dev/null || echo "(no status.json)"
+
+  ops:ledger:
+    desc: Print the recent sentinel ledger (N=50)
+    summary: >
+      `tail -n N` of /var/lib/fleet-sentinel/ledger.jsonl, pretty-printed by jq.
+      Each line is one schema-1 observation: ts, state, reasons, jobs,
+      generation_age_h, disk_pct, psi. Use jq filters for transitions, e.g.
+      `task ops:ledger | jq -r 'select(.state=="degraded") | .ts + " " + (.reasons|join(","))'`.
+    cmds:
+      - |
+        tail -n {{.N | default 50}} /var/lib/fleet-sentinel/ledger.jsonl \
+          | jq -c '{ts,state,reasons,jobs,generation_age_h,disk_pct,psi}'
+
+  ops:ledger:toon:
+    desc: Encode the recent ledger as TOON with token stats (N=200)
+    summary: >
+      The agent-facing projection: tail N events -> jq -s (one array) -> toon -e
+      --stats. TOON repeats each key once instead of once per row; use it to
+      read a long window cheaply. The JSONL file remains the source of truth —
+      never write TOON back.
+    cmds:
+      - |
+        tail -n {{.N | default 200}} /var/lib/fleet-sentinel/ledger.jsonl \
+          | jq -s . \
+          | toon -e --stats
+
+  ops:skills:
+    desc: Print the compiled skill index (name, version, tags)
+    summary: >
+      `nix eval .#agentSkills.skills` (~0.12 s warm, no host eval — lib/skills.nix).
+      This is the authoritative list; .agents/README.md routes here instead of
+      duplicating a table. Add TAG= to filter.
+    cmds:
+      - |
+        nix eval --json .#agentSkills.skills \
+          | jq -r --arg tag "{{.TAG}}" '
+              to_entries[]
+              | select($tag == "" or (.value.tags | index($tag)))
+              | [.key, .value.version, (.value.tags | join(","))] | @tsv' \
+          | sort | column -t -s$'\t'
+
+  ops:skills:check:
+    desc: Validate .agents/skills against the schema (hard gate)
+    summary: >
+      Builds checks.<system>.skills-schema. Fails on name/dir mismatch, missing
+      or >240-char description, missing body heading, or a >400-line skill.
+      Optional frontmatter is normalised and printed as WARN. Cheap; safe in CI.
+      `--builders ""` is deliberate: a gate must not spend remote build budget
+      (a trivial runCommand still dispatched to nixbuild.net on 2026-10-19).
+    cmds:
+      - nix build -L --no-link --builders "" .#checks.x86_64-linux."skills-schema"
+
+  ops:skills:tags:
+    desc: Print the skill tag cloud
+    summary: >
+      `nix eval .#agentSkills.byTag` — tag -> skill names, sorted by count.
+      Tags are the only grouping in the skill contract; use them instead of
+      adding a folder hierarchy.
+    cmds:
+      - |
+        nix eval --json .#agentSkills.byTag \
+          | jq -r 'to_entries | sort_by(-(.value|length)) | .[] | "\(.key)\t\(.value|length)\t\(.value|join(","))"' \
+          | column -t -s$'\t'
+
+  ops:kg:
+    desc: Print knowledge-graph stats and the top connected nodes
+    summary: >
+      Compiles hosts x skills x docs x mentions (lib/knowledge-graph.nix, ~10 s
+      cold because it reads every living doc). No server, no database. For
+      "what touches X" questions; use qmd for "where is this explained".
+    cmds:
+      - |
+        nix eval --raw .#knowledgeGraph.json \
+          | jq -r '.stats | "nodes: \(.hosts) hosts, \(.skills) skills, \(.docs) docs; edges: \(.edges)"'
+      - |
+        nix eval --raw .#knowledgeGraph.json \
+          | jq -r '[.edges[] | .from] | group_by(.) | map({id: .[0], n: length}) | sort_by(-.n) | .[:12][] | "\(.n)\t\(.id)"' \
+          | column -t -s$'\t'
+
+  ops:kg:host:
+    desc: Print everything the graph connects to HOST
+    summary: >
+      Inbound edges for host:<HOST> (docs and skills that mention it). HOST is
+      required. Reads the graph projection, not a config.
+    requires:
+      vars: [HOST]
+    cmds:
+      - |
+        nix eval --raw .#knowledgeGraph.json \
+          | jq -r --arg h "host:{{.HOST}}" '.edges[] | select(.to == $h) | .from'
+
+  ops:kg:cypher:
+    desc: Print the Cypher export of the knowledge graph
+    summary: >
+      MERGE statements for an *external* Neo4j. Deliberately not a service on
+      frieren (JVM heap competes with the NAS page cache); the graph is ~10^3
+      nodes and `jq` is enough. Import with:
+      `nix run nixpkgs#cypher-shell -- -f <(nix eval --raw .#knowledgeGraph.cypher)`.
+    cmds:
+      - nix eval --raw .#knowledgeGraph.cypher
+
+  ops:docs:budget:
+    desc: Check living documents against the SCHEMA.md budgets
+    summary: >
+      Line counts for the living documents; exits 1 when one exceeds its budget.
+      Budgets are in .agents/SCHEMA.md §2. Over budget means "move detail to
+      docs/ and leave a pointer", not "raise the number".
+    cmds:
+      - |
+        fail=0
+        check() {
+          f="$1"; max="$2"
+          if [ ! -f "$f" ]; then echo "MISSING $f"; fail=1; return; fi
+          n=$(wc -l < "$f")
+          if [ "$n" -gt "$max" ]; then
+            echo "OVER  $f: $n > $max"
+            fail=1
+          else
+            echo "ok    $f: $n / $max"
+          fi
+        }
+        check AGENTS.md 1200
+        check MANUAL.md 1200
+        check ARCHITECTURE.md 600
+        check AUDIT.md 150
+        check TODO.md 150
+        check HANDOFF.md 150
+        exit "$fail"
+
+  ops:bench:evals:
+    desc: Benchmark nix-eval vs legacy reads (hyperfine)
+    summary: >
+      Compares the compiled registry eval, the raw yq read, and the Python
+      tomllib read over the same field. Inputs are warm. The eval validates;
+      yq/Python do not — the numbers are why "eval-first" is a routing rule, not
+      a religion. Requires hyperfine (fleet tool, frieren tools.nix).
+    cmds:
+      - |
+        hyperfine --warmup 2 --runs 10 \
+          --command-name "nix eval inventory.hosts.frieren.role" \
+            "nix eval --raw .#inventory.hosts.frieren.role" \
+          --command-name "yq inventory.toml" \
+            "yq -r '.hosts.frieren.role' inventory.toml" \
+          --command-name "python tomllib" \
+            "python3 -c 'import tomllib;print(tomllib.load(open(\"inventory.toml\",\"rb\"))[\"hosts\"][\"frieren\"][\"role\"])'" \
+          --command-name "nix eval agentSkills.count" \
+            "nix eval --json .#agentSkills.count"

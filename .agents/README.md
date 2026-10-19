@@ -1,57 +1,81 @@
-# Agent Guidance Index
+# Agent Context — Start Here
 
-## Skills (from Taskfiles)
+This directory is the **agent context plane**: a router, a schema, and skills.
+It is not a second manual and it is not executable truth.
 
-Each taskfile shard has a corresponding skill under `.agents/skills/<name>/SKILL.md`:
+| You need | Go to |
+| :--- | :--- |
+| Fleet facts (host, hardware, role, status) | `nix eval --json .#inventory.hosts.<host>` — never a copied table |
+| What tasks exist / which answers an intent | `task help`, `task find:<word>`, `task --list-all --json` |
+| How to operate the fleet | `AGENTS.md`, `MANUAL.md` |
+| Why a design exists / what is next | `ARCHITECTURE.md`, `TODO.md` |
+| What happened | `AUDIT.md`, `docs/history/` |
+| An experiment | `EXPERIMENTS.md` (classification banner first) |
+| Host-specific deploy notes | `deploy/README.md`, `deploy/hosts/*.md` |
+| A skill | `skills/<name>/SKILL.md` — index below is compiled |
+| The rules for all of the above | [`SCHEMA.md`](SCHEMA.md) |
 
-| Skill | Source | Scope |
-|-------|--------|-------|
-| [`infra`](skills/infra/SKILL.md) | `taskfiles/infra.yml` | Host lifecycle, secrets, SOPS, store |
-| [`agents`](skills/agents/SKILL.md) | `taskfiles/agents.yml` | Operator menu, xs, OAuth |
-| [`checks`](skills/checks/SKILL.md) | `taskfiles/checks.yml` | Validation, smoke checks, nix lint |
-| [`dev`](skills/dev/SKILL.md) | `taskfiles/dev.yml` | Git, flake, site, PRs, packages |
-| [`services`](skills/services/SKILL.md) | `taskfiles/services-core.yml`, `services-legacy.yml` | Legacy wrappers |
+## Skills are compiled, not indexed by hand
 
-## Cross-Cutting Skills (start here)
+The authoritative index is Nix:
 
-| Skill | Scope |
-|-------|-------|
-| [`task-plane`](skills/task-plane/SKILL.md) | Navigate 373 tasks by intent (`task help`, `task find:<x>`), cost tiers, what each gate proves, when NOT to add a task or script |
-| [`nix-eval`](skills/nix-eval/SKILL.md) | Cheapest-instrument ladder for one-off questions: `/tmp` nix files, flake attr names, `hostChecks` assertion gates, substitutability — with measured costs and the evals that must never run here |
-| [`host-facts`](skills/host-facts/SKILL.md) | Host description from the compiled inventory (field map + jq recipes) — never evaluate a config to answer "what is host X" |
+```bash
+nix eval .#agentSkills.count                      # 43 skills, ~0.12 s warm
+nix eval --json .#agentSkills.byTag.nix           # names tagged nix
+nix eval --json .#agentSkills.skills.task-plane   # one entry
+nix build .#checks.x86_64-linux.skills-schema -L  # the gate
+nix build .#agentSkillsBundle                     # skills + index.json in one store path
+```
 
-## Specialized & Subsystem Skills
+`lib/skills.nix` parses each `SKILL.md` frontmatter, enforces the contract in
+`SCHEMA.md`, and emits the index. A new skill is discovered by adding a
+directory — there is no table to update, so there is no table to forget.
 
-| Skill | Scope |
-|-------|-------|
-| [`home-assistant`](skills/home-assistant/SKILL.md) | Home Assistant, Mosquitto MQTT, host telemetry sensors, and Uptime-Kuma on frieren |
-| [`paste`](skills/paste/SKILL.md) | Fleet paste bin (`pb`) for sharing files and logs over LAN/mesh (`paste.frieren.lan`) |
-| [`burgernas`](skills/burgernas/SKILL.md) | Synology DS220j cold vault (BurgerNAS, `taskfiles/burgernas.yml`): WoL power, restic backup target, leech-only Transmission, aria2/AriaNg, sops-managed sudo credential |
-| [`nixos-deploy`](skills/nixos-deploy/SKILL.md) | SSH-safe rebuild/activate sequence: `systemd-run` detachment, done-file polling, polkit activation workaround |
-| [`iventoy`](skills/iventoy/SKILL.md) | PXE boot management, ISO image library (`/Volumes/data/isos`), and bare-metal OS provisioning |
-| [`wikisearch`](skills/wikisearch/SKILL.md) | Offline Wikipedia and ArchWiki BM25 search via Kiwix (`wiki.frieren.lan`) |
-| [`frieren-offload`](skills/frieren-offload/SKILL.md) | Offload heavy agy tasks from netbook/workstations to frieren |
-| [`stt`](skills/stt/SKILL.md) | Speech-to-text via voxtype (numtide) daemon / headless transcription |
+## The skills that matter most (pinnacles)
 
-## Routing
+| Skill | Why it is a pinnacle |
+| :--- | :--- |
+| [`task-plane`](skills/task-plane/SKILL.md) | The control plane is 370+ tasks; this is the intent→task router, cost tiers, and the authoring contract. Read it before adding a task. |
+| [`nix-eval`](skills/nix-eval/SKILL.md) | The cheapest instrument ladder. Most "I need a script" questions are a 1-second eval. |
+| [`master-toon`](skills/master-toon/SKILL.md) | TOON is how structured evidence (ledgers, inventories, logs) reaches an agent without burning context. Encode/decode, when **not** to use it. |
+| [`knowledge-base`](skills/knowledge-base/SKILL.md) | Where knowledge lives, which store to query first, and the graph/prose/episodic split. |
+| [`host-facts`](skills/host-facts/SKILL.md) | Answer host questions from the compiled registry, never by evaluating a config. |
+| [`fleet-sentinel`](skills/fleet-sentinel/SKILL.md) | The closed loop: how a failure is detected, recorded, and routed. |
 
-- **Tasks**: `Taskfile.yml` loads the `taskfiles/*` shards. `task help` prints the intent map (namespace counts computed live) and `task find:<word>` searches names + descriptions; `task --list-all` remains the unfiltered list. See [Task Control Plane](docs/task-control-plane.md) for namespace policy and workflow examples.
-- **Task graph integrity**: `task checks:tasks` (free) fails on duplicate task keys within a shard (YAML keeps the last, silently) and on dangling `task X` references. It is part of `task checks:quick`.
-- **Host lifecycle tasks**: Canonical operations live under `infra:*` (`taskfiles/infra.yml`). Legacy `services:*` names wrap to `infra:*` via `taskfiles/services-core.yml`.
-- **Docs**: `lib/docs.nix` generates the metadata pages (fleet inventory, modules registry, per-host) and the docs-site nav from the compiled registry. `nix build .#docs` / `.#docs-site` are the source of truth; `task docs:sync` refreshes `docs/generated/`, `task checks:docs:sync` proves the copy matches. Do not hand-edit `docs/generated/*`.
-- **Deploy guidance**: Start with `.agents/deploy/README.md`; per-host notes live in `.agents/deploy/hosts/*.md`.
-- **Task routing**: `AGENTS.md` provides the top-level task namespace summary.
+## Skill families
 
-## Provenance and Home Initialization
+| Family | Skills |
+| :--- | :--- |
+| Control plane | `task-plane`, `nix-eval`, `host-facts`, `checks`, `dev`, `infra`, `services` |
+| Context & memory | `knowledge-base`, `master-toon`, `qmd`, `ai-memory` |
+| Fleet services | `fleet-sentinel`, `home-assistant`, `paste`, `wikisearch`, `iventoy`, `burgernas` |
+| Media & AI | `eisen-status`, `decision-picker`, `voice-loop`, `image-generate`, `stt` |
+| Hosting | `moto`, `serv00`, `dragoncourt`, `envs`, `bountystash`, `apps`, `google-drive` |
+| Method | `confirm-before-destructive`, `nixos-deploy`, `nix-preflight-editor` |
 
-- **Home Entrypoint**: When working from `$HOME` (`~`), `~/Taskfile.yml` provides tautological access to all commands in `~/Documents/nixconfig/Taskfile.yml` with `dir: ~/Documents/nixconfig` and `flatten: true`.
-- **Repo Root**: `~/Documents/nixconfig` (symlink to `/Volumes/data/projects/nixconfig`).
-- **Guidance & Skills**: Materialized in `~/.agents/` via Home Manager (`modules/user/ai/codex.nix`).
-- **Canonical Manual**: `AGENTS.md` (and mirrored at `~/AGENTS.md`) is the unified manual for both agents and operators.
+## Materialization (fleet-wide)
+
+`modules/user/ai/skills/default.nix` is the single materializer. It links two
+sources into every agent's discovery path:
+
+1. `.agents/skills/*` — the repo's 43 documentation/ops skills (this directory).
+2. `modules/user/ai/skills/*` — runtime skills that ship scripts (e.g.
+   `simplex-admin`, `jev-ultrafast`).
+
+Targets: `~/.agents/skills/<name>` and `~/.gemini/config/skills/<name>`.
+`~/.agents/README.md` and `~/.agents/SCHEMA.md` are linked too, so a clone-less
+agent still gets the contract. The bundle is the same tree CI validates.
+`~/AGENTS.md` itself is `.#homeAgents.<host>` (`lib/home-agents.nix`): preamble +
+compiled host card + persona, linked by activation, never rendered at runtime.
+
+> Managed names are `force`-linked: a stale hand-copied skill directory is
+> replaced on the next switch. Unmanaged names (e.g. a community skill installed
+> by `npx skills`) are left alone. To make one canonical, add it to the repo.
 
 ## Truth boundaries
 
-- `taskfiles/*.yml` are the **executable truth**.
-- `~/Taskfile.yml` forwards directly to `~/Documents/nixconfig/Taskfile.yml`.
-- `.agents/*` and `AGENTS.md` document routing, fleet matrix, and runbooks.
-- `scripts/task/*` are helper implementations, not entrypoints.
+- `taskfiles/*.yml` — executable truth.
+- `inventory.toml` / `modules.toml` — compiled data truth.
+- `hosts/**/*.nix`, `modules/**/*.nix` — deployment truth.
+- `.agents/*`, `AGENTS.md`, `MANUAL.md` — routing and procedure.
+- `scripts/task/*` — helper implementations, never entrypoints.

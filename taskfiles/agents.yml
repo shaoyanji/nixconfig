@@ -112,9 +112,9 @@ tasks:
       - |
         choice=$(printf '%s\n' "nixos-local" "darwin-local" "home-manager-local" "deploy-remote" "fleet-parallel" exit | gum choose --header "Rebuild & deployment options")
         case "$choice" in
-          "nixos-local") task infra:rebuild:nixos ;;
-          "darwin-local") task infra:rebuild:darwin ;;
-          "home-manager-local") task infra:rebuild:home-manager ;;
+          "nixos-local") NOM=1 task infra:rebuild:nixos ;;
+          "darwin-local") NOM=1 task infra:rebuild:darwin ;;
+          "home-manager-local") NOM=1 task infra:rebuild:home-manager ;;
           "deploy-remote") task infra:deploy:menu ;;
           "fleet-parallel") task infra:apply:fleet ;;
           exit) exit 0 ;;

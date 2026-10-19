@@ -10,6 +10,11 @@ tasks:
   # removed rather than replaced with whole-toplevel forces, which on this 11 GiB
   # host were measured at >120 s with swap and are O(hosts) in memory. The config
   # gate is `checks:host` (all assertions, one host, ~13 s / 720 MiB).
+  # REBUILD RULE: never run this (or any checks task) as a pre-flight for a
+  # local rebuild. `nixos-rebuild switch` evaluates and builds the host; a check
+  # first is a second evaluation for no extra proof. This task is repo hygiene,
+  # not a config gate. `checks:build:route` is the one that forces a whole
+  # toplevel and is CI/operator-only — it is no longer wired into any switch.
   checks:quick:
     desc: Run narrow repo checks (repo HYGIENE — evaluates no host config)
     aliases: [check]
@@ -28,7 +33,7 @@ tasks:
       refuses it on machines this small, and there is deliberately no task in this
       repo whose default is every host.
     cmds:
-      - nix build --no-link .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules
+      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules
       - task checks:tasks
       - task checks:nix:lint
       - task checks:sops:drift
@@ -128,6 +133,10 @@ tasks:
       aarch64/darwin hosts are checked from this machine:
       `task checks:host HOST=penguin MODE=eval`. The kind is resolved from the flake's
       output names, so it does not need to be passed.
+      ACTIVE hosts in practice: naming a preserved host (e.g. cassini) is you
+      asking for it, so it IS evaluated — and a failure there is that host's
+      dormant debt, not your change. The deploy/apply/warm gates warn instead and
+      evaluate nothing.
       ONE host, name REQUIRED — no default, no fleet sweep. Peak memory is O(hosts
       forced in one process), and that is exactly what crashed this NAS.
       Vars: HOST= (required, exactly one), MODE= (build|eval, default build),
@@ -195,6 +204,10 @@ tasks:
       then let harmonia serve the closure. On the builder itself gaps are
       reported but allowed (exit 0) — that host is where they are supposed to be
       built. Prints the exact fix (`task infra:warm:host:<h>`).
+      COST WARNING: this forces the whole host toplevel (drvPath/outPath plus a
+      `nix build --dry-run`) — the most expensive eval there is. It is a CI /
+      operator gate, NOT a pre-switch hook: `infra:switch:*` no longer calls it.
+      Run it deliberately when routing is in doubt, never as a rebuild ritual.
       Vars: HOSTS="a b" (default: the local hostname).
     cmds:
       - bash scripts/task/warm-host.sh --check {{.HOSTS | default ""}}
@@ -235,7 +248,7 @@ tasks:
       Exit 0 = clean. Non-zero names the offending hosts/counts. Also runs as part of
       `nix flake check` (checks.<system>.inventory-{schema,hosts,modules}).
     cmds:
-      - nix build --no-link .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules
+      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules
 
   checks:ports:
     desc: Diff frieren's declared firewall surface against its live listeners

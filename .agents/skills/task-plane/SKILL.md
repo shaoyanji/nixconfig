@@ -52,7 +52,7 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 | Task | Proves | Does **not** prove |
 | :--- | :--- | :--- |
 | `checks:tasks` | No duplicate task keys; every `task X` reference resolves (names + aliases, wildcards expanded) | That a task works |
-| `checks:quick` | Repo hygiene: compiled inventory checks, task graph, lint, sops drift, modules.toml | **Any host config** — it forces no `nixosConfiguration` |
+| `checks:quick` | Repo hygiene: compiled inventory checks, task graph, lint, sops drift, modules.toml | **Any host config** — it forces no `nixosConfiguration`; not a pre-rebuild step |
 | `checks:host HOST=<h>` | Module system + every assertion for ONE host (2035 assertions, ~13 s / 720 MiB) | That the closure builds |
 | `checks:build:route` | Whether THIS host would have to compile (EXP-107) | That a build succeeds |
 | `dev:closure:*` | What is big / duplicated / would be fetched | Nothing about correctness |
@@ -65,6 +65,11 @@ zero proof. `checks:host` is the config gate.
 
 ## Cost discipline (do not regress this)
 
+- **Do not run checks before a rebuild.** `task infra:rebuild:*` evaluates and
+  builds the host; a pre-flight `checks:*` is a second evaluation for no extra
+  proof. `checks:build:route` is the worst offender — it forces the whole
+  toplevel (`drvPath`/`outPath`/`--dry-run`) and is CI/operator-only. It is no
+  longer wired into any switch.
 - **No task defaults to the fleet.** `checks:hosts` requires `HOSTS="a b"`.
   A default sweep is the footgun that got `nix flake check` SIGKILLed.
 - **One host per process**, under `scripts/task/oom-guard.sh`. Peak memory is
@@ -99,6 +104,52 @@ Task hygiene, enforced by `checks:tasks`:
 - Give every task a `desc`; a task without one is invisible to `task --list`.
 - Put the variable contract in `summary` (`HOST=`, `MODE=`, defaults, exit codes)
   so an agent does not have to read the shell body.
+
+## The authoring contract (why most new tasks should not exist)
+
+The control plane is already 370+ tasks. Adding one is a maintenance bet that it
+will be typed twice a month. Before writing a `cmds:` block, walk this ladder
+and stop at the first rung that works:
+
+| Rung | Instrument | Cost | When |
+| ---: | :--- | :--- | :--- |
+| 1 | `nix eval` on a flake attr | 0.1–2 s | a question about compiled data (`.#inventory`, `.#agentSkills`, `.#knowledgeGraph`) |
+| 2 | `nix eval` on a caller-supplied expression | ~1 s | a one-off derivation/attribute question; no repo file needed |
+| 3 | `jq`/`yq` over a compiled artifact | ms | projection, filtering, formatting |
+| 4 | a **new Nix library** (`lib/*.nix`) | eval-time | a rule that must be true for every host/consumer |
+| 5 | a `checks:*` gate | ~13 s (one host) | a regression that must fail a build |
+| 6 | a task in an existing shard | seconds | a repeatable operator workflow |
+| 7 | a shell script in `scripts/task/` | — | only the body of rung 6, never an entrypoint |
+| 8 | a packaged Go binary | build | the thing ships to hosts or needs concurrency/robust parsing |
+
+Anti-patterns found in this repo (do not repeat):
+
+- **Python for glue that Nix already computes.** `compile-llm-specs.py` re-parses
+  `inventory.toml` even though `lib/inventory.nix` has already compiled it. New
+  context generation belongs in Nix; Python is legacy here.
+- **A check that shells out to `nix build`.** It spends build budget as a side
+  effect of looking. Use `nix eval --raw "<attr>.outPath"` + a cache query.
+- **A task that fans out to the fleet by default.** `checks:hosts` requires a
+  named set for a reason; `nix flake check` was SIGKILLed at 6 GiB.
+- **Duplicating the body of another task.** Use `aliases:`, an `infra:*`
+  canonical name, or a `services:*` wrapper.
+
+Shard ownership now includes `taskfiles/ops.yml` (sentinel, ledger, skills
+index, knowledge graph). Put observation tasks there, not in `checks.yml` — a
+check must be able to fail a build; an ops task reports on a running system.
+
+### Measured rung-1 costs (frieren, 2026-10-19)
+
+| Command | Wall | Proves |
+| :--- | ---: | :--- |
+| `nix eval .#agentSkills.count` | 0.12 s warm / 1.2 s cold | skill tree parses + schema fields resolve |
+| `nix eval .#inventory.hosts.fern.role` | 0.15 s | compiled registry, no host eval |
+| `nix build .#checks.x86_64-linux."skills-schema"` | <1 s after eval | the gate is real (throw on violation) |
+| `yq -r '.hosts.fern.role' inventory.toml` | 0.05 s | the raw field, **unvalidated** |
+
+The eval is slower than `yq` because it validates and normalises. Use `yq` for a
+single raw field, the eval whenever the answer must agree with what the fleet
+deploys.
 
 ## Nav quick reference
 

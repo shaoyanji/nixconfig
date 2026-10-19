@@ -36,9 +36,17 @@ do not add a Taskfile task, and above all **do not build** to answer a question.
 | Whole toplevel for one host | `nix eval --raw .#nixosConfigurations.<h>.config.system.build.toplevel.drvPath` | **>120 s, swaps** on frieren | whole system graph |
 | Every flake output | `nix flake check` | **339.78 s / 6078.5 MiB / SIGKILL 137** | **never on this NAS** |
 
+**Never point any row at a preserved host.** `status = "preserved"` hosts are
+dormant and some are known-broken (cassini's `homeDirectory` conflict predates
+the current tree), so an eval that fails there says nothing about your change.
+The deploy/apply/warm gates treat them as a warning and exit before evaluating;
+do the same by picking an **active** representative per chain.
+
 Stop at the first row that can fail for the reason you care about. The 21.6 s
 `hostChecks` row is the real config gate: it is the same conditions the toplevel
-asserts, without instantiating the closure. Reach for the toplevel `.drvPath`
+asserts, without instantiating the closure. A local `nixos-rebuild switch` already
+forces the toplevel, so never run the `.drvPath` eval as a pre-rebuild step — that
+is a duplicate evaluation. Reach for the toplevel `.drvPath`
 only when the change is about derivation-level wiring, and scope it to the hosts
 the change reaches — never the fleet, never in one process.
 

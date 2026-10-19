@@ -16,6 +16,7 @@ This repository uses a simplified task namespace for predictable operator workfl
 - `taskfiles/infra.yml`: Host lifecycle, secrets, SOPS operations
 - `taskfiles/agents.yml`: Operator helpers, xs wrappers, OAuth management
 - `taskfiles/checks.yml`: Validation and smoke checks
+- `taskfiles/ops.yml`: Observation (`ops:health`, `ops:ledger`, `ops:sentinel:*`) and the compiled context plane (`ops:skills*`, `ops:kg*`, `ops:docs:budget`, `ops:bench:evals`). Ops tasks report on a running system; they must never be able to spend build budget.
 - `taskfiles/dev.yml`: Git workflows, flake updates, site deployment
 - `taskfiles/services-core.yml`: Minimal compatibility wrappers
 - `taskfiles/services-legacy.yml`: Deprecated aliases (marked `[deprecated]`)

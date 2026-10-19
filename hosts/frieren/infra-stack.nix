@@ -52,64 +52,65 @@
     exec ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new devji@192.168.3.92 /usr/local/bin/sftp-server "$@"
   '';
 
-  fleetGatusReport = pkgs.writers.writePython3Bin "fleet-gatus-report" {
-    libraries = [pkgs.python3Packages.websockets];
-    flakeIgnore = ["E501" "E302" "E305" "E203" "W503"];
-  } ''
-    import asyncio
-    import json
-    import sys
-    import urllib.request
-    import uuid
-    import websockets
+  fleetGatusReport =
+    pkgs.writers.writePython3Bin "fleet-gatus-report" {
+      libraries = [pkgs.python3Packages.websockets];
+      flakeIgnore = ["E501" "E302" "E305" "E203" "W503"];
+    } ''
+      import asyncio
+      import json
+      import sys
+      import urllib.request
+      import uuid
+      import websockets
 
-    endpoint = "http://127.0.0.1:8181/api/v1/endpoints/statuses"
-    try:
-        req = urllib.request.Request(endpoint, headers={"User-Agent": "FleetGatusReporter/1.0"})
-        with urllib.request.urlopen(req, timeout=5) as resp:
-            data = json.loads(resp.read().decode())
-    except Exception as e:
-        msg = "⚠️ [Fleet Monitoring Alert - 05:00 AM] Gatus API unreachable at %s: %s\nHost: frieren (192.168.3.25)" % (endpoint, str(e))
-        print("FAILED: 1")
-        print(msg)
-        sys.exit(1)
+      endpoint = "http://127.0.0.1:8181/api/v1/endpoints/statuses"
+      try:
+          req = urllib.request.Request(endpoint, headers={"User-Agent": "FleetGatusReporter/1.0"})
+          with urllib.request.urlopen(req, timeout=5) as resp:
+              data = json.loads(resp.read().decode())
+      except Exception as e:
+          msg = "⚠️ [Fleet Monitoring Alert - 05:00 AM] Gatus API unreachable at %s: %s\nHost: frieren (192.168.3.25)" % (endpoint, str(e))
+          print("FAILED: 1")
+          print(msg)
+          sys.exit(1)
 
-    total = len(data)
-    failed = [d for d in data if not d.get("results", [{}])[-1].get("success", False)]
-    if failed:
-        header = "🚨 [Fleet Monitoring ALERT - 05:00 AM] %d of %d services DEGRADED." % (len(failed), total)
-    else:
-        header = "📊 [Fleet Monitoring Scorecard - 05:00 AM] All %d services NOMINAL." % total
+      total = len(data)
+      failed = [d for d in data if not d.get("results", [{}])[-1].get("success", False)]
+      if failed:
+          header = "🚨 [Fleet Monitoring ALERT - 05:00 AM] %d of %d services DEGRADED." % (len(failed), total)
+      else:
+          header = "📊 [Fleet Monitoring Scorecard - 05:00 AM] All %d services NOMINAL." % total
 
-    lines = [header, "Host: frieren (192.168.3.25)"]
-    for d in data:
-        name = d.get("name")
-        group = d.get("group", "fleet")
-        res = d.get("results", [{}])[-1]
-        status = "UP" if res.get("success") else "DOWN"
-        dur_ms = round(res.get("duration", 0) / 1000000.0, 1)
-        lines.append("• %s (%s): %s (%.1f ms)" % (name, group, status, dur_ms))
+      lines = [header, "Host: frieren (192.168.3.25)"]
+      for d in data:
+          name = d.get("name")
+          group = d.get("group", "fleet")
+          res = d.get("results", [{}])[-1]
+          status = "UP" if res.get("success") else "DOWN"
+          dur_ms = round(res.get("duration", 0) / 1000000.0, 1)
+          lines.append("• %s (%s): %s (%.1f ms)" % (name, group, status, dur_ms))
 
-    report = "\n".join(lines)
-    print("FAILED: %d" % len(failed))
-    print(report)
+      report = "\n".join(lines)
+      print("FAILED: %d" % len(failed))
+      print(report)
 
-    async def send_to_simplex():
-        corr_id = str(uuid.uuid4())[:8]
-        rpc_req = {"corrId": corr_id, "cmd": "#Fleet " + report}
-        async with websockets.connect("ws://127.0.0.1:5225") as ws:
-            await ws.send(json.dumps(rpc_req))
-            await asyncio.wait_for(ws.recv(), timeout=5.0)
+      async def send_to_simplex():
+          corr_id = str(uuid.uuid4())[:8]
+          rpc_req = {"corrId": corr_id, "cmd": "#Fleet " + report}
+          async with websockets.connect("ws://127.0.0.1:5225") as ws:
+              await ws.send(json.dumps(rpc_req))
+              await asyncio.wait_for(ws.recv(), timeout=5.0)
 
-    try:
-        asyncio.run(send_to_simplex())
-        print("Report dispatched to SimpleX #Fleet.")
-    except Exception as e:
-        sys.stderr.write("WARN: Failed to deliver 5AM report to SimpleX #Fleet: %s\n" % str(e))
+      try:
+          asyncio.run(send_to_simplex())
+          print("Report dispatched to SimpleX #Fleet.")
+      except Exception as e:
+          sys.stderr.write("WARN: Failed to deliver 5AM report to SimpleX #Fleet: %s\n" % str(e))
 
-    if failed:
-        sys.exit(1)
-  '';
+      if failed:
+          sys.exit(1)
+    '';
 
   makeAudibleBatchLiberation = {
     name,
@@ -119,93 +120,92 @@
     windowDesc,
     nice ? 10,
     ionice ? null,
-  }:
-    let
-      limitArg =
-        if limitGb != null
-        then "--limit-gb ${toString limitGb}"
-        else if limitBooks != null
-        then "--limit-books ${toString limitBooks}"
-        else "--limit-books 50";
-      priorityPrefix =
-        if nice != null && ionice != null
-        then "${pkgs.coreutils}/bin/nice -n ${toString nice} ${pkgs.util-linux}/bin/ionice -c ${toString ionice}"
-        else if nice != null
-        then "${pkgs.coreutils}/bin/nice -n ${toString nice}"
-        else "";
-      pythonWithWebsockets = pkgs.python3.withPackages (ps: [ps.websockets]);
-    in
+  }: let
+    limitArg =
+      if limitGb != null
+      then "--limit-gb ${toString limitGb}"
+      else if limitBooks != null
+      then "--limit-books ${toString limitBooks}"
+      else "--limit-books 50";
+    priorityPrefix =
+      if nice != null && ionice != null
+      then "${pkgs.coreutils}/bin/nice -n ${toString nice} ${pkgs.util-linux}/bin/ionice -c ${toString ionice}"
+      else if nice != null
+      then "${pkgs.coreutils}/bin/nice -n ${toString nice}"
+      else "";
+    pythonWithWebsockets = pkgs.python3.withPackages (ps: [ps.websockets]);
+  in
     pkgs.writeShellScript name ''
-      set -euo pipefail
+            set -euo pipefail
 
-      echo "=== [$(date)] Starting Scheduled Phased Audible Liberation (${windowDesc}) ==="
+            echo "=== [$(date)] Starting Scheduled Phased Audible Liberation (${windowDesc}) ==="
 
-      # 1. Storage safety guard (require at least 250 GB available on /srv/data)
-      AVAIL_GB=$(${pkgs.coreutils}/bin/df -BG /srv/data | ${pkgs.gawk}/bin/awk "NR==2 {gsub(/G/,\"\"); print \$4}")
-      echo "Available storage on /srv/data: ''${AVAIL_GB} GB"
+            # 1. Storage safety guard (require at least 250 GB available on /srv/data)
+            AVAIL_GB=$(${pkgs.coreutils}/bin/df -BG /srv/data | ${pkgs.gawk}/bin/awk "NR==2 {gsub(/G/,\"\"); print \$4}")
+            echo "Available storage on /srv/data: ''${AVAIL_GB} GB"
 
-      MIN_HEADROOM_GB=250
-      if [ "$AVAIL_GB" -lt "$MIN_HEADROOM_GB" ]; then
-        MSG="⚠️ [Audible Liberation Skipped] Storage headroom too low (''${AVAIL_GB} GB free < ''${MIN_HEADROOM_GB} GB threshold). Pausing liberation."
-        echo "$MSG" >&2
-        SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
-        if [ ! -f "$SIMPLEX_RPC" ]; then
-          SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
-        fi
-        if [ -f "$SIMPLEX_RPC" ]; then
-          ${pythonWithWebsockets}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$MSG" || true
-        fi
-        exit 0
-      fi
+            MIN_HEADROOM_GB=250
+            if [ "$AVAIL_GB" -lt "$MIN_HEADROOM_GB" ]; then
+              MSG="⚠️ [Audible Liberation Skipped] Storage headroom too low (''${AVAIL_GB} GB free < ''${MIN_HEADROOM_GB} GB threshold). Pausing liberation."
+              echo "$MSG" >&2
+              SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
+              if [ ! -f "$SIMPLEX_RPC" ]; then
+                SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
+              fi
+              if [ -f "$SIMPLEX_RPC" ]; then
+                ${pythonWithWebsockets}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$MSG" || true
+              fi
+              exit 0
+            fi
 
-      # 2. Hard timeout enforcement:
-      TIMEOUT_SECS=${toString timeoutSecs}
-      LIBATION_BIN="${pkgs.libation}/bin/libationcli"
+            # 2. Hard timeout enforcement:
+            TIMEOUT_SECS=${toString timeoutSecs}
+            LIBATION_BIN="${pkgs.libation}/bin/libationcli"
 
-      echo "Executing: $LIBATION_BIN liberate ${limitArg}"
-      BATCH_START_TIME=$(${pkgs.coreutils}/bin/date +%s)
-      PRE_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
+            echo "Executing: $LIBATION_BIN liberate ${limitArg}"
+            BATCH_START_TIME=$(${pkgs.coreutils}/bin/date +%s)
+            PRE_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
 
-      ${priorityPrefix} \
-        ${pkgs.coreutils}/bin/timeout --preserve-status -s TERM "$TIMEOUT_SECS" \
-        "$LIBATION_BIN" liberate ${limitArg} || {
-        EXIT_CODE=$?
-        if [ "$EXIT_CODE" -eq 124 ] || [ "$EXIT_CODE" -eq 143 ]; then
-          echo "=== [$(date)] Hit window cutoff timer (${windowDesc}); stopped gracefully ==="
-        else
-          echo "=== [$(date)] libationcli exited with code $EXIT_CODE ==="
-        fi
-      }
+            ${priorityPrefix} \
+              ${pkgs.coreutils}/bin/timeout --preserve-status -s TERM "$TIMEOUT_SECS" \
+              "$LIBATION_BIN" liberate ${limitArg} || {
+              EXIT_CODE=$?
+              if [ "$EXIT_CODE" -eq 124 ] || [ "$EXIT_CODE" -eq 143 ]; then
+                echo "=== [$(date)] Hit window cutoff timer (${windowDesc}); stopped gracefully ==="
+              else
+                echo "=== [$(date)] libationcli exited with code $EXIT_CODE ==="
+              fi
+            }
 
-      BATCH_END_TIME=$(${pkgs.coreutils}/bin/date +%s)
-      DURATION_MINS=$(( (BATCH_END_TIME - BATCH_START_TIME) / 60 ))
-      POST_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
-      NEW_BOOKS=$(( POST_COUNT - PRE_COUNT ))
-      NEW_AVAIL_GB=$(${pkgs.coreutils}/bin/df -BG /srv/data | ${pkgs.gawk}/bin/awk "NR==2 {gsub(/G/,\"\"); print \$4}")
+            BATCH_END_TIME=$(${pkgs.coreutils}/bin/date +%s)
+            DURATION_MINS=$(( (BATCH_END_TIME - BATCH_START_TIME) / 60 ))
+            POST_COUNT=$(${pkgs.findutils}/bin/find /srv/data/audiobooks/Books -type f -name "*.m4b" | ${pkgs.coreutils}/bin/wc -l || echo 0)
+            NEW_BOOKS=$(( POST_COUNT - PRE_COUNT ))
+            NEW_AVAIL_GB=$(${pkgs.coreutils}/bin/df -BG /srv/data | ${pkgs.gawk}/bin/awk "NR==2 {gsub(/G/,\"\"); print \$4}")
 
-      REPORT="📚 [Audible Batch Liberation - ${windowDesc}]
-Batch Duration: ''${DURATION_MINS}m
-New Books Converted: ''${NEW_BOOKS}
-Total Library Size: ''${POST_COUNT} books
-Remaining Free Space: ''${NEW_AVAIL_GB} GB"
+            REPORT="📚 [Audible Batch Liberation - ${windowDesc}]
+      Batch Duration: ''${DURATION_MINS}m
+      New Books Converted: ''${NEW_BOOKS}
+      Total Library Size: ''${POST_COUNT} books
+      Remaining Free Space: ''${NEW_AVAIL_GB} GB"
 
-      echo "$REPORT"
+            echo "$REPORT"
 
-      # 3. Post-batch Audiobookshelf notification / library check
-      if ${pkgs.curl}/bin/curl -s -f http://127.0.0.1:13378/healthcheck >/dev/null 2>&1; then
-        echo "Audiobookshelf is healthy on port 13378."
-      fi
+            # 3. Post-batch Audiobookshelf notification / library check
+            if ${pkgs.curl}/bin/curl -s -f http://127.0.0.1:13378/healthcheck >/dev/null 2>&1; then
+              echo "Audiobookshelf is healthy on port 13378."
+            fi
 
-      # 4. Dispatch status report to SimpleX #Fleet
-      SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
-      if [ ! -f "$SIMPLEX_RPC" ]; then
-        SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
-      fi
-      if [ -f "$SIMPLEX_RPC" ]; then
-        ${pythonWithWebsockets}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$REPORT" || true
-      fi
+            # 4. Dispatch status report to SimpleX #Fleet
+            SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
+            if [ ! -f "$SIMPLEX_RPC" ]; then
+              SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
+            fi
+            if [ -f "$SIMPLEX_RPC" ]; then
+              ${pythonWithWebsockets}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$REPORT" || true
+            fi
 
-      echo "=== [$(date)] Phased Audible Liberation Batch Finished Successfully ==="
+            echo "=== [$(date)] Phased Audible Liberation Batch Finished Successfully ==="
     '';
 
   agentCascadeScript = ''
@@ -523,6 +523,16 @@ in {
         url = "http://127.0.0.1:13378";
         group = "frieren";
         conditions = ["[STATUS] < 400"];
+      }
+      # The closed loop: not "is nginx up" (the endpoint above) but "did the
+      # nightly jobs succeed, is the generation fresh, is the NAS under
+      # pressure". Body is JSON, so the condition asserts the sentinel's own
+      # verdict rather than a 200 from a static file.
+      {
+        name = "fleet sentinel";
+        url = "http://127.0.0.1:80/sentinel/status.json";
+        group = "frieren";
+        conditions = ["[BODY].state == ok"];
       }
     ];
   };

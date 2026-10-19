@@ -556,16 +556,18 @@
     '';
   };
 
+  # Dormant by default (`enableHeavy` is not set on any host). Deliberately no
+  # Neo4j server here: the knowledge graph is a generated projection, and a JVM
+  # heap competes with the NAS page cache (ARCHITECTURE.md P3). If an external
+  # graph instance is ever needed, feed it `nix eval --raw .#knowledgeGraph.cypher`.
   heavyTools = with pkgs; [
     go
     uv
     gh
-    neo4j
     typst
     (pkgs.python3.withPackages (
       ps:
         with ps; [
-          neo4j
           pytz
           firecrawl-py
           pydantic
@@ -576,6 +578,10 @@
   lightTools = with pkgs; [
     wikisearch
     freebuff-headless
+    # TOON is the agent-facing projection for the sentinel ledger and other
+    # uniform records. Present system-wide so root/systemd helpers can encode
+    # without assuming a user profile on PATH.
+    pkgs.llm-agents.toon
     # frieren is the fleet's Freebuff mainframe: the TUI runs here and
     # clients reach it via freebuff-remote/freebuff-terminal (SSH).
     pkgs.llm-agents.freebuff
@@ -631,7 +637,7 @@
   ];
 in {
   options.services.nasTools = {
-    enableHeavy = mkEnableOption "Heavy dev tools (go, uv, gh, neo4j, python research env)";
+    enableHeavy = mkEnableOption "Heavy dev tools (go, uv, gh, typst, python research env)";
   };
 
   config = {

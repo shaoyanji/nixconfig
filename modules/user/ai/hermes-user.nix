@@ -29,6 +29,10 @@
   config,
   pkgs,
   osConfig ? {},
+  # ~/AGENTS.md itself comes from modules/user/ai/home-agents.nix (the flake's
+  # `.#homeAgents.<host>`, injected via extraSpecialArgs in
+  # modules/global/nixos.nix). This module only mirrors that link into
+  # ~/.hermes/ for the gateway daemon.
   ...
 }: {
   options.programs.hermes-user = {
@@ -124,12 +128,12 @@
         run ln -s "$REPO_DIR/modules/user/ai/hermes-persona/SOUL.md" "$HOME/.hermes/SOUL.md"
       fi
 
-      # 3. Generate combined host fastfetch card + persona AGENTS.md -> $HOME/AGENTS.md
-      if [ -f "$REPO_DIR/scripts/task/compile-llm-specs.py" ]; then
-        ${pkgs.python3}/bin/python3 "$REPO_DIR/scripts/task/compile-llm-specs.py" --home-agents "$HOST_NAME" --output "$HOME/AGENTS.md" 2>/dev/null || true
-      fi
-
-      # 4. Mirror AGENTS.md into ~/.hermes/AGENTS.md for the systemd gateway daemon
+      # 3. ~/AGENTS.md is Home Manager's (modules/user/ai/home-agents.nix →
+      # `.#homeAgents.<host>`: fleet preamble + compiled inventory card +
+      # persona). Do NOT recreate it here: home.file already links it during
+      # writeBoundary, and this hook runs after — an `rm` + `ln -s` here would
+      # fight that manager on every switch. This block only mirrors the link
+      # into ~/.hermes/AGENTS.md for the systemd gateway daemon.
       run rm -f "$HOME/.hermes/AGENTS.md"
       if [ -f "$HOME/AGENTS.md" ]; then
         run ln -s "$HOME/AGENTS.md" "$HOME/.hermes/AGENTS.md"

@@ -19,6 +19,15 @@
   # output is system-independent and does not need a per-system fan-out.
   docsGen = import ../lib/docs.nix {inherit lib inventory;};
   docs = docsGen.mkDocs (pkgsFor "x86_64-linux");
+  # Skills are compiled the same way the inventory is: parsed once, validated
+  # once, consumed by checks/tasks/bundles. No host config is evaluated.
+  skillsCtl = import ../lib/skills.nix {inherit lib;};
+  homeAgentsGen = import ../lib/home-agents.nix {inherit lib inventory;};
+  knowledgeGraphCtl = import ../lib/knowledge-graph.nix {
+    inherit lib inventory;
+    skills = skillsCtl;
+  };
+  agentDocs = pkgsFor "x86_64-linux";
 in {
   packages = import ./packages.nix {
     inherit inputs lib systems pkgsFor inventory;
@@ -29,7 +38,7 @@ in {
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
-    inherit lib systems pkgsFor self hostInventory;
+    inherit lib systems pkgsFor self hostInventory skillsCtl;
   };
 
   # Per-host evaluation gate, one host per attribute so a run costs one host's
@@ -46,7 +55,7 @@ in {
   };
 
   homeConfigurations = import ./home-configurations.nix {
-    inherit inputs nixpkgs projectHosts;
+    inherit inputs nixpkgs projectHosts self;
   };
 
   nixosConfigurations = import ./nixos-configurations.nix {
@@ -74,4 +83,31 @@ in {
   # Fast, cached entry point: `nix eval .#inventory.hosts.<host>.role` reads the
   # compiled registry WITHOUT evaluating a single host configuration.
   inherit inventory;
+
+  # --- agent context plane --------------------------------------------------
+  # `nix eval .#agentSkills.count` / `.#agentSkills.byTag.nix` are the live
+  # index; `.agents/README.md` routes to it instead of keeping a second table.
+  inherit (skillsCtl) indexJson;
+  agentSkills = skillsCtl.index;
+
+  # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
+  # Consumed by the hermes/frieren activation script as a store symlink.
+  homeAgents = lib.genAttrs (builtins.attrNames hostInventory) (
+    h: agentDocs.writeText "AGENTS-${h}.md" (homeAgentsGen.mkText h)
+  );
+
+  # Structural projection: hosts × skills × docs × mentions. `jq`-queryable
+  # today, Cypher-exportable if an external graph database ever exists.
+  knowledgeGraph = {
+    inherit (knowledgeGraphCtl) graph json cypher;
+  };
+
+  # A store-path bundle for home/fleet materialization: every skill tree plus
+  # the compiled index. `modules/user/ai/skills/default.nix` links from here.
+  agentSkillsBundle = agentDocs.runCommand "agent-skills-bundle" {} ''
+    mkdir -p $out
+    cp -a ${../.agents/skills} $out/skills
+    cp ${agentDocs.writeText "agent-skills-index.json" skillsCtl.indexJson} $out/index.json
+    chmod -R u+w $out
+  '';
 }

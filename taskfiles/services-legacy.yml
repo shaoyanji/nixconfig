@@ -81,7 +81,10 @@ tasks:
             printf '%s\n' exit
           } | awk '!seen[$0]++' | gum choose
         )
-        task "$choice"
+        case "$choice" in
+          infra:rebuild:*) NOM=1 task "$choice" ;;
+          *) task "$choice" ;;
+        esac
 
   services:logs:menu:
     desc: Compatibility alias for infra:logs:menu

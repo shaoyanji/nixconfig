@@ -99,7 +99,9 @@ graph, answers or error codes disagree with the compiled projection.
 **See the graph.** `http://fleet.frieren.lan` → *Knowledge Graph* renders the
 projection as a force-directed canvas: pan, wheel zoom, hover to inspect, click
 any node to open its static slice (neighbours, and a link to the host inventory
-page or the source file). Every click is a fetched JSON slice — no daemon. The
+page or the source file). Type in the search box to narrow by label or id, and
+toggle the per-type chips (host/skill/doc/tag) to filter — the counter follows
+the same set the renderer draws. Every click is a fetched JSON slice — no daemon. The
 definition lives in `lib/aki-site.nix`; `task checks:kg:canvas` proves it by
 driving headless Chrome through the click, and `task checks:kg:native` holds the
 cold bootstrap to **median < 20 ms** with no `nix` subprocess.

@@ -11,8 +11,14 @@
 #   2. SLICES. Every neighbour button inside every slice must point at a slice
 #             that exists — a dead end discovered by clicking is a bug found by
 #             an operator, not by CI.
-#   3. SHELL. index.html must load the canvas script and the script must parse.
-#   4. CLICK. With `agent-browser` present, click the Knowledge Graph tab, wait
+#   3. SHELL. index.html must load the canvas script and the script must parse;
+#             the slice must carry the search box and a chip per node type.
+#   4. FILTER. Type a label into the real search box: the visible set must
+#             shrink, the typed node must remain visible, and the counter must
+#             follow the same set. Toggle the `doc` chip off: exactly the doc
+#             count disappears, hosts stay. Restore, and the full 225 return.
+#             Counts come from the data, never hardcoded.
+#   5. CLICK. With `agent-browser` present, click the Knowledge Graph tab, wait
 #             for the canvas to load 225 nodes, dispatch a click at
 #             host:frieren's screen position, and require the breadcrumb to
 #             become "fleet / knowledge-graph / host:frieren". This is the exact
@@ -54,6 +60,7 @@ want_nodes="$(cd "$REPO" && nix eval --json .#knowledgeGraph.graph --apply 'g: b
 want_edges="$(cd "$REPO" && nix eval --json .#knowledgeGraph.graph --apply 'g: builtins.length g.edges')"
 got_nodes="$(jq -r '.nodes | length' "$SITE/data/kg-graph.json")"
 got_edges="$(jq -r '.edges | length' "$SITE/data/kg-graph.json")"
+want_docs="$(jq '[.nodes[] | select(.type == "doc")] | length' "$SITE/data/kg-graph.json")"
 [ "$got_nodes" = "$want_nodes" ] && ok "node count ($got_nodes)" || bad "node count: site $got_nodes vs compiled $want_nodes"
 [ "$got_edges" = "$want_edges" ] && ok "edge count ($got_edges)" || bad "edge count: site $got_edges vs compiled $want_edges"
 
@@ -100,6 +107,11 @@ else
 fi
 # The slice is JSON, so the markup arrives escaped: `id=\"kg-canvas\"`.
 grep -q 'kg-canvas' "$SITE/data/kg.json" && ok "knowledge-graph slice carries the canvas" || bad "kg slice has no canvas element"
+grep -q 'kg-search' "$SITE/data/kg.json" && ok "slice carries the label search box" || bad "kg slice has no search box"
+# The slice is JSON, so the markup is escaped; strip the backslashes before
+# counting the distinct chips, otherwise the regex stops at the first `\"`.
+chips="$(tr -d '\\' < "$SITE/data/kg.json" | grep -o 'data-kg-type="[a-z]*"' | sort -u | wc -l)"
+[ "$chips" = 4 ] && ok "slice carries a chip for all four node types" || bad "kg slice has $chips of 4 type chips"
 grep -q "aki:applied" "$SITE/aki.min.js" && ok "aki dispatches after a transition" || bad "aki does not dispatch aki:applied"
 
 say "click a node in a real browser"
@@ -133,20 +145,71 @@ else
   # agent-browser failure must read as "the canvas did not mount", never as a
   # silently skipped section that still exits 0.
   agent-browser open "http://127.0.0.1:$PORT/" >/dev/null 2>&1 || true
-  agent-browser eval "document.querySelector('button[url=\"data/kg.json\"]').click(); 'ok'" >/dev/null 2>&1 || true
-  loaded="$(agent-browser eval "new Promise(r => setTimeout(() => r(JSON.stringify({bound: !!(document.getElementById('kg-canvas') && document.getElementById('kg-canvas').dataset.kgBound), nodes: window.__kgDebug ? window.__kgDebug.nodes() : 0})), 900))" 2>/dev/null | tr -d '\n ' || true)"
-  # The eval result is a JSON *string*, so its inner quotes come back escaped;
-  # strip the escaping before matching rather than pattern-matching on it.
-  loaded_norm="$(printf '%s' "$loaded" | tr -d '\\ \n')"
-  if [[ "$loaded_norm" == *'"bound":true'* ]] && [[ "$loaded_norm" == *'"nodes":'"$want_nodes"* ]]; then
-    ok "canvas mounted with $want_nodes nodes"
+
+  # eval_json '<js returning JSON.stringify(...)>' -> decoded JSON text.
+  # agent-browser returns the value as a JSON *string* (escaped quotes), so it
+  # is decoded once with jq instead of pattern-matched with escapes in it.
+  eval_json() {
+    agent-browser eval "$1" 2>/dev/null | tr -d '\n' | jq -r . 2>/dev/null || true
+  }
+
+  agent-browser eval 'document.querySelector("[url=\"data/kg.json\"]").click(); "ok"' >/dev/null 2>&1 || true
+  sleep 1
+
+  loaded="$(eval_json 'JSON.stringify({bound: !!(document.getElementById("kg-canvas") && document.getElementById("kg-canvas").dataset.kgBound), nodes: window.__kgDebug ? window.__kgDebug.nodes() : 0, visible: window.__kgDebug ? window.__kgDebug.visible() : 0})')"
+  l_bound="$(jq -r '.bound' <<<"$loaded" 2>/dev/null || echo false)"
+  l_nodes="$(jq -r '.nodes' <<<"$loaded" 2>/dev/null || echo 0)"
+  l_visible="$(jq -r '.visible' <<<"$loaded" 2>/dev/null || echo 0)"
+  if [ "$l_bound" = true ] && [ "$l_nodes" = "$want_nodes" ] && [ "$l_visible" = "$want_nodes" ]; then
+    ok "canvas mounted with $want_nodes nodes, all visible"
   else
-    bad "canvas did not mount: $loaded"
+    bad "canvas did not mount (bound=$l_bound nodes=$l_nodes visible=$l_visible, expected $want_nodes)"
   fi
 
-  agent-browser eval "(() => { const c = document.getElementById('kg-canvas'); const p = window.__kgDebug && window.__kgDebug.toScreen('host:frieren'); if (!p) return 'no-position'; const o = {clientX: p.x, clientY: p.y, bubbles: true, pointerId: 1, isPrimary: true, pointerType: 'mouse', button: 0}; c.dispatchEvent(new PointerEvent('pointerdown', o)); c.dispatchEvent(new PointerEvent('pointerup', o)); return 'clicked'; })()" >/dev/null 2>&1 || true
+  # Search. Asserts three things at once, because any one of them alone is a
+  # weaker claim than "the filter works": the set SHRINKS, the typed node stays
+  # visible (a filter that hides what you searched for is the bug class), and
+  # the counter follows the same set the renderer uses.
+  agent-browser eval '(() => { const i = document.getElementById("kg-search"); i.value = "frieren"; i.dispatchEvent(new Event("input")); return "typed"; })()' >/dev/null 2>&1 || true
+  searched="$(eval_json 'JSON.stringify({visible: window.__kgDebug.visible(), hit: window.__kgDebug.isVisible("host:frieren"), count: document.getElementById("kg-count").textContent})')"
+  s_visible="$(jq -r '.visible' <<<"$searched" 2>/dev/null || echo "")"
+  s_hit="$(jq -r '.hit' <<<"$searched" 2>/dev/null || echo false)"
+  s_count="$(jq -r '.count' <<<"$searched" 2>/dev/null || echo "")"
+  if [ -n "$s_visible" ] && [ "$s_visible" -gt 0 ] && [ "$s_visible" -lt "$want_nodes" ] && [ "$s_hit" = true ]; then
+    ok "search \"frieren\" narrows to $s_visible nodes and keeps host:frieren"
+  else
+    bad "search did not filter as expected: $searched"
+  fi
+  case "$s_count" in
+    *"of $want_nodes nodes"*) ok "counter followed the filter ($s_count)" ;;
+    *) bad "counter did not follow the filter: '$s_count'" ;;
+  esac
+
+  # Type filter. Clearing the query first isolates the chip, and the expected
+  # count is derived from the data (not hardcoded), so adding a host cannot
+  # silently weaken this assertion.
+  agent-browser eval '(() => { const i = document.getElementById("kg-search"); i.value = ""; i.dispatchEvent(new Event("input")); document.querySelector("[data-kg-type=doc]").click(); return "toggled"; })()' >/dev/null 2>&1 || true
+  toggled="$(eval_json 'JSON.stringify({visible: window.__kgDebug.visible(), doc: window.__kgDebug.isVisible("doc:TODO.md"), host: window.__kgDebug.isVisible("host:frieren")})')"
+  t_visible="$(jq -r '.visible' <<<"$toggled" 2>/dev/null || echo "")"
+  t_doc="$(jq -r '.doc' <<<"$toggled" 2>/dev/null || echo true)"
+  t_host="$(jq -r '.host' <<<"$toggled" 2>/dev/null || echo false)"
+  expect_visible=$((want_nodes - want_docs))
+  if [ "$t_doc" = false ] && [ "$t_host" = true ] && [ "$t_visible" = "$expect_visible" ]; then
+    ok "toggling doc off hides all $want_docs docs and nothing else"
+  else
+    bad "type toggle wrong: $toggled (expected visible=$expect_visible, doc=false, host=true)"
+  fi
+
+  # Restore the full graph before the navigation test, so that test measures
+  # the click path rather than a filtered canvas.
+  agent-browser eval '(() => { document.querySelector("[data-kg-type=doc]").click(); return "restored"; })()' >/dev/null 2>&1 || true
+  restored="$(eval_json 'JSON.stringify({visible: window.__kgDebug.visible()})')"
+  r_visible="$(jq -r '.visible' <<<"$restored" 2>/dev/null || echo 0)"
+  [ "$r_visible" = "$want_nodes" ] && ok "clearing the filters restores all $want_nodes nodes" || bad "filters did not restore: $restored"
+
+  agent-browser eval '(() => { const c = document.getElementById("kg-canvas"); const p = window.__kgDebug && window.__kgDebug.toScreen("host:frieren"); if (!p) return "no-position"; const o = {clientX: p.x, clientY: p.y, bubbles: true, pointerId: 1, isPrimary: true, pointerType: "mouse", button: 0}; c.dispatchEvent(new PointerEvent("pointerdown", o)); c.dispatchEvent(new PointerEvent("pointerup", o)); return "clicked"; })()' >/dev/null 2>&1 || true
   sleep 1
-  crumbs="$(agent-browser eval "document.getElementById('breadcrumbs').textContent" 2>/dev/null | tr -d '\n' || true)"
+  crumbs="$(agent-browser eval 'document.getElementById("breadcrumbs").textContent' 2>/dev/null | tr -d '\n' || true)"
   if [[ "$crumbs" == *"knowledge-graph / host:frieren"* ]]; then
     ok "click navigated to the node slice ($crumbs)"
   else
@@ -156,7 +219,7 @@ fi
 
 echo
 if [ "$fail" = 0 ]; then
-  echo "kg-canvas-check: ok — data, slices, and node-click navigation agree"
+  echo "kg-canvas-check: ok — data, slices, filters, and node-click navigation agree"
 else
   echo "kg-canvas-check: FAILED — see the FAIL lines above"
 fi

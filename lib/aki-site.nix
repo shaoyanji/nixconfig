@@ -92,6 +92,13 @@
       var RADII = {host: 6, skill: 5, doc: 5, tag: 3};
       var loaded = null;
       var layoutCache = null;
+      // Filter state lives OUTSIDE mount(): an Aki transition rebuilds the
+      // canvas DOM, and a filter the operator just typed must survive a trip
+      // into a node slice and back.
+      // No two adjacent single quotes may appear in this file: inside a Nix
+      // indented string that pair is an escape sequence, so JS writes empty
+      // strings with double quotes (this exact line failed to parse once).
+      var filterState = {types: {host: true, skill: true, doc: true, tag: true}, q: ""};
 
       function fetchGraph() {
         if (!loaded) {
@@ -188,8 +195,20 @@
           return {x: (mx - view.x) / view.k, y: (my - view.y) / view.k};
         }
 
+        // A node is visible when its type is enabled AND, if a query is set, its
+        // label or id contains it. Everything downstream — draw, hit-testing,
+        // fit — asks this one predicate, so a filtered node can never be drawn
+        // while being unclickable (or the reverse).
+        function matches(d) {
+          if (!filterState.types[d.type]) return false;
+          var q = filterState.q;
+          return !q || d._label.indexOf(q) >= 0 || d._id.indexOf(q) >= 0;
+        }
+
         function draw() {
           if (!graph) return;
+          var on = {};
+          graph.nodes.forEach(function (d) { if (matches(d)) on[d.id] = true; });
           var dpr = window.devicePixelRatio || 1;
           var w = canvas.clientWidth || 800;
           var h = canvas.clientHeight || 560;
@@ -208,13 +227,14 @@
           ctx.beginPath();
           graph.edges.forEach(function (e) {
             var a = pos[e.from], b = pos[e.to];
-            if (!a || !b) return;
+            if (!a || !b || !on[e.from] || !on[e.to]) return;
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
           });
           ctx.stroke();
 
           graph.nodes.forEach(function (d) {
+            if (!on[d.id]) return;
             var p = pos[d.id];
             var r = RADII[d.type] || 4;
             ctx.beginPath();
@@ -233,6 +253,7 @@
           ctx.fillStyle = '#c0caf5';
           ctx.font = (11 / view.k) + 'px monospace';
           graph.nodes.forEach(function (d) {
+            if (!on[d.id]) return;
             if (d.type !== 'host' && d.type !== 'doc') return;
             var p = pos[d.id];
             ctx.fillText(d.label, p.x + 8 / view.k, p.y + 3 / view.k);
@@ -240,11 +261,14 @@
           ctx.restore();
         }
 
-        function fit() {
+        // Fit the requested nodes, falling back to all of them when a filter
+        // matches nothing — an empty canvas with no way back is a dead end.
+        function fit(list) {
           var w = canvas.clientWidth || 800;
           var h = canvas.clientHeight || 560;
-          var xs = graph.nodes.map(function (d) { return pos[d.id].x; });
-          var ys = graph.nodes.map(function (d) { return pos[d.id].y; });
+          var nodes = list && list.length ? list : graph.nodes;
+          var xs = nodes.map(function (d) { return pos[d.id].x; });
+          var ys = nodes.map(function (d) { return pos[d.id].y; });
           var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
           var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
           var pad = 40;
@@ -261,6 +285,7 @@
           var best = null;
           var bestD = Infinity;
           graph.nodes.forEach(function (d) {
+            if (!matches(d)) return;
             var p = pos[d.id];
             var dx = p.x - w.x, dy = p.y - w.y;
             var d2 = dx * dx + dy * dy;
@@ -347,20 +372,72 @@
         var reset = document.getElementById('kg-reset');
         if (zoomIn) zoomIn.addEventListener('click', function () { view.k *= 1.25; draw(); });
         if (zoomOut) zoomOut.addEventListener('click', function () { view.k /= 1.25; draw(); });
-        if (reset) reset.addEventListener('click', function () { fit(); draw(); });
+        // Fit means "fit what I can see", not "reset my filter".
+        if (reset) reset.addEventListener('click', function () { refresh(); });
+
+        // One path for every filter change: recompute the visible set, refit,
+        // repaint, and update the counter. Any control that changes what is
+        // shown calls this, so the three cannot disagree.
+        function refresh() {
+          if (!graph) return;
+          var shown = graph.nodes.filter(matches);
+          fit(shown);
+          draw();
+          var counter = document.getElementById('kg-count');
+          if (counter) {
+            counter.textContent = shown.length + ' of ' + graph.nodes.length + ' nodes';
+          }
+        }
 
         fetchGraph().then(function (g) {
           graph = g;
+          // Match against lowercased strings prepared once; `matches` is called
+          // for every node on every repaint and must not allocate.
+          graph.nodes.forEach(function (d) {
+            d._label = String(d.label || "").toLowerCase();
+            d._id = d.id.toLowerCase();
+          });
           if (!layoutCache) layoutCache = computeLayout(g);
           pos = layoutCache.pos;
           if (!fitted) fit();
-          draw();
+
+          // Controls. The search box and the type chips are ordinary DOM, so the
+          // gate drives them exactly as an operator would.
+          var search = document.getElementById('kg-search');
+          if (search) {
+            search.value = filterState.q;
+            search.addEventListener('input', function () {
+              filterState.q = search.value.trim().toLowerCase();
+              refresh();
+            });
+          }
+
+          var chips = document.querySelectorAll('[data-kg-type]');
+          for (var c = 0; c < chips.length; c++) {
+            (function (chip) {
+              var t = chip.getAttribute('data-kg-type');
+              chip.classList.toggle('nav-active', !!filterState.types[t]);
+              chip.addEventListener('click', function () {
+                filterState.types[t] = !filterState.types[t];
+                chip.classList.toggle('nav-active', filterState.types[t]);
+                refresh();
+              });
+            })(chips[c]);
+          }
+
+          refresh();
 
           // Introspection hook: `checks:kg:canvas` drives a real click at a
-          // node's screen position and asserts the slice transition. Without it
-          // the canvas click path could only be eyeballed.
+          // node's screen position, types into the search box and toggles a
+          // type chip. Without it those paths could only be eyeballed.
           window.__kgDebug = {
             nodes: function () { return graph.nodes.length; },
+            visible: function () { return graph.nodes.filter(matches).length; },
+            isVisible: function (id) {
+              var hit = null;
+              graph.nodes.forEach(function (d) { if (d.id === id) hit = d; });
+              return !!hit && matches(hit);
+            },
             toScreen: function (id) {
               var p = pos[id];
               if (!p) return null;
@@ -1059,7 +1136,8 @@
 
         <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">Interactive projection</h3>
         <p style="margin-bottom: 0.75rem; color: var(--text-muted);">
-          Drag to pan &middot; wheel to zoom &middot; <strong>click any node to open its slice</strong>.
+          Drag to pan &middot; wheel to zoom &middot; type to search labels &middot;
+          toggle a type to filter &middot; <strong>click any node to open its slice</strong>.
           Hover inspects without navigating.
         </p>
         <div style="position: relative;">
@@ -1070,12 +1148,14 @@
           <button class="tab-btn" id="kg-zoom-in">+</button>
           <button class="tab-btn" id="kg-zoom-out">&minus;</button>
           <button class="tab-btn" id="kg-reset">Fit</button>
-          <span style="margin-left: 1rem;">
-            <span class="badge badge-blue">host</span>
-            <span class="badge badge-green">skill</span>
-            <span class="badge badge-yellow">doc</span>
-            <span class="badge" style="background: rgba(187, 154, 247, 0.2); color: var(--accent); border: 1px solid var(--accent);">tag</span>
-          </span>
+          <input id="kg-search" type="search" placeholder="filter by label or id" style="flex: 1 1 200px; min-width: 170px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 0.45rem 0.6rem; font-family: inherit; font-size: 0.85rem;" />
+          <span id="kg-count" class="badge badge-blue">${toString (builtins.length kg.graph.nodes)} nodes</span>
+        </p>
+        <p style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="tab-btn nav-active" data-kg-type="host">host <span class="badge badge-blue">${toString kg.graph.stats.hosts}</span></button>
+          <button class="tab-btn nav-active" data-kg-type="skill">skill <span class="badge badge-green">${toString kg.graph.stats.skills}</span></button>
+          <button class="tab-btn nav-active" data-kg-type="doc">doc <span class="badge badge-yellow">${toString kg.graph.stats.docs}</span></button>
+          <button class="tab-btn nav-active" data-kg-type="tag">tag <span class="badge" style="background: rgba(187, 154, 247, 0.2); color: var(--accent); border: 1px solid var(--accent);">${toString tagCount}</span></button>
         </p>
 
         <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--heading);">Graph Projection Layers</h3>
@@ -1170,7 +1250,13 @@
           ];
       })
     {}
-    kg.graph.edges;
+    kg.graph.edges; # Tag nodes have no stat of their own; derive the count so the chip can
+  # never disagree with the data it filters.
+  tagCount =
+    builtins.length kg.graph.nodes
+    - kg.graph.stats.hosts
+    - kg.graph.stats.skills
+    - kg.graph.stats.docs;
 
   siteNodes =
     map

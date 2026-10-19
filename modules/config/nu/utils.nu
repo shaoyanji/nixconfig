@@ -44,6 +44,17 @@ export def animepic [] {
   http get $image_url | viu -
 }
 
+# Fetches current weather from wttr.in as JSON (or terminal text)
+# Example: weather
+# Example: weather "Berlin"
+export def weather [location: string = ""] {
+  if ($location | is-empty) {
+    http get "https://wttr.in/?format=j1"
+  } else {
+    http get $"https://wttr.in/($location)?format=j1"
+  }
+}
+
 # Searches public APIs from public-api-lists repository
 # Returns selected API details via fzf picker
 # Example: publicapi
@@ -51,12 +62,14 @@ export def "publicapi" [] {
   let url = "https://raw.githubusercontent.com/public-api-lists/public-api-lists/refs/heads/master/README.md"
   let data = (http get $url | mdq ':-: /API|Description|Auth|HTTPS|CORS/ :-:' -l inline -o json | from json | get items.table.rows | flatten | uniq)
   let selected = ($data | sk --preview {} --format {get 1} | get 0)
+  $selected
 }
 
 # Uses ddgr to return abstract for a search term
 # Example: "some search query" | util ddgr
 export def "util ddgr" [] {
   let query = $in | ddgr -n 1 --json --noua | from json | first | get abstract
+  $query
 }
 
 # Prompts for search term and returns URL via fuzzy picker
@@ -64,6 +77,7 @@ export def "util ddgr" [] {
 export def browse [] {
   let search_term = (input 'Search> ')
   let results = (ddgr -n 25 --json $search_term | from json | input list -f -d title | get url)
+  $results
 }
 
 # Returns markdown from a URL
@@ -79,6 +93,7 @@ export def "browsemd" [] {
 export def "browse link" [] {
   let url = $in
   let links = (http get $url | htmlq -w -a href a | split row "\n" | input list -f)
+  $links
 }
 
 # Scrapes markdown links from a URL
@@ -86,6 +101,7 @@ export def "browse link" [] {
 export def "scrape md" [] {
   let url = $in
   let data = (http get $url | mdq '#' -o json -l inline | from json | get items.0 | flatten | flatten | flatten | flatten | flatten | flatten | flatten | flatten | flatten | flatten | flatten | input list -f | get paragraph | mdq '[]()' -o json -l inline | from json | get items.link.url.0)
+  $data
 }
 
 # Returns markdown link from a markdown file URL
@@ -93,6 +109,7 @@ export def "scrape md" [] {
 export def "browse mdlink" [] {
   let url = $in
   let data = (http get $url | mdq '-' -o json -l inline | from json | get items.list | flatten | get item | flatten | get paragraph | input list -f | parse "{md} {description}" | get md | mdq '[]()' -o json | from json | get items.link.url.0)
+  $data
 }
 
 # Returns HTML body from a URL
@@ -199,7 +216,7 @@ export def gist [] {
 export def "gist id" [n:int = 50] {
   gh gist list -L $n
     | from tsv -n
-    | if (plugin list | where name == "skim" | is-not-empty) {
+    | if (which sk | is-not-empty) {
         sk --format {get column1} --preview {}
       } else {
         input list -f -d column1
@@ -258,6 +275,7 @@ export def "movie abstract" [] {
   let gist_id = $CONFIG.gist.movie_list_id
   let movies = (gh gist view $gist_id | split row "\n" | each { str replace -r '^(?:[1-9][0-9]?|100). ' "" } | input list -f)
   let search_term = ($movies | util ddgr)
+  $search_term
 }
 
 # Opens movie in terminal browser - selects from NYTimes top 100
@@ -283,7 +301,7 @@ export def movie [] {
 export def audible [] {
   let folder = $CONFIG.volumes.audiobooks
   let ext = "m4b"
-  if (plugin list | where name == "skim" | is-not-empty) {
+  if (which sk | is-not-empty) {
     let books = (glob $"($folder)/**/*.($ext)" | where {str contains '._' | do {not $in}})
     let selected = ($books | sk --format { path parse | get stem} --preview {path parse})
     mpv $selected
@@ -301,6 +319,7 @@ export def qrdecode [] {
   let selected = ($images | sk --format { path parse | get stem} --preview {path parse})
   let path = ($selected | path join)
   let output = (zbarimg $path -q | split row 'QR-Code:' | get 1)
+  $output
 }
 
 # Parses QR code as URL
@@ -315,11 +334,12 @@ export def "qrdecode url" [] {
 export def "qrdecode vcf" [] {
   let qr_content = $in
   let parsed = ($qr_content | from csv -n | get column0 | each { parse --regex '(?s)\A(?P<key>.*?):(?P<value>.*?)\z'} | flatten)
+  $parsed
 }
 # Opens PDF files from local volume
 # Example: readpdf
 export def readpdf [] {
-  if (plugin list | where name == "skim" | is-not-empty) {
+  if (which sk | is-not-empty) {
     let pdfs = (glob $"($CONFIG.volumes.arr)/**/*.pdf")
     let selected = ($pdfs | sk --format { path parse | get stem} --preview {pdfinfo $in} | get 0)
     start $selected
@@ -351,7 +371,7 @@ export def numail [
   w: int = 4
 ] {
   let cutoff_date = ($"($w) Weeks ago" | date from-human | format date "%Y-%m-%d")
-  let envelopes = (himalaya envelop list -s $num -o json $"after ($cutoff_date)" | from json)
+  let envelopes = (himalaya envelope list -s $num -o json $"after ($cutoff_date)" | from json)
   let selected = ($envelopes | input list -f -d subject)
   let message = (himalaya message -o json read $selected.id | from json | to md)
   glow $message
@@ -361,7 +381,7 @@ export def numail [
 # Example: numail clean
 export def "numail clean" [] {
   let cutoff_date = ("3 Weeks ago" | date from-human | format date "%Y-%m-%d")
-  let envelopes = (himalaya envelop list -s 500 -o json $"after ($cutoff_date)" | from json)
+  let envelopes = (himalaya envelope list -s 500 -o json $"after ($cutoff_date)" | from json)
   let selected = ($envelopes | sk -m --format {
     $"(ansi red_bold)($in.flags)(ansi reset)(ansi green_dimmed)($in.from.name)(ansi reset)(ansi purple_italic)($in.subject)(ansi reset)"
   } --preview {table --expand})
@@ -384,6 +404,7 @@ export def totp [] {
 export def todo [] {
   let tasks = (todoist --csv --header list | from csv)
   let selected = ($tasks | sk --format {} --preview {})
+  $selected
 }
 
 # Taskfile task runner
@@ -398,13 +419,13 @@ export def nutask [] {
 # Example: rebuild
 export def rebuild [] {
   rebuild pre-hooks
-  sudo nixos-rebuild switch --flake ~/nixconfig# o+e>| nom
+  sudo nixos-rebuild switch --flake ~/Documents/nixconfig# o+e>| nom
 }
 
 # Pre-hooks for NixOS rebuilds
 # Example: rebuild pre-hooks
 export def "rebuild pre-hooks" [] {
-  nixhash $"($env.HOME)/nixconfig/modules/config/nu.json"
+  nixhash $"($env.HOME)/Documents/nixconfig/modules/config/nu.json"
 }
 
 # MicroVM launcher

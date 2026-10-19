@@ -419,6 +419,30 @@ download.
   budget; requests are serialised by a lock, so bursts queue rather than
   oversubscribe the box.
 
+## GPU off the PCIe bus (no `/dev/dri`)
+
+`0000:05:00.0` (NAVI10 / RX 5700) disappeared between the 2026-10-18 22:22
+shutdown and the 2026-10-19 13:43 boot. In the 2026-10-18 21:31 boot it was
+healthy — `amdgpu 3.64.0` initialised it, DCN 2.0, 6 planes, `fb0`, and greetd
+ran the gamescope session for 50 min. It is now absent from firmware
+enumeration (`pci 0000:05:00.0` never appears in dmesg), `/sys/class/drm` holds
+only `version`, `/dev/dri` does not exist, and the x16 root port it used
+(`0000:00:02.0`) is not exposed at all. `amdgpu` loads only its CPU topology
+node, so greetd's greeter exits and gamescope falls back to llvmpipe.
+
+**This is not the build and not OOM**: `journalctl -k` since 2026-10-18 20:00
+has no `Out of memory` / `oom-kill` line, and the desktop was running until the
+poweroff. `nix.settings.max-jobs = 8` (commit `6d1eaac6`) is the build-side fix
+and is live.
+
+A warm reboot, `echo 1 > /sys/bus/pci/rescan` and a link retrain on the CPU root
+ports all fail, and the x16 port has no hotplug slot (`Slot-`), so there is no
+software power cycle to try either. The link is `Width x0` with `PresDet-`, i.e.
+the card is not electrically present. Power the chassis off at the PSU (a
+reboot keeps standby power on the slot), check the 8-pin PCIe power, reseat the
+card, then power on. Diagnosis: `ls -d /sys/bus/pci/devices/0000:05:00.0`,
+`ls /dev/dri`, `journalctl -k -b | grep -c 'pci 0000:05:00.0'` (0 = absent).
+
 ## Operational Notes
 
 - **Weights are not in the Nix store** — they are multi-GB files in `/mnt/storage/models`, fetched by the units above. Do not `nix-store --gc`-root them; they persist on the btrfs array.

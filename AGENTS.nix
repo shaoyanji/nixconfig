@@ -582,6 +582,38 @@
         `parakeet-server.py`.
       '';
     };
+    open-eisen-gpu-off-bus = {
+      title = "eisen's RX 5700 is off the PCIe bus";
+      kind = "open";
+      status = "OPEN";
+      priority = "P1";
+      date = "2026-10-19";
+      summary = "The RX 5700 is absent from firmware enumeration (no /dev/dri), so greetd and gamescope cannot start. Not the build and not OOM: the card dropped between poweroffs. Recovery is physical.";
+      refs = {
+        hosts = ["eisen"];
+        modules = ["hosts/eisen/configuration.nix"];
+        docs = [".agents/deploy/hosts/eisen.md"];
+      };
+      body = ''
+        Healthy in the 2026-10-18 21:31 boot (`amdgpu 3.64.0`, DCN 2.0, 6 planes, fb0,
+        50 min of greetd/gamescope) and gone from the 2026-10-19 13:43 boot onward:
+        firmware never enumerates `0000:05:00.0`, the x16 root port `0000:00:02.0` is
+        not exposed, `/sys/class/drm` holds only `version`, and `amdgpu` logs only
+        `Topology: Add CPU node`.
+
+        The obvious suspects are ruled out by evidence: no `Out of memory` / `oom-kill`
+        line exists since 2026-10-18 20:00, and the desktop ran until the poweroff, so
+        the build did not kill it. `max-jobs = 8` is live for future builds.
+
+        `pci rescan` and a CPU-root-port link retrain fail, and the x16 port has no
+        hotplug slot (`Slot-`), so no software power cycle exists either: the link is
+        `Width x0` / `PresDet-`. Recovery is physical — power off at the PSU (standby
+        keeps the rail latched), check the 8-pin PCIe power, reseat the card.
+
+        After it returns, greetd starts automatically; re-run the Kolibri benchmark,
+        because `--n-gpu-layers 99` was inert (llvmpipe only) while the card was gone.
+      '';
+    };
     open-kolibri-thread-bench = {
       title = "Kolibri thread split, measured";
       kind = "experiment";

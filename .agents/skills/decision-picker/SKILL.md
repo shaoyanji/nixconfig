@@ -36,7 +36,7 @@ rather than guessing which of six relations was meant.
 Read that table honestly. The 14/14 is independent evidence. The paraphrase
 10/10 is not: four of those answers are the bundle, and their gold labels were
 written from the same "a node-naming question means that node's context" policy
-the bundle implements — `ops:bench:kg` prints `4 are bundle answers` so the
+the bundle implements — `ops:bench:kg` prints `4 came from the bundle` so the
 number can be discounted. On that set rules alone score 6/10 against Jev's
 **9/10**, and Jev's single miss (declining "tell me about fern") is defensible.
 The third column is where Jev genuinely wins: a question that names no node

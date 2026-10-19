@@ -71,6 +71,69 @@ in {
             add_header X-Bridge-Security "POSIX-DAC-Isolated" always;
           '';
         };
+
+        # Content-hashed immutable static assets (Gap B)
+        locations."~* \\.[a-f0-9]{8}\\.(?:css|js)$" = {
+          inherit (cfg) root;
+          extraConfig = ''
+            gzip_static on;
+            open_file_cache max=1000 inactive=300s;
+            open_file_cache_valid 3600s;
+            add_header Cache-Control "public, max-age=31536000, immutable" always;
+          '';
+        };
+
+        # Live mainframe telemetry (Gap A)
+        locations."= /data/live.json" = {
+          alias = "${cfg.socketDir}/live.json";
+          extraConfig = ''
+            default_type application/json;
+            add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+          '';
+        };
+      };
+    };
+
+    # Zero-overhead local mainframe telemetry emitter (Gap A)
+    systemd.services.uds-docs-telemetry = {
+      description = "Zero-overhead local mainframe telemetry emitter for UDS docs";
+      path = with pkgs; [coreutils gnugrep gawk jq systemd];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "nginx";
+        Group = "users";
+      };
+      script = ''
+        UPTIME=$(uptime -p 2>/dev/null || echo "up")
+        LOAD=$(cut -d' ' -f1-3 /proc/loadavg 2>/dev/null || echo "0.0")
+        MEM_TOTAL=$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo 2>/dev/null || echo "0")
+        MEM_AVAIL=$(awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo 2>/dev/null || echo "0")
+        MEM_USED=$((MEM_TOTAL - MEM_AVAIL))
+        CURRENT_GEN=$(readlink -f /nix/var/nix/profiles/system | grep -oE '[0-9]+$' || echo "unknown")
+
+        cat <<EOF > ${cfg.socketDir}/live.json.tmp
+        {
+          "hostname": "${config.networking.hostName}",
+          "generation": "$CURRENT_GEN",
+          "uptime": "$UPTIME",
+          "load": "$LOAD",
+          "memory": {
+            "used_mb": $MEM_USED,
+            "total_mb": $MEM_TOTAL
+          },
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        }
+        EOF
+        mv -f ${cfg.socketDir}/live.json.tmp ${cfg.socketDir}/live.json
+      '';
+    };
+
+    systemd.timers.uds-docs-telemetry = {
+      description = "Periodic update timer for UDS docs live telemetry";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = "30s";
+        OnUnitActiveSec = "2m";
       };
     };
   };

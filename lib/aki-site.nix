@@ -25,9 +25,30 @@
     then inventory
     else rawInventory;
 
+  skills = import ./skills.nix {inherit lib;};
+  kg = import ./knowledge-graph.nix {
+    inherit lib skills;
+    inventory = inv;
+  };
+
   # Aki hypermedia driver with delegated click listener for dynamic DOM mutations
   akiJs = ''
     (() => {
+      function pollTelemetry() {
+        fetch('data/live.json')
+          .then(r => r.json())
+          .then(d => {
+            const el = document.getElementById('live-status-badge');
+            if (el && d.uptime) {
+              el.innerHTML = "🟢 " + d.hostname + ": " + d.uptime + " (Gen " + d.generation + ", load " + d.load + ")";
+            }
+          })
+          .catch(() => {});
+      }
+
+      document.addEventListener('DOMContentLoaded', pollTelemetry);
+      setInterval(pollTelemetry, 30000);
+
       document.addEventListener('click', (e) => {
         const el = e.target.closest('[url][fn="onclick"], [url]:not([fn])');
         if (!el) return;
@@ -43,6 +64,7 @@
               const target = document.querySelector(sel);
               if (target) Object.assign(target, props);
             });
+            pollTelemetry();
           })
           .catch(err => console.error("Aki transition failed:", err));
       });
@@ -234,6 +256,12 @@
     }
   '';
 
+  # Asset fingerprinting hashes for immutable caching (Gap B)
+  cssHash = builtins.substring 0 8 (builtins.hashString "sha256" styleCss);
+  jsHash = builtins.substring 0 8 (builtins.hashString "sha256" akiJs);
+  cssFileName = "style.${cssHash}.css";
+  jsFileName = "aki.${jsHash}.min.js";
+
   # Top-level shell
   indexHtml = ''
     <!DOCTYPE html>
@@ -242,23 +270,24 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Fleet Control Plane & Closure Explorer</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="aki.min.js" defer></script>
+      <link rel="stylesheet" href="${cssFileName}">
+      <script src="${jsFileName}" defer></script>
     </head>
     <body>
       <header>
         <div class="brand">
           <h1>Fleet Control Plane</h1>
-          <span class="badge badge-green">🟢 frieren: Active Production</span>
+          <span id="live-status-badge" class="badge badge-green">🟢 frieren: Active Production</span>
         </div>
         <div>
-          <span class="badge badge-blue">Aki Hypermedia (270 B)</span>
+          <span class="badge badge-blue">Aki Hypermedia</span>
         </div>
       </header>
 
       <nav>
         <button class="tab-btn nav-active" url="data/overview.json">Overview</button>
         <button class="tab-btn" url="data/inventory.json">Fleet Inventory</button>
+        <button class="tab-btn" url="data/kg.json">Knowledge Graph</button>
         <button class="tab-btn" url="data/closure.json">Closure Graph</button>
         <button class="tab-btn" url="data/debloat.json">Debloat Playbook</button>
         <button class="tab-btn" url="data/services.json">Services & Ingress</button>
@@ -272,6 +301,7 @@
           <div id="sidebar-pane" class="side-list">
             <button class="side-btn nav-active" url="data/overview.json">Mainframe Summary</button>
             <button class="side-btn" url="data/inventory.json">Host Matrix</button>
+            <button class="side-btn" url="data/kg.json">Knowledge Graph</button>
             <button class="side-btn" url="data/closure.json">Closure Rollup</button>
             <button class="side-btn" url="data/debloat.json">Debloat Status</button>
             <button class="side-btn" url="data/services.json">Port Map</button>
@@ -678,6 +708,95 @@
     };
   };
 
+  # Knowledge Graph slice (Gap D)
+  kgJson = builtins.toJSON {
+    "#breadcrumbs" = {textContent = "fleet / knowledge-graph";};
+    "#sidebar-pane" = {
+      innerHTML = ''
+        <button class="side-btn nav-active" url="data/kg.json">Graph Overview</button>
+        <button class="side-btn" url="data/inventory.json">Host Matrix</button>
+        <button class="side-btn" url="data/closure.json">Closure Rollup</button>
+      '';
+    };
+    "#detail-pane" = {
+      innerHTML = ''
+        <h2>Fleet Knowledge Graph & Architectural Projection</h2>
+        <p style="margin: 0.75rem 0; color: var(--text-muted);">
+          Deterministic structural view compiled directly from repository AST: hosts, skill manuals, and living docs.
+        </p>
+
+        <div class="card-grid">
+          <div class="card">
+            <h4>Entities (Nodes)</h4>
+            <p><strong>${toString (builtins.length kg.graph.nodes)}</strong> total nodes</p>
+            <p><small style="color: var(--text-muted);">${toString kg.graph.stats.hosts} hosts &bull; ${toString kg.graph.stats.skills} skills &bull; ${toString kg.graph.stats.docs} docs</small></p>
+          </div>
+          <div class="card">
+            <h4>Mentions (Edges)</h4>
+            <p><strong>${toString kg.graph.stats.edges}</strong> explicit connections</p>
+            <p><small style="color: var(--green);">Zero embeddings &bull; Token-exact AST</small></p>
+          </div>
+          <div class="card">
+            <h4>Query Interface</h4>
+            <p><code>task ops:kg</code></p>
+            <p><small style="color: var(--heading);">Instant sub-second projection</small></p>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--heading);">Graph Projection Layers</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Count</th>
+              <th>Canonical Source</th>
+              <th>Role in Fleet</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Hosts</strong></td>
+              <td>${toString kg.graph.stats.hosts}</td>
+              <td><code>inventory.toml</code></td>
+              <td>Physical servers, workstations, VPS, and preserved states</td>
+            </tr>
+            <tr>
+              <td><strong>Skills</strong></td>
+              <td>${toString kg.graph.stats.skills}</td>
+              <td><code>.agents/skills/*/SKILL.md</code></td>
+              <td>Autonomous agent runbooks and operational skills</td>
+            </tr>
+            <tr>
+              <td><strong>Living Documents</strong></td>
+              <td>${toString kg.graph.stats.docs}</td>
+              <td>Root markdown & <code>docs/*.md</code></td>
+              <td>Fleet architecture, invariants, and system handoffs</td>
+            </tr>
+            <tr>
+              <td><strong>Edges (Mentions)</strong></td>
+              <td>${toString kg.graph.stats.edges}</td>
+              <td>AST Token Parser</td>
+              <td>Explicit cross-subsystem knowledge references</td>
+            </tr>
+          </tbody>
+        </table>
+      '';
+    };
+  };
+
+  # Fallback live telemetry (Gap A)
+  fallbackLiveJson = builtins.toJSON {
+    hostname = "frieren";
+    generation = "booted";
+    uptime = "nominal";
+    load = "0.0";
+    memory = {
+      used_mb = 0;
+      total_mb = 0;
+    };
+    timestamp = "static-build";
+  };
+
   # Individual JSON files for active hosts
   hostJsonFiles =
     map (h: {
@@ -696,24 +815,30 @@ in
     ${indexHtml}
     EOF
 
-    cat <<'EOF' > $out/aki.min.js
+    cat <<'EOF' > $out/${jsFileName}
     ${akiJs}
     EOF
 
-    cat <<'EOF' > $out/style.css
+    cat <<'EOF' > $out/${cssFileName}
     ${styleCss}
     EOF
 
+    # Backward-compatible unhashed copies
+    cp $out/${jsFileName} $out/aki.min.js
+    cp $out/${cssFileName} $out/style.css
+
     cp ${pkgs.writeText "overview.json" overviewJson} $out/data/overview.json
     cp ${pkgs.writeText "inventory.json" inventoryJson} $out/data/inventory.json
+    cp ${pkgs.writeText "kg.json" kgJson} $out/data/kg.json
     cp ${pkgs.writeText "closure.json" closureJson} $out/data/closure.json
     cp ${pkgs.writeText "debloat.json" debloatJson} $out/data/debloat.json
     cp ${pkgs.writeText "services.json" servicesJson} $out/data/services.json
+    cp ${pkgs.writeText "live.json" fallbackLiveJson} $out/data/live.json
 
     ${lib.concatStringsSep "\n" (
       map (hj: "cp ${hj.file} $out/${hj.name}") hostJsonFiles
     )}
 
     # Pre-compress static assets for Nginx gzip_static (zero runtime CPU)
-    gzip -9k $out/index.html $out/aki.min.js $out/style.css $out/data/*.json
+    gzip -9k $out/index.html $out/*.js $out/*.css $out/data/*.json
   ''

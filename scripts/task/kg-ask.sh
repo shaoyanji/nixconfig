@@ -29,6 +29,14 @@
 #                  relation policy the bundle implements. That is coverage, not
 #                  comprehension, and `ops:bench:kg` prints the count next to the
 #                  score instead of folding it into a headline.
+#   unnamed        rules 4/9, Jev 7/9 (2026-10-19) — questions that name NO node,
+#                  which is the bundle's structural blind spot: it resolves a
+#                  name and returns that node's context, so with no name there is
+#                  nothing to resolve. The split matters more than the totals:
+#                  the rules' five misses are UNKNOWN (a visible decline), while
+#                  Jev's two are confident wrong intents, one of them marking an
+#                  off-topic question DOC_CONTEXT. A caller can act on a decline;
+#                  it cannot see a confident wrong relation.
 # The policy rests on what is not circular: a bundle cannot mis-pick a relation
 # (it returns the superset and lets the caller narrow), it needs no key and no
 # network, and 0 ms beats ~330 ms.
@@ -162,6 +170,10 @@ model_conf="0"
 # already produce, and buys nothing on the traffic that dominates agent use.
 # The call is therefore made at ONE point: when the rules return nothing at all
 # (the 4/10 paraphrase case, where Jev is the only thing that answers).
+# That is also why the `unnamed` set (rules 4/9, Jev 7/9) does NOT reopen the
+# question: Jev's advantage there comes partly from answering questions the
+# graph cannot answer at all — it labelled an off-topic question DOC_CONTEXT
+# rather than declining — which is the failure mode a caller cannot detect.
 # KG_DECIDE_ALWAYS=1 opts back into the old always-consult agreement check.
 consult_model() {
   # Preferred backend: a Jev-compatible HTTP endpoint (`/v1/systemone`). That is

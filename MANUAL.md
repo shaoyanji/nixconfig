@@ -126,18 +126,20 @@ task ops:sentinel:status   # timer + last run
 - `task ops:ask Q="what touches frieren"` — an English question routed to a jq
   query over `.#knowledgeGraph.graph` (a 50 KB store artifact, cached per
   revision). Routing is **deterministic and offline**; no model is in the path.
-- `task ops:bench:kg [--set rule|paraphrase|both]` — the evidence, re-runnable.
-  Two labelled sets on purpose: `rule` is phrased in the vocabulary the router
-  encodes, `paraphrase` asks the same questions without it (`--set both` for the
-  honest headline). It also prints a routing census, because a scorer sees only
-  the intent and a fallback that silently answered everything would look the
-  same as the rules working. Measured 2026-10-19 on frieren:
+- `task ops:bench:kg [--set rule|paraphrase|unnamed|both]` — the evidence,
+  re-runnable. Three labelled sets on purpose: `rule` is phrased in the
+  vocabulary the router encodes, `paraphrase` asks the same questions without it,
+  and `unnamed` asks for a relation without naming its subject (`--set both` is
+  rule+paraphrase; the unnamed set stays separate because the bundle cannot
+  answer it, and merging would hide that). It also prints a routing census,
+  because a scorer sees only the intent and a fallback that silently answered
+  everything would look the same as the rules working. Measured 2026-10-19:
 
-  | router | rule set | paraphrase set | latency |
-  | :--- | ---: | ---: | ---: |
-  | keyword + context bundle (offline) | **14/14** | **10/10** | 0 ms |
-  | Jev (cloud, `jev-1.13.0`) | 13/14 | 9/10 | ~330 ms |
-  | in-repo `systemone-decision` | 5/14 | 1/10 | ~180 ms |
+  | router | rule set | paraphrase set | names no node | latency |
+  | :--- | ---: | ---: | ---: | ---: |
+  | keyword + context bundle (offline) | **14/14** | **10/10** | 4/9 | 0 ms |
+  | Jev (cloud, `jev-1.13.0`) | 13/14 | 9/10 | **7/9** | ~330 ms |
+  | in-repo `systemone-decision` | 5/14 | 1/10 | 4/9 | ~180 ms |
 
   **Read the paraphrase 10/10 carefully, because four of those are circular.**
   The rule set's labels come from the six intents, so 14/14 measures the router.
@@ -149,6 +151,14 @@ task ops:sentinel:status   # timer + last run
   can be discounted instead of trusted. Independently: rules alone are 6/10 on
   that set, Jev is 9/10 (it declined "tell me about fern" — defensible, and
   scored as a miss here).
+
+  The third column is the bundle's blind spot, measured rather than argued: it
+  resolves a node NAME, so a question naming nothing has nothing for it to
+  return even in principle, and the rules fall back to keywords (4/9). Jev wins
+  that column, but read the misses, not just the count — the rules decline
+  (`UNKNOWN`, which a caller can see and rephrase around), whereas Jev gave two
+  confident wrong intents, including `DOC_CONTEXT` for an off-topic question.
+  For an automated caller a silent wrong relation is worse than a visible no.
 
   Hence the policy: **no model at all.** A model used to run when no rule
   matched; the context bundle replaced it, on grounds that do not depend on the

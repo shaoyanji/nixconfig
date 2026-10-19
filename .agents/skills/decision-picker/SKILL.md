@@ -20,13 +20,14 @@ description: Pick a decision model on Eisen: Laya (fast, ≤500 tokens), Kev-4B 
 ## Measured on this fleet's own task (2026-10-19, `task ops:bench:kg`)
 
 When the decision is *graph-intent routing* ("what touches frieren" → which
-query), the honest comparison needs two sets, because one flatters the rules:
+query), the honest comparison needs three sets, because one flatters the rules
+and the bundle cannot answer the third:
 
-| router | rule-shaped | paraphrase | latency |
-| :--- | ---: | ---: | ---: |
-| keyword rules + context bundle (offline) | **14/14** | 10/10 (4 bundle) | 0 ms |
-| hosted Jev | 13/14 | **9/10** | ~330 ms |
-| in-repo `systemone-decision` | 5/14 | 1/10 | ~180 ms |
+| router | rule-shaped | paraphrase | names no node | latency |
+| :--- | ---: | ---: | ---: | ---: |
+| keyword rules + context bundle (offline) | **14/14** | 10/10 (4 bundle) | 4/9 | 0 ms |
+| hosted Jev | 13/14 | **9/10** | **7/9** | ~330 ms |
+| in-repo `systemone-decision` | 5/14 | 1/10 | 4/9 | ~180 ms |
 
 So for **routing**, no model is used at all: when no rule matches, `ops:ask`
 returns the context bundle of the node the question names (`route: bundle`)
@@ -38,9 +39,17 @@ written from the same "a node-naming question means that node's context" policy
 the bundle implements — `ops:bench:kg` prints `4 are bundle answers` so the
 number can be discounted. On that set rules alone score 6/10 against Jev's
 **9/10**, and Jev's single miss (declining "tell me about fern") is defensible.
-The model was dropped for reasons other than accuracy: the bundle returns a
-superset, so it cannot mis-pick a relation, and it costs 0 ms offline with no key
-against ~330 ms over the network. `KG_DECIDE_ALWAYS=1` still runs Jev as an
+The third column is where Jev genuinely wins: a question that names no node
+leaves the bundle nothing to resolve, so the rules fall back to keywords (4/9).
+Read the *shape* of the misses, not just the count — the rules' five are
+`UNKNOWN` (a decline the caller can see and re-ask around), while Jev's two are
+confident wrong intents, including labelling an off-topic question DOC_CONTEXT
+instead of declining. A silent wrong relation is worse than a visible
+"no query matched" for anything automated.
+
+The model was dropped from `ops:ask` for reasons other than accuracy: the bundle
+returns a superset, so it cannot mis-pick a relation, and it costs 0 ms offline
+with no key against ~330 ms over the network. `KG_DECIDE_ALWAYS=1` still runs Jev as an
 agreement check. The public-benchmark gap below (Jev 0.966 vs Laya 0.583) is why
 the cloud model remains the default for genuine decisions — Laya/Kev-4B/Jev work
 on Eisen, not graph routing.

@@ -32,11 +32,12 @@
   otherwise, because `engine.py` is a hash-embedding heuristic, not mmBERT.
 - `ops:context` is the trigger side: sentinel status + the graph context for the
   host. Advisory — the monitor detects, it never acts.
-- `ops:bench:kg` settled the router question with TWO sets, because one was not
-  honest: keyword 14/14 rule-shaped / 6/10 paraphrase, Jev 13/14 / 9/10 at
-  ~330 ms, in-repo `systemone-decision` 5/14 / 1/10. A single-sentence "keyword
-  wins 14/14" would have been a rigged conclusion drawn from the set phrased in
-  the rules' own vocabulary.
+- `ops:bench:kg` settled the router question with labelled sets, because one was
+  not honest: keyword 14/14 rule-shaped / 6/10 paraphrase / 4/9 naming no node,
+  Jev 13/14 / 9/10 / 7/9 at ~330 ms, in-repo `systemone-decision` 5/14 / 1/10 /
+  4/9. A single-sentence "keyword wins 14/14" would have been a rigged
+  conclusion drawn from the set phrased in the rules' own vocabulary. On the
+  last set the rules lose but DECLINE (UNKNOWN) where Jev answers wrong.
 - Policy that replaced it: when no rule matches, `ops:ask` returns the **context
   bundle** of the node the question names (`route: bundle`, neighbours in
   `related`) — a superset, so it cannot mis-pick a relation, offline at 0 ms

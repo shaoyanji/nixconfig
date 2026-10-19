@@ -655,12 +655,12 @@
       '';
     };
     open-flake-bump-2-35-3 = {
-      title = "Full flake update staged: nixpkgs f20cd90 brings Nix 2.35.3";
+      title = "Full flake update landed: nixpkgs f20cd90 brings Nix 2.35.3";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P1";
       date = "2026-10-19";
-      summary = "A rehearsed lock (9 inputs moved, nixpkgs 2026-10-05 -> 2026-10-16) resolves nixVersions.latest to 2.35.3 and passes hostChecks.eisen with 1992 assertions. Staged on eisen, uncommitted pending a window.";
+      summary = "The pin moved 2026-10-05 -> 2026-10-16 in one flake update; nixVersions.latest is now 2.35.3, the release with the 2026-10-13 local-root fixes. Three chain representatives evaluated on eisen, darwin unchecked (no active host).";
       refs = {
         hosts = ["eisen"];
         modules = ["modules/global/global.nix"];
@@ -677,10 +677,11 @@
         assertions in 42.5 s. No remote builder was reachable from that command, so the
         rehearsal could not spend nixbuild.net budget.
 
-        Landing it is: copy `/tmp/nixconfig-upd/flake.lock` from eisen over the repo's
-        lock, run `task checks:host HOST=<one per chain> MODE=eval`, commit, then let
-        `fleet-warm-cache` absorb the closure delta. Held only because the owner has not
-        picked the window; nothing else blocks it.
+        Landed 2026-10-19 as a full flake update (owner ruling): the lock pins nixpkgs
+        `f20cd90e`, and chain representatives pass on eisen — eisen 1992 assertions,
+        guckloch 1699 (13.1 s), kali's home activation drvPath (45.5 s). No active darwin
+        host exists (cassini is preserved), so that chain is unchecked until CI sees it.
+        `fleet-warm-cache` absorbs the closure delta on its weekly run.
       '';
     };
     open-kolibri-thread-bench = {

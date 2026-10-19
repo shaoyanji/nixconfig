@@ -234,12 +234,18 @@
     # CPU threads for generation. Default 12 = eisen's Xeon E5-2673 v3
     # physical cores; a MoE model that keeps its expert FFNs in DDR4 is
     # memory-bandwidth bound, so hyperthreads help only up to the point the
-    # two siblings contend for the same cache lines. Kolibri overrides this
-    # with 24 (all SMT threads) — see its entry below.
+    # two siblings contend for the same cache lines. Measured on Kolibri
+    # 2026-10-19: tg128 9.17 t/s at 12 threads vs 8.42 at 24.
     threads ? 12,
+    # Prompt/batch threads. SMT does help the batch path (pp256 47.41 t/s at
+    # 12 vs 64.70 at 24 on the same run), so a model can split the two.
+    # null leaves llama.cpp's default (same as `threads`).
+    threadsBatch ? null,
   }:
     "${lib.getExe' binary "llama-server"} --host 127.0.0.1 --port \${PORT} "
-    + "--model ${model} --alias ${alias} --threads ${toString threads} --parallel 1 --ctx-size ${toString ctxSize} "
+    + "--model ${model} --alias ${alias} --threads ${toString threads} "
+    + lib.optionalString (threadsBatch != null) "--threads-batch ${toString threadsBatch} "
+    + "--parallel 1 --ctx-size ${toString ctxSize} "
     + "--flash-attn on --jinja --metrics --reasoning-format none --n-gpu-layers 99 "
     + (lib.optionalString experts "--override-tensor exps=CPU ")
     + "--cache-type-k q8_0 --cache-type-v q8_0 "
@@ -346,14 +352,13 @@ in {
             model = kolibriFile;
             alias = "kolibri-1";
             binary = llamaKolibri;
-            # All 24 SMT threads (the other models stay at 12 physical cores).
-            # Kolibri is the largest expert pool (78B / 3.46B active) and its
-            # experts live in DDR4 (`--override-tensor exps=CPU`), so the
-            # per-token cost is dominated by memory traffic; SMT gives the
-            # scheduler more outstanding loads to hide that latency.
-            # Measure, don't assume: `llama-bench -t 12 -t 24` on the Kolibri
-            # GGUF before treating 24 as faster on this box.
-            threads = 24;
+            # Measured 2026-10-19 (`llama-bench -t 12 -t 24` on the 45 GiB
+            # GGUF; the GPU was absent, so this is the CPU path): generation is
+            # bandwidth-bound and prefers physical cores (tg128 9.17 t/s at 12
+            # vs 8.42 at 24), while prompt processing gains from SMT (pp256
+            # 47.41 vs 64.70). Split them rather than pick one.
+            threads = 12;
+            threadsBatch = 24;
             # Low reasoning effort: Kolibri's default think is long (a "hi"
             # cost 352 output tokens, mostly <think>). Keep answers short.
             spec = "--reasoning-effort low";

@@ -15,6 +15,11 @@ in {
     ../dev.nix
     ../user/ai/antigravity-cli.nix
     ../zen.nix
+    # Imported unconditionally (a `pkgs`-dependent import reads `config` and
+    # recurses); niri.nix gates its own body with mkIf on Linux, because a
+    # Wayland compositor has no aarch64-darwin counterpart and its swayidle
+    # dependency is not packaged for darwin — which failed EVALUATION, not just
+    # the build, on cassini.
     ../user/desktop/niri.nix
     ../user/desktop/multimedia.nix
     ../user/kg-sidecar.nix
@@ -156,7 +161,10 @@ in {
 
   home = {
     username = user.name;
-    homeDirectory = user.home;
+    # mkDefault: on darwin the target's own default is /Users/<user>, and two
+    # normal-tier definitions conflict (cassini failed its host gate on exactly
+    # that). Linux has no competing definition, so the value still applies.
+    homeDirectory = lib.mkDefault user.home;
 
     packages = with pkgs;
       [

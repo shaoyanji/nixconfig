@@ -185,118 +185,47 @@ def generate_fleet_matrix_markdown(data):
     doc.append("")
     return "\n".join(doc)
 
-def generate_agents_table(data):
-    hosts = data.get("hosts", {})
-    # 4 distinct groups, rendered in this order: Active Nix, Active External Non-Nix, WIP, Preserved
-    active_nix = [h for h, v in hosts.items() if v.get("status") == "active" and v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"])]
-    active_ext = [h for h, v in hosts.items() if v.get("status") == "active" and not v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"])]
-    wip_hosts = [h for h, v in hosts.items() if v.get("status") == "wip"]
-    preserved_hosts = [h for h, v in hosts.items() if v.get("status") == "preserved"]
+# The AGENTS.md fleet section is a POINTER, not a table. It used to be rendered
+# from inventory.toml, which made AGENTS.md a second copy of the registry that
+# had to be re-synced on every host edit — and the copy drifted (it once claimed
+# 11 active Nix / 3 external while inventory.toml said 10 / 4). The table was
+# deliberately deleted in favour of `.agents/fleet-matrix.md` (generated below)
+# and `docs/generated/fleet-inventory.md` (built by lib/docs.nix), so this module
+# now only asserts that the pointer is intact. `--sync` keeps it byte-stable.
+AGENTS_INVENTORY_SECTION = """### Complete Client OS Fleet Inventory
 
-    active_nix.sort()
-    active_ext.sort()
-    wip_hosts.sort()
-    preserved_hosts.sort()
+> **No table here — by design.** The fleet registry has exactly one home:
+> [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
+> with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the
+> generated catalog in `docs/generated/fleet-inventory.md` (`nix build .#docs`).
+> A pasted table is a table that disagrees with itself within a month —
+> `.agents/SCHEMA.md` §1, and `docs/docs-pipeline-audit.md` F4."""
 
-    lines = [
-        "| Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |",
-        "|------|--------|-------------|------|---------------------------|-------------|----------------|"
-    ]
+AGENTS_START = "### Complete Client OS Fleet Inventory"
+AGENTS_END = "### Module Layout"
 
-    def get_module_path(h, info):
-        if h in ["serv00", "dragoncourt", "envs", "moto", "bitlockerpremium"]:
-            return "taskfiles/" + h + ".yml"
-        if h in ["penguin", "alarm", "kali"]:
-            return f"hosts/{h}.nix"
-        if h == "garnixMachine":
-            return "hosts/garnixMachine.nix"
-        if h == "testvm":
-            return "hosts/microvms/testvm.nix"
-        return f"hosts/{h}/configuration.nix"
 
-    def format_row(h, info, status_override=None):
-        st = status_override or info.get("status", "active")
-        is_nix = info.get("is_nix", info.get("kind") in ["nixos", "darwin", "home"])
-        if st == "active":
-            status_label = "**Active**"
-            env_label = "`nixos`" if info.get("kind") == "nixos" else f"`{info.get('kind')}`"
-            if not is_nix:
-                env_label = "**Non-Nix** (External)"
-        elif st == "wip":
-            status_label = "*WIP (Not Live)*"
-            env_label = f"`{info.get('kind')}`"
-        else:
-            status_label = "Preserved"
-            env_label = f"`{info.get('kind')}`"
+def update_agents_md(data=None):
+    """Return AGENTS.md with the inventory section as the canonical pointer.
 
-        arch = info.get("arch", "x86_64-linux")
-        hw = info.get("hardware", {})
-        cpu = hw.get("cpu", "")
-        cpu_short = cpu.split("(")[0].strip() if "(" in cpu else cpu
-        ram = hw.get("ram", "").split("+")[0].strip()
-        gpu = hw.get("gpu", "")
-        role = info.get("role", "")
-        
-        desc_parts = [role]
-        hw_details = []
-        if cpu_short:
-            hw_details.append(cpu_short)
-        if ram:
-            hw_details.append(ram)
-        if gpu and gpu not in ["Integrated", "Integrated / Headless", "None"]:
-            gpu_short = gpu.split("(")[0].strip()
-            hw_details.append(gpu_short)
-        if hw_details:
-            desc_parts.append(f"({', '.join(hw_details)})")
-            
-        desc = " ".join(desc_parts).replace("|", "\\|")
-        mod_path = f"`{get_module_path(h, info)}`"
-        storage = hw.get("storage_layout", hw.get("storage_type", "")).replace("|", "\\|")
-        if len(storage) > 65:
-            storage = storage[:62] + "..."
-        return f"| `{h}` | {status_label} | {env_label} | `{arch}` | {desc} | {mod_path} | {storage} |"
-
-    for h in active_nix:
-        lines.append(format_row(h, hosts[h]))
-    for h in active_ext:
-        lines.append(format_row(h, hosts[h]))
-    for h in wip_hosts:
-        lines.append(format_row(h, hosts[h]))
-    for h in preserved_hosts:
-        lines.append(format_row(h, hosts[h]))
-
-    return "\n".join(lines)
-
-def update_agents_md(table_content, data):
+    Returns None (and says why) when the section markers are gone, so `--check`
+    reports drift instead of silently passing on a rewrite that cannot happen.
+    """
     with open(AGENTS_MD, "r", encoding="utf-8") as f:
         content = f.read()
 
-    start_marker = "### Complete Client OS Fleet Inventory (`flake/host-inventory.nix`)"
-    end_marker = "### Module Layout"
-
-    if start_marker not in content or end_marker not in content:
-        print("ERROR: Markers not found in AGENTS.md", file=sys.stderr)
+    if AGENTS_START not in content or AGENTS_END not in content:
+        print(
+            "ERROR: section markers not found in AGENTS.md "
+            f"({AGENTS_START!r} / {AGENTS_END!r})",
+            file=sys.stderr,
+        )
         return None
 
-    prefix = content.split(start_marker)[0] + start_marker + "\n\n"
-    suffix = "\n\n" + end_marker + content.split(end_marker)[1]
+    head, _, rest = content.partition(AGENTS_START)
+    tail = rest[rest.index(AGENTS_END):]
+    return head + AGENTS_INVENTORY_SECTION + "\n\n" + tail
 
-    # Counts are derived, not hardcoded: a hardcoded note silently went stale
-    # (it claimed 11 active Nix / 3 active external while the table it sat above
-    # listed 10 and 4). Adding a device must not require editing this string.
-    hosts = data.get("hosts", {})
-    meta = data.get("metadata", {})
-    total = meta.get("total_devices", len(hosts))
-    active_nix = sum(1 for v in hosts.values() if v.get("status") == "active" and v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"]))
-    active_ext = sum(1 for v in hosts.values() if v.get("status") == "active" and not v.get("is_nix", v.get("kind") in ["nixos", "darwin", "home"]))
-    wip = sum(1 for v in hosts.values() if v.get("status") == "wip")
-    preserved = sum(1 for v in hosts.values() if v.get("status") == "preserved")
-
-    note = (
-        "> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) "
-        f"({total} total devices: {active_nix} active Nix, {active_ext} active non-Nix external, {wip} WIP, {preserved} preserved).\n\n"
-    )
-    return prefix + note + table_content + suffix
 
 def generate_docs_fleet_markdown(data):
     """Retired — docs/fleet-inventory.md is built by lib/docs.nix.
@@ -347,7 +276,7 @@ def main():
     # Check mode
     if args.check:
         drift = False
-        new_agents = update_agents_md(generate_agents_table(data), data)
+        new_agents = update_agents_md(data)
         with open(AGENTS_MD, "r", encoding="utf-8") as f:
             if f.read() != new_agents:
                 print("AGENTS.md has drifted from inventory.toml")
@@ -370,8 +299,7 @@ def main():
 
     # Sync / Compile
     # 1. Update AGENTS.md
-    agents_table = generate_agents_table(data)
-    new_agents_md = update_agents_md(agents_table, data)
+    new_agents_md = update_agents_md(data)
     if new_agents_md:
         with open(AGENTS_MD, "w", encoding="utf-8") as f:
             f.write(new_agents_md)

@@ -59,6 +59,12 @@
   networkModule = {
     options = {
       lan_ip = str "";
+      # The NIC's address, consumed by `infra:wol:*`. Declared HERE first: the
+      # schema is what makes a field real. `types.submodule` has no freeform
+      # passthrough, so a `mac =` row in the TOML without this option is an eval
+      # error ("The option `hosts.<h>.network.mac' does not exist") — the TOML is
+      # the reflected data, this file is the truth about its shape.
+      mac = str "";
       tailscale_ip = str "";
       domain = str "";
       ssh_alias = str "";

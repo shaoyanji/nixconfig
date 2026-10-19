@@ -18,7 +18,12 @@ in {
   ];
 
   boot = {
-    kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
+    # Lower priority than `mkDefault` (1000) on purpose: nixos-hardware modules
+    # set their kernel as a *default* too, and two equal-priority defaults are a
+    # hard "defined multiple times" error, not a pick. That is what made the
+    # raspberry-pi/3 module conflict with this baseline and refuse to evaluate
+    # minyx at all. A baseline should always yield to a hardware module.
+    kernelPackages = lib.mkOverride 1500 pkgs.linuxPackages_latest;
   };
 
   sops = {

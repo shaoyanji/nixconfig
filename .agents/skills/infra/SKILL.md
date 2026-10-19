@@ -25,6 +25,7 @@ Canonical surface for all host lifecycle, secrets, and store operations.
 | `infra:rollback:host:<host>` | Roll back to previous generation |
 | `infra:rollback:apply:host:<host>` | Rollback apply step only |
 | `infra:logs:host:<host>` | Tail journal logs via ssh (unit: `go-backend`) |
+| `infra:wol:eisen` | Wake Eisen via Wake-on-LAN magic packet |
 
 ## Local rebuilds
 

@@ -457,22 +457,15 @@ swapped. A crashed agent cannot repair the host it crashed, so:
   of building it), which is the only way to check an aarch64 or darwin host from an
   x86_64 machine: `task checks:host HOST=penguin MODE=eval` (2.7 s, 452 MiB).
 
-**Two hosts currently fail the per-host gate.** Reproduce either without touching the
-fleet (each is one host, and nothing is built in eval mode):
-
-```bash
-task checks:host HOST=minyx MODE=eval     # aarch64 — evaluated, no arm builder needed
-task checks:host HOST=cassini MODE=eval   # darwin
-```
-
-Both are pre-existing (the gate is new, and the only thing that would have caught them
-before, `nix flake check`, was never runnable here) and both are dormant `preserved`
-hosts:
-
-| host | failure | fix |
-| :--- | :--- | :--- |
-| `minyx` | The config does not evaluate at all: `boot.kernelPackages` is defined both in `modules/profiles/base-node.nix` and in `nixos-hardware/raspberry-pi/3`. | Make one of them `lib.mkDefault` — the rpi3 kernel is the right one for a Pi 3B+, so `base-node.nix` should yield. That module is shared by ~21 hosts, so it is a deliberate change, not a drive-by. |
-| `cassini` | A home-manager assertion fails: `xdg.desktopEntries` is a **Linux-only** module and `modules/user/ai/freebuff-remote.nix` sets it on this darwin host. | Gate that module to `pkgs.stdenv.isLinux`, or disable `programs.freebuff-remote` on darwin. |
+**Both former gate failures now pass** (`task checks:host HOST=minyx MODE=eval` → 1689
+assertions, `HOST=cassini MODE=eval` → 352, both rc=0). They failed on *priority and
+availability*, which only a whole-config eval catches: `boot.kernelPackages` and
+`home.homeDirectory` each had two equal-priority definitions (a conflict, not a pick),
+and three shared home modules set Linux-only options on darwin. Fixes live where the
+fact does — `base-node.nix` uses `lib.mkOverride 1500`, weaker than `mkDefault` so a
+hardware module always wins; `homeDirectory` is `mkDefault`; the `xdg` blocks in
+`freebuff-remote`/`mainframe-remotes` are `mkIf isLinux`; and `niri.nix` gates its own
+body, because a `pkgs`-dependent `imports` entry reads `config` and recurses.
 - Every bounded run goes through `scripts/task/oom-guard.sh`, which polls
   `/proc/vmstat oom_kill`, memory/io PSI and `MemAvailable` **every 10 s** and kills the
   run on pressure instead of letting it take the host down. It measures the whole

@@ -189,20 +189,24 @@ in {
     # Layer 1 — XDG desktop entry. DMS Spotlight (Mod+Space / Mod+N), Fuzzel
     # (Mod+A) and Kando (Ctrl+Space) all read XDG data dirs, so typing
     # `freebuff` surfaces the mainframe terminal on every fleet desktop.
-    xdg.desktopEntries.freebuff = {
-      name = "Freebuff";
-      genericName = "AI Coding Mainframe";
-      comment = "Connect to Freebuff AI coding assistant on frieren.lan";
-      exec = "freebuff-terminal";
-      icon = "utilities-terminal";
-      terminal = false;
-      categories = [
-        "Development"
-        "System"
-        "Utility"
-      ];
-      settings = {
-        Keywords = "ai;freebuff;codebuff;frieren;llm;coding;";
+    # Linux-only module: on darwin `xdg.desktopEntries` does not exist, and
+    # defining it made cassini's whole home-manager evaluation fail.
+    xdg = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+      desktopEntries.freebuff = {
+        name = "Freebuff";
+        genericName = "AI Coding Mainframe";
+        comment = "Connect to Freebuff AI coding assistant on frieren.lan";
+        exec = "freebuff-terminal";
+        icon = "utilities-terminal";
+        terminal = false;
+        categories = [
+          "Development"
+          "System"
+          "Utility"
+        ];
+        settings = {
+          Keywords = "ai;freebuff;codebuff;frieren;llm;coding;";
+        };
       };
     };
   };

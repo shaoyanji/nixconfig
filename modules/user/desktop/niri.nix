@@ -209,6 +209,7 @@
       "Mod+Return".action.toggle-overview = [];
       "Ctrl+Space".action.spawn-sh = "kando -m 'Kando Menu'";
       "Ctrl+Space".repeat = false;
+      "Mod+MouseMiddle".action.spawn-sh = "kando -m 'Kando Menu'";
 
       "Mod+H".action.focus-column-left = [];
       "Mod+J".action.focus-workspace-down = [];

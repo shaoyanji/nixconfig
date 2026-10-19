@@ -18,6 +18,25 @@ Convert speech to text with [voxtype](https://github.com/numtide/voxtype) (numti
 - **Agents:** `voxtype transcribe <FILE>` — audio file in, transcript out. Works headless (no display needed). This is the primary interface for scripts and agents.
 - **Humans:** `voxtype daemon` — hold-hotkey (default `SCROLLLOCK`) dictation that types/clipboard-pastes the result.
 
+## Server alternative: Parakeet Redux on Eisen
+
+When you do not need a local model, eisen serves the same kind of job over HTTP.
+It is **always resident** (CPU-only ONNX, ~1 GB), and only exists on generations
+built after 2026-10-17 (`parakeet-stt.service`).
+
+```bash
+# health (answers only after the ONNX sessions load; ~1 s, always up)
+curl -s --max-time 10 http://eisen.lan/stt/health
+
+# transcription: RAW bytes in the body — multipart/form-data FAILS
+curl -s --max-time 120 http://eisen.lan/stt/transcribe \
+  -H "Content-Type: audio/wav" --data-binary @clip.wav
+```
+
+Any ffmpeg-decodable format is accepted (WAV/MP3/OGG), 25 MB cap (~26 min of
+16 kHz mono wav), one transcription at a time. Do **not** probe it with a 2 s
+timeout on a cold host — that is a boot-time load, not an idle spin-up.
+
 ## When to use
 
 - Transcribing recordings, meeting audio, voice memos, podcasts, or call recordings into text

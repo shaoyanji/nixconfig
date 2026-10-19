@@ -97,6 +97,75 @@ task ops:kg:host HOST=frieren FORMAT=json | jq -r '.results[]'
 task ops:kg:host HOST=friere FORMAT=json   # error + suggestions, exit 201
 ```
 
+### jq cookbook — the questions the six patterns do not cover
+
+The pattern tasks answer the six questions the graph exists for. These five
+answer the ones it can still answer in one expression. Snapshot the graph first;
+**every count below is live, so re-run rather than cite**:
+
+```bash
+nix eval --json .#knowledgeGraph.graph > /tmp/kg.json
+```
+
+**1. What touches X** (inbound mentions — "what should I read before editing
+this host"):
+
+```bash
+jq -r --arg n host:frieren '.edges[] | select(.to == $n) | .from' /tmp/kg.json | sort -u
+```
+
+**2. What one document names** (outbound — the question `ops:kg:doc` also
+answers, useful when you have the file open):
+
+```bash
+jq -r --arg n doc:docs/task-control-plane.md '.edges[] | select(.from == $n) | .to' /tmp/kg.json | sort -u
+```
+
+**3. Orphan documents** — named by nobody, naming nothing, so no query will ever
+reach them:
+
+```bash
+jq -r '[.edges[].from] as $from | .nodes[]
+  | select(.type == "doc") | select(.id as $i | $from | index($i) | not) | .id' /tmp/kg.json
+```
+
+**4. Skills no document mentions** — the invisible half of the roster. A skill
+here still loads when named, but nothing in the docs points at it:
+
+```bash
+jq -r '[.edges[] | select(.to | startswith("skill:")) | .to] as $seen
+  | .nodes[] | select(.type == "skill")
+  | select(.id as $i | $seen | index($i) | not) | .id' /tmp/kg.json
+```
+
+**5. Host blast radius** — how many docs and skills a change to that host's
+configuration can invalidate:
+
+```bash
+jq -r '. as $g | $g.nodes[] | select(.type == "host") | .id as $h
+  | [$h, ([$g.edges[] | select(.to == $h)] | length)] | @tsv' /tmp/kg.json | sort -k2 -nr
+```
+
+The `. as $g` binding in 5 is load-bearing: inside `.nodes[]` the current value
+is the node, so `.edges` there would be null and every count would print 0 — a
+wrong answer that looks like a tidy result.
+
+Run 2026-10-19 (21 doc nodes, 43 skills, 387 edges): orphan documents were zero
+(all eight living docs name something), and **15 of 43 skills had no inbound
+mention** — `master-toon`, `nix-eval`, `host-facts`, `decision-picker` among
+them. Two causes, both worth
+knowing before you read that list as rot:
+
+- **Only two doc sources exist**: the eight living documents at the repo root and
+  non-recursive `docs/*.md` (`lib/knowledge-graph.nix`). `.agents/README.md`
+  lists skills and is *not* a doc node, so a skill documented only there has no
+  inbound edge.
+- **Matching is exact-token**: `EXPERIMENTS.md` says `nix-eval-jobs`, which is a
+  different token from `nix-eval` — the substring is there, the edge is not.
+
+So the honest reading is "no doc names this exactly", not "nobody uses it". For
+a fleet-visible roster, `nix eval --json .#agentSkills.byTag` is the source.
+
 `ops:ask` remains sugar over these: deterministic keywords, a model only when no
 rule matched. It is a convenience for a human phrasing a question, not the
 supported way for an agent to query a graph it can already name.

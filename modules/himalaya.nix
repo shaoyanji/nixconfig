@@ -6,7 +6,7 @@ in {
       name = "jisifu";
       primary = true;
       address = user.email;
-      realName = user.realName;
+      inherit (user) realName;
       userName = "jisifu";
       imap.host = "imap.gmail.com";
       imap.port = 993;
@@ -22,7 +22,7 @@ in {
       name = "bountystash";
       primary = false;
       address = user.workEmail;
-      realName = user.realName;
+      inherit (user) realName;
       userName = "jisifu";
       imap.host = "imap.gmail.com";
       imap.port = 993;

@@ -14,6 +14,23 @@
   tlsCertificate = ../../modules/config/tls/frieren-lan-wildcard.pem;
   tlsCertificateKey = "/run/secrets/tls-frieren-wildcard-key";
 
+  # ONE instance of the fleet site. It reads the knowledge graph and every note
+  # at eval time, so importing it per location (it used to be imported twice in
+  # this file) evaluated the same 1.9 k-line module twice for identical output.
+  fleetSite = import ../../lib/aki-site.nix {
+    inherit pkgs;
+    inventory = config.fleet.inventory;
+    host = config.networking.hostName;
+  };
+
+  # The cache policy for compiled static trees, shared with the UDS bridge
+  # (modules/config/nginx/static-cache.nix) so the two servers cannot disagree.
+  staticCache = import ../../modules/config/nginx/static-cache.nix;
+
+  # LAN addresses come from the compiled registry: a host that moves must not
+  # need its proxy edited, and the registry is what the docs site already reads.
+  lanIp = name: config.fleet.inventory.hosts.${name}.network.lan_ip;
+
   landingPage = pkgs.writeTextDir "index.html" ''
     <!DOCTYPE html>
     <html lang="en">
@@ -278,7 +295,7 @@ in {
         # EXP-102: Canary MicroVM Reverse Proxy Dogfood (Model B)
         # Exposes dummy API from frieren-canary (192.168.83.10:8080) through hypervisor Nginx
         locations."/canary/" = {
-          proxyPass = "http://192.168.83.10:8080/";
+          proxyPass = "http://${lanIp "frieren-canary"}:8080/";
           extraConfig = ''
             proxy_connect_timeout 2s;
             proxy_read_timeout 5s;
@@ -295,7 +312,7 @@ in {
         # different host from the model (Eisen); they connect only via this
         # endpoint. The microVM has no direct LAN access to Eisen.
         locations."/eisen/" = {
-          proxyPass = "http://192.168.3.87/router/";
+          proxyPass = "http://${lanIp "eisen"}/router/";
           extraConfig = ''
             proxy_set_header Host "eisen.lan";
             proxy_buffering off;
@@ -325,15 +342,15 @@ in {
         sslCertificate = tlsCertificate;
         sslCertificateKey = tlsCertificateKey;
         locations."/" = {
-          proxyPass = "http://127.0.0.1:8222";
+          proxyPass = "http://127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT}";
           proxyWebsockets = true;
         };
         locations."/notifications/hub" = {
-          proxyPass = "http://127.0.0.1:3012";
+          proxyPass = "http://127.0.0.1:${toString config.services.vaultwarden.config.WEBSOCKET_PORT}";
           proxyWebsockets = true;
         };
         locations."/notifications/hub/negotiate" = {
-          proxyPass = "http://127.0.0.1:8222";
+          proxyPass = "http://127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT}";
         };
       };
 
@@ -355,7 +372,7 @@ in {
         sslCertificate = tlsCertificate;
         sslCertificateKey = tlsCertificateKey;
         locations."/" = {
-          proxyPass = "http://127.0.0.1:8123";
+          proxyPass = "http://127.0.0.1:${toString config.services.ha-stack.port}";
           proxyWebsockets = true;
         };
       };
@@ -388,19 +405,8 @@ in {
           # The compiled registry and this host's own name are passed in: the site
           # renders the same evaluated data the host enforces, and its status
           # badge is read from the registry instead of being typed into markup.
-          root = import ../../lib/aki-site.nix {
-            inherit pkgs;
-            inventory = config.fleet.inventory;
-            host = config.networking.hostName;
-          };
-          extraConfig = ''
-            gzip_static on;
-            open_file_cache max=1000 inactive=300s;
-            open_file_cache_valid 3600s;
-            open_file_cache_min_uses 1;
-            open_file_cache_errors on;
-            add_header Cache-Control "public, max-age=3600, stale-while-revalidate=86400" always;
-          '';
+          root = fleetSite;
+          extraConfig = staticCache.html;
         };
         # Content-hashed immutable static assets (Gap B).
         #
@@ -412,17 +418,8 @@ in {
         # loop; the equivalent class below generates one valid line. The match
         # is identical — exactly eight hex characters before the extension.
         locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
-          root = import ../../lib/aki-site.nix {
-            inherit pkgs;
-            inventory = config.fleet.inventory;
-            host = config.networking.hostName;
-          };
-          extraConfig = ''
-            gzip_static on;
-            open_file_cache max=1000 inactive=300s;
-            open_file_cache_valid 3600s;
-            add_header Cache-Control "public, max-age=31536000, immutable" always;
-          '';
+          root = fleetSite;
+          extraConfig = staticCache.hashed;
         };
         # Live mainframe telemetry (Gap A)
         locations."= /data/live.json" = {
@@ -446,7 +443,7 @@ in {
           }
         ];
         locations."/" = {
-          proxyPass = "http://127.0.0.1:8181";
+          proxyPass = "http://127.0.0.1:${toString config.services.fleetMonitors.port}";
           proxyWebsockets = true;
         };
       };
@@ -480,7 +477,7 @@ in {
           }
         ];
         locations."/" = {
-          proxyPass = "http://127.0.0.1:9091";
+          proxyPass = "http://127.0.0.1:${toString config.services.transmission.settings.rpc-port}";
           proxyWebsockets = true;
         };
       };
@@ -497,7 +494,7 @@ in {
           }
         ];
         locations."/" = {
-          proxyPass = "http://192.168.83.10:8080/";
+          proxyPass = "http://${lanIp "frieren-canary"}:8080/";
           extraConfig = ''
             proxy_connect_timeout 2s;
             proxy_read_timeout 5s;
@@ -519,7 +516,7 @@ in {
           }
         ];
         locations."/" = {
-          proxyPass = "http://127.0.0.1:13378";
+          proxyPass = "http://127.0.0.1:${toString config.services.audiobookshelf.port}";
           proxyWebsockets = true;
           extraConfig = ''
             client_max_body_size 500M;

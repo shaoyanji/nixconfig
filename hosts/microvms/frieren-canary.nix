@@ -12,6 +12,7 @@
   pkgs,
   ...
 }: let
+  user = import ../../modules/global/user.nix;
   subzeroclaw = pkgs.stdenv.mkDerivation {
     pname = "subzeroclaw";
     version = "0.1.0-unstable-2026-04";
@@ -107,7 +108,7 @@ in {
 
   users.users.devji = {
     isNormalUser = true;
-    home = "/home/devji";
+    home = "${user.home}";
     extraGroups = ["wheel"];
     openssh.authorizedKeys.keys =
       config.ssh.authorizedKeys.keys
@@ -137,7 +138,7 @@ in {
   # Seed SubZeroClaw agent configuration, skills, and self-modifying workspace
   system.activationScripts.subzeroclawSetup = {
     text = ''
-            mkdir -p /home/devji/.subzeroclaw/skills /home/devji/.subzeroclaw/logs /home/devji/workspace/subzeroclaw
+            mkdir -p ${user.home}/.subzeroclaw/skills ${user.home}/.subzeroclaw/logs ${user.home}/workspace/subzeroclaw
             # SubZeroClaw config: written unconditionally (the canary is
             # ephemeral; the config is managed, not user-owned). The runner
             # (SubZeroClaw, in this microVM) talks only to the host
@@ -147,30 +148,30 @@ in {
             # api_key "none": the router forwards it to Jev; Jev rejects it
             # and the router falls back to Laya (fine for the hi test). For
             # real Jev decisions, set the real key via a secret (never here).
-            cat << 'EOF' > /home/devji/.subzeroclaw/config
+            cat << 'EOF' > ${user.home}/.subzeroclaw/config
       api_key  = "none"
       endpoint = "http://192.168.83.1/eisen/v1/chat/completions"
       request_extra = {"model":"policy:auto"}
-      skills_dir = "/home/devji/.subzeroclaw/skills"
-      log_dir    = "/home/devji/.subzeroclaw/logs"
+      skills_dir = "${user.home}/.subzeroclaw/skills"
+      log_dir    = "${user.home}/.subzeroclaw/logs"
       EOF
 
-            if [ ! -f /home/devji/.subzeroclaw/skills/sandbox.md ]; then
-              cat << 'EOF' > /home/devji/.subzeroclaw/skills/sandbox.md
+            if [ ! -f ${user.home}/.subzeroclaw/skills/sandbox.md ]; then
+              cat << 'EOF' > ${user.home}/.subzeroclaw/skills/sandbox.md
       # Sandboxed Agent in NixOS MicroVM
       You are an autonomous agent running inside an isolated NixOS Cloud-Hypervisor MicroVM.
       Use the shell tool to run commands, inspect the environment, edit code, and compile software.
-      Your workspace contains the source code of this agent harness at `/home/devji/workspace/subzeroclaw`.
+      Your workspace contains the source code of this agent harness at `${user.home}/workspace/subzeroclaw`.
       You are free to explore, create files, write scripts, or modify your own C source code.
       EOF
             fi
 
-            if [ ! -f /home/devji/workspace/subzeroclaw/Makefile ]; then
-              cp -r ${subzeroclaw}/share/subzeroclaw/* /home/devji/workspace/subzeroclaw/ 2>/dev/null || true
-              chmod -R u+rw /home/devji/workspace/subzeroclaw/ 2>/dev/null || true
+            if [ ! -f ${user.home}/workspace/subzeroclaw/Makefile ]; then
+              cp -r ${subzeroclaw}/share/subzeroclaw/* ${user.home}/workspace/subzeroclaw/ 2>/dev/null || true
+              chmod -R u+rw ${user.home}/workspace/subzeroclaw/ 2>/dev/null || true
             fi
 
-            chown -R devji:users /home/devji/.subzeroclaw /home/devji/workspace 2>/dev/null || true
+            chown -R ${user.name}:users ${user.home}/.subzeroclaw ${user.home}/workspace 2>/dev/null || true
     '';
   };
 

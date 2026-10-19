@@ -33,6 +33,8 @@
     # Tool aliases
     alias cat='${pkgs.bat}/bin/bat -p'
     alias grep='${pkgs.ripgrep}/bin/rg'
+    alias generations='nixos-rebuild list-generations'
+    alias nix-generations='nixos-rebuild list-generations'
   '';
 
   # Minimal hook (no init scripts)

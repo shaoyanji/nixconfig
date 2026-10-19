@@ -46,10 +46,20 @@ in {
       description = "Home Assistant configuration and state directory";
     };
 
+    port = lib.mkOption {
+      type = lib.types.port;
+      default = 8123;
+      description = ''
+        Port Home Assistant listens on (written to `http.server_port`). The
+        nginx vhost and the firewall rule both read this value, so the port is
+        declared here and nowhere else.
+      '';
+    };
+
     openFirewall = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Open Home Assistant (port 8123) in firewall directly";
+      description = "Open {option}`port` in the firewall directly";
     };
 
     mqtt = {
@@ -147,6 +157,7 @@ in {
         # exposure registry). Without a trusted proxy HA rejects every proxied
         # request with "400: Bad Request" (host header not in trusted_domains).
         http = {
+          server_port = cfg.port;
           use_x_forwarded_for = true;
           trusted_proxies = ["127.0.0.1" "::1"];
         };
@@ -199,7 +210,7 @@ in {
       };
     };
     networking.firewall.allowedTCPPorts = lib.mkMerge [
-      (lib.mkIf cfg.openFirewall [8123])
+      (lib.mkIf cfg.openFirewall [cfg.port])
       (lib.mkIf (cfg.uptime-kuma.enable && cfg.uptime-kuma.openFirewall) [
         cfg.uptime-kuma.port
       ])

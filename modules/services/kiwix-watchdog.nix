@@ -107,7 +107,9 @@ in {
 
     endpoint = lib.mkOption {
       type = lib.types.str;
-      default = "http://127.0.0.1:8088";
+      # Derived from the server's own option, so moving Kiwix's port does not
+      # leave the watchdog probing a dead socket.
+      default = "http://127.0.0.1:${toString config.services.kiwix-serve.port}";
       description = "HTTP endpoint URL for the Kiwix server.";
     };
 

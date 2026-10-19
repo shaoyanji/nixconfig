@@ -20,6 +20,10 @@
     inventory = config.fleet.inventory;
     host = config.networking.hostName;
   };
+
+  # Same cache policy the HTTP vhost uses (modules/config/nginx/static-cache.nix):
+  # one store path, one set of cache directives.
+  staticCache = import ../config/nginx/static-cache.nix;
 in {
   options.services.udsStaticBridge = {
     enable = lib.mkEnableOption "declarative zero-TCP static documentation bridge via UNIX domain sockets";
@@ -59,23 +63,13 @@ in {
         ];
         locations."/" = {
           inherit (cfg) root;
-          extraConfig = ''
-            # Zero-runtime CPU compression via pre-compressed static assets
-            gzip_static on;
-
-            # Inode and open file descriptor cache for immutable Nix store assets
-            open_file_cache max=1000 inactive=300s;
-            open_file_cache_valid 3600s;
-            open_file_cache_min_uses 1;
-            open_file_cache_errors on;
-
-            # Declarative client cache directives
-            add_header Cache-Control "public, max-age=3600, stale-while-revalidate=86400" always;
-
-            # Zero-TCP IPC headers
-            add_header X-Bridge-Transport "UNIX-Domain-Socket" always;
-            add_header X-Bridge-Security "POSIX-DAC-Isolated" always;
-          '';
+          extraConfig =
+            staticCache.html
+            + ''
+              # Zero-TCP IPC headers (bridge-specific, so kept next to the link)
+              add_header X-Bridge-Transport "UNIX-Domain-Socket" always;
+              add_header X-Bridge-Security "POSIX-DAC-Isolated" always;
+            '';
         };
 
         # Content-hashed immutable static assets (Gap B).
@@ -88,12 +82,7 @@ in {
         # hosts/frieren/reverse-proxy.nix.
         locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
           inherit (cfg) root;
-          extraConfig = ''
-            gzip_static on;
-            open_file_cache max=1000 inactive=300s;
-            open_file_cache_valid 3600s;
-            add_header Cache-Control "public, max-age=31536000, immutable" always;
-          '';
+          extraConfig = staticCache.hashed;
         };
 
         # Live mainframe telemetry (Gap A)

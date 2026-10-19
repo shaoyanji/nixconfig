@@ -19,6 +19,9 @@
   lib,
   ...
 }: let
+  # Primary user constants (modules/global/user.nix is the single source).
+  user = import ../../modules/global/user.nix;
+
   # The backup whose repository the restore drill below verifies.
   resticBackup = config.services.restic.backups.frieren-local;
 
@@ -150,7 +153,7 @@
               echo "$MSG" >&2
               SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
               if [ ! -f "$SIMPLEX_RPC" ]; then
-                SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
+                SIMPLEX_RPC="${user.home}/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
               fi
               if [ -f "$SIMPLEX_RPC" ]; then
                 ${pythonWithWebsockets}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$MSG" || true
@@ -199,7 +202,7 @@
             # 4. Dispatch status report to SimpleX #Fleet
             SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
             if [ ! -f "$SIMPLEX_RPC" ]; then
-              SIMPLEX_RPC="/home/devji/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
+              SIMPLEX_RPC="${user.home}/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
             fi
             if [ -f "$SIMPLEX_RPC" ]; then
               ${pythonWithWebsockets}/bin/python3 "$SIMPLEX_RPC" --send-group "#Fleet" "$REPORT" || true
@@ -221,11 +224,11 @@
       echo "=== [$(date)] WARN: agy failed (credit exhaustion, quota, or execution error). Attempting fallback... ===" >&2
 
       # Tier 2: Freebuff Headless (autonomous multi-session broker)
-      if command -v freebuff-headless >/dev/null 2>&1 || [ -x "/home/devji/.local/bin/freebuff-headless" ]; then
+      if command -v freebuff-headless >/dev/null 2>&1 || [ -x "${user.home}/.local/bin/freebuff-headless" ]; then
         echo "=== [$(date)] Agent Cascade: Attempting Tier 2 (freebuff-headless) ==="
         local fb_bin
-        fb_bin="$(command -v freebuff-headless 2>/dev/null || echo "/home/devji/.local/bin/freebuff-headless")"
-        if "$fb_bin" -C /home/devji -t 600 "$prompt"; then
+        fb_bin="$(command -v freebuff-headless 2>/dev/null || echo "${user.home}/.local/bin/freebuff-headless")"
+        if "$fb_bin" -C ${user.home} -t 600 "$prompt"; then
           echo "=== [$(date)] Agent Cascade: Tier 2 (freebuff-headless) succeeded. ==="
           return 0
         fi
@@ -239,15 +242,15 @@
         hermes_bin="$(command -v hermes 2>/dev/null || echo "/run/current-system/sw/bin/hermes")"
 
         # Source hermes API keys & env directly from ~/.hermes/.env
-        if [ -f "/home/devji/.hermes/.env" ]; then
+        if [ -f "${user.home}/.hermes/.env" ]; then
           set -a
           # shellcheck disable=SC1091
-          source /home/devji/.hermes/.env 2>/dev/null || true
+          source ${user.home}/.hermes/.env 2>/dev/null || true
           set +a
-        elif [ -f "/home/devji/.config/hermes/hermes.env" ]; then
+        elif [ -f "${user.home}/.config/hermes/hermes.env" ]; then
           set -a
           # shellcheck disable=SC1091
-          source /home/devji/.config/hermes/hermes.env 2>/dev/null || true
+          source ${user.home}/.config/hermes/hermes.env 2>/dev/null || true
           set +a
         fi
 
@@ -259,10 +262,10 @@
       fi
 
       # Tier 4: Crush CLI agent (Charmbracelet agent)
-      if command -v crush >/dev/null 2>&1 || [ -x "/home/devji/.local/bin/crush" ]; then
+      if command -v crush >/dev/null 2>&1 || [ -x "${user.home}/.local/bin/crush" ]; then
         echo "=== [$(date)] Agent Cascade: Attempting Tier 4 (crush) ==="
         local crush_bin
-        crush_bin="$(command -v crush 2>/dev/null || echo "/home/devji/.local/bin/crush")"
+        crush_bin="$(command -v crush 2>/dev/null || echo "${user.home}/.local/bin/crush")"
         if "$crush_bin" run --quiet "$prompt"; then
           echo "=== [$(date)] Agent Cascade: Tier 4 (crush) succeeded. ==="
           return 0
@@ -278,20 +281,20 @@
   agyHandoffRunner = pkgs.writeShellScript "agy-handoff-runner" ''
     set -euo pipefail
 
-    HANDOFF_FILE="/home/devji/HANDOFF.md"
+    HANDOFF_FILE="${user.home}/HANDOFF.md"
 
     if [ ! -f "$HANDOFF_FILE" ]; then
-      echo "No HANDOFF.md found in /home/devji. Skipping execution."
+      echo "No HANDOFF.md found in ${user.home}. Skipping execution."
       exit 0
     fi
 
     echo "=== [$(date)] Found $HANDOFF_FILE. Preparing execution... ==="
-    ARCHIVE_DIR="/home/devji/.agents/handoffs"
+    ARCHIVE_DIR="${user.home}/.agents/handoffs"
     mkdir -p "$ARCHIVE_DIR"
     ARCHIVE_COPY="$ARCHIVE_DIR/HANDOFF-$(date +%Y%m%d_%H%M%S).md"
     cp "$HANDOFF_FILE" "$ARCHIVE_COPY"
 
-    cd /home/devji
+    cd ${user.home}
 
     # --- System One Decision Triage Preflight (Julia-1 & Laya) ---
     TRIAGE_REPORT="/tmp/systemone-handoff-triage.json"
@@ -326,20 +329,20 @@
   agySystemRunner = pkgs.writeShellScript "agy-system-runner" ''
     set -euo pipefail
 
-    SYSTEM_FILE="/home/devji/SYSTEM.md"
+    SYSTEM_FILE="${user.home}/SYSTEM.md"
 
     if [ ! -f "$SYSTEM_FILE" ]; then
-      echo "No SYSTEM.md found in /home/devji. Skipping execution."
+      echo "No SYSTEM.md found in ${user.home}. Skipping execution."
       exit 0
     fi
 
     echo "=== [$(date)] Found $SYSTEM_FILE. Preparing execution... ==="
-    ARCHIVE_DIR="/home/devji/.agents/system"
+    ARCHIVE_DIR="${user.home}/.agents/system"
     mkdir -p "$ARCHIVE_DIR"
     ARCHIVE_COPY="$ARCHIVE_DIR/SYSTEM-$(date +%Y%m%d_%H%M%S).md"
     cp "$SYSTEM_FILE" "$ARCHIVE_COPY"
 
-    cd /home/devji
+    cd ${user.home}
 
     # --- STEP 1: Deterministic Health & Self-Repair (Runs 100% locally with 0 API tokens) ---
     echo "=== [$(date)] Step 1: Performing deterministic service checks ==="
@@ -566,6 +569,10 @@ in {
     config = {
       ROCKET_ADDRESS = "127.0.0.1";
       ROCKET_PORT = 8222;
+      # Declared rather than defaulted: the reverse proxy interpolates this value
+      # (vault.frieren.lan /notifications/hub), and before this line :3012 existed
+      # exactly once in the tree — inside the nginx config, as a literal.
+      WEBSOCKET_PORT = 3012;
       DOMAIN = "http://vault.frieren.lan";
       SIGNUPS_ALLOWED = true;
     };
@@ -737,7 +744,7 @@ in {
         set -eu
         SRC="/Volumes/data/bin-aarch64/"
         DEST="devji@192.168.3.92:/volume1/Shared Library/bin-aarch64/"
-        KEY="/home/devji/.ssh/id_ed25519"
+        KEY="${user.home}/.ssh/id_ed25519"
         SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
 
         # Verify BurgerNAS is online before attempting rsync
@@ -800,9 +807,9 @@ in {
       Environment = [
         "SSH_CLIENT=127.0.0.1 1 1"
         "SSH_CONNECTION=127.0.0.1 1 127.0.0.1 22"
-        "HOME=/home/devji"
+        "HOME=${user.home}"
         "USER=devji"
-        "PATH=/home/devji/.nix-profile/bin:/etc/profiles/per-user/devji/bin:/run/current-system/sw/bin"
+        "PATH=${user.home}/.nix-profile/bin:/etc/profiles/per-user/${user.name}/bin:/run/current-system/sw/bin"
         "SHELL=/run/current-system/sw/bin/bash"
       ];
       ExecStart = "${pkgs.antigravity-cli}/bin/agy remote-control serve";
@@ -825,14 +832,14 @@ in {
         description = "Action-gated handoff runner (runs only on autonomous promotion candidates or manual trigger)";
         schedule = "*-*-* 03:00:00";
         command = agyHandoffRunner;
-        workingDirectory = "/home/devji";
+        workingDirectory = "${user.home}";
       };
       agy-nightly-system = {
         name = "agy-nightly-system";
         description = "Trigger-gated system health audit (Mon-Sat quiet reflex, Sunday comprehensive scorecard)";
         schedule = "*-*-* 05:00:00";
         command = agySystemRunner;
-        workingDirectory = "/home/devji";
+        workingDirectory = "${user.home}";
       };
       audible-phased-liberation = {
         name = "audible-phased-liberation";
@@ -845,7 +852,7 @@ in {
           windowDesc = "Nightly 00:00-02:50 CEST";
           nice = null;
         };
-        workingDirectory = "/home/devji";
+        workingDirectory = "${user.home}";
         lockFile = "/tmp/audible-liberation.lock";
         nice = 10;
         ioSchedulingClass = "best-effort";
@@ -859,7 +866,7 @@ in {
   # - Kelly-gated dual-model reflex tier: Julia-1 (144M) + Laya (421M) in series (< 30ms sweep).
   # - 0 System 2 tokens consumed: completely protects weekly Nemotron quota.
   # - Deterministic runtime fixes: WAL compaction, thermals, Btrfs snapshots, paperless ghost quarantine.
-  # - Automatic strategic handover: writes un-remediated anomalies directly to /home/devji/HANDOFF.md.
+  # - Automatic strategic handover: writes un-remediated anomalies directly to ${user.home}/HANDOFF.md.
   # ===========================================================================
   services.fleetGovernor = {
     enable = true;
@@ -946,8 +953,8 @@ in {
   # Eliminates known_hosts collisions and prompts for ephemeral test VMs
   programs.ssh.extraConfig = ''
     Host frieren-canary
-      HostName 192.168.83.10
-      User devji
+      HostName ${config.fleet.inventory.hosts.frieren-canary.network.lan_ip}
+      User ${user.name}
       StrictHostKeyChecking accept-new
       UserKnownHostsFile /var/lib/microvms/.known_hosts
       IdentityFile ~/.ssh/id_ed25519

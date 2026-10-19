@@ -282,6 +282,7 @@ storage_layout = "119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots)
 tailscale = true
 tailscale_hostname = "eisen"
 ssh_alias = "eisen"
+lan_ip = "192.168.3.87"
 
 [hosts.eisen.software]
 module_chain = "globalModulesNixos"
@@ -1309,6 +1310,7 @@ storage_type = "microvm disk image"
 
 [hosts.frieren-canary.network]
 tailscale = false
+lan_ip = "192.168.83.10"
 
 [hosts.frieren-canary.software]
 module_chain = "microvm"

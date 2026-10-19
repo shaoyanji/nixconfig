@@ -33,6 +33,18 @@
   port = 8080;
   modelDir = "/mnt/storage/models";
 
+  # SSE proxy policy, defined once: three vhosts (the model API, /eisen/ and
+  # /router/) forwarded to this stack and each carried its own copy of it.
+  # Streaming must not be buffered, and a cold model load outlives nginx's
+  # 60 s default by far.
+  sseProxy = ''
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
+    client_max_body_size 0;
+  '';
+
   tc = config.services.tailscale.package;
 
   # Gate both serve paths on the tailnet backend actually being connected.
@@ -396,15 +408,7 @@ in {
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString port}";
         proxyWebsockets = false;
-        extraConfig = ''
-          # Token streaming: never buffer the SSE response.
-          proxy_buffering off;
-          proxy_cache off;
-          # Model swaps can take minutes on first load — don't time out.
-          proxy_read_timeout 3600s;
-          proxy_send_timeout 3600s;
-          client_max_body_size 0;
-        '';
+        extraConfig = sseProxy;
       };
     };
   };
@@ -418,13 +422,7 @@ in {
   services.nginx.virtualHosts."eisen.lan".locations."/eisen/" = {
     proxyPass = "http://127.0.0.1:80/router/";
     proxyWebsockets = false;
-    extraConfig = ''
-      proxy_buffering off;
-      proxy_cache off;
-      proxy_read_timeout 3600s;
-      proxy_send_timeout 3600s;
-      client_max_body_size 0;
-    '';
+    extraConfig = sseProxy;
   };
 
   # --- Router: http://eisen.lan/router/* -> 127.0.0.1:8000 ----------------

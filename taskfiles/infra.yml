@@ -411,6 +411,18 @@ tasks:
     cmds:
       - task infra:rollback:apply:host:{{.HOST}}
 
+  infra:generations:
+    desc: List NixOS system generations with flake commit revisions
+    cmds:
+      - nixos-rebuild list-generations
+
+  infra:generations:host:*:
+    desc: List NixOS system generations on a remote host with flake commit revisions
+    vars:
+      HOST: '{{index .MATCH 0}}'
+    cmds:
+      - ssh {{.HOST}} "nixos-rebuild list-generations"
+
   infra:ssh:rotate-cert:
     desc: Sign a fresh 90-day SSH certificate for the current user
     cmds:

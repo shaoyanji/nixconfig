@@ -455,9 +455,9 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 ### Quick Reference
 - `AGENTS.md` - Agent routing helpers and task namespace summary
 - `inventory.toml` - Canonical 31-device fleet inventory source of truth
-- `docs/generated/fleet-inventory.md` - Fleet catalog + per-host pages, built by `lib/docs.nix`
-- `docs/generated/modules-registry.md` - Knob registry, built by `lib/docs.nix`
-- `docs-site/` - HTML docs site (`nix build .#docs-site`), pages from `.#docs`
+- `docs/fleet-inventory.md`, `docs/modules-registry.md` - pointer pages; the generated
+  catalog + knob registry are `nix build .#docs` (a store path, never committed)
+- `lib/aki-site.nix` - the rendered site (`nix build .#fleet-docs-site`; `task docs:site`)
 - `docs/task-control-plane.md` - Task namespace policy and workflow examples
 - `docs/frieren-access.md` - frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports)
 - `taskfiles/README.md` - Taskfile ownership map and shard reference

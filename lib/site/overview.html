@@ -1,0 +1,55 @@
+<h2>Fleet Overview</h2>
+<p style="margin: 0.75rem 0; color: var(--text-muted);">
+  Every figure below is evaluated at build time from
+  <code>inventory.toml</code>, <code>closure-budgets.toml</code>,
+  <code>.agents/skills/*/SKILL.md</code> and the living documents. Nothing on
+  this page is typed by hand.
+</p>
+
+<div class="card-grid">
+  <div class="card">
+    <h4>Fleet Registry</h4>
+    <p><strong>{{devices}} devices</strong></p>
+    <p><small style="color: var(--text-muted);">{{active}} active &middot; {{preserved}} preserved &middot; {{wip}} WIP</small></p>
+    <p><small style="color: var(--green);">{{nixHosts}} Nix &middot; {{external}} external</small></p>
+  </div>
+  <div class="card">
+    <h4>Knowledge Projection</h4>
+    <p><strong>{{nodes}} nodes &middot; {{edges}} edges</strong></p>
+    <p><small style="color: var(--text-muted);">{{graphHosts}} hosts &middot; {{graphSkills}} skills &middot; {{graphDocs}} docs</small></p>
+    <p><small style="color: var(--heading);">{{notes}} notes readable in-site</small></p>
+  </div>
+  <div class="card">
+    <h4>Closure Budgets</h4>
+    <p><strong>{{budgets}} measured {{budgetWord}}</strong></p>
+    <p><small style="color: var(--text-muted);">{{budgetTotal}} total allowed</small></p>
+    <p><small style="color: var(--heading);">largest: {{budgetMax}}</small></p>
+  </div>
+  <div class="card">
+    <h4>Declared Services</h4>
+    <p><strong>{{services}} key services</strong></p>
+    <p><small style="color: var(--text-muted);">from the registry's per-host software declarations</small></p>
+    <p><small style="color: var(--yellow, #e0af68);">{{uncovered}} of {{activeNixHosts}} active Nix hosts lack a baseline</small></p>
+  </div>
+</div>
+
+<h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--heading);">Distribution</h3>
+<table>
+  <thead><tr><th>Kind</th><th>Status</th><th>Architecture</th><th>Devices</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>{{kindRow}}</td>
+      <td>{{statusRow}}</td>
+      <td>{{archRow}}</td>
+      <td><strong>{{devices}}</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">Where to look</h3>
+<p>
+  <button class="tab-btn" url="data/inventory.json">Fleet Inventory</button>
+  <button class="tab-btn" url="data/kg.json">Knowledge Graph</button>
+  <button class="tab-btn" url="data/notes.json">Notes</button>
+  <button class="tab-btn" url="data/closures.json">Closure Budgets</button>
+</p>

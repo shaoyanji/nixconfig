@@ -20,33 +20,11 @@
         source ${../config/secrets.nu}
       '';
 
-      # Stage 2: config.nu — executed second for UI, completions, hooks, modules
+      # Stage 2: config.nu — executed second for UI, completions, hooks, modules.
+      # The UI/history/completion settings are a real `.nu` file (they are
+      # nushell, not Nix); what stays here is only what needs interpolation.
       extraConfig = ''
-        let carapace_completer = {|spans|
-          carapace $spans.0 nushell $spans | from json
-        }
-
-        $env.config = {
-          show_banner: false
-          edit_mode: 'vi'
-          history: {
-            max_size: 100_000
-            sync_on_enter: true
-            file_format: "sqlite"
-            isolation: false
-          }
-          completions: {
-            case_sensitive: false
-            quick: true
-            partial: true
-            algorithm: "fuzzy"
-            external: {
-              enable: true
-              max_results: 100
-              completer: $carapace_completer
-            }
-          }
-        }
+        source ${../config/nu/config.nu}
 
         # User workflow modules (tracked in git under modules/config/nu/)
         source ${../config/nu/llm.nu}

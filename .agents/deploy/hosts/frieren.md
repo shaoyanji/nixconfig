@@ -38,7 +38,10 @@ NAS server (Samba, NFS, Jellyfin, Paperless-ngx, Unbound DNS + Pi-hole, aria2) a
 Two separate defects made `nginx.service` restart into a crash loop on
 2026-10-19, each one AFTER the system had switched (so the rollback is
 `/nix/var/nix/profiles/system-<N>-link/bin/switch-to-configuration switch`, not
-`nixos-rebuild --rollback`, which needs a channel):
+`nixos-rebuild --rollback`, which needs a channel).
+**CAUTION**: Always identify `<N>` with `task infra:generations` or `nixos-rebuild list-generations`!
+Never use raw `ls /nix/var/nix/profiles/` — lexicographical sorting puts `system-99-link`
+below `system-157-link`, which causes inadvertent deep rollbacks that disable hardware drivers (like `dlm.service`).
 
 1. **`{8}` in a location key** was emitted as `location ~* \.[a-f0-9] {` +
    `8` + `}` — nginx: `unexpected "}"`. Both occurrences

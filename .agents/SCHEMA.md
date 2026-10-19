@@ -11,7 +11,7 @@ Machine-enforced where possible:
 | :--- | :--- |
 | Skill frontmatter, description length, body budget | `lib/skills.nix` → `checks.<system>.skills-schema` |
 | Every tracked `.toml` parses | `task checks:toml:lint` |
-| Generated docs match the compiled registry | `task checks:docs:sync` |
+| Generated docs are never committed | `.gitignore` + review — `.#docs` is a store path (`docs/docs-pipeline-audit.md`) |
 | Task graph (duplicate keys, dangling refs) | `task checks:tasks` |
 | Everything else here | review; `task checks:docs:budget` prints the counts |
 
@@ -21,8 +21,8 @@ Machine-enforced where possible:
 
 | Fact class | Canonical home | Everyone else links |
 | :--- | :--- | :--- |
-| Fleet membership, hardware, status | `inventory.toml` (compiled by `lib/inventory.nix`) | `.#inventory`, `docs/generated/` |
-| Optional profiles / services / knobs | `modules.toml` | `docs/generated/modules-registry.md` |
+| Fleet membership, hardware, status | `inventory.toml` (compiled by `lib/inventory.nix`) | `.#inventory`, `.#docs` (`nix build`) |
+| Optional profiles / services / knobs | `modules.toml` | `.#docs` → `modules-registry.md` |
 | What is executable | `taskfiles/*.yml` | `AGENTS.md`, skills |
 | What a host runs | `hosts/<host>/*.nix` | `MANUAL.md` (service map) |
 | Why a design exists | `ARCHITECTURE.md` | `EXPERIMENTS.md` evidence links |
@@ -44,7 +44,8 @@ itself within a month.
 | **Proposals** | `ARCHITECTURE.md` | 600 lines | P0–P3 proposals, decisions, exit criteria |
 | **Studies** | `EXPERIMENTS.md` | 80 lines/entry | mode, evidence, why not prod |
 | **Ledger** | `AUDIT.md` | 150 lines | current state + dated entries, newest first |
-| **Queue** | `TODO.md`, `HANDOFF.md` | 150 lines each | open items only, priority-ordered |
+| **Queue** | `TODO.md` | 150 open items / 300 lines | open items only, priority-ordered |
+| **Queue** | `HANDOFF.md` | 150 lines | open items only, priority-ordered |
 | **Runbook** | `.agents/deploy/**`, `docs/*.md` | 400 lines | repeatable procedure |
 | **Skill** | `.agents/skills/*/SKILL.md` | 400 lines | routing + procedure, not a novel |
 | **History** | `docs/history/*.md` | unlimited | superseded narrative, never linked as current |
@@ -52,6 +53,13 @@ itself within a month.
 Over budget is a signal to move detail to `docs/` and leave a pointer — not to
 raise the budget. A living document that grows monotonically is not a manual,
 it is a diary.
+
+A **queue** is counted twice, because a queue is judged by what is still *open*:
+`TODO.md` allows 150 unchecked items (`- [ ]`) **and** 300 lines in total. Checked
+items cost against the total and never against the open budget — deleting the
+record of finished work to make room is exactly what the split forbids. The gate
+(`checks.<system>.docs-budget`) and the human view (`task ops:docs:budget`) print
+both numbers.
 
 ## 3. Status vocabulary (use these exact words)
 

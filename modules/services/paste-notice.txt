@@ -1,0 +1,3 @@
+pb — fleet paste bin.
+Upload: pipe stdin or pass a file to 'pb' (see ~/.local/bin/pb).
+Pastes are served at /<name>, e.g. http://paste.frieren.lan/ab12cd34

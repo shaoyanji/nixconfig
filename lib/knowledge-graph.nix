@@ -6,7 +6,7 @@
 #
 #   hosts   <- inventory.toml (compiled by lib/inventory.nix)
 #   skills  <- .agents/skills/*/SKILL.md (compiled by lib/skills.nix)
-#   docs    <- root living documents + docs/*.md (markdown, heading only)
+#   docs    <- living documents, docs/*.md, .agents/**/*.md, taskfiles/*.md
 #
 # Edges are mentions, which are cheap and honest ("this file names that thing").
 # No embedding, no LLM, no server. The Cypher export exists so an external Neo4j
@@ -32,16 +32,43 @@
     "README.md"
   ];
 
-  docsDir = root + "/docs";
-  docFiles = map (f: docsDir + "/${f}") (
-    builtins.attrNames (
-      lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".md" n)
-      (builtins.readDir docsDir)
-    )
-  );
+  # Markdown files directly inside a directory (empty when it does not exist).
+  mdIn = dir:
+    if builtins.pathExists dir
+    then
+      map (n: dir + "/${n}") (
+        builtins.attrNames (
+          lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".md" n) (builtins.readDir dir)
+        )
+      )
+    else [];
 
-  # `docs/generated/` is a build artifact (checks:docs:sync owns it); it is not
-  # a knowledge source and would only add duplicate edges.
+  # Markdown one level deeper — `.agents/deploy/hosts/*.md`.
+  mdInSubdirs = dir:
+    if builtins.pathExists dir
+    then
+      lib.concatMap (sub: mdIn (dir + "/${sub}")) (
+        builtins.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir dir))
+      )
+    else [];
+
+  # The doc set is every markdown file that is a document: the living documents,
+  # `docs/*.md`, the agent contract (`.agents/{README,SCHEMA}.md`, `.agents/deploy/**`)
+  # and the taskfile ownership map. The last three were rendered ONLY by the
+  # retired Python site (`docs-site/`) — the split that made the page list a
+  # second source of truth. One projection now: if a file is a document, it is a
+  # node here, and the site renders it.
+  docFiles =
+    mdIn (root + "/docs")
+    ++ mdIn (root + "/.agents")
+    ++ mdIn (root + "/.agents/deploy")
+    ++ mdInSubdirs (root + "/.agents/deploy")
+    ++ mdIn (root + "/taskfiles");
+
+  # `docs/generated/` is a build artifact and not committed (see
+  # docs/docs-pipeline-audit.md §4); it is not a knowledge source and would only
+  # add duplicate edges. The filter below is what keeps it out even if a local
+  # build output is checked out by hand.
   files = builtins.filter builtins.pathExists (rootDocs ++ docFiles);
 
   rel = p: let

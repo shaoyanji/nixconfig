@@ -1,8 +1,13 @@
 {
   pkgs,
   config,
+  lib,
   ...
-}: {
+}:
+# Linux only. The desktop role is shared with nix-darwin (cassini), where a
+# Wayland compositor does not exist and `swayidle` declares no darwin platform —
+# evaluating this module there killed the whole host eval, not just this stack.
+lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
   # Use nixpkgs' niri (cached on cache.nixos.org) instead of niri-flake's
   # self-built niri-stable, which pins libdisplay-info_0_2 (removed from
   # nixpkgs, upstream issue sodiboo/niri-flake#1851) and isn't in any cache.

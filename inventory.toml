@@ -283,6 +283,7 @@ tailscale = true
 tailscale_hostname = "eisen"
 ssh_alias = "eisen"
 lan_ip = "192.168.3.87"
+mac = "00:e0:22:1c:bb:ed"
 
 [hosts.eisen.software]
 module_chain = "globalModulesNixos"

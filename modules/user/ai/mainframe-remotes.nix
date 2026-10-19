@@ -283,30 +283,36 @@ in {
       hermes-terminal
     ];
 
-    xdg.desktopEntries.agy-remote = {
-      name = "Antigravity Remote";
-      genericName = "Mainframe Coding Agent";
-      comment = "Connect to Antigravity on frieren.lan";
-      exec = "agy-terminal";
-      icon = "utilities-terminal";
-      terminal = false;
-      categories = [
-        "Development"
-        "Utility"
-      ];
-    };
+    # `xdg.desktopEntries` is a Linux-only module (home-manager asserts on its
+    # platform), and this module is shared with nix-darwin: on cassini the
+    # assertion failed the whole home profile. The remote launchers still
+    # install on darwin; only the menu entries are dropped.
+    xdg = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+      desktopEntries.agy-remote = {
+        name = "Antigravity Remote";
+        genericName = "Mainframe Coding Agent";
+        comment = "Connect to Antigravity on frieren.lan";
+        exec = "agy-terminal";
+        icon = "utilities-terminal";
+        terminal = false;
+        categories = [
+          "Development"
+          "Utility"
+        ];
+      };
 
-    xdg.desktopEntries.hermes-remote = {
-      name = "Hermes Remote";
-      genericName = "Mainframe Hermes Agent";
-      comment = "Connect to Hermes Agent on frieren.lan";
-      exec = "hermes-terminal";
-      icon = "utilities-terminal";
-      terminal = false;
-      categories = [
-        "Development"
-        "Utility"
-      ];
+      desktopEntries.hermes-remote = {
+        name = "Hermes Remote";
+        genericName = "Mainframe Hermes Agent";
+        comment = "Connect to Hermes Agent on frieren.lan";
+        exec = "hermes-terminal";
+        icon = "utilities-terminal";
+        terminal = false;
+        categories = [
+          "Development"
+          "Utility"
+        ];
+      };
     };
   };
 }

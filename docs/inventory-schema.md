@@ -30,12 +30,21 @@ errors** (no `freeformType`), so a typo fails evaluation instead of vanishing,
 and a wrong type (`managed = "yes"`) is a hard error rather than a truthy
 string.
 
+That direction matters when adding a field: the schema is the truth and the TOML
+is its reflection. Declare the option here **first** — a row added to
+`inventory.toml` alone is not "inert data", it is
+`error: The option `hosts.<h>.network.<field>' does not exist`, and nothing may
+read the TOML directly anyway: consumers take `.#inventory` (or
+`config.fleet.inventory`), which is the compiled, validated record. `network.mac`
+is the worked example — the WoL task used to spell the address in shell; it now
+reads `hosts.<h>.network.mac` from the compiled artifact.
+
 | Section | Notes |
 | :--- | :--- |
 | `[metadata]` | `title`, `description`, `version`, `canonical_repo`, plus the derived counts (see below) |
 | `[hosts.<name>]` | `hostname` (defaults to the key), `kind` (`nixos`/`darwin`/`home`/`external`), `arch`, `status` (`active`/`preserved`/`wip`), `role`, `category`, `users`, `flake`, `managed`, `ci`, `is_nix`, `system_type`, `notes` |
 | `[hosts.<name>.hardware]` | `model`, `cpu`, `gpu`, `ram`, `display`, `battery`, `storage_type`, `storage_layout` |
-| `[hosts.<name>.network]` | `lan_ip`, `tailscale_ip`, `tailscale_hostname`, `ssh_alias`, `domain`, `gemini_url`, `gopher_url`, `tailscale` |
+| `[hosts.<name>.network]` | `lan_ip`, `mac`, `tailscale_ip`, `tailscale_hostname`, `ssh_alias`, `domain`, `gemini_url`, `gopher_url`, `tailscale` |
 | `[hosts.<name>.software]` | `module_chain`, `impermanence`, `key_services`, `traits` |
 | `[hosts.<name>.persona]` | `title`, `system_prompt_hint`, `compute_tier`, `allowed_tasks`, `constraints` |
 

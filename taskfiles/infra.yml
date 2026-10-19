@@ -336,6 +336,59 @@ tasks:
           ACTION="{{.ACTION}}" bash scripts/task/activate-host.sh "$h" || fail=1
         done
         exit $fail
+  infra:wol:eisen:
+    desc: Wake Eisen (workstation) via Wake-on-LAN, address read from the compiled inventory
+    summary: >
+      The MAC and the broadcast network are host facts, so they are read from
+      `.#inventory.hosts.eisen.network.{mac,lan_ip}` — compiled by
+      `lib/inventory.nix` from `inventory.toml`, which is the reflection. Nothing
+      is spelled twice here: a re-cased NIC edit is a data edit.
+
+      Exit 0 means the magic packets were handed to the kernel, NOT that the
+      machine answered — follow with a ping before assuming it booted.
+    cmds:
+      - |
+        set -euo pipefail
+        mac="$(nix eval --raw .#inventory.hosts.eisen.network.mac)"
+        ip="$(nix eval --raw .#inventory.hosts.eisen.network.lan_ip)"
+        if [ -z "$mac" ]; then
+          echo "infra:wol:eisen: hosts.eisen.network.mac is empty in the inventory" >&2
+          exit 1
+        fi
+        if [ -z "$ip" ]; then
+          echo "infra:wol:eisen: hosts.eisen.network.lan_ip is empty in the inventory" >&2
+          exit 1
+        fi
+        python3 - "$mac" "$ip" <<'PY'
+        import socket, sys
+
+        mac, ip = sys.argv[1], sys.argv[2]
+        magic = b"\xff" * 6 + bytes.fromhex(mac.replace(":", "").replace("-", "")) * 16
+        bcast = ip.rsplit(".", 1)[0] + ".255"
+        sent = 0
+        for iface in ("enp1s0", "wlp2s0", "enp0s20f0u2u1i5"):
+            for port in (9, 7):
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                    s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                    try:
+                        s.setsockopt(socket.SOL_SOCKET, 25, iface.encode())  # SO_BINDTODEVICE
+                    except OSError:
+                        pass  # no such NIC here; the default route still carries it
+                    for dest in (bcast, "255.255.255.255"):
+                        try:
+                            s.sendto(magic, (dest, port))
+                            sent += 1
+                        except OSError:
+                            pass
+        if not sent:
+            sys.exit("infra:wol:eisen: no interface accepted the magic packet")
+        print(f"WoL magic packet -> eisen {mac} via {bcast} ({sent} sends)")
+        PY
+
+  infra:wol:host:eisen:
+    desc: Alias for infra:wol:eisen
+    cmds:
+      - task infra:wol:eisen
 
   infra:deploy:host:netbook:
     desc: Push configuration, switch, and validate netbook remotely

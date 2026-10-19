@@ -9,6 +9,14 @@ description: Check the health and current state of the Eisen LLM stack — which
 **Use when:** before running a generation, before switching models, when something returns a 429 / timeout / 502, or when you need to know what the stack is doing.
 **Pick me over:** `infra` (host lifecycle) when the question is specifically "what is the LLM stack doing right now?"
 
+## Power & Wake-on-LAN
+
+If Eisen is powered off, wake it from Frieren (or any LAN node) via Wake-on-LAN:
+
+```bash
+task infra:wol:eisen
+```
+
 ## Quick status (one pass)
 
 ```bash

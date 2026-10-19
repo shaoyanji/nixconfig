@@ -11,7 +11,7 @@
 # Edges are mentions, which are cheap and honest ("this file names that thing").
 # No embedding, no LLM, no server. The Cypher export exists so an external Neo4j
 # can be fed in one command if the graph ever outgrows `jq`; it does not imply a
-# Neo4j process on this host (see ARCHITECTURE.md P3).
+# Neo4j process on this host (see the `p3-graph-query` note in AGENTS.nix).
 {
   lib,
   inventory,
@@ -21,14 +21,15 @@
 
   hostNames = builtins.attrNames inventory.hosts;
 
+  # ARCHITECTURE.md, TODO.md, HANDOFF.md and EXPERIMENTS.md moved into
+  # AGENTS.nix (2026-10-19) and are now <=10-line pointers; indexing a pointer
+  # would add a doc node with no content. The notes are a separate projection
+  # (`lib/agents-notes.nix`, `.#agentsNotes`, `task ops:notes`) so this graph
+  # keeps its host/skill/doc semantics and its native-builder parity.
   rootDocs = map (f: root + "/${f}") [
     "AGENTS.md"
     "MANUAL.md"
-    "ARCHITECTURE.md"
     "AUDIT.md"
-    "TODO.md"
-    "HANDOFF.md"
-    "EXPERIMENTS.md"
     "README.md"
   ];
 

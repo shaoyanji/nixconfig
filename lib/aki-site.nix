@@ -610,9 +610,14 @@
         <p style="margin: 0.75rem 0; color: var(--text-muted);">
           ${toString (builtins.length noteIndex)} notes compiled by
           <code>lib/knowledge-graph.nix</code> from living documents and
-          <code>.agents/skills/*/SKILL.md</code>. Each opens as a static slice that
-          contains the note's own text — the site reads the file at build time,
-          so there is no repository link to rot and no second copy to drift.
+          <code>.agents/skills/*/SKILL.md</code>, plus the narrative notes in
+          <code>AGENTS.nix</code> (decisions, queue, design studies). Each opens
+          as a static slice that contains the note's own text — the site renders
+          it at build time, so there is no repository link to rot and no second
+          copy to drift.
+        </p>
+        <p style="margin-bottom: 0.75rem;">
+          <button class="tab-btn" url="data/agents-notes.json">Agent notes (AGENTS.nix)</button>
         </p>
 
         <div class="card-grid">
@@ -650,6 +655,80 @@
       '';
     };
   };
+
+  # AGENTS.nix notes index + one static slice per note. These are not graph
+  # nodes: the note is the unit, so the page lists it directly and the slice
+  # carries its own rendered text (filled by injectNotes at build time).
+  agentsNotesJson = builtins.toJSON {
+    "#breadcrumbs" = {textContent = "fleet / notes / agents";};
+    "#sidebar-pane" = {innerHTML = sidebarButtons;};
+    "#detail-pane" = {
+      innerHTML = ''
+        <h2>Agent notes — <code>AGENTS.nix</code></h2>
+        <p style="margin: 0.75rem 0; color: var(--text-muted);">
+          ${toString agentsNotes.counts.total} notes
+          (${toString agentsNotes.counts.open} open, ${toString agentsNotes.counts.leaves} leaves)
+          compiled by <code>lib/agents-notes.nix</code>. A note with refs is
+          distilled onto the code it affects; a leaf keeps the original intent in
+          prose. Query them with <code>task ops:notes</code> or one of the
+          <code>ops:notes:*</code> tasks; this page is the rendered view.
+        </p>
+        <table style="margin-top: 1.5rem;">
+          <thead>
+            <tr><th>Note</th><th>Status</th><th>Kind</th><th>Refs</th></tr>
+          </thead>
+          <tbody>
+            ${lib.concatMapStringsSep "\n" (e: ''
+            <tr>
+              <td><button class="side-btn" style="padding:0;border:none;color:var(--heading);cursor:pointer;text-align:left;" url="data/agents-notes/${e.id}.json">${escH e.title}</button></td>
+              <td>${escH e.status}</td>
+              <td>${escH e.kind}</td>
+              <td>${toString (builtins.length (e.refs.hosts ++ e.refs.modules ++ e.refs.tasks ++ e.refs.docs))}</td>
+            </tr>
+          '')
+          (lib.sort (a: b: a.id < b.id) (lib.attrValues agentsNotes.notes))}
+          </tbody>
+        </table>
+      '';
+    };
+  };
+
+  agentNoteSlices =
+    lib.mapAttrsToList (id: e: let
+      metaRows =
+        [["status" e.status] ["kind" e.kind]]
+        ++ lib.optional (e.priority != null) ["priority" e.priority]
+        ++ lib.optional (e.date != null) ["updated" e.date]
+        ++ lib.optional (e.leaf) ["trace" "leaf (no code refs; verbose intent)"];
+      refRows =
+        lib.optional (e.refs.hosts != []) ["hosts" (lib.concatStringsSep ", " e.refs.hosts)]
+        ++ lib.optional (e.refs.modules != []) ["modules" (lib.concatStringsSep ", " e.refs.modules)]
+        ++ lib.optional (e.refs.tasks != []) ["tasks" (lib.concatStringsSep ", " e.refs.tasks)]
+        ++ lib.optional (e.refs.docs != []) ["docs" (lib.concatStringsSep ", " e.refs.docs)]
+        ++ lib.optional (e.links != []) ["related" (lib.concatStringsSep ", " e.links)];
+      row = r: ''<tr><th>${escH (builtins.head r)}</th><td><code>${escH (builtins.elemAt r 1)}</code></td></tr>'';
+    in {
+      name = "data/agents-notes/${id}.json";
+      file = pkgs.writeText "agent-note-${nodeSlug id}.json" (builtins.toJSON {
+        "#breadcrumbs" = {textContent = "fleet / notes / ${id}";};
+        "#sidebar-pane" = {innerHTML = sidebarButtons;};
+        "#detail-pane" = {
+          innerHTML = ''
+            <h2>${escH e.title}</h2>
+            <p style="margin: 0.75rem 0; color: var(--text-muted);">${escH e.summary}</p>
+            <table><tbody>
+              ${lib.concatMapStringsSep "\n" row (metaRows ++ refRows)}
+            </tbody></table>
+            <div class="note"><!--KG_NOTE--></div>
+            <p style="margin-top: 1.5rem;">
+              <button class="tab-btn" url="data/agents-notes.json">&larr; All agent notes</button>
+              <button class="tab-btn" url="data/notes.json">Docs &amp; skills</button>
+            </p>
+          '';
+        };
+      });
+    })
+    agentsNotes.notes;
 
   # Knowledge Graph slice (Gap D)
   kgJson = builtins.toJSON {
@@ -767,6 +846,12 @@
     ty = builtins.head sep;
   in "data/kg/${ty}-${nodeSlug id}.json";
 
+  # AGENTS.nix notes are a separate projection from the graph (they have no
+  # repository file to index): decisions, queue items and design studies,
+  # compiled and validated by lib/agents-notes.nix. They use the same
+  # build-time markdown renderer and the same static-slice navigation as a doc.
+  agentsNotes = import ./agents-notes.nix {inherit lib;};
+
   # Doc and skill nodes carry their own text into their slice. The note is read
   # from the repository at evaluation time, shipped as data next to the slice,
   # and rendered by the build step below — so "open the note" is a transition
@@ -806,7 +891,13 @@
       path = noteFile n;
       text = stripFrontmatter (builtins.readFile (root + "/${noteFile n}"));
     })
-    (builtins.filter (n: n ? path) noteNodes);
+    (builtins.filter (n: n ? path) noteNodes)
+    ++ lib.mapAttrsToList (id: _: {
+      slice = "data/agents-notes/${id}.json";
+      path = "AGENTS.nix#${id}";
+      text = agentsNotes.sitePages.${id};
+    })
+    agentsNotes.notes;
 
   # Degree and incident edges computed once here rather than in the browser:
   # the slice a click lands on must already contain its neighbours, because the
@@ -1044,6 +1135,12 @@ in
     cp ${pkgs.writeText "inventory.json" inventoryJson} $out/data/inventory.json
     cp ${pkgs.writeText "kg.json" kgJson} $out/data/kg.json
     cp ${pkgs.writeText "notes.json" notesJson} $out/data/notes.json
+    cp ${pkgs.writeText "agents-notes.json" agentsNotesJson} $out/data/agents-notes.json
+    mkdir -p $out/data/agents-notes
+
+    ${lib.concatStringsSep "\n" (
+      map (s: "cp ${s.file} $out/${s.name}") agentNoteSlices
+    )}
     cp ${pkgs.writeText "closures.json" closuresJson} $out/data/closures.json
     cp ${pkgs.writeText "live.json" fallbackLiveJson} $out/data/live.json
     cp ${pkgs.writeText "kg-graph.json" kgGraphJson} $out/data/kg-graph.json
@@ -1064,5 +1161,5 @@ in
     ${injectNotesCmd}
 
     # Pre-compress static assets for Nginx gzip_static (zero runtime CPU)
-    gzip -9k $out/index.html $out/*.js $out/*.css $out/data/*.json $out/data/kg/*.json
+    gzip -9k $out/index.html $out/*.js $out/*.css $out/data/*.json $out/data/kg/*.json $out/data/agents-notes/*.json
   ''

@@ -443,16 +443,15 @@ tasks:
         bash scripts/task/kg-ask.sh "what touches $h"
 
   ops:docs:budget:
-    desc: Check living documents against the SCHEMA.md budgets (queues count open items)
+    desc: Check living documents against the SCHEMA.md budgets (stubs stay stubs)
     summary: >
       Line counts for the living documents; exits 1 when one exceeds its budget.
       Budgets are in .agents/SCHEMA.md §2. Over budget means "move detail to
       docs/ and leave a pointer", not "raise the number".
-      TODO.md is a QUEUE and is judged twice: at most 150 unchecked items
-      (`- [ ]`) and at most 300 lines in total. Checked items are the record that
-      the work happened, so they cost against the total but not against the open
-      budget — deleting them to make room is exactly what this rule forbids.
-      Prints both counters for the queue and one count per prose document.
+      ARCHITECTURE.md, TODO.md, HANDOFF.md and EXPERIMENTS.md moved into
+      AGENTS.nix (2026-10-19) and are now one-screen pointers; this gate fails
+      if one grows past 10 lines or stops naming AGENTS.nix. Narrative work
+      goes to `task ops:notes`, not back into a root markdown file.
     cmds:
       - |
         fail=0
@@ -480,12 +479,27 @@ tasks:
             echo "ok    $f: $open open / $maxopen, $total total / $maxtotal"
           fi
         }
+        stub() {
+          f="$1"; max=10
+          if [ ! -f "$f" ]; then echo "MISSING $f"; fail=1; return; fi
+          n=$(wc -l < "$f")
+          if [ "$n" -gt "$max" ]; then
+            echo "NOT-A-STUB $f: $n > $max lines (content belongs in AGENTS.nix)"
+            fail=1
+          elif ! grep -q 'AGENTS.nix' "$f"; then
+            echo "NOT-A-STUB $f: does not point at AGENTS.nix"
+            fail=1
+          else
+            echo "ok    $f: stub ($n lines) -> AGENTS.nix"
+          fi
+        }
         check AGENTS.md 1200
         check MANUAL.md 1200
-        check ARCHITECTURE.md 600
         check AUDIT.md 150
-        check HANDOFF.md 150
-        checkqueue TODO.md 150 300
+        stub ARCHITECTURE.md
+        stub TODO.md
+        stub HANDOFF.md
+        stub EXPERIMENTS.md
         exit "$fail"
 
   ops:bench:evals:
@@ -506,3 +520,65 @@ tasks:
             "python3 -c 'import tomllib;print(tomllib.load(open(\"inventory.toml\",\"rb\"))[\"hosts\"][\"frieren\"][\"role\"])'" \
           --command-name "nix eval agentSkills.count" \
             "nix eval --json .#agentSkills.count"
+
+  ops:notes:
+    desc: List AGENTS.nix notes (decisions, queue, design studies)
+    summary: >
+      The human surface over `.#agentsNotes.json` (lib/agents-notes.nix).
+      No args lists every note; STATUS= and KIND= filter. Each row is one note
+      with its schema status and kind. AGENTS.nix replaced ARCHITECTURE.md,
+      TODO.md, HANDOFF.md and EXPERIMENTS.md on 2026-10-19: a note with refs is
+      distilled, a leaf carries the original intent in prose.
+      Author or promote one with the `agents-notes` skill (templates, field
+      rules, promotion ladder: a note graduates by gaining `refs.modules` and
+      the gate task, never by becoming a new markdown file).
+      FORMAT=json emits the selected notes as JSON.
+    cmds:
+      - bash scripts/task/notes.sh list "{{.STATUS | default ""}}" "{{.KIND | default ""}}"
+
+  ops:notes:show:
+    desc: Print one AGENTS.nix note (ID= required)
+    summary: >
+      ID is required (see `task ops:notes`). Prints the status, summary, the
+      hosts/modules/tasks/docs it affects, related notes and the body.
+      FORMAT=json emits the note object.
+    cmds:
+      - bash scripts/task/notes.sh show "{{.ID | default ""}}"
+
+  ops:notes:host:
+    desc: Print the notes that affect HOST (HOST= required)
+    summary: >
+      Reads the compiled byHost index. An empty answer is a valid answer: no
+      note claims that host. HOST is required.
+    cmds:
+      - bash scripts/task/notes.sh host "{{.HOST | default ""}}"
+
+  ops:notes:module:
+    desc: Print the notes that reference a repository path (PATH= required)
+    summary: >
+      PATH is repo-relative (e.g. modules/services/fleet-sentinel.nix). This is
+      the reverse of the module -> notes edge, so "why does this file look like
+      this" becomes one query. An unknown path prints an empty list.
+    cmds:
+      - bash scripts/task/notes.sh module "{{.PATH | default ""}}"
+
+  ops:notes:task:
+    desc: Print the notes that reference TASK (TASK= required)
+    summary: >
+      TASK is a taskfile task name (e.g. ops:health). Useful before changing or
+      deleting a task: the notes explain why it exists.
+    cmds:
+      - bash scripts/task/notes.sh task "{{.TASK | default ""}}"
+
+  ops:notes:search:
+    desc: Full-text search over AGENTS.nix notes (Q= required)
+    summary: >
+      Case-insensitive substring match over id, title, summary and body. Use it
+      for "why did we decide X"; use `ops:notes:host` / `:module` for structure.
+    cmds:
+      - bash scripts/task/notes.sh search "{{.Q | default ""}}"
+
+  ops:qmd:sync:eisen:
+    desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
+    cmds:
+      - task dev:qmd:sync:eisen

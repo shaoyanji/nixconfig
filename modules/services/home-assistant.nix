@@ -24,8 +24,7 @@
 # add a permanent warning and still subscribe nothing. The supported path is a
 # one-time UI/config-flow entry, which HA owns and rewrites — hand-seeding
 # `.storage/core.config_entries` from Nix would clobber every other entry
-# (github, met, ipp, mobile_app) on every write, the same class of mistake as
-# seeding Uptime-Kuma's SQLite DB (see EXPERIMENTS.md EXP-008).
+# (github, met, ipp, mobile_app) on every write, the same class of mistake as  # seeding Uptime-Kuma's SQLite DB (see AGENTS.nix `exp-008`).
 #
 # The gap is therefore made *visible and testable* instead of declared:
 # `task checks:ha:mqtt` fails while the broker has no Home Assistant client, so

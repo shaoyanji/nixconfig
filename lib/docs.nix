@@ -33,6 +33,9 @@
   inventory,
   # Parsed modules.toml. Pass it from the flake so the file is read once.
   modules ? builtins.fromTOML (builtins.readFile ../modules.toml),
+  # AGENTS.nix -> rendered note pages (lib/agents-notes.nix). Passed in so this
+  # module stays a pure renderer of compiled data.
+  notes ? {},
 }: let
   knobs = modules.knobs or {};
   modulesMeta = modules.metadata or {};
@@ -221,7 +224,8 @@
       "docs/generated/fleet-inventory.md" = fleetInventory;
       "docs/generated/modules-registry.md" = modulesRegistry;
     }
-    // lib.mapAttrs' (name: h: lib.nameValuePair "docs/generated/hosts/${name}.md" (hostPage name h)) nixHosts;
+    // lib.mapAttrs' (name: h: lib.nameValuePair "docs/generated/hosts/${name}.md" (hostPage name h)) nixHosts
+    // notes;
 
   # There is no `nav` value any more: the only consumer of one was the Python
   # renderer in docs-site/, which is retired. The rendered site

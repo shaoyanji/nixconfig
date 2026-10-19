@@ -521,11 +521,15 @@ defmodule KGEngine.Watcher do
   end
 
   # The watch list is DERIVED, not hand-written. It used to name four files while
-  # the projection reads the eight living docs, docs/*.md, every SKILL.md,
+  # the projection reads the living docs, docs/*.md, every SKILL.md,
   # inventory.toml and lib/knowledge-graph.nix — so most inputs could change
   # without the in-memory graph noticing. Measured: editing
   # docs/closure-reduction.md triggered nothing, editing MANUAL.md did.
-  @root_docs ~w(AGENTS.md MANUAL.md ARCHITECTURE.md AUDIT.md TODO.md HANDOFF.md EXPERIMENTS.md README.md)
+  #
+  # ARCHITECTURE/TODO/HANDOFF/EXPERIMENTS moved to AGENTS.nix (2026-10-19) and
+  # are one-line stubs; `lib/knowledge-graph.nix` does not index them, so neither
+  # does this builder or its watch list (parity is enforced by checks:kg:sidecar).
+  @root_docs ~w(AGENTS.md MANUAL.md AUDIT.md README.md)
 
   def inputs(repo_root) do
     roots = Enum.map(@root_docs, &Path.join(repo_root, &1))
@@ -604,14 +608,14 @@ defmodule KGEngine.Native do
   quietly answering from a different graph.
 
   Deliberately mirrors lib/knowledge-graph.nix:
-    * doc sources are the eight living documents plus NON-recursive docs/*.md;
+    * doc sources are the four living documents plus NON-recursive docs/*.md;
     * a mention is an exact TOKEN, split on [^A-Za-z0-9_-]+ — so `dev` does not
       match `devji`, and `nix-eval-jobs` is not `nix-eval`;
     * skill names are directory names, not the frontmatter `name:`;
     * tags come from frontmatter, deduped across skills.
   """
 
-  @root_docs ~w(AGENTS.md MANUAL.md ARCHITECTURE.md AUDIT.md TODO.md HANDOFF.md EXPERIMENTS.md README.md)
+  @root_docs ~w(AGENTS.md MANUAL.md AUDIT.md README.md)
 
   def build(repo) do
     debug = System.get_env("KG_NATIVE_DEBUG") == "1"

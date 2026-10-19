@@ -473,7 +473,7 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 
 ### Historical
 - `AUDIT.md` - AI module cleanup audit (April/October 2026)
-- `TODO.md` - Current work tracking and completed tasks
+- `AGENTS.nix` - Decisions, open work, handoffs and experiments as notes (`task ops:notes`)
 
 ### Site Management
 Manage site targets with `task dev:site:list`; build/preview/deploy the default target with `task dev:site:build`, `task dev:site:preview`, and `task dev:site:deploy`.

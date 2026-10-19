@@ -52,8 +52,8 @@ generation; `generation-stale` in the ledger is the signal that catches it.
 
 | It is… | Write it to |
 | :--- | :--- |
-| A proposal / decision | `ARCHITECTURE.md` |
-| Open work | `TODO.md` or the repo `HANDOFF.md` |
+| A proposal / decision | an `AGENTS.nix` note (`task ops:notes`) |
+| Open work | an `AGENTS.nix` note with `kind = "open"` / `"handoff"` |
 | What happened | `AUDIT.md` (one line) |
 | History | `docs/history/` |
 | A procedure | `docs/` or a skill |

@@ -9,9 +9,10 @@ It is not a second manual and it is not executable truth.
 | What touches X (structure, not prose) | `task ops:kg:host HOST=<host>` (or `ops:kg:skill`, `:doc`, `:tag`, `:comention`) — `.#knowledgeGraph`; `ops:ask Q=…` is the English sugar |
 | What tasks exist / which answers an intent | `task help`, `task find:<word>`, `task --list-all --json` |
 | How to operate the fleet | `AGENTS.md`, `MANUAL.md` |
-| Why a design exists / what is next | `ARCHITECTURE.md`, `TODO.md` |
+| Why a design exists / what is next | `AGENTS.nix` notes — `task ops:notes` (`:host`, `:module`, `:search`) |
+| How to author or promote a note | `skills/agents-notes/SKILL.md` (templates + promotion ladder) |
 | What happened | `AUDIT.md`, `docs/history/` |
-| An experiment | `EXPERIMENTS.md` (classification banner first) |
+| An experiment | `task ops:notes KIND=experiment` (`exp-NNN` notes) |
 | Host-specific deploy notes | `deploy/README.md`, `deploy/hosts/*.md` |
 | A skill | `skills/<name>/SKILL.md` — index below is compiled |
 | The rules for all of the above | [`SCHEMA.md`](SCHEMA.md) |

@@ -116,7 +116,7 @@ systemctl list-timers --all | grep -E 'restic|nixos-upgrade|sentinel'
 
 ## 6. What is deliberately not here
 
-- No push from other hosts yet (see `ARCHITECTURE.md` P1). Today the sentinel is
+- No push from other hosts yet (see the `p1-sentinel-push` note in `AGENTS.nix`). Today the sentinel is
   frieren-local; the fleet report is `task checks:*` + CI + `AUDIT.md`.
 - No alerting of its own: gatus owns the transition, and its custom webhook
   bridges to SimpleX (3 consecutive failures, with a resolved notice).

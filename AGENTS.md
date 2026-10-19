@@ -32,9 +32,10 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
 6. **This is a live host.** Bounded gates only, one host per process, no
    top-level evals during the 03:00–05:30 window, and no ssh in unattended
    paths. Watch `task ops:health` before blaming the config.
-7. **Where to write:** proposal → `ARCHITECTURE.md`; open work → `TODO.md` /
-   `HANDOFF.md`; what happened → `AUDIT.md`; history → `docs/history/`;
-   procedure → `docs/` or a skill. Never a new root markdown file.
+7. **Where to write:** proposal and open work → an `AGENTS.nix` note
+   (`task ops:notes`; authoring: `agents-notes` skill); what happened →
+   `AUDIT.md`; history → `docs/history/`; procedure → `docs/` or a skill.
+   Never a new root markdown file.
 8. **The closed loop is real:** `fleet-sentinel` records jobs, generation age,
    disk and PSI every 15 min; gatus pages on `[BODY].state != ok`. A green
    socket is not a successful job — read the ledger.
@@ -157,6 +158,7 @@ Custom packages built from the flake:
 task help                        # List all tasks
 task --list-all                  # Same, unfiltered
 task status                      # git status + hostname
+task ops:notes                   # Decisions / queue / design studies (AGENTS.nix)
 ```
 
 ### Host Lifecycle
@@ -583,7 +585,7 @@ elsewhere first.** A `nixos-rebuild build --flake .#<host>` executed on a
    - **Verify the warm landed** before touching the host:
      `task checks:build:route` must report READY (it asks the cache directly,
      over HTTP, with no ssh) — `task dev:nixbuild:plan` is the nixbuild.net view.
-   - This is EXP-107/EXP-113 in `EXPERIMENTS.md`; the enforcement gate is
+   - This is `exp-107`/`exp-113` in `AGENTS.nix`; the enforcement gate is
      `task checks:build:route`, implemented by `scripts/task/warm-host.sh`.
 
 ````
@@ -1143,7 +1145,7 @@ allowed beside the first.
 
 | Layer | Owner | Rule |
 | :--- | :--- | :--- |
-| content | `*.md`, `inventory.toml`, `modules.toml` | hand-written only, never generated |
+| content | `*.md`, `AGENTS.nix`, `inventory.toml`, `modules.toml` | hand-written only, never generated |
 | projection | `lib/inventory.nix`, `lib/docs.nix`, `lib/knowledge-graph.nix`, `lib/skills.nix` | one pure Nix compiler per projection |
 | artifact | `.#docs` (generated markdown), `.#fleet-docs-site` (the rendered site) | store paths, never repo copies |
 | serving | `hosts/frieren/reverse-proxy.nix`, `modules/services/uds-static-bridge.nix` | serve the path; never re-derive content in a host module |
@@ -1184,9 +1186,9 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | `docs/userland-package-ownership.md` | Package ownership and role wiring                                      |
 | `taskfiles/README.md`                | Taskfile ownership map and shard reference                             |
 | `hosts/sledgehammer/USB.md`          | Sledgehammer live USB creation guide                                   |
-| `ARCHITECTURE.md`                    | mk2 proposals, decisions (ADRs), priorities, rejected options          |
+| `AGENTS.nix`                         | Decisions, proposals, open work and design studies as queryable notes |
+| `ARCHITECTURE.md` / `TODO.md`        | Stubs — content moved to `AGENTS.nix` (`task ops:notes`)               |
 | `MANUAL.md`                          | Operator manual: services, ports, closed loop, DMS integration         |
 | `.agents/SCHEMA.md`                  | Documentation/skill contract: budgets, status vocabulary, one fact one home |
 | `docs/history/`                      | Superseded narrative (audit/TODO/HANDOFF) — never linked as current    |
 | `AUDIT.md`                           | Current state + dated change ledger                                    |
-| `TODO.md`                            | Priority stack (P0–P3), open items only                                |

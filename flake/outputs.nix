@@ -17,11 +17,18 @@
   # Documentation + site nav generated from the SAME compiled registry the hosts
   # use (lib/docs.nix). Built for one system: it is markdown only, so the
   # output is system-independent and does not need a per-system fan-out.
-  docsGen = import ../lib/docs.nix {inherit lib inventory;};
+  docsGen = import ../lib/docs.nix {
+    inherit lib inventory;
+    notes = agentsNotesCtl.pages;
+  };
   docs = docsGen.mkDocs (pkgsFor "x86_64-linux");
   # Skills are compiled the same way the inventory is: parsed once, validated
   # once, consumed by checks/tasks/bundles. No host config is evaluated.
   skillsCtl = import ../lib/skills.nix {inherit lib;};
+  # AGENTS.nix -> validated note index + rendered pages (lib/agents-notes.nix).
+  # One source for the decisions, queue and design studies that used to be four
+  # root markdown files; consumed by checks, docs and the query task.
+  agentsNotesCtl = import ../lib/agents-notes.nix {inherit lib inventory;};
   homeAgentsGen = import ../lib/home-agents.nix {inherit lib inventory;};
   knowledgeGraphCtl = import ../lib/knowledge-graph.nix {
     inherit lib inventory;
@@ -38,7 +45,7 @@ in {
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
-    inherit lib systems pkgsFor self hostInventory skillsCtl;
+    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl;
   };
 
   # Per-host evaluation gate, one host per attribute so a run costs one host's
@@ -93,6 +100,14 @@ in {
   homeAgents = lib.genAttrs (builtins.attrNames hostInventory) (
     h: agentDocs.writeText "AGENTS-${h}.md" (homeAgentsGen.mkText h)
   );
+
+  # AGENTS.nix as a query surface: `nix eval .#agentsNotes.index` (no host
+  # eval), `nix build .#agentsNotes.file` for the fixed JSON artifact.
+  agentsNotes = {
+    inherit (agentsNotesCtl) schemaVersion counts issues ok index notes byHost byModule byTask byStatus open;
+    file = agentDocs.writeText "agents-notes.json" agentsNotesCtl.json;
+    json = agentsNotesCtl.json;
+  };
 
   # Structural projection: hosts × skills × docs × mentions. `jq`-queryable
   # today, Cypher-exportable if an external graph database ever exists.

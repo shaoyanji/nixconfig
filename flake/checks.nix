@@ -5,6 +5,7 @@
   self,
   hostInventory,
   skillsCtl,
+  agentsNotesCtl,
 }:
 # CHEAP CHECKS ONLY — `checks.<system>` MUST NOT force a host configuration.
 #
@@ -132,6 +133,20 @@ lib.genAttrs systems.default (
             touch $out
           '';
 
+      # --- AGENTS.nix notes are traceable or verbose, never terse leaves -----
+      agents-notes-schema =
+        if !agentsNotesCtl.ok
+        then
+          builtins.throw ''
+            AGENTS.nix violates the note schema (lib/agents-notes.nix):
+              ${lib.concatStringsSep "\n  " agentsNotesCtl.issues}
+          ''
+        else
+          pkgs.runCommand "agents-notes-schema" {} ''
+            echo "AGENTS.nix OK: ${toString agentsNotesCtl.counts.total} notes (${toString agentsNotesCtl.counts.open} open, ${toString agentsNotesCtl.counts.leaves} leaves)"
+            touch $out
+          '';
+
       # --- the site's JS is code, not a Nix literal -------------------------
       # lib/aki-site.nix used to carry ~800 lines of browser JS inside `''`
       # strings, where a syntax error was either a Nix parse error or invisible.
@@ -173,16 +188,17 @@ lib.genAttrs systems.default (
         limits = {
           "AGENTS.md" = 1200;
           "MANUAL.md" = 1200;
-          "ARCHITECTURE.md" = 600;
           "AUDIT.md" = 150;
-          "HANDOFF.md" = 150;
         };
-        queueLimits = {
-          "TODO.md" = {
-            open = 150;
-            total = 300;
-          };
-        };
+        # ARCHITECTURE.md, TODO.md, HANDOFF.md and EXPERIMENTS.md moved to
+        # AGENTS.nix (2026-10-19). They exist only as one-screen pointers into it;
+        # content creeping back into a stub is the regression this catches.
+        stubs = ["ARCHITECTURE.md" "TODO.md" "HANDOFF.md" "EXPERIMENTS.md"];
+        badStubs =
+          lib.filter
+          (f: count f > 10 || !(lib.hasInfix "AGENTS.nix" (builtins.readFile (root + "/${f}"))))
+          stubs;
+        queueLimits = {};
         over =
           lib.filter (name: count name > limits.${name})
           (builtins.attrNames limits);
@@ -196,14 +212,15 @@ lib.genAttrs systems.default (
           q = queue name;
         in "${name}: ${toString q.open}/${toString queueLimits.${name}.open} open, ${toString q.total}/${toString queueLimits.${name}.total} total";
       in
-        if over != [] || overQueues != []
+        if over != [] || overQueues != [] || badStubs != []
         then
           builtins.throw ''
             living documents exceed their SCHEMA.md budget:
               ${lib.concatStringsSep "\n  " (map (n: "${n}: ${toString (count n)} > ${toString limits.${n}}") over)}
               ${lib.concatStringsSep "\n  " (map queueReport overQueues)}
-            Move detail to docs/ and leave a pointer; do not raise the budget
-            (for TODO.md, close or move open items — do not delete the record).
+              ${lib.concatStringsSep "\n  " (map (f: "${f}: must stay a <=10-line pointer to AGENTS.nix") badStubs)}
+            Move detail to docs/ and leave a pointer; do not raise the budget.
+            Narrative work belongs in AGENTS.nix (query with `task ops:notes`).
           ''
         else
           pkgs.runCommand "docs-budget" {} ''

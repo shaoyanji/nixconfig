@@ -685,12 +685,12 @@
       '';
     };
     exp-determinate-nix-trial = {
-      title = "Determinate Nix wired into eisen only (not switched yet)";
+      title = "Determinate Nix live on eisen";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "DELIVERED";
       priority = "P3";
       date = "2026-10-19";
-      summary = "`inputs.determinate` (3.23.3) is imported by hosts/eisen/determinate-nix.nix alone; the fleet default moved to lib.mkDefault so the module's mkOverride 750 can win. Evaluated to determinate-nix-3.23.3 on eisen, upstream unchanged elsewhere.";
+      summary = "eisen switched 2026-10-19: `nix --version` is Determinate Nix 3.23.3 (2.35.3), nix-daemon runs determinate-nixd, and the Qwen endpoint answers 200 on stock llama.cpp 0.6.0 (substituted). Kolibri/Bonsai are dormant.";
       refs = {
         hosts = ["eisen"];
         modules = [
@@ -710,13 +710,17 @@
         and `nix.registry.nixpkgs.to` forced back to nixpkgs `f20cd90e` because the module
         otherwise repoints it at FlakeHub weekly. guckloch still resolves nix-2.35.3.
 
-        Cost and rollback: DN's CLI is NOT on cache.nixos.org, and the flake declares no
-        substituters, so without one the first switch compiles 54 derivations (boost,
-        wasmtime, libgit2, boehm-gc) — DN's packages come from its own nixpkgs fork.
-        `install.determinate.systems` serves the same closure signed by
-        `cache.flakehub.com-3`, so eisen adds it as a substituter with that public key
-        and the switch becomes a 0-build fetch. Roll back by booting the previous
-        generation; the store format does not change.
+        Switched 2026-10-19 18:47 (generation 26.11.20261016.f20cd90): nix is
+        `Determinate Nix 3.23.3` on 2.35.3, `nix-daemon` ExecStart is determinate-nixd,
+        zero failed units, and a `/v1/chat/completions` against `qwen` returned 200
+        after a cold load. DN's CLI is not on cache.nixos.org; the substituter at
+        `install.determinate.systems` (key `cache.flakehub.com-3`) supplied it, so the
+        switch compiled nothing. Roll back by booting the previous generation.
+
+        Models: stock `llama-cpp` with Vulkan replaced the 0.7.0 pin and both forks —
+        those forced a full C++ build (~15 min) per nixpkgs bump. Kolibri and Bonsai
+        are commented out, not deleted (binary, vars, fetch unit, model entry), and the
+        router default moved to `qwen3.6-35b-a3b`.
       '';
     };
     open-kolibri-thread-bench = {

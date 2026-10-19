@@ -96,6 +96,14 @@ not an error: `modules/` and `flake/` are not graph nodes, and closures are the
 tool for those. `checks:kg:sidecar` is the parity gate — it fails if the engine's
 graph, answers or error codes disagree with the compiled projection.
 
+**See the graph.** `http://fleet.frieren.lan` → *Knowledge Graph* renders the
+projection as a force-directed canvas: pan, wheel zoom, hover to inspect, click
+any node to open its static slice (neighbours, and a link to the host inventory
+page or the source file). Every click is a fetched JSON slice — no daemon. The
+definition lives in `lib/aki-site.nix`; `task checks:kg:canvas` proves it by
+driving headless Chrome through the click, and `task checks:kg:native` holds the
+cold bootstrap to **median < 20 ms** with no `nix` subprocess.
+
 Every pattern takes **`FORMAT=json`** and returns the same envelope:
 `{pattern, arg, count, results}` — `results` is a list of ids, except `comention`
 (`{id, shared}`) and `stats` (one object of counts).

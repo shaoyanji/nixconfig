@@ -182,6 +182,40 @@ tasks:
     cmds:
       - bash scripts/task/kg-sidecar-check.sh
 
+  checks:kg:native:
+    desc: "[gate] Cold native graph build: median under 20 ms, zero subprocess, parity"
+    summary: >
+      scripts/task/kg-native-check.sh — the number this project kept quoting as
+      "~100 ms" now has a gate. Runs the engine's `--build-only` mode RUNS=7
+      times, takes the MEDIAN (a single sample on the NAS-mounted repo is
+      dominated by read jitter — p90 is ~1.2x the median), and fails above
+      BUDGET_MS (default 20). Also asserts (a) KGEngine.Native contains no
+      subprocess primitive, statically — a fallback that shells out to nix
+      cannot pass, and (b) the native node/edge counts equal the compiled
+      projection, so speed cannot be bought with a smaller graph. Measured
+      2026-10-19 on frieren: median 14.6 ms, p90 17.4 ms for 225 nodes / 387
+      edges, no nix process. Cost: ~8 s (7 interpreter boots).
+    cmds:
+      - bash scripts/task/kg-native-check.sh
+
+  checks:kg:canvas:
+    desc: "[gate] Knowledge-graph canvas: slices resolve, and a real node click navigates"
+    summary: >
+      scripts/task/kg-canvas-check.sh — builds `.#fleet-docs-site` locally
+      (`--builders ""`, so it can never dispatch to nixbuild.net) and proves the
+      interactive canvas is not a picture: every node names a slice, every slice
+      file exists, every neighbour button inside every slice resolves to another
+      slice (no dead ends), index.html loads the canvas script and it parses,
+      and — with `agent-browser` installed — headless Chrome clicks the
+      Knowledge Graph tab, waits for 225 nodes, dispatches a click at
+      `host:frieren`'s screen position and requires the breadcrumb to become
+      `fleet / knowledge-graph / host:frieren`. That is the TODO exit criterion,
+      tested through the interface an operator uses. Uses an ephemeral port and
+      verifies the served page is this site (8787 was Readarr on frieren).
+      SKIP_BROWSER=1 runs the static half only. Cost: ~15 s. Exit 0 = clean.
+    cmds:
+      - bash scripts/task/kg-canvas-check.sh
+
   checks:host:
     desc: "[gate] Evaluate ONE host: module system + assertions + compiled inventory (HOST=name)"
     summary: >

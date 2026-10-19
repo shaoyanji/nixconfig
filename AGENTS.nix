@@ -667,10 +667,10 @@
         docs = [".agents/deploy/hosts/eisen.md"];
       };
       body = ''
-        Rehearsed on eisen (24c/59 GiB, the repo worktree at `/tmp/nixconfig-upd`), never
-        on frieren: `nix flake update` moved 9 inputs (nixpkgs `aa48d347` -> `f20cd90e`,
-        nix-darwin, sops-nix, nixos-hardware, nix-index-database, mux, microvm,
-        zen-browser).
+        Rehearsed and landed from eisen (24c/59 GiB), never frieren: `nix flake update`
+        moved 20 input nodes — nixpkgs `aa48d347` -> `f20cd90e`, nix-darwin,
+        home-manager, sops-nix, nixos-hardware, nixvim, dms/dank-greeter, llm-agents,
+        zen-browser and their locked deps.
 
         Result: `nixVersions.latest` = 2.35.3 (12.9 s leaf eval incl. the input fetch),
         and `nix build .#hostChecks.x86_64-linux.eisen --builders ""` passes 1992

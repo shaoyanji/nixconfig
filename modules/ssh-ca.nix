@@ -29,11 +29,14 @@ with lib; let
       exit 1
     fi
 
-    ${pkgs.openssh}/bin/ssh-keygen -s "$CA_KEY" \\
-      -I "$(whoami)@$(hostname)-$(date +%Y%m%d)" \\
-      -n "${user.name}" \\
-      -V "+90d" \\
+    args=(
+      -s "$CA_KEY"
+      -I "${user.name}@$(${pkgs.coreutils}/bin/cat /etc/hostname 2>/dev/null || echo ''${HOSTNAME:-frieren})-$(date +%Y%m%d)"
+      -n "${user.name}"
+      -V "+90d"
       "$USER_KEY.pub"
+    )
+    ${pkgs.openssh}/bin/ssh-keygen "''${args[@]}"
     echo "Certificate renewed: $USER_KEY-cert.pub (valid 90 days)"
   '';
 in {

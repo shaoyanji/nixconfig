@@ -55,7 +55,7 @@ in {
     after = ["network.target"];
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${lib.getExe pkgs.tika} --host 127.0.0.1 --port 9998";
+      ExecStart = "${lib.getExe pkgs.tika} -noFork --host 127.0.0.1 --port 9998";
       Environment = "JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m";
       MemoryHigh = "192M";
       MemoryMax = "256M";

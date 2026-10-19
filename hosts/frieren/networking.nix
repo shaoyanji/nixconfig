@@ -29,12 +29,12 @@
     environment = {
       SERVER_PORT = "7351";
       SECURITY_ENABLELOGIN = "false";
-      JAVA_TOOL_OPTIONS = "-Xms64m -Xmx256m -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=50";
+      JAVA_TOOL_OPTIONS = "-Xms128m -Xmx512m -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=50";
     };
   };
   systemd.services.stirling-pdf.serviceConfig = {
-    MemoryHigh = "384M";
-    MemoryMax = "512M";
+    MemoryHigh = "640M";
+    MemoryMax = "768M";
   };
   networking.firewall.allowedTCPPorts = lib.mkAfter [7351];
 

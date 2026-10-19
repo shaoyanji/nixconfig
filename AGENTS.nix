@@ -710,9 +710,13 @@
         and `nix.registry.nixpkgs.to` forced back to nixpkgs `f20cd90e` because the module
         otherwise repoints it at FlakeHub weekly. guckloch still resolves nix-2.35.3.
 
-        Cost and rollback: `determinate-nix-3.23.3` is NOT on cache.nixos.org and the
-        flake declares no substituters, so the first switch compiles Nix on eisen. Roll
-        back by booting the previous generation; the store format does not change.
+        Cost and rollback: DN's CLI is NOT on cache.nixos.org, and the flake declares no
+        substituters, so without one the first switch compiles 54 derivations (boost,
+        wasmtime, libgit2, boehm-gc) — DN's packages come from its own nixpkgs fork.
+        `install.determinate.systems` serves the same closure signed by
+        `cache.flakehub.com-3`, so eisen adds it as a substituter with that public key
+        and the switch becomes a 0-build fetch. Roll back by booting the previous
+        generation; the store format does not change.
       '';
     };
     open-kolibri-thread-bench = {

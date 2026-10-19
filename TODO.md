@@ -94,6 +94,16 @@
       which drives headless Chrome: click a node -> breadcrumb becomes
       `fleet / knowledge-graph / host:frieren`.
 
+- [x] **The site renders notes, not prose** (2026-10-19). `lib/aki-site.nix` was
+      refactored so every figure is an interpolation of evaluated data: overview
+      counts from `inventory.toml`, budgets from `closure-budgets.toml`, notes
+      from the compiled graph with each file rendered into its own slice at
+      build time. The hand-written *Debloat Playbook*, *Services & Ingress* and
+      *closure attribution* pages are gone — they described one generation and
+      could not be reproduced. `checks:kg:canvas` now fails on a leftover note
+      placeholder, a note whose heading is not its source's, a budget figure the
+      TOML does not imply, a dangling nav target, or a retired page coming back.
+
 ## P3 — hygiene and maintenance
 
 - [ ] **Closure budgets for every measured host** (`closure-budgets.toml`).

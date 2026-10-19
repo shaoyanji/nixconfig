@@ -11,6 +11,14 @@
 #   2. SLICES. Every neighbour button inside every slice must point at a slice
 #             that exists — a dead end discovered by clicking is a bug found by
 #             an operator, not by CI.
+#   2b. NOTES. Every doc/skill slice must carry that note's own text, rendered
+#             at build time, with no leftover placeholder, no empty box, and the
+#             file's real heading inside it. The old site reached notes only
+#             through one hardcoded forge URL; this replaces that transport.
+#   2c. DERIVED. The notes index must list every note node, every closure figure
+#             on the budgets page must recompute from closure-budgets.toml, every
+#             navigation target must exist, and the retired hand-written pages
+#             must be absent. This is the guard against typed facts.
 #   3. SHELL. index.html must load the canvas script and the script must parse;
 #             the slice must carry the search box and a chip per node type.
 #   4. FILTER. Type a label into the real search box: the match set must
@@ -90,6 +98,128 @@ while read -r slice; do
   done < <(grep -o 'url="data/kg/[^"]*"' "$SITE/$slice" | sed 's/^url="//; s/"$//' | sort -u)
 done < <(jq -r '.nodes[].slice' "$SITE/data/kg-graph.json")
 [ -z "$bad_links" ] && ok "neighbour links resolve" || bad "dangling slice links:$bad_links"
+
+say "every note is readable inside the site"
+# A doc/skill slice must carry its own note, rendered from the file at build
+# time. Three failure modes are distinguishable here: the placeholder survived
+# (the build step did not run), the note box is empty, and the wrong note landed
+# (its first heading is not the file's). The old site had none of this — every
+# note was an outbound link to one hardcoded forge URL.
+note_slices="$(jq -r '.nodes[] | select(.type == "doc" or .type == "skill") | .slice' "$SITE/data/kg-graph.json")"
+note_total="$(grep -c . <<<"$note_slices")"
+default_notes="$(jq '[.nodes[] | select(.type == "doc" or .type == "skill")] | length' "$SITE/data/kg-graph.json")"
+[ "$note_total" = "$default_notes" ] && ok "$note_total note slices" || bad "note slice count $note_total vs $default_notes note nodes"
+# One Python pass over all 64 slices: per-slice jq+grep ran 64 processes and,
+# worse, compared markdown source to rendered HTML. The comparison here is on
+# TEXT after tags and markdown emphasis are stripped, which is what a reader
+# actually sees.
+if python3 - "$SITE" "$REPO" <<'PY'
+import html, json, os, re, sys
+
+site, repo = sys.argv[1], sys.argv[2]
+graph = json.load(open(os.path.join(site, "data/kg-graph.json")))
+problems = []
+
+
+def text_of(fragment):
+    # Tags out, entities in: a heading's `&` is `&amp;` in HTML, and `&amp;`
+    # compares unequal to `&` until it is decoded.
+    return html.unescape(re.sub(r"<[^>]+>", " ", fragment))
+
+
+def norm(s):
+    return re.sub(r"[`*_\[\]()<>\s]+", " ", s).strip().lower()
+
+
+for node in graph["nodes"]:
+    if node["type"] not in ("doc", "skill"):
+        continue
+    slice_rel = node["slice"]
+    pane = json.load(open(os.path.join(site, slice_rel)))["#detail-pane"]["innerHTML"]
+    if "<!--KG_NOTE-->" in pane:
+        problems.append(slice_rel + " placeholder")
+        continue
+    marker = '<div class="note">'
+    if marker not in pane:
+        problems.append(slice_rel + " no-note-box")
+        continue
+    note = pane.split(marker, 1)[1]
+    if not norm(text_of(note)):
+        problems.append(slice_rel + " empty")
+        continue
+    path = node["path"] + ("/SKILL.md" if node["type"] == "skill" else "")
+    try:
+        lines = open(os.path.join(repo, path), encoding="utf-8").read().splitlines()
+    except OSError:
+        problems.append(slice_rel + " unreadable-" + path)
+        continue
+    heading = next((l[2:] for l in lines if l.startswith("# ")), None)
+    if heading is None:
+        problems.append(slice_rel + " no-heading-in-" + path)
+    elif norm(heading) not in norm(text_of(note)):
+        problems.append(slice_rel + " wrong-note(" + path + ")")
+
+if problems:
+    print(" ".join(problems))
+    sys.exit(1)
+PY
+then
+  ok "all $note_total notes render their own text"
+else
+  bad "note slices wrong (see list above)"
+fi
+
+say "pages are derived, and retired pages are gone"
+for page in notes closures overview inventory kg; do
+  [ -f "$SITE/data/$page.json" ] && ok "data/$page.json exists" || bad "data/$page.json missing"
+done
+# `debloat`/`services`/`closure` were hand-written tables that could not be
+# reproduced from the repository; they were replaced rather than restyled.
+for gone in debloat services closure; do
+  [ ! -f "$SITE/data/$gone.json" ] && ok "data/$gone.json retired" || bad "data/$gone.json should not exist"
+done
+
+# The notes index must list every note node, and its rows must link to slices.
+notes_rows="$(jq -r '.["#detail-pane"]["innerHTML"]' "$SITE/data/notes.json" | grep -o 'url="data/kg/' | wc -l)"
+[ "$notes_rows" = "$note_total" ] && ok "notes index lists $notes_rows notes" || bad "notes index has $notes_rows rows, expected $note_total"
+
+# Every budget figure on the closures page is recomputed from
+# closure-budgets.toml; if the page and the file disagree, one of them is a
+# literal and this gate is how that is found.
+if python3 - "$SITE/data/closures.json" "$REPO/closure-budgets.toml" <<'PY'
+import json, sys, tomllib
+
+page = json.load(open(sys.argv[1]))["#detail-pane"]["innerHTML"]
+b = tomllib.load(open(sys.argv[2], "rb"))
+default = b.get("defaults", {}).get("headroom_pct", 0)
+bad = []
+for name, row in b.get("hosts", {}).items():
+    base = row.get("baseline", {}).get("bytes")
+    head = row.get("headroom_pct", default)
+    total = row.get("bytes") or (base * (1 + head / 100) if base else None)
+    if total is None:
+        continue
+    tenths = int(total / 107374182.4 + 0.5)
+    label = "%d.%d GiB" % (tenths // 10, tenths % 10)
+    if label not in page:
+        bad.append("%s=%s" % (name, label))
+missing = [n for n in b.get("hosts", {}) if n not in page]
+if bad or missing:
+    print("budget figures missing from the page: %s %s" % (" ".join(bad), " ".join(missing)))
+    sys.exit(1)
+PY
+then
+  ok "closures page figures recompute from closure-budgets.toml"
+else
+  bad "closures page disagrees with closure-budgets.toml"
+fi
+
+# No nav or sidebar button may point at a file the build did not make.
+nav_bad=""
+while read -r url; do
+  [ -f "$SITE/$url" ] || nav_bad="$nav_bad $url"
+done < <(grep -o 'url="data/[^"]*"' "$SITE/index.html" | sed 's/^url="//; s/"$//' | sort -u)
+[ -z "$nav_bad" ] && ok "every navigation target exists" || bad "dangling navigation:$nav_bad"
 
 say "shell wiring"
 kg_js="$(grep -o 'kg\.[a-f0-9]*\.min\.js' "$SITE/index.html" | head -1)"
@@ -269,7 +399,7 @@ fi
 
 echo
 if [ "$fail" = 0 ]; then
-  echo "kg-canvas-check: ok — data, slices, filters, neighbours, and node-click navigation agree"
+  echo "kg-canvas-check: ok — data, slices, notes, budgets, filters, neighbours, and node-click navigation agree"
 else
   echo "kg-canvas-check: FAILED — see the FAIL lines above"
 fi

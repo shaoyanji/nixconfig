@@ -112,11 +112,35 @@ in {
         wantedBy = ["multi-user.target"];
         # ffmpeg on PATH for decoding non-wav audio (read_audio in the pipeline).
         path = [pkgs.ffmpeg];
+        # A missing or corrupt ONNX file must fail visibly instead of looping
+        # forever; `Restart=always` alone hid that class of failure.
+        unitConfig = {
+          StartLimitIntervalSec = 300;
+          StartLimitBurst = 5;
+        };
         serviceConfig = {
           Type = "simple";
           ExecStart = "${parakeetApp}/bin/parakeet-server --model-dir ${modelDir} --bind 127.0.0.1 --port ${toString port} --threads 8";
           Restart = "always";
           RestartSec = 5;
+          TimeoutStopSec = 15;
+
+          # The pipeline hands untrusted uploads to ffmpeg, so run it as an
+          # unprivileged dynamic user with no writable system paths. The only
+          # write is the decoded temp file in the private /tmp.
+          DynamicUser = true;
+          PrivateTmp = true;
+          ProtectSystem = "strict";
+          ProtectHome = true;
+          NoNewPrivileges = true;
+          RestrictSUIDSGID = true;
+          ProtectKernelTunables = true;
+          ProtectKernelModules = true;
+          ProtectControlGroups = true;
+          RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+          UMask = "0077";
+          MemoryMax = "2G";
+          TasksMax = 64;
         };
       };
     };

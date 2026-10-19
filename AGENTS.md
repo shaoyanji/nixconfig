@@ -70,7 +70,8 @@ flake.nix → flake/outputs.nix (hub)
   ├── packages            ← flake/packages.nix
   ├── checks              ← flake/checks.nix
   ├── devShells           ← flake/devshells.nix
-  └── docsSite/docs-site  ← docs-site/default.nix
+  ├── docs                ← lib/docs.nix (generated markdown tree)
+  └── fleet-docs-site     ← lib/aki-site.nix (the rendered site)
 ```
 
 **Host registration flow**:
@@ -91,46 +92,14 @@ flake.nix → flake/outputs.nix (hub)
 | `globalModulesDemo`              | global + demo + home-manager (no sops)                                                 | demo (NixOS demo VM)                                                               |
 | `globalModulesHome`              | standalone HM sharedModules + allowUnfree                                              | penguin, alarm, kali (standalone home-manager)                                     |
 
-### Complete Client OS Fleet Inventory (`flake/host-inventory.nix`)
+### Complete Client OS Fleet Inventory
 
-> **Source of truth**: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml) (34 total devices: 11 active Nix, 6 active non-Nix external, 1 WIP, 16 preserved).
-
-| Host | Status | Environment | Arch | Role & Hardware Overview | Module Path | Storage Layout |
-|------|--------|-------------|------|---------------------------|-------------|----------------|
-| `aristotle` | **Active** | `nixos` | `x86_64-linux` | ThinkPad T440 Mobile Laptop Workstation (Intel Core i5-4300U, 8 GiB DDR3L, Intel HD Graphics 4400) | `hosts/aristotle/configuration.nix` | 59.6GB Innodisk M.2 (S42) 3ME4 SSD (/dev/sda2 btrfs @root, @ho... |
-| `eisen` | **Active** | `nixos` | `x86_64-linux` | High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node (Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700) | `hosts/eisen/configuration.nix` | 119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots)... |
-| `fern` | **Active** | `nixos` | `x86_64-linux` | Lightweight Daily-Driver Laptop (AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU) | `hosts/fern/configuration.nix` | /dev/nvme0n1 (disko: ESP + 8G swap + btrfs /root,/nix) |
-| `frieren` | **Active** | `nixos` | `x86_64-linux` | Central NAS Mainframe, Kitchen Light Workstation & Fleet Server (Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz) | `hosts/frieren/configuration.nix` | /dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots... |
-| `guckloch` | **Active** | `nixos` | `x86_64-linux` | Windows Subsystem for Linux (WSL2) Container (Host CPU, WSL2 Dynamic Allocation) | `hosts/guckloch/configuration.nix` | WSL2 root with SSHFS mount to /Volumes/data |
-| `kali` | **Active** | `home` | `aarch64-linux` | Mobile Offensive Security Starter Pack (ARM64, 2 to 4 GB, Adreno / VideoCore) | `hosts/kali.nix` | Tight mobile flash storage (/home/kali) |
-| `kellerbench` | **Active** | `nixos` | `x86_64-linux` | Headless GameStream & Benchmark Rig (Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti) | `hosts/kellerbench/configuration.nix` | GRUB legacy boot (nodev) |
-| `netbook` | **Active** | `nixos` | `x86_64-linux` | Alice's Travel Netbook (Pinned NixOS 25.11) (Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400) | `hosts/netbook/configuration.nix` | f2fs root, vfat /boot, systemd-boot |
-| `poseidon` | **Active** | `nixos` | `x86_64-linux` | Primary High-Performance Laptop Workstation (AMD Ryzen 7 Mobile, 16 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU) | `hosts/poseidon/configuration.nix` | High-speed persistent NVMe partitions |
-| `scratch` | **Active** | `nixos` | `x86_64-linux` | I/O Diet Lightweight Workstation (Intel Core i5-6500, 8 GB DDR4, Intel HD Graphics 530) | `hosts/scratch/configuration.nix` | Legacy BIOS + GRUB (ext4 /boot, f2fs /) |
-| `stark` | **Active** | `nixos` | `x86_64-linux` | Living Room All-in-One Gaming Terminal (Intel Core i5-7200U, 16 GiB DDR4, Intel HD 620) | `hosts/stark/configuration.nix` | SK hynix SC311 SATA SSD (system) + 1TB HDD /mnt/steam (btrfs+z... |
-| `bitlockerpremium` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Windows 11 Pro Workstation & Tailnet OpenSSH Endpoint (Intel Core i5-10310U, 16 GB DDR4-3200 (2x 8 GB Samsung, dual channel), Intel UHD Graphics) | `taskfiles/bitlockerpremium.yml` | 256 GB WDC PC SN530 SDBPNPZ-256G-1006 (C: 235.9 GiB) |
-| `burgernas` | **Active** | **Non-Nix** (External) | `aarch64-linux` | Cold Vault Storage Extension & Secondary Backup Target (Realtek RTD1296, 512 MiB DDR4 (soldered, non-expandable)) | `hosts/burgernas/configuration.nix` | /volume1 (5.4 TiB pool, ~4.9 TiB free); restic target /volume1... |
-| `dragoncourt` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Alwaysdata PHP/Wasm Web Hosting (Intel x86_64, Shared Hosting Quota) | `taskfiles/dragoncourt.yml` | /home/dragoncourt/www |
-| `envs` | **Active** | **Non-Nix** (External) | `x86_64-linux` | Envs.net Multi-Protocol Pubnix Node (Intel Xeon, Shared Pubnix Quota) | `taskfiles/envs.yml` | /home/jisifu (public_html, public_gemini, public_gopher) |
-| `moto` | **Active** | **Non-Nix** (External) | `aarch64-linux` | Primary Mobile Smartphone (Android/Termux) (Unisoc T760 / Snapdragon, 4 to 8 GB RAM, Mali-G57) | `taskfiles/moto.yml` | Android storage (/storage/emulated/0) |
-| `serv00` | **Active** | **Non-Nix** (External) | `x86_64-freebsd` | FreeBSD Web Hosting & Daemon Node (Intel Xeon, 512 MB Process Memory Limit (devil info limits)) | `taskfiles/serv00.yml` | /home/jisifu |
-| `delphi` | *WIP (Not Live)* | `nixos` | `aarch64-linux` | Cloud Bastion, Tailscale Exit Node & ARM64 Build Offloader (Ampere Altra Neoverse N1, 24 GiB RAM) | `hosts/delphi/configuration.nix` | 200 GB ext4/btrfs boot disk |
-| `aceofspades` | Preserved | `nixos` | `x86_64-linux` | AMD Graphics Workstation (Intel Core, 16 GiB, AMD Radeon GPU) | `hosts/aceofspades/configuration.nix` | GRUB legacy boot on /dev/sda |
-| `alarm` | Preserved | `home` | `aarch64-linux` | Arch Linux ARM Standalone Home Manager (ARM64, 1 to 2 GB) | `hosts/alarm.nix` | User home directory /home/alarm |
-| `ancientace` | Preserved | `nixos` | `x86_64-linux` | Virtualization Host & Local Model Server (Intel multi-core, 16 GiB, Intel Graphics) | `hosts/ancientace/configuration.nix` | GRUB boot, microVM bridge network |
-| `applevalley` | Preserved | `nixos` | `x86_64-linux` | Legacy ThinkPad Container & Utility Host (Intel Core i5-2520M, 8 GiB DDR3, Intel HD Graphics 3000) | `hosts/applevalley/configuration.nix` | Persistent btrfs |
-| `ares` | Preserved | `nixos` | `x86_64-linux` | Steam Big Picture Kiosk with Impermanence (Intel Core i5-6500, 8 GiB DDR4, NVIDIA GeForce GTX 750 Ti) | `hosts/ares/configuration.nix` | /dev/sda (root ephemeral on boot, devji home + /etc persisted ... |
-| `cassini` | Preserved | `darwin` | `aarch64-darwin` | Apple Silicon macOS Workstation (Apple Silicon, Unified Memory (16, Apple Integrated Metal GPU) | `hosts/cassini/configuration.nix` | Encrypted APFS Macintosh HD |
-| `deckstation` | Preserved | `nixos` | `x86_64-linux` | High-End Steam Kiosk & Sunshine Host (Intel 64-bit multi-core, 16 GiB, AMD Radeon RX 5700 XT) | `hosts/deckstation/configuration.nix` | Persistent storage |
-| `demo` | Preserved | `nixos` | `x86_64-linux` | NixOS Demonstration VM (x86_64, 4 GiB) | `hosts/demo/configuration.nix` | Single partition, systemd-boot |
-| `frieren-canary` | Preserved | `nixos` | `x86_64-linux` | Frieren Canary MicroVM (closure smoke test) (host-provided vCPU, host-provided) | `hosts/frieren-canary/configuration.nix` | microvm disk image |
-| `garnixMachine` | Preserved | `nixos` | `x86_64-linux` | Garnix CI Runner & Bountystash Host (x86_64 Cloud vCPU, Cloud Allocated) | `hosts/garnixMachine.nix` | Standard Nix store |
-| `minyx` | Preserved | `nixos` | `aarch64-linux` | Raspberry Pi 3B+ Edge Node (Broadcom BCM2837B0, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV) | `hosts/minyx/configuration.nix` | SD card with extlinux bootloader and impermanence |
-| `mtfuji` | Preserved | `nixos` | `x86_64-linux` | Headless Container & AI Inference Host (AMD Ryzen 64-bit, 16 GiB DDR4) | `hosts/mtfuji/configuration.nix` | f2fs / + btrfs subvolume for /nix |
-| `penguin` | Preserved | `home` | `x86_64-linux` | Chromebook Linux Container (Crostini) (Intel x86_64, Shared with ChromeOS, VirtIO GPU with nixGL wrapper) | `hosts/penguin.nix` | User home directory |
-| `schneeeule` | Preserved | `nixos` | `x86_64-linux` | Impermanent Desktop Laptop (Intel 64-bit multi-core, 16 GiB, Intel iGPU + NVIDIA GeForce) | `hosts/schneeeule/configuration.nix` | /dev/sda (root erased on boot, persistent /persist, /persist/d... |
-| `sledgehammer` | Preserved | `nixos` | `x86_64-linux` | Fleet Provisioning & Disaster Recovery USB (Any x86_64 host, Host RAM) | `hosts/sledgehammer/configuration.nix` | GRUB removable media bootloader |
-| `testvm` | Preserved | `nixos` | `x86_64-linux` | MicroVM Sandbox (1-2 vCPU, 1 GiB) | `hosts/microvms/testvm.nix` | MicroVM disk image |
+> **No table here — by design.** The fleet registry has exactly one home:
+> [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
+> with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the
+> generated catalog in `docs/generated/fleet-inventory.md` (`nix build .#docs`).
+> A pasted table is a table that disagrees with itself within a month —
+> `.agents/SCHEMA.md` §1, and `docs/docs-pipeline-audit.md` F4.
 
 ### Module Layout
 
@@ -643,13 +612,14 @@ task infra:smtp:auth             # Interactive SMTP auth for hosts (using app pa
 # Prompts for: host, username, app-password; outputs MSMTP/MUTT config for the host
 ```
 
-### Site (docs-site/)
+### Site (`docs-site/` retired 2026-10-19; the site is `.#fleet-docs-site`)
+
+Nix-native `lib/aki-site.nix` served by frieren; nav from the knowledge graph, so
+no page list, no Python renderer and no repo copy (`docs/docs-pipeline-audit.md`).
+The publisher site (`dev:site:*`) is separate.
 
 ```bash
-task dev:site:build              # Build documentation site
-task dev:site:preview            # Live preview
-task dev:site:deploy             # Deploy to target
-task dev:site:list               # List deployment targets (from taskfiles/site-manifest.json)
+task docs:build   # markdown tree (nix build .#docs)   ·   task docs:site   # rendered site
 ```
 
 ### TOTP (cloak)
@@ -1173,6 +1143,35 @@ External fetched dependencies are registered in `modules/config/fetches.json` an
 task dev:config:hash-update    # runs nix-hash-update.sh
 ```
 
+## Documentation & Site Compilation
+
+Documentation is markdown or data that Nix compiles into a store path; the store
+path is the artifact. Nothing derived is committed, and no second renderer is
+allowed beside the first.
+
+| Layer | Owner | Rule |
+| :--- | :--- | :--- |
+| content | `*.md`, `inventory.toml`, `modules.toml` | hand-written only, never generated |
+| projection | `lib/inventory.nix`, `lib/docs.nix`, `lib/knowledge-graph.nix`, `lib/skills.nix` | one pure Nix compiler per projection |
+| artifact | `.#docs` (generated markdown), `.#fleet-docs-site` (the rendered site) | store paths, never repo copies |
+| serving | `hosts/frieren/reverse-proxy.nix`, `modules/services/uds-static-bridge.nix` | serve the path; never re-derive content in a host module |
+
+- **Never commit a derivative.** `docs/generated/` is `nix build .#docs`. A
+  tracked copy can drift, so it needs `checks:docs:sync` — a gate that exists
+  because the artifact is duplicated is proof the duplication is wrong.
+- **Content is not code.** CSS/JS/HTML go in files the derivation reads, not `''`
+  literals in a `.nix` file (90 % of `lib/aki-site.nix` is such literals): literals
+  cannot be linted or reviewed, and every byte re-evaluates a module that imports
+  the knowledge graph.
+- **One instantiation.** Build the site once (`.#fleet-docs-site`) and pass the
+  path to every vhost/socket; three `import`s with identical args are three evals.
+- **Publishing must not need a system switch.** If a `.md` edit lands inside a
+  host's closure, the docs are as live as the last `nixos-rebuild`.
+- **Eval-time `builtins.readFile` is flake-scoped.** An untracked `.md` does not
+  exist to the evaluator — `git add` before you eval or serve.
+
+Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
+
 ## Documentation Map
 
 | File                                 | Content                                                                |
@@ -1181,9 +1180,10 @@ task dev:config:hash-update    # runs nix-hash-update.sh
 | `AGENTS.md`                          | This file — canonical agent routing and codebase manual                |
 | `inventory.toml`                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
 | `docs/inventory-schema.md`           | Inventory schema, compiled artifacts, and the automatic checks          |
-| `docs/generated/fleet-inventory.md`  | Fleet catalog + per-host pages, built from `inventory.toml` by `lib/docs.nix` (`task docs:sync`) |
-| `docs/generated/modules-registry.md` | Knob registry, built from `modules.toml` by `lib/docs.nix`             |
-| `docs-site/`                         | HTML site; page list + generated pages come from `nix build .#docs`   |
+| `docs/fleet-inventory.md`            | Pointer page — the catalog itself is `.#docs` (`nix build .#docs`), never committed |
+| `docs/modules-registry.md`           | Pointer page — the knob registry is built from `modules.toml` at build time |
+| `lib/aki-site.nix`                   | The rendered site (`.#fleet-docs-site`): nav comes from the knowledge graph |
+| `docs/docs-pipeline-audit.md`        | Docs/site pipeline audit: duplicated artifacts, content-in-Nix, remediation order |
 | `docs/closure-reduction.md`          | Closure size levers, evidence chains, and the runtime/interactive/one-shot tiers |
 | `docs/closure-debloat.md`            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |
 | `.agents/fleet-matrix.md`            | Compact fleet context matrix for LLMs and agent prompts                |

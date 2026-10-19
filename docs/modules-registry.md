@@ -6,9 +6,9 @@
 > fleet inventory and per-host pages, so it cannot lag the registry:
 >
 > - source of truth: `modules.toml`
-> - build: `nix build .#docs` → `docs/generated/modules-registry.md`
-> - checked-in copy: [`generated/modules-registry.md`](generated/modules-registry.md)
+> - build: `nix build .#docs` → `<store>/docs/generated/modules-registry.md`
+> - read it: `task docs:build` prints the store path
 > - interactive manager: `task modules` (`task dev:modules:menu`)
-> - refresh: `task docs:sync` · verify: `task checks:docs:sync`
 >
-> `task dev:modules:sync` still works — it delegates to `task docs:sync`.
+> Nothing is checked in, so there is nothing to refresh. `task dev:modules:sync`
+> still works — it builds the registry (`task docs:build`).

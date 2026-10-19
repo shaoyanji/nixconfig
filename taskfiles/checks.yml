@@ -35,7 +35,7 @@ tasks:
       refuses it on machines this small, and there is deliberately no task in this
       repo whose default is every host.
     cmds:
-      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules
+      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets
       - task checks:tasks
       - task checks:kg
       - task checks:nix:lint
@@ -480,22 +480,6 @@ tasks:
     desc: Verify every sops file's embedded age recipients match .sops.yaml (catches un-rekeyed files)
     cmds:
       - bash scripts/task/sops-drift-check.sh
-
-  checks:docs:sync:
-    desc: "[gate] Fail if docs/generated/ differs from `nix build .#docs`"
-    summary: >
-      The generated docs (fleet inventory, modules registry, per-host pages) are
-      built from the compiled metadata, so the checked-in copy is a cache, not a
-      source of truth. This compares docs/generated/ byte-for-byte against the
-      build output and exits 1 on any difference — edit inventory.toml or
-      lib/docs.nix, then run `task docs:sync`, never the markdown.
-      Uses --no-link: no GC root, no repo mutation, no build of the site.
-    cmds:
-      - |
-        set -euo pipefail
-        out=$(nix build --no-link --print-out-paths .#docs)
-        diff -ru "$out/docs/generated" docs/generated
-        echo "docs/generated/ matches the build"
 
   checks:nix:lint:
     desc: Run deadnix (hard gate) and statix (advisory) on all Nix files

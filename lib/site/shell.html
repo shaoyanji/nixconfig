@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Control Plane &mdash; {{devices}} devices</title>
+  <link rel="stylesheet" href="{{cssFile}}">
+  <script src="{{akiJsFile}}" defer></script>
+  <script src="{{kgJsFile}}" defer></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>Fleet Control Plane</h1>
+      <span id="live-status-badge" class="badge {{statusClass}}">{{statusText}}</span>
+    </div>
+    <div>
+      <span class="badge badge-blue">{{nodes}} nodes &middot; {{edges}} edges</span>
+    </div>
+  </header>
+
+  <nav>
+    <button class="tab-btn nav-active" url="data/overview.json">Overview</button>
+    <button class="tab-btn" url="data/inventory.json">Fleet Inventory</button>
+    <button class="tab-btn" url="data/kg.json">Knowledge Graph</button>
+    <button class="tab-btn" url="data/notes.json">Notes</button>
+    <button class="tab-btn" url="data/closures.json">Closure Budgets</button>
+  </nav>
+
+  <div id="breadcrumbs">fleet / overview</div>
+
+  <div class="layout-grid">
+    <aside>
+      <div id="sidebar-title"><h3>Navigation</h3></div>
+      <div id="sidebar-pane" class="side-list">
+        {{sidebar}}
+      </div>
+    </aside>
+
+    <main id="detail-pane">
+      {{overview}}
+    </main>
+  </div>
+</body>
+</html>

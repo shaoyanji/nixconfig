@@ -426,11 +426,16 @@ tasks:
         bash scripts/task/kg-ask.sh "what touches $h"
 
   ops:docs:budget:
-    desc: Check living documents against the SCHEMA.md budgets
+    desc: Check living documents against the SCHEMA.md budgets (queues count open items)
     summary: >
       Line counts for the living documents; exits 1 when one exceeds its budget.
       Budgets are in .agents/SCHEMA.md §2. Over budget means "move detail to
       docs/ and leave a pointer", not "raise the number".
+      TODO.md is a QUEUE and is judged twice: at most 150 unchecked items
+      (`- [ ]`) and at most 300 lines in total. Checked items are the record that
+      the work happened, so they cost against the total but not against the open
+      budget — deleting them to make room is exactly what this rule forbids.
+      Prints both counters for the queue and one count per prose document.
     cmds:
       - |
         fail=0
@@ -445,12 +450,25 @@ tasks:
             echo "ok    $f: $n / $max"
           fi
         }
+        checkqueue() {
+          f="$1"; maxopen="$2"; maxtotal="$3"
+          if [ ! -f "$f" ]; then echo "MISSING $f"; fail=1; return; fi
+          open=$(grep -c '^- \[ \]' "$f" || true)
+          total=$(wc -l < "$f")
+          if [ "$open" -gt "$maxopen" ]; then
+            echo "OVER  $f: $open open > $maxopen"; fail=1
+          elif [ "$total" -gt "$maxtotal" ]; then
+            echo "OVER  $f: $total total > $maxtotal"; fail=1
+          else
+            echo "ok    $f: $open open / $maxopen, $total total / $maxtotal"
+          fi
+        }
         check AGENTS.md 1200
         check MANUAL.md 1200
         check ARCHITECTURE.md 600
         check AUDIT.md 150
-        check TODO.md 150
         check HANDOFF.md 150
+        checkqueue TODO.md 150 300
         exit "$fail"
 
   ops:bench:evals:

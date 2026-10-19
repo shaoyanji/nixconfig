@@ -113,7 +113,9 @@ neighbours while dimming the rest. The filter lives in the URL
 (`#kg?q=frieren&types=host,doc`), so a filtered view is a link you can send;
 opening one lands directly on the graph. Every click is a fetched JSON slice —
 no daemon. The
-definition lives in `lib/aki-site.nix`; `task checks:kg:canvas` proves it by
+definition lives in `lib/aki-site.nix`, and the canvas itself is
+`lib/site/kg.js` (plain JS, parsed by `checks.<system>.site-assets`);
+`task checks:kg:canvas` proves it by
 driving headless Chrome through the click, and `task checks:kg:native` holds the
 cold bootstrap to **median < 20 ms** with no `nix` subprocess.
 

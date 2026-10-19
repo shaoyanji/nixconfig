@@ -5,11 +5,11 @@
 #
 #   inventory.toml ──lib/inventory.nix──┐
 #                                       ├──> docs.nix ──> pages (markdown)
-#   modules.toml ──builtins.fromTOML────┘                 nav (a Nix value)
+#   modules.toml ──builtins.fromTOML────┘                 nix build .#docs
 #                                                             │
-#                                              nix build .#docs (markdown tree)
-#                                                             │
-#                                              nix build .#docs-site (HTML)
+#                                    lib/aki-site.nix renders the site from the
+#                                    compiled registry + the knowledge graph
+#                                    (`.#fleet-docs-site`, task docs:site)
 #
 # Why this exists: the fleet-inventory and modules-registry pages used to be
 # hand-maintained prose that restated `inventory.toml`/`modules.toml` and drifted
@@ -19,9 +19,10 @@
 # knob can never be documented twice in two different ways.
 #
 # `mkDocs pkgs` writes the markdown tree plus `nav.json` (the site's manifest) as
-# a derivation — no repo mutation at build time. `task docs:sync` copies that
-# output into `docs/generated/` for git readers; `checks:docs:sync` proves the
-# checked-in copy is byte-identical to the build.
+# a derivation. That derivation is the ONLY copy of the generated pages: nothing
+# is checked in, so there is no copy to drift and no drift gate to run
+# (docs/docs-pipeline-audit.md §4). Read it with `nix build .#docs`, or as the
+# rendered page at `.#fleet-docs-site`.
 #
 # Add a hand-written page by listing it in `staticSections` below. Add a
 # generated page by adding a builder to `generatedPages`; it appears in the nav
@@ -67,8 +68,8 @@
 
   # `what` already carries its own formatting (e.g. "`inventory.toml`").
   banner = what: ''
-    > **Generated — do not edit.** Built from ${what} by `lib/docs.nix`
-    > (`nix build .#docs`). Refresh the checked-in copy with `task docs:sync`.
+    > **Generated — not a file in the repository.** Built from ${what} by
+    > `lib/docs.nix` (`nix build .#docs`); rendered by `.#fleet-docs-site`.
   '';
 
   header = title: what: "# ${title}\n\n${banner what}\n";
@@ -214,7 +215,7 @@
     + moduleSections
     + "\n";
 
-  # --- page set + nav (both derive from the same values) ---------------------
+  # --- page set (paths inside the derivation) --------------------------------
   generatedPages =
     {
       "docs/generated/fleet-inventory.md" = fleetInventory;
@@ -222,146 +223,11 @@
     }
     // lib.mapAttrs' (name: h: lib.nameValuePair "docs/generated/hosts/${name}.md" (hostPage name h)) nixHosts;
 
-  generatedNav =
-    [
-      {
-        label = "Fleet inventory";
-        src = "docs/generated/fleet-inventory.md";
-        slug = "/generated/fleet-inventory/";
-      }
-      {
-        label = "Modules registry";
-        src = "docs/generated/modules-registry.md";
-        slug = "/generated/modules-registry/";
-      }
-    ]
-    ++ map
-    (name: {
-      label = name;
-      src = "docs/generated/hosts/${name}.md";
-      slug = "/generated/hosts/${name}/";
-    })
-    (lib.filter (n: nixHosts.${n}.status == "active") (lib.attrNames nixHosts));
-
-  # Hand-written pages the site publishes. `src` is repo-relative; the site
-  # resolves it against the repo tree, and generated pages against `.#docs`.
-  staticSections = [
-    {
-      title = "Home";
-      pages = [
-        {
-          label = "README";
-          src = "README.md";
-          slug = "/";
-        }
-      ];
-    }
-    {
-      title = "Repo routing";
-      pages = [
-        {
-          label = "AGENTS";
-          src = "AGENTS.md";
-          slug = "/routing/agents/";
-        }
-        {
-          label = "Agent guidance";
-          src = ".agents/README.md";
-          slug = "/routing/agents-index/";
-        }
-      ];
-    }
-    {
-      title = "Deploy";
-      pages = [
-        {
-          label = "Deploy landing";
-          src = ".agents/deploy/README.md";
-          slug = "/deploy/";
-        }
-        {
-          label = "Rollback";
-          src = ".agents/deploy/rollback.md";
-          slug = "/deploy/rollback/";
-        }
-        {
-          label = "Website guide";
-          src = ".agents/deploy/website.md";
-          slug = "/deploy/website/";
-        }
-        {
-          label = "frieren notes";
-          src = ".agents/deploy/hosts/frieren.md";
-          slug = "/deploy/hosts/frieren/";
-        }
-        {
-          label = "mtfuji notes";
-          src = ".agents/deploy/hosts/mtfuji.md";
-          slug = "/deploy/hosts/mtfuji/";
-        }
-        {
-          label = "scratch notes";
-          src = ".agents/deploy/hosts/scratch.md";
-          slug = "/deploy/hosts/scratch/";
-        }
-      ];
-    }
-    {
-      title = "Control plane";
-      pages = [
-        {
-          label = "Task control plane";
-          src = "docs/task-control-plane.md";
-          slug = "/control/task-control-plane/";
-        }
-        {
-          label = "Taskfile map";
-          src = "taskfiles/README.md";
-          slug = "/control/taskfiles/";
-        }
-      ];
-    }
-    {
-      title = "Supporting docs";
-      pages = [
-        {
-          label = "Inventory schema";
-          src = "docs/inventory-schema.md";
-          slug = "/docs/inventory-schema/";
-        }
-        {
-          label = "Download & storage taxonomy";
-          src = "docs/download-taxonomy.md";
-          slug = "/docs/download-taxonomy/";
-        }
-        {
-          label = "Userland package ownership";
-          src = "docs/userland-package-ownership.md";
-          slug = "/docs/userland-package-ownership/";
-        }
-      ];
-    }
-    {
-      title = "Maintenance";
-      pages = [
-        {
-          label = "TODO";
-          src = "TODO.md";
-          slug = "/todo/";
-        }
-      ];
-    }
-  ];
-
-  nav =
-    staticSections
-    ++ [
-      {
-        title = "Generated from metadata";
-        pages = generatedNav;
-      }
-    ];
-
+  # There is no `nav` value any more: the only consumer of one was the Python
+  # renderer in docs-site/, which is retired. The rendered site
+  # (`.#fleet-docs-site`, lib/aki-site.nix) derives its own navigation from the
+  # knowledge graph — so a document that exists is a document the site shows,
+  # with no second list to keep in sync.
   # --- derivation ------------------------------------------------------------
   # `install -D` creates the parent directories, so nested slugs need no mkdir.
   mkDocs = pkgs: let
@@ -375,10 +241,9 @@
     } ''
       mkdir -p $out
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList installPage generatedPages)}
-      install -Dm644 ${pkgs.writeText "docs-nav.json" (builtins.toJSON nav)} $out/nav.json
     '';
 in {
-  inherit nav generatedPages;
+  inherit generatedPages;
 
   # All pages keyed by repo-relative path (static pages are not copied: the site
   # reads them from the repo tree, the build owns only what is generated).

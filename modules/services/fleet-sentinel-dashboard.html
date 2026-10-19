@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>fleet sentinel</title>
+<style>
+  :root { color-scheme: dark; --bg:#11111b; --panel:#1e1e2e; --text:#cdd6f4; --muted:#6c7086;
+          --ok:#a6e3a1; --bad:#f38ba8; --accent:#89b4fa; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:2rem; background:var(--bg); color:var(--text);
+         font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  h1 { font-size:1.1rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .grid { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr)); max-width:72rem; }
+  .card { background:var(--panel); border-radius:1rem; padding:1rem 1.25rem;
+          box-shadow:0 0.5rem 1.5rem rgba(0,0,0,.35); }
+  .state { font-size:2rem; font-weight:600; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); }
+  .k { color:var(--muted); font-size:.75rem; letter-spacing:.06em; text-transform:uppercase; }
+  .v { font-size:1.25rem; margin-top:.2rem; }
+  code { color:var(--accent); }
+  ul { margin:.4rem 0 0; padding-left:1.1rem; } li { color:var(--bad); }
+  a { color:var(--accent); }
+  footer { margin-top:1.5rem; color:var(--muted); font-size:.8rem; }
+</style>
+</head>
+<body>
+<h1>fleet sentinel · frieren</h1>
+<div class="grid" id="grid"><div class="card"><div class="k">state</div><div class="state">loading…</div></div></div>
+<footer>ledger: <code>task ops:ledger</code> · toon: <code>task ops:ledger:toon</code> ·
+  raw: <a href="status.json">status.json</a></footer>
+<script>
+fetch('status.json', {cache:'no-store'}).then(r => r.json()).then(s => {
+  const cls = s.state === 'ok' ? 'ok' : 'bad';
+  const disk = Object.entries(s.disk_pct || {})
+    .filter(([,v]) => v !== null).map(([k,v]) => `<div class="v">${k}: ${v}%</div>`).join("");
+  const jobs = Object.entries(s.jobs || {})
+    .map(([k,v]) => `<div class="v">${v}</div><div class="k">${k}</div>`).join("");
+  const reasons = (s.reasons || []).map(r => `<li>${r}</li>`).join("") || '<li class="ok">none</li>';
+  document.getElementById('grid').innerHTML = `
+    <div class="card"><div class="k">state</div><div class="state ${cls}">${s.state}</div>
+      <div class="k">${s.ts}</div></div>
+    <div class="card"><div class="k">reasons</div><ul>${reasons}</ul></div>
+    <div class="card"><div class="k">generation age</div><div class="v">${s.generation_age_h} h</div>
+      <div class="k">io psi ${s.psi.io} · mem psi ${s.psi.memory}</div></div>
+    <div class="card"><div class="k">disk</div>${disk}</div>
+    <div class="card"><div class="k">job results</div>${jobs}</div>`;
+}).catch(e => {
+  document.getElementById('grid').innerHTML =
+    `<div class="card"><div class="k">state</div><div class="state bad">unreachable</div></div>`;
+});
+</script>
+</body>
+</html>

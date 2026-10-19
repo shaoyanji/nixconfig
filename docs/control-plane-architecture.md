@@ -7,10 +7,11 @@
 > fleet inventory, modules registry and per-host pages from the compiled
 > `.#inventory` and `modules.toml`, and emits the site **nav as a Nix value** —
 > so there is no hand-written `nav.json` any more, and `docs/site.toml` is no
-> longer needed for that job. `nix build .#docs` is the source of truth;
-> `task docs:sync` refreshes `docs/generated/`; `checks:docs:sync` proves the
-> copy matches. The Python generator remains only as the markdown→HTML step
-> (section 4's "Retire generate.py" is still open).
+> longer needed for that job. `nix build .#docs` is the source of truth and the
+> only copy — the checked-in `docs/generated/` mirror and its drift gate were
+> removed on 2026-10-19 (see [`docs-pipeline-audit.md`](./docs-pipeline-audit.md)).
+> The Python generator remains only as the markdown→HTML step (section 4's
+> "Retire generate.py" is still open).
 > **Companion vision:** [`control-plane-vision.md`](./control-plane-vision.md)
 > (why the end state is shaped this way — Nix-as-generator, federated
 > manifests, and the evaluation-speed wall).
@@ -22,10 +23,10 @@
 
 ## 1. What this replaces, and why
 
-Today's `docs-site/` is `python3 + python3Packages.markdown` + `generate.py`,
-reading a nav that is now **emitted by `lib/docs.nix`** (it used to be a
-hand-written `docs-site/nav.json`). The data half is fixed; what remains wrong
-for the end state is the rendering/runtime half:
+**DELIVERED 2026-10-19:** `docs-site/` (`python3 + python3Packages.markdown` +
+`generate.py` + `nav.json`) is deleted, and with it the `.#docs-site` output, its
+flake check and the Python derivation. The Nix-native renderer (`lib/aki-site.nix`)
+is the site. The paragraph below is kept as the record of what was wrong:
 
 - The nav is no longer hand-maintained, but markdown→HTML still happens in
   Python at build time instead of the Go builder described below.
@@ -177,6 +178,9 @@ Running tasks from the web is powerful, so it is treated as such:
 4. **Dashboard:** promote the control surface to the index; embed live closure
    graphs.
 5. **Retire** `generate.py`, `nav.json`, and the Python derivation.
+   *Landed 2026-10-19:* `nav.json` and the committed `docs/generated/` copy are
+   gone; `generate.py` and `.#docs-site` removed the same day — the Python
+   renderer is retired, not deferred (§1 above).
 
 At every step the static site keeps working (it is just files in the store), so
 this is safe to land piecewise.

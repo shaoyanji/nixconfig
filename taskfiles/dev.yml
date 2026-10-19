@@ -273,16 +273,16 @@ tasks:
       - bash scripts/task/inventory-menu.sh
 
   dev:inventory:sync:
-    desc: Synchronize AGENTS.md + fleet matrix (LLM cards), then refresh docs/generated/
+    desc: Synchronize AGENTS.md + fleet matrix (LLM cards) and build the generated docs
     summary: >
       Three owners, run together: lib/home-agents.nix owns ~/AGENTS.md (a store
-      symlink, no Python), compile-llm-specs.py still owns the fleet matrix
+      symlink, no Python), compile-llm-specs.py owns the fleet matrix
       (.agents/fleet-matrix.md), and lib/docs.nix owns every generated doc page —
-      `task docs:sync` copies the latter out of `nix build .#docs`.
+      which exists only as a store path (no repo copy to refresh).
     cmds:
       - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --compile-fleet"
       - task dev:inventory:home-agents
-      - task docs:sync
+      - task docs:build
 
   dev:inventory:llm:
     desc: Compile and render the LLM prompt context card for a specific host (HOST=name)
@@ -347,11 +347,12 @@ tasks:
       - bash scripts/task/modules-menu.sh
 
   dev:modules:sync:
-    desc: Refresh the generated modules registry (delegates to `task docs:sync`)
+    desc: Build the generated modules registry (delegates to `task docs:build`)
     summary: >
-      The knob table is no longer produced by modules-menu.sh: lib/docs.nix builds
-      it from modules.toml (with the fleet inventory and per-host pages), and
-      `task docs:sync` copies `nix build .#docs` into docs/generated/.
+      The knob table is not produced by modules-menu.sh: lib/docs.nix builds it
+      from modules.toml (with the fleet inventory and per-host pages), and it
+      lives only in the store — `nix build .#docs`, printed by `task docs:build`.
+      The wrapper stays because `task modules` offers a "sync" action.
     cmds:
       - bash scripts/task/modules-menu.sh sync
 
@@ -525,44 +526,29 @@ tasks:
   # --- docs: generated from the compiled metadata (lib/docs.nix) ------------
   # The pages and the site nav are Nix values built from `.#inventory` and
   # modules.toml, so they cannot drift from the hosts/knobs they describe.
-  # `.#docs` is the source of truth; docs/generated/ is its git-tracked copy.
+  # `.#docs` is the ONLY copy: the tree is a store path, and no part of it is
+  # checked in (docs/generated/ used to be, which is why a drift gate had to
+  # exist — see docs/docs-pipeline-audit.md §4).
   docs:build:
     desc: Build the generated docs tree + nav from compiled metadata (nix build .#docs)
     summary: >
       Prints the store path of the generated docs: fleet-inventory.md,
       modules-registry.md, hosts/<h>.md and nav.json (the site manifest).
-      Nothing in the repo is written — `docs:sync` copies it into
-      docs/generated/ for git readers.
+      Nothing in the repo is written; read the pages from that path, or from
+      the served site (`.#fleet-docs-site`).
     cmds:
       - nix build --no-link --print-out-paths .#docs
 
   docs:site:
-    desc: Build the HTML documentation site from the generated docs (nix build .#docs-site)
+    desc: Build the rendered documentation site (nix build .#fleet-docs-site)
     summary: >
-      Renders the page list in `.#docs/nav.json` (a Nix value, not nav.json in the
-      repo) over the hand-written + generated markdown. Result linked at
-      ./result-docsite.
+      The site is a Nix-native hypermedia tree (lib/aki-site.nix): it renders the
+      compiled registry, the knowledge graph (which now includes .agents/** and
+      taskfiles/*.md as document nodes) and the generated doc pages. Result
+      linked at ./result-docsite. There is no Python phase — the markdown
+      renderer that used to live in docs-site/ is retired.
     cmds:
-      - nix build .#docs-site -o result-docsite
-
-  docs:sync:
-    desc: Refresh docs/generated/ from `nix build .#docs` (checked-in copies, DO-NOT-EDIT)
-    summary: >
-      Replaces docs/generated/ with the exact bytes of the build output. The
-      generated pages carry a "do not edit" banner; editing them in the repo is
-      pointless because `checks:docs:sync` compares the copy against the build.
-    cmds:
-      - |
-        set -euo pipefail
-        out=$(nix build --no-link --print-out-paths .#docs)
-        # Store paths are read-only; cp -r copies those modes, so a previous sync
-        # leaves directories that cannot be removed. Make them writable first.
-        chmod -R u+w docs/generated 2>/dev/null || true
-        rm -rf docs/generated
-        mkdir -p docs/generated
-        cp -r "$out/docs/generated/." docs/generated/
-        chmod -R u+w docs/generated
-        echo "synced docs/generated/ ($(find docs/generated -name '*.md' | wc -l) pages)"
+      - nix build .#fleet-docs-site -o result-docsite
 
   dev:nixbuild:plan:
     desc: Report what would build/fetch for hosts against local substituters (read-only)

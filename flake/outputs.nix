@@ -15,7 +15,7 @@
   hostProjection = import ./host-projection.nix {inherit lib hostInventory;};
   projectHosts = hostProjection.project;
   # Documentation + site nav generated from the SAME compiled registry the hosts
-  # use (lib/docs.nix). Built for one system: it is markdown/HTML only, so the
+  # use (lib/docs.nix). Built for one system: it is markdown only, so the
   # output is system-independent and does not need a per-system fan-out.
   docsGen = import ../lib/docs.nix {inherit lib inventory;};
   docs = docsGen.mkDocs (pkgsFor "x86_64-linux");
@@ -69,13 +69,11 @@ in {
   # Expose the package set, including overlays, for convenience.
   darwinPackages = self.darwinConfigurations.cassini.pkgs;
 
-  # The site consumes the generated docs derivation, never the repo copy: the
-  # page list and the pages themselves are the same build output git readers see
-  # after `task docs:sync`.
-  docsSite = (pkgsFor "x86_64-linux").callPackage ../docs-site/default.nix {inherit docs;};
-  docs-site = self.docsSite;
-
-  # `nix build .#docs` — generated markdown tree + nav.json (the site manifest).
+  # `nix build .#docs` — the generated markdown tree (fleet inventory, modules
+  # registry, per-host pages) as a store path. The rendered site is
+  # `.#fleet-docs-site` (lib/aki-site.nix), built natively from the compiled
+  # registry and the knowledge graph; the Python renderer that used to live in
+  # docs-site/ is retired (docs/docs-pipeline-audit.md §4).
   inherit docs;
 
   inherit hostProjection;

@@ -37,4 +37,19 @@
     repo = "nixpkgs";
     rev = inputs.nixpkgs.rev;
   };
+
+  # DN's binaries are NOT on cache.nixos.org: without this, the first switch
+  # compiles 54 derivations (boost 1.89, wasmtime 48, libgit2, boehm-gc, Python
+  # envs) because DN's packages come from its own nixpkgs fork. With it, the
+  # same closure is a 0-build fetch (measured: 54 builds + 848 MiB -> 0 builds).
+  # The key is the public FlakeHub Cache key that signs
+  # install.determinate.systems; it is host-local on purpose.
+  #
+  # Bootstrap order matters: this setting only takes effect AFTER activation, so
+  # the first switch must also pass it on the command line, or pre-fetch the
+  # closure (`nix copy --from https://install.determinate.systems`).
+  nix.settings = {
+    substituters = ["https://install.determinate.systems"];
+    trusted-public-keys = ["cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="];
+  };
 }

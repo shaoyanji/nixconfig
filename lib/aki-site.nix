@@ -128,7 +128,20 @@
 
   budgetRows = lib.filter (r: r.bytes != null) (map budgetRow (builtins.attrNames budgetHosts));
   budgetNames = map (r: r.name) budgetRows;
-  unbudgeted = lib.filter (n: !(builtins.elem n budgetNames)) hostNames;
+
+  # Coverage is judged against the hosts that HAVE a closure to measure. An
+  # external device (Windows, FreeBSD, Android, a NAS) has no Nix store, so
+  # listing it as "without a baseline" forever would be noise that hides the
+  # real gap: an active Nix host nobody adopted.
+  namesWhere = p: builtins.attrNames (lib.filterAttrs (_: p) hosts);
+  externalNames = namesWhere (h: (h.kind or "") == "external");
+  activeNixNames = namesWhere (h: (h.status or "") == "active" && (h.kind or "") != "external");
+  preservedNixNames =
+    namesWhere (h: (h.status or "") != "active" && (h.kind or "") != "external");
+  isCovered = n: builtins.elem n budgetNames;
+  coveredActive = lib.filter isCovered activeNixNames;
+  uncoveredActive = lib.filter (n: !(isCovered n)) activeNixNames;
+  uncoveredPreserved = lib.filter (n: !(isCovered n)) preservedNixNames;
 
   maxBudget =
     lib.foldl' (a: r:
@@ -1050,7 +1063,7 @@
         <h4>Declared Services</h4>
         <p><strong>${toString serviceCount} key services</strong></p>
         <p><small style="color: var(--text-muted);">from the registry's per-host software declarations</small></p>
-        <p><small style="color: var(--yellow, #e0af68);">${toString (builtins.length unbudgeted)} hosts without a baseline</small></p>
+        <p><small style="color: var(--yellow, #e0af68);">${toString (builtins.length uncoveredActive)} of ${toString (builtins.length activeNixNames)} active Nix hosts lack a baseline</small></p>
       </div>
     </div>
 
@@ -1333,7 +1346,8 @@
         <p style="margin: 0.75rem 0; color: var(--text-muted);">
           Baseline bytes are measured on the host and written into
           <code>closure-budgets.toml</code> by
-          <code>task dev:closure:budget:adopt</code>. The budget is
+          <code>task dev:closure:budget:adopt</code> (add <code>REMOTE=1</code>
+          for a host that is not this machine). The budget is
           <code>baseline &times; (1 + headroom)</code>, computed here — never
           entered. A host with no row has never been measured, and the site says
           so instead of guessing.
@@ -1341,9 +1355,10 @@
 
         <div class="card-grid">
           <div class="card">
-            <h4>Measured hosts</h4>
-            <p><strong>${toString (builtins.length closureRows)} of ${toString totalHosts}</strong></p>
-            <p><small style="color: var(--text-muted);">${toString (builtins.length unbudgeted)} without a baseline</small></p>
+            <h4>Active Nix hosts measured</h4>
+            <p><strong>${toString (builtins.length coveredActive)} of ${toString (builtins.length activeNixNames)}</strong></p>
+            <p><small style="color: var(--text-muted);">${toString (builtins.length uncoveredActive)} active host(s) not adopted yet</small></p>
+            <p><small style="color: var(--text-muted);">${toString (builtins.length uncoveredPreserved)} dormant Nix host(s) unmeasured &middot; ${toString (builtins.length externalNames)} external devices have no Nix closure</small></p>
           </div>
           <div class="card">
             <h4>Total allowed</h4>
@@ -1389,14 +1404,25 @@
               </tbody>
             </table>
           ''
+        }        ${
+          if uncoveredActive == []
+          then ''
+            <p style="margin-top: 1.5rem; color: var(--green);">Every active Nix host has a measured baseline.</p>
+          ''
+          else ''
+            <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">Active Nix hosts without a baseline</h3>
+            <p>${lib.concatStringsSep ", " (map (n: ''<code>${n}</code>'') uncoveredActive)}</p>
+            <p><small style="color: var(--text-muted);">Adopt them in one deliberate run from a machine that can reach the host's store:</small></p>
+            <pre>task dev:closure:budget:adopt:hosts HOSTS="${lib.concatStringsSep " " uncoveredActive}"</pre>
+          ''
         }
 
         ${
-          if unbudgeted == []
+          if uncoveredPreserved == []
           then ""
           else ''
-            <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">No measured baseline</h3>
-            <p>${lib.concatStringsSep ", " (map (n: ''<code>${n}</code>'') unbudgeted)}</p>
+            <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">Dormant Nix hosts without a baseline</h3>
+            <p>${lib.concatStringsSep ", " (map (n: ''<code>${n}</code>'') uncoveredPreserved)}</p>
           ''
         }
       '';

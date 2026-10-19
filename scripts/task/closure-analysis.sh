@@ -27,11 +27,12 @@
 #                            (baseline × (1 + headroom), or an absolute pin)
 #                            in closure-budgets.toml (HC-4); --all checks every
 #                            host that has an entry
-#   adopt                    measure the LOCAL host and rewrite the managed
-#                            baseline block in closure-budgets.toml (the ratchet)
+#   adopt                    measure a host and rewrite the managed baseline
+#                            block in closure-budgets.toml (the ratchet);
+#                            local by default, `--remote` for any reachable host
 #   tui                      interactive: pick host, then pick a view
 #
-# Flags: --host NAME  --store URI  --refresh  --all
+# Flags: --host NAME  --store URI  --refresh  --all  --remote
 # Env:   HEADROOM_PCT=<n>   one-off headroom for a budget check
 #        BUDGETS_FILE=<p>   alternate budget file (default closure-budgets.toml)
 # ==============================================================================
@@ -43,6 +44,7 @@ mkdir -p "$CACHE_DIR"
 
 REFRESH=0
 ALL=0
+REMOTE=0
 HOST=""
 STORE_URI=""
 POS=()
@@ -54,6 +56,7 @@ while [ $# -gt 0 ]; do
     --store=*) STORE_URI="${1#*=}"; shift ;;
     --refresh) REFRESH=1; shift ;;
     --all) ALL=1; shift ;;
+    --remote) REMOTE=1; shift ;;
     --help | -h) sed -n '3,31p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     --*) echo "unknown flag: $1" >&2; exit 2 ;;
     *) POS+=("$1"); shift ;;
@@ -300,22 +303,52 @@ budget_line() { # host actual-bytes
 # Adopt the local host's measured closure as its new baseline. The measurement is
 # written into the managed block, so this file's policy/comments survive.
 do_budget_adopt() {
-  local h actual on block merged
+  local h actual on block merged remote_t=""
   h="$(budget_host)"
-  if [ "$h" != "$SELF_HOST" ] && [ "$h" != "local" ]; then
-    echo "adopt measures the LOCAL closure only (got '$h'); run it on $h" >&2
-    exit 2
+  if [ "$h" = "local" ] || [ "$h" = "$SELF_HOST" ]; then
+    h="$SELF_HOST"
+    actual="$(total_of "$(target 1)")"
+  else
+    # A remote baseline must be MEASURED there, never inferred from this machine.
+    # Without --remote the old refusal stands: recording frieren's closure under
+    # `eisen` would be a plausible-looking number that describes the wrong host.
+    [ "$REMOTE" = 1 ] || {
+      echo "adopt measures the LOCAL closure only (got '$h')." >&2
+      echo "  Meant the remote host? re-run with --remote (reads ITS store DB over ssh)." >&2
+      exit 2
+    }
+    remote_t="$(ssh -o BatchMode=yes -o ControlMaster=no -o ConnectTimeout=6 "$h" 'readlink -f /run/current-system' 2>/dev/null || true)"
+    [ -n "$remote_t" ] || {
+      echo "Error: cannot resolve /run/current-system on '$h' (offline, no SSH, or no store access); nothing adopted." >&2
+      exit 1
+    }
+    actual="$(total_of_store "ssh://$h" "$remote_t")"
+    [ "${actual:-0}" -gt 0 ] || {
+      echo "Error: measured 0 bytes on '$h' ($remote_t); refusing to adopt an empty closure." >&2
+      exit 1
+    }
+    echo "measured $h → $remote_t over ssh"
   fi
   [ -f "$BUDGETS_FILE" ] || { echo "missing $BUDGETS_FILE" >&2; exit 2; }
-  actual="$(total_of "$(target 1)")"
   on="$(date +%F)"
   block="$(mktemp)"
   merged="$(mktemp)"
   {
-    yq -r '.hosts | to_entries[] | select(.value.baseline.bytes) | [.key, .value.baseline.bytes, (.value.baseline.measured_on // "")] | @tsv' "$BUDGETS_FILE"
+    # The adopted host is EXCLUDED here, not deduped afterwards. `!seen[$1]++`
+    # kept the first row, and this read is printed before the new measurement —
+    # so re-adopting an existing host used to leave its old baseline in place
+    # while reporting success (found 2026-10-19 by adopting frieren: file still
+    # said 32,104,328,080 after a 30,689,043,280 run).
+    ADOPT_HOST="$h" yq -r '.hosts | to_entries[] | select(.value.baseline.bytes and .key != strenv(ADOPT_HOST)) | [.key, .value.baseline.bytes, (.value.baseline.measured_on // "")] | @tsv' "$BUDGETS_FILE"
     printf '%s\t%s\t%s\n' "$h" "$actual" "$on"
   } | awk -F'\t' '!seen[$1]++' | sort -k1,1 |
     while IFS=$'\t' read -r host bytes date; do
+      # `yq` prints ONE EMPTY LINE when its expression matches nothing, and an
+      # empty line splits into three empty fields — which emitted a literal
+      # `[hosts..baseline]` table and made the file unparseable. Skipping blank
+      # rows is what keeps a first-ever adoption (zero existing baselines from
+      # other hosts) from corrupting the file.
+      [ -n "$host" ] || continue
       printf '[hosts.%s.baseline]\nbytes = %s\nmeasured_on = "%s"\n\n' "$host" "$bytes" "$date"
     done > "$block"
   # Splice the managed block; append it when the markers are not there yet.
@@ -343,8 +376,16 @@ do_budget_adopt() {
   fi
   mv "$merged" "$BUDGETS_FILE"
   rm -f "$block"
+  # Prove the number landed. A splice that keeps an older value is exactly the
+  # failure the ratchet exists to prevent, and it used to report success doing it.
+  if [ "$(budget_baseline "$h")" != "$actual" ]; then
+    echo "Error: the adopted value did not land in $BUDGETS_FILE (found '$(budget_baseline "$h")', expected '$actual')." >&2
+    exit 1
+  fi
   echo "adopted $h baseline: $(human "$actual") ($actual bytes) on $on"
-  do_budget
+  # `do_budget` would re-measure the LOCAL target; the row must describe the host
+  # this run just measured, so the number is passed through instead.
+  do_budget "$actual"
 }
 
 # total narSize of a target read from a named store URI — used by --all, which
@@ -365,8 +406,8 @@ total_of_store() { # store-uri target
 }
 
 do_budget() {
-  local actual
-  actual="$(total_of "$(target 1)")"
+  local actual="${1:-}"
+  [ -n "$actual" ] || actual="$(total_of "$(target 1)")"
   budget_header
   budget_line "$(budget_host)" "$actual"
 }

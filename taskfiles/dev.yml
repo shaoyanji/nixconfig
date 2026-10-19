@@ -402,16 +402,50 @@ tasks:
       - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}{{.TARGET}}{{end}}
 
   dev:closure:budget:adopt:
-    desc: Adopt the measured local closure as HOST's new baseline (dynamic budget ratchet)
+    desc: Adopt a host's measured deployed closure as its baseline (dynamic budget ratchet)
     summary: >
-      Measures the LOCAL host's deployed closure and rewrites the managed
-      `# >>> baseline` block in closure-budgets.toml; policy (headroom_pct,
-      absolute `bytes` pins, comments) is preserved. Run it after every
-      intentional cut — that is the ratchet that makes the budget meaningful.
-      HOST must be this machine (default: local); remote hosts are measured by
-      `dev:closure:budget ALL=1` but adopted from that host.
+      Measures a host's deployed closure and rewrites the managed `# >>> baseline`
+      block in closure-budgets.toml; policy (headroom_pct, absolute `bytes` pins,
+      comments) is preserved. Run it after every intentional cut — that is the
+      ratchet that makes the budget meaningful. HOST defaults to this machine.
+      A remote host requires REMOTE=1: the number is read from THAT host's store
+      DB over ssh (`readlink /run/current-system` then `nix path-info --store
+      ssh://<h>`), and an unreachable host aborts without writing anything — a
+      baseline is never this machine's closure recorded under another host's name.
     cmds:
-      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} adopt
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.REMOTE | default "0") "1"}}--remote{{end}} adopt
+
+  dev:closure:budget:adopt:hosts:
+    desc: Adopt baselines for a NAMED set of hosts (HOSTS="a b", required — never the fleet)
+    summary: >
+      Runs `dev:closure:budget:adopt` once per named host, in sequence, each in
+      its own process. HOSTS is REQUIRED and has no default: a fleet-wide sweep
+      costs one ssh + one store-DB read per host and is a deliberate act, not
+      something an agent gets by forgetting a variable. Hosts that are offline
+      are reported and skipped; the task exits 1 unless every named host was
+      adopted, so a partial run cannot look like coverage. Every value written
+      comes from that host's own store DB (no typing, no inferred numbers).
+    cmds:
+      - |
+        if [ -z "{{.HOSTS}}" ]; then
+          echo 'ERROR: HOSTS is required, e.g. HOSTS="frieren eisen fern" (no fleet default by design)' >&2
+          exit 2
+        fi
+        adopted=0; failed=""
+        for h in {{.HOSTS}}; do
+          echo "== $h"
+          if bash scripts/task/closure-analysis.sh --host "$h" --remote adopt; then
+            adopted=$((adopted + 1))
+          else
+            failed="$failed $h"
+          fi
+        done
+        echo
+        echo "adopted $adopted host(s)"
+        if [ -n "$failed" ]; then
+          echo "NOT adopted (unreachable or no store access):$failed" >&2
+          exit 1
+        fi
 
   dev:closure:tui:
     desc: Interactive closure explorer — pick a host, then a view (gum)

@@ -106,9 +106,26 @@
 
 ## P3 — hygiene and maintenance
 
+- [x] **`adopt` could not update an existing baseline** (found 2026-10-19 while
+      adopting frieren). The managed-block merge ran `yq` first and appended the
+      new row second, then `!seen[$1]++` kept the FIRST row — so re-adopting a
+      host preserved the stale number while printing success, and the trailing
+      budget table still showed the old ceiling. Fixed by excluding the adopted
+      host from the read and asserting the written value. A second bug in the
+      same path emitted a literal `[hosts..baseline]` table whenever the read
+      matched nothing (`yq` prints one empty line); blank rows are now skipped.
 - [ ] **Closure budgets for every measured host** (`closure-budgets.toml`).
-      Adoption is local-only; run it on each host when it is next online.
-      Exit: a regression on a second host fails `checks:closure:budget`.
+      Adoption is no longer local-only: `dev:closure:budget:adopt HOST=<h>
+      REMOTE=1` measures that host's store DB over ssh, and
+      `dev:closure:budget:adopt:hosts HOSTS="…"` does a named set one process at
+      a time. Both refuse to write when the host is unreachable, so a number is
+      never this machine's closure under another host's name. Done 2026-10-19:
+      the capability, the coverage split on the site (active vs dormant vs
+      external — external devices have no closure at all), and a re-adopted
+      frieren baseline (29.9 → 28.6 GiB). Blocked on the fleet being online:
+      tailscale reported only frieren up and eisen had no route, so the ten
+      active hosts are still unmeasured. Exit: 11 of 11 active Nix hosts carry a
+      measured baseline and `checks:closure:budget ALL=1` is green.
 - [ ] **CI closure budget gate** (EXP-110 remaining). Needs a built toplevel
       `TARGET=<store path>` in the workflow.
 - [ ] **Canary promotion gate** (P6): optional CI job for

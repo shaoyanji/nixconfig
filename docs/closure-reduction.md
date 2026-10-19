@@ -313,13 +313,27 @@ closure, and the gate stayed green through every drift.
 
 | Host | Baseline (measured) | Headroom | Budget | Set with |
 | --- | --- | --- | --- | --- |
-| `frieren` | `32104328080` = 29.9 GiB | +1.0% (306.2 MiB) | 30.2 GiB | `task dev:closure:budget:adopt` (2026-10-17) |
+| `frieren` | `30689043280` = 28.6 GiB | +1.0% (292.7 MiB) | 28.9 GiB | `task dev:closure:budget:adopt` (2026-10-19) |
 
 Only **measured** hosts carry a baseline — an invented number is worse than none, so a host
-is added when it is next online and measured. Adoption measures the *local* machine, so a
-remote host joins the file when the command runs there (`ssh <host> task
-dev:closure:budget:adopt`) or its baseline is committed from that host's report; adopting
-one host never drops another's baseline, because the managed block is merged, not rewritten.
+is added when it is next online and measured. Adoption defaults to *this* machine; a remote
+host is measured from its own store DB with `REMOTE=1` (ssh resolves its
+`/run/current-system`, then `nix path-info --store ssh://<host>`), or in one deliberate
+batch with a **named** set:
+
+```bash
+task dev:closure:budget:adopt HOST=frieren              # this machine
+task dev:closure:budget:adopt HOST=eisen REMOTE=1       # measured on eisen, written here
+task dev:closure:budget:adopt:hosts HOSTS="eisen fern"  # no fleet default, by design
+```
+
+An unreachable host aborts before the file is touched: the one thing adopt must never do is
+record this machine's closure under another host's name. Adopting one host never drops
+another's baseline, because the managed block is merged, not rewritten.
+
+The site's *Closure Budgets* page grades coverage against hosts that **have** a closure to
+measure: an external device (Windows, FreeBSD, Android, a NAS) has no Nix store and is
+counted separately, so "active Nix hosts measured" is the number that means something.
 
 Adjustment knobs, in precedence order: an explicit `bytes` pin under `[hosts.<h>]` wins;
 then `baseline × headroom_pct` (per-host, falling back to `[defaults]`); then
@@ -335,6 +349,7 @@ task checks:closure:budget HOST=frieren \
 
 task dev:closure:budget                    # same table, outside the checks group
 task dev:closure:budget:adopt              # re-baseline this host to its measured closure
+task dev:closure:budget:adopt:hosts HOSTS="…"   # adopt a named set, one host per process
 ```
 
 Every row prints its *basis* (`pin`, `base+1.0%`, …) next to the numbers, so a budget is

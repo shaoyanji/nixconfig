@@ -82,6 +82,20 @@ task ops:context                               # monitor state + host context
 nix eval --raw .#knowledgeGraph.cypher | head -40   # optional Neo4j import
 ```
 
+**The sidecar** (`task ops:kg:sidecar`, engine in `tools/kg-engine/`) serves the
+same graph from memory over `unix:$XDG_RUNTIME_DIR/kg.sock`: 0.2-0.9 ms per query
+server-side (~300 ms end-to-end through `task`), built natively from the files
+with no `nix` subprocess, and refreshed when any projection input changes. Use it
+for many questions in a row; use the patterns for one. Its best verb is
+`ops:kg:blast TARGET=<id>` — transitive dependents.
+
+Before **applying** a change, ask the same question about paths rather than ids:
+`task checks:blast STAGED=1` (or `FILES="hosts/frieren/reverse-proxy.nix"`) maps
+each path to its anchor and prints what it reaches. `unmapped` is information,
+not an error: `modules/` and `flake/` are not graph nodes, and closures are the
+tool for those. `checks:kg:sidecar` is the parity gate — it fails if the engine's
+graph, answers or error codes disagree with the compiled projection.
+
 Every pattern takes **`FORMAT=json`** and returns the same envelope:
 `{pattern, arg, count, results}` — `results` is a list of ids, except `comention`
 (`{id, shared}`) and `stats` (one object of counts).

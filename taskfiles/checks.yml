@@ -140,6 +140,48 @@ tasks:
     cmds:
       - bash scripts/task/kg-check.sh
 
+  checks:blast:
+    desc: "[report] Pre-flight blast radius for changed paths (FILES='a b' or STAGED=1)"
+    summary: >
+      scripts/task/kg-preflight.sh — maps each changed path to the graph anchor
+      it is about (hosts/<h>/… -> host:<h>, .agents/skills/<s>/… -> skill:<s>,
+      docs/*.md -> doc:<path>) and prints that anchor's transitive dependents.
+      It is the file-shaped half of `ops:kg:blast`, for "what does this change
+      reach?" before it is applied. Anything that is not a graph node (modules/,
+      flake/, taskfiles/) is reported UNMAPPED on purpose: those have closures,
+      not graph edges, and a confident zero would be a lie.
+      Backend: the sidecar when it is already listening (0.2-0.9 ms per query),
+      else the same reverse-edge closure in jq (~40 ms). Both are checked equal
+      by `checks:kg:sidecar` / the anchors above. Measured: three paths, one host
+      anchor, 460 ms total end-to-end (graph resolution dominates).
+      Advisory by default; STAGED=1 reads `git diff --cached`. The pre-commit
+      hook runs it in --advisory mode when staged paths map to anchors, so it
+      informs a commit and never blocks one. Exit 0 = reported.
+    # `{{if eq .STAGED "1"}}`, not `${STAGED:-0}`: go-task vars are templated,
+    # not exported to the shell, so the env-var check silently took the else
+    # branch and lost --staged.
+    cmds:
+      - bash scripts/task/kg-preflight.sh {{if eq .STAGED "1"}}--staged{{end}} {{.FILES | default ""}}
+
+  checks:kg:sidecar:
+    desc: "[gate] Sidecar parity: engine counts, answers, error codes, arg encoding, lifecycle"
+    summary: >
+      scripts/task/kg-sidecar-check.sh — boots the Elixir engine and proves it
+      agrees with the SAME compiled graph the jq surface reads. Four layers:
+      (1) parity — node/edge/type counts must equal the graph exactly, because a
+      stale in-memory copy answers queries just as confidently as a fresh one;
+      (2) answers — blast-radius equals the jq reverse-edge answer and neighbors
+      keeps its centre; (3) interface — unknown id exits 1 (404, not 200 OK),
+      missing argument exits 2, and a multi-word term arrives intact (it was
+      truncated to its first word at two layers, both with exit 0);
+      (4) lifecycle — start waits for readiness, stop removes the socket.
+      Cost: 2-4 s, one boot. Deliberately NOT part of checks:quick or the
+      pre-commit hook: checks:kg is ~1 s of jq, this starts a BEAM. Run it when
+      tools/kg-engine/** or scripts/task/kg-sidecar.sh changes; KG_GRAPH skips
+      the graph resolution. Exit 0 = clean, 1 = drift.
+    cmds:
+      - bash scripts/task/kg-sidecar-check.sh
+
   checks:host:
     desc: "[gate] Evaluate ONE host: module system + assertions + compiled inventory (HOST=name)"
     summary: >

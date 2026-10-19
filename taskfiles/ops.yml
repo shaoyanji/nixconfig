@@ -128,18 +128,29 @@ tasks:
   ops:kg:sidecar:
     desc: Manage or query the in-memory Elixir reactive Knowledge Graph sidecar
     summary: >
-      Controls the sub-millisecond in-memory ETS graph sidecar listening on unix:$XDG_RUNTIME_DIR/kg.sock.
-      Commands: start, stop, restart, status (default), node ID=<node>, neighbors ID=<node> [DEPTH=N], blast-radius ID=<node>, search Q=<term>.
+      Controls the in-memory ETS graph sidecar on unix:$XDG_RUNTIME_DIR/kg.sock.
+      Commands: start, stop, restart, status (default), node ID=<node>,
+      neighbors ID=<node> [DEPTH=N], blast-radius ID=<node>, search Q=<term>.
+      `start` waits until the daemon answers (exit 1 if not); `stop` waits for it
+      to exit. Queries auto-start it. Arguments are percent-encoded and quoted at
+      the task layer, so Q="two words" stays one term — it used to reach the
+      engine as "two" with exit 0.
+      Engine errors carry real HTTP status: 400 missing param, 404 unknown node,
+      so a typo is not an empty answer.
+      Latency, stated honestly: 0.2-0.9 ms server-side warm, 12 ms on the first
+      call after boot, ~20 ms per curl, 260-310 ms end-to-end through `task`.
     cmds:
-      - bash scripts/task/kg-sidecar.sh {{.CMD | default "status"}} {{.ID | default .Q | default ""}} {{.DEPTH | default ""}}
+      - 'bash scripts/task/kg-sidecar.sh "{{.CMD | default "status"}}" "{{.ID | default .Q | default ""}}" "{{.DEPTH | default ""}}"'
 
   ops:kg:blast:
     desc: Calculate transitive blast radius and impact analysis for an entity
     summary: >
-      Computes the full reverse dependency chain for a node (who depends on or mentions this entity).
-      Instant in-memory traversal via the Elixir sidecar engine (< 1ms).
+      Reverse walk over inbound edges: who depends on or mentions TARGET (any
+      node id: host:frieren, skill:qmd, tag:nix, doc:docs/x.md). Server-side
+      traversal is 0.3-0.9 ms; the task wrapper adds ~300 ms. Usage: TARGET=<id>.
     cmds:
-      - bash scripts/task/kg-sidecar.sh blast-radius {{.ID | default .TARGET}}
+      - 'bash scripts/task/kg-sidecar.sh blast-radius "{{.ID | default .TARGET}}"'
+
 
   # --- the explicit query surface -------------------------------------------
   # Six fixed traversals, the jq analogue of a Cypher MATCH. A caller that knows

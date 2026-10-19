@@ -65,26 +65,35 @@ defmodule KGEngine.Store do
 
     node_count = :ets.info(@nodes_table, :size)
     edge_count = :ets.info(@edges_out, :size)
+
+    # Type counts are a property of the LOAD, not of the call: recomputing them
+    # meant tab2list + group_by over every node on each /stats (0.4-0.6 ms, and
+    # it made the health endpoint slower than the queries it reports on).
+    types =
+      :ets.tab2list(@nodes_table)
+      |> Enum.group_by(fn {_, type, _, _} -> type end)
+      |> Map.new(fn {type, list} -> {type, length(list)} end)
+
+    :persistent_term.put({__MODULE__, :type_counts}, types)
     {:ok, %{nodes: node_count, edges: edge_count, source_stats: data["stats"] || %{}}}
   end
 
   def stats do
     nodes_count = :ets.info(@nodes_table, :size)
     edges_count = :ets.info(@edges_out, :size)
-
-    types =
-      :ets.tab2list(@nodes_table)
-      |> Enum.group_by(fn {_, type, _, _} -> type end)
-      |> Map.new(fn {type, list} -> {type, length(list)} end)
+    types = :persistent_term.get({__MODULE__, :type_counts}, %{})
 
     %{
       nodes: nodes_count,
       edges: edges_count,
       node_types: types,
       status: "operational",
+      source: :persistent_term.get({__MODULE__, :source}, "unknown"),
       engine: "Elixir/OTP 28 ETS"
     }
   end
+
+  def exists?(id), do: :ets.member(@nodes_table, id)
 
   def get_node(id) do
     case :ets.lookup(@nodes_table, id) do
@@ -317,14 +326,23 @@ defmodule KGEngine.Server do
           case query_params["id"] do
             nil -> %{error: "Missing required parameter 'id'"}
             id ->
-              depth = (query_params["depth"] && String.to_integer(query_params["depth"])) || 1
-              KGEngine.Store.neighbors(id, depth)
+              if KGEngine.Store.exists?(id) do
+                depth = (query_params["depth"] && String.to_integer(query_params["depth"])) || 1
+                KGEngine.Store.neighbors(id, depth)
+              else
+                %{error: "Node not found", id: id}
+              end
           end
 
         "/blast-radius" ->
           case query_params["id"] do
             nil -> %{error: "Missing required parameter 'id'"}
-            id -> KGEngine.Store.blast_radius(id)
+            id ->
+              if KGEngine.Store.exists?(id) do
+                KGEngine.Store.blast_radius(id)
+              else
+                %{error: "Node not found", id: id}
+              end
           end
 
         "/query" ->
@@ -346,8 +364,16 @@ defmodule KGEngine.Server do
 
     elapsed_us = :erlang.monotonic_time(:microsecond) - t0
     enriched = Map.put(payload, :_latency_us, elapsed_us)
-    format_json_response(200, enriched)
+    format_json_response(status_for(payload), enriched)
   end
+
+  # A missing id and a typo are not successes. They used to return 200 with an
+  # `error` body, which every HTTP client (`curl --fail`, fetch, requests) reads
+  # as success — the same silent-failure class the jq surface's exit codes exist
+  # to prevent.
+  defp status_for(%{error: "Missing required parameter" <> _}), do: 400
+  defp status_for(%{error: "Node not found"}), do: 404
+  defp status_for(_), do: 200
 
   defp format_json_response(status, payload) do
     json_bytes = JSON.encode!(payload)
@@ -373,16 +399,30 @@ defmodule KGEngine.Watcher do
     spawn_link(fn -> loop(repo_root, %{}, reload_fn) end)
   end
 
-  defp loop(repo_root, last_mtimes, reload_fn) do
-    :timer.sleep(2000)
+  # The watch list is DERIVED, not hand-written. It used to name four files while
+  # the projection reads the eight living docs, docs/*.md, every SKILL.md,
+  # inventory.toml and lib/knowledge-graph.nix — so most inputs could change
+  # without the in-memory graph noticing. Measured: editing
+  # docs/closure-reduction.md triggered nothing, editing MANUAL.md did.
+  @root_docs ~w(AGENTS.md MANUAL.md ARCHITECTURE.md AUDIT.md TODO.md HANDOFF.md EXPERIMENTS.md README.md)
 
-    # Monitored files
-    targets = [
-      Path.join(repo_root, "inventory.toml"),
-      Path.join(repo_root, "lib/knowledge-graph.nix"),
-      Path.join(repo_root, "TODO.md"),
-      Path.join(repo_root, "MANUAL.md")
-    ]
+  def inputs(repo_root) do
+    roots = Enum.map(@root_docs, &Path.join(repo_root, &1))
+    docs = Path.wildcard(Path.join(repo_root, "docs/*.md"))
+    skills = Path.wildcard(Path.join(repo_root, ".agents/skills/*/SKILL.md"))
+
+    (roots ++ docs ++ skills ++ [
+       Path.join(repo_root, "inventory.toml"),
+       Path.join(repo_root, "lib/knowledge-graph.nix")
+     ])
+    |> Enum.filter(&File.regular?/1)
+  end
+
+  defp loop(repo_root, last_mtimes, reload_fn) do
+    # 500 ms: the reload itself costs a nix eval (seconds), so a faster poll buys
+    # nothing but churn. Each poll is ~67 stats, well under a millisecond.
+    :timer.sleep(500)
+    targets = inputs(repo_root)
 
     current_mtimes =
       Enum.reduce(targets, %{}, fn path, acc ->
@@ -402,12 +442,274 @@ defmodule KGEngine.Watcher do
   end
 end
 
+defmodule KGEngine.NixSource do
+  @moduledoc "Opt-in escape hatch: evaluate the projection with nix (used to diff against the native builder)."
+
+  def load(repo_root) do
+    IO.puts("[kg-engine] Evaluating projection via nix eval .#knowledgeGraph.json...")
+
+    case System.cmd("nix", ["eval", "--raw", ".#knowledgeGraph.json"],
+           cd: repo_root,
+           stderr_to_stdout: false
+         ) do
+      {json, 0} ->
+        JSON.decode!(json)
+
+      {err, code} ->
+        IO.puts("[kg-engine] ⚠️ Nix eval failed (exit #{code}): #{err}")
+        %{"nodes" => [], "edges" => []}
+    end
+  end
+end
+
+defmodule KGEngine.Native do
+  @moduledoc """
+  Builds the projection from the files themselves — no `nix` subprocess.
+
+  The engine used to shell out to `nix eval` on every cold boot and every reload,
+  which cost 1-3 s and made a 500 ms watcher pointless. This reads the same
+  inputs `lib/knowledge-graph.nix` reads and produces the same node/edge sets in
+  well under 100 ms.
+
+  It IS a second implementation of the projection, so it is only safe because
+  `checks:kg:sidecar` compares it to the compiled graph field by field (node
+  ids, types, counts, blast answers). A divergence fails that gate instead of
+  quietly answering from a different graph.
+
+  Deliberately mirrors lib/knowledge-graph.nix:
+    * doc sources are the eight living documents plus NON-recursive docs/*.md;
+    * a mention is an exact TOKEN, split on [^A-Za-z0-9_-]+ — so `dev` does not
+      match `devji`, and `nix-eval-jobs` is not `nix-eval`;
+    * skill names are directory names, not the frontmatter `name:`;
+    * tags come from frontmatter, deduped across skills.
+  """
+
+  @root_docs ~w(AGENTS.md MANUAL.md ARCHITECTURE.md AUDIT.md TODO.md HANDOFF.md EXPERIMENTS.md README.md)
+  @token_re ~r/[^A-Za-z0-9_-]+/
+
+  @root_docs ~w(AGENTS.md MANUAL.md ARCHITECTURE.md AUDIT.md TODO.md HANDOFF.md EXPERIMENTS.md README.md)
+
+  def build(repo) do
+    hosts = hosts(repo)
+    skills = skills(repo)
+    docs = docs(repo, hosts, skills)
+    tags = skills |> Enum.flat_map(& &1.tags) |> Enum.uniq()
+
+    host_nodes =
+      Enum.map(hosts, fn {name, h} ->
+        %{"id" => "host:" <> name, "type" => "host", "label" => name}
+        |> maybe_put("status", h[:status])
+        |> maybe_put("kind", h[:kind])
+      end)
+
+    skill_nodes =
+      Enum.map(skills, fn s ->
+        %{
+          "id" => "skill:" <> s.name,
+          "type" => "skill",
+          "label" => s.name,
+          "description" => s.description,
+          "path" => s.path,
+          "tags" => s.tags
+        }
+      end)
+
+    doc_nodes =
+      Enum.map(docs, fn d ->
+        %{"id" => d.id, "type" => "doc", "label" => d.label, "path" => d.path}
+      end)
+
+    tag_nodes = Enum.map(tags, fn t -> %{"id" => "tag:" <> t, "type" => "tag", "label" => t} end)
+
+    mention_edges =
+      Enum.flat_map(docs, fn d ->
+        Enum.map(d.hosts, &%{"from" => d.id, "to" => "host:" <> &1, "type" => "mentions"}) ++
+          Enum.map(d.skills, &%{"from" => d.id, "to" => "skill:" <> &1, "type" => "mentions"})
+      end)
+
+    tag_edges =
+      Enum.flat_map(skills, fn s ->
+        Enum.map(s.tags, &%{"from" => "skill:" <> s.name, "to" => "tag:" <> &1, "type" => "tagged"})
+      end)
+
+    edges = mention_edges ++ tag_edges
+
+    %{
+      "nodes" => host_nodes ++ skill_nodes ++ doc_nodes ++ tag_nodes,
+      "edges" => edges,
+      "stats" => %{
+        "hosts" => length(hosts),
+        "skills" => length(skills),
+        "docs" => length(docs),
+        "edges" => length(edges)
+      }
+    }
+  end
+
+  # Only `[hosts.<name>]` starts a host; a sub-table (`[hosts.x.hardware]`) ends
+  # it, so a nested `status`/`kind` can never be attributed to the host.
+  defp hosts(repo) do
+    path = Path.join(repo, "inventory.toml")
+    {_, acc} =
+      path
+      |> File.read!()
+      |> String.split("\n")
+      |> Enum.reduce({nil, %{}}, fn line, {cur, acc} ->
+        t = String.trim(line)
+
+        cond do
+          String.starts_with?(t, "[") and String.ends_with?(t, "]") ->
+            case String.slice(t, 1..-2//1) |> String.split(".") do
+              ["hosts", h] -> {h, Map.put_new(acc, h, %{})}
+              _ -> {nil, acc}
+            end
+
+          cur == nil ->
+            {nil, acc}
+
+          true ->
+            case Regex.run(~r/^(status|kind)\s*=\s*"([^"]*)"/, t) do
+              [_, k, v] -> {cur, put_in(acc, [cur, String.to_atom(k)], v)}
+              _ -> {cur, acc}
+            end
+        end
+      end)
+
+    Enum.sort(acc)
+  end
+
+  defp skills(repo) do
+    dir = Path.join(repo, ".agents/skills")
+
+    dir
+    |> File.ls!()
+    |> Enum.sort()
+    |> Enum.filter(&File.dir?(Path.join(dir, &1)))
+    |> Enum.map(fn name ->
+      file = Path.join([dir, name, "SKILL.md"])
+      text = if File.exists?(file), do: File.read!(file), else: ""
+      fields = frontmatter(text)
+
+      %{
+        name: name,
+        description: fields["description"] || "",
+        tags: parse_list(fields["tags"] || ""),
+        path: ".agents/skills/" <> name
+      }
+    end)
+  end
+
+  defp frontmatter(text) do
+    lines = String.split(text, "\n")
+    # `---` fences; the block is what sits between the first two.
+    body =
+      case Enum.split_while(lines, &(String.trim(&1) != "---")) do
+        {_, ["---" | rest]} ->
+          case Enum.split_while(rest, &(String.trim(&1) != "---")) do
+            {fm, _} -> fm
+          end
+
+        _ ->
+          []
+      end
+
+    Enum.reduce(body, %{}, fn line, acc ->
+      case Regex.run(~r/^([A-Za-z0-9_-]+):\s*(.*)$/, String.trim(line)) do
+        [_, k, v] -> Map.put(acc, k, v)
+        _ -> acc
+      end
+    end)
+  end
+
+  # `[linux, macos]` -> ["linux", "macos"]; bare scalar -> [scalar]; quotes
+  # stripped. Mirrors parseList in lib/skills.nix.
+  defp parse_list(v) do
+    s = String.trim(v)
+
+    cond do
+      s == "" ->
+        []
+
+      String.starts_with?(s, "[") and String.ends_with?(s, "]") ->
+        s
+        |> String.slice(1..-2//1)
+        |> String.split(",")
+        |> Enum.map(&(&1 |> String.trim() |> unquote_str()))
+        |> Enum.reject(&(&1 == ""))
+
+      true ->
+        [unquote_str(s)]
+    end
+  end
+
+  defp unquote_str(s) do
+    s = String.trim(s)
+
+    cond do
+      String.starts_with?(s, "\"") and String.ends_with?(s, "\"") and byte_size(s) >= 2 ->
+        String.slice(s, 1..-2//1)
+
+      String.starts_with?(s, "'") and String.ends_with?(s, "'") and byte_size(s) >= 2 ->
+        String.slice(s, 1..-2//1)
+
+      true ->
+        s
+    end
+  end
+
+  defp docs(repo, hosts, skills) do
+    roots = Enum.map(@root_docs, &Path.join(repo, &1))
+    docs = Path.wildcard(Path.join(repo, "docs/*.md"))
+    host_names = Enum.map(hosts, &elem(&1, 0))
+    skill_names = Enum.map(skills, & &1.name)
+
+    # `lib/knowledge-graph.nix` filters docs/*.md on readDir type == "regular",
+    # so a SYMLINK (docs/vision.md -> control-plane-vision.md) is skipped. Wildcard
+    # follows symlinks, which made the native builder invent a 22nd doc and five
+    # extra edges — caught by the parity check, not by review.
+    roots = Enum.filter(roots, &File.exists?/1)
+    docs = Enum.filter(docs, &match?({:ok, %File.Stat{type: :regular}}, File.lstat(&1)))
+
+    # Token-split, mirroring the Nix `builtins.split` exactly. Two faster-looking
+    # alternatives were measured and rejected: `Task.async_stream` over the docs
+    # (194 ms vs 95 ms — scheduler and copy cost exceed the win on 21 small files)
+    # and a single regex alternation of the 77 names with boundary assertions
+    # (81 ms — PCRE tries every alternative at every position). The split is
+    # 72 ms for 510 KB, and it is the algorithm the projection uses, so parity is
+    # by construction rather than by argument.
+    (roots ++ docs)
+    |> Enum.map(fn path ->
+      rel = Path.relative_to(path, repo)
+      text = File.read!(path)
+      toks = text |> String.split(@token_re, trim: true) |> MapSet.new()
+
+      %{
+        id: "doc:" <> rel,
+        path: rel,
+        label: first_heading(text),
+        hosts: Enum.filter(host_names, &MapSet.member?(toks, &1)),
+        skills: Enum.filter(skill_names, &MapSet.member?(toks, &1))
+      }
+    end)
+  end
+
+  defp first_heading(text) do
+    case text |> String.split("\n") |> Enum.find(&String.starts_with?(&1, "# ")) do
+      nil -> "(untitled)"
+      line -> String.replace_prefix(line, "# ", "")
+    end
+  end
+
+  defp maybe_put(map, _k, nil), do: map
+  defp maybe_put(map, k, v), do: Map.put(map, k, v)
+end
+
 # ------------------------------------------------------------------------------
 # Entrypoint & CLI Orchestration
 # ------------------------------------------------------------------------------
 {opts, _, _} =
   OptionParser.parse(System.argv(),
-    switches: [socket: :string, file: :string, repo: :string],
+    switches: [socket: :string, file: :string, repo: :string, native: :boolean, nix: :boolean],
     aliases: [s: :socket, f: :file, r: :repo]
   )
 
@@ -429,30 +731,34 @@ KGEngine.Store.init()
 
 # Graph loader function
 reload_graph = fn ->
-  # Priority 1: Check explicitly passed file
-  json_data =
+  # Priority 1: explicitly passed file (KG_GRAPH), 2: native build from the
+  # files, 3: `nix eval` only when asked for with --nix. Native is the default
+  # because it is the only source fast enough for a 500 ms watcher and it never
+  # runs a subprocess; `checks:kg:sidecar` proves it matches the compiled graph.
+  {json_data, source} =
     cond do
       opts[:file] && File.exists?(opts[:file]) ->
         IO.puts("[kg-engine] Loading graph from #{opts[:file]}...")
-        File.read!(opts[:file]) |> JSON.decode!()
+        {File.read!(opts[:file]) |> JSON.decode!(), "file"}
 
-      # Priority 2: Check flake outputs knowledgeGraph.json
-      File.exists?(Path.join(repo_root, "data/kg.json")) ->
-        IO.puts("[kg-engine] Loading graph from data/kg.json...")
-        File.read!(Path.join(repo_root, "data/kg.json")) |> JSON.decode!()
+      opts[:nix] ->
+        {KGEngine.NixSource.load(repo_root), "nix"}
 
-      # Priority 3: Query nix eval --raw .#knowledgeGraph.json
       true ->
-        IO.puts("[kg-engine] Evaluating Nix AST projection via nix eval .#knowledgeGraph.json...")
-        case System.cmd("nix", ["eval", "--raw", ".#knowledgeGraph.json"], cd: repo_root, stderr_to_stdout: false) do
-          {json_str, 0} ->
-            JSON.decode!(json_str)
+        # Timed, because "cold bootstrap" has a number attached to it and a
+        # claim nobody measures is how the last set of latency numbers rotted.
+        {us, built} = :timer.tc(fn -> KGEngine.Native.build(repo_root) end)
+        IO.puts("[kg-engine] native build: #{Float.round(us / 1000, 1)} ms (no nix)")
+        {built, "native"}
 
-          {err, code} ->
-            IO.puts("[kg-engine] ⚠️ Nix eval failed (exit #{code}): #{err}")
-            %{"nodes" => [], "edges" => []}
-        end
+      # Priority 2: evaluate the projection. The runner normally passes --file
+      # (resolved by scripts/task/lib/kg-graph.sh, which caches per revision), so
+      # this branch is for a hand-started engine only. A `data/kg.json` tier used
+      # to sit here: it won silently whenever such a file existed, and nothing in
+      # the repo creates or ignores it, so a stale snapshot could serve for weeks.
     end
+
+  :persistent_term.put({KGEngine.Store, :source}, source)
 
   case KGEngine.Store.load_data(json_data) do
     {:ok, %{nodes: n, edges: e}} ->

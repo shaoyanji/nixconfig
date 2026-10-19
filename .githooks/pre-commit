@@ -102,4 +102,17 @@ if affects_graph "$STAGED"; then
   echo "Graph checks passed."
 fi
 
+# Pre-flight blast radius: INFORMATION, never a gate. A commit that touches a
+# host directory, a living document or a skill changes what some other node
+# claims; printing the dependents here costs ~0.5 s (or ~1 ms per anchor when the
+# sidecar is already up) and is the moment when that is still cheap to act on.
+# It runs through scripts/task/kg-preflight.sh, the same script behind
+# `task checks:blast`, and is advisory by construction: a projection is not a
+# dependency graph, so it must never refuse a commit.
+if grep -Eq '^(hosts/|docs/|\.agents/skills/|AGENTS\.md|MANUAL\.md|ARCHITECTURE\.md|AUDIT\.md|README\.md)' <<<"$STAGED"; then
+  if [ -f "$REPO_ROOT/scripts/task/kg-preflight.sh" ]; then
+    bash "$REPO_ROOT/scripts/task/kg-preflight.sh" --staged --advisory 2>/dev/null || true
+  fi
+fi
+
 exit 0

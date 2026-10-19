@@ -48,11 +48,24 @@ in {
         listen = [
           {
             addr = "unix:${cfg.socketPath}";
+            extraParameters = ["backlog=1024"];
           }
         ];
         locations."/" = {
           inherit (cfg) root;
           extraConfig = ''
+            # Zero-runtime CPU compression via pre-compressed static assets
+            gzip_static on;
+
+            # Inode and open file descriptor cache for immutable Nix store assets
+            open_file_cache max=1000 inactive=300s;
+            open_file_cache_valid 3600s;
+            open_file_cache_min_uses 1;
+            open_file_cache_errors on;
+
+            # Declarative client cache directives
+            add_header Cache-Control "public, max-age=3600, stale-while-revalidate=86400" always;
+
             # Zero-TCP IPC headers
             add_header X-Bridge-Transport "UNIX-Domain-Socket" always;
             add_header X-Bridge-Security "POSIX-DAC-Isolated" always;

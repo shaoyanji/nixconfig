@@ -209,6 +209,7 @@
 in {
   services.nginx = {
     enable = true;
+    recommendedOptimisation = true;
     recommendedProxySettings = true;
     clientMaxBodySize = "50000M"; # Support multi-gigabyte video uploads to Immich/Paperless
 
@@ -368,6 +369,14 @@ in {
         ];
         locations."/" = {
           root = import ../../lib/aki-site.nix {inherit pkgs;};
+          extraConfig = ''
+            gzip_static on;
+            open_file_cache max=1000 inactive=300s;
+            open_file_cache_valid 3600s;
+            open_file_cache_min_uses 1;
+            open_file_cache_errors on;
+            add_header Cache-Control "public, max-age=3600, stale-while-revalidate=86400" always;
+          '';
         };
       };
 

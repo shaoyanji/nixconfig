@@ -684,6 +684,37 @@
         `fleet-warm-cache` absorbs the closure delta on its weekly run.
       '';
     };
+    exp-determinate-nix-trial = {
+      title = "Determinate Nix wired into eisen only (not switched yet)";
+      kind = "experiment";
+      status = "IN FLIGHT";
+      priority = "P3";
+      date = "2026-10-19";
+      summary = "`inputs.determinate` (3.23.3) is imported by hosts/eisen/determinate-nix.nix alone; the fleet default moved to lib.mkDefault so the module's mkOverride 750 can win. Evaluated to determinate-nix-3.23.3 on eisen, upstream unchanged elsewhere.";
+      refs = {
+        hosts = ["eisen"];
+        modules = [
+          "modules/global/global.nix"
+          "hosts/eisen/determinate-nix.nix"
+        ];
+        docs = [".agents/deploy/hosts/eisen.md"];
+      };
+      body = ''
+        Without the priority fix the trial is a trap: the module sets `nix.package` at
+        `lib.mkOverride 750`, which the old plain definition (priority 100) beat, so DN's
+        daemon config would apply while the upstream binary stayed. `global.nix` now sets
+        it with `lib.mkDefault`, which 750 beats.
+
+        Evaluated on eisen: `nix.package` = determinate-nix-3.23.3, `nix-daemon` ExecStart
+        = `determinate-nixd daemon`, `/etc/nix/nix.conf` retargeted to `nix.custom.conf`,
+        and `nix.registry.nixpkgs.to` forced back to nixpkgs `f20cd90e` because the module
+        otherwise repoints it at FlakeHub weekly. guckloch still resolves nix-2.35.3.
+
+        Cost and rollback: `determinate-nix-3.23.3` is NOT on cache.nixos.org and the
+        flake declares no substituters, so the first switch compiles Nix on eisen. Roll
+        back by booting the previous generation; the store format does not change.
+      '';
+    };
     open-kolibri-thread-bench = {
       title = "Kolibri thread split, measured";
       kind = "experiment";

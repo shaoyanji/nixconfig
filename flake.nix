@@ -17,6 +17,11 @@
   };
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Determinate Nix — imported by hosts/eisen/determinate-nix.nix only (trial,
+    # 2026-10-19). Do NOT make its nixpkgs follow ours: the DN CLI and
+    # determinate-nixd come from its own locked inputs and must stay upstream-
+    # compatible with the Nix it distributes.
+    determinate.url = "github:DeterminateSystems/determinate";
     # AI coding-agent packages, auto-updated daily upstream.
     # follows is safe here: we track current nixpkgs-unstable, which is
     # what the flake builds against (stable branches WILL break it).

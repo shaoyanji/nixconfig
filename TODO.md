@@ -59,20 +59,26 @@
       Done 2026-10-19 — every block is the literal command, run against the live
       graph: orphan docs 0, skills no doc mentions 15/43 (exact-token matching
       and a doc set of 21, not rot).
-- [x] **Knowledge graph reactive sidecar engine (Elixir/OTP)**. Built 2026-10-19:
-      in-memory ETS property graph engine (`tools/kg-engine/kg_engine.exs`),
-      detached runner (`scripts/task/kg-sidecar.sh`), and task plane integrations
-      (`task ops:kg:sidecar`, `task ops:kg:blast`). Sub-millisecond queries
-      (250 µs node lookups, 3.9 ms full blast-radius impact analysis).
-- [ ] **Agent pre-flight blast radius gate**: hook `task ops:kg:blast` into the
-      agent entry contract and preflight checks. When an agent or operator modifies
-      a shared module or secret, the sidecar automatically computes and displays
-      the downstream affected services, vhosts, and docs before applying changes.
-      Exit: modifying `reverse-proxy.nix` prints the 17 impacted targets in < 5ms.
-- [ ] **Native zero-eval cold bootstrap**: replace the initial `nix eval`
-      fallback in `tools/kg-engine/kg_engine.exs` with native fast parsers for
-      `inventory.toml` and `.agents/skills/*/SKILL.md`.
-      Exit: cold sidecar boot indexes all 225 nodes in < 20ms with 0 calls to `nix`.
+- [x] **Knowledge graph reactive sidecar** (Elixir/OTP). Built and repaired
+      2026-10-19: ETS engine (`tools/kg-engine/kg_engine.exs`), runner
+      (`scripts/task/kg-sidecar.sh`), task plane (`ops:kg:sidecar`,
+      `ops:kg:blast`, `checks:kg:sidecar`). Native graph build — no `nix`
+      subprocess — 225 nodes/388 edges in ~100 ms, boot 1.2 s, queries
+      0.2-0.9 ms server-side (~300 ms through `task`). Fixed on review: multi-word
+      queries were truncated silently, engine errors returned 200 OK, the watcher
+      tracked 4 of the projection's inputs, and `start` reported success before
+      readiness.
+- [x] **Agent pre-flight blast radius** (2026-10-19). `task checks:blast
+      FILES="…"|STAGED=1` and the pre-commit hook map each changed path to its
+      graph anchor and print its dependents; `hosts/frieren/reverse-proxy.nix` →
+      host:frieren → 17. Advisory by design (a projection is not a dependency
+      graph, so it never blocks). The jq and sidecar backends agree on every
+      anchor the gate checks.
+- [ ] **Sub-20 ms cold bootstrap** — the native build is ~100 ms, not the <20 ms
+      this asked for. Measured alternatives: token split 72 ms (the projection's
+      own algorithm, kept for parity), regex alternation 81 ms, `Task.async_stream`
+      194 ms. Reaching <20 ms needs the projection precompiled into a checked
+      artifact or a native scanner; the 1.2 s BEAM boot floor dominates either way.
 - [ ] **Interactive graph canvas on fleet docsite**: render an interactive SVG
       or force-directed canvas on `https://fleet.frieren.lan` (Knowledge Graph tab)
       enabling pan, zoom, and live node inspection directly in Zen Browser.

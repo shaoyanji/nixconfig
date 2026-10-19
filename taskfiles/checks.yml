@@ -20,10 +20,12 @@ tasks:
     aliases: [check]
     summary: >
       Bounded by construction: the inventory checks read the compiled registry and
-      flake attr NAMES (~50 MiB), then task-graph integrity, nix lint, sops drift
-      and modules.toml validation run locally. NO nixosConfiguration is forced, by
-      design — this task answers "is the repo internally consistent", NOT "does
-      host X evaluate".
+      flake attr NAMES (~50 MiB), then task-graph integrity, the knowledge-graph
+      gate, nix lint, sops drift and modules.toml validation run locally. NO
+      nixosConfiguration is forced, by design — this task answers "is the repo
+      internally consistent", NOT "does host X evaluate". The graph gate
+      (`checks:kg`) evaluates the projection, not a host config: one nix eval
+      (~1 s warm) plus jq.
       For config: `task checks:host HOST=<h>` (module system + every assertion,
       ~13 s / 720 MiB). For a named set: `task checks:hosts HOSTS="a b"`.
       Do NOT "improve" this into `nix flake check`: that evaluates every flake
@@ -35,6 +37,7 @@ tasks:
     cmds:
       - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules
       - task checks:tasks
+      - task checks:kg
       - task checks:nix:lint
       - task checks:sops:drift
       - task checks:modules:validate
@@ -110,6 +113,32 @@ tasks:
 
         exit "$fail"
     silent: true
+
+  checks:kg:
+    desc: "[gate] Knowledge-graph schema and all six query patterns still agree"
+    summary: >
+      scripts/task/kg-check.sh — the gate under the graph query surface.
+      lib/knowledge-graph.nix (the projection) and scripts/task/kg-query.sh (the
+      patterns) share a field contract that nothing enforces: rename `from` to
+      `source`, emit `hosts` instead of `host`, or drop `label`, and every
+      pattern still exits 0 with an EMPTY answer. That is the silent failure the
+      0-vs-2 exit contract exists to prevent, one level down — and it would only
+      be discovered when someone asked a question and believed the blank.
+      Three layers: (1) schema — required fields, unique ids, endpoints resolve,
+      edge shapes (mentions: doc|skill -> host|skill; tagged: skill -> tag), and
+      stats equal to a recount; (2) patterns — all six return rows for anchors
+      derived from the graph, result ids are the right node types, and answers
+      are cross-checked in reverse (everything `doc AGENTS.md` returns must list
+      that doc back), which is what catches a one-sided rename; (3) surface —
+      the six ops:kg* tasks still exist and a typo still fails with exit 2 and
+      `error:"no_such_node"`.
+      Cost: one `nix eval` of the projection (~1 s warm) plus ~30 jq calls. It
+      never runs `nix build`, so it cannot spend remote build budget. Test a
+      schema change without touching the real graph by pointing KG_GRAPH at a
+      mutated JSON copy — the gate then skips nix entirely. Exit 0 = clean,
+      1 = drift (go-task reports that as 201).
+    cmds:
+      - bash scripts/task/kg-check.sh
 
   checks:host:
     desc: "[gate] Evaluate ONE host: module system + assertions + compiled inventory (HOST=name)"

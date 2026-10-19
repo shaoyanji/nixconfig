@@ -50,6 +50,15 @@
   in
     lib.removePrefix "${r}/" s;
 
+  # Mentions are TOKEN matches, not substrings. `hasInfix "dev" content` counted
+  # every occurrence of "devji" as a mention of the `dev` skill and put it at the
+  # top of `ops:kg` — a false positive that made the graph's headline output
+  # untrustworthy. Splitting on non-name characters keeps `master-toon` and
+  # `nix-eval` intact while stopping `dev` from matching `devji`.
+  tokensOf = text:
+    builtins.filter (t: builtins.isString t && t != "")
+    (builtins.split "[^A-Za-z0-9_-]+" text);
+
   firstHeading = text: let
     lines = lib.splitString "\n" text;
     hits = builtins.filter (l: lib.hasPrefix "# " l) lines;
@@ -58,16 +67,19 @@
     then "(untitled)"
     else lib.removePrefix "# " (builtins.head hits);
 
+  skillNames = builtins.attrNames skills.skills;
+
   mkDoc = p: let
     content = builtins.readFile p;
     id = rel p;
+    toks = tokensOf content;
   in {
     id = "doc:${id}";
     type = "doc";
     label = firstHeading content;
     path = id;
-    mentionsHosts = builtins.filter (h: lib.hasInfix h content) hostNames;
-    mentionsSkills = builtins.filter (s: lib.hasInfix s (lib.toLower content)) (builtins.attrNames skills.skills);
+    mentionsHosts = builtins.filter (h: builtins.elem h toks) hostNames;
+    mentionsSkills = builtins.filter (s: builtins.elem s toks) skillNames;
   };
 
   docs = map mkDoc files;

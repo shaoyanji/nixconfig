@@ -17,6 +17,34 @@ description: Pick a decision model on Eisen: Laya (fast, ≤500 tokens), Kev-4B 
 | **Laya** (local fallback) | `127.0.0.1:8090` via router fallback, on-demand | **512 tokens** (hard limit, base checkpoint) | Fast (CPU, ~0.4s for 4 questions) | 0.583 macro | ≤500-token inputs when Jev fails. Weaker — see caveats. |
 | **Kev-4B** (local) | Own llama-server on localhost (NOT via llama-swap; no public endpoint) | Long (GGUF declares 262k, validated context **not published**) | Slower (~24s cold load, then fast) | Publisher: transfer-v4 0.838 (unverified) | >500-token inputs when Jev fails. Test on your own long inputs before trusting it. |
 
+## Measured on this fleet's own task (2026-10-19, `task ops:bench:kg`)
+
+When the decision is *graph-intent routing* ("what touches frieren" → which
+query), the honest comparison needs two sets, because one flatters the rules:
+
+| router | rule-shaped | paraphrase | latency |
+| :--- | ---: | ---: | ---: |
+| keyword rules + context bundle (offline) | **14/14** | 10/10 (4 bundle) | 0 ms |
+| hosted Jev | 13/14 | **9/10** | ~330 ms |
+| in-repo `systemone-decision` | 5/14 | 1/10 | ~180 ms |
+
+So for **routing**, no model is used at all: when no rule matches, `ops:ask`
+returns the context bundle of the node the question names (`route: bundle`)
+rather than guessing which of six relations was meant.
+
+Read that table honestly. The 14/14 is independent evidence. The paraphrase
+10/10 is not: four of those answers are the bundle, and their gold labels were
+written from the same "a node-naming question means that node's context" policy
+the bundle implements — `ops:bench:kg` prints `4 are bundle answers` so the
+number can be discounted. On that set rules alone score 6/10 against Jev's
+**9/10**, and Jev's single miss (declining "tell me about fern") is defensible.
+The model was dropped for reasons other than accuracy: the bundle returns a
+superset, so it cannot mis-pick a relation, and it costs 0 ms offline with no key
+against ~330 ms over the network. `KG_DECIDE_ALWAYS=1` still runs Jev as an
+agreement check. The public-benchmark gap below (Jev 0.966 vs Laya 0.583) is why
+the cloud model remains the default for genuine decisions — Laya/Kev-4B/Jev work
+on Eisen, not graph routing.
+
 ## Routing rule (what the router does)
 
 1. **Jev first** (25s timeout). The router forwards the client's auth to Jev.

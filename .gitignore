@@ -22,3 +22,6 @@ docs/closures/
 # docs/modules-registry.md and docs/fleet-inventory.md are tracked POINTER pages.
 docs/generated/
 session-*.md
+
+# direnv: per-machine devshell cache (the flake is the source of truth)
+.direnv/

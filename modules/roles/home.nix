@@ -17,12 +17,18 @@ in {
     ../zen.nix
     ../user/desktop/niri.nix
     ../user/desktop/multimedia.nix
+    ../user/kg-sidecar.nix
     ../kitty
   ];
 
   programs = {
     home-manager.enable = true;
     nix-your-shell.enable = true;
+
+    # Keep the knowledge-graph sidecar warm so `kg-query.sh` takes its socket
+    # path (it falls back to jq when the socket is absent, so this is a speed
+    # setting, not a correctness one).
+    kgSidecar.enable = lib.mkDefault true;
 
     # Gate GPU-heavy Zed editor on hardware tier (GPUI/Vulkan unstable on legacy Haswell/low tier)
     zed-editor.enable = lib.mkDefault (graphicsTier != "low");

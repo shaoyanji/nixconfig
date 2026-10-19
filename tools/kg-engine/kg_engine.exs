@@ -95,6 +95,9 @@ defmodule KGEngine.Store do
 
   def exists?(id), do: :ets.member(@nodes_table, id)
 
+  @patterns ~w(host skill doc tag comention stats)
+  def valid_pattern?(p), do: p in @patterns
+
   def get_node(id) do
     case :ets.lookup(@nodes_table, id) do
       [{^id, type, label, props}] ->
@@ -120,6 +123,78 @@ defmodule KGEngine.Store do
       [] ->
         nil
     end
+  end
+
+  # --- the six traversals of `scripts/task/kg-query.sh` -----------------------
+  # Same questions as the jq programs there, answered from ETS. This is a second
+  # implementation of those semantics by construction (jq over a file vs Elixir
+  # over tables), so `checks:kg:sidecar` compares every pattern's answer against
+  # the jq one. A silent divergence between two implementations of one question
+  # is the failure this project already paid for once.
+  def pattern("host", id, _min, _top), do: id |> inbound_ids() |> Enum.uniq() |> Enum.sort()
+  def pattern("tag", id, _min, _top), do: id |> inbound_ids() |> Enum.uniq() |> Enum.sort()
+  def pattern("doc", id, _min, _top), do: id |> outbound_ids() |> Enum.uniq() |> Enum.sort()
+
+  def pattern("skill", id, _min, _top),
+    do: (inbound_ids(id) ++ outbound_ids(id)) |> Enum.uniq() |> Enum.sort()
+
+  def pattern("comention", id, min, _top) do
+    docs = id |> inbound_ids() |> Enum.uniq() |> MapSet.new()
+
+    :ets.tab2list(@edges_out)
+    |> Enum.filter(fn {from, to, type} ->
+      type == "mentions" and MapSet.member?(docs, from) and String.starts_with?(to, "host:") and
+        to != id
+    end)
+    |> Enum.map(fn {from, to, _type} -> {from, to} end)
+    |> MapSet.new()
+    |> Enum.map(fn {_from, to} -> to end)
+    |> Enum.frequencies()
+    |> Enum.filter(fn {_id, shared} -> shared >= min end)
+    |> Enum.sort_by(fn {id, shared} -> {-shared, id} end)
+    |> Enum.map(fn {id, shared} -> %{"id" => id, "shared" => shared} end)
+  end
+
+  # `{counts, top}` — `top` is [] when the caller did not ask for it. It is NOT
+  # part of the counts object: `kg-query.sh --json` emits one object there, and
+  # the top-degree table is a text-mode extra. Keeping it out of `results` is
+  # what makes the fast path byte-identical to the jq one.
+  def pattern("stats", _id, _min, top) do
+    s = stats()
+    types = Map.get(s, :node_types, %{})
+
+    counts = %{
+      "nodes" => s.nodes,
+      "hosts" => Map.get(types, "host", 0),
+      "skills" => Map.get(types, "skill", 0),
+      "docs" => Map.get(types, "doc", 0),
+      "tags" => Map.get(types, "tag", 0),
+      "edges" => s.edges
+    }
+
+    degrees =
+      if top > 0 do
+        :ets.tab2list(@edges_out)
+        |> Enum.map(fn {from, _to, _type} -> from end)
+        |> Enum.frequencies()
+        |> Enum.sort_by(fn {id, n} -> {-n, id} end)
+        |> Enum.take(top)
+        |> Enum.map(fn {id, n} -> %{"id" => id, "n" => n} end)
+      else
+        []
+      end
+
+    {counts, degrees}
+  end
+
+  def pattern(other, _id, _min, _top), do: {:error, "unknown pattern: #{other}"}
+
+  defp inbound_ids(id) do
+    :ets.lookup(@edges_in, id) |> Enum.map(fn {_to, from, _type} -> from end)
+  end
+
+  defp outbound_ids(id) do
+    :ets.lookup(@edges_out, id) |> Enum.map(fn {_from, to, _type} -> to end)
   end
 
   def query(term) do
@@ -349,6 +424,35 @@ defmodule KGEngine.Server do
           q = query_params["q"] || ""
           %{query: q, matches: KGEngine.Store.query(q)}
 
+        # The six traversals, so `kg-query.sh` can answer from memory when this
+        # daemon is up. The envelope is that script's `--json` contract
+        # verbatim: a fast path that changes the shape is not a fast path.
+        "/pattern" ->
+          p = query_params["p"]
+          id = query_params["name"] || ""
+          min = int_param(query_params["min"], 1)
+          top = int_param(query_params["top"], 0)
+
+          cond do
+            p == nil ->
+              %{error: "Missing required parameter 'p'"}
+
+            not KGEngine.Store.valid_pattern?(p) ->
+              %{error: "Unknown pattern", pattern: p}
+
+            p == "stats" ->
+              {counts, degrees} = KGEngine.Store.pattern("stats", nil, min, top)
+              base = %{pattern: p, arg: "", count: 1, results: [counts]}
+              if degrees == [], do: base, else: Map.put(base, :top, degrees)
+
+            not KGEngine.Store.exists?(id) ->
+              %{error: "Node not found", id: id}
+
+            true ->
+              results = KGEngine.Store.pattern(p, id, min, top)
+              %{pattern: p, arg: id, count: length(results), results: results}
+          end
+
         _ ->
           %{
             engine: "KGEngine 1.0 (Elixir/OTP 28)",
@@ -357,13 +461,18 @@ defmodule KGEngine.Server do
               "/node?id=<node_id>",
               "/neighbors?id=<node_id>&depth=<1-4>",
               "/blast-radius?id=<node_id>",
-              "/query?q=<term>"
+              "/query?q=<term>",
+              "/pattern?p=<host|skill|doc|tag|comention|stats>&name=<id>&min=<n>&top=<n>"
             ]
           }
       end
 
     elapsed_us = :erlang.monotonic_time(:microsecond) - t0
-    enriched = Map.put(payload, :_latency_us, elapsed_us)
+    # `/pattern` answers `kg-query.sh --json` verbatim, so it must not grow a
+    # field that surface does not have: an extra key is a contract break even
+    # when the answer is right. Every other endpoint is a diagnostic surface and
+    # keeps the timing.
+    enriched = if uri.path == "/pattern", do: payload, else: Map.put(payload, :_latency_us, elapsed_us)
     format_json_response(status_for(payload), enriched)
   end
 
@@ -371,8 +480,20 @@ defmodule KGEngine.Server do
   # `error` body, which every HTTP client (`curl --fail`, fetch, requests) reads
   # as success — the same silent-failure class the jq surface's exit codes exist
   # to prevent.
+  # Query params arrive as strings. A malformed number is a usage answer, not a
+  # crash inside the accept loop.
+  defp int_param(nil, default), do: default
+
+  defp int_param(value, default) do
+    case Integer.parse(value) do
+      {n, ""} -> n
+      _ -> default
+    end
+  end
+
   defp status_for(%{error: "Missing required parameter" <> _}), do: 400
   defp status_for(%{error: "Node not found"}), do: 404
+  defp status_for(%{error: "Unknown pattern"}), do: 400
   defp status_for(_), do: 200
 
   defp format_json_response(status, payload) do
@@ -408,7 +529,13 @@ defmodule KGEngine.Watcher do
 
   def inputs(repo_root) do
     roots = Enum.map(@root_docs, &Path.join(repo_root, &1))
-    docs = Path.wildcard(Path.join(repo_root, "docs/*.md"))
+
+    # Same derivation as `KGEngine.Native.docs/3` — a watcher with its own list
+    # is how `docs/closure-reduction.md` once changed without a reload.
+    docs =
+      KGEngine.Native.md_files(repo_root, ["docs", ".agents", ".agents/deploy", "taskfiles"]) ++
+        KGEngine.Native.md_files_in_subdirs(repo_root, ".agents/deploy")
+
     skills = Path.wildcard(Path.join(repo_root, ".agents/skills/*/SKILL.md"))
 
     (roots ++ docs ++ skills ++ [
@@ -685,16 +812,24 @@ defmodule KGEngine.Native do
 
   defp docs(repo, hosts, skills) do
     roots = Enum.map(@root_docs, &Path.join(repo, &1))
-    docs = Path.wildcard(Path.join(repo, "docs/*.md"))
     host_names = Enum.map(hosts, &elem(&1, 0))
     skill_names = Enum.map(skills, & &1.name)
 
-    # `lib/knowledge-graph.nix` filters docs/*.md on readDir type == "regular",
-    # so a SYMLINK (docs/vision.md -> control-plane-vision.md) is skipped. Wildcard
-    # follows symlinks, which made the native builder invent a 22nd doc and five
-    # extra edges — caught by the parity check, not by review.
+    # The doc SET is the one `lib/knowledge-graph.nix` defines: living documents,
+    # `docs/*.md`, the agent contract (`.agents/*.md`, `.agents/deploy/**`) and
+    # `taskfiles/*.md`. This list used to stop at `docs/*.md`, which stayed
+    # invisible until the projection gained the 13 agent/taskfile documents:
+    # parity then read 226/394 against 239/539. Two lists for one projection is
+    # the defect; `checks:kg:native` is what makes the next drift loud.
+    #
+    # `md_files` also mirrors the Nix side's readDir filter (type == "regular"),
+    # so a SYMLINK (docs/vision.md -> control-plane-vision.md) is skipped.
+    # Wildcard followed symlinks, which invented an extra doc and five edges.
+    docs =
+      md_files(repo, ["docs", ".agents", ".agents/deploy", "taskfiles"]) ++
+        md_files_in_subdirs(repo, ".agents/deploy")
+
     roots = Enum.filter(roots, &File.exists?/1)
-    docs = Enum.filter(docs, &match?({:ok, %File.Stat{type: :regular}}, File.lstat(&1)))
 
     # Name membership, measured rather than guessed (22 documents, 77 names,
     # 526 KB):
@@ -740,6 +875,42 @@ defmodule KGEngine.Native do
       }
     end)
   end
+
+  # Regular `*.md` files directly inside each `dirs` entry, sorted — the Elixir
+  # twin of `mdIn` in lib/knowledge-graph.nix. A missing directory yields [], and
+  # a symlink is skipped because `mdIn` keeps only `type == "regular"`.
+  def md_files(repo, dirs) do
+    Enum.flat_map(dirs, fn dir ->
+      names =
+        case File.ls(Path.join(repo, dir)) do
+          {:ok, names} -> names
+          {:error, _} -> []
+        end
+
+      names
+      |> Enum.sort()
+      |> Enum.filter(&String.ends_with?(&1, ".md"))
+      |> Enum.map(&Path.join([repo, dir, &1]))
+      |> Enum.filter(&regular?/1)
+    end)
+  end
+
+  # `mdInSubdirs`: one level deeper, which is where `.agents/deploy/hosts/*.md`
+  # lives. Shared with the watcher, which derives its watch list from the same
+  # set instead of naming four files.
+  def md_files_in_subdirs(repo, dir) do
+    subdirs =
+      case File.ls(Path.join(repo, dir)) do
+        {:ok, names} -> names
+        {:error, _} -> []
+      end
+      |> Enum.sort()
+      |> Enum.filter(&File.dir?(Path.join([repo, dir, &1])))
+
+    Enum.flat_map(subdirs, &md_files(repo, [Path.join(dir, &1)]))
+  end
+
+  defp regular?(path), do: match?({:ok, %File.Stat{type: :regular}}, File.lstat(path))
 
   # Every occurrence of any name, kept only when it stands as a whole token. 0
   # (out of range) is not a token byte, so document start/end are boundaries.

@@ -15,6 +15,13 @@ lib.genAttrs systems.default (
         pkgs.nodejs
         pkgs.go
         pkgs.gopls
+        # The knowledge-graph sidecar (tools/kg-engine) is Elixir. Declaring it
+        # here is the difference between `task ops:kg:sidecar` working offline in
+        # the repo and it resolving a store path on every invocation: inside a
+        # `nix develop` (or the repo's `.envrc` via direnv) `elixir` is on PATH
+        # and scripts/task/kg-sidecar.sh never calls nix at all.
+        pkgs.beamPackages.elixir
+        pkgs.erlang
       ];
     };
 

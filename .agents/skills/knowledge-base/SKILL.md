@@ -83,11 +83,18 @@ nix eval --raw .#knowledgeGraph.cypher | head -40   # optional Neo4j import
 ```
 
 **The sidecar** (`task ops:kg:sidecar`, engine in `tools/kg-engine/`) serves the
-same graph from memory over `unix:$XDG_RUNTIME_DIR/kg.sock`: 0.2-0.9 ms per query
-server-side (~300 ms end-to-end through `task`), built natively from the files
-with no `nix` subprocess, and refreshed when any projection input changes. Use it
-for many questions in a row; use the patterns for one. Its best verb is
-`ops:kg:blast TARGET=<id>` — transitive dependents.
+same graph from memory over `unix:$XDG_RUNTIME_DIR/kg.sock`: 58 µs server-side,
+36–50 ms per query through the script, 114–125 ms through `task` (measured
+2026-10-19) — against ~113 ms for the jq surface on a clean tree and ~530 ms on
+a dirty one, so it pays off for repeated queries, not a single lookup.
+It loads the COMPILED projection by default (`--native` selects the engine's own
+builder, which is what `checks:kg:native` measures for parity), so the socket and
+the jq surface read one graph — and `checks:kg:native` runs inside
+`checks:quick`, because a second builder that silently trails the projection is
+worse than no daemon at all. `elixir` comes from PATH in the repo's devshell
+(`.envrc`), the store otherwise, so a warm machine never calls nix to start it.
+Use it for many questions in a row, or for `ops:kg:blast TARGET=<id>` —
+transitive dependents, the one traversal the jq patterns do not do.
 
 Before **applying** a change, ask the same question about paths rather than ids:
 `task checks:blast STAGED=1` (or `FILES="hosts/frieren/reverse-proxy.nix"`) maps

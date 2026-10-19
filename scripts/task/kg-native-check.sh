@@ -42,9 +42,15 @@ resolve_elixir() {
     command -v elixir
     return 0
   fi
-  # Same rule as kg-sidecar.sh: never build an interpreter from a read path.
+  # Same rule as kg-sidecar.sh: look up the store first (`--offline` never
+  # reaches the network), then substitute. `--builders ""` keeps a miss from
+  # turning into a remote build.
   local out
   out="$(nix build --no-link --offline --builders "" --print-out-paths nixpkgs#beamPackages.elixir 2>/dev/null | head -1)"
+  if [ -z "$out" ]; then
+    echo "kg-native-check: elixir not in the store; substituting (one-off)" >&2
+    out="$(nix build --no-link --builders "" --print-out-paths nixpkgs#beamPackages.elixir 2>/dev/null | head -1)"
+  fi
   [ -n "$out" ] && printf '%s' "$out/bin/elixir"
   return 0
 }

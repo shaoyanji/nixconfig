@@ -971,12 +971,9 @@ call the concrete name. Full authoring rules: `docs/task-control-plane.md` and t
 | MEMORY.md          | Boot — persists across sessions               | Always loaded                                  |
 | Vault              | Fast working memory — offline, personal       | First stop for context                         |
 | qmd wiki           | Resource — docs, runbooks, codebase           | Concept/location queries                       |
-| knowledgeGraph     | Structure — hosts × skills × docs             | "What touches X" (`task ops:kg`)               |
 | mem0 / supermemory | Deep consult — when vault + wiki insufficient | Decided by jev (min-prob 0.8, min-margin 0.15) |
 
-Search order: vault → wiki (qmd BM25) → mem0/supermemory (jev-decided) → web.
-
-When unsure which skill to read, search the skills index first: `qmd search "<topic>" -c skills --format json`.
+Search order: vault → wiki (qmd BM25) → graph (`task ops:kg:*`) → mem0/supermemory (jev-decided) → web. Skills: `qmd search "<topic>" -c skills --format json`.
 
 ---
 
@@ -1015,6 +1012,8 @@ qmd update                                     # incremental reindex (fast, BM25
 ```
 
 Prefer BM25 `qmd search` (instant); `qmd embed` (semantic vectors) is optional and slower. Prefer qmd over raw `grep` when locating concepts or runbooks across repo docs and the vault — it is ranked and collection-scoped.
+
+**Structural queries are the graph, not `grep`.** `.#knowledgeGraph` compiles hosts × skills × docs; `task ops:kg:*` are the six fixed traversals for "what touches X". The Elixir sidecar is the DEFAULT path: `kg-query.sh` answers from its socket when live (28 ms vs ~476 ms on a dirty tree), falls back to jq byte-identically, and `checks:kg:sidecar` proves both agree — it starts at login (`programs.kgSidecar`) from the COMPILED graph. `--native` is the parity experiment (`checks:kg:native`, part of `checks:quick`), not the query path; `ops:kg:blast` is the reverse closure that jq has no one-liner for.
 
 ---
 

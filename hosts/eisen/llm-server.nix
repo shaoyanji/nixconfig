@@ -504,6 +504,33 @@ in {
     };
   };
 
+  # `tailscale-serve` is upstream's oneshot. It is ordered `After=tailscaled`,
+  # but ordering is not readiness: at boot tailscaled is still `NoState`, so
+  # `tailscale serve set-config` exits 1 once and the unit stays failed with no
+  # retry (seen on eisen 2026-10-19 13:44 — the tailnet serve config was not
+  # applied until a manual restart). Wait for BackendState=Running first, and
+  # raise TimeoutStartSec so the wait fits inside the unit's start timeout.
+  systemd.services.tailscale-serve = {
+    serviceConfig = {
+      TimeoutStartSec = 150;
+      ExecStartPre = lib.mkBefore [
+        (pkgs.writeShellScript "tailscale-serve-wait" ''
+          set -euo pipefail
+          state=NoState
+          for _ in $(seq 1 60); do
+            state=$(${tc}/bin/tailscale status --json 2>/dev/null | ${pkgs.jq}/bin/jq -r '.BackendState // "NoState"' 2>/dev/null || echo NoState)
+            if [ "$state" = Running ]; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "tailscale-serve: tailscaled not Running after 120s (last: $state)" >&2
+          exit 1
+        '')
+      ];
+    };
+  };
+
   # Expose on the LAN + tailnet only (llama workload).
   networking.firewall.allowedTCPPorts = [80 port];
 }

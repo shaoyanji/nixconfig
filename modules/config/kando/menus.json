@@ -1,24 +1,39 @@
 {
-  "version": "2.1.2",
+  "version": "3.0.0",
   "menus": [
     {
       "root": {
-        "type": "submenu",
+        "type": "root",
         "name": "Kando Menu",
         "icon": "award_star",
         "iconTheme": "material-symbols-rounded",
+        "activateWorkflow": {
+          "quickSelectKey": "Backspace",
+          "actions": [
+            {
+              "type": "close-menu"
+            }
+          ]
+        },
         "children": [
           {
-            "type": "command",
-            "data": {
-              "command": "niri msg action focus-workspace-up",
-              "detached": true,
-              "isolated": false,
-              "delayed": false
-            },
+            "type": "button",
             "name": "up",
             "icon": "arrow_upward",
-            "iconTheme": "material-symbols-rounded"
+            "iconTheme": "material-symbols-rounded",
+            "selectWorkflow": {
+              "actions": [
+                {
+                  "type": "execute-command",
+                  "command": "niri msg action focus-workspace-up",
+                  "detached": true,
+                  "isolated": false
+                },
+                {
+                  "type": "close-menu"
+                }
+              ]
+            }
           },
           {
             "type": "submenu",
@@ -27,60 +42,128 @@
             "iconTheme": "material-symbols-rounded",
             "children": [
               {
-                "type": "command",
-                "data": {
-                  "command": "zen"
-                },
+                "type": "button",
                 "name": "Web Browser",
                 "icon": "globe",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "zen",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "thunderbird"
-                },
+                "type": "button",
                 "name": "E-Mail",
                 "icon": "mail",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "thunderbird",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "gimp"
-                },
+                "type": "button",
                 "name": "GIMP",
                 "icon": "gimp",
-                "iconTheme": "simple-icons"
+                "iconTheme": "simple-icons",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "gimp",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty -- lf ~"
-                },
+                "type": "button",
                 "name": "File Browser",
                 "icon": "folder_shared",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty -- lf ~",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty"
-                },
+                "type": "button",
                 "name": "Terminal",
                 "icon": "terminal",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "steam"
-                },
+                "type": "button",
                 "name": "Steam",
                 "icon": "steam",
-                "iconTheme": "simple-icons"
+                "iconTheme": "simple-icons",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "steam",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            }
           },
           {
             "type": "submenu",
@@ -89,54 +172,101 @@
             "iconTheme": "material-symbols-rounded",
             "children": [
               {
-                "type": "uri",
-                "data": {
-                  "uri": "https://www.google.com"
-                },
+                "type": "button",
                 "name": "Google",
                 "icon": "google",
-                "iconTheme": "simple-icons"
+                "iconTheme": "simple-icons",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "open-uri",
+                      "uri": "https://www.google.com"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "uri",
-                "data": {
-                  "uri": "https://github.com/shaoyanji"
-                },
+                "type": "button",
                 "name": "Kando on GitHub",
                 "icon": "github",
-                "iconTheme": "simple-icons"
+                "iconTheme": "simple-icons",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "open-uri",
+                      "uri": "https://github.com/shaoyanji"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "uri",
-                "data": {
-                  "uri": "https://www.youtube.com"
-                },
+                "type": "button",
                 "name": "Kando on YouTube",
                 "icon": "youtube",
-                "iconTheme": "simple-icons"
+                "iconTheme": "simple-icons",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "open-uri",
+                      "uri": "https://www.youtube.com"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "uri",
-                "data": {
-                  "uri": "https://discord.gg"
-                },
+                "type": "button",
                 "name": "Kando on Discord",
                 "icon": "discord",
-                "iconTheme": "simple-icons"
+                "iconTheme": "simple-icons",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "open-uri",
+                      "uri": "https://discord.gg"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            }
           },
           {
-            "type": "command",
-            "data": {
-              "command": "niri msg action focus-monitor-right",
-              "detached": true,
-              "isolated": false,
-              "delayed": false
-            },
+            "type": "button",
             "name": "right",
             "icon": "arrow_forward",
-            "iconTheme": "material-symbols-rounded"
+            "iconTheme": "material-symbols-rounded",
+            "selectWorkflow": {
+              "actions": [
+                {
+                  "type": "execute-command",
+                  "command": "niri msg action focus-monitor-right",
+                  "detached": true,
+                  "isolated": false
+                },
+                {
+                  "type": "close-menu"
+                }
+              ]
+            }
           },
           {
             "type": "submenu",
@@ -145,86 +275,152 @@
             "iconTheme": "material-symbols-rounded",
             "children": [
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "ControlLeft+KeyV",
-                  "delayed": true
-                },
+                "type": "button",
                 "name": "Paste",
                 "icon": "content_paste_go",
                 "iconTheme": "material-symbols-rounded",
-                "angle": 90
+                "angle": 90,
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "close-menu"
+                    },
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "ControlLeft+KeyV"
+                    }
+                  ]
+                }
               },
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "ControlLeft+KeyC",
-                  "delayed": true
-                },
+                "type": "button",
                 "name": "Copy",
                 "icon": "content_copy",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "close-menu"
+                    },
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "ControlLeft+KeyC"
+                    }
+                  ]
+                }
               },
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "ControlLeft+KeyX",
-                  "delayed": true
-                },
+                "type": "button",
                 "name": "Cut",
                 "icon": "cut",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "close-menu"
+                    },
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "ControlLeft+KeyX"
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            }
           },
           {
-            "type": "macro",
-            "data": {
-              "macro": [],
-              "delayed": true
-            },
+            "type": "button",
             "name": "Execute Macro",
             "icon": "macro-item.svg",
-            "iconTheme": "kando"
+            "iconTheme": "kando",
+            "selectWorkflow": {
+              "actions": [
+                {
+                  "type": "close-menu"
+                },
+                {
+                  "type": "execute-macro",
+                  "macro": []
+                }
+              ]
+            }
           },
           {
-            "type": "command",
-            "data": {
-              "command": "niri msg action focus-workspace-down",
-              "detached": true,
-              "isolated": false,
-              "delayed": false
-            },
+            "type": "button",
             "name": "down",
             "icon": "arrow_downward",
-            "iconTheme": "material-symbols-rounded"
+            "iconTheme": "material-symbols-rounded",
+            "selectWorkflow": {
+              "actions": [
+                {
+                  "type": "execute-command",
+                  "command": "niri msg action focus-workspace-down",
+                  "detached": true,
+                  "isolated": false
+                },
+                {
+                  "type": "close-menu"
+                }
+              ]
+            }
           },
           {
             "type": "submenu",
-            "data": {},
             "name": "Submenu",
             "icon": "submenu-item.svg",
             "iconTheme": "kando",
             "children": [
               {
-                "type": "uri",
-                "data": {
-                  "uri": "http://thinsandy.fritz.box:2283"
-                },
+                "type": "button",
                 "name": "immich",
                 "icon": "uri-item.svg",
-                "iconTheme": "kando"
+                "iconTheme": "kando",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "open-uri",
+                      "uri": "http://thinsandy.fritz.box:2283"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "uri",
-                "data": {
-                  "uri": ""
-                },
+                "type": "button",
                 "name": "Open URI",
                 "icon": "uri-item.svg",
-                "iconTheme": "kando"
+                "iconTheme": "kando",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "open-uri",
+                      "uri": ""
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            }
           },
           {
             "type": "submenu",
@@ -233,72 +429,122 @@
             "iconTheme": "material-symbols-rounded",
             "children": [
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "MediaTrackNext",
-                  "delayed": false
-                },
+                "type": "button",
                 "name": "Next Track",
                 "icon": "skip_next",
                 "iconTheme": "material-symbols-rounded",
-                "angle": 90
+                "angle": 90,
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "MediaTrackNext"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "MediaPlayPause",
-                  "delayed": false
-                },
+                "type": "button",
                 "name": "Play / Pause",
                 "icon": "play_pause",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "MediaPlayPause"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "AudioVolumeMute",
-                  "delayed": false
-                },
+                "type": "button",
                 "name": "Mute",
                 "icon": "music_off",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "AudioVolumeMute"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "MediaTrackPrevious",
-                  "delayed": false
-                },
+                "type": "button",
                 "name": "Previous Track",
                 "icon": "skip_previous",
                 "iconTheme": "material-symbols-rounded",
-                "angle": 270
+                "angle": 270,
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "MediaTrackPrevious"
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "playerctl play-pause",
-                  "detached": true,
-                  "isolated": false,
-                  "delayed": false
-                },
+                "type": "button",
                 "name": "left",
                 "icon": "arrow_back",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "playerctl play-pause",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            }
           },
           {
-            "type": "command",
-            "data": {
-              "command": "niri msg action focus-monitor-left",
-              "detached": true,
-              "isolated": false,
-              "delayed": false
-            },
+            "type": "button",
             "name": "left",
             "icon": "arrow_back",
-            "iconTheme": "material-symbols-rounded"
+            "iconTheme": "material-symbols-rounded",
+            "selectWorkflow": {
+              "actions": [
+                {
+                  "type": "execute-command",
+                  "command": "niri msg action focus-monitor-left",
+                  "detached": true,
+                  "isolated": false
+                },
+                {
+                  "type": "close-menu"
+                }
+              ]
+            }
           },
           {
             "type": "submenu",
@@ -307,73 +553,123 @@
             "iconTheme": "material-symbols-rounded",
             "children": [
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "MetaLeft+ShiftLeft+KeyF",
-                  "delayed": true
-                },
+                "type": "button",
                 "name": "Toggle Maximize",
                 "icon": "open_in_full",
                 "iconTheme": "material-symbols-rounded",
-                "angle": 0
+                "angle": 0,
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "close-menu"
+                    },
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "MetaLeft+ShiftLeft+KeyF"
+                    }
+                  ]
+                }
               },
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "MetaLeft+ArrowRight",
-                  "delayed": true
-                },
+                "type": "button",
                 "name": "Tile Right",
                 "icon": "text_select_jump_to_end",
                 "iconTheme": "material-symbols-rounded",
-                "angle": 90
+                "angle": 90,
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "close-menu"
+                    },
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "MetaLeft+ArrowRight"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "niri msg action show-hotkey-overlay",
-                  "detached": true,
-                  "isolated": false,
-                  "delayed": false
-                },
+                "type": "button",
                 "name": "hotkeys",
                 "icon": "keyboard_onscreen",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "niri msg action show-hotkey-overlay",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "niri msg action consume-window-into-column",
-                  "detached": true,
-                  "isolated": false,
-                  "delayed": false
-                },
+                "type": "button",
                 "name": "hotkeys",
                 "icon": "keyboard_onscreen",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "niri msg action consume-window-into-column",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "MetaLeft+KeyQ",
-                  "delayed": true
-                },
+                "type": "button",
                 "name": "Close Window",
                 "icon": "cancel_presentation",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "close-menu"
+                    },
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "MetaLeft+KeyQ"
+                    }
+                  ]
+                }
               },
               {
-                "type": "hotkey",
-                "data": {
-                  "hotkey": "MetaLeft+ArrowLeft",
-                  "delayed": true
-                },
+                "type": "button",
                 "name": "Tile Left",
                 "icon": "text_select_jump_to_beginning",
                 "iconTheme": "material-symbols-rounded",
-                "angle": 270
+                "angle": 270,
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "close-menu"
+                    },
+                    {
+                      "type": "simulate-hotkey",
+                      "hotkey": "MetaLeft+ArrowLeft"
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            }
           },
           {
             "type": "submenu",
@@ -382,75 +678,157 @@
             "iconTheme": "material-symbols-rounded",
             "children": [
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty -- lf ~/Downloads"
-                },
+                "type": "button",
                 "name": "Downloads",
                 "icon": "download",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty -- lf ~/Downloads",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty -- lf ~/Videos"
-                },
+                "type": "button",
                 "name": "Videos",
                 "icon": "video_camera_front",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty -- lf ~/Videos",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty -- lf ~/Pictures"
-                },
+                "type": "button",
                 "name": "Pictures",
                 "icon": "imagesmode",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty -- lf ~/Pictures",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty -- lf ~/Documents"
-                },
+                "type": "button",
                 "name": "Documents",
                 "icon": "text_ad",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty -- lf ~/Documents",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty -- lf ~/Desktop"
-                },
+                "type": "button",
                 "name": "Desktop",
                 "icon": "desktop_windows",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty -- lf ~/Desktop",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty -- lf ~/"
-                },
+                "type": "button",
                 "name": "Home",
                 "icon": "home",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty -- lf ~/",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               },
               {
-                "type": "command",
-                "data": {
-                  "command": "kitty -- lf ~/Music"
-                },
+                "type": "button",
                 "name": "Music",
                 "icon": "music_note",
-                "iconTheme": "material-symbols-rounded"
+                "iconTheme": "material-symbols-rounded",
+                "selectWorkflow": {
+                  "actions": [
+                    {
+                      "type": "execute-command",
+                      "command": "kitty -- lf ~/Music",
+                      "detached": true,
+                      "isolated": false
+                    },
+                    {
+                      "type": "close-menu"
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            }
           }
         ]
       },
       "shortcut": "Control+Space",
       "shortcutID": "kando-menu",
-      "centered": false,
+      "useFixedPosition": false,
+      "fixedMenuPosition": {
+        "x": 0.5,
+        "y": 0.5
+      },
       "anchored": false,
       "hoverMode": true,
       "tags": []

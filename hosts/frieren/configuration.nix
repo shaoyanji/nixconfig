@@ -55,6 +55,7 @@ in {
     ./reverse-proxy.nix
     ../../modules/services/aria2-daemon.nix
     ../../modules/services/harmonia.nix
+    ../../modules/services/fleet-sentinel.nix
     ../../modules/services/home-assistant.nix
     ../../modules/services/kiwix.nix
     ../../modules/services/paste.nix
@@ -85,6 +86,21 @@ in {
 
   # Serve the fleet's LAN binary cache (see modules/services/harmonia.nix).
   services.harmonia-fleet.enable = true;
+
+  # Closed loop: 15-minute observation ledger + health endpoint. gatus watches
+  # /sentinel/status.json; `task ops:health` is the operator gate; the ledger is
+  # the episodic memory agents read. See modules/services/fleet-sentinel.nix.
+  services.fleetSentinel = {
+    enable = true;
+    watchUnits = [
+      {unit = "nixos-upgrade.service";}
+      {unit = "fleet-warm-cache.service";}
+      {unit = "restic-backups-frieren-local.service";}
+      {unit = "restic-backups-frieren-burgernas.service";}
+      {unit = "restic-drill.service";}
+      {unit = "postgresqlBackup-immich.service";}
+    ];
+  };
 
   # Offload the weekly fleet cache-warm builds (and any local builds) to
   # nixbuild.net. Key: sops `nixbuild_ssh_key` → /root/.ssh/nixbuild

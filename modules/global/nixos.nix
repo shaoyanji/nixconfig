@@ -1,6 +1,11 @@
 # NixOS home-manager embedded configuration.
 # Primary user constants: modules/global/user.nix
-{inputs, ...}: {
+{
+  inputs,
+  self,
+  config,
+  ...
+}: {
   imports = [
     ./home-manager-shared.nix
   ];
@@ -18,6 +23,11 @@
         ../roles/home.nix
       ];
     };
-    extraSpecialArgs = {inherit inputs;};
+    # `self` gives home modules the flake's compiled artifacts (homeAgents,
+    # agentSkills, …) without re-reading the repo at activation time.
+    extraSpecialArgs = {
+      inherit inputs self;
+      fleetHost = config.networking.hostName;
+    };
   };
 }

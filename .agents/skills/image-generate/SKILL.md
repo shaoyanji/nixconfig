@@ -1,6 +1,6 @@
 ---
 name: image-generate
-description: Generate or edit an image with Qwen-Image-2.1-Turbo on Eisen — the OpenAI-compatible /v1/images/generations endpoint, the fixed Turbo schedule (8 steps, CFG 1.0), size rules, the RGBA transparency prompt format, and editing with a reference image.
+description: Generate or edit images with Qwen-Image-2.1-Turbo on Eisen: OpenAI-compatible /v1/images/generations, the Turbo schedule, size rules, RGBA prompts, and reference-image edits.
 ---
 
 # image-generate

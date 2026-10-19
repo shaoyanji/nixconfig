@@ -275,12 +275,13 @@ tasks:
   dev:inventory:sync:
     desc: Synchronize AGENTS.md + fleet matrix (LLM cards), then refresh docs/generated/
     summary: >
-      Two owners, run together: compile-llm-specs.py owns AGENTS.md and
-      .agents/fleet-matrix.md (LLM cards), and lib/docs.nix owns every generated
-      doc page — `task docs:sync` copies the latter out of `nix build .#docs`.
-      Neither writes a second copy of the fleet table any more.
+      Three owners, run together: lib/home-agents.nix owns ~/AGENTS.md (a store
+      symlink, no Python), compile-llm-specs.py still owns the fleet matrix
+      (.agents/fleet-matrix.md), and lib/docs.nix owns every generated doc page —
+      `task docs:sync` copies the latter out of `nix build .#docs`.
     cmds:
-      - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --sync-home"
+      - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --compile-fleet"
+      - task dev:inventory:home-agents
       - task docs:sync
 
   dev:inventory:llm:
@@ -289,9 +290,27 @@ tasks:
       - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --host {{.HOST | default "frieren"}}"
 
   dev:inventory:home-agents:
-    desc: Compile and sync combined fastfetch host card + persona AGENTS.md to ~/AGENTS.md (HOST=name)
+    desc: Materialize the Nix-generated ~/AGENTS.md for HOST (default this host)
+    summary: >
+      Symlinks the flake output `.#homeAgents.<host>` (lib/home-agents.nix) to
+      ~/AGENTS.md. HOST defaults to /etc/hostname. The content is the fleet
+      preamble + compiled inventory card + persona; no Python, no second TOML
+      parser. `--builders ""` keeps a text derivation from spending remote
+      build budget.
     cmds:
-      - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --home-agents {{.HOST | default "frieren"}} --output ~/AGENTS.md"
+      - |
+        HOST="{{.HOST}}"
+        if [ -z "$HOST" ]; then
+          HOST="$(cat /etc/hostname 2>/dev/null || true)"
+          HOST="${HOST%%.*}"
+        fi
+        if [ -z "$HOST" ]; then
+          echo "HOST= is required (no /etc/hostname on this machine)"
+          exit 1
+        fi
+        p="$(nix build --no-link --print-out-paths --builders "" ".#homeAgents.$HOST")"
+        ln -sfn "$p" "$HOME/AGENTS.md"
+        echo "~/AGENTS.md -> $p"
 
   dev:inventory:json:
     desc: Print the compiled inventory as pretty JSON (schema-checked, derived counts)

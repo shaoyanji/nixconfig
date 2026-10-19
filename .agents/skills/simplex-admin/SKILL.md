@@ -1,9 +1,6 @@
 ---
 name: simplex-admin
-description: >-
-  Declarative administration, WebSocket JSON-RPC automation, and inter-agent coordination
-  for SimpleX Chat across the NixOS fleet. Use to manage daemon lifecycle, inspect group state,
-  issue invitations, and route encrypted messages between autonomous host agents and human users.
+description: Administer SimpleX Chat across the fleet: daemon lifecycle, WebSocket JSON-RPC automation, group state, invitations, and encrypted inter-agent message routing.
 ---
 
 # SimpleX Admin Skill

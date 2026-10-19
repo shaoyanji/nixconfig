@@ -84,6 +84,10 @@ includes:
         taskfile: taskfiles/moto.yml
         dir: .
         flatten: true
+    ops:
+        taskfile: taskfiles/ops.yml
+        dir: .
+        flatten: true
     serv00:
         taskfile: taskfiles/serv00.yml
         dir: .
@@ -171,6 +175,15 @@ tasks:
                 task docs:site                 HTML site from the same derivation  result-docsite/
                 task docs:sync                 refresh docs/generated/ copies
                 task checks:docs:sync          prove the copies match the build
+
+              OBSERVE / CONTEXT  (live system + compiled knowledge)
+                task ops:health                sentinel verdict, exit 1 when degraded
+                task ops:ledger                recent observations (JSONL)
+                task ops:ledger:toon           same window as TOON, token-cheap
+                task ops:skills                compiled skill index (nix eval)
+                task ops:skills:check          skill schema gate
+                task ops:kg                    knowledge graph stats
+                task ops:docs:budget           living-doc line budgets
 
               CANARY MICROVM (EXP-102)
                 task vm:canary:build           build the cloud-hypervisor runner

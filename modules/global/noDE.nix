@@ -8,6 +8,7 @@ let
 in
   {
     inputs,
+    self,
     config,
     ...
   }: {
@@ -30,10 +31,13 @@ in
         inputs.sops-nix.homeManagerModules.sops
         inputs.kickstart-nixvim.homeManagerModules.default
         inputs.nix-index-database.homeModules.nix-index
+        # Per-host ~/AGENTS.md from `.#homeAgents.<host>`.
+        ../user/ai/home-agents.nix
       ];
       extraSpecialArgs = {
-        inherit inputs;
+        inherit inputs self;
         inherit (config.networking) hostName;
+        fleetHost = config.networking.hostName;
       };
     };
   }

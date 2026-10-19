@@ -21,6 +21,13 @@
 #                                   Counts the derivations the CALLER would
 #                                   compile. Exits 1 on any gap when the caller
 #                                   is not the builder.
+#   warm-host.sh --check --emit-path <host>
+#                                   the same gate, but stdout is EXACTLY the
+#                                   resolved toplevel path (the report moves to
+#                                   stderr). infra:deploy:host:* uses this so the
+#                                   path is resolved once and handed to
+#                                   activate-host.sh via TOP= — no second
+#                                   whole-toplevel evaluation.
 #   warm-host.sh [host …]           build the closure HERE, then verify it is
 #                                   substitutable. Intended for the builder;
 #                                   on any other host it reports the gap and
@@ -48,9 +55,11 @@ INVENTORY="$REPO/inventory.toml"
 
 mode="warm"
 best_effort=0
+emit_path=0
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --check) mode="check"; shift ;;
+    --emit-path) emit_path=1; shift ;;
     --best-effort) best_effort=1; shift ;;
     -h | --help) usage 0 ;;
     --*) echo "unknown option: $1" >&2; usage 2 ;;
@@ -86,6 +95,23 @@ if [ "$#" -gt 0 ]; then
 else
   hosts=("$self")
 fi
+
+# `--emit-path` has an unambiguous stdout only for one host: a list would emit
+# several paths and the caller could not tell which one to activate.
+if [ "$emit_path" = 1 ]; then
+  [ "$mode" = "check" ] || { echo "--emit-path requires --check" >&2; usage 2; }
+  [ "${#hosts[@]}" -eq 1 ] || { echo "--emit-path takes exactly one host" >&2; usage 2; }
+fi
+
+# Human report. With --emit-path stdout is reserved for the path, so the report
+# goes to stderr instead of being swallowed by the caller's command substitution.
+report() {
+  if [ "$emit_path" = 1 ]; then
+    printf '%s\n' "$*" >&2
+  else
+    printf '%s\n' "$*"
+  fi
+}
 
 attr_for() { printf '.#nixosConfigurations.%s.config.system.build.toplevel' "$1"; }
 
@@ -136,15 +162,19 @@ for h in "${hosts[@]}"; do
   # Only active hosts. A preserved/dormant/WIP host is not deployed, so there is
   # nothing to route for it and nothing to check.
   status="$(host_status "$h")"
+  # A preserved host is NOT a check target: its config may be known-broken and
+  # evaluating it would report someone else's dormant failure as this run's
+  # regression. Warning only (fail stays 0), and we return before `drvPath`,
+  # `outPath` or the dry-run, so nothing is evaluated at all.
   if [ "$status" != "active" ]; then
-    echo "warm [$h] SKIP — not an active host (inventory status: $status)"
+    report "warm [$h] WARNING — inventory status is '$status', not 'active'; not checking a preserved host"
     continue
   fi
 
   # Not a NixOS flake host (home/darwin configurations, unregistered hosts):
   # nothing to warm, and not an error.
   if ! nix eval --raw "$attr.drvPath" >/dev/null 2>&1; then
-    echo "warm [$h] SKIP — not a NixOS flake host (home/darwin or unregistered)"
+    report "warm [$h] SKIP — not a NixOS flake host (home/darwin or unregistered)"
     continue
   fi
 
@@ -157,16 +187,22 @@ for h in "${hosts[@]}"; do
   if [ "$mode" = "check" ]; then
     n="$(pending_count "$attr")"
     if [ "${n:-0}" -eq 0 ]; then
-      echo "warm [$h] READY — this host substitutes everything${cache_url:+ (LAN cache $cache_url)}"
+      report "warm [$h] READY — this host substitutes everything${cache_url:+ (LAN cache $cache_url)}"
     else
-      echo "warm [$h] GAP — this host would COMPILE $n derivations"
+      report "warm [$h] GAP — this host would COMPILE $n derivations"
       if [ "$is_builder" = 1 ]; then
-        echo "         (allowed here: $self is the builder — the closures are supposed to be built here)"
+        report "         (allowed here: $self is the builder — the closures are supposed to be built here)"
       else
-        echo "         → fix: run 'task infra:warm:cache HOSTS=$h' on $builder, then switch"
-        echo "           (the closure is then served by $cache_url; nothing compiles on $self)"
+        report "         → fix: run 'task infra:warm:cache HOSTS=$h' on $builder, then switch"
+        report "           (the closure is then served by $cache_url; nothing compiles on $self)"
         fail=1
       fi
+    fi
+    # The single toplevel resolution the caller may reuse (TOP= in
+    # activate-host.sh). Emitted even on a GAP so a failing deploy still names
+    # the path it was about to switch to.
+    if [ "$emit_path" = 1 ]; then
+      printf '%s\n' "$top"
     fi
     continue
   fi
@@ -176,13 +212,13 @@ for h in "${hosts[@]}"; do
     # Building here is exactly what the policy forbids. Report instead of
     # saturating the machine; --best-effort keeps a switch unblocked.
     n="$(pending_count "$attr")"
-    echo "warm [$h] REFUSED — $self is not the builder ($builder); this host would compile $n derivations"
-    echo "         → run on $builder: task infra:warm:cache HOSTS=$h"
+    report "warm [$h] REFUSED — $self is not the builder ($builder); this host would compile $n derivations"
+    report "         → run on $builder: task infra:warm:cache HOSTS=$h"
     fail=1
     continue
   fi
 
-  echo "warm [$h] building on $builder (the builder; allowed)"
+  report "warm [$h] building on $builder (the builder; allowed)"
   nix build "$attr" -L --max-jobs "${MAX_JOBS:-2}"
 
   if [ "${NO_VERIFY:-0}" = "1" ]; then
@@ -191,13 +227,13 @@ for h in "${hosts[@]}"; do
 
   # ---- verify the closure is actually substitutable -------------------------
   if [ -n "$top" ] && served_by_cache "$top"; then
-    echo "warm [$h] OK — $cache_url serves $top; a switch will substitute, not compile"
+    report "warm [$h] OK — $cache_url serves $top; a switch will substitute, not compile"
   else
     # Harmonia answers narinfo only for paths in its store; a miss here while
     # the build succeeded means the path is present but not being advertised,
     # which is a real cache-side fault worth failing on.
-    echo "warm [$h] WARNING — built, but $cache_url did not serve its narinfo." >&2
-    echo "         check: curl $cache_url/nix-cache-info ; nix path-info --store $cache_url $top" >&2
+    report "warm [$h] WARNING — built, but $cache_url did not serve its narinfo." >&2
+    report "         check: curl $cache_url/nix-cache-info ; nix path-info --store $cache_url $top" >&2
     fail=1
   fi
 done

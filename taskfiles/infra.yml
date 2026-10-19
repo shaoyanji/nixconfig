@@ -113,44 +113,86 @@ tasks:
 
   infra:rebuild:home-manager:
     desc: Rebuild local Home Manager profile
+    summary: >
+      The switch IS the check: it evaluates and builds the profile. Do not run
+      `task checks:*` first — that is extra evaluation for no proof. `NOM=1`
+      pipes through nom for the human TUI; agents leave it unset.
     aliases: [home-manager-switch]
     cmds:
-      - home-manager switch --flake .?submodules=1#$(hostname) |& nom
+      - |
+        set -o pipefail
+        if [ "${NOM:-0}" = "1" ]; then
+          home-manager switch --flake .?submodules=1#$(hostname) 2>&1 | nom
+        else
+          home-manager switch --flake .?submodules=1#$(hostname)
+        fi
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:rebuild:wsl:
     desc: Rebuild WSL host configuration
+    summary: No pre-rebuild checks; NOM=1 only for the human TUI.
     aliases: [wsl-rebuild]
     cmds:
-      - sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes |& nom
+      - |
+        set -o pipefail
+        if [ "${NOM:-0}" = "1" ]; then
+          sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes 2>&1 | nom
+        else
+          sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes
+        fi
 
   infra:rebuild:orb:
     desc: Rebuild OrbStack host configuration and refresh ~/Taskfile.yml
+    summary: No pre-rebuild checks; NOM=1 only for the human TUI.
     aliases: [orb-rebuild]
     cmds:
-      - sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure |& nom
+      - |
+        set -o pipefail
+        if [ "${NOM:-0}" = "1" ]; then
+          sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure 2>&1 | nom
+        else
+          sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure
+        fi
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:switch:*:
     desc: Switch current host using a rebuild command (nixos|darwin)
     summary: >
-      Reports the build-routing state before switching (read-only, cache-based,
-      no ssh) so it is visible up front whether this host will substitute or
-      compile. Best-effort on purpose: a roaming host must still be able to
-      switch. Home/darwin hosts skip the report. The gate that actually fails is
-      `task checks:build:route`.
+      NO pre-switch check. The rebuild evaluates the host and builds the closure
+      itself; running `task checks:*` or `warm-host.sh --check` first is a second
+      whole-toplevel evaluation for no extra proof (measured >120 s with swap on
+      this host). The routing question is answered in CI and deliberately, with
+      `task checks:build:route` — not on every switch.
+      ROUTE_CHECK=1 opts into the old best-effort routing report for an operator
+      who genuinely needs it; agents leave it unset. NOM=1 pipes through nom for
+      the human TUI; agents leave it unset. Vars: OS (from the wildcard).
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
-      - bash scripts/task/warm-host.sh --check --best-effort "$(hostname)"
-      - sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) |& nom
+      - |
+        set -o pipefail
+        if [ "${ROUTE_CHECK:-0}" = "1" ]; then
+          bash scripts/task/warm-host.sh --check --best-effort "$(hostname)"
+        fi
+        if [ "${NOM:-0}" = "1" ]; then
+          sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) 2>&1 | nom
+        else
+          sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname)
+        fi
 
   infra:boot:*:
     desc: "[safe stage] Stage next generation in bootloader via rebuild command (reboot to activate)"
+    summary: No pre-rebuild checks; NOM=1 only for the human TUI.
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
-      - sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) |& nom
+      - |
+        set -o pipefail
+        if [ "${NOM:-0}" = "1" ]; then
+          sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname) 2>&1 | nom
+        else
+          sudo {{.OS}}-rebuild boot --flake .?submodules=1#$(hostname)
+        fi
 
   infra:plan:host:netbook:
     desc: Dry-run netbook configuration remotely using its pinned 25.11 channel
@@ -187,6 +229,9 @@ tasks:
       runs detached in a transient systemd unit, so a long transfer cannot be
       killed by a dropped connection. INTENDED FOR ONE HOST; the fleet is
       infra:apply:fleet on a schedule.
+      A PRESERVED host is a WARNING and a no-op (exit 0): no eval, cache query
+      or ssh happens, because a dormant config may be known-broken and is not
+      part of the deploy surface. Reviving one is explicit — ALLOW_PRESERVED=1.
       Vars: TARGET= (default <host>), CACHE= (default: inventory metadata or the
       fleet harmonia address).
     vars:
@@ -315,15 +360,37 @@ tasks:
       Note on hashes: the warmed closure must match the tree being deployed. A
       commit changes the flake source hash and therefore the toplevel, so commit
       first, then warm, then deploy — otherwise the cache serves a stale path.
-      Vars: TARGET= (default <host>), CACHE=.
+      The toplevel is resolved ONCE: the gate prints it with --emit-path and
+      activate-host.sh receives it as TOP=, so the deploy does not evaluate
+      `.#nixosConfigurations.<host>` twice (two whole-toplevel evals, tens of
+      seconds each under swap). activate-host still gates that path against the
+      cache, so reusing it cannot smuggle in a stale closure.
+      PRESERVED HOSTS ARE A WARNING, NOT A JOB: inventory status != "active"
+      prints why and exits 0 before any eval, cache query, ssh or validate.
+      A preserved host is not part of the deploy surface, and checking one
+      reports its known-broken config as if this run broke it. Reviving one is
+      explicit: `ALLOW_PRESERVED=1 task infra:apply:host:<host>`.
+      Vars: TARGET= (default <host>), CACHE=, ACTION= (switch|boot).
     vars:
       HOST: '{{index .MATCH 0}}'
       TARGET: '{{.TARGET | default .HOST}}'
       ACTION: '{{.ACTION | default "switch"}}'
     cmds:
-      - bash scripts/task/warm-host.sh --check {{.HOST}}
-      - ACTION={{.ACTION}} bash scripts/task/activate-host.sh {{.HOST}} {{.TARGET}}
-      - task services:validate:host:{{.HOST}} TARGET={{.TARGET}}
+      - |
+        set -euo pipefail
+        status="$(yq -r ".hosts.\"{{.HOST}}\".status // \"absent\"" inventory.toml 2>/dev/null || echo absent)"
+        if [ "$status" != "active" ]; then
+          echo "deploy [{{.HOST}}] WARNING — inventory status is '$status', not 'active'." >&2
+          echo "         Preserved hosts are not deployed and are not checked here:" >&2
+          echo "         nothing was evaluated, warmed, copied, switched or validated." >&2
+          echo "         Revive deliberately with: ALLOW_PRESERVED=1 task infra:apply:host:{{.HOST}}" >&2
+          exit 0
+        fi
+        top="$(bash scripts/task/warm-host.sh --check --emit-path {{.HOST}})"
+        ACTION={{.ACTION}} TOP="$top" bash scripts/task/activate-host.sh {{.HOST}} {{.TARGET}}
+        # Same cmd block on purpose: `exit 0` above must stop the chain before
+        # validation, and a separate cmds entry would still run after the guard.
+        task services:validate:host:{{.HOST}} TARGET={{.TARGET}}
 
   infra:rollback:host:netbook:
     desc: Roll back netbook to previous generation remotely

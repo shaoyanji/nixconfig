@@ -10,6 +10,35 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
 
 ---
 
+## Agent entry contract (read this first)
+
+1. **This file is the manual, not the rulebook.** The documentation contract is
+   [`.agents/SCHEMA.md`](.agents/SCHEMA.md): one fact one home, budgets, status
+   vocabulary, skill frontmatter. Every living doc is bounded on purpose.
+2. **Start from intent.** `task help` → `task find:<word>` → the owning shard.
+   Never invent a task name; never add one before walking the ladder in the
+   `task-plane` skill (eval → jq → Nix lib → check → task → script → Go).
+3. **Truth order:** compiled data (`inventory.toml`, `modules.toml`) → host and
+   module Nix → taskfiles → docs. A table that exists twice is a liability.
+4. **Facts are evaluated, not guessed.** `nix eval .#inventory…` (~0.2 s) or
+   `nix eval .#agentSkills…` (~1.2 s). Never evaluate a full host to answer a
+   fact question; never run `nix flake check` on this host.
+5. **Verification is phased:** eval to catch a config error · build to prove a
+   closure · size to plan a build. **Never run `task checks:*` before a local
+   rebuild** — the switch already evaluates and builds; a pre-flight check (and
+   especially `checks:build:route`) re-instantiates the whole toplevel for no
+   extra proof. An eval is not a build, and a build is not a runtime test (use
+   the MicroVM canary for units).
+6. **This is a live host.** Bounded gates only, one host per process, no
+   top-level evals during the 03:00–05:30 window, and no ssh in unattended
+   paths. Watch `task ops:health` before blaming the config.
+7. **Where to write:** proposal → `ARCHITECTURE.md`; open work → `TODO.md` /
+   `HANDOFF.md`; what happened → `AUDIT.md`; history → `docs/history/`;
+   procedure → `docs/` or a skill. Never a new root markdown file.
+8. **The closed loop is real:** `fleet-sentinel` records jobs, generation age,
+   disk and PSI every 15 min; gatus pages on `[BODY].state != ok`. A green
+   socket is not a successful job — read the ledger.
+
 ## Home Initialization & Tautological Control Plane
 
 When an AI agent or developer session initializes from the home directory (`$HOME` / `~`):
@@ -22,7 +51,7 @@ When an AI agent or developer session initializes from the home directory (`$HOM
    - Running `task <cmd>` in `$HOME` (or `task -g <cmd>` globally) executes immediately against the repository with correct working directory context. Speculative path discovery or tool calls are unnecessary.
 3. **Agent Guidance & Skills Materialization**:
    - `~/.agents/` (`~/.agents/skills/`, `~/.agents/deploy/`, `~/.agents/README.md`) provides guidance and skill shards.
-   - The canonical fleet operational manual is `AGENTS.md`. The local host system card + persona is compiled into `~/AGENTS.md` via `task dev:inventory:home-agents` (or `hermes-user.nix`).
+   - The canonical fleet operational manual is `AGENTS.md`. The local host system card + persona is the flake output `.#homeAgents.<host>` (`lib/home-agents.nix`), linked to `~/AGENTS.md` by activation; refresh manually with `task dev:inventory:home-agents`.
 4. **Secrets & SOPS State**:
    - Encrypted secrets live in `modules/secrets.yaml` (mirrored from the private `modules/secrets/` submodule).
    - Host and user age keys are registered in `.sops.yaml` and loaded from `~/.config/sops/age/keys.txt`.
@@ -174,7 +203,7 @@ task infra:logs:host:<host>      # View remote journald logs
 ### Local Rebuilds
 
 ```bash
-task infra:rebuild:nixos         # sudo nixos-rebuild switch (local) + refresh ~/Taskfile.yml
+task infra:rebuild:nixos         # switch IS the build; no pre-flight checks (NOM=1 for TUI)
 task infra:rebuild:darwin        # darwin-rebuild switch (local) + refresh ~/Taskfile.yml
 task infra:rebuild:home-manager  # home-manager switch (local) + refresh ~/Taskfile.yml
 ```
@@ -488,37 +517,35 @@ phases is what produces both failure modes at once: cheap per-option evals run a
 ritual (proving nothing) while the build that would have caught the error is
 never run.
 
-**Phase 1 — Pre-build: force the WHOLE toplevel, not one option.**
-`nix eval .#nixosConfigurations.<host>.config.networking.hostName` forces a single
-option and type-checks nothing else — it is not a config check. Real example:
-`networking.networkmanager.dispatcherScripts.*.type = "up"` is **invalid**
-(upstream accepts only `basic`, `pre-up`, `pre-down`); it "passed" that smoke test
-on four hosts and only exploded when a build forced the real toplevel.
+**Phase 1 — Pre-build: one bounded gate, not a toplevel force.**
+`nix eval .#nixosConfigurations.<host>.config.networking.hostName` proves nothing
+(one option, no type checking). `nix build .#hostChecks.<system>.<host>` runs the
+module system and every assertion — 13.16 s / 720 MiB on frieren — and is the
+normal pre-build gate.
 
-```bash
-nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath
-```
+The whole-toplevel force (`…toplevel.drvPath`) instantiates the entire derivation
+graph: **>120 s with swap on frieren**, O(hosts) in memory. It is a **CI / operator
+instrument**, never a per-edit or pre-rebuild step. `nixos-rebuild switch` forces
+the same graph, so a `.drvPath` eval first is duplicate work for no extra proof.
+On a local rebuild, run **no** check first — the switch is the check.
 
-This instantiates the entire configuration — every module, every option type — and
-is the cheapest thing that can actually fail on a bad option value. It is also the
-heaviest eval there is: it walks the whole system derivation graph, measured at
-**>120 s with unbounded wall clock on frieren** once ~5 GiB was swapped. It is
-O(hosts) in memory, which is exactly why running it for 23 hosts in one process
-(the old `host-eval-*` checks inside `checks.<system>`) ended in a SIGKILL.
-
-- **Cheaper first.** `nix build .#hostChecks.<system>.<host>` runs the module system
-  and every assertion — the same conditions the toplevel asserts — for 13.16 s /
-  720 MiB (frieren) and catches the option-conflict / bad-value / policy class
-  without instantiating the closure. Reach for the `.drvPath` force when the change
-  is about derivation-level wiring, not option values.
+- **Cheaper first.** `hostChecks` catches the option-conflict / bad-value / policy
+  class without instantiating the closure. Reach for `.drvPath` only when the
+  change is derivation-level wiring and CI cannot cover it.
 - **Budget it, and run it under the guard.**
   `bash scripts/task/oom-guard.sh --timeout 180 -- nix eval --raw …` kills the run on
   10 s OOM/PSI polling instead of dragging the host into swap death. Use
   `--timeout 3` for the leaf registry reads (`.#inventory.*`), which cost 0.15 s.
+- **Preserved hosts are not check targets.** `status = "preserved"` is dormant,
+  and some are *known-broken* (cassini's `homeDirectory` conflict predates this
+  tree). `warm-host.sh --check`, `infra:deploy:*` and `infra:apply:*` warn and
+  exit 0 **before any eval, cache query, ssh or validate** — a dormant failure
+  is not this run's regression. Revive with `ALLOW_PRESERVED=1`; never sweep
+  preserved hosts into a fleet check.
 - **Scope to what the change reaches, never the fleet:** host-local edit → that
   host; chain module (`modules/global/*`, `modules/profiles/*`, `modules/roles/*`)
   → one representative host per chain affected; `flake/` wiring → one host per
-  kind (nixos, darwin, home).
+  kind (nixos, darwin, home) — **active** hosts only.
 - **Batch into ONE bash loop**, not one tool call per host.
 - **A whole-system sweep is for wiring changes, not a habit.** Eval a whole system
   sparingly; eval the closure you changed often.
@@ -533,8 +560,9 @@ evaluation is no longer evidence. Build it — never on the target host:
 
 ```bash
 task infra:warm:host:<host>      # build on the builder; verify the cache serves it
-task checks:build:route          # read-only: would THIS host have to compile?
 task infra:deploy:host:<host>    # ONE intended host: gate → plan → apply → validate
+# checks:build:route is CI/operator-only: it forces the toplevel. Do not chain
+# it in front of a rebuild; invoke it deliberately when routing is in doubt.
 ```
 
 Fleet-wide building is a **schedule**, not an ad-hoc action (`fleet-warm-cache`
@@ -957,28 +985,14 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 | `antigravity`   | Delegate coding to Antigravity CLI (Google's agent) with `--dangerously-skip-permissions` and `--jsonschema` | `.agents/skills/antigravity/SKILL.md`  |
 | `crush`         | Delegate coding to Crush CLI (Charm's agent) with `--yolo` and structured output                             | `.agents/skills/crush/SKILL.md`        |
 
----
+---## Taskfile as the Agent Contract
 
-## Taskfile as the Agent Contract
+`task --list-all --json` is the discovery API (`desc`, `summary`, aliases); the
+`summary` field carries the variable/exit-code contract, and no task may use
+`internal: true` (it hides the task from JSON too). Wildcards are not invocable —
+call the concrete name. Full authoring rules: `docs/task-control-plane.md` and the
+`task-plane` skill. New observation tasks belong in `taskfiles/ops.yml`.
 
-The Taskfile is the **standalone machine contract** for this repo: an agent should
-be able to discover and drive the whole control plane from it, with no prose docs
-and no second manifest.
-
-- **Discovery is the API.** `task --list-all --json` (or `task menu:json`) returns
-  every task with its `desc`, `summary`, and aliases. Nothing is maintained twice.
-- **Contracts live in `summary`.** It is the only free-form field returned by
-  `--list-all --json`, so it carries what `desc` cannot: required vars, output
-  format, exit-code meaning, and whether the task is safe unattended. Check tasks
-  exit non-zero on drift, by convention.
-- **Never `internal: true`.** It hides the task from `--list-all --json` too, which
-  silently breaks the contract. To keep a task off the human CLI, drop its `desc`
-  and move the text into `summary` (detail in `docs/task-control-plane.md`).
-- **Parameters are vars with data-derived defaults.** `HOSTS=`, `ROOT=`, `N=` are
-  documented per task in `summary`. Defaults come from `inventory.toml` (via `yq`),
-  not from hardcoded lists — so adding a host is a data edit, not a Taskfile edit.
-- **Wildcards are not invocable.** `infra:plan:host:*` has no `.MATCH` to bind;
-  call the concrete name (`task infra:plan:host:poseidon`).
 
 ## Memory hierarchy (jev decides escalation)
 
@@ -1177,5 +1191,9 @@ task dev:config:hash-update    # runs nix-hash-update.sh
 | `docs/userland-package-ownership.md` | Package ownership and role wiring                                      |
 | `taskfiles/README.md`                | Taskfile ownership map and shard reference                             |
 | `hosts/sledgehammer/USB.md`          | Sledgehammer live USB creation guide                                   |
-| `AUDIT.md`                           | AI module cleanup audit                                                |
-| `TODO.md`                            | Current work tracking and backlog                                      |
+| `ARCHITECTURE.md`                    | mk2 proposals, decisions (ADRs), priorities, rejected options          |
+| `MANUAL.md`                          | Operator manual: services, ports, closed loop, DMS integration         |
+| `.agents/SCHEMA.md`                  | Documentation/skill contract: budgets, status vocabulary, one fact one home |
+| `docs/history/`                      | Superseded narrative (audit/TODO/HANDOFF) — never linked as current    |
+| `AUDIT.md`                           | Current state + dated change ledger                                    |
+| `TODO.md`                            | Priority stack (P0–P3), open items only                                |

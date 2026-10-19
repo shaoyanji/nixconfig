@@ -15,6 +15,14 @@ metadata:
 
 Run validation and health checks for host configs and Nix code quality.
 
+> **Rebuild rule (2026-10-19).** Do **not** run a checks task before a local
+> rebuild. `infra:rebuild:*` / `infra:switch:*` evaluates and builds the host;
+> a pre-flight check is a second evaluation for no extra proof. In particular
+> `checks:build:route` forces the whole host toplevel (`drvPath`, `outPath`,
+> `nix build --dry-run`) and is **CI/operator-only** — it is no longer wired
+> into any switch (`ROUTE_CHECK=1` opts in deliberately). Checks are for CI,
+> a deliberate audit, or a remote deploy gate — not a rebuild ritual.
+
 ## Quick checks
 
 | Task | Description |
@@ -27,6 +35,15 @@ Run validation and health checks for host configs and Nix code quality.
 | `checks:flake` | Runs `nix flake check` only where the machine can hold it; **refuses below 16 GiB RAM** |
 | `checks:inventory:compiled` | Tier-1 inventory checks: schema consistency, flake coverage, module injection |
 | `checks:sops:drift` | Verify every sops file's embedded age recipients match `.sops.yaml` (catches un-rekeyed files before they break host activation) |
+
+**Preserved hosts are a warning, not a check.** A host with
+`status = "preserved"` in `inventory.toml` is dormant, and some are known-broken
+(cassini: a `homeDirectory` conflict that predates the current tree).
+`warm-host.sh --check`, `checks:build:route`, `infra:deploy:host:*` and
+`infra:apply:host:*` print the status and exit 0 **without evaluating anything**
+— no `drvPath`, no `outPath`, no dry-run, no ssh. Do not "fix" a preserved host
+because a check you ran on it failed; check or revive one only when the user
+names it (`ALLOW_PRESERVED=1` for deploy).
 
 **Never run `nix flake check` on a small host.** It evaluates every flake output — all
 23 `nixosConfigurations` — in ONE process: measured 339.78 s, 6078.5 MiB peak, SIGKILL

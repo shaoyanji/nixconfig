@@ -1,6 +1,11 @@
 # macOS (nix-darwin) home-manager configuration.
 # Primary user constants: modules/global/user.nix
-{inputs, ...}: let
+{
+  inputs,
+  config,
+  self,
+  ...
+}: let
   user = import ../global/user.nix;
 in {
   imports = [
@@ -16,7 +21,11 @@ in {
         ../roles/home.nix
       ];
     }; # staging point for roles/home.nix commons
-    extraSpecialArgs = {inherit inputs;}; # Pass inputs to homeManagerConfiguration
+    extraSpecialArgs = {
+      inherit inputs self;
+      # lib/home-agents.nix keys on the inventory name; this is that name.
+      fleetHost = config.networking.hostName;
+    };
     # Optionally, use home-manager.extraSpecialArgs to pass
   };
   users.users.${user.name} = {

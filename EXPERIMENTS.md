@@ -4,6 +4,60 @@
 > `flake/host-inventory.nix`, or deployed. An experiment graduates by being *deleted from here and
 > rewritten as a module*, not by being left enabled somewhere.
 
+## Status index (2026-10-19)
+
+**Where to look now:** graduated experiments are *history* — the module is the
+source of truth. New proposals go to [`ARCHITECTURE.md`](ARCHITECTURE.md); this
+file keeps the evidence and the option surface that led there. Do not add a new
+study here unless it has a mode to test and an exit criterion.
+
+### Graduated into `modules/services/` (do not re-open as an experiment)
+
+| EXP | Module / surface | Since |
+| :--- | :--- | :--- |
+| 008 | `fleet-monitors.nix` (gatus as code) | 2026-10-13 |
+| 016 | `agent-scheduler.nix` | 2026-10-13 |
+| 022 | `btrfs-watchdog.nix` | 2026-10-13 |
+| 024 | `uds-static-bridge.nix` | 2026-10-13 |
+| 029 | `ups-simulation-drill.nix` | 2026-10-13 |
+| 030 | `sqlite-maintenance.nix` | 2026-10-13 |
+| 038 | `paperless-watchdog.nix` | 2026-10-13 |
+| 040 | `kiwix-watchdog.nix` | 2026-10-13 |
+| 042 | `postgres-backup-drill.nix` | 2026-10-13 |
+| 044 | `flake-advisory-audit.nix` | 2026-10-13 |
+| 045 | `postgres-pgvector-audit.nix` | 2026-10-13 |
+| 046 | `fleet-session-reaper.nix` | 2026-10-13 |
+| 100 | `fleet-governor.nix` | 2026-10-13 |
+| 101 | `systemone/` pre-harness schema | 2026-10-13 |
+| 102 | `hosts/microvms/frieren-canary.nix` | 2026-10-13 |
+| 103 | `profiles/nas-client.nix` | 2026-10-14 |
+| 110 | `closure-budgets.toml` + `checks:closure:budget` | 2026-10-12 |
+| 111 | `restic-drill.{service,timer}` | 2026-10-12 |
+| 113 | `scripts/task/warm-host.sh` + `checks:build:route` | 2026-10-15 |
+
+### Prototypes (live, but not a module yet)
+
+EXP-065…072, 081, 083, 084, 087, 088, 097 are wired to `systemone-ensemble` and
+`task checks:decision:*`. They are verified on frieren but have no reusable
+option surface, so they stay here. Promotion = extract a module; deletion =
+remove the ensemble subcommand. **Do not** describe them as delivered modules.
+
+### Active studies worth picking up
+
+| EXP | Why now | First test |
+| :--- | :--- | :--- |
+| 001/002/005/006 (wireless) | flat LAN, no VLAN capability | start one AP, measure throughput (EXP-005 sidesteps the radio trade) |
+| 007/009 (MQTT/Zigbee) | broker has no publisher or subscriber | one HA config entry, then `checks:ha:mqtt` |
+| 014/015 (UPS/memory) | battery-as-UPS only reports; PSI is now recorded | module from the existing sensors; compare sentinel `psi` |
+| 017 (service isolation) | dynamic NFS ports rely on the interface firewall | namespace per service after HC-7 |
+| 104/105/106 (resolver/client) | one resolver is a single point of failure | client fallback + health probe |
+| 112 (broker pub/sub) | same blocker as 007 | see H-5 in `HANDOFF.md` |
+
+Everything else is a **parked design study**: keep the option shape, do not
+build it without an operator asking for the outcome.
+
+---
+
 ## What belongs in this file
 
 Experiments are **service-module design studies**. The deliverable is not "a thing that works on

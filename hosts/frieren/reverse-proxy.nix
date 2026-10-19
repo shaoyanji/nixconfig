@@ -245,6 +245,17 @@ in {
             default_type text/plain;
           '';
         };
+        # fleet-sentinel (modules/services/fleet-sentinel.nix). Served from
+        # the default vhost so gatus can probe 127.0.0.1:80 without a
+        # Host-header trick or a second listener; the human vhost below maps
+        # the same directory at sentinel.frieren.lan.
+        locations."/sentinel/" = {
+          alias = "/var/lib/fleet-sentinel/www/";
+          extraConfig = ''
+            autoindex off;
+            add_header Cache-Control "no-store";
+          '';
+        };
         locations."/paste/" = {
           alias = "/var/lib/paste/";
           extraConfig = ''
@@ -374,6 +385,23 @@ in {
         locations."/" = {
           proxyPass = "http://127.0.0.1:8181";
           proxyWebsockets = true;
+        };
+      };
+
+      # Fleet sentinel dashboard (static, reads status.json client-side).
+      "sentinel.frieren.lan" = {
+        serverAliases = ["sentinel"];
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
+        locations."/" = {
+          root = "/var/lib/fleet-sentinel/www";
+          extraConfig = ''
+            add_header Cache-Control "no-store";
+          '';
         };
       };
 

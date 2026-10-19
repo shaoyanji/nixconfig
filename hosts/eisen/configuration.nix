@@ -144,7 +144,9 @@ in {
   services.llm-decision-router = {
     enable = true;
     port = 8000;
-    defaultModel = "kolibri-1";
+    # Kolibri is dormant (patched fork, retired 2026-10-19); Qwen is the only
+    # model llama-swap serves, so it is also the router default.
+    defaultModel = "qwen3.6-35b-a3b";
   };
 
   # --- Storage drives ---

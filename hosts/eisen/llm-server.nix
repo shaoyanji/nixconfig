@@ -101,6 +101,8 @@
   qwenFile = "${modelDir}/${qwenName}";
   qwenUrl = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/${qwenName}";
 
+  # Dormant with their models (2026-10-19); see the commented fork block above.
+  /*
   kolibriName = "Kolibri-1-Q4_K_M.gguf";
   kolibriFile = "${modelDir}/${kolibriName}";
   kolibriUrl = "https://huggingface.co/Hob-forge/Kolibri-1-GGUF/resolve/main/${kolibriName}";
@@ -108,7 +110,13 @@
   bonsaiName = "Ternary-Bonsai-2-27B-PTQ1_0.gguf";
   bonsaiFile = "${modelDir}/${bonsaiName}";
   bonsaiUrl = "https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/resolve/main/${bonsaiName}";
+  */
 
+  # DORMANT (2026-10-19): the 0.7.0 pin and both forks each forced a full C++
+  # build on eisen (~15 min) every nixpkgs bump — the energy cost that retired
+  # them. Kept as comments, not deleted: revive by uncommenting this block plus
+  # the matching vars, fetch unit and model entry.
+  /*
   # Vulkan (radv) build pinned to 0.7.0 (release v0.7.0 / build 11669 / commit 620d222).
   # RX 5700 (Navi 10) uses the Vulkan backend; dynamic CPU dispatch provides AVX2 for Haswell-EP.
   # The web UI is disabled in CMake to eliminate Node.js/npm dependencies during headless server builds.
@@ -198,7 +206,11 @@
         "-DGGML_VULKAN=ON"
       ];
   });
+  */
 
+  # Stock nixpkgs llama.cpp with Vulkan (radv NAVI10): Hydra builds this
+  # variant, so it substitutes instead of compiling on eisen.
+  llama = pkgs.llama-cpp.override {vulkanSupport = true;};
   # DFlash2 speculative-decoding head for Qwen: a block-diffusion drafter
   # trained for this exact target (vocab 248320, matching) that is verified by
   # the target, so output distribution is unchanged. Measured on eisen on a
@@ -294,6 +306,8 @@ in {
     file = qwenFile;
     url = qwenUrl;
   };
+  # Dormant with their models (2026-10-19).
+  /*
   systemd.services."eisen-llm-kolibri" = mkFetch {
     file = kolibriFile;
     url = kolibriUrl;
@@ -302,6 +316,7 @@ in {
     file = bonsaiFile;
     url = bonsaiUrl;
   };
+  */
   systemd.services."eisen-llm-kev" = mkFetch {
     file = kevFile;
     url = kevUrl;
@@ -316,15 +331,11 @@ in {
   systemd.services.llama-swap = {
     after = [
       "eisen-llm-qwen.service"
-      "eisen-llm-kolibri.service"
-      "eisen-llm-bonsai.service"
       "eisen-llm-dflash.service"
       "mnt-storage.mount"
     ];
     wants = [
       "eisen-llm-qwen.service"
-      "eisen-llm-kolibri.service"
-      "eisen-llm-bonsai.service"
       "eisen-llm-dflash.service"
     ];
   };
@@ -347,6 +358,9 @@ in {
           };
           aliases = ["qwen"];
         };
+        # Dormant (2026-10-19): both need patched forks. Kept commented, not
+        # deleted; revive with the fork block, vars and fetch unit above.
+        /*
         "kolibri-1" = {
           cmd = mkCmd {
             model = kolibriFile;
@@ -380,6 +394,7 @@ in {
           };
           aliases = ["bonsai"];
         };
+        */
       };
     };
   };

@@ -95,10 +95,70 @@
       // Filter state lives OUTSIDE mount(): an Aki transition rebuilds the
       // canvas DOM, and a filter the operator just typed must survive a trip
       // into a node slice and back.
+      //
+      // `q` is the normalised (trimmed, lowercased) query the matcher uses;
+      // `raw` is what the operator typed, so the box never rewrites their case.
+      // Aki transitions do not touch the URL, so the hash is the only shareable
+      // state a filtered view has — both directions are implemented below.
+      //
       // No two adjacent single quotes may appear in this file: inside a Nix
       // indented string that pair is an escape sequence, so JS writes empty
       // strings with double quotes (this exact line failed to parse once).
-      var filterState = {types: {host: true, skill: true, doc: true, tag: true}, q: ""};
+      var ALL_TYPES = ["host", "skill", "doc", "tag"];
+      var HASH_PREFIX = "#kg";
+      var filterState = {types: {host: true, skill: true, doc: true, tag: true}, q: "", raw: ""};
+
+      function allTypesOn() {
+        return ALL_TYPES.every(function (t) { return filterState.types[t]; });
+      }
+
+      function applyFilter(h) {
+        filterState.q = h.q;
+        filterState.raw = h.raw;
+        filterState.types = h.types;
+      }
+
+      // `#kg?q=frieren&types=host,doc` — an omitted field means "empty query"
+      // and "all types", so the default view carries no hash at all.
+      function readHash() {
+        var h = window.location.hash || "";
+        if (h.indexOf(HASH_PREFIX + "?") !== 0) return null;
+        var params = new URLSearchParams(h.slice(HASH_PREFIX.length + 1));
+        var types = {};
+        ALL_TYPES.forEach(function (t) { types[t] = true; });
+        var rawTypes = params.get("types");
+        if (rawTypes !== null) {
+          ALL_TYPES.forEach(function (t) { types[t] = false; });
+          rawTypes.split(",").forEach(function (t) {
+            if (types.hasOwnProperty(t)) types[t] = true;
+          });
+        }
+        var raw = params.get("q") || "";
+        return {raw: raw, q: raw.trim().toLowerCase(), types: types};
+      }
+
+      // replaceState, not pushState: a keystroke must not create a history
+      // entry — the shared link is the only thing worth keeping.
+      function writeHash() {
+        var base = window.location.pathname + window.location.search;
+        if (!filterState.q && allTypesOn()) {
+          if ((window.location.hash || "").indexOf(HASH_PREFIX) === 0) {
+            history.replaceState(null, "", base);
+          }
+          return;
+        }
+        var parts = [];
+        if (filterState.q) parts.push("q=" + encodeURIComponent(filterState.q));
+        if (!allTypesOn()) {
+          parts.push(
+            "types=" + ALL_TYPES.filter(function (t) { return filterState.types[t]; }).join(",")
+          );
+        }
+        history.replaceState(null, "", base + HASH_PREFIX + "?" + parts.join("&"));
+      }
+
+      var initial = readHash();
+      if (initial) applyFilter(initial);
 
       function fetchGraph() {
         if (!loaded) {
@@ -187,6 +247,8 @@
         var view = {x: 0, y: 0, k: 1};
         var graph = null;
         var pos = null;
+        var adj = null;
+        var byId = null;
         var hover = null;
         var drag = null;
         var fitted = false;
@@ -195,20 +257,78 @@
           return {x: (mx - view.x) / view.k, y: (my - view.y) / view.k};
         }
 
-        // A node is visible when its type is enabled AND, if a query is set, its
-        // label or id contains it. Everything downstream — draw, hit-testing,
-        // fit — asks this one predicate, so a filtered node can never be drawn
-        // while being unclickable (or the reverse).
+        function typeOn(d) {
+          return !!filterState.types[d.type];
+        }
+
+        // A MATCH is what the query asked for: type enabled, and label or id
+        // contains the query. The counter reports matches, because that is the
+        // answer to what the operator typed.
         function matches(d) {
-          if (!filterState.types[d.type]) return false;
+          if (!typeOn(d)) return false;
           var q = filterState.q;
           return !q || d._label.indexOf(q) >= 0 || d._id.indexOf(q) >= 0;
         }
 
+        // One place decides three sets, so draw, hit-testing, fit and the
+        // debug hook can never disagree:
+        //   match  — passes the query (the "N of M" count)
+        //   drawn  — what exists on screen: matches, plus the 1-hop neighbourhood
+        //            of the matches while a query is active
+        //   bright — what is highlighted: the hovered node + neighbours, or the
+        //            matches while searching, or everything when idle
+        // A search therefore shows its cluster with the matches lit and their
+        // neighbours present-but-dimmed, instead of deleting the context that
+        // makes a hit meaningful.
+        function scene() {
+          var matchSet = {};
+          var neighbour = {};
+          var drawn = {};
+          var bright = {};
+          var q = filterState.q;
+
+          graph.nodes.forEach(function (d) { if (matches(d)) matchSet[d.id] = true; });
+
+          graph.nodes.forEach(function (d) {
+            if (!typeOn(d)) return;
+            if (!q || matchSet[d.id]) {
+              drawn[d.id] = true;
+              return;
+            }
+            neighbour[d.id] = true; // provisional: confirmed below
+          });
+
+          if (q) {
+            var near = {};
+            Object.keys(matchSet).forEach(function (id) {
+              (adj[id] || []).forEach(function (n) { near[n] = true; });
+            });
+            Object.keys(near).forEach(function (id) {
+              if (drawn[id]) return; // a match stays drawn and bright
+              var node = byId[id];
+              if (node && typeOn(node)) drawn[id] = true;
+            });
+          }
+
+          if (hover) {
+            bright[hover.id] = true;
+            (adj[hover.id] || []).forEach(function (n) {
+              if (drawn[n]) bright[n] = true;
+            });
+          } else if (q) {
+            bright = matchSet;
+          } else {
+            bright = drawn;
+          }
+
+          return {match: matchSet, drawn: drawn, bright: bright};
+        }
+
         function draw() {
           if (!graph) return;
-          var on = {};
-          graph.nodes.forEach(function (d) { if (matches(d)) on[d.id] = true; });
+          var s = scene();
+          var on = s.drawn;
+          var focus = filterState.q || hover ? s.bright : null;
           var dpr = window.devicePixelRatio || 1;
           var w = canvas.clientWidth || 800;
           var h = canvas.clientHeight || 560;
@@ -223,7 +343,6 @@
           ctx.scale(view.k, view.k);
 
           ctx.lineWidth = 1 / view.k;
-          ctx.strokeStyle = 'rgba(65, 72, 104, 0.55)';
           ctx.beginPath();
           graph.edges.forEach(function (e) {
             var a = pos[e.from], b = pos[e.to];
@@ -231,12 +350,15 @@
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
           });
+          ctx.strokeStyle = focus ? 'rgba(122, 162, 247, 0.8)' : 'rgba(65, 72, 104, 0.55)';
           ctx.stroke();
 
           graph.nodes.forEach(function (d) {
             if (!on[d.id]) return;
             var p = pos[d.id];
             var r = RADII[d.type] || 4;
+            var lit = !focus || focus[d.id];
+            ctx.globalAlpha = lit ? 1 : (filterState.q ? 0.45 : 0.16);
             ctx.beginPath();
             ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
             ctx.fillStyle = COLORS[d.type] || '#c0caf5';
@@ -246,15 +368,19 @@
               ctx.strokeStyle = '#ffffff';
               ctx.stroke();
             }
+            ctx.globalAlpha = 1;
           });
 
           // Host names only: 225 labels at once is noise, and hosts are the
-          // nodes an operator is usually looking for.
+          // nodes an operator is usually looking for. With a focus set, the
+          // neighbours that light up are the point, so their names matter too.
           ctx.fillStyle = '#c0caf5';
           ctx.font = (11 / view.k) + 'px monospace';
           graph.nodes.forEach(function (d) {
             if (!on[d.id]) return;
-            if (d.type !== 'host' && d.type !== 'doc') return;
+            var lit = !focus || focus[d.id];
+            if (!lit) return;
+            if (!filterState.q && !hover && d.type !== 'host' && d.type !== 'doc') return;
             var p = pos[d.id];
             ctx.fillText(d.label, p.x + 8 / view.k, p.y + 3 / view.k);
           });
@@ -284,8 +410,11 @@
           var w = toWorld(mx, my);
           var best = null;
           var bestD = Infinity;
+          // Hit-test the DRAWN set, not the match set: while searching, the
+          // dimmed neighbours are context you can still click through to.
+          var drawn = scene().drawn;
           graph.nodes.forEach(function (d) {
-            if (!matches(d)) return;
+            if (!drawn[d.id]) return;
             var p = pos[d.id];
             var dx = p.x - w.x, dy = p.y - w.y;
             var d2 = dx * dx + dy * dy;
@@ -380,12 +509,14 @@
         // shown calls this, so the three cannot disagree.
         function refresh() {
           if (!graph) return;
-          var shown = graph.nodes.filter(matches);
-          fit(shown);
+          var s = scene();
+          // Fit what is DRAWN (matches keep their neighbourhood in view); the
+          // counter reports MATCHES (the answer to what was typed).
+          fit(graph.nodes.filter(function (d) { return s.drawn[d.id]; }));
           draw();
           var counter = document.getElementById('kg-count');
           if (counter) {
-            counter.textContent = shown.length + ' of ' + graph.nodes.length + ' nodes';
+            counter.textContent = Object.keys(s.match).length + ' of ' + graph.nodes.length + ' nodes';
           }
         }
 
@@ -399,15 +530,33 @@
           });
           if (!layoutCache) layoutCache = computeLayout(g);
           pos = layoutCache.pos;
+
+          // Adjacency once per mount: focus highlighting is a 1-hop question
+          // asked on every repaint, and scanning 387 edges each time is waste.
+          adj = {};
+          byId = {};
+          graph.nodes.forEach(function (d) {
+            adj[d.id] = [];
+            byId[d.id] = d;
+          });
+          graph.edges.forEach(function (e) {
+            if (adj[e.from] && adj[e.to]) {
+              adj[e.from].push(e.to);
+              adj[e.to].push(e.from);
+            }
+          });
+
           if (!fitted) fit();
 
           // Controls. The search box and the type chips are ordinary DOM, so the
           // gate drives them exactly as an operator would.
           var search = document.getElementById('kg-search');
           if (search) {
-            search.value = filterState.q;
+            search.value = filterState.raw;
             search.addEventListener('input', function () {
+              filterState.raw = search.value;
               filterState.q = search.value.trim().toLowerCase();
+              writeHash();
               refresh();
             });
           }
@@ -420,6 +569,7 @@
               chip.addEventListener('click', function () {
                 filterState.types[t] = !filterState.types[t];
                 chip.classList.toggle('nav-active', filterState.types[t]);
+                writeHash();
                 refresh();
               });
             })(chips[c]);
@@ -432,7 +582,9 @@
           // type chip. Without it those paths could only be eyeballed.
           window.__kgDebug = {
             nodes: function () { return graph.nodes.length; },
-            visible: function () { return graph.nodes.filter(matches).length; },
+            visible: function () { return Object.keys(scene().match).length; },
+            drawn: function () { return Object.keys(scene().drawn).length; },
+            focus: function () { return Object.keys(scene().bright).length; },
             isVisible: function (id) {
               var hit = null;
               graph.nodes.forEach(function (d) { if (d.id === id) hit = d; });
@@ -451,11 +603,36 @@
         });
       }
 
-      document.addEventListener('DOMContentLoaded', mount);
+      // A shared `#kg?...` link must land ON the graph: index.html shows the
+      // Overview slice, and clicking the tab is the same transition an operator
+      // would make. Without this the hash would be readable but useless.
+      var started = false;
+      function start() {
+        if (started) return;
+        started = true;
+        if (initial) {
+          var tab = document.querySelector('button[url="data/kg.json"]');
+          if (tab) tab.click();
+        } else {
+          mount();
+        }
+      }
+
+      // Pasted or edited hash on an open page: adopt it and re-open the graph
+      // slice so the chips and the search box re-render from the new state.
+      window.addEventListener('hashchange', function () {
+        var h = readHash();
+        if (!h) return;
+        applyFilter(h);
+        var tab = document.querySelector('button[url="data/kg.json"]');
+        if (tab) tab.click();
+      });
+
       // `fitted` is per-mount state inside `mount()`, so a re-mount (new canvas
       // element after an Aki transition) refits on its own; nothing to reset here.
+      document.addEventListener('DOMContentLoaded', start);
       document.addEventListener('aki:applied', mount);
-      if (document.readyState !== 'loading') mount();
+      if (document.readyState !== 'loading') start();
     })();
   '';
 
@@ -1137,8 +1314,9 @@
         <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--heading);">Interactive projection</h3>
         <p style="margin-bottom: 0.75rem; color: var(--text-muted);">
           Drag to pan &middot; wheel to zoom &middot; type to search labels &middot;
-          toggle a type to filter &middot; <strong>click any node to open its slice</strong>.
-          Hover inspects without navigating.
+          toggle a type to filter &middot; hover (or search) to highlight a node and its
+          neighbours &middot; <strong>click any node to open its slice</strong>.
+          The filter lives in the URL, so a filtered view is a shareable link.
         </p>
         <div style="position: relative;">
           <canvas id="kg-canvas" style="width: 100%; height: 560px; display: block; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; cursor: grab; touch-action: none;"></canvas>

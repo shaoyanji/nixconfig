@@ -18,12 +18,20 @@ in {
   ];
 
   boot = {
-    # Lower priority than `mkDefault` (1000) on purpose: nixos-hardware modules
-    # set their kernel as a *default* too, and two equal-priority defaults are a
-    # hard "defined multiple times" error, not a pick. That is what made the
-    # raspberry-pi/3 module conflict with this baseline and refuse to evaluate
-    # minyx at all. A baseline should always yield to a hardware module.
-    kernelPackages = lib.mkOverride 1500 pkgs.linuxPackages_latest;
+    # Priority 1200 sits between `mkDefault` (1000) and the option's own default
+    # (1500), and both boundaries are load-bearing:
+    #
+    #   - nixos-hardware modules set their kernel as a *default* too, and two
+    #     equal-priority defaults are a hard "defined multiple times" error, not
+    #     a pick. That is what made the raspberry-pi/3 module conflict with this
+    #     baseline and refuse to evaluate minyx at all. 1200 is weaker, so a
+    #     hardware module still wins.
+    #   - 1500 (the previous value) ties with the option default in
+    #     nixos/modules/system/boot/kernel.nix, so any host that imports this
+    #     baseline without its own kernel override failed to evaluate — eisen
+    #     was in that state until 2026-10-19. 1200 is stronger, so the baseline
+    #     still selects linuxPackages_latest.
+    kernelPackages = lib.mkOverride 1200 pkgs.linuxPackages_latest;
   };
 
   sops = {

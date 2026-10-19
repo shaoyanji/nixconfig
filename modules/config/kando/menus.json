@@ -3,10 +3,10 @@
   "menus": [
     {
       "root": {
-        "type": "root",
         "name": "Kando Menu",
         "icon": "award_star",
         "iconTheme": "material-symbols-rounded",
+        "type": "root",
         "activateWorkflow": {
           "quickSelectKey": "Backspace",
           "actions": [
@@ -17,10 +17,10 @@
         },
         "children": [
           {
-            "type": "button",
             "name": "up",
             "icon": "arrow_upward",
             "iconTheme": "material-symbols-rounded",
+            "type": "button",
             "selectWorkflow": {
               "actions": [
                 {
@@ -36,16 +36,24 @@
             }
           },
           {
-            "type": "submenu",
             "name": "Apps",
             "icon": "apps",
             "iconTheme": "material-symbols-rounded",
+            "type": "submenu",
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            },
             "children": [
               {
-                "type": "button",
                 "name": "Web Browser",
                 "icon": "globe",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -61,10 +69,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "E-Mail",
                 "icon": "mail",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -80,10 +88,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "GIMP",
                 "icon": "gimp",
                 "iconTheme": "simple-icons",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -99,10 +107,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "File Browser",
                 "icon": "folder_shared",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -118,10 +126,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Terminal",
                 "icon": "terminal",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -137,10 +145,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Steam",
                 "icon": "steam",
                 "iconTheme": "simple-icons",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -155,7 +163,13 @@
                   ]
                 }
               }
-            ],
+            ]
+          },
+          {
+            "name": "Web Links",
+            "icon": "public",
+            "iconTheme": "material-symbols-rounded",
+            "type": "submenu",
             "activateWorkflow": {
               "quickSelectKey": "Backspace",
               "actions": [
@@ -163,19 +177,13 @@
                   "type": "close-submenu"
                 }
               ]
-            }
-          },
-          {
-            "type": "submenu",
-            "name": "Web Links",
-            "icon": "public",
-            "iconTheme": "material-symbols-rounded",
+            },
             "children": [
               {
-                "type": "button",
                 "name": "Google",
                 "icon": "google",
                 "iconTheme": "simple-icons",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -189,10 +197,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Kando on GitHub",
                 "icon": "github",
                 "iconTheme": "simple-icons",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -206,10 +214,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Kando on YouTube",
                 "icon": "youtube",
                 "iconTheme": "simple-icons",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -223,10 +231,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Kando on Discord",
                 "icon": "discord",
                 "iconTheme": "simple-icons",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -239,21 +247,13 @@
                   ]
                 }
               }
-            ],
-            "activateWorkflow": {
-              "quickSelectKey": "Backspace",
-              "actions": [
-                {
-                  "type": "close-submenu"
-                }
-              ]
-            }
+            ]
           },
           {
-            "type": "button",
             "name": "right",
             "icon": "arrow_forward",
             "iconTheme": "material-symbols-rounded",
+            "type": "button",
             "selectWorkflow": {
               "actions": [
                 {
@@ -269,16 +269,24 @@
             }
           },
           {
-            "type": "submenu",
             "name": "Clipboard",
             "icon": "assignment",
             "iconTheme": "material-symbols-rounded",
+            "type": "submenu",
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            },
             "children": [
               {
-                "type": "button",
                 "name": "Paste",
                 "icon": "content_paste_go",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "angle": 90,
                 "selectWorkflow": {
                   "actions": [
@@ -293,10 +301,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Copy",
                 "icon": "content_copy",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -310,10 +318,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Cut",
                 "icon": "cut",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -326,21 +334,13 @@
                   ]
                 }
               }
-            ],
-            "activateWorkflow": {
-              "quickSelectKey": "Backspace",
-              "actions": [
-                {
-                  "type": "close-submenu"
-                }
-              ]
-            }
+            ]
           },
           {
-            "type": "button",
             "name": "Execute Macro",
             "icon": "macro-item.svg",
             "iconTheme": "kando",
+            "type": "button",
             "selectWorkflow": {
               "actions": [
                 {
@@ -354,10 +354,10 @@
             }
           },
           {
-            "type": "button",
             "name": "down",
             "icon": "arrow_downward",
             "iconTheme": "material-symbols-rounded",
+            "type": "button",
             "selectWorkflow": {
               "actions": [
                 {
@@ -373,16 +373,24 @@
             }
           },
           {
-            "type": "submenu",
             "name": "Submenu",
             "icon": "submenu-item.svg",
             "iconTheme": "kando",
+            "type": "submenu",
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            },
             "children": [
               {
-                "type": "button",
                 "name": "immich",
                 "icon": "uri-item.svg",
                 "iconTheme": "kando",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -396,10 +404,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Open URI",
                 "icon": "uri-item.svg",
                 "iconTheme": "kando",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -412,7 +420,13 @@
                   ]
                 }
               }
-            ],
+            ]
+          },
+          {
+            "name": "Audio",
+            "icon": "play_circle",
+            "iconTheme": "material-symbols-rounded",
+            "type": "submenu",
             "activateWorkflow": {
               "quickSelectKey": "Backspace",
               "actions": [
@@ -420,19 +434,13 @@
                   "type": "close-submenu"
                 }
               ]
-            }
-          },
-          {
-            "type": "submenu",
-            "name": "Audio",
-            "icon": "play_circle",
-            "iconTheme": "material-symbols-rounded",
+            },
             "children": [
               {
-                "type": "button",
                 "name": "Next Track",
                 "icon": "skip_next",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "angle": 90,
                 "selectWorkflow": {
                   "actions": [
@@ -447,10 +455,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Play / Pause",
                 "icon": "play_pause",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -464,10 +472,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Mute",
                 "icon": "music_off",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -481,10 +489,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Previous Track",
                 "icon": "skip_previous",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "angle": 270,
                 "selectWorkflow": {
                   "actions": [
@@ -499,10 +507,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "left",
                 "icon": "arrow_back",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -517,21 +525,13 @@
                   ]
                 }
               }
-            ],
-            "activateWorkflow": {
-              "quickSelectKey": "Backspace",
-              "actions": [
-                {
-                  "type": "close-submenu"
-                }
-              ]
-            }
+            ]
           },
           {
-            "type": "button",
             "name": "left",
             "icon": "arrow_back",
             "iconTheme": "material-symbols-rounded",
+            "type": "button",
             "selectWorkflow": {
               "actions": [
                 {
@@ -547,16 +547,24 @@
             }
           },
           {
-            "type": "submenu",
             "name": "Windows",
             "icon": "select_window",
             "iconTheme": "material-symbols-rounded",
+            "type": "submenu",
+            "activateWorkflow": {
+              "quickSelectKey": "Backspace",
+              "actions": [
+                {
+                  "type": "close-submenu"
+                }
+              ]
+            },
             "children": [
               {
-                "type": "button",
                 "name": "Toggle Maximize",
                 "icon": "open_in_full",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "angle": 0,
                 "selectWorkflow": {
                   "actions": [
@@ -571,10 +579,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Tile Right",
                 "icon": "text_select_jump_to_end",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "angle": 90,
                 "selectWorkflow": {
                   "actions": [
@@ -589,10 +597,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "hotkeys",
                 "icon": "keyboard_onscreen",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -608,10 +616,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "hotkeys",
                 "icon": "keyboard_onscreen",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -627,10 +635,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Close Window",
                 "icon": "cancel_presentation",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -644,10 +652,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Tile Left",
                 "icon": "text_select_jump_to_beginning",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "angle": 270,
                 "selectWorkflow": {
                   "actions": [
@@ -661,7 +669,13 @@
                   ]
                 }
               }
-            ],
+            ]
+          },
+          {
+            "name": "Bookmarks",
+            "icon": "folder_special",
+            "iconTheme": "material-symbols-rounded",
+            "type": "submenu",
             "activateWorkflow": {
               "quickSelectKey": "Backspace",
               "actions": [
@@ -669,19 +683,13 @@
                   "type": "close-submenu"
                 }
               ]
-            }
-          },
-          {
-            "type": "submenu",
-            "name": "Bookmarks",
-            "icon": "folder_special",
-            "iconTheme": "material-symbols-rounded",
+            },
             "children": [
               {
-                "type": "button",
                 "name": "Downloads",
                 "icon": "download",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -697,10 +705,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Videos",
                 "icon": "video_camera_front",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -716,10 +724,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Pictures",
                 "icon": "imagesmode",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -735,10 +743,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Documents",
                 "icon": "text_ad",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -754,10 +762,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Desktop",
                 "icon": "desktop_windows",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -773,10 +781,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Home",
                 "icon": "home",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -792,10 +800,10 @@
                 }
               },
               {
-                "type": "button",
                 "name": "Music",
                 "icon": "music_note",
                 "iconTheme": "material-symbols-rounded",
+                "type": "button",
                 "selectWorkflow": {
                   "actions": [
                     {
@@ -810,15 +818,7 @@
                   ]
                 }
               }
-            ],
-            "activateWorkflow": {
-              "quickSelectKey": "Backspace",
-              "actions": [
-                {
-                  "type": "close-submenu"
-                }
-              ]
-            }
+            ]
           }
         ]
       },

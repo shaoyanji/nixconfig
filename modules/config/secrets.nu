@@ -32,8 +32,11 @@ def --env _load_all_secrets [force_refresh: bool = false] {
     }
   }
 
-  # 2. Skip if already loaded in this environment and not forcing refresh
-  if (not $force_refresh) and ($env.GEMINI_API_KEY? != null) {
+  # 2. Skip only if THIS loader already ran in this process. Keying the check
+  # off one variable (GEMINI_API_KEY) was wrong: a session can export some keys
+  # without the rest, and the cache was then never read, so the missing keys
+  # stayed missing no matter how often the shell restarted.
+  if (not $force_refresh) and ($env.NU_SECRETS_LOADED? == "1") {
     return
   }
 
@@ -66,6 +69,7 @@ def --env _load_all_secrets [force_refresh: bool = false] {
       try {
         let secrets = (open $cache_file)
         load-env $secrets
+        load-env {NU_SECRETS_LOADED: "1"}
         return
       } catch {
         # Corrupt cache, fall through to regenerate
@@ -112,6 +116,7 @@ def --env _load_all_secrets [force_refresh: bool = false] {
       CLOUDINARY_API_KEY:            "CLOUDINARY.API.KEY"
       CLOUDINARY_API_SECRET:         "CLOUDINARY.API.SECRET"
       CLOUDINARY_NAME:               "CLOUDINARY.NAME"
+      TYPESAFE_API_KEY:              "TYPESAFE.API.KEY"
     }
 
     def _get_nested [record, path: string] {
@@ -168,11 +173,16 @@ def --env _load_all_secrets [force_refresh: bool = false] {
 
   # 7. If any secrets were collected, write to tmpfs cache and load
   if ($collected | is-not-empty) {
+    # Create the cache 0600 from the start. `save` creates 0644 under the
+    # default umask, so the old chmod-after-save left a window where the file
+    # was readable by anyone who could traverse /run/user/<uid>. Creating it
+    # first with `install` and letting `save -f` truncate preserves the mode.
     try {
+      ^install -m 600 /dev/null $cache_file
       $collected | to json | save -f $cache_file
-      ^chmod 600 $cache_file
     } catch {}
     load-env $collected
+    load-env {NU_SECRETS_LOADED: "1"}
   }
 }
 

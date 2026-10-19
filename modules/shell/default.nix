@@ -30,6 +30,21 @@ in {
       nix-direnv.enable = true;
       enableNushellIntegration = true;
       enableBashIntegration = true;
+      enableGitIntegration = true;
+      stdlib = ''
+        # Cap nix print-dev-env at 10s so slow/un-cached builds fall back to the existing devshell
+        _nix() {
+          local cmd=("''${_nix_direnv_nix:-nix}" --no-warn-dirty --extra-experimental-features "nix-command flakes" "$@")
+          if [[ "''${1:-}" == "print-dev-env" ]]; then
+            if ! timeout 10s "''${cmd[@]}"; then
+              echo "nix-direnv: devShell build exceeded 10s timeout (falling back to prior cached shell)" >&2
+              return 1
+            fi
+          else
+            "''${cmd[@]}"
+          fi
+        }
+      '';
     };
     zoxide = {
       enable = true;
@@ -47,15 +62,26 @@ in {
     fzf.enableNushellIntegration = false;
     fzf.tmux.enableShellIntegration = true;
     ripgrep.enable = true;
+    jq.enable = true;
+    fd = {
+      enable = true;
+      hidden = true;
+    };
+    bat = {
+      enable = true;
+      config = {
+        style = "plain";
+      };
+    };
+    eza = {
+      enable = true;
+      enableBashIntegration = true;
+      enableNushellIntegration = true;
+      icons = "auto";
+      git = true;
+      extraOptions = [
+        "--group-directories-first"
+      ];
+    };
   };
-  home.packages = with pkgs; [
-    zoxide
-    direnv
-    fzf
-    jq
-    ripgrep
-    fd
-    bat
-    eza
-  ];
 }

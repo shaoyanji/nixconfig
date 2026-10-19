@@ -48,9 +48,7 @@ in {
       uv = {
         enable = true;
         settings = {
-          python-downloads = "never";
           python-preference = "only-system";
-          # Use standard PyPI (removed broken test.pypi.org testing override)
         };
       };
 
@@ -64,7 +62,6 @@ in {
     home.packages = with pkgs;
     # Base lightweight developer utilities (available on all tiers)
       [
-        jq
         lazygit
       ]
       # Heavy developer toolchain — ONLY installed when tier == "full"

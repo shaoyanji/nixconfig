@@ -104,6 +104,9 @@ in {
         '';
       "nix.conf".content = ''
         access-tokens = github.com=${config.sops.placeholder.ghsudo}
+        accept-flake-config = true
+        extra-substituters = https://install.determinate.systems
+        extra-trusted-public-keys = cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM=
       '';
     };
   };

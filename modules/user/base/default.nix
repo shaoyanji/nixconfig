@@ -32,9 +32,7 @@ in {
       readPkgList ../../../pkgs.txt
       ++ [
         # ── Sysadmin Resource & Performance Monitoring ──
-        btop # Resource monitor
         duf # Disk usage/free space viewer
-        fastfetch # System info fetcher
         procs # Modern ps replacement
 
         # ── File & Remote Data Transfer ──
@@ -93,7 +91,6 @@ in {
         pciutils # PCI bus inspection (lspci)
         strace # Kernel system call tracer
         sysstat # System performance & accounting (sar, iostat)
-        tldr # Practical command manual pages
         usbutils # USB bus inspection (lsusb)
       ]
       ++ lib.optionals stdenv.hostPlatform.isDarwin [];
@@ -103,6 +100,39 @@ in {
       GUM_CHOOSE_SELECTED_FOREGROUND = 50;
       GUM_CHOOSE_CURSOR_FOREGROUND = 50;
       GUM_CHOOSE_HEADER_FOREGROUND = 30;
+    };
+  };
+
+  programs = {
+    btop = {
+      enable = true;
+      settings = {
+        color_theme = "catppuccin_mocha";
+        theme_background = false;
+        vim_keys = true;
+      };
+    };
+
+    fastfetch.enable = true;
+
+    ssh = {
+      enable = true;
+      enableDefaultConfig = false;
+      settings."*" = {
+        ServerAliveInterval = 60;
+        ServerAliveCountMax = 3;
+        ControlMaster = "auto";
+        ControlPersist = "10m";
+      };
+    };
+
+    tealdeer = {
+      enable = true;
+      settings = {
+        updates = {
+          auto_update = true;
+        };
+      };
     };
   };
 

@@ -13,7 +13,7 @@
 
   # Dormant by default (`enableHeavy` is not set on any host). Deliberately no
   # Neo4j server here: the knowledge graph is a generated projection, and a JVM
-  # heap competes with the NAS page cache (ARCHITECTURE.md P3). If an external
+  # heap competes with the NAS page cache (AGENTS.nix `p3-graph-query`). If an external
   # graph instance is ever needed, feed it `nix eval --raw .#knowledgeGraph.cypher`.
   heavyTools = with pkgs; [
     go

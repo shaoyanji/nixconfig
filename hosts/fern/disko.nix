@@ -6,8 +6,7 @@
 # formatting; disko wipes the disk).
 #
 # Shape mirrors stark's system disk: UEFI ESP + 8G swap (>= 8 GB RAM,
-# so hibernation stays possible) + btrfs /root + /nix subvolumes.
-# Host-local on purpose (TODO.md → "Things To Avoid": storage layouts
+# so hibernation stays possible) + btrfs /root + /nix subvolumes.  # Host-local on purpose (AGENTS.nix `non-goals`: storage layouts
 # stay host-specific). Persistent desktop — no impermanence.
 {device ? throw "Set this to the laptop SSD, e.g. /dev/sda or /dev/nvme0n1"}: {
   disko.devices = {

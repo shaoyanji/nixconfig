@@ -6,7 +6,7 @@
 # rarely generalise across machines.  Only import this when two or more
 # hosts genuinely share the same disk topology.
 #
-# See TODO.md → "Things To Avoid" for the policy on storage layout merging.
+# See the `non-goals` note in AGENTS.nix for the policy on storage layout merging.
 {device ? throw "Set this to your disk device, e.g. /dev/sda", ...}: {
   disko.devices = {
     disk.main = {

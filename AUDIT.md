@@ -2,7 +2,7 @@
 
 > Newest first. One entry per landed change: what, where, evidence. Narrative
 > history lives in [`docs/history/audit-2026-10.md`](docs/history/audit-2026-10.md);
-> design rationale lives in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+> design rationale lives in [`AGENTS.nix`](AGENTS.nix) (`task ops:notes`).
 > Budget: 150 lines (`.agents/SCHEMA.md` §2).
 
 ## Current state (2026-10-19)

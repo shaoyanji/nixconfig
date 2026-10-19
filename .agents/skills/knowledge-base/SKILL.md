@@ -208,11 +208,13 @@ mention** — `master-toon`, `nix-eval`, `host-facts`, `decision-picker` among
 them. Two causes, both worth
 knowing before you read that list as rot:
 
-- **Only two doc sources exist**: the eight living documents at the repo root and
-  non-recursive `docs/*.md` (`lib/knowledge-graph.nix`). `.agents/README.md`
-  lists skills and is *not* a doc node, so a skill documented only there has no
-  inbound edge.
-- **Matching is exact-token**: `EXPERIMENTS.md` says `nix-eval-jobs`, which is a
+- **Only two doc sources exist**: the four living documents at the repo root
+  (`AGENTS.md`, `MANUAL.md`, `AUDIT.md`, `README.md`) and non-recursive
+  `docs/*.md` (`lib/knowledge-graph.nix`). The retired root narratives are stubs
+  and the `AGENTS.nix` notes are a separate projection (`ops:notes`), so neither
+  is a doc node. `.agents/README.md` lists skills and is *not* a doc node, so a
+  skill documented only there has no inbound edge.
+- **Matching is exact-token**: an `AGENTS.nix` note says `nix-eval-jobs`, which is a
   different token from `nix-eval` — the substring is there, the edge is not.
 
 So the honest reading is "no doc names this exactly", not "nobody uses it". For
@@ -268,7 +270,7 @@ The diagnosis is **discoverability and write-path**, not search:
    NFS; an agent writing there from a host without the mount silently fails or
    writes to a local path.
 
-The proposed fix (ARCHITECTURE.md P2): a `vault-sync` timer that exports
+The proposed fix (note `p2-vault-write-path`): a `vault-sync` timer that exports
 `ai-memory` pages + `docs/history/` into `Obsidian-Git-Sync/inbox/` with a
 stable frontmatter block (`source`, `host`, `date`, `status`), then Git commits.
 The rule: **agents write to one inbox, a timer curates; nobody hand-maintains a
@@ -281,7 +283,7 @@ second vault.**
 | A durable rule | `.agents/SCHEMA.md` or the owning manual |
 | A host fact | `inventory.toml` (`notes`) via `task dev:inventory:menu` |
 | An operational event | the sentinel ledger (automatic) + `AUDIT.md` line |
-| A design decision | `ARCHITECTURE.md` |
+| A design decision | an `AGENTS.nix` note with `refs` (`task ops:notes`) |
 | A one-off finding | the commit message / PR; promote only if it changes a rule |
 | A procedure | `docs/` or a skill |
 | A personal note | the vault |

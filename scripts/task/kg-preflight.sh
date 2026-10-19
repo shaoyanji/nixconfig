@@ -71,9 +71,13 @@ anchor_for() {
       # non-recursive, matching lib/knowledge-graph.nix
       case "${f#docs/}" in */*) : ;; *) printf 'doc:%s' "$f" ;; esac
       ;;
-    AGENTS.md | MANUAL.md | ARCHITECTURE.md | AUDIT.md | TODO.md | HANDOFF.md | EXPERIMENTS.md | README.md)
+    AGENTS.md | MANUAL.md | AUDIT.md | README.md)
       printf 'doc:%s' "$f"
       ;;
+    # The retired root narratives are one-line stubs and not graph nodes; the
+    # content lives in AGENTS.nix, which is a separate projection (`ops:notes`).
+    ARCHITECTURE.md | TODO.md | HANDOFF.md | EXPERIMENTS.md) printf 'NOTES-WIDE' ;;
+    AGENTS.nix | lib/agents-notes.nix) printf 'NOTES-WIDE' ;;
     inventory.toml | lib/knowledge-graph.nix) printf 'GRAPH-WIDE' ;;
   esac
 }
@@ -116,6 +120,10 @@ for f in "${files[@]}"; do
   anchor="$(anchor_for "$f")"
   if [ "$anchor" = "GRAPH-WIDE" ]; then
     printf '  %-46s graph-wide — %s feeds every node; no useful single blast radius\n' "$f" "$f"
+    continue
+  fi
+  if [ "$anchor" = "NOTES-WIDE" ]; then
+    printf '  %-46s notes-wide — %s feeds the AGENTS.nix projection; query `task ops:notes`\n' "$f" "$f"
     continue
   fi
   if [ -z "$anchor" ] || ! node_exists "$anchor"; then

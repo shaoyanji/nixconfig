@@ -13,7 +13,8 @@ Machine-enforced where possible:
 | Every tracked `.toml` parses | `task checks:toml:lint` |
 | Generated docs are never committed | `.gitignore` + review — `.#docs` is a store path (`docs/docs-pipeline-audit.md`) |
 | Task graph (duplicate keys, dangling refs) | `task checks:tasks` |
-| Everything else here | review; `task checks:docs:budget` prints the counts |
+| AGENTS.nix notes: status vocabulary, resolvable refs, leaf intent | `lib/agents-notes.nix` → `checks.<system>.agents-notes-schema` |
+| Everything else here | review; `task ops:docs:budget` prints the counts |
 
 ---
 
@@ -25,8 +26,7 @@ Machine-enforced where possible:
 | Optional profiles / services / knobs | `modules.toml` | `.#docs` → `modules-registry.md` |
 | What is executable | `taskfiles/*.yml` | `AGENTS.md`, skills |
 | What a host runs | `hosts/<host>/*.nix` | `MANUAL.md` (service map) |
-| Why a design exists | `ARCHITECTURE.md` | `EXPERIMENTS.md` evidence links |
-| What is still open | `TODO.md` (priority stack) | `ARCHITECTURE.md` exit criteria |
+| Why a design exists, and what is still open | `AGENTS.nix` notes (`task ops:notes`) | `.#agentsNotes`, `.#docs` |
 | What happened | `AUDIT.md` (ledger) + `docs/history/` | commit messages |
 | How to operate | `MANUAL.md`, `.agents/deploy/` | skills |
 | How an agent should route | `AGENTS.md`, `.agents/README.md` | skills |
@@ -41,11 +41,9 @@ itself within a month.
 | Class | Files | Budget | Contains |
 | :--- | :--- | ---: | :--- |
 | **Manual** | `AGENTS.md`, `MANUAL.md` | 1 200 lines each | routing, invariants, operator procedure |
-| **Proposals** | `ARCHITECTURE.md` | 600 lines | P0–P3 proposals, decisions, exit criteria |
-| **Studies** | `EXPERIMENTS.md` | 80 lines/entry | mode, evidence, why not prod |
+| **Notes** | `AGENTS.nix` | data file | decisions, proposals, open work, design studies: status + refs + a distilled body (≤30 lines), or a leaf with verbose intent |
+| **Stubs** | `ARCHITECTURE.md`, `TODO.md`, `HANDOFF.md`, `EXPERIMENTS.md` | 10 lines | a pointer to `AGENTS.nix`; content creeping back fails `docs-budget` |
 | **Ledger** | `AUDIT.md` | 150 lines | current state + dated entries, newest first |
-| **Queue** | `TODO.md` | 150 open items / 300 lines | open items only, priority-ordered |
-| **Queue** | `HANDOFF.md` | 150 lines | open items only, priority-ordered |
 | **Runbook** | `.agents/deploy/**`, `docs/*.md` | 400 lines | repeatable procedure |
 | **Skill** | `.agents/skills/*/SKILL.md` | 400 lines | routing + procedure, not a novel |
 | **History** | `docs/history/*.md` | unlimited | superseded narrative, never linked as current |
@@ -54,12 +52,12 @@ Over budget is a signal to move detail to `docs/` and leave a pointer — not to
 raise the budget. A living document that grows monotonically is not a manual,
 it is a diary.
 
-A **queue** is counted twice, because a queue is judged by what is still *open*:
-`TODO.md` allows 150 unchecked items (`- [ ]`) **and** 300 lines in total. Checked
-items cost against the total and never against the open budget — deleting the
-record of finished work to make room is exactly what the split forbids. The gate
-(`checks.<system>.docs-budget`) and the human view (`task ops:docs:budget`) print
-both numbers.
+A **note** is judged by whether it can be acted on: a note with refs is distilled
+(the code is the detail) and a note without refs is a **leaf** that must carry
+the original intent in prose. `AGENTS.nix` has no prose budget because the
+schema, not a line count, is what keeps it honest; the four root stubs are
+bounded at 10 lines each by `checks.<system>.docs-budget` and
+`task ops:docs:budget`.
 
 ## 3. Status vocabulary (use these exact words)
 
@@ -115,23 +113,36 @@ nix build .#checks.x86_64-linux.skills-schema -L
 ## 5. Experiment lifecycle
 
 ```
-idea → EXPERIMENTS.md (study, evidence, exit criteria)
-     → ARCHITECTURE.md (proposal, priority, decision)
-     → module + host wiring + check
-     → EXPERIMENTS.md entry deleted, DELIVERED row in AUDIT.md
+idea → AGENTS.nix note (kind = experiment, status = PROPOSED; leaf → verbose intent)
+     → kind = proposal + priority (status ACCEPTED)
+     → module + host wiring + check (status IN FLIGHT → DELIVERED, refs.modules)
+     → the note stays as the design record; a DELIVERED row in AUDIT.md
 ```
 
+**Promotion is an edit to the note, never a new markdown file.** Moving up a
+rung means adding the artifact that embodies the trying (`refs.modules`), the
+gate that proves it (`refs.tasks`), and the new `status` — that is what keeps an
+idea from becoming recycled prose. A note whose exit criterion cannot be
+executed is not ready to be promoted; creating that `checks:*` task is part of
+the work.
+
 An experiment that has been "delivered" but is still imported by a host is not
-an experiment — it is either prod (document it) or rot (remove it). The
-classification banner at the top of `EXPERIMENTS.md` is the rule.
+an experiment — it is either prod (point the note's refs at the module) or rot
+(mark it `SUPERSEDED`, or `REJECTED` with the reason; never delete the record).
+`task ops:notes KIND=experiment` is the current set.
+
+Authoring contract, field rules, templates and the verification commands:
+`.agents/skills/agents-notes/SKILL.md`.
 
 ## 6. Anti-pollution checklist (before adding a paragraph)
 
 - Is this fact already in `inventory.toml`, `modules.toml`, or a taskfile?
   Link instead of repeating.
 - Is this history? Put it in `docs/history/` and add one ledger line in `AUDIT.md`.
-- Is this a proposal? `ARCHITECTURE.md`, with an exit criterion.
+- Is this a proposal or open work? An `AGENTS.nix` note with an exit criterion
+  and refs to the nodes it affects (or a verbose leaf if none exist yet).
 - Is this a one-off measurement? Keep it in the PR/commit; only the conclusion
-  belongs in the doc.
+  belongs in a note.
 - Does it name a command that does not exist? Run it before writing it.
-- Is it longer than the budget? Move it, don't grow the file.
+- Is it longer than the budget? Move it, don't grow the file — and a root
+  narrative file is now a 10-line pointer, not a home.

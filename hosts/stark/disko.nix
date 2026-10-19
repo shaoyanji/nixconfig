@@ -8,7 +8,7 @@
 #     Persistent ID: /dev/disk/by-id/ata-ST1000LM035-1RK172_WL14QR63
 #     single btrfs partition mounted at /mnt/steam.
 #
-# Host-local on purpose: disk topology is host-specific (TODO.md →
+# Host-local on purpose: disk topology is host-specific (AGENTS.nix `non-goals` →
 # "Things To Avoid" — do not merge host-local storage layouts into
 # shared modules). Shape mirrors hosts/common/disko.nix minus the LVM
 # and /persist: stark is a persistent eisen-style Steam desktop and

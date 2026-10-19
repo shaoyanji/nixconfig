@@ -514,7 +514,7 @@ in {
       }
       # The clearest previously-unwatched failure mode: a connecting probe proves
       # the resolver socket is up. A full resolution assertion needs a dns://
-      # endpoint (see TODO.md HC-6 remaining).
+      # endpoint (see the `resolver-independence` note in AGENTS.nix).
       {
         name = "dns (pihole-ftl)";
         url = "tcp://127.0.0.1:53";

@@ -76,6 +76,10 @@ want_edges="$(cd "$REPO" && nix eval --json .#knowledgeGraph.graph --apply 'g: b
 got_nodes="$(jq -r '.nodes | length' "$SITE/data/kg-graph.json")"
 got_edges="$(jq -r '.edges | length' "$SITE/data/kg-graph.json")"
 want_docs="$(jq '[.nodes[] | select(.type == "doc")] | length' "$SITE/data/kg-graph.json")"
+# A real doc node for the type-filter assertion. Deriving it from the data keeps
+# the check honest now that the retired root narratives are no longer doc nodes
+# (AGENTS.nix notes are a separate projection).
+want_doc_id="$(jq -r '[.nodes[] | select(.type == "doc")][0].id' "$SITE/data/kg-graph.json")"
 [ "$got_nodes" = "$want_nodes" ] && ok "node count ($got_nodes)" || bad "node count: site $got_nodes vs compiled $want_nodes"
 [ "$got_edges" = "$want_edges" ] && ok "edge count ($got_edges)" || bad "edge count: site $got_edges vs compiled $want_edges"
 
@@ -343,7 +347,7 @@ else
   # count is derived from the data (not hardcoded), so adding a host cannot
   # silently weaken this assertion.
   agent-browser eval '(() => { const i = document.getElementById("kg-search"); i.value = ""; i.dispatchEvent(new Event("input")); document.querySelector("[data-kg-type=doc]").click(); return "toggled"; })()' >/dev/null 2>&1 || true
-  toggled="$(eval_json 'JSON.stringify({visible: window.__kgDebug.visible(), doc: window.__kgDebug.isVisible("doc:TODO.md"), host: window.__kgDebug.isVisible("host:frieren")})')"
+  toggled="$(eval_json "JSON.stringify({visible: window.__kgDebug.visible(), doc: window.__kgDebug.isVisible(\"${want_doc_id}\"), host: window.__kgDebug.isVisible(\"host:frieren\")})")"
   t_visible="$(jq -r '.visible' <<<"$toggled" 2>/dev/null || echo "")"
   t_doc="$(jq -r '.doc' <<<"$toggled" 2>/dev/null || echo true)"
   t_host="$(jq -r '.host' <<<"$toggled" 2>/dev/null || echo false)"

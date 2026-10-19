@@ -23,7 +23,7 @@ in {
 
     envPath = lib.mkOption {
       type = lib.types.str;
-      default = "/home/devji/.config/hermes/hermes.env";
+      default = "${user.home}/.config/hermes/hermes.env";
       description = "Destination path for the assembled hermes .env file.";
     };
 

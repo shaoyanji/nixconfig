@@ -22,7 +22,11 @@
 # of nixos-fw), ICMP/allowPing, and dns.nix's per-interface entries (they merge
 # in additively). The chain's final refuse still drops everything else —
 # including NEW connections from docker0, which is the point.
-{lib, ...}: let
+{
+  config,
+  lib,
+  ...
+}: let
   scopedIfaces = [
     "enp1s0" # wired LAN
     "enp0s20f0u2u1i5" # USB-C dock wired LAN
@@ -41,6 +45,9 @@ in {
   # (declared, no listener): 631 (CUPS, removed by the Tier-1 debloat), 3005,
   # 8324 and 8920 (no owning service anywhere in the tree; 8920 is Jellyfin's
   # HTTPS port, which this host does not serve), and 32469 (Plex DLNA, off).
+  # Port values are read from the option that owns them wherever one exists, so
+  # moving a service port cannot leave a stale hole (or a stale closed port)
+  # behind in the scoped lists.
   profiles.serviceExposure = {
     enable = true;
     interfaces = scopedIfaces;
@@ -54,21 +61,21 @@ in {
       # Tier-1 printing debloat; it was a hole with no service behind it.
       nfs = {port = 2049;};
       immich = {
-        port = 2283;
+        port = config.services.immich.port;
         proxy = {
           name = "photos.frieren.lan";
           websockets = true;
         };
       };
       uptime-kuma = {
-        port = 3001;
+        port = config.services.ha-stack.uptime-kuma.port;
         proxy = {
           name = "status.frieren.lan";
           websockets = true;
         };
       };
       harmonia = {
-        port = 5000;
+        port = config.services.harmonia-fleet.port;
         proxy = {
           name = "cache.frieren.lan";
         };
@@ -91,7 +98,7 @@ in {
       };
       tcp-7878 = {port = 7878;};
       kiwix = {
-        port = 8088;
+        port = config.services.kiwix-serve.port;
         proxy = {
           name = "wiki.frieren.lan";
         };
@@ -104,7 +111,7 @@ in {
         };
       };
       home-assistant = {
-        port = 8123;
+        port = config.services.ha-stack.port;
         proxy = {
           name = "ha.frieren.lan";
           websockets = true;

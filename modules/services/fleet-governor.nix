@@ -10,6 +10,7 @@
   pkgs,
   ...
 }: let
+  user = import ../global/user.nix;
   cfg = config.services.fleetGovernor;
 
   # Declarative rules configuration serialized into Nix store JSON
@@ -114,7 +115,8 @@ in {
           };
           endpoint = lib.mkOption {
             type = lib.types.str;
-            default = "http://127.0.0.1:8088";
+            # Same source as the server's own option — no second copy of :8088.
+            default = "http://127.0.0.1:${toString config.services.kiwix-serve.port}";
             description = "Kiwix endpoint URL.";
           };
           service = lib.mkOption {
@@ -290,7 +292,7 @@ in {
           emitHandoff = lib.mkOption {
             type = lib.types.bool;
             default = true;
-            description = "Append findings directly to /home/devji/HANDOFF.md.";
+            description = "Append findings directly to ${user.home}/HANDOFF.md.";
           };
         };
       };
@@ -316,7 +318,7 @@ in {
       serviceConfig = {
         Type = "oneshot";
         User = "root";
-        WorkingDirectory = "/home/devji";
+        WorkingDirectory = "${user.home}";
         ExecStart = ''
           ${pkgs.writeShellScript "run-fleet-governor" ''
             set -euo pipefail

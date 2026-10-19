@@ -4,7 +4,7 @@
   configureNetworkd ? false,
   useDevNixDefaults ? false,
   authorizedKeys ? [],
-  userHome ? "/home/devji",
+  userHome ? (import ../../modules/global/user.nix).home,
 }: {
   lib,
   pkgs,

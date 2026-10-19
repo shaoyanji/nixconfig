@@ -448,7 +448,7 @@ in {
   };
 
   # Persistent user security vault bind-mount (isolated on 2TB NAS pool /dev/sda2)
-  fileSystems."/home/devji/security" = {
+  fileSystems."${user.home}/security" = {
     device = "/srv/data/security";
     fsType = "none";
     options = ["bind" "x-systemd.requires=srv-data.mount"];
@@ -476,8 +476,8 @@ in {
     "d /Volumes/data 0755 root root -"
     "d /srv/data 0755 root root -"
     "d /srv/data/downloads 0775 aria2 users -"
-    "d /srv/data/security 0700 devji users -"
-    "d /home/devji/security 0700 devji users -"
+    "d /srv/data/security 0700 ${user.name} users -"
+    "d ${user.home}/security 0700 ${user.name} users -"
     "d /srv/private 0755 root root -"
     "d /srv/public 0755 root root -"
     "d /export 0755 root root -"

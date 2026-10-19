@@ -314,7 +314,10 @@ run_runner() {
   # label written from the same policy. The number is part of the result, so a
   # reader can discount it instead of having to trust the total.
   if [ "$bundle_n" -gt 0 ]; then
-    SUMMARY+="$(printf '  %-10s ^ of %d matches, %d are bundle answers (node-kind policy; the gold was written with it, so not independent evidence)\n' \
+    # Phrased "came from" rather than "N are answers" because N is 1 on the
+    # unnamed set (the tag tier), and a printed line that reads "1 are" invites
+    # a reader to distrust the number. Agreement-free wording, same content.
+    SUMMARY+="$(printf '  %-10s ^ of %d matches, %d came from the bundle (node-kind policy; the gold was written with it, so not independent evidence)\n' \
       "$name" "$hit" "$bundle_hit")"$'\n'
   fi
   return 0

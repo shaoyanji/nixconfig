@@ -1,7 +1,7 @@
 #!/bin/bash
-# Pre-commit hook: Nix lint + format gate on staged .nix files.
+# Pre-commit hook: Nix lint/format gate + knowledge-graph gate.
 #
-# The checks themselves live in scripts/task/nix-fmt.sh — the SAME script behind
+# The Nix checks live in scripts/task/nix-fmt.sh — the SAME script behind
 # `task checks:nix:lint`, `checks:nix:format` and `checks:nix:fix`. That is
 # deliberate: there is exactly ONE place that resolves tool versions, so the gate
 # judging your commit cannot drift from the task you just ran locally. The script
@@ -9,46 +9,97 @@
 # them once from the nixpkgs revision pinned in flake.lock, cached as GC-rooted
 # out-links that it shares with the watcher.
 #
+# The graph gate is scripts/task/kg-check.sh — the same script behind
+# `task checks:kg`. It runs only when the staged paths can affect the graph,
+# because the projection is compiled from files and most commits do not touch
+# them (see affects_graph below). Where it does run, a schema change that
+# silently empties every pattern is refused here instead of being discovered at
+# question time by someone who believes a blank answer.
+#
 # Gates, matching the repo's stated policy:
 #   deadnix   HARD      staged files must contain no dead code
 #   alejandra HARD      staged files must be alejandra-formatted
 #   statix    ADVISORY  reported, never blocks — its W20 repeated-key warning
 #                       fires on this repo's house style
+#   checks:kg HARD      graph schema + all six patterns, when they are affected
 #
 # Fail-closed: if the formatter cannot be resolved, nix-fmt.sh exits non-zero and
-# the commit is refused, rather than silently skipping the format check.
+# the commit is refused, rather than silently skipping the format check. The same
+# applies to the graph gate — a projection that cannot be evaluated is a real
+# finding, not a reason to skip.
 
 set -euo pipefail
 
-STAGED_NIX=$(git diff --cached --name-only --diff-filter=ACM | grep '\.nix$' || true)
-
-if [ -z "$STAGED_NIX" ]; then
-  exit 0
-fi
-
 REPO_ROOT=$(git rev-parse --show-toplevel)
 NIX_FMT="$REPO_ROOT/scripts/task/nix-fmt.sh"
+KG_CHECK="$REPO_ROOT/scripts/task/kg-check.sh"
 
-if [ ! -f "$NIX_FMT" ]; then
-  echo "pre-commit: $NIX_FMT is missing; refusing to skip the Nix gate." >&2
-  exit 1
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+STAGED_NIX=$(grep '\.nix$' <<<"$STAGED" || true)
+
+# Everything that feeds `.#knowledgeGraph`. The projection reads only these, so
+# anything else — a host module, another taskfile, a script outside the kg family
+# — cannot make the graph gate fail for a reason the author did not cause.
+affects_graph() {
+  local f
+  while IFS= read -r f; do
+    case "$f" in
+      inventory.toml | AGENTS.md | MANUAL.md | ARCHITECTURE.md | AUDIT.md | TODO.md | HANDOFF.md | EXPERIMENTS.md | README.md)
+        return 0
+        ;;
+      docs/*.md) return 0 ;; # non-recursive, matching lib/knowledge-graph.nix
+      .agents/skills/*) return 0 ;;
+      lib/knowledge-graph.nix | lib/skills.nix | lib/inventory.nix) return 0 ;;
+      scripts/task/kg-*.sh | scripts/task/lib/kg-graph.sh) return 0 ;;
+      taskfiles/ops.yml) return 0 ;;
+    esac
+  done <<<"${1:-}"
+  return 1
+}
+
+if [ -n "$STAGED_NIX" ]; then
+  if [ ! -f "$NIX_FMT" ]; then
+    echo "pre-commit: $NIX_FMT is missing; refusing to skip the Nix gate." >&2
+    exit 1
+  fi
+
+  # Build an array rather than word-splitting $STAGED_NIX, so a path containing a
+  # space could never turn into two bogus paths.
+  FILES=()
+  while IFS= read -r f; do
+    [ -n "$f" ] && FILES+=("$f")
+  done <<<"$STAGED_NIX"
+
+  echo "Checking staged Nix files..."
+
+  if ! bash "$NIX_FMT" --check --tools deadnix,statix,alejandra "${FILES[@]}"; then
+    echo
+    echo "Commit refused: the hard gate above failed."
+    echo "  Fix with: task checks:nix:fix"
+    echo "  (statix findings are advisory and never block a commit.)"
+    exit 1
+  fi
+
+  echo "Nix checks passed."
 fi
 
-# Build an array rather than word-splitting $STAGED_NIX, so a path containing a
-# space could never turn into two bogus paths.
-FILES=()
-while IFS= read -r f; do
-  [ -n "$f" ] && FILES+=("$f")
-done <<<"$STAGED_NIX"
+if affects_graph "$STAGED"; then
+  if [ ! -f "$KG_CHECK" ]; then
+    echo "pre-commit: $KG_CHECK is missing; refusing to skip the graph gate." >&2
+    exit 1
+  fi
 
-echo "Checking staged Nix files..."
+  echo "Checking the knowledge graph (staged changes touch what it is built from)..."
 
-if ! bash "$NIX_FMT" --check --tools deadnix,statix,alejandra "${FILES[@]}"; then
-  echo
-  echo "Commit refused: the hard gate above failed."
-  echo "  Fix with: task checks:nix:fix"
-  echo "  (statix findings are advisory and never block a commit.)"
-  exit 1
+  if ! bash "$KG_CHECK"; then
+    echo
+    echo "Commit refused: the knowledge graph gate failed."
+    echo "  A schema change that empties every pattern is a silent failure; the"
+    echo "  gate is what makes it loud. Reproduce with: task checks:kg"
+    exit 1
+  fi
+
+  echo "Graph checks passed."
 fi
 
-echo "Nix checks passed."
+exit 0

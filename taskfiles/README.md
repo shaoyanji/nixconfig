@@ -10,7 +10,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep).
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
-- `taskfiles/ops.yml` owns observation and the context plane: `ops:health`, `ops:ledger[:toon]`, `ops:sentinel:*`, `ops:skills*`, `ops:kg*`, `ops:docs:budget`, `ops:bench:evals`. These read a live system or a compiled artifact; they are not build gates.
+- `taskfiles/ops.yml` owns observation and the context plane: `ops:health`, `ops:ledger[:toon]`, `ops:sentinel:*`, `ops:skills*`, `ops:kg*`, `ops:ask[:jev]`, `ops:context`, `ops:docs:budget`, `ops:bench:evals`, `ops:bench:kg`. These read a live system or a compiled artifact; they are not build gates.
 
 ## File-by-file map
 - `Taskfile.yml` – entrypoint with top-level menus

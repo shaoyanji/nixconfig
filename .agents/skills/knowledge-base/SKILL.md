@@ -54,15 +54,62 @@ ai-memory (deep, jev-gated). Do not start at an LLM.
 ## 3. Structural search: the graph, not grep
 
 `.#knowledgeGraph` compiles nodes (hosts, skills, docs, tags) and edges
-(`mentions` from docs/skills, `tagged` from skills) out of the files themselves:
+(`mentions` from docs/skills, `tagged` from skills) out of the files themselves.
+Mentions are **exact-token** matches, not substrings — `dev` does not match
+`devji` — so a count means "this name appears as a word in that file".
+
+**Query it explicitly, don't describe it in English.** The graph has six fixed
+traversals — the `jq` analogue of a Cypher `MATCH`. If you know which question
+you are asking, call one of these; a classifier in the middle can only get it
+wrong (`scripts/task/kg-query.sh` is the single implementation).
+
+| Pattern | Task | Means |
+| :--- | :--- | :--- |
+| host | `ops:kg:host HOST=frieren` | docs and skills that mention the host |
+| skill | `ops:kg:skill SKILL=qmd` | inbound mentions **+** the skill's tags |
+| doc | `ops:kg:doc DOC=docs/x.md` | hosts and skills that document names (the reverse direction) |
+| tag | `ops:kg:tag TAG=nix` | `(Skill)-[:TAGGED]->(Tag)` |
+| comention | `ops:kg:comention HOST=cassini MIN=2` | two hops: hosts sharing documents, ranked |
+| stats | `ops:kg:stats` | counts by node type + edge total |
 
 ```bash
-task ops:kg                                    # stats + top-connected nodes
-task ops:kg:host HOST=frieren                  # docs and skills that mention it
-nix eval --json .#knowledgeGraph.graph --apply 'g: g.edges' \
-  | jq -r '.[] | select(.from=="doc:MANUAL.md") | .to'
+task ops:kg                                    # stats + top out-degree nodes
+task ops:kg:comention HOST=poseidon            # the one multi-hop question
+task ops:ask Q="what should I read before touching minyx"   # sugar: rules, then bundle
+task ops:ask:jev Q="…"                         # same, with a Jev check recorded
+task ops:bench:kg                              # re-run the router evidence
+task ops:context                               # monitor state + host context
 nix eval --raw .#knowledgeGraph.cypher | head -40   # optional Neo4j import
 ```
+
+Every pattern takes **`FORMAT=json`** and returns the same envelope:
+`{pattern, arg, count, results}` — `results` is a list of ids, except `comention`
+(`{id, shared}`) and `stats` (one object of counts).
+
+The exit contract lives in the script: **0** = answer (possibly empty), **1** =
+graph unavailable, **2** = no such node, with near-match hints. `go-task` collapses
+any failure to **201**, so through `task` read `error:"no_such_node"` +
+`suggestions` from the JSON instead of the exit code. An unmentioned node is a
+successful empty answer; a typo is never silently one.
+
+```bash
+task ops:kg:host HOST=frieren FORMAT=json | jq -r '.results[]'
+task ops:kg:host HOST=friere FORMAT=json   # error + suggestions, exit 201
+```
+
+`ops:ask` remains sugar over these: deterministic keywords, a model only when no
+rule matched. It is a convenience for a human phrasing a question, not the
+supported way for an agent to query a graph it can already name.
+
+Routing (`ops:ask`) is deterministic and offline. Rules answer 14/14 of the
+rule-shaped set (labels written from the six intents — that number is
+independent). When no rule matches but the question **names a node**, the node's
+whole context is returned (`route: bundle`), which takes the paraphrase set from
+6/10 to 10/10 at 0 ms — but **4 of those 10 are bundle answers whose gold label
+encodes the same policy**, so read them as coverage, not comprehension;
+`ops:bench:kg` prints that count next to the score. Hosted Jev is 13/14 and 9/10
+at ~330 ms, the in-repo hash engine 5/14 and 1/10. No model is called on the
+default path; `KG_DECIDE_ALWAYS=1` opts into Jev as an agreement check only.
 
 The value is **one hop from a name to its context**: `ops:kg:host HOST=frieren`
 lists every doc and skill that names the host, without `grep` and without

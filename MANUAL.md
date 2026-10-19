@@ -123,6 +123,52 @@ task ops:sentinel:status   # timer + last run
   files on every eval; `task ops:kg` prints the live counts and
   `task ops:kg:host HOST=<h>` the inbound edges. Counts are not stored here —
   they drift with every doc edit, and a frozen number is a lie.
+- `task ops:ask Q="what touches frieren"` — an English question routed to a jq
+  query over `.#knowledgeGraph.graph` (a 50 KB store artifact, cached per
+  revision). Routing is **deterministic and offline**; no model is in the path.
+- `task ops:bench:kg [--set rule|paraphrase|both]` — the evidence, re-runnable.
+  Two labelled sets on purpose: `rule` is phrased in the vocabulary the router
+  encodes, `paraphrase` asks the same questions without it (`--set both` for the
+  honest headline). It also prints a routing census, because a scorer sees only
+  the intent and a fallback that silently answered everything would look the
+  same as the rules working. Measured 2026-10-19 on frieren:
+
+  | router | rule set | paraphrase set | latency |
+  | :--- | ---: | ---: | ---: |
+  | keyword + context bundle (offline) | **14/14** | **10/10** | 0 ms |
+  | Jev (cloud, `jev-1.13.0`) | 13/14 | 9/10 | ~330 ms |
+  | in-repo `systemone-decision` | 5/14 | 1/10 | ~180 ms |
+
+  **Read the paraphrase 10/10 carefully, because four of those are circular.**
+  The rule set's labels come from the six intents, so 14/14 measures the router.
+  The paraphrase labels were written before the bundle existed, but four of them
+  name only a NODE ("tell me about fern"), and the bundle's policy is exactly
+  "a question naming a node means that node's context" — so those four matches
+  confirm the policy against itself, which is coverage, not comprehension. The
+  bench prints how many of a runner's matches are bundle answers so the number
+  can be discounted instead of trusted. Independently: rules alone are 6/10 on
+  that set, Jev is 9/10 (it declined "tell me about fern" — defensible, and
+  scored as a miss here).
+
+  Hence the policy: **no model at all.** A model used to run when no rule
+  matched; the context bundle replaced it, on grounds that do not depend on the
+  circular matches: when no rule matches but the question NAMES A NODE, `ops:ask`
+  returns that node's whole context — mentions, related hosts, tags — as
+  `route: bundle` with the neighbours in `related`, so it returns a *superset*
+  and cannot mis-pick a relation. It is offline with no key, and 0 ms beats
+  ~330 ms. Tags are checked between exact and loose node names, because a bare
+  tag word ("the nix label") is a membership question and the candidate scan
+  cannot see tags at all. Nothing matched → `intent: UNKNOWN` and `note` prints
+  the six patterns, so an off-topic question gets a menu, not a confident guess.
+  `KG_DECIDE_ALWAYS=1` (+ `KG_DECIDE_URL`/`KG_DECIDE_TOKEN`; `task ops:ask:jev`
+  reads the key from sops, never echoes it) still opts into the model as an
+  agreement check (`route: agreed` / `keyword+disagree`). The default path makes
+  no network call at all, so a dead endpoint cannot break a query. The in-repo
+  engine stays for coarse triage only (SYSTEM.md / HANDOFF.md buckets) —
+  `engine.py` is a hash-embedding heuristic, 5/14 and 1/10 here.
+- `task ops:context` — the same query driven by the monitor: fleet-sentinel
+  state plus the docs and skills that touch this host. Advisory: the sentinel
+  detects, it never acts.
 - `.agents/SCHEMA.md`: one fact one home, document budgets, status vocabulary.
 
 ### 3.3 Documentation split

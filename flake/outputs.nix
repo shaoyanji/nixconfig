@@ -98,8 +98,12 @@ in {
 
   # Structural projection: hosts × skills × docs × mentions. `jq`-queryable
   # today, Cypher-exportable if an external graph database ever exists.
+  # `file` is the static artifact: a store path holding the same JSON, so a
+  # consumer (ops:ask, a systemd unit, a CI job) can read a fixed document
+  # instead of evaluating the flake — `nix build .#knowledgeGraph.file`.
   knowledgeGraph = {
     inherit (knowledgeGraphCtl) graph json cypher;
+    file = agentDocs.writeText "knowledge-graph.json" knowledgeGraphCtl.json;
   };
 
   # A store-path bundle for home/fleet materialization: every skill tree plus

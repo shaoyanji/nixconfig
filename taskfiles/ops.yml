@@ -121,26 +121,133 @@ tasks:
       Compiles hosts x skills x docs x mentions (lib/knowledge-graph.nix, ~10 s
       cold because it reads every living doc). No server, no database. For
       "what touches X" questions; use qmd for "where is this explained".
+      TOP= sets how many out-degree leaders to list (default 12).
     cmds:
-      - |
-        nix eval --raw .#knowledgeGraph.json \
-          | jq -r '.stats | "nodes: \(.hosts) hosts, \(.skills) skills, \(.docs) docs; edges: \(.edges)"'
-      - |
-        nix eval --raw .#knowledgeGraph.json \
-          | jq -r '[.edges[] | .from] | group_by(.) | map({id: .[0], n: length}) | sort_by(-.n) | .[:12][] | "\(.n)\t\(.id)"' \
-          | column -t -s$'\t'
+      - bash scripts/task/kg-query.sh stats --top {{.TOP | default 12}}
+
+  # --- the explicit query surface -------------------------------------------
+  # Six fixed traversals, the jq analogue of a Cypher MATCH. A caller that knows
+  # which question it is asking uses these directly; `ops:ask` is sugar in front
+  # of them, not a replacement for them. Shared implementation and exit codes:
+  # scripts/task/kg-query.sh — 0 answer (possibly empty), 1 graph unavailable,
+  # 2 usage or no such node, so an empty result and a typo never look alike.
+  # go-task collapses every failure to 201, so that distinction only survives
+  # when the script is called directly: through `task`, ask FORMAT=json and read
+  # `error:"no_such_node"` + `suggestions` instead of the exit code.
+  #   host      (Doc|Skill)-[:MENTIONS]->(Host)
+  #   skill     (Doc|Skill)->(Skill) mentions + (Skill)-[:TAGGED]->(Tag)
+  #   doc       (Doc)->(Host|Skill) mentions
+  #   tag       (Skill)-[:TAGGED]->(Tag)
+  #   comention two hops: shared documents between two hosts
+  #   stats     counts (+ top out-degree)
 
   ops:kg:host:
     desc: Print everything the graph connects to HOST
     summary: >
       Inbound edges for host:<HOST> (docs and skills that mention it). HOST is
-      required. Reads the graph projection, not a config.
+      required. Reads the graph projection, not a config. An unmentioned host is
+      a successful empty answer; a name with no node fails with near matches.
+      FORMAT=json emits {pattern, arg, count, results:[ids]}.
     requires:
       vars: [HOST]
     cmds:
       - |
-        nix eval --raw .#knowledgeGraph.json \
-          | jq -r --arg h "host:{{.HOST}}" '.edges[] | select(.to == $h) | .from'
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-query.sh host "{{.HOST}}" --json
+        else
+          bash scripts/task/kg-query.sh host "{{.HOST}}"
+        fi
+
+  ops:kg:skill:
+    desc: Print everything the graph connects to SKILL
+    summary: >
+      Inbound mentions (docs and skills that name it) plus its outbound tags, so
+      "where is nix-eval used" is one query instead of a grep. SKILL is required;
+      `qmd` and `skill:qmd` both work; an unknown name fails with near matches.
+      FORMAT=json emits {pattern, arg, count, results:[ids]} (mentions and tags
+      in one sorted list).
+    requires:
+      vars: [SKILL]
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-query.sh skill "{{.SKILL}}" --json
+        else
+          bash scripts/task/kg-query.sh skill "{{.SKILL}}"
+        fi
+
+  ops:kg:doc:
+    desc: Print what one document mentions (DOC=)
+    summary: >
+      Outbound mentions for doc:<DOC> — the hosts and skills that file names.
+      DOC is a repo-relative path (`docs/task-control-plane.md`); the `doc:`
+      prefix is optional. This is the reverse of ops:kg:host, which jq cannot
+      reach without scanning the whole edge list — the reason both directions
+      exist as tasks. An unindexed path fails with near matches — only the eight
+      living documents and docs/*.md are in the projection.
+      FORMAT=json emits {pattern, arg, count, results:[ids]}.
+    requires:
+      vars: [DOC]
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-query.sh doc "{{.DOC}}" --json
+        else
+          bash scripts/task/kg-query.sh doc "{{.DOC}}"
+        fi
+
+  ops:kg:tag:
+    desc: Print the skills carrying TAG
+    summary: >
+      Inbound `tagged` edges for tag:<TAG>. TAG is required and is the bare tag
+      (`nix`, not `tag:nix`). The graph is authoritative for tags because they
+      are compiled from skill frontmatter; ops:skills:tags prints the same
+      relation as a cloud. An unknown tag fails with near matches.
+      FORMAT=json emits {pattern, arg, count, results:[ids]}.
+    requires:
+      vars: [TAG]
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-query.sh tag "{{.TAG}}" --json
+        else
+          bash scripts/task/kg-query.sh tag "{{.TAG}}"
+        fi
+
+  ops:kg:comention:
+    desc: Print hosts that share documents with HOST (with the shared count)
+    summary: >
+      Two hops without a join operator: the documents naming host:<HOST>, then
+      every OTHER host those same documents name, ranked by how many documents
+      they share. MIN= drops pairs below that count (default 1). This is the
+      pattern a single-hop index cannot answer, and it is what "what is related
+      to X" means in this graph. HOST is required.
+      FORMAT=json emits {pattern, arg, count, results:[{id, shared}]}.
+    requires:
+      vars: [HOST]
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-query.sh comention "{{.HOST}}" --min {{.MIN | default 1}} --json
+        else
+          bash scripts/task/kg-query.sh comention "{{.HOST}}" --min {{.MIN | default 1}}
+        fi
+
+  ops:kg:stats:
+    desc: Print graph counts as one machine-readable line (FORMAT=json for an object)
+    summary: >
+      The `stats` pattern on its own: node counts by type and edge total, read
+      from the projection (not from stored counters). FORMAT=json emits
+      {pattern,arg,count,results:[{nodes,hosts,skills,docs,tags,edges}]} so a
+      check or agent can compare numbers without parsing prose. Same graph
+      cache as ops:ask: one eval per revision, then jq (~5 ms).
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-query.sh stats --json
+        else
+          bash scripts/task/kg-query.sh stats
+        fi
 
   ops:kg:cypher:
     desc: Print the Cypher export of the knowledge graph
@@ -151,6 +258,132 @@ tasks:
       `nix run nixpkgs#cypher-shell -- -f <(nix eval --raw .#knowledgeGraph.cypher)`.
     cmds:
       - nix eval --raw .#knowledgeGraph.cypher
+
+  ops:ask:
+    desc: Ask the knowledge graph a question in English (Q=)
+    summary: >
+      `scripts/task/kg-ask.sh` — the semantic front door to `.#knowledgeGraph`.
+      Q= is the question; FORMAT=json returns the machine-readable record
+      (intent, subject, results, model hint). The graph is read from
+      `~/.cache/nixconfig/kg-<rev>.json` when the tree is clean, so a repeated
+      question costs jq (~5 ms) and only the first one after a revision pays the
+      eval. A dirty tree always re-evaluates, because the graph is compiled from
+      the working tree and a stale answer is worse than a slow one.
+      ROUTING IS DETERMINISTIC AND OFFLINE — no model, no network, no key.
+      Two deterministic steps, then honesty:
+        1. keyword rules ("mention" -> SKILL_CONTEXT, "touch" -> HOST_CONTEXT);
+        2. when NO rule matched but the question NAMES A NODE, return that node's
+           whole CONTEXT BUNDLE (mentions + related hosts + tags) instead of
+           guessing which of six relations was meant. `route=bundle` records it,
+           `related` holds the neighbours;
+        3. otherwise intent=UNKNOWN and `note` lists the six patterns as a menu.
+      Measured 2026-10-19 with `ops:bench:kg`: rules+bundle 14/14 on rule-shaped
+      questions (independent labels) and 10/10 on paraphrases at 0 ms, against
+      hosted Jev 13/14 and 9/10 at ~330 ms and the in-repo hash engine 5/14 and
+      1/10. The paraphrase 10/10 is PARTLY CIRCULAR — 4 of those answers are the
+      bundle, and their gold encodes the same node-kind -> relation policy, which
+      the bench prints beside the score. The bundle replaced a model call at
+      step 2 for reasons that do not depend on that: it returns a superset and
+      cannot mis-pick a relation, needs no key, and costs 0 ms.
+      KG_DECIDE_ALWAYS=1 (plus KG_DECIDE_URL/KG_DECIDE_TOKEN, see ops:ask:jev)
+      opts back into the model as an agreement check, recorded as `agreed` /
+      `keyword+disagree`. Route `model` no longer occurs on the default path.
+      Questions it answers: "what touches frieren", "which docs mention qmd",
+      "skills tagged nix", "what is related to frieren", "what does
+      docs/x.md mention", "graph stats" — and, via the bundle, paraphrases like
+      "what should I read before touching minyx" and "tell me about fern".
+      Use qmd for prose, this for structure. Prefer the explicit ops:kg:* pattern
+      tasks when you already know which question you are asking.
+    requires:
+      vars: [Q]
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-ask.sh --json "{{.Q}}"
+        else
+          bash scripts/task/kg-ask.sh "{{.Q}}"
+        fi
+
+  ops:ask:jev:
+    desc: ops:ask plus the hosted-Jev agreement check (key from sops, never echoed)
+    summary: >
+      Same query as ops:ask with KG_DECIDE_ALWAYS=1 and KG_DECIDE_URL/
+      KG_DECIDE_TOKEN set, so the Jev-compatible HTTP path is exercised: hosted
+      Jev, or the eisen router (point KG_DECIDE_URL at
+      `http://eisen:8000/v1/decisions` and it forwards to Jev with a local
+      Laya/Kev-4B fallback). The key is read from sops into a variable
+      in-process and is never printed — no `set -x`, no header dump.
+      This is a CHECK, not the answer: the model is consulted only when a keyword
+      rule already answered, and only to record agreement (`route: agreed`) or
+      disagreement (`keyword+disagree`). A bundle or unmatched question makes NO
+      call — there is no single relation to agree with — so `model.consulted`
+      stays false and the name is `none`. Without this task, routing is fully
+      offline: `ops:ask` never touches the network.
+    requires:
+      vars: [Q]
+    cmds:
+      - |
+        token="$(sops -d modules/secrets.yaml 2>/dev/null | sed -n 's/^[[:space:]]*TYPESAFE_API_KEY=//p' | head -1)"
+        if [ -z "$token" ]; then
+          echo "ops:ask:jev — no TYPESAFE_API_KEY readable from modules/secrets.yaml" >&2
+          exit 1
+        fi
+        if [ "{{.FORMAT}}" = "json" ]; then
+          KG_DECIDE_ALWAYS=1 KG_DECIDE_URL=https://api.typesafe.ai/v1/systemone KG_DECIDE_TOKEN="$token" \
+            bash scripts/task/kg-ask.sh --json "{{.Q}}"
+        else
+          KG_DECIDE_ALWAYS=1 KG_DECIDE_URL=https://api.typesafe.ai/v1/systemone KG_DECIDE_TOKEN="$token" \
+            bash scripts/task/kg-ask.sh "{{.Q}}"
+        fi
+
+  ops:bench:kg:
+    desc: Bench the graph-intent router across models (keyword / in-repo / Jev)
+    summary: >
+      scripts/task/kg-bench.sh — 10-14 labelled questions scored on intent (and
+      subject, for runners that attempt it). Runners: `keyword` (rules + the
+      bundle fallback in kg-ask.sh), `heuristic` (the in-repo systemone-decision
+      engine), `jev` (hosted Jev, key from sops, skipped without one) and
+      `decide` (any endpoint in KG_DECIDE_URL, e.g. the eisen router).
+      VERBOSE=1 prints per-question rows. SET=rule|paraphrase|both picks the
+      labelled set: `rule` is phrased in the vocabulary the rules encode and
+      therefore flatters the deterministic router; `paraphrase` asks the same
+      questions without it, which is where a model is supposed to win.
+      A routing census follows the scores, because a scorer sees only the intent
+      and a fallback that silently answered the whole set would look identical
+      to the rules working.
+      Measured 2026-10-19: rules+bundle 14/14 rule / 10/10 paraphrase at 0 ms and
+      offline, Jev 13/14 (12/14 on a re-run) / 9/10 at ~330 ms, in-repo
+      heuristic 5/14 / 1/10. Of the keyword runner's paraphrase matches, four are
+      flagged as bundle answers, and the summary says so on its own line: their
+      gold was written from the same node-kind -> relation policy, so they are
+      coverage rather than independent accuracy. Cite the rule-set number when
+      you need evidence that does not grade itself. This is the evidence behind
+      "routing is deterministic and offline; no model is called" — re-run it
+      before changing the router.
+    cmds:
+      - |
+        args=""
+        [ "{{.VERBOSE}}" = "1" ] && args="--verbose"
+        [ -n "{{.SET}}" ] && args="$args --set {{.SET}}"
+        bash scripts/task/kg-bench.sh $args
+
+  ops:context:
+    desc: Sentinel state + the graph context that explains it (monitor -> query)
+    summary: >
+      The trigger side of the loop: the fleet sentinel watches the machine, and
+      when it reports anything, this asks the graph which docs and skills touch
+      this host — the step that turns "a unit failed" into "read these two
+      procedures". Reads status.json only (local, no nix, no network) and then
+      runs ops:ask for the host. HOST= overrides the host name (default: the
+      local hostname). ADVISORY ONLY — the sentinel detects, it never acts.
+    cmds:
+      - |
+        h="{{.HOST}}"
+        [ -n "$h" ] || h="$(hostname)"
+        jq -r '"sentinel: \(.state)" + (if (.reasons | length) > 0 then " — " + (.reasons | join("; ")) else "" end)' \
+          /var/lib/fleet-sentinel/www/status.json 2>/dev/null \
+          || echo "sentinel: no status.json here (fleet-sentinel not enabled on this host?)"
+        bash scripts/task/kg-ask.sh "what touches $h"
 
   ops:docs:budget:
     desc: Check living documents against the SCHEMA.md budgets

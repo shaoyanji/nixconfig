@@ -6,7 +6,7 @@ It is not a second manual and it is not executable truth.
 | You need | Go to |
 | :--- | :--- |
 | Fleet facts (host, hardware, role, status) | `nix eval --json .#inventory.hosts.<host>` — never a copied table |
-| What touches X (structure, not prose) | `task ops:kg`, `task ops:kg:host HOST=<host>` — `.#knowledgeGraph` |
+| What touches X (structure, not prose) | `task ops:kg:host HOST=<host>` (or `ops:kg:skill`, `:doc`, `:tag`, `:comention`) — `.#knowledgeGraph`; `ops:ask Q=…` is the English sugar |
 | What tasks exist / which answers an intent | `task help`, `task find:<word>`, `task --list-all --json` |
 | How to operate the fleet | `AGENTS.md`, `MANUAL.md` |
 | Why a design exists / what is next | `ARCHITECTURE.md`, `TODO.md` |

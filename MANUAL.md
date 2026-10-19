@@ -119,8 +119,10 @@ task ops:sentinel:status   # timer + last run
 - `.#agentSkills` / `.#agentSkillsBundle`: 43 skills parsed from frontmatter,
   schema-gated by `checks.<system>.skills-schema`; materialized to
   `~/.agents/skills` and `~/.gemini/config/skills` by Home Manager.
-- `.#knowledgeGraph`: 34 hosts × 43 skills × 21 docs, 416 mention edges;
-  `task ops:kg`, `task ops:kg:host HOST=<h>`.
+- `.#knowledgeGraph`: hosts × skills × docs × tag links, compiled from the
+  files on every eval; `task ops:kg` prints the live counts and
+  `task ops:kg:host HOST=<h>` the inbound edges. Counts are not stored here —
+  they drift with every doc edit, and a frozen number is a lie.
 - `.agents/SCHEMA.md`: one fact one home, document budgets, status vocabulary.
 
 ### 3.3 Documentation split

@@ -1001,6 +1001,7 @@ call the concrete name. Full authoring rules: `docs/task-control-plane.md` and t
 | MEMORY.md          | Boot — persists across sessions               | Always loaded                                  |
 | Vault              | Fast working memory — offline, personal       | First stop for context                         |
 | qmd wiki           | Resource — docs, runbooks, codebase           | Concept/location queries                       |
+| knowledgeGraph     | Structure — hosts × skills × docs             | "What touches X" (`task ops:kg`)               |
 | mem0 / supermemory | Deep consult — when vault + wiki insufficient | Decided by jev (min-prob 0.8, min-margin 0.15) |
 
 Search order: vault → wiki (qmd BM25) → mem0/supermemory (jev-decided) → web.

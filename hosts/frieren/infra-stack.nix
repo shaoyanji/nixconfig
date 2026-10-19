@@ -22,6 +22,8 @@
   # Primary user constants (modules/global/user.nix is the single source).
   user = import ../../modules/global/user.nix;
 
+  qmdEisenEmbedSync = import ../../modules/scripts/qmd-eisen-embed-sync.nix {inherit pkgs;};
+
   # The backup whose repository the restore drill below verifies.
   resticBackup = config.services.restic.backups.frieren-local;
 
@@ -792,6 +794,32 @@ in {
       OnCalendar = "Sun *-*-* 06:30:00";
       Persistent = true;
       RandomizedDelaySec = "15min";
+    };
+  };
+
+  # --- QMD Remote Embedding Offload (Monthly, 1st of month at 02:00) ---
+  # Offloads batch vector embeddings from Frieren (15W quad-core NAS) to Eisen
+  # (12-core Xeon workstation) via Wake-on-LAN without LLM assistance.
+  # Runs at 02:00 on the 1st of the month, well clear of the 03:00-05:30 backup window.
+  systemd.services.qmd-eisen-embed-sync = {
+    description = "Monthly QMD vector embedding synchronization to Eisen via WoL";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      User = user.name;
+      Group = "users";
+      ExecStart = "${qmdEisenEmbedSync}/bin/qmd-eisen-embed-sync";
+    };
+  };
+
+  systemd.timers.qmd-eisen-embed-sync = {
+    description = "Monthly QMD vector embedding sync to Eisen";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "*-*-01 02:00:00";
+      Persistent = true;
+      RandomizedDelaySec = "10min";
     };
   };
 

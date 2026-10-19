@@ -27,6 +27,11 @@
   ...
 }: let
   user = import ../../modules/global/user.nix;
+
+  # Suckless Wayland: dwl with Catppuccin Mocha sensible defaults
+  customDwl = pkgs.dwl.override {
+    configH = builtins.readFile ../../modules/config/dwl/config.h;
+  };
 in {
   imports = [
     ./hardware-configuration.nix
@@ -51,19 +56,74 @@ in {
     device = "/dev/sda"; # legacy BIOS MBR install — adjust if the disk is not sda
   };
 
-  # --- Desktop (eisen-style): niri compositor + DankMaterialShell greeter ---
-  # base-desktop-environment already enables autoLogin as devji; pin the
-  # session to niri (as on frieren) so autologin has an unambiguous target.
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
-  };
-  services.displayManager.defaultSession = "niri";
-  programs.dms-greeter = {
+  # --- Minimalist Suckless Desktop: dwl (Wayland) + foot + wmenu ---
+  programs.niri.enable = lib.mkForce false;
+  programs.dms-greeter.enable = lib.mkForce false;
+  services.displayManager.sddm.enable = false;
+
+  # Foot terminal with Catppuccin Mocha sensible defaults
+  programs.foot = {
     enable = true;
-    compositor.name = "niri";
-    configHome = user.home; # Sync themes with user's DankMaterialShell config
+    theme = "catppuccin-mocha";
+    settings = {
+      main = {
+        font = "JetBrainsMono NFM:size=11";
+        pad = "12x12 center";
+        dpi-aware = "yes";
+      };
+      cursor = {
+        style = "beam";
+        blink = "yes";
+      };
+      colors = {
+        alpha = "0.95";
+      };
+    };
   };
+
+  # X11 dwm fallback available on system
+  services.xserver = {
+    enable = true;
+    windowManager.dwm = {
+      enable = true;
+      extraSessionCommands = ''
+        ${pkgs.slstatus}/bin/slstatus &
+        ${pkgs.xorg.xsetroot}/bin/xsetroot -solid "#1e1e2e" &
+      '';
+    };
+    displayManager.startx.enable = true;
+  };
+
+  # Screen locker setuid PAM integrations
+  programs.slock.enable = true;
+  security.pam.services.waylock = {};
+
+  # Direct lightweight autologin into dwl via greetd (with none+dwm registered)
+  services.displayManager.defaultSession = lib.mkForce "none+dwm";
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd ${customDwl}/bin/dwl";
+        user = "greeter";
+      };
+      initial_session = {
+        command = "${customDwl}/bin/dwl";
+        user = user.name;
+      };
+    };
+  };
+
+  # ── Suckless Debloat & Closure Diet ──
+  documentation.enable = false;
+  documentation.nixos.enable = false;
+  documentation.man.enable = false;
+  documentation.doc.enable = false;
+
+  services.udisks2.enable = lib.mkForce false;
+  services.accounts-daemon.enable = lib.mkForce false;
+  services.printing.enable = lib.mkForce false;
+  services.gnome.gnome-keyring.enable = lib.mkForce false;
 
   # Intel HD 530 iGPU — Mesa via modesetting.
   hardware.graphics.enable = true;
@@ -132,6 +192,22 @@ in {
 
   environment.systemPackages = with pkgs; [
     btop # RAM/tmpfs/zram visibility
+    # Suckless Wayland (Default Session)
+    customDwl
+    foot
+    wmenu
+    waylock
+    wl-clipboard
+    imv
+    # Suckless X11 Core Toolchain
+    dwm
+    st
+    dmenu
+    slstatus
+    slock
+    nsxiv
+    vis
+    xclip
   ];
 
   services.openssh.enable = true;

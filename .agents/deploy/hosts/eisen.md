@@ -443,6 +443,11 @@ reboot keeps standby power on the slot), check the 8-pin PCIe power, reseat the
 card, then power on. Diagnosis: `ls -d /sys/bus/pci/devices/0000:05:00.0`,
 `ls /dev/dri`, `journalctl -k -b | grep -c 'pci 0000:05:00.0'` (0 = absent).
 
+**Resolved 2026-10-19 16:43** by exactly that: PSU rocker off, cord out, power
+back on. `05:00.0` re-enumerated, `amdgpu` initialised, `/dev/dri/card1` +
+`renderD128` appeared, greetd started gamescope and Steam, GPU idle at 37 °C.
+`SltSta: PresDet-` is the tell to check first next time.
+
 ## Operational Notes
 
 - **Weights are not in the Nix store** — they are multi-GB files in `/mnt/storage/models`, fetched by the units above. Do not `nix-store --gc`-root them; they persist on the btrfs array.

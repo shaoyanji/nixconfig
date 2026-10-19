@@ -23,8 +23,24 @@
 }: let
   # flavor "zed" emits {"context_servers": {...}} matching Zed's schema.
   zedConfig = inputs.mcp-servers-nix.lib.mkConfig pkgs {
-    programs.github.enable = true;
-    programs.nixos.enable = true;
+    programs = {
+      # Active MCP servers
+      nixos.enable = true;
+      tavily.enable = true;
+
+      # Available on-demand (disabled to minimize context overhead & process footprint)
+      deepl.enable = false;
+      fetch.enable = false;
+      filesystem.enable = false;
+      git.enable = false;
+      github.enable = false;
+      gsheets.enable = false;
+      home-assistant.enable = false;
+      memory.enable = false;
+      notion.enable = false;
+      playwright.enable = false;
+      sequential-thinking.enable = false;
+    };
     flavor = "zed";
   };
 
@@ -47,7 +63,7 @@
       jq -s '.[0] * {context_servers: ((.[0].context_servers // {}) * .[1].context_servers)}' \
         "$SETTINGS" "$FRAGMENT" > "$TMP"
       mv "$TMP" "$SETTINGS"
-      echo "zed-mcp-merge: github + nixos context servers merged into $SETTINGS"
+      echo "zed-mcp-merge: active MCP context servers (nixos + tavily) merged into $SETTINGS"
     '';
   };
 in {
@@ -55,8 +71,8 @@ in {
     type = lib.types.bool;
     default = true;
     description = ''
-      Install the Zed MCP integration pilot: a reproducible
-      github + nixos context_servers fragment and the zed-mcp-merge helper.
+      Install the Zed MCP integration: a reproducible
+      context_servers fragment and the zed-mcp-merge helper.
     '';
   };
 

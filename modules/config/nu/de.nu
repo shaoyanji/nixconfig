@@ -50,7 +50,7 @@ export def "de pronom" [] {
   [[nom, akk, dat];
     [ ich, mich, mir]
     [ du, dich, dir]
-    [ er, ihr, ihm]
+    [ er, ihn, ihm]
     [ sie, sie, ihr]
     [ es, es, ihm]
     [ wir, uns, uns]
@@ -58,13 +58,14 @@ export def "de pronom" [] {
     [ sie, sie, ihnen]
     [ Sie, Sie, Ihnen]]
 }
-# german language module adjectives
+# german language module articles (definite-article declension; this is NOT
+# adjective endings, despite the command name)
 export def "de adjektiv" [] {
   [[nom, akk, dat];
     [ der, den, dem]
     [ das, das, dem]
     [ die, die, der]
-    [ die, die, denen]]
+    [ die, die, den]]
 }
 # german language module pronouns possessive
 export def "de pronom possessive" [] {
@@ -99,7 +100,7 @@ export def "de pronom possessive" [] {
     [ ihr, ihr, ihrem]
     [ sein, sein, seinem]
     [ unser, unser, unserem]
-    [ euer, eures, eurem]
+    [ euer, euer, eurem]
     [ ihr, ihr, ihrem]
     [ Ihr, Ihr, Ihrem]]
   pl:

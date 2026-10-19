@@ -26,6 +26,8 @@
       # clients (CI, sandboxed shells) hit it too — flake-level nixConfig
       # is silently ignored for users not in trusted-users.
       "https://cache.numtide.com"
+      # Determinate Nix FlakeHub binary cache for prebuilt DN binaries
+      "https://install.determinate.systems"
     ];
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
@@ -34,12 +36,14 @@
       # "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
       "shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0="
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
       "frieren.lan-1:BUg+1UmfYlF0XCbC0+ZyWQOY1DpQJhj/wa2q76NTFOg="
     ];
     trusted-users = [
       "@admin"
       "@wheel"
     ];
+    accept-flake-config = true;
     experimental-features = ["nix-command" "flakes" "pipe-operators"];
     # Pre-trust the fleet caches so flake-level nixConfig (the
     # extra-substituters in flake.nix) never triggers the interactive
@@ -51,6 +55,7 @@
       "https://nix-gaming.cachix.org"
       "https://shaoyanji.cachix.org"
       "https://cache.numtide.com"
+      "https://install.determinate.systems"
     ];
     # Fail over to the next substituter quickly instead of hanging on a
     # dead/unreachable cache, and fall back to local builds when no cache

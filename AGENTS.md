@@ -1182,6 +1182,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | `docs/closure-debloat.md`            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |
 | `.agents/fleet-matrix.md`            | Compact fleet context matrix for LLMs and agent prompts                |
 | `docs/task-control-plane.md`         | Task namespace policy and workflow examples                            |
+| `docs/NUSHELL.md`                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |
 | `docs/frieren-access.md`             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
 | `docs/userland-package-ownership.md` | Package ownership and role wiring                                      |
 | `taskfiles/README.md`                | Taskfile ownership map and shard reference                             |

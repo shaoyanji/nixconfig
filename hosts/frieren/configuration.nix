@@ -78,11 +78,9 @@ in {
   # config + rotate-ssh-cert helper here too.
   ssh.ca.enableClient = true;
 
-  # pihole-ftl 6.7.1 fails to compile at the current nixpkgs rev (-Werror on an
-  # unused variable) and has no binary substitute — see the overlay header.
-  nixpkgs.overlays = [
-    (import ../../overlays/pihole-ftl-werror.nix)
-  ];
+  # pihole-ftl unused variable issue was resolved upstream in nixpkgs (env.NIX_CFLAGS_COMPILE);
+  # overlay retired as planned in overlays/pihole-ftl-werror.nix.
+  nixpkgs.overlays = [];
 
   # Serve the fleet's LAN binary cache (see modules/services/harmonia.nix).
   services.harmonia-fleet.enable = true;

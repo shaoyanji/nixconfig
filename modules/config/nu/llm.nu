@@ -10,8 +10,11 @@ const LLM_PROVIDERS = {
   }
   nvidia: {
     url: "https://integrate.api.nvidia.com/v1/chat/completions"
-    model: "minimaxai/minimax-m2.7"
-    models: ["minimaxai/minimax-m2.7", "nvidia/llama-3.3-nemotron-super-48b-instruct", "google/gemma-2-27b-it"]
+    # Live on integrate.api.nvidia.com as of 2026-10-19. The previous default
+    # (minimaxai/minimax-m2.7) was retired upstream and answers HTTP 410, and
+    # llama-3.3-nemotron-super-48b is not served to this account (404).
+    model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+    models: ["nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3-ultra-550b-a55b"]
     api_key: "NVIDIA_API_KEY"
   }
   openrouter: {
@@ -50,11 +53,12 @@ const LLM_PROVIDERS = {
 # Helper: validate API key is set
 # =============================================================================
 def "ensure-api-key" [key_name: string] {
-  let key_val = $env | get $key_name
-  if $key_val == null {
+  # `get -o`: a plain `get` throws column_not_found first, so the message below
+  # never printed and every caller died with a generic parser error instead.
+  let key_val = ($env | get -o $key_name)
+  if $key_val == null or $key_val == "" {
     error make {
       msg: $"($key_name) environment variable is not set"
-      label: {text: $"Set $\($key_name) in your environment"}
     }
   }
   $key_val
@@ -85,37 +89,37 @@ def "chat-request" [
   )
 
   # Debug: print response structure if it's not what we expect
-  # Check for API errors first
-  let has_err = try { $response | get error } catch { null }
-  if $has_err != null {
+  # OpenAI-style error object
+  let api_err = ($response | get -o error)
+  if $api_err != null {
+    let msg = ($api_err | get -o message | default ($api_err | to json))
+    error make {msg: $"API error: ($msg)"}
+  }
+
+  # Non-OpenAI error shapes: FastAPI {detail}, and RFC 7807 {status,title,detail}
+  # which NVIDIA returns for a retired model. The old handler read
+  # `error.code`/`error.message` unconditionally and died on the missing
+  # columns instead of surfacing the actual API error.
+  if ($response | get -o choices) == null {
+    let status = ($response | get -o status | default "")
+    let title = ($response | get -o title | default "")
+    let detail = ($response | get -o detail | default "")
+    let what = ([$status $title] | where { |s| $s != "" } | str join " ")
     error make {
-      msg: $"API error: ($has_err.message)"
-      label: {text: "($has_err.code)"}
+      msg: $"API error ($what): ($detail | default ($response | to json))"
     }
   }
 
-  # Verify response has choices field (some APIs return error in different format)
-  let has_choices = try { $response | get choices } catch { null }
-  if $has_choices == null {
-    print $"Unexpected LLM response: ($response | to json)"
+  # Handle OpenAI-style response. A reasoning model can return content: null
+  # with a finish_reason (it spent the whole budget on reasoning) — that is an
+  # empty completion, not a success, so fail and let the fallback chain move on.
+  let content = (try { $response | get choices.0.message.content } catch { null })
+  if ($content | is-empty) {
     error make {
-      msg: $"API response missing 'choices' field. Response may be an error or rate limit."
-      label: {text: "Unexpected response format"}
+      msg: $"Provider returned no content (finish_reason=($response | get -o choices.0.finish_reason | default 'unknown'))"
     }
   }
-
-  # Handle OpenAI-style response
-  try {
-    $response | get choices.0.message.content
-  } catch {
-    # Log the actual response for debugging
-    let debug_msg = $"LLM response parse failed. Response: ($response | to json)"
-    print $debug_msg
-    error make {
-      msg: $"Failed to parse chat response. Check debug output for full response."
-      label: {text: "Failed to parse chat response"}
-    }
-  }
+  $content
 }
 
 # =============================================================================
@@ -207,7 +211,24 @@ export def nugemini [
     }
   }
 
-  $body | to json | curl -sS -X POST $url -H $"x-goog-api-key: ($key)" -H "Content-Type: application/json" -d ($in) | from json | get candidates.0.content.parts.text.0
+  let resp = ($body | to json | curl -sS -X POST $url -H $"x-goog-api-key: ($key)" -H "Content-Type: application/json" -d ($in) | from json)
+
+  # A thinking model returns content with no parts at all when the token budget
+  # is spent on thoughts (finishReason MAX_TOKENS), and `get ...content.parts`
+  # then dies with a column error. Read defensively and report the reason.
+  let cand = ($resp | get -o candidates.0)
+  if $cand == null {
+    error make {
+      msg: $"Gemini returned no candidate (($resp | get -o promptFeedback.blockReason) | default 'empty response')"
+    }
+  }
+  let text = ($cand | get -o content.parts | default [] | each { |p| $p.text? } | compact | str join "")
+  if ($text | is-empty) {
+    error make {
+      msg: $"Gemini returned no text (finishReason=(($cand | get -o finishReason) | default 'unknown'))"
+    }
+  }
+  $text
 }
 
 export def nuhere [
@@ -255,14 +276,7 @@ export def nuaihubmix [
     [{role: "system", content: $system}, {role: "user", content: $message}]
   }
 
-  let body = {
-    model: $m
-    messages: $messages
-    temperature: $temperature
-    max_tokens: $max_tokens
-  }
-
-  $body | to json -r | curl -sS -X POST $p.url -H "Content-Type: application/json" -H $"Authorization: Bearer ($key)" -d ($in) | from json | get choices.0.message.content
+  chat-request $p.url $m $key $messages --temperature $temperature --max_tokens $max_tokens
 }
 
 export def nullama [
@@ -280,7 +294,6 @@ export def nullama [
   if $model == null {
     error make {
       msg: "No Ollama models found. Is ollama running?"
-      label: {text: "Start ollama with: ollama serve"}
     }
   }
 
@@ -290,9 +303,11 @@ export def nullama [
     [{role: "system", content: $system}, {role: "user", content: $message}]
   }
 
+  # `fold` is not a nushell command (it resolved to coreutils and failed on the
+  # closure); `each` + `str join` is what this was trying to do.
   let prompt = (
     $messages
-    | fold -s {role, content} | each { |m| $"($m.role): ($m.content)" }
+    | each { |m| $"($m.role): ($m.content)" }
     | str join "\n"
   )
 
@@ -329,14 +344,9 @@ export def nuopencode [
     [{role: "system", content: $system}, {role: "user", content: $message}]
   }
 
-  let body = {
-    model: $m
-    messages: $messages
-    temperature: $temperature
-    max_tokens: $max_tokens
-  }
-
-  $body | to json -r | curl -sS -X POST $p.url -H "Content-Type: application/json" -H $"Authorization: Bearer ($key)" -d ($in) | from json | get choices.0.message.content
+  # Shared handler: surfaces provider error shapes instead of dying on a
+  # missing `choices` column, and rejects an empty completion.
+  chat-request $p.url $m $key $messages --temperature $temperature --max_tokens $max_tokens
 }
 # =============================================================================
 # Default entrypoint — fallback chain with optional provider override
@@ -362,7 +372,7 @@ export def llm [
       "ollama" => { return (nullama $msg --system $system) }
       "aihubmix" => { return (nuaihubmix $msg --model $model --system $system --temperature $temperature --max_tokens $max_tokens) }
       "opencode" => { return (nuopencode $msg --model $model --system $system --temperature $temperature --max_tokens $max_tokens) }
-      _ => { error make {msg: $"Unknown provider: ($provider)", label: {text: "Use groq, cohere, openrouter, nvidia, gemini, ollama, or aihubmix"}}}
+      _ => { error make {msg: $"Unknown provider: ($provider)"}}
     }
   }
 
@@ -381,14 +391,16 @@ export def llm [
   for p in $providers {
     try {
       return (do $p.fn $msg)
-    } catch {
-      print $"($p.name): ($in)"
+    } catch { |err|
+      # stderr, not stdout: `llm ... | save out.txt` must not get provider
+      # error lines mixed into the answer. Bind the closure argument: bare `$in`
+      # yields the whole error record (msg, debug, raw, rendered, details).
+      print -e $"($p.name): ($err.msg)"
     }
   }
 
   error make {
     msg: "All LLM providers failed"
-    label: {text: "Fallback chain exhausted"}
   }
 }
 
@@ -422,7 +434,7 @@ export def "llm program" [code: string] {
 
 # This adds a local db (chatbot_conversation.db) if it doesn't exist and adds a new entry to it
 export def "llm db" [uinput?: string] {
-  let response = main $uinput
+  let response = llm $uinput
 
   let db_path = $"($env.HOME)/chatbot_conversation.db"
 
@@ -521,7 +533,7 @@ export def llmcp [
 
 Diff:
 ($diff)"
-    main $prompt --provider $provider
+    llm $prompt --provider $provider
   } else {
     $message
   }
@@ -576,7 +588,7 @@ def "pancakes-detect-lang" [code: string] {
 
 def "pancakes-gen" [prompt: string, --provider: string = ""] {
   let system = "You are a bash script generator. Output ONLY executable bash code that accomplishes the task. Use real commands like ls, echo, cat. Do NOT use placeholders. No explanation, no markdown."
-  let code = main $prompt --system $system --provider $provider
+  let code = llm $prompt --system $system --provider $provider
   
   try { $code | split row '```' | get 1 | str trim } catch { $code | str trim }
 }
@@ -629,5 +641,5 @@ export def pancakes [
     print $"error: ($result2.stderr)"
   }
   
-  error make {msg: "pancakes failed", label: {text: "max iterations"}}
+  error make {msg: "pancakes failed"}
 }

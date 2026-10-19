@@ -76,6 +76,23 @@ on Eisen, not graph routing.
 
 Question shapes: `choice` (n options) · `score` (ordinal) · `noul` (yes/no probability). Response: `answers` (per question: `choice`/`probabilities`/`confidence`) + `usage` (`input_tokens`, `output_tokens: 0` — a single forward pass, no generation).
 
+## From a nushell shell (`modules/config/nu/decision.nu`)
+
+```bash
+decide models                     # providers + readiness (key set? CLI present?)
+decide "pick the backup tier" --options [ssd hdd tape]        # auto: Jev, then local
+decide yes "the upstream is degraded" --state {msg: "502"}     # calibrated probability
+decide score "rate severity" --criteria [ok degraded down]     # ordered scale
+
+decide jev ...    # force TypeSafe Jev (TYPESAFE_API_KEY)
+decide local ...  # force `systemone-decision` (julia-1 | laya), no key, CPU
+```
+
+`auto` prints the provider failure to stderr before falling back, so a silent
+switch to the weaker local model is visible. The local CLI in this repo scores
+by lexical overlap (hash embeddings + softmax), not the 421M checkpoint — its
+confidence is low signal; use it as an offline fallback, not a Jev stand-in.
+
 ## Confidence caveats (read before gating on a decision)
 
 - **Laya's `confidence` is `1 - normalized entropy`.** A Jev cutoff does **not** transfer. Fit your own threshold on your own data.

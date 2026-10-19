@@ -17,6 +17,21 @@
 # :80 and a `tailscale serve` listener. The ListeningPort itself is loopback-only
 # and is deliberately NOT added to the firewall; the LAN + tailnet are the trust
 # boundary, exactly as for the LLM and the decision model.
+#
+# On-demand: the server is NOT started at boot. systemd holds `port`
+# (qwen-tts.socket); the first connection activates `qwen-tts-proxy`, a
+# `systemd-socket-proxyd` that starts the model server and forwards to it.
+# tts-server cannot take an inherited listening FD, so the proxy is what makes
+# socket activation possible without a Python data plane; its ExecStartPre
+# waits for the backend's /health before proxying, which keeps the first
+# request's connection queued in the socket backlog instead of failing with
+# ECONNREFUSED while the GGUFs load (~15 s). `--exit-idle-time` makes the
+# proxy exit after `idleTimeout` with no open connection, and the
+# qwen-tts-idle timer then stops the backend, freeing its ~3.8 GiB RSS
+# (weights + the 896 MiB KV cache allocated at startup). The socket keeps
+# listening, so the next request wakes everything again. Nothing may `want`
+# qwen-tts — nginx and tailscale-serve-tts deliberately do not — or boot would
+# pull the model server up and defeat on-demand.
 {
   config,
   lib,
@@ -107,6 +122,7 @@
 
   talker = "${cfg.modelDir}/${cfg.model}";
   codec = "${cfg.modelDir}/${cfg.codec}";
+  backend = "127.0.0.1:${toString cfg.backendPort}";
 
   # Both GGUFs must be present before the server will start.
   modelUrl = "https://huggingface.co/${cfg.hfRepo}/resolve/main";
@@ -120,6 +136,10 @@
     wants = ["network-online.target"];
     requires = ["mnt-storage.mount"];
     unitConfig.ConditionPathExists = "!${file}";
+    # Fetch at boot, not on the first request: a missing weight download on
+    # the request path would make the cold start minutes long. No-op when the
+    # file already exists.
+    wantedBy = ["multi-user.target"];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -149,7 +169,30 @@ in {
     port = mkOption {
       type = types.port;
       default = 8181;
-      description = "Loopback port the tts-server listens on.";
+      description = ''
+        Loopback port systemd listens on (the socket-activation front door).
+        This is the port nginx and `tailscale serve` point at; the model server
+        itself binds {option}`backendPort`.
+      '';
+    };
+
+    backendPort = mkOption {
+      type = types.port;
+      default = 8182;
+      description = ''
+        Loopback port the tts-server itself binds, behind the socket proxy.
+        Never exposed; only `port` is proxied to clients.
+      '';
+    };
+
+    idleTimeout = mkOption {
+      type = types.int;
+      default = 900;
+      description = ''
+        Seconds without an open connection before the socket proxy exits and
+        the model server is stopped, releasing its memory. Matches the Laya and
+        Qwen-Image idle timeouts.
+      '';
     };
 
     modelDir = mkOption {
@@ -251,7 +294,9 @@ in {
         "qwen-tts-models-codec.service"
       ];
       requires = ["mnt-storage.mount"];
-      wantedBy = ["multi-user.target"];
+      # No wantedBy: qwen-tts.socket activates this through qwen-tts-proxy on
+      # the first connection. Starting it at boot is exactly the 3.8 GiB of
+      # idle RSS this module used to hold.
 
       environment = {
         # Force the GPU path — otherwise ggml silently falls back to CPU.
@@ -283,7 +328,7 @@ in {
             "--alias"
             cfg.alias
             "--port"
-            (toString cfg.port)
+            (toString cfg.backendPort)
           ]
           ++ cfg.extraArgs
         );
@@ -302,6 +347,82 @@ in {
         MemoryMax = "8G";
         CPUWeight = 50;
         IOWeight = 50;
+      };
+    };
+
+    # --- On-demand front door: systemd holds the port, the proxy spins up -----
+    # tts-server cannot accept an inherited listening socket (no LISTEN_FDS
+    # support), so systemd owns `port` and hands it to systemd-socket-proxyd,
+    # which fronts the model server on `backendPort`.
+    systemd.sockets."qwen-tts" = {
+      description = "Qwen3-TTS socket (on-demand activation)";
+      wantedBy = ["sockets.target"];
+      socketConfig = {
+        ListenStream = "127.0.0.1:${toString cfg.port}";
+        Accept = false;
+        # The socket activates the proxy, not qwen-tts.service: the server
+        # itself gets no FD and must bind its own backend port.
+        Service = "qwen-tts-proxy.service";
+      };
+    };
+
+    systemd.services."qwen-tts-proxy" = {
+      description = "Socket-activated proxy that starts Qwen3-TTS on demand";
+      requires = ["qwen-tts.service"];
+      after = ["qwen-tts.service"];
+      # No wantedBy: qwen-tts.socket activates this on the first connection.
+      serviceConfig = {
+        # Type=exec reports the backend started as soon as it execs, but
+        # tts-server binds :8182 only after loading both GGUFs (~15 s). Gate the
+        # proxy on /health so the queued request is forwarded, not refused.
+        ExecStartPre = pkgs.writeShellScript "wait-for-qwen-tts-backend" ''
+          set -eu
+          for _ in $(${pkgs.coreutils}/bin/seq 1 180); do
+            if ${pkgs.curl}/bin/curl -sf -o /dev/null --max-time 2 http://${backend}/health; then
+              exit 0
+            fi
+            ${pkgs.coreutils}/bin/sleep 1
+          done
+          echo "qwen-tts backend not healthy on ${backend} after 180 s" >&2
+          exit 1
+        '';
+        # Exits by itself after idleTimeout with no open connection; the idle
+        # timer below then stops the backend. A long streamed request counts as
+        # a connection, so it is never cut off mid-audio.
+        ExecStart = "${config.systemd.package}/lib/systemd/systemd-socket-proxyd --exit-idle-time=${toString cfg.idleTimeout} ${backend}";
+        TimeoutStartSec = 300;
+      };
+    };
+
+    # --- Idle stop: free the ~3.8 GiB once the proxy has gone idle ----------
+    # The proxy disappears on its own (--exit-idle-time); this only has to stop
+    # the backend it was fronting. Running every 5 min also covers the failure
+    # case where the proxy never started. The socket stays listening, so the
+    # next connection re-activates the proxy -> backend.
+    systemd.services."qwen-tts-idle" = {
+      description = "Stop Qwen3-TTS once its socket proxy is gone";
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = pkgs.writeShellScript "qwen-tts-idle-check" ''
+          set -eu
+          systemctl=${config.systemd.package}/bin/systemctl
+          if "$systemctl" -q is-active qwen-tts-proxy.service; then
+            exit 0
+          fi
+          if "$systemctl" -q is-active qwen-tts.service; then
+            "$systemctl" stop qwen-tts.service
+          fi
+        '';
+      };
+    };
+
+    systemd.timers."qwen-tts-idle" = {
+      description = "Stop Qwen3-TTS after its socket proxy goes idle";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = "5min";
+        OnUnitActiveSec = "5min";
+        Unit = "qwen-tts-idle.service";
       };
     };
 
@@ -361,11 +482,13 @@ in {
       after = [
         "tailscaled.service"
         "tailscaled-autoconnect.service"
-        "qwen-tts.service"
+        "qwen-tts.socket"
       ];
       wants = [
         "tailscaled.service"
-        "qwen-tts.service"
+        # Deliberately NOT qwen-tts.service: wanting it would start the model
+        # server at boot and defeat on-demand. The serve rule proxies to the
+        # socket, which activates the model server on first use.
       ];
       wantedBy = ["multi-user.target"];
       partOf = ["tailscaled.service"];

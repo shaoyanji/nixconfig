@@ -231,9 +231,15 @@
     binary ? llama,
     ctxSize ? 32768,
     experts ? true,
+    # CPU threads for generation. Default 12 = eisen's Xeon E5-2673 v3
+    # physical cores; a MoE model that keeps its expert FFNs in DDR4 is
+    # memory-bandwidth bound, so hyperthreads help only up to the point the
+    # two siblings contend for the same cache lines. Kolibri overrides this
+    # with 24 (all SMT threads) — see its entry below.
+    threads ? 12,
   }:
     "${lib.getExe' binary "llama-server"} --host 127.0.0.1 --port \${PORT} "
-    + "--model ${model} --alias ${alias} --threads 12 --parallel 1 --ctx-size ${toString ctxSize} "
+    + "--model ${model} --alias ${alias} --threads ${toString threads} --parallel 1 --ctx-size ${toString ctxSize} "
     + "--flash-attn on --jinja --metrics --reasoning-format none --n-gpu-layers 99 "
     + (lib.optionalString experts "--override-tensor exps=CPU ")
     + "--cache-type-k q8_0 --cache-type-v q8_0 "
@@ -340,6 +346,14 @@ in {
             model = kolibriFile;
             alias = "kolibri-1";
             binary = llamaKolibri;
+            # All 24 SMT threads (the other models stay at 12 physical cores).
+            # Kolibri is the largest expert pool (78B / 3.46B active) and its
+            # experts live in DDR4 (`--override-tensor exps=CPU`), so the
+            # per-token cost is dominated by memory traffic; SMT gives the
+            # scheduler more outstanding loads to hide that latency.
+            # Measure, don't assume: `llama-bench -t 12 -t 24` on the Kolibri
+            # GGUF before treating 24 as faster on this box.
+            threads = 24;
             # Low reasoning effort: Kolibri's default think is long (a "hi"
             # cost 352 output tokens, mostly <think>). Keep answers short.
             spec = "--reasoning-effort low";

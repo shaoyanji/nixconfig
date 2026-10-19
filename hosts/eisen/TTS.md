@@ -10,7 +10,8 @@ it in [`configuration.nix`](./configuration.nix).
 | Runtime | `ServeurpersoCom/qwentts.cpp` (MIT) — C++17/GGML port of Qwen3-TTS 12 Hz, built from source with `-DGGML_VULKAN=ON` |
 | Weights | `Serveurperso/Qwen3-TTS-GGUF` — `qwen-talker-1.7b-customvoice-Q4_K_M.gguf` + `qwen-tokenizer-12hz-Q8_0.gguf` |
 | Default voice | `vivian` (named speaker; also `serena`, `uncle_fu`, `ryan`, `aiden`, `ono_anna`, `sohee`, `eric`, `dylan`) |
-| Listening | `127.0.0.1:8181` (loopback only — **not** in the firewall) |
+| Listening | `127.0.0.1:8181` held by `qwen-tts.socket` (loopback only — **not** in the firewall); the model server itself binds `127.0.0.1:8182` behind the socket proxy |
+| Lifetime | **On demand.** Nothing runs at boot; the first request starts the model server, and 15 min with no open connection stops it again |
 | LAN | `http://tts.lan/…` (nginx `:80` → `:8181`) |
 | Tailnet | `https://eisen.<tailnet>.ts.net:8444/…` (`tailscale serve`) |
 
@@ -53,8 +54,15 @@ nixos-rebuild switch --flake .?submodules=1#eisen
 ## Verify
 
 ```bash
-systemctl status qwen-tts
-systemctl is-active qwen-tts-models-talker qwen-tts-models-codec qwen-tts tailscale-serve-tts
+# Expected idle state: socket active, service and proxy inactive.
+systemctl is-active qwen-tts.socket qwen-tts-proxy qwen-tts
+systemctl status qwen-tts.socket
+systemctl is-active qwen-tts-models-talker qwen-tts-models-codec tailscale-serve-tts
+# First request cold-starts the model (~15 s); it then shows active.
+# --max-time 60 is the point: a 2-5 s probe connects instantly (systemd holds
+# :8181) and then times out reading while the GGUFs load.
+curl -s --max-time 60 -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8181/health
+systemctl is-active qwen-tts-proxy qwen-tts
 journalctl -u qwen-tts -n 40 --no-pager   # must show the Vulkan device, not CPU
 
 curl http://127.0.0.1:8181/health
@@ -82,7 +90,10 @@ curl --resolve tts.lan:80:100.119.172.99 http://tts.lan/health
 ## Acceptance
 
 - [ ] rebuild succeeds (ignoring the known exit-4)
-- [ ] `qwen-tts` active and `systemctl --failed` shows nothing new
+- [ ] idle state: `qwen-tts.socket` active, `qwen-tts` + `qwen-tts-proxy` inactive
+      (no ~3.8 GiB resident before the first request)
+- [ ] one request cold-starts `qwen-tts` and returns 200/audio
+- [ ] `systemctl --failed` shows nothing new
 - [ ] `/health` returns ok
 - [ ] speech endpoint yields a valid 24 kHz mono WAV
 - [ ] `journalctl -u qwen-tts` shows a **Vulkan device**, not a CPU fallback
@@ -95,8 +106,15 @@ curl --resolve tts.lan:80:100.119.172.99 http://tts.lan/health
 - **Weights are on `/mnt/storage/tts/models`, not a `StateDirectory`.** They are multi-GB
   and belong on the data array (same as the Qwen and Laya weights); only the small
   cloned-voice registry uses `StateDirectory=qwen-tts` (`/var/lib/qwen-tts`).
-- **Warm process.** The runtime is long-lived (`Restart=always`); it does not spawn per
-  request, so there is no per-call model-load cost. Prefer this over per-request spawning.
+- **On-demand, not per-request.** `tts-server` cannot take an inherited listening
+  socket, so systemd holds `:8181` (`qwen-tts.socket`) and activates
+  `qwen-tts-proxy`, a `systemd-socket-proxyd` that starts the model server on
+  `:8182` and waits for its `/health` before forwarding. The first request after
+  an idle period therefore pays the ~15 s model load (~3.8 GiB RSS freed when
+  idle), while the TCP connect itself succeeds immediately and waits in the
+  socket backlog. The proxy exits after `services.qwen-tts.idleTimeout` (900 s)
+  with no open connection, and the `qwen-tts-idle` timer then stops the backend.
+  A long streamed request counts as an open connection, so it is never cut off.
 - **No gaming guard.** TTS loads its model into VRAM on demand; if it contends with a
   running game, `MemoryMax=8G` + the GPU scheduler handle it. Revisit if VRAM pressure
   shows up.

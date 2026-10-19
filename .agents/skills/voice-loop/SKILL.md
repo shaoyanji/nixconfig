@@ -40,6 +40,19 @@ Tailnet: https://eisen.<tailnet>.ts.net:8444/…
 
 OpenAI-compatible `/v1/audio/speech`. Named speakers: `vivian` (default), `serena`, `uncle_fu`, `ryan`, `aiden`, `ono_anna`, `sohee`, `eric`, `dylan`.
 
+**On demand:** TTS is not resident while idle. The first request after 15 min
+without a connection cold-starts the model (~15 s of model load) — allow a
+generous client timeout, or warm it first:
+
+```bash
+# Warm-up. Not a 2 s probe: the socket accepts immediately, the model loads after.
+curl -s --max-time 60 http://tts.lan/health
+```
+
+A streamed request is an open connection and is never cut off mid-audio. **Do not
+poll `/health` in a loop or a monitor** — each probe wakes the service and defeats
+the idle saving.
+
 **`default` is NOT a valid speaker** (errors `unknown speaker 'default'`). Use `aiden` (or another named speaker) when no speaker is specified.
 
 ```bash
@@ -50,6 +63,19 @@ curl -s http://tts.lan/v1/audio/speech \
 ```
 
 Zero-shot cloning registers via the runtime's voice registry (see `hosts/eisen/TTS.md`).
+
+## Parakeet Redux (STT) on eisen
+
+The same host serves Parakeet Redux on `127.0.0.1:8091` (LAN `http://eisen.lan/stt/…`)
+for the transcription leg. It is **always resident** (~1 GB, CPU-only ONNX), so
+`/health` is a fast check, but the module landed 2026-10-17 — on older generations
+the unit does not exist at all.
+
+```bash
+curl -s --max-time 10 http://eisen.lan/stt/health
+curl -s --max-time 120 http://eisen.lan/stt/transcribe \
+  -H "Content-Type: audio/wav" --data-binary @clip.wav   # RAW bytes, not -F
+```
 
 ## The full loop
 

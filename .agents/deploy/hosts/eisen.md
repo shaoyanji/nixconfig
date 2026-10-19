@@ -11,7 +11,7 @@ High-core gaming desktop, Sunshine GameStream server, and high-RAM local AI infe
 
 | Component | Specification | AI Inference Role |
 | :--- | :--- | :--- |
-| **CPU** | Intel Xeon E5-2673 v3 (Haswell-EP, 12c/24t @ 2.40 GHz, 30MB L3) | AVX2 + FMA3 multi-threaded expert FFN math (`--threads 12`) |
+| **CPU** | Intel Xeon E5-2673 v3 (Haswell-EP, 12c/24t @ 2.40 GHz, 30MB L3) | AVX2 + FMA3 multi-threaded expert FFN math (`--threads 12`; Kolibri 24) |
 | **RAM** | **62 GiB DDR4 Quad-Channel** + 31 GiB swap | Holds the resident MoE expert pool; the binding constraint for model sizing |
 | **GPU** | **AMD Radeon RX 5700** (Navi 10, **8 GB GDDR6**, PCIe 4.0 x16, radv **Vulkan**) | Attention/norms/gate + q8_0 KV cache (`--n-gpu-layers 99`) |
 | **Storage** | 119 GB NVMe (`/`, `/nix`, `/persist`) + 931 GB btrfs `/mnt/steam` + **14.6 TB btrfs `/mnt/storage`** | Model repository at `/mnt/storage/models/*.gguf` |
@@ -55,6 +55,7 @@ Shared per-model flags:
 - **`--override-tensor exps=CPU`** keeps the sparse expert FFN tensors in DDR4, so only the ~3B active parameters per token touch the GPU.
 - **`q8_0` KV cache + `--flash-attn on`** keep the attention working set inside 8 GiB.
 - **`--jinja`** is required for the models' tool-call / chat templates.
+- **`--threads` is per model** (`mkCmd { threads = …; }`): **12 = physical cores** for Qwen and Bonsai, **24 = all SMT threads for Kolibri** (raised 2026-10-19). Kolibri has the largest expert pool and keeps its experts in DDR4, so per-token cost is memory latency; SMT gives the scheduler more outstanding loads. The 24-thread figure is **not yet benchmarked** — `llama-bench -m /mnt/storage/models/Kolibri-1-Q4_K_M.gguf -t 12 -t 24 -p 0 -n 32` (patched build) is the check before treating it as faster.
 
 ### Speculative Decoding (Qwen only, measured)
 
@@ -102,30 +103,35 @@ Both use `unitConfig.ConditionPathExists = "!<file>"` and `curl -fL --retry 5 -C
 | Model | Total / Active | Quant | Aliases | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | 🌟 **Qwen3.6-35B-A3B** | 35B / **~3B** | `Q4_K_M` (22.5 GB) | `qwen3.6-35b-a3b`, `qwen` | Primary champion: 2026 agentic coding/thinking-preservation MoE. Whole expert pool fits with ~40 GiB RAM to spare. |
-| **Aleph-Alpha Kolibri-1** | 78B / **3.46B** | `Q4_K_M` (44.2 GB) | `kolibri-1`, `kolibri`, `aleph` | German + English MoE (Apache 2.0, ctx up to 262144). Wired up and installed, but **not yet loadable — see below**. |
+| **Aleph-Alpha Kolibri-1** | 78B / **3.46B** | `Q4_K_M` (44.2 GB) | `kolibri-1`, `kolibri`, `aleph` | German + English MoE (Apache 2.0, ctx up to 262144). Loads via the patched llama.cpp build — see below. |
 
 Larger Kolibri quants exist (`Q3_K_M` ≈ 37.5 GB, `Q5_K_M` split in two parts) but `Q4_K_M` is the best fit for 62 GiB alongside the OS and Steam.
 
 Also evaluated and rejected for this box: dense 32B (`Qwen2.5-Coder-32B`, ~8–14 tok/s — no active-parameter win), `Phi-3.5-MoE-Instruct` (6.6B active, worse RAM/speed tradeoff).
 
-### Kolibri-1 is blocked on llama.cpp, not on this configuration
+### Kolibri-1 needs a patched llama.cpp (the patch is wired in)
 
-Weights, fetch unit, aliases and the llama-swap entry are all in place and correct, but **stock llama.cpp cannot load it**:
+Stock llama.cpp cannot load it:
 
 ```
 E llama_model_load: error loading model: unknown model architecture: 'kolibri1'
 ```
 
-so a request for the `kolibri` alias fails with HTTP 500 in ~0.4 s (`llama-swap: upstream command exited prematurely`).
+`hosts/eisen/llm-server.nix` therefore serves it with `llamaKolibri` — the
+`llama-cpp` package with the GGUF card's `kolibri1-llama.cpp.patch` (against
+upstream `836d571`) and `-DGGML_VULKAN=ON`. That build **works**: llama-swap logs
+`<kolibri-1> Health check passed` (2026-10-17) and the model is listed by
+`/v1/models` alongside Qwen.
 
-This is an upstream gap, not a misconfiguration: the GGUF card states outright that stock llama.cpp does not support the `kolibri1` architecture yet and ships `kolibri1-llama.cpp.patch` (against upstream `836d571`); Ollama and LM Studio are in the same position. To enable it, build `llama-cpp` with that patch (an overlay/override carrying the patch), then re-test:
+Caveats: the patch is community code (Seraphiel102 / Hob-forge), so treat output
+as "loads and talks" rather than numerically verified against Aleph Alpha, and
+`llama-bench` from a stock llama.cpp build cannot read the file (same arch error).
+Re-test with:
 
 ```bash
-curl -s http://eisen.lan/v1/chat/completions -H 'Content-Type: application/json' \
+curl -s --max-time 600 http://eisen.lan/v1/chat/completions -H 'Content-Type: application/json' \
   -d '{"model":"kolibri","messages":[{"role":"user","content":"Sag hallo."}]}'
 ```
-
-Until then use `qwen`. Note the 44 GiB Kolibri GGUF is already resident on `/mnt/storage` holding space for a model that cannot load yet — worth deleting if that space is needed before llama.cpp catches up.
 
 ---
 
@@ -151,6 +157,35 @@ nginx sets `proxy_buffering off` (never buffer SSE token streams) and `proxy_rea
 Both intentionally resolve to the **tailnet** IP, so the same name works on-LAN and off-LAN. Verify with `dig @100.97.61.65 eisen.lan A` (and `laya.lan`).
 
 > **`.lan` names do not resolve through a host's default resolver** — `getent hosts eisen.lan` and `curl http://eisen.lan/...` fail from both frieren and eisen, while `dig @100.97.61.65 eisen.lan A` answers correctly. This is **pre-existing and fleet-wide**, affects the Qwen endpoint identically, and is *not* caused by the Laya addition. Until it is fixed, address the endpoints by tailnet name + port (`:443` for the LLM, `:8443` for Laya) or with `curl --resolve`.
+
+---
+
+## Cold starts & `/health` warm-up (read before probing)
+
+Every model endpoint on this host has a cold-start budget, and **on-demand
+services wake on a health probe**. Two consequences:
+
+1. **Never poll an on-demand endpoint from a monitor.** A `/health` request opens
+   the socket and starts the model, so a 30 s poll loop keeps it resident (or
+   worse, stop/starts it every idle period). That covers `:8181` (TTS), `:8090`
+   (Laya) and `:8282` (Qwen-Image) — nothing in `services.fleetMonitors` should
+   point at them. Poll `qwen-tts.socket`/`laya-serve.socket` state over SSH
+   instead if you need liveness.
+2. **A 2–5 s probe is not a health check here.** On a socket-activated service
+   the TCP connect succeeds immediately (systemd holds the port; the connection
+   waits in the backlog), so a client sees "connected" and then times out
+   reading. Pass a `--max-time` that covers the cold load.
+
+| Endpoint | Activation | Idle stop | Cold start | Warm command |
+| :--- | :--- | :--- | :--- | :--- |
+| llama-swap `:8080` (`/v1`) | always listening (gaming guard may stop it) | model unloaded after `ttl=900` | Kolibri ~4–5 min · Qwen ~2–3 min · Bonsai ~1 min | `curl --max-time 600 …/v1/chat/completions` with `"max_tokens": 1` |
+| Qwen3-TTS `:8181` | socket | 900 s with no connection | ~15 s | `curl --max-time 60 http://127.0.0.1:8181/health` |
+| Laya `:8090` | socket | 900 s with no request | ~40 s | `curl --max-time 90 http://127.0.0.1:8090/health` |
+| Qwen-Image `:8282` | socket | 900 s with no request | minutes (HDD, ~12 GB) | `curl --max-time 600 http://127.0.0.1:8282/health` |
+| Parakeet `:8091` | always resident | none | ~1 s (loaded at boot) | `curl --max-time 10 http://127.0.0.1:8091/health` |
+
+`GET /v1/models` on llama-swap is **not** a warm-up: it answers from the swap
+config without loading any weights.
 
 ---
 
@@ -220,7 +255,7 @@ First real completions after the initial switch, all served through the declarat
 | Prompt processing | 14–30 tok/s |
 | GPU VRAM in use while decoding | **5.75 GiB of 7.98 GiB** (2.65 GiB without the draft head) |
 
-Decoding is **CPU-bound, not VRAM-bound**: offload is engaged (5.75 GiB of 7.98 GiB resident with the draft head), so the per-token cost is the sparse expert FFN reads from DDR4, not the GPU. Remaining levers, in order of effort: raise `--threads` toward 24, or move to a smaller target quant.
+Decoding is **CPU-bound, not VRAM-bound**: offload is engaged (5.75 GiB of 7.98 GiB resident with the draft head), so the per-token cost is the sparse expert FFN reads from DDR4, not the GPU. Levers: `--threads` (Qwen stays at 12; **Kolibri is now at 24**, raised 2026-10-19 and awaiting a bench) and a smaller target quant.
 
 > **There is no spare VRAM to shift experts onto the GPU.** An earlier note suggested relaxing `--override-tensor exps=CPU` using ~5 GiB of headroom; that measurement (2.65 GiB) predated the DFlash2 draft head, which now claims most of the free VRAM. Only ~2.2 GiB is unallocated while decoding.
 
@@ -329,15 +364,60 @@ Offline, OpenAI-compatible text-to-speech. Implementation: [`modules/services/qw
 - Runtime `ServeurpersoCom/qwentts.cpp` (MIT), built from source with `-DGGML_VULKAN=ON`, wrapped around its own OpenAI-compatible `tts-server` (no Python layer).
 - Weights `Serveurperso/Qwen3-TTS-GGUF` on `/mnt/storage/tts/models` (talker `qwen-talker-1.7b-customvoice-Q4_K_M.gguf` + codec `qwen-tokenizer-12hz-Q8_0.gguf`), fetched by idempotent oneshot units.
 - Loopback `127.0.0.1:8181` (no firewall entry) → `http://tts.lan/v1/audio/speech` (nginx `:80`) and `https://eisen.<tailnet>.ts.net:8444` (`tailscale serve`).
+- **On demand.** `qwen-tts.socket` holds `:8181`; the first connection starts the model server on `:8182` through `qwen-tts-proxy` (`systemd-socket-proxyd`), and 900 s with no open connection stops it again. Idle state is `qwen-tts.socket active`, `qwen-tts`/`qwen-tts-proxy` inactive — that is correct, not a failure. The first request after an idle period pays ~15 s of model load.
 
 ```bash
-systemctl status qwen-tts
-curl http://127.0.0.1:8181/health
+systemctl status qwen-tts.socket
+systemctl is-active qwen-tts qwen-tts-proxy   # inactive when idle
+curl http://127.0.0.1:8181/health            # cold-starts it
 curl -X POST http://127.0.0.1:8181/v1/audio/speech -H 'Content-Type: application/json' \
   -d '{"input":"Hello from eisen","voice":"vivian","response_format":"wav"}' -o out.wav
 ```
 
 **Before first build**, pin the runtime rev + hash in `modules/services/qwen-tts.nix` (the derivation ships `lib.fakeHash` so an unpinned build fails on purpose): `nix-prefetch-git --fetch-submodules https://github.com/ServeurpersoCom/qwentts.cpp.git`.
+
+## Speech to text: Parakeet Redux (`/stt`)
+
+Moondream's 1.58-bit ternary export of NVIDIA `parakeet-tdt-0.6b-v3` (600M, 25
+languages incl. German), CPU-only ONNX. Implementation:
+[`hosts/eisen/parakeet.nix`](../../../hosts/eisen/parakeet.nix) + the vendored
+`parakeet-transcribe.py` / `parakeet-server.py`.
+
+```text
+LAN:    http://eisen.lan/stt/transcribe   (nginx :80 -> 127.0.0.1:8091)
+Direct: http://127.0.0.1:8091/transcribe  (loopback only)
+```
+
+`POST /transcribe` takes **raw audio bytes** (any ffmpeg-decodable format) —
+multipart/form-data fails. 25 MB cap, 600 s nginx timeouts, response is
+`{"text", "duration_seconds", "segments"}`. `/health` answers only after the
+ONNX sessions load.
+
+**Deployment state (2026-10-19):** the module landed 2026-10-17 (`507b8b51`),
+but the running generation is 2026-10-13, so `parakeet-stt.service` does **not**
+exist on the host and nothing listens on `:8091`. The six ONNX files are already
+fetched into `/mnt/storage/parakeet` (425 MB), so the first switch needs no
+download.
+
+**Audit 2026-10-19:**
+
+- **Fixed:** error responses that do not consume the request body (413 over the
+  25 MB cap, 404 on a POST) now set `Connection: close`. With HTTP/1.1
+  keep-alive the unread body was parsed as the next request line on the same
+  connection.
+- **Open — idle cost:** ~1 GB resident forever with no idle stop, while the
+  model loads in about a second. It is the cheapest remaining candidate for the
+  socket-activation pattern used by TTS/Laya/Qwen-Image.
+- **Open — sandbox:** the unit has no `User=`, `NoNewPrivileges`, `ProtectSystem`
+  or `MemoryMax`, so audio decoding (ffmpeg demuxers) runs as root. `DynamicUser`
+  + `ProtectSystem=strict` + `MemoryMax` would be appropriate.
+- **Open — crash loop:** `Restart=always` with no start limit means a missing or
+  corrupt ONNX file restarts forever every 5 s instead of failing loudly.
+- **Open — no read timeout:** `ThreadingHTTPServer` has no socket timeout, so a
+  client that sends a partial body pins a handler thread indefinitely.
+- Threads: `--threads 8` onnxruntime intra-op, deliberately below the LLM's
+  budget; requests are serialised by a lock, so bursts queue rather than
+  oversubscribe the box.
 
 ## Operational Notes
 

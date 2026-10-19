@@ -54,11 +54,17 @@ def make_handler(server: Server):
         def log_message(self, *args):  # keep stdout clean; errors go via send_error_json
             pass
 
-        def _json(self, status: int, payload: dict) -> None:
+        def _json(self, status: int, payload: dict, close: bool = False) -> None:
             body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(body)))
+            if close:
+                # The request body was not consumed. Under HTTP/1.1 keep-alive
+                # the client may still send it, and those bytes would be parsed
+                # as the next request line on this connection. Close instead.
+                self.close_connection = True
+                self.send_header("Connection", "close")
             self.end_headers()
             self.wfile.write(body)
 
@@ -70,14 +76,14 @@ def make_handler(server: Server):
 
         def do_POST(self) -> None:
             if self.path not in ("/transcribe", "/transcribe/"):
-                self._json(404, {"error": "not found"})
+                self._json(404, {"error": "not found"}, close=True)
                 return
             length = int(self.headers.get("Content-Length") or 0)
             if length <= 0:
                 self._json(400, {"error": "empty body"})
                 return
             if length > MAX_BODY_BYTES:
-                self._json(413, {"error": "body exceeds 25 MB cap"})
+                self._json(413, {"error": "body exceeds 25 MB cap"}, close=True)
                 return
             try:
                 data = self.rfile.read(length)

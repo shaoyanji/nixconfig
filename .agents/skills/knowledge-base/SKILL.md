@@ -111,6 +111,13 @@ encodes the same policy**, so read them as coverage, not comprehension;
 at ~330 ms, the in-repo hash engine 5/14 and 1/10. No model is called on the
 default path; `KG_DECIDE_ALWAYS=1` opts into Jev as an agreement check only.
 
+The bundle's limits are measured too, not assumed: `--set unnamed` (questions
+that name **no** node) is rules 4/9 vs Jev 7/9. Nothing there can trigger the
+bundle, because there is no name to resolve — so above 4/9 the rules are only
+keywords. Prefer this set's shape: the rules' misses are `UNKNOWN` (visible
+declines), Jev's are confident wrong intents. If your question names nothing,
+name the thing instead — that is a one-word change that puts the bundle to work.
+
 The value is **one hop from a name to its context**: `ops:kg:host HOST=frieren`
 lists every doc and skill that names the host, without `grep` and without
 reading them. Counts are printed live, never stored. Note that `from` is

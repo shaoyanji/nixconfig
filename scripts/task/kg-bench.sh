@@ -22,10 +22,16 @@
 # no header dump, no `set -x`. Without a key (or offline) Jev is SKIPPED, and
 # the report says so rather than inventing a number.
 #
-# Usage: kg-bench.sh [--verbose] [--set rule|paraphrase|both]
+# Usage: kg-bench.sh [--verbose] [--set rule|paraphrase|unnamed|both]
 #        --set rule        vocabulary the keyword rules encode (default)
 #        --set paraphrase  same questions WITHOUT that vocabulary
-#        --set both        the union — the honest headline number
+#        --set unnamed     questions that name NO node at all — the bundle's
+#                          blind spot: it can only fire on a named node, so
+#                          this set measures rule coverage and nothing else
+#        --set both        the union of rule+paraphrase (the named sets); the
+#                          unnamed set is NOT folded in — a score that mixes
+#                          questions the bundle can answer with ones it cannot
+#                          would hide the only difference that matters
 #        VERBOSE=1 also prints per-question rows
 #        KG_GRAPH=<path> use an existing graph JSON instead of evaluating
 #        KG_DECIDE_URL=<url> add the router runner
@@ -34,6 +40,10 @@ set -euo pipefail
 
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 SECRETS="${SECRETS:-$REPO/modules/secrets.yaml}"
+
+# Sourced before the option loop because --help calls kg_usage() (the one help
+# printer shared by the kg:* scripts).
+. "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
 GRAPH="${KG_GRAPH:-}"
 VERBOSE="${VERBOSE:-0}"
 SET="${SET:-rule}"
@@ -44,7 +54,7 @@ while [ "$#" -gt 0 ]; do
     --verbose) VERBOSE=1; shift ;;
     --set) SET="${2:-}"; shift 2 ;;
     --graph) export KG_GRAPH="${2:-}"; shift 2 ;;
-    -h | --help) sed -n '2,26p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h | --help) kg_usage "${BASH_SOURCE[0]}"; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
 done
@@ -95,12 +105,38 @@ banana pancakes recipe	UNKNOWN	-
 EOF
 )"
 
+# `unnamed` asks for the relation WITHOUT naming the thing it relates to, which
+# is the one shape the context bundle structurally cannot handle: the bundle is
+# "the question names a node but no rule matched a relation", so with no name it
+# never fires and these questions fall through to UNKNOWN. That is the point of
+# the set — it separates rule coverage from bundle coverage instead of letting
+# the bundle's superset answer stand in for comprehension.
+#
+# Subject gold is `-` throughout, and that is not laziness: with no node named
+# there is no subject to be right or wrong about, and scoring one would invent a
+# 0 % the runner never attempted. These questions test INTENT ONLY. Several
+# legitimately end in a "name a host" note rather than rows — a refusal to answer
+# about nothing is correct behaviour, not a miss, so only the intent is scored.
+QS_UNNAMED="$(cat <<'EOF'
+how many edges does the whole thing have	STATS	-
+count the links between pages and machines	STATS	-
+which machines keep appearing in the same pages	CO_MENTION	-
+what else gets discussed alongside a given machine	CO_MENTION	-
+everything filed under the storage label	TAG_MEMBERS	-
+list the labels in use	TAG_MEMBERS	-
+summarise one page and everything it points at	DOC_CONTEXT	-
+which guides refer to a tool this repo depends on	SKILL_CONTEXT	-
+is there anything in here about my backup rotation	UNKNOWN	-
+EOF
+)"
+
 case "$SET" in
   rule) QS="$QS_RULE" ;;
   paraphrase) QS="$QS_PARAPHRASE" ;;
+  unnamed) QS="$QS_UNNAMED" ;;
   both) QS="$QS_RULE"$'\n'"$QS_PARAPHRASE" ;;
   *)
-    echo "kg-bench: unknown set '$SET' (rule|paraphrase|both)" >&2
+    echo "kg-bench: unknown set '$SET' (rule|paraphrase|unnamed|both)" >&2
     exit 2
     ;;
 esac
@@ -120,7 +156,6 @@ CRITERIA='{
 }'
 
 # --- graph (subject candidates + keyword runner) ----------------------------
-. "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
 GRAPH="$(kg_graph_path)" || exit 1
 [ -s "$GRAPH" ] || { echo "kg-bench: no graph at $GRAPH" >&2; exit 1; }
 
@@ -288,6 +323,12 @@ run_runner() {
 SUMMARY=""
 printf 'kg-bench — set %s, %d labelled questions, graph %s\n' "$SET" "$(grep -c . <<<"$QS")" "$GRAPH"
 printf '  criteria: HOST_CONTEXT SKILL_CONTEXT TAG_MEMBERS DOC_CONTEXT CO_MENTION STATS\n\n'
+# Stated up front for this set, so a good number here is not read as the bundle
+# working. Measured rather than assumed: the tier-1/3 node bundle cannot fire
+# (no name to resolve), but the TAG tier can, because it scans the question's
+# tokens for a tag rather than resolving a node — "filed under the storage
+# label" does reach tag:storage. The summary's bundle line prints the real count.
+[ "$SET" = "unnamed" ] && printf '  note: no question here names a node, so only the tag tier of the bundle can fire — rule coverage dominates this set\n\n'
 
 run_runner keyword fn run_keyword "" 1 || true
 run_runner heuristic fn run_heuristic "" 0 || true

@@ -285,6 +285,12 @@ tasks:
       the bench prints beside the score. The bundle replaced a model call at
       step 2 for reasons that do not depend on that: it returns a superset and
       cannot mis-pick a relation, needs no key, and costs 0 ms.
+      Its blind spot is measured, not asserted: on questions that name NO node
+      (`ops:bench:kg --set unnamed`) the rules score 4/9 against Jev 7/9, because
+      the bundle resolves a NAME and has nothing to resolve here. The rules' five
+      misses are UNKNOWN — a decline a caller can see and re-ask around — while
+      Jev's two are confident wrong intents (one marked an off-topic question
+      DOC_CONTEXT), which is the failure a caller cannot detect.
       KG_DECIDE_ALWAYS=1 (plus KG_DECIDE_URL/KG_DECIDE_TOKEN, see ops:ask:jev)
       opts back into the model as an agreement check, recorded as `agreed` /
       `keyword+disagree`. Route `model` no longer occurs on the default path.
@@ -344,10 +350,14 @@ tasks:
       bundle fallback in kg-ask.sh), `heuristic` (the in-repo systemone-decision
       engine), `jev` (hosted Jev, key from sops, skipped without one) and
       `decide` (any endpoint in KG_DECIDE_URL, e.g. the eisen router).
-      VERBOSE=1 prints per-question rows. SET=rule|paraphrase|both picks the
-      labelled set: `rule` is phrased in the vocabulary the rules encode and
+      VERBOSE=1 prints per-question rows. SET=rule|paraphrase|unnamed|both picks
+      the labelled set: `rule` is phrased in the vocabulary the rules encode and
       therefore flatters the deterministic router; `paraphrase` asks the same
-      questions without it, which is where a model is supposed to win.
+      questions without it, which is where a model is supposed to win; `unnamed`
+      asks for a relation without naming its subject — the bundle's blind spot,
+      since it resolves a name. `both` is rule+paraphrase only: a score that
+      merged questions the bundle can answer with ones it cannot would hide the
+      one difference that matters.
       A routing census follows the scores, because a scorer sees only the intent
       and a fallback that silently answered the whole set would look identical
       to the rules working.
@@ -357,8 +367,11 @@ tasks:
       flagged as bundle answers, and the summary says so on its own line: their
       gold was written from the same node-kind -> relation policy, so they are
       coverage rather than independent accuracy. Cite the rule-set number when
-      you need evidence that does not grade itself. This is the evidence behind
-      "routing is deterministic and offline; no model is called" — re-run it
+      you need evidence that does not grade itself. On the `unnamed` set the
+      rules are 4/9 against Jev 7/9, and the misses differ in kind: UNKNOWN for
+      the rules (visible decline) versus confident wrong intents for Jev. This is
+      the evidence behind "routing is deterministic and offline; no model is
+      called" — re-run it
       before changing the router.
     cmds:
       - |

@@ -20,3 +20,4 @@ __pycache__/
 docs/closures/
 # Generated registry mirror (regenerate: task dev:modules:sync)
 docs/modules-registry.md
+session-*.md

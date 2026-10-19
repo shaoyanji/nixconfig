@@ -11,6 +11,8 @@
 
   freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 
+  qmdEisenEmbedSync = import ../../modules/scripts/qmd-eisen-embed-sync.nix {inherit pkgs;};
+
   # Dormant by default (`enableHeavy` is not set on any host). Deliberately no
   # Neo4j server here: the knowledge graph is a generated projection, and a JVM
   # heap competes with the NAS page cache (AGENTS.nix `p3-graph-query`). If an external
@@ -33,6 +35,7 @@
   lightTools = with pkgs; [
     wikisearch
     freebuff-headless
+    qmdEisenEmbedSync
     # TOON is the agent-facing projection for the sentinel ledger and other
     # uniform records. Present system-wide so root/systemd helpers can encode
     # without assuming a user profile on PATH.

@@ -38,3 +38,8 @@ tasks:
     desc: Refresh qmd documentation and vault search indices
     cmds:
       - task dev:qmd:refresh
+
+  data:qmd:sync:eisen:
+    desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
+    cmds:
+      - task dev:qmd:sync:eisen -- {{.CLI_ARGS}}

@@ -581,4 +581,4 @@ tasks:
   ops:qmd:sync:eisen:
     desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
     cmds:
-      - task dev:qmd:sync:eisen
+      - task dev:qmd:sync:eisen -- {{.CLI_ARGS}}

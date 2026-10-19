@@ -121,9 +121,13 @@
         open-floating = true;
         border.enable = false;
         shadow.enable = false;
+        # `relative-to` has no module default (niri itself defaults to
+        # top-left), so omitting it fails the eval with "accessed but has no
+        # value defined" on niri 26.04. Spelling it out keeps the behaviour.
         default-floating-position = {
           x = 0;
           y = 0;
+          relative-to = "top-left";
         };
       }
       {

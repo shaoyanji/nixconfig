@@ -485,15 +485,19 @@ defmodule KGEngine.Native do
   """
 
   @root_docs ~w(AGENTS.md MANUAL.md ARCHITECTURE.md AUDIT.md TODO.md HANDOFF.md EXPERIMENTS.md README.md)
-  @token_re ~r/[^A-Za-z0-9_-]+/
-
-  @root_docs ~w(AGENTS.md MANUAL.md ARCHITECTURE.md AUDIT.md TODO.md HANDOFF.md EXPERIMENTS.md README.md)
 
   def build(repo) do
-    hosts = hosts(repo)
-    skills = skills(repo)
-    docs = docs(repo, hosts, skills)
-    tags = skills |> Enum.flat_map(& &1.tags) |> Enum.uniq()
+    debug = System.get_env("KG_NATIVE_DEBUG") == "1"
+    phase = fn label, fun ->
+      {us, value} = :timer.tc(fun)
+      if debug, do: IO.puts(:stderr, "[kg-native] #{label}: #{Float.round(us / 1000, 1)} ms")
+      value
+    end
+
+    hosts = phase.("hosts", fn -> hosts(repo) end)
+    skills = phase.("skills", fn -> skills(repo) end)
+    docs = phase.("docs", fn -> docs(repo, hosts, skills) end)
+    tags = phase.("graph", fn -> skills |> Enum.flat_map(& &1.tags) |> Enum.uniq() end)
 
     host_nodes =
       Enum.map(hosts, fn {name, h} ->
@@ -568,8 +572,10 @@ defmodule KGEngine.Native do
             {nil, acc}
 
           true ->
-            case Regex.run(~r/^(status|kind)\s*=\s*"([^"]*)"/, t) do
-              [_, k, v] -> {cur, put_in(acc, [cur, String.to_atom(k)], v)}
+            with [k, v] <- String.split(t, "=", parts: 2),
+                 true <- k in ["status", "kind"] do
+              {cur, put_in(acc, [cur, String.to_atom(k)], v |> String.trim() |> String.trim("\""))}
+            else
               _ -> {cur, acc}
             end
         end
@@ -613,12 +619,32 @@ defmodule KGEngine.Native do
           []
       end
 
+    # `String.split(line, ":", parts: 2)` instead of a regex per line: the
+    # frontmatter schema is a subset of YAML with no nesting, so the first colon
+    # is the separator and the key is alnum/_/- only.
     Enum.reduce(body, %{}, fn line, acc ->
-      case Regex.run(~r/^([A-Za-z0-9_-]+):\s*(.*)$/, String.trim(line)) do
-        [_, k, v] -> Map.put(acc, k, v)
-        _ -> acc
+      t = String.trim(line)
+
+      case String.split(t, ":", parts: 2) do
+        [k, v] ->
+          if key?(k),
+            do: Map.put(acc, k, String.trim_leading(v)),
+            else: acc
+
+        _ ->
+          acc
       end
     end)
+  end
+
+  # The empty binary is the SUCCESSFUL end of the scan (every byte was a valid
+  # key byte). Returning false here made every frontmatter key invalid, which
+  # silently dropped all 151 tag edges — the parity gate is what caught it.
+  defp key?(<<>>), do: true
+
+  defp key?(<<c, rest::binary>>) do
+    ok? = (c >= ?a and c <= ?z) or (c >= ?A and c <= ?Z) or (c >= ?0 and c <= ?9) or c == ?_ or c == ?-
+    ok? and key?(rest)
   end
 
   # `[linux, macos]` -> ["linux", "macos"]; bare scalar -> [scalar]; quotes
@@ -670,33 +696,103 @@ defmodule KGEngine.Native do
     roots = Enum.filter(roots, &File.exists?/1)
     docs = Enum.filter(docs, &match?({:ok, %File.Stat{type: :regular}}, File.lstat(&1)))
 
-    # Token-split, mirroring the Nix `builtins.split` exactly. Two faster-looking
-    # alternatives were measured and rejected: `Task.async_stream` over the docs
-    # (194 ms vs 95 ms — scheduler and copy cost exceed the win on 21 small files)
-    # and a single regex alternation of the 77 names with boundary assertions
-    # (81 ms — PCRE tries every alternative at every position). The split is
-    # 72 ms for 510 KB, and it is the algorithm the projection uses, so parity is
-    # by construction rather than by argument.
-    (roots ++ docs)
-    |> Enum.map(fn path ->
+    # Name membership, measured rather than guessed (22 documents, 77 names,
+    # 526 KB):
+    #
+    #   String.split on the token regex + MapSet   117 ms  (the Nix algorithm;
+    #                                                      allocates ~90k tokens)
+    #   split on whitespace, trim the edges        137 ms  (and NOT parity-safe:
+    #                                                      `hosts/frieren` stays one
+    #                                                      token, so mentions vanish)
+    #   one att/alternation regex                   81 ms  (PCRE retries every
+    #                                                      alternative at every byte)
+    #   :binary.matches per name + edge check       35 ms  (C scan, one pass per
+    #                                                      name; only hits are
+    #                                                      materialised)
+    #   ONE compiled multi-pattern :binary.matches   4.7 ms  (Aho-Corasick over all
+    #                                                      77 names at once)
+    #   either of the above, 8-way parallel        2.05 s   (lost by 40× — NFS
+    #                                                      reads and process copies
+    #                                                      dominate 22 small files)
+    #
+    # The compiled pattern is used. Parity holds because a hit is a mention
+    # exactly when the bytes on either side are not token characters — the same
+    # condition the split encodes — so `dev` inside `devji` and `nix-eval` inside
+    # `nix-eval-jobs` are rejected, and a non-ASCII neighbour counts as a
+    # separator on both sides. Verified equal to the per-name scan on every
+    # document in the repo, and `checks:kg:sidecar` compares the finished graph
+    # to the Nix projection, so a divergence fails a gate rather than silently
+    # dropping an edge.
+    paths = roots ++ docs
+    pattern = :binary.compile_pattern(host_names ++ skill_names)
+
+    Enum.map(paths, fn path ->
       rel = Path.relative_to(path, repo)
       text = File.read!(path)
-      toks = text |> String.split(@token_re, trim: true) |> MapSet.new()
+      found = mentions(text, pattern)
 
       %{
         id: "doc:" <> rel,
         path: rel,
         label: first_heading(text),
-        hosts: Enum.filter(host_names, &MapSet.member?(toks, &1)),
-        skills: Enum.filter(skill_names, &MapSet.member?(toks, &1))
+        hosts: Enum.filter(host_names, &MapSet.member?(found, &1)),
+        skills: Enum.filter(skill_names, &MapSet.member?(found, &1))
       }
     end)
   end
 
+  # Every occurrence of any name, kept only when it stands as a whole token. 0
+  # (out of range) is not a token byte, so document start/end are boundaries.
+  defp mentions(text, pattern) do
+    text
+    |> :binary.matches(pattern)
+    |> Enum.reduce(MapSet.new(), fn {pos, len}, acc ->
+      if token_byte?(byte_at(text, pos - 1)) or token_byte?(byte_at(text, pos + len)) do
+        acc
+      else
+        MapSet.put(acc, binary_part(text, pos, len))
+      end
+    end)
+  end
+
+  defp byte_at(_text, i) when i < 0, do: 0
+  defp byte_at(text, i) when i >= byte_size(text), do: 0
+  defp byte_at(text, i), do: :binary.at(text, i)
+
+  defp token_byte?(c) when c in ?a..?z or c in ?A..?Z or c in ?0..?9 or c == ?_ or c == ?-, do: true
+  defp token_byte?(_), do: false
+
+  # First line that starts with `# `, without splitting the document into lines:
+  # `String.split(text, "\n")` over 526 KB allocates ~90k binaries just to read
+  # one heading (it was ~15 ms of the build by itself). SCAN finds a candidate
+  # anywhere and only accepts it at a line start.
   defp first_heading(text) do
-    case text |> String.split("\n") |> Enum.find(&String.starts_with?(&1, "# ")) do
+    case heading_start(text, 0) do
       nil -> "(untitled)"
-      line -> String.replace_prefix(line, "# ", "")
+      pos ->
+        from = pos + 2
+        rest = binary_part(text, from, byte_size(text) - from)
+        len = case :binary.match(rest, "\n") do
+          :nomatch -> byte_size(rest)
+          {i, _} -> i
+        end
+        binary_part(rest, 0, len)
+    end
+  end
+
+  defp heading_start(text, from) when from >= byte_size(text), do: nil
+
+  defp heading_start(text, from) do
+    scope = {from, byte_size(text) - from}
+
+    case :binary.match(text, "# ", scope: scope) do
+      :nomatch ->
+        nil
+
+      {pos, _} ->
+        if pos == 0 or :binary.at(text, pos - 1) == ?\n,
+          do: pos,
+          else: heading_start(text, pos + 1)
     end
   end
 
@@ -709,7 +805,14 @@ end
 # ------------------------------------------------------------------------------
 {opts, _, _} =
   OptionParser.parse(System.argv(),
-    switches: [socket: :string, file: :string, repo: :string, native: :boolean, nix: :boolean],
+    switches: [
+      socket: :string,
+      file: :string,
+      repo: :string,
+      native: :boolean,
+      nix: :boolean,
+      build_only: :boolean
+    ],
     aliases: [s: :socket, f: :file, r: :repo]
   )
 
@@ -726,6 +829,24 @@ Socket:  unix:#{socket_path}
 Repo:    #{repo_root}
 ================================================================================
 """)
+
+# `--build-only` exists so the cold-bootstrap budget can be MEASURED by a gate
+# (`checks:kg:native`) rather than quoted from a comment: it builds the native
+# graph, prints {ms, nodes, edges} as JSON and exits without starting the server.
+if opts[:build_only] do
+  {us, graph} = :timer.tc(fn -> KGEngine.Native.build(repo_root) end)
+
+  IO.puts(
+    JSON.encode!(%{
+      "ms" => Float.round(us / 1000, 1),
+      "nodes" => length(graph["nodes"]),
+      "edges" => length(graph["edges"]),
+      "source" => "native"
+    })
+  )
+
+  System.halt(0)
+end
 
 KGEngine.Store.init()
 

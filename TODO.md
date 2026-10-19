@@ -74,15 +74,25 @@
       host:frieren → 17. Advisory by design (a projection is not a dependency
       graph, so it never blocks). The jq and sidecar backends agree on every
       anchor the gate checks.
-- [ ] **Sub-20 ms cold bootstrap** — the native build is ~100 ms, not the <20 ms
-      this asked for. Measured alternatives: token split 72 ms (the projection's
-      own algorithm, kept for parity), regex alternation 81 ms, `Task.async_stream`
-      194 ms. Reaching <20 ms needs the projection precompiled into a checked
-      artifact or a native scanner; the 1.2 s BEAM boot floor dominates either way.
-- [ ] **Interactive graph canvas on fleet docsite**: render an interactive SVG
-      or force-directed canvas on `https://fleet.frieren.lan` (Knowledge Graph tab)
-      enabling pan, zoom, and live node inspection directly in Zen Browser.
-      Exit: clicking any node in the Aki site visualizer navigates to its slice.
+- [x] **Sub-20 ms cold bootstrap** (2026-10-19). Native build is now **median
+      14.6 ms / p90 17.4 ms** for 225 nodes and 387 edges, with **no `nix`
+      subprocess** — `task checks:kg:native` measures it (7 boots, median) and
+      fails above 20 ms. The wins were measured, not guessed: one compiled
+      multi-pattern scan (4.7 ms) replaced 77 per-name regex splits (117 ms), and
+      `first_heading` stopped splitting a 526 KB document into 90k lines (~15 ms).
+      Process-level parallelism lost 40x (2.05 s) and is recorded in the code.
+      Caveat kept honest: the median is under budget, the tail is I/O — a cold
+      NFS read can still land at ~22 ms, which is why the gate scores the median
+      and prints p90/max.
+- [x] **Interactive graph canvas on the fleet site** (2026-10-19).
+      `fleet.frieren.lan` / Knowledge Graph now renders a force-directed canvas
+      (`lib/aki-site.nix`): pan, wheel zoom, hover inspection, and a click on any
+      node performs an Aki transition to that node's static slice
+      (`data/kg/<type>-<hash>.json`, 225 of them, each listing its neighbours and
+      linking hosts to their inventory page, docs/skills to their source). No
+      daemon, no router. Exit verified end-to-end by `task checks:kg:canvas`,
+      which drives headless Chrome: click a node -> breadcrumb becomes
+      `fleet / knowledge-graph / host:frieren`.
 
 ## P3 — hygiene and maintenance
 

@@ -69,7 +69,11 @@
   };
 
   nix = {
-    package = pkgs.nixVersions.latest;
+    # mkDefault, not a plain definition: the Determinate Nix module sets
+    # `nix.package` at `lib.mkOverride 750`, which a default-priority (100)
+    # definition would beat — leaving DN's config in place with the upstream
+    # binary. A host that imports that module must therefore be able to win.
+    package = lib.mkDefault pkgs.nixVersions.latest;
     optimise =
       {
         automatic = true;

@@ -101,7 +101,11 @@ projection as a force-directed canvas: pan, wheel zoom, hover to inspect, click
 any node to open its static slice (neighbours, and a link to the host inventory
 page or the source file). Type in the search box to narrow by label or id, and
 toggle the per-type chips (host/skill/doc/tag) to filter — the counter follows
-the same set the renderer draws. Every click is a fetched JSON slice — no daemon. The
+the set the renderer uses. Hovering a node, or searching, lights it and its
+neighbours while dimming the rest. The filter lives in the URL
+(`#kg?q=frieren&types=host,doc`), so a filtered view is a link you can send;
+opening one lands directly on the graph. Every click is a fetched JSON slice —
+no daemon. The
 definition lives in `lib/aki-site.nix`; `task checks:kg:canvas` proves it by
 driving headless Chrome through the click, and `task checks:kg:native` holds the
 cold bootstrap to **median < 20 ms** with no `nix` subprocess.

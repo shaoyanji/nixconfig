@@ -213,8 +213,12 @@ tasks:
       tested through the interface an operator uses. It also drives the filters
       as a user would: typing `frieren` into the real search box must shrink the
       visible set, keep `host:frieren` visible and update the counter; toggling
-      the `doc` chip off must hide exactly the doc count and leave hosts. Both
-      expected counts come from the data, never from a hardcoded number. Uses
+      the `doc` chip off must hide exactly the doc count and leave hosts. A
+      `qmd` search must DRAW the matches plus their neighbours (derived from the
+      edge list) while lighting only the matches, and a cold load of
+      `#kg?q=frieren&types=host,doc` must land on the graph, restore the box and
+      chips, and draw exactly the filtered set. Every expected count comes from
+      the data, never from a hardcoded number. Uses
       an ephemeral port and verifies the served page is this site (8787 was
       Readarr on frieren). SKIP_BROWSER=1 runs the static half only. Cost: ~15 s.
       Exit 0 = clean.

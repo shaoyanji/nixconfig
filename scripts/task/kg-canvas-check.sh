@@ -13,12 +13,19 @@
 #             an operator, not by CI.
 #   3. SHELL. index.html must load the canvas script and the script must parse;
 #             the slice must carry the search box and a chip per node type.
-#   4. FILTER. Type a label into the real search box: the visible set must
+#   4. FILTER. Type a label into the real search box: the match set must
 #             shrink, the typed node must remain visible, and the counter must
-#             follow the same set. Toggle the `doc` chip off: exactly the doc
-#             count disappears, hosts stay. Restore, and the full 225 return.
-#             Counts come from the data, never hardcoded.
-#   5. CLICK. With `agent-browser` present, click the Knowledge Graph tab, wait
+#             follow it. Toggle the `doc` chip off: exactly the doc count
+#             disappears, hosts stay. Restore, and the full 225 return. Counts
+#             come from the data, never hardcoded.
+#   5. NEIGHBOURS. Searching `qmd` must DRAW the matches plus their 1-hop
+#             neighbours (so the cluster is visible) while lighting only the
+#             matches. Expected size is derived from the edge list.
+#   6. SHARE. Load `#kg?q=frieren&types=host,doc` cold: it must land on the
+#             graph rather than Overview, restore the box and the chips, and
+#             draw exactly the nodes the filter names; editing the box must
+#             update the hash an operator would copy.
+#   7. CLICK. With `agent-browser` present, click the Knowledge Graph tab, wait
 #             for the canvas to load 225 nodes, dispatch a click at
 #             host:frieren's screen position, and require the breadcrumb to
 #             become "fleet / knowledge-graph / host:frieren". This is the exact
@@ -185,6 +192,23 @@ else
     *) bad "counter did not follow the filter: '$s_count'" ;;
   esac
 
+  # Neighbour highlight. `qmd` is used deliberately: its matches (skill:qmd plus
+  # a doc) have tag neighbours that do NOT match the query, so the lit set must
+  # be strictly larger than the match set. `frieren` cannot prove this — every
+  # one of its neighbours also matches, which is exactly the blind spot a
+  # hardcoded query would leave.
+  expect_drawn="$(jq '[.nodes[] | select(((.label|ascii_downcase)|contains("qmd")) or ((.id|ascii_downcase)|contains("qmd")))] as $m | [.edges[] | select(((.from as $f | $m|map(.id)|index($f)) != null) or ((.to as $t | $m|map(.id)|index($t)) != null))] | map(.from,.to) | unique | length' "$SITE/data/kg-graph.json")"
+  agent-browser eval '(() => { const i = document.getElementById("kg-search"); i.value = "qmd"; i.dispatchEvent(new Event("input")); return "typed"; })()' >/dev/null 2>&1 || true
+  focused="$(eval_json 'JSON.stringify({visible: window.__kgDebug.visible(), drawn: window.__kgDebug.drawn(), focus: window.__kgDebug.focus()})')"
+  f_visible="$(jq -r '.visible' <<<"$focused" 2>/dev/null || echo 0)"
+  f_drawn="$(jq -r '.drawn' <<<"$focused" 2>/dev/null || echo 0)"
+  f_focus="$(jq -r '.focus' <<<"$focused" 2>/dev/null || echo 0)"
+  if [ "$f_drawn" = "$expect_drawn" ] && [ "$f_drawn" -gt "$f_visible" ] && [ "$f_focus" = "$f_visible" ]; then
+    ok "search draws its neighbourhood ($f_visible matches lit, $f_drawn drawn with neighbours)"
+  else
+    bad "neighbour highlight wrong: $focused (expected drawn=$expect_drawn > matches=$f_visible, lit=$f_visible)"
+  fi
+
   # Type filter. Clearing the query first isolates the chip, and the expected
   # count is derived from the data (not hardcoded), so adding a host cannot
   # silently weaken this assertion.
@@ -215,11 +239,37 @@ else
   else
     bad "click did not navigate (breadcrumbs: $crumbs)"
   fi
+
+  # Shareable view. Aki transitions never touch the URL, so the hash is the only
+  # state a filtered view has; loading it must land ON the graph (not Overview),
+  # restore the box and the chips, and draw exactly the nodes the filter names.
+  expect_hash="$(jq '[.nodes[] | select((.type == "host" or .type == "doc") and (((.label|ascii_downcase)|contains("frieren")) or ((.id|ascii_downcase)|contains("frieren"))))] | length' "$SITE/data/kg-graph.json")"
+  agent-browser open "http://127.0.0.1:$PORT/#kg?q=frieren&types=host,doc" >/dev/null 2>&1 || true
+  sleep 1
+  shared="$(eval_json 'JSON.stringify({crumbs: document.getElementById("breadcrumbs").textContent, visible: window.__kgDebug ? window.__kgDebug.visible() : -1, q: document.getElementById("kg-search") ? document.getElementById("kg-search").value : null, chips: [].slice.call(document.querySelectorAll("[data-kg-type]")).map(function (c) { return c.getAttribute("data-kg-type") + "=" + (c.classList.contains("nav-active") ? "on" : "off"); }).join(",")})')"
+  h_crumbs="$(jq -r '.crumbs' <<<"$shared" 2>/dev/null || echo "")"
+  h_visible="$(jq -r '.visible' <<<"$shared" 2>/dev/null || echo -1)"
+  h_q="$(jq -r '.q' <<<"$shared" 2>/dev/null || echo "")"
+  h_chips="$(jq -r '.chips' <<<"$shared" 2>/dev/null || echo "")"
+  if [[ "$h_crumbs" == *"knowledge-graph"* ]] && [ "$h_visible" = "$expect_hash" ] && [ "$h_q" = "frieren" ] && [ "$h_chips" = "host=on,skill=off,doc=on,tag=off" ]; then
+    ok "#kg?q=frieren&types=host,doc opens the graph with $h_visible matching nodes"
+  else
+    bad "shareable hash did not restore the view: $shared (expected visible=$expect_hash, chips host=on,skill=off,doc=on,tag=off)"
+  fi
+
+  # Writing the other direction: an edit must update the hash an operator would
+  # copy out of the address bar.
+  agent-browser eval '(() => { const i = document.getElementById("kg-search"); i.value = "eisen"; i.dispatchEvent(new Event("input")); return "typed"; })()' >/dev/null 2>&1 || true
+  hash_now="$(agent-browser eval 'window.location.hash' 2>/dev/null | tr -d '\n' || true)"
+  case "$hash_now" in
+    *q=eisen*) ok "typing updates the URL ($hash_now)" ;;
+    *) bad "typing did not update the hash (got '$hash_now')" ;;
+  esac
 fi
 
 echo
 if [ "$fail" = 0 ]; then
-  echo "kg-canvas-check: ok — data, slices, filters, and node-click navigation agree"
+  echo "kg-canvas-check: ok — data, slices, filters, neighbours, and node-click navigation agree"
 else
   echo "kg-canvas-check: FAILED — see the FAIL lines above"
 fi

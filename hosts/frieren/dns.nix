@@ -17,8 +17,12 @@
   # failover set and moves the route to the survivor (~15 s).
   #
   # pihole-ftl already listens on 0.0.0.0:53, so nothing else has to change for
-  # it to answer on the bound address — verified before adding this.
-  profiles.tailnetDnsAddress.enable = true;
+  # it to answer on the bound address — verified before adding this. The module
+  # also advertises the /32; only the LAN route is declared here.
+  profiles.tailnetDnsAddress = {
+    enable = true;
+    advertiseRoutes = ["192.168.3.0/24"];
+  };
 
   # --- primary resolver role (HC-3) -----------------------------------------
   # The reusable resolver core — unbound + pihole-ftl's filtering config + the
@@ -91,11 +95,11 @@
   # boot — survives without re-auth, unlike extraUpFlags.
   # (useRoutingFeatures = "both" is inherited from desktop-client.nix.)
   services.tailscale.extraSetFlags = [
-    # One flag, comma-separated: `tailscale set --advertise-routes` replaces the
-    # whole set, so two flags would leave only the last one in force.
-    "--advertise-routes=192.168.3.0/24,10.99.0.53/32"
     "--ssh=true"
   ];
+  # The advertised routes (`192.168.3.0/24` + the DNS /32) are composed by
+  # profiles/tailnet-dns-address.nix from `advertiseRoutes`, so they cannot
+  # drift from the address this host actually binds.
 
   # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively,
   # and route *.frieren.lan queries to the local Pi-hole stack.

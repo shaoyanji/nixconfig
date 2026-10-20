@@ -5,7 +5,7 @@
 > design rationale lives in [`AGENTS.nix`](AGENTS.nix) (`task ops:notes`).
 > Budget: 150 lines (`.agents/SCHEMA.md` §2).
 
-## Current state (2026-10-19)
+## Current state (2026-10-20)
 
 | Area | State | Evidence |
 | :--- | :--- | :--- |
@@ -19,9 +19,26 @@
 | Observation | frieren sentinel: 15-min ledger, health endpoint, gatus body assertion | `task ops:health`, `/var/lib/fleet-sentinel/` |
 | Knowledge | qmd (prose) + `.#knowledgeGraph` (structure) + sentinel ledger (episodic) | `task ops:kg`, `task ops:ledger` |
 | Backups | local + BurgerNAS offsite; restore drill weekly; password in sops | `restic-drill.timer`, `task checks:restic:drill` |
-| DNS | single resolver (frieren) — failover group still 1 member | `task checks:dns:failover` (exit 2 = not evaluable) |
+| DNS | resolver pair: frieren pihole+unbound, delphi crab-hole, one shared `10.99.0.53` | `task checks:dns:failover` |
+| Tailnet routes | `10.99.0.53/32` advertised by both, **approved by neither** | `task ops:tailnet:routes` (exit 1) |
 
 ## Ledger
+
+### 2026-10-20 — Tailnet route approval is tailnet state, not host state
+
+- `10.99.0.53/32` was advertised on **both** nodes and approved on **neither**
+  (`enabledRoutes` held only `192.168.3.0/24` and `0.0.0.0/0,::/0`), so the "failover
+  pair" served nothing off-host: advertising is an offer, only approval injects a route.
+- New gate `ops:tailnet:routes` (`scripts/task/tailnet-routes.sh`) prints OFFERED /
+  APPROVED / UNAPPROVED per device and exits non-zero on drift; `ops:tailnet:approve
+  HOST=` writes. Verified: report exits 1 with two pending routes, approve answers 403.
+- The sops OAuth client is scope `all:read` — it reports, it cannot approve. The durable
+  fix is an `autoApprovers` rule; the console is the unblocked path.
+- Tailnet DNS is a **separate** switch and still empty (`global: []`, `split DNS: {}`):
+  approval makes the address reachable, nameservers decide whether clients ask it.
+- `profiles/tailnet-dns-address.nix` composes `--advertise-routes` from `advertiseRoutes`
+  + the service `/32` and owns `exitNode` (delphi is an approved exit node), asserting
+  exactly one such flag reaches `tailscale set`; eval'd flags byte-identical on both.
 
 ### 2026-10-20 — delphi: the user sops plane is derived, not copied
 
@@ -74,17 +91,6 @@
 - eisen's Laya/Kev-4B endpoints were unreachable during the bench (all three
   timeouts), so those runners are SKIPPED, not scored.
 
-### 2026-10-19 — Rebuild path de-bloated
-
-- `infra:switch:*` no longer runs `warm-host.sh --check` first. That hook forced
-  the whole host toplevel (`drvPath`, `outPath`, `nix build --dry-run`) before
-  every local switch — a duplicate of the work the switch itself does. The gate
-  remains as `checks:build:route` and is CI/operator-only.
-- `nom` is now opt-in (`NOM=1`), set by `agents:menu:rebuild` (the human TUI).
-  Agent/local rebuilds run plain and preserve the real exit status.
-- `checks:quick` is documented as repo hygiene, not a pre-rebuild step; its
-  header and the `task-plane` skill carry the rule.
-
 ### 2026-10-19 — Context plane mk2
 
 - **Home AGENTS.md is a flake output.** `lib/home-agents.nix` renders
@@ -118,31 +124,18 @@ Evidence: `nix eval .#agentSkills.count` → 43; `.#knowledgeGraph.graph.stats`
 → `{docs:21, edges:416, hosts:34, skills:43}`; `task checks:tasks` clean;
 `task ops:skills` lists the index.
 
-### 2026-10-17 — Closure budget baseline corrected
-
-- Fixed the closure measurement cache key (`/run/current-system` was pinned
-  before `readlink -f`, so every cached report repeated the first generation).
-- Real frieren closure: **29.9 GiB / 3229 paths**; baseline adopted
-  `32104328080` bytes, budget +1.0 % (306.2 MiB) headroom.
-
-### 2026-10-15 — Eval-granularity defect (EXP-114)
-
-- `nix flake check` measured 339.78 s / 6078.5 MiB / SIGKILL 137 on frieren.
-- `checks.<system>` no longer forces a host; per-host gate moved to
-  `hostChecks.<arch>.<host>` (13.16 s / 720 MiB for frieren).
-- Agent verification protocol rewritten: whole-toplevel eval per host, never
-  `config.networking.hostName` as a "check".
-
-### 2026-10-14 — NAS path governor (EXP-103)
-
-- LAN-first NFS with verified tailnet fallback, `OnFailure` governor, `nix-gc`
-  guard for GC roots on an absent NAS. Reboot path still unverified.
+> Retired to history on 2026-10-20 to keep this document inside its 150-line budget:
+> rebuild-path de-bloat and `nom` opt-in (10-19), closure-budget baseline (10-17),
+> the `nix flake check` eval-granularity defect EXP-114 (10-15), and the NAS path
+> governor (10-14). See `docs/history/audit-2026-10.md`.
 
 ## Open debt (tracked in TODO.md)
 
 1. `minyx` kernel conflict and `cassini` darwin assertion — both dormant, both
    reproducible with `MODE=eval`.
-2. DNS failover group has one member (HC-3); `checks:dns:failover` exits 2.
+2. `10.99.0.53/32` is advertised by both resolver nodes but approved by neither, so
+   the pair has no serving member off-host; `ops:tailnet:routes` exits 1 until the
+   console approval or an `autoApprovers` rule lands.
 3. MQTT broker has no publisher/subscriber (HC-5); 7 of 11 `extraComponents`
    entries are dormant Python dependencies, not enabled components.
 4. Sentinel is frieren-local; fleet push is P1 in `ARCHITECTURE.md`.

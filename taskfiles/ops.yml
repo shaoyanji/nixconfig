@@ -442,6 +442,33 @@ tasks:
           || echo "sentinel: no status.json here (fleet-sentinel not enabled on this host?)"
         bash scripts/task/kg-ask.sh "what touches $h"
 
+  ops:tailnet:routes:
+    desc: "[gate] Every advertised Tailscale route is actually approved"
+    summary: >
+      Advertised (`--advertise-routes`) and in-force (`enabledRoutes`) are two
+      different facts, and only the second one carries traffic: approval is
+      tailnet state, so no host eval can prove it. Prints OFFERED / APPROVED /
+      UNAPPROVED per device and exits 1 when any offered route is not in force.
+      Reads tailnet state through the sops OAuth client (scope `all:read`); no
+      nix, no host eval. Exit 0 = all approved or nothing advertised, 1 =
+      divergence, 2 = no usable credential.
+    cmds:
+      - bash scripts/task/tailnet-routes.sh
+
+  ops:tailnet:approve:
+    desc: "[destructive] Approve HOST's advertised Tailscale routes (needs write token)"
+    summary: >
+      Approves every route HOST advertises, so a new /32 or subnet stops being a
+      silent no-op. Changes tailnet routing, hence the explicit HOST and the
+      destructive tag. The sops OAuth client is read-only (an approve attempt
+      answers HTTP 403), so this needs TAILSCALE_API_TOKEN with write scope, or
+      that client's scope widened. Prefer the admin console or an autoApprovers
+      block in the policy file for anything that should persist.
+    requires:
+      vars: [HOST]
+    cmds:
+      - bash scripts/task/tailnet-routes.sh --approve "{{.HOST}}"
+
   ops:docs:budget:
     desc: Check living documents against the SCHEMA.md budgets (stubs stay stubs)
     summary: >

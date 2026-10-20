@@ -141,9 +141,117 @@ sudo systemctl stop pihole-ftl        # on frieren — clients must keep resolvi
 sudo systemctl start pihole-ftl
 ```
 
+## The tailnet layer: approval, DNS, and the two switches that are not one
+
+A tailnet resolver pair adds two switches that look related and are not. Both are
+**tailnet state**, so no host eval can prove either — the config can be perfect
+while the pair serves nothing.
+
+| Switch | Where it lives | What it decides | Today (2026-10-20) |
+| :--- | :--- | :--- | :--- |
+| **Route approval** | `enabledRoutes` on the device | whether packets to `10.99.0.53` are delivered at all | advertised on **both**, approved on **neither** |
+| **Nameservers** | tailnet DNS settings | whether tailnet clients *ask* `10.99.0.53` | none: `global: []`, `split DNS: {}`, MagicDNS on |
+
+`tailscale set --advertise-routes` records an **offer**. Tailscale serves an
+offered subnet route only after approval (admin console, API, or an
+`autoApprovers` rule), and `tailscale status` on the router shows the offer either
+way — which is exactly how a "failover pair" sat configured-but-inert.
+
+Measured, before any approval:
+
+```
+delphi     OFFERED 0.0.0.0/0,10.99.0.53/32,::/0    APPROVED 0.0.0.0/0,::/0
+frieren    OFFERED 192.168.3.0/24,10.99.0.53/32     APPROVED 192.168.3.0/24
+```
+
+### Approve the route
+
+```bash
+task ops:tailnet:routes                 # gate: prints OFFERED/APPROVED/UNAPPROVED, exits non-zero on drift
+task ops:tailnet:approve HOST=frieren   # [destructive] approves everything that host advertises
+```
+
+`ops:tailnet:routes` works today: it reads through the sops OAuth client, whose
+scope is **`all:read`** — enough to report, and `--approve` against it answers
+`HTTP 403 calling actor does not have enough permissions`. To approve without the
+console, either widen that OAuth client (Settings → OAuth clients) to `all`, or
+export a write token:
+
+```bash
+TAILSCALE_API_TOKEN=tskey-api-… task ops:tailnet:approve HOST=frieren
+```
+
+Console path (no credential needed): **Machines → `<device>` → Edit route
+settings → check `10.99.0.53/32` → Save**. Do it for **both** nodes; an approved
+pair is active-passive on the same prefix, so approving one is a single-member
+group again.
+
+### Make it survive, with `autoApprovers`
+
+Approval is per device and is lost when a node is re-registered, so the durable
+form is a policy rule. Both nodes are user-authenticated and untagged
+(`tags: []`), so list the login, not a tag:
+
+```jsonc
+"autoApprovers": {
+  "routes": {
+    "10.99.0.53/32": ["<your-login-email>"],
+    "192.168.3.0/24": ["<your-login-email>"],
+  },
+}
+```
+
+Tags would work too but change key-expiry semantics, and these are servers (key
+expiry is already disabled on both). Writing the policy file needs
+`policy_file` write scope — the current credential cannot.
+
+### Point clients at it (the second switch)
+
+Approval only makes `10.99.0.53` **reachable**. Clients still resolve through
+their own resolvers until the tailnet DNS page says otherwise, and there are two
+shapes with different blast radius:
+
+* **Split DNS for `frieren.lan` → `10.99.0.53`.** The narrow one: only
+  `*.frieren.lan` lookups go to the pair, everything else keeps the device's own
+  resolver. Do not enable *Override DNS servers*. This is the default choice.
+* **Global nameserver `10.99.0.53` + Override DNS servers.** Every tailnet query
+  then depends on frieren or delphi, and you get the ad-blocking tailnet-wide.
+  Two consequences: a phone on hotel Wi-Fi loses DNS when both nodes are down,
+  and devices using an exit node use the **exit node** for DNS unless that
+  nameserver is marked *Use with exit node* (delphi is an exit node — see below).
+
+Tailscale cannot order nameservers deterministically, so do not list
+`192.168.3.25` and `10.99.0.53` expecting fallback: a client may query either
+first. That is why the pair shares one address instead of being two entries.
+
+### Traps that belong to this design
+
+* **`--accept-routes` on a member.** Tailscale's own HA guidance warns that a
+  standby router which accepts routes can accept *its own* advertised prefix from
+  the primary — traffic hairpins through the other node. delphi sets
+  `--accept-routes=true` deliberately (it wants the LAN `192.168.3.0/24`); the
+  local `lo` bind is what keeps a direct query from looping.
+* **delphi is an exit node** (`advertiseRoutes` empty, `exitNode = true`):
+  `0.0.0.0/0,::/0` are approved, so OCI egress is a bandwidth decision there.
+* **The advertisement is now composed, not written.**
+  `profiles/tailnet-dns-address.nix` appends the service `/32` to
+  `advertiseRoutes` and emits the single comma-separated
+  `--advertise-routes=` flag (there is an assertion against a hand-written
+  second one, because `tailscale set` *replaces* the route set). Eval'd values
+  after the refactor are byte-identical to what the hosts carried before:
+  `frieren: --advertise-routes=192.168.3.0/24,10.99.0.53/32`,
+  `delphi: --advertise-routes=10.99.0.53/32 --advertise-exit-node`.
+* **`extraSetFlags` applies at boot**, through `tailscaled-set.service`; a switch
+  does not re-run it. Changing routes needs a
+  `sudo tailscale set --advertise-routes=…` now plus the reboot-order fix later.
+  Re-read `AdvertiseRoutes` vs `PrimaryRoutes`: the first is the offer, the second
+  is what is in force.
+
 ## Related
 
 * `modules/profiles/dns-failover.nix` — the module
+* `modules/profiles/tailnet-dns-address.nix` — the `lo` bind + composed advertisement
+* `scripts/task/tailnet-routes.sh` — `ops:tailnet:routes` / `ops:tailnet:approve`
 * `scripts/task/dns-failover-check.sh` — the check behind `checks:dns:failover`
 * `hosts/frieren/dns.nix` — the primary declaration
 * `docs/frieren-access.md` — service-access matrix

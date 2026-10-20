@@ -150,6 +150,48 @@ in {
     };
   };
 
+  xdg.mimeApps = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+    enable = true;
+    defaultApplications = {
+      # Directories / Folders -> Nautilus
+      "inode/directory" = ["org.gnome.Nautilus.desktop"];
+
+      # Web & HTML -> Zen Browser
+      "text/html" = ["zen-beta.desktop"];
+      "x-scheme-handler/http" = ["zen-beta.desktop"];
+      "x-scheme-handler/https" = ["zen-beta.desktop"];
+      "x-scheme-handler/about" = ["zen-beta.desktop"];
+      "x-scheme-handler/unknown" = ["zen-beta.desktop"];
+      "application/xhtml+xml" = ["zen-beta.desktop"];
+
+      # Documents / PDFs
+      "application/pdf" = ["zen-beta.desktop" "mupdf.desktop"];
+
+      # Images -> imv
+      "image/png" = ["imv.desktop"];
+      "image/jpeg" = ["imv.desktop"];
+      "image/gif" = ["imv.desktop"];
+      "image/webp" = ["imv.desktop"];
+      "image/bmp" = ["imv.desktop"];
+      "image/svg+xml" = ["imv.desktop" "zen-beta.desktop"];
+
+      # Audio & Video -> mpv.
+      # Wildcards (`video/*`) are NOT MIME types: the XDG spec has no glob
+      # matching, so those two lines were silently ignored and every video
+      # opened in whatever the desktop guessed. Explicit types are the only
+      # form `xdg-mime` honours.
+      "video/mp4" = ["mpv.desktop"];
+      "video/x-matroska" = ["mpv.desktop"];
+      "video/webm" = ["mpv.desktop"];
+      "video/quicktime" = ["mpv.desktop"];
+      "audio/mpeg" = ["mpv.desktop"];
+      "audio/flac" = ["mpv.desktop"];
+      "audio/ogg" = ["mpv.desktop"];
+      "audio/mp4" = ["mpv.desktop"];
+      "audio/x-wav" = ["mpv.desktop"];
+    };
+  };
+
   home = {
     username = user.name;
     # mkDefault: on darwin the target's own default is /Users/<user>, and two
@@ -165,6 +207,7 @@ in {
         mupdf
       ]
       ++ lib.optionals stdenv.hostPlatform.isLinux [
+        imv
         lm_sensors
         ethtool
         iotop

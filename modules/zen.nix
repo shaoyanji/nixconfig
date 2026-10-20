@@ -1,12 +1,22 @@
 {
   inputs,
   pkgs,
+  config,
+  lib,
   ...
 }: {
   imports = [
     inputs.zen-browser.homeModules.beta
     ./aria2.nix
   ];
+
+  # Zen expects profiles under ~/.zen on Linux, but the flake's Home Manager
+  # module populates ~/.config/zen. Mirror the out-of-store symlink pattern
+  # from nixoshmsymlinks.nix so all hosts resolve profiles consistently.
+  home.file = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux && config.programs.zen-browser.enable) {
+    ".zen".source = config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/zen";
+  };
+
   programs = {
     zen-browser = {
       enable = true;

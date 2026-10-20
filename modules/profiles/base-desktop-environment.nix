@@ -24,6 +24,16 @@ in {
   # plus any other libsecret users). Without it agy fails at every launch:
   # "failed to retrieve token: secret keyring is locked" + DBUS warnings.
   services.gnome.gnome-keyring.enable = true;
+  # File-manager plumbing Nautilus assumes but NixOS does not enable. Without
+  # gvfs, `trash://` and network locations fail; without tumbler no thumbnail
+  # is ever rendered (which also makes the image/video handlers look broken);
+  # without udisks2 removable media never appears, and upower is what draws a
+  # battery at all. All four are inert on a host that never opens a file manager.
+  services.gvfs.enable = true;
+  services.udisks2.enable = true;
+  services.tumbler.enable = true;
+  services.upower.enable = true;
+
   security.pam.services = {
     login.enableGnomeKeyring = true;
     greetd.enableGnomeKeyring = true; # no-op on hosts not using greetd

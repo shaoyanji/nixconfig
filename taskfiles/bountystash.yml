@@ -45,13 +45,28 @@ tasks:
     desc: Deploy preview branch to Cloudflare Pages (generates unique URL)
     cmds:
       - task: bountystash:build
-      - nix-shell -p wrangler --run "cd {{.BOUNTY_DIR}} && wrangler pages deploy dist --project-name={{.PROJECT_NAME}} --branch=preview"
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=preview"
 
   bountystash:deploy:prod:
     desc: Deploy live production to Cloudflare Pages (bountystash.com)
     cmds:
       - task: bountystash:build
-      - nix-shell -p wrangler --run "cd {{.BOUNTY_DIR}} && wrangler pages deploy dist --project-name={{.PROJECT_NAME}} --branch=main"
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=main"
+
+  # The Nix-rendered site (flake output `.#bountystash-site`). It deliberately
+  # does NOT run `bountystash:build`: that compiles the console's template into
+  # `dist/`, and deploying the Nix artifact means the artifact is the input.
+  bountystash:deploy:nix:preview:
+    desc: Deploy the Nix-rendered portfolio (.#bountystash-site) to a Pages preview branch
+    cmds:
+      - nix build --builders "" --out-link "/tmp/bountystash-site" .#bountystash-site
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/bountystash-site --project-name={{.PROJECT_NAME}} --branch=preview"
+
+  bountystash:deploy:nix:prod:
+    desc: "[destructive] Publish the Nix-rendered portfolio to bountystash.com"
+    cmds:
+      - nix build --builders "" --out-link "/tmp/bountystash-site" .#bountystash-site
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/bountystash-site --project-name={{.PROJECT_NAME}} --branch=main"
 
   bountystash:projects:
     desc: List all Cloudflare Pages projects in account

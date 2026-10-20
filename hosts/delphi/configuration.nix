@@ -94,9 +94,12 @@ in {
   # 10.99.0.53 on lo + the /32 advertised below form one half of the failover
   # group; frieren runs the same module and advertises the same route.
   # (Setting only `.address` does nothing — the bind is behind `enable`.)
+  # No `advertiseRoutes` here: delphi is a resolver and exit node, not a subnet
+  # router for a LAN it does not have.
   profiles.tailnetDnsAddress = {
     enable = true;
     address = dnsServiceAddress;
+    exitNode = true;
   };
 
   networking.hostName = "delphi";
@@ -132,10 +135,8 @@ in {
       # outage loop (the VRRP analogue is why profiles/dns-failover.nix probes
       # 127.0.0.1 and not the floating IP). crab-hole's own upstreams are DoT.
       "--accept-dns=false"
-      # Advertise the box as an exit node (approved once in the admin console).
-      "--advertise-exit-node"
-      # Join the failover group: frieren advertises the same /32.
-      "--advertise-routes=${dnsServiceAddress}/32"
+      # `--advertise-exit-node` and the `/32` route are emitted by
+      # profiles/tailnet-dns-address.nix (`exitNode = true`), not here.
     ];
   };
 

@@ -43,6 +43,12 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
 9. **The closed loop is real:** `fleet-sentinel` records jobs, generation age,
    disk and PSI every 15 min; gatus pages on `[BODY].state != ok`. A green
    socket is not a successful job — read the ledger.
+10. **TOON is the IR: consume it, emit it, and let the machine own the formats.**
+    JSON is the linking layer a program consumes; TOON is its projection for an
+    agent. TOML, YAML and Nix are source truth and cross the boundary in their own
+    tools (`yq -p toml -o json`, `nix eval --json`, `toon -d | yq -o yaml`), never
+    by hand. Repair only the interface: `task dev:toon:fix` recounts `[n]`, and
+    `checks:toon` / `checks:toon:surfaces` keep both rules true.
 
 ## Home Initialization & Tautological Control Plane
 
@@ -175,8 +181,8 @@ task ops:notes KIND=open STATUS=OPEN    # List active open backlog across fleet
 task ops:notes:module PATH=<path>       # Reverse lookup: which notes touch this module
 task ops:notes:task TASK=<task>         # Reverse lookup: why does this task exist
 task ops:notes:search Q="<phrase>"      # Fast substring search across all notes
-nix eval --json .#agentsNotes.byHost.<h> # Machine-readable note IDs for host (0.2s)
-nix eval --json .#agentsNotes.open      # All open note IDs (0.2s)
+nix eval --json .#agentsNotes.byHost.<h> | toon -e # Machine-readable note IDs for host (0.2s)
+nix eval --json .#agentsNotes.open | toon -e      # All open note IDs (0.2s)
 
 # --- Knowledge Graph Queries (Hosts x Skills x Docs) ---
 # Do NOT raw-grep for structural relationships. Query the compiled graph.
@@ -1064,7 +1070,7 @@ The `checks:qmd:*` tasks exit 1 when a collection is missing or any `.md` file i
 qmd search "impermanence disko" -c nixconfig   # repo docs only
 qmd search "zettel topic" -c vault             # vault only
 qmd search "query"                             # all collections
-qmd search "query" --json                      # agent-friendly output
+qmd search "query" --json | toon -e                      # agent-friendly output
 qmd get "#docid"                               # fetch a full document from search results
 qmd status                                     # index health and file counts
 qmd update                                     # incremental reindex (fast, BM25)
@@ -1072,7 +1078,7 @@ qmd update                                     # incremental reindex (fast, BM25
 
 Prefer BM25 `qmd search` (instant); `qmd embed` (semantic vectors) is optional and slower. Prefer qmd over raw `grep` when locating concepts or runbooks across repo docs and the vault — it is ranked and collection-scoped.
 
-**Structural queries are the graph, not `grep`.** `.#knowledgeGraph` compiles hosts × skills × docs; `task ops:kg:*` are the six fixed traversals for "what touches X". The Elixir sidecar is the DEFAULT path: `kg-query.sh` answers from its socket when live (28 ms vs ~476 ms on a dirty tree), falls back to jq byte-identically, and `checks:kg:sidecar` proves both agree — it starts at login (`programs.kgSidecar`) from the COMPILED graph. `--native` is the parity experiment (`checks:kg:native`, part of `checks:quick`), not the query path; `ops:kg:blast` is the reverse closure that jq has no one-liner for.
+**Structural queries are the graph, not `grep`.** `.#knowledgeGraph` compiles hosts × skills × docs; `task ops:kg:*` are the six fixed traversals for "what touches X". The Elixir sidecar is the DEFAULT path: `kg-query.sh` answers from its socket when live (32 ms vs 441 ms for the same question through jq on this tree; `task ops:kg:speed` re-measures both), falls back to jq byte-identically, and `checks:kg:sidecar` proves both agree — it starts at login (`programs.kgSidecar`) from the COMPILED graph. `--native` is the parity experiment (`checks:kg:native`, part of `checks:quick`), not the query path; `ops:kg:blast` is the reverse closure that jq has no one-liner for.
 
 ---
 

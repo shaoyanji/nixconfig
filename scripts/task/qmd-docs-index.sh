@@ -13,7 +13,7 @@ set -euo pipefail
 
 MODE="${1:-ensure}"
 TARGET="${2:-all}"
-REPO="$(git rev-parse --show-toplevel 2>/dev/null || echo "/Volumes/data/projects/nixconfig")"
+REPO="$(git rev-parse --show-toplevel)"
 VAULT_DIR="/Volumes/data/Obsidian-Git-Sync"
 if [ ! -d "$VAULT_DIR" ] && [ -d "$HOME/vaults/personal" ]; then
   VAULT_DIR="$(readlink -f "$HOME/vaults/personal" 2>/dev/null || echo "$HOME/vaults/personal")"

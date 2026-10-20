@@ -153,7 +153,7 @@
             if [ "$AVAIL_GB" -lt "$MIN_HEADROOM_GB" ]; then
               MSG="⚠️ [Audible Liberation Skipped] Storage headroom too low (''${AVAIL_GB} GB free < ''${MIN_HEADROOM_GB} GB threshold). Pausing liberation."
               echo "$MSG" >&2
-              SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
+              SIMPLEX_RPC="${../../modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py}"
               if [ ! -f "$SIMPLEX_RPC" ]; then
                 SIMPLEX_RPC="${user.home}/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
               fi
@@ -202,7 +202,7 @@
             fi
 
             # 4. Dispatch status report to SimpleX #Fleet
-            SIMPLEX_RPC="/Volumes/data/projects/nixconfig/modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py"
+            SIMPLEX_RPC="${../../modules/user/ai/skills/simplex-admin/scripts/simplex-rpc.py}"
             if [ ! -f "$SIMPLEX_RPC" ]; then
               SIMPLEX_RPC="${user.home}/.gemini/config/skills/simplex-admin/scripts/simplex-rpc.py"
             fi

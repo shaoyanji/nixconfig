@@ -125,6 +125,17 @@ tasks:
     cmds:
       - bash scripts/task/kg-query.sh stats --top {{.TOP | default 12}}
 
+  ops:kg:speed:
+    desc: Measure one graph question on both traversal paths (sidecar vs jq)
+    summary: >
+      Runs the same query through kg-query.sh N times per path and prints the
+      mean wall time, so the sidecar's speed is a command a reader can re-run
+      rather than a number in a paragraph. NODE defaults to frieren; RUNS=5.
+      Exits 0 = measured. If the socket is not live both columns measure the jq
+      path, and it says so instead of reporting a fake win.
+    cmds:
+      - RUNS={{.RUNS | default "5"}} bash scripts/task/kg-speed.sh {{.NODE | default "frieren"}}
+
   ops:kg:sidecar:
     desc: Manage or query the in-memory Elixir reactive Knowledge Graph sidecar
     summary: >

@@ -37,12 +37,48 @@ tasks:
       repo whose default is every host.
     cmds:
       - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets
+      - task checks:repo:paths
+      - task checks:toon
+      - task checks:toon:surfaces
       - task checks:tasks
       - task checks:kg
       - task checks:kg:native
       - task checks:nix:lint
       - task checks:sops:drift
       - task checks:modules:validate
+
+  checks:toon:surfaces:
+    desc: "[gate] Agent-facing docs pipe JSON into toon, never into the reader"
+    summary: >
+      Scans AGENTS.md, .agents/README.md, .agents/SCHEMA.md and every skill for a
+      command that emits JSON straight to a reader. A pipeline into `jq` or a
+      redirect to a file is a program consumer and stays JSON; anything else must
+      pipe into `toon -e`, or carry `json-ok: <reason>`. Joins backslash
+      continuations first, so a two-line pipeline is judged as one command.
+    cmds:
+      - bash scripts/task/toon-surfaces.sh
+
+  checks:toon:
+    desc: "[gate] TOON array lengths are counted, and every tracked .toon strict-decodes"
+    summary: >
+      The `[n]` header is a row count. An agent writing TOON by hand counts rows
+      itself and gets it wrong, and strict decode then refuses the document, so
+      the gate proves the repair path instead of the author's arithmetic: a wrong
+      under-count and a wrong over-count are both repaired to the counted value,
+      then every tracked `.toon` document must strict-decode. ~0.2 s, no host.
+    cmds:
+      - bash scripts/task/toon-check.sh
+
+  checks:repo:paths:
+    desc: "[gate] No tracked file hardcodes this machine's checkout path"
+    summary: >
+      A checkout path baked into a task, module or script works on exactly one
+      machine; the fleet deploys to every host and CI, where it does not exist.
+      Runs in ~0.1 s over tracked .sh/.py/.yml/.nix. Names the file, the line,
+      and the replacement to use. A line carrying `repo-path-ok:` with a reason
+      is accepted, for text that quotes a path rather than using one.
+    cmds:
+      - bash scripts/task/repo-paths.sh
 
   checks:tasks:
     desc: "[gate] Task graph integrity: duplicate task keys and dangling `task X` references"
@@ -822,10 +858,10 @@ tasks:
       queue priorities using non-autoregressive decision models.
     cmds:
       - |
-        if command -v systemone-decision >/dev/null 2>&1; then
-          systemone-decision --model julia-1 triage-system /home/devji/SYSTEM.md
+        if systemone-decision triage-system --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-decision --model julia-1 triage-system /home/devji/SYSTEM.md --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/engine.py --model julia-1 triage-system /home/devji/SYSTEM.md
+          python3 modules/services/systemone/engine.py --model julia-1 triage-system /home/devji/SYSTEM.md --fail-on-alert
         fi
 
   checks:decision:ensemble:
@@ -835,160 +871,160 @@ tasks:
       Nemotron-3-Ultra deliberation via Ollama when anomalies are detected.
     cmds:
       - |
-        if command -v systemone-ensemble >/dev/null 2>&1; then
-          systemone-ensemble audit-all
+        if systemone-ensemble audit-all --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble audit-all --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py audit-all
+          python3 modules/services/systemone/ensemble.py audit-all --fail-on-alert
         fi
 
   checks:decision:reconcile:
     desc: Run Nix flake self-healing & AST patch preflight ensemble check (EXP-066)
     cmds:
       - |
-        if systemone-ensemble reconcile --help >/dev/null 2>&1; then
-          systemone-ensemble reconcile
+        if systemone-ensemble reconcile --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble reconcile --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py reconcile
+          python3 modules/services/systemone/ensemble.py reconcile --fail-on-alert
         fi
 
   checks:decision:storage:
     desc: Run predictive Btrfs storage prognosis & rebalance synthesis check (EXP-067)
     cmds:
       - |
-        if systemone-ensemble storage-prognosis --help >/dev/null 2>&1; then
-          systemone-ensemble storage-prognosis
+        if systemone-ensemble storage-prognosis --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble storage-prognosis --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py storage-prognosis
+          python3 modules/services/systemone/ensemble.py storage-prognosis --fail-on-alert
         fi
 
   checks:decision:media:
     desc: Run multi-modal media metadata indexing & Kodi/Jellyfin NFO enricher check (EXP-068)
     cmds:
       - |
-        if systemone-ensemble media-enrich --help >/dev/null 2>&1; then
-          systemone-ensemble media-enrich
+        if systemone-ensemble media-enrich --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble media-enrich --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py media-enrich
+          python3 modules/services/systemone/ensemble.py media-enrich --fail-on-alert
         fi
 
   checks:decision:security:
     desc: Run zero-trust fleet telemetry anomaly & drop-rule synthesis check (EXP-069)
     cmds:
       - |
-        if systemone-ensemble fleet-security --help >/dev/null 2>&1; then
-          systemone-ensemble fleet-security
+        if systemone-ensemble fleet-security --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble fleet-security --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py fleet-security
+          python3 modules/services/systemone/ensemble.py fleet-security --fail-on-alert
         fi
 
   checks:decision:tailscale:
     desc: Run Tailscale mesh latency & DERP bypasser pre-harness check (EXP-070)
     cmds:
       - |
-        if systemone-ensemble tailscale-path --help >/dev/null 2>&1; then
-          systemone-ensemble tailscale-path
+        if systemone-ensemble tailscale-path --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble tailscale-path --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py tailscale-path
+          python3 modules/services/systemone/ensemble.py tailscale-path --fail-on-alert
         fi
 
   checks:decision:memory:
     desc: Run predictive memory PSI & zram compaction pre-harness check (EXP-071)
     cmds:
       - |
-        if systemone-ensemble memory-pressure --help >/dev/null 2>&1; then
-          systemone-ensemble memory-pressure
+        if systemone-ensemble memory-pressure --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble memory-pressure --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py memory-pressure
+          python3 modules/services/systemone/ensemble.py memory-pressure --fail-on-alert
         fi
 
   checks:decision:sops:
     desc: Run zero-leak secret rotator & SOPS rekey verifier pre-harness check (EXP-072)
     cmds:
       - |
-        if systemone-ensemble sops-rekey --help >/dev/null 2>&1; then
-          systemone-ensemble sops-rekey
+        if systemone-ensemble sops-rekey --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble sops-rekey --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py sops-rekey
+          python3 modules/services/systemone/ensemble.py sops-rekey --fail-on-alert
         fi
 
   checks:decision:kiwix:
     desc: Run offline Kiwix ZIM search with 0-byte download guarantee (EXP-074)
     cmds:
       - |
-        if systemone-ensemble kiwix-search --help >/dev/null 2>&1; then
-          systemone-ensemble kiwix-search
+        if systemone-ensemble kiwix-search --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble kiwix-search --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py kiwix-search
+          python3 modules/services/systemone/ensemble.py kiwix-search --fail-on-alert
         fi
 
   checks:decision:thermal:
     desc: Run Intel QuickSync VA-API thermal governor pre-harness check (EXP-081)
     cmds:
       - |
-        if systemone-ensemble vaapi-thermal --help >/dev/null 2>&1; then
-          systemone-ensemble vaapi-thermal
+        if systemone-ensemble vaapi-thermal --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble vaapi-thermal --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py vaapi-thermal
+          python3 modules/services/systemone/ensemble.py vaapi-thermal --fail-on-alert
         fi
 
   checks:decision:sqlite:
     desc: Run ephemeral SQLite in-memory buffer tuning & WAL compactor check (EXP-084)
     cmds:
       - |
-        if systemone-ensemble sqlite-buffer --help >/dev/null 2>&1; then
-          systemone-ensemble sqlite-buffer
+        if systemone-ensemble sqlite-buffer --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble sqlite-buffer --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py sqlite-buffer
+          python3 modules/services/systemone/ensemble.py sqlite-buffer --fail-on-alert
         fi
 
   checks:decision:cache:
     desc: Run Harmonia binary cache warming & GC pre-filter check (EXP-087)
     cmds:
       - |
-        if systemone-ensemble cache-warmer --help >/dev/null 2>&1; then
-          systemone-ensemble cache-warmer
+        if systemone-ensemble cache-warmer --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble cache-warmer --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py cache-warmer
+          python3 modules/services/systemone/ensemble.py cache-warmer --fail-on-alert
         fi
 
   checks:decision:ocr:
     desc: Run Paperless document deduplication & OCR confidence scoring check (EXP-088)
     cmds:
       - |
-        if systemone-ensemble paperless-ocr --help >/dev/null 2>&1; then
-          systemone-ensemble paperless-ocr
+        if systemone-ensemble paperless-ocr --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble paperless-ocr --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py paperless-ocr
+          python3 modules/services/systemone/ensemble.py paperless-ocr --fail-on-alert
         fi
 
   checks:decision:smart:
     desc: Run Smartd & Scrutiny predictive HDD failure and snapshot arbiter check (EXP-083)
     cmds:
       - |
-        if systemone-ensemble disk-smart --help >/dev/null 2>&1; then
-          systemone-ensemble disk-smart
+        if systemone-ensemble disk-smart --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble disk-smart --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py disk-smart
+          python3 modules/services/systemone/ensemble.py disk-smart --fail-on-alert
         fi
 
   checks:decision:vuln:
     desc: Run Flake input transitive vulnerability scanner & patch proposer check (EXP-097)
     cmds:
       - |
-        if systemone-ensemble vuln-proposer --help >/dev/null 2>&1; then
-          systemone-ensemble vuln-proposer
+        if systemone-ensemble vuln-proposer --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble vuln-proposer --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py vuln-proposer
+          python3 modules/services/systemone/ensemble.py vuln-proposer --fail-on-alert
         fi
 
   checks:decision:govern:
     desc: Run consolidated Fleet Governor with Kelly dual-model consensus & auto-repair gate
     cmds:
       - |
-        if systemone-ensemble govern --help >/dev/null 2>&1; then
-          systemone-ensemble govern
+        if systemone-ensemble govern --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
+          systemone-ensemble govern --fail-on-alert
         else
-          python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py govern
+          python3 modules/services/systemone/ensemble.py govern --fail-on-alert
         fi
 
   checks:status:

@@ -54,7 +54,7 @@ pkgs.writeShellApplication {
 
     Examples:
       freebuff-headless "Explain the project layout"
-      freebuff-headless -C /Volumes/data/projects/nixconfig "Check git status and commit message"
+      freebuff-headless -C ~/Documents/nixconfig "Check git status and commit message"
       freebuff-headless -d "Refactor tools.nix"
       freebuff-headless --status
       freebuff-headless --logs fb-1718000000-1234

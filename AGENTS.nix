@@ -1178,7 +1178,7 @@
           enable = true;
           schedule = "*-*-* 01:30:00";
           targetHosts = [ "minyx" "moto" "deckstation" ];
-          flakeUri = "/srv/data/projects/nixconfig";
+          flakeUri = "github:shaoyanji/nixconfig";
           bandwidthLimit = "30M";          # prevent saturating WAN during streaming
           keepGenerations = 2;             # limit cached history to prevent disk bloat
         };
@@ -2164,7 +2164,7 @@
         services.flakeMatrixReport = {
           enable = true;
           schedule = "weekly";
-          outputDir = "/srv/data/projects/nixconfig/docs/matrix";
+          outputDir = "docs/matrix";  # repo-relative
           targetHosts = [ "frieren" "minyx" "eisen" "stark" ];
           generateGraph = true;
         };
@@ -2241,7 +2241,7 @@
           schedule = "weekly";
           languages = [ "eng" "deu" "jpn" "fra" ];
           maxPageLatencySec = 8.0;
-          testSampleDir = "/srv/data/projects/nixconfig/tests/ocr-samples";
+          testSampleDir = "tests/ocr-samples";  # repo-relative
           alertOnMissingModel = true;
         };
         ```
@@ -2959,7 +2959,7 @@
         services.kumaToGatusSync = {
           enable = true;
           kumaDbPath = "/var/lib/private/uptime-kuma/kuma.db";
-          outputNixPath = "/Volumes/data/projects/nixconfig/hosts/frieren/generated-monitors.nix";
+          outputNixPath = "hosts/frieren/generated-monitors.nix";  # repo-relative
           syncInterval = "daily";
         };
         ```
@@ -3423,7 +3423,7 @@
 
         **Status:** not started; written from the 2026-10-14 debugging session, where every one of those inputs had to be tested by hand.
 
-        **Use case.** "I can't nixos build" had four distinct causes on one machine in one evening: a resolver outage (frieren), a boot-race mount failure (NFS), a store path that is only reachable through that mount (`/Volumes/data/projects/nixconfig` is fern's repo), and a failed `nix-gc` that shared the same root cause. A single command that names the broken leg would have replaced the entire investigation.
+        **Use case.** "I can't nixos build" had four distinct causes on one machine in one evening: a resolver outage (frieren), a boot-race mount failure (NFS), a store path that is only reachable through that mount (fern's checkout lives on the NAS mount), and a failed `nix-gc` that shared the same root cause. A single command that names the broken leg would have replaced the entire investigation.
 
         **Deliverable.**
 
@@ -3449,7 +3449,7 @@
 
         **Use case.** fern's GC failed at every boot for a reason that has nothing to do with garbage: a root on an NFS path. Roots on network paths are a *structural* fragility of this fleet's design (the canonical repo lives on the NAS and builds are run from it), and nothing reports them until the GC unit turns red.
 
-        **Evidence.** `find /nix/var/nix/gcroots/auto -lname '*Volumes*'` on fern found `…/zsaq3lrb6m1hgx6gwrzmr1w9g36q0bb7 -> /Volumes/data/projects/nixconfig/result`; `journalctl -u nix-gc.service` shows `error: getting status of "/Volumes/data/projects/nixconfig/result": Host is down` → `0 store paths deleted`. EXP-034 (`gcRootPruner`) and HC-4's budget table are the natural homes for the reporting half.
+        **Evidence.** `find /nix/var/nix/gcroots/auto -lname '*Volumes*'` on fern found `…/zsaq3lrb6m1hgx6gwrzmr1w9g36q0bb7 -> /Volumes/data/projects/nixconfig/result`; `journalctl -u nix-gc.service` shows `error: getting status of "/Volumes/data/projects/nixconfig/result": Host is down` → `0 store paths deleted`. (repo-path-ok: verbatim journalctl output) EXP-034 (`gcRootPruner`) and HC-4's budget table are the natural homes for the reporting half.
 
         **Why it is not prod.** Deleting a root is only safe when its filesystem is genuinely absent, and "absent" must be proven from the mount table rather than by touching the path (touching it triggers the automount — the trap in EXP-103). Exit criteria: a report that lists network-path roots, superseded generations, and reclaimable bytes per host, with a non-zero exit only on unbounded growth.
       '';
@@ -3540,6 +3540,54 @@
         toplevel". `checks:quick` still runs four single-option evals — the cheapest available improvement
         would be to make it force those four toplevels instead, which the phase model permits because it is
         still seconds per host.
+      '';
+    };
+    sloppiness-audit-2026-10 = {
+      title = "Sloppiness audit: knowledge with two homes and no enforcement";
+      kind = "experiment";
+      status = "IN FLIGHT";
+      date = "2026-10-20";
+      summary = "Slop here is not ugly code but uncounted truth: hand-typed numbers, checks that cannot fail, and checkout paths on a 34-host fleet.";
+      refs = {
+        modules = [
+          "taskfiles/checks.yml"
+          "scripts/task/repo-paths.sh"
+          "modules/services/systemone/ensemble.py"
+        ];
+        tasks = ["checks:repo:paths" "checks:tasks" "checks:decision:smart"];
+        docs = [".agents/SCHEMA.md" ".agents/skills/correct/SKILL.md"];
+      };
+      body = ''
+        **Finding.** Slop here is not ugly code. It is knowledge with two homes and
+        no enforcement: a fact typed into prose while the compiler that knows it sits
+        unused, a rule that fails only if a human reads it, a check that cannot return
+        non-zero.
+
+        Measured 2026-10-20 (the numbers drift; the command is the durable part):
+
+        - Hand-typed counts: `task-plane` claimed 373 tasks across 17 shards (430 / 18);
+          `.agents/README.md` claimed 43 skills (45); `AGENTS.md` claimed ~25 hosts (34).
+        - 17 `checks:decision:*` tasks wrap `ensemble.py`, which had no `sys.exit`.
+        - 39 checkout-path occurrences in 15 tracked files, on a fleet of 34.
+        - 91 broken doc links (88 absolute `file:///`); 5,220 comment lines in 236 `.nix`
+          files (17%), 66 banner rules, 86 dated narratives outside `AUDIT.md`.
+
+        **Landed.** `checks:repo:paths` fails on a hardcoded checkout path and runs in
+        `checks:quick`; the paths it named now resolve from `git rev-parse`, `../..`, or
+        `Path(__file__)`. The pstack method skills (`correct`, `no-comments`, `unslop`,
+        `prove-it-works`) are installed under `.agents/skills/`.
+
+        Every `checks:decision:*` task accepts `--fail-on-alert` and exits 1 on a
+        non-nominal status, category, safety flag or error; proved on
+        `checks:decision:smart` and the `sops-rekey`/`disk-smart`/`vuln-proposer` simulate
+        paths. Tasks probe the flag before using the installed binary, so a stale closure
+        falls back to the repo source.
+
+        **Open, in `correct` order.** Add a gate so a hand-typed count cannot land; add a
+        doc-link gate; then the `no-comments` and `unslop` passes.
+
+        **Exit.** Each gate above exists and has failed on the instance that motivated
+        it; this note then reads DELIVERED with `refs.tasks` naming them.
       '';
     };
     experiments-policy = {

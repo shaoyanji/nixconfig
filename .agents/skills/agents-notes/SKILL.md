@@ -206,7 +206,7 @@ code:
 
 ```bash
 task ops:notes:show ID=<id>                        # the note as the compiler sees it
-nix eval --json .#agentsNotes.issues               # [] = clean (0.2 s, no host eval)
+nix eval --json .#agentsNotes.issues | toon -e               # [] = clean (0.2 s, no host eval)
 nix build --builders "" .#checks.x86_64-linux.agents-notes-schema   # the gate
 task ops:notes:module PATH=<path in refs.modules>  # reverse lookup: which notes touch this file
 task ops:notes:task TASK=<task in refs.tasks>      # reverse lookup: why this task exists

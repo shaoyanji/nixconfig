@@ -279,8 +279,8 @@ in {
           };
           flakePath = lib.mkOption {
             type = lib.types.str;
-            default = "/Volumes/data/projects/nixconfig";
-            description = "Target flake path.";
+            default = toString ../..;
+            description = "Target flake path (defaults to this flake's source).";
           };
         };
         consensusAnomaly = {
@@ -333,7 +333,7 @@ in {
             if command -v systemone-ensemble >/dev/null 2>&1; then
               systemone-ensemble govern $FLAGS
             else
-              python3 /Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py govern $FLAGS
+              python3 ${toString ../..}/modules/services/systemone/ensemble.py govern $FLAGS
             fi
           ''}
         '';

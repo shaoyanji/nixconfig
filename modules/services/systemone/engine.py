@@ -403,6 +403,27 @@ def triage_handoff_md(handoff_md_path: str, model_name: str = "julia-1") -> Dict
         "items": items
     }
 
+def emit(res, fail_on_alert=False, is_triage=False):
+    """Print the report, and exit 1 when --fail-on-alert and it is not nominal."""
+    print(json.dumps(res, indent=2))
+    if not fail_on_alert:
+        return
+    problems = []
+    if res.get("error"):
+        problems.append(res["error"])
+    if is_triage:
+        tier1 = res.get("tier1_immediate_repairs", 0)
+        if tier1:
+            problems.append(f"{tier1} TIER_1 repair(s) pending")
+        for item in res.get("items", []):
+            status = str(item.get("status", "")).upper()
+            if status not in {"OK", "PASSED", "HEALTHY"}:
+                problems.append(f"{item.get('subsystem')}={item.get('status')}")
+    if problems:
+        print("\nALERT: " + ", ".join(problems), file=sys.stderr)
+        sys.exit(1)
+
+
 def main():
     parser = argparse.ArgumentParser(description="System One Decision Engine (Julia-1 & Laya)")
     parser.add_argument("--model", choices=["julia-1", "laya"], default="julia-1", help="Decision model to use")
@@ -428,22 +449,29 @@ def main():
     p_query.add_argument("--prompt", required=True, help="Question or criteria or condition")
     p_query.add_argument("--options", nargs="*", default=[], help="Options for choice/classify/route")
 
+    for sub in subparsers.choices.values():
+        sub.add_argument(
+            "--fail-on-alert",
+            action="store_true",
+            help="exit 1 when the report is not nominal",
+        )
+
     args = parser.parse_args()
 
     if args.command == "benchmark":
         print(f"=== Running Benchmarks for Model: {args.model} ({PROFILES[args.model]['params']} params) ===")
         res = run_benchmarks(args.model, args.iterations)
-        print(json.dumps(res, indent=2))
+        emit(res, args.fail_on_alert, is_triage=args.command == "triage-system")
 
     elif args.command == "triage-system":
         print(f"=== System Health Triage using Model: {args.model} ===")
         res = triage_system_md(args.file, args.model)
-        print(json.dumps(res, indent=2))
+        emit(res, args.fail_on_alert, is_triage=args.command == "triage-system")
 
     elif args.command == "triage-handoff":
         print(f"=== Strategic Handover Triage using Model: {args.model} ===")
         res = triage_handoff_md(args.file, args.model)
-        print(json.dumps(res, indent=2))
+        emit(res, args.fail_on_alert, is_triage=args.command == "triage-system")
 
     elif args.command == "query":
         engine = DecisionEngine(args.model)
@@ -458,7 +486,7 @@ def main():
         elif args.type == "route":
             handlers = {opt: f"Handle {opt}" for opt in args.options}
             res = engine.route(args.state, handlers)
-        print(json.dumps(res, indent=2))
+        emit(res, args.fail_on_alert, is_triage=args.command == "triage-system")
 
 if __name__ == "__main__":
     main()

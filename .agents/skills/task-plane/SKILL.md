@@ -18,7 +18,7 @@ metadata:
 ```bash
 task help                 # curated intent -> task map + live namespace counts (static, no nix)
 task find:dns             # substring search over names AND descriptions
-task --list-all --json    # machine-readable: name, desc, aliases, location
+task --list-all --json | toon -e    # machine-readable: name, desc, aliases, location
 ```
 
 Shards are the executable truth; this skill is the index. `taskfiles/README.md`
@@ -32,6 +32,7 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 | Secrets, SOPS, store GC | `taskfiles/infra.yml` (`infra:sops:*`, `infra:store:*`) | Needs age keys — not keyless-safe. |
 | Validation gates | `taskfiles/checks.yml` (`checks:*`) | Read the "what it proves" column below. |
 | Git, flake updates, closure analysis, site deploy | `taskfiles/dev.yml` (`dev:*`) | `dev:closure:*` is build *preparation*. |
+| Structural questions: what touches X | `taskfiles/ops.yml` (`ops:kg:*`) | Answered by the Elixir sidecar by default; `ops:kg:speed` measures it against jq. |
 | Canary MicroVM | `taskfiles/infra.yml` (`vm:canary:*`) | EXP-102. |
 | Operator menus / gum TUIs | `taskfiles/agents.yml`, root `menu*` | |
 | Legacy wrappers | `taskfiles/services-core.yml`, `services-legacy.yml` | `[deprecated]` only; never add here. |

@@ -37,6 +37,90 @@ except ImportError:
     # Standalone fallback if invoked in isolated path
     from modules.services.systemone.engine import DecisionEngine
 
+# Repo root, derived from this file's location (<repo>/modules/services/systemone/).
+# Never hardcode a checkout path here: this runs on any host, in the store, from CI.
+REPO_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+
+# --- verdict contract --------------------------------------------------------
+# A `checks:decision:*` task is a check only if it can fail. Each subcommand
+# prints a report; these status values mean the report found something a human
+# or a gate must act on, and --fail-on-alert turns that into exit 1.
+ALERT_STATUSES = {
+    "ALERT",
+    "BLOCKED",
+    "CORRUPTION_DETECTED",
+    "CRITICAL",
+    "DEGRADED",
+    "ELEVATED",
+    "ERROR",
+    "FAILED",
+    "PRESSURE_ELEVATED",
+    "REGRESSION_DETECTED",
+    "STALLED",
+    "UNHEALTHY",
+}
+
+
+# A report names its verdict in `status`, or in `category` when the command has
+# no status. These tokens in a category mean the finding needs acting on.
+ALERT_TOKENS = (
+    "BLOCKED",
+    "CORRUPT",
+    "CRITICAL",
+    "DEGRADED",
+    "DRIFT",
+    "ELEVATED",
+    "ERROR",
+    "FAIL",
+    "MISSING",
+    "PRESSURE",
+    "REGRESSION",
+    "STALL",
+)
+
+# Booleans whose false value is the finding, e.g. `harmonia_active: false`.
+NEGATIVE_FLAGS = ("_active", "_healthy", "_passed")
+
+
+def collect_alerts(node, path="$"):
+    """Every value in a report that should fail a check."""
+    alerts = []
+    if isinstance(node, dict):
+        for key, value in node.items():
+            here = f"{path}.{key}"
+            if key in {"status", "urgency", "verdict", "severity"} and isinstance(value, str):
+                if value.strip().upper() in ALERT_STATUSES:
+                    alerts.append(f"{here}={value}")
+            elif key == "category" and isinstance(value, str):
+                upper = value.upper()
+                if any(token in upper for token in ALERT_TOKENS):
+                    alerts.append(f"{here}={value}")
+            elif isinstance(value, bool):
+                if key in {"success", "ok"} and not value:
+                    alerts.append(f"{here}=false")
+                elif key.endswith(NEGATIVE_FLAGS) and not value:
+                    alerts.append(f"{here}=false")
+            elif key == "error" and value:
+                alerts.append(f"{here}={value}")
+            alerts.extend(collect_alerts(value, here))
+    elif isinstance(node, list):
+        for index, item in enumerate(node):
+            alerts.extend(collect_alerts(item, f"{path}[{index}]"))
+    return alerts
+
+
+def emit(report, fail_on_alert=False):
+    print(json.dumps(report, indent=2))
+    if not fail_on_alert:
+        return
+    alerts = collect_alerts(report)
+    if alerts:
+        print("\nALERT: " + ", ".join(alerts), file=sys.stderr)
+        sys.exit(1)
+
+
 OLLAMA_ENDPOINT = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
 DEFAULT_SYSTEM2_MODEL = "nemotron-3-ultra:cloud"
 
@@ -539,7 +623,7 @@ class PreHarnessEnsemble:
 
     # --- EXP-066: Flake Regression Self-Healing & Rollback Ensemble ---
 
-    def reconcile_flake(self, flake_path: str = "/Volumes/data/projects/nixconfig", target_file: Optional[str] = None, simulate_error: Optional[str] = None) -> Dict[str, Any]:
+    def reconcile_flake(self, flake_path: str = REPO_ROOT, target_file: Optional[str] = None, simulate_error: Optional[str] = None) -> Dict[str, Any]:
         """EXP-066: Flake Regression Self-Healing & AST patch synthesizer with preflight validation."""
         start_t = time.time()
         error_msg = simulate_error
@@ -1033,7 +1117,7 @@ class PreHarnessEnsemble:
         drift_output = ""
         drift_detected = False
         try:
-            p = subprocess.run(["bash", "scripts/task/sops-drift-check.sh"], cwd="/Volumes/data/projects/nixconfig", stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=10)
+            p = subprocess.run(["bash", "scripts/task/sops-drift-check.sh"], cwd=REPO_ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=10)
             drift_output = p.stdout.strip()
             drift_detected = p.returncode != 0
         except Exception:
@@ -1540,7 +1624,7 @@ class PreHarnessEnsemble:
 
     # --- EXP-097: Automated Flake Input Transitive Vulnerability Scanner & Patch Proposer ---
 
-    def vuln_proposer(self, flake_path: str = "/Volumes/data/projects/nixconfig", simulate_cve: bool = False) -> Dict[str, Any]:
+    def vuln_proposer(self, flake_path: str = REPO_ROOT, simulate_cve: bool = False) -> Dict[str, Any]:
         """EXP-097: Automated flake input transitive vulnerability scanner & patch proposer."""
         start_t = time.time()
         
@@ -2238,7 +2322,7 @@ def main():
 
     # Command: reconcile (EXP-066)
     rec_parser = subparsers.add_parser("reconcile", help="Nix flake self-healing & AST patch synthesizer (EXP-066)")
-    rec_parser.add_argument("--flake-path", default="/Volumes/data/projects/nixconfig", help="Path to flake directory")
+    rec_parser.add_argument("--flake-path", default=REPO_ROOT, help="Path to flake directory")
     rec_parser.add_argument("--target-file", help="Specific file to verify")
     rec_parser.add_argument("--simulate-error", help="Simulate a compiler error trace")
 
@@ -2299,7 +2383,7 @@ def main():
 
     # Command: vuln-proposer (EXP-097)
     vuln_parser = subparsers.add_parser("vuln-proposer", help="Flake input transitive vulnerability scanner & patch proposer (EXP-097)")
-    vuln_parser.add_argument("--flake-path", default="/Volumes/data/projects/nixconfig", help="Flake repository path")
+    vuln_parser.add_argument("--flake-path", default=REPO_ROOT, help="Flake repository path")
     vuln_parser.add_argument("--simulate-cve", action="store_true", help="Simulate critical transitive CVE advisory")
 
     # Command: govern (Consolidated Fleet Governor with 3-Tier Escalation Router S0/S1/S2)
@@ -2308,12 +2392,20 @@ def main():
     gov_parser.add_argument("--allow-s2", action="store_true", help="Allow fallback deliberation to System 2 Nemotron if escalated")
     gov_parser.add_argument("--rules", default=None, help="Path to declarative JSON rules specification")
 
+    # Every subcommand can fail, so every subcommand accepts the flag.
+    for sub in subparsers.choices.values():
+        sub.add_argument(
+            "--fail-on-alert",
+            action="store_true",
+            help="exit 1 when the report carries an actionable status",
+        )
+
     args = parser.parse_args()
     ensemble = PreHarnessEnsemble(s1_model=args.s1_model, s2_model=args.s2_model)
 
     if args.command == "audit-all":
         report = ensemble.audit_all()
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "triage":
         fn = getattr(ensemble, f"triage_{args.service}", None)
         if fn:
@@ -2325,49 +2417,49 @@ def main():
         print(json.dumps(result, indent=2))
     elif args.command == "reconcile":
         report = ensemble.reconcile_flake(flake_path=args.flake_path, target_file=args.target_file, simulate_error=args.simulate_error)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "storage-prognosis":
         report = ensemble.storage_prognosis(mount_point=args.mount, simulate_contention=args.simulate_contention)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "media-enrich":
         report = ensemble.media_enrich(path=args.path, sample_file=args.file, simulate=args.simulate)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "fleet-security":
         report = ensemble.fleet_security(service=args.service, lines=args.lines, simulate_attack_ip=args.simulate_attack)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "tailscale-path":
         report = ensemble.tailscale_path(peer=args.peer, simulate_derp=args.simulate_derp)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "memory-pressure":
         report = ensemble.memory_pressure(simulate_psi=args.simulate_psi)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "sops-rekey":
         report = ensemble.sops_rekey(simulate_drift=args.simulate_drift)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "kiwix-search":
         report = ensemble.kiwix_search(query=args.query, max_results=args.max)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "vaapi-thermal":
         report = ensemble.vaapi_thermal(simulate_thermal_c=args.simulate_temp)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "sqlite-buffer":
         report = ensemble.sqlite_buffer(simulate_wal_bloat=args.simulate_bloat)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "cache-warmer":
         report = ensemble.nix_cache_warmer(simulate_miss=args.simulate_miss)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "paperless-ocr":
         report = ensemble.paperless_ocr(simulate_corrupt_scan=args.simulate_corrupt)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "disk-smart":
         report = ensemble.disk_smart(simulate_fault=args.simulate_fault)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "vuln-proposer":
         report = ensemble.vuln_proposer(flake_path=args.flake_path, simulate_cve=args.simulate_cve)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     elif args.command == "govern":
         report = ensemble.govern_all(auto_repair=args.auto_repair, allow_s2=args.allow_s2, rules_path=args.rules)
-        print(json.dumps(report, indent=2))
+        emit(report, args.fail_on_alert)
     else:
         parser.print_help()
 

@@ -123,10 +123,12 @@ in {
       run mkdir -p $HOME/.hermes/memories
 
       REPO_DIR="$HOME/Documents/nixconfig"
-      if [ ! -d "$REPO_DIR/.git" ] && [ -d "/Volumes/data/projects/nixconfig/.git" ]; then
-        REPO_DIR="/Volumes/data/projects/nixconfig"
-      elif [ ! -d "$REPO_DIR/.git" ] && [ -d "$HOME/nixconfig/.git" ]; then
+      if [ ! -d "$REPO_DIR/.git" ] && [ -d "$HOME/nixconfig/.git" ]; then
         REPO_DIR="$HOME/nixconfig"
+      elif [ ! -d "$REPO_DIR/.git" ] && [ -e "${../../..}/flake.nix" ]; then
+        # No checkout here: fall back to this flake's evaluated source, never a
+        # machine-specific mount path.
+        REPO_DIR="${../../..}"
       fi
 
       # Persona source of last resort: a store copy of

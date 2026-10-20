@@ -85,8 +85,8 @@
 
       Examples:
         freebuff-remote "Review unstaged git diff"
-        freebuff-remote -C /Volumes/data/projects/nixconfig "Inspect flake.nix"
-        freebuff-remote -i /Volumes/data/projects/nixconfig
+        freebuff-remote -C ~/Documents/nixconfig "Inspect flake.nix"
+        freebuff-remote -i ~/Documents/nixconfig
         freebuff-remote -d "Audit security ports"
         freebuff-remote --status
         freebuff-remote --attach fb-1718000000-1234

@@ -32,8 +32,8 @@ source of truth.
 
 ```bash
 # 1. structural question about the fleet
-nix eval --json .#inventory.hosts.frieren.role
-nix eval --json .#agentSkills.byTag.nix
+nix eval --json .#inventory.hosts.frieren.role | toon -e
+nix eval --json .#agentSkills.byTag.nix | toon -e
 
 # 2. concept/runbook question
 qmd search "impermanence disko" -c nixconfig
@@ -87,6 +87,9 @@ same graph from memory over `unix:$XDG_RUNTIME_DIR/kg.sock`: 58 µs server-side,
 36–50 ms per query through the script, 114–125 ms through `task` (measured
 2026-10-19) — against ~113 ms for the jq surface on a clean tree and ~530 ms on
 a dirty one, so it pays off for repeated queries, not a single lookup.
+`task ops:kg:speed` re-measures both paths in one command (2026-10-20 on a
+dirty tree: 32 ms vs 441 ms for `host frieren`); run it instead of quoting this
+paragraph, because the ratio moves with tree state.
 It loads the COMPILED projection by default (`--native` selects the engine's own
 builder, which is what `checks:kg:native` measures for parity), so the socket and
 the jq surface read one graph — and `checks:kg:native` runs inside

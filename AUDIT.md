@@ -26,19 +26,19 @@
 ### 2026-10-20 — delphi: the user sops plane is derived, not copied
 
 - `modules/profiles/sops-user-identity.nix` (new, opt-in): activation derives
-  `~/.config/sops/age/keys.txt` from the host SSH key. A CA-only host has no user
-  keypair, and sops-nix's `generateKey` mints an unregistered one → `0 successful
-  groups`. The derived identity IS the `&delphi` recipient already in `.sops.yaml`, so
-  no rekey and nothing to back up. Verified: `age-keygen -y` → `age1fg8xy2g…`, `sops -d`
-  as `devji`, `checks:host HOST=delphi MODE=eval` 1816 assertions rc=0.
+  `~/.config/sops/age/keys.txt` from the host SSH key (a CA-only host has no user
+  keypair; `generateKey` mints an unregistered one → `0 successful groups`). The derived
+  identity IS `&delphi`, so no rekey. Verified on the host.
 - `docs/sops-rekey.md` (new): the two identity planes, anchor convention, rekey steps,
   and the submodule `.sops.yaml` copy trap.
 - First offload: `services.fleetMonitors` on delphi (gatus, tailnet-only `:8181`, public `:8181`
   refused) — an out-of-LAN vantage point frieren's loopback probes cannot be. 3/3 endpoints ok.
-- Public web: first ingress attempt dropped with **0 packets on the wire** (ports in
-  *Source* Port Range). Now `https://delphi.bountystash.com` → `200`, Let's Encrypt chain,
-  `:80` → `301`; DNS-only A record was the only manual step. ACME's 404 was a local nginx
-  listen-group bug, not DNS — Phase 4/4c of the runbook.
+- Public web: `https://delphi.bountystash.com` → `200`, Let's Encrypt chain, `:80` → `301`.
+  The first ingress attempt dropped with **0 packets** (ports in *Source* Port Range); ACME's
+  404 was a local nginx listen-group bug, not DNS. Runbook Phase 4/4c.
+- delphi self-updates (`autoUpgrade` 04:30) and both hosts bind + advertise `10.99.0.53/32`
+  through one shared module; frieren's advertisement awaits console approval. Also fixed:
+  `vdirsyncer` ran on every Linux host with no credentials (a red unit every 15 min).
 
 ### 2026-10-19 — Graph queries, and the decision model's real accuracy
 

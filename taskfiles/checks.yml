@@ -37,6 +37,7 @@ tasks:
       repo whose default is every host.
     cmds:
       - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets
+      - task checks:inventory:sync
       - task checks:repo:paths
       - task checks:docs:links
       - task checks:yaml:lint

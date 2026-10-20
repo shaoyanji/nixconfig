@@ -20,13 +20,33 @@
 # host down.
 #
 # TWO MODES (they answer different questions):
-#   build   builds hostChecks.<arch>.<host> — cached, substitutable, one host per
-#           attr. CI's path. Needs a local builder for <arch>.
+#   build   realises hostChecks.<arch>.<host> — cached, substitutable, one host per
+#           attr. CI's path.
 #   eval    evaluates <kind>Configurations.<host>.config — module system, EVERY
 #           assertion (throws on the first failure, so a broken host FAILS and the
 #           message names what broke) and the compiled registry. ARCH-INDEPENDENT
 #           (nothing is built), so it is the only way to check aarch64 and darwin
 #           hosts from this machine. 1.4-8.6 s / ~290-700 MiB per host.
+#
+# WHO BUILDS IN "build" MODE — three flags, one question each:
+#   (default)     --builders ""              compile the artifact here, but this
+#                                            check can NEVER spend remote build
+#                                            seconds (the rule in AGENTS.md: a
+#                                            check must not be able to spend
+#                                            budget). This is the normal gate.
+#   STRICT=1      --max-jobs 0 --builders "" substitute or FAIL — "is this host
+#                                            actually warmed / does CI cover it?"
+#   OFFLOAD=1     --max-jobs 0 + /etc/nix/machines: hand the derivation to
+#                                            nixbuild.net deliberately.
+#
+# WHERE THE COST ACTUALLY IS, because it decides what offloading can buy: the
+# hostCheck derivation is a three-line `runCommand` that echoes a summary — its
+# BUILD is free. The 6-13 s and ~700-960 MiB are pure EVALUATION (module system +
+# every assertion), and nixbuild does not evaluate: it only runs a derivation you
+# already evaluated. So no flag here moves the expensive half off this machine.
+# What offloading does buy is the OTHER gate — `nixosConfigurations.<host>`, the
+# real closure, via `task dev:nixbuild:warm` / `task dev:ci:trigger:<host>`.
+# `--builders ""` here exists so this gate can never drift into doing that.
 #
 # USAGE
 #   host-check-sweep.sh --hosts "a b c" [--mode build|eval] [--arch x86_64-linux]
@@ -43,7 +63,7 @@ ARCH="x86_64-linux"
 TIMEOUT=120
 HOSTS=""
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-cd "$ROOT"
+cd "$ROOT" || exit 1
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -108,9 +128,34 @@ while read -r kind host; do
   i=$((i + 1))
   printf '[%d/%d] ' "$i" "$count"
   if [ "$MODE" = build ]; then
+    build_flags=(--builders "")
+    if [ "${OFFLOAD:-0}" = "1" ]; then
+      # /etc/nix/machines supplies the builders; nothing may run locally.
+      build_flags=(--max-jobs 0)
+    elif [ "${STRICT:-0}" = "1" ]; then
+      build_flags=(--max-jobs 0 --builders "")
+    fi
+    log="$(mktemp)"
+    # tee on stdout, not a process substitution: PIPESTATUS gives the guard's
+    # status after tee has flushed, so the classification below reads the whole log.
     bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "host-check ${host}" -- \
-      nix build --no-link -L ".#hostChecks.${ARCH}.${host}"
-    rc=$?
+      nix build --no-link -L "${build_flags[@]}" ".#hostChecks.${ARCH}.${host}" 2>&1 | tee "$log" >&2
+    rc=${PIPESTATUS[0]}
+    # A cache miss and a failed assertion both exit 1; only the first deserves the
+    # warm-it advice, so classify by what nix said.
+    if [ "$rc" -ne 0 ] && [ "${OFFLOAD:-0}" != "1" ] \
+      && grep -qiE "don't know how to build|not substitutable|unable to download|cannot build|local builds are disabled" "$log"; then
+      echo >&2
+      if [ "${STRICT:-0}" = "1" ]; then
+        echo "  ${host}: not in any cache (STRICT=1: substituting only, nothing may build)." >&2
+      else
+        echo "  ${host}: could not be built locally and no remote builder was allowed." >&2
+      fi
+      echo "  warm it (free, CI runner):  task dev:ci:trigger:${host}" >&2
+      echo "  or hand it to nixbuild:     OFFLOAD=1 task checks:host HOST=${host}" >&2
+      echo "  or compile here (default):  task checks:host HOST=${host}" >&2
+    fi
+    rm -f "$log"
   else
     case "$kind" in
       nixos) attr="nixosConfigurations.${host}" ;;

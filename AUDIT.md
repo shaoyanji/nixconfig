@@ -25,6 +25,25 @@
 
 ## Ledger
 
+### 2026-10-20 — A check cannot offload its evaluation, only its build
+
+- `checks:host` gained three build-routing modes so the gate can never drift into spending
+  builder budget, one question each: default `--builders ""` (compile locally, nixbuild
+  unreachable), `STRICT=1` (substitute-or-fail: "is this host warmed?"), `OFFLOAD=1`
+  (`--max-jobs 0` + `/etc/nix/machines`). Measured on fern: default 10.56 s / 958 MiB;
+  OFFLOAD 12.68 s wall with the remote build itself **746 ms**.
+- **The reason that matters: nixbuild runs derivations, it does not evaluate.** A
+  hostCheck's derivation is a three-line `runCommand` echo, so ~10.5 s of a 10.6 s gate is
+  local module-system + 1961 assertions and no flag moves it. The real offload for
+  evaluation is CI, one runner per host: `task dev:ci:trigger:<host>`.
+- `oom-guard.sh` aborted on **inherited** pressure: absolute PSI thresholds killed a 1.1 s
+  `nix build --dry-run` because frieren sat at io full avg10 61 % from unrelated work, so
+  the gate became unrunnable exactly when the host was busy. Limits are now
+  `max(threshold, baseline + 5)` with the baseline sampled before the command and printed
+  beside the peak; a 3-host run completed at baselines of 52-73 %.
+- Shellcheck-clean, `checks:tasks` green, `checks:host HOST=frieren` and
+  `HOSTS="fern frieren"` rc=0.
+
 ### 2026-10-20 — Tailnet DNS is on, and its redundancy is not what it looks like
 
 - Live: global `[100.97.61.65, 10.99.0.53]`, Override on, split DNS empty. Both answer
@@ -94,42 +113,9 @@
   through one shared module; frieren's advertisement awaits console approval. Also fixed:
   `vdirsyncer` ran on every Linux host with no credentials (a red unit every 15 min).
 
-### 2026-10-19 — Graph queries, and the decision model's real accuracy
-
-- `ops:ask Q=…` / `scripts/task/kg-ask.sh`: English question → intent → jq over
-  `.#knowledgeGraph.file` (new 49 KB store artifact). Routing is **deterministic**;
-  the model is recorded, not obeyed: measured on the in-repo engine, 6-way intent
-  `choice` scored 2/8 right with equal-length options and 0.20–0.44 confidence
-  otherwise, because `engine.py` is a hash-embedding heuristic, not mmBERT.
-- `ops:context` is the trigger side: sentinel status + the graph context for the
-  host. Advisory — the monitor detects, it never acts.
-- `ops:bench:kg` settled the router question with labelled sets, because one was
-  not honest: keyword 14/14 rule-shaped / 6/10 paraphrase / 4/9 naming no node,
-  Jev 13/14 / 9/10 / 7/9 at ~330 ms, in-repo `systemone-decision` 5/14 / 1/10 /
-  4/9. A single-sentence "keyword wins 14/14" would have been a rigged
-  conclusion drawn from the set phrased in the rules' own vocabulary. On the
-  last set the rules lose but DECLINE (UNKNOWN) where Jev answers wrong.
-- Policy that replaced it: when no rule matches, `ops:ask` returns the **context
-  bundle** of the node the question names (`route: bundle`, neighbours in
-  `related`) — a superset, so it cannot mis-pick a relation, offline at 0 ms
-  against Jev's ~330 ms. The paraphrase gain (6/10 → 10/10) is **partly
-  circular**: four labels name only a node, and "a node-naming question means
-  that node's context" is the policy being tested, so those matches confirm it
-  against itself. `ops:bench:kg` prints the bundle count beside the score.
-- The query surface is explicit and gated: six patterns
-  (`ops:kg:host|skill|doc|tag|comention|stats`, `FORMAT=json` throughout) plus
-  `checks:kg`, which fails on a renamed field or node type or a dropped anchor.
-- Two bugs the bench found rather than a review: a question naming a **host** was
-  routed skill-oriented by the word "mention" (subject-override table was
-  asymmetric), and a configured-but-unreachable endpoint aborted the query under
-  `set -e` instead of degrading (now `|| out=""`, verified against a closed port).
-- Jev wiring: `ops:ask:jev` reads the key from sops in-process, never prints it,
-  and the output records `model.name` — so a result says whether a model spoke.
-- eisen's Laya/Kev-4B endpoints were unreachable during the bench (all three
-  timeouts), so those runners are SKIPPED, not scored.
-
 > Retired to history on 2026-10-20 to keep this document inside its 150-line budget:
-> context plane mk2 (10-19), rebuild-path de-bloat and `nom` opt-in (10-19),
+> the graph-query/`ops:ask` bench (10-19), context plane mk2 (10-19),
+> rebuild-path de-bloat and `nom` opt-in (10-19),
 > closure-budget baseline (10-17), the `nix flake check` eval-granularity defect
 > EXP-114 (10-15), and the NAS path governor (10-14).
 > See `docs/history/audit-2026-10.md`.

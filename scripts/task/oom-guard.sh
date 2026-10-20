@@ -26,6 +26,16 @@
 #   /proc/vmstat is read directly rather than grepping the journal: it is an
 #   exact counter and costs no I/O on a host whose journal is already busy.
 #
+# PRE-EXISTING PRESSURE IS MEASURED, NOT TAKEN AS OURS. The two PSI thresholds are
+# absolute, so on a host whose spindle is ALREADY saturated by something else
+# (frieren ran at io full avg10 44-61 % from unrelated work on 2026-10-20) every
+# guarded command aborted 1-10 s in — a 1.1 s `nix build --dry-run` was killed at
+# 61 % ambient, and the gate simply could not be run. The effective limits are
+# therefore `max(THRESHOLD, baseline + PRESSURE_MARGIN)`: pressure this run did not
+# create cannot be fixed by killing it, while a run that pushes pressure further up
+# still aborts. Baselines are printed with the result, so the number is never read
+# as "the command caused this".
+#
 # USAGE
 #   oom-guard.sh [--timeout SECONDS] [--interval SECONDS] [--label TEXT] -- CMD...
 #
@@ -45,6 +55,7 @@ LABEL="cmd"
 MEM_PRESSURE=${MEM_PRESSURE:-40}
 IO_PRESSURE=${IO_PRESSURE:-60}
 MIN_AVAIL_MB=${MIN_AVAIL_MB:-400}
+PRESSURE_MARGIN=${PRESSURE_MARGIN:-5}
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -64,6 +75,14 @@ avail_mb() { awk '/^MemAvailable/{print int($2/1024)}' /proc/meminfo 2>/dev/null
 oom_events() { awk '/^oom_kill/{print $2}' /proc/vmstat 2>/dev/null; }
 
 before_oom=$(oom_events); before_oom=${before_oom:-0}
+
+# Baseline of the pressure this command INHERITS. Sampled before it starts, so the
+# limits below can distinguish "the host was already like this" from "the command
+# is driving it up".
+base_mem=$(psifull /proc/pressure/memory); base_mem=${base_mem:-0}
+base_io=$(psifull /proc/pressure/io); base_io=${base_io:-0}
+mem_limit=$(awk -v t="$MEM_PRESSURE" -v b="$base_mem" -v m="$PRESSURE_MARGIN" 'BEGIN{l=b+m; if (l<t) l=t; printf "%g", l}')
+io_limit=$(awk -v t="$IO_PRESSURE" -v b="$base_io" -v m="$PRESSURE_MARGIN" 'BEGIN{l=b+m; if (l<t) l=t; printf "%g", l}')
 
 # Monitor mode puts the job in its OWN process group (pgid == $!), which is what
 # makes the measurement honest: `timeout` is the direct child and its own VmHWM is
@@ -104,10 +123,10 @@ while kill -0 "$pid" 2>/dev/null; do
 
     if [ "$now_oom" -gt "$before_oom" ]; then
       abort_reason="OOM killer fired (/proc/vmstat oom_kill ${before_oom} -> ${now_oom})"
-    elif awk -v a="$mfull" -v b="$MEM_PRESSURE" 'BEGIN{exit !(a>b)}'; then
-      abort_reason="memory pressure full avg10=${mfull}% > ${MEM_PRESSURE}%"
-    elif awk -v a="$iofull" -v b="$IO_PRESSURE" 'BEGIN{exit !(a>b)}'; then
-      abort_reason="io pressure full avg10=${iofull}% > ${IO_PRESSURE}%"
+    elif awk -v a="$mfull" -v b="$mem_limit" 'BEGIN{exit !(a>b)}'; then
+      abort_reason="memory pressure full avg10=${mfull}% > ${mem_limit}% (baseline ${base_mem}%)"
+    elif awk -v a="$iofull" -v b="$io_limit" 'BEGIN{exit !(a>b)}'; then
+      abort_reason="io pressure full avg10=${iofull}% > ${io_limit}% (baseline ${base_io}%)"
     elif [ "$avail" -lt "$MIN_AVAIL_MB" ]; then
       abort_reason="MemAvailable ${avail} MiB < ${MIN_AVAIL_MB} MiB"
     fi
@@ -127,7 +146,8 @@ wait "$pid"; rc=$?
 end_ns=$(date +%s%N)
 
 awk -v l="$LABEL" -v s="$start_ns" -v e="$end_ns" -v p="$peak" -v rc="$rc" \
-  'BEGIN{printf "%-46s %6.2fs  peak %7.1f MiB  rc=%d\n", l, (e-s)/1e9, p/1024, rc}'
+  -v bm="$base_mem" -v bi="$base_io" \
+  'BEGIN{printf "%-46s %6.2fs  peak %7.1f MiB  rc=%d  baseline mem=%g%% io=%g%%\n", l, (e-s)/1e9, p/1024, rc, bm, bi}'
 
 if [ -n "$abort_reason" ]; then
   echo "ABORTED ($LABEL): ${abort_reason}" >&2

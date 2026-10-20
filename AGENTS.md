@@ -500,6 +500,11 @@ On a local rebuild, run **no** check first — the switch is the check.
   `bash scripts/task/oom-guard.sh --timeout 180 -- nix eval --raw …` kills the run on
   10 s OOM/PSI polling instead of dragging the host into swap death. Use
   `--timeout 3` for the leaf registry reads (`.#inventory.*`), which cost 0.15 s.
+  The guard samples a **baseline** before the command starts and aborts only above
+  `max(threshold, baseline + 5)`: on a host already saturated by unrelated work
+  (frieren, io full avg10 44-61 %) an absolute threshold aborted a 1.1 s run, which
+  makes the gate unrunnable rather than protective. Its result line prints the
+  baseline, so "peak" is never confused with "this command caused it".
 - **Preserved hosts are not check targets.** `status = "preserved"` is dormant,
   and some are *known-broken* (cassini's `homeDirectory` conflict predates this
   tree). `warm-host.sh --check`, `infra:deploy:*` and `infra:apply:*` warn and
@@ -556,10 +561,41 @@ rules follow:
   `nix path-info --store <cache> <path>` (asks the cache).
 - **If a check must shell out to nix build, pass `--builders ""`** so it cannot
   dispatch even if the dry-run flag is lost. `scripts/task/warm-host.sh` does this
-  in `pending_count()`.
+  in `pending_count()` and so does `checks:host` (its default flags are
+  `--builders ""`, so the gate can compile its own three-line artifact and still
+  never reach nixbuild).
 
 Budget is spent deliberately, by `task dev:nixbuild:warm` — never as a side effect
 of looking.
+
+**What offloading a check can and cannot buy.** Measure before adding a flag,
+because the answer is not intuitive and it was measured on frieren 2026-10-20:
+
+```
+task checks:host HOST=fern            10.56 s   958 MiB   local compile, no builders
+offloaded (OFFLOAD=1)                12.68 s   746 MiB   remote build itself: 746 ms
+```
+
+**nixbuild.net runs derivations; it does not evaluate.** The host gate's cost is
+the module system + 1961 assertions, i.e. a local `nix eval`; the derivation it
+finally builds is a three-line `runCommand` that echoes a summary. So sending
+that derivation to the builder saves ~0.7 s of a 10.6 s gate and recovers
+nothing of the 958 MiB. The same asymmetry holds one level up: `task
+infra:warm:host:<host>` offloads a closure's **compilation**, while its
+evaluation stays local.
+
+- **Cannot be offloaded:** evaluation, assertions, `MODE=eval`, `checks:flake` —
+  the memory and CPU they cost are yours. Bound them (one host per process, under
+  `oom-guard.sh`) and keep them out of the nightly window.
+- **Can be offloaded:** closure builds (`dev:nixbuild:warm`, `infra:deploy`
+  warming) and — the only real offload for evaluation — **the whole gate to CI**,
+  where each host gets its own runner: `task dev:ci:trigger:<host>` builds
+  `nixosConfigurations.<host>` **and** `hostChecks.<arch>.<host>` and pushes both
+  to cachix. A host whose artifacts are there needs no local gate at all.
+- **`checks:host`'s three routing flags**, one question each: default
+  `--builders ""` (compile here, never spend budget) · `STRICT=1`
+  (`--max-jobs 0 --builders ""`, substitute-or-fail: "is this host warmed?") ·
+  `OFFLOAD=1` (`--max-jobs 0` + `/etc/nix/machines`: dispatch deliberately).
 
 **Never put ssh in an unattended path.** A pre-switch hook that opens ssh can
 block on an interactive auth prompt: Tailscale SSH added a browser check on `fern`

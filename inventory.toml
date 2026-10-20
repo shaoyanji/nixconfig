@@ -17,9 +17,9 @@ description = "Canonical hardware, operational status, network, and agent person
 version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
 total_devices = 34
-active_nix_devices = 11
+active_nix_devices = 12
 active_external_devices = 6
-wip_devices = 1
+wip_devices = 0
 preserved_devices = 16
 
 # ------------------------------------------------------------------------------

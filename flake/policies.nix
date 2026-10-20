@@ -32,6 +32,7 @@
     ".agents/SCHEMA.md"
     ".agents/README.md"
     "docs/ci-pipeline.md"
+    "docs/nix-patterns.md"
     "docs/sops-rekey.md"
     "docs/storage-taxonomy.md"
     "taskfiles/README.md"
@@ -66,6 +67,83 @@
   ];
   rootMd = filesWithSuffix "." ".md";
   strayRootMd = builtins.filter (f: !(builtins.elem f knownRootMd)) rootMd;
+
+  rel = p: lib.removePrefix "${toString root}/" (toString p);
+  anyMatchingLine = p: re: lib.any (l: builtins.match re l != null) (lib.splitString "\n" (builtins.readFile p));
+
+  # --- secrets: encrypted per VALUE, not per file ---------------------------
+  # Counting one `ENC[` per file passes a file whose other keys were pasted in
+  # plaintext. Position matters: everything before the `sops:` block is data,
+  # everything after it is the metadata sops itself must read.
+  indexOf = pred: xs: let
+    go = i: rest:
+      if rest == []
+      then builtins.length xs
+      else if pred (builtins.head rest)
+      then i
+      else go (i + 1) (builtins.tail rest);
+  in
+    go 0 xs;
+
+  plaintextValues = file: let
+    lines = lib.splitString "\n" (read file);
+    cut = indexOf (l: lib.hasPrefix "sops:" l) lines;
+    body = lib.take cut lines;
+    meta = lib.drop cut lines;
+    suffixHits = builtins.filter (l: lib.hasPrefix "unencrypted_suffix:" (lib.trim l)) meta;
+    suffix =
+      if suffixHits == []
+      then null
+      else lib.trim (lib.removePrefix "unencrypted_suffix:" (lib.trim (builtins.head suffixHits))); # Return the KEY, never the value: a gate error must not echo a secret.
+    plainKey = l: let
+      t = lib.trim l;
+      m = builtins.match "([A-Za-z0-9_.-]+):[[:space:]]+(.+)" t;
+    in
+      if t == "" || lib.hasPrefix "#" t || m == null
+      then null
+      else
+        (
+          let
+            key = builtins.elemAt m 0;
+            value = lib.trim (builtins.elemAt m 1);
+          in
+            if !(lib.hasPrefix "ENC[" value) && !(suffix != null && lib.hasSuffix suffix key)
+            then key
+            else null
+        );
+  in
+    builtins.filter (k: k != null) (map plainKey body);
+
+  sopsFiles = [
+    "modules/secrets.yaml"
+    "modules/ssh-ca-key.yaml"
+  ];
+  plaintextSecrets = lib.concatMap (f: map (l: "${f}: ${l}") (plaintextValues f)) sopsFiles;
+
+  # --- user access: one source of keys, no host-local key literals ----------
+  # Not "no keys at all" — `config.ssh.authorizedKeys.keys` is the fleet's
+  # break-glass list and every flake-managed host renders it. The rule is that
+  # nobody *else* pastes a key: CA-signed certs are the access path, and a
+  # second literal is how `authorized_keys` management creeps back.
+  keySourceFiles = [
+    "modules/config/authorized-keys.nix"
+    "modules/ssh-ca.nix"
+    "modules/profiles/nixbuild-client.nix"
+  ];
+  outOfScopeHosts = [
+    "hosts/netbook/"
+    "hosts/microvms/"
+  ];
+  ownKeyLiterals =
+    builtins.filter (
+      p: let
+        r = rel p;
+      in
+        !(builtins.elem r keySourceFiles)
+        && !(lib.any (h: lib.hasPrefix h r) outOfScopeHosts)
+        && anyMatchingLine p ".*(ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256) AAAA.*"
+    )
+    nixFiles;
 
   # `docs/` is the site's navigation source, so an unreferenced page has no
   # parent and no reader. A page earns its place by being linked from a living
@@ -127,17 +205,26 @@
       detail = "${toString (builtins.length proseRules)} uncited prohibition lines (shrink-only budget: 65)";
     };
 
+    paperless-closure-traps = {
+      rule = "frieren's paperless keeps stock `pkgs.tika` in an inline unit and a stubbed gotenberg chromium; an override re-derives both uncached (Maven, ~300 MiB chromium).";
+      proof = "hosts/frieren/paperless.nix";
+      holds =
+        has "hosts/frieren/paperless.nix" "systemd.services.tika"
+        && has "hosts/frieren/paperless.nix" ''runCommand "chromium"''
+        && !(anyLine "hosts/frieren/paperless.nix" (l: builtins.match "[[:space:]]*services.tika.enable = true;" l != null));
+      detail = "paperless went back to the module-level tika override or a real chromium";
+    };
+
     secrets-are-encrypted = {
       rule = "Every sops file in the tree is encrypted (`ENC[AES256_GCM` values plus `sops:` metadata); a plaintext commit fails rather than being reviewed.";
       proof = "modules/secrets.yaml, modules/ssh-ca-key.yaml";
       holds =
         lib.all (
-          f: builtins.pathExists (root + "/${f}") && has f "ENC[AES256_GCM" && anyLine f (l: lib.hasPrefix "sops:" l)
-        ) [
-          "modules/secrets.yaml"
-          "modules/ssh-ca-key.yaml"
-        ];
-      detail = "a sops file is missing, or holds values that are not encrypted";
+          f: builtins.pathExists (root + "/${f}") && anyLine f (l: lib.hasPrefix "sops:" l)
+        )
+        sopsFiles
+        && plaintextSecrets == [];
+      detail = "plaintext value(s) in a sops file: ${lib.concatStringsSep "; " plaintextSecrets}";
     };
 
     secrets-submodule-declared = {
@@ -156,6 +243,16 @@
         has "modules/ssh-ca.nix" "rotate-ssh-cert"
         && has "modules/profiles/base-node.nix" "ssh.ca.enable = true";
       detail = "the CA module lost rotate-ssh-cert, or base-node stopped enabling ssh.ca";
+    };
+
+    ca-only-user-access = {
+      rule = "User access is CA-signed certificates plus the one key list in `modules/config/authorized-keys.nix`; no host ships its own key literal.";
+      proof = "every .nix file outside the key sources and the out-of-flake hosts";
+      holds =
+        ownKeyLiterals
+        == []
+        && has "modules/config/authorized-keys.nix" "config.ssh.authorizedKeys.keys";
+      detail = "key literals outside the single source: ${lib.concatStringsSep ", " (map rel ownKeyLiterals)}";
     };
 
     ci-matrix-is-inventory = {

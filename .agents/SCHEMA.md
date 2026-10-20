@@ -60,7 +60,7 @@ A prohibition in a document is either **enforced** or it is decoration. The spli
 
 | Kind | Home | Shape |
 | :--- | :--- | :--- |
-| **Policy** — a rule a machine can check ("no task defaults to the fleet", "TOML through a tool") | `flake/policies.nix` | `{ rule, proof, holds, detail }`; `checks.policies` asserts `holds` for every id. Prose prohibitions in `AGENTS.md` are a shrink-only budget until each becomes a policy: [[flake/policies.nix#prose-prohibition-ratchet]] |
+| **Policy** — a rule a machine can check ("no task defaults to the fleet", "TOML through a tool") | `flake/policies.nix` | `{ rule, proof, holds, detail }`; `checks.policies` asserts `holds` for every id. `AGENTS.md` and the skills are shrink-only line budgets — they are read into context every turn: [[flake/policies.nix#agent-prose-budget]] |
 | **Procedure** — an action an agent takes ("read the queue before proposing", "ask before deploying") | a skill or a task's `summary` | imperative steps, no rule language |
 
 A document states a policy in one line and cites it: `Never run … [[flake/policies.nix#<policy-id>]]`.

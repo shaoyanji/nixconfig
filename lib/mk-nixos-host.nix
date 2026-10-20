@@ -1,10 +1,10 @@
 # Thin wrapper around nixpkgs.lib.nixosSystem.
 #
 # Centralised so defaults can be added for all NixOS hosts in one place.
-# nixos-configurations.nix passes { inputs, self } here; hosts that do not
+# flake/outputs.nix passes { inputs, self } here; hosts that do not
 # set their own specialArgs in flake/host-inventory.nix get the default.
 #
-# Used by flake/nixos-configurations.nix via mkNixosHost.
+# Used by flake/outputs.nix via mkNixosHost.
 {
   nixpkgs,
   inputs,

@@ -1,46 +1,35 @@
 # Userland Package Ownership
 
-## Current Owners
-- Portable shared baseline: `modules/roles/portable-home.nix` (used by `penguin`) and `modules/roles/minimal.nix` (used by `alarm`, `kali`)
-  - guarantees `shell/base` and `programs.nixvim.enable` across `penguin`, `alarm`, `kali`.
-  - `penguin` imports `portable-home.nix` directly; `alarm` and `kali` import `minimal.nix` which pulls the same baseline via `user/base`.
-- Base: `modules/user/base/default.nix`
-  - General CLI/runtime utilities.
-- Shell base contract: `modules/shell/base.nix`
-  - `bash` + `tmux` module ownership shared across minimal and full-shell stacks.
-- Shell core: `modules/shell/default.nix`
-  - `zoxide`, `direnv`, `fzf`, `ripgrep`, `jq`, `fd`, `bat`, `eza`.
-- AI: `modules/user/ai/default.nix`
-  - `tgpt`, `aichat`, `mods`.
-- Env/git workflow: `modules/env.nix`
-  - `lazygit`.
+Who guarantees what, so a host does not re-declare a package its role already
+owns. The path is the module that owns the property; hosts are consumers.
 
-## Role Wiring
-- `penguin` imports `modules/roles/portable-home.nix`.
-- `alarm` and `kali` import `modules/roles/minimal.nix` directly (canonical path).
-- `modules/roles/minimal.nix` imports:
-  - base
-  - ai
-  - shell base contract is pulled through base (`modules/user/base/default.nix` -> `modules/shell/base.nix`)
-- No experimental package bucket is imported in the default role stack.
+## Owners
 
-## Host Overlay Dedupe Applied
-- `hosts/alarm.nix`: removed duplicate role import now subsumed by `roles/minimal`:
-  - `roles/portable-home`
-- `hosts/kali.nix`: removed shared-role duplicates now owned by base/ai:
-  - `graph-easy`, `graphviz`, `tgpt`, `comrak`, `pandoc`, `zoxide`
-  - removed duplicate imports now subsumed by `roles/minimal`:
-    - `roles/portable-home`, `env.nix`, `shell/tmux.nix`, `helix.nix`
-  - retained as intentionally host-local (not guaranteed by `roles/minimal`):
-    - `programs.direnv` (host integration choices)
-    - `programs.zoxide` (host integration/options)
-    - `programs.fzf` (host shell UX settings)
-    - host package intent list (`lolcat`, `figlet`, `jp2a`, `go`, `gobuster`, `steghide`, `powershell`, `secretscanner`, `yt-dlp`, `ytfzf`, `mpv`)
-- Removed redundant role-guaranteed declarations:
-  - `hosts/penguin.nix`: dropped explicit `programs.nixvim.enable = true` (already guaranteed by `roles/portable-home`)
+- `modules/shell/base.nix` — `bash` (plus `.bash_aliases`, Wayland/X11 socket
+  autodetect, the secret-cache loader) and `tmux`. One leaf, consumed by
+  `shell/default.nix`, `user/base/default.nix` and `roles/demo.nix`.
+- `modules/shell/default.nix` — `shell/base.nix` plus zoxide, direnv, fzf,
+  ripgrep, jq, fd, bat, eza, starship and nushell.
+- `modules/user/base/default.nix` — general CLI/runtime utilities, and the
+  `shell/base.nix` import that makes a shell exist at all.
+- `modules/user/ai/default.nix` — aichat, antigravity-cli, skills,
+  freebuff-remote, mainframe-remotes, zed-mcp; tier-gated by
+  `profiles.ai.enable`.
+- `modules/env.nix` — git/env workflow (lazygit).
 
-## Deferred
-- No aggressive package removals.
-- No changes to host-specific packages that are not clear duplicates in the effective stack.
-- `pkgs.txt` contains the catalog of removed bloat and reference packages (commented out).
-- Observation-window result: experimental bucket removed with no re-homing required during eval validation.
+## Roles
+
+| Role | Is | Consumed by |
+| :--- | :--- | :--- |
+| `roles/minimal.nix` | `user/base` + `user/ai` | `alarm`, `kali`, `global/noDE.nix` |
+| `roles/home.nix` | shell base + niri desktop + dev tooling | the NixOS desktop chain |
+| `roles/demo.nix` | shell base + niri + demo package list | `demo` |
+
+`penguin` has no role file: it imports `modules/shell` and sets
+`programs.nixvim.enable` itself, because one host is not a shared property.
+
+## Rule
+
+A package belongs in the lowest module every consumer already imports. A host
+keeps only what is true of that host alone — driver, GPU, session choice. Two
+hosts duplicating an entry means the entry is owned one level up, not two.

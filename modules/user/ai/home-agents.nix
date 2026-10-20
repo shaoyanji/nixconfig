@@ -8,7 +8,7 @@
 #   * darwin  — modules/global/macos.nix         (same)
 #   * demo    — modules/global/demo.nix          (same)
 #   * containers — modules/global/noDE.nix       (same)
-#   * standalone HM — flake/home-configurations.nix (fleetHost = projection name)
+#   * standalone HM — the home assembler in flake/outputs.nix (fleetHost = projection name)
 #
 # `force` is deliberate: hosts that still carry the old Python-generated regular
 # file are converted to the store symlink on the next switch. Home Manager's

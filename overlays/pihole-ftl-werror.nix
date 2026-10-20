@@ -12,7 +12,7 @@
 # warnings that are still enabled.
 #
 # Applied only to frieren (the sole host running pihole-ftl). Promote this to
-# flake/pkgs-for.nix if another host ever enables pihole. Drop the override
+# the `overlays` list in flake/outputs.nix if another host enables pihole. Drop it
 # once upstream fixes the unused variable or the cache catches up.
 _final: prev: {
   pihole-ftl = prev.pihole-ftl.overrideAttrs (old: {

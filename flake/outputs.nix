@@ -4,16 +4,38 @@
   nixpkgs,
 }: let
   inherit (nixpkgs) lib;
-  systems = import ./systems.nix {inherit (inputs) flake-utils;};
-  pkgsFor = import ./pkgs-for.nix {inherit nixpkgs;};
+
+  # --- assembly primitives ---------------------------------------------------
+  # These four were separate files (systems/pkgs-for/host-projection + one file
+  # per host kind), each a dozen lines with exactly one consumer: this file.
+  # A file whose whole body is wiring between one node and another is not a
+  # module, it is a hop — and a hop is what makes a grep lie about what exists.
+  systems = {
+    default = inputs.flake-utils.lib.defaultSystems;
+    checks = ["x86_64-linux"];
+  };
+
+  overlays = [
+    (import ../overlays/simplex-chat.nix)
+    (import ../overlays/nvidia-persistenced-fix.nix)
+    (import ../overlays/nushell-plugins-compat.nix)
+    # kickstart.nixvim treesitter.nix still references the tmux grammar
+    # that nvim-treesitter dropped upstream
+    (import ../overlays/nvim-treesitter-tmux.nix)
+  ];
+  pkgsFor = system: import nixpkgs {inherit system overlays;};
+
   mkNixosHost = import ../lib/mk-nixos-host.nix {inherit nixpkgs inputs self;};
   # Compiled fleet inventory (lib/inventory.nix). Parsed once here and shared
   # into module chains, checks and packages — hosts never re-parse inventory.toml.
   inventory = import ../lib/inventory.nix {inherit lib;};
   moduleSets = import ./module-sets.nix {inherit inputs self lib inventory;};
   hostInventory = import ./host-inventory.nix {inherit inputs moduleSets self;};
-  hostProjection = import ./host-projection.nix {inherit lib hostInventory;};
-  projectHosts = hostProjection.project;
+
+  # Inventory -> per-kind attrset. The kind is the only thing that decides which
+  # assembler a host gets, so it is the only filter the flake needs.
+  project = kind: fn: lib.mapAttrs fn (lib.filterAttrs (_: host: host.kind == kind) hostInventory);
+
   # Documentation + site nav generated from the SAME compiled registry the hosts
   # use (lib/docs.nix). Built for one system: it is markdown only, so the
   # output is system-independent and does not need a per-system fan-out.
@@ -61,17 +83,42 @@ in {
     inherit lib systems pkgsFor self;
   };
 
-  homeConfigurations = import ./home-configurations.nix {
-    inherit inputs nixpkgs projectHosts self;
-  };
+  # --- the three host assemblers --------------------------------------------
+  # One per kind, because the kind decides the assembler: nixpkgs.nixosSystem,
+  # nix-darwin's darwinSystem, and a standalone home-manager configuration that
+  # builds its own pkgs. Per-host specialArgs from host-inventory override the
+  # { inherit inputs self; } default (see lib/mk-nixos-host.nix).
+  nixosConfigurations = project "nixos" (hostName: host:
+    mkNixosHost {
+      inherit hostName;
+      inherit (host) system modules;
+      specialArgs = host.specialArgs or {inherit inputs self;};
+    });
 
-  nixosConfigurations = import ./nixos-configurations.nix {
-    inherit mkNixosHost projectHosts inputs self;
-  };
+  darwinConfigurations = project "darwin" (_: host:
+    inputs.nix-darwin.lib.darwinSystem {
+      inherit (host) system modules;
+      specialArgs = host.specialArgs or {inherit inputs self;};
+    });
 
-  darwinConfigurations = import ./darwin-configurations.nix {
-    inherit inputs projectHosts self;
-  };
+  homeConfigurations = project "home" (name: host:
+    inputs.home-manager.lib.homeManagerConfiguration {
+      # `fleetHost` is the attrs key, which is the inventory name — the same key
+      # `.#homeAgents` uses, so `~/AGENTS.md` resolves for every standalone host.
+      extraSpecialArgs =
+        (host.extraSpecialArgs or {})
+        // {
+          inherit self;
+          fleetHost = name;
+        };
+      # Standalone HM hosts build their own pkgs; apply the repo overlays so
+      # kickstart-nixvim's treesitter config resolves the tmux grammar that
+      # nvim-treesitter dropped upstream.
+      pkgs = nixpkgs.legacyPackages.${host.system}.extend (
+        import ../overlays/nvim-treesitter-tmux.nix
+      );
+      inherit (host) modules;
+    });
 
   # Expose the package set, including overlays, for convenience.
   darwinPackages = self.darwinConfigurations.cassini.pkgs;
@@ -82,8 +129,6 @@ in {
   # registry and the knowledge graph; the Python renderer that used to live in
   # docs-site/ is retired (docs/docs-pipeline-audit.md §4).
   inherit docs;
-
-  inherit hostProjection;
 
   # Fast, cached entry point: `nix eval .#inventory.hosts.<host>.role` reads the
   # compiled registry WITHOUT evaluating a single host configuration.

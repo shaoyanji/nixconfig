@@ -25,6 +25,21 @@
 
 ## Ledger
 
+### 2026-10-20 — The tree matches the module graph
+
+- Deleted what nothing consumed: `modules/niri.nix` and `roles/heim.nix` (re-export
+  shims), `hm/niri.nix`, `wezterm/`, `nixos/k3s/`, `user/ai/gemini-cli.nix`, and
+  `lib/pie-menu.nix` (334 lines, zero callers). `roles/portable-home.nix` (one import +
+  one option, one host) is now three lines in `hosts/penguin.nix`.
+- `modules/shell/{bash,tmux}.nix` merged into `base.nix`: the two-import shim became the
+  leaf. Behaviour proven identical — eisen's HM `programs.tmux.enable` is true before and
+  after, `.bash_aliases` renders the same 322 B.
+- `flake/` lost its six wiring-only files (`systems`, `pkgs-for`, `host-projection`, and
+  one assembler per kind): each was a dozen lines with exactly one consumer, `outputs.nix`.
+  14 files → 7; the kind projection is now the only thing that picks an assembler.
+- 236 → 219 `.nix`. 26 configurations still evaluate (23 nixos + 3 home), `checks:host`
+  green on frieren/mtfuji/demo, `penguin MODE=eval` 4.5 s / 482 MiB.
+
 ### 2026-10-20 — Hostname comes from the inventory, chains come from `|>`
 
 - `mkNixosHost` sets `networking.hostName` from the inventory key (`mkDefault`), so 22 host

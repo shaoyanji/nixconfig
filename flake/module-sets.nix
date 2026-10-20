@@ -56,7 +56,7 @@
       inputs.sops-nix.homeManagerModules.sops
       inputs.nix-index-database.homeModules.nix-index
       # ~/AGENTS.md from `.#homeAgents.<host>`; standalone HM configs get
-      # `fleetHost` from flake/home-configurations.nix.
+      # `fleetHost` from the home assembler in flake/outputs.nix.
       ../modules/user/ai/home-agents.nix
     ];
 in rec {

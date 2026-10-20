@@ -21,7 +21,7 @@
 | Backups | local + BurgerNAS offsite; restore drill weekly; password in sops | `restic-drill.timer`, `task checks:restic:drill` |
 | DNS | resolver pair: frieren pihole+unbound, delphi crab-hole, one shared `10.99.0.53` | `task checks:dns:failover` |
 | Tailnet routes | `10.99.0.53/32` approved on both via `autoApprovers`; policy mirrored in the repo | `ops:tailnet:routes`, `ops:tailnet:policy` (both rc=0) |
-| Tailnet DNS | global `100.97.61.65, 10.99.0.53`, Override on, split empty — second entry is unroutable for three hosts | `ops:tailnet:dns` |
+| Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
 
@@ -51,10 +51,10 @@
 - Fix chosen: **split DNS** `frieren.lan → 100.97.61.65`, so the zone never reaches the
   global list. Console-only (`dns:core` write; the OAuth client answers `403`). Applied
   2026-10-20: the gate now reports the pin and stops faulting delphi for that zone.
-- The same edit left globals as `[10.99.0.53]` alone — a subnet route aristotle/eisen/fern
-  cannot reach — so non-fleet names have no resolver there. `ops:tailnet:dns` now FAILS on
-  a routed-only list (hosts read from the repo, not hardcoded); fix = put `100.97.61.65`
-  back in globals, since the split rule covers only the zone.
+- That edit briefly left globals as `[10.99.0.53]` alone — a subnet route the three
+  route-refusing hosts cannot reach. `ops:tailnet:dns` now FAILS on a routed-only list
+  (hosts read from the repo, not hardcoded); `100.97.61.65` is back, gate rc=0. Residual:
+  those hosts keep one usable resolver, so a frieren *service* failure still blinds them.
 
 ### 2026-10-20 — Tailnet route approval is tailnet state, not host state
 

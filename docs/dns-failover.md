@@ -150,7 +150,7 @@ while the pair serves nothing.
 | Switch | Where it lives | What it decides | Today (2026-10-20) |
 | :--- | :--- | :--- | :--- |
 | **Route approval** | `enabledRoutes` on the device | whether packets to `10.99.0.53` are delivered at all | **approved on both** (via `autoApprovers`) |
-| **Nameservers** | tailnet DNS settings | whether tailnet clients *ask* the pair | global `[100.97.61.65, 10.99.0.53]`, Override on, split empty |
+| **Nameservers** | tailnet DNS settings | whether tailnet clients *ask* the pair | global `[10.99.0.53, 100.97.61.65]`, split `frieren.lan`, Override on |
 
 `tailscale set --advertise-routes` records an **offer**. Tailscale serves an
 offered subnet route only after approval (admin console, API, or an
@@ -258,10 +258,11 @@ their own resolvers until the tailnet DNS page says otherwise:
   the fleet's resolvers and gets the ad-blocking, at the cost of depending on
   them for *all* name resolution.
 
-**Live since 2026-10-20** — global `[100.97.61.65, 10.99.0.53]`, split DNS empty,
-Override on, MagicDNS on. It works (`photos.frieren.lan → 192.168.3.25`,
-`doubleclick.net → 0.0.0.0` from both entries), but the pair is not the redundancy
-it looks like, for two measured reasons:
+**Live since 2026-10-20** — global `[10.99.0.53, 100.97.61.65]`, split DNS
+`frieren.lan → 100.97.61.65`, Override on, MagicDNS on. Through the stub:
+`photos.frieren.lan → 192.168.3.25`, `example.com`/`github.com` resolve,
+`doubleclick.net → 0.0.0.0`. The pair is still not the redundancy it looks like,
+for two measured reasons:
 
 1. **A subnet-route nameserver is invisible to hosts that refuse routes.**
    `10.99.0.53` is a route, and `--accept-routes` is *deliberately* off on eisen,
@@ -337,21 +338,25 @@ split DNS: frieren.lan -> 100.97.61.65  (photos.frieren.lan=192.168.3.25)
 The zone no longer fails over, which is the accepted trade: every name in it
 points at frieren's own services, so delphi answering them was never useful.
 
-**The split rule does not replace the node-address entry.** When it was applied,
-the global list was reduced to `[10.99.0.53]` at the same time — and that list
-now holds only a subnet route, which eisen/fern/aristotle cannot reach at all
-(`--accept-routes=false`). `frieren.lan` keeps working there because it is
-pinned, but every *other* name has no reachable resolver. Keep a node address in
-`global nameservers`:
+**The split rule does not replace the node-address entry.** When it was first
+applied the global list was cut to `[10.99.0.53]` alone — a subnet route, which
+eisen/fern/aristotle cannot reach — leaving every *non-fleet* name with no
+resolver on those hosts. `task ops:tailnet:dns` now **fails** on a routed-only
+list, naming the hosts it reads from the repo's `--accept-routes=false`
+declarations. The current list keeps one of each:
 
 ```
-global nameservers: 100.97.61.65, 10.99.0.53     # node first-class, pair second
-split DNS:          frieren.lan -> 100.97.61.65   # the zone never leaves frieren
+global nameservers: 10.99.0.53, 100.97.61.65      # pair + a node address that works everywhere
+split DNS:          frieren.lan -> 100.97.61.65    # the zone never leaves frieren
 ```
 
-`task ops:tailnet:dns` fails when every global entry is a subnet route and the
-repo declares hosts with `--accept-routes=false` — the check reads the fleet
-declaration rather than hardcoding names.
+Residual risk, and it is structural: the three route-refusing hosts can only use
+`100.97.61.65`, so if **frieren's resolver** dies while its node stays up, they
+lose DNS (the `/32` is unreachable for them, and the zone is pinned there too).
+A third entry — `100.123.145.53`, delphi's node address — gives them a second
+usable resolver for general names; measured 5/5 at ~22 ms, `example.com`
+resolving, `frieren.lan` still pinned. The zone itself still dies with frieren,
+which is acceptable: every name in it points at frieren's services.
 
 Ways out, in increasing effort:
 

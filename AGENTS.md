@@ -36,7 +36,11 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
    (`task ops:notes`; authoring: `agents-notes` skill); what happened →
    `AUDIT.md`; history → `docs/history/`; procedure → `docs/` or a skill.
    Never a new root markdown file.
-8. **The closed loop is real:** `fleet-sentinel` records jobs, generation age,
+8. **Do not read `AGENTS.nix` in full.** It is a ~3,500-line compiled data store;
+   reading it whole wastes context. Query it with `task ops:notes[:host|:show|:search]`
+   or `nix eval .#agentsNotes…` (0.2 s). Structural "what touches X" questions go to
+   the knowledge graph (`task ops:kg[:host|:skill|:doc|:blast]`), not `grep`.
+9. **The closed loop is real:** `fleet-sentinel` records jobs, generation age,
    disk and PSI every 15 min; gatus pages on `[BODY].state != ok`. A green
    socket is not a successful job — read the ledger.
 
@@ -158,7 +162,31 @@ Custom packages built from the flake:
 task help                        # List all tasks
 task --list-all                  # Same, unfiltered
 task status                      # git status + hostname
-task ops:notes                   # Decisions / queue / design studies (AGENTS.nix)
+```
+
+### Knowledge Graph & Notes Queries (AGENTS.nix & ops:kg)
+
+```bash
+# --- AGENTS.nix Queries (Decisions, Proposals, Open Todos) ---
+# Do NOT read AGENTS.nix (3,500+ lines) directly into context.
+task ops:notes:host HOST=<host>         # Notes affecting a host (e.g. eisen, frieren)
+task ops:notes:show ID=<id>             # Inspect one note by ID (summary, refs, exit criteria)
+task ops:notes KIND=open STATUS=OPEN    # List active open backlog across fleet
+task ops:notes:module PATH=<path>       # Reverse lookup: which notes touch this module
+task ops:notes:task TASK=<task>         # Reverse lookup: why does this task exist
+task ops:notes:search Q="<phrase>"      # Fast substring search across all notes
+nix eval --json .#agentsNotes.byHost.<h> # Machine-readable note IDs for host (0.2s)
+nix eval --json .#agentsNotes.open      # All open note IDs (0.2s)
+
+# --- Knowledge Graph Queries (Hosts x Skills x Docs) ---
+# Do NOT raw-grep for structural relationships. Query the compiled graph.
+task ops:kg                             # Graph summary stats & highest-degree hub nodes
+task ops:kg:host HOST=<host>            # Inbound edges: skills and docs touching this host
+task ops:kg:skill SKILL=<name>          # Inbound mentions + skill tags
+task ops:kg:doc DOC=<path>              # Reverse lookup: hosts & skills documented in file
+task ops:kg:blast TARGET=<id>           # Blast radius: transitive dependents before breaking edits
+task ops:kg:comention HOST=<h> MIN=2    # Multi-hop co-mentioned hosts sharing docs
+task ops:ask Q="what touches <host>"    # Natural language query routed to graph
 ```
 
 ### Host Lifecycle

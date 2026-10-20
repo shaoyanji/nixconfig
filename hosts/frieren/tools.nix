@@ -40,7 +40,11 @@
     desktopName = "DeepSeek Harness";
     genericName = "Agent Harness";
     comment = "Start the DeepSeek Harness and open its web UI";
-    exec = "kitty --title 'DeepSeek Harness' -e dsh-web";
+    # Double quotes, not single: the desktop-entry spec does not treat `'` as a
+    # quote, so `--title 'DeepSeek Harness'` fails desktop-file-validate with
+    # "reserved character ''' outside of a quote" and takes the whole frieren
+    # toplevel down (caught by CI, not by eval).
+    exec = "kitty --title \"DeepSeek Harness\" -e dsh-web";
     icon = "utilities-terminal";
     categories = ["Development" "Utility"];
     keywords = ["ai" "agent" "harness" "dsh" "deepseek"];

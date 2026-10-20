@@ -15,7 +15,11 @@
   # needed — auto-detection handles this correctly for AMD GPUs.
 
   boot.kernelModules = ["amdgpu"];
-  boot.kernelParams = ["video=HDMI-A-1:1920x1080@60"];
+  boot.kernelParams = [
+    "video=HDMI-A-1:1920x1080@60"
+    "reboot=pci,cold"
+    "pcie_aspm=off"
+  ];
 
   # ffmpeg-full with hardware codec support for media workflows.
   # mesa provides the VAAPI/VDPAU backends at runtime (no separate

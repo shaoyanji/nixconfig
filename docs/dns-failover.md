@@ -337,6 +337,22 @@ split DNS: frieren.lan -> 100.97.61.65  (photos.frieren.lan=192.168.3.25)
 The zone no longer fails over, which is the accepted trade: every name in it
 points at frieren's own services, so delphi answering them was never useful.
 
+**The split rule does not replace the node-address entry.** When it was applied,
+the global list was reduced to `[10.99.0.53]` at the same time — and that list
+now holds only a subnet route, which eisen/fern/aristotle cannot reach at all
+(`--accept-routes=false`). `frieren.lan` keeps working there because it is
+pinned, but every *other* name has no reachable resolver. Keep a node address in
+`global nameservers`:
+
+```
+global nameservers: 100.97.61.65, 10.99.0.53     # node first-class, pair second
+split DNS:          frieren.lan -> 100.97.61.65   # the zone never leaves frieren
+```
+
+`task ops:tailnet:dns` fails when every global entry is a subnet route and the
+repo declares hosts with `--accept-routes=false` — the check reads the fleet
+declaration rather than hardcoding names.
+
 Ways out, in increasing effort:
 
 1. **Split DNS for `frieren.lan` → `100.97.61.65`** and leave the globals for

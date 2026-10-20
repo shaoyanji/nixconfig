@@ -314,12 +314,34 @@ That also makes the pair non-interchangeable in the failover sense: losing
 frieren does not degrade to "the same answers", it degrades to "the internet
 resolves, the fleet's names do not".
 
-Three ways out, in increasing effort:
+**Chosen 2026-10-20: option 1 below** — pin the zone with split DNS. It is a
+console change (a write to this needs a `dns:core` credential; the fleet's OAuth
+client is `all:read` and answers `403`):
+
+```
+DNS page -> Add nameserver -> 100.97.61.65 -> "Restrict to search domain" frieren.lan
+# API equivalent
+POST /api/v2/tailnet/-/dns/split-dns
+{"frieren.lan": ["100.97.61.65"]}
+```
+
+After that, `*.frieren.lan` never reaches the global list, so delphi's missing
+zone stops mattering, and `ops:tailnet:dns` reports the pin instead of faulting
+the members:
+
+```
+split DNS: frieren.lan -> 100.97.61.65  (photos.frieren.lan=192.168.3.25)
+  delphi  ...  n/a — frieren.lan is pinned to 100.97.61.65
+```
+
+The zone no longer fails over, which is the accepted trade: every name in it
+points at frieren's own services, so delphi answering them was never useful.
+
+Ways out, in increasing effort:
 
 1. **Split DNS for `frieren.lan` → `100.97.61.65`** and leave the globals for
-everything else. One console change, removes the NODATA race immediately. The
-zone stops failing over — acceptable, since every name in it points at frieren's
-own services.
+everything else. One console change, removes the NODATA race immediately. (This
+is the one taken — see above.)
 2. **Put a zone-capable resolver in front of crab-hole on delphi**: dnsmasq on
 `:53` with `address=/frieren.lan/192.168.3.25`. This is a type change, not a
 config flag — dnsmasq here is an authoritative wildcard server for one zone, not

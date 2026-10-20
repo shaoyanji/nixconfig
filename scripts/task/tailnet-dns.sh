@@ -32,6 +32,22 @@ nameservers="$(curl -sS -m 20 -H "$auth" "$api/nameservers" | jq -r '.dns // [] 
 magic="$(curl -sS -m 20 -H "$auth" "$api/preferences" | jq -r '.magicDNS // false')"
 split="$(curl -sS -m 20 -H "$auth" "$api/split-dns" | jq -c '.')"
 
+# Split DNS pins a zone to specific resolvers and bypasses the global list, so a
+# zone that is pinned here is NOT faulted for what the global members answer.
+# Pinning is the chosen shape for frieren.lan: crab-hole on delphi is a forwarding
+# ad-blocker with no static-record support, so it cannot answer the fleet's
+# wildcard while it holds the shared /32.
+split_zone="$(printf '%s' "$split" | jq -r --arg z "$zone" '(.[$z] // []) | first // empty')"
+if [ -n "$split_zone" ]; then
+  za="$(dig +short +time=2 +tries=1 @"$split_zone" "photos.$zone" 2>/dev/null | head -1)"
+  printf 'split DNS: %s -> %s  (photos.%s=%s)\n' "$zone" "$split_zone" "$zone" "${za:-—}"
+  if [ -z "$za" ]; then
+    echo "PINNED RESOLVER DOES NOT SERVE $zone"
+    fail_pre=1
+  fi
+  echo
+fi
+
 if [ -z "$nameservers" ]; then
   echo "global nameservers: (none) — tailnet clients use their own resolvers"
   echo "magicDNS: $magic   split DNS: $split"
@@ -45,7 +61,7 @@ echo "magicDNS: $magic   split DNS: $split"
 echo "global nameservers (proxied; Tailscale queries them, not the OS):"
 echo
 
-fail=0
+fail=${fail_pre:-0}
 routed=0
 total=0
 node_ips=0
@@ -107,7 +123,14 @@ if [ -n "$members" ]; then
     a="$(dig +short +time=2 +tries=1 @"$ip" "photos.$zone" 2>/dev/null | head -1)"
     b="$(dig +short +time=2 +tries=1 @"$ip" "$probe" 2>/dev/null | head -1)"
     note=""
-    [ -z "$a" ] && { note="DOES NOT SERVE $zone"; fail=1; }
+    if [ -z "$a" ]; then
+      if [ -n "$split_zone" ]; then
+        note="n/a — $zone is pinned to $split_zone"
+      else
+        note="DOES NOT SERVE $zone"
+        fail=1
+      fi
+    fi
     # 0.0.0.0 or no answer = the blocked answer (crab-hole says NXDOMAIN, pihole
     # says 0.0.0.0); anything else means the blocklist is not in effect.
     case "$b" in

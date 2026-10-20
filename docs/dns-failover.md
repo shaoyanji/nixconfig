@@ -149,7 +149,7 @@ while the pair serves nothing.
 
 | Switch | Where it lives | What it decides | Today (2026-10-20) |
 | :--- | :--- | :--- | :--- |
-| **Route approval** | `enabledRoutes` on the device | whether packets to `10.99.0.53` are delivered at all | advertised on **both**, approved on **neither** |
+| **Route approval** | `enabledRoutes` on the device | whether packets to `10.99.0.53` are delivered at all | **approved on both** (via `autoApprovers`) |
 | **Nameservers** | tailnet DNS settings | whether tailnet clients *ask* `10.99.0.53` | none: `global: []`, `split DNS: {}`, MagicDNS on |
 
 `tailscale set --advertise-routes` records an **offer**. Tailscale serves an
@@ -157,53 +157,95 @@ offered subnet route only after approval (admin console, API, or an
 `autoApprovers` rule), and `tailscale status` on the router shows the offer either
 way — which is exactly how a "failover pair" sat configured-but-inert.
 
-Measured, before any approval:
-
 ```
-delphi     OFFERED 0.0.0.0/0,10.99.0.53/32,::/0    APPROVED 0.0.0.0/0,::/0
-frieren    OFFERED 192.168.3.0/24,10.99.0.53/32     APPROVED 192.168.3.0/24
-```
-
-### Approve the route
-
-```bash
-task ops:tailnet:routes                 # gate: prints OFFERED/APPROVED/UNAPPROVED, exits non-zero on drift
-task ops:tailnet:approve HOST=frieren   # [destructive] approves everything that host advertises
+before (2026-10-20)   delphi   OFFERED 0.0.0.0/0,10.99.0.53/32,::/0   APPROVED 0.0.0.0/0,::/0
+                      frieren  OFFERED 192.168.3.0/24,10.99.0.53/32    APPROVED 192.168.3.0/24
+now                   delphi   APPROVED 0.0.0.0/0,10.99.0.53/32,::/0
+                      frieren  APPROVED 192.168.3.0/24,10.99.0.53/32
 ```
 
-`ops:tailnet:routes` works today: it reads through the sops OAuth client, whose
-scope is **`all:read`** — enough to report, and `--approve` against it answers
-`HTTP 403 calling actor does not have enough permissions`. To approve without the
-console, either widen that OAuth client (Settings → OAuth clients) to `all`, or
-export a write token:
+### Approving is a policy rule now, not a click
 
-```bash
-TAILSCALE_API_TOKEN=tskey-api-… task ops:tailnet:approve HOST=frieren
-```
-
-Console path (no credential needed): **Machines → `<device>` → Edit route
-settings → check `10.99.0.53/32` → Save**. Do it for **both** nodes; an approved
-pair is active-passive on the same prefix, so approving one is a single-member
-group again.
-
-### Make it survive, with `autoApprovers`
-
-Approval is per device and is lost when a node is re-registered, so the durable
-form is a policy rule. Both nodes are user-authenticated and untagged
-(`tags: []`), so list the login, not a tag:
+The live policy carries `autoApprovers.routes` for both fleet prefixes, so a
+device authenticated by an admin (`autogroup:admin`) may advertise them and be
+approved on the spot — no console, no write credential, and it survives a node
+being re-keyed:
 
 ```jsonc
 "autoApprovers": {
+  "exitNode": ["autogroup:admin"],
   "routes": {
-    "10.99.0.53/32": ["<your-login-email>"],
-    "192.168.3.0/24": ["<your-login-email>"],
+    "10.99.0.53/32": ["autogroup:admin"],
+    "192.168.3.0/24": ["autogroup:admin"],
   },
 }
 ```
 
-Tags would work too but change key-expiry semantics, and these are servers (key
-expiry is already disabled on both). Writing the policy file needs
-`policy_file` write scope — the current credential cannot.
+**The trap: `autoApprovers` fires when a route is advertised, not when the rule
+lands.** A prefix that was already pending stays pending forever, which is why the
+pair still showed both routes unapproved *after* the rule existed. Re-offering the
+prefix fixes it — and only the /32 has to be withdrawn:
+
+```bash
+# on frieren: drop just the /32 from the offer (the LAN /24 keeps advertising)
+sudo tailscale set --advertise-routes=192.168.3.0/24
+sudo tailscale set --advertise-routes=192.168.3.0/24,10.99.0.53/32
+# 5 s later: APPROVED 192.168.3.0/24,10.99.0.53/32
+```
+
+On delphi (no LAN route of its own) park the offer on an unused prefix, then
+restore it — `10.99.0.54/32` is never bound, so nothing is reachable in between:
+
+```bash
+sudo tailscale set --advertise-routes=10.99.0.54/32
+sudo tailscale set --advertise-routes=10.99.0.53/32
+```
+
+Fallbacks, if a route ever needs approving without a matching rule:
+
+```bash
+task ops:tailnet:routes                 # gate: OFFERED/APPROVED/UNAPPROVED, non-zero on drift
+task ops:tailnet:approve HOST=frieren   # [destructive] needs write scope — see below
+```
+
+The measurement goes through the sops OAuth client, whose scope is **`all:read`**:
+enough to report, and `--approve` against it answers
+`HTTP 403 calling actor does not have enough permissions`. To use that path
+either export a write token for one command, or give the fleet a durable one:
+
+```bash
+# one command, nothing stored
+TAILSCALE_API_TOKEN=tskey-api-… task ops:tailnet:approve HOST=frieren
+
+# durable: the console's Trust credentials page. Tailscale scopes are per-operation,
+# so route approval needs `devices:core` write and the policy endpoint `policy_file`;
+# the fleet client today is `all:read`. Keep the secret in sops, not in the shell:
+#   recreate the OAuth client with those scopes -> TAILSCALE.CLIENT.ID/SECRET, or
+#   generate an API key (90-day expiry) -> TAILSCALE.API.KEY
+sops set modules/secrets/apikeys.yaml '["TAILSCALE"]["API"]["KEY"]' '"tskey-api-…"'
+task infra:secrets:sync
+```
+
+Neither is needed to approve a route covered by `autoApprovers` — only to post a
+policy change from here.
+
+### The policy file lives in the repo
+
+`modules/config/tailnet-policy.hujson` mirrors the live policy, so the rules that
+decide approval are reviewable like everything else:
+
+```bash
+task ops:tailnet:policy           # [gate] semantic diff (comments/order ignored), exit 1 on drift
+task ops:tailnet:policy:apply     # [destructive] POST the file; needs write scope
+```
+
+`apply` replaces the **whole** policy (a console edit not mirrored here is
+reverted), so it refuses to touch anything outside `.autoApprovers.routes` unless
+`FORCE=1`, and sends `If-Match` with the ETag it read — a concurrent console edit
+fails as `412` instead of being overwritten. Posting it is the one operation that
+still needs a write credential: Tailscale has no API for minting API keys or
+editing OAuth clients, so that scope is a console step by construction. Route
+approval no longer needs it at all.
 
 ### Point clients at it (the second switch)
 
@@ -246,12 +288,19 @@ first. That is why the pair shares one address instead of being two entries.
   `sudo tailscale set --advertise-routes=…` now plus the reboot-order fix later.
   Re-read `AdvertiseRoutes` vs `PrimaryRoutes`: the first is the offer, the second
   is what is in force.
+* **A reboot re-offers, which is now harmless**: `tailscaled-set` advertises the
+  composed route set at boot, `autoApprovers` approves it again, so an approved
+  pair survives without anyone re-clicking. Without the rule, a re-keyed or
+  reinstalled node silently drops back to *advertised, not approved*.
 
 ## Related
 
 * `modules/profiles/dns-failover.nix` — the module
 * `modules/profiles/tailnet-dns-address.nix` — the `lo` bind + composed advertisement
+* `modules/config/tailnet-policy.hujson` — the tailnet policy mirror (`autoApprovers`)
 * `scripts/task/tailnet-routes.sh` — `ops:tailnet:routes` / `ops:tailnet:approve`
+* `scripts/task/tailnet-policy.sh` — `ops:tailnet:policy` / `ops:tailnet:policy:apply`
+* `scripts/task/lib/tailnet-api.sh` — token resolution shared by both
 * `scripts/task/dns-failover-check.sh` — the check behind `checks:dns:failover`
 * `hosts/frieren/dns.nix` — the primary declaration
 * `docs/frieren-access.md` — service-access matrix

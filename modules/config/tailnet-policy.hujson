@@ -1,0 +1,65 @@
+// Tailnet policy file — the canonical copy of what the admin console holds.
+//
+// WHY THIS FILE EXISTS: route approval is tailnet state, so it cannot live in
+// Nix. It has to live *somewhere* reviewable, though, and "a click in a web
+// console" is not reviewable. This is that somewhere:
+//
+//   task ops:tailnet:policy          # semantic diff: repo file vs live tailnet
+//   task ops:tailnet:policy:apply    # [destructive] push this file (needs write scope)
+//
+// This file mirrors the live tailnet as of 2026-10-20, when the two fleet
+// prefixes below were added and the stale 192.168.178.0/24 rule (a FritzBox
+// default subnet nothing in inventory.toml advertises) was dropped.
+//
+// `apply` posts the WHOLE document, so everything below is authoritative —
+// a console edit that is not mirrored here is reverted by the next apply.
+//
+// autoApprovers is the point of this file: a device authenticated by an admin
+// may advertise these prefixes and Tailscale approves them on the spot, so the
+// console step disappears for every future host and survives re-registration
+// (an approval is per device and is lost when a node is re-keyed).
+{
+  "acls": [
+    // Unrestricted, as it has been. Kept verbatim so an apply cannot change
+    // access while it is changing routes.
+    {"action": "accept", "src": ["*"], "dst": ["*:*"]},
+  ],
+
+  "autoApprovers": {
+    // An exit node is a bandwidth decision (delphi bills OCI egress), so it
+    // stays admin-only and stays listed here rather than being implied.
+    "exitNode": ["autogroup:admin"],
+
+    "routes": {
+      // The tailnet resolver pair: frieren (pihole-ftl + unbound) and delphi
+      // (crab-hole) both bind this /32 on lo and advertise it, so approving one
+      // node is not enough — a rule covers both, and any future member.
+      //
+      // NOTE: autoApprovers applies when a route is ADVERTISED. A prefix that was
+      // already pending when the rule landed stays pending until something
+      // re-offers it (`tailscale set --advertise-routes=…`), so adding the rule
+      // does not retroactively approve. `ops:tailnet:routes` is the check.
+      "10.99.0.53/32": ["autogroup:admin"],
+
+      // frieren's LAN, as the subnet router for tailnet clients.
+      "192.168.3.0/24": ["autogroup:admin"],
+    },
+  },
+
+  "nodeAttrs": [
+    // Funnel for members: deliberate, and not part of route approval.
+    {
+      "attr": ["funnel"],
+      "target": ["autogroup:member"],
+    },
+  ],
+
+  "ssh": [
+    {
+      "action": "check",
+      "src": ["autogroup:member"],
+      "dst": ["autogroup:self"],
+      "users": ["autogroup:nonroot", "root"],
+    },
+  ],
+}

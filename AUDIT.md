@@ -46,8 +46,11 @@
   — routable without `--accept-routes`, and a service crash is covered by client retry
   instead of a route takeover. `10.99.0.53` stays for LAN clients that hardcode it.
 - New gate `ops:tailnet:dns`: classifies each entry (node vs subnet route), probes the
-  zone and a blocked domain, and marks `local-bind` when the reporting host answers its
-  own probe. rc=0 today; the two notes above are the actionable part.
+  zone and a blocked domain, probes every node advertising a listed address on its own
+  node IP, and marks `local-bind` when the reporting host answers its own probe.
+- Fix chosen: **split DNS** `frieren.lan → 100.97.61.65`, so the zone never reaches the
+  global list. Console-only (`dns:core` write; the OAuth client answers `403`). Once set,
+  the gate reports the pin and stops faulting delphi for a zone it cannot serve.
 
 ### 2026-10-20 — Tailnet route approval is tailnet state, not host state
 

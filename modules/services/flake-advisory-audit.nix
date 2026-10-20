@@ -103,7 +103,7 @@ in {
 
     flakePath = lib.mkOption {
       type = lib.types.path;
-      default = /Volumes/data/projects/nixconfig;
+      default = ../..;
       description = "Path to the Nix flake directory containing flake.lock.";
     };
 

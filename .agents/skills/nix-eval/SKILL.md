@@ -61,13 +61,13 @@ let
 in
   map pick hosts
 EOF
-nix eval --file /tmp/q.nix --json      # 0.03 s, no flake, no network
+nix eval --file /tmp/q.nix --json | toon -e      # 0.03 s, no flake, no network
 rm /tmp/q.nix
 ```
 
 ```bash
 # 2. project ONE attribute out of a large value instead of dumping it
-nix eval --json .#inventory.hosts.frieren --apply 'h: { inherit (h) hostname arch kind status role; }'
+nix eval --json .#inventory.hosts.frieren --apply 'h: { inherit (h) hostname arch kind status role; }' | toon -e
 
 # 3. probe whether something exists WITHOUT forcing it
 nix eval --json .#nixosConfigurations --apply 'cs: builtins.attrNames cs' | jq 'index("delphi")'

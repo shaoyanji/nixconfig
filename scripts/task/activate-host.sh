@@ -12,7 +12,7 @@
 # The three faults this path works around, all hit for real
 # --------------------------------------------------------
 # 1. **root cannot evaluate a flake on NFS.** `nixos-rebuild --flake` run as root
-#    against /Volumes/data/projects/nixconfig dies with libgit2 "repository path
+#    against a checkout on the NAS mount dies with libgit2 "repository path
 #    is not owned by current user", and root's `safe.directory` does NOT suppress
 #    it. So: resolve the store path in THIS process (where the flake evaluates)
 #    and send the *path*, never the flake, to the target.

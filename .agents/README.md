@@ -22,9 +22,9 @@ It is not a second manual and it is not executable truth.
 The authoritative index is Nix:
 
 ```bash
-nix eval .#agentSkills.count                      # 43 skills, ~0.12 s warm
-nix eval --json .#agentSkills.byTag.nix           # names tagged nix
-nix eval --json .#agentSkills.skills.task-plane   # one entry
+nix eval .#agentSkills.count                      # count, ~0.12 s warm
+nix eval --json .#agentSkills.byTag.nix | toon -e           # names tagged nix
+nix eval --json .#agentSkills.skills.task-plane | toon -e   # one entry
 nix build .#checks.x86_64-linux.skills-schema -L  # the gate
 nix build .#agentSkillsBundle                     # skills + index.json in one store path
 ```
@@ -37,7 +37,7 @@ directory — there is no table to update, so there is no table to forget.
 
 | Skill | Why it is a pinnacle |
 | :--- | :--- |
-| [`task-plane`](skills/task-plane/SKILL.md) | The control plane is 370+ tasks; this is the intent→task router, cost tiers, and the authoring contract. Read it before adding a task. |
+| [`task-plane`](skills/task-plane/SKILL.md) | The control plane is hundreds of tasks (`task --list-all \| wc -l`); this is the intent→task router, cost tiers, and the authoring contract. Read it before adding a task. |
 | [`nix-eval`](skills/nix-eval/SKILL.md) | The cheapest instrument ladder. Most "I need a script" questions are a 1-second eval. |
 | [`master-toon`](skills/master-toon/SKILL.md) | TOON is how structured evidence (ledgers, inventories, logs) reaches an agent without burning context. Encode/decode, when **not** to use it. |
 | [`knowledge-base`](skills/knowledge-base/SKILL.md) | Where knowledge lives, which store to query first, and the graph/prose/episodic split. |
@@ -53,14 +53,14 @@ directory — there is no table to update, so there is no table to forget.
 | Fleet services | `fleet-sentinel`, `home-assistant`, `paste`, `wikisearch`, `iventoy`, `burgernas` |
 | Media & AI | `eisen-status`, `decision-picker`, `voice-loop`, `image-generate`, `stt` |
 | Hosting | `moto`, `serv00`, `dragoncourt`, `envs`, `bountystash`, `apps`, `google-drive` |
-| Method | `confirm-before-destructive`, `nixos-deploy`, `nix-preflight-editor` |
+| Method | `confirm-before-destructive`, `nixos-deploy`, `nix-preflight-editor`, `correct`, `no-comments`, `unslop`, `prove-it-works` (pstack, adapted) |
 
 ## Materialization (fleet-wide)
 
 `modules/user/ai/skills/default.nix` is the single materializer. It links two
 sources into every agent's discovery path:
 
-1. `.agents/skills/*` — the repo's 43 documentation/ops skills (this directory).
+1. `.agents/skills/*` — the repo's documentation/ops skills (this directory).
 2. `modules/user/ai/skills/*` — runtime skills that ship scripts (e.g.
    `simplex-admin`, `jev-ultrafast`).
 

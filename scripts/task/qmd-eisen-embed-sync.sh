@@ -39,7 +39,7 @@ EXPLICIT_POWEROFF=0
 NO_POWEROFF=0
 TARGET_COLLECTION=""
 
-REPO="$(git rev-parse --show-toplevel 2>/dev/null || echo "/Volumes/data/projects/nixconfig")"
+REPO="$(git rev-parse --show-toplevel)"
 EISEN_SSH_HOST="eisen"
 WOKE_EISEN=0
 WAS_ONLINE=0

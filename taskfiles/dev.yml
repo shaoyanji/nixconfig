@@ -252,6 +252,31 @@ tasks:
     cmds:
       - bash scripts/task/flake-transitive-sweep.sh update
 
+  dev:toon:fix:
+    desc: Recompute every TOON array length from the rows actually present
+    summary: >
+      The `[n]` in `items[12]{id,name}:` is a row count, and a hand-written TOON
+      document miscounts it; strict decode then refuses the file. This decodes
+      loosely, re-encodes, and writes the result back, so the length is counted
+      rather than trusted. Prints the declared-vs-counted headers it changed.
+      FILES="a.toon b.toon" for files, or pipe TOON on stdin with no FILES.
+      Exit 0 = repaired or already correct; 1 = not a TOON document.
+    # go-task vars are templated, not exported to the shell: `${FILES:-}` would
+    # silently read stdin instead of the named files. Use the template form.
+    cmds:
+      - bash scripts/task/toon-fix.sh {{.FILES | default ""}}
+
+  dev:toon:
+    desc: Encode JSON from stdin as TOON (the agent-facing projection)
+    summary: >
+      AGENTS.md rule: an agent reads TOON, not JSON. Pipe any command that
+      emits JSON into this instead of showing the raw document. --stats prints
+      the measured saving, which is not always positive: nested records can
+      grow (inventory.hosts measured -1.6 %), flat rows shrink (task list +15 %).
+      Example: nix eval --json .#inventory.hosts | task dev:toon
+    cmds:
+      - toon -e --stats
+
   dev:qmd:refresh:
     desc: (Re)index markdown docs (nixconfig repo and personal vault) into local qmd collections
     cmds:

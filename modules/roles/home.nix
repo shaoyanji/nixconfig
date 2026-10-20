@@ -126,6 +126,7 @@ in {
     Unit = {
       Description = "Rclone Google Drive FUSE mount";
       Documentation = ["man:rclone(1)"];
+      ConditionPathExists = "%h/.config/rclone/rclone.conf";
       After = ["network-online.target"];
       Wants = ["network-online.target"];
     };

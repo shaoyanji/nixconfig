@@ -25,20 +25,27 @@
 
 ## Ledger
 
+### 2026-10-20 — The storage table has one home
+
+- The `/srv/data` table, media-isolation rules and security-directory notes left
+  AGENTS.md for `docs/storage-taxonomy.md`, which absorbed `download-taxonomy.md`
+  (ingest doors, torrent policy); the manual keeps a six-line pointer.
+- Replaced by `taxonomy-one-home`, `media-tree-isolation` and
+  `private-trees-restricted` — each verified to FAIL when its condition breaks.
+- Evidence: `checks.policies` rc=0 (16), `docs:links` 113, `docs-budget`,
+  `site-assets`, `qmd:docs` (the new page is top hit for its own vocabulary).
+
 ### 2026-10-20 — Prose is not where a rule lives
 
-- `.nix` headers: 1 145 comment lines across 104 files removed; every file now
-  opens with one line naming its contract. `nix-header-budget` is a gate (≤3
-  lines, banners ignored), not a convention.
-- qmd combs the nix tree: the `nixconfig` mask is `**/*.{nix,md}` (220 `.nix`
-  files), so a module comment and the page that explains it are one query
-  apart. A mask is registration-time state, so the script re-registers a
-  collection whose mask changed.
-- Docs deleted: `docs/vision.md` (byte-identical to `docs/control-plane-vision.md`)
-  and `docs/fleet-operations-recommendations.md` (ten rules already restated in
-  this manual). `no-orphan-docs` makes an unlinked page a gate failure.
-- Evidence: `checks.policies` rc=0 (4 s), `hostChecks` frieren+mtfuji rc=0,
-  `.#docs` rc=0, `docs:links` 113 files, `nix:format` 219 clean.
+- 1 145 comment lines removed from 104 `.nix` headers; `nix-header-budget` (≤3
+  lines) makes the one-line contract a gate instead of a convention.
+- qmd combs the nix tree (`**/*.{nix,md}`, 220 files); a mask is registration-time
+  state, so the index script re-registers a collection whose mask changed.
+- Deleted `docs/vision.md` (byte-identical to `control-plane-vision.md`) and
+  `docs/fleet-operations-recommendations.md` (rules already in this manual);
+  `no-orphan-docs` makes an unlinked page a gate failure.
+- Evidence: `checks.policies` rc=0, `hostChecks` frieren+mtfuji rc=0, `.#docs`,
+  `docs:links` 113, `nix:format` 219 clean.
 
 ### 2026-10-20 — The tree matches the module graph
 

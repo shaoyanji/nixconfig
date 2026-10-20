@@ -54,6 +54,20 @@ in {
   # programs.steam.gamescopeSession, so greetd/DMS can launch the upstream
   # gamescope-session script directly.
   programs.gamescope.enable = true;
+  programs.steam.gamescopeSession.args = [
+    "-W"
+    "1920"
+    "-H"
+    "1080"
+    "-w"
+    "1920"
+    "-h"
+    "1080"
+    "-r"
+    "60"
+    "-O"
+    "HDMI-A-1"
+  ];
 
   # --- Bluetooth (wireless controllers in Steam) ---
   hardware.bluetooth.enable = true;
@@ -77,7 +91,7 @@ in {
     # advertised 192.168.3.0/24 subnet route causes table 52 to hijack all
     # direct LAN traffic (e.g. Steam Link at 192.168.3.48), breaking local streaming.
     extraSetFlags = lib.mkForce [
-      "--accept-dns=true"
+      "--accept-dns=false"
       "--accept-routes=false"
     ];
   };

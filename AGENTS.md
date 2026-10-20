@@ -595,49 +595,14 @@ alejandra --check <file>                                                     # C
 
 ---
 
-## Network Storage Taxonomy & Media Server Architecture
+## Network Storage Taxonomy
 
-The persistent network storage is hosted on the primary 24/7 server `frieren` at `/srv/data` and mounted across the fleet at `/Volumes/data` via NFS (`modules/profiles/nas-client.nix`).
-
-### Canonical Storage Layout
-
-| Path (`/srv/data/` / `/Volumes/data/`)    | Role & Purpose                                       | Indexing & Access Policy                                                                                                                                                  |
-| ----------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `arr/`                                    | Movies and TV series                                 | **Indexed by Jellyfin & Plex**. Strictly clean video containers (`.mkv`, `.mp4`). No archives, software installers, or ISOs.                                              |
-| `media/`                                  | Primary media library mirror                         | Legacy and direct media storage.                                                                                                                                          |
-| `software/`                               | Software installers, desktop utilities, fonts, tools | **Unindexed**. Contains `software/torrents/` (software downloads moved out of `arr/`) shielded with `.nomedia` and `.plexignore` to prevent media scanner probe failures. |
-| `books/`                                  | Books, papers, theses, comics                        | Unindexed by video media servers; indexed by document search (`qmd`). Organized into `programming/`, `philosophy/`, `ai/`, `science/`, `comics/`.                         |
-| `isos/`                                   | Operating system images and installers               | Linux (`arch`, `nixos`, `ubuntu`, `fedora`), appliances (`opnsense`, `openwrt`), and Raspberry Pi images.                                                                 |
-| `german/`                                 | Language learning materials                          | Organized into `books/`, `audio/`, and `notes/`.                                                                                                                          |
-| `devices/`                                | Device firmwares and recovery ROMs                   | Hardware payloads (e.g. OnePlus 6 recovery tools).                                                                                                                        |
-| `projects/`                               | Cloned git repositories and source projects          | Active code checkouts (e.g. `nixconfig`, `bountystash-web`, `gpt2099.nu`).                                                                                                |
-| `bin-x86/`, `bin-aarch64/`, `bin-script/` | Lazily served standalone binaries & scripts          | Accessible directly across the fleet over NFS/HTTP without building Nix derivations.                                                                                      |
-| `appimages/`                              | Lazily served AppImages                              | Portable Linux applications served across the network.                                                                                                                    |
-| `downloads/`                              | Active aria2 RPC staging directory                   | Permissions `0775 aria2:users`. Kept clean as an ephemeral staging area; finished downloads are sorted to their target taxonomy folder.                                   |
-| `p/zhuomin`                               | User's archives                                      | **Private**: Permissions strictly enforced at `0700 devji:users`. Preserved intact for private review. Shielded with `.nomedia`.                                          |
-| `p/ppp`                                   | User's private stash                                 | **Private**: Permissions `0700 devji:users`. Fully shielded with `.nomedia` and `.plexignore` so Jellyfin/Plex do not scan it.                                            |
-| `p/web`                                   | Backward-compatibility symlink                       | Symlink pointing to `/srv/data/projects/bountystash-web`.                                                                                                                 |
-| `security/`                               | Credentials, recovery keys, certificates             | **Restricted**: Permissions strictly `0700 devji:users` (`0600` for private files). Never exposed to network guests.                                                      |
-| `storage/`                                | Backward-compatibility symlink                       | Points to `.` (the data root) so legacy paths like `/Volumes/data/storage/...` resolve seamlessly.                                                                        |
-
-### Media Server Isolation Rules
-
-- **Jellyfin and Plex libraries**: Point to `/srv/data/arr` and `/srv/data/media`.
-- **The Probe Failure Trap**: Media scanners invoke `ffprobe` on all files within indexed trees. When non-media files (e.g., Windows ISOs, Mathematica binaries, zip archives) exist in `arr/`, the scanner crashes with recurring probe exceptions.
-- **Enforcement**:
-  1. Only video and subtitle files (`.mkv`, `.mp4`, `.srt`, etc.) belong in `arr/`.
-  2. Software torrents and non-media data are isolated in `software/torrents/` or `books/`.
-  3. Directories that should never be indexed must contain `.nomedia` and `.plexignore` sentinel files.
-  4. Run `task data:audit` to verify media hygiene.
-
-### Security Directory & Key Fallback Architecture
-
-- **SOPS as Canonical Truth**: All primary secrets, API tokens, and user credentials reside in `modules/secrets.yaml` (and `modules/secrets/apikeys.yaml`).
-- **Cloak (TOTP)**: Fully integrated into `modules/secrets.yaml` under `.cloak`. Managed with `task dev:cloak:*`.
-- **Master Key (`id_ed25519`)**: Kept at `0600` inside `security/` (protected by `0700` directory permissions) and encrypted as `id_ed25519.age` using fleet age keys (`frieren`, `devji`, `poseidon`).
-- **Universal NuShell Fallback (`gist.nu`)**:
-  - Dynamically searches for `apikeys.yaml` in standard workspace locations (`~/Documents/nixconfig`, `/srv/data/nixconfig`) and decrypts via `sops`.
-  - Automatically discovers age identities (`~/.config/sops/age/keys.txt`, `~/.ssh/id_ed25519`, or local security keys) for transparent decryption.
+`/srv/data` on frieren, mounted at `/Volumes/data`: the path table, its
+permissions, the media-scanner rules and the ingest doors have one home,
+[`docs/storage-taxonomy.md`](docs/storage-taxonomy.md). The short version that
+is enforced rather than described: media trees hold only video, everything else
+carries both scanner sentinels, private trees stay `0700`, and `task data:audit`
+is the check. [[flake/policies.nix#media-tree-isolation]]
 
 ---
 
@@ -1143,6 +1108,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | `inventory.toml`                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
 | `docs/inventory-schema.md`           | Inventory schema, compiled artifacts, and the automatic checks          |
 | `docs/sops-rekey.md`                  | The two sops identity planes, `.sops.yaml` anchors, rekey procedure, fresh-host bootstrap |
+| `docs/storage-taxonomy.md`            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |
 | `docs/fleet-inventory.md`            | Pointer page — the catalog itself is `.#docs` (`nix build .#docs`), never committed |
 | `docs/modules-registry.md`           | Pointer page — the knob registry is built from `modules.toml` at build time |
 | `lib/aki-site.nix`                   | The rendered site (`.#fleet-docs-site`): nav comes from the knowledge graph |

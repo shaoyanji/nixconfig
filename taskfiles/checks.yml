@@ -255,7 +255,30 @@ tasks:
       The exhaustive closure build is CI's job: `nix build .#nixosConfigurations.<host>`.
       Runs under scripts/task/oom-guard.sh, which watches /proc/vmstat oom_kill,
       memory/io PSI and MemAvailable at 10 s intervals and kills the run on pressure
-      instead of letting it take the host down.
+      instead of letting it take the host down. That pressure is measured against a
+      baseline sampled before the command starts, so pressure the host ALREADY had
+      (frieren sat at io full avg10 44-61 % from unrelated work on 2026-10-20) no
+      longer aborts a 1 s run — only pressure this run pushes up does.
+
+      WHERE THE COST IS, because it decides what offloading can buy (measured on
+      frieren 2026-10-20, HOST=fern): 10.56 s wall, 958 MiB peak — and the
+      derivation being built is a THREE-LINE runCommand that echoes the summary.
+      So ~10.5 s of
+      a 10.6 s gate is EVALUATION (module system + 1961 assertions), which is
+      local-only: nixbuild.net runs derivations, it does not evaluate, so no flag
+      here moves the expensive half off this machine. The same run with OFFLOAD=1
+      took 12.68 s locally and the remote build itself was 746 ms.
+      The three build-routing flags, one question each:
+        (default)   --builders ""               compile the artifact here, and this
+                                                gate can never spend remote build
+                                                seconds (AGENTS.md rule).
+        STRICT=1    --max-jobs 0 --builders ""  substitute or FAIL: "is this host
+                                                warmed, does CI cover it?"
+        OFFLOAD=1   --max-jobs 0 + /etc/nix/machines  hand it to nixbuild.net
+                                                deliberately (spends build seconds).
+      To move the WHOLE gate off this host, use CI — the only real offload for
+      evaluation: `task dev:ci:trigger:<host>` builds `nixosConfigurations` AND this
+      hostCheck on a GitHub runner and pushes both to cachix.
       MODE=eval swaps the build for an arch-independent EVALUATION of the host's own
       config (module system + every assertion + the registry read), which is how
       aarch64/darwin hosts are checked from this machine:
@@ -268,8 +291,9 @@ tasks:
       ONE host, name REQUIRED — no default, no fleet sweep. Peak memory is O(hosts
       forced in one process), and that is exactly what crashed this NAS.
       Vars: HOST= (required, exactly one), MODE= (build|eval, default build),
-      ARCH= (default x86_64-linux), TIMEOUT=. Exit 1 = the host failed (assertion or
-      eval error), 2 = watchdog abort.
+      ARCH= (default x86_64-linux), TIMEOUT=, plus the env flags STRICT=1 /
+      OFFLOAD=1 above. Exit 1 = the host failed (assertion, eval error, or — under
+      STRICT — not substitutable), 2 = watchdog abort.
     cmds:
       - bash scripts/task/host-check-sweep.sh --hosts "{{.HOST}}" --mode {{.MODE | default "build"}} --arch {{.ARCH | default "x86_64-linux"}} --timeout {{.TIMEOUT | default "120"}}
 
@@ -285,10 +309,11 @@ tasks:
       One host per process, watchdog every 10 s, so peak memory is one host. The fleet
       is CI's job: .github/workflows/nixcachix.yml fans one host out per runner.
       MODE=eval evaluates instead of building, so it is arch-independent and also
-      covers aarch64/darwin hosts; build needs a local builder for ARCH.
+      covers aarch64/darwin hosts; build needs a local builder for ARCH. STRICT=1 and
+      OFFLOAD=1 route the build the same way they do for checks:host.
       Exit 0 = every named host passed, 1 = a host failed (or HOSTS was not given),
       2 = watchdog abort. Vars: HOSTS= (REQUIRED, space separated), MODE= (build|eval,
-      default build), ARCH= (default x86_64-linux), TIMEOUT=.
+      default build), ARCH= (default x86_64-linux), TIMEOUT=, STRICT=1, OFFLOAD=1.
     cmds:
       - bash scripts/task/host-check-sweep.sh --hosts "{{.HOSTS}}" --mode {{.MODE | default "build"}} --arch {{.ARCH | default "x86_64-linux"}} --timeout {{.TIMEOUT | default "120"}}
 

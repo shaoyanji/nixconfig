@@ -594,65 +594,34 @@ alejandra --check <file>                                                     # C
 
 ---
 
-## Network Storage Taxonomy
+## Storage
 
-`/srv/data` on frieren, mounted at `/Volumes/data`: the path table, its
-permissions, the media-scanner rules and the ingest doors have one home,
-[`docs/storage-taxonomy.md`](docs/storage-taxonomy.md). The short version that
-is enforced rather than described: media trees hold only video, everything else
-carries both scanner sentinels, private trees stay `0700`, and `task data:audit`
-is the check. [[flake/policies.nix#media-tree-isolation]]
+`/srv/data` on frieren → `/Volumes/data`: [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)
+[[flake/policies.nix#media-tree-isolation]]
 
 ---
 
-## Secrets Architecture
+## Secrets
 
-Two sops planes, two encrypted files, one CA: the files, their recipients, the
-key locations, the SSH-CA workflow, bootstrap and the rekey procedure live in
-[`docs/sops-rekey.md`](docs/sops-rekey.md). The facts that are gated rather than
-trusted: both files are encrypted in the tree (a plaintext commit fails)
-[[flake/policies.nix#secrets-are-encrypted]], the private files are a submodule
-whose copy is the one `sops updatekeys` reads
-[[flake/policies.nix#secrets-submodule-declared]], and user access is CA-signed
-certificates with no `authorized_keys` side channel
-[[flake/policies.nix#ssh-ca-declarative]].
+Sops planes, files, CA, rekey: [`docs/sops-rekey.md`](docs/sops-rekey.md)
+[[flake/policies.nix#secrets-are-encrypted]]
+[[flake/policies.nix#ca-only-user-access]]
 
 ---
 
-## CI Pipeline
+## CI
 
-One workflow (`.github/workflows/nixcachix.yml`), inventory-driven: which hosts
-build is derived from `inventory.toml` on every push, so there is no matrix to
-toggle and `ci`/`status` are the only knobs. Path rules, commit overrides, the
-runner/attribute mapping and the two builds per host live in
-[`docs/ci-pipeline.md`](docs/ci-pipeline.md). [[flake/policies.nix#ci-matrix-is-inventory]]
-
-The two things worth knowing before you touch it: CI builds
-`nixosConfigurations.<host>` **and** `hostChecks.<arch>.<host>`
-[[flake/policies.nix#ci-builds-config-and-gate]], and dormant hosts are excluded
-by the detector, not by a comment in the workflow
-[[flake/policies.nix#ci-dormant-hosts-excluded]].
+Inventory-driven, no matrix: [`docs/ci-pipeline.md`](docs/ci-pipeline.md)
+[[flake/policies.nix#ci-matrix-is-inventory]]
 
 ---
 
-## Nix Patterns & Gotchas
+## Nix gotchas
 
-The traps live in [`docs/nix-patterns.md`](docs/nix-patterns.md): yq picking its
-parser from the path extension, `//` being shallow, the two uncached package
-overrides on frieren, and the ten agent failure modes (no profile in a non-login
-ssh, flakes ignoring untracked files, the negative narinfo cache).
+Traps, patterns, agent failure modes: [`docs/nix-patterns.md`](docs/nix-patterns.md)
 
-HARD RULE [[flake/policies.nix#toml-through-a-tool]]: TOML goes through a
-format-aware tool. Keep the `.toml` extension (or pass `-p toml -o toml`) and run
-`task checks:toml:lint` after any edit — `yq -i -f script.yq` silently applies
-nothing, so verify the compiled result, not the diff.
-
-Four more that are gated rather than advised: a `.nix` header is one line
-[[flake/policies.nix#nix-header-budget]], `|>` needs `pipe-operators` declared
-[[flake/policies.nix#pipe-operators-declared]], a cache query disables the
-negative-narinfo TTL [[flake/policies.nix#negative-cache-disabled]], and
-paperless keeps stock `pkgs.tika` plus a stubbed chromium
-[[flake/policies.nix#paperless-closure-traps]].
+HARD RULE [[flake/policies.nix#toml-through-a-tool]]: TOML through a format-aware
+tool; `yq -i -f script.yq` applies nothing, so verify the compiled result.
 
 ---
 
@@ -929,30 +898,31 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 
 | File                                 | Content                                                                |
 | ------------------------------------ | ---------------------------------------------------------------------- |
-| `README.md`                          | Full repo documentation, architecture, all workflows                   |
-| `AGENTS.md`                          | This file — canonical agent routing and codebase manual                |
-| `inventory.toml`                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
-| `docs/inventory-schema.md`           | Inventory schema, compiled artifacts, and the automatic checks          |
-| `docs/sops-rekey.md`                  | Sops planes and files, `.sops.yaml` anchors, SSH CA, rekey procedure, fresh-host bootstrap |
-| `docs/storage-taxonomy.md`            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |
-| `docs/fleet-inventory.md`            | Pointer page — the catalog itself is `.#docs` (`nix build .#docs`), never committed |
-| `docs/modules-registry.md`           | Pointer page — the knob registry is built from `modules.toml` at build time |
-| `lib/aki-site.nix`                   | The rendered site (`.#fleet-docs-site`): nav comes from the knowledge graph |
-| `docs/docs-pipeline-audit.md`        | Docs/site pipeline audit: duplicated artifacts, content-in-Nix, remediation order |
-| `docs/closure-reduction.md`          | Closure size levers, evidence chains, and the runtime/interactive/one-shot tiers |
-| `docs/closure-debloat.md`            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |
-| `.agents/fleet-matrix.md`            | Compact fleet context matrix for LLMs and agent prompts                |
-| `docs/task-control-plane.md`         | Task namespace policy and workflow examples                            |
-| `docs/ci-pipeline.md`                | CI: inventory-driven host selection, path rules, the two builds per host |
-| `docs/nix-patterns.md`               | yq/format traps, non-obvious Nix, build-budget traps, agent failure modes |
-| `docs/NUSHELL.md`                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |
-| `docs/frieren-access.md`             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
-| `docs/userland-package-ownership.md` | Package ownership and role wiring                                      |
-| `taskfiles/README.md`                | Taskfile ownership map and shard reference                             |
-| `hosts/sledgehammer/USB.md`          | Sledgehammer live USB creation guide                                   |
-| `AGENTS.nix`                         | Decisions, proposals, open work and design studies as queryable notes |
-| `ARCHITECTURE.md` / `TODO.md`        | Stubs — content moved to `AGENTS.nix` (`task ops:notes`)               |
-| `MANUAL.md`                          | Operator manual: services, ports, closed loop, DMS integration         |
-| `.agents/SCHEMA.md`                  | Documentation/skill contract: budgets, status vocabulary, one fact one home |
-| `docs/history/`                      | Superseded narrative (audit/TODO/HANDOFF) — never linked as current    |
-| `AUDIT.md`                           | Current state + dated change ledger                                    |
+| [`README.md`](README.md)                          | Full repo documentation, architecture, all workflows                   |
+| [`AGENTS.md`](AGENTS.md)                          | This file — canonical agent routing and codebase manual                |
+| [`inventory.toml`](inventory.toml)                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
+| [`docs/inventory-schema.md`](docs/inventory-schema.md)           | Inventory schema, compiled artifacts, and the automatic checks          |
+| [`docs/sops-rekey.md`](docs/sops-rekey.md)                  | Sops planes and files, `.sops.yaml` anchors, SSH CA, rekey procedure, fresh-host bootstrap |
+| [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |
+| [`docs/fleet-inventory.md`](docs/fleet-inventory.md)            | Pointer page — the catalog itself is `.#docs` (`nix build .#docs`), never committed |
+| [`docs/modules-registry.md`](docs/modules-registry.md)           | Pointer page — the knob registry is built from `modules.toml` at build time |
+| [`lib/aki-site.nix`](lib/aki-site.nix)                   | The rendered site (`.#fleet-docs-site`): nav comes from the knowledge graph |
+| [`docs/docs-pipeline-audit.md`](docs/docs-pipeline-audit.md)        | Docs/site pipeline audit: duplicated artifacts, content-in-Nix, remediation order |
+| [`docs/closure-reduction.md`](docs/closure-reduction.md)          | Closure size levers, evidence chains, and the runtime/interactive/one-shot tiers |
+| [`docs/closure-debloat.md`](docs/closure-debloat.md)            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |
+| [`.agents/fleet-matrix.md`](.agents/fleet-matrix.md)            | Compact fleet context matrix for LLMs and agent prompts                |
+| [`docs/task-control-plane.md`](docs/task-control-plane.md)         | Task namespace policy and workflow examples                            |
+| [`docs/ci-pipeline.md`](docs/ci-pipeline.md)                | CI: inventory-driven host selection, path rules, the two builds per host |
+| [`docs/nix-patterns.md`](docs/nix-patterns.md)               | yq/format traps, non-obvious Nix, build-budget traps, agent failure modes |
+| [`docs/NUSHELL.md`](docs/NUSHELL.md)                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |
+| [`docs/frieren-access.md`](docs/frieren-access.md)             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
+| [`docs/dns-failover.md`](docs/dns-failover.md)                | Resolver pair, route vs node failover, why the `/32` cannot fail over |
+| [`docs/userland-package-ownership.md`](docs/userland-package-ownership.md) | Package ownership and role wiring                                      |
+| [`taskfiles/README.md`](taskfiles/README.md)                | Taskfile ownership map and shard reference                             |
+| [`hosts/sledgehammer/USB.md`](hosts/sledgehammer/USB.md)          | Sledgehammer live USB creation guide                                   |
+| [`AGENTS.nix`](AGENTS.nix)                         | Decisions, proposals, open work and design studies as queryable notes |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) / `TODO.md`        | Stubs — content moved to `AGENTS.nix` (`task ops:notes`)               |
+| [`MANUAL.md`](MANUAL.md)                          | Operator manual: services, ports, closed loop, DMS integration         |
+| [`.agents/SCHEMA.md`](.agents/SCHEMA.md)                  | Documentation/skill contract: budgets, status vocabulary, one fact one home |
+| [`docs/history/`](docs/history/)                      | Superseded narrative (audit/TODO/HANDOFF) — never linked as current    |
+| [`AUDIT.md`](AUDIT.md)                           | Current state + dated change ledger                                    |

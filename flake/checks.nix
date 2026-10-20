@@ -100,7 +100,8 @@ lib.genAttrs systems.default (
           id: ''
             ✗ ${id} — ${policiesCtl.policies.${id}.rule}
                proof: ${policiesCtl.policies.${id}.proof}
-               now:   ${policiesCtl.policies.${id}.detail}''
+               now:   ${policiesCtl.policies.${id}.detail}
+          ''
         )
         policyFailures;
       dangling = map (c: "${c.doc} -> ${c.id}") policiesCtl.danglingCitations;

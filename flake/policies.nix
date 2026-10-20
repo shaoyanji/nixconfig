@@ -148,22 +148,23 @@
   # `docs/` is the site's navigation source, so an unreferenced page has no
   # parent and no reader. A page earns its place by being linked from a living
   # document — the same rule that keeps prose out of a `.nix` header.
-  docsFiles = filesWithSuffix "docs" ".md";
-  # The manual's remaining prose prohibitions: lines that still say never/do not
-  # instead of citing a predicate. This is a shrink-only budget — a new rule must
-  # arrive as a policy here, cited, not as one more sentence in AGENTS.md.
-  proseRules = builtins.filter (
-    l:
-      builtins.match ".*(never|do not|don't|must not|shall not|cannot|should not).*" (lib.toLower l)
-      != null
-      && !(lib.hasInfix "flake/policies.nix#" l)
-  ) (lib.splitString "\n" (read "AGENTS.md"));
+  docsFiles = filesWithSuffix "docs" ".md"; # The agent-facing prose surfaces: the manual and every skill are read into
+  # context on each turn, so their size is a cost, not an aesthetic. Shrink-only:
+  # a cleanup lowers the number here in the same commit, and nothing may raise it.
+  lineCount = p: builtins.length (lib.splitString "\n" (builtins.readFile p)) - 1;
+  agentsLines = lineCount (root + "/AGENTS.md");
+  skillFiles = builtins.filter (p: lib.hasSuffix "/SKILL.md" (toString p)) treeFiles;
+  skillLines = builtins.foldl' (acc: p: acc + lineCount p) 0 skillFiles;
 
-  # One blob of every .md/.nix in the tree, so "named somewhere" is one scan, and
-  # a module comment pointing at a doc counts as the route it is.
+  # One blob of every .md/.nix in the tree, so "linked from somewhere" is one scan.
+  # A *link* counts (`](docs/x.md)` from the manual, `](./x.md)` from a sibling
+  # page); plain prose naming a file routes nobody to it.
   treeText = lib.concatStringsSep "\n" (map builtins.readFile textSources);
-  mentions = base: builtins.length (lib.splitString base treeText);
-  orphanDocs = builtins.filter (doc: mentions (baseNameOf doc) < 2) docsFiles;
+  links = base:
+    builtins.length (lib.splitString "](docs/${base})" treeText)
+    + builtins.length (lib.splitString "](./${base})" treeText)
+    - 2;
+  orphanDocs = builtins.filter (doc: links (baseNameOf doc) < 1) docsFiles;
 
   # Every tracked .nix / .md file, walked once: a header budget that only saw the
   # top level would miss the module tree, which is where the 30-line essays were.
@@ -198,11 +199,11 @@
       detail = "headers over budget: ${lib.concatStringsSep ", " longHeaders}";
     };
 
-    prose-prohibition-ratchet = {
-      rule = "A rule in AGENTS.md is a policy id plus a citation; prose prohibitions may only shrink (budget 65, was 65 on 2026-10-20).";
-      proof = "AGENTS.md lines with never/do not/must not/should not and no citation";
-      holds = builtins.length proseRules <= 65;
-      detail = "${toString (builtins.length proseRules)} uncited prohibition lines (shrink-only budget: 65)";
+    agent-prose-budget = {
+      rule = "AGENTS.md (928 lines) and the 55 SKILL.md files (5546 lines: 49 in `.agents/skills/`, 6 in `modules/user/ai/skills/`) are shrink-only — they are read into context on every turn, so a cleanup lowers the number here in the same commit.";
+      proof = "line counts of AGENTS.md and every tracked SKILL.md";
+      holds = agentsLines <= 928 && skillLines <= 5546;
+      detail = "AGENTS.md ${toString agentsLines}/928 lines, skills ${toString skillLines}/5546 — over budget means delete, not renumber";
     };
 
     paperless-closure-traps = {
@@ -314,10 +315,10 @@
     };
 
     no-orphan-docs = {
-      rule = "A `docs/*.md` page is named by another living document; an unlinked page is a page nothing routes to.";
-      proof = "docs/*.md against inbound mentions in AGENTS.md, README.md and the other docs";
+      rule = "A `docs/*.md` page is reachable by a markdown link from the manual or a sibling page; an unlinked page is a page nothing routes to.";
+      proof = "docs/*.md against inbound `](…x.md)` links in AGENTS.md, README.md and sibling pages";
       holds = orphanDocs == [];
-      detail = "unreferenced docs: ${lib.concatStringsSep ", " orphanDocs}";
+      detail = "docs nothing links to: ${lib.concatStringsSep ", " orphanDocs}";
     };
 
     no-fleet-default = {

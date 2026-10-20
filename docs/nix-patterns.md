@@ -56,10 +56,14 @@ Better still: `inventory.toml` is compiled by `lib/inventory.nix` — read it wi
 A module that overrides a package re-derives it, misses the binary cache, and
 spends the month's build budget. Two are fixed in place and must stay fixed:
 
-| Where | Trap | What the repo does |
-| :--- | :--- | :--- |
-| `hosts/frieren/paperless.nix` | `services.tika` calls `cfg.package.override { enableGui = false }` under the hood → uncached hash → full Maven build (~11 min) | inline `systemd.services.tika` running stock, cached `pkgs.tika` |
-| `hosts/frieren/paperless.nix` | real chromium in the closure (~300 MiB) for a route Paperless never uses | `services.gotenberg.chromium.package` stubbed to a `chromium` symlink |
+Both live in one file, and **that file's comment is the home** — the rationale is
+next to the code that would break: `hosts/frieren/paperless.nix` (§Tika,
+§Gotenberg). The index is all this page keeps:
+
+| Where | Trap |
+| :--- | :--- |
+| `hosts/frieren/paperless.nix` | module-level `tika` override → uncached Maven build |
+| `hosts/frieren/paperless.nix` | real chromium (~300 MiB) for a route Paperless never uses |
 
 [[flake/policies.nix#paperless-closure-traps]]
 

@@ -631,28 +631,19 @@ Two separate encrypted files, decrypted via `sops-nix` using host age keys:
 
 ---
 
-## CI Pipeline & Control Plane
+## CI Pipeline
 
-GitHub Actions in `.github/workflows/`:
+One workflow (`.github/workflows/nixcachix.yml`), inventory-driven: which hosts
+build is derived from `inventory.toml` on every push, so there is no matrix to
+toggle and `ci`/`status` are the only knobs. Path rules, commit overrides, the
+runner/attribute mapping and the two builds per host live in
+[`docs/ci-pipeline.md`](docs/ci-pipeline.md). [[flake/policies.nix#ci-matrix-is-inventory]]
 
-- `nixcachix.yml` — Unified multi-architecture dynamic change-detection pipeline (`scripts/ci/detect-affected-hosts.py`):
-  - Single canonical workflow replacing old separate Darwin/ARM files.
-  - Automatically maps fleet host metadata from `inventory.toml`:
-    - `arch` -> Runner OS (`x86_64-linux` -> `ubuntu-latest`, `aarch64-linux` -> `ubuntu-24.04-arm`, `aarch64-darwin` -> `macos-latest`).
-    - `kind` -> Flake attribute (`nixosConfigurations.*`, `darwinConfigurations.*`, `homeConfigurations.*`).
-  - Documentation/meta changes (`*.md`, `docs/`, `taskfiles/`) skip runner allocation (0 builds).
-  - Host-specific changes (`hosts/<host>/**`) build only the affected host on its target architecture.
-  - Shared Nix modules (`modules/**`, `flake.lock`) anchor to `frieren` by default.
-  - Policy enforcement: Hosts with `ci = false` (e.g. unfree NVIDIA on `stark`/`kellerbench`) and dormant `status = "preserved"` hosts are automatically excluded.
-  - Commit message overrides: `[skip ci]`, `[ci all]`, `[ci <host1,host2>]`.
-  - Manual dispatch: `task dev:ci:trigger:<host>` or via GitHub Actions UI.
-
-Operator control tasks:
-- `task dev:ci:plan` — Evaluate CI impact of unpushed commits against `origin/main`
-- `task dev:ci:plan:worktree` — Evaluate CI impact of current working tree changes
-- `task dev:ci:trigger:<host>` — Manually trigger CI build for `<host>` (or `all`)
-
-CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodule support).
+The two things worth knowing before you touch it: CI builds
+`nixosConfigurations.<host>` **and** `hostChecks.<arch>.<host>`
+[[flake/policies.nix#ci-builds-config-and-gate]], and dormant hosts are excluded
+by the detector, not by a comment in the workflow
+[[flake/policies.nix#ci-dormant-hosts-excluded]].
 
 ---
 
@@ -1117,6 +1108,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | `docs/closure-debloat.md`            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |
 | `.agents/fleet-matrix.md`            | Compact fleet context matrix for LLMs and agent prompts                |
 | `docs/task-control-plane.md`         | Task namespace policy and workflow examples                            |
+| `docs/ci-pipeline.md`                | CI: inventory-driven host selection, path rules, the two builds per host |
 | `docs/NUSHELL.md`                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |
 | `docs/frieren-access.md`             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
 | `docs/userland-package-ownership.md` | Package ownership and role wiring                                      |

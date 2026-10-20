@@ -1,0 +1,62 @@
+# CI Pipeline
+
+One workflow, `.github/workflows/nixcachix.yml`, builds the fleet on GitHub
+runners and pushes to the `shaoyanji` cache. There is **no build matrix to
+edit**: which hosts build is derived from `inventory.toml` on every push.
+
+## What decides
+
+`scripts/ci/detect-affected-hosts.py` maps the changed paths to hosts, then to a
+runner; the workflow dispatches one job per affected host.
+
+| Field in `inventory.toml` | Becomes                                                                |
+| :------------------------ | :--------------------------------------------------------------------- |
+| `arch`                    | runner OS: `x86_64-linux → ubuntu-latest`, `aarch64-linux → ubuntu-24.04-arm`, `aarch64-darwin → macos-latest` |
+| `kind`                    | flake attribute: `nixosConfigurations.*`, `darwinConfigurations.*`, `homeConfigurations.*` |
+| `ci = false`              | excluded (unfree NVIDIA on `stark`/`kellerbench`)                      |
+| `status = "preserved"`    | excluded (dormant hosts are not check targets)                          |
+
+Path rules:
+
+- Documentation and meta changes (`*.md`, `docs/`, `taskfiles/`) allocate **zero**
+  runners.
+- `hosts/<host>/**` builds that host only, on its own architecture.
+- Shared Nix (`modules/**`, `flake.lock`) anchors to `frieren` by default; the
+  manual dispatch input `shared_strategy` switches to `all` or `none`.
+
+Commit-message overrides, checked before anything else: `[skip ci]` / `[ci skip]`
+builds nothing, `[ci all]` builds every CI-eligible active host, `[ci h1,h2]`
+builds the named hosts even if their inventory entry excludes them.
+
+## What it builds
+
+Each affected host gets two builds, both with `?submodules=1` (the `modules/secrets`
+submodule is not optional in CI):
+
+```bash
+nix build -L .?submodules=1#<attr>                          # the closure
+nix build -L .?submodules=1#hostChecks.<arch>.<host>        # the module-system gate
+```
+
+The runner is configured with `experimental-features = nix-command flakes
+pipe-operators`: the tree uses `|>`, and a runner without it cannot parse the
+flake at all. That is why the prefix is set in `install-nix-action` rather than
+in a host config.
+
+A separate `sops-drift` job runs `scripts/task/sops-drift-check.sh --repo-only`
+with `continue-on-error`, so recipient drift is reported without failing a build.
+
+## Operating it
+
+| Task                        | What                                                              |
+| :-------------------------- | :---------------------------------------------------------------- |
+| `task dev:ci:plan`          | affected hosts for unpushed commits vs `origin/main`              |
+| `task dev:ci:plan:worktree` | the same for the current working tree                             |
+| `task dev:ci:trigger:<host>`| re-run the workflow for one host (`all`, `auto` accepted)          |
+
+Making a host CI-eligible is an inventory edit (`ci = true`, `status = "active"`);
+retiring it is `status = "preserved"` or removing the entry. Anything that edits a
+matrix is editing a list this pipeline does not read:
+[[flake/policies.nix#ci-matrix-is-inventory]]
+[[flake/policies.nix#ci-dormant-hosts-excluded]]
+[[flake/policies.nix#ci-builds-config-and-gate]]

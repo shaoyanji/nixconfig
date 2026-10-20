@@ -195,6 +195,11 @@ ssh devji@delphi 'systemctl is-active nginx crab-hole tailscaled; systemctl --fa
 ssh devji@delphi 'dig +short @10.99.0.53 github.com'
 ssh devji@delphi 'dig @10.99.0.53 doubleclick.net +noall +comments | head -1'   # NXDOMAIN = blocked
 ssh devji@delphi 'systemctl --user status hermes-gateway; journalctl --user -u hermes-gateway -n 5'
+# Fleet monitors (a second vantage OUTSIDE the LAN). Tailnet-only: bound to
+# 0.0.0.0 because the tailnet address is assigned at login, reachable only via
+# the tailscale0 firewall rule — :8181 on the public IP is refused by design.
+curl -s http://100.123.145.53:8181/api/v1/endpoints/statuses \
+  | jq -r '.[] | "\(.group)\t\(.name)\t\(.results[-1].success)"'
 ```
 
 `task checks:dns:failover` does **not** cover this host: it reads the LAN `resolvers`

@@ -318,13 +318,13 @@ in {
       # `http://<ip>/healthz` keeps working as an edge probe independent of DNS.
       // lib.optionalAttrs (publicDomain != null) {
         ${publicDomain} = {
-          listen = [
-            {
-              addr = "0.0.0.0";
-              port = 443;
-              ssl = true;
-            }
-          ];
+          # No explicit `listen`: `enableACME`/`forceSSL` generate BOTH halves,
+          # the :443 server and the :80 redirect that carries the ACME
+          # challenge location. Declaring `listen 443 ssl` by hand left the
+          # generated :80 block without a listen directive, so it landed in a
+          # different listen group from the IP-addressed default vhost and no
+          # request ever reached the challenge location — HTTP-01 answered 404
+          # while the token sat in /var/lib/acme/acme-challenge.
           enableACME = true;
           forceSSL = true;
           root = "${healthPage}";

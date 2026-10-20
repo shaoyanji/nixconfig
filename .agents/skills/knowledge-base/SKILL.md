@@ -25,12 +25,20 @@ why "I searched and found nothing" keeps happening.
 | **Episodic** | sentinel ledger, journald, generations, restic runs | `task ops:ledger`, `journalctl` | live |
 | **Personal** | Obsidian vault (`/Volumes/data/Obsidian-Git-Sync`) | `qmd search -c vault`, direct read | as of the last sync |
 
+A **design record** sits beside these: `AGENTS.nix` (`.agents/notes`) and its
+lineage. It is not prose to be searched — it is the answer to "has this been
+tried, and what did it come out of?", which `qmd` cannot answer because the
+record is data, not markdown.
+
 The graph (`.#knowledgeGraph`, below) is a **projection** over 1 + 2, not a fifth
 source of truth.
 
 ## 2. Query ladder
 
 ```bash
+# 0. a NOVEL task: has the design record been here already?
+task ops:notes:near Q="backups have never been restored"   # ranked + lineage
+
 # 1. structural question about the fleet
 nix eval --json .#inventory.hosts.frieren.role | toon -e
 nix eval --json .#agentSkills.byTag.nix | toon -e
@@ -286,7 +294,7 @@ second vault.**
 | A durable rule | `.agents/SCHEMA.md` or the owning manual |
 | A host fact | `inventory.toml` (`notes`) via `task dev:inventory:menu` |
 | An operational event | the sentinel ledger (automatic) + `AUDIT.md` line |
-| A design decision | an `AGENTS.nix` note with `refs` (`task ops:notes`) |
+| A design decision | an `AGENTS.nix` note with `refs`, plus `from` naming what it grew out of (`task ops:notes:near` first) |
 | A one-off finding | the commit message / PR; promote only if it changes a rule |
 | A procedure | `docs/` or a skill |
 | A personal note | the vault |

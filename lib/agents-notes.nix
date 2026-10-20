@@ -52,6 +52,15 @@
   docsOf = n: (refsOf n).docs or [];
   hasRefs = n: (hostsOf n ++ modulesOf n ++ tasksOf n ++ docsOf n) != [];
 
+  # Lineage. `links` is an undirected peer edge ("same thread") and says nothing
+  # about which came first. `from` and `supersedes` are the directed ones: they
+  # are what make a delivered note usable as provenance instead of a dead file.
+  # Everything below (ancestors, descendants, replacedBy) is DERIVED from those
+  # two fields, so a note never stores the same edge twice.
+  fromOf = n: n.from or [];
+  supersedesOf = n: n.supersedes or [];
+  parentsOf = n: fromOf n ++ supersedesOf n;
+
   hostNames =
     if inventory == null
     then []
@@ -97,6 +106,34 @@
     ++ map (l: "${id}: links names unknown note '${l}'") (
       builtins.filter (l: !(builtins.elem l noteIds)) (n.links or [])
     )
+    ++ map (l: "${id}: from names unknown note '${l}'") (
+      builtins.filter (l: !(builtins.elem l noteIds)) (fromOf n)
+    )
+    ++ map (l: "${id}: supersedes names unknown note '${l}'") (
+      builtins.filter (l: !(builtins.elem l noteIds)) (supersedesOf n)
+    )
+    # Superseding is a two-sided edit, or it is an unrecorded deletion: the new
+    # note claims the edge, the old one keeps its body and changes status.
+    ++ map (
+      l: "${id}: supersedes '${l}', but '${l}' is ${raw.${l}.status or "unknown"} — mark it SUPERSEDED (the record stays) or use `from` if it is not being replaced"
+    ) (
+      builtins.filter (
+        l: builtins.elem l noteIds && (raw.${l}.status or "") != "SUPERSEDED"
+      ) (supersedesOf n)
+    )
+    ++ map (l: "${id}: '${l}' appears twice in one relation list") (
+      lib.unique (
+        builtins.filter (
+          l:
+            (builtins.length (builtins.filter (x: x == l) (n.links or [])) > 1)
+            || (builtins.length (builtins.filter (x: x == l) (fromOf n)) > 1)
+            || (builtins.length (builtins.filter (x: x == l) (supersedesOf n)) > 1)
+        )
+        ((n.links or []) ++ fromOf n ++ supersedesOf n)
+      )
+    )
+    ++ lib.optional (builtins.elem id (parentsOf n))
+    "${id}: a note cannot derive from or supersede itself"
     # Traceable notes are distilled; an untraceable one is a leaf and must carry
     # the verbose intent instead of losing it.
     ++ (
@@ -108,6 +145,33 @@
         lib.optional (bodyLines n < 6)
         "${id}: leaf note (no refs) needs a verbose body (>=6 lines) explaining the intent"
     );
+
+  # Transitive ancestry, seeded with the DIRECT parents so a cycle is observable
+  # (the closure comes back to the note itself). The depth bound is the note
+  # count: a cycle terminates the eval instead of hanging it, and the gate above
+  # reports it as an issue rather than pretending the graph is a DAG.
+  reach = id: let
+    go = depth: acc:
+      if depth == 0
+      then acc
+      else let
+        next = lib.unique (acc ++ lib.concatMap stepOf acc);
+      in
+        if builtins.length next == builtins.length acc
+        then acc
+        else go (depth - 1) next;
+  in
+    go (builtins.length noteIds + 1) (stepOf id);
+
+  stepOf = id:
+    builtins.filter (x: builtins.elem x noteIds) (lib.unique (parentsOf raw.${id}));
+
+  # Computed once per note, not once per query: 157 notes is already more than
+  # the graph will ever hold, and a closure per call would make `near` quadratic.
+  ancestors = lib.genAttrs noteIds (id: lib.unique (reach id));
+  cyclic = id: builtins.elem id ancestors.${id};
+  descendantsOf = id: builtins.filter (x: builtins.elem id ancestors.${x}) noteIds;
+  replacedByOf = id: builtins.filter (x: builtins.elem id (supersedesOf raw.${x})) noteIds;
 
   entry = id: n: {
     inherit id;
@@ -124,6 +188,11 @@
       docs = docsOf n;
     };
     links = n.links or [];
+    from = fromOf n;
+    supersedes = supersedesOf n;
+    ancestors = ancestors.${id};
+    descendants = descendantsOf id;
+    replacedBy = replacedByOf id;
     leaf = !(hasRefs n);
     lines = bodyLines n;
     body = bodyOf n;
@@ -133,7 +202,20 @@
   entryList = map (id: entries.${id}) noteIds;
   ordered = lib.sort (a: b: a.id < b.id) entryList;
 
-  issues = lib.concatMap (id: issuesFor id raw.${id}) noteIds;
+  # Two whole-corpus rules, not per-note ones: a cycle in `from` has no single
+  # guilty note, and SCHEMA §3's "SUPERSEDED links the replacement" is only
+  # true if the replacement actually claims it.
+  graphIssues =
+    lib.concatMap (
+      id:
+        lib.optional (cyclic id) "${id}: lineage cycle (from/supersedes returns to this note)"
+        ++ lib.optional (
+          (raw.${id}.status or "") == "SUPERSEDED" && replacedByOf id == []
+        ) "${id}: SUPERSEDED but no note supersedes it — add `supersedes = [\"${id}\"]` to the replacement so the record is not a dead end"
+    )
+    noteIds;
+
+  issues = lib.concatMap (id: issuesFor id raw.${id}) noteIds ++ graphIssues;
 
   byStatus = status: builtins.filter (e: e.status == status) entryList;
   byKind = kind: builtins.filter (e: e.kind == kind) entryList;
@@ -151,6 +233,8 @@
     byKind = lib.genAttrs kinds (k: builtins.length (byKind k));
     open = builtins.length (builtins.filter (e: builtins.elem e.status openStatuses) entryList);
     leaves = builtins.length (builtins.filter (e: e.leaf) entryList);
+    lineageEdges = builtins.length (lib.concatMap (id: parentsOf raw.${id}) noteIds);
+    withLineage = builtins.length (builtins.filter (e: e.ancestors != []) entryList);
   };
   byStatusIds = lib.genAttrs statuses (s: map (e: e.id) (byStatus s));
 
@@ -170,6 +254,14 @@
       )
     );
 
+  # Lineage renders like a ref line but every entry is a note, so it goes through
+  # the same link function the notes index uses (repo-relative in `.#docs`, code
+  # in the site).
+  lineageLine = relatedLink: label: xs:
+    lib.optionalString (xs != []) (
+      "- **${label}:** " + lib.concatStringsSep ", " (map relatedLink xs)
+    );
+
   notePageWith = linkify: relatedLink: e:
     "# ${e.title}\n\n"
     + "**Status:** ${statusBadge e} · **Kind:** `${e.kind}`"
@@ -183,6 +275,12 @@
         (refLine linkify "docs" e.refs.docs)
         (lib.optionalString (e.links != [])
           ("- **Related notes:** " + lib.concatStringsSep ", " (map (l: relatedLink l) e.links)))
+        (lineageLine relatedLink "From" e.from)
+        (lineageLine relatedLink "Supersedes" e.supersedes)
+        (lineageLine relatedLink "Replaced by" e.replacedBy)
+        # A superseding note IS a descendant (it knew what it replaced), so it is
+        # already on its own line; listing it twice reads like two successors.
+        (lineageLine relatedLink "Led to" (lib.subtractLists e.replacedBy e.descendants))
       ]
     )
     + "\n"
@@ -229,7 +327,7 @@
   sitePages = lib.mapAttrs (_: e: notePageWith (x: "`${x}`") (l: "`${l}`") e) entries;
 
   api = {
-    schemaVersion = 1;
+    schemaVersion = 2;
     inherit counts issues;
     ok = issues == [];
     index = lib.mapAttrs (_: e: removeAttrs e ["body"]) entries;
@@ -237,11 +335,25 @@
     byHost = indexOf "hosts";
     byModule = indexOf "modules";
     byTask = indexOf "tasks";
+    byDoc = indexOf "docs";
     byStatus = byStatusIds;
+    # One record per note, both directions, all derived. This is what
+    # `task ops:notes:lineage` reads — no traversal at query time.
+    lineage =
+      lib.mapAttrs (_: e: {
+        from = e.from;
+        supersedes = e.supersedes;
+        ancestors = e.ancestors;
+        descendants = e.descendants;
+        replacedBy = e.replacedBy;
+      })
+      entries;
+    origins = builtins.filter (id: entries.${id}.ancestors == []) noteIds;
+    frontier = builtins.filter (id: entries.${id}.descendants == []) noteIds;
     open = map (e: e.id) (builtins.filter (e: builtins.elem e.status openStatuses) ordered);
   };
 in {
-  inherit (api) schemaVersion counts issues ok index notes byHost byModule byTask byStatus open;
+  inherit (api) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
   inherit pages sitePages;
   json = builtins.toJSON api;
 }

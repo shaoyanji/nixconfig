@@ -33,6 +33,7 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 | Validation gates | `taskfiles/checks.yml` (`checks:*`) | Read the "what it proves" column below. |
 | Git, flake updates, closure analysis, site deploy | `taskfiles/dev.yml` (`dev:*`) | `dev:closure:*` is build *preparation*. |
 | Structural questions: what touches X | `taskfiles/ops.yml` (`ops:kg:*`) | Answered by the Elixir sidecar by default; `ops:kg:speed` measures it against jq. |
+| "Has this been tried?" on a novel task | `taskfiles/ops.yml` (`ops:notes:near`, `ops:notes:lineage`) | ~1 s. The design record is data, so `qmd` cannot answer it. Do this before writing a note. |
 | Canary MicroVM | `taskfiles/infra.yml` (`vm:canary:*`) | EXP-102. |
 | Operator menus / gum TUIs | `taskfiles/agents.yml`, root `menu*` | |
 | Legacy wrappers | `taskfiles/services-core.yml`, `services-legacy.yml` | `[deprecated]` only; never add here. |

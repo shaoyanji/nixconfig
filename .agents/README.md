@@ -12,6 +12,7 @@ It is not a second manual and it is not executable truth.
 | Why a design exists / what is next | `AGENTS.nix` notes — `task ops:notes` (`:host`, `:module`, `:search`) |
 | How to author or promote a note | `skills/agents-notes/SKILL.md` (templates + promotion ladder) |
 | What happened | `AUDIT.md`, `docs/history/` |
+| A novel task, or "has this been tried?" | `task ops:notes:near Q="<the intent in your words>"` — ranked notes, each with its lineage and refs; `task ops:notes:lineage ID=<id>` for one note's ancestry |
 | An experiment | `task ops:notes KIND=experiment` (`exp-NNN` notes) |
 | Host-specific deploy notes | `deploy/README.md`, `deploy/hosts/*.md` |
 | A skill | `skills/<name>/SKILL.md` — index below is compiled |
@@ -43,6 +44,7 @@ directory — there is no table to update, so there is no table to forget.
 | [`master-toon`](skills/master-toon/SKILL.md) | TOON is how structured evidence (ledgers, inventories, logs) reaches an agent without burning context. Encode/decode, when **not** to use it. |
 | [`knowledge-base`](skills/knowledge-base/SKILL.md) | Where knowledge lives, which store to query first, and the graph/prose/episodic split. |
 | [`host-facts`](skills/host-facts/SKILL.md) | Answer host questions from the compiled registry, never by evaluating a config. |
+| [`agents-notes`](skills/agents-notes/SKILL.md) | The design record: find the note near a novel intent, read its lineage, and promote an idea into a gate instead of a second markdown file. |
 | [`fleet-sentinel`](skills/fleet-sentinel/SKILL.md) | The closed loop: how a failure is detected, recorded, and routed. |
 
 ## Skill families

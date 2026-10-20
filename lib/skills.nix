@@ -53,7 +53,11 @@
     then []
     else if m == null
     then [(unquote s)]
-    else lib.filter (x: x != "") (map (x: unquote (trim x)) (lib.splitString "," (builtins.head m)));
+    else
+      builtins.head m
+      |> lib.splitString ","
+      |> map (x: x |> trim |> unquote)
+      |> lib.filter (x: x != "");
 
   takeUntil = pred: xs: let
     go = acc: rest:

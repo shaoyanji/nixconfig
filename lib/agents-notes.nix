@@ -121,16 +121,17 @@
         l: builtins.elem l noteIds && (raw.${l}.status or "") != "SUPERSEDED"
       ) (supersedesOf n)
     )
-    ++ map (l: "${id}: '${l}' appears twice in one relation list") (
-      lib.unique (
-        builtins.filter (
-          l:
-            (builtins.length (builtins.filter (x: x == l) (n.links or [])) > 1)
-            || (builtins.length (builtins.filter (x: x == l) (fromOf n)) > 1)
-            || (builtins.length (builtins.filter (x: x == l) (supersedesOf n)) > 1)
-        )
-        ((n.links or []) ++ fromOf n ++ supersedesOf n)
+    ++ (
+      ((n.links or []) ++ fromOf n ++ supersedesOf n)
+      |> lib.unique
+      |> builtins.filter (
+        l:
+          lib.count (x: x == l) (n.links or [])
+          > 1
+          || lib.count (x: x == l) (fromOf n) > 1
+          || lib.count (x: x == l) (supersedesOf n) > 1
       )
+      |> map (l: "${id}: '${l}' appears twice in one relation list")
     )
     ++ lib.optional (builtins.elem id (parentsOf n))
     "${id}: a note cannot derive from or supersede itself"
@@ -164,7 +165,9 @@
     go (builtins.length noteIds + 1) (stepOf id);
 
   stepOf = id:
-    builtins.filter (x: builtins.elem x noteIds) (lib.unique (parentsOf raw.${id}));
+    parentsOf raw.${id}
+    |> lib.unique
+    |> builtins.filter (x: builtins.elem x noteIds);
 
   # Computed once per note, not once per query: 157 notes is already more than
   # the graph will ever hold, and a closure per call would make `near` quadratic.

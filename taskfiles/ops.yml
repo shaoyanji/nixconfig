@@ -469,6 +469,30 @@ tasks:
     cmds:
       - bash scripts/task/tailnet-routes.sh --approve "{{.HOST}}"
 
+  ops:tailnet:policy:
+    desc: "[gate] The repo tailnet policy matches the live tailnet"
+    summary: >
+      Semantic diff between modules/config/tailnet-policy.hujson and the live
+      policy file. Comments and list order do not count as drift; JSON content
+      does. Exit 0 = in sync, 1 = drift (the diff is printed), 2 = no usable
+      credential or unparseable HuJSON. Reads through the sops OAuth client
+      (scope `all:read`), so it works without a write token.
+    cmds:
+      - bash scripts/task/tailnet-policy.sh
+
+  ops:tailnet:policy:apply:
+    desc: "[destructive] Push the repo tailnet policy to the live tailnet"
+    summary: >
+      POSTs modules/config/tailnet-policy.hujson, which replaces the WHOLE policy
+      — a console edit not mirrored in the file is reverted, which is the point.
+      Refuses when the change reaches outside `.autoApprovers.routes` unless
+      FORCE=1, so it cannot quietly rewrite access rules. Sends If-Match with the
+      ETag it read, so a concurrent console edit fails as 412 instead of being
+      overwritten. Needs write scope: the fleet OAuth client is `all:read` and
+      answers 403 — widen its scopes or set TAILSCALE.API.KEY / TAILSCALE_API_TOKEN.
+    cmds:
+      - bash scripts/task/tailnet-policy.sh --apply
+
   ops:docs:budget:
     desc: Check living documents against the SCHEMA.md budgets (stubs stay stubs)
     summary: >

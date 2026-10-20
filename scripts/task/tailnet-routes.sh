@@ -10,11 +10,15 @@
 # state, not host state. That is exactly how 10.99.0.53 sat advertised-but-dead
 # on both frieren and delphi.
 #
-# Credentials: TAILSCALE.CLIENT.ID / .SECRET from the private sops submodule are
-# an OAuth client whose scope is `all:read`, which is enough to REPORT and not
-# enough to APPROVE (the API answers 403 "calling actor does not have enough
-# permissions"). Pass a write-capable token in TAILSCALE_API_TOKEN (or widen that
-# OAuth client's scope) and --approve starts working too.
+# Credentials: shared with tailnet-policy.sh through lib/tailnet-api.sh — an
+# explicit TAILSCALE_API_TOKEN, else TAILSCALE.API.KEY from sops, else the fleet
+# OAuth client, whose scope is `all:read`: enough to REPORT and not enough to
+# APPROVE (the API answers 403 "calling actor does not have enough permissions").
+# Widening that client's scopes needs no new secret; --approve starts working the
+# moment it changes.
+#
+# Prefer `autoApprovers` in the policy file over approving by hand — that is what
+# stops a new host needing this command at all: `task ops:tailnet:policy`.
 #
 # Usage:
 #   tailnet-routes.sh                     # report; exit 1 if any route is unapproved
@@ -25,9 +29,10 @@
 #       2 = no usable credential or the API could not be read.
 set -euo pipefail
 
-repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-secrets="$repo/modules/secrets/apikeys.yaml"
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 api="https://api.tailscale.com/api/v2"
+# shellcheck source=lib/tailnet-api.sh
+source "$here/lib/tailnet-api.sh"
 
 mode="report"
 device=""
@@ -47,27 +52,7 @@ case "${1:-}" in
     ;;
 esac
 
-token="${TAILSCALE_API_TOKEN:-}"
-if [ -z "$token" ]; then
-  if [ ! -f "$secrets" ]; then
-    echo "tailnet-routes.sh: no TAILSCALE_API_TOKEN and $secrets is missing (is the modules/secrets submodule checked out?)" >&2
-    exit 2
-  fi
-  client_id="$(sops -d --extract '["TAILSCALE"]["CLIENT"]["ID"]' "$secrets" 2>/dev/null || true)"
-  client_secret="$(sops -d --extract '["TAILSCALE"]["CLIENT"]["SECRET"]' "$secrets" 2>/dev/null || true)"
-  if [ -z "$client_id" ] || [ -z "$client_secret" ]; then
-    echo "tailnet-routes.sh: TAILSCALE.CLIENT.ID/SECRET not readable from sops" >&2
-    exit 2
-  fi
-  token="$(curl -sS -m 20 -X POST "$api/oauth/token" \
-    -d "grant_type=client_credentials" \
-    -d "client_id=$client_id" \
-    -d "client_secret=$client_secret" | jq -r '.access_token // empty')"
-  if [ -z "$token" ]; then
-    echo "tailnet-routes.sh: OAuth token exchange failed" >&2
-    exit 2
-  fi
-fi
+token="$(tailnet_token)" || exit 2
 
 auth="Authorization: Bearer $token"
 

@@ -20,25 +20,30 @@
 | Knowledge | qmd (prose) + `.#knowledgeGraph` (structure) + sentinel ledger (episodic) | `task ops:kg`, `task ops:ledger` |
 | Backups | local + BurgerNAS offsite; restore drill weekly; password in sops | `restic-drill.timer`, `task checks:restic:drill` |
 | DNS | resolver pair: frieren pihole+unbound, delphi crab-hole, one shared `10.99.0.53` | `task checks:dns:failover` |
-| Tailnet routes | `10.99.0.53/32` advertised by both, **approved by neither** | `task ops:tailnet:routes` (exit 1) |
+| Tailnet routes | `10.99.0.53/32` approved on both via `autoApprovers`; policy mirrored in the repo | `ops:tailnet:routes`, `ops:tailnet:policy` (both rc=0) |
 
 ## Ledger
 
 ### 2026-10-20 — Tailnet route approval is tailnet state, not host state
 
-- `10.99.0.53/32` was advertised on **both** nodes and approved on **neither**
-  (`enabledRoutes` held only `192.168.3.0/24` and `0.0.0.0/0,::/0`), so the "failover
-  pair" served nothing off-host: advertising is an offer, only approval injects a route.
-- New gate `ops:tailnet:routes` (`scripts/task/tailnet-routes.sh`) prints OFFERED /
-  APPROVED / UNAPPROVED per device and exits non-zero on drift; `ops:tailnet:approve
-  HOST=` writes. Verified: report exits 1 with two pending routes, approve answers 403.
-- The sops OAuth client is scope `all:read` — it reports, it cannot approve. The durable
-  fix is an `autoApprovers` rule; the console is the unblocked path.
-- Tailnet DNS is a **separate** switch and still empty (`global: []`, `split DNS: {}`):
-  approval makes the address reachable, nameservers decide whether clients ask it.
+- `10.99.0.53/32` was advertised on **both** nodes and approved on **neither**, so the
+  "failover pair" served nothing off-host: an advertisement is an offer, and no eval can
+  see whether it landed. Both are approved now.
+- `autoApprovers.routes` (`autogroup:admin`) covers it and `192.168.3.0/24`, but fires
+  only when a route is **advertised** — a prefix already pending stays pending, so a
+  re-offer finished it (withdraw just the /32, re-add; approved in 5 s on frieren,
+  parked on `10.99.0.54/32` on delphi). A reboot re-offers, so the pair now self-heals.
+- The policy is in the repo: `modules/config/tailnet-policy.hujson`, with `ops:tailnet:policy`
+  (semantic diff gate) and `ops:tailnet:policy:apply` (If-Match, refuses non-route edits
+  without `FORCE=1`). `ops:tailnet:routes` is the drift gate; both rc=0.
+- Token resolution is shared (`scripts/task/lib/tailnet-api.sh`): the sops OAuth client is
+  `all:read`, so reads work and policy **writes** still need a widened scope or
+  `TAILSCALE.API.KEY`. Approval itself needs no credential any more.
 - `profiles/tailnet-dns-address.nix` composes `--advertise-routes` from `advertiseRoutes`
-  + the service `/32` and owns `exitNode` (delphi is an approved exit node), asserting
-  exactly one such flag reaches `tailscale set`; eval'd flags byte-identical on both.
+  + the service `/32` and owns `exitNode`, asserting exactly one such flag reaches
+  `tailscale set`; eval'd flags byte-identical on both hosts.
+- Tailnet DNS is a separate, still-empty switch (`global: []`, `split: {}`): approval
+  makes the address reachable, nameservers decide whether clients ask it.
 
 ### 2026-10-20 — delphi: the user sops plane is derived, not copied
 

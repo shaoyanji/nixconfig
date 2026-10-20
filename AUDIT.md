@@ -25,6 +25,15 @@
 
 ## Ledger
 
+### 2026-10-20 — Secrets are a page and three predicates
+
+- The secrets table, key locations, SSH-CA workflow and bootstrap moved from
+  AGENTS.md into `docs/sops-rekey.md`, which already owned the two sops planes.
+- Gates: `secrets-are-encrypted` (a plaintext sops file fails),
+  `secrets-submodule-declared` (the submodule *and* its mirror are named),
+  `ssh-ca-declarative` (`rotate-ssh-cert` + `ssh.ca.enable`) — each verified to fail
+  when broken. Evidence: `checks.policies` rc=0 (22), `docs:links`, `docs-budget`.
+
 ### 2026-10-20 — CI has no matrix
 
 - The CI section moved to `docs/ci-pipeline.md`, and `lifecycle:ci:enable-host` /
@@ -107,36 +116,20 @@
 
 ### 2026-10-20 — Tailnet DNS is on, and its redundancy is not what it looks like
 
-- Live: global `[100.97.61.65, 10.99.0.53]`, Override on, split DNS empty. Both answer
+- Live: global `[100.97.61.65, 10.99.0.53]`, Override on. Both answer
   (`photos.frieren.lan → 192.168.3.25`) and filter (`doubleclick.net → 0.0.0.0`).
-- **A subnet-route nameserver is invisible to hosts that refuse routes.** eisen, fern and
-  aristotle set `--accept-routes=false` deliberately (table 52 hijacks their LAN traffic),
-  so `10.99.0.53` is unreachable from them and `100.97.61.65` is their only resolver — a
-  frieren outage is total DNS loss there, Override or not.
-- **Route failover is node-level, not service-level.** crab-hole stopped on delphi — then
-  the `/32` primary — for 32 s and the route never moved: the node was online, the
-  resolver was not. There is no tailnet equivalent of the VRRP `vrrp_script`; the second
-  nameserver entry is what kept queries alive.
-- **delphi cannot be an equivalent resolver.** crab-hole has no static-record or zone
-  support (blocklist/downstream/upstream/api only), so `*.frieren.lan` is NODATA there —
-  and the `/32` is on delphi right now, so fleet names break for anyone using tailnet
-  DNS. `ops:tailnet:dns` fails on exactly this; split DNS for the zone is the cheap fix,
-  a dnsmasq zone front-end the equivalent-resolver one.
-- Recommended shape: list both resolver *node* addresses (`100.97.61.65`, `100.123.145.53`)
-  — routable without `--accept-routes`, and a service crash is covered by client retry
-  instead of a route takeover. `10.99.0.53` stays for LAN clients that hardcode it.
-- New gate `ops:tailnet:dns`: classifies each entry (node vs subnet route), probes the
-  zone and a blocked domain, probes every node advertising a listed address on its own
-  node IP, and marks `local-bind` when the reporting host answers its own probe.
-- Fix chosen: **split DNS** `frieren.lan → 100.97.61.65`, so the zone never reaches the
-  global list. Console-only (`dns:core` write; the OAuth client answers `403`). Applied
-  2026-10-20: the gate now reports the pin and stops faulting delphi for that zone.
-- That edit briefly left globals as `[10.99.0.53]` alone — a subnet route the three
-  route-refusing hosts cannot reach. `ops:tailnet:dns` now FAILS on a routed-only list
-  (hosts read from the repo, not hardcoded); `100.97.61.65` is back, gate rc=0. Residual:
-  those hosts keep one usable resolver, so a frieren *service* failure still blinds them.
+- **A subnet-route nameserver is invisible to hosts that refuse routes**: eisen, fern and
+  aristotle run `--accept-routes=false`, so `100.97.61.65` is their only resolver and a
+  frieren outage is total DNS loss there.
+- **Failover is node-level, not service-level**: crab-hole stopped for 32 s and the route
+  never moved. delphi also cannot be equivalent — crab-hole has no zone support, so
+  `*.frieren.lan` is NODATA behind the `/32` it holds.
+- Fix applied: **split DNS** `frieren.lan → 100.97.61.65` (console-only write). Gate
+  `ops:tailnet:dns` classifies each entry, probes the zone and a blocked domain, and now
+  FAILS on a routed-only list — an intermediate edit left `[10.99.0.53]` alone and it
+  caught that. Residual: those three hosts keep one usable resolver.
 
-## Open debt (tracked in TODO.md)
+## Open debt (`task ops:notes`)
 
 1. `minyx` kernel conflict and `cassini` darwin assertion — both dormant, both
    reproducible with `MODE=eval`.

@@ -66,9 +66,8 @@ When an AI agent or developer session initializes from the home directory (`$HOM
 3. **Agent Guidance & Skills Materialization**:
    - `~/.agents/` (`~/.agents/skills/`, `~/.agents/deploy/`, `~/.agents/README.md`) provides guidance and skill shards.
    - The canonical fleet operational manual is `AGENTS.md`. The local host system card + persona is the flake output `.#homeAgents.<host>` (`lib/home-agents.nix`), linked to `~/AGENTS.md` by activation; refresh manually with `task dev:inventory:home-agents`.
-4. **Secrets & SOPS State**:
-   - Encrypted secrets live in `modules/secrets.yaml` (mirrored from the private `modules/secrets/` submodule).
-   - Host and user age keys are registered in `.sops.yaml` and loaded from `~/.config/sops/age/keys.txt`.
+4. **Secrets & SOPS State**: two encrypted files, two identity planes, one CA —
+   the state and its rekey procedure are [`docs/sops-rekey.md`](docs/sops-rekey.md).
 
 ---
 
@@ -608,26 +607,15 @@ is the check. [[flake/policies.nix#media-tree-isolation]]
 
 ## Secrets Architecture
 
-Two separate encrypted files, decrypted via `sops-nix` using host age keys:
-
-| File                      | Decryptors                                                                         | Contents                                      |
-| ------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------- |
-| `modules/secrets.yaml`    | All hosts (via `ssh_host_ed25519_key`)                                             | App secrets, `hashedPassword`, API keys, TOTP |
-| `modules/ssh-ca-key.yaml` | Full fleet (all age recipients in `.sops.yaml`; includes frieren since 2026-10-08) | SSH User CA private key                       |
-
-**Key locations**:
-
-- `.sops.yaml` — age key registrations (each host maps its `ssh_host_ed25519_key` age pubkey)
-- `modules/secrets/` — **git submodule** pointing to private `shaoyanji/secrets` repo (contains actual encrypted files)
-- `modules/secrets.yaml` — local symlink/mirror of the submodule's secrets.yaml
-
-**SSH CA workflow**:
-
-- Servers trust a single CA public key (`modules/ssh-ca.nix`)
-- Workstations sign 1-week certs via `rotate-ssh-cert` (uses `~/.ssh/user_ca_key` from sops-nix)
-- No `authorized_keys` management needed after CA setup
-
-**Bootstrap**: First connection to bare metal is outside CA model (USB ISO/temp password).
+Two sops planes, two encrypted files, one CA: the files, their recipients, the
+key locations, the SSH-CA workflow, bootstrap and the rekey procedure live in
+[`docs/sops-rekey.md`](docs/sops-rekey.md). The facts that are gated rather than
+trusted: both files are encrypted in the tree (a plaintext commit fails)
+[[flake/policies.nix#secrets-are-encrypted]], the private files are a submodule
+whose copy is the one `sops updatekeys` reads
+[[flake/policies.nix#secrets-submodule-declared]], and user access is CA-signed
+certificates with no `authorized_keys` side channel
+[[flake/policies.nix#ssh-ca-declarative]].
 
 ---
 
@@ -1098,7 +1086,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | `AGENTS.md`                          | This file — canonical agent routing and codebase manual                |
 | `inventory.toml`                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
 | `docs/inventory-schema.md`           | Inventory schema, compiled artifacts, and the automatic checks          |
-| `docs/sops-rekey.md`                  | The two sops identity planes, `.sops.yaml` anchors, rekey procedure, fresh-host bootstrap |
+| `docs/sops-rekey.md`                  | Sops planes and files, `.sops.yaml` anchors, SSH CA, rekey procedure, fresh-host bootstrap |
 | `docs/storage-taxonomy.md`            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |
 | `docs/fleet-inventory.md`            | Pointer page — the catalog itself is `.#docs` (`nix build .#docs`), never committed |
 | `docs/modules-registry.md`           | Pointer page — the knob registry is built from `modules.toml` at build time |

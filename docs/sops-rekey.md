@@ -16,6 +16,36 @@ The host key cannot serve the Home Manager plane: activation runs as the user an
 are never re-encrypted and no secret is printed. It is cheap and safe; what it
 needs is *any identity that is currently a recipient*.
 
+## Files
+
+| File | Decryptors | Holds |
+| :--- | :--- | :--- |
+| `modules/secrets.yaml` | every host (host SSH key ⇒ age) | app secrets, `hashedPassword`, API keys, TOTP (`cloak`) |
+| `modules/ssh-ca-key.yaml` | the full fleet (all recipients in `.sops.yaml`) | the SSH User CA private key |
+
+The real files live in the **`modules/secrets/` git submodule** (private
+`shaoyanji/secrets`); `modules/secrets.yaml` is the tracked mirror the flake
+reads, and it is a separate file from the submodule's — a `sops updatekeys` run
+inside the submodule uses *that* copy. A recipient added only to one of them is
+silently absent from the other: [[flake/policies.nix#secrets-submodule-declared]]
+
+Both files are sops-encrypted in the tree — `sops:` metadata plus `ENC[AES256_GCM`
+values — so a plaintext commit is a gate failure, not a review question:
+[[flake/policies.nix#secrets-are-encrypted]]
+
+## SSH CA
+
+Servers trust one CA public key (`modules/ssh-ca.nix`); `ssh.ca.enable = true` is
+inherited from `modules/profiles/base-node.nix`. Workstations sign 1-week user
+certs with `rotate-ssh-cert`, which reads the CA key from sops-nix at
+`~/.ssh/user_ca_key`. After the CA is in place there is no `authorized_keys`
+management at all — and no other path should grow one:
+[[flake/policies.nix#ssh-ca-declarative]]
+
+**Bootstrap is outside the model.** The first connection to bare metal is a USB
+ISO or a temporary password; only then can the host key be enrolled as a
+recipient.
+
 ## Anchors in `.sops.yaml`
 
 ```yaml

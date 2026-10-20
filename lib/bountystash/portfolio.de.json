@@ -1,0 +1,137 @@
+{
+  "profile": {
+    "name": "Matt Ji",
+    "legal_name": "Shao-Yan Ji",
+    "handle": "shaoyanji",
+    "title": "Leitender System- und Infrastrukturingenieur",
+    "subtitle": "Go • NixOS • Verteilte Systeme • Energie- und Quantitative Infrastruktur",
+    "location": "Gutach im Breisgau / Freiburg, Deutschland (Remote)",
+    "bio": "Systemingenieur mit quantitativem Hintergrund in Ingenieurwesen, Volkswirtschaft und erneuerbaren Energiesystemen (Colorado School of Mines & Universität Freiburg). Entwicklung nebenläufiger Go-Dienste, deklarativer NixOS-Infrastruktur und quantitativer Daten-Pipelines. Langjährige Erfahrung in Risikosteuerung und Telemetrie von über 100 Mio. $ Kapitalanlagen im Bereich erneuerbare Energien.",
+    "status": {
+      "indicator": "Verfügbar",
+      "text": "Verfügbar für Senior / Lead Systems & Infrastructure Rollen (Remote MEZ / US-Ostküste)",
+      "available": true
+    },
+    "work_auth": {
+      "citizenship": "US-Staatsbürger",
+      "residency": "Deutsche Niederlassungserlaubnis",
+      "languages": "Englisch (Muttersprache) · Deutsch (Verhandlungssicher C1)",
+      "availability": "Kündigungsfrist: Flexibel / Kurzfristig verfügbar"
+    },
+    "education": [
+      {
+        "degree": "M.Sc. Renewable Energy Management",
+        "school": "Albert-Ludwigs-Universität Freiburg (Abschlussnote: 1,8)",
+        "period": "2011 — 2014"
+      },
+      {
+        "degree": "B.S. Petroleum Engineering",
+        "school": "Colorado School of Mines (Nebenfächer: Volkswirtschaft & Public Policy)",
+        "period": "2006 — 2010"
+      }
+    ],
+    "contacts": {
+      "email": "matt@bountystash.com",
+      "phone": "+49 1733281570",
+      "github": "https://github.com/shaoyanji",
+      "linkedin": "https://linkedin.com/in/mattji",
+      "website": "https://www.bountystash.com"
+    }
+  },
+  "metrics": [
+    { "label": "Portfolio-Steuerung", "value": "100M+ $" },
+    { "label": "Ingenieur-Alma-Mater", "value": "Mines & Freiburg" },
+    { "label": "Primärer Tech-Stack", "value": "Go & NixOS" },
+    { "label": "Aufenthaltsstatus", "value": "US & Niederlassungserlaubnis" }
+  ],
+  "skills": [
+    {
+      "category": "Systeme & Nebenläufigkeit (Go / Python)",
+      "items": ["Go (Golang)", "Concurrency & Channels", "Kafka & Event Streaming", "PostgreSQL", "Redis", "gRPC & REST APIs", "Zustandsautomaten"]
+    },
+    {
+      "category": "Deklarative Infrastruktur & Linux",
+      "items": ["NixOS Fleets", "Nix Flakes", "SSH Certificate Authority", "SOPS / Age Verschlüsselung", "Docker & Container", "ZFS / Btrfs", "Linux Kernel / ZRAM"]
+    },
+    {
+      "category": "Energie, Finanzen & Domänenmodellierung",
+      "items": ["Quantitative Anlagenbewertung", "Solar-Telemetrie-Abgleich", "Algorithmische Risikomodelle", "Banken-Audit-Reporting", "Typst Schriftsatz-Engine"]
+    }
+  ],
+  "projects": [
+    {
+      "title": "Erneuerbare Energieanlagen & Telemetrie-Plattform",
+      "role": "Lead Operations @ O3 Energy",
+      "period": "2016 — 2020",
+      "description": "Leitung der Datenarchitektur und kaufmännischen Betriebsführung eines Solarportfolios von über 100 Mio. $ Kapitalwert. Entwicklung dynamischer Ertrags- und Bewertungsmodelle unter strengen Banken-Audits, Automatisierung mobiler Felddatenerfassung und Absicherung von Kontrahentenrisiken.",
+      "stack": ["Python", "PostgreSQL", "Time-Series Data", "Docker", "Financial Due Diligence"],
+      "impact": "Quantitative Betriebsführung von über 100 Mio. $ Kapitalanlagen; M&A-Prüfungen mit institutionellen Kreditgebern, Steuereigenkapital und Fraunhofer-ISE-Forschungsgrundlagen.",
+      "link": "#",
+      "featured": true
+    },
+    {
+      "title": "fibtransponder: Fibonacci-Streaming-Zustandsautomat",
+      "role": "Forschung & Implementierung (Go)",
+      "period": "2026",
+      "description": "Experimentelles Substrat für semantische Sensorik und Tokenisierung auf Basis eines Fibonacci-Radix-Streaming-Zustandsautomaten (FSVM). Untersucht Bitstrom-Verarbeitung mit begrenztem Schrittaufwand, strukturelle Kalibrierung über Adjazenzbreite und Zobrist-Hash-Tabellen.",
+      "stack": ["Go", "Zustandsautomaten", "Fibonacci Radix", "Zobrist Hashing", "Bitstrom-Analyse"],
+      "impact": "Nachweis der strukturellen Adjazenzbreite als Selektor für Lokalitätssensitivität; Falsifizierung reiner Seed-Diversität anhand automatisierter Korpus-Benchmarks.",
+      "link": "https://github.com/shaoyanji/fibtransponder",
+      "featured": true
+    },
+    {
+      "title": "Deklarative Multi-Host NixOS-Infrastruktur",
+      "role": "Persönliche Infrastruktur-Flotte",
+      "period": "Aktiv",
+      "description": "Vollständig reproduzierbare Multi-Host-Flotte (NAS, Workstations, Cloud-Endpunkte), verwaltet mit Nix Flakes. Eigene SSH Certificate Authority mit automatisierter Rotation, Age/SOPS-Verschlüsselung, automatisierte Selbst-Upgrades und Taskfile-Steuerung.",
+      "stack": ["NixOS", "Nix Flakes", "SSH CA", "SOPS / Age", "Tailscale", "Taskfile"],
+      "impact": "Keine manuelle Serverkonfiguration oder Konfigurationsdrift. Bereitstellung per Einzelbefehl, tägliche Kernel-Boot-Validierung und isolierte Secret-Hygiene.",
+      "link": "https://github.com/shaoyanji/nixconfig",
+      "featured": true
+    },
+    {
+      "title": "Bountystash: Deterministische Aufgaben-Engine",
+      "role": "Urheber & Systemarchitekt",
+      "period": "2024 — Heute",
+      "description": "Schlanke, serverseitig gerenderte Go-Anwendung zur Überführung unstrukturierter Aufgabenanforderungen in unveränderliche, inhaltsadressierte Spezifikationen. Append-Only-Event-Ledger, tastaturfokussierte Terminal-Oberfläche und curl-fähige Endpunkte.",
+      "stack": ["Go", "PostgreSQL", "Nix Flakes", "TUI", "HTML"],
+      "impact": "Single-Binary-Bereitstellung, Routenauflösung im Sub-Millisekundenbereich, null Frontend-Ballast und manipulationssichere Audit-Historie.",
+      "link": "https://github.com/shaoyanji/bountystash",
+      "featured": true
+    }
+  ],
+  "philosophy": [
+    {
+      "title": "Reproduzierbarkeit ist nicht verhandelbar",
+      "body": "Wenn ein Infrastrukturstatus, ein Dokumenten-Build oder ein Service-Binary nicht deterministisch aus Code gebaut werden kann, existiert es nicht wirklich. Deklarative NixOS Flakes verhindern eine ganze Klasse von Produktionsausfällen."
+    },
+    {
+      "title": "Domänentiefe schlägt Schlagworte",
+      "body": "Code zu schreiben ist nur die halbe Miete. Das Verständnis finanzieller Ertragsformeln, physikalischer Energiesysteme oder Bitstrom-Lokalität verhindert Architekturfehler, bevor die erste Zeile SQL geschrieben wird."
+    },
+    {
+      "title": "Schlanke Laufzeitumgebungen",
+      "body": "Systeme mit niedriger Latenz basieren auf soliden Grundlagen: kompilierte Go-Dienste, saubere Datenmodelle, serverseitiges Rendering und Respekt vor Netzwerk-Budgets wie der 14KB-Regel."
+    }
+  ],
+  "notes": [
+    {
+      "title": "Adjazenzbreite und Lokalitätssensitivität in Streaming-Zustandsautomaten",
+      "date": "2026-08",
+      "tag": "Go & Forschung",
+      "reading_time": "6 Min."
+    },
+    {
+      "title": "Flottenverwaltung mit NixOS, SSH CAs und SOPS Secret-Rotation",
+      "date": "2026-05",
+      "tag": "NixOS",
+      "reading_time": "8 Min."
+    },
+    {
+      "title": "Abgleich von Echtzeit-Telemetrie mit Finanzmodellen erneuerbarer Energien",
+      "date": "2026-03",
+      "tag": "Energie & Quant",
+      "reading_time": "7 Min."
+    }
+  ]
+}

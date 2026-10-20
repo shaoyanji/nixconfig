@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:locale" content="{{locale}}">
+<link rel="alternate" hreflang="en" href="{{altEn}}">
+<link rel="alternate" hreflang="de" href="{{altDe}}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2317150f'/%3E%3Ctext x='6' y='23' font-family='monospace' font-size='18' fill='%23f7f3ea'%3Eb%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="{{cssHref}}">
+</head>
+<body>
+<a class="skip" href="#main">{{skip}}</a>
+<header class="masthead">
+  <div class="topline">
+    <p class="id">{{handle}} — {{location}}</p>
+    <p class="lang" aria-label="Language">{{langSwitch}}</p>
+  </div>
+  <h1>{{name}}</h1>
+  <p class="role">{{role}}</p>
+  <p class="sub">{{subtitle}}</p>
+  <div class="baseline">
+    <p class="status">{{status}}</p>
+    <p class="contact">{{contacts}}</p>
+  </div>
+</header>
+<nav class="index" aria-label="{{navLabel}}">{{nav}}</nav>
+<main id="main">
+{{body}}
+</main>
+<footer class="colophon">
+  <p>{{footer}}</p>
+</footer>
+</body>
+</html>

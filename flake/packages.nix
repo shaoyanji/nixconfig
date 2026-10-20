@@ -59,6 +59,11 @@ in {
     jq . ${pkgs.writeText "inventory.compiled.json" inventory.json} > $out
   '';
 
+  # bountystash.com — the portfolio, rendered from evaluated data by the same
+  # Nix-native approach as the fleet site (lib/bountystash-site.nix): one CSS
+  # file, two locales, no JavaScript.
+  bountystash-site = import ../lib/bountystash-site.nix {inherit pkgs lib;};
+
   # The agent feed: every Nix host's role, persona hint, hardware, traits and
   # operational notes as one compiled document. This is where the commentary
   # that used to live as Nix comments is meant to land.

@@ -637,175 +637,22 @@ by the detector, not by a comment in the workflow
 
 ## Nix Patterns & Gotchas
 
-### HARD RULE [[flake/policies.nix#toml-through-a-tool]]: TOML goes through a format-aware tool
+The traps live in [`docs/nix-patterns.md`](docs/nix-patterns.md): yq picking its
+parser from the path extension, `//` being shallow, the two uncached package
+overrides on frieren, and the ten agent failure modes (no profile in a non-login
+ssh, flakes ignoring untracked files, the negative narinfo cache).
 
-Hand-editing `inventory.toml` produced unparseable TOML (a stray indent merged two
-lines) and nothing noticed until another tool read it. Owning tool per format:
-[`.agents/SCHEMA.md`](.agents/SCHEMA.md) §1.
+HARD RULE [[flake/policies.nix#toml-through-a-tool]]: TOML goes through a
+format-aware tool. Keep the `.toml` extension (or pass `-p toml -o toml`) and run
+`task checks:toml:lint` after any edit — `yq -i -f script.yq` silently applies
+nothing, so verify the compiled result, not the diff.
 
-**yq chooses the parser from the PATH'S EXTENSION, and that is the real trap.**
-`yq -i '<expr>' some.toml` is correct. Hand the same expression a path that does
-not end in `.toml` — a temp copy called `/tmp/inv.test` — and yq falls back to
-YAML, reads `[metadata]` as a YAML flow sequence, and dies with
-`Error: cannot index array with 'metadata'` while writing nothing. Verified both
-ways on this repo's file. Keep the `.toml` extension on every path you give yq,
-or pass `-p toml -o toml` explicitly (as `scripts/task/modules-menu.sh` does).
-
-> A previous revision of this section claimed `yq -i` was simply broken on TOML.
-> That was a bad test using a non-`.toml` temp filename, **not** a yq defect —
-> `scripts/task/inventory-menu.sh`'s `yq -i` writes work correctly. Do not
-> "fix" it again on that basis.
-
-Separately: yq's TOML *output* collapses multi-line arrays, so **any** yq write
-reformats `inventory.toml` (expect a large cosmetic diff). That is formatting,
-not data loss; the values survive.
-
-**A second silent no-op, found 2026-10-15: `yq -i -f script.yq file.toml` ignores
-the script.** It exits 0, rewrites the file — so `git diff` shows a big diff — and
-applies *nothing*: the script is dropped, leaving the identity transform, which is
-exactly why it looks like it worked. The identical program with the flags in the
-other order, `yq --from-file script.yq -i file.toml`, applies correctly. Both
-verified on `inventory.toml` with yq v4.54.1. Prefer an inline expression; if you
-need a script file, put `--from-file` **before** `-i`, and then verify the *effect*
-— `git diff` is not proof, because the array collapse above produces diff noise even
-when nothing was applied. The evidence that counts is the compiled result:
-`nix eval --raw .#inventory.json` before and after, diffed.
-
-```bash
-# Read (safe; exits 1 on a parse error)
-yq '.hosts | to_entries | length' inventory.toml
-
-# Value write (AST-level). The path MUST end in .toml:
-yq -i '.hosts.eisen.managed = true' inventory.toml
-
-# Explicit about the format — use this in scripts, where a path may be a temp file:
-yq -p toml -o toml -i '.hosts.eisen.managed = true' inventory.toml
-
-# Surgical, format- AND comment-preserving (no array reflow) via tomlkit:
-nix shell --impure --expr 'let pkgs = import (builtins.getFlake "nixpkgs").outPath {}; in pkgs.python3.withPackages (ps: [ps.tomlkit])' \
-  -c python3 -c 'import tomlkit; d=tomlkit.parse(open("inventory.toml").read()); d["hosts"]["eisen"]["managed"]=True; open("inventory.toml","w").write(tomlkit.dumps(d))'
-
-task checks:toml:lint                                 # prove EVERY tracked .toml parses
-```
-
-- Keep the `.toml` extension on yq paths, or pass `-p toml -o toml`. Never
-  `sed -i`, never an editor-style string replace.
-- After any TOML change — including one the tools cannot express — run
-  `task checks:toml:lint`. It exits non-zero and names the offending file.
-- The same applies to JSON (`jq`) and YAML (`yq -p yaml -o yaml`); the rule is
-  "edit through a format-aware tool", not "edit text that happens to be data".
-- **Better: do not edit at all.** `inventory.toml` is compiled to typed data by
-  `lib/inventory.nix`; read it with `task dev:inventory:json` (or
-  `nix eval .#inventory…`) instead of re-parsing TOML with yq. See
-  `docs/inventory-schema.md`.
-
-### A `.nix` header is one line, not an essay
-
-A file opens with `# <name> — <the contract in one sentence>` and at most two
-more lines. Design rationale goes to a `docs/` page (indexed by qmd, which now
-combs the nix tree), an `AGENTS.nix` note, or the commit — not into bytes every
-`nix eval` re-parses. [[flake/policies.nix#nix-header-budget]]
-
-### Non-obvious patterns
-
-- **Pipes, not `let` chains.** `|>` for 2+ transformations
-  [[flake/policies.nix#pipe-operators-declared]]. A box that cannot parse the tree
-  is on older Nix: add the flag, do not rewrite.
-- **User constants**: `modules/global/user.nix` is the single source of truth for the primary user (`devji`). Import it with `let user = import ../global/user.nix;` — never hardcode user paths or the username.
-- **Attrset merging**: `//` is **shallow, right-biased** — `{ a.x = 1; } // { a.y = 2; }` loses `a.x`. Use `lib.recursiveUpdate` for deep merge.
-- **`lib.mkIf` / `lib.mkMerge`**: the standard conditional patterns. Also `lib.optionalAttrs` for conditional attrsets and `lib.optionals` for conditional list items.
-- **Option priorities**: `lib.mkDefault` vs `lib.mkForce` vs `lib.mkOverride` are used for option priority layering.
-- **`profiles.boot` module**: boot options are accessed via `config.profiles.boot.systemd-boot` and `config.profiles.boot.efi` (not direct `boot.loader.*`).
-
-### Build-avoidance traps
-
-Some packages build from source (Maven, Go, etc.) with no cached variant for overridden configurations:
-
-| Module                                 | Issue                                                      | Mitigation                                                |
-| -------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------- |
-| `services.tika` (`search/tika.nix`)    | `cfg.package.override { enableGui = false }` → Maven build | Inline systemd unit with stock `pkgs.tika`                |
-| `services.gotenberg` (`paperless.nix`) | Chromium stub at module level keeps ~300 MiB chromium      | Configure `services.gotenberg.chromium.package` with stub |
-
-Before deploying a host referencing Java (Maven/Gradle), Go, or Rust packages, run `nix build --dry-run` to verify the closure is cached.
-
-### Service module conventions
-
-- **Option namespaces**: `services.<name>` for system services, `profiles.<name>` for composable profiles
-- **`lib.types.nullOr lib.types.path`**: optional file path patterns use this type
-- **Secret injection**: uses `systemd LoadCredential` (never on command line). Example: `rpcSecretFile` in aria2-daemon module.
-
-### CI quirk
-
-CI commands use `nix build -L .?submodules=1#...` — the `?submodules=1` is critical for accessing the `modules/secrets` submodule. Local `nix build` without that flag works fine since the submodule is already checked out.
-
-### Autonomous Agent Operational Rules & Nix Environment Gotchas (Field Notes)
-
-When autonomous agents (`agy`, `hermes`, subagents) execute tool calls across NixOS hosts and WSL2, the pure/declarative nature of Nix introduces specific failure modes that do not exist in conventional FHS Linux distributions:
-
-#### 1. Non-Login SSH Shells Lack Ambient Profile PATH
-* **Failure Mode**: Running `ssh host 'python3 ...'` or `ssh host 'simplex-chat ...'` fails with `bash: line 1: command: not found` (exit code 127), even though the package is installed in `environment.systemPackages` or `home.packages`.
-* **Root Cause**: Non-interactive, non-login SSH sessions do not execute `/etc/profile` or Home Manager session scripts, so Nix store binaries in `/run/current-system/sw/bin` and `~/.nix-profile/bin` are absent from `PATH`.
-* **Fix**: Force a login shell via `ssh host 'bash -l -c "command"'`, invoke via full path (e.g. `/etc/profiles/per-user/<user>/bin/<binary>`), or run dynamically via `ssh host 'nix shell nixpkgs#<pkg> -c <bin>'`.
-
-#### 2. Python Package Composition in `nix shell` (`python3.withPackages`)
-* **Failure Mode**: Calling `nix shell nixpkgs#python3 nixpkgs#python3Packages.websockets -c python3 script.py` fails with `ModuleNotFoundError: No module named 'websockets'`.
-* **Root Cause**: In Nix, Python modules are not ambiently placed in a global `site-packages`. Providing `python3` and `python3Packages.foo` as separate packages in `nix shell` produces two distinct store paths; the Python interpreter does not know about the library.
-* **Fix**: Always compose dependencies explicitly via `withPackages`:
-  ```bash
-  nix shell --impure --expr 'let pkgs = import <nixpkgs> {}; in pkgs.python3.withPackages (ps: with ps; [ websockets requests ])' -c python3 script.py
-  ```
-  Declaratively, specify `(python3.withPackages (ps: with ps; [ ... ]))`.
-
-#### 3. Flakes Ignore Untracked Files (`git add -N` Trap)
-* **Failure Mode**: After creating a new Nix module or overlay (e.g. `modules/services/smp-server.nix`), running `nix build`, `nix eval`, or `nixos-rebuild` errors with `file does not exist` or evaluates stale code.
-* **Root Cause**: Nix Flakes evaluate strictly against the git staging index / tracked tree. Untracked working tree files are completely invisible to the Nix evaluator.
-* **Fix**: Always stage newly created files before invoking Nix:
-  ```bash
-  git add -N <path/to/new/file.nix>
-  ```
-
-#### 4. Stale SSH ControlMaster Multiplexing Sockets
-* **Failure Mode**: Remote `ssh <host>` commands hang indefinitely without output until cancelled or timed out.
-* **Root Cause**: `~/.ssh/config` enables `ControlMaster auto` with socket paths under `~/.ssh/sockets/%r@%h:%p`. If a previous SSH process or subagent terminated abruptly, a dead Unix socket remains, causing subsequent SSH calls to wait on a non-responsive master multiplexer.
-* **Fix**: For non-interactive agent commands, bypass ControlMaster by passing `-o ControlMaster=no`:
-  ```bash
-  ssh -o ControlMaster=no host 'command'
-  ```
-  Or purge stale master sockets: `rm -f ~/.ssh/sockets/*`.
-
-#### 5. Cross-Device Link / Permission Denied on Symlinked Secrets (`atomic_replace`)
-* **Failure Mode**: Application setup wizards (e.g. `hermes gateway setup`) crash with:
-  `OSError: [Errno 18] Invalid cross-device link: '/home/user/.app/.env.tmp' -> '/run/secrets/rendered/app.env'`
-  followed by `PermissionError: [Errno 13] Permission denied: '/run/secrets/rendered/app.env'`.
-* **Root Cause**: Tools like Python's `atomic_replace` write to a temporary file on disk (`/home/user/`) and execute `os.replace` to replace the target. If `target` is a symlink pointing to `/run/secrets/` (rendered on a `tmpfs` RAM disk with `0400` mode), `os.replace` fails across filesystem boundaries, and fallback copy fails due to read-only `0400` file permissions.
-* **Fix**: Never symlink mutable application configuration files (where self-managing CLIs write runtime tokens) directly into read-only `tmpfs` secrets. Decouple into an independent `0600` standalone file populated with secrets, or inject credentials via systemd `EnvironmentFile` directly.
-
-#### 6. Upstream FHS Binaries on NixOS (Dynamic Linker & Missing Subprocess Tools)
-* **Failure Mode**: Running raw upstream Linux binaries directly yields `/lib64/ld-linux-x86-64.so.2: No such file or directory`. Even with `autoPatchelfHook`, subprocess calls during `init` (e.g. calling `openssl` or `/bin/sh`) fail with exit code 127.
-* **Root Cause**: NixOS does not conform to the FHS filesystem layout (no `/lib64` or ambient `/bin/sh`).
-* **Fix**:
-  1. Package upstream binaries in overlays with `autoPatchelfHook` and complete `buildInputs` (`[ zlib openssl gmp stdenv.cc.cc.lib ]`).
-  2. For systemd services, explicitly provide runtime CLI dependencies via `systemd.services.<name>.path = with pkgs; [ openssl coreutils gnused bash ];`.
-
-#### 7. Strict Firewall Scoping Overrides Global `allowedTCPPorts`
-* **Failure Mode**: A service declares `networking.firewall.allowedTCPPorts = [ port ];` (or `openFirewall = true`), but the port remains unreachable and packets are silently dropped.
-* **Root Cause**: Hardened hosts (e.g. `hosts/frieren/firewall-scope.nix`) use `lib.mkForce` to clear global allowed ports and enforce strict per-interface scoping (`enp1s0`, `wlp2s0`, `tailscale0`) to prevent container bridge leaks (`docker0`).
-* **Fix**: On scoped hosts, always add new service ports to `scopedTCP` in `hosts/<host>/firewall-scope.nix` in addition to the service module's `openFirewall`.
-
-#### 8. Haskell / Haskeline Piped Stdin Crash (`System.Terminal.Platform: undefined`)
-* **Failure Mode**: Piping commands into terminal-oriented CLIs (like `simplex-chat`) via `printf "cmd\n" | simplex-chat` terminates immediately with `simplex-chat: Prelude.undefined ... System.Terminal.Platform`.
-* **Root Cause**: Interactive terminal frameworks expect a pseudo-terminal (TTY). Passing piped stdin into interactive loops invokes unhandled code paths in the terminal driver.
-* **Fix**: Use dedicated non-interactive execution flags (e.g. `simplex-chat -e "<cmd>"`) or communicate via daemon WebSocket / JSON-RPC APIs (`simplex-rpc.py`).
-
-#### 9. Remote Heredoc Backtick / Variable Expansion
-* **Failure Mode**: Running `ssh host 'bash -c "cat << EOF ... \`backticks\` ... $var ... EOF"'` produces syntax errors on remote or evaluates variables locally on the caller machine.
-* **Root Cause**: Double-quoted SSH strings and unquoted heredoc tags (`<< EOF`) expand variables and command substitutions before transmission.
-* **Fix**: Always quote heredocs (`<< 'EOF'`), write scripts to shared storage (`/Volumes/data/projects/...`), or pipe scripts into remote interpreters via stdin (`ssh host 'python3' < script.py`).
-
-#### 10. Negative Narinfo Cache Makes a Freshly Warmed Cache Look Empty
-* **Failure Mode**: A target stuck pulling from harmonia before its closure was warmed keeps failing with `path is not valid` / `don't know how to build these paths` even *after* the builder finishes `infra:warm:cache` — a raw HTTP fetch of the `.narinfo` returns 200 (signed), yet every `nix path-info --store` / `nix copy --from` still reports the path missing. `warm-host.sh`'s post-build verification can false-fail the same way.
-* **Root Cause**: Nix caches negative (404) narinfo lookups for **1 hour** (`narinfo-cache-negative-ttl`, in-process plus the user's on-disk `~/.cache/nix/binary-cache-v6.sqlite`). Any query that ran during the gap — the target's stuck pull, the builder's own pre-build gate — poisons the answer for the full TTL, on both the target and the builder.
-* **Fix**: `--option narinfo-cache-negative-ttl 0` on every cache query [[flake/policies.nix#negative-cache-disabled]]. `scripts/task/activate-host.sh` (gate + remote `nix copy`) and `scripts/task/warm-host.sh` (`served_by_cache`) already do this. One-off: `nix path-info --store http://192.168.3.25:5000 --option narinfo-cache-negative-ttl 0 <path>`.
+Four more that are gated rather than advised: a `.nix` header is one line
+[[flake/policies.nix#nix-header-budget]], `|>` needs `pipe-operators` declared
+[[flake/policies.nix#pipe-operators-declared]], a cache query disables the
+negative-narinfo TTL [[flake/policies.nix#negative-cache-disabled]], and
+paperless keeps stock `pkgs.tika` plus a stubbed chromium
+[[flake/policies.nix#paperless-closure-traps]].
 
 ---
 
@@ -1097,6 +944,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | `.agents/fleet-matrix.md`            | Compact fleet context matrix for LLMs and agent prompts                |
 | `docs/task-control-plane.md`         | Task namespace policy and workflow examples                            |
 | `docs/ci-pipeline.md`                | CI: inventory-driven host selection, path rules, the two builds per host |
+| `docs/nix-patterns.md`               | yq/format traps, non-obvious Nix, build-budget traps, agent failure modes |
 | `docs/NUSHELL.md`                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |
 | `docs/frieren-access.md`             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
 | `docs/userland-package-ownership.md` | Package ownership and role wiring                                      |

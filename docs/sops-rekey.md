@@ -42,6 +42,12 @@ certs with `rotate-ssh-cert`, which reads the CA key from sops-nix at
 management at all — and no other path should grow one:
 [[flake/policies.nix#ssh-ca-declarative]]
 
+Exactly one key list survives, because a CA does not help the first login:
+`modules/config/authorized-keys.nix`, rendered into every flake-managed host as
+`config.ssh.authorizedKeys.keys`. A host that pastes its own `ssh-ed25519`
+literal is regrowing the thing the CA replaced:
+[[flake/policies.nix#ca-only-user-access]]
+
 **Bootstrap is outside the model.** The first connection to bare metal is a USB
 ISO or a temporary password; only then can the host key be enrolled as a
 recipient.

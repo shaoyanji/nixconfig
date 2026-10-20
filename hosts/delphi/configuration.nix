@@ -241,12 +241,12 @@ in {
         group = "delphi";
         conditions = ["[STATUS] < 400"];
       }
-      {
-        name = "delphi dns (crab-hole)";
-        url = "tcp://127.0.0.1:53";
-        group = "dns";
-        conditions = ["[CONNECTED] == true"];
-      }
+      # No DNS endpoint on purpose. crab-hole v0.1.12 has no TCP listener on 53
+      # (its downstream protocols are udp|tls|https|quic), so `tcp://…:53` is
+      # refused and reports a permanent red — a monitor that can never go green
+      # is worse than none. A real assertion needs a `dns://` endpoint with a
+      # query name, which `services.fleetMonitors` does not model yet; until it
+      # does, the resolver is proven by `dig @10.99.0.53 example.com`.
       # Tailnet IP, not MagicDNS: delphi runs `--accept-dns=false` (a resolver
       # must not resolve through the address it serves), so names do not resolve
       # here. The address is stable per node key.

@@ -163,6 +163,36 @@ wipe for no reason. Rapid SSH probes from one source trip the installer's
   Tailscale does not fail over between two nameservers, so listing frieren and delphi
   separately loses DNS when the first dies.
 
+## Phase 4d — the 10.99.0.53 failover pair (done 2026-10-20)
+
+Both hosts bind `10.99.0.53/32` on `lo` through
+`modules/profiles/tailnet-dns-address.nix` (one module, not a copy) and both
+advertise it. Tailscale has no floating address: two nodes advertising the SAME
+subnet route become a failover set, and the route moves to the survivor in
+~15 s. Listing two nameservers in the tailnet settings does **not** work — a
+client that loses the first one does not retry in time.
+
+```bash
+ip -4 addr show lo | grep 10.99.0.53        # both hosts: 10.99.0.53/32
+sudo tailscale debug prefs | jq .AdvertiseRoutes   # both list 10.99.0.53/32
+sudo tailscale status --json | jq .Self.PrimaryRoutes  # APPROVED routes only
+dig +short @10.99.0.53 example.com          # whoever currently holds the route
+```
+
+Three things that are not obvious:
+
+- **`extraSetFlags` is a boot-time oneshot (`tailscaled-set.service`).** A
+  `nixos-rebuild switch` does not re-run it, so after changing the flag run
+  `sudo tailscale set --advertise-routes=…` by hand or the declaration is only
+  true after the next boot.
+- **One comma-separated `--advertise-routes` flag, not two.** `tailscale set`
+  replaces the whole route set, so a second flag would silently drop the first.
+- **Approval is per node and not declarable from here.** `PrimaryRoutes` is the
+  only honest check — `AdvertiseRoutes` shows what was offered, not what the
+  tailnet accepted. There is no Tailscale API key in sops, so approve it in the
+  admin console (Machines → the node → Edit route settings), or add a
+  `autoApprovers` block to the tailnet policy file to stop doing this per host.
+
 ## Phase 4c — HTTPS (done 2026-10-20)
 
 `publicDomain = "delphi.bountystash.com"` in the host config is the whole switch:

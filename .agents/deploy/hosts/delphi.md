@@ -163,6 +163,34 @@ wipe for no reason. Rapid SSH probes from one source trip the installer's
   Tailscale does not fail over between two nameservers, so listing frieren and delphi
   separately loses DNS when the first dies.
 
+## Phase 4c — HTTPS (done 2026-10-20)
+
+`publicDomain = "delphi.bountystash.com"` in the host config is the whole switch:
+`enableACME` + `forceSSL` generate the :443 server, the :80 redirect and the ACME
+renewal timer. The only non-declarable step is the **DNS record**: a **DNS-only**
+A record to the instance (`proxied = false`). A proxied (orange-cloud) record
+cannot work — HTTP-01 would be answered by Cloudflare, not the origin.
+
+```bash
+# created via the API, token in sops CLOUDFLARE.API.TOKEN (modules/secrets/apikeys.yaml)
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  "https://api.cloudflare.com/client/v4/zones/$ZONE/dns_records" \
+  -d '{"type":"A","name":"delphi","content":"92.5.115.103","ttl":300,"proxied":false}'
+```
+
+**The trap that cost an hour:** do not declare `listen = [{port = 443; ssl = true;}]`
+on the vhost by hand. It suppresses the `listen` on the *generated* :80 redirect
+block, so that block lands in a different listen group from the IP-addressed
+default vhost; the exact `server_name` then never matches, HTTP-01 gets **404
+while the token sits in `/var/lib/acme/acme-challenge`**, and the journal reads
+"your DNS records are set up incorrectly" — which is a lie. Let `forceSSL`
+generate both blocks.
+
+Diagnose with the server-selection test, not with DNS:
+`curl -o /dev/null -w '%{http_code} %{redirect_url}' -H 'Host: delphi.bountystash.com' http://127.0.0.1/`
+must answer `301`; a `200` means the default vhost is catching the request and
+ACME can never succeed.
+
 ## Phase 4b — rebuilding from the pushed flake (the autoUpgrade path)
 
 Once a change is on `main`, the host can update itself exactly the way the daily
@@ -200,6 +228,9 @@ ssh devji@delphi 'systemctl --user status hermes-gateway; journalctl --user -u h
 # the tailscale0 firewall rule — :8181 on the public IP is refused by design.
 curl -s http://100.123.145.53:8181/api/v1/endpoints/statuses \
   | jq -r '.[] | "\(.group)\t\(.name)\t\(.results[-1].success)"'
+# TLS: expect a valid Let's Encrypt chain, 200, and the :80 redirect.
+curl -sS --resolve delphi.bountystash.com:443:92.5.115.103 \
+  -o /dev/null -w '%{http_code} verify=%{ssl_verify_result}\n' https://delphi.bountystash.com/healthz
 ```
 
 `task checks:dns:failover` does **not** cover this host: it reads the LAN `resolvers`

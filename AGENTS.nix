@@ -232,6 +232,25 @@
         - A completed item is `DELIVERED` with a path, not "done".
       '';
     };
+    open-strata-eisen-rx5700 = {
+      title = "Implement Strata MoE inference on eisen's RX 5700";
+      kind = "open";
+      status = "OPEN";
+      priority = "P0";
+      date = "2026-10-20";
+      summary = "Deploy Niko1221/Strata (Qwen3.8-Flash-Next 125B MoE) on eisen's RX 5700 (Navi 10 / gfx1010) via experimental HIP build without compromising Vulkan gaming.";
+      refs = {
+        hosts = ["eisen"];
+        modules = ["hosts/eisen/amd-rx-5700.nix" "hosts/eisen/llm-server.nix"];
+        tasks = ["checks:host"];
+        docs = [".agents/deploy/hosts/eisen.md"];
+      };
+      body = ''
+        Goal: Run Niko1221/Strata on eisen's AMD Radeon RX 5700 (Navi 10 / gfx1010, 8 GB VRAM) for 125B MoE inference (e.g. Qwen IQ1_M / IQ2_XS).
+        Architecture: Build Strata via `-DCMAKE_HIP_ARCHITECTURES=gfx1010` (docs/OLDER_GPUS.md) in an isolated container/FHS on /mnt/storage so host mesa/radv Vulkan stays clean for Steam/Sunshine.
+        Exit: Strata service starts on eisen, exposes an OpenAI-compatible API endpoint (e.g. :8085), verifies token generation on gfx1010, and yields GPU to gaming guard when Steam launches.
+      '';
+    };
     doc-budget-ci = {
       title = "Doc budget gate in CI";
       kind = "open";

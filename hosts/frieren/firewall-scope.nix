@@ -1,27 +1,4 @@
 # Firewall scoping: every open service port is reachable ONLY on the LAN NICs
-# (enp1s0 wired, wlp2s0 wifi) and tailscale0 — not from docker0, a container
-# bridge, or any interface that appears later.
-#
-# Why: NixOS's global `allowedTCPPorts`/`allowedUDPPorts` accepts are
-# interface-blind (live: `-A nixos-fw -p tcp --dport 22 -j nixos-fw-accept`),
-# so they also accept docker0 and anything else. This module empties the
-# global lists (mkForce) and re-applies the ports per interface.
-#
-# The per-interface lists are derived by
-# `modules/profiles/service-exposure.nix` from the `profiles.serviceExposure`
-# registry below, so a service's exposure is declared once. `dns.nix` still
-# adds its own per-interface entries (53/67/4011) additively — the merge is
-# intentional, and `task checks:ports` remains the drift guard.
-#
-# FAIL-CLOSED RULE: the mkForce on the global lists is absolute, so a port that
-# only reaches the globals (a service's `openFirewall = true`) stays CLOSED
-# everywhere on this host until it is declared in the registry below. Migrate a
-# service by adding its port here, not by removing the mkForce.
-#
-# Unaffected: lo + established/related replies (unconditional rules at the top
-# of nixos-fw), ICMP/allowPing, and dns.nix's per-interface entries (they merge
-# in additively). The chain's final refuse still drops everything else —
-# including NEW connections from docker0, which is the point.
 {
   config,
   lib,

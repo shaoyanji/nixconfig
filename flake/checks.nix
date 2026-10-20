@@ -6,6 +6,7 @@
   hostInventory,
   skillsCtl,
   agentsNotesCtl,
+  policiesCtl,
 }:
 # CHEAP CHECKS ONLY — `checks.<system>` MUST NOT force a host configuration.
 #
@@ -66,7 +67,91 @@ lib.genAttrs systems.default (
         (builtins.attrNames hostInventory);
 
       hostCount = builtins.length (builtins.attrNames hostInventory);
+
+      # pkgs.txt is a file a human edits: a trailing reason, a pasted markdown
+      # list, a repeated name. The parser is a lib because another flake can
+      # read its own list with it (lib/pkg-list.nix).
+      pkgList = import ../lib/pkg-list.nix {inherit lib;};
+      pkgFixture = pkgList.parse ''
+        # a heading is a comment
+        helix  # editor
+        - bat # pager
+        * jq
+        1. ripgrep
+        - [x] fd
+        helix
+      '';
+      pkgExpected = ["helix" "bat" "jq" "ripgrep" "fd"];
+
+      # The lenient half: a list copied out of a markdown handoff contains names
+      # nixpkgs has no attribute for. `split` resolves what exists and names the
+      # rest, which is the only way ingesting an untrusted list is usable.
+      pkgSplit = pkgList.split {
+        inherit pkgs;
+        text = pkgFixtureString;
+      };
+      pkgFixtureString = ''
+        - helix  # editor
+        - SomeAppImage.bin
+      '';
+      policyFailures = builtins.filter (id: !policiesCtl.policies.${id}.holds) policiesCtl.ids;
+      policyReport =
+        lib.concatMapStrings (
+          id: ''
+            ✗ ${id} — ${policiesCtl.policies.${id}.rule}
+               proof: ${policiesCtl.policies.${id}.proof}
+               now:   ${policiesCtl.policies.${id}.detail}''
+        )
+        policyFailures;
+      dangling = map (c: "${c.doc} -> ${c.id}") policiesCtl.danglingCitations;
+      unenforced = policiesCtl.unenforcedHardRules;
     in {
+      # --- pkgs.txt: the format a human will actually edit -------------------
+      pkg-list = assert pkgFixture == pkgExpected;
+      assert (pkgList.parse "") == [];
+      assert (pkgList.resolve {
+        inherit pkgs;
+        text = "python3Packages.requests";
+      })
+      != [];
+      # deepSeq, not tryEval alone: resolve returns a lazy list, so a bare
+      # tryEval sees the spine and never forces the throw inside it. A missing
+      # entry must fail loudly rather than vanish from a user's PATH.
+      assert !(
+        builtins.tryEval (
+          builtins.deepSeq (pkgList.resolve {
+            inherit pkgs;
+            text = "no-such-package-xyz";
+          })
+          null
+        )
+      ).success;
+      assert (builtins.length pkgSplit.packages) == 1;
+      assert pkgSplit.missing == ["SomeAppImage.bin"];
+        pkgs.runCommand "pkg-list" {} ''
+          echo "pkgs.txt: inline + heading comments, markdown markers, dedupe, dotted paths, loud failure"
+          touch $out
+        '';
+      # --- policies: a rule the docs state must be a predicate here ----------
+      # The gate has two halves and both matter. `holds` proves the tree still
+      # does what the rule says; the citation checks prove the rule is reachable
+      # from the document that states it, in both directions, so neither the
+      # prose nor the gate can drift into being decorative.
+      policies =
+        if policyFailures != []
+        then builtins.throw "policy violated:\n${policyReport}"
+        else if dangling != []
+        then builtins.throw "a doc cites a policy that does not exist:\n  ${lib.concatStringsSep "\n  " dangling}"
+        else if policiesCtl.uncitedPolicies != []
+        then builtins.throw "a policy is enforced but no document cites it (invisible gate):\n  ${lib.concatStringsSep "\n  " policiesCtl.uncitedPolicies}"
+        else if unenforced != []
+        then builtins.throw "HARD RULE without a [[flake/policies.nix#id]] citation — state the rule in the registry and cite it, or delete it:\n  ${lib.concatStringsSep "\n  " unenforced}"
+        else
+          pkgs.runCommand "policies" {} ''
+            echo "${toString (builtins.length policiesCtl.ids)} policies hold; every citation resolves; every id is cited"
+            touch $out
+          '';
+
       # --- the compiled registry is internally consistent --------------------
       inventory-schema =
         if !self.inventory.ok

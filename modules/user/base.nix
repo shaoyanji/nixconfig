@@ -3,33 +3,24 @@
   lib,
   ...
 }: let
-  readPkgList = path: let
-    lines = lib.pipe (builtins.readFile path) [
-      (lib.splitString "\n")
-      (map lib.strings.trim)
-      (builtins.filter (line: line != "" && !(lib.hasPrefix "#" line)))
-    ];
-  in
-    map
-    (
-      name:
-        pkgs.${name} or (throw "Unknown package in ${toString path}: ${name}")
-    )
-    lines;
+  # `#` starts a comment, whole-line or trailing, so a curated list can carry
+  # the reason next to the name (lib/pkg-list.nix).
+  pkgList = import ../lib/pkg-list.nix {inherit lib;};
+  readPkgList = path: pkgList.resolve {inherit pkgs path;};
 in {
   imports = [
-    ../../scripts
-    ../../lf
-    ../../env.nix
-    ../../shell/base.nix
-    ../../sops.nix
-    ../../helix.nix
+    ../scripts
+    ../lf.nix
+    ../env.nix
+    ../shell
+    ../sops.nix
+    ../helix.nix
   ];
 
   home = {
     stateVersion = "25.05";
     packages = with pkgs;
-      readPkgList ../../../pkgs.txt
+      readPkgList ../../pkgs.txt
       ++ [
         # ── Sysadmin Resource & Performance Monitoring ──
         duf # Disk usage/free space viewer

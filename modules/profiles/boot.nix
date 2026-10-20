@@ -1,9 +1,4 @@
 # Boot configuration profile
-# Provides standardized boot loader configuration for NixOS hosts
-# Usage:
-#   imports = [ ../../modules/profiles/boot.nix ];
-#   profiles.boot.systemd-boot = true;
-#   profiles.boot.efi = true;
 {
   config,
   lib,

@@ -1,6 +1,4 @@
 # Canonical user constants for this flake.
-# Import with: let user = import ../global/user.nix; in (or relative path)
-# These values are the single source of truth for the primary user.
 {
   # System account username & paths
   name = "devji";

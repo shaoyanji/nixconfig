@@ -1,9 +1,4 @@
 # Declarative Consolidated Fleet Governor & 3-Tier Escalation Router
-#
-# Consolidates fragmented, monitoring-only watchdogs into a structured 3-tier router:
-# - System 0 (S0): Pure deterministic CLI / JSON metrics & isolated playbooks (0 inference, 0 tokens).
-# - System 1 (S1): Multi-resource trade-off arbiter via Julia-1 + Laya Kelly consensus (0 LLM tokens, < 10ms CPU).
-# - System 2 (S2): High-entropy investigative reasoning loop via Nemotron schema harness & sandboxed tool dispatch.
 {
   config,
   lib,

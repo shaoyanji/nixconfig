@@ -1,7 +1,4 @@
 # Local fork of nixpkgs nixos/modules/services/misc/paperless.nix.
-# The upstream module always overrides tesseract5 with language-specific languages
-# via cfg.package.apply, producing an uncached derivation that builds from source.
-# This fork removes the `apply` so the stock cached pkgs.paperless-ngx is used.
 {
   config,
   options,

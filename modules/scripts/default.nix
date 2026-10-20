@@ -5,7 +5,7 @@
   ];
   home.packages = with pkgs; [
     # NOTE: `nvidia-offload` used to live here, which shipped it to EVERY host
-    # (``modules/user/base`` pulls in this directory). It is a PRIME render-offload
+    # (``modules/user/base.nix`` pulls in this directory). It is a PRIME render-offload
     # wrapper, so it belongs only on the NVIDIA GPU hosts. Those hosts get the
     # canonical wrapper directly from NixOS via
     # `hardware.nvidia.prime.offload.enableOffloadCmd = true` (see

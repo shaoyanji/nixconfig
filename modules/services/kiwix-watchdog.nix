@@ -1,8 +1,4 @@
 # Declarative Kiwix Offline Knowledge Library Integrity & Search Health Probe (EXP-040).
-#
-# Periodically inspects the Kiwix server daemon, verifies catalog integrity in
-# /var/lib/kiwix/library.xml, validates physical readability of all declared ZIM archives,
-# and benchmarks search index responsiveness across sample queries (NixOS, Btrfs, Linux).
 {
   config,
   lib,

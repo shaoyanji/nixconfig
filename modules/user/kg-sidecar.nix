@@ -1,19 +1,4 @@
 # The knowledge-graph sidecar (tools/kg-engine) as a user service.
-#
-# The repo's scripts already know how to start and stop it, so this module is
-# deliberately thin: a oneshot whose ExecStart/ExecStop are the same two
-# commands `task ops:kg:sidecar` runs. What it adds is the thing that was
-# missing — something actually STARTS it, so `kg-query.sh` can take its fast
-# path (28 ms vs ~476 ms on a dirty tree) instead of silently falling back to
-# jq every time.
-#
-# It serves the COMPILED projection (lib/knowledge-graph.nix), resolved from
-# THIS checkout, so the socket and the jq surface read one graph. `--native` is
-# the parity experiment behind `checks:kg:native`, never the daemon default.
-#
-# Skipped, not failed, when the checkout or the script is absent (a preserved
-# host, a container without the repo): ConditionPathExists makes that a clean
-# "not applicable" rather than a red unit on every login.
 {
   config,
   lib,

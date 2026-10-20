@@ -1,12 +1,4 @@
 # Frieren Canary & Runtime Sandbox MicroVM (EXP-102)
-#
-# Provides an ephemeral, fast-boot (< 500ms) NixOS testing environment:
-# - Shares host /nix/store via virtiofs (zero store copying / duplication).
-# - Ephemeral writable overlay for builds and system activations.
-# - Fixed persistent SSH host keys mounted from /var/lib/microvms/frieren-canary/ssh-host-keys
-#   to ensure the host never experiences known_hosts collisions across teardowns.
-# - Local NetworkManager bridge networking (microbr: 192.168.83.1 -> 192.168.83.10).
-# - Hypervisor: cloud-hypervisor over KVM.
 {
   config,
   pkgs,

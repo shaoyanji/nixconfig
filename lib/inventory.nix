@@ -1,23 +1,4 @@
 # Fleet inventory: schema + compiler for `inventory.toml`.
-#
-# inventory.toml is the canonical device registry (hardware, network, persona,
-# status) for every device the fleet knows about, including non-Nix ones. This
-# module turns it into *compiled* data:
-#
-#   * Parse ONCE with pure `builtins.fromTOML` — no IFD, no `yq`, no shell, no
-#     per-host re-parse. The result is a plain attrset of scalars, so handing it
-#     to every host as a module argument costs one shared thunk.
-#   * Validate against an explicit schema. Unknown keys are errors (no
-#     `freeformType`), so a typo in inventory.toml fails evaluation instead of
-#     silently disappearing. Types are declared, so `managed = "yes"` is a hard
-#     error rather than a truthy string.
-#   * Derive what used to be hand-maintained prose. The device counts and the
-#     "is this host built by the flake" fact are COMPUTED; where inventory.toml
-#     still declares a copy, `issues` reports the disagreement instead of
-#     letting it drift silently.
-#
-# Consumers (`flake/checks.nix`, `flake/packages.nix`, every host's
-# `config.fleet.inventory`) read the compiled result. See docs/inventory-schema.md.
 {
   lib,
   src ? ../inventory.toml,

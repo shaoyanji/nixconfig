@@ -1,13 +1,4 @@
 # aria2-daemon — network RPC download service with AriaNg web UI.
-#
-# Delegates the daemon lifecycle to the native nixpkgs `services.aria2`
-# module and adds the nginx vhost for AriaNg + RPC reverse proxy.
-#
-# The RPC secret is loaded via systemd LoadCredential at runtime — never
-# stored in the Nix store or command line.
-#
-# AriaNg is pulled as a pre-built release zip via fetchzip instead of
-# building from source via npm (which is fragile and breaks frequently).
 {
   config,
   lib,

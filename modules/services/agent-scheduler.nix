@@ -1,13 +1,4 @@
 # Declarative Agent Scheduler (EXP-016).
-#
-# Provides a declarative registry for autonomous agent jobs across the fleet
-# (e.g. nightly health auditing, handoff execution, repository upkeep).
-#
-# Replaces ad-hoc, hand-rolled user timer/service definitions with:
-#   - Structured options per job (schedule, command, working directory, lock).
-#   - Automatic mutex locking via flock to enforce "at most one rebuild/audit at a time".
-#   - Consistent PATH injection with setuid wrappers (/run/wrappers/bin) first.
-#   - Full integration with systemd user timers under user linger.
 {
   config,
   lib,

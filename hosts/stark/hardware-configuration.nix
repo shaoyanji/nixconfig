@@ -1,8 +1,4 @@
 # stark — hand-written hardware-configuration (not from a real
-# nixos-generate-config scan yet; revisit after first boot).
-#
-# fileSystems are owned by ./disko.nix (SSD system + 1 TB HDD Steam
-# library) — do not add fileSystems entries here.
 {
   config,
   lib,

@@ -1,9 +1,4 @@
 # Declarative SQLite WAL Checkpoint, Optimization & Integrity Dispatcher (EXP-030).
-#
-# Periodically inspects embedded SQLite databases across fleet services (Pi-hole,
-# Uptime-Kuma, SimpleX, Scrutiny, Sonarr), performs non-blocking or truncating WAL
-# checkpoints, runs query planner statistics optimization (PRAGMA optimize), and
-# verifies database integrity (PRAGMA quick_check) before nightly backup windows.
 {
   config,
   lib,

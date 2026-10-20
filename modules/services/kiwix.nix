@@ -1,19 +1,4 @@
 # Offline wiki stack: kiwix-serve (native NixOS module) + declarative ZIM
-# library (Wikipedia + ArchWiki), behind nginx at wiki.frieren.lan.
-#
-# History: both the server (kiwix-serve.service) and the downloader
-# (wikipedia-download.service + download_full.sh) started as hand-rolled
-# ~/.config/systemd/user units, declared nowhere. The downloader re-hashed the
-# full ~52GB ZIM on every boot and switch-to-configuration restart, saturating
-# disk IO for ~10-20 minutes per rebuild (seen 2026-10-08, starved
-# hermes-gateway startup). Archives are now declarative store paths: adding a
-# new wiki = add a fetchurl entry below (use `nurl <url>` for the hash).
-#
-# The 52GB Wikipedia ZIM was imported into the store locally (no re-download):
-#   nix store add-file /var/lib/kiwix/wikipedia_en_all_nopic_2026-06.zim
-#   → /nix/store/8n4nhjwy2bbk36j170vv3qxqdv06j0np-wikipedia_en_all_nopic_2026-06.zim
-# It is kept alive by the library derivation below; do NOT drop it from the
-# library attrset without also deleting the local copy at /var/lib/kiwix.
 {pkgs, ...}: let
   user = import ../global/user.nix;
   # Per-archive ZIM sources. fetchurl for small archives; store path for the

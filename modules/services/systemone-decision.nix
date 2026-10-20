@@ -1,5 +1,4 @@
 # System One Decision Service Module (Julia-1 & Laya)
-# Provides declarative packaging and optional HTTP / CLI service for typed AI decisions.
 {
   config,
   lib,

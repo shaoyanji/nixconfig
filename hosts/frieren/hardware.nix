@@ -1,6 +1,4 @@
 # Hardware acceleration for i5-8250U (Kaby Lake R, Intel UHD Graphics 620).
-# QuickSync supports H.264 + HEVC/H.265 encode + decode — excellent for
-# 4K Jellyfin/Plex transcoding.
 {pkgs, ...}: {
   # --- Intel QuickSync VA-API ---
   nixpkgs.config.packageOverrides = pkgs: {

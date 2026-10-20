@@ -1,27 +1,4 @@
 # Qwen-Image-2.1-Turbo — image generation / editing on Eisen.
-#
-# Pipeline (all GGUF/safetensors from Hugging Face, weights in designated
-# storage, NOT the Nix store):
-#   DiT (diffusion)  qwen-image-2.1-turbo-Q8_0.gguf  ~7-8 GB  (unsloth, Turbo, 8-step schedule)
-#   Text encoder      Qwen3VL-8B-Instruct-Q4_K_M.gguf  ~5 GB    (Qwen, shared with the base)
-#   VAE decoder       qwen_image_2.1_vae_bf16.safetensors ~0.68 GB (Comfy-Org)
-#   mmproj (editing)  mmproj-Qwen3VL-8B-Instruct-F16.gguf ~1.1 GB (Qwen, vision tower)
-#
-# Runner: stable-diffusion.cpp (leejet, llama.cpp sibling for diffusion).
-# License: the Turbo checkpoint is Qwen Research License (research/eval
-# only, non-commercial). Non-commercial use on this host, so the license
-# is a non-issue; Turbo is kept because it is the best in class (8-step
-# schedule, same quality as the 40-step base). The base Qwen-Image-2.1
-# (Apache-2.0, leejet/Qwen-Image-2.1-GGUF qwen_image_2.1-Q8_0.gguf) is the
-# fallback if the license ever matters.
-#
-# Endpoints:
-#   LAN:      http://eisen.lan/images/v1/images/generations (nginx :80 -> 127.0.0.1:8282)
-#   Tailnet:  https://eisen.<tailnet>.ts.net:8445/v1/images/generations
-# 8282 stays bound to loopback; nginx and `tailscale serve` are the only
-# ways in, so there is no firewall allowance for it. (image.eisen.lan is
-# NOT wired — frieren's pi-hole only maps eisen.lan itself, not subdomains;
-# the /images/ merge into eisen.lan avoids a frieren DNS change.)
 {
   config,
   lib,

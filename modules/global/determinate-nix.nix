@@ -1,31 +1,4 @@
 # Determinate Nix across the NixOS fleet — fleet-wide since 2026-10-19.
-#
-# ONE module, imported by every NixOS chain (`globalModulesNixos`,
-# `globalModulesContainers`, `globalModulesDemo`), so the fleet runs one Nix
-# binary. Two Nix versions in a fleet that pushes its own store paths makes
-# every cache warm and every `nix copy` a guess about who can read what.
-#
-# Proven on eisen first (generation 26.11.20261016.f20cd90, 2026-10-19): the
-# trial switched, the daemon came up as `determinate-nixd`, and the Qwen
-# endpoint answered 200. This file is that module promoted, with the trial-only
-# commentary replaced by what the fleet now depends on.
-#
-# What DN changes at runtime (read from modules/nixos.nix in the pinned input):
-#   - `nix.package` -> determinate's own `nix` at the normal priority (100);
-#     `modules/global/global.nix` sets the fleet default with `lib.mkDefault`,
-#     because a *plain* fleet definition is a definition CONFLICT, not a pick.
-#   - `nix-daemon.service` ExecStart -> `determinate-nixd … daemon`, plus a
-#     socket at /nix/var/determinate/determinate-nixd.socket.
-#   - `/etc/nix/nix.conf` becomes a target for `nix/nix.custom.conf`; every
-#     `nix.settings` entry (fleet substituters, trusted keys, experimental
-#     features) still lands, just in the included file.
-#   - the `nix` CLI is added to `environment.systemPackages`.
-#
-# Rollback is the generation, not a migration — the store format is unchanged:
-#   nixos-rebuild --rollback switch    (or boot the previous generation)
-#
-# Not imported by: the microVMs (`testvm`, `frieren-canary`) and
-# `garnixMachine`, which build their own module lists and are not fleet hosts.
 {
   inputs,
   lib,

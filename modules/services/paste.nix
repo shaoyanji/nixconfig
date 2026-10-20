@@ -1,12 +1,4 @@
 # Remote paste bin: pastes land on frieren over SSH, served read-only by
-# nginx at http://paste.frieren.lan (LAN + Tailscale only — no auth, so treat
-# pastes as LAN-visible; 8-char random names + 30-day tmpfiles expiry).
-#
-# Server component on frieren. The client CLI `pb` is installed fleet-wide via
-# modules/scripts/pb.nix.
-#
-# DNS: covered by the dnsmasq wildcard (address=/frieren.lan/192.168.3.25);
-# firewall: port 80 already open via reverse-proxy.nix.
 _: let
   user = import ../global/user.nix;
 in {

@@ -1,20 +1,4 @@
 # Home AGENTS.md — one store path per host, no runtime re-parse.
-#
-# Before this file, `~/AGENTS.md` was produced at activation by
-# `scripts/task/compile-llm-specs.py --home-agents`, which re-read
-# `inventory.toml` with Python even though `lib/inventory.nix` had already
-# compiled it. That meant a Python interpreter in the activation path, a second
-# TOML parser, and content that could drift from the flake.
-#
-# Now the flake exposes `.#homeAgents.<host>` (see flake/outputs.nix); the
-# activation script only symlinks the store path. The content is:
-#
-#   docs/agent-context/HOME-PREAMBLE.md   (fleet-wide contract)
-#   inventory.toml (compiled)             (host card)
-#   modules/user/ai/personas/<host>/AGENTS.md, else hermes-persona/AGENTS.md
-#
-# There is no second template. Add a field by adding it to inventory.toml, not
-# by editing a Python renderer.
 {
   lib,
   inventory,

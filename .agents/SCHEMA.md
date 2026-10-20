@@ -31,6 +31,7 @@ Machine-enforced where possible:
 | How to operate | `MANUAL.md`, `.agents/deploy/` | skills |
 | How an agent should route | `AGENTS.md`, `.agents/README.md` | skills |
 | What a skill can do | `.agents/skills/<name>/SKILL.md` | `.#agentSkills` index |
+| What is forbidden, and the proof | `flake/policies.nix` | cite `[[flake/policies.nix#<policy-id>]]`; never restate |
 
 **Never** paste a fleet table into a second file. Query `.#inventory` or link to
 the generated page. A table that exists twice is a table that disagrees with
@@ -52,6 +53,22 @@ it. This table is the place to look before touching data in place.
 
 TOON never becomes a source of truth. An agent consumes and emits TOON; the
 converter crosses to the format that owns the data (`master-toon` skill).
+
+### Rules are predicates, not prose
+
+A prohibition in a document is either **enforced** or it is decoration. The split:
+
+| Kind | Home | Shape |
+| :--- | :--- | :--- |
+| **Policy** — a rule a machine can check ("no task defaults to the fleet", "TOML through a tool") | `flake/policies.nix` | `{ rule, proof, holds, detail }`; `checks.policies` asserts `holds` for every id. Prose prohibitions in `AGENTS.md` are a shrink-only budget until each becomes a policy: [[flake/policies.nix#prose-prohibition-ratchet]] |
+| **Procedure** — an action an agent takes ("read the queue before proposing", "ask before deploying") | a skill or a task's `summary` | imperative steps, no rule language |
+
+A document states a policy in one line and cites it: `Never run … [[flake/policies.nix#<policy-id>]]`.
+The gate is bidirectional — a citation to an unknown id fails, an id nobody cites
+fails (an invisible gate rots), and any line tagged as a hard rule without a
+citation fails.
+If a sentence cannot be written as a predicate, it is procedure, and it belongs in
+a skill instead of the manual.
 
 ## 2. Document classes and budgets
 

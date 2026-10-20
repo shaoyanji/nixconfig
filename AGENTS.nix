@@ -1,23 +1,5 @@
 # AGENTS.nix — the repo's narrative knowledge as data.
-#
-# One home for what used to be ARCHITECTURE.md, TODO.md, HANDOFF.md and
-# EXPERIMENTS.md. AGENTS.md stays the manual (routing + invariants); this file
-# is the *content*: decisions, proposals, open work and design studies, each
-# with a schema status and typed refs into the tree it affects.
-#
-# Compiled by lib/agents-notes.nix. Query it:
-#   task ops:notes                    list everything
-#   task ops:notes:show ID=<id>       one note
-#   task ops:notes HOST=frieren       what touches a host
-#   task ops:notes MODULE=modules/services/fleet-sentinel.nix
-#   nix eval .#agentsNotes.index      machine-readable
-#
-# Rules (enforced by lib/agents-notes.nix -> checks.<system>.agents-notes-schema):
-#   - status uses the SCHEMA.md vocabulary; kind is one of decision, proposal,
-#     open, experiment, handoff, reference.
-#   - a note with refs is DISTILLED (body <= 30 lines): the code is the detail.
-#   - a note with no refs is a LEAF and must carry its verbose intent (>= 6
-#     lines), because nothing downstream can reconstruct it.
+
 {
   schemaVersion = 1;
   notes = {

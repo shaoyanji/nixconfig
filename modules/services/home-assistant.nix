@@ -1,34 +1,4 @@
 # Home Assistant device-layer stack: Home Assistant + Mosquitto MQTT broker
-# + Uptime-Kuma service monitoring + hardware telemetry.
-#
-# Reusable NixOS module for hosting Home Assistant with a local loopback
-# MQTT broker (Mosquitto), Uptime-Kuma status dashboards, and system
-# telemetry sensors.
-#
-# WHAT THIS MODULE CANNOT DECLARE — and why there is no `mqtt:` stanza below.
-# Home Assistant's MQTT integration is **config-entry only**: the client is
-# created from an entry in `<configDir>/.storage/core.config_entries`, not from
-# YAML. Verified in the pinned `homeassistant-2026.9.4`:
-#
-#   * `components/mqtt/__init__.py` has a `CONFIG_SCHEMA` but its
-#     `async_setup()` only registers the publish/websocket actions — it does not
-#     build a client. A YAML `mqtt:` block with no active entry instead raises
-#     the repair issue `yaml_setup_without_active_setup` (a WARNING).
-#   * The broker connection is read in `async_setup_entry()` from
-#     `entry.data[CONF_BROKER]`, i.e. from the config entry.
-#   * `components/mqtt/config_flow.py` has no `async_step_import`, so YAML is not
-#     imported into an entry either — the only YAML path left is
-#     `async_step_export_yaml`, which *exports* the entry as a template.
-#
-# So emitting `mqtt = { broker = ...; }` here would be actively wrong: it would
-# add a permanent warning and still subscribe nothing. The supported path is a
-# one-time UI/config-flow entry, which HA owns and rewrites — hand-seeding
-# `.storage/core.config_entries` from Nix would clobber every other entry
-# (github, met, ipp, mobile_app) on every write, the same class of mistake as  # seeding Uptime-Kuma's SQLite DB (see AGENTS.nix `exp-008`).
-#
-# The gap is therefore made *visible and testable* instead of declared:
-# `task checks:ha:mqtt` fails while the broker has no Home Assistant client, so
-# "MQTT stack declared but not wired" can never silently pass again (HC-5).
 {
   config,
   lib,

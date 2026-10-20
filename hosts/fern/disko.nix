@@ -1,13 +1,4 @@
 # Disk layout for fern (HP 15 laptop, Ryzen 3 3250U).
-#
-# Single SSD (SATA M.2 / 2.5" — most HP 15s-eq units enumerate it as
-# /dev/sda; NVMe units would be /dev/nvme0n1 — verify with `lsblk` and
-# adjust the device argument in flake/host-inventory.nix BEFORE
-# formatting; disko wipes the disk).
-#
-# Shape mirrors stark's system disk: UEFI ESP + 8G swap (>= 8 GB RAM,
-# so hibernation stays possible) + btrfs /root + /nix subvolumes.  # Host-local on purpose (AGENTS.nix `non-goals`: storage layouts
-# stay host-specific). Persistent desktop — no impermanence.
 {device ? throw "Set this to the laptop SSD, e.g. /dev/sda or /dev/nvme0n1"}: {
   disko.devices = {
     disk.main = {

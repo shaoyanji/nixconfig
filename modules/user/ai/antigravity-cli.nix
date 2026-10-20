@@ -1,7 +1,4 @@
 # Antigravity CLI (agy) — Google's successor to Gemini CLI.
-# Config schema per https://antigravity.google/docs/cli/reference/ (settings.json keys).
-# Settings land in ~/.gemini/antigravity-cli/settings.json (managed by home-manager);
-# auth tokens are stored in the OS keyring at first `agy` run, NOT in settings.json.
 {
   lib,
   config,

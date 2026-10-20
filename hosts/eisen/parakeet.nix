@@ -1,21 +1,4 @@
 # eisen — Parakeet Redux speech-to-text (ONNX, CPU-only), its own endpoint.
-#
-# Parakeet Redux is Moondream's 1.58-bit ternary version of NVIDIA's
-# parakeet-tdt-0.6b-v3 (600M params, 25 languages incl. German). The ONNX
-# export used here is the COMMUNITY export eschmidbauer/parakeet-redux-onnx
-# on Hugging Face — NOT Moondream-official, treat as experiment. The
-# transcribe pipeline (preprocessor -> encoder -> greedy decoder_joint loop,
-# VAD cuts >30 s audio at pauses) is vendored verbatim from that repo's
-# transcribe.py into parakeet-transcribe.py; parakeet-server.py is the thin
-# HTTP wrapper around it.
-#
-# It deliberately does NOT go through llama-swap (llama-swap execs
-# llama-server; Parakeet is ONNX). CPU-only: the RX 5700 has no ROCm and ONNX
-# has no Vulkan path for this model. ~1 GB resident, serialised requests.
-#
-# Exposure:
-#   * LAN:   http://eisen.lan/stt/transcribe   (nginx :80 -> 127.0.0.1:8091)
-#   * Direct: http://eisen:8091/transcribe     (loopback only; no firewall port)
 {
   lib,
   pkgs,

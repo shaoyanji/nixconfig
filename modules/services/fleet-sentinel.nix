@@ -1,25 +1,4 @@
 # fleet-sentinel — the closed loop for "did the config actually work?".
-#
-# The fleet has plenty of *probes* (gatus endpoints, checks:*, port audits) but
-# no **record** and no **transition detector**. A failed 03:30 restic run, a
-# 04:00 autoUpgrade that produced no new generation, or a unit that has been
-# failed since Tuesday all look the same from the outside: the UI is green
-# because nothing watches the job, only the socket.
-#
-# This module is deliberately small and boring:
-#
-#   timer (15 min) -> collect -> status.json + health.txt + ledger.jsonl
-#                                -> nginx serves /sentinel/
-#                                -> gatus watches health.txt body == "ok"
-#                                -> the SimpleX bridge alerts on 3 failures
-#
-# `ledger.jsonl` is append-only, one uniform JSON object per run, which is
-# exactly the shape `master-toon` compresses for agents (`task ops:ledger:toon`).
-# It is the *episodic* store: AUDIT.md says what changed, the ledger says what
-# was observed, journald says why.
-#
-# It performs no builds, opens no port, and runs as a oneshot: a failed
-# collector must never take the NAS down with it.
 {
   config,
   lib,

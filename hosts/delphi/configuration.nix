@@ -1,27 +1,4 @@
 # delphi — Oracle Cloud Infrastructure (OCI) Ampere A1 ARM64 headless server.
-#
-# Hardware (MEASURED 2026-10-20 on the live instance, not as ordered):
-#   Shape: VM.Standard.A1.Flex (Ampere Altra Neoverse N1, aarch64-linux)
-#   Sizing: 2 OCPU, 11 GiB RAM, 200 GB paravirtualized boot volume (OCI Always
-#   Free tier). The inventory and the earlier revision of this header claimed
-#   4 OCPU / 24 GB — that was the shape ceiling, not what was created. Two
-#   cores is the budget for anything that compiles here; prefer build-on-remote
-#   or the cache over local builds.
-#
-# Role:
-#   Headless cloud server, remote offload worker, and Tailscale mesh peer.
-#   Uses the globalModulesContainers (noDE) chain: minimal userland, sops
-#   secrets, hardened SSH — no desktop bloat.
-#
-#   Three jobs, in the order they are wired below:
-#     1. webserver            — nginx on :80, a health/landing page.
-#     2. tailnet resolver     — crab-hole (Pi-hole clone in Rust) answering on
-#                               the shared tailnet DNS service address, so it
-#                               can fail over with frieren's stack.
-#     3. hermes agent         — hermes CLI + gateway, its own Telegram bot.
-#
-# Provisioning (nixos-anywhere + the sops bootstrap that must happen FIRST):
-#   .agents/deploy/hosts/delphi.md
 {
   pkgs,
   lib,

@@ -7,7 +7,6 @@
 in {
   imports = [
     ./desktop-client.nix
-    ../nixos/lxc
     ./boot.nix
   ];
 

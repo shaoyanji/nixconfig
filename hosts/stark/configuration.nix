@@ -1,29 +1,4 @@
 # stark — Dell Inspiron 24 3477 All-in-One Steam desktop.
-#
-# Hardware:
-#   CPU:  Intel Core i5-7200U (Kaby Lake-U, 2c/4t, 15 W)
-#   GPU:  Intel HD 620 iGPU (drives the 23.8" 1080p panel) +
-#         NVIDIA GeForce MX110 (Maxwell GM108M, sm_50) via PRIME render
-#         offload → legacy_580 driver (./nvidia-mx110.nix)
-#   RAM:  16 GB DDR4
-#   Disk: SK hynix SC311 SATA SSD (system, disko main) +
-#         1 TB HDD (Steam library, btrfs → /mnt/steam, disko hdd)
-#   Boot: UEFI (systemd-boot)
-#
-# Role:  Steam Big Picture on a full desktop chain (eisen-style):
-#        globalModulesNixos → niri + DankMaterialShell greeter +
-#        role:heim userland. autoLogin drops devji straight into the
-#        upstream gamescope-session (steam -gamepadui); if it exits,
-#        the DMS greeter is the fallback (niri session selectable).
-#        NOT the noDE steamos.nix kiosk path (ares) — the desktop
-#        chain is wanted here.
-#
-# Storage: /mnt/steam = 1 TB HDD (btrfs+zstd, labeled `steam`). After
-#          first boot own it once:
-#            sudo chown devji:users /mnt/steam
-#          Then add it in Steam: Settings → Storage → Add Drive →
-#          /mnt/steam. Games that benefit from the dGPU: right-click →
-#          Properties → Launch Options → `nvidia-offload %command%`.
 {pkgs, ...}: let
   user = import ../../modules/global/user.nix;
 in {

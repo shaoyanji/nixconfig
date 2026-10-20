@@ -1,17 +1,4 @@
 # A structural view of the repo's knowledge, compiled from the files themselves.
-#
-# Why this exists: BM25 (`qmd`) answers "where is this explained"; it is bad at
-# "what touches X" and "which skills mention frieren". A graph answers that in
-# one hop. The graph is a *projection*, not a new source of truth:
-#
-#   hosts   <- inventory.toml (compiled by lib/inventory.nix)
-#   skills  <- .agents/skills/*/SKILL.md (compiled by lib/skills.nix)
-#   docs    <- living documents, docs/*.md, .agents/**/*.md, taskfiles/*.md
-#
-# Edges are mentions, which are cheap and honest ("this file names that thing").
-# No embedding, no LLM, no server. The Cypher export exists so an external Neo4j
-# can be fed in one command if the graph ever outgrows `jq`; it does not imply a
-# Neo4j process on this host (see the `p3-graph-query` note in AGENTS.nix).
 {
   lib,
   inventory,

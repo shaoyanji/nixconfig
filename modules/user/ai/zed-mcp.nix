@@ -1,19 +1,4 @@
 # zed-mcp — Zed editor MCP integration pilot (github + nixos servers).
-#
-# Uses natsukium/mcp-servers-nix (flake input) to build pinned MCP servers
-# and emit a Zed-flavored context_servers fragment. Zed is the fleet's
-# official editor (heim persona), so it is the MCP integration target.
-#
-# Why a sidecar + merge helper instead of writing ~/.config/zed/settings.json
-# directly: Zed rewrites settings.json from its own UI, which would make
-# every home-manager activation fight the user (and produce the recurring
-# ".hm-backup would be clobbered" activation failures seen with other
-# runtime-managed files). The fragment below is reproducible; run
-# `zed-mcp-merge` once per client to fold it into the live settings.json.
-#
-# NOTE: the github MCP server needs a GITHUB_PERSONAL_ACCESS_TOKEN.
-# Export it in the shell that launches Zed, or wire it through
-# mcp-servers-nix's envFile/passwordCommand once a sops key exists.
 {
   inputs,
   pkgs,

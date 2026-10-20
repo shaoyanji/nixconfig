@@ -1,12 +1,4 @@
 # Disk layout for impermanence-based hosts (ares, schneeeule).
-#
-# Design decision: kept host-adjacent under hosts/common/ rather than
-# moved to modules/profiles/ because disk partitioning is inherently
-# host-specific — device paths, LVM VG names, and partition sizes
-# rarely generalise across machines.  Only import this when two or more
-# hosts genuinely share the same disk topology.
-#
-# See the `non-goals` note in AGENTS.nix for the policy on storage layout merging.
 {device ? throw "Set this to your disk device, e.g. /dev/sda", ...}: {
   disko.devices = {
     disk.main = {

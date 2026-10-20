@@ -1,5 +1,4 @@
 # Autonomous Nginx SSL/TLS Certificate Expiry & OCSP Stapling Watchdog (EXP-050)
-# Probes local certificate files and declared HTTPS endpoints to assert valid expiration windows.
 {
   config,
   lib,

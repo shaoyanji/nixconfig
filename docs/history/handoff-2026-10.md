@@ -482,7 +482,7 @@
   - The operator's actual request was to remove the top GUI window title bar displayed by the Kitty terminal emulator (`kitty -- tmux`).
 * **Actions Taken:**
   1. Reverted `modules/shell/tmux.nix` to remove `status off`, `set-titles off`, and `pane-border-status off`.
-  2. Added `hide_window_decorations = "yes"` to `programs.kitty.settings` in [`modules/kitty/default.nix`](../../modules/kitty/default.nix) to remove the top GUI title bar and window decorations from Kitty under Wayland/X11.
+  2. Added `hide_window_decorations = "yes"` to `programs.kitty.settings` in [`modules/kitty.nix`](../../modules/kitty.nix) to remove the top GUI title bar and window decorations from Kitty under Wayland/X11.
   3. Preflight verified Nix AST syntax via `nix-instantiate --parse`.
   4. Committed and pushed `d355727` to `origin/main`.
   5. Successfully rebuilt and switched to NixOS Generation 133 (`px28k7jav07j5jymrrf9mp1161lx1lgb-nixos-system-frieren-26.11.20261005.aa48d34`).
@@ -758,7 +758,7 @@
 * **Remediations Executed:**
   1. **Removed `T1-2` Font Override:** Dropped the `fonts = { ... }` block from [`hosts/frieren/configuration.nix`](../../hosts/frieren/configuration.nix), restoring the full ``nerd-fonts.jetbrains-mono`` package declared in [`modules/profiles/base-desktop-environment.nix`](../../modules/profiles/base-desktop-environment.nix).
   2. **Configured Monospace Font Hierarchy:** Set `fontconfig.defaultFonts.monospace = ["JetBrainsMono Nerd Font Mono" "JetBrainsMono NFM"];` in [`base-desktop-environment.nix`](../../modules/profiles/base-desktop-environment.nix).
-  3. **Configured Kitty:** Updated [`modules/kitty/default.nix`](../../modules/kitty/default.nix) to `font.name = "JetBrainsMono NFM";`.
+  3. **Configured Kitty:** Updated [`modules/kitty.nix`](../../modules/kitty.nix) to `font.name = "JetBrainsMono NFM";`.
   4. **Verification:**
      - Verified `fc-match monospace` and `fc-match "JetBrainsMono NFM"` cleanly resolve to `JetBrainsMonoNerdFontMono-Regular.ttf`.
      - Verified `~/.config/kitty/kitty.conf` on disk reflects `font_family JetBrainsMono NFM`.

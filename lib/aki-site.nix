@@ -1,34 +1,4 @@
-# ==============================================================================
 # lib/aki-site.nix — the fleet site, as a project of evaluated data
-# ==============================================================================
-# An ultra-minimal hypermedia site (~270 B aki JS primitive) generated natively
-# by Nix at build time: index.html, aki.min.js, style.css, and static JSON slices
-# for zero-daemon exploration of hosts, notes, closures, and the knowledge graph.
-#
-# WHAT IS CODE AND WHAT IS NIX: browser JS, CSS, the page shell and the page
-# bodies live in lib/site/ — `aki.js`, `kg.js`, `style.css`, `sidebar.html`,
-# `shell.html`, `overview.html`. They are read at eval time, so they are
-# lintable/parseable as what they are (`checks.site-assets` runs `node --check`
-# on the JS) and a typo in them is not a Nix parse error. The HTML files carry
-# `{{name}}` holes filled by `render` below; what stays in this file is data +
-# interpolation: every figure is a `${...}` over an evaluated source, never a
-# typed literal.
-#
-# HARD RULE — no typed facts. Every figure, path, service, size and status this
-# site prints is an INTERPOLATION of an evaluated value:
-#
-#   inventory.toml          (compiled by lib/inventory.nix)  hosts, counts, roles
-#   closure-budgets.toml    (measured by the adopt task)     closure baselines
-#   .agents/skills/**       (compiled by lib/skills.nix)     skill notes
-#   living docs + docs/*.md (compiled by lib/knowledge-graph.nix)
-#   the note files themselves (rendered into their own slices)
-#
-# The 2026-10-19 revision still claimed "Generation 82", "33.8 GiB", "3,946
-# store paths" and a port table months after each value had changed: literals
-# outlive the config they describe. So the rule is structural — if a value has
-# no source of truth, it is not rendered at all, and anything that does have one
-# is written as ${toString ...} over that source.
-# ==============================================================================
 {
   pkgs,
   lib ? pkgs.lib,

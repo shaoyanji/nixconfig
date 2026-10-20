@@ -1,5 +1,4 @@
 # Fix for nixpkgs bug where nvidia_x11.persistenced tries to access missing makeFlags
-# See: https://github.com/NixOS/nixpkgs/issues/...
 _final: prev: {
   nvidia_x11 =
     prev.nvidia_x11.overrideAttrs

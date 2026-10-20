@@ -1,7 +1,4 @@
 # freebuff-headless — headless runner/daemon for the Freebuff (Codebuff) TUI.
-#
-# Moved out of hosts/frieren/tools.nix (2026-10-19): same reason as
-# modules/scripts/wikisearch.nix — the script is a program, not host wiring.
 {pkgs, ...}:
 pkgs.writeShellApplication {
   name = "freebuff-headless";

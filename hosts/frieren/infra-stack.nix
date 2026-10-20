@@ -1,18 +1,4 @@
 # Infrastructure monitoring + backups for frieren.
-#
-# smartd + scrutiny: SMART health polling and web dashboard for the
-#   NAS's disks. frieren is a laptop running 24/7 — temperature and
-#   reallocation trends are the early-warning system. Alerts land in
-#   the journal (smartd) and the scrutiny UI; wire them into HA or
-#   uptime-kuma notifications later. Port 8124 because the module
-#   default 8080 collides with pihole-web.
-# restic: nightly backup of the stateful services to /srv/backup
-#   (data pool). The repository password is generated on-device on
-#   first run (root-only file) — swap for an sops-managed file and/or
-#   a remote repository when off-site backups land. PostgreSQL data
-#   dirs are deliberately EXCLUDED: hot-copying a live data directory
-#   is not a consistent backup — add services.postgresql.backup
-#   (pg_dump) alongside before trusting DB restore points.
 {
   pkgs,
   config,

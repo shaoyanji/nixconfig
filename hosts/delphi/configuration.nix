@@ -49,7 +49,7 @@
   # the DNS A record — and a wrong or missing record turns every renewal into a
   # failing unit, so do not set this before the name resolves to the instance's
   # RESERVED public IP (an ephemeral IP changes on stop/start).
-  publicDomain = null;
+  publicDomain = "delphi.bountystash.com";
 
   # Static landing page. The point is proof of life (and the webserver
   # criterion), not a product: no CMS, no PHP, no runtime.

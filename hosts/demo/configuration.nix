@@ -4,8 +4,6 @@
     ../../modules/profiles/firewall-baseline.nix
   ];
 
-  networking.hostName = "demo";
-
   # No sops, no secrets — use plain password for demo/travel box
   users.users.user = {
     isNormalUser = true;

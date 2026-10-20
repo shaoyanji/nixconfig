@@ -76,7 +76,6 @@ in {
     ];
   };
 
-  networking.hostName = "frieren-canary";
   networking.firewall.enable = false;
 
   # Network configuration matching host bridge microbr (192.168.83.1/24)

@@ -12,7 +12,6 @@
     ../../modules/profiles/base-desktop-environment.nix
     ../../modules/profiles/laptop.nix
   ];
-  networking.hostName = "schneeeule";
 
   fileSystems."/persist/data" = {
     device = "/dev/disk/by-uuid/ae50ae59-36e2-4e9a-88d0-04951f6a51fc";

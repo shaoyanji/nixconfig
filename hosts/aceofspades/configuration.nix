@@ -12,7 +12,6 @@
       device = "/dev/sda";
     })
   ];
-  networking.hostName = "aceofspades";
   services.xserver.videoDrivers = ["amdgpu"];
 
   hardware.graphics.extraPackages = [

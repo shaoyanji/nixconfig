@@ -18,7 +18,5 @@
     resolved.settings.Resolve.Domains = ["~.cloudforest-kardashev.ts.net" "~.fritz.box" "~."];
   };
 
-  networking.hostName = "mtfuji";
-
   system.stateVersion = "25.05";
 }

@@ -58,7 +58,6 @@
     ];
   };
 
-  networking.hostName = "testvm";
   networking.firewall.enable = false;
 
   services.openssh =

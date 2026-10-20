@@ -5,8 +5,6 @@
 }: let
   user = import ../../modules/global/user.nix;
 in {
-  networking.hostName = "guckloch";
-
   imports = [
     ../../modules/profiles/sshfs-nas-client.nix
     ../../modules/config/authorized-keys.nix

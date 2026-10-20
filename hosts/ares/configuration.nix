@@ -30,8 +30,6 @@ _: {
     ../../modules/profiles/base-node.nix
   ];
 
-  networking.hostName = "ares";
-
   # X server is required so XWayland can host legacy X11-only windows
   # that Steam spawns inside gamescope's Wayland surface.  No desktop
   # environment is configured — greetd auto-logs devji into

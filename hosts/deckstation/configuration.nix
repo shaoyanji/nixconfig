@@ -7,8 +7,6 @@ _: {
     ../../modules/profiles/sunshine.nix
   ];
 
-  networking.hostName = "deckstation";
-
   # X server is required by greetd so XWayland can host any legacy
   # X11-only windows that gamescope/Steam spawn. No desktop environment
   # is configured - greetd + tuigreet + gamescope-session is the entire

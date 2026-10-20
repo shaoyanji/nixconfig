@@ -45,8 +45,6 @@ in {
     ./qwen-image.nix
   ];
 
-  networking.hostName = "eisen";
-
   # --- Desktop (poseidon-style): niri compositor + DankMaterialShell greeter ---
   # The previous cage-kiosk specialisation and greetd dual-session experiments
   # both hung boot at graphical.target, so the DMS greeter path (as on

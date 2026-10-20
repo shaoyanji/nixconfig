@@ -5,7 +5,6 @@
     ../../modules/profiles/desktop-client.nix
     ../../modules/profiles/laptop.nix
   ];
-  networking.hostName = "applevalley";
   environment.systemPackages = with pkgs; [
     btrfs-progs
   ];

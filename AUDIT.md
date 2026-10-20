@@ -25,6 +25,13 @@
 
 ## Ledger
 
+### 2026-10-20 — Hostname comes from the inventory, chains come from `|>`
+
+- `mkNixosHost` sets `networking.hostName` from the inventory key (`mkDefault`), so 22 host
+  files lost the line repeating their own directory name: 23/23 configs resolve to their key
+  and `checks:host` is green on frieren/mtfuji/demo. `|>` is now the preferred chain form
+  (CI sets `pipe-operators` explicitly, since a runner without it cannot parse the tree).
+
 ### 2026-10-20 — The design record gets edges, and a way in
 
 - Notes gained two directed fields, `from` (what this idea grew out of) and `supersedes`;
@@ -87,51 +94,6 @@
   route-refusing hosts cannot reach. `ops:tailnet:dns` now FAILS on a routed-only list
   (hosts read from the repo, not hardcoded); `100.97.61.65` is back, gate rc=0. Residual:
   those hosts keep one usable resolver, so a frieren *service* failure still blinds them.
-
-### 2026-10-20 — Tailnet route approval is tailnet state, not host state
-
-- `10.99.0.53/32` was advertised on **both** nodes and approved on **neither**, so the
-  "failover pair" served nothing off-host: an advertisement is an offer, and no eval can
-  see whether it landed. Both are approved now.
-- `autoApprovers.routes` (`autogroup:admin`) covers it and `192.168.3.0/24`, but fires
-  only when a route is **advertised** — a prefix already pending stays pending, so a
-  re-offer finished it (withdraw just the /32, re-add; approved in 5 s on frieren,
-  parked on `10.99.0.54/32` on delphi). A reboot re-offers, so the pair now self-heals.
-- The policy is in the repo: `modules/config/tailnet-policy.hujson`, with `ops:tailnet:policy`
-  (semantic diff gate) and `ops:tailnet:policy:apply` (If-Match, refuses non-route edits
-  without `FORCE=1`). `ops:tailnet:routes` is the drift gate; both rc=0.
-- Token resolution is shared (`scripts/task/lib/tailnet-api.sh`): the sops OAuth client is
-  `all:read`, so reads work and policy **writes** still need a widened scope or
-  `TAILSCALE.API.KEY`. Approval itself needs no credential any more.
-- `profiles/tailnet-dns-address.nix` composes `--advertise-routes` from `advertiseRoutes`
-  + the service `/32` and owns `exitNode`, asserting exactly one such flag reaches
-  `tailscale set`; eval'd flags byte-identical on both hosts.
-- Tailnet DNS is a separate, still-empty switch (`global: []`, `split: {}`): approval
-  makes the address reachable, nameservers decide whether clients ask it.
-
-### 2026-10-20 — delphi: the user sops plane is derived, not copied
-
-- `modules/profiles/sops-user-identity.nix` (new, opt-in): activation derives
-  `~/.config/sops/age/keys.txt` from the host SSH key (a CA-only host has no user
-  keypair; `generateKey` mints an unregistered one → `0 successful groups`). The derived
-  identity IS `&delphi`, so no rekey. Verified on the host.
-- `docs/sops-rekey.md` (new): the two identity planes, anchor convention, rekey steps,
-  and the submodule `.sops.yaml` copy trap.
-- First offload: `services.fleetMonitors` on delphi (gatus, tailnet-only `:8181`, public `:8181`
-  refused) — an out-of-LAN vantage point frieren's loopback probes cannot be. 3/3 endpoints ok.
-- Public web: `https://delphi.bountystash.com` → `200`, Let's Encrypt chain, `:80` → `301`.
-  The first ingress attempt dropped with **0 packets** (ports in *Source* Port Range); ACME's
-  404 was a local nginx listen-group bug, not DNS. Runbook Phase 4/4c.
-- delphi self-updates (`autoUpgrade` 04:30) and both hosts bind + advertise `10.99.0.53/32`
-  through one shared module; frieren's advertisement awaits console approval. Also fixed:
-  `vdirsyncer` ran on every Linux host with no credentials (a red unit every 15 min).
-
-> Retired to history on 2026-10-20 to keep this document inside its 150-line budget:
-> the graph-query/`ops:ask` bench (10-19), context plane mk2 (10-19),
-> rebuild-path de-bloat and `nom` opt-in (10-19),
-> closure-budget baseline (10-17), the `nix flake check` eval-granularity defect
-> EXP-114 (10-15), and the NAS path governor (10-14).
-> See `docs/history/audit-2026-10.md`.
 
 ## Open debt (tracked in TODO.md)
 

@@ -102,8 +102,6 @@ in {
     exitNode = true;
   };
 
-  networking.hostName = "delphi";
-
   # --- User-plane sops identity ----------------------------------------------
   # base-node.nix gives the NixOS plane the host key (root can read it). Home
   # Manager activation runs as devji and needs a user-readable identity file,

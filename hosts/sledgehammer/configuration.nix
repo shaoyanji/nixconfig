@@ -11,8 +11,6 @@
     ../../modules/profiles/base-node.nix
   ];
 
-  networking.hostName = "sledgehammer";
-
   boot.loader = {
     efi.canTouchEfiVariables = lib.mkForce false; # Required when using efiInstallAsRemovable
     grub = {

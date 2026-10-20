@@ -42,8 +42,6 @@ in {
     ../../modules/profiles/base-desktop-environment.nix
   ];
 
-  networking.hostName = "scratch";
-
   # /boot is ext4 (legacy BIOS + GRUB) — NOT a vfat ESP, so systemd-boot
   # cannot be used. base-node's boot.nix defaults to systemd-boot; override
   # per the machine's original layout (gist 12006e57e885fc3864e9197826d69276).

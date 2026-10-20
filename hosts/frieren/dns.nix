@@ -4,7 +4,21 @@
   pkgs,
   ...
 }: {
-  imports = [../../modules/profiles/dns-failover.nix];
+  imports = [
+    ../../modules/profiles/dns-failover.nix
+    ../../modules/profiles/tailnet-dns-address.nix
+  ];
+
+  # --- tailnet failover peer for 10.99.0.53 ---------------------------------
+  # delphi was built to be the second member of this group; without frieren
+  # advertising the same /32 the address is served by delphi alone, so losing
+  # delphi loses tailnet DNS. Both nodes bind 10.99.0.53 on lo (the shared
+  # module) and advertise it; Tailscale treats the two advertisements as a
+  # failover set and moves the route to the survivor (~15 s).
+  #
+  # pihole-ftl already listens on 0.0.0.0:53, so nothing else has to change for
+  # it to answer on the bound address — verified before adding this.
+  profiles.tailnetDnsAddress.enable = true;
 
   # --- primary resolver role (HC-3) -----------------------------------------
   # The reusable resolver core — unbound + pihole-ftl's filtering config + the
@@ -77,7 +91,9 @@
   # boot — survives without re-auth, unlike extraUpFlags.
   # (useRoutingFeatures = "both" is inherited from desktop-client.nix.)
   services.tailscale.extraSetFlags = [
-    "--advertise-routes=192.168.3.0/24"
+    # One flag, comma-separated: `tailscale set --advertise-routes` replaces the
+    # whole set, so two flags would leave only the last one in force.
+    "--advertise-routes=192.168.3.0/24,10.99.0.53/32"
     "--ssh=true"
   ];
 

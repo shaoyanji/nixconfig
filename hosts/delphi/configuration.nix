@@ -87,8 +87,13 @@ in {
     ../../modules/profiles/firewall-baseline.nix
     ../../modules/profiles/hermes.nix
     ../../modules/profiles/sops-user-identity.nix
+    ../../modules/profiles/tailnet-dns-address.nix
     ../../modules/services/fleet-monitors.nix
   ];
+
+  # 10.99.0.53 on lo + the /32 advertised below form one half of the failover
+  # group; frieren runs the same module and advertises the same route.
+  profiles.tailnetDnsAddress.address = dnsServiceAddress;
 
   networking.hostName = "delphi";
 
@@ -130,19 +135,8 @@ in {
     ];
   };
 
-  # Bind the service address on lo so crab-hole answers on it. `ip addr replace`
-  # is idempotent, which matters because this runs on every boot.
-  systemd.services.dns-service-address = {
-    description = "Tailnet DNS service address ${dnsServiceAddress}/32";
-    wantedBy = ["multi-user.target"];
-    after = ["network-pre.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.iproute2}/bin/ip addr replace ${dnsServiceAddress}/32 dev lo";
-      ExecStop = "${pkgs.iproute2}/bin/ip addr del ${dnsServiceAddress}/32 dev lo";
-    };
-  };
+  # The lo bind itself lives in profiles/tailnet-dns-address.nix (shared with
+  # frieren, which advertises the same /32 as the passive member).
 
   # --- Tailnet resolver: crab-hole -------------------------------------------
   # Chosen over the pihole-ftl + unbound stack in profiles/dns-failover.nix:
@@ -344,6 +338,22 @@ in {
   security.acme = lib.mkIf (publicDomain != null) {
     acceptTerms = true;
     defaults.email = user.email;
+  };
+
+  # --- Unattended updates ----------------------------------------------------
+  # Same shape as frieren, staggered by 30 min so the two never pull and build
+  # at once (delphi has 2 cores; a simultaneous fetch on the home link would
+  # just move the delay). `allowReboot` stages with `nixos-rebuild boot` and only
+  # reboots when the kernel changed; `persistent` catches up after downtime.
+  #
+  # The `github:` ref is the pushed main branch — which is why nothing here is
+  # built from a local tree: a dirty checkout is invisible to this job.
+  system.autoUpgrade = {
+    enable = true;
+    flake = "github:shaoyanji/nixconfig#delphi";
+    dates = "04:30";
+    allowReboot = true;
+    persistent = true;
   };
 
   # --- Hermes agent ----------------------------------------------------------

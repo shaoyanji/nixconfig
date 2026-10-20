@@ -67,3 +67,93 @@ run outside systemd; a syntax or `ssl_certificate` error is real.
 ## Operational Interpretation
 - Prefer the canonical host deploy flow (`infra:deploy:host:frieren`).
 - After the daily autoUpgrade lands, `infra:deploy:host:frieren` is still fine for immediate/manual deploys — the timer just catches drift the next morning.
+
+## Rebuild topology (read before rebuilding this host)
+
+frieren is a laptop-class NAS (11 GiB RAM, 8 threads, btrfs). Its nightly
+window is already load-saturated; a rebuild started blind will look "stuck"
+and tempt you into a retry loop, which is the failure mode this section exists
+to prevent.
+
+**Nightly job matrix (all timers `Persistent = true`):**
+
+| Time                    | Unit                                   | Source of truth                                                |
+| ----------------------- | -------------------------------------- | -------------------------------------------------------------- |
+| 03:00                   | `agy-nightly-handoff` (user)           | Action-gated `~/HANDOFF.md` via Julia-1; executes cascade only on promotion candidates or on-demand (`task checks:audit:handoff`) |
+| 03:00                   | `postgresqlBackup-immich`              | local                                                          |
+| 03:28                   | `restic-backups-frieren-burgernas`     | daily SFTP push within DSM 03:25–04:00 power window            |
+| 03:30 (+10m jitter)     | `restic-backups-frieren-local`         | local                                                          |
+| Sun 01:30 (+30m jitter) | `fleet-warm-cache`                     | **`github:shaoyanji/nixconfig`** — builds 7 active host closures |
+| 04:00                   | `nixos-upgrade` (`system.autoUpgrade`) | **`github:shaoyanji/nixconfig#frieren`**                       |
+| 05:00 (Daily) / Sun     | `agy-nightly-system` (user)            | Trigger-gated `~/SYSTEM.md`: Mon-Sat quiet reflex (bypasses LLM if nominal), Sunday comprehensive scorecard, or on-demand (`task checks:audit:system`) |
+| Sun 06:00               | `nix-optimise`                         | weekly hardlink deduplication across live store paths          |
+
+**The origin-vs-local trap (this is the one that bites):**
+`system.autoUpgrade` builds from the **pushed GitHub flake**, not
+`/Volumes/data/projects/nixconfig`. Any local `nixos-rebuild switch` from a
+dirty tree is therefore **silently reverted by the next 04:00 run** unless the
+change is committed **and pushed**. A local switch that produced no new
+generation usually means exactly this. Confirm what the 04:00 run used:
+
+```bash
+journalctl -u nixos-upgrade -n 40 --no-pager | grep -E 'unpacking|new configuration'
+git -C /Volumes/data/projects/nixconfig rev-parse HEAD     # must match the unpacked rev
+```
+
+**Rebuild rules:**
+
+1. **At most one `nixos-rebuild` at a time.** Never retry-loop it — six
+   concurrent attempts is what caused the 2026-10-07 06:46 incident. If it
+   seems slow, _measure_ progress (next point) before touching anything.
+2. **After a dirty `flake.lock` bump the closure is re-fetched, not rebuilt.**
+   A nixpkgs rev change invalidates every store hash, so expect a multi-GB
+   download (tens of minutes on this host). It is not hung. Watch it:
+   ```bash
+   find /nix/store -maxdepth 1 -newermt '-2 minutes' | wc -l   # >0 = progressing
+   ls -l /nix/var/nix/temproots/<nix-pid>                      # mtime advances
+   ```
+   Fat tail to expect: frieren's closure contains **`paperless-ngx` →
+   `python3.14-torch` + `triton-llvm` + `wandb` + `google-cloud-cpp`**
+   (`nix why-depends /run/current-system <torch-path>` to re-verify). Cheap
+   slimming levers here are worth more than any build tuning.
+3. **Do not rebuild in the 03:00–05:30 window** on this host. Also avoid
+   Sunday mornings while `fleet-warm-cache` is running.
+4. **Load average lies here.** It is dominated by D-state btrfs kworkers and
+   `kswapd0`, not CPU. Judge pressure with `free -h` + `vmstat 1 3` (look at
+   `si/so`, `wa`, and idle%) — CPU is often 60–90% idle at loadavg 8+.
+5. **A killed `nixos-rebuild` leaves an orphaned root `nix build`** that can
+   never switch anything but keeps ~2 GB resident. Before retrying:
+   ```bash
+   pgrep -af 'nix build .*nixosConfigurations'    # kill it if it is an orphan
+   ```
+6. **After a successful switch, verify state, not vibes:**
+   ```bash
+   readlink -f /run/current-system
+   nixos-rebuild list-generations | tail -3
+   systemctl --failed; systemctl --user --failed
+   ```
+
+## Wiki stack, cache-warm, hermes, SSH CA
+
+- **Kiwix is declarative** (`hosts/frieren/kiwix.nix`, native
+  `services.kiwix-serve`): ZIMs are store paths / `fetchurl` entries, served on
+  8088 and reverse-proxied at `http://wiki.frieren.lan`. Data lives in
+  `/var/lib/kiwix` (NOT `$HOME` — DynamicUser + ProtectHome can't read
+  `/home`); the big ZIMs live only as GC-rooted `/nix/store` paths and
+  `library.xml` is force-synced from the declarative copy by the
+  `kiwix-library` activation script (tmpfiles `C+` never overwrites — it left
+  a stale library until 2026-10-08). Add a new wiki by adding a `fetchurl`
+  entry (use `nurl <url>` for
+  the hash) + a book entry in `kiwixLibrary`. Never hand-run `kiwix-manage`
+  and never hand-roll units under `~/.config/systemd/user/` — they shadow the
+  declarative ones (that shadowing broke the gateway on 2026-10-08).
+- **Uncached fleet builds (NVIDIA 580 etc. are unfree, never upstream-cached):**
+  run `task infra:update:fleet` — flake update → `infra:warm:cache` (build all
+  host closures on frieren) → `infra:apply:fleet`. Closures built elsewhere:
+  `task infra:cache:push:host:<host>` pushes them into harmonia.
+- **hermes-gateway:** never run `hermes gateway install` on frieren; edit the
+  unit in `modules/user/ai/hermes-user.nix`. Full checklist in
+  `.agents/deploy/hosts/frieren.md`.
+- **SSH CA:** every host (incl. frieren) can sign certs — `ssh.ca.enableClient`
+  - `rotate-ssh-cert` (1-week user certs, CA key via sops-nix at
+    `~/.ssh/user_ca_key`).

@@ -31,6 +31,7 @@
     "AUDIT.md"
     ".agents/SCHEMA.md"
     ".agents/README.md"
+    "docs/storage-taxonomy.md"
     "taskfiles/README.md"
   ];
 
@@ -122,6 +123,35 @@
       proof = "AGENTS.md lines with never/do not/must not/should not and no citation";
       holds = builtins.length proseRules <= 65;
       detail = "${toString (builtins.length proseRules)} uncited prohibition lines (shrink-only budget: 65)";
+    };
+
+    taxonomy-one-home = {
+      rule = "The `/srv/data` layout has one home (`docs/storage-taxonomy.md`); the manual links to it instead of carrying a second table.";
+      proof = "docs/storage-taxonomy.md exists, and AGENTS.md has no `/srv/data` layout table";
+      holds =
+        builtins.pathExists (root + "/docs/storage-taxonomy.md")
+        && !(lib.hasInfix "| Path (`/srv/data/` /" (read "AGENTS.md"));
+      detail = "the storage table is back in AGENTS.md, or the taxonomy page is gone";
+    };
+
+    media-tree-isolation = {
+      rule = "A media library holds only video, and every unindexed tree carries both `.nomedia` and `.plexignore`.";
+      proof = "scripts/task/data-ops.sh (arr/ hygiene + sentinel checks), taskfiles/data.yml";
+      holds =
+        has "taskfiles/data.yml" "data:audit"
+        && has "scripts/task/data-ops.sh" "Media Server Hygiene"
+        && has "scripts/task/data-ops.sh" "plexignore";
+      detail = "the data audit stopped checking media hygiene or the plexignore sentinel";
+    };
+
+    private-trees-restricted = {
+      rule = "`p/*` and `security/` stay `0700`, key material `0600`, and the private trees stay shielded from scanners.";
+      proof = "scripts/task/data-ops.sh (protect-private)";
+      holds =
+        has "scripts/task/data-ops.sh" "chmod 700"
+        && has "scripts/task/data-ops.sh" "chmod 600"
+        && has "scripts/task/data-ops.sh" ".nomedia";
+      detail = "protect-private stopped widening-restoring to 0700/0600 or stopped planting sentinels";
     };
 
     no-orphan-docs = {

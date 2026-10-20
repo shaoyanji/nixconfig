@@ -69,4 +69,4 @@ task -t taskfiles/burgernas.yml burgernas:transmission:leech
 ```
 
 See also: `inventory.toml` (`[hosts.burgernas]`), `hosts/frieren/infra-stack.nix`
-(restic target + `burgernas-poweroff` timer), and `docs/download-taxonomy.md`.
+(restic target + `burgernas-poweroff` timer), and `docs/storage-taxonomy.md`.

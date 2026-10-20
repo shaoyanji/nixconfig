@@ -52,11 +52,13 @@ lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
 
   home.sessionVariables = {
     QT_STYLE_OVERRIDE = "kvantum";
+    TERMINAL = "kitty";
   };
 
   programs.niri.settings = {
     hotkey-overlay.skip-at-startup = true;
     environment."NIXOS_OZONE_WL" = "1";
+    environment."TERMINAL" = "kitty";
     input.focus-follows-mouse.enable = true;
     input.warp-mouse-to-focus.enable = true;
     layout.focus-ring.enable = false;

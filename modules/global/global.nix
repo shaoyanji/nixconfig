@@ -81,7 +81,7 @@
     package = lib.mkDefault pkgs.nixVersions.latest;
     optimise =
       {
-        automatic = true;
+        automatic = lib.mkDefault true;
       }
       // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
         dates = ["Sun 06:00"];
@@ -100,6 +100,9 @@
       max-free = ${toString (1024 * 1024 * 1024)}
     '';
   };
+
+  # Prevent missed maintenance timers from bursting during daytime production hours.
+  systemd.timers.nix-optimise.timerConfig.Persistent = lib.mkIf pkgs.stdenv.hostPlatform.isLinux (lib.mkDefault false);
 
   nixpkgs.config.allowUnfree = true;
 }

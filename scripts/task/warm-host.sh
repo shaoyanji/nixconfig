@@ -218,8 +218,9 @@ for h in "${hosts[@]}"; do
     continue
   fi
 
-  report "warm [$h] building on $builder (the builder; allowed)"
-  nix build "$attr" -L --max-jobs "${MAX_JOBS:-2}"
+  report "warm [$h] building on $builder (the builder; allowed) and pinning fleet GC root"
+  mkdir -p /nix/var/nix/gcroots/fleet
+  nix build "$attr" -L --max-jobs "${MAX_JOBS:-2}" --out-link "/nix/var/nix/gcroots/fleet/$h"
 
   if [ "${NO_VERIFY:-0}" = "1" ]; then
     continue

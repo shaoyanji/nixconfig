@@ -59,7 +59,17 @@ in {
   delphi = {
     kind = "nixos";
     system = "aarch64-linux";
-    modules = globalModulesContainers ++ [../hosts/delphi/configuration.nix];
+    modules =
+      globalModulesContainers
+      ++ [
+        inputs.disko.nixosModules.default
+        ../hosts/delphi/configuration.nix
+        # Install-time layout (disko also owns delphi's fileSystems). OCI
+        # paravirtualized boot volumes enumerate as /dev/sda; verify with
+        # `lsblk` on the instance BEFORE the first nixos-anywhere run — disko
+        # wipes the device it is given.
+        (import ../hosts/delphi/disko.nix {device = "/dev/sda";})
+      ];
   };
   eisen = {
     kind = "nixos";

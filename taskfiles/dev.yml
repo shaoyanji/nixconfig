@@ -305,8 +305,9 @@ tasks:
       Symlinks the flake output `.#homeAgents.<host>` (lib/home-agents.nix) to
       ~/AGENTS.md. HOST defaults to /etc/hostname. The content is the fleet
       preamble + compiled inventory card + persona; no Python, no second TOML
-      parser. `--builders ""` keeps a text derivation from spending remote
-      build budget.
+      parser. The artifact is `builtins.toFile` (pure text, no builder), so it
+      is architecture-independent and costs no build budget — `nix eval --raw`
+      is the correct read, `nix build` would reject a non-derivation.
     cmds:
       - |
         HOST="{{.HOST}}"
@@ -318,7 +319,7 @@ tasks:
           echo "HOST= is required (no /etc/hostname on this machine)"
           exit 1
         fi
-        p="$(nix build --no-link --print-out-paths --builders "" ".#homeAgents.$HOST")"
+        p="$(nix eval --raw ".#homeAgents.$HOST")"
         ln -sfn "$p" "$HOME/AGENTS.md"
         echo "~/AGENTS.md -> $p"
 

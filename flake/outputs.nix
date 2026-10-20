@@ -96,9 +96,15 @@ in {
   agentSkills = skillsCtl.index;
 
   # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
-  # Consumed by the hermes/frieren activation script as a store symlink.
+  # Consumed by the home activation script as a store symlink.
+  #
+  # `builtins.toFile`, not `agentDocs.writeText`: this artifact is pure text, and
+  # a derivation pinned to x86_64 (`agentDocs = pkgsFor "x86_64-linux"`) cannot
+  # be built at all on an aarch64 host — installing delphi failed on
+  # `AGENTS-delphi.md.drv` with "required system x86_64-linux" (2026-10-20).
+  # toFile has no builder, so the same text is available on every architecture.
   homeAgents = lib.genAttrs (builtins.attrNames hostInventory) (
-    h: agentDocs.writeText "AGENTS-${h}.md" (homeAgentsGen.mkText h)
+    h: builtins.toFile "AGENTS-${h}.md" (homeAgentsGen.mkText h)
   );
 
   # AGENTS.nix as a query surface: `nix eval .#agentsNotes.index` (no host

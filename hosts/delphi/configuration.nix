@@ -1,52 +1,350 @@
 # delphi — Oracle Cloud Infrastructure (OCI) Ampere A1 ARM64 headless server.
 #
-# Hardware:
+# Hardware (MEASURED 2026-10-20 on the live instance, not as ordered):
 #   Shape: VM.Standard.A1.Flex (Ampere Altra Neoverse N1, aarch64-linux)
-#   Sizing: 4 OCPU, 24 GB RAM, 200 GB paravirtualized boot volume (OCI Always Free tier)
+#   Sizing: 2 OCPU, 11 GiB RAM, 200 GB paravirtualized boot volume (OCI Always
+#   Free tier). The inventory and the earlier revision of this header claimed
+#   4 OCPU / 24 GB — that was the shape ceiling, not what was created. Two
+#   cores is the budget for anything that compiles here; prefer build-on-remote
+#   or the cache over local builds.
 #
 # Role:
 #   Headless cloud server, remote offload worker, and Tailscale mesh peer.
 #   Uses the globalModulesContainers (noDE) chain: minimal userland, sops
 #   secrets, hardened SSH — no desktop bloat.
+#
+#   Three jobs, in the order they are wired below:
+#     1. webserver            — nginx on :80, a health/landing page.
+#     2. tailnet resolver     — crab-hole (Pi-hole clone in Rust) answering on
+#                               the shared tailnet DNS service address, so it
+#                               can fail over with frieren's stack.
+#     3. hermes agent         — hermes CLI + gateway, its own Telegram bot.
+#
+# Provisioning (nixos-anywhere + the sops bootstrap that must happen FIRST):
+#   .agents/deploy/hosts/delphi.md
 {
   pkgs,
   lib,
   ...
-}: {
+}: let
+  user = import ../../modules/global/user.nix;
+
+  # The address the whole tailnet points its DNS at (see the route group below).
+  # Both this host and frieren bind it on lo and advertise it as the SAME /32,
+  # which makes Tailscale treat them as one active/passive failover group: one
+  # node answers, and the route moves when it disappears (~15 s).
+  #
+  # Deliberately NOT a 100.64/10 tailnet member address: a /32 subnet route is
+  # the only way to give clients ONE resolver address backed by several hosts.
+  # Tailscale does not fail over between two global nameservers, so listing
+  # "frieren then delphi" would just break DNS when the first one dies.
+  dnsServiceAddress = "10.99.0.53";
+
+  # Public HTTPS name. null = the box serves plain HTTP on :80 only.
+  #
+  # Setting this is the ONLY thing needed to bring up TLS, and it belongs here
+  # rather than in a manual step: `enableACME` issues and renews a Let's Encrypt
+  # cert over HTTP-01 (port 80, now reachable), `forceSSL` adds the :80→:443
+  # redirect, and nginx reloads on renewal. The one part nixconfig cannot own is
+  # the DNS A record — and a wrong or missing record turns every renewal into a
+  # failing unit, so do not set this before the name resolves to the instance's
+  # RESERVED public IP (an ephemeral IP changes on stop/start).
+  publicDomain = null;
+
+  # Static landing page. The point is proof of life (and the webserver
+  # criterion), not a product: no CMS, no PHP, no runtime.
+  healthPage = pkgs.writeTextDir "index.html" ''
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>delphi</title>
+        <style>
+          body { background:#1e1e2e; color:#cdd6f4; font:16px/1.6 ui-monospace, monospace;
+                 max-width:44rem; margin:12vh auto; padding:0 1.5rem; }
+          h1 { color:#89b4fa; font-size:1.6rem; margin-bottom:.2rem; }
+          .sub { color:#a6adc8; margin-top:0; }
+          li { margin:.35rem 0; }
+          code { color:#a6e3a1; }
+        </style>
+      </head>
+      <body>
+        <h1>delphi</h1>
+        <p class="sub">OCI Ampere A1 &middot; aarch64-linux &middot; NixOS</p>
+        <ul>
+          <li><code>/healthz</code> — plain-text liveness probe</li>
+          <li>tailnet DNS service address — <code>10.99.0.53</code> (crab-hole)</li>
+          <li>mesh — Tailscale, exit node + <code>10.99.0.53/32</code> route</li>
+        </ul>
+      </body>
+    </html>
+  '';
+in {
   imports = [
     ./hardware-configuration.nix
     ../../modules/profiles/base-node.nix
-    ../../modules/profiles/server-hardening.nix
     ../../modules/profiles/firewall-baseline.nix
+    ../../modules/profiles/hermes.nix
+    ../../modules/profiles/sops-user-identity.nix
   ];
 
   networking.hostName = "delphi";
+
+  # --- User-plane sops identity ----------------------------------------------
+  # base-node.nix gives the NixOS plane the host key (root can read it). Home
+  # Manager activation runs as devji and needs a user-readable identity file,
+  # and this host has no `~/.ssh/id_ed25519` — logins are CA certificates. The
+  # activation derives it from the host key, which yields exactly the `&delphi`
+  # recipient already in .sops.yaml: no extra key, no rekey, nothing to back up.
+  # Out of scope for frieren/fern, which use the TPM identity path.
+  profiles.sopsUserIdentity.enable = true;
 
   # --- OCI Networking & Paravirtualized DHCP ---
   networking.useDHCP = lib.mkDefault true;
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [22]; # SSH
+    allowedTCPPorts = [
+      22 # SSH
+      80 # nginx (a landing page that proves the webserver)
+      443 # reserved for the TLS vhost; nothing listens until a cert exists
+    ];
     allowedUDPPorts = [41641]; # Tailscale direct WireGuard port
   };
 
-  # Tailscale mesh networking & exit node capabilities
+  # --- Tailscale mesh: exit node + shared DNS service address ---
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
     extraSetFlags = [
       "--accept-routes=true"
-      "--accept-dns=true"
+      # A resolver must never resolve THROUGH the address it serves: that is an
+      # outage loop (the VRRP analogue is why profiles/dns-failover.nix probes
+      # 127.0.0.1 and not the floating IP). crab-hole's own upstreams are DoT.
+      "--accept-dns=false"
+      # Advertise the box as an exit node (approved once in the admin console).
+      "--advertise-exit-node"
+      # Join the failover group: frieren advertises the same /32.
+      "--advertise-routes=${dnsServiceAddress}/32"
     ];
   };
 
-  # OCI Serial Console & Early Kernel Logging.
+  # Bind the service address on lo so crab-hole answers on it. `ip addr replace`
+  # is idempotent, which matters because this runs on every boot.
+  systemd.services.dns-service-address = {
+    description = "Tailnet DNS service address ${dnsServiceAddress}/32";
+    wantedBy = ["multi-user.target"];
+    after = ["network-pre.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.iproute2}/bin/ip addr replace ${dnsServiceAddress}/32 dev lo";
+      ExecStop = "${pkgs.iproute2}/bin/ip addr del ${dnsServiceAddress}/32 dev lo";
+    };
+  };
+
+  # --- Tailnet resolver: crab-hole -------------------------------------------
+  # Chosen over the pihole-ftl + unbound stack in profiles/dns-failover.nix:
+  # that module is built around a LAN interface and keepalived VRRP, neither of
+  # which exists on a cloud host. crab-hole is one Rust binary, keeps the same
+  # StevenBlack + Disconnect lists frieren blocks, and speaks plain DNS on 53.
+  #
+  # It listens on 0.0.0.0 rather than a hardcoded tailnet IP: the IP is assigned
+  # by Tailscale at login and would otherwise have to be baked in. The firewall
+  # (not the bind address) is what limits it to the tailnet.
+  services.crab-hole = {
+    enable = true;
+    # openFirewall would open 53 globally; the scoped interface rule below is
+    # the only intended path in.
+    openFirewall = false;
+    settings = {
+      # UDP only, and that is a crab-hole limitation, not a choice: v0.1.12
+      # takes `udp|tls|https|quic` for a downstream protocol and has no plain
+      # `tcp` variant (the build-time validate-config rejects it). Consequence:
+      # no DNS-over-TCP on 53, so a truncated answer cannot be retried over TCP
+      # and very large TXT chains will fail. Everything else resolves normally.
+      downstream = [
+        {
+          listen = "0.0.0.0";
+          port = 53;
+          protocol = "udp";
+        }
+      ];
+      # DoT upstreams, IPv4 only: OCI free-tier instances have no IPv6 uplink,
+      # and a resolver that prefers IPv6 root/upstream servers SERVFAILs every
+      # lookup (the 2026-10-14 frieren outage, same failure class).
+      upstream.name_servers = [
+        {
+          protocol = "tls";
+          socket_addr = "1.1.1.1:853";
+          tls_dns_name = "one.one.one.one";
+          trust_nx_responses = false;
+        }
+        {
+          protocol = "tls";
+          socket_addr = "9.9.9.9:853";
+          tls_dns_name = "dns.quad9.net";
+          trust_nx_responses = false;
+        }
+      ];
+      # Same two lists frieren's pihole-ftl uses, so a failover answer is the
+      # answer the client would have got from the primary.
+      blocklist = {
+        include_subdomains = true;
+        lists = [
+          "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts"
+          "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt"
+        ];
+      };
+      # Loopback only; there is no crab-hole web UI to expose.
+      api = {
+        listen = "127.0.0.1";
+        port = 8081;
+        show_doc = false;
+      };
+    };
+  };
+
+  # DNS arrives over the tailnet only (and on lo, where the host resolves
+  # through it). 53 is deliberately absent from allowedTCPPorts/allowedUDPPorts.
+  networking.firewall.interfaces.tailscale0 = {
+    allowedUDPPorts = [53];
+    allowedTCPPorts = [53];
+  };
+
+  # crab-hole owns port 53, so resolved must not squat on it: the wildcard bind
+  # in `downstream` collides with the 127.0.0.53 stub and the unit fails with
+  # EADDRINUSE. Point the host's own resolution at the local resolver instead.
+  services.resolved.settings.Resolve = {
+    DNSStubListener = "no";
+    LLMNR = false;
+  };
+  networking.networkmanager.dns = lib.mkForce "none";
+  networking.nameservers = [
+    "127.0.0.1"
+    "::1"
+  ];
+
+  # --- Webserver --------------------------------------------------------------
+  # HTTP only for now: ACME needs a name that resolves from the internet. The
+  # tailnet HTTPS path is `tailscale serve` / the *.ts.net MagicDNS name, which
+  # needs no certificate of our own. OCI's security list must also allow 80/443
+  # (console change, not declarable here — see .agents/deploy/hosts/delphi.md).
+  services.nginx = {
+    enable = true;
+    recommendedOptimisation = true;
+    recommendedGzipSettings = true;
+
+    # One definition of `virtualHosts`, because a module may not set the same
+    # attribute path twice: the TLS vhost is merged in with `//` rather than
+    # declared as a second `services.nginx.virtualHosts = …`.
+    virtualHosts =
+      {
+        delphi = {
+          default = true;
+          listen = [
+            {
+              addr = "0.0.0.0";
+              port = 80;
+            }
+          ];
+          root = "${healthPage}";
+          locations."/" = {
+            index = "index.html";
+            tryFiles = "$uri $uri/ =404";
+          };
+          # Plain-text liveness probe for gatus / curl / a browser tab.
+          locations."= /healthz".extraConfig = ''
+            default_type text/plain;
+            return 200 "ok";
+          '';
+        };
+      }
+      # HTTPS vhost — inert until `publicDomain` names a record that resolves
+      # here. The IP-addressed :80 vhost above stays the default, so
+      # `http://<ip>/healthz` keeps working as an edge probe independent of DNS.
+      // lib.optionalAttrs (publicDomain != null) {
+        ${publicDomain} = {
+          listen = [
+            {
+              addr = "0.0.0.0";
+              port = 443;
+              ssl = true;
+            }
+          ];
+          enableACME = true;
+          forceSSL = true;
+          root = "${healthPage}";
+          locations."/" = {
+            index = "index.html";
+            tryFiles = "$uri $uri/ =404";
+          };
+          locations."= /healthz".extraConfig = ''
+            default_type text/plain;
+            return 200 "ok";
+          '';
+        };
+      };
+  };
+
+  # ACME client settings only exist when a cert is actually being requested.
+  security.acme = lib.mkIf (publicDomain != null) {
+    acceptTerms = true;
+    defaults.email = user.email;
+  };
+
+  # --- Hermes agent ----------------------------------------------------------
+  # profiles.hermes installs the CLI, seeds ~/.hermes, renders the credential
+  # file from sops and (with gateway.enable) declares the gateway unit.
+  #
+  # telegramSecret must exist in modules/secrets.yaml BEFORE the first switch:
+  # sops-install-secrets fails activation for a missing key, which would abort
+  # the install. Add it with `task infra:secrets:edit:secrets` first.
+  profiles.hermes = {
+    enable = true;
+    gateway.enable = true;
+    telegramSecret = "delphi-telegram";
+    # delphi has no SimpleX identity; the daemon would just idle and retry.
+    simplex.daemon = false;
+  };
+
+  # globalModulesContainers (noDE) switches the AI CLI stack OFF for container
+  # hosts, and that stays off here: hermes is the exception, not a reason to
+  # install Chromium/qmd/crush. programs.hermes-user is gated on its own
+  # `enable` + `hosts` list, so only the host list has to be extended.
+  home-manager.users.${user.name}.programs.hermes-user = {
+    # The persona activation is opt-in per host; frieren is the default.
+    hosts = ["frieren" "delphi"];
+  };
+
+  # User lingering: without it the per-user systemd manager only exists while
+  # devji has a session, so hermes-gateway (a --user unit) would stop at logout
+  # and never start at boot. On frieren this was set by hand (`loginctl
+  # enable-linger`); declaring it here is what makes a headless agent host
+  # actually run its agent. scoped to this host deliberately — the fleet has no
+  # blanket linger policy, and desktop hosts do not need one.
+  users.users.${user.name}.linger = true;
+
+  # --- OCI Serial Console & Early Kernel Logging ---
   # Allows debugging boots via OCI Cloud Shell / Console Connection.
   boot.kernelParams = [
     "console=ttyAMA0,115200"
     "console=tty0"
     "earlycon"
   ];
+
+  # --- Headless logging footprint --------------------------------------------
+  # profiles/server-hardening.nix is deliberately NOT imported: it bind-mounts
+  # /var/log and /var/cache to /srv/private (a NAS path) and ships an
+  # /etc/pihole tmpfiles entry owned by a `pihole` user that a crab-hole host
+  # has no reason to create — a failing tmpfiles unit on a fresh boot. The two
+  # settings worth keeping are declared directly.
+  services.journald.settings.Journal = {
+    SystemMaxUse = "300M";
+    RuntimeMaxUse = "200M";
+    MaxRetentionSec = "1week";
+  };
+  boot.tmp.cleanOnBoot = true;
 
   # --- Headless Server Packages & Lightweight Base Closure ---
   # Keep the base closure small: btop and helix instead of baking a heavy
@@ -62,6 +360,10 @@
     jq
     ripgrep
     fd
+    # Resolver/route debugging without installing a toolkit.
+    dnsutils
+    iproute2
+    tcpdump
   ];
 
   # Modal editor defaults (Catppuccin Mocha theme, relative line numbers).

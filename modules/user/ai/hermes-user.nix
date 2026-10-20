@@ -1,7 +1,9 @@
 # hermes — Nous Research's self-improving agent, frieren user-space persona.
 #
-# Hermes (pkgs.llm-agents.hermes-agent) is installed ONLY on frieren (the
-# mainframe), as a host package — see hosts/frieren/tools.nix. This module
+# Hermes (pkgs.llm-agents.hermes-agent) runs on frieren (the mainframe, as a
+# host package — see hosts/frieren/tools.nix) and on delphi (the OCI ARM64
+# bastion, via profiles/hermes.nix). Hosts are opted in per name through
+# `programs.hermes-user.hosts`; the default is still frieren alone. This module
 # seeds ~/.hermes with the resurrected OpenClaw persona from
 # /Volumes/data/openclaw (agent "Vanta", 2026-03/04),
 # whose four runtime files map 1:1 onto Hermes' auto-injected context:
@@ -14,8 +16,10 @@
 #   MEMORY.md        ->  MEMORY.md            ->  memory policy
 #
 # Hermes reads these from $HERMES_HOME (default ~/.hermes) and injects them
-# into every chat turn (see --ignore-rules in hermes --help). Symlinked
-# to nixconfig source — runtime edits version-control themselves.
+# into every chat turn (see --ignore-rules in hermes --help). On a host with a
+# nixconfig checkout they are symlinked to source, so runtime edits
+# version-control themselves; a host without one (delphi) gets a read-only
+# store copy instead of silently seeding nothing.
 #
 # First-run (interactive, NOT declarative — hermes stores model/API config
 # in ~/.hermes/config.yaml + .env):
@@ -34,7 +38,10 @@
   # modules/global/nixos.nix). This module only mirrors that link into
   # ~/.hermes/ for the gateway daemon.
   ...
-}: {
+}: let
+  hostName = osConfig.networking.hostName or "";
+  hosts = config.programs.hermes-user.hosts;
+in {
   options.programs.hermes-user = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -42,6 +49,17 @@
       description = ''
         Seed ~/.hermes with the resurrected OpenClaw persona files and install
         hermes-agent CLI and environment.
+      '';
+    };
+
+    hosts = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = ["frieren"];
+      description = ''
+        Hosts on which the ~/.hermes persona activation runs. Hermes was
+        frieren-only; the gate is a list so a second host (delphi) can opt in
+        without forking the module. The runtime activation honours the same
+        list, so a host that is enabled but not listed seeds nothing.
       '';
     };
 
@@ -83,15 +101,23 @@
     };
   };
 
-  config = lib.mkIf (config.programs.hermes-user.enable && ((osConfig.networking.hostName or "") == "frieren") && (config.profiles.ai.enable or true)) {
+  # Deliberately NOT gated on `profiles.ai.enable`: that flag also decides
+  # whether the heavy agent suite (Chromium, qmd, crush) is installed, and
+  # host containers turn it off. Hermes has its own `enable`, set by
+  # profiles/hermes.nix — coupling the two meant a cloud host had to install
+  # the whole AI stack to get one agent.
+  config = lib.mkIf (config.programs.hermes-user.enable && builtins.elem hostName hosts) {
     # Persona files — symlinked to nixconfig source.
     # Runtime edits modify the repo directly (version controlled).
     home.activation.hermesPersonaSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      HOST_NAME="$(cat /etc/hostname 2>/dev/null || hostname 2>/dev/null || echo "frieren")"
-      if [ "$HOST_NAME" != "frieren" ]; then
-        echo "hermes-user: skipping activation on non-frieren host ($HOST_NAME)"
-        exit 0
-      fi
+      HOST_NAME="$(cat /etc/hostname 2>/dev/null || hostname 2>/dev/null || echo "${lib.head hosts}")"
+      case " ${lib.concatStringsSep " " hosts} " in
+        *" $HOST_NAME "*) : ;;
+        *)
+          echo "hermes-user: skipping activation on unlisted host ($HOST_NAME); see programs.hermes-user.hosts"
+          exit 0
+          ;;
+      esac
 
       run mkdir -p $HOME/.hermes
       run mkdir -p $HOME/.hermes/memories
@@ -102,6 +128,14 @@
       elif [ ! -d "$REPO_DIR/.git" ] && [ -d "$HOME/nixconfig/.git" ]; then
         REPO_DIR="$HOME/nixconfig"
       fi
+
+      # Persona source of last resort: a store copy of
+      # modules/user/ai/hermes-persona. A host with no nixconfig checkout
+      # (delphi is a cloud VM) would otherwise seed NOTHING here, and the
+      # repo-symlink branch would fail silently rather than loudly. Store
+      # copies cannot version-control a runtime edit, which is the right trade
+      # for a host that needs the persona, not the repo.
+      PERSONA_STORE="${./hermes-persona}"
 
       # Clean up misplaced files in $HOME from earlier experiments
       for f in SOUL.md USER.md MEMORY.md config.yaml; do
@@ -115,6 +149,8 @@
         run rm -f "$HOME/.hermes/$f"
         if [ -f "$REPO_DIR/modules/user/ai/hermes-persona/$f" ]; then
           run ln -s "$REPO_DIR/modules/user/ai/hermes-persona/$f" "$HOME/.hermes/$f"
+        elif [ -f "$PERSONA_STORE/$f" ]; then
+          run ln -s "$PERSONA_STORE/$f" "$HOME/.hermes/$f"
         fi
       done
 
@@ -126,6 +162,8 @@
         run ln -s "$REPO_DIR/modules/user/ai/personas/default/SOUL.md" "$HOME/.hermes/SOUL.md"
       elif [ -f "$REPO_DIR/modules/user/ai/hermes-persona/SOUL.md" ]; then
         run ln -s "$REPO_DIR/modules/user/ai/hermes-persona/SOUL.md" "$HOME/.hermes/SOUL.md"
+      elif [ -f "$PERSONA_STORE/SOUL.md" ]; then
+        run ln -s "$PERSONA_STORE/SOUL.md" "$HOME/.hermes/SOUL.md"
       fi
 
       # 3. ~/AGENTS.md is Home Manager's (modules/user/ai/home-agents.nix →
@@ -139,7 +177,10 @@
         run ln -s "$HOME/AGENTS.md" "$HOME/.hermes/AGENTS.md"
       fi
 
-      if [ ! -e "$HOME/.hermes/openclaw-archive" ]; then
+      # /Volumes/data is the frieren NAS mount. A cloud host has none, and a
+      # dangling symlink here makes hermes-handoff's `find` complain on every
+      # run, so only link it when the archive is actually reachable.
+      if [ ! -e "$HOME/.hermes/openclaw-archive" ] && [ -d /Volumes/data/openclaw ]; then
         run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
       fi
       # Hermes reads credentials exclusively from $HERMES_HOME/.env
@@ -153,7 +194,7 @@
       if [ ! -e "$HOME/.hermes/.env" ] && [ -e "$HOME/.config/hermes/hermes.env" ]; then
         run ln -s "$HOME/.config/hermes/hermes.env" "$HOME/.hermes/.env"
       fi
-      if [ ! -e "$HOME/.hermes/skills/agents-sync" ]; then
+      if [ ! -e "$HOME/.hermes/skills/agents-sync" ] && [ -d "$HOME/.agents/skills" ]; then
         run mkdir -p "$HOME/.hermes/skills"
         run ln -sf "$HOME/.agents/skills" "$HOME/.hermes/skills/agents-sync"
       fi

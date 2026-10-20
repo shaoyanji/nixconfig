@@ -39,6 +39,7 @@ keys:
   - &fern age1k3jp4k3p87a2xsq2dgenv6zjlypzn889jkfkj04mvt7x04seyuzq4tv6mn
   - &tpmfrieren age1tag1qd42em4jfvxlxkvz8zrmrynxmdvl4q4pgj5keqn2ldujzngzn2e2vk4hfzp
   - &tpmfern age1tag1qfys3rjfsl2vlcy4xk0v7kvz0ugaflmuqwrg0fsj4wwcwe9l9kfuu8g2e39
+  - &delphi age1fg8xy2g5nrxsah45upvzl8eq9u7vy36e6dsw6pg5j9rfmh5qhe7sn6j4jp
 
 creation_rules:
   - path_regex: modules/.*\.(yaml|json|env|ini)$
@@ -79,3 +80,4 @@ creation_rules:
           - *fern
           - *tpmfrieren
           - *tpmfern
+          - *delphi

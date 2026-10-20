@@ -12,6 +12,10 @@
   `.agents/SCHEMA.md`; the operator guide is `MANUAL.md`.
 - Do not re-derive fleet facts from prose: `nix eval .#inventory.hosts.<host>`
   (0.2 s) or `task dev:inventory:host HOST=<host>`.
+- Do not read `AGENTS.nix` in full (3,500+ lines): query it with
+  `task ops:notes[:host|:show|:search]` or `nix eval .#agentsNotes…` (0.2 s).
+  Structural "what touches X" questions go to the knowledge graph
+  (`task ops:kg[:host|:skill|:doc|:blast]`), not `grep`.
 
 ## Read order
 

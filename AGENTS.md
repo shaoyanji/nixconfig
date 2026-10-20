@@ -478,11 +478,10 @@ On a local rebuild, run **no** check first — the switch is the check.
 - **Batch into ONE bash loop**, not one tool call per host.
 - **A whole-system sweep is for wiring changes, not a habit.** Eval a whole system
   sparingly; eval the closure you changed often.
-- **Keyless environments (Codespaces, CI sandboxes, fresh clones).** Evaluation
-  never needs sops keys, age keys or secret values — sops-nix only declares file
-  paths at eval time. Safe: `nix eval`, `alejandra --check`, `deadnix`,
-  `statix check`. NOT keyless: `task checks:quick` (sops drift step), any
-  `infra:*` secret/deploy task.
+- **Keyless environments (fresh clones, sandboxes).** Evaluation needs no sops
+  keys — sops-nix only declares paths. Safe: `nix eval`, `alejandra --check`,
+  `deadnix`, `statix check`. Not keyless: `checks:quick` (sops drift), `infra:*`
+  secret tasks. Stock Nix also needs the `pipe-operators` flag (see below).
 
 **Phase 2 — Build: the build IS the test.** Once a change alters the closure,
 evaluation is no longer evidence. Build it — never on the target host:
@@ -809,6 +808,9 @@ task checks:toml:lint                                 # prove EVERY tracked .tom
 
 ### Non-obvious patterns
 
+- **Pipes, not `let` chains.** `|>` (`pipe-operators`, enabled fleet-wide in
+  `modules/global/global.nix`) is preferred for 2+ transformations; a box that
+  cannot parse the tree is on older Nix — add the flag, do not rewrite.
 - **User constants**: `modules/global/user.nix` is the single source of truth for the primary user (`devji`). Import it with `let user = import ../global/user.nix;` — never hardcode user paths or the username.
 - **Attrset merging**: `//` is **shallow, right-biased** — `{ a.x = 1; } // { a.y = 2; }` loses `a.x`. Use `lib.recursiveUpdate` for deep merge.
 - **`lib.mkIf` / `lib.mkMerge`**: the standard conditional patterns. Also `lib.optionalAttrs` for conditional attrsets and `lib.optionals` for conditional list items.

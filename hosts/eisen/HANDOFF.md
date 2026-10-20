@@ -2,8 +2,8 @@
 
 Detailed architecture specification for running local MoE LLMs on Eisen's Xeon E5-2673 v3 (12c/24t) + 62 GiB DDR4 + AMD Radeon RX 5700 (8 GiB VRAM, **Vulkan/radv** — Navi 10 has no ROCm target).
 
-**Canonical Documentation**: [`.agents/deploy/hosts/eisen.md`](file:///home/devji/Documents/nixconfig/.agents/deploy/hosts/eisen.md)
-**Implementation**: [`hosts/eisen/llm-server.nix`](file:///home/devji/Documents/nixconfig/hosts/eisen/llm-server.nix) (generative LLM), [`hosts/eisen/decision-models.nix`](file:///home/devji/Documents/nixconfig/hosts/eisen/decision-models.nix) (Laya), [`modules/services/llm-decision-router.nix`](file:///home/devji/Documents/nixconfig/modules/services/llm-decision-router.nix) (router)
+**Canonical Documentation**: [`.agents/deploy/hosts/eisen.md`](../../.agents/deploy/hosts/eisen.md)
+**Implementation**: [`hosts/eisen/llm-server.nix`](llm-server.nix) (generative LLM), [`hosts/eisen/decision-models.nix`](decision-models.nix) (Laya), [`modules/services/llm-decision-router.nix`](../../modules/services/llm-decision-router.nix) (router)
 
 Updated **2026-10-17 (final)**. Main tip `7a9b2c70` (union merge: pre-integration lineage + `origin/main`). The old `laya-HANDOFF.md` (a 2026-10-09 verification checklist for a superseded Laya deployment — it still listed Kolibri as blocked and "no hosted Jev") was deleted; the current Laya state is in this doc. The local `~/nixconfig` checkout (behind at `e520abc`) was deleted 2026-10-17 — `~/Documents/nixconfig` is the only live repo.
 

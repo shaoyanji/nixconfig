@@ -104,7 +104,7 @@ Frieren (Fleet Mainframe, 15W quad-core `i5-8250U`, 11.5 GB RAM) must **never** 
 ## Automated Monthly Synchronization (No LLM in the Loop)
 
 The entire sync pipeline is packaged as a hermetic `pkgs.writeShellApplication`
-([`modules/scripts/qmd-eisen-embed-sync.nix`](file:///home/devji/Documents/nixconfig/modules/scripts/qmd-eisen-embed-sync.nix))
+([`modules/scripts/qmd-eisen-embed-sync.nix`](../../../modules/scripts/qmd-eisen-embed-sync.nix))
 installed into PATH on Frieren as `qmd-eisen-embed-sync`:
 
 * **Avoids WoL if online:** Probes SSH reachability first; skips WoL if Eisen is already awake.

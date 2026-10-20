@@ -123,7 +123,7 @@ def generate_fleet_matrix_markdown(data):
         "# Fleet LLM Context Matrix",
         "",
         "> Dense machine context matrix optimized for LLM token budgets and prompt injection.",
-        "> Source of truth: `inventory.toml`.",
+        "> Source of truth: [`inventory.toml`](../inventory.toml).",
         "",
         "## Fleet Status Breakdown",
         "",

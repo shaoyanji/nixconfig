@@ -15,6 +15,7 @@ It is not a second manual and it is not executable truth.
 | An experiment | `task ops:notes KIND=experiment` (`exp-NNN` notes) |
 | Host-specific deploy notes | `deploy/README.md`, `deploy/hosts/*.md` |
 | A skill | `skills/<name>/SKILL.md` — index below is compiled |
+| Which tool owns a data format (TOML, YAML, Nix, JSON, TOON) | [`SCHEMA.md`](SCHEMA.md) §1, "Formats, and the tool that owns each" |
 | The rules for all of the above | [`SCHEMA.md`](SCHEMA.md) |
 
 ## Skills are compiled, not indexed by hand

@@ -165,8 +165,8 @@
 ### 7. [x] Declarative Agent Scheduler Module with Flock Rebuild Locks (EXP-016)
 * **Status:** `COMPLETED & VERIFIED` (Committed `f89228f`, Switched to Generation 86)
 * **Actions Taken:**
-  - Created reusable service module [`modules/services/agent-scheduler.nix`](file:///Volumes/data/projects/nixconfig/modules/services/agent-scheduler.nix) (`services.agentScheduler`).
-  - Consolidated ad-hoc user units in [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) into typed job declarations for `agy-nightly-handoff` and `agy-nightly-system`.
+  - Created reusable service module [`modules/services/agent-scheduler.nix`](../../modules/services/agent-scheduler.nix) (`services.agentScheduler`).
+  - Consolidated ad-hoc user units in [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) into typed job declarations for `agy-nightly-handoff` and `agy-nightly-system`.
   - Added flock mutex locking (`flock -w 60 /tmp/agent-scheduler.lock`) preventing overlapping rebuilds or concurrent agent runs.
   - Injected `/run/wrappers/bin` into unit `PATH` resolving setuid sudo wrapper issues.
   - Verified active systemd user timers (`agy-nightly-handoff`, `agy-nightly-system`) and 0 failed units.
@@ -174,109 +174,109 @@
 ### 6. [x] Declarative Btrfs Silent Corruption & Device Error Watchdog (EXP-022)
 * **Status:** `COMPLETED & VERIFIED` (Committed `7cf0196`, Switched to Generation 87)
 * **Actions Taken:**
-  - Created reusable service module [`modules/services/btrfs-watchdog.nix`](file:///Volumes/data/projects/nixconfig/modules/services/btrfs-watchdog.nix) (`services.btrfsWatchdog`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) to inspect `/` (`/dev/sdb3` SSD) and `/Volumes/data` (`/dev/sda2` HDD) hourly.
-  - Added companion task `task checks:btrfs:stats` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created reusable service module [`modules/services/btrfs-watchdog.nix`](../../modules/services/btrfs-watchdog.nix) (`services.btrfsWatchdog`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) to inspect `/` (`/dev/sdb3` SSD) and `/Volumes/data` (`/dev/sda2` HDD) hourly.
+  - Added companion task `task checks:btrfs:stats` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified 0 hardware errors across all Btrfs pools and active timer `btrfs-watchdog.timer`.
 
 ### 7. [x] Zero-TCP Static Documentation Bridge via UNIX Domain Sockets (EXP-024)
 * **Status:** `COMPLETED & VERIFIED` (Committed `f5da68e`, Switched to Generation 88)
 * **Actions Taken:**
-  - Created service module [`modules/services/uds-static-bridge.nix`](file:///Volumes/data/projects/nixconfig/modules/services/uds-static-bridge.nix) (`services.udsStaticBridge`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) serving `lib/aki-site.nix` over `unix:/run/uds-docs/docs.sock`.
-  - Added companion verification task `task checks:uds:docs` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/uds-static-bridge.nix`](../../modules/services/uds-static-bridge.nix) (`services.udsStaticBridge`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) serving `lib/aki-site.nix` over `unix:/run/uds-docs/docs.sock`.
+  - Added companion verification task `task checks:uds:docs` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified sub-millisecond retrieval (371 µs) via `curl --unix-socket`, strict `0660` POSIX-DAC isolation, and zero TCP/IP stack overhead.
 
 ### 8. [x] Hardware UPS Clean-Poweroff Simulation Drill & Telemetry (EXP-029)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 89)
 * **Actions Taken:**
-  - Created service module [`modules/services/ups-simulation-drill.nix`](file:///Volumes/data/projects/nixconfig/modules/services/ups-simulation-drill.nix) (`services.upsSimulationDrill`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) scheduled for weekly/monthly automated power drills.
-  - Added companion verification task `task checks:ups:drill` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/ups-simulation-drill.nix`](../../modules/services/ups-simulation-drill.nix) (`services.upsSimulationDrill`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) scheduled for weekly/monthly automated power drills.
+  - Added companion verification task `task checks:ups:drill` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified battery health (72%), runtime estimation (6.35 hours under 1.97 W power draw), and UPower 5% clean poweroff emergency threshold assertion.
 
 ### 9. [x] Declarative SQLite WAL Checkpoint & Integrity Maintenance (EXP-030)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 90, Expanded in Gen 91)
 * **Actions Taken:**
-  - Created service module [`modules/services/sqlite-maintenance.nix`](file:///Volumes/data/projects/nixconfig/modules/services/sqlite-maintenance.nix) (`services.sqliteMaintenance`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) running daily at 02:30 CEST (before 03:00 backup window).
+  - Created service module [`modules/services/sqlite-maintenance.nix`](../../modules/services/sqlite-maintenance.nix) (`services.sqliteMaintenance`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) running daily at 02:30 CEST (before 03:00 backup window).
   - Configured 9 production SQLite databases (Pi-hole FTL & Gravity, Uptime-Kuma, Scrutiny, Sonarr, Paperless DB & CeleryBeat, SimpleX Agent & Chat).
   - Implemented dynamic UID/GID ownership preservation to guarantee daemon POSIX permissions never drift.
-  - Added companion verification task `task checks:sqlite:maintenance` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Added companion verification task `task checks:sqlite:maintenance` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified on live target: 9 databases inspected, 0 corruption errors, WAL files truncated to 0 bytes across Pi-hole and Uptime-Kuma, Paperless CeleryBeat WAL compacted from 3.2 MB to 8 KB, query planner statistics optimized via `PRAGMA optimize;`.
 
 ### 10. [x] Declarative Paperless Document Ingestion Watchdog & Pipeline Health Probe (EXP-038)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 91)
 * **Actions Taken:**
-  - Created service module [`modules/services/paperless-watchdog.nix`](file:///Volumes/data/projects/nixconfig/modules/services/paperless-watchdog.nix) (`services.paperlessWatchdog`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) scheduled hourly.
-  - Added companion verification task `task checks:paperless:watchdog` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/paperless-watchdog.nix`](../../modules/services/paperless-watchdog.nix) (`services.paperlessWatchdog`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) scheduled hourly.
+  - Added companion verification task `task checks:paperless:watchdog` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified on live target: 3 Paperless services operational (`consumer`, `web`, `task-queue`), successfully detected 1 stalled 0-byte ghost PDF (`sandra_staging/sandra_0228_japanese pigs.pdf`) lingering in `/var/lib/paperless/consume` since 2016 without disrupting pipeline operations.
 
 ### 11. [x] Declarative Kiwix Offline Knowledge Library Integrity & Search Health Probe (EXP-040)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 92)
 * **Actions Taken:**
-  - Created service module [`modules/services/kiwix-watchdog.nix`](file:///Volumes/data/projects/nixconfig/modules/services/kiwix-watchdog.nix) (`services.kiwixWatchdog`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) scheduled daily.
-  - Added companion verification task `task checks:kiwix:watchdog` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/kiwix-watchdog.nix`](../../modules/services/kiwix-watchdog.nix) (`services.kiwixWatchdog`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) scheduled daily.
+  - Added companion verification task `task checks:kiwix:watchdog` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified on live target: `kiwix-serve` operational, physical readability of 49.07 GB Wikipedia and 34.0 MB ArchWiki ZIM archives verified, and sub-second search response latency benchmarked (NixOS 0.18s, Btrfs 0.20s, Linux 0.25s) with 0 errors.
 
 ### 12. [x] Declarative PostgreSQL Vector (pgvector/vchord) Index Health & Vacuum Drill (EXP-045)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 93)
 * **Actions Taken:**
-  - Created service module [`modules/services/postgres-pgvector-audit.nix`](file:///Volumes/data/projects/nixconfig/modules/services/postgres-pgvector-audit.nix) (`services.postgresPgvectorAudit`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) scheduled weekly at Sunday 02:15 CEST (strictly before 03:00 backup window).
-  - Added companion verification task `task checks:postgres:vector` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/postgres-pgvector-audit.nix`](../../modules/services/postgres-pgvector-audit.nix) (`services.postgresPgvectorAudit`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) scheduled weekly at Sunday 02:15 CEST (strictly before 03:00 backup window).
+  - Added companion verification task `task checks:postgres:vector` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified on live target: PostgreSQL 17 operational, inspected vector tables `face_search` and `smart_search` in Immich DB, validated `vector` (v0.8.7) and `vchord` (v1.1.1) extensions, executed page compaction `VACUUM (VERBOSE, ANALYZE)` freeing fragmented allocated vector pages (6 pages on `face_search`, 9 pages on `smart_search`), and completed with 0 errors.
 
 ### 13. [x] Declarative SSH Bastion & Inactive Session Reaper (EXP-046)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 94)
 * **Actions Taken:**
-  - Created service module [`modules/services/fleet-session-reaper.nix`](file:///Volumes/data/projects/nixconfig/modules/services/fleet-session-reaper.nix) (`services.fleetSessionReaper`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) scheduled hourly.
-  - Added companion verification task `task checks:sessions:reaper` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/fleet-session-reaper.nix`](../../modules/services/fleet-session-reaper.nix) (`services.fleetSessionReaper`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) scheduled hourly.
+  - Added companion verification task `task checks:sessions:reaper` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified on live target: 5 sessions inspected, local console (seat0) and user manager protected, multiplexers preserved (`tmux: server` in Session 4, `agy` in Session 46), active remote session verified (Session 47 within 4h threshold), and 0 execution errors.
 
 ### 14. [x] Declarative PostgreSQL Logical Backup Verification Drill (EXP-042)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 95)
 * **Actions Taken:**
-  - Created service module [`modules/services/postgres-backup-drill.nix`](file:///Volumes/data/projects/nixconfig/modules/services/postgres-backup-drill.nix) (`services.postgresBackupDrill`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) scheduled weekly at Sunday 06:00 CEST (strictly outside 03:00-05:30 backup window).
-  - Added companion verification task `task checks:postgres:drill` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/postgres-backup-drill.nix`](../../modules/services/postgres-backup-drill.nix) (`services.postgresBackupDrill`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) scheduled weekly at Sunday 06:00 CEST (strictly outside 03:00-05:30 backup window).
+  - Added companion verification task `task checks:postgres:drill` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified on live target: Ephemeral tmpfs PostgreSQL cluster initialized, 20.39 MB compressed dump `/srv/backup/postgresql/immich.sql.gz` restored in 23.82 seconds, all 71 public schema tables verified (exceeding minimum 20 threshold), core Immich entity counts validated (assets: 654, users: 1, face_search: 300, smart_search: 517), and ephemeral cluster cleaned up with 0 errors.
 
 ### 15. [x] Declarative Flake Lock Drift & Security Advisory Audit Unit (EXP-044)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 96)
 * **Actions Taken:**
-  - Created service module [`modules/services/flake-advisory-audit.nix`](file:///Volumes/data/projects/nixconfig/modules/services/flake-advisory-audit.nix) (`services.flakeAdvisoryAudit`).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) scheduled weekly at Sunday 07:00 CEST (strictly after backup window).
-  - Added companion verification task `task checks:flake:advisory` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/flake-advisory-audit.nix`](../../modules/services/flake-advisory-audit.nix) (`services.flakeAdvisoryAudit`).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) scheduled weekly at Sunday 07:00 CEST (strictly after backup window).
+  - Added companion verification task `task checks:flake:advisory` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified on live target: Audited all 22 flake inputs, confirmed core security inputs are fresh (< 14 days: nixpkgs 8.1d, home-manager 6.7d, sops-nix 9.1d), flagged 5 archival/slow-moving dependencies (`flake-utils`, `garnix-lib`, `impermanence`, `bountystash`, `niri`), asserted 0 critical drift errors, and confirmed active systemd timer `flake-advisory-audit.timer`.
 
 ### 16. [x] Declarative Nginx SSL/TLS Certificate Expiry & OCSP Stapling Watchdog (EXP-050)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 97)
 * **Actions Taken:**
-  - Created service module [`modules/services/tls-cert-watchdog.nix`](file:///Volumes/data/projects/nixconfig/modules/services/tls-cert-watchdog.nix) (`services.tlsCertWatchdog`) and standalone CLI helper [`modules/services/tls-watchdog/watchdog.py`](file:///Volumes/data/projects/nixconfig/modules/services/tls-watchdog/watchdog.py).
-  - Wired into [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) scheduled twice daily (`00/12:00:00`).
-  - Added companion verification task `task checks:tls:watchdog` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Created service module [`modules/services/tls-cert-watchdog.nix`](../../modules/services/tls-cert-watchdog.nix) (`services.tlsCertWatchdog`) and standalone CLI helper [`modules/services/tls-watchdog/watchdog.py`](../../modules/services/tls-watchdog/watchdog.py).
+  - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) scheduled twice daily (`00/12:00:00`).
+  - Added companion verification task `task checks:tls:watchdog` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Verified on live target: Executed audit against declared HTTP/TLS virtual hosts, asserted warning (14d) and critical (5d) thresholds, verified active timer `tls-cert-watchdog.timer`, and confirmed 0 errors.
 
 ### 17. [x] Declarative System One Decision Models (Julia-1 & Laya) Runtime & CLI Package
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 97)
 * **Actions Taken:**
-  - Created service module [`modules/services/systemone-decision.nix`](file:///Volumes/data/projects/nixconfig/modules/services/systemone-decision.nix) (`services.systemoneDecision`) and standalone Python decision runtime [`modules/services/systemone/engine.py`](file:///Volumes/data/projects/nixconfig/modules/services/systemone/engine.py).
+  - Created service module [`modules/services/systemone-decision.nix`](../../modules/services/systemone-decision.nix) (`services.systemoneDecision`) and standalone Python decision runtime [`modules/services/systemone/engine.py`](../../modules/services/systemone/engine.py).
   - Benchmarked CPU limits on `frieren`:
     - **Julia-1 (144M, mmBERT):** 0.235 ms average decision latency (~4,258 decisions/sec), context scaling from 0.18 ms (64 tokens) to 15.46 ms (8,192 tokens).
     - **Laya (421M, ModernBERT):** 0.414 ms average decision latency (~2,413 decisions/sec), 512 context limit respected (2.14 ms).
     - Memory RSS: Stable ~348 MB with 0 KB memory leak delta.
-  - Added companion task `task checks:decision:triage` to [`taskfiles/checks.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/checks.yml).
+  - Added companion task `task checks:decision:triage` to [`taskfiles/checks.yml`](../../taskfiles/checks.yml).
   - Installed system-wide binary `systemone-decision` in `/run/current-system/sw/bin/systemone-decision`.
-  - Authored dedicated agent skill [`system-triage-decision`](file:///home/devji/.agents/skills/system-triage-decision/SKILL.md) for automated triage of [`SYSTEM.md`](file:///home/devji/SYSTEM.md) and [`HANDOFF.md`](file:///home/devji/HANDOFF.md).
+  - Authored dedicated agent skill ``system-triage-decision`` for automated triage of ``SYSTEM.md`` and ``HANDOFF.md``.
 
 ### 18. [x] Nix Preflight Syntax Validator & Precision Line Inspector Skill
 * **Status:** `COMPLETED & VERIFIED` (Deployed in `~/.agents/skills/nix-preflight-editor`)
 * **Actions Taken:**
-  - Created agent skill [`nix-preflight-editor`](file:///home/devji/.agents/skills/nix-preflight-editor/SKILL.md) in [`modules/user/ai/skills/nix-preflight-editor/`](file:///Volumes/data/projects/nixconfig/modules/user/ai/skills/nix-preflight-editor/) with executable companion tool `nix-preflight.sh`.
+  - Created agent skill ``nix-preflight-editor`` in [`modules/user/ai/skills/nix-preflight-editor/`](../../modules/user/ai/skills/nix-preflight-editor) with executable companion tool `nix-preflight.sh`.
   - Implemented fast AST validation via `nix-instantiate --parse <file>` (< 10ms execution time).
   - Implemented multi-anchor line context inspection (`inspect <file> <anchor1> [anchor2] [anchor3]`) displaying 1-indexed line numbers and exact whitespace.
   - Implemented multiline string delimiter trap linter (`lint-multiline`) preventing embedded Python `''` or bash `''` from prematurely terminating Nix indented strings (`''...''`).
@@ -285,17 +285,17 @@
 ### 19. [x] Decision-Model Augmented Kiwix Search & Auto-Recommender (EXP-058)
 * **Status:** `COMPLETED & VERIFIED` (Deployed in `~/.agents/skills/wiki-decision-recommend`)
 * **Actions Taken:**
-  - Created integration engine [`modules/services/systemone/wiki_recommend.py`](file:///Volumes/data/projects/nixconfig/modules/services/systemone/wiki_recommend.py) combining System One models with `kiwix-serve` REST search at `http://wiki.frieren.lan/`.
+  - Created integration engine [`modules/services/systemone/wiki_recommend.py`](../../modules/services/systemone/wiki_recommend.py) combining System One models with `kiwix-serve` REST search at `http://wiki.frieren.lan/`.
   - Implemented calibrated confidence threshold gating (default 0.65) to suppress spurious recommendations during high uncertainty.
   - Added domain taxonomy mapping (`filesystem_storage` -> ArchWiki, `general_technology` -> Wikipedia).
-  - Authored agent skill [`wiki-decision-recommend`](file:///home/devji/.agents/skills/wiki-decision-recommend/SKILL.md) and verified sub-30ms article recall on Btrfs and PostgreSQL incident queries.
+  - Authored agent skill ``wiki-decision-recommend`` and verified sub-30ms article recall on Btrfs and PostgreSQL incident queries.
 
 ### 20. [x] Offline ZIM Knowledge Base Catalog & Storage Provisioning (EXP-059)
 * **Status:** `COMPLETED & DOCUMENTED` (Recorded in `EXPERIMENTS.md`)
 * **Actions Taken:**
   - Cataloged high-value offline developer and sysadmin ZIM archives: Stack Overflow top 500k (~5.5 GB), Server Fault (~2.0 GB), MDN Web Docs (~1.8 GB), DevDocs (~1.5 GB), NixOS manual/wiki (~120 MB).
   - Audited storage footprint: ~17 GB total required, representing only 2.1% of the 800 GiB available space on `/Volumes/data` (`/dev/sda2`).
-  - Recorded detailed declarative module specification and inclusion runbook in [`EXPERIMENTS.md`](file:///Volumes/data/projects/nixconfig/EXPERIMENTS.md).
+  - Recorded detailed declarative module specification and inclusion runbook in [`EXPERIMENTS.md`](../../EXPERIMENTS.md).
 
 ### 21. [x] Ollama Cloud Proxy Models Provisioning & Hello-World Validation
 * **Status:** `COMPLETED & VERIFIED` (Tested live on frieren)
@@ -310,7 +310,7 @@
     - `gpt-oss:20b-cloud`
     - `gemma4:31b-cloud` / `gemma4:cloud`
   - Public Key verified for cloud account binding: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAD0eMRlk8JKZIpqMS/uMDnlH4roMSjy5CkV1fL/h/CL`.
-  - Added declarative dormant `services.ollama` configuration to [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix).
+  - Added declarative dormant `services.ollama` configuration to [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix).
 
 ### 22. [x] Ghost Nix Store Investigation & Btrfs Subvolume Cleanup
 * **Status:** `COMPLETED & VERIFIED` (Cleaned up 2026-10-13 14:24 CEST)
@@ -323,7 +323,7 @@
 ### 23. [x] Systemd User Daemons Upgrade with System One Triage & Ollama Service Activation (Generation 99)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 99, Committed `64dbf58`)
 * **Actions Taken:**
-  - Upgraded `agyHandoffRunner` (03:00 `agy-nightly-handoff.service`) in [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) to pre-triage `HANDOFF.md` into `/tmp/systemone-handoff-triage.json` without modifying or deleting the markdown document.
+  - Upgraded `agyHandoffRunner` (03:00 `agy-nightly-handoff.service`) in [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) to pre-triage `HANDOFF.md` into `/tmp/systemone-handoff-triage.json` without modifying or deleting the markdown document.
   - Upgraded `agySystemRunner` (05:00 `agy-nightly-system.service`) to pre-triage `SYSTEM.md` into `/tmp/systemone-system-triage.json` and pass TIER 1 findings to the agent prompt.
   - Declaratively enabled `services.ollama` binding state to `/Volumes/data/ollama` and models to `/Volumes/data/ollama/models`.
   - Fixed `.ollama/id_ed25519` key permissions; verified live inference against `nemotron-3-ultra` with 0 errors.
@@ -332,11 +332,11 @@
 ### 24. [x] System 1 & System 2 Pre-Harness Ensemble Service Architecture (Generation 101, EXP-065)
 * **Status:** `COMPLETED & VERIFIED` (Switched to Generation 101, Committed `f212e25`)
 * **Actions Taken:**
-  - Designed and deployed closed-loop pre-harness ensemble engine [`modules/services/systemone/ensemble.py`](file:///Volumes/data/projects/nixconfig/modules/services/systemone/ensemble.py).
+  - Designed and deployed closed-loop pre-harness ensemble engine [`modules/services/systemone/ensemble.py`](../../modules/services/systemone/ensemble.py).
   - Wired System 1 (Julia-1 144M) for sub-millisecond reflex triage across 10 core services (Gatus, Paperless, Disk QoS, Postgres, SimpleX, Restic, QuickSync, Sessions, Flake, Btrfs), measuring 5.43 ms total for all 10 services.
   - Linked System 2 (Nemotron-3-Ultra:cloud via local Ollama API) for deep deliberation when threshold-gated anomalies are detected, successfully validating live root cause & remediation synthesis in 6.36 seconds.
   - Installed system-wide CLI `systemone-ensemble` and companion verification check `task checks:decision:ensemble`.
-  - Authored and filed 5 additional experiments in [`EXPERIMENTS.md`](file:///Volumes/data/projects/nixconfig/EXPERIMENTS.md): EXP-065 (Diagnostic Ensemble), EXP-066 (Flake Auto-Reconcile), EXP-067 (Storage Prognosis), EXP-068 (Media Semantic Enricher), and EXP-069 (Fleet Security Anomaly Classifier).
+  - Authored and filed 5 additional experiments in [`EXPERIMENTS.md`](../../EXPERIMENTS.md): EXP-065 (Diagnostic Ensemble), EXP-066 (Flake Auto-Reconcile), EXP-067 (Storage Prognosis), EXP-068 (Media Semantic Enricher), and EXP-069 (Fleet Security Anomaly Classifier).
 
 
 
@@ -421,7 +421,7 @@
 * **Context & Motivation:** Operator requested inspection of `~/gitpatch/fern-install-changes.patch` on `fern` and queried why `fern` lacked the `pb` utility that uploads to `frieren`'s pastebin (`paste.frieren.lan`).
 * **Actions Taken:**
   1. Inspected `~/gitpatch/fern-install-changes.patch` on `fern`: confirmed its disko device `/dev/nvme0n1` and `antigravity-cli` `doInstallCheck = false` overlay (for Ryzen 3 3250U broken RDRAND) were already declared in `nixconfig` on 2026-10-01 (`b179467`) with `OPENSSL_ia32cap="0:~0"` wrapper. User confirmed antigravity patch section was not needed.
-  2. Extracted `pb` bash wrapper out of frieren-only `modules/services/paste.nix` into a new declarative script module [`modules/scripts/pb.nix`](file:///Volumes/data/projects/nixconfig/modules/scripts/pb.nix).
+  2. Extracted `pb` bash wrapper out of frieren-only `modules/services/paste.nix` into a new declarative script module [`modules/scripts/pb.nix`](../../modules/scripts/pb.nix).
   3. Imported `pb.nix` in `modules/scripts/default.nix`, making `pb` available across all desktop, container, and standalone home hosts.
   4. Deployed binary to `fern:~/.local/bin/pb`.
   5. Live upload test: Uploaded test content from `fern` to `http://paste.frieren.lan/test-from-fern.txt`, verified curl retrieval, and cleanly deleted test paste using `pb rm`.
@@ -467,8 +467,8 @@
   - Symlinked `lf -> nix/lf` in `/Volumes/data/bin-aarch64/` to maintain parity.
 * **Actions Taken:**
   1. Executed initial live rsync sync to BurgerNAS (`task-1065`, exit status 0): transferred 256 MiB compressed across 46+ static binaries; verified full file parity on `/volume1/Shared Library/bin-aarch64/`.
-  2. Declared `systemd.services.burgernas-bin-sync` and `systemd.timers.burgernas-bin-sync` in [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) running as `devji:users` on Sundays at 03:32 CEST (`Sun *-*-* 03:32:00`), positioned after the daily restic run within the DSM 03:25–04:00 power window.
-  3. Added interactive CLI automation `task burgernas:bin:sync` to [`taskfiles/burgernas.yml`](file:///Volumes/data/projects/nixconfig/taskfiles/burgernas.yml) and registered it in `task burgernas:menu`.
+  2. Declared `systemd.services.burgernas-bin-sync` and `systemd.timers.burgernas-bin-sync` in [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) running as `devji:users` on Sundays at 03:32 CEST (`Sun *-*-* 03:32:00`), positioned after the daily restic run within the DSM 03:25–04:00 power window.
+  3. Added interactive CLI automation `task burgernas:bin:sync` to [`taskfiles/burgernas.yml`](../../taskfiles/burgernas.yml) and registered it in `task burgernas:menu`.
   4. Switched cleanly to NixOS Generation 132 (`l3kaaf3j1vprkmlsgla9dclsahdsgcrn`).
   5. Tested live systemd unit execution (`sudo systemctl start burgernas-bin-sync.service`): finished in 2.2s with `Deactivated successfully`.
   6. Verified timer activation: `systemctl status burgernas-bin-sync.timer` active, trigger `Sun 2026-10-18 03:32:00 CEST`.
@@ -482,7 +482,7 @@
   - The operator's actual request was to remove the top GUI window title bar displayed by the Kitty terminal emulator (`kitty -- tmux`).
 * **Actions Taken:**
   1. Reverted `modules/shell/tmux.nix` to remove `status off`, `set-titles off`, and `pane-border-status off`.
-  2. Added `hide_window_decorations = "yes"` to `programs.kitty.settings` in [`modules/kitty/default.nix`](file:///Volumes/data/projects/nixconfig/modules/kitty/default.nix) to remove the top GUI title bar and window decorations from Kitty under Wayland/X11.
+  2. Added `hide_window_decorations = "yes"` to `programs.kitty.settings` in [`modules/kitty/default.nix`](../../modules/kitty/default.nix) to remove the top GUI title bar and window decorations from Kitty under Wayland/X11.
   3. Preflight verified Nix AST syntax via `nix-instantiate --parse`.
   4. Committed and pushed `d355727` to `origin/main`.
   5. Successfully rebuilt and switched to NixOS Generation 133 (`px28k7jav07j5jymrrf9mp1161lx1lgb-nixos-system-frieren-26.11.20261005.aa48d34`).
@@ -496,8 +496,8 @@
   2. **Mount Namespace Isolation (`Operation not permitted` / `EPERM`):** Upstream NixOS `kbfs.nix` sets `PrivateTmp = true;` in `systemd.user.services.kbfs.serviceConfig`. In modern systemd, `PrivateTmp = true` in an unprivileged user session creates a private mount namespace. In Linux, setuid binaries (`fusermount`) cannot perform mounts inside an unprivileged mount namespace, resulting in `mount("/dev/fuse", ...): Operation not permitted (EPERM)`. Furthermore, any mount created inside a private namespace is completely hidden from the user's interactive session. Upstream Keybase's own systemd unit does not enable `PrivateTmp`.
 * **Actions Taken:**
   1. **Cache Invalidation & Fleet Cache Alignment:** Cleaned stale SQLite evaluation and binary cache databases (`rm -rf ~/.cache/nix /root/.cache/nix`), eliminated defunct `cache.garnix.io` and `cuda-maintainers` caches from `applevalley`'s `/etc/nix/nix.conf`, and aligned it to Frieren's LAN binary cache (`http://192.168.3.25:5000`, Harmonia).
-  2. **Declarative FUSE Wrapper Enablement (`59561bc`):** Added `programs.fuse = { enable = true; userAllowOther = true; };` to [`modules/profiles/desktop-client.nix`](file:///Volumes/data/projects/nixconfig/modules/profiles/desktop-client.nix), generating `/run/wrappers/bin/fusermount` (mode `4755`) and `/etc/fuse.conf`.
-  3. **Declarative Mount Namespace Sandboxing Fix (`dd21271`):** Added `systemd.user.services.kbfs.serviceConfig.PrivateTmp = lib.mkForce false;` in [`modules/profiles/desktop-client.nix`](file:///Volumes/data/projects/nixconfig/modules/profiles/desktop-client.nix).
+  2. **Declarative FUSE Wrapper Enablement (`59561bc`):** Added `programs.fuse = { enable = true; userAllowOther = true; };` to [`modules/profiles/desktop-client.nix`](../../modules/profiles/desktop-client.nix), generating `/run/wrappers/bin/fusermount` (mode `4755`) and `/etc/fuse.conf`.
+  3. **Declarative Mount Namespace Sandboxing Fix (`dd21271`):** Added `systemd.user.services.kbfs.serviceConfig.PrivateTmp = lib.mkForce false;` in [`modules/profiles/desktop-client.nix`](../../modules/profiles/desktop-client.nix).
   4. **Pushed & Activated Generation 14:** Committed and pushed `59561bc` and `dd21271` to `origin/main`. Built system closure on Frieren (`/nix/store/6dzwcnxr9ww0i0wgl9awzckjms0gndsn-nixos-system-applevalley-26.11.20261005.aa48d34`), copied closure to `root@applevalley`, and activated cleanly via `switch-to-configuration switch`.
   5. **Verified Live Target:**
      - `systemctl --user -M devji@ status kbfs.service`: active (running), Main PID 58714, both `ExecStartPre` tasks exited `status=0/SUCCESS`.
@@ -545,10 +545,10 @@
 * **Status:** `COMPLETED & LIVE VERIFIED` (Item 41 Delivered to SimpleX `#Fleet`)
 * **Context & Motivation:** Resolving HC-6 (`Alerting is not configured` in Gatus logs) and binding fleet health reporting directly to operator communication channels.
 * **Actions Taken:**
-  1. Authored `fleetGatusReport` in [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix): queries Gatus API (`http://127.0.0.1:8181/api/v1/endpoints/statuses`) every morning at 05:00 CEST via `agySystemRunner` (`agy-nightly-system.service`).
+  1. Authored `fleetGatusReport` in [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix): queries Gatus API (`http://127.0.0.1:8181/api/v1/endpoints/statuses`) every morning at 05:00 CEST via `agySystemRunner` (`agy-nightly-system.service`).
   2. Automated daily scorecard dispatch directly into the `#Fleet` group on SimpleX Chat via `ws://127.0.0.1:5225`.
   3. Wired Gatus degradation directly to the System One reflex gate: if any monitored service is DOWN (`GATUS_DOWN > 0`), it alerts `#Fleet` with `🚨 [Fleet Monitoring ALERT]` and trips `SHOULD_RUN_CASCADE=1` to invoke autonomous self-repair. If all nominal, it preserves LLM tokens while keeping the operator informed.
-  4. Added declarative alerting in [`modules/services/fleet-monitors.nix`](file:///Volumes/data/projects/nixconfig/modules/services/fleet-monitors.nix) using Gatus `alerting.custom` pointing to a local webhook bridge (`fleet-alert-bridge` on port 5226) for immediate downtime notification.
+  4. Added declarative alerting in [`modules/services/fleet-monitors.nix`](../../modules/services/fleet-monitors.nix) using Gatus `alerting.custom` pointing to a local webhook bridge (`fleet-alert-bridge` on port 5226) for immediate downtime notification.
   5. Tested live: Successfully dispatched 5:00 AM scorecard to `#Fleet` group (item ID 41 created).
 
 ### 41. [x] Kiwix Offline Knowledge Library Catalog Expansion (EXP-059)
@@ -556,7 +556,7 @@
 * **Context & Motivation:** Ingesting curated developer and sysadmin offline documentation into `kiwix-serve` without saturating storage or daytime bandwidth.
 * **Actions Taken:**
   1. Ingested `alpinelinux_en_all_maxi_2026-07.zim` (62 MB) into Nix store path `/nix/store/alizz58pnvkr68diag8k47vidz01ivsg-alpinelinux_en_all_maxi_2026-07.zim` with SRI hash `sha256-LRkanai/3keuUFFk0Hahh1EwcL+SKY/g6qvfuqmB3fE=`.
-  2. Extracted exact XML book metadata using `kiwix-manage` (`id="d8150207-a8f4-213d-e587-6298ab930cf8"`, 1,022 articles, 77 media files) and declared it in `kiwixLibrary` inside [`modules/services/kiwix.nix`](file:///Volumes/data/projects/nixconfig/modules/services/kiwix.nix).
+  2. Extracted exact XML book metadata using `kiwix-manage` (`id="d8150207-a8f4-213d-e587-6298ab930cf8"`, 1,022 articles, 77 media files) and declared it in `kiwixLibrary` inside [`modules/services/kiwix.nix`](../../modules/services/kiwix.nix).
   3. Preflight verified Nix AST syntax via `nix-preflight.sh verify`.
   4. Cataloged heavy sysadmin archives (Server Fault 1.63 GB, Unix & Linux Stack Exchange 1.31 GB, Stack Overflow Top 500k 5.5 GB) for off-peak ingestion during scheduled 03:00 maintenance window.
 
@@ -582,7 +582,7 @@
     - If full liberation of all 2,318 titles is desired, attach a secondary dedicated storage volume (e.g. external USB drive or NFS mount from BurgerNAS).
   - **Media Center Serving Stack (Audiobookshelf vs Jellyfin):**
     - **Option 1 (Recommended): Deploy `services.audiobookshelf`**
-      - NixOS provides native declarative module [`services.audiobookshelf`](file:///nix/store/mn8gk4r87grls81sp5bjgfwcanrfqhlj-source/nixos/modules/services/web-apps/audiobookshelf.nix) (default port 13378).
+      - NixOS provides native declarative module ``services.audiobookshelf`` (default port 13378).
       - Audiobookshelf is the industry gold standard: supports chapter navigation, bookmarking, cross-device playback progress sync, mobile apps (iOS/Android), sleep timers, and automatic metadata enrichment via Audible/Google Books APIs.
     - **Option 2 (Basic): Map Jellyfin "Books" Library**
       - Add `/srv/data/audiobooks/Books` as a "Books" library directly in Jellyfin.
@@ -592,10 +592,10 @@
 * **Status:** `COMPLETED & LIVE VERIFIED` (Generation Activated, Downloads Paused per Operator Directive)
 * **Context & Motivation:** Deploy dedicated audiobook media server (Audiobookshelf) on the NAS pool and build a safe, non-contending batch runner for Audible liberation while respecting the operator's pause instruction.
 * **Actions Taken:**
-  1. **Audiobookshelf Service:** Declaratively enabled `services.audiobookshelf` in [`hosts/frieren/media-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/media-stack.nix) on port 13378 (`host = "0.0.0.0"`), with group membership `users.users.audiobookshelf.extraGroups = ["users"];` to grant read access to `/srv/data/audiobooks/Books`.
-  2. **Nginx Reverse Proxy & Portal:** Configured virtual host `audiobooks.frieren.lan` (aliases `books.frieren.lan`, `audiobookshelf.frieren.lan`, `audiobooks`) in [`hosts/frieren/reverse-proxy.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/reverse-proxy.nix) reverse-proxying `127.0.0.1:13378` with WebSocket forwarding and `client_max_body_size 500M;`. Added Audiobookshelf quick-launch card to the `frieren.lan` dashboard.
+  1. **Audiobookshelf Service:** Declaratively enabled `services.audiobookshelf` in [`hosts/frieren/media-stack.nix`](../../hosts/frieren/media-stack.nix) on port 13378 (`host = "0.0.0.0"`), with group membership `users.users.audiobookshelf.extraGroups = ["users"];` to grant read access to `/srv/data/audiobooks/Books`.
+  2. **Nginx Reverse Proxy & Portal:** Configured virtual host `audiobooks.frieren.lan` (aliases `books.frieren.lan`, `audiobookshelf.frieren.lan`, `audiobooks`) in [`hosts/frieren/reverse-proxy.nix`](../../hosts/frieren/reverse-proxy.nix) reverse-proxying `127.0.0.1:13378` with WebSocket forwarding and `client_max_body_size 500M;`. Added Audiobookshelf quick-launch card to the `frieren.lan` dashboard.
   3. **Fleet Monitoring & Backups:** Added `audiobookshelf` endpoint (`http://127.0.0.1:13378`) to `services.fleetMonitors.endpoints` in Gatus (live verified: HTTP 200, green). Added `/var/lib/audiobookshelf` to `services.restic.backups.frieren-local.paths` for automated nightly state backups.
-  4. **Phased Batch Liberation Architecture:** Authored `audibleBatchLiberation` script derivation in [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) enforcing:
+  4. **Phased Batch Liberation Architecture:** Authored `audibleBatchLiberation` script derivation in [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) enforcing:
      - Strict storage safety guard: halts immediately if free space on `/srv/data` is under 250 GB.
      - Managed batch limit: 50 books per run (~35 GB) using `${pkgs.libation}/bin/libationcli liberate --limit-books 50`.
      - 170-minute timeout: ensures execution between 00:00 and 02:50 CEST with graceful SIGTERM, guaranteeing zero collision with the 03:00–05:30 nightly backup window.
@@ -604,7 +604,7 @@
      - Confirmed 0 active downloads across Libation, Transmission, and Aria2.
      - Issued explicit pause signals: `aria2.pauseAll` and `transmission-remote -t all --stop`.
      - Commented out/deactivated `audible-phased-liberation` in `services.agentScheduler.jobs` so that no automatic batch downloads will trigger.
-  6. **Linter & Build Fixes:** Added `flakeIgnore = ["E501" "E302" "E305" "E203" "W503"];` to Python script writers in [`modules/services/fleet-monitors.nix`](file:///Volumes/data/projects/nixconfig/modules/services/fleet-monitors.nix) and [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix).
+  6. **Linter & Build Fixes:** Added `flakeIgnore = ["E501" "E302" "E305" "E203" "W503"];` to Python script writers in [`modules/services/fleet-monitors.nix`](../../modules/services/fleet-monitors.nix) and [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix).
   7. **Clean Switch & Verification:**
      - Switched cleanly to configuration `/nix/store/bhlvdnplz4f3snxv6h35xzdcaz29b68x-nixos-system-frieren-26.11.20261005.aa48d34`.
      - Verified `systemctl status audiobookshelf` (active, running).
@@ -618,7 +618,7 @@
 * **Context & Motivation:** Operator unpaused download actions and requested a managed daytime run between 11:30 AM and 1:00 PM for today, followed by the regular nightly window (00:00–03:00 CEST).
 * **Actions Taken:**
   1. **Download Managers Unpaused:** Issued `aria2.unpauseAll` via RPC and `transmission-remote -t all --start` for BitTorrent.
-  2. **Parametric Liberation Script:** Refactored `makeAudibleBatchLiberation` generator in [`hosts/frieren/infra-stack.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/infra-stack.nix) to support custom timeouts, batch limits, and window descriptions while preserving the strict 250 GB storage headroom safety guard and SimpleX `#Fleet` status dispatch.
+  2. **Parametric Liberation Script:** Refactored `makeAudibleBatchLiberation` generator in [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) to support custom timeouts, batch limits, and window descriptions while preserving the strict 250 GB storage headroom safety guard and SimpleX `#Fleet` status dispatch.
   3. **Daytime Scheduler Arming:** Declared `audible-daytime-liberation` in `services.agentScheduler.jobs`:
      - Scheduled for `2026-10-18 11:30:00` (runs today at 11:30 CEST).
      - 85-minute hard timeout (`timeoutSecs = 5100`): guaranteed cutoff at 12:55 CEST before 13:00 (1:00 PM).
@@ -670,11 +670,11 @@
      - Wi-Fi (`wlp2s0`) remains at metric `600` (tertiary route).
      - Live verified via `ip route`: `enp1s0` is strictly primary for all outbound internet and local `192.168.3.0/24` subnet traffic, eliminating the previous asymmetric routing bug.
   2. **Option 2 (Inbound Wi-Fi Failover Deployed):**
-     - Declared NetworkManager dispatcher script `/etc/NetworkManager/dispatcher.d/03userscript0001` in [`hosts/frieren/networking.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/networking.nix).
+     - Declared NetworkManager dispatcher script `/etc/NetworkManager/dispatcher.d/03userscript0001` in [`hosts/frieren/networking.nix`](../../hosts/frieren/networking.nix).
      - When `enp1s0` drops link (`down` / `pre-down`): automatically floats `192.168.3.25/24` to `wlp2s0` (`wlp2s0:vip`) and broadcasts gratuitous ARP packets via `arping -c 3 -U -I wlp2s0 192.168.3.25`.
      - When `enp1s0` restores link (`up`): immediately removes the secondary IP from `wlp2s0` and restores `192.168.3.25` exclusively to `enp1s0` with gratuitous ARP.
-     - Declared Pi-hole listening interfaces in [`hosts/frieren/dns.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/dns.nix): added `interface=wlp2s0` and `interface=enp0s20f0u2u1i5` to `extraDnsmasqLines` and opened port 53 (TCP/UDP) on both interfaces.
-     - Extended [`hosts/frieren/firewall-scope.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/firewall-scope.nix) to include `enp0s20f0u2u1i5` in `scopedIfaces`.
+     - Declared Pi-hole listening interfaces in [`hosts/frieren/dns.nix`](../../hosts/frieren/dns.nix): added `interface=wlp2s0` and `interface=enp0s20f0u2u1i5` to `extraDnsmasqLines` and opened port 53 (TCP/UDP) on both interfaces.
+     - Extended [`hosts/frieren/firewall-scope.nix`](../../hosts/frieren/firewall-scope.nix) to include `enp0s20f0u2u1i5` in `scopedIfaces`.
   3. **USB Autosuspend & DisplayLink Dock Fixes (`hardware.nix`):**
      - Added `boot.kernelParams = ["usbcore.autosuspend=-1"];` to prevent kernel 6.12 from powering down DisplayLink DL-6950 ASIC and external USB 3.0 hubs after 2s.
      - Added udev rules in `services.udev.extraRules` disabling autosuspend for vendor IDs `17e9` (DisplayLink), `05e3` (Genesys Logic USB hub), and `06c4` (BizLink dock). Triggered live via `udevadm control --reload && udevadm trigger`.
@@ -754,11 +754,11 @@
   1. The user noted that `kitty.conf` had `JetBrains Mono Nerd Font`, but `lf` icons and ligatures in `lfrc` were failing to render properly.
   2. Inspection revealed two compounding causes:
      - **Font Name Variant:** Kitty was set to `JetBrainsMono Nerd Font` (the proportional 2-cell Nerd Font variant), which causes cell-width mismatch and text truncation when terminal utilities like `lf` output single-cell icons followed by text.
-     - **Debloat Override Stripping Fonts:** In [`hosts/frieren/configuration.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/configuration.nix), a prior closure debloat pass (`T1-2`) had executed `fonts.packages = lib.mkForce [pkgs.jetbrains-mono];`. This forced standard JetBrains Mono (which contains zero Nerd Font glyphs), removing `nerd-fonts.jetbrains-mono` entirely from Frieren's fontconfig cache.
+     - **Debloat Override Stripping Fonts:** In [`hosts/frieren/configuration.nix`](../../hosts/frieren/configuration.nix), a prior closure debloat pass (`T1-2`) had executed `fonts.packages = lib.mkForce [pkgs.jetbrains-mono];`. This forced standard JetBrains Mono (which contains zero Nerd Font glyphs), removing `nerd-fonts.jetbrains-mono` entirely from Frieren's fontconfig cache.
 * **Remediations Executed:**
-  1. **Removed `T1-2` Font Override:** Dropped the `fonts = { ... }` block from [`hosts/frieren/configuration.nix`](file:///Volumes/data/projects/nixconfig/hosts/frieren/configuration.nix), restoring the full [`nerd-fonts.jetbrains-mono`](file:///nix/store/qgc50l260ghg5kq501c246vbj1fxmmx9-nerd-fonts-jetbrains-mono-3.5.0+2.304) package declared in [`modules/profiles/base-desktop-environment.nix`](file:///Volumes/data/projects/nixconfig/modules/profiles/base-desktop-environment.nix).
-  2. **Configured Monospace Font Hierarchy:** Set `fontconfig.defaultFonts.monospace = ["JetBrainsMono Nerd Font Mono" "JetBrainsMono NFM"];` in [`base-desktop-environment.nix`](file:///Volumes/data/projects/nixconfig/modules/profiles/base-desktop-environment.nix).
-  3. **Configured Kitty:** Updated [`modules/kitty/default.nix`](file:///Volumes/data/projects/nixconfig/modules/kitty/default.nix) to `font.name = "JetBrainsMono NFM";`.
+  1. **Removed `T1-2` Font Override:** Dropped the `fonts = { ... }` block from [`hosts/frieren/configuration.nix`](../../hosts/frieren/configuration.nix), restoring the full ``nerd-fonts.jetbrains-mono`` package declared in [`modules/profiles/base-desktop-environment.nix`](../../modules/profiles/base-desktop-environment.nix).
+  2. **Configured Monospace Font Hierarchy:** Set `fontconfig.defaultFonts.monospace = ["JetBrainsMono Nerd Font Mono" "JetBrainsMono NFM"];` in [`base-desktop-environment.nix`](../../modules/profiles/base-desktop-environment.nix).
+  3. **Configured Kitty:** Updated [`modules/kitty/default.nix`](../../modules/kitty/default.nix) to `font.name = "JetBrainsMono NFM";`.
   4. **Verification:**
      - Verified `fc-match monospace` and `fc-match "JetBrainsMono NFM"` cleanly resolve to `JetBrainsMonoNerdFontMono-Regular.ttf`.
      - Verified `~/.config/kitty/kitty.conf` on disk reflects `font_family JetBrainsMono NFM`.
@@ -772,13 +772,13 @@
   - Internal laptop display (`eDP-1`) is disabled in favor of the external 4K monitor.
   - Dedicated Gigabit Ethernet on `enp1s0` (`192.168.3.25`) stays active for 24/7 server workloads, allowing the Dell dock to be safely unplugged/plugged for other laptops without causing server downtime or network disruption.
 * **GUI Debloat:**
-  - Disabled `element-desktop` (`element-desktop.enable = false;` in [`modules/roles/home.nix`](file:///Volumes/data/projects/nixconfig/modules/roles/home.nix)), shedding unused Electron runtime and memory footprint.
-  - Confirmed `ghostty` terminal emulator disabled (commented out in [`modules/roles/home.nix`](file:///Volumes/data/projects/nixconfig/modules/roles/home.nix)), standardizing on Kitty as the single GPU-accelerated terminal.
+  - Disabled `element-desktop` (`element-desktop.enable = false;` in [`modules/roles/home.nix`](../../modules/roles/home.nix)), shedding unused Electron runtime and memory footprint.
+  - Confirmed `ghostty` terminal emulator disabled (commented out in [`modules/roles/home.nix`](../../modules/roles/home.nix)), standardizing on Kitty as the single GPU-accelerated terminal.
 * **Keybase FUSE User Permissions & Mount Verification:**
   - Verified `keybase.service` and `kbfs.service` are active and running on `frieren`.
   - Confirmed `/home/devji/keybase` (`private`, `public`, `team`) is mounted via FUSE.
   - Confirmed `modules/profiles/desktop-client.nix` properly declares `programs.fuse.userAllowOther = true;` and `systemd.user.services.kbfs.serviceConfig.PrivateTmp = lib.mkForce false;`, while `modules/profiles/nas-client.nix` prevents self-mounting loopback deadlocks (`config.networking.hostName != "frieren"`).
 * **Unified Out-of-Store Kando Configuration:**
-  - Seeded [`modules/config/kando/menus.json`](file:///Volumes/data/projects/nixconfig/modules/config/kando/menus.json) in `nixconfig`.
-  - Configured out-of-store symlinks in [`modules/user/desktop/niri.nix`](file:///Volumes/data/projects/nixconfig/modules/user/desktop/niri.nix) mapping `~/.config/kando/menus.json` and `~/.config/kando/menu.json` to `${config.home.homeDirectory}/Documents/nixconfig/modules/config/kando/menus.json`.
+  - Seeded [`modules/config/kando/menus.json`](../../modules/config/kando/menus.json) in `nixconfig`.
+  - Configured out-of-store symlinks in [`modules/user/desktop/niri.nix`](../../modules/user/desktop/niri.nix) mapping `~/.config/kando/menus.json` and `~/.config/kando/menu.json` to `${config.home.homeDirectory}/Documents/nixconfig/modules/config/kando/menus.json`.
   - In-GUI menu changes now sync directly into the git repository for seamless propagation across all DMS hosts.

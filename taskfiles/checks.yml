@@ -38,6 +38,8 @@ tasks:
     cmds:
       - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets
       - task checks:repo:paths
+      - task checks:docs:links
+      - task checks:yaml:lint
       - task checks:toon
       - task checks:toon:surfaces
       - task checks:tasks
@@ -46,6 +48,17 @@ tasks:
       - task checks:nix:lint
       - task checks:sops:drift
       - task checks:modules:validate
+
+  checks:docs:links:
+    desc: "[gate] Every markdown link resolves, and none points at a machine path"
+    summary: >
+      Scans tracked markdown for two classes found on 2026-10-20: a
+      `file:///Volumes/...` link to one machine's checkout (dead everywhere else,
+      and a local path in a public doc), and a relative path that is simply
+      wrong. Web links and anchors are skipped. A deliberate dangling pointer
+      carries `link-ok: <reason>` on its line. ~0.1 s, no network, no eval.
+    cmds:
+      - bash scripts/task/docs-links.sh
 
   checks:toon:surfaces:
     desc: "[gate] Agent-facing docs pipe JSON into toon, never into the reader"
@@ -664,6 +677,28 @@ tasks:
           exit 1
         fi
         echo "checks:nix:watch: stopped (verified, no watcher process remains)"
+
+  checks:yaml:lint:
+    desc: Validate that every tracked YAML file parses — the guard for task and workflow edits
+    summary: >
+      YAML here has three consumers with three parsers: go-task reads
+      `taskfiles/*.yml`, GitHub reads `.github/workflows/*.yml`, sops reads
+      `.sops.yaml`. One failure mode is shared: a file stops parsing and only
+      the consumer notices. Edits go through `yq -p yaml -o yaml -i`; this
+      proves the result parses and names every file that does not.
+    cmds:
+      - |
+        fail=0
+        count=0
+        for f in $(git ls-files '*.yml' '*.yaml'); do
+          count=$((count + 1))
+          if ! yq '.' "$f" >/dev/null 2>&1; then
+            echo "FAIL: $f does not parse"
+            fail=1
+          fi
+        done
+        if [ "$fail" -ne 0 ]; then exit 1; fi
+        echo "PASS: $count YAML files parse."
 
   checks:toml:lint:
     desc: Validate that every tracked TOML file parses — the guard for tool-written TOML edits

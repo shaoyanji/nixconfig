@@ -32,6 +32,7 @@
     ".agents/SCHEMA.md"
     ".agents/README.md"
     "docs/ci-pipeline.md"
+    "docs/sops-rekey.md"
     "docs/storage-taxonomy.md"
     "taskfiles/README.md"
   ];
@@ -124,6 +125,37 @@
       proof = "AGENTS.md lines with never/do not/must not/should not and no citation";
       holds = builtins.length proseRules <= 65;
       detail = "${toString (builtins.length proseRules)} uncited prohibition lines (shrink-only budget: 65)";
+    };
+
+    secrets-are-encrypted = {
+      rule = "Every sops file in the tree is encrypted (`ENC[AES256_GCM` values plus `sops:` metadata); a plaintext commit fails rather than being reviewed.";
+      proof = "modules/secrets.yaml, modules/ssh-ca-key.yaml";
+      holds =
+        lib.all (
+          f: builtins.pathExists (root + "/${f}") && has f "ENC[AES256_GCM" && anyLine f (l: lib.hasPrefix "sops:" l)
+        ) [
+          "modules/secrets.yaml"
+          "modules/ssh-ca-key.yaml"
+        ];
+      detail = "a sops file is missing, or holds values that are not encrypted";
+    };
+
+    secrets-submodule-declared = {
+      rule = "The real secret files are the `modules/secrets` submodule; `modules/secrets.yaml` is its mirror, and both copies carry the recipients.";
+      proof = ".gitmodules, docs/sops-rekey.md";
+      holds =
+        has ".gitmodules" ''[submodule "modules/secrets"]''
+        && has "docs/sops-rekey.md" "modules/secrets.yaml";
+      detail = ".gitmodules lost the secrets submodule, or the rekey page stopped naming the mirror";
+    };
+
+    ssh-ca-declarative = {
+      rule = "User access is CA-signed certificates: one CA key, `rotate-ssh-cert` for 1-week certs, no `authorized_keys` management.";
+      proof = "modules/ssh-ca.nix, modules/profiles/base-node.nix";
+      holds =
+        has "modules/ssh-ca.nix" "rotate-ssh-cert"
+        && has "modules/profiles/base-node.nix" "ssh.ca.enable = true";
+      detail = "the CA module lost rotate-ssh-cert, or base-node stopped enabling ssh.ca";
     };
 
     ci-matrix-is-inventory = {

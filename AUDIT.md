@@ -33,6 +33,8 @@
   as `devji`, `checks:host HOST=delphi MODE=eval` 1816 assertions rc=0.
 - `docs/sops-rekey.md` (new): the two identity planes, anchor convention, rekey steps,
   and the submodule `.sops.yaml` copy trap.
+- First offload: `services.fleetMonitors` on delphi (gatus, tailnet-only `:8181`, public `:8181`
+  refused) — an out-of-LAN vantage point frieren's loopback probes cannot be. 3/3 endpoints ok.
 - Public web verified: `/healthz` → `200`, SYN→SYN-ACK→ACK on `enp0s6`. The first ingress
   attempt dropped with **0 packets on the wire** — the ports went into *Source* Port
   Range, and an inbound connection's source port is ephemeral. Rule + method:

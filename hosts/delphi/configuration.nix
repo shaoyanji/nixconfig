@@ -87,6 +87,7 @@ in {
     ../../modules/profiles/firewall-baseline.nix
     ../../modules/profiles/hermes.nix
     ../../modules/profiles/sops-user-identity.nix
+    ../../modules/services/fleet-monitors.nix
   ];
 
   networking.hostName = "delphi";
@@ -205,11 +206,63 @@ in {
     };
   };
 
-  # DNS arrives over the tailnet only (and on lo, where the host resolves
-  # through it). 53 is deliberately absent from allowedTCPPorts/allowedUDPPorts.
+  # DNS and the monitor dashboard arrive over the tailnet only. 53 and 8181 are
+  # deliberately absent from the global allowedTCPPorts/allowedUDPPorts: a port
+  # open to the internet is exactly what this host's whole posture is about.
   networking.firewall.interfaces.tailscale0 = {
     allowedUDPPorts = [53];
-    allowedTCPPorts = [53];
+    allowedTCPPorts = [
+      53
+      8181
+    ];
+  };
+
+  # --- Fleet monitors, from OUTSIDE the LAN ---------------------------------
+  # frieren's own gatus cannot see a home-WAN outage: it probes loopback. This
+  # instance is the other vantage point — everything on delphi probes 127.0.0.1,
+  # and the frieren checks go over the tailnet, so "delphi can reach frieren" is
+  # a fact about the internet path and frieren's tailnet ingress, not about the
+  # LAN switch.
+  #
+  # `modules/services/fleet-monitors.nix` owns the mechanism (gatus plus the
+  # monitor definitions as Nix state); this block is only the endpoint list.
+  # Alerting stays off: the SimpleX bridge points at 127.0.0.1:5225, and this
+  # host runs no SimpleX daemon.
+  services.fleetMonitors = {
+    enable = true;
+    # Bound to all interfaces because the tailnet address is assigned at login
+    # and must not be baked in; the tailscale0 firewall rule above is the only
+    # way in. Reached at http://100.123.145.53:8181/ from a tailnet client.
+    address = "0.0.0.0";
+    endpoints = [
+      {
+        name = "delphi nginx";
+        url = "http://127.0.0.1/healthz";
+        group = "delphi";
+        conditions = ["[STATUS] < 400"];
+      }
+      {
+        name = "delphi dns (crab-hole)";
+        url = "tcp://127.0.0.1:53";
+        group = "dns";
+        conditions = ["[CONNECTED] == true"];
+      }
+      # Tailnet IP, not MagicDNS: delphi runs `--accept-dns=false` (a resolver
+      # must not resolve through the address it serves), so names do not resolve
+      # here. The address is stable per node key.
+      {
+        name = "frieren portal (tailnet)";
+        url = "http://100.97.61.65/";
+        group = "frieren";
+        conditions = ["[STATUS] < 400"];
+      }
+      {
+        name = "frieren sentinel";
+        url = "http://100.97.61.65/sentinel/status.json";
+        group = "frieren";
+        conditions = ["[BODY].state == ok"];
+      }
+    ];
   };
 
   # crab-hole owns port 53, so resolved must not squat on it: the wildcard bind

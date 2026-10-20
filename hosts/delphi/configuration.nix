@@ -93,7 +93,11 @@ in {
 
   # 10.99.0.53 on lo + the /32 advertised below form one half of the failover
   # group; frieren runs the same module and advertises the same route.
-  profiles.tailnetDnsAddress.address = dnsServiceAddress;
+  # (Setting only `.address` does nothing — the bind is behind `enable`.)
+  profiles.tailnetDnsAddress = {
+    enable = true;
+    address = dnsServiceAddress;
+  };
 
   networking.hostName = "delphi";
 

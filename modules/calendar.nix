@@ -2,8 +2,24 @@
   config,
   pkgs,
   lib,
+  osConfig ? null,
   ...
 }: let
+  # Hosts that have no Google OAuth credentials (~/.config/rclone/rclone.conf).
+  # vdirsyncer cannot work there: it fails every 15 minutes with
+  # `NoSectionError: No section: 'gdrive'`, which is a permanently red user unit
+  # on a machine that has no business syncing a calendar. This module is merged
+  # as a config fragment, so it cannot declare a `options` block — the host gate
+  # is a list here, like `tpmHosts` in modules/sops.nix.
+  hostName =
+    if osConfig != null
+    then osConfig.networking.hostName
+    else "";
+  syncEnabled =
+    pkgs.stdenv.hostPlatform.isLinux
+    && !(builtins.elem hostName [
+      "delphi"
+    ]);
   getGoogleClientId = pkgs.writeShellScript "google-client-id" ''
     ${pkgs.python3}/bin/python3 -c "import configparser; cfg=configparser.ConfigParser(); cfg.read('${config.home.homeDirectory}/.config/rclone/rclone.conf'); print(cfg.get('gdrive','client_id'))"
   '';
@@ -102,11 +118,11 @@ in {
   programs.vdirsyncer.enable = true;
 
   services.vdirsyncer = {
-    enable = pkgs.stdenv.hostPlatform.isLinux;
+    enable = syncEnabled;
     frequency = "*:0/15";
   };
 
-  systemd.user.services.calendar-notify = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+  systemd.user.services.calendar-notify = lib.mkIf syncEnabled {
     Unit = {
       Description = "Google Calendar event notifier via libnotify/dms";
       After = ["graphical-session.target"];
@@ -117,7 +133,7 @@ in {
     };
   };
 
-  systemd.user.timers.calendar-notify = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+  systemd.user.timers.calendar-notify = lib.mkIf syncEnabled {
     Unit = {
       Description = "Check for upcoming calendar events every 5 minutes";
     };

@@ -92,9 +92,9 @@ The entire offload pipeline is fully deterministic and requires **zero interacti
 
 ### Package & Script
 Packaged as a hermetic Nix application via `pkgs.writeShellApplication` at
-[`modules/scripts/qmd-eisen-embed-sync.nix`](file:///home/devji/Documents/nixconfig/modules/scripts/qmd-eisen-embed-sync.nix)
+[`modules/scripts/qmd-eisen-embed-sync.nix`](../modules/scripts/qmd-eisen-embed-sync.nix)
 and installed into system PATH on Frieren via `hosts/frieren/tools.nix`.
-The source script [`scripts/task/qmd-eisen-embed-sync.sh`](file:///home/devji/Documents/nixconfig/scripts/task/qmd-eisen-embed-sync.sh)
+The source script [`scripts/task/qmd-eisen-embed-sync.sh`](../scripts/task/qmd-eisen-embed-sync.sh)
 provides:
 * **Avoid WoL if already online:** Probes SSH reachability first; skips WoL if Eisen is already awake.
 * **Automated Post-Sync Poweroff:** Cleanly shuts down Eisen (`systemctl poweroff`) if it was woken by WoL for this run.

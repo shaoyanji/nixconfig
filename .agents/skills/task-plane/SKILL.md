@@ -1,6 +1,6 @@
 ---
 name: task-plane
-description: "Navigate the nixconfig task control plane by intent: 373 tasks across 17 shards, cost tiers, what each gate proves, and when NOT to add a task or a script."
+description: "Navigate the nixconfig task control plane by intent: which shard owns a question, cost tiers, what each gate proves, and when NOT to add a task or a script."
 version: 0.1.0
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
@@ -13,7 +13,7 @@ metadata:
 
 # task-plane — find the task by intent, not by name
 
-`task --list-all` prints 373 names. That is a wall, not a map. Start here:
+`task --list-all` prints every name in the tree. That is a wall, not a map. Start here:
 
 ```bash
 task help                 # curated intent -> task map + live namespace counts (static, no nix)
@@ -108,7 +108,7 @@ Task hygiene, enforced by `checks:tasks`:
 
 ## The authoring contract (why most new tasks should not exist)
 
-The control plane is already 370+ tasks. Adding one is a maintenance bet that it
+The control plane is already hundreds of tasks. Adding one is a maintenance bet that it
 will be typed twice a month. Before writing a `cmds:` block, walk this ladder
 and stop at the first rung that works:
 

@@ -1,7 +1,7 @@
 # Fleet LLM Context Matrix
 
 > Dense machine context matrix optimized for LLM token budgets and prompt injection.
-> Source of truth: [`inventory.toml`](file:///home/devji/Documents/nixconfig/inventory.toml).
+> Source of truth: [`inventory.toml`](../inventory.toml).
 
 ## Fleet Status Breakdown
 
@@ -50,7 +50,7 @@
 | 🟢 **`burgernas`** | `active` | No (Ext) | `aarch64-linux` | `storage-cold-constrained-arm` | Realtek RTD1296, 512 MiB DDR4 (soldered, non-expandable) | Cold Vault Storage Extension & Secondary Backup Target |
 | ⚪ **`cassini`** | `preserved` | Yes | `aarch64-darwin` | `apple-silicon-workstation` | Apple Silicon, Unified Memory (16, Apple Integrated Metal GPU | Apple Silicon macOS Workstation |
 | ⚪ **`deckstation`** | `preserved` | Yes | `x86_64-linux` | `heavy-gaming` | Intel 64-bit multi-core, 16 GiB, AMD Radeon RX 5700 XT | High-End Steam Kiosk & Sunshine Host |
-| 🟡 **`delphi`** | `wip` | Yes | `aarch64-linux` | `cloud-high-ram` | Ampere Altra Neoverse N1, 24 GiB RAM | Cloud Bastion, Tailscale Exit Node & ARM64 Build Offloader |
+| 🟢 **`delphi`** | `active` | Yes | `aarch64-linux` | `cloud-lite` | Ampere Altra Neoverse N1, 11 GiB RAM (measured; 12 GB nominal) | Cloud Bastion, Tailscale Exit Node & ARM64 Build Offloader |
 | ⚪ **`demo`** | `preserved` | Yes | `x86_64-linux` | `demo-sandbox` | x86_64, 4 GiB | NixOS Demonstration VM |
 | 🟢 **`dragoncourt`** | `active` | No (Ext) | `x86_64-linux` | `shared-web-hosting` | Intel x86_64, Shared Hosting Quota | Alwaysdata PHP/Wasm Web Hosting |
 | 🟢 **`eisen`** | `active` | Yes | `x86_64-linux` | `heavy-compute-64gb` | Intel Xeon E5-2673 v3, 64 GiB DDR4, AMD Radeon RX 5700 | High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node |

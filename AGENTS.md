@@ -1,6 +1,6 @@
 # AGENTS.md
 
-**Nixconfig** — Personal Nix flake managing NixOS, nix-darwin, and Home Manager across ~25 hosts.
+**Nixconfig** — Personal Nix flake managing NixOS, nix-darwin, and Home Manager across the hosts registered in `inventory.toml`.
 
 `Taskfile.yml` plus the `taskfiles/*` shards are the canonical entrypoint for every executable task.
 
@@ -815,6 +815,10 @@ CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodul
 ## Nix Patterns & Gotchas
 
 ### HARD RULE: never hand-edit TOML — edit through a format-aware tool
+
+Every format in this tree has one owning tool and one guard; the table is in
+[`.agents/SCHEMA.md`](.agents/SCHEMA.md) §1 ("Formats, and the tool that owns
+each"). This section is the TOML case in detail.
 
 **TOML is edited with a TOML AST editor, never by text substitution.** This is not
 style: hand-editing `inventory.toml` in this repo produced unparseable TOML (a

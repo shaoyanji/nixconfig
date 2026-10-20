@@ -36,6 +36,23 @@ Machine-enforced where possible:
 the generated page. A table that exists twice is a table that disagrees with
 itself within a month.
 
+### Formats, and the tool that owns each
+
+A format is chosen by what reads it, and edited only by a tool that understands
+it. This table is the place to look before touching data in place.
+
+| Format | Lives in | Edit with | Guard |
+| :--- | :--- | :--- | :--- |
+| TOML | `inventory.toml`, `modules.toml` | `yq -p toml -o toml -i`; keep the `.toml` extension, or pass `-p`/`-o` explicitly. `tomlkit` when comments must survive | `task checks:toml:lint` |
+| YAML | `taskfiles/*.yml`, `.github/workflows/*.yml` | `yq -p yaml -o yaml -i`; a task graph edit is verified by running it | `task checks:yaml:lint`, `checks:tasks` |
+| Nix | `*.nix`, `flake.nix` | editor plus `alejandra`; read a value with `nix eval` instead of re-parsing it | `task checks:nix:format`, `checks:nix:lint` |
+| JSON | flake outputs, API bodies, anything feeding `jq` | `jq` | none: a program consumes it |
+| JSONL | `/var/lib/fleet-sentinel/ledger.jsonl` | append-only; filter with `jq` | `fleet-sentinel` |
+| TOON | nowhere on disk. It is the agent's projection of JSON | `toon -e` / `toon -d`; recount `[n]` with `task dev:toon:fix` | `task checks:toon`, `checks:toon:surfaces` |
+
+TOON never becomes a source of truth. An agent consumes and emits TOON; the
+converter crosses to the format that owns the data (`master-toon` skill).
+
 ## 2. Document classes and budgets
 
 | Class | Files | Budget | Contains |

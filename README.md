@@ -320,7 +320,7 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 The fleet roster — 31 devices across NixOS, nix-darwin, standalone Home Manager,
 external non-Nix nodes, preserved and WIP machines — is defined once in
 [`inventory.toml`](inventory.toml), the machine-readable source of truth, and
-rendered for humans in [`docs/generated/fleet-inventory.md`](docs/generated/fleet-inventory.md)
+rendered for humans by `nix build .#docs` (pointer: [`docs/fleet-inventory.md`](docs/fleet-inventory.md))
 (built by `lib/docs.nix`; refresh with `task docs:sync`, verify with
 `task checks:docs:sync`). Neither copy is hand-maintained, so the roster is
 deliberately **not** duplicated here.

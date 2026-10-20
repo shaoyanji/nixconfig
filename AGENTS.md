@@ -1174,6 +1174,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | `AGENTS.md`                          | This file — canonical agent routing and codebase manual                |
 | `inventory.toml`                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
 | `docs/inventory-schema.md`           | Inventory schema, compiled artifacts, and the automatic checks          |
+| `docs/sops-rekey.md`                  | The two sops identity planes, `.sops.yaml` anchors, rekey procedure, fresh-host bootstrap |
 | `docs/fleet-inventory.md`            | Pointer page — the catalog itself is `.#docs` (`nix build .#docs`), never committed |
 | `docs/modules-registry.md`           | Pointer page — the knob registry is built from `modules.toml` at build time |
 | `lib/aki-site.nix`                   | The rendered site (`.#fleet-docs-site`): nav comes from the knowledge graph |

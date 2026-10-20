@@ -23,6 +23,21 @@
 
 ## Ledger
 
+### 2026-10-20 — delphi: the user sops plane is derived, not copied
+
+- `modules/profiles/sops-user-identity.nix` (new, opt-in): activation derives
+  `~/.config/sops/age/keys.txt` from the host SSH key. A CA-only host has no user
+  keypair, and sops-nix's `generateKey` mints an unregistered one → `0 successful
+  groups`. The derived identity IS the `&delphi` recipient already in `.sops.yaml`, so
+  no rekey and nothing to back up. Verified: `age-keygen -y` → `age1fg8xy2g…`, `sops -d`
+  as `devji`, `checks:host HOST=delphi MODE=eval` 1816 assertions rc=0.
+- `docs/sops-rekey.md` (new): the two identity planes, anchor convention, rekey steps,
+  and the submodule `.sops.yaml` copy trap.
+- Public web verified: `/healthz` → `200`, SYN→SYN-ACK→ACK on `enp0s6`. The first ingress
+  attempt dropped with **0 packets on the wire** — the ports went into *Source* Port
+  Range, and an inbound connection's source port is ephemeral. Rule + method:
+  `.agents/deploy/hosts/delphi.md` Phase 4.
+
 ### 2026-10-19 — Graph queries, and the decision model's real accuracy
 
 - `ops:ask Q=…` / `scripts/task/kg-ask.sh`: English question → intent → jq over
@@ -120,22 +135,6 @@ Evidence: `nix eval .#agentSkills.count` → 43; `.#knowledgeGraph.graph.stats`
 
 - LAN-first NFS with verified tailnet fallback, `OnFailure` governor, `nix-gc`
   guard for GC roots on an absent NAS. Reboot path still unverified.
-
-### 2026-10-13 — Service modularization & System One prototypes
-
-- `fleet-governor`, `btrfs-watchdog`, `uds-static-bridge`, `ups-simulation-drill`,
-  `sqlite-maintenance`, `paperless-watchdog`, `kiwix-watchdog`,
-  `postgres-backup-drill`, `flake-advisory-audit`, `postgres-pgvector-audit`,
-  `fleet-session-reaper` graduated from `EXPERIMENTS.md` into `modules/services/`.
-- System One ensemble prototypes (EXP-065…072, 081, 083, 084, 087, 088, 097)
-  wired to `systemone-ensemble` + `task checks:decision:*`; these are
-  prototypes, not modules, and are recorded as such in the experiment index.
-
-### 2026-10-08 — Service extraction & lint convergence
-
-- Home Assistant stack, Kiwix, pastebin, iVentoy moved to `modules/services/`.
-- 181/181 Nix files alejandra-clean; deadnix/statix clean; SOPS drift zero.
-- Duplicate 52 GB Wikipedia ZIM reclaimed; single GC-rooted store path kept.
 
 ## Open debt (tracked in TODO.md)
 

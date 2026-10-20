@@ -21,8 +21,33 @@
 | Backups | local + BurgerNAS offsite; restore drill weekly; password in sops | `restic-drill.timer`, `task checks:restic:drill` |
 | DNS | resolver pair: frieren pihole+unbound, delphi crab-hole, one shared `10.99.0.53` | `task checks:dns:failover` |
 | Tailnet routes | `10.99.0.53/32` approved on both via `autoApprovers`; policy mirrored in the repo | `ops:tailnet:routes`, `ops:tailnet:policy` (both rc=0) |
+| Tailnet DNS | global `100.97.61.65, 10.99.0.53`, Override on, split empty — second entry is unroutable for three hosts | `ops:tailnet:dns` |
 
 ## Ledger
+
+### 2026-10-20 — Tailnet DNS is on, and its redundancy is not what it looks like
+
+- Live: global `[100.97.61.65, 10.99.0.53]`, Override on, split DNS empty. Both answer
+  (`photos.frieren.lan → 192.168.3.25`) and filter (`doubleclick.net → 0.0.0.0`).
+- **A subnet-route nameserver is invisible to hosts that refuse routes.** eisen, fern and
+  aristotle set `--accept-routes=false` deliberately (table 52 hijacks their LAN traffic),
+  so `10.99.0.53` is unreachable from them and `100.97.61.65` is their only resolver — a
+  frieren outage is total DNS loss there, Override or not.
+- **Route failover is node-level, not service-level.** crab-hole stopped on delphi — then
+  the `/32` primary — for 32 s and the route never moved: the node was online, the
+  resolver was not. There is no tailnet equivalent of the VRRP `vrrp_script`; the second
+  nameserver entry is what kept queries alive.
+- **delphi cannot be an equivalent resolver.** crab-hole has no static-record or zone
+  support (blocklist/downstream/upstream/api only), so `*.frieren.lan` is NODATA there —
+  and the `/32` is on delphi right now, so fleet names break for anyone using tailnet
+  DNS. `ops:tailnet:dns` fails on exactly this; split DNS for the zone is the cheap fix,
+  a dnsmasq zone front-end the equivalent-resolver one.
+- Recommended shape: list both resolver *node* addresses (`100.97.61.65`, `100.123.145.53`)
+  — routable without `--accept-routes`, and a service crash is covered by client retry
+  instead of a route takeover. `10.99.0.53` stays for LAN clients that hardcode it.
+- New gate `ops:tailnet:dns`: classifies each entry (node vs subnet route), probes the
+  zone and a blocked domain, and marks `local-bind` when the reporting host answers its
+  own probe. rc=0 today; the two notes above are the actionable part.
 
 ### 2026-10-20 — Tailnet route approval is tailnet state, not host state
 
@@ -96,51 +121,19 @@
 - eisen's Laya/Kev-4B endpoints were unreachable during the bench (all three
   timeouts), so those runners are SKIPPED, not scored.
 
-### 2026-10-19 — Context plane mk2
-
-- **Home AGENTS.md is a flake output.** `lib/home-agents.nix` renders
-  `.#homeAgents.<host>` (preamble + compiled host card + persona); frieren's
-  activation links it to `~/AGENTS.md`. The Python renderer and
-  `--home-agents`/`--sync-home` paths were removed; `dev:inventory:home-agents`
-  now builds the derivation. Verified: `nix build .#homeAgents.frieren` →
-  store path, `~/AGENTS.md` symlink, activation eval includes
-  `AGENTS-frieren.md`.
-
-- **Skills are compiled.** `lib/skills.nix` parses `.agents/skills/*/SKILL.md`,
-  emits `.#agentSkills` + `.#agentSkillsBundle`, and fails
-  `checks.<system>.skills-schema` on name/dir mismatch, missing/oversized
-  description, missing heading, or >400 lines. 43 skills indexed in ~0.12 s warm.
-- **One materializer.** `modules/user/ai/skills/default.nix` links the union of
-  `.agents/skills` and `modules/user/ai/skills` into `~/.agents/skills` and
-  `~/.gemini/config/skills`, and links `README.md`/`SCHEMA.md`. Managed names
-  are forced, so stale hand copies disappear.
-- **Knowledge graph.** `lib/knowledge-graph.nix` projects 34 hosts, 43 skills,
-  21 docs, 416 mention edges to `.#knowledgeGraph` (JSON + Cypher).
-- **Closed loop.** `modules/services/fleet-sentinel.nix` (frieren) records
-  failed units, watched oneshot results, generation age, disk and PSI every
-  15 min; serves `status.json` + static dashboard at `sentinel.frieren.lan`;
-  gatus asserts `[BODY].state == ok`; SimpleX bridge pages on 3 failures.
-- **Docs reclassified.** `ARCHITECTURE.md` (proposals), slim `AUDIT.md` /
-  `TODO.md` / `HANDOFF.md`, indexed `EXPERIMENTS.md`, `.agents/SCHEMA.md`.
-- **Tasks.** New `ops:*` shard (health, ledger, ledger:toon, skills, kg,
-  docs:budget, bench:evals); help map updated.
-
-Evidence: `nix eval .#agentSkills.count` → 43; `.#knowledgeGraph.graph.stats`
-→ `{docs:21, edges:416, hosts:34, skills:43}`; `task checks:tasks` clean;
-`task ops:skills` lists the index.
-
 > Retired to history on 2026-10-20 to keep this document inside its 150-line budget:
-> rebuild-path de-bloat and `nom` opt-in (10-19), closure-budget baseline (10-17),
-> the `nix flake check` eval-granularity defect EXP-114 (10-15), and the NAS path
-> governor (10-14). See `docs/history/audit-2026-10.md`.
+> context plane mk2 (10-19), rebuild-path de-bloat and `nom` opt-in (10-19),
+> closure-budget baseline (10-17), the `nix flake check` eval-granularity defect
+> EXP-114 (10-15), and the NAS path governor (10-14).
+> See `docs/history/audit-2026-10.md`.
 
 ## Open debt (tracked in TODO.md)
 
 1. `minyx` kernel conflict and `cassini` darwin assertion — both dormant, both
    reproducible with `MODE=eval`.
-2. `10.99.0.53/32` is advertised by both resolver nodes but approved by neither, so
-   the pair has no serving member off-host; `ops:tailnet:routes` exits 1 until the
-   console approval or an `autoApprovers` rule lands.
+2. Tailnet DNS lists `10.99.0.53`, which eisen/fern/aristotle cannot route
+   (`--accept-routes=false` is deliberate), so their failover is nominal; list both
+   resolver node addresses instead (`ops:tailnet:dns` reports the set).
 3. MQTT broker has no publisher/subscriber (HC-5); 7 of 11 `extraComponents`
    entries are dormant Python dependencies, not enabled components.
 4. Sentinel is frieren-local; fleet push is P1 in `ARCHITECTURE.md`.

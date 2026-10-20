@@ -152,6 +152,15 @@ in {
   # It listens on 0.0.0.0 rather than a hardcoded tailnet IP: the IP is assigned
   # by Tailscale at login and would otherwise have to be baked in. The firewall
   # (not the bind address) is what limits it to the tailnet.
+  #
+  # LIMIT, measured 2026-10-20: crab-hole is a forwarding ad-blocker, not an
+  # authoritative server — its config has blocklist/downstream/upstream/api and
+  # no static-record or zone support (LuckyTurtleDev/crab-hole). It therefore
+  # answers the internet but NOT the fleet's `*.frieren.lan` wildcard, so while
+  # the shared `10.99.0.53/32` route sits on this node every fleet name returns
+  # NODATA. `task ops:tailnet:dns` fails on exactly this, and
+  # docs/dns-failover.md lists the three fixes (split DNS for the zone is the
+  # cheap one; a dnsmasq zone front-end is the equivalent-resolver one).
   services.crab-hole = {
     enable = true;
     # openFirewall would open 53 globally; the scoped interface rule below is

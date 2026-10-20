@@ -469,6 +469,21 @@ tasks:
     cmds:
       - bash scripts/task/tailnet-routes.sh --approve "{{.HOST}}"
 
+  ops:tailnet:dns:
+    desc: "[gate] The tailnet nameserver list actually serves clients"
+    summary: >
+      Prints the global nameservers, MagicDNS and split-DNS state, then probes
+      each nameserver for the zone and for a known blocked domain. Classifies
+      every entry as a tailnet node address or a subnet route — a routed address
+      is unreachable from clients with `--accept-routes=false`, which is
+      deliberate on eisen, fern and aristotle. Exit 0 = every listed resolver
+      answers and filters, 1 = one does not, 2 = no credential. `override` is
+      console-only and invisible to the API, so the report says so instead of
+      guessing. Run it from a plain client: a `local-bind` entry is answered by
+      the reporting host's own bind, not by the routed path.
+    cmds:
+      - bash scripts/task/tailnet-dns.sh
+
   ops:tailnet:policy:
     desc: "[gate] The repo tailnet policy matches the live tailnet"
     summary: >

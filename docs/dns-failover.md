@@ -150,7 +150,7 @@ while the pair serves nothing.
 | Switch | Where it lives | What it decides | Today (2026-10-20) |
 | :--- | :--- | :--- | :--- |
 | **Route approval** | `enabledRoutes` on the device | whether packets to `10.99.0.53` are delivered at all | **approved on both** (via `autoApprovers`) |
-| **Nameservers** | tailnet DNS settings | whether tailnet clients *ask* `10.99.0.53` | none: `global: []`, `split DNS: {}`, MagicDNS on |
+| **Nameservers** | tailnet DNS settings | whether tailnet clients *ask* the pair | global `[100.97.61.65, 10.99.0.53]`, Override on, split empty |
 
 `tailscale set --advertise-routes` records an **offer**. Tailscale serves an
 offered subnet route only after approval (admin console, API, or an
@@ -250,21 +250,97 @@ approval no longer needs it at all.
 ### Point clients at it (the second switch)
 
 Approval only makes `10.99.0.53` **reachable**. Clients still resolve through
-their own resolvers until the tailnet DNS page says otherwise, and there are two
-shapes with different blast radius:
+their own resolvers until the tailnet DNS page says otherwise:
 
-* **Split DNS for `frieren.lan` → `10.99.0.53`.** The narrow one: only
-  `*.frieren.lan` lookups go to the pair, everything else keeps the device's own
-  resolver. Do not enable *Override DNS servers*. This is the default choice.
-* **Global nameserver `10.99.0.53` + Override DNS servers.** Every tailnet query
-  then depends on frieren or delphi, and you get the ad-blocking tailnet-wide.
-  Two consequences: a phone on hotel Wi-Fi loses DNS when both nodes are down,
-  and devices using an exit node use the **exit node** for DNS unless that
-  nameserver is marked *Use with exit node* (delphi is an exit node — see below).
+* **Split DNS for `frieren.lan` → the resolvers.** Narrow: only `*.frieren.lan`
+  lookups leave the device's own resolver.
+* **Global nameservers + Override DNS servers.** Every tailnet query goes through
+  the fleet's resolvers and gets the ad-blocking, at the cost of depending on
+  them for *all* name resolution.
 
-Tailscale cannot order nameservers deterministically, so do not list
-`192.168.3.25` and `10.99.0.53` expecting fallback: a client may query either
-first. That is why the pair shares one address instead of being two entries.
+**Live since 2026-10-20** — global `[100.97.61.65, 10.99.0.53]`, split DNS empty,
+Override on, MagicDNS on. It works (`photos.frieren.lan → 192.168.3.25`,
+`doubleclick.net → 0.0.0.0` from both entries), but the pair is not the redundancy
+it looks like, for two measured reasons:
+
+1. **A subnet-route nameserver is invisible to hosts that refuse routes.**
+   `10.99.0.53` is a route, and `--accept-routes` is *deliberately* off on eisen,
+   fern and aristotle (accepting frieren's `192.168.3.0/24` puts every LAN
+   connection into table 52 and hijacks it — Steam Link and LAN SSH both broke).
+   On those hosts the only working entry is `100.97.61.65`, so a frieren outage
+   is a total DNS outage there, Override or not.
+2. **Route failover is node-level, not service-level.** Stopping crab-hole on
+   delphi — then the `/32` primary — for 32 s left the route exactly where it
+   was, because the *node* was still online and Tailscale has no idea the
+   resolver behind it died. Only the second nameserver entry kept queries alive.
+   There is no tailnet equivalent of the VRRP `vrrp_script` that demotes a host
+   whose resolver stopped answering.
+
+**The shape that survives both:** list the two resolver *node* addresses.
+
+```
+100.97.61.65     frieren   (always routable — a node address needs no route)
+100.123.145.53   delphi    (idem, and the second implementation: crab-hole)
+```
+
+Node addresses need no `--accept-routes`, so every client gets two real
+resolvers and a service crash on either is covered by the client's own retry —
+no route takeover, no 32 s hole. Keep `10.99.0.53` advertised for what it is
+actually for: **LAN clients** configured by hand (or DHCP) and anything that
+hardcodes one stable address. It is not the tailnet's failover mechanism.
+
+Check the live list with `task ops:tailnet:dns` — it classifies each entry,
+probes it for the zone and for a blocked domain, and flags `local-bind` when the
+reporting host answers the probe itself. It also probes every node that
+*advertises* a listed address on its own node IP, which is the only way to see
+what the `/32` currently resolves through.
+
+### delphi is not an equivalent resolver (measured, and it cannot be one)
+
+`task ops:tailnet:dns` fails today, and this is why:
+
+```
+@100.97.61.65     photos.frieren.lan -> 192.168.3.25   doubleclick.net -> 0.0.0.0
+@100.123.145.53   photos.frieren.lan -> (no answer)    doubleclick.net -> NXDOMAIN
+```
+
+crab-hole is an ad-blocking **forwarder**, not an authoritative server: its config
+has `[blocklist]`, `[[downstream]]`, `[[upstream]]` and `[api]` — there is no
+static-record or zone feature, so `*.frieren.lan` cannot exist there at all. The
+`/32` is served by delphi right now, which means every fleet name that lands on
+`10.99.0.53` comes back NODATA.
+
+That also makes the pair non-interchangeable in the failover sense: losing
+frieren does not degrade to "the same answers", it degrades to "the internet
+resolves, the fleet's names do not".
+
+Three ways out, in increasing effort:
+
+1. **Split DNS for `frieren.lan` → `100.97.61.65`** and leave the globals for
+everything else. One console change, removes the NODATA race immediately. The
+zone stops failing over — acceptable, since every name in it points at frieren's
+own services.
+2. **Put a zone-capable resolver in front of crab-hole on delphi**: dnsmasq on
+`:53` with `address=/frieren.lan/192.168.3.25`. This is a type change, not a
+config flag — dnsmasq here is an authoritative wildcard server for one zone, not
+a second resolver.
+3. **Drop delphi from the DNS role**: `advertiseRoutes = []` on the `/32` and no
+delphi entry in the tailnet nameservers. delphi stays a tailnet-wide ad-blocker
+for public names only.
+
+Until one of those lands, prefer `100.97.61.65` as the nameserver for anything
+that needs `*.frieren.lan`, i.e. option 1.
+
+Tailscale cannot order nameservers deterministically (it queries them in
+parallel), so never list two entries expecting "first, then fallback" — and any
+public resolver added for safety will win some queries and leak past the block
+lists. Override with zero working entries is total DNS loss, including
+`login.tailscale.com`.
+
+Devices using an **exit node** resolve through the exit node instead of this
+list, unless a nameserver is marked *Use with exit node* in the console. delphi
+is the tailnet's exit node and runs crab-hole, so that case is currently
+consistent by accident rather than by configuration.
 
 ### Traps that belong to this design
 
@@ -300,7 +376,8 @@ first. That is why the pair shares one address instead of being two entries.
 * `modules/config/tailnet-policy.hujson` — the tailnet policy mirror (`autoApprovers`)
 * `scripts/task/tailnet-routes.sh` — `ops:tailnet:routes` / `ops:tailnet:approve`
 * `scripts/task/tailnet-policy.sh` — `ops:tailnet:policy` / `ops:tailnet:policy:apply`
-* `scripts/task/lib/tailnet-api.sh` — token resolution shared by both
+* `scripts/task/tailnet-dns.sh` — `ops:tailnet:dns` (nameserver set, classification, probes)
+* `scripts/task/lib/tailnet-api.sh` — token resolution shared by all three
 * `scripts/task/dns-failover-check.sh` — the check behind `checks:dns:failover`
 * `hosts/frieren/dns.nix` — the primary declaration
 * `docs/frieren-access.md` — service-access matrix

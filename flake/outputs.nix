@@ -110,7 +110,7 @@ in {
   # AGENTS.nix as a query surface: `nix eval .#agentsNotes.index` (no host
   # eval), `nix build .#agentsNotes.file` for the fixed JSON artifact.
   agentsNotes = {
-    inherit (agentsNotesCtl) schemaVersion counts issues ok index notes byHost byModule byTask byStatus open;
+    inherit (agentsNotesCtl) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
     file = agentDocs.writeText "agents-notes.json" agentsNotesCtl.json;
     json = agentsNotesCtl.json;
   };

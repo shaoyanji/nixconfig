@@ -25,6 +25,19 @@
 
 ## Ledger
 
+### 2026-10-20 — The design record gets edges, and a way in
+
+- Notes gained two directed fields, `from` (what this idea grew out of) and `supersedes`;
+  `ancestors`/`descendants`/`replacedBy` are derived by `lib/agents-notes.nix`. The gate
+  rejects a cycle, a self-edge, a `supersedes` target that is not `SUPERSEDED`, and a
+  `SUPERSEDED` note nobody claims.
+- `ops:notes:near Q=` is the novel-task entry (~1 s): ranked hits with `match n/total`,
+  lineage and refs. `ops:notes:lineage ID=` both directions; `ops:notes:doc` the fourth
+  reverse index (157 notes, 63 leaves, 4 edges). Rendered in `.#docs` and the site.
+- Seeded only edges the prose already claimed: `exp-113 ← exp-107`,
+  `decision-determinate-nix-fleet ← exp-determinate-nix-trial → nix-binary-upgrade-2026-10`,
+  `open-flake-bump-2-35-3 ← nix-binary-upgrade-2026-10`.
+
 ### 2026-10-20 — A check cannot offload its evaluation, only its build
 
 - `checks:host` gained three build-routing modes so the gate can never drift into spending

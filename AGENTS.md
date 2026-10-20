@@ -32,10 +32,13 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
 6. **This is a live host.** Bounded gates only, one host per process, no
    top-level evals during the 03:00–05:30 window, and no ssh in unattended
    paths. Watch `task ops:health` before blaming the config.
-7. **Where to write:** proposal and open work → an `AGENTS.nix` note
-   (`task ops:notes`; authoring: `agents-notes` skill); what happened →
-   `AUDIT.md`; history → `docs/history/`; procedure → `docs/` or a skill.
-   Never a new root markdown file.
+7. **Ask the record before you write.** A task that is novel to you starts with
+   `task ops:notes:near Q="<intent>"` (ranked notes, each with its lineage) and
+   `task ops:notes:lineage ID=<id>` — so an idea attaches to the one it grew out
+   of (`from`) instead of restating it. Then: proposal and open work → an
+   `AGENTS.nix` note (`task ops:notes`; authoring: `agents-notes` skill); what
+   happened → `AUDIT.md`; history → `docs/history/`; procedure → `docs/` or a
+   skill. Never a new root markdown file.
 8. **Do not read `AGENTS.nix` in full.** It is a ~3,500-line compiled data store;
    reading it whole wastes context. Query it with `task ops:notes[:host|:show|:search]`
    or `nix eval .#agentsNotes…` (0.2 s). Structural "what touches X" questions go to

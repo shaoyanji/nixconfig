@@ -35,9 +35,43 @@ until the first artifact is nameable.
 | id `[a-z0-9-]`, known `kind`, known `status`, valid `priority` | `checks.<system>.agents-notes-schema` |
 | `refs.hosts` names a real inventory host | same gate (eval-time check) |
 | `refs.modules` / `refs.docs` paths exist on disk | same gate |
-| `links` names an existing note id | same gate |
+| `links` / `from` / `supersedes` name an existing note, once, not itself | same gate |
+| `from`/`supersedes` form no cycle | same gate |
+| `supersedes` target is marked `SUPERSEDED` | same gate |
+| a `SUPERSEDED` note is claimed by some `supersedes` | same gate — no dead ends |
 | note **with** refs → body ≤30 lines | same gate — the code is the detail |
 | note **without** refs → body ≥6 lines | same gate — a leaf must carry intent |
+
+## Start here when the task is novel
+
+Before writing a note, ask the record whether the thing already exists — the
+experiments are a design record, not a graveyard, and the cost of asking is about
+a second (`nix eval` of the compiled index, then jq; no host eval).
+
+```bash
+task ops:notes:near Q="backups have never been restored"      # ranked, with lineage + refs
+task ops:notes:lineage ID=restic-drill-through-unit           # ancestors, descendants, replacement
+task ops:notes:task TASK=checks:build:route                   # why this task exists
+```
+
+`near` takes an intent, not keywords: stopwords are dropped and id/title/
+summary/refs weigh more than a body hit, so "builds are too slow on the laptop"
+returns the build-routing experiment rather than every note containing "slow".
+Each hit prints `match n/total` — an honest confidence, not a ranking to obey.
+
+Read the answer by **status**, because that is the difference between a solved
+area and an open one:
+
+| Hit | What it means | What to do |
+| :--- | :--- | :--- |
+| `DELIVERED`, has descendants | solved, and the solving was already extended | read the descendant and the `refs`; do not rebuild it |
+| `DELIVERED`, no descendants | solved, nobody built on it | reference it, then decide: extend it (`from`) or leave it closed |
+| `PROPOSED` / `OPEN`, refs | live work with an artifact | read `refs.tasks` first — the gate says how far it got |
+| `PROPOSED`, leaf (no refs) | an idea owing a commit | promote it or `REJECTED` it with the reason; do not add a second leaf beside it |
+| `REJECTED` | tried and killed | read the number that killed it before proposing the same thing |
+
+An empty answer is a real answer: nothing in the record is near this intent, so
+the first artifact you name becomes the note.
 
 ## Pick the kind by what can make it untrue
 
@@ -68,6 +102,7 @@ part that turns an idea into something a future agent can find from the code.
       status = "PROPOSED";
       date = "2026-10-19";
       summary = "Hypothesis, and the measurement that would settle it.";
+      from = ["exp-107"];                           # optional: the note this grew out of
       refs = {
         hosts = ["frieren"];                        # inventory names only
         modules = ["modules/services/thing.nix"];   # where the trying lives (must exist)
@@ -172,7 +207,21 @@ leaf experiment (no refs, verbose intent)
   → IN FLIGHT (+ refs.modules = what landed so far)    ← partial, be specific
   → DELIVERED (+ refs.modules = the landed module, refs.tasks = the gate)
   → one line in AUDIT.md, note stays as the design record
+  → someone writes a note with from = [this]           ← provenance, not a tombstone
 ```
+
+That last rung is the one that gets skipped, and skipping it is why a delivered
+note is unreadable six months later: the module says *what* landed, only the
+edge says *what it was an answer to*. Two fields, both new → old:
+
+- `from` — this note exists because of that one (grew out of, closes, inspired
+  by). Transitive: ancestry is a chain, and `ops:notes:lineage` prints it.
+- `supersedes` — this note replaces that one; the gate then requires the target
+  to be `SUPERSEDED`, and `replacedBy` is derived on the target. Never delete
+  the replaced record: the rejection reason is the expensive part.
+
+`links` stays for "same thread" with no order claimed. If you are unsure which
+of the three you have, you have `links`.
 
 The rung between "idea" and "delivered" is where slop forms. Two rules keep it
 code:
@@ -198,8 +247,9 @@ code:
 - **One outcome per note.** Two exit criteria = two notes with a `links` edge.
 - **`summary` sells the decision, not the topic.** It is what `ops:notes`
   prints; "Investigate X" tells the next agent nothing.
-- **Related notes use ids** in `links`, never titles — a rename must not orphan
-  the edge.
+- **Related notes use ids**, never titles — a rename must not orphan the edge.
+- **Do not restate lineage in prose.** "This supersedes X" in `body` is a claim
+  the gate cannot check; `supersedes = ["X"]` is the same sentence, checked.
 - **Update `date` when status changes.** It is the only recency signal.
 
 ## Verify before you commit
@@ -208,18 +258,19 @@ code:
 task ops:notes:show ID=<id>                        # the note as the compiler sees it
 nix eval --json .#agentsNotes.issues | toon -e               # [] = clean (0.2 s, no host eval)
 nix build --builders "" .#checks.x86_64-linux.agents-notes-schema   # the gate
+task ops:notes:lineage ID=<id>                     # from / supersedes / descendants / replacedBy
 task ops:notes:module PATH=<path in refs.modules>  # reverse lookup: which notes touch this file
 task ops:notes:task TASK=<task in refs.tasks>      # reverse lookup: why this task exists
+task ops:notes:doc DOC=<path in refs.docs>         # reverse lookup: why this contract looks like this
 ```
 
-The reverse index covers `refs.modules` and `refs.tasks` only. For a note you
-found through a document, use `task ops:notes:search Q=<filename or phrase>` —
-`refs.docs` has no reverse edge (there is no second index to drift).
+All four reverse indexes (`:host`, `:module`, `:task`, `:doc`) are compiled from
+the same `refs` block, so there is nothing to keep in sync by hand.
 
-**Common trap:** a skill or runbook path stored under `refs.docs` will not be
-found by `ops:notes:module` — that task reads `refs.modules`. Keep the
-classification honest: `refs.modules` is code you could edit; `refs.docs` is the
-contract that explains it.
+**Common trap:** a skill or runbook path stored under `refs.docs` is not found by
+`ops:notes:module` — that task reads `refs.modules`. Keep the classification
+honest: `refs.modules` is code you could edit; `refs.docs` is the contract that
+explains it.
 
 Then check the surfaces actually updated:
 
@@ -235,8 +286,8 @@ task ops:docs:budget                              # stubs stayed stubs
 | :--- | :--- |
 | markdown | `.#docs` → `docs/generated/agents-notes.md` + one page per note, refs as repo links |
 | site | `.#fleet-docs-site` → Planner → **Agent notes (AGENTS.nix)**, one slice per note |
-| query | `task ops:notes[:show\|:host\|:module\|:task\|:search]` |
-| code | `nix eval .#agentsNotes.{index,byHost,byModule,byTask,byStatus,open}` |
+| query | `task ops:notes[:near\|:lineage\|:show\|:host\|:module\|:task\|:doc\|:search]` |
+| code | `nix eval .#agentsNotes.{index,lineage,byHost,byModule,byTask,byDoc,byStatus,origins,frontier,open}` |
 
 ## Related
 

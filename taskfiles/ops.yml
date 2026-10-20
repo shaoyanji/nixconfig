@@ -599,13 +599,16 @@ tasks:
             "nix eval --json .#agentSkills.count"
 
   ops:notes:
-    desc: List AGENTS.nix notes (decisions, queue, design studies)
+    desc: List AGENTS.nix notes or find the ones near an intent
     summary: >
       The human surface over `.#agentsNotes.json` (lib/agents-notes.nix).
       No args lists every note; STATUS= and KIND= filter. Each row is one note
       with its schema status and kind. AGENTS.nix replaced ARCHITECTURE.md,
       TODO.md, HANDOFF.md and EXPERIMENTS.md on 2026-10-19: a note with refs is
       distilled, a leaf carries the original intent in prose.
+      Starting something not in this repo yet? `ops:notes:near Q=<intent>`
+      ranks notes against it and shows each one's lineage — that is the entry
+      point for a novel task, before any file is written.
       Author or promote one with the `agents-notes` skill (templates, field
       rules, promotion ladder: a note graduates by gaining `refs.modules` and
       the gate task, never by becoming a new markdown file).
@@ -646,6 +649,51 @@ tasks:
       deleting a task: the notes explain why it exists.
     cmds:
       - bash scripts/task/notes.sh task "{{.TASK | default ""}}"
+
+  ops:notes:near:
+    desc: Rank the notes near an intent (Q= required) — the novel-task entry
+    summary: >
+      Q= is an intent in your own words ("backups have never been restored"),
+      not a keyword: the query is tokenised, stopwords dropped, and each note
+      scored on id/title/summary/refs (strong) plus a body substring (weak).
+      Every hit prints `match n/total` and, when it has any, its lineage and
+      refs — so the answer to "has this been tried?" arrives with the note that
+      came out of it and the task that proves it. LIMIT= is the row count
+      (default 8). ~1 s: one eval of the compiled index plus jq; there is no
+      cache, because a stale note index is worse than a second of latency.
+      An empty answer is a real answer: nothing in the design record is near
+      this intent. FORMAT=json emits the ranked records.
+    requires:
+      vars: [Q]
+    cmds:
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh near "{{.Q}}" "{{.LIMIT | default 8}}"
+
+  ops:notes:lineage:
+    desc: Print a note's design provenance in both directions (ID= required)
+    summary: >
+      `from` (what this idea grew out of), `supersedes` / `replaced by` (the
+      retirement record), the transitive ancestry and what it led to. ID is
+      required. This is a LOOKUP, not a walk: lib/agents-notes.nix compiles the
+      closure, so the query is the same one eval as every other note read.
+      A note with no descendants is a frontier note — the place a new idea
+      attaches with `from`, which is how the design record stays a line rather
+      than a pile. FORMAT=json emits the lineage record.
+    requires:
+      vars: [ID]
+    cmds:
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh lineage "{{.ID}}"
+
+  ops:notes:doc:
+    desc: Print the notes that reference DOC (DOC= required)
+    summary: >
+      DOC is repo-relative (e.g. .agents/SCHEMA.md). The reverse of the
+      docs -> notes edge: read a contract or runbook, then ask why it is shaped
+      that way. Alongside :host, :module and :task this is the fourth reverse
+      index, all compiled from the same refs — none is hand-maintained.
+    requires:
+      vars: [DOC]
+    cmds:
+      - bash scripts/task/notes.sh doc "{{.DOC}}"
 
   ops:notes:search:
     desc: Full-text search over AGENTS.nix notes (Q= required)

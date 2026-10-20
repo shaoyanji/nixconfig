@@ -127,7 +127,7 @@ nix eval .#agentSkills.count                 # 1.2 s, no host eval
 nix build .#checks.x86_64-linux.skills-schema -L
 ```
 
-## 5. Experiment lifecycle
+## 5. Experiment lifecycle, and its lineage
 
 ```
 idea → AGENTS.nix note (kind = experiment, status = PROPOSED; leaf → verbose intent)
@@ -148,6 +148,38 @@ an experiment — it is either prod (point the note's refs at the module) or rot
 (mark it `SUPERSEDED`, or `REJECTED` with the reason; never delete the record).
 `task ops:notes KIND=experiment` is the current set.
 
+### Edges: how a new idea reaches an old one
+
+Refs point at code. Edges point at thinking, and a note with neither is a file
+nobody finds twice. Three fields; only two of them are directed:
+
+| Field | Claim | Gate (`agents-notes-schema`) |
+| :--- | :--- | :--- |
+| `links` | same thread, no order claimed | target is a real note |
+| `from` (new → old) | this note exists because of that one: grew out of it, closes it, was inspired by it | target is real, no self-edge, no cycle |
+| `supersedes` (new → old) | this note replaces that one | target is real **and marked `SUPERSEDED`** |
+
+`ancestors`, `descendants` and `replacedBy` are **derived, never stored** — one
+edge, one home. A `SUPERSEDED` note that nothing claims fails the gate, because
+SCHEMA §3 says retirement links the replacement and a dead end is not a record.
+
+**Before writing anything, ask the record.** This is the novel-task entry, and
+it costs about a second:
+
+```bash
+task ops:notes:near Q="backups have never been restored"   # ranked, with lineage + refs
+task ops:notes:lineage ID=<note>                           # where it came from, what it led to
+```
+
+Read the answer by status, not by relevance alone:
+
+- `DELIVERED` **with** descendants — solved area; read the descendant, do not
+  repeat the work. This is what the finished note is *for*.
+- `PROPOSED`/`OPEN` **with no descendants** — a frontier: the live end of a line,
+  and where a new note attaches with `from`.
+- `PROPOSED` **leaf** — an idea that owes a commit; promote or reject it rather
+  than adding a second leaf beside it.
+
 Authoring contract, field rules, templates and the verification commands:
 `.agents/skills/agents-notes/SKILL.md`.
 
@@ -158,6 +190,8 @@ Authoring contract, field rules, templates and the verification commands:
 - Is this history? Put it in `docs/history/` and add one ledger line in `AUDIT.md`.
 - Is this a proposal or open work? An `AGENTS.nix` note with an exit criterion
   and refs to the nodes it affects (or a verbose leaf if none exist yet).
+- Does it grow out of something that already exists? Add `from`. An idea with no
+  ancestry is indistinguishable from one nobody checked, and gets re-litigated.
 - Is this a one-off measurement? Keep it in the PR/commit; only the conclusion
   belongs in a note.
 - Does it name a command that does not exist? Run it before writing it.

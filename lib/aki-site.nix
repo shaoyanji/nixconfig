@@ -705,7 +705,15 @@
         ++ lib.optional (e.refs.modules != []) ["modules" (lib.concatStringsSep ", " e.refs.modules)]
         ++ lib.optional (e.refs.tasks != []) ["tasks" (lib.concatStringsSep ", " e.refs.tasks)]
         ++ lib.optional (e.refs.docs != []) ["docs" (lib.concatStringsSep ", " e.refs.docs)]
-        ++ lib.optional (e.links != []) ["related" (lib.concatStringsSep ", " e.links)];
+        ++ lib.optional (e.links != []) ["related" (lib.concatStringsSep ", " e.links)]
+        # Same four lineage rows as the markdown page (lib/agents-notes.nix), and
+        # the same subtraction: a superseding note is also a descendant, so it
+        # prints once, on `replaced by`.
+        ++ lib.optional (e.from != []) ["from" (lib.concatStringsSep ", " e.from)]
+        ++ lib.optional (e.supersedes != []) ["supersedes" (lib.concatStringsSep ", " e.supersedes)]
+        ++ lib.optional (e.replacedBy != []) ["replaced by" (lib.concatStringsSep ", " e.replacedBy)]
+        ++ lib.optional (e.descendants != [] && lib.subtractLists e.replacedBy e.descendants != [])
+        ["led to" (lib.concatStringsSep ", " (lib.subtractLists e.replacedBy e.descendants))];
       row = r: ''<tr><th>${escH (builtins.head r)}</th><td><code>${escH (builtins.elemAt r 1)}</code></td></tr>'';
     in {
       name = "data/agents-notes/${id}.json";

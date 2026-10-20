@@ -692,6 +692,7 @@
         modules = ["modules/global/global.nix"];
         docs = [".agents/deploy/hosts/eisen.md"];
       };
+      from = ["nix-binary-upgrade-2026-10"];
       body = ''
         Rehearsed and landed from eisen (24c/59 GiB), never frieren: `nix flake update`
         moved 20 input nodes — nixpkgs `aa48d347` -> `f20cd90e`, nix-darwin,
@@ -726,7 +727,8 @@
         ];
         docs = [".agents/deploy/README.md"];
       };
-      links = ["exp-determinate-nix-trial" "nix-binary-upgrade-2026-10"];
+      from = ["exp-determinate-nix-trial"];
+      supersedes = ["nix-binary-upgrade-2026-10"];
       body = ''
         The 2026-10-19 rejection named three disqualifiers: an imperative upgrader,
         ownership of `/etc/nix/nix.conf`, and a forked nix-eval-jobs. The trial refuted
@@ -3495,6 +3497,7 @@
       refs = {
         modules = ["scripts/task/warm-host.sh"];
       };
+      from = ["exp-107"];
     };
     exp-114 = {
       title = "EXP-114 — The eval-granularity defect";

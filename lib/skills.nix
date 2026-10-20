@@ -1,18 +1,4 @@
 # Skills as compiled data.
-#
-# `.agents/skills/*/SKILL.md` was 40 hand-maintained files with a hand-maintained
-# index in `.agents/README.md` and no gate: a missing description, a directory
-# that disagreed with its `name:`, or a 900-line skill could all land silently.
-# This file makes the skill tree a *compiled* artifact, the same way
-# `lib/inventory.nix` compiles `inventory.toml`:
-#
-#   * parse the YAML frontmatter (the subset the schema allows — no YAML parser),
-#   * normalise optional fields,
-#   * collect hard errors + soft warnings,
-#   * emit a machine index (`.#agentSkills`) and a store bundle (`.#agentSkillsBundle`).
-#
-# It evaluates no host configuration and reads only `.agents/skills`. Cost is a
-# few milliseconds, which is why `task ops:skills` can be a gate instead of a ritual.
 {lib}: let
   root = ../.agents/skills;
 

@@ -1,13 +1,4 @@
 # Shell builder function to eliminate duplication across devShells
-# Usage:
-#   { pkgs }: let
-#     builder = import ./builder.nix { inherit pkgs; };
-#   in builder.mkDevShell {
-#     name = "flaskpy";
-#     packages = with pkgs; [ common.python-flask ];
-#     greeting = "Hello, Flask!";
-#     extraHooks = [ hooks.greeting ];
-#   }
 {
   pkgs,
   lib,

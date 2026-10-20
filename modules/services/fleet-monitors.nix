@@ -1,24 +1,4 @@
 # Fleet monitors as code (HC-6).
-#
-# Why a module and not Uptime-Kuma monitors: Kuma runs on frieren with **0
-# monitors**, so nothing in the fleet is actually watched — not the nightly restic
-# job, not the 04:00 `autoUpgrade`, not DNS, not the nginx vhosts. Declaring Kuma's
-# monitors in Nix is blocked by the product, not by effort: Kuma 2.5.5's HTTP API
-# is read-only (`GET /api/entry-page`, `GET /api/badge/:id/*`) and monitor CRUD
-# lives on Socket.IO. Seeding its SQLite DB from Nix is rejected for the same
-# reason as seeding Home Assistant's `.storage` (see
-# `modules/services/home-assistant.nix`): it is versioned state the application
-# owns and rewrites.
-#
-# So the monitor *definitions* live here as Nix state, and a backend whose
-# definition **is** a config file is what consumes them — gatus, through nixpkgs'
-# `services.gatus`. Kuma can keep the dashboard for humans.
-#
-# Endpoints probe `127.0.0.1` by design, so entering one needs no
-# `hosts/frieren/firewall-scope.nix` change. The web UI is loopback-only and
-# reached through nginx, which is why `openFirewall` defaults to false — a hole
-# with only a loopback listener behind it is the REDUNDANT class `checks:ports`
-# flags.
 {
   config,
   lib,

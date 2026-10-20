@@ -56,6 +56,9 @@
     inherit lib inventory;
     skills = skillsCtl;
   };
+  # The rules the docs state, as predicates (flake/policies.nix). Compiled once
+  # and asserted by `checks.policies`; docs cite an id instead of explaining it.
+  policiesCtl = import ./policies.nix {inherit lib;};
   agentDocs = pkgsFor "x86_64-linux";
 in {
   packages = import ./packages.nix {
@@ -67,8 +70,11 @@ in {
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
-    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl;
+    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl;
   };
+
+  # `nix eval .#policies.uncitedPolicies` — the docs' rule registry as data.
+  inherit (policiesCtl) policies ids citedIds danglingCitations uncitedPolicies unenforcedHardRules;
 
   # Per-host evaluation gate, one host per attribute so a run costs one host's
   # worth of evaluator heap instead of the whole fleet's. Not part of `checks`

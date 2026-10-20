@@ -36,7 +36,7 @@ tasks:
       refuses it on machines this small, and there is deliberately no task in this
       repo whose default is every host.
     cmds:
-      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets
+      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets .#checks.x86_64-linux.policies
       - task checks:inventory:sync
       - task checks:repo:paths
       - task checks:docs:links

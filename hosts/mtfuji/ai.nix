@@ -1,7 +1,4 @@
 # Decommissioned AI-host reference (2026-09): the agent-era modules
-# (nullclaw, hermes, xs, pancakes-harness, ai-services-*) were removed from
-# the repo. mtfuji keeps ollama and the btrfs subvol mounts for the
-# nullclaw/ollama data that still lives on disk.
 {
   fileSystems = {
     "/var/lib/nullclaw" = {

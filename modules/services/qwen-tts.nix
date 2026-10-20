@@ -1,37 +1,4 @@
 # qwen-tts — offline Qwen3-TTS text-to-speech served over OpenAI-compatible HTTP.
-#
-# Runtime: ServeurpersoCom/qwentts.cpp, a C++17/GGML port of Qwen3-TTS 12 Hz
-# (MIT; upstream model + codec are Apache-2.0). It builds against the bundled
-# ggml submodule with a Vulkan backend, so it runs on the RX 5700 (Navi 10)
-# where ROCm is unavailable. The runtime already ships an OpenAI-compatible
-# `tts-server`, so this module WRAPS that rather than writing a Python server:
-# fewer moving parts, and the engine's streaming path is used as-is.
-#
-# Weights are the pre-converted GGUFs from Serveurperso/Qwen3-TTS-GGUF. Two
-# files load together: a "talker" LM (per mode/size/variant) and a shared
-# "tokenizer" codec (SEANet+ConvNeXt+DAC, RVQ). Q4_K_M is the low-VRAM variant
-# (~1.2 GB talker) which leaves headroom on an 8 GB card that Qwen may also be
-# using; Q8_0 (~2.1 GB) is the upstream-recommended quality default.
-#
-# Exposure mirrors llm-server.nix / decision-models.nix: an nginx *.lan vhost on
-# :80 and a `tailscale serve` listener. The ListeningPort itself is loopback-only
-# and is deliberately NOT added to the firewall; the LAN + tailnet are the trust
-# boundary, exactly as for the LLM and the decision model.
-#
-# On-demand: the server is NOT started at boot. systemd holds `port`
-# (qwen-tts.socket); the first connection activates `qwen-tts-proxy`, a
-# `systemd-socket-proxyd` that starts the model server and forwards to it.
-# tts-server cannot take an inherited listening FD, so the proxy is what makes
-# socket activation possible without a Python data plane; its ExecStartPre
-# waits for the backend's /health before proxying, which keeps the first
-# request's connection queued in the socket backlog instead of failing with
-# ECONNREFUSED while the GGUFs load (~15 s). `--exit-idle-time` makes the
-# proxy exit after `idleTimeout` with no open connection, and the
-# qwen-tts-idle timer then stops the backend, freeing its ~3.8 GiB RSS
-# (weights + the 896 MiB KV cache allocated at startup). The socket keeps
-# listening, so the next request wakes everything again. Nothing may `want`
-# qwen-tts — nginx and tailscale-serve-tts deliberately do not — or boot would
-# pull the model server up and defeat on-demand.
 {
   config,
   lib,

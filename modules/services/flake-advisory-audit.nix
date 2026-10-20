@@ -1,8 +1,4 @@
 # Declarative Flake Lock Drift & Security Advisory Audit Unit (EXP-044).
-#
-# Periodically inspects flake.lock input pins, evaluates input freshness, audits core
-# security dependencies (nixpkgs, home-manager, sops-nix) against staleness thresholds,
-# and flags archival or drifting dependencies before weekly autoUpgrades.
 {
   config,
   lib,

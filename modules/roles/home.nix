@@ -1,5 +1,4 @@
 # Unified user desktop role (merged home.nix and heim.nix)
-# Primary user constants: modules/global/user.nix
 {
   config,
   lib,
@@ -23,7 +22,7 @@ in {
     ../user/desktop/niri.nix
     ../user/desktop/multimedia.nix
     ../user/kg-sidecar.nix
-    ../kitty
+    ../kitty.nix
   ];
 
   programs = {

@@ -1,8 +1,4 @@
 # Declarative PostgreSQL Vector (pgvector/vchord) Index Health, Maintenance & Vacuum Drill (EXP-045).
-#
-# Periodically inspects high-dimensional vector tables (face_search, smart_search) in Immich DB,
-# validates pgvector and vchord extension integrity, executes VACUUM (VERBOSE, ANALYZE) to trigger
-# vchord index page compaction and prevent fragmentation, and monitors index sizes.
 {
   config,
   lib,

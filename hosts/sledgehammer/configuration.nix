@@ -1,6 +1,4 @@
 # Sledgehammer — NixOS USB stick for fleet provisioning.
-# Boots headless with everything needed to set up a new machine:
-# SOPS decrypt, SSH, git, age key tools, nixos-install.
 {
   lib,
   pkgs,

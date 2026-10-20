@@ -1,6 +1,4 @@
 # LLM and Decision Model Router Service Module
-# Routes /v1/chat/completions to local llama-swap (Qwen3.6-35B-A3B)
-# Routes /v1/decisions to TypeSafe Jev (cloud) with automatic fallback to local Laya (:8090)
 {
   config,
   lib,

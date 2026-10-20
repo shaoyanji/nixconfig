@@ -1,11 +1,4 @@
 # Hardware configuration for OCI Ampere A1 (aarch64-linux, UEFI, VirtIO).
-#
-# NOTE: a declarative disko layout for the same disk lives in ./disko.nix,
-# and it is imported into the flake alongside the disko NixOS module
-# (flake/host-inventory.nix). fileSystems are owned there — do not add
-# fileSystems entries here, or the two definitions collide at eval time.
-# That import is also what lets nixos-anywhere partition the disk:
-#   nix run github:nix-community/nixos-anywhere -- --flake .#delphi --target-host ubuntu@<ip>
 {
   lib,
   modulesPath,

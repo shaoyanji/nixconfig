@@ -1,25 +1,4 @@
 # iventoy — PXE boot server for the /Volumes/data/isos collection.
-#
-# Serves the ISO library over PXE/HTTPBoot to UEFI + Legacy BIOS clients on
-# 192.168.3.0/24 WITHOUT running a competing DHCP server: the router
-# (192.168.3.1) owns all DHCP leases. iVentoy's Proxy/ProxyNet modes only
-# ANSWER with next-server + bootfile options (they never lease IPs).
-#
-# Ports (upstream doc_portnum):
-#   UDP 67/69  DHCP-proxy/TFTP (ProxyNet listens on 67 too)
-#   UDP 4011   ProxyDHCP
-#   TCP 16000  PXE HTTP streaming
-#   TCP 26000  Web management UI
-#
-# ONE-TIME MANUAL STEP (first start only — web UI is up regardless):
-#   1. Open http://frieren.lan:26000
-#   2. Configuration -> DHCP Server Mode -> "ProxyNet" (iVentoy on Linux,
-#      router DHCP on a different OS — see upstream doc_ext_dhcp).
-#   3. Select server IP 192.168.3.25 / enp1s0, then click the green Start
-#      button once. Settings persist in /srv/iventoy/data/iventoy.dat and
-#      the -R auto-start flag replays them on every subsequent boot.
-#   NOTE: until the green Start is clicked, only the web UI runs — no DHCP
-#   service is active, so there is zero risk to the LAN's DHCP.
 {
   pkgs,
   lib,

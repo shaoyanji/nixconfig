@@ -1,13 +1,4 @@
 # Declarative Btrfs Silent Corruption & Device Error Watchdog (EXP-022).
-#
-# Periodically probes Btrfs hardware error counters (write_io_errs, read_io_errs,
-# flush_io_errs, corruption_errs, generation_errs) across declared mount points.
-#
-# Detects silent bit rot, cable glitches, and deteriorating media without waiting
-# for unrecoverable read failures or manual `btrfs device stats` checks.
-#
-# Emits structured journal alerts and fails the systemd unit so that daily audits
-# (SYSTEM.md) or systemd OnFailure triggers can alert immediately.
 {
   config,
   lib,

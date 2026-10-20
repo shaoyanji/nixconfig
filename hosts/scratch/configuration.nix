@@ -1,26 +1,4 @@
 # scratch — Fujitsu ESPRIMO D556 (i5-6500) niri desktop.
-#
-# Hardware:
-#   CPU:  Intel i5-6500 (Skylake, 4c/4t)
-#   GPU:  Intel HD Graphics 530 (iGPU, modesetting + Mesa)
-#   RAM:  8 GB DDR4
-#   SSD:  128 GB f2fs (shaky — disk IO is deliberately minimised)
-#   Boot: legacy BIOS + GRUB (ext4 /boot — NOT a vfat ESP)
-#
-# Role:  Lightweight desktop mirroring eisen/poseidon: niri compositor
-#        with the DankMaterialShell greeter, autoLogin into niri
-#        (globalModulesNixos chain → role:heim userland).
-#
-# History: previously a Steam Remote Play kiosk (greetd auto-login into
-#          cage + steam -gamepadui, mirroring ares/eisen/kellerbench).
-#          Steam was dropped entirely in the 2026-09 desktop conversion.
-#
-# Disk-IO diet (shaky f2fs SSD → "almost a ramfs") — kept verbatim:
-#   - zram 100% zstd swap, no disk swap at all
-#   - /var/log, /tmp, /var/tmp, /var/cache and ~/.cache on tmpfs
-#     (8 GB RAM budget)
-#   - journald volatile (RAM only), core dumps disabled
-#   - weekly fstrim + noatime + gentle writeback sysctls
 {
   lib,
   pkgs,

@@ -1,9 +1,4 @@
 # Declarative PostgreSQL Logical Backup Verification Drill (EXP-042).
-#
-# Periodically spins up an isolated, ephemeral PostgreSQL cluster in a temporary directory,
-# restores nightly pg_dump snapshots (e.g. /srv/backup/postgresql/immich.sql.gz), verifies
-# schema integrity, extension loading (pgvector, vchord), and core table row counts,
-# and cleans up completely, proving database recoverability before disaster strikes.
 {
   config,
   lib,

@@ -1,11 +1,4 @@
 # Declarative Hardware UPS Clean-Poweroff Simulation Drill & Telemetry (EXP-029).
-#
-# Periodically inspects frieren's internal battery hardware (Lenovo L16M2PB1)
-# and AC power adapter to model battery health degradation, discharge runtime
-# under active NAS workloads, and verify UPower clean poweroff thresholds.
-#
-# Probes sysfs directly without cutting power, verifying that the hardware UPS
-# will safely sustain or shut down the mainframe during a power failure.
 {
   config,
   lib,

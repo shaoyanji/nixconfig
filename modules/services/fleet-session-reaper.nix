@@ -1,8 +1,4 @@
 # Declarative SSH Bastion & Inactive Session Reaper (EXP-046).
-#
-# Periodically sweeps active user sessions, detects abandoned scopes and lingering
-# remote SSH terminal sessions idle beyond maxIdleHours, rigorously preserves
-# multiplexers (tmux, screen, agy), and terminates stale sessions via loginctl.
 {
   config,
   lib,

@@ -1,15 +1,6 @@
 # One nginx cache policy for compiled static trees.
-#
-# The fleet docs site is served twice: over HTTP (`hosts/frieren/reverse-proxy.nix`)
-# and over the UNIX-domain-socket bridge (`modules/services/uds-static-bridge.nix`).
 # Both serve the same immutable store path, so the policy that describes it must
-# exist once. Four copies of `open_file_cache …` used to live in those two files;
 # only `Cache-Control` differed between the HTML and the content-hashed assets.
-#
-# Consume as:
-#   extraConfig = staticCache.html;              # HTML + JSON
-#   extraConfig = staticCache.hashed;            # *.css / *.js (hashed names)
-#   extraConfig = staticCache.html + ''…'';      # append site-specific headers
 {
   # Public for an hour, tolerated stale for a day: the bytes are a store path,
   # so a rebuild changes the path and a stale copy is never wrong for long.

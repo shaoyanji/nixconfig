@@ -1,10 +1,4 @@
 # NOTE: the dms/niri greeter used to live here but is now extracted to
-# ./impermanence-greeter.nix.  Even `lib.mkIf false` cannot define the
-# `programs.dank-material-shell` path on noDE hosts — the module system
-# walks config paths structurally and throws "option does not exist"
-# before mkIf conditions are evaluated.  Desktop hosts (dms in closure)
-# import ./impermanence-greeter.nix alongside this profile; noDE kiosks
-# (e.g. ares) import only this one.
 _: {
   boot.initrd.systemd.services = {
     impermanence-root = {

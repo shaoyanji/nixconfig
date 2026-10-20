@@ -1,24 +1,4 @@
 # fern — HP 15 laptop (Ryzen 3 3250U) niri desktop.
-#
-# Hardware:
-#   CPU:  AMD Ryzen 3 3250U (Picasso/Zen+, 2c/4t, 15 W)
-#   GPU:  AMD Radeon Vega 3 iGPU (Mesa/radeonsi via amdgpu)
-#   RAM:  8 GB DDR4
-#   Disk: single SSD (disko: ESP + 8G swap + btrfs /root,/nix)
-#
-# Role:  Lightweight desktop mirroring scratch (NO Steam — deliberately
-#        not imported): niri compositor with the DankMaterialShell
-#        greeter, autoLogin straight into niri
-#        as devji (globalModulesNixos chain → role:heim userland).
-#        modules/profiles/laptop.nix adds auto-cpufreq (powersave on
-#        battery, performance on AC) + libinput for the touchpad.
-#
-# Storage: persistent btrfs (no impermanence), monthly scrub below.
-#
-# NOTE: this host's LAN address is DHCP. Never write fern's 192.168.3.x
-# address into this file (or any other) — it changes on lease renewal. A
-# stable handle is its tailnet name (`fern`) / tailnet address, or a DHCP
-# reservation made on the router.
 {
   pkgs,
   lib,

@@ -1,11 +1,4 @@
 # Declarative Zero-TCP Static Documentation Bridge via UNIX Domain Sockets (EXP-024).
-#
-# Serves immutable static documentation and hypermedia assets (Aki fleet docs,
-# NixOS manuals, closure graphs) directly over a local filesystem UNIX domain socket
-# (unix:/run/uds-docs/docs.sock) rather than loopback TCP ports (127.0.0.1:PORT).
-#
-# Eliminates loopback TCP 3-way handshakes, packet framing, and port collisions,
-# while enforcing POSIX filesystem DAC security (0660 / group: users).
 {
   config,
   lib,
@@ -21,9 +14,9 @@
     host = config.networking.hostName;
   };
 
-  # Same cache policy the HTTP vhost uses (modules/config/nginx/static-cache.nix):
+  # Same cache policy the HTTP vhost uses (modules/config/nginx-static-cache.nix):
   # one store path, one set of cache directives.
-  staticCache = import ../config/nginx/static-cache.nix;
+  staticCache = import ../config/nginx-static-cache.nix;
 in {
   options.services.udsStaticBridge = {
     enable = lib.mkEnableOption "declarative zero-TCP static documentation bridge via UNIX domain sockets";

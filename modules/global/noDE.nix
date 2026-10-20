@@ -1,8 +1,4 @@
 # Container/no-DE home-manager configuration.
-# Primary user constants: modules/global/user.nix
-#
-# NOTE: sharedModules intentionally do NOT import home-manager-shared.nix
-# because container hosts should not pull in dms/niri desktop modules.
 let
   user = import ./user.nix;
 in

@@ -1,14 +1,4 @@
 # LAN binary cache: harmonia served from the NAS (frieren).
-#
-# Lets every host on the LAN share store paths — the first host to
-# fetch or build a path makes it available to all the others at LAN
-# speed, instead of each host pulling from WAN caches independently.
-#
-# The signing keypair is fleet-wide static:
-#   - private key: sops `harmonia_signing_key` in modules/secrets.yaml
-#     (only enabled on the cache host)
-#   - public key:  registered in modules/global/global.nix
-#     ("frieren.lan-1:...")
 {
   config,
   lib,

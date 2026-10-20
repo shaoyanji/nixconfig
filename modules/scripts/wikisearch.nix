@@ -1,8 +1,4 @@
 # wikisearch — universal offline wiki search over Kiwix-served ZIM archives.
-#
-# Moved out of hosts/frieren/tools.nix (2026-10-19): a 200-line program is a
-# program, and modules/scripts/ is where the fleet keeps its packaged scripts
-# (cf. pb.nix). The host module now only says "this host ships it".
 {pkgs, ...}:
 pkgs.writeShellApplication {
   name = "wikisearch";

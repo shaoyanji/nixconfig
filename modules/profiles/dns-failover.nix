@@ -1,40 +1,4 @@
 # DNS high availability: one reusable, role-based resolver stack (HC-3).
-#
-# frieren is the fleet's only resolver. It answers `*.frieren.lan`
-# (`address=/frieren.lan/192.168.3.25`) and does ad-blocking (`pihole-ftl` →
-# `unbound` on `127.0.0.1#5335`) from a single host, so losing frieren breaks
-# name resolution for every client that points at it. This module makes that
-# stack reusable so a second always-on host can serve the *same* answers, and
-# gives the primary/secondary relationship a declaration instead of two
-# hand-synced copies.
-#
-# Failover has two shapes, chosen by `virtualIp`:
-#   * `virtualIp = null` (default) — client-side. Clients are handed the whole
-#     `resolvers` list (primary first) and retry the next one when the first
-#     stops answering. Nothing floats, so nothing can split.
-#   * `virtualIp = "…"` — VRRP via keepalived. Both hosts advertise one virtual
-#     address; the primary holds it and a DNS-aware `vrrp_script` demotes it the
-#     moment its local resolver stops answering (a NIC that stays up while
-#     pihole-ftl dies is exactly the failure a link check misses).
-#
-# Split brain is prevented structurally, not by convention:
-#   * `role` is an enum, so a host is exactly one of primary/secondary;
-#   * `virtualRouterId` is REQUIRED once `virtualIp` is set — two hosts that
-#     advertise the same address under *different* router ids are two separate
-#     one-node VRRP groups that both elect themselves MASTER, which is exactly
-#     split brain (asserted below);
-#   * `primaryPriority` must exceed `secondaryPriority`, so a partition cannot
-#     promote a backup while the primary is still healthy.
-# The VRRP outcome itself is a runtime fact, so the final check is operational,
-# not declarative: `scripts/task/dns-failover-check.sh` fails if the group
-# answers from two places at once (duplicate-address probe on the VIP).
-#
-# This module owns the MECHANISM: unbound + the pihole-ftl core settings + the
-# zone wildcard + the LAN firewall hole + optional VRRP. Host POLICY stays on
-# the host and is passed in, so the module never guesses: extra `dnsmasq_lines`
-# (`extraDnsmasqLines` — extra `address=` records, the tailscale0 `interface=`
-# line, the PXE proxyDHCP lines), blocklists, the web UI and log deleter, and
-# any non-LAN firewall interfaces.
 {
   config,
   lib,

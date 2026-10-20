@@ -1,29 +1,4 @@
 # eisen — offline MoE LLM inference (native llama.cpp, Vulkan/radv).
-#
-# Three models share one OpenAI-compatible endpoint via llama-swap, which
-# starts/stops a llama-server per model on demand (Qwen ~21 GiB + Kolibri
-# ~44 GiB cannot co-reside in 62 GiB RAM; Bonsai ~6 GiB fits RAM beside
-# Qwen but not VRAM, so it swaps like the others).
-#
-#   * qwen3.6-35b-a3b — Qwen3.6-35B-A3B, 35B total / ~3B active (Q4_K_M).
-#   * kolibri-1       — Aleph-Alpha Kolibri-1, 78B total / 3.46B active,
-#                       German+English (Q4_K_M).
-#   * bonsai-2-27b    — PrismML Ternary Bonsai 2, 27B dense ternary (PTQ1_0),
-#                       served by the PrismML fork of llama.cpp (Vulkan).
-#
-# Blueprint: ~/HANDOFF.md §3 and .agents/deploy/hosts/eisen.md.
-#
-# MoE expert-offload strategy (per model):
-#   * `--n-gpu-layers 99` offloads every non-expert tensor (attention, norms,
-#     embeddings, router/gate) to the RX 5700's 8 GiB VRAM.
-#   * `--override-tensor exps=CPU` keeps the sparse expert FFN tensors in DDR4,
-#     so only the ~3B active parameters per token touch the GPU.
-#   * q8_0 KV cache + flash-attn keep the attention working set inside 8 GiB.
-#
-# Exposure:
-#   * LAN:      http://eisen.lan/v1              (nginx :80 -> 127.0.0.1:8080)
-#   * Tailnet:  https://eisen.<tailnet>.ts.net/v1 (services.tailscale.serve)
-#   * Direct:   http://eisen:8080/v1             (llama-swap on 0.0.0.0)
 {
   config,
   lib,

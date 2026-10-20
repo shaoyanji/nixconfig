@@ -1,14 +1,4 @@
 # GENERATED PLACEHOLDER — must be replaced by `nixos-generate-config` on
-# the target machine before the first build of the deckstation host.
-#
-# On the target (live ISO or staged chroot):
-#   sudo nixos-generate-config --root /mnt
-#   cp /mnt/etc/nixos/hardware-configuration.nix \
-#      /path/to/this/repo/hosts/deckstation/hardware-configuration.nix
-#
-# Adjust the kernel modules, fileSystems, and swapDevices entries for
-# the real hardware. The defaults below are empty so a missing
-# placeholder makes the failure obvious at evaluation time.
 {
   config,
   lib,

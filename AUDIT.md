@@ -17,13 +17,28 @@
 | Secrets | 6 SOPS files, zero drift | `task checks:sops:drift` |
 | Skills | 43, compiled + schema-gated | `nix eval .#agentSkills.count`, `task ops:skills:check` |
 | Observation | frieren sentinel: 15-min ledger, health endpoint, gatus body assertion | `task ops:health`, `/var/lib/fleet-sentinel/` |
-| Knowledge | qmd (prose) + `.#knowledgeGraph` (structure) + sentinel ledger (episodic) | `task ops:kg`, `task ops:ledger` |
+| Knowledge | qmd (`.md` + `.nix`) + `.#knowledgeGraph` (structure) + sentinel ledger (episodic) | `task ops:kg`, `task ops:ledger` |
 | Backups | local + BurgerNAS offsite; restore drill weekly; password in sops | `restic-drill.timer`, `task checks:restic:drill` |
 | DNS | resolver pair: frieren pihole+unbound, delphi crab-hole, one shared `10.99.0.53` | `task checks:dns:failover` |
 | Tailnet routes | `10.99.0.53/32` approved on both via `autoApprovers`; policy mirrored in the repo | `ops:tailnet:routes`, `ops:tailnet:policy` (both rc=0) |
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+
+### 2026-10-20 — Prose is not where a rule lives
+
+- `.nix` headers: 1 145 comment lines across 104 files removed; every file now
+  opens with one line naming its contract. `nix-header-budget` is a gate (≤3
+  lines, banners ignored), not a convention.
+- qmd combs the nix tree: the `nixconfig` mask is `**/*.{nix,md}` (220 `.nix`
+  files), so a module comment and the page that explains it are one query
+  apart. A mask is registration-time state, so the script re-registers a
+  collection whose mask changed.
+- Docs deleted: `docs/vision.md` (byte-identical to `docs/control-plane-vision.md`)
+  and `docs/fleet-operations-recommendations.md` (ten rules already restated in
+  this manual). `no-orphan-docs` makes an unlinked page a gate failure.
+- Evidence: `checks.policies` rc=0 (4 s), `hostChecks` frieren+mtfuji rc=0,
+  `.#docs` rc=0, `docs:links` 113 files, `nix:format` 219 clean.
 
 ### 2026-10-20 — The tree matches the module graph
 

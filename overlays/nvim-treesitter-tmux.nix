@@ -1,16 +1,4 @@
 # Re-add the `tmux` tree-sitter grammar to `nvim-treesitter.builtGrammars`.
-#
-# nvim-treesitter upstream dropped the tmux grammar (generated.nix no longer
-# contains it), which breaks the pinned kickstart-nixvim fork: its
-# `config/plugins/kickstart/treesitter.nix` references `tmux` via
-# `with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [ ... ]`.
-#
-# Same definition the previous nixpkgs rev shipped:
-#   tmux = buildGrammar {
-#     language = "tmux";
-#     version = "0.0.0+rev=75d1b99";
-#     src = fetchFromGitHub { owner = "Freed-Wu"; repo = "tree-sitter-tmux"; ... };
-#   };
 _final: prev: {
   vimPlugins =
     prev.vimPlugins

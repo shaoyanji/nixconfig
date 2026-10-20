@@ -4,7 +4,7 @@
   ...
 }: {
   imports = [
-    ../shell/base.nix
+    ../shell
     ../user/desktop/niri.nix
   ];
 

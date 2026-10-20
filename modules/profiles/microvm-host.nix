@@ -1,11 +1,4 @@
 # Shared microVM host networking configuration.
-# Provides the microbr bridge profile, NetworkManager dispatcher script,
-# and NAT/firewall rules needed for tap-based microVMs.
-#
-# Parameters (via function import):
-#   natExternalInterface   - WiFi/Ethernet uplink for NAT (e.g. "wlp4s0")
-#   microvmExternalInterface - Uplink for microvm.network bridge (e.g. "eno1")
-#   bridgeAddress          - IPv4 address for the bridge (default "192.168.83.1/24")
 {
   natExternalInterface ? throw "Set natExternalInterface to your uplink (e.g. wlp4s0)",
   microvmExternalInterface ? "eno1",

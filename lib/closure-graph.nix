@@ -1,40 +1,4 @@
-# ==============================================================================
 # closure-graph.nix — Nix-native closure analysis (prototype)
-# ==============================================================================
-#
-# Milestone 4 of `docs/control-plane-vision.md` ("Nix-native closure graph"):
-# the same data as `scripts/task/closure-analysis.sh`, expressed as a function
-# over Nix's own store graph instead of a shell loop over `nix path-info`.
-#
-# Why `pkgs.closureInfo` and not `nix path-info`:
-#   `closureInfo { rootPaths = [ root ]; }` runs `exportReferencesGraph` in its
-#   builder, so the traversal is done BY NIX over the derivation graph. It emits
-#   a store path — reproducible and cached — containing:
-#
-#     store-paths      every path in the closure, one per line
-#     registration     `nix-store --load-db` format, i.e. per path:
-#                        <path> / <narHash> / <narSize> / <deriver> /
-#                        <refCount> / <ref>…
-#     total-nar-size   sum of the *own* (nar) sizes — the closure's footprint
-#
-#   Verified on frieren: `store-paths` and `nix path-info --recursive` return
-#   the *identical* 3949-path set, and `total-nar-size` equals the shell tool's
-#   summed narSize exactly. So this is not an approximation.
-#
-# Declaring roots (the sharp edge):
-#   `exportReferencesGraph` refuses paths that are not in the derivation's input
-#   closure:
-#     error: cannot export references of path '…' because it is not in the input
-#            closure of the derivation
-#   Passing the "/run/current-system" symlink therefore fails. Two things work:
-#     • `builtins.storePath "/nix/store/…"`  — a live, already-resolved store path
-#     • a derivation attribute (`config.system.build.toplevel`) — inside a flake
-#   `mkClosureGraph` accepts either and declares strings with `storePath`.
-#
-# Scope: local store only. Unlike `closure-analysis.sh` this cannot read a
-# remote store (`closureInfo` builds locally); a remote host's closure must be
-# copied or analysed by the shell tool.
-# ==============================================================================
 {lib}: let
   inherit
     (builtins)

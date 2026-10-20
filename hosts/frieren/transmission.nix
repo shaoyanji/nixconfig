@@ -1,31 +1,4 @@
 # Transmission — leech-only BitTorrent client for open-access content.
-#
-# Scope: this host only ever *downloads*. It is not a seedbox. The policy is
-# enforced in `settings` (not by trusting the UI):
-#
-#   * Leech-only stop: `ratio-limit = 0` + `ratio-limit-enabled = true`. In
-#     Transmission 4.1.3 `effective_seed_ratio()` returns `0.0`, so the seed
-#     goal is `size_when_done * 0 = 0` bytes and is met the instant the torrent
-#     finishes; the ratio check only ever runs for seeds (`seed_ratio_applies =
-#     is_done()`), so it never interrupts a download.
-#   * Upload capped at 1 kB/s (the protocol floor — 0 would mean *unlimited*)
-#     plus a single upload slot, so the swarm gets handshakes and no bulk data.
-#   * DHT/PEX/LPD off and no UPnP/NAT-PMP: the client never advertises itself to
-#     the public swarm nor asks the router to open an inbound port.
-#   * `openPeerPorts = false`: no inbound peer connections at all.
-#
-# RPC binds loopback only; the `torrent.frieren.lan` vhost in reverse-proxy.nix
-# is the sole reachable front end. Deliberately NOT a `profiles.serviceExposure`
-# entry — that would open a raw LAN port with only a loopback listener behind it
-# (the REDUNDANT class `checks:ports` flags).
-#
-# State lives on the dedicated btrfs subvolume /var/lib/transmission. Downloads
-# land in the shared /srv/data/downloads staging area (same 2TB pool), so the
-# `transmission` service user is added to `users` to write the aria2:users 0775
-# directory. Per-torrent locations can still be overridden in the web UI.
-#
-# Where finished downloads belong (ISOs -> isos/, papers -> books/, video ->
-# arr/, installers -> software/) is defined in docs/download-taxonomy.md.
 {
   services.transmission = {
     enable = true;

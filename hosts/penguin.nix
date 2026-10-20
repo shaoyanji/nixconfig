@@ -8,7 +8,7 @@ in {
   imports = [
     ../modules/shell
     ../modules/env.nix
-    ../modules/lf
+    ../modules/lf.nix
     ../modules/sops.nix
     ../modules/scripts
   ];

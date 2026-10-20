@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
-# Index markdown documentation and personal knowledge base vaults into local qmd collections
-# and verify index freshness.
-#
-# Collections:
-#   nixconfig - Personal Nix flake documentation, architecture, and runbooks
-#   vault     - Personal Obsidian vault (zettels, schematics, notes)
-#
-# Modes:
-#   ensure [all|nixconfig|vault]  Register collection(s) if missing + qmd update
-#   check  [all|nixconfig|vault]  Verify collection(s) registered and index fresh
+# Register and refresh the qmd collections, and verify their freshness.
+# nixconfig indexes the nix tree too (`**/*.{nix,md}`): the module that carries a
+# fact and the page that explains it are one search away, so a prose duplicate in
+# docs/ has no alibi. Modes: ensure [all|nixconfig|vault], check [all|...]
 set -euo pipefail
 
 MODE="${1:-ensure}"
@@ -36,19 +30,37 @@ index_path() {
   "$QMD" status 2>/dev/null | awk '/^Index:/ {print $2}'
 }
 
+collection_mask() {
+  "$QMD" collection show "$1" 2>/dev/null | sed -n 's/^  Pattern:  //p' | head -1
+}
+
 ensure_single() {
   local name="$1"
   local path="$2"
   local desc="$3"
+  local mask="${4:-**/*.md}"
   if [ ! -d "$path" ]; then
     echo "WARN  directory '$path' not found for collection '$name', skipping"
     return 0
   fi
   if have_collection "$name"; then
-    echo "collection '${name}' already registered (${path})"
+    local current
+    current="$(collection_mask "$name")"
+    if [ "$current" = "$mask" ]; then
+      echo "collection '${name}' already registered (${path}, ${mask})"
+    else
+      # A mask is registration-time state with no in-place setter; re-register so
+      # an existing index starts combing the nix tree instead of only markdown.
+      echo "updating collection '${name}' mask: ${current:-?} -> ${mask}"
+      "$QMD" collection remove "$name" >/dev/null
+      "$QMD" collection add "${path}" --name "${name}" --mask "${mask}"
+      if [ -n "$desc" ]; then
+        "$QMD" context add "qmd://${name}/" "$desc" >/dev/null 2>&1 || true
+      fi
+    fi
   else
-    echo "registering collection '${name}' (${path})"
-    "$QMD" collection add "${path}" --name "${name}" --mask "**/*.md"
+    echo "registering collection '${name}' (${path}, ${mask})"
+    "$QMD" collection add "${path}" --name "${name}" --mask "${mask}"
     if [ -n "$desc" ]; then
       "$QMD" context add "qmd://${name}/" "$desc" >/dev/null 2>&1 || true
     fi
@@ -72,7 +84,7 @@ check_single() {
     echo "STALE  cannot locate the qmd index file ('qmd status' parse failed)"
     exit 1
   fi
-  stale="$(find "${path}" -name '*.md' -not -path '*/.git/*' -not -path '*/.trash/*' -newer "$idxfile" 2>/dev/null | head -5)"
+  stale="$(find "${path}" \( -name '*.md' -o -name '*.nix' \) -not -path '*/.git/*' -not -path '*/.trash/*' -newer "$idxfile" 2>/dev/null | head -5)"
   if [ -n "$stale" ]; then
     echo "STALE  markdown in '${name}' changed after the last qmd index update:"
     echo "${stale}" | sed 's/^/       /'
@@ -86,14 +98,14 @@ case "$MODE" in
 ensure | update)
   case "$TARGET" in
   nixconfig)
-    ensure_single "nixconfig" "${REPO}" "NixOS, Darwin, and Home Manager fleet documentation and runbooks"
+    ensure_single "nixconfig" "${REPO}" "NixOS, Darwin, and Home Manager fleet documentation, runbooks and nix modules" "**/*.{nix,md}"
     ;;
   vault)
-    ensure_single "vault" "${VAULT_DIR}" "Personal Obsidian knowledge base with zettels, schematics, and notes"
+    ensure_single "vault" "${VAULT_DIR}" "Personal Obsidian knowledge base with zettels, schematics, and notes" "**/*.md"
     ;;
   all)
-    ensure_single "nixconfig" "${REPO}" "NixOS, Darwin, and Home Manager fleet documentation and runbooks"
-    ensure_single "vault" "${VAULT_DIR}" "Personal Obsidian knowledge base with zettels, schematics, and notes"
+    ensure_single "nixconfig" "${REPO}" "NixOS, Darwin, and Home Manager fleet documentation, runbooks and nix modules" "**/*.{nix,md}"
+    ensure_single "vault" "${VAULT_DIR}" "Personal Obsidian knowledge base with zettels, schematics, and notes" "**/*.md"
     ;;
   *)
     echo "Unknown target: $TARGET (use nixconfig|vault|all)" >&2

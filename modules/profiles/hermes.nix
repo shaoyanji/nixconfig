@@ -1,5 +1,4 @@
 # Reusable NixOS profile for Hermes agent environment, flexible YAML config, and secret templating.
-# Isolates Hermes agent state strictly to frieren and manages secrets via SOPS.
 {
   config,
   lib,

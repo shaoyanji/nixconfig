@@ -1,17 +1,4 @@
 # One declarative exposure registry for a host's scoped firewall.
-#
-# A service declares once what it exposes (`port`, protocol, reachability) and
-# this module derives `networking.firewall.interfaces.<iface>` from it. It
-# exists because frieren's exposure was duplicated across four hand-synced
-# lists — see `hosts/frieren/firewall-scope.nix`, whose own header warns
-# "Keep in sync with the global contributions". Enforcement stays in
-# `firewall-scope.nix` (which clears the interface-blind global lists with
-# `lib.mkForce`); this module only fills the per-interface lists.
-#
-# It deliberately does NOT read back the global `allowedTCPPorts` option: a
-# scoped host `mkForce`s that option, and `lib.optionals`/`.definitions` only
-# keep the winning definition, so contributors cannot be recovered from it.
-# Services therefore migrate onto this registry explicitly.
 {
   lib,
   config,

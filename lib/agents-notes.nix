@@ -1,19 +1,4 @@
 # lib/agents-notes.nix — compile AGENTS.nix into a validated note index.
-#
-# AGENTS.nix is the ONE home for the repo's narrative knowledge that used to be
-# split across ARCHITECTURE.md, TODO.md, HANDOFF.md and EXPERIMENTS.md. It is a
-# data file, not code: an attrset of notes, each with a status from the
-# `.agents/SCHEMA.md` vocabulary, typed refs into the actual Nix tree, and a
-# body. This module is the only projection: it validates the data, builds the
-# indexes the query task and the docs site read, and renders the markdown pages.
-#
-# The traceability rule is enforced, not documented: a note must either point at
-# at least one real node (host, module/file, task, doc) or carry a verbose body
-# explaining the intent of an idea that has no code yet ("leaf"). A terse leaf
-# is exactly how an idea becomes unactionable.
-#
-# Authoring contract (templates, promotion ladder, anti-slop rules):
-# `.agents/skills/agents-notes/SKILL.md`; lifecycle rules: `.agents/SCHEMA.md` §5.
 {
   lib,
   inventory ? null,

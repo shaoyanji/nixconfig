@@ -24,8 +24,8 @@
   };
 
   # The cache policy for compiled static trees, shared with the UDS bridge
-  # (modules/config/nginx/static-cache.nix) so the two servers cannot disagree.
-  staticCache = import ../../modules/config/nginx/static-cache.nix;
+  # (modules/config/nginx-static-cache.nix) so the two servers cannot disagree.
+  staticCache = import ../../modules/config/nginx-static-cache.nix;
 
   # LAN addresses come from the compiled registry: a host that moves must not
   # need its proxy edited, and the registry is what the docs site already reads.

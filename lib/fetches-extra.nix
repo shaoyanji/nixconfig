@@ -1,11 +1,4 @@
 # fetches-extra — central registry for external fetched dependencies.
-#
-# Usage:
-#   fetchesExtra = import ../lib/fetches-extra.nix { inherit pkgs; };
-#   ariang = fetchesExtra.fetch "ariang";
-#
-# All registered entries live in modules/config/fetches.json.
-# Update hashes: task dev:config:hash-update (runs nix-hash-update.sh).
 {
   pkgs,
   fetchesJson ? ../modules/config/fetches.json,

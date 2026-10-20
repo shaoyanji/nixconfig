@@ -1,6 +1,4 @@
 # pb — fleet paste bin CLI (uploads to http://paste.frieren.lan via SSH)
-# Server definition and nginx vhost: modules/services/paste.nix
-# Runbook: .agents/skills/paste/SKILL.md
 {pkgs, ...}: let
   # writers.writeBashBin (fleet pattern, cf. modules/scripts/default.nix):
   # writeShellApplication would dispatch shellcheck to nixbuild.net where it

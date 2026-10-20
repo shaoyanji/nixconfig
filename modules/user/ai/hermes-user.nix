@@ -1,33 +1,4 @@
 # hermes — Nous Research's self-improving agent, frieren user-space persona.
-#
-# Hermes (pkgs.llm-agents.hermes-agent) runs on frieren (the mainframe, as a
-# host package — see hosts/frieren/tools.nix) and on delphi (the OCI ARM64
-# bastion, via profiles/hermes.nix). Hosts are opted in per name through
-# `programs.hermes-user.hosts`; the default is still frieren alone. This module
-# seeds ~/.hermes with the resurrected OpenClaw persona from
-# /Volumes/data/openclaw (agent "Vanta", 2026-03/04),
-# whose four runtime files map 1:1 onto Hermes' auto-injected context:
-#
-#   OpenClaw (old)   ->  Hermes (~/.hermes)   ->  Purpose
-#   ---------------------------------------------------------
-#   SOUL.md          ->  SOUL.md              ->  orientation/voice
-#   AGENTS.md        ->  AGENTS.md            ->  operational rules
-#   USER.md          ->  USER.md              ->  user profile (Matt)
-#   MEMORY.md        ->  MEMORY.md            ->  memory policy
-#
-# Hermes reads these from $HERMES_HOME (default ~/.hermes) and injects them
-# into every chat turn (see --ignore-rules in hermes --help). On a host with a
-# nixconfig checkout they are symlinked to source, so runtime edits
-# version-control themselves; a host without one (delphi) gets a read-only
-# store copy instead of silently seeding nothing.
-#
-# First-run (interactive, NOT declarative — hermes stores model/API config
-# in ~/.hermes/config.yaml + .env):
-#   hermes setup          # full wizard
-#   hermes model          # provider + model picker (Nous Portal / OpenAI-
-#                         # compatible / OpenRouter / Anthropic ...)
-#   hermes memory setup   # optional external memory provider
-#   hermes status         # verify
 {
   lib,
   config,

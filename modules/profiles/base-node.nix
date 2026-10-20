@@ -1,5 +1,4 @@
 # Base node configuration for all NixOS hosts.
-# Primary user constants: modules/global/user.nix
 {
   config,
   lib,

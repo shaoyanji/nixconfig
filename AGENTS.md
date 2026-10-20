@@ -38,7 +38,7 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
    of (`from`) instead of restating it. Then: proposal and open work → an
    `AGENTS.nix` note (`task ops:notes`; authoring: `agents-notes` skill); what
    happened → `AUDIT.md`; history → `docs/history/`; procedure → `docs/` or a
-   skill. Never a new root markdown file.
+   skill. No new root markdown file [[flake/policies.nix#root-markdown-closed]].
 8. **Do not read `AGENTS.nix` in full.** It is a ~3,500-line compiled data store;
    reading it whole wastes context. Query it with `task ops:notes[:host|:show|:search]`
    or `nix eval .#agentsNotes…` (0.2 s). Structural "what touches X" questions go to
@@ -373,61 +373,20 @@ nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath
 task checks:nix:lint             # deadnix (fail) + statix (advisory)
 ```
 
-#### HARD RULE: never run `nix flake check` on a small host
+#### HARD RULE [[flake/policies.nix#flake-check-memory-gated]]: no `nix flake check` on a small host
 
-`nix flake check` evaluates **every flake output**, not just `checks.<system>` — its own
-progress output says so:
+It evaluates **every flake output** in one process — 23 NixOS configs, measured
+2026-10-15 at 339.78 s / 6078.5 MiB / SIGKILL 137 on this 11 GiB host, which then
+sat at 62 % IO-stall with 5.4 GiB swapped. `task checks:flake` refuses below
+16384 MiB. Check **one** host (`checks:host HOST=`, 13 s / 720 MiB)
+[[flake/policies.nix#no-fleet-default]] or a named set under the watchdog
+[[flake/policies.nix#sweeps-under-watchdog]]; `MODE=eval` checks an
+aarch64/darwin host from here. The fleet is CI's job.
 
-```
-checking flake output 'nixosConfigurations'...
-checking NixOS configuration 'nixosConfigurations.ares'...
-checking NixOS configuration 'nixosConfigurations.testvm'...
-```
-
-On frieren (11 GiB RAM, ~5 GiB already swapped) that is 23 NixOS evaluations inside **one**
-process. Measured 2026-10-15:
-
-| command | wall | peak RSS | result |
-| :--- | ---: | ---: | :--- |
-| `nix flake check` | **339.78 s** | **6078.5 MiB** | SIGKILL, exit **137** |
-| `nix build .#hostChecks.x86_64-linux.frieren` | 13.16 s | 720.0 MiB | ok, 2035 assertions |
-| `nix build .#hostChecks.x86_64-linux.mtfuji` | 11.42 s | 645.5 MiB | ok, 1620 assertions |
-| `nix eval .#inventory.hosts.fern.role` | 0.15 s | 47.1 MiB | ok (no host eval) |
-
-After the kill the host sat at **62 % sustained IO-stall** (PSI `full avg10`) with 5.4 GiB
-swapped. A crashed agent cannot repair the host it crashed, so:
-
-- **Memory is O(hosts forced in one process).** One host per invocation, always.
-- `nix flake check` is gated behind `task checks:flake`, which **refuses below 16384 MiB
-  of `MemTotal`** and points at the bounded gates.
-- **No task in this repo defaults to the fleet, and that is a rule, not a gap.**
-  `checks:host:HOST=<host>` takes exactly one host and the name is required;
-  `checks:hosts:HOSTS="a b"` takes a named set and **refuses to run without one**.
-  An earlier revision of this work shipped a `checks:hosts` defaulting to all 21 x86_64
-  hosts and a `checks:hosts:all` that swept 27 — the same footgun, serialized, and handed
-  to every agent that reads the contract. A default is what an agent runs. Do not
-  reintroduce a default host set.
-- **The fleet is CI's job.** `.github/workflows/nixcachix.yml` maps affected hosts to
-  runners, so each host gets its own machine: `nix build .#nixosConfigurations.<host>`
-  plus `.#hostChecks.<arch>.<host>`. That is where "check every host" belongs.
-- `MODE=eval` makes `checks:host` **arch-independent** (it evaluates the config instead
-  of building it), which is the only way to check an aarch64 or darwin host from an
-  x86_64 machine: `task checks:host HOST=penguin MODE=eval` (2.7 s, 452 MiB).
-
-**Both former gate failures now pass** (`task checks:host HOST=minyx MODE=eval` → 1689
-assertions, `HOST=cassini MODE=eval` → 352, both rc=0). They failed on *priority and
-availability*, which only a whole-config eval catches: `boot.kernelPackages` and
-`home.homeDirectory` each had two equal-priority definitions (a conflict, not a pick),
-and three shared home modules set Linux-only options on darwin. Fixes live where the
-fact does — `base-node.nix` uses `lib.mkOverride 1500`, weaker than `mkDefault` so a
-hardware module always wins; `homeDirectory` is `mkDefault`; the `xdg` blocks in
-`freebuff-remote`/`mainframe-remotes` are `mkIf isLinux`; and `niri.nix` gates its own
-body, because a `pkgs`-dependent `imports` entry reads `config` and recurses.
-- Every bounded run goes through `scripts/task/oom-guard.sh`, which polls
-  `/proc/vmstat oom_kill`, memory/io PSI and `MemAvailable` **every 10 s** and kills the
-  run on pressure instead of letting it take the host down. It measures the whole
-  **process group**: sampling only the direct child reported a 4.9 MiB peak for a run
-  that actually took a 6 GiB grandchild to the OOM killer.
+`scripts/task/oom-guard.sh` is what makes a sweep safe: it polls `oom_kill`,
+memory/io PSI and `MemAvailable` every 10 s over the whole **process group**
+(a 4.9 MiB direct-child peak hid a 6 GiB grandchild) and kills the run on
+pressure instead of taking the host down.
 
 #### Agent Verification Protocol (compute discipline)
 
@@ -734,16 +693,11 @@ CI uses `nix build -L .?submodules=1#...` (note `?submodules=1` for git submodul
 
 ## Nix Patterns & Gotchas
 
-### HARD RULE: never hand-edit TOML — edit through a format-aware tool
+### HARD RULE [[flake/policies.nix#toml-through-a-tool]]: TOML goes through a format-aware tool
 
-Every format in this tree has one owning tool and one guard; the table is in
-[`.agents/SCHEMA.md`](.agents/SCHEMA.md) §1 ("Formats, and the tool that owns
-each"). This section is the TOML case in detail.
-
-**TOML is edited with a TOML AST editor, never by text substitution.** This is not
-style: hand-editing `inventory.toml` in this repo produced unparseable TOML (a
-stray-indent anchor silently merged two lines), and it is not caught until
-something else reads the file.
+Hand-editing `inventory.toml` produced unparseable TOML (a stray indent merged two
+lines) and nothing noticed until another tool read it. Owning tool per format:
+[`.agents/SCHEMA.md`](.agents/SCHEMA.md) §1.
 
 **yq chooses the parser from the PATH'S EXTENSION, and that is the real trap.**
 `yq -i '<expr>' some.toml` is correct. Hand the same expression a path that does
@@ -801,11 +755,18 @@ task checks:toml:lint                                 # prove EVERY tracked .tom
   `nix eval .#inventory…`) instead of re-parsing TOML with yq. See
   `docs/inventory-schema.md`.
 
+### A `.nix` header is one line, not an essay
+
+A file opens with `# <name> — <the contract in one sentence>` and at most two
+more lines. Design rationale goes to a `docs/` page (indexed by qmd, which now
+combs the nix tree), an `AGENTS.nix` note, or the commit — not into bytes every
+`nix eval` re-parses. [[flake/policies.nix#nix-header-budget]]
+
 ### Non-obvious patterns
 
-- **Pipes, not `let` chains.** `|>` (`pipe-operators`, enabled fleet-wide in
-  `modules/global/global.nix`) is preferred for 2+ transformations; a box that
-  cannot parse the tree is on older Nix — add the flag, do not rewrite.
+- **Pipes, not `let` chains.** `|>` for 2+ transformations
+  [[flake/policies.nix#pipe-operators-declared]]. A box that cannot parse the tree
+  is on older Nix: add the flag, do not rewrite.
 - **User constants**: `modules/global/user.nix` is the single source of truth for the primary user (`devji`). Import it with `let user = import ../global/user.nix;` — never hardcode user paths or the username.
 - **Attrset merging**: `//` is **shallow, right-biased** — `{ a.x = 1; } // { a.y = 2; }` loses `a.x`. Use `lib.recursiveUpdate` for deep merge.
 - **`lib.mkIf` / `lib.mkMerge`**: the standard conditional patterns. Also `lib.optionalAttrs` for conditional attrsets and `lib.optionals` for conditional list items.
@@ -900,7 +861,7 @@ When autonomous agents (`agy`, `hermes`, subagents) execute tool calls across Ni
 #### 10. Negative Narinfo Cache Makes a Freshly Warmed Cache Look Empty
 * **Failure Mode**: A target stuck pulling from harmonia before its closure was warmed keeps failing with `path is not valid` / `don't know how to build these paths` even *after* the builder finishes `infra:warm:cache` — a raw HTTP fetch of the `.narinfo` returns 200 (signed), yet every `nix path-info --store` / `nix copy --from` still reports the path missing. `warm-host.sh`'s post-build verification can false-fail the same way.
 * **Root Cause**: Nix caches negative (404) narinfo lookups for **1 hour** (`narinfo-cache-negative-ttl`, in-process plus the user's on-disk `~/.cache/nix/binary-cache-v6.sqlite`). Any query that ran during the gap — the target's stuck pull, the builder's own pre-build gate — poisons the answer for the full TTL, on both the target and the builder.
-* **Fix**: Disable the negative cache on every cache-serving check and every pull of a just-warmed path: `--option narinfo-cache-negative-ttl 0`. `scripts/task/activate-host.sh` (gate + remote `nix copy`) and `scripts/task/warm-host.sh` (`served_by_cache`) already do this. One-off: `nix path-info --store http://192.168.3.25:5000 --option narinfo-cache-negative-ttl 0 <path>`.
+* **Fix**: `--option narinfo-cache-negative-ttl 0` on every cache query [[flake/policies.nix#negative-cache-disabled]]. `scripts/task/activate-host.sh` (gate + remote `nix copy`) and `scripts/task/warm-host.sh` (`served_by_cache`) already do this. One-off: `nix path-info --store http://192.168.3.25:5000 --option narinfo-cache-negative-ttl 0 <path>`.
 
 ---
 
@@ -1005,6 +966,11 @@ qmd update                                     # incremental reindex (fast, BM25
 
 Prefer BM25 `qmd search` (instant); `qmd embed` (semantic vectors) is optional and slower. Prefer qmd over raw `grep` when locating concepts or runbooks across repo docs and the vault — it is ranked and collection-scoped.
 
+The `nixconfig` collection masks `**/*.{nix,md}`, so a `nix eval`-time comment and
+the page that explains it are one query apart — which is why a `.nix` header no
+longer has to carry the essay. Vector-embedding offload to Eisen:
+[`docs/qmd-embedding-offload.md`](docs/qmd-embedding-offload.md).
+
 **Structural queries are the graph, not `grep`.** `.#knowledgeGraph` compiles hosts × skills × docs; `task ops:kg:*` are the six fixed traversals for "what touches X". The Elixir sidecar is the DEFAULT path: `kg-query.sh` answers from its socket when live (32 ms vs 441 ms for the same question through jq on this tree; `task ops:kg:speed` re-measures both), falls back to jq byte-identically, and `checks:kg:sidecar` proves both agree — it starts at login (`programs.kgSidecar`) from the COMPILED graph. `--native` is the parity experiment (`checks:kg:native`, part of `checks:quick`), not the query path; `ops:kg:blast` is the reverse closure that jq has no one-liner for.
 
 ---
@@ -1013,8 +979,9 @@ Prefer BM25 `qmd search` (instant); `qmd embed` (semantic vectors) is optional a
 
 - `agents:menu` is the interactive operator control plane
 - `task menu` is the whole-Taskfile gum TUI; `menu:list` / `menu:json` are its
-  machine surfaces. Never mark a task `internal: true` to hide it — that removes
-  it from `--list-all --json` too and breaks the agent endpoint.
+  machine surfaces. A task is never `internal: true`
+  [[flake/policies.nix#task-surface-visible]] — that removes it from
+  `--list-all --json` too and breaks the agent endpoint.
 - NAS client recovery logic lives under `modules/profiles/nas-client.nix`
 
 ## Deployment Guidance
@@ -1062,10 +1029,10 @@ Add a new Nix tool task by passing `--tools`, never by calling
 `nix-shell -p alejandra` (or deadnix/statix) directly.
 
 The default tool set is the **hard gates, `deadnix` and `alejandra`** — the ones
-that make the commit fail. **statix is never auto-applied**: it is advisory here
-(its W20 warning fires on the house style, and the pre-commit hook never fixes
-with it), so it is only *reported* by `checks:nix:lint`. To write its suggestions
-deliberately, pass it by name:
+that make the commit fail. statix is advisory and never auto-applied
+[[flake/policies.nix#statix-advisory]] — its W20 warning fires on the house style,
+so `checks:nix:lint` only *reports* it. To write its suggestions deliberately,
+pass it by name:
 `bash scripts/task/nix-fmt.sh --fix --all --tools deadnix,statix,alejandra`.
 
 The toolchain resolves from the **nixpkgs revision pinned in `flake.lock`** — the
@@ -1147,9 +1114,10 @@ allowed beside the first.
 | artifact | `.#docs` (generated markdown), `.#fleet-docs-site` (the rendered site) | store paths, never repo copies |
 | serving | `hosts/frieren/reverse-proxy.nix`, `modules/services/uds-static-bridge.nix` | serve the path; never re-derive content in a host module |
 
-- **Never commit a derivative.** `docs/generated/` is `nix build .#docs`. A
-  tracked copy can drift, so it needs `checks:docs:sync` — a gate that exists
-  because the artifact is duplicated is proof the duplication is wrong.
+- **Never commit a derivative** [[flake/policies.nix#generated-not-tracked]]:
+  `docs/generated/` is `nix build .#docs`, and a committed copy is a second
+  source of truth. `checks:docs:sync` is the gate that would otherwise be needed
+  — its existence is proof the duplication is wrong.
 - **Content is not code.** CSS/JS/HTML go in files the derivation reads, not `''`
   literals in a `.nix` file (90 % of `lib/aki-site.nix` is such literals): literals
   cannot be linted or reviewed, and every byte re-evaluates a module that imports
@@ -1160,6 +1128,9 @@ allowed beside the first.
   host's closure, the docs are as live as the last `nixos-rebuild`.
 - **Eval-time `builtins.readFile` is flake-scoped.** An untracked `.md` does not
   exist to the evaluator — `git add` before you eval or serve.
+- **An unlinked page is a page nothing routes to.** A `docs/*.md` earns its place
+  by being named from a living document; deleting it is the other valid answer.
+  [[flake/policies.nix#no-orphan-docs]]
 
 Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 

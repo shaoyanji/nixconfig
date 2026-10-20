@@ -1,5 +1,4 @@
 # Hybrid demo home-manager configuration — niri desktop without sops/secrets.
-# User is "user", not "devji".
 let
   userName = "user";
   userHome = "/home/user";

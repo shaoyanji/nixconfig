@@ -1,21 +1,4 @@
-# ==============================================================================
 # lib/bountystash-site.nix — the portfolio, as evaluated data
-# ==============================================================================
-# Same principles as lib/aki-site.nix, applied to bountystash.com:
-#
-#   * data is evaluated, never typed. Every figure, title and sentence on the
-#     page is an interpolation of `portfolio*.json`; there is no literal copy
-#     that can outlive the data it describes.
-#   * markup lives in files (`bountystash/shell.html`, `project.html`) so it is
-#     reviewable as HTML, and `render` refuses to emit a page with a hole left.
-#   * no JavaScript, no webfonts, no network asset: one CSS file, real anchors,
-#     and `details` for the only interaction the page needs.
-#   * two locales from two data files: `/` and `/de/`, with the same slug per
-#     project so a case study has one canonical URL in both languages.
-#
-# The data files are copied from the console repo (`bountystash-console/data/`)
-# because a flake input pointing at a machine-local path cannot resolve in CI.
-# ==============================================================================
 {
   pkgs,
   lib ? pkgs.lib,

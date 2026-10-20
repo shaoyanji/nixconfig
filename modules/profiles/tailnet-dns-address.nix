@@ -1,28 +1,4 @@
 # Bind the shared tailnet DNS service address on lo.
-#
-# Tailscale has no concept of a floating address, so a resolver pair that clients
-# can point at with ONE address needs a trick: both nodes bind the same /32 on
-# lo and advertise it as the SAME subnet route. Tailscale then treats the two
-# advertisements as a failover set and moves the route to the survivor within
-# ~15 s. Listing two nameservers in the tailnet settings does not work — clients
-# would not retry fast enough and a dead first entry breaks DNS outright.
-#
-# The address is deliberately outside 100.64/10: it must not be confused with a
-# node's own tailnet address, or packets take the local-interface shortcut and
-# never reach the other node.
-#
-# This module owns the `lo` bind AND the advertisement of that /32. What answers
-# on it is the host's own resolver (pihole-ftl on frieren, crab-hole on delphi),
-# which stays a host decision.
-#
-# The advertisement is composed here rather than hand-written per host because
-# the two facts — "bind it" and "advertise it" — must never diverge. They did:
-# setting only `.address` leaves the bind behind `enable`, and a hand-written
-# flag can advertise a route the other member does not (or forget the /32
-# entirely while the group still looks configured). The host now contributes
-# only its *own* routes; this module appends the service /32 and emits the one
-# comma-separated flag, so `tailscale set` (which REPLACES the whole route set)
-# can never be handed two competing flags.
 {
   config,
   lib,

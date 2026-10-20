@@ -1,29 +1,4 @@
 # Derive the Home Manager sops identity from the host's SSH key.
-#
-# Two sops planes exist on a NixOS host and they do not share an identity:
-#
-#   * NixOS (root) — `modules/profiles/base-node.nix` sets
-#     `sops.age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"]`, so the host
-#     key IS the identity. Nothing to bootstrap.
-#   * Home Manager — `modules/sops.nix` needs an identity FILE the user can
-#     read (`~/.config/sops/age/keys.txt`). `sshKeyPaths` is commented out
-#     there on purpose: HM activation runs as the user, and the host key is
-#     0600 root:root.
-#
-# On a host with no `~/.ssh/id_ed25519` this leaves nothing to bootstrap from.
-# The fleet logs in with SSH CA certificates, so a fresh cloud VM has no user
-# keypair at all, and sops-nix's `generateKey` would mint a random identity that
-# is not a recipient in `.sops.yaml` — decryption then fails with
-# "0 successful groups" and Home Manager activation aborts.
-#
-# `ssh-to-age` over a keypair is deterministic, so the identity derived here is
-# **exactly** the recipient `.sops.yaml` already lists for the host: the host's
-# anchor doubles as its user-plane recipient. No new recipient, no rekey, and
-# nothing to back up — the host key regenerates it.
-#
-# Enable ONLY on hosts that do not use the TPM identity path (`modules/sops.nix`
-# `tpmHosts` = frieren, fern): those read a TPM-sealed file, and a file written
-# here would simply be ignored.
 {
   config,
   lib,

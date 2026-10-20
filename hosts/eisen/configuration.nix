@@ -1,27 +1,4 @@
 # eisen — Xeon E5-2673 v3 + RX 5700 + 64 GB RAM gaming desktop.
-#
-# Hardware:
-#   CPU:  Intel Xeon E5-2673 v3 (Haswell-EP, 12c/24t, no iGPU)
-#   GPU:  AMD Radeon RX 5700 (Navi 10, 8 GB VRAM, VCN 2.0)
-#   RAM:  64 GB DDR4
-#   SSD:  128 GB NVMe (BTRFS: @root, @nix, @persist, @log, @snapshots)
-#   Boot: UEFI (systemd-boot on /dev/disk/by-uuid/34F9-8033)
-#
-# Role:  Full desktop (poseidon-style) with Steam gaming.
-#        niri compositor with DankMaterialShell greeter (DMS) provides the
-#        desktop; Steam runs under the upstream gamescope-session, which is
-#        safe on the RX 5700's modern Vulkan ICD (unlike kellerbench's
-#        Kepler card, where cage is required).  Sunshine GameStream for
-#        Moonlight clients.  RX 5700 VCN 2.0 handles H.264/H.265 encode for
-#        streaming and ffmpeg transcoding.
-#
-# History: previously a pure cage + steam -gamepadui kiosk (steamos.nix
-#          auto-login).  The specialisation AND greetd dual-session
-#          experiments both hung boot at graphical.target, so the DMS
-#          greeter path (as on poseidon) replaces greetd auto-login.
-#
-# Storage: /mnt/steam = sda (931.5G HDD, btrfs+zstd) — Steam library, live.
-# Future:  16 TB HDD → /mnt/media (media library) when the drive arrives.
 {
   pkgs,
   lib,

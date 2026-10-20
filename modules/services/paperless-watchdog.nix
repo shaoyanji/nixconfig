@@ -1,8 +1,4 @@
 # Declarative Paperless-ngx Document Ingestion Watchdog & Health Probe (EXP-038).
-#
-# Periodically inspects the Paperless consume directory (/var/lib/paperless/consume)
-# for stalled, corrupted, or 0-byte files that fail to be ingested by the consumer daemon,
-# and verifies active operational status across all Paperless systemd service units.
 {
   config,
   lib,

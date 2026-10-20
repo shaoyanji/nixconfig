@@ -1,8 +1,4 @@
 # fern — hand-written hardware-configuration (not from a real
-# nixos-generate-config scan yet; revisit after first boot).
-#
-# fileSystems are owned by ./disko.nix — do not add fileSystems entries
-# here.
 {
   config,
   lib,

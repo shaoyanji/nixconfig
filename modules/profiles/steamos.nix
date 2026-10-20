@@ -1,29 +1,4 @@
 # SteamOS-style kiosk profile for headless Steam clients.
-#
-# Composes:
-#   - programs.steam (imported from ./steam.nix, which also enables the
-#     upstream gamescopeSession)
-#   - a real gamescope session: greetd auto-logs devji into the
-#     upstream `gamescope-session` wrapper (gamescope -e -- steam
-#     -gamepadui). No custom wrapper needed — the previous cage-based
-#     wrapper existed because a Steam Big Picture startup hang was
-#     misdiagnosed as a legacy_580 Vulkan limitation ("Creating headless
-#     backend" crash); in reality the machine was just downloading
-#     Steam's ~400 MB bootstrap. gamescope works fine on Kepler with
-#     the legacy_580 driver once nvidia_drm KMS is enabled (both
-#     nvidia-gt-750-ti GPU profiles set modeset=1/fbdev=1).
-#   - PipeWire audio (mandatory for game audio)
-#   - greetd auto-login as devji into gamescope-session (no login prompt)
-#   - Avahi / mDNS for LAN game discovery + local network transfers
-#   - 32-bit graphics packages for legacy OpenGL games
-#   - All Steam network services (remotePlay, dedicatedServer,
-#     localNetworkGameTransfers) — full remote play + LAN posture
-#
-# Designed for hosts using globalModulesContainers (noDE) so no dms, niri,
-# KDE, or GNOME desktop modules leak into the closure.
-#
-# Usage:
-#   imports = [ ../../modules/profiles/steamos.nix ];
 {lib, ...}: {
   imports = [
     ./steam.nix

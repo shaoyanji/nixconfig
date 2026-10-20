@@ -1,11 +1,14 @@
 # ==============================================================================
 # REMOVED USERLAND BLOAT & REFERENCE PACKAGES (pkgs.txt)
 # ==============================================================================
-# Packages removed from modules/user/base/default.nix and base-desktop-environment.nix
-# to keep the base layer lightweight and focused strictly on fleet sysadmin & core Unix utilities.
+# Packages removed from modules/user/base.nix and base-desktop-environment.nix to
+# keep the base layer lightweight and focused on fleet sysadmin & core Unix utilities.
 #
-# Lines prefixed with '#' are ignored by readPkgList in modules/user/base/default.nix.
-# To temporarily restore a package for a user environment, uncomment its line below.
+# Format (lib/pkg-list.nix, gated by checks.pkg-list): one name per line; `#`
+# starts a comment anywhere on the line, so an uncommented entry can keep its
+# reason; markdown markers (`-`, `*`, `1.`, `- [x]`) and `## headings` are
+# ignored; a dotted path (`python3Packages.requests`) resolves through pkgs.
+# To restore a package, uncomment the name — the trailing note stays a comment.
 # ==============================================================================
 
 # ── Document & Typesetting Bloat (~3+ GB closure) ──

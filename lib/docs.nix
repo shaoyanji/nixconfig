@@ -1,33 +1,4 @@
-# ==============================================================================
 # lib/docs.nix — documentation generated from the COMPILED metadata
-# ==============================================================================
-# One source of truth, two consumers, zero re-parsing:
-#
-#   inventory.toml ──lib/inventory.nix──┐
-#                                       ├──> docs.nix ──> pages (markdown)
-#   modules.toml ──builtins.fromTOML────┘                 nix build .#docs
-#                                                             │
-#                                    lib/aki-site.nix renders the site from the
-#                                    compiled registry + the knowledge graph
-#                                    (`.#fleet-docs-site`, task docs:site)
-#
-# Why this exists: the fleet-inventory and modules-registry pages used to be
-# hand-maintained prose that restated `inventory.toml`/`modules.toml` and drifted
-# from them, and the site's page list lived in `docs-site/nav.json` while the
-# aki explorer re-parsed `inventory.toml` on its own. Here the pages AND the nav
-# are values derived from the same compiled registry the hosts use, so a host or
-# knob can never be documented twice in two different ways.
-#
-# `mkDocs pkgs` writes the markdown tree plus `nav.json` (the site's manifest) as
-# a derivation. That derivation is the ONLY copy of the generated pages: nothing
-# is checked in, so there is no copy to drift and no drift gate to run
-# (docs/docs-pipeline-audit.md §4). Read it with `nix build .#docs`, or as the
-# rendered page at `.#fleet-docs-site`.
-#
-# Add a hand-written page by listing it in `staticSections` below. Add a
-# generated page by adding a builder to `generatedPages`; it appears in the nav
-# automatically.
-# ==============================================================================
 {
   lib,
   inventory,

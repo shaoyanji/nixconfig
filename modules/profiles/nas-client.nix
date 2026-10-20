@@ -1,34 +1,4 @@
 # NAS client: mount frieren's `/data` export at /Volumes/data.
-#
-# Shape (2026-10-14, reworked after the boot-time failures on fern):
-#
-#   * **LAN first.** The fstab entry points at frieren's LAN address and keeps
-#     `x-systemd.automount`, so systemd owns the fast path: lazy mount on first
-#     access, idle unmount after that.
-#   * **Tailnet is a fallback only.** systemd bakes the device into the
-#     generated `.mount` unit, so it cannot choose between two servers. When
-#     the LAN server is unreachable the governor mounts the same export over
-#     Tailscale (frieren is 100.97.61.65 on the tailnet). The LAN is always
-#     tried first, and when it comes back the governor hands the path back to
-#     the automount instead of leaving the laptop on the overlay.
-#   * **A roaming laptop must not wedge the kernel.** Both paths mount `soft`
-#     with short timeouts. A hard NFS mount blocks access *indefinitely* when
-#     the server is unreachable — processes sit in D state and shutdown stalls
-#     (2026-10-14: `mount.nfs: Network is unreachable` at boot on fern). `soft`
-#     turns that into a prompt EIO the caller can handle. Workflows that cannot
-#     tolerate an interrupted write belong on a local path, not this share.
-#   * **The governor verifies.** The old recovery service only ran
-#     `systemctl restart Volumes-data.automount`, which re-arms the automount
-#     without mounting or checking anything — so a failed boot-time access was
-#     never retried, and the path stayed dead until the next stray access. The
-#     governor probes reachability, triggers the mount, *waits for it*, retries
-#     on a timer, and re-homes to the LAN after roaming.
-#   * **nix-gc must survive the NAS being absent.** A `result` symlink created
-#     by a build run from /Volumes/data registers an auto-GC-root *on the
-#     network path*. nix-gc stats it, the stat triggers the automount, and an
-#     unreachable NAS turns the whole GC run into exit 1 ("Host is down", on
-#     fern at every boot). The unit now waits for the governor and prunes only
-#     the roots that point into an unmounted NAS.
 {
   config,
   lib,

@@ -93,23 +93,55 @@
   css = builtins.readFile ./bountystash/style.css;
 
   mkLocale = lang: let
-    d = if lang == "de" then dataDe else data;
+    d =
+      if lang == "de"
+      then dataDe
+      else data;
     t = labels.${lang};
-    root = if lang == "de" then "../" else "";
+    root =
+      if lang == "de"
+      then "../"
+      else "";
     p = d.profile;
 
     nav = lib.concatMapStringsSep "" (s: ''<a href="${root}index.html#${s.id}">${s.n} ${esc s.label}</a>'') [
-      {id = "profile"; n = "00"; label = t.profile;}
-      {id = "metrics"; n = "01"; label = t.metrics;}
-      {id = "work"; n = "02"; label = t.work;}
-      {id = "stack"; n = "03"; label = t.stack;}
-      {id = "principles"; n = "04"; label = t.principles;}
-      {id = "record"; n = "05"; label = t.record;}
+      {
+        id = "profile";
+        n = "00";
+        label = t.profile;
+      }
+      {
+        id = "metrics";
+        n = "01";
+        label = t.metrics;
+      }
+      {
+        id = "work";
+        n = "02";
+        label = t.work;
+      }
+      {
+        id = "stack";
+        n = "03";
+        label = t.stack;
+      }
+      {
+        id = "principles";
+        n = "04";
+        label = t.principles;
+      }
+      {
+        id = "record";
+        n = "05";
+        label = t.record;
+      }
     ];
 
-    metrics = lib.concatMapStringsSep "" (m: ''
-      <div><dt>${esc m.label}</dt><dd>${esc m.value}</dd></div>
-    '') d.metrics;
+    metrics =
+      lib.concatMapStringsSep "" (m: ''
+        <div><dt>${esc m.label}</dt><dd>${esc m.value}</dd></div>
+      '')
+      d.metrics;
 
     workRows = lib.concatMapStringsSep "" (i: let
       pr = projectAt i;
@@ -122,25 +154,38 @@
       </a></li>
     '') (lib.range 0 (builtins.length data.projects - 1));
 
-    stack = lib.concatMapStringsSep "" (c: ''
-      <details>
-        <summary><span>${esc c.category}</span><span>${toString (builtins.length c.items)} ${t.items}</span></summary>
-        <ul class="tags">${lib.concatMapStringsSep "" (i: "<li>${esc i}</li>") c.items}</ul>
-      </details>
-    '') d.skills;
+    stack =
+      lib.concatMapStringsSep "" (c: ''
+        <details>
+          <summary><span>${esc c.category}</span><span>${toString (builtins.length c.items)} ${t.items}</span></summary>
+          <ul class="tags">${lib.concatMapStringsSep "" (i: "<li>${esc i}</li>") c.items}</ul>
+        </details>
+      '')
+      d.skills;
 
-    principles = lib.concatMapStringsSep "" (x: ''
-      <article><h3>${esc x.title}</h3><p>${esc x.body}</p></article>
-    '') d.philosophy;
+    principles =
+      lib.concatMapStringsSep "" (x: ''
+        <article><h3>${esc x.title}</h3><p>${esc x.body}</p></article>
+      '')
+      d.philosophy;
 
     education = lib.concatMapStringsSep "" (e: "
       <span>${esc e.degree} — ${esc e.school} <span class=\"org\">${esc e.period}</span></span>
     ") p.education;
 
     contacts = lib.concatMapStringsSep " · " (c: ''<a href="${c.href}">${esc c.label}</a>'') [
-      {label = "email"; href = "mailto:${p.contacts.email}";}
-      {label = "github"; href = p.contacts.github;}
-      {label = "linkedin"; href = p.contacts.linkedin;}
+      {
+        label = "email";
+        href = "mailto:${p.contacts.email}";
+      }
+      {
+        label = "github";
+        href = p.contacts.github;
+      }
+      {
+        label = "linkedin";
+        href = p.contacts.linkedin;
+      }
     ];
 
     body = ''
@@ -184,7 +229,10 @@
       title = "${p.name} — ${p.title}";
       description = "${p.title} — ${p.subtitle}";
       cssHref = "${root}style.css";
-      locale = if lang == "de" then "de_DE" else "en_US";
+      locale =
+        if lang == "de"
+        then "de_DE"
+        else "en_US";
       altEn = "${root}index.html";
       altDe = "${root}de/index.html";
       langSwitch =
@@ -204,7 +252,10 @@
 
     projectPage = i: let
       pr = projectAt i;
-      x = if lang == "de" then pr.de else pr.en;
+      x =
+        if lang == "de"
+        then pr.de
+        else pr.en;
       body = render ./bountystash/project.html {
         index = "0${toString (i + 1)}";
         kind = t.kind;
@@ -226,7 +277,10 @@
         title = "${esc x.title} — ${p.name}";
         description = x.role;
         cssHref = "${root}style.css";
-        locale = if lang == "de" then "de_DE" else "en_US";
+        locale =
+          if lang == "de"
+          then "de_DE"
+          else "en_US";
         altEn = "${root}work/${pr.url}";
         altDe = "${root}de/work/${pr.url}";
         langSwitch =

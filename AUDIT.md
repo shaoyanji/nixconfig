@@ -49,8 +49,12 @@
   zone and a blocked domain, probes every node advertising a listed address on its own
   node IP, and marks `local-bind` when the reporting host answers its own probe.
 - Fix chosen: **split DNS** `frieren.lan → 100.97.61.65`, so the zone never reaches the
-  global list. Console-only (`dns:core` write; the OAuth client answers `403`). Once set,
-  the gate reports the pin and stops faulting delphi for a zone it cannot serve.
+  global list. Console-only (`dns:core` write; the OAuth client answers `403`). Applied
+  2026-10-20: the gate now reports the pin and stops faulting delphi for that zone.
+- The same edit left globals as `[10.99.0.53]` alone — a subnet route aristotle/eisen/fern
+  cannot reach — so non-fleet names have no resolver there. `ops:tailnet:dns` now FAILS on
+  a routed-only list (hosts read from the repo, not hardcoded); fix = put `100.97.61.65`
+  back in globals, since the split rule covers only the zone.
 
 ### 2026-10-20 — Tailnet route approval is tailnet state, not host state
 

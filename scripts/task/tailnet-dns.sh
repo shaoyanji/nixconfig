@@ -18,6 +18,7 @@
 set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+repo="$(cd "$here/../.." && pwd)"
 # shellcheck source=lib/tailnet-api.sh
 source "$here/lib/tailnet-api.sh"
 
@@ -150,8 +151,24 @@ echo "actually use this list or keep their local resolvers."
 if [ "$routed" -gt 0 ]; then
   echo
   echo "NOTE: $routed of $total entries are subnet routes. Clients with"
-  echo "--accept-routes=false cannot reach them at all — eisen, fern and aristotle"
-  echo "set that deliberately. Node addresses ($node_ips listed) always work."
+  echo "--accept-routes=false cannot reach them at all. Node addresses ($node_ips listed)"
+  echo "always work."
+fi
+
+# A list made ONLY of subnet routes is unusable for every host that refuses
+# routes — and those hosts refuse them on purpose, so this is not a preference,
+# it is a broken configuration. Read the set from the repo rather than hardcoding
+# names: the declaration is what makes it true.
+if [ "$node_ips" -eq 0 ] && [ "$routed" -gt 0 ]; then
+  # Option order matters: `--` ends option parsing, so `--include` must come
+  # first. A grep miss must not abort the report under `set -e`/pipefail.
+  routes_off="$( (grep -rl --include='*.nix' -- '--accept-routes=false' "$repo/hosts" 2>/dev/null || true) \
+    | sed -E 's|.*/hosts/([^/]+)/.*|\1|' | sort -u | tr '\n' ' ')"
+  echo
+  echo "FAIL: every global nameserver is a subnet route, and these hosts refuse"
+  echo "routes (${routes_off:-none found in the repo}): they have no usable resolver."
+  echo "Add a node address — 100.97.61.65 (frieren) or 100.123.145.53 (delphi)."
+  fail=1
 fi
 if [ "$total" -lt 2 ]; then
   echo

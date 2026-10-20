@@ -77,10 +77,10 @@ When an AI agent or developer session initializes from the home directory (`$HOM
 ### Flake Output Assembly
 
 ```
-flake.nix → flake/outputs.nix (hub)
-  ├── nixosConfigurations ← flake/nixos-configurations.nix ← mkNixosHost (lib/mk-nixos-host.nix)
-  ├── darwinConfigurations ← flake/darwin-configurations.nix
-  ├── homeConfigurations  ← flake/home-configurations.nix
+flake.nix → flake/outputs.nix (the one assembly node)
+  ├── nixosConfigurations  ← mkNixosHost (lib/mk-nixos-host.nix), inline
+  ├── darwinConfigurations ← darwinSystem, inline
+  ├── homeConfigurations   ← homeManagerConfiguration, inline
   ├── packages            ← flake/packages.nix
   ├── checks              ← flake/checks.nix
   ├── devShells           ← flake/devshells.nix
@@ -91,7 +91,7 @@ flake.nix → flake/outputs.nix (hub)
 **Host registration flow**:
 
 1. One entry per host in `flake/host-inventory.nix`: defines `kind` (nixos/darwin/home), `system`, module chain, and host module path
-2. `flake/host-projection.nix` projects inventory into per-kind attrsets automatically — no manual output wiring
+2. `outputs.nix` projects inventory by `kind` — the kind picks the assembler, nothing is wired by hand
 3. `flake/module-sets.nix` defines the 5 global module chains used as baselines
 
 ### Module Chains (defined in `flake/module-sets.nix`)
@@ -122,7 +122,7 @@ modules/
   global/          — Global NixOS/Darwin/Home-Manager module chains
     user.nix       — Canonical user constants (user = devji, import this, not hardcode)
     global.nix     — Nix config: experimental features, substituters, GC
-    nixos.nix      — NixOS HM embedded: overlays, home-manager-shared, role:heim
+    nixos.nix      — NixOS HM embedded: overlays, home-manager-shared, role:home
     noDE.nix       — Container host HM: role:minimal + shell
     macos.nix      — Darwin HM: role:home
     impermanence.nix — Persistence rules for devji user
@@ -139,19 +139,14 @@ modules/
     nixbuild-client.nix — Optional nixbuild.net remote builder (distributedBuilds, off by default)
   services/        — Service modules
     aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)
-  roles/           — User role assemblers
-    minimal.nix    — Base user stack + AI
-    heim.nix       — devji desktop preferences (niri, kitty, dev, zen)
-    home.nix       — Desktop-oriented role (MacOS)
-    portable-home.nix — Shared HM baseline (shell/base + nixvim)
+  roles/           — User role assemblers (minimal, home, demo)
   user/            — User module domains
     base/          — CLI/editor/env base
-    ai/            — AI tools (gemini-cli, mods, opencode, aichat, agents)
+    ai/            — AI tools (aichat, antigravity-cli, codex, mods, opencode)
     desktop/       — Niri compositor integration
-  shell/           — Shell modules (bash, tmux, nu, zsh)
+  shell/           — Shell baseline (`base.nix`: bash+tmux) on top of nu/starship/zsh
   config/          — Config data (authorized-keys, fetches.json, shells/*.nix)
     shells/        — Dev shell definitions (flaskpy, jekyll, yarn, pdf, yt, kali, pi, etc.)
-  hm/              — Home-manager-only modules
   lib/             — Internal library functions
 ```
 
@@ -919,7 +914,7 @@ When autonomous agents (`agy`, `hermes`, subagents) execute tool calls across Ni
    - Module chain (`globalModulesNixos`, `globalModulesImpermanence`, `globalModulesContainers`, etc.)
    - Host module path(s)
    - `specialArgs` or `extraSpecialArgs` as needed
-4. Output assembly is automatic via `flake/host-projection.nix`
+4. Output assembly is automatic via the `kind` projection in `flake/outputs.nix`
 5. Build: `task infra:plan:host:<name>` or `nix build .#nixosConfigurations.<name>.config.system.build.toplevel`
 
 For provisioning a new server:

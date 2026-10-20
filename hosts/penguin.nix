@@ -6,17 +6,21 @@
   user = import ../modules/global/user.nix;
 in {
   imports = [
-    ../modules/roles/portable-home.nix
     ../modules/shell
     ../modules/env.nix
     ../modules/lf
     ../modules/sops.nix
     ../modules/scripts
   ];
-  # Use the host's pkgs (with the nvim-treesitter-tmux overlay) inside nixvim
-  # instead of nixvim's own pinned nixpkgs, which dropped the `tmux` grammar
-  # that kickstart-nixvim's treesitter config still references.
-  programs.nixvim.nixpkgs.useGlobalPackages = true;
+  # Was roles/portable-home.nix, a file with one import plus this line and a
+  # single consumer. One host is not a shared property.
+  programs.nixvim = {
+    enable = true;
+    # Use the host's pkgs (with the nvim-treesitter-tmux overlay) inside nixvim
+    # instead of nixvim's own pinned nixpkgs, which dropped the `tmux` grammar
+    # that kickstart-nixvim's treesitter config still references.
+    nixpkgs.useGlobalPackages = true;
+  };
 
   programs = {
     pay-respects.enable = true;

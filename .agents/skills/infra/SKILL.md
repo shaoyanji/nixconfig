@@ -101,7 +101,7 @@ All hosts configured in `flake/host-inventory.nix`:
 
 ### Darwin & Standalone Home Manager
 - `cassini`: Apple Silicon macOS (aarch64-darwin, nix-darwin + nix-homebrew).
-- `penguin`: Chromebook / Linux standalone Home Manager (`roles/portable-home`).
+- `penguin`: Chromebook / Linux standalone Home Manager (`shell/` + inline nixvim).
 - `alarm`: Arch Linux ARM standalone Home Manager (`roles/minimal`).
 - `kali`: Kali Linux ARM standalone Home Manager (`roles/minimal`).
 

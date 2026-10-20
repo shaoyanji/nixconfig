@@ -5,7 +5,7 @@
 }: let
   # `#` starts a comment, whole-line or trailing, so a curated list can carry
   # the reason next to the name (lib/pkg-list.nix).
-  pkgList = import ../lib/pkg-list.nix {inherit lib;};
+  pkgList = import ../../lib/pkg-list.nix {inherit lib;};
   readPkgList = path: pkgList.resolve {inherit pkgs path;};
 in {
   imports = [

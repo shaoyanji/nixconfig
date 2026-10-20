@@ -162,21 +162,11 @@ cat /sys/bus/platform/drivers/ideapad_acpi/*/conservation_mode  # Should be: 1 (
 
 #### 7. CI warm-up (recommended)
 
-Add the host to the CI build matrix so GitHub Actions pre-builds its closure and pushes to cache:
-
-```bash
-task lifecycle:ci:enable-host:<name>
-# Then commit and push the CI workflow change
-```
-
-This avoids hours of compilation on the target machine. Only a small closure (like the main server) is enabled by default — new hosts are commented out until you're ready to CI-build them.
-
-> Only `frieren` (the NAS) is actively built in CI by default. Most hosts are commented out in the `machine:` list to save CI minutes.
-
-To check what's currently enabled:
-```bash
-task lifecycle:ci:list
-```
+CI is inventory-driven — there is no build matrix to edit. Set `ci = true` (and
+keep `status = "active"`) in the host's `inventory.toml` entry; the next push
+builds its closure and `hostChecks` on the runner for its `arch`, and pushes
+them to the cache. Check what would build with `task dev:ci:plan`. Details:
+[`docs/ci-pipeline.md`](docs/ci-pipeline.md).
 
 ---
 
@@ -255,7 +245,7 @@ rm -rf hosts/<old-name>
 | `.agents/skills/*/SKILL.md` | Remove any `<old-name>` from task tables (smoke checks, deploy aliases, etc.) |
 | `docs/*fleet-pattern.md` (or similar) | Remove from Current Hosts lists and validation examples |
 | `inventory.toml` | Update device status or mark preserved in inventory source of truth |
-| `.github/workflows/nixcachix.yml` | Disable via `task lifecycle:ci:disable-host:<old-name>` (comments it out) — or remove manually |
+| `inventory.toml` | Host entry: remove it, or set `status = "preserved"` / `ci = false` (CI eligibility dies with the entry) |
 | `AGENTS.md` | Update CI pipeline section, module chain tables if stale |
 | `HANDOFF.md` (if it exists for this migration) | Mark migration complete, update module paths |
 | `README.md` | Update Quick Start examples, hosts table, and NAS client references |
@@ -286,13 +276,12 @@ nix eval '.#nixosConfigurations' --apply 'x: builtins.attrNames x' | grep <old-n
 - [ ] `nix eval` → host name resolves
 - [ ] First deploy via `task infra:apply:host:<name>`
 - [ ] Validate: SSH, governor, services
-- [ ] Enable in CI: `task lifecycle:ci:enable-host:<name>`
-- [ ] Check what's enabled: `task lifecycle:ci:list`
+- [ ] Set `ci = true` in `inventory.toml`; confirm with `task dev:ci:plan`
 
 #### Decommissioning
 
 - [ ] Audit: `task lifecycle:decommission:audit:<old-name>`
-- [ ] Disable in CI: `task lifecycle:ci:disable-host:<old-name>`
+- [ ] Drop the `inventory.toml` entry (CI eligibility dies with it)
 - [ ] Remove deploy doc: `task lifecycle:decommission:clean:<old-name>` (CI + deploy doc)
 - [ ] Migrate borrowed modules to new owner, update import paths
 - [ ] Fix hardware-specific traps in copied modules (NIC names, GPU, etc.)

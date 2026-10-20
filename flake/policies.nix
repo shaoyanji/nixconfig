@@ -31,6 +31,7 @@
     "AUDIT.md"
     ".agents/SCHEMA.md"
     ".agents/README.md"
+    "docs/ci-pipeline.md"
     "docs/storage-taxonomy.md"
     "taskfiles/README.md"
   ];
@@ -123,6 +124,35 @@
       proof = "AGENTS.md lines with never/do not/must not/should not and no citation";
       holds = builtins.length proseRules <= 65;
       detail = "${toString (builtins.length proseRules)} uncited prohibition lines (shrink-only budget: 65)";
+    };
+
+    ci-matrix-is-inventory = {
+      rule = "CI eligibility is `inventory.toml`; a task that edits a build matrix, or a workflow matrix list, is editing something the pipeline does not read.";
+      proof = ".github/workflows/nixcachix.yml (calls the detector, has no `machine:` list), taskfiles/*.yml";
+      holds =
+        has ".github/workflows/nixcachix.yml" "detect-affected-hosts.py"
+        && !(anyLine ".github/workflows/nixcachix.yml" (l: builtins.match "[[:space:]]*machine:.*" l != null))
+        && lib.all (f: !(has f "lifecycle:ci:enable-host")) taskfiles;
+      detail = "the workflow stopped being inventory-driven, or a task went back to editing a matrix";
+    };
+
+    ci-dormant-hosts-excluded = {
+      rule = "Dormant and `ci = false` hosts are excluded by the detector, not by a comment in the workflow.";
+      proof = "scripts/ci/detect-affected-hosts.py";
+      holds =
+        has "scripts/ci/detect-affected-hosts.py" ''status") == "active"''
+        && has "scripts/ci/detect-affected-hosts.py" "ci_excluded";
+      detail = "the detector stopped selecting active hosts only, or stopped honouring the per-host ci flag";
+    };
+
+    ci-builds-config-and-gate = {
+      rule = "CI builds the closure and the module-system gate for each affected host, both with `?submodules=1`.";
+      proof = ".github/workflows/nixcachix.yml";
+      holds =
+        has ".github/workflows/nixcachix.yml" "nix build -L .?submodules=1#"
+        && has ".github/workflows/nixcachix.yml" "hostChecks."
+        && has ".github/workflows/nixcachix.yml" "pipe-operators";
+      detail = "the workflow stopped building hostChecks, lost ?submodules=1, or dropped pipe-operators";
     };
 
     taxonomy-one-home = {

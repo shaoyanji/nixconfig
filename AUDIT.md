@@ -25,6 +25,14 @@
 
 ## Ledger
 
+### 2026-10-20 — CI has no matrix
+
+- The CI section moved to `docs/ci-pipeline.md`, and `lifecycle:ci:enable-host` /
+  `disable-host` were deleted: they `sed`-ed a `machine:` list the pipeline stopped
+  reading when detection became inventory-driven, and README pointed at them.
+- Gates: `ci-matrix-is-inventory`, `ci-dormant-hosts-excluded`,
+  `ci-builds-config-and-gate`; evidence `checks.policies` rc=0 (19), `docs:links` 114.
+
 ### 2026-10-20 — The storage table has one home
 
 - The `/srv/data` table, media-isolation rules and security-directory notes left
@@ -49,16 +57,12 @@
 
 ### 2026-10-20 — The tree matches the module graph
 
-- Deleted what nothing consumed: `modules/niri.nix` and `roles/heim.nix` (re-export
-  shims), `hm/niri.nix`, `wezterm/`, `nixos/k3s/`, `user/ai/gemini-cli.nix`, and
-  `lib/pie-menu.nix` (334 lines, zero callers). `roles/portable-home.nix` (one import +
-  one option, one host) is now three lines in `hosts/penguin.nix`.
-- `modules/shell/{bash,tmux}.nix` merged into `base.nix`: the two-import shim became the
-  leaf. Behaviour proven identical — eisen's HM `programs.tmux.enable` is true before and
-  after, `.bash_aliases` renders the same 322 B.
-- `flake/` lost its six wiring-only files (`systems`, `pkgs-for`, `host-projection`, and
-  one assembler per kind): each was a dozen lines with exactly one consumer, `outputs.nix`.
-  14 files → 7; the kind projection is now the only thing that picks an assembler.
+- Deleted what nothing consumed: `modules/niri.nix`, `roles/heim.nix`, `hm/niri.nix`,
+  `wezterm/`, `nixos/k3s/`, `user/ai/gemini-cli.nix`, `lib/pie-menu.nix` (334 lines,
+  zero callers); `roles/portable-home.nix` is three lines in `hosts/penguin.nix`.
+- `modules/shell/{bash,tmux}.nix` merged into `base.nix` (behaviour proven identical:
+  eisen's `programs.tmux.enable`, the same 322 B `.bash_aliases`); `flake/` lost six
+  wiring-only files, 14 → 7, one consumer each.
 - 236 → 219 `.nix`. 26 configurations still evaluate (23 nixos + 3 home), `checks:host`
   green on frieren/mtfuji/demo, `penguin MODE=eval` 4.5 s / 482 MiB.
 

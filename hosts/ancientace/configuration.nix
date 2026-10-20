@@ -63,7 +63,6 @@ in {
 
   home-manager.users.devji.home.sessionVariables.EDITOR = lib.mkForce "nvim";
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
-  networking.hostName = "ancientace";
 
   hardware.graphics.extraPackages = [];
   services = {

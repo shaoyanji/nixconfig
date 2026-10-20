@@ -67,7 +67,6 @@ in {
     ../../modules/services/simplex-smp-server.nix
     ../../modules/profiles/nixbuild-client.nix
   ];
-  networking.hostName = "frieren";
 
   # nixpkgs enables speechd for any graphical desktop
   # (services/misc/graphical-desktop.nix: `services.speechd.enable =

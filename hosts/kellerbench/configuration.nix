@@ -34,8 +34,6 @@ in {
       ../../modules/profiles/sunshine.nix
     ];
 
-  networking.hostName = "kellerbench";
-
   # X server is required so XWayland can host any legacy X11-only windows
   # that Steam spawns inside gamescope's Wayland surface. No desktop environment
   # is configured - greetd auto-logs devji into gamescope-session (real

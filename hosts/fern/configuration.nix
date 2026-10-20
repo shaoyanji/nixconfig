@@ -34,8 +34,6 @@ in {
     ../../modules/profiles/base-node.nix
   ];
 
-  networking.hostName = "fern";
-
   # --- Tailscale: keep the native LAN path ---
   # desktop-client.nix sets `--accept-routes=true`, which makes frieren's
   # advertised 192.168.3.0/24 subnet route land in table 52 (`ip rule 5270`)

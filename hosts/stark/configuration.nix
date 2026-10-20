@@ -36,8 +36,6 @@ in {
     ../../modules/profiles/base-node.nix
   ];
 
-  networking.hostName = "stark";
-
   # --- Desktop (eisen-style): niri compositor + DankMaterialShell greeter ---
   services.displayManager.sddm = {
     enable = false;

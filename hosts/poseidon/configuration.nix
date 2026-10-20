@@ -66,7 +66,6 @@ in {
     kernelPackages = lib.mkForce pkgs.linuxPackages;
     kernelModules = [];
   };
-  networking.hostName = "poseidon";
 
   environment = {
     systemPackages = with pkgs;

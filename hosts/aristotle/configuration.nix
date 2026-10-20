@@ -24,7 +24,6 @@ in {
   # Inbound ICMP ping allowed for diagnostics and network health audits
   networking.firewall.allowPing = true;
   networking.firewall.allowedTCPPorts = [2049];
-  networking.hostName = "aristotle";
 
   # Hardware video acceleration for Intel HD Graphics 4400 (Haswell Gen 7.5).
   # Uses legacy i965 intel-vaapi-driver (modern intel-media-driver iHD only supports Gen 8+ / Broadwell+).

@@ -162,7 +162,17 @@ in {
       "x-scheme-handler/https" = ["zen-beta.desktop"];
       "x-scheme-handler/about" = ["zen-beta.desktop"];
       "x-scheme-handler/unknown" = ["zen-beta.desktop"];
+      "x-scheme-handler/chrome" = ["zen-beta.desktop"];
       "application/xhtml+xml" = ["zen-beta.desktop"];
+      "application/x-extension-htm" = ["zen-beta.desktop"];
+      "application/x-extension-html" = ["zen-beta.desktop"];
+      "application/x-extension-shtml" = ["zen-beta.desktop"];
+      "application/x-extension-xhtml" = ["zen-beta.desktop"];
+      "application/x-extension-xht" = ["zen-beta.desktop"];
+
+      # Custom URL schemes (desktop apps)
+      "x-scheme-handler/kando" = ["kando.desktop"];
+      "x-scheme-handler/freetube" = ["freetube.desktop"];
 
       # Documents / PDFs
       "application/pdf" = ["zen-beta.desktop" "mupdf.desktop"];
@@ -189,6 +199,20 @@ in {
       "audio/ogg" = ["mpv.desktop"];
       "audio/mp4" = ["mpv.desktop"];
       "audio/x-wav" = ["mpv.desktop"];
+    };
+
+    associations.added = {
+      # Fallback secondary browsers and handlers from desktop profile
+      "x-scheme-handler/http" = ["zen-beta.desktop" "zen-twilight.desktop"];
+      "x-scheme-handler/https" = ["zen-beta.desktop" "zen-twilight.desktop"];
+      "x-scheme-handler/chrome" = ["zen-beta.desktop" "zen-twilight.desktop"];
+      "text/html" = ["zen-twilight.desktop"];
+      "application/x-extension-htm" = ["zen-twilight.desktop"];
+      "application/x-extension-html" = ["zen-twilight.desktop"];
+      "application/x-extension-shtml" = ["zen-twilight.desktop"];
+      "application/xhtml+xml" = ["zen-twilight.desktop"];
+      "application/x-extension-xhtml" = ["zen-twilight.desktop"];
+      "application/x-extension-xht" = ["zen-twilight.desktop"];
     };
   };
 

@@ -20,17 +20,21 @@
   # flake so harmonia serves the closures to the whole LAN at wire speed.
   # Uses the same github: source as system.autoUpgrade (eval works without
   # the secrets submodule because modules/secrets.yaml is tracked in the
-  # main repo). flake.lock refreshes stay manual:
-  # task infra:warm:cache UPDATE=1.
+  # main repo). Pins the current generation of each host under
+  # /nix/var/nix/gcroots/fleet/$h to prevent nix.gc from sweeping Harmonia paths.
+  # flake.lock refreshes stay manual: task infra:warm:cache UPDATE=1.
   fleetWarmCache = pkgs.writeShellScript "fleet-warm-cache" ''
     set -u
     fail=0
+    mkdir -p /nix/var/nix/gcroots/fleet
     for h in \
       frieren poseidon eisen fern stark scratch guckloch
     do
-      echo "==> warming: $h"
+      echo "==> warming & pinning current generation: $h"
+      out_link="/nix/var/nix/gcroots/fleet/$h"
       ${pkgs.nix}/bin/nix --extra-experimental-features "nix-command flakes" build \
         "github:shaoyanji/nixconfig#nixosConfigurations.$h.config.system.build.toplevel" \
+        --out-link "$out_link" \
         -L || fail=1
     done
     exit $fail
@@ -108,6 +112,17 @@ in {
   # Server-class host: pin the current nixpkgs LTS kernel instead of the
   # latest-kernel default from profiles/base-node.nix.
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_12;
+
+  # Frieren is a server-heavy-io-sensitive node with spinning media (/dev/sda).
+  # 1. Disable full-store batch traversal to prevent mechanical head thrashing.
+  nix.optimise.automatic = lib.mkForce false;
+
+  # 2. Strict cgroup v2 I/O safety guardrails in case nix-optimise is manually triggered.
+  systemd.services.nix-optimise.serviceConfig = {
+    IOReadIOPSMax = ["/dev/sda 35"];
+    IOWriteIOPSMax = ["/dev/sda 20"];
+    IOWeight = 10;
+  };
 
   # --- Fleet cache warmer ---
   # Weekly unattended build of all host closures (script defined above);
@@ -471,6 +486,7 @@ in {
 
   # Ensure directories exist
   systemd.tmpfiles.rules = [
+    "d /nix/var/nix/gcroots/fleet 0755 root root -"
     "d /Volumes/data 0755 root root -"
     "d /srv/data 0755 root root -"
     "d /srv/data/downloads 0775 aria2 users -"

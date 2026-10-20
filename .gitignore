@@ -25,3 +25,7 @@ session-*.md
 
 # direnv: per-machine devshell cache (the flake is the source of truth)
 .direnv/
+
+# Local diff files
+*.diff
+

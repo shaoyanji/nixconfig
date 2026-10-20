@@ -35,10 +35,10 @@
   and the submodule `.sops.yaml` copy trap.
 - First offload: `services.fleetMonitors` on delphi (gatus, tailnet-only `:8181`, public `:8181`
   refused) — an out-of-LAN vantage point frieren's loopback probes cannot be. 3/3 endpoints ok.
-- Public web verified: `/healthz` → `200`, SYN→SYN-ACK→ACK on `enp0s6`. The first ingress
-  attempt dropped with **0 packets on the wire** — the ports went into *Source* Port
-  Range, and an inbound connection's source port is ephemeral. Rule + method:
-  `.agents/deploy/hosts/delphi.md` Phase 4.
+- Public web: first ingress attempt dropped with **0 packets on the wire** (ports in
+  *Source* Port Range). Now `https://delphi.bountystash.com` → `200`, Let's Encrypt chain,
+  `:80` → `301`; DNS-only A record was the only manual step. ACME's 404 was a local nginx
+  listen-group bug, not DNS — Phase 4/4c of the runbook.
 
 ### 2026-10-19 — Graph queries, and the decision model's real accuracy
 

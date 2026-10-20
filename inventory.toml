@@ -143,7 +143,7 @@ constraints = ["Preserved host; do not target for live deployment."]
 [hosts.delphi]
 hostname = "delphi"
 status = "active"
-status_detail = "Live since 2026-10-20 on OCI Ampere A1 (NixOS 26.11): nginx landing page + /healthz reachable from the internet (SYN->SYN-ACK verified on the wire), crab-hole tailnet resolver on 10.99.0.53 (UDP/53, ads+telemetry NXDOMAIN), Hermes agent + gateway (own Telegram bot, polling), Tailscale up as exit node. Outstanding: no 443 vhost (needs a name that resolves; the vhost + ACME are declared and inert behind `publicDomain`), and frieren does not yet advertise the same /32, so the DNS failover group has one member."
+status_detail = "Live since 2026-10-20 on OCI Ampere A1 (NixOS 26.11): HTTPS on delphi.bountystash.com (Let's Encrypt via HTTP-01, DNS-only A record, :80 redirects) plus /healthz reachable from the internet, crab-hole tailnet resolver on 10.99.0.53 (UDP/53, ads+telemetry NXDOMAIN), Hermes agent + gateway (own Telegram bot, polling), fleet monitors as an out-of-LAN vantage (gatus on tailnet :8181), Tailscale up as exit node. Outstanding: frieren does not yet advertise the same /32, so the DNS failover group has one member."
 kind = "nixos"
 is_nix = true
 arch = "aarch64-linux"

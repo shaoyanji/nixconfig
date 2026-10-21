@@ -132,6 +132,7 @@ tasks:
                 task checks:build:route        would THIS host have to compile?         HTTP only
                 task checks:ports              declarations vs live listeners           free, local
                 task checks:dns:failover       resolver group answers + can fail over    LAN probes
+                task checks:dns:pool           resolver addresses vs DHCP pool         POOL=<a-b>
 
               REPO HYGIENE  (proves no host config — that is `checks:host`)
                 task checks:quick              inventory checks + lint + sops drift      bounded, no host eval

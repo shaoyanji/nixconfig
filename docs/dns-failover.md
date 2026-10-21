@@ -50,8 +50,9 @@ stack as `role = "secondary"` (its own `lanInterface = "wlo1"`), answering the s
 client that falls back gets identical answers.
 
 `virtualIp` is still **null**, so failover is **client-side**: nothing floats, and
-clients must be handed both resolvers (FritzBox DHCP secondary, or a client's
-`networking.nameservers`). There is no VIP to answer if a node dies silently.
+clients must be handed both resolvers (a second DHCPv4 server on the Huawei router,
+or a client's `networking.nameservers`). There is no VIP to answer if a node dies
+silently.
 
 ### fern's address is deliberately NOT in `resolvers`
 
@@ -65,7 +66,16 @@ group once fern's address is reserved and listed.
 frieren's own `192.168.3.25` is likewise a reservation rather than a Nix-static address
 (`networking.interfaces` is empty and `useDHCP` is true), which is why it is the only
 address the fleet hardcodes: it is the NAS and the subnet router, and every
-`*.frieren.lan` record points at it.
+`*.frieren.lan` record points at it. The reservation is bound to `enp1s0`'s MAC
+(`54:E1:AD:D5:EC:FF`), not to the dock's USB NIC, so a dock lease can never be handed
+the resolver address.
+
+A reservation is a binding, not a range. The lowest address seen in use on the LAN is
+`.26`, one above the resolver, so whether `.25` sits inside the dynamic range depends
+on the pool's lower bound — and the binding is then the only thing keeping the
+resolver address out of circulation. `checks:dns:pool` makes that overlap explicit;
+narrowing the router's pool (e.g. `.100`–`.200`) makes the separation structural
+instead of procedural.
 
 ## Bringing up a secondary
 
@@ -91,8 +101,9 @@ falls back to it gets the same answers.
 
 * **Client-side (default, `virtualIp = null`).** No floating address. Clients must be
   configured with both resolvers (DHCP secondary, or `networking.nameservers`). To
-  make this real for LAN clients the **FritzBox** (`192.168.3.1`, the DHCP server) must
-  hand out both addresses — that is a manual router change, not something Nix owns.
+  make this real for LAN clients the **Huawei router** (`192.168.3.1`, the DHCP
+  server — the FRITZ!Box is one of its clients, not the DHCP server) must hand out
+  both addresses — a manual router change, not something Nix owns.
 * **VRRP (`virtualIp = "192.168.3.53", virtualRouterId = 53`).** keepalived advertises
   one address that both hosts share; clients keep pointing at the single VIP. A
   DNS-aware `vrrp_script` demotes a node whose resolver stops answering (not just one
@@ -114,6 +125,18 @@ task checks:dns:failover RESOLVERS="192.168.3.25 192.168.3.26"
 Exit codes: **0** = group answers the zone and is redundant; **1** = a listed resolver
 failed to answer, or the VIP answered from two MACs (split brain); **2** = failover
 cannot be evaluated (fewer than 2 members — the state today).
+
+A resolver address that a client can be *leased* is a resolver a client can lose to
+another device, so the pool is checked separately. The pool bounds are router state,
+so they are an input, never a guess:
+
+```bash
+task checks:dns:pool POOL=192.168.3.100-192.168.3.200   # 0 = .25 is outside the pool
+task checks:dns:pool POOL=192.168.3.20-192.168.3.200    # 1 = .25 is inside it
+```
+
+Exit **0** = every declared address is outside; **1** = one is inside (or the range is
+misordered); **2** = cannot evaluate (no pool or bad input).
 
 The check probes a **subdomain** (`hc3-check.<zone>`), not the apex, and routes a query
 to a resolver that *is* the local host through `127.0.0.1`. Both are deliberate:
@@ -422,5 +445,6 @@ consistent by accident rather than by configuration.
 * `scripts/task/tailnet-dns.sh` — `ops:tailnet:dns` (nameserver set, classification, probes)
 * `scripts/task/lib/tailnet-api.sh` — token resolution shared by all three
 * `scripts/task/dns-failover-check.sh` — the check behind `checks:dns:failover`
+* `scripts/task/dns-pool-check.sh` — the check behind `checks:dns:pool`
 * `hosts/frieren/dns.nix` — the primary declaration
 * `docs/frieren-access.md` — service-access matrix

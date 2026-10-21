@@ -25,6 +25,23 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-21 — `dsh-remote` delivers the browser, and the worker boots signed in
+
+- `modules/user/ai/dsh-launcher.nix` stops assuming a fixed `:3080`: the worker
+  starts `dsh web --no-open --host 127.0.0.1 --port 0`, that URL's own port is
+  forwarded to a free local one and rewritten onto it, and reuse is gated on the
+  port still answering — a dead pane restarts instead of feeding the browser a
+  stale token. The pane command must stay `bash -lc '…'`: `delphi`'s tmux
+  `default-shell` is nushell, which rejects `2>&1` and killed the session.
+- Auth: a signed-in client's `~/.dsh/.credentials.yaml` is piped over ssh before
+  the harness starts (worker's copy kept as `.bak`; a grant already on the worker
+  wins unless `--sync-auth`). Browser sign-in still works — the callback returns
+  through the same forward.
+- Evidence from `frieren` against `delphi`: token `303` → cookie `200` with
+  `<title>DeepSeek Harness</title>`, `/api/remote.mux` upgrade `401` → **`101`**
+  through `ssh -L`; reuse, cold start, `--status`, `--kill` exercised; the wrapper
+  builds and the module's `drvPath` is the tested one.
+
 ### 2026-10-21 — Pi research is dumped, and there is no 2.0 to design against
 
 - Checked against npm and GitHub: 60 published versions, **no `2.x`**, newest tag and

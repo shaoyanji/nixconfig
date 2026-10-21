@@ -7,6 +7,7 @@ Superseded narrative, kept for provenance. **Nothing here is current truth.**
 | `audit-2026-10.md` | The monolithic audit (April–October 2026): AI-module teardown, lint convergence, service extraction, per-host eval history | `AUDIT.md` (current state + ledger) |
 | `todo-2026-10.md` | The long TODO/HANDOFF hybrid: HC-1…HC-8 delivery notes, fleet optimizations, follow-up queues | `TODO.md` + `HANDOFF.md` (bounded queues), `ARCHITECTURE.md` (proposals) |
 | `handoff-2026-10.md` | The 784-line strategic handoff: host disambiguation, audit findings, completed maintenance | `HANDOFF.md` (queue) |
+| `handoff-dsh-remote-2026-10-21.md` | The unfinished remote-harness launcher: what worked, what was unproven | `modules/user/ai/dsh-launcher.nix` (the launcher itself) + the 2026-10-21 `AUDIT.md` entry |
 
 Rules:
 

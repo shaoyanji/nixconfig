@@ -4,6 +4,9 @@
 NAS server (Samba, NFS, Jellyfin, Paperless-ngx, Unbound DNS + Pi-hole, aria2) and 4K media center (Ideapad). Built in CI by default.
 
 ## Key Differences
+- **Two boot personas**: the default generation is headless (no compositor, greeter, or DisplayLink); the niri media centre is `specialisation.desktop` (`hosts/frieren/desktop.nix`). Self-upgrade stages both, so switching persona needs no rebuild — pick it in the systemd-boot menu.
+  - A specialisation is **boot-time only**. `nixos-rebuild switch` (what the 04:00 self-upgrade does when the kernel is unchanged) activates the *headless* toplevel even while the desktop session is running, so a desktop-stack edit needs `nixos-rebuild boot` plus a reboot, then selecting the `desktop` entry.
+  - Jellyfin's QuickSync does **not** depend on the persona: VA-API (`hardware.graphics`, `intel-media-driver`, `LIBVA_DRIVER_NAME=iHD`) lives in the base `hosts/frieren/hardware.nix`, and `media-stack.nix` puts the `jellyfin` user in `video`/`render` so `/dev/dri/renderD128` is reachable without relying on a 0666 device node.
 - **Daily self-upgrade**: canonical `system.autoUpgrade` module (no hand-rolled timer/script) runs at 04:00 every morning with a persistent timer (catches up on next boot if the NAS was off). It stages `nixos-rebuild boot --flake github:shaoyanji/nixconfig#frieren` first, then:
   - kernel/initrd/kernel-modules **changed** → reboots into the new generation (`shutdown -r +1`) — only reached when the boot command exited 0;
   - otherwise → live `nixos-rebuild switch`, no reboot.

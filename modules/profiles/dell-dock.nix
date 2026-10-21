@@ -70,6 +70,17 @@ in {
       ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="06c4", ATTR{power/control}="on", ATTR{power/wakeup}="enabled"
     '';
 
+    # The dock's Ethernet is a USB CDC-NCM device (`cdc_ncm`, e.g.
+    # enp0s20f0u2u1i5 on frieren). Left managed, NetworkManager treats every
+    # dock/replug as a new connection and takes a fresh DHCP lease (observed
+    # .60, then .253), which the router then recycles to the next device. The
+    # port is spare — frieren and fern each keep their own wired/wifi uplink —
+    # so leave it unmanaged: no lease churn, and no duplicate-address window
+    # against a device that already holds that address.
+    networking.networkmanager.unmanaged = [
+      "driver:cdc_ncm"
+    ];
+
     # Disable USB autosuspend for btusb: kernel 6.12 defaults enable_autosuspend=Y,
     # which aggressively powers down BT adapters after 2s and drops connection to MX Keys/Master.
     boot.extraModprobeConfig = lib.mkIf cfg.preventAutosuspend ''

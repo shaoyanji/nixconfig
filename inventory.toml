@@ -34,11 +34,12 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Central NAS Mainframe, Kitchen Light Workstation & Fleet Server"
 category = "server-and-workstation"
-desktop_environment = "niri (Wayland) via greetd/dms-greeter autologin (Dell D6000 Dock to Samsung 4K Display)"
+desktop_environment = "headless by default; niri (Wayland) via greetd/dms-greeter autologin in the `desktop` specialisation (Dell D6000 Dock to Samsung 4K Display)"
 users = ["devji"]
 notes = [
   "Central NAS and services mainframe on a Lenovo ideapad 320-15IKB. Moved to the basement for 24/7 quiet operation.",
-  "External 4K display output driven through the Dell D6000 Universal Dock (DisplayLink EVDI) using profiles.dell-dock.enable.",
+  "External 4K display output driven through the Dell D6000 Universal Dock (DisplayLink EVDI) using profiles.dell-dock.enable — only in the `desktop` specialisation.",
+  "Boot default is headless server mode (no compositor, greeter, or DisplayLink); the niri media centre is the `desktop` specialisation, picked from the systemd-boot menu.",
   "Network interfaces: onboard Gigabit Ethernet (enp1s0, 192.168.3.25) and Wi-Fi (wlp2s0, 192.168.3.98).",
 ]
 

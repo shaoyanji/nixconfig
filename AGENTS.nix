@@ -3683,6 +3683,44 @@
         CLI (`systemone-decision`) remains the offline answer.
       '';
     };
+    nix-comment-audit = {
+      title = "Comment density in .nix files: indexed, not yet audited";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-10-21";
+      summary = "4169 comment lines sit in tracked .nix files (AGENTS.nix excluded); qmd already retrieves them, so the fix is pruning narrative, not adding an index.";
+      refs = {
+        hosts = ["delphi" "frieren"];
+        modules = ["hosts/delphi/configuration.nix" "hosts/frieren/configuration.nix" "lib/aki-site.nix"];
+        tasks = ["dev:qmd:refresh"];
+      };
+      body = ''
+        **Measured 2026-10-21.** Top offenders by comment lines / total:
+        delphi 236/641, frieren 148/627, lib/aki-site 147/1143, lib/taskfile
+        146/653, eisen/llm-server 130/503, frieren/infra-stack 125/992,
+        flake/checks 113/395, netbook 109/302, frieren/dns 92/216 (43 %), kali
+        88/194, eisen/decision-models 85/352, frieren/reverse-proxy 83/448.
+
+        **Discoverability is already solved.** qmd indexes the .nix tree (2052
+        files) and a comment is findable: `qmd search disko -c nixconfig` lands
+        on `flake/host-inventory.nix` at 91 %, `qmd search accept-dns` lands on
+        `hosts/frieren/dns.nix` at 92 %. So a comment is not hidden — the
+        question is only whether it should exist twice.
+
+        **Probe trap, recorded because it cost a wrong conclusion.** Searching a
+        quoted sentence ("disko wipes BOTH disks") returns `[]` while the same
+        words hit at 91 %; BM25 matches tokens, so probe with one distinctive
+        word, not a phrase, or a working index looks broken.
+
+        **The test to apply per comment.** Keep it if it states a *why* or a trap
+        that no policy, option or note carries ("a resolver must not resolve
+        through the address it serves"); delete it if it restates the code
+        ("# enable the service"), duplicates an inventory note or a policy, or
+        narrates history that belongs in `docs/history/`. Start at the top of
+        the list, where delphi is both the largest and the freshest.
+      '';
+    };
     open-minyx-2611 = {
       title = "minyx reflash after the 26.11 stable release";
       kind = "open";

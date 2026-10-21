@@ -288,6 +288,24 @@ curl -sL -c /tmp/j -b /tmp/j https://delphi.bountystash.com/deepseek/ | grep -o 
 ssh delphi 'journalctl -u dsh-web -o cat | grep "^dsh web:" | tail -1'   # signed-in URL
 ```
 
+**An unsigned worker is not a dead end, but it has exactly two doors.** Upstream
+accepts the DeepSeek OAuth callback only on a loopback origin with an explicit
+port (`dsh-deepseek-account-platform` `loginOrigin()`, whose own comment reads
+"remote domains and path-based proxies are unsupported"; the UI passes
+`window.location.origin`). So the in-page Sign-in button cannot complete through
+`/deepseek/` — it fails with a protocol error, not a network one. The launcher
+covers both working doors:
+
+```bash
+dsh-remote --login       # temporary 127.0.0.1:<port> forward; sign in there, and
+                         # the forward closes itself when the credential lands
+dsh-remote --sync-auth   # import a signed-in client's ~/.dsh credential over ssh
+```
+
+The harness needs no account to *boot*: measured with the credential moved aside,
+`dsh-web` stayed active, published its URL and served the page (`200`), and
+`--status` reported `account NONE` instead of looking broken.
+
 `https://delphi.cloudforest-kardashev.ts.net/deepseek/` is **not** served:
 nginx binds `0.0.0.0:443`, so `tailscale serve` cannot take the tailnet address
 (`bind: address already in use`, measured 2026-10-21). Adding it means a

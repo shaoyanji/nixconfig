@@ -25,6 +25,18 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-21 — Delphi cloud workspace seeder, Freebuff mainframe, & Antigravity gateway
+
+- Fixed `seed-workspace` on delphi: added `gh` to `delphi-seed-workspace` with
+  `url."https://github.com/".insteadOf "git@github.com:"` rewrite and `gh repo clone`
+  so recursive submodule clones do not block on missing GitHub SSH keys.
+- Deployed `freebuff` and `freebuff-headless` to Delphi; re-pointed `freebuff-remote`
+  away from frieren to `delphi.bountystash.com`.
+- Enabled 24/7 `antigravity-cli-daemon` (`agy remote-control serve`) on Delphi
+  under user lingering for persistent connectivity on `antigravity.google.com`.
+- Fixed direnv cached devShell progcomp bug: added `bashInteractive` to `nativeBuildInputs`
+  in `flake/devshells.nix` so interactive subshells retain completion builtins.
+
 ### 2026-10-21 — the harness is a worker service behind HTTPS, not a tunnel
 
 - `services.dshWeb` runs `dsh web` on the worker (systemd, loopback `:3080`,
@@ -110,24 +122,6 @@
 - So the stall was neither build nor copy-back cost: it was one remote build that
   never reported. The 141.6 MiB modules pair is still fetched **locally** even with
   `builders-use-substitutes true`, so the flag does not move this host's cost.
-
-### 2026-10-21 — Exit codes are a gate; prose has its own digest
-
-- The 33 summaries naming an exit code were cross-checked against the script their
-  task invokes (25 script-backed, 8 inline by hand): **0 over-promise**. The two
-  real drifts were already fixed — `checks:ports` lost `1 = STRICT drift`,
-  `checks:kg:sidecar` read the engine's 404 as its own status.
-- That audit is now `exitDrift` (fatal): a code a `summary` promises that no script
-  or inline command emits. `0` is never a claim, `fail=1 … exit "$fail"` counts,
-  and a task
-  that just runs `nix build` is `opaque` (nothing to compare). Membership is asked
-  of `readDir` — `pathExists` answers false for an unrealised lazy flake path.
-- `graph.json` now carries the prose surface verbatim, and the artifact name holds
-  both digests (`taskfile-graph-<version>-p<prose>`), so a prose-only edit is
-  addressable. Measured: version unchanged, prose `c0e18535aacf → ce94226f319a`,
-  new path; reverting restored the original path byte for byte.
-- Evidence: `checks:tasks` rc=0 (437 tasks, 17 buckets, 0 hard violations),
-  selftest 17 buckets / 16 tasks, `checks:quick` rc=0.
 
 ### 2026-10-21 — The 2026-10-20 ledger entries are archived
 

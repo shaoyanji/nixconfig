@@ -57,6 +57,8 @@
   # COMPILED from `services.servicePortal` below — the public page carries no
   # cards, because a tailnet URL on an internet-facing page is a map.
   healthPage = config.services.servicePortal.pages.public;
+
+  freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 in {
   imports = [
     ./hardware-configuration.nix
@@ -578,12 +580,17 @@ in {
     dnsutils
     iproute2
     tcpdump
+    gh
+    antigravity-cli
+    llm-agents.freebuff
+    freebuff-headless
     # Autonomous Cloud Workspace Seeder: sets up ~/Documents/nixconfig and ~/vaults/personal
-    # directly from upstream GitHub without requiring fragile LAN mounts or manual flags.
+    # directly from upstream GitHub via GitHub CLI / HTTPS, avoiding missing SSH key blocks.
     (writeShellApplication {
       name = "delphi-seed-workspace";
       runtimeInputs = [
         git
+        gh
         openssh
         coreutils
       ];
@@ -592,9 +599,19 @@ in {
         echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
         mkdir -p "$HOME/Documents" "$HOME/vaults"
 
+        # Rewrite SSH submodule URLs to HTTPS so submodule clones do not require GitHub SSH keys
+        git config --global url."https://github.com/".insteadOf "git@github.com:" || true
+        if command -v gh >/dev/null 2>&1; then
+          gh auth setup-git || true
+        fi
+
         if [ ! -d "$HOME/Documents/nixconfig/.git" ]; then
           echo "--> Cloning nixconfig to ~/Documents/nixconfig (with recursive submodules)..."
-          git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$HOME/Documents/nixconfig"
+          if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+            gh repo clone shaoyanji/nixconfig "$HOME/Documents/nixconfig" -- --recurse-submodules
+          else
+            git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$HOME/Documents/nixconfig"
+          fi
         else
           echo "--> ~/Documents/nixconfig already exists. Pulling latest..."
           git -C "$HOME/Documents/nixconfig" pull --recurse-submodules || true
@@ -609,6 +626,34 @@ in {
       '';
     })
   ];
+
+  # 24/7 Remote Operator Gateway: Antigravity remote-control daemon (antigravity.google.com)
+  systemd.user.services.antigravity-cli-daemon = {
+    description = "antigravity remote-control daemon";
+    after = ["network.target"];
+    unitConfig = {
+      StartLimitIntervalSec = 0;
+    };
+    serviceConfig = {
+      Type = "simple";
+      Environment = [
+        "SSH_CLIENT=127.0.0.1 1 1"
+        "SSH_CONNECTION=127.0.0.1 1 127.0.0.1 22"
+        "HOME=${user.home}"
+        "USER=${user.name}"
+        "PATH=${user.home}/.nix-profile/bin:/etc/profiles/per-user/${user.name}/bin:/run/current-system/sw/bin"
+        "SHELL=/run/current-system/sw/bin/bash"
+      ];
+      ExecStart = "${pkgs.antigravity-cli}/bin/agy remote-control serve";
+      Restart = "on-failure";
+      RestartSec = "10s";
+      RestartPreventExitStatus = 3;
+      TimeoutStopSec = "30s";
+      StandardOutput = "journal";
+      StandardError = "journal";
+    };
+    wantedBy = ["default.target"];
+  };
 
   # Modal editor defaults (Catppuccin Mocha theme, relative line numbers).
   # This nixpkgs revision has no NixOS programs.helix module, so helix comes

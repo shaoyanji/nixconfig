@@ -12,6 +12,7 @@ lib.genAttrs systems.default (
   in {
     default = pkgs.mkShell {
       nativeBuildInputs = [
+        pkgs.bashInteractive
         pkgs.nodejs
         pkgs.go
         pkgs.gopls
@@ -21,7 +22,7 @@ lib.genAttrs systems.default (
         # `nix develop` (or the repo's `.envrc` via direnv) `elixir` is on PATH
         # and scripts/task/kg-sidecar.sh never calls nix at all.
         pkgs.beamPackages.elixir
-        pkgs.erlang
+        pkgs.beamPackages.erlang
       ];
     };
 

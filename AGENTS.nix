@@ -3494,6 +3494,249 @@
       };
       from = ["exp-107"];
     };
+    exp-115 = {
+      title = "EXP-115 — delphi as the fleet aarch64 builder";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-21";
+      summary = "delphi is the fleet's only aarch64-linux host, so minyx and any mobile-nixos target have nowhere to build today; one timed closure decides whether it is a builder or a dead end.";
+      refs = {
+        hosts = ["delphi" "frieren" "minyx"];
+        modules = ["modules/profiles/nixbuild-client.nix" "hosts/minyx/custompi.nix"];
+        tasks = ["checks:host" "dev:nixbuild:plan"];
+        docs = [".agents/deploy/hosts/delphi.md"];
+      };
+      body = ''
+        **Hypothesis.** Two A1 cores and 11 GiB build an aarch64 system closure in
+        a time that beats "nobody can build it", and 175 GiB free holds one target
+        if the store is collected after each run.
+
+        **Measured.** minyx evaluates here in 41 s at 1.4 GiB peak. The instance is
+        at the whole Always Free A1 allowance (2 OCPU / 12 GiB / 200 GiB block),
+        so there is no second instance to grow into: every idea must fit here.
+
+        **Auth, measured.** PermitRootLogin is off on delphi, TrustedUserCAKeys is
+        set, and frieren's devji already authenticates with a CA-signed cert. But
+        the nix daemon opens builder ssh as root, so the design needs a
+        root-readable key under /etc/nix (sops) or a dedicated builder user with
+        nix.settings.trusted-users. Not devji: a builder that holds the fleet CA
+        key turns a build into fleet access.
+
+        **Two shapes.** (A) nix.buildMachines on frieren plus trusted-users on
+        delphi: transparent nix build .#nixosConfigurations.minyx, but needs a key.
+        (B) build on delphi over the existing CA session and push to Cachix: no new
+        secrets, one task instead of a client-side config.
+
+        **Measurement.** Build one closure with builders disabled on the far side;
+        record wall time, peak RSS and store growth.
+
+        **Exit.** A minyx closure builds on delphi and frieren substitutes it; or
+        REJECTED with the wall-clock or OOM number that killed it.
+      '';
+    };
+    exp-116 = {
+      title = "EXP-116 — delphi as the fleet exit node";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-21";
+      summary = "delphi measures 1.38 Gbps down and 430 Mbps up against the home link's 50/20, so routing a laptop through it is a bandwidth multiplier rather than a tunnel.";
+      refs = {
+        hosts = ["delphi" "frieren"];
+        docs = [".agents/deploy/hosts/delphi.md"];
+      };
+      body = ''
+        **Measured.** iperf3 over the direct WireGuard path (13 ms) gives 50 Mbps
+        down and 20 Mbps up to frieren; the same VM reaches a well-connected peer
+        at 172 MB/s down and 54 MB/s up. delphi already advertises itself as an
+        exit node.
+
+        **Operator state.** The split route is already configured, so this is a
+        measurement, not a setup: what the laptop actually gets, and whether the
+        fleet LAN stays reachable.
+
+        **Limits.** Exit traffic is decrypted at delphi, so geographic and account
+        identity become the VM's; egress counts against the free allowance; a
+        missing split route silently takes LAN and tailnet peers off the fast path.
+
+        **Exit.** A laptop records a before/after transfer number in the delphi
+        runbook, and the one-liner to enable and disable the exit is documented there.
+      '';
+    };
+    exp-117 = {
+      title = "EXP-117 — delphi stages ciphertext, never plaintext";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-21";
+      summary = "Backups are upload-bound and the home link uploads at 20 Mbps while delphi does 430, so staging restic/age ciphertext there turns a two-hour push into six minutes without giving the VM the key.";
+      refs = {
+        hosts = ["delphi" "frieren"];
+        modules = ["modules/sops.nix"];
+        tasks = ["infra:sops:update-keys"];
+      };
+      body = ''
+        **Measured.** 20 GB at 20 Mbps is about 2.2 h from frieren; the same push
+        from delphi at 430 Mbps is about 6 min. Upload, not capacity, is the
+        constraint.
+
+        **Shape.** frieren encrypts (restic repo password or age recipient from
+        sops, never leaving the LAN), ships ciphertext to delphi, delphi pushes to
+        the bucket. delphi holds only ciphertext and can burn its staging copy.
+
+        **Not a backup target.** A single VM in one region is a worse home for the
+        only copy than object storage; delphi is the pipe, the bucket is the copy.
+
+        **Exit.** A 5 GB append is timed from frieren and from delphi to the same
+        bucket, and the faster path is wired behind a task or a timer. If the
+        difference is under 2x, REJECTED with the number.
+      '';
+    };
+    exp-118 = {
+      title = "EXP-118 — a signed ingest door on delphi";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-21";
+      summary = "delphi already owns a public name, an ACME certificate and 430 Mbps up, so one HMAC-verified receiver there buys the fleet inbound reachability without exposing frieren.";
+      refs = {
+        hosts = ["delphi" "frieren"];
+        modules = ["hosts/delphi/configuration.nix"];
+        tasks = ["checks:host"];
+        docs = [".agents/deploy/hosts/delphi.md"];
+      };
+      body = ''
+        **What it replaces.** frieren terminates nothing inbound itself; today any
+        inbound path is a tunnel someone else operates.
+
+        **Shape.** One vhost location, one systemd unit: verify the HMAC and the
+        timestamp window, then dispatch over the tailnet to frieren (a webhook that
+        triggers a build, a phone-to-home drop, a cache purge). No secret in the
+        URL, no shell interpolation of the payload, rate limited per source.
+
+        **Why this host.** The certificate and the public record already exist, and
+        it is the only fleet member whose ingress does not depend on the home link.
+
+        **Exit.** A signed request lands on frieren while frieren has no public
+        port, and an unsigned or replayed one is rejected in the same test run.
+      '';
+    };
+    exp-119 = {
+      title = "EXP-119 — yt-dlp prefetch for the media stack";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-21";
+      summary = "A channel watcher on delphi fetches at 1.38 Gbps and drips files home, which wins on back-catalogue, retries and remote viewing but not on playback bytes.";
+      refs = {
+        hosts = ["frieren" "delphi"];
+        modules = ["hosts/frieren/media-stack.nix"];
+        tasks = ["data:audit"];
+        docs = ["docs/storage-taxonomy.md"];
+      };
+      body = ''
+        **Honest math.** Jellyfin plays at home, so the bytes still cross the 50 Mbps
+        downlink; a cache on the VM does not make playback faster.
+
+        **Where it wins.** A back catalogue (50 GB in about 5 min at line rate),
+        retries against a flaky source, sources that rate-limit a residential IP,
+        and watching over the tailnet while away from home.
+
+        **Shape.** yt-dlp plus --download-archive on delphi, a rolling cache well
+        under 175 GiB, a drip-sync into the existing media ingest door, and the
+        *arr stack untouched on frieren because that is where the QSV transcode is.
+
+        **Exit.** Ten videos are fetched both ways and the end-to-end wall clock is
+        recorded; if the home path is not at least 3x slower, REJECTED with the number.
+      '';
+    };
+    exp-120 = {
+      title = "EXP-120 — a tailnet gateway for System One decisions";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-21";
+      summary = "System One has no serve mode: every consumer runs the Python locally, so a gateway on delphi would let the fleet ask one always-on host instead of each shipping the engine.";
+      refs = {
+        hosts = ["delphi" "frieren"];
+        modules = ["modules/services/systemone-decision.nix" "hosts/delphi/configuration.nix"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **Measured.** engine.py imports only the standard library (sys, json,
+        hashlib, resource, argparse); its profiles describe julia-1 (144M mmBERT,
+        CPU) and laya (421M ModernBERT) without loading either. Subcommands are
+        benchmark, triage-system, triage-handoff and query; there is no HTTP mode,
+        so today each caller runs its own copy as a CLI.
+
+        **What landed.** delphi enables services.systemoneDecision, so
+        systemone-decision exists on an always-on aarch64 host and a decision is
+        available while frieren is under load or the laptop is closed.
+
+        **The gap.** eisen serves /v1/systemone for the real models; the local
+        engine has no equivalent. A gateway would be a socket-activated
+        http.server around the same query/route functions, mounted on the tailnet
+        by tailscale serve (the pattern this host already uses for the harness).
+
+        **Exit.** An agent asks delphi for a typed decision and gets the same
+        envelope eisen returns; the CLI stays the offline fallback. If no consumer
+        appears, REJECTED and the CLI alone stays.
+      '';
+    };
+    open-minyx-2611 = {
+      title = "minyx reflash after the 26.11 stable release";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-10-21";
+      summary = "minyx is refreshed for a reflash (NetworkManager, zram, single-job Nix, a firewall that actually admits blocky, trimmed packages) and waits on an SD card and 26.11 stable.";
+      refs = {
+        hosts = ["minyx"];
+        modules = ["hosts/minyx/custompi.nix"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **What changed.** The static 192.168.178.3 Wi-Fi address was a foreign
+        subnet with no supplicant behind it; NetworkManager now owns both
+        interfaces and the persistent connection store was already being kept.
+        zram covers 1 GiB with a tmpfs root, Nix is one job and one core, the
+        firewall admits 53/tcp+udp for blocky, and kubectl/helm/nodejs/compose/
+        openvpn are gone from a 1 GiB device.
+
+        **Before flashing.** minyx must be built somewhere: that is exp-115. Until
+        then `task checks:host HOST=minyx MODE=eval` is the only gate, and it is
+        green on this tree (41 s, 1.4 GiB).
+
+        **Exit.** The image is written, the host boots with a persisted
+        /nix/persist, and `infra:deploy:host:minyx` validates; then the inventory
+        entry moves off `preserved`.
+      '';
+    };
+    open-frieren-offload = {
+      title = "Move the movable services off frieren";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-10-21";
+      summary = "frieren's persistent footprint is small and named; the movable candidates are the paperless OCR queue, stirling-pdf and the hermes daemon, in that order of measured cost.";
+      refs = {
+        hosts = ["frieren" "delphi"];
+        modules = ["hosts/frieren/infra-stack.nix" "modules/profiles/service-exposure.nix"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **Measured on frieren.** system.slice totals about 2.4 GiB: paperless
+        task-queue 389 MiB, immich-server 292 MiB, stirling-pdf 188 MiB, jellyfin
+        105 MiB, home-assistant 82 MiB, influxdb 77 MiB. In the user slice the
+        persistent outlier is hermes at 340 MiB; the 1.3 GiB and 600 MiB entries
+        are the agent and browser of the current session, not services.
+
+        **Rule.** Move stateless CPU and RAM, never data: immich, paperless media
+        and jellyfin transcode stay (data and QSV).
+
+        **Candidates.** paperless-task-queue (OCR is CPU-bound and bursty),
+        stirling-pdf (Java, stateless, aarch64-ready), hermes (a daemon with no
+        local-only state).
+
+        **Exit.** For each moved unit: it is gone from frieren's system.slice,
+        serves from delphi over the tailnet, and the same validation passes.
+      '';
+    };
     exp-114 = {
       title = "EXP-114 — The eval-granularity defect";
       kind = "experiment";

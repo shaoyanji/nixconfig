@@ -87,6 +87,7 @@ in {
     ../../modules/profiles/tailnet-dns-address.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
+    ../../modules/services/systemone-decision.nix
   ];
 
   # 10.99.0.53 on lo + the /32 advertised below form one half of the failover
@@ -367,6 +368,17 @@ in {
     publicUrl = dshUrl;
     trustedHosts = ["${tailnetHost}:${toString servePort}"];
     environmentFile = config.sops.templates."dsh-web.env".path;
+  };
+
+  # --- System One decision engine (Julia-1 / Laya) ----------------------------
+  # The engine is stdlib Python (no torch, no model weights at runtime): its
+  # profiles describe the architectures, and `query`/`triage-*` answer locally in
+  # milliseconds. That is why it belongs on an aarch64 2-core VM as much as on
+  # eisen: fleet decisions stay available when the home hosts are busy or asleep.
+  # exp-120 carries the missing piece (a serve mode for other agents).
+  services.systemoneDecision = {
+    enable = true;
+    defaultModel = "julia-1";
   };
 
   # Tailnet-only HTTPS front. tailscaled issues and renews the certificate for

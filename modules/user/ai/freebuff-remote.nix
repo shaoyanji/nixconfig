@@ -19,10 +19,10 @@
       # the frieren mainframe inside the best available terminal emulator.
       set -euo pipefail
 
-      FREEBUFF_HOST="''${FREEBUFF_HOST:-frieren.lan}"
+      FREEBUFF_HOST="''${FREEBUFF_HOST:-delphi.bountystash.com}"
       SESSION="''${FREEBUFF_SESSION:-freebuff}"
       CWD="''${FREEBUFF_CWD:-/Volumes/data/projects}"
-      TITLE="Freebuff (frieren.lan)"
+      TITLE="Freebuff (delphi.bountystash.com)"
 
       # Attach if the session exists, otherwise create it running the Freebuff
       # TUI. bash -lc so the non-login SSH shell still picks up /etc/profile
@@ -47,10 +47,10 @@
       coreutils
     ];
     text = ''
-      # freebuff-remote: Plan 9-style thin client for offloading Freebuff tasks to frieren mainframe
+      # freebuff-remote: Plan 9-style thin client for offloading Freebuff tasks to delphi server
       set -euo pipefail
 
-      FREEBUFF_HOST="''${FREEBUFF_HOST:-frieren.lan}"
+      FREEBUFF_HOST="''${FREEBUFF_HOST:-delphi.bountystash.com}"
       export SSH_AUTH_SOCK="''${SSH_AUTH_SOCK:-/run/user/1000/gcr/ssh}"
 
       show_help() {
@@ -58,30 +58,30 @@
       freebuff-remote - Plan 9-style mainframe client for Freebuff
 
       Delegates AI coding tasks from this lightweight client node to the
-      high-compute frieren.lan server without persistent local RAM or CPU overhead.
+      delphi server (delphi.bountystash.com) without persistent local RAM or CPU overhead.
 
       Usage:
         freebuff-remote [options] "<prompt>"
         echo "<prompt>" | freebuff-remote [options]
 
       Subcommands & Actions:
-        -i, --interactive [dir] Interactive full-screen Freebuff TUI session on frieren
+        -i, --interactive [dir] Interactive full-screen Freebuff TUI session on delphi
         -a, --attach <session>  Attach interactively to an existing remote tmux session
-        --status                List active Freebuff sessions running on frieren
+        --status                List active Freebuff sessions running on delphi
         --logs <session>        Fetch scrollback capture from a remote session
         --kill <session>        Terminate a remote Freebuff session
 
       Options:
         -C, --cwd <dir>         Remote directory (auto-detects shared /Volumes/data paths)
         -s, --session <name>    Custom remote session name
-        -d, --detach            Launch in background on frieren and exit immediately
+        -d, --detach            Launch in background on delphi and exit immediately
         -t, --timeout <secs>    Wait timeout in seconds (default: 300)
         -c, --continue [id]     Resume previous conversation ID
         --raw                   Output raw captured scrollback without stripping TUI chrome
         -h, --help              Show this help message
 
       Environment:
-        FREEBUFF_HOST           Remote host (default: frieren.lan)
+        FREEBUFF_HOST           Remote host (default: delphi.bountystash.com)
 
       Examples:
         freebuff-remote "Review unstaged git diff"
@@ -93,8 +93,8 @@
       HELP
       }
 
-      # If running directly on frieren, invoke freebuff-headless locally
-      if [[ "$(hostname 2>/dev/null || true)" == "frieren" ]]; then
+      # If running directly on delphi, invoke freebuff-headless locally
+      if [[ "$(hostname 2>/dev/null || true)" == "delphi" ]]; then
         exec freebuff-headless "$@"
       fi
 
@@ -195,7 +195,7 @@ in {
       desktopEntries.freebuff = {
         name = "Freebuff";
         genericName = "AI Coding Mainframe";
-        comment = "Connect to Freebuff AI coding assistant on frieren.lan";
+        comment = "Connect to Freebuff AI coding assistant on delphi.bountystash.com";
         exec = "freebuff-terminal";
         icon = "utilities-terminal";
         terminal = false;
@@ -205,7 +205,7 @@ in {
           "Utility"
         ];
         settings = {
-          Keywords = "ai;freebuff;codebuff;frieren;llm;coding;";
+          Keywords = "ai;freebuff;codebuff;delphi;llm;coding;";
         };
       };
     };

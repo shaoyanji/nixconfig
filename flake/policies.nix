@@ -337,6 +337,21 @@
       detail = "docs nothing links to: ${lib.concatStringsSep ", " orphanDocs}";
     };
 
+    surfaces-are-compiled = {
+      rule = "A human-facing surface — landing page, service list, tailnet mount — is compiled from one registry with assertions, never written twice by hand.";
+      proof = "modules/services/service-portal.nix (registry + asserts) · hosts/frieren/reverse-proxy.nix · hosts/delphi/configuration.nix";
+      holds =
+        has "modules/services/service-portal.nix" "assertions = ["
+        && has "hosts/frieren/reverse-proxy.nix" "config.services.servicePortal.pages.lan"
+        && has "hosts/delphi/configuration.nix" "config.services.servicePortal.pages.public"
+        # A hand-written card list and a hand-rolled mount are the two shapes
+        # this replaced; either coming back means a second source of truth.
+        && !(has "hosts/frieren/reverse-proxy.nix" "class=\"card\"")
+        && !(has "hosts/frieren/reverse-proxy.nix" "card-desc")
+        && !(has "hosts/delphi/configuration.nix" "tailscale serve --bg");
+      detail = "a portal page or a `tailscale serve` mount was hand-written again instead of declared in `services.servicePortal`";
+    };
+
     no-fleet-default = {
       rule = "No task defaults to the whole fleet: `checks:hosts` takes the set at the call site (a default of one local host is fine, a default of 23 is not).";
       proof = "taskfiles/checks.yml";

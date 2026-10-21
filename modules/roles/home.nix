@@ -113,7 +113,7 @@ in {
 
   services = {
     cliphist.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
-    caffeine.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
+    caffeine.enable = false;
     tailscale-systray.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
     wl-clip-persist.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
     udiskie = {

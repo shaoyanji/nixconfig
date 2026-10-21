@@ -58,13 +58,16 @@ in {
 
     # Disable USB autosuspend: kernel 6.12 defaults enable_autosuspend=Y (and usbcore.autosuspend=2),
     # which aggressively powers down BT adapters after 2s and drops DisplayLink DL-6950 ASIC / USB 3.0 hubs.
-    boot.kernelParams = lib.mkIf cfg.preventAutosuspend ["usbcore.autosuspend=-1"];
+    boot.kernelParams = lib.mkIf cfg.preventAutosuspend [
+      "usbcore.autosuspend=-1"
+      "consoleblank=0"
+    ];
 
     services.udev.extraRules = lib.mkIf cfg.preventAutosuspend ''
-      # Prevent autosuspend on DisplayLink docks and external USB hubs
-      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="17e9", ATTR{power/control}="on"
-      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="05e3", ATTR{power/control}="on"
-      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="06c4", ATTR{power/control}="on"
+      # Prevent autosuspend and enable wakeup on DisplayLink docks and external USB hubs
+      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="17e9", ATTR{power/control}="on", ATTR{power/wakeup}="enabled"
+      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="05e3", ATTR{power/control}="on", ATTR{power/wakeup}="enabled"
+      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="06c4", ATTR{power/control}="on", ATTR{power/wakeup}="enabled"
     '';
 
     # Disable USB autosuspend for btusb: kernel 6.12 defaults enable_autosuspend=Y,

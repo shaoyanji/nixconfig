@@ -31,6 +31,19 @@ tasks:
         jq -r '.reasons[]?' /var/lib/fleet-sentinel/www/status.json 2>/dev/null || true
         exit 1
 
+  ops:decide:
+    desc: Ask the self-hosted decision engine (POST /v1/systemone)
+    summary: >
+      One CLI for the Julia-1/Laya envelope (`task ops:decide -- -s STATE -q q.json`):
+      `-s STATE -q QUESTIONS.json` returns
+      answers + usage, `--health` probes the engine. Endpoint defaults to
+      $SYSTEMONE_URL, else loopback:8091; delphi serves it on tailnet 8444
+      (`-e https://delphi.cloudforest-kardashev.ts.net:8444`). Exit 2 on a bad
+      flag or envelope, 1 when the engine does not answer. The skill is the
+      reasoning; this is the command.
+    cmds:
+      - bash scripts/task/systemone.sh {{.CLI_ARGS}}
+
   ops:sentinel:run:
     desc: Force one sentinel collection now
     summary: >

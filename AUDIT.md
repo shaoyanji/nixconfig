@@ -27,21 +27,18 @@
 ## Ledger
 ### 2026-10-21 — the harness is a worker service behind HTTPS, not a tunnel
 
-- `services.dshWeb` (`modules/services/dsh-web.nix`) runs `dsh web` as a systemd
-  unit on the worker, loopback `:3080`, `--public-url https://<domain>/deepseek/`
-  plus `--trusted-host <domain>`. `hosts/delphi/configuration.nix` publishes it
-  from the TLS vhost: `proxy_pass …/` strips the prefix, `Host $host` carries the
-  /api fence and the cookie authority. A prefix is legal because the frontend
-  ships `<base href="./">`, relative assets, and a `./` token redirect.
-- `dsh-remote` is now a client, not a proxy: it reads the signed-in URL from the
-  worker's journal, proves the ingress from THIS machine (fresh cookie jar → 200
-  and `DeepSeek Harness`), then opens it. No ssh `-L`, so the tab outlives the
-  command and the URL is bookmarkable; `--url/--status/--restart/--log`.
-- Evidence (`frieren` → `delphi`, over the real HTTPS vhost): token `303` → cookie
-  `200` (37,512 bytes), `/deepseek/api/remote.mux` upgrade `401` → **`101`**;
-  `checks:host HOST=delphi MODE=eval` rc=0 (1,841 assertions).
-- `tailscale serve` cannot add a ts.net entry: nginx owns `0.0.0.0:443`
-  (measured `bind: address already in use`); that needs its own cert + vhost.
+- `services.dshWeb` runs `dsh web` on the worker (systemd, loopback `:3080`,
+  `--public-url …/deepseek/`, `--trusted-host`); delphi's TLS vhost publishes it
+  with prefix-stripping `proxy_pass`, `Host $host` and `proxyWebsockets`. A
+  prefix is legal because the frontend ships `<base href="./">` + relative assets.
+- `dsh-remote` is a client: it reads the signed-in URL from the worker's journal,
+  proves the ingress from this machine, then opens it. No `ssh -L`, so the tab
+  outlives the command and the URL is bookmarked; `--url/--status/--restart/--log`.
+- Unsigned worker: measured — it still boots and serves (`200`), but upstream
+  takes the OAuth callback only on a loopback origin, so `--login` forwards one
+  and `--sync-auth` imports a client credential; the launcher says which.
+- Evidence: token `303` → cookie `200` (37,512 B), `/deepseek/api/remote.mux`
+  upgrade `401` → **`101`**; `checks:host HOST=delphi MODE=eval` rc=0 (1,841).
 
 ### 2026-10-21 — Pi research is dumped, and there is no 2.0 to design against
 

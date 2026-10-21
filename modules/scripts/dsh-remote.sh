@@ -36,6 +36,9 @@ dsh-remote — open the DeepSeek Harness that runs on a remote worker
   dsh-remote --restart       restart it on the worker, then open a fresh URL
   dsh-remote --stop          stop it on the worker
   dsh-remote --log           follow its journal on the worker
+  dsh-remote --login         give the worker a DeepSeek account: sign in once
+                             through a temporary loopback forward (the only
+                             callback origin upstream accepts)
   dsh-remote --sync-auth     re-import this client's DeepSeek credential
   dsh-remote --no-sync-auth  never import it; sign in through the Web UI instead
   dsh-remote --no-browser    print the URL instead of opening a browser
@@ -62,6 +65,7 @@ while [ $# -gt 0 ]; do
     --status) ACTION=status; shift ;;
     --stop) ACTION=stop; shift ;;
     --restart) ACTION=restart; shift ;;
+    --login) ACTION=login; shift ;;
     --log) ACTION=log; shift ;;
     --sync-auth) SYNC_AUTH=always; shift ;;
     --no-sync-auth) SYNC_AUTH=never; shift ;;
@@ -174,12 +178,24 @@ printf 'DSHROOT:%s\n' "${DSH_HOME:-$HOME/.dsh}"
 REMOTE
 }
 
+# "Signed in" means the DeepSeek platform grant is in the harness home on the
+# worker. The credential lives there, not in this client, and not in the tab.
+worker_signed_in() {
+  local path=${1:-} out
+  [ -n "$path" ] || path=$(worker_root)/.credentials.yaml
+  out=$(remote "$path" <<'REMOTE' 2>/dev/null || true
+if grep -qs 'deepseek-account-platform/default' "$1"; then printf 'SIGNED\n'; else printf 'UNSIGNED\n'; fi
+REMOTE
+  )
+  [ "$(printf '%s\n' "$out" | tail -1)" = SIGNED ]
+}
+
 # Credentials travel inside the ssh channel, never on a command line, and the
 # worker's own account is not overwritten with this client's: a worker that is
 # already signed in wins unless the operator asks for the import.
 imported=0
 sync_auth() {
-  local root remote_creds local_creds signed
+  local root remote_creds local_creds
   [ "$SYNC_AUTH" = never ] && return 0
   local_creds="${DSH_HOME:-$HOME/.dsh}/.credentials.yaml"
   [ -r "$local_creds" ] || return 0
@@ -189,12 +205,8 @@ sync_auth() {
   [ -n "$root" ] || return 0
   remote_creds="$root/.credentials.yaml"
 
-  if [ "$SYNC_AUTH" != always ]; then
-    signed=$(remote "$remote_creds" <<'REMOTE' 2>/dev/null || true
-if grep -qs 'deepseek-account-platform/default' "$1"; then printf 'SIGNED\n'; else printf 'UNSIGNED\n'; fi
-REMOTE
-    )
-    [ "$(printf '%s\n' "$signed" | tail -1)" = SIGNED ] && return 0
+  if [ "$SYNC_AUTH" != always ] && worker_signed_in "$remote_creds"; then
+    return 0
   fi
 
   umask 077
@@ -263,6 +275,11 @@ case "$ACTION" in
       printf '  from here NOT usable (HTTP %s)\n' "$PROBE_CODE" >&2
       exit 1
     fi
+    if worker_signed_in; then
+      printf '  account   signed in (the worker holds the credential)\n'
+    else
+      printf '  account   NONE — dsh-remote --login\n'
+    fi
     exit 0
     ;;
   stop)
@@ -274,6 +291,64 @@ case "$ACTION" in
     old=$(read_url)
     unit_cmd restart || exit 1
     URL=$(fresh_url "$old") || die "$SERVICE did not publish a URL within 60s (try: dsh-remote --log)"
+    ;;
+  login)
+    root=$(worker_root)
+    creds="$root/.credentials.yaml"
+    if worker_signed_in "$creds"; then
+      printf 'dsh-remote: %s is already signed in (%s)\n' "$HOST" "$creds"
+      exit 0
+    fi
+
+    if [ "$(service_state)" != active ]; then
+      printf 'dsh-remote: starting %s on %s\n' "$SERVICE" "$HOST"
+      unit_cmd start || exit 1
+    fi
+    URL=$(read_url)
+    [ -n "$URL" ] || URL=$(fresh_url "") || die "$SERVICE did not publish a URL within 60s (try: dsh-remote --log)"
+    case "$URL" in
+      *\?*) QUERY=${URL#*\?} ;;
+      *) die "the worker published an URL without a token: $URL" ;;
+    esac
+
+    # DeepSeek's OAuth callback is accepted ONLY on a browser loopback origin
+    # with an explicit port — upstream's rule ("remote domains and path-based
+    # proxies are unsupported"), and the UI sends window.location.origin. So the
+    # sign-in runs on the origin root over a private forward, and the forward
+    # closes itself the moment the worker's credential exists.
+    LPORT=${DSH_LOGIN_PORT:-3090}
+    while (exec 3<>"/dev/tcp/127.0.0.1/$LPORT") 2>/dev/null; do LPORT=$((LPORT + 1)); done
+    ssh -N -o BatchMode=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=20 \
+      -L "127.0.0.1:$LPORT:127.0.0.1:$PORT" "$HOST" &
+    FWD=$!
+    trap 'kill "$FWD" 2>/dev/null || true' EXIT
+
+    LOGIN_URL="http://127.0.0.1:$LPORT/?$QUERY"
+    for _ in $(seq 1 40); do
+      curl -sS -o /dev/null -m 2 "http://127.0.0.1:$LPORT/" 2>/dev/null && break
+      kill -0 "$FWD" 2>/dev/null || die "the loopback forward to $HOST:$PORT exited"
+      sleep 0.25
+    done
+
+    printf 'dsh-remote: signing in on a loopback origin (%s),\n' "http://127.0.0.1:$LPORT/"
+    printf '             because DeepSeek will not call back through a path proxy.\n'
+    if [ "$OPEN_BROWSER" = 1 ] && open_url "$LOGIN_URL"; then
+      :
+    else
+      printf 'dsh-remote: open this and sign in:\n\n  %s\n\n' "$LOGIN_URL"
+    fi
+    printf 'dsh-remote: the forward closes itself once %s has the account.\n' "$HOST"
+
+    WAIT=${DSH_LOGIN_WAIT:-300}
+    for _ in $(seq 1 $((WAIT / 2))); do
+      if worker_signed_in "$creds"; then
+        printf 'dsh-remote: %s is signed in; use dsh-remote (or %s) from now on.\n' "$HOST" "$(clean_url "$URL")"
+        exit 0
+      fi
+      kill -0 "$FWD" 2>/dev/null || die "the loopback forward exited before the sign-in completed"
+      sleep 2
+    done
+    die "no sign-in after ${WAIT}s; $HOST still has no DeepSeek account"
     ;;
   url)
     if [ "$(service_state)" != active ]; then
@@ -312,6 +387,15 @@ case "$ACTION" in
       URL=$(fresh_url "$old") || die "$SERVICE did not publish a URL within 60s (try: dsh-remote --log)"
       wait_probe "$URL" ||
         die "the ingress still answers HTTP $PROBE_CODE on $HOST (nginx / TLS / DNS, not the harness)"
+    fi
+
+    # The tab loads without an account, but upstream refuses the OAuth callback
+    # through a path prefix, so saying nothing would leave the user clicking a
+    # Sign-in button that cannot succeed.
+    if [ "$imported" = 0 ] && ! worker_signed_in; then
+      printf 'dsh-remote: %s has no DeepSeek account, and the ingress cannot finish a sign-in\n' "$HOST" >&2
+      printf 'dsh-remote:   dsh-remote --login       sign in here, through a temporary loopback forward\n' >&2
+      printf 'dsh-remote:   dsh-remote --sync-auth   import it from a client that is signed in\n' >&2
     fi
     ;;
 esac

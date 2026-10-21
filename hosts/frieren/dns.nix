@@ -60,7 +60,7 @@
       # nginx vhost on :80, tailscale serve :8444.
       "address=/tts.lan/100.119.172.99"
       # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
-      # Answer ONLY PXE clients on the LAN; never lease IPs — the FritzBox
+      # Answer ONLY PXE clients on the LAN; never lease IPs — the Huawei router
       # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode
       # waits 2s for the real DHCP server's OFFER and only supplies the
       # PXE boot options the router lacks.
@@ -195,7 +195,7 @@
   # the LAN interface.
   networking.firewall.interfaces.enp1s0 = {
     allowedUDPPorts = [
-      67 # DHCP-proxy replies to PXE clients (FritzBox still owns leases)
+      67 # DHCP-proxy replies to PXE clients (the router still owns leases)
       4011 # legacy BIOS ProxyDHCP
     ];
   };

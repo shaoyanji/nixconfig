@@ -316,6 +316,20 @@ tasks:
     cmds:
       - HOST={{.HOST | default "frieren"}} ITEM="{{.ITEM | default ""}}" nix-shell -p bitwarden-cli jq --run "bash scripts/task/bitwarden-ssh-test.sh"
 
+  checks:ssh:modes:
+    desc: Assert SSH private keys are 600-class and certificates are readable
+    summary: >
+      Walks SSH_DIR (default ~/.ssh): private keys (id_*, *.key, user_ca_key, or
+      any file whose first line is a PRIVATE KEY header) must have no group/other
+      bits — the rule ssh itself enforces, so 400 and 600 pass and 640/644 fail —
+      and every *-cert.pub must be owner-readable and parse with ssh-keygen -L.
+      Symlinks are followed (id_ed25519, user_ca_key); a dangling one is a
+      failure, not a skip. Certificates are public: 644 is correct, not a finding.
+      Exit 0 = clean, 1 = violation, 2 = cannot evaluate (no SSH_DIR or nothing
+      to check). Vars: SSH_DIR=.
+    cmds:
+      - SSH_DIR="{{.SSH_DIR | default ""}}" bash scripts/task/ssh-key-modes.sh
+
   checks:restic:drill:
     desc: Verify frieren's restic repository and restore a sample (HC-2)
     summary: >
@@ -372,6 +386,21 @@ tasks:
       a local override. Vars: HOST=, RESOLVERS=, NAME=, EXPECT=, VIP=, IFACE=.
     cmds:
       - HOST={{.HOST | default "frieren"}} RESOLVERS="{{.RESOLVERS | default ""}}" NAME="{{.NAME | default ""}}" IFACE={{.IFACE | default ""}} bash scripts/task/dns-failover-check.sh
+
+  checks:dns:pool:
+    desc: Fail when a declared DNS resolver address sits inside the LAN DHCP pool
+    summary: >
+      Reads the resolver addresses from profiles.dnsFailover on HOST (default
+      frieren: resolvers, zoneAddress, virtualIp) and compares them with the
+      router's dynamic DHCP range. The pool is router state, so it is passed in
+      and never guessed: POOL=192.168.3.100-192.168.3.200 (or POOL_START=/POOL_END=).
+
+      Exit 0 = every address is outside the pool; 1 = at least one is inside (a
+      device leased it would answer DNS for the LAN), or the range is misordered;
+      2 = cannot evaluate (no pool, bad address, nix eval failed). Vars: HOST=,
+      RESOLVERS=, POOL=, POOL_START=, POOL_END=.
+    cmds:
+      - HOST={{.HOST | default "frieren"}} RESOLVERS="{{.RESOLVERS | default ""}}" POOL="{{.POOL | default ""}}" POOL_START="{{.POOL_START | default ""}}" POOL_END="{{.POOL_END | default ""}}" bash scripts/task/dns-pool-check.sh
 
   checks:qmd:vault:
     desc: Check the Obsidian vault qmd collection exists and its index is fresh

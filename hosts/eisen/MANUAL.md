@@ -46,6 +46,13 @@ curl -s http://127.0.0.1:8085/v1/models | jq
 
 Eisen's RX 5700 has **8,176 MiB total VRAM**. Gamescope/X11 typically consumes ~450–500 MiB at idle, leaving ~7,600 MiB for inference.
 
+> [!WARNING]
+> **The decode column is not a measurement on this card.** These figures match
+> Strata's reference table for a 16 GB RX 9070 XT (its README lists Coder at
+> 44 tok/s decode, 1,420 tok/s prompt). The only measured run on eisen's RX 5700
+> is §7: **14.6–21.0 tok/s decode, 167 tok/s prompt ingestion**. Use this table
+> for VRAM planning; do not quote its speed column as eisen's.
+
 | Context Length | KV Cache Type | VRAM Footprint | Expert Slots in VRAM | Decode Speed | Status & Recommendations |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **8K (8,192)** | `int8` | ~512 MiB | ~750 experts | ~52 tok/s | Fastest decode, ideal for short chat & single turns. |
@@ -108,9 +115,9 @@ curl -s http://127.0.0.1:8085/v1/messages \
 
 ---
 
-## 5. Speculative Decoding & Tuning for 40–50 tok/s
+## 5. Speculative Decoding & Tuning
 
-Strata achieves 40–50 tok/s on an 8 GB card by combining four optimizations:
+Strata's reference card reaches 40–50 tok/s on 16 GB by combining four optimizations. On eisen's 8 GB RX 5700 the same configuration measured **14.6–21.0 tok/s decode** (§7) — the levers below are real; the headline number belongs to a different card.
 
 1. **Multi-Token Prediction (MTP) Drafting (`--spec 4`)**:
    - Evaluates 4 candidate tokens in parallel using the model's native MTP draft layer (`mtp/rt`).
@@ -157,4 +164,11 @@ Empirically verified on Eisen's AMD Radeon RX 5700 (`gfx1010`) with `tools/strat
 | **Turn Decode (Agent Session)** | **19.4 tok/s** | Multi-turn agent trajectory with prompt prefix caching. |
 | **Prompt Cache Hit Rate** | **69.4%** | Fast re-entry on SubZeroClaw and agent tool loops. |
 | **GPU VRAM Allocation** | **6.1 GiB / 8.18 GiB** | 763 resident GPU expert slots (1.47 GiB), MTP layer (839 MiB), INT8 KV (1.85 GiB). |
+
+**Read these two rows together.** 167 tok/s is *prompt ingestion*, about 10k
+tokens/minute: a fresh 30k-token agent prefix costs ~3 minutes before the first
+answer token, while a cached follow-up does not. 14.6–21.0 tok/s is *decode*, and
+it is the interactive constraint — a 500-token reply takes 25–35 s to stream. A
+persistent server is what makes the 69.4% cache-hit row pay off; a restart pays
+the prefix again.
 

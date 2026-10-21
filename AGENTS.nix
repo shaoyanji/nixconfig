@@ -1,5 +1,4 @@
 # AGENTS.nix — the repo's narrative knowledge as data.
-
 {
   schemaVersion = 1;
   notes = {
@@ -3618,6 +3617,51 @@
            below exist precisely because the first draft of that analysis was wrong.
         3. **A mode is not an implementation detail.** If the interesting part is "run the same radio in a
            different mode", say so up front; that is the experiment.
+      '';
+    };
+    pi-eisen-ondemand = {
+      title = "Pi as the eisen-backed coding harness (on-demand inference, not a resident model)";
+      kind = "proposal";
+      status = "PROPOSED";
+      date = "2026-10-21";
+      summary = "Pi 1.3.0 is a thin harness with `models.json` and a settable agent dir; the lean fleet shape is a generated `models.json` pointing at eisen's llama-swap plus one pre-warm shim that reuses `infra:wol:eisen`. No 2.0 exists (npm latest 1.3.0, changelog newest tag 1.3.0).";
+      refs = {
+        hosts = ["eisen"];
+        modules = ["hosts/eisen/llm-server.nix" "modules/user/ai/default.nix"];
+        tasks = ["infra:wol:eisen" "infra:rebuild:home-manager"];
+        docs = ["docs/pi-harness.md" ".agents/skills/eisen-status/SKILL.md"];
+      };
+      body = ''
+        **No Pi 2.0 exists.** npm publishes 60 versions and no `2.x`; newest tag and `latest` are
+        `1.3.0` (2026-10-15). The "MCP coding mode" is `codemode`, which ships in 1.x: the model writes
+        JS calling `tools.*` (MCP namespaced `tools.mcp__<server>__<tool>`) and only the script's output
+        reaches the model. Source material: `docs/pi-harness.md`.
+
+        **Three knobs.** `<agent-dir>/models.json` takes any OpenAI-compatible endpoint (`baseUrl`,
+        `api: "openai-completions"`, `apiKey`, `models[].id`); `PI_CODING_AGENT_DIR` relocates the agent
+        dir, so config is a store path, not a hand-edited `~/.pi/agent`; `--print`/JSON/RPC make the
+        harness scriptable (`pi-chat` leans on that).
+
+        **Shape — three layers, no new daemon.**
+        1. *Data*: one `models.json` from eisen's LLM module facts (`qwen`, `http://eisen.lan/v1`,
+           tailnet URL), so the endpoint cannot drift from the server it names.
+        2. *Control*: a `pi-eisen` shim — probe `/v1/models` (1 s), else `task infra:wol:eisen` + poll,
+           then a `max_tokens: 1` completion to force the GGUF load (2–3 min cold; `/v1/models` does
+           not load weights), then `exec pi`. Per session: `!command` hooks in `models.json` run per
+           request uncached, so a wake there would block every turn inside auth.
+        3. *Lifecycle*: none. llama-swap idles the model out and the gaming guard stops it; waking is
+           only the cold path, and nothing should auto-sleep a gaming desktop.
+
+        **Scenarios.** LAN warm-but-unloaded (prewarm once) · off-LAN tailnet `serve` · Steam game
+        running (refuses; offer a cloud model instead of hanging) · unattended/agy/CI (never eisen: the
+        guard is non-deterministic and a 21 GiB reload must not gate a schedule) · two sessions (one slot).
+
+        **Don't.** Pi's `/llama` router on eisen (duplicates declarative llama-swap); `curl | sh`
+        (unpinned); sharing the model with a Sunshine stream.
+
+        **Exit criteria.** `checks:host HOST=eisen MODE=eval` green with the generated files as store
+        paths; one measured cold session (wake → first token); guard refusal exercised; a cloud fallback
+        so no run depends on the desktop being awake.
       '';
     };
   };

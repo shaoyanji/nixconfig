@@ -528,9 +528,13 @@ in {
   # hosts, and that stays off here: hermes is the exception, not a reason to
   # install Chromium/qmd/crush. programs.hermes-user is gated on its own
   # `enable` + `hosts` list, so only the host list has to be extended.
-  home-manager.users.${user.name}.programs.hermes-user = {
-    # The persona activation is opt-in per host; frieren is the default.
-    hosts = ["frieren" "delphi"];
+  home-manager.users.${user.name} = {
+    programs.hermes-user = {
+      # The persona activation is opt-in per host; frieren is the default.
+      hosts = ["frieren" "delphi"];
+    };
+    # Delphi uses HTTPS with GitHub CLI token credentials rather than host SSH keys.
+    programs.gh.settings.git_protocol = lib.mkForce "https";
   };
 
   # User lingering: without it the per-user systemd manager only exists while
@@ -599,22 +603,24 @@ in {
         echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
         mkdir -p "$HOME/Documents" "$HOME/vaults"
 
-        # Rewrite SSH submodule URLs to HTTPS so submodule clones do not require GitHub SSH keys
-        git config --global url."https://github.com/".insteadOf "git@github.com:" || true
-        if command -v gh >/dev/null 2>&1; then
-          gh auth setup-git || true
-        fi
+        # Ensure git rewrites SSH URLs to HTTPS and uses gh credential helper without failing on read-only ~/.config/git/config
+        git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
+        git config --file "$HOME/.gitconfig" credential."https://github.com".helper "!gh auth git-credential"
+        git config --file "$HOME/.gitconfig" credential."https://gist.github.com".helper "!gh auth git-credential"
 
         if [ ! -d "$HOME/Documents/nixconfig/.git" ]; then
           echo "--> Cloning nixconfig to ~/Documents/nixconfig (with recursive submodules)..."
           if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-            gh repo clone shaoyanji/nixconfig "$HOME/Documents/nixconfig" -- --recurse-submodules
+            gh repo clone https://github.com/shaoyanji/nixconfig "$HOME/Documents/nixconfig" -- --recurse-submodules
           else
             git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$HOME/Documents/nixconfig"
           fi
         else
           echo "--> ~/Documents/nixconfig already exists. Pulling latest..."
+          git -C "$HOME/Documents/nixconfig" config url."https://github.com/".insteadOf "git@github.com:"
           git -C "$HOME/Documents/nixconfig" pull --recurse-submodules || true
+          git -C "$HOME/Documents/nixconfig" submodule sync --recursive || true
+          git -C "$HOME/Documents/nixconfig" submodule update --init --recursive || true
         fi
 
         if [ ! -d "$HOME/vaults/personal/.git" ]; then

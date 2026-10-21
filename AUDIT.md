@@ -25,22 +25,23 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
-### 2026-10-21 — `dsh-remote` delivers the browser, and the worker boots signed in
+### 2026-10-21 — the harness is a worker service behind HTTPS, not a tunnel
 
-- `modules/user/ai/dsh-launcher.nix` stops assuming a fixed `:3080`: the worker
-  starts `dsh web --no-open --host 127.0.0.1 --port 0`, that URL's own port is
-  forwarded to a free local one and rewritten onto it, and reuse is gated on the
-  port still answering — a dead pane restarts instead of feeding the browser a
-  stale token. The pane command must stay `bash -lc '…'`: `delphi`'s tmux
-  `default-shell` is nushell, which rejects `2>&1` and killed the session.
-- Auth: a signed-in client's `~/.dsh/.credentials.yaml` is piped over ssh before
-  the harness starts (worker's copy kept as `.bak`; a grant already on the worker
-  wins unless `--sync-auth`). Browser sign-in still works — the callback returns
-  through the same forward.
-- Evidence from `frieren` against `delphi`: token `303` → cookie `200` with
-  `<title>DeepSeek Harness</title>`, `/api/remote.mux` upgrade `401` → **`101`**
-  through `ssh -L`; reuse, cold start, `--status`, `--kill` exercised; the wrapper
-  builds and the module's `drvPath` is the tested one.
+- `services.dshWeb` (`modules/services/dsh-web.nix`) runs `dsh web` as a systemd
+  unit on the worker, loopback `:3080`, `--public-url https://<domain>/deepseek/`
+  plus `--trusted-host <domain>`. `hosts/delphi/configuration.nix` publishes it
+  from the TLS vhost: `proxy_pass …/` strips the prefix, `Host $host` carries the
+  /api fence and the cookie authority. A prefix is legal because the frontend
+  ships `<base href="./">`, relative assets, and a `./` token redirect.
+- `dsh-remote` is now a client, not a proxy: it reads the signed-in URL from the
+  worker's journal, proves the ingress from THIS machine (fresh cookie jar → 200
+  and `DeepSeek Harness`), then opens it. No ssh `-L`, so the tab outlives the
+  command and the URL is bookmarkable; `--url/--status/--restart/--log`.
+- Evidence (`frieren` → `delphi`, over the real HTTPS vhost): token `303` → cookie
+  `200` (37,512 bytes), `/deepseek/api/remote.mux` upgrade `401` → **`101`**;
+  `checks:host HOST=delphi MODE=eval` rc=0 (1,841 assertions).
+- `tailscale serve` cannot add a ts.net entry: nginx owns `0.0.0.0:443`
+  (measured `bind: address already in use`); that needs its own cert + vhost.
 
 ### 2026-10-21 — Pi research is dumped, and there is no 2.0 to design against
 

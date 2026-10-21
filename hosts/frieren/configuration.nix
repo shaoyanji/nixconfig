@@ -47,7 +47,11 @@ in {
     ../../modules/profiles/hermes.nix
     ../../modules/profiles/server-hardening.nix
     ../../modules/profiles/laptop.nix
-    ../../modules/profiles/base-desktop-environment.nix
+    # desktop-client is infrastructure, not the desktop: it owns avahi/resolved/
+    # tailscale/fuse and the NAS mounts. The graphical stack lives in desktop.nix,
+    # which only the `desktop` specialisation imports.
+    ../../modules/profiles/boot.nix
+    ../../modules/profiles/desktop-client.nix
     ./dns.nix
     ./media-stack.nix
     ./transmission.nix
@@ -67,13 +71,6 @@ in {
     ../../modules/services/simplex-smp-server.nix
     ../../modules/profiles/nixbuild-client.nix
   ];
-
-  # nixpkgs enables speechd for any graphical desktop
-  # (services/misc/graphical-desktop.nix: `services.speechd.enable =
-  # lib.mkDefault true`). On this NAS it only buys speech-dispatcher → mbrola →
-  # mbrola-voices, measured 2026-10-17 at ~650 MiB. A plain `false` beats the
-  # mkDefault; nothing in the repo or the desktop setup uses a speech daemon.
-  services.speechd.enable = false;
 
   # Frieren signs SSH user certificates like the workstations (aristotle,
   # poseidon): the CA private key is already deployed via sops-nix
@@ -314,38 +311,16 @@ in {
   # --- Thermal management (controls fan curve on Intel) ---
   services.thermald.enable = true;
 
-  # --- Display / compositor ---
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
+  # --- Boot persona: headless server by default, desktop on demand ---
+  # This file is the boot default: no compositor, no greeter, no DisplayLink, no
+  # X. specialisation.desktop (desktop.nix) adds the niri media-centre stack
+  # back as a separate systemd-boot entry; nothing has to be rebuilt to pick it.
+  specialisation.desktop.configuration = {
+    imports = [./desktop.nix];
   };
 
-  # Autologin: media-center display boots straight into the niri desktop (no
-  # login prompt on the TV). greetd's initial_session (DMS greeter module) runs
-  # the resolved session; if it exits, greetd falls back to the DMS greeter.
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = user.name;
-  };
-  services.displayManager.defaultSession = "niri";
-
-  programs.dms-greeter = {
-    enable = true;
-    compositor.name = "niri";
-    configHome = user.home; # Sync themes with user's DankMaterialShell config
-  };
-
-  # --- Screen idle management: swayidle runs as a user-level spawn-at-startup
-  # in the niri compositor config (modules/user/desktop/niri.nix), using niri
-  # IPC actions (power-off-monitors / power-on-monitors) instead of root-level
-  # /sys writes.  The compositor owns the DRM lease — DPMS must go through it.
-
-  # --- Logind: lock on lid close (media center: blank screen but keep HDMI output active, server stays up)
-  services.logind.settings.Login = {
-    HandleLidSwitch = "lock";
-    HandleLidSwitchDocked = "ignore";
-    HandleLidSwitchExternalPower = "lock";
-  };
+  # --- Logind: headless, so a closed lid changes nothing (sleep is off below).
+  services.logind.settings.Login.HandleLidSwitch = "ignore";
 
   # --- Disable all forms of system sleep (server must stay up) ---
   systemd.sleep.settings.Sleep = {

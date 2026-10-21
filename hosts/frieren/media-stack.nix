@@ -81,6 +81,12 @@ in {
   # --- Jellyfin ---
   systemd.services.jellyfin.environment.LIBVA_DRIVER_NAME = "iHD";
 
+  # QuickSync needs the iGPU render node. nixpkgs' jellyfin user carries no
+  # video/render groups, so transcoding only worked because udev happens to
+  # expose /dev/dri/renderD128 as 0666 here. Declare the groups instead of
+  # relying on that: headless and desktop both import this file.
+  users.users.jellyfin.extraGroups = ["video" "render"];
+
   services.jellyfin = {
     enable = true;
     openFirewall = true;

@@ -26,8 +26,9 @@
     LIBVA_DRIVER_NAME = "iHD";
   };
 
-  # --- Dell D6000 Universal Dock (DisplayLink / EVDI) ---
-  profiles.dell-dock.enable = true;
+  # --- Dell D6000 Universal Dock: desktop-only ---
+  # Enabled by `specialisation.desktop`, so the headless boot carries neither
+  # evdi nor the DisplayLink daemon.
 
   # --- Power management (laptop-as-server, battery = built-in UPS) ---
   # powertop is intentionally NOT enabled: its `--auto-tune` boot service

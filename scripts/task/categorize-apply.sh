@@ -43,8 +43,10 @@ while IFS=$'\t' read -r score cat path; do
   # because it is about routing rather than classification.
   note=""
   if [ "$cat" = "docs" ]; then
-    linked=$(grep -rlF --exclude-dir=.git --exclude-dir=.crush --exclude=supervision.jsonl "$path" . \
-      | grep -v "^./${path}$" | head -1 || true)
+    # Links into a directory are usually relative to the linking file
+    # (`.agents/deploy/README.md` says `hosts/stark.md`), so both forms count.
+    linked=$(grep -rlF --exclude-dir=.git --exclude-dir=.crush --exclude=supervision.jsonl \
+      -e "$path" -e "hosts/$(basename "$path")" . | grep -v "^./${path}$" | head -1 || true)
     if [ -z "$linked" ]; then
       note="  ← ORPHAN (nothing outside the ledger links this page)"
       bad=$((bad + 1))

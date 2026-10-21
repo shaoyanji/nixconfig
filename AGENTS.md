@@ -918,10 +918,10 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/frieren-access.md`](docs/frieren-access.md)             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
 | [`docs/dns-failover.md`](docs/dns-failover.md)                | Resolver pair, route vs node failover, why the `/32` cannot fail over |
 | [`docs/userland-package-ownership.md`](docs/userland-package-ownership.md) | Package ownership and role wiring                                      |
+| [`docs/eisen-llm-architecture.md`](docs/eisen-llm-architecture.md) | eisen LLM stack: design rationale, model roster, measured performance (runbook: `.agents/deploy/hosts/eisen.md`) |
 | [`taskfiles/README.md`](taskfiles/README.md)                | Taskfile ownership map and shard reference                             |
 | [`hosts/sledgehammer/USB.md`](hosts/sledgehammer/USB.md)          | Sledgehammer live USB creation guide                                   |
 | [`AGENTS.nix`](AGENTS.nix)                         | Decisions, proposals, open work and design studies as queryable notes |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) / `TODO.md`        | Stubs — content moved to `AGENTS.nix` (`task ops:notes`)               |
 | [`MANUAL.md`](MANUAL.md)                          | Operator manual: services, ports, closed loop, DMS integration         |
 | [`.agents/SCHEMA.md`](.agents/SCHEMA.md)                  | Documentation/skill contract: budgets, status vocabulary, one fact one home |
 | [`docs/history/`](docs/history/)                      | Superseded narrative (audit/TODO/HANDOFF) — never linked as current    |

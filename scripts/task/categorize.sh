@@ -15,7 +15,11 @@
 # a table.
 set -euo pipefail
 
+ENGINE="${CATEGORIZE_ENGINE:-jev}"   # jev | julia
+PROVIDER="${JEV_PROVIDER:-typesafe}"
 ENDPOINT="${SYSTEMONE_URL:-https://delphi.cloudforest-kardashev.ts.net:8444}"
+CRITERIA_FILE="$(mktemp "${TMPDIR:-/tmp}/categorize-criteria.XXXXXX.json")"
+trap 'rm -f "$CRITERIA_FILE"' EXIT
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
 # Short, oppositional labels: a binary question must look like a coin, not a menu.
@@ -30,6 +34,17 @@ CATS=(policy fact history procedure docs)
 
 case "${1:-}" in -h|--help) sed -n '2,11p' "$0"; exit 0 ;; esac
 [ $# -gt 0 ] || { echo "categorize: give one or more paths" >&2; exit 2; }
+
+# jev: a calibrated classifier, so the five-way form is legitimate here. The
+# duel machinery below only exists because julia-1's choice is label-biased.
+jev_classify() {
+  local text="$1"
+  jq -n '{policy:"a rule or failure mode the build should enforce",fact:"an address, role or hardware detail that belongs in inventory",history:"narrative explaining why a decision was made",procedure:"commands to run in order",docs:"reference material meant to be read"}' > "$CRITERIA_FILE"
+  local out
+  out=$(jev-decide classify --provider "$PROVIDER" --text "$text" --criteria "$CRITERIA_FILE" --min-probability 0.5 2>&1) || {
+    echo "jev-error"; return 0; }
+  printf '%s' "$out" | jq -r '.decisions.category.value // "jev-error"'
+}
 
 ask() { # state, optA, optB -> winner label
   local state="$1" a="$2" b="$3" body out
@@ -84,15 +99,27 @@ check() { # state, expected
 }
 rule_state="this service must not bind 443 because nginx owns it and the switch fails the build"
 steps_state="step 1 ssh delphi step 2 sudo nixos-rebuild switch step 3 systemctl status then verify"
+if [ "$ENGINE" = "jev" ]; then
+  r_hit=$(jev_classify "$rule_state"); s_hit=$(jev_classify "$steps_state")
+  printf 'calibration: rule→%s | steps→%s\n' "$r_hit" "$s_hit" >&2
+  [ "$r_hit" = "policy" ] && [ "$s_hit" = "procedure" ] || calib=0
+  r_pts=1; s_pts=1
+else
 r_pts=$(check "$rule_state" policy); s_pts=$(check "$steps_state" procedure)
 printf 'calibration: rule→%s/10 policy | steps→%s/10 procedure | position-flips %s/%s\n' \
   "$r_pts" "$s_pts" "$flipped" "$pairs" >&2
 [ "$r_pts" -ge 1 ] && [ "$s_pts" -ge 1 ] || calib=0
+fi
 
 rows="[]"
 for f in "$@"; do
   [ -r "$f" ] || { echo "categorize: cannot read $f" >&2; exit 2; }
   state="$(features "$f")"
+  if [ "$ENGINE" = "jev" ]; then
+    cat_j="$(jev_classify "$state")"
+    rows="$(jq -c --arg f "$f" --arg c "$cat_j" '. + [{path:$f, category:$c, wins:5}]' <<<"$rows")"
+    continue
+  fi
   declare -A wins=()
   for c in "${CATS[@]}"; do wins[$c]=0; done
   for i in "${!CATS[@]}"; do for j in "${!CATS[@]}"; do
@@ -110,6 +137,8 @@ flip_pct=$((pairs ? flipped * 100 / pairs : 0))
 [ "$calib" -eq 0 ] && echo "categorize: QUERY NOT CALIBRATED — table is shape, not a verdict" >&2
 [ "$flip_pct" -gt 50 ] && { echo "categorize: POSITION-DOMINATED — $flip_pct% of pairs flipped under swap" >&2; exit 1; }
 
+errors=$(jq '[.[] | select(.category == "jev-error")] | length' <<<"$rows")
+[ "$errors" -eq 0 ] || { echo "categorize: ENGINE ERRORS on $errors file(s) — no table" >&2; exit 1; }
 distinct=$(jq '[.[].category] | unique | length' <<<"$rows")
 [ "$distinct" -ge 2 ] || { echo "categorize: DOES NOT DISCRIMINATE — every file read as one category" >&2; exit 1; }
 

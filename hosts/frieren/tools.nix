@@ -45,7 +45,7 @@
     name = "dsh-remote";
     desktopName = "DeepSeek Harness (Remote)";
     genericName = "Agent Harness";
-    comment = "Open the DeepSeek Harness running on delphi (delphi.bountystash.com/deepseek)";
+    comment = "Open the DeepSeek Harness running on delphi (tailnet only, delphi.cloudforest-kardashev.ts.net:8443)";
     exec = "dsh-remote";
     icon = "utilities-terminal";
     categories = ["Development" "Utility"];

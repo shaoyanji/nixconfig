@@ -28,9 +28,9 @@
 ### 2026-10-21 — the harness is a worker service behind HTTPS, not a tunnel
 
 - `services.dshWeb` runs `dsh web` on the worker (systemd, loopback `:3080`,
-  `--public-url …/deepseek/`, `--trusted-host`); delphi's TLS vhost publishes it
-  with prefix-stripping `proxy_pass`, `Host $host` and `proxyWebsockets`. A
-  prefix is legal because the frontend ships `<base href="./">` + relative assets.
+  `--public-url`, `--trusted-host`) and is **tailnet only**: `tailscale serve`
+  terminates TLS at the MagicDNS name on 8443 and proxies there, preserving
+  `Host` (measured), so the public vhost carries only the landing page.
 - `dsh-remote` is a client: it reads the signed-in URL from the worker's journal,
   proves the ingress from this machine, then opens it. No `ssh -L`, so the tab
   outlives the command and the URL is bookmarked; `--url/--status/--restart/--log`.
@@ -39,8 +39,9 @@
   and `--sync-auth` imports a client credential; the launcher says which.
 - Evidence: token `303` → cookie `200` (37,512 B), `/deepseek/api/remote.mux`
   upgrade `401` → **`101`**; `checks:host HOST=delphi MODE=eval` rc=0 (1,841).
-- A turn also needs the **model** key, not just the account grant: sops → the unit's
-  `EnvironmentFile` (a login shell never sees it); link clocked 1.38 Gbps↓ / 430↑.
+- A turn also needs the **model** key, not just the account grant: sops → the
+  unit's `EnvironmentFile`. Public `/deepseek/` now **404**s; the tailnet page is
+  `200` with six sockets to `:3080`. Link 1.38 Gbps↓ / 430↑.
 
 ### 2026-10-21 — Pi research is dumped, and there is no 2.0 to design against
 

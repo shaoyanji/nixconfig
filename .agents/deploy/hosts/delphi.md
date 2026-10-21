@@ -267,25 +267,29 @@ curl -sS --resolve delphi.bountystash.com:443:92.5.115.103 \
 group out of frieren's declaration and probes a LAN zone. The tailnet group is verified
 with `dig` against `10.99.0.53`.
 
-## DeepSeek Harness ingress (`/deepseek`)
+## DeepSeek Harness (tailnet only)
 
 The harness runs **here** so a thin client can use this host's CPU, disk and
-workspaces from its own browser. `services.dshWeb` owns the unit (loopback
-`:3080`, `--public-url https://delphi.bountystash.com/deepseek/`,
-`--trusted-host delphi.bountystash.com`); the TLS vhost above owns the proxy.
-Three properties make the prefix work, and all three are load-bearing:
+workspaces from its own browser. It is published on the **tailnet only**:
+`tailscale serve` terminates TLS at the MagicDNS name and proxies to the loopback
+app, so the public vhost carries the landing page and `/healthz` and nothing else.
 
-- `proxy_pass http://127.0.0.1:3080/` — the trailing slash **strips** `/deepseek/`.
-- `proxy_set_header Host $host` — dsh fences `/api` on the authority and keys its
-  session cookie to it; the default (`$proxy_host`) would be `127.0.0.1:3080`.
-- `proxy_read_timeout 1h` — an idle harness WebSocket outlives nginx's 60 s.
+- `services.dshWeb` — loopback `:3080`, `--public-url
+  https://delphi.cloudforest-kardashev.ts.net:8443/`, `--trusted-host` the same
+  `host:port`. Mounted at the root, so there is no prefix to strip.
+- `tailscale-serve-dsh.service` — `tailscale serve --bg --https=8443
+  http://127.0.0.1:3080`. tailscaled issues and renews the certificate (no ACME,
+  no cert file to own); 8443 because nginx owns `0.0.0.0:443`.
+- `Host` survives the front (measured: `Host: delphi.cloudforest-kardashev.ts.net:8443`
+  reached the upstream verbatim), which is load-bearing twice — dsh fences `/api`
+  on the authority and keys the session cookie to it.
 
-Verify from a *client*, not from the host (a loopback curl proves none of it):
+Verify from a *client*, not from the host:
 
 ```bash
-dsh-remote --status                 # service state + ingress + a real probe
-curl -sL -c /tmp/j -b /tmp/j https://delphi.bountystash.com/deepseek/ | grep -o '<title>.*</title>'
-ssh delphi 'journalctl -u dsh-web -o cat | grep "^dsh web:" | tail -1'   # signed-in URL
+getent hosts delphi.cloudforest-kardashev.ts.net    # must resolve (see below)
+dsh-remote --status                                 # service + ingress + real probe
+curl -s -o /dev/null -w 'public=%{http_code}\n' https://delphi.bountystash.com/deepseek/   # 404
 ```
 
 **An unsigned worker is not a dead end, but it has exactly two doors.** Upstream
@@ -327,15 +331,22 @@ ssh delphi sudo systemctl disable dsh-web    # stays down across boots (it ships
 ssh delphi sudo systemctl restart dsh-web    # the EnvironmentFile is read at start
 ```
 
-Stopping the unit does **not** remove the public surface: the vhost is still on
-`:443`, so the next start is public again without a rebuild.
+Stopping `dsh-web` takes the app down for tailnet clients too; the front keeps
+listening and answers `502`. `sudo systemctl stop tailscale-serve-dsh` is what
+removes the entry point itself — the public vhost never carried it.
 
-**Do not mistake the token for a perimeter.** `delphi.bountystash.com` is a plain
-A record to this host's public IP — no Cloudflare proxy, no mTLS, no rate limit —
-and the worker runs as `devji`, whose `~/.ssh/user_ca_key` is the fleet user CA.
-A leaked `/deepseek/?token=…` is therefore fleet SSH authority, not just a chat
-pane. Closing that means bound to the tailnet address (`listen 100.123.145.53:443`
-for this server block) and running the worker as a user with no `~/.ssh`.
+**The name does not resolve by default, and that is the one client-side step.**
+The fleet resolver pins `~.` to its own DNS, so `*.ts.net` returns nothing
+(`getent hosts` on frieren before the 2026-10-21 rebuild: empty). The mapping now
+lives in `modules/profiles/base-node.nix` (`networking.hosts`), stated once for
+the fleet; `dsh-remote` names a missing entry instead of blaming the worker.
+
+**Why it left the public internet.** The vhost used to publish `/deepseek/`
+behind nothing but a bearer token, while the worker runs as `devji`, whose
+`~/.ssh/user_ca_key` is the fleet user CA — a leaked URL was fleet SSH authority,
+not a chat pane. Measured after the move: public `/deepseek/` **404**, tailnet
+page `200` with six sockets to `:3080`. What is still open is the worker's own
+shell as `devji`: a dedicated user without a `~/.ssh` is the next step.
 
 **The network is asymmetric and the fleet link is the bottleneck** (measured
 2026-10-21): 172 MB/s down (~1.38 Gbps), 54 MB/s up (~430 Mbps), 101 MB/s sync
@@ -343,11 +354,9 @@ disk write — but only 50/20 Mbps over WireGuard to frieren. Never point this
 host's substituters at the LAN cache: pull from upstream at line rate and push to
 Cachix, which is also why `01e9906e` decoupled it.
 
-`https://delphi.cloudforest-kardashev.ts.net/deepseek/` is **not** served:
-nginx binds `0.0.0.0:443`, so `tailscale serve` cannot take the tailnet address
-(`bind: address already in use`, measured 2026-10-21). Adding it means a
-`tailscale cert` for the ts.net name plus a second vhost on this listener —
-until then use the public name, which resolves from the tailnet too.
+`tailscale serve` cannot take 443 on the tailnet address while nginx holds
+`0.0.0.0:443` (`bind: address already in use`, measured 2026-10-21), which is why
+the front listens on 8443. That port is visible only inside the tailnet.
 
 ## DNS failover topology (why 10.99.0.53)
 

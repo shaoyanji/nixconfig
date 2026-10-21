@@ -187,25 +187,54 @@ static const char *playpause[] = { "playerctl", "play-pause", NULL };
 static const char *stopcmd[] = { "playerctl", "stop", NULL };
 static const char *nextcmd[] = { "playerctl", "next", NULL };
 static const char *prevcmd[] = { "playerctl", "previous", NULL };
+static const char *brightup[] = { "brightnessctl", "set", "+5%", NULL };
+static const char *brightdown[] = { "brightnessctl", "set", "5%-", NULL };
 
 static const Key keys[] = {
+	/*
+	 * niri -> dwl. Reference: modules/user/desktop/niri.nix.
+	 *
+	 *   niri action            dwl binding      niri action         dwl binding
+	 *   ---------------------  ---------------  ------------------  -----------------
+	 *   Mod+A launcher         wmenu-run        Mod+T terminal      foot
+	 *   Mod+Q close            killclient       Mod+W float         togglefloating
+	 *   Mod+H / Mod+L focus    focusstack -1/+1 Mod+J / Mod+K       viewdir +1/-1
+	 *   Mod+Shift+H/L monitor  focusmon L/R     Mod+Shift+J/K       viewdir (+1/-1)
+	 *   Mod+Ctrl+H/L reorder   movestack -1/+1  Mod+Ctrl+J/K send   movetotag +1/-1
+	 *   Mod+Ctrl+Shift+H/L     tagmon L/R       Mod+1..9            view tag N
+	 *   Mod+Ctrl+1..9          tag (send)       Mod+0, Mod+I        viewlast
+	 *   Mod+F maximize         togglefullscreen Mod+Shift+F         togglefullscreen
+	 *   Mod+Return overview    zoom             Mod+R / Shift+R     setmfact +/-0.05
+	 *   Mod+S region shot      grim + slurp     Mod+Print screen    grim
+	 *   XF86 audio/mic/media   wpctl, playerctl XF86 brightness     brightnessctl
+	 *
+	 * Two niri keys have no dwl meaning and are mapped to the nearest intent:
+	 * Mod+F is "maximize-column" in niri and Mod+Return is the overview; dwl
+	 * has neither, so Mod+F is fullscreen (the effect the operator wants) and
+	 * Mod+Return promotes the focused window to master.
+	 *
+	 * Deliberately unbound, because dwl has no primitive for them: Mod+E
+	 * (niri switches focus between the floating and tiling layers), Mod+[
+	 * and Mod+] (consume/expel into a column), Mod+U (previous monitor), and
+	 * every DMS/kando/zen key — Mod+Y P V Space N M B Shift+B Z C,
+	 * Ctrl+Space, Mod+MouseMiddle — whose programs are not installed here.
+	 * Mod+Shift+E stays as an escape hatch; niri has no equivalent.
+	 */
 	/* modifier                    key                  function          argument */
 	/* niri: Mod+A launcher, Mod+T terminal (kitty) */
 	{ MODKEY,                      XKB_KEY_a,           spawn,            {.v = menucmd} },
 	{ MODKEY,                      XKB_KEY_t,           spawn,            {.v = termcmd} },
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_Return,      spawn,            {.v = termcmd} },
 
-	/* niri: Mod+Q close, Mod+W toggle floating, Mod+F maximize,
-	 * Mod+Shift+F fullscreen. dwl has no per-column maximize, so Mod+F and
-	 * Mod+Return promote the window to master (zoom), which is the closest
-	 * thing to "give this window the screen". */
+	/* niri: Mod+Q close, Mod+W float, Mod+F fullscreen. In niri Mod+F gives
+	 * the focused column the screen and Mod+Shift+F is the explicit
+	 * fullscreen; dwl has one fullscreen state, so both land on it. Mod+E is
+	 * left free instead of being overloaded with togglefloating. */
 	{ MODKEY,                      XKB_KEY_q,           killclient,       {0} },
 	{ MODKEY,                      XKB_KEY_w,           togglefloating,   {0} },
-	{ MODKEY,                      XKB_KEY_e,           togglefloating,   {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_space,       togglefloating,   {0} },
-	{ MODKEY,                      XKB_KEY_f,           zoom,             {0} },
-	{ MODKEY,                      XKB_KEY_Return,      zoom,             {0} },
+	{ MODKEY,                      XKB_KEY_f,           togglefullscreen, {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_f,           togglefullscreen, {0} },
+	{ MODKEY,                      XKB_KEY_Return,      zoom,             {0} },
 
 	/* niri: Mod+H/L focus column, Mod+J/K workspace down/up */
 	{ MODKEY,                      XKB_KEY_h,           focusstack,       {.i = -1} },
@@ -216,13 +245,10 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_k,           viewdir,          {.i = -1} },
 	{ MODKEY,                      XKB_KEY_i,           viewlast,         {0} },
 	{ MODKEY,                      XKB_KEY_0,           viewlast,         {0} },
-	{ MODKEY,                      XKB_KEY_Tab,         view,             {.ui = ~0} },
 
 	/* niri: Mod+Shift+H/L focus the neighbouring monitor */
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_h,           focusmon,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_l,           focusmon,         {.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY,                      XKB_KEY_comma,       focusmon,         {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY,                      XKB_KEY_period,      focusmon,         {.i = WLR_DIRECTION_RIGHT} },
 
 	/* niri: Mod+Ctrl+H/L move the column, Mod+Ctrl+J/K move it to the next
 	 * workspace, Mod+Ctrl+Shift+H/L move it to another monitor. */
@@ -238,8 +264,9 @@ static const Key keys[] = {
 	/* niri: Mod+R switches the column width — here it widens, Shift narrows */
 	{ MODKEY,                      XKB_KEY_r,           setmfact,         {.f = +0.05f} },
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_r,           setmfact,         {.f = -0.05f} },
+	/* The only global mode switch dwl has, parked where niri opens the DMS
+	 * spotlight; there is no DMS on this host. */
 	{ MODKEY,                      XKB_KEY_space,       setlayout,        {0} },
-	{ MODKEY,                      XKB_KEY_m,           setlayout,        {.v = &layouts[2]} },
 
 	/* niri: Mod+S region screenshot, Mod+Print full screen (into the clipboard) */
 	{ MODKEY,                      XKB_KEY_s,           spawn,            SHCMD("grim -g \"$(slurp)\" - | wl-copy") },
@@ -254,6 +281,8 @@ static const Key keys[] = {
 	{ 0, XKB_KEY_XF86AudioStop,        spawn,           {.v = stopcmd} },
 	{ 0, XKB_KEY_XF86AudioNext,        spawn,           {.v = nextcmd} },
 	{ 0, XKB_KEY_XF86AudioPrev,        spawn,           {.v = prevcmd} },
+	{ 0, XKB_KEY_XF86MonBrightnessUp,  spawn,           {.v = brightup} },
+	{ 0, XKB_KEY_XF86MonBrightnessDown, spawn,          {.v = brightdown} },
 	TAGKEYS(                     XKB_KEY_1,           0),
 	TAGKEYS(                     XKB_KEY_2,           1),
 	TAGKEYS(                     XKB_KEY_3,           2),
@@ -267,9 +296,10 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_BackSpace, quit, {0} },
 };
 
+/* niri drags windows with the modkey held; no middle-click action exists there
+ * (its Mod+MouseMiddle opens kando, which is not installed). */
 static const Button buttons[] = {
 	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
-	{ MODKEY, BTN_MIDDLE, togglefloating, {0} },
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
 };
 

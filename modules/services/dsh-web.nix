@@ -93,11 +93,15 @@ in {
       wants = ["network-online.target"];
       after = ["network-online.target"];
 
-      # HOME decides which `.dsh` (credentials, profiles, storages) is used;
-      # PATH is inherited by the agent's bash, so it is the system profile.
+      # HOME decides which `.dsh` (credentials, profiles, storages) is used.
+      # PATH is inherited by the agent's bash, and the systemd module already
+      # defines a minimal one (coreutils/sed/grep/systemd) for every unit — a
+      # plain second definition is a hard conflict at build time, which is why
+      # this is an explicit override: the agent needs the system profile (git,
+      # ripgrep, the harness's own tooling), not a shell that can only cat.
       environment = {
         HOME = home;
-        PATH = "/run/current-system/sw/bin";
+        PATH = lib.mkForce "/run/current-system/sw/bin:${home}/.nix-profile/bin";
       };
 
       serviceConfig = {

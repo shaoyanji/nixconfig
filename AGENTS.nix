@@ -3699,8 +3699,9 @@
         openvpn are gone from a 1 GiB device.
 
         **Before flashing.** minyx must be built somewhere: that is exp-115. Until
-        then `task checks:host HOST=minyx MODE=eval` is the only gate, and it is
-        green on this tree (41 s, 1.4 GiB).
+        then `checks:host HOST=minyx MODE=eval` is the only gate, and it is green on
+        this tree (5.3 s / 696 MiB, 1,852 assertions); forcing the toplevel drvPath
+        costs 41 s / 1.4 GiB and proves no more.
 
         **Exit.** The image is written, the host boots with a persisted
         /nix/persist, and `infra:deploy:host:minyx` validates; then the inventory

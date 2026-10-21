@@ -641,9 +641,9 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "I/O Diet Lightweight Workstation"
 category = "workstation"
-desktop_environment = "Niri + DankMaterialShell greeter"
+desktop_environment = "dwl (suckless Wayland) on a niri-parity keymap, foot + wmenu"
 users = ["devji"]
-notes = ["Lightweight niri desktop (eisen-style) on a Fujitsu ESPRIMO D556 (i5-6500, 8 GB, 128 GB f2fs SSD). Formerly a Steam Remote Play kiosk; Steam dropped in the 2026-09 desktop conversion.", "f2fs has no subvolumes, so the btrfs impermanence module is NOT used: the host config puts every heavy-write dir on tmpfs (zram 100%, journald volatile, fstrim, noatime).", "Legacy BIOS boot: GRUB on /dev/sda, systemd-boot disabled."]
+notes = ["Lightweight dwl desktop (suckless Wayland, niri-parity keymap) on a Fujitsu ESPRIMO D556 (i5-6500, 8 GB, 128 GB f2fs SSD). Formerly a Steam Remote Play kiosk, then a niri desktop; dwl since 2026-10.", "f2fs has no subvolumes, so the btrfs impermanence module is NOT used: the host config puts every heavy-write dir on tmpfs (zram 100%, journald volatile, fstrim, noatime).", "Legacy BIOS boot: GRUB on /dev/sda, systemd-boot disabled."]
 
 [hosts.scratch.hardware]
 model = "Fujitsu ESPRIMO D556 Small Form Factor"
@@ -660,8 +660,8 @@ ssh_alias = "scratch"
 [hosts.scratch.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Niri Wayland Desktop + DMS Greeter", "zram 100% swap (zero disk swap)", "tmpfs mounts for /var/log, /tmp, /var/tmp, /var/cache, ~/.cache", "volatile journald (RAM only, core dumps disabled)", "weekly fstrim + noatime"]
-traits = ["strict-io-diet", "f2fs", "legacy-bios", "zram-100", "tmpfs-caches"]
+key_services = ["dwl Wayland desktop (greetd autologin, tuigreet greeter)", "zram 100% swap (zero disk swap)", "tmpfs mounts for /var/log, /tmp, /var/tmp, /var/cache, ~/.cache", "volatile journald (RAM only, core dumps disabled)", "weekly fstrim + noatime"]
+traits = ["strict-io-diet", "f2fs", "legacy-bios", "zram-100", "tmpfs-caches", "suckless-dwl"]
 
 [hosts.scratch.persona]
 title = "I/O Diet Minimalist & RAM-First Steward"

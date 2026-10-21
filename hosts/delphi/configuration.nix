@@ -590,47 +590,53 @@ in {
     freebuff-headless
     # Autonomous Cloud Workspace Seeder: sets up ~/Documents/nixconfig and ~/vaults/personal
     # directly from upstream GitHub via GitHub CLI / HTTPS, avoiding missing SSH key blocks.
-    (writeShellApplication {
-      name = "delphi-seed-workspace";
-      runtimeInputs = [
-        git
-        gh
-        openssh
-        coreutils
-      ];
-      text = ''
-        set -euo pipefail
-        echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
-        mkdir -p "$HOME/Documents" "$HOME/vaults"
+    (let
+      delphi-seed = writeShellApplication {
+        name = "delphi-seed-workspace";
+        runtimeInputs = [
+          git
+          gh
+          openssh
+          coreutils
+        ];
+        text = ''
+          set -euo pipefail
+          echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
+          mkdir -p "$HOME/Documents" "$HOME/vaults"
 
-        # Ensure git rewrites SSH URLs to HTTPS and uses gh credential helper without failing on read-only ~/.config/git/config
-        git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
-        git config --file "$HOME/.gitconfig" credential."https://github.com".helper "!gh auth git-credential"
-        git config --file "$HOME/.gitconfig" credential."https://gist.github.com".helper "!gh auth git-credential"
+          # Ensure git rewrites SSH URLs to HTTPS and uses gh credential helper without failing on read-only ~/.config/git/config
+          git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
+          git config --file "$HOME/.gitconfig" credential."https://github.com".helper "!gh auth git-credential"
+          git config --file "$HOME/.gitconfig" credential."https://gist.github.com".helper "!gh auth git-credential"
 
-        if [ ! -d "$HOME/Documents/nixconfig/.git" ]; then
-          echo "--> Cloning nixconfig to ~/Documents/nixconfig (with recursive submodules)..."
-          if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-            gh repo clone https://github.com/shaoyanji/nixconfig "$HOME/Documents/nixconfig" -- --recurse-submodules
+          if [ ! -d "$HOME/Documents/nixconfig/.git" ]; then
+            echo "--> Cloning nixconfig to ~/Documents/nixconfig (with recursive submodules)..."
+            if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+              gh repo clone https://github.com/shaoyanji/nixconfig "$HOME/Documents/nixconfig" -- --recurse-submodules
+            else
+              git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$HOME/Documents/nixconfig"
+            fi
           else
-            git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$HOME/Documents/nixconfig"
+            echo "--> ~/Documents/nixconfig already exists. Pulling latest..."
+            git -C "$HOME/Documents/nixconfig" config url."https://github.com/".insteadOf "git@github.com:"
+            git -C "$HOME/Documents/nixconfig" pull --recurse-submodules || true
+            git -C "$HOME/Documents/nixconfig" submodule sync --recursive || true
+            git -C "$HOME/Documents/nixconfig" submodule update --init --recursive || true
           fi
-        else
-          echo "--> ~/Documents/nixconfig already exists. Pulling latest..."
-          git -C "$HOME/Documents/nixconfig" config url."https://github.com/".insteadOf "git@github.com:"
-          git -C "$HOME/Documents/nixconfig" pull --recurse-submodules || true
-          git -C "$HOME/Documents/nixconfig" submodule sync --recursive || true
-          git -C "$HOME/Documents/nixconfig" submodule update --init --recursive || true
-        fi
 
-        if [ ! -d "$HOME/vaults/personal/.git" ]; then
-          mkdir -p "$HOME/vaults/personal"
-          echo "--> Initialized ~/vaults/personal."
-        fi
+          if [ ! -d "$HOME/vaults/personal/.git" ]; then
+            mkdir -p "$HOME/vaults/personal"
+            echo "--> Initialized ~/vaults/personal."
+          fi
 
-        echo "=== [delphi] Workspace ready at ~/Documents/nixconfig ==="
-      '';
-    })
+          echo "=== [delphi] Workspace ready at ~/Documents/nixconfig ==="
+        '';
+      };
+    in runCommand "delphi-workspace-seeders" {} ''
+      mkdir -p "$out/bin"
+      ln -s "${delphi-seed}/bin/delphi-seed-workspace" "$out/bin/delphi-seed-workspace"
+      ln -s "${delphi-seed}/bin/delphi-seed-workspace" "$out/bin/seed-workspace"
+    '')
   ];
 
   # 24/7 Remote Operator Gateway: Antigravity remote-control daemon (antigravity.google.com)

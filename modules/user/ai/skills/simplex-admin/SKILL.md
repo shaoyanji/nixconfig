@@ -63,16 +63,13 @@ environment.systemPackages = with pkgs; [
 ];
 ```
 
-### 2. Hermes User Service Daemon
-In `hosts/frieren/configuration.nix`:
-```nix
-home-manager.users.devji.programs.hermes-user = {
-  enable = true;
-  gateway.enable = true;
-  simplex.daemon = true;  # Generates systemd user service simplex-chat on :5225
-  envFile = "/run/secrets/rendered/hermes.env";
-};
-```
+### 2. Hermes user service daemon
+
+The option is `programs.hermes-user` in `modules/user/ai/hermes-user.nix`; the
+values frieren sets (gateway, simplex daemon, env file) are in
+`hosts/frieren/configuration.nix`. Read the option, not a copy of it — a pasted
+block is a block that drifts, and `checks:policies#services-live-in-modules`
+rejects one.
 
 ---
 

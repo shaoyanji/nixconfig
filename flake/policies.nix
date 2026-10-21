@@ -170,6 +170,14 @@
   skillName = p: baseNameOf (dirOf (toString p));
   skillsWithoutTruth = map skillName (builtins.filter (p: !(citesTruth p)) skillFiles);
 
+  # A skill may name an option; it may not define one. A pasted `*.enable =`
+  # block is the module's value typed a second time, with no type check and no
+  # assertion behind it.
+  definesService = p:
+    lib.any (l: builtins.match "[[:space:]]+[A-Za-z][A-Za-z0-9.-]*\\.enable = (true|false);" l != null)
+    (lib.splitString "\n" (builtins.readFile p));
+  skillsDefiningServices = map skillName (builtins.filter definesService skillFiles);
+
   # One blob of every .md/.nix in the tree, so "linked from somewhere" is one scan.
   # A *link* counts (`](docs/x.md)` from the manual, `](./x.md)` from a sibling
   # page); plain prose naming a file routes nobody to it.
@@ -222,6 +230,13 @@
       # that had none. Net −155, cap lowered 5546 → 5526 in the same change.
       holds = agentsLines <= 928 && skillLines <= 5526;
       detail = "AGENTS.md ${toString agentsLines}/928 lines, skills ${toString skillLines}/5526 — over budget means delete or an audited `Truth:` extension, not a renumber";
+    };
+
+    services-live-in-modules = {
+      rule = "A skill names a service option, it never defines one: no `*.enable = true|false;` assignment inside a SKILL.md. Service behaviour is an option in a module with its own assertions, so a skill that carries the value is a second home.";
+      proof = "line scan of every tracked SKILL.md";
+      holds = skillsDefiningServices == [];
+      detail = "skills defining a service: ${lib.concatStringsSep ", " skillsDefiningServices}";
     };
 
     skills-cite-truth = {

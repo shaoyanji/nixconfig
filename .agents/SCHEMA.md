@@ -142,7 +142,8 @@ Rules:
    [[flake/policies.nix#skills-cite-truth]] and every channel keeps a route
    [[flake/policies.nix#channels-have-a-task]] and the engine that answers
    [[flake/policies.nix#decision-engine-routing]], and it sends features, not
-   contents [[flake/policies.nix#categorize-sends-features-only]]. It names a
+   contents [[flake/policies.nix#categorize-sends-features-only]]; automation
+   itself is earned [[flake/policies.nix#automation-is-earned]]. It names a
    service option,
    never defines one [[flake/policies.nix#services-live-in-modules]]: the skill
    is the procedure, the file is the mechanism.

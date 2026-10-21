@@ -1,0 +1,8 @@
+{"date":"2026-10-21","target":".agents/deploy/README.md","engine":"jev-typesafe","jev":"docs","human":"docs","agree":true}
+{"date":"2026-10-21","target":".agents/deploy/rollback.md","engine":"jev-typesafe","jev":"docs","human":"procedure","agree":false}
+{"date":"2026-10-21","target":".agents/deploy/hosts/mtfuji.md","engine":"jev-typesafe","jev":"docs","human":"fact","agree":false}
+{"date":"2026-10-21","target":".agents/deploy/hosts/scratch.md","engine":"jev-typesafe","jev":"docs","human":"docs","agree":true}
+{"date":"2026-10-21","target":".agents/deploy/hosts/stark.md","engine":"jev-typesafe","jev":"docs","human":"docs","agree":true}
+{"date":"2026-10-21","target":".agents/deploy/hosts/frieren.md","engine":"jev-typesafe","jev":"fact","human":"procedure","agree":false}
+{"date":"2026-10-21","target":".agents/deploy/hosts/eisen.md","engine":"jev-typesafe","jev":"fact","human":"docs","agree":false}
+{"date":"2026-10-21","target":".agents/deploy/hosts/delphi.md","engine":"jev-typesafe","jev":"fact","human":"docs","agree":false}

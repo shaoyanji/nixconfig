@@ -1,17 +1,6 @@
 # The DeepSeek Harness Web UI as a worker service, published under a path
 # prefix by whatever reverse proxy fronts this host.
 #
-# Why a service and not a tmux session: the harness is a server, and the client
-# only ever needs its browser. A tunnel per client cannot be bookmarked, dies
-# with the terminal, and gives every client its own port; a fixed loopback port
-# behind one HTTPS entry does not. `dsh web` is told the browser-visible root
-# with `--public-url` and the authority to accept with `--trusted-host`, so the
-# proxy in front must BOTH strip the prefix (`proxy_pass http://…:PORT/`) and
-# forward the client's `Host` (`proxy_set_header Host $host`) — dsh gates /api
-# on that authority and keys its session cookie to it.
-#
-# The prefix works because the frontend is served with `<base href="./">` and
-# relative asset URLs, and the token exchange redirects to `./`.
 {
   config,
   lib,

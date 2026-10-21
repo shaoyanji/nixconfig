@@ -29,13 +29,24 @@
   # RESERVED public IP (an ephemeral IP changes on stop/start).
   publicDomain = "delphi.bountystash.com";
 
-  # DeepSeek Harness mount. One pair of constants because three places have to
-  # agree: the service's advertised root, the proxy's location, and the
-  # launcher that opens it. The trailing slash is the prefix strip
-  # (`proxy_pass http://…/`), not decoration.
+  # DeepSeek Harness, TAILNET ONLY. tailscaled terminates TLS for the MagicDNS
+  # name with a certificate no public client can present, and forwards to the
+  # same loopback app — so the harness is not reachable from the internet at
+  # all. That matters because the only gate out there was a bearer token, and
+  # the worker runs as a user that holds the fleet SSH CA key.
+  #
+  # Mounted at the root: no prefix to strip, so the proxy is a plain
+  # pass-through and the session cookie is keyed to exactly one authority
+  # (`tailnetHost:servePort`).
+  #
+  # 8443 on purpose. nginx owns 0.0.0.0:443 for the public landing page, and a
+  # listener on the tailnet address at 443 fails while that bind exists
+  # (measured: "bind: address already in use").
+  tailnetHost = "delphi.cloudforest-kardashev.ts.net";
+  servePort = 8443;
   dshPort = 3080;
-  dshPath = "/deepseek/";
-  dshUrl = "https://${publicDomain}${dshPath}";
+  dshPath = "/";
+  dshUrl = "https://${tailnetHost}:${toString servePort}/";
 
   # Static landing page. The point is proof of life (and the webserver
   # criterion), not a product: no CMS, no PHP, no runtime.
@@ -276,10 +287,11 @@ in {
   # probe independent of DNS. OCI's security list must also allow 80/443
   # (console change, not declarable here — see .agents/deploy/hosts/delphi.md).
   #
-  # `tailscale serve` is NOT an option for a second (tailnet) entry point:
-  # nginx binds 0.0.0.0:443, so tailscaled cannot take the tailnet address on
-  # 443 (measured 2026-10-21: "bind: address already in use"). A ts.net name
-  # would need its own `tailscale cert` plus a vhost on this listener.
+  # The tailnet entry point is `tailscale serve` on 8443, not a second nginx
+  # vhost: nginx binds 0.0.0.0:443, so tailscaled cannot take 443 on the tailnet
+  # address (measured 2026-10-21: "bind: address already in use"), and serve
+  # brings its own managed certificate for the MagicDNS name instead of another
+  # ACME line. This vhost keeps only the public landing page and /healthz.
   services.nginx = {
     enable = true;
     recommendedOptimisation = true;
@@ -333,45 +345,45 @@ in {
             default_type text/plain;
             return 200 "ok";
           '';
-          # DeepSeek Harness (services.dshWeb). `proxy_pass` with a trailing
-          # slash strips `dshPath`; `Host $host` is load-bearing — dsh's /api
-          # fence accepts only loopback, its own bind address, or an explicitly
-          # trusted authority, and the session cookie it mints is keyed to that
-          # same authority. `proxyWebsockets` is NOT on by default in this
-          # nixpkgs (checked: false), and the whole UI rides one upgraded
-          # socket, so it is set explicitly; the read timeout then covers an idle
-          # harness socket, which nginx would otherwise cut at 60 s.
-          locations."= ${lib.removeSuffix "/" dshPath}" = {
-            return = "301 ${dshPath}";
-          };
-          locations."${dshPath}" = {
-            proxyPass = "http://127.0.0.1:${toString dshPort}/";
-            proxyWebsockets = true;
-            extraConfig = ''
-              proxy_set_header Host $host;
-              proxy_set_header X-Forwarded-Proto $scheme;
-              proxy_buffering off;
-              proxy_read_timeout 1h;
-            '';
-          };
+          # Deliberately no harness location. The worker is tailnet-only (see
+          # `tailscale-serve-dsh` below); publishing it here would put a
+          # token-only gate in front of a user that holds the fleet SSH CA key.
         };
       };
   };
 
-  # --- DeepSeek Harness, hosted HERE -----------------------------------------
+  # --- DeepSeek Harness, hosted HERE, TAILNET ONLY ----------------------------
   # The harness (agent loop, bash, model calls, workspaces) runs on this host;
-  # a client only needs a browser at `dshUrl`. The unit binds loopback and the
-  # vhost above publishes it under `dshPath`, passing the client's Host through
-  # — that authority is both the /api fence entry (`trustedHosts`) and the key
-  # the session cookie is minted for.
+  # a client needs only a browser at `dshUrl`. The unit binds loopback and
+  # `tailscale-serve-dsh` below is the only way in. `tailscale serve` preserves
+  # the client's Host header (measured: `Host: delphi.<tailnet>.ts.net:8443`
+  # reached the upstream verbatim), so that authority is both the /api fence
+  # entry (`trustedHosts`) and the key the session cookie is minted for.
   services.dshWeb = {
     enable = true;
     user = user.name;
     port = dshPort;
     path = dshPath;
     publicUrl = dshUrl;
-    trustedHosts = [publicDomain];
+    trustedHosts = ["${tailnetHost}:${toString servePort}"];
     environmentFile = config.sops.templates."dsh-web.env".path;
+  };
+
+  # Tailnet-only HTTPS front. tailscaled issues and renews the certificate for
+  # the MagicDNS name, so there is no ACME line, no cert file to own and no
+  # public listener; the mapping is `--bg` (kept in tailscaled state) and this
+  # unit re-asserts it so a config switch cannot leave it stale.
+  systemd.services.tailscale-serve-dsh = {
+    description = "Tailnet-only HTTPS front for the DeepSeek Harness (localhost:${toString dshPort})";
+    after = ["tailscaled.service" "dsh-web.service"];
+    wants = ["tailscaled.service" "dsh-web.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg --https=${toString servePort} http://127.0.0.1:${toString dshPort}";
+      ExecStop = "${pkgs.tailscale}/bin/tailscale serve --https=${toString servePort} off";
+    };
   };
 
   # A model credential, not an account one: the harness's signed-in grant is

@@ -1,6 +1,7 @@
 # delphi — Oracle Cloud Infrastructure (OCI) Ampere A1 ARM64 headless server.
 {
   pkgs,
+  config,
   lib,
   ...
 }: let
@@ -370,6 +371,31 @@ in {
     path = dshPath;
     publicUrl = dshUrl;
     trustedHosts = [publicDomain];
+    environmentFile = config.sops.templates."dsh-web.env".path;
+  };
+
+  # A model credential, not an account one: the harness's signed-in grant is
+  # for the browser surface, while a turn resolves to the `deepseek-official`
+  # route and dies with MISSING_CREDENTIAL without this key. Rendered 0400 for
+  # the unit's user; never in the store, never on a command line.
+  # The key lives in the TRACKED fleet file, not `modules/secrets/apikeys.yaml`:
+  # that directory is outside the flake (delphi builds from `github:…` with no
+  # submodules), so a `sopsFile` pointing there is a path that does not exist in
+  # the store. The value was copied in from apikeys.yaml.
+  sops.secrets."deepseek/api/key" = {
+    sopsFile = ../../modules/secrets.yaml;
+    key = "deepseek/api/key";
+    owner = user.name;
+    group = "users";
+    mode = "0400";
+  };
+  sops.templates."dsh-web.env" = {
+    owner = user.name;
+    group = "users";
+    mode = "0400";
+    content = ''
+      DEEPSEEK_API_KEY=${config.sops.placeholder."deepseek/api/key"}
+    '';
   };
 
   # ACME client settings only exist when a cert is actually being requested.

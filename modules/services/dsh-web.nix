@@ -62,6 +62,17 @@ in {
       type = lib.types.package;
       default = pkgs.llm-agents.dsh;
     };
+
+    # The DeepSeek account grant is a browser sign-in, not a model credential:
+    # a turn on the stock profile resolves to the `deepseek-official` route,
+    # which wants `DEEPSEEK_API_KEY` (upstream's own error says so). The host
+    # renders that key from sops into this file so the unit never carries it in
+    # the store or on a command line.
+    environmentFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Optional EnvironmentFile (rendered from sops) holding the model credential.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -104,25 +115,29 @@ in {
         PATH = lib.mkForce "/run/current-system/sw/bin:${home}/.nix-profile/bin";
       };
 
-      serviceConfig = {
-        User = cfg.user;
-        WorkingDirectory = home;
-        ExecStart = lib.concatStringsSep " " ([
-            "${cfg.package}/bin/dsh"
-            "web"
-            "--no-open"
-            "--host"
-            "127.0.0.1"
-            "--port"
-            (toString cfg.port)
-            "--public-url"
-            cfg.publicUrl
-          ]
-          ++ lib.optional (cfg.trustedHosts != []) "--trusted-host"
-          ++ cfg.trustedHosts);
-        Restart = "always";
-        RestartSec = 3;
-      };
+      serviceConfig =
+        {
+          User = cfg.user;
+          WorkingDirectory = home;
+          ExecStart = lib.concatStringsSep " " ([
+              "${cfg.package}/bin/dsh"
+              "web"
+              "--no-open"
+              "--host"
+              "127.0.0.1"
+              "--port"
+              (toString cfg.port)
+              "--public-url"
+              cfg.publicUrl
+            ]
+            ++ lib.optional (cfg.trustedHosts != []) "--trusted-host"
+            ++ cfg.trustedHosts);
+          Restart = "always";
+          RestartSec = 3;
+        }
+        // lib.optionalAttrs (cfg.environmentFile != null) {
+          EnvironmentFile = cfg.environmentFile;
+        };
     };
   };
 }

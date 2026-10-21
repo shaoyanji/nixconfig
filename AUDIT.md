@@ -39,6 +39,8 @@
   and `--sync-auth` imports a client credential; the launcher says which.
 - Evidence: token `303` → cookie `200` (37,512 B), `/deepseek/api/remote.mux`
   upgrade `401` → **`101`**; `checks:host HOST=delphi MODE=eval` rc=0 (1,841).
+- A turn also needs the **model** key, not just the account grant: sops → the unit's
+  `EnvironmentFile` (a login shell never sees it); link clocked 1.38 Gbps↓ / 430↑.
 
 ### 2026-10-21 — Pi research is dumped, and there is no 2.0 to design against
 

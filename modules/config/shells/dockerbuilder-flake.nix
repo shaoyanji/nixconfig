@@ -18,7 +18,6 @@
         if targetSystem == "x86_64-linux"
         then "amd64"
         else "arm64";
-      #          duckgpt = pkgs.callPackage ./official.nix {};
       alpine = pkgs.dockerTools.pullImage {
         imageName = "alpine";
         imageDigest = "sha256:115729ec5cb049ba6359c3ab005ac742012d92bbaa5b8bc1a878f1e8f62c0cb8";

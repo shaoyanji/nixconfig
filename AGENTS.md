@@ -739,8 +739,7 @@ longer has to carry the essay. Vector-embedding offload to Eisen:
 - `agents:menu` is the interactive operator control plane
 - `task menu` is the whole-Taskfile gum TUI; `menu:list` / `menu:json` are its
   machine surfaces. A task is never `internal: true`
-  [[flake/policies.nix#task-surface-visible]] — that removes it from
-  `--list-all --json` too and breaks the agent endpoint.
+  [[flake/policies.nix#task-surface-visible]] — that breaks the agent endpoint.
 - NAS client recovery logic lives under `modules/profiles/nas-client.nix`
 
 ## Deployment Guidance
@@ -884,8 +883,7 @@ allowed beside the first.
 - **One instantiation.** Build the site once (`.#fleet-docs-site`) and pass the
   path to every vhost/socket; three `import`s with identical args are three evals.
 - **A rendered surface is compiled** [[flake/policies.nix#surfaces-are-compiled]]:
-  one registry emits pages, tailnet mounts and `data/services.json`; a card with
-  no owner, or a mount with no card, fails the host gate.
+  one registry emits pages, mounts and `data/services.json`; an ownerless card fails the gate.
 - **Publishing must not need a system switch.** If a `.md` edit lands inside a
   host's closure, the docs are as live as the last `nixos-rebuild`.
 - **Eval-time `builtins.readFile` is flake-scoped.** An untracked `.md` does not

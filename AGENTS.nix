@@ -3684,7 +3684,7 @@
       '';
     };
     nix-comment-audit = {
-      title = "Comment density in .nix files: indexed, not yet audited";
+      title = "Prose in .nix files: categorize, then route each kind to its channel";
       kind = "open";
       status = "OPEN";
       priority = "P3";
@@ -3696,29 +3696,36 @@
         tasks = ["dev:qmd:refresh"];
       };
       body = ''
-        **Measured 2026-10-21.** Top offenders by comment lines / total:
-        delphi 236/641, frieren 148/627, lib/aki-site 147/1143, lib/taskfile
-        146/653, eisen/llm-server 130/503, frieren/infra-stack 125/992,
-        flake/checks 113/395, netbook 109/302, frieren/dns 92/216 (43 %), kali
-        88/194, eisen/decision-models 85/352, frieren/reverse-proxy 83/448.
+        **The goal is routing, not deletion.** A comment is not slop because it
+        is long; it is out of place when its kind belongs to another channel.
+        Deleting it loses the reasoning that made a fix correct, which is the
+        expensive thing to reconstruct.
 
-        **Discoverability is already solved.** qmd indexes the .nix tree (2052
-        files) and a comment is findable: `qmd search disko -c nixconfig` lands
-        on `flake/host-inventory.nix` at 91 %, `qmd search accept-dns` lands on
-        `hosts/frieren/dns.nix` at 92 %. So a comment is not hidden — the
-        question is only whether it should exist twice.
+        **Categories, and the channel that owns each.** A *policy or trap*
+        ("80/443 belong to nginx", "a resolver must not resolve through the
+        address it serves") goes to `flake/policies.nix` as a predicate, or to
+        an option assertion; discovery is `checks.policies` failing a build. A
+        *fleet fact* (addresses, roles, hardware) goes to `inventory.toml`, read
+        with `task dev:inventory:feed`. A *why/history* narrative goes to an
+        AGENTS.nix note, found with `ops:notes:search`. A *procedure* becomes a
+        task (`taskfiles/*.yml`) or a `writeShellApplication`; the prose keeps a
+        pointer. A *durable explanation* goes to `docs/`, served by the site.
 
-        **Probe trap, recorded because it cost a wrong conclusion.** Searching a
-        quoted sentence ("disko wipes BOTH disks") returns `[]` while the same
-        words hit at 91 %; BM25 matches tokens, so probe with one distinctive
-        word, not a phrase, or a working index looks broken.
+        **Measured 2026-10-21** (scale, not a verdict): 4169 comment lines in
+        tracked `.nix`. delphi 236/641, frieren 148/627, lib/aki-site 147/1143,
+        lib/taskfile 146/653, eisen/llm-server 130/503, frieren/infra-stack
+        125/992, flake/checks 113/395, netbook 109/302, frieren/dns 92/216.
 
-        **The test to apply per comment.** Keep it if it states a *why* or a trap
-        that no policy, option or note carries ("a resolver must not resolve
-        through the address it serves"); delete it if it restates the code
-        ("# enable the service"), duplicates an inventory note or a policy, or
-        narrates history that belongs in `docs/history/`. Start at the top of
-        the list, where delphi is both the largest and the freshest.
+        **Discovery is already solved.** qmd indexes the .nix tree (2052 files):
+        `qmd search disko -c nixconfig` → `flake/host-inventory.nix` at 91 %,
+        `qmd search accept-dns` → `hosts/frieren/dns.nix` at 92 %. Probe with one
+        distinctive token: a quoted sentence ("disko wipes BOTH disks") returns
+        `[]` while the same words hit, because BM25 matches tokens.
+
+        **Pipeline rule, enforced.** `channels-have-a-task` asserts every channel
+        still has an entry point, so a category cannot be orphaned by removing a
+        task: inventory → `dev:inventory:feed`, notes → `ops:notes`, policies →
+        `checks:policies`, docs → `docs:build`.
       '';
     };
     open-minyx-2611 = {

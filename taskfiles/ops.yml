@@ -31,6 +31,17 @@ tasks:
         jq -r '.reasons[]?' /var/lib/fleet-sentinel/www/status.json 2>/dev/null || true
         exit 1
 
+  ops:categorize:
+    desc: Categorize prose with the decision engine, gated on calibration
+    summary: >
+      Sends each file's FEATURES (comment density, restated-code hits, facts
+      present in inventory/policies, age, assertion/metric/step/address counts)
+      to the engine as one classify question, then refuses to print a table when
+      the answer is uniform or a known-answer anchor misses. `--help` for usage.
+      An uncalibrated table is shape, not a verdict — the warning says which.
+    cmds:
+      - bash scripts/task/categorize.sh {{.CLI_ARGS}}
+
   ops:decide:
     desc: Ask the self-hosted decision engine (POST /v1/systemone)
     summary: >

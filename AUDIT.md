@@ -25,6 +25,37 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-21 — Pi research is dumped, and there is no 2.0 to design against
+
+- Checked against npm and GitHub: 60 published versions, **no `2.x`**, newest tag and
+  `latest` are `v1.3.0` (2026-10-15). The "MCP coding mode" is `codemode`, which
+  ships in 1.x (QuickJS sandbox, `tools.*` including namespaced MCP tools, only the
+  script's output reaches the model).
+- `docs/pi-harness.md` holds the source material — versions, codemode limits, config
+  surfaces (`models.json`, `PI_CODING_AGENT_DIR`), the eisen three-layer shape,
+  scenarios, and the open questions — so none of it needs re-fetching. Proposal:
+  `AGENTS.nix` `pi-eisen-ondemand`.
+
+### 2026-10-21 — fern's battery is healthy; btop cannot read a rate
+
+- `BAT0` is present and reports fine: `energy_full == energy_full_design == 35.199 Wh`
+  (**100 % health**, 0 % wear), 316 cycles, Li-ion, charging at 59 %.
+- `power_now` exists in sysfs but **reads ENODEV** (no `current_now` either), so the
+  firmware reports no rate and btop 1.4.7 hides the battery rather than draw one
+  without a rate. Not a kernel regression — a rollback changes nothing here.
+- `services.upower.enable` landed 2026-10-20 (`90f4bc7d`), but fern boots a
+  2026-10-05 generation, so the unit is `not-found` on the host today; upower
+  samples `energy_now` and is the missing health/rate source. A rebuild, not a
+  kernel change, is the fix.
+
+### 2026-10-21 — Strata MANUAL stops claiming 40–50 tok/s on this card
+
+- `hosts/eisen/MANUAL.md` §3/§5 carried 40–48 / 40–50 tok/s decode, which is Strata's
+  16 GB RX 9070 XT reference table, not a measurement here. Both now mark the speed
+  column as an upper bound and point at §7 (14.6–21.0 tok/s decode, 167 tok/s prefill).
+- `hosts/eisen/llm-server.nix`: two comments still named llama-swap as the upstream;
+  nginx :80 proxies Strata :8085. No behaviour change.
+
 ### 2026-10-21 — Strata MoE (Qwen3.8-Flash-Next 125B) running on Eisen RX 5700
 
 - Deployed Niko1221/Strata MoE inference on Eisen's AMD Radeon RX 5700 (`gfx1010`) via
@@ -52,10 +83,15 @@
   uploaded; 4 remote builds, the three nixbuild.net reported **finished in 0.8 s,
   4 s, 2 s** (1–2 CPUs). Then 27 min of silence waiting for the remote
   `initrd-linux-7.2.10` build — no completion report, no error; killed.
-- `--option builders-use-substitutes true` on a re-run still fetched the 141.6
-  MiB modules pair **locally**, so the flag does not move this host's cost. No
-  end-to-end completion: the copy-back phase was never reached, and a fair A/B
-  needs a cold builder store that nixbuild.net does not expose.
+- **Retry with the copy-back isolated went through**: the same drv under
+  `--option builders ssh://eu.nixbuild.net` completed in **60 s** (rc=0), goal
+  `0rwkkb2d…-nixos-system-fern`. Seven paths came back from the builder and every
+  copy-back was ≤ **0.21 s** — the initrd 0.12 s, `linux-7.2.10-modules-shrunk`
+  0.21 s. Copying the toplevel alone (`--no-recursive`) is 254 KB NAR in 2.4–3.2 s,
+  i.e. `nix` process start-up, not transfer.
+- So the stall was neither build nor copy-back cost: it was one remote build that
+  never reported. The 141.6 MiB modules pair is still fetched **locally** even with
+  `builders-use-substitutes true`, so the flag does not move this host's cost.
 
 ### 2026-10-21 — Exit codes are a gate; prose has its own digest
 

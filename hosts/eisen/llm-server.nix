@@ -355,12 +355,13 @@ in {
   # SteamLinuxRuntime-container games alike, and leaves the LLM alone when
   # only Steam itself is idle in the background.
   #
-  # On detection llama-swap is stopped outright rather than left holding a
-  # half-starved model: that returns the model's RAM (21 GiB Qwen, 44 GiB
-  # Kolibri) and, measured with Qwen resident, 5.4 GiB of the 8 GiB VRAM to the
-  # game, and the API answers
+  # On detection both services are stopped outright rather than left holding a
+  # half-starved model: Strata frees its resident expert arena plus the 6.1 GiB
+  # of 8.18 GiB VRAM it holds (hosts/eisen/MANUAL.md §7), and the API answers
   # connection-refused until the game exits — an honest "yielded to gaming"
-  # instead of a model quietly competing for VRAM.
+  # instead of a model quietly competing for VRAM. `llama-swap.service` is
+  # dormant (llm-server.nix): the stop/start is a no-op there, kept so reviving
+  # the llama-swap block restores the same guard behaviour.
   systemd.services."llama-swap-gaming-guard" = {
     description = "Suspend the LLM while a Steam game is running";
     after = ["llama-swap.service"];
@@ -373,7 +374,7 @@ in {
     };
   };
 
-  # --- LAN: plain http://eisen.lan/v1 (nginx :80 -> llama-swap :8080) ---
+  # --- LAN: plain http://eisen.lan/v1 (nginx :80 -> Strata :8085) ---
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;

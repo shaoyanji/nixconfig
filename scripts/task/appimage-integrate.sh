@@ -87,6 +87,13 @@ case "$(uname -m)" in
   *) host_arch="$(uname -m)" ;;
 esac
 
+for tool in readelf unsquashfs file; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    echo "appimage-integrate: required tool '$tool' is not in PATH" >&2
+    exit 1
+  fi
+done
+
 records="$(mktemp)"
 stage="$(mktemp -d)"
 trap 'rm -rf "$records" "$stage"' EXIT
@@ -235,29 +242,27 @@ done <<EOF
 $winners
 EOF
 
-# Drop entries and icons for images that left the library.
+# Drop entries whose image is gone. The test is the entry's own Exec target, not
+# "did this run see it": a partial run must never empty the menu.
 if [ "$DRY_RUN" = 0 ]; then
   for stale in "$APPS_DIR"/appimage-*.desktop; do
     [ -e "$stale" ] || continue
+    target="$(sed -n 's/^Exec="\(.*\)"$/\1/p' "$stale" | head -1)"
+    [ -n "$target" ] || target="$(sed -n 's/^Exec=\(.*\)$/\1/p' "$stale" | head -1)"
+    [ -n "$target" ] || continue
+    [ -e "$target" ] && continue
     slug="$(basename "$stale" .desktop)"
     slug="${slug#appimage-}"
-    case " $written " in
-      *" $slug "*) ;;
-      *)
-        say "remove stale entry: $(basename "$stale")"
-        rm -f "$stale"
-        ;;
-    esac
+    say "remove stale entry: $(basename "$stale")"
+    rm -f "$stale"
+    rm -f "$ICON_DIR/$slug".* 2>/dev/null || true
   done
-  for stale in "$ICON_DIR"/*; do
-    [ -e "$stale" ] || continue
-    slug="$(basename "$stale")"
-    slug="${slug%.*}"
-    case " $written " in
-      *" $slug "*) ;;
-      *) rm -f "$stale" ;;
-    esac
-  done
+fi
+
+# A run that read nothing is a failure, not a clean no-op.
+if [ "$failed" -gt 0 ] && [ "$integrated" -eq 0 ]; then
+  echo "appimage-integrate: $failed image(s) unreadable and nothing integrated" >&2
+  exit 1
 fi
 
 echo "appimage-integrate: $integrated integrated from $APPIMAGE_DIR" \

@@ -548,7 +548,11 @@ tasks:
       images are pruned. Exit 0 = done, 1 = library unreadable, 2 = usage error.
       Vars: APPIMAGE_DIR=, FLAGS (--dry-run).
     cmds:
-      - APPIMAGE_DIR="{{.APPIMAGE_DIR | default ""}}" bash scripts/task/appimage-integrate.sh {{.FLAGS}}
+      - |
+        # squashfs-tools/binutils are the readers; without them the script now
+        # refuses to run rather than silently pruning every entry.
+        export APPIMAGE_DIR="{{.APPIMAGE_DIR | default ""}}"
+        nix-shell -p squashfs-tools file binutils --run "bash scripts/task/appimage-integrate.sh {{.FLAGS}}"
 
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:

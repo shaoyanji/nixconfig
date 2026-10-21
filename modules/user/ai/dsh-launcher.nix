@@ -17,33 +17,11 @@
     magick ${iconIco} -resize 256x256 $out
   '';
 
-  # The harness runs on the worker; the browser runs here. The worker hosts it
-  # as a service (`services.dshWeb`) behind its own TLS ingress at /deepseek/,
-  # so this launcher is a *client*: it reads the current signed-in URL from the
-  # worker's journal, proves the ingress answers from this machine, and hands
-  # the URL to a browser. No tunnel, so the tab outlives the command and the
-  # URL can be bookmarked; the worker's CPU and model access are what the UI
-  # uses. The token in that URL is the credential — the first visit trades it
-  # for a 30-day cookie, after which the bare /deepseek/ works.
-  #
-  # ssh carries the URL, not the UI: public SSH (delphi.bountystash.com), never
-  # the Tailscale SSH path, which adds a browser device check that hangs an
-  # unattended launch.
-  #
-  # The script lives beside this file because it is the part that changes; a
-  # Nix string would make every `$` a quoting exercise and no linter would see it.
-  dshRemote = pkgs.writeShellApplication {
-    name = "dsh-remote";
-    runtimeInputs = [
-      pkgs.openssh
-      pkgs.coreutils
-      pkgs.gnugrep
-      pkgs.gawk
-      pkgs.curl
-      pkgs.xdg-utils
-    ];
-    text = builtins.readFile ./dsh-remote.sh;
-  };
+  # The harness runs on the worker (`services.dshWeb`), which publishes it under
+  # its own TLS ingress at /deepseek/; this is the client half. Shared with the
+  # hosts that install it directly (frieren), so there is one definition of what
+  # `dsh-remote` means and one place to change it.
+  dshRemote = import ../../scripts/dsh-remote.nix {inherit pkgs;};
 
   # Local entry, only where the harness is actually installed (tier "full").
   dshLocal = pkgs.writeShellApplication {

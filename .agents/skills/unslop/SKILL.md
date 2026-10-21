@@ -70,3 +70,5 @@ Scan for the patterns, then rewrite. Match the tone of the file you are editing.
 Apply it to text you write and to text you already touch. Do not open a rewrite of a file just to satisfy rule 13.
 
 Truth: `flake/policies.nix` — the rules this page applies are predicates there; this page is the procedure.
+
+Auditing a doc tree: score each file with `task ops:decide -- -q …` as a prior, then decide by hand — julia-1 returns ~0.37 confidence on structurally identical states, so its verdict ranks candidates and never replaces reading them.

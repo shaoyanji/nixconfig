@@ -129,15 +129,34 @@ in {
       # Pi-hole forwards to this explicitly; unbound must not also grab the host
       # resolver stub, which would fight systemd-resolved.
       resolveLocalQueries = false;
-      settings.server = {
-        interface = ["127.0.0.1@5335"];
-        access-control = ["127.0.0.0/8 allow"];
-        # The resolver hosts have no IPv6 uplink. With IPv6 enabled (the
-        # default) unbound sends its recursion to the IPv6 root servers, gets
-        # `module_event_noreply` for every one (the kernel has no route), and
-        # SERVFAILs the lookup — the 2026-10-14 frieren outage. Recurse over
-        # IPv4 only; AAAA records still resolve fine.
-        do-ip6 = false;
+      settings = {
+        server = {
+          interface = ["127.0.0.1@5335"];
+          access-control = ["127.0.0.0/8 allow"];
+          # The resolver hosts have no IPv6 uplink. With IPv6 enabled (the
+          # default) unbound sends its recursion to the IPv6 root servers, gets
+          # `module_event_noreply` for every one (the kernel has no route), and
+          # SERVFAILs the lookup — the 2026-10-14 frieren outage. Recurse over
+          # IPv4 only; AAAA records still resolve fine.
+          do-ip6 = false;
+          msg-cache-size = "32m";
+          rrset-cache-size = "64m";
+          infra-cache-numhosts = 10000;
+          so-reuseport = true;
+        };
+        # Forward to fast, reliable upstream resolvers with local DNS caching
+        # to prevent slow root iterations from timing out on LAN clients.
+        forward-zone = [
+          {
+            name = ".";
+            forward-addr = [
+              "1.1.1.1"
+              "9.9.9.9"
+              "1.0.0.1"
+              "149.112.112.112"
+            ];
+          }
+        ];
       };
     };
 
@@ -149,6 +168,12 @@ in {
           upstreams = ["127.0.0.1#5335"];
           listeningMode = "ALL";
           interface = cfg.lanInterface;
+          # Disable query rate-limiting so household traffic (Smart TVs, mobile
+          # bursts, router proxying) is never REFUSED.
+          rateLimit = {
+            count = 0;
+            interval = 60;
+          };
         };
         database.maxDBdays = 31;
         # The LAN interface MUST be listed explicitly. Any dnsmasq `interface=`

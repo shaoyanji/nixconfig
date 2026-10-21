@@ -465,6 +465,36 @@ in {
     dnsutils
     iproute2
     tcpdump
+    # Autonomous Cloud Workspace Seeder: sets up ~/Documents/nixconfig and ~/vaults/personal
+    # directly from upstream GitHub without requiring fragile LAN mounts or manual flags.
+    (writeShellApplication {
+      name = "delphi-seed-workspace";
+      runtimeInputs = [
+        git
+        openssh
+        coreutils
+      ];
+      text = ''
+        set -euo pipefail
+        echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
+        mkdir -p "$HOME/Documents" "$HOME/vaults"
+
+        if [ ! -d "$HOME/Documents/nixconfig/.git" ]; then
+          echo "--> Cloning nixconfig to ~/Documents/nixconfig (with recursive submodules)..."
+          git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$HOME/Documents/nixconfig"
+        else
+          echo "--> ~/Documents/nixconfig already exists. Pulling latest..."
+          git -C "$HOME/Documents/nixconfig" pull --recurse-submodules || true
+        fi
+
+        if [ ! -d "$HOME/vaults/personal/.git" ]; then
+          mkdir -p "$HOME/vaults/personal"
+          echo "--> Initialized ~/vaults/personal."
+        fi
+
+        echo "=== [delphi] Workspace ready at ~/Documents/nixconfig ==="
+      '';
+    })
   ];
 
   # Modal editor defaults (Catppuccin Mocha theme, relative line numbers).
@@ -491,6 +521,7 @@ in {
   programs.bash.shellAliases = {
     nvim = "nix run github:shaoyanji/kickstart.nixvim --";
     vim = "helix";
+    seed-workspace = "delphi-seed-workspace";
   };
 
   system.stateVersion = "25.05";

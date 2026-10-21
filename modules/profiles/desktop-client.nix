@@ -72,7 +72,7 @@
     # tailscale version. Tailscaled skips installing routes for subnets the
     # machine is directly attached to, so LAN-resident hosts keep their
     # native path.
-    tailscale.extraSetFlags = [
+    tailscale.extraSetFlags = lib.mkDefault [
       "--accept-dns=true"
       "--accept-routes=true"
     ];

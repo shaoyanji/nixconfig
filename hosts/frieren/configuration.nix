@@ -505,6 +505,7 @@ in {
     enable = true;
     nssmdns4 = true;
     openFirewall = true;
+    reflector = true; # Reflect mDNS across interfaces (wired, wifi, dock) for TV & device discovery
     publish = {
       enable = true;
       userServices = true;

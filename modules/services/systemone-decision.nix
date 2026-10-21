@@ -53,6 +53,31 @@ in {
       default = true;
       description = "Whether to install decision and ensemble CLIs into system environment packages.";
     };
+
+    # The envelope other agents call, so they do not each ship engine.py. Bind
+    # loopback and put a proxy in front: on a host with `services.tailscale`,
+    # `tailscale serve --https=<port>` is the tailnet mount (exp-120).
+    serve = {
+      enable = lib.mkEnableOption "the /v1/systemone HTTP envelope";
+
+      host = lib.mkOption {
+        type = lib.types.str;
+        default = "127.0.0.1";
+        description = "Bind address. Loopback by default: the proxy is the perimeter.";
+      };
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8091;
+        description = "Bind port (8090 is eisen's Laya, so stay off it).";
+      };
+
+      model = lib.mkOption {
+        type = lib.types.nullOr (lib.types.enum ["julia-1" "laya"]);
+        default = null;
+        description = "Architecture to serve; null follows defaultModel.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -60,5 +85,31 @@ in {
       cfg.package
       cfg.ensemblePackage
     ];
+
+    # One process, one loopback port, no writes: the engine is pure computation,
+    # so it is sandboxed harder than a service that owns state.
+    systemd.services.systemone-decision-serve = lib.mkIf cfg.serve.enable {
+      description = "System One decision envelope (/v1/systemone) on ${cfg.serve.host}:${toString cfg.serve.port}";
+      wantedBy = ["multi-user.target"];
+      # No `network-online`: a loopback listener needs no network state.
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${cfg.package}/bin/systemone-decision --model ${
+          if cfg.serve.model != null
+          then cfg.serve.model
+          else cfg.defaultModel
+        } serve --host ${cfg.serve.host} --port ${toString cfg.serve.port}";
+        Restart = "always";
+        RestartSec = 2;
+        DynamicUser = true;
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
+        # Measured at 24 MiB; the cap is the runaway guard, not the expectation.
+        MemoryMax = "256M";
+      };
+    };
   };
 }

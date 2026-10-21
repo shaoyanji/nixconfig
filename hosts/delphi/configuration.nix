@@ -379,6 +379,28 @@ in {
   services.systemoneDecision = {
     enable = true;
     defaultModel = "julia-1";
+    # The envelope other agents call; mounted on the tailnet below. 8091 on
+    # loopback because 8090 is eisen's Laya, and one port per proxy mount.
+    serve = {
+      enable = true;
+      port = 8091;
+    };
+  };
+
+  # Tailnet-only HTTPS front for the decision envelope. Same shape as
+  # `tailscale-serve-dsh`: tailscaled terminates TLS, the app stays on loopback,
+  # and nothing about it is reachable from the public vhost.
+  systemd.services.tailscale-serve-systemone = {
+    description = "Tailnet-only HTTPS front for the System One decision envelope";
+    after = ["tailscaled.service" "systemone-decision-serve.service"];
+    wants = ["tailscaled.service" "systemone-decision-serve.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg --https=8444 http://127.0.0.1:8091";
+      ExecStop = "${pkgs.tailscale}/bin/tailscale serve --https=8444 off";
+    };
   };
 
   # Tailnet-only HTTPS front. tailscaled issues and renews the certificate for

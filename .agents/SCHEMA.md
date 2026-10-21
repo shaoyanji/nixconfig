@@ -139,10 +139,10 @@ Rules:
 6. **Prose cites truth, it never becomes it.** Every `SKILL.md` carries a
    `Truth:` line naming a resolvable repo path (`modules/`, `hosts/`, `flake/`,
    `lib/`, `taskfiles/`, `scripts/`) or a policy citation —
-   [[flake/policies.nix#skills-cite-truth]]. It names a service option, never
-   defines one [[flake/policies.nix#services-live-in-modules]]: the skill is
-   the procedure, the file is the mechanism, and a skill that is the only home
-   of a fact is the fact nobody can diff.
+   [[flake/policies.nix#skills-cite-truth]] and every channel keeps a route
+   [[flake/policies.nix#channels-have-a-task]]. It names a service option,
+   never defines one [[flake/policies.nix#services-live-in-modules]]: the skill
+   is the procedure, the file is the mechanism.
 
 Validate with:
 

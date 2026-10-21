@@ -232,6 +232,17 @@
       detail = "AGENTS.md ${toString agentsLines}/928 lines, skills ${toString skillLines}/5526 — over budget means delete or an audited `Truth:` extension, not a renumber";
     };
 
+    channels-have-a-task = {
+      rule = "Every discovery channel keeps an entry point: a fleet fact is read with `task dev:inventory:feed`, a note with `ops:notes:show`, a durable doc with `docs:build`, and a rule with the policy check. A category with no entry point is a fact nobody can reach, which is how prose becomes the only home.";
+      proof = "taskfiles/dev.yml (inventory:feed, docs:build), taskfiles/ops.yml (ops:notes:show), flake/checks.nix (policyFailures)";
+      holds =
+        has "taskfiles/dev.yml" "inventory:feed"
+        && has "taskfiles/dev.yml" "docs:build"
+        && has "taskfiles/ops.yml" "ops:notes:show"
+        && has "flake/checks.nix" "policyFailures";
+      detail = "a channel lost its task, so the category it owns has no route";
+    };
+
     services-live-in-modules = {
       rule = "A skill names a service option, it never defines one: no `*.enable = true|false;` assignment inside a SKILL.md. Service behaviour is an option in a module with its own assertions, so a skill that carries the value is a second home.";
       proof = "line scan of every tracked SKILL.md";

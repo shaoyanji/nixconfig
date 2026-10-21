@@ -307,10 +307,16 @@ lib.genAttrs systems.default (
           nameGrammar = [];
           sourcesWithoutWatch = [];
           retiredRef = [];
-          # `badexit` promises 7 against a script that only exits 3; `badexit-missing`
-          # promises 1 and names a script the tree does not have, which is a
-          # report, not drift.
-          exitDrift = ["Taskfile.yml:badexit claims exit 7; emits [3]"];
+          # `badexit` promises 7 against a script that only exits 3; `badrange`
+          # promises 130-137 against the same script, so a parser that kept only
+          # the left endpoint would still call 130 emitted and pass it. The
+          # passing twins (`rangeexit` 134, `two-digit` 42) are in the fixture and
+          # must stay out of this bucket. `badexit-missing` promises 1 and names a
+          # script the tree does not have, which is a report, not drift.
+          exitDrift = [
+            "Taskfile.yml:badexit claims exit 7; emits [3]"
+            "Taskfile.yml:badrange claims exit 130-137; emits [3]"
+          ];
           exitUnverified = ["Taskfile.yml:badexit-missing claims exit 1 but scripts/task/not-here.sh is not in the tree"];
         };
         sorted = builtins.sort builtins.lessThan;
@@ -347,6 +353,31 @@ lib.genAttrs systems.default (
           done
           touch $out
         '';
+
+      # --- the task graph is pinned, not just versioned ----------------------
+      # `version`/`proseVersion` are addresses; nothing compares them to a known
+      # value, so a reformatted shard or a script-rewritten summary changed what
+      # the fleet executes without a red build. The pin is the comparison: it
+      # moves only when someone edits `flake/taskfile-digest-pin.nix`, which makes
+      # every digest change a reviewed line instead of an accident.
+      taskfile-digest-pin = let
+        pin = import ./taskfile-digest-pin.nix;
+        moved =
+          lib.optional (pin.exec != taskfileCtl.version) "exec ${pin.exec} -> ${taskfileCtl.version}"
+          ++ lib.optional (pin.prose != taskfileCtl.proseVersion) "prose ${pin.prose} -> ${taskfileCtl.proseVersion}";
+      in
+        if moved != []
+        then
+          builtins.throw ''
+            The task graph moved: ${lib.concatStringsSep "; " moved}.
+            If the change is intentional, update flake/taskfile-digest-pin.nix in the same commit.
+            If it is not, find the shard that changed (`task checks:tasks` prints both digests).
+          ''
+        else
+          pkgs.runCommand "taskfile-digest-pin" {} ''
+            echo "task graph pinned: exec ${pin.exec}, prose ${pin.prose}"
+            touch $out
+          '';
 
       # --- living documents have budgets (SCHEMA.md §2) ---------------------
       # One implementation: scripts/task/docs-budget.sh, the same script

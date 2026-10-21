@@ -35,7 +35,11 @@
 
       add_newline = true;
       follow_symlinks = false;
-      command_timeout = 1000;
+      # Repos that live on the NAS (/Volumes/data, NFS from a client) answer
+      # `git status` in seconds, not milliseconds: at the 1000 ms default Starship
+      # aborts with "Executing command \"git\" timed out" on every prompt there.
+      # 5 s is below a human noticing a slow prompt, above a cold NFS lookup.
+      command_timeout = 5000;
       continuation_prompt = "[∙ ](dimmed overlay0)";
 
       format = lib.concatStrings [
@@ -107,6 +111,9 @@
       };
 
       git_status = {
+        # nixconfig carries submodules; walking each one is what pushes the
+        # status call past the timeout on the NAS.
+        ignore_submodules = true;
         style = "bold peach";
         format = "([$all_status$ahead_behind]($style) )";
         conflicted = "=";

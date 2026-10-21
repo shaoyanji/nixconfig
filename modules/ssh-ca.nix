@@ -78,9 +78,13 @@ in {
       # login session — devji is lingered on frieren.
       systemd.user.services.renew-ssh-cert = {
         description = "Renew the ${user.name} SSH user certificate (90-day validity)";
+        unitConfig = {
+          # A condition belongs in [Unit]; under [Service] systemd logs
+          # "Unknown key 'ConditionUser'" on every daemon-reload.
+          ConditionUser = user.name;
+        };
         serviceConfig = {
           Type = "oneshot";
-          ConditionUser = user.name;
           Environment = [
             "HOME=${user.home}"
             "PATH=${pkgs.coreutils}/bin"

@@ -25,6 +25,20 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-21 — frieren headless-by-default, governor store references, Caddyfile removal
+
+- Split frieren into two boot personas: `hosts/frieren/configuration.nix` is now the
+  headless server default (no niri, greetd, or DisplayLink) and `hosts/frieren/desktop.nix`
+  is `specialisation.desktop`. QuickSync/VA-API stays in the base `hardware.nix`, so Jellyfin
+  transcodes in both; `media-stack.nix` adds the `jellyfin` user to `video`/`render`.
+- Fixed the `builtins.derivation ... references the store path ... without a proper context`
+  warning: `modules/services/fleet-governor.nix` used `toString ../..` (and `toString ../..`
+  for the S2 `flakePath` default), which strips store context. Both now interpolate a path,
+  so `run-fleet-governor` and `fleet-governor-rules.json` have real inputs
+  (`nix-store -q --references <drv>` lists `…-systemone` / the flake source; both build with
+  `--builders ""`).
+- Deleted `modules/config/Caddyfile` (no references in the tree or in history).
+
 ### 2026-10-21 — Delphi cloud workspace seeder, Freebuff mainframe, & Antigravity gateway
 
 - Fixed `seed-workspace` on delphi: added `gh` to `delphi-seed-workspace` with
@@ -101,31 +115,6 @@
 - Measured: 167 tok/s prompt prefill, 14.6–21.0 tok/s decode, 87.5% MTP speculative drafting
   acceptance (70/80 tokens accepted) with 32K context and INT8 KV cache. Documented in `hosts/eisen/MANUAL.md`.
 - `AGENTS.nix` note `open-strata-eisen-rx5700` marked `DELIVERED`.
-
-### 2026-10-21 — A doc-only push now has a gate
-
-- `docs-budget` CI job builds `checks.<system>.docs-budget` on every push; the
-  budgets live once, in `scripts/task/docs-budget.sh` (task, check and job run
-  it), and `[[flake/policies.nix#ci-doc-budget]]` fails if the job disappears.
-- Evidence: padded-copy build exits 1 (`AGENTS.md: 1300 > 1200`), policies green.
-
-### 2026-10-21 — A remote host closure is transfer-bound, not build-bound
-
-- One `fern` toplevel, profiled phase by phase: eval **133 s** (2.38 GiB peak,
-  oom-guard); plan 14,804 store paths, 56 derivations to build and 37 paths to
-  fetch (159.5 MiB); local substitution of 36 paths in **36 s**; 3 small paths
-  uploaded; 4 remote builds, the three nixbuild.net reported **finished in 0.8 s,
-  4 s, 2 s** (1–2 CPUs). Then 27 min of silence waiting for the remote
-  `initrd-linux-7.2.10` build — no completion report, no error; killed.
-- **Retry with the copy-back isolated went through**: the same drv under
-  `--option builders ssh://eu.nixbuild.net` completed in **60 s** (rc=0), goal
-  `0rwkkb2d…-nixos-system-fern`. Seven paths came back from the builder and every
-  copy-back was ≤ **0.21 s** — the initrd 0.12 s, `linux-7.2.10-modules-shrunk`
-  0.21 s. Copying the toplevel alone (`--no-recursive`) is 254 KB NAR in 2.4–3.2 s,
-  i.e. `nix` process start-up, not transfer.
-- So the stall was neither build nor copy-back cost: it was one remote build that
-  never reported. The 141.6 MiB modules pair is still fetched **locally** even with
-  `builders-use-substitutes true`, so the flag does not move this host's cost.
 
 ### 2026-10-21 — The 2026-10-20 ledger entries are archived
 

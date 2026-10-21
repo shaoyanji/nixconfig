@@ -306,6 +306,43 @@ The harness needs no account to *boot*: measured with the credential moved aside
 `dsh-web` stayed active, published its URL and served the page (`200`), and
 `--status` reported `account NONE` instead of looking broken.
 
+**It needs a model key as well as the account grant.** A signed-in worker whose
+env lacks `DEEPSEEK_API_KEY` fails every turn with `MISSING_CREDENTIAL … no API
+key for provider route "deepseek-official"` — the account is fine, the model is
+not. `services.dshWeb` renders the key from sops into the unit's
+`EnvironmentFile` (`/run/secrets/rendered/dsh-web.env`); a login shell does **not**
+inherit it, so reproduce a turn with the unit's env and never with `dsh` alone:
+
+```bash
+ssh delphi 'set -a; . /run/secrets/rendered/dsh-web.env; set +a; dsh --profile headless "reply OK"'
+ssh delphi 'tr "\0" "\n" < /proc/$(systemctl show -p MainPID --value dsh-web)/environ | grep -c "^DEEPSEEK_API_KEY=sk-"'
+```
+
+**Operating it.** It is a systemd unit, not a tmux window — Ctrl+C in a shell
+does nothing to it, and an open tab outlives any restart:
+
+```bash
+ssh delphi sudo systemctl stop dsh-web       # app down; nginx keeps :443, so /deepseek/ 502s
+ssh delphi sudo systemctl disable dsh-web    # stays down across boots (it ships enabled)
+ssh delphi sudo systemctl restart dsh-web    # the EnvironmentFile is read at start
+```
+
+Stopping the unit does **not** remove the public surface: the vhost is still on
+`:443`, so the next start is public again without a rebuild.
+
+**Do not mistake the token for a perimeter.** `delphi.bountystash.com` is a plain
+A record to this host's public IP — no Cloudflare proxy, no mTLS, no rate limit —
+and the worker runs as `devji`, whose `~/.ssh/user_ca_key` is the fleet user CA.
+A leaked `/deepseek/?token=…` is therefore fleet SSH authority, not just a chat
+pane. Closing that means bound to the tailnet address (`listen 100.123.145.53:443`
+for this server block) and running the worker as a user with no `~/.ssh`.
+
+**The network is asymmetric and the fleet link is the bottleneck** (measured
+2026-10-21): 172 MB/s down (~1.38 Gbps), 54 MB/s up (~430 Mbps), 101 MB/s sync
+disk write — but only 50/20 Mbps over WireGuard to frieren. Never point this
+host's substituters at the LAN cache: pull from upstream at line rate and push to
+Cachix, which is also why `01e9906e` decoupled it.
+
 `https://delphi.cloudforest-kardashev.ts.net/deepseek/` is **not** served:
 nginx binds `0.0.0.0:443`, so `tailscale serve` cannot take the tailnet address
 (`bind: address already in use`, measured 2026-10-21). Adding it means a

@@ -3649,33 +3649,38 @@
     exp-120 = {
       title = "EXP-120 — a tailnet gateway for System One decisions";
       kind = "experiment";
-      status = "PROPOSED";
+      status = "DELIVERED";
       date = "2026-10-21";
-      summary = "System One has no serve mode: every consumer runs the Python locally, so a gateway on delphi would let the fleet ask one always-on host instead of each shipping the engine.";
+      summary = "System One serves the /v1/systemone envelope on delphi (loopback 8091, tailnet 8444) and `task ops:decide` is the one command for it, so a consumer asks one always-on host instead of running the engine locally.";
       refs = {
         hosts = ["delphi" "frieren"];
-        modules = ["modules/services/systemone-decision.nix" "hosts/delphi/configuration.nix"];
-        tasks = ["checks:host"];
+        modules = ["modules/services/systemone-decision.nix" "hosts/delphi/configuration.nix" "scripts/task/systemone.sh"];
+        tasks = ["checks:host" "ops:decide"];
       };
       body = ''
         **Measured.** engine.py imports only the standard library (sys, json,
         hashlib, resource, argparse); its profiles describe julia-1 (144M mmBERT,
-        CPU) and laya (421M ModernBERT) without loading either. Subcommands are
-        benchmark, triage-system, triage-handoff and query; there is no HTTP mode,
-        so today each caller runs its own copy as a CLI.
+        CPU) and laya (421M ModernBERT) without loading either, so a serve mode is
+        a stdlib http.server around the same query/route functions — no torch, no
+        model weights at runtime.
 
-        **What landed.** delphi enables services.systemoneDecision, so
-        systemone-decision exists on an always-on aarch64 host and a decision is
-        available while frieren is under load or the laptop is closed.
+        **Delivered.** `services.systemoneDecision.serve` answers POST
+        /v1/systemone and GET /health; delphi mounts it on the tailnet at 8444
+        through `services.servicePortal`, so the mount and its portal card come
+        from one declaration. `scripts/task/systemone.sh` (`task ops:decide`)
+        wraps the envelope with flags — `-e`, `-s`, `-q`, `-m`, `--health` — and
+        the two decision skills now point at that command instead of carrying
+        HTTP calls.
 
-        **The gap.** eisen serves /v1/systemone for the real models; the local
-        engine has no equivalent. A gateway would be a socket-activated
-        http.server around the same query/route functions, mounted on the tailnet
-        by tailscale serve (the pattern this host already uses for the harness).
+        **Verified (2026-10-21).** health over the tailnet: julia-1, 144M, `ok`;
+        a choice question (severity of a full disk) answered in 0.32 ms with the
+        documented `answers`+`usage` envelope. Uniform probabilities in that
+        answer are the deterministic scorer having no signal, not a transport
+        fault.
 
-        **Exit.** An agent asks delphi for a typed decision and gets the same
-        envelope eisen returns; the CLI stays the offline fallback. If no consumer
-        appears, REJECTED and the CLI alone stays.
+        **What it is not.** eisen's Laya is the accuracy path; this is a shape
+        and routing fallback that stays up when frieren is loaded or closed. The
+        CLI (`systemone-decision`) remains the offline answer.
       '';
     };
     open-minyx-2611 = {

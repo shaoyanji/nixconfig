@@ -44,3 +44,5 @@ parallel-cli memory ...                        # recall saved tasks/monitors/fin
   quick lookups; use `findall` to enumerate candidates (vendors, tools).
 - Combine with `pdfvision` when a result is a PDF, and `ai-memory` to persist
   findings: `parallel-cli extract <url> | ai-memory write-page --path research/<topic> -`.
+
+Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.

@@ -50,3 +50,5 @@ nix-preflight.sh verify <file.nix>
 1. **Always use double quotes `""` for Python strings** embedded in Nix indented strings (`''...''`).
 2. **Always run `check-syntax` or `verify`** immediately after modifying a Nix file before running any git commit or rebuild command.
 3. **If `check-syntax` fails**, revert or fix the exact file immediately using the reported line and column numbers.
+
+Truth: `modules/user/ai/skills/default.nix` — the materialization of the module skills; this page is the procedure.

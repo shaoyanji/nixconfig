@@ -117,3 +117,5 @@ evaluation never needs the keys — activation does.
 - You can name the cost tier of what you ran (table above) and why the next
   tier down could not answer it.
 - Nothing was built, fetched, or switched as a side effect.
+
+Truth: `taskfiles/ops.yml` — the executable contract; this page is the procedure.

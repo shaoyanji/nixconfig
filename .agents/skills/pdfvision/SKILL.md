@@ -45,3 +45,5 @@ pdfvision --clear-cache                    # drop cached extractions
 
 `pdfvision mcp` exposes extraction over Model Context Protocol — add it to
 Zed context_servers or hermes the same way as ai-memory's server.
+
+Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.

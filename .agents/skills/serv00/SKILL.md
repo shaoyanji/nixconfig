@@ -81,3 +81,5 @@ task serv00:server:status
 # Run Devil CLI to check ports
 task serv00:devil -- port list
 ```
+
+Truth: `taskfiles/serv00.yml` — the executable contract; this page is the procedure.

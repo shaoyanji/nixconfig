@@ -148,3 +148,5 @@ use `transcribe`, which needs no display.
   `base.en`). Remote mode is faster once a valid API key is configured.
 - Part of numtide's flake (`github:numtide/llm-agents.nix`), same source as
   the `reasonix` skill.
+
+Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.

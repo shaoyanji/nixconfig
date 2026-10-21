@@ -136,6 +136,12 @@ Rules:
    what it proves and what it does not.
 5. **No secrets, no live tokens, no personal data.** Reference
    `task infra:sops:get:*` instead.
+6. **Prose cites truth, it never becomes it.** Every `SKILL.md` carries a
+   `Truth:` line naming a resolvable repo path (`modules/`, `hosts/`, `flake/`,
+   `lib/`, `taskfiles/`, `scripts/`) or a policy citation —
+   [[flake/policies.nix#skills-cite-truth]]. The skill is the procedure; the
+   file it names is the mechanism, and a skill that is the only home of a fact
+   is the fact nobody can diff.
 
 Validate with:
 

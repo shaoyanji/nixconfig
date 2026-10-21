@@ -33,3 +33,5 @@ If token expires, re-auth with `rclone config reconnect gdrive:` and repeat the 
 - Auth state mismatch: use the current state from the running server
 - Token expired: re-auth with new verification code
 - tailscale funnel not working: check `tailscale funnel status --json`
+
+Truth: `modules/config/shells/common-packages.nix` — what installs the tool; this page is the procedure.

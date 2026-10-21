@@ -45,3 +45,5 @@ Confirm before any action that spends money or prepaid credit: `parallel-cli` `r
 - `--yolo`, `--dangerously-skip-permissions`, or any flag that bypasses the confirmation prompt. Never set them by default, never bake them into examples.
 - "The user said go ahead" for a *different* step. Approval covers the exact step named.
 - Hiding a destructive step inside a larger command ("and then it cleans up"). Name every destructive step separately.
+
+Truth: `flake/policies.nix` — the rules this page applies are predicates there; this page is the procedure.

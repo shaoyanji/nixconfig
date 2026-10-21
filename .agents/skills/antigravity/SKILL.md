@@ -101,3 +101,5 @@ Before deploying any archive/deletion action:
 7. **Always report execution honestly** (exit codes, applied counts, syntax errors, timeout results — e.g., previous `proc_60c8a2ea9699` completed exit=0 with truncated/no artifact).
 8. **Always clean up** — kill `proc_*` background sessions (verify with `ps` or `notify_on_complete`); remove temp directories.
 9. **Never migrate binary** — `agy` (`/etc/profiles/per-user/devji/bin/agy`, installed version) stays in profile; this skill only defines invocation patterns.
+
+Truth: `modules/user/ai/antigravity-cli.nix` — the CLI module; this page is the procedure.

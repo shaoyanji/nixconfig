@@ -59,3 +59,5 @@ task dragoncourt:status
 # Rebuild markdown templates
 task dragoncourt:build
 ```
+
+Truth: `taskfiles/dragoncourt.yml` — the executable contract; this page is the procedure.

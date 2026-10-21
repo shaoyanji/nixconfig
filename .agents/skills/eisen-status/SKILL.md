@@ -77,3 +77,5 @@ journalctl -u qwen-image --since "10 min ago" | tail -30
 ```
 
 **Confirm before:** restarting a service that would drop an in-flight generation (`systemctl restart llama-swap` unloads the model and kills the current generation). Ask first, or wait for the generation to finish.
+
+Truth: `hosts/eisen/configuration.nix` — the stack this page inspects; this page is the procedure.

@@ -52,3 +52,5 @@ The repository includes a non-blocking interactive pre-push hook (`scripts/pre-p
 - **14KB Initial TCP Envelope Rule**: The entire document (semantic HTML + minified CSS + inline SVGs) must remain under 14,336 bytes gzipped to load in a single roundtrip.
 - **Dual-Mode Engine**: 3D HUD mode (spatial depth camera along Z-axis) and Flat Doc mode (independent left scroll driving right telemetry inspector).
 - **Edge Deployment**: Production deployed to Cloudflare Pages edge network under `bountystash.com`.
+
+Truth: `taskfiles/bountystash.yml` — the executable contract; this page is the procedure.

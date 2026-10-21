@@ -44,3 +44,5 @@ Manage `/srv/data` (mirrored to `/Volumes/data` across the fleet) folder taxonom
 | `p/web` | Backward-compatibility symlink to `projects/bountystash-web` | Frontend for bountystash website |
 | `security/` | Credentials, certificates, recovery keys, age/sops keys | Permissions `0700 devji:users`. `id_ed25519.age` encrypted with fleet age keys |
 | `storage/` | Backward-compatibility symlink pointing to `.` | Ensures legacy `/Volumes/data/storage` paths resolve |
+
+Truth: `taskfiles/data.yml` — the executable contract; this page is the procedure.

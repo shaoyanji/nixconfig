@@ -88,3 +88,5 @@ Before deploying, always verify:
 4. **Git repo required** — Crush won't run outside a git directory. Use `mktemp -d && git init` for scratch work
 5. **Don't interfere** — monitor with `poll`/`log`, be patient with long-running tasks
 6. **Always clean up** — kill background processes, remove temp directories, and verify workspace hygiene
+
+Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.

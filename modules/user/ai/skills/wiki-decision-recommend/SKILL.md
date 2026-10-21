@@ -26,3 +26,5 @@ An intelligent offline knowledge retrieval skill combining **System One decision
 # Custom threshold gating with Laya model
 ~/.agents/skills/wiki-decision-recommend/scripts/wiki-recommend.sh "PostgreSQL pgvector vacuum compaction" --model laya --threshold 0.75
 ```
+
+Truth: `modules/user/ai/skills/default.nix` — the materialization of the module skills; this page is the procedure.

@@ -151,3 +151,5 @@ write TOON back as state.
 - `.agents/SCHEMA.md`: what may be stored where. TOON is never the source.
 - `knowledge-base`: the query ladder, and the sidecar that answers it.
 - `fleet-sentinel`: ledger schema and what each event means.
+
+Truth: `modules/config/shells/common-packages.nix` — what installs the tool; this page is the procedure.

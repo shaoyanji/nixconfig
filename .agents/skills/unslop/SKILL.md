@@ -68,3 +68,5 @@ Scan for the patterns, then rewrite. Match the tone of the file you are editing.
 `AGENTS.md`, `MANUAL.md`, `docs/*.md`, `.agents/skills/*/SKILL.md`, `AGENTS.nix` note bodies, `AUDIT.md` entries, commit messages, and the reply you are about to send.
 
 Apply it to text you write and to text you already touch. Do not open a rewrite of a file just to satisfy rule 13.
+
+Truth: `flake/policies.nix` — the rules this page applies are predicates there; this page is the procedure.

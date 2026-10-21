@@ -76,3 +76,5 @@ DELETE. Run with:
 ```sh
 nix-shell -p python3 --run "python3 ~/.agents/skills/jevdecide/assets/jev_inbox.py --limit 150"
 ```
+
+Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.

@@ -18,7 +18,7 @@
   # Auto-detection of tier based on GPU description and host identity
   detectedTier =
     if
-      builtins.elem hostName ["aristotle" "netbook" "thinsandy"]
+      builtins.elem hostName ["aristotle" "netbook"]
       || lib.strings.hasInfix "4400" gpuDesc
       || lib.strings.hasInfix "3000" gpuDesc
       || lib.strings.hasInfix "Braswell" gpuDesc

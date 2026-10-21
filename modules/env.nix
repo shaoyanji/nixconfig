@@ -18,7 +18,7 @@
   isLaptop =
     category
     == "laptop"
-    || builtins.elem hostName ["aristotle" "fern" "scratch" "netbook" "thinsandy"];
+    || builtins.elem hostName ["aristotle" "fern" "scratch" "netbook"];
   defaultSideBySide = !isLaptop;
   user = import ./global/user.nix;
 in {

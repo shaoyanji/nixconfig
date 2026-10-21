@@ -34,11 +34,13 @@ tasks:
   ops:categorize:
     desc: Categorize prose with the decision engine, gated on calibration
     summary: >
-      Sends each file's FEATURES (comment density, restated-code hits, facts
-      present in inventory/policies, age, assertion/metric/step/address counts)
-      to the engine as one classify question, then refuses to print a table when
-      the answer is uniform or a known-answer anchor misses. `--help` for usage.
-      An uncalibrated table is shape, not a verdict — the warning says which.
+      Asks the engine ten FORCED BINARY questions per file (every category pair,
+      each in both orders, so a position effect has to show as a flip) over the
+      file's features (comment density, restated-code hits, facts already in
+      inventory/policies, age, assertion/metric/step/address counts). Refuses to
+      print a table when known-answer anchors miss, when a majority of pairs
+      flip under swap, or when every file lands in one category. `--help` for
+      usage; an uncalibrated table is shape, not a verdict.
     cmds:
       - bash scripts/task/categorize.sh {{.CLI_ARGS}}
 

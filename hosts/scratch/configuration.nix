@@ -51,7 +51,9 @@ in {
         style = "beam";
         blink = "yes";
       };
-      colors = {
+      # foot 1.28 replaced the single [colors] section with dark/light
+      # palettes; [colors] is now rejected outright at parse time.
+      colors-dark = {
         alpha = "0.95";
       };
     };

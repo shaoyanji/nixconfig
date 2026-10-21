@@ -25,61 +25,62 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
-### 2026-10-20 — The gotcha essays become a page
+### 2026-10-21 — Strata MoE (Qwen3.8-Flash-Next 125B) running on Eisen RX 5700
 
-- The 110-line "Nix Patterns & Gotchas" section is now `docs/nix-patterns.md`:
-  yq/format traps, non-obvious Nix, the two uncached overrides, ten agent failure
-  modes. The manual keeps the TOML rule line and four citations.
-- New gate `paperless-closure-traps` (stock `pkgs.tika` in an inline unit, stubbed
-  gotenberg chromium) — verified to fail on `services.tika.enable = true`.
-- Evidence: `checks.policies` rc=0 (24), `docs:links` 115, `fmt`/`lint` 219 clean.
+- Deployed Niko1221/Strata MoE inference on Eisen's AMD Radeon RX 5700 (`gfx1010`) via
+  an isolated FHS wrapper (`strata-fhs`) and AMD TheRock ROCm 7.14 wheels on `/mnt/storage/strata`.
+- Configured systemd service `strata.service` on port 8085; Nginx port 80 proxy and
+  `tailscale-serve-node` routed to `:8085`; `llama-swap` made dormant.
+- SubZeroClaw harness (`~/.subzeroclaw/config`) verified on `:8085` executing tool-calling
+  file creation (`echo 'write me a hello.txt in home directory' | subzeroclaw`).
+- Measured: 167 tok/s prompt prefill, 14.6–21.0 tok/s decode, 87.5% MTP speculative drafting
+  acceptance (70/80 tokens accepted) with 32K context and INT8 KV cache. Documented in `hosts/eisen/MANUAL.md`.
+- `AGENTS.nix` note `open-strata-eisen-rx5700` marked `DELIVERED`.
 
-### 2026-10-20 — Two gates get sharper
+### 2026-10-21 — A doc-only push now has a gate
 
-- `secrets-are-encrypted` is **per value**: any key before the `sops:` block that is
-  not `ENC[...]` (or declared `_unencrypted`) fails, and the error names the key, never
-  the value. Verified with one plaintext value among 32 encrypted ones.
-- `ca-only-user-access`: no `.nix` outside the three key sources (`authorized-keys`,
-  `ssh-ca`, `nixbuild-client`) and the out-of-flake hosts may hold an `ssh-ed25519`
-  literal; verified with a stray key added to `hosts/demo`.
-- Ledger archived: the five entries older than today moved to `docs/history/`.
-- Evidence: `checks.policies` rc=0 (23), `docs:links`, `docs-budget`.
+- `docs-budget` CI job builds `checks.<system>.docs-budget` on every push; the
+  budgets live once, in `scripts/task/docs-budget.sh` (task, check and job run
+  it), and `[[flake/policies.nix#ci-doc-budget]]` fails if the job disappears.
+- Evidence: padded-copy build exits 1 (`AGENTS.md: 1300 > 1200`), policies green.
 
-### 2026-10-20 — Secrets are a page and three predicates
+### 2026-10-21 — A remote host closure is transfer-bound, not build-bound
 
-- The secrets table, key locations, SSH-CA workflow and bootstrap moved from
-  AGENTS.md into `docs/sops-rekey.md`, which already owned the two sops planes.
-- Gates: `secrets-are-encrypted` (a plaintext sops file fails),
-  `secrets-submodule-declared` (the submodule *and* its mirror are named),
-  `ssh-ca-declarative` (`rotate-ssh-cert` + `ssh.ca.enable`) — each verified to fail
-  when broken. Evidence: `checks.policies` rc=0 (22), `docs:links`, `docs-budget`.
-### 2026-10-20 — CI has no matrix
+- One `fern` toplevel, profiled phase by phase: eval **133 s** (2.38 GiB peak,
+  oom-guard); plan 14,804 store paths, 56 derivations to build and 37 paths to
+  fetch (159.5 MiB); local substitution of 36 paths in **36 s**; 3 small paths
+  uploaded; 4 remote builds, the three nixbuild.net reported **finished in 0.8 s,
+  4 s, 2 s** (1–2 CPUs). Then 27 min of silence waiting for the remote
+  `initrd-linux-7.2.10` build — no completion report, no error; killed.
+- `--option builders-use-substitutes true` on a re-run still fetched the 141.6
+  MiB modules pair **locally**, so the flag does not move this host's cost. No
+  end-to-end completion: the copy-back phase was never reached, and a fair A/B
+  needs a cold builder store that nixbuild.net does not expose.
 
-- The CI section moved to `docs/ci-pipeline.md`, and `lifecycle:ci:enable-host` /
-  `disable-host` were deleted: they `sed`-ed a `machine:` list the pipeline stopped
-  reading when detection became inventory-driven, and README pointed at them.
-- Gates: `ci-matrix-is-inventory`, `ci-dormant-hosts-excluded`,
-  `ci-builds-config-and-gate`; evidence `checks.policies` rc=0 (19), `docs:links` 114.
-### 2026-10-20 — The storage table has one home
+### 2026-10-21 — Exit codes are a gate; prose has its own digest
 
-- The `/srv/data` table, media-isolation rules and security-directory notes left
-  AGENTS.md for `docs/storage-taxonomy.md`, which absorbed `download-taxonomy.md`
-  (ingest doors, torrent policy); the manual keeps a six-line pointer.
-- Replaced by `taxonomy-one-home`, `media-tree-isolation` and
-  `private-trees-restricted` — each verified to FAIL when its condition breaks.
-- Evidence: `checks.policies` rc=0 (16), `docs:links` 113, `docs-budget`,
-  `site-assets`, `qmd:docs` (the new page is top hit for its own vocabulary).
-### 2026-10-20 — Prose is not where a rule lives
+- The 33 summaries naming an exit code were cross-checked against the script their
+  task invokes (25 script-backed, 8 inline by hand): **0 over-promise**. The two
+  real drifts were already fixed — `checks:ports` lost `1 = STRICT drift`,
+  `checks:kg:sidecar` read the engine's 404 as its own status.
+- That audit is now `exitDrift` (fatal): a code a `summary` promises that no script
+  or inline command emits. `0` is never a claim, `fail=1 … exit "$fail"` counts,
+  and a task
+  that just runs `nix build` is `opaque` (nothing to compare). Membership is asked
+  of `readDir` — `pathExists` answers false for an unrealised lazy flake path.
+- `graph.json` now carries the prose surface verbatim, and the artifact name holds
+  both digests (`taskfile-graph-<version>-p<prose>`), so a prose-only edit is
+  addressable. Measured: version unchanged, prose `c0e18535aacf → ce94226f319a`,
+  new path; reverting restored the original path byte for byte.
+- Evidence: `checks:tasks` rc=0 (437 tasks, 17 buckets, 0 hard violations),
+  selftest 17 buckets / 16 tasks, `checks:quick` rc=0.
 
-- 1 145 comment lines removed from 104 `.nix` headers; `nix-header-budget` (≤3
-  lines) makes the one-line contract a gate instead of a convention.
-- qmd combs the nix tree (`**/*.{nix,md}`, 220 files); a mask is registration-time
-  state, so the index script re-registers a collection whose mask changed.
-- Deleted `docs/vision.md` (byte-identical to `control-plane-vision.md`) and
-  `docs/fleet-operations-recommendations.md` (rules already in this manual);
-  `no-orphan-docs` makes an unlinked page a gate failure.
-- Evidence: `checks.policies` rc=0, `hostChecks` frieren+mtfuji rc=0, `.#docs`,
-  `docs:links` 113, `nix:format` 219 clean.
+### 2026-10-21 — The 2026-10-20 ledger entries are archived
+
+- Seven entries (task graph compiled, gotcha essays, two gates sharper,
+  secrets as a page, CI without a matrix, the storage table, rules in code)
+  moved verbatim to `docs/history/audit-2026-10.md`; `AUDIT.md` had reached
+  159 of its 150-line budget. Content unchanged, only the home moved.
 
 ## Open debt (`task ops:notes`)
 

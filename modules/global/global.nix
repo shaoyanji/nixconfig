@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   ...
@@ -102,7 +103,9 @@
   };
 
   # Prevent missed maintenance timers from bursting during daytime production hours.
-  systemd.timers.nix-optimise.timerConfig.Persistent = lib.mkIf pkgs.stdenv.hostPlatform.isLinux (lib.mkDefault false);
+  systemd.timers = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux && config.nix.optimise.automatic) {
+    nix-optimise.timerConfig.Persistent = lib.mkDefault false;
+  };
 
   nixpkgs.config.allowUnfree = true;
 }

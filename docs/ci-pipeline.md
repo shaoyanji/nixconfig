@@ -18,8 +18,9 @@ runner; the workflow dispatches one job per affected host.
 
 Path rules:
 
-- Documentation and meta changes (`*.md`, `docs/`, `taskfiles/`) allocate **zero**
-  runners.
+- Documentation and meta changes (`*.md`, `docs/`, `taskfiles/`) allocate **zero
+  build** runners. The `docs-budget` job is not in the matrix and runs anyway, so
+  a doc-only push still has a gate.
 - `hosts/<host>/**` builds that host only, on its own architecture.
 - Shared Nix (`modules/**`, `flake.lock`) anchors to `frieren` by default; the
   manual dispatch input `shared_strategy` switches to `all` or `none`.
@@ -46,6 +47,13 @@ in a host config.
 A separate `sops-drift` job runs `scripts/task/sops-drift-check.sh --repo-only`
 with `continue-on-error`, so recipient drift is reported without failing a build.
 
+The `docs-budget` job runs on every push and builds
+`checks.x86_64-linux.docs-budget` — the same gate as `task ops:docs:budget` and
+`nix flake check`, not a second implementation. It counts lines at eval time
+(manual 1200, ledger 150, root stubs 10 and pointing at `AGENTS.nix`) and fails
+the job on a violation, so documentation cannot grow past its `SCHEMA.md` §2
+budget just because the change touched no host.
+
 ## Operating it
 
 | Task                        | What                                                              |
@@ -60,3 +68,4 @@ matrix is editing a list this pipeline does not read:
 [[flake/policies.nix#ci-matrix-is-inventory]]
 [[flake/policies.nix#ci-dormant-hosts-excluded]]
 [[flake/policies.nix#ci-builds-config-and-gate]]
+[[flake/policies.nix#ci-doc-budget]]

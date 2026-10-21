@@ -217,36 +217,50 @@
     open-strata-eisen-rx5700 = {
       title = "Implement Strata MoE inference on eisen's RX 5700";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P0";
       date = "2026-10-20";
-      summary = "Deploy Niko1221/Strata (Qwen3.8-Flash-Next 125B MoE) on eisen's RX 5700 (Navi 10 / gfx1010) via experimental HIP build without compromising Vulkan gaming.";
+      summary = "Deploy Niko1221/Strata (Qwen3.8-Flash-Next 125B MoE Coder IQ1_M) on eisen's RX 5700 (Navi 10 / gfx1010) via experimental HIP build without compromising Vulkan gaming.";
       refs = {
         hosts = ["eisen"];
-        modules = ["hosts/eisen/amd-rx-5700.nix" "hosts/eisen/llm-server.nix"];
+        modules = [
+          "hosts/eisen/amd-rx-5700.nix"
+          "hosts/eisen/llm-server.nix"
+          "hosts/eisen/strata.nix"
+        ];
         tasks = ["checks:host"];
-        docs = [".agents/deploy/hosts/eisen.md"];
+        docs = [
+          ".agents/deploy/hosts/eisen.md"
+          "hosts/eisen/MANUAL.md"
+        ];
       };
       body = ''
-        Goal: Run Niko1221/Strata on eisen's AMD Radeon RX 5700 (Navi 10 / gfx1010, 8 GB VRAM) for 125B MoE inference (e.g. Qwen IQ1_M / IQ2_XS).
-        Architecture: Build Strata via `-DCMAKE_HIP_ARCHITECTURES=gfx1010` (docs/OLDER_GPUS.md) in an isolated container/FHS on /mnt/storage so host mesa/radv Vulkan stays clean for Steam/Sunshine.
-        Exit: Strata service starts on eisen, exposes an OpenAI-compatible API endpoint (e.g. :8085), verifies token generation on gfx1010, and yields GPU to gaming guard when Steam launches.
+        Delivered: Niko1221/Strata running Qwen3.8-Flash-Next 125B MoE Coder IQ1_M on eisen's AMD Radeon RX 5700 (Navi 10 / gfx1010, 8 GB VRAM).
+        Architecture: Strata compiled with gfx1010 HIP architecture under hermetic FHS wrapper (strata-fhs) on /mnt/storage/strata with official AMD TheRock ROCm 7.14 wheels, keeping host Mesa/RADV Vulkan clean for Steam and Sunshine.
+        Service & Endpoints: Systemd service strata.service serving on :8085; Nginx port 80 proxy and Tailscale serve (https://eisen.cloudforest-kardashev.ts.net/) reverse-proxying directly to Strata; llama-swap dormant and commented out.
+        SubZeroClaw Harness: ~/.subzeroclaw/config pointed to :8085, successfully executing end-to-end agent tool loops.
+        Performance: Benchmarked at 167 tok/s prompt ingestion, 14.6–21.0 tok/s decode, and 87.5% MTP speculative drafting acceptance rate (70/80 tokens accepted) with 32K context and INT8 KV cache. Documented in hosts/eisen/MANUAL.md.
+        Gaming Guard: llama-swap-gaming-guard unit updated to suspend strata.service when Steam games launch, returning 100% VRAM to Proton/Gamescope.
       '';
     };
     doc-budget-ci = {
       title = "Doc budget gate in CI";
       kind = "open";
-      status = "OPEN";
+      status = "IN FLIGHT";
       priority = "P0";
-      date = "2026-10-19";
-      summary = "The flake check exists (`docs-budget`); the workflow does not run it on doc-only changes, so a runaway living document can land green.";
+      date = "2026-10-21";
+      summary = "A doc-only push allocated zero runners and gated nothing; the workflow now has a `docs-budget` job that builds the same check as `task ops:docs:budget`, through one script.";
       refs = {
-        modules = [".github/workflows/nixcachix.yml"];
+        modules = [".github/workflows/nixcachix.yml" "scripts/task/docs-budget.sh"];
         tasks = ["ops:docs:budget"];
-        docs = [".agents/SCHEMA.md"];
+        docs = [".agents/SCHEMA.md" "docs/ci-pipeline.md"];
       };
       body = ''
-        Exit: `ops:docs:budget` runs on doc-only changes; a 200-line growth in AGENTS.md fails the job.
+        Missing: the green run. The red half is proven locally — on a copy with
+        AGENTS.md padded to 1300 lines, `nix build .#checks.x86_64-linux.docs-budget`
+        exits 1 and names the file — but only a push proves the job executes.
+
+        Exit: the `docs-budget` job is green on a `*.md`-only commit.
       '';
     };
     dormant-host-gates = {

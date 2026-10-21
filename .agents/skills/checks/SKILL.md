@@ -28,7 +28,7 @@ Run validation and health checks for host configs and Nix code quality.
 | Task | Description |
 |------|-------------|
 | `checks:quick` | Bounded repo HYGIENE: compiled inventory checks, task-graph integrity, nix lint, sops drift, modules.toml. **Evaluates no host config** — for that use `checks:host` |
-| `checks:tasks` | Task-graph gate: duplicate task keys (YAML drops the first silently) and dangling `task X` references (names + aliases, wildcards expanded) |
+| `checks:tasks` | Task-graph gate: `lib/taskfile.nix` compiles the graph (duplicate keys, dangling refs, include cycles, orphan shards, `internal: true`, MATCH arity, an exit code a summary promises but its script never emits) and its name set must equal `task --list-all --json`; `checks.<system>.taskfile-graph` is the same rules as pure Nix (CI/keyless, exec + prose digests in the store name) |
 | `checks:host:HOST=<host>` | **Per-host gate:** module system + all assertions + compiled `inventory.toml`, one host (~13 s, ~700 MiB) under the OOM watchdog |
 | `checks:hosts HOSTS="a b"` | A **named set**, ONE AT A TIME, fresh process + watchdog each. `HOSTS` is required — there is no default and no fleet sweep, by design |
 | `checks:host HOST=… MODE=eval` | One host, **evaluated** rather than built — arch-independent, and the way to check an aarch64 or darwin host from x86_64 |

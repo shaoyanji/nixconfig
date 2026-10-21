@@ -52,7 +52,7 @@ headroom_pct = 1.0
 
 # >>> baseline (managed by `task dev:closure:budget:adopt` — do not edit)
 [hosts.frieren.baseline]
-bytes = 30689043280
-measured_on = "2026-10-19"
+bytes = 31873529880
+measured_on = "2026-10-21"
 
 # <<< baseline

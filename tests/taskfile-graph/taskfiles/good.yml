@@ -1,0 +1,11 @@
+tasks:
+  # A well-formed task: one wildcard, one MATCH. Must NOT be flagged.
+  fine:
+    desc: a well-formed task, no wildcards
+    cmds:
+      - echo fine
+
+  fan:*:
+    desc: a well-formed wildcard task whose arity matches its MATCH index
+    cmds:
+      - echo {{index .MATCH 0}}

@@ -20,6 +20,7 @@ in {
     ./parakeet.nix
     ./decision-models.nix
     ./qwen-image.nix
+    ./strata.nix
   ];
 
   # --- Desktop (poseidon-style): niri compositor + DankMaterialShell greeter ---

@@ -670,12 +670,12 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 
 ---## Taskfile as the Agent Contract
 
-`task --list-all --json` is the discovery API (`desc`, `summary`, aliases); the
-`summary` field carries the variable/exit-code contract, and no task may use
-`internal: true` (it hides the task from JSON too). Wildcards are not invocable —
-call the concrete name. Full authoring rules: `docs/task-control-plane.md` and the
-`task-plane` skill. New observation tasks belong in `taskfiles/ops.yml`.
-
+`task --list-all --json` is the discovery API (`desc`, `summary`, aliases): `summary`
+carries the variable/exit-code contract, `internal: true` is banned (it hides the task
+from JSON), and wildcards are not invocable — call the concrete name. The graph is
+compiled (`lib/taskfile.nix`), so `checks:tasks` asserts it *and* its parity with
+`task --list-all --json`. Authoring: `docs/task-control-plane.md`, `task-plane` skill,
+observation tasks → `taskfiles/ops.yml`.
 
 ## Memory hierarchy (jev decides escalation)
 

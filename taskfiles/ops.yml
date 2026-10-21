@@ -37,8 +37,9 @@ tasks:
       Classifies each file from its features only (comment density, restated
       code, facts already in inventory/policies, age, assertion/metric/block/
       task-reference/address counts); no contents leave the host. A page with
-      two command blocks or three `task …` references is a `procedure` by RULE
-      and is not asked. Refuses a table when anchors miss, pairs flip under
+      two command blocks or three `task …` references is a `procedure` by RULE,
+      and a page that argues (rejections) while tabulating (measured sections)
+      is `design`; neither is asked. Refuses a table when anchors miss, pairs flip under
       swap, any file errors, or every file lands in one category; automation is
       gated by [[flake/policies.nix#automation-is-earned]].
     cmds:

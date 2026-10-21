@@ -296,7 +296,18 @@
     '';
 
   mountPorts = map (m: m.port) (builtins.attrValues cfg.mounts);
-  isLoopback = u: builtins.match "https?://(127\\.0\\.0\\.1|localhost|\\[::1\\])(:[0-9]+)?(/.*)?" u != null;
+  # Prefix test, not a regex: POSIX ERE rejected the bracket form of `[::1]`
+  # at eval (measured on delphi, 2026-10-21), and a mount upstream is a literal
+  # loopback URL in every case this registry will ever hold.
+  isLoopback = u:
+    lib.any (p: lib.hasPrefix p u) [
+      "http://127.0.0.1"
+      "https://127.0.0.1"
+      "http://localhost"
+      "https://localhost"
+      "http://[::1]"
+      "https://[::1]"
+    ];
 in {
   options.services.servicePortal = {
     enable = lib.mkEnableOption "the compiled service portal and its tailnet mounts";

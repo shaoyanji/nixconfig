@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
-# Categorize prose with FORCED BINARY choices, not a five-way guess.
+# Categorize prose for the routing plan. jev (TypeSafe) by default, over FEATURES
+# only — comment density, restated code, facts already in inventory/policies, age,
+# assertion/metric/block/task-reference/rejection/section counts. No file contents
+# leave the host.
 #
-# Forced binary: every question is "dark or light?", never "which of five
-# shades?", and every pair is asked in both orders so a position effect shows up
-# as a flip. Measured 2026-10-21 after the rewrite: "a fact about a machine" beat
-# "commands to run in order" for BOTH a counts-only state and a prose snippet of
-# actual commands, in both orders (11/11 pairs) — so the dominant weight is a
-# label prior, not order and not state. The rule anchor still scores 4/10.
+# Two answers are not the engine's to give, because it sees counts and not the
+# page: enough command blocks or `task …` references make a page a `procedure`,
+# and a page that argues (rejection phrases) while tabulating (measured, roster,
+# sizing, performance sections) is `design`. Those rows print `rule`.
 #
-# That makes the engine unusable as a semantic classifier until its scorer
-# weights state tokens (we own it: modules/services/systemone/engine.py, the
-# `choice` path). The anchors below are what refuse to let a label prior become
-# a table.
+# `CATEGORIZE_ENGINE=julia` keeps the old forced-binary duel as a comparison
+# instrument only: julia-1's `choice` is label-biased — a real command sequence
+# read as "a fact about a machine" in both orders (0/10 steps, 4/10 rule anchor) —
+# so it is recorded and never trusted as a category.
 set -euo pipefail
 
 ENGINE="${CATEGORIZE_ENGINE:-jev}"   # jev | julia
@@ -33,7 +34,7 @@ declare -A LABEL=(
 )
 CATS=(policy fact history design procedure docs)
 
-case "${1:-}" in -h|--help) sed -n '2,11p' "$0"; exit 0 ;; esac
+case "${1:-}" in -h|--help) sed -n '2,16p' "$0"; exit 0 ;; esac
 [ $# -gt 0 ] || { echo "categorize: give one or more paths" >&2; exit 2; }
 
 # jev: a calibrated classifier, so the five-way form is legitimate here. The

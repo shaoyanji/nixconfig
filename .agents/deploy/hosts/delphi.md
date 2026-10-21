@@ -267,6 +267,33 @@ curl -sS --resolve delphi.bountystash.com:443:92.5.115.103 \
 group out of frieren's declaration and probes a LAN zone. The tailnet group is verified
 with `dig` against `10.99.0.53`.
 
+## DeepSeek Harness ingress (`/deepseek`)
+
+The harness runs **here** so a thin client can use this host's CPU, disk and
+workspaces from its own browser. `services.dshWeb` owns the unit (loopback
+`:3080`, `--public-url https://delphi.bountystash.com/deepseek/`,
+`--trusted-host delphi.bountystash.com`); the TLS vhost above owns the proxy.
+Three properties make the prefix work, and all three are load-bearing:
+
+- `proxy_pass http://127.0.0.1:3080/` — the trailing slash **strips** `/deepseek/`.
+- `proxy_set_header Host $host` — dsh fences `/api` on the authority and keys its
+  session cookie to it; the default (`$proxy_host`) would be `127.0.0.1:3080`.
+- `proxy_read_timeout 1h` — an idle harness WebSocket outlives nginx's 60 s.
+
+Verify from a *client*, not from the host (a loopback curl proves none of it):
+
+```bash
+dsh-remote --status                 # service state + ingress + a real probe
+curl -sL -c /tmp/j -b /tmp/j https://delphi.bountystash.com/deepseek/ | grep -o '<title>.*</title>'
+ssh delphi 'journalctl -u dsh-web -o cat | grep "^dsh web:" | tail -1'   # signed-in URL
+```
+
+`https://delphi.cloudforest-kardashev.ts.net/deepseek/` is **not** served:
+nginx binds `0.0.0.0:443`, so `tailscale serve` cannot take the tailnet address
+(`bind: address already in use`, measured 2026-10-21). Adding it means a
+`tailscale cert` for the ts.net name plus a second vhost on this listener —
+until then use the public name, which resolves from the tailnet too.
+
 ## DNS failover topology (why 10.99.0.53)
 
 Every resolver binds `10.99.0.53/32` on `lo` (`systemd.services.dns-service-address`)

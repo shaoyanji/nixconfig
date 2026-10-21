@@ -28,6 +28,14 @@
   # RESERVED public IP (an ephemeral IP changes on stop/start).
   publicDomain = "delphi.bountystash.com";
 
+  # DeepSeek Harness mount. One pair of constants because three places have to
+  # agree: the service's advertised root, the proxy's location, and the
+  # launcher that opens it. The trailing slash is the prefix strip
+  # (`proxy_pass http://…/`), not decoration.
+  dshPort = 3080;
+  dshPath = "/deepseek/";
+  dshUrl = "https://${publicDomain}${dshPath}";
+
   # Static landing page. The point is proof of life (and the webserver
   # criterion), not a product: no CMS, no PHP, no runtime.
   healthPage = pkgs.writeTextDir "index.html" ''
@@ -65,6 +73,7 @@ in {
     ../../modules/profiles/hermes.nix
     ../../modules/profiles/sops-user-identity.nix
     ../../modules/profiles/tailnet-dns-address.nix
+    ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
   ];
 
@@ -262,10 +271,14 @@ in {
   ];
 
   # --- Webserver --------------------------------------------------------------
-  # HTTP only for now: ACME needs a name that resolves from the internet. The
-  # tailnet HTTPS path is `tailscale serve` / the *.ts.net MagicDNS name, which
-  # needs no certificate of our own. OCI's security list must also allow 80/443
+  # TLS comes from ACME on the public name; the :80 IP vhost stays as an edge
+  # probe independent of DNS. OCI's security list must also allow 80/443
   # (console change, not declarable here — see .agents/deploy/hosts/delphi.md).
+  #
+  # `tailscale serve` is NOT an option for a second (tailnet) entry point:
+  # nginx binds 0.0.0.0:443, so tailscaled cannot take the tailnet address on
+  # 443 (measured 2026-10-21: "bind: address already in use"). A ts.net name
+  # would need its own `tailscale cert` plus a vhost on this listener.
   services.nginx = {
     enable = true;
     recommendedOptimisation = true;
@@ -319,8 +332,44 @@ in {
             default_type text/plain;
             return 200 "ok";
           '';
+          # DeepSeek Harness (services.dshWeb). `proxy_pass` with a trailing
+          # slash strips `dshPath`; `Host $host` is load-bearing — dsh's /api
+          # fence accepts only loopback, its own bind address, or an explicitly
+          # trusted authority, and the session cookie it mints is keyed to that
+          # same authority. `proxyWebsockets` is NOT on by default in this
+          # nixpkgs (checked: false), and the whole UI rides one upgraded
+          # socket, so it is set explicitly; the read timeout then covers an idle
+          # harness socket, which nginx would otherwise cut at 60 s.
+          locations."= ${lib.removeSuffix "/" dshPath}" = {
+            return = "301 ${dshPath}";
+          };
+          locations."${dshPath}" = {
+            proxyPass = "http://127.0.0.1:${toString dshPort}/";
+            proxyWebsockets = true;
+            extraConfig = ''
+              proxy_set_header Host $host;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_buffering off;
+              proxy_read_timeout 1h;
+            '';
+          };
         };
       };
+  };
+
+  # --- DeepSeek Harness, hosted HERE -----------------------------------------
+  # The harness (agent loop, bash, model calls, workspaces) runs on this host;
+  # a client only needs a browser at `dshUrl`. The unit binds loopback and the
+  # vhost above publishes it under `dshPath`, passing the client's Host through
+  # — that authority is both the /api fence entry (`trustedHosts`) and the key
+  # the session cookie is minted for.
+  services.dshWeb = {
+    enable = true;
+    user = user.name;
+    port = dshPort;
+    path = dshPath;
+    publicUrl = dshUrl;
+    trustedHosts = [publicDomain];
   };
 
   # ACME client settings only exist when a cert is actually being requested.

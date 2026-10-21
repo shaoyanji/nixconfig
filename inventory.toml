@@ -169,7 +169,7 @@ ssh_alias = "delphi"
 [hosts.delphi.software]
 module_chain = "globalModulesContainers"
 impermanence = false
-key_services = ["nginx landing page + /healthz on :80", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry, same lists as frieren)", "Tailscale exit node + 10.99.0.53/32 DNS failover route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "OCI serial console logging"]
+key_services = ["nginx landing page + /healthz on :80", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry, same lists as frieren)", "Tailscale exit node + 10.99.0.53/32 DNS failover route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "DeepSeek Harness Web UI at /deepseek/ (systemd dsh-web on loopback :3080, published by the TLS vhost)", "OCI serial console logging"]
 traits = ["cloud-server", "aarch64-arm", "11gb-ram", "tailscale-exit-node", "oci-always-free"]
 
 [hosts.delphi.persona]

@@ -294,6 +294,13 @@
       detail = "the workflow lost the docs-budget job; doc-only pushes now allocate nothing and gate nothing";
     };
 
+    ci-task-graph-pin = {
+      rule = "The task graph's exec and prose digests are pinned, and the pin is built on every push (doc-only included), so a silent shard rewrite cannot ship.";
+      proof = ".github/workflows/nixcachix.yml builds `checks.<system>.taskfile-digest-pin`";
+      holds = has ".github/workflows/nixcachix.yml" "checks.x86_64-linux.taskfile-digest-pin";
+      detail = "the workflow lost the task-graph pin step; digest drift now reaches a deploy unflagged";
+    };
+
     taxonomy-one-home = {
       rule = "The `/srv/data` layout has one home (`docs/storage-taxonomy.md`); the manual links to it instead of carrying a second table.";
       proof = "docs/storage-taxonomy.md exists, and AGENTS.md has no `/srv/data` layout table";

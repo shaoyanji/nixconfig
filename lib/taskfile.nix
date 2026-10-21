@@ -386,9 +386,12 @@
   # to the script that implements it: when the over-budget summaries were shrunk
   # to the 600-char contract, `checks:ports` lost "1 = STRICT drift" and the task
   # kept exiting 1. Prose and code drifted with no gate in between, so there is
-  # one now. Four rules keep it quiet enough to be fatal:
+  # one now. Five rules keep it quiet enough to be fatal:
   #   * a claim is `exit N` / `exits N` / `Exit N (…)`, plus `N = …` pairs in a
   #     summary that names an exit at all ("Exit 0 = clean, 1 = drift, 2 = …");
+  #   * a claim may name a band (`exit 130-137`): the band holds when the task
+  #     emits any code inside it, so the parser reads both endpoints instead of
+  #     silently truncating the promise to its left edge;
   #   * 0 is never a claim — every script can exit 0;
   #   * a script emits every literal `exit N`, plus the repo's `fail=1 … exit
   #     "$fail"` idiom, which a literal-only scan called two correct summaries
@@ -408,17 +411,40 @@
       map lib.toInt (captures "(exit)[[:space:]]+([0-9]+)" text)
       ++ lib.optionals (lib.hasInfix "exit \"$" text) (map lib.toInt (captures "(fail|rc|status|code)=([0-9]+)" text))
     );
+  # Claims carry a band, not a number: `exit 7` is 7-7. The first parser read
+  # only the left endpoint of `exit 130-137`, so a summary could promise the band
+  # while the script emitted a code outside it and the gate still passed.
+  claim = lo: hi: {inherit lo hi;};
+  claimText = c:
+    if c.lo == c.hi
+    then toString c.lo
+    else "${toString c.lo}-${toString c.hi}";
+  claimHolds = c: n: n >= c.lo && n <= c.hi;
+  claimWithin = outer: inner: inner.lo >= outer.lo && inner.hi <= outer.hi;
+  claimMatches = pattern: summary: builtins.filter builtins.isList (builtins.split pattern summary);
   claimsIn = summary:
     if summary == null
     then []
     else let
-      explicit = map lib.toInt (captures "([Ee]xits?)[[:space:]]*[(]?([0-9]+)" summary);
-      listed =
-        if explicit == []
-        then []
-        else map lib.toInt (capturesFirst "([0-9]+)([[:space:]]*=)" summary);
+      bands = map (m: claim (lib.toInt (builtins.elemAt m 1)) (lib.toInt (builtins.elemAt m 2))) (claimMatches "([Ee]xits?)[[:space:]]*[(]?([0-9]+)[[:space:]]*[-–][[:space:]]*([0-9]+)" summary);
+      singles = map (m: let n = lib.toInt (builtins.elemAt m 1); in claim n n) (claimMatches "([Ee]xits?)[[:space:]]*[(]?([0-9]+)" summary);
+      # The `N = …` list only means anything when the summary named an exit at
+      # all; otherwise a version number in prose ("v2 = …") becomes a claim.
+      named = bands != [] || singles != [];
+      listedBands =
+        if named
+        then map (m: claim (lib.toInt (builtins.elemAt m 0)) (lib.toInt (builtins.elemAt m 1))) (claimMatches "([0-9]+)[[:space:]]*[-–][[:space:]]*([0-9]+)([[:space:]]*=)" summary)
+        else [];
+      listedSingles =
+        if named
+        then map (m: let n = lib.toInt (builtins.elemAt m 0); in claim n n) (claimMatches "([0-9]+)([[:space:]]*=)" summary)
+        else [];
+      allBands = bands ++ listedBands;
+      # `130-137 = …` also matches the single-number pattern on its right edge;
+      # a single already covered by a band is the same promise twice.
+      allSingles = builtins.filter (s: !(builtins.any (b: claimWithin b s) allBands)) (singles ++ listedSingles);
     in
-      lib.unique (explicit ++ listed);
+      builtins.filter (c: !(c.lo == 0 && c.hi == 0)) (lib.unique (allBands ++ allSingles));
   # `builtins.pathExists` cannot answer "is this script in the tree?": on a lazy
   # flake source it reports false for a path that is merely not yet realized, and
   # the first version of this rule called 20 existing scripts "not in the tree".
@@ -432,12 +458,14 @@
   exitFacts =
     map (
       t: let
-        claims = builtins.filter (c: c != 0) (claimsIn t.summary);
+        claims = claimsIn t.summary;
         refs = scriptRefs t;
         known = builtins.filter (r: builtins.elem r scriptFiles) refs;
         inline = lib.concatMap codesIn t.cmds;
         emitted = lib.unique (inline ++ lib.concatMap (r: codesIn (builtins.readFile (root + ("/" + r)))) known);
-        drifting = builtins.filter (c: !(builtins.elem c emitted)) claims;
+        # A band holds when any emitted code falls inside it: `130-137` is one
+        # failure mode (killed by a signal), not seven separate contracts.
+        drifting = builtins.filter (c: !(builtins.any (e: claimHolds c e) emitted)) claims;
         # A claim can only be judged against something that states a code. A task
         # that just runs `nix build` inherits that tool's status, so there is
         # nothing to compare — failing those would fail correct summaries
@@ -505,12 +533,12 @@
     # on one is unverified, and saying so beats a silent pass.
     exitDrift =
       map (
-        f: "${f.t.shard}:${f.t.name} claims exit ${lib.concatMapStringsSep ", " toString f.drifting}; emits [${lib.concatMapStringsSep " " toString f.emitted}]"
+        f: "${f.t.shard}:${f.t.name} claims exit ${lib.concatMapStringsSep ", " claimText f.drifting}; emits [${lib.concatMapStringsSep " " toString f.emitted}]"
       )
       (builtins.filter (f: f.status == "drift") exitFacts);
     exitUnverified =
       map (
-        f: "${f.t.shard}:${f.t.name} claims exit ${lib.concatMapStringsSep ", " toString f.claims} but ${lib.concatMapStringsSep ", " toString (builtins.filter (r: !(builtins.elem r f.known)) f.refs)} is not in the tree"
+        f: "${f.t.shard}:${f.t.name} claims exit ${lib.concatMapStringsSep ", " claimText f.claims} but ${lib.concatMapStringsSep ", " toString (builtins.filter (r: !(builtins.elem r f.known)) f.refs)} is not in the tree"
       )
       (builtins.filter (f: f.status == "unverified") exitFacts);
     retiredRef =

@@ -190,11 +190,14 @@ Two precision rules matter, both learned from a noisy first version that reporte
 A `summary` that promises an exit code is the sharpest part of the contract, and
 it is the part that decays without a sound: when 28 over-budget summaries were
 rewritten to fit, `checks:ports` lost `1 = STRICT drift` while the script kept
-exiting 1. Nothing compared the sentence to the shell. Four rules make that
+exiting 1. Nothing compared the sentence to the shell. Five rules make that
 comparison a gate (`exitDrift`, fatal) without drowning it in false positives:
 
 - a claim is `exit N` / `exits N` / `Exit N (…)`, **plus** `N = …` pairs in a
   summary that names an exit at all (`Exit 0 = clean, 1 = drift, 2 = unreadable`);
+- a claim may name a **band** (`exit 130-137`): it holds when the task emits any
+  code inside it, and both endpoints are parsed — the first version kept only
+  the left edge, so `130-137` was silently the promise `130`;
 - `0` is never a claim — every script can exit 0;
 - a script emits every literal `exit N`, plus the repo's `fail=1 … exit "$fail"`
   idiom, which a literal-only scan called two *correct* summaries wrong;
@@ -225,6 +228,13 @@ budget (`--builders ""`), `STRICT=1` is substitute-or-fail, `OFFLOAD=1` dispatch
 Two runs agree when they print the same path **and** the same `sha256` of
 `graph.json` — an input-addressed derivation cannot yield two paths for one input,
 so a disagreement means the input set moved (or a builder is nondeterministic).
+
+The digests are **pinned** in [`flake/taskfile-digest-pin.nix`](../flake/taskfile-digest-pin.nix)
+and compared by `checks.<system>.taskfile-digest-pin`, which the `docs-budget` CI
+job builds on every push. A deliberate edit updates the pin in the same commit; an
+unintentional one — a shard reformatted by a menu, a summary rewritten in bulk —
+fails with both digests named instead of shipping as a silent change in what the
+fleet executes or what an agent reads.
 
 Measured 2026-10-21: the same graph minted here and on eu.nixbuild.net
 (`taskfile-graph-<digest>`) gives one path and one hash; a deliberate `cmds` edit

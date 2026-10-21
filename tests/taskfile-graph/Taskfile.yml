@@ -107,6 +107,27 @@ tasks:
     cmds:
       - bash scripts/task/not-here.sh
 
+  # Two-digit codes and bands. `130-137` is one failure mode (killed by a
+  # signal), so the script below exits 134 (inside) while `badrange` reuses the
+  # 3-exit script (outside) — the right endpoint must be read, not truncated.
+  rangeexit:
+    desc: promises a band that the script enters
+    summary: Exit 0 = clean, 130-137 = killed by a signal.
+    cmds:
+      - bash scripts/task/fixture-range.sh
+
+  badrange:
+    desc: promises a band the script never enters
+    summary: Exit 130-137 = killed by a signal.
+    cmds:
+      - bash scripts/task/fixture-exit.sh
+
+  two-digit:
+    desc: a two-digit code the script keeps
+    summary: Exit 42 = the answer.
+    cmds:
+      - bash scripts/task/fixture-42.sh
+
   # "go-task itself." is the regression case: `task ` inside a word, followed by a
   # word and a full stop, must not become the reference `itself.`.
   prose:

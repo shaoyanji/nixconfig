@@ -40,10 +40,15 @@ case "${1:-}" in -h|--help) sed -n '2,11p' "$0"; exit 0 ;; esac
 jev_classify() {
   local text="$1"
   jq -n '{policy:"a rule or failure mode the build should enforce",fact:"an address, role or hardware detail that belongs in inventory",history:"narrative explaining why a decision was made",procedure:"commands to run in order",docs:"reference material meant to be read"}' > "$CRITERIA_FILE"
-  local out
-  out=$(jev-decide classify --provider "$PROVIDER" --text "$text" --criteria "$CRITERIA_FILE" --min-probability 0.5 2>&1) || {
-    echo "jev-error"; return 0; }
-  printf '%s' "$out" | jq -r '.decisions.category.value // "jev-error"'
+  local out try
+  for try in 1 2 3; do
+    if out=$(jev-decide classify --provider "$PROVIDER" --text "$text" --criteria "$CRITERIA_FILE" --min-probability 0.5 2>&1); then
+      printf '%s' "$out" | jq -r '[.decisions.category.value, (.decisions.category.probability // 0 | tostring)] | @tsv'
+      return 0
+    fi
+    sleep 2
+  done
+  printf 'jev-error\t0\n'
 }
 
 ask() { # state, optA, optB -> winner label
@@ -100,7 +105,8 @@ check() { # state, expected
 rule_state="this service must not bind 443 because nginx owns it and the switch fails the build"
 steps_state="step 1 ssh delphi step 2 sudo nixos-rebuild switch step 3 systemctl status then verify"
 if [ "$ENGINE" = "jev" ]; then
-  r_hit=$(jev_classify "$rule_state"); s_hit=$(jev_classify "$steps_state")
+  r_hit=$(jev_classify "$rule_state"); r_hit="${r_hit%%$'\t'*}"
+  s_hit=$(jev_classify "$steps_state"); s_hit="${s_hit%%$'\t'*}"
   printf 'calibration: rule→%s | steps→%s\n' "$r_hit" "$s_hit" >&2
   [ "$r_hit" = "policy" ] && [ "$s_hit" = "procedure" ] || calib=0
   r_pts=1; s_pts=1
@@ -117,7 +123,8 @@ for f in "$@"; do
   state="$(features "$f")"
   if [ "$ENGINE" = "jev" ]; then
     cat_j="$(jev_classify "$state")"
-    rows="$(jq -c --arg f "$f" --arg c "$cat_j" '. + [{path:$f, category:$c, wins:5}]' <<<"$rows")"
+    label_j="${cat_j%%$'\t'*}"; prob_j="${cat_j##*$'\t'}"
+    rows="$(jq -c --arg f "$f" --arg c "$label_j" --argjson s "$prob_j" '. + [{path:$f, category:$c, score:$s}]' <<<"$rows")"
     continue
   fi
   declare -A wins=()
@@ -130,7 +137,7 @@ for f in "$@"; do
   best=""; n=-1
   for c in "${CATS[@]}"; do [ "${wins[$c]}" -gt "$n" ] && { n=${wins[$c]}; best=$c; }; done
   rows="$(jq -c --arg f "$f" --arg c "$best" --argjson w "$n" \
-    '. + [{path:$f, category:$c, wins:$w}]' <<<"$rows")"
+    '. + [{path:$f, category:$c, score:($w / 4)}]' <<<"$rows")"
 done
 
 flip_pct=$((pairs ? flipped * 100 / pairs : 0))
@@ -142,4 +149,4 @@ errors=$(jq '[.[] | select(.category == "jev-error")] | length' <<<"$rows")
 distinct=$(jq '[.[].category] | unique | length' <<<"$rows")
 [ "$distinct" -ge 2 ] || { echo "categorize: DOES NOT DISCRIMINATE — every file read as one category" >&2; exit 1; }
 
-jq -r 'sort_by(-.wins)[] | "\(.wins)/4\t\(.category)\t\(.path)"' <<<"$rows"
+jq -r 'sort_by(-.score)[] | "\(.score * 100 | floor)%\t\(.category)\t\(.path)"' <<<"$rows"

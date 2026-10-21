@@ -608,8 +608,8 @@ ssh_alias = "fern"
 [hosts.fern.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NAS client automount (/Volumes/data from frieren)", "NO Steam (deliberately omitted)"]
-traits = ["battery-optimized", "lightweight-desktop", "no-steam", "laptop-profile", "btrfs"]
+key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "Dell D6000 Dock (DisplayLink / EVDI)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NAS client automount (/Volumes/data from frieren)", "NO Steam (deliberately omitted)"]
+traits = ["battery-optimized", "lightweight-desktop", "no-steam", "laptop-profile", "btrfs", "dell-dock"]
 
 [hosts.fern.persona]
 title = "Portable Field Operative"

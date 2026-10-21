@@ -6,8 +6,19 @@ Operator deploy activity means `infra:*` for host lifecycle flows.
 ## Entry points
 - `taskfiles/infra.yml` (`infra:*`) runs rebuilds, switches, boots, deploys, and logs.
 
-## AI host exceptions
-Per-host notes live under `.agents/deploy/hosts/*.md`.
+## Host cards
+A card exists only where a host departs from the chain, and each one is listed
+here so no card is an orphan:
+
+- [`hosts/delphi.md`](hosts/delphi.md) — OCI Ampere A1 provisioning and verification.
+- [`hosts/eisen.md`](hosts/eisen.md) — LLM stack operations; architecture and
+  measurements are [`docs/eisen-llm-architecture.md`](../../docs/eisen-llm-architecture.md).
+- [`hosts/frieren.md`](hosts/frieren.md) — NAS self-upgrade topology and its traps.
+- [`hosts/scratch.md`](hosts/scratch.md) — throwaway host conventions.
+- [`hosts/stark.md`](hosts/stark.md) — All-in-One Steam kiosk, first-boot disk layout.
+
+A decommissioned host needs no card: its facts belong in `inventory.toml`
+(mtfuji's moved there on 2026-10-21, and the card was deleted).
 
 ## Determinate Nix (fleet-wide since 2026-10-19)
 Every NixOS host runs Determinate Nix via `modules/global/determinate-nix.nix`.

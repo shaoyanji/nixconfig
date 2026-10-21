@@ -76,6 +76,11 @@ role = "Headless Container & AI Inference Host"
 category = "container-host"
 desktop_environment = "headless"
 users = ["devji"]
+notes = [
+  "Decommissioned AI-host reference (2026-09): the agent-era tooling (nullclaw, hermes, xs, pancakes-harness) was removed from the repo, so `hosts/mtfuji/ai.nix` is a minimal module and no agent services run here.",
+  "Still runs `services.ollama` with dedicated btrfs subvols (`nix/ollama`, `nix/nullclaw`), which is the pattern this preserved host keeps alive.",
+  "Deploys by the canonical host flow (`task infra:deploy:host:mtfuji`); the old `checks:nullclaw:smoke:mtfuji` validation is gone with the tooling.",
+]
 
 [hosts.mtfuji.hardware]
 model = "Custom Headless Server"

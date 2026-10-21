@@ -1,28 +1,13 @@
 {lib, ...}: let
-  # Load authorized keys from centralized config
-  keysConfig = builtins.fromJSON (builtins.readFile ../config/authorized-keys.json);
+  # The fleet's one key list. Most keys come from the gist named in
+  # authorized-keys.json; the literals below cover machines that are not in it.
+  keysSource = builtins.elemAt (builtins.fromJSON (builtins.readFile ./authorized-keys.json)) 0;
   fetchedKeys =
-    builtins.filter
-    (x: x != [])
-    (
-      builtins.split "\n"
-      (
-        builtins.readFile
-        (
-          builtins.fetchurl {
-            inherit ((builtins.elemAt keysConfig 0)) url;
-            inherit ((builtins.elemAt keysConfig 0)) sha256;
-          }
-        )
-      )
-    );
+    builtins.filter (key: key != "")
+    (lib.splitString "\n" (builtins.readFile (builtins.fetchurl {
+      inherit (keysSource) url sha256;
+    })));
 
-  # Repo-side extra keys. benutzer@bitlockerpremium is a Windows machine
-  # (not a NixOS host) that SSHes into the fleet — appended here rather
-  # than in the gist so the repo is the reviewable source for it. The
-  # second key is the Bitwarden-stored SSH key (no comment field on the
-  # key itself). devji@eisen / devji@fern are the per-host user keys of the
-  # eisen and fern workstations.
   sshKeys =
     fetchedKeys
     ++ [
@@ -35,13 +20,12 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMptCVdbDOaPovY/J7QOicHHjThJd7GOSSMFxZg7uh04 devji@fern"
     ];
 in {
-  options.ssh.authorizedKeys = {
-    keys = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = sshKeys;
-      description = "SSH authorized keys loaded from centralized config";
-    };
+  options.ssh.authorizedKeys.keys = lib.mkOption {
+    type = lib.types.listOf lib.types.str;
+    default = sshKeys;
+    description = "The fleet's one SSH authorized-key list";
   };
 
+  # Pinned so no host can ship a divergent list (flake/policies.nix asserts it).
   config.ssh.authorizedKeys.keys = sshKeys;
 }

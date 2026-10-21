@@ -1,6 +1,6 @@
-# One nginx cache policy for compiled static trees.
-# Both serve the same immutable store path, so the policy that describes it must
-# only `Cache-Control` differed between the HTML and the content-hashed assets.
+# One cache policy for compiled static trees: the HTML entry point and the
+# content-hashed assets serve the same immutable store path and differ only in
+# Cache-Control.
 {
   # Public for an hour, tolerated stale for a day: the bytes are a store path,
   # so a rebuild changes the path and a stale copy is never wrong for long.

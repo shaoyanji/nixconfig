@@ -70,6 +70,9 @@ in {
   hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
 
+  # Dell D6000 Universal Dock (DisplayLink / EVDI)
+  profiles.dell-dock.enable = true;
+
   # --- Btrfs auto-scrub (monthly) ---
   services.btrfs.autoScrub = {
     enable = true;

@@ -27,45 +27,7 @@
   };
 
   # --- Dell D6000 Universal Dock (DisplayLink / EVDI) ---
-  # Dell D6000 drives external displays over USB 3.0 / USB-C via DisplayLink (DL-6950).
-  # Synaptics upstream zip is fetched via fetchurl so hydra/nixbuild can build it without requireFile prompts.
-  nixpkgs.overlays = [
-    (final: prev: {
-      displaylink = prev.displaylink.overrideAttrs (_old: {
-        src = final.fetchurl {
-          url = "https://www.synaptics.com/sites/default/files/exe_files/2026-06/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.3-EXE.zip";
-          hash = "sha256-cmmFbHUnBgxRMhXOG1o2/vB02Oicq4m8qxPfNCrM4Jg=";
-          name = "displaylink-630.zip";
-        };
-      });
-    })
-  ];
-
-  services.xserver.videoDrivers = ["displaylink" "modesetting"];
-
-  # EVDI kernel module requires drm_ttm_helper for GEM buffer mapping symbols (drm_gem_ttm_vmap)
-  boot.kernelModules = ["drm_ttm_helper" "evdi"];
-
-  systemd.services.dlm = {
-    wantedBy = ["multi-user.target"];
-  };
-
-  # Disable USB autosuspend: kernel 6.12 defaults enable_autosuspend=Y (and usbcore.autosuspend=2),
-  # which aggressively powers down BT adapters after 2s and drops DisplayLink DL-6950 ASIC / USB 3.0 hubs.
-  boot.kernelParams = ["usbcore.autosuspend=-1"];
-
-  services.udev.extraRules = ''
-    # Prevent autosuspend on DisplayLink docks and external USB hubs
-    ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="17e9", ATTR{power/control}="on"
-    ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="05e3", ATTR{power/control}="on"
-    ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="06c4", ATTR{power/control}="on"
-  '';
-
-  # Disable USB autosuspend for btusb: kernel 6.12 defaults enable_autosuspend=Y,
-  # which aggressively powers down BT adapters after 2s and drops connection to MX Keys/Master.
-  boot.extraModprobeConfig = ''
-    options btusb enable_autosuspend=n
-  '';
+  profiles.dell-dock.enable = true;
 
   # --- Power management (laptop-as-server, battery = built-in UPS) ---
   # powertop is intentionally NOT enabled: its `--auto-tune` boot service

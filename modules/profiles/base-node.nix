@@ -14,6 +14,7 @@ in {
     inputs.sops-nix.nixosModules.sops
     ./firewall-baseline.nix
     ./boot.nix
+    ./dell-dock.nix
   ];
 
   boot = {

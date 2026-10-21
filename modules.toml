@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 23
+total_knobs = 24
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -123,6 +123,16 @@ path = "modules/profiles/nvidia.nix"
 description = "Proprietary NVIDIA graphics drivers (unfree, local builds on host)"
 default = false
 hosts = ["stark", "kellerbench"]
+
+[knobs.dell-dock]
+name = "Dell D6000 Docking Station"
+type = "profile"
+category = "hardware"
+option = "profiles.dell-dock.enable"
+path = "modules/profiles/dell-dock.nix"
+description = "Dell D6000 Universal Dock (DisplayLink / EVDI drivers, USB autosuspend prevention, udev rules)"
+default = false
+hosts = ["frieren", "fern"]
 
 [knobs.microvm-host]
 name = "MicroVM Virtualization Host"

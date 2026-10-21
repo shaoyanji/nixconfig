@@ -8,7 +8,7 @@ This page is why the stack looks like this and what it measured; it is not a pro
 ## Scope
 High-core gaming desktop, Sunshine GameStream server, and high-RAM local AI inference host (`Intel Xeon E5-2673 v3`, `64 GiB DDR4`, `AMD Radeon RX 5700 8 GB VRAM`).
 
-**Implementation lives in [`hosts/eisen/llm-server.nix`](../../../hosts/eisen/llm-server.nix) (generative LLM) and [`hosts/eisen/decision-models.nix`](../../../hosts/eisen/decision-models.nix) (Laya, the CPU-only Jev-compatible decision model).** This document is the rationale + operations guide for both.
+**Implementation lives in [`hosts/eisen/llm-server.nix`](../hosts/eisen/llm-server.nix) (generative LLM) and [`hosts/eisen/decision-models.nix`](../hosts/eisen/decision-models.nix) (Laya, the CPU-only Jev-compatible decision model).** This page is the rationale for both; every command lives in the runbook linked above.
 
 ---
 
@@ -108,7 +108,7 @@ Both use `unitConfig.ConditionPathExists = "!<file>"` and `curl -fL --retry 5 -C
 | Model | Total / Active | Quant | Aliases | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | 🌟 **Qwen3.6-35B-A3B** | 35B / **~3B** | `Q4_K_M` (22.5 GB) | `qwen3.6-35b-a3b`, `qwen` | Primary champion: 2026 agentic coding/thinking-preservation MoE. Whole expert pool fits with ~40 GiB RAM to spare. |
-| **Aleph-Alpha Kolibri-1** | 78B / **3.46B** | `Q4_K_M` (44.2 GB) | `kolibri-1`, `kolibri`, `aleph` | German + English MoE (Apache 2.0, ctx up to 262144). Loads via the patched llama.cpp build — see below. |
+| **Aleph-Alpha Kolibri-1** | 78B / **3.46B** | `Q4_K_M` (44.2 GB) | `kolibri-1`, `kolibri`, `aleph` | German + English MoE (Apache 2.0, ctx up to 262144). Loads via the patched llama.cpp build — see Serving Design above. |
 
 Larger Kolibri quants exist (`Q3_K_M` ≈ 37.5 GB, `Q5_K_M` split in two parts) but `Q4_K_M` is the best fit for 62 GiB alongside the OS and Steam.
 

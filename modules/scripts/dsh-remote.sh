@@ -2,10 +2,10 @@
 # dsh-remote — open the DeepSeek Harness that runs on a worker host.
 #
 # The harness is a SERVICE on the worker (systemd unit `dsh-web`) bound to
-# loopback there, and the worker publishes it through its TLS ingress at
-# `/deepseek/`. This client opens the browser; it does not proxy anything, so
-# the tab survives this command, the URL is bookmarkable, and the worker's CPU,
-# disk and model access are what the UI is talking to.
+# loopback there, and the worker publishes it on the TAILNET only (`tailscale
+# serve`, TLS from tailscaled, at the MagicDNS name). This client opens the
+# browser; it does not proxy anything, so the tab survives this command and the
+# worker's CPU, disk and model access are what the UI is talking to.
 #
 # The ingress is gated by dsh's launch token. The unit prints one signed-in URL
 # per start to its journal; that is what this script reads over ssh (never a
@@ -45,11 +45,16 @@ dsh-remote — open the DeepSeek Harness that runs on a remote worker
   dsh-remote --no-browser    print the URL instead of opening a browser
   dsh-remote --host <host>   another worker (default delphi.bountystash.com)
 
-The harness runs on the worker and binds loopback there; the worker serves it at
-https://<host>/deepseek/ behind its own TLS vhost. Nothing is tunneled from this
-machine, so closing this command does not close the tab. The first visit to a
-browser profile exchanges the printed token for a 30-day cookie, after which the
-bare https://<host>/deepseek/ works on its own.
+The harness runs on the worker and binds loopback there; the worker publishes it
+on the tailnet only, at its MagicDNS name (TLS issued by tailscaled). Nothing is
+tunneled from this machine, so closing this command does not close the tab. The
+first visit exchanges the printed token for a 30-day cookie, after which the
+bare URL works on its own.
+
+That name has no public DNS record on purpose, and the fleet resolver pins `~.`
+to its own DNS, so the client wants a hosts entry (`networking.hosts` in
+`modules/profiles/base-node.nix`) or an overlay resolver before the browser can
+reach it. `--status` says so instead of reporting a broken ingress.
 
 Env: DSH_HOST DSH_SERVICE DSH_PORT DSH_SYNC_AUTH DSH_OPEN_BROWSER DSH_BROWSER
      DSH_TIMEOUT DSH_WAIT DSH_OPEN_TIMEOUT
@@ -127,6 +132,24 @@ REMOTE
 
 clean_url() {
   printf '%s' "${1%%\?*}"
+}
+
+# The ingress answers only under the name its certificate was issued for, and
+# that name has no public record (it is a tailnet leaf). Without this check a
+# missing resolver entry shows up as `HTTP none` followed by a pointless
+# restart of a perfectly healthy worker.
+resolve_url() {
+  local name
+  name=$(printf '%s' "${1#*://}" | cut -d/ -f1 | cut -d: -f1)
+  case "$name" in
+    *[!0-9.]*) : ;;
+    *) return 0 ;;
+  esac
+  getent hosts "$name" >/dev/null 2>&1 && return 0
+  printf 'dsh-remote: %s does not resolve here, and the ingress certificate is only valid for that name.\n' "$name" >&2
+  printf 'dsh-remote:   add it with networking.hosts (modules/profiles/base-node.nix) or an overlay resolver.\n' >&2
+  printf 'dsh-remote:   nothing is wrong with %s; the browser would fail the same way.\n' "$HOST" >&2
+  return 1
 }
 
 # Prove the ingress from HERE, with a fresh cookie jar: DNS, TLS, the proxy
@@ -392,6 +415,8 @@ case "$ACTION" in
       fi
       URL=$(fresh_url "$old") || die "$SERVICE did not publish a URL within 60s (try: dsh-remote --log)"
     fi
+
+    resolve_url "$URL" || exit 1
 
     if ! wait_probe "$URL"; then
       printf 'dsh-remote: %s answered HTTP %s; restarting %s on %s\n' "$(clean_url "$URL")" "$PROBE_CODE" "$SERVICE" "$HOST" >&2

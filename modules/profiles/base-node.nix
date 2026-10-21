@@ -93,6 +93,12 @@ in {
     # (see profiles/nas-client.nix).
     hosts = {
       "192.168.3.25" = ["frieren"];
+      # Tailnet-only services are reached by their MagicDNS name, but the fleet
+      # resolver pins `~.` to its own DNS, so `*.ts.net` does not resolve here
+      # (`getent hosts` → nothing on frieren; eisen's docs work around it with
+      # `curl --resolve`). Stating the address once is what lets a browser and
+      # `dsh-remote`'s probe use the name the certificate is issued for.
+      "100.123.145.53" = ["delphi.cloudforest-kardashev.ts.net"];
       # "192.168.3.36" = ["netbook"];
       "192.168.3.23" = ["fern"];
       "192.168.3.48" = ["steamlink"];

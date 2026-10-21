@@ -387,9 +387,39 @@ in {
     };
   };
 
+  # --- Stirling PDF, moved off frieren (tailnet only) ------------------------
+  # Stateless by design: no library to lose, which is why this one moves while
+  # paperless and immich stay where their data and their family users live.
+  # Same port as on frieren so the browser bookmark's path is the only change.
+  services.stirling-pdf = {
+    enable = true;
+    environment = {
+      SERVER_PORT = "7351";
+      SECURITY_ENABLELOGIN = "false";
+      JAVA_TOOL_OPTIONS = "-Xms128m -Xmx512m -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=50";
+    };
+  };
+  systemd.services.stirling-pdf.serviceConfig = {
+    MemoryHigh = "640M";
+    MemoryMax = "768M";
+  };
+
   # Tailnet-only HTTPS front for the decision envelope. Same shape as
   # `tailscale-serve-dsh`: tailscaled terminates TLS, the app stays on loopback,
   # and nothing about it is reachable from the public vhost.
+  systemd.services.tailscale-serve-pdf = {
+    description = "Tailnet-only HTTPS front for Stirling PDF";
+    after = ["tailscaled.service" "stirling-pdf.service"];
+    wants = ["tailscaled.service" "stirling-pdf.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg --https=8445 http://127.0.0.1:7351";
+      ExecStop = "${pkgs.tailscale}/bin/tailscale serve --https=8445 off";
+    };
+  };
+
   systemd.services.tailscale-serve-systemone = {
     description = "Tailnet-only HTTPS front for the System One decision envelope";
     after = ["tailscaled.service" "systemone-decision-serve.service"];

@@ -177,6 +177,9 @@ in {
     waylock
     wl-clipboard
     imv
+    # Mod+S / Mod+Print screenshots (niri parity)
+    grim
+    slurp
     # Suckless X11 Core Toolchain
     dwm
     st

@@ -73,6 +73,27 @@ in {
   # Dell D6000 Universal Dock (DisplayLink / EVDI)
   profiles.dell-dock.enable = true;
 
+  # --- Logind: prevent fatal ACPI suspend freeze on lid close ---
+  # Ryzen 3 3250U (Picasso APU) has a known kernel display engine hang on ACPI
+  # suspend resume. When docked or on external power, keep the system alive and
+  # lock/blank the screen instead of sleeping.
+  services.logind.settings.Login = {
+    HandleLidSwitch = "lock";
+    HandleLidSwitchDocked = "ignore";
+    HandleLidSwitchExternalPower = "lock";
+  };
+
+  # Disable ACPI sleep/suspend states that hang the Picasso APU
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowSuspendThenHibernate = "no";
+    AllowHybridSleep = "no";
+  };
+
+  # Picasso/Raven APU stability: avoid IOMMU page faults on USB/GPU wake
+  boot.kernelParams = ["iommu=pt"];
+
   # --- Btrfs auto-scrub (monthly) ---
   services.btrfs.autoScrub = {
     enable = true;

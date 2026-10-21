@@ -7,6 +7,7 @@
 static const int sloppyfocus               = 1;
 static const int bypass_surface_visibility = 0;
 static const unsigned int borderpx         = 2;
+static const unsigned int snap             = 32;
 static const float rootcolor[]             = COLOR(0x1e1e2eff);
 static const float bordercolor[]           = COLOR(0x313244ff);
 static const float focuscolor[]            = COLOR(0xcba6f7ff);
@@ -116,4 +117,10 @@ static const Button buttons[] = {
 	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
 	{ MODKEY, BTN_MIDDLE, togglefloating, {0} },
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
+};
+
+/* Trackpad / mouse wheel: Super+scroll adjusts the PipeWire default sink */
+static const Axis axes[] = {
+	{ MODKEY, AxisUp,     spawn, SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+") },
+	{ MODKEY, AxisDown,   spawn, SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-") },
 };

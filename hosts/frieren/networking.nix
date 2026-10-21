@@ -20,23 +20,12 @@
     };
   };
 
-  # --- Stirling PDF (re-enabled 2026-09-29) ---
-  # Port 7351 because the module default 8080 collides with pihole-web.
-  # Opened here (not in configuration.nix's firewall block) so the
-  # port lives next to the service that needs it.
-  services.stirling-pdf = {
-    enable = true;
-    environment = {
-      SERVER_PORT = "7351";
-      SECURITY_ENABLELOGIN = "false";
-      JAVA_TOOL_OPTIONS = "-Xms128m -Xmx512m -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=50";
-    };
-  };
-  systemd.services.stirling-pdf.serviceConfig = {
-    MemoryHigh = "640M";
-    MemoryMax = "768M";
-  };
-  networking.firewall.allowedTCPPorts = lib.mkAfter [7351];
+  # --- Stirling PDF: MOVED to delphi (2026-10-21) ---
+  # It is stateless, so it was the one service worth moving off this host while
+  # paperless and immich stay where their data and their users are. It now runs
+  # on delphi behind `tailscale serve` (port 8445) — see
+  # `.agents/deploy/hosts/delphi.md`, and AGENTS.nix `open-frieren-offload`.
+  # Nothing here listens on 7351 any more, and the firewall does not open it.
 
   # --- Inbound LAN Failover (enp1s0 -> wlp2s0) ---
   # If the primary wired link drops, float 192.168.3.25 to Wi-Fi with gratuitous ARP.

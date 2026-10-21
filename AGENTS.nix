@@ -3714,7 +3714,7 @@
       status = "OPEN";
       priority = "P3";
       date = "2026-10-21";
-      summary = "frieren's persistent footprint is small and named; the movable candidates are the paperless OCR queue, stirling-pdf and the hermes daemon, in that order of measured cost.";
+      summary = "frieren's persistent footprint is small and named; stirling-pdf moves (stateless), hermes waits on a cutover, and paperless plus immich stay by operator decision — their data and their family users live there.";
       refs = {
         hosts = ["frieren" "delphi"];
         modules = ["hosts/frieren/infra-stack.nix" "modules/profiles/service-exposure.nix"];
@@ -3727,15 +3727,26 @@
         persistent outlier is hermes at 340 MiB; the 1.3 GiB and 600 MiB entries
         are the agent and browser of the current session, not services.
 
-        **Rule.** Move stateless CPU and RAM, never data: immich, paperless media
-        and jellyfin transcode stay (data and QSV).
+        **Settled by the operator (2026-10-21).** paperless and immich stay: the
+        personal data and the family users are on frieren, and a move would mean
+        re-doing that setup by hand. The rule that falls out is sharper than
+        "move stateless services": move what has no library and no shared logins.
 
-        **Candidates.** paperless-task-queue (OCR is CPU-bound and bursty),
-        stirling-pdf (Java, stateless, aarch64-ready), hermes (a daemon with no
-        local-only state).
+        **stirling-pdf moved (2026-10-21).** Stateless, so it was the one service
+        worth moving: the unit is gone from this host's system.slice, delphi
+        serves it on tailnet 8445, and frieren's closure fell 1005 MiB
+        (31.88 → 30.82 GB) with 87 MiB of cgroup going with it. Its aarch64
+        closure is not on cache.nixos.org, so the first build ran on two A1
+        cores (~40 min) and delphi needs ~60 s of JVM warmup before the mount
+        answers 200 rather than 502. `pdf.frieren.lan` no longer serves it.
 
-        **Exit.** For each moved unit: it is gone from frieren's system.slice,
-        serves from delphi over the tailnet, and the same validation passes.
+        **Candidates left.** hermes, 342 MiB and 226 MiB of state in `~/.hermes`,
+        needs a cutover decision: one bot token cannot be polled twice, so the
+        sequence is copy state, enable on delphi, stop frieren, and measure.
+
+        **Exit.** Each moved unit is gone from frieren's system.slice, serves from
+        delphi over the tailnet, and `systemctl show -p MemoryCurrent` on frieren
+        shows the release. hermes is the last one, and only with an agreed window.
       '';
     };
     exp-114 = {

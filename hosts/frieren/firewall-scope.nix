@@ -66,13 +66,9 @@ in {
           websockets = true;
         };
       };
-      stirling-pdf = {
-        port = 7351;
-        proxy = {
-          name = "pdf.frieren.lan";
-          websockets = true;
-        };
-      };
+      # stirling-pdf moved to delphi (tailnet 8445); `pdf.frieren.lan` is gone
+      # with it, so the bookmark is now the ts.net name — see
+      # `open-frieren-offload` in AGENTS.nix.
       tcp-7878 = {port = 7878;};
       kiwix = {
         port = config.services.kiwix-serve.port;

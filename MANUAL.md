@@ -62,7 +62,7 @@
 | Immich | `immich-server`, `immich-machine-learning`, `redis-immich` | 2283 | `photos.frieren.lan`* |
 | Paperless-ngx | `paperless-web`, `-consumer`, `-scheduler`, `-task-queue`, `redis-paperless` | 28981 | `docs.frieren.lan`* |
 | Gotenberg / Tika | `gotenberg`, `tika` | loopback | Paperless helpers |
-| Stirling PDF | `stirling-pdf` | 8080-ish | `pdf.frieren.lan`* |
+| Stirling PDF | `stirling-pdf` on **delphi** | 7351 loopback / 8445 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8445` (moved off frieren 2026-10-21; `pdf.frieren.lan` no longer serves it) |
 | *arr stack | `sonarr`, `radarr`, `lidarr`, `readarr`, `prowlarr` | 8989/7878/8686/8787/9696 | LAN, library hygiene |
 | Transmission | `transmission` | 9091 loopback | `torrent.frieren.lan`* (leech-only) |
 | aria2 | `aria2` | 6800/6801 loopback | `aria.frieren.lan`* |

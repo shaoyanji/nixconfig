@@ -358,6 +358,43 @@ Cachix, which is also why `01e9906e` decoupled it.
 `0.0.0.0:443` (`bind: address already in use`, measured 2026-10-21), which is why
 the front listens on 8443. That port is visible only inside the tailnet.
 
+## Tailnet service mounts (one port per service)
+
+Everything reachable from the tailnet is a loopback listener plus a
+`tailscale serve` mount; nothing here is added to the public vhost. tailscaled
+terminates TLS, so there is no certificate to own per service.
+
+| Port | Service | Unit | Upstream |
+| :--- | :--- | :--- | :--- |
+| 8443 | DeepSeek Harness | `tailscale-serve-dsh` | `127.0.0.1:3080` |
+| 8444 | System One decisions (`/v1/systemone`) | `tailscale-serve-systemone` | `127.0.0.1:8091` |
+| 8445 | Stirling PDF | `tailscale-serve-pdf` | `127.0.0.1:7351` |
+
+A port is the mount, not a path: `tailscale serve` proxies a whole origin, so a
+new service takes the next free number rather than a location under an existing
+one.
+
+**Stirling is a JVM.** After a switch `stirling-pdf.service` reports `active`
+while `tailscale serve` still answers **502** for about a minute; measured
+2026-10-21, first 200 at ~60 s. Read the log for `Stirling-PDF Started.` rather
+than trusting `ActiveState`, and do not treat the 502 as a broken mount. It was
+moved off frieren because it is stateless — the old bookmark `pdf.frieren.lan`
+now points at a closed port on frieren, so the URL is the tailnet one above.
+
+Verify the whole set at once:
+
+```bash
+ssh delphi 'sudo tailscale serve status'
+getent hosts delphi.cloudforest-kardashev.ts.net      # the name must resolve
+curl -s https://delphi.cloudforest-kardashev.ts.net:8444/health
+```
+
+The decision envelope is the standard-library engine, not eisen's Laya:
+`POST /v1/systemone` with `{"state": …, "questions": {id: {type, instructions,
+criteria}}}` returns `answers` + `usage`, and `GET /` or `/health` is the probe.
+It answers in under a millisecond because it is a deterministic scoring pass, not
+a transformer inference — so it is a fallback for shape, not for Laya's accuracy.
+
 ## DNS failover topology (why 10.99.0.53)
 
 Every resolver binds `10.99.0.53/32` on `lo` (`systemd.services.dns-service-address`)

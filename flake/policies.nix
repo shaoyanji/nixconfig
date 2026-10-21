@@ -243,6 +243,17 @@
       detail = "a channel lost its task, so the category it owns has no route";
     };
 
+    decision-engine-routing = {
+      rule = "Categorization runs on jev (TypeSafe) and says so: julia-1's `choice` is label-biased — a real command sequence reads as 'a fact about a machine' in both orders (0/10 on the steps anchor, 4/10 on the rule anchor) — and OpenRouter answers HTTP 402 without credit, so a skill may not offer it as the default.";
+      proof = "scripts/task/categorize.sh (default engine, error gate) and .agents/skills/jevdecide/SKILL.md (named provider)";
+      holds =
+        has "scripts/task/categorize.sh" "CATEGORIZE_ENGINE:-jev"
+        && has "scripts/task/categorize.sh" "jev-error"
+        && has ".agents/skills/jevdecide/SKILL.md" "--provider typesafe"
+        && !(has ".agents/skills/jevdecide/SKILL.md" "--provider openrouter");
+      detail = "the categorizer fell back to julia-1, lost its engine-error gate, or a skill advertises the provider without credit";
+    };
+
     services-live-in-modules = {
       rule = "A skill names a service option, it never defines one: no `*.enable = true|false;` assignment inside a SKILL.md. Service behaviour is an option in a module with its own assertions, so a skill that carries the value is a second home.";
       proof = "line scan of every tracked SKILL.md";

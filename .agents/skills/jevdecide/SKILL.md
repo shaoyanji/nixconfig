@@ -50,6 +50,7 @@ jev-decide classify --provider typesafe \
   --criteria /tmp/jev_inbox_criteria.json \
   --min-probability 0.8 --review-label REVIEW
 ```
+OpenRouter answers HTTP 402 without credit; TypeSafe is the tested provider.
 Read `.decisions.category.value` and `.decisions.category.probability`. One
 `jev-decide` invocation per message; loop to batch.
 

@@ -71,4 +71,4 @@ Apply it to text you write and to text you already touch. Do not open a rewrite 
 
 Truth: `flake/policies.nix` — the rules this page applies are predicates there; this page is the procedure.
 
-Auditing a doc tree: score each file with `task ops:decide -- -q …` as a prior, then decide by hand — julia-1 returns ~0.37 confidence on structurally identical states, so its verdict ranks candidates and never replaces reading them.
+Auditing a doc tree: `task ops:categorize -- <paths>` (jev, TypeSafe) ranks candidates; julia-1's choice is label-biased (rule 4/10, steps 0/10), so it never picks the category.

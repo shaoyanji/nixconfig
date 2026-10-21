@@ -17,6 +17,7 @@ SERVICE="${DSH_SERVICE:-dsh-web}"
 SYNC_AUTH="${DSH_SYNC_AUTH:-auto}"
 OPEN_BROWSER="${DSH_OPEN_BROWSER:-1}"
 PORT="${DSH_PORT:-3080}"
+OPEN_ERROR=""
 ACTION=run
 
 SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=20)
@@ -50,7 +51,8 @@ machine, so closing this command does not close the tab. The first visit to a
 browser profile exchanges the printed token for a 30-day cookie, after which the
 bare https://<host>/deepseek/ works on its own.
 
-Env: DSH_HOST DSH_SERVICE DSH_PORT DSH_SYNC_AUTH DSH_OPEN_BROWSER DSH_TIMEOUT DSH_WAIT
+Env: DSH_HOST DSH_SERVICE DSH_PORT DSH_SYNC_AUTH DSH_OPEN_BROWSER DSH_BROWSER
+     DSH_TIMEOUT DSH_WAIT DSH_OPEN_TIMEOUT
 EOF
 }
 
@@ -223,7 +225,8 @@ sync_auth() {
 }
 
 open_url() {
-  local url=$1 cmd
+  local url=$1 cmd out
+  OPEN_ERROR=""
   if [ -n "${DSH_BROWSER:-}" ]; then
     # shellcheck disable=SC2086
     set -- ${DSH_BROWSER}
@@ -236,15 +239,25 @@ open_url() {
     nohup "$@" "$url" >/dev/null 2>&1 &
     return 0
   fi
-  # xdg-open reports whether this session has a desktop; a browser binary
-  # launched directly does not, so it is the fallback, not the default.
-  if command -v xdg-open >/dev/null 2>&1 && timeout 10 xdg-open "$url" >/dev/null 2>&1; then
-    return 0
+  # The desktop's own handler is the right first move: it is what a click on a
+  # link uses, so it already resolves through mime-apps (`zen-beta.desktop`
+  # here). The timeout is generous on purpose — a cold handoff through the
+  # portal has been measured at ~10 s, and killing it reported "no browser"
+  # while a tab was in fact about to appear.
+  if command -v xdg-open >/dev/null 2>&1; then
+    if out=$(timeout "${DSH_OPEN_TIMEOUT:-25}" xdg-open "$url" 2>&1); then
+      return 0
+    fi
+    OPEN_ERROR=${out:-xdg-open timed out after ${DSH_OPEN_TIMEOUT:-25}s}
   fi
-  if command -v wslview >/dev/null 2>&1 && timeout 10 wslview "$url" >/dev/null 2>&1; then
-    return 0
+  if command -v wslview >/dev/null 2>&1; then
+    if out=$(timeout "${DSH_OPEN_TIMEOUT:-25}" wslview "$url" 2>&1); then
+      return 0
+    fi
+    OPEN_ERROR=${out:-wslview failed}
   fi
-  for cmd in zen firefox chromium chromium-browser brave google-chrome; do
+  # No handler, or one that refuses: the binaries themselves, newest first.
+  for cmd in zen-beta zen firefox librewolf chromium chromium-browser brave google-chrome; do
     command -v "$cmd" >/dev/null 2>&1 || continue
     nohup "$cmd" "$url" >/dev/null 2>&1 &
     return 0
@@ -409,7 +422,9 @@ if [ "$OPEN_BROWSER" = 1 ]; then
   if open_url "$URL"; then
     printf 'dsh-remote: opened %s\n' "$(clean_url "$URL")"
   else
-    printf 'dsh-remote: no browser found here; open this URL yourself:\n\n  %s\n\n' "$URL" >&2
+    printf 'dsh-remote: no browser took the URL%s; open it yourself:\n\n  %s\n\n' \
+      "${OPEN_ERROR:+ ($OPEN_ERROR)}" "$URL" >&2
+    printf 'dsh-remote: set DSH_BROWSER to a browser command to force one.\n' >&2
   fi
 else
   printf '%s\n' "$URL"

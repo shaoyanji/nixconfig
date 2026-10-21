@@ -1,21 +1,16 @@
-# Edit this configuration file to define what should be installed on
+# minyx — Raspberry Pi 3B+ edge node (preserved; reflash planned after 26.11).
+#
+# The device is 1 GiB of RAM on an SD card with an impermanent (tmpfs) root, so
+# every choice here is about not running out of memory or wearing the card.
 {
   lib,
   pkgs,
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
     ../../modules/profiles/desktop-client.nix
   ];
-  # !!! Adding a swap file is optional, but strongly recommended!
-  swapDevices = [
-    #{device = "/swap";}
-  ];
-  # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
-  # Enables the generation of /boot/extlinux/extlinux.conf
-  # Disable ZFS on kernel 6
-  #hardware.pulseaudio.enable = true;
+
   boot = {
     kernelParams = [
       "cma=256M"
@@ -29,150 +24,96 @@
       "nfs"
       "f2fs"
     ];
-    tmp.useTmpfs = true;
+    tmp.cleanOnBoot = true;
   };
-  systemd.services.nix-daemon = {
-    environment.TMPDIR = "/var/tmp";
+
+  # Nix on a 1 GiB device: one job, one core. The default `max-jobs = auto`
+  # starts four compiles on four Cortex-A53s and dies of OOM before it finishes
+  # any of them. aarch64 closures belong on delphi (see the note in AGENTS.nix),
+  # not here — this is the setting that stops the Pi from trying.
+  nix.settings = {
+    max-jobs = 1;
+    cores = 1;
+    auto-optimise-store = true;
   };
-  # A bunch of boot parameters needed for optimal runtime on RPi 3b+
-  networking.hostName = "minyx"; # Define your hostname.
-  # Pick only one of the below networking options.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  services.scx.enable = lib.mkDefault false;
-  environment.systemPackages = with pkgs; [
-    #neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    bind
-    kubectl
-    kubernetes-helm
-    iptables
-    openvpn
-    python3
-    nodejs
-    docker-compose
-    bluez
-    bluez-tools
-  ];
+
+  # tmpfs root plus 1 GiB means the only useful swap is compressed RAM, and
+  # without it the first `nix build` takes the kernel down.
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+  };
+
+  # The build scratch dir lives on the SD card's /var, not in a 500 MB tmpfs.
+  systemd.services.nix-daemon.environment.TMPDIR = "/var/tmp";
+
+  networking = {
+    hostName = "minyx";
+    # NetworkManager owns both interfaces (the fleet standard, and why
+    # `/etc/NetworkManager/system-connections` is in the persistence list).
+    # The Wi-Fi credentials live in NM's persistent store, not in the repo.
+    networkmanager.enable = true;
+    # blocky answers DNS for the LAN; without these the firewall drops it and
+    # the service looks broken. 22 is sshd.
+    firewall = {
+      allowedTCPPorts = [22 53];
+      allowedUDPPorts = [53];
+    };
+  };
+
   services.blocky = {
     enable = true;
 
     settings = {
-      ports.dns = 53; # Port for incoming DNS Queries.
+      ports.dns = 53;
       upstreams.groups.default = [
-        "https://one.one.one.one/dns-query" # Using Cloudflare's DNS over HTTPS server for resolving queries.
+        "https://one.one.one.one/dns-query"
       ];
-      # For initially solving DoH/DoT Requests when no system Resolver is available.
+      # Bootstrap DoH before the system resolver is up.
       bootstrapDns = {
         upstream = "https://one.one.one.one/dns-query";
         ips = ["1.1.1.1" "1.0.0.1"];
       };
-      #Enable Blocking of certain domains.
       blocking = {
         denylists = {
-          #Adblocking
           ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
-          #Another filter for blocking adult sites
-          #adult = ["https://blocklistproject.github.io/Lists/porn.txt"];
-          #You can add additional categories
         };
-        #Configure what block categories are used
         clientGroupsBlock = {
           default = ["ads"];
-          #kids-ipad = ["ads" "adult"];
         };
-      }; # anything from config.yml
+      };
     };
   };
-  #  services.dnsmasq = {
-  #  enable = false;
-  #  settings.servers = [ "9.9.9.9" "8.8.4.4" "1.1.1.1" ];
-  #};
-  # WiFi
-  #inputs.raspberry-pi-nix.board = "bcm2711";
+
   hardware = {
-    #    raspberry-pi.config.all = {
-    #      # as per exaple: https://github.com/nix-community/raspberry-pi-nix/blob/aaec735faf81ff05356d65c7408136d2c1522d34/example/default.nix#L17C11-L32C13
-    #      base-dt-params = {
-    #        BOOT_UART = {
-    #          value = 1;
-    #          enable = true;
-    #        };
-    #        uart_2ndstage = {
-    #          value = 1;
-    #          enable = true;
-    #        };
-    #      };
-    #      dt-overlays = {
-    #        disable-bt = {
-    #          enable = true;
-    #          params = { };
-    #        };
-    #      };
-    #    };
     bluetooth.enable = true;
     enableRedistributableFirmware = true;
     firmware = [pkgs.wireless-regdb];
   };
-  # Networking - no need to punch a hole through router firewall
-  networking = {
-    #firewall = {
-    #  allowedTCPPorts = [443 80 26656 22];
-    #  allowPing = true;
-    #};
 
-    # useDHCP = true;
-    interfaces.wlan0 = {
-      useDHCP = false;
-      ipv4.addresses = [
-        {
-          # I used static IP over WLAN because I want to use it as local DNS resolver
-          address = "192.168.178.3";
-          prefixLength = 24;
-        }
-      ];
-    };
-    interfaces.eth0 = {
-      useDHCP = true;
-      #useDHCP = false;
-      # I used DHCP because sometimes I disconnect the LAN cable
-      #ipv4.addresses = [{
-      #  address = "192.168.173.3";
-      #  prefixLength = 24;
-      #}];
-    };
-
-    # Enabling WIFI
-    #    wireless.enable = true;
-    #    wireless.interfaces = [ "wlan0" ];
-    # If you want to connect also via WIFI to your router
-    # wireless.networks."SATRIA".psk = "wifipassword";
-    # You can set default nameservers
-    # nameservers = [ "192.168.100.3" "192.168.100.4" "192.168.100.1" ];
-    # You can set default gateway
-    # defaultGateway = {
-    #  address = "192.168.1.1";
-    #  interface = "eth0";
-    # };
-  };
-  # forwarding
-  #boot.kernel.sysctl = {
-  #  "net.ipv4.conf.all.forwarding" = true;
-  #  "net.ipv6.conf.all.forwarding" = true;
-  #  "net.ipv4.tcp_ecn" = true;
-  #};
+  # Docker stays (edge containers were the original point of the box); the k8s
+  # toolchain that came with the borrowed Pi config does not — there is no
+  # cluster in this fleet, and kubectl/helm/nodejs are pure SD-card weight.
+  virtualisation.docker.enable = true;
+  environment.systemPackages = with pkgs; [
+    bind # dig, for checking blocky
+    iptables
+    bluez
+    bluez-tools
+  ];
 
   documentation.nixos.enable = false;
-  boot.tmp.cleanOnBoot = true;
-  virtualisation.docker.enable = true;
 
-  # fileSystems."/etc/ssh".neededForBoot = true;
+  # Boot loader and `stateVersion` stay in `configuration.nix` (the host entry).
   fileSystems."/nix/persist".neededForBoot = true;
   environment.persistence."/nix/persist/system" = {
     hideMounts = true;
     directories = [
       "/etc/nixos"
-      "/etc/ssh" # for sops impermanence
+      "/etc/ssh"
       "/var/log"
       "/var/lib/bluetooth"
+      "/var/lib/docker"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
       "/var/lib/tailscale"
@@ -186,10 +127,6 @@
     ];
     files = [
       "/etc/machine-id"
-      {
-        file = "/var/keys/secret_file";
-        parentDirectory = {mode = "u=rwx,g=,o=";};
-      }
     ];
   };
 }

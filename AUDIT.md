@@ -49,7 +49,7 @@
   `latest` are `v1.3.0` (2026-10-15). The "MCP coding mode" is `codemode`, which
   ships in 1.x (QuickJS sandbox, `tools.*` including namespaced MCP tools, only the
   script's output reaches the model).
-- `docs/pi-harness.md` holds the source material — versions, codemode limits, config
+- [`docs/pi-harness.md`](docs/pi-harness.md) holds the source material — versions, codemode limits, config
   surfaces (`models.json`, `PI_CODING_AGENT_DIR`), the eisen three-layer shape,
   scenarios, and the open questions — so none of it needs re-fetching. Proposal:
   `AGENTS.nix` `pi-eisen-ondemand`.

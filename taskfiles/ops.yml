@@ -32,17 +32,30 @@ tasks:
         exit 1
 
   ops:categorize:
-    desc: Categorize prose with the decision engine, gated on calibration
+    desc: Categorize prose (jev, TypeSafe) behind calibration, rule and error gates
     summary: >
-      Asks the engine ten FORCED BINARY questions per file (every category pair,
-      each in both orders, so a position effect has to show as a flip) over the
-      file's features (comment density, restated-code hits, facts already in
-      inventory/policies, age, assertion/metric/step/address counts). Refuses to
-      print a table when known-answer anchors miss, when a majority of pairs
-      flip under swap, or when every file lands in one category. `--help` for
-      usage; an uncalibrated table is shape, not a verdict.
+      Classifies each file from its features only (comment density, restated
+      code, facts already in inventory/policies, age, assertion/metric/block/
+      task-reference/address counts); no contents leave the host. A page with
+      two command blocks or three `task …` references is a `procedure` by RULE
+      and is not asked. Refuses a table when anchors miss, pairs flip under
+      swap, any file errors, or every file lands in one category; automation is
+      gated by [[flake/policies.nix#automation-is-earned]].
     cmds:
       - bash scripts/task/categorize.sh {{.CLI_ARGS}}
+
+  ops:categorize:plan:
+    desc: Turn a categorize table into a routing plan, validated against the page
+    summary: >
+      Runs the categorizer, then names the channel each page would move to
+      (policy → flake/policies.nix, fact → inventory.toml, procedure → docs plus
+      the owning taskfile, history → docs/history/, docs → docs/). Writes
+      nothing. Exits 1 when a row is contradicted by the page's own evidence
+      (a non-procedure row carrying command blocks, or a rule-procedure row
+      without any), or when the categorizer refuses a table. Reports the
+      supervision count that the automation label is gated on.
+    cmds:
+      - bash scripts/task/categorize-apply.sh {{.CLI_ARGS}}
 
   ops:decide:
     desc: Ask the self-hosted decision engine (POST /v1/systemone)

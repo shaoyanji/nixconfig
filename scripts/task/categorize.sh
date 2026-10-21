@@ -39,14 +39,24 @@ case "${1:-}" in -h|--help) sed -n '2,11p' "$0"; exit 0 ;; esac
 # duel machinery below only exists because julia-1's choice is label-biased.
 jev_classify() {
   local text="$1"
-  jq -n '{policy:"a rule or failure mode the build should enforce",fact:"an address, role or hardware detail that belongs in inventory",history:"narrative explaining why a decision was made",procedure:"commands to run in order",docs:"reference material meant to be read"}' > "$CRITERIA_FILE"
+  # Mutually exclusive by construction: each label names what the reader DOES
+  # with the page, so "readable" cannot count as a category of its own. v2 —
+  # v1 let `docs` absorb anything with prose in it (5 of 8 files), including a
+  # routing table of commands and a host's own machine facts.
+  jq -n '{
+    policy:"an invariant or failure mode the build or a test enforces (must / must not)",
+    fact:"a property of one machine — address, port, role, path, hardware — with no steps; belongs in inventory",
+    history:"why a past decision was made, and what was rejected",
+    procedure:"an ordered sequence of commands or decisions the reader executes, including routing tables of tasks",
+    docs:"reference with neither commands, addresses nor invariants — prose you read once and do not execute"
+  }' > "$CRITERIA_FILE"
   local out try
-  for try in 1 2 3; do
+  for try in 1 2 3 4 5; do
     if out=$(jev-decide classify --provider "$PROVIDER" --text "$text" --criteria "$CRITERIA_FILE" --min-probability 0.5 2>&1); then
       printf '%s' "$out" | jq -r '[.decisions.category.value, (.decisions.category.probability // 0 | tostring)] | @tsv'
       return 0
     fi
-    sleep 2
+    sleep $((try * 2))
   done
   printf 'jev-error\t0\n'
 }
@@ -84,13 +94,20 @@ features() {
   for w in $(grep -oE '[a-z][a-z0-9-]{6,}' "$f" | sort -u | head -40); do
     grep -qsi "$w" inventory.toml flake/policies.nix 2>/dev/null && dup=$((dup + 1))
   done
-  days=$(( ( $(date +%s) - $(git log -1 --format=%ct -- "$f" 2>/dev/null || date +%s) ) / 86400 ))
+  # A staged-but-never-committed file has no log entry, and the empty command
+  # substitution used to kill the whole table with "arithmetic syntax error".
+  ts=$(git log -1 --format=%ct -- "$f" 2>/dev/null || true)
+  [ -n "$ts" ] || ts=$(date +%s)
+  days=$(( ( $(date +%s) - ts ) / 86400 ))
   hits=$(grep -ciE 'must not|never|conflict|collision|bind: |belongs to|belongs in' "$f" || true)
   claims=$(grep -cE '[0-9]+ ?(ms|MiB|GiB|s|%)' "$f" || true)
   blocks=$(grep -c '```bash' "$f" || true)
   addrs=$(grep -cE '(192\.168\.[0-9]+\.[0-9]+|100\.[0-9]+\.[0-9]+\.[0-9]+|[a-z0-9-]+\.lan)' "$f" || true)
-  printf 'comments=%s lines=%s ratio=%s restated=%s elsewhere=%s age_days=%s assertions=%s metrics=%s blocks=%s addresses=%s' \
-    "$c" "$l" "$ratio" "$restated" "$dup" "$days" "$hits" "$claims" "$blocks" "$addrs"
+  # `taskrefs` was the missing signal: rollback.md is a routing table of six
+  # `task infra:*` calls and scored no command evidence at all without it.
+  taskrefs=$(grep -coE 'task [a-z]+:[a-z:<>{}-]+' "$f" || true)
+  printf 'comments=%s lines=%s ratio=%s restated=%s elsewhere=%s age_days=%s assertions=%s metrics=%s blocks=%s taskrefs=%s addresses=%s' \
+    "$c" "$l" "$ratio" "$restated" "$dup" "$days" "$hits" "$claims" "$blocks" "$taskrefs" "$addrs"
 }
 
 # Calibration: known answers, asked the same way the table is asked.
@@ -124,7 +141,23 @@ for f in "$@"; do
   if [ "$ENGINE" = "jev" ]; then
     cat_j="$(jev_classify "$state")"
     label_j="${cat_j%%$'\t'*}"; prob_j="${cat_j##*$'\t'}"
-    rows="$(jq -c --arg f "$f" --arg c "$label_j" --argjson s "$prob_j" '. + [{path:$f, category:$c, score:$s}]' <<<"$rows")"
+    # The engine sees counts, not the page, so "does the reader execute this?"
+    # was being answered by a feature that was never in the vector (task refs)
+    # and a prior that called any host page a fact. Executable content is
+    # therefore a RULE: enough command blocks or task references makes the page
+    # a procedure, and the engine only classifies pages that carry none. This
+    # fixed rollback.md, delphi.md and frieren.md, and it is falsifiable — a page
+    # classified `procedure` by rule with no executable content fails the table.
+    blocks_n=$(sed -n 's/.*blocks=\([0-9]*\).*/\1/p' <<<"$state")
+    task_n=$(sed -n 's/.*taskrefs=\([0-9]*\).*/\1/p' <<<"$state")
+    if [ "${blocks_n:-0}" -ge 2 ] || [ "${task_n:-0}" -ge 3 ]; then
+      label_j=procedure; prob_j=0; basis=rule
+      echo "categorize: rule procedure on $f (${blocks_n} command block(s), ${task_n} task ref(s))" >&2
+    else
+      basis=jev
+    fi
+    rows="$(jq -c --arg f "$f" --arg c "$label_j" --argjson s "$prob_j" --arg b "$basis" \
+      '. + [{path:$f, category:$c, score:$s, basis:$b}]' <<<"$rows")"
     continue
   fi
   declare -A wins=()
@@ -149,4 +182,5 @@ errors=$(jq '[.[] | select(.category == "jev-error")] | length' <<<"$rows")
 distinct=$(jq '[.[].category] | unique | length' <<<"$rows")
 [ "$distinct" -ge 2 ] || { echo "categorize: DOES NOT DISCRIMINATE — every file read as one category" >&2; exit 1; }
 
-jq -r 'sort_by(-.score)[] | "\(.score * 100 | floor)%\t\(.category)\t\(.path)"' <<<"$rows"
+# A rule row has no probability to show, and printing one would invent a number.
+jq -r 'sort_by(-(.score // 0.5))[] | (if .basis == "rule" then "rule" else "\(.score * 100 | floor)%" end) + "\t" + .category + "\t" + .path' <<<"$rows"

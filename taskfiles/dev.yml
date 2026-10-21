@@ -536,6 +536,20 @@ tasks:
     cmds:
       - bash scripts/task/closure-analysis.sh diff {{.FROM}} {{.TO | default "/run/current-system"}}
 
+  dev:appimage:integrate:
+    desc: Write launcher entries for the AppImages in the shared NAS library
+    summary: >
+      Walks APPIMAGE_DIR (default ~/Applications/appimages, else the NAS library)
+      and writes ~/.local/share/applications/appimage-<slug>.desktop plus icons, so
+      DMS and fuzzel list the images like any application. Each Exec points at the
+      AppImage where it lives, run through appimage-run by binfmt; metadata is read
+      from the image's squashfs, so nothing is executed or copied. The ELF header
+      decides architecture, the newest build of an app wins, and entries for removed
+      images are pruned. Exit 0 = done, 1 = library unreadable, 2 = usage error.
+      Vars: APPIMAGE_DIR=, FLAGS (--dry-run).
+    cmds:
+      - APPIMAGE_DIR="{{.APPIMAGE_DIR | default ""}}" bash scripts/task/appimage-integrate.sh {{.FLAGS}}
+
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
     desc: Print every nixosConfigurations host name (attr names only — no config forced)

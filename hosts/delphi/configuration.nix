@@ -48,35 +48,10 @@
   dshPath = "/";
   dshUrl = "https://${tailnetHost}:${toString servePort}/";
 
-  # Static landing page. The point is proof of life (and the webserver
-  # criterion), not a product: no CMS, no PHP, no runtime.
-  healthPage = pkgs.writeTextDir "index.html" ''
-    <!doctype html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>delphi</title>
-        <style>
-          body { background:#1e1e2e; color:#cdd6f4; font:16px/1.6 ui-monospace, monospace;
-                 max-width:44rem; margin:12vh auto; padding:0 1.5rem; }
-          h1 { color:#89b4fa; font-size:1.6rem; margin-bottom:.2rem; }
-          .sub { color:#a6adc8; margin-top:0; }
-          li { margin:.35rem 0; }
-          code { color:#a6e3a1; }
-        </style>
-      </head>
-      <body>
-        <h1>delphi</h1>
-        <p class="sub">OCI Ampere A1 &middot; aarch64-linux &middot; NixOS</p>
-        <ul>
-          <li><code>/healthz</code> — plain-text liveness probe</li>
-          <li>tailnet DNS service address — <code>10.99.0.53</code> (crab-hole)</li>
-          <li>mesh — Tailscale, exit node + <code>10.99.0.53/32</code> route</li>
-        </ul>
-      </body>
-    </html>
-  '';
+  # Landing pages. Proof of life on :80, and the tailnet service list that is
+  # COMPILED from `services.servicePortal` below — the public page carries no
+  # cards, because a tailnet URL on an internet-facing page is a map.
+  healthPage = config.services.servicePortal.pages.public;
 in {
   imports = [
     ./hardware-configuration.nix
@@ -87,6 +62,7 @@ in {
     ../../modules/profiles/tailnet-dns-address.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
+    ../../modules/services/service-portal.nix
     ../../modules/services/systemone-decision.nix
   ];
 
@@ -322,6 +298,24 @@ in {
             return 200 "ok";
           '';
         };
+
+        # The tailnet portal: the compiled service list, loopback-only and
+        # reached through `tailscale serve` on 8446. It is a vhost rather than
+        # a `return 200 "…"` so the page keeps its own CSP-free static root and
+        # the mounts stay the only ingress.
+        delphi-portal = {
+          listen = [
+            {
+              addr = "127.0.0.1";
+              port = 8082;
+            }
+          ];
+          root = "${config.services.servicePortal.pages.tailnet}";
+          locations."/" = {
+            index = "index.html";
+            tryFiles = "$uri $uri/ =404";
+          };
+        };
       }
       # HTTPS vhost — inert until `publicDomain` names a record that resolves
       # here. The IP-addressed :80 vhost above stays the default, so
@@ -404,49 +398,61 @@ in {
     MemoryMax = "768M";
   };
 
-  # Tailnet-only HTTPS front for the decision envelope. Same shape as
-  # `tailscale-serve-dsh`: tailscaled terminates TLS, the app stays on loopback,
-  # and nothing about it is reachable from the public vhost.
-  systemd.services.tailscale-serve-pdf = {
-    description = "Tailnet-only HTTPS front for Stirling PDF";
-    after = ["tailscaled.service" "stirling-pdf.service"];
-    wants = ["tailscaled.service" "stirling-pdf.service"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg --https=8445 http://127.0.0.1:7351";
-      ExecStop = "${pkgs.tailscale}/bin/tailscale serve --https=8445 off";
+  # --- Tailnet-only HTTPS mounts, from ONE registry --------------------------
+  # Each mount is a `tailscale serve` https front for a loopback listener; the
+  # portal card is generated from the same declaration, so the service list on
+  # the tailnet page cannot drift from the mounts that exist. Ports are checked
+  # for collisions, upstreams for being loopback, and `requires` for naming a
+  # unit that exists — see `modules/services/service-portal.nix`.
+  services.servicePortal = {
+    enable = true;
+    title = "delphi";
+    subtitle = "OCI Ampere A1 · aarch64-linux · NixOS · tailnet DNS 10.99.0.53";
+    groups = ["Tailnet services"];
+    tailnetHost = tailnetHost;
+    # No `profiles.serviceExposure` here: this host's exposure is the tailnet,
+    # and the mounts below are the whole of it.
+    includeExposure = false;
+    mounts = {
+      dsh = {
+        port = servePort;
+        upstream = "http://127.0.0.1:${toString dshPort}";
+        title = "DeepSeek Harness";
+        description = "Agent loop, bash, model calls and workspaces, in the browser.";
+        requires = ["dsh-web.service"];
+      };
+      systemone = {
+        port = 8444;
+        upstream = "http://127.0.0.1:8091";
+        title = "System One decisions";
+        description = "POST /v1/systemone — the state+questions → answers envelope.";
+        requires = ["systemone-decision-serve.service"];
+      };
+      pdf = {
+        port = 8445;
+        upstream = "http://127.0.0.1:7351";
+        title = "Stirling PDF";
+        description = "PDF merge, split, OCR and conversion. Moved off frieren 2026-10-21; JVM warmup is ~60 s.";
+        requires = ["stirling-pdf.service"];
+      };
+      portal = {
+        port = 8446;
+        upstream = "http://127.0.0.1:8082";
+        title = "Service portal";
+        description = "This page, served only on the tailnet.";
+        requires = ["nginx.service"];
+        # The page lists the mounts; listing its own mount is noise.
+        hideCard = true;
+      };
     };
-  };
-
-  systemd.services.tailscale-serve-systemone = {
-    description = "Tailnet-only HTTPS front for the System One decision envelope";
-    after = ["tailscaled.service" "systemone-decision-serve.service"];
-    wants = ["tailscaled.service" "systemone-decision-serve.service"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg --https=8444 http://127.0.0.1:8091";
-      ExecStop = "${pkgs.tailscale}/bin/tailscale serve --https=8444 off";
-    };
-  };
-
-  # Tailnet-only HTTPS front. tailscaled issues and renews the certificate for
-  # the MagicDNS name, so there is no ACME line, no cert file to own and no
-  # public listener; the mapping is `--bg` (kept in tailscaled state) and this
-  # unit re-asserts it so a config switch cannot leave it stale.
-  systemd.services.tailscale-serve-dsh = {
-    description = "Tailnet-only HTTPS front for the DeepSeek Harness (localhost:${toString dshPort})";
-    after = ["tailscaled.service" "dsh-web.service"];
-    wants = ["tailscaled.service" "dsh-web.service"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg --https=${toString servePort} http://127.0.0.1:${toString dshPort}";
-      ExecStop = "${pkgs.tailscale}/bin/tailscale serve --https=${toString servePort} off";
+    entries.gatus = {
+      title = "Fleet monitors (external vantage)";
+      description = "Gatus checks that watch frieren from outside its LAN, on the tailnet IP.";
+      group = "Tailnet services";
+      audience = "tailnet";
+      external = true;
+      href = "http://100.123.145.53:8181";
+      badge = "100.123.145.53:8181";
     };
   };
 

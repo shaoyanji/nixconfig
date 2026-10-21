@@ -557,9 +557,8 @@ task infra:smtp:auth             # Interactive SMTP auth for hosts (using app pa
 
 ### Site (`docs-site/` retired 2026-10-19; the site is `.#fleet-docs-site`)
 
-Nix-native `lib/aki-site.nix` served by frieren; nav from the knowledge graph, so
-no page list, no Python renderer and no repo copy (`docs/docs-pipeline-audit.md`).
-The publisher site (`dev:site:*`) is separate.
+Nix-native `lib/aki-site.nix` served by frieren, nav from the knowledge graph
+(`docs/docs-pipeline-audit.md`); the publisher site (`dev:site:*`) is separate.
 
 ```bash
 task docs:build   # markdown tree (nix build .#docs)   ·   task docs:site   # rendered site
@@ -884,6 +883,9 @@ allowed beside the first.
   the knowledge graph.
 - **One instantiation.** Build the site once (`.#fleet-docs-site`) and pass the
   path to every vhost/socket; three `import`s with identical args are three evals.
+- **A rendered surface is compiled** [[flake/policies.nix#surfaces-are-compiled]]:
+  one registry emits pages, tailnet mounts and `data/services.json`; a card with
+  no owner, or a mount with no card, fails the host gate.
 - **Publishing must not need a system switch.** If a `.md` edit lands inside a
   host's closure, the docs are as live as the last `nixos-rebuild`.
 - **Eval-time `builtins.readFile` is flake-scoped.** An untracked `.md` does not

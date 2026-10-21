@@ -31,203 +31,121 @@
   # need its proxy edited, and the registry is what the docs site already reads.
   lanIp = name: config.fleet.inventory.hosts.${name}.network.lan_ip;
 
-  landingPage = pkgs.writeTextDir "index.html" ''
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>frieren // Fleet Control & Storage Portal</title>
-      <style>
-        :root {
-          --bg: #0d1117;
-          --card: #161b22;
-          --border: #30363d;
-          --text: #c9d1d9;
-          --accent: #58a6ff;
-          --accent-hover: #79c0ff;
-        }
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-          background-color: var(--bg);
-          color: var(--text);
-          margin: 0;
-          padding: 2.5rem 1.5rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        h1 { margin-bottom: 0.25rem; font-size: 2rem; color: #fff; }
-        p.subtitle { color: #8b949e; margin-top: 0; margin-bottom: 2rem; font-size: 1rem; }
-        .grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.25rem;
-          max-width: 1000px;
-          width: 100%;
-        }
-        .section-title {
-          grid-column: 1 / -1;
-          font-size: 1.15rem;
-          font-weight: 600;
-          color: #8b949e;
-          border-bottom: 1px solid var(--border);
-          padding-bottom: 0.5rem;
-          margin-top: 1rem;
-        }
-        .card {
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          padding: 1.25rem;
-          text-decoration: none;
-          color: inherit;
-          transition: transform 0.15s ease, border-color 0.15s ease;
-          display: flex;
-          flex-direction: column;
-        }
-        .card:hover {
-          transform: translateY(-2px);
-          border-color: var(--accent);
-        }
-        .card-header {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          margin-bottom: 0.5rem;
-        }
-        .card-title {
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: var(--accent);
-        }
-        .card:hover .card-title { color: var(--accent-hover); }
-        .card-desc {
-          font-size: 0.875rem;
-          color: #8b949e;
-          line-height: 1.4;
-        }
-        .badge {
-          display: inline-block;
-          font-size: 0.7rem;
-          padding: 2px 6px;
-          border-radius: 4px;
-          background: #21262d;
-          color: #58a6ff;
-          margin-top: auto;
-          padding-top: 0.5rem;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>frieren</h1>
-      <p class="subtitle">24/7 Primary Fleet NAS & Core Services (192.168.3.25 / 100.97.61.65)</p>
-
-      <div class="grid">
-        <div class="section-title">Storage, Media & Documents</div>
-
-        <a class="card" href="http://photos.frieren.lan">
-          <div class="card-header"><span class="card-title">Immich</span></div>
-          <div class="card-desc">Personal photo & video cloud with facial recognition and semantic AI search.</div>
-          <div class="badge">photos.frieren.lan :2283</div>
-        </a>
-
-        <a class="card" href="http://docs.frieren.lan">
-          <div class="card-header"><span class="card-title">Paperless-ngx</span></div>
-          <div class="card-desc">Document archive, automated OCR indexing, full-text search, and tagging.</div>
-          <div class="badge">docs.frieren.lan :28981</div>
-        </a>
-
-        <a class="card" href="http://media.frieren.lan">
-          <div class="card-header"><span class="card-title">Jellyfin</span></div>
-          <div class="card-desc">Media streaming server for movies, television, audiobooks, and music.</div>
-          <div class="badge">media.frieren.lan :8096</div>
-        </a>
-
-        <a class="card" href="http://audiobooks.frieren.lan">
-          <div class="card-header"><span class="card-title">Audiobookshelf</span></div>
-          <div class="card-desc">Self-hosted audiobook & podcast streamer with playback sync and mobile apps.</div>
-          <div class="badge">audiobooks.frieren.lan :13378</div>
-        </a>
-
-        <a class="card" href="http://pdf.frieren.lan">
-          <div class="card-header"><span class="card-title">Stirling PDF</span></div>
-          <div class="card-desc">Local PDF editing, merging, splitting, OCR, and conversion suite.</div>
-          <div class="badge">pdf.frieren.lan :7351</div>
-        </a>
-
-        <a class="card" href="http://aria.frieren.lan">
-          <div class="card-header"><span class="card-title">AriaNg</span></div>
-          <div class="card-desc">Web frontend for aria2 network RPC download daemon.</div>
-          <div class="badge">aria.frieren.lan :6801</div>
-        </a>
-
-        <a class="card" href="http://torrent.frieren.lan">
-          <div class="card-header"><span class="card-title">Transmission</span></div>
-          <div class="card-desc">Leech-only BitTorrent client for ISOs, datasets and open-access papers.</div>
-          <div class="badge">torrent.frieren.lan :9091</div>
-        </a>
-
-        <a class="card" href="http://wiki.frieren.lan">
-          <div class="card-header"><span class="card-title">Kiwix</span></div>
-          <div class="card-desc">Offline Wikipedia & ArchWiki reader with full-text search.</div>
-          <div class="badge">wiki.frieren.lan :80</div>
-        </a>
-
-        <a class="card" href="http://paste.frieren.lan">
-          <div class="card-header"><span class="card-title">Paste Bin</span></div>
-          <div class="card-desc">LAN paste bin — upload via SSH (`pb` in ~/.local/bin), 30-day expiry.</div>
-          <div class="badge">paste.frieren.lan :80</div>
-        </a>
-
-        <div class="section-title">Operations & Fleet Infrastructure</div>
-
-        <a class="card" href="https://ha.frieren.lan">
-          <div class="card-header"><span class="card-title">Home Assistant</span></div>
-          <div class="card-desc">Home automation hub, Zigbee/ESPHome control, and server battery telemetry.</div>
-          <div class="badge">ha.frieren.lan :443</div>
-        </a>
-
-        <a class="card" href="http://status.frieren.lan">
-          <div class="card-header"><span class="card-title">Uptime Kuma</span></div>
-          <div class="card-desc">Fleet service monitoring, uptime dashboards, and ping health metrics.</div>
-          <div class="badge">status.frieren.lan :3001</div>
-        </a>
-
-        <a class="card" href="http://smart.frieren.lan">
-          <div class="card-header"><span class="card-title">Scrutiny</span></div>
-          <div class="card-desc">Hard drive S.M.A.R.T. monitoring and drive health analysis dashboard.</div>
-          <div class="badge">smart.frieren.lan :8124</div>
-        </a>
-
-        <a class="card" href="http://monitors.frieren.lan">
-          <div class="card-header"><span class="card-title">Fleet Monitors</span></div>
-          <div class="card-desc">Config-declared health checks (gatus) — service, cache and DNS liveness.</div>
-          <div class="badge">monitors.frieren.lan :8181</div>
-        </a>
-
-        <a class="card" href="https://vault.frieren.lan">
-          <div class="card-header"><span class="card-title">Vaultwarden</span></div>
-          <div class="card-desc">Bitwarden-compatible vault for passwords and 2FA TOTP authentication codes.</div>
-          <div class="badge">vault.frieren.lan :443</div>
-        </a>
-
-        <a class="card" href="http://fleet.frieren.lan">
-          <div class="card-header"><span class="card-title">Fleet Control Plane</span></div>
-          <div class="card-desc">Aki hypermedia static documentation, host inventory & Nix closure explorer.</div>
-          <div class="badge">fleet.frieren.lan :80</div>
-        </a>
-
-        <a class="card" href="http://cache.frieren.lan">
-          <div class="card-header"><span class="card-title">Harmonia</span></div>
-          <div class="card-desc">Local LAN Nix binary cache serving signed packages at wire speed.</div>
-          <div class="badge">cache.frieren.lan :5000</div>
-        </a>
-      </div>
-    </body>
-    </html>
-  '';
+  # The page is COMPILED from the service registry in `config`, not written
+  # here: a hand-kept list outlives the services it names (this file still
+  # advertised `pdf.frieren.lan` after Stirling moved to delphi). The
+  # registry lives at the bottom of this file; the asserts in
+  # `modules/services/service-portal.nix` fail the build when a card has no
+  # owner.
+  landingPage = config.services.servicePortal.pages.lan;
 in {
+  imports = [../../modules/services/service-portal.nix];
+
+  # --- Service portal: the page, from the registry ----------------------------
+  # One entry per card. Keys under `exposed` services (immich, paperless, …) are
+  # the `profiles.serviceExposure` keys, so the address and badge come from the
+  # same place the firewall and vhost do; the rest name a vhost this file
+  # serves. A key that matches neither is a card nothing serves, and
+  # `modules/services/service-portal.nix` asserts that at eval.
+  services.servicePortal = {
+    enable = true;
+    title = "frieren";
+    subtitle = "24/7 primary fleet NAS & core services · 192.168.3.25 / 100.97.61.65";
+    groups = [
+      "Storage, Media & Documents"
+      "Operations & Fleet Infrastructure"
+    ];
+    entries = {
+      # --- exposure rows (address derived from profiles.serviceExposure) ------
+      immich = {
+        title = "Immich";
+        description = "Personal photo & video cloud with facial recognition and semantic AI search.";
+        group = "Storage, Media & Documents";
+      };
+      paperless = {
+        title = "Paperless-ngx";
+        description = "Document archive, automated OCR indexing, full-text search, and tagging.";
+        group = "Storage, Media & Documents";
+      };
+      jellyfin = {
+        title = "Jellyfin";
+        description = "Media streaming server for movies, television, audiobooks, and music.";
+        group = "Storage, Media & Documents";
+      };
+      ariang = {
+        title = "AriaNg";
+        description = "Web frontend for the aria2 network RPC download daemon.";
+        group = "Storage, Media & Documents";
+      };
+      kiwix = {
+        title = "Kiwix";
+        description = "Offline Wikipedia & ArchWiki reader with full-text search.";
+        group = "Storage, Media & Documents";
+      };
+      home-assistant = {
+        title = "Home Assistant";
+        description = "Home automation hub, Zigbee/ESPHome control, and server battery telemetry.";
+        group = "Operations & Fleet Infrastructure";
+        scheme = "https";
+      };
+      uptime-kuma = {
+        title = "Uptime Kuma";
+        description = "Fleet service monitoring, uptime dashboards, and ping health metrics.";
+        group = "Operations & Fleet Infrastructure";
+      };
+      scrutiny = {
+        title = "Scrutiny";
+        description = "Hard drive S.M.A.R.T. monitoring and drive health analysis dashboard.";
+        group = "Operations & Fleet Infrastructure";
+      };
+      harmonia = {
+        title = "Harmonia";
+        description = "Local LAN Nix binary cache, serving signed packages at wire speed.";
+        group = "Operations & Fleet Infrastructure";
+      };
+
+      # --- vhosts this file serves, outside the exposure registry -------------
+      audiobookshelf = {
+        title = "Audiobookshelf";
+        description = "Self-hosted audiobook & podcast streamer with playback sync and mobile apps.";
+        group = "Storage, Media & Documents";
+        vhost = "audiobooks.frieren.lan";
+      };
+      transmission = {
+        title = "Transmission";
+        description = "Leech-only BitTorrent client for ISOs, datasets and open-access papers.";
+        group = "Storage, Media & Documents";
+        vhost = "torrent.frieren.lan";
+      };
+      paste = {
+        title = "Paste Bin";
+        description = "LAN paste bin — upload over SSH with `pb`, 30-day expiry.";
+        group = "Storage, Media & Documents";
+        vhost = "frieren.lan";
+        href = "http://paste.frieren.lan";
+      };
+      vaultwarden = {
+        title = "Vaultwarden";
+        description = "Bitwarden-compatible vault for passwords and 2FA TOTP codes.";
+        group = "Operations & Fleet Infrastructure";
+        vhost = "vault.frieren.lan";
+        href = "https://vault.frieren.lan";
+      };
+      fleet = {
+        title = "Fleet Control Plane";
+        description = "Aki hypermedia docs, host inventory & Nix closure explorer.";
+        group = "Operations & Fleet Infrastructure";
+        vhost = "fleet.frieren.lan";
+      };
+      monitors = {
+        title = "Fleet Monitors";
+        description = "Config-declared health checks (gatus) — service, cache and DNS liveness.";
+        group = "Operations & Fleet Infrastructure";
+        vhost = "monitors.frieren.lan";
+      };
+    };
+  };
+
   services.nginx = {
     enable = true;
     recommendedOptimisation = true;

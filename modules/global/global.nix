@@ -8,7 +8,8 @@
   hostName = config.networking.hostName or (config.hostName or "");
   hostMeta = config.fleet.inventory.hosts.${hostName} or {};
   isCloudHost =
-    (hostMeta.category or "") == "cloud"
+    (hostMeta.category or "")
+    == "cloud"
     || hostName == "delphi"
     || hostName == "garnixMachine";
 

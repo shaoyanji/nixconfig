@@ -1,8 +1,4 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   # --- Networking tools ---
   environment.systemPackages = with pkgs; [
     docker

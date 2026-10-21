@@ -369,6 +369,15 @@ terminates TLS, so there is no certificate to own per service.
 | 8443 | DeepSeek Harness | `tailscale-serve-dsh` | `127.0.0.1:3080` |
 | 8444 | System One decisions (`/v1/systemone`) | `tailscale-serve-systemone` | `127.0.0.1:8091` |
 | 8445 | Stirling PDF | `tailscale-serve-pdf` | `127.0.0.1:7351` |
+| 8446 | Service portal (the list below, as a page) | `tailscale-serve-portal` | `127.0.0.1:8082` |
+
+Both the mounts and the portal are compiled from `services.servicePortal` in
+`hosts/delphi/configuration.nix`: add a mount and its card appears, remove one and
+the card goes. Nothing on this page is hand-written — `data/services.json`
+carries the same list for a TUI or a probe, and the asserts in
+`modules/services/service-portal.nix` fail the build when a mount has no card, a
+card has no owner, two mounts share a port, an upstream is not loopback, or a
+`requires` names a unit that does not exist.
 
 A port is the mount, not a path: `tailscale serve` proxies a whole origin, so a
 new service takes the next free number rather than a location under an existing

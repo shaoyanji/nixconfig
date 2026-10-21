@@ -216,24 +216,15 @@ tasks:
   infra:apply:host:*:
     desc: Activate ONE active host by pulling its closure from the LAN cache
     summary: >
-      The fast unattended deploy path: the TARGET pulls the closure from harmonia
-      over HTTP (parallel, resumable) and switches itself, instead of the caller
-      pushing it over ssh with `nixos-rebuild --target-host`. Measured
-      2026-10-15: ~130-150 paths/min pulling vs 18 paths/min pushing — the
-      difference between a couple of minutes and ~30 for a full delta.
-      Preconditions are checked, not assumed: the host must be ACTIVE in
-      inventory.toml and the closure must already be servable by the cache (warm
-      it on the builder with infra:warm:cache HOSTS=<host>). The gate fails loudly
-      rather than letting the switch quietly compile on the target.
-      No ssh prompt is ever opened — BatchMode + ConnectTimeout, and activation
-      runs detached in a transient systemd unit, so a long transfer cannot be
-      killed by a dropped connection. INTENDED FOR ONE HOST; the fleet is
-      infra:apply:fleet on a schedule.
-      A PRESERVED host is a WARNING and a no-op (exit 0): no eval, cache query
-      or ssh happens, because a dormant config may be known-broken and is not
-      part of the deploy surface. Reviving one is explicit — ALLOW_PRESERVED=1.
-      Vars: TARGET= (default <host>), CACHE= (default: inventory metadata or the
-      fleet harmonia address).
+      The fast unattended deploy: the TARGET pulls the closure from harmonia over
+      HTTP and switches itself. Preconditions are checked, not assumed: the host
+      must be ACTIVE in inventory.toml and the closure already servable by the cache
+      (`infra:warm:cache HOSTS=<h>`), else the gate fails instead of compiling on
+      the target. No ssh prompt (BatchMode + ConnectTimeout); activation runs
+      detached in a transient unit. ONE HOST; the fleet is `infra:apply:fleet`.
+
+      A PRESERVED host is a warning and exit 0 — no eval, no cache query, no ssh
+      (ALLOW_PRESERVED=1 revives). Vars: TARGET= (default: <host>), CACHE=.
     vars:
       HOST: '{{index .MATCH 0}}'
       TARGET: '{{.TARGET | default .HOST}}'
@@ -276,16 +267,16 @@ tasks:
   infra:warm:host:*:
     desc: Make one host's closure substitutable — builds on the builder, verifies the cache serves it
     summary: >
-      Run this ON THE BUILDER (inventory.toml metadata.builder_host, else frieren).
-      It builds <host>'s closure from the LOCAL tree — so uncommitted edits are
-      covered, which neither CI (pushed branch) nor the weekly fleet-warm-cache
-      (github: ref) can do — then verifies the LAN cache actually serves the
-      result. On any other host it refuses and prints the right command rather
-      than compiling on a machine that cannot afford it. Performs no ssh: the
-      verification is one bounded HTTP request, so it cannot hang on an
-      interactive auth prompt.
-      Env: CACHE=<url> checks a different substituter, NO_VERIFY=1 skips the check.
-      Exit 1 = derivations remain (a switch would compile them locally).
+      Run this ON THE BUILDER (inventory metadata.builder_host, else frieren). It
+      builds <host>'s closure from the LOCAL tree — so uncommitted edits are
+      covered, which neither CI (pushed branch) nor fleet-warm-cache (github: ref)
+      can do — then verifies the LAN cache actually serves the result. On any other
+      host it refuses and prints the right command instead of compiling where that
+      is not affordable.
+
+      No ssh: the verification is one bounded HTTP request, so it cannot hang on an
+      auth prompt. Env: CACHE=<url>, NO_VERIFY=1. Exit 1 = derivations remain (a
+      switch would compile them locally).
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
@@ -399,31 +390,15 @@ tasks:
   infra:deploy:host:*:
     desc: Deploy ONE intended host — gate, activate from the cache, then validate
     summary: >
-      The intended deploy path for a single host, and deliberately not fleet-wide:
-      fleet builds belong on the schedule (`fleet-warm-cache`), a fleet push is
-      `infra:apply:fleet`, and a host needed NOW gets this.
+      The intended single-host deploy: routing gate → pull from the cache → switch →
+      `services:validate`. Not fleet-wide (fleet builds are scheduled;
+      `infra:apply:fleet` pushes). The gate runs first and read-only, so a closure
+      that is not yet servable fails the deploy instead of becoming a 30-minute
+      compile; the toplevel is resolved once, and activate-host re-gates it.
 
-      Order matters and is the whole point: the build-routing gate runs first
-      (`checks:build:route`, read-only, cache-based, no ssh) so a closure that is
-      not yet servable fails the deploy instead of silently turning into a
-      30-minute compile. Then the target pulls the closure from the cache and
-      switches (see infra:apply:host:*), and finally `services:validate` proves the
-      host came up.
-
-      Note on hashes: the warmed closure must match the tree being deployed. A
-      commit changes the flake source hash and therefore the toplevel, so commit
-      first, then warm, then deploy — otherwise the cache serves a stale path.
-      The toplevel is resolved ONCE: the gate prints it with --emit-path and
-      activate-host.sh receives it as TOP=, so the deploy does not evaluate
-      `.#nixosConfigurations.<host>` twice (two whole-toplevel evals, tens of
-      seconds each under swap). activate-host still gates that path against the
-      cache, so reusing it cannot smuggle in a stale closure.
-      PRESERVED HOSTS ARE A WARNING, NOT A JOB: inventory status != "active"
-      prints why and exits 0 before any eval, cache query, ssh or validate.
-      A preserved host is not part of the deploy surface, and checking one
-      reports its known-broken config as if this run broke it. Reviving one is
-      explicit: `ALLOW_PRESERVED=1 task infra:apply:host:<host>`.
-      Vars: TARGET= (default <host>), CACHE=, ACTION= (switch|boot).
+      Commit before warming (a new commit changes the toplevel). A PRESERVED host
+      prints why and exits 0 before any eval or ssh (ALLOW_PRESERVED=1). Vars:
+      TARGET=, CACHE=, ACTION=switch|boot. Exit 0 = validated.
     vars:
       HOST: '{{index .MATCH 0}}'
       TARGET: '{{.TARGET | default .HOST}}'

@@ -12,7 +12,7 @@ Machine-enforced where possible:
 | Skill frontmatter, description length, body budget | `lib/skills.nix` → `checks.<system>.skills-schema` |
 | Every tracked `.toml` parses | `task checks:toml:lint` |
 | Generated docs are never committed | `.gitignore` + review — `.#docs` is a store path (`docs/docs-pipeline-audit.md`) |
-| Task graph (duplicate keys, dangling refs) | `task checks:tasks` |
+| Task graph (duplicate keys, dangling refs, include cycles, name parity) | `task checks:tasks` |
 | AGENTS.nix notes: status vocabulary, resolvable refs, leaf intent | `lib/agents-notes.nix` → `checks.<system>.agents-notes-schema` |
 | Everything else here | review; `task ops:docs:budget` prints the counts |
 

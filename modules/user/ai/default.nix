@@ -46,6 +46,7 @@ in {
     ./antigravity-cli.nix
     ./skills
     ./freebuff-remote.nix
+    ./dsh-launcher.nix
     ./mainframe-remotes.nix
     ./zed-mcp.nix
     # ./opencode.nix

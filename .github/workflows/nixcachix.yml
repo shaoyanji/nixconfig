@@ -37,6 +37,28 @@ jobs:
         continue-on-error: true
         run: bash scripts/task/sops-drift-check.sh --repo-only
 
+  # Doc-only changes allocate zero build runners (the detector ignores *.md),
+  # so without this job a runaway living document lands green. The gate is
+  # `checks.<system>.docs-budget`: line counts for AGENTS.md / MANUAL.md /
+  # AUDIT.md and the four root stubs (SCHEMA.md §2), evaluated at eval time and
+  # building a three-line artifact. It runs on every push, doc-only included.
+  docs-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+      - name: Sync repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+          token: "${{ secrets.GH_PAT }}"
+      - name: Living documents within budget
+        run: nix build -L .?submodules=1#checks.x86_64-linux.docs-budget
+
   plan:
     runs-on: ubuntu-latest
     outputs:

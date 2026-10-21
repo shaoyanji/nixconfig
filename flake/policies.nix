@@ -285,6 +285,15 @@
       detail = "the workflow stopped building hostChecks, lost ?submodules=1, or dropped pipe-operators";
     };
 
+    ci-doc-budget = {
+      rule = "A doc-only change still runs the living-document budget, so a runaway manual cannot land green on a push that allocated no build runner.";
+      proof = ".github/workflows/nixcachix.yml (the `docs-budget` job builds `checks.<system>.docs-budget`)";
+      holds =
+        has ".github/workflows/nixcachix.yml" "docs-budget:"
+        && has ".github/workflows/nixcachix.yml" "checks.x86_64-linux.docs-budget";
+      detail = "the workflow lost the docs-budget job; doc-only pushes now allocate nothing and gate nothing";
+    };
+
     taxonomy-one-home = {
       rule = "The `/srv/data` layout has one home (`docs/storage-taxonomy.md`); the manual links to it instead of carrying a second table.";
       proof = "docs/storage-taxonomy.md exists, and AGENTS.md has no `/srv/data` layout table";
@@ -335,7 +344,11 @@
     task-surface-visible = {
       rule = "No task is hidden with `internal: true`: it disappears from `task --list-all --json` too.";
       proof = "taskfiles/*.yml";
-      holds = lib.all (f: !(has f "internal: true")) taskfiles;
+      # A YAML KEY, not the phrase: `task checks:tasks`' own summary names the
+      # rule (`internal: true` is banned), and a substring match made the gate
+      # fail on its own documentation. Matched at field indent so a `desc:` or a
+      # `#` comment may talk about it freely.
+      holds = lib.all (f: !(anyLine f (l: builtins.match " +internal:[[:space:]]*true[[:space:]]*(#.*)?" l != null))) taskfiles;
       detail = "a taskfile marks a task internal";
     };
 

@@ -7,6 +7,7 @@
   skillsCtl,
   agentsNotesCtl,
   policiesCtl,
+  taskfileCtl,
 }:
 # CHEAP CHECKS ONLY — `checks.<system>` MUST NOT force a host configuration.
 #
@@ -233,6 +234,104 @@ lib.genAttrs systems.default (
             touch $out
           '';
 
+      # --- the task graph is data, and a gate mints it ----------------------
+      # lib/taskfile.nix parses Taskfile.yml + the include graph. What it cannot
+      # prove is that go-task agrees with the parse — that is
+      # `checks:taskfile:graph` (scripts/task/taskfile-graph.sh), which compares
+      # this name set against `task --list-all --json`. This check is the half
+      # that needs no `task` binary, so it runs in CI and on a keyless box.
+      #
+      # The derivation NAME carries the graph digest, so the artifact is
+      # addressable as a version: `nix build .#checks.x86_64-linux.taskfile-graph`
+      # mints one, and a kept path is a graph you can diff or fail back to.
+      taskfile-graph =
+        if taskfileCtl.gateFailures != []
+        then
+          builtins.throw ''
+            the task graph violates a hard rule (lib/taskfile.nix):
+              ${lib.concatStringsSep "\n  " taskfileCtl.gateFailures}
+
+            Hard buckets: ${lib.concatStringsSep ", " taskfileCtl.gateBuckets}
+            Advisory buckets (reported, never fatal): ${lib.concatStringsSep ", " (
+              builtins.filter (k: !(builtins.elem k taskfileCtl.gateBuckets)) (builtins.attrNames taskfileCtl.violations)
+            )}.
+          ''
+        else let
+          report = builtins.toJSON {
+            inherit (taskfileCtl) version proseVersion files names includes violations descBudget summaryBudget;
+            tasks = builtins.length taskfileCtl.parsed;
+            # The prose surface verbatim, not just findings *about* prose: a
+            # wording edit has no address in `version` (it is the execution
+            # surface on purpose), so the artifact carries what the summaries
+            # actually said. An old build can then be diffed against the new one.
+            prose = taskfileCtl.proseSurface;
+          };
+        in
+          # Both digests in the name: `<version>` is what executes, `p<digest>` is
+          # what an agent reads. Identical execution + edited prose is two paths,
+          # and the prefix says so before you open either.
+          pkgs.runCommand "taskfile-graph-${taskfileCtl.version}-p${taskfileCtl.proseVersion}" {} ''
+            mkdir -p $out
+            cp ${pkgs.writeText "taskfile-graph.json" report} $out/graph.json
+            printf '%s\n' '${taskfileCtl.version}' > $out/version
+            printf '%s\n' '${taskfileCtl.proseVersion}' > $out/prose
+            echo "task graph ${taskfileCtl.version} (prose ${taskfileCtl.proseVersion}): ${toString (builtins.length taskfileCtl.parsed)} tasks in ${toString (builtins.length taskfileCtl.files)} files, ${toString (builtins.length taskfileCtl.includes)} include edges"
+            echo "advisory: ${toString (builtins.length taskfileCtl.violations.longSummary)} summaries over ${toString taskfileCtl.summaryBudget} chars, ${toString (builtins.length taskfileCtl.violations.proseRef)} unresolved prose mentions, ${toString (builtins.length taskfileCtl.violations.exitUnverified)} exit claims unverifiable"
+          '';
+
+      # A gate that has only ever run on a clean tree is a gate nobody knows the
+      # shape of. The fixture violates every hard bucket exactly once, and names
+      # its expected verdicts here, so a bucket that stops firing (or starts
+      # firing on prose) fails this check instead of drifting silently.
+      taskfile-graph-selftest = let
+        fixture = import ../lib/taskfile.nix {
+          inherit lib;
+          root = ../tests/taskfile-graph;
+        };
+        expect = {
+          duplicate = ["dup"];
+          orphanShard = ["orphan.yml"];
+          unflattened = ["Taskfile.yml: loose -> taskfiles/loose.yml"];
+          missingInclude = ["Taskfile.yml: gone -> taskfiles/typo.yml"];
+          includeCycle = ["taskfiles/cycle.yml: root -> Taskfile.yml"];
+          internal = ["Taskfile.yml:hidden"];
+          danglingRef = ["Taskfile.yml:broken -> ghost:run"];
+          wildcardArity = ["Taskfile.yml:wild has 0 '*' but 1 MATCH refs [0]"];
+          proseRef = ["Taskfile.yml:prose -> nowhere:real"];
+          noDesc = ["Taskfile.yml:bare"];
+          longSummary = ["Taskfile.yml:longsum (${toString (builtins.stringLength fixture.byName.longsum.summary)})"];
+          longDesc = ["Taskfile.yml:longdesc (${toString (builtins.stringLength fixture.byName.longdesc.desc)})"];
+          # Deliberately empty: these tasks are well-formed, the flags task
+          # (`task --list-all`) is a flag, not a dangling reference, and the
+          # fixture's `desc`-only / `summary`-only tasks are legal shapes.
+          nameGrammar = [];
+          sourcesWithoutWatch = [];
+          retiredRef = [];
+          # `badexit` promises 7 against a script that only exits 3; `badexit-missing`
+          # promises 1 and names a script the tree does not have, which is a
+          # report, not drift.
+          exitDrift = ["Taskfile.yml:badexit claims exit 7; emits [3]"];
+          exitUnverified = ["Taskfile.yml:badexit-missing claims exit 1 but scripts/task/not-here.sh is not in the tree"];
+        };
+        sorted = builtins.sort builtins.lessThan;
+        keySet = builtins.sort builtins.lessThan (builtins.attrNames fixture.violations);
+        expectedKeys = builtins.sort builtins.lessThan (builtins.attrNames expect);
+        mismatched = builtins.filter (k: sorted fixture.violations.${k} != sorted expect.${k}) (builtins.attrNames expect);
+        detail = lib.concatMapStrings (k: "\n  ${k}\n    expected: ${builtins.toJSON (sorted expect.${k})}\n    actual:   ${builtins.toJSON (sorted fixture.violations.${k})}") mismatched;
+      in
+        if mismatched != [] || keySet != expectedKeys
+        then
+          builtins.throw ''
+            tests/taskfile-graph asserts the task-graph buckets and disagrees:
+              ${lib.concatStringsSep "\n  " (lib.optionals (keySet != expectedKeys) ["bucket set changed: expected ${builtins.toJSON expectedKeys}, got ${builtins.toJSON keySet}"])}${detail}
+            Fix the detector or update the fixture's expectations in flake/checks.nix.
+          ''
+        else
+          pkgs.runCommand "taskfile-graph-selftest" {} ''
+            echo "fixture verdicts match: ${toString (builtins.length expectedKeys)} buckets, ${toString (builtins.length fixture.parsed)} tasks, ${toString (builtins.length (builtins.concatLists (builtins.attrValues expect)))} expected findings"
+            touch $out
+          '';
+
       # --- the site's JS is code, not a Nix literal -------------------------
       # lib/aki-site.nix used to carry ~800 lines of browser JS inside `''`
       # strings, where a syntax error was either a Nix parse error or invisible.
@@ -250,69 +349,16 @@ lib.genAttrs systems.default (
         '';
 
       # --- living documents have budgets (SCHEMA.md §2) ---------------------
-      # Pure eval: counts lines of tracked files, builds nothing, needs no
-      # host. This is the flake-hook half of `task ops:docs:budget`; the task
-      # is the human view, this is the gate CI can run on a doc-only change.
-      docs-budget = let
-        root = ./..;
-        # `wc -l` semantics: the trailing newline does not start a line. Counting
-        # the split as-is made this gate disagree with `task ops:docs:budget` by
-        # exactly one line, so a document exactly at its budget failed the flake
-        # check while passing the task.
-        lines = f: lib.splitString "\n" (lib.removeSuffix "\n" (builtins.readFile (root + "/${f}")));
-        count = f: builtins.length (lines f);
-        # A queue is judged by what is still OPEN, not by how much it has already
-        # done — the checked items are the record that the work happened, and
-        # deleting them to make room would erase exactly that record. So TODO.md
-        # carries two counters: 150 open items, 300 lines in total.
-        queue = f: let
-          ls = lines f;
-        in {
-          open = builtins.length (builtins.filter (l: lib.hasPrefix "- [ ]" l) ls);
-          total = builtins.length ls;
-        };
-        limits = {
-          "AGENTS.md" = 1200;
-          "MANUAL.md" = 1200;
-          "AUDIT.md" = 150;
-        };
-        # ARCHITECTURE.md, TODO.md, HANDOFF.md and EXPERIMENTS.md moved to
-        # AGENTS.nix (2026-10-19). They exist only as one-screen pointers into it;
-        # content creeping back into a stub is the regression this catches.
-        stubs = ["ARCHITECTURE.md" "TODO.md" "HANDOFF.md" "EXPERIMENTS.md"];
-        badStubs =
-          lib.filter
-          (f: count f > 10 || !(lib.hasInfix "AGENTS.nix" (builtins.readFile (root + "/${f}"))))
-          stubs;
-        queueLimits = {};
-        over =
-          lib.filter (name: count name > limits.${name})
-          (builtins.attrNames limits);
-        overQueues = lib.filter (
-          name: let
-            q = queue name;
-          in
-            q.open > queueLimits.${name}.open || q.total > queueLimits.${name}.total
-        ) (builtins.attrNames queueLimits);
-        queueReport = name: let
-          q = queue name;
-        in "${name}: ${toString q.open}/${toString queueLimits.${name}.open} open, ${toString q.total}/${toString queueLimits.${name}.total} total";
-      in
-        if over != [] || overQueues != [] || badStubs != []
-        then
-          builtins.throw ''
-            living documents exceed their SCHEMA.md budget:
-              ${lib.concatStringsSep "\n  " (map (n: "${n}: ${toString (count n)} > ${toString limits.${n}}") over)}
-              ${lib.concatStringsSep "\n  " (map queueReport overQueues)}
-              ${lib.concatStringsSep "\n  " (map (f: "${f}: must stay a <=10-line pointer to AGENTS.nix") badStubs)}
-            Move detail to docs/ and leave a pointer; do not raise the budget.
-            Narrative work belongs in AGENTS.nix (query with `task ops:notes`).
-          ''
-        else
-          pkgs.runCommand "docs-budget" {} ''
-            echo "living documents within budget: ${toString (builtins.length (builtins.attrNames limits))} + ${toString (builtins.length (builtins.attrNames queueLimits))} queue"
-            echo "${lib.concatStringsSep "; " (map queueReport (builtins.attrNames queueLimits))}"
-            touch $out
-          '';
+      # One implementation: scripts/task/docs-budget.sh, the same script
+      # `task ops:docs:budget` runs and the same gate the CI `docs-budget` job
+      # builds on every push. The budgets used to live here *and* in the task,
+      # and they disagreed by one line (`wc -l` vs a split); running the script
+      # over the flake source removes the second copy, so a document exactly at
+      # its budget cannot pass one surface and fail the other.
+      docs-budget = pkgs.runCommand "docs-budget" {} ''
+        cd ${../.}
+        bash scripts/task/docs-budget.sh
+        touch $out
+      '';
     }
 )

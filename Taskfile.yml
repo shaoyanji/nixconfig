@@ -128,7 +128,7 @@ tasks:
 
               WHAT NEEDS DOING (cheap, read-only, no config evaluated)
                 task status                    git state + hostname                     free
-                task checks:tasks              task graph: dup keys, dangling refs      free
+                task checks:tasks              task graph: Nix-compiled + parity        ~1s
                 task checks:build:route        would THIS host have to compile?         HTTP only
                 task checks:ports              declarations vs live listeners           free, local
                 task checks:dns:failover       resolver group answers + can fail over    LAN probes
@@ -284,8 +284,15 @@ tasks:
         cmds:
             - task dev:modules:menu
 
+    # No `internal: true` (AGENTS.md): it hides a task from `--list-all --json`
+    # too, i.e. from the agent/MCP surface. No `desc` either, so it stays out of
+    # the human `task --list` menu (§ "keep tasks visible to agents" in
+    # docs/task-control-plane.md) — but it keeps a `summary`, so the JSON surface
+    # still says what it does. Neither would make it invisible twice.
     exit:
-        internal: true
+        summary: >
+            Exits the task shell (a no-op convenience for menus); no `desc` on purpose so
+            `task --list` stays free of it.
         cmds:
             - exit
         silent: true

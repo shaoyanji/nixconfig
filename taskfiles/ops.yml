@@ -140,30 +140,13 @@ tasks:
     desc: Manage or query the in-memory Elixir reactive Knowledge Graph sidecar
     summary: >
       Controls the in-memory ETS graph sidecar on unix:$XDG_RUNTIME_DIR/kg.sock.
-      Commands: start, stop, restart, status (default), node ID=<node>,
-      neighbors ID=<node> [DEPTH=N], blast-radius ID=<node>, search Q=<term>.
-      The graph is the COMPILED projection (lib/knowledge-graph.nix), resolved
-      and cached by lib/kg-graph.sh: the socket and the jq surface cannot
-      disagree. `--native` asks the engine for its own builder instead — that is
-      the parity experiment `checks:kg:native` measures, not the query path;
-      when the projection widened to 35 docs the native builder kept serving the
-      old 22 and quietly answered short.
-      Interpreter: `elixir` from PATH (the repo's devshell / `.envrc`), else the
-      store, else a one-off substitution of nixpkgs#beamPackages.elixir — never a
-      remote build.
-      `start` waits until the daemon answers (exit 1 if not); `stop` waits for it
-      to exit. Queries auto-start it. Arguments are percent-encoded and quoted at
-      the task layer, so Q="two words" stays one term — it used to reach the
-      engine as "two" with exit 0.
-      Engine errors carry real HTTP status: 400 missing param, 404 unknown node,
-      so a typo is not an empty answer.
-      Latency, measured 2026-10-19 on this host and stated honestly: 58 us
-      server-side warm; 36-50 ms per query through the script (process + curl);
-      114-125 ms end-to-end through `task`, almost all of it task's own startup.
-      For comparison the jq surface is ~113 ms on a clean tree (graph cached by
-      revision) and ~530 ms on a dirty one (cache deliberately bypassed), so the
-      sidecar's real win is repeated queries and the multi-hop verbs nix has no
-      equivalent for - not a single one-shot lookup.
+      Commands: start, stop, restart, status (default), node ID=, neighbors ID=
+      [DEPTH=], blast-radius ID=, search Q=. The graph is the COMPILED projection
+      (lib/kg-graph.sh caches it), so the socket and jq cannot disagree; `--native`
+      asks for the engine's own builder, which is `checks:kg:native`'s experiment,
+      not the query path. Queries auto-start it; `start` waits for readiness. Q="two
+      words" stays one term; errors carry real status (400/404), so a typo is not an
+      empty answer.
     cmds:
       - 'bash scripts/task/kg-sidecar.sh "{{.CMD | default "status"}}" "{{.ID | default .Q | default ""}}" "{{.DEPTH | default ""}}"'
 
@@ -317,44 +300,16 @@ tasks:
   ops:ask:
     desc: Ask the knowledge graph a question in English (Q=)
     summary: >
-      `scripts/task/kg-ask.sh` — the semantic front door to `.#knowledgeGraph`.
-      Q= is the question; FORMAT=json returns the machine-readable record
-      (intent, subject, results, model hint). The graph is read from
-      `~/.cache/nixconfig/kg-<rev>.json` when the tree is clean, so a repeated
-      question costs jq (~5 ms) and only the first one after a revision pays the
-      eval. A dirty tree always re-evaluates, because the graph is compiled from
-      the working tree and a stale answer is worse than a slow one.
-      ROUTING IS DETERMINISTIC AND OFFLINE — no model, no network, no key.
-      Two deterministic steps, then honesty:
-        1. keyword rules ("mention" -> SKILL_CONTEXT, "touch" -> HOST_CONTEXT);
-        2. when NO rule matched but the question NAMES A NODE, return that node's
-           whole CONTEXT BUNDLE (mentions + related hosts + tags) instead of
-           guessing which of six relations was meant. `route=bundle` records it,
-           `related` holds the neighbours;
-        3. otherwise intent=UNKNOWN and `note` lists the six patterns as a menu.
-      Measured 2026-10-19 with `ops:bench:kg`: rules+bundle 14/14 on rule-shaped
-      questions (independent labels) and 10/10 on paraphrases at 0 ms, against
-      hosted Jev 13/14 and 9/10 at ~330 ms and the in-repo hash engine 5/14 and
-      1/10. The paraphrase 10/10 is PARTLY CIRCULAR — 4 of those answers are the
-      bundle, and their gold encodes the same node-kind -> relation policy, which
-      the bench prints beside the score. The bundle replaced a model call at
-      step 2 for reasons that do not depend on that: it returns a superset and
-      cannot mis-pick a relation, needs no key, and costs 0 ms.
-      Its blind spot is measured, not asserted: on questions that name NO node
-      (`ops:bench:kg --set unnamed`) the rules score 4/9 against Jev 7/9, because
-      the bundle resolves a NAME and has nothing to resolve here. The rules' five
-      misses are UNKNOWN — a decline a caller can see and re-ask around — while
-      Jev's two are confident wrong intents (one marked an off-topic question
-      DOC_CONTEXT), which is the failure a caller cannot detect.
-      KG_DECIDE_ALWAYS=1 (plus KG_DECIDE_URL/KG_DECIDE_TOKEN, see ops:ask:jev)
-      opts back into the model as an agreement check, recorded as `agreed` /
-      `keyword+disagree`. Route `model` no longer occurs on the default path.
-      Questions it answers: "what touches frieren", "which docs mention qmd",
-      "skills tagged nix", "what is related to frieren", "what does
-      docs/x.md mention", "graph stats" — and, via the bundle, paraphrases like
-      "what should I read before touching minyx" and "tell me about fern".
-      Use qmd for prose, this for structure. Prefer the explicit ops:kg:* pattern
-      tasks when you already know which question you are asking.
+      scripts/task/kg-ask.sh — front door to `.#knowledgeGraph`. Q= is the question.
+      Clean tree: cached per revision; dirty tree: re-evaluates, because a stale
+      answer is worse than a slow one.
+
+      ROUTING IS DETERMINISTIC AND OFFLINE: keyword rules; else, if the question
+      names a node, return that node's context bundle (route=bundle, `related` =
+      neighbours); else intent=UNKNOWN listing the six patterns. Naming no node is
+      the blind spot: UNKNOWN, a visible decline rather than a confident guess.
+      KG_DECIDE_ALWAYS=1 adds a model as a check (`ops:ask:jev`); scores and
+      caveats: `ops:bench:kg`.
     requires:
       vars: [Q]
     cmds:
@@ -368,18 +323,16 @@ tasks:
   ops:ask:jev:
     desc: ops:ask plus the hosted-Jev agreement check (key from sops, never echoed)
     summary: >
-      Same query as ops:ask with KG_DECIDE_ALWAYS=1 and KG_DECIDE_URL/
-      KG_DECIDE_TOKEN set, so the Jev-compatible HTTP path is exercised: hosted
-      Jev, or the eisen router (point KG_DECIDE_URL at
-      `http://eisen:8000/v1/decisions` and it forwards to Jev with a local
-      Laya/Kev-4B fallback). The key is read from sops into a variable
-      in-process and is never printed — no `set -x`, no header dump.
-      This is a CHECK, not the answer: the model is consulted only when a keyword
-      rule already answered, and only to record agreement (`route: agreed`) or
-      disagreement (`keyword+disagree`). A bundle or unmatched question makes NO
-      call — there is no single relation to agree with — so `model.consulted`
-      stays false and the name is `none`. Without this task, routing is fully
-      offline: `ops:ask` never touches the network.
+      Same query as ops:ask with KG_DECIDE_ALWAYS=1, so the Jev-compatible HTTP path
+      is exercised: hosted Jev, or the eisen router (point KG_DECIDE_URL at
+      `http://eisen:8000/v1/decisions`; it forwards to Jev with a local fallback).
+      The sops key stays in-process and is never printed (no `set -x`, no header
+      dump).
+
+      A CHECK, not the answer: the model is consulted only when a keyword rule
+      already answered, to record `agreed` / `keyword+disagree`. A bundle or
+      unmatched question makes NO call, so `model.consulted` stays false. Without
+      this task routing is fully offline: `ops:ask` never touches the network.
     requires:
       vars: [Q]
     cmds:
@@ -400,34 +353,14 @@ tasks:
   ops:bench:kg:
     desc: Bench the graph-intent router across models (keyword / in-repo / Jev)
     summary: >
-      scripts/task/kg-bench.sh — 10-14 labelled questions scored on intent (and
-      subject, for runners that attempt it). Runners: `keyword` (rules + the
-      bundle fallback in kg-ask.sh), `heuristic` (the in-repo systemone-decision
-      engine), `jev` (hosted Jev, key from sops, skipped without one) and
-      `decide` (any endpoint in KG_DECIDE_URL, e.g. the eisen router).
-      VERBOSE=1 prints per-question rows. SET=rule|paraphrase|unnamed|both picks
-      the labelled set: `rule` is phrased in the vocabulary the rules encode and
-      therefore flatters the deterministic router; `paraphrase` asks the same
-      questions without it, which is where a model is supposed to win; `unnamed`
-      asks for a relation without naming its subject — the bundle's blind spot,
-      since it resolves a name. `both` is rule+paraphrase only: a score that
-      merged questions the bundle can answer with ones it cannot would hide the
-      one difference that matters.
-      A routing census follows the scores, because a scorer sees only the intent
-      and a fallback that silently answered the whole set would look identical
-      to the rules working.
-      Measured 2026-10-19: rules+bundle 14/14 rule / 10/10 paraphrase at 0 ms and
-      offline, Jev 13/14 (12/14 on a re-run) / 9/10 at ~330 ms, in-repo
-      heuristic 5/14 / 1/10. Of the keyword runner's paraphrase matches, four are
-      flagged as bundle answers, and the summary says so on its own line: their
-      gold was written from the same node-kind -> relation policy, so they are
-      coverage rather than independent accuracy. Cite the rule-set number when
-      you need evidence that does not grade itself. On the `unnamed` set the
-      rules are 4/9 against Jev 7/9, and the misses differ in kind: UNKNOWN for
-      the rules (visible decline) versus confident wrong intents for Jev. This is
-      the evidence behind "routing is deterministic and offline; no model is
-      called" — re-run it
-      before changing the router.
+      scripts/task/kg-bench.sh — labelled questions scored on intent (and subject).
+      Runners: keyword (rules + bundle), heuristic (in-repo systemone-decision), jev
+      (hosted, sops key, skipped without one), decide (any KG_DECIDE_URL).
+      SET=rule|paraphrase|unnamed|both: `rule` uses the router's own vocabulary and
+      so flatters it, `paraphrase` does not, `unnamed` omits the subject (the
+      bundle's blind spot), `both` is rule+paraphrase only. VERBOSE=1 prints per-
+      question rows, with a routing census, so a silent fallback cannot pass for the
+      rules working. Re-run before changing the router. Exit 0 = ran.
     cmds:
       - |
         args=""
@@ -483,15 +416,14 @@ tasks:
   ops:tailnet:dns:
     desc: "[gate] The tailnet nameserver list actually serves clients"
     summary: >
-      Prints the global nameservers, MagicDNS and split-DNS state, then probes
-      each nameserver for the zone and for a known blocked domain. Classifies
-      every entry as a tailnet node address or a subnet route — a routed address
-      is unreachable from clients with `--accept-routes=false`, which is
-      deliberate on eisen, fern and aristotle. Exit 0 = every listed resolver
-      answers and filters, 1 = one does not, 2 = no credential. `override` is
-      console-only and invisible to the API, so the report says so instead of
-      guessing. Run it from a plain client: a `local-bind` entry is answered by
-      the reporting host's own bind, not by the routed path.
+      Prints global nameservers, MagicDNS and split-DNS state, then probes each
+      nameserver for the zone and a known blocked domain. Classifies every entry as
+      a tailnet node address or a subnet route — a routed address is unreachable
+      from clients with `--accept-routes=false` (deliberate on eisen, fern,
+      aristotle). Exit 0 = every resolver answers and filters, 1 = one does not, 2 =
+      no credential. `override` is console-only and invisible to the API, so the
+      report says so. Run it from a plain client: a `local-bind` entry is answered
+      by the reporting host's own bind, not the routed path.
     cmds:
       - bash scripts/task/tailnet-dns.sh
 
@@ -530,54 +462,7 @@ tasks:
       if one grows past 10 lines or stops naming AGENTS.nix. Narrative work
       goes to `task ops:notes`, not back into a root markdown file.
     cmds:
-      - |
-        fail=0
-        check() {
-          f="$1"; max="$2"
-          if [ ! -f "$f" ]; then echo "MISSING $f"; fail=1; return; fi
-          n=$(wc -l < "$f")
-          if [ "$n" -gt "$max" ]; then
-            echo "OVER  $f: $n > $max"
-            fail=1
-          else
-            echo "ok    $f: $n / $max"
-          fi
-        }
-        checkqueue() {
-          f="$1"; maxopen="$2"; maxtotal="$3"
-          if [ ! -f "$f" ]; then echo "MISSING $f"; fail=1; return; fi
-          open=$(grep -c '^- \[ \]' "$f" || true)
-          total=$(wc -l < "$f")
-          if [ "$open" -gt "$maxopen" ]; then
-            echo "OVER  $f: $open open > $maxopen"; fail=1
-          elif [ "$total" -gt "$maxtotal" ]; then
-            echo "OVER  $f: $total total > $maxtotal"; fail=1
-          else
-            echo "ok    $f: $open open / $maxopen, $total total / $maxtotal"
-          fi
-        }
-        stub() {
-          f="$1"; max=10
-          if [ ! -f "$f" ]; then echo "MISSING $f"; fail=1; return; fi
-          n=$(wc -l < "$f")
-          if [ "$n" -gt "$max" ]; then
-            echo "NOT-A-STUB $f: $n > $max lines (content belongs in AGENTS.nix)"
-            fail=1
-          elif ! grep -q 'AGENTS.nix' "$f"; then
-            echo "NOT-A-STUB $f: does not point at AGENTS.nix"
-            fail=1
-          else
-            echo "ok    $f: stub ($n lines) -> AGENTS.nix"
-          fi
-        }
-        check AGENTS.md 1200
-        check MANUAL.md 1200
-        check AUDIT.md 150
-        stub ARCHITECTURE.md
-        stub TODO.md
-        stub HANDOFF.md
-        stub EXPERIMENTS.md
-        exit "$fail"
+      - bash scripts/task/docs-budget.sh
 
   ops:bench:evals:
     desc: Benchmark nix-eval vs legacy reads (hyperfine)
@@ -601,18 +486,13 @@ tasks:
   ops:notes:
     desc: List AGENTS.nix notes or find the ones near an intent
     summary: >
-      The human surface over `.#agentsNotes.json` (lib/agents-notes.nix).
-      No args lists every note; STATUS= and KIND= filter. Each row is one note
-      with its schema status and kind. AGENTS.nix replaced ARCHITECTURE.md,
-      TODO.md, HANDOFF.md and EXPERIMENTS.md on 2026-10-19: a note with refs is
-      distilled, a leaf carries the original intent in prose.
-      Starting something not in this repo yet? `ops:notes:near Q=<intent>`
-      ranks notes against it and shows each one's lineage — that is the entry
-      point for a novel task, before any file is written.
-      Author or promote one with the `agents-notes` skill (templates, field
-      rules, promotion ladder: a note graduates by gaining `refs.modules` and
-      the gate task, never by becoming a new markdown file).
-      FORMAT=json emits the selected notes as JSON.
+      The human surface over `.#agentsNotes.json` (lib/agents-notes.nix). No args
+      lists every note; STATUS= and KIND= filter; FORMAT=json emits records. A note
+      with refs is distilled, a leaf carries the original intent in prose. Starting
+      something not in the repo yet? `ops:notes:near Q=<intent>` ranks notes against
+      it with each one's lineage — the entry point before any file is written.
+      Author or promote with the `agents-notes` skill: a note graduates by gaining
+      `refs.modules` and its gate task, never by becoming a markdown file.
     cmds:
       - bash scripts/task/notes.sh list "{{.STATUS | default ""}}" "{{.KIND | default ""}}"
 
@@ -653,16 +533,14 @@ tasks:
   ops:notes:near:
     desc: Rank the notes near an intent (Q= required) — the novel-task entry
     summary: >
-      Q= is an intent in your own words ("backups have never been restored"),
-      not a keyword: the query is tokenised, stopwords dropped, and each note
-      scored on id/title/summary/refs (strong) plus a body substring (weak).
-      Every hit prints `match n/total` and, when it has any, its lineage and
-      refs — so the answer to "has this been tried?" arrives with the note that
-      came out of it and the task that proves it. LIMIT= is the row count
-      (default 8). ~1 s: one eval of the compiled index plus jq; there is no
-      cache, because a stale note index is worse than a second of latency.
-      An empty answer is a real answer: nothing in the design record is near
-      this intent. FORMAT=json emits the ranked records.
+      Q= is an intent in your own words ("backups have never been restored"), not a
+      keyword: tokenised, stopwords dropped, each note scored on
+      id/title/summary/refs (strong) plus a body substring (weak). Every hit prints
+      `match n/total` and its lineage + refs, so "has this been tried?" arrives with
+      the note it came from and the task that proves it. LIMIT= defaults to 8;
+      FORMAT=json emits the ranking. ~1 s: one eval plus jq, no cache — a stale note
+      index is worse than a second. An empty answer is a real answer: nothing in the
+      design record is near this intent.
     requires:
       vars: [Q]
     cmds:

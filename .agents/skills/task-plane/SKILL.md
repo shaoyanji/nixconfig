@@ -42,7 +42,7 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 
 | Tier | Examples | Cost |
 | :--- | :--- | :--- |
-| **free** | `task status`, `task help`, `task find:<x>`, `task checks:tasks`, `task checks:ports`, `dev:inventory:host` | < 1 s, local files only |
+| **free** | `task status`, `task help`, `task find:<x>`, `task checks:ports`, `dev:inventory:host`, `task checks:tasks` | < 1 s, local files; `checks:tasks` adds one `nix eval` of `.#taskfileGraph` (~1.2 s total) |
 | **cheap (eval)** | `dev:inventory:json`, `dev:flake:get-hosts` | 0.1–2.5 s, no host config |
 | **bounded (one host)** | `checks:host HOST=<h>` | ~13 s / 720 MiB per host, OOM-guarded |
 | **HTTP probe** | `checks:build:route`, `checks:dns:failover` | bounded network request, no compile |
@@ -53,17 +53,12 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 
 | Task | Proves | Does **not** prove |
 | :--- | :--- | :--- |
-| `checks:tasks` | No duplicate task keys; every `task X` reference resolves (names + aliases, wildcards expanded) | That a task works |
+| `checks:tasks` | The Nix-compiled graph (`lib/taskfile.nix`) has no duplicate keys, dangling refs, include cycles, orphan shards, `internal: true` or MATCH-arity mismatches, **and** its name set equals `task --list-all --json` exactly. Same rules as pure-Nix `checks.<system>.taskfile-graph`, which also runs in CI/keyless and self-tests every bucket against `tests/taskfile-graph` | That a task works; that go-task can run it |
 | `checks:quick` | Repo hygiene: compiled inventory checks, task graph, lint, sops drift, modules.toml | **Any host config** — it forces no `nixosConfiguration`; not a pre-rebuild step |
 | `checks:host HOST=<h>` | Module system + every assertion for ONE host (2035 assertions, ~13 s / 720 MiB) | That the closure builds |
 | `checks:build:route` | Whether THIS host would have to compile (EXP-107) | That a build succeeds |
 | `dev:closure:*` | What is big / duplicated / would be fetched | Nothing about correctness |
 | `infra:warm:host:<h>` | Builder-side build + the cache serves the result | That the host activated it |
-
-Note the removal: `checks:quick` used to run four
-`config.networking.hostName` evals. They forced one option each and could not
-fail on a real option-type error (EXP-114), so they were four nix processes of
-zero proof. `checks:host` is the config gate.
 
 ## Cost discipline (do not regress this)
 
@@ -95,14 +90,19 @@ else is the wrong shape:
 | Repeat a workflow a human would type twice a month | Add a task to the owning shard, with `desc` and a `summary` that names what it **does not** prove. |
 | Wrap an existing task | Use `aliases:` (no `*` in an alias) or a `services:*` wrapper. Never copy the body. |
 
-Task hygiene, enforced by `checks:tasks`:
+Task hygiene, enforced by `checks:tasks` (`lib/taskfile.nix` compiles the graph,
+`task --list-all --json` confirms the name set):
 
-- A duplicate key in the same shard is **silent** — YAML keeps the last one.
-  (Found 2026-10-17: `dev:nixbuild:plan` and `dev:nixbuild:warm` were each
-  defined twice in `taskfiles/dev.yml`.) A duplicate across shards is fatal at
-  load (`task` exits 203, "Found multiple tasks").
-- Every `cmds` line invoking `task <name>` must resolve. `checks:tasks` resolves
-  names *and* aliases, expanding wildcard tasks.
+- A duplicate key in the same shard is **silent** — YAML keeps the last one
+  (2026-10-17: `dev:nixbuild:plan`/`:warm` were each defined twice); a duplicate
+  across shards is fatal at load (`task` exits 203).
+- Every `task <name>` in `cmds` must resolve, and only a **command position**
+  counts (line start, `$({`, `&&`, `;`, `|`) — `task keys` in prose is not a
+  reference. `task checks:host:HOST=x` peels its argument segment, and a wildcard
+  matches segment-for-segment.
+- `internal: true` hides a task from `--list-all --json` (the agent surface), so
+  it is banned; `*` and `{{index .MATCH n}}` must agree both ways; a shard no
+  include edge reaches is an orphan; an include cycle makes `task` exit 110.
 - Give every task a `desc`; a task without one is invisible to `task --list`.
 - Put the variable contract in `summary` (`HOST=`, `MODE=`, defaults, exit codes)
   so an agent does not have to read the shell body.
@@ -158,7 +158,7 @@ deploys.
 ```bash
 task help                          # intent map
 task find:closure                  # name+desc search
-task checks:tasks                  # task-graph gate (free)
+task checks:tasks                  # task-graph gate (~1 s: one nix eval)
 task checks:host HOST=frieren      # one host, all assertions
 task dev:inventory:host HOST=fern  # host record, no host eval
 task infra:deploy:host:fern        # plan -> apply -> validate

@@ -5,7 +5,7 @@
   pkgs,
   ...
 }: let
-  port = 8080;
+  port = 8085; # Strata MoE port on eisen (supersedes llama-swap 8080)
   modelDir = "/mnt/storage/models";
 
   # SSE proxy policy, defined once: three vhosts (the model API, /eisen/ and
@@ -59,13 +59,13 @@
     while true; do
       if gaming; then
         if [ "$suspended" = 0 ]; then
-          echo "game detected - yielding, stopping llama-swap"
-          systemctl stop llama-swap.service || true
+          echo "game detected - yielding, stopping llama-swap and strata"
+          systemctl stop llama-swap.service strata.service || true
           suspended=1
         fi
       elif [ "$suspended" = 1 ]; then
-        echo "game exited - resuming llama-swap"
-        systemctl start llama-swap.service || true
+        echo "game exited - resuming llama-swap and strata"
+        systemctl start llama-swap.service strata.service || true
         suspended=0
       fi
       sleep 15
@@ -183,9 +183,11 @@
   });
   */
 
+  /*
   # Stock nixpkgs llama.cpp with Vulkan (radv NAVI10): Hydra builds this
   # variant, so it substitutes instead of compiling on eisen.
   llama = pkgs.llama-cpp.override {vulkanSupport = true;};
+  */
   # DFlash2 speculative-decoding head for Qwen: a block-diffusion drafter
   # trained for this exact target (vocab 248320, matching) that is verified by
   # the target, so output distribution is unchanged. Measured on eisen on a
@@ -205,6 +207,7 @@
   # Q8_0 is the recommended quant for decision models. Apache-2.0.
   kevFile = "${modelDir}/Kev-4B-Q8_0.gguf";
   kevUrl = "https://huggingface.co/ggml-org/Kev-4B-GGUF/resolve/main/Kev-4B-Q8_0.gguf";
+  /*
   dflashFlags = "--spec-draft-model ${dflashFile} --spec-type draft-dflash --spec-draft-n-max 7 --spec-draft-ngl 99";
 
   # llama-swap substitutes ${PORT} with a free port before exec'ing the server.
@@ -237,6 +240,7 @@
     + (lib.optionalString experts "--override-tensor exps=CPU ")
     + "--cache-type-k q8_0 --cache-type-v q8_0 "
     + spec;
+  */
 
   # Kolibri-1 loads via `llamaKolibri` (patched llama.cpp, Hob-forge patch);
   # the stock binary exits with "unknown model architecture: 'kolibri1'".
@@ -302,6 +306,10 @@ in {
     url = dflashUrl;
   };
 
+  # --- Native llama.cpp servers, swapped on demand (no Ollama) ---
+  # DORMANT (2026-10-21): superseded by Strata MoE on port 8085 (open-strata-eisen-rx5700).
+  # Kept commented, not deleted: revive by uncommenting this block and setting port back to 8080.
+  /*
   # Weights and the storage mount must exist before llama-swap accepts traffic.
   systemd.services.llama-swap = {
     after = [
@@ -315,7 +323,6 @@ in {
     ];
   };
 
-  # --- Native llama.cpp servers, swapped on demand (no Ollama) ---
   services.llama-swap = {
     enable = true;
     listenAddress = "0.0.0.0";
@@ -333,46 +340,10 @@ in {
           };
           aliases = ["qwen"];
         };
-        # Dormant (2026-10-19): both need patched forks. Kept commented, not
-        # deleted; revive with the fork block, vars and fetch unit above.
-        /*
-        "kolibri-1" = {
-          cmd = mkCmd {
-            model = kolibriFile;
-            alias = "kolibri-1";
-            binary = llamaKolibri;
-            # Measured 2026-10-19 (`llama-bench -t 12 -t 24` on the 45 GiB
-            # GGUF; the GPU was absent, so this is the CPU path): generation is
-            # bandwidth-bound and prefers physical cores (tg128 9.17 t/s at 12
-            # vs 8.42 at 24), while prompt processing gains from SMT (pp256
-            # 47.41 vs 64.70). Split them rather than pick one.
-            threads = 12;
-            threadsBatch = 24;
-            # Low reasoning effort: Kolibri's default think is long (a "hi"
-            # cost 352 output tokens, mostly <think>). Keep answers short.
-            spec = "--reasoning-effort low";
-          };
-          aliases = ["kolibri" "aleph"];
-        };
-        # Bonsai 2 27B (dense ternary, PTQ1_0) on the PrismML fork.
-        # No exps=CPU (dense, no experts), no DFlash (vocab/arch mismatch).
-        # Verify weights after fetch: 5,946,648,928 bytes,
-        # sha256 53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3.
-        "bonsai-2-27b" = {
-          cmd = mkCmd {
-            model = bonsaiFile;
-            alias = "bonsai-2-27b";
-            binary = llamaPrism;
-            ctxSize = 16384;
-            experts = false;
-            spec = "--reasoning-effort medium";
-          };
-          aliases = ["bonsai"];
-        };
-        */
       };
     };
   };
+  */
 
   # --- Auto-yield to gaming ------------------------------------------------
   #

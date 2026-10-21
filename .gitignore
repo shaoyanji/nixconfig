@@ -21,6 +21,7 @@ docs/closures/
 # Generated docs tree — a build output, never committed (nix build .#docs).
 # docs/modules-registry.md and docs/fleet-inventory.md are tracked POINTER pages.
 docs/generated/
+docs/history/handoff*
 session-*.md
 
 # direnv: per-machine devshell cache (the flake is the source of truth)

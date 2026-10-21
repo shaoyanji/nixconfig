@@ -1,0 +1,115 @@
+# Fixture: a task graph that violates ONE bucket per defect, in 2-space YAML.
+#
+# 2 spaces on purpose — the real root Taskfile.yml uses 4, so this also proves
+# the reader measures indentation instead of assuming it (the first version
+# assumed a width and silently parsed zero root tasks).
+#
+# Expected verdicts are asserted in flake/checks.nix (`taskfile-graph-selftest`).
+# Do not "fix" the defects here; each one is a gate case.
+version: "3"
+
+includes:
+  good:
+    taskfile: taskfiles/good.yml
+    dir: .
+    flatten: true
+  loose:
+    taskfile: taskfiles/loose.yml
+    dir: .
+  cycle:
+    taskfile: taskfiles/cycle.yml
+    dir: .
+    flatten: true
+  gone:
+    taskfile: taskfiles/typo.yml
+    dir: .
+    flatten: true
+
+tasks:
+  dup:
+    desc: first definition wins nothing — YAML keeps the last
+    cmds:
+      - echo one
+  dup:
+    desc: second definition, silently discards the first
+    cmds:
+      - echo two
+
+  wild:
+    desc: zero stars but a MATCH index, so the arity assertion must fire
+    cmds:
+      - echo {{index .MATCH 0}}
+
+  hidden:
+    desc: internal true hides this from --list-all --json too
+    internal: true
+    cmds:
+      - echo hidden
+
+  broken:
+    desc: calls a task that does not exist
+    cmds:
+      - echo start
+      - task ghost:run
+
+  flagged:
+    desc: a flag is not a reference
+    cmds:
+      - task --list-all
+
+  # Neither `desc` nor `summary`: invisible to `task --list` AND to
+  # `--list-all --json`. Omitting one is the documented way to stay off the human
+  # list; omitting both deletes the task from the agent surface too.
+  bare:
+    cmds:
+      - echo bare
+
+  longdesc:
+    desc: >
+      A desc longer than the 240-character budget, which is the line `task --list`
+      prints next to the name. If this text needs more than one screen line it is
+      documentation, not a list label, and the budget exists to say so before the
+      list becomes unreadable on a terminal and useless as an MCP description. The
+      contract (vars, exit codes, what it does not prove) belongs in `summary`,
+      which is where an agent looks when it has picked the task by name.
+    cmds:
+      - echo longdesc
+
+  longsum:
+    desc: a summary beyond the 600-character agent-surface budget
+    summary: >
+      Fixture data, not documentation. This paragraph exists to be longer than the
+      six-hundred-character budget so the `longSummary` bucket has something to
+      fire on; a bucket that is only ever exercised against a clean tree is a
+      bucket nobody knows the shape of. Every sentence here is padding of the kind
+      that accumulates in real summaries: the measurements, the incident that
+      motivated the check, the host it happened on, the exact byte count of the
+      peak that killed it, what the old implementation did instead, which task
+      replaced it, why the replacement is cheaper, and a reminder not to
+      reintroduce the old shape. That is all true and all useful once, in a docs
+      page, and it is all paid for on every single read of the task list, which is
+      the trade the budget refuses. Read the budget as: contract here, narrative in
+      docs, measurements in the ledger.
+    cmds:
+      - echo longsum
+
+  # Exit-code drift, both halves: a claim the script contradicts, and a claim
+  # resting on a script the tree does not have (report, not drift).
+  badexit:
+    desc: promises an exit code its script never emits
+    summary: Exit 0 = clean, 7 = drift.
+    cmds:
+      - bash scripts/task/fixture-exit.sh
+
+  badexit-missing:
+    desc: promises an exit code from a script that is not in the tree
+    summary: Exit 1 = drift.
+    cmds:
+      - bash scripts/task/not-here.sh
+
+  # "go-task itself." is the regression case: `task ` inside a word, followed by a
+  # word and a full stop, must not become the reference `itself.`.
+  prose:
+    desc: "prose may mention `task nowhere:real` without being a call; confirmed against go-task itself."
+    cmds:
+      - echo ok

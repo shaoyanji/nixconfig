@@ -1,0 +1,14 @@
+# Include cycle: this shard includes the root, which includes this shard.
+# go-task refuses the whole Taskfile with exit 110 when this happens (it did on
+# 2026-10-08 through the ~/Documents/nixconfig symlink chain), so the gate must
+# name the closing edge rather than die on it.
+includes:
+  root:
+    taskfile: ../Taskfile.yml
+    flatten: true
+
+tasks:
+  cycle-task:
+    desc: exists only to give the cycle section something to parse
+    cmds:
+      - echo cycle

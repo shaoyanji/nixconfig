@@ -1,0 +1,8 @@
+# Included without `flatten: true`: the root graph must report the edge.
+# Every include in the real tree is flattened (task names are already
+# namespaced), so an unflattened edge is drift, not a preference.
+tasks:
+  loose-task:
+    desc: reachable only under the include namespace because flatten is absent
+    cmds:
+      - echo loose

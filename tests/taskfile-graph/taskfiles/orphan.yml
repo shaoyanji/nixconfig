@@ -1,0 +1,8 @@
+# On disk, included by nobody: the shard a rename or a bad merge leaves behind.
+# Its tasks do not exist as far as `task` is concerned, but every file-scanner
+# in the repo still sees them.
+tasks:
+  orphan-task:
+    desc: defined in a shard no include points at
+    cmds:
+      - echo orphan

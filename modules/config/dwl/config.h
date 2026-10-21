@@ -62,44 +62,198 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* Modkey: Super (Windows logo key) */
 #define MODKEY WLR_MODIFIER_LOGO
 
+/* niri's tag row: Mod+N focuses workspace N, Mod+Ctrl+N sends the window there */
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,                    KEY,            view,            {.ui = 1 << TAG} }, \
-	{ MODKEY|WLR_MODIFIER_CTRL,  KEY,            toggleview,      {.ui = 1 << TAG} }, \
-	{ MODKEY|WLR_MODIFIER_SHIFT, KEY,            tag,             {.ui = 1 << TAG} }, \
-	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT,KEY,toggletag,  {.ui = 1 << TAG} }
+	{ MODKEY|WLR_MODIFIER_CTRL,  KEY,            tag,             {.ui = 1 << TAG} }
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+
+/*
+ * ---- niri-parity helpers ------------------------------------------------
+ * The keymap follows ~/.config/niri (modules/user/desktop/niri.nix) so muscle
+ * memory carries over. dwl has no "next/previous tag" and no "reorder
+ * column" primitive, but both are a few lines against the structures dwl.c
+ * already declares before it includes this file (selmon, clients, tagset).
+ */
+
+/* niri Mod+J / Mod+K (focus-workspace-down/up): tags are a bitmask, so the
+ * neighbouring workspace is a rotate of the current one. */
+static void
+viewdir(const Arg *arg)
+{
+	Arg a;
+	uint32_t cur;
+
+	if (!selmon)
+		return;
+	cur = selmon->tagset[selmon->seltags] & TAGMASK;
+	if (!cur)
+		return;
+	if (arg->i > 0) {
+		a.ui = (cur << 1) & TAGMASK;
+		if (!a.ui)
+			a.ui = 1;
+	} else {
+		a.ui = cur >> 1;
+		if (!a.ui)
+			a.ui = 1u << (TAGCOUNT - 1);
+	}
+	view(&a);
+}
+
+/* niri Mod+0 / Mod+I (focus-workspace-previous). view() parks the tagset you
+ * came from in the other slot, so this is a read rather than a history. */
+static void
+viewlast(const Arg *arg)
+{
+	Arg a;
+
+	(void)arg;
+	if (!selmon)
+		return;
+	a.ui = selmon->tagset[selmon->seltags ^ 1] & TAGMASK;
+	if (!a.ui)
+		return;
+	view(&a);
+}
+
+/* niri Mod+Ctrl+H / Mod+Ctrl+L (move-column-left/right): reorder the window
+ * in the tiling list. */
+static void
+movestack(const Arg *arg)
+{
+	Client *c = focustop(selmon);
+	struct wl_list *a, *b;
+
+	if (!c)
+		return;
+	a = &c->link;
+	if (arg->i > 0) {
+		b = a->next;
+		if (b == &clients)
+			return;
+		wl_list_remove(a);
+		wl_list_insert(b->next, a);
+	} else {
+		b = a->prev;
+		if (b == &clients)
+			return;
+		wl_list_remove(a);
+		wl_list_insert(b, a);
+	}
+	arrange(selmon);
+}
+
+/* niri Mod+Ctrl+J / Mod+Ctrl+K (move-column-to-workspace-down/up): send the
+ * focused window a tag along and follow it, which is what niri does. */
+static void
+movetotag(const Arg *arg)
+{
+	Arg a;
+	Client *c = focustop(selmon);
+	uint32_t cur;
+
+	if (!c)
+		return;
+	cur = c->tags & TAGMASK;
+	if (!cur)
+		return;
+	if (arg->i > 0) {
+		a.ui = (cur << 1) & TAGMASK;
+		if (!a.ui)
+			a.ui = 1;
+	} else {
+		a.ui = cur >> 1;
+		if (!a.ui)
+			a.ui = 1u << (TAGCOUNT - 1);
+	}
+	c->tags = a.ui;
+	view(&a);
+	arrange(selmon);
+}
 
 /* Commands with Catppuccin Mocha themed wmenu */
 static const char *termcmd[] = { "foot", NULL };
 static const char *menucmd[] = { "wmenu-run", "-f", "JetBrainsMono Nerd Font 11", "-N", "1e1e2e", "-n", "cdd6f4", "-M", "313244", "-m", "cdd6f4", "-S", "cba6f7", "-s", "11111b", NULL };
 
+/* Media keys are bound in the keymap here because scratch runs no DMS daemon
+ * to own them; niri binds the same XF86 keys explicitly. */
+static const char *volup[] = { "wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
+static const char *voldown[] = { "wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
+static const char *volmute[] = { "wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
+static const char *micmute[] = { "wpctl", "set-mute", "@DEFAULT_AUDIO_SOURCE@", "toggle", NULL };
+static const char *playpause[] = { "playerctl", "play-pause", NULL };
+static const char *stopcmd[] = { "playerctl", "stop", NULL };
+static const char *nextcmd[] = { "playerctl", "next", NULL };
+static const char *prevcmd[] = { "playerctl", "previous", NULL };
+
 static const Key keys[] = {
-	/* modifier                  key                  function          argument */
-	{ MODKEY,                    XKB_KEY_p,           spawn,            {.v = menucmd} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            {.v = termcmd} },
-	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = termcmd} },
-	{ MODKEY,                    XKB_KEY_j,           focusstack,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_k,           focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_i,           incnmaster,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_d,           incnmaster,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_h,           setmfact,         {.f = -0.05f} },
-	{ MODKEY,                    XKB_KEY_l,           setmfact,         {.f = +0.05f} },
-	{ MODKEY,                    XKB_KEY_Tab,         view,             {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c,           killclient,       {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,           killclient,       {0} },
-	{ MODKEY,                    XKB_KEY_t,           setlayout,        {.v = &layouts[0]} },
-	{ MODKEY,                    XKB_KEY_f,           setlayout,        {.v = &layouts[1]} },
-	{ MODKEY,                    XKB_KEY_m,           setlayout,        {.v = &layouts[2]} },
-	{ MODKEY,                    XKB_KEY_space,       setlayout,        {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,       togglefloating,   {0} },
-	{ MODKEY,                    XKB_KEY_e,           togglefullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_0,           view,             {.ui = ~0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_0,           tag,              {.ui = ~0} },
-	{ MODKEY,                    XKB_KEY_comma,       focusmon,         {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY,                    XKB_KEY_period,      focusmon,         {.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_comma,       tagmon,           {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_period,      tagmon,           {.i = WLR_DIRECTION_RIGHT} },
+	/* modifier                    key                  function          argument */
+	/* niri: Mod+A launcher, Mod+T terminal (kitty) */
+	{ MODKEY,                      XKB_KEY_a,           spawn,            {.v = menucmd} },
+	{ MODKEY,                      XKB_KEY_t,           spawn,            {.v = termcmd} },
+	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_Return,      spawn,            {.v = termcmd} },
+
+	/* niri: Mod+Q close, Mod+W toggle floating, Mod+F maximize,
+	 * Mod+Shift+F fullscreen. dwl has no per-column maximize, so Mod+F and
+	 * Mod+Return promote the window to master (zoom), which is the closest
+	 * thing to "give this window the screen". */
+	{ MODKEY,                      XKB_KEY_q,           killclient,       {0} },
+	{ MODKEY,                      XKB_KEY_w,           togglefloating,   {0} },
+	{ MODKEY,                      XKB_KEY_e,           togglefloating,   {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_space,       togglefloating,   {0} },
+	{ MODKEY,                      XKB_KEY_f,           zoom,             {0} },
+	{ MODKEY,                      XKB_KEY_Return,      zoom,             {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_f,           togglefullscreen, {0} },
+
+	/* niri: Mod+H/L focus column, Mod+J/K workspace down/up */
+	{ MODKEY,                      XKB_KEY_h,           focusstack,       {.i = -1} },
+	{ MODKEY,                      XKB_KEY_l,           focusstack,       {.i = +1} },
+	{ MODKEY,                      XKB_KEY_j,           viewdir,          {.i = +1} },
+	{ MODKEY,                      XKB_KEY_k,           viewdir,          {.i = -1} },
+	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_j,           viewdir,          {.i = +1} },
+	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_k,           viewdir,          {.i = -1} },
+	{ MODKEY,                      XKB_KEY_i,           viewlast,         {0} },
+	{ MODKEY,                      XKB_KEY_0,           viewlast,         {0} },
+	{ MODKEY,                      XKB_KEY_Tab,         view,             {.ui = ~0} },
+
+	/* niri: Mod+Shift+H/L focus the neighbouring monitor */
+	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_h,           focusmon,         {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_l,           focusmon,         {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY,                      XKB_KEY_comma,       focusmon,         {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY,                      XKB_KEY_period,      focusmon,         {.i = WLR_DIRECTION_RIGHT} },
+
+	/* niri: Mod+Ctrl+H/L move the column, Mod+Ctrl+J/K move it to the next
+	 * workspace, Mod+Ctrl+Shift+H/L move it to another monitor. */
+	{ MODKEY|WLR_MODIFIER_CTRL,    XKB_KEY_h,           movestack,        {.i = -1} },
+	{ MODKEY|WLR_MODIFIER_CTRL,    XKB_KEY_l,           movestack,        {.i = +1} },
+	{ MODKEY|WLR_MODIFIER_CTRL,    XKB_KEY_j,           movetotag,        {.i = +1} },
+	{ MODKEY|WLR_MODIFIER_CTRL,    XKB_KEY_k,           movetotag,        {.i = -1} },
+	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_h, tagmon,    {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_l, tagmon,    {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_j, movetotag, {.i = +1} },
+	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_k, movetotag, {.i = -1} },
+
+	/* niri: Mod+R switches the column width — here it widens, Shift narrows */
+	{ MODKEY,                      XKB_KEY_r,           setmfact,         {.f = +0.05f} },
+	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_r,           setmfact,         {.f = -0.05f} },
+	{ MODKEY,                      XKB_KEY_space,       setlayout,        {0} },
+	{ MODKEY,                      XKB_KEY_m,           setlayout,        {.v = &layouts[2]} },
+
+	/* niri: Mod+S region screenshot, Mod+Print full screen (into the clipboard) */
+	{ MODKEY,                      XKB_KEY_s,           spawn,            SHCMD("grim -g \"$(slurp)\" - | wl-copy") },
+	{ MODKEY,                      XKB_KEY_Print,       spawn,            SHCMD("grim - | wl-copy") },
+
+	/* media keys, as niri binds them */
+	{ 0, XKB_KEY_XF86AudioRaiseVolume, spawn,           {.v = volup} },
+	{ 0, XKB_KEY_XF86AudioLowerVolume, spawn,           {.v = voldown} },
+	{ 0, XKB_KEY_XF86AudioMute,        spawn,           {.v = volmute} },
+	{ 0, XKB_KEY_XF86AudioMicMute,     spawn,           {.v = micmute} },
+	{ 0, XKB_KEY_XF86AudioPlay,        spawn,           {.v = playpause} },
+	{ 0, XKB_KEY_XF86AudioStop,        spawn,           {.v = stopcmd} },
+	{ 0, XKB_KEY_XF86AudioNext,        spawn,           {.v = nextcmd} },
+	{ 0, XKB_KEY_XF86AudioPrev,        spawn,           {.v = prevcmd} },
 	TAGKEYS(                     XKB_KEY_1,           0),
 	TAGKEYS(                     XKB_KEY_2,           1),
 	TAGKEYS(                     XKB_KEY_3,           2),
@@ -119,8 +273,10 @@ static const Button buttons[] = {
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
 };
 
-/* Trackpad / mouse wheel: Super+scroll adjusts the PipeWire default sink */
+/* niri: Mod+wheel changes workspace, Mod+Ctrl+wheel moves the column */
 static const Axis axes[] = {
-	{ MODKEY, AxisUp,     spawn, SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+") },
-	{ MODKEY, AxisDown,   spawn, SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-") },
+	{ MODKEY,                    AxisUp,   viewdir,  {.i = -1} },
+	{ MODKEY,                    AxisDown, viewdir,  {.i = +1} },
+	{ MODKEY|WLR_MODIFIER_CTRL,  AxisUp,   movetotag, {.i = -1} },
+	{ MODKEY|WLR_MODIFIER_CTRL,  AxisDown, movetotag, {.i = +1} },
 };

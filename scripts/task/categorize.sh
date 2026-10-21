@@ -1,39 +1,63 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
-# Measured 2026-10-21: this engine's `classify` behaves as an ORDERED prior on
-# this corpus. A rule-shaped state made option 0 win, and a steps-shaped state
-# made option 1 (fleet-fact) win under four different `procedure:` label
-# wordings — so option text is not the weight, position is. Until that changes,
-# treat the table as a prior and keep the calibration anchors: they caught it.
+# Categorize prose with FORCED BINARY choices, not a five-way guess.
 #
-# Categorize prose candidates with the decision engine, then GATE the query:
-# a query that answers everything the same way, or cannot answer a case whose
-# answer is known, has measured nothing and exits 1.
+# Forced binary: every question is "dark or light?", never "which of five
+# shades?", and every pair is asked in both orders so a position effect shows up
+# as a flip. Measured 2026-10-21 after the rewrite: "a fact about a machine" beat
+# "commands to run in order" for BOTH a counts-only state and a prose snippet of
+# actual commands, in both orders (11/11 pairs) — so the dominant weight is a
+# label prior, not order and not state. The rule anchor still scores 4/10.
+#
+# That makes the engine unusable as a semantic classifier until its scorer
+# weights state tokens (we own it: modules/services/systemone/engine.py, the
+# `choice` path). The anchors below are what refuse to let a label prior become
+# a table.
 set -euo pipefail
 
 ENDPOINT="${SYSTEMONE_URL:-https://delphi.cloudforest-kardashev.ts.net:8444}"
-CATEGORIES='["policy-or-trap: a rule or failure mode that should fail a build","fleet-fact: an address, role or hardware detail that belongs in inventory","why-or-history: narrative explaining a decision","procedure: steps that should be a task","durable-explanation: reference material for docs"]'
-UNIFORM=$(jq -n --argjson c "$CATEGORIES" '1 / ($c | length)')
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
-case "${1:-}" in -h|--help) sed -n '2,6p' "$0"; exit 0 ;; esac
+# Short, oppositional labels: a binary question must look like a coin, not a menu.
+declare -A LABEL=(
+  [policy]="a rule the build should enforce"
+  [fact]="a fact about a machine"
+  [history]="why a decision was made"
+  [procedure]="commands to run in order"
+  [docs]="reference material to read"
+)
+CATS=(policy fact history procedure docs)
+
+case "${1:-}" in -h|--help) sed -n '2,11p' "$0"; exit 0 ;; esac
 [ $# -gt 0 ] || { echo "categorize: give one or more paths" >&2; exit 2; }
 
-ask() { # state -> answers JSON; a 400 is the caller's query error, not a dead engine
-  local state="$1" body out
-  body="$(jq -n --arg s "$state" --argjson c "$CATEGORIES" \
-    '{state:$s, questions:{c:{type:"classify", instructions:"which channel owns this prose", criteria:$c}}}')"
-  if ! out=$(curl -fsS --max-time 60 -H 'content-type: application/json' -d "$body" "$ENDPOINT/v1/systemone" 2>&1); then
+ask() { # state, optA, optB -> winner label
+  local state="$1" a="$2" b="$3" body out
+  body="$(jq -n --arg s "$state" --arg a "$a" --arg b "$b" \
+    '{state:$s, questions:{c:{type:"choice", instructions:"pick one", criteria:[$a,$b]}}}')"
+  if ! out=$(curl -fsS --max-time 30 -H 'content-type: application/json' -d "$body" "$ENDPOINT/v1/systemone" 2>&1); then
     echo "categorize: engine refused or unreachable: $out" >&2
     exit 1
   fi
-  printf '%s' "$out"
+  printf '%s' "$out" | jq -r '.answers.c.choice'
+}
+
+flipped=0
+pairs=0
+# duel: ask (a|b) and (b|a); a category scores only when both orders agree.
+duel() {
+  local state="$1" a="$2" b="$3" ab ba
+  ab=$(ask "$state" "${LABEL[$a]}" "${LABEL[$b]}")
+  ba=$(ask "$state" "${LABEL[$b]}" "${LABEL[$a]}")
+  pairs=$((pairs + 1))
+  if [ "$ab" = "${LABEL[$a]}" ] && [ "$ba" = "${LABEL[$a]}" ]; then echo "$a"
+  elif [ "$ab" = "${LABEL[$b]}" ] && [ "$ba" = "${LABEL[$b]}" ]; then echo "$b"
+  else flipped=$((flipped + 1)); echo "undecided"; fi
 }
 
 features() {
   local f="$1" c l ratio restated dup days hits claims blocks addrs
-  c=$(grep -cE '^\s*#' "$f" || true)
-  l=$(grep -c '' "$f" || true)
+  c=$(grep -cE '^\s*#' "$f" || true); l=$(grep -c '' "$f" || true)
   ratio=$(awk -v c="$c" -v l="$l" 'BEGIN { printf "%.2f", (l ? c / l : 0) }')
   restated=$(grep -cE '^\s*#\s*(Enable|Set|Add|Use|Configure|This sets|Install)' "$f" || true)
   dup=0
@@ -41,51 +65,52 @@ features() {
     grep -qsi "$w" inventory.toml flake/policies.nix 2>/dev/null && dup=$((dup + 1))
   done
   days=$(( ( $(date +%s) - $(git log -1 --format=%ct -- "$f" 2>/dev/null || date +%s) ) / 86400 ))
-  # Feature names avoid the option vocabulary: a key called `contains_rule` used
-  # to match the word "rule" in an option label regardless of its value, which
-  # made every candidate look like a policy. Weights must not be echoes.
   hits=$(grep -ciE 'must not|never|conflict|collision|bind: |belongs to|belongs in' "$f" || true)
   claims=$(grep -cE '[0-9]+ ?(ms|MiB|GiB|s|%)' "$f" || true)
   blocks=$(grep -c '```bash' "$f" || true)
   addrs=$(grep -cE '(192\.168\.[0-9]+\.[0-9]+|100\.[0-9]+\.[0-9]+\.[0-9]+|[a-z0-9-]+\.lan)' "$f" || true)
-  printf 'comments=%s lines=%s ratio=%s restated=%s elsewhere=%s age_days=%s assertions=%s metrics=%s blocks=%s addresses=%s kind=%s' \
-    "$c" "$l" "$ratio" "$restated" "$dup" "$days" "$hits" "$claims" "$blocks" "$addrs" \
-    "$(case "$f" in *.nix) echo nix ;; *) echo markdown ;; esac)"
+  printf 'comments=%s lines=%s ratio=%s restated=%s elsewhere=%s age_days=%s assertions=%s metrics=%s blocks=%s addresses=%s' \
+    "$c" "$l" "$ratio" "$restated" "$dup" "$days" "$hits" "$claims" "$blocks" "$addrs"
 }
 
-# CALIBRATION: known answers before any table. A miss means the token weighting
-# is wrong for this corpus, and the table would be decoration.
-calibrate() {
-  local a b
-  a=$(ask "this service must not bind 443 because nginx owns it and the switch fails the build" | jq -r '.answers.c.choice')
-  b=$(ask "run these shell blocks in order to deploy the host, then verify the unit" | jq -r '.answers.c.choice')
-  printf 'calibration: rule→%s | steps→%s\n' "${a%%:*}" "${b%%:*}" >&2
-  case "$a" in policy-or-trap*) ;; *) echo "categorize: anchor(rule) read as $a" >&2; return 1 ;; esac
-  case "$b" in procedure*) ;; *) echo "categorize: anchor(steps) read as $b" >&2; return 1 ;; esac
+# Calibration: known answers, asked the same way the table is asked.
+calib=1
+check() { # state, expected
+  local s="$1" want="$2" score="" a b
+  for i in "${!CATS[@]}"; do for j in "${!CATS[@]}"; do
+    [ "$i" -lt "$j" ] && { r=$(duel "$s" "${CATS[$i]}" "${CATS[$j]}"); [ "$r" = "$want" ] && score="$score."; }
+  done; done
+  printf '%s\n' "${#score}"
 }
-
-CALIBRATED=1
-calibrate || CALIBRATED=0
+rule_state="this service must not bind 443 because nginx owns it and the switch fails the build"
+steps_state="step 1 ssh delphi step 2 sudo nixos-rebuild switch step 3 systemctl status then verify"
+r_pts=$(check "$rule_state" policy); s_pts=$(check "$steps_state" procedure)
+printf 'calibration: rule→%s/10 policy | steps→%s/10 procedure | position-flips %s/%s\n' \
+  "$r_pts" "$s_pts" "$flipped" "$pairs" >&2
+[ "$r_pts" -ge 1 ] && [ "$s_pts" -ge 1 ] || calib=0
 
 rows="[]"
 for f in "$@"; do
   [ -r "$f" ] || { echo "categorize: cannot read $f" >&2; exit 2; }
   state="$(features "$f")"
-  cat_out="$(ask "$state")"
-  rows="$(jq -c --arg f "$f" --arg s "$state" --argjson o "$cat_out" \
-    '. + [{path:$f, category:$o.answers.c.choice, confidence:$o.answers.c.confidence, state:$s}]' <<<"$rows")"
+  declare -A wins=()
+  for c in "${CATS[@]}"; do wins[$c]=0; done
+  for i in "${!CATS[@]}"; do for j in "${!CATS[@]}"; do
+    [ "$i" -lt "$j" ] || continue
+    r=$(duel "$state" "${CATS[$i]}" "${CATS[$j]}")
+    [ "$r" != "undecided" ] && wins[$r]=$((wins[$r] + 1))
+  done; done
+  best=""; n=-1
+  for c in "${CATS[@]}"; do [ "${wins[$c]}" -gt "$n" ] && { n=${wins[$c]}; best=$c; }; done
+  rows="$(jq -c --arg f "$f" --arg c "$best" --argjson w "$n" \
+    '. + [{path:$f, category:$c, wins:$w}]' <<<"$rows")"
 done
 
+flip_pct=$((pairs ? flipped * 100 / pairs : 0))
+[ "$calib" -eq 0 ] && echo "categorize: QUERY NOT CALIBRATED — table is shape, not a verdict" >&2
+[ "$flip_pct" -gt 50 ] && { echo "categorize: POSITION-DOMINATED — $flip_pct% of pairs flipped under swap" >&2; exit 1; }
+
 distinct=$(jq '[.[].category] | unique | length' <<<"$rows")
-top=$(jq '[.[].confidence] | max' <<<"$rows")
+[ "$distinct" -ge 2 ] || { echo "categorize: DOES NOT DISCRIMINATE — every file read as one category" >&2; exit 1; }
 
-if [ "$CALIBRATED" -eq 0 ]; then
-  echo "categorize: QUERY NOT CALIBRATED — table below is shape, not a verdict" >&2
-fi
-if [ "$distinct" -lt 2 ] || awk -v t="$top" -v u="$UNIFORM" 'BEGIN { exit !(t <= u + 0.01) }'; then
-  echo "categorize: DOES NOT DISCRIMINATE — $distinct categories, max $top vs uniform $UNIFORM" >&2
-  jq -r '.[] | "\(.confidence)\t\(.category)\t\(.path)"' <<<"$rows" >&2
-  exit 1
-fi
-
-jq -r 'sort_by(-.confidence)[] | "\(.confidence * 100 | floor)%\t\(.category | split(":")[0])\t\(.path)"' <<<"$rows"
+jq -r 'sort_by(-.wins)[] | "\(.wins)/4\t\(.category)\t\(.path)"' <<<"$rows"

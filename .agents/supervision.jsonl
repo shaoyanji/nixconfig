@@ -1,7 +1,7 @@
 {"date":"2026-10-21","target":".agents/deploy/README.md","engine":"jev","basis":"typesafe","jev":"docs","human":"docs","agree":true,"note":"host index added; cards are no longer orphans"}
 {"date":"2026-10-21","target":".agents/deploy/rollback.md","engine":"rule","basis":"taskrefs=5","jev":"procedure","human":"procedure","agree":true,"note":""}
 {"date":"2026-10-21","target":".agents/deploy/hosts/eisen.md","engine":"rule","basis":"blocks>=2","jev":"procedure","human":"procedure","agree":true,"note":"split: runbook half of the old handoff"}
-{"date":"2026-10-21","target":"docs/eisen-llm-architecture.md","engine":"jev","basis":"typesafe","jev":"fact","human":"history","agree":false,"note":"split: design rationale half reads as a machine fact to jev"}
+{"date":"2026-10-21","target":"docs/eisen-llm-architecture.md","engine":"rule","basis":"rejections=4 essays=4","jev":"design","human":"design","agree":true,"note":"v3 label: a rationale page argues and tabulates; it is not a machine fact"}
 {"date":"2026-10-21","target":".agents/deploy/hosts/stark.md","engine":"jev","basis":"typesafe","jev":"docs","human":"docs","agree":true,"note":""}
 {"date":"2026-10-21","target":".agents/deploy/hosts/scratch.md","engine":"jev","basis":"typesafe","jev":"docs","human":"docs","agree":true,"note":""}
 {"date":"2026-10-21","target":".agents/deploy/hosts/frieren.md","engine":"rule","basis":"blocks=5","jev":"procedure","human":"procedure","agree":true,"note":""}

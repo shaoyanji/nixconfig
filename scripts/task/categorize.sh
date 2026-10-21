@@ -27,10 +27,11 @@ declare -A LABEL=(
   [policy]="a rule the build should enforce"
   [fact]="a fact about a machine"
   [history]="why a decision was made"
+  [design]="why the system is built this way"
   [procedure]="commands to run in order"
   [docs]="reference material to read"
 )
-CATS=(policy fact history procedure docs)
+CATS=(policy fact history design procedure docs)
 
 case "${1:-}" in -h|--help) sed -n '2,11p' "$0"; exit 0 ;; esac
 [ $# -gt 0 ] || { echo "categorize: give one or more paths" >&2; exit 2; }
@@ -42,11 +43,13 @@ jev_classify() {
   # Mutually exclusive by construction: each label names what the reader DOES
   # with the page, so "readable" cannot count as a category of its own. v2 —
   # v1 let `docs` absorb anything with prose in it (5 of 8 files), including a
-  # routing table of commands and a host's own machine facts.
+  # routing table of commands and a host's own machine facts; v3 adds `design`
+  # because a rationale page is not a machine fact and had no honest slot.
   jq -n '{
     policy:"an invariant or failure mode the build or a test enforces (must / must not)",
     fact:"a property of one machine — address, port, role, path, hardware — with no steps; belongs in inventory",
     history:"why a past decision was made, and what was rejected",
+    design:"a design rationale for one system — why it is shaped this way, what was measured and what was ruled out; read to understand or change it, not to run",
     procedure:"an ordered sequence of commands or decisions the reader executes, including routing tables of tasks",
     docs:"reference with neither commands, addresses nor invariants — prose you read once and do not execute"
   }' > "$CRITERIA_FILE"
@@ -106,8 +109,13 @@ features() {
   # `taskrefs` was the missing signal: rollback.md is a routing table of six
   # `task infra:*` calls and scored no command evidence at all without it.
   taskrefs=$(grep -coE 'task [a-z]+:[a-z:<>{}-]+' "$f" || true)
-  printf 'comments=%s lines=%s ratio=%s restated=%s elsewhere=%s age_days=%s assertions=%s metrics=%s blocks=%s taskrefs=%s addresses=%s' \
-    "$c" "$l" "$ratio" "$restated" "$dup" "$days" "$hits" "$claims" "$blocks" "$taskrefs" "$addrs"
+  # Design pages argue: they name what was ruled out and they tabulate what they
+  # measured. Facts do neither, which is the only structural difference between a
+  # machine card and the rationale next to it.
+  rejections=$(grep -ciE 'rejected|ruled out|instead of|trade-off|why not' "$f" || true)
+  essays=$(grep -cE '^##+ .*(Rationale|Design|Sizing|Roster|Measured|Performance)' "$f" || true)
+  printf 'comments=%s lines=%s ratio=%s restated=%s elsewhere=%s age_days=%s assertions=%s metrics=%s blocks=%s taskrefs=%s rejections=%s essays=%s addresses=%s' \
+    "$c" "$l" "$ratio" "$restated" "$dup" "$days" "$hits" "$claims" "$blocks" "$taskrefs" "$rejections" "$essays" "$addrs"
 }
 
 # Calibration: known answers, asked the same way the table is asked.
@@ -150,9 +158,16 @@ for f in "$@"; do
     # classified `procedure` by rule with no executable content fails the table.
     blocks_n=$(sed -n 's/.*blocks=\([0-9]*\).*/\1/p' <<<"$state")
     task_n=$(sed -n 's/.*taskrefs=\([0-9]*\).*/\1/p' <<<"$state")
+    rej_n=$(sed -n 's/.*rejections=\([0-9]*\).*/\1/p' <<<"$state")
+    essay_n=$(sed -n 's/.*essays=\([0-9]*\).*/\1/p' <<<"$state")
     if [ "${blocks_n:-0}" -ge 2 ] || [ "${task_n:-0}" -ge 3 ]; then
       label_j=procedure; prob_j=0; basis=rule
       echo "categorize: rule procedure on $f (${blocks_n} command block(s), ${task_n} task ref(s))" >&2
+    elif [ "${rej_n:-0}" -ge 2 ] && [ "${essay_n:-0}" -ge 2 ] && [ "${blocks_n:-0}" -le 1 ]; then
+      # A rationale page argues (what was ruled out) and tabulates (what it
+      # measured). A machine card does neither, so this stays off facts.
+      label_j=design; prob_j=0; basis=rule
+      echo "categorize: rule design on $f (${rej_n} rejection(s), ${essay_n} rationale section(s))" >&2
     else
       basis=jev
     fi

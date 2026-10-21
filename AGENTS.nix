@@ -230,6 +230,7 @@
         tasks = ["checks:host"];
         docs = [
           ".agents/deploy/hosts/eisen.md"
+          "docs/eisen-llm-architecture.md"
           "hosts/eisen/MANUAL.md"
         ];
       };
@@ -606,7 +607,10 @@
       refs = {
         hosts = ["eisen"];
         modules = ["hosts/eisen/configuration.nix"];
-        docs = [".agents/deploy/hosts/eisen.md"];
+        docs = [
+          ".agents/deploy/hosts/eisen.md"
+          "docs/eisen-llm-architecture.md"
+        ];
       };
       body = ''
         Healthy in the 2026-10-18 21:31 boot (`amdgpu 3.64.0`, DCN 2.0, 6 planes, fb0,
@@ -805,7 +809,10 @@
       refs = {
         hosts = ["eisen"];
         modules = ["hosts/eisen/llm-server.nix"];
-        docs = [".agents/deploy/hosts/eisen.md"];
+        docs = [
+          ".agents/deploy/hosts/eisen.md"
+          "docs/eisen-llm-architecture.md"
+        ];
       };
       body = ''
         Measured 2026-10-19 on the patched `llamaKolibri` build:

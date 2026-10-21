@@ -27,6 +27,7 @@ channel() {
   case "$1" in
     policy) echo "flake/policies.nix (a predicate, with a check that breaks)" ;;
     fact) echo "inventory.toml (compiled registry) — or the host's card if machine-private" ;;
+    design) echo "docs/ (design page), linked from the manual's doc map" ;;
     procedure) echo "docs/*.md + the owning taskfile shard; skills cite, not restate" ;;
     history) echo "docs/history/ (superseded narrative, never linked as current)" ;;
     docs) echo "docs/ (reference), linked from a living document" ;;

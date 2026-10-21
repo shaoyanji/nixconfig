@@ -9,7 +9,7 @@
   # module active in chains that don't declare the option.
   config = lib.mkIf (config.profiles.ai.enable or true) {
     programs.antigravity-cli = {
-      enable = true;
+      enable = lib.mkDefault true;
       package = pkgs.llm-agents.antigravity-cli;
       # Fast Gemini model, set via $GEMINI_MODEL (HM module behavior).
       defaultModel = "gemini-3.8-flash";
@@ -66,19 +66,21 @@
     # agy's self-updater writes versioned binaries to ~/.local/bin, which is
     # impossible on NixOS (read-only store paths) and would shadow the
     # nix-managed binary on darwin; documented opt-out:
-    home.sessionVariables = {
+    home.sessionVariables = lib.mkIf config.programs.antigravity-cli.enable {
       AGY_CLI_DISABLE_AUTO_UPDATE = "true";
     };
 
     # Antigravity standalone project fallback to avoid project store read failures
     # when starting sessions without an explicit active workspace project.
     # Prevent Home Manager activation collisions when agy mutates settings.json at runtime
-    home.file.".gemini/antigravity-cli/settings.json".force = true;
+    home.file = lib.mkIf config.programs.antigravity-cli.enable {
+      ".gemini/antigravity-cli/settings.json".force = true;
 
-    home.file.".gemini/config/projects/outside-of-project.json".text = builtins.toJSON {
-      id = "outside-of-project";
-      name = "Outside of Project";
-      projectResources = {};
+      ".gemini/config/projects/outside-of-project.json".text = builtins.toJSON {
+        id = "outside-of-project";
+        name = "Outside of Project";
+        projectResources = {};
+      };
     };
   };
 }

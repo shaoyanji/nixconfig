@@ -94,7 +94,12 @@
   # callbacks) see tailnet-sourced traffic. Applied via `tailscale set` at
   # boot — survives without re-auth, unlike extraUpFlags.
   # (useRoutingFeatures = "both" is inherited from desktop-client.nix.)
+  #
+  # mkForce: Frieren is the PRIMARY resolver for the fleet. A resolver must
+  # NEVER accept tailnet DNS (--accept-dns=false); accepting the tailnet
+  # nameserver override creates a recursive query loop through 10.99.0.53.
   services.tailscale.extraSetFlags = [
+    "--accept-dns=false"
     "--ssh=true"
   ];
   # The advertised routes (`192.168.3.0/24` + the DNS /32) are composed by

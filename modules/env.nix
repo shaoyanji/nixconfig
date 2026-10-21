@@ -85,6 +85,12 @@ in {
         init.defaultBranch = lib.mkForce "master";
         pull.rebase = lib.mkForce true;
         push.autoSetupRemote = true;
+        # Automatic submodule handling: operations (pull, checkout, switch, reset)
+        # recurse into submodules automatically without needing manual sbupdate.
+        submodule.recurse = true;
+        status.submoduleSummary = true;
+        diff.submodule = "log";
+        fetch.recurseSubmodules = "on-demand";
         alias = {
           co = "checkout";
           ci = "commit";

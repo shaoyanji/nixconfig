@@ -2,11 +2,17 @@
   lib,
   pkgs,
   config,
+  osConfig ? {},
+  fleetHost ? (osConfig.networking.hostName or (config.networking.hostName or "")),
   ...
 }: let
   nixNAS = "/Volumes/data";
-  hostName = config.networking.hostName or null;
-  noSymlinkHosts = [];
+  hostName = fleetHost;
+  # Cloud and remote hosts without local NAS access must not inherit broken symlinks
+  noSymlinkHosts = [
+    "delphi"
+    "garnixMachine"
+  ];
   cfg = config.nixoshmsymlinks;
 in {
   options.nixoshmsymlinks = {

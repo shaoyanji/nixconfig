@@ -36,9 +36,10 @@
   under user lingering for persistent connectivity on `antigravity.google.com`.
 - Fixed direnv cached devShell progcomp bug: added `bashInteractive` to `nativeBuildInputs`
   in `flake/devshells.nix` so interactive subshells retain completion builtins.
-- Factored Dell D6000 Universal Dock (DisplayLink / EVDI) into reusable profile
-  `modules/profiles/dell-dock.nix` (`profiles.dell-dock.enable`); enabled for both
-  frieren and fern, registered knob in `modules.toml`.
+- Factored Dell D6000 Universal Dock into `modules/profiles/dell-dock.nix` (`profiles.dell-dock.enable`);
+  enabled for frieren and fern, registered in `modules.toml`.
+- Fixed Fern lid-close sleep deadlock (`AllowSuspend = "no"`), enabled DisplayLink EVDI for
+  Samsung 4K TV, removed Wayland-incompatible `caffeine`, and distilled hardware quirks into `inventory.toml`.
 
 ### 2026-10-21 — the harness is a worker service behind HTTPS, not a tunnel
 

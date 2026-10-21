@@ -36,6 +36,11 @@ role = "Central NAS Mainframe, Kitchen Light Workstation & Fleet Server"
 category = "server-and-workstation"
 desktop_environment = "niri (Wayland) via greetd/dms-greeter autologin (Dell D6000 Dock to Samsung 4K Display)"
 users = ["devji"]
+notes = [
+  "Central NAS and services mainframe on a Lenovo ideapad 320-15IKB. Moved to the basement for 24/7 quiet operation.",
+  "External 4K display output driven through the Dell D6000 Universal Dock (DisplayLink EVDI) using profiles.dell-dock.enable.",
+  "Network interfaces: onboard Gigabit Ethernet (enp1s0, 192.168.3.25) and Wi-Fi (wlp2s0, 192.168.3.98).",
+]
 
 [hosts.frieren.hardware]
 model = "Lenovo ideapad 320-15IKB (Type 81BG, Laptop-as-Server & Kitchen Workstation)"
@@ -57,7 +62,7 @@ ssh_alias = "frieren"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Harmonia (LAN binary cache on :5000)", "Paperless-ngx (:28981, data /srv/data/paperless)", "Hermes Agent & Gateway (user systemd service)", "Home Assistant (:8123) + Mosquitto MQTT", "Kiwix Serve (declarative ZIMs :8088 -> wiki.frieren.lan)", "Immich Photo Server & ML backend", "Jellyfin Media Server (:8096)", "Plex Media Server", "Aria2 RPC daemon (:6801 + AriaNg web)", "Paste (pb server at paste.frieren.lan)", "Vaultwarden", "Uptime Kuma", "iVentoy PXE server", "Samba & NFS export (/srv/data)", "Syncthing"]
-traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter"]
+traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter", "dell-dock"]
 
 [hosts.frieren.persona]
 title = "Fleet Mainframe & Storage Steward"
@@ -590,13 +595,21 @@ role = "Lightweight Daily-Driver Laptop"
 category = "laptop"
 desktop_environment = "Niri + DankMaterialShell greeter"
 users = ["devji"]
-notes = ["HP 15 laptop (Ryzen 3 3250U Picasso, Vega 3 iGPU, 8 GB): lightweight niri desktop mirroring scratch — globalModulesNixos (niri + DankMaterialShell greeter via programs.dms-greeter + role:heim userland), autoLogin straight into niri as devji.", "Deliberately NO Steam (contrast stark/eisen). modules/profiles/laptop.nix layers auto-cpufreq + libinput.", "Single-disk disko (ESP + 8G swap + btrfs /root,/nix). This unit's SSD is NVMe (KIOXIA KBG40ZNV256G), so the device is /dev/nvme0n1; HP 15s-eq units with a SATA M.2 enumerate as /dev/sda instead — verify with lsblk BEFORE disko formats it. Persistent (no impermanence)."]
+notes = [
+  "HP 15 laptop (Ryzen 3 3250U Picasso, Vega 3 iGPU, 8 GB): lightweight Niri desktop mirroring scratch — globalModulesNixos (Niri + DankMaterialShell greeter + role:heim userland), autoLogin into devji.",
+  "Deliberately NO Steam (contrast stark/eisen). modules/profiles/laptop.nix layers auto-cpufreq + libinput.",
+  "Single-disk disko (ESP + 8G swap + btrfs /root,/nix). NVMe (KIOXIA KBG40ZNV256G) on /dev/nvme0n1; SATA M.2 variants enumerate as /dev/sda.",
+  "Hardware quirk (USB-C data-only): HP 15s-eq Type-C port is SuperSpeed USB 3.1 Gen 1 data-only (5 Gbps) without DisplayPort Alt Mode pins. External displays (Samsung 4K TV via Dell D6000 dock) require DisplayLink EVDI via profiles.dell-dock.enable.",
+  "Hardware quirk (Picasso APU sleep deadlock): Ryzen 3 3250U APU crashes on ACPI S3/s2idle wake due to amdgpu DCN 1.0.1 engine lockup. ACPI sleep is disabled via systemd.sleep.settings.Sleep.AllowSuspend = 'no', logind locks on lid close (HandleLidSwitch = 'lock', HandleLidSwitchDocked = 'ignore'), and boot.kernelParams includes iommu=pt.",
+  "Network interfaces: Realtek Wi-Fi (wlo1, 192.168.3.23) and Dell D6000 CDC NCM Ethernet (enp4s0f3u1u1i5, 192.168.3.253) when docked.",
+]
 
 [hosts.fern.hardware]
 model = "HP 15 Laptop (15s-eq series)"
 cpu = "AMD Ryzen 3 3250U (Picasso/Zen+, 2c/4t, 15 W)"
 gpu = "AMD Radeon Vega 3 iGPU (amdgpu)"
 ram = "8 GB DDR4"
+display = "Samsung U28E590 28\" 4K Monitor (3840x2160 @ 60 Hz, 1.5x scaling via Dell D6000 DisplayLink Dock) + 15.6\" 1080p internal panel (eDP-1)"
 storage_type = "NVMe SSD"
 storage_layout = "/dev/nvme0n1 (disko: ESP + 8G swap + btrfs /root,/nix)"
 

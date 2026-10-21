@@ -10,6 +10,18 @@
   customDwl = pkgs.dwl.override {
     configH = builtins.readFile ../../modules/config/dwl/config.h;
   };
+
+  # greetd launches the session with XDG_SESSION_TYPE=tty, which is what a
+  # greeter is, not what a compositor is: clients that branch on it (portals,
+  # GTK, screencast) then take the TTY path. niri exports these itself; dwl
+  # does not, so the session gets a wrapper. Both the autologin session and
+  # tuigreet's --cmd use it, so a manual login is identical to the autologin.
+  dwlSession = pkgs.writeShellScript "dwl-session" ''
+    export XDG_SESSION_TYPE=wayland
+    export XDG_SESSION_DESKTOP=dwl
+    export XDG_CURRENT_DESKTOP=dwl
+    exec ${customDwl}/bin/dwl "$@"
+  '';
 in {
   imports = [
     ./hardware-configuration.nix
@@ -82,11 +94,11 @@ in {
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${customDwl}/bin/dwl";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${dwlSession}";
         user = "greeter";
       };
       initial_session = {
-        command = "${customDwl}/bin/dwl";
+        command = "${dwlSession}";
         user = user.name;
       };
     };

@@ -177,6 +177,16 @@
     lib.any (l: builtins.match "[[:space:]]+[A-Za-z][A-Za-z0-9.-]*\\.enable = (true|false);" l != null)
     (lib.splitString "\n" (builtins.readFile p));
   skillsDefiningServices = map skillName (builtins.filter definesService skillFiles);
+  # Supervision is a record, not a feeling: one JSON line per judged candidate,
+  # and the automation label is gated on its verdicts (see `automation-is-earned`).
+  ledger = ".agents/supervision.jsonl";
+  ledgerLines =
+    if builtins.pathExists (root + "/${ledger}")
+    then lib.splitString "\n" (read ledger)
+    else [];
+  agreeCount = builtins.length (builtins.filter (l: lib.hasInfix "\"agree\":true" (lib.replaceStrings [" "] [""] l)) ledgerLines);
+  totalJudged = builtins.length (builtins.filter (l: lib.hasInfix "\"target\"" l) ledgerLines);
+  disagreeCount = totalJudged - agreeCount;
 
   # One blob of every .md/.nix in the tree, so "linked from somewhere" is one scan.
   # A *link* counts (`](docs/x.md)` from the manual, `](./x.md)` from a sibling
@@ -251,6 +261,20 @@
         && !(has "scripts/task/categorize.sh" "cat \"$f\"")
         && !(has "scripts/task/categorize.sh" "jq -Rs");
       detail = "the categorizer started sending file contents (or stopped proving it sends features)";
+    };
+
+    automation-is-earned = {
+      rule = "An automation stamp is earned by the supervision ledger, never by an agent's optimism: `.agents/supervision.jsonl` records one judged candidate per line (target, engine label, human label, agree), and the categorizer may not grow an `--auto`/`--apply` path unless at least 5 agreements are recorded AND they are at least half the judged set. A paywall, a 402 or a provider error is not a disagreement to average over — it is a refusal.";
+      proof = ".agents/supervision.jsonl and scripts/task/categorize.sh";
+      holds =
+        (!(has "scripts/task/categorize.sh" "--auto")
+          && !(has "scripts/task/categorize.sh" "--apply"))
+        || (agreeCount >= 5 && agreeCount * 2 >= totalJudged);
+      detail = "supervision: ${toString agreeCount} agree / ${toString disagreeCount} disagree of ${toString totalJudged} judged — automation is ${
+        if agreeCount >= 5 && agreeCount * 2 >= totalJudged
+        then "earned"
+        else "not earned"
+      }; adding --auto now fails this policy";
     };
 
     decision-engine-routing = {

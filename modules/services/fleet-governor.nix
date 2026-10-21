@@ -7,6 +7,12 @@
 }: let
   user = import ../global/user.nix;
   cfg = config.services.fleetGovernor;
+  # The ensemble CLI lives in a sibling directory. Interpolating the directory
+  # (not `toString ../..`) gives the store reference a string context, so the
+  # derivation really depends on it and the sandbox can see it. Copying the
+  # whole directory — rather than just ensemble.py — keeps `from engine import
+  # DecisionEngine` resolvable through sys.path[0].
+  systemoneDir = ./systemone;
 
   # Declarative rules configuration serialized into Nix store JSON
   rulesConfig = pkgs.writeText "fleet-governor-rules.json" (builtins.toJSON {
@@ -274,7 +280,11 @@ in {
           };
           flakePath = lib.mkOption {
             type = lib.types.str;
-            default = toString ../..;
+            # Interpolation, not `toString`: the latter strips the store-path
+            # context, which made the rules JSON a derivation that referenced
+            # the flake source without depending on it (nix warns, and the
+            # reference stops resolving once that path is collected).
+            default = "${../..}";
             description = "Target flake path (defaults to this flake's source).";
           };
         };
@@ -328,7 +338,7 @@ in {
             if command -v systemone-ensemble >/dev/null 2>&1; then
               systemone-ensemble govern $FLAGS
             else
-              python3 ${toString ../..}/modules/services/systemone/ensemble.py govern $FLAGS
+              python3 ${systemoneDir}/ensemble.py govern $FLAGS
             fi
           ''}
         '';

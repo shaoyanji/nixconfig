@@ -243,6 +243,16 @@
       detail = "a channel lost its task, so the category it owns has no route";
     };
 
+    categorize-sends-features-only = {
+      rule = "The categorizer sends a file's FEATURES to the provider, never its contents: comment/line counts, duplicate-fact hits, age and pattern counts. A categorizer that pipes the document itself to a remote model is a data-egress path wearing a lint's clothes, so the state format is a predicate and `cat \"$f\"` is not allowed in it.";
+      proof = "scripts/task/categorize.sh (features() builds the state; ask/jev_classify send only that string)";
+      holds =
+        has "scripts/task/categorize.sh" "printf 'comments="
+        && !(has "scripts/task/categorize.sh" "cat \"$f\"")
+        && !(has "scripts/task/categorize.sh" "jq -Rs");
+      detail = "the categorizer started sending file contents (or stopped proving it sends features)";
+    };
+
     decision-engine-routing = {
       rule = "Categorization runs on jev (TypeSafe) and says so: julia-1's `choice` is label-biased — a real command sequence reads as 'a fact about a machine' in both orders (0/10 on the steps anchor, 4/10 on the rule anchor) — and OpenRouter answers HTTP 402 without credit, so a skill may not offer it as the default.";
       proof = "scripts/task/categorize.sh (default engine, error gate) and .agents/skills/jevdecide/SKILL.md (named provider)";

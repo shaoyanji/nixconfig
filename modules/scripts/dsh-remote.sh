@@ -47,7 +47,7 @@ machine, so closing this command does not close the tab. The first visit to a
 browser profile exchanges the printed token for a 30-day cookie, after which the
 bare https://<host>/deepseek/ works on its own.
 
-Env: DSH_HOST DSH_SERVICE DSH_PORT DSH_SYNC_AUTH DSH_OPEN_BROWSER DSH_TIMEOUT
+Env: DSH_HOST DSH_SERVICE DSH_PORT DSH_SYNC_AUTH DSH_OPEN_BROWSER DSH_TIMEOUT DSH_WAIT
 EOF
 }
 
@@ -140,8 +140,10 @@ probe_url() {
   return 1
 }
 
-# A restart mints a new token, so "the URL changed" is how we know the line we
-# read belongs to the process that is running now.
+# A start or restart mints a new token, so "the URL changed" is how we know the
+# line we read belongs to the process that is running now — the journal keeps
+# every previous start, and acting on a stale line is a 401 (or a 502 while the
+# new process has not bound yet).
 fresh_url() {
   local old=$1 url
   for _ in $(seq 1 60); do
@@ -153,6 +155,17 @@ fresh_url() {
     sleep 1
   done
   return 1
+}
+
+# The URL line is printed as soon as the harness is up, which can be a beat
+# before the listener accepts — a 502 here is a race, not a broken ingress.
+wait_probe() {
+  local url=$1 deadline=$((SECONDS + ${DSH_WAIT:-45}))
+  while :; do
+    probe_url "$url" && return 0
+    [ "$SECONDS" -ge "$deadline" ] && return 1
+    sleep 1
+  done
 }
 
 worker_root() {
@@ -258,8 +271,7 @@ case "$ACTION" in
     exit 0
     ;;
   restart)
-    old=""
-    [ "$(service_state)" = active ] && old=$(read_url)
+    old=$(read_url)
     unit_cmd restart || exit 1
     URL=$(fresh_url "$old") || die "$SERVICE did not publish a URL within 60s (try: dsh-remote --log)"
     ;;
@@ -274,6 +286,9 @@ case "$ACTION" in
   run)
     URL=""
     sync_auth
+    # Baseline from BEFORE we act: the journal holds every previous start, and a
+    # stopped unit's last line is not the process we are about to launch.
+    old=$(read_url)
     if [ "$imported" = 0 ] && [ "$(service_state)" = active ]; then
       URL=$(read_url)
     fi
@@ -281,7 +296,6 @@ case "$ACTION" in
     # Credentials are read at boot, so an import only takes effect on a restart.
     if [ "$imported" = 1 ] || [ -z "$URL" ]; then
       [ "$imported" = 1 ] && printf 'dsh-remote: restarting %s to pick up the credential\n' "$SERVICE"
-      old=$URL
       if [ "$(service_state)" = active ]; then
         unit_cmd restart || exit 1
       else
@@ -291,12 +305,12 @@ case "$ACTION" in
       URL=$(fresh_url "$old") || die "$SERVICE did not publish a URL within 60s (try: dsh-remote --log)"
     fi
 
-    if ! probe_url "$URL"; then
+    if ! wait_probe "$URL"; then
       printf 'dsh-remote: %s answered HTTP %s; restarting %s on %s\n' "$(clean_url "$URL")" "$PROBE_CODE" "$SERVICE" "$HOST" >&2
       old=$URL
       unit_cmd restart || exit 1
       URL=$(fresh_url "$old") || die "$SERVICE did not publish a URL within 60s (try: dsh-remote --log)"
-      probe_url "$URL" ||
+      wait_probe "$URL" ||
         die "the ingress still answers HTTP $PROBE_CODE on $HOST (nginx / TLS / DNS, not the harness)"
     fi
     ;;

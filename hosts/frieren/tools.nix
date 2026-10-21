@@ -35,6 +35,24 @@
     '';
   };
 
+  # The worker half of the harness lives on delphi (`services.dshWeb` + the TLS
+  # ingress at /deepseek/); this is the client that opens it from here. Its own
+  # local `dsh-web` below stays, because a local harness is still useful when the
+  # remote host is down.
+  dshRemote = import ../../modules/scripts/dsh-remote.nix {inherit pkgs;};
+
+  dshRemoteDesktop = pkgs.makeDesktopItem {
+    name = "dsh-remote";
+    desktopName = "DeepSeek Harness (Remote)";
+    genericName = "Agent Harness";
+    comment = "Open the DeepSeek Harness running on delphi (delphi.bountystash.com/deepseek)";
+    exec = "dsh-remote";
+    icon = "utilities-terminal";
+    categories = ["Development" "Utility"];
+    keywords = ["ai" "agent" "harness" "dsh" "deepseek" "remote"];
+    terminal = false;
+  };
+
   dshDesktop = pkgs.makeDesktopItem {
     name = "dsh-web";
     desktopName = "DeepSeek Harness";
@@ -140,7 +158,7 @@ in {
 
   config = {
     environment.systemPackages =
-      lightTools ++ [dshWeb dshDesktop pkgs.plocate] ++ lib.optionals cfg.enableHeavy heavyTools;
+      lightTools ++ [dshWeb dshRemote dshDesktop dshRemoteDesktop pkgs.plocate] ++ lib.optionals cfg.enableHeavy heavyTools;
 
     # --- Fast Filesystem Indexing (plocate) ---
     services.locate = {

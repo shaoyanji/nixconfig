@@ -68,3 +68,5 @@ task envs:build
 # Validate markup and equations
 task envs:validate
 ```
+
+Truth: `taskfiles/envs.yml` — the executable contract; this page is the procedure.

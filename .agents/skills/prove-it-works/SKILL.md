@@ -43,3 +43,5 @@ An eval is not a build. A build is not a runtime test.
 The strongest proof is a deterministic command a reviewer can re-run, not a one-time eyeball. Prefer an existing `task checks:*` over a new script, and paste the command with its output.
 
 Commit the artifact only for large or long-running work where the trail has to be auditable later.
+
+Truth: `flake/policies.nix` — the rules this page applies are predicates there; this page is the procedure.

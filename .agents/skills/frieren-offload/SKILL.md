@@ -200,3 +200,5 @@ ssh frieren.lan "journalctl --user -u agy-nightly-system.service -n 30 --no-page
 # View archived copies
 ssh frieren.lan "ls -la ~/.agents/handoffs/ ~/.agents/system/"
 ```
+
+Truth: `hosts/frieren/configuration.nix` — the worker that does the work; this page is the procedure.

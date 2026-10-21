@@ -68,3 +68,5 @@ The skill provides an executable CLI:
   --state "PostgreSQL vacuum pgvector completed with 15 pages freed" \
   --prompt "Did the vacuum operation succeed?"
 ```
+
+Truth: `modules/user/ai/skills/default.nix` — the materialization of the module skills; this page is the procedure.

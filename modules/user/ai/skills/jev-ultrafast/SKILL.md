@@ -112,3 +112,5 @@ To verify the skill installation and end-to-end operation driving Windows `chrom
 ```bash
 npm --prefix ~/.agents/skills/jev-ultrafast test
 ```
+
+Truth: `modules/user/ai/skills/default.nix` — the materialization of the module skills; this page is the procedure.

@@ -55,3 +55,5 @@ sudo -n /nix/store/<hash>-nixos-system-eisen-26.11.20261005.aa48d34/bin/switch-t
 Work in `~/Documents/nixconfig` (the NAS copy, current main). The `~/nixconfig` checkout is behind and has an unrelated history — do not merge between them by hand. Commit with conventional messages (`feat(eisen): …`, `fix(eisen): …`, `docs(eisen): …`, `perf(eisen): …`).
 
 **Confirm before:** `switch-to-configuration switch` (changes the boot entry), any `git push --force` (history rewrite — see `confirm-before-destructive`).
+
+Truth: `taskfiles/infra.yml` — the executable contract; this page is the procedure.

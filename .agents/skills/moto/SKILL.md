@@ -60,3 +60,5 @@ task moto:push -- ./book.pdf
 # Pull camera photo from phone
 task moto:pull -- storage/dcim/Camera/photo.jpg ./
 ```
+
+Truth: `taskfiles/moto.yml` — the executable contract; this page is the procedure.

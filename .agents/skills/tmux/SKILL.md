@@ -133,3 +133,5 @@ On an agent's own shell each step is wrong for a different reason:
 The process writes to a file from a *later* tool call, and
 `tmux has-session`/`systemctl --user is-active` still reports it running. If the
 second check is missing, the start did not survive and the recipe was wrong.
+
+Truth: `modules/config/shells/common-packages.nix` — what installs the tool; this page is the procedure.

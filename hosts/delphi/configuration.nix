@@ -43,6 +43,11 @@
   # listener on the tailnet address at 443 fails while that bind exists
   # (measured: "bind: address already in use").
   tailnetHost = "delphi.cloudforest-kardashev.ts.net";
+  # Stable per node key, and the only address that works here: delphi runs
+  # `--accept-dns=false` (a resolver must not resolve through the address it
+  # serves), so a MagicDNS name does not resolve from inside this host. One
+  # constant, because the portal card and the monitor both point at it.
+  tailnetIp = "100.123.145.53";
   servePort = 8443;
   dshPort = 3080;
   dshPath = "/";
@@ -451,8 +456,8 @@ in {
       group = "Tailnet services";
       audience = "tailnet";
       external = true;
-      href = "http://100.123.145.53:8181";
-      badge = "100.123.145.53:8181";
+      href = "http://${tailnetIp}:8181";
+      badge = "${tailnetIp}:8181";
     };
   };
 

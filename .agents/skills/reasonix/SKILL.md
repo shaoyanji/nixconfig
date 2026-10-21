@@ -76,3 +76,5 @@ reasonix doctor --json
 - Model selection: `--model NAME` on any invocation.
 - Permission gating for non-interactive runs: `--permission-mode MODE` (used with `-p` / `run`).
 - `reasonix` is a prebuilt package from `github:numtide/llm-agents.nix`; cache hits only when our nixpkgs matches theirs, otherwise it builds locally from source.
+
+Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.

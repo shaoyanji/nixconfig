@@ -76,3 +76,5 @@ Hermes: `hermes mcp add ai-memory -- /run/current-system/sw/bin/ai-memory serve`
 - `ai-memory compact` — reclaim DB pages; `ai-memory reset` — nuke wiki+db
   (destructive; `backup` first).
 - Restore onto a new machine: `ai-memory restore <tarball>` then `reindex`.
+
+Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.

@@ -67,3 +67,5 @@ These wrappers route to canonical `infra:*`, `checks:*`, and `dev:*` tasks. Pref
 
 | `push-fuji-rebuild` | Alias for `infra:deploy:host:mtfuji` |
 | `rebuild` | Deprecated rebuild menu |
+
+Truth: `taskfiles/services.yml` — the executable contract; this page is the procedure.

@@ -52,3 +52,5 @@ Drive the job-application pipeline at `/srv/data/projects/antigravity-applicatio
 - Email flow: `task apps:emails` scans inbound mail (Himalaya), matches recruiter replies to applications, and updates statuses; draft/reuse follow-ups with `task apps:followups --copy <id>`.
 - Never hand-edit `applications.db` — mutate `applications.json` (or use `apps:update` / `apps:emails`) and let sync reconcile.
 - Heavy interactive submission automation lives in the workflow repo's own skills (`antigravity-application-workflow`, `playwright-job-submission`), not here.
+
+Truth: `taskfiles/apps.yml` — the executable contract; this page is the procedure.

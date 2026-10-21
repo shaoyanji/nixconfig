@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
+# Measured 2026-10-21: this engine's `classify` behaves as an ORDERED prior on
+# this corpus. A rule-shaped state made option 0 win, and a steps-shaped state
+# made option 1 (fleet-fact) win under four different `procedure:` label
+# wordings — so option text is not the weight, position is. Until that changes,
+# treat the table as a prior and keep the calibration anchors: they caught it.
+#
 # Categorize prose candidates with the decision engine, then GATE the query:
 # a query that answers everything the same way, or cannot answer a case whose
 # answer is known, has measured nothing and exits 1.

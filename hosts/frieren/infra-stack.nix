@@ -819,8 +819,8 @@ in {
     serviceConfig = {
       Type = "simple";
       Environment = [
-        "SSH_CLIENT=127.0.0.1 1 1"
-        "SSH_CONNECTION=127.0.0.1 1 127.0.0.1 22"
+        ''"SSH_CLIENT=127.0.0.1 1 1"''
+        ''"SSH_CONNECTION=127.0.0.1 1 127.0.0.1 22"''
         "HOME=${user.home}"
         "USER=devji"
         "PATH=${user.home}/.nix-profile/bin:/etc/profiles/per-user/${user.name}/bin:/run/current-system/sw/bin"

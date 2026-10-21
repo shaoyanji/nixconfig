@@ -1,6 +1,6 @@
 # eisen Deployment & Operations
 
-Rationale, design and measurements: [`docs/eisen-llm-architecture.md`](../../docs/eisen-llm-architecture.md).
+Rationale, design and measurements: [`docs/eisen-llm-architecture.md`](../../../docs/eisen-llm-architecture.md).
 Every command lives here; that page explains the choices.
 
 ---

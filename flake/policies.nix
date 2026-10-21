@@ -264,17 +264,26 @@
     };
 
     automation-is-earned = {
-      rule = "An automation stamp is earned by the supervision ledger, never by an agent's optimism: `.agents/supervision.jsonl` records one judged candidate per line (target, engine label, human label, agree), and the categorizer may not grow an `--auto`/`--apply` path unless at least 5 agreements are recorded AND they are at least half the judged set. A paywall, a 402 or a provider error is not a disagreement to average over — it is a refusal.";
+      rule = "An automation stamp is earned by the supervision ledger, never by an agent's optimism: `.agents/supervision.jsonl` records one judged candidate per line (target, engine label, human label, agree), the categorizer never moves or rewrites prose (`git mv`, `sed -i`, an in-place write to the candidate file all fail it), and it may not grow an `--auto`/`--apply` path unless at least 5 agreements are recorded AND they are at least half the judged set. A paywall, a 402 or a provider error is not a disagreement to average over — it is a refusal.";
       proof = ".agents/supervision.jsonl and scripts/task/categorize.sh";
       holds =
-        (!(has "scripts/task/categorize.sh" "--auto")
-          && !(has "scripts/task/categorize.sh" "--apply"))
-        || (agreeCount >= 5 && agreeCount * 2 >= totalJudged);
+        # It classifies and never moves: a mutating categorizer is an automation
+        # path whatever it calls itself, so the flag-name gate alone is not enough.
+        !(lib.any (t: has "scripts/task/categorize.sh" t) ["git mv" "sed -i" "mv \"$f\"" ">\"$f\""])
+        && (
+          (!(has "scripts/task/categorize.sh" "--auto")
+            && !(has "scripts/task/categorize.sh" "--apply"))
+          || (agreeCount >= 5 && agreeCount * 2 >= totalJudged)
+        );
       detail = "supervision: ${toString agreeCount} agree / ${toString disagreeCount} disagree of ${toString totalJudged} judged — automation is ${
         if agreeCount >= 5 && agreeCount * 2 >= totalJudged
         then "earned"
         else "not earned"
-      }; adding --auto now fails this policy";
+      }; ${
+        if agreeCount >= 5 && agreeCount * 2 >= totalJudged
+        then "an --auto path is permitted while this majority holds"
+        else "adding --auto now fails this policy"
+      }";
     };
 
     decision-engine-routing = {

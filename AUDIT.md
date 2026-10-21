@@ -39,9 +39,8 @@
   and `--sync-auth` imports a client credential; the launcher says which.
 - Evidence: token `303` → cookie `200` (37,512 B), `/deepseek/api/remote.mux`
   upgrade `401` → **`101`**; `checks:host HOST=delphi MODE=eval` rc=0 (1,841).
-- A turn needs the **model** key too (sops → `EnvironmentFile`); the harness is
-  tailnet-only now, and delphi runs `systemone-decision` (24 MiB RSS, julia-1).
-- minyx refreshed for a reflash (NM, zram, one-job Nix, blocky firewall); the
+- A turn needs the **model** key too (sops → `EnvironmentFile`); harness tailnet-only,
+  delphi runs `systemone-decision` (24 MiB); minyx refreshed for a reflash, and the
   builder / exit-node / staging / ingest / gateway ideas are `exp-115`..`exp-120`.
 
 ### 2026-10-21 — Pi research is dumped, and there is no 2.0 to design against

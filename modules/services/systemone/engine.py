@@ -424,6 +424,199 @@ def emit(res, fail_on_alert=False, is_triage=False):
         sys.exit(1)
 
 
+# ---------------------------------------------------------------------------
+# Serve mode: the /v1/systemone envelope, so a consumer asks one host instead of
+# shipping this file. Standard library only, like everything else here: the
+# instance that runs it is aarch64 with two cores and no PyPI.
+#
+#   POST /v1/systemone   {"state": <str|object>, "questions": {id: {type, ...}}}
+#   GET  /health         liveness + which model this process answers with
+#
+# The response is the documented envelope (`answers` + `usage`), not the
+# engine's internal dict, because the Go decision router forwards it verbatim to
+# SubZeroClaw and the skills parse `answers[<id>].{choice,probabilities,confidence}`.
+# ---------------------------------------------------------------------------
+MAX_BODY = 1 << 20  # a triage document, not a file transfer
+MAX_QUESTIONS = 64
+SERVE_PATHS = ("/v1/systemone", "/v1/decisions")
+
+
+def answer_questions(engine: "DecisionEngine", state: str, questions: Dict[str, Any]) -> Dict[str, Any]:
+    """Evaluate a `questions` object into the documented per-question answers."""
+    if not isinstance(questions, dict) or not questions:
+        raise ValueError("questions must be a non-empty object mapping id -> question")
+    if len(questions) > MAX_QUESTIONS:
+        raise ValueError(f"too many questions ({len(questions)} > {MAX_QUESTIONS})")
+
+    answers: Dict[str, Any] = {}
+    for qid, question in questions.items():
+        if not isinstance(question, dict):
+            raise ValueError(f"question {qid!r} must be an object")
+        qtype = str(question.get("type", "choice"))
+        instructions = str(question.get("instructions") or question.get("prompt") or "")
+        criteria = question.get("criteria") or question.get("options") or {}
+
+        if qtype in ("choice", "classify", "route"):
+            options = list(criteria.keys()) if isinstance(criteria, dict) else [str(o) for o in criteria]
+            if not options:
+                raise ValueError(f"question {qid!r} of type {qtype} needs criteria or options")
+
+        if qtype == "choice":
+            r = engine.choice(state, instructions, options)
+            answers[qid] = {
+                "choice": r["decision"],
+                "probabilities": r["probabilities"],
+                "confidence": r["confidence"],
+                "entropy": r["entropy"],
+            }
+        elif qtype == "classify":
+            r = engine.classify(state, options)
+            answers[qid] = {
+                "choice": r.get("decision"),
+                "probabilities": r.get("probabilities"),
+                "confidence": r.get("confidence"),
+            }
+        elif qtype == "route":
+            handlers = criteria if isinstance(criteria, dict) else {o: o for o in options}
+            r = engine.route(state, handlers)
+            answers[qid] = {
+                "choice": r.get("target_handler"),
+                "confidence": r.get("confidence"),
+                "rationale": r.get("rationale"),
+            }
+        elif qtype == "score":
+            r = engine.score(state, instructions)
+            answers[qid] = {
+                "score": r["score"],
+                "min_scale": r.get("min_scale"),
+                "max_scale": r.get("max_scale"),
+                "confidence": r.get("confidence"),
+            }
+        elif qtype == "noul":
+            r = engine.noul(state, instructions)
+            answers[qid] = {
+                "holds": r.get("holds"),
+                "probability": r.get("probability_true"),
+                "confidence": r.get("confidence"),
+            }
+        else:
+            raise ValueError(f"question {qid!r} has unknown type {qtype!r}")
+
+    return answers
+
+
+def _make_handler(engine: "DecisionEngine"):
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer  # noqa: F401  (import kept local to the mode)
+
+    class Handler(BaseHTTPRequestHandler):
+        server_version = "systemone-decision/1.0"
+        protocol_version = "HTTP/1.1"
+
+        def log_message(self, fmt: str, *args: Any) -> None:  # journald is the log
+            sys.stderr.write("systemone-decision: " + (fmt % args) + "\n")
+            sys.stderr.flush()
+
+        def _json(self, code: int, payload: Dict[str, Any]) -> None:
+            body = json.dumps(payload).encode("utf-8")
+            self.send_response(code)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self) -> None:  # noqa: N802
+            path = self.path.split("?", 1)[0].rstrip("/") or "/"
+            # `/` answers too: this process is mounted behind a proxy at the
+            # root of its own port, so a bare request is a liveness probe.
+            if path in ("/", "/health", "/v1/systemone/health", "/v1/health"):
+                self._json(200, {
+                    "status": "ok",
+                    "model": engine.model_name,
+                    "params": engine.profile["params"],
+                    "capabilities": ["choice", "score", "noul", "classify", "route"],
+                    "pid": os.getpid(),
+                })
+                return
+            self._json(404, {"error": "not found", "paths": list(SERVE_PATHS)})
+
+        def do_POST(self) -> None:  # noqa: N802
+            path = self.path.split("?", 1)[0].rstrip("/")
+            if path not in SERVE_PATHS:
+                self._json(404, {"error": "not found", "paths": list(SERVE_PATHS)})
+                return
+
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                length = 0
+            if length <= 0:
+                self._json(400, {"error": "empty body"})
+                return
+            if length > MAX_BODY:
+                self._json(413, {"error": f"body larger than {MAX_BODY} bytes"})
+                return
+
+            started = time.time()
+            try:
+                payload = json.loads(self.rfile.read(length).decode("utf-8"))
+            except Exception as exc:  # a malformed body is the caller's problem, not a 500
+                self._json(400, {"error": f"invalid JSON: {exc}"})
+                return
+            if not isinstance(payload, dict):
+                self._json(400, {"error": "body must be a JSON object"})
+                return
+
+            raw_state = payload.get("state", "")
+            state = raw_state if isinstance(raw_state, str) else json.dumps(raw_state, sort_keys=True)
+            questions = payload.get("questions")
+            try:
+                answers = answer_questions(engine, state, questions)
+            except ValueError as exc:
+                self._json(400, {"error": str(exc)})
+                return
+            except Exception:
+                self.log_message("internal error for %s", path)
+                import traceback
+                traceback.print_exc(file=sys.stderr)
+                self._json(500, {"error": "internal error"})
+                return
+
+            self._json(200, {
+                "answers": answers,
+                "usage": {
+                    "input_tokens": max(1, len(state) // 4),
+                    "output_tokens": 0,
+                    "model": engine.model_name,
+                    "questions": len(answers),
+                },
+                "latency_ms": round((time.time() - started) * 1000, 2),
+            })
+
+    return Handler
+
+
+def serve(host: str, port: int, model_name: str = "julia-1") -> None:
+    """Serve the decision envelope until interrupted."""
+    from http.server import ThreadingHTTPServer
+
+    engine = DecisionEngine(model_name)
+    httpd = ThreadingHTTPServer((host, port), _make_handler(engine))
+    httpd.daemon_threads = True
+    print(
+        f"systemone-decision: serving {model_name} on http://{host}:{port}"
+        f"{SERVE_PATHS[0]} (health: /health)",
+        file=sys.stderr,
+        flush=True,
+    )
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        httpd.server_close()
+
+
 def main():
     parser = argparse.ArgumentParser(description="System One Decision Engine (Julia-1 & Laya)")
     parser.add_argument("--model", choices=["julia-1", "laya"], default="julia-1", help="Decision model to use")
@@ -449,6 +642,11 @@ def main():
     p_query.add_argument("--prompt", required=True, help="Question or criteria or condition")
     p_query.add_argument("--options", nargs="*", default=[], help="Options for choice/classify/route")
 
+    # Serve mode: the /v1/systemone envelope for other agents on the tailnet.
+    p_serve = subparsers.add_parser("serve", help="Serve the /v1/systemone envelope over HTTP")
+    p_serve.add_argument("--host", default="127.0.0.1", help="Bind address (loopback; front it with a proxy)")
+    p_serve.add_argument("--port", type=int, default=8091, help="Bind port")
+
     for sub in subparsers.choices.values():
         sub.add_argument(
             "--fail-on-alert",
@@ -458,7 +656,10 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "benchmark":
+    if args.command == "serve":
+        serve(args.host, args.port, args.model)
+
+    elif args.command == "benchmark":
         print(f"=== Running Benchmarks for Model: {args.model} ({PROFILES[args.model]['params']} params) ===")
         res = run_benchmarks(args.model, args.iterations)
         emit(res, args.fail_on_alert, is_triage=args.command == "triage-system")

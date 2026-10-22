@@ -69,6 +69,15 @@
   strayRootMd = builtins.filter (f: !(builtins.elem f knownRootMd)) rootMd;
 
   rel = p: lib.removePrefix "${toString root}/" (toString p);
+
+  # Position, not presence: a guard that runs after the expensive step is
+  # decoration. An absent needle resolves to the whole file, so `before` is false
+  # for a guard somebody deleted.
+  offsetOf = p: needle: builtins.stringLength (builtins.head (lib.splitString needle (read p)));
+  before = p: a: b:
+    offsetOf p a
+    < offsetOf p b
+    && offsetOf p a < builtins.stringLength (read p);
   anyMatchingLine = p: re: lib.any (l: builtins.match re l != null) (lib.splitString "\n" (builtins.readFile p));
 
   # --- secrets: encrypted per VALUE, not per file ---------------------------
@@ -518,6 +527,19 @@
       proof = "scripts/task/host-check-sweep.sh";
       holds = has "scripts/task/host-check-sweep.sh" "oom-guard";
       detail = "host-check-sweep.sh stopped calling oom-guard.sh";
+    };
+
+    boot-gate-needs-kvm = {
+      rule = "A boot of some OTHER host is an instrument, not a check: `scripts/task/boot-check.sh` refuses before its first eval or build unless /dev/kvm is usable, and names CI when it does. Under TCG a real host costs a core for ~8 minutes, and the machines that reach for it by hand are also serving (delphi: public TLS and ssh on 2 OCPU), so the cost is degraded traffic rather than a slow test. The one exception is the host you are about to switch — `--self` resolves to `$(hostname)` or refuses — because a bad stage-1 there cannot be diagnosed from outside. ALLOW_TCG=1 is the remaining deliberate override.";
+      proof = "the /dev/kvm probe's position in scripts/task/boot-check.sh, ahead of its first `nix eval` and `nix build`";
+      holds =
+        has "scripts/task/boot-check.sh" "ALLOW_TCG"
+        && has "scripts/task/boot-check.sh" ''[ ! -r /dev/kvm ]''
+        && has "scripts/task/boot-check.sh" "no usable /dev/kvm"
+        && has "scripts/task/boot-check.sh" "--self is for"
+        && before "scripts/task/boot-check.sh" "/dev/kvm" ''status="$(nix eval''
+        && before "scripts/task/boot-check.sh" "/dev/kvm" "nix build --no-link";
+      detail = "boot-check.sh builds a VM without probing /dev/kvm first, or lost the ALLOW_TCG/--self overrides";
     };
 
     flake-check-memory-gated = {

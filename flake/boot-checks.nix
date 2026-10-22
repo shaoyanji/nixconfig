@@ -100,7 +100,11 @@ let
 
     virtualisation = {
       memorySize = 2048;
-      cores = 2;
+      # ONE vCPU, deliberately. The question is whether stage-1 hands off, which
+      # one core answers; on the 2-OCPU boxes that can run this by hand a second
+      # vCPU starves the nginx/ssh that share the machine (TCG is one thread per
+      # vCPU, so this is the difference between half the box and all of it).
+      cores = 1;
       diskSize = 4096;
     };
   };

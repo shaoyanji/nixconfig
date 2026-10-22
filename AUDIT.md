@@ -29,10 +29,15 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
-### 2026-10-22 — the boot gate boots a host's own config
+### 2026-10-22 — the boot gate boots a host's own config, and is not a hygiene instrument
 - `hostBootChecks.<arch>.<host>` runs the host's real module list in a VM and fails unless the console
-  shows `Reached target Multi-User System`; `task checks:boot HOST=`, CI `boot-canary` for `modules/services/**`.
-  Proof: delphi reached stage-2 under TCG, a missing root device fails; hardware (eMMC/NVIDIA/TPM) is out of reach.
+  shows `Reached target Multi-User System`; CI `boot-canary` for `modules/services/**`. Proof: delphi reached
+  stage-2, a missing root device fails; hardware (eMMC/NVIDIA/TPM) is out of reach.
+- `checks:boot` now refuses before its first eval unless `/dev/kvm` is usable, and `boot-gate-needs-kvm`
+  checks the probe precedes the build. Eight TCG boots of the same guest, after doc edits that could not
+  change it, pegged a core of a host answering `delphi.bountystash.com` and ssh — an outage, not a slow test.
+- The exception is the host being switched: `checks:boot:self` / `BOOT=1` boots `$(hostname)` under TCG
+  (one vCPU, `nice -n 19`, watchdog) because a bad stage-1 there cannot be diagnosed from outside.
 
 ### 2026-10-22 — skills audit: 19 files, −732 lines, and a gate against the pattern
 - Measured first: verbatim duplication against `AGENTS.md` and between skills is zero, so
@@ -74,23 +79,6 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 - Registry and runbook rewritten to match (`inventory.toml` role/notes/traits, `docs/inventory-schema.md`,
   `.agents/fleet-matrix.md`, `.agents/deploy/hosts/netbook.md`). Gates: `checks:host HOST=netbook` rc=0
   (1521 assertions), `ACTION=verify` rc=0.
-
-### 2026-10-22 — netbook deploy: build ladder on frieren, and a half-activation is now detectable
-- The deploy's build step became a ladder instead of one flag: `BUILD=auto` (default) substitutes on
-  frieren with `--max-jobs 0 --builders ""` and only escalates to nixbuild.net when a path is missing;
-  `local` compiles on frieren; `remote` (`REMOTE_ONLY=1`) is nixbuild.net only. Measured: unchanged tree
-  = seconds (pure substitution), `remote` 2m28s.
-- **A half-activation is now caught.** `switch-to-configuration` links `/etc` and `/run/current-system`
-  *before* it talks to systemd, so with a dead system bus the host looks current while every changed unit
-  keeps running the old config. Measured end to end: gen 49 moved `current` while `dbus-daemon` rejected
-  every uid-0 message to `org.freedesktop.systemd1`/`login1` (identical `/etc/dbus-1` policy before and
-  after, so not a config difference). The deploy now asks the bus for its unit list after the switch
-  (exit 5) and reports a non-zero switcher with a live bus (exit 6). Recovery: restart `dbus.service`,
-  re-run the switch, reboot if a desktop session died — the bus restart was what restored `Subscribe`.
-- Verified on the host after the reboot: booted `vraa14k5…` with kernel 7.1.2 (the pinned chain), 0 failed
-  units, greetd + alice session on seat0, substituters = harmonia + cachix + numtide, flakes enabled.
-  Full `infra:apply:host:netbook` rc=0 with the boot-chain guard matching and the closure pushed over the
-  LAN. `ACTION=preflight` now also reports whether harmonia actually serves the running system.
 
 ### 2026-10-22 — netbook becomes a flake host without touching its boot chain
 - `flake.nix` gains `nixpkgs_25_11`, pinned to `b6018f87da91` — the exact rev the netbook boots — and

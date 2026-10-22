@@ -18,35 +18,44 @@
 #   default and pays for the fleet. Name one host at a time; CI fans out over
 #   runners (`.github/workflows/nixcachix.yml`, job `boot-canary`).
 #
+# TWO REASONS TO BOOT, AND ONLY ONE OF THEM IS FREE HERE
+#   hygiene  any host, because a change reaches it. Belongs in CI: ~1 min on a
+#            runner with /dev/kvm, ~8 min of a core under TCG.
+#   self     the machine you are ABOUT TO SWITCH, because nobody can diagnose
+#            its initrd from outside: a bad handoff is a box that never comes
+#            back, and this is the only pre-flight that runs the boot. Allowed
+#            under TCG (`--self`), niced, one vCPU — see below.
+#   Machines that run this by hand are also serving (delphi: public TLS on
+#   delphi.bountystash.com + ssh, 2 OCPU), so an unqualified local boot spends
+#   someone's page load. The KVM probe refuses before any eval or build; `--self`
+#   and ALLOW_TCG=1 are the deliberate paths.
+#
 # BUILD BUDGET
 #   `--builders ""` is not a preference. A boot test still has to build, but it
 #   must never dispatch that build to nixbuild.net, which bills per second — the
 #   rule is that only `dev:nixbuild:warm` spends that budget on purpose.
 #
-# NOT A PRE-SWITCH HOOK
-#   Never chain this in front of a switch: it boots a VM, it does not predict the
-#   host's own hardware. See flake/boot-checks.nix for what it does and does not
-#   prove.
-#
 # SELF-CONTAINED ASSERTION
 #   The test asserts stage-2 from the GUEST SERIAL CONSOLE, not the driver's
 #   backdoor shell: the shell has a hard 10 x 30 s connect budget from QEMU start,
-#   and a full host under TCG (this machine has no /dev/kvm) takes minutes. The
-#   console line `Reached target Multi-User System` is printed by stage-2 systemd
-#   only — the initrd reaches `Initrd Default Target`.
+#   and under TCG a full host takes minutes. The console line
+#   `Reached target Multi-User System` is printed by stage-2 systemd only — the
+#   initrd reaches `Initrd Default Target`.
 #
 # USAGE
 #   boot-check.sh --host NAME [--arch ARCH] [--timeout SECONDS]
+#   boot-check.sh --self [--timeout SECONDS]     the local host, TCG allowed
 #
 # EXIT
 #   0  booted to multi-user (or the host is preserved: nothing to check)
-#   1  failed to boot or build, or the host is not in the flake
+#   1  failed to boot or build, the host is not in the flake, or no /dev/kvm
 #   2  watchdog aborted (host protected; the run stopped)
 set -uo pipefail
 
 HOST=""
 ARCH=""
-TIMEOUT=1800
+SELF=0
+TIMEOUT=900
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT" || exit 1
 
@@ -55,9 +64,22 @@ while [ $# -gt 0 ]; do
     --host) HOST="$2"; shift 2 ;;
     --arch) ARCH="$2"; shift 2 ;;
     --timeout) TIMEOUT="$2"; shift 2 ;;
+    --self) SELF=1; shift ;;
     *) echo "boot-check: unknown argument $1" >&2; exit 1 ;;
   esac
 done
+
+if [ "$SELF" = "1" ]; then
+  # `--self` is an identity, not a permission: the exception exists because a bad
+  # initrd on THIS box cannot be diagnosed from anywhere else. A remote host's
+  # boot is hygiene, and hygiene does not get to spend this machine's cores.
+  HERE="$(hostname -s)"
+  if [ -n "$HOST" ] && [ "$HOST" != "$HERE" ]; then
+    echo "boot-check: --self is for $(hostname), not '$HOST' — use --host for another machine." >&2
+    exit 1
+  fi
+  HOST="$HERE"
+fi
 
 if [ -z "$HOST" ]; then
   cat >&2 <<'MSG'
@@ -66,9 +88,35 @@ boot-check: --host is REQUIRED and takes exactly one host.
   a boot test evaluates and builds a full host and then runs QEMU; a default set
   is the fleet-evaluation footgun checks:hosts refuses.
 
-  task checks:boot HOST=frieren
+  task checks:boot HOST=frieren        one host, CI/anywhere with KVM
+  task checks:boot:self                THIS host, before its own switch
 MSG
   exit 1
+fi
+
+# KVM OR SOMETHING DELIBERATE, before the first eval: a guard placed after the
+# build saves nothing when the build succeeded and the boot is what costs a core.
+# `checks.policies` proves this probe precedes the first `nix build` here.
+NICE=()
+if [ ! -r /dev/kvm ]; then
+  if [ "${ALLOW_TCG:-0}" != "1" ] && [ "$SELF" != "1" ]; then
+    echo "boot-check: no usable /dev/kvm — refusing to boot a full host under TCG." >&2
+    echo "  ~8 min of one core to prove what a runner proves in one, and the hosts" >&2
+    echo "  that reach for this by hand are serving (delphi: public TLS + ssh, 2 OCPU)." >&2
+    echo "  run it in CI:            task dev:ci:trigger:<host>   (boot-canary job)" >&2
+    echo "  before THIS host's switch: task checks:boot:self" >&2
+    echo "  deliberate emulation:    ALLOW_TCG=1 $(basename "$0") --host <host>" >&2
+    echo "  rule: [[flake/policies.nix#boot-gate-needs-kvm]]" >&2
+    exit 1
+  fi
+  if [ "$SELF" = "1" ]; then
+    echo "boot-check: no /dev/kvm — emulated boot of $(hostname), one vCPU, below everything else in nice." >&2
+  else
+    echo "boot-check: /dev/kvm unusable, ALLOW_TCG=1 — emulated boot, expect minutes" >&2
+  fi
+  # Emulation is CPU-bound and the machine is serving; QEMU also only gets one
+  # vCPU here (flake/boot-checks.nix), so the rest of the box stays responsive.
+  NICE=(nice -n 19)
 fi
 
 # Registry facts first: a preserved host must not reach an eval, a cache query or
@@ -97,6 +145,13 @@ fi
 # the lookup is cheap: attr names only, no host evaluation.
 if ! nix eval --json ".#hostBootChecks.\"$ARCH\"" --apply 'builtins.attrNames' 2>/dev/null |
   tr -d '[]"' | tr ',' '\n' | grep -qx "$HOST"; then
+  if [ "$SELF" = "1" ]; then
+    # A pre-switch boot is insurance, not a gate on coverage: a host the matrix
+    # does not cover must still be switchable, with the gap said out loud.
+    echo "boot-check: '$HOST' has no boot check on '$ARCH' — nothing to boot before this switch." >&2
+    echo "  hostBootChecks carries active NixOS hosts only (see flake/boot-checks.nix)." >&2
+    exit 0
+  fi
   echo "boot-check: no boot check for '$HOST' on '$ARCH'." >&2
   echo "  hostBootChecks carries active NixOS hosts only (see flake/boot-checks.nix)." >&2
   exit 1
@@ -105,7 +160,7 @@ fi
 echo "boot-check: ${HOST} (${ARCH}) — building and booting its real module graph"
 log="$(mktemp -t "boot-check-${HOST}.XXXXXX.log")"
 bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "boot ${HOST}" -- \
-  nix build --no-link -L --builders "" ".#hostBootChecks.${ARCH}.${HOST}" 2>&1 | tee "$log" >&2
+  "${NICE[@]}" nix build --no-link -L --builders "" ".#hostBootChecks.${ARCH}.${HOST}" 2>&1 | tee "$log" >&2
 rc=${PIPESTATUS[0]}
 
 case "$rc" in

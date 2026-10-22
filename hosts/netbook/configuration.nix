@@ -1,6 +1,6 @@
-# Alice's travel netbook — the fleet's one PINNED host: it builds from
-# `nixpkgs_25_11` (the rev it boots), carries no global chain, and is deployed by
-# push. Rationale and procedure: `.agents/deploy/hosts/netbook.md`.
+# Alice's travel netbook — fleet nixpkgs, LTS kernel (newer initrds could not
+# mount this eMMC root), no global chain, deployed by push. Rationale and the
+# boot test: `.agents/deploy/hosts/netbook.md`.
 {
   config,
   pkgs,
@@ -90,9 +90,12 @@ in {
     ];
     trusted-substituters = ["http://192.168.3.25:5000"];
   };
-  services.journald.extraConfig = "SystemMaxUse=50M";
-  # Use latest kernel.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  services.journald.settings.Journal = {SystemMaxUse = "50M";};
+  # LTS, not latest: the newest kernel's initrd produced by this nixpkgs could not
+  # mount the f2fs root on this eMMC (the failure that pinned the whole host to
+  # 25.11). Tracking the fleet's nixpkgs is safe as long as the kernel does not
+  # chase `linuxPackages_latest` with it.
+  boot.kernelPackages = pkgs.linuxPackages;
 
   zramSwap = {
     priority = 100;

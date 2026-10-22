@@ -168,16 +168,15 @@ in {
     modules = globalModulesNixos ++ [../hosts/aristotle/configuration.nix];
   };
 
-  # netbook is the fleet's one PINNED host: it builds from `inputs.nixpkgs_25_11`
-  # (the exact revision it boots, 25.11.12484.b6018f87da91) instead of the
-  # flake's unstable nixpkgs, and carries no global module chain — its own
-  # configuration is the whole system. The pin is what makes it a flake host at
-  # all: same revision ⇒ the same kernel and initrd store paths it already runs,
-  # so a deploy cannot touch the boot chain that newer kernels broke here.
+  # netbook carries no global module chain — its own configuration is the whole
+  # system — and it follows the fleet's nixpkgs like every other host. What it
+  # pins instead is the KERNEL: `boot.kernelPackages = pkgs.linuxPackages` (LTS)
+  # in hosts/netbook/configuration.nix, because the newest kernel's initrd could
+  # not mount this eMMC box's root. A pinned nixpkgs was the wrong lever: it froze
+  # every package to buy a kernel, and left the host a channel island.
   netbook = {
     kind = "nixos";
     system = "x86_64-linux";
-    nixpkgs = inputs.nixpkgs_25_11;
     # Its own configuration is the whole system, so it takes the compiled-inventory
     # injection explicitly — the same reason the microVM hosts above do. Without it
     # the host has no `config.fleet.inventory`, which `checks.<system>.inventory-modules`

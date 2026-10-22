@@ -31,8 +31,8 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 ### 2026-10-22 — netbook's sops identity is its TPM, not an SSH key
 - `&tpmnetbook` (`age1tag1q…`) generated on the host as `alice` via `sg tss`, registered in `.sops.yaml`,
   all 6 files rekeyed additively. Proven there against the rekeyed file (`436f477d…` == frieren's digest;
-  no-identity control 128). Capability: `security.tpm2`, `alice` in `tss`, `age-plugin-tpm`, gen
-  `2gl0wd10…`. No sops-nix plane yet, so it is used by hand; the rule now has 37 recipients.
+  no-identity control 128). Capability: `security.tpm2`, `alice` in `tss`, `age-plugin-tpm` + `sops`,
+  gen `yz3rvkab…`. No sops-nix plane yet, so it is used by hand; the rule now has 37 recipients.
 
 ### 2026-10-22 — netbook on the fleet nixpkgs; the boot pin is the initrd, not nixpkgs
 - `hosts/netbook/configuration.nix`: fleet nixpkgs kernel (`pkgs.linuxPackages`, 6.18.56) plus

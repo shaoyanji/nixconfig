@@ -63,6 +63,12 @@ the host lacks travel, not the closure.
 | bus dead after activation — units never restarted | exit 5 | none; fix the bus and re-run |
 | `switch-to-configuration` non-zero with a live bus | exit 6 | none; read its output |
 
+Both guards compare `/nix/store/<name>` — the kernel and initrd *output* paths —
+not the image files. The built system exposes `kernel`/`initrd` as symlinks into
+`…-linux-7.1.2/bzImage`, while the target reports the same symlink resolved, so
+the first version compared an output path against a file and refused two deploys
+on an identical boot chain before either side was normalized.
+
 The boot-chain guard is the anti-brick check. The drift guard covers the other
 direction: `/etc/nixos` stays on the machine as a fallback, so a local
 `nixos-rebuild` from an edited copy would deploy something the flake cannot see.
@@ -87,7 +93,11 @@ here 2026-10-22 — the switch looked successful (`/run/current-system` moved,
 create sessions and nothing restarted. The policy sets in `/etc/dbus-1` were
 byte-identical before and after, so this is not a config difference: whatever put
 the daemon in that state, `systemctl restart dbus.service` restored
-`Subscribe`/`ListUnits`, and the reboot into the new generation came up clean.
+`Subscribe`/`ListUnits`, and the reboot into the new generation came up clean —
+verified after it: `current = booted = profile` at
+`…-nixos-system-netbook-25.11.20260630.b6018f8`, kernel and initrd the same store
+paths it had before the deploy, 0 failed units, 53 % disk, and `Peer.Ping` to
+pid1 answering again.
 
 So the deploy now verifies instead of assuming (exit 5 = bus dead after the
 switch, exit 6 = switch exited non-zero with a live bus). If exit 5 happens:
@@ -101,6 +111,13 @@ The push uses LAN ssh as root (`root@192.168.3.36`), the same key alice has
 out for a minute or two while the interface and `sshd` come up — `ping` succeeds
 with ~90–230 ms RTT at the same moment, so the neighbour table is not the test.
 Retry `ACTION=preflight` rather than switching `TARGET` to the tailnet.
+
+Who reaches the netbook's tailnet address depends on the source, which is why
+"use the tailnet" is not a blanket answer: from **frieren** (tagged) it is
+intercepted by Tailscale SSH and hangs on a browser check, while from **delphi**
+(an untagged member) the same `root@100.72.110.107` reaches the real sshd and the
+deploy key works — that path is how the 2026-10-22 verification was read. The
+script runs on frieren, so its unattended target stays the LAN address.
 
 ## Preconditions
 

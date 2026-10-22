@@ -216,7 +216,34 @@
     builtins.length (builtins.filter (s: s != "" && !(isBanner s)) bodies);
   longHeaders = map (p: lib.removePrefix "${toString root}/" (toString p)) (builtins.filter (p: headerLines p > 3) nixFiles);
 
+  # A compositor swap inside `base-desktop-environment` is two configs fighting:
+  # niri/DMS are force-disabled while the profile that installed them, and their
+  # whole userland (zen, nautilus, portals, gnome-keyring), stays in the closure.
+  # 2026-10-22: scratch ran exactly that shape for days — dwl on screen, fleet
+  # desktop underneath. A host that disables a compositor has to fork the profile.
+  hostConfigs = builtins.filter (p: builtins.pathExists (root + "/${p}")) (
+    map (h: "hosts/${h}/configuration.nix") (
+      builtins.attrNames (
+        lib.filterAttrs (_: t: t == "directory") (builtins.readDir (root + "/hosts"))
+      )
+    )
+  );
+  halfForked =
+    builtins.filter (
+      p:
+        lib.hasInfix "base-desktop-environment" (read p)
+        && lib.hasInfix "programs.niri.enable = lib.mkForce false" (read p)
+    )
+    hostConfigs;
+
   policies = {
+    desktop-fork-not-disable = {
+      rule = "Swapping the compositor means forking the userland: a host may not import `base-desktop-environment` and force `programs.niri.enable = false` in the same module. That combination keeps niri, DMS, zen, nautilus and the portal/keyring stack installed behind a different WM, so the session changes and everything it opens does not. Drop the profile and declare the modules instead.";
+      proof = "hosts/*/configuration.nix that both import base-desktop-environment and force niri off";
+      holds = halfForked == [];
+      detail = "half-forked hosts: ${lib.concatStringsSep ", " halfForked}";
+    };
+
     root-markdown-closed = {
       rule = "No new root-level markdown: a document lives in docs/, in a skill, or as a note in AGENTS.nix.";
       proof = "root *.md listing";

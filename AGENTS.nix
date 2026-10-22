@@ -3987,11 +3987,12 @@
         hosts = ["scratch" "fern" "frieren"];
         modules = ["modules/sops.nix" "hosts/scratch/configuration.nix" "hosts/fern/configuration.nix"];
         tasks = ["infra:sops:update-keys" "infra:secrets:sync"];
-        docs = [".agents/skills/tpm-sops/SKILL.md" "docs/sops-rekey.md" ".agents/deploy/hosts/scratch.md"];
+        docs = ["docs/sops-rekey.md" ".agents/deploy/hosts/scratch.md"];
       };
       body = ''
-        Procedure lives in `.agents/skills/tpm-sops/SKILL.md`; the contract is `docs/sops-rekey.md`.
-        Three facts are the ones a reconstruction gets wrong:
+        Procedure is `docs/sops-rekey.md` § *TPM-sealed identity* (the skill that
+        duplicated it was deleted: `agent-prose-budget`). Three facts a reconstruction
+        gets wrong:
 
         1. **Two rebuilds.** Rebuild A installs `security.tpm2`, `tss` and `age-plugin-tpm` and must not
            reference the identity; rebuild B points `sops.age.keyFile` at it. Referencing a file that
@@ -4048,6 +4049,66 @@
         read-only), it must not redefine a flattened name such as `load-env` (use a prefixed/namespace
         include instead of `flatten: true`), and it needs a gate that runs `task --list` in `$HOME` so a
         collision cannot ship. Exit criteria: that gate passes on every active host the module serves.
+      '';
+    };
+
+    rice-fork-not-patch = {
+      title = "Changing the compositor means forking the userland, not disabling it";
+      kind = "decision";
+      status = "DELIVERED";
+      date = "2026-10-22";
+      summary = "scratch ran dwl on top of base-desktop-environment with niri force-disabled: the session changed and everything it opened did not. Enforced by [[flake/policies.nix#desktop-fork-not-disable]]; port the mechanism a binding needs, not just the chord.";
+      refs = {
+        hosts = ["scratch"];
+        modules = ["hosts/scratch/configuration.nix" "modules/global/nixos.nix" "modules/config/dwl/config.h"];
+        tasks = ["checks:policies"];
+        docs = ["flake/policies.nix"];
+      };
+      body = ''
+        Three failures, one shape: inheriting an appearance instead of the behaviour.
+
+        1. **WM swap, userland inherited.** `programs.niri.enable = mkForce false` inside the profile that
+           installed niri, DMS, zen, nautilus and the portal/keyring stack. The operator sees dwl; the
+           closure is the fleet desktop. Now an assert (`desktop-fork-not-disable`) rather than a review
+           note: drop the profile, declare the modules, and fork HM through `fleet.hmUserModules` —
+           `imports` is a module argument, so it cannot be `mkForce`d at the call site.
+        2. **Table ported, mechanism lost.** niri's chords went into config.h, but `Mod+A` ran
+           `wmenu-run`, which walks `$PATH` and cannot see `.desktop` files: the 55 appimage entries in
+           `~/.local/share/applications` vanished while the keymap looked correct. `j4-dmenu-desktop`
+           feeds those entries to wmenu. For every binding, port what it opens, not only its keys.
+        3. **Infrastructure was in the profile being dropped.** `tailscaled` and the NAS automount came
+           from `desktop-client.nix`, so forking took the host off the tailnet and left the canonical
+           `~/Documents/nixconfig` dangling at `/Volumes/data/projects/nixconfig`. A fork must list what
+           it keeps: reachability and the canonical path are not rice.
+
+        Documentation rule that came with this: rationale goes here or in a policy, not into comment
+        blocks in `.nix` files — `nix-header-budget` bounds headers, and the body-comment essays this run
+        produced are what the `agent-prose-budget` squeeze caught (a duplicated `tpm-sops` SKILL went so
+        `docs/sops-rekey.md` stays the single home).
+      '';
+    };
+
+    zen-profile-extensions = {
+      title = "Zen's declarative extensions arrive disabled, and it is a pref, not an install bug";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-10-22";
+      summary = "`extensions.packages` writes XPIs into the app-profile scope; Firefox's default `extensions.autoDisableScopes` (15) then disables each on discovery, so every add-on shows `userDisabled: true`. Set the pref to 0, keep `enabledScopes` 15 — and expect existing entries to stay disabled until reset.";
+      refs = {
+        hosts = ["scratch" "frieren"];
+        modules = ["modules/zen.nix"];
+        docs = ["AUDIT.md"];
+      };
+      body = ''
+        Measured on scratch 2026-10-22: 31 add-ons in `extensions.json`, 9 active, 22 `userDisabled`,
+        `autoDisableScopes` absent from `user.js`/`prefs.js`. One HM-installed extension (uBlock0) was
+        active with a `path` under `~/.zen/...`, which proves the profile path — and the `.zen` →
+        `.config/zen` symlink — resolves; the install was never the problem.
+
+        The fix is two prefs in `modules/zen.nix`: `extensions.autoDisableScopes = 0` stops the
+        auto-disable, `extensions.enabledScopes = 15` keeps every scope enabled. It only governs future
+        discovery: entries already marked `userDisabled` stay off until toggled in `about:addons` or
+        `extensions.json` is reset (back it up; the browser must be closed).
       '';
     };
   };

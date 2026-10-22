@@ -173,21 +173,14 @@ movetotag(const Arg *arg)
 	arrange(selmon);
 }
 
-/* Commands with Catppuccin Mocha themed wmenu */
 static const char *termcmd[] = { "foot", NULL };
-/* Mod+A / Mod+Space. `wmenu-run` only walks $PATH, so the appimage-*.desktop
- * entries appimage-launchers keeps in ~/.local/share/applications never appear.
- * j4-dmenu-desktop feeds XDG desktop entries to wmenu, so the picker keeps the
- * pure suckless tool AND niri's list; the wmenu flags are the Catppuccin ones
- * this config used before, carried through the wrapper. */
+/* wmenu-run walks $PATH only; j4-dmenu-desktop adds the .desktop entries. */
 static const char *menucmd[] = {
 	"sh", "-c",
 	"j4-dmenu-desktop --dmenu='wmenu -f \"JetBrainsMono Nerd Font 11\" -N 1e1e2e -n cdd6f4 -M 313244 -m cdd6f4 -S cba6f7 -s 11111b'",
 	NULL};
 
-/* niri Mod+Space opens the DMS spotlight bar. There is no DMS here, and the
- * nearest intent is the same picker the launcher opens, so the binding is not
- * silently dropped. */
+/* niri Mod+Space opened DMS spotlight; this is the nearest intent. */
 static const char *spotlight[] = {
 	"sh", "-c",
 	"j4-dmenu-desktop --dmenu='wmenu -f \"JetBrainsMono Nerd Font 11\" -N 1e1e2e -n cdd6f4 -M 313244 -m cdd6f4 -S cba6f7 -s 11111b'",

@@ -10,12 +10,7 @@
     ./home-manager-shared.nix
   ];
 
-  # The embedded user's module list, as an option so a host can *fork* it
-  # instead of inheriting. The fleet default is the shared desktop role; a host
-  # that is deliberately a different desktop (a suckless dwl session, say) sets
-  # its own list, because otherwise the WM changes and the userland — zen, niri,
-  # kitty, DMS, zed — comes along anyway. `imports` is a module argument, not a
-  # mergeable list option, so it cannot be `mkForce`d at the call site.
+  # `imports` is a module argument, so a fork has to be an option, not mkForce.
   options.fleet.hmUserModules = lib.mkOption {
     type = lib.types.listOf lib.types.path;
     default = [../roles/home.nix];

@@ -11,69 +11,44 @@ metadata:
     related_skills: []
 ---
 
-# dev — Development Workflows
+# dev — what the descriptions leave out
 
-Git, flake, site deployment, PR management, and package workflows.
+80 `dev:*` tasks, each with a `desc`:
 
-## Git operations
+```bash
+task --list-all --json | jq -r '.tasks[] | select(.name|startswith("dev:")) | "\(.name)\t\(.desc)"'
+```
 
-| Task | Description |
-|------|-------------|
-| `dev:git:quick-push` | Commit/push with AI commit message (gmc) |
-| `dev:git:quick-push-safe` | Same with auto-stash/restore |
-| `dev:git:build-push` | Commit tracked changes after successful build (no push) |
-| `dev:git:ai-commit` | Stage tracked + interactive AI commit |
-| `dev:git:ai-commit-push` | Stage tracked + AI commit + push |
-| `dev:git:quick-pull` | Pull with submodules |
-| `dev:git:stage` | Stage tracked changes + .sops.yaml drift warning |
-| `dev:git:status` | Show branch, status, stashed changes |
-| `dev:git:stash-push` | Stash with message |
-| `dev:git:stash-pop` | Pop most recent stash |
+This page keeps only the four traps that a description cannot warn about.
 
-## Flake management
+## Git
 
-| Task | Description |
-|------|-------------|
-| `dev:flake:update-branch` | Create/force-push update branch |
-| `dev:flake:merge-update` | Merge update branch into main |
-| `dev:flake:update-complete` | Full update workflow in one command |
-| `dev:flake:update:bountystash` | Update only bountystash input |
-| `dev:flake:get-hosts` | List nixosConfigurations hostnames |
-| `dev:flake:update-garnix` | Sync garnix.yaml with current hosts |
+- `quick-push` commits **and** pushes. `build-push` commits and does **not** push,
+  despite the name. `ai-commit` is interactive, `ai-commit-push` adds the push,
+  `quick-push-safe` stashes and restores around it.
+- Prefer `dev:git:stage` over `git add -A`: it warns when the staged set includes
+  a `.sops.yaml` recipient drift, the one change that silently breaks a host's
+  decryption.
 
-## Site deployment
+## Flake
 
-| Task | Description |
-|------|-------------|
-| `dev:site:list` | List targets from site-manifest.json |
-| `dev:site:show:<target>` | Show target metadata |
-| `dev:site:build:<target>` | Build target |
-| `dev:site:preview:<target>` | Preview target |
-| `dev:site:deploy:<target>` | Deploy target |
-| `dev:site:build` | Build default target |
-| `dev:site:preview` | Preview default target |
-| `dev:site:deploy` | Deploy default target |
+`update-complete` is the whole workflow (branch, update, merge). Use
+`update-branch` + `merge-update` when you want to read the lock diff first, and
+`update-transitive` for pins a root update misses. After adding a host,
+`dev:flake:update-garnix` syncs `garnix.yaml` or CI never builds it.
 
-Uses `scripts/task/site-target.sh`. Source of truth: `taskfiles/site-manifest.json`.
+## Site — two different sites
 
-## Package management
+`dev:site:*` publishes from `taskfiles/site-manifest.json` (via
+`scripts/task/site-target.sh`); its `list`/`show`/`preview`/`deploy` name a target
+from that file. The **fleet docs site** is not in it: that is `task docs:site`
+(`.#fleet-docs-site`) and `task docs:build` (`.#docs`).
 
-| Task | Description |
-|------|-------------|
-| `dev:config:hash-update` | Refresh sha256 for config/*.json files |
+## Closure analysis is not verification
 
-## Pull requests
+`dev:closure:*` reads the store DB to answer "what is big, what will be fetched".
+It proves nothing about correctness, so it is build preparation — pair it with a
+build, never use it instead of one. `dev:fmt` is `checks:nix:fix`; `nixpkgs-fmt`
+is not installed and would rewrite most of the tree.
 
-| Task | Description |
-|------|-------------|
-| `dev:pr:list` | List open PRs (by @me or all) |
-| `dev:pr:create` | Create PR from current branch (opens browser) |
-| `dev:pr:checkout:<num>` | Checkout PR by number |
-| `dev:pr:review:<num>` | Review/approve PR in browser |
-| `dev:pr:status` | CI status for current branch |
-
-## Formatting
-
-| Task | Description |
-|------|-------------|
-| `dev:fmt` | Format all Nix files with alejandra in-place |
+Truth: `taskfiles/dev.yml` — the executable contract; this page is the procedure.

@@ -11,198 +11,93 @@ metadata:
     related_skills: ['infra', 'checks']
 ---
 
-# `home-assistant` — Home Assistant & IoT Device Stack Runbook
+# home-assistant — HA and MQTT on frieren
 
-Operational runbook and guidance for interacting with the Home Assistant service, the local Mosquitto MQTT broker, server telemetry sensors, and IoT integrations on `frieren.lan`.
+Declarative in `modules/services/home-assistant.nix` (`services.ha-stack.*`),
+enabled in `hosts/frieren/configuration.nix`. Editing any other file does nothing.
 
----
+| | |
+| :--- | :--- |
+| Web | `http://ha.frieren.lan/` (nginx vhost) or `127.0.0.1:8123` |
+| MQTT | `127.0.0.1:1883`, Mosquitto, loopback, `allow_anonymous = true` |
+| Status | `http://status.frieren.lan/` (Uptime-Kuma, port 3001) |
+| State | `configDir` → `/srv/private/home-assistant` |
 
-## 1. System Overview & Topology
+The port is declared once (`services.ha-stack.port`) and the nginx vhost and
+firewall read it, so do not hardcode 8123 in a new module.
 
-* **Host:** `frieren.lan` (`192.168.3.25`, Tailscale `100.97.61.65`).
-* **Service Definition:** Declaratively defined in `modules/services/home-assistant.nix` (enabled via `services.ha-stack.enable = true;`).
-* **State & Data Directory:** `/srv/private/home-assistant` (persistent dataset on NAS pool).
-* **Configuration:** `/etc/home-assistant/configuration.yaml` (symlinked into the data directory by NixOS).
-* **Endpoints:**
-  * **Web Frontend:** `http://ha.frieren.lan/` (via Nginx reverse proxy port 80) and direct port `8123` (`http://127.0.0.1:8123`).
-  * **MQTT Broker:** `127.0.0.1:1883` (Mosquitto, loopback-only, anonymous).
-  * **Uptime Monitoring:** `http://status.frieren.lan/` and `http://127.0.0.1:3001/` (Uptime-Kuma dashboard).
-* **Enabled Components:** `rest`, `command_line`, `todoist`, `jellyfin`, `plex`, `fritzbox`, `github`, `immich`, `met`, `ipp`, `mqtt`, plus Python package `androidtvremote2`.
+## The laptop-as-UPS sensors
 
----
+frieren's battery is the NAS's UPS, so `command_line` sensors read it directly
+when `services.ha-stack.telemetry.enable` is on:
 
-## 2. Server Telemetry Sensors (Laptop-as-UPS)
+| Entity | Reads |
+| :--- | :--- |
+| `sensor.frieren_battery_level` | `/sys/class/power_supply/BAT0/capacity` |
+| `sensor.frieren_battery_status` | `/sys/class/power_supply/BAT0/status` |
+| `binary_sensor.frieren_ac_connected` | `/sys/class/power_supply/ADP0/online` (`1` = mains) |
 
-Because `frieren` is an IdeaPad laptop serving as a headless NAS, its internal battery acts as an uninterruptible power supply (UPS). NixOS declares real-time power sensors under `command_line`:
+Check the underlying values over ssh before believing a stale sensor; the
+`command_line` integration caches and HA logs the failure, not the sensor.
 
-| Entity ID | Source Command | Unit / Class | Description |
-| :--- | :--- | :--- | :--- |
-| `sensor.frieren_battery_level` | `cat /sys/class/power_supply/BAT0/capacity` | `%` (`battery`) | Current battery charge percentage |
-| `sensor.frieren_battery_status` | `cat /sys/class/power_supply/BAT0/status` | String | `Charging`, `Discharging`, or `Full` |
-| `binary_sensor.frieren_ac_connected` | `cat /sys/class/power_supply/ADP0/online` | Binary (`power`) | `on` (mains AC online) / `off` (mains disconnected) |
+## REST API
 
-### Quick CLI Check of Host Power Sensors
-```bash
-# Check directly on frieren:
-cat /sys/class/power_supply/BAT0/capacity
-cat /sys/class/power_supply/BAT0/status
-cat /sys/class/power_supply/ADP0/online
-```
-
----
-
-## 3. Querying & Controlling Home Assistant via REST API
-
-Home Assistant provides a comprehensive REST API on port `8123`.
-
-### A. Authentication
-Generate a **Long-Lived Access Token** in Home Assistant UI (`Profile -> Long-Lived Access Tokens`), and store or export it:
-```bash
-export HASS_TOKEN="<your_long_lived_access_token>"
-export HASS_URL="http://127.0.0.1:8123"  # or http://ha.frieren.lan
-```
-
-### B. Health & API Status
-```bash
-curl -s -H "Authorization: Bearer $HASS_TOKEN" \
-     -H "Content-Type: application/json" \
-     "$HASS_URL/api/"
-```
-
-### C. Reading All Entity States
-```bash
-curl -s -H "Authorization: Bearer $HASS_TOKEN" \
-     "$HASS_URL/api/states" | jq '.[] | {entity_id: .entity_id, state: .state}'
-```
-
-### D. Reading a Specific Entity
-```bash
-# Query frieren battery status
-curl -s -H "Authorization: Bearer $HASS_TOKEN" \
-     "$HASS_URL/api/states/sensor.frieren_battery_level" | jq '.'
-
-# Query AC power connectivity
-curl -s -H "Authorization: Bearer $HASS_TOKEN" \
-     "$HASS_URL/api/states/binary_sensor.frieren_ac_connected" | jq '.state'
-```
-
-### E. Triggering Services (Automations & Toggles)
-```bash
-# Example: Toggle a switch or trigger an automation
-curl -X POST \
-     -H "Authorization: Bearer $HASS_TOKEN" \
-     -H "Content-Type: application/json" \
-     -d '{"entity_id": "automation.nightly_shutdown"}' \
-     "$HASS_URL/api/services/automation/trigger"
-```
-
-### F. Rendering Jinja2 Templates on the Server
-```bash
-curl -X POST \
-     -H "Authorization: Bearer $HASS_TOKEN" \
-     -H "Content-Type: application/json" \
-     -d '{"template": "Battery is at {{ states(\"sensor.frieren_battery_level\") }}% and status is {{ states(\"sensor.frieren_battery_status\") }}."}' \
-     "$HASS_URL/api/template"
-```
-
----
-
-## 4. Mosquitto MQTT Broker Integration
-
-`ha-stack.nix` provides a local Mosquitto MQTT broker on `127.0.0.1:1883`. It is configured without authentication (`allow_anonymous = true`) for local processes on frieren.
-
-### A. Publishing MQTT Messages
-To publish telemetry or test sensors to Home Assistant:
-```bash
-nix shell nixpkgs#mosquitto --command mosquitto_pub \
-  -h 127.0.0.1 -p 1883 \
-  -t "homeassistant/sensor/frieren_custom/state" \
-  -m "{\"temperature\": 41.5, \"load\": 0.82}"
-```
-
-### B. Subscribing / Monitoring All MQTT Traffic
-```bash
-nix shell nixpkgs#mosquitto --command mosquitto_sub \
-  -h 127.0.0.1 -p 1883 \
-  -t "#" -v
-```
-
-### C. Home Assistant MQTT Discovery
-Home Assistant automatically discovers devices publishing discovery payloads under `homeassistant/<component>/<node_id>/<object_id>/config`:
-```bash
-nix shell nixpkgs#mosquitto --command mosquitto_pub \
-  -h 127.0.0.1 -p 1883 \
-  -t "homeassistant/sensor/frieren_disk/config" \
-  -m '{"name": "frieren Data Pool Free", "state_topic": "homeassistant/sensor/frieren_disk/state", "unit_of_meas": "GB"}'
-```
-
----
-
-## 5. Declarative Extensions in Nixconfig
-
-All permanent components and sensors should be added to `hosts/frieren/media-stack.nix`:
-
-### Adding Python Packages & Integrations
-```nix
-services.home-assistant = {
-  enable = true;
-  extraComponents = [
-    "rest"
-    "command_line"
-    "mqtt"
-    # Add new native integrations:
-    "sun"
-    "wled"
-  ];
-  extraPackages = ps: [
-    # Add external PyPI dependencies needed by custom integrations:
-    ps.paho-mqtt
-  ];
-  config = {
-    # Custom YAML configuration
-  };
-};
-```
-
-### Rebuilding & Switching
-Always evaluate before deploying:
-```bash
-nix eval .#nixosConfigurations.frieren.config.services.home-assistant.enable
-task infra:apply:host:frieren
-```
-
----
-
-## 6. Uptime-Kuma Status Monitoring
-
-Uptime-Kuma runs alongside Home Assistant on port `3001` and is accessible at `http://status.frieren.lan`.
-
-* Checks the availability of local NAS endpoints:
-  * Nginx web server (`:80`)
-  * Home Assistant (`:8123`)
-  * Kiwix Wikipedia (`:8088`)
-  * Paperless-ngx (`:28981`)
-  * Jellyfin Media Server (`:8096`)
-  * Vaultwarden (`:8222`)
-* Can push webhook alerts to Home Assistant or Telegram via `hermes-gateway`.
-
----
-
-## 7. Diagnostics & Service Recovery
+Token: HA UI → Profile → Long-Lived Access Tokens. Export it, never commit it.
 
 ```bash
-# Check Home Assistant daemon status
-systemctl status home-assistant
+export HASS_URL=http://127.0.0.1:8123
+export HASS_TOKEN='<token>'
+h() { curl -fsS -H "Authorization: Bearer $HASS_TOKEN" -H 'Content-Type: application/json' "$@"; }
 
-# Tail recent Home Assistant logs
+h "$HASS_URL/api/"                                   # 200 + "API running."
+h "$HASS_URL/api/states" | jq -r '.[] | "\(.entity_id) \(.state)"'
+h "$HASS_URL/api/states/sensor.frieren_battery_level" | jq .state
+h -X POST -d '{"entity_id":"automation.nightly_shutdown"}' \
+  "$HASS_URL/api/services/automation/trigger"
+h -X POST "$HASS_URL/api/template" \
+  -d '{"template":"{{ states(\"sensor.frieren_battery_level\") }}%"}'
+```
+
+`-fsS` matters: without `-f` a 401 prints as a JSON error body and an agent reads
+it as an empty state list.
+
+## MQTT
+
+```bash
+nix shell nixpkgs#mosquitto --command mosquitto_sub -h 127.0.0.1 -v -t '#'
+nix shell nixpkgs#mosquitto --command mosquitto_pub -h 127.0.0.1 \
+  -t homeassistant/sensor/frieren_extra/state -m '{"load": 0.82}'
+```
+
+Discovery (`homeassistant/<component>/<node>/<object>/config`) is enabled for
+the components in `extraComponents`, but a name there only makes an integration
+*available*: 4 of the 11 defaults are actually configured (`command_line`,
+`github`, `met`, `ipp`), the rest are dependency-only. To turn one on, add its
+config entry or YAML in the module, and say which in the commit.
+
+Adding a native integration is an `extraComponents` entry; a PyPI dependency an
+`extraPackages` entry. Both live in that same module.
+
+## Rebuild
+
+```bash
+nix eval .#nixosConfigurations.frieren.config.services.ha-stack.enable
+task infra:deploy:host:frieren        # build happens on the builder, not here
+```
+
+frieren is 15 W: never `nixos-rebuild switch` on it for a config this small.
+`infra:deploy` gates, plans, warms and validates.
+
+## When it is down
+
+```bash
+systemctl status home-assistant mosquitto
 journalctl -u home-assistant -n 50 --no-pager
-
-# Inspect internal Python tracebacks
-sudo tail -n 50 /srv/private/home-assistant/home-assistant.log
-
-# Check Mosquitto broker
-systemctl status mosquitto
-
-# Restart Home Assistant service
-sudo systemctl restart home-assistant
+sudo tail -n 50 /srv/private/home-assistant/home-assistant.log   # Python tracebacks
 ```
+
+A `400 Bad Request` on every proxied request is the `trusted_proxies` /
+`use_x_forwarded_for` block, not auth. A sensor stuck at a value is a failed
+`command_line` command in that log.
+
+Truth: `modules/services/home-assistant.nix` — the option tree; this page is the procedure.

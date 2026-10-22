@@ -15,16 +15,9 @@ metadata:
 
 Manage `/srv/data` (mirrored to `/Volumes/data` across the fleet) folder taxonomy, permissions, media server isolation, and data hygiene.
 
-## Tasks
-
-| Task | Description |
-|------|-------------|
-| `data:audit` | Full audit of storage categories, disk usage, privacy permissions, and media server hygiene |
-| `data:clean:metadata` | Scan and remove macOS artifacts (`._*`, `.DS_Store`, `@eaDir`) across the tree |
-| `data:clean:downloads` | Audit downloads staging directory and remove orphaned `.aria2` control files |
-| `data:protect:private` | Enforce `0700` permissions and `.nomedia` / `.plexignore` shields on private folders |
-| `data:status` | Quick overview alias for `data:audit` |
-| `data:index:refresh` | Trigger refresh of qmd documentation and vault indices |
+`data:status` is an alias of `data:audit`, and `data:clean:downloads` removes
+orphaned `.aria2` control files — a half-download leaves one behind and aria2
+will not resume around it. The rest are named for what they do.
 
 ## Canonical Storage Taxonomy
 

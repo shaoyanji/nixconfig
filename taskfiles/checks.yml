@@ -20,7 +20,8 @@ tasks:
     aliases: [check]
     summary: >
       Bounded repo hygiene: compiled inventory checks, task-graph integrity, the
-      knowledge-graph and sidecar-parity gates, nix lint, sops drift, modules.toml.
+      knowledge-graph and sidecar-parity gates, skill task-mirrors, nix lint, sops
+      drift, modules.toml.
       NO nixosConfiguration is forced — this answers "is the repo internally
       consistent", not "does host X evaluate". For a host: `checks:host HOST=<h>`
       (~13 s / 720 MiB); for a named set: `checks:hosts HOSTS="a b"`.
@@ -29,7 +30,7 @@ tasks:
       configs) in one process — 6078 MiB peak, SIGKILL 137 on this host. Exit 0 =
       clean.
     cmds:
-      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets .#checks.x86_64-linux.policies .#checks.x86_64-linux.taskfile-graph .#checks.x86_64-linux.taskfile-graph-selftest
+      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets .#checks.x86_64-linux.policies .#checks.x86_64-linux.taskfile-graph .#checks.x86_64-linux.taskfile-graph-selftest .#checks.x86_64-linux.skills-task-mirror
       - task checks:inventory:sync
       - task checks:repo:paths
       - task checks:docs:links

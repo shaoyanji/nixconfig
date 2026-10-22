@@ -11,61 +11,24 @@ metadata:
     related_skills: []
 ---
 
-# services — Legacy Compatibility
+# services — legacy aliases, and nothing to add here
 
-These wrappers route to canonical `infra:*`, `checks:*`, and `dev:*` tasks. Prefer canonical namespaces for new workflows.
+Every `services:*` task routes to a canonical `infra:*` task, and the deprecated
+ones (`switch:`, `boot:`, `nixos-rebuild`, `*rebuild`, `push-*-rebuild`) are
+one-line aliases in `taskfiles/services-legacy.yml`. They exist so old muscle
+memory keeps working; **write the canonical name in anything new**.
 
-## Validation
+`services:deploy:host:<h>` is a bare pass-through to `infra:deploy:host:<h>`, so
+there is never a reason to prefer it. Three wrappers are not aliases:
 
-| Task | Description |
-|------|-------------|
-| `services:validate:host:<host>` | Check systemd overall state over SSH |
+| Task | What it adds |
+| :--- | :--- |
+| `services:rollback:host:<h>` | `infra:rollback:host:<h>`, then `services:evidence:rollback:host:<h>` |
+| `services:validate:host:<h>` | systemd's overall state over ssh; `TARGET=` overrides transport, so a tailnet-aliased host can be checked over the LAN |
+| `services:record:host:<h>` | `dev:git:stage`, then a commit saying the build succeeded on that host |
 
-## Deploy
+Resolve any of them to its target with `task --list-all --json | jq` rather than
+trusting this table; the file is the contract.
 
-| Task | Description |
-|------|-------------|
-| `services:deploy:host:<host>` | Plan + apply + validate (routes to `infra:deploy:host:<host>`) |
-| `services:deploy:rpi` | Deploy minyx (PI) host |
-
-| `services:deploy:mtfuji` | Deploy mtfuji host |
-| `services:deploy:menu` | Compatibility alias for `infra:deploy:menu` |
-
-## Rollback
-
-| Task | Description |
-|------|-------------|
-| `services:rollback:host:<host>` | Rollback + validate (routes to `infra:rollback:host:<host>` + evidence) |
-| `services:rollback:apply:host:<host>` | Rollback apply (routes to `infra:rollback:apply:host:<host>`) |
-| `services:evidence:rollback:host:<host>` | Validate after rollback |
-
-## Logs
-
-| Task | Description |
-|------|-------------|
-| `services:logs:host:<host>` | Tail logs (routes to `infra:logs:host:<host>`) |
-| `services:logs:menu` | Compatibility alias for `infra:logs:menu` |
-
-## Record
-
-| Task | Description |
-|------|-------------|
-| `services:record:host:<host>` | Commit deployment outcome in git |
-
-## Deprecated aliases (services-legacy.yml)
-
-| Task | Description |
-|------|-------------|
-| `switch:<os>` | Alias for `infra:switch:<os>` |
-| `boot:<os>` | Alias for `infra:boot:<os>` |
-| `nixos-rebuild` | Alias for `infra:rebuild:nixos` |
-| `darwin-rebuild` | Alias for `infra:rebuild:darwin` |
-| `home-manager-switch` | Alias for `infra:rebuild:home-manager` |
-| `wsl-rebuild` | Alias for `infra:rebuild:wsl` |
-| `orb-rebuild` | Alias for `infra:rebuild:orb` |
-| `push-rpi-rebuild` | Alias for `infra:deploy:host:{{.PI}}` |
-
-| `push-fuji-rebuild` | Alias for `infra:deploy:host:mtfuji` |
-| `rebuild` | Deprecated rebuild menu |
-
-Truth: `taskfiles/services.yml` — the executable contract; this page is the procedure.
+Truth: `taskfiles/services.yml` and `taskfiles/services-legacy.yml` — the
+executable contract; this page is the procedure.

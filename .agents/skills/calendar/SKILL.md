@@ -6,107 +6,68 @@ platforms: [linux]
 tags: [calendar, khal, vdirsyncer, libnotify, dms]
 ---
 
-# calendar — Google Calendar, Khal & DMS Notifications
+# calendar — Google → vdirsyncer → khal → notification
 
-Declarative terminal calendar synchronization and desktop notification pipeline across NixOS workstations and servers.
+Declared in `modules/calendar.nix`, imported by `modules/env.nix`. Google CalDAV
+(`caldav.googleapis.com`) → `vdirsyncer` writes `.ics` into
+`~/.local/share/calendars/google/` → `khal` reads them → `calendar-notify` polls
+`khal list now 15m` and raises a libnotify toast, which DMS shows in its
+notification center.
 
-## Architecture
+| | |
+| :--- | :--- |
+| Token cache | `~/.config/vdirsyncer/google_token` |
+| Client id / secret | extracted from `~/.config/rclone/rclone.conf` by the `google-client-id`/`-secret` scripts, so the credentials live in one file |
+| Default calendar | `Primary` |
+| Sync timer | `vdirsyncer.timer`, `frequency = "*:0/15"` |
+| Notify timer | `calendar-notify.timer`, `OnCalendar = "*:0/5"`, oneshot |
 
-```
-Google CalDAV (OAuth2)
-       │
-       ▼ (caldav.googleapis.com)
-  vdirsyncer (token in ~/.config/vdirsyncer/google_token)
-       │
-       ▼ (writes .ics files to ~/.local/share/calendars/google/)
-     khal (CLI / TUI calendar)
-       │
-       ▼ (polls 'khal list now 15m' every 5 min)
-calendar-notify (oneshot systemd user service)
-       │
-       ▼ (libnotify / notify-send)
-  Dank Material Shell (DMS notification center on Niri)
-```
+## Hosts without the rclone credentials do not sync
 
-## Declarative Configuration
+`syncEnabled` is false on hosts in the module's `hostName` list (today: `delphi`),
+because `vdirsyncer` there fails every 15 minutes with `NoSectionError: No section:
+'gdrive'` — a permanently red user unit on a box with no Google credentials. The
+list is in the module, not an option block; add a host there, not an override.
 
-- **Module**: `modules/calendar.nix` (imported by `modules/env.nix`).
-- **Storage**: `~/.local/share/calendars/google/`
-- **OAuth Credentials**: Extracted from `~/.config/rclone/rclone.conf` dynamically by hermetic nix derivation scripts (`google-client-id`, `google-client-secret`).
-- **Token Cache**: `~/.config/vdirsyncer/google_token`
-- **Default Calendar**: `Primary` (mapped to `jisifu@gmail.com`)
+Adding a host that *should* sync needs `~/.config/rclone/rclone.conf` to exist
+first, or the same error appears under its own name.
 
-## Operational Cheatsheet
-
-### 1. View & Manage Events
+## Operational
 
 ```bash
-# Interactive TUI browser (vim keybindings, event editor)
-ikhal
-
-# Fast agenda view of today's schedule
-khal agenda
-
-# Upcoming events for the next 7 or 30 days
-khal list today 7d
-khal list today 30d
-
-# Create a new event on Primary calendar
+vdirsyncer sync                     # immediate sync, no waiting for the timer
+systemctl --user start calendar-notify.service   # one-shot probe of the next 15 min
+systemctl --user status calendar-notify.timer
+khal list today 7d                  # agenda; `ikhal` is the TUI
 khal new 2026-10-20 14:00 15:00 "Team Meeting" :: Discuss project roadmap
 ```
 
-### 2. Manual & Periodic Synchronization
+The notifier only fires when `$WAYLAND_DISPLAY` or `$DISPLAY` is set, and it
+deduplicates through `$XDG_RUNTIME_DIR/calendar-notified.cache`, so a re-run
+inside the same event does not repeat the toast. Both are deliberate: a headless
+host exits 0 instead of logging a failure every five minutes.
 
-The systemd user timer `vdirsyncer.timer` runs every 15 minutes. To trigger immediate synchronization:
-
-```bash
-vdirsyncer sync
-```
-
-### 3. Desktop Notification Daemon & Simulation
-
-The systemd user timer `calendar-notify.timer` checks for upcoming events every 5 minutes and pushes alerts to DMS.
+To prove DMS rendering, bypass the notifier:
 
 ```bash
-# Check timer and service status
-systemctl --user status calendar-notify.timer
-systemctl --user status calendar-notify.service
-
-# Trigger a one-shot check immediately
-systemctl --user start calendar-notify.service
-
-# Directly simulate a notification to verify DMS toast rendering
-notify-send \
-  --app-name="Calendar" \
-  --urgency=normal \
-  --icon="calendar-symbolic" \
-  --category="appointment" \
-  "Calendar Test" \
-  "Meeting starts at 17:30 (Simulated)"
+notify-send --app-name="Calendar" --urgency=normal \
+  --icon="calendar-symbolic" --category="appointment" \
+  "Calendar Test" "Meeting starts at 17:30 (Simulated)"
 ```
 
-## First-Time Setup on New Hosts
+## First sync on a host
 
-1. Rebuild and activate configuration:
-   ```bash
-   sudo nixos-rebuild switch --flake .?submodules=1#<host>
-   ```
-2. If `~/.config/vdirsyncer/google_token` is missing or expired, run discovery:
-   ```bash
-   vdirsyncer discover
-   ```
-   Open the printed Google OAuth authorization link in Zen/browser, approve access, and accept creating the local collections.
-3. Perform initial collection sync:
-   ```bash
-   vdirsyncer sync
-   ```
-4. Verify khal index:
-   ```bash
-   khal list today 7d
-   ```
+`vdirsyncer discover` must keep running while you open its printed OAuth link and
+approve — closing it makes the callback hit a refused localhost port. Then
+`vdirsyncer sync` and `khal list today 7d`.
 
 ## Troubleshooting
 
-- **403 accessNotConfigured**: The Google Cloud project must have the `CalDAV API` (`caldav.googleapis.com`) enabled in Google Cloud Console.
-- **Connection refused on localhost during OAuth**: Ensure `vdirsyncer discover` remains running in the background while approving the authorization link in the browser.
-- **Headless host notifications**: `calendar-notify` checks `$WAYLAND_DISPLAY` and `$DISPLAY`; if neither is set, it exits cleanly (status 0) without spamming logs.
+- **403 accessNotConfigured** — the Google Cloud project lacks the CalDAV API
+  (`caldav.googleapis.com`); the OAuth grant is fine, the API is not enabled.
+- **Nothing appears after a sync** — check `khal list` sees the collection before
+  blaming the timer: `vdirsyncer` writes files whether or not khal indexed them.
+- **Expired token** — delete `google_token` and re-run `vdirsyncer discover`; the
+  client id is re-derived from rclone at build time, so nothing else to edit.
+
+Truth: `modules/calendar.nix` — the option surface; this page is the procedure.

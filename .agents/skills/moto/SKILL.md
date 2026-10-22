@@ -11,54 +11,31 @@ metadata:
     related_skills: []
 ---
 
-# moto — Motorola Android (Termux) Control Plane
+# moto — Termux on the phone, over Tailscale
 
-Control and interact with the Motorola Android phone running Termux over Tailscale.
+| | |
+| :--- | :--- |
+| Host | `moto-g35-5g`, `100.75.49.73` (tailnet only), alias `moto` |
+| Port / user | `8022` / `u0_a301` (Termux sandbox UID) |
+| Entry point | `task moto:exec -- "<cmd>"`; `moto:ssh` is interactive |
 
-- **Host / IP**: `100.75.49.73` (Tailscale hostname `moto-g35-5g`)
-- **Port**: `8022`
-- **User**: `u0_a301` (Termux sandbox UID)
-- **SSH Alias**: `moto` (defined in `~/.ssh/config`)
+Termux `~/storage/*` are symlinks into Android storage, which is why `push`
+defaults to `storage/downloads`:
 
-## Quick Tasks
-
-| Task | Description |
-|------|-------------|
-| `task moto:ssh` | Interactive SSH shell into Termux on the phone |
-| `task moto:exec -- "<cmd>"` | Execute command non-interactively on phone via SSH (agent-friendly) |
-| `task moto:push -- <local> [dest]` | Transfer local file/dir to phone (defaults to `storage/downloads/`) |
-| `task moto:pull -- <remote> [dest]` | Transfer remote file/dir from phone to local machine (defaults to `./`) |
-| `task moto:info` | Query device kernel, uptime, load, and storage metrics |
-| `task moto:obsidian:status` | Check Obsidian Git status on the phone |
-| `task moto:obsidian:sync` | Pull latest Obsidian notes on the phone |
-| `task moto:menu` | Interactive Charmbracelet Gum / Wish menu for quick phone operations |
-| `task moto:wishlist` | Open Charmbracelet Wishlist SSH directory |
-
-## Termux Storage Shortcuts
-
-Termux provides symlinks in `~/storage` to Android internal storage:
-
-| Shortcut | Android Native Path |
-|----------|---------------------|
+| Shortcut | Android path |
+| :--- | :--- |
 | `~/storage/downloads` | `/storage/emulated/0/Download` |
+| `~/storage/dcim` | `/storage/emulated/0/DCIM` |
 | `~/storage/pictures` | `/storage/emulated/0/Pictures` |
-| `~/storage/dcim` | `/storage/emulated/0/DCIM` (Camera) |
 | `~/storage/documents` | `/storage/emulated/0/Documents` |
-| `~/storage/music` | `/storage/emulated/0/Music` |
-| `~/storage/movies` | `/storage/emulated/0/Movies` |
-| `~/storage/shared` | `/storage/emulated/0` (Root of internal SD) |
+| `~/storage/shared` | `/storage/emulated/0` |
 
-## Agent Usage Examples
+Android kills Termux when it is backgrounded unless Termux holds a wake lock, so
+a long job started over ssh can die with the connection still open. Write its
+output to a file and poll it instead of holding a session.
 
-```bash
-# Query disk space and battery
-task moto:exec -- "df -h /data"
-
-# Transfer an APK or PDF directly to phone Downloads
-task moto:push -- ./book.pdf
-
-# Pull camera photo from phone
-task moto:pull -- storage/dcim/Camera/photo.jpg ./
-```
+The phone has no Nix, so nothing here is declarative: what `task moto:*` does is
+whatever `taskfiles/moto.yml` says, and a change to the phone is a change on the
+phone.
 
 Truth: `taskfiles/moto.yml` — the executable contract; this page is the procedure.

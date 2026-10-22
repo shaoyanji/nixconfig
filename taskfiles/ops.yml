@@ -135,13 +135,15 @@ tasks:
   ops:skills:check:
     desc: Validate .agents/skills against the schema (hard gate)
     summary: >
-      Builds checks.<system>.skills-schema. Fails on name/dir mismatch, missing
-      or >240-char description, missing body heading, or a >400-line skill.
-      Optional frontmatter is normalised and printed as WARN. Cheap; safe in CI.
-      `--builders ""` is deliberate: a gate must not spend remote build budget
-      (a trivial runCommand still dispatched to nixbuild.net on 2026-10-19).
+      Builds checks.<system>.skills-schema and skills-task-mirror. Fails on
+      name/dir mismatch, missing or >240-char description, missing body heading,
+      or a >400-line skill; and on a skill whose table rows restate a task's own
+      `desc` (>=3 rows) instead of naming it. Optional frontmatter is normalised
+      and printed as WARN. Cheap; safe in CI. `--builders ""` is deliberate: a
+      gate must not spend remote build budget (a trivial runCommand still
+      dispatched to nixbuild.net on 2026-10-19).
     cmds:
-      - nix build -L --no-link --builders "" .#checks.x86_64-linux."skills-schema"
+      - nix build -L --no-link --builders "" .#checks.x86_64-linux."skills-schema" .#checks.x86_64-linux."skills-task-mirror"
 
   ops:skills:tags:
     desc: Print the skill tag cloud

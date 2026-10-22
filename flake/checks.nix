@@ -95,6 +95,83 @@ lib.genAttrs systems.default (
         - helix  # editor
         - SomeAppImage.bin
       '';
+      # --- a skill is not an index of the task surface -----------------------
+      # `lib/taskfile.nix` compiles one `desc` per task and `task --list-all
+      # --json` serves it. A skill table row that restates that `desc` is a second
+      # copy of the same fact, and it goes stale the first time the task changes.
+      # Three such rows in one skill is a task index wearing a skill's name.
+      #
+      # A row is a mirror when BOTH hold, measured over alnum word tokens:
+      #   * >= 70 % of the desc's significant words (length > 3, not part of the
+      #     task name) appear in the row's non-name cells, and
+      #   * those cells are no longer than 1.5x the desc — a row that adds a
+      #     caveat is longer, which is the only reason to have the table.
+      # Reads both compiled projections: no host eval, no shell, keyless.
+      # `builtins.split` returns the matched separators as sub-lists, so the
+      # predicate needs `isString` — an empty-string test alone passes lists
+      # through and they fail later as "cannot coerce a list to a string".
+      skillWords = s: builtins.filter (w: builtins.isString w && w != "") (builtins.split "[^A-Za-z0-9]+" (lib.toLower s));
+      rowTaskName = cell: let
+        bare = lib.replaceStrings ["`"] [""] (lib.trim cell);
+        ws = builtins.filter (w: w != "") (lib.splitString " " bare);
+      in
+        if ws == []
+        then ""
+        else if builtins.head ws == "task" && builtins.length ws > 1
+        then builtins.elemAt ws 1
+        else builtins.head ws;
+      mirrorsOf = skill: let
+        row = line: let
+          cells = builtins.filter (c: lib.trim c != "") (lib.splitString "|" (lib.trim line));
+          name =
+            if cells == []
+            then ""
+            else rowTaskName (builtins.head cells);
+          task = taskfileCtl.byName.${name} or null;
+          rest =
+            if cells == []
+            then ""
+            else lib.concatStringsSep " " (builtins.tail cells);
+          desc =
+            if task == null
+            then ""
+            else (task.desc or "");
+          nameTokens = skillWords name;
+          descTokens =
+            builtins.filter (w: builtins.stringLength w > 3 && !(lib.elem w nameTokens)) (skillWords desc);
+          restTokens = skillWords rest;
+          hits = builtins.length (builtins.filter (w: lib.elem w restTokens) descTokens);
+          descNorm = lib.concatStringsSep " " (skillWords desc);
+          restNorm = lib.concatStringsSep " " restTokens;
+        in
+          if cells == [] || descTokens == [] || restTokens == []
+          then null
+          else if
+            hits
+            * 10
+            >= builtins.length descTokens * 7
+            && 2 * builtins.stringLength restNorm <= 3 * builtins.stringLength descNorm
+          then "${name}: ${lib.trim rest}"
+          else null;
+      in
+        builtins.filter (r: r != null) (map row skill.body);
+      skillMirrors = map (n: {
+        skill = n;
+        rows = mirrorsOf skillsCtl.skills.${n};
+      }) (builtins.attrNames skillsCtl.skills);
+      mirrorOffenders = builtins.filter (s: builtins.length s.rows >= 3) skillMirrors;
+      mirrorWarnings = builtins.filter (s: s.rows != [] && builtins.length s.rows < 3) skillMirrors;
+      mirrorReport =
+        lib.concatMapStrings (
+          s: "\n  ${s.skill}: ${toString (builtins.length s.rows)} row(s)\n" + lib.concatMapStrings (r: "    ${r}\n") s.rows
+        )
+        mirrorOffenders;
+      mirrorWarningReport =
+        lib.concatMapStrings (
+          s: "WARN ${s.skill}: ${toString (builtins.length s.rows)} task row(s) restate a `desc`\n"
+        )
+        mirrorWarnings;
+
       policyFailures = builtins.filter (id: !policiesCtl.policies.${id}.holds) policiesCtl.ids;
       policyReport =
         lib.concatMapStrings (
@@ -217,6 +294,25 @@ lib.genAttrs systems.default (
             ${lib.concatMapStrings (w: ''                echo "WARN ${w}"
               '')
               skillsCtl.warnings}
+            touch $out
+          '';
+
+      # --- a skill must not mirror the task surface ---------------------------
+      skills-task-mirror =
+        if mirrorOffenders != []
+        then
+          builtins.throw ''
+            agent skill(s) mirror `task --list-all --json` — the task surface already
+            carries these `desc` lines, so the table is a second copy that goes stale:
+              ${mirrorReport}
+            Keep the row only when it says something the `desc` does not (a caveat, a
+            cost, a "does not prove"); otherwise name the task and drop the cell.
+          ''
+        else
+          pkgs.runCommand "skills-task-mirror" {} ''
+            echo "agent skills OK: ${toString skillsCtl.index.count} skills, ${toString (builtins.length skillMirrors)} tables read"
+            echo "  task rows mirroring a desc: 0"
+            ${mirrorWarningReport}
             touch $out
           '';
 

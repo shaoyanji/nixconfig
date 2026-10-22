@@ -28,6 +28,23 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+
+### 2026-10-22 — skills audit: 19 files, −732 lines, and a gate against the pattern
+- Measured first: verbatim duplication against `AGENTS.md` and between skills is zero, so
+  the bloat was structural — rows restating a task's `desc`, facts copied from their source.
+- Rewrote `infra` (dropped the fleet host matrix AGENTS.md bans), `home-assistant`,
+  `frieren-offload`, `knowledge-base`, `services`, `dev`, `agents`, `serv00`, `envs`,
+  `dragoncourt`, `moto`, `bountystash`, `apps`, `data`, `checks`, `burgernas`, `tmux`,
+  `calendar`, `agents-notes`: 4,946 → 4,214 lines across 50 skills.
+- `checks.<system>.skills-task-mirror` fails a skill whose rows restate a `desc` (≥70 % of
+  its tokens, ≤1.5x its length, three rows): calibrated on the old tree at 13 skills / 78
+  rows, proven with a planted row that threw, wired into `ops:skills:check` and
+  `checks:quick`.
+- Corrections: `home-assistant` pointed at `hosts/frieren/media-stack.nix` (no HA config);
+  `frieren-offload` cited a missing `scripts/agy-offload` and claimed the 03:00 runner
+  deletes `HANDOFF.md` (it preserves it, gated on triage); `infra` misstated
+  `store:collect-garbage` (it is `-d`, every generation).
+
 ### 2026-10-22 — netbook imports the shared boot and NAS profiles instead of copies
 - `profiles/boot.nix` (`profiles.boot.efi = false`) + `profiles/nas-client.nix` replace a hand-rolled fstab entry
   and an inbound `2049` a client never needed: LAN→tailnet failover, recovery timer, gc-root guard. Gen `h9pvpjyr…`.
@@ -113,26 +130,9 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
   closure (cache fetches, no build), after which `checks:toon`, `ops:tailnet:policy` and
   `checks:kg:canvas` (static half) pass here; `agent-browser` stays opt-in — that gate skips its click.
 
-### 2026-10-22 — the portable library gets an admission rule, not a bigger disk
-- Audited the four store dirs: 178 files, 9.5 GiB, 83 static, glibc floor 2.39, 11 MiB exact duplicates, 92 MiB eget re-fetch residue (`*.1`).
-- `data:library`, `:index`, `:fetch` replace ad-hoc eget use: a dynamic download is rejected to
-  `.rejected/`, provenance goes to `.library.tsv`; asserts
-  [[flake/policies.nix#library-fetch-is-static]] + [[flake/policies.nix#library-crosses-the-wire]],
-  note `portable-library`.
-
-### 2026-10-22 — scratch's sops planes unseal through its TPM; the proof moves to the store copy
-- scratch is the third TPM-sealed host (`&tpmscratch`) and the first whose **system** plane unseals
-  through the chip: `age.keyFile` + `age.plugins`, `sshKeyPaths` forced empty, no SSH-derived recipient
-  at all. `switch-to-configuration` exits 0. Audio was firmware, not config (BIOS re-enabled `00:1f.3`).
-- `modules/sops.nix` gained `age.plugins` for `tpmHosts`: without it the user unit's
-  `Environment=PATH=` is empty and the unseal dies on `0 successful groups required, got 0` —
-  measured on frieren, exit 128 with the identity / exit 0 with the plugin. frieren and fern stay
-  green only because a software `keys.txt` is still a recipient there, so their `sops -d` says nothing.
-- Proof now targets `/nix/store/<hash>-secrets.yaml` through the unit's own manifest, not a checkout:
-  both planes decrypt it to the pulled tree's digest, and a no-identity control exits 128. scratch's
-  clone sat 2768 commits behind at `~/nixconfig` while `~/Documents/nixconfig` was a store symlink.
-  Procedure `docs/sops-rekey.md`; note `tpm-sops-planes`.
-
+### 2026-10-22 — the skills audit lands; two older entries move to `docs/history/audit-2026-10.md`
+- The portable-library admission rule and scratch's TPM sops planes moved verbatim at the 150-line
+  budget; content unchanged, only the home.
 
 ### 2026-10-22 — the 2026-10-21 entries are archived to `docs/history/audit-2026-10.md`
 

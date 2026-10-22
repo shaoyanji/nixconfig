@@ -168,35 +168,16 @@ either promote it or mark it `REJECTED` with the reason.
 
 No checkboxes. State is `status`, not `- [x]`, or the same item has two truths.
 
-### Handoff
+### Handoff and proposal
 
-`kind = "handoff"` is for queue **state**, not daily findings: queue rules, the
-closed-cycle record, and the boundary rule that `~/HANDOFF.md` is live host
-state written by `agy-nightly-*` and never promoted by copying. A finding
-becomes a note only when a human or agent commits it as `open` with refs.
+`kind = "handoff"` is queue **state**, not daily findings: queue rules, the
+closed-cycle record, and the rule that `~/HANDOFF.md` is live host state written
+by `agy-nightly-*`, never promoted by copying it into a note. It takes the same
+shape, one line per landed change, each naming the module that carries it.
 
-```nix
-    handoff-closed-2026-10 = {
-      title = "Closed in the 2026-10 cycle";
-      kind = "handoff";
-      status = "DELIVERED";
-      date = "2026-10-19";
-      summary = "What landed this cycle; dates live in AUDIT.md.";
-      refs = {
-        modules = ["lib/home-agents.nix"];
-        docs = [".agents/SCHEMA.md"];
-      };
-      body = ''
-        - One line per landed change, each with the module that carries it.
-      '';
-    };
-```
-
-### Proposal (promoted from an experiment)
-
-Same shape as an experiment, but `kind = "proposal"`, `status = "ACCEPTED"`,
-a `priority`, and the `body` states the option surface and the exit criterion.
-Promotion is an edit to this note, not a new document.
+A `proposal` is an experiment that was accepted: same fields plus `priority`, and
+a `body` that states the option surface and the exit criterion. Promotion is an
+edit to that note, not a new document.
 
 ## Promotion ladder
 
@@ -275,9 +256,8 @@ explains it.
 Then check the surfaces actually updated:
 
 ```bash
-nix build --builders "" .#docs                     # docs/generated/agents-notes/<id>.md
-nix build .#fleet-docs-site                        # data/agents-notes/<id>.json (site page)
-task ops:docs:budget                              # stubs stayed stubs
+nix build --builders "" .#docs          # docs/generated/agents-notes/<id>.md
+nix build .#fleet-docs-site             # data/agents-notes/<id>.json (site page)
 ```
 
 ## Where it renders

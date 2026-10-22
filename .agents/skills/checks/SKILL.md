@@ -34,7 +34,6 @@ Run validation and health checks for host configs and Nix code quality.
 | `checks:host HOST=… MODE=eval` | One host, **evaluated** rather than built — arch-independent, and the way to check an aarch64 or darwin host from x86_64 |
 | `checks:flake` | Runs `nix flake check` only where the machine can hold it; **refuses below 16 GiB RAM** |
 | `checks:inventory:compiled` | Tier-1 inventory checks: schema consistency, flake coverage, module injection |
-| `checks:sops:drift` | Verify every sops file's embedded age recipients match `.sops.yaml` (catches un-rekeyed files before they break host activation) |
 | `checks:kg:native` | Cold native graph build: median < 20 ms over 7 runs, **no subprocess in `KGEngine.Native`**, node/edge parity with the compiled projection |
 | `checks:kg:canvas` | Builds `.#fleet-docs-site` locally and proves the knowledge-graph canvas works: every node has a slice, no dangling slice links, and headless Chrome **clicks a node** and must land on `fleet / knowledge-graph / host:frieren` |
 
@@ -55,11 +54,10 @@ one process); use `task checks:hosts` (sequential) and wrap anything heavy in
 
 ## Nix linting & formatting
 
-| Task | Description |
-|------|-------------|
-| `checks:nix:lint` | Run deadnix + statix on all nix files |
-| `checks:nix:fix` | Auto-fix dead code, style, and formatting |
-| `checks:nix:format` | Check formatting with alejandra (read-only) |
+`checks:nix:lint` is read-only and fails on deadnix, reports statix.
+`checks:nix:fix` writes; `checks:nix:format` is `alejandra --check` alone. All
+three run `scripts/task/nix-fmt.sh --tools …`, so they resolve tool versions from
+the `flake.lock` pin rather than whatever is on `PATH`.
 
 ### experimental-features global wiring
 
@@ -69,6 +67,5 @@ Pitfall: `nix.settings` uses shallow attrset merge (`//`), so a host-level `expe
 
 ## Status
 
-| Task | Description |
-|------|-------------|
-| `checks:status` | Show task list + git status |
+`checks:status` is the one check that proves nothing: it prints the task list and
+`git status`. Use it to orient, never as evidence a change works.

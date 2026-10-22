@@ -87,8 +87,68 @@ The activation writes `~/.config/sops/age/keys.txt` from
 recipient already listed — no new recipient, no rekey, and nothing to back up
 (losing the disk loses the secrets anyway, and the host is reinstalled).
 
-Do **not** enable it on `frieren` or `fern`: they use the TPM identity path
-(`modules/sops.nix` `tpmHosts`) and read `tpm-identity.txt` instead.
+Do **not** enable it on `frieren`, `fern` or `scratch`: they use the TPM identity
+path (`modules/sops.nix` `tpmHosts`) and read `tpm-identity.txt` instead.
+
+## TPM-sealed identity (`frieren`, `fern`, `scratch`)
+
+An `age-plugin-tpm` identity is a **key sealed by the chip**: the file is only
+the handle, so it decrypts on that machine and nowhere else. Verified
+2026-10-22 against the pinned toolchain (sops 3.13.3, age-plugin-tpm 1.0.1):
+`sops encrypt --age age1tag1…`, `sops updatekeys`, and `sops decrypt` with
+`SOPS_AGE_KEY_FILE=…/tpm-identity.txt` all succeed, so a plugin recipient is a
+normal recipient to sops.
+
+Order matters — the chip must be usable before the identity exists, and the
+identity must be a recipient before either plane reads it.
+
+```bash
+# 1. Capability first: deploy security.tpm2.enable, devji in `tss`, and
+#    pkgs.age-plugin-tpm/tpm2-tools. Leave sops.age.keyFile on the default;
+#    pointing it at a file that does not exist yet only breaks activation.
+
+# 2. Generate ON the host, as the user — /dev/tpmrm0 is root:tss 0660, and a
+#    fresh group membership needs a new session (`sg`, or re-login).
+ssh <host> 'sg tss -c "age-plugin-tpm --generate -o \$HOME/.config/sops/age/tpm-identity.txt"'
+ssh <host> 'chmod 400 ~/.config/sops/age/tpm-identity.txt'
+ssh <host> 'age-plugin-tpm -y ~/.config/sops/age/tpm-identity.txt'   # → recipient
+```
+
+The default recipient type is **p256tag** (`age1tag1…`), which is what this
+fleet uses; `--tpm-recipient` produces the older `age1tpm1…` form. Use the
+default, and register the recipient as `&tpm<host>` (existing: `&tpmfrieren`,
+`&tpmfern`).
+
+```bash
+# 3. Register + rekey exactly as below (anchor, key_groups, submodule copy,
+#    sops updatekeys on every file, mirror back, drift check).
+
+# 4. Only now point both planes at it:
+#    modules/sops.nix   tpmHosts += the host AND
+#                       age.plugins = lib.optional useTpm pkgs.age-plugin-tpm;
+#    hosts/<host>       sops.age = {
+#                         keyFile = "<home>/.config/sops/age/tpm-identity.txt";
+#                         sshKeyPaths = lib.mkForce [];   # no SSH-derived recipient
+#                         plugins = [pkgs.age-plugin-tpm]; # system activation PATH
+#                       };
+```
+
+Both planes read the **same** file: root can read the user's `0400` handle. Each
+plane needs the plugin for its own reason: on the system plane `sops.age.plugins`
+builds the activation `PATH`, and on the user plane sops-nix sets the unit's
+`Environment=PATH=` to *exactly* that list — so a TPM host that omits it starts
+`sops-nix.service` with an empty PATH and dies with `0 successful groups
+required, got 0`, while the identical command by hand succeeds. `home.packages`
+is not a substitute: the unit does not inherit the login PATH.
+
+`tss` is per **session**: the deploy that adds the user to the group does not
+change the already-running `systemd --user` manager, so the first user-plane
+activation still fails until that manager restarts (reboot). `id -nG` in a fresh
+ssh session showing `tss` is not proof the manager has it.
+
+A host whose only recipient is the TPM has no fallback — clearing or replacing the
+chip loses the secrets, which is the accepted trade for keeping nothing
+exportable on disk.
 
 ## Add a recipient to an existing host (the normal rekey)
 

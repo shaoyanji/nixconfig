@@ -14,6 +14,50 @@ Lightweight dwl desktop (Fujitsu ESPRIMO D556, i5-6500, 8 GB RAM, shaky 128 GB f
 - **Storage UUIDs (filled)**: from the original machine config (gist `12006e57e885fc3864e9197826d69276`) — root = f2fs `6353b865-96ba-4ba9-8d2f-4f996862508e`, /boot = ext4 `c0f1f0cb-501a-4ce0-a5fc-006557662a4c`.
 - **Boot**: /boot is **ext4** → legacy BIOS + GRUB. `systemd-boot` is disabled (base-node default overridden in `hosts/scratch/configuration.nix`) and GRUB installs to the `/dev/sda` MBR. Adjust the GRUB device if the disk is not sda.
 - **GC**: no host-local `nix.gc` — inherits the global `--delete-older-than 10d` from `modules/global/global.nix`.
+- **Stale software key**: `~/.config/sops/age/keys.txt` (189 B, Aug 3) survives from the pre-TPM install. Its public half `age12p7hss…` is **not** a recipient of any current file, so it decrypts nothing — but it is exportable key material on a host whose point is that nothing exportable exists. Delete it once the TPM path is proven.
+
+## Two checkouts — read this before "pulling" here
+
+`~/Documents/nixconfig` on this host is **not a repository**: it is a symlink into
+`…-home-manager-files/Documents/nixconfig` → `…-hm_nixconfig`, the read-only copy of
+whatever generation is active. `git rev-parse HEAD` there reports the *generation's*
+commit and looks reassuring; `git pull` cannot work. The clone is `~/nixconfig`, and
+on 2026-10-22 it was **2768 commits behind** (Aug 3 `5a4a2be`) with an uninitialised
+`modules/secrets` — every "is the host current?" check against the `$HOME` path was
+reading the store copy and answering about the wrong tree.
+
+```bash
+cd ~/nixconfig
+git fetch origin && git status -sb          # ahead/behind before touching anything
+git pull --ff-only origin main              # fast-forward only; it is not a fork
+git submodule status                        # expect " 7a35ad4…" (space = clean)
+```
+
+**The submodule cannot be fetched on this host.** `modules/secrets` is private
+(`git@github.com:shaoyanji/secrets.git`) and scratch has no GitHub credentials
+(`ssh -T git@github.com` → *Host key verification failed*; `~/.ssh` holds only
+`codespaces.auto`). `git submodule update --init` fails with *Could not read from
+remote repository*. Bring the exact commit over from a host that already has it:
+
+```bash
+# on frieren (submodule clean at the gitlink the pull expects)
+cd ~/Documents/nixconfig/modules/secrets && git bundle create /tmp/secrets.bundle --all
+cat /tmp/secrets.bundle | ssh devji@100.97.17.113 'cat > /tmp/secrets.bundle'
+
+# on scratch
+cd ~/nixconfig && rm -rf modules/secrets
+git clone -q /tmp/secrets.bundle modules/secrets
+git -C modules/secrets remote set-url origin git@github.com:shaoyanji/secrets.git
+git submodule status        # no leading '-' ; tree hash must equal frieren's
+```
+
+Verify by content, not by the checkout's self-report: the submodule `HEAD` and
+`HEAD^{tree}` must equal frieren's, `.sops.yaml` md5 must equal the root copy, and
+the mirror must match (`scripts/task/sops-drift-check.sh`, 7 files, 36 recipients).
+
+Also: **`~/Taskfile.yml` does not exist on this host**, so the tautological task
+plane described in `AGENTS.md` is not present here — `task` must be run from
+`~/nixconfig`.
 
 ## Initial Deploy (first boot from NixOS ISO)
 ```bash

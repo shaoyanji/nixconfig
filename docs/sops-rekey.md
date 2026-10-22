@@ -200,12 +200,36 @@ you on a wiped, formatted disk).
 
 ## Verify on the host
 
+**Decrypt the store copy, not the checkout.** `sops -d modules/secrets.yaml` proves
+that *some* identity can read *some* file in a working tree that may be stale, on a
+host whose task plane may be a different checkout entirely. What activation reads is
+`/nix/store/<hash>-secrets.yaml`, named by the manifest the unit executes:
+
 ```bash
-sudo systemctl status sops-nix                     # NixOS plane
-ls -l ~/.config/sops/age/keys.txt                  # 0600, owned by the user
-nix shell nixpkgs#age -c age-keygen -y ~/.config/sops/age/keys.txt   # pubkey
-sops -d modules/secrets.yaml > /dev/null && echo "user plane OK"
-journalctl -u home-manager-<user> -n 20            # no "0 successful groups"
+# which manifest the user unit actually runs, and the secrets file it points at
+systemctl --user show sops-nix -p ExecStart -p Environment -p Result
+cat $(systemctl --user show sops-nix -p ExecStart --value \
+      | grep -o '/nix/store/[a-z0-9]*-manifest[a-z-]*\.json') \
+  | grep -o '/nix/store/[a-z0-9]*-secrets\.yaml'
+
+# both planes, against that store path (identical digests = both read the same file)
+STORE=/nix/store/<hash>-secrets.yaml
+SOPS_AGE_KEY_FILE=$HOME/.config/sops/age/tpm-identity.txt sops -d "$STORE" | sha256sum
+sudo env SOPS_AGE_KEY_FILE=/home/<user>/.config/sops/age/tpm-identity.txt \
+  PATH=<age-plugin-tpm>/bin:$PATH sops -d "$STORE" | sha256sum
+
+# negative control — with no identity it MUST fail, or a stale keys.txt is doing
+# the work and the chip is untested
+SOPS_AGE_KEY_FILE=/nonexistent sops -d "$STORE" >/dev/null; echo $?   # expect 128
+```
+
+Then the units and the material they were supposed to install:
+
+```bash
+systemctl --user show sops-nix -p Result -p ExecMainStatus   # success / 0
+sudo ls -l /run/secrets-for-users/                           # hashedPassword present
+journalctl -u home-manager-<user> -n 20                      # no "0 successful groups"
+SOPS_AGE_KEY_FILE=… sops -d "$STORE" | sha256sum             # == the pulled checkout's
 ```
 
 ## Traps
@@ -220,3 +244,7 @@ journalctl -u home-manager-<user> -n 20            # no "0 successful groups"
 - **Mirrors drift.** `modules/secrets.yaml` is a tracked mirror of
   `modules/secrets/secrets.yaml`. `task infra:secrets:sync` is the only correct way
   to refresh it; `checks:quick` includes the drift check for exactly this.
+- **A store copy is not a checkout.** On a host where `~/Documents/nixconfig` is a
+  home-manager store symlink, `git rev-parse` there reports the *generation's* commit,
+  not what you pulled — and it cannot be pulled at all. The clone is elsewhere
+  (`~/nixconfig` on scratch); see `.agents/deploy/hosts/scratch.md`.

@@ -257,6 +257,14 @@ sudo nix-env -p /nix/var/nix/profiles/system --delete-generations <n> …
 sudo nix-collect-garbage   # measured 1.5 GiB freed after one aborted HM attempt
 ```
 
+**A collect that frees nothing means roots, and this host had three:** a 5.9 GiB
+`/etc/nixos/result` from a Sep 30 build, plus both users' home-manager
+`gcroots/current-home` (3.8 GiB and 380 MiB). Removing them freed 7.2 GiB. The
+check and the removal procedure are fleet-wide, in
+[`docs/nix-patterns.md`](../../../docs/nix-patterns.md) — *Reclaiming store space*.
+Do not repeat the generation-pruning step here expecting space; on a 24 GiB eMMC
+the first question after any collect is `sudo nix-store --gc --print-roots`.
+
 ## Preconditions
 
 - **Root ssh by key from frieren.** `nix copy` writes to the store, so it needs

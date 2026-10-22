@@ -913,7 +913,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`.agents/fleet-matrix.md`](.agents/fleet-matrix.md)            | Compact fleet context matrix for LLMs and agent prompts                |
 | [`docs/task-control-plane.md`](docs/task-control-plane.md)         | Task namespace policy and workflow examples                            |
 | [`docs/ci-pipeline.md`](docs/ci-pipeline.md)                | CI: inventory-driven host selection, path rules, the two builds per host |
-| [`docs/nix-patterns.md`](docs/nix-patterns.md)               | yq/format traps, non-obvious Nix, build-budget traps, agent failure modes |
+| [`docs/nix-patterns.md`](docs/nix-patterns.md)               | yq/format traps, non-obvious Nix, build-budget traps, store reclaim (GC roots), agent failure modes |
 | [`docs/NUSHELL.md`](docs/NUSHELL.md)                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |
 | [`docs/frieren-access.md`](docs/frieren-access.md)             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
 | [`docs/dns-failover.md`](docs/dns-failover.md)                | Resolver pair, route vs node failover, why the `/32` cannot fail over |

@@ -70,6 +70,60 @@ next to the code that would break: `hosts/frieren/paperless.nix` (§Tika,
 Before deploying anything referencing Java (Maven/Gradle), Go or Rust, run
 `nix build --dry-run` and confirm the closure is substitutable.
 
+## Reclaiming store space: the collect is only half the job
+
+GC frees paths that **no root reaches**. A generation is one kind of root, not
+the only kind: a `result` symlink from a build nobody uses, a per-user
+home-manager gcroots link, `/run/booted-system`, a `nix profile` entry — each one
+pins a whole closure. `nix-collect-garbage` then reports success and frees
+nothing, which reads as "GC is broken" when the answer is "something is still
+alive".
+
+**The tell: generations deleted, store size unchanged.**
+
+```bash
+sudo nix-store --gc --print-roots | grep -v -e /proc/ -e /sys/      # 2 s
+
+df -h /nix                                 # what is actually left
+sudo du -sh /nix/store                     # what the store holds
+nix path-info -Sh /run/current-system      # what the running closure costs
+```
+
+Store ≈ current system + booted system is healthy. A store several GiB larger
+than those two is rooted garbage, not data.
+
+Measured on netbook 2026-10-22, after pruning to a single generation: 15 GiB in
+`/nix/store` against a 6.7 GiB running closure, and three roots held the gap.
+Removing them and collecting again freed **7.2 GiB / 14,702 paths**.
+
+| Root | Held |
+| :--- | :--- |
+| `/etc/nixos/result` (a `nixos-rebuild build` from Sep 30) | 5.9 GiB |
+| `~devji/.local/state/home-manager/gcroots/current-home` | 3.8 GiB |
+| `~alice/.local/state/home-manager/gcroots/current-home` | 380 MiB |
+
+Remove the **symlink**, never the store path it points at, then collect:
+
+```bash
+sudo rm /etc/nixos/result
+sudo rm ~alice/.local/state/home-manager/gcroots/current-home
+sudo nix-collect-garbage -d        # deletes old generations, then collects
+sudo nix store gc                  # or collect without touching generations
+```
+
+A dangling `gcroots/auto` link is pruned by GC itself; a root that is still
+valid stays until the symlink goes. Never `rm -rf` inside `/nix/store` — GC is
+the only safe deleter, because only it walks the reference graph.
+
+**A small reclaim is not a failed reclaim.** Ten same-nixpkgs generations on
+netbook returned 140 MiB: they share almost every path, so there was little to
+free. Compare store size against the closure, not against the generation count.
+
+Fleet defaults that do the routine half: `nix.gc` runs `--delete-older-than 10d`
+(`modules/global/global.nix`) and `nas-client.nix` prunes roots that live on an
+absent NAS before `nix-gc` starts. Neither touches a root outside those two
+patterns — which is why the `--print-roots` check belongs in the operator's hands.
+
 ## Service module conventions
 
 - Options live under `services.<name>`; composable profiles under `profiles.<name>`.

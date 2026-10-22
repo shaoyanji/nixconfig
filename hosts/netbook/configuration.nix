@@ -31,7 +31,9 @@ in {
 
   boot.supportedFilesystems = ["f2fs" "nfs"];
   hardware.enableRedistributableFirmware = true;
-  boot.loader.systemd-boot.configurationLimit = 10;
+  # Two entries is one seatbelt more than this host has ever needed at once, and
+  # the menu is 3 s — more generations only add paths to keep alive.
+  boot.loader.systemd-boot.configurationLimit = 5;
   # Measured 2026-10-22: 13.1 s of a 47.3 s boot was the loader stage, 5 s of it
   # this countdown. 3 s keeps a usable window for the other generations while
   # still paying 2 s less than the default.
@@ -101,7 +103,10 @@ in {
     # machine shipped with is not a flag, so every run exited 1 and generations
     # piled up until the eMMC was 84 %% full. Measured: `nix-collect-garbage
     # --help` lists the space-separated form only.
-    options = "--delete-older-than 30d";
+    # 30 d (this host's old value) meant a day of deploy testing could keep five
+    # generations alive for a month against a 6.7 GiB closure. A week still
+    # covers "broke it, fix it tomorrow" without hoarding.
+    options = "--delete-older-than 7d";
   };
   nix.settings = {
     # This host only receives closures (`nix copy` from frieren); it never builds

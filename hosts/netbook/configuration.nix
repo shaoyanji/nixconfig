@@ -3,6 +3,7 @@
 # boot test: `.agents/deploy/hosts/netbook.md`.
 {
   config,
+  lib,
   pkgs,
   ...
 }: let
@@ -31,6 +32,12 @@ in {
   boot.supportedFilesystems = ["f2fs" "nfs"];
   hardware.enableRedistributableFirmware = true;
   boot.loader.systemd-boot.configurationLimit = 10;
+
+  # eMMC has no seek cost, so the block-layer scheduler only adds latency; the
+  # kernel recommends none for devices with their own queueing.
+  services.udev.extraRules = ''
+    ACTION=="add|change", KERNEL=="mmcblk*", ATTR{queue/scheduler}="none"
+  '';
   boot.tmp.cleanOnBoot = true;
   services.fstrim.enable = true;
   services.tailscale.enable = true;
@@ -43,6 +50,9 @@ in {
   ];
   boot.kernel.sysctl = {
     "vm.swappiness" = 100;
+    # zram is the swap device that actually gets used (1.8 GiB, 3.76:1 measured).
+    # Decompressing 8 pages to satisfy a 1-page fault is wasted CPU here.
+    "vm.page-cluster" = 0;
     "vm.vfs_cache_pressure" = 150;
     "vm.dirty_ratio" = 10;
     "vm.dirty_background_ratio" = 5;
@@ -64,7 +74,10 @@ in {
     options = "--delete-older-than 30d";
   };
   nix.settings = {
-    auto-optimise-store = true;
+    # This host only receives closures (`nix copy` from frieren); it never builds
+    # or imports by hand, so hashing every path written is a tax on each deploy
+    # with no dedupe to show for it. The weekly optimise timer still runs.
+    auto-optimise-store = lib.mkForce false;
     # Flakes on, because this host is now a fleet host rather than a channel
     # island: deploys resolve `.#nixosConfigurations.netbook`.
     experimental-features = ["nix-command" "flakes"];
@@ -179,6 +192,21 @@ in {
   # programs.firefox.enable = true;
 
   programs.niri.enable = true;
+  # niri's module ships `default = "gnome;gtk"` and pulls
+  # xdg-desktop-portal-gnome, keeping a 20 MiB GTK4/GNOME stack resident for
+  # interfaces this compositor cannot serve (its ScreenCast needs mutter). GTK
+  # implements the file chooser, Access and Notification; Secret stays on
+  # gnome-keyring (enabled below).
+  xdg.portal.config.niri = lib.mkForce {
+    default = "gtk";
+    "org.freedesktop.impl.portal.Access" = "gtk";
+    "org.freedesktop.impl.portal.Notification" = "gtk";
+    "org.freedesktop.impl.portal.Secret" = "gnome-keyring";
+  };
+  xdg.portal.extraPortals = lib.mkForce [
+    pkgs.gnome-keyring
+    pkgs.xdg-desktop-portal-gtk
+  ];
 
   services.greetd = {
     enable = true;

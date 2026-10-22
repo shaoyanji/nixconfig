@@ -217,13 +217,25 @@ tasks:
     summary: >
       scripts/task/boot-check.sh — realises hostBootChecks.<arch>.<host>: a NixOS VM
       test over the host's OWN module list, failing unless stage-2 is reached
-      (`Reached target Multi-User System` on the serial console). The only gate that
-      runs the config; netbook gen 50 (no handoff, green everywhere) is the class.
-      ONE host, `--builders ""`, under oom-guard; not a pre-switch hook (QEMU has no
-      eMMC/NVIDIA/TPM). Vars: HOST=, ARCH=, TIMEOUT=1800.
-      Exit 0 = stage-2, 1 = no stage-2, 2 = watchdog.
+      (`Reached target Multi-User System` on the console). The only gate that runs
+      the config. KVM ONLY: refuses before any eval without /dev/kvm, because a boot
+      is a CI instrument, not a hygiene step (under TCG it costs a core for ~8 min on
+      hosts that also serve). ONE host, `--builders ""`, oom-guard. Vars: HOST=,
+      ARCH=, TIMEOUT=900. Exit 0 = stage-2, 1 = no stage-2/no KVM, 2 = watchdog.
     cmds:
-      - bash scripts/task/boot-check.sh --host "{{.HOST}}" --arch "{{.ARCH}}" --timeout "{{.TIMEOUT | default "1800"}}"
+      - bash scripts/task/boot-check.sh --host "{{.HOST}}" --arch "{{.ARCH}}" --timeout "{{.TIMEOUT | default "900"}}"
+
+  checks:boot:self:
+    desc: "[gate] Boot THIS host before its own switch — the one path allowed to emulate"
+    summary: >
+      scripts/task/boot-check.sh --self. A bad stage-1 on the machine you are about
+      to switch is a box nobody can diagnose from outside, so booting it is a real
+      pre-flight even under TCG: no /dev/kvm, one vCPU, `nice -n 19`, watchdog and
+      `--builders ""`. It is NOT the hygiene gate — for another host the answer is
+      `checks:boot HOST=` (KVM or CI), which refuses here. Vars: TIMEOUT=900.
+      Exit 0 = stage-2, 1 = refused or no stage-2, 2 = watchdog.
+    cmds:
+      - bash scripts/task/boot-check.sh --self --timeout "{{.TIMEOUT | default "900"}}"
 
   checks:flake:
     desc: "[gate] Run `nix flake check` only where the machine can hold it; refuse otherwise"

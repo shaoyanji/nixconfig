@@ -71,10 +71,25 @@ nix build -L .?submodules=1#hostBootChecks.<arch>.<host>
 That is a NixOS VM test (`flake/boot-checks.nix`) over the host's own module
 list, asserting `multi-user.target` and PID 1 being systemd. It runs after
 `build-machines`, so the closure is already substituted, and it needs `/dev/kvm`
-(the job enables it); without KVM a boot falls back to TCG and takes tens of
-minutes. Locally the same gate is `task checks:boot HOST=<host>` — one host,
-under the OOM watchdog, `--builders ""` so it can never spend nixbuild.net
-budget.
+(the job enables it).
+
+Locally the same gate is `task checks:boot HOST=<host>`: one host, under the OOM
+watchdog, `--builders ""` so it can never spend nixbuild.net budget — and it
+**refuses without `/dev/kvm`**, before its first eval or build. That refusal is
+the point. A KVM boot is about a minute; under TCG it is a core for ~8 minutes,
+and the machines that reach for this by hand are the fleet's always-on servers:
+delphi answers `delphi.bountystash.com` and ssh on 2 OCPU, where a pegged core
+is degraded traffic rather than a slow test. A boot is cheap where it belongs —
+on a virtualised CI runner.
+
+The one boot worth emulating is the host you are about to switch. Nobody can
+diagnose that initrd from outside, so `task checks:boot:self` (or `BOOT=1` on
+`infra:switch:nixos`) boots exactly this machine under TCG when `/dev/kvm` is
+absent: one vCPU, `nice -n 19`, the watchdog, and `--self` refuses any name but
+`$(hostname)`. Emulation is the exception for a switch, never for hygiene, and
+that is the whole distinction — hygiene runs kept on booting the same guest after
+edits that could not change it, which is what this boundary now stops.
+[[flake/policies.nix#boot-gate-needs-kvm]]
 
 What it cannot see: hardware. QEMU has no eMMC, NVIDIA or TPM, so a regression
 that only reproduces on the target's storage controller or GPU is out of reach —

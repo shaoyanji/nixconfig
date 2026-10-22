@@ -24,11 +24,11 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
    `nix eval .#agentSkills…` (~1.2 s). Never evaluate a full host to answer a
    fact question; never run `nix flake check` on this host.
 5. **Verification is phased:** eval to catch a config error · build to prove a
-   closure · size to plan a build. **Never run `task checks:*` before a local
-   rebuild** — the switch already evaluates and builds; a pre-flight check (and
-   especially `checks:build:route`) re-instantiates the whole toplevel for no
-   extra proof. An eval is not a build, and a build is not a runtime test (use
-   the MicroVM canary for units).
+   closure · size to plan a build. **Never run a check before a local rebuild**
+   except the boot — the switch already evaluates and builds, so a pre-flight
+   check re-instantiates the whole toplevel for no extra proof. A boot is the
+   thing a switch cannot prove before it happens: `checks:boot:self` on nixos
+   (BOOT=1, default) runs the config; `checks:boot` is the CI path for others.
 6. **This is a live host.** Bounded gates only, one host per process, no
    top-level evals during the 03:00–05:30 window, and no ssh in unattended
    paths. Watch `task ops:health` before blaming the config.

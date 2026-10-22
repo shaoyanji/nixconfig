@@ -173,10 +173,10 @@
       status = "DELIVERED";
       priority = "P6";
       date = "2026-10-19";
-      summary = "The canary is the HOST, not a guest: `hostBootChecks.<arch>.<host>` boots that host's own module list in a VM and fails unless stage-2 is reached. `task checks:boot HOST=`; CI's `boot-canary` job for `modules/services/**`.";
+      summary = "The canary is the HOST, not a guest: `hostBootChecks.<arch>.<host>` boots that host's own module list in a VM and fails unless stage-2 is reached. `task checks:boot HOST=` (KVM/CI) and `checks:boot:self` (this host, before its switch); CI's `boot-canary` job for `modules/services/**`.";
       refs = {
         modules = ["flake/boot-checks.nix" "flake/outputs.nix" ".github/workflows/nixcachix.yml"];
-        tasks = ["checks:boot"];
+        tasks = ["checks:boot" "checks:boot:self"];
         docs = ["docs/ci-pipeline.md" "hosts/microvms/README.md"];
       };
       body = ''
@@ -189,9 +189,16 @@
         300 s connect budget and a Requires on /dev/ttyAMA0 that aarch64 guests do not
         always satisfy.
 
-        Reach: delphi booted its real graph to stage-2 under TCG in ~10 min; CI with
-        KVM is seconds. Not in reach: hardware (no eMMC/NVIDIA/TPM), so netbook gen
-        50's HANDOFF class is covered while its eMMC trigger is not — said in the file.
+        Reach: delphi booted its real graph to stage-2 under TCG; CI with KVM is
+        seconds. Not in reach: hardware (no eMMC/NVIDIA/TPM), so netbook gen 50's
+        HANDOFF class is covered while its eMMC trigger is not — said in the file.
+
+        A boot is not a hygiene step. Re-running it after doc edits that could not
+        change the guest is what pegged one of delphi's two cores while it served
+        delphi.bountystash.com and ssh. So `checks:boot` refuses without /dev/kvm,
+        before its first eval (`boot-gate-needs-kvm`), and the one emulation allowed
+        is `checks:boot:self` / `BOOT=1`: the machine being switched, one vCPU,
+        niced — the initrd nobody can diagnose from outside.
       '';
     };
     arch-shape = {

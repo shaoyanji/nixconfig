@@ -1,9 +1,18 @@
-# Edit this configuration file to define what should be installed on
+# Alice's travel netbook — the fleet's one PINNED host: it builds from
+# `nixpkgs_25_11` (the rev it boots), carries no global chain, and is deployed by
+# push. Rationale and procedure: `.agents/deploy/hosts/netbook.md`.
 {
   config,
   pkgs,
   ...
-}: {
+}: let
+  # The fleet's deploy key (frieren's `devji` identity). alice logs in with it,
+  # and root accepts the same key so `nix copy --to ssh://root@…` can push a
+  # closure over the LAN — `PermitRootLogin` stays `prohibit-password`, so this
+  # grants keys only. One literal, used twice.
+  deployKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHnNR7isgO8VDY76XzwyH3mOg1/DQo8dZgqQOfziw0DQ devji@nixos";
+in {
+  users.users.root.openssh.authorizedKeys.keys = [deployKey];
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -53,10 +62,33 @@
     automatic = true;
     persistent = true;
     dates = "weekly";
-    options = "--delete-older-than-30d";
+    # Nix 2.31 wants `--delete-older-than 30d` (space); the hyphenated form this
+    # machine shipped with is not a flag, so every run exited 1 and generations
+    # piled up until the eMMC was 84 %% full. Measured: `nix-collect-garbage
+    # --help` lists the space-separated form only.
+    options = "--delete-older-than 30d";
   };
   nix.settings = {
     auto-optimise-store = true;
+    # Flakes on, because this host is now a fleet host rather than a channel
+    # island: deploys resolve `.#nixosConfigurations.netbook`.
+    experimental-features = ["nix-command" "flakes"];
+    # The LAN cache is 3.4 ms away and answers 200 from here (measured), but the
+    # image shipped with cache.nixos.org only — so nothing it already had on the
+    # NAS was ever used, and every rebuild went to the WAN.
+    # cache.nixos.org is added by the module (and appears twice if listed here).
+    substituters = [
+      "http://192.168.3.25:5000"
+      "https://shaoyanji.cachix.org"
+      "https://cache.numtide.com"
+    ];
+    trusted-public-keys = [
+      "frieren.lan-1:BUg+1UmfYlF0XCbC0+ZyWQOY1DpQJhj/wa2q76NTFOg="
+      "shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0="
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+    ];
+    trusted-substituters = ["http://192.168.3.25:5000"];
   };
   services.journald.extraConfig = "SystemMaxUse=50M";
   # Use latest kernel.
@@ -120,9 +152,7 @@
     isNormalUser = true;
     extraGroups = ["wheel"]; # Enable ‘sudo’ for the user.
 
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHnNR7isgO8VDY76XzwyH3mOg1/DQo8dZgqQOfziw0DQ devji@nixos"
-    ];
+    openssh.authorizedKeys.keys = [deployKey];
     packages = with pkgs; [
       tree
     ];
@@ -166,6 +196,8 @@
     wget
     uv
     eget
+    sqlite
+    typst
     waybar
     playerctl
     brightnessctl

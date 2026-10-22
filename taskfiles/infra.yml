@@ -195,10 +195,15 @@ tasks:
         fi
 
   infra:plan:host:netbook:
-    desc: Dry-run netbook configuration remotely using its pinned 25.11 channel
+    desc: Report what a netbook deploy would build or fetch (nothing runs on the host)
+    summary: >
+      netbook is deployed by PUSH, so its plan is the flake's own derivation
+      graph: this prints what the local store lacks without building it. The
+      real gate is inside `infra:apply:host:netbook`, on the target, which refuses
+      a system whose kernel or initrd differs from the ones it is running — the
+      pinned 25.11 input is what makes that answer "identical".
     cmds:
-      - rsync -avz hosts/netbook/configuration.nix hosts/netbook/hardware-configuration.nix root@netbook:/tmp/netbook-dry/
-      - ssh root@netbook "NIXOS_CONFIG=/tmp/netbook-dry/configuration.nix nixos-rebuild dry-build"
+      - nix build --dry-run --print-out-paths .#nixosConfigurations.netbook.config.system.build.toplevel
 
   infra:plan:host:*:
     desc: Build/evaluate a specific host closure (no apply)
@@ -208,10 +213,19 @@ tasks:
       - nix build .#nixosConfigurations.{{.HOST}}.config.system.build.toplevel -L
 
   infra:apply:host:netbook:
-    desc: Push configuration and switch netbook remotely using its pinned 25.11 channel
+    desc: Build netbook on frieren (nixbuild.net) and push the closure over the LAN
+    summary: >
+      The one host whose closure is PUSHED: no builder, no flake checkout, no
+      harmonia paths. This stages the tree on frieren, builds there, `nix copy`s
+      the closure over the LAN, and activates the BUILT system — nothing is
+      evaluated or compiled on the netbook.
+
+      Two guards run on the target after the build, before the copy: a changed
+      kernel or initrd is refused (exit 3), and an edited `/etc/nixos` is refused
+      (exit 4). ALLOW_KERNEL_CHANGE=1 / ALLOW_CONFIG_DRIFT=1 override them.
+      Vars: TARGET=, STAGE=switch|boot, ACTION=preflight. Exit 0 = activated.
     cmds:
-      - rsync -avz hosts/netbook/configuration.nix hosts/netbook/hardware-configuration.nix root@netbook:/etc/nixos/
-      - ssh root@netbook "nixos-rebuild switch"
+      - bash scripts/task/deploy-netbook.sh
 
   infra:apply:host:*:
     desc: Activate ONE active host by pulling its closure from the LAN cache
@@ -421,9 +435,14 @@ tasks:
         task services:validate:host:{{.HOST}} TARGET={{.TARGET}}
 
   infra:rollback:host:netbook:
-    desc: Roll back netbook to previous generation remotely
+    desc: Roll netbook back one generation and reactivate it (pushed deploy)
+    summary: >
+      `nix-env --rollback` on the system profile followed by that generation's
+      `switch-to-configuration switch`: no rebuild, no eval, no channel state
+      involved — the same two steps `nixos-rebuild switch --rollback` performs.
+      Exit 1 when there is no earlier generation.
     cmds:
-      - ssh root@netbook "nixos-rebuild switch --rollback"
+      - ACTION=rollback bash scripts/task/deploy-netbook.sh
 
   infra:rollback:apply:host:*:
     desc: Roll back a remote host to previous generation (apply only)

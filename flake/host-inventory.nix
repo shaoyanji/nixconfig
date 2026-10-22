@@ -168,10 +168,22 @@ in {
     modules = globalModulesNixos ++ [../hosts/aristotle/configuration.nix];
   };
 
-  # netbook is deliberately absent from this registry, and that fact is COMPILED
-  # rather than commented: inventory.toml carries `[hosts.netbook] flake = false`
-  # plus the reason in its `notes`. `checks.<system>.inventory-hosts` fails if this
-  # registry and inventory.toml ever disagree.
+  # netbook is the fleet's one PINNED host: it builds from `inputs.nixpkgs_25_11`
+  # (the exact revision it boots, 25.11.12484.b6018f87da91) instead of the
+  # flake's unstable nixpkgs, and carries no global module chain — its own
+  # configuration is the whole system. The pin is what makes it a flake host at
+  # all: same revision ⇒ the same kernel and initrd store paths it already runs,
+  # so a deploy cannot touch the boot chain that newer kernels broke here.
+  netbook = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    nixpkgs = inputs.nixpkgs_25_11;
+    # Its own configuration is the whole system, so it takes the compiled-inventory
+    # injection explicitly — the same reason the microVM hosts above do. Without it
+    # the host has no `config.fleet.inventory`, which `checks.<system>.inventory-modules`
+    # rejects structurally and `hostChecks` rejects when it reads the registry.
+    modules = inventoryModules ++ [../hosts/netbook/configuration.nix];
+  };
 
   aceofspades = {
     kind = "nixos";

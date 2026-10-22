@@ -889,6 +889,22 @@
         "url": "https://flakehub.com/f/DeterminateSystems/nixpkgs-weekly/0.1"
       }
     },
+    "nixpkgs_25_11": {
+      "locked": {
+        "lastModified": 1782847189,
+        "narHash": "sha256-twXPFqFsrrY5r28Zh7Homgcp2gUMBgQ6WDS98Q/3xFI=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b6018f87da91d19d0ab4cf979885689b469cdd41",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b6018f87da91d19d0ab4cf979885689b469cdd41",
+        "type": "github"
+      }
+    },
     "nixpkgs_3": {
       "locked": {
         "lastModified": 1737569578,
@@ -1025,6 +1041,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_8",
+        "nixpkgs_25_11": "nixpkgs_25_11",
         "sops-nix": "sops-nix",
         "zen-browser": "zen-browser"
       }

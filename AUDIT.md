@@ -25,6 +25,21 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — netbook becomes a flake host without touching its boot chain
+- `flake.nix` gains `nixpkgs_25_11`, pinned to `b6018f87da91` — the exact rev the netbook boots — and
+  `outputs.nix` can now give a host its own nixpkgs (`mkNixosHostWith`; passing `nixpkgs` into the
+  assembler's second call was silently dropped by `...`, which is why the first attempt still produced
+  `linux-7.2.10`). With the pin, `.#nixosConfigurations.netbook` resolves kernel `kvi34z8k…-linux-7.1.2`
+  and initrd `mbsmjy1ld…` — the two store paths the host is already running.
+- Deploy is a push: `infra:apply:host:netbook` stages the tree on frieren, builds there (4m22s wall / 8s
+  CPU — substitution, not compilation), `nix copy`s the closure over the LAN, and activates the built
+  system with nix-env + switch-to-configuration, so nothing is evaluated or compiled on the Celeron.
+  Guards run on the target before the copy: boot chain (exit 3) and `/etc/nixos` drift (exit 4).
+- Fixed on the host: harmonia/cachix/numtide substituters (it shipped `cache.nixos.org` only, so the NAS
+  cache 3.4 ms away was never used); `nix.gc` options hyphen → `--delete-older-than 30d` (Nix 2.31
+  rejects the hyphenated flag, so every weekly GC exited 1); flakes enabled. Runbook:
+  `.agents/deploy/hosts/netbook.md`.
+
 ### 2026-10-22 — `.#delphi-site` is what serves, and the server says so
 - The flake package was a host-free lookalike: same name, same templates, empty `cards` — it printed "no
   mount registry" while the live console listed four mounts. It is now

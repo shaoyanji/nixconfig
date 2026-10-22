@@ -301,6 +301,26 @@ Deleting a dead `.conf` is safe and needs no rebuild — it points at nothing.
 `bootctl set-default`/`set-timeout` do not write `/boot/loader/loader.conf` on
 this box (verified 2026-10-22); edit that file directly.
 
+### Deferred: generation 60 (trimmed initrd + `pti=off`), 2026-10-22
+
+Gen 60 booted to a **black screen and wrote no journal of its own** —
+`journalctl --list-boots` jumps straight to the next boot, so it died before
+journald, the same signature as generation 50. Rolled back the same night:
+`nix-env --switch-generation 59`, `loader.conf` rewritten to the 59 entry (a
+switch leaves the *new* entry as default, which is how a second black screen
+gets queued), and the config reverted in the repo. Gen 60 stays in the menu as
+the thing to re-test.
+
+The trimmed initrd is not obviously the cause — it still carries `sdhci-acpi`,
+`sdhci`, `mmc_block`, `mmc_core`, `f2fs`, `sd_mod`, `scsi_mod` (16 modules vs
+35; the 19 dropped are SATA, NVMe, EXT4 and vendor HID). The other boot-parameter
+change was `pti=off`. Isolate them one at a time, keep 59 in the menu, and read
+the console at `loglevel=7`.
+
+**Unpacking trap:** `cpio -id < initrd` extracts only the microcode prepend and
+makes a healthy image look empty of modules. Ask the raw bytes instead:
+`grep -a -o '[a-zA-Z0-9_-]*\.ko\.[a-z]*' <initrd> | sort -u`.
+
 ## Rollback
 
 `task infra:rollback:host:netbook` — `nix-env --rollback` on the system profile,

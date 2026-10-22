@@ -102,8 +102,9 @@ normal recipient to sops.
 Order matters — the chip must be usable before the identity exists, and the
 identity must be a recipient before either plane reads it. On `netbook` the
 identity belongs to user **`alice`** (not `devji`), and no sops-nix plane is
-wired there: step 4 is skipped, so the sealed key is used only by hand
-(`SOPS_AGE_KEY_FILE=… sops -d`) until a plane exists.
+wired there: step 4 is skipped, so the sealed key is used only by hand. It is
+named `tpm-identity-netbook.txt` with `keys.txt` symlinked to it, so a bare
+`sops -d` finds the chip with no env var and no `keyFile` to configure.
 
 ```bash
 # 1. Capability first: deploy security.tpm2.enable, devji in `tss`, and
@@ -224,8 +225,12 @@ sudo env SOPS_AGE_KEY_FILE=/home/<user>/.config/sops/age/tpm-identity.txt \
   PATH=<age-plugin-tpm>/bin:$PATH sops -d "$STORE" | sha256sum
 
 # negative control — with no identity it MUST fail, or a stale keys.txt is doing
-# the work and the chip is untested
-SOPS_AGE_KEY_FILE=/nonexistent sops -d "$STORE" >/dev/null; echo $?   # expect 128
+# the work and the chip is untested. Pointing SOPS_AGE_KEY_FILE at a nonexistent
+# path is NOT a control: sops then falls back to ~/.config/sops/age/keys.txt and
+# still succeeds (measured on netbook). Hide the handles instead.
+D=$HOME/.config/sops/age; mkdir -p /tmp/hidden
+mv "$D"/keys.txt "$D"/tpm-identity*.txt /tmp/hidden/ && sops -d "$STORE" >/dev/null; echo $?  # 128
+mv /tmp/hidden/* "$D"/
 ```
 
 Then the units and the material they were supposed to install:

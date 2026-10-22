@@ -64,6 +64,21 @@ in {
       ++ [
         inputs.disko.nixosModules.default
         ../hosts/delphi/configuration.nix
+        # microVM host: the same guest set as frieren, on the aarch64 side. This
+        # instance has no nested virtualisation, so the guests run under qemu
+        # (TCG) — usable for aarch64-only closures, not for fast cycles.
+        ({pkgs, ...}: {
+          imports = [
+            (import ../modules/profiles/microvm-host.nix {
+              natExternalInterface = "enp0s6";
+              inherit pkgs;
+            })
+          ];
+        })
+        (import ../hosts/microvms/guests.nix {
+          inherit inputs;
+          hypervisor = "qemu";
+        })
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with
         # `lsblk` on the instance BEFORE the first nixos-anywhere run — disko
@@ -93,7 +108,15 @@ in {
   frieren = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [../hosts/frieren/configuration.nix];
+    modules =
+      globalModulesNixos
+      ++ [
+        ../hosts/frieren/configuration.nix
+        # Declarative guests on the brlan bridge (microvm-host.nix is imported by
+        # infra-stack.nix). KVM is available here, so cloud-hypervisor: a guest
+        # boots in seconds off the shared store instead of building an image.
+        (import ../hosts/microvms/guests.nix {inherit inputs;})
+      ];
   };
 
   ares = {

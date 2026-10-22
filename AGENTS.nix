@@ -205,6 +205,32 @@
         the last run for that host: the affordability claim is a comparable number.
       '';
     };
+    microvm-guests = {
+      title = "MicroVM guests: declarative, store-shared, one base module";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-10-22";
+      summary = "`microvm.vms.<name>` on frieren (brlan, KVM, cloud-hypervisor) and on delphi (aarch64, qemu/TCG). A guest reads the host's /nix/store over virtiofs, so starting one is seconds and no image is built; only the shares persist.";
+      refs = {
+        hosts = ["frieren" "delphi"];
+        modules = ["hosts/microvms/base.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix"];
+        tasks = ["microvm:list" "microvm:start" "microvm:stop" "microvm:ssh"];
+      };
+      body = ''
+        The shape is Michael Stapelberg's ("Coding Agent VMs on NixOS with
+        microvm.nix", 2026-02-01): a shared read-only store, explicit shares, and
+        ephemeral by default. Nothing is copied at boot, which is why a start is
+        seconds rather than a disk image build.
+
+        sandbox is throwaway (/var is tmpfs, a restart is a factory reset);
+        slides is a service (/var image plus nginx over the workspace share). Both
+        autostart = false: a guest runs because it was started.
+
+        delphi runs the same set under qemu because OCI A1 has no nested
+        virtualisation and cloud-hypervisor is KVM-only. That is the aarch64 parity
+        path, not the fast one — the same boundary `checks:boot` learned.
+      '';
+    };
     arch-shape = {
       title = "Architecture — the layers, in one note";
       kind = "reference";

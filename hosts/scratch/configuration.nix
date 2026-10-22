@@ -74,6 +74,11 @@ in {
   };
   security.rtkit.enable = true;
 
+  # `desktop-client.nix` used to bring tailscaled in; without it the host is
+  # only reachable on the LAN, which is not how this fleet is administered.
+  # Keep it: reachability is infrastructure, not part of the desktop rice.
+  services.tailscale.enable = true;
+
   # appimage-run through binfmt: the launcher entries the HM module writes
   # execute the images in place under /Volumes/data/appimages.
   programs.appimage = {

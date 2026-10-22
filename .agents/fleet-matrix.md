@@ -65,7 +65,7 @@
 | ⚪ **`minyx`** | `preserved` | Yes | `aarch64-linux` | `strictly-constrained-1gb` | Broadcom BCM2837B0, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV | Raspberry Pi 3B+ Edge Node |
 | 🟢 **`moto`** | `active` | No (Ext) | `aarch64-linux` | `mobile-termux` | Unisoc T760 / Snapdragon, 4 to 8 GB RAM, Mali-G57 | Primary Mobile Smartphone (Android/Termux) |
 | ⚪ **`mtfuji`** | `preserved` | Yes | `x86_64-linux` | `container-compute` | AMD Ryzen 64-bit, 16 GiB DDR4 | Headless Container & AI Inference Host |
-| 🟢 **`netbook`** | `active` | Yes | `x86_64-linux` | `strictly-constrained-cpu` | Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400 | Alice's Travel Netbook (Pinned NixOS 25.11) |
+| 🟢 **`netbook`** | `active` | Yes | `x86_64-linux` | `strictly-constrained-cpu` | Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400 | Alice's Travel Netbook (Fleet nixpkgs, Scripted Initrd) |
 | ⚪ **`penguin`** | `preserved` | Yes | `x86_64-linux` | `container-client` | Intel x86_64, Shared with ChromeOS, VirtIO GPU with nixGL wrapper | Chromebook Linux Container (Crostini) |
 | 🟢 **`poseidon`** | `active` | Yes | `x86_64-linux` | `flagship-compute` | AMD Ryzen 7 Mobile, 16 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU | Primary High-Performance Laptop Workstation |
 | ⚪ **`schneeeule`** | `preserved` | Yes | `x86_64-linux` | `standard-laptop` | Intel 64-bit multi-core, 16 GiB, Intel iGPU + NVIDIA GeForce | Impermanent Desktop Laptop |

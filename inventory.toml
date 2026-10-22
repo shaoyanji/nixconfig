@@ -711,15 +711,15 @@ constraints = ["Preserved host; do not target for live deployment."]
 [hosts.netbook]
 hostname = "netbook"
 status = "active"
-status_detail = "In active production as Alice's lightweight travel netbook on pinned NixOS 25.11."
+status_detail = "In active production as Alice's lightweight travel netbook; follows the fleet nixpkgs with the scripted initrd pinned."
 kind = "nixos"
 arch = "x86_64-linux"
-role = "Alice's Travel Netbook (Pinned NixOS 25.11)"
+role = "Alice's Travel Netbook (Fleet nixpkgs, Scripted Initrd)"
 category = "laptop"
 desktop_environment = "Niri + greetd"
 users = ["alice"]
 flake = true
-notes = ["Flake host on a PINNED nixpkgs (25.11.12484.b6018f87da91, the exact rev it boots): same revision means the kernel and initrd derivations are the same store paths it already runs, so deploys cannot break the boot chain newer kernels broke.", "Deploy is push-based: frieren builds the closure (nixbuild.net for x86_64) and `nix copy`s it over the LAN, because the netbook cannot pull a closure it does not already have from harmonia. `task infra:apply:host:netbook`."]
+notes = ["Flake host on the fleet nixpkgs; the ONE pin is the initrd implementation (`boot.initrd.systemd.enable = false`), not the kernel. NixOS 26.11 made systemd-initrd the default, so generation 50 reached no stage-2 on this eMMC (no journal entry, blank console at loglevel=3) while the same kernel 6.18.56 with the scripted stage-1 boots clean (gen 51, 0 failed units).", "Deploy is push-based: frieren builds the closure (nixbuild.net for x86_64) and `nix copy`s it over the LAN, because the netbook cannot pull a closure it does not already have from harmonia. `task infra:apply:host:netbook`."]
 
 [hosts.netbook.hardware]
 model = "Intel Celeron Netbook"
@@ -734,17 +734,17 @@ tailscale = true
 ssh_alias = "netbook"
 
 [hosts.netbook.software]
-module_chain = "Independent NixOS 25.11 (No Flake)"
+module_chain = "Own configuration only (no global chain), fleet nixpkgs"
 impermanence = false
 key_services = ["Niri Compositor", "greetd", "Pipewire", "NFS client automount"]
-traits = ["alice-user", "celeron-n3060", "pinned-25.11", "f2fs", "ultra-low-spec"]
+traits = ["alice-user", "celeron-n3060", "fleet-nixpkgs", "scripted-initrd", "f2fs", "ultra-low-spec"]
 
 [hosts.netbook.persona]
 title = "Alice's Travel Companion"
 system_prompt_hint = "You assist Alice on her ultra-lightweight travel netbook. The Celeron CPU is extremely weak; keep everything lightweight, smooth, and friendly."
 compute_tier = "strictly-constrained-cpu"
 allowed_tasks = ["Simple note taking", "Document viewing", "Alice user assistance"]
-constraints = ["NEVER run local Nix builds or heavy evals; offload all packages to frieren.", "Host is pinned to NixOS 25.11 channel due to upstream kernel initrd bug."]
+constraints = ["NEVER run local Nix builds or heavy evals; offload all packages to frieren.", "Pin the scripted initrd (`boot.initrd.systemd.enable = false`); systemd-initrd never reached stage 2 on this eMMC."]
 
 [hosts.penguin]
 hostname = "penguin"

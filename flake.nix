@@ -21,13 +21,11 @@
   };
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    # netbook's boot chain, pinned to the EXACT revision that host runs
-    # (NixOS 25.11.12484.b6018f87da91). Same revision ⇒ the kernel and initrd
-    # derivations are the same store paths it already boots, which is what makes
-    # a flake deploy safe on hardware where newer initrds failed to mount root.
-    # Do NOT add `follows = "nixpkgs"`: that is the failure this pin prevents.
-    # Moving the host forward means changing this rev and boot-testing it.
-    nixpkgs_25_11.url = "github:NixOS/nixpkgs/b6018f87da91d19d0ab4cf979885689b469cdd41";
+    # No pinned nixpkgs: netbook followed `nixpkgs` from 2026-10-22, and what it
+    # pins instead is the initrd implementation (`boot.initrd.systemd.enable =
+    # false`) — the reason and the boot test are in
+    # `.agents/deploy/hosts/netbook.md`. The `nixpkgs_25_11` input that used to
+    # carry this host was pruned from `flake.nix` and `flake.lock` once unused.
     # Determinate Nix — imported by modules/global/determinate-nix.nix, which
     # every NixOS chain carries since 2026-10-19. Do NOT make its nixpkgs
     # follow ours: the DN CLI and determinate-nixd come from its own locked

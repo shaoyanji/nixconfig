@@ -13,7 +13,7 @@ const CONFIG = {
   }
   network: {
     microvm_ip: "192.168.83.10"
-    microvm_bridge: "microbr"
+    microvm_bridge: "brlan"
   }
   gist: {
     movie_list_id: "f54acf4ff3274a96d3287003e7cdc988"

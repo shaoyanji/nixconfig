@@ -4018,5 +4018,37 @@
         accept `age1tag1…`.
       '';
     };
+
+    taskfile-plane-handmade = {
+      title = "The $HOME task plane is a hand-made shim, and it fails where it exists";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-10-22";
+      summary = "`~/Taskfile.yml` is hand-made and untracked, and `task` from $HOME fails on both hosts checked: 203 on frieren (duplicate `load-env` under a flattened include) and 100 on scratch (no file). Working forms are `task -t <repo>/Taskfile.yml` or running inside the clone.";
+      refs = {
+        hosts = ["frieren" "scratch"];
+        modules = ["Taskfile.yml"];
+        tasks = ["checks:tasks"];
+        docs = ["AGENTS.md" "docs/task-control-plane.md"];
+      };
+      body = ''
+        Measured 2026-10-22, not inferred: `cd ~ && task --list` exits **203** on frieren with
+        `Found multiple tasks (load-env) included by "nixconfig"`, because `~/Taskfile.yml` defines
+        `load-env` while `Taskfile.yml:301` does too and the include uses `flatten: true`. On scratch the
+        file is absent, so `task` and `task -g` both exit **100** (`No Taskfile found`).
+
+        Why it went unnoticed: nothing writes the file. `git ls-files` has no home-level Taskfile and no
+        `.nix` module emits one, so it exists only where someone made it by hand — and the two working
+        paths (`task -t ~/Documents/nixconfig/Taskfile.yml`, or running inside the clone) kept the shim
+        out of daily use. `AGENTS.md` described it as an invariant anyway; that section is now corrected.
+
+        A declarative version has to clear three things, which is why this is open: `dir:` must be the
+        host's *actual* checkout (`~/Documents/nixconfig` is a home-manager store symlink on scratch,
+        read-only), it must not redefine a flattened name such as `load-env` (use a prefixed/namespace
+        include instead of `flatten: true`), and it needs a gate that runs `task --list` in `$HOME` so a
+        collision cannot ship. Exit criteria: that gate passes on every active host the module serves.
+      '';
+    };
   };
 }

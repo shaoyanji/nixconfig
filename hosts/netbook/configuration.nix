@@ -46,11 +46,11 @@ in {
   services.fstrim.enable = true;
   services.tailscale.enable = true;
 
-  # Measured 1.895 s of boot. Its only consumers here are the NAS governor and
-  # the /Volumes/data automount (through network-online.target), and the governor
-  # already retries on a timer while the mount is an automount with its own
-  # timeouts — boot does not need the network to be "online" to proceed.
-  systemd.services.NetworkManager-wait-online.enable = false;
+  # NetworkManager-wait-online stays enabled on purpose. Masking it on
+  # 2026-10-22 looked like a 1.895 s win but only moved the wait: nas-path-governor
+  # is WantedBy nix-gc.service (which runs at boot via `nix.gc.persistent`), and
+  # without the gate it probed before the link was up, failed twice and spent
+  # 12.1 s instead of 0.3 s. Same total, less predictable.
 
   boot.kernelParams = [
     # pti=off was tried here on 2026-10-22 (gens 60 and 62) and both boots came

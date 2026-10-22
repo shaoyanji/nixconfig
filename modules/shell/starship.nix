@@ -125,7 +125,7 @@
         staged = "+";
         renamed = "»";
         deleted = "✘";
-        stashed = "$$"; # escaped: every git_status symbol is a format string
+        stashed = "\$\$"; # escaped: every git_status symbol is a format string
       };
 
       nix_shell = {

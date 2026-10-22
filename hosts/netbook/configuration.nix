@@ -49,11 +49,10 @@ in {
   systemd.services.NetworkManager-wait-online.enable = false;
 
   boot.kernelParams = [
-    # Isolation test, 2026-10-22. Generation 60 black-screened before journald
-    # with three suspects; the other two (trimmed initrd, nodiscard) are not in
-    # this generation, so a repeat failure here names pti=off and clears them.
-    # Baseline on the proven kernel: 3000 fork+exec = 22.7 s (7.6 ms each).
-    "pti=off"
+    # pti=off was tried here on 2026-10-22 (gens 60 and 62) and both boots came
+    # back unusable while gen 61 booted fine, so it is out until someone watches
+    # a boot with it and can say what actually failed. Baseline for a re-test on
+    # the proven kernel: 3000 fork+exec = 22.7 s (7.6 ms each).
     # "fsck.mode=skip"
     # "nomodeset"
     # "console=tty1"

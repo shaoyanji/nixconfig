@@ -25,6 +25,22 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — scratch moves both sops planes onto its TPM, and switch exits 0
+
+- scratch is the fleet's third TPM-sealed host (`&tpmscratch`) and the first whose
+  **system** plane (not just Home Manager) unseals through the chip: `sops.age.keyFile`
+  + `age.plugins` in the host module with `sshKeyPaths` forced empty, so there is no
+  SSH-derived recipient at all. `hashedPassword`, the user `sops-nix` unit and
+  `vdirsyncer` now succeed; `switch-to-configuration` exits 0 where it used to exit 4.
+- `modules/sops.nix` gained `age.plugins` for `tpmHosts`. Without it sops-nix sets the
+  user unit's `Environment=PATH=` to an empty value and the unseal fails as
+  `0 successful groups required, got 0` — indistinguishable from a missing recipient.
+  frieren and fern carry the same latent fault until their next switch.
+- Procedure and traps written down in one place: `.agents/skills/tpm-sops/SKILL.md`,
+  with the contract in `docs/sops-rekey.md` and the note `tpm-sops-planes`.
+- Audio on scratch was firmware, not config: enabling the onboard controller in the BIOS
+  gave `00:1f.3` and a PipeWire sink with no change in the tree.
+
 ### 2026-10-21 — frieren headless-by-default, governor store references, Caddyfile removal
 
 - Split frieren into two boot personas: `hosts/frieren/configuration.nix` is now the

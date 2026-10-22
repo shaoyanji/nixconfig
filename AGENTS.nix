@@ -3976,5 +3976,36 @@
         so no run depends on the desktop being awake.
       '';
     };
+
+    tpm-sops-planes = {
+      title = "TPM sops: two rebuilds, two PATHs, and a per-session group";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-10-22";
+      summary = "A TPM identity is a sealed handle, so the order is fixed: deploy the chip, generate the identity on the host, register + rekey, then point both planes at it. The user unit's PATH is the plugin list, not the login PATH — the fault that looks like \"not a recipient\".";
+      refs = {
+        hosts = ["scratch" "fern" "frieren"];
+        modules = ["modules/sops.nix" "hosts/scratch/configuration.nix" "hosts/fern/configuration.nix"];
+        tasks = ["infra:sops:update-keys" "infra:secrets:sync"];
+        docs = [".agents/skills/tpm-sops/SKILL.md" "docs/sops-rekey.md" ".agents/deploy/hosts/scratch.md"];
+      };
+      body = ''
+        Procedure lives in `.agents/skills/tpm-sops/SKILL.md`; the contract is `docs/sops-rekey.md`.
+        Three facts are the ones a reconstruction gets wrong:
+
+        1. **Two rebuilds.** Rebuild A installs `security.tpm2`, `tss` and `age-plugin-tpm` and must not
+           reference the identity; rebuild B points `sops.age.keyFile` at it. Referencing a file that
+           does not exist yet fails activation and reads as a config bug.
+        2. **`sops.age.plugins` on both planes.** sops-nix sets the user unit's `Environment=PATH=` to
+           exactly that list, so a TPM host without it runs `sops-nix.service` with an empty PATH and
+           dies on `0 successful groups required, got 0`. `home.packages` does not reach the unit.
+        3. **`tss` is per session.** The deploy that adds the user to the group does not change the
+           running `systemd --user` manager, so the first user-plane start still fails until a reboot.
+
+        Verified on scratch 2026-10-22: `hashedPassword` installed, user unit `Result=success`, CA key
+        present, `switch-to-configuration` exit 0. Upstream's `p256tag unsupported` report is stale for
+        sops 3.13.3 / age 1.3.2: encrypt, `updatekeys` and decrypt all accept `age1tag1…`.
+      '';
+    };
   };
 }

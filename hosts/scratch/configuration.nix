@@ -192,6 +192,9 @@ in {
     # Mod+S / Mod+Print screenshots (niri parity)
     grim
     slurp
+    # TPM: identity generation and inspection live on the host
+    age-plugin-tpm
+    tpm2-tools
     # Suckless X11 Core Toolchain
     dwm
     st
@@ -202,6 +205,31 @@ in {
     vis
     xclip
   ];
+
+  # --- sops: both planes unseal through the TPM ---
+  # base-node gives every host `age.sshKeyPaths = [/etc/ssh/ssh_host_ed25519_key]`
+  # and .sops.yaml carries the matching `&<host>host` recipient. This host has
+  # no SSH-derived recipient on purpose: the only scratch recipient is the
+  # TPM-sealed identity, so root reads the same tpm-identity.txt the user plane
+  # does (root can read the 0400 file; `age-plugin-tpm` must be on PATH for the
+  # unseal, which is what `age.plugins` puts there).
+  sops = {
+    age.keyFile = "${user.home}/.config/sops/age/tpm-identity.txt";
+    age.sshKeyPaths = lib.mkForce [];
+    age.plugins = [pkgs.age-plugin-tpm];
+  };
+
+  # --- TPM 2.0 (firmware TPM on the Q150 board) ---
+  # Same shape as hosts/fern/configuration.nix and hosts/frieren/hardware.nix:
+  # the chip holds the age identity that the user sops plane unseals, so no
+  # identity file has to be copied onto the machine. tss-groups devji because
+  # /dev/tpmrm0 is root:tss 0660 and `age-plugin-tpm --generate` runs as the
+  # user, not as root.
+  security.tpm2 = {
+    enable = true;
+    tctiEnvironment.enable = true;
+  };
+  users.users.${user.name}.extraGroups = ["tss"];
 
   services.openssh.enable = true;
   system.stateVersion = "25.05";

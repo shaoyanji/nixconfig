@@ -6,7 +6,7 @@
   ...
 }: let
   # Hosts with initialized and registered TPM 2.0 identities
-  tpmHosts = ["frieren" "fern"];
+  tpmHosts = ["frieren" "fern" "scratch"];
   useTpm = osConfig != null && builtins.elem (osConfig.networking.hostName or "") tpmHosts;
   tpm_key_path = "${config.home.homeDirectory}/.config/sops/age/tpm-identity.txt";
   default_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
@@ -21,6 +21,11 @@ in {
         else default_key_path
       );
       generateKey = lib.mkDefault (!useTpm);
+      # sops-nix sets the user unit's PATH to *exactly* this list, so a TPM host
+      # without it starts the unit with `Environment=PATH=` — the unseal then
+      # fails as "0 successful groups" even though the identity is a recipient.
+      # home.packages is not enough: the unit does not inherit the login PATH.
+      plugins = lib.optional useTpm pkgs.age-plugin-tpm;
       #sshKeyPaths = [ "${ssh_key_path}" ];
     };
     # defaultSopsFile = "${inputs.secrets."secrets.yaml"}";

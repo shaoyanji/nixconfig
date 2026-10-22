@@ -210,7 +210,7 @@
       kind = "reference";
       status = "DELIVERED";
       date = "2026-10-22";
-      summary = "`microvm.vms.<name>` on frieren (brlan, KVM, cloud-hypervisor) and on delphi (aarch64, qemu/TCG). A guest reads the host's /nix/store over virtiofs, so starting one is seconds and no image is built; only the shares persist.";
+      summary = "`microvm.vms.<name>` on frieren (brlan, KVM, cloud-hypervisor) and on delphi (aarch64, same cloud-hypervisor runner, but no /dev/kvm, so a guest refuses to start there). A guest reads the host's /nix/store over virtiofs, so starting one is seconds and no image is built; only the shares persist.";
       refs = {
         hosts = ["frieren" "delphi"];
         modules = ["hosts/microvms/base.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix"];
@@ -226,9 +226,11 @@
         slides is a service (/var image plus nginx over the workspace share). Both
         autostart = false: a guest runs because it was started.
 
-        delphi runs the same set under qemu because OCI A1 has no nested
-        virtualisation and cloud-hypervisor is KVM-only. That is the aarch64 parity
-        path, not the fast one — the same boundary `checks:boot` learned.
+        delphi declares the same set under cloud-hypervisor, but OCI A1 has no
+        nested virtualisation: the runner exits in under a second with `no
+        supported hypervisor`. qemu/TCG was the earlier answer and is deliberately
+        gone — the fleet does not carry an emulator for guests, and a guest belongs
+        on the KVM host. That is the boundary `checks:boot` learned.
       '';
     };
     arch-shape = {

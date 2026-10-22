@@ -225,6 +225,38 @@ intercepted by Tailscale SSH and hangs on a browser check, while from **delphi**
 deploy key works. The script runs on frieren, so its unattended target stays the
 LAN address.
 
+## Before a structural change: measure the closure first
+
+A change that adds a module chain, a user profile or a desktop stack is measured
+**before** anything is copied to the host. This box has ~6 GiB free on a 24 GiB
+eMMC at 75 %, and its entire system store is smaller than one DMS desktop: the
+fleet's home-manager component set builds 4.3 GiB, of which ~3 GiB is Qt, and
+that is what a "just manage the dotfiles" idea costs here.
+
+```bash
+# 1. what would land — build it on frieren, never here
+P=$(nix build --no-link --print-out-paths --builders "" \
+  .#nixosConfigurations.netbook.config.home-manager.users.alice.home.activationPackage)
+nix path-info -Sh "$P"                              # total
+nix path-info -rS "$P" | sort -n -k2 | tail -10      # what dominates, in bytes
+
+# 2. what is free, right now
+ssh alice@192.168.3.36 'df -h / | tail -1'
+```
+
+The rule: the closure must fit with **at least 1 GiB left over**. This host has
+been full before (84 %), and a full eMMC breaks GC — which is how generations
+pile up until something else fails. If it does not fit, the answer is a smaller
+component set, not a slower copy.
+
+An aborted attempt leaves its bytes in the store until GC. Reclaim them:
+
+```bash
+sudo nix-env -p /nix/var/nix/profiles/system --list-generations
+sudo nix-env -p /nix/var/nix/profiles/system --delete-generations <n> …
+sudo nix-collect-garbage   # measured 1.5 GiB freed after one aborted HM attempt
+```
+
 ## Preconditions
 
 - **Root ssh by key from frieren.** `nix copy` writes to the store, so it needs

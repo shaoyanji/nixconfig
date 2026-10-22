@@ -8,9 +8,6 @@
   gateway ? "192.168.83.1",
   prefix ? 24,
   hypervisor ? "cloud-hypervisor",
-  # microvm.nix passes `-enable-kvm` exactly when this is null; a host without
-  # /dev/kvm must name a CPU or the runner dies on the missing module.
-  cpu ? null,
   vcpu ? 2,
   mem ? 2048,
 }: {
@@ -65,7 +62,7 @@
   ];
 
   microvm = {
-    inherit hypervisor cpu vcpu mem;
+    inherit hypervisor vcpu mem;
     socket = "control.socket";
     # Without a writable layer over the shared store, activation has nowhere to
     # write and the boot sits on "GID Wrappers" for minutes. It is a tmpfs, not

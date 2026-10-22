@@ -75,13 +75,11 @@ in {
             })
           ];
         })
-        (import ../hosts/microvms/guests.nix {
-          inherit inputs;
-          hypervisor = "qemu";
-          # No /dev/kvm here: microvm.nix emits -enable-kvm when cpu is null, so a
-          # named CPU is what makes the runner use TCG instead of failing.
-          cpu = "max";
-        })
+        # cloud-hypervisor only: this fleet does not carry qemu for guests. It
+        # needs /dev/kvm, which this instance does not expose, so the guest here
+        # fails fast rather than emulating — that is the correct answer, not a
+        # slower one.
+        (import ../hosts/microvms/guests.nix {inherit inputs;})
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with
         # `lsblk` on the instance BEFORE the first nixos-anywhere run — disko

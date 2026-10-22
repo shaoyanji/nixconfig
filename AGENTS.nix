@@ -643,42 +643,32 @@
       };
       body = ''
         Healthy in the 2026-10-18 21:31 boot (`amdgpu 3.64.0`, DCN 2.0, 6 planes, fb0,
-        50 min of greetd/gamescope) and gone from the 2026-10-19 13:43 boot onward:
-        firmware never enumerates `0000:05:00.0`, the x16 root port `0000:00:02.0` is
-        not exposed, `/sys/class/drm` holds only `version`, and `amdgpu` logs only
-        `Topology: Add CPU node`.
+        50 min of greetd/gamescope) and gone from 2026-10-19 13:43 onward: firmware never
+        enumerates `0000:05:00.0`, the x16 root port `0000:00:02.0` is not exposed,
+        `/sys/class/drm` holds only `version`, `amdgpu` logs only `Topology: Add CPU node`.
 
-        The obvious suspects are ruled out by evidence: no `Out of memory` / `oom-kill`
-        line exists since 2026-10-18 20:00, and the desktop ran until the poweroff, so
-        the build did not kill it. `max-jobs = 8` is live for future builds.
+        Not OOM and not the build: no `Out of memory`/`oom-kill` line since 2026-10-18
+        20:00, and the desktop ran until the poweroff. `max-jobs = 8` is live now.
 
-        `pci rescan` and a CPU-root-port link retrain fail, and the x16 port has no
-        hotplug slot (`Slot-`), so no software power cycle exists either: the link is
-        `Width x0` / `PresDet-`. Recovery is physical — power off at the PSU (standby
-        keeps the rail latched), check the 8-pin PCIe power, reseat the card.
+        `pci rescan` and a link retrain fail, and the x16 port has no hotplug slot
+        (`Slot-`), so there is no software power cycle: the link is `Width x0` /
+        `PresDet-`. Recovery is physical — PSU power off (standby keeps the rail
+        latched), check the 8-pin PCIe power, reseat the card. That cold cycle at
+        16:43 brought `05:00.0` back, amdgpu initialised, `/dev/dri/card1` returned,
+        greetd started gamescope and Steam. Re-run the Kolibri benchmark afterwards:
+        `--n-gpu-layers 99` was inert (llvmpipe) while the card was gone.
 
-        Resolved 2026-10-19 16:43 by that cold cycle: `05:00.0` re-enumerated, amdgpu
-        initialised, `/dev/dri/card1` returned, greetd started gamescope and Steam.
+        Recurred on the 2026-10-22 21:32 boot after 22 h in S5 (again not a cold cycle).
+        The x16 port moved to `0000:00:03.0`, still `LnkSta Width x0` / `DLActive-`, and
+        the NIC renumbered `09:00.0 enp9s0` → `06:00.0 enp6s0`, so the name-keyed WoL
+        declaration matched nothing (`Wake-on: d`). Same chain: greetd's `steam`
+        autologin dies on gamescope `Failed to initialize Vulkan` with llvmpipe only,
+        the greeter exits, Steam never listens, Steam Link gets no discovery reply —
+        UDP/27036 arrivals were still counted, so the network path was never at fault.
 
-        After it returns, greetd starts automatically; re-run the Kolibri benchmark,
-        because `--n-gpu-layers 99` was inert (llvmpipe only) while the card was gone.
-
-        Recurred on the 2026-10-22 21:32 boot after 22 h in S5 — which is not a cold
-        cycle, because standby keeps the rail latched. The x16 port moved to
-        `0000:00:03.0`: `LnkSta Width x0`, `DLActive-`, no hotplug slot, `/sys/class/drm`
-        holds only `version`, `amdgpu` loads with no node, and the NIC renumbered
-        `09:00.0 enp9s0` → `06:00.0 enp6s0` (so the enp9s0 WoL declaration matched
-        nothing and `Wake-on: d`). The chain is identical: greetd's `steam` autologin
-        dies on gamescope `Failed to initialize Vulkan` with llvmpipe as the only
-        device, the greeter exits without a session, Steam never listens, and a Steam
-        Link gets no discovery reply — though UDP/27036 arrivals were still counted at
-        the firewall, so the network path was never the fault.
-
-        The same PSU cold cycle recovered it at 21:53 (PCI rescan did nothing):
-        `05:00.0` returned as NAVI10, `card1` + `HDMI-A-1` connected at 1920x1080,
-        gamescope picked `RADV NAVI10`, and Steam came up listening on UDP/TCP 27036.
-        The NIC also returned to `enp9s0`, so `Wake-on: g` re-applied — the WoL
-        declaration is name-keyed and only works while the topology names it that way.
+        The same PSU cold cycle recovered it at 21:53 (rescan did nothing): `05:00.0` as
+        NAVI10, `card1` + `HDMI-A-1` at 1920x1080, `RADV NAVI10`, Steam on UDP/TCP 27036,
+        and the NIC back at `enp9s0` so `Wake-on: g` re-applied.
       '';
     };
     nix-binary-upgrade-2026-10 = {
@@ -4015,8 +4005,7 @@
         running (refuses; offer a cloud model instead of hanging) · unattended/agy/CI (never eisen: the
         guard is non-deterministic and a 21 GiB reload must not gate a schedule) · two sessions (one slot).
 
-        **Don't.** Pi's `/llama` router on eisen (duplicates declarative llama-swap); `curl | sh`
-        (unpinned); sharing the model with a Sunshine stream.
+        **Don't.** Pi's `/llama` router on eisen (duplicates declarative llama-swap); `curl | sh` (unpinned); sharing the model with a Sunshine stream.
 
         **Exit criteria.** `checks:host HOST=eisen MODE=eval` green with the generated files as store
         paths; one measured cold session (wake → first token); guard refusal exercised; a cloud fallback

@@ -218,10 +218,11 @@ tasks:
       scripts/task/boot-check.sh — realises hostBootChecks.<arch>.<host>: a NixOS VM
       test over the host's OWN module list, failing unless stage-2 is reached
       (`Reached target Multi-User System` on the console). The only gate that runs
-      the config. KVM ONLY: refuses before any eval without /dev/kvm, because a boot
-      is a CI instrument, not a hygiene step (under TCG it costs a core for ~8 min on
-      hosts that also serve). ONE host, `--builders ""`, oom-guard. Vars: HOST=,
-      ARCH=, TIMEOUT=900. Exit 0 = stage-2, 1 = no stage-2/no KVM, 2 = watchdog.
+      the config. KVM ONLY: refuses before any eval without /dev/kvm — a boot is a CI
+      instrument, not a hygiene step. ONE host, `--builders ""`, oom-guard. Prints
+      elapsed + peak RSS and records both in $XDG_STATE_HOME/nixconfig/boot-check.log
+      so the next run can compare. Vars: HOST=, ARCH=, TIMEOUT=900. Exit 0 = stage-2,
+      1 = no stage-2/no KVM, 2 = watchdog.
     cmds:
       - bash scripts/task/boot-check.sh --host "{{.HOST}}" --arch "{{.ARCH}}" --timeout "{{.TIMEOUT | default "900"}}"
 

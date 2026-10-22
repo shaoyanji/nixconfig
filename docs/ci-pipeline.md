@@ -82,6 +82,11 @@ delphi answers `delphi.bountystash.com` and ssh on 2 OCPU, where a pegged core
 is degraded traffic rather than a slow test. A boot is cheap where it belongs —
 on a virtualised CI runner.
 
+Every run reports what it cost — the watchdog's elapsed time and process-group
+peak RSS — and appends one line to `$XDG_STATE_HOME/nixconfig/boot-check.log`,
+comparing against the last run for the same host. CI's job log carries the same
+line, so "a boot is affordable" is a number rather than a claim.
+
 The one boot worth emulating is the host you are about to switch. Nobody can
 diagnose that initrd from outside, so `task checks:boot:self` (or `BOOT=1` on
 `infra:switch:nixos`) boots exactly this machine under TCG when `/dev/kvm` is

@@ -85,6 +85,17 @@
   publicPage = "${delphiSite}/public";
   tailnetPage = "${delphiSite}/tailnet";
 
+  # Which store path a vhost is serving, said by the vhost itself. A deploy can
+  # finish and still leave the previous generation's tree in place (a boot-only
+  # activation, a rollback, a flake ref that did not move), and from outside both
+  # look identical — so a staleness gate asks the server instead of the journal.
+  # The value is the SITE, not the `public`/`tailnet` root under it, so the gate
+  # compares against `.#delphi-site.outPath` byte for byte and every vhost can be
+  # probed with the same expectation.
+  # It belongs in each `location`: a location that sets its own `add_header` (the
+  # cache policy does) does not inherit the server's.
+  siteHeader = ''add_header X-Site-Path "${delphiSite}" always;'';
+
   # One cache policy for compiled static trees, shared with frieren's vhosts
   # (modules/config/nginx-static-cache.nix) so the two hosts cannot disagree
   # about how long a store path may be cached.
@@ -341,6 +352,10 @@ in {
   # address (measured 2026-10-21: "bind: address already in use"), and serve
   # brings its own managed certificate for the MagicDNS name instead of another
   # ACME line. This vhost keeps only the public landing page and /healthz.
+  # The served artifact, exposed where every other host build output lives, so
+  # `.#delphi-site` can be THIS value instead of a host-free lookalike.
+  system.build.delphiSite = delphiSite;
+
   services.nginx = {
     enable = true;
     recommendedOptimisation = true;
@@ -363,7 +378,7 @@ in {
           locations."/" = {
             index = "index.html";
             tryFiles = "$uri $uri/ =404";
-            extraConfig = staticCache.html;
+            extraConfig = staticCache.html + siteHeader;
           };
           # Content-hashed assets are immutable, so they get the one-year policy
           # (modules/config/nginx-static-cache.nix) rather than the HTML revalidate.
@@ -392,7 +407,7 @@ in {
           locations."/" = {
             index = "index.html";
             tryFiles = "$uri $uri/ =404";
-            extraConfig = staticCache.html;
+            extraConfig = staticCache.html + siteHeader;
           };
           locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
             root = "${tailnetPage}";
@@ -420,12 +435,15 @@ in {
           locations."/" = {
             index = "index.html";
             tryFiles = "$uri $uri/ =404";
-            extraConfig = ''
-              allow 127.0.0.1;
-              allow ::1;
-              allow 100.64.0.0/10;
-              deny all;
-            '';
+            # No cache policy here: the allow-list IS the point of this vhost,
+            # and the gate reads the same header the mesh client would.
+            extraConfig =
+              ''
+                allow 127.0.0.1;
+                allow ::1;
+                allow 100.64.0.0/10;
+                deny all;            ''
+              + siteHeader;
           };
           locations."= /healthz".extraConfig = ''
             allow 127.0.0.1;
@@ -455,7 +473,7 @@ in {
           locations."/" = {
             index = "index.html";
             tryFiles = "$uri $uri/ =404";
-            extraConfig = staticCache.html;
+            extraConfig = staticCache.html + siteHeader;
           };
           # Same eight explicit hex classes as frieren's vhost: a `{8}` brace
           # quantifier is emitted SPLIT across lines by the config generator and

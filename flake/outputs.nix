@@ -67,7 +67,7 @@
   agentDocs = pkgsFor "x86_64-linux";
 in {
   packages = import ./packages.nix {
-    inherit inputs lib systems pkgsFor inventory;
+    inherit inputs lib systems pkgsFor inventory self;
   };
 
   apps = lib.genAttrs systems.default (_: {});

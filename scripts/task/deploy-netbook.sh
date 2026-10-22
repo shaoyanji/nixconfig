@@ -7,12 +7,14 @@
 # either compiles on the weakest machine in the fleet or fails on a path nothing
 # serves.
 #
-# So: stage the tree on frieren, build it there (`--builders ""`: the closure is
-# substitutable — measured 4m22s wall / 8s CPU), `nix copy` it over the LAN, then
-# activate the BUILT system with nix-env + switch-to-configuration. No flake
-# evaluation and no compiler runs on the netbook at all.
+# So: stage the tree on frieren, obtain the closure there — substitute first,
+# nixbuild.net for the gaps (`BUILD=auto`, measured 4m22s wall / 8s CPU when
+# nothing had to be built) — `nix copy` it over the LAN, then activate the BUILT
+# system with nix-env + switch-to-configuration. No flake evaluation and no
+# compiler runs on the netbook at all.
 #
-# TWO GUARDS run on the target after the build and before the copy:
+# TWO GUARDS run on the target after the build and before the copy, and one
+# check runs after activation:
 #
 #   1. Boot chain (exit 3). The pinned nixpkgs (`nixpkgs_25_11`) makes the new
 #      system's kernel and initrd the store paths the host already boots; if they
@@ -24,12 +26,27 @@
 #      cannot see. The last deploy records its hash; a different one is refused.
 #      ALLOW_CONFIG_DRIFT=1 overrides it after reading the printed diff.
 #
+#   3. Activation completeness (exit 5/6, after the switch). The switcher links
+#      /etc and /run/current-system before it talks to systemd, so a dead system
+#      bus leaves a half-activated host that still looks current. The check asks
+#      the bus for the unit list; a failure means changed units never restarted.
+#
+# Nothing on the netbook pulls. It cannot use harmonia (the LAN cache never held
+# its paths, and its own closure is 6.6 GB of paths fetched years ago from
+# cache.nixos.org), so "pull from the cache" is not a fallback that might work:
+# the push IS the delivery. Frieren is the only machine in the loop that can
+# both evaluate the flake and hold the result.
+#
 # Vars: TARGET=root@192.168.3.36 (LAN — Tailscale SSH is check-gated, so an
 #         unattended connection hangs on a browser prompt)
 #       ACTION=apply|boot|preflight|rollback|verify   STAGE=switch|boot
 #       ATTR=netbook   BUILDER=devji@100.97.61.65 (frieren's tailnet address)
-#       REMOTE=/tmp/netbook-deploy   REMOTE_ONLY=1 (everything to nixbuild.net)
+#       REMOTE=/tmp/netbook-deploy
+#       BUILD=auto|local|remote (default auto: substitute, then nixbuild.net for
+#         the gaps; local = compile on frieren; remote = nixbuild.net only)
+#       REMOTE_ONLY=1 (alias of BUILD=remote)
 # Exit: 0 ok · 1 usage/build/copy failure · 3 boot chain changed · 4 config drift
+#       5 system bus dead after activation (units not restarted) · 6 switch non-zero
 set -euo pipefail
 
 TARGET=${TARGET:-root@192.168.3.36}
@@ -87,6 +104,19 @@ fi
 failed=$(systemctl --failed --no-legend | wc -l)
 echo "failed units: ${failed}"
 [ "${failed}" -eq 0 ] || systemctl --failed --no-legend | sed -n '1,5p'
+# Delivery: report which link in the chain works instead of assuming the LAN
+# cache. On this host the honest answer is usually "reachable, but it has none
+# of these paths", because every path predates the cache.
+cache=${HARMONIA_CACHE:-http://192.168.3.25:5000}
+if timeout 8 nix path-info --store "$cache" "$cur" >/dev/null 2>&1; then
+  echo "harmonia:   has this system — a pull would work"
+else
+  err=$(timeout 8 nix path-info --store "$cache" "$cur" 2>&1 | tr '\n' ' ')
+  case "$err" in
+    *onnect* | *efused* | *imeout* | *imed*) echo "harmonia:   UNREACHABLE — the push is the only path" ;;
+    *) echo "harmonia:   reachable but does NOT have this system — the push is the only path" ;;
+  esac
+fi
 df -h / | tail -1
 REPORT
 }
@@ -120,18 +150,41 @@ ROLLBACK
     ;;
 
   apply | boot)
-    if [ "${REMOTE_ONLY:-0}" = "1" ]; then
-      build_flags=(--max-jobs 0)
-      say "building .#nixosConfigurations.${ATTR} on the remote builder only"
-    else
-      build_flags=(--builders "")
-      say "building .#nixosConfigurations.${ATTR} on ${BUILDER} (substitution)"
-    fi
-    system=$(nix build --no-link --print-out-paths "${build_flags[@]}" \
-      ".#nixosConfigurations.${ATTR}.config.system.build.toplevel")
+    toplevel=".#nixosConfigurations.${ATTR}.config.system.build.toplevel"
+    # Three ways to get the closure onto frieren, cheapest first: substitute
+    # (free), then nixbuild.net (25 h/month budget), then compile locally. `auto`
+    # is the useful default because it spends nothing when the pinned 25.11
+    # release is already in the caches, and still completes when it is not.
+    mode=${BUILD:-auto}
+    [ "${REMOTE_ONLY:-0}" = "1" ] && mode=remote
+    case "$mode" in
+      auto)
+        say "substituting .#nixosConfigurations.${ATTR} on the builder (no compile)"
+        if ! system=$(nix build --no-link --print-out-paths --max-jobs 0 --builders "" "$toplevel" 2>/dev/null); then
+          say "not fully substitutable — filling the gaps on nixbuild.net"
+          system=$(nix build --no-link --print-out-paths --max-jobs 0 "$toplevel")
+        fi
+        ;;
+      local)
+        say "building .#nixosConfigurations.${ATTR} on the builder (local compile allowed)"
+        system=$(nix build --no-link --print-out-paths --builders "" "$toplevel")
+        ;;
+      remote)
+        say "building .#nixosConfigurations.${ATTR} on nixbuild.net only"
+        system=$(nix build --no-link --print-out-paths --max-jobs 0 "$toplevel")
+        ;;
+      *) die "unknown BUILD=${mode} (auto|local|remote)" ;;
+    esac
     [ -n "${system}" ] || die "build produced no system path"
-    new_k=$(nix eval --raw ".#nixosConfigurations.${ATTR}.config.system.build.kernel.outPath")
-    new_i=$(nix eval --raw ".#nixosConfigurations.${ATTR}.config.system.build.initialRamdisk.outPath")
+    # Both sides must speak the same shape or the guard refuses every deploy. The
+    # built system exposes `kernel`/`initrd` as symlinks to FILES
+    # (`…-linux-7.1.2/bzImage`); the target reduces its running ones to the store
+    # directory. Normalizing both to `/nix/store/<name>` is what makes this an
+    # exact comparison instead of a permanent false positive (measured 2026-10-22:
+    # refused an identical boot chain twice, once from each mismatch direction).
+    store_path() { printf '%s\n' "$1" | cut -d/ -f1-4; }
+    new_k=$(store_path "$(readlink -f "${system}/kernel")")
+    new_i=$(store_path "$(readlink -f "${system}/initrd")")
     say "system: ${system}"
 
     # Both guards, on the target, before a single path is copied.
@@ -142,9 +195,14 @@ new_k=$1
 new_i=$2
 allow_k=$3
 allow_d=$4
-run_k=$(readlink -f /run/current-system/kernel)
-run_i=$(readlink -f /run/current-system/initrd)
-echo "boot chain  new: ${new_k} + ${new_i}"
+# Compare the STORE PATHS, not the files: `readlink -f /run/current-system/kernel`
+# resolves to `<store>/bzImage`, while the evaluated value is the store directory
+# itself. Cutting to /nix/store/<name> keeps the comparison exact and stops it
+# from reporting a false change (which it did, on this host, before this line).
+store_path() { printf '%s\n' "$1" | cut -d/ -f1-4; }
+run_k=$(store_path "$(readlink -f /run/current-system/kernel)")
+run_i=$(store_path "$(readlink -f /run/current-system/initrd)")
+echo "boot chain  new:     ${new_k} + ${new_i}"
 echo "boot chain  running: ${run_k} + ${run_i}"
 if [ "$new_k" != "$run_k" ] || [ "$new_i" != "$run_i" ]; then
   if [ "$allow_k" != "1" ]; then
@@ -183,7 +241,27 @@ set -e
 system=$1
 stage=$2
 nix-env -p /nix/var/nix/profiles/system --set "$system"
+# The switcher links /etc and /run/current-system BEFORE it asks systemd to
+# restart units, so a broken system bus produces a half-activation that still
+# looks like success: the new system is current, and every unit whose config
+# changed kept running the old one. Measured on this host 2026-10-22.
+set +e
 "${system}/bin/switch-to-configuration" "$stage"
+switch_rc=$?
+set -e
+if ! busctl call org.freedesktop.systemd1 /org/freedesktop/systemd1 \
+  org.freedesktop.systemd1.Manager ListUnits >/dev/null 2>&1; then
+  echo "deploy-netbook: the system bus cannot reach pid1 — activation is PARTIAL." >&2
+  echo "  /etc and /run/current-system point at ${system}, but changed units were not" >&2
+  echo "  restarted. Restart the bus, re-run the switch, and reboot if a desktop" >&2
+  echo "  session died with it:  systemctl restart dbus.service" >&2
+  exit 5
+fi
+if [ "$switch_rc" -ne 0 ]; then
+  echo "deploy-netbook: switch-to-configuration exited ${switch_rc} with a live bus." >&2
+  echo "  Read its output above; the common cause is logind refusing to list users." >&2
+  exit 6
+fi
 # Record what this host is actually running, so `verify` can tell a flake deploy
 # from a local `nixos-rebuild` nobody can see from the repo.
 mkdir -p /etc/nixos

@@ -213,17 +213,16 @@ tasks:
       - nix build .#nixosConfigurations.{{.HOST}}.config.system.build.toplevel -L
 
   infra:apply:host:netbook:
-    desc: Build netbook on frieren (nixbuild.net) and push the closure over the LAN
+    desc: Build netbook on frieren (substitute, then nixbuild.net) and push the closure over the LAN
     summary: >
-      The one host whose closure is PUSHED: no builder, no flake checkout, no
-      harmonia paths. This stages the tree on frieren, builds there, `nix copy`s
-      the closure over the LAN, and activates the BUILT system — nothing is
-      evaluated or compiled on the netbook.
+      PUSHED, not pulled: no builder, no flake checkout, harmonia never held its
+      paths. Frieren obtains the closure, `nix copy`s it over the LAN, and the
+      BUILT system is activated — nothing evaluates or compiles on the host.
 
-      Two guards run on the target after the build, before the copy: a changed
-      kernel or initrd is refused (exit 3), and an edited `/etc/nixos` is refused
-      (exit 4). ALLOW_KERNEL_CHANGE=1 / ALLOW_CONFIG_DRIFT=1 override them.
-      Vars: TARGET=, STAGE=switch|boot, ACTION=preflight. Exit 0 = activated.
+      BUILD=auto (default) substitutes first, sending only gaps to nixbuild.net;
+      local compiles on frieren; remote is nixbuild.net only. Guards: changed
+      kernel/initrd (exit 3), edited `/etc/nixos` (4), dead system bus after the
+      switch (5; 6 = switch non-zero). Vars: TARGET=, STAGE=, ACTION=preflight.
     cmds:
       - bash scripts/task/deploy-netbook.sh
 

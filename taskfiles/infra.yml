@@ -611,6 +611,55 @@ tasks:
         )
         [ "$host" = "exit" ] || task infra:logs:host:$host
 
+  microvm:list:
+    desc: List this host's declarative microVMs and their microvm@ unit state
+    summary: >
+      The guests are `microvm.vms.<name>` in the host's NixOS config
+      (`hosts/microvms/guests.nix`), so the config is the list — nothing is
+      enumerated by hand. Nothing autostarts: a guest runs because it was started.
+      Run it on the host that declares the guests (frieren: brlan + KVM; delphi:
+      aarch64 under TCG, slow). See `checks:boot` for why the fast path needs KVM.
+    cmds:
+      - |
+        host=$(hostname)
+        names=$(nix eval --json ".#nixosConfigurations.$host.config.microvm.vms" --apply 'builtins.attrNames' | tr -d '[]"' | tr ',' ' ')
+        [ -n "$names" ] || { echo "microvm:list: $host declares no microVM guests"; exit 0; }
+        for name in $names; do
+          printf '%-10s %s\n' "$name" "$(systemctl is-active "microvm@$name" 2>/dev/null || true)"
+        done
+
+  microvm:start:
+    desc: "Start a declarative microVM guest (NAME=sandbox|slides)"
+    requires:
+      vars: [NAME]
+    cmds:
+      - sudo systemctl start "microvm@{{.NAME}}"
+      - |
+        sleep 3
+        if ssh -o BatchMode=yes -o ConnectTimeout=3 "{{.NAME}}" true; then
+          echo "{{.NAME}}: up, ssh answering"
+        else
+          echo "{{.NAME}}: unit started but ssh did not answer in 3s" >&2
+          exit 1
+        fi
+
+  microvm:stop:
+    desc: "Stop a declarative microVM guest (NAME=sandbox|slides)"
+    requires:
+      vars: [NAME]
+    cmds:
+      - sudo systemctl stop "microvm@{{.NAME}}"
+
+  microvm:ssh:
+    desc: "SSH into a declarative microVM guest (NAME=sandbox|slides)"
+    summary: >
+      Resolves `sandbox` / `slides` from `/etc/ssh/ssh_config` on the host that
+      declares them (hosts/microvms/guests.nix), so the address is declared once.
+    requires:
+      vars: [NAME]
+    cmds:
+      - ssh "{{.NAME}}"
+
   vm:canary:build:
     desc: Build the frieren-canary microVM runner (EXP-102)
     cmds:

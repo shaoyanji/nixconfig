@@ -214,6 +214,8 @@ in {
     #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     age-plugin-tpm # unseals the TPM-sealed sops identity
     tpm2-tools
+    sops # the other half: `SOPS_AGE_KEY_FILE=~/… sops -d`
+
     git
     curl
     helix

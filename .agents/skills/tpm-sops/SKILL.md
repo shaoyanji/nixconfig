@@ -137,7 +137,12 @@ previously-failed units being active.
 - **The user unit's PATH is the plugin list, not the login PATH.**
   `systemctl --user show sops-nix -p Environment` printing `PATH=` is the whole
   diagnosis; add the plugin to `sops.age.plugins` at the module that builds the
-  unit (Home Manager), not to `home.packages`.
+  unit (Home Manager), not to `home.packages`. Measured on frieren: TPM identity
+  only with an empty PATH → exit 128, same identity with the plugin on PATH → exit 0.
+- **A leftover software `keys.txt` hides the fault.** sops falls back to it, so a
+  host with a stale recipient in `~/.config/sops/age/keys.txt` reports success while
+  the chip is never used. Judge the unit by `Environment=` + `Result=`, not by a
+  successful `sops -d` in the shell.
 - **`tss` is per session, not per host.** The first deploy adds the user to the
   group; the *already-running* `systemd --user` manager keeps the old groups, so
   the user plane stays failed until that manager restarts (reboot or

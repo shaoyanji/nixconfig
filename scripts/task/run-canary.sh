@@ -29,7 +29,7 @@ trap cleanup EXIT INT TERM
 
 echo "==> [1/4] Preparing TAP interface microvm1..."
 "$BIN_DIR/tap-up"
-ip link set microvm1 master microbr 2>/dev/null || true
+ip link set microvm1 master brlan 2>/dev/null || true
 
 echo "==> [2/4] Cleaning stale runtime state..."
 rm -f frieren-canary*.sock notify.vsock* *.pid 2>/dev/null || true

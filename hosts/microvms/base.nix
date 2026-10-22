@@ -8,6 +8,10 @@
   gateway ? "192.168.83.1",
   prefix ? 24,
   hypervisor ? "cloud-hypervisor",
+  # microvm.nix passes `-enable-kvm` exactly when this is null. A host with no
+  # /dev/kvm names a CPU ("max") so the runner uses TCG instead of dying on the
+  # missing KVM module.
+  cpu ? null,
   vcpu ? 2,
   mem ? 2048,
 }: {
@@ -62,7 +66,7 @@
   ];
 
   microvm = {
-    inherit hypervisor vcpu mem;
+    inherit hypervisor cpu vcpu mem;
     socket = "control.socket";
     # Without a writable layer over the shared store, activation has nowhere to
     # write and the boot sits on "GID Wrappers" for minutes. It is a tmpfs, not

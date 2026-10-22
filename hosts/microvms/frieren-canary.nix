@@ -70,7 +70,7 @@ in {
 
   networking.firewall.enable = false;
 
-  # Network configuration matching host bridge microbr (192.168.83.1/24)
+  # Network configuration matching host bridge brlan (192.168.83.1/24)
   networking.useNetworkd = true;
   networking.useDHCP = false;
   networking.nameservers = ["1.1.1.1" "8.8.8.8"];

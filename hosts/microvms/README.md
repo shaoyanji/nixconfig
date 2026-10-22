@@ -18,7 +18,7 @@ pi-hole maps only bare names).
 | Guest | `hosts/microvms/frieren-canary.nix` (microvm.nix, cloud-hypervisor/KVM) |
 | vCPU / RAM | 2 vCPU, 2,048 MB |
 | vsock | cid 10 |
-| Tap | `microvm1` (MAC `02:00:00:00:00:01`) on host bridge `microbr` |
+| Tap | `microvm1` (MAC `02:00:00:00:00:01`) on host bridge `brlan` |
 | Guest IP | `192.168.83.10/24`, gateway `192.168.83.1` (the host), DNS 1.1.1.1 / 8.8.8.8 |
 | Virtiofs | host `/nix/store` -> `/nix/.ro-store` (ro) + `/var/lib/microvms/frieren-canary/ssh-host-keys` -> `/etc/ssh/host-keys` (persistent host keys) |
 | `/var` | volume (`var.img`, 2,048 MB), writableStoreOverlay `/nix/.rw-store` |
@@ -51,7 +51,7 @@ SSH alias `frieren-canary` is defined in `hosts/frieren/infra-stack.nix`
 ## Host prerequisites (runtime, not repo)
 
 Before the first run, the host needs (created once, not in the repo):
-- The `microbr` bridge (`192.168.83.1/24`).
+- The `brlan` bridge (`192.168.83.1/24`), owned by NetworkManager.
 - `/var/lib/microvms/frieren-canary/` (`ssh-host-keys` share + run dir) with a
   fresh ed25519 host key.
 - A `microvm` system user (`tap-up` fails with `invalid user "microvm"` without it).
@@ -117,4 +117,4 @@ the guest.
 `vm:canary:stop` (poweroff via SSH). The bridge, run dir, and ssh-host-keys
 persist on the host for the next run (they are runtime state, not repo).
 To fully remove the guest: delete `/var/lib/microvms/frieren-canary/` and
-the `microbr` bridge.
+the `brlan` bridge.

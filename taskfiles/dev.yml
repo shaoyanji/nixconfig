@@ -723,6 +723,18 @@ tasks:
     cmds:
       - nix-shell -p python3 --run "python3 scripts/ci/detect-affected-hosts.py --working-tree"
 
+  dev:ci:wait:
+    desc: Block until CI for a commit is finished; 0 green, 1 failed, 124 timeout
+    summary: >
+      scripts/task/ci-wait.sh — one call instead of a poll every few minutes. gh is
+      the source (exact, and `--log-failed` names the failing lines); VIA=mail waits
+      on GitHub's "Run failed" mail through himalaya instead, which is the only path
+      without a gh token. Nothing is committed: one line per verdict goes to
+      $XDG_STATE_HOME/nixconfig/ci-watch.log. Vars: COMMIT=HEAD, VIA=gh|mail,
+      TIMEOUT=2400.
+    cmds:
+      - scripts/task/ci-wait.sh --commit "{{.COMMIT | default "HEAD"}}" --via "{{.VIA | default "gh"}}" --timeout "{{.TIMEOUT | default "2400"}}"
+
   dev:ci:trigger:*:
     desc: Trigger remote GitHub Actions CI build for a host (e.g. task dev:ci:trigger:stark, all, auto)
     vars:

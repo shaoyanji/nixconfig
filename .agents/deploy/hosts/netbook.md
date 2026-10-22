@@ -301,25 +301,35 @@ Deleting a dead `.conf` is safe and needs no rebuild — it points at nothing.
 `bootctl set-default`/`set-timeout` do not write `/boot/loader/loader.conf` on
 this box (verified 2026-10-22); edit that file directly.
 
-### Deferred: generation 60 (trimmed initrd + `pti=off`), 2026-10-22
+### `pti=off` black-panels this machine (gens 60 and 62), 2026-10-22
 
-Gen 60 booted to a **black screen and wrote no journal of its own** —
-`journalctl --list-boots` jumps straight to the next boot, so it died before
-journald, the same signature as generation 50. Rolled back the same night:
-`nix-env --switch-generation 59`, `loader.conf` rewritten to the 59 entry (a
-switch leaves the *new* entry as default, which is how a second black screen
-gets queued), and the config reverted in the repo. Gen 60 stays in the menu as
-the thing to re-test.
+Two generations that carried `pti=off` came back with the **panel dark while
+the machine ran**; generations without it (59, 61) booted normally. Gen 62 is
+the clean evidence: its journal is complete — i915 bound cherryview and took
+over as `fb0`, niri initialised the renderer on `renderD128`, swaybg, alacritty
+and xwayland-satellite started, the gnome-keyring prompt appeared exactly as on
+a good boot — and the only difference from 61 was that flag plus a masked unit.
+So the fault is the display, not stage 1, and `pti=off` is out for good. The CPU
+win it promised is not worth an i915 debugging project on a Celeron.
 
-The trimmed initrd is not obviously the cause — it still carries `sdhci-acpi`,
-`sdhci`, `mmc_block`, `mmc_core`, `f2fs`, `sd_mod`, `scsi_mod` (16 modules vs
-35; the 19 dropped are SATA, NVMe, EXT4 and vendor HID). The other boot-parameter
-change was `pti=off`. Isolate them one at a time, keep 59 in the menu, and read
-the console at `loglevel=7`.
+Gen 60's failure is less clean: it wrote **no journal at all**, so that boot died
+before journald for some other reason, with the trimmed initrd and `nodiscard`
+as the remaining suspects. Both are dropped on value: the trim measured
+27,100,550 → 25,613,589 bytes and the loader reads at ~4.8 MiB/s, so **0.3 s**
+for a boot-chain change, and `nodiscard` only moves TRIM from per-delete to the
+weekly `fstrim`.
 
-**Unpacking trap:** `cpio -id < initrd` extracts only the microcode prepend and
-makes a healthy image look empty of modules. Ask the raw bytes instead:
-`grep -a -o '[a-zA-Z0-9_-]*\.ko\.[a-z]*' <initrd> | sort -u`.
+**A switch rewrites `loader.conf` to point at the generation that just failed.**
+Both times the machine came back up only after a manual pick, and the *next*
+reboot would have black-panelled again. After any failed generation: rewrite
+`default` in `/boot/loader/loader.conf` and `nix-env -p … --switch-generation`
+before anything else.
+
+**Reading an initrd:** `cpio -id < initrd` extracts only the microcode prepend
+and makes a healthy image look empty. The layout is 15.2 MiB of Intel microcode
+(uncompressed, mandatory) followed by a zstd frame holding stage 1 — so read the
+frame (`tail -c +<offset> initrd | zstd -dc`) or the raw bytes
+(`grep -a -o '[a-zA-Z0-9_-]*\.ko\.[a-z]*'`).
 
 ## Rollback
 

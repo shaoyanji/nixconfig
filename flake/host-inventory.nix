@@ -65,8 +65,9 @@ in {
         inputs.disko.nixosModules.default
         ../hosts/delphi/configuration.nix
         # microVM host: the same guest set as frieren, on the aarch64 side. This
-        # instance has no nested virtualisation, so the guests run under qemu
-        # (TCG) — usable for aarch64-only closures, not for fast cycles.
+        # instance exposes no /dev/kvm, so cloud-hypervisor refuses here in under a
+        # second — deliberately, since the alternative is an emulator in the
+        # closure. Guests belong on the KVM host.
         ({pkgs, ...}: {
           imports = [
             (import ../modules/profiles/microvm-host.nix {

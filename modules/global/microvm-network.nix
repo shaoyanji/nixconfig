@@ -12,7 +12,7 @@
       };
       bridgeName = lib.mkOption {
         type = lib.types.str;
-        default = "microbr";
+        default = "brlan";
         description = "Bridge name to use for VMs";
       };
       externalInterface = lib.mkOption {

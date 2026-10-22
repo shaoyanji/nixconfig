@@ -221,7 +221,7 @@ Instead of polling and managing processes on bare metal, services are progressiv
    - Boot latency is sub-4 seconds; teardown is instantaneous and free of unmount deadlocks (`DefaultDependencies = false`).
 
 3. **Hypervisor Ingress & Tailscale Subnet Continuity:**
-   - Services inside the MicroVM bind internal virtual interfaces on the host bridge (`microbr` on `192.168.83.1/24`).
+   - Services inside the MicroVM bind internal virtual interfaces on the host bridge (`brlan` on `192.168.83.1/24`).
    - The bare-metal host's Nginx acts as the single reverse proxy ingress point, mapping virtual hosts and paths (e.g. `service.frieren.lan` or `/service/`) to guest IPs.
    - Remote clients access these services transparently over Tailscale (`100.97.61.65` or MagicDNS), with zero requirement for fragile Tailscale subnet route advertising.
    - **Teardown Resiliency:** If a MicroVM is stopped or rebuilt, Nginx cleanly returns `504 Gateway Time-out`. Upon VM boot, connections immediately and automatically restore with zero reload or route flap.

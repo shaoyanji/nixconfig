@@ -210,7 +210,7 @@
       kind = "reference";
       status = "DELIVERED";
       date = "2026-10-22";
-      summary = "`microvm.vms.<name>` on frieren (brlan, KVM, cloud-hypervisor) and on delphi (aarch64, same cloud-hypervisor runner, but no /dev/kvm, so a guest refuses to start there). A guest reads the host's /nix/store over virtiofs, so starting one is seconds and no image is built; only the shares persist.";
+      summary = "`microvm.vms.<name>` on frieren (brlan, KVM, cloud-hypervisor) and on delphi (aarch64, qemu/TCG: OCI A1 exposes no EL2, and cloud-hypervisor has no TCG backend). A guest reads the host's /nix/store over virtiofs, so starting one is seconds on KVM and minutes under TCG; no image is built either way, only the shares persist.";
       refs = {
         hosts = ["frieren" "delphi"];
         modules = ["hosts/microvms/base.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix"];
@@ -226,11 +226,11 @@
         slides is a service (/var image plus nginx over the workspace share). Both
         autostart = false: a guest runs because it was started.
 
-        delphi declares the same set under cloud-hypervisor, but OCI A1 has no
-        nested virtualisation: the runner exits in under a second with `no
-        supported hypervisor`. qemu/TCG was the earlier answer and is deliberately
-        gone — the fleet does not carry an emulator for guests, and a guest belongs
-        on the KVM host. That is the boundary `checks:boot` learned.
+        frieren runs them under cloud-hypervisor because it has /dev/kvm. delphi
+        does not: OCI A1 exposes no EL2 (`kvm [1]: HYP mode not available`), and
+        cloud-hypervisor has no TCG backend, so that host names qemu with
+        cpu = "max" and raises microvm@'s start timeout to 900 s. TCG boots in
+        minutes, not seconds; the KVM host is the fast path.
       '';
     };
     arch-shape = {

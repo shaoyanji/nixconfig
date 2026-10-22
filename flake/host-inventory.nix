@@ -64,10 +64,7 @@ in {
       ++ [
         inputs.disko.nixosModules.default
         ../hosts/delphi/configuration.nix
-        # microVM host: the same guest set as frieren, on the aarch64 side. This
-        # instance exposes no /dev/kvm, so cloud-hypervisor refuses here in under a
-        # second — deliberately, since the alternative is an emulator in the
-        # closure. Guests belong on the KVM host.
+        # microVM host: the same guest set as frieren, on the aarch64 side.
         ({pkgs, ...}: {
           imports = [
             (import ../modules/profiles/microvm-host.nix {
@@ -76,11 +73,15 @@ in {
             })
           ];
         })
-        # cloud-hypervisor only: this fleet does not carry qemu for guests. It
-        # needs /dev/kvm, which this instance does not expose, so the guest here
-        # fails fast rather than emulating — that is the correct answer, not a
-        # slower one.
-        (import ../hosts/microvms/guests.nix {inherit inputs;})
+        # cloud-hypervisor is KVM-only, and OCI A1 does not expose EL2: dmesg says
+        # `kvm [1]: HYP mode not available`, /dev/kvm is absent, and the CH runner
+        # exits with `no supported hypervisor` in 33 ms. So this host names qemu
+        # with cpu = "max" (TCG): slow, but it boots. frieren keeps CH.
+        (import ../hosts/microvms/guests.nix {
+          inherit inputs;
+          hypervisor = "qemu";
+          cpu = "max";
+        })
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with
         # `lsblk` on the instance BEFORE the first nixos-anywhere run — disko

@@ -1,10 +1,25 @@
 # Shared microVM host networking: bridge, tap attachment, NAT.
+#
+# NetworkManager owns the bridge, because both guest hosts already run NM for
+# their uplink and a second network manager is a second source of truth. NM
+# never emits an event for a tap it does not manage, so a dispatcher script
+# cannot enslave the interfaces (that variant was tried and silently did
+# nothing). The taps are NM-unmanaged and a udev rule attaches each one to the
+# bridge when the device appears. Shape: Stapelberg's microvm.nix setup, with
+# the bridge handed to NM instead of systemd-networkd.
 {
   natExternalInterface ? throw "Set natExternalInterface to your uplink (e.g. wlp4s0)",
   microvmExternalInterface ? "eno1",
   bridgeAddress ? "192.168.83.1/24",
   ...
-}: {lib, ...}: {
+}: {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  bridge = config.microvm.network.bridgeName;
+in {
   options.microvm.network = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -13,7 +28,7 @@
     };
     bridgeName = lib.mkOption {
       type = lib.types.str;
-      default = "microbr";
+      default = "brlan";
       description = "Bridge name to use for VMs";
     };
     externalInterface = lib.mkOption {
@@ -26,44 +41,47 @@
   config = {
     microvm.network = {
       enable = true;
-      bridgeName = "microbr";
+      bridgeName = "brlan";
       externalInterface = microvmExternalInterface;
     };
 
-    # DECLARATIVE, because the imperative version does not survive a reboot:
-    # NetworkManager + a dispatcher script that enslaved `microvm*` on "up" never
-    # fired (NM does not manage taps), so every rebuild left the bridge with no
-    # ports and `ip link set <tap> master microbr` had to be run by hand.
-    #
-    # networkd owns ONLY this bridge — NetworkManager keeps the uplink. The tap
-    # rule is a name match, so a guest added tomorrow needs no network config:
-    #   netdev  microbr
-    #   network microbr      address, and usable with no carrier
-    #   network microvm*     Bridge=microbr
-    systemd.network.enable = true;
-    systemd.network.netdevs."20-microbr".netdevConfig = {
-      Kind = "bridge";
-      Name = "microbr";
+    # One declarative keyfile profile. NM creates and owns the bridge, gives it
+    # the gateway address, and keeps STP off so a guest is reachable immediately.
+    networking.networkmanager.ensureProfiles.profiles.${bridge} = {
+      connection = {
+        id = bridge;
+        type = "bridge";
+        interface-name = bridge;
+        autoconnect = true;
+      };
+      bridge = {
+        stp = false;
+        forward-delay = 0;
+      };
+      ipv4 = {
+        method = "manual";
+        address1 = bridgeAddress;
+      };
+      ipv6 = {
+        method = "disabled";
+      };
     };
-    systemd.network.networks."20-microbr" = {
-      matchConfig.Name = "microbr";
-      addresses = [{Address = bridgeAddress;}];
-      networkConfig.ConfigureWithoutCarrier = true;
-    };
-    systemd.network.networks."21-microvm-tap" = {
-      matchConfig.Name = "microvm*";
-      networkConfig.Bridge = "microbr";
-    };
-    networking.networkmanager.unmanaged = [
-      "interface-name:microbr"
-      "interface-name:microvm*"
-    ];
+
+    # NM does not manage taps, so it must not race the udev rule for them.
+    networking.networkmanager.unmanaged = ["interface-name:microvm*"];
+
+    # The add event fires when microvm-tap-interfaces@ creates the tap, which is
+    # the one place a tap reliably produces an event. Runs `ip`, not `nmcli`:
+    # the bridge is a kernel device by then and NM owns the profile, not the port.
+    services.udev.extraRules = ''
+      ACTION=="add", SUBSYSTEM=="net", KERNEL=="microvm*", RUN+="${pkgs.iproute2}/bin/ip link set %k master ${bridge}"
+    '';
 
     networking.nat = {
       enable = true;
-      internalInterfaces = ["microbr"];
+      internalInterfaces = [bridge];
       externalInterface = natExternalInterface;
     };
-    networking.firewall.trustedInterfaces = ["microbr"];
+    networking.firewall.trustedInterfaces = [bridge];
   };
 }

@@ -43,3 +43,41 @@ tasks:
     desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
     cmds:
       - task dev:qmd:sync:eisen -- {{.CLI_ARGS}}
+
+  data:library:
+    desc: Audit the portable tool library (/Volumes/data/bin-*, appimages) for a non-Nix target
+    summary: >
+      Read-only report over the library that non-Nix machines execute from
+      (pentest targets, research boxes): per-directory size, portability (static
+      vs dynamic and the highest glibc floor — what a target can actually run),
+      byte-identical duplicates, fetch provenance from .library.tsv, eget
+      re-fetch residue, and variant sets that must be kept because they differ
+      by libc or arch. Hashes ~9.5 GB, so it takes ~2 min over NFS; use
+      data:library:index for the machine table. Exit 0 = report written,
+      1 = no library root mounted.
+    cmds:
+      - bash scripts/task/library-audit.sh
+
+  data:library:index:
+    desc: Emit the library as TSV (sha256, arch, linkage, glibc floor, bytes, path)
+    summary: >
+      The machine surface of the library, one row per file: sha256, arch,
+      linkage (static/dynamic/script), highest GLIBC_ symbol demanded, bytes and
+      path. This is the table used to pick a build per target — a tool with
+      several libc builds is a compatibility set, not redundancy. Pipe to toon
+      for an agent. Exit 0 = table emitted, 1 = no library root mounted.
+    cmds:
+      - bash scripts/task/library-audit.sh --index
+
+  data:library:fetch:
+    desc: Fetch one GitHub release asset into the library (non-interactive, static only)
+    summary: >
+      Wraps eget so a scheduled or remote run can never wait on its interactive
+      asset picker: --asset is required. The download is then probed and must be
+      STATICALLY linked — a glibc build runs only on the box that fetched it, so
+      a dynamic asset is moved to .rejected/ instead of entering the library.
+      Provenance (sha256, repo, resolved tag, asset, date) is appended to
+      .library.tsv. Pass args after `--`. Exit 0 = fetched and static,
+      1 = fetch failed or the asset was dynamic, 2 = usage error.
+    cmds:
+      - bash scripts/task/library-fetch.sh {{.CLI_ARGS}}

@@ -25,6 +25,14 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — the portable library gets an admission rule, not a bigger disk
+- Audited the four store dirs: 178 files, 9.5 GiB, 71 static, glibc floor 2.39, 11 MiB exact
+  duplicates, 90 MiB eget re-fetch residue (`*.1`).
+- `data:library`, `:index`, `:fetch` replace ad-hoc eget use: a dynamic download is rejected to
+  `.rejected/`, provenance goes to `.library.tsv`; asserts
+  [[flake/policies.nix#library-fetch-is-static]] + [[flake/policies.nix#library-crosses-the-wire]],
+  note `portable-library`.
+
 ### 2026-10-22 — scratch's sops planes unseal through its TPM; the proof moves to the store copy
 - scratch is the third TPM-sealed host (`&tpmscratch`) and the first whose **system** plane unseals
   through the chip: `age.keyFile` + `age.plugins`, `sshKeyPaths` forced empty, no SSH-derived recipient
@@ -44,12 +52,9 @@
   headless server default (no niri, greetd, or DisplayLink) and `hosts/frieren/desktop.nix`
   is `specialisation.desktop`. QuickSync/VA-API stays in the base `hardware.nix`, so Jellyfin
   transcodes in both; `media-stack.nix` adds the `jellyfin` user to `video`/`render`.
-- Fixed the `builtins.derivation ... references the store path ... without a proper context`
-  warning: `modules/services/fleet-governor.nix` used `toString ../..` (and `toString ../..`
-  for the S2 `flakePath` default), which strips store context. Both now interpolate a path,
-  so `run-fleet-governor` and `fleet-governor-rules.json` have real inputs
-  (`nix-store -q --references <drv>` lists `…-systemone` / the flake source; both build with
-  `--builders ""`).
+- Fixed the `references the store path without a proper context` warning: `fleet-governor.nix`
+  interpolated `toString ../..` (stripping store context) for both the script and the S2
+  `flakePath`. Now real path inputs — `nix-store -q --references` lists `…-systemone`.
 - Deleted `modules/config/Caddyfile` (no references in the tree or in history).
 
 ### 2026-10-21 — Delphi cloud workspace seeder, Freebuff mainframe, & Antigravity gateway
@@ -121,20 +126,15 @@
 
 - Deployed Niko1221/Strata MoE inference on Eisen's AMD Radeon RX 5700 (`gfx1010`) via
   an isolated FHS wrapper (`strata-fhs`) and AMD TheRock ROCm 7.14 wheels on `/mnt/storage/strata`.
-- Configured systemd service `strata.service` on port 8085; Nginx port 80 proxy and
-  `tailscale-serve-node` routed to `:8085`; `llama-swap` made dormant.
-- SubZeroClaw harness (`~/.subzeroclaw/config`) verified on `:8085` executing tool-calling
-  file creation (`echo 'write me a hello.txt in home directory' | subzeroclaw`).
-- Measured: 167 tok/s prompt prefill, 14.6–21.0 tok/s decode, 87.5% MTP speculative drafting
-  acceptance (70/80 tokens accepted) with 32K context and INT8 KV cache. Documented in `hosts/eisen/MANUAL.md`.
-- `AGENTS.nix` note `open-strata-eisen-rx5700` marked `DELIVERED`.
+- `strata.service` on `:8085`, Nginx trames it; SubZeroClaw verified end to end. Measured 167 tok/s
+  prefill, 14.6–21.0 tok/s decode, 87.5 % MTP acceptance — detail in `hosts/eisen/MANUAL.md`;
+  `AGENTS.nix` note `open-strata-eisen-rx5700` is `DELIVERED`.
 
 ### 2026-10-21 — The 2026-10-20 ledger entries are archived
 
-- Seven entries (task graph compiled, gotcha essays, two gates sharper,
-  secrets as a page, CI without a matrix, the storage table, rules in code)
-  moved verbatim to `docs/history/audit-2026-10.md`; `AUDIT.md` had reached
-  159 of its 150-line budget. Content unchanged, only the home moved.
+- Seven entries (task graph compiled, gotcha essays, two gates sharper, secrets as a page, CI
+  without a matrix, the storage table, rules in code) moved verbatim to `docs/history/audit-2026-10.md`
+  at 159/150 lines. Content unchanged, only the home moved.
 
 ## Open debt (`task ops:notes`)
 

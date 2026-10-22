@@ -559,6 +559,28 @@
       detail = "activate-host.sh queries the cache without disabling the negative cache";
     };
 
+    library-fetch-is-static = {
+      rule = "The portable tool library (/Volumes/data/bin-*, appimages) is executed by NON-Nix machines — pentest targets, research boxes — which cannot relink a binary or install a matching libc, so a fetch only accepts a statically linked build and a dynamic asset is moved to `.rejected/` and fails the run. The judgment is `library-audit.sh --probe`, the one implementation of \"is this static\" shared by the audit and the fetcher, and every accepted fetch records provenance (sha256, repo, resolved tag, asset, date) in `.library.tsv` — the one fact a file cannot carry about itself.";
+      proof = "scripts/task/library-fetch.sh · scripts/task/library-audit.sh (--probe)";
+      holds =
+        has "scripts/task/library-fetch.sh" "library-audit.sh\" --probe"
+        && has "scripts/task/library-fetch.sh" ''"$linkage" != static''
+        && !(has "scripts/task/library-fetch.sh" "allow-dynamic")
+        && has "scripts/task/library-fetch.sh" ".library.tsv"
+        && has "scripts/task/library-audit.sh" "--probe)";
+      detail = "the fetcher stopped proving its download is static, grew an override, or stopped recording provenance";
+    };
+
+    library-crosses-the-wire = {
+      rule = "The library is mirrored whole to BurgerNAS inside its scheduled uptime window, so a non-Nix machine pulls tools from the NAS without frieren being up: every bin-*/appimages directory is mirrored (`--delete`, the mirror is not an append-only attic) and `.rejected` is excluded because a dynamic binary is not library material.";
+      proof = "hosts/frieren/infra-stack.nix (burgernas-library-sync)";
+      holds =
+        has "hosts/frieren/infra-stack.nix" "burgernas-library-sync"
+        && has "hosts/frieren/infra-stack.nix" ''dirs="bin-x86 bin-aarch64 bin-script appimages"''
+        && has "hosts/frieren/infra-stack.nix" "--exclude '.rejected'";
+      detail = "the NAS mirror lost a directory, kept rejected downloads, or stopped deleting removed files";
+    };
+
     pipe-operators-declared = {
       rule = "`|>` needs `pipe-operators` in experimental-features; the tree does not parse without it.";
       proof = "modules/global/global.nix";

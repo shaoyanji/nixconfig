@@ -12,6 +12,9 @@
   # /dev/kvm names a CPU ("max") so the runner uses TCG instead of dying on the
   # missing KVM module.
   cpu ? null,
+  # Host directory holding ssh_host_ed25519_key. null = generate an ephemeral
+  # key on every boot (slow under TCG, and the guest's identity changes).
+  sshHostKeys ? null,
   vcpu ? 2,
   mem ? 2048,
 }: {
@@ -29,6 +32,16 @@
   # shell you throw away, not a workstation.
   services.openssh = {
     enable = true;
+    # A shared key keeps the guest identity stable across restarts, and skips
+    # sshd-keygen entirely: `generateHostKeys = false` disables the RSA/ed25519
+    # generation that costs minutes of emulated CPU under TCG.
+    hostKeys = lib.mkIf (sshHostKeys != null) [
+      {
+        path = "/etc/ssh/host-keys/ssh_host_ed25519_key";
+        type = "ed25519";
+      }
+    ];
+    generateHostKeys = sshHostKeys == null;
     settings = {
       PermitRootLogin = "yes";
       PasswordAuthentication = false;
@@ -73,15 +86,23 @@
     # closure, so a guest that installs nothing still gets one.
     writableStoreOverlay = "/nix/.rw-store";
     # The store comes from the host over virtiofs: no image build, nothing
-    # copied at boot. The read-only half is the only share this guest needs.
-    shares = [
-      {
+    # copied at boot. The read-only half is the only share this guest needs,
+    # plus the host key directory when the caller supplies one.
+    shares =
+      [
+        {
+          proto = "virtiofs";
+          tag = "ro-store";
+          source = "/nix/store";
+          mountPoint = "/nix/.ro-store";
+        }
+      ]
+      ++ lib.optional (sshHostKeys != null) {
         proto = "virtiofs";
-        tag = "ro-store";
-        source = "/nix/store";
-        mountPoint = "/nix/.ro-store";
-      }
-    ];
+        tag = "ssh-keys";
+        source = sshHostKeys;
+        mountPoint = "/etc/ssh/host-keys";
+      };
     interfaces = [
       {
         type = "tap";

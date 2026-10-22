@@ -10,13 +10,48 @@
   cpu ? null,
   tapId ? "microvm3",
   address ? "192.168.83.11",
-}: {lib, ...}: {
+  stateRoot ? "/var/lib/microvms",
+}: {
+  lib,
+  pkgs,
+  ...
+}: let
+  sshHostKeys = "${stateRoot}/sandbox/ssh-host-keys";
+in {
   imports = [inputs.microvm.nixosModules.host];
 
   # microvm.nix bounds a start at 150 s, which assumes KVM. A TCG boot takes
   # minutes, so without this the unit is killed mid-boot and reports a timeout
   # while the guest is still healthy.
   systemd.services."microvm@sandbox".serviceConfig.TimeoutStartSec = lib.mkIf (cpu != null) "900";
+
+  # The runner user must own the state dir: microvm-set-booted@ writes `current`
+  # there, and the keygen unit below writes the key as the same user.
+  systemd.tmpfiles.rules = [
+    "d ${stateRoot} 0755 microvm kvm -"
+    "d ${stateRoot}/sandbox 0755 microvm kvm -"
+    "d ${sshHostKeys} 0700 microvm kvm -"
+  ];
+
+  # One key per guest, generated once and served to the guest over virtiofs.
+  # Without this every boot runs sshd-keygen under TCG, which took minutes and
+  # gave the guest a new identity each time.
+  systemd.services.microvm-sandbox-ssh-host-keys = {
+    description = "Persistent SSH host key for the sandbox microVM";
+    before = ["microvm@sandbox.service"];
+    requiredBy = ["microvm@sandbox.service"];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "microvm";
+      Group = "kvm";
+      UMask = "0077";
+    };
+    script = ''
+      ${pkgs.coreutils}/bin/install -d -m 0700 ${sshHostKeys}
+      key=${sshHostKeys}/ssh_host_ed25519_key
+      [ -s "$key" ] || ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C "sandbox" -f "$key"
+    '';
+  };
 
   # `ssh sandbox` from the host that runs it, as root: the bridge subnet is
   # host-local, so this name means nothing on another machine.
@@ -43,7 +78,7 @@
         (import ./base.nix {
           hostName = "sandbox";
           ipAddress = address;
-          inherit hypervisor cpu tapId;
+          inherit hypervisor cpu tapId sshHostKeys;
           mac = "02:00:00:00:83:11";
           # RAM is not closure: 512 MiB was my guess and it thrashed the boot.
           mem = 1024;

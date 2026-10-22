@@ -46,6 +46,14 @@
         settings = {
           "widget.use-xdg-desktop-portal.file-picker" = 1;
           "security.enterprise_roots.enabled" = true;
+          # `extensions.packages` installs XPIs into the profile, i.e. the
+          # app-profile scope. Firefox's default autoDisableScopes (15) then
+          # disables each one the first time it is discovered, which is
+          # indistinguishable from "the extensions did not install": they are
+          # present in extensions.json with userDisabled=true. Both values are
+          # needed — 0 stops the auto-disable, 15 keeps every scope enabled.
+          "extensions.autoDisableScopes" = 0;
+          "extensions.enabledScopes" = 15;
         };
         extensions.packages = with inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system}; [
           ublock-origin

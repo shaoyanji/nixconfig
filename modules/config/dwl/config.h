@@ -175,7 +175,11 @@ movetotag(const Arg *arg)
 
 /* Commands with Catppuccin Mocha themed wmenu */
 static const char *termcmd[] = { "foot", NULL };
-static const char *menucmd[] = { "wmenu-run", "-f", "JetBrainsMono Nerd Font 11", "-N", "1e1e2e", "-n", "cdd6f4", "-M", "313244", "-m", "cdd6f4", "-S", "cba6f7", "-s", "11111b", NULL };
+/* Mod+A. `wmenu-run`/`dmenu_run` only walk $PATH, so they cannot see the
+ * `appimage-*.desktop` entries appimage-launchers keeps in
+ * ~/.local/share/applications — the picker then looks emptier than niri's.
+ * fuzzel reads XDG desktop entries, so the same list survives the port. */
+static const char *menucmd[] = { "fuzzel", NULL };
 
 /* Media keys are bound in the keymap here because scratch runs no DMS daemon
  * to own them; niri binds the same XF86 keys explicitly. */

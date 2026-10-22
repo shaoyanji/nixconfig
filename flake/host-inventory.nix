@@ -78,6 +78,9 @@ in {
         (import ../hosts/microvms/guests.nix {
           inherit inputs;
           hypervisor = "qemu";
+          # No /dev/kvm here: microvm.nix emits -enable-kvm when cpu is null, so a
+          # named CPU is what makes the runner use TCG instead of failing.
+          cpu = "max";
         })
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with

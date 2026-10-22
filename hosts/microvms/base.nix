@@ -16,6 +16,9 @@
   persistent ? false,
   varSizeMb ? 8192,
   hypervisor ? "cloud-hypervisor",
+  # microvm.nix passes `-enable-kvm` exactly when this is null. A host without
+  # /dev/kvm must name a CPU ("max") or its runner dies on the missing module.
+  cpu ? null,
   vcpu ? 2,
   mem ? 2048,
   extraShares ? [],
@@ -105,7 +108,7 @@ in {
   ];
 
   microvm = {
-    inherit hypervisor vcpu mem;
+    inherit hypervisor vcpu mem cpu;
     socket = "control.socket";
 
     # home-manager activation writes to the store, so it must be writable on top

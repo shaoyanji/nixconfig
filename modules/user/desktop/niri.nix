@@ -13,7 +13,43 @@ lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
   # nixpkgs, upstream issue sodiboo/niri-flake#1851) and isn't in any cache.
   programs.niri.package = pkgs.niri;
 
-  programs.fuzzel.enable = true;
+  # Fuzzel styled like a TUI rather than a floating GTK panel: monospace at the
+  # same size as the terminals, no icons, no rounded corners, flat Catppuccin
+  # Mocha chrome. DMS owns the visual language on this desktop; the picker is a
+  # keyboard surface, so it should read as one.
+  programs.fuzzel = {
+    enable = true;
+    settings = {
+      main = {
+        font = "JetBrainsMono Nerd Font Mono:size=11";
+        prompt = "❯ ";
+        icons-enabled = false;
+        terminal = "kitty";
+        lines = 12;
+        width = 56;
+        horizontal-pad = 10;
+        vertical-pad = 8;
+        inner-pad = 6;
+        show-actions = false;
+      };
+      border = {
+        width = 0;
+        radius = 0;
+      };
+      colors = {
+        background = "1e1e2eff";
+        text = "cdd6f4ff";
+        prompt = "cba6f7ff";
+        input = "cdd6f4ff";
+        match = "f5c2e7ff";
+        selection = "313244ff";
+        selection-text = "cdd6f4ff";
+        selection-match = "cba6f7ff";
+        counter = "6c7086ff";
+        border = "313244ff";
+      };
+    };
+  };
 
   # GTK portal only (see modules/profiles/base-desktop-environment.nix): the
   # KDE portal stack cost ~466 MiB for a file chooser Nautilus already covers.

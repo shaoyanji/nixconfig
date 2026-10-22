@@ -162,9 +162,11 @@ in {
   # chip is only useful once `tss` owns /dev/tpmrm0, and the sealed identity is
   # generated ON this host as alice, so alice needs the group. Procedure and
   # traps: docs/sops-rekey.md § TPM-sealed identity. The sealed key lives at
-  # ~alice/.config/sops/age/tpm-identity.txt, and its recipient is registered
-  # in .sops.yaml as `&tpmnetbook` — the one identity that is not derived from
-  # an SSH key here. No sops-nix plane is wired yet, so it is used by hand.
+  # ~alice/.config/sops/age/tpm-identity-netbook.txt with `keys.txt` symlinked
+  # to it, so plain `sops -d` finds the TPM identity with no env var and no
+  # keyFile to configure. Its recipient is `.sops.yaml`'s `&tpmnetbook` — the
+  # one identity here that is not derived from an SSH key. No sops-nix plane
+  # is wired yet, so it is used by hand.
   security.tpm2 = {
     enable = true;
     tctiEnvironment.enable = true;

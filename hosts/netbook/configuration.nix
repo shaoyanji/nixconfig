@@ -46,6 +46,22 @@ in {
   services.fstrim.enable = true;
   services.tailscale.enable = true;
 
+  # Keep the NAS probe out of the boot path. `nas-path-governor` is
+  # WantedBy nix-gc.service so that GC's root guard runs with the mount up, and
+  # nix-gc runs at boot via `nix.gc.persistent` — which meant every boot waited
+  # for a NAS probe: 0.3 s on-LAN, 12.1 s measured when the link was still
+  # coming up, and worse off-LAN on a travel machine. This host has **no gcroots
+  # under /Volumes/data** (checked 2026-10-22: `nix-store --gc --print-roots |
+  # grep -c Volumes/data` = 0), so the guard has nothing to protect here. The
+  # timer (`OnBootSec=15s`, every 5 min) and the NetworkManager dispatcher still
+  # drive the governor, and /Volumes/data still mounts on first access.
+  # The pull is declared on nix-gc's side (`Wants=` + `After=`), so clearing the
+  # governor's own `wantedBy` only empties its [Install] section and changes
+  # nothing — verified by building and reading the unit. This is the line that
+  # actually takes it out of the boot transaction.
+  systemd.services.nix-gc.wants = lib.mkForce [];
+  systemd.services.nas-path-governor.wantedBy = lib.mkForce [];
+
   # NetworkManager-wait-online stays enabled on purpose. Masking it on
   # 2026-10-22 looked like a 1.895 s win but only moved the wait: nas-path-governor
   # is WantedBy nix-gc.service (which runs at boot via `nix.gc.persistent`), and

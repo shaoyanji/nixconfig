@@ -33,17 +33,23 @@ lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
         width = 0;
         radius = 0;
       };
+      # Catppuccin Mocha, spelled out key by key. Every key fuzzel knows is
+      # set here on purpose: a key left out falls back to fuzzel's own light
+      # theme, so one missing line reads as "the launcher is white" rather than
+      # as an unset colour (measured on netbook 2026-10-22, where no config at
+      # all shipped and fuzzel opened white on a dark desktop).
       colors = {
-        background = "1e1e2eff";
-        text = "cdd6f4ff";
-        prompt = "cba6f7ff";
-        input = "cdd6f4ff";
-        match = "f5c2e7ff";
-        selection = "313244ff";
-        selection-text = "cdd6f4ff";
-        selection-match = "cba6f7ff";
-        counter = "6c7086ff";
-        border = "313244ff";
+        background = "1e1e2eff"; # base
+        text = "cdd6f4ff"; # text
+        prompt = "cba6f7ff"; # mauve
+        input = "cdd6f4ff"; # text
+        placeholder = "6c7086ff"; # overlay0
+        match = "f5c2e7ff"; # pink
+        selection = "313244ff"; # surface0
+        selection-text = "cdd6f4ff"; # text
+        selection-match = "cba6f7ff"; # mauve
+        counter = "6c7086ff"; # overlay0
+        border = "313244ff"; # surface0
       };
     };
   };

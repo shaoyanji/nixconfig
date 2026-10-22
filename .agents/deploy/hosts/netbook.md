@@ -80,6 +80,34 @@ activates the **built** system with `nix-env -p /nix/var/nix/profiles/system
 --set` + `switch-to-configuration`. No flake evaluation and no compiler on the
 netbook — the Celeron never evaluates and never builds.
 
+### Where the desktop config lives
+
+`alice`'s rice is `~/.dotfiles` (a git repo with its own installer), symlinked
+into `~/.config`. The flake does not own it, and the host's system packages do
+not either — `programs.niri.enable` starts the session, the symlinks shape it.
+
+Putting it under home-manager was tried on 2026-10-22 and reverted, for a reason
+that is arithmetic rather than taste: `modules/user/base.nix` +
+`modules/user/desktop/niri.nix` build a **4.3 GiB** home generation (niri 695 MiB;
+the DMS stack pulls ~3 GiB of Qt/Kirigami/qtdeclarative), while the eMMC has
+**4.5 GiB** free at 82 % full — on a host that already sat at 84 % once. Two
+ways to make a fleet-owned home fit, neither taken yet:
+
+- turn DMS off for this host and give alice a bar (waybar, ~1.3 GiB total), or
+- grow the disk first.
+
+Traps found while trying it, worth knowing before the next attempt:
+
+- **Link files, not directories.** `~/.config/tmux` was a *symlink to a directory*
+  in the dotfiles repo, so a directory-level `home.file` wrote into that repo
+  instead of out of it.
+- **Existing symlinks are skipped when identical, refused when not.**
+  `backupFileExtension` only moves real files; a differing symlink is a hard
+  "would be clobbered" and the whole activation fails.
+- **A failed activation leaves the desktop half-owned.** Removing the links and
+  letting activation time out leaves `fuzzel` with no config at all, which looks
+  like a white theme, not a missing file. Restore the symlinks before debugging.
+
 ### Staging a boot-chain change (the practiced path)
 
 A deploy that changes the kernel or initrd store paths is refused by the guard

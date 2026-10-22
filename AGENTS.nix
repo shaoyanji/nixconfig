@@ -170,16 +170,28 @@
     p6-canary-gate = {
       title = "P6 — canary as the promotion gate";
       kind = "proposal";
-      status = "PROPOSED";
+      status = "DELIVERED";
       priority = "P6";
       date = "2026-10-19";
-      summary = "Between eval and a full fleet build there is no cheap runtime proof. A one-shot MicroVM canary is that proof; wire it as an optional CI job for `modules/services/**`.";
+      summary = "The canary is the HOST, not a guest: `hostBootChecks.<arch>.<host>` boots that host's own module list in a VM and fails unless stage-2 is reached. `task checks:boot HOST=`; CI's `boot-canary` job for `modules/services/**`.";
       refs = {
-        modules = ["hosts/microvms/frieren-canary.nix"];
-        tasks = ["vm:canary:agent"];
+        modules = ["flake/boot-checks.nix" "flake/outputs.nix" ".github/workflows/nixcachix.yml"];
+        tasks = ["checks:boot"];
+        docs = ["docs/ci-pipeline.md" "hosts/microvms/README.md"];
       };
       body = ''
-        Exit: a deliberately broken unit fails the canary, a good one passes in under 3 minutes.
+        The SubZeroClaw guest was the wrong instrument: its own kernel and root, so
+        it could never fail for the host being promoted. It stays a sandbox
+        (`vm:canary:*`); the promotion gate imports `<host>.modules` verbatim, moves
+        root onto the VM disk, drops the bootloader, and neutralises sops (no TPM,
+        no keys in a VM). Assertion: `Reached target Multi-User System` on the serial
+        console, then a QEMU-monitor crash — the driver's backdoor shell has a hard
+        300 s connect budget and a Requires on /dev/ttyAMA0 that aarch64 guests do not
+        always satisfy.
+
+        Reach: delphi booted its real graph to stage-2 under TCG in ~10 min; CI with
+        KVM is seconds. Not in reach: hardware (no eMMC/NVIDIA/TPM), so netbook gen
+        50's HANDOFF class is covered while its eMMC trigger is not — said in the file.
       '';
     };
     arch-shape = {
@@ -309,6 +321,23 @@
         docs = ["docs/dns-failover.md"];
       };
       body = ''
+        Measured 2026-10-22: there is NO secondary. `8bd17500` (2026-10-15) removed
+        pihole-ftl, unbound and dns-failover from fern, and `docs/dns-failover.md`
+        kept claiming fern was the second member until this pass corrected it.
+        `rg 'role = "secondary"' hosts/ modules/` returns nothing, `checks:dns:failover`
+        exits 2, and frieren is the only answer for `*.frieren.lan` AND for the LAN
+        service records it carries (`eisen.lan`, `laya.lan`, `tts.lan`). delphi does
+        answer the shared address, but with crab-hole, which cannot hold a zone: it
+        NXDOMAINs every `.lan` name even though the hosts behind them are up.
+
+        The dependency worth removing first is the ZONE'S SINGLE HOME, not the data
+        plane: losing frieren makes hosts that are still up (`eisen.lan`,
+        `laya.lan`) unreachable by name, and that is the cheapest to fix because
+        delphi is always-on and already a resolver — the missing piece is static
+        records (a dnsmasq front, or split DNS), not hardware. Second: hand every
+        client both resolvers (router DHCP, or `networking.nameservers`, which only
+        aristotle sets today).
+
         Exit: a client with frieren down still resolves public names; `checks:dns:resolver-health` reproduces it.
       '';
     };

@@ -97,6 +97,16 @@ in {
     inherit lib systems pkgsFor self hostInventory;
   };
 
+  # Per-host RUNTIME gate: boot the host's real module graph in a VM and fail
+  # unless stage-1 reaches stage-2 (`task checks:boot HOST=<host>`). Separate
+  # output for the same reason as `hostChecks` — one boot test is one full host
+  # evaluation plus a QEMU run, and `nix flake check` forces every attribute of
+  # `checks` in a single process. See flake/boot-checks.nix for what it does and
+  # does not prove.
+  hostBootChecks = import ./boot-checks.nix {
+    inherit lib inputs systems pkgsFor self hostInventory;
+  };
+
   devShells = import ./devshells.nix {
     inherit lib systems pkgsFor self;
   };

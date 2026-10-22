@@ -212,6 +212,19 @@ tasks:
     cmds:
       - bash scripts/task/host-check-sweep.sh --hosts "{{.HOSTS}}" --mode {{.MODE | default "build"}} --arch {{.ARCH | default "x86_64-linux"}} --timeout {{.TIMEOUT | default "120"}}
 
+  checks:boot:
+    desc: "[gate] Boot ONE host's real module graph in a VM; fail unless stage-2 is reached (HOST=name)"
+    summary: >
+      scripts/task/boot-check.sh — realises hostBootChecks.<arch>.<host>: a NixOS VM
+      test over the host's OWN module list, failing unless stage-2 is reached
+      (`Reached target Multi-User System` on the serial console). The only gate that
+      runs the config; netbook gen 50 (no handoff, green everywhere) is the class.
+      ONE host, `--builders ""`, under oom-guard; not a pre-switch hook (QEMU has no
+      eMMC/NVIDIA/TPM). Vars: HOST=, ARCH=, TIMEOUT=1800.
+      Exit 0 = stage-2, 1 = no stage-2, 2 = watchdog.
+    cmds:
+      - bash scripts/task/boot-check.sh --host "{{.HOST}}" --arch "{{.ARCH}}" --timeout "{{.TIMEOUT | default "1800"}}"
+
   checks:flake:
     desc: "[gate] Run `nix flake check` only where the machine can hold it; refuse otherwise"
     summary: >

@@ -14,7 +14,7 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 | Area | State | Evidence |
 | :--- | :--- | :--- |
 | Fleet registry | 34 devices: 18 active (11 NixOS, 1 home-manager, 6 external), 16 preserved | `nix eval .#inventory.hosts`, `.#inventory.derived` |
-| Host gates | per-host module system + assertions, one host per process | `nix build .#hostChecks.x86_64-linux.<host>` |
+| Host gates | per-host eval (assertions) and per-host VM boot to stage-2, one process each | `.#hostChecks.x86_64-linux.<host>`, `.#hostBootChecks.aarch64-linux.delphi` |
 | Known red gates | `minyx` (kernel conflict), `cassini` (xdg.desktopEntries on darwin) — both dormant | `task checks:host HOST=minyx MODE=eval` |
 | Formatting | alejandra, 231 tracked `.nix` files clean | `task checks:nix:format` |
 | Lint | deadnix hard gate, statix advisory | `task checks:nix:lint` |
@@ -23,11 +23,16 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 | Observation | frieren sentinel: 15-min ledger, health endpoint, gatus body assertion | `task ops:health`, `/var/lib/fleet-sentinel/` |
 | Knowledge | qmd (`.md` + `.nix`) + `.#knowledgeGraph` (structure) + sentinel ledger (episodic) | `task ops:kg`, `task ops:ledger` |
 | Backups | local + BurgerNAS offsite; restore drill weekly; password in sops | `restic-drill.timer`, `task checks:restic:drill` |
-| DNS | resolver pair: frieren pihole+unbound, delphi crab-hole, one shared `10.99.0.53` | `task checks:dns:failover` |
+| DNS | frieren pihole+unbound owns the zone; delphi crab-hole answers public DNS only, same address | `task checks:dns:failover` (exit 2: no zone secondary) |
 | Tailnet routes | `10.99.0.53/32` approved on both via `autoApprovers`; policy mirrored in the repo | `ops:tailnet:routes`, `ops:tailnet:policy` (both rc=0) |
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+
+### 2026-10-22 — the boot gate boots a host's own config
+- `hostBootChecks.<arch>.<host>` runs the host's real module list in a VM and fails unless the console
+  shows `Reached target Multi-User System`; `task checks:boot HOST=`, CI `boot-canary` for `modules/services/**`.
+  Proof: delphi reached stage-2 under TCG, a missing root device fails; hardware (eMMC/NVIDIA/TPM) is out of reach.
 
 ### 2026-10-22 — skills audit: 19 files, −732 lines, and a gate against the pattern
 - Measured first: verbatim duplication against `AGENTS.md` and between skills is zero, so
@@ -130,11 +135,6 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
   closure (cache fetches, no build), after which `checks:toon`, `ops:tailnet:policy` and
   `checks:kg:canvas` (static half) pass here; `agent-browser` stays opt-in — that gate skips its click.
 
-### 2026-10-22 — the skills audit lands; two older entries move to `docs/history/audit-2026-10.md`
-- The portable-library admission rule and scratch's TPM sops planes moved verbatim at the 150-line
-  budget; content unchanged, only the home.
-
-### 2026-10-22 — the 2026-10-21 entries are archived to `docs/history/audit-2026-10.md`
 
 ## Open debt (`task ops:notes`)
 

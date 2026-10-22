@@ -44,24 +44,23 @@ profiles.dnsFailover = {
 };
 ```
 
-**fern is now the second member**: `hosts/fern/configuration.nix` declares the same
-stack as `role = "secondary"` (its own `lanInterface = "wlo1"`), answering the same
-`frieren.lan` wildcard and the same upstream chain (`127.0.0.1#5335` unbound), so a
-client that falls back gets identical answers.
+**There is no second member.** fern briefly ran the same stack as
+`role = "secondary"`; `8bd17500` (2026-10-15) removed pihole-ftl, unbound and
+dns-failover from it, so a roaming laptop stops carrying a resolver it cannot serve.
+`rg 'role = "secondary"' hosts/ modules/` returns nothing, which is why
+`checks:dns:failover` still exits 2 and frieren remains the only answer for the
+zone. This paragraph used to claim the opposite.
 
-`virtualIp` is still **null**, so failover is **client-side**: nothing floats, and
-clients must be handed both resolvers (a second DHCPv4 server on the Huawei router,
-or a client's `networking.nameservers`). There is no VIP to answer if a node dies
-silently.
+delphi answers DNS at the fleet's shared address (`10.99.0.53` / `100.97.61.65`),
+but with crab-hole, which has no static-record or zone support: it resolves the
+internet and NXDOMAINs every `.lan` name, so it fails over public DNS only.
+`hosts/delphi/configuration.nix` lists the three ways to close that gap; replicating
+this zone on the always-on host is the one that makes failover real.
 
-### fern's address is deliberately NOT in `resolvers`
-
-fern's LAN address is **DHCP**, so it is not written anywhere in the flake: it belongs
-in the router's DHCP reservation (or a tailnet name), not as a literal. Consequence to
-expect: `checks:dns:failover` reads the group from frieren's declaration, so while fern
-is still an unlisted member the check reports the **exit 2 "cannot be evaluated"**
-state it always has. That is correct, not a regression — it becomes a real two-member
-group once fern's address is reserved and listed.
+`virtualIp` is still **null**, so failover would be **client-side**: nothing floats,
+and clients must be handed both resolvers (a second DHCPv4 server on the Huawei
+router, or a client's `networking.nameservers`). There is no VIP to answer if a node
+dies silently.
 
 frieren's own `192.168.3.25` is likewise a reservation rather than a Nix-static address
 (`networking.interfaces` is empty and `useDHCP` is true), which is why it is the only

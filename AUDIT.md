@@ -25,26 +25,18 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
-### 2026-10-22 — scratch moves both sops planes onto its TPM, and switch exits 0
-
-- scratch is the fleet's third TPM-sealed host (`&tpmscratch`) and the first whose
-  **system** plane (not just Home Manager) unseals through the chip: `sops.age.keyFile`
-  + `age.plugins` in the host module with `sshKeyPaths` forced empty, so there is no
-  SSH-derived recipient at all. `hashedPassword`, the user `sops-nix` unit and
-  `vdirsyncer` now succeed; `switch-to-configuration` exits 0 where it used to exit 4.
-- `modules/sops.nix` gained `age.plugins` for `tpmHosts`. Without it sops-nix sets the
-  user unit's `Environment=PATH=` to an empty value, the plugin cannot be started and
-  the unseal fails as `0 successful groups required, got 0` — indistinguishable from a
-  missing recipient. Measured on frieren: TPM identity only, empty PATH → exit 128;
-  same identity with the plugin on PATH → exit 0.
-- frieren and fern still show `Environment=PATH=` on that unit, and stay green only
-  because a real software `keys.txt` is still a recipient there, so sops falls back to
-  it. The chip is not being used by their user plane; a working `sops -d` proves nothing
-  until that fallback is gone.
-- Procedure and traps written down in one place: `.agents/skills/tpm-sops/SKILL.md`,
-  with the contract in `docs/sops-rekey.md` and the note `tpm-sops-planes`.
-- Audio on scratch was firmware, not config: enabling the onboard controller in the BIOS
-  gave `00:1f.3` and a PipeWire sink with no change in the tree.
+### 2026-10-22 — scratch's sops planes unseal through its TPM; the proof moves to the store copy
+- scratch is the third TPM-sealed host (`&tpmscratch`) and the first whose **system** plane unseals
+  through the chip: `age.keyFile` + `age.plugins`, `sshKeyPaths` forced empty, no SSH-derived recipient
+  at all. `switch-to-configuration` exits 0. Audio was firmware, not config (BIOS re-enabled `00:1f.3`).
+- `modules/sops.nix` gained `age.plugins` for `tpmHosts`: without it the user unit's
+  `Environment=PATH=` is empty and the unseal dies on `0 successful groups required, got 0` —
+  measured on frieren, exit 128 with the identity / exit 0 with the plugin. frieren and fern stay
+  green only because a software `keys.txt` is still a recipient there, so their `sops -d` says nothing.
+- Proof now targets `/nix/store/<hash>-secrets.yaml` through the unit's own manifest, not a checkout:
+  both planes decrypt it to the pulled tree's digest, and a no-identity control exits 128. scratch's
+  clone sat 2768 commits behind at `~/nixconfig` while `~/Documents/nixconfig` was a store symlink.
+  Procedure `.agents/skills/tpm-sops/SKILL.md`; contract `docs/sops-rekey.md`; note `tpm-sops-planes`.
 
 ### 2026-10-21 — frieren headless-by-default, governor store references, Caddyfile removal
 

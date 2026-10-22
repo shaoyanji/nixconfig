@@ -1,204 +1,99 @@
 ---
 name: frieren-offload
-description: "Offload heavy agy tasks from netbook to frieren."
-version: 0.1.0
+description: "Offload heavy agy tasks from netbook to frieren: the agentScheduler nightly jobs, their triage gate, the 4-tier agent cascade, and dispatch by hand when you cannot wait."
+version: 0.2.0
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
 platforms: [linux]
 metadata:
   hermes:
     tags: ['frieren', 'offload', 'agy']
-    related_skills: []
+    related_skills: ['tmux', 'agents-notes']
 ---
 
-# Frieren Offload Runbook (Antigravity Remote Delegation)
+# frieren-offload — put the heavy agent on the always-on host
 
-Operational runbook and tooling for delegating heavy, memory-intensive, or long-running Antigravity (`agy`) agent workloads from host `netbook` to `frieren.lan`.
+netbook is 1.8 GiB of RAM: an indexing job, a container build or a long agent loop
+exhausts it. frieren is always on and has the storage. The point is decoupling —
+once dispatched, the netbook can be closed.
 
----
+Facts about either host are `inventory.toml`; `nix eval .#inventory.hosts.<h>`
+answers them without evaluating a config. ssh hosts are in `~/.ssh/config`
+(`frieren` on the LAN, `frieren-ts` over Tailscale), so never paste the IP.
 
-## 1. Context & Motivation
+## The scheduler is the offload mechanism
 
-* **Local Host (`netbook`):**
-  * Hardware: Intel Celeron N3060 (2 cores, 1.6–2.4 GHz), 1.8 GiB RAM.
-  * Storage: 24 GB eMMC (~11 GB free).
-  * Role: Ultra-lightweight, battery-efficient Wayland terminal client.
-  * Limitations: Compiling large codebases, indexing massive archives (e.g. 50 GB Wikipedia ZIM dumps), running containerized builds, or long-running agent loops will exhaust memory or storage and throttle the machine.
+Nightly work is declarative: `services.agentScheduler.jobs` in
+`hosts/frieren/infra-stack.nix`, each an entry with `schedule`, `command`,
+`workingDirectory` and an optional `lockFile`. Adding a job is an edit there and
+a deploy of frieren, not a second cron.
 
-* **Remote Host (`frieren.lan`):**
-  * Hardware: Multi-core x86_64 workstation / server.
-  * Storage: >860 GiB available on `/home/devji`.
-  * Role: Always-on high-compute host.
-  * Installed Tooling: `agy` (installed version), `uv`, `nix`, `aria2c`, `tmux`.
-
-**Key Benefit:** Decoupled execution. Once dispatched, the netbook lid can be closed or disconnected without interrupting the remote agent.
-
----
-
-## 2. Network & Authentication
-
-SSH connection details are pre-configured in `~/.ssh/config`:
-
-```sshconfig
-Host frieren.lan frieren
-    HostName 192.168.3.25
-    User devji
-
-Host frieren-ts
-    HostName 100.97.61.65
-    User devji
-```
-
-* **Local LAN:** `frieren.lan` (`192.168.3.25`).
-* **Tailscale Fallback:** `frieren-ts` (`100.97.61.65`).
-* **Remote User:** `devji`.
-* **Auth:** Passwordless Ed25519 key authentication.
-
-Quick connectivity test:
-```bash
-ssh frieren.lan "hostname; whoami"
-```
-
----
-
-## 3. The `agy-offload` CLI Utility
-
-A helper tool is available in `~/.local/bin/agy-offload` (source: `scripts/agy-offload`):
-
-| Subcommand | Description | Example |
+| Job | When | What it runs |
 | :--- | :--- | :--- |
-| `start` | Dispatch a task inside a detached `tmux` session on `frieren` | `agy-offload start wiki-task /var/lib/kiwix HANDOFF.md` |
-| `status` | List running `agy` processes and `tmux` sessions on `frieren` | `agy-offload status` |
-| `logs` | Tail or view the remote `agy.log` | `agy-offload logs /var/lib/kiwix -f` |
-| `attach` | Interactively connect to the remote `tmux` session | `agy-offload attach wiki-task` |
-| `kill` | Terminate a remote session | `agy-offload kill wiki-task` |
-| `pull` | Rsync finished files from `frieren` back to `netbook` | `agy-offload pull /var/lib/kiwix/output ./local-dir` |
+| `agy-nightly-handoff` | 03:00 | `agyHandoffRunner` on `~/HANDOFF.md` |
+| `agy-nightly-system` | 05:00 | `agySystemRunner` on `~/SYSTEM.md` |
+| `audible-phased-liberation` | 00:00 | batch download, 50 GB cap, hard stop 02:50 |
 
----
+Read the definitions before relying on a schedule: `rg -n "agentScheduler" -A40
+hosts/frieren/infra-stack.nix`.
 
-## 4. End-to-End Offloading Workflow
+### The 03:00 handoff runner
 
-### Step 1: Draft the `HANDOFF.md`
-Create a markdown task specification containing:
-1. **Background & Constraints:** Why the task is being offloaded and available resources.
-2. **Clear Objectives:** Specific deliverables, files to generate, or services to configure.
-3. **Execution Steps:** Concrete shell commands, tools to install via Nix, or APIs to use.
-4. **Verification Criteria:** Exact test commands to verify completion.
+1. No `~/HANDOFF.md` → exit 0. Dropping that file is the whole interface:
+   `scp HANDOFF.md frieren:~/HANDOFF.md`.
+2. Archives it to `~/.agents/handoffs/HANDOFF-<timestamp>.md`.
+3. **Triage gate:** `systemone-decision --model julia-1 triage-handoff` writes
+   `/tmp/systemone-handoff-triage.json`. With no `AUTONOMOUS_PROMOTION_CANDIDATE`
+   the run exits 0 without spending a token, which is why a handoff full of items
+   blocked on hardware costs nothing. `FORCE_RUN=1` (or `--force`) skips the gate.
+4. Runs the cascade with the triage report in the prompt.
+5. **Leaves `HANDOFF.md` in place.** It is preserved for inspection on success
+   and on failure; nothing deletes it.
 
-### Step 2: Dispatch the Remote Agent
-Run `agy-offload start`:
-```bash
-agy-offload start <session_name> <remote_workdir> <path_to_HANDOFF.md>
-```
-What this does under the hood:
-1. Creates the target directory on `frieren.lan` via SSH.
-2. Securely copies `HANDOFF.md` into the remote directory.
-3. Creates an isolated executable runner (`run.sh`) that calls `agy --dangerously-skip-permissions -p "..."` and tees output to `agy.log`.
-4. Launches the runner inside a persistent, detached `tmux` session named `<session_name>`.
+### The 05:00 system runner
 
-### Step 3: Verify and Disconnect
-Check that the agent is running:
-```bash
-agy-offload status
-```
-Inspect initial output:
-```bash
-agy-offload logs <remote_workdir>
-```
-At this point, **the netbook can safely be closed or suspended.**
+Deterministic checks first, no tokens: failed system and user units (`reset-failed`),
+btrfs device stats, a fixed list of backup units, then the cascade for anything
+that needs judgement. Archives to `~/.agents/system/` and also preserves the file.
 
-### Step 4: Check Progress & Pull Artifacts
-When reconnecting:
-```bash
-# Stream live logs
-agy-offload logs <remote_workdir> -f
+### The agent cascade (same for both jobs)
 
-# If interactive input is needed, attach to the tmux session
-agy-offload attach <session_name>
+Tier 1 `agy` → Tier 2 `freebuff-headless` → Tier 3 `hermes --oneshot` → Tier 4
+`crush run --quiet`. The first tier that exits 0 wins; agy fails on credit
+exhaustion, so the fallbacks are not theoretical. Tier 3 sources its API keys from
+`~/.hermes/.env` or `~/.config/hermes/hermes.env`.
 
-# Once complete, sync output back to the netbook
-agy-offload pull <remote_workdir>/results/ ./local-results/
-```
+## Dispatch something now
 
----
-
-## 5. Low-Level Protocol (Manual Execution)
-
-If `agy-offload` is unavailable, execute the steps manually:
+The old `agy-offload` helper is gone; do not look for it. Two routes:
 
 ```bash
-# 1. Create directory and transfer handoff
-ssh frieren.lan "mkdir -p ~/task-dir"
-scp HANDOFF.md frieren.lan:~/task-dir/HANDOFF.md
+# a) queue it for 03:00 — survives logout, costs nothing until triage says go
+scp HANDOFF.md frieren:~/HANDOFF.md
 
-# 2. Create the execution wrapper
-ssh frieren.lan "cat << 'EOF' > ~/task-dir/run.sh
-#!/usr/bin/env bash
-cd ~/task-dir
-echo '=== Starting agy at \$(date) ===' >> agy.log
-agy --dangerously-skip-permissions -p 'Read HANDOFF.md and execute the plan.' 2>&1 | tee -a agy.log
-echo '=== Completed at \$(date) ===' >> agy.log
-EOF
-chmod +x ~/task-dir/run.sh"
-
-# 3. Launch inside detached tmux
-ssh frieren.lan "tmux new-session -d -s task-session ~/task-dir/run.sh"
-
-# 4. Monitor
-ssh frieren.lan "tail -f ~/task-dir/agy.log"
+# b) run it immediately, in a session that outlives the tool call (see `tmux`)
+ssh frieren "tmux new-session -d -s agent-job -c /var/lib/job -- \
+  nix shell nixpkgs#... -c agy --dangerously-skip-permissions -p 'Read HANDOFF.md and execute it.'"
 ```
 
----
+Use `/var/lib/<job>` for the working directory, not `$HOME`: hardened units with
+`DynamicUser` + `ProtectHome` cannot read `/home`. Give each job its own directory
+so two of them do not share a log or a `HANDOFF.md`.
 
-## 6. Best Practices
+Agent CLI flags worth knowing: `agy` needs `--dangerously-skip-permissions` in any
+detached session (there is no TTY to approve a prompt, so it would block forever);
+`hermes` wants `--oneshot`; `crush` `run --quiet`.
 
-* **Always use `--dangerously-skip-permissions`:** Remote detached sessions have no TTY for interactive confirmation prompts. Any unapproved tool call would otherwise block execution indefinitely.
-* **Always run in `tmux`:** Running commands over raw SSH will terminate when the netbook closes or WiFi drops. `tmux` ensures persistence on `frieren`.
-* **Separate Task Directories:** Always give each offloaded job its own distinct directory (e.g. `/var/lib/kiwix`, `/var/lib/kernel-build`) so multiple agent jobs do not clobber `HANDOFF.md` or `agy.log`. Prefer `/var/lib/<job>` over `$HOME` — hardened system services (DynamicUser + ProtectHome) cannot read `/home`.
+## Watching it
 
----
-
-## 7. Nightly Autonomous Execution (3:00 AM & 5:00 AM Systemd Services)
-
-`frieren.lan` is configured with two persistent systemd user timers that automate overnight task and system management:
-
-### A. 3:00 AM Task Runner (`HANDOFF.md`)
-* **Timer:** `agy-nightly-handoff.timer` (`*-*-* 03:00:00`)
-* **File:** `/home/devji/HANDOFF.md`
-* **Workflow:**
-  1. Checks if `/home/devji/HANDOFF.md` exists. If missing, exits immediately with code 0.
-  2. Archives a copy to `/home/devji/.agents/handoffs/HANDOFF-<timestamp>.md`.
-  3. Executes `agy --dangerously-skip-permissions -p "Please read HANDOFF.md in the current working directory and execute the plan."`.
-  4. Deletes `/home/devji/HANDOFF.md` upon completion.
-* **Usage:**
-  ```bash
-  scp HANDOFF.md frieren.lan:~/HANDOFF.md
-  ```
-
-### B. 5:00 AM System Maintenance Runner (`SYSTEM.md`)
-* **Timer:** `agy-nightly-system.timer` (`*-*-* 05:00:00`)
-* **File:** `/home/devji/SYSTEM.md`
-* **Workflow:**
-  1. Checks if `/home/devji/SYSTEM.md` exists. If missing, exits immediately with code 0.
-  2. Archives a copy to `/home/devji/.agents/system/SYSTEM-<timestamp>.md`.
-  3. Executes `agy --dangerously-skip-permissions -p "Please read SYSTEM.md in the current working directory and execute the plan."`.
-  4. Deletes `/home/devji/SYSTEM.md` upon completion.
-* **Usage:**
-  ```bash
-  scp SYSTEM.md frieren.lan:~/SYSTEM.md
-  ```
-
-### C. Monitoring & Verification
 ```bash
-# Check scheduled timers
-ssh frieren.lan "systemctl --user list-timers 'agy-nightly-*'"
-
-# View logs for either service
-ssh frieren.lan "journalctl --user -u agy-nightly-handoff.service -n 30 --no-pager"
-ssh frieren.lan "journalctl --user -u agy-nightly-system.service -n 30 --no-pager"
-
-# View archived copies
-ssh frieren.lan "ls -la ~/.agents/handoffs/ ~/.agents/system/"
+ssh frieren "systemctl --user list-timers 'agy-nightly-*' --no-pager"
+ssh frieren "journalctl --user -u agy-nightly-handoff.service -n 40 --no-pager"
+ssh frieren "ls -lt ~/.agents/handoffs/ | head"
+ssh frieren "grep -c '\"status\": \"OPEN\"' /tmp/systemone-handoff-triage.json"
 ```
 
-Truth: `hosts/frieren/configuration.nix` — the worker that does the work; this page is the procedure.
+A tier success line in the journal is the evidence; a green timer only says the
+timer fired. That distinction is the `fleet-sentinel` lesson applied here.
+
+Truth: `hosts/frieren/infra-stack.nix` — the jobs and their runners; this page is the procedure.

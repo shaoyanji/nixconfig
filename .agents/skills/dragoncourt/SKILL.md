@@ -11,53 +11,26 @@ metadata:
     related_skills: []
 ---
 
-# dragoncourt — Alwaysdata Hosting Control Plane
+# dragoncourt — Alwaysdata, and the Comrak render step
 
-Control and manage the Alwaysdata Debian host (`ssh-dragoncourt.alwaysdata.net`) and the webserver for `dragoncourt.alwaysdata.net`.
+| | |
+| :--- | :--- |
+| Host | `ssh-dragoncourt.alwaysdata.net`, Debian 12, alias `dragoncourt` |
+| User / webroot | `dragoncourt` / `~/www` |
+| Web | `https://dragoncourt.alwaysdata.net`, Apache + PHP 8.4 |
 
-- **Host**: `ssh-dragoncourt.alwaysdata.net`
-- **User**: `dragoncourt`
-- **Port**: `22` (standard SSH)
-- **SSH Alias**: `dragoncourt` or `alwaysdata` (defined in `~/.ssh/config`)
-- **Web Domain**: `https://dragoncourt.alwaysdata.net` (served via Apache + alproxy)
-- **Webroot**: `/home/dragoncourt/www`
+The page is not a template: `index.md`, `sidebar.md` and `footer.md` are compiled
+to HTML by **Comrak** at `~/.local/bin/comrak`, run through `task
+dragoncourt:build`. Editing the markdown without the build leaves the old HTML
+served, and the generated files are in `~/www`, so a `push` of the `.md` alone is
+not a deploy.
 
-## Quick Tasks
+`home/wasm.php` serves a Go WebAssembly bundle (`wasm_exec.js` + `wasm.wasm`).
+Those two are artefacts: `dragoncourt:build` only re-renders markdown, so a Go
+change is a separate build and a separate push.
 
-| Task | Description |
-|------|-------------|
-| `task dragoncourt:ssh` | Interactive SSH shell into Alwaysdata Debian host |
-| `task dragoncourt:exec -- "<cmd>"` | Execute command non-interactively on Alwaysdata (agent-friendly) |
-| `task dragoncourt:status` | Health check on `https://dragoncourt.alwaysdata.net` & disk usage |
-| `task dragoncourt:audit` | Comprehensive health, quota, web HTTP, and permissions audit |
-| `task dragoncourt:harden` | Enforce secure permissions (SSH 700/600, www 750) |
-| `task dragoncourt:logs` | Tail live Apache HTTP access/error logs from `~/admin/logs/sites/` |
-| `task dragoncourt:backup` | Download compressed tarball of Alwaysdata webroot (`~/www`) |
-| `task dragoncourt:build` | Re-render Comrak markdown templates in `~/www/` |
-| `task dragoncourt:push -- <local> [dest]` | Transfer local file/dir to Alwaysdata (defaults to `www/`) |
-| `task dragoncourt:pull -- <remote> [dest]` | Transfer remote file/dir from Alwaysdata to local machine |
-| `task dragoncourt:info` | Query Debian uname, disk quota, and PHP/Node/Go versions |
-| `task dragoncourt:menu` | Interactive Charmbracelet Gum / Wish menu for Alwaysdata |
-
-## Web Environment Overview
-
-The `dragoncourt.alwaysdata.net` site runs on Debian 12 with:
-- **Apache + PHP 8.4** (`index.php`, `home/wasm.php`)
-- **Comrak Markdown Engine** (`~/.local/bin/comrak`) for compiling `index.md`, `sidebar.md`, and `footer.md`
-- **Go WebAssembly** (`wasm_exec.js`, `wasm.wasm`)
-- **Image Gallery** (`www/jpg/`)
-
-## Agent Usage Examples
-
-```bash
-# Query server health and disk usage
-task dragoncourt:info
-
-# Check if public website is active
-task dragoncourt:status
-
-# Rebuild markdown templates
-task dragoncourt:build
-```
+`task dragoncourt:exec -- "<cmd>"` is the agent entry point (`:ssh` is
+interactive). `:info` is uname + quota + runtime versions, `:harden` enforces SSH
+700/600 and `www` 750.
 
 Truth: `taskfiles/dragoncourt.yml` — the executable contract; this page is the procedure.

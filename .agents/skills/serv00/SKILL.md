@@ -11,75 +11,52 @@ metadata:
     related_skills: []
 ---
 
-# serv00 — Serv00 FreeBSD Hosting Control Plane
+# serv00 — FreeBSD hosting
 
-Control and manage the Serv00 FreeBSD host (`s13.serv00.com`), Devil CLI configuration, and the webserver backend for `jisifu.serv00.net`.
+| | |
+| :--- | :--- |
+| Host | `s13.serv00.com`, port 22 (ssh alias `serv00`/`s13`) |
+| User | `jisifu` |
+| Site | `https://jisifu.serv00.net` → proxied to `127.0.0.1:49613` |
+| Backend | Go webserver on TCP `49613`, kept alive by cron |
 
-- **Host**: `s13.serv00.com`
-- **User**: `jisifu`
-- **Port**: `22` (standard SSH)
-- **SSH Alias**: `serv00` or `s13` (defined in `~/.ssh/config`)
-- **Web Domain**: `https://jisifu.serv00.net` (proxied to `127.0.0.1:49613`)
-- **Backend Port**: `49613` (TCP reserved via `devil port`)
-
-## Quick Tasks
-
-| Task | Description |
-|------|-------------|
-| `task serv00:ssh` | Interactive SSH shell into Serv00 FreeBSD |
-| `task serv00:exec -- "<cmd>"` | Execute command non-interactively on Serv00 (agent-friendly) |
-| `task serv00:devil -- <args>` | Execute Devil CLI command (e.g. `task serv00:devil -- port list`) |
-| `task serv00:server:status` | Check running webserver process & curl `https://jisifu.serv00.net` |
-| `task serv00:server:start` | Launch backend webserver on port 49613 via `/usr/sbin/daemon` |
-| `task serv00:server:stop` | Stop background webserver process |
-| `task serv00:server:restart` | Restart background webserver |
-| `task serv00:server:build` | Recompile `server.go` on FreeBSD using Go 1.24 |
-| `task serv00:audit` | Comprehensive health, limits, daemon and permissions audit |
-| `task serv00:harden` | Enforce strict permissions (domains 750, SSH 700/600, logs 600) |
-| `task serv00:limits` | Check resource quotas (RAM 512MB, processes, disk) via `devil info limits` |
-| `task serv00:logs` | Tail webserver supervisor log (`~/webserver.log`) |
-| `task serv00:backup` | Download compressed tarball of server code and domains |
-| `task serv00:cron:enable` | Install keep-alive cron job to ensure 24/7 webserver uptime |
-| `task serv00:cron:disable` | Remove keep-alive cron job |
-| `task serv00:ports` | List reserved TCP/UDP ports via `devil port list` |
-| `task serv00:www` | List domains and reverse proxy targets via `devil www list` |
-| `task serv00:push -- <local> [dest]` | Transfer local file/dir to Serv00 |
-| `task serv00:pull -- <remote> [dest]` | Transfer remote file/dir from Serv00 |
-| `task serv00:info` | Query FreeBSD uname, quota, and running user processes |
-| `task serv00:menu` | Interactive Charmbracelet Gum / Wish menu for Serv00 |
-
-## Devil CLI Overview
-
-Serv00 uses the `devil` CLI command on FreeBSD:
+22 tasks, all named and described:
 
 ```bash
-# Check or enable permission to run user binaries:
-devil binexec on
+task --list-all --json | jq -r '.tasks[] | select(.name|startswith("serv00:")) | .name'
+```
 
-# List / add reserved ports:
-devil port list
-devil port add tcp <port>
+Three of them carry a caveat a description cannot:
 
-# Manage web domains & proxy forwarding:
+```bash
+task serv00:exec -- "<cmd>"     # non-interactive; the agent-safe entry point
+task serv00:devil -- port list   # every Devil call goes through this
+task serv00:server:build        # Go 1.24 on FreeBSD, not the local toolchain
+```
+
+`serv00:ssh` is interactive, so it is for the human only.
+
+## Devil CLI
+
+```bash
+devil binexec on                       # allow user binaries (needed once)
+devil port list                        # reserved TCP/UDP ports
+devil port add tcp <port>              # reserve one before binding
 devil www list
 devil www add <domain> proxy <target_url>
-
-# Manage databases:
 devil mysql list
 devil pgsql list
 ```
 
-## Agent Usage Examples
+## What bites
 
-```bash
-# Query server health and running processes
-task serv00:info
-
-# Check if public website is healthy
-task serv00:server:status
-
-# Run Devil CLI to check ports
-task serv00:devil -- port list
-```
+- Reserved ports are per-account and finite. `devil port add` before a new
+  listener, or the process dies with `EADDRINUSE` that looks like a crash.
+- FreeBSD userland: `sed -i ''`, `ps -aux`, no GNU `date -d`. Anything you write
+  for Linux and paste here fails on the flags, not the logic.
+- `~/.ssh` must be 700/600 and domains 750, or the webserver cannot read them;
+  `task serv00:harden` enforces that and `task serv00:audit` reports drift.
+- Quotas are real (512 MB RAM, process and disk caps): `task serv00:limits`. A
+  build that passes locally can be OOM-killed by the jailed limit.
 
 Truth: `taskfiles/serv00.yml` — the executable contract; this page is the procedure.

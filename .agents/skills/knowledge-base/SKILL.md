@@ -26,9 +26,8 @@ why "I searched and found nothing" keeps happening.
 | **Personal** | Obsidian vault (`/Volumes/data/Obsidian-Git-Sync`) | `qmd search -c vault`, direct read | as of the last sync |
 
 A **design record** sits beside these: `AGENTS.nix` (`.agents/notes`) and its
-lineage. It is not prose to be searched — it is the answer to "has this been
-tried, and what did it come out of?", which `qmd` cannot answer because the
-record is data, not markdown.
+lineage. It answers "has this been tried, and what did it come out of?" —
+`qmd` cannot, because the record is data, not markdown.
 
 The graph (`.#knowledgeGraph`, below) is a **projection** over 1 + 2, not a fifth
 source of truth.
@@ -81,69 +80,20 @@ wrong (`scripts/task/kg-query.sh` is the single implementation).
 | stats | `ops:kg:stats` | counts by node type + edge total |
 
 ```bash
-task ops:kg                                    # stats + top out-degree nodes
-task ops:kg:comention HOST=poseidon            # the one multi-hop question
+task ops:kg                                # stats + top out-degree nodes
+task ops:kg:comention HOST=poseidon        # the one multi-hop question
 task ops:ask Q="what should I read before touching minyx"   # sugar: rules, then bundle
-task ops:ask:jev Q="…"                         # same, with a Jev check recorded
-task ops:bench:kg                              # re-run the router evidence
-task ops:context                               # monitor state + host context
-nix eval --raw .#knowledgeGraph.cypher | head -40   # optional Neo4j import
+task ops:kg:blast TARGET=<id>              # reverse closure; jq has no one-liner
 ```
 
-**The sidecar** (`task ops:kg:sidecar`, engine in `tools/kg-engine/`) serves the
-same graph from memory over `unix:$XDG_RUNTIME_DIR/kg.sock`: 58 µs server-side,
-36–50 ms per query through the script, 114–125 ms through `task` (measured
-2026-10-19) — against ~113 ms for the jq surface on a clean tree and ~530 ms on
-a dirty one, so it pays off for repeated queries, not a single lookup.
-`task ops:kg:speed` re-measures both paths in one command (2026-10-20 on a
-dirty tree: 32 ms vs 441 ms for `host frieren`); run it instead of quoting this
-paragraph, because the ratio moves with tree state.
-It loads the COMPILED projection by default (`--native` selects the engine's own
-builder, which is what `checks:kg:native` measures for parity), so the socket and
-the jq surface read one graph — and `checks:kg:native` runs inside
-`checks:quick`, because a second builder that silently trails the projection is
-worse than no daemon at all. `elixir` comes from PATH in the repo's devshell
-(`.envrc`), the store otherwise, so a warm machine never calls nix to start it.
-Use it for many questions in a row, or for `ops:kg:blast TARGET=<id>` —
-transitive dependents, the one traversal the jq patterns do not do.
+The sidecar, its measured timings and the `--native` parity experiment live in
+`AGENTS.md` (*Structural queries are the graph, not grep*); `task ops:kg:speed`
+re-measures both paths rather than quoting a ratio that moves with tree state.
 
-Before **applying** a change, ask the same question about paths rather than ids:
-`task checks:blast STAGED=1` (or `FILES="hosts/frieren/reverse-proxy.nix"`) maps
-each path to its anchor and prints what it reaches. `unmapped` is information,
-not an error: `modules/` and `flake/` are not graph nodes, and closures are the
-tool for those. `checks:kg:sidecar` is the parity gate — it fails if the engine's
-graph, answers or error codes disagree with the compiled projection.
-
-**Read the note, don't leave the site.** `http://fleet.frieren.lan` → *Notes*
-lists every doc and skill by how often the graph cites it; clicking one opens its
-slice, which contains **that note's own markdown rendered at build time** (the
-file is read during evaluation, so there is no forge URL to rot). The
-*Knowledge Graph* opens the same slice from a node, and its host slices link to
-the inventory page.
-
-**See the graph.** *Knowledge Graph* renders the
-projection as a force-directed canvas: pan, wheel zoom, hover to inspect, click
-any node to open its static slice (note text where there is one, neighbours, and
-the inventory page for a host). Type in the search box to narrow by label or id, and
-toggle the per-type chips (host/skill/doc/tag) to filter — the counter follows
-the set the renderer uses. Hovering a node, or searching, lights it and its
-neighbours while dimming the rest. The filter lives in the URL
-(`#kg?q=frieren&types=host,doc`), so a filtered view is a link you can send;
-opening one lands directly on the graph. Every click is a fetched JSON slice —
-no daemon. The
-definition lives in `lib/aki-site.nix`, and the canvas itself is
-`lib/site/kg.js` (plain JS, parsed by `checks.<system>.site-assets`);
-`task checks:kg:canvas` proves it by
-driving headless Chrome through the click, and `task checks:kg:native` holds the
-cold bootstrap to **median < 20 ms** with no `nix` subprocess.
-
-**Nothing on the site is typed.** Overview counts, inventory rows, notes and the
-closure budgets page are all `${...}` over evaluated data (`inventory.toml` via
-`lib/inventory.nix`, `closure-budgets.toml`, the compiled graph) — a figure with
-no source of truth is not rendered at all. That is why the site has no "closure
-attribution" or "debloat playbook" page any more: both were prose about one
-generation. `task checks:kg:canvas` recomputes every budget figure from the file
-and refuses a slice whose note does not match its source.
+Use the six patterns for *"what touches X"*, a question BM25 is bad at. Use `qmd`
+for *"where is this explained"*, which a graph is bad at. Before **applying** a
+change the same question about paths is `task checks:blast STAGED=1`; `unmapped`
+is information, not an error — `modules/` and `flake/` are not graph nodes.
 
 Every pattern takes **`FORMAT=json`** and returns the same envelope:
 `{pattern, arg, count, results}` — `results` is a list of ids, except `comention`
@@ -162,9 +112,8 @@ task ops:kg:host HOST=friere FORMAT=json   # error + suggestions, exit 201
 
 ### jq cookbook — the questions the six patterns do not cover
 
-The pattern tasks answer the six questions the graph exists for. These five
-answer the ones it can still answer in one expression. Snapshot the graph first;
-**every count below is live, so re-run rather than cite**:
+Snapshot the graph first; **every count below is live, so re-run rather than
+cite**:
 
 ```bash
 nix eval --json .#knowledgeGraph.graph > /tmp/kg.json
@@ -184,16 +133,14 @@ answers, useful when you have the file open):
 jq -r --arg n doc:docs/task-control-plane.md '.edges[] | select(.from == $n) | .to' /tmp/kg.json | sort -u
 ```
 
-**3. Orphan documents** — named by nobody, naming nothing, so no query will ever
-reach them:
+**3. Orphan documents** — named by nobody, so no query will ever reach them:
 
 ```bash
 jq -r '[.edges[].from] as $from | .nodes[]
   | select(.type == "doc") | select(.id as $i | $from | index($i) | not) | .id' /tmp/kg.json
 ```
 
-**4. Skills no document mentions** — the invisible half of the roster. A skill
-here still loads when named, but nothing in the docs points at it:
+**4. Skills no document mentions** — the invisible half of the roster:
 
 ```bash
 jq -r '[.edges[] | select(.to | startswith("skill:")) | .to] as $seen
@@ -213,61 +160,26 @@ The `. as $g` binding in 5 is load-bearing: inside `.nodes[]` the current value
 is the node, so `.edges` there would be null and every count would print 0 — a
 wrong answer that looks like a tidy result.
 
-Run 2026-10-19 (21 doc nodes, 43 skills, 387 edges): orphan documents were zero
-(all eight living docs name something), and **15 of 43 skills had no inbound
-mention** — `master-toon`, `nix-eval`, `host-facts`, `decision-picker` among
-them. Two causes, both worth
-knowing before you read that list as rot:
+Read "skills no document mentions" as "no doc names this exactly", not "nobody
+uses it". Only the four root living documents and non-recursive `docs/*.md` are
+doc nodes (`lib/knowledge-graph.nix`), so a skill listed only in
+`.agents/README.md` has no inbound edge, and matching is exact-token, so a note
+saying `nix-eval-jobs` does not reach `nix-eval`. For a fleet-visible roster,
+`nix eval --json .#agentSkills.byTag` is the source.
 
-- **Only two doc sources exist**: the four living documents at the repo root
-  (`AGENTS.md`, `MANUAL.md`, `AUDIT.md`, `README.md`) and non-recursive
-  `docs/*.md` (`lib/knowledge-graph.nix`). The retired root narratives are stubs
-  and the `AGENTS.nix` notes are a separate projection (`ops:notes`), so neither
-  is a doc node. `.agents/README.md` lists skills and is *not* a doc node, so a
-  skill documented only there has no inbound edge.
-- **Matching is exact-token**: an `AGENTS.nix` note says `nix-eval-jobs`, which is a
-  different token from `nix-eval` — the substring is there, the edge is not.
+`from` is only ever a doc (`doc:<path>`) or a skill (`skill:<name>`); hosts and
+tags are only `to` ends, so filtering on `from=="frieren"` matches nothing.
 
-So the honest reading is "no doc names this exactly", not "nobody uses it". For
-a fleet-visible roster, `nix eval --json .#agentSkills.byTag` is the source.
+`ops:ask` is deterministic and offline: rules answer the rule-shaped set, and a
+question that names a node gets that node's whole context (`route: bundle`). It
+is a convenience for a human phrasing a question, not the supported way for an
+agent to query a graph it can already name — call the pattern. `ops:bench:kg`
+prints the router evidence; no model is on the default path.
 
-`ops:ask` remains sugar over these: deterministic keywords, a model only when no
-rule matched. It is a convenience for a human phrasing a question, not the
-supported way for an agent to query a graph it can already name.
-
-Routing (`ops:ask`) is deterministic and offline. Rules answer 14/14 of the
-rule-shaped set (labels written from the six intents — that number is
-independent). When no rule matches but the question **names a node**, the node's
-whole context is returned (`route: bundle`), which takes the paraphrase set from
-6/10 to 10/10 at 0 ms — but **4 of those 10 are bundle answers whose gold label
-encodes the same policy**, so read them as coverage, not comprehension;
-`ops:bench:kg` prints that count next to the score. Hosted Jev is 13/14 and 9/10
-at ~330 ms, the in-repo hash engine 5/14 and 1/10. No model is called on the
-default path; `KG_DECIDE_ALWAYS=1` opts into Jev as an agreement check only.
-
-The bundle's limits are measured too, not assumed: `--set unnamed` (questions
-that name **no** node) is rules 4/9 vs Jev 7/9. Nothing there can trigger the
-bundle, because there is no name to resolve — so above 4/9 the rules are only
-keywords. Prefer this set's shape: the rules' misses are `UNKNOWN` (visible
-declines), Jev's are confident wrong intents. If your question names nothing,
-name the thing instead — that is a one-word change that puts the bundle to work.
-
-The value is **one hop from a name to its context**: `ops:kg:host HOST=frieren`
-lists every doc and skill that names the host, without `grep` and without
-reading them. Counts are printed live, never stored. Note that `from` is
-only ever a doc (`doc:<path>`) or a skill (`skill:<name>`); hosts and tags are
-only `to` ends, so filtering on `from=="frieren"` matches nothing.
-
-Use it to answer *"what touches X"* — a question BM25 is bad at. Use `qmd` for
-*"where is this explained"*, which a graph is bad at.
-
-**Neo4j verdict (2026-10-19):** do not run a Neo4j server on frieren. The JVM
-heap competes with the NAS's page cache on an 11 GiB host that already swaps,
-and the graph is ~10³ nodes — it fits in a JSON file and a `jq` expression.
-`hosts/frieren/tools.nix` keeps `neo4j` in the heavy optional set for
-experiments; the production path is the generated graph + Cypher export for an
-external instance if one ever exists. A `cypher-shell` import is a 30-second
-operation against the export, not a service.
+Do not run a Neo4j server for a ~10³-node graph on an 11 GiB host that already
+swaps. The generated graph plus the Cypher export (`.#knowledgeGraph.cypher`)
+is the production path; a `cypher-shell` import against an external instance is
+a 30-second operation, not a service.
 
 ## 4. Why agent learnings do not reach the vault
 

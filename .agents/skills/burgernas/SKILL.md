@@ -34,30 +34,19 @@ on the device (see its `~/AGENTS.md`).
 
 **State (2026-10-14):** the frieren restic baseline seed is **complete and verified** (`ce946da9`; `restic check` clean, sampled restore matched the source), and the legacy `/volume1/Shared Library/core/Sandy` plaintext copy was removed. On-device `restic` 0.19.1 (SynoCommunity) is available for local restores, and `aria2` 1.37.0 + AriaNg 1.3.7 (RPC `:6800`, UI `/ariang/`) run alongside Transmission.
 
-## Quick Tasks
+## Two tasks that run elsewhere
 
-| Task | Description |
-|------|-------------|
-| `task burgernas:ssh` | Interactive SSH shell |
-| `task burgernas:exec -- "<cmd>"` | Non-interactive command (agent-friendly) |
-| `task burgernas:status` | System, memory, storage, WoL and Transmission state |
-| `task burgernas:info` | DSM build, shared folders, restic repo |
-| `task burgernas:wol` | Wake via Wake-on-LAN magic packet |
-| `task burgernas:online` | Wait for SSH after a wake (120s) |
-| `task burgernas:poweroff` | Arm WoL and cleanly power off |
-| `task burgernas:transmission:status` | Transmission state + leech-only keys |
-| `task burgernas:transmission:leech` | Apply the shared leech-only policy (needs `/run/secrets/nas`) |
-| `task burgernas:backup:seed` | `[frieren root]` Start the restic seed systemd unit |
-| `task burgernas:snapshot` | `[frieren root]` List repository snapshots |
-| `task burgernas:menu` | Interactive gum menu |
+`burgernas:backup:seed` and `burgernas:snapshot` are `[frieren root]`: they start
+and inspect the restic unit on frieren, not on the NAS. Everything else runs from
+any host over the `burgernas` ssh alias.
 
 ## Constraints
 
-- ⚠ **512 MiB RAM** — never run heavy compilers, browsers, containers, or full AI
-  runtimes on the NAS; they OOM-kill.
-- ⚠ **Non-Nix** — no `nix`, `nixos-rebuild`, or flake commands.
-- ⚠ **Frieren is the backup controller** — no imperative cron/rsync on the NAS.
-- ⚠ **Keep WoL armed** on `eth0` so the backup window can wake it.
+- **512 MiB RAM** — no compilers, browsers, containers or AI runtimes; they
+  OOM-kill.
+- **Non-Nix** — there is no `nix`, `nixos-rebuild` or flake on the device.
+- **Frieren is the backup controller** — no imperative cron or rsync on the NAS.
+- **Keep WoL armed** on `eth0`, or the backup window cannot wake it.
 - Power ops use devji's passwordless sudo (`/sbin/poweroff`, `/bin/ethtool`,
   `/bin/systemctl`); writing `settings.json` needs the `/run/secrets/nas` password.
 

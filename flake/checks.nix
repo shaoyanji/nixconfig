@@ -347,7 +347,7 @@ lib.genAttrs systems.default (
         pkgs.runCommand "site-assets" {
           nativeBuildInputs = [pkgs.nodejs];
         } ''
-          for f in ${../lib/site/aki.js} ${../lib/site/kg.js}; do
+          for f in ${../lib/site/aki.js} ${../lib/site/kg.js} ${../lib/delphi/juno.js}; do
             node --check "$f"
             echo "parsed $(basename "$f")"
           done

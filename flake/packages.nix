@@ -48,6 +48,23 @@ in {
   # disagree with the hosts or with the markdown docs built from the same value.
   fleet-docs-site = import ../lib/aki-site.nix {inherit pkgs lib inventory;};
 
+  # delphi's two surfaces: the public dossier and the tailnet console, from one
+  # evaluated structure (lib/delphi-site.nix).
+  #
+  # This build carries the registry and the knowledge graph but NOT a host
+  # config, so its card list is empty and the console says so instead of printing
+  # an empty grid. The artifact that actually serves is the host's own
+  # instantiation in `hosts/delphi/configuration.nix`, which additionally passes
+  # `services.servicePortal.cards`. What this output proves is that both
+  # templates and the asset files compile on any architecture, without a host
+  # evaluation.
+  delphi-site = import ../lib/delphi-site.nix {
+    inherit pkgs lib inventory;
+    host = "delphi";
+    publicDomain = inventory.hosts.delphi.network.domain;
+    tailnetHost = "${inventory.hosts.delphi.network.tailscale_hostname}.cloudforest-kardashev.ts.net";
+  };
+
   # --- compiled inventory artifacts ---------------------------------------
   # Both are generated from the ONE parse in lib/inventory.nix, so they cannot
   # disagree with each other or with inventory.toml.

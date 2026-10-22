@@ -25,6 +25,23 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — delphi's two surfaces are compiled from one structure; two gates stop needing python
+- `lib/delphi-site.nix` renders the public dossier and the tailnet console from ONE evaluated structure
+  (`inventory.toml` + knowledge graph + `config.services.servicePortal.cards`); markup in
+  `lib/delphi/*.{html,css,js}`, `render` throws on an unbound hole. Replaces the inline page whose public
+  surface carried no content at all (every card was tailnet-audience). `cards` is the new read-only
+  projection, so the mount declaration and either page cannot drift. Registry truth fixed: `domain`/`tailscale_ip`
+  registered (the host reads them), `status_detail`/`key_services`/`notes` corrected. The MagicDNS name
+  answers on `:80` behind `allow 100.64.0.0/10; deny all;` — 443 belongs to ACME. Evidence: 1856
+  assertions, 4 console cards / 4 withheld names, no tailnet address on the public page. Runbook:
+  `.agents/deploy/hosts/delphi.md` § *The two surfaces*.
+- `docs-links.sh` and `toon-surfaces.sh` lost their `python3` dependency (awk + `test -e`): a gate that
+  fails where no interpreter exists is not a gate. Negative controls prove both still catch a broken link
+  and a bare `nix eval --json`. The tools the gates needed are declared, not ad-hoc:
+  `profiles.operatorTools` (`modules/profiles/operator-tools.nix`) puts `toon` + `python3` in delphi's
+  closure (cache fetches, no build), after which `checks:toon`, `ops:tailnet:policy` and
+  `checks:kg:canvas` (static half) pass here; `agent-browser` stays opt-in — that gate skips its click.
+
 ### 2026-10-22 — the portable library gets an admission rule, not a bigger disk- Audited the four store dirs: 178 files, 9.5 GiB, 83 static, glibc floor 2.39, 11 MiB exact duplicates, 92 MiB eget re-fetch residue (`*.1`).
 - `data:library`, `:index`, `:fetch` replace ad-hoc eget use: a dynamic download is rejected to
   `.rejected/`, provenance goes to `.library.tsv`; asserts
@@ -44,95 +61,13 @@
   clone sat 2768 commits behind at `~/nixconfig` while `~/Documents/nixconfig` was a store symlink.
   Procedure `docs/sops-rekey.md`; note `tpm-sops-planes`.
 
-### 2026-10-21 — frieren headless-by-default, governor store references, Caddyfile removal
 
-- Split frieren into two boot personas: `hosts/frieren/configuration.nix` is now the
-  headless server default (no niri, greetd, or DisplayLink) and `hosts/frieren/desktop.nix`
-  is `specialisation.desktop`. QuickSync/VA-API stays in the base `hardware.nix`, so Jellyfin
-  transcodes in both; `media-stack.nix` adds the `jellyfin` user to `video`/`render`.
-- Fixed the `references the store path without a proper context` warning: `fleet-governor.nix`
-  interpolated `toString ../..` (stripping store context) for both the script and the S2
-  `flakePath`. Now real path inputs — `nix-store -q --references` lists `…-systemone`.
-- Deleted `modules/config/Caddyfile` (no references in the tree or in history).
-
-### 2026-10-21 — Delphi cloud workspace seeder, Freebuff mainframe, & Antigravity gateway
-
-- Fixed `seed-workspace` on delphi: added `gh` to `delphi-seed-workspace` with
-  `url."https://github.com/".insteadOf "git@github.com:"` rewrite and `gh repo clone`
-  so recursive submodule clones do not block on missing GitHub SSH keys.
-- Deployed `freebuff` and `freebuff-headless` to Delphi; re-pointed `freebuff-remote`
-  away from frieren to `delphi.bountystash.com`.
-- Enabled 24/7 `antigravity-cli-daemon` (`agy remote-control serve`) on Delphi
-  under user lingering for persistent connectivity on `antigravity.google.com`.
-- Fixed direnv cached devShell progcomp bug: added `bashInteractive` to `nativeBuildInputs`
-  in `flake/devshells.nix` so interactive subshells retain completion builtins.
-- Factored Dell D6000 Universal Dock into `modules/profiles/dell-dock.nix` (`profiles.dell-dock.enable`);
-  enabled for frieren and fern, registered in `modules.toml`.
-- Fixed Fern lid-close sleep deadlock (`AllowSuspend = "no"`), enabled DisplayLink EVDI for
-  Samsung 4K TV, removed Wayland-incompatible `caffeine`, and distilled hardware quirks into `inventory.toml`.
-
-### 2026-10-21 — the harness is a worker service behind HTTPS, not a tunnel
-
-- `services.dshWeb` runs `dsh web` on the worker (systemd, loopback `:3080`,
-  `--public-url`, `--trusted-host`) and is **tailnet only**: `tailscale serve`
-  terminates TLS at the MagicDNS name on 8443 and proxies there, preserving
-  `Host` (measured), so the public vhost carries only the landing page.
-- `dsh-remote` is a client: it reads the signed-in URL from the worker's journal,
-  proves the ingress from this machine, then opens it. No `ssh -L`, so the tab
-  outlives the command and the URL is bookmarked; `--url/--status/--restart/--log`.
-- Unsigned worker: measured — it still boots and serves (`200`), but upstream
-  takes the OAuth callback only on a loopback origin, so `--login` forwards one
-  and `--sync-auth` imports a client credential; the launcher says which.
-- Evidence: token `303` → cookie `200` (37,512 B), `/deepseek/api/remote.mux`
-  upgrade `401` → **`101`**; `checks:host HOST=delphi MODE=eval` rc=0 (1,841).
-- A turn needs the **model** key too (sops → `EnvironmentFile`); harness tailnet-only,
-  delphi runs `systemone-decision` (24 MiB); minyx refreshed for a reflash, and the
-  builder / exit-node / staging / ingest / gateway ideas are `exp-115`..`exp-120`.
-
-### 2026-10-21 — Pi research is dumped, and there is no 2.0 to design against
-
-- Checked against npm and GitHub: 60 published versions, **no `2.x`**, newest tag and
-  `latest` are `v1.3.0` (2026-10-15). The "MCP coding mode" is `codemode`, which
-  ships in 1.x (QuickJS sandbox, `tools.*` including namespaced MCP tools, only the
-  script's output reaches the model).
-- [`docs/pi-harness.md`](docs/pi-harness.md) holds the source material — versions, codemode limits, config
-  surfaces (`models.json`, `PI_CODING_AGENT_DIR`), the eisen three-layer shape,
-  scenarios, and the open questions — so none of it needs re-fetching. Proposal:
-  `AGENTS.nix` `pi-eisen-ondemand`.
-
-### 2026-10-21 — fern's battery is healthy; btop cannot read a rate
-
-- `BAT0` is present and reports fine: `energy_full == energy_full_design == 35.199 Wh`
-  (**100 % health**, 0 % wear), 316 cycles, Li-ion, charging at 59 %.
-- `power_now` exists in sysfs but **reads ENODEV** (no `current_now` either), so the
-  firmware reports no rate and btop 1.4.7 hides the battery rather than draw one
-  without a rate. Not a kernel regression — a rollback changes nothing here.
-- `services.upower.enable` landed 2026-10-20 (`90f4bc7d`), but fern boots a
-  2026-10-05 generation, so the unit is `not-found` on the host today; upower
-  samples `energy_now` and is the missing health/rate source. A rebuild, not a
-  kernel change, is the fix.
-
-### 2026-10-21 — Strata MANUAL stops claiming 40–50 tok/s on this card
-
-- `hosts/eisen/MANUAL.md` §3/§5 carried 40–48 / 40–50 tok/s decode, which is Strata's
-  16 GB RX 9070 XT reference table, not a measurement here. Both now mark the speed
-  column as an upper bound and point at §7 (14.6–21.0 tok/s decode, 167 tok/s prefill).
-- `hosts/eisen/llm-server.nix`: two comments still named llama-swap as the upstream;
-  nginx :80 proxies Strata :8085. No behaviour change.
-
-### 2026-10-21 — Strata MoE (Qwen3.8-Flash-Next 125B) running on Eisen RX 5700
-
-- Deployed Niko1221/Strata MoE inference on Eisen's AMD Radeon RX 5700 (`gfx1010`) via
-  an isolated FHS wrapper (`strata-fhs`) and AMD TheRock ROCm 7.14 wheels on `/mnt/storage/strata`.
-- `strata.service` on `:8085`, Nginx trames it; SubZeroClaw verified end to end. Measured 167 tok/s
-  prefill, 14.6–21.0 tok/s decode, 87.5 % MTP acceptance — detail in `hosts/eisen/MANUAL.md`;
-  `AGENTS.nix` note `open-strata-eisen-rx5700` is `DELIVERED`.
-
-### 2026-10-21 — The 2026-10-20 ledger entries are archived
-
-- Seven entries (task graph compiled, gotcha essays, two gates sharper, secrets as a page, CI
-  without a matrix, the storage table, rules in code) moved verbatim to `docs/history/audit-2026-10.md`
-  at 159/150 lines. Content unchanged, only the home moved.
+### 2026-10-22 — the 2026-10-21 ledger entries are archived
+- Eight entries (frieren's two boot personas, delphi's seeder / Freebuff / antigravity, the dsh worker
+  service, Pi research, fern's battery, both Strata entries, and the previous archive note) moved to
+  `docs/history/audit-2026-10.md` § *Ledger: 2026-10-21 (continued)* at 165/150 lines. Content
+  unchanged but for one link re-based to its new depth (`docs/pi-harness.md` → `../pi-harness.md`), which
+  `checks:docs:links` caught.
 
 ## Open debt (`task ops:notes`)
 

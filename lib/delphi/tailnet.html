@@ -1,0 +1,37 @@
+<section id="mounts">
+  <h2><span>01</span> Services</h2>
+  <div class="filter">
+    <input id="svc-filter" type="search" placeholder="filter services &mdash; press / to focus" autocomplete="off" spellcheck="false" aria-label="Filter services">
+    <output id="svc-count" for="svc-filter">{{mountCount}} {{mountWord}}</output>
+  </div>
+  {{serviceList}}
+</section>
+
+<section id="wire">
+  <h2><span>02</span> The wire</h2>
+  <table class="ledger"><tbody>
+    <tr><th scope="row">Tailnet address</th><td><code>{{tailnetIp}}</code></td></tr>
+    <tr><th scope="row">Resolver</th><td><code>{{resolver}}</code> &mdash; the /32 every tailnet client is pointed at. A second host binds and advertises the same address, so the route moves in about fifteen seconds instead of taking DNS with it.</td></tr>
+    <tr><th scope="row">Registry</th><td><code>inventory.toml [hosts.delphi.network]</code> &mdash; the source of the address above, the public name and the node name.</td></tr>
+    <tr><th scope="row">Public surface</th><td><a href="{{publicUrl}}">{{publicUrl}}</a> &mdash; the dossier and <code>/healthz</code>. Nothing listed on this page is published there.</td></tr>
+  </tbody></table>
+</section>
+
+<section id="contract">
+  <h2><span>03</span> What this page promises</h2>
+  <p>
+    Every card above is declared in <code>services.servicePortal</code> &mdash; a
+    <code>tailscale serve</code> mount, or a daemon bound to the tailnet address
+    &mdash; and the page is compiled from that declaration: add one and its card
+    appears, remove it and the card goes.
+    The build fails instead of drifting when a mount has no card, two mounts share
+    a port, an upstream is not loopback, or a <code>requires</code> names a unit
+    that does not exist on this host.
+  </p>
+  <p>
+    It shows structure, not liveness. A card says where a service is, never that
+    it is up &mdash; those are different claims, and the monitors on the tailnet
+    are the ones allowed to make the second. Nothing here is sampled from a
+    running process, so nothing here can be stale in a way that looks live.
+  </p>
+</section>

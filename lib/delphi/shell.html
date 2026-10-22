@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-surface="{{surface}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta name="robots" content="{{robots}}">
+<meta name="color-scheme" content="light dark">
+{{canonicalTag}}
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2317150f'/%3E%3Ctext x='8' y='23' font-family='monospace' font-size='18' fill='%23f7f3ea'%3Ed%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="{{cssFile}}">
+<script src="{{jsFile}}" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <p class="eyebrow">{{eyebrow}}</p>
+  <h1 class="display">{{heading}}</h1>
+  <p class="deck">{{deck}}</p>
+  <p class="baseline">
+    <span class="stamp"><span class="dot dot-{{statusClass}}" aria-hidden="true"></span>{{statusText}}</span>
+    <span class="stamp-meta">{{stamp}}</span>
+    <button class="theme" id="juno-theme" type="button">auto</button>
+  </p>
+  {{specs}}
+</header>
+
+<main id="main">
+{{body}}
+</main>
+
+<footer class="colophon">
+  <p>{{colophon}}</p>
+  <p class="provenance">{{provenance}}</p>
+</footer>
+</body>
+</html>

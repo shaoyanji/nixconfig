@@ -369,15 +369,68 @@ terminates TLS, so there is no certificate to own per service.
 | 8443 | DeepSeek Harness | `tailscale-serve-dsh` | `127.0.0.1:3080` |
 | 8444 | System One decisions (`/v1/systemone`) | `tailscale-serve-systemone` | `127.0.0.1:8091` |
 | 8445 | Stirling PDF | `tailscale-serve-pdf` | `127.0.0.1:7351` |
-| 8446 | Service portal (the list below, as a page) | `tailscale-serve-portal` | `127.0.0.1:8082` |
+| 8446 | Service console (the compiled tailnet portal) | `tailscale-serve-portal` | `127.0.0.1:8082` |
 
-Both the mounts and the portal are compiled from `services.servicePortal` in
+Both the mounts and the console are compiled from `services.servicePortal` in
 `hosts/delphi/configuration.nix`: add a mount and its card appears, remove one and
 the card goes. Nothing on this page is hand-written — `data/services.json`
 carries the same list for a TUI or a probe, and the asserts in
 `modules/services/service-portal.nix` fail the build when a mount has no card, a
 card has no owner, two mounts share a port, an upstream is not loopback, or a
 `requires` names a unit that does not exist.
+
+## The two surfaces: a dossier and a console (`lib/delphi-site.nix`)
+
+Delphi serves two documents, and they are two projections of ONE evaluated
+structure — not two pages kept in step by hand:
+
+| Surface | Address | What it is |
+| :--- | :--- | :--- |
+| Dossier | `https://delphi.bountystash.com` | The portfolio page: the project, the machine, what runs here, the operating envelope, and the fleet it belongs to |
+| Console | `https://delphi.cloudforest-kardashev.ts.net:8446` · `http://delphi.cloudforest-kardashev.ts.net/` | The tailnet service list: every mount, its port, and the unit it waits on |
+
+Where the values come from — all of them evaluated at build time:
+
+| Fact | Source |
+| :--- | :--- |
+| role, hardware, notes, traits, constraints, declared services | `inventory.toml` via `lib/inventory.nix` |
+| device / status / kind / arch counts, skills, docs, edges | `lib/knowledge-graph.nix` + `lib/skills.nix` |
+| the cards, their ports, upstreams and `requires` | `config.services.servicePortal.cards` (the same declaration that generates the mount units) |
+| public name, tailnet name, tailnet address | `inventory.toml [hosts.delphi.network]` |
+| resolver address | `config.profiles.tailnetDnsAddress.address` |
+| NixOS release | `config.system.nixos.release` |
+
+Markup lives in files (`lib/delphi/{shell,public,tailnet}.html`, `juno.css`,
+`juno.js`), and `render` in the compiler throws on an unbound `{{hole}}`, so a
+renamed field fails the build instead of shipping braces. `data/delphi.json` is
+the compiled structure itself, for a TUI, a probe or an agent.
+
+Three rules the pages are built to keep:
+
+- **A tailnet address never appears on the public page.** The console prints
+  `host:port`; the dossier prints the *count* of tailnet services and their names,
+  with the addresses withheld.
+- **The pages never claim liveness.** They are structure, not telemetry: a card
+  says where a service is, never that it is up. No value is sampled, so nothing
+  can look live while being stale.
+- **The `tailnet name` at the root is source-restricted, not authenticated.**
+  nginx holds `0.0.0.0:443` for the public ACME vhost, so tailscaled cannot take
+  443 (measured 2026-10-21: `bind: address already in use`). The console's TLS
+  entry point is therefore the `:8446` mount, and the MagicDNS name also answers
+  on `:80` behind `allow 100.64.0.0/10; deny all;` — the client's tailnet address
+  is what admits it, so the name is inert from the internet even though the
+  listener is the same one the public vhost uses.
+
+Preview it without touching the host:
+
+```bash
+nix build .#delphi-site --print-out-paths      # both surfaces, empty card list
+nix build --print-out-paths \
+  .#nixosConfigurations.delphi.config.services.nginx.virtualHosts.delphi.root  # the served tree
+```
+
+The first carries the registry and the graph but no host config, so its console
+says it has no mount registry; the second is the artifact nginx actually serves.
 
 A port is the mount, not a path: `tailscale serve` proxies a whole origin, so a
 new service takes the next free number rather than a location under an existing

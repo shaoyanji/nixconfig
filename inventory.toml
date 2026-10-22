@@ -154,7 +154,7 @@ constraints = ["Preserved host; do not target for live deployment."]
 [hosts.delphi]
 hostname = "delphi"
 status = "active"
-status_detail = "Live since 2026-10-20 on OCI Ampere A1 (NixOS 26.11): HTTPS on delphi.bountystash.com (Let's Encrypt via HTTP-01, DNS-only A record, :80 redirects) plus /healthz reachable from the internet, crab-hole tailnet resolver on 10.99.0.53 (UDP/53, ads+telemetry NXDOMAIN), Hermes agent + gateway (own Telegram bot, polling), fleet monitors as an out-of-LAN vantage (gatus on tailnet :8181), Tailscale up as exit node. frieren now binds and advertises the same /32 too, so 10.99.0.53 is a failover pair rather than a single node; frieren's advertisement still needs its one-time route approval in the Tailscale admin console."
+status_detail = "Live since 2026-10-20 as the fleet's only internet-facing host: one Let's Encrypt TLS vhost on delphi.bountystash.com, a tailnet resolver address shared with frieren, and an out-of-LAN vantage for the fleet monitors. Everything else it runs is tailnet-only."
 kind = "nixos"
 is_nix = true
 arch = "aarch64-linux"
@@ -162,7 +162,7 @@ role = "Cloud Bastion, Tailscale Exit Node & ARM64 Build Offloader"
 category = "cloud"
 desktop_environment = "headless"
 users = ["devji"]
-notes = ["Oracle Cloud Always Free ARM64 (Ampere Altra Neoverse N1) headless server: 2 OCPU / 11 GiB / 200 GB (measured 2026-10-20; the earlier entry listed the 4 OCPU / 24 GB ceiling).", "Two cores is the whole build budget here: prefer build-on-remote or the binary cache, never a local compile."]
+notes = ["Always Free tenancy in eu-frankfurt-1. The public IP is ephemeral unless reserved, so pin it before pointing DNS or ACME at it.", "Two OCPU is the whole build budget: closures are built on a builder and substituted here, never compiled here.", "No IPv6 uplink on this instance, which is why the resolver's upstreams are IPv4 DoT."]
 
 [hosts.delphi.hardware]
 model = "Oracle Cloud Infrastructure (OCI) VM.Standard.A1.Flex"
@@ -173,14 +173,16 @@ storage_type = "Paravirtualized Boot Volume"
 storage_layout = "200 GB ext4/btrfs boot disk"
 
 [hosts.delphi.network]
+domain = "delphi.bountystash.com"
 tailscale = true
 tailscale_hostname = "delphi"
+tailscale_ip = "100.123.145.53"
 ssh_alias = "delphi"
 
 [hosts.delphi.software]
 module_chain = "globalModulesContainers"
 impermanence = false
-key_services = ["nginx landing page + /healthz on :80", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry, same lists as frieren)", "Tailscale exit node + 10.99.0.53/32 DNS failover route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "DeepSeek Harness Web UI at /deepseek/ (systemd dsh-web on loopback :3080, published by the TLS vhost)", "OCI serial console logging"]
+key_services = ["nginx :443 — Let's Encrypt TLS for the public dossier, /healthz, :80 redirect", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry NXDOMAIN, failover pair with frieren)", "Tailscale exit node, advertising the shared 10.99.0.53/32 route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "DeepSeek Harness, tailnet-only (:8443, dsh-web on loopback :3080)", "System One decision engine, tailnet-only (:8444, loopback :8091)", "Stirling PDF, tailnet-only (:8445, loopback :7351)", "Service console, tailnet-only (:8446, loopback :8082)", "Gatus fleet monitors — an out-of-LAN vantage", "OCI serial console logging"]
 traits = ["cloud-server", "aarch64-arm", "11gb-ram", "tailscale-exit-node", "oci-always-free"]
 
 [hosts.delphi.persona]

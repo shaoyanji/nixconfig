@@ -3947,7 +3947,8 @@
         **No Pi 2.0 exists.** npm publishes 60 versions and no `2.x`; newest tag and `latest` are
         `1.3.0` (2026-10-15). The "MCP coding mode" is `codemode`, which ships in 1.x: the model writes
         JS calling `tools.*` (MCP namespaced `tools.mcp__<server>__<tool>`) and only the script's output
-        reaches the model. Source material: `docs/pi-harness.md`.
+        reaches the model. Source material: [docs/pi-harness.md](docs/pi-harness.md) — the versions,
+        codemode limits and config surfaces, so none of it needs re-fetching.
 
         **Three knobs.** `<agent-dir>/models.json` takes any OpenAI-compatible endpoint (`baseUrl`,
         `api: "openai-completions"`, `apiKey`, `models[].id`); `PI_CODING_AGENT_DIR` relocates the agent
@@ -4078,8 +4079,9 @@
            feeds those entries to wmenu. For every binding, port what it opens, not only its keys.
         3. **Infrastructure was in the profile being dropped.** `tailscaled` and the NAS automount came
            from `desktop-client.nix`, so forking took the host off the tailnet and left the canonical
-           `~/Documents/nixconfig` dangling at `/Volumes/data/projects/nixconfig`. A fork must list what
-           it keeps: reachability and the canonical path are not rice.
+           `~/Documents/nixconfig` symlink dangling at its NAS target (the mapping is stated once, in
+           AGENTS.md § Home Initialization). A fork must list what it keeps: reachability and the
+           canonical path are not rice.
 
         Documentation rule that came with this: rationale goes here or in a policy, not into comment
         blocks in `.nix` files — `nix-header-budget` bounds headers, and the body-comment essays this run

@@ -27,6 +27,10 @@
       IdentityFile ~/.ssh/id_ed25519
       StrictHostKeyChecking accept-new
       ConnectTimeout 3
+      # OpenSSH 10 puts sntrup761x25519 first; that KEX takes about a minute
+      # in a TCG guest, so the handshake times out before the banner. Curve25519
+      # is instant and still the modern choice.
+      KexAlgorithms curve25519-sha256
   '';
 
   microvm.vms.sandbox = {

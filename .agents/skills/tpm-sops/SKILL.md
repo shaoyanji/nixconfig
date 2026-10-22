@@ -113,18 +113,43 @@ activation `PATH` is likewise built from this list.
 
 ## Prove it — do not infer it from a green switch
 
+**Decrypt the store copy.** The unit reads a `/nix/store/<hash>-secrets.yaml` named by
+its manifest; a `sops -d` against a working-tree copy proves that *some* identity can
+read *some* file, which is not the question and can be a different checkout entirely.
+
+The system plane's activation script names its manifest directly, so ask it:
+
 ```bash
-# system plane (root): the unit that failed before
-ssh <host> systemctl is-active sops-nix
-ssh <host> sudo ls -l /run/secrets/ | head
-# user plane
-ssh <host> systemctl --user is-active sops-nix ; systemctl status 'home-manager-*'
-ssh <host> 'SOPS_AGE_KEY_FILE=$HOME/.config/sops/age/tpm-identity.txt \
-            sops -d ~/Documents/nixconfig/modules/secrets.yaml > /dev/null && echo user-plane-OK'
-# the two things that were blocked
-ssh <host> 'getent shadow <user> | cut -d: -f2 | head -c 4'   # hashedPassword ($y$…)
-ssh <host> systemctl is-failed home-manager-<user> vdirsyncer
+ssh <host> 'sudo cat /nix/store/<hash>-sops-nix-user | grep -o "/nix/store/[a-z0-9]*-manifest[a-z-]*\.json"'
+# or, without knowing the script path:
+ssh <host> 'systemctl --user show sops-nix -p ExecStart --value'
 ```
+
+Then decrypt that path on both planes and require the **same digest**:
+
+```bash
+STORE=/nix/store/<hash>-secrets.yaml
+# user plane
+SOPS_AGE_KEY_FILE=$HOME/.config/sops/age/tpm-identity.txt sops -d "$STORE" | sha256sum
+# root plane, plugin-only PATH (what `sops.age.plugins` builds)
+sudo env SOPS_AGE_KEY_FILE=/home/<user>/.config/sops/age/tpm-identity.txt \
+  PATH=/nix/store/<hash>-age-plugin-tpm-<ver>/bin:$PATH sops -d "$STORE" | sha256sum
+# negative control: no identity must FAIL (128 "get the data key"), or something
+# else is decrypting and the chip is untested
+SOPS_AGE_KEY_FILE=/nonexistent sops -d "$STORE" >/dev/null; echo $?
+```
+
+A stale `~/.config/sops/age/keys.txt` is why the negative control is not optional: it
+survives a TPM migration, is not a recipient any more, and still makes a careless
+check look green. Compare its public half (`age-keygen -y`) against the recipient list
+and delete it if it is not one.
+
+```bash
+# the units and the material they were supposed to install
+ssh <host> 'systemctl --user show sops-nix -p Result -p ExecMainStatus'   # success / 0
+ssh <host> 'systemctl --user show sops-nix -p Environment'   # PATH must be the plugin
+ssh <host> 'sudo ls -l /run/secrets-for-users/'              # hashedPassword present
+ssh <host> 'systemctl is-failed home-manager-<user>'
 
 A clean `switch-to-configuration` is not the proof — the system can switch with a
 failing `sops-nix` and exit 4. The proof is the secret material existing and the
@@ -149,7 +174,13 @@ previously-failed units being active.
   `systemctl restart user@<uid>`). Verify with `id -nG` inside a new ssh session,
   and expect the first user-plane failure after the group change.
 - **`0400` owned by the user, not root.** Root reads it anyway; the user plane
-  cannot read a root-owned file.
+  cannot read a root-owned file. `sops-install-secrets` copies it to
+  `/run/secrets-for-users.d/*/age-keys.txt` for the user unit, which is why root can
+  unseal a file the user owns.
+- **Verify against the store path, not a checkout.** On scratch `~/Documents/nixconfig`
+  is a home-manager store symlink: `git rev-parse` there reports the generation's
+  commit and cannot be pulled, while the real clone sits at `~/nixconfig`. Both were
+  read in one run and produced two different answers to "what commit is deployed".
 - **The submodule `.sops.yaml`** — copy it first (`update-keys` does) or the rekey
   targets the old recipient set and only the new host notices, later.
 - **`modules/secrets.yaml` is a mirror.** Rekey inside `modules/secrets/`, then

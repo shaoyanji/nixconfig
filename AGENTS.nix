@@ -4001,10 +4001,21 @@
            dies on `0 successful groups required, got 0`. `home.packages` does not reach the unit.
         3. **`tss` is per session.** The deploy that adds the user to the group does not change the
            running `systemd --user` manager, so the first user-plane start still fails until a reboot.
+        4. **Verify the store copy, not a checkout.** The unit executes
+           `sops-install-secrets … <manifest>.json`, which names `/nix/store/<hash>-secrets.yaml`; that
+           path is what activation reads. Decrypting a working-tree copy proves the wrong thing on a host
+           where `~/Documents/nixconfig` is a home-manager store symlink (`git rev-parse` there answers
+           about the active generation, and it cannot be pulled — scratch's real clone was `~/nixconfig`,
+           2768 commits behind). Pair the decrypt with a `SOPS_AGE_KEY_FILE=/nonexistent` control that
+           must fail, or a stale `keys.txt` passes the test the chip was supposed to pass.
 
-        Verified on scratch 2026-10-22: `hashedPassword` installed, user unit `Result=success`, CA key
-        present, `switch-to-configuration` exit 0. Upstream's `p256tag unsupported` report is stale for
-        sops 3.13.3 / age 1.3.2: encrypt, `updatekeys` and decrypt all accept `age1tag1…`.
+        Verified on scratch 2026-10-22: `hashedPassword` installed, user unit `Result=success` with
+        `Environment=PATH=<age-plugin-tpm>`, CA key present, `switch-to-configuration` exit 0. After a
+        genuine pull (`0dfff23c`, submodule `7a35ad4` matching frieren byte-for-byte) the store file
+        decrypts on both planes to the same digest as the checkout and the mirror (sha256 `5042298e…`
+        encrypted, `436f477d…` plaintext), with the no-identity control at exit 128. Upstream's `p256tag
+        unsupported` report is stale for sops 3.13.3 / age 1.3.2: encrypt, `updatekeys` and decrypt all
+        accept `age1tag1…`.
       '';
     };
   };

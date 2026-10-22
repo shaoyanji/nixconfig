@@ -33,9 +33,14 @@
   SSH-derived recipient at all. `hashedPassword`, the user `sops-nix` unit and
   `vdirsyncer` now succeed; `switch-to-configuration` exits 0 where it used to exit 4.
 - `modules/sops.nix` gained `age.plugins` for `tpmHosts`. Without it sops-nix sets the
-  user unit's `Environment=PATH=` to an empty value and the unseal fails as
-  `0 successful groups required, got 0` — indistinguishable from a missing recipient.
-  frieren and fern carry the same latent fault until their next switch.
+  user unit's `Environment=PATH=` to an empty value, the plugin cannot be started and
+  the unseal fails as `0 successful groups required, got 0` — indistinguishable from a
+  missing recipient. Measured on frieren: TPM identity only, empty PATH → exit 128;
+  same identity with the plugin on PATH → exit 0.
+- frieren and fern still show `Environment=PATH=` on that unit, and stay green only
+  because a real software `keys.txt` is still a recipient there, so sops falls back to
+  it. The chip is not being used by their user plane; a working `sops -d` proves nothing
+  until that fallback is gone.
 - Procedure and traps written down in one place: `.agents/skills/tpm-sops/SKILL.md`,
   with the contract in `docs/sops-rekey.md` and the note `tpm-sops-planes`.
 - Audio on scratch was firmware, not config: enabling the onboard controller in the BIOS

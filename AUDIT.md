@@ -18,7 +18,7 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 | Known red gates | `minyx` (kernel conflict), `cassini` (xdg.desktopEntries on darwin) — both dormant | `task checks:host HOST=minyx MODE=eval` |
 | Formatting | alejandra, 231 tracked `.nix` files clean | `task checks:nix:format` |
 | Lint | deadnix hard gate, statix advisory | `task checks:nix:lint` |
-| Secrets | 7 SOPS files, zero drift (36 recipients per rule) | `task checks:sops:drift` |
+| Secrets | 7 SOPS files, zero drift (37 recipients per rule) | `task checks:sops:drift` |
 | Skills | 50, compiled + schema-gated | `nix eval .#agentSkills.count`, `task ops:skills:check` |
 | Observation | frieren sentinel: 15-min ledger, health endpoint, gatus body assertion | `task ops:health`, `/var/lib/fleet-sentinel/` |
 | Knowledge | qmd (`.md` + `.nix`) + `.#knowledgeGraph` (structure) + sentinel ledger (episodic) | `task ops:kg`, `task ops:ledger` |
@@ -28,6 +28,12 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — netbook's sops identity is its TPM, not an SSH key
+- `&tpmnetbook` (`age1tag1q…`) generated on the host as `alice` via `sg tss`, registered in `.sops.yaml`,
+  all 6 files rekeyed additively. Proven there against the rekeyed file (`436f477d…` == frieren's digest;
+  no-identity control 128). Capability: `security.tpm2`, `alice` in `tss`, `age-plugin-tpm`, gen
+  `2gl0wd10…`. No sops-nix plane yet, so it is used by hand; the rule now has 37 recipients.
+
 ### 2026-10-22 — netbook on the fleet nixpkgs; the boot pin is the initrd, not nixpkgs
 - `hosts/netbook/configuration.nix`: fleet nixpkgs kernel (`pkgs.linuxPackages`, 6.18.56) plus
   `boot.initrd.systemd.enable = false` and `boot.consoleLogLevel = 7`. Running gen 51 `jfw8ir…`, 0 failed
@@ -126,11 +132,8 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 
 ### 2026-10-22 — the 2026-10-21 ledger entries are archived
-- Eight entries (frieren's two boot personas, delphi's seeder / Freebuff / antigravity, the dsh worker
-  service, Pi research, fern's battery, both Strata entries, and the previous archive note) moved to
-  `docs/history/audit-2026-10.md` § *Ledger: 2026-10-21 (continued)* at 165/150 lines. Content
-  unchanged but for one link re-based to its new depth (`docs/pi-harness.md` → `../pi-harness.md`), which
-  `checks:docs:links` caught.
+- Eight entries moved to `docs/history/audit-2026-10.md` § *Ledger: 2026-10-21 (continued)*; one link
+  re-based to its new depth, which `checks:docs:links` caught.
 
 ## Open debt (`task ops:notes`)
 

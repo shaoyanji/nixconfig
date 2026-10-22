@@ -33,6 +33,11 @@ in {
     ./hardware-configuration.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/boot.nix
+    # `~/Documents/nixconfig` is the canonical repo path and it resolves through
+    # /Volumes/data (NAS). desktop-client used to carry this import; without it
+    # the canonical path dangles, which is worse than any of the desktop weight
+    # it replaced.
+    ../../modules/profiles/nas-client.nix
   ];
 
   # --- Home Manager: minimal user role, not the fleet desktop ---

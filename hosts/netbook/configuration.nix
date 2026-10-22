@@ -55,7 +55,10 @@ in {
     "vm.dirty_ratio" = 10;
     "vm.dirty_background_ratio" = 5;
   };
-  boot.consoleLogLevel = 3;
+  # Verbose on purpose: this machine has no serial port, and at the old level 3
+  # a failing boot was indistinguishable from a frozen screen — generation 50
+  # died with nothing on the console to read.
+  boot.consoleLogLevel = 7;
   nix.optimise.automatic = true;
   # nix.optimise.interval = "weekly";
   nix.gc = {
@@ -91,11 +94,15 @@ in {
     trusted-substituters = ["http://192.168.3.25:5000"];
   };
   services.journald.settings.Journal = {SystemMaxUse = "50M";};
-  # LTS, not latest: the newest kernel's initrd produced by this nixpkgs could not
-  # mount the f2fs root on this eMMC (the failure that pinned the whole host to
-  # 25.11). Tracking the fleet's nixpkgs is safe as long as the kernel does not
-  # chase `linuxPackages_latest` with it.
+  # LTS, not latest: the newest kernel (`linuxPackages_latest`) could not mount
+  # the f2fs root on this eMMC — the failure that pinned the whole host to 25.11.
   boot.kernelPackages = pkgs.linuxPackages;
+  # NixOS 26.11 defaults `boot.initrd.systemd.enable` to TRUE, so following the
+  # fleet nixpkgs silently swapped the scripted busybox stage-1 this box has
+  # booted for a year for systemd-initrd. Generation 50 (systemd-initrd +
+  # 6.18.56) produced no journal entry at all: it never reached stage-2. The
+  # scripted stage-1 is the variant generation 49 proves on this hardware.
+  boot.initrd.systemd.enable = false;
 
   zramSwap = {
     priority = 100;

@@ -1,15 +1,71 @@
-# netbook — pinned boot chain, push deploy
+# netbook — fleet nixpkgs, pinned stage-1, push deploy
 
-Alice's travel netbook (N3060, 1.8 GiB, eMMC). It is a flake host, but the only
-one whose boot chain is fixed: **newer kernels produced an initrd this box could
-not mount root from**, so the machine builds from `inputs.nixpkgs_25_11` in
-`flake.nix`, pinned to the exact revision it boots (25.11.12484.b6018f87da91).
-Same revision ⇒ the kernel and initrd derivations are the same store paths the
-host already runs, which is what makes a flake deploy safe here.
+Alice's travel netbook (N3060, 1.8 GiB, eMMC). It carries no global module
+chain: its own configuration is the whole system, plus `inventoryModules`. It is
+the only host whose closure is **pushed** rather than pulled — see
+[Build ladder](#build-ladder-this-is-the-whole-topology).
 
-Moving the host forward means changing that input and **boot-testing it**, not
-editing `hosts/netbook/configuration.nix`. The host carries no global module
-chain: its own configuration is the whole system, plus `inventoryModules`.
+## What is pinned, and what is not
+
+The kernel is **not** pinned. `boot.kernelPackages = pkgs.linuxPackages` follows
+whatever the fleet's nixpkgs ships (6.18.56 on 2026-10-22), and the host follows
+the fleet nixpkgs like every other host.
+
+What is pinned is the **initrd implementation**:
+
+```nix
+boot.initrd.systemd.enable = false; # scripted stage-1, not systemd-initrd
+```
+
+NixOS 26.11 defaults that option to `true`. Commit `e673777e` (2026-10-22)
+dropped the old `inputs.nixpkgs_25_11` pin in favour of the fleet nixpkgs (the
+input and its `flake.lock` node were pruned the same day, once nothing
+referenced them), which silently changed **two** things at once — kernel 7.1.2 → 6.18.56 *and* scripted
+stage-1 → systemd-initrd. Only the second one was fatal:
+
+| | generation 50 (failed) | generation 51 (boots) |
+| --- | --- | --- |
+| nixpkgs | fleet 26.11 | fleet 26.11 |
+| kernel | 6.18.56 | 6.18.56 |
+| stage 1 | systemd-initrd | scripted |
+| loader marker | `root=fstab` | — |
+| initrd | 44.5 MB, `lib/systemd` inside | 27.1 MB, `/init` + modules |
+| outcome | no stage-2: **no journal entry for the boot**, blank console | booted, 0 failed units |
+
+The boot-critical modules were present in *both* initrds (`f2fs`, `mmc_block`,
+`mmc_core`, `sdhci-acpi`, `sdhci`, `rtsx_pci_sdmmc`), and the ESP copies were
+byte-identical to their store paths — so "missing initrd" was never the failure.
+The eMMC root mounts fine under 6.18.56 with the scripted stage-1.
+
+Nothing here proves `linuxPackages_latest`; the comment that blamed "newer
+kernels" predates this measurement. If nixpkgs ever drops the LTS line, that is
+the next thing to boot-test — with the same staged procedure, not by deploying
+straight across.
+
+## Diagnosing a boot that never reaches stage 2
+
+A failed boot leaves **no journal entry**: stage 1 died before journald started.
+Instruments, all runnable from frieren:
+
+```bash
+# authoritative: what does the flake say this host's initrd should be?
+nix eval .#nixosConfigurations.netbook.config.boot.initrd.systemd.enable
+# an installed system: systemd-initrd is the variant that passes root=fstab
+grep -h '^options' /boot/loader/entries/*.conf
+# did the machine ever reach stage 2? absent boot id = it did not
+ssh root@192.168.3.36 journalctl --list-boots
+```
+
+Reading the archive itself needs one fact about its layout: an initrd is
+`[microcode cpio][TRAILER][padding to 512][zstd cpio]`, so `cpio -it` on the raw
+file stops after the microcode entry and a plain `grep` sees nothing. Find the
+zstd magic (`28 b5 2f fd`) after the first `TRAILER!!!` and start there — that
+is how the 604-entry scripted initrd and the 2078-entry systemd one were
+compared.
+
+`boot.consoleLogLevel = 7` is set on purpose. This machine has no serial port,
+and at the previous level 3 a hang was indistinguishable from a frozen screen —
+generation 50 died with nothing on the console to read.
 
 ## Deploy
 
@@ -24,6 +80,31 @@ activates the **built** system with `nix-env -p /nix/var/nix/profiles/system
 --set` + `switch-to-configuration`. No flake evaluation and no compiler on the
 netbook — the Celeron never evaluates and never builds.
 
+### Staging a boot-chain change (the practiced path)
+
+A deploy that changes the kernel or initrd store paths is refused by the guard
+on purpose. The way across is deliberate and staged, never one shot:
+
+```bash
+# 1. write entries + profile, activate nothing (guarded by ALLOW_KERNEL_CHANGE)
+ON_BUILDER=1 REMOTE="$PWD" TARGET=root@192.168.3.36 STAGE=boot \
+  ALLOW_KERNEL_CHANGE=1 bash scripts/task/deploy-netbook.sh
+# 2. keep the proven generation default until the new entry has booted:
+#    read the entries, then point `default` at the proven one
+ssh root@192.168.3.36 'grep -H "^version" /boot/loader/entries/*.conf'
+ssh root@192.168.3.36 "sed -i 's|^default .*|default <proven-entry>.conf|' /boot/loader/loader.conf"
+# 3. boot the new entry; once it reaches stage 2 it IS the running generation —
+#    confirm with ACTION=verify (deployed == running) and leave the default there
+ON_BUILDER=1 REMOTE="$PWD" TARGET=root@192.168.3.36 ACTION=verify \
+  bash scripts/task/deploy-netbook.sh
+```
+
+Staging with `STAGE=boot` makes the new generation the loader default, because
+`switch-to-configuration boot` installs entries for the *current profile*. That
+is why step 2 exists: until the entry is proven, the default must stay on the
+generation that boots. Give the test entry a distinguishable `title` while it is
+under test, and delete the copy afterwards.
+
 ### Build ladder (this is the whole topology)
 
 Frieren evaluates and holds the result; nixbuild.net supplies anything missing;
@@ -31,14 +112,13 @@ the netbook only receives. `BUILD` picks how the closure is obtained:
 
 | `BUILD` | Flags on frieren | When |
 | --- | --- | --- |
-| `auto` (default) | `--max-jobs 0 --builders ""`, then `--max-jobs 0` on failure | pins are substitutable, unknown gaps still get built |
+| `auto` (default) | `--max-jobs 0 --builders ""`, then `--max-jobs 0` on failure | the fleet nixpkgs closure is normally already in the caches, unknown gaps still get built |
 | `local` | `--builders ""` | fall back to compiling on frieren |
 | `remote` (`REMOTE_ONLY=1`) | `--max-jobs 0` | every gap on nixbuild.net, nothing local |
 
-`auto` is the default because the first attempt costs nothing: the pinned 25.11
-release is already in the caches, so a deploy that changes nothing still
-completes in seconds without touching the 25 h/month nixbuild budget, and a
-deploy that does need work escalates instead of failing.
+`auto` is the default because the first attempt costs nothing: a substituted
+closure completes in seconds without touching the 25 h/month nixbuild budget, and
+a deploy that does need work escalates instead of failing.
 
 **Nothing on the netbook pulls, and that is not a bug to fix.** Its paths predate
 any LAN cache: the closure is 6.6 GB of things it fetched from `cache.nixos.org`
@@ -50,9 +130,10 @@ host to fetch. `ACTION=preflight` prints the answer for the running system, so
 this stays a measurement instead of an assumption.
 
 Measured 2026-10-22: `BUILD=remote` 2m28s; `BUILD=auto` on an unchanged tree
-seconds (pure substitution); toplevel
-`…-nixos-system-netbook-25.11.20260630.b6018f8`, closure 6.6 GB — only the paths
-the host lacks travel, not the closure.
+seconds (pure substitution); only the paths the host lacks travel, not the
+closure. Staging generation 51 — the scripted initrd added to an otherwise cached
+fleet closure — reported "substituting … (no compile)": it escalated to neither
+nixbuild.net nor a local build, and copied only the paths the host lacked.
 
 ## The two guards (both before anything is copied)
 
@@ -65,16 +146,18 @@ the host lacks travel, not the closure.
 
 Both guards compare `/nix/store/<name>` — the kernel and initrd *output* paths —
 not the image files. The built system exposes `kernel`/`initrd` as symlinks into
-`…-linux-7.1.2/bzImage`, while the target reports the same symlink resolved, so
+`…-linux-6.18.56/bzImage`, while the target reports the same symlink resolved, so
 the first version compared an output path against a file and refused two deploys
 on an identical boot chain before either side was normalized.
 
-The boot-chain guard is the anti-brick check. The drift guard covers the other
-direction: `/etc/nixos` stays on the machine as a fallback, so a local
-`nixos-rebuild` from an edited copy would deploy something the flake cannot see.
-After activating, the deploy records `system=` and `config-sha256=` in
-`/etc/nixos/.flake-managed` (plus a `FLAKE-IS-TRUTH` note), and `ACTION=verify`
-reports when the running system or that file no longer matches.
+The boot-chain guard is the anti-brick check, and it is what catches an
+accidental kernel move: with the fleet nixpkgs the default kernel changes without
+anyone editing `hosts/netbook/`. The drift guard covers the other direction:
+`/etc/nixos` stays on the machine as a fallback, so a local `nixos-rebuild` from
+an edited copy would deploy something the flake cannot see. After activating, the
+deploy records `system=` and `config-sha256=` in `/etc/nixos/.flake-managed`
+(plus a `FLAKE-IS-TRUTH` note), and `ACTION=verify` reports when the running
+system or that file no longer matches.
 
 `ACTION=preflight` (or `verify`) is read-only: reachability, what the host is
 running, drift against the recorded manifest, failed units, disk, and whether
@@ -87,22 +170,17 @@ online.
 asks systemd to restart units. When the system bus cannot reach pid1 the deploy
 prints `Failed to subscribe to systemd dbus messages` and stops halfway: the new
 system is *current* and the units that changed kept running the old one. Measured
-here 2026-10-22 — the switch looked successful (`/run/current-system` moved,
-`generation 49` current) while `dbus-daemon` rejected every message from uid 0 to
+here 2026-10-22 — the switch looked successful (`/run/current-system` moved)
+while `dbus-daemon` rejected every message from uid 0 to
 `org.freedesktop.systemd1` and `org.freedesktop.login1`, so logind could not
-create sessions and nothing restarted. The policy sets in `/etc/dbus-1` were
-byte-identical before and after, so this is not a config difference: whatever put
-the daemon in that state, `systemctl restart dbus.service` restored
-`Subscribe`/`ListUnits`, and the reboot into the new generation came up clean —
-verified after it: `current = booted = profile` at
-`…-nixos-system-netbook-25.11.20260630.b6018f8`, kernel and initrd the same store
-paths it had before the deploy, 0 failed units, 53 % disk, and `Peer.Ping` to
-pid1 answering again.
+create sessions and nothing restarted. The policy sets in `/etc/dbus-1` were byte-identical before and after,
+so this is not a config difference: `systemctl restart dbus.service` restored
+`Subscribe`/`ListUnits`, and the reboot into the new generation came up clean.
 
-So the deploy now verifies instead of assuming (exit 5 = bus dead after the
-switch, exit 6 = switch exited non-zero with a live bus). If exit 5 happens:
-restart the bus, re-run the switch — and expect a live desktop session to be
-gone, because restarting the bus kills it; a reboot is the clean recovery.
+So the deploy verifies instead of assuming (exit 5 = bus dead after the switch,
+exit 6 = switch exited non-zero with a live bus). If exit 5 happens: restart the
+bus, re-run the switch — and expect a live desktop session to be gone, because
+restarting the bus kills it; a reboot is the clean recovery.
 
 ## Launching an activation over ssh
 
@@ -116,8 +194,8 @@ Who reaches the netbook's tailnet address depends on the source, which is why
 "use the tailnet" is not a blanket answer: from **frieren** (tagged) it is
 intercepted by Tailscale SSH and hangs on a browser check, while from **delphi**
 (an untagged member) the same `root@100.72.110.107` reaches the real sshd and the
-deploy key works — that path is how the 2026-10-22 verification was read. The
-script runs on frieren, so its unattended target stays the LAN address.
+deploy key works. The script runs on frieren, so its unattended target stays the
+LAN address.
 
 ## Preconditions
 
@@ -134,13 +212,12 @@ script runs on frieren, so its unattended target stays the LAN address.
 
 ## Boot menu
 
-A switch writes an entry per live generation, but entries for generations whose
-kernel and initrd were pruned from `/boot/EFI/nixos` survive it. On 2026-10-22
-that meant **15 of 22 entries pointed at files that no longer existed**
-(generations 13–26 and 29, from the 26.05 Yarara and 26.11 Zokor experiments) —
-paths that look like boot options and hang instead. They were deleted after the
-first flake deploy; the seven that remain (27, 28, 45–49) all resolve, and
-`default` is the running generation.
+Entries for generations whose kernel and initrd were pruned from
+`/boot/EFI/nixos` survive a switch and hang when selected. On 2026-10-22 **15 of
+22 entries pointed at files that no longer existed** (generations 13–26 and 29);
+they were deleted, and generation 50 — the systemd-initrd failure — was deleted
+once generation 51 replaced it. Live entries are 45–49 plus 51, and `default` is
+the running generation.
 
 Re-check whenever the menu is suspected:
 
@@ -153,8 +230,16 @@ done
 ```
 
 Deleting a dead `.conf` is safe and needs no rebuild — it points at nothing.
+`bootctl set-default`/`set-timeout` do not write `/boot/loader/loader.conf` on
+this box (verified 2026-10-22); edit that file directly.
 
 ## Rollback
 
 `task infra:rollback:host:netbook` — `nix-env --rollback` on the system profile,
 then that generation's `switch-to-configuration switch`. No rebuild, no eval.
+
+Known defect: when the profile is *ahead* of the running system (the staged case
+above), the script performs the rollback and then exits 1 with "no previous
+generation to roll back to", because it compares the new profile target against
+`/run/current-system`. The rollback itself succeeded — verify with
+`readlink -f /nix/var/nix/profiles/system` before trusting the exit code.

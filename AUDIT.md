@@ -25,6 +25,22 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — netbook on the fleet nixpkgs; the boot pin is the initrd, not nixpkgs
+- `hosts/netbook/configuration.nix`: fleet nixpkgs kernel (`pkgs.linuxPackages`, 6.18.56) plus
+  `boot.initrd.systemd.enable = false` and `boot.consoleLogLevel = 7`. Running gen 51 `jfw8ir…`, 0 failed
+  units, niri session up; loader default moved to it and the broken gen 50 entry deleted.
+- Cause of the gen-50 no-boot: NixOS 26.11 defaults `boot.initrd.systemd.enable` to `true`, so dropping
+  `inputs.nixpkgs_25_11` changed the kernel *and* stage 1 at once. gen 50 (systemd-initrd) reached no
+  stage-2 — **no journal entry for that boot**, blank console at `loglevel=3` — while the same 6.18.56
+  kernel boots under the scripted stage-1. Both initrds carried `f2fs`/`mmc_block`/`sdhci-acpi` and matched
+  their store paths, so no initrd was ever missing: the kernel was not the fault.
+- `nixpkgs_25_11` pruned from `flake.nix` and `flake.lock` — nothing references it now. The lock diff is
+  that node and its root entry only; no other input moved. `nix eval .#agentSkills.count` (50) and
+  `.#inventory.hosts.netbook.role` both evaluate after the prune.
+- Registry and runbook rewritten to match (`inventory.toml` role/notes/traits, `docs/inventory-schema.md`,
+  `.agents/fleet-matrix.md`, `.agents/deploy/hosts/netbook.md`). Gates: `checks:host HOST=netbook` rc=0
+  (1521 assertions), `ACTION=verify` rc=0.
+
 ### 2026-10-22 — netbook deploy: build ladder on frieren, and a half-activation is now detectable
 - The deploy's build step became a ladder instead of one flag: `BUILD=auto` (default) substitutes on
   frieren with `--max-jobs 0 --builders ""` and only escalates to nixbuild.net when a path is missing;

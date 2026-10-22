@@ -57,10 +57,10 @@ so the compiled record is uniform even when the source omits a section.
 
 `flake = true` (default) means "this flake produces this host". It is implied
 `false` for `kind = "external"`. Set it `false` explicitly for a real host that
-is deliberately outside the flake. `netbook` used to be that host; it is now
-`true`, built from `inputs.nixpkgs_25_11` — the 25.11 revision it boots — so it
-has a flake output without moving its boot chain. That is the compiled
-replacement for the prose note that used to explain the same thing.
+is deliberately outside the flake. Which nixpkgs a host builds from, and which
+boot-chain constraint it pins, is not schema: it belongs in that host's module
+and in its `notes`/runbook (`netbook` is the worked example —
+`.agents/deploy/hosts/netbook.md`).
 
 ### `notes` — where host commentary goes
 

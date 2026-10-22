@@ -25,9 +25,7 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
-### 2026-10-22 — the portable library gets an admission rule, not a bigger disk
-- Audited the four store dirs: 178 files, 9.5 GiB, 71 static, glibc floor 2.39, 11 MiB exact
-  duplicates, 90 MiB eget re-fetch residue (`*.1`).
+### 2026-10-22 — the portable library gets an admission rule, not a bigger disk- Audited the four store dirs: 178 files, 9.5 GiB, 83 static, glibc floor 2.39, 11 MiB exact duplicates, 92 MiB eget re-fetch residue (`*.1`).
 - `data:library`, `:index`, `:fetch` replace ad-hoc eget use: a dynamic download is rejected to
   `.rejected/`, provenance goes to `.library.tsv`; asserts
   [[flake/policies.nix#library-fetch-is-static]] + [[flake/policies.nix#library-crosses-the-wire]],

@@ -26,7 +26,9 @@
       User root
       IdentityFile ~/.ssh/id_ed25519
       StrictHostKeyChecking accept-new
-      ConnectTimeout 3
+      # 3 s was tight enough to fail the banner exchange on a TCG guest whose
+      # vCPUs are busy finishing boot; 30 s still fails fast on a dead guest.
+      ConnectTimeout 30
       # OpenSSH 10 puts sntrup761x25519 first; that KEX takes about a minute
       # in a TCG guest, so the handshake times out before the banner. Curve25519
       # is instant and still the modern choice.

@@ -3,7 +3,6 @@
 # boot test: `.agents/deploy/hosts/netbook.md`.
 {
   config,
-  lib,
   pkgs,
   ...
 }: let
@@ -32,35 +31,11 @@ in {
   boot.supportedFilesystems = ["f2fs" "nfs"];
   hardware.enableRedistributableFirmware = true;
   boot.loader.systemd-boot.configurationLimit = 10;
-  # Measured 2026-10-22: the loader stage took 13.1 s of a 47.3 s boot, of which
-  # 5 s was this countdown. The menu holds ONE entry, so nobody is choosing —
-  # but it holds two while the trimmed initrd (below) is unproven, and this is
-  # the only window in which the previous generation can be picked. 10 s until
-  # the new initrd has booted once, then 1 s.
-  boot.loader.timeout = 10;
-
-  # f2fs mounts with `discard` on by default in this kernel, which issues a
-  # synchronous TRIM per delete on a device that measures ~67 IOPS at 4 KiB.
-  # fstrim.timer (enabled below) covers the same ground once a week, in bulk.
-  fileSystems."/".options = ["nodiscard"];
-
-  # eMMC has no seek cost, so the block-layer scheduler only adds latency. The
-  # kernel recommends none for devices with their own queueing; measured
-  # 4 KiB direct writes here cost 15 ms each, so nothing else is vying for it.
-  services.udev.extraRules = ''
-    ACTION=="add|change", KERNEL=="mmcblk*", ATTR{queue/scheduler}="none"
-  '';
   boot.tmp.cleanOnBoot = true;
   services.fstrim.enable = true;
   services.tailscale.enable = true;
 
   boot.kernelParams = [
-    # Experiment, 2026-10-22: the kernel applies PTI here although Braswell is
-    # generally listed as not Meltdown-affected — it cannot confirm it, there is
-    # no RDCL_NO bit on this part. Benchmark before the change: 3000 fork+exec
-    # took 22.7 s (7.6 ms each). Re-run after a boot with this set; if the delta
-    # is not real, delete this line rather than keep a security cost for noise.
-    "pti=off"
     # "fsck.mode=skip"
     # "nomodeset"
     # "console=tty1"
@@ -68,10 +43,6 @@ in {
   ];
   boot.kernel.sysctl = {
     "vm.swappiness" = 100;
-    # zram is the swap device that actually gets used (1.8 GiB, 3.76:1 measured),
-    # and decompressing 8 pages to satisfy a 1-page fault is wasted CPU on a
-    # 2-core Celeron. 0 = one page per read.
-    "vm.page-cluster" = 0;
     "vm.vfs_cache_pressure" = 150;
     "vm.dirty_ratio" = 10;
     "vm.dirty_background_ratio" = 5;
@@ -93,12 +64,7 @@ in {
     options = "--delete-older-than 30d";
   };
   nix.settings = {
-    # This host only receives closures (`nix copy` from frieren); it never builds
-    # or imports by hand. auto-optimise hashes every path written, i.e. it taxes
-    # each deploy on the slowest device in the fleet. The weekly nix.optimise
-    # timer below still dedupes, and 15 GiB free makes that a disk question, not
-    # an emergency.
-    auto-optimise-store = lib.mkForce false;
+    auto-optimise-store = true;
     # Flakes on, because this host is now a fleet host rather than a channel
     # island: deploys resolve `.#nixosConfigurations.netbook`.
     experimental-features = ["nix-command" "flakes"];
@@ -129,24 +95,6 @@ in {
   # 6.18.56) produced no journal entry at all: it never reached stage-2. The
   # scripted stage-1 is the variant generation 49 proves on this hardware.
   boot.initrd.systemd.enable = false;
-  # The probe wrote the whole superset (SATA, NVMe, vendor HID) into
-  # `availableKernelModules` on an eMMC-only box, and the default module set was
-  # added on top. The loader reads this image off vfat at ~4.8 MiB/s, so every
-  # byte here is boot time: 25.8 MiB measured before this change. Keep the eMMC
-  # path, the filesystem, and enough input/USB to reach a rescue shell.
-  boot.initrd.includeDefaultModules = lib.mkForce false;
-  boot.initrd.availableKernelModules = lib.mkForce [
-    "sdhci_acpi"
-    "mmc_block"
-    "sd_mod"
-    "usb_storage"
-    "xhci_pci"
-    "usbhid"
-    "hid_generic"
-    "i8042"
-    "atkbd"
-    "rtsx_pci_sdmmc"
-  ];
 
   zramSwap = {
     priority = 100;
@@ -231,21 +179,6 @@ in {
   # programs.firefox.enable = true;
 
   programs.niri.enable = true;
-  # niri's module ships `default = "gnome;gtk"` and pulls
-  # xdg-desktop-portal-gnome, so a 20 MiB GTK4/GNOME stack stays resident for
-  # interfaces this compositor cannot serve (the GNOME portal's ScreenCast
-  # needs mutter). GTK implements the file chooser, Access and Notification
-  # these machines actually use; Secret stays on gnome-keyring (enabled below).
-  xdg.portal.config.niri = lib.mkForce {
-    default = "gtk";
-    "org.freedesktop.impl.portal.Access" = "gtk";
-    "org.freedesktop.impl.portal.Notification" = "gtk";
-    "org.freedesktop.impl.portal.Secret" = "gnome-keyring";
-  };
-  xdg.portal.extraPortals = lib.mkForce [
-    pkgs.gnome-keyring
-    pkgs.xdg-desktop-portal-gtk
-  ];
 
   services.greetd = {
     enable = true;

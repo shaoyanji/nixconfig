@@ -5,10 +5,13 @@
 
 ## Fleet Status Breakdown
 
-- **Active Production Nix Hosts (11)**: `frieren`, `poseidon`, `eisen`, `stark`, `fern`, `scratch`, `netbook`, `guckloch`, `kellerbench`, `kali`, `moto`
-- **Active External Non-Nix Hosts (3)**: `serv00`, `dragoncourt`, `envs`
-- **Work-in-Progress Hosts (1)**: `delphi` (OCI A1 bastion - NOT yet live)
-- **Preserved Architecture Patterns (16)**: `aceofspades`, `alarm`, `ancientace`, `applevalley`, `ares`, `aristotle`, `cassini`, `deckstation`, `demo`, `garnixMachine`, `minyx`, `mtfuji`, `penguin`, `schneeeule`, `sledgehammer`, `testvm`
+- **Active Nix-Managed Hosts (12)**: `frieren`, `poseidon`, `eisen`, `stark`, `fern`, `scratch`, `netbook`, `guckloch`, `kellerbench`, `kali` (home-manager), `aristotle`, `delphi`
+- **Active External Hosts (6)**: `serv00`, `dragoncourt`, `envs`, `bitlockerpremium`, `burgernas`, `moto` (aarch64 Android/Termux)
+- **Preserved Architecture Patterns (16)**: `aceofspades`, `alarm`, `ancientace`, `applevalley`, `ares`, `cassini`, `deckstation`, `demo`, `frieren-canary`, `garnixMachine`, `minyx`, `mtfuji`, `penguin`, `schneeeule`, `sledgehammer`, `testvm`
+
+Membership is derived, not copied: `nix eval --json .#inventory.hosts` and group by
+`status`/`kind` (`kali` is `kind = "home"`, a Nix-managed host; `moto` is
+`kind = "external"`).
 
 ---
 

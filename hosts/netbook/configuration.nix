@@ -158,9 +158,20 @@ in {
   # services.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Firmware TPM (Intel PTT, ACPI MSFT0101) — the netbook's sops identity. The
+  # chip is only useful once `tss` owns /dev/tpmrm0, and the sealed identity is
+  # generated ON this host as alice, so alice needs the group. Procedure and
+  # traps: docs/sops-rekey.md § TPM-sealed identity. No sops-nix plane is wired
+  # here yet: the recipient is registered in .sops.yaml and files are re-keyed
+  # to it, which is what makes this host able to decrypt without its SSH key.
+  security.tpm2 = {
+    enable = true;
+    tctiEnvironment.enable = true;
+  };
+
   users.users.alice = {
     isNormalUser = true;
-    extraGroups = ["wheel"]; # Enable ‘sudo’ for the user.
+    extraGroups = ["wheel" "tss"]; # wheel = sudo, tss = /dev/tpmrm0
 
     openssh.authorizedKeys.keys = [deployKey];
     packages = with pkgs; [
@@ -200,6 +211,8 @@ in {
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
     #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    age-plugin-tpm # unseals the TPM-sealed sops identity
+    tpm2-tools
     git
     curl
     helix

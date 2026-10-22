@@ -132,16 +132,27 @@ case "$ACTION" in
     say "rolling ${TARGET} back one generation"
     target_ssh bash -s <<'ROLLBACK'
 set -e
-cur=$(readlink -f /run/current-system)
+# "nothing to roll back" is a question about the PROFILE, not about what is
+# running. Comparing the rollback target with /run/current-system made the
+# staged case — profile ahead of the running system, which is exactly what
+# `STAGE=boot` leaves behind — perform the rollback and then exit 1 as if there
+# had been no previous generation. Ask whether the profile moved instead.
+before=$(readlink -f /nix/var/nix/profiles/system)
 nix-env -p /nix/var/nix/profiles/system --rollback
-prev=$(readlink -f /nix/var/nix/profiles/system)
-if [ "$prev" = "$cur" ]; then
+after=$(readlink -f /nix/var/nix/profiles/system)
+if [ "$after" = "$before" ]; then
   echo "deploy-netbook: no previous generation to roll back to" >&2
   exit 1
 fi
-echo "rolling back: ${cur} -> ${prev}"
-"${prev}/bin/switch-to-configuration" switch
-echo "current: $(readlink -f /run/current-system)"
+echo "rolling back: ${before} -> ${after}"
+"${after}/bin/switch-to-configuration" switch
+echo "current:  $(readlink -f /run/current-system)"
+echo "profile:  ${after}"
+# The switcher links /run/current-system but does not install boot entries, so
+# the loader still defaults to the newer generation. Say it rather than letting
+# a reboot quietly undo the rollback.
+echo "note: /boot/loader/loader.conf still defaults to the newer entry — run"
+echo "      ${after}/bin/switch-to-configuration boot to make the rollback stick"
 ROLLBACK
     ;;
 

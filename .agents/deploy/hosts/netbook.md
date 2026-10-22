@@ -236,10 +236,19 @@ this box (verified 2026-10-22); edit that file directly.
 ## Rollback
 
 `task infra:rollback:host:netbook` — `nix-env --rollback` on the system profile,
-then that generation's `switch-to-configuration switch`. No rebuild, no eval.
+then that generation's `switch-to-configuration switch`. No rebuild, no eval. The
+guard asks whether the **profile** moved, so a rollback that lands on the system
+already running is a success (fixed 2026-10-22; it used to exit 1 after doing the
+work whenever the profile was ahead of the running system — the exact state
+`STAGE=boot` leaves behind).
 
-Known defect: when the profile is *ahead* of the running system (the staged case
-above), the script performs the rollback and then exits 1 with "no previous
-generation to roll back to", because it compares the new profile target against
-`/run/current-system`. The rollback itself succeeded — verify with
-`readlink -f /nix/var/nix/profiles/system` before trusting the exit code.
+Two things the command does not do for you:
+
+- **The loader default still names the newer generation.** The switcher links
+  `/run/current-system` but installs no boot entries, so a reboot undoes the
+  rollback. Run `<generation>/bin/switch-to-configuration boot` — the task now
+  prints the command — to make it stick.
+- **A blind rollback from 51 lands on generation 50**, the systemd-initrd system
+  that cannot boot. Read `nix-env -p /nix/var/nix/profiles/system
+  --list-generations` first, and use `--switch-generation` when the target
+  matters.

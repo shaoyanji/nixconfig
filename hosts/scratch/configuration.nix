@@ -23,32 +23,15 @@
     exec ${customDwl}/bin/dwl "$@"
   '';
 in {
-  # Deliberately NOT `base-desktop-environment` (eisen/poseidon: niri + DMS +
-  # nautilus/gvfs/portal/printing/gnome-keyring). This host is a suckless
-  # **fork**, not an inheritance of the fleet desktop: base-node for the OS
-  # contract (SSH, sops, firewall, user, zram, boot) and then only the plumbing
-  # dwl actually spawns. The home-manager role is forked below for the same
-  # reason — otherwise the WM changes and the userland does not.
+  # Fork, not inheritance: see [[flake/policies.nix#desktop-fork-not-disable]].
   imports = [
     ./hardware-configuration.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/boot.nix
-    # `~/Documents/nixconfig` is the canonical repo path and it resolves through
-    # /Volumes/data (NAS). desktop-client used to carry this import; without it
-    # the canonical path dangles, which is worse than any of the desktop weight
-    # it replaced.
     ../../modules/profiles/nas-client.nix
   ];
 
-  # --- Home Manager: minimal user role, not the fleet desktop ---
-  # `roles/home.nix` is the fleet userland (zen, niri, kitty, DMS, zed, kg
-  # sidecar, AI CLIs). Forking it is a deliberate departure from the shared
-  # chain: this host keeps the base CLI/env + sops identity from roles/minimal,
-  # the shell, and the one desktop nicety the launcher depends on — the appimage
-  # .desktop entries. Keybindings live in dwl's config.h, not in the userland.
-  # `user/base.nix` already pulls the shell, sops identity, helix/lf and the
-  # curated pkgs.txt; roles/minimal would additionally drag the AI CLI stack in.
-  # This *replaces* the fleet default (roles/home.nix) rather than adding to it.
+  # Replaces the fleet userland default; see [[flake/policies.nix#desktop-fork-not-disable]].
   fleet.hmUserModules = [
     ../../modules/user/base.nix
     ../../modules/user/desktop/appimage-launchers.nix
@@ -66,12 +49,8 @@ in {
     device = "/dev/sda"; # legacy BIOS MBR install — adjust if the disk is not sda
   };
 
-  # --- Minimalist Suckless Desktop: dwl (Wayland) + foot + wmenu ---
-  # Nothing else registers a desktop session; greetd launches dwl directly.
+  # Media keys in config.h spawn wpctl/playerctl.
   services.displayManager.sddm.enable = false;
-
-  # dwl's media keys shell out to wpctl/playerctl, and PipeWire is the only
-  # audio stack this host needs (desktop-client used to supply it).
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -79,26 +58,21 @@ in {
   };
   security.rtkit.enable = true;
 
-  # `desktop-client.nix` used to bring tailscaled in; without it the host is
-  # only reachable on the LAN, which is not how this fleet is administered.
-  # Keep it: reachability is infrastructure, not part of the desktop rice.
+  # Reachability is infrastructure, not part of the desktop.
   services.tailscale.enable = true;
 
-  # appimage-run through binfmt: the launcher entries the HM module writes
-  # execute the images in place under /Volumes/data/appimages.
+  # Needed by appimage-launchers' .desktop entries.
   programs.appimage = {
     enable = true;
     binfmt = true;
   };
 
-  # foot/wmenu are told "JetBrainsMono Nerd Font" by name, so the font has to
-  # exist system-wide; base-desktop-environment used to provide it.
+  # dwl/foot/wmenu name the font, they do not ship it.
   fonts = {
     packages = [pkgs.nerd-fonts.jetbrains-mono];
     fontconfig.defaultFonts.monospace = ["JetBrainsMono Nerd Font Mono" "JetBrainsMono NFM"];
   };
 
-  # Foot terminal with Catppuccin Mocha sensible defaults
   programs.foot = {
     enable = true;
     theme = "catppuccin-mocha";
@@ -112,16 +86,13 @@ in {
         style = "beam";
         blink = "yes";
       };
-      # foot 1.28 replaced the single [colors] section with dark/light
-      # palettes; [colors] is now rejected outright at parse time.
+      # foot 1.28 rejects the old single [colors] section.
       colors-dark = {
         alpha = "0.95";
       };
     };
   };
 
-  # Screen locker PAM integration (Wayland); the X11 stack is gone with the
-  # desktop baseline, so slock/dwm/xsetroot are no longer built here.
   security.pam.services.waylock = {};
   services.greetd = {
     enable = true;
@@ -137,24 +108,16 @@ in {
     };
   };
 
-  # ── Suckless Debloat & Closure Diet ──
-  # Nothing to mkForce off any more: the file manager / portal / keyring stack
-  # was never inherited (that was base-desktop-environment).
   documentation.enable = false;
   documentation.nixos.enable = false;
   documentation.man.enable = false;
   documentation.doc.enable = false;
 
-  # Intel HD 530 iGPU — Mesa via modesetting.
   hardware.graphics.enable = true;
 
-  # ── Swap: zram only, 100% of RAM, zstd ──
-  # base-node defaults to 50%; scratch has NO disk swap so we take the
-  # full 8 GB (compressed ~2-4x in RAM). mkForce overrides base-node.
+  # No disk swap; base-node's 50% default is overridden.
   zramSwap.memoryPercent = lib.mkForce 100;
 
-  # ── Heavy-write dirs on tmpfs (8 GB RAM budget) ──
-  # /tmp on tmpfs (NixOS-managed), capped at 25% of RAM.
   boot.tmp.useTmpfs = true;
   boot.tmp.tmpfsSize = "25%";
 
@@ -182,19 +145,14 @@ in {
     options = ["size=256M" "mode=0755" "nosuid" "nodev"];
   };
 
-  # Journals live in RAM only — nothing hits the f2fs SSD.
   services.journald = {
     storage = "volatile";
     settings.Journal.SystemMaxUse = "50M";
   };
 
-  # No core dumps written to disk.
   systemd.coredump.enable = false;
-
-  # Weekly TRIM for the SSD (f2fs supports discard via fstrim).
   services.fstrim.enable = true;
 
-  # ── Writeback tuning: gentle bursts + keep metadata cached ──
   boot.kernel.sysctl = {
     "vm.swappiness" = 100; # prefer zram swap over evicting cache
     "vm.vfs_cache_pressure" = 50; # keep dentries/inodes in RAM → fewer reads
@@ -202,55 +160,37 @@ in {
     "vm.dirty_background_ratio" = 5;
   };
 
-  # Quiet early-boot console chatter.
   boot.consoleLogLevel = 3;
-
-  # ── Nix store hygiene: small store = less SSD churn ──
-  # GC is inherited from the global nix settings (modules/global/global.nix,
-  # `--delete-older-than 10d`); no host-local GC override needed.
   nix.optimise.automatic = true;
 
   environment.systemPackages = with pkgs; [
-    btop # RAM/tmpfs/zram visibility
-    # Suckless Wayland (the whole desktop)
+    btop
     customDwl
     foot
     wmenu
-    # Mod+A / Mod+Space: feeds .desktop entries (incl. appimages) to wmenu
     j4-dmenu-desktop
     waylock
     wl-clipboard
     imv
-    # Mod+S / Mod+Print screenshots (niri parity)
     grim
     slurp
-    # Media keys bound in config.h
     playerctl
     brightnessctl
-    # TPM: identity generation and inspection live on the host
     age-plugin-tpm
     tpm2-tools
   ];
+  # Referenced by config.h: j4-dmenu-desktop (Mod+A/Mod+Space), grim+slurp
+  # (Mod+S/Mod+Print), playerctl/brightnessctl (media keys).
 
-  # --- sops: both planes unseal through the TPM ---
-  # base-node gives every host `age.sshKeyPaths = [/etc/ssh/ssh_host_ed25519_key]`
-  # and .sops.yaml carries the matching `&<host>host` recipient. This host has
-  # no SSH-derived recipient on purpose: the only scratch recipient is the
-  # TPM-sealed identity, so root reads the same tpm-identity.txt the user plane
-  # does (root can read the 0400 file; `age-plugin-tpm` must be on PATH for the
-  # unseal, which is what `age.plugins` puts there).
+  # TPM-only recipient; base-node's sshKeyPaths would need an `&scratchhost`
+  # entry that deliberately does not exist. See docs/sops-rekey.md.
   sops = {
     age.keyFile = "${user.home}/.config/sops/age/tpm-identity.txt";
     age.sshKeyPaths = lib.mkForce [];
     age.plugins = [pkgs.age-plugin-tpm];
   };
 
-  # --- TPM 2.0 (firmware TPM on the Q150 board) ---
-  # Same shape as hosts/fern/configuration.nix and hosts/frieren/hardware.nix:
-  # the chip holds the age identity that the user sops plane unseals, so no
-  # identity file has to be copied onto the machine. tss-groups devji because
-  # /dev/tpmrm0 is root:tss 0660 and `age-plugin-tpm --generate` runs as the
-  # user, not as root.
+  # /dev/tpmrm0 is root:tss 0660 and --generate runs as the user.
   security.tpm2 = {
     enable = true;
     tctiEnvironment.enable = true;

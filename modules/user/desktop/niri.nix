@@ -13,10 +13,7 @@ lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
   # nixpkgs, upstream issue sodiboo/niri-flake#1851) and isn't in any cache.
   programs.niri.package = pkgs.niri;
 
-  # Fuzzel styled like a TUI rather than a floating GTK panel: monospace at the
-  # same size as the terminals, no icons, no rounded corners, flat Catppuccin
-  # Mocha chrome. DMS owns the visual language on this desktop; the picker is a
-  # keyboard surface, so it should read as one.
+  # Keyboard surface, not a floating GTK panel: monospace, no icons, no radius.
   programs.fuzzel = {
     enable = true;
     settings = {

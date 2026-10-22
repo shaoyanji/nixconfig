@@ -1,14 +1,6 @@
-# Launcher entries for the AppImages kept in the shared NAS library.
-#
-# The images stay where they are (`/Volumes/data/appimages`, symlinked as
-# ~/Applications/appimages) and are executed by appimage-run through binfmt; this
-# module only keeps ~/.local/share/applications in sync so DMS and fuzzel list
-# them like any other application. It reads each image's embedded .desktop and
-# icon out of the squashfs (`unsquashfs -cat`), so nothing is executed, unpacked
-# in full, or copied.
-#
-# Linux-only: `systemd.user` and binfmt have no darwin counterpart, and the
-# script's `file`/`readelf`/`unsquashfs` reads assume an ELF AppImage.
+# Syncs ~/.local/share/applications with /Volumes/data/appimages from the
+# squashfs header (`unsquashfs -cat`), never executing or copying an image.
+# Linux-only: `systemd.user` and binfmt have no darwin counterpart.
 {
   lib,
   pkgs,

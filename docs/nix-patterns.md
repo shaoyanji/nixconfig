@@ -118,6 +118,13 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
 10. **A negative narinfo cache makes a warmed path look missing** for an hour.
     Pass `--option narinfo-cache-negative-ttl 0` on every cache query
     [[flake/policies.nix#negative-cache-disabled]].
+11. **Disabling a compositor is not a port.** `base-desktop-environment` plus
+    `programs.niri.enable = lib.mkForce false` leaves niri, DMS, zen and the
+    portal/keyring stack installed behind whatever WM you added; the session
+    changes and nothing it opens does. Fork the profile and the HM module list
+    instead — enforced by [[flake/policies.nix#desktop-fork-not-disable]], which
+    also catches dropping infrastructure the profile carried (tailscaled, the NAS
+    mount behind `~/Documents/nixconfig`).
 
 Longer-form procedure for the operational half: [`../AGENTS.md`](../AGENTS.md)
 (routing) and the `infra` skill (deploy, rebuild, rollback).

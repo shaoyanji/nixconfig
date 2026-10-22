@@ -36,7 +36,7 @@
 - Proof now targets `/nix/store/<hash>-secrets.yaml` through the unit's own manifest, not a checkout:
   both planes decrypt it to the pulled tree's digest, and a no-identity control exits 128. scratch's
   clone sat 2768 commits behind at `~/nixconfig` while `~/Documents/nixconfig` was a store symlink.
-  Procedure `.agents/skills/tpm-sops/SKILL.md`; contract `docs/sops-rekey.md`; note `tpm-sops-planes`.
+  Procedure `docs/sops-rekey.md`; note `tpm-sops-planes`.
 
 ### 2026-10-21 — frieren headless-by-default, governor store references, Caddyfile removal
 

@@ -206,11 +206,13 @@ host whose task plane may be a different checkout entirely. What activation read
 `/nix/store/<hash>-secrets.yaml`, named by the manifest the unit executes:
 
 ```bash
-# which manifest the user unit actually runs, and the secrets file it points at
-systemctl --user show sops-nix -p ExecStart -p Environment -p Result
-cat $(systemctl --user show sops-nix -p ExecStart --value \
-      | grep -o '/nix/store/[a-z0-9]*-manifest[a-z-]*\.json') \
-  | grep -o '/nix/store/[a-z0-9]*-secrets\.yaml'
+# The user unit's ExecStart is a sops-nix-generated SCRIPT; the manifest is inside it.
+# `--value` prints a struct (`{ path=/nix/store/… ; argv[]=… }`), so parse `path=`.
+SCRIPT=$(systemctl --user show sops-nix -p ExecStart --value \
+  | sed -n 's/.*path=\([^ ;]*\).*/\1/p')
+MANIFEST=$(grep -o '/nix/store/[a-z0-9]*-manifest[a-z-]*\.json' "$SCRIPT")
+echo "script=$SCRIPT manifest=$MANIFEST"
+grep -o '/nix/store/[a-z0-9]*-secrets\.yaml' "$MANIFEST" | sort -u   # ← activation reads this
 
 # both planes, against that store path (identical digests = both read the same file)
 STORE=/nix/store/<hash>-secrets.yaml

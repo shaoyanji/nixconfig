@@ -6,17 +6,20 @@
 > lives in [`AGENTS.nix`](AGENTS.nix) (`task ops:notes`).
 > Budget: 150 lines (`.agents/SCHEMA.md` §2).
 
-## Current state (2026-10-20)
+## Current state (2026-10-22)
+
+Rows carrying a command were re-measured 2026-10-22 with it. The live-system rows
+(observation, knowledge, backups, DNS, tailnet) were last confirmed 2026-10-20.
 
 | Area | State | Evidence |
 | :--- | :--- | :--- |
-| Fleet registry | 34 devices: 11 active Nix, 6 active external, 1 WIP, 16 preserved | `.#inventory`, `docs/generated/fleet-inventory.md` |
+| Fleet registry | 34 devices: 18 active (11 NixOS, 1 home-manager, 6 external), 16 preserved | `nix eval .#inventory.hosts`, `.#inventory.derived` |
 | Host gates | per-host module system + assertions, one host per process | `nix build .#hostChecks.x86_64-linux.<host>` |
 | Known red gates | `minyx` (kernel conflict), `cassini` (xdg.desktopEntries on darwin) — both dormant | `task checks:host HOST=minyx MODE=eval` |
-| Formatting | alejandra, 100 % of tracked `.nix` | `task checks:nix:format` |
+| Formatting | alejandra, 231 tracked `.nix` files clean | `task checks:nix:format` |
 | Lint | deadnix hard gate, statix advisory | `task checks:nix:lint` |
-| Secrets | 6 SOPS files, zero drift | `task checks:sops:drift` |
-| Skills | 43, compiled + schema-gated | `nix eval .#agentSkills.count`, `task ops:skills:check` |
+| Secrets | 7 SOPS files, zero drift (36 recipients per rule) | `task checks:sops:drift` |
+| Skills | 50, compiled + schema-gated | `nix eval .#agentSkills.count`, `task ops:skills:check` |
 | Observation | frieren sentinel: 15-min ledger, health endpoint, gatus body assertion | `task ops:health`, `/var/lib/fleet-sentinel/` |
 | Knowledge | qmd (`.md` + `.nix`) + `.#knowledgeGraph` (structure) + sentinel ledger (episodic) | `task ops:kg`, `task ops:ledger` |
 | Backups | local + BurgerNAS offsite; restore drill weekly; password in sops | `restic-drill.timer`, `task checks:restic:drill` |

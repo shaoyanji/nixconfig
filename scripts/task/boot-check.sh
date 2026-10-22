@@ -117,12 +117,14 @@ if [ ! -r /dev/kvm ]; then
     exit 1
   fi
   if [ "$SELF" = "1" ]; then
-    echo "boot-check: no /dev/kvm — emulated boot of $(hostname), one vCPU, below everything else in nice." >&2
+    echo "boot-check: no /dev/kvm — emulated boot of $(hostname), one vCPU, bounded by the watchdog." >&2
   else
     echo "boot-check: /dev/kvm unusable, ALLOW_TCG=1 — emulated boot, expect minutes" >&2
   fi
-  # Emulation is CPU-bound and the machine is serving; QEMU also only gets one
-  # vCPU here (flake/boot-checks.nix), so the rest of the box stays responsive.
+  # What actually bounds this is ONE vCPU (flake/boot-checks.nix): measured on
+  # delphi, QEMU held 99% of one core on a 2-OCPU box and the rest of the machine
+  # stayed responsive. `nice` only reaches the client — a multi-user nix daemon
+  # runs the build, so the guest itself sits at priority 0 whatever is asked here.
   NICE=(nice -n 19)
 fi
 

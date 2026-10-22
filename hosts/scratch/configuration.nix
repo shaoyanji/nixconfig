@@ -127,6 +127,13 @@ in {
     options = ["size=512M" "mode=0755" "uid=1000" "gid=100"];
   };
 
+  # Its own budget: appimage-run never evicts extractions (notes: appimage-run-cache-tmpfs).
+  fileSystems."${user.home}/.cache/appimage-run" = {
+    device = "tmpfs";
+    fsType = "tmpfs";
+    options = ["size=3G" "mode=0700" "uid=1000" "gid=100" "nosuid" "nodev"];
+  };
+
   fileSystems."/var/log" = {
     device = "tmpfs";
     fsType = "tmpfs";

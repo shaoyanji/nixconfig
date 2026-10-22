@@ -161,9 +161,10 @@ in {
   # Firmware TPM (Intel PTT, ACPI MSFT0101) — the netbook's sops identity. The
   # chip is only useful once `tss` owns /dev/tpmrm0, and the sealed identity is
   # generated ON this host as alice, so alice needs the group. Procedure and
-  # traps: docs/sops-rekey.md § TPM-sealed identity. No sops-nix plane is wired
-  # here yet: the recipient is registered in .sops.yaml and files are re-keyed
-  # to it, which is what makes this host able to decrypt without its SSH key.
+  # traps: docs/sops-rekey.md § TPM-sealed identity. The sealed key lives at
+  # ~alice/.config/sops/age/tpm-identity.txt, and its recipient is registered
+  # in .sops.yaml as `&tpmnetbook` — the one identity that is not derived from
+  # an SSH key here. No sops-nix plane is wired yet, so it is used by hand.
   security.tpm2 = {
     enable = true;
     tctiEnvironment.enable = true;

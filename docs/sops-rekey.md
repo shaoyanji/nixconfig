@@ -87,10 +87,10 @@ The activation writes `~/.config/sops/age/keys.txt` from
 recipient already listed — no new recipient, no rekey, and nothing to back up
 (losing the disk loses the secrets anyway, and the host is reinstalled).
 
-Do **not** enable it on `frieren`, `fern` or `scratch`: they use the TPM identity
-path (`modules/sops.nix` `tpmHosts`) and read `tpm-identity.txt` instead.
+Do **not** enable it on `frieren`, `fern`, `scratch` or `netbook`: they use the
+TPM identity path and read `tpm-identity.txt` instead.
 
-## TPM-sealed identity (`frieren`, `fern`, `scratch`)
+## TPM-sealed identity (`frieren`, `fern`, `scratch`, `netbook`)
 
 An `age-plugin-tpm` identity is a **key sealed by the chip**: the file is only
 the handle, so it decrypts on that machine and nowhere else. Verified
@@ -100,7 +100,10 @@ the handle, so it decrypts on that machine and nowhere else. Verified
 normal recipient to sops.
 
 Order matters — the chip must be usable before the identity exists, and the
-identity must be a recipient before either plane reads it.
+identity must be a recipient before either plane reads it. On `netbook` the
+identity belongs to user **`alice`** (not `devji`), and no sops-nix plane is
+wired there: step 4 is skipped, so the sealed key is used only by hand
+(`SOPS_AGE_KEY_FILE=… sops -d`) until a plane exists.
 
 ```bash
 # 1. Capability first: deploy security.tpm2.enable, devji in `tss`, and
@@ -117,7 +120,7 @@ ssh <host> 'age-plugin-tpm -y ~/.config/sops/age/tpm-identity.txt'   # → recip
 The default recipient type is **p256tag** (`age1tag1…`), which is what this
 fleet uses; `--tpm-recipient` produces the older `age1tpm1…` form. Use the
 default, and register the recipient as `&tpm<host>` (existing: `&tpmfrieren`,
-`&tpmfern`).
+`&tpmfern`, `&tpmscratch`, `&tpmnetbook`).
 
 ```bash
 # 3. Register + rekey exactly as below (anchor, key_groups, submodule copy,

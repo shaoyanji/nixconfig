@@ -40,6 +40,7 @@ keys:
   - &tpmfrieren age1tag1qd42em4jfvxlxkvz8zrmrynxmdvl4q4pgj5keqn2ldujzngzn2e2vk4hfzp
   - &tpmfern age1tag1qfys3rjfsl2vlcy4xk0v7kvz0ugaflmuqwrg0fsj4wwcwe9l9kfuu8g2e39
   - &tpmscratch age1tag1q2ng9uhpteuj830ltlf3jtanm4l2qf00xcugs82xn7k50nq04e4w24l93hw
+  - &tpmnetbook age1tag1qfkuzu5q9sxvnlcuwx0xmhskgeu2wx87nefk7kjt0t8jazhxf3tzk382vx5
   - &delphi age1fg8xy2g5nrxsah45upvzl8eq9u7vy36e6dsw6pg5j9rfmh5qhe7sn6j4jp
 
 creation_rules:
@@ -82,4 +83,5 @@ creation_rules:
           - *tpmfrieren
           - *tpmfern
           - *tpmscratch
+          - *tpmnetbook
           - *delphi

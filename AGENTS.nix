@@ -633,6 +633,23 @@
 
         After it returns, greetd starts automatically; re-run the Kolibri benchmark,
         because `--n-gpu-layers 99` was inert (llvmpipe only) while the card was gone.
+
+        Recurred on the 2026-10-22 21:32 boot after 22 h in S5 — which is not a cold
+        cycle, because standby keeps the rail latched. The x16 port moved to
+        `0000:00:03.0`: `LnkSta Width x0`, `DLActive-`, no hotplug slot, `/sys/class/drm`
+        holds only `version`, `amdgpu` loads with no node, and the NIC renumbered
+        `09:00.0 enp9s0` → `06:00.0 enp6s0` (so the enp9s0 WoL declaration matched
+        nothing and `Wake-on: d`). The chain is identical: greetd's `steam` autologin
+        dies on gamescope `Failed to initialize Vulkan` with llvmpipe as the only
+        device, the greeter exits without a session, Steam never listens, and a Steam
+        Link gets no discovery reply — though UDP/27036 arrivals were still counted at
+        the firewall, so the network path was never the fault.
+
+        The same PSU cold cycle recovered it at 21:53 (PCI rescan did nothing):
+        `05:00.0` returned as NAVI10, `card1` + `HDMI-A-1` connected at 1920x1080,
+        gamescope picked `RADV NAVI10`, and Steam came up listening on UDP/TCP 27036.
+        The NIC also returned to `enp9s0`, so `Wake-on: g` re-applied — the WoL
+        declaration is name-keyed and only works while the topology names it that way.
       '';
     };
     nix-binary-upgrade-2026-10 = {

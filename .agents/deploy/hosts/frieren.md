@@ -15,6 +15,11 @@ NAS server (Samba, NFS, Jellyfin, Paperless-ngx, Unbound DNS + Pi-hole, aria2) a
   - **Don't leave uncommitted local config on frieren** — the self-upgrade pulls from GitHub and will override a dirty local checkout.
 - **SOPS**: decrypts `modules/secrets.yaml` via its `ssh_host_ed25519_key` age key (also `aria2-rpc-secret`).
 - **Samba/NFS**: exports live under `/export/*` (bind-mounted from `/srv/*`); NFS serves `192.168.3.0/24` + Tailscale / 100.* subnet `100.0.0.0/8`.
+- **Outbound routing is wired-first (2026-10-22)**: `enp1s0` (192.168.3.25) carries `ipv4.route-metric 300`, the Wi-Fi profile `Obi LAN Kenobi` is standby at `600`. Until that date Wi-Fi was `100` and wired `300`, so the NAS's default *and* LAN traffic left over `wlp2s0` — NFS replies and DNS included. Measured against a wired peer: 300 Mbit/s over Wi-Fi vs 941 Mbit/s once the route moved to `enp1s0`.
+  - The metrics live in the **imperative** NM profiles (`/etc/NetworkManager/system-connections/`), not `ensureProfiles`, because the Wi-Fi PSK is a secret. Re-apply on any from-scratch install:
+    `sudo nmcli connection modify "Obi LAN Kenobi" ipv4.route-metric 600 ipv6.route-metric 600 && sudo nmcli connection up "Obi LAN Kenobi"`
+  - Verify: `ip route get 8.8.8.8` and `ip route get <lan-host>` must name `enp1s0`; `iperf3` to a wired peer should reach ~940 Mbit/s.
+  - The `enp1s0` dispatcher below is unaffected — when the wire drops it floats `192.168.3.25` to `wlp2s0` and the Wi-Fi default route (600) takes over.
 
 ## Deploy Checklist
 - [ ] **Fleet flake update?** Run `task infra:update:fleet` (update → warm

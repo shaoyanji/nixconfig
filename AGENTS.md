@@ -216,21 +216,17 @@ task infra:rebuild:home-manager  # home-manager switch (local) + refresh ~/Taskf
 Before deploying changes to any client OS, evaluate its configuration:
 
 ```bash
-task infra:plan:host:<host>   # build/substitute the closure (no apply)
-nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath
-#   ^ instantiates the WHOLE config — every option type — in seconds.
-#     Do NOT use `.config.networking.hostName`: that forces one option and
-#     type-checks nothing else (see the Agent Verification Protocol below).
+task infra:plan:host:<host>   # substitute the closure, apply nothing
 ```
+
+That is the pre-build instrument. A toplevel `.drvPath` eval instantiates the
+whole graph (>120 s, CI-only) and a switch forces it anyway — Agent Verification
+Protocol below. `.config.networking.hostName` proves nothing at all.
 
 #### 2. Deploying Remote Hosts
 
-Apply configurations over SSH:
-
-```bash
-task infra:deploy:host:<host>    # Plan + apply + validate
-task infra:apply:host:<host>     # Apply closure directly
-```
+The same two tasks as Host Lifecycle above: `infra:deploy:*` = gate → plan →
+apply → validate, `infra:apply:*` applies an already-planned closure.
 
 #### 3. Remote Log & Service Inspection
 
@@ -596,6 +592,11 @@ alejandra --check <file>                                                     # C
 
 `/srv/data` on frieren → `/Volumes/data`: [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)
 [[flake/policies.nix#media-tree-isolation]]
+
+**Portable tool library** (`bin-*`, `appimages`) is what NON-Nix machines execute, so
+linkage is the contract, not size: `eget` hangs on its asset picker without `--asset`,
+a fetch is static-only [[flake/policies.nix#library-fetch-is-static]], and the tree
+mirrors to BurgerNAS [[flake/policies.nix#library-crosses-the-wire]] (`task data:library`).
 
 ---
 

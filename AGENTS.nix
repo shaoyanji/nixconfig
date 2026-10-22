@@ -4111,5 +4111,40 @@
         `extensions.json` is reset (back it up; the browser must be closed).
       '';
     };
+
+    portable-library = {
+      title = "The tool library is a portability set, so static linkage is the admission rule";
+      kind = "decision";
+      status = "DELIVERED";
+      date = "2026-10-22";
+      summary = "`/Volumes/data/{bin-x86,bin-aarch64,bin-script,appimages}` is executed by NON-Nix machines (pentest targets, research boxes), so arch + glibc floor decide whether a file works, not its size. Fetches are non-interactive and static-only [[flake/policies.nix#library-fetch-is-static]]; the tree mirrors to BurgerNAS [[flake/policies.nix#library-crosses-the-wire]].";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["hosts/frieren/infra-stack.nix" "scripts/task/library-audit.sh" "scripts/task/library-fetch.sh"];
+        tasks = ["data:library" "data:library:index" "data:library:fetch"];
+        docs = ["AGENTS.md"];
+      };
+      body = ''
+        Measured 2026-10-22 on frieren: 178 files, 9.5 GiB. bin-x86 38/52 static (glibc floor 2.39),
+        bin-aarch64 33/43 (2.39), bin-script 18/18 scripts, appimages 65 (runtime static, payload
+        unavailable). Two byte-identical pairs (11 MiB) and two eget re-fetch residues (`*.1`, 90 MiB).
+
+        1. **eget prompts unless it can narrow the release.** `--asset` is required in the wrapper;
+           without it a scheduled or remote run blocks on a picker. Two more traps: `find -newer`
+           cannot detect the write (eget writes immediately, so a marker created afterwards is always
+           newer — the wrapper diffs a directory snapshot), and `readelf` is not installed on every
+           host that runs the audit, so the linkage probe reads the ELF header bytes and greps
+           `GLIBC_` instead of shelling out to binutils.
+        2. **Compression is the wrong lever.** AppImages are squashfs+zstd inside: `zstd -3` returns
+           ratio 0.99 for ~5 s/472 MiB. Raw binaries do compress (0.36 at -3, 0.32 at -9) but every
+           run then pays a decompress, which is the opposite of what a pentest toolkit wants.
+        3. **A libc fork is a compatibility set, not duplication.** The four `simplex-chat` builds
+           differ by target (22.04 / 24.04 / static musl); pruning them breaks the boxes that need
+           exactly one. Byte-identical copies are the only safe prune.
+        4. **Provenance cannot be derived from the file.** `.library.tsv` records sha256, repo,
+           resolved tag, asset and date; the audit reports every file with no record, so an
+           unattributed 100 MiB binary is visible instead of plausible.
+      '';
+    };
   };
 }

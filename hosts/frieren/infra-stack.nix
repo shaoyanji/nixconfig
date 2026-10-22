@@ -717,42 +717,51 @@ in {
     };
   };
 
-  # --- BurgerNAS static aarch64 binary sync (weekly Sunday 03:32) ---
-  # Synchronizes static compiled ARM64 binaries (/Volumes/data/bin-aarch64/)
-  # to BurgerNAS (/volume1/Shared Library/bin-aarch64/) during its 03:25-04:00 window.
-  systemd.services.burgernas-bin-sync = {
-    description = "Weekly sync of static aarch64 binaries to BurgerNAS";
+  # --- BurgerNAS portable-library mirror (weekly Sunday 03:32) ---
+  # The whole tool library crosses the wire while the NAS is powered for its
+  # scheduled window, so a non-Nix machine can pull tools from the NAS without
+  # frieren being up. Rejected (dynamic) downloads are excluded: they are not
+  # library material.
+  systemd.services.burgernas-library-sync = {
+    description = "Weekly mirror of the portable tool library to BurgerNAS";
     after = ["network-online.target" "restic-backups-frieren-burgernas.service"];
     wants = ["network-online.target"];
     serviceConfig = {
       Type = "oneshot";
       User = "devji";
       Group = "users";
-      ExecStart = pkgs.writeShellScript "burgernas-bin-sync" ''
+      ExecStart = pkgs.writeShellScript "burgernas-library-sync" ''
         set -eu
-        SRC="/Volumes/data/bin-aarch64/"
-        DEST="devji@192.168.3.92:/volume1/Shared Library/bin-aarch64/"
+        SRC="/Volumes/data"
+        DEST="devji@192.168.3.92:/volume1/Shared Library/tools"
         KEY="${user.home}/.ssh/id_ed25519"
         SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
 
-        # Verify BurgerNAS is online before attempting rsync
         if ! timeout 5 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
-          echo "BurgerNAS offline; skipping binary sync."
+          echo "BurgerNAS offline; skipping library sync."
           exit 0
         fi
 
-        echo "=== [$(date -Is)] Synchronizing $SRC to BurgerNAS ==="
-        ${pkgs.rsync}/bin/rsync -avz --delete \
-          --rsync-path=/usr/bin/rsync \
-          -e "$SSH" \
-          "$SRC" "$DEST"
-        echo "=== [$(date -Is)] Binary sync finished successfully. ==="
+        dirs="bin-x86 bin-aarch64 bin-script appimages"
+        # rsync creates only the final component, so the tree root goes first.
+        $SSH devji@192.168.3.92 "mkdir -p '$DEST' '$DEST/bin-x86' '$DEST/bin-aarch64' '$DEST/bin-script' '$DEST/appimages'"
+        for dir in $dirs; do
+          [ -d "$SRC/$dir" ] || continue
+          echo "=== [$(date -Is)] mirroring $dir ==="
+          ${pkgs.rsync}/bin/rsync -az --delete --partial \
+            --exclude '.rejected' \
+            --rsync-path=/usr/bin/rsync \
+            -e "$SSH" \
+            "$SRC/$dir/" "$DEST/$dir/"
+        done
+        ${pkgs.rsync}/bin/rsync -q -e "$SSH" "$SRC/.library.tsv" "$DEST/.library.tsv" || true
+        echo "=== [$(date -Is)] Library mirror finished. ==="
       '';
     };
   };
 
-  systemd.timers.burgernas-bin-sync = {
-    description = "Weekly sync of static aarch64 binaries to BurgerNAS";
+  systemd.timers.burgernas-library-sync = {
+    description = "Weekly mirror of the portable tool library to BurgerNAS";
     wantedBy = ["timers.target"];
     timerConfig = {
       OnCalendar = "Sun *-*-* 03:32:00";

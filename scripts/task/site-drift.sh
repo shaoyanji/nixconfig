@@ -14,6 +14,10 @@
 #   0  the live server serves the path this tree builds
 #   1  it serves a different path — the deploy is stale or the tree moved after it
 #   2  cannot tell: no answer, no header, or the eval failed
+#
+# Those are this script's codes, which is what CI and a direct caller see. Under
+# `task` go-task reports every failure as 201, so read the message: it says which
+# of the two it was.
 set -uo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."

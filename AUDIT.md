@@ -25,6 +25,23 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — netbook deploy: build ladder on frieren, and a half-activation is now detectable
+- The deploy's build step became a ladder instead of one flag: `BUILD=auto` (default) substitutes on
+  frieren with `--max-jobs 0 --builders ""` and only escalates to nixbuild.net when a path is missing;
+  `local` compiles on frieren; `remote` (`REMOTE_ONLY=1`) is nixbuild.net only. Measured: unchanged tree
+  = seconds (pure substitution), `remote` 2m28s.
+- **A half-activation is now caught.** `switch-to-configuration` links `/etc` and `/run/current-system`
+  *before* it talks to systemd, so with a dead system bus the host looks current while every changed unit
+  keeps running the old config. Measured end to end: gen 49 moved `current` while `dbus-daemon` rejected
+  every uid-0 message to `org.freedesktop.systemd1`/`login1` (identical `/etc/dbus-1` policy before and
+  after, so not a config difference). The deploy now asks the bus for its unit list after the switch
+  (exit 5) and reports a non-zero switcher with a live bus (exit 6). Recovery: restart `dbus.service`,
+  re-run the switch, reboot if a desktop session died — the bus restart was what restored `Subscribe`.
+- Verified on the host after the reboot: booted `vraa14k5…` with kernel 7.1.2 (the pinned chain), 0 failed
+  units, greetd + alice session on seat0, substituters = harmonia + cachix + numtide, flakes enabled.
+  Full `infra:apply:host:netbook` rc=0 with the boot-chain guard matching and the closure pushed over the
+  LAN. `ACTION=preflight` now also reports whether harmonia actually serves the running system.
+
 ### 2026-10-22 — netbook becomes a flake host without touching its boot chain
 - `flake.nix` gains `nixpkgs_25_11`, pinned to `b6018f87da91` — the exact rev the netbook boots — and
   `outputs.nix` can now give a host its own nixpkgs (`mkNixosHostWith`; passing `nixpkgs` into the

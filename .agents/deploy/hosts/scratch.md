@@ -29,9 +29,18 @@ reading the store copy and answering about the wrong tree.
 ```bash
 cd ~/nixconfig
 git fetch origin && git status -sb          # ahead/behind before touching anything
-git pull --ff-only origin main              # fast-forward only; it is not a fork
+# `submodule.recurse true` is set in this clone's config, so a plain `git pull`
+# fetches modules/secrets and ABORTS the whole pull on this host (exit 1).
+git -c submodule.recurse=false -c fetch.recurseSubmodules=false \
+  pull --ff-only --no-recurse-submodules origin main
 git submodule status                        # expect " 7a35ad4…" (space = clean)
+git ls-tree HEAD modules/secrets            # gitlink must equal the worktree HEAD
 ```
+
+Local edits on this host are not necessarily upstream: the 2026-10-22 clone had a
+hand-edited `hosts/scratch/configuration.nix` (the old Steam-kiosk variant) and two
+untracked `*.original.nix`. Back them up outside the tree before restoring, or
+`--ff-only` refuses to run over them.
 
 **The submodule cannot be fetched on this host.** `modules/secrets` is private
 (`git@github.com:shaoyanji/secrets.git`) and scratch has no GitHub credentials

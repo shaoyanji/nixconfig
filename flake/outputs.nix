@@ -25,7 +25,10 @@
   ];
   pkgsFor = system: import nixpkgs {inherit system overlays;};
 
-  mkNixosHost = import ../lib/mk-nixos-host.nix {inherit nixpkgs inputs self;};
+  # The assembler is bound to a nixpkgs at construction time, so a host that
+  # pins its own (netbook, on the 25.11 rev it boots) needs its own instance —
+  # passing `nixpkgs` into the second call would be silently dropped by `...`.
+  mkNixosHostWith = nixpkgs: import ../lib/mk-nixos-host.nix {inherit nixpkgs inputs self;};
   # Compiled fleet inventory (lib/inventory.nix). Parsed once here and shared
   # into module chains, checks and packages — hosts never re-parse inventory.toml.
   inventory = import ../lib/inventory.nix {inherit lib;};
@@ -104,7 +107,7 @@ in {
   # builds its own pkgs. Per-host specialArgs from host-inventory override the
   # { inherit inputs self; } default (see lib/mk-nixos-host.nix).
   nixosConfigurations = project "nixos" (hostName: host:
-    mkNixosHost {
+    (mkNixosHostWith (host.nixpkgs or nixpkgs)) {
       inherit hostName;
       inherit (host) system modules;
       specialArgs = host.specialArgs or {inherit inputs self;};

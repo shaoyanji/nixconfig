@@ -17,8 +17,10 @@ Three problems, one mechanism:
    them, so drift fails a check instead of living in the file.
 2. **Facts lived in comments.** "netbook has no flake output, it is applied by
    remote fleet ops" was a Nix comment. A comment cannot be checked, so drift is
-   invisible. It is now `[hosts.netbook] flake = false`, which the coverage
-   check enforces.
+   invisible. It became `[hosts.netbook] flake = false`, which the coverage check
+   enforced — and when the host was later brought into the flake on a pinned
+   nixpkgs, the same field became `flake = true` and the same check now demands
+   the output exist. The fact moved between values, never into prose.
 3. **Every consumer re-parsed the same file.** `yq` in shell, `tomllib` in
    Python, `builtins.fromTOML` in Nix — three parsers that can disagree. Now
    there is one parse, and one compiled artifact everything reads.
@@ -55,9 +57,10 @@ so the compiled record is uniform even when the source omits a section.
 
 `flake = true` (default) means "this flake produces this host". It is implied
 `false` for `kind = "external"`. Set it `false` explicitly for a real host that
-is deliberately outside the flake — `netbook`, which is pinned to the 25.11
-channel by an upstream initrd bug and applied by remote fleet ops. That is the
-compiled replacement for the prose note that used to explain the same thing.
+is deliberately outside the flake. `netbook` used to be that host; it is now
+`true`, built from `inputs.nixpkgs_25_11` — the 25.11 revision it boots — so it
+has a flake output without moving its boot chain. That is the compiled
+replacement for the prose note that used to explain the same thing.
 
 ### `notes` — where host commentary goes
 
@@ -161,8 +164,10 @@ same values are emitted under `derived` in the compiled artifact.
 
 1. Add `[hosts.<name>]` to `inventory.toml` with at least `kind`, `arch` and
    `status`; put operational commentary in `notes`.
-2. Register it in `flake/host-inventory.nix` if it is a flake host — or set
-   `flake = false` if it deliberately is not.
+2.   Register it in `flake/host-inventory.nix` if it is a flake host — or set
+   `flake = false` if it deliberately is not. A host that builds from its own
+   pinned nixpkgs (netbook) passes `nixpkgs = inputs.<pin>` and must carry
+   `inventoryModules` explicitly, because it uses no global chain.
 3. `task checks:inventory:compiled` — names any missing registration or stale
    count — then `task checks:host:HOST=<name>` to prove the host compiles the
    registry through its own module system.

@@ -16,31 +16,23 @@ in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    # Shared profiles instead of copies. `boot.nix` owns the loader switches —
+    # this box's firmware variables are read-only, so it opts out through the
+    # profile's own option rather than hand-rolling `systemd-boot.enable`.
+    # `nas-client.nix` owns /Volumes/data: LAN first, tailnet fallback, a
+    # recovery timer and the gc-root guard — strictly more than the two-line
+    # fstab entry it replaces, and what a travel laptop actually needs.
+    ../../modules/profiles/boot.nix
+    ../../modules/profiles/nas-client.nix
   ];
 
-  # Use the GRUB 2 boot loader.
-  # boot.loader.grub.enable = true;
-  # boot.loader.grub.efiSupport = true;
-  # boot.loader.grub.efiInstallAsRemovable = true;
-  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  # Define on which hard drive you want to install Grub.
-  # boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = false;
+  profiles.boot.efi = false;
+
   boot.supportedFilesystems = ["f2fs" "nfs"];
   hardware.enableRedistributableFirmware = true;
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.tmp.cleanOnBoot = true;
   services.fstrim.enable = true;
-  fileSystems = {
-    "/Volumes/data" = {
-      device = "192.168.3.25:/data";
-      fsType = "nfs";
-      options = ["noatime" "nfsvers=4" "rw" "x-systemd.automount" "x-systemd.idle-timeout=600"];
-    };
-  };
-
-  networking.firewall.allowedTCPPorts = [2049];
   services.tailscale.enable = true;
 
   boot.kernelParams = [

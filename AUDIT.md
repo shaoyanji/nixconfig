@@ -28,11 +28,14 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — netbook imports the shared boot and NAS profiles instead of copies
+- `profiles/boot.nix` (`profiles.boot.efi = false`) + `profiles/nas-client.nix` replace a hand-rolled fstab entry
+  and an inbound `2049` a client never needed: LAN→tailnet failover, recovery timer, gc-root guard. Gen `h9pvpjyr…`.
+
 ### 2026-10-22 — netbook's sops identity is its TPM, not an SSH key
-- `&tpmnetbook` (`age1tag1q…`) generated on the host as `alice` via `sg tss`, registered in `.sops.yaml`,
-  all 6 files rekeyed additively. Proven against the rekeyed file (`436f477d…` == frieren's digest;
-  handles hidden 128 — a `/nonexistent` `SOPS_AGE_KEY_FILE` is no control, sops falls back to `keys.txt`).
-  Bare `sops -d` works (`tpm-identity-netbook.txt`, `keys.txt` symlinked). No sops-nix plane yet.
+- `&tpmnetbook` (`age1tag1q…`) generated on the host as `alice` via `sg tss`, registered in `.sops.yaml`, all
+  6 files rekeyed additively. Proven (`436f477d…` == frieren's digest; handles hidden 128, because a
+  `/nonexistent` `SOPS_AGE_KEY_FILE` falls back to `keys.txt`). Bare `sops -d` works; no sops-nix plane yet.
 
 ### 2026-10-22 — netbook on the fleet nixpkgs; the boot pin is the initrd, not nixpkgs
 - `hosts/netbook/configuration.nix`: fleet nixpkgs kernel (`pkgs.linuxPackages`, 6.18.56) plus
@@ -131,9 +134,7 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
   Procedure `docs/sops-rekey.md`; note `tpm-sops-planes`.
 
 
-### 2026-10-22 — the 2026-10-21 ledger entries are archived
-- Eight entries moved to `docs/history/audit-2026-10.md` § *Ledger: 2026-10-21 (continued)*; one link
-  re-based to its new depth, which `checks:docs:links` caught.
+### 2026-10-22 — the 2026-10-21 entries are archived to `docs/history/audit-2026-10.md`
 
 ## Open debt (`task ops:notes`)
 

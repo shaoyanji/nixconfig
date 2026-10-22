@@ -7,14 +7,18 @@
   # Compiled registry (flake output `inventory`). The host passes
   # `config.fleet.inventory`, so the page cannot disagree with the host config
   # about a status, a role or an address. The TOML fallback exists only for a
-  # standalone `nix-build lib/delphi-site.nix`.
+  # standalone `nix-build lib/delphi-site.nix` — which needs `cards` too, and
+  # says so at eval instead of rendering an empty console.
   inventory ? null,
   host ? "delphi",
   # `config.services.servicePortal.cards` — the compiled card projection. This
   # is the same list the host's own mount units are generated from, so a mount
   # cannot exist that the console does not list, and a card cannot point at a
-  # port nothing serves.
-  cards ? [],
+  # port nothing serves. Required: an omitted or empty registry throws below,
+  # because the one artifact that serves IS this host instantiation
+  # (`system.build.delphiSite`), so a host-free preview would be a different
+  # page wearing the same name.
+  cards ? throw "lib/delphi-site.nix: `cards` is required — pass `config.services.servicePortal.cards`; the served site is the host instantiation, not a host-free build",
   publicDomain ? null,
   tailnetHost ? null,
   # The tailnet resolver address this host binds on `lo` (the host config's one
@@ -74,13 +78,23 @@
   # A tag-net card is an address on the tailnet. Printing one on the public page
   # would be a map, so the public surface reports the COUNT and withholds the
   # addresses: `withheld` below is derived, not an editorial choice made twice.
-  byAudience = a: lib.filter (c: c.audience == a) cards;
+  # An empty list is not a smaller site, it is a site that knows nothing: the
+  # cards ARE the registry, so `[]` means the portal is disabled or the caller
+  # invented its own empty list. Fail here rather than ship a page that explains
+  # its own emptiness.
+  cardRegistry =
+    if cards == []
+    then throw "lib/delphi-site.nix: `cards` is empty — enable `services.servicePortal` on the host so the site renders the registry that also generates the `tailscale serve` units"
+    else cards;
+
+  byAudience = a: lib.filter (c: c.audience == a) cardRegistry;
   tailnetCards =
     lib.sort (a: b: a.title < b.title)
-    (lib.filter (c: c.audience == "tailnet") cards);
+    (lib.filter (c: c.audience == "tailnet") cardRegistry);
   publicCards = byAudience "public";
   lanCards = byAudience "lan";
   withheld = builtins.length tailnetCards;
+  cardCount = builtins.length cardRegistry;
 
   keyServices = sw.key_services or [];
   traits = sw.traits or [];
@@ -145,9 +159,8 @@
   in
     lib.concatMapStringsSep " · " (k: "${k} ${n attrs.${k}}") (known ++ rest);
 
-  # The withheld note only exists when something is withheld. A build without a
-  # card registry (the flake-level smoke target) says so elsewhere rather than
-  # printing "0 services, addresses withheld".
+  # The withheld note only exists when something is withheld: a host whose cards
+  # are all public has nothing to explain.
   withheldNote = lib.optionalString (withheld > 0) ''
     <div class="panel">
       <h3>${n withheld} ${plural withheld "service" "services"}, addresses withheld</h3>
@@ -159,12 +172,9 @@
     </div>
   '';
 
-  # One honest sentence about where the card list came from, because "0 cards"
-  # with no explanation is the failure mode this site replaced.
-  serviceLine =
-    if cards == []
-    then "no card registry in this instantiation — the served build reads <code>services.servicePortal.cards</code> from the host"
-    else "${n (builtins.length cards)} compiled cards, ${n withheld} of them tailnet-only";
+  # Where the card list came from, counted rather than described, because "the
+  # services page" with no numbers was the failure mode this site replaced.
+  serviceLine = "${n cardCount} compiled cards, ${n withheld} of them tailnet-only";
 
   # A card is a link with its address on the console, and a bare row on the
   # public surface — the same evaluated values, one difference that is the whole
@@ -238,13 +248,13 @@
       tags = tagCount;
     };
     services = {
-      total = builtins.length cards;
+      total = cardCount;
       inherit withheld;
       public = builtins.length publicCards;
       lan = builtins.length lanCards;
       tailnet = builtins.length tailnetCards;
       declared = keyServices;
-      cards = cards;
+      cards = cardRegistry;
     };
     declared = {
       inherit traits constraints allowedTasks notes;
@@ -379,16 +389,7 @@
       else "—";
     mountCount = n withheld;
     mountWord = plural withheld "service" "services";
-    serviceList =
-      if tailnetCardsOrThrow == []
-      then ''
-        <p class="pull">
-          No mount registry in this instantiation. The served console reads
-          <code>services.servicePortal.cards</code> from the host, so an empty
-          list here means a flake-level build, not a host with no services.
-        </p>
-      ''
-      else cardGrid "console" tailnetCardsOrThrow;
+    serviceList = cardGrid "console" tailnetCardsOrThrow;
     publicUrl =
       if publicUrl != ""
       then esc publicUrl

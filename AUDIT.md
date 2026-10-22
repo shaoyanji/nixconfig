@@ -25,6 +25,17 @@
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-22 — `.#delphi-site` is what serves, and the server says so
+- The flake package was a host-free lookalike: same name, same templates, empty `cards` — it printed "no
+  mount registry" while the live console listed four mounts. It is now
+  `nixosConfigurations.delphi.config.system.build.delphiSite` (aarch64 only, because it *is* that host's
+  evaluation), so `.#delphi-site.outPath` equals `/etc/nginx`'s root. `cards` has no default, and an empty
+  list throws: a preview that cannot carry the registry fails at eval instead of shipping an apology.
+- Each site vhost emits `X-Site-Path`, and `checks:site:path` (`scripts/task/site-drift.sh`) compares it
+  with `nix eval --raw .#delphi-site.outPath` — one request with a timeout, one eval under the OOM
+  watchdog, no ssh. Proven in three states: rc 2 before the header existed, rc 1 with the tree one newline
+  ahead of the deploy (`ady9526…` vs `r68sfyg…`), rc 0 in sync.
+
 ### 2026-10-22 — delphi's two surfaces are compiled from one structure; two gates stop needing python
 - `lib/delphi-site.nix` renders the public dossier and the tailnet console from ONE evaluated structure
   (`inventory.toml` + knowledge graph + `config.services.servicePortal.cards`); markup in
@@ -42,7 +53,8 @@
   closure (cache fetches, no build), after which `checks:toon`, `ops:tailnet:policy` and
   `checks:kg:canvas` (static half) pass here; `agent-browser` stays opt-in — that gate skips its click.
 
-### 2026-10-22 — the portable library gets an admission rule, not a bigger disk- Audited the four store dirs: 178 files, 9.5 GiB, 83 static, glibc floor 2.39, 11 MiB exact duplicates, 92 MiB eget re-fetch residue (`*.1`).
+### 2026-10-22 — the portable library gets an admission rule, not a bigger disk
+- Audited the four store dirs: 178 files, 9.5 GiB, 83 static, glibc floor 2.39, 11 MiB exact duplicates, 92 MiB eget re-fetch residue (`*.1`).
 - `data:library`, `:index`, `:fetch` replace ad-hoc eget use: a dynamic download is rejected to
   `.rejected/`, provenance goes to `.library.tsv`; asserts
   [[flake/policies.nix#library-fetch-is-static]] + [[flake/policies.nix#library-crosses-the-wire]],

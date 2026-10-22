@@ -424,13 +424,28 @@ Three rules the pages are built to keep:
 Preview it without touching the host:
 
 ```bash
-nix build .#delphi-site --print-out-paths      # both surfaces, empty card list
-nix build --print-out-paths \
-  .#nixosConfigurations.delphi.config.services.nginx.virtualHosts.delphi.root  # the served tree
+nix eval --raw .#delphi-site.outPath    # the tree nginx serves, cards included
+nix build .#delphi-site --print-out-paths
 ```
 
-The first carries the registry and the graph but no host config, so its console
-says it has no mount registry; the second is the artifact nginx actually serves.
+`.#delphi-site` **is** `config.system.build.delphiSite` — the host's own
+instantiation, with `services.servicePortal.cards` — so the preview cannot be a
+second page wearing the same name. It is defined for `aarch64-linux` only, and
+because it is a host evaluation it costs one to evaluate; building it needs an
+aarch64 builder (or this host). Without the card registry the compiler throws at
+eval instead of rendering a console with no services in it.
+
+A deploy can still leave the previous tree serving (a boot-only activation, a
+rollback, a flake ref that did not move). The vhosts emit `X-Site-Path`, so ask
+the server instead of trusting the log:
+
+```bash
+task checks:site:path                   # exit 1 = the live tree is not this tree
+```
+
+It sends one request with a timeout — no ssh, so it cannot hang on an interactive
+auth check — and compares the header with `nix eval --raw .#delphi-site.outPath`.
+Exit 2 means nobody answered or the serving generation predates the header.
 
 A port is the mount, not a path: `tailscale serve` proxies a whole origin, so a
 new service takes the next free number rather than a location under an existing

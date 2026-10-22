@@ -3,6 +3,7 @@
   systems,
   pkgsFor,
   inventory,
+  self,
   ...
 }:
 lib.genAttrs systems.default (system: let
@@ -41,71 +42,68 @@ lib.genAttrs systems.default (system: let
       + prose "notes" h.notes;
   in
     lib.concatStringsSep "\n" lines + lists + "\n";
-in {
-  inherit (pkgs) simplex-chat;
-  inherit (pkgs) smp-server;
-  # Aki explorer site: fed the COMPILED registry, so its host matrix cannot
-  # disagree with the hosts or with the markdown docs built from the same value.
-  fleet-docs-site = import ../lib/aki-site.nix {inherit pkgs lib inventory;};
+in
+  {
+    inherit (pkgs) simplex-chat;
+    inherit (pkgs) smp-server;
+    # Aki explorer site: fed the COMPILED registry, so its host matrix cannot
+    # disagree with the hosts or with the markdown docs built from the same value.
+    fleet-docs-site = import ../lib/aki-site.nix {inherit pkgs lib inventory;};
 
+    # --- compiled inventory artifacts ---------------------------------------
+    # Both are generated from the ONE parse in lib/inventory.nix, so they cannot
+    # disagree with each other or with inventory.toml.
+
+    # Machine-readable registry, pretty-printed for diffing. Consume this instead
+    # of re-parsing inventory.toml with `yq` in scripts: it is already validated,
+    # defaults-normalised and carries the derived counts.
+    inventory-json = pkgs.runCommand "inventory.json" {nativeBuildInputs = [pkgs.jq];} ''
+      jq . ${pkgs.writeText "inventory.compiled.json" inventory.json} > $out
+    '';
+
+    # bountystash.com — the portfolio, rendered from evaluated data by the same
+    # Nix-native approach as the fleet site (lib/bountystash-site.nix): one CSS
+    # file, two locales, no JavaScript.
+    bountystash-site = import ../lib/bountystash-site.nix {inherit pkgs lib;};
+
+    # The agent feed: every Nix host's role, persona hint, hardware, traits and
+    # operational notes as one compiled document. This is where the commentary
+    # that used to live as Nix comments is meant to land.
+    fleet-feed = pkgs.writeText "FLEET-FEED.md" (
+      let
+        m = inventory.metadata;
+        d = inventory.derived;
+      in
+        ''
+          # ${m.title}
+
+          ${m.description}
+
+          Compiled from `inventory.toml` (schema v${m.version}) by `lib/inventory.nix`.
+
+          - devices: ${toString d.total} (nix: ${toString d.nix}, external: ${toString d.external})
+          - active: ${toString d.active} (nix: ${toString d.activeNix}, external: ${toString d.activeExternal})
+          - wip: ${toString d.wip}, preserved: ${toString d.preserved}
+
+        ''
+        + lib.concatStringsSep "\n" (lib.mapAttrsToList feedHost inventory.nixHosts)
+        + ''
+          ## Non-Nix devices
+
+          ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: h: "- ${name}: ${h.role} (${h.status})") inventory.externalHosts)}
+        ''
+    );
+  }
   # delphi's two surfaces: the public dossier and the tailnet console, from one
-  # evaluated structure (lib/delphi-site.nix).
+  # evaluated structure (`lib/delphi-site.nix`).
   #
-  # This build carries the registry and the knowledge graph but NOT a host
-  # config, so its card list is empty and the console says so instead of printing
-  # an empty grid. The artifact that actually serves is the host's own
-  # instantiation in `hosts/delphi/configuration.nix`, which additionally passes
-  # `services.servicePortal.cards`. What this output proves is that both
-  # templates and the asset files compile on any architecture, without a host
-  # evaluation.
-  delphi-site = import ../lib/delphi-site.nix {
-    inherit pkgs lib inventory;
-    host = "delphi";
-    publicDomain = inventory.hosts.delphi.network.domain;
-    tailnetHost = "${inventory.hosts.delphi.network.tailscale_hostname}.cloudforest-kardashev.ts.net";
-  };
-
-  # --- compiled inventory artifacts ---------------------------------------
-  # Both are generated from the ONE parse in lib/inventory.nix, so they cannot
-  # disagree with each other or with inventory.toml.
-
-  # Machine-readable registry, pretty-printed for diffing. Consume this instead
-  # of re-parsing inventory.toml with `yq` in scripts: it is already validated,
-  # defaults-normalised and carries the derived counts.
-  inventory-json = pkgs.runCommand "inventory.json" {nativeBuildInputs = [pkgs.jq];} ''
-    jq . ${pkgs.writeText "inventory.compiled.json" inventory.json} > $out
-  '';
-
-  # bountystash.com — the portfolio, rendered from evaluated data by the same
-  # Nix-native approach as the fleet site (lib/bountystash-site.nix): one CSS
-  # file, two locales, no JavaScript.
-  bountystash-site = import ../lib/bountystash-site.nix {inherit pkgs lib;};
-
-  # The agent feed: every Nix host's role, persona hint, hardware, traits and
-  # operational notes as one compiled document. This is where the commentary
-  # that used to live as Nix comments is meant to land.
-  fleet-feed = pkgs.writeText "FLEET-FEED.md" (
-    let
-      m = inventory.metadata;
-      d = inventory.derived;
-    in
-      ''
-        # ${m.title}
-
-        ${m.description}
-
-        Compiled from `inventory.toml` (schema v${m.version}) by `lib/inventory.nix`.
-
-        - devices: ${toString d.total} (nix: ${toString d.nix}, external: ${toString d.external})
-        - active: ${toString d.active} (nix: ${toString d.activeNix}, external: ${toString d.activeExternal})
-        - wip: ${toString d.wip}, preserved: ${toString d.preserved}
-
-      ''
-      + lib.concatStringsSep "\n" (lib.mapAttrsToList feedHost inventory.nixHosts)
-      + ''
-        ## Non-Nix devices
-
-        ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: h: "- ${name}: ${h.role} (${h.status})") inventory.externalHosts)}
-      ''
-  );
-})
+  # This IS the artifact nginx serves — `system.build.delphiSite` from the host's
+  # own evaluation, including `services.servicePortal.cards` — because a second,
+  # card-less build under the same name was a preview that showed an empty console
+  # while the live page listed four mounts. It costs a host evaluation to read, so
+  # it lives outside the per-system set below only for delphi's architecture: a
+  # package set for another system would hold a foreign derivation that a local
+  # `nix build` can only satisfy by spending a builder's budget.
+  // lib.optionalAttrs (system == "aarch64-linux") {
+    delphi-site = self.nixosConfigurations.delphi.config.system.build.delphiSite;
+  })

@@ -18,6 +18,7 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFOS9RHGObNEmXWrmgry6j4NjepOYSC101CmdCtfxRVr devji@stark"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF1XL9TzXWLtNRoO/csE9BbcYsZChMUSZPnDtFIH0eVY devji@eisen"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMptCVdbDOaPovY/J7QOicHHjThJd7GOSSMFxZg7uh04 devji@fern"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIbiJspn0JANpr2SNXCzOd7xVS2YoF35fq6wRrHf9wfB devji@delphi"
     ];
 in {
   options.ssh.authorizedKeys.keys = lib.mkOption {

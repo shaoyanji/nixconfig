@@ -3,6 +3,9 @@
 {
   inputs,
   hypervisor ? "cloud-hypervisor",
+  # TCG hosts name a CPU; without it microvm.nix passes -enable-kvm and the
+  # runner fails on a host with no nested virtualisation.
+  cpu ? null,
   # Tap ids must not collide with other guests on the same bridge (frieren's
   # canary holds microvm1).
   tapIds ? ["microvm3" "microvm4"],
@@ -35,16 +38,18 @@ in {
       HostName ${slidesIp}
   '';
 
-  # Shares are host paths; create them once, owned by the runner's login.
+  # Shares are host paths. They must be writable by the RUNNER user (`microvm`,
+  # group kvm) — `microvm-set-booted@` creates a `booted` symlink there and fails
+  # with EACCES if root owns the directory. devji is in kvm, so 0770 is shared.
   systemd.tmpfiles.rules = [
-    "d ${stateRoot} 0755 root root -"
-    "d ${stateRoot}/sandbox 0755 root root -"
-    "d ${stateRoot}/sandbox/workspace 0755 devji users -"
-    "d ${stateRoot}/sandbox/ssh-host-keys 0700 devji users -"
-    "d ${stateRoot}/slides 0755 root root -"
-    "d ${stateRoot}/slides/workspace 0755 devji users -"
-    "d ${stateRoot}/slides/workspace/slides 0755 devji users -"
-    "d ${stateRoot}/slides/ssh-host-keys 0700 devji users -"
+    "d ${stateRoot} 0755 microvm kvm -"
+    "d ${stateRoot}/sandbox 0755 microvm kvm -"
+    "d ${stateRoot}/sandbox/workspace 0770 microvm kvm -"
+    "d ${stateRoot}/sandbox/ssh-host-keys 0770 microvm kvm -"
+    "d ${stateRoot}/slides 0755 microvm kvm -"
+    "d ${stateRoot}/slides/workspace 0770 microvm kvm -"
+    "d ${stateRoot}/slides/workspace/slides 0770 microvm kvm -"
+    "d ${stateRoot}/slides/ssh-host-keys 0770 microvm kvm -"
   ];
 
   microvm.vms = {
@@ -60,7 +65,7 @@ in {
             ipAddress = sandboxIp;
             tapId = sandbox;
             mac = "02:00:00:00:83:11";
-            inherit hypervisor;
+            inherit hypervisor cpu;
             workspace = "${stateRoot}/sandbox/workspace";
             sshHostKeys = "${stateRoot}/sandbox/ssh-host-keys";
             persistent = false;
@@ -88,7 +93,7 @@ in {
             ipAddress = slidesIp;
             tapId = slides;
             mac = "02:00:00:00:83:12";
-            inherit hypervisor;
+            inherit hypervisor cpu;
             workspace = "${stateRoot}/slides/workspace";
             sshHostKeys = "${stateRoot}/slides/ssh-host-keys";
             persistent = true;

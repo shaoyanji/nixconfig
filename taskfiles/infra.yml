@@ -613,6 +613,7 @@ tasks:
 
   microvm:list:
     desc: List this host's declarative microVMs and their microvm@ unit state
+    # Read from the evaluated config, never a hand-kept list.
     summary: >
       The guests are `microvm.vms.<name>` in the host's NixOS config
       (`hosts/microvms/guests.nix`), so the config is the list — nothing is
@@ -629,19 +630,27 @@ tasks:
         done
 
   microvm:start:
-    desc: "Start a declarative microVM guest (NAME=sandbox|slides)"
+    desc: "Start a declarative microVM guest and wait for ssh (NAME=sandbox|slides)"
+    summary: >
+      `microvm@<name>` then a wait on the CONDITION, not a fixed sleep: ssh answers
+      for the guest once systemd is up. WAIT=180 because a guest on a host without
+      /dev/kvm boots under TCG and takes minutes — on KVM it is seconds. Exit 1 if
+      ssh never answers within WAIT.
     requires:
       vars: [NAME]
     cmds:
-      - sudo systemctl start "microvm@{{.NAME}}"
       - |
-        sleep 3
-        if ssh -o BatchMode=yes -o ConnectTimeout=3 "{{.NAME}}" true; then
-          echo "{{.NAME}}: up, ssh answering"
-        else
-          echo "{{.NAME}}: unit started but ssh did not answer in 3s" >&2
-          exit 1
-        fi
+        sudo systemctl start "microvm@{{.NAME}}" || exit $?
+        waited=0
+        while [ "$waited" -lt "{{.WAIT | default "180"}}" ]; do
+          if ssh -o BatchMode=yes -o ConnectTimeout=3 "{{.NAME}}" true 2>/dev/null; then
+            echo "{{.NAME}}: up after ${waited}s, ssh answering"
+            exit 0
+          fi
+          sleep 5; waited=$((waited + 5))
+        done
+        echo "{{.NAME}}: started, ssh silent after {{.WAIT | default "180"}}s" >&2
+        exit 1
 
   microvm:stop:
     desc: "Stop a declarative microVM guest (NAME=sandbox|slides)"

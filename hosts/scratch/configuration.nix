@@ -23,13 +23,30 @@
     exec ${customDwl}/bin/dwl "$@"
   '';
 in {
+  # Deliberately NOT `base-desktop-environment` (eisen/poseidon: niri + DMS +
+  # nautilus/gvfs/portal/printing/gnome-keyring). This host is a suckless
+  # **fork**, not an inheritance of the fleet desktop: base-node for the OS
+  # contract (SSH, sops, firewall, user, zram, boot) and then only the plumbing
+  # dwl actually spawns. The home-manager role is forked below for the same
+  # reason — otherwise the WM changes and the userland does not.
   imports = [
     ./hardware-configuration.nix
-    # Full desktop baseline (eisen/poseidon): niri + DMS greeter +
-    # portals + fonts, and transitively base-node (SSH, sops, firewall,
-    # zram default) + desktop-client (tailscale, avahi, printing,
-    # pipewire, bluetooth).
-    ../../modules/profiles/base-desktop-environment.nix
+    ../../modules/profiles/base-node.nix
+    ../../modules/profiles/boot.nix
+  ];
+
+  # --- Home Manager: minimal user role, not the fleet desktop ---
+  # `roles/home.nix` is the fleet userland (zen, niri, kitty, DMS, zed, kg
+  # sidecar, AI CLIs). Forking it is a deliberate departure from the shared
+  # chain: this host keeps the base CLI/env + sops identity from roles/minimal,
+  # the shell, and the one desktop nicety the launcher depends on — the appimage
+  # .desktop entries. Keybindings live in dwl's config.h, not in the userland.
+  # `user/base.nix` already pulls the shell, sops identity, helix/lf and the
+  # curated pkgs.txt; roles/minimal would additionally drag the AI CLI stack in.
+  # This *replaces* the fleet default (roles/home.nix) rather than adding to it.
+  fleet.hmUserModules = [
+    ../../modules/user/base.nix
+    ../../modules/user/desktop/appimage-launchers.nix
   ];
 
   # /boot is ext4 (legacy BIOS + GRUB) — NOT a vfat ESP, so systemd-boot
@@ -45,9 +62,31 @@ in {
   };
 
   # --- Minimalist Suckless Desktop: dwl (Wayland) + foot + wmenu ---
-  programs.niri.enable = lib.mkForce false;
-  programs.dms-greeter.enable = lib.mkForce false;
+  # Nothing else registers a desktop session; greetd launches dwl directly.
   services.displayManager.sddm.enable = false;
+
+  # dwl's media keys shell out to wpctl/playerctl, and PipeWire is the only
+  # audio stack this host needs (desktop-client used to supply it).
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+  };
+  security.rtkit.enable = true;
+
+  # appimage-run through binfmt: the launcher entries the HM module writes
+  # execute the images in place under /Volumes/data/appimages.
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+
+  # foot/wmenu are told "JetBrainsMono Nerd Font" by name, so the font has to
+  # exist system-wide; base-desktop-environment used to provide it.
+  fonts = {
+    packages = [pkgs.nerd-fonts.jetbrains-mono];
+    fontconfig.defaultFonts.monospace = ["JetBrainsMono Nerd Font Mono" "JetBrainsMono NFM"];
+  };
 
   # Foot terminal with Catppuccin Mocha sensible defaults
   programs.foot = {
@@ -71,25 +110,9 @@ in {
     };
   };
 
-  # X11 dwm fallback available on system
-  services.xserver = {
-    enable = true;
-    windowManager.dwm = {
-      enable = true;
-      extraSessionCommands = ''
-        ${pkgs.slstatus}/bin/slstatus &
-        ${pkgs.xorg.xsetroot}/bin/xsetroot -solid "#1e1e2e" &
-      '';
-    };
-    displayManager.startx.enable = true;
-  };
-
-  # Screen locker setuid PAM integrations
-  programs.slock.enable = true;
+  # Screen locker PAM integration (Wayland); the X11 stack is gone with the
+  # desktop baseline, so slock/dwm/xsetroot are no longer built here.
   security.pam.services.waylock = {};
-
-  # Direct lightweight autologin into dwl via greetd (with none+dwm registered)
-  services.displayManager.defaultSession = lib.mkForce "none+dwm";
   services.greetd = {
     enable = true;
     settings = {
@@ -105,15 +128,12 @@ in {
   };
 
   # ── Suckless Debloat & Closure Diet ──
+  # Nothing to mkForce off any more: the file manager / portal / keyring stack
+  # was never inherited (that was base-desktop-environment).
   documentation.enable = false;
   documentation.nixos.enable = false;
   documentation.man.enable = false;
   documentation.doc.enable = false;
-
-  services.udisks2.enable = lib.mkForce false;
-  services.accounts-daemon.enable = lib.mkForce false;
-  services.printing.enable = lib.mkForce false;
-  services.gnome.gnome-keyring.enable = lib.mkForce false;
 
   # Intel HD 530 iGPU — Mesa via modesetting.
   hardware.graphics.enable = true;
@@ -182,28 +202,24 @@ in {
 
   environment.systemPackages = with pkgs; [
     btop # RAM/tmpfs/zram visibility
-    # Suckless Wayland (Default Session)
+    # Suckless Wayland (the whole desktop)
     customDwl
     foot
     wmenu
+    # Mod+A / Mod+Space: feeds .desktop entries (incl. appimages) to wmenu
+    j4-dmenu-desktop
     waylock
     wl-clipboard
     imv
     # Mod+S / Mod+Print screenshots (niri parity)
     grim
     slurp
+    # Media keys bound in config.h
+    playerctl
+    brightnessctl
     # TPM: identity generation and inspection live on the host
     age-plugin-tpm
     tpm2-tools
-    # Suckless X11 Core Toolchain
-    dwm
-    st
-    dmenu
-    slstatus
-    slock
-    nsxiv
-    vis
-    xclip
   ];
 
   # --- sops: both planes unseal through the TPM ---

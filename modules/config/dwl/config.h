@@ -175,11 +175,23 @@ movetotag(const Arg *arg)
 
 /* Commands with Catppuccin Mocha themed wmenu */
 static const char *termcmd[] = { "foot", NULL };
-/* Mod+A. `wmenu-run`/`dmenu_run` only walk $PATH, so they cannot see the
- * `appimage-*.desktop` entries appimage-launchers keeps in
- * ~/.local/share/applications — the picker then looks emptier than niri's.
- * fuzzel reads XDG desktop entries, so the same list survives the port. */
-static const char *menucmd[] = { "fuzzel", NULL };
+/* Mod+A / Mod+Space. `wmenu-run` only walks $PATH, so the appimage-*.desktop
+ * entries appimage-launchers keeps in ~/.local/share/applications never appear.
+ * j4-dmenu-desktop feeds XDG desktop entries to wmenu, so the picker keeps the
+ * pure suckless tool AND niri's list; the wmenu flags are the Catppuccin ones
+ * this config used before, carried through the wrapper. */
+static const char *menucmd[] = {
+	"sh", "-c",
+	"j4-dmenu-desktop --dmenu='wmenu -f \"JetBrainsMono Nerd Font 11\" -N 1e1e2e -n cdd6f4 -M 313244 -m cdd6f4 -S cba6f7 -s 11111b'",
+	NULL};
+
+/* niri Mod+Space opens the DMS spotlight bar. There is no DMS here, and the
+ * nearest intent is the same picker the launcher opens, so the binding is not
+ * silently dropped. */
+static const char *spotlight[] = {
+	"sh", "-c",
+	"j4-dmenu-desktop --dmenu='wmenu -f \"JetBrainsMono Nerd Font 11\" -N 1e1e2e -n cdd6f4 -M 313244 -m cdd6f4 -S cba6f7 -s 11111b'",
+	NULL};
 
 /* Media keys are bound in the keymap here because scratch runs no DMS daemon
  * to own them; niri binds the same XF86 keys explicitly. */
@@ -220,9 +232,10 @@ static const Key keys[] = {
 	 * Deliberately unbound, because dwl has no primitive for them: Mod+E
 	 * (niri switches focus between the floating and tiling layers), Mod+[
 	 * and Mod+] (consume/expel into a column), Mod+U (previous monitor), and
-	 * every DMS/kando/zen key — Mod+Y P V Space N M B Shift+B Z C,
-	 * Ctrl+Space, Mod+MouseMiddle — whose programs are not installed here.
-	 * Mod+Shift+E stays as an escape hatch; niri has no equivalent.
+	 * the DMS/kando/zen keys — Mod+Y P V N M B Shift+B Z C, Ctrl+Space,
+	 * Mod+MouseMiddle — whose programs are not installed here. Mod+Space is
+	 * bound (spotlight[]). Mod+Shift+E stays as an escape hatch; niri has no
+	 * equivalent.
 	 */
 	/* modifier                    key                  function          argument */
 	/* niri: Mod+A launcher, Mod+T terminal (kitty) */
@@ -268,9 +281,8 @@ static const Key keys[] = {
 	/* niri: Mod+R switches the column width — here it widens, Shift narrows */
 	{ MODKEY,                      XKB_KEY_r,           setmfact,         {.f = +0.05f} },
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_r,           setmfact,         {.f = -0.05f} },
-	/* The only global mode switch dwl has, parked where niri opens the DMS
-	 * spotlight; there is no DMS on this host. */
-	{ MODKEY,                      XKB_KEY_space,       setlayout,        {0} },
+	/* niri: Mod+Space opens the DMS spotlight bar (see spotlight[]) */
+	{ MODKEY,                      XKB_KEY_space,       spawn,            {.v = spotlight} },
 
 	/* niri: Mod+S region screenshot, Mod+Print full screen (into the clipboard) */
 	{ MODKEY,                      XKB_KEY_s,           spawn,            SHCMD("grim -g \"$(slurp)\" - | wl-copy") },

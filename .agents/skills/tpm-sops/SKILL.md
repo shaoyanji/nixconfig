@@ -120,9 +120,12 @@ read *some* file, which is not the question and can be a different checkout enti
 The system plane's activation script names its manifest directly, so ask it:
 
 ```bash
-ssh <host> 'sudo cat /nix/store/<hash>-sops-nix-user | grep -o "/nix/store/[a-z0-9]*-manifest[a-z-]*\.json"'
-# or, without knowing the script path:
-ssh <host> 'systemctl --user show sops-nix -p ExecStart --value'
+# ExecStart is a sops-nix-generated script holding the manifest path; --value emits a
+# struct, so parse `path=` rather than awk-ing the first field.
+ssh <host> 'S=$(systemctl --user show sops-nix -p ExecStart --value \
+  | sed -n "s/.*path=\([^ ;]*\).*/\1/p"); \
+  M=$(grep -o "/nix/store/[a-z0-9]*-manifest[a-z-]*\.json" "$S"); \
+  grep -o "/nix/store/[a-z0-9]*-secrets\.yaml" "$M" | sort -u'
 ```
 
 Then decrypt that path on both planes and require the **same digest**:

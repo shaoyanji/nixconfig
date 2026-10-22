@@ -1,5 +1,10 @@
 # MicroVM SubZeroClaw — operating documentation
 
+> **This guest is a sandbox, not the fleet's promotion gate.** It boots its own
+> kernel and root, so it can never fail for the host being deployed. The gate that
+> boots a host's real module graph is `task checks:boot HOST=<host>`
+> (`flake/boot-checks.nix`); CI runs it for `modules/services/**` changes.
+
 Run SubZeroClaw inside an isolated microVM (the `frieren-canary` guest) while the
 LLM inference stays on the host (Eisen). The guest talks only to its host
 (`192.168.83.1`), never directly to the LAN. Frieren is the example host

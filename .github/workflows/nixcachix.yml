@@ -68,6 +68,7 @@ jobs:
       affected_hosts: ${{ steps.detect.outputs.affected_hosts }}
       matrix: ${{ steps.detect.outputs.matrix }}
       reason: ${{ steps.detect.outputs.reason }}
+      services_changed: ${{ steps.services.outputs.changed }}
     steps:
       - name: Sync repository
         uses: actions/checkout@v4
@@ -95,6 +96,23 @@ jobs:
             fi
           else
             python3 scripts/ci/detect-affected-hosts.py --ci --shared-strategy "$STRATEGY"
+          fi
+
+      # The boot canary is scoped to a path class, not to every push: it boots a
+      # full VM per host, which is minutes, while a normal host build is the gate
+      # for everything else. `modules/services/**` is the class where a change
+      # evaluates and builds and then never reaches userspace.
+      - name: Detect service-module changes
+        id: services
+        run: |
+          base="${{ github.event.before }}"
+          if [ -z "$base" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            base="HEAD~1"
+          fi
+          if git diff --name-only "$base" HEAD | grep -qE '^modules/services/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
   build-machines:
@@ -159,3 +177,67 @@ jobs:
       - name: Per-host eval + assertion gate
         if: matrix.kind == 'nixos'
         run: nix build -L .?submodules=1#hostChecks.${{ matrix.arch }}.${{ matrix.host }}
+
+  # Boot the host's REAL module graph before a services change can be trusted.
+  # Reuses `plan`'s matrix, so only hosts the change reaches boot, and runs after
+  # build-machines so their closures are already substituted. Gated on
+  # `modules/services/**` because a boot test is a full host evaluation plus a
+  # QEMU run — minutes per host, not a per-push cost.
+  boot-canary:
+    needs: [plan, build-machines]
+    if: needs.plan.outputs.has_machines == 'true' && needs.plan.outputs.services_changed == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Maximize build disk space (Linux only)
+        if: runner.os == 'Linux'
+        uses: easimon/maximize-build-space@v10
+        with:
+          overprovision-lvm: true
+          swap-size-mb: 1024
+          remove-dotnet: "true"
+          remove-android: "true"
+          remove-haskell: "true"
+          remove-codeql: "true"
+          remove-docker-images: "true"
+          build-mount-path: /nix
+
+      # nixosTest drives QEMU with KVM when /dev/kvm is usable. GitHub's Linux
+      # runners expose it but root-only; without this the test falls back to TCG
+      # and a boot takes tens of minutes instead of one.
+      - name: Enable KVM
+        if: runner.os == 'Linux'
+        run: |
+          if [ -e /dev/kvm ]; then
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
+          else
+            echo "::warning::/dev/kvm absent; the boot test runs under TCG (slow)"
+          fi
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+
+      - name: Sync repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+          token: "${{ secrets.GH_PAT }}"
+
+      - uses: cachix/cachix-action@v14
+        with:
+          name: shaoyanji
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          useDaemon: false
+          installCommand: nix profile install nixpkgs#cachix
+
+      - name: Boot to stage-2 (no stage-1 handoff = failure)
+        if: matrix.kind == 'nixos'
+        run: nix build -L .?submodules=1#hostBootChecks.${{ matrix.arch }}.${{ matrix.host }}

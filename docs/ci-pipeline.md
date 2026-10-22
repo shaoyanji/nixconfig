@@ -54,6 +54,33 @@ The `docs-budget` job runs on every push and builds
 the job on a violation, so documentation cannot grow past its `SCHEMA.md` §2
 budget just because the change touched no host.
 
+## The boot canary (`modules/services/**`)
+
+Neither of the two builds above proves the system reaches userspace: a host can
+evaluate, assert and build, then die in stage-1 (netbook generation 50 booted a
+systemd-initrd that never handed off, with every gate green). The third gate
+runs the config.
+
+When a push touches `modules/services/**`, the `boot-canary` job boots each host
+in `plan`'s matrix — the affected hosts, not the fleet — with:
+
+```bash
+nix build -L .?submodules=1#hostBootChecks.<arch>.<host>
+```
+
+That is a NixOS VM test (`flake/boot-checks.nix`) over the host's own module
+list, asserting `multi-user.target` and PID 1 being systemd. It runs after
+`build-machines`, so the closure is already substituted, and it needs `/dev/kvm`
+(the job enables it); without KVM a boot falls back to TCG and takes tens of
+minutes. Locally the same gate is `task checks:boot HOST=<host>` — one host,
+under the OOM watchdog, `--builders ""` so it can never spend nixbuild.net
+budget.
+
+What it cannot see: hardware. QEMU has no eMMC, NVIDIA or TPM, so a regression
+that only reproduces on the target's storage controller or GPU is out of reach —
+that half of netbook gen 50 was never a VM bug. The gate is still the only one
+that runs the configuration it is about to promote.
+
 ## Operating it
 
 | Task                        | What                                                              |

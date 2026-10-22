@@ -32,6 +32,10 @@ in {
   boot.supportedFilesystems = ["f2fs" "nfs"];
   hardware.enableRedistributableFirmware = true;
   boot.loader.systemd-boot.configurationLimit = 10;
+  # Measured 2026-10-22: 13.1 s of a 47.3 s boot was the loader stage, 5 s of it
+  # this countdown. 3 s keeps a usable window for the other generations while
+  # still paying 2 s less than the default.
+  boot.loader.timeout = 3;
 
   # eMMC has no seek cost, so the block-layer scheduler only adds latency; the
   # kernel recommends none for devices with their own queueing.

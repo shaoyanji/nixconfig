@@ -1,0 +1,99 @@
+<section id="brief">
+  <h2><span>01</span> The brief</h2>
+  <p class="lede">
+    The cloud outpost of a fleet that provisions every one of its
+    <strong>{{devices}}</strong> machines from a single Nix flake &mdash; and the
+    only member of it that faces the open internet.
+  </p>
+  <p class="pull">{{statusDetail}}</p>
+  <p>
+    Delphi is not a demo deployment. It is the fleet's outside vantage point: the
+    resolver address every tailnet client is pointed at, a pair of eyes on the
+    home servers from a network that is not the home network, and a shell that
+    stays reachable when the basement does not. What runs here is a module in the
+    same flake that builds the laptops &mdash; there is no second way to
+    provision it, no image built by hand, and no state that outlives a rebuild.
+  </p>
+</section>
+
+<section id="machine">
+  <h2><span>02</span> The machine</h2>
+  <p>
+    An always-free ARM64 instance, chosen for the shape most fleets cannot
+    afford: a public address, 24/7 uptime, and a network position outside every
+    home router.
+  </p>
+  <table class="ledger"><tbody>
+  {{hardwareRows}}
+  </tbody></table>
+  <h3>Field notes</h3>
+  <ul class="plain">{{noteList}}</ul>
+</section>
+
+<section id="stack">
+  <h2><span>03</span> What it runs</h2>
+  <p>
+    The public tier is deliberately small: one TLS virtual host, a health
+    endpoint, and the redirect from port 80. The interesting half is inside the
+    mesh, where a tailnet client gets a proxy per service and a certificate it can
+    verify.
+  </p>
+  {{serviceList}}
+  {{withheldNote}}
+</section>
+
+<section id="envelope">
+  <h2><span>04</span> The operating envelope</h2>
+  <p>
+    This is a small machine and it is treated as one. Nothing compiles here that a
+    builder can compile elsewhere; binary caches are pulled at line rate and the
+    home link is never in the path.
+  </p>
+  <h3>{{personaTitle}} &middot; tier <code>{{computeTier}}</code></h3>
+  <ul class="plain">{{constraintList}}</ul>
+  <h3>What this host may be asked to do</h3>
+  <ul class="plain">{{allowedTaskList}}</ul>
+  <ul class="chips">{{traitList}}</ul>
+</section>
+
+<section id="fleet">
+  <h2><span>05</span> The fleet it belongs to</h2>
+  <dl class="stats">
+    <div>
+      <dt>Registered devices</dt>
+      <dd>{{devices}}</dd>
+      <small>{{kindRow}}</small>
+    </div>
+    <div>
+      <dt>Active</dt>
+      <dd>{{active}}</dd>
+      <small>of {{devices}} registered &middot; {{preserved}} preserved &middot; {{wip}} in progress</small>
+    </div>
+    <div>
+      <dt>Architectures</dt>
+      <dd>{{archs}}</dd>
+      <small>{{archRow}}</small>
+    </div>
+    <div>
+      <dt>Knowledge edges</dt>
+      <dd>{{graphEdges}}</dd>
+      <small>{{graphNodes}} nodes &middot; {{graphHosts}} hosts &middot; {{graphSkills}} skills &middot; {{graphDocs}} docs</small>
+    </div>
+  </dl>
+  <p>
+    Those figures are counted, never curated. They are the same values the fleet's
+    own control plane reads, because they come from the same compile: a registry
+    that says <code>{{nixCount}}</code> Nix machines here says it everywhere.
+  </p>
+</section>
+
+<section id="ledger">
+  <h2><span>06</span> How this page is made</h2>
+  <table class="ledger"><tbody>
+    <tr><th scope="row">Module chain</th><td><code>{{moduleChain}}</code> &middot; {{impermanence}}</td></tr>
+    <tr><th scope="row">Registry</th><td><code>inventory.toml</code> through <code>lib/inventory.nix</code>, parsed once at flake evaluation and normalised before any host sees it.</td></tr>
+    <tr><th scope="row">Graph</th><td><code>lib/knowledge-graph.nix</code> &mdash; {{graphNodes}} nodes and {{graphEdges}} edges across {{graphTags}} tags, all token-matched out of the documents and skills themselves.</td></tr>
+    <tr><th scope="row">Services</th><td><code>services.servicePortal</code> &mdash; {{serviceLine}}.</td></tr>
+    <tr><th scope="row">Renderer</th><td><code>lib/delphi-site.nix</code> &mdash; one evaluated structure, two surfaces. The page reads without JavaScript; the script only remembers a theme choice and filters the console.</td></tr>
+  </tbody></table>
+</section>

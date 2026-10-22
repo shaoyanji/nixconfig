@@ -471,17 +471,24 @@
 
     surfaces-are-compiled = {
       rule = "A human-facing surface — landing page, service list, tailnet mount — is compiled from one registry with assertions, never written twice by hand.";
-      proof = "modules/services/service-portal.nix (registry + asserts) · hosts/frieren/reverse-proxy.nix · hosts/delphi/configuration.nix";
+      proof = "modules/services/service-portal.nix (registry + asserts) · lib/delphi-site.nix (the dossier and the console) · hosts/frieren/reverse-proxy.nix · hosts/delphi/configuration.nix";
       holds =
         has "modules/services/service-portal.nix" "assertions = ["
+        # frieren renders the registry's own LAN page; delphi renders the CARD
+        # PROJECTION through its own compiler, because its two surfaces (a
+        # portfolio dossier and a tailnet console) are not the same page twice.
         && has "hosts/frieren/reverse-proxy.nix" "config.services.servicePortal.pages.lan"
-        && has "hosts/delphi/configuration.nix" "config.services.servicePortal.pages.public"
+        && has "hosts/delphi/configuration.nix" "config.services.servicePortal.cards"
+        && has "hosts/delphi/configuration.nix" "lib/delphi-site.nix"
         # A hand-written card list and a hand-rolled mount are the two shapes
         # this replaced; either coming back means a second source of truth.
         && !(has "hosts/frieren/reverse-proxy.nix" "class=\"card\"")
         && !(has "hosts/frieren/reverse-proxy.nix" "card-desc")
-        && !(has "hosts/delphi/configuration.nix" "tailscale serve --bg");
-      detail = "a portal page or a `tailscale serve` mount was hand-written again instead of declared in `services.servicePortal`";
+        && !(has "hosts/delphi/configuration.nix" "tailscale serve --bg")
+        # The card rows are generated in the compiler, never typed into a page.
+        && !(has "lib/delphi/public.html" "class=\"svc\"")
+        && !(has "lib/delphi/tailnet.html" "class=\"svc\"");
+      detail = "a portal page, a card row or a `tailscale serve` mount was hand-written again instead of declared in `services.servicePortal`";
     };
 
     no-fleet-default = {

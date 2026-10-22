@@ -18,6 +18,11 @@
   # "frieren then delphi" would just break DNS when the first one dies.
   dnsServiceAddress = "10.99.0.53";
 
+  # Registry facts, not constants: `inventory.toml` carries the public name and
+  # the tailnet address, and the dossier below reads the same values. A host that
+  # moves one address cannot leave its own page pointing at the old one.
+  hostMeta = config.fleet.inventory.hosts.delphi;
+
   # Public HTTPS name. null = the box serves plain HTTP on :80 only.
   #
   # Setting this is the ONLY thing needed to bring up TLS, and it belongs here
@@ -27,7 +32,15 @@
   # the DNS A record — and a wrong or missing record turns every renewal into a
   # failing unit, so do not set this before the name resolves to the instance's
   # RESERVED public IP (an ephemeral IP changes on stop/start).
-  publicDomain = "delphi.bountystash.com";
+  #
+  # `""` (the registry's "unknown") becomes null, or `lib.optionalAttrs` would
+  # generate a vhost with an empty `server_name`.
+  publicDomain = let
+    d = hostMeta.network.domain;
+  in
+    if d == ""
+    then null
+    else d;
 
   # DeepSeek Harness, TAILNET ONLY. tailscaled terminates TLS for the MagicDNS
   # name with a certificate no public client can present, and forwards to the
@@ -42,21 +55,40 @@
   # 8443 on purpose. nginx owns 0.0.0.0:443 for the public landing page, and a
   # listener on the tailnet address at 443 fails while that bind exists
   # (measured: "bind: address already in use").
-  tailnetHost = "delphi.cloudforest-kardashev.ts.net";
+  # The tailnet suffix is fleet-wide and typed once per host that needs it; the
+  # node name is a registry fact.
+  tailnetHost = "${hostMeta.network.tailscale_hostname}.cloudforest-kardashev.ts.net";
   # Stable per node key, and the only address that works here: delphi runs
   # `--accept-dns=false` (a resolver must not resolve through the address it
-  # serves), so a MagicDNS name does not resolve from inside this host. One
-  # constant, because the portal card and the monitor both point at it.
-  tailnetIp = "100.123.145.53";
+  # serves), so a MagicDNS name does not resolve from inside this host.
+  tailnetIp = hostMeta.network.tailscale_ip;
   servePort = 8443;
   dshPort = 3080;
   dshPath = "/";
   dshUrl = "https://${tailnetHost}:${toString servePort}/";
 
-  # Landing pages. Proof of life on :80, and the tailnet service list that is
-  # COMPILED from `services.servicePortal` below — the public page carries no
-  # cards, because a tailnet URL on an internet-facing page is a map.
-  healthPage = config.services.servicePortal.pages.public;
+  # Both landing pages, from ONE compiled site (`lib/delphi-site.nix`): the
+  # public dossier and the tailnet console are two projections of a single
+  # evaluated structure, so a count on the dossier and the card list on the
+  # console cannot disagree. The dossier's facts come from the registry, the
+  # knowledge graph and `services.servicePortal.cards` — the same declaration
+  # that generates the `tailscale serve` units.
+  delphiSite = import ../../lib/delphi-site.nix {
+    inherit pkgs;
+    inventory = config.fleet.inventory;
+    host = "delphi";
+    cards = config.services.servicePortal.cards;
+    inherit publicDomain tailnetHost;
+    resolver = config.profiles.tailnetDnsAddress.address;
+    nixosVersion = config.system.nixos.release;
+  };
+  publicPage = "${delphiSite}/public";
+  tailnetPage = "${delphiSite}/tailnet";
+
+  # One cache policy for compiled static trees, shared with frieren's vhosts
+  # (modules/config/nginx-static-cache.nix) so the two hosts cannot disagree
+  # about how long a store path may be cached.
+  staticCache = import ../../modules/config/nginx-static-cache.nix;
 
   freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 in {
@@ -65,6 +97,7 @@ in {
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/firewall-baseline.nix
     ../../modules/profiles/hermes.nix
+    ../../modules/profiles/operator-tools.nix
     ../../modules/profiles/sops-user-identity.nix
     ../../modules/profiles/tailnet-dns-address.nix
     ../../modules/services/dsh-web.nix
@@ -82,6 +115,38 @@ in {
     enable = true;
     address = dnsServiceAddress;
     exitNode = true;
+  };
+
+  # The two public surfaces are compiled from these registry fields, so an empty
+  # one would ship a vhost with no `server_name` and a console whose cards point
+  # at `.cloudforest-kardashev.ts.net`. Fail at eval instead.
+  assertions = [
+    {
+      assertion = hostMeta.network.domain != "";
+      message = "inventory.toml [hosts.delphi.network]: `domain` is required for the public TLS vhost.";
+    }
+    {
+      assertion = hostMeta.network.tailscale_hostname != "";
+      message = "inventory.toml [hosts.delphi.network]: `tailscale_hostname` is required for the tailnet console's links.";
+    }
+    {
+      assertion = hostMeta.network.tailscale_ip != "";
+      message = "inventory.toml [hosts.delphi.network]: `tailscale_ip` is required for the console and the monitor card.";
+    }
+  ];
+
+  # --- The gate toolchain -----------------------------------------------------
+  # This box runs `task checks:*` (it is where delphi's own gates are cheapest to
+  # run), so the tools those tasks call from PATH belong in the closure rather
+  # than in an ad-hoc `nix shell`: `toon` for `checks:toon`, `python3` for
+  # `ops:tailnet:policy` and the site preview helpers. Neither is an AI/dev stack
+  # — `globalModulesContainers` keeps that off here on purpose.
+  # `browser` stays off: `checks:kg:canvas` already skips its click step when
+  # `agent-browser` is absent, and ~700 MB for one optional half is a deliberate
+  # trade rather than a default.
+  profiles.operatorTools = {
+    enable = true;
+    browser = false;
   };
 
   # --- User-plane sops identity ----------------------------------------------
@@ -294,10 +359,17 @@ in {
               port = 80;
             }
           ];
-          root = "${healthPage}";
+          root = "${publicPage}";
           locations."/" = {
             index = "index.html";
             tryFiles = "$uri $uri/ =404";
+            extraConfig = staticCache.html;
+          };
+          # Content-hashed assets are immutable, so they get the one-year policy
+          # (modules/config/nginx-static-cache.nix) rather than the HTML revalidate.
+          locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
+            root = "${publicPage}";
+            extraConfig = staticCache.hashed;
           };
           # Plain-text liveness probe for gatus / curl / a browser tab.
           locations."= /healthz".extraConfig = ''
@@ -306,10 +378,9 @@ in {
           '';
         };
 
-        # The tailnet portal: the compiled service list, loopback-only and
-        # reached through `tailscale serve` on 8446. It is a vhost rather than
-        # a `return 200 "…"` so the page keeps its own CSP-free static root and
-        # the mounts stay the only ingress.
+        # The tailnet console, loopback-only and reached through `tailscale
+        # serve` on 8446. It is a vhost rather than a `return 200 "…"` so the
+        # page keeps its own static root and the mounts stay the only ingress.
         delphi-portal = {
           listen = [
             {
@@ -317,11 +388,53 @@ in {
               port = 8082;
             }
           ];
-          root = "${config.services.servicePortal.pages.tailnet}";
+          root = "${tailnetPage}";
           locations."/" = {
             index = "index.html";
             tryFiles = "$uri $uri/ =404";
+            extraConfig = staticCache.html;
           };
+          locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
+            root = "${tailnetPage}";
+            extraConfig = staticCache.hashed;
+          };
+        };
+
+        # The MagicDNS name at the root, tailnet-only by SOURCE ADDRESS.
+        #
+        # 443 is owned by the public ACME vhost and tailscaled cannot take it
+        # (measured 2026-10-21: "bind: address already in use"), so the console's
+        # TLS entry point remains the :8446 mount. This vhost makes
+        # `http://<tailnet name>/` work too: WireGuard already encrypts the mesh,
+        # and the allow-list — the client's 100.64/10 address on tailscale0 — is
+        # what makes the name inert on the public internet even though the
+        # listener is the same :80.
+        "${tailnetHost}" = {
+          listen = [
+            {
+              addr = "0.0.0.0";
+              port = 80;
+            }
+          ];
+          root = "${tailnetPage}";
+          locations."/" = {
+            index = "index.html";
+            tryFiles = "$uri $uri/ =404";
+            extraConfig = ''
+              allow 127.0.0.1;
+              allow ::1;
+              allow 100.64.0.0/10;
+              deny all;
+            '';
+          };
+          locations."= /healthz".extraConfig = ''
+            allow 127.0.0.1;
+            allow ::1;
+            allow 100.64.0.0/10;
+            deny all;
+            default_type text/plain;
+            return 200 "ok";
+          '';
         };
       }
       # HTTPS vhost — inert until `publicDomain` names a record that resolves
@@ -338,10 +451,18 @@ in {
           # while the token sat in /var/lib/acme/acme-challenge.
           enableACME = true;
           forceSSL = true;
-          root = "${healthPage}";
+          root = "${publicPage}";
           locations."/" = {
             index = "index.html";
             tryFiles = "$uri $uri/ =404";
+            extraConfig = staticCache.html;
+          };
+          # Same eight explicit hex classes as frieren's vhost: a `{8}` brace
+          # quantifier is emitted SPLIT across lines by the config generator and
+          # nginx rejects the whole server for it.
+          locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
+            root = "${publicPage}";
+            extraConfig = staticCache.hashed;
           };
           locations."= /healthz".extraConfig = ''
             default_type text/plain;
@@ -632,11 +753,12 @@ in {
           echo "=== [delphi] Workspace ready at ~/Documents/nixconfig ==="
         '';
       };
-    in runCommand "delphi-workspace-seeders" {} ''
-      mkdir -p "$out/bin"
-      ln -s "${delphi-seed}/bin/delphi-seed-workspace" "$out/bin/delphi-seed-workspace"
-      ln -s "${delphi-seed}/bin/delphi-seed-workspace" "$out/bin/seed-workspace"
-    '')
+    in
+      runCommand "delphi-workspace-seeders" {} ''
+        mkdir -p "$out/bin"
+        ln -s "${delphi-seed}/bin/delphi-seed-workspace" "$out/bin/delphi-seed-workspace"
+        ln -s "${delphi-seed}/bin/delphi-seed-workspace" "$out/bin/seed-workspace"
+      '')
   ];
 
   # 24/7 Remote Operator Gateway: Antigravity remote-control daemon (antigravity.google.com)

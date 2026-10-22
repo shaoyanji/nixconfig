@@ -76,6 +76,33 @@
     };
   };
 
+  # The compiled card, as a value any second renderer can consume: a host
+  # dossier, a TUI, a gatus probe. One registry, many renderers — never a second
+  # declaration of the same service.
+  cardType = lib.types.submodule {
+    options = {
+      name = lib.mkOption {
+        type = lib.types.str;
+        description = "Exposure key or mount name.";
+      };
+      title = lib.mkOption {type = lib.types.str;};
+      description = lib.mkOption {type = lib.types.str;};
+      group = lib.mkOption {type = lib.types.str;};
+      audience = lib.mkOption {type = lib.types.enum ["public" "lan" "tailnet"];};
+      href = lib.mkOption {type = lib.types.str;};
+      badge = lib.mkOption {type = lib.types.str;};
+      requires = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        description = "Units the card's mount waits on (mounts only).";
+      };
+      vhost = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+      };
+    };
+  };
+
   mountType = lib.types.submodule {
     options = {
       port = lib.mkOption {
@@ -182,6 +209,7 @@
       if e != null && e.badge != null
       then e.badge
       else "${cfg.tailnetHost}:${toString m.port}";
+    requires = m.requires;
     vhost = null;
   }) (builtins.attrNames (lib.filterAttrs (_: m: !m.hideCard) cfg.mounts));
 
@@ -248,7 +276,8 @@
   # HTML. `services.servicePortal.json` is the host-independent copy.
   cardsJson = audiences:
     builtins.toJSON (map (c: {
-      inherit (c) title description group audience href badge;
+      inherit (c) name title description group audience href badge;
+      requires = c.requires or [];
     }) (lib.filter (c: builtins.elem c.audience audiences) visible));
 
   page = audiences: let
@@ -371,6 +400,17 @@ in {
       '';
     };
 
+    cards = lib.mkOption {
+      type = lib.types.listOf cardType;
+      readOnly = true;
+      description = ''
+        Every card as a compiled value — the projection a second renderer reads
+        instead of writing the list again. `delphi`'s dossier
+        ({file}`lib/delphi-site.nix`) is the first consumer: one registry, two
+        surfaces (a portfolio page and a tailnet console), no duplicated table.
+      '';
+    };
+
     pages = lib.mkOption {
       type = lib.types.attrsOf lib.types.path;
       readOnly = true;
@@ -388,6 +428,13 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    services.servicePortal.cards =
+      map (c: {
+        inherit (c) name title description group audience href badge vhost;
+        requires = c.requires or [];
+      })
+      visible;
+
     services.servicePortal.pages = {
       public = page ["public"];
       lan = page ["lan" "public"];

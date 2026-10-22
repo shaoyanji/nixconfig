@@ -4,17 +4,10 @@
 {
   inputs,
   hypervisor ? "cloud-hypervisor",
-  # A host without /dev/kvm names a CPU ("max") so the runner uses TCG.
-  cpu ? null,
   tapId ? "microvm3",
   address ? "192.168.83.11",
-}: {lib, ...}: {
+}: {
   imports = [inputs.microvm.nixosModules.host];
-
-  # microvm.nix bounds the start at 150 s, which is the guest registering itself
-  # after boot. On a host without /dev/kvm that boot is minutes, so the unit was
-  # killed mid-boot and reported `Result: timeout` while the guest was healthy.
-  systemd.services."microvm@sandbox".serviceConfig.TimeoutStartSec = lib.mkIf (cpu != null) "900";
 
   # `ssh sandbox` from the host that runs it, as root: the bridge subnet is
   # host-local, so this name means nothing on another machine.
@@ -35,7 +28,7 @@
         (import ./base.nix {
           hostName = "sandbox";
           ipAddress = address;
-          inherit hypervisor cpu tapId;
+          inherit hypervisor tapId;
           mac = "02:00:00:00:83:11";
           # RAM is not closure: 512 MiB was my guess and it thrashed the boot.
           mem = 1024;

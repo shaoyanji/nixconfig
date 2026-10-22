@@ -199,6 +199,10 @@
         before its first eval (`boot-gate-needs-kvm`), and the one emulation allowed
         is `checks:boot:self` / `BOOT=1`: the machine being switched, one vCPU,
         niced — the initrd nobody can diagnose from outside.
+
+        Cost is printed by every run (watchdog elapsed + process-group peak RSS) and
+        appended to `$XDG_STATE_HOME/nixconfig/boot-check.log`, with the delta against
+        the last run for that host: the affordability claim is a comparable number.
       '';
     };
     arch-shape = {

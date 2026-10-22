@@ -46,6 +46,13 @@
 #   boot-check.sh --host NAME [--arch ARCH] [--timeout SECONDS]
 #   boot-check.sh --self [--timeout SECONDS]     the local host, TCG allowed
 #
+# COST, BECAUSE THIS GATE IS THE EXPENSIVE ONE
+#   Every run prints elapsed and peak RSS (the OOM watchdog's own measurement of
+#   the whole process group) and appends a one-line record to
+#   `$XDG_STATE_HOME/nixconfig/boot-check.log`, then compares against the last
+#   record for the same host+arch. A claim that a boot is affordable has to be a
+#   number somebody can check, and a regression in cost is otherwise invisible.
+#
 # EXIT
 #   0  booted to multi-user (or the host is preserved: nothing to check)
 #   1  failed to boot or build, the host is not in the flake, or no /dev/kvm
@@ -159,6 +166,48 @@ fi
 
 echo "boot-check: ${HOST} (${ARCH}) — building and booting its real module graph"
 log="$(mktemp -t "boot-check-${HOST}.XXXXXX.log")"
+
+# One record per run, in state (never the repo: this is a measurement, not config).
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/nixconfig"
+ledger="$state_dir/boot-check.log"
+
+# Report the cost the watchdog measured, and the delta against the previous run of
+# the same host. Called on every exit path that ran the build: a failed boot still
+# spent the core, and that is the number a later run compares against.
+report_cost() {
+  local rc="$1" stats elapsed peak drv prev prev_e prev_p
+  # The guard's result line, e.g.
+  #   boot delphi   511.32s  peak  2074.3 MiB  rc=0  baseline mem=0% io=0.2%
+  stats="$(grep -E '[0-9]+\.[0-9]+s  peak +[0-9]+\.[0-9]+ MiB  rc=' "$log" | tail -1)"
+  if [ -z "$stats" ]; then
+    echo "  cost: not measured (the watchdog printed no result line)" >&2
+    echo "  log:  ${log}" >&2
+    return 0
+  fi
+  elapsed="$(echo "$stats" | awk '{for (i = 1; i <= NF; i++) if ($i ~ /^[0-9.]+s$/) {sub(/s$/, "", $i); print $i; exit}}')"
+  peak="$(echo "$stats" | awk '{for (i = 1; i <= NF; i++) if ($(i + 1) == "MiB") {print $i; exit}}')"
+  # The derivation the VM test ran, read off nix's own output so the record names
+  # the thing measured without a second evaluation.
+  drv="$(grep -o '/nix/store/[a-z0-9]*-vm-test-run-boot-[A-Za-z0-9._-]*\.drv' "$log" | tail -1)"
+  drv="${drv:-not-built}"
+
+  prev="$(grep -F " host=${HOST} arch=${ARCH} " "$ledger" 2>/dev/null | tail -1)"
+  prev_e="$(echo "$prev" | awk '{for (i = 1; i <= NF; i++) if ($i ~ /^cost_s=/) {sub(/^cost_s=/, "", $i); print $i; exit}}')"
+  prev_p="$(echo "$prev" | awk '{for (i = 1; i <= NF; i++) if ($i ~ /^peak_mib=/) {sub(/^peak_mib=/, "", $i); print $i; exit}}')"
+
+  printf '  cost: %ss wall, %s MiB peak\n' "$elapsed" "$peak" >&2
+  if [ -n "$prev_e" ] && [ -n "$prev_p" ]; then
+    echo "  compared to the previous ${HOST} boot ($(printf '%s' "$prev" | awk '{print $1}')):" >&2
+    awk -v e="$elapsed" -v pe="$prev_e" -v p="$peak" -v pp="$prev_p" \
+      'BEGIN{printf "    wall %+.1fs, peak %+.1f MiB\n", e - pe, p - pp}' >&2
+  else
+    echo "  no earlier ${HOST} run recorded — this one becomes the baseline" >&2
+  fi
+  mkdir -p "$state_dir" 2>/dev/null
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) host=${HOST} arch=${ARCH} rc=${rc} cost_s=${elapsed} peak_mib=${peak} drv=${drv}" >>"$ledger"
+  echo "  record: ${ledger}" >&2
+}
+
 bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "boot ${HOST}" -- \
   "${NICE[@]}" nix build --no-link -L --builders "" ".#hostBootChecks.${ARCH}.${HOST}" 2>&1 | tee "$log" >&2
 rc=${PIPESTATUS[0]}
@@ -166,6 +215,7 @@ rc=${PIPESTATUS[0]}
 case "$rc" in
   0)
     echo "boot-check: ${HOST} reached multi-user.target — stage-2 is up"
+    report_cost 0
     rm -f "$log"
     exit 0
     ;;
@@ -176,6 +226,7 @@ case "$rc" in
     ;;
   124)
     echo "boot-check: ${HOST} exceeded ${TIMEOUT}s — no stage-2 within the budget" >&2
+    report_cost 124
     ;;
   *)
     # Distinguish "the VM ran and never handed off" from "it never got that far":
@@ -186,6 +237,7 @@ case "$rc" in
     else
       echo "boot-check: ${HOST} failed before the VM booted (eval/build); see the log" >&2
     fi
+    report_cost "$rc"
     ;;
 esac
 

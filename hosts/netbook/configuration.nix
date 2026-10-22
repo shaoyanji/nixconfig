@@ -42,7 +42,18 @@ in {
   services.fstrim.enable = true;
   services.tailscale.enable = true;
 
+  # Measured 1.895 s of boot. Its only consumers here are the NAS governor and
+  # the /Volumes/data automount (through network-online.target), and the governor
+  # already retries on a timer while the mount is an automount with its own
+  # timeouts — boot does not need the network to be "online" to proceed.
+  systemd.services.NetworkManager-wait-online.enable = false;
+
   boot.kernelParams = [
+    # Isolation test, 2026-10-22. Generation 60 black-screened before journald
+    # with three suspects; the other two (trimmed initrd, nodiscard) are not in
+    # this generation, so a repeat failure here names pti=off and clears them.
+    # Baseline on the proven kernel: 3000 fork+exec = 22.7 s (7.6 ms each).
+    "pti=off"
     # "fsck.mode=skip"
     # "nomodeset"
     # "console=tty1"

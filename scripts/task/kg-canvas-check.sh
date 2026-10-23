@@ -62,7 +62,7 @@ bad() {
 say() { printf '\n== %s ==\n' "$1"; }
 
 say "build the site (local only, no remote builders)"
-SITE="$(cd "$REPO" && nix build --builders "" --no-link --print-out-paths .#fleet-docs-site 2>/dev/null | tail -1)"
+SITE="$(cd "$REPO" && nix build --builders "" --no-link --print-out-paths .#sites.fleet-docs-site 2>/dev/null | tail -1)"
 if [ -n "$SITE" ] && [ -f "$SITE/index.html" ]; then
   ok "built $SITE"
 else

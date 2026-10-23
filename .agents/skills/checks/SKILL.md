@@ -35,7 +35,7 @@ Run validation and health checks for host configs and Nix code quality.
 | `checks:flake` | Runs `nix flake check` only where the machine can hold it; **refuses below 16 GiB RAM** |
 | `checks:inventory:compiled` | Tier-1 inventory checks: schema consistency, flake coverage, module injection |
 | `checks:kg:native` | Cold native graph build: median < 20 ms over 7 runs, **no subprocess in `KGEngine.Native`**, node/edge parity with the compiled projection |
-| `checks:kg:canvas` | Builds `.#fleet-docs-site` locally and proves the knowledge-graph canvas works: every node has a slice, no dangling slice links, and headless Chrome **clicks a node** and must land on `fleet / knowledge-graph / host:frieren` |
+| `checks:kg:canvas` | Builds `.#sites.fleet-docs-site` locally and proves the knowledge-graph canvas works: every node has a slice, no dangling slice links, and headless Chrome **clicks a node** and must land on `fleet / knowledge-graph / host:frieren` |
 
 **Preserved hosts are a warning, not a check.** A host with
 `status = "preserved"` in `inventory.toml` is dormant, and some are known-broken

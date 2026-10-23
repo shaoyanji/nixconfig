@@ -75,10 +75,19 @@
   # feeds the flake check, the parity gate and any future generator.
   taskfileCtl = import ../lib/taskfile.nix {inherit lib;};
   agentDocs = pkgsFor "x86_64-linux";
+  # The CLI table is compiled once here and projected into both namespaces:
+  # `packages.<system>.cli` for a store path, `apps.<system>.cli` for `nix run`.
+  cliFor = system:
+    import ./cli.nix {
+      inherit lib inputs system;
+      pkgs = pkgsFor system;
+    };
 in {
   packages = import ./packages.nix {
-    inherit inputs lib systems pkgsFor inventory self;
+    inherit lib systems pkgsFor inventory self cliFor;
   };
+
+  apps = lib.genAttrs systems.work (system: {cli = (cliFor system).apps;});
 
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
@@ -158,7 +167,7 @@ in {
 
   # `nix build .#docs` — the generated markdown tree (fleet inventory, modules
   # registry, per-host pages) as a store path. The rendered site is
-  # `.#fleet-docs-site` (lib/aki-site.nix), built natively from the compiled
+  # `.#sites.fleet-docs-site` (lib/aki-site.nix), built natively from the compiled
   # registry and the knowledge graph; the Python renderer that used to live in
   # docs-site/ is retired (docs/docs-pipeline-audit.md §4).
   inherit docs;

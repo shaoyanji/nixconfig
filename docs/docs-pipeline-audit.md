@@ -31,7 +31,7 @@ Four tests, applied to each finding below:
 | Producer | Kind | Output | Consumers | Live? |
 | :--- | :--- | :--- | :--- | :--- |
 | `lib/docs.nix` | Nix (pure values) | `.#docs` — generated markdown + `nav.json`, 0.7 s | site generator, `docs:sync` | no, an input |
-| `lib/aki-site.nix` | Nix (built **at eval**) | `.#fleet-docs-site` — HTML/JSON tree, 9.1 s | nginx vhost, UDS bridge, `.#fleet-docs-site` | yes, on frieren |
+| `lib/aki-site.nix` | Nix (built **at eval**) | `.#sites.fleet-docs-site` — HTML/JSON tree, 9.1 s | nginx vhost, UDS bridge, `.#sites.fleet-docs-site` | yes, on frieren |
 | ~~`docs-site/{default.nix,generate.py}`~~ | **retired 2026-10-19** | ~~`.#docs-site`~~ | — | **deleted** |
 
 They do not render the same page set: `lib/docs.nix` owns `staticSections`, aki
@@ -70,15 +70,15 @@ which pages exist.
 | # | Evidence | Why it is wrong |
 | :- | :--- | :--- |
 | F10 | Eval-time `builtins.readFile`: `lib/aki-site.nix:37`, `:107`, `:1644` (every note's text), `lib/docs.nix:34` (default `modules.toml` argument), plus the readers inside `lib/knowledge-graph.nix` / `lib/skills.nix`. | Legal, but flake-scoped: an **untracked** `.md` does not exist to the evaluator, so a page you wrote and did not `git add` silently vanishes — the second half of "compilation isn't keeping pace". It also makes every doc byte an input to every importing host. |
-| F11 | Cost on this host: `nix build .#fleet-docs-site` **9.1 s**; `.#docs` 0.7 s; `.#docs-site` 4.1 s; evaling `.#fleet-docs-site.drvPath` 1.67 s / 164.5 MiB — repeated for each of the three instantiations. | The cheapest artifact (0.7 s, pure values) is the one nothing serves; the most expensive is instantiated three times inside a host config. |
+| F11 | Cost on this host: `nix build .#sites.fleet-docs-site` **9.1 s**; `.#docs` 0.7 s; `.#docs-site` 4.1 s; evaling `.#sites.fleet-docs-site.drvPath` 1.67 s / 164.5 MiB — repeated for each of the three instantiations. | The cheapest artifact (0.7 s, pure values) is the one nothing serves; the most expensive is instantiated three times inside a host config. |
 
 ### P4 — packaging and gates
 
 | # | Evidence | Why it is wrong |
 | :- | :--- | :--- |
 | F12 | **FIXED 2026-10-19** — `docs-site/default.nix:27` `src = ../.` fed the whole repo into the Python build. The derivation, its `src`, and the output are gone. | Every commit used to invalidate the site build and copy the tree into the store. |
-| F13 | **FIXED 2026-10-19** — the `docs-site` check (`ls index.html`) is deleted with the output it checked. The site's real gate stays `checks:kg:canvas`, which builds `.#fleet-docs-site` and clicks a node in headless Chrome. | A check that proved nothing about content was worse than no check: it made the pipeline look verified. |
-| F14 | **FIXED 2026-10-19** — `docs/control-plane-architecture.md` §1 now records the retirement as DELIVERED and §9 step 5 is closed; `task docs:site` builds `.#fleet-docs-site`. | The tree documented its own duplication and kept both halves; now it documents one half. |
+| F13 | **FIXED 2026-10-19** — the `docs-site` check (`ls index.html`) is deleted with the output it checked. The site's real gate stays `checks:kg:canvas`, which builds `.#sites.fleet-docs-site` and clicks a node in headless Chrome. | A check that proved nothing about content was worse than no check: it made the pipeline look verified. |
+| F14 | **FIXED 2026-10-19** — `docs/control-plane-architecture.md` §1 now records the retirement as DELIVERED and §9 step 5 is closed; `task docs:site` builds `.#sites.fleet-docs-site`. | The tree documented its own duplication and kept both halves; now it documents one half. |
 | F15 | The living-doc budget gate is **red at HEAD**: `TODO.md` is 156 lines against a 150 limit (`task ops:docs:budget`, and `checks.<system>.docs-budget` throws), and `AGENTS.md` sits at 1,198 / 1,200. | The pressure F4 describes has already crossed the limit. A gate nobody runs (see the `nix flake check` rule) hides it. |
 
 ## 3. Already correct — do not "fix"
@@ -107,7 +107,7 @@ which pages exist.
 4. **Instantiate once.** Add `fleetDocsSite` to the flake and pass that path to
    both vhost locations and the UDS bridge. Removes F8.
 5. **Decouple publishing from the system switch.** Serve a `current` symlink that
-   a `nix build .#fleet-docs-site` + `ln -sfn` flips; a doc edit then costs a
+   a `nix build .#sites.fleet-docs-site` + `ln -sfn` flips; a doc edit then costs a
    9 s build, not a NAS rebuild. Removes F9.
 6. ~~**Retire `docs-site/`**~~ **DONE 2026-10-19:** the pre-condition was met by
    widening the projection instead of the page list — `lib/knowledge-graph.nix`
@@ -130,9 +130,9 @@ git, there is nothing to fall behind.
 | Command | Wall | Notes |
 | :--- | ---: | :--- |
 | `nix build .#docs` | 0.69 s | pure values → markdown tree + `nav.json` |
-| `nix build .#fleet-docs-site` | 9.09 s | all Nix string processing, 1,723 literal lines |
-| ~~`nix build .#docs-site`~~ | removed | the Python derivation is gone; the site is `.#fleet-docs-site` (9.1 s) |
-| `nix eval .#fleet-docs-site.drvPath` | 1.67 s / 164.5 MiB | paid 3× inside frieren's host eval |
+| `nix build .#sites.fleet-docs-site` | 9.09 s | all Nix string processing, 1,723 literal lines |
+| ~~`nix build .#docs-site`~~ | removed | the Python derivation is gone; the site is `.#sites.fleet-docs-site` (9.1 s) |
+| `nix eval .#sites.fleet-docs-site.drvPath` | 1.67 s / 164.5 MiB | paid 3× inside frieren's host eval |
 | `task checks:docs:sync` | removed | the gate went with the committed copy (was failing: 2 of 30 pages stale) |
 
 ---

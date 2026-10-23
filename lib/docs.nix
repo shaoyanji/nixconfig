@@ -43,7 +43,7 @@
   # `what` already carries its own formatting (e.g. "`inventory.toml`").
   banner = what: ''
     > **Generated — not a file in the repository.** Built from ${what} by
-    > `lib/docs.nix` (`nix build .#docs`); rendered by `.#fleet-docs-site`.
+    > `lib/docs.nix` (`nix build .#docs`); rendered by `.#sites.fleet-docs-site`.
   '';
 
   header = title: what: "# ${title}\n\n${banner what}\n";
@@ -200,7 +200,7 @@
 
   # There is no `nav` value any more: the only consumer of one was the Python
   # renderer in docs-site/, which is retired. The rendered site
-  # (`.#fleet-docs-site`, lib/aki-site.nix) derives its own navigation from the
+  # (`.#sites.fleet-docs-site`, lib/aki-site.nix) derives its own navigation from the
   # knowledge graph — so a document that exists is a document the site shows,
   # with no second list to keep in sync.
   # --- derivation ------------------------------------------------------------

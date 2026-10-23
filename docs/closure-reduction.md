@@ -233,7 +233,7 @@ boot closure.
 | --- | --- | --- | --- |
 | **A — runtime** | systemd units, drivers, kernel, firmware | `environment.systemPackages`, modules | yes, by definition |
 | **B — interactive** | editors, language servers, agents you actually launch | **devShells**, `nix shell` | no |
-| **C — one-shot** | converters, format-specific tools used occasionally | **`nix run .#<tool>`** | no |
+| **C — one-shot** | converters, format-specific tools used occasionally | **`nix run .#cli.<family>.<tool>`** | no |
 
 Tier B already half-exists: `modules/config/shells/*` defines `flaskpy`,
 `jekyll`, `yarn`, `pdf`, `yt`, `kali`, `pi`, `replit`, `shell` (wired in
@@ -254,13 +254,11 @@ There is currently **no `nix run` path at all**, so a tool used once a month mus
 be installed permanently. That is the concrete blocker to the `nix shell`
 direction, and the cheapest thing to fix.
 
-### First move
-
-Populate `flake/packages.nix` and add an `apps` output for the fleet-wide CLI
-tools currently in `home.packages`, then drop them from `home.packages` on hosts
-that do not run them
-continuously (start with the §3 cohort on frieren). `nix run .#qmd` then resolves
-from the store, which on a warm host is effectively immediate.
+### First moveThe tree exists now: `flake/cli.nix` holds the CLI families, `packages.<system>.cli`
+is the store path and `apps.<system>.cli` the run target, so `nix run .#cli.search.qmd`
+resolves from the store — on a warm host, effectively immediate. The next move is
+family by family: drop what a host does not run continuously from `home.packages`
+(start with the §3 cohort on frieren) once its family is in the table.
 
 Trade-off, stated plainly: `nix run` is a store lookup on every invocation and a
 fetch if the path is not yet local. That is the price of not carrying the closure.

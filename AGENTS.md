@@ -550,7 +550,7 @@ task infra:smtp:auth             # Interactive SMTP auth for hosts (using app pa
 # Prompts for: host, username, app-password; outputs MSMTP/MUTT config for the host
 ```
 
-### Site (`docs-site/` retired 2026-10-19; the site is `.#fleet-docs-site`)
+### Site (`docs-site/` retired 2026-10-19; the site is `.#sites.fleet-docs-site`)
 
 Nix-native `lib/aki-site.nix` served by frieren, nav from the knowledge graph
 (`docs/docs-pipeline-audit.md`); the publisher site (`dev:site:*`) is separate.
@@ -869,7 +869,7 @@ allowed beside the first.
 | :--- | :--- | :--- |
 | content | `*.md`, `AGENTS.nix`, `inventory.toml`, `modules.toml` | hand-written only, never generated |
 | projection | `lib/inventory.nix`, `lib/docs.nix`, `lib/knowledge-graph.nix`, `lib/skills.nix` | one pure Nix compiler per projection |
-| artifact | `.#docs` (generated markdown), `.#fleet-docs-site` (the rendered site) | store paths, never repo copies |
+| artifact | `.#docs` (generated markdown), `.#sites.fleet-docs-site` (the rendered site) | store paths, never repo copies |
 | serving | `hosts/frieren/reverse-proxy.nix`, `modules/services/uds-static-bridge.nix` | serve the path; never re-derive content in a host module |
 
 - **Never commit a derivative** [[flake/policies.nix#generated-not-tracked]]:
@@ -880,7 +880,7 @@ allowed beside the first.
   literals in a `.nix` file (90 % of `lib/aki-site.nix` is such literals): literals
   cannot be linted or reviewed, and every byte re-evaluates a module that imports
   the knowledge graph.
-- **One instantiation.** Build the site once (`.#fleet-docs-site`) and pass the
+- **One instantiation.** Build the site once (`.#sites.fleet-docs-site`) and pass the
   path to every vhost/socket; three `import`s with identical args are three evals.
 - **A rendered surface is compiled** [[flake/policies.nix#surfaces-are-compiled]]:
   one registry emits pages, mounts and `data/services.json`; an ownerless card fails the gate.
@@ -906,7 +906,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |
 | [`docs/fleet-inventory.md`](docs/fleet-inventory.md)            | Pointer page — the catalog itself is `.#docs` (`nix build .#docs`), never committed |
 | [`docs/modules-registry.md`](docs/modules-registry.md)           | Pointer page — the knob registry is built from `modules.toml` at build time |
-| [`lib/aki-site.nix`](lib/aki-site.nix)                   | The rendered site (`.#fleet-docs-site`): nav comes from the knowledge graph |
+| [`lib/aki-site.nix`](lib/aki-site.nix)                   | The rendered site (`.#sites.fleet-docs-site`): nav comes from the knowledge graph |
 | [`docs/docs-pipeline-audit.md`](docs/docs-pipeline-audit.md)        | Docs/site pipeline audit: duplicated artifacts, content-in-Nix, remediation order |
 | [`docs/closure-reduction.md`](docs/closure-reduction.md)          | Closure size levers, evidence chains, and the runtime/interactive/one-shot tiers |
 | [`docs/closure-debloat.md`](docs/closure-debloat.md)            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |

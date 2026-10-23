@@ -589,12 +589,12 @@ tasks:
       Prints the store path of the generated docs: fleet-inventory.md,
       modules-registry.md, hosts/<h>.md and nav.json (the site manifest).
       Nothing in the repo is written; read the pages from that path, or from
-      the served site (`.#fleet-docs-site`).
+      the served site (`.#sites.fleet-docs-site`).
     cmds:
       - nix build --no-link --print-out-paths .#docs
 
   docs:site:
-    desc: Build the rendered documentation site (nix build .#fleet-docs-site)
+    desc: Build the rendered documentation site (nix build .#sites.fleet-docs-site)
     summary: >
       The site is a Nix-native hypermedia tree (lib/aki-site.nix): it renders the
       compiled registry, the knowledge graph (which now includes .agents/** and
@@ -602,7 +602,7 @@ tasks:
       linked at ./result-docsite. There is no Python phase — the markdown
       renderer that used to live in docs-site/ is retired.
     cmds:
-      - nix build .#fleet-docs-site -o result-docsite
+      - nix build .#sites.fleet-docs-site -o result-docsite
 
   dev:nixbuild:plan:
     desc: Report what would build/fetch for hosts against local substituters (read-only)

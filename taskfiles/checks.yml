@@ -170,7 +170,7 @@ tasks:
   checks:kg:canvas:
     desc: "[gate] Knowledge-graph canvas: slices resolve, and a real node click navigates"
     summary: >
-      scripts/task/kg-canvas-check.sh — builds `.#fleet-docs-site` locally
+      scripts/task/kg-canvas-check.sh — builds `.#sites.fleet-docs-site` locally
       (`--builders ""`) and tests the canvas through the interface: every node names
       a slice, every slice exists, every neighbour button resolves, index.html loads
       and parses the script, and — with agent-browser — headless Chrome clicks the

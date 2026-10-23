@@ -87,10 +87,10 @@ The activation writes `~/.config/sops/age/keys.txt` from
 recipient already listed — no new recipient, no rekey, and nothing to back up
 (losing the disk loses the secrets anyway, and the host is reinstalled).
 
-Do **not** enable it on `frieren`, `fern`, `scratch` or `netbook`: they use the
-TPM identity path and read `tpm-identity.txt` instead.
+Do **not** enable it on `frieren`, `fern`, `scratch`, `poseidon` or `netbook`:
+they use the TPM identity path and read `tpm-identity.txt` instead.
 
-## TPM-sealed identity (`frieren`, `fern`, `scratch`, `netbook`)
+## TPM-sealed identity (`frieren`, `fern`, `scratch`, `poseidon`, `netbook`)
 
 An `age-plugin-tpm` identity is a **key sealed by the chip**: the file is only
 the handle, so it decrypts on that machine and nowhere else. Verified
@@ -121,7 +121,7 @@ ssh <host> 'age-plugin-tpm -y ~/.config/sops/age/tpm-identity.txt'   # → recip
 The default recipient type is **p256tag** (`age1tag1…`), which is what this
 fleet uses; `--tpm-recipient` produces the older `age1tpm1…` form. Use the
 default, and register the recipient as `&tpm<host>` (existing: `&tpmfrieren`,
-`&tpmfern`, `&tpmscratch`, `&tpmnetbook`).
+`&tpmfern`, `&tpmscratch`, `&tpmposeidon`, `&tpmnetbook`).
 
 ```bash
 # 3. Register + rekey exactly as below (anchor, key_groups, submodule copy,
@@ -152,7 +152,9 @@ ssh session showing `tss` is not proof the manager has it.
 
 A host whose only recipient is the TPM has no fallback — clearing or replacing the
 chip loses the secrets, which is the accepted trade for keeping nothing
-exportable on disk.
+exportable on disk. `poseidon` deliberately keeps both doors: the TPM identity
+covers the user plane, while its SSH host key (`&hposeidon`) stays a recipient
+for the root plane and manual recovery.
 
 ## Add a recipient to an existing host (the normal rekey)
 

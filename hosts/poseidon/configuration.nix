@@ -96,6 +96,23 @@ in {
   };
   users.users.${user.name}.extraGroups = ["tss"];
 
+  # --- TPM unlock for both LUKS volumes ---
+  # The passphrase keyslot stays enrolled as the recovery door, and the host
+  # SSH key stays a sops recipient; the chip is convenience, not the only path.
+  # PCR 7 is systemd's own default and survives kernel/NixOS updates — binding
+  # PCR 0/4/9 would demand a re-enrol on every update of a rolling system.
+  boot.initrd = {
+    systemd = {
+      enable = true;
+      tpm2.enable = true;
+    };
+    kernelModules = ["tpm_crb" "tpm_tis"];
+    luks.devices = {
+      "luks-a03ed119-37a7-4609-aca5-679ba0eccddf".crypttabExtraOpts = ["tpm2-device=auto"];
+      "luks-d8c4ffdb-dd14-4836-9e1b-6c400362987d".crypttabExtraOpts = ["tpm2-device=auto"];
+    };
+  };
+
   # users.groups.libvirtd.members = [ "devji" ];
   # virtualisation.libvirtd.enable = true;
   # virtualisation.spiceUSBRedirection.enable = true;

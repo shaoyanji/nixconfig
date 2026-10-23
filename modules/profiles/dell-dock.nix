@@ -160,7 +160,9 @@ in {
             uuid = "b37ece9c-f7c4-440c-b49f-1dd1c851c03c";
             type = "ethernet";
             autoconnect = true;
-            autoconnect-priority = 10;
+            # Above any auto-generated "Wired connection N" NM has minted for the
+            # same USB device (priority 0), so a re-activation always picks this.
+            autoconnect-priority = 100;
           }
           // lib.optionalAttrs (cfg.usbEthernetInterface != null) {
             interface-name = cfg.usbEthernetInterface;
@@ -196,6 +198,18 @@ in {
         ipv6.method = "auto";
         ipv6.route-metric = 600;
       };
+    };
+
+    # The declarative profiles land in /run/NetworkManager/system-connections,
+    # and the unit that writes them starts *after* NetworkManager -- at boot NM
+    # therefore has carrier on the dock before the profile exists, assumes the
+    # device with a DHCP connection and keeps it. Measured 2026-10-23: after a
+    # reboot the dock held .3 by DHCP at metric 100 while `dock-ethernet` sat
+    # inactive. Bringing the profile up once the files exist settles it.
+    systemd.services.NetworkManager-ensure-profiles = lib.mkIf cfg.manageUsbEthernet {
+      postStart = ''
+        ${config.networking.networkmanager.package}/bin/nmcli connection up dock-ethernet || true
+      '';
     };
 
     # Disable USB autosuspend for btusb: kernel 6.12 defaults enable_autosuspend=Y,

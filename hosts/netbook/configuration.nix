@@ -94,6 +94,10 @@ in {
   # died with nothing on the console to read.
   boot.consoleLogLevel = 7;
   nix.optimise.automatic = true;
+  # Flake-only, matching the fleet: the NixOS default appends
+  # `/nix/var/nix/profiles/per-user/root/channels` to NIX_PATH, which this host
+  # no longer populates, so every `<nixpkgs>` lookup warned it did not exist.
+  nix.channel.enable = false;
   # nix.optimise.interval = "weekly";
   nix.gc = {
     automatic = true;

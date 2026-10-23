@@ -136,6 +136,50 @@
         + ''return 301 /microvm/${(lib.head microvmGuest.services).name}/;'';
     };
 
+  # The deck (hosts/microvms/slideshow.md) is a terminal app — `slides` over ssh
+  # into the guest — so its web surface is an address card, not the show. This
+  # gives /slideshow a real page before anything renders, and names both ways in
+  # from the same declaration that created the account and the forward.
+  # `slideshow.bountystash.com` can point at this path later.
+  slidesEnabled = microvmGuest.sshPort != null && microvmGuest.sshUser != null;
+  slideshowPage = pkgs.writeTextDir "index.html" ''
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <title>slideshow</title>
+      </head>
+      <body style="font-family: system-ui, sans-serif; margin: 3rem; max-width: 46rem">
+        <h1>slideshow</h1>
+        <p>A terminal deck: <code>slides</code> reading a markdown file inside the
+          <code>sandbox</code> microVM on this host. It renders over ssh, so a
+          browser has nothing to show yet.</p>
+        <h2>Reach it</h2>
+        <pre>ssh -p ${toString microvmGuest.sshPort} ${microvmGuest.sshUser}@${tailnetHost}</pre>
+        <p>Key-only, and the login <em>is</em> the deck: that account runs one
+          forced command with no shell and no forwarding.</p>
+        <p>Public ssh is not wired yet. <code>tcp/${toString microvmGuest.sshPort}</code>
+          is open on this host, but <code>${publicDomain}</code> reaches it through an
+          edge forward that carries only 80 and 443, so that name needs its own TCP
+          forward before <code>ssh -p ${toString microvmGuest.sshPort} ${microvmGuest.sshUser}@${publicDomain}</code>
+          can work.</p>
+      </body>
+    </html>
+  '';
+
+  # Same treatment as /microvm/: locations inherit nothing from the server
+  # block, so the tailnet gate is repeated in each one.
+  slideshowLocations = withGate: {
+    "= /slideshow".extraConfig =
+      (lib.optionalString withGate tailnetOnly)
+      + ''return 301 /slideshow/;'';
+    "/slideshow/" = {
+      alias = "${slideshowPage}/";
+      index = "index.html";
+      extraConfig = lib.optionalString withGate tailnetOnly;
+    };
+  };
+
   freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 in {
   imports = [
@@ -482,7 +526,8 @@ in {
                 return 200 "ok";
               '';
             }
-            // microvmProxyLocations true;
+            // microvmProxyLocations true
+            // lib.optionalAttrs slidesEnabled (slideshowLocations true);
         };
       }
       # HTTPS vhost — inert until `publicDomain` names a record that resolves
@@ -519,7 +564,8 @@ in {
                 return 200 "ok";
               '';
             }
-            // microvmProxyLocations false;
+            // microvmProxyLocations false
+            // lib.optionalAttrs slidesEnabled (slideshowLocations false);
           # Deliberately no harness location. The worker is tailnet-only (see
           # `tailscale-serve-dsh` below); publishing it here would put a
           # token-only gate in front of a user that holds the fleet SSH CA key.

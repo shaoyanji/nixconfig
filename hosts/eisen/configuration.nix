@@ -112,9 +112,11 @@ in {
   };
 
   # --- Wake-on-LAN (WOL) ---
-  # Enables Wake-on-LAN on enp9s0 (Realtek GbE at 192.168.3.91, MAC 00:e0:22:1c:bb:ed).
-  # systemd-udevd generates linkConfig.WakeOnLan = "magic" so the NIC stays powered in
-  # standby (+5VSB) listening for magic packets from Steam Link or other LAN devices.
+  # udevd arms linkConfig.WakeOnLan = "magic" on enp9s0 (Realtek GbE, MAC
+  # 00:e0:22:1c:bb:ed) at every boot, so the NIC listens in standby and
+  # `task infra:wol:eisen` can start the box from S5. Kept deliberate: any host on
+  # the LAN can wake it, so a device that emits magic packets on its own is the
+  # thing to fix — the Steam Link's saved-host list is where that comes from.
   networking.interfaces.enp9s0.wakeOnLan.enable = true;
 
   # --- 4K transcoding tooling ---

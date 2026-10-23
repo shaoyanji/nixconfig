@@ -16,6 +16,8 @@
   inventory,
   docsGen,
   skillsCtl,
+  agentsNotesCtl,
+  knowledgeGraphCtl,
   self,
 }: let
   feedHost = name: h: let
@@ -55,6 +57,10 @@ in
   lib.genAttrs systems.work (system: let
     pkgs = pkgsFor system;
     cli = cliFor system;
+    # The one serializer. `pkgs.formats.json` validates the value against the
+    # JSON type at eval time, so an attribute that cannot be represented fails
+    # here instead of producing a broken artifact nobody parses until runtime.
+    json = pkgs.formats.json {};
   in {
     sites =
       {
@@ -87,7 +93,7 @@ in
         # of re-parsing inventory.toml with `yq` in scripts: it is already validated,
         # defaults-normalised and carries the derived counts.
         inventory-json = pkgs.runCommand "inventory.json" {nativeBuildInputs = [pkgs.jq];} ''
-          jq . ${pkgs.writeText "inventory.compiled.json" inventory.json} > $out
+          jq . ${json.generate "inventory.compiled.json" inventory.compiled} > $out
         '';
 
         # The agent feed: every Nix host's role, persona hint, hardware, traits and
@@ -130,9 +136,14 @@ in
         agent-skills-bundle = pkgs.runCommand "agent-skills-bundle" {} ''
           mkdir -p $out
           cp -a ${../.agents/skills} $out/skills
-          cp ${pkgs.writeText "agent-skills-index.json" skillsCtl.indexJson} $out/index.json
+          cp ${json.generate "agent-skills-index.json" skillsCtl.index} $out/index.json
           chmod -R u+w $out
         '';
+
+        # The two agent-context documents, serialized from the typed values the
+        # roots (`.#agentsNotes.api`, `.#knowledgeGraph.graph`) already expose.
+        agents-notes = json.generate "agents-notes.json" agentsNotesCtl.api;
+        knowledge-graph = json.generate "knowledge-graph.json" knowledgeGraphCtl.graph;
       };
 
     servers = {

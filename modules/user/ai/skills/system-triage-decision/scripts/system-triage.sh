@@ -1,14 +1,27 @@
 #!/usr/bin/env bash
+# Thin dispatcher: the decision engine has exactly one implementation, in the
+# repo. This skill used to carry a copy, which went stale and answered for the
+# repo (2026-10-23) -- every triage result was the old, non-status-aware mapping.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-# Resolve the engine from the repo, not from a checkout path: the skill is
-# symlinked into ~/.agents/skills, and `pwd -P` above resolves that link.
-ENGINE_PY="$SCRIPT_DIR/../../../../../../modules/services/systemone/engine.py"
+REPO_ROOT="${NIXCONFIG_ROOT:-$HOME/Documents/nixconfig}"
 
+# From a checkout the relative path wins; `pwd -P` above lands in the nix store
+# when the skill is materialized under ~/.agents/skills, where it cannot resolve.
+ENGINE_PY="$SCRIPT_DIR/../../../../../../modules/services/systemone/engine.py"
 if [ ! -f "$ENGINE_PY" ]; then
-  # Fallback to a local engine copy if this script was moved out of the repo
-  ENGINE_PY="$SCRIPT_DIR/engine.py"
+  ENGINE_PY="$REPO_ROOT/modules/services/systemone/engine.py"
 fi
 
-exec python3 "$ENGINE_PY" "$@"
+if [ -f "$ENGINE_PY" ]; then
+  exec python3 "$ENGINE_PY" "$@"
+fi
+
+# Fleet hosts install the same file as a CLI (services.systemoneDecision).
+if command -v systemone-decision >/dev/null 2>&1; then
+  exec systemone-decision "$@"
+fi
+
+printf 'system-triage-decision: no engine found (looked for %s and systemone-decision)\n' "$ENGINE_PY" >&2
+exit 127

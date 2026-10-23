@@ -772,14 +772,19 @@ tasks:
     desc: Run System One decision triage on SYSTEM.md and HANDOFF.md (Julia-1 & Laya)
     summary: >
       Invokes systemone-decision to evaluate system scorecard health and strategic
-      queue priorities using non-autoregressive decision models.
+      queue priorities using non-autoregressive decision models. Runs the mapping
+      selftest first: a report that ignores the Status column is not a report.
     cmds:
       - |
-        if systemone-decision triage-system --help 2>/dev/null | grep -q -- '--fail-on-alert'; then
-          systemone-decision --model julia-1 triage-system /home/devji/SYSTEM.md --fail-on-alert
+        # Capability probe, not a version guess: an installed CLI from before the
+        # mapping fix has no `selftest` and must not be trusted with the gate.
+        if systemone-decision selftest >/dev/null 2>&1; then
+          ENGINE=systemone-decision
         else
-          python3 modules/services/systemone/engine.py --model julia-1 triage-system /home/devji/SYSTEM.md --fail-on-alert
+          ENGINE="python3 modules/services/systemone/engine.py"
         fi
+        $ENGINE selftest
+        $ENGINE --model julia-1 triage-system /home/devji/SYSTEM.md --fail-on-alert
 
   checks:decision:ensemble:
     desc: Run System 1 & System 2 Pre-Harness Ensemble audit across 10 core services (EXP-065)

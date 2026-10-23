@@ -24,6 +24,7 @@ import math
 import hashlib
 import resource
 import argparse
+import tempfile
 from typing import Dict, List, Any, Optional, Tuple
 
 # Stopwords filtered during semantic keyword alignment
@@ -59,6 +60,100 @@ PROFILES = {
         "license": "Apache-2.0"
     }
 }
+
+# --- status vocabulary ------------------------------------------------------
+# The scorecard's Status column is a fact; the decision models are a judgement.
+# The route is therefore derived from the status, not from a hash of the row
+# text: until 2026-10-23 the tier was `engine.choice`d per row, which flagged 17
+# healthy subsystems for immediate repair and could not tell FAILED from OK
+# (flipping every OK to FAILED left the report byte-identical).
+HEALTHY_STATUSES = {"OK", "PASSED", "HEALTHY", "ACTIVE", "RUNNING", "VERIFIED"}
+FAILING_STATUSES = {"FAILED", "FAIL", "BROKEN", "ERROR", "CRITICAL", "DOWN", "MISSING"}
+SEVERITY_WEIGHT = {"healthy": 1.0, "warn": 0.5, "failing": 0.0}
+TIER_FOR_SEVERITY = {
+    "failing": "TIER_1_IMMEDIATE_REPAIR",
+    "warn": "TIER_2_STRATEGIC_HANDOFF",
+    "healthy": "HEALTHY_MONITOR_ONLY",
+}
+# A row nobody measured is a measurement task, whatever its subject looks like.
+UNMEASURED_STATUSES = {"UNVERIFIED", "PENDING", "STALE", "UNKNOWN"}
+
+# Handlers are advisory (nothing executes them) but still have to fit the row:
+# "scrub the storage" for a dead user unit is worse than no suggestion.
+HANDLER_RATIONALE = {
+    "nixos_rebuild": "Patch NixOS configuration module and switch system generation",
+    "service_restart": "Restart failed systemd unit and reset failed state",
+    "storage_scrub": "Execute Btrfs scrub or filesystem repair",
+    "database_vacuum": "Run PostgreSQL reindex/vacuum drill or SQLite maintenance",
+    "advisory_note": "Record the finding without halting operations",
+    "verify_probe": "Re-run the check that produced this row: an unmeasured subsystem is not a healthy one",
+}
+HANDLER_RULES = (
+    ("storage_scrub", ("btrfs", "scrub", "filesystem", "disk", "smart", "pool")),
+    ("database_vacuum", ("postgres", "database", "sqlite", "immich", "paperless", "vacuum")),
+    ("nixos_rebuild", ("nix", "flake", "format", "generation", "config", "module", "patch")),
+    ("service_restart", ("service", "unit", "systemd", "daemon", "gateway", "listening", "target")),
+)
+
+# Handoff categories: a judgement call, so the model may make it -- above its own
+# confidence threshold. `OPERATOR_DECISION_REQUIRED` is new: the queue's
+# "operator decision needed" / "advisory" / "review" items had nowhere to go in
+# the four-state taxonomy and were mistagged as autonomous work.
+HANDOFF_CATEGORIES = (
+    "AUTONOMOUS_PROMOTION_CANDIDATE",
+    "BLOCKED_ON_HARDWARE_DEPENDENCY",
+    "DOCUMENTED_UPSTREAM_GAP",
+    "ALREADY_VERIFIED",
+    "OPERATOR_DECISION_REQUIRED",
+)
+HANDOFF_RULES = (
+    ("ALREADY_VERIFIED", ("[x]", "completed", "already verified", "landed in")),
+    ("DOCUMENTED_UPSTREAM_GAP", ("upstream", "no action", "deprecated", "wontfix")),
+    (
+        "BLOCKED_ON_HARDWARE_DEPENDENCY",
+        ("blocked on hardware", "hardware", "capacity", "replace the", "drive", "provision"),
+    ),
+    ("OPERATOR_DECISION_REQUIRED", ("operator", "advisory", "decision needed", "review")),
+)
+
+
+def severity_of(status: str) -> str:
+    """healthy / warn / failing for a scorecard status.
+
+    A status word this table does not know is not evidence of health, so it lands
+    in `warn`: the report asks for a look instead of passing the row.
+    """
+    s = (status or "").strip().upper()
+    if s in HEALTHY_STATUSES:
+        return "healthy"
+    if s in FAILING_STATUSES:
+        return "failing"
+    return "warn"
+
+
+def health_from_rows(severities: List[str]) -> float:
+    """Weighted health of the scorecard: 100.0 when every row is healthy."""
+    if not severities:
+        return 0.0
+    weight = sum(SEVERITY_WEIGHT[s] for s in severities)
+    return round(100.0 * weight / len(severities), 2)
+
+
+def handler_for(*parts: str) -> str:
+    text = " ".join(parts).lower()
+    for handler, needles in HANDLER_RULES:
+        if any(needle in text for needle in needles):
+            return handler
+    return "advisory_note"
+
+
+def handoff_category_from_rules(text: str) -> str:
+    lowered = text.lower()
+    for category, needles in HANDOFF_RULES:
+        if any(needle in lowered for needle in needles):
+            return category
+    return "AUTONOMOUS_PROMOTION_CANDIDATE"
+
 
 def softmax(logits: List[float], temperature: float = 1.0) -> List[float]:
     t = max(0.01, temperature)
@@ -287,25 +382,30 @@ def triage_system_md(system_md_path: str, model_name: str = "julia-1") -> Dict[s
         content = f.read()
 
     engine = DecisionEngine(model_name)
+    threshold = engine.profile["min_confidence_threshold"]
 
     # Extract scorecard rows
     scorecard_matches = re.findall(r"\|\s*\*\*([^*]+)\*\*\s*\|\s*`?([A-Z_]+)`?\s*\|\s*([^|]+)\|", content)
-    
     triage_results = []
-    overall_incidents = 0
+    status_counts = {"healthy": 0, "warn": 0, "failing": 0}
     tier1_count = 0
     tier2_count = 0
+    gated_count = 0
 
     for name, status, detail in scorecard_matches:
         item_text = f"Subsystem: {name}\nStatus: {status}\nDetails: {detail}"
-        is_failing = status not in ["OK", "PASSED", "HEALTHY"]
-        
-        # Decision: Is this TIER 1 immediate repair vs TIER 2 strategic handoff?
-        decision = engine.choice(
+        severity = severity_of(status)
+        status_counts[severity] += 1
+
+        model_call = engine.choice(
             item_text,
             "What remediation protocol applies to this subsystem?",
-            ["TIER_1_IMMEDIATE_REPAIR", "TIER_2_STRATEGIC_HANDOFF", "HEALTHY_MONITOR_ONLY"]
+            list(TIER_FOR_SEVERITY.values()),
         )
+        protocol = TIER_FOR_SEVERITY[severity]
+        gated = model_call["confidence"] < threshold
+        if gated:
+            gated_count += 1
 
         urgency_score = engine.score(
             item_text,
@@ -314,46 +414,48 @@ def triage_system_md(system_md_path: str, model_name: str = "julia-1") -> Dict[s
             max_scale=5.0
         )
 
-        handler_route = engine.route(
-            item_text,
-            {
-                "nixos_rebuild": "Patch NixOS configuration module and switch system generation",
-                "service_restart": "Restart failed systemd unit and reset failed state",
-                "storage_scrub": "Execute Btrfs scrub or filesystem repair",
-                "database_vacuum": "Run PostgreSQL reindex/vacuum drill or SQLite maintenance",
-                "advisory_note": "Record finding in HANDOFF.md without halting operations"
-            }
-        )
+        handler = "advisory_note" if severity == "healthy" else handler_for(name, detail)
+        if status.strip().upper() in UNMEASURED_STATUSES:
+            handler = "verify_probe"
 
-        if decision["decision"] == "TIER_1_IMMEDIATE_REPAIR":
+        if protocol == "TIER_1_IMMEDIATE_REPAIR":
             tier1_count += 1
-            overall_incidents += 1
-        elif decision["decision"] == "TIER_2_STRATEGIC_HANDOFF":
+        elif protocol == "TIER_2_STRATEGIC_HANDOFF":
             tier2_count += 1
-            overall_incidents += 1
 
         triage_results.append({
             "subsystem": name.strip(),
             "status": status.strip(),
-            "protocol": decision["decision"],
-            "confidence": decision["confidence"],
+            "severity": severity,
+            "protocol": protocol,
+            "decided_by": "status",
+            "model_suggestion": model_call["decision"],
+            "model_disagrees": model_call["decision"] != protocol,
+            "confidence": model_call["confidence"],
+            "confidence_gated": gated,
             "urgency": urgency_score["score"],
-            "recommended_action": handler_route["target_handler"],
-            "rationale": handler_route["rationale"]
+            "recommended_action": handler,
+            "rationale": HANDLER_RATIONALE[handler]
         })
 
-    # System-level health assessment
-    overall_health = engine.score(content[:2000], "Overall system stability and fleet readiness", 1.0, 100.0)
-
-    return {
+    report = {
         "model": model_name,
         "audited_file": system_md_path,
-        "overall_health_score": overall_health["score"],
+        "overall_health_score": health_from_rows([item["severity"] for item in triage_results]),
+        "health_basis": "scorecard rows, healthy=1.0 / unverified=0.5 / failed=0.0",
         "subsystems_inspected": len(scorecard_matches),
+        "status_counts": status_counts,
         "tier1_immediate_repairs": tier1_count,
         "tier2_strategic_handoffs": tier2_count,
+        "low_confidence_decisions": gated_count,
+        "min_confidence_threshold": threshold,
         "items": triage_results
     }
+    if not scorecard_matches:
+        # An unparseable scorecard is not a healthy system: fail closed rather
+        # than report 0 incidents.
+        report["error"] = "no scorecard rows matched; cannot verify this document"
+    return report
 
 def triage_handoff_md(handoff_md_path: str, model_name: str = "julia-1") -> Dict[str, Any]:
     if not os.path.isfile(handoff_md_path):
@@ -363,24 +465,39 @@ def triage_handoff_md(handoff_md_path: str, model_name: str = "julia-1") -> Dict
         content = f.read()
 
     engine = DecisionEngine(model_name)
+    threshold = engine.profile["min_confidence_threshold"]
 
     # Extract queue items: e.g. ### 1. DNS Failover ...
     sections = re.split(r"\n###\s+", content)
     items = []
+    gated_count = 0
 
     for sec in sections[1:]:
         lines = sec.splitlines()
         header = lines[0] if lines else "Unknown"
-        sec_text = "\n".join(lines[:10])
+        # The split is on `###`; a following `## ` heading still lands inside the
+        # section and its words ("## Completed items") would tag an open item.
+        body = "\n".join(lines[:10]).split("\n## ")[0]
+        sec_text = body
 
         is_completed = "[x]" in header or "COMPLETED" in sec_text
         is_open = "OPEN" in sec_text or "IN PROGRESS" in sec_text
 
-        decision = engine.choice(
+        model_call = engine.choice(
             sec_text,
             "What is the operational readiness and execution category of this item?",
-            ["AUTONOMOUS_PROMOTION_CANDIDATE", "BLOCKED_ON_HARDWARE_DEPENDENCY", "DOCUMENTED_UPSTREAM_GAP", "ALREADY_VERIFIED"]
+            list(HANDOFF_CATEGORIES),
         )
+
+        # The category is a judgement, so the model may make it -- but only above
+        # its own confidence threshold. Below it the item's own status words are
+        # the better evidence (2026-10: five of seven tags contradicted the
+        # document at 0.25-0.36 confidence, every one of them below threshold).
+        if model_call["confidence"] >= threshold:
+            category, decided_by = model_call["decision"], "model"
+        else:
+            category, decided_by = handoff_category_from_rules(f"{header}\n{sec_text}"), "rules"
+            gated_count += 1
 
         priority = engine.score(
             sec_text,
@@ -391,8 +508,11 @@ def triage_handoff_md(handoff_md_path: str, model_name: str = "julia-1") -> Dict
         items.append({
             "title": header.strip(),
             "status": "COMPLETED" if is_completed else ("OPEN" if is_open else "DOCUMENTED"),
-            "category": decision["decision"],
-            "confidence": decision["confidence"],
+            "category": category,
+            "decided_by": decided_by,
+            "model_suggestion": model_call["decision"],
+            "confidence": model_call["confidence"],
+            "confidence_gated": model_call["confidence"] < threshold,
             "priority": priority["score"]
         })
 
@@ -400,8 +520,76 @@ def triage_handoff_md(handoff_md_path: str, model_name: str = "julia-1") -> Dict
         "model": model_name,
         "audited_file": handoff_md_path,
         "total_items": len(items),
+        "low_confidence_decisions": gated_count,
+        "min_confidence_threshold": threshold,
         "items": items
     }
+
+def run_selftest() -> Dict[str, Any]:
+    """Prove the mapping is status-driven.
+
+    The 2026-10 regression was a report that ignored the Status column entirely,
+    so the guard is an experiment on that column: flip one row and the tier and
+    the health score must move.
+    """
+    checks: List[Tuple[str, bool]] = []
+
+    def check(name: str, got: Any, want: Any) -> None:
+        checks.append((name, got == want))
+
+    check("severity OK", severity_of("OK"), "healthy")
+    check("severity FAILED", severity_of("FAILED"), "failing")
+    check("severity UNVERIFIED", severity_of("UNVERIFIED"), "warn")
+    check("severity unknown word", severity_of("PURPLE"), "warn")
+    check("tier failing", TIER_FOR_SEVERITY[severity_of("FAILED")], "TIER_1_IMMEDIATE_REPAIR")
+    check("tier unverified", TIER_FOR_SEVERITY[severity_of("UNVERIFIED")], "TIER_2_STRATEGIC_HANDOFF")
+    check("tier healthy", TIER_FOR_SEVERITY[severity_of("OK")], "HEALTHY_MONITOR_ONLY")
+    check("health all healthy", health_from_rows(["healthy", "healthy"]), 100.0)
+    check("health all failing", health_from_rows(["failing"]), 0.0)
+    check("health mixed", health_from_rows(["healthy", "warn", "failing"]), 50.0)
+
+    scorecard = (
+        "| Subsystem | Status | Detail |\n"
+        "| :-- | :--: | :-- |\n"
+        "| **Alpha** | `OK` | fine |\n"
+        "| **Beta** | `OK` | fine |\n"
+    )
+
+    with tempfile.TemporaryDirectory() as tmp:
+        system_md = os.path.join(tmp, "SYSTEM.md")
+        with open(system_md, "w", encoding="utf-8") as f:
+            f.write(scorecard)
+        clean = triage_system_md(system_md, "julia-1")
+        check("clean scorecard: no tier1", clean["tier1_immediate_repairs"], 0)
+        check("clean scorecard: health 100", clean["overall_health_score"], 100.0)
+
+        with open(system_md, "w", encoding="utf-8") as f:
+            f.write(scorecard.replace("| **Beta** | `OK` |", "| **Beta** | `FAILED` |"))
+        flipped = triage_system_md(system_md, "julia-1")
+        check("one FAILED: tier1", flipped["tier1_immediate_repairs"], 1)
+        check(
+            "one FAILED: health drops",
+            flipped["overall_health_score"] < clean["overall_health_score"],
+            True,
+        )
+
+        with open(system_md, "w", encoding="utf-8") as f:
+            f.write("# no scorecard here\n")
+        check("no rows: fails closed", "error" in triage_system_md(system_md, "julia-1"), True)
+
+        handoff_md = os.path.join(tmp, "HANDOFF.md")
+        with open(handoff_md, "w", encoding="utf-8") as f:
+            f.write("## Open queue\n\n### 1. Needs a second resolver\n* **Status:** `OPEN` — blocked on hardware.\n")
+        handoff = triage_handoff_md(handoff_md, "julia-1")
+        check(
+            "handoff blocked item",
+            handoff["items"][0]["category"],
+            "BLOCKED_ON_HARDWARE_DEPENDENCY",
+        )
+
+    failed = [name for name, ok in checks if not ok]
+    return {"selftest": "fail" if failed else "pass", "checks": len(checks), "failed": failed}
+
 
 def emit(res, fail_on_alert=False, is_triage=False):
     """Print the report, and exit 1 when --fail-on-alert and it is not nominal."""
@@ -415,9 +603,10 @@ def emit(res, fail_on_alert=False, is_triage=False):
         tier1 = res.get("tier1_immediate_repairs", 0)
         if tier1:
             problems.append(f"{tier1} TIER_1 repair(s) pending")
+        # One vocabulary owner: `severity_of`, not a second copy of the healthy
+        # set that drifts from it.
         for item in res.get("items", []):
-            status = str(item.get("status", "")).upper()
-            if status not in {"OK", "PASSED", "HEALTHY"}:
+            if severity_of(str(item.get("status", ""))) != "healthy":
                 problems.append(f"{item.get('subsystem')}={item.get('status')}")
     if problems:
         print("\nALERT: " + ", ".join(problems), file=sys.stderr)
@@ -635,6 +824,8 @@ def main():
     p_hand = subparsers.add_parser("triage-handoff", help="Triage HANDOFF.md queue and priority scores")
     p_hand.add_argument("file", help="Path to HANDOFF.md")
 
+    subparsers.add_parser("selftest", help="Verify the status -> tier mapping and fail on regression")
+
     # Raw query command
     p_query = subparsers.add_parser("query", help="Run raw typed decision query")
     p_query.add_argument("--type", choices=["choice", "noul", "score", "classify", "route"], required=True)
@@ -673,6 +864,13 @@ def main():
         print(f"=== Strategic Handover Triage using Model: {args.model} ===")
         res = triage_handoff_md(args.file, args.model)
         emit(res, args.fail_on_alert, is_triage=args.command == "triage-system")
+
+    elif args.command == "selftest":
+        res = run_selftest()
+        print(json.dumps(res, indent=2))
+        if res["selftest"] != "pass":
+            print("\nALERT: mapping selftest failed: " + ", ".join(res["failed"]), file=sys.stderr)
+            sys.exit(1)
 
     elif args.command == "query":
         engine = DecisionEngine(args.model)

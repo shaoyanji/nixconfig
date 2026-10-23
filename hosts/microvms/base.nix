@@ -15,6 +15,7 @@
   # Host directory holding ssh_host_ed25519_key. null = generate an ephemeral
   # key on every boot (slow under TCG, and the guest's identity changes).
   sshHostKeys ? null,
+  hopAuthDir ? null,
   vcpu ? 2,
   mem ? 2048,
 }: {
@@ -54,8 +55,13 @@
   networking.useDHCP = false;
   networking.useNetworkd = true;
   systemd.network.enable = true;
+  # udev's predictable rename (eth0 -> enp0s7) lands *after* networkd has matched
+  # the link, and the rename resets it to "off (pending)" with no config applied:
+  # the guest then boots with no address and no sshd reachable, while QMP shows a
+  # healthy virtio-net device. Keeping the kernel's own name removes the race.
+  networking.usePredictableInterfaceNames = false;
   systemd.network.networks."10-uplink" = {
-    matchConfig.Name = "e*";
+    matchConfig.Name = "eth0";
     addresses = [{Address = "${ipAddress}/${toString prefix}";}];
     routes = [{Gateway = gateway;}];
   };
@@ -102,6 +108,16 @@
         tag = "ssh-keys";
         source = sshHostKeys;
         mountPoint = "/etc/ssh/host-keys";
+      }
+      # Root-owned on the host, because sshd's StrictModes rejects an
+      # `AuthorizedKeysFile` — and any directory above it — that neither root nor
+      # the target user owns. The state root belongs to the VM's runner user, so
+      # the host's hop key has a directory of its own.
+      ++ lib.optional (hopAuthDir != null) {
+        proto = "virtiofs";
+        tag = "hop-auth";
+        source = hopAuthDir;
+        mountPoint = "/etc/ssh/hop-auth";
       };
     interfaces = [
       {

@@ -2,7 +2,10 @@
 
 delphi · aarch64-linux · NixOS
 
-`ssh -p 2222 slides@delphi.bountystash.com`
+`ssh slides@delphi.bountystash.com` · `ssh -p 2222 slides@delphi.cloudforest-kardashev.ts.net`
+
+The public name is port 22: the host's sshd authenticates a fleet key, then hops
+into this guest. The tailnet name is the guest directly, on 2222.
 
 ---
 
@@ -29,12 +32,14 @@ delphi · aarch64-linux · NixOS
 
 - Two stub HTTP services (`:8080`, `:8081`), proxied at
   `/microvm/one/` and `/microvm/two/` on both hostnames.
-- Three empty state volumes, waiting for the services they are named after:
+- Stirling PDF (`:8082`), proxied at `/microvm/stirling/` — tailnet only, because
+  it holds documents a public vhost has no business answering for.
+- Three state volumes; Stirling's is in use, the other two wait for their service:
 
 | volume | mount | size |
 | :--- | :--- | :--- |
 | `hermes` | `/var/lib/hermes` | 1 GiB |
-| `stirling` | `/var/lib/stirling` | 2 GiB |
+| `stirling` | `/var/lib/stirling-pdf` | 4 GiB |
 | `dsh` | `/var/lib/deepseek-harness` | 1 GiB |
 
 ---
@@ -50,8 +55,8 @@ delphi · aarch64-linux · NixOS
 
 ## Next
 
-- Port Stirling PDF, then the DeepSeek harness, then hermes — one service per
-  switch, each behind its own `/microvm/<name>/` proxy.
+- Port the DeepSeek harness, then hermes — one service per switch, each behind
+  its own `/microvm/<name>/` proxy.
 - Raise the guest's RAM as the service set grows; the ceiling for this host is
   8 GiB, and it must stay under what the hypervisor needs to serve.
 - Keep the deck: `slides` is the cheapest way to explain a change to a person

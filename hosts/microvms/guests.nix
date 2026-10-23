@@ -1,7 +1,8 @@
 # `microvm.vms.<name>` for a host that runs guests. One guest: a shell sandbox
 # by default, and the host's service tier when `services = true` (delphi runs
-# the two stub HTTP services there, proxied under /microvm/). Rationale:
-# AGENTS.nix `microvm-guests`.
+# the two stub HTTP services there, proxied under /microvm/). `persist` gives a
+# service real state on a disk, and `slidesUser` turns an account's login into a
+# terminal deck. Rationale: AGENTS.nix `microvm-guests`.
 {
   inputs,
   hypervisor ? "cloud-hypervisor",
@@ -18,13 +19,47 @@
   # The two stub HTTP services the host proxy exposes under /microvm/. Off by
   # default: a shell sandbox should not carry web servers.
   services ? false,
+  # Persistent state, one ext4 image per entry, keyed by name:
+  #   persist = { hermes = { }; stirling = { size = 2048; }; }
+  # `mountPoint` defaults to /var/lib/<name>. The image lives on the HOST at
+  # `<stateRoot>/sandbox/volumes/<name>.img` and is created (mkfs, label = name)
+  # before first start, so a ported service's StateDirectory survives a guest
+  # restart with no host-side file ownership to negotiate.
+  persist ? {},
+  # A guest user whose only login is `slides` reading ./slideshow.md. null = no
+  # such account.
+  slidesUser ? null,
+  # Host port forwarded to the guest's sshd. null = reachable only from the host
+  # and the brlan subnet; the listener is always the host's, so the guest itself
+  # gains no inbound path.
+  exposeSsh ? null,
   mem ? 1024,
 }: {
+  config,
   lib,
   pkgs,
   ...
 }: let
   sshHostKeys = "${stateRoot}/sandbox/ssh-host-keys";
+
+  # Compiled from the repo, so the deck is a store path the guest already sees
+  # over the virtiofs /nix/store share.
+  deck = ./slideshow.md;
+
+  # One volume per persisted name. A label rather than a /dev/vdX letter: disk
+  # enumeration order is not a stable identity.
+  persistVolumes =
+    lib.mapAttrsToList (name: opts: {
+      image = "${stateRoot}/sandbox/volumes/${name}.img";
+      label = name;
+      mountPoint = opts.mountPoint or "/var/lib/${name}";
+      size = opts.size or 1024;
+    })
+    persist;
+
+  # Both halves of the deck entry — the port and the account — are published so
+  # the host's proxy page names exactly what this module created.
+  sshEnabled = exposeSsh != null && slidesUser != null;
 
   # One page per stub. The page names its upstream so a browser at
   # /microvm/<name>/ can prove which guest answered.
@@ -59,7 +94,7 @@ in {
   imports = [inputs.microvm.nixosModules.host];
 
   # The host side of these stubs is generated from this declaration, so the
-  # address and the port pair have exactly one home.
+  # address, the port pair, the deck account and its port have one home.
   options.microvmGuests.sandbox = {
     address = lib.mkOption {
       type = lib.types.str;
@@ -76,6 +111,16 @@ in {
       default = lib.optionals services (map (svc: {inherit (svc) name port;}) stubServices);
       description = "Stub HTTP services running inside the sandbox guest.";
     };
+    sshPort = lib.mkOption {
+      type = lib.types.nullOr lib.types.port;
+      default = exposeSsh;
+      description = "Host port forwarded to the guest's sshd (null = not forwarded).";
+    };
+    sshUser = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = slidesUser;
+      description = "Guest account whose login runs the deck (null = no deck).";
+    };
   };
 
   config = {
@@ -85,12 +130,15 @@ in {
     systemd.services."microvm@sandbox".serviceConfig.TimeoutStartSec = lib.mkIf (cpu != null) "900";
 
     # The runner user must own the state dir: microvm-set-booted@ writes `current`
-    # there, and the keygen unit below writes the key as the same user.
-    systemd.tmpfiles.rules = [
-      "d ${stateRoot} 0755 microvm kvm -"
-      "d ${stateRoot}/sandbox 0755 microvm kvm -"
-      "d ${sshHostKeys} 0700 microvm kvm -"
-    ];
+    # there, the keygen unit below writes the key as the same user, and the
+    # volume images are created there before the guest starts.
+    systemd.tmpfiles.rules =
+      [
+        "d ${stateRoot} 0755 microvm kvm -"
+        "d ${stateRoot}/sandbox 0755 microvm kvm -"
+        "d ${sshHostKeys} 0700 microvm kvm -"
+      ]
+      ++ lib.optional (persist != {}) "d ${stateRoot}/sandbox/volumes 0700 microvm kvm -";
 
     # One key per guest, generated once and served to the guest over virtiofs.
     # Without this every boot runs sshd-keygen under TCG, which took minutes and
@@ -112,6 +160,28 @@ in {
       '';
     };
 
+    # The deck's door. nginx proxies HTTP, and ssh is not HTTP, so this is a
+    # socket-activated TCP forward: connections are accepted by the host and
+    # handed to the guest's sshd, which means nothing listens inside the guest
+    # that the host did not open.
+    systemd.sockets.microvm-sandbox-ssh = lib.mkIf sshEnabled {
+      wantedBy = ["sockets.target"];
+      listenStreams = ["0.0.0.0:${toString exposeSsh}"];
+      socketConfig = {
+        Accept = false;
+        NoDelay = true;
+      };
+    };
+
+    systemd.services.microvm-sandbox-ssh = lib.mkIf sshEnabled {
+      description = "Forward tcp/${toString exposeSsh} to the sandbox guest's sshd";
+      requires = ["microvm-sandbox-ssh.socket"];
+      after = ["microvm-sandbox-ssh.socket"];
+      serviceConfig.ExecStart = "${config.systemd.package}/lib/systemd/systemd-socket-proxyd ${address}:22";
+    };
+
+    networking.firewall.allowedTCPPorts = lib.optional sshEnabled exposeSsh;
+
     # `ssh sandbox` from the host that runs it, as root: the bridge subnet is
     # host-local, so this name means nothing on another machine.
     programs.ssh.extraConfig = ''
@@ -131,7 +201,7 @@ in {
 
     microvm.vms.sandbox = {
       inherit autostart;
-      config = {
+      config = {config, ...}: {
         imports = [
           inputs.microvm.nixosModules.microvm
           (import ./base.nix {
@@ -141,6 +211,40 @@ in {
             mac = "02:00:00:00:83:11";
           })
         ];
+
+        # TCG (cpu = "max") boots this guest in minutes, and systemd's 90 s device
+        # timeout expires while udev is still coldplugging — the volumes then land
+        # in emergency mode with "Timed out waiting for device
+        # /dev/disk/by-label/…". A KVM guest does not need the slack.
+        systemd.settings.Manager.DefaultDeviceTimeoutSec = lib.mkIf (cpu != null) "600";
+        # nixpkgs caps the console at 4; on an emulated guest the kernel's device
+        # messages are the only place a missing disk shows up.
+        boot.consoleLogLevel = lib.mkIf (cpu != null) 7;
+
+        microvm.volumes = persistVolumes;
+
+        # One account, one command. No password is set, and `base.nix` turns
+        # password auth off for the whole guest, so this account exists only to
+        # match a key from the fleet's one key list.
+        users.users = lib.optionalAttrs (slidesUser != null) {
+          ${slidesUser} = {
+            isNormalUser = true;
+            description = "Terminal deck over ssh (forced command)";
+            openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
+          };
+        };
+
+        # Last block in sshd_config — the only place a Match may appear. The
+        # login is the deck: no shell to escape to, no forwarding, and the deck
+        # itself is a read-only store path.
+        services.openssh.extraConfig = lib.mkIf (slidesUser != null) ''
+          Match User ${slidesUser}
+            ForceCommand ${pkgs.slides}/bin/slides ${deck}
+            AllowTcpForwarding no
+            AllowAgentForwarding no
+            X11Forwarding no
+            PermitTunnel no
+        '';
 
         # busybox httpd, not nginx: a stub is a directory and a listener, and the
         # guest's closure is paid for on every TCG start.

@@ -81,10 +81,24 @@ in {
           inherit inputs;
           hypervisor = "qemu";
           cpu = "max";
-          # This guest is a service host, not a shell: bring it back at boot and
-          # give it the two stub HTTP services the proxy below exposes.
+          # This guest is a service host, not a shell: bring it back at boot,
+          # give it the two stub HTTP services the proxy below exposes, and
+          # reserve the state disks the ported services will mount.
           autostart = true;
           services = true;
+          persist = {
+            hermes = {size = 1024;};
+            stirling = {size = 2048;};
+            dsh = {
+              mountPoint = "/var/lib/deepseek-harness";
+              size = 1024;
+            };
+          };
+          # The deck: a guest account whose login is `slides`, reachable on the
+          # host's 2222. OCI's security list must also allow 2222 (console
+          # change, not declarable here — see .agents/deploy/hosts/delphi.md).
+          slidesUser = "slides";
+          exposeSsh = 2222;
         })
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with

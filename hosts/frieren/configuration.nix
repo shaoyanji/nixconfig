@@ -173,6 +173,11 @@ in {
   system.autoUpgrade = {
     enable = true;
     flake = "github:shaoyanji/nixconfig#frieren";
+    # `--upgrade` updates root's `nixos` channel, which nixos-rebuild itself
+    # reports has no effect on a flake system — it just unpacked a channel for
+    # ~2.5 min at 04:02 before saying so. The github: ref is fetched fresh on
+    # every run, so the flag buys nothing and channels are disabled fleet-wide.
+    upgrade = false;
     dates = "04:00";
     allowReboot = true;
     persistent = true;

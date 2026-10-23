@@ -80,17 +80,12 @@ in {
   };
 
   # --- Dell D6000 Universal Dock (DisplayLink / EVDI) ---
-  # The dock's CDC-NCM port is poseidon's wired uplink (192.168.3.74), so it has
-  # to stay NetworkManager-managed; the profile's default is to leave dock
-  # ethernet unmanaged, which only suits hosts with a spare port (frieren/fern).
-  profiles.dell-dock = {
-    enable = true;
-    manageUsbEthernet = true;
-    # Pinned: an unbound profile is rewritten by NetworkManager on activation,
-    # leaving a duplicate connection that fails every later activation and
-    # bounces the link under an SSH session.
-    usbEthernetInterface = "enp6s0f3u1u1i5";
-  };
+  # Display and USB only: the dock's CDC-NCM port is left unmanaged on purpose.
+  # Poseidon's Wi-Fi is already on 192.168.3.0/24, and a second NIC on the same
+  # subnet produces ARP flux — both interfaces answer for each other's address
+  # and replies leave the wrong one, which kills an SSH session mid-stream.
+  # One uplink per subnet; use the dock cable only if Wi-Fi is off, by hand.
+  profiles.dell-dock.enable = true;
 
   # --- TPM 2.0 (AMD firmware TPM) ---
   # /dev/tpmrm0 is root:tss 0660 and age-plugin-tpm --generate runs as the user.

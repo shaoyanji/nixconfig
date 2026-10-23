@@ -29,6 +29,18 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-23 — delphi's guest becomes a service tier: named volumes, Stirling, a deck on port 22
+- `persist` in `hosts/microvms/guests.nix` mounts one labelled ext4 image per name at
+  `/var/lib/<name>` (hermes, stirling, dsh); Stirling PDF runs on the 4 GiB one behind
+  `/microvm/stirling/` (tailnet-gated, public name 302s there). Proof: 200 through the tailnet vhost,
+  403 for a public client spoofing the tailnet Host, 302 on `https://delphi.bountystash.com/…`.
+- The deck is reachable at `ssh -p 22 slides@delphi.bountystash.com` — the edge carries 22, not 2222 —
+  through a host account whose login is a hop into the guest's forced command. Proof: rendered from
+  frieren over the public IP and the public hostname.
+- Two guest faults fixed on the way: udev's eth0→enp0s7 rename landed after networkd matched the link
+  (`usePredictableInterfaceNames = false`), and `Match`'s `AuthorizedKeysFile` replaced the default that
+  names `/etc/ssh/authorized_keys.d/%u`.
+
 ### 2026-10-22 — the boot gate boots a host's own config, and is not a hygiene instrument
 - `hostBootChecks.<arch>.<host>` runs the host's real module list in a VM and fails unless the console
   shows `Reached target Multi-User System`; CI `boot-canary` for `modules/services/**`. Proof: delphi reached

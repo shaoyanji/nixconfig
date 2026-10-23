@@ -3782,6 +3782,111 @@
         CLI (`systemone-decision`) remains the offline answer.
       '';
     };
+    exp-121 = {
+      title = "EXP-121 — Ollama's /v1/systemone as a second decision backend";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-23";
+      summary = "Nimble, tev1 and Clef answer the same typed /v1/systemone envelope Laya already serves, and poseidon declares Ollama, so the experiment is a like-for-like accuracy and latency comparison on this repo's own fixtures — not a new client.";
+      refs = {
+        hosts = ["poseidon"];
+        modules = ["hosts/poseidon/nvidia.nix" "modules/services/systemone-decision.nix"];
+        tasks = ["checks:host" "ops:decide"];
+      };
+      body = ''
+        **What shipped.** Ollama 0.35 (2026-09-29) added POST /v1/systemone:
+        named typed questions (`choice`, `noul`, `score`) answered in one
+        non-autoregressive pass, 1-64 per request, with a probability per
+        option. Models today: `nimble` (9B, 9.3-9.5 GB, 256K ctx, Apache 2.0,
+        Bespoke Labs, fine-tuned from Qwen3.5-9B), `tev1` (4B) and `tev1:0.8b`
+        (Together AI, experimental), plus `clef` (2026-10-19, Cloudflare, 27B
+        multimodal from Qwen3.8-27B, 18-20 GB, 256K ctx, Apache 2.0), which needs
+        Ollama 0.35.1 or later locally.
+
+        **Why it lands here.** The pinned nixpkgs ships Ollama 0.40.4 (measured
+        2026-10-23), so no flake bump is needed, and poseidon is the one active
+        host that declares Ollama this week. The envelope is the one
+        `services.systemoneDecision` serves and `task ops:decide` speaks, so a
+        single payload can hit both backends with no glue.
+
+        **Measurement.** The same state and question set through `nimble`,
+        `tev1:0.8b` and eisen's Laya; record accuracy against Laya's 0.583
+        baseline and p50 latency. Two numbers, one fixture, one client.
+
+        **Exit.** If `nimble` beats Laya on the fixture, the router prefers it and
+        this note flips to DELIVERED with the module that consumes it; if not,
+        REJECTED with the delta.
+      '';
+    };
+    exp-122 = {
+      title = "EXP-122 — WiFi as a metric anchor for camera depth (Blender)";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-23";
+      from = ["exp-004"];
+      summary = "A monocular depth map has structure but no scale; radio ranges have scale but no structure. The experiment is whether a handful of monitor-mode RSSI ranges puts a Blender-ready point cloud in real metres.";
+      refs = {
+        hosts = ["poseidon"];
+      };
+      body = ''
+        **The asymmetry that makes it work.** A camera gives dense structure with
+        unknown scale; radio gives sparse, noisy metric distance with no
+        structure. Fusing a few ranges into a monocular depth map is the textbook
+        fix for scale ambiguity — and poseidon-to-AP distance is already
+        something this tree has measured, so the anchor has precedent before the
+        experiment starts.
+
+        **What the literature does.** Person-in-WiFi 3D (CVPR 2024) needs three
+        receivers at the room's corners; WiFi-3D-Fusion is an open CSI-to-pose
+        project; a 2026 survey covers CSI to depth fields and meshes. None of
+        them is one AP plus one laptop, which is the only question worth asking
+        here.
+
+        **CSI is the hard part, not the maths.** RSSI gives range alone, through
+        log-distance path loss, and drifts with orientation and furniture. CSI
+        (per-subcarrier amplitude and phase) needs a NIC that exports it —
+        ath9k/ath10k with the right firmware, Broadcom with nexmon, or research
+        hardware; Intel iwlwifi exports none. Establish which radio is in the AP
+        and in poseidon before promising a depth map: RSSI-only is a distance
+        fence, not perception.
+
+        **First artifact.** Monitor-mode capture on the OpenWrt side plus one
+        camera frame, timestamped together; fit path loss per link; project the
+        camera depth at that scale; write a PLY and open it in Blender.
+
+        **Exit.** One room, one subject, depth error against a tape measure at
+        1/2/3 m. If the cloud is metres off, close it REJECTED with the number.
+      '';
+    };
+    exp-123 = {
+      title = "EXP-123 — Occupancy from radio, not from phones";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-23";
+      links = ["exp-004" "exp-122"];
+      summary = "Home Assistant infers presence from phones and device tracking, which fails exactly when it matters — phone on a charger downstairs, person upstairs. Radio variance on a link that already exists is a second signal with no wearable.";
+      refs = {
+        hosts = ["frieren" "poseidon"];
+        modules = ["modules/services/home-assistant.nix"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **The signal.** Mean and variance of RSSI per link, sampled from monitor
+        mode at 10 Hz: an empty room is the baseline, a body in the path shifts
+        both. No CSI is required for this, which is what makes it the cheap
+        rung of the RF idea — see exp-122 for the part that needs a
+        subcarrier-capable NIC.
+
+        **What it is not.** Motion artefacts and breathing need micro-Doppler and
+        a second note; this one claims occupancy only, where a phone's location
+        says nothing about the person holding it.
+
+        **Exit.** A `binary_sensor` in Home Assistant fed by the capture, judged
+        over seven days: false positives with the room empty, missed entries,
+        latency from walking in. Seven days without manual correction is the
+        bar.
+      '';
+    };
     nix-comment-audit = {
       title = "Prose in .nix files: categorize, then route each kind to its channel";
       kind = "open";

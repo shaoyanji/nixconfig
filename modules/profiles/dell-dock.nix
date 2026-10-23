@@ -111,6 +111,12 @@ in {
         # link silently becomes the primary resolution path and those break.
         ipv4.dns = "192.168.3.25";
         ipv6.method = "auto";
+        # A metric above Wi-Fi's. Two equal-metric defaults let this cable win
+        # the default route, so a flaky dock uplink takes browsing and DNS down
+        # with it. At 600 the dock is a fallback for when Wi-Fi is absent, not a
+        # competing primary.
+        ipv4.route-metric = 600;
+        ipv6.route-metric = 600;
       };
     };
 

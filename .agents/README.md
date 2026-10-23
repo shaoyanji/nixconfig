@@ -28,7 +28,7 @@ nix eval .#agentSkills.count                      # count, ~0.12 s warm
 nix eval --json .#agentSkills.byTag.nix | toon -e           # names tagged nix
 nix eval --json .#agentSkills.skills.task-plane | toon -e   # one entry
 nix build .#checks.x86_64-linux.skills-schema -L  # the gate
-nix build .#agentSkillsBundle                     # skills + index.json in one store path
+nix build .#artifacts.agent-skills-bundle                     # skills + index.json in one store path
 ```
 
 `lib/skills.nix` parses each `SKILL.md` frontmatter, enforces the contract in

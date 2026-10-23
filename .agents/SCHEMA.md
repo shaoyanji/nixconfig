@@ -11,7 +11,7 @@ Machine-enforced where possible:
 | :--- | :--- |
 | Skill frontmatter, description length, body budget | `lib/skills.nix` → `checks.<system>.skills-schema` |
 | Every tracked `.toml` parses | `task checks:toml:lint` |
-| Generated docs are never committed | `.gitignore` + review — `.#docs` is a store path (`docs/docs-pipeline-audit.md`) |
+| Generated docs are never committed | `.gitignore` + review — `.#artifacts.docs` is a store path (`docs/docs-pipeline-audit.md`) |
 | Task graph (duplicate keys, dangling refs, include cycles, name parity) | `task checks:tasks` |
 | AGENTS.nix notes: status vocabulary, resolvable refs, leaf intent | `lib/agents-notes.nix` → `checks.<system>.agents-notes-schema` |
 | Everything else here | review; `task ops:docs:budget` prints the counts |
@@ -22,11 +22,11 @@ Machine-enforced where possible:
 
 | Fact class | Canonical home | Everyone else links |
 | :--- | :--- | :--- |
-| Fleet membership, hardware, status | `inventory.toml` (compiled by `lib/inventory.nix`) | `.#inventory`, `.#docs` (`nix build`) |
-| Optional profiles / services / knobs | `modules.toml` | `.#docs` → `modules-registry.md` |
+| Fleet membership, hardware, status | `inventory.toml` (compiled by `lib/inventory.nix`) | `.#inventory`, `.#artifacts.docs` (`nix build`) |
+| Optional profiles / services / knobs | `modules.toml` | `.#artifacts.docs` → `modules-registry.md` |
 | What is executable | `taskfiles/*.yml` | `AGENTS.md`, skills |
 | What a host runs | `hosts/<host>/*.nix` | `MANUAL.md` (service map) |
-| Why a design exists, and what is still open | `AGENTS.nix` notes (`task ops:notes`) | `.#agentsNotes`, `.#docs` |
+| Why a design exists, and what is still open | `AGENTS.nix` notes (`task ops:notes`) | `.#agentsNotes`, `.#artifacts.docs` |
 | What happened | `AUDIT.md` (ledger) + `docs/history/` | commit messages |
 | How to operate | `MANUAL.md`, `.agents/deploy/` | skills |
 | How an agent should route | `AGENTS.md`, `.agents/README.md` | skills |

@@ -14,6 +14,8 @@
   pkgsFor,
   cliFor,
   inventory,
+  docsGen,
+  skillsCtl,
   self,
 }: let
   feedHost = name: h: let
@@ -79,42 +81,59 @@ in
         delphi-site = self.nixosConfigurations.delphi.config.system.build.delphiSite;
       };
 
-    artifacts = {
-      # Machine-readable registry, pretty-printed for diffing. Consume this instead
-      # of re-parsing inventory.toml with `yq` in scripts: it is already validated,
-      # defaults-normalised and carries the derived counts.
-      inventory-json = pkgs.runCommand "inventory.json" {nativeBuildInputs = [pkgs.jq];} ''
-        jq . ${pkgs.writeText "inventory.compiled.json" inventory.json} > $out
-      '';
+    artifacts =
+      {
+        # Machine-readable registry, pretty-printed for diffing. Consume this instead
+        # of re-parsing inventory.toml with `yq` in scripts: it is already validated,
+        # defaults-normalised and carries the derived counts.
+        inventory-json = pkgs.runCommand "inventory.json" {nativeBuildInputs = [pkgs.jq];} ''
+          jq . ${pkgs.writeText "inventory.compiled.json" inventory.json} > $out
+        '';
 
-      # The agent feed: every Nix host's role, persona hint, hardware, traits and
-      # operational notes as one compiled document. This is where the commentary
-      # that used to live as Nix comments is meant to land.
-      fleet-feed = pkgs.writeText "FLEET-FEED.md" (
-        let
-          m = inventory.metadata;
-          d = inventory.derived;
-        in
-          ''
-            # ${m.title}
+        # The agent feed: every Nix host's role, persona hint, hardware, traits and
+        # operational notes as one compiled document. This is where the commentary
+        # that used to live as Nix comments is meant to land.
+        fleet-feed = pkgs.writeText "FLEET-FEED.md" (
+          let
+            m = inventory.metadata;
+            d = inventory.derived;
+          in
+            ''
+              # ${m.title}
 
-            ${m.description}
+              ${m.description}
 
-            Compiled from `inventory.toml` (schema v${m.version}) by `lib/inventory.nix`.
+              Compiled from `inventory.toml` (schema v${m.version}) by `lib/inventory.nix`.
 
-            - devices: ${toString d.total} (nix: ${toString d.nix}, external: ${toString d.external})
-            - active: ${toString d.active} (nix: ${toString d.activeNix}, external: ${toString d.activeExternal})
-            - wip: ${toString d.wip}, preserved: ${toString d.preserved}
+              - devices: ${toString d.total} (nix: ${toString d.nix}, external: ${toString d.external})
+              - active: ${toString d.active} (nix: ${toString d.activeNix}, external: ${toString d.activeExternal})
+              - wip: ${toString d.wip}, preserved: ${toString d.preserved}
 
-          ''
-          + lib.concatStringsSep "\n" (lib.mapAttrsToList feedHost inventory.nixHosts)
-          + ''
-            ## Non-Nix devices
+            ''
+            + lib.concatStringsSep "\n" (lib.mapAttrsToList feedHost inventory.nixHosts)
+            + ''
+              ## Non-Nix devices
 
-            ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: h: "- ${name}: ${h.role} (${h.status})") inventory.externalHosts)}
-          ''
-      );
-    };
+              ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: h: "- ${name}: ${h.role} (${h.status})") inventory.externalHosts)}
+            ''
+        );
+      }
+      // lib.optionalAttrs (system == "x86_64-linux") {
+        # Documentation is compiled once, on the x86 host that serves it. Keeping
+        # it out of aarch64's set is the point: delphi is a two-core OCI instance
+        # that runs services, and asking it for `.#artifacts.docs` should be a
+        # missing attribute, not a failed build of a foreign system.
+        docs = docsGen.mkDocs pkgs;
+
+        # Every skill tree plus the compiled index, for consumers that want one
+        # path instead of a directory walk. Same reasoning as above.
+        agent-skills-bundle = pkgs.runCommand "agent-skills-bundle" {} ''
+          mkdir -p $out
+          cp -a ${../.agents/skills} $out/skills
+          cp ${pkgs.writeText "agent-skills-index.json" skillsCtl.indexJson} $out/index.json
+          chmod -R u+w $out
+        '';
+      };
 
     servers = {
       inherit (pkgs) simplex-chat smp-server;

@@ -7,7 +7,7 @@
 > fleet inventory, modules registry and per-host pages from the compiled
 > `.#inventory` and `modules.toml`, and emits the site **nav as a Nix value** —
 > so there is no hand-written `nav.json` any more, and `docs/site.toml` is no
-> longer needed for that job. `nix build .#docs` is the source of truth and the
+> longer needed for that job. `nix build .#artifacts.docs` is the source of truth and the
 > only copy — the checked-in `docs/generated/` mirror and its drift gate were
 > removed on 2026-10-19 (see [`docs-pipeline-audit.md`](./docs-pipeline-audit.md)).
 > The Python generator remains only as the markdown→HTML step (section 4's

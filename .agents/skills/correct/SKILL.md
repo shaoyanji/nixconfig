@@ -27,7 +27,7 @@ The repo already keeps one such record: the "Agent Verification Protocol" in `AG
 
 | Level | What it looks like here | Example already in the tree |
 | :--- | :--- | :--- |
-| 1. Architecture | one owner per fact, one supported way per task, delete the old path | `lib/inventory.nix` compiles `inventory.toml`; `.#docs` is a store path, never a committed copy |
+| 1. Architecture | one owner per fact, one supported way per task, delete the old path | `lib/inventory.nix` compiles `inventory.toml`; `.#artifacts.docs` is a store path, never a committed copy |
 | 2. Type or lint | a check whose error names the file or option to use instead | `checks:toml:lint`, `checks:tasks`, `checks.<system>.skills-schema` |
 | 3. Test or gate | a runnable gate that fails on the real mistake | `checks:host` refuses a fleet sweep; `checks:flake` refuses below 16 GiB |
 | 4. Docs and rules | prose in `AGENTS.md` or a skill | last resort: nothing fails when an agent skips it |

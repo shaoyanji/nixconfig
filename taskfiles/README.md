@@ -32,7 +32,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 
 ## Truth boundaries
 - `taskfiles/site-manifest.json` is the site/static deployment metadata source; query it through `scripts/task/site-target.sh` or `dev:site:*` wrappers.
-- `lib/docs.nix` owns every generated doc page and the docs-tree layout: pages come from the compiled `.#inventory` and `modules.toml`, and `nix build .#docs` is the ONLY copy (nothing generated is committed). The rendered site is `lib/aki-site.nix` (`task docs:site`), whose navigation is compiled from the knowledge graph.
+- `lib/docs.nix` owns every generated doc page and the docs-tree layout: pages come from the compiled `.#inventory` and `modules.toml`, and `nix build .#artifacts.docs` is the ONLY copy (nothing generated is committed). The rendered site is `lib/aki-site.nix` (`task docs:site`), whose navigation is compiled from the knowledge graph.
 - `scripts/task/*` are helper implementations only.
 - `AGENTS.md` and `.agents/*` document routing/guidance; they do not execute.
 

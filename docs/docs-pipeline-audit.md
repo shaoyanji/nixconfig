@@ -30,7 +30,7 @@ Four tests, applied to each finding below:
 
 | Producer | Kind | Output | Consumers | Live? |
 | :--- | :--- | :--- | :--- | :--- |
-| `lib/docs.nix` | Nix (pure values) | `.#docs` — generated markdown + `nav.json`, 0.7 s | site generator, `docs:sync` | no, an input |
+| `lib/docs.nix` | Nix (pure values) | `.#artifacts.docs` — generated markdown + `nav.json`, 0.7 s | site generator, `docs:sync` | no, an input |
 | `lib/aki-site.nix` | Nix (built **at eval**) | `.#sites.fleet-docs-site` — HTML/JSON tree, 9.1 s | nginx vhost, UDS bridge, `.#sites.fleet-docs-site` | yes, on frieren |
 | ~~`docs-site/{default.nix,generate.py}`~~ | **retired 2026-10-19** | ~~`.#docs-site`~~ | — | **deleted** |
 
@@ -45,8 +45,8 @@ which pages exist.
 
 | # | Evidence | Why it is wrong |
 | :- | :--- | :--- |
-| F1 | `docs-site/nav.json` (1,814 B, tracked) vs the nav emitted by `lib/docs.nix`. Verified **it differs** from `nix build .#docs`'s `nav.json`, and nothing reads it — `docs-site/default.nix:36` passes `--nav ${docs}/nav.json`. | A second manifest that is already stale. Delete it; there is one nav, the Nix value. |
-| F2 | **FIXED 2026-10-19.** `docs/generated/` was **30 tracked `.md` files**, refreshed by `task docs:sync` and guarded by `checks:docs:sync` — a gate that was red in the working tree (`fleet-inventory.md` and `hosts/frieren.md` stale). All 30 files, the `docs:sync` write-back and the gate are deleted; `.gitignore` now blocks the path from returning. | The artifact was committed, so it could drift, so it needed a drift check, which could fail. A check that exists only because a build output is duplicated is proof the duplication is wrong. `nix build .#docs` is the only copy now. |
+| F1 | `docs-site/nav.json` (1,814 B, tracked) vs the nav emitted by `lib/docs.nix`. Verified **it differs** from `nix build .#artifacts.docs`'s `nav.json`, and nothing reads it — `docs-site/default.nix:36` passes `--nav ${docs}/nav.json`. | A second manifest that is already stale. Delete it; there is one nav, the Nix value. |
+| F2 | **FIXED 2026-10-19.** `docs/generated/` was **30 tracked `.md` files**, refreshed by `task docs:sync` and guarded by `checks:docs:sync` — a gate that was red in the working tree (`fleet-inventory.md` and `hosts/frieren.md` stale). All 30 files, the `docs:sync` write-back and the gate are deleted; `.gitignore` now blocks the path from returning. | The artifact was committed, so it could drift, so it needed a drift check, which could fail. A check that exists only because a build output is duplicated is proof the duplication is wrong. `nix build .#artifacts.docs` is the only copy now. |
 | F3 | **FIXED 2026-10-19.** `docs/modules-registry.md` (640 B pointer) was tracked *and* matched by `.gitignore:22`, with its target tracked separately. The ignore line is replaced by `docs/generated/`, and both pointer pages now name the store path instead of a repo file. | A stale ignore entry plus two paths for one page. |
 | F4 | `AGENTS.md` was **exactly 1,200 / 1,200 lines** (budget in `.agents/SCHEMA.md` §2), with lines 94–133 a pasted fleet table restating `inventory.toml` — which `.agents/SCHEMA.md` §1 forbids by name. *Fixed here:* the table is gone, replaced by a pointer, and the pipeline rule now occupies part of the freed space (1,198 lines). | The manual was full of a second copy of the registry, so there was no room to document the docs pipeline in it. That is why *"AGENTS.md does not address this"*. |
 
@@ -70,7 +70,7 @@ which pages exist.
 | # | Evidence | Why it is wrong |
 | :- | :--- | :--- |
 | F10 | Eval-time `builtins.readFile`: `lib/aki-site.nix:37`, `:107`, `:1644` (every note's text), `lib/docs.nix:34` (default `modules.toml` argument), plus the readers inside `lib/knowledge-graph.nix` / `lib/skills.nix`. | Legal, but flake-scoped: an **untracked** `.md` does not exist to the evaluator, so a page you wrote and did not `git add` silently vanishes — the second half of "compilation isn't keeping pace". It also makes every doc byte an input to every importing host. |
-| F11 | Cost on this host: `nix build .#sites.fleet-docs-site` **9.1 s**; `.#docs` 0.7 s; `.#docs-site` 4.1 s; evaling `.#sites.fleet-docs-site.drvPath` 1.67 s / 164.5 MiB — repeated for each of the three instantiations. | The cheapest artifact (0.7 s, pure values) is the one nothing serves; the most expensive is instantiated three times inside a host config. |
+| F11 | Cost on this host: `nix build .#sites.fleet-docs-site` **9.1 s**; `.#artifacts.docs` 0.7 s; `.#docs-site` 4.1 s; evaling `.#sites.fleet-docs-site.drvPath` 1.67 s / 164.5 MiB — repeated for each of the three instantiations. | The cheapest artifact (0.7 s, pure values) is the one nothing serves; the most expensive is instantiated three times inside a host config. |
 
 ### P4 — packaging and gates
 
@@ -92,7 +92,7 @@ which pages exist.
 
 1. ~~**Stop committing build output.**~~ **DONE 2026-10-19:** `git rm -r
    docs/generated` (30 files), `docs:sync` + `checks:docs:sync` deleted,
-   `.gitignore` guards the path, every reader now points at `nix build .#docs`
+   `.gitignore` guards the path, every reader now points at `nix build .#artifacts.docs`
    or the served site. Removes F2 and its red gate.
 2. ~~**Delete the dead manifest.**~~ **DONE 2026-10-19:** `docs-site/nav.json`
    removed; the stale `.gitignore` line replaced. Removes F1, F3.
@@ -129,7 +129,7 @@ git, there is nothing to fall behind.
 
 | Command | Wall | Notes |
 | :--- | ---: | :--- |
-| `nix build .#docs` | 0.69 s | pure values → markdown tree + `nav.json` |
+| `nix build .#artifacts.docs` | 0.69 s | pure values → markdown tree + `nav.json` |
 | `nix build .#sites.fleet-docs-site` | 9.09 s | all Nix string processing, 1,723 literal lines |
 | ~~`nix build .#docs-site`~~ | removed | the Python derivation is gone; the site is `.#sites.fleet-docs-site` (9.1 s) |
 | `nix eval .#sites.fleet-docs-site.drvPath` | 1.67 s / 164.5 MiB | paid 3× inside frieren's host eval |

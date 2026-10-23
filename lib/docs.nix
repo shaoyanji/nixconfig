@@ -43,7 +43,7 @@
   # `what` already carries its own formatting (e.g. "`inventory.toml`").
   banner = what: ''
     > **Generated — not a file in the repository.** Built from ${what} by
-    > `lib/docs.nix` (`nix build .#docs`); rendered by `.#sites.fleet-docs-site`.
+    > `lib/docs.nix` (`nix build .#artifacts.docs`); rendered by `.#sites.fleet-docs-site`.
   '';
 
   header = title: what: "# ${title}\n\n${banner what}\n";

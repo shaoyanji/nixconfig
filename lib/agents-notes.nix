@@ -243,7 +243,7 @@
     );
 
   # Lineage renders like a ref line but every entry is a note, so it goes through
-  # the same link function the notes index uses (repo-relative in `.#docs`, code
+  # the same link function the notes index uses (repo-relative in `.#artifacts.docs`, code
   # in the site).
   lineageLine = relatedLink: label: xs:
     lib.optionalString (xs != []) (
@@ -280,7 +280,7 @@
   indexPage = base:
     "# Agent notes\n\n"
     + "> **Generated — do not edit.** `AGENTS.nix` is the source; `lib/agents-notes.nix`\n"
-    + "> compiles it (`nix build .#docs`). Query it with `task ops:notes` or\n"
+    + "> compiles it (`nix build .#artifacts.docs`). Query it with `task ops:notes` or\n"
     + "> `nix eval .#agentsNotes.index`.\n\n"
     + "${toString counts.total} notes (${toString counts.open} open, ${toString counts.leaves} leaves) — "
     + "each note links the hosts, modules, tasks and documents it affects; a note\n"
@@ -304,7 +304,7 @@
       kinds
     );
 
-  # Paths inside the `.#docs` derivation. `base` is the relative prefix back to
+  # Paths inside the `.#artifacts.docs` derivation. `base` is the relative prefix back to
   # the repository root, so a ref renders as a working link in the markdown tree.
   pages =
     {"docs/generated/agents-notes.md" = indexPage "";}

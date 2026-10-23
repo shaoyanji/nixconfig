@@ -172,7 +172,7 @@ tasks:
                 task dev:closure:reduce ROOT=<p>   duplicate groups
 
               DOCS  (pages + site nav generated from the compiled metadata)
-                task docs:build                markdown + nav from .#docs         store path only
+                task docs:build                markdown + nav from .#artifacts.docs         store path only
                 task docs:site                 rendered site (Nix-native)          result-docsite/
 
               OBSERVE / CONTEXT  (live system + compiled knowledge)

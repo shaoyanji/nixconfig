@@ -563,8 +563,8 @@
     };
 
     generated-not-tracked = {
-      rule = "A generated artifact is a store path (`.#docs`), never a tracked directory.";
-      # Presence is not the failure mode — a local `nix build .#docs` writes
+      rule = "A generated artifact is a store path (`.#artifacts.docs`), never a tracked directory.";
+      # Presence is not the failure mode — a local `nix build .#artifacts.docs` writes
       # docs/generated legitimately. Being *trackable* is: once the artifact is
       # not gitignored, a `git add -A` commits a copy that drifts.
       proof = ".gitignore + docs-site absence";

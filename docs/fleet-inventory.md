@@ -6,7 +6,7 @@
 > tables are built from `inventory.toml` by `lib/docs.nix`:
 >
 > - source of truth: `inventory.toml` (compiled once by `lib/inventory.nix`)
-> - build: `nix build .#docs` → `<store>/docs/generated/fleet-inventory.md`
+> - build: `nix build .#artifacts.docs` → `<store>/docs/generated/fleet-inventory.md`
 > - read it: `task docs:build` prints the store path; `.#sites.fleet-docs-site`
 >   serves the same pages as HTML
 > - per-host pages: `<store>/docs/generated/hosts/`

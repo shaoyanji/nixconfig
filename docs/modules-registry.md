@@ -6,7 +6,7 @@
 > fleet inventory and per-host pages, so it cannot lag the registry:
 >
 > - source of truth: `modules.toml`
-> - build: `nix build .#docs` → `<store>/docs/generated/modules-registry.md`
+> - build: `nix build .#artifacts.docs` → `<store>/docs/generated/modules-registry.md`
 > - read it: `task docs:build` prints the store path
 > - interactive manager: `task modules` (`task dev:modules:menu`)
 >

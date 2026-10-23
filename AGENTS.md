@@ -109,7 +109,7 @@ flake.nix → flake/outputs.nix (the one assembly node)
 > **No table here — by design.** The fleet registry has exactly one home:
 > [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
 > with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the
-> generated catalog in `docs/generated/fleet-inventory.md` (`nix build .#docs`).
+> generated catalog in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`).
 > A pasted table is a table that disagrees with itself within a month —
 > `.agents/SCHEMA.md` §1, and `docs/docs-pipeline-audit.md` F4.
 
@@ -556,7 +556,7 @@ Nix-native `lib/aki-site.nix` served by frieren, nav from the knowledge graph
 (`docs/docs-pipeline-audit.md`); the publisher site (`dev:site:*`) is separate.
 
 ```bash
-task docs:build   # markdown tree (nix build .#docs)   ·   task docs:site   # rendered site
+task docs:build   # markdown tree (nix build .#artifacts.docs)   ·   task docs:site   # rendered site
 ```
 
 ### TOTP (cloak)
@@ -869,11 +869,11 @@ allowed beside the first.
 | :--- | :--- | :--- |
 | content | `*.md`, `AGENTS.nix`, `inventory.toml`, `modules.toml` | hand-written only, never generated |
 | projection | `lib/inventory.nix`, `lib/docs.nix`, `lib/knowledge-graph.nix`, `lib/skills.nix` | one pure Nix compiler per projection |
-| artifact | `.#docs` (generated markdown), `.#sites.fleet-docs-site` (the rendered site) | store paths, never repo copies |
+| artifact | `.#artifacts.docs` (generated markdown), `.#sites.fleet-docs-site` (the rendered site) | store paths, never repo copies |
 | serving | `hosts/frieren/reverse-proxy.nix`, `modules/services/uds-static-bridge.nix` | serve the path; never re-derive content in a host module |
 
 - **Never commit a derivative** [[flake/policies.nix#generated-not-tracked]]:
-  `docs/generated/` is `nix build .#docs`, and a committed copy is a second
+  `docs/generated/` is `nix build .#artifacts.docs`, and a committed copy is a second
   source of truth. `checks:docs:sync` is the gate that would otherwise be needed
   — its existence is proof the duplication is wrong.
 - **Content is not code.** CSS/JS/HTML go in files the derivation reads, not `''`
@@ -904,7 +904,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/inventory-schema.md`](docs/inventory-schema.md)           | Inventory schema, compiled artifacts, and the automatic checks          |
 | [`docs/sops-rekey.md`](docs/sops-rekey.md)                  | Sops planes and files, `.sops.yaml` anchors, SSH CA, rekey procedure, fresh-host bootstrap |
 | [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |
-| [`docs/fleet-inventory.md`](docs/fleet-inventory.md)            | Pointer page — the catalog itself is `.#docs` (`nix build .#docs`), never committed |
+| [`docs/fleet-inventory.md`](docs/fleet-inventory.md)            | Pointer page — the catalog itself is `.#artifacts.docs` (`nix build .#artifacts.docs`), never committed |
 | [`docs/modules-registry.md`](docs/modules-registry.md)           | Pointer page — the knob registry is built from `modules.toml` at build time |
 | [`lib/aki-site.nix`](lib/aki-site.nix)                   | The rendered site (`.#sites.fleet-docs-site`): nav comes from the knowledge graph |
 | [`docs/docs-pipeline-audit.md`](docs/docs-pipeline-audit.md)        | Docs/site pipeline audit: duplicated artifacts, content-in-Nix, remediation order |

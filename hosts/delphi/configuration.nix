@@ -184,17 +184,39 @@
           <code>sandbox</code> microVM on this host. It renders over ssh, so a
           browser has nothing to show yet.</p>
         <h2>Reach it</h2>
-        <pre>ssh -p ${toString microvmGuest.sshPort} ${microvmGuest.sshUser}@${tailnetHost}</pre>
-        <p>Key-only, and the login <em>is</em> the deck: that account runs one
-          forced command with no shell and no forwarding.</p>
-        <p>Public ssh is not wired yet. <code>tcp/${toString microvmGuest.sshPort}</code>
-          is open on this host, but <code>${publicDomain}</code> reaches it through an
-          edge forward that carries only 80 and 443, so that name needs its own TCP
-          forward before <code>ssh -p ${toString microvmGuest.sshPort} ${microvmGuest.sshUser}@${publicDomain}</code>
-          can work.</p>
+        <pre>ssh ${microvmGuest.sshUser}@${publicDomain}
+        ssh -p ${toString microvmGuest.sshPort} ${microvmGuest.sshUser}@${tailnetHost}</pre>
+        <p>Key-only, and the login <em>is</em> the deck: the account runs one
+          forced command with no shell and no forwarding. The public name is port
+          22, where the host's sshd hops into the guest; the tailnet name goes
+          straight to the guest's own sshd.</p>
       </body>
     </html>
   '';
+
+  # The public ssh door to the deck. The edge carries 22 and nothing else new: a
+  # rule for 2222 is the tenancy's to add, and it is not ours to make from inside
+  # (instance principals are unauthorised in this compartment). So the public
+  # path reuses 22 — a host account whose whole login is a hop into the guest,
+  # where the deck's own forced command lives. The client holds a fleet key that
+  # the host already accepts; the guest credential never leaves this machine.
+  slidesHopEnabled = microvmGuest.sshHopTarget != null;
+  slidesHopCommand = lib.concatStringsSep " " [
+    "${pkgs.openssh}/bin/ssh"
+    # The outer session's stdin is the deck's terminal, so the inner client must
+    # ask for a pty even when the outer login was `-T`.
+    "-tt"
+    "-o BatchMode=yes"
+    "-o StrictHostKeyChecking=yes"
+    "-o IdentitiesOnly=yes"
+    "-o UserKnownHostsFile=${toString microvmGuest.sshHopKnownHosts}"
+    # sntrup761x25519 costs about a minute of interpreted CPU under TCG; the
+    # handshake times out before the banner without this.
+    "-o KexAlgorithms=curve25519-sha256"
+    "-o ConnectTimeout=30"
+    "-i ${toString microvmGuest.sshHopKeyFile}"
+    microvmGuest.sshHopTarget
+  ];
 
   # Same treatment as /microvm/: locations inherit nothing from the server
   # block, so the tailnet gate is repeated in each one.
@@ -798,6 +820,50 @@ in {
   # actually run its agent. scoped to this host deliberately — the fleet has no
   # blanket linger policy, and desktop hosts do not need one.
   users.users.${user.name}.linger = true;
+
+  # --- The deck's public door, on the one port the edge already carries -------
+  # Port 2222 reaches the guest directly from the tailnet, but OCI's ingress rules
+  # admit only 22/80/443, so the public name gets a hop instead: this account has
+  # no shell of its own — every login runs `slidesHopCommand`, which is an ssh
+  # into the guest's `slides` account and therefore into the same forced command.
+  # A client still needs a fleet key (the host's own authorized list); nothing
+  # about the guest's credential is handed out.
+  users.users.slides = lib.mkIf slidesHopEnabled {
+    isNormalUser = true;
+    description = "Terminal deck over ssh (forced command hops into the sandbox microVM)";
+    openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
+    # The hop keypair is group-readable by design; this account is its only member.
+    extraGroups = [microvmGuest.sshHopGroup];
+  };
+
+  # A fleet client authenticates with a certificate whose principal is the user
+  # name (`modules/ssh-ca.nix` signs `-n devji`), so it never matches a `slides`
+  # login on its own: `AuthorizedPrincipalsFile none` means "the login name,
+  # exactly". Listing the fleet principal for this one account accepts exactly
+  # the certificates the CA already issues — no wildcard, which sshd does not
+  # support here — and the account still has no shell.
+  #
+  # A real file under /var/lib, not `environment.etc`: an /etc entry is a symlink
+  # into /nix/store, and sshd's StrictModes rejects that path (the store is
+  # group-writable), which silently leaves the principal list empty.
+  systemd.tmpfiles.rules = lib.mkIf slidesHopEnabled [
+    "d /var/lib/ssh-deck 0755 root root -"
+    # `\\n` is a literal backslash-n: tmpfiles turns it into the trailing
+    # newline sshd expects, while a real newline would end the rule early.
+    "f+ /var/lib/ssh-deck/principals 0644 root root - ${user.name}\\n"
+  ];
+
+  # Last block in sshd_config, which is where `extraConfig` lands and the only
+  # place a Match may appear.
+  services.openssh.extraConfig = lib.mkIf slidesHopEnabled ''
+    Match User slides
+      ForceCommand ${slidesHopCommand}
+      AuthorizedPrincipalsFile /var/lib/ssh-deck/principals
+      AllowTcpForwarding no
+      AllowAgentForwarding no
+      X11Forwarding no
+      PermitTunnel no
+  '';
 
   # --- OCI Serial Console & Early Kernel Logging ---
   # Allows debugging boots via OCI Cloud Shell / Console Connection.

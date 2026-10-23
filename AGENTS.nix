@@ -241,9 +241,13 @@
         reached through a host-side `systemd-socket-proxyd` on 2222 → 192.168.83.11:22. The guest
         gains no inbound path of its own.
 
-        Public ssh is the gap: delphi's edge carries 22/80/443 only, so
-        `ssh -p 2222 …@delphi.bountystash.com` is filtered outside the tailnet until the OCI
-        security list admits 2222; the listener and the nft accept are already there.
+        Public ssh reuses 22 instead of asking the tenancy for 2222: a host account `slides`
+        whose whole login is `ssh -tt` into the guest's forced command. Three things only the
+        live host taught: `AuthorizedKeysFile` REPLACES the default, so the keys NixOS writes to
+        `/etc/ssh/authorized_keys.d/%u` must be named back; StrictModes refuses a keys file whose
+        path is not root-owned, and `/var/lib/microvms` belongs to the runner, so the hop's public
+        half lives in `/srv/microvm/hop-auth`; and a fleet cert's principal is the user name, so
+        this account needs `AuthorizedPrincipalsFile` listing `devji` (no wildcards there).
       '';
     };
     arch-shape = {

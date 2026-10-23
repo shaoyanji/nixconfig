@@ -166,7 +166,7 @@ wipe for no reason. Rapid SSH probes from one source trip the installer's
 ## Phase 4d — the 10.99.0.53 failover pair (done 2026-10-20)
 
 Both hosts bind `10.99.0.53/32` on `lo` through
-`modules/profiles/tailnet-dns-address.nix` (one module, not a copy) and both
+`modules/net/dns/tailnet-address.nix` (one module, not a copy) and both
 advertise it. Tailscale has no floating address: two nodes advertising the SAME
 subnet route become a failover set, and the route moves to the survivor in
 ~15 s. Listing two nameservers in the tailnet settings does **not** work — a

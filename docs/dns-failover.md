@@ -10,7 +10,7 @@ second answer to fall back to.
 
 ## The module
 
-`modules/profiles/dns-failover.nix` owns the **mechanism** — the unbound +
+`modules/net/dns/failover.nix` owns the **mechanism** — the unbound +
 pihole-ftl resolver core, the wildcard zone, the LAN firewall hole, and (optionally)
 VRRP. Host **policy** stays on the host and is passed in, so the module never guesses:
 
@@ -82,7 +82,7 @@ On an always-on host, the resolver is a three-line opt-in — the module derives
 rest:
 
 ```nix
-imports = [../../modules/profiles/dns-failover.nix];
+imports = [../../modules/net/dns/failover.nix];
 
 profiles.dnsFailover = {
   enable = true;
@@ -417,7 +417,7 @@ consistent by accident rather than by configuration.
 * **delphi is an exit node** (`advertiseRoutes` empty, `exitNode = true`):
   `0.0.0.0/0,::/0` are approved, so OCI egress is a bandwidth decision there.
 * **The advertisement is now composed, not written.**
-  `profiles/tailnet-dns-address.nix` appends the service `/32` to
+  `net/dns/tailnet-address.nix` appends the service `/32` to
   `advertiseRoutes` and emits the single comma-separated
   `--advertise-routes=` flag (there is an assertion against a hand-written
   second one, because `tailscale set` *replaces* the route set). Eval'd values
@@ -436,8 +436,8 @@ consistent by accident rather than by configuration.
 
 ## Related
 
-* `modules/profiles/dns-failover.nix` — the module
-* `modules/profiles/tailnet-dns-address.nix` — the `lo` bind + composed advertisement
+* `modules/net/dns/failover.nix` — the module
+* `modules/net/dns/tailnet-address.nix` — the `lo` bind + composed advertisement
 * `modules/config/tailnet-policy.hujson` — the tailnet policy mirror (`autoApprovers`)
 * `scripts/task/tailnet-routes.sh` — `ops:tailnet:routes` / `ops:tailnet:approve`
 * `scripts/task/tailnet-policy.sh` — `ops:tailnet:policy` / `ops:tailnet:policy:apply`

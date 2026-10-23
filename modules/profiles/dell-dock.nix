@@ -54,7 +54,11 @@ in {
     # DisplayLink video driver (appended so primary GPU drivers like amdgpu/nvidia remain first)
     services.xserver.videoDrivers = lib.mkAfter ["displaylink" "modesetting"];
 
-    # EVDI kernel module requires drm_ttm_helper for GEM buffer mapping symbols (drm_gem_ttm_vmap)
+    # EVDI is a kernel module and must be built against the running kernel and
+    # installed: naming it in boot.kernelModules alone yields "Failed to find
+    # module 'evdi'" and the dock then drives USB and ethernet but no display.
+    # It also needs drm_ttm_helper for GEM buffer mapping (drm_gem_ttm_vmap).
+    boot.extraModulePackages = [config.boot.kernelPackages.evdi];
     boot.kernelModules = ["drm_ttm_helper" "evdi"];
 
     # DisplayLink Manager daemon
@@ -77,15 +81,34 @@ in {
     '';
 
     # The dock's Ethernet is a USB CDC-NCM device (`cdc_ncm`, e.g.
-    # enp0s20f0u2u1i5 on frieren). Left managed, NetworkManager treats every
-    # dock/replug as a new connection and takes a fresh DHCP lease (observed
-    # .60, then .253), which the router then recycles to the next device. The
-    # port is spare — frieren and fern each keep their own wired/wifi uplink —
-    # so leave it unmanaged: no lease churn, and no duplicate-address window
-    # against a device that already holds that address.
+    # enp0s20f0u2u1i5 on frieren). Left to NetworkManager's auto-generated
+    # "Wired connection N", every dock/replug mints a NEW profile and takes a
+    # fresh DHCP lease (observed .60, then .253), which the router then
+    # recycles to the next device — the duplicate-address window behind
+    # poseidon/.74 answering from two MACs. One matched profile renews the
+    # same lease instead, so the dock can move between hosts without churn.
+    #
+    # Hosts where the port is spare (frieren, fern) keep it unmanaged: no
+    # lease at all beats a stale third default route.
     networking.networkmanager.unmanaged = lib.mkIf (!cfg.manageUsbEthernet) [
       "driver:cdc_ncm"
     ];
+
+    networking.networkmanager.ensureProfiles.profiles = lib.mkIf cfg.manageUsbEthernet {
+      dock-ethernet = {
+        connection = {
+          id = "dock-ethernet";
+          type = "ethernet";
+          autoconnect = true;
+          autoconnect-priority = 10;
+          # Match the USB-attached NIC, not a fixed name: the interface is
+          # renamed by port/hub, and each host sees a different one.
+          match-device = "interface-name:enp*u*";
+        };
+        ipv4.method = "auto";
+        ipv6.method = "auto";
+      };
+    };
 
     # Disable USB autosuspend for btusb: kernel 6.12 defaults enable_autosuspend=Y,
     # which aggressively powers down BT adapters after 2s and drops connection to MX Keys/Master.

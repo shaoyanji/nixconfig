@@ -209,28 +209,41 @@
       title = "MicroVM guests: declarative, store-shared, one base module";
       kind = "reference";
       status = "DELIVERED";
-      date = "2026-10-22";
+      date = "2026-10-23";
       summary = "`microvm.vms.<name>` on frieren (brlan, KVM, cloud-hypervisor) and on delphi (aarch64, qemu/TCG: OCI A1 exposes no EL2, and cloud-hypervisor has no TCG backend). A guest reads the host's /nix/store over virtiofs, so starting one is seconds on KVM and minutes under TCG; no image is built either way, only the shares persist.";
       refs = {
         hosts = ["frieren" "delphi"];
-        modules = ["hosts/microvms/base.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix"];
+        modules = ["hosts/microvms/base.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix" "hosts/delphi/configuration.nix"];
         tasks = ["microvm:list" "microvm:start" "microvm:stop" "microvm:ssh"];
+        docs = ["hosts/microvms/README.md"];
       };
       body = ''
-        The shape is Michael Stapelberg's ("Coding Agent VMs on NixOS with
-        microvm.nix", 2026-02-01): a shared read-only store, explicit shares, and
-        ephemeral by default. Nothing is copied at boot, which is why a start is
-        seconds rather than a disk image build.
+        The shape is Stapelberg's ("Coding Agent VMs on NixOS with microvm.nix", 2026-02-01):
+        a shared read-only store, explicit shares, ephemeral by default. Nothing is copied at boot.
 
-        sandbox is throwaway (/var is tmpfs, a restart is a factory reset);
-        slides is a service (/var image plus nginx over the workspace share). Both
-        autostart = false: a guest runs because it was started.
+        Two tiers, and the tier is a declaration. frieren's guests are ephemeral tooling
+        (`autostart = false`, /var is tmpfs, a restart is a factory reset). delphi's sandbox is a
+        service tier — `autostart = true`, 4096 MiB, two stub httpd units, Stirling PDF — because a
+        reboot should bring back what the vhost serves.
 
-        frieren runs them under cloud-hypervisor because it has /dev/kvm. delphi
-        does not: OCI A1 exposes no EL2 (`kvm [1]: HYP mode not available`), and
-        cloud-hypervisor has no TCG backend, so that host names qemu with
-        cpu = "max" and raises microvm@'s start timeout to 900 s. TCG boots in
-        minutes, not seconds; the KVM host is the fast path.
+        State is a named volume, never a bind mount into the host's /var.
+        `persist = { hermes = {}; stirling = { size = 4096; }; }` is one ext4 image per name at
+        `<stateRoot>/sandbox/volumes/<name>.img`, mkfs'd on first start, mounted at /var/lib/<name>
+        and found by **label** (enumeration order is not identity). The guest owns the filesystem,
+        so a service keeps its own uid and `StateDirectory` just works.
+
+        TCG is why the guest needed a wider device timeout: systemd's 90 s expired before udev
+        published the virtio-blk labels and the boot fell into emergency mode.
+        `DefaultDeviceTimeoutSec = 600` there; KVM hosts untouched.
+
+        The deck is one account, not a shell: `slides` gets a forced command to `pkgs.slides`
+        (hosts/microvms/slideshow.md) with forwarding, agent forwarding, X11 and tunnels off,
+        reached through a host-side `systemd-socket-proxyd` on 2222 → 192.168.83.11:22. The guest
+        gains no inbound path of its own.
+
+        Public ssh is the gap: delphi's edge carries 22/80/443 only, so
+        `ssh -p 2222 …@delphi.bountystash.com` is filtered outside the tailnet until the OCI
+        security list admits 2222; the listener and the nft accept are already there.
       '';
     };
     arch-shape = {

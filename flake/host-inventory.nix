@@ -86,9 +86,17 @@ in {
           # reserve the state disks the ported services will mount.
           autostart = true;
           services = true;
+          # A JVM app is the first real tenant, so the guest gets room: 4 GiB of
+          # the host's 11.9 GiB, still under the 8 GiB ceiling.
+          mem = 4096;
+          stirling = true;
           persist = {
             hermes = {size = 1024;};
-            stirling = {size = 2048;};
+            stirling = {
+              # The service's own StateDirectory, so its state lands on the disk.
+              mountPoint = "/var/lib/stirling-pdf";
+              size = 4096;
+            };
             dsh = {
               mountPoint = "/var/lib/deepseek-harness";
               size = 1024;

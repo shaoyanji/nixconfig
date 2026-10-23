@@ -1,0 +1,76 @@
+#!/bin/sh /etc/rc.common
+# Mount the ext4 package/capture stick at /mnt/usb and publish its contents.
+#
+# Deliberately NOT extroot. On this firmware `usb-storage` is aliased from the
+# overlay (/etc/modules-boot.d/usb-storage -> ../modules.d/usb-storage), so
+# preinit cannot load it while jffs2 is still coming up, and an extroot mount
+# attempt just fails back to flash. A post-boot mount has no such dependency:
+# if the stick is absent, only /mnt/usb is missing.
+#
+# Installed by `openwrt install` (scripts/openwrt/openwrt.sh).
+START=95
+STOP=10
+EXTRA_COMMANDS="link"
+EXTRA_HELP="        link            publish new files from the stick on PATH"
+
+LABEL=extroot
+MP=/mnt/usb
+
+device() {
+	local dev
+	dev=$(block info 2>/dev/null | awk -v l="LABEL=\"$LABEL\"" 'index($0, l) {sub(/:$/, "", $1); print $1; exit}')
+	[ -n "$dev" ] || dev=/dev/sda
+	echo "$dev"
+}
+
+# opkg -d usb writes into /mnt/usb/usr; a symlink is what puts a binary on the
+# default PATH and a library in the loader path, for every invocation style
+# (ssh one-liners, cron, netprofile), without env plumbing.
+link() {
+	local d f b n=0
+	for d in bin sbin; do
+		for f in "$MP/usr/$d"/*; do
+			[ -f "$f" ] || continue
+			b=${f##*/}
+			[ -e "/usr/$d/$b" ] && continue
+			ln -sfn "$f" "/usr/$d/$b" && n=$((n + 1))
+		done
+	done
+	for f in "$MP/usr/lib"/*.so*; do
+		[ -e "$f" ] || continue
+		b=${f##*/}
+		[ -e "/usr/lib/$b" ] && continue
+		ln -sfn "$f" "/usr/lib/$b" && n=$((n + 1))
+	done
+	logger -t usbstore "linked $n new file(s)"
+}
+
+start() {
+	local m dev i=0
+	for m in usb-storage sd_mod ext4; do modprobe "$m" 2>/dev/null; done
+	while [ $i -lt 15 ]; do
+		[ -b "$(device)" ] && break
+		sleep 1
+		i=$((i + 1))
+	done
+	mkdir -p "$MP"
+	if grep -q " $MP " /proc/mounts; then
+		link
+		return 0
+	fi
+	dev=$(device)
+	[ -b "$dev" ] || {
+		logger -t usbstore "no block device"
+		return 1
+	}
+	mount -t ext4 -o noatime "$dev" "$MP" || {
+		logger -t usbstore "mount failed"
+		return 1
+	}
+	logger -t usbstore "mounted $dev at $MP"
+	link
+}
+
+stop() {
+	grep -q " $MP " /proc/mounts && umount "$MP"
+}

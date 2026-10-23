@@ -355,7 +355,7 @@
       date = "2026-10-19";
       summary = "One resolver is a single point of failure. The module and the check exist; the blocker is hardware, not code.";
       refs = {
-        modules = ["modules/profiles/dns-failover.nix" "hosts/frieren/dns.nix"];
+        modules = ["modules/net/dns/failover.nix" "hosts/frieren/dns.nix"];
         tasks = ["checks:dns:failover"];
         docs = ["docs/dns-failover.md"];
       };
@@ -372,7 +372,7 @@
       links = ["dns-second-resolver"];
       summary = "Clients still depend on one resolver. Client-side fallback and a health probe can ship before a second server exists.";
       refs = {
-        modules = ["modules/profiles/dns-failover.nix"];
+        modules = ["modules/net/dns/failover.nix"];
         tasks = ["checks:dns:failover"];
         docs = ["docs/dns-failover.md"];
       };

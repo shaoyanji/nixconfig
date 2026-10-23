@@ -240,7 +240,7 @@ in {
     ../../modules/profiles/hermes.nix
     ../../modules/profiles/operator-tools.nix
     ../../modules/profiles/sops-user-identity.nix
-    ../../modules/profiles/tailnet-dns-address.nix
+    ../../modules/net/dns/tailnet-address.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
     ../../modules/services/service-portal.nix
@@ -318,19 +318,19 @@ in {
     extraSetFlags = [
       "--accept-routes=true"
       # A resolver must never resolve THROUGH the address it serves: that is an
-      # outage loop (the VRRP analogue is why profiles/dns-failover.nix probes
+      # outage loop (the VRRP analogue is why net/dns/failover.nix probes
       # 127.0.0.1 and not the floating IP). crab-hole's own upstreams are DoT.
       "--accept-dns=false"
       # `--advertise-exit-node` and the `/32` route are emitted by
-      # profiles/tailnet-dns-address.nix (`exitNode = true`), not here.
+      # net/dns/tailnet-address.nix (`exitNode = true`), not here.
     ];
   };
 
-  # The lo bind itself lives in profiles/tailnet-dns-address.nix (shared with
+  # The lo bind itself lives in net/dns/tailnet-address.nix (shared with
   # frieren, which advertises the same /32 as the passive member).
 
   # --- Tailnet resolver: crab-hole -------------------------------------------
-  # Chosen over the pihole-ftl + unbound stack in profiles/dns-failover.nix:
+  # Chosen over the pihole-ftl + unbound stack in net/dns/failover.nix:
   # that module is built around a LAN interface and keepalived VRRP, neither of
   # which exists on a cloud host. crab-hole is one Rust binary, keeps the same
   # StevenBlack + Disconnect lists frieren blocks, and speaks plain DNS on 53.

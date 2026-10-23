@@ -5,8 +5,7 @@
   ...
 }: {
   imports = [
-    ../../modules/profiles/dns-failover.nix
-    ../../modules/profiles/tailnet-dns-address.nix
+    ../../modules/net/dns
   ];
 
   # --- tailnet failover peer for 10.99.0.53 ---------------------------------
@@ -27,7 +26,7 @@
   # --- primary resolver role (HC-3) -----------------------------------------
   # The reusable resolver core — unbound + pihole-ftl's filtering config + the
   # wildcard zone + the LAN firewall hole — lives in
-  # modules/profiles/dns-failover.nix. frieren is the fleet PRIMARY; host policy
+  # modules/net/dns/failover.nix. frieren is the fleet PRIMARY; host policy
   # (extra address= records, the tailscale interface line, PXE proxyDHCP,
   # blocklists, the web UI) stays here and is fed in.
   #
@@ -103,7 +102,7 @@
     "--ssh=true"
   ];
   # The advertised routes (`192.168.3.0/24` + the DNS /32) are composed by
-  # profiles/tailnet-dns-address.nix from `advertiseRoutes`, so they cannot
+  # net/dns/tailnet-address.nix from `advertiseRoutes`, so they cannot
   # drift from the address this host actually binds.
 
   # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively,

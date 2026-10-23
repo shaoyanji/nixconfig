@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 24
+total_knobs = 13
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -19,20 +19,10 @@ name = "AI Agent Tooling"
 type = "profile"
 category = "ai"
 option = "profiles.ai.enable"
-path = "modules/user/ai/default.nix"
+path = "modules/global/noDE.nix"
 description = "AI coding agent CLI tooling (mods, aichat, crush, freebuff, antigravity-cli)"
 default = false
 hosts = ["eisen", "poseidon", "fern", "stark", "scratch", "guckloch"]
-
-[knobs.sunshine]
-name = "Sunshine GameStream"
-type = "profile"
-category = "gaming"
-option = "services.sunshine.enable"
-path = "modules/profiles/sunshine.nix"
-description = "Sunshine GameStream/Moonlight host server for LAN/remote low-latency game streaming"
-default = false
-hosts = ["eisen", "kellerbench", "deckstation"]
 
 [knobs.steam]
 name = "Steam Gaming & Gamescope"
@@ -43,16 +33,6 @@ path = "modules/profiles/steam.nix"
 description = "Steam client with gamescope session support and hardware controller udev rules"
 default = false
 hosts = ["eisen", "kellerbench", "deckstation", "ares"]
-
-[knobs.steamos]
-name = "SteamOS Big Picture Kiosk"
-type = "profile"
-category = "gaming"
-option = "steamos.kiosk.enable"
-path = "modules/profiles/steamos.nix"
-description = "Dedicated Big Picture kiosk cage auto-login session"
-default = false
-hosts = ["ares"]
 
 [knobs.nixbuild]
 name = "nixbuild.net Remote Builder"
@@ -89,30 +69,10 @@ name = "NAS Client Mounts"
 type = "profile"
 category = "storage"
 option = "profiles.nas-client.enable"
-path = "modules/profiles/nas-client.nix"
+path = "modules/profiles/desktop-client.nix"
 description = "Direct NFS and Samba mounts to frieren NAS data pools"
 default = false
 hosts = ["eisen", "poseidon", "fern", "kellerbench", "deckstation", "ares"]
-
-[knobs.sshfs-nas-client]
-name = "SSHFS NAS Client Mounts"
-type = "profile"
-category = "storage"
-option = "profiles.sshfs-nas-client.enable"
-path = "modules/profiles/sshfs-nas-client.nix"
-description = "Encrypted userland SSHFS mounts to frieren for remote/Tailscale clients"
-default = false
-hosts = []
-
-[knobs.laptop]
-name = "Laptop Power Management"
-type = "profile"
-category = "hardware"
-option = "profiles.laptop.enable"
-path = "modules/profiles/laptop.nix"
-description = "Power saving tweaks (TLP / thermald / auto-cpufreq) for mobile nodes"
-default = false
-hosts = ["frieren", "poseidon", "fern", "applevalley"]
 
 [knobs.nvidia]
 name = "NVIDIA Proprietary Drivers"
@@ -133,36 +93,6 @@ path = "modules/profiles/dell-dock.nix"
 description = "Dell D6000 Universal Dock (DisplayLink / EVDI drivers, USB autosuspend prevention, udev rules)"
 default = false
 hosts = ["frieren", "fern"]
-
-[knobs.microvm-host]
-name = "MicroVM Virtualization Host"
-type = "profile"
-category = "virtualization"
-option = "microvm.host.enable"
-path = "modules/profiles/microvm-host.nix"
-description = "Hypervisor host for lightweight NixOS MicroVMs"
-default = false
-hosts = []
-
-[knobs.base-desktop]
-name = "Base Desktop Environment"
-type = "profile"
-category = "desktop"
-option = "profiles.desktop.enable"
-path = "modules/profiles/base-desktop-environment.nix"
-description = "Wayland niri compositor, DankMaterialShell greeter, and pipewire audio"
-default = false
-hosts = ["frieren", "poseidon", "eisen", "fern", "scratch"]
-
-[knobs.base-node]
-name = "Base Node Baseline"
-type = "profile"
-category = "system"
-option = "profiles.base-node.enable"
-path = "modules/profiles/base-node.nix"
-description = "Core system baseline: systemd, SSH, sudo, nix settings, and firewall baseline"
-default = true
-hosts = ["frieren", "poseidon", "eisen", "fern", "stark", "kellerbench", "deckstation", "ares", "delphi", "applevalley", "scratch", "minyx"]
 
 [knobs.impermanence]
 name = "Impermanence Root Rollback"
@@ -207,26 +137,6 @@ description = "Declarative Kiwix offline Wikipedia / ArchWiki server (:8088)"
 default = false
 hosts = ["frieren"]
 
-[knobs.paste]
-name = "Fleet Pastebin"
-type = "service"
-category = "infrastructure"
-option = "services.paste.enable"
-path = "modules/services/paste.nix"
-description = "Self-hosted pb pastebin service with private fleet pasta storage"
-default = false
-hosts = ["frieren"]
-
-[knobs.iventoy]
-name = "iVentoy Network PXE"
-type = "service"
-category = "infrastructure"
-option = "services.iventoy.enable"
-path = "modules/services/iventoy.nix"
-description = "PXE boot server for multi-ISO network installation across LAN"
-default = false
-hosts = ["frieren"]
-
 [knobs.aria2]
 name = "Aria2 RPC Download Daemon"
 type = "service"
@@ -236,26 +146,3 @@ path = "modules/services/aria2-daemon.nix"
 description = "Headless aria2 RPC daemon (:6801) with AriaNg web UI frontend"
 default = false
 hosts = ["frieren"]
-
-# ------------------------------------------------------------------------------
-# 3. SYSTEM ROLES
-# ------------------------------------------------------------------------------
-[knobs.role-heim]
-name = "Heim Full Workstation Role"
-type = "role"
-category = "roles"
-option = "roles.heim.enable"
-path = "modules/roles/home.nix"
-description = "Full daily-driver developer workstation with GUI and user tooling"
-default = false
-hosts = ["poseidon", "fern"]
-
-[knobs.role-minimal]
-name = "Minimal Server Role"
-type = "role"
-category = "roles"
-option = "roles.minimal.enable"
-path = "modules/roles/minimal.nix"
-description = "Headless server role without desktop environments or heavy AI CLI tools"
-default = false
-hosts = ["delphi", "garnixMachine", "minyx", "kali", "alarm"]

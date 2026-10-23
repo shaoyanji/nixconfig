@@ -30,6 +30,20 @@ in {
       default = false;
       description = "Keep the dock's CDC-NCM ethernet managed by NetworkManager (hosts whose wired uplink is the dock, e.g. poseidon).";
     };
+
+    usbEthernetInterface = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "enp6s0f3u1u1i5";
+      description = ''
+        Exact interface name the dock NIC connection is bound to. Leave null to
+        match the USB-attached pattern instead — but note NetworkManager then
+        binds on first activation by rewriting the profile with `interface-name`
+        and a UUID-suffixed filename, which lands beside the declarative file as
+        a second connection with the same UUID. The duplicate makes later
+        activations fail, so pin the name wherever it is stable.
+      '';
+    };
   };
 
   # Generic alias option so hosts can enable either profiles.dell-dock or profiles.docking-station
@@ -96,15 +110,24 @@ in {
 
     networking.networkmanager.ensureProfiles.profiles = lib.mkIf cfg.manageUsbEthernet {
       dock-ethernet = {
-        connection = {
-          id = "dock-ethernet";
-          type = "ethernet";
-          autoconnect = true;
-          autoconnect-priority = 10;
-          # Match the USB-attached NIC, not a fixed name: the interface is
-          # renamed by port/hub, and each host sees a different one.
-          match-device = "interface-name:enp*u*";
-        };
+        connection =
+          {
+            id = "dock-ethernet";
+            # Fixed, so a NetworkManager rewrite cannot mint a second identity
+            # for the same profile.
+            uuid = "b37ece9c-f7c4-440c-b49f-1dd1c851c03c";
+            type = "ethernet";
+            autoconnect = true;
+            autoconnect-priority = 10;
+          }
+          // lib.optionalAttrs (cfg.usbEthernetInterface != null) {
+            interface-name = cfg.usbEthernetInterface;
+          }
+          // lib.optionalAttrs (cfg.usbEthernetInterface == null) {
+            # Falling back to the USB pattern: the name is renamed by port/hub
+            # and differs per host, so each host matches its own.
+            match-device = "interface-name:enp*u*";
+          };
         ipv4.method = "auto";
         # Fleet resolver (Pi-hole on frieren). The dock link's DHCP answer is the
         # router, which does not serve the ~lan names; without this, the wired

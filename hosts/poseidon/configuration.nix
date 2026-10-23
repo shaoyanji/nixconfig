@@ -86,6 +86,10 @@ in {
   profiles.dell-dock = {
     enable = true;
     manageUsbEthernet = true;
+    # Pinned: an unbound profile is rewritten by NetworkManager on activation,
+    # leaving a duplicate connection that fails every later activation and
+    # bounces the link under an SSH session.
+    usbEthernetInterface = "enp6s0f3u1u1i5";
   };
 
   # --- TPM 2.0 (AMD firmware TPM) ---

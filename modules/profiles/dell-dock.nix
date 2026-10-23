@@ -106,6 +106,10 @@ in {
           match-device = "interface-name:enp*u*";
         };
         ipv4.method = "auto";
+        # Fleet resolver (Pi-hole on frieren). The dock link's DHCP answer is the
+        # router, which does not serve the ~lan names; without this, the wired
+        # link silently becomes the primary resolution path and those break.
+        ipv4.dns = "192.168.3.25";
         ipv6.method = "auto";
       };
     };

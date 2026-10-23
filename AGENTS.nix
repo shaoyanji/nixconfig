@@ -4139,11 +4139,16 @@
         3. **The dock's display was a missing module.** `evdi` in `boot.kernelModules`
            alone yields "Failed to find module 'evdi'": the package must also be in
            `boot.extraModulePackages`. `card0-DVI-I-1` appearing is the signal.
-        4. **The dock NIC is one connection, per host.** The auto-generated
-           "Wired connection N" takes a fresh DHCP lease on every replug, which the
-           router then recycles — the window that had `.74` answering from two MACs.
-           `ensureProfiles` fixes the churn; `manageUsbEthernet` keeps the port
-           managed where it is the uplink rather than a spare.
+        4. **The dock NIC stays unmanaged on a host whose Wi-Fi owns the subnet.**
+           Managing it put a second interface on `192.168.3.0/24`; the resulting ARP
+           flux (either NIC answering for the other's address) killed live SSH
+           sessions, and a managed profile added its own failure mode: when
+           `interface-name` is unset NetworkManager binds by rewriting the profile,
+           leaving a UUID-named copy beside the declarative one so activation then
+           fails against the duplicate. `ensureProfiles` also writes to
+           `/run/NetworkManager/system-connections`, so an old copy persisted in
+           `/etc` shadows it and must be removed. Display/USB work with the port
+           unmanaged; one uplink per subnet.
 
         Remaining limit: DHCP is the Huawei router (`192.168.3.1`; frieren's dnsmasq is
         proxy-only PXE), so a reservation for the dock's MAC (`9c:eb:e8:d2:ea:bc`) is

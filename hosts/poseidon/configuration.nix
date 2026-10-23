@@ -110,6 +110,15 @@ in {
     # so Wi-Fi stays the primary uplink and the dock is the fallback.
     manageUsbEthernet = true;
     usbEthernetInterface = "enp6s0f3u1u1i5";
+    # Static, because this router's DHCP keys on hostname: both links raced for
+    # one lease and traded .2/.3/.4 on every restart (2026-10-23). Wi-Fi is
+    # pinned to .2 by hand for the same reason -- its PSK keeps that profile out
+    # of Nix. Re-apply on a fresh install:
+    #   nmcli connection modify "Obi LAN Kenobi" ipv4.method manual \
+    #     ipv4.addresses 192.168.3.2/24 ipv4.gateway 192.168.3.1 \
+    #     ipv4.dns 192.168.3.25 ipv4.route-metric 300
+    usbEthernetAddress = "192.168.3.3/24";
+    usbEthernetGateway = "192.168.3.1";
   };
 
   # --- Battery longevity: pack at 48 % of design capacity (measured 2026-10-23) ---

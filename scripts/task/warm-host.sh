@@ -115,6 +115,28 @@ report() {
 
 attr_for() { printf '.#nixosConfigurations.%s.config.system.build.toplevel' "$1"; }
 
+# Pin a store path as a fleet GC root. /nix/var/nix/gcroots/fleet is root-owned
+# 0755, so `nix build --out-link` there fails for the operator account: measured
+# 2026-10-23, the build succeeded and the run still exited 1 on "creating symlink
+# ... Permission denied". Try the direct link, then passwordless sudo, and say
+# plainly when neither can pin -- a warm that warmed must not report failure
+# because of where its root lives.
+pin_fleet_root() {
+  local host="$1" path="$2" dir=/nix/var/nix/gcroots/fleet dest
+  dest="$dir/$host"
+  mkdir -p "$dir" 2>/dev/null || true
+  if [ -w "$dir" ] && ln -sfn "$path" "$dest" 2>/dev/null; then
+    return 0
+  fi
+  if sudo -n ln -sfn "$path" "$dest" 2>/dev/null; then
+    report "warm [$host] GC root pinned as root: $dest"
+    return 0
+  fi
+  report "warm [$host] WARNING -- $dest is not writable by $(id -un) and sudo is not passwordless." >&2
+  report "         The closure is built and served; it is only unpinned until the next GC." >&2
+  return 0
+}
+
 # Build routing only applies to hosts that are actually deployed. Probing a
 # dormant/preserved host is pointless churn — and the inventory is the source of
 # truth for which those are, so ask it rather than poking the host.
@@ -219,8 +241,8 @@ for h in "${hosts[@]}"; do
   fi
 
   report "warm [$h] building on $builder (the builder; allowed) and pinning fleet GC root"
-  mkdir -p /nix/var/nix/gcroots/fleet
-  nix build "$attr" -L --max-jobs "${MAX_JOBS:-2}" --out-link "/nix/var/nix/gcroots/fleet/$h"
+  built_top="$(nix build "$attr" -L --max-jobs "${MAX_JOBS:-2}" --no-link --print-out-paths | tail -n1)"
+  pin_fleet_root "$h" "$built_top"
 
   if [ "${NO_VERIFY:-0}" = "1" ]; then
     continue

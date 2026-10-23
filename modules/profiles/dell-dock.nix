@@ -53,9 +53,30 @@ in {
         match the USB-attached pattern instead — but note NetworkManager then
         binds on first activation by rewriting the profile with `interface-name`
         and a UUID-suffixed filename, which lands beside the declarative file as
-        a second connection with the same UUID. The duplicate makes later
+        a second connection with the same UUID.        The duplicate makes later
         activations fail, so pin the name wherever it is stable.
       '';
+    };
+
+    usbEthernetAddress = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "192.168.3.3/24";
+      description = ''
+        Static `<address>/<prefix>` for the dock uplink; null keeps DHCP.
+
+        Set it where the LAN's DHCP keys on the client's hostname rather than its
+        MAC: both links of one host then claim the same lease and the addresses
+        trade places on every re-lease (measured on poseidon 2026-10-23 -- the
+        dock took Wi-Fi's .2 and Wi-Fi fell back to .4).
+      '';
+    };
+
+    usbEthernetGateway = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "192.168.3.1";
+      description = "Default gateway for the static dock uplink (ignored while usbEthernetAddress is null).";
     };
   };
 
@@ -149,17 +170,30 @@ in {
             # and differs per host, so each host matches its own.
             match-device = "interface-name:enp*u*";
           };
-        ipv4.method = "auto";
         # Fleet resolver (Pi-hole on frieren). The dock link's DHCP answer is the
         # router, which does not serve the ~lan names; without this, the wired
         # link silently becomes the primary resolution path and those break.
-        ipv4.dns = "192.168.3.25";
+        ipv4 =
+          {
+            dns = "192.168.3.25";
+            # A metric above Wi-Fi's. Two equal-metric defaults let this cable win
+            # the default route, so a flaky dock uplink takes browsing and DNS down
+            # with it. At 600 the dock is a fallback for when Wi-Fi is absent, not a
+            # competing primary.
+            route-metric = 600;
+          }
+          // (
+            if cfg.usbEthernetAddress == null
+            then {method = "auto";}
+            else {
+              method = "manual";
+              address1 = cfg.usbEthernetAddress;
+            }
+          )
+          // lib.optionalAttrs (cfg.usbEthernetAddress != null && cfg.usbEthernetGateway != null) {
+            gateway = cfg.usbEthernetGateway;
+          };
         ipv6.method = "auto";
-        # A metric above Wi-Fi's. Two equal-metric defaults let this cable win
-        # the default route, so a flaky dock uplink takes browsing and DNS down
-        # with it. At 600 the dock is a fallback for when Wi-Fi is absent, not a
-        # competing primary.
-        ipv4.route-metric = 600;
         ipv6.route-metric = 600;
       };
     };

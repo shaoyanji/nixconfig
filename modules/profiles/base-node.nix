@@ -15,6 +15,7 @@ in {
     ./firewall-baseline.nix
     ./boot.nix
     ./dell-dock.nix
+    ./battery-charge-limit.nix
   ];
 
   boot = {

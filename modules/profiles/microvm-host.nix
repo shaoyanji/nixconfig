@@ -1,12 +1,6 @@
-# Shared microVM host networking: bridge, tap attachment, NAT.
-#
-# NetworkManager owns the bridge, because both guest hosts already run NM for
-# their uplink and a second network manager is a second source of truth. NM
-# never emits an event for a tap it does not manage, so a dispatcher script
-# cannot enslave the interfaces (that variant was tried and silently did
-# nothing). The taps are NM-unmanaged and a udev rule attaches each one to the
-# bridge when the device appears. Shape: Stapelberg's microvm.nix setup, with
-# the bridge handed to NM instead of systemd-networkd.
+# Shared microVM host networking: NM-owned bridge, udev-attached taps, NAT.
+# A dispatcher cannot do the taps (NM emits no event for an unmanaged one), so
+# udev attaches them. Shape: Stapelberg's microvm.nix with NM as bridge owner.
 {
   natExternalInterface ? throw "Set natExternalInterface to your uplink (e.g. wlp4s0)",
   microvmExternalInterface ? "eno1",

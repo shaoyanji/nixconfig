@@ -80,8 +80,6 @@ in {
     inherit inputs lib systems pkgsFor inventory self;
   };
 
-  apps = lib.genAttrs systems.work (_: {});
-
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
@@ -92,8 +90,11 @@ in {
   # derivation and without `task` installed.
   taskfileGraph = taskfileCtl;
 
-  # `nix eval .#policies.uncitedPolicies` — the docs' rule registry as data.
-  inherit (policiesCtl) policies ids citedIds danglingCitations uncitedPolicies unenforcedHardRules;
+  # The rules as data, looked up by id: `nix eval .#policies.ids`. The derived
+  # queries (citedIds, danglingCitations, uncitedPolicies, unenforcedHardRules)
+  # stay inside `flake/checks.nix`, which is their only consumer — exporting
+  # them here was four root outputs nothing read.
+  inherit (policiesCtl) policies;
 
   # Per-host evaluation gate, one host per attribute so a run costs one host's
   # worth of evaluator heap instead of the whole fleet's. Not part of `checks`
@@ -169,7 +170,9 @@ in {
   # --- agent context plane --------------------------------------------------
   # `nix eval .#agentSkills.count` / `.#agentSkills.byTag.nix` are the live
   # index; `.agents/README.md` routes to it instead of keeping a second table.
-  inherit (skillsCtl) indexJson;
+  # `skillsCtl.indexJson` is that same index serialized, used only where a
+  # string is needed (the bundle below); as a root output it was a second path
+  # to one fact with no reader.
   agentSkills = skillsCtl.index;
 
   # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
@@ -188,7 +191,10 @@ in {
   # eval), `nix build .#agentsNotes.file` for the fixed JSON artifact.
   agentsNotes = {
     inherit (agentsNotesCtl) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
-    file = agentDocs.writeText "agents-notes.json" agentsNotesCtl.json;
+    # toFile, not a derivation: the payload is pure JSON, and `agentDocs` is
+    # pinned to x86_64-linux, so a build artifact made this unreadable on
+    # delphi. `nix build .#agentsNotes.file` still prints the store path.
+    file = builtins.toFile "agents-notes.json" agentsNotesCtl.json;
     json = agentsNotesCtl.json;
   };
 
@@ -199,7 +205,7 @@ in {
   # instead of evaluating the flake — `nix build .#knowledgeGraph.file`.
   knowledgeGraph = {
     inherit (knowledgeGraphCtl) graph json cypher;
-    file = agentDocs.writeText "knowledge-graph.json" knowledgeGraphCtl.json;
+    file = builtins.toFile "knowledge-graph.json" knowledgeGraphCtl.json;
   };
 
   # A store-path bundle for home/fleet materialization: every skill tree plus

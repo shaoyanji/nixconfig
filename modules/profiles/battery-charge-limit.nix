@@ -1,13 +1,6 @@
-# Battery charge ceiling for a plugged-in laptop: a pack parked at 100 % state of
-# charge is where calendar ageing is fastest, and the ceiling is the only battery
-# knob firmware exposes.
-#
-# The interface is a sysfs attribute, not an option, and drivers differ: some
-# (thinkpad, asus-wmi, ideapad, acer-wmi, ...) expose
-# charge_control_end_threshold, some expose only charge_behaviour, and some
-# expose nothing -- the ceiling then lives in a vendor BIOS setting. The unit
-# reports which case it found rather than failing on hardware it cannot drive:
-# `journalctl -u battery-charge-limit` is the probe.
+# Battery charge ceiling for a plugged-in laptop, through whichever sysfs knob
+# the driver exposes (charge_control_end_threshold, charge_behaviour, or none).
+# The unit reports what it found: `journalctl -u battery-charge-limit`.
 {
   config,
   lib,

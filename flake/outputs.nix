@@ -82,7 +82,7 @@
     };
 in {
   packages = import ./packages.nix {
-    inherit lib systems pkgsFor inventory cliFor docsGen skillsCtl self;
+    inherit lib systems pkgsFor inventory cliFor docsGen skillsCtl agentsNotesCtl knowledgeGraphCtl self;
   };
 
   apps = lib.genAttrs systems.work (system: {cli = (cliFor system).apps;});
@@ -183,33 +183,26 @@ in {
   # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
   # Consumed by the home activation script as a store symlink.
   #
-  # `builtins.toFile`, not `builtins.toFile`: this artifact is pure text, and
-  # a derivation pinned to x86_64 (the x86-pinned derivation) cannot
-  # be built at all on an aarch64 host — installing delphi failed on
-  # `AGENTS-delphi.md.drv` with "required system x86_64-linux" (2026-10-20).
-  # toFile has no builder, so the same text is available on every architecture.
+  # `builtins.toFile`, not a derivation: this artifact is pure text, and a
+  # derivation pinned to x86_64 cannot be built at all on an aarch64 host —
+  # installing delphi failed on `AGENTS-delphi.md.drv` with "required system
+  # x86_64-linux" (2026-10-20). toFile has no builder, so the same text is
+  # available on every architecture.
   homeAgents = lib.genAttrs (builtins.attrNames hostInventory) (
     h: builtins.toFile "AGENTS-${h}.md" (homeAgentsGen.mkText h)
   );
 
   # AGENTS.nix as a query surface: `nix eval .#agentsNotes.index` (no host
-  # eval), `nix build .#agentsNotes.file` for the fixed JSON artifact.
+  # eval). The document itself is typed data (`api`); JSON is made at the edge
+  # by `.#artifacts.agents-notes`, not carried here as a string.
   agentsNotes = {
-    inherit (agentsNotesCtl) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
-    # toFile, not a derivation: the payload is pure JSON, and a derivation is
-    # pinned to x86_64-linux, so a build artifact made this unreadable on
-    # delphi. `nix build .#agentsNotes.file` still prints the store path.
-    file = builtins.toFile "agents-notes.json" agentsNotesCtl.json;
-    json = agentsNotesCtl.json;
+    inherit (agentsNotesCtl) api schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
   };
 
   # Structural projection: hosts × skills × docs × mentions. `jq`-queryable
-  # today, Cypher-exportable if an external graph database ever exists.
-  # `file` is the static artifact: a store path holding the same JSON, so a
-  # consumer (ops:ask, a systemd unit, a CI job) can read a fixed document
-  # instead of evaluating the flake — `nix build .#knowledgeGraph.file`.
+  # today, Cypher-exportable if an external graph database ever exists. The
+  # store artifact a non-evaluating consumer reads is `.#artifacts.knowledge-graph`.
   knowledgeGraph = {
-    inherit (knowledgeGraphCtl) graph json cypher;
-    file = builtins.toFile "knowledge-graph.json" knowledgeGraphCtl.json;
+    inherit (knowledgeGraphCtl) graph cypher;
   };
 }

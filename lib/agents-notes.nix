@@ -341,7 +341,8 @@
     open = map (e: e.id) (builtins.filter (e: builtins.elem e.status openStatuses) ordered);
   };
 in {
+  inherit api;
   inherit (api) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
   inherit pages sitePages;
-  json = builtins.toJSON api;
+  # `api` is the typed document; `artifacts.agents-notes` serializes it.
 }

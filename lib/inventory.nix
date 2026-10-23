@@ -254,7 +254,8 @@ in
     flakeHosts = lib.filterAttrs (_: h: isNixHost h && h.flake) hosts;
     # Per-host lookup that fails loudly rather than returning null.
     host = name: hosts.${name} or (throw "inventory: no such host '${name}' in ${toString src}");
-    # The compiled artifact: pretty-printed by `packages.<system>.artifacts.inventory-json`,
-    # consumed by agents instead of re-parsing TOML with yq.
-    json = builtins.toJSON compiled;
+    # The compiled registry as typed data. `artifacts.inventory-json` serializes
+    # it at the edge; this file never carries a JSON string, so a consumer that
+    # wants JSON asks for it and the format check happens where the bytes are made.
+    inherit compiled;
   }

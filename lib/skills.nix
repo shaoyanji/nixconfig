@@ -158,5 +158,4 @@ in {
   inherit skills index byTag issues warnings;
   ok = issues == [];
   strictOk = issues == [] && warnings == [];
-  indexJson = builtins.toJSON index;
 }

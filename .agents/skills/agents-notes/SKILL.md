@@ -257,7 +257,7 @@ Then check the surfaces actually updated:
 
 ```bash
 nix build --builders "" .#docs          # docs/generated/agents-notes/<id>.md
-nix build .#fleet-docs-site             # data/agents-notes/<id>.json (site page)
+nix build .#sites.fleet-docs-site             # data/agents-notes/<id>.json (site page)
 ```
 
 ## Where it renders
@@ -265,7 +265,7 @@ nix build .#fleet-docs-site             # data/agents-notes/<id>.json (site page
 | Surface | How |
 | :--- | :--- |
 | markdown | `.#docs` → `docs/generated/agents-notes.md` + one page per note, refs as repo links |
-| site | `.#fleet-docs-site` → Planner → **Agent notes (AGENTS.nix)**, one slice per note |
+| site | `.#sites.fleet-docs-site` → Planner → **Agent notes (AGENTS.nix)**, one slice per note |
 | query | `task ops:notes[:near\|:lineage\|:show\|:host\|:module\|:task\|:doc\|:search]` |
 | code | `nix eval .#agentsNotes.{index,lineage,byHost,byModule,byTask,byDoc,byStatus,origins,frontier,open}` |
 

@@ -204,8 +204,8 @@ Worst offenders, each individually larger than most services:
 
 The top 15 alone are **4.3 GiB**. This is the cohort the three-tier model in
 `docs/closure-reduction.md` §5 is for: move them to devShells or `nix run`
-(which needs `flake/packages.nix` filled in and an `apps` output created —
-neither exists yet), and drop them from `home.packages`.
+(which now has a home: `flake/cli.nix`, reached as
+`nix run .#cli.<family>.<tool>`), and drop them from `home.packages`.
 
 Also in this tier: `home-manager-files` carries
 `index-x86_64-linux` at **101.6 MiB** — the `nix-index` database. If recursive
@@ -298,9 +298,10 @@ declares it.
 A group is a candidate until a human confirms which copy is redundant.
 
 **6 · Tier 3, the Home Manager cohort — up to 4.3 GiB for the top 15.**
-Blocked on `flake/packages.nix` not carrying the tools and no `apps` output
-existing — with no `nix run` path, every tool must be installed to be reachable. Fill those, then
-drop the cohort from `home.packages` on hosts that do not run them continuously.
+Unblocked in principle: `flake/cli.nix` carries the families and `apps.<system>.cli`
+makes each one a `nix run` target, so a tool no longer has to be installed to be
+reachable. Move the cohort out of `home.packages` on hosts that do not run them
+continuously.
 Start with `qmd` (904.2 MiB) — investigate *why* a markdown search tool is nearly
 a gigabyte before deciding.
 

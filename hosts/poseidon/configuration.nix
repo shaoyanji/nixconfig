@@ -131,9 +131,11 @@ in {
   # device), and there is no /dev/smi for smbios-battery-ctl. The ceiling that
   # actually holds is the BIOS one, which the EC keeps across OSes and updates:
   # F2 -> Power Management -> Battery Charge Configuration -> Custom (start 50,
-  # stop 80) or Primarily AC Use. Set it there once; this profile is the probe,
-  # not the enforcement -- it writes the ceiling on hardware that exposes one and
-  # reports once per boot when it does not (`journalctl -u battery-charge-limit`).
+  # stop 80) or Primarily AC Use. Configured there on 2026-10-23 as Custom with a
+  # 50/80 window. This profile is the probe, not the enforcement -- it writes the
+  # ceiling on hardware that exposes one and reports once per boot when it does
+  # not (`journalctl -u battery-charge-limit`). The EC does not discharge down to
+  # a newly set ceiling, so the setting binds on the first charge from below it.
   profiles.batteryChargeLimit = {
     enable = true;
     endThreshold = 80;

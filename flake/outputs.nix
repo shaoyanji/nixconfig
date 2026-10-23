@@ -53,7 +53,6 @@
     inherit lib inventory;
     notes = agentsNotesCtl.pages;
   };
-  docs = docsGen.mkDocs (pkgsFor "x86_64-linux");
   # Skills are compiled the same way the inventory is: parsed once, validated
   # once, consumed by checks/tasks/bundles. No host config is evaluated.
   skillsCtl = import ../lib/skills.nix {inherit lib;};
@@ -74,7 +73,6 @@
   # `nix eval .#taskfileGraph.version` is a 4 s leaf read, and the same compile
   # feeds the flake check, the parity gate and any future generator.
   taskfileCtl = import ../lib/taskfile.nix {inherit lib;};
-  agentDocs = pkgsFor "x86_64-linux";
   # The CLI table is compiled once here and projected into both namespaces:
   # `packages.<system>.cli` for a store path, `apps.<system>.cli` for `nix run`.
   cliFor = system:
@@ -84,7 +82,7 @@
     };
 in {
   packages = import ./packages.nix {
-    inherit lib systems pkgsFor inventory self cliFor;
+    inherit lib systems pkgsFor inventory cliFor docsGen skillsCtl self;
   };
 
   apps = lib.genAttrs systems.work (system: {cli = (cliFor system).apps;});
@@ -165,12 +163,10 @@ in {
       inherit (host) modules;
     });
 
-  # `nix build .#docs` — the generated markdown tree (fleet inventory, modules
-  # registry, per-host pages) as a store path. The rendered site is
-  # `.#sites.fleet-docs-site` (lib/aki-site.nix), built natively from the compiled
-  # registry and the knowledge graph; the Python renderer that used to live in
-  # docs-site/ is retired (docs/docs-pipeline-audit.md §4).
-  inherit docs;
+  # The generated markdown tree and the skills bundle are per-system packages,
+  # and x86_64-linux only: `nix build .#artifacts.docs` compiles them on the host
+  # that serves them, and aarch64 hosts simply do not carry the attribute. The
+  # rendered site is `.#sites.fleet-docs-site` (lib/aki-site.nix).
 
   # Fast, cached entry point: `nix eval .#inventory.hosts.<host>.role` reads the
   # compiled registry WITHOUT evaluating a single host configuration.
@@ -187,8 +183,8 @@ in {
   # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
   # Consumed by the home activation script as a store symlink.
   #
-  # `builtins.toFile`, not `agentDocs.writeText`: this artifact is pure text, and
-  # a derivation pinned to x86_64 (`agentDocs = pkgsFor "x86_64-linux"`) cannot
+  # `builtins.toFile`, not `builtins.toFile`: this artifact is pure text, and
+  # a derivation pinned to x86_64 (the x86-pinned derivation) cannot
   # be built at all on an aarch64 host — installing delphi failed on
   # `AGENTS-delphi.md.drv` with "required system x86_64-linux" (2026-10-20).
   # toFile has no builder, so the same text is available on every architecture.
@@ -200,7 +196,7 @@ in {
   # eval), `nix build .#agentsNotes.file` for the fixed JSON artifact.
   agentsNotes = {
     inherit (agentsNotesCtl) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
-    # toFile, not a derivation: the payload is pure JSON, and `agentDocs` is
+    # toFile, not a derivation: the payload is pure JSON, and a derivation is
     # pinned to x86_64-linux, so a build artifact made this unreadable on
     # delphi. `nix build .#agentsNotes.file` still prints the store path.
     file = builtins.toFile "agents-notes.json" agentsNotesCtl.json;
@@ -216,13 +212,4 @@ in {
     inherit (knowledgeGraphCtl) graph json cypher;
     file = builtins.toFile "knowledge-graph.json" knowledgeGraphCtl.json;
   };
-
-  # A store-path bundle for home/fleet materialization: every skill tree plus
-  # the compiled index. `modules/user/ai/skills/default.nix` links from here.
-  agentSkillsBundle = agentDocs.runCommand "agent-skills-bundle" {} ''
-    mkdir -p $out
-    cp -a ${../.agents/skills} $out/skills
-    cp ${agentDocs.writeText "agent-skills-index.json" skillsCtl.indexJson} $out/index.json
-    chmod -R u+w $out
-  '';
 }

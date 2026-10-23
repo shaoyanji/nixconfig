@@ -116,7 +116,7 @@ task ops:sentinel:status   # timer + last run
 
 ### 3.2 Compiled agent context
 
-- `.#agentSkills` / `.#agentSkillsBundle`: 43 skills parsed from frontmatter,
+- `.#agentSkills` / `.#artifacts.agent-skills-bundle`: 43 skills parsed from frontmatter,
   schema-gated by `checks.<system>.skills-schema`; materialized to
   `~/.agents/skills` and `~/.gemini/config/skills` by Home Manager.
 - `.#knowledgeGraph`: hosts × skills × docs × tag links, compiled from the

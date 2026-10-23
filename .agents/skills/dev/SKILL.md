@@ -42,7 +42,7 @@ This page keeps only the four traps that a description cannot warn about.
 `dev:site:*` publishes from `taskfiles/site-manifest.json` (via
 `scripts/task/site-target.sh`); its `list`/`show`/`preview`/`deploy` name a target
 from that file. The **fleet docs site** is not in it: that is `task docs:site`
-(`.#sites.fleet-docs-site`) and `task docs:build` (`.#docs`).
+(`.#sites.fleet-docs-site`) and `task docs:build` (`.#artifacts.docs`).
 
 ## Closure analysis is not verification
 

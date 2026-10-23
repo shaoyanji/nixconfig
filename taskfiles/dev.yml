@@ -387,7 +387,7 @@ tasks:
     summary: >
       The knob table is not produced by modules-menu.sh: lib/docs.nix builds it
       from modules.toml (with the fleet inventory and per-host pages), and it
-      lives only in the store — `nix build .#docs`, printed by `task docs:build`.
+      lives only in the store — `nix build .#artifacts.docs`, printed by `task docs:build`.
       The wrapper stays because `task modules` offers a "sync" action.
     cmds:
       - bash scripts/task/modules-menu.sh sync
@@ -580,18 +580,18 @@ tasks:
   # --- docs: generated from the compiled metadata (lib/docs.nix) ------------
   # The pages and the site nav are Nix values built from `.#inventory` and
   # modules.toml, so they cannot drift from the hosts/knobs they describe.
-  # `.#docs` is the ONLY copy: the tree is a store path, and no part of it is
+  # `.#artifacts.docs` is the ONLY copy: the tree is a store path, and no part of it is
   # checked in (docs/generated/ used to be, which is why a drift gate had to
   # exist — see docs/docs-pipeline-audit.md §4).
   docs:build:
-    desc: Build the generated docs tree + nav from compiled metadata (nix build .#docs)
+    desc: Build the generated docs tree + nav from compiled metadata (nix build .#artifacts.docs)
     summary: >
       Prints the store path of the generated docs: fleet-inventory.md,
       modules-registry.md, hosts/<h>.md and nav.json (the site manifest).
       Nothing in the repo is written; read the pages from that path, or from
       the served site (`.#sites.fleet-docs-site`).
     cmds:
-      - nix build --no-link --print-out-paths .#docs
+      - nix build --no-link --print-out-paths .#artifacts.docs
 
   docs:site:
     desc: Build the rendered documentation site (nix build .#sites.fleet-docs-site)

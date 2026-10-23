@@ -309,7 +309,7 @@ Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs
 The fleet roster — 31 devices across NixOS, nix-darwin, standalone Home Manager,
 external non-Nix nodes, preserved and WIP machines — is defined once in
 [`inventory.toml`](inventory.toml), the machine-readable source of truth, and
-rendered for humans by `nix build .#docs` (pointer: [`docs/fleet-inventory.md`](docs/fleet-inventory.md))
+rendered for humans by `nix build .#artifacts.docs` (pointer: [`docs/fleet-inventory.md`](docs/fleet-inventory.md))
 (built by `lib/docs.nix`; refresh with `task docs:sync`, verify with
 `task checks:docs:sync`). Neither copy is hand-maintained, so the roster is
 deliberately **not** duplicated here.
@@ -445,7 +445,7 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 - `AGENTS.md` - Agent routing helpers and task namespace summary
 - `inventory.toml` - Canonical 31-device fleet inventory source of truth
 - `docs/fleet-inventory.md`, `docs/modules-registry.md` - pointer pages; the generated
-  catalog + knob registry are `nix build .#docs` (a store path, never committed)
+  catalog + knob registry are `nix build .#artifacts.docs` (a store path, never committed)
 - `lib/aki-site.nix` - the rendered site (`nix build .#sites.fleet-docs-site`; `task docs:site`)
 - `docs/task-control-plane.md` - Task namespace policy and workflow examples
 - `docs/frieren-access.md` - frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports)

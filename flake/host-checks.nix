@@ -29,7 +29,7 @@
 # `nix flake check` forces every attribute of `checks.<system>` in one process, so
 # anything host-sized in there is a fleet-sized memory bill. Drive this with
 # `task checks:host:HOST=<host>` (one) or `task checks:hosts` (sequential sweep).
-lib.genAttrs systems.default (
+lib.genAttrs systems.work (
   system: let
     pkgs = pkgsFor system;
     # Only hosts whose DECLARED system matches this attribute set. The system comes

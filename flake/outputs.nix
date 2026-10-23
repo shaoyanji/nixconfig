@@ -10,8 +10,15 @@
   # per host kind), each a dozen lines with exactly one consumer: this file.
   # A file whose whole body is wiring between one node and another is not a
   # module, it is a hop — and a hop is what makes a grep lie about what exists.
+  # The systems this flake produces shells, packages, apps and checks for. It
+  # used to be flake-utils' defaultSystems, which includes both darwin entries:
+  # the root then advertised two macOS devshells and a macOS package set, so any
+  # surface that walks the outputs (flake show/check, an editor, a completion
+  # helper) instantiated darwin nixpkgs on a Linux-only host. The one darwin
+  # machine is configuration-only and stays reachable by name through
+  # `darwinConfigurations`; nothing else fans out to it.
   systems = {
-    default = inputs.flake-utils.lib.defaultSystems;
+    work = ["x86_64-linux" "aarch64-linux"];
     checks = ["x86_64-linux"];
   };
 
@@ -73,7 +80,7 @@ in {
     inherit inputs lib systems pkgsFor inventory self;
   };
 
-  apps = lib.genAttrs systems.default (_: {});
+  apps = lib.genAttrs systems.work (_: {});
 
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
@@ -147,9 +154,6 @@ in {
       );
       inherit (host) modules;
     });
-
-  # Expose the package set, including overlays, for convenience.
-  darwinPackages = self.darwinConfigurations.cassini.pkgs;
 
   # `nix build .#docs` — the generated markdown tree (fleet inventory, modules
   # registry, per-host pages) as a store path. The rendered site is

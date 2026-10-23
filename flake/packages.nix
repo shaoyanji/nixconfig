@@ -6,7 +6,7 @@
   self,
   ...
 }:
-lib.genAttrs systems.default (system: let
+lib.genAttrs systems.work (system: let
   pkgs = pkgsFor system;
 
   feedHost = name: h: let

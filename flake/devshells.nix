@@ -4,7 +4,7 @@
   pkgsFor,
   self,
 }:
-lib.genAttrs systems.default (
+lib.genAttrs systems.work (
   system: let
     pkgs = pkgsFor system;
     # Import shells using the flake's root path

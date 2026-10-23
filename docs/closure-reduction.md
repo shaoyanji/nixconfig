@@ -245,9 +245,9 @@ nothing surfaces the overlap.
 
 ```nix
 # flake/packages.nix
-lib.genAttrs systems.default (_: {})
-# flake/outputs.nix:19
-apps = lib.genAttrs systems.default (_: {});
+lib.genAttrs systems.work (_: {})
+# flake/outputs.nix
+apps = lib.genAttrs systems.work (_: {});
 ```
 
 There is currently **no `nix run` path at all**, so a tool used once a month must

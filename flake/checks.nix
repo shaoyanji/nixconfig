@@ -31,7 +31,7 @@
 #                                CI runs it for affected hosts; `task
 #                                checks:host:HOST=` runs one; `task checks:hosts`
 #                                sweeps sequentially, never in one process.
-lib.genAttrs systems.default (
+lib.genAttrs systems.work (
   system: let
     pkgs = pkgsFor system;
   in

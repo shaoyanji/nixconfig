@@ -114,7 +114,7 @@ in
   # building `hostBootChecks.aarch64-linux.delphi` never demands an x86_64 builder.
   # Non-Linux systems get {}, because a NixOS VM test needs a Linux host — test the
   # string, not `pkgs.stdenv`: importing nixpkgs for x86_64-darwin on 26.11 throws.
-  lib.genAttrs systems.default (
+  lib.genAttrs systems.work (
     system: let
       pkgs = pkgsFor system;
       hosts = lib.filterAttrs (name: _: (hostInventory.${name}.system or null) == system) activeNixos;

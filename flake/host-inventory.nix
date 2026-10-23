@@ -81,6 +81,10 @@ in {
           inherit inputs;
           hypervisor = "qemu";
           cpu = "max";
+          # This guest is a service host, not a shell: bring it back at boot and
+          # give it the two stub HTTP services the proxy below exposes.
+          autostart = true;
+          services = true;
         })
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with

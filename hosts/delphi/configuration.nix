@@ -101,6 +101,41 @@
   # about how long a store path may be cached.
   staticCache = import ../../modules/config/nginx-static-cache.nix;
 
+  # The gate that makes this name inert on the public internet even though the
+  # tailnet vhost listens on the same 0.0.0.0:80: the client's 100.64/10
+  # address on tailscale0 is the allow-list.
+  tailnetOnly = ''
+    allow 127.0.0.1;
+    allow ::1;
+    allow 100.64.0.0/10;
+    deny all;
+  '';
+
+  # Stub services in the sandbox microVM, generated from the guest declaration
+  # (hosts/microvms/guests.nix) so the address and the port pair are not typed
+  # a second time here. `withGate` adds the tailnet allow-list, which locations
+  # do not inherit from the server block.
+  microvmGuest = config.microvmGuests.sandbox;
+  microvmProxyLocations = withGate: let
+    proxies = lib.listToAttrs (map (svc: {
+        name = "/microvm/${svc.name}/";
+        value =
+          {
+            # Trailing slash on both sides: /microvm/<name>/x -> upstream /x.
+            proxyPass = "http://${microvmGuest.address}:${toString svc.port}/";
+          }
+          // lib.optionalAttrs withGate {extraConfig = tailnetOnly;};
+      })
+      microvmGuest.services);
+  in
+    proxies
+    // lib.optionalAttrs (microvmGuest.services != []) {
+      # Bare /microvm is the namespace, not a page: send it to the first stub.
+      "= /microvm".extraConfig =
+        (lib.optionalString withGate tailnetOnly)
+        + ''return 301 /microvm/${(lib.head microvmGuest.services).name}/;'';
+    };
+
   freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 in {
   imports = [
@@ -432,27 +467,22 @@ in {
             }
           ];
           root = "${tailnetPage}";
-          locations."/" = {
-            index = "index.html";
-            tryFiles = "$uri $uri/ =404";
-            # No cache policy here: the allow-list IS the point of this vhost,
-            # and the gate reads the same header the mesh client would.
-            extraConfig =
-              ''
-                allow 127.0.0.1;
-                allow ::1;
-                allow 100.64.0.0/10;
-                deny all;            ''
-              + siteHeader;
-          };
-          locations."= /healthz".extraConfig = ''
-            allow 127.0.0.1;
-            allow ::1;
-            allow 100.64.0.0/10;
-            deny all;
-            default_type text/plain;
-            return 200 "ok";
-          '';
+          locations =
+            {
+              "/" = {
+                index = "index.html";
+                tryFiles = "$uri $uri/ =404";
+                # No cache policy here: the allow-list IS the point of this vhost,
+                # and the gate reads the same header the mesh client would.
+                extraConfig = tailnetOnly + siteHeader;
+              };
+              "= /healthz".extraConfig = ''
+                ${tailnetOnly}
+                default_type text/plain;
+                return 200 "ok";
+              '';
+            }
+            // microvmProxyLocations true;
         };
       }
       # HTTPS vhost — inert until `publicDomain` names a record that resolves
@@ -470,22 +500,26 @@ in {
           enableACME = true;
           forceSSL = true;
           root = "${publicPage}";
-          locations."/" = {
-            index = "index.html";
-            tryFiles = "$uri $uri/ =404";
-            extraConfig = staticCache.html + siteHeader;
-          };
-          # Same eight explicit hex classes as frieren's vhost: a `{8}` brace
-          # quantifier is emitted SPLIT across lines by the config generator and
-          # nginx rejects the whole server for it.
-          locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
-            root = "${publicPage}";
-            extraConfig = staticCache.hashed;
-          };
-          locations."= /healthz".extraConfig = ''
-            default_type text/plain;
-            return 200 "ok";
-          '';
+          locations =
+            {
+              "/" = {
+                index = "index.html";
+                tryFiles = "$uri $uri/ =404";
+                extraConfig = staticCache.html + siteHeader;
+              };
+              # Same eight explicit hex classes as frieren's vhost: a `{8}` brace
+              # quantifier is emitted SPLIT across lines by the config generator and
+              # nginx rejects the whole server for it.
+              "~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
+                root = "${publicPage}";
+                extraConfig = staticCache.hashed;
+              };
+              "= /healthz".extraConfig = ''
+                default_type text/plain;
+                return 200 "ok";
+              '';
+            }
+            // microvmProxyLocations false;
           # Deliberately no harness location. The worker is tailnet-only (see
           # `tailscale-serve-dsh` below); publishing it here would put a
           # token-only gate in front of a user that holds the fleet SSH CA key.
@@ -643,6 +677,10 @@ in {
   system.autoUpgrade = {
     enable = true;
     flake = "github:shaoyanji/nixconfig#delphi";
+    # `--upgrade` only updates root's `nixos` channel; it is a no-op for a flake
+    # system (the unit already warns "no channels to update") and channels are
+    # disabled fleet-wide. The github: ref is fetched fresh on every run.
+    upgrade = false;
     dates = "04:30";
     allowReboot = true;
     persistent = true;

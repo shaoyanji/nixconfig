@@ -36,5 +36,9 @@ lib.genAttrs systems.default (
     kali = (import "${shellsDir}/kali.nix") {inherit pkgs;};
     pi = (import "${shellsDir}/pi.nix") {inherit pkgs;};
     replit = (import "${shellsDir}/replit.nix") {inherit pkgs;};
+    openwrt = (import "${shellsDir}/openwrt.nix") {
+      inherit pkgs;
+      root = self.outPath;
+    };
   }
 )

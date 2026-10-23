@@ -6,7 +6,7 @@
   ...
 }: let
   # Hosts with initialized and registered TPM 2.0 identities
-  tpmHosts = ["frieren" "fern" "scratch"];
+  tpmHosts = ["frieren" "fern" "scratch" "poseidon"];
   useTpm = osConfig != null && builtins.elem (osConfig.networking.hostName or "") tpmHosts;
   tpm_key_path = "${config.home.homeDirectory}/.config/sops/age/tpm-identity.txt";
   default_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";

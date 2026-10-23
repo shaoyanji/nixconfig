@@ -80,17 +80,12 @@ in {
   };
 
   # --- Dell D6000 Universal Dock (DisplayLink / EVDI) ---
-  # The dock's CDC-NCM port is managed here rather than left dormant: Wi-Fi
-  # deauthenticates ~22 times per four hours against one mesh AP, and with the
-  # cable unmanaged that costs every session on the box. The profile in
-  # modules/profiles/dell-dock.nix pins the interface and holds route-metric 600,
-  # so Wi-Fi stays primary and the wire is the fallback — no competing default
-  # route, which is what the old ARP-flux note was guarding against.
-  profiles.dell-dock = {
-    enable = true;
-    manageUsbEthernet = true;
-    usbEthernetInterface = "enp6s0f3u1u1i5";
-  };
+  # Display and USB only: the dock's CDC-NCM port stays unmanaged. The cable
+  # lands behind a cascaded mesh node (192.168.5.0/24) while this host's Wi-Fi
+  # sits on the parent (192.168.3.0/24), so DHCP on both would put two subnets on
+  # one machine — the node then reads the parent address as an uplink and loses
+  # its own bridging. One uplink per host; Wi-Fi already owns this subnet.
+  profiles.dell-dock.enable = true;
 
   # --- TPM 2.0 (AMD firmware TPM) ---
   # /dev/tpmrm0 is root:tss 0660 and age-plugin-tpm --generate runs as the user.

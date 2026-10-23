@@ -28,7 +28,20 @@ in {
     manageUsbEthernet = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Keep the dock's CDC-NCM ethernet managed by NetworkManager (hosts whose wired uplink is the dock, e.g. poseidon).";
+      description = ''
+        Keep the dock's CDC-NCM ethernet managed by NetworkManager, as a second
+        uplink. Only correct when the dock cable terminates on the SAME L2
+        segment as the host's other uplink.
+
+        Do not enable this where the cable lands behind a cascaded router — a
+        Huawei mesh puts each node's LAN on its own /24 (…3.0/24, …4.0/24,
+        …5.0/24) and NATs upward. A host then holds two subnets at once, and the
+        node interprets the parent address arriving on its own port as an
+        upstream device, which takes its bridging down for everything behind it
+        (observed 2026-10-23: a static parent address on a child node broke that
+        node, and the same dual-homing on a dock cable cost a host its uplink).
+        Leave it false and keep one uplink per host.
+      '';
     };
 
     usbEthernetInterface = lib.mkOption {
@@ -52,6 +65,14 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    warnings = lib.optional cfg.manageUsbEthernet ''
+      profiles.dell-dock.manageUsbEthernet is enabled. That is only safe when the
+      dock cable is on the same L2 segment as the host's other uplink; behind a
+      cascaded mesh node (Huawei …3/…4/…5 /24 chain) it dual-homes the host across
+      two subnets and can take that node's bridging down for every device behind
+      it.
+    '';
+
     # Synaptics upstream zip is fetched via fetchurl so hydra/nixbuild can build it without requireFile prompts.
     nixpkgs.overlays = [
       (final: _prev: {

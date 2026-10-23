@@ -37,17 +37,17 @@ The skill provides an executable CLI:
 ```bash
 ~/.agents/skills/system-triage-decision/scripts/system-triage.sh --model julia-1 triage-system /home/devji/SYSTEM.md
 ```
-- Categorizes each subsystem row into:
-  - `TIER_1_IMMEDIATE_REPAIR`: Subsystems experiencing regressions requiring instant in-place repair.
-  - `TIER_2_STRATEGIC_HANDOFF`: Architectural dependencies or maintenance to log in `HANDOFF.md`.
-  - `HEALTHY_MONITOR_ONLY`: Healthy operational services.
-- Computes urgency scores (1.0 to 5.0) and routes to action handlers (`nixos_rebuild`, `service_restart`, `storage_scrub`, `database_vacuum`).
+- The tier comes from the **Status column**, never from the model: `FAILED` → `TIER_1_IMMEDIATE_REPAIR`, `UNVERIFIED`/`WARN` → `TIER_2_STRATEGIC_HANDOFF`, `OK` → `HEALTHY_MONITOR_ONLY`. A status the table does not recognise is treated as `warn`, so an unknown word cannot pass as health.
+- `overall_health_score` is weighted from the rows (`healthy=1.0`, `unverified=0.5`, `failed=0.0`), so a status change moves it. A document with no parsable rows is an `error`, not a clean bill.
+- Per row it reports the model's own `model_suggestion` next to the tier, with `model_disagrees` and `confidence_gated` — a disagreement is a signal about the model, not a reason to call a failed subsystem healthy.
+- Routes to action handlers (`nixos_rebuild`, `service_restart`, `storage_scrub`, `database_vacuum`, `verify_probe`, `advisory_note`) chosen from the row's subject; an `UNVERIFIED` row always asks for a re-measure, whatever it is about.
 
 ### 2. Triage `HANDOFF.md` Strategic Queue
 ```bash
 ~/.agents/skills/system-triage-decision/scripts/system-triage.sh --model julia-1 triage-handoff /home/devji/HANDOFF.md
 ```
-- Evaluates queue items, computes priority scores (1.0 to 5.0), and tags items as `AUTONOMOUS_PROMOTION_CANDIDATE`, `BLOCKED_ON_HARDWARE_DEPENDENCY`, or `DOCUMENTED_UPSTREAM_GAP`.
+- Tags each item `AUTONOMOUS_PROMOTION_CANDIDATE`, `BLOCKED_ON_HARDWARE_DEPENDENCY`, `DOCUMENTED_UPSTREAM_GAP`, `ALREADY_VERIFIED`, or `OPERATOR_DECISION_REQUIRED`.
+- The category is a judgement, so the model may make it — but only at or above its `min_confidence_threshold` (0.70 julia-1, 0.75 laya). Below it the item's own status words decide and `decided_by` says `rules`; `model_suggestion` still shows what the model wanted.
 
 ### 3. Run Limit Benchmarks
 ```bash
@@ -68,5 +68,9 @@ The skill provides an executable CLI:
   --state "PostgreSQL vacuum pgvector completed with 15 pages freed" \
   --prompt "Did the vacuum operation succeed?"
 ```
+
+## One engine, resolved not copied
+
+`scripts/system-triage.sh` runs `modules/services/systemone/engine.py` from the repo and falls back to the `systemone-decision` CLI. It keeps no vendored copy: the one it used to carry went stale and answered with the old tier logic for months (2026-10-23). Same for the served envelope — `task checks:decision:triage` is the gate.
 
 Truth: `scripts/task/systemone.sh` (`task ops:decide`) — the engine call; this page is the judgment.

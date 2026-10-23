@@ -355,7 +355,9 @@ tasks:
       is spelled twice here: a re-cased NIC edit is a data edit.
 
       Exit 0 means the magic packets were handed to the kernel, NOT that the
-      machine answered — follow with a ping before assuming it booted.
+      machine answered — this task cannot know that. `infra:wol:eisen:online`
+      is the half that proves it booted; it asks the same question
+      `burgernas:online` does (a TCP connect on the LAN address).
     cmds:
       - |
         set -euo pipefail
@@ -394,6 +396,35 @@ tasks:
             sys.exit("infra:wol:eisen: no interface accepted the magic packet")
         print(f"WoL magic packet -> eisen {mac} via {bcast} ({sent} sends)")
         PY
+
+  infra:wol:eisen:online:
+    desc: Wait for Eisen to answer SSH after a WoL wake (lan_ip from the compiled inventory)
+    summary: >
+      The wake task returns as soon as the packets leave the NIC, which says
+      nothing about the box; measured on 2026-10-23 the ARP entry went
+      INCOMPLETE → REACHABLE at ~48 s, with sshd a little later. This polls
+      port 22 on `.#inventory.hosts.eisen.network.lan_ip` for 180 s so a failed
+      wake is a non-zero exit instead of a silent one.
+
+      No ssh is attempted: a TCP connect cannot hang on an auth prompt, which
+      is what makes it safe to chain. Exit 0 = sshd accepted a connection.
+    cmds:
+      - |
+        set -euo pipefail
+        ip="$(nix eval --raw .#inventory.hosts.eisen.network.lan_ip)"
+        if [ -z "$ip" ]; then
+          echo "infra:wol:eisen:online: hosts.eisen.network.lan_ip is empty in the inventory" >&2
+          exit 1
+        fi
+        for i in $(seq 1 90); do
+          if timeout 2 bash -c "cat < /dev/null > /dev/tcp/$ip/22" 2>/dev/null; then
+            echo "eisen ssh up on $ip:22 after $((i * 2))s"
+            exit 0
+          fi
+          sleep 2
+        done
+        echo "ERROR: eisen did not answer on $ip:22 within 180s" >&2
+        exit 1
 
   infra:wol:host:eisen:
     desc: Alias for infra:wol:eisen

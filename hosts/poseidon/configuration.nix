@@ -71,11 +71,30 @@ in {
     systemPackages = with pkgs;
       [
         btrfs-progs
+        age-plugin-tpm # unseals the TPM-sealed sops identity
+        tpm2-tools
       ]
       ++ lib.optionals obsConfig.enable [
         (pkgs.wrapOBS {inherit (obsConfig) plugins;})
       ];
   };
+
+  # --- Dell D6000 Universal Dock (DisplayLink / EVDI) ---
+  # The dock's CDC-NCM port is poseidon's wired uplink (192.168.3.74), so it has
+  # to stay NetworkManager-managed; the profile's default is to leave dock
+  # ethernet unmanaged, which only suits hosts with a spare port (frieren/fern).
+  profiles.dell-dock = {
+    enable = true;
+    manageUsbEthernet = true;
+  };
+
+  # --- TPM 2.0 (AMD firmware TPM) ---
+  # /dev/tpmrm0 is root:tss 0660 and age-plugin-tpm --generate runs as the user.
+  security.tpm2 = {
+    enable = true;
+    tctiEnvironment.enable = true;
+  };
+  users.users.${user.name}.extraGroups = ["tss"];
 
   # users.groups.libvirtd.members = [ "devji" ];
   # virtualisation.libvirtd.enable = true;

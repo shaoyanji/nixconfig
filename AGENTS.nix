@@ -4095,6 +4095,49 @@
       '';
     };
 
+    poseidon-tpm-luks-dock = {
+      title = "Poseidon: chip-sealed sops identity plus TPM unlock for both LUKS volumes";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-10-23";
+      summary = "The same chip now unseals the user sops identity and both LUKS volumes, with the passphrase keyslot and host SSH key left as the recovery doors. The dock's missing display was an unbuilt evdi module, not a config flag.";
+      from = ["tpm-sops-planes"];
+      refs = {
+        hosts = ["poseidon"];
+        modules = [
+          "hosts/poseidon/configuration.nix"
+          "modules/sops.nix"
+          "modules/profiles/dell-dock.nix"
+        ];
+        tasks = ["checks:host"];
+        docs = ["docs/sops-rekey.md"];
+      };
+      body = ''
+        The sops half is the documented two-rebuild order; what is load-bearing here:
+
+        1. **PCR 7, not the boot chain.** Secure Boot is off on this laptop, so PCR 7
+           keeps the token valid across kernel and NixOS updates but does not attest
+           the boot path. The passphrase keyslot stays enrolled for that reason.
+        2. **The initrd is the proof, not the running system.** Its crypttab carries
+           `tpm2-device=auto` on both volumes, it ships `systemd-cryptsetup` and
+           `tpm2-tss`, and `tpm_crb` is built into the kernel — no module list is
+           needed for the chip to exist in stage 1. The reboot journal containing no
+           "Please enter" event is the exit criterion.
+        3. **The dock's display was a missing module.** `evdi` in `boot.kernelModules`
+           alone yields "Failed to find module 'evdi'": the package must also be in
+           `boot.extraModulePackages`. `card0-DVI-I-1` appearing is the signal.
+        4. **The dock NIC is one connection, per host.** The auto-generated
+           "Wired connection N" takes a fresh DHCP lease on every replug, which the
+           router then recycles — the window that had `.74` answering from two MACs.
+           `ensureProfiles` fixes the churn; `manageUsbEthernet` keeps the port
+           managed where it is the uplink rather than a spare.
+
+        Remaining limit: DHCP is the Huawei router (`192.168.3.1`; frieren's dnsmasq is
+        proxy-only PXE), so a reservation for the dock's MAC (`9c:eb:e8:d2:ea:bc`) is
+        a router-side action, not a repo change.
+      '';
+    };
+
     taskfile-plane-handmade = {
       title = "The $HOME task plane is a hand-made shim, and it fails where it exists";
       kind = "open";

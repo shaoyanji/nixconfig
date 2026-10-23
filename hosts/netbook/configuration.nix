@@ -25,6 +25,10 @@ in {
     # fstab entry it replaces, and what a travel laptop actually needs.
     ../../modules/profiles/boot.nix
     ../../modules/profiles/nas-client.nix
+    # Voice dictation as a packaged script: the body is shellcheck-gated at
+    # build and the Groq key is decrypted from the fleet sops plane at use time
+    # with this host's TPM identity, instead of a plaintext file in $HOME.
+    ../../modules/profiles/voice-dictate.nix
   ];
 
   profiles.boot.efi = false;
@@ -231,6 +235,7 @@ in {
   # programs.firefox.enable = true;
 
   programs.niri.enable = true;
+  profiles.voiceDictate.enable = true;
   # niri's module ships `default = "gnome;gtk"` and pulls
   # xdg-desktop-portal-gnome, keeping a 20 MiB GTK4/GNOME stack resident for
   # interfaces this compositor cannot serve (its ScreenCast needs mutter). GTK

@@ -256,8 +256,9 @@ direction, and the cheapest thing to fix.
 
 ### First move
 
-Populate `flake/packages.nix` / `apps` with the fleet-wide CLI tools currently in
-`home.packages`, then drop them from `home.packages` on hosts that do not run them
+Populate `flake/packages.nix` and add an `apps` output for the fleet-wide CLI
+tools currently in `home.packages`, then drop them from `home.packages` on hosts
+that do not run them
 continuously (start with the §3 cohort on frieren). `nix run .#qmd` then resolves
 from the store, which on a warm host is effectively immediate.
 

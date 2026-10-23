@@ -1,9 +1,6 @@
-# `microvm.vms.<name>` for a host that runs guests. One guest: a shell sandbox
-# by default, and the host's service tier when `services = true` (delphi runs
-# the two stub HTTP services there, proxied under /microvm/). `persist` gives a
-# service real state on a disk, `stirling` adds a real app, and `slidesUser`
-# turns an account's login into a terminal deck under ssh. Rationale: AGENTS.nix
-# `microvm-guests`.
+# `microvm.vms.<name>` for a guest host: a shell sandbox by default, the host's
+# service tier with `services = true`, plus optional state, apps and a terminal
+# deck login. Rationale: AGENTS.nix `microvm-guests`.
 {
   inputs,
   hypervisor ? "cloud-hypervisor",

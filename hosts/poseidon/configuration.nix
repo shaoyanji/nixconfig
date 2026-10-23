@@ -79,13 +79,57 @@ in {
       ];
   };
 
+  # --- Tailscale: keep the native LAN path ---
+  # desktop-client.nix sets `--accept-routes=true`, so frieren's advertised
+  # 192.168.3.0/24 subnet route lands in table 52 (ip rule 5270) and every
+  # direct LAN destination is sent over the tailnet instead. Measured
+  # 2026-10-23: `ip route show table 52` carried `192.168.3.0/24 dev tailscale0`
+  # and frieren -> poseidon LAN SSH timed out on port 22 while tailnet SSH
+  # worked; a policy rule preferring table main for the prefix fixed it
+  # instantly. eisen (Steam Link) and fern (LAN SSH) carry the same override.
+  services.tailscale.extraSetFlags = lib.mkForce [
+    "--accept-dns=true"
+    "--accept-routes=false"
+  ];
+
   # --- Dell D6000 Universal Dock (DisplayLink / EVDI) ---
   # Display and USB only: the dock's CDC-NCM port stays unmanaged. The cable
   # lands behind a cascaded mesh node (192.168.5.0/24) while this host's Wi-Fi
   # sits on the parent (192.168.3.0/24), so DHCP on both would put two subnets on
   # one machine — the node then reads the parent address as an uplink and loses
   # its own bridging. One uplink per host; Wi-Fi already owns this subnet.
-  profiles.dell-dock.enable = true;
+  profiles.dell-dock = {
+    enable = true;
+    # The dock's RJ45 is a CDC-NCM function and the profile leaves it strictly
+    # unmanaged by default, which is what "disabled" looks like from the GUI:
+    # carrier up, no address, `nmcli device connect` refuses it. Re-enabled
+    # 2026-10-23 because the cable terminates on the parent 192.168.3.0/24 (its
+    # lease is .3, alongside Wi-Fi's .2) and not behind a cascaded mesh node, so
+    # this does not put two subnets on one host -- the trap commit 87e967cc
+    # reverted for. The profile pins the interface and keeps route-metric 600,
+    # so Wi-Fi stays the primary uplink and the dock is the fallback.
+    manageUsbEthernet = true;
+    usbEthernetInterface = "enp6s0f3u1u1i5";
+  };
+
+  # --- Battery longevity: pack at 48 % of design capacity (measured 2026-10-23) ---
+  # Dell G15 5515, `BAT1`: charge_full 2.36 Ah against 4.91 Ah design, sitting
+  # Full at 100 % SoC on AC -- the state that ages a cell fastest. Sustained
+  # partial charge also guards against the swelling that comes with it.
+  #
+  # This model has NO software ceiling: BAT1 exposes no
+  # charge_control_end_threshold, `dell-wmi-sysman` refuses to load (No such
+  # device), and there is no /dev/smi for smbios-battery-ctl. The ceiling that
+  # actually holds is the BIOS one, which the EC keeps across OSes and updates:
+  # F2 -> Power Management -> Battery Charge Configuration -> Custom (start 50,
+  # stop 80) or Primarily AC Use. Set it there once; this profile is the probe,
+  # not the enforcement -- it writes the ceiling on hardware that exposes one and
+  # reports once per boot when it does not (`journalctl -u battery-charge-limit`).
+  profiles.batteryChargeLimit = {
+    enable = true;
+    endThreshold = 80;
+    startThreshold = 75;
+  };
 
   # --- TPM 2.0 (AMD firmware TPM) ---
   # /dev/tpmrm0 is root:tss 0660 and age-plugin-tpm --generate runs as the user.

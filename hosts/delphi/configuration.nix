@@ -136,6 +136,35 @@
         + ''return 301 /microvm/${(lib.head microvmGuest.services).name}/;'';
     };
 
+  # Stirling holds whatever a document tool holds, so it is tailnet-only on both
+  # vhosts — unlike the stubs, which are public by design. The tailnet name
+  # proxies it behind the allow-list; the public name redirects there instead of
+  # answering 403 from a gate a public client can never satisfy.
+  #
+  # Stirling knows its own prefix (SERVER_SERVLET_CONTEXT_PATH), so the path is
+  # passed through unchanged instead of being stripped like a stub's.
+  stirlingTailnetUrl = "http://${tailnetHost}${microvmGuest.stirlingPath}/";
+  stirlingProxyLocations = lib.optionalAttrs (microvmGuest.stirling != null) {
+    "${microvmGuest.stirlingPath}/" = {
+      proxyPass = "http://${microvmGuest.address}:${toString microvmGuest.stirling}${microvmGuest.stirlingPath}/";
+      extraConfig =
+        tailnetOnly
+        + ''
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_buffering off;
+          proxy_read_timeout 900s;
+          client_max_body_size 512m;
+        '';
+    };
+    "= ${microvmGuest.stirlingPath}".extraConfig = tailnetOnly + ''return 301 ${microvmGuest.stirlingPath}/;'';
+  };
+  stirlingPublicRedirect = lib.optionalAttrs (microvmGuest.stirling != null) {
+    "${microvmGuest.stirlingPath}/".extraConfig = ''return 302 ${stirlingTailnetUrl};'';
+    "= ${microvmGuest.stirlingPath}".extraConfig = ''return 302 ${stirlingTailnetUrl};'';
+  };
+
   # The deck (hosts/microvms/slideshow.md) is a terminal app — `slides` over ssh
   # into the guest — so its web surface is an address card, not the show. This
   # gives /slideshow a real page before anything renders, and names both ways in
@@ -527,6 +556,7 @@ in {
               '';
             }
             // microvmProxyLocations true
+            // stirlingProxyLocations
             // lib.optionalAttrs slidesEnabled (slideshowLocations true);
         };
       }
@@ -565,6 +595,7 @@ in {
               '';
             }
             // microvmProxyLocations false
+            // stirlingPublicRedirect
             // lib.optionalAttrs slidesEnabled (slideshowLocations false);
           # Deliberately no harness location. The worker is tailnet-only (see
           # `tailscale-serve-dsh` below); publishing it here would put a

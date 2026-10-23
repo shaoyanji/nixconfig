@@ -80,12 +80,17 @@ in {
   };
 
   # --- Dell D6000 Universal Dock (DisplayLink / EVDI) ---
-  # Display and USB only: the dock's CDC-NCM port is left unmanaged on purpose.
-  # Poseidon's Wi-Fi is already on 192.168.3.0/24, and a second NIC on the same
-  # subnet produces ARP flux — both interfaces answer for each other's address
-  # and replies leave the wrong one, which kills an SSH session mid-stream.
-  # One uplink per subnet; use the dock cable only if Wi-Fi is off, by hand.
-  profiles.dell-dock.enable = true;
+  # The dock's CDC-NCM port is managed here rather than left dormant: Wi-Fi
+  # deauthenticates ~22 times per four hours against one mesh AP, and with the
+  # cable unmanaged that costs every session on the box. The profile in
+  # modules/profiles/dell-dock.nix pins the interface and holds route-metric 600,
+  # so Wi-Fi stays primary and the wire is the fallback — no competing default
+  # route, which is what the old ARP-flux note was guarding against.
+  profiles.dell-dock = {
+    enable = true;
+    manageUsbEthernet = true;
+    usbEthernetInterface = "enp6s0f3u1u1i5";
+  };
 
   # --- TPM 2.0 (AMD firmware TPM) ---
   # /dev/tpmrm0 is root:tss 0660 and age-plugin-tpm --generate runs as the user.

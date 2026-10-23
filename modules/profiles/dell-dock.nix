@@ -24,6 +24,12 @@ in {
       default = true;
       description = "Disable USB autosuspend for DisplayLink, USB hubs, and Bluetooth adapters.";
     };
+
+    manageUsbEthernet = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Keep the dock's CDC-NCM ethernet managed by NetworkManager (hosts whose wired uplink is the dock, e.g. poseidon).";
+    };
   };
 
   # Generic alias option so hosts can enable either profiles.dell-dock or profiles.docking-station
@@ -77,7 +83,7 @@ in {
     # port is spare — frieren and fern each keep their own wired/wifi uplink —
     # so leave it unmanaged: no lease churn, and no duplicate-address window
     # against a device that already holds that address.
-    networking.networkmanager.unmanaged = [
+    networking.networkmanager.unmanaged = lib.mkIf (!cfg.manageUsbEthernet) [
       "driver:cdc_ncm"
     ];
 

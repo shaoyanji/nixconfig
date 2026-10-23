@@ -46,6 +46,24 @@
 }: let
   sshHostKeys = "${stateRoot}/sandbox/ssh-host-keys";
 
+  # A second keypair, this one a CLIENT key: the host holds the private half and
+  # the guest trusts the public half, so a host-side forced command can open the
+  # deck on a port the edge already carries (22) without the client ever holding
+  # a guest credential. It lives under the shared host-key directory, which is
+  # already mounted in the guest at /etc/ssh/host-keys.
+  hopDir = "${sshHostKeys}/hop";
+  hopKeyFile = "${hopDir}/id_ed25519";
+  hopKnownHosts = "${hopDir}/known_hosts";
+  # Outside the state root on purpose (see base.nix): sshd will only read an
+  # authorized_keys that root owns, along with every directory above it.
+  hopAuthDir = "/srv/microvm/hop-auth";
+  hopTarget = "${slidesUser}@${address}";
+  # The forced command that runs the hop is an ordinary account, not root, so
+  # the keypair is group-readable and the host config puts that account in this
+  # group. Nothing else on the host is: the guest's own private host key in the
+  # same directory stays 0600.
+  hopGroup = "microvm-deck-hop";
+
   # Compiled from the repo, so the deck is a store path the guest already sees
   # over the virtiofs /nix/store share.
   deck = ./slideshow.md;
@@ -136,6 +154,41 @@ in {
       default = slidesUser;
       description = "Guest account whose login runs the deck (null = no deck).";
     };
+    # A host-side forced command can reach the deck through this keypair without
+    # the client holding a guest credential. Published rather than hard-coded in
+    # the host config: the paths belong to this module's state directory.
+    sshHopTarget = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default =
+        if slidesUser != null
+        then hopTarget
+        else null;
+      description = "ssh destination for a host-side hop into the deck (null = no hop).";
+    };
+    sshHopKeyFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default =
+        if slidesUser != null
+        then hopKeyFile
+        else null;
+      description = "Host-side private key of the hop keypair.";
+    };
+    sshHopKnownHosts = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default =
+        if slidesUser != null
+        then hopKnownHosts
+        else null;
+      description = "known_hosts pinned to the guest's own host key.";
+    };
+    sshHopGroup = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default =
+        if slidesUser != null
+        then hopGroup
+        else null;
+      description = "Group a forced-command account must belong to in order to read the hop key.";
+    };
     stirling = lib.mkOption {
       type = lib.types.nullOr lib.types.port;
       default =
@@ -164,28 +217,69 @@ in {
       [
         "d ${stateRoot} 0755 microvm kvm -"
         "d ${stateRoot}/sandbox 0755 microvm kvm -"
-        "d ${sshHostKeys} 0700 microvm kvm -"
+        # Trailable by the hop group when there is one: its members read the hop
+        # key, and the guest's own private host key stays 0600.
+        "d ${sshHostKeys} ${
+          if slidesUser != null
+          then "0750"
+          else "0700"
+        } microvm ${
+          if slidesUser != null
+          then hopGroup
+          else "kvm"
+        } -"
       ]
       ++ lib.optional (persist != {}) "d ${stateRoot}/sandbox/volumes 0700 microvm kvm -";
+
+    users.groups = lib.mkIf (slidesUser != null) {${hopGroup} = {};};
 
     # One key per guest, generated once and served to the guest over virtiofs.
     # Without this every boot runs sshd-keygen under TCG, which took minutes and
     # gave the guest a new identity each time.
     systemd.services.microvm-sandbox-ssh-host-keys = {
-      description = "Persistent SSH host key for the sandbox microVM";
+      description = "Persistent SSH keys for the sandbox microVM";
       before = ["microvm@sandbox.service"];
       requiredBy = ["microvm@sandbox.service"];
       serviceConfig = {
         Type = "oneshot";
         User = "microvm";
         Group = "kvm";
+        SupplementaryGroups = lib.optional (slidesUser != null) hopGroup;
         UMask = "0077";
+        # sshd's StrictModes accepts an `AuthorizedKeysFile` outside the home only
+        # when root owns it; a file owned by the share's runner user is refused
+        # with nothing but "Permission denied (publickey)" on the client. The
+        # `+` runs this one command with full privileges inside a User= unit, so
+        # the public half lands root-owned while the private half stays with the
+        # hop group — the guest can read the key it must trust, never the one the
+        # host signs with.
+        ExecStartPost =
+          lib.optional (slidesUser != null) "+${pkgs.coreutils}/bin/install -d -o root -g root -m 0755 ${hopAuthDir}"
+          ++ lib.optional (slidesUser != null) "+${pkgs.coreutils}/bin/install -o root -g root -m 0644 ${hopKeyFile}.pub ${hopAuthDir}/authorized_keys";
       };
-      script = ''
-        ${pkgs.coreutils}/bin/install -d -m 0700 ${sshHostKeys}
-        key=${sshHostKeys}/ssh_host_ed25519_key
-        [ -s "$key" ] || ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C "sandbox" -f "$key"
-      '';
+      script =
+        ''
+          ${pkgs.coreutils}/bin/install -d -m 0700 ${sshHostKeys}
+          key=${sshHostKeys}/ssh_host_ed25519_key
+          [ -s "$key" ] || ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C "sandbox" -f "$key"
+        ''
+        + lib.optionalString (slidesUser != null) ''
+          # The hop's credential. The public half goes to a root-owned directory
+          # the guest mounts (see ExecStartPost); the private half never leaves
+          # the host and is group-readable only by the forced-command account.
+          ${pkgs.coreutils}/bin/install -d -m 0750 ${hopDir}
+          [ -s ${hopKeyFile} ] || ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C "sandbox-hop" -f ${hopKeyFile}
+          # Pinned from the guest's own host key, so the hop is `StrictHostKeyChecking=yes`
+          # and not accept-new: the guest's identity is this file, not trust on first use.
+          printf '%s %s\n' '${address}' "$(${pkgs.coreutils}/bin/cut -d' ' -f1,2 ${sshHostKeys}/ssh_host_ed25519_key.pub)" > ${hopKnownHosts}
+          # UMask 0077 wrote all of it 0600; the group is how the forced-command
+          # account reads the key without running as root. Deliberately not `-R`:
+          # the guest's own host key in this directory belongs to root, and the
+          # runner user cannot change its group — a recursive chgrp fails the unit.
+          ${pkgs.coreutils}/bin/chgrp ${hopGroup} ${hopDir} ${sshHostKeys}
+          ${pkgs.coreutils}/bin/chmod 0750 ${sshHostKeys} ${hopDir}
+          ${pkgs.coreutils}/bin/chmod 0640 ${hopKeyFile} ${hopKeyFile}.pub ${hopKnownHosts}
+        '';
     };
 
     # The deck's door. nginx proxies HTTP, and ssh is not HTTP, so this is a
@@ -236,6 +330,10 @@ in {
             hostName = "sandbox";
             ipAddress = address;
             inherit hypervisor cpu tapId sshHostKeys mem;
+            hopAuthDir =
+              if slidesUser != null
+              then hopAuthDir
+              else null;
             mac = "02:00:00:00:83:11";
           })
         ];
@@ -284,9 +382,16 @@ in {
         # Last block in sshd_config — the only place a Match may appear. The
         # login is the deck: no shell to escape to, no forwarding, and the deck
         # itself is a read-only store path.
+        # `AuthorizedKeysFile` lists every path because the directive REPLACES the
+        # default instead of adding to it, and NixOS puts a user's keys in
+        # /etc/ssh/authorized_keys.d/<user> — not in the home directory — so that
+        # entry has to be named back explicitly. The hop key comes from the shared
+        # directory, which is how the host-side door reaches this account. A guest
+        # user therefore accepts either key, and neither is a password.
         services.openssh.extraConfig = lib.mkIf (slidesUser != null) ''
           Match User ${slidesUser}
             ForceCommand ${pkgs.slides}/bin/slides ${deck}
+            AuthorizedKeysFile %h/.ssh/authorized_keys /etc/ssh/authorized_keys.d/%u /etc/ssh/hop-auth/authorized_keys
             AllowTcpForwarding no
             AllowAgentForwarding no
             X11Forwarding no

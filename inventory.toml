@@ -295,7 +295,7 @@ storage_layout = "119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots)
 tailscale = true
 tailscale_hostname = "eisen"
 ssh_alias = "eisen"
-lan_ip = "192.168.3.87"
+lan_ip = "192.168.3.91"
 mac = "00:e0:22:1c:bb:ed"
 
 [hosts.eisen.software]

@@ -450,6 +450,40 @@ lib.genAttrs systems.work (
           touch $out
         '';
 
+      # --- the knob registry describes code that exists ----------------------
+      # modules.toml is hand-written, so it will drift; what it can be denied is
+      # drifting silently. Every entry must name a real file, that file must
+      # declare a toggle, and every host it claims must be in the inventory —
+      # the three ways a stale registry misleads someone reading the docs page.
+      knobs = let
+        registry = builtins.fromTOML (builtins.readFile ../modules.toml);
+        entries = registry.knobs;
+        ids = builtins.attrNames entries;
+        pathOf = id: ../. + "/${entries.${id}.path}";
+        missingPath = builtins.filter (id: !(builtins.pathExists (pathOf id))) ids;
+        readable = builtins.filter (id: builtins.pathExists (pathOf id)) ids;
+        noToggle = builtins.filter (id: !(lib.hasInfix "mkEnableOption" (builtins.readFile (pathOf id)))) readable;
+        unknownHosts = id: builtins.filter (h: !(builtins.hasAttr h hostInventory)) entries.${id}.hosts;
+        badHosts = builtins.filter (id: unknownHosts id != []) ids;
+        countDrift = (registry.metadata.total_knobs or (builtins.length ids)) != builtins.length ids;
+        problems =
+          lib.optional (missingPath != []) "paths that do not exist: ${lib.concatStringsSep ", " missingPath}"
+          # `noToggle` is reported, not fatal: a knob may be nixpkgs' own option
+          # (`programs.steam.enable`) whose declaration lives outside this tree.
+          ++ lib.optional (badHosts != []) "knobs naming hosts the inventory does not have: ${lib.concatStringsSep ", " badHosts}"
+          ++ lib.optional countDrift "metadata.total_knobs disagrees with the ${toString (builtins.length ids)} entries";
+      in
+        if problems != []
+        then
+          builtins.throw ''
+            modules.toml drifted from the tree:
+              ${lib.concatStringsSep "\n  " problems}
+            Fix the registry in the same commit as the module, not later.''
+        else
+          pkgs.runCommand "knobs-ok" {} ''
+            echo "knobs: ${toString (builtins.length ids)} entries, every path exists, every host resolves; ${toString (builtins.length (lib.subtractLists noToggle readable))} of them point at a file that declares the toggle${lib.optionalString (noToggle != []) ", ${toString (builtins.length noToggle)} are wired to an option declared elsewhere: ${lib.concatStringsSep ", " noToggle}"}" > $out
+          '';
+
       # --- the task graph is pinned, not just versioned ----------------------
       # `version`/`proseVersion` are addresses; nothing compares them to a known
       # value, so a reformatted shard or a script-rewritten summary changed what

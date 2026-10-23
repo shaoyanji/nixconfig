@@ -139,6 +139,12 @@ in {
       # not a pick. mkDefault makes the fleet value the fallback DN overrides.
       package = lib.mkDefault pkgs.nixVersions.latest;
 
+      # The fleet is flake-bootstrapped and has never had a channel profile,
+      # but NixOS/nix-darwin default `nix.channel.enable = true`, which appends
+      # `/nix/var/nix/profiles/per-user/root/channels` to NIX_PATH. Resolving
+      # `<nixpkgs>` then prints "search path entry ... does not exist, ignoring".
+      channel.enable = false;
+
       gc = {
         automatic = true;
         options = "--delete-older-than 10d";

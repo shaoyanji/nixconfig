@@ -744,7 +744,7 @@ longer has to carry the essay. Vector-embedding offload to Eisen:
 
 ## Deployment Guidance
 
-Host deployment flows use `infra:*` tasks directly. See `.agents/deploy/README.md` for host-specific deployment notes. Per-host quirks live in `.agents/deploy/hosts/*.md`.
+Host deployment flows use `infra:*` tasks directly. See `.agents/deploy/README.md` for host-specific deployment notes. Per-host quirks live in `.agents/deploy/hosts/*.md` — a host is not only its own config: delphi runs the service-tier `sandbox` microVM (`hosts/microvms/guests.nix`) behind `/microvm/*` and the terminal deck, where `ssh slides@delphi.bountystash.com` is the deck, `task microvm:ssh NAME=sandbox` (from delphi) is the guest shell, and plain `ssh delphi.bountystash.com` is the host shell as `devji`; frieren's `frieren-canary` guest is proved end to end by `task vm:canary:test` (boot → ssh → guest API → host proxy → stop → teardown). Guest mechanics: `hosts/microvms/README.md`.
 
 ## Git Hooks Setup
 

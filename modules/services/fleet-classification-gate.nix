@@ -1,4 +1,19 @@
 # fleet-classification-gate — the nightly systemd classification drift sweep.
+#
+# WHY ONE SYSTEMD UNIT PER HOST instead of one command that walks the fleet: the
+# expensive half of this gate is EVALUATION, and `nix build --max-jobs 1` serialises
+# builds, not evaluation. Building `fleetChecks` in one process forces every active
+# host's config in one evaluator — measured 2026-10-24 at 5122.9 MiB peak against
+# 2358.9 MiB for the same twelve hosts dispatched one per process. That is the
+# banned shape (a fleet eval in one process), so the schedule is generated as units
+# instead: systemd starts one check per host, `After=` chains them so exactly one
+# evaluator is alive at a time, and each failure lands on a named unit.
+#
+# What a host is gated on is the flake output `fleetHostChecks.<system>.<host>` —
+# the same three-line echo `task checks:host` builds, but with THIS machine's pkgs,
+# so delphi and kali (aarch64) are gated from an x86_64 NAS: their configuration is
+# evaluated, never built. A nightly pass warms nothing and proves exactly what the
+# interactive gate proves.
 {
   config,
   lib,
@@ -7,61 +22,29 @@
 }: let
   cfg = config.services.fleetClassificationGate;
 
-  # The driver resolves its own root as `dirname/../..` and calls oom-guard.sh
-  # relative to it, so both files must sit in the same tree. Staging them into the
-  # store makes the gate independent of a checkout: the unit runs the driver that
-  # was built into THIS generation and judges `flakeRef` — so a dirty or half-pulled
-  # checkout cannot change either the rules or the revision under judgement.
-  driver = pkgs.runCommand "fleet-classification-gate-driver" {} ''
-    install -Dm755 ${../../scripts/task/host-check-sweep.sh} $out/scripts/task/host-check-sweep.sh
-    install -Dm755 ${../../scripts/task/oom-guard.sh} $out/scripts/task/oom-guard.sh
-  '';
+  system = pkgs.stdenv.hostPlatform.system;
 
-  gate = pkgs.writeShellApplication {
-    name = "fleet-classification-gate";
-    runtimeInputs = [
-      config.nix.package
-      pkgs.bash
-      pkgs.coreutils
-      pkgs.gawk
-      pkgs.gnugrep
-      pkgs.procps
-    ];
-    text = ''
-      set -uo pipefail
-      REF="${cfg.flakeRef}"
-      export NIX_CONFIG="experimental-features = nix-command flakes"
+  # Membership is the compiled inventory, not a list: a host added to inventory.toml
+  # is gated the next night, and a host that leaves stops being gated.
+  active =
+    lib.filterAttrs
+    (_: host: host.status == "active" && host.kind != "external")
+    config.fleet.inventory.hosts;
 
-      # One fetch before the loop: on 2026-10-24 a fetch racing the first per-host
-      # eval failed delphi for a network hiccup, which is not drift. After this line
-      # every eval reads the local git cache.
-      nix flake metadata "$REF" >/dev/null
+  # Sorted so the `After=` chain is deterministic: a generation must not reorder
+  # the schedule (or the store paths) because attrNames happened to differ.
+  hosts = lib.sort builtins.lessThan (builtins.attrNames active);
 
-      # The set and the filter are Nix, not jq: one leaf read of the compiled
-      # registry (0.15 s), so no second parser sits between the truth and the loop.
-      # A host added to inventory.toml is gated the next night; `external` kinds
-      # have no flake configuration to evaluate.
-      # getAttr, not attribute-access-by-name: inside shell single quotes that
-      # syntax is read as an unexpanded shell variable (SC2016) and shellcheck
-      # fails the build.
-      HOSTS="$(nix eval --raw "$REF#inventory.hosts" --apply '
-        h: let keep = n: let v = builtins.getAttr n h; in v.status == "active" && v.kind != "external";
-        in builtins.concatStringsSep " " (builtins.filter keep (builtins.attrNames h))')"
-      if [ -z "''${HOSTS// /}" ]; then
-        echo "fleet-classification-gate: the inventory read returned no active host — refusing to report green" >&2
-        exit 1
-      fi
+  unitOf = host: "fleet-classification-check-${host}.service";
 
-      echo "fleet-classification-gate: gating $REF"
-      echo "  hosts: $HOSTS"
-      # eval mode is arch-independent, so no builder is involved and aarch64/darwin
-      # hosts are covered from this machine. One host per process under the OOM
-      # watchdog: peak memory is one host, and pressure stops the run instead of
-      # the NAS (AGENTS.md: never a fleet eval in one process).
-      bash ${driver}/scripts/task/host-check-sweep.sh \
-        --hosts "$HOSTS" --mode eval --flake "$REF" --timeout ${toString cfg.timeout}
-    '';
-  };
+  # Each check is `After=` the previous host's check, so the timer cannot start
+  # twelve evaluators at once. Deliberately NOT `Requires=`: one broken host must
+  # not hide the rest — the old shell sweep's `--keep-going` behaviour, expressed as
+  # ordering instead of as a flag.
+  previous = host: let
+    i = lib.lists.findFirstIndex (h: h == host) 0 hosts;
+  in
+    lib.optional (i > 0) (unitOf (lib.lists.elemAt hosts (i - 1)));
 in {
   options.services.fleetClassificationGate = {
     enable = lib.mkEnableOption "the nightly systemd classification drift sweep";
@@ -87,24 +70,64 @@ in {
 
     timeout = lib.mkOption {
       type = lib.types.int;
-      default = 180;
-      description = "Per-host timeout, seconds, enforced by oom-guard.sh.";
+      default = 600;
+      description = "Per-host TimeoutStartSec, seconds.";
     };
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.fleet-classification-gate = {
-      description = "Nightly systemd classification drift gate (per-host assertions)";
-      after = ["network-online.target"];
-      wants = ["network-online.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${gate}/bin/fleet-classification-gate";
-        TimeoutStartSec = "45min";
-        Nice = 10;
-        IOSchedulingClass = "idle";
+    systemd.services =
+      lib.mapAttrs' (host: hostCfg:
+        lib.nameValuePair "fleet-classification-check-${host}" {
+          description = "Classification gate: ${host} (${hostCfg.kind})";
+          after = ["network-online.target"];
+          wants = ["network-online.target"];
+          # Ordered after the previous host, so one evaluator is alive at a time.
+          unitConfig.After = previous host;
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = "${pkgs.writeShellScript "fleet-classification-check-${host}" ''
+              set -uo pipefail
+              export NIX_CONFIG="experimental-features = nix-command flakes"
+              # One fetch before the first deref: a network hiccup during the first
+              # evaluation is not drift, and it failed a host on 2026-10-24.
+              nix flake metadata ${cfg.flakeRef} >/dev/null
+              # `--builders ""` because the check is a local echo and a gate must be
+              # unable to spend remote build seconds (AGENTS.md).
+              exec ${config.nix.package}/bin/nix build \
+                --builders "" -L --no-link \
+                "${cfg.flakeRef}#fleetHostChecks.${system}.${host}"
+            ''}/bin/fleet-classification-check-${host}";
+            TimeoutStartSec = toString cfg.timeout;
+            Nice = 10;
+            IOSchedulingClass = "idle";
+          };
+        })
+      active
+      // {
+        # The result everyone reads: one command, no loop. `systemctl is-failed`
+        # exits 0 when AT LEAST ONE of the named units failed (verified on 2026-10-24:
+        # two active units -> 1, one failed -> 0), so the verdict is its inverse. The
+        # exit status is what the sentinel ledger records.
+        fleet-classification-gate = {
+          description = "Nightly systemd classification drift gate (verdict)";
+          wants = map unitOf hosts;
+          after = map unitOf hosts;
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "${pkgs.writeShellScript "fleet-classification-verdict" ''
+              set -uo pipefail
+              if out=$(${pkgs.systemd}/bin/systemctl is-failed ${lib.concatMapStringsSep " " unitOf hosts}); then
+                echo "classification gate: at least one host failed — journalctl -u fleet-classification-check-*" >&2
+                printf '%s\n' "$out" >&2
+                exit 1
+              fi
+              echo "${toString (builtins.length hosts)} active host(s): module system + assertions pass"
+            ''}/bin/fleet-classification-verdict";
+          };
+        };
       };
-    };
 
     systemd.timers.fleet-classification-gate = {
       wantedBy = ["timers.target"];

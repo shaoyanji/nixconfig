@@ -68,6 +68,7 @@ in {
     ../../modules/services/home-assistant.nix
     ../../modules/services/kiwix.nix
     ../../modules/services/paste.nix
+    ../../modules/services/atuin-server.nix
     ../../modules/services/iventoy.nix
     ../../modules/services/simplex-smp-server.nix
     ../../modules/profiles/nixbuild-client.nix
@@ -238,6 +239,17 @@ in {
 
   # Home Assistant IoT and device stack (modules/services/home-assistant.nix)
   services.ha-stack.enable = true;
+
+  # Shell-history sync (modules/services/atuin-server.nix). Registration is on
+  # only long enough to create the first account; flip it off afterwards.
+  services.atuin-server = {
+    enable = true;
+    openRegistration = true;
+    serverAliases = [
+      "atuin.lan"
+      "atuin.frieren.local"
+    ];
+  };
 
   # SimpleX Chat SMP relay server (modules/services/simplex-smp-server.nix)
   services.simplex-smp-server = {

@@ -18,6 +18,7 @@ in {
   imports = [
     ./starship.nix
     ./nushell.nix
+    ./atuin.nix
     # ./zsh.nix
   ];
   programs = {

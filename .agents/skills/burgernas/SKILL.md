@@ -64,6 +64,27 @@ a real file is never overwritten. The older flat `/volume1/Shared Library/bin-aa
 collection comes from the Mac via `burgernas:bin:sync` and is *unmanaged* — do not
 assume it is reproducible.
 
+## Sharing the vault over NFS
+
+The NAS exports `/volume1/peachcable` (tools, appimages, the archive) and DSM caps
+the protocol at **NFSv4.1** — asking for `vers=4.2` fails with `Protocol not
+supported`, which reads like a client problem and is not one. Frieren mounts it at
+`/mnt/burgernas/peachcable`, declared in `hosts/frieren/configuration.nix` as an
+automount (`systemd.automounts` + `noauto` in the fstab entry) because the NAS is
+off most of the day and a boot-time mount would wait on a sleeping peer.
+
+Adding a client is the one operation with **no CLI and no API** on DSM 7: `synoshare`
+has no `--setnfspriv`, `synonfs` only manages rules for existing paths, and
+`synowebapi api=SYNO.Core.Share.NFS` answers `code 102` on every version. The
+export list lives in `/etc/exports`, so the imperative path is: back it up, append
+the client with the same option string as its siblings, then `exportfs -ra`, and
+verify with `showmount -e 127.0.0.1`. It survives until someone edits NFS
+privileges in the UI; if that happens, re-add the client.
+
+`devji`'s `~/.bashrc` puts `/volume1/Shared Library/toolbox/bin` **first** on PATH,
+so the farm's sqlite3 (3.53 with FTS5) wins over the firmware's 3.40. That file is
+hand-edited on the device — no nix, nothing to declare it in.
+
 ## Constraints
 
 - **512 MiB RAM** — no compilers, browsers, containers or AI runtimes; they

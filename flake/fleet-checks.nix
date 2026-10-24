@@ -32,7 +32,7 @@
 let
   perSystem = system: let
     pkgs = pkgsFor system;
-    check = import ./host-check.nix {inherit lib pkgs hostInventory;};
+    check = import ./host-check.nix {inherit lib pkgs;};
     active = lib.filterAttrs (_: host: host.status == "active" && host.kind != "external") inventory.hosts;
     configsFor = kind:
       {

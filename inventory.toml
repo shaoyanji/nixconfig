@@ -63,7 +63,7 @@ ssh_alias = "frieren"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Harmonia (LAN binary cache on :5000)", "Paperless-ngx (:28981, data /srv/data/paperless)", "Hermes Agent & Gateway (user systemd service)", "Home Assistant (:8123) + Mosquitto MQTT", "Kiwix Serve (declarative ZIMs :8088 -> wiki.frieren.lan)", "Immich Photo Server & ML backend", "Jellyfin Media Server (:8096)", "Plex Media Server", "Aria2 RPC daemon (:6801 + AriaNg web)", "Paste (pb server at paste.frieren.lan)", "Vaultwarden", "Uptime Kuma", "iVentoy PXE server", "Samba & NFS export (/srv/data)", "Syncthing"]
-traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter", "dell-dock", "ai-full", "tpm-identity"]
+traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter", "dell-dock", "ai-full", "tpm-identity", "nas-server"]
 
 [hosts.frieren.persona]
 title = "Fleet Mainframe & Storage Steward"

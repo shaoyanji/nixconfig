@@ -40,6 +40,11 @@ in {
       "aws/secret/access/key" = {};
       "openmeteo/api/key" = {};
       "neocities" = {};
+      # Google OAuth client for calendar sync. `key` names the nested path in the
+      # sops file, so the pair stays grouped there while the secret path stays
+      # slash-free. This replaced vdirsyncer scraping a hand-made rclone.conf.
+      "gdrive_client_id".key = "googleDrive/clientId";
+      "gdrive_client_secret".key = "googleDrive/clientSecret";
       "gemini/api/key" = {};
       # "todoist" = {
       #   sopsFile = ./secrets.json;

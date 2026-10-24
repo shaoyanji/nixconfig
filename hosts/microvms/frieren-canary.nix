@@ -191,12 +191,19 @@ in {
           httpd.serve_forever()
     '';
   in {
+    # This canary is judged by whether it keeps answering, so it must come back
+    # and must never be retired by systemd's start limit.
+    unitConfig.X-Fleet-Role = "daemon";
+    unitConfig.StartLimitIntervalSec = 0;
     description = "Dummy HTTP Service for Model B Reverse Proxy Verification";
     wantedBy = ["multi-user.target"];
     after = ["network.target"];
     serviceConfig = {
       ExecStart = "${pkgs.python3}/bin/python3 ${serverScript}";
       Restart = "always";
+      RestartSec = "2s";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "300s";
       DynamicUser = true;
     };
   };

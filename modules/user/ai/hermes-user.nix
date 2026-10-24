@@ -10,8 +10,6 @@
   # ~/.hermes/ for the gateway daemon.
   ...
 }: let
-  hostName = osConfig.networking.hostName or "";
-  hosts = config.programs.hermes-user.hosts;
 in {
   options.programs.hermes-user = {
     enable = lib.mkOption {
@@ -23,16 +21,11 @@ in {
       '';
     };
 
-    hosts = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = ["frieren"];
-      description = ''
-        Hosts on which the ~/.hermes persona activation runs. Hermes was
-        frieren-only; the gate is a list so a second host (delphi) can opt in
-        without forking the module. The runtime activation honours the same
-        list, so a host that is enabled but not listed seeds nothing.
-      '';
-    };
+    persona = lib.mkEnableOption ''
+      the ~/.hermes persona files on this host. Per-host declaration rather than a
+      hostname list compiled in this module: the gateway units are gated by
+      `enable` alone, and a host opts into seeding where it declares this.
+    '';
 
     gateway = {
       enable = lib.mkOption {
@@ -77,18 +70,11 @@ in {
   # host containers turn it off. Hermes has its own `enable`, set by
   # profiles/hermes.nix — coupling the two meant a cloud host had to install
   # the whole AI stack to get one agent.
-  config = lib.mkIf (config.programs.hermes-user.enable && builtins.elem hostName hosts) {
+  config = lib.mkIf config.programs.hermes-user.enable {
     # Persona files — symlinked to nixconfig source.
     # Runtime edits modify the repo directly (version controlled).
     home.activation.hermesPersonaSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      HOST_NAME="$(cat /etc/hostname 2>/dev/null || hostname 2>/dev/null || echo "${lib.head hosts}")"
-      case " ${lib.concatStringsSep " " hosts} " in
-        *" $HOST_NAME "*) : ;;
-        *)
-          echo "hermes-user: skipping activation on unlisted host ($HOST_NAME); see programs.hermes-user.hosts"
-          exit 0
-          ;;
-      esac
+      ${lib.optionalString (!config.programs.hermes-user.persona) "exit 0"}
 
       run mkdir -p $HOME/.hermes
       run mkdir -p $HOME/.hermes/memories

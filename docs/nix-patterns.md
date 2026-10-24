@@ -130,6 +130,22 @@ patterns — which is why the `--print-roots` check belongs in the operator's ha
 - An optional file path is `lib.types.nullOr lib.types.path`.
 - A secret is injected with systemd `LoadCredential`, never on a command line
   (`rpcSecretFile` in the aria2 module is the reference).
+- **A unit exists because a capability is declared, not because a hostname is
+  listed** [[flake/policies.nix#systemd-units-are-capability-gated]]. The
+  capability is the option that installs the thing the unit needs —
+  `programs.niri.enable` for anything bound to `graphical-session.target`, a
+  systemd `Condition*` for a file nobody declares — and the compositor's
+  `spawn-at-startup` starts that target and imports `WAYLAND_DISPLAY`, so
+  session units are pulled in by a session instead of by home-manager activation.
+- **A daemon states its crash-loop class where it is declared**
+  [[flake/policies.nix#systemd-daemons-declare-their-class]]:
+  `unitConfig.X-Fleet-Role = "daemon"` (must come back: `Restart` set, and
+  `StartLimitIntervalSec = 0` with `RestartSteps`/`RestartMaxDelaySec` so the
+  default 5-starts-in-10s limit cannot retire it) or `"bounded"` (retiring is the
+  point, so carry an explicit `StartLimitBurst`). Both the class and its
+  consequence are asserted per host by `modules/systemd-policy.nix`, over the
+  evaluated unit set — so the failure names the unit, not a daemon that quietly
+  stopped days later.
 
 ## CI quirk
 

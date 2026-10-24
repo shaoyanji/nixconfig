@@ -802,12 +802,11 @@ in {
 
   # globalModulesContainers (noDE) switches the AI CLI stack OFF for container
   # hosts, and that stays off here: hermes is the exception, not a reason to
-  # install Chromium/qmd/crush. programs.hermes-user is gated on its own
-  # `enable` + `hosts` list, so only the host list has to be extended.
+  # install Chromium/qmd/crush. The gateway units follow `enable` (set by
+  # profiles.hermes); seeding the persona is this host's own declaration.
   home-manager.users.${user.name} = {
     programs.hermes-user = {
-      # The persona activation is opt-in per host; frieren is the default.
-      hosts = ["frieren" "delphi"];
+      persona = true;
     };
     # Delphi uses HTTPS with GitHub CLI token credentials rather than host SSH keys.
     programs.gh.settings.git_protocol = lib.mkForce "https";

@@ -77,6 +77,11 @@
 
   defaultServiceConfig = {
     Slice = "system-paperless.slice";
+    # Crash-loop policy shared by all four units: a database blip must not retire
+    # them for the rest of the boot (100 ms retries fill the start limit in 0.5 s).
+    RestartSec = "2s";
+    RestartSteps = 5;
+    RestartMaxDelaySec = "300s";
     # Secure the services
     ReadWritePaths = [
       cfg.consumptionDir
@@ -540,6 +545,8 @@ in {
         };
 
         systemd.services.paperless-scheduler = {
+          unitConfig.X-Fleet-Role = "daemon";
+          unitConfig.StartLimitIntervalSec = 0;
           description = "Paperless Celery Beat";
           wantedBy = ["multi-user.target"];
           wants = [
@@ -604,6 +611,8 @@ in {
         };
 
         systemd.services.paperless-task-queue = {
+          unitConfig.X-Fleet-Role = "daemon";
+          unitConfig.StartLimitIntervalSec = 0;
           description = "Paperless Celery Workers";
           requires = lib.optional cfg.database.createLocally "postgresql.target";
           after =
@@ -626,6 +635,8 @@ in {
         };
 
         systemd.services.paperless-consumer = {
+          unitConfig.X-Fleet-Role = "daemon";
+          unitConfig.StartLimitIntervalSec = 0;
           description = "Paperless document consumer";
           # Bind to `paperless-scheduler` so that the consumer never runs
           # during migrations
@@ -651,6 +662,8 @@ in {
         };
 
         systemd.services.paperless-web = {
+          unitConfig.X-Fleet-Role = "daemon";
+          unitConfig.StartLimitIntervalSec = 0;
           description = "Paperless web server";
           # Bind to `paperless-scheduler` so that the web server never runs
           # during migrations

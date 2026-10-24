@@ -1,11 +1,6 @@
 # CLI tools the fleet can borrow instead of installing: `nix run .#cli.<family>.<tool>`.
-#
-# One table is the whole namespace — the family names are the comment groups the
-# host package lists already use, so a tool moved here keeps the word it was
-# found under and can be dropped from `home.packages` without moving the idea.
-#
-# `bin` is set only where the executable and the attribute name disagree;
-# otherwise the attribute *is* the binary, which keeps `nix run` from guessing.
+# One table is the whole namespace, using the family names the host package lists
+# already use; `bin` is set only where the attribute and the executable disagree.
 {
   lib,
   pkgs,

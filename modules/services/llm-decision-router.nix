@@ -75,6 +75,7 @@ in {
 
   config = lib.mkIf cfg.enable {
     systemd.services.llm-decision-router = {
+      unitConfig.X-Fleet-Role = "daemon";
       description = "LLM & Decision Model Router for SubZeroClaw";
       after = [
         "network.target"

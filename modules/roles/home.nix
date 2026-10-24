@@ -21,6 +21,7 @@ in {
     ../shell
     ../dev.nix
     ../user/ai/antigravity-cli.nix
+    ../systemd-policy.nix
     ../zen.nix
     # Imported unconditionally (a `pkgs`-dependent import reads `config` and
     # recurses); niri.nix gates its own body with mkIf on Linux, because a

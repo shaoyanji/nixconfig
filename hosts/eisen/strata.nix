@@ -21,6 +21,7 @@
   };
 in {
   systemd.services.strata = {
+    unitConfig.X-Fleet-Role = "daemon";
     description = "Strata MoE LLM Inference Engine (ROCm HIP gfx1010)";
     after = ["network-online.target"];
     wants = ["network-online.target"];

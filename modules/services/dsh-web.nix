@@ -88,6 +88,7 @@ in {
     environment.systemPackages = [cfg.package];
 
     systemd.services.dsh-web = {
+      unitConfig.X-Fleet-Role = "daemon";
       description = "DeepSeek Harness Web UI (dsh web)";
       wantedBy = ["multi-user.target"];
       wants = ["network-online.target"];

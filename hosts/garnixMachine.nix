@@ -53,6 +53,7 @@ in {
   };
 
   systemd.services.bountystash = {
+    unitConfig.X-Fleet-Role = "daemon";
     description = "Bountystash web app";
     wantedBy = ["multi-user.target"];
     after = ["network-online.target"];

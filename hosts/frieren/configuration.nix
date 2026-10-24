@@ -247,6 +247,7 @@ in {
   # Resurrected OpenClaw persona ("Vanta") for the hermes mainframe agent.
   home-manager.users.devji.programs.hermes-user = {
     enable = true;
+    persona = true;
     gateway.enable = true;
     simplex.daemon = true;
     envFile = "/run/secrets/rendered/hermes.env";

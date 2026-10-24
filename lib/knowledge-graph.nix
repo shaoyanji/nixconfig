@@ -51,7 +51,12 @@
     ++ mdIn (root + "/.agents")
     ++ mdIn (root + "/.agents/deploy")
     ++ mdInSubdirs (root + "/.agents/deploy")
-    ++ mdIn (root + "/taskfiles");
+    ++ mdIn (root + "/taskfiles")
+    # Host-local documents: `hosts/microvms/README.md` describes the guest layer two
+    # hosts depend on, and `hosts/sledgehammer/USB.md` a provisioning procedure —
+    # both were rendered nowhere, so the layer that `/microvm/*` serves had no node
+    # and no skill could be reached from it.
+    ++ mdInSubdirs (root + "/hosts");
 
   # `docs/generated/` is a build artifact and not committed (see
   # docs/docs-pipeline-audit.md §4); it is not a knowledge source and would only

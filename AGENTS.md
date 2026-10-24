@@ -651,7 +651,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 
 | Namespace       | What                                                                                                         | Skill                                  |
 | --------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
-| `infra:*`       | Host lifecycle, secrets, SOPS                                                                                | `.agents/skills/infra/SKILL.md`        |
+| `infra:*`       | Host lifecycle, secrets, SOPS, microVM guests (`microvm:*` declarative, `vm:canary:*` runner)                  | `.agents/skills/infra/SKILL.md`, `.agents/skills/microvm/SKILL.md` |
 | `agents:*`      | Operator menu, xs, OAuth                                                                                     | `.agents/skills/agents/SKILL.md`       |
 | `checks:*`      | Validation, smoke checks, nix lint                                                                           | `.agents/skills/checks/SKILL.md`       |
 | `dev:*`         | Git, flake, site, PRs, packages                                                                              | `.agents/skills/dev/SKILL.md`          |

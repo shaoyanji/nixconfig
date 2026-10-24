@@ -712,14 +712,49 @@ tasks:
       - nix build --no-link --print-out-paths .#microvmRunners.frieren-canary
 
   vm:canary:run:
-    desc: Boot the frieren-canary microVM in the foreground (Ctrl-C stops it)
+    desc: Boot the frieren-canary microVM and return once sshd answers
     summary: >
-      Delegates to scripts/task/run-canary.sh, which asserts root, /dev/kvm, the
-      brlan bridge and every helper in the built runner BEFORE it touches the
-      host, then starts the virtiofsd shares and cloud-hypervisor and tears all
-      three down on exit. Exit 1 with the reason when a precondition is missing.
+      Boots scripts/task/run-canary.sh (root, /dev/kvm, brlan and runner helpers
+      asserted before anything is touched) under a transient systemd unit,
+      frieren-canary-runner, so the guest outlives the terminal that started it —
+      the script tears the guest down from its own EXIT trap, so a foreground run
+      dies with its shell and the next login just times out. Waits up to 90 s for
+      sshd, then prints the log command and both teardowns. FOREGROUND=1 keeps the
+      blocking behaviour (Ctrl-C stops). Exit 1 when a precondition fails or the
+      guest never answers.
     cmds:
-      - sudo scripts/task/run-canary.sh
+      - |
+        if [ "${FOREGROUND:-0}" = "1" ]; then
+          exec sudo scripts/task/run-canary.sh
+        fi
+        if systemctl is-active --quiet frieren-canary-runner; then
+          echo "frieren-canary-runner is already up; 'task vm:canary:stop' first to restart it" >&2
+          exit 1
+        fi
+        # The runner is resolved HERE, as the invoking user. Root evaluating this
+        # flake fails libgit2's owner check on the checkout ("repository path is not
+        # owned by current user"), so the unit is handed a store path instead.
+        RUNNER="$(nix build --no-link --print-out-paths .#microvmRunners.frieren-canary)" || exit 1
+        # systemd's default PATH is /usr/bin:/bin, which does not exist on NixOS:
+        # without this the unit dies on its first `dirname`.
+        sudo systemd-run --unit=frieren-canary-runner --collect \
+          --description "frieren-canary microVM" \
+          --working-directory "$PWD" \
+          --setenv PATH=/run/current-system/sw/bin:/run/wrappers/bin \
+          --setenv HOME=/root \
+          --setenv CANARY_RUNNER="$RUNNER" \
+          bash scripts/task/run-canary.sh
+        for _ in $(seq 1 30); do
+          if ssh -o BatchMode=yes -o ConnectTimeout=2 frieren-canary true 2>/dev/null; then
+            echo "up: ssh frieren-canary, or 'task vm:canary:ssh'"
+            echo "logs:   journalctl -u frieren-canary-runner -f"
+            echo "stop:   task vm:canary:stop"
+            exit 0
+          fi
+          sleep 3
+        done
+        echo "guest did not answer on ssh within 90 s — see: journalctl -u frieren-canary-runner -n 40" >&2
+        exit 1
 
   vm:canary:test:
     desc: "[gate] Boot frieren-canary, assert guest + proxy, stop, assert teardown"

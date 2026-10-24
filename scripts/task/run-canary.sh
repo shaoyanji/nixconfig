@@ -48,11 +48,21 @@ need_root() {
 # this script must not paper over it.
 resolve_runner() {
   if [ -z "$RUNNER" ]; then
-    RUNNER="$(
+    # Nix's own stderr is kept: the previous version sent it to /dev/null and then
+    # said only "could not resolve", which is indistinguishable between a broken
+    # flake, an unset HOME (a systemd unit has none by default) and a failed build.
+    local err
+    err="$(mktemp)"
+    if ! RUNNER="$(
       cd "$REPO_DIR" || exit 1
       NIX_CONFIG="experimental-features = nix-command flakes pipe-operators" \
-        nix build --builders "" --no-link --print-out-paths ".#${RUNNER_ATTR}" 2>/dev/null
-    )" || die "could not resolve .#${RUNNER_ATTR} — build it with: task vm:canary:build"
+        nix build --builders "" --no-link --print-out-paths ".#${RUNNER_ATTR}" 2>"$err"
+    )"; then
+      sed 's/^/  nix: /' "$err" >&2
+      rm -f "$err"
+      die "could not resolve .#${RUNNER_ATTR} — build it with: task vm:canary:build"
+    fi
+    rm -f "$err"
   fi
   [ -n "$RUNNER" ] || die "empty runner path for .#${RUNNER_ATTR}"
   [ -e "$RUNNER" ] || die "runner path does not exist: $RUNNER"

@@ -737,13 +737,20 @@ tasks:
         RUNNER="$(nix build --no-link --print-out-paths .#microvmRunners.frieren-canary)" || exit 1
         # systemd's default PATH is /usr/bin:/bin, which does not exist on NixOS:
         # without this the unit dies on its first `dirname`.
-        sudo systemd-run --unit=frieren-canary-runner --collect \
-          --description "frieren-canary microVM" \
-          --working-directory "$PWD" \
-          --setenv PATH=/run/current-system/sw/bin:/run/wrappers/bin \
-          --setenv HOME=/root \
-          --setenv CANARY_RUNNER="$RUNNER" \
-          bash scripts/task/run-canary.sh
+        # systemd unloads a collected transient unit a moment after it exits, so a
+        # run straight after `vm:canary:stop` can still find the name taken.
+        for attempt in 1 2 3; do
+          sudo systemd-run --unit=frieren-canary-runner --collect \
+            --description "frieren-canary microVM" \
+            --working-directory "$PWD" \
+            --setenv PATH=/run/current-system/sw/bin:/run/wrappers/bin \
+            --setenv HOME=/root \
+            --setenv CANARY_RUNNER="$RUNNER" \
+            bash scripts/task/run-canary.sh && break
+          sudo systemctl reset-failed frieren-canary-runner 2>/dev/null || true
+          sleep 2
+          [ "$attempt" = 3 ] && exit 1
+        done
         for _ in $(seq 1 30); do
           if ssh -o BatchMode=yes -o ConnectTimeout=2 frieren-canary true 2>/dev/null; then
             echo "up: ssh frieren-canary, or 'task vm:canary:ssh'"

@@ -18,11 +18,31 @@
     userAllowOther = true;
   };
 
-  # Upstream nixpkgs sets PrivateTmp = true in services.kbfs, which places the unit
-  # in an unprivileged private mount namespace where setuid fusermount fails (EPERM)
-  # and isolates any mounts from the rest of the user session. Disable PrivateTmp to
-  # allow persistent user-visible FUSE mounting.
-  systemd.user.services.kbfs.serviceConfig.PrivateTmp = lib.mkForce false;
+  systemd.user.services.kbfs = {
+    # `Restart=on-failure` without `RestartSec` retries at systemd's 100 ms
+    # default, so a login without a network retires the unit after five fast
+    # failures and the session has no kbfs at all. Retry forever with backoff.
+    unitConfig.StartLimitIntervalSec = 0;
+    serviceConfig = {
+      # Upstream nixpkgs sets PrivateTmp = true in services.kbfs, which places the
+      # unit in an unprivileged private mount namespace where setuid fusermount
+      # fails (EPERM) and isolates any mounts from the rest of the user session.
+      # Disable PrivateTmp to allow persistent user-visible FUSE mounting.
+      PrivateTmp = lib.mkForce false;
+      RestartSec = "2s";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "300s";
+    };
+  };
+
+  systemd.user.services.keybase = {
+    unitConfig.StartLimitIntervalSec = 0;
+    serviceConfig = {
+      RestartSec = "2s";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "300s";
+    };
+  };
 
   services = {
     keybase.enable = true;

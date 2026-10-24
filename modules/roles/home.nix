@@ -3,10 +3,18 @@
   config,
   lib,
   pkgs,
+  osConfig ? {},
   ...
 }: let
   user = import ../global/user.nix;
   graphicsTier = config.profiles.graphics.tier or "medium";
+  # Session daemons belong to a generation that declares a compositor:
+  # modules/profiles/base-desktop-environment.nix sets `programs.niri.enable`, and
+  # frieren's headless boot default never imports it. Enabling them everywhere is
+  # what produced services that could only ever fail and be retired.
+  sessionEnabled =
+    pkgs.stdenv.hostPlatform.isLinux
+    && (osConfig.programs.niri.enable or false);
 in {
   imports = [
     ./minimal.nix
@@ -113,10 +121,10 @@ in {
   };
 
   services = {
-    cliphist.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
+    cliphist.enable = lib.mkDefault sessionEnabled;
     caffeine.enable = false;
-    tailscale-systray.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
-    wl-clip-persist.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isLinux;
+    tailscale-systray.enable = lib.mkDefault sessionEnabled;
+    wl-clip-persist.enable = lib.mkDefault sessionEnabled;
     udiskie = {
       enable = false;
       tray = "auto";
@@ -127,7 +135,7 @@ in {
   # `RestartSec`, i.e. systemd's 100 ms default: five fast failures at login
   # (no Wayland socket yet, no network) hit the default start limit and retire
   # them for the session. Retry forever with backoff instead of giving up.
-  systemd.user.services.cliphist = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+  systemd.user.services.cliphist = lib.mkIf sessionEnabled {
     Unit.StartLimitIntervalSec = 0;
     Service = {
       RestartSec = "2s";
@@ -136,7 +144,7 @@ in {
     };
   };
 
-  systemd.user.services.cliphist-images = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+  systemd.user.services.cliphist-images = lib.mkIf sessionEnabled {
     Unit.StartLimitIntervalSec = 0;
     Service = {
       RestartSec = "2s";
@@ -145,7 +153,7 @@ in {
     };
   };
 
-  systemd.user.services.wl-clip-persist = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+  systemd.user.services.wl-clip-persist = lib.mkIf sessionEnabled {
     Unit.StartLimitIntervalSec = 0;
     Service = {
       RestartSec = "2s";

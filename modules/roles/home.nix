@@ -124,17 +124,40 @@ in {
   };
 
   systemd.user.services.rclone-gdrive = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+    Install.WantedBy = ["default.target"];
+
     Unit = {
       Description = "Rclone Google Drive FUSE mount";
       Documentation = ["man:rclone(1)"];
       ConditionPathExists = "%h/.config/rclone/rclone.conf";
       After = ["network-online.target"];
       Wants = ["network-online.target"];
+      # A resolver that is not up yet must never be able to retire this mount for
+      # the rest of the session: never rate-limit the retries below.
+      StartLimitIntervalSec = 0;
     };
 
     Service = {
       Type = "notify";
-      ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %h/GoogleDrive";
+      TimeoutStartSec = 180;
+      # `network-online.target` in a user session is reached well before the
+      # resolver answers, so the first OAuth call can die with
+      # "lookup oauth2.googleapis.com: no such host" and the mount then sits
+      # down. Wait for the name (bounded, ~2 min), then fail loudly so the
+      # restart policy tries again instead of mounting nothing.
+      ExecStartPre = [
+        "${pkgs.coreutils}/bin/mkdir -p %h/GoogleDrive"
+        (pkgs.writeShellScript "rclone-gdrive-wait-dns" ''
+          for ((i = 1; i <= 40; i++)); do
+            if ${pkgs.getent}/bin/getent hosts oauth2.googleapis.com >/dev/null; then
+              exit 0
+            fi
+            ${pkgs.coreutils}/bin/sleep 3
+          done
+          echo "rclone-gdrive: oauth2.googleapis.com still unresolvable; letting systemd retry" >&2
+          exit 1
+        '')
+      ];
       ExecStart = lib.concatStringsSep " " [
         "${pkgs.rclone}/bin/rclone mount gdrive: %h/GoogleDrive"
         "--vfs-cache-mode=full"
@@ -144,7 +167,10 @@ in {
       ];
       ExecStop = "/run/wrappers/bin/fusermount3 -u %h/GoogleDrive";
       Restart = "on-failure";
+      # 10 s first, backing off to 5 min while the network is out.
       RestartSec = "10s";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "300s";
       Environment = [
         "PATH=/run/wrappers/bin:/run/current-system/sw/bin:/usr/bin:/bin"
       ];

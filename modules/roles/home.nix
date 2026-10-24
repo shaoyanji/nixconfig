@@ -123,6 +123,37 @@ in {
     };
   };
 
+  # The session daemons above come from nixpkgs with `Restart=on-failure` and no
+  # `RestartSec`, i.e. systemd's 100 ms default: five fast failures at login
+  # (no Wayland socket yet, no network) hit the default start limit and retire
+  # them for the session. Retry forever with backoff instead of giving up.
+  systemd.user.services.cliphist = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+    Unit.StartLimitIntervalSec = 0;
+    Service = {
+      RestartSec = "2s";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "300s";
+    };
+  };
+
+  systemd.user.services.cliphist-images = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+    Unit.StartLimitIntervalSec = 0;
+    Service = {
+      RestartSec = "2s";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "300s";
+    };
+  };
+
+  systemd.user.services.wl-clip-persist = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+    Unit.StartLimitIntervalSec = 0;
+    Service = {
+      RestartSec = "2s";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "300s";
+    };
+  };
+
   systemd.user.services.rclone-gdrive = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
     Install.WantedBy = ["default.target"];
 

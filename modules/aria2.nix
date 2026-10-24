@@ -36,11 +36,19 @@ in {
       Unit = {
         Description = "aria2 RPC download daemon (local fallback)";
         After = ["network.target"];
+        # `Restart=on-failure` alone retries at systemd's 100 ms default, so five
+        # fast failures (network not up yet) hit the default start limit and
+        # retire the daemon for the session. Never rate-limit it instead.
+        StartLimitIntervalSec = 0;
       };
       Service = {
         Type = "simple";
         ExecStart = "${pkgs.aria2}/bin/aria2c --conf-path=${aria2Conf} --enable-rpc";
         Restart = "on-failure";
+        # 2 s first, backing off to 5 min: retry forever without hammering.
+        RestartSec = "2s";
+        RestartSteps = 5;
+        RestartMaxDelaySec = "300s";
       };
       Install = {
         WantedBy = ["default.target"];

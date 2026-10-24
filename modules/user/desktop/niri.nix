@@ -133,6 +133,29 @@ lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
           ''
         ];
       }
+      # Tie the compositor to the systemd user manager — the two facts that make
+      # `graphical-session.target` real (it is declared nowhere else in this repo).
+      # Importing the environment gives session units the compositor's
+      # WAYLAND_DISPLAY; starting the target pulls in the units that declare
+      # `WantedBy=graphical-session.target` (cliphist, wl-clip-persist,
+      # tailscale-systray). Without this they are only ever started by
+      # home-manager activation, which is not a session.
+      {
+        command = [
+          "${pkgs.systemd}/bin/systemctl"
+          "--user"
+          "import-environment"
+          "WAYLAND_DISPLAY"
+        ];
+      }
+      {
+        command = [
+          "${pkgs.systemd}/bin/systemctl"
+          "--user"
+          "start"
+          "graphical-session.target"
+        ];
+      }
     ];
     window-rules = [
       {

@@ -20,17 +20,28 @@ notification center.
 | Client id / secret | extracted from `~/.config/rclone/rclone.conf` by the `google-client-id`/`-secret` scripts, so the credentials live in one file |
 | Default calendar | `Primary` |
 | Sync timer | `vdirsyncer.timer`, `frequency = "*:0/15"` |
-| Notify timer | `calendar-notify.timer`, `OnCalendar = "*:0/5"`, oneshot |
+| Notify timer | `calendar-notify.timer`, `OnCalendar = "*:0/5"`, oneshot — exists only on a generation that declares a compositor |
 
-## Hosts without the rclone credentials do not sync
+## What decides whether it runs (no host lists)
 
-`syncEnabled` is false on hosts in the module's `hostName` list (today: `delphi`),
-because `vdirsyncer` there fails every 15 minutes with `NoSectionError: No section:
-'gdrive'` — a permanently red user unit on a box with no Google credentials. The
-list is in the module, not an option block; add a host there, not an override.
+Two declarative gates, both owned by the config rather than by a hostname:
 
-Adding a host that *should* sync needs `~/.config/rclone/rclone.conf` to exist
-first, or the same error appears under its own name.
+- **Sync** — `vdirsyncer.service` carries
+  `ConditionPathExists=%h/.config/rclone/rclone.conf`, the file its
+  `google-client-id`/`-secret` scripts read. Where the file is absent the service
+  is skipped (not failed), so a host without Google credentials has no red unit,
+  and a host that gains the file starts syncing with no config change.
+- **Notify** — `calendar-notify.{service,timer}` are `mkIf`
+  `osConfig.programs.niri.enable`: the profile that installs the compositor
+  (`modules/profiles/base-desktop-environment.nix`) sets it, so a headless
+  generation (frieren's boot default) has no such unit at all, while its `desktop`
+  specialisation and every desktop host do. The unit also carries the same
+  `rclone.conf` condition, because khal only has data after a sync.
+
+The compositor side of that contract lives in `modules/user/desktop/niri.nix`:
+niri's `spawn-at-startup` runs `systemctl --user import-environment WAYLAND_DISPLAY`
+and starts `graphical-session.target`, which is what pulls in every
+`WantedBy=graphical-session.target` session unit.
 
 ## Operational
 
@@ -42,10 +53,12 @@ khal list today 7d                  # agenda; `ikhal` is the TUI
 khal new 2026-10-20 14:00 15:00 "Team Meeting" :: Discuss project roadmap
 ```
 
-The notifier only fires when `$WAYLAND_DISPLAY` or `$DISPLAY` is set, and it
-deduplicates through `$XDG_RUNTIME_DIR/calendar-notified.cache`, so a re-run
-inside the same event does not repeat the toast. Both are deliberate: a headless
-host exits 0 instead of logging a failure every five minutes.
+The notifier deduplicates through `$XDG_RUNTIME_DIR/calendar-notified.cache`, so a
+re-run inside the same event does not repeat the toast. An event is written to
+that cache **only when `notify-send` succeeded** — a failed send (no session bus,
+no notification daemon) is retried on the next tick instead of being swallowed for
+the rest of the day. There is no display test in the script: the unit's existence
+is the test.
 
 To prove DMS rendering, bypass the notifier:
 

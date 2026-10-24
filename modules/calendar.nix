@@ -5,21 +5,17 @@
   osConfig ? null,
   ...
 }: let
-  # Hosts that have no Google OAuth credentials (~/.config/rclone/rclone.conf).
-  # vdirsyncer cannot work there: it fails every 15 minutes with
-  # `NoSectionError: No section: 'gdrive'`, which is a permanently red user unit
-  # on a machine that has no business syncing a calendar. This module is merged
-  # as a config fragment, so it cannot declare a `options` block — the host gate
-  # is a list here, like `tpmHosts` in modules/sops.nix.
-  hostName =
-    if osConfig != null
-    then osConfig.networking.hostName
-    else "";
-  syncEnabled =
+  # A graphical session is a declared capability, not a hostname: the profile
+  # that installs the compositor (modules/profiles/base-desktop-environment.nix)
+  # sets `programs.niri.enable`. A generation that never imports that profile
+  # has no session, so the notifier does not exist there at all — frieren's boot
+  # default is headless and gets nothing, while its `desktop` specialisation
+  # declares the compositor and gets the unit. Standalone HM hosts have no
+  # osConfig, hence no session.
+  hasSession =
     pkgs.stdenv.hostPlatform.isLinux
-    && !(builtins.elem hostName [
-      "delphi"
-    ]);
+    && osConfig != null
+    && (osConfig.programs.niri.enable or false);
   getGoogleClientId = pkgs.writeShellScript "google-client-id" ''
     ${pkgs.python3}/bin/python3 -c "import configparser; cfg=configparser.ConfigParser(); cfg.read('${config.home.homeDirectory}/.config/rclone/rclone.conf'); print(cfg.get('gdrive','client_id'))"
   '';
@@ -37,11 +33,6 @@
       gnugrep
     ];
     text = ''
-      # Only probe and notify if an active graphical display session exists
-      if [ -z "''${WAYLAND_DISPLAY:-}" ] && [ -z "''${DISPLAY:-}" ]; then
-        exit 0
-      fi
-
       RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
       STATE_FILE="$RUNTIME_DIR/calendar-notified.cache"
       touch "$STATE_FILE"
@@ -58,15 +49,18 @@
             BODY="$BODY ($loc)"
           fi
 
-          notify-send \
+          # Record the event only when the toast was actually delivered: a
+          # failed send (no session bus, no notification daemon) must be retried
+          # on the next tick, not silently swallowed for the rest of the day.
+          if notify-send \
             --app-name="Calendar" \
             --urgency=normal \
             --icon="calendar-symbolic" \
             --category="appointment" \
             "$title" \
-            "$BODY" || true
-
-          echo "$EVENT_KEY" >> "$STATE_FILE"
+            "$BODY"; then
+            echo "$EVENT_KEY" >> "$STATE_FILE"
+          fi
         fi
       done
     '';
@@ -118,14 +112,25 @@ in {
   programs.vdirsyncer.enable = true;
 
   services.vdirsyncer = {
-    enable = syncEnabled;
+    enable = pkgs.stdenv.hostPlatform.isLinux;
     frequency = "*:0/15";
   };
 
-  systemd.user.services.calendar-notify = lib.mkIf syncEnabled {
+  # vdirsyncer's credentials are the Google OAuth client id/secret read out of the
+  # hand-made ~/.config/rclone/rclone.conf (see getGoogleClientId/Secret) — a file
+  # no Nix module declares, which is why this used to be a hostname list. A
+  # systemd condition is the declarative form of that dependency: the timer keeps
+  # ticking, the service is skipped where the file is absent (no red unit), and a
+  # host that later gains the file starts syncing with no config change.
+  systemd.user.services.vdirsyncer.Unit.ConditionPathExists = "%h/.config/rclone/rclone.conf";
+
+  # The notifier only exists on a generation that declares a session, and only
+  # runs where the sync that fills khal can work.
+  systemd.user.services.calendar-notify = lib.mkIf hasSession {
     Unit = {
       Description = "Google Calendar event notifier via libnotify/dms";
       After = ["graphical-session.target"];
+      ConditionPathExists = "%h/.config/rclone/rclone.conf";
     };
     Service = {
       Type = "oneshot";
@@ -133,7 +138,7 @@ in {
     };
   };
 
-  systemd.user.timers.calendar-notify = lib.mkIf syncEnabled {
+  systemd.user.timers.calendar-notify = lib.mkIf hasSession {
     Unit = {
       Description = "Check for upcoming calendar events every 5 minutes";
     };

@@ -214,6 +214,11 @@
     # handshake times out before the banner without this.
     "-o KexAlgorithms=curve25519-sha256"
     "-o ConnectTimeout=30"
+    # If the deck stops answering, end the hop instead of parking the outer
+    # session on a dead channel — the guest's keepalive handles the other
+    # direction, this one handles a silent peer.
+    "-o ServerAliveInterval=30"
+    "-o ServerAliveCountMax=3"
     "-i ${toString microvmGuest.sshHopKeyFile}"
     microvmGuest.sshHopTarget
   ];

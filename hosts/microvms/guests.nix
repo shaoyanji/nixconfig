@@ -387,7 +387,10 @@ in {
         # user therefore accepts either key, and neither is a password.
         services.openssh.extraConfig = lib.mkIf (slidesUser != null) ''
           Match User ${slidesUser}
-            ForceCommand ${pkgs.slides}/bin/slides ${deck}
+            # An absolute ceiling, because `slides` has no idle detection and a
+            # forgotten deck renders forever. Keepalive reaps a vanished client;
+            # this reaps a live one that was simply left open.
+            ForceCommand ${pkgs.coreutils}/bin/timeout 1800 ${pkgs.slides}/bin/slides ${deck}
             AuthorizedKeysFile %h/.ssh/authorized_keys /etc/ssh/authorized_keys.d/%u /etc/ssh/hop-auth/authorized_keys
             AllowTcpForwarding no
             AllowAgentForwarding no

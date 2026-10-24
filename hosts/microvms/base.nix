@@ -54,6 +54,13 @@
       PermitRootLogin = "yes";
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
+      # Reap sessions whose client is gone. TCPKeepAlive only notices a peer
+      # whose stack died; a client that detached, suspended, or was killed with
+      # the socket half-open leaves a login running forever — and under TCG that
+      # is expensive, not merely untidy. Interval 0 (the default) disables the
+      # probe entirely and makes ClientAliveCountMax inert.
+      ClientAliveInterval = 30;
+      ClientAliveCountMax = 3;
     };
   };
   users.users.root.openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;

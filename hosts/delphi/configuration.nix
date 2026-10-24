@@ -660,22 +660,30 @@ in {
     };
   };
 
-  # --- Stirling PDF, moved off frieren (tailnet only) ------------------------
-  # Stateless by design: no library to lose, which is why this one moves while
-  # paperless and immich stay where their data and their family users live.
-  # Same port as on frieren so the browser bookmark's path is the only change.
+  # --- Stirling PDF: the JVM lives in the sandbox guest, not on the host ------
+  # Native copy retired 2026-10-24. Heavy, stateless apps belong in the guest
+  # (hosts/microvms/guests.nix, `stirling = true`), which gives them a state
+  # volume and a restart that is a decision rather than a boot side effect.
+  # Running both meant two JVMs on one 2-core box: the guest's, plus this one,
+  # for a service that receives no traffic. The guest is the survivor and is
+  # served at /microvm/stirling/ (tailnet only).
+  #
+  # Kept disabled rather than deleted for posterity: this is the shape that ran
+  # natively 2026-10-21..24, and the reference for a host with no microvm layer.
   services.stirling-pdf = {
-    enable = true;
+    enable = false;
     environment = {
       SERVER_PORT = "7351";
       SECURITY_ENABLELOGIN = "false";
       JAVA_TOOL_OPTIONS = "-Xms128m -Xmx512m -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=50";
     };
   };
-  systemd.services.stirling-pdf.serviceConfig = {
-    MemoryHigh = "640M";
-    MemoryMax = "768M";
-  };
+  # Only meaningful when the native service is enabled; defining serviceConfig
+  # for a unit that does not exist would leave a bare unit behind at boot.
+  # systemd.services.stirling-pdf.serviceConfig = {
+  #   MemoryHigh = "640M";
+  #   MemoryMax = "768M";
+  # };
 
   # --- Tailnet-only HTTPS mounts, from ONE registry --------------------------
   # Each mount is a `tailscale serve` https front for a loopback listener; the
@@ -707,13 +715,17 @@ in {
         description = "POST /v1/systemone — the state+questions → answers envelope.";
         requires = ["systemone-decision-serve.service"];
       };
-      pdf = {
-        port = 8445;
-        upstream = "http://127.0.0.1:7351";
-        title = "Stirling PDF";
-        description = "PDF merge, split, OCR and conversion. Moved off frieren 2026-10-21; JVM warmup is ~60 s.";
-        requires = ["stirling-pdf.service"];
-      };
+      # 8445 retired with the native JVM (2026-10-24). Stirling is a guest
+      # service now; the mount would have to point off loopback, and the guest
+      # already has a first-class path of its own, generated from its module:
+      #   https://<tailnetHost>/microvm/stirling/
+      # pdf = {
+      #   port = 8445;
+      #   upstream = "http://127.0.0.1:7351";
+      #   title = "Stirling PDF";
+      #   description = "PDF merge, split, OCR and conversion. Guest-hosted since 2026-10-24; JVM warmup is ~60 s.";
+      #   requires = ["stirling-pdf.service"];
+      # };
       portal = {
         port = 8446;
         upstream = "http://127.0.0.1:8082";

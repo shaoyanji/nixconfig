@@ -25,6 +25,9 @@ quiet = false
 # failure in a non-interactive run.
 ["FiloSottile/age"]
 asset_filters = [".tar.gz", "^proof", "^sha256"]
+# The tarball carries age *and* age-keygen (plus plugin binaries that are noise
+# here). eget extracts one executable per asset, so on a fresh dir run
+# `eget FiloSottile/age --file age-keygen` once for the second.
 
 ["junegunn/fzf"]
 asset_filters = [".tar.gz"]

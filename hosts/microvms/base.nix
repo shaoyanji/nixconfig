@@ -29,6 +29,13 @@
   networking.hostName = hostName;
   system.stateVersion = "25.11";
 
+  # A guest is a box you work in, not an appliance: flakes, `nix-command` and the
+  # pipe operator are on, so `nix-shell -p cowsay` or `nix build` there needs
+  # neither `--extra-experimental-features` nor a wrapper. These guests do not
+  # import `modules/global/global.nix`, which is where the rest of the fleet gets
+  # them, so they have to declare them here.
+  nix.settings.experimental-features = ["nix-command" "flakes" "pipe-operators"];
+
   # Root, by key only. No normal user, no sudo, no home-manager: this guest is a
   # shell you throw away, not a workstation.
   services.openssh = {

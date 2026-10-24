@@ -86,8 +86,11 @@ def --env _load_all_secrets [force_refresh: bool = false] {
   mut collected = {}
 
   if ($sops_path != null and $has_sops) {
+    # GitHub deliberately has no shell variable: sops already renders the
+    # credential into gh's hosts.yml and nix's access-tokens (modules/sops.nix),
+    # and a second copy in the environment shadowed those files for anything
+    # that reads a token first. One owner, not two.
     let secrets_map = {
-      GITHUB_API_KEY:                "GITHUB.API.KEY"
       POP_FROM:                      "POP.FROM"
       POP_SIGNATURE:                 "POP.SIGNATURE"
       POP_SMTP_USERNAME:             "POP.SMTP.USERNAME"
@@ -151,7 +154,6 @@ def --env _load_all_secrets [force_refresh: bool = false] {
     let sops_nix_map = {
       GEMINI_API_KEY: $"($sops_nix_dir)/gemini/api/key",
       OPENMETEO_API_KEY: $"($sops_nix_dir)/openmeteo/api/key",
-      GITHUB_API_KEY: $"($sops_nix_dir)/ghsudo",
       NEOCITIES_API_KEY: $"($sops_nix_dir)/neocities",
       AWS_ACCESS_KEY_ID: $"($sops_nix_dir)/aws/access/key/id",
       AWS_SECRET_ACCESS_KEY: $"($sops_nix_dir)/aws/secret/access/key",

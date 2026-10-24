@@ -335,6 +335,13 @@ in {
           })
         ];
 
+        # The guest is a box you work in, not an appliance: flakes, `nix-command`
+        # and the pipe operator are on, so a `nix build` there needs neither
+        # `--extra-experimental-features` nor a `nix shell` wrapper. `base.nix` does
+        # not import `modules/global/global.nix`, which is where the rest of the
+        # fleet gets these, so the guest has to declare them itself.
+        nix.settings.experimental-features = ["nix-command" "flakes" "pipe-operators"];
+
         # TCG (cpu = "max") boots this guest in minutes, and systemd's 90 s device
         # timeout expires while udev is still coldplugging — the volumes then land
         # in emergency mode with "Timed out waiting for device

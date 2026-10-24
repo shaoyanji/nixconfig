@@ -64,6 +64,7 @@ in {
     ../../modules/services/aria2-daemon.nix
     ../../modules/services/harmonia.nix
     ../../modules/services/fleet-sentinel.nix
+    ../../modules/services/fleet-classification-gate.nix
     ../../modules/services/home-assistant.nix
     ../../modules/services/kiwix.nix
     ../../modules/services/paste.nix
@@ -93,12 +94,20 @@ in {
     watchUnits = [
       {unit = "nixos-upgrade.service";}
       {unit = "fleet-warm-cache.service";}
+      # Nightly classification drift: a failed run degrades this sentinel, so
+      # config that would fail its own gate is reported before the 04:00 deploy.
+      {unit = "fleet-classification-gate.service";}
       {unit = "restic-backups-frieren-local.service";}
       {unit = "restic-backups-frieren-burgernas.service";}
       {unit = "restic-drill.service";}
       {unit = "postgresqlBackup-immich.service";}
     ];
   };
+
+  # Nightly drift gate: evaluates the pushed flake's host configs (the same ref
+  # autoUpgrade installs) one host per process, so a broken assertion or a
+  # misclassified unit is in the sentinel before it is deployed.
+  services.fleetClassificationGate.enable = true;
 
   # Offload the weekly fleet cache-warm builds (and any local builds) to
   # nixbuild.net. Key: sops `nixbuild_ssh_key` → /root/.ssh/nixbuild

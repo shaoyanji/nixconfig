@@ -102,11 +102,14 @@ in {
               size = 1024;
             };
           };
-          # The deck: a guest account whose login is `slides`, reachable on the
-          # host's 2222. OCI's security list must also allow 2222 (console
-          # change, not declarable here — see .agents/deploy/hosts/delphi.md).
-          slidesUser = "slides";
-          exposeSsh = 2222;
+          # No deck here. `slidesUser` is a development facility — a forced
+          # command into a markdown deck — and this guest is a service tier: the
+          # deck accumulated one abandoned TUI per session and, under TCG, each
+          # one cost real host CPU. Set `slidesUser = "slides"` and
+          # `exposeSsh = 2222` to bring it back (OCI's security list must then
+          # also allow 2222 — a console change, see .agents/deploy/hosts/delphi.md).
+          # Admin access is the bridge: `ssh sandbox` on delphi, or
+          # `task microvm:ssh NAME=sandbox` from the repo.
         })
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with

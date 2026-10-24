@@ -10,8 +10,8 @@ Operator deploy activity means `infra:*` for host lifecycle flows.
 A card exists only where a host departs from the chain, and each one is listed
 here so no card is an orphan:
 
-- [`hosts/delphi.md`](hosts/delphi.md) — OCI Ampere A1 provisioning, the `sandbox`
-  microVM guest, and how the deck is reached (`ssh slides@delphi.bountystash.com`).
+- [`hosts/delphi.md`](hosts/delphi.md) — OCI Ampere A1 provisioning and the
+  `sandbox` microVM guest (`ssh sandbox` on delphi; the deck is off).
 - [`hosts/eisen.md`](hosts/eisen.md) — LLM stack operations; architecture and
   measurements are [`docs/eisen-llm-architecture.md`](../../docs/eisen-llm-architecture.md).
 - [`hosts/frieren.md`](hosts/frieren.md) — NAS self-upgrade topology and its traps.

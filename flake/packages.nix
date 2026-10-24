@@ -1,13 +1,6 @@
-# `packages.<system>` as a tree, not a bag: one namespace per kind of artifact.
-#
-#   sites.*      rendered HTML trees a vhost serves
-#   artifacts.*  compiled data (inventory, agent feed)
-#   servers.*    long-running services a host may install
-#   cli.*        borrowed commands, `nix run .#cli.<family>.<tool>` (flake/cli.nix)
-#
-# The CLI tree is imported rather than repeated here: `flake/cli.nix` is the one
-# table, and both `packages.cli` and `apps.cli` are projections of it, so a tool
-# cannot exist in one namespace and be missing from the other.
+# `packages.<system>` as a tree, not a bag: one namespace per kind of artifact —
+# sites, artifacts, servers, cli. The CLI tree is imported from flake/cli.nix, so
+# a tool cannot exist in one namespace and be missing from the other.
 {
   lib,
   systems,

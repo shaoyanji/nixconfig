@@ -1,20 +1,6 @@
-# Voice dictation: press the hotkey, speak, press it again, and the transcript
-# is typed into the focused window.
-#
-# Two things this profile owns that the shell script it replaces could not:
-#    #   1. The key is decrypted from the fleet's sops plane at use time, not read
-#      from a plaintext file in $HOME. The encrypted file is a store path (it is
-#      already in this flake), so the script carries no secret and the value
-#      never enters the nix store. Decryption needs an identity, which every
-#      host has: TPM-sealed on netbook, SSH-derived elsewhere.
-#   2. The body is a `writeShellApplication`, so shellcheck runs on it at build
-#      and the interpreter's inputs are the closure rather than whatever $PATH
-#      the niri session happened to inherit.
-#
-# The script decrypts once per cache window instead of once per keystroke: on
-# netbook the identity is unsealed from the TPM, and paying that on every
-# dictation would be worse than the transcription itself. The cache lives in
-# $XDG_RUNTIME_DIR (tmpfs, 0600, gone at logout), never on disk.
+# Voice dictation: press the hotkey, speak, press it again, and the transcript is
+# typed into the focused window; the key is decrypted from the sops plane once per
+# cache window (tmpfs, 0600) rather than once per keystroke.
 {
   config,
   lib,

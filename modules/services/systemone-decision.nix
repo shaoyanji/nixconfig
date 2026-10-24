@@ -89,6 +89,7 @@ in {
     # One process, one loopback port, no writes: the engine is pure computation,
     # so it is sandboxed harder than a service that owns state.
     systemd.services.systemone-decision-serve = lib.mkIf cfg.serve.enable {
+      unitConfig.X-Fleet-Role = "daemon";
       description = "System One decision envelope (/v1/systemone) on ${cfg.serve.host}:${toString cfg.serve.port}";
       wantedBy = ["multi-user.target"];
       # No `network-online`: a loopback listener needs no network state.

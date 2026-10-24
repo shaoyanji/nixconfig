@@ -796,6 +796,7 @@ in {
   # Offloads batch vector embeddings from Frieren (15W quad-core NAS) to Eisen
   # (12-core Xeon workstation) via Wake-on-LAN without LLM assistance.
   # Runs at 02:00 on the 1st of the month, well clear of the 03:00-05:30 backup window.
+  # A timer-driven oneshot, not a daemon: it has no crash-loop class to declare.
   systemd.services.qmd-eisen-embed-sync = {
     description = "Monthly QMD vector embedding synchronization to Eisen via WoL";
     after = ["network-online.target"];

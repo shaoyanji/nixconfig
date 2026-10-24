@@ -250,6 +250,7 @@ in {
 
     # --- The speech server ---------------------------------------------------
     systemd.services.qwen-tts = {
+      unitConfig.X-Fleet-Role = "daemon";
       description = "Qwen3-TTS speech server (OpenAI-compatible)";
       after = [
         "qwen-tts-models-talker.service"

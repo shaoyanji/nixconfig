@@ -54,6 +54,7 @@ in {
     ];
 
     systemd.services.smp-server = {
+      unitConfig.X-Fleet-Role = "daemon";
       description = "SimpleX SMP Server";
       wantedBy = ["multi-user.target"];
       after = ["network-online.target"];

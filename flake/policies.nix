@@ -22,6 +22,80 @@
   taskfiles = filesWithSuffix "taskfiles" ".yml";
   shellScripts = filesWithSuffix "scripts/task" ".sh";
 
+  # Every .nix under a directory, repo-relative. The systemd policies read the
+  # modules that DECLARE units, which is a directory walk, not a top-level list.
+  nixUnder = dir: let
+    walk = d: let
+      entries = builtins.readDir (root + "/${d}");
+    in
+      lib.concatMap (n: let
+        rel =
+          if d == "."
+          then n
+          else "${d}/${n}";
+      in
+        if entries.${n} == "directory"
+        then walk rel
+        else lib.optional (lib.hasSuffix ".nix" n) rel)
+      (builtins.attrNames entries);
+  in
+    walk dir;
+
+  # `systemd.services.<name> = …` blocks: from a declaration line to the next one,
+  # so a `Restart` cannot borrow a neighbouring unit's classification.
+  # A unit's attrset extent: from its declaration through the first following
+  # non-comment line indented no deeper than the declaration itself. Indentation,
+  # not "next declaration", because a partial override
+  # (`systemd.services.<n>.serviceConfig = …`) and a block with no sibling after it
+  # both otherwise swallow unrelated lines and report a `Restart` that belongs to
+  # another unit — a false positive, which is worse than no gate.
+  indentOf = l: builtins.stringLength (builtins.head (builtins.match "([[:space:]]*).*" l));
+  serviceBlocks = p: let
+    lines = lib.splitString "\n" (read p);
+    isStart = l: builtins.match "[[:space:]]*systemd\\.services\\.[A-Za-z0-9_.-]+ *=.*" l != null;
+    isComment = l: builtins.match "[[:space:]]*#.*" l != null;
+    isBlank = l: builtins.match "[[:space:]]*" l != null;
+    indices = lib.range 0 (builtins.length lines - 1);
+    starts = builtins.filter (i: isStart (builtins.elemAt lines i)) indices;
+    endOf = i: let
+      at = builtins.elemAt lines i;
+      sibling =
+        builtins.filter (
+          j: j > i && !(isBlank (builtins.elemAt lines j)) && !(isComment (builtins.elemAt lines j)) && indentOf (builtins.elemAt lines j) <= indentOf at
+        )
+        indices;
+    in
+      if sibling == []
+      then builtins.length lines
+      else builtins.head sibling + 1;
+  in
+    if lines == []
+    then []
+    else map (i: lib.concatStringsSep "\n" (lib.sublist i (endOf i - i) lines)) starts;
+
+  # Modules that declare systemd units are exactly the ones a hostname list may
+  # not gate: a host file naming itself is that host's config, a shared module
+  # naming hosts is a capability nobody declared.
+  unitModules = builtins.filter (
+    p:
+      lib.hasInfix "systemd.services" (read p)
+      || lib.hasInfix "systemd.user.services" (read p)
+  ) (nixUnder "modules");
+  hostnameGatedUnitModules =
+    builtins.filter (
+      p:
+        anyLine p (l: builtins.match ".*builtins\\.elem hostName.*" l != null)
+        || anyLine p (l: builtins.match ".*hostName ==.*" l != null)
+    )
+    unitModules;
+  unclassifiedDaemons =
+    lib.concatMap (
+      p:
+        map (b: "${p}: ${lib.removeSuffix "\n" (builtins.head (lib.splitString "\n" b))}")
+        (builtins.filter (b: lib.hasInfix "Restart" b && !(lib.hasInfix "X-Fleet-Role" b)) (serviceBlocks p))
+    )
+    (builtins.filter (p: builtins.pathExists (root + "/${p}")) (nixUnder "modules" ++ nixUnder "hosts"));
+
   # The normative documents: the ones allowed to state a rule. Skills are
   # procedure, deliberately out of scope (`.agents/SCHEMA.md` §4).
   normativeDocs = builtins.filter (d: builtins.pathExists (root + "/${d}")) [
@@ -251,6 +325,27 @@
       proof = "hosts/*/configuration.nix that both import base-desktop-environment and force niri off";
       holds = halfForked == [];
       detail = "half-forked hosts: ${lib.concatStringsSep ", " halfForked}";
+    };
+
+    systemd-units-are-capability-gated = {
+      rule = "A systemd unit, timer or enable is gated by a declared capability, a systemd `Condition*`, or not at all — never by a hostname list and never by a runtime environment probe inside the unit's script. A hostname list is a capability nobody declared, so the config cannot say where a unit runs and the unit exists on hosts where it can only fail; a runtime probe makes the unit look healthy while doing nothing.";
+      proof = "modules/*.nix that declare systemd units, scanned for hostname gates; modules/user/desktop/niri.nix (the session capability's activation half); modules/calendar.nix (no WAYLAND_DISPLAY probe)";
+      holds =
+        hostnameGatedUnitModules
+        == []
+        && has "modules/user/desktop/niri.nix" "graphical-session.target"
+        && has "modules/user/desktop/niri.nix" "import-environment"
+        && has "modules/calendar.nix" "ConditionPathExists"
+        && !(has "modules/calendar.nix" "WAYLAND_DISPLAY")
+        && has "modules/systemd-policy.nix" "userUnitViolations";
+      detail = "hostname-gated unit modules: ${lib.concatStringsSep ", " hostnameGatedUnitModules}; session wiring or the calendar gate is missing";
+    };
+
+    systemd-daemons-declare-their-class = {
+      rule = "A system systemd service this tree declares states its crash-loop class where it is declared: `unitConfig.X-Fleet-Role = \"daemon\"` (must come back: Restart set and never retirable by systemd's start limit) or `\"bounded\"` (retiring is the point, so it carries an explicit StartLimitBurst). nixpkgs' own units are upstream's policy and carry no marker; a `Restart=` block without a role is a unit whose behaviour nobody decided, and the gate in modules/systemd-policy.nix enforces the class it names.";
+      proof = "systemd.services blocks in modules/ and hosts/ that set Restart; lib/systemd-policy.nix markedSystemViolations";
+      holds = unclassifiedDaemons == [];
+      detail = "system services with Restart and no X-Fleet-Role:\n    ${lib.concatStringsSep "\n    " unclassifiedDaemons}";
     };
 
     root-markdown-closed = {

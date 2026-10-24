@@ -7,13 +7,15 @@ _: {
     enableBashIntegration = true;
     enableNushellIntegration = true;
 
-    # Plain http on the LAN: the payload is shell history, the alternative is
-    # certificate plumbing for a name only this network resolves. Sync is
-    # opportunistic — with no session file atuin stays local-only and offline,
-    # so a fresh host still opens its own history.
+    # The tailnet address, not atuin.frieren.lan: the .lan names only resolve on
+    # hosts pointed at frieren's resolver, and a laptop that is off the LAN still
+    # syncs fine over tailscale. Plain http because the payload is shell history
+    # and the alternative is certificate plumbing for one host. Sync is
+    # opportunistic — with no session file atuin stays local-only and offline, so
+    # a fresh host still opens its own history.
     settings = {
       auto_sync = true;
-      sync_address = "http://atuin.frieren.lan";
+      sync_address = "http://100.97.61.65";
       sync_frequency = "5m";
       update_check = false;
       search_mode = "fuzzy";

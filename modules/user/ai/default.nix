@@ -7,11 +7,20 @@
 }: let
   hostName = osConfig.networking.hostName or (config.networking.hostName or "");
 
-  # By default, only the central mainframe (frieren), AI/compute workstation (eisen),
-  # and flagship workstation (poseidon) receive the heavy multi-agent suite.
-  # Lightweight mobile laptops (aristotle, fern) and other clients default to "light".
+  # Which hosts get the heavy multi-agent suite is a trait a host DECLARES in
+  # inventory.toml (`ai-full`), not a list of names kept here: two workstations and
+  # the mainframe had to be remembered in three different modules. A host promoted
+  # to full tooling now states it once, next to the hardware that justifies it.
+  invHost =
+    if hostName != ""
+    then (osConfig.fleet.inventory.hosts.${hostName} or (config.fleet.inventory.hosts.${hostName} or null))
+    else null;
+  traits =
+    if invHost == null
+    then []
+    else (invHost.software.traits or []);
   defaultTier =
-    if builtins.elem hostName ["frieren" "eisen" "poseidon"]
+    if builtins.elem "ai-full" traits
     then "full"
     else "light";
 in {

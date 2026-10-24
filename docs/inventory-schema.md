@@ -48,6 +48,13 @@ reads `hosts.<h>.network.mac` from the compiled artifact.
 | `[hosts.<name>.hardware]` | `model`, `cpu`, `gpu`, `ram`, `display`, `battery`, `storage_type`, `storage_layout` |
 | `[hosts.<name>.network]` | `lan_ip`, `mac`, `tailscale_ip`, `tailscale_hostname`, `ssh_alias`, `domain`, `gemini_url`, `gopher_url`, `tailscale` |
 | `[hosts.<name>.software]` | `module_chain`, `impermanence`, `key_services`, `traits` |
+
+`software.traits` is the vocabulary shared modules read instead of keeping
+hostname lists [[flake/policies.nix#capabilities-are-traits-not-names]]. A module
+keys on a trait (`ai-full`, `dev-full`, `gpu-low`, `gpu-high`, `small-screen`,
+`tpm-identity`) or on `category` (`cloud`, `laptop`, `workstation`); promotion to a
+fuller toolchain or a different GPU tier is therefore an edit to one host's
+inventory entry, not to the module that consumes it.
 | `[hosts.<name>.persona]` | `title`, `system_prompt_hint`, `compute_tier`, `allowed_tasks`, `constraints` |
 
 Everything except `kind`, `arch` and `status` is optional with an empty default,

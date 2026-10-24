@@ -63,7 +63,7 @@ ssh_alias = "frieren"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Harmonia (LAN binary cache on :5000)", "Paperless-ngx (:28981, data /srv/data/paperless)", "Hermes Agent & Gateway (user systemd service)", "Home Assistant (:8123) + Mosquitto MQTT", "Kiwix Serve (declarative ZIMs :8088 -> wiki.frieren.lan)", "Immich Photo Server & ML backend", "Jellyfin Media Server (:8096)", "Plex Media Server", "Aria2 RPC daemon (:6801 + AriaNg web)", "Paste (pb server at paste.frieren.lan)", "Vaultwarden", "Uptime Kuma", "iVentoy PXE server", "Samba & NFS export (/srv/data)", "Syncthing"]
-traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter", "dell-dock"]
+traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter", "dell-dock", "ai-full", "tpm-identity"]
 
 [hosts.frieren.persona]
 title = "Fleet Mainframe & Storage Steward"
@@ -224,7 +224,7 @@ ssh_alias = "poseidon"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Niri Wayland Compositor", "DankMaterialShell Greeter", "Steam (full gaming suite)", "Ollama (CUDA acceleration with lfm2.5)", "NVIDIA proprietary drivers (open kernel module)", "NAS client automount"]
-traits = ["flagship-workstation", "cuda-compute", "laptop-profile", "optimus-prime", "dual-gpu", "niri-desktop", "steam-gaming"]
+traits = ["flagship-workstation", "cuda-compute", "laptop-profile", "optimus-prime", "dual-gpu", "niri-desktop", "steam-gaming", "ai-full", "dev-full", "tpm-identity"]
 
 [hosts.poseidon.persona]
 title = "Flagship Laptop Workstation Architect"
@@ -302,7 +302,7 @@ mac = "00:e0:22:1c:bb:ed"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Niri Wayland Desktop + DMS Greeter", "Steam (gamescope-session)", "Sunshine GameStream server (Moonlight LAN host)", "RX 5700 VCN 2.0 hardware video encode", "NAS client automount", "llama-swap model router on :8080 (OpenAI /v1 via nginx on eisen.lan:80 and tailscale serve; model 'qwen' = qwen3.6-35b-a3b)", "Qwen3.6-35B-A3B on Vulkan/radv llama.cpp with DFlash2 speculative decoding (+40% decode, measured) and expert tensors kept in CPU RAM", "llama-swap-gaming-guard: suspends the LLM while a Steam game runs, freeing ~21 GiB RAM + 5.4 GiB VRAM, and resumes on exit", "Kolibri-1 (78B A3B, German/English) weights staged at /mnt/storage/models but not loadable: stock llama.cpp lacks the kolibri1 architecture", "Laya decision model (421M, CPU-only) on 127.0.0.1:8090 behind nginx on laya.lan:80 and tailscale serve :8443, exposing the Jev-compatible POST /v1/systemone (choice/score/noul) — holds no VRAM, so it keeps answering while a game runs"]
-traits = ["12-core-24-thread", "64gb-ram", "amd-gpu", "sunshine-streaming", "steam-gaming", "llm-inference", "llm-model-router", "moe-expert-offload", "speculative-decoding", "game-aware-yield", "vulkan-compute", "decision-model", "jev-compatible", "cpu-inference"]
+traits = ["12-core-24-thread", "64gb-ram", "amd-gpu", "sunshine-streaming", "steam-gaming", "llm-inference", "llm-model-router", "moe-expert-offload", "speculative-decoding", "game-aware-yield", "vulkan-compute", "decision-model", "jev-compatible", "cpu-inference", "ai-full", "dev-full"]
 
 [hosts.eisen.persona]
 title = "High-Core Gaming, Streaming, LLM & Decision-Model Host"
@@ -502,7 +502,7 @@ ssh_alias = "ares"
 module_chain = "containers + impermanence"
 impermanence = true
 key_services = ["greetd autologin to gamescope-session (steam -gamepadui)", "Impermanence (/persist subvolume)", "NVIDIA legacy_580 driver with DRM KMS"]
-traits = ["kiosk-only", "no-de", "impermanence", "ephemeral-root", "kepler-gpu"]
+traits = ["kiosk-only", "no-de", "impermanence", "ephemeral-root", "kepler-gpu", "dev-full", "gpu-high"]
 
 [hosts.ares.persona]
 title = "Impermanent Arcade & Steam Kiosk (Preserved)"
@@ -625,7 +625,7 @@ ssh_alias = "fern"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "Dell D6000 Dock (DisplayLink / EVDI)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NAS client automount (/Volumes/data from frieren)", "NO Steam (deliberately omitted)"]
-traits = ["battery-optimized", "lightweight-desktop", "no-steam", "laptop-profile", "btrfs", "dell-dock"]
+traits = ["battery-optimized", "lightweight-desktop", "no-steam", "laptop-profile", "btrfs", "dell-dock", "tpm-identity"]
 
 [hosts.fern.persona]
 title = "Portable Field Operative"
@@ -663,7 +663,7 @@ ssh_alias = "scratch"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["dwl Wayland desktop (greetd autologin, tuigreet greeter)", "zram 100% swap (zero disk swap)", "tmpfs mounts for /var/log, /tmp, /var/tmp, /var/cache, ~/.cache", "volatile journald (RAM only, core dumps disabled)", "weekly fstrim + noatime"]
-traits = ["strict-io-diet", "f2fs", "legacy-bios", "zram-100", "tmpfs-caches", "suckless-dwl"]
+traits = ["strict-io-diet", "f2fs", "legacy-bios", "zram-100", "tmpfs-caches", "suckless-dwl", "small-screen", "tpm-identity"]
 
 [hosts.scratch.persona]
 title = "I/O Diet Minimalist & RAM-First Steward"
@@ -737,7 +737,7 @@ ssh_alias = "netbook"
 module_chain = "Own configuration only (no global chain), fleet nixpkgs"
 impermanence = false
 key_services = ["Niri Compositor", "greetd", "Pipewire", "NFS client automount"]
-traits = ["alice-user", "celeron-n3060", "fleet-nixpkgs", "scripted-initrd", "f2fs", "ultra-low-spec"]
+traits = ["alice-user", "celeron-n3060", "fleet-nixpkgs", "scripted-initrd", "f2fs", "ultra-low-spec", "gpu-low"]
 
 [hosts.netbook.persona]
 title = "Alice's Travel Companion"

@@ -1,19 +1,5 @@
-# fleet-classification-gate — the nightly systemd classification drift sweep.
-#
-# WHY ONE SYSTEMD UNIT PER HOST instead of one command that walks the fleet: the
-# expensive half of this gate is EVALUATION, and `nix build --max-jobs 1` serialises
-# builds, not evaluation. Building `fleetChecks` in one process forces every active
-# host's config in one evaluator — measured 2026-10-24 at 5122.9 MiB peak against
-# 2358.9 MiB for the same twelve hosts dispatched one per process. That is the
-# banned shape (a fleet eval in one process), so the schedule is generated as units
-# instead: systemd starts one check per host, `After=` chains them so exactly one
-# evaluator is alive at a time, and each failure lands on a named unit.
-#
-# What a host is gated on is the flake output `fleetHostChecks.<system>.<host>` —
-# the same three-line echo `task checks:host` builds, but with THIS machine's pkgs,
-# so delphi and kali (aarch64) are gated from an x86_64 NAS: their configuration is
-# evaluated, never built. A nightly pass warms nothing and proves exactly what the
-# interactive gate proves.
+# fleet-classification-gate — nightly drift sweep: one generated unit per host.
+# --max-jobs 1 serialises builds, not evaluation, so one unit per host bounds memory.
 {
   config,
   lib,

@@ -13,12 +13,16 @@
     then (osConfig.fleet.inventory.hosts.${hostName} or (config.fleet.inventory.hosts.${hostName} or null))
     else null;
   category = invHost.category or "";
+  traits =
+    if invHost == null
+    then []
+    else (invHost.software.traits or []);
 
-  # Workstations (eisen, poseidon, scratch) get the full heavy developer toolchain.
-  # Mobile laptops (aristotle, fern, netbook) default to "light" to keep closures small
-  # and avoid pulling LLVM/Clang (nixd 588MB) or devenv (864MB) onto 15W CPUs and 8GB RAM.
+  # The heavy developer toolchain (LLVM/Clang via nixd, devenv) is a declared trait:
+  # `dev-full` in inventory.toml, plus every host whose category is `workstation`.
+  # Mobile laptops default to "light" so a 15W CPU and 8GB RAM do not pay for it.
   defaultTier =
-    if builtins.elem hostName ["eisen" "poseidon" "ares"] || category == "workstation"
+    if builtins.elem "dev-full" traits || category == "workstation"
     then "full"
     else "light";
 in {

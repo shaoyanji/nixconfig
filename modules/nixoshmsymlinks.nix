@@ -8,18 +8,20 @@
 }: let
   nixNAS = "/Volumes/data";
   hostName = fleetHost;
-  # Cloud and remote hosts without local NAS access must not inherit broken symlinks
-  noSymlinkHosts = [
-    "delphi"
-    "garnixMachine"
-  ];
+  invHost =
+    if hostName != ""
+    then (osConfig.fleet.inventory.hosts.${hostName} or (config.fleet.inventory.hosts.${hostName} or null))
+    else null;
+  # A cloud host has no NAS to link into, so it must not inherit /Volumes/data
+  # symlinks that resolve to nothing. That is the declared category, not a name list.
+  hasNas = (invHost.category or "") != "cloud";
   cfg = config.nixoshmsymlinks;
 in {
   options.nixoshmsymlinks = {
     enable =
       lib.mkEnableOption "NAS-backed home directory symlinks"
       // {
-        default = !(builtins.elem hostName noSymlinkHosts);
+        default = hasNas;
       };
   };
 

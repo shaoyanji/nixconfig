@@ -9,8 +9,29 @@ figure was the shape ceiling, not what was created), aarch64-linux, 200 GB parav
 boot volume on `/dev/sda` (GPT/UEFI, confirmed by `lsblk`).
 Reached as `ubuntu@92.5.115.103` pre-install, `devji@92.5.115.103` after.
 
-Three jobs: **webserver** (nginx + `/healthz`), **hermes agent** (CLI + gateway,
-own Telegram bot), **tailnet resolver** (crab-hole on the shared `10.99.0.53`).
+Four jobs: **webserver** (nginx + `/healthz`), **hermes agent** (CLI + gateway,
+own Telegram bot), **tailnet resolver** (crab-hole on the shared `10.99.0.53`), and
+the **`sandbox` microVM guest** that `/microvm/*` and the deck are served from.
+
+## Guest layer — the `sandbox` microVM
+
+Declared in `hosts/microvms/guests.nix`; rationale and the traps that shaped it are
+in the `AGENTS.nix` note `microvm-guests` (`task ops:notes:show ID=microvm-guests`).
+
+| What | From a workstation | From delphi |
+| :--- | :--- | :--- |
+| Terminal deck (`slides`) | `ssh slides@delphi.bountystash.com` | `task microvm:ssh NAME=slides` |
+| Guest root shell | not reachable (bridge is host-local) | `task microvm:ssh NAME=sandbox` |
+| Deck over the tailnet | `ssh -p 2222 slides@delphi.cloudforest-kardashev.ts.net` | — |
+
+`ssh delphi.bountystash.com` is the **host** shell as `devji`, not the deck. The deck
+is chosen by the account: `slides` exists on the host only as a forced command that
+hops into the guest, and the guest's own forced command runs `pkgs.slides` over
+`hosts/microvms/slideshow.md`. `sandbox` resolves only from delphi because
+`192.168.83.0/24` is host-local.
+
+HTTP lives in the guest too: `/microvm/one/` and `/microvm/two/` (busybox stubs) on
+both hostnames, `/microvm/stirling/` on the tailnet only (public answers 302).
 
 ## Phase 0 — facts first (measured 2026-10-20)
 

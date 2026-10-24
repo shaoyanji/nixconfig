@@ -214,7 +214,7 @@
       refs = {
         hosts = ["frieren" "delphi"];
         modules = ["hosts/microvms/base.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix" "hosts/delphi/configuration.nix"];
-        tasks = ["microvm:list" "microvm:start" "microvm:stop" "microvm:ssh"];
+        tasks = ["microvm:list" "microvm:start" "microvm:stop" "microvm:ssh" "vm:canary:run" "vm:canary:test"];
         docs = ["hosts/microvms/README.md"];
       };
       body = ''
@@ -226,28 +226,28 @@
         service tier — `autostart = true`, 4096 MiB, two stub httpd units, Stirling PDF — because a
         reboot should bring back what the vhost serves.
 
-        State is a named volume, never a bind mount into the host's /var.
-        `persist = { hermes = {}; stirling = { size = 4096; }; }` is one ext4 image per name at
-        `<stateRoot>/sandbox/volumes/<name>.img`, mkfs'd on first start, mounted at /var/lib/<name>
-        and found by **label** (enumeration order is not identity). The guest owns the filesystem,
-        so a service keeps its own uid and `StateDirectory` just works.
+        State is a named volume, never a bind mount: `persist = { stirling = { size = 4096; }; }`
+        mkfs's one ext4 image per name under `<stateRoot>/sandbox/volumes/` and finds it by **label**
+        (enumeration order is not identity), so the guest owns the filesystem and its own uids.
 
         TCG is why the guest needed a wider device timeout: systemd's 90 s expired before udev
-        published the virtio-blk labels and the boot fell into emergency mode.
-        `DefaultDeviceTimeoutSec = 600` there; KVM hosts untouched.
+        published the virtio-blk labels. `DefaultDeviceTimeoutSec = 600` there; KVM untouched.
 
-        The deck is one account, not a shell: `slides` gets a forced command to `pkgs.slides`
-        (hosts/microvms/slideshow.md) with forwarding, agent forwarding, X11 and tunnels off,
-        reached through a host-side `systemd-socket-proxyd` on 2222 → 192.168.83.11:22. The guest
-        gains no inbound path of its own.
+        How to get in — the account selects the deck, never the hostname:
+        `ssh slides@delphi.bountystash.com` from a workstation, `ssh -p 2222 slides@<tailnet>`, or
+        `task microvm:ssh NAME=slides|sandbox` from delphi itself. Plain
+        `ssh delphi.bountystash.com` is the HOST shell as `devji`; `sandbox` resolves only on delphi
+        because the bridge subnet is host-local.
 
-        Public ssh reuses 22 instead of asking the tenancy for 2222: a host account `slides`
-        whose whole login is `ssh -tt` into the guest's forced command. Three things only the
-        live host taught: `AuthorizedKeysFile` REPLACES the default, so the keys NixOS writes to
-        `/etc/ssh/authorized_keys.d/%u` must be named back; StrictModes refuses a keys file whose
-        path is not root-owned, and `/var/lib/microvms` belongs to the runner, so the hop's public
-        half lives in `/srv/microvm/hop-auth`; and a fleet cert's principal is the user name, so
-        this account needs `AuthorizedPrincipalsFile` listing `devji` (no wildcards there).
+        Public ssh reuses 22 instead of asking the tenancy for 2222: a host account `slides` whose
+        whole login is `ssh -tt` into the guest's forced command (`pkgs.slides` over
+        hosts/microvms/slideshow.md), forwarding/X11/tunnels off, via a host-side
+        `systemd-socket-proxyd` on 2222 → 192.168.83.11:22; the guest gains no inbound path.
+        Three things only the live host taught: `AuthorizedKeysFile` REPLACES the default, so the
+        keys NixOS writes to `/etc/ssh/authorized_keys.d/%u` must be named back; StrictModes refuses
+        a keys file whose path is not root-owned, so the hop's public half lives in
+        `/srv/microvm/hop-auth`; and a fleet cert's principal is the user name, so the account needs
+        `AuthorizedPrincipalsFile` listing `devji`.
       '';
     };
     arch-shape = {

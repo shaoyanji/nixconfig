@@ -1,8 +1,6 @@
-# Atuin history server: one sync target for every shell that runs atuin, so
-# history follows the user instead of living in a different sqlite file on each
-# host. nixpkgs ships the server (`atuin-server start`) and its postgres wiring,
-# so this module is the deployment: loopback listener, nginx in front, no
-# second firewall hole.
+# Atuin history server: one sync target for every shell that runs atuin. nixpkgs
+# ships the server and its postgres wiring; this module is the deployment —
+# loopback listener, nginx in front, no second firewall hole.
 {
   config,
   lib,

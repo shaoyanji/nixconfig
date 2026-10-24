@@ -1,20 +1,16 @@
-# atuin on every host, pointed at the one server. Bash and nushell both get the
-# Ctrl-R UI from here, so every host and shell searches one history as long as it
-# has run `atuin login` once — user `devji`, password and key under `atuin` in
-# modules/secrets/secrets.yaml, then `atuin import bash` / `atuin import nu-hist-db`
-# for the history that predates the account.
+# atuin on every host, pointed at the one server: bash and nushell both get the
+# Ctrl-R UI, so a shell searches one history. Credentials live under `atuin` in
+# modules/secrets/secrets.yaml; `atuin import` seeds history that predates it.
 _: {
   programs.atuin = {
     enable = true;
     enableBashIntegration = true;
     enableNushellIntegration = true;
 
-    # The tailnet address, not atuin.frieren.lan: the .lan names only resolve on
-    # hosts pointed at frieren's resolver, and a laptop that is off the LAN still
-    # syncs fine over tailscale. Plain http because the payload is shell history
-    # and the alternative is certificate plumbing for one host. Sync is
-    # opportunistic — with no session file atuin stays local-only and offline, so
-    # a fresh host still opens its own history.
+    # The tailnet address, not atuin.frieren.lan: the .lan names only resolve
+    # against frieren's resolver, while tailscale works off the LAN. Plain http
+    # because the payload is shell history and the alternative is certificate
+    # plumbing; with no session file atuin stays local-only and offline.
     settings = {
       auto_sync = true;
       sync_address = "http://100.97.61.65";

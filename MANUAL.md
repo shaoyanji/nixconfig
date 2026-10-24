@@ -82,6 +82,7 @@
 | iVentoy (PXE/ISO) | `iventoy` | 26000, 10809 | `pxe.frieren.lan`* |
 | Vaultwarden | `vaultwarden` | 8222 loopback | `vault.frieren.lan`* |
 | SimpleX SMP relay | `smp-server` | 5223/5225/5226 | inter-agent messaging |
+| Atuin history sync | `atuin` | 8888 loopback | `atuin.frieren.lan`*; one account, sign-ups closed [[flake/policies.nix#history-sync-is-one-server]] |
 | Ollama | `ollama` | 11434 | local inference (if enabled) |
 | LLM decision router | `llm-decision-router` | 8080-ish | `eisen` upstream, not on frieren |
 | Antigravity remote control | `antigravity-cli-daemon` (user) | — | 24/7 remote operator |

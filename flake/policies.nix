@@ -207,6 +207,20 @@
   in
     builtins.filter (k: k != null) (map plainKey body);
 
+  # The library's release table, read as data: a row that lands in an arch dir
+  # without a pin downloads whichever asset eget feels like.
+  library = import (root + "/tools/library.nix");
+  unpinnedRows =
+    lib.concatMap (
+      name: let
+        t = library.tools.${name};
+        archDirs = builtins.filter (d: d != "appimages") t.dirs;
+        missing = builtins.filter (d: !(t ? pick) || !(builtins.hasAttr d t.pick)) archDirs;
+      in
+        map (d: "${name}/${d}") missing
+    )
+    (builtins.attrNames library.tools);
+
   sopsFiles = [
     "modules/secrets.yaml"
     "modules/ssh-ca-key.yaml"
@@ -720,6 +734,40 @@
         && has "hosts/frieren/infra-stack.nix" ''dirs="bin-x86 bin-aarch64 bin-script appimages"''
         && has "hosts/frieren/infra-stack.nix" "--exclude '.rejected'";
       detail = "the NAS mirror lost a directory, kept rejected downloads, or stopped deleting removed files";
+    };
+
+    library-table-generated = {
+      rule = "The release-built library is one table in `tools/library.nix`, rendered by `task data:library:update` into `library-fetch.sh` calls. No TOML, eget config or hand-written download line is tracked, and no second fetcher pushes the library on its own schedule — the NAS copy is the scheduled mirror.";
+      proof = "tools/library.nix · taskfiles/data.yml";
+      holds =
+        filesWithSuffix "tools" ".toml" == []
+        && has "taskfiles/data.yml" "tools/library.nix"
+        && has "tools/library.nix" "library-fetch.sh";
+      detail = "a TOML or a second fetcher is back under tools/, or the library task stopped rendering the table";
+    };
+
+    library-row-pins-its-arch = {
+      rule = "Every library row names the substring that pins its asset per dir (`pick`), because eget does not filter by architecture: an aarch64 host fetched `starship-x86_64` once the arm token was missing, which is a binary the NAS can only fail to exec.";
+      proof = "tools/library.nix rows that land in bin-aarch64/bin-x86";
+      holds = unpinnedRows == [];
+      detail = "rows with no pin for an arch dir: ${lib.concatStringsSep ", " unpinnedRows}";
+    };
+
+    history-sync-is-one-server = {
+      rule = "Shell history syncs to the one atuin server this tree declares, and that server stops accepting sign-ups once the account exists — an open registration on a history database is an account anyone who reaches the vhost can create.";
+      proof = "modules/shell/atuin.nix · modules/services/atuin-server.nix · hosts/frieren/configuration.nix";
+      holds =
+        !(has "hosts/frieren/configuration.nix" "openRegistration = true")
+        && has "modules/services/atuin-server.nix" "openRegistration"
+        && !(has "modules/shell/atuin.nix" "api.atuin.sh");
+      detail = "registration is open again, the server lost the option, or a client points at the public service";
+    };
+
+    one-history-widget = {
+      rule = "Ctrl-R has one owner: with atuin enabled, fzf's history widget is disabled, so the key that searches history searches the synced history instead of whichever host's local file fzf found.";
+      proof = "modules/shell/default.nix";
+      holds = has "modules/shell/default.nix" ''fzf.historyWidget.command = ""'';
+      detail = "fzf took Ctrl-R back from atuin";
     };
 
     pipe-operators-declared = {

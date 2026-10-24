@@ -49,6 +49,10 @@ Better still: `inventory.toml` is compiled by `lib/inventory.nix` — read it wi
   `boot.loader.*`.
 - **The user is a constant**: import `modules/global/user.nix`; do not hardcode a
   path or the login name.
+- **Two modules on one key is a build error, not a merge**: home-manager
+  asserts when fzf and atuin both bind Ctrl-R, and the message only appears at
+  evaluation of the affected host's system. Pick the owner in the same module
+  that enables the second one [[flake/policies.nix#one-history-widget]].
 - **A file header is one line** [[flake/policies.nix#nix-header-budget]].
 
 ## Build-budget traps

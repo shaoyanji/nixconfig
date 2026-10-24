@@ -94,6 +94,11 @@
       # for a host that needs the persona, not the repo.
       PERSONA_STORE="${./hermes-persona}"
 
+      # Personas are per-host. The activation script runs under `set -u`, so the
+      # name has to come from somewhere: `uname -n` always exists, while nothing
+      # exports HOST_NAME into an activation sandbox.
+      HOST_NAME="$(uname -n | cut -d. -f1)"
+
       # Clean up misplaced files in $HOME from earlier experiments
       for f in SOUL.md USER.md MEMORY.md config.yaml; do
         if [ -L "$HOME/$f" ]; then

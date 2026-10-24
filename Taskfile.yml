@@ -173,7 +173,7 @@ tasks:
 
               DOCS  (pages + site nav generated from the compiled metadata)
                 task docs:build                markdown + nav from .#artifacts.docs         store path only
-                task docs:site                 rendered site (Nix-native)          result-docsite/
+                task docs:site                 rendered site (Nix-native)          store path
 
               OBSERVE / CONTEXT  (live system + compiled knowledge)
                 task ops:health                sentinel verdict, exit 1 when degraded

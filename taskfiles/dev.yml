@@ -598,11 +598,13 @@ tasks:
     summary: >
       The site is a Nix-native hypermedia tree (lib/aki-site.nix): it renders the
       compiled registry, the knowledge graph (which now includes .agents/** and
-      taskfiles/*.md as document nodes) and the generated doc pages. Result
-      linked at ./result-docsite. There is no Python phase — the markdown
-      renderer that used to live in docs-site/ is retired.
+      taskfiles/*.md as document nodes) and the generated doc pages. Prints the
+      store path; it does NOT create a ./result-docsite symlink — build artifacts
+      in the checkout are what `result`/`result-*` used to be. There is no Python
+      phase — the markdown renderer that lived in docs-site/ is retired. Exit 1 on
+      a build failure.
     cmds:
-      - nix build .#sites.fleet-docs-site -o result-docsite
+      - nix build --no-link --print-out-paths .#sites.fleet-docs-site
 
   dev:nixbuild:plan:
     desc: Report what would build/fetch for hosts against local substituters (read-only)

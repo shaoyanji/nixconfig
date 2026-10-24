@@ -4392,5 +4392,127 @@
            unattributed 100 MiB binary is visible instead of plausible.
       '';
     };
+    exp-124 = {
+      title = "EXP-124 — The public edge is a registry, not a vhost";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-24";
+      priority = "P1";
+      links = ["exp-118" "exp-116"];
+      from = ["microvm-guests"];
+      summary = "Stirling was six edits in six places — nginx location, tailnet gate, socket-proxyd, sshd Match, principals file, docs page — and the second tenant already retyped the gate. One `fleet.exposure` row should compile all six, and `edge:verify` should prove the row from both vantage points.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["hosts/delphi/configuration.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix"];
+        tasks = ["microvm:start" "checks:host"];
+        docs = ["hosts/microvms/README.md" ".agents/deploy/hosts/delphi.md"];
+      };
+      body = ''
+        **What exists.** delphi carries every public surface itself: the ACME vhost, `tailnetOnly`,
+        `/microvm/*`, `/microvm/stirling/*`, `/slideshow/*`, the 2222 socket-proxyd, the `slides`
+        hop account with its principals file, and the 302 that sends a public client to the
+        tailnet name. Stirling was that list, once.
+
+        **Why it does not scale.** Each tenant repeats the same decisions in a different place,
+        and nothing checks that they agree. A third service typed from memory drops the gate or
+        the redirect and still looks healthy from the machine that built it.
+
+        **Shape.** `fleet.exposure.<name> = { guest, port, transport, path, audience }` in one
+        module that emits the location and its gate, the socket unit, the `Match` block and
+        principals file for a hop, the public redirect, the `data/services.json` card and the docs
+        row. `audience` — `tailnet`, `public`, `cert-only` — is the only knob that decides who
+        may reach it.
+
+        **The part that makes it real.** `task edge:verify` walks the registry: every row from the
+        public IP and from the tailnet, a spoofed `Host` from the public side must get 403/302, and
+        a stopped guest must turn the row red in gatus within one scrape. Exposure that cannot be
+        proved is a comment.
+
+        **Boundary.** v1 admits only tenants co-located with the edge: a guest on frieren's brlan
+        is not routable from delphi, and crossing that is EXP-118's signed door, not this.
+
+        **Exit.** stirling and the deck are rows; a third tenant is one row plus one import;
+        deleting a row removes every artifact in a single `systemctl --diff`; `edge:verify` green.
+      '';
+    };
+    exp-125 = {
+      title = "EXP-125 — Services stop being daemons: restore a guest, do not boot one";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-24";
+      priority = "P2";
+      links = ["exp-124"];
+      from = ["microvm-guests"];
+      summary = "Stirling costs minutes of emulated boot and holds 1.2 GiB of heap all day for a tool used twice a week. A snapshot of the booted guest turns start into a restore that keeps the volume, the store share and the identity, and gives the RAM back between uses.";
+      refs = {
+        hosts = ["delphi" "frieren"];
+        modules = ["hosts/microvms/guests.nix" "hosts/microvms/base.nix" "modules/profiles/microvm-host.nix"];
+        tasks = ["microvm:start" "microvm:stop"];
+        docs = ["hosts/microvms/README.md"];
+      };
+      body = ''
+        **The cost being paid.** Stirling is a JVM inside an emulated guest: minutes from
+        `systemctl start` to first byte, and its heap held all day on a host that has 11 GiB.
+        Idle tenants are the price of never booting them twice.
+
+        **Shape.** Boot once with the volumes mounted, snapshot RAM plus device state to the state
+        root, stop. The socket unit starts the guest on first connection and it resumes instead of
+        booting. cloud-hypervisor does this over the API socket microvm.nix already exposes
+        (`control.socket`); the qemu path on delphi uses `savevm`/`loadvm` on the same disk.
+
+        **Named risks, not surprises.** virtiofs shares and the shared store must survive a
+        restore (the host path is unchanged, which is the argument that they will); the ext4
+        volume must be quiesced before the snapshot or fsck runs on resume; and a guest the
+        bridge re-registers may come back without a route.
+
+        **What this buys.** A service tier without resident cost: ten tenants stopped, one
+        resumed. It is also the only way a TCG host serves something interactive on demand, since
+        boot is the expensive part and the snapshot removes it from the request path.
+
+        **Exit.** First byte under 2 s from a stopped state on delphi and on KVM; host RSS returns
+        when it stops; five snapshot/restore cycles with no fs corruption; `microvm:snapshot`
+        refuses while a volume write is in flight.
+      '';
+    };
+    exp-126 = {
+      title = "EXP-126 — A guest per gate: the memory rule becomes a cgroup, not a refusal";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-10-24";
+      priority = "P2";
+      links = ["exp-107" "exp-114" "exp-124"];
+      from = ["microvm-guests"];
+      summary = "`checks:flake` refuses below 16 GiB because a fleet eval once reached 6078 MiB and died at 137, and `oom-guard.sh` watches pressure around that absence of isolation. A microVM with a declared cap is the same gate with the blast radius removed — and it is the `sandbox:run` primitive underneath.";
+      refs = {
+        hosts = ["frieren" "delphi"];
+        modules = ["flake/checks.nix" "hosts/microvms/base.nix" "hosts/microvms/guests.nix"];
+        tasks = ["checks:host" "checks:flake"];
+        docs = ["docs/ci-pipeline.md" "docs/nix-patterns.md"];
+      };
+      body = ''
+        **The rule being worked around.** `nix flake check` was measured at 339.78 s / 6078.5 MiB /
+        SIGKILL 137 here, so the task refuses under 16384 MiB, runs one host per process, and
+        `oom-guard.sh` polls PSI and kills. All three exist because a gate shares a kernel and a
+        memory pool with a live host.
+
+        **Shape.** `GUEST=1` for `checks:host` and `checks:flake`: the same task in a microVM with
+        declared `vcpu`/`mem`, the host store over virtiofs so nothing is copied, the result
+        returned as the check's store path plus its journal. On frieren that is a KVM guest at
+        native speed under a hard cap; on delphi it is TCG, which is still worth it for a keyless
+        aarch64 gate that has no local alternative.
+
+        **Generalise once.** Same runner, `task sandbox:run CMD=... MEM=8G`: boot, run, collect,
+        destroy. The gate is the first customer; the second is untrusted agent output (`npx`,
+        `pip install`, a fetched script) which today runs on the host because there is nowhere
+        else to put it.
+
+        **What it replaces.** Not the guard — a host without `/dev/kvm` keeps the script — but the
+        refusal. The cap becomes a property of the run instead of a judgement about the machine.
+
+        **Exit.** A deliberately memory-hungry command OOMs the guest and leaves the host's
+        MemAvailable unchanged; `checks:host HOST=<h> GUEST=1` returns the same verdict as the
+        local run on the same commit; cold start measured on both hypervisors and written down.
+      '';
+    };
   };
 }

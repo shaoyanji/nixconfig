@@ -50,7 +50,12 @@
 #
 # USAGE
 #   host-check-sweep.sh --hosts "a b c" [--mode build|eval] [--arch x86_64-linux]
-#                       [--timeout SECONDS]
+#                       [--timeout SECONDS] [--flake REF]
+#
+# --flake REF gates REF instead of the local tree (default "."). The nightly
+# drift sweep passes github:shaoyanji/nixconfig so it reports what systemd.
+# autoUpgrade will actually install, never a dirty local checkout.
+
 #
 # EXIT
 #   0  every named host passed
@@ -62,6 +67,7 @@ MODE="build"
 ARCH="x86_64-linux"
 TIMEOUT=120
 HOSTS=""
+REF="."
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT" || exit 1
 
@@ -71,6 +77,7 @@ while [ $# -gt 0 ]; do
     --arch) ARCH="$2"; shift 2 ;;
     --timeout) TIMEOUT="$2"; shift 2 ;;
     --hosts) HOSTS="$2"; shift 2 ;;
+    --flake) REF="$2"; shift 2 ;;
     *) echo "host-check-sweep: unknown argument $1" >&2; exit 1 ;;
   esac
 done
@@ -99,7 +106,7 @@ if [ "$MODE" = eval ]; then
   NAMES=""
   for pair in "nixos nixosConfigurations" "darwin darwinConfigurations" "home homeConfigurations"; do
     set -- $pair
-    n=$(timeout 30 nix eval --json ".#$2" --apply 'builtins.attrNames' 2>/dev/null | tr -d '[]"' | tr ',' ' ')
+    n=$(timeout 30 nix eval --json "${REF}#$2" --apply 'builtins.attrNames' 2>/dev/null | tr -d '[]"' | tr ',' ' ')
     NAMES="${NAMES}
 $(for h in $n; do [ -n "$h" ] && echo "$1 $h"; done)"
   done
@@ -139,7 +146,7 @@ while read -r kind host; do
     # tee on stdout, not a process substitution: PIPESTATUS gives the guard's
     # status after tee has flushed, so the classification below reads the whole log.
     bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "host-check ${host}" -- \
-      nix build --no-link -L "${build_flags[@]}" ".#hostChecks.${ARCH}.${host}" 2>&1 | tee "$log" >&2
+      nix build --no-link -L "${build_flags[@]}" "${REF}#hostChecks.${ARCH}.${host}" 2>&1 | tee "$log" >&2
     rc=${PIPESTATUS[0]}
     # A cache miss and a failed assertion both exit 1; only the first deserves the
     # warm-it advice, so classify by what nix said.
@@ -166,7 +173,7 @@ while read -r kind host; do
     # (frieren-canary) and bare Nix attr names may not.
     EXPR=$(printf 'c: let bad = builtins.filter (a: !a.assertion) c.assertions; in if bad != [] then throw ("assertion(s) failed: " + builtins.concatStringsSep " | " (map (a: a.message) bad)) else { hostname = c.fleet.inventory.hosts."%s".hostname; registry = builtins.length (builtins.attrNames c.fleet.inventory.hosts); assertions = builtins.length c.assertions; }' "$host")
     bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "eval ${host}" -- \
-      nix eval --json ".#${attr}.config" --apply "$EXPR"
+      nix eval --json "${REF}#${attr}.config" --apply "$EXPR"
     rc=$?
   fi
   case "$rc" in

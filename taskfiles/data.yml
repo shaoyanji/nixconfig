@@ -69,6 +69,18 @@ tasks:
     cmds:
       - bash scripts/task/library-audit.sh --index
 
+  data:library:update:
+    desc: Refresh the release-built library dirs from the table in tools/library.nix
+    summary: >
+      One row per project in tools/library.nix; the fetch calls, the asset pins
+      and the arch split are generated from it. Every fetch goes through
+      library-fetch.sh, so the static gate and .library.tsv apply. Run on the
+      host holding the library root; the NAS copy is the scheduled mirror.
+    cmds:
+      - nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/library.nix).plan "aarch64"' | bash
+      - nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/library.nix).plan "amd64"' | bash
+      - nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/library.nix).plan "appimages"' | bash
+
   data:library:fetch:
     desc: Fetch one GitHub release asset into the library (non-interactive, static only)
     summary: >

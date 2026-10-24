@@ -146,27 +146,6 @@ tasks:
     cmds:
       - ssh -o BatchMode=yes {{.DELPHI_SSH}} '~/.local/share/bin-farm/farm.sh deploy burgernas'
 
-  burgernas:bin:eget:
-    desc: Refresh the NAS aarch64 tool dir from GitHub releases (run on delphi)
-    summary: >
-      tools/eget.nix holds the table; it renders the TOML and the fetch command,
-      so this task only names a target dir. Delphi, because eget picks assets for
-      the machine it runs on.
-    cmds:
-      - |
-        nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/eget.nix).fetcher "aarch64" ~/.local/share/bin-aarch64' | bash
-        rsync -az --rsync-path=/usr/bin/rsync -e 'ssh -o BatchMode=yes' \
-          ~/.local/share/bin-aarch64/ burgernas:/volume1/peachcable/bin-aarch64/
-
-  burgernas:bin:eget:x86:
-    desc: Refresh /srv/data/bin-x86 and /srv/data/appimages (run on frieren)
-    summary: >
-      The x86 halves. Same table, same generated command; the arch of what lands
-      here is the arch of this host, so it must not run on an aarch64 machine.
-    cmds:
-      - nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/eget.nix).fetcher "amd64" /srv/data/bin-x86' | bash
-      - nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/eget.nix).fetcher "appimages" /srv/data/appimages' | bash
-
   burgernas:menu:
     desc: Interactive menu for BurgerNAS operations (gum)
     cmds:
@@ -178,7 +157,6 @@ tasks:
           "poweroff" \
           "transmission status" \
           "transmission apply leech-only" \
-          "tools: eget aarch64 (delphi -> NAS)" \
           "restic seed (frieren root)" \
           "restic snapshots (frieren root)" \
           "ssh" \
@@ -190,8 +168,6 @@ tasks:
           "poweroff") task burgernas:poweroff ;;
           "transmission status") task burgernas:transmission:status ;;
           "transmission apply leech-only") task burgernas:transmission:leech ;;
-          "tools: eget aarch64 (delphi -> NAS)") task burgernas:bin:eget ;;
-          "tools: eget x86 + appimages (frieren)") task burgernas:bin:eget:x86 ;;
           "restic seed (frieren root)") task burgernas:backup:seed ;;
           "restic snapshots (frieren root)") task burgernas:snapshot ;;
           "ssh") task burgernas:ssh ;;

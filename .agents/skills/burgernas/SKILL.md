@@ -64,22 +64,21 @@ a real file is never overwritten.
 
 ### The flat dirs are eget's, not a mirror
 
-`/srv/data/bin-x86`, `/srv/data/appimages` and the NAS copy at
-`/volume1/peachcable/bin-aarch64` are filled by **eget** from one table in
-`tools/eget.nix`: a row per upstream project naming the token that pins its
-asset per arch (`pick`). The TOML and the fetch command are both generated, so
-nothing is kept in sync by hand. `task burgernas:bin:eget` fetches the aarch64
-set on delphi and pushes it to the NAS; `burgernas:bin:eget:x86` fetches the
-x86 and AppImage sets on frieren. There is no source machine to sync *from* any
-more — the old `bin:sync` rsynced a Mac that no longer exists.
+`/srv/data/{bin-x86,bin-aarch64,appimages}` and the NAS copy at
+`/volume1/peachcable/bin-aarch64` come from one table in `tools/library.nix`:
+a row per upstream project naming the token that pins its asset per arch
+(`pick`). `task data:library:update` renders that table into `library-fetch.sh`
+calls, so the static gate and `.library.tsv` provenance apply and the NAS copy
+stays the scheduled mirror. There is no source machine to sync *from* any more —
+the old `bin:sync` rsynced a Mac that no longer exists.
 
 Three hard rules, all measured: eget 1.3.4 **does not filter by architecture**
 (an aarch64 host fetched `starship-x86_64` when only the arch token was
 missing), hence `pick`; `--to` is ignored for a bare asset (yq, AppImages) and
-the file lands in the working directory, hence the `cd`; and two matching assets
-make eget prompt, which is a hard failure non-interactively — hence the
-`^proof` / `^sbom` / `^tar.gz` anti-matches. Use a GitHub token
-(`gh auth token`) or the 60-request hourly limit will bite mid-run.
+the file lands in the working directory, hence the `cd` in `library-fetch.sh`;
+and two matching assets make eget prompt, which is a hard failure
+non-interactively — hence the `^proof` / `^sbom` / `^tar.gz` anti-matches. Use a
+GitHub token (`gh auth token`) or the 60-request hourly limit will bite mid-run.
 
 ## Sharing the vault over NFS
 

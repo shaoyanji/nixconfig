@@ -25,7 +25,7 @@
   # restart with no host-side file ownership to negotiate.
   persist ? {},
   # A guest user whose only login is `slides` reading ./slideshow.md. null = no
-  # such account.
+  # such account. A development facility, not a service: delphi has it off.
   slidesUser ? null,
   # Stirling PDF behind the host's /microvm/stirling/, with its state on the
   # `stirling` volume. Off by default: it is a JVM app, not a stub.
@@ -76,9 +76,11 @@
     })
     persist;
 
-  # Both halves of the deck entry — the port and the account — are published so
-  # the host's proxy page names exactly what this module created.
-  sshEnabled = exposeSsh != null && slidesUser != null;
+  # The forwarded sshd is its own decision, not a side effect of the deck: a
+  # login can be forced into a deck, but a guest that serves HTTP should still
+  # be reachable when nobody wants a deck. Gating this on `slidesUser` meant the
+  # only way to get a forwarded sshd was to publish a terminal app.
+  sshEnabled = exposeSsh != null;
 
   # Stirling PDF 3.1.0 from the upstream release jar. nixpkgs' `stirling-pdf` is
   # unfree (no binary cache) and builds the frontend and JVM tree from source —

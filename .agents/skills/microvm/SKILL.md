@@ -1,6 +1,6 @@
 ---
 name: microvm
-description: "Guests on delphi (declarative sandbox) and frieren (canary runner): the task that boots each, the account that opens the deck, and the traps that make a healthy guest look unreachable."
+description: "Guests on delphi (declarative sandbox) and frieren (canary runner): the task that boots each, how to get a shell in one, and the traps that make a healthy guest look unreachable."
 version: 0.1.0
 platforms: [linux]
 metadata:
@@ -38,9 +38,9 @@ static address on `brlan`). Rationale, tiers and state volumes: `AGENTS.nix` not
 
 ## Logging in
 
-- **delphi's deck** is an account, not a hostname: `ssh slides@delphi.bountystash.com`
-  (public door, port 22 hops into the guest) or `ssh -p 2222 slides@delphi.cloudforest-kardashev.ts.net`.
-  Plain `ssh delphi.bountystash.com` is the **host** shell as `devji`.
+- **The deck** is off on delphi, and it is a development facility, not a service:
+  `slidesUser` + `exposeSsh` in `flake/host-inventory.nix` bring it back. Plain
+  `ssh delphi.bountystash.com` is the **host** shell as `devji`.
 - **The canary**: `ssh frieren-canary` from frieren (alias and known-hosts entry in
   `hosts/frieren/infra-stack.nix`), `task vm:canary:ssh` from anywhere with the repo.
 - **The sandbox shell**, from delphi: `task microvm:ssh NAME=sandbox` (root in the guest).

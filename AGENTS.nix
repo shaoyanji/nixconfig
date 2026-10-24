@@ -233,21 +233,19 @@
         TCG is why the guest needed a wider device timeout: systemd's 90 s expired before udev
         published the virtio-blk labels. `DefaultDeviceTimeoutSec = 600` there; KVM untouched.
 
-        How to get in — the account selects the deck, never the hostname:
-        `ssh slides@delphi.bountystash.com` from a workstation, `ssh -p 2222 slides@<tailnet>`, or
-        `task microvm:ssh NAME=slides|sandbox` from delphi itself. Plain
-        `ssh delphi.bountystash.com` is the HOST shell as `devji`; `sandbox` resolves only on delphi
-        because the bridge subnet is host-local.
+        How to get in — the guest is a service tier, not a shell you visit: `ssh sandbox` on delphi,
+        or `task microvm:ssh NAME=sandbox`. Plain `ssh delphi.bountystash.com` is the HOST shell as
+        `devji`; `sandbox` resolves only on delphi because the bridge subnet is host-local.
 
-        Public ssh reuses 22 instead of asking the tenancy for 2222: a host account `slides` whose
-        whole login is `ssh -tt` into the guest's forced command (`pkgs.slides` over
-        hosts/microvms/slideshow.md), forwarding/X11/tunnels off, via a host-side
-        `systemd-socket-proxyd` on 2222 → 192.168.83.11:22; the guest gains no inbound path.
-        Three things only the live host taught: `AuthorizedKeysFile` REPLACES the default, so the
-        keys NixOS writes to `/etc/ssh/authorized_keys.d/%u` must be named back; StrictModes refuses
-        a keys file whose path is not root-owned, so the hop's public half lives in
-        `/srv/microvm/hop-auth`; and a fleet cert's principal is the user name, so the account needs
-        `AuthorizedPrincipalsFile` listing `devji`.
+        The deck is OFF, and it is a development facility rather than a service: `slidesUser =
+        "slides"` plus `exposeSsh = 2222` brings back a forced command into a terminal markdown deck.
+        It was turned off because it leaked — every login is a TUI that no one closes, and under TCG
+        each one cost real host CPU (three abandoned sessions were 0.65 of the box's two cores). The
+        forced-command traps, kept for whoever turns it back on: `AuthorizedKeysFile` REPLACES the
+        default, so the keys NixOS writes to `/etc/ssh/authorized_keys.d/%u` must be named back;
+        StrictModes refuses a keys file whose path is not root-owned, so the hop's public half lives
+        in `/srv/microvm/hop-auth`; and a fleet cert's principal is the user name, so the account
+        needs `AuthorizedPrincipalsFile` listing `devji`.
       '';
     };
     arch-shape = {

@@ -146,13 +146,32 @@ tasks:
     cmds:
       - ssh -o BatchMode=yes {{.DELPHI_SSH}} '~/.local/share/bin-farm/farm.sh deploy burgernas'
 
-  burgernas:bin:sync:
-    desc: "[Mac] Mirror the legacy flat bin-aarch64 dump to BurgerNAS (unmanaged)"
+  burgernas:bin:eget:
+    desc: Update the flat aarch64 tool dir from GitHub releases (runs on delphi)
+    summary: >
+      The release is the source: tools/eget/aarch64.toml pins one asset per
+      project, so nothing depends on a machine having a copy to rsync from. It
+      runs on delphi because eget follows the running system — `--system
+      linux/arm64` on an x86 host is ignored, measured on all 13 entries — so the
+      architecture is the host, not a flag. The staged dir is then pushed to
+      /volume1/peachcable/bin-aarch64, which is the copy the NAS reads.
     cmds:
       - |
-        rsync -avz --delete --rsync-path=/usr/bin/rsync \
-          -e "ssh -o BatchMode=yes" \
-          /Volumes/data/bin-aarch64/ burgernas:"/volume1/Shared Library/bin-aarch64/"
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'mkdir -p ~/.local/share/bin-aarch64'
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cat > ~/.local/share/bin-aarch64/aarch64.toml' < tools/eget/aarch64.toml
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cd ~/.local/share/bin-aarch64 && EGET_CONFIG=$PWD/aarch64.toml EGET_BIN=$PWD EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) nix run nixpkgs#eget -- --download-all'
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'rsync -az --rsync-path=/usr/bin/rsync --exclude "*.toml" -e "ssh -o BatchMode=yes" ~/.local/share/bin-aarch64/ burgernas:"/volume1/peachcable/bin-aarch64/"'
+
+  burgernas:bin:eget:x86:
+    desc: Update the flat x86_64 tool dir from GitHub releases (run from frieren)
+    summary: >
+      The x86 twin of the task above, for /srv/data/bin-x86. Run it on an x86_64
+      host for the same reason: eget 1.3.4 picks assets for the machine it is on.
+    cmds:
+      - |
+        EGET_CONFIG=$PWD/tools/eget/amd64.toml EGET_BIN=/srv/data/bin-x86 \
+          EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) \
+          nix run nixpkgs#eget -- --download-all
 
   burgernas:menu:
     desc: Interactive menu for BurgerNAS operations (gum)
@@ -177,7 +196,7 @@ tasks:
           "poweroff") task burgernas:poweroff ;;
           "transmission status") task burgernas:transmission:status ;;
           "transmission apply leech-only") task burgernas:transmission:leech ;;
-          "bin sync (static aarch64)") task burgernas:bin:sync ;;
+          "tools: update aarch64 set (eget)") task burgernas:bin:eget ;;
           "restic seed (frieren root)") task burgernas:backup:seed ;;
           "restic snapshots (frieren root)") task burgernas:snapshot ;;
           "ssh") task burgernas:ssh ;;

@@ -60,9 +60,24 @@ or `pkgsStatic.<attr>` when upstream ships no aarch64-linux binary). Two tasks:
   `/volume1/Shared Library/toolbox/`, checking each sha256 on the receiver.
 
 Identity is content, not filename: nothing absent from `farm.toml` is touched and
-a real file is never overwritten. The older flat `/volume1/Shared Library/bin-aarch64/`
-collection comes from the Mac via `burgernas:bin:sync` and is *unmanaged* — do not
-assume it is reproducible.
+a real file is never overwritten.
+
+### The flat dirs are eget's, not a mirror
+
+`/srv/data/bin-aarch64`, `/srv/data/bin-x86` (and the NAS copy at
+`/volume1/peachcable/bin-aarch64`) are managed by **eget** from
+`tools/eget/{aarch64,amd64}.toml`: one section per upstream project, pinning the
+release asset that project actually publishes. `task burgernas:bin:eget` fetches
+the aarch64 set and pushes it over ssh; `burgernas:bin:eget:x86` does the local
+x86 dir. There is no source machine to sync *from* any more — the old
+`bin:sync` rsynced a Mac that no longer exists.
+
+Two hard rules, both measured: eget 1.3.4 **follows the running system**
+(`--system linux/amd64` on an aarch64 host still extracts arm64 assets, on every
+entry), so each config must run on a host of its own architecture; and two
+matching assets make eget prompt, which is a hard failure non-interactively —
+hence the `^proof` / `^sbom` / `^tar.gz` anti-match filters. Use a GitHub token
+(`gh auth token`) or the 60-request hourly limit will bite mid-run.
 
 ## Sharing the vault over NFS
 

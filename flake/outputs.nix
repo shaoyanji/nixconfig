@@ -115,6 +115,15 @@ in {
     inherit lib systems pkgsFor self hostInventory;
   };
 
+  # Every microVM guest's runner, addressable as an attribute instead of a
+  # `./result-*` symlink in the checkout: `nix build .#microvmRunners.<name>`
+  # prints the store path, and `nix eval --raw` gives it without building anything
+  # else. Membership is the inventory (`category = "microvm"`), so a new guest is
+  # reachable the moment it is registered — nothing here names it.
+  microvmRunners = lib.mapAttrs (
+    name: _: self.nixosConfigurations.${name}.config.microvm.declaredRunner
+  ) (lib.filterAttrs (_: host: host.category == "microvm") inventory.hosts);
+
   # The fleet gate, in two shapes (see flake/fleet-checks.nix):
   #   fleetHostChecks.<system>.<host> — one host per attribute, membership from the
   #                                    compiled inventory. What the nightly gate

@@ -975,19 +975,23 @@ in {
 
   # Ephemeral MicroVM Sandbox SSH Client Configuration (EXP-102)
   # Eliminates known_hosts collisions and prompts for ephemeral test VMs
+  # `~/.ssh/known_hosts_canary`, not /var/lib/microvms/.known_hosts: that directory
+  # belongs to the microvm runner user (0755), so a non-root login could not write
+  # its host key there and ssh failed on the pin while reporting only a key error.
+  # The separate file still keeps ephemeral guests out of the real known_hosts.
   programs.ssh.extraConfig = ''
     Host frieren-canary
       HostName ${config.fleet.inventory.hosts.frieren-canary.network.lan_ip}
       User ${user.name}
       StrictHostKeyChecking accept-new
-      UserKnownHostsFile /var/lib/microvms/.known_hosts
+      UserKnownHostsFile ~/.ssh/known_hosts_canary
       IdentityFile ~/.ssh/id_ed25519
       ConnectTimeout 3
 
     Host 192.168.83.* testvm
       User devji
       StrictHostKeyChecking accept-new
-      UserKnownHostsFile /var/lib/microvms/.known_hosts
+      UserKnownHostsFile ~/.ssh/known_hosts_canary
       IdentityFile ~/.ssh/id_ed25519
       ConnectTimeout 3
   '';

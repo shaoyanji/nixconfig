@@ -37,24 +37,31 @@ The activation script `subzeroclawSetup` seeds `~/.subzeroclaw/{skills,logs}`,
 
 | Task | What it does |
 | :--- | :--- |
-| `vm:canary:build` | `nix build .#nixosConfigurations.frieren-canary.config.microvm.declaredRunner -o result-canary` |
+| `vm:canary:build` | builds `.#microvmRunners.frieren-canary` and prints the store path — no `./result-*` symlink |
 | `vm:canary:run` | `sudo scripts/task/run-canary.sh` (run dir `/var/lib/microvms/frieren-canary/run`) |
-| `vm:canary:test` | 6-step dogfood test |
+| `vm:canary:test` | `scripts/task/vm-canary-test.sh`: boot → ssh → guest API → host proxy → stop → teardown |
+| `vm:canary:status` | hypervisor + tap state (`run-canary.sh --status`) |
 | `vm:canary:ssh` | SSH into the guest |
 | `vm:canary:agent` | `ssh -t frieren-canary subzeroclaw <prompt>` (default: "echo Hello World from inside the MicroVM sandbox") |
-| `vm:canary:stop` | poweroff via SSH |
+| `vm:canary:stop` | `run-canary.sh --stop`: guest poweroff, then shares + tap |
 
 SSH alias `frieren-canary` is defined in `hosts/frieren/infra-stack.nix`
-(-> `192.168.83.10`, `UserKnownHostsFile /var/lib/microvms/.known_hosts`).
+(-> `192.168.83.10`, `UserKnownHostsFile ~/.ssh/known_hosts_canary` — a
+user-writable file, so the pin works for a non-root login).
 `infra-stack.nix` imports `modules/profiles/microvm-host.nix`.
 
 ## Host prerequisites (runtime, not repo)
 
-Before the first run, the host needs (created once, not in the repo):
-- The `brlan` bridge (`192.168.83.1/24`), owned by NetworkManager.
-- `/var/lib/microvms/frieren-canary/` (`ssh-host-keys` share + run dir) with a
-  fresh ed25519 host key.
-- A `microvm` system user (`tap-up` fails with `invalid user "microvm"` without it).
+The runner asserts these before it touches the host:
+- root, `/dev/kvm`, and the `brlan` bridge (`192.168.83.1/24`, networkd).
+- **The guest subnet is owned by `brlan` alone.** A second interface carrying
+  `192.168.83.0/24` steals the route: on 2026-10-24 a stale hand-made `microbr`
+  did exactly that and every packet went to a DOWN bridge while the guest booted
+  happily and sshd listened. `run-canary.sh` now refuses to start in that case and
+  names the offending interface.
+- `microvm1` tap: created and torn down by the runner's own `tap-up`/`tap-down`.
+- `/var/lib/microvms/frieren-canary/ssh-host-keys`: created, with a fresh ed25519
+  key, by the runner on first boot — it is the guest's persistent identity.
 
 ## Endpoint chain
 

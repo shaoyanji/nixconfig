@@ -701,70 +701,37 @@ tasks:
       - ssh "{{.NAME}}"
 
   vm:canary:build:
-    desc: Build the frieren-canary microVM runner (EXP-102)
+    desc: Build the frieren-canary microVM runner and print its store path
+    summary: >
+      Builds `.#microvmRunners.frieren-canary` — the flake output, not a
+      `./result-canary` symlink in the checkout — and prints the path. The runner
+      scripts resolve the same attribute themselves, so this task is for warming
+      the build, not for creating a path anything depends on. Exit 1 on a build
+      failure; nothing is written into the repo.
     cmds:
-      - nix build .#nixosConfigurations.frieren-canary.config.microvm.declaredRunner -o result-canary
+      - nix build --no-link --print-out-paths .#microvmRunners.frieren-canary
 
   vm:canary:run:
-    desc: Run the frieren-canary microVM interactively (EXP-102)
+    desc: Boot the frieren-canary microVM in the foreground (Ctrl-C stops it)
+    summary: >
+      Delegates to scripts/task/run-canary.sh, which asserts root, /dev/kvm, the
+      brlan bridge and every helper in the built runner BEFORE it touches the
+      host, then starts the virtiofsd shares and cloud-hypervisor and tears all
+      three down on exit. Exit 1 with the reason when a precondition is missing.
     cmds:
-      - |
-        if [ ! -e result-canary ]; then
-          task vm:canary:build
-        fi
-        sudo scripts/task/run-canary.sh
+      - sudo scripts/task/run-canary.sh
 
   vm:canary:test:
-    desc: Automated boot, SSH health check, Tailscale reverse-proxy verification, and graceful shutdown (EXP-102)
+    desc: "[gate] Boot frieren-canary, assert guest + proxy, stop, assert teardown"
+    summary: >
+      Runs scripts/task/vm-canary-test.sh AS THE INVOKING USER (it sudos only the
+      runner): boot, wait for ssh, assert the guest hostname and the dummy API's
+      JSON, assert both proxy routes (/canary/ and the canary.frieren.lan vhost)
+      on 127.0.0.1, then stop and assert the proxy no longer returns 200. The
+      address and port come from the flake, not from this file. Exit 1 = a failed
+      assertion; the runner log is /tmp/frieren-canary-test.log.
     cmds:
-      - |
-        if [ ! -e result-canary ]; then
-          task vm:canary:build
-        fi
-        echo "==> [1/6] Launching frieren-canary VM in background..."
-        LOGFILE="/tmp/canary-test.log"
-        sudo scripts/task/run-canary.sh > "$LOGFILE" 2>&1 &
-        RUNNER_PID=$!
-        trap "sudo pkill -f 'microvm@frieren-canary' 2>/dev/null || true; wait $RUNNER_PID 2>/dev/null || true" EXIT
-
-        echo "==> [2/6] Probing persistent SSH on frieren-canary (192.168.83.10)..."
-        MAX_WAIT=20
-        CONNECTED=0
-        for i in $(seq 1 $MAX_WAIT); do
-          if ssh -o BatchMode=yes -o ConnectTimeout=1 frieren-canary "echo ok" >/dev/null 2>&1; then
-            CONNECTED=1
-            echo "==> frieren-canary SSH ready in $i s!"
-            break
-          fi
-          sleep 0.5
-        done
-
-        if [ "$CONNECTED" -ne 1 ]; then
-          echo "ERROR: Failed to connect via SSH to frieren-canary within $MAX_WAIT s"
-          cat "$LOGFILE"
-          exit 1
-        fi
-
-        echo "==> [3/6] Inspecting guest system isolation..."
-        ssh frieren-canary "hostname && uptime && free -m && df -h /var /nix/store"
-
-        echo "==> [4/6] Verifying dummy API directly (192.168.83.10:8080)..."
-        curl -sSf http://192.168.83.10:8080/ | jq .
-
-        echo "==> [5/6] Verifying Model B Reverse Proxy via Hypervisor Nginx & Tailscale..."
-        curl -sSf http://127.0.0.1/canary/ | jq .
-        curl -sSf http://100.97.61.65/canary/ | jq .
-        curl -sSf -H "Host: canary.frieren.lan" http://100.97.61.65/ | jq .
-
-        echo "==> [6/6] Triggering clean guest shutdown & verifying teardown 504..."
-        ssh frieren-canary "sudo systemctl poweroff" || true
-        wait $RUNNER_PID 2>/dev/null || true
-
-        # Verify Nginx gracefully returns 504 on teardown
-        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://100.97.61.65/canary/ || true)
-        echo "==> Post-teardown HTTP status: $HTTP_CODE (expected: 504)"
-
-        echo "==> EXP-102 Canary microVM Model B dogfood test passed successfully!"
+      - scripts/task/vm-canary-test.sh
 
   vm:canary:ssh:
     desc: Open interactive SSH shell into frieren-canary microVM
@@ -787,11 +754,17 @@ tasks:
         ssh -t frieren-canary subzeroclaw {{if .CLI_ARGS}}{{.CLI_ARGS | q}}{{else}}"echo Hello World from inside the MicroVM sandbox"{{end}}
 
   vm:canary:stop:
-    desc: Gracefully shut down frieren-canary microVM
+    desc: Stop the frieren-canary microVM (graceful, then the tap and the shares)
+    summary: >
+      Delegates to `run-canary.sh --stop`: guest poweroff through the runner's own
+      microvm-shutdown, then SIGTERM to the supervisord process group and tap-down.
+      Safe when nothing is running — it removes stale sockets instead of failing.
     cmds:
-      - |
-        echo "==> Shutting down frieren-canary microVM..."
-        ssh -o BatchMode=yes -o ConnectTimeout=2 frieren-canary "sudo systemctl poweroff" 2>/dev/null || true
-        sleep 1
-        sudo pkill -f 'microvm@frieren-canary' 2>/dev/null || true
-        echo "==> Canary microVM stopped."
+      - sudo scripts/task/run-canary.sh --stop
+
+  vm:canary:status:
+    desc: Report whether the canary hypervisor and its tap exist
+    summary: Prints the hypervisor state and whether the tap interface is present.
+      Exit 1 = no hypervisor process (the tap may still linger; --stop clears it).
+    cmds:
+      - scripts/task/run-canary.sh --status

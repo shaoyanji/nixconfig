@@ -3,8 +3,6 @@
 ._*
 .smbdelete*
 @eaDir*
-result
-result-*
 
 .codex
 .wrangler/

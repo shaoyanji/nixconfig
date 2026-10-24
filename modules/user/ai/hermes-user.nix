@@ -3,14 +3,12 @@
   lib,
   config,
   pkgs,
-  osConfig ? {},
   # ~/AGENTS.md itself comes from modules/user/ai/home-agents.nix (the flake's
   # `.#homeAgents.<host>`, injected via extraSpecialArgs in
   # modules/global/nixos.nix). This module only mirrors that link into
   # ~/.hermes/ for the gateway daemon.
   ...
-}: let
-in {
+}: {
   options.programs.hermes-user = {
     enable = lib.mkOption {
       type = lib.types.bool;

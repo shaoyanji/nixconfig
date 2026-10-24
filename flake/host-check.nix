@@ -1,7 +1,6 @@
 {
   lib,
   pkgs,
-  hostInventory,
 }:
 # ONE host's evaluation gate, as a derivation.
 #

@@ -89,7 +89,12 @@
     builtins.filter (
       p:
         anyLine p (l: builtins.match ".*builtins\\.elem hostName.*" l != null)
+        || anyLine p (l: builtins.match ".*lib\\.elem hostName.*" l != null)
         || anyLine p (l: builtins.match ".*hostName ==.*" l != null)
+        # `hostName != "frieren"` is the same list in the negative: a capability
+        # nobody declared. The empty-string guard (`hostName != ""`, used to pick an
+        # inventory entry) is not a hostname comparison and stays legal.
+        || anyLine p (l: builtins.match ".*hostName *[!=]= *\"[^\"]+\".*" l != null)
     )
     (nixUnder "modules");
   hostnameGatedUnitModules = builtins.filter (p: builtins.elem p unitModules) hostnameGatedModules;
@@ -333,8 +338,8 @@
     };
 
     capabilities-are-traits-not-names = {
-      rule = "A shared module asks a host what it declares, never what it is called. Capability belongs in `inventory.toml` (`category`, `persona.compute_tier`, `software.traits`), and the module reads it: `traits` for a package list or toolchain tier, `category` for what kind of machine it is. A hostname list compiles in a second registry whose only maintenance event is a breakage — frieren, eisen and poseidon were remembered in three separate modules, and the GPU tier list had drifted from `hardware.gpu` (ares matched only by name, netbook's card matched by neither).";
-      proof = "modules/**/*.nix scanned for `builtins.elem hostName` and `hostName ==`; the traits they now read live in inventory.toml";
+      rule = "A shared module asks a host what it declares, never what it is called. Capability belongs in `inventory.toml` (`category`, `persona.compute_tier`, `software.traits`), and the module reads it: `traits` for a package list or toolchain tier, `category` for what kind of machine it is. A hostname list compiles in a second registry whose only maintenance event is a breakage — frieren, eisen and poseidon were remembered in three separate modules, the GPU tier list had drifted from `hardware.gpu` (ares matched only by name, netbook's card matched by neither), and the NAS profiles excluded the server by comparing its name.";
+      proof = "modules/**/*.nix scanned for `builtins.elem hostName`, `hostName ==` and a comparison against a quoted hostname; the traits they now read (including `nas-server`) live in inventory.toml";
       holds = hostnameGatedModules == [];
       detail = "hostname-gated modules (the trait they need belongs in inventory.toml): ${lib.concatStringsSep ", " hostnameGatedModules}";
     };

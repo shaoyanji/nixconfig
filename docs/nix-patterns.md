@@ -133,10 +133,12 @@ patterns — which is why the `--print-roots` check belongs in the operator's ha
 - **A module asks what a host declares, never what it is called**
   [[flake/policies.nix#capabilities-are-traits-not-names]]. Package lists and
   toolchain tiers read `software.traits` (`ai-full`, `dev-full`, `gpu-low`,
-  `gpu-high`, `small-screen`, `tpm-identity`) and the machine's `category`
-  (`cloud`, `laptop`, `workstation`); a host that gains a capability states it in
-  `inventory.toml`, next to the hardware that justifies it. `checks.policies`
-  fails on `builtins.elem hostName` or `hostName ==` anywhere under `modules/`.
+  `gpu-high`, `small-screen`, `tpm-identity`, `nas-server`) and the machine's
+  `category` (`cloud`, `laptop`, `workstation`); a host that gains a capability
+  states it in `inventory.toml`, next to the hardware that justifies it.
+  `checks.policies` fails on `builtins.elem hostName`, on `hostName ==`, and on
+  any comparison against a quoted hostname — `hostName != "frieren"` was the same
+  list in the negative, hiding in the profile the NAS server also imports.
 - **A unit exists because a capability is declared, not because a hostname is
   listed** [[flake/policies.nix#systemd-units-are-capability-gated]]. The
   capability is the option that installs the thing the unit needs —

@@ -10,6 +10,12 @@
   tailnetServer = "100.97.61.65"; # frieren over Tailscale
   exportPath = "/data"; # NFSv4 pseudo-root → /export/data on frieren
 
+  # A NAS server does not mount its own export, and which host that is belongs in
+  # inventory.toml (`nas-server`) rather than in a name compared here: this profile
+  # is reached by frieren through desktop-client like any other client, so the
+  # comparison was the only thing keeping it from mounting itself.
+  isNasServer = builtins.elem "nas-server" (config.fleet.inventory.hosts.${config.networking.hostName}.software.traits or []);
+
   # NFSv4 keeps everything on 2049, so one TCP connect is a cheap, bounded
   # reachability probe.
   probeTool = pkgs.writeShellScriptBin "nas-reachable" ''
@@ -163,8 +169,7 @@
     exec ${pkgs.systemd}/bin/systemctl start --no-block nas-path-governor.service
   '';
 in
-  # Skip the NAS mount on the NAS host itself (frieren does not mount itself).
-  lib.mkIf (config.networking.hostName != "frieren") {
+  lib.mkIf (!isNasServer) {
     environment.systemPackages = [
       pkgs.nfs-utils
       governor

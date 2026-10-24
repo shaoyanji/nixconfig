@@ -35,7 +35,7 @@
 lib.genAttrs systems.work (
   system: let
     pkgs = pkgsFor system;
-    check = import ./host-check.nix {inherit lib pkgs hostInventory;};
+    check = import ./host-check.nix {inherit lib pkgs;};
     # Only hosts whose DECLARED system matches this attribute set. The system comes
     # from the registry, not from the evaluated config (which would cost the very
     # host evaluation this file exists to bound). Without the filter

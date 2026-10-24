@@ -11,6 +11,10 @@
   nasRemotePath = "/Volumes/data";
   mountPoint = "/Volumes/data";
 
+  # Same rule as profiles/nas-client.nix, declared once in inventory.toml: the host
+  # that serves the export reads `nas-server` and skips the client half.
+  isNasServer = builtins.elem "nas-server" (config.fleet.inventory.hosts.${config.networking.hostName}.software.traits or []);
+
   sshfsOptions = [
     "allow_other"
     "default_permissions"
@@ -29,7 +33,7 @@
     "x-systemd.mount-timeout=10s"
   ];
 in
-  lib.mkIf (config.networking.hostName != "frieren") {
+  lib.mkIf (!isNasServer) {
     # Allow non-root users and systemd mount units to use allow_other
     programs.fuse.userAllowOther = true;
 

@@ -248,6 +248,10 @@ in {
     serverAliases = [
       "atuin.lan"
       "atuin.frieren.local"
+      # Clients whose DNS does not know the .lan names reach it by address; the
+      # client config uses the tailnet one because it works off the LAN too.
+      "100.97.61.65"
+      "192.168.3.25"
     ];
   };
 

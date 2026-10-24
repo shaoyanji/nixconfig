@@ -149,29 +149,41 @@ tasks:
   burgernas:bin:eget:
     desc: Update the flat aarch64 tool dir from GitHub releases (runs on delphi)
     summary: >
-      The release is the source: tools/eget/aarch64.toml pins one asset per
-      project, so nothing depends on a machine having a copy to rsync from. It
-      runs on delphi because eget follows the running system — `--system
-      linux/arm64` on an x86 host is ignored, measured on all 13 entries — so the
-      architecture is the host, not a flag. The staged dir is then pushed to
-      /volume1/peachcable/bin-aarch64, which is the copy the NAS reads.
+      tools/eget.nix is the list — one row per project, rendered to a TOML here
+      so nothing has to be kept in sync by hand. It runs on delphi because eget
+      follows the running system (`--system linux/arm64` on an x86 host is
+      ignored, measured), then pushes the result to the copy the NAS shell reads.
     cmds:
       - |
+        nix eval --raw --impure --expr '(import {{.ROOT_DIR}}/tools/eget.nix).aarch64' > /tmp/eget-aarch64.toml
         ssh -o BatchMode=yes {{.DELPHI_SSH}} 'mkdir -p ~/.local/share/bin-aarch64'
-        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cat > ~/.local/share/bin-aarch64/aarch64.toml' < tools/eget/aarch64.toml
-        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cd ~/.local/share/bin-aarch64 && EGET_CONFIG=$PWD/aarch64.toml EGET_BIN=$PWD EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) nix run nixpkgs#eget -- --download-all'
-        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'rsync -az --rsync-path=/usr/bin/rsync --exclude "*.toml" -e "ssh -o BatchMode=yes" ~/.local/share/bin-aarch64/ burgernas:"/volume1/peachcable/bin-aarch64/"'
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cat > ~/.local/share/bin-aarch64/eget.toml' < /tmp/eget-aarch64.toml
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cd ~/.local/share/bin-aarch64 && EGET_CONFIG=$PWD/eget.toml EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) nix run nixpkgs#eget -- --download-all --to $PWD'
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'rsync -az --rsync-path=/usr/bin/rsync --exclude "eget.toml" -e "ssh -o BatchMode=yes" ~/.local/share/bin-aarch64/ burgernas:"/volume1/peachcable/bin-aarch64/"'
 
   burgernas:bin:eget:x86:
     desc: Update the flat x86_64 tool dir from GitHub releases (run from frieren)
     summary: >
-      The x86 twin of the task above, for /srv/data/bin-x86. Run it on an x86_64
-      host for the same reason: eget 1.3.4 picks assets for the machine it is on.
+      The x86 twin, for /srv/data/bin-x86. Run it on an x86_64 host for the same
+      reason: eget 1.3.4 picks assets for the machine it is on.
     cmds:
       - |
-        EGET_CONFIG=$PWD/tools/eget/amd64.toml EGET_BIN=/srv/data/bin-x86 \
-          EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) \
-          nix run nixpkgs#eget -- --download-all
+        nix eval --raw --impure --expr '(import {{.ROOT_DIR}}/tools/eget.nix).amd64' > /tmp/eget-amd64.toml
+        mkdir -p /srv/data/bin-x86
+        EGET_CONFIG=/tmp/eget-amd64.toml EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) \
+          nix run nixpkgs#eget -- --download-all --to /srv/data/bin-x86
+
+  burgernas:bin:eget:appimages:
+    desc: Update the AppImage dir from GitHub releases (run from frieren)
+    summary: >
+      Same table, rows whose `dirs` include "appimages": one file per asset, no
+      archive, and the arch in the asset name comes from the running host.
+    cmds:
+      - |
+        nix eval --raw --impure --expr '(import {{.ROOT_DIR}}/tools/eget.nix).appimages' > /tmp/eget-appimages.toml
+        mkdir -p /srv/data/appimages
+        EGET_CONFIG=/tmp/eget-appimages.toml EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) \
+          nix run nixpkgs#eget -- --download-all --to /srv/data/appimages
 
   burgernas:menu:
     desc: Interactive menu for BurgerNAS operations (gum)

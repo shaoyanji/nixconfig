@@ -473,9 +473,42 @@ in {
     options = ["bind"];
   };
 
+  # BurgerNAS cold vault over NFS. The NAS is powered off most of the day, so this
+  # is an **automount**: a plain mount at boot would wait on a peer that is asleep
+  # by design, and a hard mount would hang anything that lists the directory while
+  # it is down. DSM's kernel has no NFSv4.2 (it answers "Protocol not supported"),
+  # so 4.1 is pinned rather than negotiated. The export is granted on the NAS side
+  # in /etc/exports — DSM 7 offers no CLI/API for NFS privileges, see the skill.
+  fileSystems."/mnt/burgernas/peachcable" = {
+    device = "192.168.3.92:/volume1/peachcable";
+    fsType = "nfs4";
+    options = [
+      "vers=4.1"
+      "soft"
+      "timeo=100"
+      "retrans=2"
+      "noauto"
+      "nofail"
+      "_netdev"
+    ];
+  };
+
+  # NixOS does not translate `x-systemd.automount` in fileSystems options into an
+  # automount unit (tasks/filesystems.nix only reads autoResize/autoFormat), so the
+  # unit is declared here: nothing mounts at boot, and the first access wakes the
+  # NAS instead of blocking local-fs.target behind it.
+  systemd.automounts = [
+    {
+      where = "/mnt/burgernas/peachcable";
+      wantedBy = ["multi-user.target"];
+      automountConfig.TimeoutIdleSec = "10min";
+    }
+  ];
+
   # Ensure directories exist
   systemd.tmpfiles.rules = [
     "d /nix/var/nix/gcroots/fleet 0755 root root -"
+    "d /mnt/burgernas 0755 root root -"
     "d /Volumes/data 0755 root root -"
     "d /srv/data 0755 root root -"
     "d /srv/data/downloads 0775 aria2 users -"

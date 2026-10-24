@@ -41,6 +41,9 @@
   inventory = import ../lib/inventory.nix {inherit lib;};
   moduleSets = import ./module-sets.nix {inherit inputs self lib inventory;};
   hostInventory = import ./host-inventory.nix {inherit inputs moduleSets self;};
+  # Fleet-wide gates (per-host eval checks + the all-in-one aggregate). One binding
+  # because both outputs come from the same computation.
+  fleetCtl = import ./fleet-checks.nix {inherit lib systems pkgsFor self inventory hostInventory;};
 
   # Inventory -> per-kind attrset. The kind is the only thing that decides which
   # assembler a host gets, so it is the only filter the flake needs.
@@ -111,6 +114,16 @@ in {
   hostChecks = import ./host-checks.nix {
     inherit lib systems pkgsFor self hostInventory;
   };
+
+  # The fleet gate, in two shapes (see flake/fleet-checks.nix):
+  #   fleetHostChecks.<system>.<host> — one host per attribute, membership from the
+  #                                    compiled inventory. What the nightly gate
+  #                                    starts, one systemd unit per host.
+  #   fleetChecks.<system>            — all active hosts as one derivation. Tidy, but
+  #                                    forces every host's config in one evaluator
+  #                                    (measured 5.1 GiB / 12 hosts), so it is for CI
+  #                                    and operators, not the nightly.
+  inherit (fleetCtl) fleetChecks fleetHostChecks;
 
   # Per-host RUNTIME gate: boot the host's real module graph in a VM and fail
   # unless stage-1 reaches stage-2 (`task checks:boot HOST=<host>`). Separate

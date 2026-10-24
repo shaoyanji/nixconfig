@@ -39,6 +39,33 @@ nix build -L .?submodules=1#<attr>                          # the closure
 nix build -L .?submodules=1#hostChecks.<arch>.<host>        # the module-system gate
 ```
 
+### The fleet gate, and why there are two shapes of it
+
+`hostChecks.<arch>.<host>` is what CI builds: one host per attribute, built with
+that host's own architecture, so the store path is shared with the host machine.
+
+Two further outputs make "every active host" a flake attribute instead of a shell
+loop (`flake/fleet-checks.nix`):
+
+| Output | Shape | Use |
+| :--- | :--- | :--- |
+| `fleetHostChecks.<system>.<host>` | one host, built with **the evaluator's** pkgs | the nightly drift gate: one systemd unit per host, each its own nix process |
+| `fleetChecks.<system>` | every active host as ONE derivation | CI and operators, where the runner has the headroom |
+
+Membership is the compiled inventory (`status = "active"`, kind not `external`),
+so no host list exists to rot. Because the artifact is a three-line echo and the
+host's configuration is only *evaluated*, `fleetHostChecks.x86_64-linux.delphi`
+builds on an x86_64 machine even though `delphi` is `aarch64-linux` — measured
+8.35 s / 793 MiB, against `hostChecks.aarch64-linux.delphi`, which needs an ARM
+builder for the same echo.
+
+The aggregate is the tidier expression but it is **not** what runs nightly:
+resolving that one derivation forces every host's config in a single evaluator —
+measured 2026-10-24 at **5122.9 MiB for twelve hosts**, against 2358.9 MiB for the
+same twelve dispatched one attribute at a time. That is the fleet-in-one-process
+shape that got `nix flake check` SIGKILLed, so the nightly gate uses
+`fleetHostChecks` under `--max-jobs 1`, one unit at a time.
+
 The runner is configured with `experimental-features = nix-command flakes
 pipe-operators`: the tree uses `|>`, and a runner without it cannot parse the
 flake at all. That is why the prefix is set in `install-nix-action` rather than

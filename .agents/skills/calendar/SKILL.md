@@ -17,7 +17,7 @@ notification center.
 | | |
 | :--- | :--- |
 | Token cache | `~/.config/vdirsyncer/google_token` |
-| Client id / secret | extracted from `~/.config/rclone/rclone.conf` by the `google-client-id`/`-secret` scripts, so the credentials live in one file |
+| Client id / secret | sops plane: `googleDrive.clientId` / `.clientSecret` in `modules/secrets.yaml`, declared as `sops.secrets.gdrive_client_{id,secret}` — vdirsyncer's `clientIdCommand`/`clientSecretCommand` are `cat` of the rendered secret |
 | Default calendar | `Primary` |
 | Sync timer | `vdirsyncer.timer`, `frequency = "*:0/15"` |
 | Notify timer | `calendar-notify.timer`, `OnCalendar = "*:0/5"`, oneshot — exists only on a generation that declares a compositor |
@@ -26,17 +26,20 @@ notification center.
 
 Two declarative gates, both owned by the config rather than by a hostname:
 
-- **Sync** — `vdirsyncer.service` carries
-  `ConditionPathExists=%h/.config/rclone/rclone.conf`, the file its
-  `google-client-id`/`-secret` scripts read. Where the file is absent the service
-  is skipped (not failed), so a host without Google credentials has no red unit,
-  and a host that gains the file starts syncing with no config change.
+- **Sync** — the credentials are declared (sops, above); the OAuth **token** is
+  state, so `vdirsyncer.service` carries
+  `ConditionPathExists=$XDG_CONFIG_HOME/vdirsyncer/google_token`. Where the token
+  is absent the service is skipped (not failed): a host that has the credentials
+  but has not consented yet has no red unit, and finishing the flow starts sync
+  with no config change. This replaced a condition on
+  `~/.config/rclone/rclone.conf`, which named rclone's file rather than the thing
+  sync actually needs.
 - **Notify** — `calendar-notify.{service,timer}` are `mkIf`
   `osConfig.programs.niri.enable`: the profile that installs the compositor
   (`modules/profiles/base-desktop-environment.nix`) sets it, so a headless
   generation (frieren's boot default) has no such unit at all, while its `desktop`
   specialisation and every desktop host do. The unit also carries the same
-  `rclone.conf` condition, because khal only has data after a sync.
+  token condition, because khal only has data after a sync.
 
 The compositor side of that contract lives in `modules/user/desktop/niri.nix`:
 niri's `spawn-at-startup` runs `systemctl --user import-environment WAYLAND_DISPLAY`

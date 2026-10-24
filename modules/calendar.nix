@@ -16,13 +16,21 @@
     pkgs.stdenv.hostPlatform.isLinux
     && osConfig != null
     && (osConfig.programs.niri.enable or false);
-  getGoogleClientId = pkgs.writeShellScript "google-client-id" ''
-    ${pkgs.python3}/bin/python3 -c "import configparser; cfg=configparser.ConfigParser(); cfg.read('${config.home.homeDirectory}/.config/rclone/rclone.conf'); print(cfg.get('gdrive','client_id'))"
-  '';
+  # The OAuth client is declared, not scraped. Both halves come from the sops
+  # plane (`googleDrive.clientId` / `.clientSecret` in modules/secrets.yaml,
+  # declared in modules/sops.nix), so vdirsyncer reads the rendered secret and no
+  # hand-made rclone.conf sits between the config and the credential. rclone keeps
+  # its own conf because rclone cannot read sops — the two now merely hold the
+  # same client, and the secret plane is the source.
+  clientIdPath = config.sops.secrets.gdrive_client_id.path;
+  clientSecretPath = config.sops.secrets.gdrive_client_secret.path;
 
-  getGoogleClientSecret = pkgs.writeShellScript "google-client-secret" ''
-    ${pkgs.python3}/bin/python3 -c "import configparser; cfg=configparser.ConfigParser(); cfg.read('${config.home.homeDirectory}/.config/rclone/rclone.conf'); print(cfg.get('gdrive','client_secret'))"
-  '';
+  # The OAuth *token* is the opposite kind of fact: it exists only after an
+  # interactive consent flow on that host (calendar skill § First sync), so config
+  # cannot declare it. It is the honest runtime condition for sync — and unlike
+  # rclone.conf it says what sync actually needs, because a client id with no
+  # token still cannot fetch a calendar.
+  tokenFile = "${config.xdg.configHome}/vdirsyncer/google_token";
 
   calendarNotify = pkgs.writeShellApplication {
     name = "calendar-notify";
@@ -79,9 +87,9 @@ in {
       enable = true;
       collections = ["from a" "from b"];
       metadata = ["color" "displayname"];
-      tokenFile = "${config.xdg.configHome}/vdirsyncer/google_token";
-      clientIdCommand = ["${getGoogleClientId}"];
-      clientSecretCommand = ["${getGoogleClientSecret}"];
+      inherit tokenFile;
+      clientIdCommand = ["${pkgs.coreutils}/bin/cat" clientIdPath];
+      clientSecretCommand = ["${pkgs.coreutils}/bin/cat" clientSecretPath];
     };
     remote = {
       type = "google_calendar";
@@ -116,13 +124,12 @@ in {
     frequency = "*:0/15";
   };
 
-  # vdirsyncer's credentials are the Google OAuth client id/secret read out of the
-  # hand-made ~/.config/rclone/rclone.conf (see getGoogleClientId/Secret) — a file
-  # no Nix module declares, which is why this used to be a hostname list. A
-  # systemd condition is the declarative form of that dependency: the timer keeps
-  # ticking, the service is skipped where the file is absent (no red unit), and a
-  # host that later gains the file starts syncing with no config change.
-  systemd.user.services.vdirsyncer.Unit.ConditionPathExists = "%h/.config/rclone/rclone.conf";
+  # Sync runs wherever this host has completed the consent flow. The credentials
+  # are declared (sops); the token is state. A systemd condition is the declarative
+  # form of that dependency: the timer keeps ticking, the service is skipped where
+  # the token is absent (no red unit), and a host that finishes the flow starts
+  # syncing with no config change.
+  systemd.user.services.vdirsyncer.Unit.ConditionPathExists = tokenFile;
 
   # The notifier only exists on a generation that declares a session, and only
   # runs where the sync that fills khal can work.
@@ -130,7 +137,7 @@ in {
     Unit = {
       Description = "Google Calendar event notifier via libnotify/dms";
       After = ["graphical-session.target"];
-      ConditionPathExists = "%h/.config/rclone/rclone.conf";
+      ConditionPathExists = tokenFile;
     };
     Service = {
       Type = "oneshot";

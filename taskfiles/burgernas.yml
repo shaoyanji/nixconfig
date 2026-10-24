@@ -147,43 +147,25 @@ tasks:
       - ssh -o BatchMode=yes {{.DELPHI_SSH}} '~/.local/share/bin-farm/farm.sh deploy burgernas'
 
   burgernas:bin:eget:
-    desc: Update the flat aarch64 tool dir from GitHub releases (runs on delphi)
+    desc: Refresh the NAS aarch64 tool dir from GitHub releases (run on delphi)
     summary: >
-      tools/eget.nix is the list — one row per project, rendered to a TOML here
-      so nothing has to be kept in sync by hand. It runs on delphi because eget
-      follows the running system (`--system linux/arm64` on an x86 host is
-      ignored, measured), then pushes the result to the copy the NAS shell reads.
+      tools/eget.nix holds the table; it renders the TOML and the fetch command,
+      so this task only names a target dir. Delphi, because eget picks assets for
+      the machine it runs on.
     cmds:
       - |
-        nix eval --raw --impure --expr '(import {{.ROOT_DIR}}/tools/eget.nix).aarch64' > /tmp/eget-aarch64.toml
-        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'mkdir -p ~/.local/share/bin-aarch64'
-        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cat > ~/.local/share/bin-aarch64/eget.toml' < /tmp/eget-aarch64.toml
-        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cd ~/.local/share/bin-aarch64 && EGET_CONFIG=$PWD/eget.toml EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) nix run nixpkgs#eget -- --download-all --to $PWD'
-        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'rsync -az --rsync-path=/usr/bin/rsync --exclude "eget.toml" -e "ssh -o BatchMode=yes" ~/.local/share/bin-aarch64/ burgernas:"/volume1/peachcable/bin-aarch64/"'
+        nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/eget.nix).fetcher "aarch64" ~/.local/share/bin-aarch64' | bash
+        rsync -az --rsync-path=/usr/bin/rsync -e 'ssh -o BatchMode=yes' \
+          ~/.local/share/bin-aarch64/ burgernas:/volume1/peachcable/bin-aarch64/
 
   burgernas:bin:eget:x86:
-    desc: Update the flat x86_64 tool dir from GitHub releases (run from frieren)
+    desc: Refresh /srv/data/bin-x86 and /srv/data/appimages (run on frieren)
     summary: >
-      The x86 twin, for /srv/data/bin-x86. Run it on an x86_64 host for the same
-      reason: eget 1.3.4 picks assets for the machine it is on.
+      The x86 halves. Same table, same generated command; the arch of what lands
+      here is the arch of this host, so it must not run on an aarch64 machine.
     cmds:
-      - |
-        nix eval --raw --impure --expr '(import {{.ROOT_DIR}}/tools/eget.nix).amd64' > /tmp/eget-amd64.toml
-        mkdir -p /srv/data/bin-x86
-        EGET_CONFIG=/tmp/eget-amd64.toml EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) \
-          nix run nixpkgs#eget -- --download-all --to /srv/data/bin-x86
-
-  burgernas:bin:eget:appimages:
-    desc: Update the AppImage dir from GitHub releases (run from frieren)
-    summary: >
-      Same table, rows whose `dirs` include "appimages": one file per asset, no
-      archive, and the arch in the asset name comes from the running host.
-    cmds:
-      - |
-        nix eval --raw --impure --expr '(import {{.ROOT_DIR}}/tools/eget.nix).appimages' > /tmp/eget-appimages.toml
-        mkdir -p /srv/data/appimages
-        EGET_CONFIG=/tmp/eget-appimages.toml EGET_GITHUB_TOKEN=$(gh auth token 2>/dev/null) \
-          nix run nixpkgs#eget -- --download-all --to /srv/data/appimages
+      - nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/eget.nix).fetcher "amd64" /srv/data/bin-x86' | bash
+      - nix eval --raw --impure --expr '(import {{.TASKFILE_DIR}}/../tools/eget.nix).fetcher "appimages" /srv/data/appimages' | bash
 
   burgernas:menu:
     desc: Interactive menu for BurgerNAS operations (gum)
@@ -196,7 +178,7 @@ tasks:
           "poweroff" \
           "transmission status" \
           "transmission apply leech-only" \
-          "bin sync (static aarch64)" \
+          "tools: eget aarch64 (delphi -> NAS)" \
           "restic seed (frieren root)" \
           "restic snapshots (frieren root)" \
           "ssh" \
@@ -208,7 +190,8 @@ tasks:
           "poweroff") task burgernas:poweroff ;;
           "transmission status") task burgernas:transmission:status ;;
           "transmission apply leech-only") task burgernas:transmission:leech ;;
-          "tools: update aarch64 set (eget)") task burgernas:bin:eget ;;
+          "tools: eget aarch64 (delphi -> NAS)") task burgernas:bin:eget ;;
+          "tools: eget x86 + appimages (frieren)") task burgernas:bin:eget:x86 ;;
           "restic seed (frieren root)") task burgernas:backup:seed ;;
           "restic snapshots (frieren root)") task burgernas:snapshot ;;
           "ssh") task burgernas:ssh ;;

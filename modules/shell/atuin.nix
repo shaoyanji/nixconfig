@@ -1,6 +1,8 @@
 # atuin on every host, pointed at the one server. Bash and nushell both get the
-# Ctrl-R UI from here, so a shell on the laptop and a shell on the NAS search
-# the same history as long as the host has run `atuin login` once.
+# Ctrl-R UI from here, so every host and shell searches one history as long as it
+# has run `atuin login` once — user `devji`, password and key under `atuin` in
+# modules/secrets/secrets.yaml, then `atuin import bash` / `atuin import nu-hist-db`
+# for the history that predates the account.
 _: {
   programs.atuin = {
     enable = true;

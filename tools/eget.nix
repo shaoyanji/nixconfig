@@ -1,108 +1,148 @@
-# The tool list, in nix, rendered into eget TOMLs at use time.
+# The release-binary table, in nix. `toml` renders it for eget and `fetcher`
+# wraps that TOML in the command that downloads it — no TOML or download line is
+# kept by hand anywhere.
 #
-# One row per project: the repo it releases from, the asset filters that single
-# out the wanted file, and which dirs it belongs in. The TOMLs are generated
-# (`nix eval --raw --impure --expr '(import ./tools/eget.nix).aarch64'`), so
-# there is no second copy to drift and adding a tool is one row.
-#
-# Why a table and not just `nixpkgs`: these binaries are for the NAS and for
-# machines that cannot run nix, and eget fetches the artifact upstream publishes
-# instead of building it. Tools with no prebuilt release are NOT here — those go
-# through tools/bin-farm (pkgsStatic on delphi).
-#
-# Two facts that shape the rows, both measured:
-#   * eget 1.3.4 follows the running system; `--system` does not cross-compile
-#     (13/13 entries still came back arm64 on an x86 request), so the arch of a
-#     generated file is the arch of the host that runs it.
-#   * two matching assets make eget prompt, which is a hard failure with no TTY,
-#     hence the `^sidecar` filters.
+# Two measured facts:
+#   * eget 1.3.4 does not filter by arch (an aarch64 host happily fetched
+#     starship-x86_64 when nothing else matched), so each row names the token
+#     that pins its asset per dir. That is also why a dir's contents are only
+#     right on the arch the tokens name, not the arch of the host.
+#   * two matching assets make eget prompt, and prompting without a TTY fails.
 let
-  # dir: which target the row lands in. A row may appear in several.
-  # filters: ANDed substrings; a leading ^ excludes.
   tools = {
     age = {
       repo = "FiloSottile/age";
       dirs = ["aarch64" "amd64"];
-      filters = [".tar.gz" "^proof" "^sha256"];
-      # The tarball also carries age-keygen; eget extracts one executable per
-      # asset, so a fresh dir needs `eget FiloSottile/age --file age-keygen`.
+      filters = [".tar.gz" "^proof"];
+      pick = {
+        aarch64 = "linux-arm64";
+        amd64 = "linux-amd64";
+      };
     };
     fzf = {
       repo = "junegunn/fzf";
       dirs = ["aarch64" "amd64"];
       filters = [".tar.gz"];
+      pick = {
+        aarch64 = "linux_arm64";
+        amd64 = "linux_amd64";
+      };
     };
     gh = {
       repo = "cli/cli";
       dirs = ["aarch64" "amd64"];
       filters = [".tar.gz"];
+      pick = {
+        aarch64 = "linux_arm64";
+        amd64 = "linux_amd64";
+      };
     };
     duf = {
       repo = "muesli/duf";
-      dirs = ["aarch64" "amd64"];
+      # arm only: upstream ships no x86_64 tarball (just .deb/.rpm/.apk).
+      dirs = ["aarch64"];
       filters = [".tar.gz"];
+      pick = {
+        aarch64 = "linux_arm64";
+        amd64 = "linux_amd64";
+      };
     };
     zoxide = {
       repo = "ajeetdsouza/zoxide";
       dirs = ["aarch64" "amd64"];
       filters = [".tar.gz"];
+      pick = {
+        aarch64 = "aarch64-unknown-linux-musl";
+        amd64 = "x86_64-unknown-linux-musl";
+      };
     };
     glow = {
       repo = "charmbracelet/glow";
       dirs = ["aarch64" "amd64"];
       filters = [".tar.gz" "^sbom"];
+      pick = {
+        aarch64 = "Linux_arm64";
+        amd64 = "Linux_x86_64";
+      };
     };
     gum = {
       repo = "charmbracelet/gum";
       dirs = ["aarch64" "amd64"];
       filters = [".tar.gz" "^sbom"];
+      pick = {
+        aarch64 = "Linux_arm64";
+        amd64 = "Linux_x86_64";
+      };
     };
     task = {
       repo = "go-task/task";
       dirs = ["aarch64" "amd64"];
       filters = [".tar.gz"];
+      pick = {
+        aarch64 = "linux_arm64";
+        amd64 = "linux_amd64";
+      };
     };
     lazygit = {
       repo = "jesseduffield/lazygit";
       dirs = ["aarch64" "amd64"];
       filters = [".tar.gz"];
+      pick = {
+        aarch64 = "linux_arm64";
+        amd64 = "linux_x86_64";
+      };
     };
     hugo = {
       repo = "gohugoio/hugo";
       dirs = ["aarch64" "amd64"];
-      # plain / extended / extended_withdeploy exist for every platform.
       filters = ["hugo_extended_" "^withdeploy" ".tar.gz"];
+      pick = {
+        aarch64 = "linux-arm64";
+        amd64 = "linux-amd64";
+      };
     };
     sops = {
       repo = "getsops/sops";
       dirs = ["aarch64" "amd64"];
-      filters = [".linux." "^sbom"];
+      filters = ["^sbom"];
+      pick = {
+        aarch64 = "linux.arm64";
+        amd64 = "linux.amd64";
+      };
     };
     pdfcpu = {
       repo = "pdfcpu/pdfcpu";
       dirs = ["aarch64" "amd64"];
       filters = [".tar.xz" "^sbom"];
+      pick = {
+        aarch64 = "Linux_arm64";
+        amd64 = "Linux_x86_64";
+      };
     };
     starship = {
       repo = "starship/starship";
       dirs = ["aarch64" "amd64"];
-      # gnu and musl tarballs both match the platform; two survivors make eget
-      # ask, and asking with no TTY is a failure.
-      filters = [".tar.gz" "^musl"];
+      filters = [".tar.gz"];
+      # arm ships musl only; x86 ships both, so pin gnu there.
+      pick = {
+        aarch64 = "aarch64-unknown-linux-musl";
+        amd64 = "x86_64-unknown-linux-gnu";
+      };
     };
     yq = {
       repo = "mikefarah/yq";
       dirs = ["aarch64" "amd64"];
       filters = ["^tar.gz"]; # the bare binary, not the tarball of it
       file = "yq";
+      pick = {
+        aarch64 = "linux_arm64";
+        amd64 = "linux_amd64";
+      };
     };
 
-    # GUI apps: one file, no archive, and the name carries the arch, so the
-    # filter names the x86_64 asset — that is what /srv/data/appimages holds.
-    # Every AppImage release also ships a .zsync beside it, and two matching
-    # assets make eget prompt — which is death without a TTY. `target` is what
-    # keeps the version out of the filename: eget would otherwise name the file
-    # after the repo and drop the extension.
+    # GUI apps: no archive, and the arch sits in the asset name. `target` keeps
+    # the version out of the filename; every AppImage release also ships a
+    # .zsync beside it.
     zen-browser = {
       repo = "zen-browser/desktop";
       dirs = ["appimages"];
@@ -135,29 +175,38 @@ let
     };
   };
 
-  renderDir = dir: let
-    rows = builtins.filter (n: builtins.elem dir tools.${n}.dirs) (builtins.attrNames tools);
+  # EGET_CONFIG is a file, so the TOML goes through a heredoc rather than a flag.
+  toml = dir: let
     row = name: let
       t = tools.${name};
-      filters = "[" + builtins.concatStringsSep ", " (map (f: "\"${f}\"") t.filters) + "]";
+      filters = t.filters ++ (if t ? pick then [t.pick.${dir}] else []);
       opt = k: if t ? ${k} then "\n${k} = \"${t.${k}}\"" else "";
     in ''
-      # ${name}
       ["${t.repo}"]
-      asset_filters = ${filters}${opt "file"}${opt "target"}
-    '';
+      asset_filters = [${builtins.concatStringsSep ", " (map (f: "\"${f}\"") filters)}]${opt "file"}${opt "target"}'';
+
+    rows = builtins.filter (n: builtins.elem dir tools.${n}.dirs) (builtins.attrNames tools);
   in ''
-    # GENERATED by tools/eget.nix — edit the table there, not this file.
-    # No `target` here on purpose: the caller passes --to, so the same table
-    # describes both the NAS copy and a host-local dir.
-    # The arch of what lands here is the arch of the machine that runs it.
     [global]
     quiet = false
 
-    ${builtins.concatStringsSep "\n" (map row rows)}
+    ${builtins.concatStringsSep "\n\n" (map row rows)}
+  '';
+
+  # cd, not just `--to`: eget extracts archives into `--to` but writes a bare
+  # asset (yq, every AppImage) into the working directory.
+  fetcher = dir: dest: ''
+    set -eu
+    mkdir -p '${dest}'
+    cd '${dest}'
+    cfg=$(mktemp)
+    trap 'rm -f "$cfg"' EXIT
+    cat > "$cfg" <<'TOML'
+    ${toml dir}
+    TOML
+    EGET_CONFIG=$cfg EGET_GITHUB_TOKEN=''${EGET_GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)} \
+      nix run nixpkgs#eget -- --download-all --to "$PWD"
   '';
 in {
-  aarch64 = renderDir "aarch64";
-  amd64 = renderDir "amd64";
-  appimages = renderDir "appimages";
+  inherit toml fetcher;
 }

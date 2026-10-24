@@ -137,6 +137,10 @@ in {
     # shell start. Re-enable once home-manager ships the fixed script.
     fzf.enableNushellIntegration = false;
     fzf.tmux.enableShellIntegration = true;
+    # Ctrl-R belongs to atuin: one history index that syncs, instead of fzf
+    # reading whichever host's history file is local. fzf keeps its file and
+    # process pickers.
+    fzf.historyWidget.command = "";
     ripgrep.enable = true;
     jq.enable = true;
     fd = {

@@ -1,0 +1,67 @@
+# eget-amd64 — the flat x86_64 tool dir (/srv/data/bin-x86).
+#
+# Run this ON AN X86_64 HOST (frieren): eget 1.3.4 follows the running system,
+# so `--system` cannot ask for another architecture — measured on the aarch64
+# twin of this file, where every entry still came back arm64.
+#
+# Same sections as aarch64.toml, same reasons. Anything with no prebuilt release
+# belongs in tools/bin-farm instead; eget cannot compile.
+#
+# GitHub allows 60 unauthenticated API requests an hour, which a full run can
+# approach; the task passes `gh auth token` when one exists.
+#
+# Adding a tool: run `eget owner/repo --download-only` once, see which asset it
+# picks, then pin that preference here.
+
+[global]
+quiet = false
+
+# age ships one tarball per platform carrying age and age-keygen; releases also
+# publish `.proof`/`.sha256` sidecars, and two matches means a prompt, which is a
+# failure in a non-interactive run.
+["FiloSottile/age"]
+asset_filters = [".tar.gz", "^proof", "^sha256"]
+
+["junegunn/fzf"]
+asset_filters = [".tar.gz"]
+
+["cli/cli"]
+asset_filters = [".tar.gz"]
+
+["muesli/duf"]
+asset_filters = [".tar.gz"]
+
+["ajeetdsouza/zoxide"]
+asset_filters = [".tar.gz"]
+
+["charmbracelet/glow"]
+asset_filters = [".tar.gz", "^sbom"]
+
+["charmbracelet/gum"]
+asset_filters = [".tar.gz", "^sbom"]
+
+["go-task/task"]
+asset_filters = [".tar.gz"]
+
+["jesseduffield/lazygit"]
+asset_filters = [".tar.gz"]
+
+# hugo publishes plain / extended / extended_withdeploy per platform; only the
+# plain extended build is wanted.
+["gohugoio/hugo"]
+asset_filters = ["hugo_extended_", "^withdeploy", ".tar.gz"]
+
+["getsops/sops"]
+asset_filters = [".linux.", "^sbom"]
+
+["pdfcpu/pdfcpu"]
+asset_filters = [".tar.xz", "^sbom"]
+
+["starship/starship"]
+asset_filters = [".tar.gz"]
+
+# yq publishes the bare binary *and* a tarball of it; the flat dir wants the bare
+# one, so the archive is excluded.
+["mikefarah/yq"]
+asset_filters = ["^tar.gz"]
+file = "yq"

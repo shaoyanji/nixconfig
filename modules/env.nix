@@ -38,9 +38,11 @@ in {
 
   config = {
     # programs.nixvim.enable = true;
-    home.activation.removeExistingGitConfig = lib.hm.dag.entryAfter ["checkLinkTargets"] ''
-      rm -f ~/.gitconfig
-    '';
+    # `~/.gitconfig` is deliberately NOT deleted on activation: it is where
+    # `gh auth setup-git` writes its credential helper, so wiping it made every
+    # setup-git run disappear on the next switch. Git config that must be
+    # authoritative lives in programs.git.settings (rendered to
+    # ~/.config/git/config); ~/.gitconfig is left to the user and to gh.
     programs.delta = {
       enableGitIntegration = true;
       enable = true;

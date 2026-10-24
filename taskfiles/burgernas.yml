@@ -6,6 +6,9 @@ vars:
   BURGERNAS_MAC: "90:09:D0:06:C1:EE"
   BURGERNAS_RESTIC_REPO: "sftp:devji@192.168.3.92:/volume1/backup/frieren/restic"
   BURGERNAS_TX_SETTINGS: "/volume1/@appdata/transmission/settings.json"
+  # The fleet's aarch64 builder. `ssh delphi` is a host-local alias; this name
+  # resolves from every host, which is what the toolbox tasks need.
+  DELPHI_SSH: "delphi.bountystash.com"
 
 tasks:
   burgernas:ssh:
@@ -117,8 +120,34 @@ tasks:
           -o sftp.command="ssh {{.BURGERNAS_ALIAS}} /usr/local/bin/sftp-server" \
           snapshots
 
+  burgernas:bin:lock:
+    desc: Resolve the aarch64 static toolbox on delphi (farm.sh lock)
+    summary: >
+      tools/bin-farm is content-addressed: farm.toml names the tools, `farm.sh lock`
+      resolves each into a local store keyed by sha256, and farm.lock.json is the
+      record of what was resolved. It runs on delphi because the nixpkgs provider
+      needs a native aarch64 builder, and the NAS has 512 MiB and cannot compile
+      anything. Runtime state (store, lock, downloads) lives in
+      ~/.local/share/bin-farm there, so a reboot does not re-download.
+    cmds:
+      - |
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'mkdir -p ~/.local/share/bin-farm'
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cat > ~/.local/share/bin-farm/farm.toml' < tools/bin-farm/farm.toml
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'cat > ~/.local/share/bin-farm/farm.sh' < tools/bin-farm/farm.sh
+        ssh -o BatchMode=yes {{.DELPHI_SSH}} 'chmod +x ~/.local/share/bin-farm/farm.sh && ~/.local/share/bin-farm/farm.sh lock'
+
+  burgernas:bin:deploy:
+    desc: Push the resolved toolbox to BurgerNAS and verify every file on arrival
+    summary: >
+      Each upload is followed by sha256sum on the receiver and discarded if it does
+      not match the lock; a real file where a farm symlink belongs is refused, never
+      overwritten. Lands in /volume1/Shared Library/toolbox (bin/<name> ->
+      store/<sha256>/<name>) because /volume1 itself is root-owned on DSM.
+    cmds:
+      - ssh -o BatchMode=yes {{.DELPHI_SSH}} '~/.local/share/bin-farm/farm.sh deploy burgernas'
+
   burgernas:bin:sync:
-    desc: Synchronize static aarch64 binaries from frieren to BurgerNAS
+    desc: "[Mac] Mirror the legacy flat bin-aarch64 dump to BurgerNAS (unmanaged)"
     cmds:
       - |
         rsync -avz --delete --rsync-path=/usr/bin/rsync \

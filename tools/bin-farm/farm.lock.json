@@ -1,0 +1,51 @@
+{
+  "agy": {
+    "name": "agy",
+    "provider": "release",
+    "sha256": "484f6bacb0828a4d6c2768ce94d02a3cc347e72e67572d6b97ab0ff9025474fb",
+    "size": 217338064,
+    "version": "1.4.7"
+  },
+  "crush": {
+    "name": "crush",
+    "provider": "release",
+    "sha256": "412ffbd1c77ad98c9c7cd4f12d6e0f64c6a4523a7255042cd32cef22f99a805b",
+    "size": 87031968,
+    "version": "0.98.2"
+  },
+  "lazygit": {
+    "name": "lazygit",
+    "provider": "release",
+    "sha256": "784cc7cfa382e9c27d032035ffbe24c626015e1410d6035edb58127e8a7b2d74",
+    "size": 19333282,
+    "version": "0.66.2"
+  },
+  "obsidian-export": {
+    "name": "obsidian-export",
+    "provider": "nixpkgs",
+    "sha256": "61d05cd1594872f2b4456ddd4bb82821933d69274028c43b3c51e84e2bada786",
+    "size": 4942816,
+    "version": "25.3.0"
+  },
+  "sqlite3": {
+    "name": "sqlite3",
+    "provider": "nixpkgs",
+    "sha256": "747f038572146dcaa78a58a2084e05c4338bbd7ee94e6f8b612f3b8021eb5fd4",
+    "size": 2502840,
+    "version": "3.53.3"
+  },
+  "typst": {
+    "name": "typst",
+    "provider": "release",
+    "sha256": "3088dd985a891d804a98c69db24dfca77a35878e45d40e38c79cf36d72bcd4c1",
+    "size": 48655936,
+    "version": "0.15.1"
+  },
+  "zola": {
+    "name": "zola",
+    "provider": "release",
+    "sha256": "c3a3710beca5609f8ef9c52b0527a8922d0de377d1fd3a47d55ee47a943f4930",
+    "size": 45555144,
+    "version": "0.23.6"
+  }
+}

@@ -1,0 +1,77 @@
+# bin-farm.toml — single source of truth for the aarch64 static binary farm.
+#
+# Two providers:
+#   release = "fetch upstream static build, pinned by sha256"   <- default, ~1 s
+#   nixpkgs = "compile pkgsStatic.<attr> on an aarch64 host"    <- only when no
+#             upstream aarch64-linux binary exists (e.g. obsidian-export)
+#
+# Anything NOT listed here is never touched, never upgraded, never deleted.
+# `farm.sh deploy` will refuse to overwrite a file it did not create.
+
+[typst]
+provider = "release"
+version  = "0.15.1"
+url      = "https://github.com/typst/typst/releases/download/v0.15.1/typst-aarch64-unknown-linux-musl.tar.xz"
+sha256   = "5aa8d74a3d906e60ea12a66ac2f37f8eef1b14cbad7182a745e393a10c23dcee"
+member   = "typst-aarch64-unknown-linux-musl/typst"
+
+[obsidian-export]
+provider = "nixpkgs"
+attr     = "obsidian-export"
+version  = "25.3.0"
+
+[agy]
+# upstream tarball, not the nix build: the nix derivation carries a
+# /nix/store glibc interpreter and cannot exec on DSM at all.
+provider = "release"
+version  = "1.4.7"
+url      = "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.4.7-5900205422411776/linux-arm/cli_linux_arm64.tar.gz"
+sha256   = "b273c791b7647f680598fa1dbdf9c8086bdc42374b2276fa70e900bf8120e1d5"
+member   = "antigravity"
+
+[crush]
+provider = "release"
+version  = "0.98.2"
+url      = "https://github.com/charmbracelet/crush/releases/download/v0.98.2/crush_0.98.2_Linux_arm64.tar.gz"
+sha256   = "151fb5f109e7277bd2462839b9b92de0409db785fd50b8c80697192f4fb0da9d"
+member   = "crush_0.98.2_Linux_arm64/crush"
+
+[sqlite3]
+# DSM ships 3.40 without FTS5 in /usr/bin — firmware-owned, do not replace.
+# This one is static with FTS5 (BM25 ranking) compiled in.
+provider = "nixpkgs"
+attr     = "sqlite"
+version  = "3.53.3"
+
+[lazygit]
+provider = "release"
+version  = "0.66.2"
+url      = "https://github.com/jesseduffield/lazygit/releases/download/v0.66.2/lazygit_0.66.2_linux_arm64.tar.gz"
+sha256   = "79a3161eeb642f0473e23db6341f7baabd4a5933e921a9c1167c5d5c765c41a4"
+member   = "lazygit"
+
+[zola]
+provider = "release"
+version  = "0.23.6"
+url      = "https://github.com/getzola/zola/releases/download/v0.23.6/zola-v0.23.6-aarch64-unknown-linux-gnu.tar.gz"
+sha256   = "266448fffbf7c7004ca399d0e76dd699541771096d8a42aede98cebe2a029d02"
+member   = "zola"
+
+# --- SynoCommunity cannot supply any of the below; add as needed -------------
+# [vale]
+# provider = "release"
+# version  = "3.25.1"
+# url      = "https://github.com/vale-cli/vale/releases/download/v3.25.1/vale_3.25.1_Linux_arm64.tar.gz"
+# sha256   = "<sha256sum of that file>"
+# member   = "vale"
+#
+# [lychee]      release  https://github.com/lycheeverse/lychee/releases  (musl aarch64)
+# [zola]        release  https://github.com/getzola/zola/releases        (static musl aarch64)
+# [mdbook]      release  https://github.com/rust-lang/mdBook/releases    (musl aarch64)
+# [jless]       release  https://github.com/PaulJuliusMartinez/jless/releases
+# [miller]      release  https://github.com/johnkerl/miller/releases     (miller-static)
+# [qsv]         release  https://github.com/dathere/qsv/releases         (musl aarch64)
+# [pandoc]      release  https://github.com/jgm/pandoc/releases          (linux-arm64 tarball)
+# [tectonic]    release  https://github.com/tectonic-typesetting/tectonic/releases
+# [duckdb]      release  https://github.com/duckdb/duckdb/releases       (linux_arm64)
+# [gh]          release  refresh your Jan-2025 copy the same way

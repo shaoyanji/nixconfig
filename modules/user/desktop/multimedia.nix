@@ -14,18 +14,25 @@
     then (osConfig.fleet.inventory.hosts.${hostName} or (config.fleet.inventory.hosts.${hostName} or null))
     else null;
   gpuDesc = invHost.hardware.gpu or "";
+  traits =
+    if invHost == null
+    then []
+    else (invHost.software.traits or []);
 
-  # Auto-detection of tier based on GPU description and host identity
+  # Tier from the declared GPU where the inventory states one (`gpu-low`/`gpu-high`),
+  # else from the GPU's own name. The hostname lists that used to sit here were a
+  # second place to remember which machine has which card, and they disagreed with
+  # `hardware.gpu` (ares matched only by name, netbook's HD 400 by neither).
   detectedTier =
     if
-      builtins.elem hostName ["aristotle" "netbook"]
+      builtins.elem "gpu-low" traits
       || lib.strings.hasInfix "4400" gpuDesc
       || lib.strings.hasInfix "3000" gpuDesc
       || lib.strings.hasInfix "Braswell" gpuDesc
       || lib.strings.hasInfix "N3060" gpuDesc
     then "low"
     else if
-      builtins.elem hostName ["eisen" "poseidon" "ares"]
+      builtins.elem "gpu-high" traits
       || lib.strings.hasInfix "RX 5700" gpuDesc
       || lib.strings.hasInfix "RTX" gpuDesc
       || lib.strings.hasInfix "Navi" gpuDesc

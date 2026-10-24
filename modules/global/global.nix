@@ -7,11 +7,10 @@
 }: let
   hostName = config.networking.hostName or (config.hostName or "");
   hostMeta = config.fleet.inventory.hosts.${hostName} or {};
-  isCloudHost =
-    (hostMeta.category or "")
-    == "cloud"
-    || hostName == "delphi"
-    || hostName == "garnixMachine";
+  # `category = "cloud"` in inventory.toml is the whole fact: a host that is not on
+  # the LAN and must not assume LAN services. The two names that used to be OR'd in
+  # both carry it, so the list was already redundant.
+  isCloudHost = (hostMeta.category or "") == "cloud";
 
   # ── Fleet Binary Cache Registry ─────────────────────────────────────────────
   # Single source of truth for all substituters and their signing keys.

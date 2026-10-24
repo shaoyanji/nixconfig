@@ -11,14 +11,16 @@
     then (osConfig.fleet.inventory.hosts.${hostName} or (config.fleet.inventory.hosts.${hostName} or null))
     else null;
   category = invHost.category or "";
+  traits =
+    if invHost == null
+    then []
+    else (invHost.software.traits or []);
 
-  # On laptops and compact screens (e.g. 14" 1600x900 or 1080p),
-  # side-by-side diffs compress columns and cause awkward line wrapping.
-  # Workstations and widescreen setups default to side-by-side.
-  isLaptop =
-    category
-    == "laptop"
-    || builtins.elem hostName ["aristotle" "fern" "scratch" "netbook"];
+  # On laptops and compact screens (e.g. 14" 1600x900 or 1080p), side-by-side diffs
+  # compress columns and cause awkward line wrapping. The category covers laptops;
+  # `small-screen` covers a workstation in the same position (scratch's 1366x768)
+  # without naming it here.
+  isLaptop = category == "laptop" || builtins.elem "small-screen" traits;
   defaultSideBySide = !isLaptop;
   user = import ./global/user.nix;
 in {

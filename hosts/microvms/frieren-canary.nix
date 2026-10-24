@@ -1,12 +1,6 @@
-# Frieren Canary & Runtime Sandbox MicroVM (EXP-102)
-#
-# The guest skeleton — tap + static address, virtiofs store, shared ssh host key,
-# predictable-name opt-out, the shutdown deadlock fix — lives in ./base.nix and is
-# shared with every other guest. This file used to carry its own copy of all of it,
-# which drifted: no `usePredictableInterfaceNames = false`, so udev renamed the NIC
-# after networkd had matched on "e*", and the guest booted to a login prompt with no
-# IPv4 address at all (`ssh frieren-canary` then timed out forever while the serial
-# console looked healthy). What is left here is only what makes this guest a canary.
+# Frieren Canary & Runtime Sandbox MicroVM (EXP-102): the guest skeleton comes
+# from ./base.nix, so only the canary-specific parts are declared here. The copy it
+# replaces had drifted (no predictable-name opt-out, so the guest booted with no IP).
 {
   config,
   lib,

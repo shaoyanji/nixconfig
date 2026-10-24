@@ -81,13 +81,18 @@
       lib.hasInfix "systemd.services" (read p)
       || lib.hasInfix "systemd.user.services" (read p)
   ) (nixUnder "modules");
-  hostnameGatedUnitModules =
+  # Every module, not only the ones that declare units: a package list or a tier
+  # chosen by name is the same undeclared capability as a unit gated by name, and
+  # it rots the moment a host is renamed, added or repurposed. Host files under
+  # hosts/ are that host's own config and may say its name; a shared module may not.
+  hostnameGatedModules =
     builtins.filter (
       p:
         anyLine p (l: builtins.match ".*builtins\\.elem hostName.*" l != null)
         || anyLine p (l: builtins.match ".*hostName ==.*" l != null)
     )
-    unitModules;
+    (nixUnder "modules");
+  hostnameGatedUnitModules = builtins.filter (p: builtins.elem p unitModules) hostnameGatedModules;
   unclassifiedDaemons =
     lib.concatMap (
       p:
@@ -325,6 +330,13 @@
       proof = "hosts/*/configuration.nix that both import base-desktop-environment and force niri off";
       holds = halfForked == [];
       detail = "half-forked hosts: ${lib.concatStringsSep ", " halfForked}";
+    };
+
+    capabilities-are-traits-not-names = {
+      rule = "A shared module asks a host what it declares, never what it is called. Capability belongs in `inventory.toml` (`category`, `persona.compute_tier`, `software.traits`), and the module reads it: `traits` for a package list or toolchain tier, `category` for what kind of machine it is. A hostname list compiles in a second registry whose only maintenance event is a breakage — frieren, eisen and poseidon were remembered in three separate modules, and the GPU tier list had drifted from `hardware.gpu` (ares matched only by name, netbook's card matched by neither).";
+      proof = "modules/**/*.nix scanned for `builtins.elem hostName` and `hostName ==`; the traits they now read live in inventory.toml";
+      holds = hostnameGatedModules == [];
+      detail = "hostname-gated modules (the trait they need belongs in inventory.toml): ${lib.concatStringsSep ", " hostnameGatedModules}";
     };
 
     systemd-units-are-capability-gated = {

@@ -5,9 +5,19 @@
   osConfig ? null,
   ...
 }: let
-  # Hosts with initialized and registered TPM 2.0 identities
-  tpmHosts = ["frieren" "fern" "scratch" "poseidon"];
-  useTpm = osConfig != null && builtins.elem (osConfig.networking.hostName or "") tpmHosts;
+  # A host whose TPM identity is enrolled says so in inventory.toml (`tpm-identity`)
+  # instead of being remembered in a list here: the list lived in this file while the
+  # enrollment itself lives on the machine, so the two could disagree silently.
+  hostName = osConfig.networking.hostName or (config.networking.hostName or "");
+  invHost =
+    if hostName != ""
+    then (osConfig.fleet.inventory.hosts.${hostName} or (config.fleet.inventory.hosts.${hostName} or null))
+    else null;
+  traits =
+    if invHost == null
+    then []
+    else (invHost.software.traits or []);
+  useTpm = osConfig != null && builtins.elem "tpm-identity" traits;
   tpm_key_path = "${config.home.homeDirectory}/.config/sops/age/tpm-identity.txt";
   default_key_path = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 in {

@@ -130,6 +130,13 @@ patterns — which is why the `--print-roots` check belongs in the operator's ha
 - An optional file path is `lib.types.nullOr lib.types.path`.
 - A secret is injected with systemd `LoadCredential`, never on a command line
   (`rpcSecretFile` in the aria2 module is the reference).
+- **A module asks what a host declares, never what it is called**
+  [[flake/policies.nix#capabilities-are-traits-not-names]]. Package lists and
+  toolchain tiers read `software.traits` (`ai-full`, `dev-full`, `gpu-low`,
+  `gpu-high`, `small-screen`, `tpm-identity`) and the machine's `category`
+  (`cloud`, `laptop`, `workstation`); a host that gains a capability states it in
+  `inventory.toml`, next to the hardware that justifies it. `checks.policies`
+  fails on `builtins.elem hostName` or `hostName ==` anywhere under `modules/`.
 - **A unit exists because a capability is declared, not because a hostname is
   listed** [[flake/policies.nix#systemd-units-are-capability-gated]]. The
   capability is the option that installs the thing the unit needs —

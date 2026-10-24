@@ -240,11 +240,11 @@ in {
   # Home Assistant IoT and device stack (modules/services/home-assistant.nix)
   services.ha-stack.enable = true;
 
-  # Shell-history sync (modules/services/atuin-server.nix). Registration is on
-  # only long enough to create the first account; flip it off afterwards.
+  # Shell-history sync (modules/services/atuin-server.nix). The one account is
+  # registered; leaving signup open would let anyone who reaches the vhost write
+  # to the history database.
   services.atuin-server = {
     enable = true;
-    openRegistration = true;
     serverAliases = [
       "atuin.lan"
       "atuin.frieren.local"

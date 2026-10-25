@@ -10,25 +10,33 @@
   systemoneSrc = ./systemone;
 
   # Standalone CLI package wrapping python3 and the decision engine
+  # Pinned to cfg.pythonPackage (nixpkgs system python) for fleet-wide closure efficiency
   systemoneDecisionPkg = pkgs.writeShellApplication {
     name = "systemone-decision";
-    runtimeInputs = [pkgs.python3];
+    runtimeInputs = [cfg.pythonPackage];
     text = ''
-      exec python3 "${systemoneSrc}/engine.py" "$@"
+      exec "${cfg.pythonPackage}/bin/python3" "${systemoneSrc}/engine.py" "$@"
     '';
   };
 
   # Ensemble CLI package wrapping System 1 (Julia-1) + System 2 (Nemotron-3-Ultra) Pre-Harness
   systemoneEnsemblePkg = pkgs.writeShellApplication {
     name = "systemone-ensemble";
-    runtimeInputs = [pkgs.python3];
+    runtimeInputs = [cfg.pythonPackage];
     text = ''
-      exec python3 "${systemoneSrc}/ensemble.py" "$@"
+      exec "${cfg.pythonPackage}/bin/python3" "${systemoneSrc}/ensemble.py" "$@"
     '';
   };
 in {
   options.services.systemoneDecision = {
     enable = lib.mkEnableOption "System One Decision Engine (Julia-1 & Laya)";
+
+    pythonPackage = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.python3;
+      defaultText = lib.literalExpression "pkgs.python3";
+      description = "The Python 3 package to use for System One decisions (pinned to nixpkgs system python for closure efficiency).";
+    };
 
     package = lib.mkOption {
       type = lib.types.package;
@@ -95,7 +103,8 @@ in {
       # No `network-online`: a loopback listener needs no network state.
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/systemone-decision --model ${
+        # Pinned directly to cfg.pythonPackage without intermediate bash wrapper
+        ExecStart = "${cfg.pythonPackage}/bin/python3 ${systemoneSrc}/engine.py --model ${
           if cfg.serve.model != null
           then cfg.serve.model
           else cfg.defaultModel

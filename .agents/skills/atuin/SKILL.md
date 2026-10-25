@@ -1,7 +1,7 @@
 ---
 name: atuin
-description: "Pick me to finish atuin sync on a fleet host: shared sops key, login with the mnemonic (not the base64 file form), import nu + bash history, then the count check that proves convergence. Temporary migration skill."
-version: 0.1.0
+description: "Pick me to finish atuin sync on a fleet host: one script does login, the one-time nu+bash seed, sync and the count check. The traps are the two key forms, the public-server fallback, and a non-idempotent import. Temporary migration skill."
+version: 0.2.0
 platforms: [linux]
 metadata:
   hermes:
@@ -21,6 +21,42 @@ registration closed). Client: `modules/shell/atuin.nix`. Shared key:
 
 Truth: `modules/sops.nix`, `modules/shell/atuin.nix`, `modules/services/atuin-server.nix`, `modules/secrets.yaml`; fleet membership from `inventory.toml`.
 
+## One command, after the rebuild
+
+The rebuild renders the key; `scripts/atuin-bootstrap.sh` (next to this file) does
+everything else in one pass — login, the one-time history seed, two syncs, and the
+count check. It is idempotent: a second run only syncs.
+
+```bash
+FLEET=24520    # the item count a converged host reports; ask a live one, it grows
+
+# on the host
+bash .agents/skills/atuin/scripts/atuin-bootstrap.sh --expect "$FLEET"
+
+# or from here, no copy, no login for the target to work out
+ssh <host> "bash -s -- --expect $FLEET" < .agents/skills/atuin/scripts/atuin-bootstrap.sh
+```
+
+Credentials come from sops (`ATUIN_PASSWORD`/`ATUIN_KEY`) when the host can read
+the repo, else from the environment. Output is the whole proof on six lines:
+
+```
+host        stark
+atuin       18.23.0
+key         key · 60-char base64
+login       done
+seed        done: nu-hist-db bash
+items       24520
+verdict     synced
+```
+
+| code | meaning | what to do |
+| :--- | :--- | :--- |
+| 2 | not ready: no binary/key, mnemonic in the key file, or no fleet `sync_address` | rebuild the host |
+| 3 | no usable credentials | export them, or point `NIXCONFIG` at a readable repo |
+| 4 | login or sync failed | read the message; the landmines below |
+| 5 | count ≠ `--expect` | this host's seed, or the server, is behind |
+
 ## The trap that costs an hour
 
 The key has **two representations and they are not interchangeable**:
@@ -33,48 +69,24 @@ The key has **two representations and they are not interchangeable**:
 Writing the mnemonic into the key file fails with
 `failed to decode the loaded key: failed to base64 decode`. Writing base64 into
 `-k` fails with `key mnemonic was not valid`. Sops renders the base64 one;
-humans paste the mnemonic one.
+humans paste the mnemonic one. The script checks both shapes before it logs in.
 
-## Procedure, one host at a time
+## Two more traps it now catches
 
-Run on the host (or over ssh). `sops` must work there, and the host needs its
-declarative generation — the key file is written by activation, so rebuild first
-if `~/.local/share/atuin/key` is missing.
-
-```bash
-# 1. Log in. Not `atuin register`: registration is closed server-side.
-atuin login -u devji \
-  -p "$(sops -d --extract '["atuin"]["password"]' modules/secrets.yaml)" \
-  -k "$(sops -d --extract '["atuin"]["key"]' modules/secrets.yaml)"
-
-# 2. Seed the history that predates atuin (both shells, both importers).
-atuin import nu-hist-db    # ~/.config/nushell/history.sqlite3 (nu >= 0.100)
-atuin import bash          # ~/.bash_history
-
-# 3. Push, then confirm it landed.
-atuin sync
-atuin sync 2>&1 | tail -1     # expect: Sync complete! <N> items
-```
-
-`atuin import nu` (no `-hist-db`) is for the pre-0.100 `history.txt`; it is
-essentially empty on this fleet. Skip `atuin import auto` — it guesses wrong in a
-non-interactive shell.
-
-### Non-interactive shells need a session id
-
-Scripted syncs that trigger a store init die with
-`Failed to find $ATUIN_SESSION in the environment`. Interactive shells export it
-from the hook; for a script, supply one:
-
-```bash
-export ATUIN_SESSION=$(cat /proc/sys/kernel/random/uuid)
-```
-
-Nothing persists from that variable; it only labels the session.
+- **`atuin import` is not idempotent.** Running `import bash` twice doubled the
+  rows (measured 1,940 → 3,880), so the seed is guarded by
+  `~/.local/share/atuin/.fleet-seeded`; `--force-seed` overrides it deliberately.
+  `import nu-hist-db` reads `~/.config/nushell/history.sqlite3` (nu ≥ 0.100);
+  plain `import nu` is the pre-0.100 `history.txt` and is empty on this fleet.
+  Skip `import auto` — it guesses wrong in a non-interactive shell.
+- **A host without `modules/shell/atuin.nix` logs into the public
+  `api.atuin.sh`** and reports `invalid credentials`, which reads exactly like a
+  wrong sops password. The script refuses an unset or public `sync_address` first.
 
 ## Proof, not vibes
 
-Two numbers must agree — the server's record count and the host's item count:
+Two numbers must agree — the server's record count and the host's item count, and
+the server sits a constant **+2** above the item count (bookkeeping rows, not history):
 
 ```bash
 # on frieren (server)
@@ -83,8 +95,9 @@ sudo -u postgres psql -d atuin -tAc "select count(*) from store"
 sqlite3 ~/.local/share/atuin/history.db 'select shell, count(*) from history group by shell'
 ```
 
-`systemctl is-active atuin` proves nothing about sync; an empty `history` table on
-the server is normal (v18 keeps records in `store`).
+`--expect` is the same check in one step. `systemctl is-active atuin` proves
+nothing about sync; an empty `history` table on the server is normal (v18 keeps
+records in `store`).
 
 ## Hosts that are not Nix-managed (burgernas)
 
@@ -98,7 +111,8 @@ there and say so in their own comments: `~/.config/atuin/config.toml`, and
 
 **`nu -c '…'` does not load those config files.** A verification run that way
 reports zero atuin commands and looks like a broken install; pass the configs
-explicitly instead:
+explicitly instead — the same is true on Nix-managed hosts, where the atuin hook is
+one `source` line in `config.nu`:
 
 ```bash
 nu --env-config ~/.config/nushell/env.nu --config ~/.config/nushell/config.nu \
@@ -120,6 +134,8 @@ nu --env-config ~/.config/nushell/env.nu --config ~/.config/nushell/config.nu \
 - **Remaining hosts.** Derive them, do not trust a list:
   `nix eval --json .#inventory.hosts | jq -r 'to_entries[] | select(.value.status=="active") | .key'`.
   Done so far: `frieren`, `poseidon`, `delphi`, `fern`, `stark`. Each remaining host needs a
-  rebuild (for the key) and the three steps above.
+  rebuild (for the key) and one run of the script. `guckloch` is only reachable
+  from its Windows box (no tailnet, and `guckloch.frieren.lan` resolves to
+  frieren), so its run is `ssh`-less and local.
 - Syncing is per-account, so the count is the fleet's: a host that shows fewer
   items has not finished its own import, not a sync problem.

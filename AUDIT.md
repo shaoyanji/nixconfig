@@ -29,6 +29,23 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-25 — atuin bring-up is one script, not five commands
+- `.agents/skills/atuin/scripts/atuin-bootstrap.sh` does the whole host: key-shape
+  preconditions, login, a marked one-time seed, two syncs, and an `--expect` count check.
+  Idempotent on purpose — `atuin import` is not (measured 1,940 → 3,880 rows on a second
+  `import bash`), and a host without `modules/shell/atuin.nix` would log into `api.atuin.sh`
+  and report `invalid credentials`, which reads like a wrong sops password.
+- Proof: exit 2/3/4/5 paths exercised against stubs, and a sandbox happy path that logged in,
+  seeded nothing and matched 24,520 on the real server with the server count unchanged; a
+  re-run reported `login skipped / seed skipped`. `stark` was done by hand before the script
+  existed (24,520 items).
+
+### 2026-10-25 — the skill-mirror gate survives a null `desc` and backticks
+- `skills-task-mirror` aborted with *expected a string but found null* on any doc whose table
+  named the `exit` task (it has no `desc`, and `task.desc or ""` returns null for an attr that
+  exists and is null), then died in its own `runCommand` because the warning text carried
+  backticks. Both fixed; gate green at 52 skills, one advisory warning (`microvm`, 2 rows).
+
 ### 2026-10-25 — stark joins atuin
 - `stark` (Steam AIO) had the sops-rendered key and `atuin 18.23.0` but no session: `atuin login`
   (mnemonic from `atuin/key`, not the base64 key file), `import nu-hist-db` + `import bash`, `sync` →

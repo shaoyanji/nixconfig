@@ -132,10 +132,14 @@ lib.genAttrs systems.work (
             if cells == []
             then ""
             else lib.concatStringsSep " " (builtins.tail cells);
+          # `or` only covers a missing attr: a task with `desc = null` (name
+          # only, e.g. `exit`) would hand null to skillWords and abort the gate.
           desc =
             if task == null
             then ""
-            else (task.desc or "");
+            else if (task.desc or null) == null
+            then ""
+            else task.desc;
           nameTokens = skillWords name;
           descTokens =
             builtins.filter (w: builtins.stringLength w > 3 && !(lib.elem w nameTokens)) (skillWords desc);
@@ -309,10 +313,14 @@ lib.genAttrs systems.work (
             cost, a "does not prove"); otherwise name the task and drop the cell.
           ''
         else
+          # A quoted heredoc, not a bare interpolation: the warning lines carry
+          # backticks (`desc`), which bash would run as a command substitution.
           pkgs.runCommand "skills-task-mirror" {} ''
             echo "agent skills OK: ${toString skillsCtl.index.count} skills, ${toString (builtins.length skillMirrors)} tables read"
             echo "  task rows mirroring a desc: 0"
+            cat <<'SKILL_MIRROR_WARN'
             ${mirrorWarningReport}
+            SKILL_MIRROR_WARN
             touch $out
           '';
 

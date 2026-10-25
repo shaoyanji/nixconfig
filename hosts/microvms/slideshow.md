@@ -40,7 +40,6 @@ into this guest. The tailnet name is the guest directly, on 2222.
 | :--- | :--- | :--- |
 | `hermes` | `/var/lib/hermes` | 1 GiB |
 | `stirling` | `/var/lib/stirling-pdf` | 4 GiB |
-| `dsh` | `/var/lib/deepseek-harness` | 1 GiB |
 
 ---
 
@@ -53,10 +52,13 @@ into this guest. The tailnet name is the guest directly, on 2222.
 
 ---
 
-## Next
+## Service Placement (Lane Decisions)
 
-- Port the DeepSeek harness, then hermes — one service per switch, each behind
-  its own `/microvm/<name>/` proxy.
+- DeepSeek Harness (`dsh-web`) is pinned to the **Native Host Lane**: running an active
+  interactive coding agent inside QEMU TCG software emulation on OCI A1 incurs massive
+  interpreted CPU overhead on the 2 OCPU budget. Native bare-metal execution protects latency.
+- Stirling PDF is pinned to the **MicroVM Guest Lane**: passive JVM document processing
+  with isolated temp directories and no continuous CPU footprint.
 - Raise the guest's RAM as the service set grows; the ceiling for this host is
   8 GiB, and it must stay under what the hypervisor needs to serve.
 - Keep the deck: `slides` is the cheapest way to explain a change to a person

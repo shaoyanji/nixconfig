@@ -41,8 +41,56 @@
           Cryptomining = true;
           Fingerprinting = true;
         };
+        SearchEngines = {
+          Default = "SearXNG";
+          PreventInstalls = false;
+          Add = [
+            {
+              Name = "SearXNG";
+              URLTemplate = "https://delphi.cloudforest-kardashev.ts.net:8447/search?q={searchTerms}";
+              Method = "GET";
+              IconURL = "https://delphi.cloudforest-kardashev.ts.net:8447/favicon.ico";
+              Alias = "@s";
+              Description = "Delphi SearXNG Meta-Search";
+              SuggestURLTemplate = "https://delphi.cloudforest-kardashev.ts.net:8447/autocompleter?q={searchTerms}";
+            }
+          ];
+        };
       };
       profiles."m4i7gl4m.default" = {
+        search = {
+          force = true;
+          default = "SearXNG";
+          order = ["SearXNG" "Google"];
+          engines = {
+            "SearXNG" = {
+              urls = [
+                {
+                  template = "https://delphi.cloudforest-kardashev.ts.net:8447/search";
+                  params = [
+                    {
+                      name = "q";
+                      value = "{searchTerms}";
+                    }
+                  ];
+                }
+                {
+                  type = "application/x-suggestions+json";
+                  template = "https://delphi.cloudforest-kardashev.ts.net:8447/autocompleter";
+                  params = [
+                    {
+                      name = "q";
+                      value = "{searchTerms}";
+                    }
+                  ];
+                }
+              ];
+              iconUpdateURL = "https://delphi.cloudforest-kardashev.ts.net:8447/favicon.ico";
+              updateInterval = 24 * 60 * 60 * 1000;
+              definedAliases = ["@s" "@searxng"];
+            };
+          };
+        };
         settings = {
           "widget.use-xdg-desktop-portal.file-picker" = 1;
           "security.enterprise_roots.enabled" = true;

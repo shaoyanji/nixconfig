@@ -354,12 +354,20 @@ in {
       # entry would also open its port on the LAN interface — a hole with only a
       # loopback listener behind it is the REDUNDANT class `checks:ports` flags.
       "monitors.frieren.lan" = {
+        addSSL = true;
         listen = [
           {
             addr = "0.0.0.0";
             port = 80;
           }
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
         ];
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString config.services.fleetMonitors.port}";
           proxyWebsockets = true;
@@ -369,12 +377,20 @@ in {
       # Fleet sentinel dashboard (static, reads status.json client-side).
       "sentinel.frieren.lan" = {
         serverAliases = ["sentinel"];
+        addSSL = true;
         listen = [
           {
             addr = "0.0.0.0";
             port = 80;
           }
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
         ];
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
         locations."/" = {
           root = "/var/lib/fleet-sentinel/www";
           extraConfig = ''
@@ -388,12 +404,20 @@ in {
       # so no raw :9091 LAN hole is opened. Same rationale as
       # monitors.frieren.lan above: not a profiles.serviceExposure entry.
       "torrent.frieren.lan" = {
+        addSSL = true;
         listen = [
           {
             addr = "0.0.0.0";
             port = 80;
           }
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
         ];
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString config.services.transmission.settings.rpc-port}";
           proxyWebsockets = true;
@@ -427,12 +451,20 @@ in {
           "books.frieren.lan"
           "audiobooks"
         ];
+        addSSL = true;
         listen = [
           {
             addr = "0.0.0.0";
             port = 80;
           }
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
         ];
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString config.services.audiobookshelf.port}";
           proxyWebsockets = true;

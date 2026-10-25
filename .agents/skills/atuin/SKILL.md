@@ -86,6 +86,25 @@ sqlite3 ~/.local/share/atuin/history.db 'select shell, count(*) from history gro
 `systemctl is-active atuin` proves nothing about sync; an empty `history` table on
 the server is normal (v18 keeps records in `store`).
 
+## Hosts that are not Nix-managed (burgernas)
+
+The NAS runs atuin without a flake: a pinned **static aarch64-musl** release in
+`~/.local/bin/atuin`, installed by piping the binary over `ssh 'cat > …'` because
+DSM refuses `scp`. It syncs to `http://192.168.3.25` (LAN), because its tailscale
+link is not up and the tailnet address returns nothing. Two files are hand-written
+there and say so in their own comments: `~/.config/atuin/config.toml`, and
+`~/.config/nushell/{env,config}.nu` — nushell reaches atuin only through
+`~/.local/share/atuin/init.nu`, and DSM's PATH does not include `~/.local/bin`.
+
+**`nu -c '…'` does not load those config files.** A verification run that way
+reports zero atuin commands and looks like a broken install; pass the configs
+explicitly instead:
+
+```bash
+nu --env-config ~/.config/nushell/env.nu --config ~/.config/nushell/config.nu \
+  -c 'print (scope commands | where name =~ "_atuin_" | length)'
+```
+
 ## Landmines
 
 - **A host that ran atuin before login has a private key in its store.** Its

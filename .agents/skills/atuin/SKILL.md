@@ -119,7 +119,7 @@ nu --env-config ~/.config/nushell/env.nu --config ~/.config/nushell/config.nu \
   permanently unreadable.
 - **Remaining hosts.** Derive them, do not trust a list:
   `nix eval --json .#inventory.hosts | jq -r 'to_entries[] | select(.value.status=="active") | .key'`.
-  Done so far: `frieren`, `poseidon`, `delphi`. Each remaining host needs a
+  Done so far: `frieren`, `poseidon`, `delphi`, `fern`, `stark`. Each remaining host needs a
   rebuild (for the key) and the three steps above.
 - Syncing is per-account, so the count is the fleet's: a host that shows fewer
   items has not finished its own import, not a sync problem.

@@ -1,94 +1,81 @@
 ---
 name: voice-loop
-description: The voice loop on Eisen — Parakeet Redux speech-to-text (POST raw audio bytes, not multipart) plus Qwen3-TTS text-to-speech (named speakers; `default` is invalid). Covers the STT → LLM → TTS loop end to end.
+description: "The voice loop on eisen as one script: say text via Qwen3-TTS, hear audio via Parakeet (raw bytes, never multipart), or roundtrip both and get a pass/fail on the word overlap. Named speakers only — `default` is invalid."
+version: 0.2.0
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [voice, tts, stt, parakeet, qwen3-tts]
+    related_skills: [stt, eisen-status]
 ---
 
 # voice-loop
 
-**Runs on:** Eisen (Parakeet STT :8091, Qwen3-TTS :8181, both loopback-only, exposed via nginx).
-**Use when:** transcribing speech, generating speech, or running the full voice loop (speak → transcribe → LLM → speak).
-**Pick me over:** `stt` (transcription only) when you need the full loop including TTS, or `parakeet` internals when you need the endpoint contract.
+**Runs on:** eisen (Parakeet STT :8091, Qwen3-TTS :8181, both loopback-only behind nginx).
+**Use when:** generating speech, transcribing it back, or proving the whole chain still works.
+**Pick me over:** `stt` when the text-to-speech leg is involved; `eisen-status` when the question is whether the stack is up at all.
 
-## Speech-to-text (Parakeet Redux)
+```bash
+scripts/voice-loop.sh say "Reminder: the meeting moved to 15:30." -v aiden -o /tmp/x.wav
+scripts/voice-loop.sh hear /tmp/x.wav
+scripts/voice-loop.sh roundtrip "Ask not what your country can do for you"   # exit 1 if the loop does not close
+```
+
+`hear` calls the `stt` skill's script (`../stt/scripts/stt.sh`) so the raw-bytes
+contract has one home; `roundtrip` says the text, transcribes the audio, and
+scores the result by word overlap (default 0.6, `--min-overlap`). The threshold
+exists because TTS is never word-identical to its own transcript — numbers,
+punctuation and casing drift — while a wrong speaker or a wrong model fails hard.
+
+## Endpoints
 
 ```text
-LAN:  http://eisen.lan/stt/transcribe   (nginx :80 -> 127.0.0.1:8091)
-Direct: http://127.0.0.1:8091/transcribe  (loopback only)
+STT   LAN http://eisen.lan/stt/transcribe     nginx :80 -> 127.0.0.1:8091
+TTS   LAN http://tts.lan/v1/audio/speech      nginx :80 -> 127.0.0.1:8181
+      tailnet https://eisen.<tailnet>.ts.net:8444/…
 ```
 
-**Endpoint contract: POST `/transcribe` takes RAW audio bytes in the request body.** Multipart/form-data FAILS (ffmpeg chokes on the MIME body). Send the bytes directly:
+**STT: POST `/transcribe` takes raw audio bytes.** Multipart fails. Accepts any
+ffmpeg-decodable format, 25 MB cap, 600 s timeout, CPU-only (the RX 5700 has no
+ROCm, ONNX has no Vulkan path). Weights live in `/mnt/storage/parakeet`, code in
+`hosts/eisen/parakeet.nix`.
+
+**TTS: OpenAI-compatible `/v1/audio/speech`.** Named speakers only: `vivian`
+(default), `serena`, `uncle_fu`, `ryan`, `aiden`, `ono_anna`, `sohee`, `eric`,
+`dylan`. `default` is **not** a speaker — it answers `unknown speaker 'default'`,
+and only after a cold start has already been paid for, which is why the script
+rejects it before the network call.
+
+## On-demand means asleep, not down
+
+TTS, Laya and image generation idle-stop after 900 s and cold-start on the next
+request (~15 s for TTS). The socket accepts immediately and the model loads
+after it, so a 2 s probe proves nothing:
 
 ```bash
-# Correct: raw bytes
-curl -s http://eisen.lan/stt/transcribe \
-  -H "Content-Type: audio/wav" --data-binary @clip.wav
-
-# WRONG: multipart (fails)
-# curl -F "file=@clip.wav" http://eisen.lan/stt/transcribe
+curl -s --max-time 60 http://tts.lan/health   # warm-up with a real budget
 ```
 
-- Accepts WAV (and other ffmpeg-decodable formats). 25 MB cap, 600s timeout.
-- CPU-only (RX 5700 has no ROCm, ONNX has no Vulkan path). Real-speech test passed (exact transcription, 2.64s).
-- Weights in `/mnt/storage/parakeet` (NOT the Nix store). Code: `hosts/eisen/parakeet.nix` + vendored `parakeet-transcribe.py` + `parakeet-server.py`.
+**Never poll `/health` in a loop or a monitor.** Each probe wakes the service and
+defeats the idle saving. Socket state (`systemctl is-active qwen-tts.socket`) is
+the liveness signal that costs nothing — that is what `task infra:status:eisen`
+reports.
 
-## Text-to-speech (Qwen3-TTS)
-
-```text
-LAN:  http://tts.lan/v1/audio/speech   (nginx :80 -> 127.0.0.1:8181)
-Tailnet: https://eisen.<tailnet>.ts.net:8444/…
-```
-
-OpenAI-compatible `/v1/audio/speech`. Named speakers: `vivian` (default), `serena`, `uncle_fu`, `ryan`, `aiden`, `ono_anna`, `sohee`, `eric`, `dylan`.
-
-**On demand:** TTS is not resident while idle. The first request after 15 min
-without a connection cold-starts the model (~15 s of model load) — allow a
-generous client timeout, or warm it first:
-
-```bash
-# Warm-up. Not a 2 s probe: the socket accepts immediately, the model loads after.
-curl -s --max-time 60 http://tts.lan/health
-```
-
-A streamed request is an open connection and is never cut off mid-audio. **Do not
-poll `/health` in a loop or a monitor** — each probe wakes the service and defeats
-the idle saving.
-
-**`default` is NOT a valid speaker** (errors `unknown speaker 'default'`). Use `aiden` (or another named speaker) when no speaker is specified.
-
-```bash
-curl -s http://tts.lan/v1/audio/speech \
-  -H "Content-Type: application/json" \
-  -d '{"model": "qwen3-tts", "input": "Hello, this is a test.", "voice": "aiden", "response_format": "wav"}' \
-  -o /tmp/tts.wav
-```
-
-Zero-shot cloning registers via the runtime's voice registry (see `hosts/eisen/TTS.md`).
-
-## Parakeet Redux (STT) on eisen
-
-The same host serves Parakeet Redux on `127.0.0.1:8091` (LAN `http://eisen.lan/stt/…`)
-for the transcription leg. It is **always resident** (~1 GB, CPU-only ONNX), so
-`/health` is a fast check, but the module landed 2026-10-17 — on older generations
-the unit does not exist at all.
-
-```bash
-curl -s --max-time 10 http://eisen.lan/stt/health
-curl -s --max-time 120 http://eisen.lan/stt/transcribe \
-  -H "Content-Type: audio/wav" --data-binary @clip.wav   # RAW bytes, not -F
-```
+A streamed request is an open connection and is never cut off mid-audio; a
+non-streamed one needs the generous timeout the script passes.
 
 ## The full loop
 
 ```text
-Microphone / audio file
-  → POST /stt/transcribe (raw bytes) → text
-  → LLM (eisen.lan/v1, e.g. Kolibri or Qwen) → reply text
-  → POST /v1/audio/speech (voice: aiden) → WAV
-  → Speaker / audio file
+audio → /stt/transcribe (raw bytes) → text → LLM (eisen.lan/v1) → reply
+      → /v1/audio/speech (voice: aiden) → WAV
 ```
 
-- Keep each step's output small (the LLM reply should be short — long replies make long audio).
-- If transcription is wrong, check the audio first (sample rate, clipping, background noise) before blaming the model.
-- If TTS fails with `unknown speaker`, you passed `default` or a misspelled name — use one of the named speakers above.
+If transcription looks wrong, check the audio first (sample rate, clipping,
+background noise) before blaming the model — and note that `stt.sh` normalizes
+sample rate and channel count for exactly that reason.
 
-**Confirm before:** playing generated speech to a third party or sending a transcription containing private audio to an external service.
+**Confirm before:** playing generated speech to a third party, or sending a
+transcription of private audio to an external service.
+
+Truth: `hosts/eisen/TTS.md` and `hosts/eisen/parakeet.nix`; this page is the procedure.

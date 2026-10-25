@@ -426,6 +426,102 @@ tasks:
         echo "ERROR: eisen did not answer on $ip:22 within 180s" >&2
         exit 1
 
+  infra:status:eisen:
+    desc: Read the Eisen LLM stack in one pass (model, router, sockets, disk, gaming guard)
+    summary: >
+      Read-only, and deliberately without `/health` probes: the on-demand
+      services (TTS, Laya, image) sleep behind socket units, so asking /health
+      is what wakes a model and defeats the idle saving. Socket state answers
+      "up" without spending a cold start.
+
+      Address is `.#inventory.hosts.eisen.network.lan_ip`. JSON=1 prints one
+      object for a program (needs jq, exit 3 without it); the default render is
+      for a human. Exit 0 whenever eisen answered — a sleeping stack is a state,
+      not a failure — and 2 when the host is unreachable, which is the same
+      condition `task infra:wol:eisen` fixes.
+    cmds:
+      - |
+        set -euo pipefail
+        ip="$(nix eval --raw .#inventory.hosts.eisen.network.lan_ip)"
+        if [ -z "$ip" ]; then
+          echo "infra:status:eisen: hosts.eisen.network.lan_ip is empty in the inventory" >&2
+          exit 2
+        fi
+        timeout 2 bash -c "cat < /dev/null > /dev/tcp/$ip/22" 2>/dev/null || {
+          echo "eisen unreachable on $ip:22 — wake it with: task infra:wol:eisen" >&2
+          exit 2
+        }
+
+        raw="$(mktemp)"; trap 'rm -f "$raw"' EXIT
+        # One round trip, and a remote side that only reports: every fact comes
+        # back as key=value so the parsing lives here, where it is testable.
+        ssh -o BatchMode=yes -o ConnectTimeout=8 -o StrictHostKeyChecking=accept-new \
+          "devji@$ip" bash -s >"$raw" <<'REMOTE'
+        set +e
+        echo "strata=$(systemctl is-active strata.service)"
+        echo "llama_swap=$(systemctl is-active llama-swap.service)"
+        echo "guard=$(systemctl is-active llama-swap-gaming-guard.service)"
+        echo "parakeet=$(systemctl is-active parakeet-stt.service)"
+        echo "tts_socket=$(systemctl is-active qwen-tts.socket)"
+        echo "laya_socket=$(systemctl is-active laya-serve.socket)"
+        echo "image_socket=$(systemctl is-active qwen-image.socket)"
+        echo "router=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://127.0.0.1:8000/v1/models)"
+        echo "models=$(curl -s --max-time 10 http://127.0.0.1:8085/v1/models | tr -d '\n')"
+        echo "disk_used=$(df -P /mnt/storage 2>/dev/null | awk 'NR==2{print $5}')"
+        echo "disk_free=$(df -P -h /mnt/storage 2>/dev/null | awk 'NR==2{print $4}')"
+        # The guard's own signal: an executable under a Steam library. Steam and
+        # gamescope run permanently on this host, so neither means "in a game".
+        for p in /proc/[0-9]*/exe; do
+          t=$(readlink "$p" 2>/dev/null) || continue
+          case "$t" in */steamapps/common/*) echo "game=yes"; exit 0 ;; esac
+        done
+        echo "game=no"
+        REMOTE
+
+        val() { sed -n "s/^$1=//p" "$raw" | head -1; }
+        strata=$(val strata)
+        llama_swap=$(val llama_swap)
+        guard=$(val guard)
+        parakeet=$(val parakeet)
+        tts=$(val tts_socket)
+        laya=$(val laya_socket)
+        image=$(val image_socket)
+        router=$(val router)
+        used=$(val disk_used)
+        free=$(val disk_free)
+        game=$(val game)
+        model=""
+        if command -v jq >/dev/null; then
+          model=$(val models | jq -r '[.data[]?.id // empty] | join(",")' 2>/dev/null || true)
+        fi
+        [ -n "$model" ] || model=$(val models | head -c 100)
+
+        if [ "${JSON:-0}" = 1 ]; then
+          command -v jq >/dev/null || { echo "JSON=1 needs jq on this host" >&2; exit 3; }
+          jq -n \
+            --arg addr "$ip" --arg strata "$strata" --arg llama "$llama_swap" \
+            --arg guard "$guard" --arg parakeet "$parakeet" --arg tts "$tts" \
+            --arg laya "$laya" --arg image "$image" --arg router "$router" \
+            --arg model "$model" --arg used "$used" --arg free "$free" --arg game "$game" \
+            '{host: "eisen", addr: $addr,
+              server: {strata: $strata, llama_swap: $llama},
+              router: $router, model: $model,
+              resident: {parakeet_stt: $parakeet},
+              sockets: {qwen_tts: $tts, laya_serve: $laya, qwen_image: $image},
+              disk: {used_pct: $used, free: $free},
+              gaming: {guard: $guard, game_running: $game}}'
+          exit 0
+        fi
+
+        printf 'eisen      %s\n' "$ip"
+        printf 'server     strata=%s  llama-swap=%s\n' "$strata" "$llama_swap"
+        printf 'router     %s\n' "$router"
+        printf 'model      %s\n' "${model:-unknown}"
+        printf 'resident   parakeet-stt=%s\n' "$parakeet"
+        printf 'on demand  qwen-tts=%s laya-serve=%s qwen-image=%s\n' "$tts" "$laya" "$image"
+        printf 'disk       %s used, %s free on /mnt/storage\n' "${used:-n/a}" "${free:-n/a}"
+        printf 'gaming     guard=%s game=%s\n' "$guard" "$game"
+
   infra:wol:host:eisen:
     desc: Alias for infra:wol:eisen
     cmds:

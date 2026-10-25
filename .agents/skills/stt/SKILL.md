@@ -1,152 +1,86 @@
 ---
 name: stt
-description: "Speech-to-text via voxtype (numtide). Transcribe audio files to text headlessly; push-to-talk daemon for live dictation. Runs from nix shell github:numtide/llm-agents.nix#voxtype when not installed."
-version: 0.1.0
+description: "Speech-to-text, one command: scripts/stt.sh transcribes a file locally with voxtype or on eisen's always-resident Parakeet (raw bytes, not multipart). Covers engines, models, and the packaged voice-dictate path."
+version: 0.2.0
 author: Shaoyan Ji (shaoyanji)
 license: MIT
 platforms: [linux]
 metadata:
   hermes:
     tags: [STT, Speech-to-Text, Transcription, Voxtype, Voice]
-    related_skills: [reasonix]
+    related_skills: [voice-loop, reasonix]
 ---
 
-# stt — speech-to-text with voxtype
+# stt — speech to text
 
-Convert speech to text with [voxtype](https://github.com/numtide/voxtype) (numtide, v1.1.0): push-to-talk voice-to-text for Linux, optimized for Wayland (works on X11). Two interfaces matter:
-
-- **Agents:** `voxtype transcribe <FILE>` — audio file in, transcript out. Works headless (no display needed). This is the primary interface for scripts and agents.
-- **Humans:** `voxtype daemon` — hold-hotkey (default `SCROLLLOCK`) dictation that types/clipboard-pastes the result.
-
-## Server alternative: Parakeet Redux on Eisen
-
-When you do not need a local model, eisen serves the same kind of job over HTTP.
-It is **always resident** (CPU-only ONNX, ~1 GB), and only exists on generations
-built after 2026-10-17 (`parakeet-stt.service`).
+`scripts/stt.sh` is the procedure; this page is the why.
 
 ```bash
-# health (answers only after the ONNX sessions load; ~1 s, always up)
-curl -s --max-time 10 http://eisen.lan/stt/health
-
-# transcription: RAW bytes in the body — multipart/form-data FAILS
-curl -s --max-time 120 http://eisen.lan/stt/transcribe \
-  -H "Content-Type: audio/wav" --data-binary @clip.wav
+scripts/stt.sh clip.m4a            # auto: local voxtype if installed, else eisen
+scripts/stt.sh --server clip.m4a   # force the always-resident Parakeet on eisen
+scripts/stt.sh --local clip.m4a    # force voxtype; fetches it from numtide's flake if absent
+scripts/stt.sh --out notes.txt clip.m4a
 ```
 
-Any ffmpeg-decodable format is accepted (WAV/MP3/OGG), 25 MB cap (~26 min of
-16 kHz mono wav), one transcription at a time. Do **not** probe it with a 2 s
-timeout on a cold host — that is a boot-time load, not an idle spin-up.
+stdout is the transcript and nothing else, so `stt.sh a.mp3 > notes.txt` feeds
+qmd or a document directly; diagnostics go to stderr.
 
-## When to use
+## What the script guarantees
 
-- Transcribing recordings, meeting audio, voice memos, podcasts, or call recordings into text
-- Turning any speech audio into a searchable/check-in-able document (feed the text into `qmd`/notes afterwards)
-- Live dictation on the desktop via the push-to-talk daemon
+- **Any decodable audio in.** It always re-encodes to 16 kHz mono PCM with
+  ffmpeg. A 44.1 kHz stereo upload is both the "garbled speech" bug and a way to
+  cross the 25 MB cap on audio that would fit converted.
+- **Two probes, two budgets.** It checks the TCP port with a 2 s budget (an off
+  host should cost 2 s, not a minute), then `/health` with 60 s — the socket
+  accepts immediately and the ONNX sessions load after it, so a 2 s health probe
+  reports "up" on a server that then fails the request.
+- **The cap is reported, not hidden.** Over 25 MB (~26 min of 16 kHz mono wav)
+  it says so and asks for a split instead of returning a server error.
 
-## Availability
+Eisen's endpoint takes **raw bytes** in the body; `multipart/form-data` fails
+because ffmpeg chokes on the MIME body. The script uses `--data-binary` and
+`--fail-with-body`, so a 4xx prints its reason rather than being mistaken for a
+transcript. For the text-to-speech leg and the whole loop, see `voice-loop`.
 
-`voxtype` may **not** be on PATH. Check first:
+## Local engine (voxtype)
+
+[voxtype](https://github.com/numtide/voxtype) (numtide) is the local option:
+push-to-talk dictation for Linux, optimized for Wayland.
 
 ```bash
-command -v voxtype
+voxtype transcribe FILE   # audio in, transcript out; works headless
+voxtype                   # push-to-talk daemon: hotkey → types into the focused window
+voxtype status            # idle / recording / transcribing (Waybar)
+voxtype info engines      # whisper (default), parakeet, moonshine, sensevoice, …
+voxtype info models       # catalog per engine, and which are installed
 ```
 
-Fallback straight from numtide's flake (no install needed):
+Input must be WAV 16 kHz mono PCM, which is what the script hands it. First local
+run downloads the model (`base.en`, 147 MB) into
+`~/.local/share/voxtype/models/`; measured on frieren's CPU, `base.en` runs about
+1.6× realtime.
 
-```bash
-nix shell github:numtide/llm-agents.nix#voxtype --command voxtype --version
-```
-
-## Usage
-
-### Transcribe a file (primary interface)
-
-```bash
-voxtype transcribe /path/to/audio.wav
-```
-
-Fallback form when not installed:
-
-```bash
-nix shell github:numtide/llm-agents.nix#voxtype \
-  --command voxtype transcribe /path/to/audio.wav
-```
-
-Input must be **WAV, 16 kHz, mono PCM**. Convert anything else with ffmpeg first:
-
-```bash
-ffmpeg -i in.mp3 -ar 16000 -ac 1 -c:a pcm_s16le /tmp/in.wav
-voxtype transcribe /tmp/in.wav
-```
-
-The transcript is printed to stdout (rc 0 on success; transcription errors —
-missing model, bad API key — exit non-zero with the reason on stderr).
-
-Verified 2026-10-08 on frieren (headless): `jfk.wav` (11 s, 16 kHz mono) →
-*"And so my fellow Americans, ask not what your country can do for you, ask
-what you can do for your country."* — whisper
-`base.en`, local mode, ~18 s on CPU. (Full quote returned correctly;
-runtime scales roughly with audio length on CPU.)
-
-### Engines & models
-
-```bash
-voxtype info engines      # compiled engines; whisper is active by default
-voxtype info models       # model catalog per engine + which are installed
-voxtype info devices      # audio capture devices
-```
-
-- Engines: `whisper` (default), `parakeet`, `moonshine`, `sensevoice`,
-  `paraformer`, `dolphin`, `omnilingual`, `cohere`, `openvino`, `soniox`.
-  Switch: `voxtype config set engine <NAME>`.
-- Default model: whisper `base.en` (147 MB — download once with
-  `voxtype setup --download --model base.en`).
-- Models live in `~/.local/share/voxtype/models/`; config in
-  `~/.config/voxtype/config.toml` (`voxtype config set <key> <value>`
-  preserves comments; daemon needs `systemctl --user restart voxtype`).
-
-### Remote mode gotcha (Groq/OpenAI-compatible APIs)
-
-`whisper.mode` is `local | remote | cli`. In `remote` mode voxtype calls
-`<endpoint>/v1/audio/transcriptions` **itself** — so the configured endpoint
-must NOT include `/v1`:
+**Remote mode gotcha.** `whisper.mode` is `local | remote | cli`; in `remote`
+mode voxtype calls `<endpoint>/v1/audio/transcriptions` itself, so the endpoint
+must not include `/v1` — `404 .../v1/v1/...` means it does:
 
 ```bash
 voxtype config set whisper.remote_endpoint https://api.groq.com/openai
 voxtype config set whisper.remote_api_key  gsk_...
 ```
 
-Symptoms: `404 ... /v1/v1/audio/transcriptions` = endpoint has a trailing
-`/v1`; `401 Invalid API Key` = rotate the key. Falling back to local mode:
+**The quality bar for dictation on this fleet** is not the transcribe path but
+`modules/profiles/voice-dictate.nix`: a packaged `voice-dictate` that records
+with `pw-record` on a hotkey, transcribes through Groq (sops key, cached in
+tmpfs), and types the result with `wtype`, with `--fail-with-body` so an error
+body is never typed into the focused window. Read it before writing another
+record-and-paste script.
 
-```bash
-voxtype config set whisper.mode local
-```
+## Server alternative: Parakeet on eisen
 
-### Live dictation (human interface)
+Always resident (CPU-only ONNX, ~1 GB), LAN `http://eisen.lan/stt`, direct
+`http://127.0.0.1:8091/transcribe`. One transcription at a time, 600 s timeout.
+It exists only on generations built after 2026-10-17 (`parakeet-stt.service`);
+`task infra:status:eisen` reports whether it is up without waking anything.
 
-```bash
-voxtype                     # run the push-to-talk daemon
-voxtype status               # idle/recording/transcribing state (Waybar)
-voxtype record start|stop    # drive recording from keybindings/scripts
-voxtype meeting              # continuous meeting transcription mode
-voxtype configure            # interactive config TUI
-```
-
-Daemon install: `voxtype setup systemd` (user service). Output chain types
-into the focused window via `wtype` (Wayland) / `ydotool` (X11), falling
-back to clipboard (`wl-copy`/`xclip`). In headless shells none apply —
-use `transcribe`, which needs no display.
-
-## Notes
-
-- First local run downloads the model (147 MB `base.en`); it is cached in
-  `~/.local/share/voxtype/models/`.
-- `transcribe` honors the active engine/mode from config; `--engine <NAME>`
-  overrides the engine per call.
-- No GPU on frieren: local whisper is CPU-only (measured ~1.6× realtime on
-  `base.en`). Remote mode is faster once a valid API key is configured.
-- Part of numtide's flake (`github:numtide/llm-agents.nix`), same source as
-  the `reasonix` skill.
-
-Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.
+Truth: `modules/user/ai/default.nix` and `hosts/eisen/parakeet.nix`; this page is the procedure.

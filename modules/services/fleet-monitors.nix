@@ -82,7 +82,8 @@
           }
         ];
     }
-    // lib.optionalAttrs (e.group != null) {inherit (e) group;};
+    // lib.optionalAttrs (e.group != null) {inherit (e) group;}
+    // lib.optionalAttrs (e.headers != null) {inherit (e) headers;};
 in {
   options.services.fleetMonitors = {
     enable = lib.mkEnableOption "config-declared fleet monitors (gatus backend)";
@@ -174,6 +175,11 @@ in {
             type = lib.types.nullOr (lib.types.listOf lib.types.attrs);
             default = null;
             description = "Optional custom alerts for this endpoint.";
+          };
+          headers = lib.mkOption {
+            type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
+            default = null;
+            description = "Optional HTTP request headers for the probe.";
           };
         };
       });

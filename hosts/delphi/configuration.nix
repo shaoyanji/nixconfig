@@ -240,6 +240,7 @@
 in {
   imports = [
     ./hardware-configuration.nix
+    ./infra-stack.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/firewall-baseline.nix
     ../../modules/profiles/hermes.nix
@@ -440,6 +441,12 @@ in {
         group = "delphi";
         conditions = ["[STATUS] < 400"];
       }
+      {
+        name = "delphi sentinel";
+        url = "http://127.0.0.1/sentinel/status.json";
+        group = "delphi";
+        conditions = ["[BODY].state == ok"];
+      }
       # No DNS endpoint on purpose. crab-hole v0.1.12 has no TCP listener on 53
       # (its downstream protocols are udp|tls|https|quic), so `tcp://…:53` is
       # refused and reports a permanent red — a monitor that can never go green
@@ -459,6 +466,9 @@ in {
         name = "frieren sentinel";
         url = "http://100.97.61.65/sentinel/status.json";
         group = "frieren";
+        headers = {
+          Host = "frieren.lan";
+        };
         conditions = ["[BODY].state == ok"];
       }
     ];
@@ -526,6 +536,16 @@ in {
             default_type text/plain;
             return 200 "ok";
           '';
+          # Closed-loop fleet sentinel observation ledger & health
+          locations."/sentinel/" = {
+            alias = "/var/lib/fleet-sentinel/www/";
+            extraConfig =
+              ''
+                autoindex off;
+                add_header Cache-Control "no-store";
+              ''
+              + siteHeader;
+          };
         };
 
         # The tailnet console, loopback-only and reached through `tailscale
@@ -581,6 +601,16 @@ in {
                 default_type text/plain;
                 return 200 "ok";
               '';
+              "/sentinel/" = {
+                alias = "/var/lib/fleet-sentinel/www/";
+                extraConfig =
+                  ''
+                    ${tailnetOnly}
+                    autoindex off;
+                    add_header Cache-Control "no-store";
+                  ''
+                  + siteHeader;
+              };
             }
             // microvmProxyLocations true
             // stirlingProxyLocations
@@ -620,6 +650,15 @@ in {
                 default_type text/plain;
                 return 200 "ok";
               '';
+              "/sentinel/" = {
+                alias = "/var/lib/fleet-sentinel/www/";
+                extraConfig =
+                  ''
+                    autoindex off;
+                    add_header Cache-Control "no-store";
+                  ''
+                  + siteHeader;
+              };
             }
             // microvmProxyLocations false
             // stirlingPublicRedirect

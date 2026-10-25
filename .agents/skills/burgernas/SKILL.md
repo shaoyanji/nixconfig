@@ -82,12 +82,16 @@ GitHub token (`gh auth token`) or the 60-request hourly limit will bite mid-run.
 
 ## Sharing the vault over NFS
 
-The NAS exports `/volume1/peachcable` (tools, appimages, the archive) and DSM caps
-the protocol at **NFSv4.1** — asking for `vers=4.2` fails with `Protocol not
-supported`, which reads like a client problem and is not one. Frieren mounts it at
-`/mnt/burgernas/peachcable`, declared in `hosts/frieren/configuration.nix` as an
-automount (`systemd.automounts` + `noauto` in the fstab entry) because the NAS is
-off most of the day and a boot-time mount would wait on a sleeping peer.
+The NAS exports **`/volume1/peachcable` and nothing else**, so that path is the
+**one lane**: whatever a client must reach has to physically live there, which is
+why the mirror writes into the export rather than to a tidier path beside it.
+The four legacy `/volume1/Shared Library/{bin-*,appimages}` paths are server-local
+symlinks to it — a symlink is resolved by the *client* over NFS, where `/volume1`
+does not exist, so it can never split the lane.
+
+Protocol version, mount options and frieren's automount are declared in
+`hosts/frieren/configuration.nix`; this file does not restate them
+([[flake/policies.nix#nix-header-budget]]).
 
 Adding a client is the one operation with **no CLI and no API** on DSM 7: `synoshare`
 has no `--setnfspriv`, `synonfs` only manages rules for existing paths, and

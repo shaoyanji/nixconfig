@@ -387,10 +387,14 @@
     };
 
     nix-header-budget = {
-      rule = "A `.nix` file opens with at most three comment lines naming its contract; rationale belongs in a docs page, an AGENTS.nix note, or the commit.";
-      proof = "leading comment block of every tracked .nix file";
-      holds = longHeaders == [];
-      detail = "headers over budget: ${lib.concatStringsSep ", " longHeaders}";
+      rule = "A `.nix` file opens with at most three comment lines naming its contract, and no comment block — header or inline — explains a fact that has a home: rationale belongs in a docs page, an AGENTS.nix note, a skill, or a policy, which the graph and qmd compile into an answer. Nothing compiles a comment, so an explanation written in a module is answerable only by reading that module; restating what Nix already declares (a mount's protocol version, a unit's ordering) is worse, a second home that drifts. The corpus is gated by the header budget; new work is gated on the **diff** by `scripts/task/nix-prose-lint.sh` in the pre-commit hook — a run of 8+ added comment lines citing no home fails — so an essay cannot land even where the old backlog remains.";
+      proof = "leading comment block of every tracked .nix file · scripts/task/nix-prose-lint.sh (added lines) · .githooks/pre-commit";
+      holds =
+        longHeaders
+        == []
+        && has ".githooks/pre-commit" "nix-prose-lint.sh"
+        && has "taskfiles/checks.yml" "checks:nix:prose";
+      detail = "headers over budget: ${lib.concatStringsSep ", " longHeaders} (or the diff gate was unwired from the hook or its task); report the comment backlog with `task checks:nix:prose MODE=all`";
     };
 
     agent-prose-budget = {
@@ -727,20 +731,22 @@
     };
 
     library-crosses-the-wire = {
-      rule = "The library is mirrored whole to BurgerNAS inside its scheduled uptime window, so a non-Nix machine pulls tools from the NAS without frieren being up: every bin-*/appimages directory is mirrored (`--delete`, the mirror is not an append-only attic) and `.rejected` is excluded because a dynamic binary is not library material.";
+      rule = "The library is mirrored whole to BurgerNAS inside its scheduled uptime window, so a non-Nix machine pulls tools from the NAS without frieren being up: every bin-*/appimages directory is mirrored (`--delete`, the mirror is not an append-only attic) and `.rejected` is excluded because a dynamic binary is not library material. The destination is the **NFS export** (`/volume1/peachcable`, the only share DSM exports), not merely a directory on the NAS: a mirror written anywhere else is unreachable by the DietPi/Raspberry Pi clients that are its whole reason to exist, and one lane holds the real bytes while the legacy `/volume1/Shared Library/{bin-*,appimages}` paths are server-local symlinks to it.";
       proof = "hosts/frieren/infra-stack.nix (burgernas-library-sync)";
       holds =
         has "hosts/frieren/infra-stack.nix" "burgernas-library-sync"
         && has "hosts/frieren/infra-stack.nix" ''dirs="bin-x86 bin-aarch64 bin-script appimages"''
+        && has "hosts/frieren/infra-stack.nix" ''DEST_PATH="/volume1/peachcable"''
         && has "hosts/frieren/infra-stack.nix" "--exclude '.rejected'";
-      detail = "the NAS mirror lost a directory, kept rejected downloads, or stopped deleting removed files";
+      detail = "the NAS mirror lost a directory, kept rejected downloads, stopped deleting removed files, or drifted off the exported share into a path no NFS client can reach";
     };
 
     library-table-generated = {
       rule = "The release-built library is one table in `tools/library.nix`, rendered by `task data:library:update` into `library-fetch.sh` calls. No TOML, eget config or hand-written download line is tracked, and no second fetcher pushes the library on its own schedule — the NAS copy is the scheduled mirror.";
       proof = "tools/library.nix · taskfiles/data.yml";
       holds =
-        filesWithSuffix "tools" ".toml" == []
+        filesWithSuffix "tools" ".toml"
+        == []
         && has "taskfiles/data.yml" "tools/library.nix"
         && has "tools/library.nix" "library-fetch.sh";
       detail = "a TOML or a second fetcher is back under tools/, or the library task stopped rendering the table";

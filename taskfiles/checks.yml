@@ -465,6 +465,19 @@ tasks:
     cmds:
       - bash scripts/task/nix-fmt.sh --check --all --tools deadnix,statix
 
+  checks:nix:prose:
+    desc: "[gate] Nix comments must cite a home (docs/, skill, policy), not explain in place"
+    summary: >
+      Judges the DIFF, not the corpus: a run of 8+ added comment lines that cite
+      no home (docs/ path, .agents/ skill, policy citation, `task <name>`, `.#`
+      attribute, repo path) fails, because a comment is compiled by nothing while
+      the graph, qmd and the skills index are. The same rule runs in the
+      pre-commit hook, so `--staged` is the default scope and an essay cannot
+      land in the first place. MODE=all reports the existing backlog read-only
+      and never fails. MIN= raises the run length. ~0.1 s, git only, no eval.
+    cmds:
+      - bash scripts/task/nix-prose-lint.sh --{{.MODE | default "staged"}}
+
   checks:nix:fix:
     desc: Auto-fix the Nix hard gates (deadnix + alejandra) on all Nix files
     summary: >

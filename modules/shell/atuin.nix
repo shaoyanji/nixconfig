@@ -1,6 +1,6 @@
-# atuin on every host, pointed at the one server: bash and nushell both get the
-# Ctrl-R UI, so a shell searches one history. Credentials live under `atuin` in
-# modules/secrets/secrets.yaml; `atuin import` seeds history that predates it.
+# atuin on every host, pointed at the one server; bash and nushell both get the
+# Ctrl-R UI. Key: modules/sops.nix · server: modules/services/atuin-server.nix ·
+# login/import procedure: .agents/skills/atuin/SKILL.md
 _: {
   programs.atuin = {
     enable = true;

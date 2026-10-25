@@ -21,6 +21,8 @@
 #   alejandra HARD      staged files must be alejandra-formatted
 #   statix    ADVISORY  reported, never blocks — its W20 repeated-key warning
 #                       fires on this repo's house style
+#   prose     HARD      added comment lines must cite a home, not explain in
+#                       place (scripts/task/nix-prose-lint.sh, on the diff)
 #   checks:kg HARD      graph schema + all six patterns, when they are affected
 #
 # Fail-closed: if the formatter cannot be resolved, nix-fmt.sh exits non-zero and
@@ -81,6 +83,16 @@ if [ -n "$STAGED_NIX" ]; then
   fi
 
   echo "Nix checks passed."
+
+  # Commentary gate on the staged diff: the fact belongs where the graph, qmd
+  # or a skill can answer it; the .nix keeps the constraint and a pointer.
+  if ! bash "$REPO_ROOT/scripts/task/nix-prose-lint.sh"; then
+    echo
+    echo "Commit refused: Nix commentary must point at a home, not explain there."
+    echo "  Rule: [[flake/policies.nix#nix-header-budget]]"
+    echo "  Backlog report: task checks:nix:prose MODE=all"
+    exit 1
+  fi
 fi
 
 if affects_graph "$STAGED"; then

@@ -208,6 +208,16 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     instead — enforced by [[flake/policies.nix#desktop-fork-not-disable]], which
     also catches dropping infrastructure the profile carried (tailscaled, the NAS
     mount behind `~/Documents/nixconfig`).
+12. **A comment is not a home for a fact.** Nothing compiles a `#` block:
+    `.#knowledgeGraph`, qmd and the skills index are built from `docs/*.md`,
+    `.agents/skills/*` and the compiled registry, so an explanation written
+    inside a module is answerable only by reading that module — the thing the
+    agent was supposed to avoid. Keep the constraint in the `.nix` and put the
+    narrative in `docs/` or a skill, with one line pointing there. Restating
+    what Nix already declares is worse: the DSM mount's `vers=4.1` fact lives in
+    `hosts/frieren/configuration.nix`, so repeating it in prose is a second home
+    that drifts. Gate: `task checks:nix:prose` (pre-commit, on added lines) —
+    [[flake/policies.nix#nix-header-budget]].
 
 Longer-form procedure for the operational half: [`../AGENTS.md`](../AGENTS.md)
 (routing) and the `infra` skill (deploy, rebuild, rollback).

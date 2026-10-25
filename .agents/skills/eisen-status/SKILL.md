@@ -1,81 +1,77 @@
 ---
 name: eisen-status
-description: Check the health and current state of the Eisen LLM stack — which model is loaded, whether the router and services are up, whether a Steam game is running (gaming guard), and disk space.
+description: "What eisen's LLM stack is doing right now: one task prints the served model, router code, socket states, disk, and whether the gaming guard is yielding. Read-only and probe-free, so it never wakes an on-demand model."
+version: 0.2.0
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [eisen, llm, llama-swap, strata, tts, sockets]
+    related_skills: [voice-loop, stt, infra]
 ---
 
 # eisen-status
 
-**Runs on:** Eisen (SSH `devji@eisen`, or directly on the host).
-**Use when:** before running a generation, before switching models, when something returns a 429 / timeout / 502, or when you need to know what the stack is doing.
-**Pick me over:** `infra` (host lifecycle) when the question is specifically "what is the LLM stack doing right now?"
+**Runs on:** eisen (its facts), from frieren or any LAN node (the reach).
+**Use when:** before a generation, before switching models, after a 429 / timeout / 502, or when you need to know what the stack is doing.
+**Pick me over:** `infra` (host lifecycle) when the question is specifically this stack.
 
-## Power & Wake-on-LAN
-
-If Eisen is powered off, wake it from Frieren (or any LAN node) via Wake-on-LAN:
+## The read
 
 ```bash
-task infra:wol:eisen
+task infra:status:eisen            # human lines
+JSON=1 task infra:status:eisen     # one object, for a program (needs jq, exit 3 without)
 ```
 
-## Quick status (one pass)
+Exit 0 whenever eisen answered — a sleeping stack is a state, not a failure.
+Exit 2 when the host is unreachable, which is the same condition
+`task infra:wol:eisen` fixes; `infra:wol:eisen:online` then waits for sshd.
 
-```bash
-# Which model is loaded (llama-swap)
-curl -s http://127.0.0.1:8080/v1/models
+It reads **socket units, never `/health`**: the on-demand services idle-stop, and
+a probe is what wakes them. `qwen-tts.socket=active` with `qwen-tts.service=inactive`
+is the correct steady state, not a fault.
 
-# Router (chat + decisions) — should answer 200
-curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/v1/models
+## Reading it
 
-# On-demand services: the SOCKET is the health signal, the service idles at 0.
-# socket active + service inactive is the correct steady state (TTS, Laya, image).
-systemctl is-active qwen-tts.socket qwen-tts.service qwen-tts-proxy.service
-systemctl is-active laya-serve.socket laya-serve.service
-systemctl is-active qwen-image.socket qwen-image.service
+- `strata` is the live server on `:8085`; `llama-swap` on `:8080` is **dormant**
+  in `hosts/eisen/llm-server.nix` and reports `inactive` by design. The model line
+  comes from strata's `/v1/models`; only one model is resident at a time (71 GiB
+  of weights against 62 GiB of RAM).
+- `gaming=yes` means a process whose executable lives under a Steam library
+  (`steamapps/common/`) is running, so `llama-swap-gaming-guard.service` has
+  stopped strata and the API answers connection-refused until the game exits. Do
+  not start strata by hand during a game. Steam and gamescope themselves run
+  permanently here and are *not* the signal.
+- Router `429 {"error":{"code":"llm_busy"}}` means a generation is already
+  running (one slot). Wait; do not hammer it.
+- Laya `inactive` is normal (socket-activated). The first decision request wakes
+  it and may 502 because a cold start outlives the router's 25 s decision
+  timeout — the second request succeeds.
+- `disk` is `/mnt/storage`: weights live there, and a full disk breaks fetches.
 
-# Parakeet STT (always resident; absent on generations older than 2026-10-17)
-systemctl is-active parakeet-stt.service
+## When you must wake something
 
-# Disk (weights live on /mnt/storage; a full disk breaks fetches)
-df -h /mnt/storage
-
-# Gaming guard — is a Steam game running (llama-swap stopped)?
-systemctl is-active llama-swap.service
-```
-
-## Reading the output
-
-- `llama-swap /v1/models` lists each model with `status: running` (loaded) or `unloaded`. Only one model is loaded at a time (RAM: 71 GiB of weights > 62 GiB).
-- If `llama-swap` is `inactive` and a Steam game is running, the gaming guard stopped it (frees VRAM). It restarts when the game exits. Do **not** manually start llama-swap during a game.
-- Router `429 {"error":{"code":"llm_busy"}}` means a generation is already running (one slot). Wait and retry — do not hammer it.
-- Laya `inactive` is normal (on-demand via socket activation). The first decision request wakes it; that request may 502 (cold start > router's 25s decision timeout). Retry — the second request succeeds.
-- A request during a model swap waits (llama-swap queues it) or times out. Cold-load times: Kolibri ~4–5 min, Qwen ~2–3 min, Bonsai ~1 min. Pre-warm a cold model (send a request for it with `"max_tokens": 1` and `--max-time 600`, then wait) before running SubZeroClaw (its cap is 120s). `/v1/models` does **not** load weights.
-
-## Warm-up probes (`/health`) — timeouts matter
-
-`inactive` on an on-demand service means "asleep", not "down". Waking it costs
-time, so probe with a budget, never a 2–5 s default:
+Wake a service only when you intend to use it, and give the probe a real budget:
 
 | Service | Idle stop | Cold start | Probe |
 | :--- | :--- | :--- | :--- |
-| Qwen3-TTS `:8181` | 900 s no connection | ~15 s | `curl --max-time 60 http://127.0.0.1:8181/health` |
-| Laya `:8090` | 900 s no request | ~40 s | `curl --max-time 90 http://127.0.0.1:8090/health` |
-| Qwen-Image `:8282` | 900 s no request | minutes | `curl --max-time 600 http://127.0.0.1:8282/health` |
-| Parakeet `:8091` | always resident | ~1 s | `curl --max-time 10 http://127.0.0.1:8091/health` |
-| llama-swap `:8080` | model unloads after 900 s | 1–5 min | tiny completion, `--max-time 600` |
+| Qwen3-TTS `:8181` | 900 s | ~15 s | `curl --max-time 60 …/health` |
+| Laya `:8090` | 900 s | ~40 s | `curl --max-time 90 …/health` |
+| Qwen-Image `:8282` | 900 s | minutes | `curl --max-time 600 …/health` |
+| Parakeet `:8091` | always resident | ~1 s | `curl --max-time 10 …/health` |
+| strata `:8085` | model unloads after 900 s | 1–5 min | a 1-token completion, `--max-time 600` |
 
-**Do not health-poll an on-demand endpoint from a monitor or watch loop** (gatus,
-watch, cron): each `/health` wakes the model, so polling defeats the idle saving
-and can stop/start it every idle period. Check the *socket* unit over SSH if you
-need liveness without waking anything.
+Pre-warm a cold model before a caller with a short cap (SubZeroClaw's is 120 s)
+runs against it: send one request with `"max_tokens": 1` and wait.
 
-## Logs (when something is wrong)
+## Logs
 
 ```bash
-journalctl -u llama-swap --since "10 min ago" | tail -30
+journalctl -u strata --since "10 min ago" | tail -30
 journalctl -u llm-decision-router --since "10 min ago" | tail -30
-journalctl -u qwen-image --since "10 min ago" | tail -30
+journalctl -u llama-swap-gaming-guard --since "10 min ago" | tail -20
 ```
 
-**Confirm before:** restarting a service that would drop an in-flight generation (`systemctl restart llama-swap` unloads the model and kills the current generation). Ask first, or wait for the generation to finish.
+**Confirm before:** restarting anything that would drop an in-flight generation —
+`systemctl restart strata` unloads the model and kills the current request.
 
-Truth: `hosts/eisen/configuration.nix` — the stack this page inspects; this page is the procedure.
+Truth: `hosts/eisen/llm-server.nix` (the stack and the guard) and `task infra:status:eisen` (the read); this page is the interpretation.

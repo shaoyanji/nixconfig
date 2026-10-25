@@ -29,6 +29,23 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-25 — three skills become one command each; eisen's stack gets a read
+- `.agents/skills/{stt,voice-loop,google-drive}/scripts/` now hold the procedure: `stt.sh`
+  normalizes to 16 kHz mono and picks local voxtype or eisen, `voice-loop.sh` says/hears/
+  roundtrips and scores the loop by word overlap, `drive-auth.sh` runs the OAuth handshake and
+  tears its funnel down on exit. `task infra:status:eisen` replaces the prose probe list.
+- **The eisen skill was describing a stack that no longer runs.** `llama-swap` is dormant and
+  `strata` serves `:8085` (`hosts/eisen/llm-server.nix`); the task reports both, reads socket
+  units rather than `/health` so it never wakes an idle model, and exits 2 when the host is off.
+- Proof: stt — stub *voxtype* local path with `--out`, ffmpeg rejection of non-audio, 2.1 s
+  fast-fail off a cold host; voice-loop — `default` rejected before any request, overlap scores
+  1.00 / 0.75 / 0.00; drive-auth — `verify` against the live remote (5 TiB, 17 dirs), URL
+  extraction, wait budget and process teardown against a stub; status — unreachable exit 2 plus
+  human and JSON renders over ssh. **Not exercised:** a real transcription, a real TTS call, and
+  the OAuth consent step — eisen is powered off and consent needs a browser.
+- Gates: `ops:skills:check`, `checks:tasks` (460 tasks, exact name parity), `checks:docs:links`,
+  `docs-budget.sh`, `shellcheck -S warning` on all four scripts.
+
 ### 2026-10-25 — atuin bring-up is one script, not five commands
 - `.agents/skills/atuin/scripts/atuin-bootstrap.sh` does the whole host: key-shape
   preconditions, login, a marked one-time seed, two syncs, and an `--expect` count check.

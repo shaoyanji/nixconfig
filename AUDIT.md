@@ -29,6 +29,12 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-25 — delphi debloats QEMU TCG microvm, restores native stirling-pdf, adds searxng and uptime-kuma
+- Delphi cloud bastion: retired autostart of QEMU TCG microvm (reclaiming ~2.5 GiB RAM and eliminating
+  idle CPU drag on 2-OCPU ARM64). Restored native `services.stirling-pdf` with JVM bounds on loopback :7351,
+  added `services.searx` on tailnet :8447 and `services.uptime-kuma` on tailnet :8448. Sentinel watchUnits
+  and autonomous agentScheduler checks updated accordingly.
+
 ### 2026-10-25 — guckloch reaches atuin over the LAN, and calendar gets its script
 - guckloch has no tailnet (`inventory.toml`), so the fleet's tailnet sync address was unroutable
   there and atuin answered `invalid credentials` — the same message a wrong password gives. It now

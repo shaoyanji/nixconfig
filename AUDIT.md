@@ -29,6 +29,22 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-25 — guckloch reaches atuin over the LAN, and calendar gets its script
+- guckloch has no tailnet (`inventory.toml`), so the fleet's tailnet sync address was unroutable
+  there and atuin answered `invalid credentials` — the same message a wrong password gives. It now
+  overrides `sync_address` with frieren's LAN address read from `config.fleet.inventory`, so the
+  fact keeps one home. Login failing on guckloch was this, not the credentials.
+- `atuin-bootstrap.sh` names the network before the password now: a TCP probe of the sync address
+  with a 3 s budget, then atuin's own error line. Proven both ways — an unroutable address reports
+  `cannot reach …`, and `http://192.168.3.25` logs in and syncs.
+- `.agents/skills/calendar/scripts/calendar-auth.sh` does the consent flow (the callback lives only
+  while `vdirsyncer discover` runs, and it is `localhost:8080`, so the answer is `ssh -L`, not a
+  funnel) and a `verify` that separates an auth rejection from a per-item skip. Proof: `verify` on
+  frieren reports 48 upcoming events and one skipped item, exit 0.
+- Found on the way: `WEBEX-MEETING%2BCENTER-6.0418931-1376670602.ics` fails every sync — Google's
+  multiget returns no properties for that href, so vdirsyncer logs *properties are missing* and
+  raises `NotFound`. One event, not a token problem; recorded in the skill as known.
+
 ### 2026-10-25 — three skills become one command each; eisen's stack gets a read
 - `.agents/skills/{stt,voice-loop,google-drive}/scripts/` now hold the procedure: `stt.sh`
   normalizes to 16 kHz mono and picks local voxtype or eisen, `voice-loop.sh` says/hears/

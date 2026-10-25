@@ -92,8 +92,21 @@ export ATUIN_SESSION="${ATUIN_SESSION:-$(cat /proc/sys/kernel/random/uuid 2>/dev
 # --- 1. login (not 'register': registration is closed server-side) ---------
 LOGIN="skipped"
 if ! atuin status >/dev/null 2>&1; then
-  atuin login -u "${ATUIN_USER:-devji}" -p "$ATUIN_PASSWORD" -k "$ATUIN_KEY" >/dev/null 2>&1 ||
-    die 4 "atuin login failed (wrong password, or base64 key passed instead of the mnemonic)"
+  # Reachability first. An unroutable sync_address — a host with no tailnet, or
+  # nginx down — surfaces from atuin as `invalid credentials`, which reads as a
+  # wrong password; ask the network directly and name the address instead.
+  authority=${SYNC_ADDR#*://}
+  authority=${authority%%/*}
+  host=${authority%%:*}
+  port=${authority##*:}
+  [ "$port" = "$authority" ] && port=80
+  timeout 3 bash -c "</dev/tcp/$host/$port" 2>/dev/null ||
+    die 4 "cannot reach $host:$port ($SYNC_ADDR) — a host with no tailnet needs the LAN address (see SKILL.md, 'Hosts without a tailnet')"
+  # Keep atuin's own words: "invalid credentials" and a timeout are different
+  # bugs, and the old message guessed between them.
+  if ! login_out=$(atuin login -u "${ATUIN_USER:-devji}" -p "$ATUIN_PASSWORD" -k "$ATUIN_KEY" 2>&1); then
+    die 4 "atuin login failed at $SYNC_ADDR: $(tail -1 <<<"$login_out")"
+  fi
   LOGIN="done"
 fi
 

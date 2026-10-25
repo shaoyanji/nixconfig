@@ -1,6 +1,7 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: let
   user = import ../../modules/global/user.nix;
@@ -44,6 +45,13 @@ in {
       ../../modules/user/ai/skills
       ../../modules/user/ai/antigravity-cli.nix
     ];
+
+    # The fleet syncs shell history over the tailnet, which this host is not on
+    # (inventory.toml: guckloch network.tailscale = false), so the shared
+    # address is unroutable here and atuin reports `invalid credentials` — the
+    # same message a wrong password gives. Frieren's LAN address answers, and it
+    # is read from the registry rather than restated.
+    programs.atuin.settings.sync_address = lib.mkForce "http://${config.fleet.inventory.hosts.frieren.network.lan_ip}";
   };
 
   system.stateVersion = "25.05";

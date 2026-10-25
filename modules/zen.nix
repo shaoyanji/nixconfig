@@ -115,56 +115,114 @@
           sponsorblock
           offline-qr-code-generator
           hacktools
-          # ghosttext
           geminize
           export-tabs-urls-and-titles
           chatgptbox
           brotab
           aria2-integration
-          # single-file
-          # wappalyzer
+          # Power tool & privacy additions
+          ghosttext
+          single-file
+          refined-github
+          clearurls
+          fastforwardteam
+          bypass-paywalls-clean
+          open-in-freedium
+          web-archives
+          return-youtube-dislikes
+          dearrow
+          page-assist
+          translate-web-pages
+          # Note: wappalyzer is unfree ('allrightsreserved'); excluded from pure flake build
           # ipfs-companion
         ];
-        # containersForce = true;
-        # containers = {
-        #   Personal = {
-        #     color = "purple";
-        #     icon = "fingerprint";
-        #     id = 1;
-        #   };
-        #   Work = {
-        #     color = "blue";
-        #     icon = "briefcase";
-        #     id = 2;
-        #   };
-        #   Shopping = {
-        #     color = "yellow";
-        #     icon = "dollar";
-        #     id = 3;
-        #   };
-        # };
-        # spacesForce = true;
-        # spaces = let
-        #   containers = config.programs.zen-browser.profiles."default".containers;
-        # in {
-        #   "Space" = {
-        #     id = "c6de089c-410d-4206-961d-ab11f988d40a";
-        #     position = 1000;
-        #   };
-        #   "Work" = {
-        #     id = "cdd10fab-4fc5-494b-9041-325e5759195b";
-        #     icon = "chrome://browser/skin/zen-icons/selectable/star-2.svg";
-        #     container = containers."Work".id;
-        #     position = 2000;
-        #   };
-        #   "Shopping" = {
-        #     id = "78aabdad-8aae-4fe0-8ff0-2a0c6c4ccc24";
-        #     icon = "💸";
-        #     container = containers."Shopping".id;
-        #     position = 3000;
-        #   };
-        # };
-        #
+        spacesForce = false;
+        spaces = {
+          "Delphi Cloud" = {
+            id = "c6de089c-410d-4206-961d-ab11f988d40a";
+            position = 1000;
+            icon = "☁️";
+            pins = {
+              "SearXNG" = {
+                id = "d1a10001-0000-4000-8000-000000000001";
+                url = "https://delphi.cloudforest-kardashev.ts.net:8447";
+                position = 1000;
+              };
+              "Stirling PDF" = {
+                id = "d1a10001-0000-4000-8000-000000000002";
+                url = "https://delphi.cloudforest-kardashev.ts.net:8445";
+                position = 2000;
+              };
+              "Uptime Kuma" = {
+                id = "d1a10001-0000-4000-8000-000000000003";
+                url = "https://delphi.cloudforest-kardashev.ts.net:8448";
+                position = 3000;
+              };
+              "Service Portal" = {
+                id = "d1a10001-0000-4000-8000-000000000004";
+                url = "https://delphi.cloudforest-kardashev.ts.net:8446";
+                position = 4000;
+              };
+              "DeepSeek Harness" = {
+                id = "d1a10001-0000-4000-8000-000000000005";
+                url = "https://delphi.cloudforest-kardashev.ts.net:8443";
+                position = 5000;
+              };
+            };
+          };
+          "Frieren Mainframe" = {
+            id = "cdd10fab-4fc5-494b-9041-325e5759195b";
+            position = 2000;
+            icon = "🏰";
+            pins = {
+              "Immich Photos" = {
+                id = "f1a10002-0000-4000-8000-000000000001";
+                url = "https://photos.frieren.lan";
+                position = 1000;
+              };
+              "Jellyfin Media" = {
+                id = "f1a10002-0000-4000-8000-000000000002";
+                url = "https://media.frieren.lan";
+                position = 2000;
+              };
+              "Audiobookshelf" = {
+                id = "f1a10002-0000-4000-8000-000000000003";
+                url = "https://audiobooks.frieren.lan";
+                position = 3000;
+              };
+              "Vaultwarden" = {
+                id = "f1a10002-0000-4000-8000-000000000004";
+                url = "https://vault.frieren.lan";
+                position = 4000;
+              };
+              "Home Assistant" = {
+                id = "f1a10002-0000-4000-8000-000000000005";
+                url = "https://ha.frieren.lan";
+                position = 5000;
+              };
+              "Transmission Torrent" = {
+                id = "f1a10002-0000-4000-8000-000000000006";
+                url = "https://torrent.frieren.lan";
+                position = 6000;
+              };
+              "Kiwix Offline Wiki" = {
+                id = "f1a10002-0000-4000-8000-000000000007";
+                url = "https://wiki.frieren.lan";
+                position = 7000;
+              };
+              "Fleet Docs" = {
+                id = "f1a10002-0000-4000-8000-000000000008";
+                url = "https://docs.frieren.lan";
+                position = 8000;
+              };
+              "Paste (pb)" = {
+                id = "f1a10002-0000-4000-8000-000000000009";
+                url = "https://paste.frieren.lan";
+                position = 9000;
+              };
+            };
+          };
+        };
       };
     };
   };

@@ -733,7 +733,12 @@ in {
       ExecStart = pkgs.writeShellScript "burgernas-library-sync" ''
         set -eu
         SRC="/Volumes/data"
-        DEST="devji@192.168.3.92:/volume1/Shared Library/tools"
+        # The host and the path stay separate values. Concatenated into one
+        # string they were both pasted into the `mkdir` that runs on the NAS,
+        # which created a literal `./devji@192.168.3.92:/volume1/...` tree in its
+        # home while rsync then failed on the path that was never made.
+        DEST_HOST="devji@192.168.3.92"
+        DEST_PATH="/volume1/Shared Library"
         KEY="${user.home}/.ssh/id_ed25519"
         SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
 
@@ -744,17 +749,24 @@ in {
 
         dirs="bin-x86 bin-aarch64 bin-script appimages"
         # rsync creates only the final component, so the tree root goes first.
-        $SSH devji@192.168.3.92 "mkdir -p '$DEST' '$DEST/bin-x86' '$DEST/bin-aarch64' '$DEST/bin-script' '$DEST/appimages'"
+        # The share already exists; this is a no-op there and a creation on a
+        # fresh NAS.
+        $SSH "$DEST_HOST" "mkdir -p '$DEST_PATH' '$DEST_PATH/bin-x86' '$DEST_PATH/bin-aarch64' '$DEST_PATH/bin-script' '$DEST_PATH/appimages'"
         for dir in $dirs; do
           [ -d "$SRC/$dir" ] || continue
           echo "=== [$(date -Is)] mirroring $dir ==="
-          ${pkgs.rsync}/bin/rsync -az --delete --partial \
+          # -s (--protect-args) is required, not cosmetic: the remote path
+          # contains a space, and without it the *remote* shell splits it.
+          # --no-perms because DSM's shared folders are ACL-managed and chmod
+          # on the directory itself fails with EPERM, turning a successful
+          # transfer into rsync exit 23.
+          ${pkgs.rsync}/bin/rsync -azs --delete --partial --no-perms \
             --exclude '.rejected' \
             --rsync-path=/usr/bin/rsync \
             -e "$SSH" \
-            "$SRC/$dir/" "$DEST/$dir/"
+            "$SRC/$dir/" "$DEST_HOST:$DEST_PATH/$dir/"
         done
-        ${pkgs.rsync}/bin/rsync -q -e "$SSH" "$SRC/.library.tsv" "$DEST/.library.tsv" || true
+        ${pkgs.rsync}/bin/rsync -qs --no-perms -e "$SSH" "$SRC/.library.tsv" "$DEST_HOST:$DEST_PATH/.library.tsv" || true
         echo "=== [$(date -Is)] Library mirror finished. ==="
       '';
     };

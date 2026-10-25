@@ -97,10 +97,6 @@ in {
               mountPoint = "/var/lib/stirling-pdf";
               size = 4096;
             };
-            dsh = {
-              mountPoint = "/var/lib/deepseek-harness";
-              size = 1024;
-            };
           };
           # No deck here. `slidesUser` is a development facility — a forced
           # command into a markdown deck — and this guest is a service tier: the

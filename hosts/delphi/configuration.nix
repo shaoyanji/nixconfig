@@ -670,9 +670,17 @@ in {
       };
   };
 
-  # --- DeepSeek Harness, hosted HERE, TAILNET ONLY ----------------------------
-  # The harness (agent loop, bash, model calls, workspaces) runs on this host;
-  # a client needs only a browser at `dshUrl`. The unit binds loopback and
+  # --- DeepSeek Harness, hosted HERE (NATIVE LANE), TAILNET ONLY --------------
+  # Architectural Decision: Pinned to the NATIVE host lane. Delphi runs on an
+  # OCI A1 ARM64 instance without KVM virtualization (EL2 unavailable), meaning
+  # the sandbox microVM runs under interpreted QEMU TCG. Running an active agent
+  # coding harness (bash executions, model orchestration, git workspaces) inside
+  # TCG incurs severe interpreted CPU penalties and stalls the 2 OCPU budget.
+  # Native host execution runs at bare-metal Ampere Altra speed with systemd
+  # cgroup guards (CPUWeight=200, MemoryHigh=1200M) and direct SOPS key access.
+  # The phantom guest volume reservation in hosts/microvms was retired.
+  #
+  # A client needs only a browser at `dshUrl`. The unit binds loopback and
   # `tailscale-serve-dsh` below is the only way in. `tailscale serve` preserves
   # the client's Host header (measured: `Host: delphi.<tailnet>.ts.net:8443`
   # reached the upstream verbatim), so that authority is both the /api fence

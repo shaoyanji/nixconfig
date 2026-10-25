@@ -55,6 +55,22 @@ in {
       # slash-free. This replaced vdirsyncer scraping a hand-made rclone.conf.
       "gdrive_client_id".key = "googleDrive/clientId";
       "gdrive_client_secret".key = "googleDrive/clientSecret";
+      # One shell history across the fleet: atuin encrypts every command before
+      # upload, so this key is what makes another host's history readable here.
+      # It is rendered to atuin's own default path because a bare `atuin` run
+      # generates a private key there when the file is missing -- which is how
+      # each host ended up syncing a history no other host could decrypt.
+      #
+      # Two representations, and they are not interchangeable: the key file holds
+      # the base64 form (`key_base64`, what `atuin key --base64` prints), while
+      # `atuin login -k` takes the 24-word mnemonic. The mnemonic stays in the
+      # `atuin/key` slot as the credential for logging in a new host; the session
+      # token is deliberately absent, because `atuin login` binds it per host.
+      "atuin-key" = {
+        key = "atuin/key_base64";
+        path = "${config.home.homeDirectory}/.local/share/atuin/key";
+        mode = "0600";
+      };
       "gemini/api/key" = {};
       # "todoist" = {
       #   sopsFile = ./secrets.json;

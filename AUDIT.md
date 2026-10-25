@@ -29,6 +29,24 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-25 — fern joins atuin; the NAS mirror moves onto the exported lane
+- `fern` rebuilt and logged in (`atuin 18.23.0`; the key is rendered by `modules/sops.nix`, so the
+  host only needed `atuin login`): `import nu-hist-db` + `import bash` then `sync` → **24,282 items**
+  (5,208 bash / 19,074 nu), server `store` at **24,284**. Proof: the two imports, `atuin sync`
+  complete, the postgres count on frieren, and 3 `_atuin_*` commands visible in fern's nushell.
+- `burgernas-library-sync` writes `/volume1/peachcable` — the only NFS export — instead of
+  `/volume1/Shared Library`, where the DietPi/Raspberry Pi clients could never see it. 48 files that
+  existed only on the NAS were rescued into `/Volumes/data/{bin-x86,bin-aarch64,bin-script}` first,
+  and the legacy paths are relative symlinks to the export (an NFS symlink resolves client-side, so it
+  cannot split the lane). Proof: one run to exact name parity 80/66/20/66, six hashes equal, ~10 G of
+  duplicate freed, same counts through frieren's `vers=4.1` mount. Live on frieren's next rebuild;
+  the timer is weekly (Sun 03:32).
+- Commentary gate: `scripts/task/nix-prose-lint.sh` fails a commit when 8+ **added** comment lines
+  cite no home (docs, skill, policy, `task`, `.#`, repo path) — the diff, not the corpus, so it bites
+  now instead of demanding a rewrite of the 58 existing blocks that `MODE=all` reports. Folded into
+  the existing `nix-header-budget` policy rather than a second rule for one topic; `checks.policies`
+  reports 44 holding.
+
 ### 2026-10-23 — delphi's guest becomes a service tier: named volumes, Stirling, a deck on port 22
 - `persist` in `hosts/microvms/guests.nix` mounts one labelled ext4 image per name at
   `/var/lib/<name>` (hermes, stirling, dsh); Stirling PDF runs on the 4 GiB one behind

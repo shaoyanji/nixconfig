@@ -1,6 +1,8 @@
 # atuin on every host, pointed at the one server: bash and nushell both get the
-# Ctrl-R UI, so a shell searches one history. Credentials live under `atuin` in
-# modules/secrets/secrets.yaml; `atuin import` seeds history that predates it.
+# Ctrl-R UI, so a shell searches one history. The shared encryption key is
+# `atuin.key` in modules/secrets.yaml, rendered to atuin's default path by
+# modules/sops.nix; the session is per host (`atuin login`), and `atuin import`
+# seeds the history that predates atuin.
 _: {
   programs.atuin = {
     enable = true;

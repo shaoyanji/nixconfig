@@ -83,6 +83,24 @@ humans paste the mnemonic one. The script checks both shapes before it logs in.
   `api.atuin.sh`** and reports `invalid credentials`, which reads exactly like a
   wrong sops password. The script refuses an unset or public `sync_address` first.
 
+### Hosts without a tailnet (guckloch)
+
+`modules/shell/atuin.nix` points every host at the **tailnet** address. A host
+that is not on the tailnet cannot route it, and atuin reports
+`invalid credentials` — indistinguishable from a wrong password, which is why
+login was failing on guckloch with credentials that work everywhere else.
+`hosts/guckloch/configuration.nix` overrides `sync_address` with frieren's LAN
+address taken from `config.fleet.inventory`, so the fact still has one home.
+burgernas is the hand-written equivalent (below).
+
+Test an address without a rebuild — atuin honours `ATUIN_CONFIG_DIR`:
+
+```bash
+mkdir -p /tmp/atuin-cfg
+printf 'sync_address = "http://192.168.3.25"\n' > /tmp/atuin-cfg/config.toml
+ATUIN_CONFIG_DIR=/tmp/atuin-cfg bash .agents/skills/atuin/scripts/atuin-bootstrap.sh
+```
+
 ## Proof, not vibes
 
 Two numbers must agree — the server's record count and the host's item count, and

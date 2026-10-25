@@ -81,31 +81,12 @@ in {
           inherit inputs;
           hypervisor = "qemu";
           cpu = "max";
-          # This guest is a service host, not a shell: bring it back at boot,
-          # give it the two stub HTTP services the proxy below exposes, and
-          # reserve the state disks the ported services will mount.
-          autostart = true;
-          services = true;
-          # A JVM app is the first real tenant, so the guest gets room: 4 GiB of
-          # the host's 11.9 GiB, still under the 8 GiB ceiling.
-          mem = 4096;
-          stirling = true;
-          persist = {
-            hermes = {size = 1024;};
-            stirling = {
-              # The service's own StateDirectory, so its state lands on the disk.
-              mountPoint = "/var/lib/stirling-pdf";
-              size = 4096;
-            };
-          };
-          # No deck here. `slidesUser` is a development facility — a forced
-          # command into a markdown deck — and this guest is a service tier: the
-          # deck accumulated one abandoned TUI per session and, under TCG, each
-          # one cost real host CPU. Set `slidesUser = "slides"` and
-          # `exposeSsh = 2222` to bring it back (OCI's security list must then
-          # also allow 2222 — a console change, see .agents/deploy/hosts/delphi.md).
-          # Admin access is the bridge: `ssh sandbox` on delphi, or
-          # `task microvm:ssh NAME=sandbox` from the repo.
+          # Retired from autostart on 2026-10-25: OCI A1 lacks KVM hardware acceleration
+          # (TCG software emulation burned 44m CPU and 2.5G RAM). Stirling PDF now runs
+          # natively on Delphi (sub-second responses, ARM64 native execution).
+          autostart = false;
+          services = false;
+          stirling = false;
         })
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with

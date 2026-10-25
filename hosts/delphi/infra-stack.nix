@@ -178,9 +178,9 @@
       SYSTEMONE_FAILED=1
     fi
 
-    MICROVM_FAILED=0
-    if ! systemctl is-active microvm@sandbox.service >/dev/null 2>&1; then
-      MICROVM_FAILED=1
+    STIRLING_FAILED=0
+    if ! systemctl is-active stirling-pdf.service >/dev/null 2>&1; then
+      STIRLING_FAILED=1
     fi
 
     UPGRADE_FAILED=0
@@ -227,9 +227,9 @@
     elif [ "$SYSTEMONE_FAILED" -gt 0 ]; then
       SHOULD_RUN_CASCADE=1
       RUN_REASON="System One decision serve probe failure on 127.0.0.1:8091"
-    elif [ "$MICROVM_FAILED" -gt 0 ]; then
+    elif [ "$STIRLING_FAILED" -gt 0 ]; then
       SHOULD_RUN_CASCADE=1
-      RUN_REASON="MicroVM sandbox service is not active"
+      RUN_REASON="Stirling PDF service is not active"
     elif [ "$UPGRADE_FAILED" -gt 0 ]; then
       SHOULD_RUN_CASCADE=1
       RUN_REASON="NixOS autoUpgrade failure detected"
@@ -271,7 +271,9 @@ in {
     enable = true;
     watchUnits = [
       {unit = "nixos-upgrade.service";}
-      {unit = "microvm@sandbox.service";}
+      {unit = "stirling-pdf.service";}
+      {unit = "searx.service";}
+      {unit = "uptime-kuma.service";}
       {unit = "dsh-web.service";}
       {unit = "crab-hole.service";}
       {unit = "systemone-decision-serve.service";}
@@ -312,12 +314,12 @@ in {
   # --- Refined CGroup & Resource Controls (2 OCPU / 11 GiB RAM Cloud Bastion) -
   # Protects interactive sshd, Nginx and crab-hole DNS from being starved by
   # guest workloads or batch harness compilations.
-  systemd.services."microvm@sandbox".serviceConfig = {
-    CPUWeight = 100;
-    IOWeight = 100;
-    MemoryHigh = "3500M";
-    MemoryMax = "4000M";
-  };
+  # systemd.services."microvm@sandbox".serviceConfig = {
+  #   CPUWeight = 100;
+  #   IOWeight = 100;
+  #   MemoryHigh = "3500M";
+  #   MemoryMax = "4000M";
+  # };
 
   systemd.services.dsh-web.serviceConfig = {
     CPUWeight = 200;

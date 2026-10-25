@@ -722,20 +722,41 @@ in {
   #
   # Kept disabled rather than deleted for posterity: this is the shape that ran
   # natively 2026-10-21..24, and the reference for a host with no microvm layer.
+  # --- Native Services (Retiring QEMU TCG MicroVM bottleneck) ----------------
+  # Native Stirling PDF (ARM64 native execution, sub-second responses, ~450 MB RAM)
   services.stirling-pdf = {
-    enable = false;
+    enable = true;
     environment = {
       SERVER_PORT = "7351";
       SECURITY_ENABLELOGIN = "false";
       JAVA_TOOL_OPTIONS = "-Xms128m -Xmx512m -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=50";
     };
   };
-  # Only meaningful when the native service is enabled; defining serviceConfig
-  # for a unit that does not exist would leave a bare unit behind at boot.
-  # systemd.services.stirling-pdf.serviceConfig = {
-  #   MemoryHigh = "640M";
-  #   MemoryMax = "768M";
-  # };
+  systemd.services.stirling-pdf.serviceConfig = {
+    MemoryHigh = "640M";
+    MemoryMax = "768M";
+  };
+
+  # Private Meta-Search Engine (SearXNG on Tailnet)
+  services.searx = {
+    enable = true;
+    redisCreateLocally = true;
+    settings = {
+      server.port = 8888;
+      server.bind_address = "127.0.0.1";
+      server.secret_key = "delphi-searxng-salt-secret";
+      search.safe_search = 0;
+    };
+  };
+
+  # External Fleet & WAN Status Monitor (Uptime Kuma on Tailnet)
+  services.uptime-kuma = {
+    enable = true;
+    settings = {
+      HOST = "127.0.0.1";
+      PORT = "3001";
+    };
+  };
 
   # --- Tailnet-only HTTPS mounts, from ONE registry --------------------------
   # Each mount is a `tailscale serve` https front for a loopback listener; the
@@ -767,17 +788,13 @@ in {
         description = "POST /v1/systemone — the state+questions → answers envelope.";
         requires = ["systemone-decision-serve.service"];
       };
-      # 8445 retired with the native JVM (2026-10-24). Stirling is a guest
-      # service now; the mount would have to point off loopback, and the guest
-      # already has a first-class path of its own, generated from its module:
-      #   https://<tailnetHost>/microvm/stirling/
-      # pdf = {
-      #   port = 8445;
-      #   upstream = "http://127.0.0.1:7351";
-      #   title = "Stirling PDF";
-      #   description = "PDF merge, split, OCR and conversion. Guest-hosted since 2026-10-24; JVM warmup is ~60 s.";
-      #   requires = ["stirling-pdf.service"];
-      # };
+      pdf = {
+        port = 8445;
+        upstream = "http://127.0.0.1:7351";
+        title = "Stirling PDF";
+        description = "PDF merge, split, OCR and conversion (native ARM64).";
+        requires = ["stirling-pdf.service"];
+      };
       portal = {
         port = 8446;
         upstream = "http://127.0.0.1:8082";
@@ -786,6 +803,20 @@ in {
         requires = ["nginx.service"];
         # The page lists the mounts; listing its own mount is noise.
         hideCard = true;
+      };
+      search = {
+        port = 8447;
+        upstream = "http://127.0.0.1:8888";
+        title = "SearXNG";
+        description = "Private, ad-free meta-search engine on the tailnet.";
+        requires = ["searx.service"];
+      };
+      kuma = {
+        port = 8448;
+        upstream = "http://127.0.0.1:3001";
+        title = "Uptime Kuma";
+        description = "External fleet and home WAN status monitor.";
+        requires = ["uptime-kuma.service"];
       };
     };
     entries.gatus = {

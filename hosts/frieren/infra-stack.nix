@@ -738,7 +738,9 @@ in {
         # which created a literal `./devji@192.168.3.92:/volume1/...` tree in its
         # home while rsync then failed on the path that was never made.
         DEST_HOST="devji@192.168.3.92"
-        DEST_PATH="/volume1/Shared Library"
+        # The one lane is the export, so the bytes must live here.
+        # Why: [[flake/policies.nix#library-crosses-the-wire]]
+        DEST_PATH="/volume1/peachcable"
         KEY="${user.home}/.ssh/id_ed25519"
         SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
 
@@ -762,6 +764,8 @@ in {
           # transfer into rsync exit 23.
           ${pkgs.rsync}/bin/rsync -azs --delete --partial --no-perms \
             --exclude '.rejected' \
+            --exclude '@eaDir' \
+            --exclude '.DS_Store' \
             --rsync-path=/usr/bin/rsync \
             -e "$SSH" \
             "$SRC/$dir/" "$DEST_HOST:$DEST_PATH/$dir/"

@@ -87,8 +87,12 @@ jobs:
             echo "GOK_HTTP_PASSWORD is not set — add the gokrazy web password as a repository secret" >&2
             exit 1
           fi
+          # Bounded on purpose: `gok update` waits for the appliance to accept the
+          # image, reboot and come back. Without a timeout that wait is unbounded —
+          # a run sat in this step for 80 minutes with no log to show for it, which
+          # is a black hole rather than a failure.
           if [ "${{ inputs.insecure }}" = "true" ]; then
-            ./scripts/task/gok.sh update --insecure
+            timeout 900 ./scripts/task/gok.sh update --insecure
           else
-            ./scripts/task/gok.sh update
+            timeout 900 ./scripts/task/gok.sh update
           fi

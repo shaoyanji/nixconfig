@@ -1,11 +1,13 @@
-{lib, ...}: {
+# minyx — host entry.
+#
+# The bootloader and firmware are owned by the sd-image module imported from
+# hardware-configuration.nix, so no loader is configured by hand here.
+{...}: {
   imports = [
     ./hardware-configuration.nix
+    ./custompi.nix
+    ./tunnel.nix
   ];
-
-  boot.loader.grub.enable = false;
-  boot.loader.systemd-boot.enable = lib.mkForce false;
-  boot.loader.generic-extlinux-compatible.enable = true;
 
   system.stateVersion = "24.11";
 }

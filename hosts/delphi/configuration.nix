@@ -336,7 +336,7 @@ in {
       "--accept-routes=true"
       # A resolver must never resolve THROUGH the address it serves: that is an
       # outage loop (the VRRP analogue is why net/dns/failover.nix probes
-      # 127.0.0.1 and not the floating IP). blocky's own upstreams are DoT.
+      # 127.0.0.1 and not the floating IP). crab-hole's own upstreams are DoT.
       "--accept-dns=false"
       # `--advertise-exit-node` and the `/32` route are emitted by
       # net/dns/tailnet-address.nix (`exitNode = true`), not here.
@@ -346,58 +346,74 @@ in {
   # The lo bind itself lives in net/dns/tailnet-address.nix (shared with
   # frieren, which advertises the same /32 as the passive member).
 
-  # --- Tailnet resolver: blocky ----------------------------------------------
-  # This is the fleet's second resolver, and it has to answer the SAME questions
-  # as frieren's pihole-ftl or "failover" is a lie: crab-hole (the previous
-  # occupant) forwards public names and NXDOMAINs every *.frieren.lan name, which
-  # docs/dns-failover.md measures and calls out as the reason
-  # `task ops:tailnet:dns` failed while this host served the shared /32.
+  # --- Tailnet resolver: crab-hole -------------------------------------------
+  # Chosen over the pihole-ftl + unbound stack in net/dns/failover.nix:
+  # that module is built around a LAN interface and keepalived VRRP, neither of
+  # which exists on a cloud host. crab-hole is one Rust binary, keeps the same
+  # StevenBlack + Disconnect lists frieren blocks, and speaks plain DNS on 53.
   #
-  # blocky is a forwarding resolver WITH a local zone: `customDNS` pins
-  # *.frieren.lan to 192.168.3.25 (every name in the zone points at frieren's own
-  # services), so the zone answers whether or not frieren's resolver is alive.
-  # The same two blocklists frieren uses are loaded here, so a client that falls
-  # back gets the answer it would have got from the primary.
+  # It listens on 0.0.0.0 rather than a hardcoded tailnet IP: the IP is assigned
+  # by Tailscale at login and would otherwise have to be baked in. The firewall
+  # (not the bind address) is what limits it to the tailnet.
   #
-  # Independence is the point: the upstreams are public DoT, not frieren. A
-  # failover resolver that forwards through the node it is failing over from
-  # inherits that node's outage.
-  services.blocky = {
+  # LIMIT, measured 2026-10-20: crab-hole is a forwarding ad-blocker, not an
+  # authoritative server — its config has blocklist/downstream/upstream/api and
+  # no static-record or zone support (LuckyTurtleDev/crab-hole). It therefore
+  # answers the internet but NOT the fleet's `*.frieren.lan` wildcard, so while
+  # the shared `10.99.0.53/32` route sits on this node every fleet name returns
+  # NODATA. `task ops:tailnet:dns` fails on exactly this, and
+  # docs/dns-failover.md lists the three fixes (split DNS for the zone is the
+  # cheap one; a dnsmasq zone front-end is the equivalent-resolver one).
+  services.crab-hole = {
     enable = true;
+    # openFirewall would open 53 globally; the scoped interface rule below is
+    # the only intended path in.
+    openFirewall = false;
     settings = {
-      ports = {
-        dns = 53;
-        # Metrics/API on loopback only; nothing here is meant to be reachable.
-        http = 4000;
-      };
-      upstreams.groups.default = [
-        "https://one.one.one.one/dns-query"
-        "https://dns.quad9.net/dns-query"
+      # UDP only, and that is a crab-hole limitation, not a choice: v0.1.12
+      # takes `udp|tls|https|quic` for a downstream protocol and has no plain
+      # `tcp` variant (the build-time validate-config rejects it). Consequence:
+      # no DNS-over-TCP on 53, so a truncated answer cannot be retried over TCP
+      # and very large TXT chains will fail. Everything else resolves normally.
+      downstream = [
+        {
+          listen = "0.0.0.0";
+          port = 53;
+          protocol = "udp";
+        }
       ];
-      # The zone frieren owns, answered locally. A wildcard covers every
-      # subdomain, which is what the primary's dnsmasq `address=/frieren.lan/`
-      # line does.
-      customDNS = {
-        customTTL = "1h";
-        mapping = {
-          "frieren.lan" = "192.168.3.25";
-          "*.frieren.lan" = "192.168.3.25";
-        };
-      };
-      blocking = {
-        denylists.ads = [
+      # DoT upstreams, IPv4 only: OCI free-tier instances have no IPv6 uplink,
+      # and a resolver that prefers IPv6 root/upstream servers SERVFAILs every
+      # lookup (the 2026-10-14 frieren outage, same failure class).
+      upstream.name_servers = [
+        {
+          protocol = "tls";
+          socket_addr = "1.1.1.1:853";
+          tls_dns_name = "one.one.one.one";
+          trust_nx_responses = false;
+        }
+        {
+          protocol = "tls";
+          socket_addr = "9.9.9.9:853";
+          tls_dns_name = "dns.quad9.net";
+          trust_nx_responses = false;
+        }
+      ];
+      # Same two lists frieren's pihole-ftl uses, so a failover answer is the
+      # answer the client would have got from the primary.
+      blocklist = {
+        include_subdomains = true;
+        lists = [
           "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts"
           "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt"
         ];
-        clientGroupsBlock.default = ["ads"];
-        # Same answer the primary gives for a blocked name.
-        blockType = "zeroIp";
       };
-      caching = {
-        minTime = "5m";
-        maxTime = "30m";
+      # Loopback only; there is no crab-hole web UI to expose.
+      api = {
+        listen = "127.0.0.1";
+        port = 8081;
+        show_doc = false;
       };
-      log.level = "info";
     };
   };
 
@@ -442,11 +458,12 @@ in {
         group = "delphi";
         conditions = ["[BODY].state == ok"];
       }
-      # No DNS endpoint on purpose: `services.fleetMonitors` has no `dns://` type
-      # with a query name, and an HTTP probe of a DNS port reports a permanent
-      # red — a monitor that can never go green is worse than none. The resolver
-      # is proven by `dig @10.99.0.53 example.com` and by
-      # `task ops:tailnet:dns`, which probes the zone and a blocked name.
+      # No DNS endpoint on purpose. crab-hole v0.1.12 has no TCP listener on 53
+      # (its downstream protocols are udp|tls|https|quic), so `tcp://…:53` is
+      # refused and reports a permanent red — a monitor that can never go green
+      # is worse than none. A real assertion needs a `dns://` endpoint with a
+      # query name, which `services.fleetMonitors` does not model yet; until it
+      # does, the resolver is proven by `dig @10.99.0.53 example.com`.
       # Tailnet IP, not MagicDNS: delphi runs `--accept-dns=false` (a resolver
       # must not resolve through the address it serves), so names do not resolve
       # here. The address is stable per node key.
@@ -468,9 +485,9 @@ in {
     ];
   };
 
-  # blocky owns port 53, so resolved must not squat on it: a 0.0.0.0:53 bind
-  # collides with the 127.0.0.53 stub and the unit fails with EADDRINUSE. Point
-  # the host's own resolution at the local resolver instead.
+  # crab-hole owns port 53, so resolved must not squat on it: the wildcard bind
+  # in `downstream` collides with the 127.0.0.53 stub and the unit fails with
+  # EADDRINUSE. Point the host's own resolution at the local resolver instead.
   services.resolved.settings.Resolve = {
     DNSStubListener = "no";
     LLMNR = false;
@@ -996,8 +1013,8 @@ in {
   # --- Headless logging footprint --------------------------------------------
   # profiles/server-hardening.nix is deliberately NOT imported: it bind-mounts
   # /var/log and /var/cache to /srv/private (a NAS path) and ships an
-  # /etc/pihole tmpfiles entry owned by a `pihole` user that a blocky host has
-  # no reason to create — a failing tmpfiles unit on a fresh boot. The two
+  # /etc/pihole tmpfiles entry owned by a `pihole` user that a crab-hole host
+  # has no reason to create — a failing tmpfiles unit on a fresh boot. The two
   # settings worth keeping are declared directly.
   services.journald.settings.Journal = {
     SystemMaxUse = "300M";

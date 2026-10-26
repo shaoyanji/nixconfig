@@ -16,11 +16,11 @@ title = "Fleet Device & Host Inventory"
 description = "Canonical hardware, operational status, network, and agent persona registry for all fleet devices."
 version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_devices = 34
+total_devices = 35
 active_nix_devices = 12
-active_external_devices = 6
-wip_devices = 0
-preserved_devices = 16
+active_external_devices = 7
+wip_devices = 1
+preserved_devices = 15
 
 # ------------------------------------------------------------------------------
 # 1. CORE SERVERS & INFRASTRUCTURE
@@ -785,6 +785,25 @@ constraints = ["Preserved host; do not target for live deployment."]
 # ------------------------------------------------------------------------------
 # 5. EMBEDDED, SECURITY & MOBILE DEVICES
 # ------------------------------------------------------------------------------
+[hosts.gok]
+hostname = "gok"
+status = "active"
+status_detail = "gokrazy (Go appliance OS) on the spare SD card, flashed from the nixpkgs gok CLI; the image is written and the card has never been booted."
+kind = "external"
+arch = "aarch64-linux"
+role = "gokrazy Appliance (Pi 3B SD card, not NixOS)"
+category = "embedded"
+is_nix = false
+managed = false
+ci = false
+flake = false
+users = []
+notes = [
+  "Flashed on stark with `gok overwrite --full=/dev/sdc` from `pkgs.gokrazy` (gokrazy-0-unstable-2026-09-13): ARM64 vmlinuz, the rpi kernel/firmware packages, and an ext4 `perm` partition created after the write.",
+  "Instance state lives at `~/gokrazy/gok` on stark; the device's HTTP password is `gokrazy.gok.http_password` in `modules/secrets.yaml`, so a rebuild does not depend on that machine's disk.",
+  "Updates build and push over the network (`gok -i gok update`); there is no hostname override, so the device's DHCP name `gok` must resolve before that works.",
+]
+
 [hosts.minyx]
 hostname = "minyx"
 status = "wip"

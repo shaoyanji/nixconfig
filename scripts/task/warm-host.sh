@@ -200,8 +200,20 @@ served_by_cache() {
 # a `--check` that called `nix build --print-out-paths` (instead of --dry-run)
 # dispatched full closures to the remote builder. With builders disabled here, a
 # check CANNOT build even if a future edit drops the --dry-run.
-pending_count() {
-  nix build "$1" --dry-run --builders "" 2>&1 | grep -c 'will be built' || true
+#
+# The host's own `nixos-system-<host>` toplevel is excluded, and that exclusion is
+# the difference between a useful gate and a permanent false alarm: the toplevel is
+# a generated script + symlink tree that NOTHING caches — not cachix, not
+# cache.nixos.org, not harmonia — so it is built by the switch in milliseconds on
+# every host, every time. Counting it reported "GAP 1" for a perfectly
+# substitutable host, which is how a gate gets ignored.
+# ONE dry run per host: it instantiates the whole graph, so asking twice (once
+# for a count, once for names) doubled a 90 s eval into a timeout.
+pending_list() {
+  nix build "$1" --dry-run --builders "" --json 2>/dev/null |
+    jq -r '.[].drvPath' 2>/dev/null |
+    grep -vE -- '-nixos-system-[^/]+\.drv$' |
+    sed 's|.*/||; s|\.drv$||' || true
 }
 
 is_builder=0
@@ -245,18 +257,21 @@ for h in "${hosts[@]}"; do
   top="$(nix eval --raw "$attr.outPath" 2>/dev/null || true)"
 
   if [ "$mode" = "check" ]; then
-    n="$(pending_count "$attr")"
+    mapfile -t gaps < <(pending_list "$attr")
+    n="${#gaps[@]}"
     if [ "${n:-0}" -eq 0 ]; then
       report "warm [$h] READY — this host substitutes everything"
     else
-      report "warm [$h] GAP — this host would COMPILE $n derivations"
+      report "warm [$h] GAP — this host would COMPILE $n derivations:"
+      printf '%s\n' "${gaps[@]:0:5}" | sed 's/^/           /' | while IFS= read -r line; do report "$line"; done
       if [ "$warm_on" = "self" ] && [ "$h" != "$self" ]; then
         # delphi is not behind this LAN. Counting its derivations as a gap HERE
         # would demand the NAS build or relay an aarch64 closure for a host it
         # cannot serve — neither is a fix, and the relay would cost 20 Mbit up.
         # This must be checked BEFORE the "I am the builder" allowance, or
         # frieren answering about delphi always takes that branch.
-        report "         cloud host: it builds natively ON ITSELF and pushes from its own uplink"
+        report "         substitutes the rest from cachix/cache.nixos.org; only fleet-specific"
+        report "         derivations are compiled here, and those are pushed from this uplink"
         report "         strategic anchor in cachix (not routine): task dev:ci:trigger:$h"
       elif [ "$h" = "$builder" ] || [ "$is_builder" = 1 ]; then
         report "         (allowed here: $self is the builder — the closures are supposed to be built here)"
@@ -278,7 +293,8 @@ for h in "${hosts[@]}"; do
   if [ "$is_builder" != 1 ]; then
     # Building here is exactly what the policy forbids. Report instead of
     # saturating the machine; --best-effort keeps a switch unblocked.
-    n="$(pending_count "$attr")"
+    mapfile -t gaps < <(pending_list "$attr")
+    n="${#gaps[@]}"
     report "warm [$h] REFUSED — $self is not the builder ($builder); this host would compile $n derivations"
     report "         → default warm path: task infra:warm:host:$h  (CI → cachix)"
     fail=1

@@ -173,6 +173,12 @@
 
   hosts = evaluated.config.hosts;
   metadata = evaluated.config.metadata;
+
+  # The cache decision, compiled from the same `category` the hosts carry. It is
+  # exposed here so that `global.nix`, `activate-host.sh` and `warm-host.sh` read
+  # ONE answer instead of each re-deriving it — the bug that gated a cloud host on
+  # a LAN cache it cannot reach.
+  cachePolicy = import ./cache-policy.nix {inherit lib;};
   names = lib.attrNames hosts;
 
   isNixHost = host: host.kind != "external";
@@ -254,6 +260,10 @@ in
     flakeHosts = lib.filterAttrs (_: h: isNixHost h && h.flake) hosts;
     # Per-host lookup that fails loudly rather than returning null.
     host = name: hosts.${name} or (throw "inventory: no such host '${name}' in ${toString src}");
+    # `.#inventory.cache.<host>`: substituters, trusted keys, where it is warmed
+    # and which stores a deploy may pull from. Scripts read this instead of
+    # branching on `category` themselves.
+    cache = cachePolicy.forHosts hosts;
     # The compiled registry as typed data. `artifacts.inventory-json` serializes
     # it at the edge; this file never carries a JSON string, so a consumer that
     # wants JSON asks for it and the format check happens where the bytes are made.

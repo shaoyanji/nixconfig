@@ -77,25 +77,19 @@ target="${2:-$1}"
 [ -f "$INVENTORY" ] || { echo "inventory.toml not found" >&2; exit 2; }
 command -v yq >/dev/null 2>&1 || { echo "yq required" >&2; exit 2; }
 
-# Which substituters may serve this host's closure, IN THE HOST'S OWN ORDER.
-#
-# Deriving this from the host (instead of hardcoding harmonia) is the fix for a
-# measured failure: delphi is `category = "cloud"`, so modules/global/global.nix
-# gives it cachix + cache.nixos.org and EXCLUDES the LAN Harmonia cache — but this
-# script still gated on harmonia and copied `--from` it only. On a host that cannot
-# reach it, either the gate aborts the deploy or the switch finds nothing and
-# compiles the whole system on a cloud box. One registry, two readers, disagreeing
-# = the bug; read the same fact the module reads.
+# Which substituters may serve this host's closure, IN THE HOST'S OWN ORDER —
+# read from `.#inventory.cache.<host>`, the same projection modules/global/global.nix
+# consumes for nix.settings.substituters. Deciding it in both places is what broke
+# delphi's deploys: the module excluded the LAN cache for a cloud host while this
+# script gated on it, so the deploy either aborted or left the switch with nothing
+# to fetch — and the whole system compiled there.
 #
 # Env CACHE=<url> pins it to exactly one cache (unchanged escape hatch).
-case "$(yq -r ".hosts.\"$host\".category // \"lan\"" "$INVENTORY" 2>/dev/null || echo lan)" in
-  cloud)
-    caches="https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com"
-    ;;
-  *)
-    caches="$(yq -r '.metadata.cache_url // ""' "$INVENTORY" 2>/dev/null || true) https://shaoyanji.cachix.org https://cache.nixos.org/"
-    ;;
-  esac
+caches="$(nix eval --json "$REPO#inventory.cache.$host.deployStores" 2>/dev/null | jq -r '.[]' | tr '\n' ' ' || true)"
+if [ -z "$caches" ]; then
+  echo "activate [$host] cannot read $REPO#inventory.cache.$host.deployStores" >&2
+  exit 2
+fi
 [ -n "${CACHE:-}" ] && caches="$CACHE"
 # shellcheck disable=SC2086
 set -- $caches

@@ -85,36 +85,31 @@ command -v yq >/dev/null 2>&1 || {
 
 # The host that is allowed to build: it is the one serving the cache.
 builder="$(yq -r '.metadata.builder_host // "frieren"' "$INVENTORY")"
-# Falls back to the fleet's harmonia address: `yq -i` rewrites all of inventory.toml
-# (a 622-line diff), so the metadata key could not be added without destroying the
-# file's formatting. Env CACHE= overrides either way.
-cache_url="$(yq -r '.metadata.cache_url // ""' "$INVENTORY" 2>/dev/null || true)"
-[ -n "$cache_url" ] || cache_url="http://192.168.3.25:5000"
 self="$(hostname)"
 
-# Where the closure is expected to be substitutable from, per host — because the
-# two caches have different jobs:
+# Which caches may serve a host, and where its closure is warmed: both come from
+# `.#inventory.cache.<host>`, the SAME projection modules/global/global.nix reads.
+# Deciding it here as well is what produced the original bug — the deploy gated a
+# cloud host on a LAN cache it cannot reach.
 #
-#   LAN host    harmonia is the BULK cache. One build on frieren serves every
-#               client at gigabit, so it is asked first and a LAN-only hit is a
-#               success for that host.
-#   cloud host  cacix only. delphi is not behind this LAN; harmonia is neither
-#               its cache nor reachable, and relaying its closure through the NAS
-#               costs the NAS 20 Mbit up for no gain.
-#
-# Probing the caches directly (rather than trusting nix.settings.substituters) is
-# deliberate: a host whose config has not been switched yet still gets an honest
-# answer.
-wan_cache="https://shaoyanji.cachix.org"
+# `verifyStores` already encodes the design: a LAN host is asked of harmonia first
+# (gigabit, one build serves the house), a cloud host is asked of cachix only
+# (it is not behind this LAN, and relaying through the NAS costs 20 Mbit up).
+policy() {
+  nix eval --json "$REPO#inventory.cache.$1" 2>/dev/null
+}
 stores_for() {
   if [ -n "${CACHE:-}" ]; then
     printf '%s\n' "$CACHE"
     return
   fi
-  case "$(yq -r ".hosts.\"$1\".category // \"lan\"" "$INVENTORY" 2>/dev/null || echo lan)" in
-    cloud) printf '%s\n' "$wan_cache" ;;
-    *) printf '%s\n' "$cache_url" "$wan_cache" ;;
-  esac
+  local out
+  out="$(policy "$1" | jq -r '.verifyStores[]' 2>/dev/null || true)"
+  if [ -z "$out" ]; then
+    echo "warm [$1] ERROR — $REPO#inventory.cache.$1 did not evaluate" >&2
+    return 1
+  fi
+  printf '%s\n' "$out"
 }
 
 if [ "$#" -gt 0 ]; then
@@ -216,7 +211,7 @@ fail=0
 
 for h in "${hosts[@]}"; do
   attr="$(attr_for "$h")"
-  category="$(yq -r ".hosts.\"$h\".category // \"lan\"" "$INVENTORY" 2>/dev/null || echo lan)"
+  warm_on="$(policy "$h" | jq -r '.warmOn' 2>/dev/null || echo harmonia)"
   mapfile -t stores < <(stores_for "$h")
 
   # Only active hosts. A preserved/dormant/WIP host is not deployed, so there is
@@ -255,7 +250,7 @@ for h in "${hosts[@]}"; do
       report "warm [$h] READY — this host substitutes everything"
     else
       report "warm [$h] GAP — this host would COMPILE $n derivations"
-      if [ "$category" = "cloud" ] && [ "$h" != "$self" ]; then
+      if [ "$warm_on" = "self" ] && [ "$h" != "$self" ]; then
         # delphi is not behind this LAN. Counting its derivations as a gap HERE
         # would demand the NAS build or relay an aarch64 closure for a host it
         # cannot serve — neither is a fix, and the relay would cost 20 Mbit up.

@@ -179,7 +179,8 @@ tasks:
           echo "  Building here compiles a full closure on the machine that answers DNS for" >&2
           echo "  every client; measured 2026-10-26 that aborted the boot test and left" >&2
           echo "  pihole-ftl stopped mid-activation (LAN-wide 'Server Not Found')." >&2
-          echo "  Build off-host instead:  REMOTE_BUILD=1 task infra:switch:{{.OS}}" >&2
+          echo "  Land it without compiling here:  REMOTE_BUILD=1 task infra:switch:{{.OS}}" >&2
+          echo "  (substitute-or-fail; warm the closure from CI: task dev:ci:trigger:frieren)" >&2
           exit 1
         fi
         if [ "${ROUTE_CHECK:-0}" = "1" ]; then
@@ -192,11 +193,14 @@ tasks:
           bash scripts/task/boot-check.sh --self || exit $?
         fi
         if [ "${REMOTE_BUILD:-0}" = "1" ]; then
-          # Builders only: no derivation may compile on this box.
+          # Substitute or fail, never compile here. `max-jobs = 0` was the wrong
+          # instrument: it uploads the whole closure to the builder (hours of
+          # copying) instead of refusing. A resolver host either has its closure
+          # in the cache — warmed by CI — or the switch stops and says so.
           if [ "${NOM:-0}" = "1" ]; then
-            sudo env NIX_CONFIG="max-jobs = 0" {{.OS}}-rebuild switch --flake .?submodules=1#"$host" 2>&1 | nom
+            sudo {{.OS}}-rebuild switch --use-substitutes --flake .?submodules=1#"$host" 2>&1 | nom
           else
-            sudo env NIX_CONFIG="max-jobs = 0" {{.OS}}-rebuild switch --flake .?submodules=1#"$host"
+            sudo {{.OS}}-rebuild switch --use-substitutes --flake .?submodules=1#"$host"
           fi
         else
           if [ "${NOM:-0}" = "1" ]; then

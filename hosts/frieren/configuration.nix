@@ -92,6 +92,10 @@ in {
   # the episodic memory agents read. See modules/services/fleet-sentinel.nix.
   services.fleetSentinel = {
     enable = true;
+    # The cold vault is powered on demand: its automount failing while BurgerNAS
+    # sleeps is the design, not a fault, and counting it put the whole host in
+    # "degraded" — which gatus then reported as a broken monitor.
+    ignoreFailedUnits = ["mnt-burgernas-peachcable.mount"];
     watchUnits = [
       {unit = "nixos-upgrade.service";}
       {unit = "fleet-warm-cache.service";}

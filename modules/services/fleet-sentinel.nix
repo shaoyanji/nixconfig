@@ -9,6 +9,9 @@
 
   watchedUnits = map (u: u.unit) cfg.watchUnits;
 
+  # Space-delimited for the shell loop below; empty is harmless (`case " " in`).
+  IGNORE = lib.concatStringsSep " " cfg.ignoreFailedUnits;
+
   collect = pkgs.writeShellApplication {
     name = "fleet-sentinel-collect";
     runtimeInputs = with pkgs; [coreutils gnugrep gawk jq systemd findutils];
@@ -33,6 +36,9 @@
       NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
       REASONS=()
       FAILED_UNITS=()
+      # Assigned rather than used inline: a `case` on a literal word trips
+      # SC2194, and writeShellApplication fails the build on any finding.
+      IGNORE_UNITS="${IGNORE}"
 
       # --- failed units ------------------------------------------------------
       while IFS= read -r line; do
@@ -41,6 +47,14 @@
         # The collector itself is allowed to be the only failed thing while it
         # is still starting; do not let a self-transition flap the loop.
         [ "$unit" = "fleet-sentinel.service" ] && continue
+        # A unit that fails BY DESIGN is not a degradation. The BurgerNAS cold
+        # vault is powered on demand, so its automount timing out while the NAS
+        # sleeps says nothing about this host; counting it marked frieren
+        # degraded and paged on a monitor that was only reporting a dependency we
+        # had deliberately left off.
+        case " $IGNORE_UNITS " in
+          *" $unit "*) continue ;;
+        esac
         FAILED_UNITS+=("$unit")
       done < <(systemctl list-units --state=failed --no-legend --plain --no-pager 2>/dev/null || true)
 
@@ -199,6 +213,16 @@ in {
         Degrade when the running system generation is older than this. 72 h is
         three missed 04:00 autoUpgrade windows on frieren — late enough not to
         fire on a quiet weekend, early enough to catch a broken update path.
+      '';
+    };
+
+    ignoreFailedUnits = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      example = ["mnt-burgernas-peachcable.mount"];
+      description = ''
+        Units whose failed state is expected — a dependency that is off by design,
+        not a fault — and must not degrade the sentinel.
       '';
     };
 

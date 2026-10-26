@@ -24,9 +24,15 @@ materialize() {
   chmod 700 "$cache" "$inst"
 
   local password
-  password=$(sops -d --extract "$secret" "$repo/modules/secrets.yaml")
+  # CI has no age key, so the password may arrive in the environment instead of
+  # sops. One implementation, two sources.
+  if [ -n "${GOK_HTTP_PASSWORD:-}" ]; then
+    password=$GOK_HTTP_PASSWORD
+  else
+    password=$(sops -d --extract "$secret" "$repo/modules/secrets.yaml")
+  fi
   [ -n "$password" ] || {
-    echo "gok.sh: no password at $secret in modules/secrets.yaml" >&2
+    echo "gok.sh: no password at $secret in modules/secrets.yaml and GOK_HTTP_PASSWORD unset" >&2
     exit 1
   }
 
@@ -73,10 +79,16 @@ materialize() {
 # host is the appliance's builder — a warm push reuses them, and `rm -rf $cache`
 # resets the lot.
 gok() {
-  export GOCACHE=$cache/go/build
-  export GOMODCACHE=$cache/go/mod
+  export GOCACHE=${GOCACHE:-$cache/go/build}
+  export GOMODCACHE=${GOMODCACHE:-$cache/go/mod}
   mkdir -p "$GOCACHE" "$GOMODCACHE"
-  nix shell nixpkgs#gokrazy nixpkgs#go -c gok -i gok --parent_dir "$cache" "$@"
+  # GOK_BIN lets CI use the gok it installed, so the build runs on the runner
+  # instead of a NAS; locally the same wrapper gets it from a nix shell.
+  if [ -n "${GOK_BIN:-}" ]; then
+    "$GOK_BIN" -i gok --parent_dir "$cache" "$@"
+  else
+    nix shell nixpkgs#gokrazy nixpkgs#go -c gok -i gok --parent_dir "$cache" "$@"
+  fi
 }
 
 # Cache -> repo, with every secret stripped back out: the HTTP password, the TLS

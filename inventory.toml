@@ -19,8 +19,8 @@ canonical_repo = "https://github.com/shaoyanji/nixconfig"
 total_devices = 35
 active_nix_devices = 12
 active_external_devices = 7
-wip_devices = 1
-preserved_devices = 15
+wip_devices = 0
+preserved_devices = 16
 
 # ------------------------------------------------------------------------------
 # 1. CORE SERVERS & INFRASTRUCTURE
@@ -814,8 +814,8 @@ tailscale_ip = "100.126.186.109"
 
 [hosts.minyx]
 hostname = "minyx"
-status = "wip"
-status_detail = "Being rebuilt as the fleet's tunnel/jump box on a USB system disk (sd-image + extlinux); image built, not yet booted."
+status = "preserved"
+status_detail = "Standby until a clean NixOS install on the RPi3. Its sdImage/kernel are not cachix artifacts, so building it in CI only spends runners and load; the host stays off the deploy and sweep surfaces."
 kind = "nixos"
 arch = "aarch64-linux"
 role = "Raspberry Pi 3 Model B Tunnel & Jump Box"

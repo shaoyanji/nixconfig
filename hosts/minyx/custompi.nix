@@ -17,19 +17,13 @@ in {
   boot.kernelParams = ["cma=16M"];
   boot.tmp.cleanOnBoot = true;
 
-  # aarch64 closures are BUILT ELSEWHERE and substituted here — so this host is
-  # configured to substitute and never to compile. `max-jobs = 1` (the previous
-  # value) contradicted that sentence: one job is exactly enough to start the
-  # Raspberry Pi kernel build, which on four Cortex-A53s and 1 GiB runs for hours
-  # and never finishes. 0 means "substitute or fail", which is the honest
-  # failure: CI warms the closure on an aarch64 runner (toplevel AND sdImage, see
-  # scripts/ci/detect-affected-hosts.py) and pushes it to the shaoyanji cache.
-  #
-  # Escape hatch, deliberate and per-command: `--max-jobs 1` on the CLI overrides
-  # this file, so a genuinely local build is still possible without editing the
-  # host. It is never the default.
+  # aarch64 closures are built elsewhere when they can be. This is NOT
+  # `max-jobs = 0`: the host has no cached closure of its own and no push path, so
+  # substitute-or-fail left it unable to even build its way back to a working
+  # system. It is a WIP host pending a clean reinstall — until then the honest
+  # setting is "may build, slowly", not "may never build".
   nix.settings = {
-    max-jobs = 0;
+    max-jobs = 1;
     cores = 1;
     auto-optimise-store = true;
   };

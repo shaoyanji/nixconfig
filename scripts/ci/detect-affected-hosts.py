@@ -74,20 +74,16 @@ def get_flake_attr(kind, name):
 
 
 def get_flake_attrs(kind, name, category):
-    """Everything CI must build for this host to be substitutable.
+    """The artifacts CI builds for this host.
 
-    The toplevel alone is not enough for an embedded host: the artifact an
-    operator flashes is `sdImage`, and its Raspberry Pi kernel
-    (`linuxPackages_rpi3`) is NOT on cache.nixos.org. Warming only the toplevel
-    left every image build compiling that kernel from source — measured at hours
-    on a Pi 3B and enough to make a cloud box look hung. One host, all its
-    artifacts, one cache push.
+    Deliberately the toplevel only. An embedded host's `sdImage` is NOT a cachix
+    artifact: its Raspberry Pi kernel is not on cache.nixos.org, so building it in
+    CI is a long runner job that caches something no deploy substitutes — the
+    image is flashed, once, from a local build. Adding it here turned a host's
+    image build into routine CI load for no cache benefit.
     """
     primary = get_flake_attr(kind, name)
-    attrs = [primary] if primary else []
-    if kind == "nixos" and category == "embedded":
-        attrs.append(f"nixosConfigurations.{name}.config.system.build.sdImage")
-    return attrs
+    return [primary] if primary else []
 
 
 def load_fleet_hosts():

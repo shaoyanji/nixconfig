@@ -64,6 +64,64 @@ tasks:
       - task infra:secrets:sync
       - cd {{.SECRETS}} && git add {{.ENC_SECRETS}} && git commit -m "secrets - update" && git push origin HEAD:master
 
+  infra:secrets:form:gok:
+    desc: One form for the gok appliance — wifi into sops, Tailscale OAuth + update password into GitHub secrets
+    summary: >
+      Each value goes to its real home, because they are not the same plane: the
+      wifi SSID/PSK belong in modules/secrets.yaml (sops, decrypted on the machine
+      that builds the appliance), while the Tailscale OAuth client and the
+      appliance update password are GitHub repository secrets consumed by
+      .github/workflows/gok.yml on a runner that has no sops key. Blank answers are
+      skipped, so it can be run once per field. Nothing is echoed, and writes go
+      through stdin (sops set --value-stdin / gh secret set), so no value lands in
+      shell history.
+
+      Where the Tailscale pair comes from: admin console -> Settings -> OAuth
+      clients -> Generate OAuth client, scopes `auth_keys` (write) for the tag the
+      runner joins as (`tag:ci`). The client id/secret are shown once at creation.
+      API reference: tailscale.com/docs/features/access-control/auth-keys
+    cmds:
+      - |
+        set -euo pipefail
+        cd "$(git rev-parse --show-toplevel)"
+
+        put_sops() {
+          # $1 = sops key path, $2 = prompt label, $3 = optional gum flag
+          value=$(gum input --header "$2  (blank = skip)" ${3:-})
+          [ -n "${value:-}" ] || { echo "skip: $2"; return 0; }
+          # `sops set --value-stdin` still wants a JSON document on stdin, so the
+          # answer is JSON-encoded first. Piping it raw fails with "Value for
+          # --set is not valid JSON" — verified, and verified fixed: a string
+          # round-trips byte-identical.
+          jq -Rn --arg v "$value" '$v' | sops set modules/secrets.yaml "$1" --value-stdin
+          echo "stored: $2 -> modules/secrets.yaml $1"
+        }
+
+        put_gh() {
+          value=$(gum input --header "$2  (blank = skip)" ${3:-})
+          [ -n "${value:-}" ] || { echo "skip: $2"; return 0; }
+          printf '%s' "$value" | gh secret set "$1"
+          echo "stored: $2 -> GitHub secret $1"
+        }
+
+        put_sops '["gokrazy"]["gok"]["wifi_ssid"]' 'wifi SSID' ''
+        put_sops '["gokrazy"]["gok"]["wifi_psk"]' 'wifi passphrase' '--password'
+
+        put_gh TS_OAUTH_CLIENT_ID 'Tailscale OAuth client ID' ''
+        put_gh TS_OAUTH_SECRET 'Tailscale OAuth client secret' '--password'
+
+        # The update password already exists in sops; offer it instead of asking
+        # the operator to copy it by hand.
+        existing=$(sops -d --extract '["gokrazy"]["gok"]["http_password"]' modules/secrets.yaml 2>/dev/null || true)
+        if [ -n "$existing" ] && gum confirm 'Use the gok update password from sops as the CI secret GOK_HTTP_PASSWORD?'; then
+          printf '%s' "$existing" | gh secret set GOK_HTTP_PASSWORD
+          echo 'stored: GitHub secret GOK_HTTP_PASSWORD (from sops)'
+        fi
+
+        echo
+        echo 'Next: bash scripts/task/gok.sh show   # wifi entry now renders with the SSID'
+        echo '      gh secret list                 # confirm the three CI secrets'
+
   infra:sops:update-keys:
     desc: Rotate SOPS recipient keys across ALL sops files, resync mirror, push secret repo changes
     cmds:

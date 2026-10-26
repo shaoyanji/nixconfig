@@ -48,6 +48,10 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
   (1890 assertions). Its unit carries an explicit PATH because tar/zstd are not in the system profile there.
 - Repaired while here: `flake/outputs.nix` still passed `hostInventory` to `flake/fleet-checks.nix` after
   deadnix dropped the argument, which left `fleetHostChecks` unappellable — every fleet gate, not just this.
+- Corrected the same day: `profiles.cachePush` was a post-build hook, so a switch that built anything fired
+  `nix copy` to cachix as a nix-daemon child that outlived the rebuild — removed (module, import, enable).
+  Delphi now only *substitutes* from `shaoyanji.cachix.org`, first in `.#inventory.cache.delphi`. The upgrade
+  went back to `github:`: that fetcher rejects `?submodules=1` (measured) and root has no key for the submodule.
 
 ### 2026-10-25 — delphi debloats QEMU TCG microvm, restores native stirling-pdf, adds searxng and uptime-kuma
 - Delphi cloud bastion: retired autostart of QEMU TCG microvm (reclaiming ~2.5 GiB RAM and eliminating

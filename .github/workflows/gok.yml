@@ -47,8 +47,21 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
             accept-flake-config = false
-            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
             connect-timeout = 5
+
+      # The cache list is DERIVED, never retyped: a hand-written list silently
+      # drops a cache the fleet actually has, and every path in it becomes a local
+      # build (the 100 % peg this job kept causing). delphi's compiled policy is the
+      # WAN-ordered set — cachix, cache.nixos.org, numtide, determinate,
+      # nix-community, nix-gaming — with the LAN Harmonia cache already absent,
+      # which is exactly what a runner on the internet may use.
+      - name: Use the fleet's WAN caches
+        run: |
+          subs=$(nix eval --json .#inventory.cache.delphi.substituters | jq -r 'join(" ")')
+          [ -n "$subs" ] || { echo 'no substituters compiled for delphi' >&2; exit 1; }
+          echo "substituters = $subs" >> "$GITHUB_ENV"
+          echo "NIX_CONFIG=substituters = $subs" >> "$GITHUB_ENV"
+          echo "using: $subs"
 
       - uses: actions/setup-go@v5
         with:

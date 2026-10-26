@@ -11,7 +11,10 @@
         "github.com/gokrazy/fbstatus",
         "github.com/gokrazy/hello",
         "github.com/gokrazy/serial-busybox",
-        "github.com/gokrazy/breakglass"
+        "github.com/gokrazy/breakglass",
+        "tailscale.com/cmd/tailscaled",
+        "tailscale.com/cmd/tailscale",
+        "github.com/gokrazy/mkfs"
     ],
     "PackageConfig": {
         "github.com/gokrazy/breakglass": {
@@ -26,6 +29,11 @@
             "ExtraFileContents": {
                 "/etc/machine-id": "3e8de745bc7c4cf89cd363e11d9a7718\n"
             }
+        },
+        "tailscale.com/cmd/tailscale": {
+            "CommandLineFlags": [
+                "up"
+            ]
         }
     },
     "SerialConsole": "disabled"

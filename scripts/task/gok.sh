@@ -88,6 +88,16 @@ materialize() {
       "$inst/config.json" > "$inst/config.json.tmp"
     mv "$inst/config.json.tmp" "$inst/config.json"
     chmod 600 "$inst/config.json"
+  else
+    # No SSID in sops = a wired appliance. The rendered spec carries a wifi entry
+    # with empty credentials (the module cannot know whether the secret exists at
+    # eval time), and shipping THAT would have the appliance try to associate to
+    # an empty network. Removing it is the difference between "no wifi" and
+    # "broken wifi".
+    jq 'del(.PackageConfig["github.com/gokrazy/wifi"])' \
+      "$inst/config.json" > "$inst/config.json.tmp"
+    mv "$inst/config.json.tmp" "$inst/config.json"
+    chmod 600 "$inst/config.json"
   fi
 
   # The flag list comes from the repo (`up`, `--hostname=gok`); the key is

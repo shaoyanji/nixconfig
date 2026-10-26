@@ -10,7 +10,10 @@
 }: let
   user = import ../../modules/global/user.nix;
 in {
-  imports = [../../modules/config/authorized-keys.nix];
+  imports = [
+    ../../modules/config/authorized-keys.nix
+    ../../modules/ssh-ca.nix
+  ];
 
   # The old config reserved 256M of this box's 1 GiB for a VideoCore that a
   # headless jump host never shows anything on.
@@ -59,6 +62,16 @@ in {
       PermitRootLogin = "no";
     };
   };
+
+  # This host is never managed in place: it takes a remotely built closure
+  # pushed from delphi, and with `PermitRootLogin = "no"` plus no password for
+  # its user there is no other way back in. The fleet baseline
+  # (modules/profiles/base-node.nix) answers that with two settings, and this
+  # host had neither: CA-signed certs are what a fleet host authenticates with,
+  # and passwordless wheel sudo is what `nixos-rebuild --target-host
+  # --use-remote-sudo` needs to activate the pushed system.
+  ssh.ca.enable = true;
+  security.sudo.wheelNeedsPassword = false;
 
   services.tailscale.enable = true;
 

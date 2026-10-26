@@ -50,7 +50,7 @@ materialize() {
       lib = flake.inputs.nixpkgs.lib;
       ev = lib.evalModules { modules = [ $repo/modules/services/gokrazy.nix $decl ]; };
     in (builtins.fromJSON ev.config.services.gokrazy.rendered.gok.configJSON)
-  " 2>/dev/null) || {
+  ") || {
     echo "gok.sh: could not render $decl — run 'nix eval --impure' on it to see why" >&2
     exit 1
   }
@@ -67,7 +67,10 @@ materialize() {
 
   # The fleet key list has exactly one home (modules/config/authorized-keys.nix),
   # so an appliance reflash cannot drift from the hosts that may log in to it.
-  nix eval --json "$repo#nixosConfigurations.frieren.config.ssh.authorizedKeys.keys" 2>/dev/null |
+  # stderr stays visible: this evaluates a whole host config, and when it fails
+  # on a runner (an unreachable substituter, a missing input) the old `2>/dev/null`
+  # left nothing but an empty key file and a 19-minute silence to debug from.
+  nix eval --json "$repo#nixosConfigurations.frieren.config.ssh.authorizedKeys.keys" |
     jq -r '.[]' > "$inst/breakglass.authorized_keys"
 
   # Unattended tailscale auth only if a key exists in sops. Absent (the default),

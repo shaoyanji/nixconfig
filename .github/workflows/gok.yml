@@ -36,10 +36,19 @@ jobs:
 
       # `gok.sh` derives the breakglass key list from modules/config/authorized-keys.nix,
       # so the runner needs Nix to evaluate it. Pipe operators are required to parse.
+      #
+      # WAN substituters only, and the flake's `nixConfig` is refused outright. The
+      # materialise step runs `nix eval` on this flake, which inherits this config;
+      # flake.nix lists the LAN Harmonia cache, and an internet runner cannot reach
+      # it, so every missing path sat on a connect timeout — this job showed 19
+      # minutes of silence and then exit 124, twice. Same rule as nixcachix.yml.
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
+            accept-flake-config = false
+            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            connect-timeout = 5
 
       - uses: actions/setup-go@v5
         with:

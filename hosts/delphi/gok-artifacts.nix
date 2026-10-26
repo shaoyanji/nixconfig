@@ -27,6 +27,20 @@
   # rendering a whole host. `replaceVarsWith` (not `replaceVars`) because the
   # result is `ExecStart`, and the plain variant installs 0444 — a text file that
   # systemd refuses to exec.
+  # One list, two consumers: the unit's PATH (which resolves the `#!/usr/bin/env
+  # bash` shebang — without bash here the unit dies at exec with status 127) and
+  # the script's own PATH (a unit gets no login PATH, and tar/zstd on this host
+  # live in a user profile, so the receiver would find nothing to unpack with).
+  tools = [
+    pkgs.bash
+    pkgs.coreutils
+    pkgs.gnutar
+    pkgs.zstd
+    pkgs.gnused
+    pkgs.gnugrep
+    pkgs.findutils
+  ];
+
   receive = pkgs.replaceVarsWith {
     src = ./gok-artifacts.sh;
     isExecutable = true;
@@ -34,10 +48,7 @@
       inherit (cfg) directory;
       keep = toString cfg.keep;
       tailscale = "${pkgs.tailscale}/bin/tailscale";
-      # A unit has no login PATH. tar and zstd are not in the system profile on
-      # this host (they come from a user profile), so without this the receiver
-      # finds nothing to unpack with.
-      path = lib.makeBinPath [pkgs.coreutils pkgs.gnutar pkgs.zstd pkgs.gnused pkgs.gnugrep pkgs.findutils];
+      path = lib.makeBinPath tools;
     };
   };
 in {
@@ -67,6 +78,7 @@ in {
       description = "Receive gokrazy build artifacts sent to this host via Taildrop";
       wants = ["tailscaled.service"];
       after = ["tailscaled.service"];
+      path = tools;
       serviceConfig = {
         Type = "oneshot";
         ExecStart = receive;

@@ -47,6 +47,23 @@ materialize() {
   # so an appliance reflash cannot drift from the hosts that may log in to it.
   nix eval --json "$repo#nixosConfigurations.frieren.config.ssh.authorizedKeys.keys" 2>/dev/null |
     jq -r '.[]' > "$inst/breakglass.authorized_keys"
+
+  # Unattended tailscale auth only if a key exists in sops. Absent (the default),
+  # `tailscale up` prints a login URL in the appliance's web UI and the session
+  # persists in the ext4 /perm partition.
+  local authkey
+  authkey=$(sops -d --extract '["gokrazy"]["gok"]["tailscale_auth_key"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+  if [ -n "$authkey" ]; then
+    # --hostname keeps the tailnet node named `gok` even if the instance
+    # Hostname is ever pointed at an address to reach a device that is not
+    # resolvable yet.
+    jq --arg k "$authkey" \
+      '.PackageConfig["tailscale.com/cmd/tailscale"].CommandLineFlags =
+         ["up", "--auth-key=" + $k, "--hostname=gok"]' \
+      "$inst/config.json" > "$inst/config.json.tmp"
+    mv "$inst/config.json.tmp" "$inst/config.json"
+    chmod 600 "$inst/config.json"
+  fi
 }
 
 # `go` is gok's build dependency, not something this repo installs: gok shells
@@ -55,11 +72,14 @@ gok() {
   nix shell nixpkgs#gokrazy nixpkgs#go -c gok -i gok --parent_dir "$cache" "$@"
 }
 
-# Cache -> repo, with every secret gok may have written stripped back out.
+# Cache -> repo, with every secret stripped back out: the HTTP password, the TLS
+# material gok pins, and the tailscale auth key.
 save() {
   umask 077
-  jq 'del(.Update.HTTPPassword, .Update.CertPEM, .Update.KeyPEM)' "$inst/config.json" \
-    > "$src/config.json"
+  jq 'del(.Update.HTTPPassword, .Update.CertPEM, .Update.KeyPEM)
+      | if .PackageConfig["tailscale.com/cmd/tailscale"]
+        then .PackageConfig["tailscale.com/cmd/tailscale"].CommandLineFlags = ["up"]
+        else . end' "$inst/config.json" > "$src/config.json"
 }
 
 case "${1:-}" in
@@ -78,6 +98,12 @@ case "${1:-}" in
     ;;
   *)
     materialize
+    # The instance Hostname is what `gok update` resolves. Before tailscale is up
+    # (or on a host without tailnet DNS), point one run at an address instead.
+    if [ -n "${GOK_HOST:-}" ]; then
+      jq --arg h "$GOK_HOST" '.Hostname = $h' "$inst/config.json" > "$inst/config.json.tmp"
+      mv "$inst/config.json.tmp" "$inst/config.json"
+    fi
     gok "$@"
     ;;
 esac

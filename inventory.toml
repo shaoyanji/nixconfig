@@ -803,11 +803,14 @@ notes = [
   "Instance state lives at `~/gokrazy/gok` on stark; the device's HTTP password is `gokrazy.gok.http_password` in `modules/secrets.yaml`, so a rebuild does not depend on that machine's disk.",
   "`gok update` was proven end to end on 2026-10-26 (41 MiB root + 71 MiB boot pushed, device rebooted): scripts/task/gok.sh builds via `nix shell nixpkgs#gokrazy nixpkgs#go`. The instance Hostname `gok` resolves only through the `address=/gok/` lines in hosts/frieren/dns.nix, so a frieren deploy is required before the name works.",
   "breakglass is installed but intentionally not started at boot (gokrazy's own rule); start it from the web UI before `ssh` into the appliance will answer.",
+  "On the tailnet as `gok` (100.126.186.109) since 2026-10-26, authenticated by `gokrazy.gok.tailscale_auth_key`; MagicDNS answers at 100.100.100.100 but fleet hosts do not accept it, so `gok update` still needs the name `gok` to resolve locally (a router DHCP reservation would do it).",
 ]
 
 [hosts.gok.network]
 lan_ip = "192.168.3.4"
-tailscale = false
+tailscale = true
+tailscale_hostname = "gok"
+tailscale_ip = "100.126.186.109"
 
 [hosts.minyx]
 hostname = "minyx"

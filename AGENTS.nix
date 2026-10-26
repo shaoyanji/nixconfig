@@ -3966,7 +3966,7 @@
       status = "IN FLIGHT";
       priority = "P3";
       date = "2026-10-26";
-      summary = "The spare SD card runs gokrazy; its instance is declared in hosts/gok and pushed by scripts/task/gok.sh, with the password read from sops and the binary taken from nixpkgs at call time instead of being installed fleet-wide.";
+      summary = "The spare SD card runs gokrazy and receives updates pushed from any fleet host: the instance is declared in hosts/gok, the password comes from sops, breakglass keys are generated from authorized-keys.nix, and gok itself is only ever a `nix shell` instantiation.";
       refs = {
         hosts = ["gok"];
         modules = ["hosts/gok/config.json" "scripts/task/gok.sh"];
@@ -3988,9 +3988,15 @@
         `gok.sh show` | `gok.sh edit` | `gok.sh update` (first contact may need
         `--insecure` until the cert is pinned) | `gok.sh overwrite --full=/dev/sdX`.
 
-        **Exit.** A change to `hosts/gok/config.json` reaches the appliance with
-        `gok.sh update` from a host other than stark, and the flash path no longer
-        depends on any one machine's instance directory.
+        **Proven 2026-10-26.** `gok.sh update` from frieren built the instance and
+        pushed 41 MiB root + 71 MiB boot over HTTP; the device rebooted and
+        answered again. breakglass is installed but not started at boot by
+        gokrazy's own rule, so port 2222 stays closed until it is started from the
+        web UI.
+
+        **Exit.** `gok update` works by name from any fleet host — which needs the
+        `address=/gok/` lines in hosts/frieren/dns.nix deployed — and the flash
+        path no longer depends on one machine's instance directory.
       '';
     };
     open-frieren-offload = {

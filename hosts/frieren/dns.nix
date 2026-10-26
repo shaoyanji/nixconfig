@@ -58,6 +58,10 @@
       # Qwen3-TTS speech server on eisen (OpenAI-compatible /v1/audio/speech);
       # nginx vhost on :80, tailscale serve :8444.
       "address=/tts.lan/100.119.172.99"
+      # gokrazy appliance on the spare SD card. `gok update` resolves the instance
+      # Hostname, so this record is what makes the push path work by name.
+      "address=/gok/192.168.3.4"
+      "address=/gok.lan/192.168.3.4"
       # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
       # Answer ONLY PXE clients on the LAN; never lease IPs — the Huawei router
       # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode

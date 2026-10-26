@@ -224,6 +224,8 @@ in {
         # browser auto-upgrades to) silently lands on whichever service vhost
         # happens to be serialized first — 2026-10-26 that served
         # audiobookshelf for frieren.<tailnet>.ts.net.
+        # IPv4 *and* IPv6: MagicDNS answers AAAA as well as A, so a client that
+        # prefers IPv6 got connection refused while every IPv4 check passed.
         listen = [
           {
             addr = "0.0.0.0";
@@ -231,7 +233,18 @@ in {
             extraParameters = ["default_server"];
           }
           {
+            addr = "[::]";
+            port = 80;
+            extraParameters = ["default_server"];
+          }
+          {
             addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+            extraParameters = ["default_server"];
+          }
+          {
+            addr = "[::]";
             port = 443;
             ssl = true;
             extraParameters = ["default_server"];
@@ -521,6 +534,11 @@ in {
             port = 443;
             ssl = true;
           }
+          {
+            addr = "[::]";
+            port = 443;
+            ssl = true;
+          }
         ];
         # addSSL is what makes the module emit ssl_certificate (setting the
         # paths alone emits nothing, and nginx then handshakes with no cert).
@@ -535,6 +553,23 @@ in {
           # headers, which the upstream answers with 400.
           extraConfig = ''
             client_max_body_size 500M;
+          '';
+        };
+      };
+
+      # The appliance's own UI is HTTP-only (gokrazy serves plain HTTP, and
+      # `tailscale cert` will not issue a certificate for another node's name),
+      # so browsers that insist on HTTPS cannot open it. This vhost gives it an
+      # HTTPS address with the LAN wildcard cert, proxying to its tailnet IP.
+      "gok.frieren.lan" = {
+        addSSL = true;
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
+        locations."/" = {
+          proxyPass = "http://100.126.186.109:80";
+          proxyWebsockets = true;
+          extraConfig = ''
+            client_max_body_size 1024M;
           '';
         };
       };

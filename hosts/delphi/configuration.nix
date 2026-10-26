@@ -1081,9 +1081,20 @@ in {
             git -C "$HOME/Documents/nixconfig" submodule update --init --recursive || true
           fi
 
+          # The vault is a repo, not a directory: the previous version only
+          # mkdir'd this path, so a reseeded host came up with an empty vault
+          # and every note was "missing" until someone cloned it by hand
+          # (delphi 2026-10-26). Clone it when gh is authenticated, and fall
+          # back to the empty directory only when it cannot.
           if [ ! -d "$HOME/vaults/personal/.git" ]; then
-            mkdir -p "$HOME/vaults/personal"
-            echo "--> Initialized ~/vaults/personal."
+            echo "--> Cloning the vault into ~/vaults/personal..."
+            if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+              gh repo clone shaoyanji/Obsidian-Git-Sync "$HOME/vaults/personal" -- --quiet ||
+                echo "--> vault clone failed; left ~/vaults/personal empty" >&2
+            else
+              mkdir -p "$HOME/vaults/personal"
+              echo "--> gh not authenticated; initialized ~/vaults/personal empty."
+            fi
           fi
 
           echo "=== [delphi] Workspace ready at ~/Documents/nixconfig ==="

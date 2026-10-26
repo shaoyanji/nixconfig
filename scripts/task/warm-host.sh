@@ -92,20 +92,30 @@ cache_url="$(yq -r '.metadata.cache_url // ""' "$INVENTORY" 2>/dev/null || true)
 [ -n "$cache_url" ] || cache_url="http://192.168.3.25:5000"
 self="$(hostname)"
 
-# Where the closure is expected to be substitutable from. Probing the caches
-# directly (rather than relying on nix.settings.substituters) is deliberate: a
-# host whose config has not been switched yet still gets an honest answer.
+# Where the closure is expected to be substitutable from, per host — because the
+# two caches have different jobs:
 #
-# cachix first, LAN second, on purpose: cachix is what CI pushes to and what a
-# cloud host can reach, so it is the answer that means "warmed" for the whole
-# fleet. The LAN cache is a fast local path, not the source of truth.
+#   LAN host    harmonia is the BULK cache. One build on frieren serves every
+#               client at gigabit, so it is asked first and a LAN-only hit is a
+#               success for that host.
+#   cloud host  cacix only. delphi is not behind this LAN; harmonia is neither
+#               its cache nor reachable, and relaying its closure through the NAS
+#               costs the NAS 20 Mbit up for no gain.
+#
+# Probing the caches directly (rather than trusting nix.settings.substituters) is
+# deliberate: a host whose config has not been switched yet still gets an honest
+# answer.
 wan_cache="https://shaoyanji.cachix.org"
-check_stores=()
-if [ -n "${CACHE:-}" ]; then
-  check_stores=("$CACHE")
-else
-  check_stores=("$wan_cache" "$cache_url")
-fi
+stores_for() {
+  if [ -n "${CACHE:-}" ]; then
+    printf '%s\n' "$CACHE"
+    return
+  fi
+  case "$(yq -r ".hosts.\"$1\".category // \"lan\"" "$INVENTORY" 2>/dev/null || echo lan)" in
+    cloud) printf '%s\n' "$wan_cache" ;;
+    *) printf '%s\n' "$cache_url" "$wan_cache" ;;
+  esac
+}
 
 if [ "$#" -gt 0 ]; then
   hosts=("$@")
@@ -171,8 +181,9 @@ host_status() {
 answer_cache=""
 served_by_cache() {
   local path="$1" store
+  shift
   answer_cache=""
-  for store in "${check_stores[@]}"; do
+  for store in "$@"; do
     [ -n "$store" ] || continue
     # narinfo-cache-negative-ttl 0: nix caches 404 narinfo answers for 1h, so a
     # path queried before it was built would keep "missing" after the build —
@@ -205,6 +216,8 @@ fail=0
 
 for h in "${hosts[@]}"; do
   attr="$(attr_for "$h")"
+  category="$(yq -r ".hosts.\"$h\".category // \"lan\"" "$INVENTORY" 2>/dev/null || echo lan)"
+  mapfile -t stores < <(stores_for "$h")
 
   # Only active hosts. A preserved/dormant/WIP host is not deployed, so there is
   # nothing to route for it and nothing to check.
@@ -220,8 +233,13 @@ for h in "${hosts[@]}"; do
 
   # Not a NixOS flake host (home/darwin configurations, unregistered hosts):
   # nothing to warm, and not an error.
-  if ! nix eval --raw "$attr.drvPath" >/dev/null 2>&1; then
-    report "warm [$h] SKIP — not a NixOS flake host (home/darwin or unregistered)"
+  #
+  # Asked of the COMPILED inventory (0.15 s), not of `nix eval <attr>.drvPath`:
+  # that probe instantiates a host's entire derivation graph to answer a question
+  # about the host's kind, which is the whole-toplevel eval AGENTS.md forbids —
+  # it is why `--check` silently sat past two minutes before printing anything.
+  if [ "$(yq -r ".hosts.\"$h\".kind // \"\"" "$INVENTORY" 2>/dev/null || true)" != "nixos" ]; then
+    report "warm [$h] SKIP — not a NixOS host (home/darwin or unregistered)"
     continue
   fi
 
@@ -237,11 +255,18 @@ for h in "${hosts[@]}"; do
       report "warm [$h] READY — this host substitutes everything"
     else
       report "warm [$h] GAP — this host would COMPILE $n derivations"
-      if [ "$is_builder" = 1 ]; then
+      if [ "$category" = "cloud" ] && [ "$h" != "$self" ]; then
+        # delphi is not behind this LAN. Counting its derivations as a gap HERE
+        # would demand the NAS build or relay an aarch64 closure for a host it
+        # cannot serve — neither is a fix, and the relay would cost 20 Mbit up.
+        # This must be checked BEFORE the "I am the builder" allowance, or
+        # frieren answering about delphi always takes that branch.
+        report "         cloud host: it builds natively ON ITSELF and pushes from its own uplink"
+        report "         strategic anchor in cachix (not routine): task dev:ci:trigger:$h"
+      elif [ "$h" = "$builder" ] || [ "$is_builder" = 1 ]; then
         report "         (allowed here: $self is the builder — the closures are supposed to be built here)"
       else
-        report "         → fix: task infra:warm:host:$h   (CI runner → cachix, nothing compiles on $self)"
-        report "           or on an already-built closure: LOCAL=1 … on $builder, a deliberate compile"
+        report "         → fix: build on $builder: task infra:warm:host:$h"
         fail=1
       fi
     fi
@@ -274,28 +299,25 @@ for h in "${hosts[@]}"; do
   fi
 
   # ---- verify the closure is actually substitutable -------------------------
-  if [ -n "$top" ] && served_by_cache "$top"; then
+  if [ -n "$top" ] && served_by_cache "$top" "${stores[@]}"; then
     report "warm [$h] OK — $answer_cache serves $top; a switch will substitute, not compile"
-    if [ "$answer_cache" != "$wan_cache" ]; then
-      report "warm [$h] NOTE — only the LAN cache has it; a cloud host cannot substitute this." >&2
-    fi
   else
     # Harmonia answers narinfo only for paths in its store; a miss here while
     # the build succeeded means the path is present but not being advertised,
     # which is a real cache-side fault worth failing on.
-    report "warm [$h] WARNING — built, but no substituter serves $top:" >&2
-    for store in "${check_stores[@]}"; do
+    report "warm [$h] WARNING — built, but no substituter for this host serves $top:" >&2
+    for store in "${stores[@]}"; do
       report "         $store" >&2
     done
-    report "         check: nix path-info --store <url> $top   (CI pushes to $wan_cache)" >&2
+    report "         check: nix path-info --store <url> $top" >&2
     fail=1
   fi
 done
 
 if [ "$fail" -ne 0 ] && [ "$best_effort" = 1 ]; then
   cat >&2 <<-EOF
-	WARNING: $self could not be prepared from ${check_stores[*]} — a switch would
-	         compile the closure HERE. Warm it on CI first: task infra:warm:host:<host>
+	WARNING: $self could not be prepared from ${stores[*]} — a switch would
+	         compile the closure HERE. Warm it first: task infra:warm:host:<host>
 	EOF
   exit 0
 fi

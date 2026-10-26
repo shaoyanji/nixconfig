@@ -14,7 +14,9 @@
         "github.com/gokrazy/breakglass",
         "tailscale.com/cmd/tailscaled",
         "tailscale.com/cmd/tailscale",
-        "github.com/gokrazy/mkfs"
+        "github.com/gokrazy/mkfs",
+        "github.com/gokrazy/wifi",
+        "github.com/prometheus/node_exporter"
     ],
     "PackageConfig": {
         "github.com/gokrazy/breakglass": {
@@ -34,6 +36,16 @@
             "CommandLineFlags": [
                 "up",
                 "--hostname=gok"
+            ]
+        },
+        "github.com/gokrazy/wifi": {
+            "ExtraFileContents": {
+                "/etc/wifi.json": "{\"ssid\": \"\", \"psk\": \"\"}\n"
+            }
+        },
+        "github.com/prometheus/node_exporter": {
+            "CommandLineFlags": [
+                "--web.listen-address=:9100"
             ]
         }
     },

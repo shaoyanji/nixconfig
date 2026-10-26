@@ -48,10 +48,15 @@ jobs:
 
       # The appliance is only reachable on the tailnet (its Hostname is the
       # tailnet FQDN), so the runner joins as an ephemeral tagged node.
+      # Auth KEY, not an OAuth client. Both work, but an auth key is a single
+      # Settings -> Keys -> Generate value with the same effect here and needs no
+      # separate client registration; `tag:ci` + ephemeral means the runner's node
+      # disappears when the job ends. If an OAuth client is ever preferred, swap
+      # these two lines back to oauth-client-id/oauth-secret — the action accepts
+      # either.
       - uses: tailscale/github-action@v3
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          authkey: ${{ secrets.TS_AUTH_KEY }}
           tags: tag:ci
 
       # Go's caches are what take the build from minutes to seconds; they live

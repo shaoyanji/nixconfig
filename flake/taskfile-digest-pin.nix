@@ -1,6 +1,6 @@
 # Task-graph digests, pinned: an intentional edit updates this file in the same
 # commit; an accidental one fails `checks.<system>.taskfile-digest-pin`.
 {
-  exec = "726f98fa6f29";
-  prose = "99fd1292a2b6";
+  exec = "9d06fc6a67e5";
+  prose = "0072e8090ec5";
 }

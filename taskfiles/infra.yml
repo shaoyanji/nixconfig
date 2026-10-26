@@ -76,10 +76,13 @@ tasks:
       through stdin (sops set --value-stdin / gh secret set), so no value lands in
       shell history.
 
-      Where the Tailscale pair comes from: admin console -> Settings -> OAuth
-      clients -> Generate OAuth client, scopes `auth_keys` (write) for the tag the
-      runner joins as (`tag:ci`). The client id/secret are shown once at creation.
-      API reference: tailscale.com/docs/features/access-control/auth-keys
+      The Tailscale value is an AUTH KEY: console -> Settings -> Keys -> Generate
+      auth key, with tag `tag:ci`, Ephemeral (the runner's node vanishes when the
+      job ends) and Pre-approved. Paste that where the form asks for it. An OAuth
+      client is the alternative the action also accepts, but it lives under
+      Settings -> OAuth clients and is not shown to every role or plan, which is
+      why this asks for the key instead.
+      Reference: tailscale.com/docs/features/access-control/auth-keys
     cmds:
       - |
         set -euo pipefail
@@ -107,8 +110,11 @@ tasks:
         put_sops '["gokrazy"]["gok"]["wifi_ssid"]' 'wifi SSID' ''
         put_sops '["gokrazy"]["gok"]["wifi_psk"]' 'wifi passphrase' '--password'
 
-        put_gh TS_OAUTH_CLIENT_ID 'Tailscale OAuth client ID' ''
-        put_gh TS_OAUTH_SECRET 'Tailscale OAuth client secret' '--password'
+        # Auth key, not OAuth: one value from Settings -> Keys -> Generate auth
+        # key (tag `tag:ci`, ephemeral, pre-approved). OAuth clients live under
+        # Settings -> OAuth clients and are simply not visible to every role or
+        # plan, while the keys page always is — and the CI action accepts either.
+        put_gh TS_AUTH_KEY 'Tailscale auth key (tag:ci, ephemeral)' '--password'
 
         # The update password already exists in sops; offer it instead of asking
         # the operator to copy it by hand.

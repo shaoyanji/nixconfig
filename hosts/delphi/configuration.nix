@@ -246,6 +246,7 @@ in {
     ../../modules/profiles/hermes.nix
     ../../modules/profiles/operator-tools.nix
     ../../modules/profiles/sops-user-identity.nix
+    ../../modules/profiles/cache-push.nix
     ../../modules/net/dns/tailnet-address.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
@@ -304,6 +305,22 @@ in {
   # recipient already in .sops.yaml: no extra key, no rekey, nothing to back up.
   # Out of scope for frieren/fern, which use the TPM identity path.
   profiles.sopsUserIdentity.enable = true;
+
+  # Delphi is the fleet's only native aarch64 builder (nixbuild.net is x86), so
+  # everything it compiles is the only copy of that artifact that will ever
+  # exist. Without a push it dies in /nix/store at the next GC and the next
+  # switch rebuilds it — hours on two cores.
+  #
+  # Deliberately OFF until the token exists: sops-nix fails ACTIVATION when a
+  # declared secret is absent from modules/secrets.yaml, so enabling this before
+  # `cachix/auth_token` is added would break this host's next switch instead of
+  # fixing its cache. Two steps, in this order:
+  #   1. add `cachix: { auth_token: <token from cachix.io/user> }` to the secrets
+  #      file (task infra:secrets:edit:secrets)
+  #   2. flip this to true and deploy
+  # After that every local build is copied to cachix by the post-build hook, over
+  # delphi's own uplink — never relayed through the NAS at 20 Mbit.
+  profiles.cachePush.enable = lib.mkDefault false;
 
   # --- OCI Networking & Paravirtualized DHCP ---
   networking.useDHCP = lib.mkDefault true;

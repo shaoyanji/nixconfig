@@ -49,9 +49,29 @@ in {
       type = lib.types.str;
       default = "cachix/auth_token";
       description = ''
-        sops key holding the cache's auth token. The KEY MUST EXIST before this is
-        enabled: sops-nix fails activation when a declared secret is absent from
-        the file, which would break the host's next switch rather than the push.
+        NAME of the secret sops-nix declares (`/run/secrets/<name>`), not the key
+        inside the file — that is `tokenKey`. It must point at an existing entry:
+        a declared secret that is absent fails activation, which would break the
+        host's next switch rather than the push.
+      '';
+    };
+
+    tokenKey = lib.mkOption {
+      type = lib.types.str;
+      default = "CACHIX/AUTH/TOKEN";
+      description = ''
+        Slash-separated path of the token inside {option}`sopsFile` — the shape
+        `sops decrypt --extract` uses. The fleet's API keys live in one file, so a
+        nested path is the normal case.
+      '';
+    };
+
+    sopsFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = ''
+        sops file holding the token. `null` inherits the global default
+        (`modules/secrets.yaml`); the CACHIX token lives in the API-keys file.
       '';
     };
   };
@@ -59,10 +79,13 @@ in {
   config = lib.mkIf cfg.enable {
     # Nix reads the token from a netrc entry, so nothing has to export an
     # environment variable into a daemon that has no session of its own.
-    sops.secrets.${cfg.tokenSecret} = {
-      owner = "root";
-      mode = "0400";
-    };
+    sops.secrets.${cfg.tokenSecret} =
+      {
+        owner = "root";
+        mode = "0400";
+        key = cfg.tokenKey;
+      }
+      // lib.optionalAttrs (cfg.sopsFile != null) {sopsFile = cfg.sopsFile;};
 
     sops.templates."nix-cache-netrc" = {
       owner = "root";

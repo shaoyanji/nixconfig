@@ -2,7 +2,7 @@
 # gok.sh — edit and push the declarative gokrazy instance. Repo is the source of
 # truth; the password comes from sops; runtime TLS state stays in a local cache.
 #
-#   gok.sh show                 resolved config, password masked
+#   gok.sh show                 resolved config, EVERY credential masked
 #   gok.sh edit                 $EDITOR on the cached copy, then write back to the repo
 #   gok.sh build [OUT]          build root/boot/mbr into OUT — no device, no network
 #   gok.sh push [--stage|--testboot] [ARTIFACT]   stream it — no gok, no Go
@@ -328,7 +328,30 @@ case "${1:-}" in
     ;;
   show)
     materialize
-    jq '.Update.HTTPPassword = "(sops: gokrazy.gok.http_password)"' "$inst/config.json"
+    # Everything that authenticates is masked, not just the update password.
+    # This printed the wifi PSK and the tailnet auth key verbatim in the config
+    # dump, which is where a terminal, a scrollback and a pasted log all keep a
+    # copy. The shape is preserved — an operator still sees which slots are
+    # filled and where — and each value names the sops key it came from.
+    jq '
+      .Update.HTTPPassword = "(sops: gokrazy.gok.http_password)"
+      | .PackageConfig["tailscale.com/cmd/tailscale"].CommandLineFlags |= (
+          if type == "array"
+          then map(if type == "string" and startswith("--auth-key=")
+                   then "--auth-key=(sops: gokrazy.gok.tailscale_auth_key)"
+                   else . end)
+          else . end)
+      | .PackageConfig["github.com/gokrazy/wifi"].ExtraFileContents["/etc/wifi.json"] |= (
+          if type == "string"
+          then (fromjson | with_entries(.value = "(sops: gokrazy.gok.wifi_\(.key))") | tojson) + "\n"
+          else . end)
+      # Any tailnet key that reached the config by another path (a future
+      # package, a hand edit that survived a render) is caught here rather than
+      # relying on the list of known slots above.
+      | walk(if type == "string"
+             then gsub("tskey-[A-Za-z0-9_-]+"; "(sops: gokrazy.gok.tailscale_auth_key)")
+             else . end)
+    ' "$inst/config.json"
     ;;
   edit)
     materialize

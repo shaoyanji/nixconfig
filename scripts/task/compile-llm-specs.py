@@ -197,7 +197,7 @@ AGENTS_INVENTORY_SECTION = """### Complete Client OS Fleet Inventory
 > **No table here — by design.** The fleet registry has exactly one home:
 > [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
 > with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the
-> generated catalog in `docs/generated/fleet-inventory.md` (`nix build .#docs`).
+> generated catalog in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`).
 > A pasted table is a table that disagrees with itself within a month —
 > `.agents/SCHEMA.md` §1, and `docs/docs-pipeline-audit.md` F4."""
 
@@ -283,8 +283,8 @@ def main():
                 drift = True
 
         # docs/fleet-inventory.md is no longer checked here: it is built from the
-        # same compiled registry by lib/docs.nix and verified by
-        # `task checks:docs:sync` (byte comparison against `nix build .#docs`).
+        # same compiled registry by lib/docs.nix (`nix build .#artifacts.docs`).
+        # Nothing generated is committed, so there is no drift gate to run.
 
         new_fleet_matrix = generate_fleet_matrix_markdown(data)
         if not AGENTS_FLEET_MD.exists() or AGENTS_FLEET_MD.read_text(encoding="utf-8") != new_fleet_matrix:

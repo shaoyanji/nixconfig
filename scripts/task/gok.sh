@@ -183,10 +183,12 @@ build() {
   echo "gok.sh: building the appliance into $out" >&2
   # `tee … >&2`: the log goes to the operator AND to the file, never to stdout —
   # stdout is the tarball path, which CI captures with $( ).
-  # `</dev/null` and an explicit timeout because this runs unattended on a
-  # runner: gok asks for sudo without `--sudo never`, and a question with no TTY
-  # is an infinite wait — the 19-minute silence that made two CI runs look hung.
-  timeout "${GOK_BUILD_TIMEOUT:-900}" gok overwrite \
+  # `</dev/null` because this runs unattended on a runner: gok asks for sudo
+  # without `--sudo never`, and a question with no TTY is an infinite wait — the
+  # 19-minute silence that made two CI runs look hung. The bound is the caller's
+  # (`timeout … gok.sh build` in the workflow); `gok` here is a shell function, so
+  # `timeout gok` would look for an executable and fail with 127.
+  gok overwrite \
     --root="$out/root.squashfs" \
     --boot="$out/boot.fat" \
     --mbr="$out/mbr.img" \

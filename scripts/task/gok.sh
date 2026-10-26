@@ -9,8 +9,10 @@
 #   gok.sh <anything else>      passed straight to gok
 set -euo pipefail
 
-repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-src=$repo/hosts/gok
+# `pwd -P`: builtins.getFlake refuses a path that is a symlink, and the repo is
+# reached through one on this fleet (~/Documents/nixconfig -> /Volumes/data/...).
+repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)
+decl=$repo/hosts/gok/instance.nix
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-gok
 inst=$cache/gok
 secret='["gokrazy"]["gok"]["http_password"]'
@@ -36,12 +38,26 @@ materialize() {
     exit 1
   }
 
-  # A cached copy may hold keys gok wrote at runtime (pinned TLS cert/key). The
-  # repo wins for everything it declares; anything repo-absent survives the merge.
+  # The spec is MODULE OUTPUT, not a file: modules/services/gokrazy.nix renders
+  # hosts/gok/instance.nix into a config.json whose credential positions are "".
+  # A cached copy may also hold values gok wrote at runtime (pinned TLS cert and
+  # key), which the module does not declare, so the cache wins only for keys the
+  # repo does not mention.
+  local declared
+  declared=$(nix eval --impure --json --expr "
+    let
+      flake = builtins.getFlake (toString $repo);
+      lib = flake.inputs.nixpkgs.lib;
+      ev = lib.evalModules { modules = [ $repo/modules/services/gokrazy.nix $decl ]; };
+    in (builtins.fromJSON ev.config.services.gokrazy.rendered.gok.configJSON)
+  " 2>/dev/null) || {
+    echo "gok.sh: could not render $decl — run 'nix eval --impure' on it to see why" >&2
+    exit 1
+  }
   if [ -f "$inst/config.json" ]; then
-    jq -s '.[0] * .[1]' "$inst/config.json" "$src/config.json" > "$inst/config.json.tmp"
+    printf '%s' "$declared" | jq -s '.[0] * .[1]' "$inst/config.json" - > "$inst/config.json.tmp"
   else
-    cp "$src/config.json" "$inst/config.json.tmp"
+    printf '%s' "$declared" | jq '.' > "$inst/config.json.tmp"
   fi
 
   jq --arg p "$password" '.Update = ((.Update // {}) + {HTTPPassword: $p})' \
@@ -106,19 +122,12 @@ gok() {
   fi
 }
 
-# Cache -> repo, with every secret stripped back out: the HTTP password, the TLS
-# material gok pins, and the tailscale auth key.
+# There is no cache -> repo write any more, and that is the point: the instance
+# is declared in $decl, so a change made with `gok edit` cannot survive the next
+# render unless it is expressed there. Saying so is cheaper than a silent revert.
 save() {
   umask 077
-  jq 'del(.Update.HTTPPassword, .Update.CertPEM, .Update.KeyPEM)
-      | if .PackageConfig["github.com/gokrazy/wifi"]
-        then .PackageConfig["github.com/gokrazy/wifi"].ExtraFileContents["/etc/wifi.json"] =
-             "{\"ssid\": \"\", \"psk\": \"\"}\n"
-        else . end
-      | if .PackageConfig["tailscale.com/cmd/tailscale"]
-        then .PackageConfig["tailscale.com/cmd/tailscale"].CommandLineFlags |=
-             map(select(startswith("--auth-key=") | not))
-        else . end' "$inst/config.json" > "$src/config.json"
+  chmod 600 "$inst/config.json"
 }
 
 case "${1:-}" in
@@ -133,7 +142,8 @@ case "${1:-}" in
     materialize
     gok edit
     save
-    echo "gok.sh: repo updated at hosts/gok/config.json (password + TLS keys stripped)"
+    echo "gok.sh: the instance is declared in hosts/gok/instance.nix — an edit made" >&2
+    echo "         here lives only in $inst/config.json and is replaced on the next render." >&2
     ;;
   *)
     materialize

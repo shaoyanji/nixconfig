@@ -4,10 +4,7 @@
 #
 #   gok.sh show                 resolved config, password masked
 #   gok.sh edit                 $EDITOR on the cached copy, then write back to the repo
-#   gok.sh build [OUT]          build root/boot/mbr into OUT — no device, no network
-#   gok.sh push [--stage|--testboot] [ARTIFACT]   stream it — no gok, no Go
-#   gok.sh fetch [DEST]         download the newest artifact from the artifact host
-#   gok.sh update [--insecure]  build + push in one process
+#   gok.sh update [--insecure]  build + push to the running appliance
 #   gok.sh overwrite --full=/dev/sdX   reflash a card
 #   gok.sh <anything else>      passed straight to gok
 set -euo pipefail
@@ -21,17 +18,7 @@ inst=$cache/gok
 secret='["gokrazy"]["gok"]["http_password"]'
 
 usage() {
-  sed -n '2,12p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
-}
-
-# One lookup, two consumers: `materialize` bakes it into config.json and `push`
-# sends it as basic auth. CI has no age key, so the environment wins when set.
-update_password() {
-  if [ -n "${GOK_HTTP_PASSWORD:-}" ]; then
-    printf '%s' "$GOK_HTTP_PASSWORD"
-  else
-    sops -d --extract "$secret" "$repo/modules/secrets.yaml"
-  fi
+  sed -n '2,9p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 materialize() {
@@ -39,7 +26,13 @@ materialize() {
   chmod 700 "$cache" "$inst"
 
   local password
-  password=$(update_password || true)
+  # CI has no age key, so the password may arrive in the environment instead of
+  # sops. One implementation, two sources.
+  if [ -n "${GOK_HTTP_PASSWORD:-}" ]; then
+    password=$GOK_HTTP_PASSWORD
+  else
+    password=$(sops -d --extract "$secret" "$repo/modules/secrets.yaml")
+  fi
   [ -n "$password" ] || {
     echo "gok.sh: no password at $secret in modules/secrets.yaml and GOK_HTTP_PASSWORD unset" >&2
     exit 1
@@ -81,15 +74,7 @@ materialize() {
   # `tailscale up` prints a login URL in the appliance's web UI and the session
   # persists in the ext4 /perm partition.
   local authkey
-  # Same two sources as the password, for the same reason: a runner has no age
-  # key, and an image built without this joins the tailnet only if the node key
-  # already persists in /perm. Absent is reported in the artifact's manifest, so
-  # a deploy never has to guess.
-  if [ -n "${GOK_TAILSCALE_AUTH_KEY:-}" ]; then
-    authkey=$GOK_TAILSCALE_AUTH_KEY
-  else
-    authkey=$(sops -d --extract '["gokrazy"]["gok"]["tailscale_auth_key"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
-  fi
+  authkey=$(sops -d --extract '["gokrazy"]["gok"]["tailscale_auth_key"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
   # WiFi credentials never enter the repo: the instance ships an empty
   # /etc/wifi.json and this fills it from sops only when both keys exist. No
   # keys → no wifi file, which is the wired default.
@@ -153,147 +138,6 @@ gok() {
   fi
 }
 
-# --- artifact-first deployment -----------------------------------------------
-#
-# `gok update` builds and pushes in one process, which is why none of it could be
-# split across a runner and the device: the push is three streams —
-# PUT /update/{root,boot,mbr} (github.com/gokrazy/updater, StreamTo) — and those
-# are exactly the files `gok overwrite --root/--boot/--mbr` writes. `overwrite`
-# stops before the device is contacted (`newInstallation` returns ahead of
-# logicUpdate in gok's internal/packer), so a build on a runner and a push from a
-# laptop are the same artifact. `push` below speaks that protocol with curl: no
-# Go, no gok, no compiling at deploy time. Deploy path: workflows/gok.yml builds
-# and drops the tarball on delphi, `task infra:gok:deploy` fetches and streams it.
-
-# gok's URL banner carries the update password in it, and build.log travels with
-# the artifact, so the file is redacted once the build is done.
-redact() {
-  sed -i -E 's#(//)[^@/ ]+@#\1REDACTED@#g' "$1"
-}
-
-build() {
-  local out=${1:-}
-  if [ -z "$out" ]; then
-    out=$cache/artifacts/$(date -u +%Y%m%dT%H%M%SZ)-$(git -C "$repo" rev-parse --short=8 HEAD 2>/dev/null || echo nogit)
-  fi
-  out=${out%/}
-  mkdir -p "$out"
-  materialize
-  echo "gok.sh: building the appliance into $out" >&2
-  # `tee … >&2`: the log goes to the operator AND to the file, never to stdout —
-  # stdout is the tarball path, which CI captures with $( ).
-  gok overwrite \
-    --root="$out/root.squashfs" \
-    --boot="$out/boot.fat" \
-    --mbr="$out/mbr.img" \
-    --sudo never 2>&1 | tee "$out/build.log" >&2
-  redact "$out/build.log"
-
-  # The device reports this timestamp from `/` after it has booted the new root,
-  # which is what lets `push` prove the appliance runs THIS artifact rather than
-  # merely answering HTTP again.
-  local buildts rev dirty
-  buildts=$(sed -n 's/^.*Build timestamp: //p' "$out/build.log" | tail -1)
-  [ -n "$buildts" ] || buildts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  rev=$(git -C "$repo" rev-parse HEAD 2>/dev/null || echo unknown)
-  if git -C "$repo" diff --quiet 2>/dev/null; then dirty=false; else dirty=true; fi
-
-  # Which credential slots actually got filled. A runner has no age key, so a
-  # CI-built image carries the update password (a GitHub secret) and NOT the
-  # tailscale auth key or the wifi entry — the same omission that would have been
-  # invisible before, and the reason this is in the manifest `push` prints.
-  local creds
-  creds=$(jq -n \
-    --arg password baked \
-    --arg authkey "$([ -n "${GOK_TAILSCALE_AUTH_KEY:-}" ] && echo env || { [ -s "$inst/config.json" ] && jq -e '.PackageConfig["tailscale.com/cmd/tailscale"].CommandLineFlags[]? | select(startswith("--auth-key="))' "$inst/config.json" >/dev/null 2>&1 && echo baked || echo absent; })" \
-    --arg wifi "$(jq -e '.PackageConfig["github.com/gokrazy/wifi"]' "$inst/config.json" >/dev/null 2>&1 && echo baked || echo absent)" \
-    '{http_password: $password, tailscale_auth_key: $authkey, wifi: $wifi}')
-
-  jq -n \
-    --arg rev "$rev" --argjson dirty "$dirty" --arg buildts "$buildts" \
-    --arg built "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-    --arg host "$(jq -r .Hostname "$inst/config.json")" \
-    --argjson creds "$creds" \
-    --argjson files "$(cd "$out" && sha256sum root.squashfs boot.fat mbr.img | jq -R -s 'split("\n") | map(select(length > 0) | split("  ")) | map({key: .[1], value: .[0]}) | from_entries')" \
-    '{git: {rev: $rev, dirty: $dirty}, built: $built, buildTimestamp: $buildts, hostname: $host, credentials: $creds, files: $files}' \
-    > "$out/manifest.json"
-  (cd "$out" && sha256sum root.squashfs boot.fat mbr.img manifest.json > SHA256SUMS)
-
-  tar --zstd -cf "$out.tar.zst" -C "$out" .
-  # stdout is the tarball path and nothing else, because CI captures it.
-  printf '%s\n' "$out.tar.zst"
-  printf 'gok.sh: %s bytes, streams hash-pinned in SHA256SUMS, build %s\n' \
-    "$(stat -c %s "$out.tar.zst")" "$buildts" >&2
-}
-
-# A directory or a tarball in, the directory holding the streams out.
-unpack() {
-  local art=$1 dir
-  if [ -d "$art" ]; then
-    printf '%s\n' "$art"
-    return 0
-  fi
-  [ -f "$art" ] || {
-    echo "gok.sh: no artifact at '$art' — build one (gok.sh build) or fetch the CI one (gok.sh fetch)" >&2
-    return 1
-  }
-  dir=$(mktemp -d "${TMPDIR:-/tmp}/gok-artifact.XXXXXX")
-  tar --zstd -xf "$art" -C "$dir"
-  printf '%s\n' "$dir"
-}
-# Resolve the artifact (a directory or a tarball), verify it, hand it to the
-# streamer. The wire protocol itself lives in scripts/task/gok-stream.sh, because
-# the usual place to run it is the host that already holds the artifact
-# (`task infra:gok:deploy` pipes that file to delphi), not this one.
-push() {
-  local arg art='' passthrough=()
-  for arg in ${1:+"$@"}; do
-    case $arg in
-      --stage | --testboot) passthrough+=("$arg") ;;
-      *) art=$arg ;;
-    esac
-  done
-  if [ -z "$art" ]; then
-    art=$(ls -1t "$cache"/artifacts/*.tar.zst 2>/dev/null | head -1 || true)
-  fi
-  [ -n "$art" ] || {
-    echo "gok.sh: no artifact named and none in $cache/artifacts — build one (gok.sh build) or fetch the CI one (gok.sh fetch)" >&2
-    exit 1
-  }
-  local dir
-  dir=$(unpack "$art") || exit 1
-  # A tarball unpacks into a temp dir (~140 MB); a directory is the caller's. The
-  # path is interpolated rather than referenced: the trap fires after this
-  # function returns, when `dir` is out of scope.
-  [ "$dir" = "$art" ] || trap "rm -rf $(printf '%q' "$dir")" EXIT
-  # The password comes from sops here (this script's own two sources); the
-  # streamer takes it from the environment and knows nothing about sops.
-  local pw
-  pw=$(update_password || true)
-  [ -n "$pw" ] || {
-    echo "gok.sh: no update password (sops, or GOK_HTTP_PASSWORD)" >&2
-    exit 1
-  }
-  GOK_HTTP_PASSWORD=$pw bash "$(dirname "${BASH_SOURCE[0]}")/gok-stream.sh" ${passthrough[@]+"${passthrough[@]}"} "$dir"
-}
-
-fetch() {
-  local dest=${1:-$cache/artifacts} url=${GOK_ARTIFACT_URL:-} host
-  if [ -z "$url" ]; then
-    host=$(nix eval --raw "$repo#inventory.hosts.delphi.network.tailscale_hostname" 2>/dev/null || true)
-    url="http://${host:-delphi}.cloudforest-kardashev.ts.net/gok/latest.tar.zst"
-  fi
-  mkdir -p "$dest"
-  local out=$dest/fetched-$(date -u +%Y%m%dT%H%M%SZ).tar.zst
-  echo "gok.sh: fetching $url" >&2
-  curl -fsSL --progress-bar -m 900 -o "$out" "$url" || {
-    rm -f "$out"
-    echo "gok.sh: fetch failed. Is the artifact receiver on the artifact host up (taildrop, not ssh)?" >&2
-    exit 1
-  }
-  printf '%s\n' "$out"
-}
-
 # There is no cache -> repo write any more, and that is the point: the instance
 # is declared in $decl, so a change made with `gok edit` cannot survive the next
 # render unless it is expressed there. Saying so is cheaper than a silent revert.
@@ -316,16 +160,6 @@ case "${1:-}" in
     save
     echo "gok.sh: the instance is declared in hosts/gok/instance.nix — an edit made" >&2
     echo "         here lives only in $inst/config.json and is replaced on the next render." >&2
-    ;;
-  build)
-    build "${2:-}"
-    ;;
-  push)
-    shift
-    push "$@"
-    ;;
-  fetch)
-    fetch "${2:-}"
     ;;
   *)
     materialize

@@ -239,7 +239,6 @@
   freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 in {
   imports = [
-    ./gok-artifacts.nix
     ./hardware-configuration.nix
     ./infra-stack.nix
     ../../modules/profiles/base-node.nix
@@ -498,12 +497,6 @@ in {
     "::1"
   ];
 
-  # --- The gokrazy appliance's build artifacts ---------------------------------
-  # .github/workflows/gok.yml sends them here over Taildrop and
-  # `task infra:gok:deploy` fetches them back; hosts/delphi/gok-artifacts.nix
-  # explains why a runner publishes a file instead of pushing to the device.
-  services.gokArtifacts.enable = true;
-
   # --- Webserver --------------------------------------------------------------
   # TLS comes from ACME on the public name; the :80 IP vhost stays as an edge
   # probe independent of DNS. OCI's security list must also allow 80/443
@@ -620,21 +613,6 @@ in {
               '';
               "/sentinel/" = {
                 alias = "/var/lib/fleet-sentinel/www/";
-                extraConfig =
-                  ''
-                    ${tailnetOnly}
-                    autoindex off;
-                    add_header Cache-Control "no-store";
-                  ''
-                  + siteHeader;
-              };
-              # Taildrop's landing pad (hosts/delphi/gok-artifacts.nix), served
-              # back to `task infra:gok:deploy`. Tailnet vhost only, deliberately:
-              # the appliance image has the wifi PSK, the tailscale auth key and
-              # the update password baked into it, so the mesh ACL is the whole
-              # authorization boundary and there is no public counterpart.
-              "/gok/" = {
-                alias = "${config.services.gokArtifacts.directory}/";
                 extraConfig =
                   ''
                     ${tailnetOnly}

@@ -905,17 +905,34 @@ in {
   #
   # The `github:` ref is the pushed main branch — which is why nothing here is
   # built from a local tree: a dirty checkout is invisible to this job.
+  # NOT `github:shaoyanji/nixconfig` any more. This host's config reads
+  # `modules/secrets/apikeys.yaml`, which lives in the private submodule, and a
+  # `github:` fetch carries no submodule content — the eval dies with “path
+  # .../apikeys.yaml does not exist”, which is exactly how the first real
+  # upgrade since the role expanded failed (measured 2026-10-26). The seeded
+  # working tree has it, so the upgrade builds from that, refreshed first.
+  # `path:` also avoids libgit2's "repository is not owned by current user" when
+  # root evaluates a repo in another user's home.
   system.autoUpgrade = {
     enable = true;
-    flake = "github:shaoyanji/nixconfig#delphi";
+    flake = "path:/home/devji/Documents/nixconfig#delphi";
     # `--upgrade` only updates root's `nixos` channel; it is a no-op for a flake
     # system (the unit already warns "no channels to update") and channels are
-    # disabled fleet-wide. The github: ref is fetched fresh on every run.
+    # disabled fleet-wide.
     upgrade = false;
     dates = "04:30";
     allowReboot = true;
     persistent = true;
   };
+
+  # The tree the upgrade builds from has to be current before the build, or the
+  # job keeps re-applying whatever was seeded last. `seed-workspace` is the same
+  # pull an operator runs; it needs devji's git config and gh credentials, hence
+  # runuser rather than root, and a failure here must not cancel the upgrade.
+  systemd.services.nixos-upgrade.preStart = lib.mkBefore ''
+    ${pkgs.util-linux}/bin/runuser -u ${user.name} -- \
+      ${pkgs.bash}/bin/bash -lc '/run/current-system/sw/bin/seed-workspace' || true
+  '';
 
   # --- Hermes agent ----------------------------------------------------------
   # profiles.hermes installs the CLI, seeds ~/.hermes, renders the credential

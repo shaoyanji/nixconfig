@@ -110,6 +110,18 @@ tasks:
         put_sops '["gokrazy"]["gok"]["wifi_ssid"]' 'wifi SSID' ''
         put_sops '["gokrazy"]["gok"]["wifi_psk"]' 'wifi passphrase' '--password'
 
+        # The CI plane needs the same two values. A runner has no age key, and a
+        # build that cannot see the SSID DELETES the wifi package instead of
+        # shipping empty credentials — so a CI image deployed to a wifi
+        # appliance comes back with no link and no obvious reason (2026-10-26).
+        ssid=$(sops -d --extract '["gokrazy"]["gok"]["wifi_ssid"]' modules/secrets.yaml 2>/dev/null || true)
+        psk=$(sops -d --extract '["gokrazy"]["gok"]["wifi_psk"]' modules/secrets.yaml 2>/dev/null || true)
+        if [ -n "$ssid" ] && gum confirm 'Also store the wifi pair as GitHub secrets GOK_WIFI_SSID / GOK_WIFI_PSK (CI images otherwise ship without wifi)?'; then
+          printf '%s' "$ssid" | gh secret set GOK_WIFI_SSID
+          printf '%s' "$psk" | gh secret set GOK_WIFI_PSK
+          echo 'stored: GitHub secrets GOK_WIFI_SSID, GOK_WIFI_PSK'
+        fi
+
         # Auth key, not OAuth: one value from Settings -> Keys -> Generate auth
         # key (tag `tag:ci`, ephemeral, pre-approved). OAuth clients live under
         # Settings -> OAuth clients and are simply not visible to every role or

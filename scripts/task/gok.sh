@@ -91,11 +91,22 @@ materialize() {
     authkey=$(sops -d --extract '["gokrazy"]["gok"]["tailscale_auth_key"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
   fi
   # WiFi credentials never enter the repo: the instance ships an empty
-  # /etc/wifi.json and this fills it from sops only when both keys exist. No
-  # keys → no wifi file, which is the wired default.
+  # /etc/wifi.json and this fills it from the environment or sops. No keys → no
+  # wifi package at all, which is the wired default.
+  #
+  # The environment wins for the same reason the update password's does: a CI
+  # runner has no age key. Without this the package was DELETED in every
+  # CI-built image, so an update silently took a wifi appliance off the air
+  # (2026-10-26). An absent SSID is now reported in the manifest as
+  # `wifi: absent`, which is what `task infra:gok:deploy` reads before pushing.
   local wifi_ssid wifi_psk
-  wifi_ssid=$(sops -d --extract '["gokrazy"]["gok"]["wifi_ssid"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
-  wifi_psk=$(sops -d --extract '["gokrazy"]["gok"]["wifi_psk"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+  if [ -n "${GOK_WIFI_SSID:-}" ]; then
+    wifi_ssid=$GOK_WIFI_SSID
+    wifi_psk=${GOK_WIFI_PSK:-}
+  else
+    wifi_ssid=$(sops -d --extract '["gokrazy"]["gok"]["wifi_ssid"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+    wifi_psk=$(sops -d --extract '["gokrazy"]["gok"]["wifi_psk"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+  fi
   if [ -n "$wifi_ssid" ]; then
     jq --arg s "$wifi_ssid" --arg p "$wifi_psk" \
       '.PackageConfig["github.com/gokrazy/wifi"].ExtraFileContents["/etc/wifi.json"] =
@@ -113,6 +124,10 @@ materialize() {
       "$inst/config.json" > "$inst/config.json.tmp"
     mv "$inst/config.json.tmp" "$inst/config.json"
     chmod 600 "$inst/config.json"
+    # Loud, because the consequence is silence: an image without this package
+    # cannot associate, and the appliance only reveals that after it reboots.
+    echo "gok.sh: WARNING — no wifi credentials (GOK_WIFI_SSID, or gokrazy/gok/wifi_ssid in sops);" >&2
+    echo "         this image has no wifi package and can only run on a wired node." >&2
   fi
 
   # The flag list comes from the repo (`up`, `--hostname=gok`); the key is

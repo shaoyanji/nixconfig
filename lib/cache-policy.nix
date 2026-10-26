@@ -11,8 +11,10 @@
 #   harmonia (frieren)  the LAN cache. Serves this house at gigabit after ONE
 #                       build. Not a cache for a cloud host, whose closure would
 #                       have to be relayed through the NAS's 20 Mbit uplink.
-#   cachix (shaoyanji)  the cache every host reaches, LAN or cloud. A builder
-#                       host pushes its own output here (profiles.cachePush).
+#   cachix (shaoyanji)  the cache every host reaches, LAN or cloud. CI pushes to
+#                       it; hosts only read from it. There is no per-build push
+#                       hook anywhere in this fleet — a post-build hook on a
+#                       small host turns every switch into an upload.
 #   CI                  a strategic anchor: an artifact expensive enough to be
 #                       worth caching once (an aarch64 image, an RPi kernel).
 #                       Not a per-push path.

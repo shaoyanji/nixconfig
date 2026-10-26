@@ -247,7 +247,6 @@ in {
     ../../modules/profiles/hermes.nix
     ../../modules/profiles/operator-tools.nix
     ../../modules/profiles/sops-user-identity.nix
-    ../../modules/profiles/cache-push.nix
     ../../modules/net/dns/tailnet-address.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
@@ -307,19 +306,15 @@ in {
   # Out of scope for frieren/fern, which use the TPM identity path.
   profiles.sopsUserIdentity.enable = true;
 
-  # Delphi is the fleet's only native aarch64 builder (nixbuild.net is x86), so
-  # everything it compiles is the only copy of that artifact that will ever
-  # exist. Without a push it dies in /nix/store at the next GC and the next
-  # switch rebuilds it — hours on two cores.
-  #
-  # The token is in the fleet's API-keys sops file (`CACHIX.AUTH.TOKEN`), not in
-  # modules/secrets.yaml: the post-build hook reads it from /run/secrets and
-  # copies each finished output to cachix over delphi's OWN uplink. Nothing is
-  # relayed through the NAS, whose line is 20 Mbit up.
-  profiles.cachePush = {
-    enable = true;
-    sopsFile = ../../modules/secrets/apikeys.yaml;
-  };
+  # No `profiles.cachePush` here, deliberately. A post-build-hook fires for every
+  # locally built output and runs as nix-daemon, so on this 2-vCPU guest a switch
+  # that builds anything turns into a NAR re-compress + upload per derivation,
+  # with the copies outliving the rebuild that started them. What delphi needs is
+  # the other direction: SUBSTITUTION from cachix, so an artifact CI already
+  # built for github is fetched instead of compiled here. That is a read, and it
+  # costs this host nothing — `config.fleet.inventory.cache.delphi` already lists
+  # shaoyanji.cachix.org in the WAN tier, so `nix.settings.substituters` carries
+  # it with no token and no hook.
 
   # --- OCI Networking & Paravirtualized DHCP ---
   networking.useDHCP = lib.mkDefault true;
@@ -905,34 +900,27 @@ in {
   #
   # The `github:` ref is the pushed main branch — which is why nothing here is
   # built from a local tree: a dirty checkout is invisible to this job.
-  # NOT `github:shaoyanji/nixconfig` any more. This host's config reads
-  # `modules/secrets/apikeys.yaml`, which lives in the private submodule, and a
-  # `github:` fetch carries no submodule content — the eval dies with “path
-  # .../apikeys.yaml does not exist”, which is exactly how the first real
-  # upgrade since the role expanded failed (measured 2026-10-26). The seeded
-  # working tree has it, so the upgrade builds from that, refreshed first.
-  # `path:` also avoids libgit2's "repository is not owned by current user" when
-  # root evaluates a repo in another user's home.
+  # Plain `github:` again, and the submodule question is why. That fetch is a
+  # tarball: it carries only the submodule's gitlink, and the fetcher rejects a
+  # `submodules=1` parameter outright (measured: "unknown parameter
+  # 'submodules'"). The git fetchers that do support the flag would clone
+  # `git@github.com:shaoyanji/secrets` as root, and root here has no git config,
+  # no key and no gh login — so the flag cannot be the fix by itself.
+  # What actually broke the 2026-10-26 upgrade was the only eval-time reader of
+  # that submodule: `profiles.cachePush`'s `sopsFile`. The push is gone, nothing
+  # in this host's closure references `modules/secrets/`, and the tarball
+  # evaluates. CI keeps `?submodules=1` because it fetches a git tree, not this.
   system.autoUpgrade = {
     enable = true;
-    flake = "path:/home/devji/Documents/nixconfig#delphi";
+    flake = "github:shaoyanji/nixconfig#delphi";
     # `--upgrade` only updates root's `nixos` channel; it is a no-op for a flake
     # system (the unit already warns "no channels to update") and channels are
-    # disabled fleet-wide.
+    # disabled fleet-wide. The github: ref is fetched fresh on every run.
     upgrade = false;
     dates = "04:30";
     allowReboot = true;
     persistent = true;
   };
-
-  # The tree the upgrade builds from has to be current before the build, or the
-  # job keeps re-applying whatever was seeded last. `seed-workspace` is the same
-  # pull an operator runs; it needs devji's git config and gh credentials, hence
-  # runuser rather than root, and a failure here must not cancel the upgrade.
-  systemd.services.nixos-upgrade.preStart = lib.mkBefore ''
-    ${pkgs.util-linux}/bin/runuser -u ${user.name} -- \
-      ${pkgs.bash}/bin/bash -lc '/run/current-system/sw/bin/seed-workspace' || true
-  '';
 
   # --- Hermes agent ----------------------------------------------------------
   # profiles.hermes installs the CLI, seeds ~/.hermes, renders the credential

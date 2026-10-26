@@ -4,6 +4,7 @@
 # here is about RAM, store size and keeping the medium alive.
 {
   config,
+  lib,
   pkgs,
   ...
 }: let
@@ -32,10 +33,13 @@ in {
   };
 
   # The store is the only thing that grows between fleet updates, so bound it.
+  # `automatic` and `dates` are set here; the retention string belongs to
+  # modules/global/global.nix (10d) — defining it in both places is a hard eval
+  # error that a module-system + assertions check does not surface, because a
+  # conflicting option is only detected when its value is forced.
   nix.gc = {
     automatic = true;
     dates = "weekly";
-    options = "--delete-older-than 14d";
   };
 
   networking = {
@@ -66,11 +70,27 @@ in {
     openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;
   };
 
+  # ext4 is the root filesystem and vfat the firmware partition. Both are
+  # declared so their tools (e2fsprogs, dosfstools) are in the closure the
+  # expand-on-boot service needs, and nothing else is — no btrfs, xfs, zfs, cifs
+  # or NFS tooling on a box whose only filesystem is the one it boots from.
+  boot.supportedFilesystems = ["ext4" "vfat"];
+
+  # sd-image.nix forces hardware.enableAllHardware = true, and that implies
+  # enableRedistributableFirmware — which is linux-firmware at 1.98 GB, plus
+  # Intel 2200/ralink/zd1211 radios, DVB tuner blobs and SOF audio DSPs. On a Pi
+  # 3B the only radio is a Broadcom SDIO part, so the firmware payload drops to
+  # the Pi wireless firmware and the regulatory database. The
+  # all-hardware *kernel modules* stay on purpose: usb-storage/xhci in the initrd
+  # is what finds this box's root disk on the USB stick.
+  hardware.enableRedistributableFirmware = lib.mkForce false;
+  hardware.wirelessRegulatoryDatabase = true;
+
   environment.systemPackages = with pkgs; [
     age
     curl
     gh
-    git
+    gitMinimal
     jq
     mosh
     rsync

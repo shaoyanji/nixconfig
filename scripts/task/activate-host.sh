@@ -77,12 +77,36 @@ target="${2:-$1}"
 [ -f "$INVENTORY" ] || { echo "inventory.toml not found" >&2; exit 2; }
 command -v yq >/dev/null 2>&1 || { echo "yq required" >&2; exit 2; }
 
-# Read the cache from inventory when it is declared there, else fall back to the
-# fleet's harmonia address. The fallback is a constant on purpose: `yq -i` rewrites
-# ALL of inventory.toml (a 622-line diff) so the metadata key could not be added
-# without destroying the file's formatting. Env CACHE= always wins.
-cache="${CACHE:-$(yq -r '.metadata.cache_url // ""' "$INVENTORY" 2>/dev/null || true)}"
-[ -n "$cache" ] || cache="http://192.168.3.25:5000"
+# Which substituters may serve this host's closure, IN THE HOST'S OWN ORDER.
+#
+# Deriving this from the host (instead of hardcoding harmonia) is the fix for a
+# measured failure: delphi is `category = "cloud"`, so modules/global/global.nix
+# gives it cachix + cache.nixos.org and EXCLUDES the LAN Harmonia cache — but this
+# script still gated on harmonia and copied `--from` it only. On a host that cannot
+# reach it, either the gate aborts the deploy or the switch finds nothing and
+# compiles the whole system on a cloud box. One registry, two readers, disagreeing
+# = the bug; read the same fact the module reads.
+#
+# Env CACHE=<url> pins it to exactly one cache (unchanged escape hatch).
+case "$(yq -r ".hosts.\"$host\".category // \"lan\"" "$INVENTORY" 2>/dev/null || echo lan)" in
+  cloud)
+    caches="https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com"
+    ;;
+  *)
+    caches="$(yq -r '.metadata.cache_url // ""' "$INVENTORY" 2>/dev/null || true) https://shaoyanji.cachix.org https://cache.nixos.org/"
+    ;;
+  esac
+[ -n "${CACHE:-}" ] && caches="$CACHE"
+# shellcheck disable=SC2086
+set -- $caches
+cache="$1"
+serving=""
+for c in "$@"; do
+  if nix path-info --store "$c" --option narinfo-cache-negative-ttl 0 "$top" >/dev/null 2>&1; then
+    serving="$c"
+    break
+  fi
+done
 
 # Active hosts only. A preserved/dormant host is not part of the deploy surface:
 # evaluating its config is how a known-broken preserved host (cassini: a
@@ -125,11 +149,13 @@ fi
 # answers that request with 404 while serving the path perfectly well over the
 # store API (measured 2026-10-15 on both a warm and a cold path — the curl test
 # gave false failures). `nix path-info --store` is the authoritative answer.
-if ! nix path-info --store "$cache" --option narinfo-cache-negative-ttl 0 "$top" >/dev/null 2>&1; then
-  echo "activate [$host] GATE FAILED — $cache does not serve $top" >&2
-  echo "  warm it on the builder first: task infra:warm:cache HOSTS=$host" >&2
+if [ -z "$serving" ]; then
+  echo "activate [$host] GATE FAILED — none of this host's substituters serve $top:" >&2
+  echo "  $caches" >&2
+  echo "  warm it on the builder first: task infra:warm:host:$host" >&2
   exit 1
 fi
+cache="$serving"
 echo "activate [$host] closure is served by $cache"
 
 if [ "$mode" = "check" ]; then
@@ -147,15 +173,27 @@ set -euo pipefail
 export PATH="/run/current-system/sw/bin:/run/current-system/sw/sbin:\$PATH"
 NIX=/run/current-system/sw/bin/nix
 NIXENV=/run/current-system/sw/bin/nix-env
-CACHE='$cache'
+CACHES='$caches'
 TOP='$top'
 ACTION='$action'
 if [ "\$(readlink -f /run/current-system)" = "\$TOP" ]; then
   echo "already on \$TOP — nothing to do"
   exit 0
 fi
-echo "== pulling closure from \$CACHE (HTTP, parallel, resumable) =="
-"\$NIX" copy --from "\$CACHE" --no-check-sigs --option narinfo-cache-negative-ttl 0 --option trusted-substituters "\$CACHE" "\$TOP"
+# Substitute from EVERY cache the host is configured for, in its order, and
+# never let this path compile: a copy that silently falls through to a build is
+# how a deploy turns into a 100%-CPU NAS/cloud host. A cache that cannot serve
+# the toplevel is skipped; the validity check below is the verdict.
+set -- \$CACHES
+for c in "\$@"; do
+  echo "== pulling closure from \$c (HTTP, parallel, resumable) =="
+  "\$NIX" copy --from "\$c" --no-check-sigs --option narinfo-cache-negative-ttl 0 --option trusted-substituters "\$c" "\$TOP" && break || echo "   \$c did not serve it; trying the next substituter"
+done
+if ! "\$NIX" path-info "\$TOP" >/dev/null 2>&1; then
+  echo "activate FAILED — \$TOP is not in the local store and no substituter served it." >&2
+  echo "  refusing to fall through to a local build on this host. Warm it: task infra:warm:host:<host>" >&2
+  exit 1
+fi
 echo "== registering generation =="
 "\$NIXENV" -p /nix/var/nix/profiles/system --set "\$TOP"
 echo "== activating (\$ACTION) =="

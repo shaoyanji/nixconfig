@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   config,
   ...
 }: let
@@ -191,6 +192,32 @@ in {
       RandomizedDelaySec = "1h";
     };
   };
+
+  # --- eval-time guards for the reverse proxy ---------------------------------
+  # Each assertion here is a mistake that was actually made and cost an outage:
+  # a TLS listener that handshakes with no certificate, and an unknown Host that
+  # lands on whichever service vhost happens to serialise first (2026-10-26:
+  # frieren.<tailnet>.ts.net served Audiobookshelf). They fail the evaluation,
+  # so the host cannot be built or switched into that state.
+  assertions = let
+    onTls = v: builtins.any (l: (l.port or 80) == 443) (v.listen or []);
+    tlsVhosts = lib.filterAttrs (_: v: onTls v) config.services.nginx.virtualHosts;
+    certless = lib.filterAttrs (_: v: v.sslCertificate == null && v.useACMEHost == null) tlsVhosts;
+    defaults = lib.filterAttrs (_: v: v.default or false) tlsVhosts;
+  in [
+    {
+      assertion = certless == {};
+      message = "nginx: every vhost listening on :443 must declare sslCertificate (or useACMEHost) — a TLS listener without one handshakes with the wrong name. Offenders: ${toString (builtins.attrNames certless)}";
+    }
+    {
+      assertion = defaults != {};
+      message = "nginx: no vhost is the default on :443, so a Host that matches nothing (the tailnet FQDN, vault.frieren.lan upgraded to https) is answered by whichever vhost serialises first. Give the portal `default = true`.";
+    }
+    {
+      assertion = (config.services.nginx.virtualHosts.${tailnetName} or null) != null;
+      message = "nginx: the tailnet entry point ${tailnetName} is not declared; https://${tailnetName}/ would fall through to the default vhost with a certificate that does not cover it.";
+    }
+  ];
 
   services.nginx = {
     enable = true;

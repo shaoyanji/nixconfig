@@ -59,6 +59,21 @@ materialize() {
   # persists in the ext4 /perm partition.
   local authkey
   authkey=$(sops -d --extract '["gokrazy"]["gok"]["tailscale_auth_key"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+  # WiFi credentials never enter the repo: the instance ships an empty
+  # /etc/wifi.json and this fills it from sops only when both keys exist. No
+  # keys → no wifi file, which is the wired default.
+  local wifi_ssid wifi_psk
+  wifi_ssid=$(sops -d --extract '["gokrazy"]["gok"]["wifi_ssid"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+  wifi_psk=$(sops -d --extract '["gokrazy"]["gok"]["wifi_psk"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+  if [ -n "$wifi_ssid" ]; then
+    jq --arg s "$wifi_ssid" --arg p "$wifi_psk" \
+      '.PackageConfig["github.com/gokrazy/wifi"].ExtraFileContents["/etc/wifi.json"] =
+         (({ssid: $s} + (if $p == "" then {} else {psk: $p} end)) | tojson + "\n")' \
+      "$inst/config.json" > "$inst/config.json.tmp"
+    mv "$inst/config.json.tmp" "$inst/config.json"
+    chmod 600 "$inst/config.json"
+  fi
+
   # The flag list comes from the repo (`up`, `--hostname=gok`); the key is
   # appended here and never written back, so rotating it is one sops edit.
   if [ -n "$authkey" ]; then
@@ -96,6 +111,10 @@ gok() {
 save() {
   umask 077
   jq 'del(.Update.HTTPPassword, .Update.CertPEM, .Update.KeyPEM)
+      | if .PackageConfig["github.com/gokrazy/wifi"]
+        then .PackageConfig["github.com/gokrazy/wifi"].ExtraFileContents["/etc/wifi.json"] =
+             "{\"ssid\": \"\", \"psk\": \"\"}\n"
+        else . end
       | if .PackageConfig["tailscale.com/cmd/tailscale"]
         then .PackageConfig["tailscale.com/cmd/tailscale"].CommandLineFlags |=
              map(select(startswith("--auth-key=") | not))

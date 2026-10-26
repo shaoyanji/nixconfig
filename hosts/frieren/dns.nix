@@ -152,6 +152,25 @@
     serviceConfig.Restart = lib.mkDefault "always";
   };
 
+  # --- eval-time guards for the resolver --------------------------------------
+  # The resolver is the fleet's single point of failure, so the things that make
+  # it survivable are asserted rather than remembered: a resolver host must have
+  # the watchdog, and the tailnet zone must be forwarded (without it, every
+  # *.ts.net URL is NXDOMAIN for anyone using this resolver — measured
+  # 2026-10-26).
+  assertions = [
+    {
+      assertion = config.services.pihole-ftl.enable -> (config.systemd.services ? dns-resolver-watchdog);
+      message = "dns: services.pihole-ftl.enable requires the dns-resolver-watchdog unit — an unattended resolver has to notice its own death.";
+    }
+    {
+      assertion = builtins.any (
+        l: builtins.match "server=.*cloudforest-kardashev\\.ts\\.net.*" l != null
+      ) config.profiles.dnsFailover.extraDnsmasqLines;
+      message = "dns: extraDnsmasqLines must forward the tailnet zone to MagicDNS (server=/cloudforest-kardashev.ts.net/100.100.100.100), or tailnet FQDNs resolve nowhere on the LAN.";
+    }
+  ];
+
   # --- resolver watchdog (2026-10-26) ---------------------------------------
   # This host IS the fleet resolver: while pihole-ftl was stopped by a switch
   # the whole LAN got "Server Not Found" and nothing said so. The watchdog asks

@@ -25,10 +25,14 @@ jobs:
   push:
     runs-on: ubuntu-latest
     steps:
+      # `token:` is load-bearing: the secrets submodule is private, and
+      # `persist-credentials: false` alone leaves the submodule clone anonymous —
+      # the job died at checkout with the tailscale step never reached.
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
           submodules: recursive
+          token: ${{ secrets.GH_PAT }}
 
       # `gok.sh` derives the breakglass key list from modules/config/authorized-keys.nix,
       # so the runner needs Nix to evaluate it. Pipe operators are required to parse.

@@ -164,7 +164,17 @@ jobs:
           useDaemon: false
           installCommand: nix profile install nixpkgs#cachix
 
-      - run: nix build -L .?submodules=1#${{ matrix.attr }}
+      # Every artifact the host needs to be substitutable — for an embedded host
+      # that includes `sdImage`, whose Raspberry Pi kernel is not on
+      # cache.nixos.org. Warming only the toplevel is what left image builds
+      # compiling from source on every attempt.
+      - run: |
+          set -euo pipefail
+          for attr in ${{ join(matrix.attrs, ' ') }}; do
+            echo "::group::nix build $attr"
+            nix build -L ".?submodules=1#${attr}"
+            echo "::endgroup::"
+          done
 
       # Per-host eval gate: module system + every assertion + the compiled
       # inventory.toml record, one host per runner (~13 s, ~700 MiB). This is the

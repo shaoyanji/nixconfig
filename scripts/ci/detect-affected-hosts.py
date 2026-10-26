@@ -73,6 +73,23 @@ def get_flake_attr(kind, name):
     return None
 
 
+def get_flake_attrs(kind, name, category):
+    """Everything CI must build for this host to be substitutable.
+
+    The toplevel alone is not enough for an embedded host: the artifact an
+    operator flashes is `sdImage`, and its Raspberry Pi kernel
+    (`linuxPackages_rpi3`) is NOT on cache.nixos.org. Warming only the toplevel
+    left every image build compiling that kernel from source — measured at hours
+    on a Pi 3B and enough to make a cloud box look hung. One host, all its
+    artifacts, one cache push.
+    """
+    primary = get_flake_attr(kind, name)
+    attrs = [primary] if primary else []
+    if kind == "nixos" and category == "embedded":
+        attrs.append(f"nixosConfigurations.{name}.config.system.build.sdImage")
+    return attrs
+
+
 def load_fleet_hosts():
     if not INVENTORY_FILE.exists():
         fallback_host = {
@@ -107,6 +124,7 @@ def load_fleet_hosts():
             "arch": arch,
             "os": runner_os,
             "attr": attr,
+            "attrs": get_flake_attrs(kind, h, data.get("category", "")),
         }
         all_nix_hosts[h] = host_info
 
@@ -166,7 +184,7 @@ def get_changed_files(base=None, head=None, working_tree=False):
     return [f.strip() for f in diff_out.splitlines() if f.strip()]
 
 
-def parse_commit_directives(msg, active_hosts):
+def parse_commit_directives(msg, active_hosts, all_nix_hosts=None):
     if not msg:
         return None, None
 
@@ -179,7 +197,14 @@ def parse_commit_directives(msg, active_hosts):
     match = re.search(r"\[ci[:\s]+([a-zA-Z0-9_,\s-]+)\]", msg, re.IGNORECASE)
     if match:
         requested = [h.strip() for h in match.group(1).split(",") if h.strip()]
-        valid = [h for h in requested if h in active_hosts]
+        # `[ci all]` above stays active-only — a sweep must not brush dormant
+        # configs. Naming a host is the opposite: it is a deliberate request, so
+        # it is honoured for any host the flake still builds, `wip` included.
+        # Filtering this to active_hosts silently discarded `[ci minyx]` (wip,
+        # aarch64) and fell through to the anchor host, so nothing ever warmed
+        # the Pi's closure.
+        named = all_nix_hosts if all_nix_hosts else active_hosts
+        valid = [h for h in requested if h in named]
         if valid:
             return valid, f"Explicit host directive in commit message: {', '.join(valid)}"
 
@@ -268,7 +293,7 @@ def main():
     all_nix_hosts, active_hosts, ci_excluded = load_fleet_hosts()
     commit_msg = args.commit_msg or get_commit_message()
 
-    directed_hosts, directive_reason = parse_commit_directives(commit_msg, active_hosts)
+    directed_hosts, directive_reason = parse_commit_directives(commit_msg, active_hosts, all_nix_hosts)
     if directed_hosts is not None:
         targets = directed_hosts
         reason = directive_reason
@@ -285,7 +310,13 @@ def main():
         )
 
     has_machines = len(targets) > 0
-    matrix_include = [active_hosts[h] for h in targets if h in active_hosts]
+    # all_nix_hosts, not active_hosts: an explicitly NAMED host is a deliberate
+    # request and must reach a runner even when its status is wip/preserved. It was
+    # filtered to active_hosts here, so `[ci minyx]` (wip, aarch64) produced an
+    # empty matrix, exited green, and warmed nothing — the reason the Pi's closure
+    # never existed in any cache. The default sweep still selects from
+    # active_hosts (above); this only makes naming a host mean something.
+    matrix_include = [all_nix_hosts[h] for h in targets if h in all_nix_hosts]
     matrix = {"include": matrix_include}
 
     if args.ci:

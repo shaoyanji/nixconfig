@@ -43,12 +43,16 @@ materialize() {
   rm -f "$inst/config.json.tmp"
   chmod 600 "$inst/config.json"
 
-  [ -f "$inst/breakglass.authorized_keys" ] ||
-    cp "$src/breakglass.authorized_keys" "$inst/"
+  # The fleet key list has exactly one home (modules/config/authorized-keys.nix),
+  # so an appliance reflash cannot drift from the hosts that may log in to it.
+  nix eval --json "$repo#nixosConfigurations.frieren.config.ssh.authorizedKeys.keys" 2>/dev/null |
+    jq -r '.[]' > "$inst/breakglass.authorized_keys"
 }
 
+# `go` is gok's build dependency, not something this repo installs: gok shells
+# out to it for every package in the instance.
 gok() {
-  nix shell nixpkgs#gokrazy -c gok -i gok --parent_dir "$cache" "$@"
+  nix shell nixpkgs#gokrazy nixpkgs#go -c gok -i gok --parent_dir "$cache" "$@"
 }
 
 # Cache -> repo, with every secret gok may have written stripped back out.

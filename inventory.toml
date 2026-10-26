@@ -801,8 +801,13 @@ users = []
 notes = [
   "Flashed on stark with `gok overwrite --full=/dev/sdc` from `pkgs.gokrazy` (gokrazy-0-unstable-2026-09-13): ARM64 vmlinuz, the rpi kernel/firmware packages, and an ext4 `perm` partition created after the write.",
   "Instance state lives at `~/gokrazy/gok` on stark; the device's HTTP password is `gokrazy.gok.http_password` in `modules/secrets.yaml`, so a rebuild does not depend on that machine's disk.",
-  "Updates build and push over the network (`gok -i gok update`); there is no hostname override, so the device's DHCP name `gok` must resolve before that works.",
+  "`gok update` was proven end to end on 2026-10-26 (41 MiB root + 71 MiB boot pushed, device rebooted): scripts/task/gok.sh builds via `nix shell nixpkgs#gokrazy nixpkgs#go`. The instance Hostname `gok` resolves only through the `address=/gok/` lines in hosts/frieren/dns.nix, so a frieren deploy is required before the name works.",
+  "breakglass is installed but intentionally not started at boot (gokrazy's own rule); start it from the web UI before `ssh` into the appliance will answer.",
 ]
+
+[hosts.gok.network]
+lan_ip = "192.168.3.4"
+tailscale = false
 
 [hosts.minyx]
 hostname = "minyx"

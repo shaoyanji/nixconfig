@@ -447,10 +447,33 @@ in {
         description = "Tailnet-only HTTPS front for ${m.title}";
         after = ["tailscaled.service"] ++ m.requires;
         wants = ["tailscaled.service"] ++ m.requires;
+        # `After=` is ordering, not readiness: at boot tailscaled is still
+        # NoState, `tailscale serve` exits 1 exactly once, and the unit then
+        # stays failed with no retry — every mount on delphi was down until a
+        # manual restart (2026-10-26). Wait for BackendState=Running, and
+        # re-assert the mount when tailscaled restarts, because serve
+        # configuration is per-process state rather than a file.
+        partOf = ["tailscaled.service"];
         wantedBy = ["multi-user.target"];
+        unitConfig.StartLimitIntervalSec = 0;
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
+          TimeoutStartSec = 150;
+          ExecStartPre = pkgs.writeShellScript "tailscale-serve-wait" ''
+            set -euo pipefail
+            state=NoState
+            for _ in $(seq 1 60); do
+              state=$(${config.services.tailscale.package}/bin/tailscale status --json 2>/dev/null |
+                ${pkgs.jq}/bin/jq -r '.BackendState // "NoState"' 2>/dev/null || echo NoState)
+              if [ "$state" = Running ]; then
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "tailscale serve: tailscaled not Running after 120s (last: $state)" >&2
+            exit 1
+          '';
           ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --bg --https=${toString m.port} ${m.upstream}";
           ExecStop = "${config.services.tailscale.package}/bin/tailscale serve --https=${toString m.port} off";
         };

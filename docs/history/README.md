@@ -8,7 +8,6 @@ Superseded narrative, kept for provenance. **Nothing here is current truth.**
 | `todo-2026-10.md` | The long TODO/HANDOFF hybrid: HC-1…HC-8 delivery notes, fleet optimizations, follow-up queues | `TODO.md` + `HANDOFF.md` (bounded queues), `ARCHITECTURE.md` (proposals) |
 | `handoff-2026-10.md` | The 784-line strategic handoff: host disambiguation, audit findings, completed maintenance | `HANDOFF.md` (queue) |
 | `handoff-dsh-remote-2026-10-21.md` | The unfinished remote-harness launcher: what worked, what was unproven | `modules/user/ai/dsh-launcher.nix` (the launcher itself) + the 2026-10-21 `AUDIT.md` entry |
-| `handoff-minyx-build-2026-10-26.md` | The minyx sd-image trim and the build left running on delphi: what left the closure, what the eval gate does not force, how to read the result | `hosts/minyx/*` (the config) + that build's log |
 
 Rules:
 

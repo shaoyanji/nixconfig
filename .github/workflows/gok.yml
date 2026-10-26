@@ -1,0 +1,85 @@
+name: gok
+
+# The appliance's Go build belongs on a runner, not on frieren: compiling there
+# saturates the disk of the host that answers DNS for the fleet. A push that
+# touches the instance materialises it with the same wrapper the operator uses
+# (scripts/task/gok.sh), then sends it over the tailnet to the appliance.
+on:
+  push:
+    paths:
+      - hosts/gok/config.json
+      - scripts/task/gok.sh
+      - .github/workflows/gok.yml
+  workflow_dispatch:
+    inputs:
+      insecure:
+        description: "First push to a device whose TLS certificate is not pinned yet"
+        type: boolean
+        default: false
+
+concurrency:
+  group: gok
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      # `gok.sh` derives the breakglass key list from modules/config/authorized-keys.nix,
+      # so the runner needs Nix to evaluate it. Pipe operators are required to parse.
+      - uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "^1.24"
+
+      - name: Install the gok CLI
+        run: |
+          go install github.com/gokrazy/tools/cmd/gok@main
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      # The appliance is only reachable on the tailnet (its Hostname is the
+      # tailnet FQDN), so the runner joins as an ephemeral tagged node.
+      - uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      # Go's caches are what take the build from minutes to seconds; they live
+      # under the wrapper's instance cache so this key covers exactly what gok uses.
+      - name: Cache the Go build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/nixconfig-gok/go/build
+            ~/.cache/nixconfig-gok/go/mod
+            ~/.cache/nixconfig-gok/gok/builddir
+          key: gok-go-${{ hashFiles('hosts/gok/config.json') }}-${{ github.run_id }}
+          restore-keys: |
+            gok-go-${{ hashFiles('hosts/gok/config.json') }}-
+            gok-go-
+
+      - name: Build and push
+        env:
+          GOK_HTTP_PASSWORD: ${{ secrets.GOK_HTTP_PASSWORD }}
+          GOK_BIN: gok
+        run: |
+          set -eu
+          if [ -z "${GOK_HTTP_PASSWORD:-}" ]; then
+            echo "GOK_HTTP_PASSWORD is not set — add the gokrazy web password as a repository secret" >&2
+            exit 1
+          fi
+          if [ "${{ inputs.insecure }}" = "true" ]; then
+            ./scripts/task/gok.sh update --insecure
+          else
+            ./scripts/task/gok.sh update
+          fi

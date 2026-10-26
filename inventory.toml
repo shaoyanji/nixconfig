@@ -787,14 +787,15 @@ constraints = ["Preserved host; do not target for live deployment."]
 # ------------------------------------------------------------------------------
 [hosts.minyx]
 hostname = "minyx"
-status = "preserved"
-status_detail = "Preserved for Raspberry Pi 3 Model B impermanent edge computing patterns; not actively deployed."
+status = "wip"
+status_detail = "Being rebuilt as the fleet's tunnel/jump box on a USB system disk (sd-image + extlinux); image built, not yet booted."
 kind = "nixos"
 arch = "aarch64-linux"
-role = "Raspberry Pi 3 Model B Edge Node"
+role = "Raspberry Pi 3 Model B Tunnel & Jump Box"
 notes = [
   "Board is a Raspberry Pi 3 Model B v1.2 (measured 2026-10-26), not a 3B+: 4x Cortex-A53 at 1.2 GHz, 100 Mbit NIC, 2.4 GHz-only Wi-Fi. Any VRRP/DNS failover work must use the wired interface.",
   "Measured 2026-10-26 on an interim DietPi boot: vcgencmd get_throttled = 0x50000 (under-voltage AND throttling have occurred). A 5 V/2.5 A supply is required before this board takes an always-on role.",
+  "Repurposed 2026-10-26 as the fleet tunnel/jump box: USB system disk via sd-image-aarch64 (OTP USB boot), no Home Manager, no desktop, no Docker. btrfs on the root is a deliberate later phase — it swaps sdImage.rootFilesystemCreator rather than the firmware path.",
 ]
 category = "embedded"
 desktop_environment = "headless"
@@ -814,17 +815,17 @@ tailscale_hostname = "minyx"
 ssh_alias = "minyx"
 
 [hosts.minyx.software]
-module_chain = "globalModulesContainers + impermanence"
-impermanence = true
-key_services = ["extlinux bootloader", "custompi kernel optimizations", "tmpfs /tmp"]
-traits = ["raspberry-pi-3", "1gb-ram-limit", "sd-card-wear-sensitive", "impermanence"]
+module_chain = "globalModules + determinate-nix + sops + raspberry-pi-3 (no home-manager)"
+impermanence = false
+key_services = ["key-only sshd", "Tailscale", "persistent ssh forwards (systemd units)", "gh codespaces wrapper"]
+traits = ["raspberry-pi-3", "1gb-ram-limit", "usb-boot", "no-home-manager", "tunnel-box"]
 
 [hosts.minyx.persona]
-title = "Edge Sensor & Minimalist IoT Guardian (Preserved)"
-system_prompt_hint = "You represent embedded Raspberry Pi 3 configurations under strict 1 GB RAM constraints."
+title = "Fleet Tunnel & Jump Box"
+system_prompt_hint = "You are a low-power ARM jump host: you hold ssh tunnels, forward ports to the tailnet and run gh codespaces. You compile nothing and hold no data of value."
 compute_tier = "strictly-constrained-1gb"
-allowed_tasks = ["Configuration pattern reference"]
-constraints = ["Preserved host; do not target for live deployment."]
+allowed_tasks = ["SSH jump host and port forwarding", "GitHub Codespaces access", "Reaching delphi from anywhere"]
+constraints = ["aarch64 closures are built on delphi and substituted; never compile here.", "1 GiB RAM: no home-manager, no desktop environment, no Docker.", "The system disk is USB; state lives in the flake, not on the stick."]
 
 [hosts.kali]
 hostname = "kali"

@@ -5,6 +5,7 @@
 }: let
   inherit
     (moduleSets)
+    globalModules
     globalModulesContainers
     globalModulesDemo
     globalModulesHome
@@ -242,12 +243,16 @@ in {
   minyx = {
     kind = "nixos";
     system = "aarch64-linux";
+    # Its own chain, not globalModulesContainers: that one imports noDE.nix,
+    # which wires Home Manager — for a host deliberately built without it — and
+    # carries the impermanence/disko pair that an sd-image root filesystem
+    # makes meaningless. The tunnel role needs native NixOS options only.
     modules =
-      globalModulesContainers
+      globalModules
       ++ [
+        ../modules/global/determinate-nix.nix
+        inputs.sops-nix.nixosModules.sops
         ../hosts/minyx/configuration.nix
-        ../hosts/minyx/custompi.nix
-        inputs.impermanence.nixosModules.impermanence
         inputs.nixos-hardware.nixosModules.raspberry-pi-3
       ];
   };

@@ -58,6 +58,17 @@
       # Qwen3-TTS speech server on eisen (OpenAI-compatible /v1/audio/speech);
       # nginx vhost on :80, tailscale serve :8444.
       "address=/tts.lan/100.119.172.99"
+      # The gokrazy appliance has no LAN A record: its name lives in the
+      # tailnet. A conditional forward asks MagicDNS (served by the local
+      # tailscaled) instead of pinning an address, so `gok update` resolves the
+      # instance Hostname and the answer follows the node wherever it moves.
+      "server=/gok/100.100.100.100"
+      # Whole tailnet zone: every `*.cloudforest-kardashev.ts.net` name is
+      # answered by MagicDNS, which follows the node. Without this the fleet
+      # resolver returns NXDOMAIN for tailnet FQDNs, so any browser on the LAN
+      # gets "Server Not Found" for frieren.<tailnet>.ts.net (measured
+      # 2026-10-26: MagicDNS answered, pihole did not).
+      "server=/cloudforest-kardashev.ts.net/100.100.100.100"
       # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
       # Answer ONLY PXE clients on the LAN; never lease IPs — the Huawei router
       # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode
@@ -133,9 +144,67 @@
     "::1"
   ];
 
-  # pihole-ftl references tailscale0 interface, must wait for tailscaled
+  # pihole-ftl references tailscale0 interface, must wait for tailscaled.
+  # Restart=always: the resolver is the one unit whose death every client feels,
+  # so a crash recovers itself instead of waiting for a human to notice.
   systemd.services.pihole-ftl = {
     after = ["tailscaled.service"];
+    serviceConfig.Restart = lib.mkDefault "always";
+  };
+
+  # --- resolver watchdog (2026-10-26) ---------------------------------------
+  # This host IS the fleet resolver: while pihole-ftl was stopped by a switch
+  # the whole LAN got "Server Not Found" and nothing said so. The watchdog asks
+  # the resolver the question a client asks, and restarts it after three
+  # consecutive failures — seconds of degradation instead of an outage that waits
+  # for a human. It refuses to act during a switch, where systemd is already
+  # starting/stopping the unit and a second actor would race it.
+  systemd.services.dns-resolver-watchdog = {
+    description = "Restart the local resolver when it stops answering DNS";
+    wantedBy = ["multi-user.target"];
+    after = [
+      "pihole-ftl.service"
+      "unbound.service"
+    ];
+    wants = ["pihole-ftl.service"];
+    restartIfChanged = false;
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = 10;
+      Nice = 10;
+      ExecStart = pkgs.writeShellScript "dns-resolver-watchdog" ''
+        set -u
+        # `dig` exits 0 on NXDOMAIN, so the answer must be non-empty: an empty
+        # reply is exactly the "Server Not Found" a client sees.
+        probe() {
+          [ -n "$(${pkgs.dnsutils}/bin/dig +short +time=2 +tries=1 @127.0.0.1 "$1" A 2>/dev/null)" ]
+        }
+        fail=0
+        while :; do
+          if probe vault.frieren.lan; then
+            fail=0
+            # Upstream reachability is a different fault: restarting the
+            # resolver cannot fix it, so it is only reported.
+            probe github.com || logger -t dns-watchdog "upstream probe failed (no restart)"
+          else
+            fail=$((fail + 1))
+            logger -t dns-watchdog "probe failed ($fail/3)"
+            if [ "$fail" -ge 3 ]; then
+              if systemctl is-active --quiet nixos-rebuild-switch-to-configuration.service; then
+                logger -t dns-watchdog "switch in progress — leaving the unit alone"
+              else
+                logger -t dns-watchdog "resolver not answering — restarting pihole-ftl"
+                systemctl restart pihole-ftl || true
+              fi
+              fail=0
+              sleep 10
+            fi
+          fi
+          sleep 5
+        done
+      '';
+    };
   };
   systemd.services.pihole-ftl-setup = {
     after = [

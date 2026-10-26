@@ -34,7 +34,17 @@ in {
     # usage hint instead; actual pastes are /<name> and keep being served above.
     # The hint is a file the server sends verbatim: no escaped-newline body in
     # the config, and the wording can be edited without touching nginx syntax.
+    # `alias` to a FILE inside an exact location whose URI ends in `/` runs the
+    # index module and asks for "<file>index.html", which nginx answers with a
+    # 500 (measured 2026-10-26: paste.frieren.lan was the one dead card on the
+    # portal). Rewrite internally to a non-directory URI so the alias target is
+    # served verbatim; the browser URL stays `/`.
     locations."= /" = {
+      extraConfig = ''
+        rewrite ^ /_notice.txt last;
+      '';
+    };
+    locations."= /_notice.txt" = {
       alias = ./paste-notice.txt;
       extraConfig = ''
         default_type text/plain;

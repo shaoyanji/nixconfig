@@ -158,21 +158,32 @@ tasks:
   infra:switch:*:
     desc: Switch current host using a rebuild command (nixos|darwin)
     summary: >
-      NO pre-switch eval. The rebuild evaluates the host and builds the closure
-      itself; `task checks:*` or `warm-host.sh --check` first is a second
-      whole-toplevel evaluation for no extra proof. Routing is answered in CI
-      (`checks:build:route`), not on every switch. The exception is the boot, which
-      a switch cannot give itself: on nixos this runs `checks:boot:self` first, so a
-      stage-1 that would leave the box un-diagnosable fails here instead of at boot.
-      BOOT=0 skips it. ROUTE_CHECK=1 opts into the routing report; NOM=1 pipes
-      through nom. Vars: OS (wildcard).
+      NO pre-switch eval: the rebuild evaluates and builds the closure, and a
+      boot test runs first on nixos (BOOT=0 skips). A host whose `hosts/<host>/`
+      `dns.nix` declares `profiles.dnsFailover` refuses unless REMOTE_BUILD=1
+      (builds with max-jobs = 0) — a resolver must not compile for itself, see the
+      resolver-never-breaks note — and after its switch the task proves the
+      resolver answers before exit 0. ROUTE_CHECK=1, NOM=1. Vars: OS (wildcard).
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
       - |
         set -o pipefail
+        host=$(hostname)
+        resolver=0
+        if [ -f "hosts/$host/dns.nix" ] && grep -q "profiles.dnsFailover" "hosts/$host/dns.nix"; then
+          resolver=1
+        fi
+        if [ "$resolver" = "1" ] && [ "${REMOTE_BUILD:-0}" != "1" ]; then
+          echo "infra:switch [$host] REFUSED — this host is a fleet DNS resolver." >&2
+          echo "  Building here compiles a full closure on the machine that answers DNS for" >&2
+          echo "  every client; measured 2026-10-26 that aborted the boot test and left" >&2
+          echo "  pihole-ftl stopped mid-activation (LAN-wide 'Server Not Found')." >&2
+          echo "  Build off-host instead:  REMOTE_BUILD=1 task infra:switch:{{.OS}}" >&2
+          exit 1
+        fi
         if [ "${ROUTE_CHECK:-0}" = "1" ]; then
-          bash scripts/task/warm-host.sh --check --best-effort "$(hostname)"
+          bash scripts/task/warm-host.sh --check --best-effort "$host"
         fi
         # Default ON for nixos: a headless box that will not come back cannot be
         # diagnosed from anywhere, and the boot is the only pre-flight that runs the
@@ -180,10 +191,36 @@ tasks:
         if [ "${BOOT:-auto}" != "0" ] && [ "{{.OS}}" = "nixos" ]; then
           bash scripts/task/boot-check.sh --self || exit $?
         fi
-        if [ "${NOM:-0}" = "1" ]; then
-          sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname) 2>&1 | nom
+        if [ "${REMOTE_BUILD:-0}" = "1" ]; then
+          # Builders only: no derivation may compile on this box.
+          if [ "${NOM:-0}" = "1" ]; then
+            sudo env NIX_CONFIG="max-jobs = 0" {{.OS}}-rebuild switch --flake .?submodules=1#"$host" 2>&1 | nom
+          else
+            sudo env NIX_CONFIG="max-jobs = 0" {{.OS}}-rebuild switch --flake .?submodules=1#"$host"
+          fi
         else
-          sudo {{.OS}}-rebuild switch --flake .?submodules=1#$(hostname)
+          if [ "${NOM:-0}" = "1" ]; then
+            sudo {{.OS}}-rebuild switch --flake .?submodules=1#"$host" 2>&1 | nom
+          else
+            sudo {{.OS}}-rebuild switch --flake .?submodules=1#"$host"
+          fi
+        fi
+        # A switch restarts the resolver. Prove it answers before claiming success.
+        if [ "$resolver" = "1" ]; then
+          ok=0
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
+            if dig +short +time=2 +tries=1 @127.0.0.1 vault.frieren.lan A 2>/dev/null | grep -q .; then
+              ok=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ok" != "1" ]; then
+            echo "infra:switch [$host] FAILED — the local resolver is not answering." >&2
+            echo "  recover now:  sudo systemctl start pihole-ftl" >&2
+            exit 1
+          fi
+          echo "infra:switch [$host] resolver answering after switch"
         fi
 
   infra:boot:*:

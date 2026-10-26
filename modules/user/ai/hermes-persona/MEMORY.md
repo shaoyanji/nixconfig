@@ -217,3 +217,21 @@ Environment / tool facts (not user identity — see USER.md for persona/preferen
 2. To make an official skill with a wrapper: define `SKILL.md` with trigger/description; add a `scripts/` wrapper that validates inputs (check `--help` before invoking), loads env, builds evidence files (not strings), and calls the underlying binary with `--dry-run` first.
 3. Never invent invocation shapes — read the wrapper source (`cat /path/to/wrapper`) and the underlying binary's `--help` before writing the skill.
 4. Log results back: `jev_called`, `transport`, `probability`, `margin`, model used, and whether the user overrode.
+
+---
+
+## Fleet Work In Flight (2026-10-26)
+
+State, not procedure. Procedure lives in `.agents/deploy/hosts/<host>.md`.
+
+- **minyx** (Pi 3B, jump box): config committed `e57537f6`. `sdImage` build runs on
+  delphi — log `~/minyx-sdimage.log`, `EXIT=` is the last marker. Trimmed to the
+  generic sd-image (no installation-CD profile), `gitMinimal`, and
+  `enableRedistributableFirmware = false`; the package closure measured
+  1.31 GB → 0.85 GB. `checks:host MODE=eval` does **not** force option values, so
+  only a build catches duplicate definitions.
+- **gok** (gokrazy on the spare SD card, arm64 Pi 3B): written to `/dev/sdc` on
+  stark with `gok overwrite --full` from instance `~/gokrazy/gok`. HTTP password
+  is in `modules/secrets.yaml` at `gokrazy.gok.http_password`. Fleet updates run
+  where the instance lives: `ssh stark` then `nix shell nixpkgs#gokrazy -c gok -i gok update`.
+  `gok edit` changes the package list; `gok update` pushes over the network.

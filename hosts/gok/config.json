@@ -32,7 +32,8 @@
         },
         "tailscale.com/cmd/tailscale": {
             "CommandLineFlags": [
-                "up"
+                "up",
+                "--hostname=gok"
             ]
         }
     },

@@ -168,13 +168,30 @@ in {
           "192.168.3.25"
           "frieren.local"
         ];
+        # 443 as well as 80, and both DEFAULT: nginx picks the first server
+        # block per port for a name it does not know, so without this an
+        # unknown Host (the tailnet FQDN, vault.frieren.lan over the HTTPS a
+        # browser auto-upgrades to) silently lands on whichever service vhost
+        # happens to be serialized first — 2026-10-26 that served
+        # audiobookshelf for frieren.<tailnet>.ts.net.
         listen = [
           {
             addr = "0.0.0.0";
             port = 80;
             extraParameters = ["default_server"];
           }
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+            extraParameters = ["default_server"];
+          }
         ];
+        # addSSL is what makes the module emit ssl_certificate; the explicit
+        # 443 listen above is what carries default_server.
+        addSSL = true;
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
         locations."/" = {
           root = landingPage;
         };

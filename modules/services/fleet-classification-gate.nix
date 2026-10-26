@@ -84,7 +84,7 @@ in {
               exec ${config.nix.package}/bin/nix build \
                 --builders "" -L --no-link \
                 "${cfg.flakeRef}#fleetHostChecks.${system}.${host}"
-            ''}/bin/fleet-classification-check-${host}";
+            ''}";
             TimeoutStartSec = toString cfg.timeout;
             Nice = 10;
             IOSchedulingClass = "idle";
@@ -110,7 +110,7 @@ in {
                 exit 1
               fi
               echo "${toString (builtins.length hosts)} active host(s): module system + assertions pass"
-            ''}/bin/fleet-classification-verdict";
+            ''}";
           };
         };
       };

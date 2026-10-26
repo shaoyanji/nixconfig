@@ -3995,8 +3995,57 @@
         web UI.
 
         **Exit.** `gok update` works by name from any fleet host — which needs the
-        `address=/gok/` lines in hosts/frieren/dns.nix deployed — and the flash
-        path no longer depends on one machine's instance directory.
+        `server=/gok/100.100.100.100` line in hosts/frieren/dns.nix deployed — and
+        the flash path no longer depends on one machine's instance directory.
+      '';
+    };
+    resolver-never-breaks = {
+      title = "The fleet resolver survives its own host's rebuilds";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      priority = "P1";
+      date = "2026-10-26";
+      summary = "frieren answers DNS for the LAN and the tailnet; a local switch stopped pihole-ftl mid-activation and every client got 'Server Not Found'. A watchdog restarts it in seconds, and the switch task now refuses to build on a resolver host unless the closure comes from a builder.";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["hosts/frieren/dns.nix" "hosts/frieren/reverse-proxy.nix" "taskfiles/infra.yml"];
+        docs = [".agents/deploy/hosts/frieren.md"];
+        tasks = ["infra:switch:nixos"];
+      };
+      body = ''
+        **What broke (2026-10-26).** A local `nixos-rebuild switch` on frieren was
+        aborted by the IO watchdog and then failed on a stale
+        `mnt-burgernas-peachcable.mount`; pihole-ftl had already been stopped for
+        the activation, so the LAN had no resolver. Two further faults were
+        exposed, not caused: the portal vhost only listened on :80, so any
+        unmatched `https://` name landed on the first 443 block (Audiobookshelf);
+        and pihole answered NXDOMAIN for every `*.cloudforest-kardashev.ts.net`
+        name, so tailnet URLs never resolved for a LAN browser.
+
+        **Four fixes, in order of what they protect.**
+        - pihole forwards the whole tailnet zone to MagicDNS
+          (`server=/cloudforest-kardashev.ts.net/100.100.100.100`), so tailnet
+          FQDNs resolve for any client of the fleet resolver and follow the node.
+        - the portal owns :443 as `default_server` with the LAN wildcard cert, so
+          an unknown Host (the tailnet FQDN, `vault.frieren.lan` upgraded to
+          https) gets the portal instead of whichever vhost serialized first.
+        - `dns-resolver-watchdog` asks 127.0.0.1 the question a client asks and
+          restarts pihole-ftl after three failed probes, standing down while a
+          switch is in progress; `pihole-ftl` itself is `Restart=always`.
+        - `infra:switch:<os>` refuses on a host whose `hosts/<host>/dns.nix`
+          declares `profiles.dnsFailover` unless `REMOTE_BUILD=1` (builds with
+          `max-jobs = 0`), and after any switch there proves the resolver answers
+          before exiting 0.
+
+        **Proven.** 15/15 portal links returned 200 through both entry points
+        (`192.168.3.25` and `frieren.<tailnet>.ts.net`), each resolving through
+        pihole; the guard refuses in 0.1 s before any evaluation; the watchdog has
+        no false positives against live names and fails a nonexistent one.
+
+        **Exit.** A rebuild of frieren is a rebuild of a peer, not of the fleet's
+        resolver: either the second resolver comment in hosts/frieren/dns.nix
+        becomes true (fern runs `role = "secondary"`) or the resolver moves off the
+        host that also runs the storage stack.
       '';
     };
     open-frieren-offload = {

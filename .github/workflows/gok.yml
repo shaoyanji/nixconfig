@@ -99,22 +99,49 @@ jobs:
             gok-go-${{ hashFiles('hosts/gok/config.json') }}-
             gok-go-
 
-      - name: Build and push
+      # Two steps, not one: `gok update` builds and pushes in the same process,
+      # so its log cannot say which half is talking and a stall looks identical
+      # to a slow build. Here the build is bounded on its own and the artifact is
+      # kept, so a push failure costs a retry rather than another 15 minutes.
+      - name: Build the appliance artifact
+        id: build
         env:
           GOK_HTTP_PASSWORD: ${{ secrets.GOK_HTTP_PASSWORD }}
+          # Optional. TS_AUTH_KEY is the runner's own ephemeral key and must not be
+          # baked into the appliance, so this is a separate secret; empty means the
+          # image carries no auth key (fine for updates, the node key persists in
+          # /perm) and the manifest says so.
+          GOK_TAILSCALE_AUTH_KEY: ${{ secrets.GOK_TAILSCALE_AUTH_KEY }}
           GOK_BIN: gok
+          GOK_BUILD_TIMEOUT: "900"
         run: |
           set -eu
           if [ -z "${GOK_HTTP_PASSWORD:-}" ]; then
             echo "GOK_HTTP_PASSWORD is not set — add the gokrazy web password as a repository secret" >&2
             exit 1
           fi
-          # Bounded on purpose: `gok update` waits for the appliance to accept the
-          # image, reboot and come back. Without a timeout that wait is unbounded —
-          # a run sat in this step for 80 minutes with no log to show for it, which
-          # is a black hole rather than a failure.
-          if [ "${{ inputs.insecure }}" = "true" ]; then
-            timeout 900 ./scripts/task/gok.sh update --insecure
-          else
-            timeout 900 ./scripts/task/gok.sh update
-          fi
+          tarball=$(timeout 1200 ./scripts/task/gok.sh build "$RUNNER_TEMP/gok")
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+          ls -lh "$RUNNER_TEMP/gok"
+          {
+            echo "### appliance artifact"
+            echo '```'
+            jq . "$RUNNER_TEMP/gok/manifest.json"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gok-artifact
+          path: ${{ steps.build.outputs.tarball }}
+          retention-days: 14
+
+      # The push writes three streams and waits for the device to report the build
+      # timestamp it just booted, so it is bounded too — 900 s covers a 132 MB
+      # transfer plus one reboot (measured over the tailnet: 132 s).
+      - name: Push the artifact to the appliance
+        env:
+          GOK_HTTP_PASSWORD: ${{ secrets.GOK_HTTP_PASSWORD }}
+        run: |
+          set -eu
+          timeout 900 ./scripts/task/gok.sh push "$RUNNER_TEMP/gok" </dev/null

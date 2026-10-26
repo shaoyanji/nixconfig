@@ -1,37 +1,29 @@
 name: gok
 
-# BUILD ONLY. The runner compiles the appliance and publishes the three streams
-# `gok update` would have sent; it never contacts the device. That split is what
-# the earlier build-and-push job could not survive: `gok update` builds and
-# pushes in one process, so a runner that could not finish the push showed a
-# black hole instead of a build.
-#
-# The artifact is the same one `scripts/task/gok.sh build` makes locally
-# (root.squashfs + boot.fat + mbr.img + manifest.json + SHA256SUMS), dropped on
-# delphi over Taildrop because the appliance image carries baked credentials
-# (wifi PSK, tailscale auth key, update password) and a public URL is the wrong
-# place for it. Deploy is then `task infra:gok:deploy`, which fetches and streams
-# it with curl — no Go, no gok, no compile at deploy time.
+# The appliance's Go build belongs on a runner, not on frieren: compiling there
+# saturates the disk of the host that answers DNS for the fleet. A push that
+# touches the instance materialises it with the same wrapper the operator uses
+# (scripts/task/gok.sh), then sends it over the tailnet to the appliance.
 on:
   push:
     paths:
-      - hosts/gok/instance.nix
-      - modules/services/gokrazy.nix
+      - hosts/gok/config.json
       - scripts/task/gok.sh
       - .github/workflows/gok.yml
   workflow_dispatch:
+    inputs:
+      insecure:
+        description: "First push to a device whose TLS certificate is not pinned yet"
+        type: boolean
+        default: false
 
 concurrency:
   group: gok
   cancel-in-progress: false
 
 jobs:
-  build:
+  push:
     runs-on: ubuntu-latest
-    env:
-      # Destination for Taildrop. delphi is the artifact host: cloud uplink for
-      # the publish, and a tailnet route for whoever fetches it back.
-      ARTIFACT_HOST: delphi.cloudforest-kardashev.ts.net
     steps:
       # `token:` is load-bearing: the secrets submodule is private, and
       # `persist-credentials: false` alone leaves the submodule clone anonymous —
@@ -42,9 +34,8 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GH_PAT }}
 
-      # `gok.sh` renders hosts/gok/instance.nix through modules/services/gokrazy.nix
-      # and derives the breakglass key list from modules/config/authorized-keys.nix,
-      # so the runner needs Nix. Pipe operators are required to parse the tree.
+      # `gok.sh` derives the breakglass key list from modules/config/authorized-keys.nix,
+      # so the runner needs Nix to evaluate it. Pipe operators are required to parse.
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
@@ -59,10 +50,14 @@ jobs:
           go install github.com/gokrazy/tools/cmd/gok@main
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
-      # The appliance is only reachable on the tailnet, and so is the artifact
-      # host. Auth KEY, not an OAuth client: one value from Settings -> Keys
-      # (tag `tag:ci`, ephemeral, pre-approved), and the runner's node disappears
-      # when the job ends. An OAuth client works too if one is ever preferred.
+      # The appliance is only reachable on the tailnet (its Hostname is the
+      # tailnet FQDN), so the runner joins as an ephemeral tagged node.
+      # Auth KEY, not an OAuth client. Both work, but an auth key is a single
+      # Settings -> Keys -> Generate value with the same effect here and needs no
+      # separate client registration; `tag:ci` + ephemeral means the runner's node
+      # disappears when the job ends. If an OAuth client is ever preferred, swap
+      # these two lines back to oauth-client-id/oauth-secret — the action accepts
+      # either.
       - uses: tailscale/github-action@v3
         with:
           authkey: ${{ secrets.TS_AUTH_KEY }}
@@ -77,60 +72,27 @@ jobs:
             ~/.cache/nixconfig-gok/go/build
             ~/.cache/nixconfig-gok/go/mod
             ~/.cache/nixconfig-gok/gok/builddir
-          key: gok-go-${{ hashFiles('hosts/gok/instance.nix') }}-${{ github.run_id }}
+          key: gok-go-${{ hashFiles('hosts/gok/config.json') }}-${{ github.run_id }}
           restore-keys: |
-            gok-go-${{ hashFiles('hosts/gok/instance.nix') }}-
+            gok-go-${{ hashFiles('hosts/gok/config.json') }}-
             gok-go-
 
-      # `gok overwrite --root/--boot/--mbr`, not `update`: it stops after writing
-      # the files instead of streaming them to a device (gok's `newInstallation`
-      # returns ahead of logicUpdate), which is what keeps this job device-free.
-      - name: Build the appliance artifact
-        id: build
+      - name: Build and push
         env:
           GOK_HTTP_PASSWORD: ${{ secrets.GOK_HTTP_PASSWORD }}
-          # Optional. TS_AUTH_KEY is the runner's own ephemeral tag:ci key and must
-          # NOT be baked into the appliance, so this is a separate secret holding
-          # the appliance's key. Empty = the image carries no auth key (fine for an
-          # update, since the node key persists in /perm) and the manifest says so.
-          GOK_TAILSCALE_AUTH_KEY: ${{ secrets.GOK_TAILSCALE_AUTH_KEY }}
           GOK_BIN: gok
         run: |
           set -eu
           if [ -z "${GOK_HTTP_PASSWORD:-}" ]; then
-            echo "GOK_HTTP_PASSWORD is not set — run `task infra:secrets:form:gok`" >&2
+            echo "GOK_HTTP_PASSWORD is not set — add the gokrazy web password as a repository secret" >&2
             exit 1
           fi
-          # Bounded on purpose: the build is minutes, and an unbounded step is how
-          # the old push job sat silent for 80 minutes.
-          tarball=$(timeout 1200 ./scripts/task/gok.sh build "$RUNNER_TEMP/gok")
-          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
-          echo "### appliance artifact" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          jq . "$RUNNER_TEMP/gok/manifest.json" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-
-      # Always keep a copy in GitHub: it survives a broken tailnet ACL, and it is
-      # what `task infra:gok:fetch` can fall back to by URL.
-      - uses: actions/upload-artifact@v4
-        with:
-          name: gok-artifact
-          path: ${{ steps.build.outputs.tarball }}
-          retention-days: 14
-
-      - name: Publish to the artifact host (Taildrop)
-        run: |
-          set -eu
-          tarball='${{ steps.build.outputs.tarball }}'
-          # `tailscale file cp` talks to tailscaled's LocalAPI socket, which the
-          # action owns as root while this step runs as `runner` — hence the two
-          # attempts rather than one guess.
-          if tailscale file cp "$tarball" "$ARTIFACT_HOST:" ||
-             sudo -n tailscale file cp "$tarball" "$ARTIFACT_HOST:"; then
-            echo "queued on $ARTIFACT_HOST: $(basename "$tarball")"
-            echo "deploy from a fleet host with: task infra:gok:deploy" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+          # Bounded on purpose: `gok update` waits for the appliance to accept the
+          # image, reboot and come back. Without a timeout that wait is unbounded —
+          # a run sat in this step for 80 minutes with no log to show for it, which
+          # is a black hole rather than a failure.
+          if [ "${{ inputs.insecure }}" = "true" ]; then
+            timeout 900 ./scripts/task/gok.sh update --insecure
+          else
+            timeout 900 ./scripts/task/gok.sh update
           fi
-          echo "::error::Taildrop to $ARTIFACT_HOST failed. Either the tailnet ACL does not allow tag:ci -> $ARTIFACT_HOST file sends (console -> Access controls -> grants, capability tailscale.com/cap/file), or Taildrop is disabled for the tailnet."
-          echo "The GitHub artifact above is intact: fetch it with \`gh run download -n gok-artifact\` and push with \`bash scripts/task/gok.sh push <tarball>\`." >&2
-          exit 1

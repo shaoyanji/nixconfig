@@ -14,6 +14,17 @@
   tlsCertificate = ../../modules/config/tls/frieren-lan-wildcard.pem;
   tlsCertificateKey = "/run/secrets/tls-frieren-wildcard-key";
 
+  # The tailnet FQDN needs its own certificate: a browser pointed at
+  # `frieren.<tailnet>.ts.net` rejects the `*.frieren.lan` wildcard (name
+  # mismatch), which is why the tailnet URL looked unreachable while the LAN one
+  # worked. `tailscale cert` issues a publicly trusted one; the renewal unit below
+  # refreshes it before the 90-day expiry, and the key stays group-readable for
+  # the nginx user.
+  tailnetName = "frieren.cloudforest-kardashev.ts.net";
+  tailnetCertDir = "/var/lib/tailscale-certs";
+  tailnetCertificate = "${tailnetCertDir}/${tailnetName}.crt";
+  tailnetCertificateKey = "${tailnetCertDir}/${tailnetName}.key";
+
   # ONE instance of the fleet site. It reads the knowledge graph and every note
   # at eval time, so importing it per location (it used to be imported twice in
   # this file) evaluated the same 1.9 k-line module twice for identical output.
@@ -146,6 +157,41 @@ in {
     };
   };
 
+  systemd.services.tailscale-cert-frieren = {
+    description = "Issue/renew the Tailscale TLS certificate for ${tailnetName}";
+    after = [
+      "tailscaled.service"
+      "network-online.target"
+    ];
+    wants = [
+      "tailscaled.service"
+      "network-online.target"
+    ];
+    before = ["nginx.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      set -eu
+      mkdir -p ${tailnetCertDir}
+      ${config.services.tailscale.package}/bin/tailscale cert \
+        --cert-file ${tailnetCertificate} \
+        --key-file ${tailnetCertificateKey} \
+        ${tailnetName}
+      chown root:nginx ${tailnetCertificateKey}
+      chmod 640 ${tailnetCertificateKey}
+      chmod 644 ${tailnetCertificate}
+    '';
+  };
+
+  systemd.timers.tailscale-cert-frieren = {
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "daily";
+      Persistent = true;
+      RandomizedDelaySec = "1h";
+    };
+  };
+
   services.nginx = {
     enable = true;
     recommendedOptimisation = true;
@@ -156,6 +202,10 @@ in {
       proxy_headers_hash_max_size 1024;
       proxy_headers_hash_bucket_size 128;
     '';
+
+    # Fetch/renew the tailnet certificate and hand nginx a readable key. A
+    # missing certificate would stop nginx starting at all, so the unit runs
+    # before it and is wanted by it.
 
     virtualHosts = {
       # Default portal / landing page
@@ -457,6 +507,34 @@ in {
           extraConfig = ''
             proxy_connect_timeout 2s;
             proxy_read_timeout 5s;
+          '';
+        };
+      };
+
+      # The tailnet entry point. Same portal, but with the certificate that
+      # actually covers this name; proxying to loopback keeps one copy of the
+      # portal's locations instead of a second, drifting declaration.
+      ${tailnetName} = {
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
+        ];
+        # addSSL is what makes the module emit ssl_certificate (setting the
+        # paths alone emits nothing, and nginx then handshakes with no cert).
+        addSSL = true;
+        sslCertificate = tailnetCertificate;
+        sslCertificateKey = tailnetCertificateKey;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:80";
+          proxyWebsockets = true;
+          # No `proxy_set_header Host` here: the module's recommended-headers
+          # include already sets it, and a second one makes nginx send two Host
+          # headers, which the upstream answers with 400.
+          extraConfig = ''
+            client_max_body_size 500M;
           '';
         };
       };

@@ -43,7 +43,7 @@
   hostInventory = import ./host-inventory.nix {inherit inputs moduleSets self;};
   # Fleet-wide gates (per-host eval checks + the all-in-one aggregate). One binding
   # because both outputs come from the same computation.
-  fleetCtl = import ./fleet-checks.nix {inherit lib systems pkgsFor self inventory hostInventory;};
+  fleetCtl = import ./fleet-checks.nix {inherit lib systems pkgsFor self inventory;};
 
   # Inventory -> per-kind attrset. The kind is the only thing that decides which
   # assembler a host gets, so it is the only filter the flake needs.

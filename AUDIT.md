@@ -29,6 +29,26 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-26 — the appliance is built by CI and deployed from an artifact, never from a runner
+- `gok update` builds and pushes in one process, which is why the CI variant could only stall silently for 80
+  minutes. Split at the protocol: `scripts/task/gok.sh build` writes the three streams it would have sent
+  (`gok overwrite --root/--boot/--mbr`, which stops before the device is contacted) plus a manifest and a
+  SHA256SUMS; `push` streams them with curl (`PUT /update/{root,boot,mbr}`, switch, reboot) and the device
+  answers a sha256 per stream. Proven against the live appliance with `--stage`: 181 MB, all three
+  hash-verified, no reboot; the build is 13 s on frieren's warm Go cache.
+- The push runs on **delphi**, not on a laptop: it already holds the tarball and sits on the tailnet, so
+  `task infra:gok:deploy` pipes the streamer over ssh instead of dragging 140 MB home to send it forward.
+  Measured from delphi, which reaches the appliance through `DERP(ams)` with no direct path: 71 s for all
+  three streams against 65 s from frieren on the LAN — the device's own write is the bottleneck, so the
+  relay costs ~6 s. The password travels as a root-only file, never in a command line.
+- `workflows/gok.yml` now builds only — artifact upload plus a Taildrop send to delphi. `hosts/delphi/gok-artifacts.nix`
+  receives it, gates it on the build's own sums, keeps three and serves them at `/gok/` on the tailnet vhost
+  only (the image has the wifi PSK, the auth key and the update password baked in). The receiver was run
+  against a scratch directory for the duplicate, corrupt and prune paths; delphi's module graph evaluates
+  (1890 assertions). Its unit carries an explicit PATH because tar/zstd are not in the system profile there.
+- Repaired while here: `flake/outputs.nix` still passed `hostInventory` to `flake/fleet-checks.nix` after
+  deadnix dropped the argument, which left `fleetHostChecks` unappellable — every fleet gate, not just this.
+
 ### 2026-10-25 — delphi debloats QEMU TCG microvm, restores native stirling-pdf, adds searxng and uptime-kuma
 - Delphi cloud bastion: retired autostart of QEMU TCG microvm (reclaiming ~2.5 GiB RAM and eliminating
   idle CPU drag on 2-OCPU ARM64). Restored native `services.stirling-pdf` with JVM bounds on loopback :7351,

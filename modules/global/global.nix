@@ -12,95 +12,41 @@
   # both carry it, so the list was already redundant.
   isCloudHost = (hostMeta.category or "") == "cloud";
 
-  # ── Fleet Binary Cache Registry ─────────────────────────────────────────────
-  # Single source of truth for all substituters and their signing keys.
-  fleetCaches = {
-    # 1. Private LAN Binary Cache (Harmonia on frieren.lan)
-    harmoniaLan = {
-      name = "Harmonia LAN (frieren)";
-      url = "http://192.168.3.25:5000";
-      key = "frieren.lan-1:BUg+1UmfYlF0XCbC0+ZyWQOY1DpQJhj/wa2q76NTFOg=";
-      tier = "lan";
-    };
-
-    # 2. Personal Cachix Cache (prebuilt fleet derivations & gaps)
-    shaoyanji = {
-      name = "Personal Cachix (shaoyanji)";
-      url = "https://shaoyanji.cachix.org";
-      key = "shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0=";
-      tier = "personal";
-    };
-
-    # 3. Official Upstream Nixpkgs Binary Cache
-    nixos = {
-      name = "NixOS Official Cache";
-      url = "https://cache.nixos.org/";
-      key = "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=";
-      tier = "upstream";
-    };
-
-    # 4. Numtide LLM Agents Cache (crush, toon, qmd, pdfvision, etc.)
-    numtide = {
-      name = "Numtide LLM Agents Cache";
-      url = "https://cache.numtide.com";
-      key = "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=";
-      tier = "upstream";
-    };
-
-    # 5. Nix Community Cachix
-    nixCommunity = {
-      name = "Nix Community Cachix";
-      url = "https://nix-community.cachix.org";
-      key = "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=";
-      tier = "community";
-    };
-
-    # 6. Nix Gaming Cachix (Steam, gamescope, proton enhancements)
-    nixGaming = {
-      name = "Nix Gaming Cachix";
-      url = "https://nix-gaming.cachix.org";
-      key = "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4=";
-      tier = "community";
-    };
-
-    # 7. Determinate Systems / FlakeHub Binary Cache
-    determinate = {
-      name = "Determinate Systems FlakeHub";
-      url = "https://install.determinate.systems";
-      key = "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM=";
-      tier = "upstream";
-    };
-  };
+  # ── Binary cache policy ──────────────────────────────────────────────────────
+  # The list itself lives in lib/cache-policy.nix and is compiled per host into
+  # `.#inventory.cache.<host>`; this module only applies it to nix.settings. The
+  # registry used to be duplicated here, which is how the deploy scripts ended up
+  # disagreeing with the module about whether harmonia serves a cloud host.
+  policy = config.fleet.inventory.cache.${hostName} or null;
+  harmoniaUrl = "http://192.168.3.25:5000";
 
   # Active substituters ordered by network tier:
   # - LAN hosts: Harmonia LAN first (gigabit local transfer), followed by Cachix and upstreams.
   # - Cloud/Remote hosts (Delphi): Cachix and fast WAN upstreams first. Harmonia LAN is
   #   excluded (or deprioritized to bottom) to prevent WAN timeouts and asymmetric uplink saturation.
+  # `policy.substituters` is already ordered for this host: harmonia first on the
+  # LAN, absent for a cloud host. The two options stay as deliberate overrides —
+  # preferCloud forces the WAN order, includeHarmonia re-adds the LAN cache — but
+  # their defaults now come from the same fact the scripts read.
   activeSubstituters =
-    if config.profiles.cache.preferCloud
-    then
-      [
-        fleetCaches.shaoyanji.url
-        fleetCaches.nixos.url
-        fleetCaches.numtide.url
-        fleetCaches.nixCommunity.url
-        fleetCaches.determinate.url
-        fleetCaches.nixGaming.url
-      ]
-      ++ lib.optional config.profiles.cache.includeHarmonia fleetCaches.harmoniaLan.url
-    else
-      (lib.optional config.profiles.cache.includeHarmonia fleetCaches.harmoniaLan.url)
-      ++ [
-        fleetCaches.shaoyanji.url
-        fleetCaches.nixos.url
-        fleetCaches.numtide.url
-        fleetCaches.nixCommunity.url
-        fleetCaches.nixGaming.url
-        fleetCaches.determinate.url
-      ];
+    if policy == null
+    then []
+    else let
+      wan = builtins.filter (u: u != harmoniaUrl) policy.substituters;
+      lan = lib.optional config.profiles.cache.includeHarmonia harmoniaUrl ++ wan;
+    in
+      if config.profiles.cache.preferCloud
+      then wan ++ lib.optional config.profiles.cache.includeHarmonia harmoniaUrl
+      else lan;
 
-  allSubstituterUrls = builtins.map (c: c.url) (builtins.attrValues fleetCaches);
-  allTrustedKeys = builtins.map (c: c.key) (builtins.attrValues fleetCaches);
+  allSubstituterUrls =
+    if policy == null
+    then []
+    else policy.trustedSubstituters;
+  allTrustedKeys =
+    if policy == null
+    then []
+    else policy.trustedKeys;
 in {
   options.profiles.cache = {
     preferCloud = lib.mkOption {
@@ -124,7 +70,10 @@ in {
 
     registry = lib.mkOption {
       type = lib.types.attrsOf lib.types.attrs;
-      default = fleetCaches;
+      default =
+        if policy == null
+        then {}
+        else policy.registry;
       readOnly = true;
       description = "Queryable structured registry of all fleet binary caches.";
     };

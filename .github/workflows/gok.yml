@@ -63,14 +63,12 @@ jobs:
           echo "NIX_CONFIG=substituters = $subs" >> "$GITHUB_ENV"
           echo "using: $subs"
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "^1.24"
-
-      - name: Install the gok CLI
-        run: |
-          go install github.com/gokrazy/tools/cmd/gok@main
-          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      # gok and Go come from nixpkgs through `gok.sh`, exactly as on an operator
+      # machine. `go install gok@main` is a different gok: it ignored
+      # `-i gok --parent_dir` and looked for the instance at ~/gokrazy/hello,
+      # which is how a 4-minute build failed with "no such file or directory".
+      - name: Warm gok and Go
+        run: nix shell nixpkgs#gokrazy nixpkgs#go -c gok version || true
 
       # The appliance is only reachable on the tailnet (its Hostname is the
       # tailnet FQDN), so the runner joins as an ephemeral tagged node.
@@ -112,7 +110,6 @@ jobs:
           # image carries no auth key (fine for updates, the node key persists in
           # /perm) and the manifest says so.
           GOK_TAILSCALE_AUTH_KEY: ${{ secrets.GOK_TAILSCALE_AUTH_KEY }}
-          GOK_BIN: gok
           GOK_BUILD_TIMEOUT: "900"
         run: |
           set -eu

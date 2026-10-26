@@ -121,6 +121,13 @@ jobs:
           # means the image carries no auth key (fine for updates, the node key
           # persists in /perm) and the manifest says so.
           GOK_TAILSCALE_AUTH_KEY: ${{ secrets.GOK_TAILSCALE_AUTH_KEY }}
+          # Without these the build DELETES the wifi package rather than shipping
+          # empty credentials, so the appliance loses its link at the next boot —
+          # an update that looks successful and is not (2026-10-26). Optional for
+          # a wired node; the manifest's `credentials.wifi` records which it is,
+          # and `gok-stream.sh` prints that line before every push.
+          GOK_WIFI_SSID: ${{ secrets.GOK_WIFI_SSID }}
+          GOK_WIFI_PSK: ${{ secrets.GOK_WIFI_PSK }}
         run: |
           set -eu
           if [ -z "${GOK_HTTP_PASSWORD:-}" ]; then

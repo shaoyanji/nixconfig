@@ -25,8 +25,15 @@ jobs:
         with:
           # The tree uses `|>` (modules/global/global.nix enables pipe-operators
           # fleet-wide); a runner with only nix-command+flakes cannot PARSE it.
+          # WAN substituters only; the flake's nixConfig is deliberately not
+          # accepted here. flake.nix lists the LAN Harmonia cache, which a GitHub
+          # runner cannot reach — accepting it spends a connect-timeout per path on
+          # a cache behind this house's LAN, and CI must never depend on that. The
+          # NAS consumes cachix; it is not CI's build or warm path.
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
+            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            connect-timeout = 5
       - name: Sync repository
         uses: actions/checkout@v4
         with:
@@ -48,8 +55,15 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v30
         with:
+          # WAN substituters only; the flake's nixConfig is deliberately not
+          # accepted here. flake.nix lists the LAN Harmonia cache, which a GitHub
+          # runner cannot reach — accepting it spends a connect-timeout per path on
+          # a cache behind this house's LAN, and CI must never depend on that. The
+          # NAS consumes cachix; it is not CI's build or warm path.
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
+            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            connect-timeout = 5
       - name: Sync repository
         uses: actions/checkout@v4
         with:
@@ -147,8 +161,15 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v30
         with:
+          # WAN substituters only; the flake's nixConfig is deliberately not
+          # accepted here. flake.nix lists the LAN Harmonia cache, which a GitHub
+          # runner cannot reach — accepting it spends a connect-timeout per path on
+          # a cache behind this house's LAN, and CI must never depend on that. The
+          # NAS consumes cachix; it is not CI's build or warm path.
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
+            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            connect-timeout = 5
 
       - name: Sync repository
         uses: actions/checkout@v4
@@ -231,8 +252,15 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v30
         with:
+          # WAN substituters only; the flake's nixConfig is deliberately not
+          # accepted here. flake.nix lists the LAN Harmonia cache, which a GitHub
+          # runner cannot reach — accepting it spends a connect-timeout per path on
+          # a cache behind this house's LAN, and CI must never depend on that. The
+          # NAS consumes cachix; it is not CI's build or warm path.
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
+            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            connect-timeout = 5
 
       - name: Sync repository
         uses: actions/checkout@v4

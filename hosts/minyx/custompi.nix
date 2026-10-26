@@ -1,4 +1,4 @@
-# minyx — Raspberry Pi 3B+ edge node (preserved; reflash planned after 26.11).
+# minyx — Raspberry Pi 3 Model B edge node (preserved; reflash planned after 26.11).
 #
 # The device is 1 GiB of RAM on an SD card with an impermanent (tmpfs) root, so
 # every choice here is about not running out of memory or wearing the card.

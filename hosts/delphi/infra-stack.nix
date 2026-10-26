@@ -1,6 +1,5 @@
 # Delphi Infrastructure Stack — Health Sentinel, Autonomous Agent Schedulers, and Resource Regulation
 {
-  config,
   pkgs,
   lib,
   ...
@@ -275,7 +274,7 @@ in {
       {unit = "searx.service";}
       {unit = "uptime-kuma.service";}
       {unit = "dsh-web.service";}
-      {unit = "crab-hole.service";}
+      {unit = "blocky.service";}
       {unit = "systemone-decision-serve.service";}
       {unit = "nginx.service";}
       {unit = "tailscaled.service";}
@@ -312,7 +311,7 @@ in {
   };
 
   # --- Refined CGroup & Resource Controls (2 OCPU / 11 GiB RAM Cloud Bastion) -
-  # Protects interactive sshd, Nginx and crab-hole DNS from being starved by
+  # Protects interactive sshd, Nginx and blocky DNS from being starved by
   # guest workloads or batch harness compilations.
   # systemd.services."microvm@sandbox".serviceConfig = {
   #   CPUWeight = 100;
@@ -328,9 +327,16 @@ in {
     MemoryMax = "1500M";
   };
 
-  systemd.services.crab-hole.serviceConfig = {
-    Restart = lib.mkForce "always";
-    RestartSec = lib.mkForce 2;
-    CPUWeight = 1000; # Maximum scheduling priority for zero-jitter DNS lookups
+  # blocky answers the fleet's DNS failover; it keeps crab-hole's priority and
+  # restart posture because the job is the same one (a resolver every client
+  # depends on) even though the implementation changed.
+  systemd.services.blocky = {
+    unitConfig.X-Fleet-Role = "daemon";
+    unitConfig.StartLimitIntervalSec = 0;
+    serviceConfig = {
+      Restart = lib.mkForce "always";
+      RestartSec = lib.mkForce 2;
+      CPUWeight = 1000; # Maximum scheduling priority for zero-jitter DNS lookups
+    };
   };
 }

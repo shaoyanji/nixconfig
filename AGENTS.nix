@@ -3994,9 +3994,24 @@
         gokrazy's own rule, so port 2222 stays closed until it is started from the
         web UI.
 
-        **Exit.** `gok update` works by name from any fleet host — which needs the
-        `server=/gok/100.100.100.100` line in hosts/frieren/dns.nix deployed — and
-        the flash path no longer depends on one machine's instance directory.
+        **The instance Hostname is the tailnet FQDN**, not the bare `gok`: gok
+        resolves `Hostname` with the host's resolver, and systemd-resolved refuses
+        single-label names (`resolvectl query gok` → "No appropriate name
+        servers"; `dig gok.` answers, Go's resolver does not).
+        `gok.cloudforest-kardashev.ts.net` resolves through pihole's tailnet-zone
+        forward on the LAN and through MagicDNS on the tailnet, so one update works
+        from any host. `--hostname=gok` keeps the tailnet node name short and
+        independent of it.
+
+        **Cost is cached, measured 2026-10-26.** GOCACHE and GOMODCACHE live under
+        `~/.cache/nixconfig-gok/go/{build,mod}` beside the instance's `builddir`, so
+        repeat pushes reuse the compiled tailscale: a cold build spent 4m45s
+        compiling; the same update with warm caches took **1m48s end to end**
+        (build + 41 MiB root / 71 MiB boot push + reboot + `Device ready to use!`).
+        First run on a fresh host pays the cold compile once.
+
+        **Exit.** `gok update` works by name from any fleet host, and the flash path
+        no longer depends on one machine's instance directory.
       '';
     };
     resolver-never-breaks = {

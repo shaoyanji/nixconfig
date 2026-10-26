@@ -102,9 +102,15 @@ materialize() {
 
   # The flag list comes from the repo (`up`, `--hostname=gok`); the key is
   # appended here and never written back, so rotating it is one sops edit.
+  #
+  # Any `--auth-key=` already in the file is dropped FIRST. A cached instance that
+  # predates a rotation otherwise keeps the old key next to the new one, and gok
+  # bakes both into the image — the appliance would still carry a key that was
+  # rotated precisely because it should stop working.
   if [ -n "$authkey" ]; then
     jq --arg k "--auth-key=$authkey" \
-      '.PackageConfig["tailscale.com/cmd/tailscale"].CommandLineFlags += [$k]' \
+      '.PackageConfig["tailscale.com/cmd/tailscale"].CommandLineFlags |=
+         (map(select(startswith("--auth-key=") | not)) + [$k])' \
       "$inst/config.json" > "$inst/config.json.tmp"
     mv "$inst/config.json.tmp" "$inst/config.json"
     chmod 600 "$inst/config.json"

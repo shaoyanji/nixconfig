@@ -1,18 +1,23 @@
 name: gok
 
-# BUILD AND PUBLISH ONLY. Any host edits the instance and pushes; the runner
-# compiles it and drops the tarball on delphi over Taildrop. The appliance is
-# never contacted from here.
+# BUILD ONLY. Any host edits the instance and pushes; the runner compiles it and
+# keeps the artifact. Delivery to delphi is deliberately not in this job yet:
+# Taildrop refuses to send between devices owned by different users
+# (`peer is owned by a different user`), and the runner is tag:ci while delphi is
+# a user device — so a publish step here could only ever fail. Build takes about
+# five minutes and nothing in this job waits on a timeout.
 #
 # One deploy path, deliberately: delphi holds the artifact and is the only host
 # that streams it to the appliance over the tailnet — `task infra:gok:deploy`.
 # That keeps the 140 MB push on the machine that already has the bytes instead of
 # dragging them back to a laptop (or building them on the NAS, which answers DNS
-# for the fleet) to send them forward again.
+# for the fleet) to send them forward again. Getting the artifact to delphi is
+# the open decision (a delphi-side pull with a read-only token is the candidate);
+# until then this job's artifact is the deliverable.
 #
 # The artifact carries baked credentials (wifi PSK, tailnet node key, update
-# password), so it is published to a tailnet-only path, never a public one, and
-# delphi gates what it receives on the build's own SHA256SUMS.
+# password), which is why it is never published to a public URL and why
+# `gok-stream.sh` prints the manifest's `credentials` line before every push.
 on:
   push:
     paths:
@@ -80,16 +85,6 @@ jobs:
       - name: Warm gok and Go
         run: nix shell nixpkgs#gokrazy nixpkgs#go -c gok version || true
 
-      # Publishing is a file drop, and Taildrop needs a node on the tailnet, so
-      # the runner joins as an ephemeral tagged one. Auth KEY, not an OAuth
-      # client: one value from Settings -> Keys, tagged `tag:ci` and ephemeral, so
-      # the node disappears when the job ends. If an OAuth client is ever
-      # preferred, the action accepts oauth-client-id/oauth-secret instead.
-      - uses: tailscale/github-action@v3
-        with:
-          authkey: ${{ secrets.TS_AUTH_KEY }}
-          tags: tag:ci
-
       # Go's caches are what take the build from minutes to seconds; they live
       # under the wrapper's instance cache so this key covers exactly what gok uses.
       - name: Cache the Go build
@@ -135,7 +130,7 @@ jobs:
             exit 1
           fi
           out="$RUNNER_TEMP/gok-$GITHUB_RUN_ID"
-          tarball=$(timeout 1200 ./scripts/task/gok.sh build "$out")
+          tarball=$(./scripts/task/gok.sh build "$out")
           echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
           echo "buildts=$(jq -r .buildTimestamp "$out/manifest.json")" >> "$GITHUB_OUTPUT"
           ls -lh "$out"
@@ -153,40 +148,3 @@ jobs:
           name: gok-artifact
           path: ${{ steps.build.outputs.tarball }}
           retention-days: 14
-
-      - name: Publish to delphi (Taildrop)
-        run: |
-          set -eu
-          tarball='${{ steps.build.outputs.tarball }}'
-          # `tailscale file cp` talks to tailscaled's LocalAPI socket, which the
-          # action owns as root while this step runs as `runner` — hence the two
-          # attempts rather than one guess.
-          if tailscale file cp "$tarball" "$ARTIFACT_HOST:" ||
-             sudo -n tailscale file cp "$tarball" "$ARTIFACT_HOST:"; then
-            echo "queued on $ARTIFACT_HOST: $(basename "$tarball")"
-            exit 0
-          fi
-          echo "::error::Taildrop to $ARTIFACT_HOST failed. Either the tailnet ACL does not allow tag:ci -> $ARTIFACT_HOST file sends (console -> Access controls -> grants, capability tailscale.com/cap/file), or Taildrop is disabled for the tailnet."
-          echo "The GitHub artifact above is intact: fetch it with \`gh run download -n gok-artifact\` and push it from delphi with \`task infra:gok:deploy\`." >&2
-          exit 1
-
-      # The green signal for this job is "delphi holds this build", not "the PUT
-      # returned". The receiver polls every two minutes, verifies SHA256SUMS and
-      # only then moves it into place, so this reads the artifact back through the
-      # same tailnet path the deploy uses.
-      - name: Prove delphi holds this build
-        run: |
-          set -eu
-          want='${{ steps.build.outputs.buildts }}'
-          url="http://$ARTIFACT_HOST/gok/latest/manifest.json"
-          for _ in $(seq 1 60); do
-            got=$(curl -fsS -m 10 "$url" 2>/dev/null | jq -r .buildTimestamp 2>/dev/null || true)
-            if [ "$got" = "$want" ]; then
-              echo "delphi is serving build $want"
-              echo "deploy from delphi with: task infra:gok:deploy" >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::error::delphi did not serve build $want from $url within 5 minutes (last seen: ${got:-none}). Check on delphi: systemctl status gok-taildrop, journalctl -u gok-taildrop -n 40"
-          exit 1

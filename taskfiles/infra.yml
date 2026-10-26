@@ -200,6 +200,33 @@ tasks:
           < scripts/task/gok-stream.sh
     silent: true
 
+
+  infra:restore:
+    desc: Repair a host's runtime state — device nodes, activation, home ownership, HM, keys, vault, atuin, tailnet mounts
+    summary: >
+      The config is not the runtime: a switch can leave /dev/null and /bin/sh
+      missing, a root-owned ~/.config that fails home-manager, an empty
+      ~/vaults and serve units that gave up before tailscaled was Ready — while
+      every one of those looks like "the host is bricked" from outside. This
+      runs the repair steps in order, skipping each one that is already correct,
+      so a second run is a no-op and a partial repair cannot pass as complete.
+
+      HOST=<name> targets a host over ssh (the script is piped, nothing is
+      copied); empty means this machine. CHECK=1 changes nothing and exits 1 if
+      anything is still wrong, so it doubles as the post-reboot gate. Exit 2
+      means root is needed to repair and passwordless sudo is unavailable.
+    vars:
+      HOST: '{{.HOST | default ""}}'
+      CHECK: '{{.CHECK | default "0"}}'
+    cmds:
+      - |
+        set -eu
+        flag=""
+        if [ "{{.CHECK}}" = "1" ]; then flag="--check"; fi
+        if [ -z "{{.HOST}}" ]; then
+          exec bash scripts/task/host-restore.sh $flag
+        fi
+        exec ssh -o BatchMode=yes -o ConnectTimeout=10 "{{.HOST}}" "bash -s -- $flag" < scripts/task/host-restore.sh
   infra:sops:update-keys:
     desc: Rotate SOPS recipient keys across ALL sops files, resync mirror, push secret repo changes
     cmds:

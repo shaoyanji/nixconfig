@@ -128,6 +128,78 @@ tasks:
         echo 'Next: bash scripts/task/gok.sh show   # wifi entry now renders with the SSID'
         echo '      gh secret list                 # confirm the three CI secrets'
 
+  infra:gok:build:
+    desc: Build the appliance artifact locally — root/boot/mbr plus manifest, no device and no network
+    summary: >
+      The same three streams `gok update` would send, written to files by
+      `gok overwrite --root/--boot/--mbr`, which stops before the device is
+      contacted. Prints the tarball path; .github/workflows/gok.yml runs exactly
+      this and publishes the result. Needs the update password (sops, or
+      GOK_HTTP_PASSWORD) because the image bakes it in, and a warm Go cache —
+      cold, it compiles tailscale from source.
+    cmds:
+      - bash scripts/task/gok.sh build
+
+  infra:gok:fetch:
+    desc: Download the newest appliance artifact from the artifact host — for flashing or inspection
+    summary: >
+      Pulls latest.tar.zst from delphi's tailnet-only /gok/ (the Taildrop receiver
+      in hosts/delphi/gok-artifacts.nix) into the local artifact cache and prints
+      the path. Nothing is built and nothing is deployed. The deploy does NOT use
+      this — it streams from delphi — so it exists for a local reflash or a look at
+      the manifest. GOK_ARTIFACT_URL overrides the source, which is the fallback
+      when the route is down: point it at `gh run download -n gok-artifact`.
+    cmds:
+      - bash scripts/task/gok.sh fetch
+
+  infra:gok:deploy:
+    desc: Stream the newest CI artifact to the appliance from delphi — no download, no build
+    summary: >
+      It runs on the artifact host, not here: delphi already holds the tarball and is
+      on the tailnet, so the streamer is piped over ssh and pushes from there rather
+      than dragging ~140 MB back to a laptop to send forward again. The device
+      answers a sha256 for each of root/boot/mbr before the switch, and the update
+      password travels as a root-only file, never in a command line. ARGS=--stage
+      verifies the path without a reboot; ARGS=--testboot boots the new root once and
+      reverts if it does not report in. LOCAL=1 pushes from this host instead.
+    vars:
+      ARGS: '{{.ARGS | default ""}}'
+      REMOTE: '{{.REMOTE | default "delphi.bountystash.com"}}'
+      ARTIFACT: '{{.ARTIFACT | default "/var/lib/gok-artifacts/latest"}}'
+      LOCAL: '{{.LOCAL | default "0"}}'
+    cmds:
+      - |
+        set -euo pipefail
+        if [ "{{.LOCAL}}" = 1 ]; then
+          artifact=$(bash scripts/task/gok.sh fetch)
+          exec bash scripts/task/gok.sh push {{.ARGS}} "$artifact"
+        fi
+        # The appliance's address, from the compiled registry: delphi runs
+        # tailscaled with --accept-dns=false (a resolver must not resolve through
+        # the address it serves), so the FQDN in the artifact's manifest is not
+        # resolvable THERE and the push would fail on name lookup.
+        appliance=$(nix eval --raw .#inventory.hosts.gok.network.tailscale_ip)
+        [ -n "$appliance" ] || { echo 'no tailscale_ip for gok in the inventory' >&2; exit 1; }
+        # sudo starts with no login PATH, and jq/curl live in a user profile on
+        # delphi, so the interactive PATH is carried across rather than guessed.
+        remote_path=$(ssh -o BatchMode=yes -o ConnectTimeout=10 {{.REMOTE}} 'printf %s "$PATH"')
+        [ -n "$remote_path" ] || { echo 'could not read PATH on {{.REMOTE}}' >&2; exit 1; }
+        pw=$(sops -d --extract '["gokrazy"]["gok"]["http_password"]' modules/secrets.yaml)
+        ssh_args=(-o BatchMode=yes -o ConnectTimeout=10)
+        cleanup() {
+          ssh "${ssh_args[@]}" {{.REMOTE}} 'sudo -n rm -f /run/gok-push.pw' >/dev/null 2>&1 || true
+        }
+        trap cleanup EXIT
+        # sudo because the artifact directory is root:nginx 2750 — the image has the
+        # wifi PSK, the auth key and the update password baked in, so only root and
+        # nginx read it on that host.
+        printf '%s' "$pw" |
+          ssh "${ssh_args[@]}" {{.REMOTE}} 'sudo -n install -m400 /dev/stdin /run/gok-push.pw'
+        ssh "${ssh_args[@]}" {{.REMOTE}} \
+          "sudo -n env PATH=$remote_path GOK_PUSH_PASSWORD_FILE=/run/gok-push.pw GOK_PUSH_URL=http://$appliance/ bash -s -- {{.ARGS}} {{.ARTIFACT}}" \
+          < scripts/task/gok-stream.sh
+    silent: true
+
   infra:sops:update-keys:
     desc: Rotate SOPS recipient keys across ALL sops files, resync mirror, push secret repo changes
     cmds:
@@ -235,7 +307,12 @@ tasks:
         set -o pipefail
         host=$(hostname)
         resolver=0
-        if [ -f "hosts/$host/dns.nix" ] && grep -q "profiles.dnsFailover" "hosts/$host/dns.nix"; then
+        # A resolver is a host that ANSWERS DNS, not a host that keeps its config in
+        # dns.nix. delphi carries crab-hole in configuration.nix and was therefore
+        # invisible to this guard: a switch there compiled under both cores while the
+        # box answered 10.99.0.53 for the tailnet, which is the same mistake the
+        # dnsFailover check was written for. Both shapes count now.
+        if grep -qs "profiles.dnsFailover\|services.crab-hole" hosts/"$host"/*.nix; then
           resolver=1
         fi
         if [ "$resolver" = "1" ] && [ "${REMOTE_BUILD:-0}" != "1" ] && [ "${ALLOW_LOCAL_BUILD:-0}" != "1" ]; then
@@ -244,7 +321,8 @@ tasks:
           echo "  client; on 2026-10-26 it aborted the boot test and left pihole-ftl stopped" >&2
           echo "  mid-activation (LAN-wide 'Server Not Found')." >&2
           echo "  Land it from a warm cache:   REMOTE_BUILD=1 task infra:switch:{{.OS}}" >&2
-          echo "  Warm that cache from CI:     task dev:ci:trigger:frieren" >&2
+          echo "  (that path compiles nothing: max-jobs 0 and no builders, so a missing" >&2
+          echo "   path stops the switch instead of burning both cores for minutes)" >&2
           echo "  Build locally anyway:        ALLOW_LOCAL_BUILD=1 task infra:switch:{{.OS}}" >&2
           exit 1
         fi
@@ -258,14 +336,16 @@ tasks:
           bash scripts/task/boot-check.sh --self || exit $?
         fi
         if [ "${REMOTE_BUILD:-0}" = "1" ]; then
-          # Substitute or fail, never compile here. `max-jobs = 0` was the wrong
-          # instrument: it uploads the whole closure to the builder (hours of
-          # copying) instead of refusing. A resolver host either has its closure
-          # in the cache — warmed by CI — or the switch stops and says so.
+          # Substitute or fail, never compile here. `max-jobs 0` alone still lets
+          # Nix dispatch to a configured remote builder, which uploads the whole
+          # closure before it starts (hours on a 20 Mbit line) — `builders ""` is
+          # what makes it a refusal instead of a relay. A resolver host either has
+          # its closure in the cache already or this stops and says which path is
+          # missing.
           if [ "${NOM:-0}" = "1" ]; then
-            sudo {{.OS}}-rebuild switch --use-substitutes --flake .?submodules=1#"$host" 2>&1 | nom
+            sudo {{.OS}}-rebuild switch --option max-jobs 0 --option builders "" --flake .?submodules=1#"$host" 2>&1 | nom
           else
-            sudo {{.OS}}-rebuild switch --use-substitutes --flake .?submodules=1#"$host"
+            sudo {{.OS}}-rebuild switch --option max-jobs 0 --option builders "" --flake .?submodules=1#"$host"
           fi
         else
           if [ "${NOM:-0}" = "1" ]; then

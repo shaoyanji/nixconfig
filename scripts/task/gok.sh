@@ -6,6 +6,7 @@
 #   gok.sh edit                 $EDITOR on the cached copy, then write back to the repo
 #   gok.sh build [OUT]          build root/boot/mbr into OUT — no device, no network
 #   gok.sh push [--stage|--testboot] [ARTIFACT]   stream it — no gok, no Go
+#   gok.sh fetch [DEST]         download the newest artifact from the artifact host
 #   gok.sh update [--insecure]  build + push in one process
 #   gok.sh overwrite --full=/dev/sdX   reflash a card
 #   gok.sh <anything else>      passed straight to gok
@@ -162,9 +163,7 @@ gok() {
 # logicUpdate in gok's internal/packer), so a build on a runner and a push from a
 # laptop are the same artifact. `push` below speaks that protocol with curl: no
 # Go, no gok, no compiling at deploy time. Deploy path: workflows/gok.yml builds
-# the artifact on the runner and streams it from there in a second step, so the
-# build is bounded and visible separately from the push (a single `gok update`
-# shows neither, and an empty log for 19 minutes is not a diagnosis).
+# and drops the tarball on delphi, `task infra:gok:deploy` fetches and streams it.
 
 # gok's URL banner carries the update password in it, and build.log travels with
 # the artifact, so the file is redacted once the build is done.
@@ -240,7 +239,7 @@ unpack() {
     return 0
   fi
   [ -f "$art" ] || {
-    echo "gok.sh: no artifact at '$art' — build one with `gok.sh build`" >&2
+    echo "gok.sh: no artifact at '$art' — build one (gok.sh build) or fetch the CI one (gok.sh fetch)" >&2
     return 1
   }
   dir=$(mktemp -d "${TMPDIR:-/tmp}/gok-artifact.XXXXXX")
@@ -263,7 +262,7 @@ push() {
     art=$(ls -1t "$cache"/artifacts/*.tar.zst 2>/dev/null | head -1 || true)
   fi
   [ -n "$art" ] || {
-    echo "gok.sh: no artifact named and none in $cache/artifacts — build one with `gok.sh build`" >&2
+    echo "gok.sh: no artifact named and none in $cache/artifacts — build one (gok.sh build) or fetch the CI one (gok.sh fetch)" >&2
     exit 1
   }
   local dir
@@ -283,6 +282,22 @@ push() {
   GOK_HTTP_PASSWORD=$pw bash "$(dirname "${BASH_SOURCE[0]}")/gok-stream.sh" ${passthrough[@]+"${passthrough[@]}"} "$dir"
 }
 
+fetch() {
+  local dest=${1:-$cache/artifacts} url=${GOK_ARTIFACT_URL:-} host
+  if [ -z "$url" ]; then
+    host=$(nix eval --raw "$repo#inventory.hosts.delphi.network.tailscale_hostname" 2>/dev/null || true)
+    url="http://${host:-delphi}.cloudforest-kardashev.ts.net/gok/latest.tar.zst"
+  fi
+  mkdir -p "$dest"
+  local out=$dest/fetched-$(date -u +%Y%m%dT%H%M%SZ).tar.zst
+  echo "gok.sh: fetching $url" >&2
+  curl -fsSL --progress-bar -m 900 -o "$out" "$url" || {
+    rm -f "$out"
+    echo "gok.sh: fetch failed. Is the artifact receiver on the artifact host up (taildrop, not ssh)?" >&2
+    exit 1
+  }
+  printf '%s\n' "$out"
+}
 
 # There is no cache -> repo write any more, and that is the point: the instance
 # is declared in $decl, so a change made with `gok edit` cannot survive the next
@@ -313,6 +328,9 @@ case "${1:-}" in
   push)
     shift
     push "$@"
+    ;;
+  fetch)
+    fetch "${2:-}"
     ;;
   *)
     materialize

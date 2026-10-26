@@ -293,7 +293,7 @@ tasks:
       - bash scripts/task/activate-host.sh {{.HOST}} {{.TARGET}}
 
   infra:warm:cache:
-    desc: Build the managed host closures locally so harmonia serves them at LAN speed (HOSTS="a b" overrides; UPDATE=1 also refreshes flake.lock)
+    desc: Warm managed host closures on CI runners and push them to cachix (HOSTS="a b"; UPDATE=1 refreshes flake.lock first)
     vars:
       # The set comes from inventory.toml, NOT from `status = "active"`: warming
       # costs a full closure fetch/build on the cache host and the store is
@@ -315,51 +315,90 @@ tasks:
           echo "==> refreshing flake.lock"
           nix flake update --commit-lock-file
         fi
-        # Run on the cache host (frieren): harmonia serves paths straight
-        # out of the local store, so every closure built here becomes an
-        # instant LAN cache hit for all other hosts.
-        fail=0
+        # Warming used to mean "compile every managed closure on frieren and let
+        # harmonia serve it". That is a build farm on the DNS/NAS host, paid for
+        # in hours of its own CPU, and it only ever helped hosts that can reach
+        # the LAN — a cloud host got nothing. The fleet's builders are GitHub
+        # runners (free, one per architecture) and their artifacts land in
+        # cachix, which every host substitutes from over the WAN.
+        if [ "${LANWARM:-0}" = "1" ]; then
+          echo "LANWARM=1 — compiling on $(hostname) and serving it from the LAN cache (deliberate)." >&2
+          fail=0
+          for h in {{.HOSTS}}; do
+            echo "==> warming locally: $h"
+            nix build ".#nixosConfigurations.$h.config.system.build.toplevel" -L || fail=1
+          done
+          exit $fail
+        fi
+        command -v gh >/dev/null 2>&1 || {
+          echo "ERROR: gh is required to warm through CI (the default)." >&2
+          echo "       A deliberate local warm on this host: LANWARM=1 task infra:warm:cache HOSTS=\"{{.HOSTS}}\"" >&2
+          exit 1
+        }
         for h in {{.HOSTS}}; do
-          echo "==> warming: $h"
-          nix build ".#nixosConfigurations.$h.config.system.build.toplevel" -L || fail=1
+          echo "==> dispatching a CI build: $h"
+          gh workflow run nixcachix.yml -f host="$h" || exit 1
         done
-        exit $fail
+        echo "Dispatched {{.HOSTS}} to CI; artifacts land in cachix (shaoyanji) from the runner for each architecture."
+        echo "Watch: gh run list --workflow=nixcachix.yml -L 5"
 
   infra:warm:host:*:
-    desc: Make one host's closure substitutable — builds on the builder, verifies the cache serves it
+    desc: Warm one host's closure on CI → cachix (LOCAL=1 builds on the builder, CHECK=1 is a read-only gate)
     summary: >
-      Run this ON THE BUILDER (inventory metadata.builder_host, else frieren). It
-      builds <host>'s closure from the LOCAL tree — so uncommitted edits are
-      covered, which neither CI (pushed branch) nor fleet-warm-cache (github: ref)
-      can do — then verifies the LAN cache actually serves the result. On any other
-      host it refuses and prints the right command instead of compiling where that
-      is not affordable.
+      Default: dispatch the host to a GitHub runner of its own architecture and
+      push the result to cachix. This is the only warm path that costs the NAS
+      nothing and works for cloud hosts too.
 
-      No ssh: the verification is one bounded HTTP request, so it cannot hang on an
-      auth prompt. Env: CACHE=<url>, NO_VERIFY=1. Exit 1 = derivations remain (a
-      switch would compile them locally).
+      LOCAL=1 runs scripts/task/warm-host.sh here: a real compile on the
+      inventory's builder host, from the LOCAL tree (so uncommitted edits are
+      covered, which a pushed branch cannot do). It refuses anywhere else.
+      CHECK=1 runs the same script read-only: no build, no ssh, one bounded HTTP
+      query per substituter.
+
+      Exit 1 = the closure is still not substitutable, so a switch would compile
+      it on the target.
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - bash scripts/task/warm-host.sh {{.HOST}}
+      - |
+        if [ "${CHECK:-0}" = "1" ]; then
+          exec bash scripts/task/warm-host.sh --check {{.HOST}}
+        fi
+        if [ "${LOCAL:-0}" = "1" ]; then
+          exec bash scripts/task/warm-host.sh {{.HOST}}
+        fi
+        exec task dev:ci:trigger:{{.HOST}}
 
   infra:update:fleet:
-    desc: Full fleet update cycle — flake update, warm harmonia, then apply everywhere
+    desc: Full fleet update cycle — flake update, warm on CI → cachix, then apply everywhere
     summary: >
       The canonical answer to "clients hit uncached builds after flake updates".
       NVIDIA drivers (580/legacy etc.) are unfree and never on upstream caches,
-      so every fleet bump must be built ONCE on frieren (infra:warm:cache) and
-      let harmonia serve the closures at LAN speed before any client switches.
+      so each fleet bump is built ONCE, on CI runners, and pushed to cachix — the
+      artifact every host can substitute, LAN or cloud. Nothing is compiled on
+      frieren (LANWARM=1 asks for that deliberately).
     cmds:
       - task infra:warm:cache UPDATE={{.UPDATE | default "1"}}
       - task infra:apply:fleet
 
   infra:cache:push:host:*:
-    desc: Push a host closure to harmonia from wherever it was built (nix copy, signed at serve time)
+    desc: Push a closure into the LAN harmonia cache (needs ALLOW_LAN_WARM=1; normally warm on CI → cachix instead)
+    summary: >
+      LAN-only by construction: the result is invisible to a cloud host and the
+      bytes are written over this LAN. It exists for an operator who already has
+      a closure locally and needs it served on the LAN right now. The default
+      warm path is `infra:warm:host:<h>` (CI → cachix).
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - nix copy --to http://192.168.3.25:5000?compress=true ".#nixosConfigurations.{{.HOST}}.config.system.build.toplevel"
+      - |
+        if [ "${ALLOW_LAN_WARM:-0}" != "1" ]; then
+          echo "REFUSED: this warms a cache through the LAN and serves nothing outside it." >&2
+          echo "  Default: task infra:warm:host:{{.HOST}}   (CI runner -> cachix)" >&2
+          echo "  Deliberate LAN push: ALLOW_LAN_WARM=1 task infra:cache:push:host:{{.HOST}}" >&2
+          exit 1
+        fi
+        exec nix copy --to http://192.168.3.25:5000?compress=true ".#nixosConfigurations.{{.HOST}}.config.system.build.toplevel"
 
   infra:apply:fleet:
     desc: Sequentially activate managed hosts from the LAN binary cache (HOSTS="h1 h2"; default = managed active hosts)

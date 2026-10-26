@@ -11,9 +11,9 @@
 # -------------------
 # `nixos-rebuild` on a 15 W dual-core host saturates it for as long as a full
 # closure compile takes (measured: load ~9.4 on fern's 2c/4t, killed after
-# 30 min). One build on the builder is served to every other host at LAN speed
-# by harmonia (inventory metadata.cache_url; first entry in
-# nix.settings.substituters), so the client only substitutes.
+# 30 min). One build on a builder is served to every host — LAN or cloud — by
+# cachix, so the client only substitutes. The fleet's builders are CI runners;
+# this script's build mode (LOCAL=1) is the deliberate local exception.
 #
 # Modes
 # -----
@@ -29,16 +29,23 @@
 #                                   activate-host.sh via TOP= — no second
 #                                   whole-toplevel evaluation.
 #   warm-host.sh [host …]           build the closure HERE, then verify it is
-#                                   substitutable. Intended for the builder;
-#                                   on any other host it reports the gap and
+#                                   substitutable. This is what `LOCAL=1` runs:
+#                                   a real compile on the builder host. The
+#                                   default warm path is CI (`infra:warm:host:*`
+#                                   dispatches a runner and pushes to cachix),
+#                                   because compiling on the NAS is exactly what
+#                                   the fleet stopped doing. On any host that is
+#                                   not the builder this reports the gap and
 #                                   exits 1 rather than saturating the machine.
 #   warm-host.sh --best-effort …    for switch hooks: never fails the switch.
 #                                   Prints the gap as a loud warning and exits 0.
 #
 # Env
 # ---
-#   CACHE      override the substituter to check against (default: the LAN cache
-#              from inventory.toml, then the local store)
+#   CACHE      check exactly this substituter; when unset the script asks
+#              cachix (the canonical target) first and the LAN cache second.
+#              A LAN-only answer is reported as such: it is invisible to a cloud
+#              host, so it is not the same as "warmed".
 #   NO_VERIFY=1  skip the post-build substitution check
 #
 # Exit codes: 0 = the caller substitutes everything (or is the builder);
@@ -85,10 +92,20 @@ cache_url="$(yq -r '.metadata.cache_url // ""' "$INVENTORY" 2>/dev/null || true)
 [ -n "$cache_url" ] || cache_url="http://192.168.3.25:5000"
 self="$(hostname)"
 
-# Where the closure is expected to be substitutable from. Probing the LAN cache
+# Where the closure is expected to be substitutable from. Probing the caches
 # directly (rather than relying on nix.settings.substituters) is deliberate: a
 # host whose config has not been switched yet still gets an honest answer.
-check_store="${CACHE:-$cache_url}"
+#
+# cachix first, LAN second, on purpose: cachix is what CI pushes to and what a
+# cloud host can reach, so it is the answer that means "warmed" for the whole
+# fleet. The LAN cache is a fast local path, not the source of truth.
+wan_cache="https://shaoyanji.cachix.org"
+check_stores=()
+if [ -n "${CACHE:-}" ]; then
+  check_stores=("$CACHE")
+else
+  check_stores=("$wan_cache" "$cache_url")
+fi
 
 if [ "$#" -gt 0 ]; then
   hosts=("$@")
@@ -151,13 +168,21 @@ host_status() {
 # store protocol rather than curl: harmonia answers a raw <hash>.narinfo request
 # with 404 even for paths it serves (measured 2026-10-15), so a curl-based gate
 # reports false failures. No ssh, no daemon, no auth involved either way.
+answer_cache=""
 served_by_cache() {
-  local path="$1"
-  [ -n "$check_store" ] || return 1
-  # narinfo-cache-negative-ttl 0: nix caches 404 narinfo answers for 1h, so a
-  # path queried before it was built would keep "missing" after the build —
-  # the verify step must always ask the cache fresh.
-  nix path-info --store "$check_store" --option narinfo-cache-negative-ttl 0 "$path" >/dev/null 2>&1
+  local path="$1" store
+  answer_cache=""
+  for store in "${check_stores[@]}"; do
+    [ -n "$store" ] || continue
+    # narinfo-cache-negative-ttl 0: nix caches 404 narinfo answers for 1h, so a
+    # path queried before it was built would keep "missing" after the build —
+    # the verify step must always ask the cache fresh.
+    if nix path-info --store "$store" --option narinfo-cache-negative-ttl 0 "$path" >/dev/null 2>&1; then
+      answer_cache="$store"
+      return 0
+    fi
+  done
+  return 1
 }
 
 # Derivations no substituter can serve, i.e. what would be COMPILED.
@@ -209,14 +234,14 @@ for h in "${hosts[@]}"; do
   if [ "$mode" = "check" ]; then
     n="$(pending_count "$attr")"
     if [ "${n:-0}" -eq 0 ]; then
-      report "warm [$h] READY — this host substitutes everything${cache_url:+ (LAN cache $cache_url)}"
+      report "warm [$h] READY — this host substitutes everything"
     else
       report "warm [$h] GAP — this host would COMPILE $n derivations"
       if [ "$is_builder" = 1 ]; then
         report "         (allowed here: $self is the builder — the closures are supposed to be built here)"
       else
-        report "         → fix: run 'task infra:warm:cache HOSTS=$h' on $builder, then switch"
-        report "           (the closure is then served by $cache_url; nothing compiles on $self)"
+        report "         → fix: task infra:warm:host:$h   (CI runner → cachix, nothing compiles on $self)"
+        report "           or on an already-built closure: LOCAL=1 … on $builder, a deliberate compile"
         fail=1
       fi
     fi
@@ -235,7 +260,7 @@ for h in "${hosts[@]}"; do
     # saturating the machine; --best-effort keeps a switch unblocked.
     n="$(pending_count "$attr")"
     report "warm [$h] REFUSED — $self is not the builder ($builder); this host would compile $n derivations"
-    report "         → run on $builder: task infra:warm:cache HOSTS=$h"
+    report "         → default warm path: task infra:warm:host:$h  (CI → cachix)"
     fail=1
     continue
   fi
@@ -250,21 +275,27 @@ for h in "${hosts[@]}"; do
 
   # ---- verify the closure is actually substitutable -------------------------
   if [ -n "$top" ] && served_by_cache "$top"; then
-    report "warm [$h] OK — $cache_url serves $top; a switch will substitute, not compile"
+    report "warm [$h] OK — $answer_cache serves $top; a switch will substitute, not compile"
+    if [ "$answer_cache" != "$wan_cache" ]; then
+      report "warm [$h] NOTE — only the LAN cache has it; a cloud host cannot substitute this." >&2
+    fi
   else
     # Harmonia answers narinfo only for paths in its store; a miss here while
     # the build succeeded means the path is present but not being advertised,
     # which is a real cache-side fault worth failing on.
-    report "warm [$h] WARNING — built, but $cache_url did not serve its narinfo." >&2
-    report "         check: curl $cache_url/nix-cache-info ; nix path-info --store $cache_url $top" >&2
+    report "warm [$h] WARNING — built, but no substituter serves $top:" >&2
+    for store in "${check_stores[@]}"; do
+      report "         $store" >&2
+    done
+    report "         check: nix path-info --store <url> $top   (CI pushes to $wan_cache)" >&2
     fail=1
   fi
 done
 
 if [ "$fail" -ne 0 ] && [ "$best_effort" = 1 ]; then
   cat >&2 <<-EOF
-	WARNING: $self could not be prepared from $cache_url — a switch would compile the
-	         closure HERE. Prepare it on $builder first: task infra:warm:cache HOSTS=${hosts[*]}
+	WARNING: $self could not be prepared from ${check_stores[*]} — a switch would
+	         compile the closure HERE. Warm it on CI first: task infra:warm:host:<host>
 	EOF
   exit 0
 fi

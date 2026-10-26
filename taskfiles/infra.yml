@@ -174,13 +174,14 @@ tasks:
         if [ -f "hosts/$host/dns.nix" ] && grep -q "profiles.dnsFailover" "hosts/$host/dns.nix"; then
           resolver=1
         fi
-        if [ "$resolver" = "1" ] && [ "${REMOTE_BUILD:-0}" != "1" ]; then
+        if [ "$resolver" = "1" ] && [ "${REMOTE_BUILD:-0}" != "1" ] && [ "${ALLOW_LOCAL_BUILD:-0}" != "1" ]; then
           echo "infra:switch [$host] REFUSED — this host is a fleet DNS resolver." >&2
-          echo "  Building here compiles a full closure on the machine that answers DNS for" >&2
-          echo "  every client; measured 2026-10-26 that aborted the boot test and left" >&2
-          echo "  pihole-ftl stopped mid-activation (LAN-wide 'Server Not Found')." >&2
-          echo "  Land it without compiling here:  REMOTE_BUILD=1 task infra:switch:{{.OS}}" >&2
-          echo "  (substitute-or-fail; warm the closure from CI: task dev:ci:trigger:frieren)" >&2
+          echo "  A full local compile here saturates the disk that answers DNS for every" >&2
+          echo "  client; on 2026-10-26 it aborted the boot test and left pihole-ftl stopped" >&2
+          echo "  mid-activation (LAN-wide 'Server Not Found')." >&2
+          echo "  Land it from a warm cache:   REMOTE_BUILD=1 task infra:switch:{{.OS}}" >&2
+          echo "  Warm that cache from CI:     task dev:ci:trigger:frieren" >&2
+          echo "  Build locally anyway:        ALLOW_LOCAL_BUILD=1 task infra:switch:{{.OS}}" >&2
           exit 1
         fi
         if [ "${ROUTE_CHECK:-0}" = "1" ]; then

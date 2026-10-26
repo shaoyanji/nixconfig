@@ -3960,6 +3960,39 @@
         entry moves off `preserved`.
       '';
     };
+    gokrazy-appliance = {
+      title = "Run a Go appliance (gokrazy) on the spare SD card";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      priority = "P3";
+      date = "2026-10-26";
+      summary = "The spare SD card runs gokrazy; its instance is declared in hosts/gok and pushed by scripts/task/gok.sh, with the password read from sops and the binary taken from nixpkgs at call time instead of being installed fleet-wide.";
+      refs = {
+        hosts = ["gok"];
+        modules = ["hosts/gok/config.json" "scripts/task/gok.sh"];
+        docs = [".agents/deploy/README.md"];
+      };
+      body = ''
+        **Declared.** `hosts/gok/config.json` is the instance: hostname, the four
+        default packages, breakglass keys, and `Update.HTTPPassword` muted to "".
+        `scripts/task/gok.sh` materialises it into `~/.cache/nixconfig-gok`, injects
+        `gokrazy.gok.http_password` from sops, and runs `gok` via
+        `nix shell nixpkgs#gokrazy` — nothing is installed.
+
+        **Why a cache.** `gok update` pins the device TLS material into the
+        instance config (`Update.CertPEM/KeyPEM`), which may not live in the repo.
+        The cache keeps it, the repo wins for declared keys, and `edit` writes back
+        with password and TLS keys stripped.
+
+        **Usage, any fleet host with the repo and an age key.**
+        `gok.sh show` | `gok.sh edit` | `gok.sh update` (first contact may need
+        `--insecure` until the cert is pinned) | `gok.sh overwrite --full=/dev/sdX`.
+
+        **Exit.** A change to `hosts/gok/config.json` reaches the appliance with
+        `gok.sh update` from a host other than stark, and the flash path no longer
+        depends on any one machine's instance directory.
+      '';
+    };
     open-frieren-offload = {
       title = "Move the movable services off frieren";
       kind = "open";

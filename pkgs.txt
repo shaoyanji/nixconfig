@@ -26,7 +26,7 @@
 # ── Cloud Infrastructure & Heavy SDKs (~1+ GB closure) ──
 # awscli2                # AWS Command Line Interface (Python SDK bundle ~1 GB)
 # cloudflared            # Cloudflare Tunnel client (managed via system service if needed)
-# gokrazy                # Go-based appliance builder
+# gokrazy                # Go appliance builder — run via `nix run nixpkgs#gokrazy` (59.6 MB not worth shipping fleet-wide)
 
 # ── Desktop & GUI Bloat (removed from base-desktop-environment.nix) ──
 # inkscape               # Vector graphics editor (>1 GB closure, run via `nix-shell -p inkscape`)

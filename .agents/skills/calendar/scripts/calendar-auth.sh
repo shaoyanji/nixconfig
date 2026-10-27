@@ -86,18 +86,28 @@ auth() {
   done
   [ -n "$url" ] || die "no consent URL after 20s: $(tail -3 "$log")"
 
+  PORT=$(printf '%s\n' "$url" | sed -n 's/.*redirect_uri=http%3A%2F%2F127\.0\.0\.1%3A\([0-9]*\).*/\1/p')
+  [ -n "$PORT" ] || PORT="$PAIR_PORT"
+
   cat >&2 <<EOF
 Open this URL in a browser and approve calendar access:
 
   $url
 
-Google then redirects to http://localhost:$PAIR_PORT on the machine running the
-browser. On a headless host, hold that port open from your laptop first:
+Google will redirect to:
+  http://127.0.0.1:$PORT/?state=...&code=...
 
-  ssh -N -L $PAIR_PORT:127.0.0.1:$PAIR_PORT $(hostname)
+Option A (Recommended — No SSH tunnel needed):
+  Open the URL on your client browser, approve consent. When the browser fails
+  to connect to the 127.0.0.1:$PORT redirect page, copy the full URL from your
+  browser's address bar and paste it below:
 
-Do not close this terminal: vdirsyncer's callback server lives only as long as
-this run. Waiting up to ${WAIT}s for $TOKEN.
+Option B (SSH tunnel):
+  Open a tunnel for port $PORT (NOTE: NOT 8080, which is Pi-hole):
+    ssh -N -L $PORT:127.0.0.1:$PORT $(hostname)
+
+Waiting up to ${WAIT}s for $TOKEN...
+Paste redirect URL here (or press Enter if using Option B):
 EOF
 
   waited=0
@@ -106,11 +116,21 @@ EOF
       echo "calendar-auth: token written after ${waited}s" >&2
       break
     fi
+    if [ -t 0 ]; then
+      if read -t 1 -r line; then
+        if [ -n "$line" ]; then
+          clean_url=$(printf '%s\n' "$line" | sed 's|https://127.0.0.1|http://127.0.0.1|; s|localhost|127.0.0.1|')
+          echo "Sending authorization response to local listener on port $PORT..." >&2
+          curl -s "$clean_url" >/dev/null 2>&1 || true
+        fi
+      fi
+    else
+      sleep 1
+    fi
     kill -0 "$pid" 2>/dev/null || die "vdirsyncer discover exited without a token: $(tail -3 "$log")"
-    sleep 1
     waited=$((waited + 1))
   done
-  [ -s "$TOKEN" ] || die "no token after ${WAIT}s — the redirect never reached localhost:$PAIR_PORT (tunnel not open?)"
+  [ -s "$TOKEN" ] || die "no token after ${WAIT}s — the redirect never reached localhost:$PORT"
   verify
 }
 

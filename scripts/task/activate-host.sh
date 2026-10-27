@@ -77,31 +77,6 @@ target="${2:-$1}"
 [ -f "$INVENTORY" ] || { echo "inventory.toml not found" >&2; exit 2; }
 command -v yq >/dev/null 2>&1 || { echo "yq required" >&2; exit 2; }
 
-# Which substituters may serve this host's closure, IN THE HOST'S OWN ORDER —
-# read from `.#inventory.cache.<host>`, the same projection modules/global/global.nix
-# consumes for nix.settings.substituters. Deciding it in both places is what broke
-# delphi's deploys: the module excluded the LAN cache for a cloud host while this
-# script gated on it, so the deploy either aborted or left the switch with nothing
-# to fetch — and the whole system compiled there.
-#
-# Env CACHE=<url> pins it to exactly one cache (unchanged escape hatch).
-caches="$(nix eval --json "$REPO#inventory.cache.$host.deployStores" 2>/dev/null | jq -r '.[]' | tr '\n' ' ' || true)"
-if [ -z "$caches" ]; then
-  echo "activate [$host] cannot read $REPO#inventory.cache.$host.deployStores" >&2
-  exit 2
-fi
-[ -n "${CACHE:-}" ] && caches="$CACHE"
-# shellcheck disable=SC2086
-set -- $caches
-cache="$1"
-serving=""
-for c in "$@"; do
-  if nix path-info --store "$c" --option narinfo-cache-negative-ttl 0 "$top" >/dev/null 2>&1; then
-    serving="$c"
-    break
-  fi
-done
-
 # Active hosts only. A preserved/dormant host is not part of the deploy surface:
 # evaluating its config is how a known-broken preserved host (cassini: a
 # homeDirectory conflict that predates any of this) gets mistaken for a
@@ -135,6 +110,36 @@ else
   top="$(nix eval --raw "$attr.outPath" 2>/dev/null || true)"
 fi
 [ -n "$top" ] || { echo "activate [$host] cannot evaluate $attr" >&2; exit 1; }
+
+# Which substituters may serve this host's closure, IN THE HOST'S OWN ORDER —
+# read from `.#inventory.cache.<host>`, the same projection modules/global/global.nix
+# consumes for nix.settings.substituters. Deciding it in both places is what broke
+# delphi's deploys: the module excluded the LAN cache for a cloud host while this
+# script gated on it, so the deploy either aborted or left the switch with nothing
+# to fetch — and the whole system compiled there.
+#
+# Env CACHE=<url> pins it to exactly one cache (unchanged escape hatch).
+#
+# AFTER the toplevel, not before: the loop below tests `$top` against each cache, so
+# resolving it later made every caller that did not pass TOP= die on `set -u` at
+# this line — `infra:apply:host:*` and the fleet loop, i.e. the paths that exist
+# precisely because they have no gate of their own to resolve it.
+caches="$(nix eval --json "$REPO#inventory.cache.$host.deployStores" 2>/dev/null | jq -r '.[]' | tr '\n' ' ' || true)"
+if [ -z "$caches" ]; then
+  echo "activate [$host] cannot read $REPO#inventory.cache.$host.deployStores" >&2
+  exit 2
+fi
+[ -n "${CACHE:-}" ] && caches="$CACHE"
+# shellcheck disable=SC2086
+set -- $caches
+cache="$1"
+serving=""
+for c in "$@"; do
+  if nix path-info --store "$c" --option narinfo-cache-negative-ttl 0 "$top" >/dev/null 2>&1; then
+    serving="$c"
+    break
+  fi
+done
 
 # The closure must already be servable; otherwise this is not a deploy, it is a
 # build waiting to happen on the target.

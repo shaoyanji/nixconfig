@@ -153,6 +153,14 @@ in {
         "enable-peer-exchange" = true;
         "dht-listen-port" = cfg.btListenPort;
 
+        # DHT state needs an explicit home. The built-in default is
+        # $HOME/.cache/aria2/dht.dat, and nothing creates `.cache` under the
+        # module's state directory, so every start logged "Failed to load DHT
+        # routing table" and the table never survived a restart — each boot
+        # re-bootstrapped the DHT from scratch instead of the known peers.
+        "dht-file-path" = "/var/lib/aria2/dht.dat";
+        "dht-file-path6" = "/var/lib/aria2/dht6.dat";
+
         # Peer/client impersonation.
         "peer-id-prefix" = "-TR2770-";
         "peer-agent" = "Transmission/2.77";

@@ -101,8 +101,8 @@ Two layers now, and the split is the point:
   binding for the same key. There is **no bar and no secret
   service**, and that is measured rather than taste: waybar's closure is 1001 MiB
   (zenity alone is 902 MiB of it) against dwl's 345 MiB, and gnome-keyring is
-  378 MiB — see [the measurements](#no-bar-no-secret-service-the-measurements)
-  below.
+  378 MiB — the table and the four verdicts are in
+  [`docs/netbook-rice-port.md`](../../../docs/netbook-rice-port.md).
 - **`alice`'s rice is `~/.dotfiles`** (a git repo with its own installer),
   symlinked into `~/.config`, and it still wins wherever it carries a file — XDG
   user config beats `/etc/xdg`. It was written for niri, fuzzel, mako and

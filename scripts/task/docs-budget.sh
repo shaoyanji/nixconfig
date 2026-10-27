@@ -65,4 +65,25 @@ stub ARCHITECTURE.md
 stub TODO.md
 stub HANDOFF.md
 stub EXPERIMENTS.md
+
+# Runbook class (`.agents/SCHEMA.md` §2), 400 lines: `docs/*.md` and `.agents/**/*.md`.
+# The list is derived rather than hand-kept, because three runbooks drifted past the
+# budget with nothing enumerating them: the hand-checked class above was green while
+# `docs/dns-failover.md` sat at 618 lines. `docs/history/` is the archive and has no
+# budget; skill bodies are `lib/skills.nix`'s to gate, so both are excluded here.
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  runbooks="$(git ls-files 'docs/*.md' '.agents/**/*.md')"
+else
+  runbooks="$(find docs .agents -name '*.md' 2>/dev/null)"
+fi
+while read -r f; do
+  [ -n "$f" ] || continue
+  case "$f" in
+    docs/history/* | .agents/skills/*) continue ;;
+  esac
+  check "$f" 400
+done <<EOF
+$runbooks
+EOF
+
 exit "$fail"

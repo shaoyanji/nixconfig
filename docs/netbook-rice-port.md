@@ -144,3 +144,41 @@ existed on the host.
 - **Verified.** fnott owns the bus name, a synthetic `Notify` reads back through
   `fnottctl list`, `📊 makotop` appears and dismisses on the same chord, and
   `checks:host HOST=netbook` is green.
+
+## What was declined, with the numbers
+
+Moved here from `.agents/deploy/hosts/netbook.md` when that runbook hit its budget.
+Everything declined on this host was declined with a number behind it, measured
+2026-10-27 as a per-package closure (`nix path-info -Sh --store
+https://cache.nixos.org`, fleet nixpkgs):
+
+| Component | Closure |
+| --- | --- |
+| niri — the compositor this host ran | 695 MiB |
+| dwl — the compositor it runs now | 345 MiB |
+| waybar | **1001 MiB** |
+| gnome-keyring | **378 MiB** |
+| greetd / tuigreet | 60 / 51 MiB |
+| foot / wmenu / fnott / swaybg / swayidle / waylock | 97 / 100 / 112 / 128 / 43 / 78 MiB |
+| mako — the notifier until 2026-10-27 | 326 MiB |
+| firefox (removed 2026-10-27) | 1.46 GiB |
+
+- **Bar: declined.** waybar is not a bar in closure terms — it brings zenity
+  (902 MiB) and `sdl2-compat`/sdl3 (~955 MiB) with it, so a status line would have
+  cost more than the rest of the session combined, and more than the compositor it
+  replaced. If one is ever wanted, the thing to beat is dwl's 345 MiB, not zero.
+- **Browser: settled 2026-10-27.** `firefox` cost 1.46 GiB of closure and measured
+  **~1.0 GiB RSS** on this 1818 MiB host, so it is gone and the browsers come from
+  the NAS AppImage library through the launcher entries instead (zero closure).
+- **Secret service: declined.** Nothing on this host implements the freedesktop
+  Secret API — the browsers keep their own credential stores — so the keyring would
+  have been 378 MiB of idle daemon. Scratch
+  has run without one since its dwl conversion.
+- **Display manager: declined.** `greetd` + `tuigreet` were 111 MiB to autologin a
+  single user, and SDDM is a Qt stack. tty1 autologins through `getty` instead,
+  which still gives the session a real logind/seat through PAM, and
+  `environment.loginShellInit` execs `/etc/xdg/dwl-session` from the login shell.
+  NixOS's `/etc/profile` reads **`/etc/profile.local` and the `loginShellInit`
+  slot, not `/etc/profile.d`** — checked against the generated file, because the
+  hook that is not read fails silently.
+

@@ -132,6 +132,7 @@ in {
 
   services.vdirsyncer = {
     enable = pkgs.stdenv.hostPlatform.isLinux;
+    package = config.programs.vdirsyncer.package;
     frequency = "*:0/15";
   };
 

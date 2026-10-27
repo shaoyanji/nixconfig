@@ -202,6 +202,12 @@
       "unbound.service"
     ];
     wants = ["pihole-ftl.service"];
+    path = with pkgs; [
+      coreutils
+      dnsutils
+      systemd
+      util-linux
+    ];
     restartIfChanged = false;
     unitConfig = {
       X-Fleet-Role = "daemon";
@@ -225,22 +231,22 @@
             fail=0
             # Upstream reachability is a different fault: restarting the
             # resolver cannot fix it, so it is only reported.
-            probe github.com || logger -t dns-watchdog "upstream probe failed (no restart)"
+            probe github.com || ${pkgs.util-linux}/bin/logger -t dns-watchdog "upstream probe failed (no restart)"
           else
             fail=$((fail + 1))
-            logger -t dns-watchdog "probe failed ($fail/3)"
+            ${pkgs.util-linux}/bin/logger -t dns-watchdog "probe failed ($fail/3)"
             if [ "$fail" -ge 3 ]; then
-              if systemctl is-active --quiet nixos-rebuild-switch-to-configuration.service; then
-                logger -t dns-watchdog "switch in progress — leaving the unit alone"
+              if ${pkgs.systemd}/bin/systemctl is-active --quiet nixos-rebuild-switch-to-configuration.service; then
+                ${pkgs.util-linux}/bin/logger -t dns-watchdog "switch in progress — leaving the unit alone"
               else
-                logger -t dns-watchdog "resolver not answering — restarting pihole-ftl"
-                systemctl restart pihole-ftl || true
+                ${pkgs.util-linux}/bin/logger -t dns-watchdog "resolver not answering — restarting pihole-ftl"
+                ${pkgs.systemd}/bin/systemctl restart pihole-ftl || true
               fi
               fail=0
-              sleep 10
+              ${pkgs.coreutils}/bin/sleep 10
             fi
           fi
-          sleep 5
+          ${pkgs.coreutils}/bin/sleep 5
         done
       '';
     };

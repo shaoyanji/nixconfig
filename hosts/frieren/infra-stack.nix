@@ -985,7 +985,7 @@ in {
     enable = true;
     home = "/Volumes/data/ollama";
     modelsDir = "/Volumes/data/ollama/models";
-    host = "0.0.0.0";
+    host = "127.0.0.1";
     openFirewall = false;
   };
 

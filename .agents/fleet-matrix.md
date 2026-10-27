@@ -63,7 +63,7 @@
 | 🟢 **`guckloch`** | `active` | Yes | `x86_64-linux` | `wsl2-container` | Host CPU, WSL2 Dynamic Allocation | Windows Subsystem for Linux (WSL2) Container |
 | 🟢 **`kali`** | `active` | Yes | `aarch64-linux` | `specialized-cli` | ARM64, 2 to 4 GB, Adreno / VideoCore | Mobile Offensive Security Starter Pack |
 | 🟢 **`kellerbench`** | `active` | Yes | `x86_64-linux` | `kiosk-gaming` | Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti | Headless GameStream & Benchmark Rig |
-| 🟡 **`minyx`** | `wip` | Yes | `aarch64-linux` | `strictly-constrained-1gb` | Broadcom BCM2837, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV | Raspberry Pi 3 Model B Tunnel & Jump Box |
+| ⚪ **`minyx`** | `preserved` | Yes | `aarch64-linux` | `strictly-constrained-1gb` | Broadcom BCM2837, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV | Raspberry Pi 3 Model B Tunnel & Jump Box |
 | 🟢 **`moto`** | `active` | No (Ext) | `aarch64-linux` | `mobile-termux` | Unisoc T760 / Snapdragon, 4 to 8 GB RAM, Mali-G57 | Primary Mobile Smartphone (Android/Termux) |
 | ⚪ **`mtfuji`** | `preserved` | Yes | `x86_64-linux` | `container-compute` | AMD Ryzen 64-bit, 16 GiB DDR4 | Headless Container & AI Inference Host |
 | 🟢 **`netbook`** | `active` | Yes | `x86_64-linux` | `strictly-constrained-cpu` | Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400 | Alice's Travel Netbook (Fleet nixpkgs, Scripted Initrd) |

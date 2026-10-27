@@ -218,6 +218,20 @@ in {
   # profile-relative, and a literal value would only duplicate entries.
   environment.enableAllTerminfo = true;
 
+  # The stock image left nix-channel's artefacts behind, and Nix still consults
+  # them whenever NIX_PATH is unset (NixOS/nix#9574) — every activation of this
+  # host printed "… exists, but channels have been disabled" for both. Channels
+  # are off fleet-wide (`nix.channel.enable = false`, modules/global/global.nix),
+  # so NixOS will not recreate them; this removes what a flash put on the card,
+  # which means reflashing and re-pushing cannot silently reintroduce a channel
+  # as a second nixpkgs. `R` on the profile also drops its `channels-N-link`
+  # generations via the glob.
+  systemd.tmpfiles.rules = [
+    "R /root/.nix-defexpr/channels"
+    "R /nix/var/nix/profiles/per-user/root/channels"
+    "R /nix/var/nix/profiles/per-user/root/channels-*-link"
+  ];
+
   documentation = {
     nixos.enable = false;
     man.enable = false;

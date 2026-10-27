@@ -7,30 +7,41 @@ U-Boot, which reads `/boot/extlinux/extlinux.conf` from the root filesystem — 
 file a switch writes. This host is not on `infra:deploy` or the sweeps (inventory
 `status = "preserved"`), so the commands below are the deploy path.
 
-## Push topology
+## Push topology — the canonical deploy
 
 ```bash
-# on delphi, as root — the nix daemon's ssh uses /root/.ssh/id_ed25519
-sudo nixos-rebuild switch -L --flake .#minyx --target-host root@192.168.3.9
+# on delphi, from the checkout, as devji — NOT sudo
+cd ~/Documents/nixconfig
+nixos-rebuild switch -L --builders "" --flake .#minyx \
+  --target-host devji@192.168.3.9 --use-remote-sudo
 ```
 
+- **`devji`, not `sudo`.** root cannot evaluate a devji-owned git tree (`repository
+  path is not owned by current user`, which root's `safe.directory` does not
+  suppress), and only the activation needs privilege on the target —
+  `--use-remote-sudo` supplies it there. `root@` is not a target either:
+  `PermitRootLogin = "no"`, and `ssh.ca.enable` + passwordless wheel sudo (the
+  two settings this host lacked) are what leave a way back in.
 - **Reachable without a tailnet on the Pi:** frieren advertises `192.168.3.0/24`
   and delphi runs `--accept-routes=true`, so the cloud host opens TCP/22 to a LAN
-  address. Proved before the first push.
-- **The build is cheap here, unlike the image.** The RPi kernel and modules
-  substitute from `shaoyanji.cachix.org` (155 MiB): only ~26 derivations (etc,
-  units, `activate`, the toplevel) compile on delphi's two OCPUs, about five
-  minutes. `--builders ""` keeps this off nixbuild.net.
-- **The first push is the last one over `root@`.** `custompi.nix` sets
-  `PermitRootLogin = "no"`, so after activation the target is `devji@` +
-  CA-signed cert + `--use-remote-sudo`. delphi had no client key at all; it now
-  holds `/root/.ssh/id_ed25519` (this push) and `~/.ssh/id_ed25519` with a cert
-  it signed from the CA it already carries (the next one).
-- **The pushed system is what makes that possible**: `ssh.ca.enable = true` and
-  `security.sudo.wheelNeedsPassword = false`, the two settings every other NixOS
-  host inherits from `modules/profiles/base-node.nix` and this one lacked. With
-  root logins off and no password for `devji`, a push without them leaves no way
-  back in.
+  address.
+- **The build is native and cheap, unlike the image.** Delphi and minyx are both
+  aarch64, so nothing is emulated; the RPi kernel and modules substitute from
+  `shaoyanji.cachix.org` (155 MiB) and ~26 derivations compile in about five
+  minutes. `--builders ""` keeps a routine push off nixbuild.net. Once built, the
+  switch is a closure copy plus activation — measured 19.7 s in
+  `switch-to-configuration` on 2026-10-27.
+- **Nothing goes through frieren or harmonia.** The copy is delphi → minyx over the
+  LAN route. Harmonia is an x86 store: an aarch64 closure parked there is dead
+  weight that `nix store optimise` would then churn for no benefit.
+- **`infra:deploy`/`infra:apply` do not reach this host.** Inventory says
+  `status = "preserved"` (warn + exit 0), and `activate-host.sh` pulls from
+  harmonia — the wrong arch path. The push above *is* the deploy.
+- **Exception: after `nix flake update`.** A nixpkgs bump turns most of the aarch64
+  closure into new derivations, which 2 OCPU / 11 GiB cannot absorb on its own.
+  Attach remote builders for that one push (nixbuild.net — budgeted, 25
+  build-hours/month) instead of letting delphi grind, then push as usual. Routine
+  config changes never need them.
 - **Rollback is a reflash.** The previous generation stays on the card
   (`nixos-1-default` in `/boot/extlinux/extlinux.conf`, kernel in `/boot/nixos`),
   but the board is headless: choosing it needs a serial console.
@@ -92,6 +103,20 @@ fix if the two ever diverge again.
   belongs to `gok.sh`, which parses the same entry its own way. A dotted key is
   looked up as one literal name, and the failure only appears when the derivation
   is built — the eval gate cannot see it.
+
+- **Every client terminal works, and none of them is pinned.** kitty / foot /
+  alacritty reach this box as three different `TERM`s, so `custompi.nix` sets
+  `environment.enableAllTerminfo = true` instead of base-node's
+  `TERM=xterm-256color`. Verified after the 2026-10-27 push: `xterm-kitty`,
+  `foot`, `alacritty` and `ghostty` entries present under
+  `/run/current-system/sw/share/terminfo`, `infocmp xterm-kitty` resolves, and
+  `tmux new -d` starts under each. Cost: 11 store paths, 65 KB.
+- **Channels are gone, not just disabled.** The stock image's
+  `/root/.nix-defexpr/channels` and `/nix/var/nix/profiles/per-user/root/channels`
+  made every activation warn (NixOS/nix#9574: Nix may still read them when
+  `NIX_PATH` is unset). `systemd.tmpfiles.rules` in `custompi.nix` removes both,
+  plus the `channels-N-link` generations, so a reflash and re-push cannot bring a
+  second nixpkgs back.
 
 ## Image layout (the flash path, retired)
 

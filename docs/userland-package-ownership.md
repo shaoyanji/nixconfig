@@ -34,7 +34,8 @@ A package belongs in the lowest module every consumer already imports. A host
 keeps only what is true of that host alone — driver, GPU, session choice. Two
 hosts duplicating an entry means the entry is owned one level up, not two.
 
-A host's own userland can lag this rule: `netbook` still installs `mako`, `fuzzel`,
-`alacritty` and `swaylock` because alice's dotfiles invoke them, so the profile
-cannot own the desktop until they are ported —
-[`./netbook-rice-port.md`](./netbook-rice-port.md) is that plan.
+A host's own userland can lag this rule, and `netbook` did: it installed `mako`,
+`fuzzel`, `alacritty` and `swaylock` because alice's dotfiles invoked them, which is
+what a bridge block is for. The port landed 2026-10-27, those four left, and the
+profile owns the desktop again — [`./netbook-rice-port.md`](./netbook-rice-port.md)
+is the mapping that got it there.

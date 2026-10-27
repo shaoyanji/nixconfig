@@ -29,6 +29,29 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-27 — the netbook's rice runs fnott: daemon swap and userland in one deploy
+- **Why one deploy.** Two processes cannot own `org.freedesktop.Notifications`, so shipping the swap before the
+  cards were ported would have looked like a broken HUD: the cards identified themselves through `makoctl
+  list`'s app name, and fnott renders only `<b> <i> <u>`. `profiles.dwlDesktop` now installs `pkgs.fnott` and
+  ships `/etc/xdg/fnott/fnott.ini` (the Catppuccin palette foot already had; fnott has no per-app sections, so
+  the six cards' border colours went with mako). `hosts/netbook/configuration.nix` starts `fnott`, and its
+  bridge block — `mako`, `fuzzel`, `alacritty`, `swaylock` — is gone.
+- **Her repos, edited in place (authorised 2026-10-27).** `~/mako-suite` `15e14a2`: dismiss and card liveness
+  moved from mako's app name to a unique summary (`fnottctl list` prints `id: <summary>`; `makofetch`'s title
+  gained its name), menus are `wmenu -p/-l/-P`, makobatt locks with `waylock -fork-on-lock`, and bodies pass
+  through a `strip_span` at the notification boundary. `~/.dotfiles` `feb8d6e`: the helpers launch
+  `wmenu`/`foot`, the installer stopped installing configs for the retired stack, and the niri config's spawn
+  lines moved with them.
+- **The bug a static read missed.** The first pass filtered `$body`, but makokill sends `body` and `footer` as
+  one argument — the operator saw literal `<span foreground=…>` XML on Mod+Alt+Backspace. Every `Notify` body
+  now filters at its own call site, and a grim capture of the card (the region, not the desktop) shows the
+  table and italic footer with no literal markup: the check is a rendering, not a grep of the source.
+- **Evidence.** `infra:apply:host:netbook` 3m24s, current == deployed, 0 failed units. Live: fnott owns the bus
+  name (`busctl --user status` → PID), a synthetic `Notify` reads back through `fnottctl list`, `📊 makotop`
+  appears and dismisses on the same chord, the four retired packages no longer resolve on the session PATH,
+  and `checks:host HOST=netbook` is green. Scratch shares the profile: closure warmed from `d77499af` by CI
+  (6m44s), deploy still pending.
+
 ### 2026-10-27 — the netbook's session ran stock dwl; sessions are `programs.dwl` now
 - **The defect.** `profiles.dwlDesktop` handed the session to a hand-rolled `writeShellApplication`
   that listed `pkgs.dwl` in `runtimeInputs` while the *keymap* build went to `systemPackages`. A wrapper's
@@ -52,8 +75,8 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   4/1817 MiB RAM used, `/` 44 %. Session restarted and read back: compositor = the spliced path with the
   host keymap in the binary, all five clients up, `WAYLAND_DISPLAY=wayland-0`, and a `Notify` through
   their cards' call shape read back from `makoctl list` as `App name: buffy-check`.
-- **Not fixed yet:** `scratch` shares this profile and is offline (last seen 20 h), so its closure was
-  never deployed with it; it needs the same deploy when it returns.
+- **Scratch** shares this profile and was offline; its closure is warmed by CI (`d77499af`, 6m44s) and its
+  deploy is still pending.
 
 ### 2026-10-27 — netbook and scratch: one dwl session, and the desktop's bloat measured out
 - `5f07866a` lifted the dwl session into `profiles.dwlDesktop`, so scratch stopped keeping a host-local copy

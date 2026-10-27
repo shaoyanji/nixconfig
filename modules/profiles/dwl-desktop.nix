@@ -116,10 +116,10 @@ in {
       [
         fleetMenu
         pkgs.brightnessctl
-        # mako still ships here because a HUD suite in the user's own dotfiles
-        # drives `makoctl` (see the `netbook-desktop-phase-2` note); the swap to
-        # fnott is that note's work, not this profile's.
-        pkgs.mako
+        # The notifier a host's `autostart` starts. It is a package and a
+        # baseline config rather than a service because a session daemon has to
+        # die with the session; two daemons would race for the bus name.
+        pkgs.fnott
         pkgs.foot
         pkgs.grim
         pkgs.imv
@@ -134,6 +134,48 @@ in {
         pkgs.wtype
       ]
       ++ lib.optional (cfg.wallpaper != null) pkgs.swaybg;
+
+    # fnott reads $XDG_CONFIG_HOME/fnott/fnott.ini first and /etc/xdg second, so
+    # this is the baseline a host gets for free and a user's own file still wins.
+    # The palette is the one this profile already gives foot; there are no
+    # per-app sections, because fnott styles by urgency (low/normal/critical).
+    environment.etc."xdg/fnott/fnott.ini".text = ''
+      title-font=JetBrainsMono Nerd Font:size=11
+      summary-font=JetBrainsMono Nerd Font:size=11
+      body-font=JetBrainsMono Nerd Font:size=11
+
+      background=1e1e2ef2
+      title-color=cdd6f4ff
+      summary-color=cdd6f4ff
+      body-color=cdd6f4ff
+
+      border-color=89b4faff
+      border-size=2
+      border-radius=10
+
+      padding-vertical=12
+      padding-horizontal=12
+      edge-margin-vertical=8
+      edge-margin-horizontal=8
+
+      min-width=360
+      max-width=440
+      max-height=240
+      max-icon-size=48
+
+      anchor=top-right
+      default-timeout=5
+
+      [low]
+      border-color=89b4faff
+
+      [normal]
+      border-color=89b4faff
+
+      [critical]
+      border-color=f38ba8ff
+      default-timeout=0
+    '';
 
     # dwl, foot and wmenu name this font; none of them ship it.
     fonts = {

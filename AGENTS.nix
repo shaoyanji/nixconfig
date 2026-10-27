@@ -4408,11 +4408,11 @@
 
     netbook-desktop-phase-2 = {
       title = "The netbook's session is the fleet's; the rice it runs is still hers";
-      kind = "open";
-      status = "OPEN";
+      kind = "proposal";
+      status = "DELIVERED";
       priority = "P1";
       date = "2026-10-27";
-      summary = "Phase 1 delivered the session and found two defects inside it (it ran stock dwl; then its clients raced a socket file a killed session left behind). Left is the port of ~/.dotfiles and ~/mako-suite off mako, fuzzel and alacritty — plan, mapping and measured win: docs/netbook-rice-port.md.";
+      summary = "The session is the fleet's (programs.dwl via profiles.dwlDesktop) and so is her userland: the six cards and every ~/.dotfiles helper were ported to fnott, wmenu, foot and waylock in one deploy, and mako, fuzzel, alacritty and swaylock left the closure. Mapping and losses: docs/netbook-rice-port.md.";
       refs = {
         hosts = ["netbook"];
         modules = [
@@ -4429,32 +4429,33 @@
       };
       from = ["rice-fork-not-patch"];
       body = ''
-        **Delivered 2026-10-27: the session is the fleet's.** tty1 autologins and the login shell execs
-        `/etc/xdg/dwl-session` — NixOS's own `programs.dwl`, driven by this profile's `package` (the
-        spliced keymap) and `extraSessionCommands`, so the compositor is `lib.getExe cfg.package` and no
-        PATH can shadow it. niri, waybar, greetd/tuigreet and gnome-keyring left the closure. Her layer is
-        `hosts/netbook/dwl-keybinds.h`, spliced into the keymap *first* because dwl takes the first match:
-        the dead-key workaround for a broken ribbon connector, plus both of niri's launcher chords.
-        Two defects came out of deploying it (both in `AUDIT.md`, 2026-10-27): the session ran stock dwl
-        for one deploy because a hand-rolled wrapper listed `pkgs.dwl` beside the keymap build, and a
-        wrapper's PATH wins inside the session; then its clients raced a socket FILE a killed session had
-        left behind, losing swaybg, swayidle and mako while the autostart lines that never touch Wayland
-        survived. Instruments: `grep -a quick-keys.sh /proc/$(pgrep -x dwl)/exe` reads the *running*
-        binary, and a canary client proves that the compositor answers.
-        **Left: her userland is the old stack.** Every menu calls `fuzzel -d`, the six cards in
-        `~/mako-suite` find themselves through `makoctl list`, the launchers `exec alacritty`, and
-        makobatt locks with swaylock — so mako, fuzzel, alacritty and swaylock stay installed. That is
-        `rice-fork-not-patch` one layer out: port the mechanism a binding needs, not only its chord.
-        **The port is planned, not done — `docs/netbook-rice-port.md`.** Load-bearing facts: `fnottctl
-        list` prints `id: <raw title>` (cards identify by title; five of six already do, `makofetch`
-        needs one), fnott renders only `<b> <i> <u>` so `<span>` is *drawn* rather than dropped, and
-        fnott.ini has no per-app sections. Daemon swap and card port are one deploy, because only one
-        process can own `org.freedesktop.Notifications`.
-        Browser: firefox stays (her call, 2026-10-27); the seven measured candidates are not pursued.
-        **Exit criteria:** a HUD card appears under fnott and toggles off on the same chord; the bridge
-        block in `hosts/netbook/configuration.nix` is gone; every bind target resolves on the session's
-        *own* PATH (against `/proc/<dwl-pid>/environ`, never the ssh PATH); `checks:host HOST=netbook`
-        green after each step.
+        **Delivered 2026-10-27: the session is the fleet's.** tty1 autologins and the login
+        shell execs `/etc/xdg/dwl-session` — NixOS's `programs.dwl`, driven by this
+        profile's `package` (spliced keymap) and `extraSessionCommands`, so the compositor
+        is `lib.getExe cfg.package` and no PATH shadows it. niri, waybar, greetd and
+        gnome-keyring left the closure; her layer is `hosts/netbook/dwl-keybinds.h`,
+        spliced *first* because dwl takes the first match. Two defects came from that
+        deploy (AUDIT.md): it ran stock dwl for one deploy — a wrapper listed `pkgs.dwl`
+        beside the keymap build, and a wrapper's PATH wins inside the session — then its
+        clients raced a socket FILE a killed session left behind.
+
+        **Delivered 2026-10-27: her userland runs the session it is in.** The six cards and
+        every `~/.dotfiles` helper were ported in place and committed in her two repos;
+        `mako`, `fuzzel`, `alacritty` and `swaylock` left the bridge block, so the closure
+        carries fnott (112 MiB, was mako 326) and the profile ships
+        `/etc/xdg/fnott/fnott.ini`. Three rules carry it: a card identifies itself by a
+        unique *summary* (`fnottctl list` → `id: <summary>`; makofetch gained one), bodies
+        pass through `strip_span` because fnott draws `<span>` literally, and menus/lock
+        are `wmenu -p/-l/-P` and `waylock -fork-on-lock`. Losses and mapping:
+        `docs/netbook-rice-port.md`.
+
+        **Proven.** fnott owns the bus name, a synthetic Notify reads back through
+        `fnottctl list`, `📊 makotop` toggles on the same chord, and a grim capture of the
+        Mod+Alt+Backspace card shows its table and italic footer with no literal markup.
+        That capture caught what the first pass missed — makokill sends `body` and `footer`
+        as one argument, so neither was filtered; every Notify body now filters at its own
+        call site. Exit met: bridge block gone, bind targets resolve on the session PATH,
+        `checks:host HOST=netbook` green, deploy 3m24s / 0 failed units. Firefox stays.
       '';
     };
 

@@ -4,7 +4,6 @@
   pkgsFor,
   self,
   inventory,
-  hostInventory,
 }:
 # THE FLEET GATE AS FLAKE OUTPUTS — two shapes, because they answer different
 # questions and one of them is expensive.

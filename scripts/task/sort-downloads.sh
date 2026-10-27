@@ -329,6 +329,62 @@ video_target() {
   fi
 }
 
+# A directory of videos is one set, not one file. Moving only its largest file
+# would scatter a lecture series or a split film across the next few runs, each
+# part named on its own — so the set moves under one title.
+video_set() {
+  local item=$1 count raw year name base
+  [ -d "$item" ] || return 1
+  count=$(find "$item" -maxdepth 2 -type f \
+    \( -iname '*.mp4' -o -iname '*.mkv' -o -iname '*.avi' -o -iname '*.mov' \
+    -o -iname '*.webm' -o -iname '*.m4v' -o -iname '*.mpg' -o -iname '*.mpeg' \) 2>/dev/null | wc -l)
+  # One video is enough: a release folder carries its own subtitles and
+  # samples, and splitting the video from them is how a library ends up with
+  # subtitles the player cannot find.
+  [ "$count" -ge 1 ] || return 1
+  raw=$(basename "$item")
+  year=$(year_in "$raw")
+  name=$(title_before_year "$raw" "$year" | tr '._' '  ')
+  name=$(squeeze "$name")
+  [ -n "$year" ] || name=$(squeeze "$(strip_tags "$name")")
+  printf '%s' "$name" | grep -q '[[:alpha:]]' || return 1
+  base=$name
+  [ -n "$year" ] && base="$name ($year)"
+  if [ -n "$year" ]; then quality=ok; else quality=guess; fi
+  printf '%s:%s\n' "$quality" "$base"
+}
+
+# Directories move whole: nothing inside is renamed, because a set's own file
+# names are what the operator recognises.
+place_dir() {
+  local src=$1 dest_abs=$2 kind=$3 rel dest
+  rel="$(rel_of "$dest_abs")"
+  dest="$DATA_ROOT/$rel"
+  if [ -e "$dest" ]; then
+    if [ "$REPLACE" = 1 ]; then
+      say "REPLACE  $(basename "$src")/ -> $rel (existing directory replaced)"
+      if [ "$APPLY" = 1 ]; then rm -rf "$dest"; fi
+    else
+      say "CONFLICT $(basename "$src")/ — $rel exists (rerun with --replace)"
+      pending=$((pending + 1))
+      return 0
+    fi
+  else
+    say "MOVE     $(basename "$src")/ -> $rel/"
+  fi
+  if [ "$APPLY" = 1 ]; then
+    mkdir -p "$(dirname "$dest")"
+    mv -f "$src" "$dest"
+    if ! chown -R devji:users "$dest" 2>/dev/null; then OWNERSHIP_FAILED=1; fi
+    chmod 0755 "$dest" 2>/dev/null || true
+    find "$dest" -type f -exec chmod 0644 {} + 2>/dev/null || true
+  fi
+  case "$kind" in
+    media) moved_media=$((moved_media + 1)) ;;
+    *) moved_other=$((moved_other + 1)) ;;
+  esac
+}
+
 same_content() {
   local a=$1 b=$2
   [ -f "$b" ] || return 1
@@ -372,6 +428,17 @@ place() {
 
 classify() {
   local item=$1 file lname ext rel out guessed label
+  if out=$(video_set "$item"); then
+    case "$out" in
+      guess:*)
+        rel="${out#guess:}"
+        say "GUESS    $(basename "$item")/ — no year to match on; placed as arr/$rel/"
+        ;;
+      *) rel="${out#ok:}" ;;
+    esac
+    place_dir "$item" "$VIDEO_DIR/$rel" media
+    return 0
+  fi
   file=$(payload_of "$item")
   if [ -z "$file" ]; then
     say "UNKNOWN  $item — empty or unreadable directory"
@@ -426,6 +493,12 @@ classify() {
       place "$file" "$APPLIANCE_DIR/$(basename "$file")" 0644 other
       return 0
       ;;
+    # Compound suffixes belong here, not in the extension case below: `${f##*.}`
+    # on `tool-1.2.tar.gz` is `gz`, so a `.tar.gz` rule there never matches.
+    *.tar.gz | *.tgz | *.tar.xz | *.tar.zst | *.tar.bz2 | *.tar)
+      place "$file" "$SOFTWARE_DIR/$(basename "$file")" 0644 other
+      return 0
+      ;;
   esac
 
   case "$ext" in
@@ -458,7 +531,7 @@ classify() {
         pending=$((pending + 1))
       fi
       ;;
-    tar.gz | tgz | tar.xz | tar.zst | tar.bz2 | zip | 7z | deb | rpm)
+    zip | 7z | deb | rpm | exe | msi | dmg | pkg | apk | xz | zst | bz2)
       place "$file" "$SOFTWARE_DIR/$(basename "$file")" 0644 other
       ;;
     *)

@@ -20,8 +20,11 @@ orphaned `.aria2` control files — a half-download leaves one behind and aria2
 will not resume around it. `data:sort` moves finished staging items into the
 tree that owns their kind, so an AppImage or an OS image is never left behind
 as an unknown extension; it prints a plan unless given `--apply`, and refuses
-anything aria2 still holds, including a completed torrent that is seeding, and
-`--classify` (`services.downloadsSort.classify` on frieren) is the second layer:
+anything aria2 still holds, including a completed torrent that is seeding. A
+staged directory whose payload is video moves as one set under a single
+`arr/<Title (Year)>/` — a release folder keeps its own subtitles and a lecture
+series keeps its parts. `--classify`
+(`services.downloadsSort.classify` on frieren) is the second layer:
 when extension and kind rules cannot place an item, `jev-decide` picks one label
 from a fixed destination list at >= 0.8 probability — never a media title. The
 rest are named for what they do.

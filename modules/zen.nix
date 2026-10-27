@@ -126,7 +126,6 @@
           refined-github
           clearurls
           fastforwardteam
-          bypass-paywalls-clean
           open-in-freedium
           web-archives
           return-youtube-dislikes

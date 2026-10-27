@@ -9,7 +9,7 @@
 # gates `vdirsyncer.service` on the token file, so nothing here needs a rebuild.
 set -euo pipefail
 
-ACCOUNT=${CAL_ACCOUNT:-google}
+ACCOUNT=${CAL_ACCOUNT:-calendar_google}
 CFG=${XDG_CONFIG_HOME:-$HOME/.config}
 TOKEN=${CAL_TOKEN:-$CFG/vdirsyncer/google_token}
 WAIT=${CAL_WAIT:-300}
@@ -62,6 +62,7 @@ auth() {
   if [ -s "$TOKEN" ] && [ "$force" = 0 ]; then
     die "already authorised ($TOKEN) — use 'calendar-auth.sh verify', or auth --force to redo it"
   fi
+  [ "$force" -eq 1 ] && rm -f "$TOKEN"
 
   log=$(mktemp)
   # vdirsyncer keeps its OAuth callback server alive only while this runs, so

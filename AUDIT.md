@@ -29,6 +29,25 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-27 — netbook and scratch: one dwl session, and the desktop's bloat measured out
+- `5f07866a` lifted the dwl session into `profiles.dwlDesktop`, so scratch stopped keeping a host-local copy
+  and netbook stopped running niri. Both now get the same keymap, launcher, wallpaper and lock; the launcher is
+  `fleet-menu` (XDG entries *and* `$PATH` in one menu — the `j4-dmenu-desktop` + `wmenu-run` pair each listed
+  half), and its first version dropped any entry carrying a `[Desktop Action …]` group, which is most real apps.
+- `ea152738` removed what measuring said was not needed: waybar (closure **1001 MiB** against dwl's 345 MiB —
+  it drags zenity at 902 MiB), gnome-keyring (**378 MiB**, no consumer: firefox keeps its own NSS store and
+  nautilus has no gvfs here), greetd + tuigreet (**111 MiB** to autologin one user). SDDM was already off on
+  both and is now vetoed in the profile, so no adopter can inherit it.
+- The session starts without a display manager: `getty` autologins tty1 (still a real logind session, seat and
+  runtime dir, through PAM) and `environment.loginShellInit` execs dwl. It has to be that option — NixOS's
+  `/etc/profile` reads `/etc/profile.local` and the `loginShellInit` slot and never `/etc/profile.d`, so the
+  obvious version of this fails silently. Verified by reading both hosts' generated `/etc/profile` and running
+  its guard against stubbed `id`/`tty`.
+- Evidence: `checks:host` green for both (1846 and 1541 assertions), `checks:quick` green, `.#checks.<sys>.knobs`
+  14/14 with `dwl-desktop` registered. **Not deployed: both hosts are offline** (netbook 2d, scratch 19h). CI is
+  warming both closures. The one thing eval cannot prove is the autologin itself; recovery if dwl never starts
+  is ssh, which never depended on a greeter.
+
 ### 2026-10-27 — the VIP is back: minyx is the backup, and the takeover was observed
 - `8d271c31` declared the group again with the address rules that were missing the first time: VIP
   `192.168.3.50` (static block, not `.25`, not the peer's `.3`, and not `.53` — an option `example` the router

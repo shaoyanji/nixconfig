@@ -1,19 +1,6 @@
-# The fleet's binary caches: URL and public key, in one place.
-#
-# Two consumers read this file, and they must never disagree:
-#
-#   lib/cache-policy.nix     which caches a host may use (nix.settings.substituters)
-#   flake.nix (nixConfig)    which caches may serve the EVALUATION that builds it
-#
-# The second list used to be written out by hand in flake.nix, which is how the
-# tailnet mirror ended up known to the flake and unknown to the policy.
-#
-# `caches` is the fact (addresses). `evalOrder` is the one judgement this file
-# makes for the flake's own evaluation: each path is requested from these caches
-# in turn, so a LAN host must see harmonia first. WHICH host uses which cache at
-# RUN time is still cache-policy.nix's decision, not a property of a cache.
-#
-# `key = null` means "the same key as the cache this one mirrors".
+# The fleet's binary caches: URL, public key, and `evalOrder` — the one judgement
+# this file makes, namely which cache the flake's own evaluation asks first (a LAN
+# host must see harmonia first). `key = null` mirrors the cache's own key.
 {
   caches = {
     harmonia = {

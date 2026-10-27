@@ -17,10 +17,10 @@ description = "Canonical hardware, operational status, network, and agent person
 version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
 total_devices = 35
-active_nix_devices = 12
+active_nix_devices = 13
 active_external_devices = 7
 wip_devices = 0
-preserved_devices = 16
+preserved_devices = 15
 
 # ------------------------------------------------------------------------------
 # 1. CORE SERVERS & INFRASTRUCTURE
@@ -816,11 +816,17 @@ tailscale_ip = "100.126.186.109"
 hostname = "minyx"
 status = "active"
 status_detail = "DNS failover member for the frieren.lan zone (blocky backend, keepalived BACKUP at priority 1). Promoted off preserved on 2026-10-27; its closure is still built on delphi, not in CI, because the sdImage/kernel are not cachix artifacts."
+managed = true
+builder = "delphi"
+# Active and in the rotation, but not a CI target: its sdImage/kernel are not
+# cachix artifacts, so a runner would compile for an arch it cannot cache and
+# delphi is the declared builder anyway (scripts/task/minyx-keeper.sh).
+ci = false
 kind = "nixos"
 arch = "aarch64-linux"
 role = "Raspberry Pi 3 Model B Tunnel & Jump Box"
 notes = [
-  "Board is a Raspberry Pi 3 Model B v1.2 (measured 2026-10-26), not a 3B+: 4x Cortex-A53 at 1.2 GHz, 100 Mbit NIC, 2.4 GHz-only Wi-Fi. Any VRRP/DNS failover work must use the wired interface.",
+  "Board is a Raspberry Pi 3 Model B v1.2 (measured 2026-10-26), not a 3B+: 4x Cortex-A53 at 1.2 GHz, 100 Mbit NIC, 2.4 GHz-only Wi-Fi. The DNS role currently rides wlan0 because enu1u1 is unplugged; the wired link is the upgrade path, and a reservation is per MAC, so switching links means reserving the other one.",
   "Measured 2026-10-26 on an interim DietPi boot: vcgencmd get_throttled = 0x50000 (under-voltage AND throttling have occurred). A 5 V/2.5 A supply is required before this board takes an always-on role.",
   "Repurposed 2026-10-26 as the fleet tunnel/jump box: USB system disk via sd-image-aarch64 (OTP USB boot), no Home Manager, no desktop, no Docker. btrfs on the root is a deliberate later phase — it swaps sdImage.rootFilesystemCreator rather than the firmware path.",
 ]

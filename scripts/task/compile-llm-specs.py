@@ -119,6 +119,55 @@ def render_host_card(h, info, template_str=None):
 
 def generate_fleet_matrix_markdown(data):
     hosts = data.get("hosts", {})
+
+    # Derived, not written down. The status lines below used to be literals in
+    # this generator, and they drifted on exactly the fact they existed to state:
+    # `delphi` stayed "WIP - NOT yet live" after it went live, `minyx` stayed in
+    # the preserved list after it was promoted, and both counts were stale by the
+    # same amount. inventory.toml is the one home for status (.agents/SCHEMA.md §1),
+    # so the list is read out of it here and the checked-in file is regenerated.
+    def is_nix(info):
+        return info.get("is_nix", info.get("kind") in ("nixos", "darwin", "home"))
+
+    def by_status(want):
+        return sorted(h for h, i in hosts.items() if i.get("status", "active") == want)
+
+    def tick(names):
+        return ", ".join(f"`{h}`" for h in names)
+
+    active = by_status("active")
+    active_nix = [h for h in active if is_nix(hosts[h])]
+    active_ext = [h for h in active if not is_nix(hosts[h])]
+    wip = by_status("wip")
+    preserved = by_status("preserved")
+
+    status_lines = [
+        f"- **Active Production Nix Hosts ({len(active_nix)})**: {tick(active_nix)}",
+        f"- **Active External Non-Nix Hosts ({len(active_ext)})**: {tick(active_ext)}",
+    ]
+    if wip:
+        status_lines.append(f"- **Work-in-Progress Hosts ({len(wip)})**: {tick(wip)} — not live")
+    status_lines.append(
+        f"- **Preserved Architecture Patterns ({len(preserved)})**: {tick(preserved)}"
+    )
+
+    # A cross-architecture host has exactly one builder here, and the field is
+    # declared in inventory rather than held in someone's head: minyx is aarch64,
+    # delphi builds it, the x86 hosts cannot, and scripts/task/minyx-keeper.sh
+    # refuses to run where it is not the declared builder.
+    cross = sorted(h for h, i in hosts.items() if i.get("builder"))
+    cross_section = (
+        [
+            f"### 5. Cross-Architecture Builds ({tick(cross)})",
+            "- **Builder**: "
+            + ", ".join(f"`{h}` → `{hosts[h]['builder']}`" for h in cross)
+            + ". Built there and substituted here; a host with a declared builder is not a CI target.",
+            "",
+        ]
+        if cross
+        else []
+    )
+
     doc = [
         "# Fleet LLM Context Matrix",
         "",
@@ -127,10 +176,7 @@ def generate_fleet_matrix_markdown(data):
         "",
         "## Fleet Status Breakdown",
         "",
-        "- **Active Production Nix Hosts (11)**: `frieren`, `poseidon`, `eisen`, `stark`, `fern`, `scratch`, `netbook`, `guckloch`, `kellerbench`, `kali`, `moto`",
-        "- **Active External Non-Nix Hosts (3)**: `serv00`, `dragoncourt`, `envs`",
-        "- **Work-in-Progress Hosts (1)**: `delphi` (OCI A1 bastion - NOT yet live)",
-        "- **Preserved Architecture Patterns (16)**: `aceofspades`, `alarm`, `ancientace`, `applevalley`, `ares`, `aristotle`, `cassini`, `deckstation`, `demo`, `garnixMachine`, `minyx`, `mtfuji`, `penguin`, `schneeeule`, `sledgehammer`, `testvm`",
+        *status_lines,
         "",
         "---",
         "",
@@ -153,9 +199,7 @@ def generate_fleet_matrix_markdown(data):
         "- **Strict Warning**: NON-NIX. NEVER run `nixos-rebuild`, `nix`, or NixOS commands.",
         "- **Serv00 Quota**: Strict 512 MB RAM limit. Violators killed by FreeBSD kernel. Manage via Devil CLI.",
         "",
-        "### 5. Work in Progress (`delphi`)",
-        "- **Status**: WIP / Not Live. Do not assume active production services until deployed.",
-        "",
+        *cross_section,
         "---",
         "",
         "## Quick Host Spec Reference",
@@ -196,10 +240,9 @@ AGENTS_INVENTORY_SECTION = """### Complete Client OS Fleet Inventory
 
 > **No table here — by design.** The fleet registry has exactly one home:
 > [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
-> with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the
-> generated catalog in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`).
-> A pasted table is a table that disagrees with itself within a month —
-> `.agents/SCHEMA.md` §1, and `docs/docs-pipeline-audit.md` F4."""
+> with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the catalog
+> in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`). A pasted
+> table disagrees with itself within a month — `.agents/SCHEMA.md` §1, `docs/docs-pipeline-audit.md` F4."""
 
 AGENTS_START = "### Complete Client OS Fleet Inventory"
 AGENTS_END = "### Module Layout"

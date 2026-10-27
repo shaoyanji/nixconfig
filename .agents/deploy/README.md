@@ -15,8 +15,10 @@ here so no card is an orphan:
 - [`hosts/eisen.md`](hosts/eisen.md) — LLM stack operations; architecture and
   measurements are [`docs/eisen-llm-architecture.md`](../../docs/eisen-llm-architecture.md).
 - [`hosts/frieren.md`](hosts/frieren.md) — NAS self-upgrade topology and its traps.
-- [`hosts/minyx.md`](hosts/minyx.md) — Pi 3B jump box: the sd-image trim, who owns
-  the firmware partition versus `/boot`, and what the eval gate does not prove.
+- [`hosts/minyx.md`](hosts/minyx.md) — Pi 3B jump box: built and pushed by delphi
+  (`builder` in inventory, kept current by `minyx-keeper.timer`), the sd-image
+  trim, who owns the firmware partition versus `/boot`, and what the eval gate
+  does not prove.
 - [`hosts/netbook.md`](hosts/netbook.md) — pinned boot chain, push deploy, and the
   two on-target guards (kernel/initrd, `/etc/nixos` drift).
 - [`hosts/scratch.md`](hosts/scratch.md) — throwaway host conventions.

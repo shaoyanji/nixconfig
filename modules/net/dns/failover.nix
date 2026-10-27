@@ -1,10 +1,6 @@
-# DNS high availability: one reusable, role-based resolver stack (HC-3).
-#
-# Two backends, one declaration: `pihole` (unbound + pihole-ftl, the filtering
-# stack with a web UI) and `blocky` (one Go binary, local records, same
-# blocklists). The backend is a host property, not a preference: frieren has the
-# RAM for FTL, minyx is a 1 GiB Pi where a second daemon is the difference
-# between answering and swapping.
+# DNS high availability: one reusable, role-based resolver stack (HC-3). Two
+# backends, one declaration — `pihole` (frieren) or `blocky` (minyx, 1 GiB).
+# Address rules, preconditions and the takeover test: docs/dns-failover.md.
 {
   config,
   lib,

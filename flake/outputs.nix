@@ -19,7 +19,17 @@
   # `darwinConfigurations`; nothing else fans out to it.
   systems = {
     work = ["x86_64-linux" "aarch64-linux"];
-    checks = ["x86_64-linux"];
+    # Both Linux architectures the fleet runs, because `checks.<system>` is repo
+    # hygiene (inventory, policies, task graph, skills) and forces no host config —
+    # the budget rule that keeps this set cheap is in flake/checks.nix. It was
+    # x86_64-only, which made every consumer of "the checks for THIS system"
+    # unrunnable on the fleet's ARM hosts: `task checks:quick` (a platform mismatch
+    # on delphi), `taskfile-graph.sh --artifact` (resolves builtins.currentSystem
+    # and then asks for an attribute that did not exist), and the skills gate.
+    # Cost is one more cheap evaluation when something walks both systems
+    # (`nix flake check`); CI pins `checks.x86_64-linux.*` explicitly, so it is
+    # unaffected. darwin is still absent on purpose — see the note above.
+    checks = ["x86_64-linux" "aarch64-linux"];
   };
 
   overlays = [

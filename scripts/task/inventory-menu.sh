@@ -11,7 +11,9 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 INVENTORY_FILE="${REPO_ROOT}/inventory.toml"
 
-if ! command -v gum >/dev/null 2>&1; then
+# `--counts` is the one non-interactive entry point (the drift gate's fix), so it
+# must not be gated on the TUI's dependency.
+if [ "${1:-}" != "--counts" ] && ! command -v gum >/dev/null 2>&1; then
   echo "Error: 'gum' is required for the interactive inventory menu." >&2
   echo "Ensure gum is installed or run within devShell." >&2
   exit 1
@@ -33,14 +35,37 @@ list_hosts() {
     ] | @tsv' "$INVENTORY_FILE" | awk -F'\t' '{printf "%-13s [%-9s | %-6s | CI: %-3s] %s\n", $1, $2, $3, $4, $5}'
 }
 
+# Recompute the derived [metadata] counts from .hosts.
+#
+# yq computes them; a line edit writes them. `yq -i` on the whole document is a
+# format round-trip, not an edit: it collapsed every multi-line `notes = [...]`
+# array in this 900-line file onto one line, so a five-number change arrived as a
+# 48-line diff. Read-only yq + an anchored substitution keeps the diff to the
+# five lines that actually changed.
 update_metadata_counts() {
-  yq -i '
-    .metadata.total_devices = (.hosts | length) |
-    .metadata.active_nix_devices = ([.hosts[] | select(.status == "active" and (.kind == "nixos" or .kind == "darwin" or .kind == "home"))] | length) |
-    .metadata.active_external_devices = ([.hosts[] | select(.status == "active" and .kind != "nixos" and .kind != "darwin" and .kind != "home")] | length) |
-    .metadata.wip_devices = ([.hosts[] | select(.status == "wip")] | length) |
-    .metadata.preserved_devices = ([.hosts[] | select(.status == "preserved")] | length)
-  ' "$INVENTORY_FILE"
+  local total active_nix active_ext wip preserved key value missing=0
+  total=$(yq '.hosts | length' "$INVENTORY_FILE")
+  active_nix=$(yq '[.hosts[] | select(.status == "active" and (.kind == "nixos" or .kind == "darwin" or .kind == "home"))] | length' "$INVENTORY_FILE")
+  active_ext=$(yq '[.hosts[] | select(.status == "active" and .kind != "nixos" and .kind != "darwin" and .kind != "home")] | length' "$INVENTORY_FILE")
+  wip=$(yq '[.hosts[] | select(.status == "wip")] | length' "$INVENTORY_FILE")
+  preserved=$(yq '[.hosts[] | select(.status == "preserved")] | length' "$INVENTORY_FILE")
+
+  while IFS='=' read -r key value; do
+    if grep -qE "^${key} = " "$INVENTORY_FILE"; then
+      sed -i -E "s/^${key} = .*/${key} = ${value}/" "$INVENTORY_FILE"
+    else
+      echo "inventory-menu: no top-level '${key}' line to rewrite" >&2
+      missing=1
+    fi
+  done <<EOF
+total_devices=$total
+active_nix_devices=$active_nix
+active_external_devices=$active_ext
+wip_devices=$wip
+preserved_devices=$preserved
+EOF
+
+  return "$missing"
 }
 
 show_host_card() {
@@ -197,5 +222,17 @@ main_menu() {
     esac
   done
 }
+
+# Non-interactive: recompute the derived `[metadata]` counts from `.hosts`.
+# These counts had exactly one writer — a menu item in the TUI above — so the
+# consistency gate in lib/inventory.nix told the reader to run
+# `task dev:inventory:sync`, which does not touch inventory.toml at all. A gate
+# whose remedy does not exist is a gate that stays red, which is what happened
+# when minyx was promoted preserved -> active. Same yq expression, same function.
+if [ "${1:-}" = "--counts" ]; then
+  update_metadata_counts
+  echo "inventory.toml: [metadata] counts recomputed from .hosts"
+  exit 0
+fi
 
 main_menu

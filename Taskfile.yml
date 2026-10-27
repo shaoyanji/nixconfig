@@ -17,7 +17,14 @@ vars:
     SECRETS: modules/secrets
     PI: minyx
     # Personal/desktop vars used by this file's own tasks:
-    NIX_CONFIG: ~/Documents/nixconfig
+    #
+    # There was a `NIX_CONFIG: ~/Documents/nixconfig` here, restored by the
+    # c85a41d comment above. Nothing ever read `{{.NIX_CONFIG}}`, and the name is
+    # not free: NIX_CONFIG is how Nix takes configuration *lines*, so task
+    # exporting this var into a command's environment made every `nix` invocation
+    # under it die with "syntax error in configuration line '~/Documents/nixconfig'".
+    # It was invisible until a task resolved the local system in a `sh:` var
+    # (checks:quick), where the failure is a failed eval, not a loud error.
     NIXNAS: /Volumes/data
     MNTW: /Volumes/peachcable
     MNTX: /Volumes/shared

@@ -319,6 +319,19 @@ tasks:
       - task dev:inventory:home-agents
       - task docs:build
 
+  dev:inventory:counts:
+    desc: Recompute inventory.toml's derived [metadata] counts from .hosts
+    summary: >
+      The fix the inventory-schema gate names when a host changes status. It runs
+      the same yq expression the inventory TUI uses (yq -i over inventory.toml),
+      non-interactively, because that menu item used to be the ONLY writer of
+      these counts — so the gate's advice pointed at dev:inventory:sync, which
+      never touches inventory.toml, and stayed red until someone drove the TUI by
+      hand. Run after any status/kind change, then re-run the gate. Exit 0 =
+      counts rewritten; 1 = yq missing.
+    cmds:
+      - bash scripts/task/inventory-menu.sh --counts
+
   dev:inventory:llm:
     desc: Compile and render the LLM prompt context card for a specific host (HOST=name)
     cmds:

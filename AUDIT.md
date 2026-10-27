@@ -15,7 +15,7 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 | :--- | :--- | :--- |
 | Fleet registry | 34 devices: 18 active (11 NixOS, 1 home-manager, 6 external), 16 preserved | `nix eval .#inventory.hosts`, `.#inventory.derived` |
 | Host gates | per-host eval (assertions) and per-host VM boot to stage-2, one process each | `.#hostChecks.x86_64-linux.<host>`, `.#hostBootChecks.aarch64-linux.delphi` |
-| Known red gates | `minyx` (kernel conflict), `cassini` (xdg.desktopEntries on darwin) — both dormant | `task checks:host HOST=minyx MODE=eval` |
+| Known red gates | `cassini` (xdg.desktopEntries on darwin), dormant. `minyx` passes its gate on its own arch (`ARCH` now resolves per host, so no flag); its hardware is the shortfall, not its config: continuous under-voltage in `dmesg` | `task checks:host HOST=minyx` |
 | Formatting | alejandra, 231 tracked `.nix` files clean | `task checks:nix:format` |
 | Lint | deadnix hard gate, statix advisory | `task checks:nix:lint` |
 | Secrets | 7 SOPS files, zero drift (37 recipients per rule) | `task checks:sops:drift` |

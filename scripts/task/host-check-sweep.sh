@@ -49,8 +49,15 @@
 # `--builders ""` here exists so this gate can never drift into doing that.
 #
 # USAGE
-#   host-check-sweep.sh --hosts "a b c" [--mode build|eval] [--arch x86_64-linux]
+#   host-check-sweep.sh --hosts "a b c" [--mode build|eval] [--arch ARCH]
 #                       [--timeout SECONDS] [--flake REF]
+#
+# --arch defaults to EACH HOST'S OWN arch, read from the compiled registry (one
+# 0.2 s attr read, no host evaluation), not to the machine running this script.
+# It used to default to x86_64-linux, which made the gate unrunnable on the one
+# host that needs it most: `checks:host HOST=minyx` from delphi (aarch64) asked
+# for hostChecks.x86_64-linux.minyx, an attribute that does not exist. Pass
+# --arch to override; the x86_64 fleet never has to.
 #
 # --flake REF gates REF instead of the local tree (default "."). The nightly
 # drift sweep passes github:shaoyanji/nixconfig so it reports what systemd.
@@ -64,7 +71,7 @@
 set -uo pipefail
 
 MODE="build"
-ARCH="x86_64-linux"
+ARCH=""
 TIMEOUT=120
 HOSTS=""
 REF="."
@@ -125,7 +132,7 @@ nixos $h"; done
 fi
 
 count=$(echo "$HOSTS" | wc -w)
-echo "host-check-sweep: ${count} named host(s), mode=${MODE}, one process each, watchdog every 10s"
+echo "host-check-sweep: ${count} named host(s), mode=${MODE}, arch=${ARCH:-per-host}, one process each, watchdog every 10s"
 echo
 
 failed=""
@@ -135,6 +142,15 @@ while read -r kind host; do
   i=$((i + 1))
   printf '[%d/%d] ' "$i" "$count"
   if [ "$MODE" = build ]; then
+    # hostChecks is keyed by the HOST's arch, so an unset --arch has to be read
+    # from the registry rather than assumed from `uname`. A bare
+    # /run/current-system check would also be wrong: this gate must be callable
+    # for a host whose arch differs from the caller's.
+    host_arch="$ARCH"
+    if [ -z "$host_arch" ]; then
+      host_arch="$(timeout 30 nix eval --raw "${REF}#inventory.hosts.\"${host}\".arch" 2>/dev/null || true)"
+      host_arch="${host_arch:-x86_64-linux}"
+    fi
     build_flags=(--builders "")
     if [ "${OFFLOAD:-0}" = "1" ]; then
       # /etc/nix/machines supplies the builders; nothing may run locally.
@@ -146,7 +162,7 @@ while read -r kind host; do
     # tee on stdout, not a process substitution: PIPESTATUS gives the guard's
     # status after tee has flushed, so the classification below reads the whole log.
     bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "host-check ${host}" -- \
-      nix build --no-link -L "${build_flags[@]}" "${REF}#hostChecks.${ARCH}.${host}" 2>&1 | tee "$log" >&2
+      nix build --no-link -L "${build_flags[@]}" "${REF}#hostChecks.${host_arch}.${host}" 2>&1 | tee "$log" >&2
     rc=${PIPESTATUS[0]}
     # A cache miss and a failed assertion both exit 1; only the first deserves the
     # warm-it advice, so classify by what nix said.

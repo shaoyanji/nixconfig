@@ -3599,7 +3599,7 @@
       summary = "delphi is the fleet's only aarch64-linux host, so minyx and any mobile-nixos target have nowhere to build today; one timed closure decides whether it is a builder or a dead end.";
       refs = {
         hosts = ["delphi" "frieren" "minyx"];
-        modules = ["modules/profiles/nixbuild-client.nix" "hosts/minyx/custompi.nix"];
+        modules = ["modules/profiles/nixbuild-client.nix" "hosts/minyx/configuration.nix"];
         tasks = ["checks:host" "dev:nixbuild:plan"];
         docs = [".agents/deploy/hosts/delphi.md"];
       };
@@ -3939,7 +3939,7 @@
       summary = "minyx is refreshed for a reflash (NetworkManager, zram, single-job Nix, a firewall that actually admits blocky, trimmed packages) and waits on an SD card and 26.11 stable.";
       refs = {
         hosts = ["minyx"];
-        modules = ["hosts/minyx/custompi.nix"];
+        modules = ["hosts/minyx/configuration.nix"];
         tasks = ["checks:host"];
       };
       body = ''

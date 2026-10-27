@@ -294,9 +294,13 @@ for an orphan before retrying.
 ## 7. Known limits
 
 - Sentinel is frieren-local; fleet push is P1 in `ARCHITECTURE.md`.
-- DNS has one resolver (HC-3); `checks:dns:failover` exits 2 by design.
+- DNS has two members (HC-3): frieren primary, minyx backup behind `192.168.3.50`.
+  `checks:dns:failover` probes the VIP, so it reports a real owner only when run
+  from the LAN's L2 — from delphi it says undecided rather than green.
 - MQTT has no subscriber (HC-5); HA needs one config-entry action.
-- `minyx` and `cassini` fail their per-host gate; both are dormant.
+- `cassini` fails its per-host gate (`xdg.desktopEntries` on darwin) and is dormant.
+- `minyx` passes its gate and is active, but its power supply is short:
+  `dmesg` shows continuous under-voltage (see `.agents/deploy/hosts/minyx.md`).
 - Uptime Kuma still has zero monitors; gatus is the declarative monitor.
 - `~/AGENTS.md` is `.#homeAgents.<host>` (a store symlink); the offline fleet-matrix table still uses `compile-llm-specs.py`.
 

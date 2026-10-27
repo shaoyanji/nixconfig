@@ -44,10 +44,17 @@ reads `hosts.<h>.network.mac` from the compiled artifact.
 | Section | Notes |
 | :--- | :--- |
 | `[metadata]` | `title`, `description`, `version`, `canonical_repo`, plus the derived counts (see below) |
-| `[hosts.<name>]` | `hostname` (defaults to the key), `kind` (`nixos`/`darwin`/`home`/`external`), `arch`, `status` (`active`/`preserved`/`wip`), `role`, `category`, `users`, `flake`, `managed`, `ci`, `is_nix`, `system_type`, `notes` |
+| `[hosts.<name>]` | `hostname` (defaults to the key), `kind` (`nixos`/`darwin`/`home`/`external`), `arch`, `status` (`active`/`preserved`/`wip`), `role`, `category`, `users`, `flake`, `managed`, `builder`, `ci`, `is_nix`, `system_type`, `notes` |
 | `[hosts.<name>.hardware]` | `model`, `cpu`, `gpu`, `ram`, `display`, `battery`, `storage_type`, `storage_layout` |
 | `[hosts.<name>.network]` | `lan_ip`, `mac`, `tailscale_ip`, `tailscale_hostname`, `ssh_alias`, `domain`, `gemini_url`, `gopher_url`, `tailscale` |
 | `[hosts.<name>.software]` | `module_chain`, `impermanence`, `key_services`, `traits` |
+
+`builder` names the one host allowed to build and deploy this one, by hostname.
+It exists because a cross-architecture member has exactly one builder in this
+fleet (minyx is aarch64 and is built on delphi; the x86 hosts cannot build it and
+the board itself is too slow): `scripts/task/minyx-keeper.sh` reads the field and
+refuses to run where it is not the declared builder, so "who deploys this" is a
+declared fact rather than a convention held in someone's head.
 
 `software.traits` is the vocabulary shared modules read instead of keeping
 hostname lists [[flake/policies.nix#capabilities-are-traits-not-names]]. A module
@@ -128,8 +135,14 @@ for another architecture needs a builder for it.
 `<kind>Configurations.<host>.config` (module system, every assertion, and the registry
 read) instead of building, so it is architecture-independent and works for all three
 kinds from an x86_64 machine — `task checks:host HOST=penguin MODE=eval` costs 2.7 s /
-452 MiB. That is the only way to check an aarch64 or darwin host here, and it is how
-the two currently-failing hosts were found (`minyx`, `cassini` — see AGENTS.md).
+452 MiB. That is the only way to check an aarch64 or darwin host from an x86_64 host,
+and it is how the failing darwin host was found (`cassini` — see AGENTS.md).
+
+A *build* mode gate no longer needs `ARCH` either: `hostChecks` is keyed by each
+host's own architecture and the sweep reads it from the compiled registry, so
+`task checks:host HOST=minyx` is the same command on delphi (aarch64, native) and
+on an x86_64 host (which then needs a builder for it). Passing `ARCH=` overrides
+that, and `MODE=eval` ignores it.
 
 There is deliberately **no task that defaults to the fleet**. `checks:host` requires one
 host name and `checks:hosts` requires an explicit `HOSTS=` list, because a default set

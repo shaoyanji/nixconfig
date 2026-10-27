@@ -1,31 +1,86 @@
-# minyx — Pi 3B jump box, sd-image build
+# minyx — Pi 3B jump box, pushed to the device from delphi
 
-The Pi is not deployed with `infra:deploy`; it takes an image, and the image is
-built anywhere but there.
+Deployment is a **closure push**, not a flash. The host is built on delphi (the
+fleet's only aarch64 builder) and activated over ssh on the running system; no
+sdImage is built for it any more. The device's own FAT partition already boots
+U-Boot, which reads `/boot/extlinux/extlinux.conf` from the root filesystem — the
+file a switch writes. This host is not on `infra:deploy` or the sweeps (inventory
+`status = "preserved"`), so the commands below are the deploy path.
 
-## In flight (2026-10-26)
-
-`nix build .#nixosConfigurations.minyx.config.system.build.sdImage` runs on
-**delphi**, detached, from commit `e57537f6`:
-
-| | |
-|---|---|
-| wrapper | `~/minyx-build.sh` on delphi |
-| log | `~/minyx-sdimage.log` on delphi |
-| started | 2026-10-26T10:57:51+01:00 |
-| flags | `-L --builders "" --print-out-paths` — local compile, cannot bill nixbuild.net |
-| done marker | `EXIT=<code>` plus a timestamp as the last lines |
+## Push topology
 
 ```bash
-ssh delphi.bountystash.com 'tail -5 ~/minyx-sdimage.log; pgrep -fa "nix build" | head -2'
+# on delphi, as root — the nix daemon's ssh uses /root/.ssh/id_ed25519
+sudo nixos-rebuild switch -L --flake .#minyx --target-host root@192.168.3.9
 ```
 
-The run is long because the kernel comes from nixos-hardware
-(`linux-rpi-…-stable`), not from `cache.nixos.org`, so delphi compiles it on two
-OCPUs. The finished image is `<out>/sd-image/*.img.zst`; nothing has booted it
-yet.
+- **Reachable without a tailnet on the Pi:** frieren advertises `192.168.3.0/24`
+  and delphi runs `--accept-routes=true`, so the cloud host opens TCP/22 to a LAN
+  address. Proved before the first push.
+- **The build is cheap here, unlike the image.** The RPi kernel and modules
+  substitute from `shaoyanji.cachix.org` (155 MiB): only ~26 derivations (etc,
+  units, `activate`, the toplevel) compile on delphi's two OCPUs, about five
+  minutes. `--builders ""` keeps this off nixbuild.net.
+- **The first push is the last one over `root@`.** `custompi.nix` sets
+  `PermitRootLogin = "no"`, so after activation the target is `devji@` +
+  CA-signed cert + `--use-remote-sudo`. delphi had no client key at all; it now
+  holds `/root/.ssh/id_ed25519` (this push) and `~/.ssh/id_ed25519` with a cert
+  it signed from the CA it already carries (the next one).
+- **The pushed system is what makes that possible**: `ssh.ca.enable = true` and
+  `security.sudo.wheelNeedsPassword = false`, the two settings every other NixOS
+  host inherits from `modules/profiles/base-node.nix` and this one lacked. With
+  root logins off and no password for `devji`, a push without them leaves no way
+  back in.
+- **Rollback is a reflash.** The previous generation stays on the card
+  (`nixos-1-default` in `/boot/extlinux/extlinux.conf`, kernel in `/boot/nixos`),
+  but the board is headless: choosing it needs a serial console.
 
-## Image layout
+## Label declaration must match the media (the brick of 2026-10-26)
+
+`fileSystems."/"` is generated from `sdImage.rootVolumeLabel`, so the pushed
+system's stage-1 mounts `/dev/disk/by-label/<that string>`. The flashed media
+carried the stock image's `NIXOS_SD` while the tree declared `NIXER`; the next
+reboot panicked in stage-1 and the host had no network to fix itself. Two things
+made it recoverable: the closure and boot entries were already on the card, and a
+stock `nixos`/`nixos` console login still worked.
+
+Before any push to this host, compare the declared label with the target's:
+
+```bash
+nix eval --raw .#nixosConfigurations.minyx.config.sdImage.rootVolumeLabel
+ssh devji@192.168.3.9 'sudo blkid -p /dev/sda2 | grep -o "LABEL=\"[^\"]*\""'
+```
+
+The declaration now matches the flashed media (`NIXOS_SD`), so relabelling the
+stick is not part of this workflow. `sudo e2label /dev/sda2 <label>` is the online
+fix if the two ever diverge again.
+
+## Verified state (2026-10-27, after a reboot that came back unattended)
+
+- **sops is enrolled and decrypting.** `custompi.nix` declares `defaultSopsFile`,
+  `age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"]` and the `github-token`
+  secret (`key = "ghsudo"`, owner `devji`). The host's own tooling names the
+  identity it derived — *Imported /etc/ssh/ssh_host_ed25519_key as age key with
+  fingerprint age155uxts5…* — which is `&minyxhost` in both `.sops.yaml` files.
+  `/run/secrets/github-token` renders `0400 devji` and `gh auth status` with it
+  reports account `shaoyanji`, so `ghcs` works.
+- **Push as `devji`, not as root.** Under `sudo` the store copy authenticates as
+  root, whose key holds no cert for `devji` — observed as `devji@192.168.3.9:
+  Permission denied (publickey,keyboard-interactive)` after a successful build.
+  devji's `~/.ssh` on delphi carries the CA cert; `--use-remote-sudo` elevates on
+  the target only.
+- **Tailscale is still logged out** — the one piece not done. It needs a tailnet
+  auth key (a sops slot + `services.tailscale.authKeyFile`, or a one-off
+  `sudo tailscale up --authkey=…`, which survives reboot: `/var/lib/tailscale` is
+  on the card and this host has no impermanence).
+- **Disk after GC: 2.2 GB of 15 GB** (`nix-env --delete-generations old` +
+  `nix-collect-garbage -d` freed 752 paths / 2.3 GiB; the stock generation and the
+  superseded initrd are gone, and `switch-to-configuration boot` pruned
+  `/boot/nixos`).
+
+## Image layout (the flash path, retired)
+
+Kept because it is the ownership map for anyone who goes back to flashing. It
 
 `hosts/minyx/hardware-configuration.nix` imports the **generic**
 `installer/sd-card/sd-image.nix`, not `sd-image-aarch64.nix`. The aarch64
@@ -75,6 +130,9 @@ without              240 paths  0.85 GB      systemPackages 166 → 133
   value is read. A build, or a forced toplevel, is the only proof.
 - The host had no system account before this work — only a Home Manager user
   entry — so a preserved config was never loginable.
-- Flashing needs two inputs at the time: the USB device name, and the age
-  recipient, which only exists after the first boot from the host key. Sops and
-  the Tailscale auth key therefore land in a second commit.
+- Anything that authenticates the host still has to be added deliberately: the
+  Tailscale auth key and the `github-token` `ghcs` reads are declared by no
+  module, and `.sops.yaml` has no minyx recipient, so a rekey is part of the fix.
+- **Resolve the device's own address before the reboot, not after.** hostname is
+  served by DHCP on `192.168.3.9`; a switch does not change the kernel hostname
+  (`hostname` still printed `nixos` while `/etc/hostname` said `minyx`).

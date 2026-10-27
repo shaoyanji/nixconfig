@@ -73,6 +73,28 @@ in {
   ssh.ca.enable = true;
   security.sudo.wheelNeedsPassword = false;
 
+  # ── secrets ─────────────────────────────────────────────────────────────
+  # This host imports sops-nix (flake/host-inventory.nix) but nothing ever
+  # configured it: no default file, no identity, and no secret declared — so
+  # every secret would have stayed unrendered, which is why `ghcs` reported
+  # "sops is not enrolled on this host yet".
+  #
+  # `age.sshKeyPaths` is the fleet convention (modules/profiles/base-node.nix):
+  # the host's own SSH host key *is* its age identity, and `&minyxhost` in
+  # .sops.yaml is the matching recipient. No age `keys.txt` belongs on a NixOS
+  # host — that file is the Home Manager plane, and this host has no Home
+  # Manager on purpose.
+  sops = {
+    defaultSopsFile = ../../modules/secrets.yaml;
+    age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+    secrets."github-token" = {
+      # Read by `ghcs` (hosts/minyx/tunnel.nix); the value is the `ghsudo`
+      # entry in modules/secrets.yaml.
+      key = "ghsudo";
+      owner = user.name;
+    };
+  };
+
   services.tailscale.enable = true;
 
   # This box had no system account at all: the old chain created only a

@@ -227,6 +227,12 @@ static const Key keys[] = {
 	 * bound (spotlight[]). Mod+Shift+E stays as an escape hatch; niri has no
 	 * equivalent.
 	 */
+	/* Host keybinds, spliced here by modules/profiles/dwl-desktop.nix from a
+	 * host's `profiles.dwlDesktop.extraKeybinds`. They sit FIRST because dwl
+	 * takes the first match, so a host entry deliberately shadows the fleet
+	 * binding for the same key. */
+	/* @EXTRA_KEYBINDS@ */
+
 	/* modifier                    key                  function          argument */
 	/* niri: Mod+A launcher, Mod+T terminal (kitty) */
 	{ MODKEY,                      XKB_KEY_a,           spawn,            {.v = menucmd} },

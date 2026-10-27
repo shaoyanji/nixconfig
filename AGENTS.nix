@@ -3969,49 +3969,32 @@
       summary = "The spare SD card runs gokrazy and receives updates pushed from any fleet host: the instance is declared in hosts/gok, the password comes from sops, breakglass keys are generated from authorized-keys.nix, and gok itself is only ever a `nix shell` instantiation.";
       refs = {
         hosts = ["gok"];
-        modules = ["hosts/gok/config.json" "scripts/task/gok.sh"];
+        modules = ["hosts/gok/instance.nix" "modules/services/gokrazy.nix" "scripts/task/gok.sh"];
         docs = [".agents/deploy/README.md"];
       };
       body = ''
-        **Declared.** `hosts/gok/config.json` is the instance: hostname, the four
-        default packages, breakglass keys, and `Update.HTTPPassword` muted to "".
-        `scripts/task/gok.sh` materialises it into `~/.cache/nixconfig-gok`, injects
-        `gokrazy.gok.http_password` from sops, and runs `gok` via
-        `nix shell nixpkgs#gokrazy` — nothing is installed.
-
-        **Why a cache.** `gok update` pins the device TLS material into the
-        instance config (`Update.CertPEM/KeyPEM`), which may not live in the repo.
-        The cache keeps it, the repo wins for declared keys, and `edit` writes back
-        with password and TLS keys stripped.
-
-        **Usage, any fleet host with the repo and an age key.**
-        `gok.sh show` | `gok.sh edit` | `gok.sh update` (first contact may need
-        `--insecure` until the cert is pinned) | `gok.sh overwrite --full=/dev/sdX`.
-
-        **Proven 2026-10-26.** `gok.sh update` from frieren built the instance and
-        pushed 41 MiB root + 71 MiB boot over HTTP; the device rebooted and
-        answered again. breakglass is installed but not started at boot by
-        gokrazy's own rule, so port 2222 stays closed until it is started from the
-        web UI.
-
-        **The instance Hostname is the tailnet FQDN**, not the bare `gok`: gok
-        resolves `Hostname` with the host's resolver, and systemd-resolved refuses
-        single-label names (`resolvectl query gok` → "No appropriate name
-        servers"; `dig gok.` answers, Go's resolver does not).
-        `gok.cloudforest-kardashev.ts.net` resolves through pihole's tailnet-zone
-        forward on the LAN and through MagicDNS on the tailnet, so one update works
-        from any host. `--hostname=gok` keeps the tailnet node name short and
-        independent of it.
-
+        **Declared.** `hosts/gok/instance.nix` is the instance — hostname, the four default packages,
+        breakglass keys, `Update.HTTPPassword` muted to `""`; `modules/services/gokrazy.nix` renders it, and
+        `scripts/task/gok.sh` (whose header is the usage) materialises it into `~/.cache/nixconfig-gok`,
+        injects `gokrazy.gok.http_password` from sops and runs `gok` from `nix shell nixpkgs#gokrazy` —
+        nothing is installed. The cache exists because the runtime TLS state (`Update.CertPEM/KeyPEM`) is
+        not the repo's to declare: the repo wins for declared keys, the cache keeps the rest, and `edit`
+        writes back with password and TLS keys stripped.
+        **Proven 2026-10-26.** `gok.sh update` from frieren pushed 41 MiB root + 71 MiB boot over HTTP and
+        the device rebooted into an answering system. breakglass is installed but not started at boot by
+        gokrazy's own rule, so port 2222 stays closed until it is started from the web UI.
+        **The instance Hostname is the tailnet FQDN**, not bare `gok`: gok resolves it with the host's
+        resolver, and systemd-resolved refuses single-label names (`resolvectl query gok` → "No
+        appropriate name servers", while `dig gok.` answers) — Go's resolver takes the strict path.
+        `gok.cloudforest-kardashev.ts.net` resolves through pihole's tailnet-zone forward on the LAN and
+        MagicDNS on the tailnet, so one update works from any host; `--hostname=gok` keeps the tailnet node
+        name short and independent of it.
         **Cost is cached, measured 2026-10-26.** GOCACHE and GOMODCACHE live under
-        `~/.cache/nixconfig-gok/go/{build,mod}` beside the instance's `builddir`, so
-        repeat pushes reuse the compiled tailscale: a cold build spent 4m45s
-        compiling; the same update with warm caches took **1m48s end to end**
-        (build + 41 MiB root / 71 MiB boot push + reboot + `Device ready to use!`).
-        First run on a fresh host pays the cold compile once.
-
-        **Exit.** `gok update` works by name from any fleet host, and the flash path
-        no longer depends on one machine's instance directory.
+        `~/.cache/nixconfig-gok/go/{build,mod}` beside `builddir`, so repeat pushes reuse the compiled
+        tailscale: a cold build spent 4m45s compiling, the same update warm took **1m48s end to end**
+        (build + push + reboot + `Device ready to use!`) — a fresh host pays the cold compile once.
+        **Exit.** `gok update` works by name from any fleet host, and the flash path no longer depends on
+        one machine's instance directory.
       '';
     };
     resolver-never-breaks = {
@@ -4028,39 +4011,27 @@
         tasks = ["infra:switch:nixos"];
       };
       body = ''
-        **What broke (2026-10-26).** A local `nixos-rebuild switch` on frieren was
-        aborted by the IO watchdog and then failed on a stale
-        `mnt-burgernas-peachcable.mount`; pihole-ftl had already been stopped for
-        the activation, so the LAN had no resolver. Two further faults were
-        exposed, not caused: the portal vhost only listened on :80, so any
-        unmatched `https://` name landed on the first 443 block (Audiobookshelf);
-        and pihole answered NXDOMAIN for every `*.cloudforest-kardashev.ts.net`
-        name, so tailnet URLs never resolved for a LAN browser.
-
-        **Four fixes, in order of what they protect.**
-        - pihole forwards the whole tailnet zone to MagicDNS
-          (`server=/cloudforest-kardashev.ts.net/100.100.100.100`), so tailnet
-          FQDNs resolve for any client of the fleet resolver and follow the node.
-        - the portal owns :443 as `default_server` with the LAN wildcard cert, so
-          an unknown Host (the tailnet FQDN, `vault.frieren.lan` upgraded to
-          https) gets the portal instead of whichever vhost serialized first.
-        - `dns-resolver-watchdog` asks 127.0.0.1 the question a client asks and
-          restarts pihole-ftl after three failed probes, standing down while a
-          switch is in progress; `pihole-ftl` itself is `Restart=always`.
-        - `infra:switch:<os>` refuses on a host whose `hosts/<host>/dns.nix`
-          declares `profiles.dnsFailover` unless `REMOTE_BUILD=1` (builds with
-          `max-jobs = 0`), and after any switch there proves the resolver answers
-          before exiting 0.
-
-        **Proven.** 15/15 portal links returned 200 through both entry points
-        (`192.168.3.25` and `frieren.<tailnet>.ts.net`), each resolving through
-        pihole; the guard refuses in 0.1 s before any evaluation; the watchdog has
-        no false positives against live names and fails a nonexistent one.
-
-        **Exit.** A rebuild of frieren is a rebuild of a peer, not of the fleet's
-        resolver: either the second resolver comment in hosts/frieren/dns.nix
-        becomes true (fern runs `role = "secondary"`) or the resolver moves off the
-        host that also runs the storage stack.
+        **What broke (2026-10-26).** A local `nixos-rebuild switch` on frieren was aborted by the IO
+        watchdog and then failed on a stale `mnt-burgernas-peachcable.mount`; pihole-ftl had already been
+        stopped for the activation, so the LAN had no resolver. Two faults surfaced with it: the portal
+        vhost only listened on :80, so any unmatched `https://` name landed on the first 443 block
+        (Audiobookshelf), and pihole answered NXDOMAIN for every `*.cloudforest-kardashev.ts.net` name, so
+        tailnet URLs never resolved from a LAN browser.
+        **Four fixes, in order of what they protect.** pihole forwards the whole tailnet zone to MagicDNS
+        (`server=/cloudforest-kardashev.ts.net/100.100.100.100`), so tailnet FQDNs resolve for any client of
+        the fleet resolver and follow the node. The portal owns :443 as `default_server` with the LAN
+        wildcard cert, so an unknown Host (the tailnet FQDN, `vault.frieren.lan` upgraded to https) gets the
+        portal instead of whichever vhost serialized first. `dns-resolver-watchdog` asks 127.0.0.1 the
+        question a client asks and restarts pihole-ftl after three failed probes, standing down while a
+        switch is in progress, and `pihole-ftl` itself is `Restart=always`. `infra:switch:<os>` refuses on
+        a host whose `hosts/<host>/dns.nix` declares `profiles.dnsFailover` unless `REMOTE_BUILD=1` (builds
+        with `max-jobs = 0`), and after any switch it proves the resolver answers before exiting 0.
+        **Proven.** 15/15 portal links returned 200 through both entry points (`192.168.3.25` and
+        `frieren.<tailnet>.ts.net`), each resolving through pihole; the guard refuses in 0.1 s before any
+        evaluation; the watchdog has no false positives against live names and fails a nonexistent one.
+        **Exit.** A rebuild of frieren is a rebuild of a peer, not of the fleet's resolver: either the
+        second resolver comment in `hosts/frieren/dns.nix` becomes true (fern runs `role = "secondary"`) or
+        the resolver moves off the host that also runs the storage stack.
       '';
     };
     open-frieren-offload = {
@@ -4432,6 +4403,58 @@
         blocks in `.nix` files — `nix-header-budget` bounds headers, and the body-comment essays this run
         produced are what the `agent-prose-budget` squeeze caught (a duplicated `tpm-sops` SKILL went so
         `docs/sops-rekey.md` stays the single home).
+      '';
+    };
+
+    netbook-desktop-phase-2 = {
+      title = "The netbook's session is the fleet's; the rice it runs is still hers";
+      kind = "open";
+      status = "OPEN";
+      priority = "P1";
+      date = "2026-10-27";
+      summary = "Phase 1 delivered the session and found two defects inside it (it ran stock dwl; then its clients raced a socket file a killed session left behind). Left is the port of ~/.dotfiles and ~/mako-suite off mako, fuzzel and alacritty — plan, mapping and measured win: docs/netbook-rice-port.md.";
+      refs = {
+        hosts = ["netbook"];
+        modules = [
+          "hosts/netbook/configuration.nix"
+          "hosts/netbook/dwl-keybinds.h"
+          "modules/profiles/dwl-desktop.nix"
+          "modules/config/dwl/config.h"
+        ];
+        tasks = ["infra:apply:host:netbook" "checks:host"];
+        docs = [
+          ".agents/deploy/hosts/netbook.md"
+          "docs/netbook-rice-port.md"
+        ];
+      };
+      from = ["rice-fork-not-patch"];
+      body = ''
+        **Delivered 2026-10-27: the session is the fleet's.** tty1 autologins and the login shell execs
+        `/etc/xdg/dwl-session` — NixOS's own `programs.dwl`, driven by this profile's `package` (the
+        spliced keymap) and `extraSessionCommands`, so the compositor is `lib.getExe cfg.package` and no
+        PATH can shadow it. niri, waybar, greetd/tuigreet and gnome-keyring left the closure. Her layer is
+        `hosts/netbook/dwl-keybinds.h`, spliced into the keymap *first* because dwl takes the first match:
+        the dead-key workaround for a broken ribbon connector, plus both of niri's launcher chords.
+        Two defects came out of deploying it (both in `AUDIT.md`, 2026-10-27): the session ran stock dwl
+        for one deploy because a hand-rolled wrapper listed `pkgs.dwl` beside the keymap build, and a
+        wrapper's PATH wins inside the session; then its clients raced a socket FILE a killed session had
+        left behind, losing swaybg, swayidle and mako while the autostart lines that never touch Wayland
+        survived. Instruments: `grep -a quick-keys.sh /proc/$(pgrep -x dwl)/exe` reads the *running*
+        binary, and a canary client proves that the compositor answers.
+        **Left: her userland is the old stack.** Every menu calls `fuzzel -d`, the six cards in
+        `~/mako-suite` find themselves through `makoctl list`, the launchers `exec alacritty`, and
+        makobatt locks with swaylock — so mako, fuzzel, alacritty and swaylock stay installed. That is
+        `rice-fork-not-patch` one layer out: port the mechanism a binding needs, not only its chord.
+        **The port is planned, not done — `docs/netbook-rice-port.md`.** Load-bearing facts: `fnottctl
+        list` prints `id: <raw title>` (cards identify by title; five of six already do, `makofetch`
+        needs one), fnott renders only `<b> <i> <u>` so `<span>` is *drawn* rather than dropped, and
+        fnott.ini has no per-app sections. Daemon swap and card port are one deploy, because only one
+        process can own `org.freedesktop.Notifications`.
+        Browser: firefox stays (her call, 2026-10-27); the seven measured candidates are not pursued.
+        **Exit criteria:** a HUD card appears under fnott and toggles off on the same chord; the bridge
+        block in `hosts/netbook/configuration.nix` is gone; every bind target resolves on the session's
+        *own* PATH (against `/proc/<dwl-pid>/environ`, never the ssh PATH); `checks:host HOST=netbook`
+        green after each step.
       '';
     };
 

@@ -1,0 +1,131 @@
+# The netbook's rice port: mako → fnott, and the lighter call sites
+
+Alice's userland (`~/.dotfiles`, `~/mako-suite`) was written for niri, fuzzel, mako
+and alacritty. The session is already the fleet's (`profiles.dwlDesktop`, 2026-10-27);
+this page is the plan for her half — the `netbook-desktop-phase-2` note owns the
+decision and the exit criteria, and the numbers below were read out of fnott 1.8.0's
+source and today's package closures, not from memory.
+
+Nothing here is executed yet. It is the mapping so the port does not have to be
+re-derived.
+
+## Why the daemon swap and the card port are one deploy
+
+Two processes cannot own `org.freedesktop.Notifications`. And fnott's renderer does
+not ignore markup it does not know: `notif_layout()` in `notification.c` breaks a run
+only on `<b>`, `<i>`, `<u>` and their closers, so a card still sending
+`<span foreground=…>` draws those characters. Half a swap therefore reads as "the HUD
+broke", not as "half-migrated".
+
+## Three facts that decide the port (fnott 1.8.0)
+
+### 1. Identification is by title, not by app name
+
+`fnottctl list` prints `id: <summary>` — `ctrl.c` writes `notif_get_summary(notif)`,
+which is the **raw summary with HTML entities decoded** (`notification.c`). It is not
+the rendered template, so `summary-format` cannot smuggle `%a` into the list. Each
+card must carry a unique, stable title; the toggle is then:
+
+```sh
+fnottctl list | awk -v t='🔋 makobatt' '$0 ~ t {gsub(":", "", $1); print $1; exit}'
+fnottctl dismiss <id>        # was: makoctl dismiss -n <id>
+fnottctl dismiss all         # was: makoctl dismiss --all
+```
+
+Five of the six cards already do this — `🔋 makobatt…`, `💾 makodf…`, `🎯 makokill…`,
+`📡 makonet…`, `📊 makotop…`. Only `makofetch`'s `❄️ ${USER}@$(hostname)` carries no
+card name and needs one.
+
+### 2. Markup is `<b> <i> <u>`, and nothing else
+
+`<span foreground=…>` is rasterized as literal text. The cards' per-line colours are
+genuinely lost; `<b>` survives. Strip the tags in the port — do not rely on the
+renderer to drop them.
+
+### 3. No per-app sections
+
+`fnott.ini` has `[main]`, `[low]`, `[normal]`, `[critical]` — three urgency buckets,
+not mako's arbitrary `[app-name=…]`. The six per-card blocks (border colour, 380–500 px
+width) collapse to one look, or to three if a card picks its urgency. Per-card
+*sticky* behaviour survives: the cards already pass the timeout in the `Notify` call.
+
+## The option mapping (the netbook's own mako config)
+
+| mako | fnott.ini | Note |
+| :--- | :--- | :--- |
+| `font=JetBrainsMono Nerd Font 11` | `title-font`, `summary-font`, `body-font` | fontconfig syntax, `:size=11`, three keys |
+| `background-color=#1e1e2ef2` | `background=1e1e2ef2` | RGBA hex, no `#` |
+| `text-color=#cdd6f4` | `title-color`, `summary-color`, `body-color` | three keys |
+| `border-color`, `border-size`, `border-radius` | same names | no `#` |
+| `progress-color=over #313244` | `progress-color` + `progress-style=background\|bar` | no `over` |
+| `icons=1`, `max-icon-size=48` | `max-icon-size=48` | `0` disables icons |
+| `default-timeout=5000` | `default-timeout=5` | **seconds**, not milliseconds |
+| `anchor=top-right` | `anchor=top-right` | |
+| `margin=8` | `edge-margin-vertical`/`-horizontal=8` | one key becomes two |
+| `padding=12` | `padding-vertical`/`-horizontal=12` | one key becomes two |
+| `width=360`, `height=120` | `min-width`/`max-width=360`, `max-height=120` | fnott wraps at `max-width` |
+| `max-visible=4` | — | **no equivalent** |
+| `markup=1` | always on, `<b> <i> <u>` only | see fact 2 |
+| `[urgency=low\|normal\|high]` | `[low]`, `[normal]`, `[critical]` | three named sections |
+| `[app-name=makotop]` ×6 | — | see fact 3 |
+| `[app-name=…] default-timeout=0` | the card's own `Notify` timeout | already per-call |
+
+`makoctl reload` has no `fnottctl` counterpart (`dismiss`, `actions`,
+`dismiss-with-default-action`, `list`, `pause`, `unpause`, `quit` — and `--version`).
+The installer's reload block drops that line rather than inventing one.
+
+## Where the look lives
+
+`fnott.ini` is read from `$XDG_CONFIG_HOME/fnott/fnott.ini` first, then
+`/etc/xdg/fnott/fnott.ini`. So the fleet ships the baseline declaratively at
+`/etc/xdg/fnott/fnott.ini` and her own file, if she ever writes one, still wins. The
+daemon itself belongs in the profile's `programs.dwl`-adjacent package list, and the
+host starts it from the same `autostart` entry that starts mako today.
+
+## The call sites
+
+`~/.dotfiles`, invocations only (config files for the retired stack are dead weight):
+`fuzzel -d -p … -w N -l N` and `fuzzel -d --password` in `ani-app`, `qr-sync`,
+`taildrop`, `yt-app`, `web-app`, `hermes-terminal`, `freebuff-terminal` —
+`wmenu` takes `-p` (prompt), `-l` (lines), `-P` (masked) and has **no width flag**,
+so `-w` drops; omitting `-l` already means one line per entry, which is fuzzel's
+`--minimal-lines`. `alacritty -e …` in the same launchers → `foot -e`. The seven
+`Notify` senders (`voice-dictate.sh`, `voice-agent.sh`, `quick-keys.sh`, `qr-sync`,
+`taildrop`, `hermes-terminal`, `freebuff-terminal`) need no change unless their bodies
+carry `<span>`.
+
+`~/mako-suite`, per card: `makoctl` (toggle + dismiss) in all six, fuzzel menus in
+`makokill` (7 hits), `makonet` (5), `makobatt` (4), and `swaylock` in `makobatt` (3).
+Each card already defines `APP_NAME=` and passes it in the `Notify` call.
+
+## The measured win
+
+Closure sizes from `cache.nixos.org`, x86_64, measured 2026-10-27:
+
+| Leaves | MiB | Arrives | MiB | Already installed |
+| :--- | ---: | :--- | ---: | :--- |
+| mako 1.11.0 | 326.2 | fnott 1.8.0 | 112.2 | no |
+| fuzzel 1.15.0 | 140.3 | wmenu 0.2.0 | 100.4 | yes |
+| alacritty 0.17.0 | 240.0 | foot 1.28.0 | 97.4 | yes |
+| swaylock 1.8.6 | 140.7 | waylock 1.6.0 | 77.6 | yes |
+
+Notifier only ≈ **214 MiB**; the whole stack ≈ **735 MiB** off a host that has
+4.5 GiB free at 82 % full. (`swaylock` is 140.7 MiB, not the 61 MiB a 2026-10-27 note
+recorded — measure before quoting.)
+
+## Execution order
+
+1. **Fleet, invisible:** the profile installs fnott and ships `/etc/xdg/fnott/fnott.ini`.
+   The autostart line still starts mako, so nothing changes for her. Deploy, and check
+   `fnott` resolves on the session PATH.
+2. **Her repos, in place:** port the six cards (fnottctl, titles, markup, fuzzel→wmenu,
+   swaylock→waylock) and the seven helpers; commit in each repo. Her repos are edited
+   and committed directly — authorised 2026-10-27.
+3. **Fleet, the swap:** the autostart line starts fnott, `mako` leaves the profile and
+   the host's bridge block. Deploy, then verify: the bus name's owner, a synthetic
+   `Notify` read back by `fnottctl list`, and each card's chord toggling its own card.
+4. **Fleet, the rest (optional):** fuzzel, alacritty and swaylock leave once their call
+   sites are gone, and the four library/config files for the retired stack are deleted.
+
+Each step ends with `task checks:host HOST=netbook`, and step 3 with a session restart,
+because the notifier is a session process, not a service.

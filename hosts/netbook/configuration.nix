@@ -241,6 +241,25 @@ in {
   profiles.dwlDesktop = {
     enable = true;
     user = "alice";
+    # The wallpaper their niri rice used. swaybg renders it, and it is a file of
+    # theirs rather than a package — absent, the session simply has no wallpaper.
+    wallpaper = "/home/alice/Pictures/wallpapers/catppuccin-mocha.png";
+    # Their keyboard's ribbon connector is broken, so this is the workaround
+    # layer for the dead keys, spliced into the fleet keymap ahead of it (first
+    # match wins). The file explains itself; `extraKeybinds` in the profile owns
+    # the mechanism.
+    extraKeybinds = builtins.readFile ./dwl-keybinds.h;
+    # The two `spawn-at-startup` lines from niri worth keeping: the battery
+    # sentinel (the bar is gone, so its alerts come from here) and the taildrop
+    # receiver. waybar's line is deliberately absent, and swayidle/swaybg are the
+    # session's own job now.
+    # mako comes first: it is the bus name the HUD cards and every `notify()` in
+    # alice's scripts talk to. niri used to spawn it; nothing else does now.
+    autostart = [
+      "mako"
+      "makobatt -s"
+      "taildrop --daemon"
+    ];
   };
 
   security.polkit.enable = true; # polkit
@@ -261,6 +280,16 @@ in {
     eget
     sqlite
     typst
+    # Bridges, and the only packages here the target state does not want: alice's
+    # own scripts call fuzzel (every menu), mako + makoctl (the ~/mako-suite HUD
+    # cards) and alacritty (the terminal launchers). They cannot leave before
+    # those scripts are ported, or her keyboard loses its symbol menu and every
+    # HUD with it. Phase 2 owns that port; swaylock is here for the same reason
+    # (makobatt's power menu locks with it).
+    fuzzel
+    mako
+    alacritty
+    swaylock
     # The compositor, terminal, launcher, wallpaper, notifications, idle and lock
     # come from profiles.dwlDesktop — including the nerd font, since dwl and foot
     # name it rather than ship it.

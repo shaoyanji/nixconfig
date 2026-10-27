@@ -174,17 +174,14 @@ movetotag(const Arg *arg)
 }
 
 static const char *termcmd[] = { "foot", NULL };
-/* wmenu-run walks $PATH only; j4-dmenu-desktop adds the .desktop entries. */
-static const char *menucmd[] = {
-	"sh", "-c",
-	"j4-dmenu-desktop --dmenu='wmenu -f \"JetBrainsMono Nerd Font 11\" -N 1e1e2e -n cdd6f4 -M 313244 -m cdd6f4 -S cba6f7 -s 11111b'",
-	NULL};
+/* fleet-menu: XDG desktop entries AND $PATH binaries in one menu. It exists
+ * because j4-dmenu-desktop lists only .desktop files and wmenu-run only $PATH,
+ * so the merged list has to be built before the menu runs — see
+ * modules/scripts/fleet-menu.sh. */
+static const char *menucmd[] = { "fleet-menu", NULL };
 
 /* niri Mod+Space opened DMS spotlight; this is the nearest intent. */
-static const char *spotlight[] = {
-	"sh", "-c",
-	"j4-dmenu-desktop --dmenu='wmenu -f \"JetBrainsMono Nerd Font 11\" -N 1e1e2e -n cdd6f4 -M 313244 -m cdd6f4 -S cba6f7 -s 11111b'",
-	NULL};
+static const char *spotlight[] = { "fleet-menu", NULL };
 
 /* Media keys are bound in the keymap here because scratch runs no DMS daemon
  * to own them; niri binds the same XF86 keys explicitly. */

@@ -82,18 +82,32 @@ netbook — the Celeron never evaluates and never builds.
 
 ### Where the desktop config lives
 
-`alice`'s rice is `~/.dotfiles` (a git repo with its own installer), symlinked
-into `~/.config`. The flake does not own it, and the host's system packages do
-not either — `programs.niri.enable` starts the session, the symlinks shape it.
+Two layers now, and the split is the point:
+
+- **The system layer is the flake's** — `profiles.dwlDesktop`
+  (`modules/profiles/dwl-desktop.nix`), adopted 2026-10-27 and shared with
+  scratch. It starts the session (dwl as alice through greetd autologin; niri
+  has left the closure) and owns the launcher (`fleet-menu`), the bar (waybar,
+  read from `/etc/xdg/waybar/` so a host without Home Manager can share it), the
+  terminal (foot), wallpaper, notifications (mako), and idle/lock
+  (swayidle → waylock).
+- **`alice`'s rice is `~/.dotfiles`** (a git repo with its own installer),
+  symlinked into `~/.config`, and it still wins wherever it carries a file — XDG
+  user config beats `/etc/xdg`. It was written for niri, fuzzel and alacritty,
+  none of which are installed any more, so what still takes effect is whatever
+  it holds for the apps that remain (foot, tmux).
 
 Putting it under home-manager was tried on 2026-10-22 and reverted, for a reason
 that is arithmetic rather than taste: `modules/user/base.nix` +
 `modules/user/desktop/niri.nix` build a **4.3 GiB** home generation (niri 695 MiB;
 the DMS stack pulls ~3 GiB of Qt/Kirigami/qtdeclarative), while the eMMC has
 **4.5 GiB** free at 82 % full — on a host that already sat at 84 % once. Two
-ways to make a fleet-owned home fit, neither taken yet:
+ways to make a fleet-owned home fit. The first is now half taken — at the
+**system** layer, which is where it was cheap: `profiles.dwlDesktop` gives alice
+dwl + waybar without a 4.3 GiB home generation:
 
-- turn DMS off for this host and give alice a bar (waybar, ~1.3 GiB total), or
+- turn DMS off for this host and give alice a bar — done system-side 2026-10-27,
+  with the home-manager half still untaken, or
 - grow the disk first.
 
 Traps found while trying it, worth knowing before the next attempt:

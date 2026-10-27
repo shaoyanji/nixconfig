@@ -2,7 +2,6 @@
 # mount this eMMC root), no global chain, deployed by push. Rationale and the
 # boot test: `.agents/deploy/hosts/netbook.md`.
 {
-  config,
   lib,
   pkgs,
   ...
@@ -24,6 +23,10 @@ in {
     # recovery timer and the gc-root guard — strictly more than the two-line
     # fstab entry it replaces, and what a travel laptop actually needs.
     ../../modules/profiles/boot.nix
+    # The dwl session: keybinds, launcher, bar, wallpaper, idle/lock. This host
+    # ran niri, whose stock config was what it got — no fleet keybinds, and a
+    # compositor sized for a desktop rather than for 2 GB and a Celeron.
+    ../../modules/profiles/dwl-desktop.nix
     ../../modules/profiles/nas-client.nix
     # Voice dictation as a packaged script: the body is shellcheck-gated at
     # build and the Groq key is decrypted from the fleet sops plane at use time
@@ -234,37 +237,15 @@ in {
 
   # programs.firefox.enable = true;
 
-  programs.niri.enable = true;
   profiles.voiceDictate.enable = true;
-  # niri's module ships `default = "gnome;gtk"` and pulls
-  # xdg-desktop-portal-gnome, keeping a 20 MiB GTK4/GNOME stack resident for
-  # interfaces this compositor cannot serve (its ScreenCast needs mutter). GTK
-  # implements the file chooser, Access and Notification; Secret stays on
-  # gnome-keyring (enabled below).
-  xdg.portal.config.niri = lib.mkForce {
-    default = "gtk";
-    "org.freedesktop.impl.portal.Access" = "gtk";
-    "org.freedesktop.impl.portal.Notification" = "gtk";
-    "org.freedesktop.impl.portal.Secret" = "gnome-keyring";
-  };
-  xdg.portal.extraPortals = lib.mkForce [
-    pkgs.gnome-keyring
-    pkgs.xdg-desktop-portal-gtk
-  ];
-
-  services.greetd = {
+  profiles.dwlDesktop = {
     enable = true;
-    settings = {
-      default_session = {
-        command = "${config.programs.niri.package}/bin/niri-session";
-        user = "alice";
-      };
-    };
+    user = "alice";
+    bar.enable = true;
   };
-  systemd.user.services.niri.enableDefaultPath = false;
+
   security.polkit.enable = true; # polkit
   services.gnome.gnome-keyring.enable = true; # secret service
-  security.pam.services.swaylock = {};
 
   # programs.waybar.enable = true; # top bar
   # services.displayManager.sddm.enable = true;
@@ -290,19 +271,12 @@ in {
     eget
     sqlite
     typst
-    waybar
-    playerctl
-    brightnessctl
+    # The compositor, terminal, launcher, bar, wallpaper, notifications, idle and
+    # lock come from profiles.dwlDesktop — including the nerd font, since dwl and
+    # foot name it rather than ship it.
     pavucontrol
-    swaylock
     polkit_gnome
     bibata-cursors
-    # quickshell
-    alacritty
-    fuzzel
-    mako
-    swayidle
-    swaybg
     nautilus
     # crush
     nixd

@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 13
+total_knobs = 14
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -93,6 +93,16 @@ path = "modules/profiles/dell-dock.nix"
 description = "Dell D6000 Universal Dock (DisplayLink / EVDI drivers, USB autosuspend prevention, udev rules)"
 default = false
 hosts = ["frieren", "fern"]
+
+[knobs.dwl-desktop]
+name = "dwl Desktop Session"
+type = "profile"
+category = "desktop"
+option = "profiles.dwlDesktop.enable"
+path = "modules/profiles/dwl-desktop.nix"
+description = "Suckless Wayland session shared by the smallest desktops: dwl with the fleet keymap, fleet-menu launcher, waybar, foot, swaybg and waylock"
+default = false
+hosts = ["scratch", "netbook"]
 
 [knobs.impermanence]
 name = "Impermanence Root Rollback"

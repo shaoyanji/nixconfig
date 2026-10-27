@@ -19,6 +19,20 @@ tasks:
     cmds:
       - task -d {{.VOLUMES_DATA}} clean:downloads 2>/dev/null || bash scripts/task/data-ops.sh clean-downloads
 
+  data:sort:
+    desc: Sort finished downloads into the taxonomy (dry-run unless --apply)
+    summary: >
+      Sorts finished staging items into the tree that owns their kind. Refuses
+      anything aria2 still holds, including a completed torrent that is seeding,
+      plus .aria2 control files and files modified within the quiet window; drops
+      byte-identical duplicates and reports what it will not guess rather than
+      inventing a media title. Media scans need JELLYFIN_TOKEN / PLEX_TOKEN.
+      No flags = plan only, --apply executes, --replace overwrites a same-named
+      destination, --classify lets jev-decide pick one when the rules cannot.
+      Exit 0 = staging resolved, 1 = items need a human, 2 = usage.
+    cmds:
+      - bash scripts/task/sort-downloads.sh {{.CLI_ARGS}}
+
   data:protect:private:
     desc: Enforce 0700 permissions and media shields (.nomedia, .plexignore) on private folders
     cmds:

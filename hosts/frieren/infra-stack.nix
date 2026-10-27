@@ -439,6 +439,7 @@ in {
       bridgeAddress = "192.168.83.1/24";
     })
     ../../modules/services/fleet-monitors.nix
+    ../../modules/services/downloads-sort.nix
     ../../modules/services/agent-scheduler.nix
     ../../modules/services/btrfs-watchdog.nix
     ../../modules/services/uds-static-bridge.nix
@@ -461,6 +462,22 @@ in {
   # the repo instead and gatus consumes it. Every endpoint probes loopback, so no
   # firewall entry is needed and the UI is reached at monitors.frieren.lan through
   # nginx (reverse-proxy.nix).
+  # Staging is a waiting room, not a home: everything downloaded lands in
+  # /srv/data/downloads and is sorted into the taxonomy by scripts/task/
+  # sort-downloads.sh (also `task data:sort`). The timer keeps it from becoming
+  # a second, undeclared media tree; an item it cannot classify leaves the unit
+  # failed rather than being guessed into arr/ or isos/.
+  services.downloadsSort = {
+    enable = true;
+    interval = "hourly";
+    # Extension and kind rules place the common case; a model is asked only when
+    # they cannot, and only from a fixed list of destinations. It needs the
+    # TypeSafe key, which lives in the rendered secrets tree for this host.
+    classify = true;
+    classifyPath = "/home/devji/.local/bin";
+    classifyEnvironment = "/run/secrets/rendered/hermes.env";
+  };
+
   services.fleetMonitors = {
     enable = true;
     endpoints = [

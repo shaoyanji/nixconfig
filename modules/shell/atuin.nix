@@ -1,7 +1,7 @@
 # atuin on every host, pointed at the one server; bash and nushell both get the
 # Ctrl-R UI. Key: modules/sops.nix · server: modules/services/atuin-server.nix ·
 # login/import procedure: .agents/skills/atuin/SKILL.md
-_: {
+{lib, ...}: {
   programs.atuin = {
     enable = true;
     enableBashIntegration = true;
@@ -20,4 +20,15 @@ _: {
       style = "compact";
     };
   };
+
+  # bash-preexec appends its preexec hook to PS0, and bash prints any part of PS0
+  # that is not the `${ …; }` form at every prompt — so a foreign PS0 inherited from
+  # a parent shell prints itself in every new terminal. Clear it and its export
+  # attribute before bash-preexec installs its hook; the mechanism and the evidence
+  # are in docs/nix-patterns.md ("Agent failure modes", item 13).
+  # mkOrder 1: this has to run before the integrations below, not after them.
+  programs.bash.initExtra = lib.mkOrder 1 ''
+    export -n PS0 2>/dev/null || true
+    PS0=
+  '';
 }

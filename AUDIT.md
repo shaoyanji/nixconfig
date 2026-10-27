@@ -29,6 +29,24 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-27 — the minyx VIP is withdrawn, and the reason the 04:00 switch failed
+- `f021660a` made minyx the P1 (priority 1) DNS failover behind a floating `192.168.3.53`. It was wrong on three
+  counts and is reverted: the host is inventory `status = "preserved"` (so the closure was never pushed and only the
+  primary half went live at 04:00), the VIP was the same address the router was already leasing to that board, and it
+  was copied from the `virtualIp` option's `example` rather than reserved anywhere.
+- The 04:00 autoUpgrade exited **4**: keepalived's `openFirewall` renders `extraStopCommands` that `iptables -D` rules
+  the running firewall did not have yet, and `firewall-reload` runs those under `set -e` right after inserting a
+  DROP-all rule — so the reload aborted and INPUT kept dropping. Evidence: `Failed to reload firewall.service`, then
+  `switching to … failed (status 4)`; the firewall was restarted by hand at 05:03. The module now opens VRRP from the
+  firewall's start path (nftables `extraInputRules`, else `extraCommands`) and never through `openFirewall`.
+- Also fixed while reverting: the group's probe requires a non-empty answer that equals the zone address (it probed
+  the apex, which frieren answers with `127.0.0.1`, and `dig` exits 0 on NXDOMAIN); `unicastPeers` is now an
+  assertion, not advice (multicast VRRP splits brain on a LAN that filters `224.0.0.18`); the default script user
+  `keepalived_script` exists, without which the track script was rejected and the instance ran unchecked.
+- State now: frieren alone at `192.168.3.25`, no keepalived, `checks:dns:failover` exit 2 (no zone secondary — the
+  honest answer). Blocky backend kept in the module. No second member until a non-dormant host has a reserved
+  address; see [`docs/dns-failover.md`](docs/dns-failover.md).
+
 ### 2026-10-26 — delphi's resolver returns to crab-hole, and SearXNG with it
 - At 22:28 delphi activated `d08f3343`: blocky resolves its DoH upstream *hostnames* through the system resolver,
   which is itself, so every query SERVFAIL'd and SearXNG had no results — while its own fix was unreachable, because

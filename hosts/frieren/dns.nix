@@ -32,35 +32,35 @@
   # (extra address= records, the tailscale interface line, PXE proxyDHCP,
   # blocklists, the web UI) stays here and is fed in.
   #
-  # The second member is minyx (hosts/minyx/dns.nix): `role = "secondary"`, the
-  # blocky backend, priority 1. It is a Pi 3B that cannot carry this stack, so
-  # the module's blocky backend answers the same zone from local records.
+  # There is no floating VIP, because there is no second live member. The
+  # 2026-10-27 attempt put one on minyx — a `preserved` Pi 3B with a measured
+  # under-voltage fault and no reservation for the address on the router — and
+  # the 04:00 autoUpgrade activated the primary half alone. Never activate half a
+  # VRRP group: one member is not redundancy, and an unreserved VIP is an address
+  # the DHCP server is free to hand to somebody else.
   #
-  # Failover is VRRP, not client-side: `virtualIp` floats one address between
-  # the two nodes, so a client is configured with 192.168.3.53 and does not have
-  # to know which host is answering. Both values are required together — the
-  # module asserts that a VIP without a router id is split brain — and the
-  # priorities are what make minyx a P1 rather than a peer: 200 here, 1 there.
+  # What the group needs before `virtualIp` comes back:
+  #   1. a second member that is not dormant (inventory status is not
+  #      `preserved`) and can carry a resolver;
+  #   2. `unicastPeers` on both nodes — the module now asserts it, because
+  #      multicast VRRP splits brain on a network that filters 224.0.0.18;
+  #   3. an address reserved on the router, outside its DHCP pool, documented in
+  #      docs/dns-failover.md rather than copied from an option's `example`.
   #
-  # The VIP is deliberately NOT 192.168.3.25: that address is the target of
-  # every *.frieren.lan record (the NAS), so floating it would drag the zone
-  # with it. It must also sit outside the router's DHCP pool — `checks:dns:pool`
-  # reports when it does not, and narrowing the pool is a router change, not a
-  # Nix one.
-  #
-  # minyx's own address is absent on purpose: it is DHCP, so it belongs in the
-  # router's reservation, never as a literal here. The VIP is what clients use.
-  # See docs/dns-failover.md for the failover test.
+  # Meanwhile the appliance `gok` answers this same zone independently
+  # (hosts/gok/instance.nix). It has no keepalived and cannot hold a VIP, so
+  # failover today is client-side: a second resolver in DHCP option 6.
+  # See docs/dns-failover.md.
   profiles.dnsFailover = {
     enable = true;
     role = "primary";
     lanInterface = "enp1s0";
     zone = "frieren.lan";
     zoneAddress = "192.168.3.25";
-    resolvers = ["192.168.3.53"];
-    virtualIp = "192.168.3.53";
-    virtualRouterId = 53;
-    primaryPriority = 200;
+    # This host's own address: the zone's target and the address clients use.
+    # The module reads it for the runbook and `checks:dns:failover`; nothing
+    # here pushes it to clients.
+    resolvers = ["192.168.3.25"];
     extraDnsmasqLines = [
       "interface=tailscale0"
       "interface=wlp2s0"

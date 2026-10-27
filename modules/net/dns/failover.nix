@@ -15,19 +15,21 @@
 
   isPrimary = cfg.role == "primary";
 
+  # One gate for the whole VRRP half: emitting an instance with a null router id
+  # would hit the option's type checker before the split-brain assertion could
+  # explain itself, and an open VRRP hole without an instance is a hole.
+  vrrpOn = cfg.virtualIp != null && cfg.virtualRouterId != null;
+
   usePihole = cfg.backend == "pihole";
   useBlocky = cfg.backend == "blocky";
 
-  # A DNS-aware liveness probe: demote the node whose *resolver* died, not the
-  # one whose link flapped. Dig the zone this resolver is authoritative for.
-  #
-  # The answer must be non-empty: `dig` exits 0 on NXDOMAIN and on an empty
-  # reply, so a resolver that is listening but has lost its zone would keep the
-  # VIP forever — the exact failure this script exists to catch.
+  # Demote the node whose *resolver* died. A wildcard name, not the apex: frieren
+  # answers its own apex with 127.0.0.1. Why an empty answer fails: see
+  # docs/dns-failover.md ("The failover test").
   dnsProbe = pkgs.writeShellScript "dns-vrrp-probe" ''
     set -eu
-    answer="$(${pkgs.dnsutils}/bin/dig +short +time=2 +tries=1 -4 @127.0.0.1 "${cfg.zone}" A)"
-    [ -n "$answer" ]
+    answer="$(${pkgs.dnsutils}/bin/dig +short +time=2 +tries=1 -4 @127.0.0.1 "dns-probe.${cfg.zone}" A)"
+    [ "$answer" = "${cfg.zoneAddress}" ]
   '';
 
   vrrpPriority =
@@ -323,21 +325,47 @@ in {
 
     # DNS is reachable on the LAN interface only; other interfaces (tailscale0,
     # a second LAN NIC) are the host's business, not this module's guess.
-    networking.firewall.interfaces.${cfg.lanInterface} = {
-      allowedTCPPorts = [53];
-      allowedUDPPorts = [53];
-    };
+    #
+    # VRRP goes in the firewall's start path, never keepalived's `openFirewall`:
+    # its stop commands kill a reload that added them, leaving INPUT dropping.
+    # [[flake/policies.nix]] has the rule; docs/dns-failover.md the outage.
+    networking.firewall = lib.mkMerge [
+      {
+        interfaces.${cfg.lanInterface} = {
+          allowedTCPPorts = [53];
+          allowedUDPPorts = [53];
+        };
+      }
+      (lib.mkIf vrrpOn (
+        if config.networking.nftables.enable
+        then {
+          extraInputRules = ''
+            meta l4proto vrrp counter accept comment "profiles.dnsFailover"
+          '';
+        }
+        else {
+          extraCommands = ''
+            ip46tables -A nixos-fw -p vrrp -m comment --comment "profiles.dnsFailover" -j ACCEPT
+          '';
+        }
+      ))
+    ];
 
     # --- optional VRRP failover -----------------------------------------------
     # Gated on BOTH values: emitting the instance with a null router id would hit
     # the option's type checker before the split-brain assertion could explain
     # itself. With this gate the incomplete config still evaluates, so the
     # `virtualIp without virtualRouterId` assertion below is the error you see.
-    services.keepalived = lib.mkIf (cfg.virtualIp != null && cfg.virtualRouterId != null) {
+    services.keepalived = lib.mkIf vrrpOn {
       enable = true;
-      # Opens VRRP (proto 112). On a `mkForce`-scoped host this global hole is
-      # cleared — add 112 to that host's per-interface list as well.
-      openFirewall = true;
+      # Deliberately NOT `openFirewall`: see the firewall definition above. The
+      # module's option also opens IPsec AH, which this group does not use.
+      #
+      # keepalived's default script user must exist or the track script is
+      # rejected with "track script … not found, ignoring" (measured
+      # 2026-10-27): the instance then runs with no health check at all, which
+      # looks exactly like a healthy VIP holder.
+      openFirewall = false;
       vrrpScripts.dns = {
         script = toString dnsProbe;
         interval = 5;
@@ -361,6 +389,14 @@ in {
       };
     };
 
+    # Looked up by name in the VRRP instance above, so it is scoped with the
+    # instance rather than declared for every host that imports this module.
+    users.groups.keepalived_script = lib.mkIf vrrpOn {};
+    users.users.keepalived_script = lib.mkIf vrrpOn {
+      isSystemUser = true;
+      group = "keepalived_script";
+    };
+
     assertions = [
       {
         assertion = cfg.zone != "" && !(lib.hasInfix "/" cfg.zone);
@@ -381,6 +417,20 @@ in {
       {
         assertion = cfg.virtualRouterId == null || cfg.virtualIp != null;
         message = "profiles.dnsFailover.virtualRouterId has no effect without virtualIp.";
+      }
+      {
+        # Multicast VRRP (224.0.0.18) is filtered on plenty of home gear, and
+        # two nodes that cannot hear each other both elect themselves MASTER:
+        # the same VIP on two MACs, an ARP fight, and a LAN-wide outage that
+        # looks like the DNS server dying. Unicast peers make the group's
+        # membership explicit, so this is required rather than optional
+        # (frieren, 2026-10-27).
+        assertion = cfg.virtualIp == null || cfg.unicastPeers != [];
+        message = ''
+          profiles.dnsFailover: virtualIp requires unicastPeers. Multicast VRRP
+          silently splits brain on a network that filters 224.0.0.18, which puts
+          one floating address on two MACs. List every peer's address.
+        '';
       }
       {
         assertion = cfg.primaryPriority > cfg.secondaryPriority;

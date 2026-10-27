@@ -253,10 +253,11 @@ in {
     # sentinel (the bar is gone, so its alerts come from here) and the taildrop
     # receiver. waybar's line is deliberately absent, and swayidle/swaybg are the
     # session's own job now.
-    # mako comes first: it is the bus name the HUD cards and every `notify()` in
-    # alice's scripts talk to. niri used to spawn it; nothing else does now.
+    # fnott owns org.freedesktop.Notifications for the ~/mako-suite cards and
+    # every `notify()` in alice's scripts. Two daemons would race for that name,
+    # which is why the port of the cards and this line are one change.
     autostart = [
-      "mako"
+      "fnott"
       "makobatt -s"
       "taildrop --daemon"
     ];
@@ -280,16 +281,6 @@ in {
     eget
     sqlite
     typst
-    # Bridges, and the only packages here the target state does not want: alice's
-    # own scripts call fuzzel (every menu), mako + makoctl (the ~/mako-suite HUD
-    # cards) and alacritty (the terminal launchers). They cannot leave before
-    # those scripts are ported, or her keyboard loses its symbol menu and every
-    # HUD with it. Phase 2 owns that port; swaylock is here for the same reason
-    # (makobatt's power menu locks with it).
-    fuzzel
-    mako
-    alacritty
-    swaylock
     # The compositor, terminal, launcher, wallpaper, notifications, idle and lock
     # come from profiles.dwlDesktop — including the nerd font, since dwl and foot
     # name it rather than ship it.

@@ -93,8 +93,9 @@ Two layers now, and the split is the point:
   `lib.getExe cfg.package` — an absolute store path. tty1 autologins as alice
   through getty and the login shell execs that wrapper; there is no display
   manager and niri has left the closure. `profiles.dwlDesktop` also owns the
-  launcher (`fleet-menu`), the terminal (foot), notifications (mako) and
-  idle/lock (swayidle → waylock). The keymap is the fleet's
+  launcher (`fleet-menu`), the terminal (foot), notifications (fnott, with the
+  palette at `/etc/xdg/fnott/fnott.ini`) and idle/lock (swayidle → waylock).
+  The keymap is the fleet's
   `modules/config/dwl/config.h` plus this host's dead-key layer, spliced in from
   `hosts/netbook/dwl-keybinds.h` through the profile's `extraKeybinds` — inserted
   first, because dwl takes the first match, so a host entry shadows the fleet
@@ -106,15 +107,17 @@ Two layers now, and the split is the point:
 - **`alice`'s rice is `~/.dotfiles`** (a git repo with its own installer),
   symlinked into `~/.config`, and it still wins wherever it carries a file — XDG
   user config beats `/etc/xdg`. It was written for niri, fuzzel, mako and
-  alacritty: niri is gone, and the other three are **kept on purpose**. Every
-  menu in the rice calls `fuzzel -d`, the six cards in `~/mako-suite` find their
-  own notification through `makoctl list`, and the terminal launchers `exec
-  alacritty` — so the session starts mako rather than fnott, and those packages
-  are the Phase-1 bridges. Porting the scripts is the `netbook-desktop-phase-2`
-  note, under [[flake/policies.nix#desktop-fork-not-disable]] as documented in
-  `rice-fork-not-patch`: port the mechanism a binding needs, not only its chord. The
-  port itself is planned in [`docs/netbook-rice-port.md`](../../../docs/netbook-rice-port.md) —
-  the mako→fnott mapping, the call sites, and the three things it loses.
+  alacritty; the port to the session it actually runs in **landed 2026-10-27**, so
+  the rice calls `wmenu` (every menu), `foot` (the launchers), `waylock` (lock)
+  and `fnottctl` (the six cards), and none of the retired four is installed any
+  more. Two rules keep it there: a card identifies itself by a **unique summary
+  title** rather than mako's app name, because `fnottctl list` prints
+  `id: <summary>`; and bodies pass through a `strip_span` at the notification
+  boundary, because fnott renders only `<b> <i> <u>` and would draw a mako
+  `<span foreground=…>` as literal text. Porting the mechanism a binding needs,
+  not only its chord, is [[flake/policies.nix#desktop-fork-not-disable]] /
+  `rice-fork-not-patch`. The mapping and what it loses:
+  [`docs/netbook-rice-port.md`](../../../docs/netbook-rice-port.md).
 - **The session's compositor is an absolute path, and that is a lesson bought
   once.** The first version of this profile wrapped the session in its own
   `writeShellApplication` with `pkgs.dwl` among its `runtimeInputs` while the
@@ -178,7 +181,8 @@ https://cache.nixos.org`, fleet nixpkgs):
 | waybar | **1001 MiB** |
 | gnome-keyring | **378 MiB** |
 | greetd / tuigreet | 60 / 51 MiB |
-| foot / wmenu / mako / swaybg / swayidle / waylock | 97 / 100 / 326 / 128 / 43 / 78 MiB |
+| foot / wmenu / fnott / swaybg / swayidle / waylock | 97 / 100 / 112 / 128 / 43 / 78 MiB |
+| mako — the notifier until 2026-10-27 | 326 MiB |
 | firefox (the browser this host has) | 1.46 GiB |
 
 - **Bar: declined.** waybar is not a bar in closure terms — it brings zenity

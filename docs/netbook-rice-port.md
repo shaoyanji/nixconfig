@@ -6,8 +6,10 @@ this page is the plan for her half — the `netbook-desktop-phase-2` note owns t
 decision and the exit criteria, and the numbers below were read out of fnott 1.8.0's
 source and today's package closures, not from memory.
 
-Nothing here is executed yet. It is the mapping so the port does not have to be
-re-derived.
+It **landed 2026-10-27** (note `netbook-desktop-phase-2`, `DELIVERED`); the page stays
+as the mapping — what fnott can and cannot express, and which call sites had to
+move — because the code cannot say why a rule exists. The last section records
+where the port went differently from this plan.
 
 ## Why the daemon swap and the card port are one deploy
 
@@ -79,8 +81,8 @@ The installer's reload block drops that line rather than inventing one.
 `fnott.ini` is read from `$XDG_CONFIG_HOME/fnott/fnott.ini` first, then
 `/etc/xdg/fnott/fnott.ini`. So the fleet ships the baseline declaratively at
 `/etc/xdg/fnott/fnott.ini` and her own file, if she ever writes one, still wins. The
-daemon itself belongs in the profile's `programs.dwl`-adjacent package list, and the
-host starts it from the same `autostart` entry that starts mako today.
+daemon is in the profile's package list, and the host starts it from its
+`autostart` entry.
 
 ## The call sites
 
@@ -113,19 +115,32 @@ Notifier only ≈ **214 MiB**; the whole stack ≈ **735 MiB** off a host that h
 4.5 GiB free at 82 % full. (`swaylock` is 140.7 MiB, not the 61 MiB a 2026-10-27 note
 recorded — measure before quoting.)
 
-## Execution order
+## What landed, and where it differs from the plan above
 
-1. **Fleet, invisible:** the profile installs fnott and ships `/etc/xdg/fnott/fnott.ini`.
-   The autostart line still starts mako, so nothing changes for her. Deploy, and check
-   `fnott` resolves on the session PATH.
-2. **Her repos, in place:** port the six cards (fnottctl, titles, markup, fuzzel→wmenu,
-   swaylock→waylock) and the seven helpers; commit in each repo. Her repos are edited
-   and committed directly — authorised 2026-10-27.
-3. **Fleet, the swap:** the autostart line starts fnott, `mako` leaves the profile and
-   the host's bridge block. Deploy, then verify: the bus name's owner, a synthetic
-   `Notify` read back by `fnottctl list`, and each card's chord toggling its own card.
-4. **Fleet, the rest (optional):** fuzzel, alacritty and swaylock leave once their call
-   sites are gone, and the four library/config files for the retired stack are deleted.
+One deploy (2026-10-27, `infra:apply:host:netbook`, 3m24s, 0 failed units), not the
+three phases listed here: only one process can own `org.freedesktop.Notifications`,
+so the daemon swap and the card port shipped together and the half-state never
+existed on the host.
 
-Each step ends with `task checks:host HOST=netbook`, and step 3 with a session restart,
-because the notifier is a session process, not a service.
+- **The daemon.** `profiles.dwlDesktop` installs `pkgs.fnott` and ships
+  `/etc/xdg/fnott/fnott.ini`; the host's `autostart` starts `fnott`. `mako`,
+  `fuzzel`, `alacritty` and `swaylock` left `environment.systemPackages` — the
+  operator asked for fuzzel to go entirely rather than menu by menu, so "step 4,
+  optional" is not a follow-up.
+- **The cards** (`~/mako-suite`, commit `15e14a2`): dismiss and liveness on the
+  summary, `makofetch`'s title gained its name, menus are `wmenu -p/-l` (`-P` for the
+  two password prompts), makobatt locks with `waylock -fork-on-lock`, and the
+  per-app styling blocks went with the daemon that read them.
+- **The helpers** (`~/.dotfiles`, commit `feb8d6e`): menus and launchers as above;
+  the installer stopped installing configs for the retired stack and dropped a
+  reload it could not perform.
+- **Markup.** The plan said strip the tags by hand; the port put a three-line
+  `strip_span` at the notification boundary instead, because the colours are lost
+  either way and the tag lists sit inside awk `printf` strings. The first pass
+  filtered `$body` only, and makokill sends `body` and `footer` as one argument —
+  the operator saw that as literal XML on Mod+Alt+Backspace. Every `Notify` body is
+  now filtered at its own call site, and a grim capture of the card shows its table
+  and italic footer with no literal markup.
+- **Verified.** fnott owns the bus name, a synthetic `Notify` reads back through
+  `fnottctl list`, `📊 makotop` appears and dismisses on the same chord, and
+  `checks:host HOST=netbook` is green.

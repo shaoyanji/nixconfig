@@ -15,14 +15,10 @@ in {
     ../../modules/profiles/nas-client.nix
   ];
 
-  # The compositor, keybinds, launcher, bar, wallpaper and idle/lock all come from
-  # the profile (modules/profiles/dwl-desktop.nix); this host only chooses which
-  # of them it wants.
-  profiles.dwlDesktop = {
-    enable = true;
-    bar.enable = true;
-    greeter.enable = true;
-  };
+  # The compositor, keybinds, launcher, wallpaper and idle/lock all come from the
+  # profile (modules/profiles/dwl-desktop.nix); this host only chooses which of
+  # them it wants.
+  profiles.dwlDesktop.enable = true;
 
   # Replaces the fleet userland default; see [[flake/policies.nix#desktop-fork-not-disable]].
   fleet.hmUserModules = [
@@ -41,8 +37,6 @@ in {
     enable = true;
     device = "/dev/sda"; # legacy BIOS MBR install — adjust if the disk is not sda
   };
-
-  services.displayManager.sddm.enable = false;
 
   # Reachability is infrastructure, not part of the desktop.
   services.tailscale.enable = true;

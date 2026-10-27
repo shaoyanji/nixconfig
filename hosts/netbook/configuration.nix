@@ -23,7 +23,7 @@ in {
     # recovery timer and the gc-root guard — strictly more than the two-line
     # fstab entry it replaces, and what a travel laptop actually needs.
     ../../modules/profiles/boot.nix
-    # The dwl session: keybinds, launcher, bar, wallpaper, idle/lock. This host
+    # The dwl session: keybinds, launcher, wallpaper, idle/lock. This host
     # ran niri, whose stock config was what it got — no fleet keybinds, and a
     # compositor sized for a desktop rather than for 2 GB and a Celeron.
     ../../modules/profiles/dwl-desktop.nix
@@ -241,20 +241,10 @@ in {
   profiles.dwlDesktop = {
     enable = true;
     user = "alice";
-    bar.enable = true;
   };
 
   security.polkit.enable = true; # polkit
-  services.gnome.gnome-keyring.enable = true; # secret service
 
-  # programs.waybar.enable = true; # top bar
-  # services.displayManager.sddm.enable = true;
-  # services.displayManager.sddm.wayland.enable = true;
-  # services.displayManager.autoLogin = {
-  # enable=true;
-  # user="alice";
-
-  # };
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
@@ -271,9 +261,9 @@ in {
     eget
     sqlite
     typst
-    # The compositor, terminal, launcher, bar, wallpaper, notifications, idle and
-    # lock come from profiles.dwlDesktop — including the nerd font, since dwl and
-    # foot name it rather than ship it.
+    # The compositor, terminal, launcher, wallpaper, notifications, idle and lock
+    # come from profiles.dwlDesktop — including the nerd font, since dwl and foot
+    # name it rather than ship it.
     pavucontrol
     polkit_gnome
     bibata-cursors
@@ -329,7 +319,7 @@ in {
     XCURSOR_SIZE = "24";
   };
 
-  # Fonts for the desktop (bar icons, emoji).
+  # Nerd-font glyphs are what the launcher and terminal render; emoji for the web.
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     noto-fonts-color-emoji

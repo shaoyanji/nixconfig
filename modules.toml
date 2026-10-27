@@ -100,7 +100,7 @@ type = "profile"
 category = "desktop"
 option = "profiles.dwlDesktop.enable"
 path = "modules/profiles/dwl-desktop.nix"
-description = "Suckless Wayland session shared by the smallest desktops: dwl with the fleet keymap, fleet-menu launcher, waybar, foot, swaybg and waylock"
+description = "Suckless Wayland session shared by the smallest desktops: dwl with the fleet keymap, fleet-menu launcher, foot, swaybg and waylock"
 default = false
 hosts = ["scratch", "netbook"]
 

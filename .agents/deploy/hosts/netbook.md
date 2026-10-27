@@ -86,11 +86,14 @@ Two layers now, and the split is the point:
 
 - **The system layer is the flake's** — `profiles.dwlDesktop`
   (`modules/profiles/dwl-desktop.nix`), adopted 2026-10-27 and shared with
-  scratch. It starts the session (dwl as alice through greetd autologin; niri
-  has left the closure) and owns the launcher (`fleet-menu`), the bar (waybar,
-  read from `/etc/xdg/waybar/` so a host without Home Manager can share it), the
-  terminal (foot), wallpaper, notifications (mako), and idle/lock
-  (swayidle → waylock).
+  scratch. It starts the session (tty1 autologins as alice through getty and the
+  login shell execs dwl — no display manager; niri has left the closure) and owns
+  the launcher (`fleet-menu`), the terminal (foot), wallpaper, notifications
+  (mako), and idle/lock (swayidle → waylock). There is **no bar and no secret
+  service**, and that is measured rather than taste: waybar's closure is 1001 MiB
+  (zenity alone is 902 MiB of it) against dwl's 345 MiB, and gnome-keyring is
+  378 MiB — see [the measurements](#no-bar-no-secret-service-the-measurements)
+  below.
 - **`alice`'s rice is `~/.dotfiles`** (a git repo with its own installer),
   symlinked into `~/.config`, and it still wins wherever it carries a file — XDG
   user config beats `/etc/xdg`. It was written for niri, fuzzel and alacritty,
@@ -102,12 +105,12 @@ that is arithmetic rather than taste: `modules/user/base.nix` +
 `modules/user/desktop/niri.nix` build a **4.3 GiB** home generation (niri 695 MiB;
 the DMS stack pulls ~3 GiB of Qt/Kirigami/qtdeclarative), while the eMMC has
 **4.5 GiB** free at 82 % full — on a host that already sat at 84 % once. Two
-ways to make a fleet-owned home fit. The first is now half taken — at the
-**system** layer, which is where it was cheap: `profiles.dwlDesktop` gives alice
-dwl + waybar without a 4.3 GiB home generation:
+ways to make a fleet-owned home fit. The first is now taken at the **system**
+layer, which is where it was cheap: `profiles.dwlDesktop` gives alice dwl without
+a 4.3 GiB home generation — but not the bar half of it (below):
 
-- turn DMS off for this host and give alice a bar — done system-side 2026-10-27,
-  with the home-manager half still untaken, or
+- turn DMS off for this host and give alice a bar — dwl done system-side
+  2026-10-27; the bar is declined, the home-manager half is still untaken, or
 - grow the disk first.
 
 Traps found while trying it, worth knowing before the next attempt:
@@ -121,6 +124,37 @@ Traps found while trying it, worth knowing before the next attempt:
 - **A failed activation leaves the desktop half-owned.** Removing the links and
   letting activation time out leaves `fuzzel` with no config at all, which looks
   like a white theme, not a missing file. Restore the symlinks before debugging.
+
+### No bar, no secret service: the measurements
+
+Everything that was declined on this host was declined with a number behind it.
+Measured 2026-10-27 per-package closure (`nix path-info -Sh --store
+https://cache.nixos.org`, fleet nixpkgs):
+
+| Component | Closure |
+| --- | --- |
+| niri — the compositor this host ran | 695 MiB |
+| dwl — the compositor it runs now | 345 MiB |
+| waybar | **1001 MiB** |
+| gnome-keyring | **378 MiB** |
+| greetd / tuigreet | 60 / 51 MiB |
+| foot / wmenu / mako / swaybg / swayidle / waylock | 97 / 100 / 326 / 128 / 43 / 78 MiB |
+
+- **Bar: declined.** waybar is not a bar in closure terms — it brings zenity
+  (902 MiB) and `sdl2-compat`/sdl3 (~955 MiB) with it, so a status line would have
+  cost more than the rest of the session combined, and more than the compositor it
+  replaced. If one is ever wanted, the thing to beat is dwl's 345 MiB, not zero.
+- **Secret service: declined.** Nothing on this host implements the freedesktop
+  Secret API — `firefox` keeps its own NSS store and `nautilus` has no `gvfs` to
+  store mounts in — so the keyring would have been 378 MiB of idle daemon. Scratch
+  has run without one since its dwl conversion.
+- **Display manager: declined.** `greetd` + `tuigreet` were 111 MiB to autologin a
+  single user, and SDDM is a Qt stack. tty1 autologins through `getty` instead,
+  which still gives the session a real logind/seat through PAM, and
+  `environment.loginShellInit` execs the compositor from the login shell. NixOS's
+  `/etc/profile` reads **`/etc/profile.local` and the `loginShellInit` slot, not
+  `/etc/profile.d`** — checked against the generated file, because the hook that
+  is not read fails silently.
 
 ### Staging a boot-chain change (the practiced path)
 

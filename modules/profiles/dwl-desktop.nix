@@ -23,23 +23,17 @@
         pkgs.swayidle
         pkgs.waylock
       ]
-      ++ lib.optional cfg.bar.enable pkgs.waybar
       ++ lib.optional (cfg.wallpaper != null) pkgs.swaybg;
     text = builtins.readFile ../config/dwl/dwl-session.sh;
   };
 
-  # The session's knobs are exported in-process, not through
-  # `environment.sessionVariables`: a greetd session does not necessarily source
-  # /etc/profile, so PAM-provided variables are not a guarantee at that point.
+  # The session's knobs are exported in-process rather than through
+  # `environment.sessionVariables`, so the session carries its own environment
+  # wherever it is launched from.
   sessionCommand = "${
     pkgs.writeShellApplication {
       name = "dwl-session-launch";
       text = ''
-        export DWL_BAR=${
-          if cfg.bar.enable
-          then "1"
-          else "0"
-        }
         export DWL_WALLPAPER=${lib.escapeShellArg (
           if cfg.wallpaper == null
           then ""
@@ -49,11 +43,9 @@
       '';
     }
   }/bin/dwl-session-launch";
-
-  tuigreet = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${sessionCommand}";
 in {
   options.profiles.dwlDesktop = {
-    enable = lib.mkEnableOption "a dwl session with launcher, bar and wallpaper";
+    enable = lib.mkEnableOption "a dwl session with launcher and wallpaper";
 
     user = lib.mkOption {
       type = lib.types.str;
@@ -68,18 +60,6 @@ in {
         Catppuccin Mocha base as a colour (swaybg -c), an absolute path for an
         image (swaybg -m fill -i), or null for none.
       '';
-    };
-
-    bar.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Run waybar, with the fleet's minimal config from modules/config/waybar.";
-    };
-
-    greeter.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Show tuigreet on logout instead of re-entering the session directly.";
     };
   };
 
@@ -98,7 +78,6 @@ in {
         pkgs.wl-clipboard
         pkgs.wmenu
       ]
-      ++ lib.optional cfg.bar.enable pkgs.waybar
       ++ lib.optional (cfg.wallpaper != null) pkgs.swaybg;
 
     # dwl, foot and wmenu name this font; none of them ship it.
@@ -129,13 +108,6 @@ in {
       binfmt = true;
     };
 
-    # A bar config under /etc/xdg is read with or without Home Manager, which is
-    # what lets a non-HM host (netbook) share the same bar as an HM one.
-    environment.etc = lib.mkIf cfg.bar.enable {
-      "xdg/waybar/config.jsonc".source = ../config/waybar/config.jsonc;
-      "xdg/waybar/style.css".source = ../config/waybar/style.css;
-    };
-
     xdg.portal = {
       enable = lib.mkDefault true;
       extraPortals = [pkgs.xdg-desktop-portal-gtk];
@@ -151,34 +123,24 @@ in {
     services.upower.enable = true;
     hardware.graphics.enable = lib.mkDefault true;
 
-    # One definition: `security.pam.services` twice is a conflict, not a merge.
-    security.pam.services = lib.mkMerge [
-      {waylock = {};}
-      (lib.mkIf config.services.gnome.gnome-keyring.enable {
-        greetd.enableGnomeKeyring = true;
-      })
-    ];
+    # waylock authenticates through PAM, so it needs a service of its own.
+    security.pam.services.waylock = {};
 
-    services.greetd = {
-      enable = true;
-      settings =
-        if cfg.greeter.enable
-        then {
-          default_session = {
-            command = tuigreet;
-            user = "greeter";
-          };
-          initial_session = {
-            command = sessionCommand;
-            inherit (cfg) user;
-          };
-        }
-        else {
-          default_session = {
-            command = sessionCommand;
-            inherit (cfg) user;
-          };
-        };
-    };
+    # No display manager. getty autologins tty1, which gives the session a real
+    # logind session (seat, runtime dir, PAM) the way a DM would, and the login
+    # shell execs dwl. Measured: SDDM is a Qt stack and greetd + tuigreet were
+    # 111 MiB between them, for a machine that logs in one user.
+    services.displayManager.sddm.enable = false;
+    services.getty.autologinUser = cfg.user;
+
+    # `environment.loginShellInit` is the slot NixOS compiles into /etc/profile
+    # (and zsh's equivalent) — /etc/profile.d is NOT read here. Guarded on user,
+    # tty and an existing session so ssh, root on the console and a shell inside
+    # the desktop are all unaffected.
+    environment.loginShellInit = ''
+      if [ "$(id -un)" = ${lib.escapeShellArg cfg.user} ] && [ "$(tty)" = /dev/tty1 ] && [ -z "''${WAYLAND_DISPLAY:-}" ]; then
+        exec ${sessionCommand}
+      fi
+    '';
   };
 }

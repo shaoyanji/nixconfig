@@ -766,9 +766,13 @@ tasks:
 
   infra:deploy:host:netbook:
     desc: Push configuration, switch, and validate netbook remotely
+    summary: >
+      The post-check addresses the host by the same LAN literal `deploy-netbook.sh`
+      pushes to: `netbook` is not a resolvable name on the machine that runs the
+      deploy, so `ssh root@netbook` failed the task AFTER a successful switch.
     cmds:
       - task infra:apply:host:netbook
-      - ssh root@netbook "hostname && nixos-version"
+      - ssh root@192.168.3.36 "hostname && nixos-version"
 
   infra:minyx:keep:
     desc: Bring minyx to main — build on delphi (its declared builder), push over the LAN, verify

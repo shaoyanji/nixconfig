@@ -115,24 +115,25 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 - Open, and neither is Nix: the router still hands out `.25` + `9.9.9.9` (`.50` is proven free by ARP
   duplicate-address detection but is not yet served to clients), and **poseidon declares `.3` statically** for
   its dock NIC while minyx holds it by reservation — the peer address frieren advertises to.
-
-### 2026-10-27 — the minyx VIP is withdrawn, and the reason the 04:00 switch failed
-- `f021660a` made minyx the P1 (priority 1) DNS failover behind a floating `192.168.3.53`. It was wrong on three
-  counts and is reverted: the host is inventory `status = "preserved"` (so the closure was never pushed and only the
-  primary half went live at 04:00), the VIP was the same address the router was already leasing to that board, and it
-  was copied from the `virtualIp` option's `example` rather than reserved anywhere.
-- The 04:00 autoUpgrade exited **4**: keepalived's `openFirewall` renders `extraStopCommands` that `iptables -D` rules
-  the running firewall did not have yet, and `firewall-reload` runs those under `set -e` right after inserting a
-  DROP-all rule — so the reload aborted and INPUT kept dropping. Evidence: `Failed to reload firewall.service`, then
-  `switching to … failed (status 4)`; the firewall was restarted by hand at 05:03. The module now opens VRRP from the
-  firewall's start path (nftables `extraInputRules`, else `extraCommands`) and never through `openFirewall`.
-- Also fixed while reverting: the group's probe requires a non-empty answer that equals the zone address (it probed
-  the apex, which frieren answers with `127.0.0.1`, and `dig` exits 0 on NXDOMAIN); `unicastPeers` is now an
-  assertion, not advice (multicast VRRP splits brain on a LAN that filters `224.0.0.18`); the default script user
-  `keepalived_script` exists, without which the track script was rejected and the instance ran unchecked.
-- State now: frieren alone at `192.168.3.25`, no keepalived, `checks:dns:failover` exit 2 (no zone secondary — the
-  honest answer). Blocky backend kept in the module. No second member until a non-dormant host has a reserved
-  address; see [`docs/dns-failover.md`](docs/dns-failover.md).
+### 2026-10-27 — the netbook's browsers come off the NAS, and its userland shrinks 708 MiB
+- **What left, measured on the generation.** 719.5 MiB out, 11.0 MiB in: 1318 → 1284 paths, 5887 → 5179 MiB
+(`nix-store -qR` nar sums, new against previous generation, plus a per-path `comm` of the two). The biggest items
+are `firefox-unwrapped` 391 MiB **and the ML runtimes it alone pulled — `openvino` 142, `onnxruntime` 56** — so
+firefox really cost ~590, not the 393 a closure-exclusive read suggested; `nautilus` 14 took glycin, adwaita-icon-
+theme, poppler-data and exempi with it. `pcmanfm` went in (+4.7 MiB against her 1318-path closure) to keep a
+menu-launchable file manager — `nnn` was +0.4 MiB, `yazi` +97.9 MiB (Rust runtime, a second firefox).
+- **The replacement is the library, not a package.** `appimage-integrate` writes one XDG entry per image in
+`/Volumes/data/appimages`; Helium runs from the menu (3 renderers, 2 wayland fds) with LibreWolf, Vieb and
+Thorium beside it.
+- **A removal that needed a code change.** With firefox gone nothing claimed `text/html` and every link would have
+died: the script now emits `MimeType=text/html;…;x-scheme-handler/http[s]` for an entry saying `Categories=…WebBrowser…`
+— all five browsers ship that and no `MimeType`. `xdg-mime query default text/html` → `appimage-helium.desktop`.
+- **`.cache` stays on the eMMC.** `appimage-run` unsquashes each image to `~/.cache/appimage-run` (110 MiB for
+Helium, 660 MiB for the set), so a tmpfs there re-extracts 150 MiB off NFS on every boot.
+- **A false failure fixed.** `infra:deploy:host:netbook`'s post-check ran `ssh root@netbook`, which does not resolve
+where the deploy runs, so a successful switch reported 255; it uses the LAN literal now.
+- **Evidence.** `checks:host HOST=netbook` 3.72 s / 494 MiB rc=0; the push switched, 0 failed units, harmonia holds
+the system; firefox and nautilus absent, pcmanfm and nano present; `docs-budget` and `checks:tasks` (467) green.
 
 ## Open debt (`task ops:notes`)
 

@@ -50,7 +50,9 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 HOSTS=("$@")
-[ "${#HOSTS[@]}" -eq 0 ] && HOSTS=(${WARM_HOSTS:-frieren stark fern})
+if [ "${#HOSTS[@]}" -eq 0 ]; then
+  read -r -a HOSTS <<<"${WARM_HOSTS:-frieren stark fern}"
+fi
 # Flake ref: "." (local tree) or e.g. "/path/to/flake" / "github:shaoyanji/nixconfig"
 FLAKE_REF="${FLAKE:-.}"
 

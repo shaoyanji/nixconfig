@@ -95,14 +95,14 @@ dial() { # <jump opts...> <ssh args...>
 # The jump host is a laptop over Tailscale, so a probe or a dial can lose a
 # race; exit 255 means "never connected", which is the one case worth retrying.
 run() {
-  local jump rc attempt
+  local jump rc
   if [[ $# -eq 0 ]]; then
     # interactive shell: the USB paths come from /etc/profile.d on the box
     jump="$(route)" || return 1
     dial "${jump}" "${ROUTER_USER}@${ROUTER}"
     return
   fi
-  for attempt in 1 2; do
+  for _ in 1 2; do
     jump="$(route)" || return 1
     if dial "${jump}" "${ROUTER_USER}@${ROUTER}" "$@"; then
       return 0
@@ -118,8 +118,8 @@ run() {
 
 # push <local file> <remote path> — copies over stdin (no base64 on OpenWrt).
 push() {
-  local jump rc attempt
-  for attempt in 1 2; do
+  local jump rc
+  for _ in 1 2; do
     jump="$(route)" || return 1
     if dial "${jump}" "${ROUTER_USER}@${ROUTER}" "cat > $2" <"$1"; then
       return 0

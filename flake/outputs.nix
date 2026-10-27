@@ -153,6 +153,11 @@ in {
   # never nixpkgs-fmt: the latter would rewrite ~170 of the 187 tracked files.
   formatter = lib.genAttrs systems.work (system: (pkgsFor system).alejandra);
 
+  # The cache addresses as data, for scripts that need one without importing
+  # half a host: `nix eval --raw .#cacheRegistry.caches.harmonia.url`. Pure data
+  # from lib/cache-registry.nix, so a script never carries its own copy of a URL.
+  cacheRegistry = import ../lib/cache-registry.nix;
+
   # --- the three host assemblers --------------------------------------------
   # One per kind, because the kind decides the assembler: nixpkgs.nixosSystem,
   # nix-darwin's darwinSystem, and a standalone home-manager configuration that

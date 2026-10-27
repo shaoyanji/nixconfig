@@ -23,6 +23,10 @@ lib.genAttrs systems.work (
         # and scripts/task/kg-sidecar.sh never calls nix at all.
         pkgs.beamPackages.elixir
         pkgs.beamPackages.erlang
+        # scripts/ is 73 files of bash; `nix build .#checks.<system>.scripts-shellcheck` is the gate, but
+        # the binary has to be reachable to fix what it finds. It was absent from
+        # every host before this, which is why the audit could only run patterns.
+        pkgs.shellcheck
       ];
     };
 

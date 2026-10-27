@@ -231,7 +231,13 @@ kg_js="$(grep -o 'kg\.[a-f0-9]*\.min\.js' "$SITE/index.html" | head -1)"
 # already-built store path — never a build), and say so when it is absent.
 NODE="$(command -v node 2>/dev/null || true)"
 if [ -z "$NODE" ]; then
-  NODE="$(ls -d /nix/store/*-nodejs-*/bin/node 2>/dev/null | grep -v -- '-source' | head -1 || true)"
+  for cand in /nix/store/*-nodejs-*/bin/node; do
+    case "$cand" in *-source*) continue ;; esac
+    if [ -x "$cand" ]; then
+      NODE="$cand"
+      break
+    fi
+  done
 fi
 
 if [ -n "$kg_js" ] && [ -f "$SITE/$kg_js" ]; then

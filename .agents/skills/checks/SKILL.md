@@ -65,6 +65,16 @@ Enable `nix-command` / `flakes` / `pipe-operators` in `modules/global/global.nix
 
 Pitfall: `nix.settings` uses shallow attrset merge (`//`), so a host-level `experimental-features = [...]` **replaces** the global list entirely. The legacy `extra-experimental-features` key is a separate attrset entry that appends — both can coexist on the same host. Check hosts that override `experimental-features` (e.g. `garnixMachine`, `testvm`) after changing the global default.
 
+## Scripted checks are verdicts, not pipelines
+
+The `scripts/task/*.sh` checkers use `set -uo pipefail` and **not** `-e` on
+purpose: they gather several facts and map them to an exit-code table (0 ok,
+1 drift, 2 cannot tell), so aborting on the first non-zero `dig`/`curl`/`nix
+eval` would turn a verdict into a shell failure. Thirteen scripts do this; the
+sweep and the guard additionally have to survive a child dying. Do not "fix" the
+missing `-e` — `checks.<system>.scripts-shellcheck` (`shellcheck -S warning`, at
+zero findings since 2026-10-27) is the gate for real defects in that class.
+
 ## Status
 
 `checks:status` is the one check that proves nothing: it prints the task list and

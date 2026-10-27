@@ -285,6 +285,7 @@ push() {
   # A tarball unpacks into a temp dir (~140 MB); a directory is the caller's. The
   # path is interpolated rather than referenced: the trap fires after this
   # function returns, when `dir` is out of scope.
+  # shellcheck disable=SC2064 # deliberate: $dir is out of scope when EXIT fires
   [ "$dir" = "$art" ] || trap "rm -rf $(printf '%q' "$dir")" EXIT
   # The password comes from sops here (this script's own two sources); the
   # streamer takes it from the environment and knows nothing about sops.
@@ -304,7 +305,8 @@ fetch() {
     url="http://${host:-delphi}.cloudforest-kardashev.ts.net/gok/latest.tar.zst"
   fi
   mkdir -p "$dest"
-  local out=$dest/fetched-$(date -u +%Y%m%dT%H%M%SZ).tar.zst
+  local out
+  out=$dest/fetched-$(date -u +%Y%m%dT%H%M%SZ).tar.zst
   echo "gok.sh: fetching $url" >&2
   curl -fsSL --progress-bar -m 900 -o "$out" "$url" || {
     rm -f "$out"

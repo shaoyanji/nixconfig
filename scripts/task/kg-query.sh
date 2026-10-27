@@ -39,7 +39,6 @@
 # codes — a silent empty result is how a graph stops being trusted.
 set -euo pipefail
 
-REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 PATTERN="${1:-}"
 [ -n "$PATTERN" ] && shift || true
 

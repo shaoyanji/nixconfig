@@ -513,6 +513,24 @@ in {
     ];
   };
 
+  # High-speed flash cache tier on USB 3.0 Samsung Flash Drive (F2FS + transparent ZSTD compression).
+  # Ephemeral & acceleration tier: Nix evaluation cache, transcode scratch, gallery thumbnails, ISO staging.
+  # `nofail` ensures the host boots without delay even if the external USB drive is unplugged.
+  fileSystems."/mnt/flash-cache" = {
+    device = "/dev/disk/by-label/flash-cache";
+    fsType = "f2fs";
+    options = [
+      "noatime"
+      "lazytime"
+      "compress_algorithm=zstd:3"
+      "compress_chksum"
+      "compress_extension=*"
+      "nodiscard"
+      "nofail"
+      "x-systemd.device-timeout=5s"
+    ];
+  };
+
   # NixOS does not translate `x-systemd.automount` in fileSystems options into an
   # automount unit (tasks/filesystems.nix only reads autoResize/autoFormat), so the
   # unit is declared here: nothing mounts at boot, and the first access wakes the
@@ -529,6 +547,12 @@ in {
   systemd.tmpfiles.rules = [
     "d /nix/var/nix/gcroots/fleet 0755 root root -"
     "d /mnt/burgernas 0755 root root -"
+    "d /mnt/flash-cache 0755 root root -"
+    "d /mnt/flash-cache/nix-eval 0755 ${user.name} users -"
+    "d /mnt/flash-cache/staging 0755 ${user.name} users -"
+    "d /mnt/flash-cache/tmp 1777 ${user.name} users -"
+    "d /mnt/flash-cache/jellyfin-transcode 0777 root root -"
+    "d /mnt/flash-cache/immich-thumbs 0777 root root -"
     "d /Volumes/data 0755 root root -"
     "d /srv/data 0755 root root -"
     "d /srv/data/downloads 0775 aria2 users -"

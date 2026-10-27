@@ -65,12 +65,9 @@ esac
 # --- credentials -----------------------------------------------------------
 REPO="${NIXCONFIG:-}"
 if [ -z "$REPO" ]; then
-  for c in "$HOME/Documents/nixconfig" /srv/data/projects/nixconfig /Volumes/data/projects/nixconfig; do
-    [ -f "$c/modules/secrets.yaml" ] && {
-      REPO="$c"
-      break
-    }
-  done
+  if git rev-parse --show-toplevel >/dev/null 2>&1; then
+    REPO="$(git rev-parse --show-toplevel)"
+  fi
 fi
 from_sops() {
   [ -n "$REPO" ] && command -v sops >/dev/null && [ -f "$REPO/modules/secrets.yaml" ] || return 1

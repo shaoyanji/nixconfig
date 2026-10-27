@@ -49,7 +49,58 @@ in {
 
   networking = {
     hostName = "minyx";
-    useDHCP = true;
+
+    # NetworkManager owns both interfaces. It is the only client that can take a
+    # PSK from a file at activation time (`ensureProfiles.environmentFiles` runs
+    # envsubst over the generated profile), so the secret stays out of the store
+    # and out of this file. `useDHCP` is deliberately unset: the NetworkManager
+    # module assigns it `false` outright, and a second definition of one option
+    # is a hard eval error rather than a pick.
+    networkmanager = {
+      enable = true;
+      ensureProfiles = {
+        environmentFiles = [config.sops.templates."network-manager.env".path];
+        profiles = {
+          # Ethernet is the preferred path: the jump box is reached at its LAN
+          # address, and keeping the USB NIC on the same lease beats churning
+          # over to wifi whenever both are up.
+          fleet-wired = {
+            connection = {
+              id = "fleet-wired";
+              # Fixed, so an NM rewrite cannot mint a second identity for the
+              # same profile (the dell-dock precedent).
+              uuid = "6f0a1cf4-6c2e-4a7b-9f0e-5b3d8c1a2e77";
+              type = "ethernet";
+              interface-name = "enu1u1";
+              autoconnect = true;
+              autoconnect-priority = 100;
+            };
+            ipv4.method = "auto";
+            ipv6.method = "auto";
+          };
+          fleet-wifi = {
+            connection = {
+              id = "fleet-wifi";
+              uuid = "0d7c4b19-3a5e-4d2f-8c61-9e0f2b7a4d58";
+              type = "wifi";
+              autoconnect = true;
+              autoconnect-priority = 10;
+            };
+            wifi = {
+              ssid = "$WIFI_SSID";
+              mode = "infrastructure";
+            };
+            wifi-security = {
+              key-mgmt = "wpa-psk";
+              psk = "$WIFI_PSK";
+            };
+            ipv4.method = "auto";
+            ipv6.method = "auto";
+          };
+        };
+      };
+    };
+
     # Only sshd listens. Tailscale is outbound-initiated and installs its own
     # rules, so it needs no inbound hole here.
     firewall.allowedTCPPorts = [22];
@@ -93,6 +144,21 @@ in {
       key = "ghsudo";
       owner = user.name;
     };
+    # The fleet's own wireless network — the same pair the gok appliance takes
+    # from sops (hosts/gok/instance.nix). The SSID is not a secret, but it lives
+    # beside the PSK so one entry owns the network and the two cannot drift.
+    # sops-nix splits `key` on `/` (pkgs/sops-install-secrets/main.go), so the
+    # path is slashes, not the dotted form `gok.sh` uses when it reads the same
+    # entry — a dotted key is looked up as one literal name and fails the
+    # build-time manifest check.
+    secrets."wifi-ssid" = {key = "gokrazy/gok/wifi_ssid";};
+    secrets."wifi-psk" = {key = "gokrazy/gok/wifi_psk";};
+    # NetworkManager's profile writer is the only piece that can substitute a
+    # secret at activation time, so this is where the PSK crosses the boundary.
+    templates."network-manager.env".content = ''
+      WIFI_SSID=${config.sops.placeholder."wifi-ssid"}
+      WIFI_PSK=${config.sops.placeholder."wifi-psk"}
+    '';
   };
 
   services.tailscale.enable = true;

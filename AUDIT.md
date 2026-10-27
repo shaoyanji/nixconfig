@@ -29,6 +29,32 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-27 — the netbook's session ran stock dwl; sessions are `programs.dwl` now
+- **The defect.** `profiles.dwlDesktop` handed the session to a hand-rolled `writeShellApplication`
+  that listed `pkgs.dwl` in `runtimeInputs` while the *keymap* build went to `systemPackages`. A wrapper's
+  PATH wins inside the session, so the deployed compositor was upstream's `config.h`: no bind in this repo
+  existed, on either host, and nothing looked wrong — stock dwl renders, spawns and tiles. Evidence:
+  `/proc/<dwl>/exe` was `3b7ph6qz…-dwl-0.9` (= plain `pkgs.dwl`), referenced only by `dwl-session`,
+  while the spliced `8rsfl73qq…` was referenced only by `system-path` — and evaluating
+  `pkgs.dwl.override {configH = <repo splice>}` from `modules/config/dwl/config.h` +
+  `hosts/netbook/dwl-keybinds.h` yields exactly `8rsfl73qq…`. So the host's own `Mod+D` did nothing.
+- **The fix is the declarative route.** The session is nixpkgs' `programs.dwl`: the profile passes
+  `package` (the spliced keymap) and `extraSessionCommands` (exports, wallpaper, idle/lock, the host's
+  autostart lines), and the module's `/etc/xdg/dwl-session` execs `lib.getExe cfg.package` — an absolute
+  store path no PATH can shadow. `modules/config/dwl/dwl-session.sh` is gone; one `dwl-0.9` remains in the
+  closure.
+- **A second defect, found by putting the first one live.** The clients start from a hook that runs
+  *before* dwl, so the wrapper waits for the socket — and a killed session leaves its socket **file**
+  behind. Restarting `getty@tty1` made it treat that file as proof: `swaybg`, `swayidle` and `mako` all
+  exited, while `makobatt -s` and `taildrop --daemon` survived. The wait now runs `swayidle` as a canary and
+  proceeds only if it is still up 0.3 s later.
+- Deployed as generation 71 (`0fyzq71w…`): current == deployed, loader default on it, 0 failed units,
+  4/1817 MiB RAM used, `/` 44 %. Session restarted and read back: compositor = the spliced path with the
+  host keymap in the binary, all five clients up, `WAYLAND_DISPLAY=wayland-0`, and a `Notify` through
+  their cards' call shape read back from `makoctl list` as `App name: buffy-check`.
+- **Not fixed yet:** `scratch` shares this profile and is offline (last seen 20 h), so its closure was
+  never deployed with it; it needs the same deploy when it returns.
+
 ### 2026-10-27 — netbook and scratch: one dwl session, and the desktop's bloat measured out
 - `5f07866a` lifted the dwl session into `profiles.dwlDesktop`, so scratch stopped keeping a host-local copy
   and netbook stopped running niri. Both now get the same keymap, launcher, wallpaper and lock; the launcher is

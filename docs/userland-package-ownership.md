@@ -33,3 +33,8 @@ owns. The path is the module that owns the property; hosts are consumers.
 A package belongs in the lowest module every consumer already imports. A host
 keeps only what is true of that host alone — driver, GPU, session choice. Two
 hosts duplicating an entry means the entry is owned one level up, not two.
+
+A host's own userland can lag this rule: `netbook` still installs `mako`, `fuzzel`,
+`alacritty` and `swaylock` because alice's dotfiles invoke them, so the profile
+cannot own the desktop until they are ported —
+[`./netbook-rice-port.md`](./netbook-rice-port.md) is that plan.

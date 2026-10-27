@@ -86,19 +86,59 @@ Two layers now, and the split is the point:
 
 - **The system layer is the flake's** — `profiles.dwlDesktop`
   (`modules/profiles/dwl-desktop.nix`), adopted 2026-10-27 and shared with
-  scratch. It starts the session (tty1 autologins as alice through getty and the
-  login shell execs dwl — no display manager; niri has left the closure) and owns
-  the launcher (`fleet-menu`), the terminal (foot), wallpaper, notifications
-  (mako), and idle/lock (swayidle → waylock). There is **no bar and no secret
+  scratch. The compositor and its session wrapper are NixOS's own
+  **`programs.dwl`**: this profile passes `package` (the spliced keymap) and
+  `extraSessionCommands` (the session exports, the wallpaper, the idle unit and
+  the host's autostart lines), and `/etc/xdg/dwl-session` execs
+  `lib.getExe cfg.package` — an absolute store path. tty1 autologins as alice
+  through getty and the login shell execs that wrapper; there is no display
+  manager and niri has left the closure. `profiles.dwlDesktop` also owns the
+  launcher (`fleet-menu`), the terminal (foot), notifications (mako) and
+  idle/lock (swayidle → waylock). The keymap is the fleet's
+  `modules/config/dwl/config.h` plus this host's dead-key layer, spliced in from
+  `hosts/netbook/dwl-keybinds.h` through the profile's `extraKeybinds` — inserted
+  first, because dwl takes the first match, so a host entry shadows the fleet
+  binding for the same key. There is **no bar and no secret
   service**, and that is measured rather than taste: waybar's closure is 1001 MiB
   (zenity alone is 902 MiB of it) against dwl's 345 MiB, and gnome-keyring is
   378 MiB — see [the measurements](#no-bar-no-secret-service-the-measurements)
   below.
 - **`alice`'s rice is `~/.dotfiles`** (a git repo with its own installer),
   symlinked into `~/.config`, and it still wins wherever it carries a file — XDG
-  user config beats `/etc/xdg`. It was written for niri, fuzzel and alacritty,
-  none of which are installed any more, so what still takes effect is whatever
-  it holds for the apps that remain (foot, tmux).
+  user config beats `/etc/xdg`. It was written for niri, fuzzel, mako and
+  alacritty: niri is gone, and the other three are **kept on purpose**. Every
+  menu in the rice calls `fuzzel -d`, the six cards in `~/mako-suite` find their
+  own notification through `makoctl list`, and the terminal launchers `exec
+  alacritty` — so the session starts mako rather than fnott, and those packages
+  are the Phase-1 bridges. Porting the scripts is the `netbook-desktop-phase-2`
+  note, under [[flake/policies.nix#desktop-fork-not-disable]] as documented in
+  `rice-fork-not-patch`: port the mechanism a binding needs, not only its chord. The
+  port itself is planned in [`docs/netbook-rice-port.md`](../../../docs/netbook-rice-port.md) —
+  the mako→fnott mapping, the call sites, and the three things it loses.
+- **The session's compositor is an absolute path, and that is a lesson bought
+  once.** The first version of this profile wrapped the session in its own
+  `writeShellApplication` with `pkgs.dwl` among its `runtimeInputs` while the
+  *keymap* build went to `systemPackages`. The wrapper's PATH wins inside the
+  session, so the deployed compositor was upstream's `config.h`: no bind in this
+  repo existed, on either host, and nothing looked wrong — stock dwl renders,
+  spawns and tiles. `programs.dwl` execs `lib.getExe cfg.package` instead, which
+  no PATH can shadow. Instruments, in order of what they actually answer:
+  `grep -a quick-keys.sh /proc/$(pgrep -x dwl)/exe` says whether the **running**
+  binary carries the host keymap, while reading the derivation only says it was
+  built; `nix-store -q --referrers` on each `dwl-0.9` path says which layer pulled
+  which.
+- **A Wayland socket file outlives the compositor that made it.** The clients
+  (wallpaper, idle/lock, the notifier, the autostart lines) start from a hook that
+  runs *before* dwl, so the wrapper waits for the socket — and on a session restart
+  dwl is killed rather than exiting, leaving `wayland-0` bound to nothing. The
+  first version treated the file as the proof and launched the set against a dead
+  socket: `swaybg`, `swayidle` and `mako` all exited while `makobatt -s` and
+  `taildrop --daemon` (which never touch Wayland) survived, which reads as "some
+  programs are gone" rather than "the session raced". Now `swayidle` starts first
+  as a canary and the set only proceeds if it is still up 0.3 s later: a client
+  that answers is the proof, the file is only a hint. Measured 2026-10-27 by
+  restarting `getty@tty1` — a fresh boot never shows it, because `/run/user/1000`
+  starts empty.
 
 Putting it under home-manager was tried on 2026-10-22 and reverted, for a reason
 that is arithmetic rather than taste: `modules/user/base.nix` +
@@ -139,11 +179,16 @@ https://cache.nixos.org`, fleet nixpkgs):
 | gnome-keyring | **378 MiB** |
 | greetd / tuigreet | 60 / 51 MiB |
 | foot / wmenu / mako / swaybg / swayidle / waylock | 97 / 100 / 326 / 128 / 43 / 78 MiB |
+| firefox (the browser this host has) | 1.46 GiB |
 
 - **Bar: declined.** waybar is not a bar in closure terms — it brings zenity
   (902 MiB) and `sdl2-compat`/sdl3 (~955 MiB) with it, so a status line would have
   cost more than the rest of the session combined, and more than the compositor it
   replaced. If one is ever wanted, the thing to beat is dwl's 345 MiB, not zero.
+- **Browser: open work, with the table in the `netbook-desktop-phase-2` note.**
+  `firefox` is 1.46 GiB of closure and measured **~1.0 GiB RSS** on this 1818 MiB
+  host (WebExtensions 319 + wrapper 309 + Isolated 224 + three content processes
+  at 65 each), which is the clunkiness, and nothing cheaper is a drop-in.
 - **Secret service: declined.** Nothing on this host implements the freedesktop
   Secret API — `firefox` keeps its own NSS store and `nautilus` has no `gvfs` to
   store mounts in — so the keyring would have been 378 MiB of idle daemon. Scratch
@@ -151,10 +196,10 @@ https://cache.nixos.org`, fleet nixpkgs):
 - **Display manager: declined.** `greetd` + `tuigreet` were 111 MiB to autologin a
   single user, and SDDM is a Qt stack. tty1 autologins through `getty` instead,
   which still gives the session a real logind/seat through PAM, and
-  `environment.loginShellInit` execs the compositor from the login shell. NixOS's
-  `/etc/profile` reads **`/etc/profile.local` and the `loginShellInit` slot, not
-  `/etc/profile.d`** — checked against the generated file, because the hook that
-  is not read fails silently.
+  `environment.loginShellInit` execs `/etc/xdg/dwl-session` from the login shell.
+  NixOS's `/etc/profile` reads **`/etc/profile.local` and the `loginShellInit`
+  slot, not `/etc/profile.d`** — checked against the generated file, because the
+  hook that is not read fails silently.
 
 ### Staging a boot-chain change (the practiced path)
 

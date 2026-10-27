@@ -1,6 +1,6 @@
-# A dwl session any host can adopt: the layer around the compositor, not a second
-# compositor. Keybinds: `modules/config/dwl/config.h`. Launcher:
-# `modules/scripts/fleet-menu.sh`. Per-host notes: `.agents/deploy/hosts/`.
+# A dwl session any host can adopt: NixOS's `programs.dwl` plus the package and the
+# clients. Keybinds `modules/config/dwl/config.h`, launcher `modules/scripts/fleet-menu.sh`,
+# host procedure `.agents/deploy/hosts/netbook.md`.
 {
   config,
   lib,
@@ -10,39 +10,60 @@
   cfg = config.profiles.dwlDesktop;
   fleetMenu = import ../scripts/fleet-menu.nix {inherit pkgs;};
 
+  # Spliced host entries go first, which is what makes them shadow the fleet bind
+  # for the same key (`keybinding()` returns the first entry matching mod + keysym).
+  # Handed to `programs.dwl.package`, never added to a PATH: see AUDIT.md 2026-10-27.
   dwl = pkgs.dwl.override {
-    configH = builtins.readFile ../config/dwl/config.h;
+    configH =
+      builtins.replaceStrings
+      ["/* @EXTRA_KEYBINDS@ */"]
+      [cfg.extraKeybinds]
+      (builtins.readFile ../config/dwl/config.h);
   };
 
-  session = pkgs.writeShellApplication {
-    name = "dwl-session";
-    runtimeInputs =
-      [
-        pkgs.coreutils
-        pkgs.dwl
-        pkgs.swayidle
-        pkgs.waylock
-      ]
-      ++ lib.optional (cfg.wallpaper != null) pkgs.swaybg;
-    text = builtins.readFile ../config/dwl/dwl-session.sh;
-  };
+  wallpaperLine =
+    if cfg.wallpaper == null
+    then ""
+    else if lib.hasPrefix "/" cfg.wallpaper
+    then "swaybg -m fill -i ${lib.escapeShellArg cfg.wallpaper} &"
+    else "swaybg -c ${lib.escapeShellArg cfg.wallpaper} &";
 
-  # The session's knobs are exported in-process rather than through
-  # `environment.sessionVariables`, so the session carries its own environment
-  # wherever it is launched from.
-  sessionCommand = "${
-    pkgs.writeShellApplication {
-      name = "dwl-session-launch";
-      text = ''
-        export DWL_WALLPAPER=${lib.escapeShellArg (
-          if cfg.wallpaper == null
-          then ""
-          else cfg.wallpaper
-        )}
-        exec ${session}/bin/dwl-session "$@"
-      '';
-    }
-  }/bin/dwl-session-launch";
+  # One line per entry, run through sh by name: what resolves them is the PATH
+  # this session inherited from the login shell, which home-manager puts
+  # ~/.local/bin first on — where a user's own tools live.
+  autostartLines = lib.concatMapStringsSep "\n" (cmd: "      sh -c ${lib.escapeShellArg cmd} &") cfg.autostart;
+
+  # dwl publishes WAYLAND_DISPLAY only once its socket exists, and this slot runs
+  # before dwl does, so the clients wait for the socket in the background and
+  # export the name dwl actually chose: wayland-0 is what libwayland guesses,
+  # not what `wl_display_add_socket_auto` promises.
+  sessionCommands = ''
+    export TERMINAL=foot
+    export XDG_SESSION_TYPE=wayland
+    export XDG_SESSION_DESKTOP=dwl
+    export XDG_CURRENT_DESKTOP=dwl
+
+    (
+      for _ in $(seq 1 300); do
+        for sock in "''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"/wayland-*; do
+          [ -S "$sock" ] || continue
+          export WAYLAND_DISPLAY="''${sock##*/}"
+          # The socket FILE outlives the compositor, so the file is only a hint and
+          # swayidle — started first, as a client this session needs anyway — is the
+          # proof: the set below waits for it to stay up. `.agents/deploy/hosts/netbook.md`
+          swayidle -w timeout 600 waylock before-sleep waylock &
+          idle=$!
+          sleep 0.3
+          kill -0 "$idle" 2>/dev/null || continue
+
+          ${wallpaperLine}
+    ${autostartLines}
+          exit 0
+        done
+        sleep 0.1
+      done
+    ) &
+  '';
 in {
   options.profiles.dwlDesktop = {
     enable = lib.mkEnableOption "a dwl session with launcher and wallpaper";
@@ -61,22 +82,56 @@ in {
         image (swaybg -m fill -i), or null for none.
       '';
     };
+
+    extraKeybinds = lib.mkOption {
+      type = lib.types.lines;
+      default = "";
+      description = ''
+        Key[] entries spliced into the shared keymap (modules/config/dwl/config.h)
+        at its @EXTRA_KEYBINDS@ marker. They are inserted first, and dwl takes the
+        first match, so an entry here shadows the fleet binding for that key.
+      '';
+    };
+
+    autostart = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = ''
+        Commands the session runs once the Wayland socket exists, with the same
+        environment the compositor gets. Entries are shell command lines, and a
+        notification daemon belongs here rather than in this profile: which one
+        is a host's choice, and two daemons would race for the same bus name.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
+    programs.dwl = {
+      enable = true;
+      package = dwl;
+      extraSessionCommands = sessionCommands;
+    };
+
     environment.systemPackages =
       [
-        dwl
         fleetMenu
         pkgs.brightnessctl
+        # mako still ships here because a HUD suite in the user's own dotfiles
+        # drives `makoctl` (see the `netbook-desktop-phase-2` note); the swap to
+        # fnott is that note's work, not this profile's.
+        pkgs.mako
         pkgs.foot
         pkgs.grim
         pkgs.imv
-        pkgs.mako
         pkgs.playerctl
         pkgs.slurp
+        pkgs.swayidle
+        pkgs.waylock
+        # wl-copy + wtype are the pair a dead-key workaround needs: copy for
+        # paste-anywhere, wtype to synthesize the character into the focused window.
         pkgs.wl-clipboard
         pkgs.wmenu
+        pkgs.wtype
       ]
       ++ lib.optional (cfg.wallpaper != null) pkgs.swaybg;
 
@@ -112,6 +167,10 @@ in {
       enable = lib.mkDefault true;
       extraPortals = [pkgs.xdg-desktop-portal-gtk];
       config.common.default = lib.mkDefault ["gtk"];
+      # programs.dwl names `wlr` first for this desktop; the closure carries only
+      # the gtk portal, so asking for a backend that is not installed buys a
+      # warning at every portal start and nothing else.
+      config.dwl.default = ["gtk"];
     };
 
     services.pipewire = {
@@ -128,8 +187,9 @@ in {
 
     # No display manager. getty autologins tty1, which gives the session a real
     # logind session (seat, runtime dir, PAM) the way a DM would, and the login
-    # shell execs dwl. Measured: SDDM is a Qt stack and greetd + tuigreet were
-    # 111 MiB between them, for a machine that logs in one user.
+    # shell execs `programs.dwl`'s session wrapper. Measured: SDDM is a Qt stack
+    # and greetd + tuigreet were 111 MiB between them, for a machine that logs in
+    # one user.
     services.displayManager.sddm.enable = false;
     services.getty.autologinUser = cfg.user;
 
@@ -139,7 +199,7 @@ in {
     # the desktop are all unaffected.
     environment.loginShellInit = ''
       if [ "$(id -un)" = ${lib.escapeShellArg cfg.user} ] && [ "$(tty)" = /dev/tty1 ] && [ -z "''${WAYLAND_DISPLAY:-}" ]; then
-        exec ${sessionCommand}
+        exec /etc/xdg/dwl-session
       fi
     '';
   };

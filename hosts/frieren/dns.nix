@@ -1,3 +1,5 @@
+# frieren's resolver role: modules/net/dns plus the tailnet failover peer for the
+# shared 10.99.0.53, so losing either node does not lose tailnet DNS.
 {
   config,
   lib,

@@ -127,16 +127,14 @@ in {
     };
   };
 
+  # No `~/.config/nixpkgs/config.nix`. It existed to make `pkgs.nur` visible, so
+  # browser extensions could be named out of NUR — but the extensions come from
+  # the `firefox-addons` flake input (modules/zen.nix), and nothing in this repo
+  # ever referenced `pkgs.nur`. What it did do was worse than nothing: nixpkgs reads
+  # that file during an impure `import nixpkgs {}`, so every flake evaluation on a
+  # machine whose user had it applied a network `fetchTarball` of NUR `main` and
+  # could differ from CI on the same commit.
   xdg.configFile = {
-    "nixpkgs/config.nix".text = ''
-      {
-        packageOverrides = pkgs: {
-          nur = import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/main.tar.gz") {
-            inherit pkgs;
-          };
-        };
-      }
-    '';
     "elvish/rc.elv".source = builtins.fetchurl {
       url = "https://gist.githubusercontent.com/shaoyanji/656406074a590a09e33755b88ac29d53/raw/rc.elv";
       sha256 = "0b0078sp6fyqygxz9hap7inhpnwz17s0vcpb4fgklzxa2h8kp194";

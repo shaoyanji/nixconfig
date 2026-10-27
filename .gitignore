@@ -1,4 +1,7 @@
 .DS_Store
+# The flake's build symlink: a store path, never content. `git add -A` would
+# otherwise commit it (it was the only untracked entry a plain `git status` showed).
+/result
 .devenv
 ._*
 .smbdelete*

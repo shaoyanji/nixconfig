@@ -1,5 +1,5 @@
 # Yarn/Node.js development shell
-{pkgs ? import <nixpkgs> {}}: let
+{pkgs}: let
   builder = pkgs.callPackage ./builder.nix {};
   common = pkgs.callPackage ./common-packages.nix {};
   hooks = pkgs.callPackage ./shell-hooks.nix {};

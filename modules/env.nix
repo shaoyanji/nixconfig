@@ -1,3 +1,5 @@
+# Interactive environment for the fleet's user: editor, shell, git identity and the
+# CLI defaults every host shares (host-specific knobs come from the inventory).
 {
   lib,
   pkgs,
@@ -84,10 +86,14 @@ in {
     programs.git = {
       enable = true;
       settings = {
-        user.name = lib.mkForce user.realName;
-        user.email = lib.mkForce user.githubEmail;
-        init.defaultBranch = lib.mkForce "master";
-        pull.rebase = lib.mkForce true;
+        # Plain assignments, not mkForce: nothing else in the tree defines these
+        # (checked with `rg 'programs\.git'`), so forcing bought no conflict
+        # resolution — it only made a future host-level override impossible to
+        # express. `init.defaultBranch = "master"` is git's own default anyway.
+        user.name = user.realName;
+        user.email = user.githubEmail;
+        init.defaultBranch = "master";
+        pull.rebase = true;
         push.autoSetupRemote = true;
         # Automatic submodule handling: operations (pull, checkout, switch, reset)
         # recurse into submodules automatically without needing manual sbupdate.

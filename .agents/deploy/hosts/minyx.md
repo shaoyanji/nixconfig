@@ -13,7 +13,7 @@ file a switch writes. This host is not on `infra:deploy` or the sweeps (inventor
 # on delphi, from the checkout, as devji — NOT sudo
 cd ~/Documents/nixconfig
 nixos-rebuild switch -L --builders "" --flake .#minyx \
-  --target-host devji@192.168.3.9 --use-remote-sudo
+  --target-host devji@192.168.3.3 --use-remote-sudo
 ```
 
 - **`devji`, not `sudo`.** root cannot evaluate a devji-owned git tree (`repository
@@ -46,34 +46,48 @@ nixos-rebuild switch -L --builders "" --flake .#minyx \
   (`nixos-1-default` in `/boot/extlinux/extlinux.conf`, kernel in `/boot/nixos`),
   but the board is headless: choosing it needs a serial console.
 
-## DNS failover role — withdrawn 2026-10-27, do not re-declare it here
+## DNS failover role (declared 2026-10-27; `status = "active"`)
 
-This host was made the **P1 (priority 1) DNS failover** for frieren's Pi-hole for
-about six hours (`hosts/minyx/dns.nix`, since deleted). It is the wrong host for the
-role and the attempt caused a LAN outage:
+This board is the **DNS failover** for frieren's Pi-hole: blocky answers the
+`*.frieren.lan` zone from local records, and keepalived holds `192.168.3.50` at
+priority 1 — it can never preempt a healthy frieren (200), and claims the address
+when frieren's resolver stops answering the zone. Peers are unicast
+(`192.168.3.25` here, the reserved address of the role's link there): multicast VRRP
+split brain on this LAN is
+what put one address on two MACs on 2026-10-27.
 
-- **It is `status = "preserved"`.** `infra:deploy` and the sweeps refuse it, the
-  closure was never pushed, and the primary half went live alone at 04:00 — a VRRP
-group with one member is not redundancy.
-- **Its address is DHCP.** The VIP was set to `192.168.3.53`, the same address the
-  router was already leasing to this board. A floating address that duplicates a
-  lease is a duplicate address on the wire, and the fix was unplugging the Pi.
-- **It under-volts.** `vcgencmd get_throttled = 0x50000` on the interim boot. A
-  resolver has to be the most reliable box on the LAN, not the one that browns out.
+Do not push this role until all four are true. The first attempt skipped them and
+took the LAN down:
 
-Before this board takes any always-on role: a 5 V/2.5 A supply, a clean NixOS
-install, `status` changed off `preserved` in `inventory.toml`, and an address
-**reserved on the router outside its DHCP pool** and written into
-[`docs/dns-failover.md`](../../../docs/dns-failover.md). A VIP also needs
-`unicastPeers` on both nodes — the module now asserts it, because multicast VRRP
-splits brain on this LAN.
+| Precondition | Why | Check |
+| :--- | :--- | :--- |
+| **5 V/2.5 A supply** | `vcgencmd get_throttled = 0x50000` on the interim boot: under-voltage and throttling have happened. A failover that browns out is worse than none | `vcgencmd get_throttled` on the board |
+| **the role link reserved** | `unicastPeers` on frieren hardcodes this address, so a new lease silently points the group at nothing. Reservations are **per MAC** and this board has two (wifi + USB ethernet), so reserving one link does not cover the other | router admin page |
+| **`.50` outside the pool** | the VIP has no MAC to reserve, so only the pool's bounds protect it. `.53` failed exactly here: the router was already leasing it to this board | `task checks:dns:pool POOL=<start>-<end>` → exit 0 |
+| **clean install on the card** | the preserved note's condition: the current boot is an interim one | `nixos-version`, `/boot/extlinux/extlinux.conf` |
 
-What the attempt did leave behind, and is kept: the module's `blocky` backend (zone,
-custom records and blocklists from one declaration; config validated against the
-real binary) so a future secondary is a short opt-in rather than a port of frieren's
-stack. If it is revived, the units to check are `blocky` (answers the zone from
-local records) and `keepalived` (holds the VIP) — both fail quietly, with a green
-config.
+Then the push (from delphi, aarch64 → aarch64, no emulation):
+
+```bash
+nixos-rebuild switch -L --builders "" --flake .#minyx \
+  --target-host devji@192.168.3.3 --use-remote-sudo
+```
+
+Verify on the board, in this order — both units fail quietly with a green config:
+
+```bash
+systemctl is-active blocky keepalived                      # both active
+ip -br addr | grep -v lo                                   # wlan0 UP: the role's link, not enu1u1
+journalctl -u keepalived -b | grep -iE 'track script|state'  # must NOT say "track script dns not found"
+ip -br addr show wlan0                                     # no .50 while frieren is healthy
+dig +short @127.0.0.1 photos.frieren.lan                    # 192.168.3.25
+```
+
+A rejected track script is the silent failure: keepalived then holds the VIP with no
+health check, so it looks healthy while the resolver behind it is dead. Then run the
+two-direction takeover in [`docs/dns-failover.md`](../../../docs/dns-failover.md)
+("The failover test"); until the address has moved out *and* back, the group is
+unproven.
 
 Known gap, by backend design: blocky has no dnsmasq-style conditional forward, so
 `*.cloudforest-kardashev.ts.net` and `gok` do **not** resolve on it. The LAN zone and

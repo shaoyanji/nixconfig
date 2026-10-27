@@ -42,17 +42,24 @@ profiles.dnsFailover = {
   lanInterface = "enp1s0";
   zone = "frieren.lan";
   zoneAddress = "192.168.3.25";
-  resolvers = ["192.168.3.25"];      # this host; no VIP (see below)
+  resolvers = ["192.168.3.50"];      # the VIP clients are configured with
+  virtualIp = "192.168.3.50";        # reserved, outside the DHCP pool
+  virtualRouterId = 50;
+  unicastPeers = ["192.168.3.3"];    # minyx; unicast, never multicast
+  primaryPriority = 200;             # minyx is 1
   extraDnsmasqLines = [ ... ];
 };
 ```
 
-**There is still no second live member.** minyx was declared one on 2026-10-27 and
-reverted the same day: the host is inventory `status = "preserved"` (standby until a
-clean install, with a measured under-voltage fault `0x50000`), so `infra:deploy`
-never reaches it, the closure was never pushed, and the primary half went live alone
-via the 04:00 autoUpgrade. What made that dangerous is not the missing backup but the
-floating address: see *The VIP that was withdrawn* below.
+**The second member is minyx** (`hosts/minyx/dns.nix`): `role = "secondary"`,
+`backend = "blocky"`, priority 1. It was declared, withdrawn and reinstated on
+2026-10-27 — the withdrawal is the useful part of the story (*The 2026-10-27 outage*
+below), and the reinstatement is gated on the address rules in *Choosing the VIP*.
+
+The reason for the backend split is weight, not preference: minyx is a 1 GiB Pi 3B
+whose root is a USB stick with no TRIM, so pihole-ftl's query database and unbound's
+recursion are the wrong shape for a node whose only job is to answer while frieren is
+gone.
 
 The backend is a host property, not a preference. `pihole` keeps the unbound +
 FTL stack above; `blocky` is a single process that answers the same zone from
@@ -83,7 +90,7 @@ this zone on an always-on host is the one that makes failover real, and minyx do
 that — deliberately in a different shape (blocky, not crab-hole) precisely because
 crab-hole cannot carry the zone.
 
-### The VIP that was withdrawn (2026-10-27)
+### The 2026-10-27 outage
 
 A floating `192.168.3.53` was declared on frieren and minyx and withdrawn the same
 day, after a 04:00 autoUpgrade took the LAN's DNS down. Three separate mistakes, all
@@ -106,20 +113,46 @@ gone from the option for that reason.
   switch that adds them found nothing to delete, aborted mid-reload, and left INPUT
   dropping every packet. frieren's 04:00 switch exited 4 (`Failed to reload
   firewall.service`), the generation went live half-activated, and the LAN lost DNS
-  until the firewall was restarted by hand. The module opens `vrrp` through
-  `allowedProtocols` instead, which is rebuilt on every start and is therefore
-  idempotent.
+  until the firewall was restarted by hand. The module now opens `vrrp` from the
+  firewall's **start** path (`extraInputRules` under nftables, else `extraCommands`),
+  which is rebuilt from scratch each start — there is no `allowedProtocols` option in
+  this nixpkgs, and a start-path rule cannot half-delete itself.
 
 What a VIP buys when it is done properly: one address, configured once on the router,
 that survives losing a node — without clients having to implement fallback. It is
 still not `192.168.3.25`, because that address is the target of every
 `*.frieren.lan` record and floating it would drag the NAS along.
 
-A VIP is the last step, not the first. Before one comes back, a group needs a second
-member that is *not* dormant, an address **reserved on the router outside its DHCP
-pool** (and written down here, not taken from an example), and `unicastPeers` on both
-nodes. Until then failover is client-side: the appliance `gok` answers the same zone
-independently, so a second resolver in DHCP option 6 is the honest, working shape.
+### Choosing the VIP
+
+The address is the part that broke, so it has rules, and they are checks rather than
+conventions:
+
+1. **Outside the router's DHCP pool.** A VIP has no MAC to reserve, so the only
+   structural protection is that the pool cannot reach it. Verify with
+   `task checks:dns:pool POOL=<start>-<end>` — exit 0 means every declared address
+   (resolvers, `zoneAddress`, `virtualIp`) is clear of it.
+2. **Not an address a node already holds.** `192.168.3.53` was rejected for exactly
+   this: the router was already leasing it to the Pi, so "failover" meant two MACs
+   answering for one address. The VIP is `.50` — not frieren's `.25`, not minyx's
+   `.3`.
+
+   A reservation is per MAC, and this board has two MACs (built-in wifi and the USB
+   ethernet adapter), so one reservation covers one link. Whichever link carries the
+   role must have its own reservation, and that is the address `unicastPeers` names.
+3. **Not the zone target.** `.25` is what every `*.frieren.lan` record points at, so
+   floating it would drag the NAS along with the resolver.
+4. **Written down here, never copied from an option's `example`.** The `example` is
+   gone from the `virtualIp` option for that reason.
+
+With the pool at `.100`–`.200`, `.25`, `.9` and `.50` all sit in the static block and
+the gate above passes. Tested both ways: the same command with
+`POOL=192.168.3.20-192.168.3.200` exits 1 and names `.25` and `.50` as inside it.
+
+Unicast is the other half of doing it properly: `unicastPeers` is asserted by the
+module, so a group that would split brain does not evaluate. The appliance `gok`
+cannot join this group at all (no systemd, no keepalived — and it is the same board
+as minyx, different boot), so it is not an alternative member.
 
 ### What the router hands out today (measured 2026-10-27)
 
@@ -202,7 +235,7 @@ second resolver.
   whose NIC flaps). `unicastPeers` is required, not preferred (the 2026-10-27 split
   brain), and the VIP must be an address **reserved on the router, outside its DHCP
   pool** — never one copied from an option's `example`. Withdrawn 2026-10-27; see
-  *The VIP that was withdrawn*.
+  *The 2026-10-27 outage*.
 
 Split brain is prevented structurally: the `role` enum makes a host one of
 primary/secondary, `virtualRouterId` is required once `virtualIp` is set (two hosts
@@ -231,7 +264,7 @@ is DHCP), so after a switch prove both nodes directly — this is the real end-t
 test, and the only one that shows the takeover:
 
 ```bash
-task checks:dns:failover RESOLVERS="192.168.3.25 192.168.3.9"   # both answer the zone
+task checks:dns:failover RESOLVERS="192.168.3.25 192.168.3.3"   # both answer the zone
 ```
 
 A resolver address that a client can be *leased* is a resolver a client can lose to
@@ -265,16 +298,32 @@ dig +short @192.168.3.25 photos.frieren.lan   # 192.168.3.25
 dig +short @<secondary>  photos.frieren.lan   # same answer => failover target is real
 ```
 
-With no VIP there is no takeover to watch: prove the second member answers the same
-zone (`dig +short @<secondary> photos.frieren.lan` → `192.168.3.25`), then prove the
-router actually hands it out. "It built" and "it was declared" are both not
-failover.
+Two things are not failover and must not be reported as it: "it built" and "it was
+declared". The takeover has to be observed in **both** directions — a VIP that moves
+out and stays out is half a failover:
 
-When a group does come back, the takeover must be observed in **both** directions
-(a VIP that moves out and stays out is half a failover): stop the primary's resolver,
-watch the address leave that host and appear on the other, query the VIP, then restart
-the primary and confirm the higher priority pulls it back. `checks:dns:failover`
-reports a VIP that answers from two MACs as split brain.
+```bash
+# 1. before: .50 lives on frieren, minyx is BACKUP
+ip -br addr show enp1s0 | grep 192.168.3.50        # on frieren
+ssh minyx 'ip -br addr show wlan0'                 # no .50 here
+
+# 2. stop the primary's resolver (not the host)
+ssh frieren 'sudo systemctl stop pihole-ftl'
+
+# 3. within fall x interval (~10 s): .50 leaves frieren, appears on minyx,
+#    and the VIP still answers the zone from blocky
+dig +short @192.168.3.50 photos.frieren.lan         # 192.168.3.25
+
+# 4. restore: priority 200 must pull the VIP back, not leave it on the backup
+ssh frieren 'sudo systemctl start pihole-ftl'
+```
+
+If the VIP moves but the answer is NXDOMAIN, blocky is up and its zone is not — check
+`customRecords`, not keepalived. If it never moves, the group is not talking: check
+`unicastPeers` on both sides, then `journalctl -u keepalived` on both (a rejected
+`track_script` reads as "track script dns not found, ignoring" and leaves the instance
+running with no health check at all). `checks:dns:failover` reports a VIP that answers
+from two MACs as split brain.
 
 The DNS-aware `vrrp_script` is what makes this work: a node whose *resolver* stopped
 answering is demoted even though its NIC never flapped. It probes a synthesized name

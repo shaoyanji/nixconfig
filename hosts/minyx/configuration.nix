@@ -6,6 +6,7 @@
   imports = [
     ./hardware-configuration.nix
     ./custompi.nix
+    ./dns.nix
     ./tunnel.nix
   ];
 

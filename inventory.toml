@@ -814,8 +814,8 @@ tailscale_ip = "100.126.186.109"
 
 [hosts.minyx]
 hostname = "minyx"
-status = "preserved"
-status_detail = "Standby until a clean NixOS install on the RPi3. Its sdImage/kernel are not cachix artifacts, so building it in CI only spends runners and load; the host stays off the deploy and sweep surfaces."
+status = "active"
+status_detail = "DNS failover member for the frieren.lan zone (blocky backend, keepalived BACKUP at priority 1). Promoted off preserved on 2026-10-27; its closure is still built on delphi, not in CI, because the sdImage/kernel are not cachix artifacts."
 kind = "nixos"
 arch = "aarch64-linux"
 role = "Raspberry Pi 3 Model B Tunnel & Jump Box"

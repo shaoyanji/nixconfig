@@ -262,7 +262,7 @@
         (refLine linkify "tasks" e.refs.tasks)
         (refLine linkify "docs" e.refs.docs)
         (lib.optionalString (e.links != [])
-          ("- **Related notes:** " + lib.concatStringsSep ", " (map (l: relatedLink l) e.links)))
+          ("- **Related notes:** " + lib.concatStringsSep ", " (map relatedLink e.links)))
         (lineageLine relatedLink "From" e.from)
         (lineageLine relatedLink "Supersedes" e.supersedes)
         (lineageLine relatedLink "Replaced by" e.replacedBy)
@@ -329,11 +329,11 @@
     # `task ops:notes:lineage` reads — no traversal at query time.
     lineage =
       lib.mapAttrs (_: e: {
-        from = e.from;
-        supersedes = e.supersedes;
-        ancestors = e.ancestors;
-        descendants = e.descendants;
-        replacedBy = e.replacedBy;
+        inherit (e) from;
+        inherit (e) supersedes;
+        inherit (e) ancestors;
+        inherit (e) descendants;
+        inherit (e) replacedBy;
       })
       entries;
     origins = builtins.filter (id: entries.${id}.ancestors == []) noteIds;

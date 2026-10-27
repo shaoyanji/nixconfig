@@ -98,7 +98,7 @@
     inherit name description version tags platforms lineCount;
     # The parsed body lines (`p.body`), for a gate that has to read the markdown
     # itself — currently the task-mirror check. `index` does not project it.
-    body = p.body;
+    inherit (p) body;
     declaredName = declared;
     path = ".agents/skills/${name}";
     bodyHeading = trim p.bodyFirst;

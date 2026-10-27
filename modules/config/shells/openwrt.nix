@@ -4,7 +4,7 @@
   pkgs,
   root ? null,
 }: let
-  lib = pkgs.lib;
+  inherit (pkgs) lib;
   tools = [
     pkgs.openssh
     pkgs.sops

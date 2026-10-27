@@ -222,15 +222,15 @@
         if lang == "de"
         then ''<a href="${root}index.html" hreflang="en">EN</a><span aria-hidden="true">/</span><span aria-current="page">DE</span>''
         else ''<span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="${root}de/index.html" hreflang="de">DE</a>'';
-      handle = p.handle;
-      location = p.location;
-      name = p.name;
+      inherit (p) handle;
+      inherit (p) location;
+      inherit (p) name;
       role = p.title;
-      subtitle = p.subtitle;
+      inherit (p) subtitle;
       status = p.status.text;
-      skip = t.skip;
-      navLabel = t.navLabel;
-      footer = t.footer;
+      inherit (t) skip;
+      inherit (t) navLabel;
+      inherit (t) footer;
     };
 
     projectPage = i: let
@@ -241,14 +241,14 @@
         else pr.en;
       body = render ./bountystash/project.html {
         index = "0${toString (i + 1)}";
-        kind = t.kind;
-        title = x.title;
-        role = x.role;
-        period = x.period;
-        description = x.description;
-        impact = x.impact;
+        inherit (t) kind;
+        inherit (x) title;
+        inherit (x) role;
+        inherit (x) period;
+        inherit (x) description;
+        inherit (x) impact;
         impactLabel = t.impact;
-        stackLabel = t.stackLabel;
+        inherit (t) stackLabel;
         stack = lib.concatMapStringsSep "" (s: "<li>${esc s}</li>") x.stack;
         backHref = "${root}index.html#work";
         backLabel = t.back;
@@ -270,15 +270,15 @@
           if lang == "de"
           then ''<a href="${root}work/${pr.url}" hreflang="en">EN</a><span aria-hidden="true">/</span><span aria-current="page">DE</span>''
           else ''<span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="${root}de/work/${pr.url}" hreflang="de">DE</a>'';
-        handle = p.handle;
-        location = p.location;
-        name = p.name;
+        inherit (p) handle;
+        inherit (p) location;
+        inherit (p) name;
         role = p.title;
-        subtitle = p.subtitle;
+        inherit (p) subtitle;
         status = p.status.text;
-        skip = t.skip;
-        navLabel = t.navLabel;
-        footer = t.footer;
+        inherit (t) skip;
+        inherit (t) navLabel;
+        inherit (t) footer;
       };
   in {
     inherit index projectPage root;

@@ -43,7 +43,7 @@ in {
         mode = "0400";
         key = cfg.tokenKey;
       }
-      // lib.optionalAttrs (cfg.sopsFile != null) {sopsFile = cfg.sopsFile;};
+      // lib.optionalAttrs (cfg.sopsFile != null) {inherit (cfg) sopsFile;};
 
     sops.templates."nix-cache-netrc" = {
       owner = "root";

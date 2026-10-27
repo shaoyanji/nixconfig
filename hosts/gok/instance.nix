@@ -1,7 +1,7 @@
 # The gok appliance, declared. `scripts/task/gok.sh` renders this module into the
 # instance's config.json and then fills the credential slots from sops; nothing
 # here is a secret, and no credential belongs in this file.
-{...}: {
+_: {
   services.gokrazy.instances.gok = {
     # DHCP name and the address `gok update` resolves.
     hostname = "gok.cloudforest-kardashev.ts.net";

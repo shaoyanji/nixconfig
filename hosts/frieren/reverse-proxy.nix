@@ -201,7 +201,7 @@ in {
   # so the host cannot be built or switched into that state.
   assertions = let
     onTls = v: builtins.any (l: (l.port or 80) == 443) (v.listen or []);
-    tlsVhosts = lib.filterAttrs (_: v: onTls v) config.services.nginx.virtualHosts;
+    tlsVhosts = lib.filterAttrs (_: onTls) config.services.nginx.virtualHosts;
     certless = lib.filterAttrs (_: v: v.sslCertificate == null && v.useACMEHost == null) tlsVhosts;
     defaults = lib.filterAttrs (_: v: v.default or false) tlsVhosts;
   in [

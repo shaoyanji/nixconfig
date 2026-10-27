@@ -25,10 +25,18 @@
 #     @127.0.0.1 answers), so the LAN path cannot be exercised from the host
 #     itself. The pass is annotated so it is not read as "the LAN path works".
 #
+# Redundancy has two shapes, and counting entries in `resolvers` only sees one:
+#   * client-side — clients are handed the member addresses, so >= 2 entries is
+#     the proof that there is somewhere to fall back to;
+#   * VRRP — clients are handed ONE address that floats between nodes, so a
+#     single entry is correct by design and the group is proven by that address
+#     answering the zone while exactly one MAC owns it (two owners = two
+#     MASTERs, i.e. split brain).
+#
 # Exit codes: 0 = group healthy AND redundant; 1 = a listed resolver failed to
 #   answer the zone, or the VIP answered from two MACs (split brain); 2 = the
-#   failover path cannot be evaluated (no dig/jq/nix, nix eval failed, or the
-#   group has fewer than 2 members).
+#   failover path cannot be evaluated (no dig/jq/nix, nix eval failed, one
+#   member and no probed VIP).
 set -uo pipefail
 
 HOST="${HOST:-frieren}"
@@ -107,6 +115,10 @@ echo
 # --- split brain on the VRRP VIP (only when one is declared) -----------------
 vip_split=""
 vip_checked="no"
+# `yes` only when the address answered and one MAC owned it — the positive
+# evidence the redundancy rule below needs. Reachability alone is not it: an
+# address nobody answers is a group that is down, not a group that can fail over.
+vip_owned="no"
 if [ -n "$vip" ]; then
   if command -v arping >/dev/null 2>&1; then
     iface_args=()
@@ -122,6 +134,7 @@ if [ -n "$vip" ]; then
       echo "FAIL  VIP ${vip} answered from ${mac_count} MACs — split brain:"
       printf '        %s\n' $macs
     elif [ "$mac_count" -eq 1 ]; then
+      vip_owned="yes"
       echo "OK    VIP ${vip} owned by exactly one MAC (${macs})"
     else
       echo "WARN  VIP ${vip} answered from no MAC — is the group up?"
@@ -133,11 +146,23 @@ fi
 
 # --- redundancy: a group of one is not failover ------------------------------
 echo
-if [ "${#resolvers[@]}" -lt 2 ]; then
-  echo "NOT EVALUABLE: ${#resolvers[@]} resolver(s) declared — a one-member group proves"
-  echo "               the primary answers, not that failover works. Provision a second"
-  echo "               always-on resolver and add it to profiles.dnsFailover.resolvers."
+if [ "${#resolvers[@]}" -lt 2 ] && [ "$vip_owned" != "yes" ]; then
+  echo "NOT EVALUABLE: ${#resolvers[@]} resolver(s) declared and no probed VIP — a"
+  echo "               one-member group proves the primary answers, not that failover"
+  echo "               works. Provision a second always-on resolver and either list both"
+  echo "               addresses in profiles.dnsFailover.resolvers or declare a"
+  echo "               virtualIp both nodes hold."
+  echo "               A VIP that exists but was not probed (no arping?) leaves this"
+  echo "               undecided on purpose: RESOLVERS=\"<primary> <secondary>\" checks"
+  echo "               the members directly."
   exit 2
+fi
+
+if [ "${#resolvers[@]}" -lt 2 ]; then
+  echo "Redundancy: VRRP VIP ${vip} (one client address, floating between the group's"
+  echo "            nodes). Priority decides MASTER; the peer itself is not enumerable"
+  echo "            from one host's config — probe it after a switch with"
+  echo "            RESOLVERS=\"<primary> <secondary>\"."
 fi
 
 if [ -n "$failed" ]; then
@@ -149,5 +174,6 @@ if [ "$vip_split" = "yes" ]; then
   exit 1
 fi
 
-echo "OK: group answers the zone and is redundant (>=2 resolvers; VIP checked: ${vip_checked})"
+echo "OK: group answers the zone and is redundant (\
+${#resolvers[@]} resolver(s) declared, VIP checked: ${vip_checked}, VIP owned: ${vip_owned})"
 exit 0

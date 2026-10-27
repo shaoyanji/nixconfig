@@ -422,10 +422,13 @@ tasks:
       drift from the declaration — digs the wildcard zone at every resolver in the
       group, and probes a declared VRRP VIP for two answering MACs (split brain).
 
-      Exit 2 while the group has <2 members: that proves the primary answers, not
-      that failover works (the HC-3 gap). Exit 1 is a real failure. Probes a
-      subdomain (NAME=, default hc3-check.<zone>), not the apex — the apex can carry
-      a local override. Vars: HOST=, RESOLVERS=, NAME=, EXPECT=, VIP=, IFACE=.
+      Redundancy is counted two ways: >=2 literal resolvers (client-side failover),
+      or one declared VRRP VIP that answers the zone and is owned by exactly one MAC
+      (two owners = split brain). Exit 2 means neither holds, i.e. one member and no
+      probed VIP — that proves the primary answers, not that failover works. Exit 1
+      is a real failure. Probes a subdomain (NAME=, default hc3-check.<zone>), not
+      the apex — the apex can carry a local override. Vars: HOST=, RESOLVERS=, NAME=,
+      EXPECT=, VIP=, IFACE=.
     cmds:
       - HOST={{.HOST | default "frieren"}} RESOLVERS="{{.RESOLVERS | default ""}}" NAME="{{.NAME | default ""}}" IFACE={{.IFACE | default ""}} bash scripts/task/dns-failover-check.sh
 

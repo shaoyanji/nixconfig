@@ -37,14 +37,18 @@ callback server alive **only while it runs**, so the browser step has to happen
 inside that window, and the token file appearing is the success signal — not the
 process exit code.
 
-**The callback is `http://localhost:8080` on the host** — Google redirects the
-*browser* there, so a tailscale funnel cannot help (unlike rclone's flow in the
-`google-drive` skill). On a headless host, open the tunnel from the machine with
-the browser:
+**The callback is `http://127.0.0.1:<port>` on the host** — `vdirsyncer` dynamically
+binds to an ephemeral port (note: `8080` is occupied by `pihole-FTL` on frieren).
+`scripts/calendar-auth.sh` parses the allocated port directly from the OAuth URL.
 
-```bash
-ssh -N -L 8080:127.0.0.1:8080 <host>
-```
+To complete the flow from another machine:
+- **Option A (No SSH tunnel):** Approve the consent URL in your browser. When Google
+  redirects to `http://127.0.0.1:<port>/?state=...&code=...` (which fails on your
+  client), copy the full URL from the browser address bar and paste it into the script.
+- **Option B (SSH tunnel):** Hold open the dynamically assigned port from your client:
+  ```bash
+  ssh -N -L <port>:127.0.0.1:<port> <host>
+  ```
 
 `verify` separates two failures that share an exit code: an auth rejection
 (`invalid_grant`, `403 accessNotConfigured`) is fatal and named, while a

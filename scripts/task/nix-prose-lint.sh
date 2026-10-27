@@ -2,7 +2,7 @@
 # Nix commentary gate: a comment may state a constraint or point at the one home
 # of a fact — never carry the explanation itself.
 #
-# Why: a comment is the one thing nothing compiles. `.#knowledgeGraph`, qmd and
+# Why: a comment is the one thing nothing compiles. `.?submodules=1#knowledgeGraph`, qmd and
 # the skills index are built from `docs/*.md`, `.agents/skills/*` and the compiled
 # registry, so a fact written there is answerable (`task ops:kg:*`, `qmd search`)
 # while the same fact written inside a `.nix` file is only findable by reading the

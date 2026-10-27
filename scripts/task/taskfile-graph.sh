@@ -114,7 +114,7 @@ if [ "$artifact" = "1" ]; then
   }
   echo "== artifact (${build_flags[*]})"
   if ! paths=$(nix build --no-link --print-out-paths -L "${build_flags[@]}" \
-    ".#checks.${system}.taskfile-graph" ".#checks.${system}.taskfile-graph-selftest"); then
+    ".?submodules=1#checks.${system}.taskfile-graph" ".?submodules=1#checks.${system}.taskfile-graph-selftest"); then
     echo "taskfile-graph: the artifact did not build" >&2
     exit 2
   fi

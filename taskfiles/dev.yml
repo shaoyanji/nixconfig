@@ -273,7 +273,7 @@ tasks:
       emits JSON into this instead of showing the raw document. --stats prints
       the measured saving, which is not always positive: nested records can
       grow (inventory.hosts measured -1.6 %), flat rows shrink (task list +15 %).
-      Example: nix eval --json .#inventory.hosts | task dev:toon
+      Example: nix eval --json .?submodules=1#inventory.hosts | task dev:toon
     cmds:
       - toon -e --stats
 
@@ -369,7 +369,7 @@ tasks:
       defaults-normalised, and carries the derived counts, so no consumer can disagree
       with another. Store-cached — repeat calls cost nothing.
     cmds:
-      - nix build --no-link --print-out-paths .#packages.x86_64-linux.inventory-json | xargs cat
+      - nix build --no-link --print-out-paths .?submodules=1#packages.x86_64-linux.inventory-json | xargs cat
 
   dev:inventory:feed:
     desc: Print the compiled agent feed for every Nix host
@@ -379,7 +379,7 @@ tasks:
       compiled registry. This is where host commentary is meant to live (inventory.toml
       `notes`) instead of as comments in Nix.
     cmds:
-      - nix build --no-link --print-out-paths .#packages.x86_64-linux.fleet-feed | xargs cat
+      - nix build --no-link --print-out-paths .?submodules=1#packages.x86_64-linux.fleet-feed | xargs cat
 
   dev:inventory:host:
     desc: Print one host's compiled inventory record (HOST=name)
@@ -388,7 +388,7 @@ tasks:
       configuration. The fast path for scripts that today shell out to `yq`. Fails
       loudly on an unknown host rather than printing null.
     cmds:
-      - nix eval --json .#inventory.hosts.{{.HOST | default "frieren"}}
+      - nix eval --json .?submodules=1#inventory.hosts.{{.HOST | default "frieren"}}
 
   dev:modules:menu:
     desc: Interactive Charmbracelet Gum TUI for fleet modules.toml control knobs (yq-backed)
@@ -400,7 +400,7 @@ tasks:
     summary: >
       The knob table is not produced by modules-menu.sh: lib/docs.nix builds it
       from modules.toml (with the fleet inventory and per-host pages), and it
-      lives only in the store — `nix build .#artifacts.docs`, printed by `task docs:build`.
+      lives only in the store — `nix build .?submodules=1#artifacts.docs`, printed by `task docs:build`.
       The wrapper stays because `task modules` offers a "sync" action.
     cmds:
       - bash scripts/task/modules-menu.sh sync
@@ -576,7 +576,7 @@ tasks:
       frieren: 2.42 s cold, 0.08 s on a warm eval cache. For host FACTS prefer
       `dev:inventory:host` (compiled registry, also no host eval).
     cmds:
-      - "nix eval --raw .#nixosConfigurations --apply 'hosts: builtins.concatStringsSep \"\\n\" (builtins.attrNames hosts)'"
+      - "nix eval --raw .?submodules=1#nixosConfigurations --apply 'hosts: builtins.concatStringsSep \"\\n\" (builtins.attrNames hosts)'"
 
   # Update garnix.yaml with current nixosConfigurations
   dev:flake:update-garnix:
@@ -591,23 +591,23 @@ tasks:
         done
 
   # --- docs: generated from the compiled metadata (lib/docs.nix) ------------
-  # The pages and the site nav are Nix values built from `.#inventory` and
+  # The pages and the site nav are Nix values built from `.?submodules=1#inventory` and
   # modules.toml, so they cannot drift from the hosts/knobs they describe.
-  # `.#artifacts.docs` is the ONLY copy: the tree is a store path, and no part of it is
+  # `.?submodules=1#artifacts.docs` is the ONLY copy: the tree is a store path, and no part of it is
   # checked in (docs/generated/ used to be, which is why a drift gate had to
   # exist — see docs/docs-pipeline-audit.md §4).
   docs:build:
-    desc: Build the generated docs tree + nav from compiled metadata (nix build .#artifacts.docs)
+    desc: Build the generated docs tree + nav from compiled metadata (nix build .?submodules=1#artifacts.docs)
     summary: >
       Prints the store path of the generated docs: fleet-inventory.md,
       modules-registry.md, hosts/<h>.md and nav.json (the site manifest).
       Nothing in the repo is written; read the pages from that path, or from
-      the served site (`.#sites.fleet-docs-site`).
+      the served site (`.?submodules=1#sites.fleet-docs-site`).
     cmds:
-      - nix build --no-link --print-out-paths .#artifacts.docs
+      - nix build --no-link --print-out-paths .?submodules=1#artifacts.docs
 
   docs:site:
-    desc: Build the rendered documentation site (nix build .#sites.fleet-docs-site)
+    desc: Build the rendered documentation site (nix build .?submodules=1#sites.fleet-docs-site)
     summary: >
       The site is a Nix-native hypermedia tree (lib/aki-site.nix): it renders the
       compiled registry, the knowledge graph (which now includes .agents/** and
@@ -617,7 +617,7 @@ tasks:
       phase — the markdown renderer that lived in docs-site/ is retired. Exit 1 on
       a build failure.
     cmds:
-      - nix build --no-link --print-out-paths .#sites.fleet-docs-site
+      - nix build --no-link --print-out-paths .?submodules=1#sites.fleet-docs-site
 
   dev:nixbuild:plan:
     desc: Report what would build/fetch for hosts against local substituters (read-only)

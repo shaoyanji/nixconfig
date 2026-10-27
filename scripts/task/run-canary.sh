@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Boot (or stop) the frieren-canary microVM from the DECLARED runner.
 #
-# Everything here is derived from `.#nixosConfigurations.frieren-canary.config.microvm.declaredRunner`:
+# Everything here is derived from `.?submodules=1#nixosConfigurations.frieren-canary.config.microvm.declaredRunner`:
 # the tap helpers, the virtiofsd wrappers (and therefore their socket names), and the
 # hypervisor command line. Nothing is guessed.
 #

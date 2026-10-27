@@ -3,8 +3,8 @@
 #
 # AGENTS.nix is the compiled home for the decisions, queue and design studies
 # that used to be ARCHITECTURE.md / TODO.md / HANDOFF.md / EXPERIMENTS.md. This
-# script is the human surface over `.#agentsNotes.json`; the machine surface is
-# `nix eval .#agentsNotes.index` or `nix eval --json .#agentsNotes.json`.
+# script is the human surface over `.?submodules=1#agentsNotes.json`; the machine surface is
+# `nix eval .?submodules=1#agentsNotes.index` or `nix eval --json .?submodules=1#agentsNotes.json`.
 #
 # Usage: notes.sh list [STATUS] [KIND] | show ID | near Q [LIMIT]
 #        | lineage ID | host HOST | module PATH | task TASK | doc DOC | search Q
@@ -26,9 +26,9 @@ shift 2>/dev/null || true
 err="$(mktemp)"
 trap 'rm -f "$err"' EXIT
 
-if ! data="$(nix eval --json .#agentsNotes 2>"$err")"; then
+if ! data="$(nix eval --json .?submodules=1#agentsNotes 2>"$err")"; then
   cat "$err" >&2
-  echo "notes: could not evaluate .#agentsNotes" >&2
+  echo "notes: could not evaluate .?submodules=1#agentsNotes" >&2
   exit 1
 fi
 

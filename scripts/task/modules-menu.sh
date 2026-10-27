@@ -201,7 +201,7 @@ sync_docs() {
   # it (with the fleet inventory and per-host pages) from the compiled metadata,
   # so the knob table cannot drift from modules.toml. This wrapper keeps
   # `modules-menu.sh sync` working by driving the ONE generator.
-  echo "Generating docs from modules.toml via lib/docs.nix (nix build .#artifacts.docs)..."
+  echo "Generating docs from modules.toml via lib/docs.nix (nix build .?submodules=1#artifacts.docs)..."
   # Nothing is copied into the repo any more: the registry is a store path.
   ( cd "$REPO_ROOT" && task docs:build )
 }

@@ -177,7 +177,7 @@ tasks:
         # tailscaled with --accept-dns=false (a resolver must not resolve through
         # the address it serves), so the FQDN in the artifact's manifest is not
         # resolvable THERE and the push would fail on name lookup.
-        appliance=$(nix eval --raw .#inventory.hosts.gok.network.tailscale_ip)
+        appliance=$(nix eval --raw .?submodules=1#inventory.hosts.gok.network.tailscale_ip)
         [ -n "$appliance" ] || { echo 'no tailscale_ip for gok in the inventory' >&2; exit 1; }
         # sudo starts with no login PATH, and jq/curl live in a user profile on
         # delphi, so the interactive PATH is carried across rather than guessed.
@@ -414,14 +414,14 @@ tasks:
       a system whose kernel or initrd differs from the ones it is running — the
       pinned 25.11 input is what makes that answer "identical".
     cmds:
-      - nix build --dry-run --print-out-paths .#nixosConfigurations.netbook.config.system.build.toplevel
+      - nix build --dry-run --print-out-paths .?submodules=1#nixosConfigurations.netbook.config.system.build.toplevel
 
   infra:plan:host:*:
     desc: Build/evaluate a specific host closure (no apply)
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:
-      - nix build .#nixosConfigurations.{{.HOST}}.config.system.build.toplevel -L
+      - nix build .?submodules=1#nixosConfigurations.{{.HOST}}.config.system.build.toplevel -L
 
   infra:apply:host:netbook:
     desc: Build netbook on frieren (substitute, then nixbuild.net) and push the closure over the LAN
@@ -499,7 +499,7 @@ tasks:
               ;;
             *)
               echo "==> warming locally for the LAN cache: $h"
-              nix build ".#nixosConfigurations.$h.config.system.build.toplevel" -L || fail=1
+              nix build ".?submodules=1#nixosConfigurations.$h.config.system.build.toplevel" -L || fail=1
               ;;
           esac
         done
@@ -554,7 +554,7 @@ tasks:
           echo "  Deliberate LAN push: ALLOW_LAN_WARM=1 task infra:cache:push:host:{{.HOST}}" >&2
           exit 1
         fi
-        exec nix copy --to http://192.168.3.25:5000?compress=true ".#nixosConfigurations.{{.HOST}}.config.system.build.toplevel"
+        exec nix copy --to http://192.168.3.25:5000?compress=true ".?submodules=1#nixosConfigurations.{{.HOST}}.config.system.build.toplevel"
 
   infra:apply:fleet:
     desc: Sequentially activate managed hosts from the LAN binary cache (HOSTS="h1 h2"; default = managed active hosts)
@@ -587,7 +587,7 @@ tasks:
     desc: Wake Eisen (workstation) via Wake-on-LAN, address read from the compiled inventory
     summary: >
       The MAC and the broadcast network are host facts, so they are read from
-      `.#inventory.hosts.eisen.network.{mac,lan_ip}` — compiled by
+      `.?submodules=1#inventory.hosts.eisen.network.{mac,lan_ip}` — compiled by
       `lib/inventory.nix` from `inventory.toml`, which is the reflection. Nothing
       is spelled twice here: a re-cased NIC edit is a data edit.
 
@@ -598,8 +598,8 @@ tasks:
     cmds:
       - |
         set -euo pipefail
-        mac="$(nix eval --raw .#inventory.hosts.eisen.network.mac)"
-        ip="$(nix eval --raw .#inventory.hosts.eisen.network.lan_ip)"
+        mac="$(nix eval --raw .?submodules=1#inventory.hosts.eisen.network.mac)"
+        ip="$(nix eval --raw .?submodules=1#inventory.hosts.eisen.network.lan_ip)"
         if [ -z "$mac" ]; then
           echo "infra:wol:eisen: hosts.eisen.network.mac is empty in the inventory" >&2
           exit 1
@@ -640,7 +640,7 @@ tasks:
       The wake task returns as soon as the packets leave the NIC, which says
       nothing about the box; measured on 2026-10-23 the ARP entry went
       INCOMPLETE → REACHABLE at ~48 s, with sshd a little later. This polls
-      port 22 on `.#inventory.hosts.eisen.network.lan_ip` for 180 s so a failed
+      port 22 on `.?submodules=1#inventory.hosts.eisen.network.lan_ip` for 180 s so a failed
       wake is a non-zero exit instead of a silent one.
 
       No ssh is attempted: a TCP connect cannot hang on an auth prompt, which
@@ -648,7 +648,7 @@ tasks:
     cmds:
       - |
         set -euo pipefail
-        ip="$(nix eval --raw .#inventory.hosts.eisen.network.lan_ip)"
+        ip="$(nix eval --raw .?submodules=1#inventory.hosts.eisen.network.lan_ip)"
         if [ -z "$ip" ]; then
           echo "infra:wol:eisen:online: hosts.eisen.network.lan_ip is empty in the inventory" >&2
           exit 1
@@ -671,7 +671,7 @@ tasks:
       is what wakes a model and defeats the idle saving. Socket state answers
       "up" without spending a cold start.
 
-      Address is `.#inventory.hosts.eisen.network.lan_ip`. JSON=1 prints one
+      Address is `.?submodules=1#inventory.hosts.eisen.network.lan_ip`. JSON=1 prints one
       object for a program (needs jq, exit 3 without it); the default render is
       for a human. Exit 0 whenever eisen answered — a sleeping stack is a state,
       not a failure — and 2 when the host is unreachable, which is the same
@@ -679,7 +679,7 @@ tasks:
     cmds:
       - |
         set -euo pipefail
-        ip="$(nix eval --raw .#inventory.hosts.eisen.network.lan_ip)"
+        ip="$(nix eval --raw .?submodules=1#inventory.hosts.eisen.network.lan_ip)"
         if [ -z "$ip" ]; then
           echo "infra:status:eisen: hosts.eisen.network.lan_ip is empty in the inventory" >&2
           exit 2
@@ -1006,7 +1006,7 @@ tasks:
     cmds:
       - |
         host=$(hostname)
-        names=$(nix eval --json ".#nixosConfigurations.$host.config.microvm.vms" --apply 'builtins.attrNames' | tr -d '[]"' | tr ',' ' ')
+        names=$(nix eval --json ".?submodules=1#nixosConfigurations.$host.config.microvm.vms" --apply 'builtins.attrNames' | tr -d '[]"' | tr ',' ' ')
         [ -n "$names" ] || { echo "microvm:list: $host declares no microVM guests"; exit 0; }
         for name in $names; do
           printf '%-10s %s\n' "$name" "$(systemctl is-active "microvm@$name" 2>/dev/null || true)"

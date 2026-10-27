@@ -556,6 +556,29 @@
       detail = "the workflow stopped building hostChecks, lost ?submodules=1, or dropped pipe-operators";
     };
 
+    host-path-pinned-to-submodules = {
+      rule = "Every task-surface reference to a host closure carries `?submodules=1`, so the path a switch evaluates is the path a warm built.";
+      proof = "scripts/task/warm-host.sh, scripts/task/activate-host.sh, scripts/task/host-check-sweep.sh, scripts/task/boot-check.sh, taskfiles/infra.yml";
+      # A warm built `.#frieren` (v3xykfhr…); the switch evaluated
+      # `.?submodules=1#frieren` (fpmxv4fn…), 34 derivations apart, so the cache
+      # could not serve it. It is also faster (0.12 s vs 0.24 s for a leaf read).
+      holds =
+        has "scripts/task/warm-host.sh" ".?submodules=1#nixosConfigurations."
+        && has "scripts/task/activate-host.sh" ".?submodules=1#nixosConfigurations."
+        && has "scripts/task/host-check-sweep.sh" "?submodules=1#hostChecks."
+        && has "scripts/task/boot-check.sh" "?submodules=1#hostBootChecks."
+        && has "taskfiles/infra.yml" "?submodules=1#nixosConfigurations."
+        && lib.all
+        (f:
+          !(anyLine f (l:
+            builtins.match ".*\\.#(nixosConfigurations|hostChecks|hostBootChecks)\\..*" l
+            != null
+            && builtins.match ".*submodules=1.*" l == null
+            && builtins.match ".*flakeref.*" l == null)))
+        (taskfiles ++ shellScripts);
+      detail = "a task or script grew a bare `.#host...` reference; use `.?submodules=1#` (or the `flakeref` helper in nixbuild-warm.sh for remote refs)";
+    };
+
     ci-doc-budget = {
       rule = "A doc-only change still runs the living-document budget, so a runaway manual cannot land green on a push that allocated no build runner.";
       proof = ".github/workflows/nixcachix.yml (the `docs-budget` job builds `checks.<system>.docs-budget`)";

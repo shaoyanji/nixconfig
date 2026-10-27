@@ -64,7 +64,7 @@ if [ "$want" = "$have" ]; then
 fi
 
 # Ownership is declared, not assumed: only the named builder deploys this host.
-declared=$(nix eval --raw ".#inventory.hosts.${HOST}.builder" 2>/dev/null || true)
+declared=$(nix eval --raw ".?submodules=1#inventory.hosts.${HOST}.builder" 2>/dev/null || true)
 me=$(hostname)
 if [ -n "$declared" ] && [ "$declared" != "$me" ]; then
   echo "minyx-keeper: inventory names '$declared' as $HOST's builder, not '$me'" >&2

@@ -2,7 +2,7 @@ version: "3"
 
 tasks:
   # HONEST SCOPE. This task used to end with four
-  # `nix eval .#nixosConfigurations.<h>.config.networking.hostName` lines. Those
+  # `nix eval .?submodules=1#nixosConfigurations.<h>.config.networking.hostName` lines. Those
   # forced ONE option and type-checked nothing else, so they could not fail on
   # the class of error that actually happens (EXP-114: an invalid
   # `networkmanager.dispatcherScripts.*.type = "up"` "passed" that smoke test on
@@ -38,7 +38,7 @@ tasks:
       SYSTEM:
         sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
-      - nix build --no-link --builders "" .#checks.{{.SYSTEM}}.inventory-schema .#checks.{{.SYSTEM}}.inventory-hosts .#checks.{{.SYSTEM}}.inventory-modules .#checks.{{.SYSTEM}}.site-assets .#checks.{{.SYSTEM}}.policies .#checks.{{.SYSTEM}}.taskfile-graph .#checks.{{.SYSTEM}}.taskfile-graph-selftest .#checks.{{.SYSTEM}}.skills-task-mirror
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules .?submodules=1#checks.{{.SYSTEM}}.site-assets .?submodules=1#checks.{{.SYSTEM}}.policies .?submodules=1#checks.{{.SYSTEM}}.taskfile-graph .?submodules=1#checks.{{.SYSTEM}}.taskfile-graph-selftest .?submodules=1#checks.{{.SYSTEM}}.skills-task-mirror
       - task checks:inventory:sync
       - task checks:repo:paths
       - task checks:docs:links
@@ -178,7 +178,7 @@ tasks:
   checks:kg:canvas:
     desc: "[gate] Knowledge-graph canvas: slices resolve, and a real node click navigates"
     summary: >
-      scripts/task/kg-canvas-check.sh — builds `.#sites.fleet-docs-site` locally
+      scripts/task/kg-canvas-check.sh — builds `.?submodules=1#sites.fleet-docs-site` locally
       (`--builders ""`) and tests the canvas through the interface: every node names
       a slice, every slice exists, every neighbour button resolves, index.html loads
       and parses the script, and — with agent-browser — headless Chrome clicks the
@@ -337,7 +337,7 @@ tasks:
       SYSTEM:
         sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
-      - nix build --no-link --builders "" .#checks.{{.SYSTEM}}.inventory-schema .#checks.{{.SYSTEM}}.inventory-hosts .#checks.{{.SYSTEM}}.inventory-modules
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules
 
   checks:ports:
     desc: Diff frieren's declared firewall surface against its live listeners

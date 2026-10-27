@@ -1,9 +1,6 @@
-# downloads-sort — run the taxonomy sorter on a timer.
-#
-# Staging is only useful while it is small: everything else in the pool has one
-# home, and `downloads/` is where finished items wait for theirs. The sorter
-# itself is scripts/task/sort-downloads.sh (also reachable as `task data:sort`),
-# so a manual run and the timer can never disagree about where something goes.
+# downloads-sort — run the taxonomy sorter on a timer. It runs the same script
+# as `task data:sort` (scripts/task/sort-downloads.sh), so a manual run and the
+# timer can never disagree about where a staged item goes.
 {
   config,
   lib,

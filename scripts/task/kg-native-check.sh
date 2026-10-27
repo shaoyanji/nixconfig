@@ -70,7 +70,7 @@ fi
 
 echo
 echo "== parity with the compiled projection =="
-want="$(cd "$REPO" && nix eval --json .#knowledgeGraph.graph --apply 'g: { nodes = builtins.length g.nodes; edges = builtins.length g.edges; }')"
+want="$(cd "$REPO" && nix eval --json .?submodules=1#knowledgeGraph.graph --apply 'g: { nodes = builtins.length g.nodes; edges = builtins.length g.edges; }')"
 want_nodes="$(jq -r '.nodes' <<<"$want")"
 want_edges="$(jq -r '.edges' <<<"$want")"
 

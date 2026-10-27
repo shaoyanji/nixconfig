@@ -43,7 +43,8 @@
 #
 # Env: CACHE=<url> (default: inventory metadata.cache_url)
 #      TOP=<store path> reuse an already-resolved toplevel instead of evaluating
-#      `.#nixosConfigurations.<host>.config.system.build.toplevel` again.
+#      `.?submodules=1#nixosConfigurations.<host>.config.system.build.toplevel`
+#      again — the flag matches what the warm path builds, or the two disagree.
 #      infra:deploy:host:* passes the path its gate just resolved
 #      (`warm-host.sh --check --emit-path`), so a deploy evaluates the toplevel
 #      ONCE. The path is still gated against the cache here, so a stale or
@@ -98,7 +99,7 @@ fi
 # Resolve the target store path HERE (NixOS toplevel output path, no build).
 # TOP= skips the evaluation: the caller already forced it and this would be a
 # second whole-toplevel eval of the same attrset for the same answer.
-attr=".#nixosConfigurations.$host.config.system.build.toplevel"
+attr=".?submodules=1#nixosConfigurations.$host.config.system.build.toplevel"
 if [ -n "${TOP:-}" ]; then
   top="$TOP"
   case "$top" in
@@ -112,7 +113,7 @@ fi
 [ -n "$top" ] || { echo "activate [$host] cannot evaluate $attr" >&2; exit 1; }
 
 # Which substituters may serve this host's closure, IN THE HOST'S OWN ORDER —
-# read from `.#inventory.cache.<host>`, the same projection modules/global/global.nix
+# read from `.?submodules=1#inventory.cache.<host>`, the same projection modules/global/global.nix
 # consumes for nix.settings.substituters. Deciding it in both places is what broke
 # delphi's deploys: the module excluded the LAN cache for a cloud host while this
 # script gated on it, so the deploy either aborted or left the switch with nothing

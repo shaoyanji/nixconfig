@@ -56,6 +56,10 @@ CLASSIFY_PROVIDER="${CLASSIFY_PROVIDER:-typesafe}"
 CLASSIFY_MIN_PROBABILITY="${CLASSIFY_MIN_PROBABILITY:-0.8}"
 MODEL_CRITERIA=""
 
+# A finished torrent seeds forever at seed-ratio 0, so "still seeding" is not a
+# reason to leave an item staged. Set KEEP_SEED=1 to leave seeds alone.
+KEEP_SEED="${KEEP_SEED:-0}"
+
 APPLY=0
 REPLACE=0
 OWNERSHIP_FAILED=0
@@ -70,6 +74,8 @@ Usage: sort-downloads.sh [--apply] [--replace] [--quiet SECONDS] [--classify]
   --quiet N    treat files modified within N seconds as still in flight (120)
   --classify   ask a local model to pick a destination when the rules cannot
                (needs jev-decide on PATH; ignored, with a warning, if absent)
+  --keep-seed  leave a completed torrent seeding instead of releasing it
+               (default: a finished seed is stopped so its item can be sorted)
 
 Exit codes: 0 everything landed, 1 items need a human decision, 2 usage/root error.
 
@@ -83,6 +89,7 @@ while (($#)); do
     --apply) APPLY=1 ;;
     --replace) REPLACE=1 ;;
     --classify) CLASSIFY=1 ;;
+    --keep-seed) KEEP_SEED=1 ;;
     --quiet)
       QUIET_SECONDS="${2:?--quiet needs a value}"
       shift
@@ -106,6 +113,7 @@ moved_other=0
 pending=0
 inflight=0
 unknown=0
+released=0
 
 say() { printf '%s\n' "$*"; }
 warn() { printf '%s\n' "$*" >&2; }
@@ -116,11 +124,15 @@ rel_of() { printf '%s\n' "${1#"$DATA_ROOT"/}"; }
 
 # aria2 knows what is still in flight — including a finished torrent that is
 # still seeding, which looks complete on disk but breaks when the file moves.
+# Two maps, because a completed seed is a finished download, not a running one:
+# ACTIVE blocks a move, SEEDING means "stop the seed, then move it".
 declare -A ACTIVE=()
+declare -A SEEDING=()
+RPC_SECRET=""
 load_active() {
-  local secret json method
-  secret="$(cat "$RPC_SECRET_FILE" 2>/dev/null || sudo -n cat "$RPC_SECRET_FILE" 2>/dev/null || true)"
-  if [ -z "$secret" ]; then
+  local json method gid path seeder completed total
+  RPC_SECRET="$(cat "$RPC_SECRET_FILE" 2>/dev/null || sudo -n cat "$RPC_SECRET_FILE" 2>/dev/null || true)"
+  if [ -z "$RPC_SECRET" ]; then
     # A seeding torrent has no control file, so without RPC its file looks idle.
     warn "note: aria2 state unreadable ($RPC_SECRET_FILE); judging by control files only"
     return 0
@@ -128,16 +140,37 @@ load_active() {
   for method in tellActive tellWaiting; do
     if [ "$method" = tellWaiting ]; then
       json="$(curl -sf -m 5 -X POST "$RPC_URL" -H 'Content-Type: application/json' \
-        -d "{\"jsonrpc\":\"2.0\",\"id\":\"sort\",\"method\":\"aria2.$method\",\"params\":[\"token:$secret\",0,100,[\"files\"]]}" || true)"
+        -d "{\"jsonrpc\":\"2.0\",\"id\":\"sort\",\"method\":\"aria2.$method\",\"params\":[\"token:$RPC_SECRET\",0,100,[\"gid\",\"files\",\"seeder\",\"completedLength\",\"totalLength\"]]}" || true)"
     else
       json="$(curl -sf -m 5 -X POST "$RPC_URL" -H 'Content-Type: application/json' \
-        -d "{\"jsonrpc\":\"2.0\",\"id\":\"sort\",\"method\":\"aria2.$method\",\"params\":[\"token:$secret\",[\"files\"]]}" || true)"
+        -d "{\"jsonrpc\":\"2.0\",\"id\":\"sort\",\"method\":\"aria2.$method\",\"params\":[\"token:$RPC_SECRET\",[\"gid\",\"files\",\"seeder\",\"completedLength\",\"totalLength\"]]}" || true)"
     fi
     [ -n "$json" ] || continue
-    while IFS= read -r path; do
-      [ -n "$path" ] && ACTIVE["$path"]=1
-    done < <(printf '%s' "$json" | jq -r '.result[]?.files[]?.path // empty' 2>/dev/null || true)
+    # Tab-separated: a downloaded path may contain spaces, so a space-delimited
+    # read would split one file into several fields.
+    while IFS=$'\t' read -r gid path seeder completed total; do
+      [ -n "$path" ] || continue
+      ACTIVE["$path"]="$gid"
+      if [ "$seeder" = true ] && [ -n "$completed" ] && [ "$completed" = "$total" ]; then
+        SEEDING["$path"]="$gid"
+      fi
+    # Every file of a torrent, not just the first: a multi-file payload is
+    # detected by the largest file, which is rarely files[0].
+    done < <(printf '%s' "$json" | jq -r '.result[]? as $t | ($t.files // [])[] | [($t.gid // ""), .path, ($t.seeder // false | tostring), ($t.completedLength // ""), ($t.totalLength // "")] | @tsv' 2>/dev/null || true)
   done
+}
+
+# Releases a finished seed. `remove` stops it, and the download record is
+# dropped too: a leftover record reappears in tellWaiting and would keep the
+# item INFLIGHT forever.
+release_seed() {
+  local gid=$1
+  curl -sf -m 5 -X POST "$RPC_URL" -H 'Content-Type: application/json' \
+    -d "{\"jsonrpc\":\"2.0\",\"id\":\"sort\",\"method\":\"aria2.remove\",\"params\":[\"token:$RPC_SECRET\",\"$gid\"]}" >/dev/null || return 1
+  sleep 1
+  curl -sf -m 5 -X POST "$RPC_URL" -H 'Content-Type: application/json' \
+    -d "{\"jsonrpc\":\"2.0\",\"id\":\"sort\",\"method\":\"aria2.removeDownloadResult\",\"params\":[\"token:$RPC_SECRET\",\"$gid\"]}" >/dev/null || true
+  return 0
 }
 
 is_quiet() {
@@ -374,7 +407,11 @@ place_dir() {
   fi
   if [ "$APPLY" = 1 ]; then
     mkdir -p "$(dirname "$dest")"
-    mv -f "$src" "$dest"
+    if ! mv -f "$src" "$dest"; then
+      warn "MOVE FAILED $(basename "$src")/ -> $rel (run with sudo)"
+      pending=$((pending + 1))
+      return 0
+    fi
     if ! chown -R devji:users "$dest" 2>/dev/null; then OWNERSHIP_FAILED=1; fi
     chmod 0755 "$dest" 2>/dev/null || true
     find "$dest" -type f -exec chmod 0644 {} + 2>/dev/null || true
@@ -415,7 +452,13 @@ place() {
   fi
   if [ "$APPLY" = 1 ]; then
     mkdir -p "$(dirname "$dest")"
-    mv -f "$src" "$dest"
+    if ! mv -f "$src" "$dest"; then
+      # Downloads and arr/ are different subvolumes here, so this is a copy plus
+      # an unlink — and the unlink happens inside an aria2-owned directory.
+      warn "MOVE FAILED $(basename "$src") -> $rel (run with sudo)"
+      pending=$((pending + 1))
+      return 0
+    fi
     if ! chown devji:users "$dest" 2>/dev/null; then OWNERSHIP_FAILED=1; fi
     chmod "$mode" "$dest" 2>/dev/null || true
   fi
@@ -592,9 +635,19 @@ for item in "$DOWNLOADS"/*; do
   fi
   payload=$(payload_of "$item")
   if [ -n "$payload" ] && [ -n "${ACTIVE["$payload"]:-}" ]; then
-    say "INFLIGHT $name — aria2 still holds it (active or seeding); stop the task first"
-    inflight=$((inflight + 1))
-    continue
+    if [ -n "${SEEDING["$payload"]:-}" ] && [ "$KEEP_SEED" != 1 ]; then
+      # A complete seed is a finished download: keeping it would leave the item
+      # staged forever, because seed-ratio 0 never releases it on its own.
+      say "SEEDSTOP $name — complete and only seeding; released to be sorted"
+      released=$((released + 1))
+      if [ "$APPLY" = 1 ]; then
+        release_seed "${SEEDING["$payload"]}" || warn "SEEDSTOP $name — aria2 refused to release it"
+      fi
+    else
+      say "INFLIGHT $name — aria2 still holds it (active or seeding); stop the task first"
+      inflight=$((inflight + 1))
+      continue
+    fi
   fi
   if ! is_quiet "$item"; then
     say "INFLIGHT $name — modified less than ${QUIET_SECONDS}s ago"
@@ -616,7 +669,8 @@ fi
 
 say ""
 if [ "$APPLY" = 1 ]; then verb=moved; else verb=planned; fi
-say "$verb: $moved_other other, $moved_media media, $moved_books books · inflight: $inflight · pending: $pending · unknown: $unknown"
+if [ "$APPLY" = 1 ]; then seed_verb=released; else seed_verb="to release"; fi
+say "$verb: $moved_other other, $moved_media media, $moved_books books · seeds $seed_verb: $released · inflight: $inflight · pending: $pending · unknown: $unknown"
 if ((unknown > 0 || pending > 0)); then
   say "needs a human decision before this staging dir is empty"
   exit 1

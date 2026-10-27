@@ -88,7 +88,7 @@ builder="$(yq -r '.metadata.builder_host // "frieren"' "$INVENTORY")"
 self="$(hostname)"
 
 # Which caches may serve a host, and where its closure is warmed: both come from
-# `.#inventory.cache.<host>`, the SAME projection modules/global/global.nix reads.
+# `.?submodules=1#inventory.cache.<host>`, the SAME projection modules/global/global.nix reads.
 # Deciding it here as well is what produced the original bug — the deploy gated a
 # cloud host on a LAN cache it cannot reach.
 #
@@ -135,7 +135,11 @@ report() {
   fi
 }
 
-attr_for() { printf '.#nixosConfigurations.%s.config.system.build.toplevel' "$1"; }
+# `?submodules=1` is not optional here: a git tree read without it has a
+# different source hash, so the path this warms is NOT the path a switch
+# evaluates (measured 2026-10-27: 34 derivations apart, and the switch then
+# refused to substitute what the warm had served).
+attr_for() { printf '.?submodules=1#nixosConfigurations.%s.config.system.build.toplevel' "$1"; }
 
 # Pin a store path as a fleet GC root. /nix/var/nix/gcroots/fleet is root-owned
 # 0755, so `nix build --out-link` there fails for the operator account: measured

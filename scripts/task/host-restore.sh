@@ -161,7 +161,7 @@ fi
 # while the declaration still lists 24 keys.
 keys_decl=""
 if [ -d "$repo" ]; then
-  keys_decl=$(nix eval --json "$repo#nixosConfigurations.$(hostname -s).config.users.users.$me.openssh.authorizedKeys.keys" 2>/dev/null |
+  keys_decl=$(nix eval --json "$repo?submodules=1#nixosConfigurations.$(hostname -s).config.users.users.$me.openssh.authorizedKeys.keys" 2>/dev/null |
     jq -r '.[]' 2>/dev/null || true)
 fi
 if [ -z "$keys_decl" ]; then

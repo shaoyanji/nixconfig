@@ -59,7 +59,7 @@ done
 # --- the declaration (authoritative: the merged option, not a grep) -----------
 cfg_json="$(
   nix eval --json --extra-experimental-features 'nix-command flakes' \
-    ".#nixosConfigurations.${HOST}.config.profiles.dnsFailover" 2>/dev/null
+    ".?submodules=1#nixosConfigurations.${HOST}.config.profiles.dnsFailover" 2>/dev/null
 )" || {
   echo "ERROR: nix eval failed for ${HOST}.config.profiles.dnsFailover" >&2
   echo "       (is HOST a host that enables profiles.dnsFailover?)" >&2

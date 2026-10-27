@@ -56,10 +56,21 @@ fi
 # Flake ref: "." (local tree) or e.g. "/path/to/flake" / "github:shaoyanji/nixconfig"
 FLAKE_REF="${FLAKE:-.}"
 
+# The ref a closure is read from. A local tree is read as a git tree, where
+# submodule contents are opt-in — and without the flag the source hash differs
+# from the one a switch evaluates, so a plan here would report a gap that is not
+# the gap. A remote ref (github:) is a tarball and rejects the flag.
+flakeref() {
+  case "$FLAKE_REF" in
+    . | /*) printf '%s?submodules=1' "$FLAKE_REF" ;;
+    *) printf '%s' "$FLAKE_REF" ;;
+  esac
+}
+
 # Root derivation for a host (from the local eval, no build needed)
 root_drv() {
   local host="$1"
-  nix eval --raw "${FLAKE_REF}#nixosConfigurations.${host}.config.system.build.toplevel.drvPath" 2>/dev/null
+  nix eval --raw "$(flakeref)#nixosConfigurations.${host}.config.system.build.toplevel.drvPath" 2>/dev/null
 }
 
 # Set of .drv paths that would be BUILT (not fetched) for a closure.

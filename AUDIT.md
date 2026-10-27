@@ -29,6 +29,21 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-26 — delphi's resolver returns to crab-hole, and SearXNG with it
+- At 22:28 delphi activated `d08f3343`: blocky resolves its DoH upstream *hostnames* through the system resolver,
+  which is itself, so every query SERVFAIL'd and SearXNG had no results — while its own fix was unreachable, because
+  `git fetch` needs the DNS that was broken.
+- Fix: `git merge --ff-only origin/main` (`d08f3343` → `86b63dd5`) then `sudo nixos-rebuild switch --flake .#delphi`:
+  blocky stopped, crab-hole started. `dig` on `127.0.0.1` and `10.99.0.53` NOERROR, `doubleclick.net` NXDOMAIN,
+  21 searx results on `:8447`, and a crab-hole restart with `resolv.conf` = `127.0.0.1` alone still resolved.
+
+### 2026-10-26 — minyx runs on the Pi at 192.168.3.9, pushed from delphi
+- The device took a remotely built closure (toplevel on delphi, then `--target-host`); no sdImage is built for it any
+  more. The push needed a key delphi did not have, and a host that stays reachable afterwards — it now keeps
+  `ssh.ca.enable` + passwordless wheel sudo, the two `base-node.nix` settings it was missing.
+- `tailscaled` is installed but **logged out**: no auth key, and no sops recipient for the host. Procedure and the
+  open work: [`.agents/deploy/hosts/minyx.md`](.agents/deploy/hosts/minyx.md).
+
 ### 2026-10-26 — delphi stops pushing to cachix, and the artifact pipeline is withdrawn
 - Corrected the same day: `profiles.cachePush` was a post-build hook, so a switch that built anything fired
   `nix copy` to cachix as a nix-daemon child that outlived the rebuild — removed (module, import, enable).

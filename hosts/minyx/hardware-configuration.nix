@@ -26,7 +26,7 @@
     # device on first boot, so the image itself stays small.
     expandOnBoot = true;
     compressImage = true;
-    rootVolumeLabel = "NIXER";
+    rootVolumeLabel = "NIXOS_SD";
 
     # extlinux + kernel + initrd on the root partition. generic-extlinux-
     # compatible.enable is set by the raspberry-pi module.

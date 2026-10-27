@@ -43,6 +43,9 @@ keys:
   - &tpmnetbook age1tag1qfkuzu5q9sxvnlcuwx0xmhskgeu2wx87nefk7kjt0t8jazhxf3tzk382vx5
   - &tpmposeidon age1tag1qg8lxwpkqjjd238f57dq6jf7ge8ea00jwnvx7wh7dmnykl3z3a5rgvxxjjd
   - &delphi age1fg8xy2g5nrxsah45upvzl8eq9u7vy36e6dsw6pg5j9rfmh5qhe7sn6j4jp
+  # Derived from the Pi's own /etc/ssh/ssh_host_ed25519_key (sops.age.sshKeyPaths),
+  # not a key file: minyx runs no Home Manager, so the host key IS the identity.
+  - &minyxhost age155uxts5lnphv7xfa39w7424k054nsunc7fpvrkjc84lg9r6d35rq7r0d0x
 
 creation_rules:
   - path_regex: modules/.*\.(yaml|json|env|ini)$
@@ -87,3 +90,4 @@ creation_rules:
           - *tpmnetbook
           - *tpmposeidon
           - *delphi
+          - *minyxhost

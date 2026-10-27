@@ -166,6 +166,7 @@ for app in "$APPIMAGE_DIR"/*.AppImage; do
   name=""
   comment=""
   categories=""
+  mimetype=""
   terminal="false"
   if [ -n "$desk" ]; then
     text="$(timeout 30 unsquashfs -o "$offset" -cat "$app" "$desk" 2>/dev/null || true)"
@@ -175,9 +176,19 @@ for app in "$APPIMAGE_DIR"/*.AppImage; do
       name="$(field Name)"
       comment="$(field Comment)"
       categories="$(field Categories)"
+      mimetype="$(field MimeType)"
       terminal="$(field Terminal)"
       [ -n "$terminal" ] || terminal="false"
     fi
+  fi
+
+  # A browser image must claim the URL types even when its embedded entry does
+  # not: on a host with no packaged browser, an unclaimed `text/html` means
+  # `xdg-open` has nothing to call and every link in every app dies. Helium,
+  # Vieb, Thorium, LibreWolf and zen all ship `Categories=…WebBrowser…` and no
+  # `MimeType=`.
+  if [ -z "$mimetype" ] && printf '%s' "$categories" | grep -qE '(^|;)WebBrowser(;|$)'; then
+    mimetype="text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;"
   fi
   if [ -z "$name" ]; then
     # No embedded entry: name it after the file (minus version and arch tags) so
@@ -201,8 +212,8 @@ for app in "$APPIMAGE_DIR"/*.AppImage; do
   version="$(printf '%s' "$base" | grep -oE '[0-9]+(\.[0-9]+)+' | tail -1 || true)"
   [ -n "$version" ] || version="0"
 
-  printf '%s\037%s\037%s\037%s\037%s\037%s\037%s\n' \
-    "$name" "$version" "$base" "$icon_tmp" "$comment" "$categories" "$terminal" >> "$records"
+  printf '%s\037%s\037%s\037%s\037%s\037%s\037%s\037%s\n' \
+    "$name" "$version" "$base" "$icon_tmp" "$comment" "$categories" "$terminal" "$mimetype" >> "$records"
 done
 
 # Newest build of a name wins; two builds of one app never produce two entries.
@@ -210,7 +221,7 @@ winners="$(sort -t "$(printf '\037')" -k1,1 -k2,2V "$records" |
   awk -F'\037' '{last[$1] = $0} END {for (n in last) print last[n]}' | sort)"
 
 written=""
-while IFS="$(printf '\037')" read -r name version base icon_tmp comment categories terminal; do
+while IFS="$(printf '\037')" read -r name version base icon_tmp comment categories terminal mimetype; do
   [ -n "$name" ] || continue
   slug="$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')"
   [ -n "$slug" ] || slug="$(printf '%s' "${base%.AppImage}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g')"
@@ -232,6 +243,7 @@ while IFS="$(printf '\037')" read -r name version base icon_tmp comment categori
       [ -n "$icon_final" ] && echo "Icon=$icon_final"
       echo "Terminal=${terminal:-false}"
       [ -n "$categories" ] && echo "Categories=$categories"
+      [ -n "$mimetype" ] && echo "MimeType=$mimetype"
       echo "X-AppImage-Integrator=appimage-integrate"
     } > "$entry"
     chmod 0644 "$entry"

@@ -11,6 +11,12 @@
   # closure over the LAN — `PermitRootLogin` stays `prohibit-password`, so this
   # grants keys only. One literal, used twice.
   deployKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHnNR7isgO8VDY76XzwyH3mOg1/DQo8dZgqQOfziw0DQ devji@nixos";
+  # The AppImages live on the NAS (`/Volumes/data/appimages`) and are shared with
+  # the other clients, so nothing is copied: this writes one launcher per image
+  # into alice's `~/.local/share/applications`, read out of the squashfs header.
+  # No home-manager on this host, so the packaged script is wired here instead of
+  # through `modules/user/desktop/appimage-launchers.nix`.
+  appimageIntegrate = import ../../modules/scripts/appimage-integrate.nix {inherit pkgs;};
 in {
   users.users.root.openssh.authorizedKeys.keys = [deployKey];
   imports = [
@@ -265,6 +271,29 @@ in {
 
   security.polkit.enable = true; # polkit
 
+  # NAS AppImages in her launcher: the entries point at the image where it is, so
+  # a drop on the NAS shows up in the next menu without a rebuild. A missing
+  # mount is a no-op, not a failure — the script exits 0 and the hourly run
+  # retries. `--quiet` because a user unit's output goes to the journal.
+  systemd.user.services.appimage-launchers = {
+    description = "Generate XDG launchers for the AppImages in the shared library";
+    after = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${appimageIntegrate}/bin/appimage-integrate --quiet";
+      Nice = 10;
+    };
+  };
+  systemd.user.timers.appimage-launchers = {
+    description = "Refresh AppImage launcher entries (login + hourly)";
+    timerConfig = {
+      OnStartupSec = "2min";
+      OnUnitActiveSec = "1h";
+      Unit = "appimage-launchers.service";
+    };
+    wantedBy = ["timers.target"];
+  };
+
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
@@ -275,26 +304,35 @@ in {
 
     git
     curl
-    helix
     wget
-    uv
     eget
     sqlite
-    typst
+    appimageIntegrate # also the unit's ExecStart; on PATH so she can --dry-run it
+    # Dev tooling is deliberately not here (2026-10-27): uv, typst, nixd and
+    # nixfmt cost 326 MiB of exclusive closure between them on a 1.8 GiB Celeron,
+    # and nano is the editor this host actually keeps.
     # The compositor, terminal, launcher, wallpaper, notifications, idle and lock
     # come from profiles.dwlDesktop — including the nerd font, since dwl and foot
     # name it rather than ship it.
     pavucontrol
     polkit_gnome
     bibata-cursors
-    nautilus
+    # nautilus is gone (2026-10-27): it was only 14 MiB exclusive — its GTK and
+    # portal deps are here for other clients — but so is pcmanfm, which keeps a
+    # menu-launchable file manager for 4.7 MiB of new paths (measured against
+    # this host's 1318-path closure). nnn is 0.4 MiB if a terminal picker is
+    # enough; yazi is 98 MiB of Rust runtime and is the one not to reach for.
+    pcmanfm
     # crush
-    nixd
-    nixfmt
     btop
     fastfetch
-    # librewolf
-    firefox
+    # firefox is gone (2026-10-27): ~590 MiB once the ML runtimes it pulls alone
+    # are counted, and the browsers come off the NAS library instead — Helium
+    # through Thorium, from the entries `appimage-integrate` writes.
+    # `xdg-desktop-portal` stays (17 MiB): it owns the file-attach and
+    # screen-share dialogs, and the script gives every browser entry the
+    # `text/html` and `x-scheme-handler` types this removal would otherwise
+    # leave unclaimed.
     tmux
     lowfi
     grim

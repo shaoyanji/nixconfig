@@ -6,19 +6,9 @@
   pkgs,
   ...
 }: let
-  integrate = pkgs.writeShellApplication {
-    name = "appimage-integrate";
-    runtimeInputs = with pkgs; [
-      binutils
-      coreutils
-      file
-      gawk
-      gnugrep
-      gnused
-      squashfs-tools
-    ];
-    text = builtins.readFile ../../../scripts/task/appimage-integrate.sh;
-  };
+  # One packaged script for both callers: this module and hosts that run without
+  # home-manager (`hosts/netbook`).
+  integrate = import ../../scripts/appimage-integrate.nix {inherit pkgs;};
 in
   lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
     home.packages = [integrate];

@@ -32,35 +32,29 @@
   # (extra address= records, the tailscale interface line, PXE proxyDHCP,
   # blocklists, the web UI) stays here and is fed in.
   #
-  # There is no floating VIP, because there is no second live member. The
-  # 2026-10-27 attempt put one on minyx — a `preserved` Pi 3B with a measured
-  # under-voltage fault and no reservation for the address on the router — and
-  # the 04:00 autoUpgrade activated the primary half alone. Never activate half a
-  # VRRP group: one member is not redundancy, and an unreserved VIP is an address
-  # the DHCP server is free to hand to somebody else.
+  # Failover is VRRP: minyx (hosts/minyx/dns.nix) is the second member, MASTER
+  # here at 200 and BACKUP there at 1, so it can only take the address when this
+  # resolver stops answering the zone. Both halves must be deployed together —
+  # the 2026-10-27 outage was one half live on an address nobody had reserved.
   #
-  # What the group needs before `virtualIp` comes back:
-  #   1. a second member that is not dormant (inventory status is not
-  #      `preserved`) and can carry a resolver;
-  #   2. `unicastPeers` on both nodes — the module now asserts it, because
-  #      multicast VRRP splits brain on a network that filters 224.0.0.18;
-  #   3. an address reserved on the router, outside its DHCP pool, documented in
-  #      docs/dns-failover.md rather than copied from an option's `example`.
-  #
-  # Meanwhile the appliance `gok` answers this same zone independently
-  # (hosts/gok/instance.nix). It has no keepalived and cannot hold a VIP, so
-  # failover today is client-side: a second resolver in DHCP option 6.
-  # See docs/dns-failover.md.
+  # `192.168.3.50` is a static-block address (below the DHCP pool), not this
+  # host's `.25` and not minyx's `.9`: a VIP that duplicates an address already
+  # on the wire is a duplicate address, not redundancy. Unicast peers, because
+  # multicast VRRP splits brain on this LAN. Preconditions and the test:
+  # docs/dns-failover.md.
   profiles.dnsFailover = {
     enable = true;
     role = "primary";
     lanInterface = "enp1s0";
     zone = "frieren.lan";
     zoneAddress = "192.168.3.25";
-    # This host's own address: the zone's target and the address clients use.
-    # The module reads it for the runbook and `checks:dns:failover`; nothing
-    # here pushes it to clients.
-    resolvers = ["192.168.3.25"];
+    # The VIP is the only resolver clients are configured with; `.25` stays what
+    # every *.frieren.lan record points at.
+    resolvers = ["192.168.3.50"];
+    virtualIp = "192.168.3.50";
+    virtualRouterId = 50;
+    unicastPeers = ["192.168.3.3"];
+    primaryPriority = 200;
     extraDnsmasqLines = [
       "interface=tailscale0"
       "interface=wlp2s0"

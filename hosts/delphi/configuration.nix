@@ -1081,19 +1081,32 @@ in {
             git -C "$HOME/Documents/nixconfig" submodule update --init --recursive || true
           fi
 
-          # The vault is a repo, not a directory: the previous version only
+          # The vault is a repo, not a directory: an earlier version only
           # mkdir'd this path, so a reseeded host came up with an empty vault
           # and every note was "missing" until someone cloned it by hand
-          # (delphi 2026-10-26). Clone it when gh is authenticated, and fall
-          # back to the empty directory only when it cannot.
-          if [ ! -d "$HOME/vaults/personal/.git" ]; then
-            echo "--> Cloning the vault into ~/vaults/personal..."
+          # (delphi 2026-10-26). Clone it when it is absent, and — the part that
+          # was missing — fast-forward it when it is already there, so a seed is
+          # a sync and not just a first-run clone.
+          VAULT="$HOME/vaults/personal"
+          VAULT_REPO=shaoyanji/Obsidian-Git-Sync
+          if [ -d "$VAULT/.git" ]; then
+            echo "--> $VAULT already exists. Fast-forwarding from $VAULT_REPO..."
+            git -C "$VAULT" config url."https://github.com/".insteadOf "git@github.com:"
+            git -C "$VAULT" pull --ff-only --quiet ||
+              echo "--> vault pull did not fast-forward (local commits or dirty tree); left as-is" >&2
+          elif [ -d "$VAULT" ] && [ -n "$(ls -A "$VAULT" 2>/dev/null)" ]; then
+            # Never clone over notes. This happens when the old mkdir-only path
+            # (or Obsidian itself, pointed here by nixoshmsymlinks) left files
+            # with no .git; the operator decides, the seeder does not delete.
+            echo "--> $VAULT holds files but is not a git checkout; refusing to clone over it." >&2
+          else
+            echo "--> Cloning the vault from $VAULT_REPO into $VAULT..."
             if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-              gh repo clone shaoyanji/Obsidian-Git-Sync "$HOME/vaults/personal" -- --quiet ||
-                echo "--> vault clone failed; left ~/vaults/personal empty" >&2
+              gh repo clone "$VAULT_REPO" "$VAULT" -- --quiet ||
+                echo "--> vault clone failed; left $VAULT empty" >&2
             else
-              mkdir -p "$HOME/vaults/personal"
-              echo "--> gh not authenticated; initialized ~/vaults/personal empty."
+              mkdir -p "$VAULT"
+              echo "--> gh not authenticated; initialized $VAULT empty."
             fi
           fi
 

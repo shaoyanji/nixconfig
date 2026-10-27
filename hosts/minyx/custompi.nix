@@ -200,6 +200,24 @@ in {
     tmux
   ];
 
+  # This box is ssh'd into from three different terminals — kitty on the
+  # desktops, foot on scratch, alacritty on the netbook — and ssh passes the
+  # client's TERM through, so minyx is handed xterm-kitty, foot or alacritty and
+  # has to answer all of them. With none of those entries present ncurses refuses
+  # the session ("missing or unsuitable terminal") and tmux will not start.
+  #
+  # modules/profiles/base-node.nix settles this fleet-wide by pinning
+  # TERM=xterm-256color. This host imports globalModules instead of that
+  # baseline, and pinning one name is the wrong answer for a jump box every
+  # client lands on anyway: it hides the client's real terminal and takes its
+  # capabilities with it. enableAllTerminfo installs the *terminfo outputs* only
+  # (kitty, foot, alacritty, ghostty, wezterm, st, tmux and seven more), not the
+  # applications — a couple of megabytes of database, nothing that runs.
+  #
+  # TERMINFO_DIRS needs no config: nixpkgs' terminfo module already exports it
+  # profile-relative, and a literal value would only duplicate entries.
+  environment.enableAllTerminfo = true;
+
   documentation = {
     nixos.enable = false;
     man.enable = false;

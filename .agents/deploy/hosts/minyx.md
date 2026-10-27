@@ -77,6 +77,21 @@ fix if the two ever diverge again.
   `nix-collect-garbage -d` freed 752 paths / 2.3 GiB; the stock generation and the
   superseded initrd are gone, and `switch-to-configuration boot` pruned
   `/boot/nixos`).
+- **Wireless is declarative** (`custompi.nix`): NetworkManager with
+  `ensureProfiles.environmentFiles` pointed at the sops template that renders the
+  fleet SSID and PSK — the same `gokrazy/gok/wifi_ssid` and `wifi_psk` entries the
+  gok appliance uses. Verified on the box: `wlan0` connected to the sops SSID with a
+  DHCP lease, ethernet still the preferred path, and the store copy of the profile
+  holding only `psk=$WIFI_PSK` while
+  `/run/NetworkManager/system-connections/fleet-wifi.nmconnection` holds the
+  substituted value. `useDHCP` is *not* set: the NetworkManager module assigns it
+  `false` outright, and two definitions of one option is a hard eval error.
+- **sops-nix key paths are slash-separated.** `key = "gokrazy.gok.wifi_psk"`
+  fails the build-time manifest check ("the key … cannot be found") because
+  `pkgs/sops-install-secrets/main.go` splits the path on `/`; the dotted form
+  belongs to `gok.sh`, which parses the same entry its own way. A dotted key is
+  looked up as one literal name, and the failure only appears when the derivation
+  is built — the eval gate cannot see it.
 
 ## Image layout (the flash path, retired)
 

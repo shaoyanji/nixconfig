@@ -19,6 +19,17 @@
   # "Options", i.e. localStorage "AriaNg.Options", with the RPC fields held
   # DIRECTLY on that object (rpcAlias/rpcHost/rpcPort/secret base64) plus an
   # extendRpcServers array — there is no "AriaNgSettings"/rpcList key.
+  #
+  # `language` is not decoration. AriaNg only merges its defaults into a stored
+  # object lazily, per key, at read time (ariaNgSettingService: k() backfills
+  # o[key]); the one read that runs BEFORE that path is the language guard in
+  # b(): `t && !languages[t.language] && (t.language = normalize(t.language))`.
+  # A seeded object without `language` therefore reaches normalize(undefined)
+  # and throws `Cannot read properties of undefined (reading 'toLowerCase')`
+  # inside getCurrentRpcUrl — the whole app dies before the first RPC call, so
+  # a fresh browser shows a blank pane and "not connecting" while an older tab
+  # (whose stored object AriaNg completed itself) keeps working. 'en' is
+  # AriaNg's own default, so this matches a first-run install.
   ariangConfigTemplate = pkgs.writeText "ariang-config.js" ''
     // Managed: rendered by ariang-site.service — edits are overwritten.
     // Pre-seeds the AriaNg RPC connection to this vhost's /jsonrpc proxy.
@@ -28,6 +39,8 @@
       // angular-local-storage may double-encode; unwrap a string result.
       if (typeof s === 'string') { try { s = JSON.parse(s); } catch (e) { s = null; } }
       if (!s || typeof s !== 'object') { s = {}; }
+      // Must be present before AriaNg boots: its language guard dereferences it.
+      s.language = s.language || 'en';
       s.rpcAlias = s.rpcAlias || 'frieren aria2';
       s.rpcHost = location.hostname;
       s.rpcPort = String(location.port || '80');

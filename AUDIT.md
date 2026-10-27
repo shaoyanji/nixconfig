@@ -29,6 +29,14 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-27 — the preexec hook printed itself in every new terminal
+- **The defect.** atuin's bash integration sources bash-preexec, which *appends* its preexec hook to PS0, and bash
+prints whatever PS0 holds outside that `${ …; }` form at every prompt with `$_` expanded — so a PS0 inherited from
+a parent shell printed the whole zoxide init at the first prompt of a fresh foot window. `modules/shell/atuin.nix`
+drops an inherited PS0 and its export attribute before bash-preexec installs its own.
+- **Evidence.** With a poisoned PS0 exported: the deployed `.bashrc` prints the blob, the new one prints nothing,
+PS0 reads back canonical, and a child shell's env carries no PS0. `checks:host` green for delphi, scratch `MODE=eval`.
+
 ### 2026-10-27 — scratch is current again, and `activate-host` was broken without `TOP=`
 - **The defect.** `activate-host.sh` tested `$top` against each substituter ~30 lines before resolving it, so
 under `set -u` every caller that does not pass `TOP=` died at that loop — `infra:apply:host:*` and the fleet
@@ -41,19 +49,16 @@ a path (`nix-direnv`) lives only on `cache.nixos.org`. `nix-store --realise` of 
 compile) plus the normal deploy landed it, and the new generation carries the key.
 - **Evidence.** `checks:host HOST=scratch` 5.06 s / 697 MiB rc=0; deployed `6pz4lsqi` == current; 0 failed units;
 53 AppImage entries with `xdg-mime query default text/html` → `appimage-helium.desktop`.
-- **Docs debloat, same day.** Three runbooks were past the 400-line budget with nothing enumerating them:
-`docs/dns-failover.md` 618 → 399, `.agents/deploy/hosts/delphi.md` 520 → 267 (walkthrough to
-`docs/delphi-install.md`), `.agents/deploy/hosts/netbook.md` 449 → 399 (measurements to
-`docs/netbook-rice-port.md`). `docs-budget.sh` derives the runbook class now, so the next drift fails a gate.
-
+- **Docs debloat, same day.** Three runbooks were past the 400-line budget with nothing enumerating them
+(`docs/dns-failover.md` 618 → 399, `delphi.md` 520 → 267, `netbook.md` 449 → 399, detail to
+`docs/delphi-install.md` / `docs/netbook-rice-port.md`); `docs-budget.sh` derives the runbook class now.
 
 ### 2026-10-27 — the netbook's rice runs fnott: daemon swap and userland in one deploy
 - **Why one deploy.** Two processes cannot own `org.freedesktop.Notifications`, so shipping the swap before the
-  cards were ported would have looked like a broken HUD: the cards identified themselves through `makoctl
-  list`'s app name, and fnott renders only `<b> <i> <u>`. `profiles.dwlDesktop` now installs `pkgs.fnott` and
-  ships `/etc/xdg/fnott/fnott.ini` (the Catppuccin palette foot already had; fnott has no per-app sections, so
-  the six cards' border colours went with mako). `hosts/netbook/configuration.nix` starts `fnott`, and its
-  bridge block — `mako`, `fuzzel`, `alacritty`, `swaylock` — is gone.
+  cards were ported would have looked like a broken HUD: they identified themselves through `makoctl list`'s app
+  name, and fnott renders only `<b> <i> <u>`. `profiles.dwlDesktop` installs `pkgs.fnott` and ships
+  `/etc/xdg/fnott/fnott.ini` (fnott has no per-app sections, so the cards' border colours went with mako);
+  `hosts/netbook/configuration.nix` starts `fnott` and its mako/fuzzel/alacritty/swaylock block is gone.
 - **Her repos, edited in place (authorised 2026-10-27).** `~/mako-suite` `15e14a2`: dismiss and card liveness
   moved from mako's app name to a unique summary (`fnottctl list` prints `id: <summary>`; `makofetch`'s title
   gained its name), menus are `wmenu -p/-l/-P`, makobatt locks with `waylock -fork-on-lock`, and bodies pass
@@ -114,26 +119,6 @@ compile) plus the normal deploy landed it, and the new generation carries the ke
   14/14 with `dwl-desktop` registered. **Not deployed: both hosts are offline** (netbook 2d, scratch 19h). CI is
   warming both closures. The one thing eval cannot prove is the autologin itself; recovery if dwl never starts
   is ssh, which never depended on a greeter.
-
-### 2026-10-27 — the netbook's browsers come off the NAS, and its userland shrinks 708 MiB
-- **What left, measured on the generation.** 719.5 MiB out, 11.0 MiB in: 1318 → 1284 paths, 5887 → 5179 MiB
-(`nix-store -qR` nar sums, new against previous generation, plus a per-path `comm` of the two). The biggest items
-are `firefox-unwrapped` 391 MiB **and the ML runtimes it alone pulled — `openvino` 142, `onnxruntime` 56** — so
-firefox really cost ~590, not the 393 a closure-exclusive read suggested; `nautilus` 14 took glycin, adwaita-icon-
-theme, poppler-data and exempi with it. `pcmanfm` went in (+4.7 MiB against her 1318-path closure) to keep a
-menu-launchable file manager — `nnn` was +0.4 MiB, `yazi` +97.9 MiB (Rust runtime, a second firefox).
-- **The replacement is the library, not a package.** `appimage-integrate` writes one XDG entry per image in
-`/Volumes/data/appimages`; Helium runs from the menu (3 renderers, 2 wayland fds) with LibreWolf, Vieb and
-Thorium beside it.
-- **A removal that needed a code change.** With firefox gone nothing claimed `text/html` and every link would have
-died: the script now emits `MimeType=text/html;…;x-scheme-handler/http[s]` for an entry saying `Categories=…WebBrowser…`
-— all five browsers ship that and no `MimeType`. `xdg-mime query default text/html` → `appimage-helium.desktop`.
-- **`.cache` stays on the eMMC.** `appimage-run` unsquashes each image to `~/.cache/appimage-run` (110 MiB for
-Helium, 660 MiB for the set), so a tmpfs there re-extracts 150 MiB off NFS on every boot.
-- **A false failure fixed.** `infra:deploy:host:netbook`'s post-check ran `ssh root@netbook`, which does not resolve
-where the deploy runs, so a successful switch reported 255; it uses the LAN literal now.
-- **Evidence.** `checks:host HOST=netbook` 3.72 s / 494 MiB rc=0; the push switched, 0 failed units, harmonia holds
-the system; firefox and nautilus absent, pcmanfm and nano present; `docs-budget` and `checks:tasks` (467) green.
 
 ## Open debt (`task ops:notes`)
 

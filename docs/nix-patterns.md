@@ -218,6 +218,17 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     `hosts/frieren/configuration.nix`, so repeating it in prose is a second home
     that drifts. Gate: `task checks:nix:prose` (pre-commit, on added lines) —
     [[flake/policies.nix#nix-header-budget]].
+13. **An inherited `PS0` prints the preexec hook at every prompt.** `bash-preexec`
+    (sourced by atuin's bash integration) hooks preexec by *appending* to `PS0`, and
+    bash prints whatever `PS0` holds outside that `${ …; }` form at every prompt,
+    with `$_` expanded — so a `PS0` inherited from a parent shell reprints itself in
+    every new terminal. Measured 2026-10-27: a fresh foot window's first prompt
+    printed the entire zoxide init script (`$_` is the last argument of the
+    `.bashrc` eval that initializes zoxide) followed by `>&2; }`, and each prompt
+    after it reprinted the previous command's last argument. `modules/shell/atuin.nix`
+    clears an inherited `PS0` and its export attribute before bash-preexec installs
+    its hook; a live session is cleaned with `export -n PS0` plus one re-assignment
+    to bash-preexec's own string.
 
 Longer-form procedure for the operational half: [`../AGENTS.md`](../AGENTS.md)
 (routing) and the `infra` skill (deploy, rebuild, rollback).

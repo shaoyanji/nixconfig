@@ -37,10 +37,9 @@ The boot-critical modules were present in *both* initrds (`f2fs`, `mmc_block`,
 byte-identical to their store paths — so "missing initrd" was never the failure.
 The eMMC root mounts fine under 6.18.56 with the scripted stage-1.
 
-Nothing here proves `linuxPackages_latest`; the comment that blamed "newer
-kernels" predates this measurement. If nixpkgs ever drops the LTS line, that is
-the next thing to boot-test — with the same staged procedure, not by deploying
-straight across.
+Nothing here proves `linuxPackages_latest`; the comment that blamed "newer kernels"
+predates the measurement. If nixpkgs drops the LTS line, boot-test that with the same
+staged procedure, not by deploying straight across.
 
 ## Diagnosing a boot that never reaches stage 2
 
@@ -168,42 +167,12 @@ Traps found while trying it, worth knowing before the next attempt:
   letting activation time out leaves `fuzzel` with no config at all, which looks
   like a white theme, not a missing file. Restore the symlinks before debugging.
 
-### No bar, no secret service: the measurements
+### No bar, no secret service
 
-Everything that was declined on this host was declined with a number behind it.
-Measured 2026-10-27 per-package closure (`nix path-info -Sh --store
-https://cache.nixos.org`, fleet nixpkgs):
+Everything declined on this host was declined with a number: the closure table and
+the four verdicts (bar, browser, secret service, display manager) are in
+[`docs/netbook-rice-port.md`](../../docs/netbook-rice-port.md).
 
-| Component | Closure |
-| --- | --- |
-| niri — the compositor this host ran | 695 MiB |
-| dwl — the compositor it runs now | 345 MiB |
-| waybar | **1001 MiB** |
-| gnome-keyring | **378 MiB** |
-| greetd / tuigreet | 60 / 51 MiB |
-| foot / wmenu / fnott / swaybg / swayidle / waylock | 97 / 100 / 112 / 128 / 43 / 78 MiB |
-| mako — the notifier until 2026-10-27 | 326 MiB |
-| firefox (the browser this host has) | 1.46 GiB |
-
-- **Bar: declined.** waybar is not a bar in closure terms — it brings zenity
-  (902 MiB) and `sdl2-compat`/sdl3 (~955 MiB) with it, so a status line would have
-  cost more than the rest of the session combined, and more than the compositor it
-  replaced. If one is ever wanted, the thing to beat is dwl's 345 MiB, not zero.
-- **Browser: open work, with the table in the `netbook-desktop-phase-2` note.**
-  `firefox` is 1.46 GiB of closure and measured **~1.0 GiB RSS** on this 1818 MiB
-  host (WebExtensions 319 + wrapper 309 + Isolated 224 + three content processes
-  at 65 each), which is the clunkiness, and nothing cheaper is a drop-in.
-- **Secret service: declined.** Nothing on this host implements the freedesktop
-  Secret API — `firefox` keeps its own NSS store and `nautilus` has no `gvfs` to
-  store mounts in — so the keyring would have been 378 MiB of idle daemon. Scratch
-  has run without one since its dwl conversion.
-- **Display manager: declined.** `greetd` + `tuigreet` were 111 MiB to autologin a
-  single user, and SDDM is a Qt stack. tty1 autologins through `getty` instead,
-  which still gives the session a real logind/seat through PAM, and
-  `environment.loginShellInit` execs `/etc/xdg/dwl-session` from the login shell.
-  NixOS's `/etc/profile` reads **`/etc/profile.local` and the `loginShellInit`
-  slot, not `/etc/profile.d`** — checked against the generated file, because the
-  hook that is not read fails silently.
 
 ### Staging a boot-chain change (the practiced path)
 
@@ -245,20 +214,12 @@ the netbook only receives. `BUILD` picks how the closure is obtained:
 closure completes in seconds without touching the 25 h/month nixbuild budget, and
 a deploy that does need work escalates instead of failing.
 
-**Nothing on the netbook pulls, and that is not a bug to fix.** Its paths predate
-any LAN cache: the closure is 6.6 GB of things it fetched from `cache.nixos.org`
-years ago. Measured 2026-10-22 from the host itself, harmonia is reachable
-(`nix-cache-info` answers) and *does* serve the current system — because frieren
-built it and harmonia serves frieren's store. What it does **not** serve is the
-long tail of old paths, which is why the deploy pushes rather than asking the
-host to fetch. `ACTION=preflight` prints the answer for the running system, so
-this stays a measurement instead of an assumption.
-
-Measured 2026-10-22: `BUILD=remote` 2m28s; `BUILD=auto` on an unchanged tree
-seconds (pure substitution); only the paths the host lacks travel, not the
-closure. Staging generation 51 — the scripted initrd added to an otherwise cached
-fleet closure — reported "substituting … (no compile)": it escalated to neither
-nixbuild.net nor a local build, and copied only the paths the host lacked.
+**Nothing on the netbook pulls, and that is not a bug to fix.** Its paths predate any
+LAN cache (6.6 GB fetched from `cache.nixos.org` years ago): harmonia serves the
+current system because frieren built it, but not the long tail — which is why the
+deploy pushes. `ACTION=preflight` prints that answer instead of assuming it.
+Measured 2026-10-22: `BUILD=remote` 2m28s, `BUILD=auto` on an unchanged tree seconds,
+and only the paths the host lacks travel.
 
 ## The two guards (both before anything is copied)
 
@@ -400,33 +361,22 @@ this box (verified 2026-10-22); edit that file directly.
 
 ### `pti=off` black-panels this machine (gens 60 and 62), 2026-10-22
 
-Two generations that carried `pti=off` came back with the **panel dark while
-the machine ran**; generations without it (59, 61) booted normally. Gen 62 is
-the clean evidence: its journal is complete — i915 bound cherryview and took
-over as `fb0`, niri initialised the renderer on `renderD128`, swaybg, alacritty
-and xwayland-satellite started, the gnome-keyring prompt appeared exactly as on
-a good boot — and the only difference from 61 was that flag plus a masked unit.
-So the fault is the display, not stage 1, and `pti=off` is out for good. The CPU
-win it promised is not worth an i915 debugging project on a Celeron.
-
-Gen 60's failure is less clean: it wrote **no journal at all**, so that boot died
-before journald for some other reason, with the trimmed initrd and `nodiscard`
-as the remaining suspects. Both are dropped on value: the trim measured
-27,100,550 → 25,613,589 bytes and the loader reads at ~4.8 MiB/s, so **0.3 s**
-for a boot-chain change, and `nodiscard` only moves TRIM from per-delete to the
-weekly `fstrim`.
+Two generations carrying `pti=off` came back with the **panel dark while the
+machine ran**; 59 and 61 booted normally. Gen 62 is the clean evidence: its journal
+is complete — i915 bound cherryview as `fb0`, the renderer initialised on
+`renderD128`, the session's clients started — and the only difference from 61 was
+that flag plus a masked unit. So the fault is the display, not stage 1, and
+`pti=off` is out for good. Gen 60 wrote no journal at all, so that boot died before
+journald for another reason; the trimmed initrd (0.3 s of loader time saved) and
+`nodiscard` were dropped on value too.
 
 **A switch rewrites `loader.conf` to point at the generation that just failed.**
-Both times the machine came back up only after a manual pick, and the *next*
-reboot would have black-panelled again. After any failed generation: rewrite
-`default` in `/boot/loader/loader.conf` and `nix-env -p … --switch-generation`
-before anything else.
-
-**Reading an initrd:** `cpio -id < initrd` extracts only the microcode prepend
-and makes a healthy image look empty. The layout is 15.2 MiB of Intel microcode
-(uncompressed, mandatory) followed by a zstd frame holding stage 1 — so read the
-frame (`tail -c +<offset> initrd | zstd -dc`) or the raw bytes
-(`grep -a -o '[a-zA-Z0-9_-]*\.ko\.[a-z]*'`).
+Both times the machine came back only after a manual pick, and the next reboot would
+have black-panelled again. After any failed generation, rewrite `default` in
+`/boot/loader/loader.conf` and `nix-env -p … --switch-generation` before anything
+else. Reading an initrd: `cpio -id < initrd` extracts only the uncompressed
+microcode prepend, so read the zstd frame after it (`tail -c +<offset> initrd | zstd
+-dc`) or the raw bytes.
 
 ## Rollback
 

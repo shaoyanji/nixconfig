@@ -29,6 +29,24 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-27 — scratch is current again, and `activate-host` was broken without `TOP=`
+- **The defect.** `activate-host.sh` tested `$top` against each substituter ~30 lines before resolving it, so
+under `set -u` every caller that does not pass `TOP=` died at that loop — `infra:apply:host:*` and the fleet
+loop, the two paths that exist because they have no gate of their own to resolve it. Only `infra:deploy:host:*`
+worked. The cache block now sits after the toplevel, which also restores the preserved-host promise of no eval
+and no cache query before the status read, and `--check` runs for the first time.
+- **Scratch, five days behind** (generation 15, 2026-10-22), needed three things: its `trusted-public-keys`
+predated the shaoyanji cachix key, harmonia had no toplevel, and `nix copy --from` one cache cannot complete when
+a path (`nix-direnv`) lives only on `cache.nixos.org`. `nix-store --realise` of the toplevel **on frieren** (no
+compile) plus the normal deploy landed it, and the new generation carries the key.
+- **Evidence.** `checks:host HOST=scratch` 5.06 s / 697 MiB rc=0; deployed `6pz4lsqi` == current; 0 failed units;
+53 AppImage entries with `xdg-mime query default text/html` → `appimage-helium.desktop`.
+- **Docs debloat, same day.** Three runbooks were past the 400-line budget with nothing enumerating them:
+`docs/dns-failover.md` 618 → 399, `.agents/deploy/hosts/delphi.md` 520 → 267 (walkthrough to
+`docs/delphi-install.md`), `.agents/deploy/hosts/netbook.md` 449 → 399 (measurements to
+`docs/netbook-rice-port.md`). `docs-budget.sh` derives the runbook class now, so the next drift fails a gate.
+
+
 ### 2026-10-27 — the netbook's rice runs fnott: daemon swap and userland in one deploy
 - **Why one deploy.** Two processes cannot own `org.freedesktop.Notifications`, so shipping the swap before the
   cards were ported would have looked like a broken HUD: the cards identified themselves through `makoctl
@@ -97,24 +115,6 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   warming both closures. The one thing eval cannot prove is the autologin itself; recovery if dwl never starts
   is ssh, which never depended on a greeter.
 
-### 2026-10-27 — the VIP is back: minyx is the backup, and the takeover was observed
-- `8d271c31` declared the group again with the address rules that were missing the first time: VIP
-  `192.168.3.50` (static block, not `.25`, not the peer's `.3`, and not `.53` — an option `example` the router
-  was already leasing to the board), `unicastPeers` asserted by the module, minyx's role bound to **`wlan0`**
-  because `enu1u1` is DOWN (verified on the box), and minyx promoted off `preserved`.
-- Deployed: minyx by closure push from delphi (`--target-host devji@192.168.3.3`), frieren by
-  `nixos-rebuild switch --flake github:…#frieren`. The first frieren run reused a cached tarball and built the
-  previous generation — pinned to the exact revision, which is the reliable form.
-- **Observed, both directions:** frieren preempted at 09:52:33 (`received lower priority (1) advert from
-  192.168.3.3 - discarding` → MASTER); stopping keepalived on frieren moved `.50` to minyx in ~4 s and
-  `dig @192.168.3.50 photos.frieren.lan` still answered `192.168.3.25` while `doubleclick.net` stayed `0.0.0.0`;
-  restarting frieren pulled it back (`Master received advert … higher priority 200` → BACKUP on minyx). One
-  transition each way after 09:52, no flapping. `.25` was never touched, so clients saw no outage.
-- The 04:00 failure class did not recur: frieren's switch reloaded `firewall.service` and finished `running`.
-  The track script loads on both nodes (`VRRP_Script(dns) succeeded`, zero "track script dns not found").
-- Open, and neither is Nix: the router still hands out `.25` + `9.9.9.9` (`.50` is proven free by ARP
-  duplicate-address detection but is not yet served to clients), and **poseidon declares `.3` statically** for
-  its dock NIC while minyx holds it by reservation — the peer address frieren advertises to.
 ### 2026-10-27 — the netbook's browsers come off the NAS, and its userland shrinks 708 MiB
 - **What left, measured on the generation.** 719.5 MiB out, 11.0 MiB in: 1318 → 1284 paths, 5887 → 5179 MiB
 (`nix-store -qR` nar sums, new against previous generation, plus a per-path `comm` of the two). The biggest items

@@ -32,13 +32,24 @@
   # (extra address= records, the tailscale interface line, PXE proxyDHCP,
   # blocklists, the web UI) stays here and is fed in.
   #
-  # No `virtualIp` yet: failover is client-side via `resolvers` until a
-  # floating address is worth the router/client change. fern runs the matching
-  # `role = "secondary"` stack (hosts/fern/configuration.nix) with the same
-  # zone/zoneAddress, so a client that falls back gets identical answers.
+  # The second member is minyx (hosts/minyx/dns.nix): `role = "secondary"`, the
+  # blocky backend, priority 1. It is a Pi 3B that cannot carry this stack, so
+  # the module's blocky backend answers the same zone from local records.
   #
-  # fern's own address is deliberately NOT listed: it is DHCP, so it belongs in
-  # the router's DHCP reservation (or a tailnet name), never as a literal here.
+  # Failover is VRRP, not client-side: `virtualIp` floats one address between
+  # the two nodes, so a client is configured with 192.168.3.53 and does not have
+  # to know which host is answering. Both values are required together — the
+  # module asserts that a VIP without a router id is split brain — and the
+  # priorities are what make minyx a P1 rather than a peer: 200 here, 1 there.
+  #
+  # The VIP is deliberately NOT 192.168.3.25: that address is the target of
+  # every *.frieren.lan record (the NAS), so floating it would drag the zone
+  # with it. It must also sit outside the router's DHCP pool — `checks:dns:pool`
+  # reports when it does not, and narrowing the pool is a router change, not a
+  # Nix one.
+  #
+  # minyx's own address is absent on purpose: it is DHCP, so it belongs in the
+  # router's reservation, never as a literal here. The VIP is what clients use.
   # See docs/dns-failover.md for the failover test.
   profiles.dnsFailover = {
     enable = true;
@@ -46,7 +57,10 @@
     lanInterface = "enp1s0";
     zone = "frieren.lan";
     zoneAddress = "192.168.3.25";
-    resolvers = ["192.168.3.25"];
+    resolvers = ["192.168.3.53"];
+    virtualIp = "192.168.3.53";
+    virtualRouterId = 53;
+    primaryPriority = 200;
     extraDnsmasqLines = [
       "interface=tailscale0"
       "interface=wlp2s0"

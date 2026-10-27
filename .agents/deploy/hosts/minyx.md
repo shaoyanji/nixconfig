@@ -46,6 +46,47 @@ nixos-rebuild switch -L --builders "" --flake .#minyx \
   (`nixos-1-default` in `/boot/extlinux/extlinux.conf`, kernel in `/boot/nixos`),
   but the board is headless: choosing it needs a serial console.
 
+## DNS failover role (declared 2026-10-27 — a push is what activates it)
+
+This host is the **P1 (priority 1) DNS failover** for frieren's Pi-hole
+(`hosts/minyx/dns.nix`, `modules/net/dns/failover.nix`). A push to it now also
+starts two units the box never ran before, and both have a failure mode that looks
+like success:
+
+| Unit | What it is | If it is not running |
+| :--- | :--- | :--- |
+| `blocky` | answers `*.frieren.lan` from local records, blocks frieren's two lists | queries to the VIP go unanswered — i.e. an outage with a green config |
+| `keepalived` | holds the VIP `192.168.3.53` when frieren's resolver fails | the VIP never moves; failover silently does nothing |
+
+Why blocky and not frieren's stack: 1 GiB of RAM and a USB stick with no TRIM.
+pihole-FTL would put a query database and a web server on that stick; blocky is one
+Go process that keeps the zone in memory. The two nodes answer the same zone from
+the same `customRecords` input, which is the property that makes it a failover.
+
+After the push, the box is *ready*; it is not serving anything yet:
+
+```bash
+ssh devji@192.168.3.9 'systemctl is-active blocky keepalived'
+ssh devji@192.168.3.9 'dig +short @127.0.0.1 frieren.lan'   # 192.168.3.25
+ssh devji@192.168.3.9 'ip -br addr show enu1u1'              # no 192.168.3.53 while frieren is healthy
+```
+
+Three things this role depends on, none of which Nix owns:
+
+- **The VIP must be outside the router's DHCP pool.** `192.168.3.53` is a floating
+  address; if the Huawei leases it to a phone the two fight for it. `task
+  checks:dns:pool POOL=<router range>` says whether it is inside.
+- **Clients must be handed the VIP.** Until the router's DHCP option 6 points at
+  `192.168.3.53`, clients keep asking `192.168.3.25` and the failover is inert.
+- **`enu1u1` must exist.** It is the USB NIC the NetworkManager profile pins, and
+  it is both the DNS interface and the VRRP interface. Unplug it and keepalived
+  fails to start — which is quiet, so check the unit, not just the cable.
+
+Known gap, by backend design: blocky has no dnsmasq-style conditional forward, so
+`*.cloudforest-kardashev.ts.net` and `gok` do **not** resolve here. The LAN zone and
+the static `eisen.lan` / `laya.lan` / `tts.lan` records do. Do not "fix" this by
+pointing blocky at frieren — a failover that needs the primary is not one.
+
 ## Label declaration must match the media (the brick of 2026-10-26)
 
 `fileSystems."/"` is generated from `sdImage.rootVolumeLabel`, so the pushed

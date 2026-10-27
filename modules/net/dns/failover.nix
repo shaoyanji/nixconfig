@@ -1,4 +1,10 @@
 # DNS high availability: one reusable, role-based resolver stack (HC-3).
+#
+# Two backends, one declaration: `pihole` (unbound + pihole-ftl, the filtering
+# stack with a web UI) and `blocky` (one Go binary, local records, same
+# blocklists). The backend is a host property, not a preference: frieren has the
+# RAM for FTL, minyx is a 1 GiB Pi where a second daemon is the difference
+# between answering and swapping.
 {
   config,
   lib,
@@ -9,11 +15,19 @@
 
   isPrimary = cfg.role == "primary";
 
+  usePihole = cfg.backend == "pihole";
+  useBlocky = cfg.backend == "blocky";
+
   # A DNS-aware liveness probe: demote the node whose *resolver* died, not the
   # one whose link flapped. Dig the zone this resolver is authoritative for.
+  #
+  # The answer must be non-empty: `dig` exits 0 on NXDOMAIN and on an empty
+  # reply, so a resolver that is listening but has lost its zone would keep the
+  # VIP forever — the exact failure this script exists to catch.
   dnsProbe = pkgs.writeShellScript "dns-vrrp-probe" ''
     set -eu
-    exec ${pkgs.dnsutils}/bin/dig +time=2 +tries=1 -4 @127.0.0.1 "${cfg.zone}" A >/dev/null
+    answer="$(${pkgs.dnsutils}/bin/dig +short +time=2 +tries=1 -4 @127.0.0.1 "${cfg.zone}" A)"
+    [ -n "$answer" ]
   '';
 
   vrrpPriority =
@@ -30,6 +44,23 @@ in {
       description = ''
         This host's role in the resolver group. Exactly one host is `primary`
         (frieren); every additional resolver is a `secondary`.
+      '';
+    };
+
+    backend = lib.mkOption {
+      type = lib.types.enum ["pihole" "blocky"];
+      default = "pihole";
+      description = ''
+        Which resolver implements the zone on this host. `pihole` is unbound +
+        pihole-ftl (filtering, web UI, per-query database); `blocky` is a single
+        Go process with local records and the same blocklists, sized for a host
+        that cannot carry the FTL stack.
+
+        Both answer {option}`zone` and every entry in {option}`customRecords`
+        and block {option}`blocklists`, so a client that falls back gets the
+        answer it would have got from the primary. What blocky cannot do is
+        dnsmasq's conditional forward (`server=/domain/…`), so tailnet names are
+        the primary's job alone.
       '';
     };
 
@@ -73,9 +104,33 @@ in {
       type = lib.types.listOf lib.types.str;
       default = [];
       description = ''
-        Host-specific dnsmasq lines appended after the zone wildcard — extra
-        `address=` records, the `interface=tailscale0` line, PXE proxyDHCP.
-        Kept as an input so the module never has to guess the host's policy.
+        Host-specific dnsmasq lines appended after the zone wildcard — the
+        `interface=tailscale0` line, PXE proxyDHCP, conditional forwards. Kept
+        as an input so the module never has to guess the host's policy. The
+        `pihole` backend only: blocky has no equivalent escape hatch.
+      '';
+    };
+
+    customRecords = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = {};
+      example = {"eisen.lan" = "100.119.172.99";};
+      description = ''
+        Static A records every role in the group must answer the same way, as
+        name → address. The `pihole` backend renders them as `address=` lines,
+        the `blocky` backend as `customDNS.mapping` entries; this is why the
+        option exists instead of raw dnsmasq lines — a secondary has to mirror
+        the primary's records in its own dialect or it is not a failover.
+      '';
+    };
+
+    blocklists = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = ''
+        URLs the `blocky` backend blocks, so a failover returns the same answer
+        for an ad domain as the primary. The `pihole` backend leaves lists to
+        the host's {option}`services.pihole-ftl.lists`.
       '';
     };
 
@@ -123,8 +178,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    # --- resolver core (identical on every role) ------------------------------
-    services.unbound = {
+    # --- resolver core (pihole backend) ---------------------------------------
+    services.unbound = lib.mkIf usePihole {
       enable = true;
       # Pi-hole forwards to this explicitly; unbound must not also grab the host
       # resolver stub, which would fight systemd-resolved.
@@ -160,7 +215,7 @@ in {
       };
     };
 
-    services.pihole-ftl = {
+    services.pihole-ftl = lib.mkIf usePihole {
       enable = true;
       settings = {
         dns = {
@@ -186,8 +241,84 @@ in {
             "interface=${cfg.lanInterface}"
             "address=/${cfg.zone}/${cfg.zoneAddress}"
           ]
+          ++ map (n: "address=/${n}/${cfg.customRecords.${n}}") (lib.attrNames cfg.customRecords)
           ++ cfg.extraDnsmasqLines;
       };
+    };
+
+    # --- resolver core (blocky backend) ---------------------------------------
+    services.blocky = lib.mkIf useBlocky {
+      enable = true;
+      settings =
+        {
+          # `http` is OMITTED, not 0: in blocky 0.35 a port of 0 means "pick a
+          # random free port" and the API starts anyway (measured 2026-10-27:
+          # `HTTP = [::]:45471`). Omitting the key is what turns it off
+          # (`HTTP = []`) — there is no UI to reach here, and a listener the
+          # firewall happens not to open is still a listener.
+          ports.dns = 53;
+          # A resolver cannot look up its own upstreams through the resolver it
+          # replaced. IP literals mean no lookup is required to start.
+          bootstrapDns = [
+            {upstream = "1.1.1.1";}
+            {upstream = "9.9.9.9";}
+          ];
+          # IPv4 only, for the same reason the pihole backend recurses over
+          # IPv4: the LAN uplink has no usable IPv6 path, and a resolver that
+          # prefers AAAA SERVFAILs names (the 2026-10-14 outage class).
+          connectIPVersion = "v4";
+          # Public DoT only. Pointing the failover at the primary would make it
+          # inherit the outage it exists to cover.
+          upstreams.groups.default = [
+            "https://one.one.one.one/dns-query"
+            "https://dns.quad9.net/dns-query"
+          ];
+          # The zone this group owns, answered locally — never forwarded, so it
+          # survives the primary being gone. Apex and wildcard both, because
+          # clients ask for both.
+          customDNS = {
+            customTTL = "1h";
+            mapping =
+              {
+                "${cfg.zone}" = cfg.zoneAddress;
+                "*.${cfg.zone}" = cfg.zoneAddress;
+              }
+              // cfg.customRecords;
+          };
+          caching = {
+            minTime = "5m";
+            maxTime = "30m";
+          };
+          # No query log: the hosts that need this backend are the ones writing
+          # to flash, and a log nobody reads is a write stream with a cost.
+          queryLog.type = "none";
+          log.level = "info";
+        }
+        // lib.optionalAttrs (cfg.blocklists != []) {
+          blocking = {
+            denylists.ads = cfg.blocklists;
+            clientGroupsBlock.default = ["ads"];
+            blockType = "zeroIp";
+            # Serve immediately and load the lists behind it: a resolver whose
+            # DNS waits for a list download is down at the exact moment it is
+            # needed (measured on the appliance, 2026-10-26).
+            loading = {
+              strategy = "fast";
+              refreshPeriod = "15m";
+              downloads = {
+                attempts = 5;
+                cooldown = "5s";
+              };
+            };
+          };
+        };
+    };
+
+    # blocky binds :53 itself, so resolved's stub listener has to go or the
+    # resolver never starts — and a failover that does not start is worse than
+    # none, because the config reads as if it does.
+    services.resolved = lib.mkIf useBlocky {
+      settings.Resolve.DNSStubListener = "no";
     };
 
     # DNS is reachable on the LAN interface only; other interfaces (tailscale0,

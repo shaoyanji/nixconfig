@@ -17,10 +17,13 @@ VRRP. Host **policy** stays on the host and is passed in, so the module never gu
 | Option | Meaning |
 | :--- | :--- |
 | `role` | `"primary"` (frieren) or `"secondary"` |
+| `backend` | `"pihole"` (unbound + pihole-ftl) or `"blocky"` (one Go process) |
 | `lanInterface` | interface FTL answers on / DNS is opened on / VRRP runs on |
 | `zone`, `zoneAddress` | the wildcard record, e.g. `frieren.lan` → `192.168.3.25` |
 | `resolvers` | ordered resolver addresses clients should be given, primary first |
-| `extraDnsmasqLines` | host lines: extra `address=` records, `interface=tailscale0`, PXE proxyDHCP |
+| `extraDnsmasqLines` | host lines (pihole backend only): `interface=tailscale0`, PXE proxyDHCP |
+| `customRecords` | static A records every role must answer the same way (name → address) |
+| `blocklists` | URLs the `blocky` backend blocks; the pihole backend uses `services.pihole-ftl.lists` |
 | `virtualIp`, `virtualRouterId`, `unicastPeers` | optional VRRP failover (see below) |
 | `primaryPriority`, `secondaryPriority` | VRRP priority; primary must outrank secondary |
 
@@ -39,28 +42,68 @@ profiles.dnsFailover = {
   lanInterface = "enp1s0";
   zone = "frieren.lan";
   zoneAddress = "192.168.3.25";
-  resolvers = ["192.168.3.25"];
+  resolvers = ["192.168.3.53"];      # the VIP, not frieren's own address
+  virtualIp = "192.168.3.53";
+  virtualRouterId = 53;
+  primaryPriority = 200;             # minyx is 1: it can never preempt this node
   extraDnsmasqLines = [ ... ];
 };
 ```
 
-**There is no second member.** fern briefly ran the same stack as
-`role = "secondary"`; `8bd17500` (2026-10-15) removed pihole-ftl, unbound and
-dns-failover from it, so a roaming laptop stops carrying a resolver it cannot serve.
-`rg 'role = "secondary"' hosts/ modules/` returns nothing, which is why
-`checks:dns:failover` still exits 2 and frieren remains the only answer for the
-zone. This paragraph used to claim the opposite.
+**There is a second member now: minyx** (`hosts/minyx/dns.nix`, 2026-10-27). It is
+`role = "secondary"` with `backend = "blocky"`, because the host is a 1 GiB Pi 3B
+whose root filesystem is a USB stick with no TRIM — pihole-ftl brings a query
+database and a web server, and unbound a recursive resolver, which is the wrong
+weight for a node whose only job is to answer while frieren is gone.
+
+The backend is a host property, not a preference. `pihole` keeps the unbound +
+FTL stack above; `blocky` is a single process that answers the same zone from
+local records (`customDNS.mapping`, apex and wildcard) and blocks the same two
+lists. Both are rendered from the same `zone` / `zoneAddress` / `customRecords`
+inputs, so the two nodes cannot answer a fleet name differently.
+
+What blocky cannot do is dnsmasq's conditional forward (`server=/domain/…`). The
+tailnet zone and `gok` therefore resolve through frieren only — the same shape of
+gap delphi's crab-hole has, and documented here so it is not discovered during an
+outage. What survives on minyx is what LAN clients actually use: `*.frieren.lan`,
+and the static `eisen.lan` / `laya.lan` / `tts.lan` records.
+
+fern briefly ran the same stack as `role = "secondary"`; `8bd17500` (2026-10-15)
+removed pihole-ftl, unbound and dns-failover from it, so a roaming laptop stops
+carrying a resolver it cannot serve.
 
 delphi answers DNS at the fleet's shared address (`10.99.0.53` / `100.97.61.65`),
 but with crab-hole, which has no static-record or zone support: it resolves the
 internet and NXDOMAINs every `.lan` name, so it fails over public DNS only.
 `hosts/delphi/configuration.nix` lists the three ways to close that gap; replicating
-this zone on the always-on host is the one that makes failover real.
+this zone on an always-on host is the one that makes failover real, and minyx does
+that — deliberately in a different shape (blocky, not crab-hole) precisely because
+crab-hole cannot carry the zone.
 
-`virtualIp` is still **null**, so failover would be **client-side**: nothing floats,
-and clients must be handed both resolvers (a second DHCPv4 server on the Huawei
-router, or a client's `networking.nameservers`). There is no VIP to answer if a node
-dies silently.
+**Failover is VRRP as of 2026-10-27.** Both hosts declare `virtualIp =
+"192.168.3.53"` and `virtualRouterId = 53`; frieren is MASTER at priority 200 and
+minyx is BACKUP at priority 1 — the "P1" in its declaration. Priority is what makes
+it a backup rather than a peer: minyx can never preempt a healthy frieren, and
+claims the address as soon as frieren's resolver stops answering the zone.
+
+The VIP is deliberately not `192.168.3.25`: that address is the target of every
+`*.frieren.lan` record, so floating it would drag the NAS with it. It must also sit
+**outside the router's DHCP pool** — `checks:dns:pool` reports when it does not,
+and narrowing the pool is a router change, not a Nix one.
+
+Two things this does not buy:
+
+* **Clients still have to be pointed at the VIP.** The router (the Huawei at
+  `192.168.3.1`, the DHCPv4 server) hands out DNS by option 6; until it hands out
+  `192.168.3.53`, LAN clients keep using `192.168.3.25` and the VIP is inert.
+  Until then the failover is *ready*, not *in force*.
+* **minyx's own address is still DHCP.** It is not a resolver address any client is
+  handed — the VIP is — so it belongs in a router reservation, never as a literal
+  in `resolvers`.
+
+Deployment is two switches the operator runs, not the agent: frieren (x86, from a
+build on delphi) and minyx (the closure push in
+[`.agents/deploy/hosts/minyx.md`](../.agents/deploy/hosts/minyx.md)).
 
 frieren's own `192.168.3.25` is likewise a reservation rather than a Nix-static address
 (`networking.interfaces` is empty and `useDHCP` is true), which is why it is the only
@@ -78,8 +121,7 @@ instead of procedural.
 
 ## Bringing up a secondary
 
-On an always-on host, the resolver is a three-line opt-in — the module derives the
-rest:
+On an always-on host, the resolver is a short opt-in — the module derives the rest:
 
 ```nix
 imports = [../../modules/net/dns/failover.nix];
@@ -87,22 +129,30 @@ imports = [../../modules/net/dns/failover.nix];
 profiles.dnsFailover = {
   enable = true;
   role = "secondary";
+  backend = "blocky";              # pihole on a host with the RAM for FTL
   lanInterface = "enp0s3";          # that host's LAN NIC
   # zone/zoneAddress default to frieren.lan / 192.168.3.25
+  customRecords = { … };            # mirror the primary's static records
+  blocklists = [ … ];               # mirror the primary's lists
 };
 ```
 
-Then add its address to frieren's `resolvers` list so clients are handed both. The
-secondary answers the same wildcard zone with the same upstream chain, so a client that
-falls back to it gets the same answers.
+Without a VIP, add the secondary's address to frieren's `resolvers` list so clients
+are handed both. With a VIP (`virtualIp` + `virtualRouterId` on **both** hosts),
+clients are handed one address and `resolvers` carries only that. Either way the
+secondary answers the same zone from the same records, so a client that falls back
+gets the same answers — which is the property that makes it a failover rather than a
+second resolver.
 
 ### Failover mode: client-side vs VRRP
 
-* **Client-side (default, `virtualIp = null`).** No floating address. Clients must be
+* **Client-side (`virtualIp = null`).** No floating address. Clients must be
   configured with both resolvers (DHCP secondary, or `networking.nameservers`). To
   make this real for LAN clients the **Huawei router** (`192.168.3.1`, the DHCP
   server — the FRITZ!Box is one of its clients, not the DHCP server) must hand out
-  both addresses — a manual router change, not something Nix owns.
+  both addresses — a manual router change, not something Nix owns. Not the fleet's
+  choice as of 2026-10-27: many clients only fall back after a full timeout, and some
+  never try the second entry at all.
 * **VRRP (`virtualIp = "192.168.3.53", virtualRouterId = 53`).** keepalived advertises
   one address that both hosts share; clients keep pointing at the single VIP. A
   DNS-aware `vrrp_script` demotes a node whose resolver stops answering (not just one
@@ -123,11 +173,26 @@ task checks:dns:failover RESOLVERS="192.168.3.25 192.168.3.26"
 
 Exit codes: **0** = group answers the zone and is redundant; **1** = a listed resolver
 failed to answer, or the VIP answered from two MACs (split brain); **2** = failover
-cannot be evaluated (fewer than 2 members — the state today).
+cannot be evaluated (fewer than 2 members *and* no VIP that answered with a single
+owner).
+
+Redundancy has two shapes and the check must not confuse them: with a VIP, `resolvers`
+holds **one** address by design, so a single entry is correct and the proof is that
+address answering the zone while exactly one MAC owns it. Without a VIP, one entry is
+a single point of failure and the check says so.
+
+The member list is not enumerable from one host's config (the secondary's own address
+is DHCP), so after a switch prove both nodes directly — this is the real end-to-end
+test, and the only one that shows the takeover:
+
+```bash
+task checks:dns:failover RESOLVERS="192.168.3.25 192.168.3.9"   # both answer the zone
+```
 
 A resolver address that a client can be *leased* is a resolver a client can lose to
-another device, so the pool is checked separately. The pool bounds are router state,
-so they are an input, never a guess:
+another device, so the pool is checked separately. It reads `.resolvers`, the zone
+address and `virtualIp`, so the VIP is covered without being listed twice. The pool
+bounds are router state, so they are an input, never a guess:
 
 ```bash
 task checks:dns:pool POOL=192.168.3.100-192.168.3.200   # 0 = .25 is outside the pool
@@ -156,12 +221,25 @@ dig +short @<secondary>  photos.frieren.lan   # same answer => failover target i
 ```
 
 To actually observe a takeover (non-trivial: it stops DNS for the NAS), stop the
-resolver on the primary and confirm clients still resolve via the secondary/VIP:
+resolver on the primary and watch the address move — **both** directions, or the
+failover is only half proven:
 
 ```bash
-sudo systemctl stop pihole-ftl        # on frieren — clients must keep resolving
+# on frieren: the VIP must leave this host and appear on minyx within ~5-10 s
+sudo systemctl stop pihole-ftl
+ip -br addr show enp1s0 | grep 192.168.3.53 || echo "VIP gone from frieren"
+dig +short @192.168.3.53 hc3-check.frieren.lan      # must still answer 192.168.3.25
+# on minyx
+ip -br addr show enu1u1 | grep 192.168.3.53
+
+# restore: priority 200 must pull the VIP back, not leave it on the backup
 sudo systemctl start pihole-ftl
 ```
+
+The DNS-aware `vrrp_script` is what makes this work: a node whose *resolver* stopped
+answering is demoted even though its NIC never flapped, and the probe requires a
+non-empty answer — `dig` exits 0 on NXDOMAIN, so an empty reply would otherwise keep
+the VIP on a node that no longer has the zone.
 
 ## The tailnet layer: approval, DNS, and the two switches that are not one
 

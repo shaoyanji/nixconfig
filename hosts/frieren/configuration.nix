@@ -239,6 +239,12 @@ in {
     rpcSecretFile = config.sops.secrets."aria2-rpc-secret".path;
     nginx.enable = true;
     nginx.listenPort = 6801;
+    # Transmission owns 51413 (its default peer port) on this host, so every
+    # BitTorrent task in aria2 died on start with `Failed to bind a socket,
+    # cause: Address already in use` / `Errors occurred while binding port`:
+    # magnets and .torrent links were the one task type that could not work.
+    # Moving aria2's listen/DHT port off the clash is all it takes.
+    btListenPort = 51414;
   };
 
   # Home Assistant IoT and device stack (modules/services/home-assistant.nix)

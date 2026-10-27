@@ -1,7 +1,7 @@
 # delphi — the install walkthrough (2026-10-19/20)
 
 The dated, one-time procedure for bringing delphi up from a fresh Always Free
-instance, moved out of [`.agents/deploy/hosts/delphi.md`](../deploy/hosts/delphi.md)
+instance, moved out of [`.agents/deploy/hosts/delphi.md`](../.agents/deploy/hosts/delphi.md)
 when that runbook hit its 400-line budget. The live parts of delphi — guest layer,
 tailnet mounts, the two compiled surfaces, the traps — stay there.
 
@@ -98,7 +98,7 @@ wipe for no reason. Rapid SSH probes from one source trip the installer's
    is **exactly** the `&delphi` recipient already in `.sops.yaml` — no new key, no rekey.
    Verified: `age-keygen -y ~/.config/sops/age/keys.txt` → `age1fg8xy2g…`, `sops -d`
    succeeds as `devji`. The one-time manual copy it replaced (frieren's identity) is gone.
-   Procedure and the general case: [`docs/sops-rekey.md`](../../../docs/sops-rekey.md).
+   Procedure and the general case: [`docs/sops-rekey.md`](../docs/sops-rekey.md).
 
 ## Phase 4 — cloud-side work no config can do
 

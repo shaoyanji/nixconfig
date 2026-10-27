@@ -171,7 +171,7 @@ Traps found while trying it, worth knowing before the next attempt:
 
 Everything declined on this host was declined with a number: the closure table and
 the four verdicts (bar, browser, secret service, display manager) are in
-[`docs/netbook-rice-port.md`](../../docs/netbook-rice-port.md).
+[`docs/netbook-rice-port.md`](../../../docs/netbook-rice-port.md).
 
 
 ### Staging a boot-chain change (the practiced path)

@@ -121,6 +121,31 @@ pool** (and written down here, not taken from an example), and `unicastPeers` on
 nodes. Until then failover is client-side: the appliance `gok` answers the same zone
 independently, so a second resolver in DHCP option 6 is the honest, working shape.
 
+### What the router hands out today (measured 2026-10-27)
+
+Option 6 carries `192.168.3.25` and `9.9.9.9`. The second entry is a public resolver,
+so a client that falls back keeps the internet and **loses the zone**: every
+`*.frieren.lan` name NXDOMAINs and the blocklists stop applying. Measured, not
+assumed:
+
+```
+$ task checks:dns:failover RESOLVERS="192.168.3.25 9.9.9.9"
+OK    192.168.3.25 answers hc3-check.frieren.lan -> 192.168.3.25
+FAIL  9.9.9.9 answered '<no answer>' for hc3-check.frieren.lan (expected 192.168.3.25)
+ERROR: resolvers did not answer the zone: 9.9.9.9        # exit 1
+```
+
+That is a trade, not an oversight — partial degradation beats no internet. It has a
+symptom worth recognising: a client that rotates between entries (`options rotate`,
+some Android stacks) fails `.lan` names *intermittently* while frieren is healthy, and
+ads appear only sometimes.
+
+A zone-aware second entry would be the `gok` appliance at `192.168.3.4`: blocky, the
+same zone, the same two lists. Two gaps before it is a real substitute — it does not
+carry the `eisen.lan` / `laya.lan` / `tts.lan` static records, and on 2026-10-27 it was
+**offline for ~10 h** while its declaration read as working. It also needs its address
+reserved rather than leased, or the router hands out a secondary that moves.
+
 frieren's own `192.168.3.25` is likewise a reservation rather than a Nix-static address
 (`networking.interfaces` is empty and `useDHCP` is true), which is why it is the only
 address the fleet hardcodes: it is the NAS and the subnet router, and every

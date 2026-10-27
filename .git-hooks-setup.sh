@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Setup script to configure git to use the custom hooks directory
 # Run once: bash .git-hooks-setup.sh
 

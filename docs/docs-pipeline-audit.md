@@ -193,10 +193,12 @@ evaluates": every change that touches a host was checked by diffing the
 | H12 | **FIXED** | `modules/services/fleet-sentinel-dashboard.html` installed by the collector; the 53-line heredoc and its `''${...}` escapes are gone. | `frieren` eval. |
 | H13 | **FIXED (new)** | `hosts/frieren/firewall-scope.nix` exposure registry now derives `immich`, `uptime-kuma`, `harmonia`, `kiwix` and `home-assistant` ports from their options. | Derived ports evaluate to the previous literals (2283 / 3001 / 5000 / 8088 / 8123) with identical per-interface TCP lists; `task checks:ports` passes. |
 
-Still open, deliberately: the hardware-configuration mount keys
-(`hosts/minyx/hardware-configuration.nix:32`, `hosts/poseidon/…:41`) keep a
-literal `/home/devji` — those files are generated boilerplate where the key *is*
-the mount path, and hand-editing them buys nothing the constant already gives.
+Still open, deliberately: the hardware-configuration mount keys keep a literal
+`/home/devji` where the path *is* the mount point. One survives —
+`hosts/poseidon/hardware-configuration.nix:39`, `fileSystems."/home/devji/.steamlib"`
+— and it is generated boilerplate where hand-substituting a constant buys nothing.
+(`hosts/minyx/hardware-configuration.nix` no longer carries one: the sd-image
+rewrite dropped the mount entirely.)
 
 ## 6.3 Cheap, low-risk fixes (in order)
 

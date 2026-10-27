@@ -195,10 +195,11 @@ def parse_commit_directives(msg, active_hosts, all_nix_hosts=None):
         requested = [h.strip() for h in match.group(1).split(",") if h.strip()]
         # `[ci all]` above stays active-only — a sweep must not brush dormant
         # configs. Naming a host is the opposite: it is a deliberate request, so
-        # it is honoured for any host the flake still builds, `wip` included.
-        # Filtering this to active_hosts silently discarded `[ci minyx]` (wip,
-        # aarch64) and fell through to the anchor host, so nothing ever warmed
-        # the Pi's closure.
+        # it is honoured for any host the flake still builds, `wip` and
+        # `ci = false` included. Filtering this to active_hosts silently discarded
+        # `[ci minyx]` (aarch64; then wip, now active with `ci = false` because its
+        # sdImage/kernel are not cachix artifacts) and fell through to the anchor
+        # host, so nothing ever warmed the Pi's closure.
         named = all_nix_hosts if all_nix_hosts else active_hosts
         valid = [h for h in requested if h in named]
         if valid:
@@ -307,11 +308,13 @@ def main():
 
     has_machines = len(targets) > 0
     # all_nix_hosts, not active_hosts: an explicitly NAMED host is a deliberate
-    # request and must reach a runner even when its status is wip/preserved. It was
-    # filtered to active_hosts here, so `[ci minyx]` (wip, aarch64) produced an
-    # empty matrix, exited green, and warmed nothing — the reason the Pi's closure
-    # never existed in any cache. The default sweep still selects from
-    # active_hosts (above); this only makes naming a host mean something.
+    # request and must reach a runner even when its status is wip/preserved or its
+    # `ci = false`. It was filtered to active_hosts here, so `[ci minyx]` (aarch64)
+    # produced an empty matrix, exited green, and warmed nothing — the reason the
+    # Pi's closure never existed in any cache. The default sweep still selects from
+    # active_hosts minus ci_excluded (above); this only makes naming a host mean
+    # something, so delphi's keeper stays the routine path and a runner remains
+    # available when the whole aarch64 closure has to be rebuilt.
     matrix_include = [all_nix_hosts[h] for h in targets if h in all_nix_hosts]
     matrix = {"include": matrix_include}
 

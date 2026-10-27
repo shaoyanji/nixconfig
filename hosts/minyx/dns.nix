@@ -1,7 +1,6 @@
-# minyx — DNS failover for the *.frieren.lan zone: blocky answers the zone from
-# local records, keepalived floats the VIP at priority 1 so it can only take over
-# from a dead primary. Preconditions (reserved addresses, narrowed pool) and the
-# takeover test: docs/dns-failover.md.
+# minyx — DNS failover for *.frieren.lan: blocky answers the zone, keepalived
+# floats the VIP at priority 1 so it can only take over from a dead primary.
+# Preconditions (reserved addresses, narrowed pool) and test: docs/dns-failover.md.
 {lib, ...}: {
   imports = [../../modules/net/dns/failover.nix];
 
@@ -51,11 +50,18 @@
 
   # A pathological blocklist must not take down the node whose address clients
   # were told to use when the primary is already gone.
-  systemd.services.blocky.serviceConfig = {
-    MemoryMax = "256M";
-    # nixpkgs sets `on-failure`; a resolver that exits cleanly still stopped
-    # answering, so it restarts either way.
-    Restart = lib.mkForce "always";
+  systemd.services.blocky = {
+    # Class declared, not implied — see hosts/frieren/dns.nix for the primary's
+    # marker on the same role. nixpkgs sets `on-failure`; a resolver that exits
+    # cleanly still stopped answering, so it comes back either way.
+    unitConfig = {
+      X-Fleet-Role = "daemon";
+      StartLimitIntervalSec = 0;
+    };
+    serviceConfig = {
+      MemoryMax = "256M";
+      Restart = lib.mkForce "always";
+    };
   };
 
   # Gap, by backend design: blocky has no dnsmasq-style conditional forward, so the

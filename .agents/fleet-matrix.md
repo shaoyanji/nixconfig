@@ -5,10 +5,9 @@
 
 ## Fleet Status Breakdown
 
-- **Active Production Nix Hosts (11)**: `frieren`, `poseidon`, `eisen`, `stark`, `fern`, `scratch`, `netbook`, `guckloch`, `kellerbench`, `kali`, `moto`
-- **Active External Non-Nix Hosts (3)**: `serv00`, `dragoncourt`, `envs`
-- **Work-in-Progress Hosts (1)**: `delphi` (OCI A1 bastion - NOT yet live)
-- **Preserved Architecture Patterns (16)**: `aceofspades`, `alarm`, `ancientace`, `applevalley`, `ares`, `aristotle`, `cassini`, `deckstation`, `demo`, `garnixMachine`, `minyx`, `mtfuji`, `penguin`, `schneeeule`, `sledgehammer`, `testvm`
+- **Active Production Nix Hosts (13)**: `aristotle`, `delphi`, `eisen`, `fern`, `frieren`, `guckloch`, `kali`, `kellerbench`, `minyx`, `netbook`, `poseidon`, `scratch`, `stark`
+- **Active External Non-Nix Hosts (7)**: `bitlockerpremium`, `burgernas`, `dragoncourt`, `envs`, `gok`, `moto`, `serv00`
+- **Preserved Architecture Patterns (15)**: `aceofspades`, `alarm`, `ancientace`, `applevalley`, `ares`, `cassini`, `deckstation`, `demo`, `frieren-canary`, `garnixMachine`, `mtfuji`, `penguin`, `schneeeule`, `sledgehammer`, `testvm`
 
 ---
 
@@ -31,8 +30,8 @@
 - **Strict Warning**: NON-NIX. NEVER run `nixos-rebuild`, `nix`, or NixOS commands.
 - **Serv00 Quota**: Strict 512 MB RAM limit. Violators killed by FreeBSD kernel. Manage via Devil CLI.
 
-### 5. Work in Progress (`delphi`)
-- **Status**: WIP / Not Live. Do not assume active production services until deployed.
+### 5. Cross-Architecture Builds (`minyx`)
+- **Builder**: `minyx` → `delphi`. Built there and substituted here; a host with a declared builder is not a CI target.
 
 ---
 
@@ -63,7 +62,7 @@
 | 🟢 **`guckloch`** | `active` | Yes | `x86_64-linux` | `wsl2-container` | Host CPU, WSL2 Dynamic Allocation | Windows Subsystem for Linux (WSL2) Container |
 | 🟢 **`kali`** | `active` | Yes | `aarch64-linux` | `specialized-cli` | ARM64, 2 to 4 GB, Adreno / VideoCore | Mobile Offensive Security Starter Pack |
 | 🟢 **`kellerbench`** | `active` | Yes | `x86_64-linux` | `kiosk-gaming` | Intel 64-bit multi-core, 8 GiB, NVIDIA GeForce GTX 750 Ti | Headless GameStream & Benchmark Rig |
-| ⚪ **`minyx`** | `preserved` | Yes | `aarch64-linux` | `strictly-constrained-1gb` | Broadcom BCM2837, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV | Raspberry Pi 3 Model B Tunnel & Jump Box |
+| 🟢 **`minyx`** | `active` | Yes | `aarch64-linux` | `strictly-constrained-1gb` | Broadcom BCM2837, 1 GiB LPDDR2 SDRAM, Broadcom VideoCore IV | Raspberry Pi 3 Model B Tunnel & Jump Box |
 | 🟢 **`moto`** | `active` | No (Ext) | `aarch64-linux` | `mobile-termux` | Unisoc T760 / Snapdragon, 4 to 8 GB RAM, Mali-G57 | Primary Mobile Smartphone (Android/Termux) |
 | ⚪ **`mtfuji`** | `preserved` | Yes | `x86_64-linux` | `container-compute` | AMD Ryzen 64-bit, 16 GiB DDR4 | Headless Container & AI Inference Host |
 | 🟢 **`netbook`** | `active` | Yes | `x86_64-linux` | `strictly-constrained-cpu` | Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400 | Alice's Travel Netbook (Fleet nixpkgs, Scripted Initrd) |

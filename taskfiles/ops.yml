@@ -142,8 +142,13 @@ tasks:
       and printed as WARN. Cheap; safe in CI. `--builders ""` is deliberate: a
       gate must not spend remote build budget (a trivial runCommand still
       dispatched to nixbuild.net on 2026-10-19).
+    vars:
+      # Per-system attrs, resolved from the running system so the gate also runs on
+      # the fleet's aarch64 hosts (see `checks:quick`).
+      SYSTEM:
+        sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
-      - nix build -L --no-link --builders "" .#checks.x86_64-linux."skills-schema" .#checks.x86_64-linux."skills-task-mirror"
+      - nix build -L --no-link --builders "" .#checks.{{.SYSTEM}}."skills-schema" .#checks.{{.SYSTEM}}."skills-task-mirror"
 
   ops:skills:tags:
     desc: Print the skill tag cloud

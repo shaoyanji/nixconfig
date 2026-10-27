@@ -99,7 +99,8 @@ flake.nix → flake/outputs.nix (the one assembly node)
 | `globalModulesNixos`             | global + nixos + home-manager-shared + sops + nix-index + dms + dank-greeter (desktop) | poseidon, aristotle, aceofspades, ancientace, eisen, frieren, scratch, stark, fern |
 | `globalModulesImpermanence`      | globalModulesNixos + impermanence + disko                                              | schneeeule                                                                         |
 | containers + impermanence (ares) | globalModulesContainers + impermanence + disko                                         | ares (Steam kiosk)                                                                 |
-| `globalModulesContainers`        | global + noDE + sops + home-manager + nix-index (no dms/niri desktop)                  | mtfuji, kellerbench, applevalley, minyx, sledgehammer, guckloch (WSL), deckstation |
+| `globalModulesContainers`        | global + noDE + sops + home-manager + nix-index (no dms/niri desktop)                  | mtfuji, kellerbench, applevalley, sledgehammer, guckloch (WSL), deckstation        |
+| own chain (see `flake/host-inventory.nix`) | global + determinate-nix + sops + `raspberry-pi-3` — no noDE, so no Home Manager | minyx |
 | `globalModulesMacos`             | global + macos + nix-homebrew + home-manager + sops                                    | cassini (darwin)                                                                   |
 | `globalModulesDemo`              | global + demo + home-manager (no sops)                                                 | demo (NixOS demo VM)                                                               |
 | `globalModulesHome`              | standalone HM sharedModules + allowUnfree                                              | penguin, alarm, kali (standalone home-manager)                                     |
@@ -108,10 +109,9 @@ flake.nix → flake/outputs.nix (the one assembly node)
 
 > **No table here — by design.** The fleet registry has exactly one home:
 > [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
-> with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the
-> generated catalog in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`).
-> A pasted table is a table that disagrees with itself within a month —
-> `.agents/SCHEMA.md` §1, and `docs/docs-pipeline-audit.md` F4.
+> with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the catalog
+> in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`). A pasted
+> table disagrees with itself within a month — `.agents/SCHEMA.md` §1, `docs/docs-pipeline-audit.md` F4.
 
 ### Module Layout
 

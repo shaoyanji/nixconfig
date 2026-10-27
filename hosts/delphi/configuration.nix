@@ -242,6 +242,7 @@ in {
     ./gok-artifacts.nix
     ./hardware-configuration.nix
     ./infra-stack.nix
+    ./minyx-keeper.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/firewall-baseline.nix
     ../../modules/profiles/hermes.nix

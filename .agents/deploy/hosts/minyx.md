@@ -4,8 +4,25 @@ Deployment is a **closure push**, not a flash. The host is built on delphi (the
 fleet's only aarch64 builder) and activated over ssh on the running system; no
 sdImage is built for it any more. The device's own FAT partition already boots
 U-Boot, which reads `/boot/extlinux/extlinux.conf` from the root filesystem — the
-file a switch writes. This host is not on `infra:deploy` or the sweeps (inventory
-`status = "preserved"`), so the commands below are the deploy path.
+file a switch writes. Inventory says `status = "active"` since 2026-10-27, but the
+fleet's own activate path still does not fit it — see the ownership section below.
+
+## Built by delphi (ownership)
+
+`inventory.toml` declares `builder = "delphi"` and `managed = true` for this host,
+and the declaration is enforced rather than decorative:
+
+- `scripts/task/minyx-keeper.sh` refuses to run where it is not the declared
+  builder, so a copy of the checkout on another host cannot quietly deploy this one.
+- delphi runs it from `minyx-keeper.timer` — 06:15 daily, `Persistent = true`, after
+  frieren's 04:00 window: fetch `origin/main`, compare with
+  `/var/lib/minyx-keeper/deployed-rev`, and do nothing when they match. A change
+  builds on delphi with `--builders ""`, pushes over the LAN, then requires `blocky`
+  and `keepalived` active and the zone to answer.
+- `task infra:minyx:keep` runs the same script by hand; `DRY=1` reports only.
+
+Why delphi and not the board: a `nix-shell -p` on a 1 GiB single-core Pi is slower
+than the closure copy over the LAN, and the x86 hosts cannot build aarch64 at all.
 
 ## Push topology — the canonical deploy
 
@@ -34,9 +51,10 @@ nixos-rebuild switch -L --builders "" --flake .#minyx \
 - **Nothing goes through frieren or harmonia.** The copy is delphi → minyx over the
   LAN route. Harmonia is an x86 store: an aarch64 closure parked there is dead
   weight that `nix store optimise` would then churn for no benefit.
-- **`infra:deploy`/`infra:apply` do not reach this host.** Inventory says
-  `status = "preserved"` (warn + exit 0), and `activate-host.sh` pulls from
-  harmonia — the wrong arch path. The push above *is* the deploy.
+- **`infra:deploy`/`infra:apply` are still the wrong path for this host.** It is
+  active now, so they no longer refuse — which is worse: `activate-host.sh` pulls
+  from harmonia, an x86 store, and expects a builder to have put an aarch64 closure
+  there. Use the push above, or `task infra:minyx:keep`.
 - **Exception: after `nix flake update`.** A nixpkgs bump turns most of the aarch64
   closure into new derivations, which 2 OCPU / 11 GiB cannot absorb on its own.
   Attach remote builders for that one push (nixbuild.net — budgeted, 25
@@ -61,10 +79,10 @@ took the LAN down:
 
 | Precondition | Why | Check |
 | :--- | :--- | :--- |
-| **5 V/2.5 A supply** | `vcgencmd get_throttled = 0x50000` on the interim boot: under-voltage and throttling have happened. A failover that browns out is worse than none | `vcgencmd get_throttled` on the board |
+| **5 V/2.5 A supply** | **Failing, and it is the one thing software cannot fix.** `dmesg` on the board alternates `Undervoltage detected!` with `Voltage normalised` continuously — 765 events in the 2026-10-27 boot alone. A failover that browns out mid-outage is worse than none, and a flapping supply on a no-TRIM stick also rewrites live data | `sudo dmesg \| grep -ci undervoltage` (`vcgencmd` is not in this closure) |
 | **the role link reserved** | `unicastPeers` on frieren hardcodes this address, so a new lease silently points the group at nothing. Reservations are **per MAC** and this board has two (wifi + USB ethernet), so reserving one link does not cover the other | router admin page |
 | **`.50` outside the pool** | the VIP has no MAC to reserve, so only the pool's bounds protect it. `.53` failed exactly here: the router was already leasing it to this board | `task checks:dns:pool POOL=<start>-<end>` → exit 0 |
-| **clean install on the card** | the preserved note's condition: the current boot is an interim one | `nixos-version`, `/boot/extlinux/extlinux.conf` |
+| **clean install on the card** | **Met.** The board runs the fleet's own NixOS (`26.11.20261016`), not the interim image the preserved note was waiting to replace | `nixos-version` |
 
 Then the push (from delphi, aarch64 → aarch64, no emulation):
 
@@ -107,7 +125,7 @@ Before any push to this host, compare the declared label with the target's:
 
 ```bash
 nix eval --raw .#nixosConfigurations.minyx.config.sdImage.rootVolumeLabel
-ssh devji@192.168.3.9 'sudo blkid -p /dev/sda2 | grep -o "LABEL=\"[^\"]*\""'
+ssh devji@192.168.3.3 'sudo blkid -p /dev/sda2 | grep -o "LABEL=\"[^\"]*\""'
 ```
 
 The declaration now matches the flashed media (`NIXOS_SD`), so relabelling the
@@ -116,7 +134,7 @@ fix if the two ever diverge again.
 
 ## Verified state (2026-10-27, after a reboot that came back unattended)
 
-- **sops is enrolled and decrypting.** `custompi.nix` declares `defaultSopsFile`,
+- **sops is enrolled and decrypting.** `configuration.nix` declares `defaultSopsFile`,
   `age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"]` and the `github-token`
   secret (`key = "ghsudo"`, owner `devji`). The host's own tooling names the
   identity it derived — *Imported /etc/ssh/ssh_host_ed25519_key as age key with
@@ -128,15 +146,15 @@ fix if the two ever diverge again.
   Permission denied (publickey,keyboard-interactive)` after a successful build.
   devji's `~/.ssh` on delphi carries the CA cert; `--use-remote-sudo` elevates on
   the target only.
-- **Tailscale is still logged out** — the one piece not done. It needs a tailnet
-  auth key (a sops slot + `services.tailscale.authKeyFile`, or a one-off
-  `sudo tailscale up --authkey=…`, which survives reboot: `/var/lib/tailscale` is
-  on the card and this host has no impermanence).
+- **Tailscale is enrolled** (verified 2026-10-27: `tailscale status` on the board
+  reports `minyx 100.64.159.82`, and `tailscale0` is up). The node key lives in
+  `/var/lib/tailscale` on the card and this host has no impermanence, so it
+  survives a reboot.
 - **Disk after GC: 2.2 GB of 15 GB** (`nix-env --delete-generations old` +
   `nix-collect-garbage -d` freed 752 paths / 2.3 GiB; the stock generation and the
   superseded initrd are gone, and `switch-to-configuration boot` pruned
   `/boot/nixos`).
-- **Wireless is declarative** (`custompi.nix`): NetworkManager with
+- **Wireless is declarative** (`configuration.nix`): NetworkManager with
   `ensureProfiles.environmentFiles` pointed at the sops template that renders the
   fleet SSID and PSK — the same `gokrazy/gok/wifi_ssid` and `wifi_psk` entries the
   gok appliance uses. Verified on the box: `wlan0` connected to the sops SSID with a
@@ -153,7 +171,7 @@ fix if the two ever diverge again.
   is built — the eval gate cannot see it.
 
 - **Every client terminal works, and none of them is pinned.** kitty / foot /
-  alacritty reach this box as three different `TERM`s, so `custompi.nix` sets
+  alacritty reach this box as three different `TERM`s, so `configuration.nix` sets
   `environment.enableAllTerminfo = true` instead of base-node's
   `TERM=xterm-256color`. Verified after the 2026-10-27 push: `xterm-kitty`,
   `foot`, `alacritty` and `ghostty` entries present under
@@ -162,13 +180,26 @@ fix if the two ever diverge again.
 - **Channels are gone, not just disabled.** The stock image's
   `/root/.nix-defexpr/channels` and `/nix/var/nix/profiles/per-user/root/channels`
   made every activation warn (NixOS/nix#9574: Nix may still read them when
-  `NIX_PATH` is unset). `systemd.tmpfiles.rules` in `custompi.nix` removes both,
+  `NIX_PATH` is unset). `systemd.tmpfiles.rules` in `configuration.nix` removes both,
   plus the `channels-N-link` generations, so a reflash and re-push cannot bring a
   second nixpkgs back.
 
+## The medium (why the write policy exists)
+
+Measured on the candidate stick (SanDisk Cruzer, 2026-10-26): 16.9 MB/s read and
+`discard_max_bytes = 0` — **no TRIM at all**. Without it the controller cannot learn
+which blocks the filesystem freed, so GC churn rewrites live data instead of
+reclaiming dead writes, which is how a USB stick on a NixOS host dies early.
+
+`hosts/minyx/configuration.nix` therefore treats write volume as a policy rather
+than a tuning: the journal is volatile with a 32 MB cap, `/tmp` is tmpfs, dirty
+writeback is batched into fewer and larger bursts, and `fstrim` is off — a weekly
+trim against a device that reports no discard support is a request the controller
+drops.
+
 ## Image layout (the flash path, retired)
 
-Kept because it is the ownership map for anyone who goes back to flashing. It
+Kept because it is the ownership map for anyone who goes back to flashing.
 
 `hosts/minyx/hardware-configuration.nix` imports the **generic**
 `installer/sd-card/sd-image.nix`, not `sd-image-aarch64.nix`. The aarch64
@@ -188,7 +219,7 @@ Ownership of the two halves:
 
 `sd-image.nix` also forces `hardware.enableAllHardware = true`, which implies
 `enableRedistributableFirmware`: `linux-firmware` at 1.98 GB for a board with one
-Broadcom SDIO radio. `custompi.nix` forces it off and keeps the all-hardware
+Broadcom SDIO radio. `configuration.nix` forces it off and keeps the all-hardware
 kernel modules, which the initrd needs to find a root disk on USB.
 
 ## Measured
@@ -205,7 +236,7 @@ without              240 paths  0.85 GB      systemPackages 166 → 133
 - `python3` 147 MB was transitive — `git` was the largest referrer — and
   `gitMinimal` (34 paths / 0.19 GB) drops it.
 - `helix` is 297 MB on aarch64 against vim's 46 MB. Adding it is one line in
-  `custompi.nix` and a quarter of the image.
+  `configuration.nix` and a quarter of the image.
 - `binutils` is absent, so there is no `ld`: `pip install` of anything with C
   extensions cannot build on the box.
 
@@ -213,14 +244,16 @@ without              240 paths  0.85 GB      systemPackages 166 → 133
 
 - **The eval gate does not force option values.** `checks:host HOST=minyx
   MODE=eval` passes on a config with a duplicate option definition (it caught
-  nothing when `nix.gc.options` was defined in both `custompi.nix` and
+  nothing when `nix.gc.options` was defined in both `configuration.nix` and
   `modules/global/global.nix`), because a conflict is only detected when the
   value is read. A build, or a forced toplevel, is the only proof.
 - The host had no system account before this work — only a Home Manager user
   entry — so a preserved config was never loginable.
 - Anything that authenticates the host still has to be added deliberately: the
-  Tailscale auth key and the `github-token` `ghcs` reads are declared by no
-  module, and `.sops.yaml` has no minyx recipient, so a rekey is part of the fix.
+  Tailscale auth key and the `github-token` `ghcs` reads are declared by no module.
+  The sops side of that is now closed — `&minyxhost`
+  (`age155uxts5…`, derived from the board's own ssh host key) is a recipient in
+  both `.sops.yaml` files, so a fleet rekey covers this host.
 - **Resolve the device's own address before the reboot, not after.** hostname is
-  served by DHCP on `192.168.3.9`; a switch does not change the kernel hostname
+  served by DHCP on `192.168.3.3`; a switch does not change the kernel hostname
   (`hostname` still printed `nixos` while `/etc/hostname` said `minyx`).

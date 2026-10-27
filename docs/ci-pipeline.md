@@ -13,7 +13,7 @@ runner; the workflow dispatches one job per affected host.
 | :------------------------ | :--------------------------------------------------------------------- |
 | `arch`                    | runner OS: `x86_64-linux → ubuntu-latest`, `aarch64-linux → ubuntu-24.04-arm`, `aarch64-darwin → macos-latest` |
 | `kind`                    | flake attribute: `nixosConfigurations.*`, `darwinConfigurations.*`, `homeConfigurations.*` |
-| `ci = false`              | excluded (unfree NVIDIA on `stark`/`kellerbench`)                      |
+| `ci = false`              | excluded (unfree NVIDIA on `stark`/`kellerbench`; `minyx`, whose aarch64 closure is built on delphi instead) |
 | `status = "preserved"`    | excluded (dormant hosts are not check targets)                          |
 
 Path rules:

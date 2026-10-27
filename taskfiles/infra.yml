@@ -770,6 +770,21 @@ tasks:
       - task infra:apply:host:netbook
       - ssh root@netbook "hostname && nixos-version"
 
+  infra:minyx:keep:
+    desc: Bring minyx to main — build on delphi (its declared builder), push over the LAN, verify
+    summary: >
+      Runs the same script as delphi's `minyx-keeper.timer`, by hand instead of
+      waiting for 06:15. Fetches main, compares it with
+      /var/lib/minyx-keeper/deployed-rev, and does nothing when they match;
+      otherwise builds `.#minyx` on delphi with `--builders ""` (a keeper must not
+      spend nixbuild.net budget), pushes it, then requires blocky and keepalived
+      active and the zone to answer. Refuses where the host is not inventory's
+      declared `builder`; skips the 03:00-05:30 window. Exit 0 = current or
+      deployed, 1 = unreachable, wrong builder, or failed post-check. Vars: DRY=1,
+      TARGET=, HOST=, REPO=.
+    cmds:
+      - bash scripts/task/minyx-keeper.sh
+
   infra:deploy:host:*:
     desc: Deploy ONE intended host — gate, activate from the cache, then validate
     summary: >

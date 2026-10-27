@@ -85,7 +85,8 @@ by `checks:build:route` and satisfied by `infra:warm:host:<h>` on the builder.
 
 - `.#inventory` is the whole registry — `--json .#inventory` alone is fine
   (data only) but `.#nixosConfigurations` alone forces every host config.
-- `status = "preserved"` hosts may not evaluate at all (`minyx` has a
-  `boot.kernelPackages` conflict); do not treat "registered" as "buildable".
+- `status = "preserved"` hosts may not evaluate at all (`cassini` has a
+  `homeDirectory` conflict that predates this tree, and `checks:host` says so
+  loudly); do not treat "registered" as "buildable".
 - `--raw` on a numeric field prints digits but is not typed JSON; use `--json`
   when the value feeds a script.

@@ -29,8 +29,16 @@ tasks:
       Do not turn this into `nix flake check`: it forces every flake output (23
       configs) in one process — 6078 MiB peak, SIGKILL 137 on this host. Exit 0 =
       clean.
+    vars:
+      # These checks are per-system and the flake has them for aarch64-linux too,
+      # but the attribute was pinned to x86_64-linux — so on delphi (aarch64, the
+      # ARM64 build offloader) every one of them was a platform mismatch and this
+      # gate could not run at all. Resolved from the running system, per
+      # scripts/task/taskfile-graph.sh.
+      SYSTEM:
+        sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
-      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules .#checks.x86_64-linux.site-assets .#checks.x86_64-linux.policies .#checks.x86_64-linux.taskfile-graph .#checks.x86_64-linux.taskfile-graph-selftest .#checks.x86_64-linux.skills-task-mirror
+      - nix build --no-link --builders "" .#checks.{{.SYSTEM}}.inventory-schema .#checks.{{.SYSTEM}}.inventory-hosts .#checks.{{.SYSTEM}}.inventory-modules .#checks.{{.SYSTEM}}.site-assets .#checks.{{.SYSTEM}}.policies .#checks.{{.SYSTEM}}.taskfile-graph .#checks.{{.SYSTEM}}.taskfile-graph-selftest .#checks.{{.SYSTEM}}.skills-task-mirror
       - task checks:inventory:sync
       - task checks:repo:paths
       - task checks:docs:links
@@ -185,16 +193,15 @@ tasks:
   checks:host:
     desc: "[gate] Evaluate ONE host: module system + assertions + compiled inventory (HOST=name)"
     summary: >
-      Builds hostChecks.<arch>.<host>: ONE host per attribute — the module system
-      plus every assertion condition nixpkgs' toplevel asserts — so option
-      conflicts, bad values and policy violations fail without instantiating the
-      closure. Also proves the host compiles inventory.toml. The closure build is
-      CI's job; 23 at once is the SIGKILL above. Runs under oom-guard.sh (baseline-
-      relative), so pre-existing pressure cannot abort it. Vars: HOST= (required),
-      ARCH=, MODE=build|eval, STRICT=1, OFFLOAD=1. Exit 0 = passed, 1 = assertion
-      failed, 2 = watchdog abort.
+      Builds hostChecks.<arch>.<host>: ONE host per attribute — module system plus
+      every assertion nixpkgs' toplevel asserts — so option conflicts, bad values
+      and policy violations fail without instantiating the closure; it also proves
+      the host compiles inventory.toml. ARCH defaults to the host's own arch from
+      the compiled registry, so the gate runs wherever you are. Under oom-guard.sh;
+      the closure build is CI's job. Vars: HOST= (required), ARCH=, MODE=build|eval,
+      STRICT=1, OFFLOAD=1. Exit 0 = passed, 1 = assertion failed, 2 = watchdog abort.
     cmds:
-      - bash scripts/task/host-check-sweep.sh --hosts "{{.HOST}}" --mode {{.MODE | default "build"}} --arch {{.ARCH | default "x86_64-linux"}} --timeout {{.TIMEOUT | default "120"}}
+      - bash scripts/task/host-check-sweep.sh --hosts "{{.HOST}}" --mode {{.MODE | default "build"}} --arch "{{.ARCH}}" --timeout {{.TIMEOUT | default "120"}}
 
   checks:hosts:
     desc: "[gate] Evaluate a NAMED SET of hosts, ONE AT A TIME, under the OOM watchdog"
@@ -210,7 +217,7 @@ tasks:
       was not given, 2 = watchdog abort. Vars: HOSTS= (required), MODE=, ARCH=,
       TIMEOUT=.
     cmds:
-      - bash scripts/task/host-check-sweep.sh --hosts "{{.HOSTS}}" --mode {{.MODE | default "build"}} --arch {{.ARCH | default "x86_64-linux"}} --timeout {{.TIMEOUT | default "120"}}
+      - bash scripts/task/host-check-sweep.sh --hosts "{{.HOSTS}}" --mode {{.MODE | default "build"}} --arch "{{.ARCH}}" --timeout {{.TIMEOUT | default "120"}}
 
   checks:boot:
     desc: "[gate] Boot ONE host's real module graph in a VM; fail unless stage-2 is reached (HOST=name)"
@@ -324,8 +331,13 @@ tasks:
       than by evaluating hosts.
 
       Exit 0 = clean, 1 = drift.
+    vars:
+      # Per-system attrs, resolved from the running system so the gate also runs on
+      # the fleet's aarch64 hosts (see `checks:quick`).
+      SYSTEM:
+        sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
-      - nix build --no-link --builders "" .#checks.x86_64-linux.inventory-schema .#checks.x86_64-linux.inventory-hosts .#checks.x86_64-linux.inventory-modules
+      - nix build --no-link --builders "" .#checks.{{.SYSTEM}}.inventory-schema .#checks.{{.SYSTEM}}.inventory-hosts .#checks.{{.SYSTEM}}.inventory-modules
 
   checks:ports:
     desc: Diff frieren's declared firewall surface against its live listeners
@@ -418,17 +430,14 @@ tasks:
   checks:dns:failover:
     desc: Verify the DNS resolver group answers the wildcard zone and can fail over (HC-3)
     summary: >
-      Reads profiles.dnsFailover from HOST (default frieren) — so the check cannot
-      drift from the declaration — digs the wildcard zone at every resolver in the
-      group, and probes a declared VRRP VIP for two answering MACs (split brain).
-
-      Redundancy is counted two ways: >=2 literal resolvers (client-side failover),
-      or one declared VRRP VIP that answers the zone and is owned by exactly one MAC
-      (two owners = split brain). Exit 2 means neither holds, i.e. one member and no
-      probed VIP — that proves the primary answers, not that failover works. Exit 1
-      is a real failure. Probes a subdomain (NAME=, default hc3-check.<zone>), not
-      the apex — the apex can carry a local override. Vars: HOST=, RESOLVERS=, NAME=,
-      EXPECT=, VIP=, IFACE=.
+      Reads profiles.dnsFailover from HOST (default frieren) — so it cannot drift
+      from the declaration — digs the wildcard zone at every resolver, and probes a
+      declared VIP for two answering MACs (split brain). Redundancy is either >=2
+      literal resolvers, or one VIP owned by exactly one MAC. Exit 0 = redundant,
+      1 = a resolver did not answer or the VIP had two owners, 2 = one member and no
+      probed VIP: the primary answers, failover is unproven. Probes a subdomain
+      (NAME=, default hc3-check.<zone>), not the apex, which carries an override.
+      Vars: HOST=, RESOLVERS=, NAME=, EXPECT=, VIP=, IFACE=.
     cmds:
       - HOST={{.HOST | default "frieren"}} RESOLVERS="{{.RESOLVERS | default ""}}" NAME="{{.NAME | default ""}}" IFACE={{.IFACE | default ""}} bash scripts/task/dns-failover-check.sh
 

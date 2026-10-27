@@ -93,6 +93,10 @@
       # replaces the prose note that used to carry the same fact.
       flake = bool true;
       managed = bool false;
+      # Host (by hostname) allowed to build and deploy this one. Declared because
+      # a cross-architecture host has exactly one builder in this fleet, and the
+      # keeper refuses to run where it is not the declared one.
+      builder = str "";
       ci = bool true;
       # Declared only where it adds information; `derived.isNix` is the truth
       # and any declared value must AGREE with it or it is reported in `issues`.
@@ -217,7 +221,7 @@
     (lib.mapAttrsToList
       (key: expected:
         lib.optional (metadata.${key} != expected)
-        "metadata.${key} declares ${toString metadata.${key}} but inventory.toml now derives ${toString expected}; run `task dev:inventory:sync`")
+        "metadata.${key} declares ${toString metadata.${key}} but inventory.toml now derives ${toString expected}; run `task dev:inventory:counts`")
       declaredCounts)
     (lib.mapAttrsToList
       (name: host:

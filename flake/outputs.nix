@@ -148,6 +148,11 @@ in {
     inherit lib systems pkgsFor self;
   };
 
+  # `nix fmt` = the repo's canonical formatter, so the tool is reachable through
+  # the flake instead of only through the task script that wraps it. alejandra,
+  # never nixpkgs-fmt: the latter would rewrite ~170 of the 187 tracked files.
+  formatter = lib.genAttrs systems.work (system: (pkgsFor system).alejandra);
+
   # --- the three host assemblers --------------------------------------------
   # One per kind, because the kind decides the assembler: nixpkgs.nixosSystem,
   # nix-darwin's darwinSystem, and a standalone home-manager configuration that

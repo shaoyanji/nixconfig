@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Pre-commit hook: Nix lint/format gate + knowledge-graph gate.
 #
 # The Nix checks live in scripts/task/nix-fmt.sh — the SAME script behind

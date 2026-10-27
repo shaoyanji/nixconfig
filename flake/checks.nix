@@ -249,6 +249,31 @@ lib.genAttrs systems.work (
             touch $out
           '';
 
+      # --- the eval-time cache list is a copy of the registry ---------------
+      # flake.nix must write nixConfig as literals (Determinate's reader rejects
+      # thunks there), so the addresses exist twice by necessity. This gate is
+      # what keeps the copy honest: it compares the flake's nixConfig against
+      # lib/cache-registry.nix in both directions and throws on any difference.
+      # `import ../flake.nix` reads only the `.nixConfig` attribute — the
+      # `outputs` function is never applied — so it does not recurse into this
+      # file.
+      cache-registry = let
+        flakeCache = (import ../flake.nix).nixConfig;
+        registryCache = import ../lib/cache-registry.nix;
+        expectedUrls = map (n: registryCache.caches.${n}.url) registryCache.evalOrder;
+        expectedKeys = builtins.filter (k: k != null) (map (n: registryCache.caches.${n}.key) registryCache.evalOrder);
+        drift =
+          lib.subtractLists expectedUrls flakeCache.extra-substituters
+          ++ lib.subtractLists flakeCache.extra-substituters expectedUrls
+          ++ lib.subtractLists expectedKeys flakeCache.extra-trusted-public-keys
+          ++ lib.subtractLists flakeCache.extra-trusted-public-keys expectedKeys;
+      in
+        assert drift == [] || throw "flake.nix nixConfig and lib/cache-registry.nix disagree: ${builtins.toString drift}";
+          pkgs.runCommand "cache-registry" {} ''
+            echo "flake.nix nixConfig matches lib/cache-registry.nix (${toString (builtins.length expectedUrls)} substituters, ${toString (builtins.length expectedKeys)} keys)"
+            touch $out
+          '';
+
       # --- registry and flake outputs agree, both directions ----------------
       inventory-hosts = assert (coverage.missing == []) || throw "inventory.toml declares flake hosts the flake does not build: ${builtins.toString coverage.missing}";
       assert (coverage.unregistered == []) || throw "the flake builds hosts missing from inventory.toml: ${builtins.toString coverage.unregistered}";

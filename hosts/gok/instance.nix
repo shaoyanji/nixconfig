@@ -1,9 +1,7 @@
 # The gok appliance, declared. `scripts/task/gok.sh` renders this module into the
 # instance's config.json and then fills the credential slots from sops; nothing
 # here is a secret, and no credential belongs in this file.
-{
-  ...
-}: {
+{...}: {
   services.gokrazy.instances.gok = {
     # DHCP name and the address `gok update` resolves.
     hostname = "gok.cloudforest-kardashev.ts.net";
@@ -34,8 +32,7 @@
       # randomd writes /etc/machine-id at first boot. A fixed value here keeps
       # the appliance's identity stable across reflashes, which is what makes
       # its tailscale node and metrics series the same node.
-      "github.com/gokrazy/gokrazy/cmd/randomd".extraFileContents."/etc/machine-id" =
-        "3e8de745bc7c4cf89cd363e11d9a7718\n";
+      "github.com/gokrazy/gokrazy/cmd/randomd".extraFileContents."/etc/machine-id" = "3e8de745bc7c4cf89cd363e11d9a7718\n";
 
       # node_exporter, reachable on the LAN/tailnet as :9100.
       "github.com/prometheus/node_exporter".commandLineFlags = ["--web.listen-address=:9100"];

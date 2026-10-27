@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Pre-commit hook: Check for broken absolute paths in documentation
 # Usage: Place in .githooks/check-docs.sh and run via: git config core.hooksPath .githooks
 

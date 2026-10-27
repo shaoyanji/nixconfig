@@ -52,30 +52,28 @@ profiles.dnsFailover = {
 
 **The second member is minyx** (`hosts/minyx/dns.nix`): `role = "secondary"`,
 `backend = "blocky"`, priority 1. It was declared, withdrawn and reinstated on
-2026-10-27 — the withdrawal is the useful part of the story (*The 2026-10-27 outage*
-below), and the reinstatement is gated on the address rules in *Choosing the VIP*.
+2026-10-27 (*The 2026-10-27 outage*, below); bringing it back is gated on the address
+rules in *Choosing the VIP*.
 
 The reason for the backend split is weight, not preference: minyx is a 1 GiB Pi 3B
 whose root is a USB stick with no TRIM, so pihole-ftl's query database and unbound's
 recursion are the wrong shape for a node whose only job is to answer while frieren is
 gone.
 
-The backend is a host property, not a preference. `pihole` keeps the unbound +
+The backend is a host property. `pihole` keeps the unbound +
 FTL stack above; `blocky` is a single process that answers the same zone from
 local records (`customDNS.mapping`, apex and wildcard) and blocks the same two
 lists. Both are rendered from the same `zone` / `zoneAddress` / `customRecords`
 inputs, so the two nodes cannot answer a fleet name differently.
 
-What blocky cannot do is dnsmasq's conditional forward (`server=/domain/…`). The
-tailnet zone and `gok` resolve through frieren only — the same shape of gap delphi's
-crab-hole has, and documented here so it is not discovered during an outage. A
-blocky node would still cover what LAN clients actually use: `*.frieren.lan` and the
-static `eisen.lan` / `laya.lan` / `tts.lan` records.
+What blocky cannot do is dnsmasq's conditional forward (`server=/domain/…`), so the
+tailnet zone and `gok` resolve through frieren only. A blocky node still covers what
+LAN clients use: `*.frieren.lan` and the static `eisen.lan` / `laya.lan` / `tts.lan`
+records.
 
-The backend lives on in the module, tested (config validated by `blocky --config …
-validate`, and the rendered YAML served the zone, the custom records and the two
-blocklists on a spare port); no host declares it until there is a node to declare it
-on.
+The `blocky` path was validated before it had a host: `blocky --config … validate`
+accepted the rendered YAML, and that config served the zone, the custom records and
+the two blocklists on a spare port. minyx declares it now (*Current state*).
 
 fern briefly ran the same stack as `role = "secondary"`; `8bd17500` (2026-10-15)
 removed pihole-ftl, unbound and dns-failover from it, so a roaming laptop stops
@@ -107,8 +105,6 @@ autoUpgrade took the LAN's DNS down. Each mistake is a check now, not a note:
   `extraCommands`), which is rebuilt each start and cannot half-delete itself.
 
 A VIP buys one address, configured once on the router, that survives losing a node.
-It is not `.25`: every `*.frieren.lan` record points there, so floating it would drag
-the NAS along.
 
 ### Choosing the VIP
 
@@ -163,9 +159,7 @@ records, needs its address reserved rather than leased, and was offline for ~10 
 
 frieren's `.25` is a DHCP reservation on `enp1s0`'s MAC, not a Nix-static address,
 which is why it is the one address the fleet hardcodes: the NAS, the subnet router
-and the target of every `*.frieren.lan` record. A reservation binds one MAC and this
-board has two links, so whichever link carries a role needs its own reservation —
-that is the address `unicastPeers` names.
+and the target of every `*.frieren.lan` record.
 
 ## Bringing up a secondary
 

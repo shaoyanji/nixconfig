@@ -1,3 +1,4 @@
+# Desktop client layer: base-node plus fuse/kbfs and the user services a graphical host runs.
 {
   pkgs,
   lib,

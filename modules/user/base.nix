@@ -1,3 +1,4 @@
+# The user environment: packages, shell integration and XDG files shared by every HM host.
 {
   pkgs,
   lib,

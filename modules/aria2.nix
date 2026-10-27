@@ -1,3 +1,4 @@
+# aria2 downloader as an opt-in user service, with its config directory and RPC defaults.
 {
   pkgs,
   lib,

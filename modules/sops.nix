@@ -1,3 +1,4 @@
+# User-session secrets via sops-nix: the default file, the age identity and each secret's path.
 {
   config,
   lib,

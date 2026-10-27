@@ -1,3 +1,4 @@
+# A standalone flake for the docker builder shell; the root flake does not import it.
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";

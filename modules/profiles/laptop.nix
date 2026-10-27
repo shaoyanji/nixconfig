@@ -1,3 +1,4 @@
+# Laptop profile: libinput, auto-cpufreq and the power services a portable host needs.
 _: {
   services = {
     libinput.enable = true;

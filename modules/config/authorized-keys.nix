@@ -1,3 +1,4 @@
+# The fleet's authorized SSH keys: one option, filled from the shared keys list.
 {lib, ...}: let
   # The fleet's one key list. Most keys come from the gist named in
   # authorized-keys.json; the literals below cover machines that are not in it.

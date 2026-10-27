@@ -1,3 +1,4 @@
+# `services.simplex-smp-server`: SimpleX SMP relay under systemd, TLS from the proxy.
 {
   config,
   lib,

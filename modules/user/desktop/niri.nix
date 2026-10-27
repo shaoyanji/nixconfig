@@ -1,3 +1,4 @@
+# niri: compositor package, keybinds, portals and the spawn targets (kitty, fuzzel).
 {
   pkgs,
   config,

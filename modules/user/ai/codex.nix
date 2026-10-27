@@ -1,3 +1,4 @@
+# `ai.codex`: the Codex CLI and its config.
 {
   config,
   lib,

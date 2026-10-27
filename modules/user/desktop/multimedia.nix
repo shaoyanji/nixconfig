@@ -1,3 +1,4 @@
+# `profiles.graphics`: codecs, GPU media bits and the players a desktop needs.
 {
   config,
   osConfig ? {},

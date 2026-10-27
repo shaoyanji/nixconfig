@@ -1,3 +1,4 @@
+# The shell baseline: aliases and the bash+tmux layer every host gets before zsh/nu.
 {pkgs, ...}: let
   myAliases = {
     l = "${pkgs.eza}/bin/eza -lahF --color=auto --icons --sort=size --group-directories-first";

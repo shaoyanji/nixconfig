@@ -1,3 +1,4 @@
+# Steam: package, gamemode and the 32-bit graphics/audio a game session needs.
 {
   pkgs,
   lib,

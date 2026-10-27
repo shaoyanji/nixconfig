@@ -1,3 +1,4 @@
+# `role:demo`: the throwaway NixOS VM — niri and foot, no sops, nothing fleet-owned.
 {
   pkgs,
   lib,

@@ -1,3 +1,4 @@
+# `profiles.dev`: the development toolset a host opts into.
 {
   lib,
   pkgs,

@@ -1,3 +1,4 @@
+# What survives a reboot on an impermanent host: the home paths kept under /persist.
 _: {
   # Note: home-manager settings (useGlobalPkgs, sharedModules, etc.) are
   # provided by globalModulesNixos → nixos.nix.  This module only adds

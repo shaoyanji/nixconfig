@@ -1,3 +1,4 @@
+# starship: one prompt config for every shell the fleet runs.
 {lib, ...}: {
   programs.starship = {
     enable = true;

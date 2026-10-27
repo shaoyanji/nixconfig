@@ -1,3 +1,4 @@
+# Out-of-store home symlinks, so editors and Obsidian see the NAS copies of notes and projects.
 {
   lib,
   pkgs,

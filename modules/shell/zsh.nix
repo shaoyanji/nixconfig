@@ -1,3 +1,4 @@
+# zsh: completion, history and the prompt hook for interactive sessions.
 {pkgs, ...}: {
   programs = {
     zsh = {

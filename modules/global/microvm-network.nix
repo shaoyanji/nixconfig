@@ -1,3 +1,4 @@
+# `microvm` network options shared by every guest (address, gateway, interface).
 {
   config,
   lib,

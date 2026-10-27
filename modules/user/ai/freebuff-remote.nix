@@ -1,3 +1,4 @@
+# `programs.freebuff-remote`: run Freebuff on a remote host in a local terminal window.
 {
   pkgs,
   lib,

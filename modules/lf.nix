@@ -1,3 +1,4 @@
+# lf file manager: icons, previews and the kitty-image preview helper.
 {pkgs, ...}: {
   # pkgs.fetchurl, not builtins.fetchurl: the builtin fetches during EVAL, so
   # every host whose store lacks this path needs GitHub to evaluate its config,

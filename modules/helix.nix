@@ -1,3 +1,4 @@
+# Helix: package, language servers and the config the fleet standardises on.
 {pkgs, ...}: {
   home.packages = with pkgs; [
     dprint

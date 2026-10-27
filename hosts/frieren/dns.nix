@@ -149,6 +149,10 @@
   # so a crash recovers itself instead of waiting for a human to notice.
   systemd.services.pihole-ftl = {
     after = ["tailscaled.service"];
+    unitConfig = {
+      X-Fleet-Role = "daemon";
+      StartLimitIntervalSec = 0;
+    };
     serviceConfig.Restart = lib.mkDefault "always";
   };
 
@@ -164,9 +168,11 @@
       message = "dns: services.pihole-ftl.enable requires the dns-resolver-watchdog unit — an unattended resolver has to notice its own death.";
     }
     {
-      assertion = builtins.any (
-        l: builtins.match "server=.*cloudforest-kardashev\\.ts\\.net.*" l != null
-      ) config.profiles.dnsFailover.extraDnsmasqLines;
+      assertion =
+        builtins.any (
+          l: builtins.match "server=.*cloudforest-kardashev\\.ts\\.net.*" l != null
+        )
+        config.profiles.dnsFailover.extraDnsmasqLines;
       message = "dns: extraDnsmasqLines must forward the tailnet zone to MagicDNS (server=/cloudforest-kardashev.ts.net/100.100.100.100), or tailnet FQDNs resolve nowhere on the LAN.";
     }
   ];
@@ -187,6 +193,10 @@
     ];
     wants = ["pihole-ftl.service"];
     restartIfChanged = false;
+    unitConfig = {
+      X-Fleet-Role = "daemon";
+      StartLimitIntervalSec = 0;
+    };
     serviceConfig = {
       Type = "simple";
       Restart = "always";

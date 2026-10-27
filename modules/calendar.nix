@@ -117,7 +117,17 @@ in {
     };
   };
 
-  programs.vdirsyncer.enable = true;
+  programs.vdirsyncer = {
+    enable = true;
+    package = pkgs.vdirsyncer.overridePythonAttrs (old: {
+      postPatch =
+        (old.postPatch or "")
+        + ''
+          substituteInPlace vdirsyncer/storage/dav.py \
+            --replace-fail 'urlparse.quote(x, "/@")' 'urlparse.quote(x, "/@+")'
+        '';
+    });
+  };
 
   services.vdirsyncer = {
     enable = pkgs.stdenv.hostPlatform.isLinux;

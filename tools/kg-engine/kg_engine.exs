@@ -538,7 +538,8 @@ defmodule KGEngine.Watcher do
     # is how `docs/closure-reduction.md` once changed without a reload.
     docs =
       KGEngine.Native.md_files(repo_root, ["docs", ".agents", ".agents/deploy", "taskfiles"]) ++
-        KGEngine.Native.md_files_in_subdirs(repo_root, ".agents/deploy")
+        KGEngine.Native.md_files_in_subdirs(repo_root, ".agents/deploy") ++
+        KGEngine.Native.md_files_in_subdirs(repo_root, "hosts")
 
     skills = Path.wildcard(Path.join(repo_root, ".agents/skills/*/SKILL.md"))
 
@@ -831,7 +832,8 @@ defmodule KGEngine.Native do
     # Wildcard followed symlinks, which invented an extra doc and five edges.
     docs =
       md_files(repo, ["docs", ".agents", ".agents/deploy", "taskfiles"]) ++
-        md_files_in_subdirs(repo, ".agents/deploy")
+        md_files_in_subdirs(repo, ".agents/deploy") ++
+        md_files_in_subdirs(repo, "hosts")
 
     roots = Enum.filter(roots, &File.exists?/1)
 

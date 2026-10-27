@@ -874,9 +874,8 @@ allowed beside the first.
 
 - **Never commit a derivative** [[flake/policies.nix#generated-not-tracked]]:
   `docs/generated/` is `nix build .#artifacts.docs`, and a committed copy is a second
-  source of truth. The path is gitignored so a copy cannot return, and there is no
-  drift gate to maintain — a check that existed only because a build output was
-  duplicated was itself proof the duplication was wrong.
+  source of truth. The path is gitignored so a copy cannot return; with no drift gate
+  to maintain, build output is never duplicated.
 - **Content is not code.** CSS/JS/HTML go in files the derivation reads, not `''`
   literals in a `.nix` file (90 % of `lib/aki-site.nix` is such literals): literals
   cannot be linted or reviewed, and every byte re-evaluates a module that imports

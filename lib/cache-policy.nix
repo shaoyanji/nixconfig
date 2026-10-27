@@ -1,25 +1,5 @@
-# One cache decision per host, in one file.
-#
-# Three consumers used to answer "which cache?" separately: modules/global/global.nix
-# (substituters in nix.conf), scripts/task/activate-host.sh (which store to pull
-# from) and scripts/task/warm-host.sh (which store to verify against). They
-# disagreed in exactly the way duplicated facts do — the deploy gated a cloud host
-# on a LAN cache it cannot reach, and the warm gate called a LAN-only hit "warmed".
-#
-# The three caches have different jobs:
-#
-#   harmonia (frieren)  the LAN cache. Serves this house at gigabit after ONE
-#                       build. Not a cache for a cloud host, whose closure would
-#                       have to be relayed through the NAS's 20 Mbit uplink.
-#   cachix (shaoyanji)  the cache every host reaches, LAN or cloud. CI pushes to
-#                       it; hosts only read from it. There is no per-build push
-#                       hook anywhere in this fleet — a post-build hook on a
-#                       small host turns every switch into an upload.
-#   CI                  a strategic anchor: an artifact expensive enough to be
-#                       worth caching once (an aarch64 image, an RPi kernel).
-#                       Not a per-push path.
-#
-# `tier` is the only fact derived from the inventory; everything else follows.
+# One cache decision per host in one file.
+# Derives cache tier from inventory: LAN (harmonia), WAN (cachix), or CI anchor.
 {lib}: let
   registry = {
     harmonia = {

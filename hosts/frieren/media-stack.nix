@@ -176,8 +176,8 @@ in {
   services.audiobookshelf = {
     enable = true;
     port = 13378;
-    host = "0.0.0.0";
-    openFirewall = true;
+    host = "127.0.0.1";
+    openFirewall = false;
   };
   users.users.audiobookshelf.extraGroups = ["users"];
 

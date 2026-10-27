@@ -1,19 +1,4 @@
-# The gokrazy appliance's build artifacts live here.
-#
-# .github/workflows/gok.yml builds root.squashfs + boot.fat + mbr.img and sends
-# the tarball over Taildrop; this module receives it, proves it against the
-# SHA256SUMS the build wrote, keeps the newest few and serves them back at /gok/
-# on the tailnet vhost (the location is in configuration.nix, next to /sentinel/).
-#
-# Why Taildrop and not ssh: publishing is a one-way file drop from a runner that
-# already joins the tailnet as `tag:ci`, so there is no new private key to hold
-# and no ssh in an unattended path — the failure mode this replaces was a push
-# step that waited forever with no output.
-#
-# Why the artifact is not on the public vhost: the image is built with credentials
-# baked in (the wifi PSK, the tailscale auth key, the update password), so the
-# tailnet ACL is the whole authorization boundary. `task infra:gok:deploy` fetches
-# from the tailnet name; nothing public ever sees these bytes.
+# Gokrazy appliance build artifacts receiver and tailnet HTTP server.
 {
   config,
   pkgs,

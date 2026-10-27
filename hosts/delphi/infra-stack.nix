@@ -1,6 +1,5 @@
 # Delphi Infrastructure Stack — Health Sentinel, Autonomous Agent Schedulers, and Resource Regulation
 {
-  config,
   pkgs,
   lib,
   ...
@@ -328,9 +327,15 @@ in {
     MemoryMax = "1500M";
   };
 
-  systemd.services.crab-hole.serviceConfig = {
-    Restart = lib.mkForce "always";
-    RestartSec = lib.mkForce 2;
-    CPUWeight = 1000; # Maximum scheduling priority for zero-jitter DNS lookups
+  systemd.services.crab-hole = {
+    unitConfig = {
+      X-Fleet-Role = "daemon";
+      StartLimitIntervalSec = 0;
+    };
+    serviceConfig = {
+      Restart = lib.mkForce "always";
+      RestartSec = lib.mkForce 2;
+      CPUWeight = 1000; # Maximum scheduling priority for zero-jitter DNS lookups
+    };
   };
 }

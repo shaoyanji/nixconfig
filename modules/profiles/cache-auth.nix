@@ -1,15 +1,4 @@
-# Cache PUSH credentials, and nothing else.
-#
-# This is deliberately not a post-build-hook. A hook runs as nix-daemon for every
-# output a host compiles, so on a 2-OCPU guest a single switch becomes a stream of
-# NAR re-compresses and uploads that outlives the rebuild that started them — the
-# host looks wedged and cannot get a new generation landed.
-#
-# What a small builder actually needs is the ability to publish ONCE, when it has
-# finished: `nix copy --to <cache> $(readlink -f /run/current-system)` stores what
-# took an hour to compile so the next switch substitutes it. That is a task
-# (`task infra:cache:publish`), not a hook, and it costs one process the operator
-# started rather than one per derivation.
+# Cache PUSH credentials for publishing closures to the fleet WAN cache (task, not a hook).
 {
   config,
   lib,

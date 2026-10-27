@@ -1,23 +1,4 @@
-# gokrazy instances, declared in Nix.
-#
-# gokrazy is not NixOS: the appliance image is assembled by the `gok` CLI from a
-# `config.json`, so there is no module system on the target. This module is
-# therefore evaluated STANDALONE — `lib.evalModules { modules = [ this
-# ../hosts/gok/instance.nix ]; }` — and its output is data, not a system.
-#
-# Two rules make it worth having at all:
-#
-#   1. **Secrets never enter the store.** A rendered config carries `""` in every
-#      credential position and names the sops key that fills it
-#      (`secretSlots`). `scripts/task/gok.sh` injects the values at materialize
-#      time, so the update password, the wifi credentials and the tailscale auth
-#      key are not derivations, not repo files, and not in the Nix store.
-#   2. **The appliance spec is one attrset, not a JSON file to hand-edit.** A new
-#      package, flag or machine-id is a Nix edit a reviewer can see, and the
-#      rendered JSON is reproducible.
-#
-# gokrazy's own keys are kept (Hostname, Packages, Environment, PackageConfig,
-# Update, SerialConsole) so `gok` consumes the result unchanged.
+# Gokrazy appliances declared in Nix: secret injection, schema and config generation.
 {
   config,
   lib,
@@ -35,29 +16,42 @@
       lib.filterAttrs (_: v: v != null) {
         # `or` defaults: a submodule entry has all three keys, a merged-in plain
         # attrset may not, and a missing key here is an eval error, not a skip.
-        CommandLineFlags = if (c.commandLineFlags or []) == [] then null else c.commandLineFlags;
-        ExtraFilePaths = if (c.extraFilePaths or {}) == {} then null else c.extraFilePaths;
-        ExtraFileContents = if (c.extraFileContents or {}) == {} then null else c.extraFileContents;
+        CommandLineFlags =
+          if (c.commandLineFlags or []) == []
+          then null
+          else c.commandLineFlags;
+        ExtraFilePaths =
+          if (c.extraFilePaths or {}) == {}
+          then null
+          else c.extraFilePaths;
+        ExtraFileContents =
+          if (c.extraFileContents or {}) == {}
+          then null
+          else c.extraFileContents;
       })
     (mergedPackageConfig inst);
 
   mergedPackageConfig = inst:
     lib.recursiveUpdate inst.packageConfig (
       lib.optionalAttrs inst.breakglass.enable {
-      "github.com/gokrazy/breakglass" = {
-        extraFilePaths."/etc/breakglass.authorized_keys" = inst.breakglass.authorizedKeysFile;
-        commandLineFlags = ["-authorized_keys=/etc/breakglass.authorized_keys"];
-      };
-    }
-    // lib.optionalAttrs inst.tailscale.enable {
-      "tailscale.com/cmd/tailscale".commandLineFlags = ["up" "--hostname=${inst.tailscale.hostname}"];
-    }
-    // lib.optionalAttrs (inst.wifi.ssidSecret != null) {
-      # The file ships as a pair of empty strings on purpose: the real values are
-      # injected from sops after rendering, so the store never holds the PSK.
-      "github.com/gokrazy/wifi".extraFileContents."/etc/wifi.json" =
-        builtins.toJSON {ssid = ""; psk = "";} + "\n";
-    }
+        "github.com/gokrazy/breakglass" = {
+          extraFilePaths."/etc/breakglass.authorized_keys" = inst.breakglass.authorizedKeysFile;
+          commandLineFlags = ["-authorized_keys=/etc/breakglass.authorized_keys"];
+        };
+      }
+      // lib.optionalAttrs inst.tailscale.enable {
+        "tailscale.com/cmd/tailscale".commandLineFlags = ["up" "--hostname=${inst.tailscale.hostname}"];
+      }
+      // lib.optionalAttrs (inst.wifi.ssidSecret != null) {
+        # The file ships as a pair of empty strings on purpose: the real values are
+        # injected from sops after rendering, so the store never holds the PSK.
+        "github.com/gokrazy/wifi".extraFileContents."/etc/wifi.json" =
+          builtins.toJSON {
+            ssid = "";
+            psk = "";
+          }
+          + "\n";
+      }
     );
 
   # Each slot says: this JSON path gets its value from this sops key. `append`

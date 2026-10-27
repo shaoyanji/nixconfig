@@ -67,22 +67,9 @@ tasks:
   infra:secrets:form:gok:
     desc: One form for the gok appliance — wifi into sops, Tailscale OAuth + update password into GitHub secrets
     summary: >
-      Each value goes to its real home, because they are not the same plane: the
-      wifi SSID/PSK belong in modules/secrets.yaml (sops, decrypted on the machine
-      that builds the appliance), while the Tailscale OAuth client and the
-      appliance update password are GitHub repository secrets consumed by
-      .github/workflows/gok.yml on a runner that has no sops key. Blank answers are
-      skipped, so it can be run once per field. Nothing is echoed, and writes go
-      through stdin (sops set --value-stdin / gh secret set), so no value lands in
-      shell history.
-
-      The Tailscale value is an AUTH KEY: console -> Settings -> Keys -> Generate
-      auth key, with tag `tag:ci`, Ephemeral (the runner's node vanishes when the
-      job ends) and Pre-approved. Paste that where the form asks for it. An OAuth
-      client is the alternative the action also accepts, but it lives under
-      Settings -> OAuth clients and is not shown to every role or plan, which is
-      why this asks for the key instead.
-      Reference: tailscale.com/docs/features/access-control/auth-keys
+      Writes wifi SSID/PSK to modules/secrets.yaml (sops) and Tailscale auth key
+      (tag:ci, Ephemeral) + update password to GitHub repo secrets. Blank answers
+      are skipped. All writes use stdin; nothing lands in shell history.
     cmds:
       - |
         set -euo pipefail
@@ -216,17 +203,10 @@ tasks:
   infra:restore:
     desc: Repair a host's runtime state — device nodes, activation, home ownership, HM, keys, vault, atuin, tailnet mounts
     summary: >
-      The config is not the runtime: a switch can leave /dev/null and /bin/sh
-      missing, a root-owned ~/.config that fails home-manager, an empty
-      ~/vaults and serve units that gave up before tailscaled was Ready — while
-      every one of those looks like "the host is bricked" from outside. This
-      runs the repair steps in order, skipping each one that is already correct,
-      so a second run is a no-op and a partial repair cannot pass as complete.
-
-      HOST=<name> targets a host over ssh (the script is piped, nothing is
-      copied); empty means this machine. CHECK=1 changes nothing and exits 1 if
-      anything is still wrong, so it doubles as the post-reboot gate. Exit 2
-      means root is needed to repair and passwordless sudo is unavailable.
+      Repairs runtime state in order: device nodes, activation, home ownership,
+      HM, keys, vault, atuin, tailnet mounts. Skips already-correct steps.
+      HOST=<name> targets a host over ssh; empty means this machine.
+      CHECK=1 runs dry-run checks and exits 1 if errors remain. Exit 2 requires root.
     vars:
       HOST: '{{.HOST | default ""}}'
       CHECK: '{{.CHECK | default "0"}}'
@@ -528,18 +508,10 @@ tasks:
   infra:warm:host:*:
     desc: Warm one host's closure on its own builder and verify the cache serves it (CI=1 for a strategic cachix anchor, CHECK=1 read-only)
     summary: >
-      Default: scripts/task/warm-host.sh builds on the inventory's builder host —
-      for a LAN host that is frieren, whose harmonia then serves every client at
-      gigabit. Cloud hosts are refused here: delphi is not behind this LAN, so its
-      closure is built on delphi and pushed from delphi's own uplink.
-
-      CI=1 dispatches a GitHub runner instead. Use it for a STRATEGIC anchor — an
-      artifact expensive enough to be worth caching once (aarch64 image, RPi
-      kernel) — not as the routine path; runners are allocated per push.
-      CHECK=1 is read-only: no build, no ssh, one bounded HTTP query per cache.
-
-      Exit 1 = the closure is still not substitutable, so a switch would compile
-      it on the target.
+      Default: builds on inventory builder (frieren for LAN hosts) and serves via
+      harmonia. Cloud hosts build on themselves. CI=1 dispatches GitHub runner for
+      strategic caching (aarch64 image/kernel). CHECK=1 runs read-only cache queries.
+      Exit 1 = closure not substitutable.
     vars:
       HOST: '{{index .MATCH 0}}'
     cmds:

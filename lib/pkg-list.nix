@@ -97,7 +97,7 @@
       })
       entries;
   in {
-    label = label;
+    inherit label;
     packages = builtins.map (r: r.value) (builtins.filter (r: r.value != null) resolved);
     missing = builtins.map (r: r.name) (builtins.filter (r: r.value == null) resolved);
   };

@@ -803,7 +803,7 @@ in {
     title = "delphi";
     subtitle = "OCI Ampere A1 · aarch64-linux · NixOS · tailnet DNS 10.99.0.53";
     groups = ["Tailnet services"];
-    tailnetHost = tailnetHost;
+    inherit tailnetHost;
     # No `profiles.serviceExposure` here: this host's exposure is the tailnet,
     # and the mounts below are the whole of it.
     includeExposure = false;

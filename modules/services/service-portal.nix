@@ -209,7 +209,7 @@
       if e != null && e.badge != null
       then e.badge
       else "${cfg.tailnetHost}:${toString m.port}";
-    requires = m.requires;
+    inherit (m) requires;
     vhost = null;
   }) (builtins.attrNames (lib.filterAttrs (_: m: !m.hideCard) cfg.mounts));
 
@@ -226,10 +226,10 @@
       e = cfg.entries.${n};
     in {
       name = n;
-      title = e.title;
-      description = e.description;
-      group = e.group;
-      audience = e.audience;
+      inherit (e) title;
+      inherit (e) description;
+      inherit (e) group;
+      inherit (e) audience;
       href =
         if e.href != null
         then e.href
@@ -242,7 +242,7 @@
         else if e.vhost != null
         then e.vhost
         else "";
-      vhost = e.vhost;
+      inherit (e) vhost;
     })
     standaloneKeys;
 

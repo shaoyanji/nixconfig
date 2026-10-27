@@ -669,7 +669,7 @@
         [["status" e.status] ["kind" e.kind]]
         ++ lib.optional (e.priority != null) ["priority" e.priority]
         ++ lib.optional (e.date != null) ["updated" e.date]
-        ++ lib.optional (e.leaf) ["trace" "leaf (no code refs; verbose intent)"];
+        ++ lib.optional e.leaf ["trace" "leaf (no code refs; verbose intent)"];
       refRows =
         lib.optional (e.refs.hosts != []) ["hosts" (lib.concatStringsSep ", " e.refs.hosts)]
         ++ lib.optional (e.refs.modules != []) ["modules" (lib.concatStringsSep ", " e.refs.modules)]

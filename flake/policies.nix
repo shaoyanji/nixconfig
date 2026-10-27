@@ -131,7 +131,7 @@
     groups = builtins.filter builtins.isList (builtins.split citationRe text);
   in
     map (g: {
-      doc = doc;
+      inherit doc;
       id = builtins.head g;
     })
     groups)

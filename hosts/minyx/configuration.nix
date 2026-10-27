@@ -236,7 +236,7 @@ in {
   # home-manager user entry, so there was nothing to log in as once HM went away.
   users.users.${user.name} = {
     isNormalUser = true;
-    home = user.home;
+    inherit (user) home;
     description = user.shortName;
     extraGroups = ["wheel"];
     openssh.authorizedKeys.keys = config.ssh.authorizedKeys.keys;

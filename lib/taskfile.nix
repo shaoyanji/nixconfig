@@ -208,12 +208,12 @@
       );
 
   parseTask = shard: entry: let
-    body = entry.body;
+    inherit (entry) body;
     text = bodyText body;
     desc = field "desc" body;
   in {
     inherit shard desc;
-    name = entry.name;
+    inherit (entry) name;
     body = text;
     summary = field "summary" body;
     wildcards = builtins.length (builtins.filter (c: c == "*") (lib.stringToCharacters entry.name));
@@ -367,7 +367,7 @@
   missingIncludes = graph.missing;
   # A cycle is the incident that made `task` exit 110 for every root invocation
   # (2026-10-08, see Taskfile.yml), so the gate names the closing edge.
-  cycles = graph.cycles;
+  inherit (graph) cycles;
   unflattened = builtins.filter (e: !e.flatten) includes;
 
   descBudget = 240;

@@ -220,7 +220,7 @@
   site = {
     schemaVersion = 1;
     generatedBy = "lib/delphi-site.nix";
-    host = host;
+    inherit host;
     identity = {
       role = meta.role or "";
       status = meta.status or "unknown";
@@ -327,9 +327,9 @@
     graphSkills = n site.graph.skills;
     graphDocs = n site.graph.docs;
     graphTags = n site.graph.tags;
-    hardwareRows = hardwareRows;
-    withheldNote = withheldNote;
-    serviceLine = serviceLine;
+    inherit hardwareRows;
+    inherit withheldNote;
+    inherit serviceLine;
     # The card rows, WITHOUT href or badge: what a service is, never where it
     # answers. The same rows on the console carry both.
     serviceList = cardGrid "dossier" tailnetCards;
@@ -363,7 +363,7 @@
       if nixCount > 0
       then "An always-free ARM64 outpost, provisioned by one Nix flake: the outside vantage point for a fleet of ${n devices} registered devices, ${n nixCount} of them Nix machines that build themselves."
       else "An always-free ARM64 outpost, provisioned by one Nix flake.";
-    statusClass = statusClass;
+    inherit statusClass;
     statusText = meta.status or "unknown";
     stamp = "registry · ${n devices} devices";
     specs = publicSpecs;
@@ -423,7 +423,7 @@
     eyebrow = "Tailnet · Service Console";
     heading = host;
     deck = "Each service gets its own port inside the mesh, reachable by name or address. Nothing on this page answers from the internet — that is the whole design, not a setting.";
-    statusClass = statusClass;
+    inherit statusClass;
     statusText = meta.status or "unknown";
     stamp = "${n withheld} ${plural withheld "service" "services"}";
     specs = tailnetSpecs;

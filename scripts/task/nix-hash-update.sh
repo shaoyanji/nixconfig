@@ -17,7 +17,7 @@ if [[ ! -f "$config_file" ]]; then
 fi
 
 tmp=$(mktemp)
-trap "rm -f $tmp" EXIT
+trap 'rm -f "$tmp"' EXIT
 
 echo "Fetching hashes..."
 

@@ -63,7 +63,6 @@
 #       2 = usage error; 1 = graph could not be produced.
 set -euo pipefail
 
-REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 
 # Shared with the other kg:* scripts. Sourced BEFORE the option loop, because
 # `--help` calls kg_usage() from inside it.

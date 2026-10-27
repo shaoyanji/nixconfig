@@ -81,8 +81,17 @@ cd "$REMOTE"
 target_ssh() { ssh -o BatchMode=yes -o ConnectTimeout=10 "${TARGET}" "$@"; }
 
 report_target() {
-  target_ssh bash -s <<'REPORT'
+  # The cache address is resolved HERE, on the builder, where the flake
+  # evaluates — the target has no tree to evaluate and no business knowing an
+  # internal URL. One home for the address: lib/cache-registry.nix, read through
+  # this flake's projection. HARMONIA_CACHE= still overrides for a one-off probe
+  # of a different store.
+  local cache
+  cache=${HARMONIA_CACHE:-$(nix eval --raw .#cacheRegistry.caches.harmonia.url 2>/dev/null || true)}
+  [ -n "$cache" ] || die "cannot resolve .#cacheRegistry.caches.harmonia.url; set HARMONIA_CACHE= to probe one"
+  target_ssh bash -s "$cache" <<'REPORT'
 set -e
+cache=$1
 cur=$(readlink -f /run/current-system)
 echo "current:    ${cur}"
 echo "booted:     $(readlink -f /run/booted-system)"
@@ -106,8 +115,8 @@ echo "failed units: ${failed}"
 [ "${failed}" -eq 0 ] || systemctl --failed --no-legend | sed -n '1,5p'
 # Delivery: report which link in the chain works instead of assuming the LAN
 # cache. On this host the honest answer is usually "reachable, but it has none
-# of these paths", because every path predates the cache.
-cache=${HARMONIA_CACHE:-http://192.168.3.25:5000}
+# of these paths", because every path predates the cache. `cache` arrived as
+# $1 from the builder — see report_target().
 if timeout 8 nix path-info --store "$cache" "$cur" >/dev/null 2>&1; then
   echo "harmonia:   has this system — a pull would work"
 else

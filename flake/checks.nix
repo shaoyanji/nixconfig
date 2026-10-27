@@ -274,6 +274,22 @@ lib.genAttrs systems.work (
             touch $out
           '';
 
+      # --- shell scripts: read-only static analysis -------------------------
+      # `-S warning` is the gate; notes are printed but do not fail, because the
+      # two notes this tree produces are structural (a sourced file shellcheck
+      # cannot follow, a variable used only by the sourcing shell). The tree is at
+      # zero errors and zero warnings here: the 1 error (SC2068, an unquoted path
+      # array) and the 14 warnings that existed were fixed, not excluded. Reads
+      # the flake source, so it sees exactly the tree being gated.
+      scripts-shellcheck = pkgs.runCommand "scripts-shellcheck" {nativeBuildInputs = [pkgs.shellcheck];} ''
+        set -euo pipefail
+        cd ${self}
+        mapfile -t files < <(find scripts .githooks -type f \( -name "*.sh" -o -name "pre-commit" \))
+        files+=(.git-hooks-setup.sh)
+        shellcheck -f gcc -S warning "''${files[@]}" | tee "$out"
+        echo "shellcheck: ''${#files[@]} files, no error or warning" >> "$out"
+      '';
+
       # --- registry and flake outputs agree, both directions ----------------
       inventory-hosts = assert (coverage.missing == []) || throw "inventory.toml declares flake hosts the flake does not build: ${builtins.toString coverage.missing}";
       assert (coverage.unregistered == []) || throw "the flake builds hosts missing from inventory.toml: ${builtins.toString coverage.unregistered}";

@@ -128,7 +128,9 @@ if [ "${#drifted[@]}" -gt 0 ] && command -v nix >/dev/null 2>&1; then
   trap 'rm -rf "$tmpdir"' EXIT
   mkdir -p "${tmpdir}/flake"
   (cd "$FLAKE_DIR" && tar --exclude=.git --exclude=result -cf - .) | tar -xf - -C "${tmpdir}/flake"
-  if (cd "${tmpdir}/flake" && nix flake update "${NIX_AUTH[@]+"${NIX_AUTH[@]}"}" ${drifted[@]%%|*} >/dev/null 2>&1); then
+  targets=()
+  for row in "${drifted[@]}"; do targets+=("${row%%|*}"); done
+  if (cd "${tmpdir}/flake" && nix flake update "${NIX_AUTH[@]+"${NIX_AUTH[@]}"}" "${targets[@]}" >/dev/null 2>&1); then
     for row in "${drifted[@]}"; do
       IFS='|' read -r path node upstream <<<"$row"
       newrev="$(jq -r --arg n "$node" '.nodes[$n].locked.rev // empty' "${tmpdir}/flake/flake.lock")"

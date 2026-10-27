@@ -20,7 +20,7 @@
 # of the two it was.
 set -uo pipefail
 
-cd "$(dirname "${BASH_SOURCE[0]}")/../.."
+cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 2
 
 ATTR=${ATTR:-delphi-site}
 HOST_HEADER=${HOST_HEADER:-delphi}

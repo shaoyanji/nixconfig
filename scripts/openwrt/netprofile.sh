@@ -5,6 +5,7 @@
 # `openwrt install` (nix develop .#openwrt) — never edited on the device.
 # Only the radio changes; wired LAN access (192.168.1.1) is never touched.
 CONF=/etc/netprofile.conf
+# shellcheck source=/dev/null # runtime config on the router, not in this tree
 [ -f "$CONF" ] && . "$CONF"
 CHANNEL=${CHANNEL:-6}
 SSID=${SSID:-pentest-7320}

@@ -111,8 +111,7 @@ resolve_elixir() {
 }
 
 wait_ready() {
-  local i
-  for i in {1..75}; do
+  for _ in {1..75}; do
     is_alive && return 0
     sleep 0.2
   done
@@ -174,12 +173,12 @@ ensure_running() {
 }
 
 stop_daemon() {
-  local pid i
+  local pid
   if [ -f "$PIDFILE" ]; then
     pid="$(cat "$PIDFILE")"
     if kill -0 "$pid" 2>/dev/null; then
       kill "$pid" 2>/dev/null || true
-      for i in {1..25}; do
+      for _ in {1..25}; do
         kill -0 "$pid" 2>/dev/null || break
         sleep 0.2
       done

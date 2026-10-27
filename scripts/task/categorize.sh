@@ -21,7 +21,6 @@ PROVIDER="${JEV_PROVIDER:-typesafe}"
 ENDPOINT="${SYSTEMONE_URL:-https://delphi.cloudforest-kardashev.ts.net:8444}"
 CRITERIA_FILE="$(mktemp "${TMPDIR:-/tmp}/categorize-criteria.XXXXXX.json")"
 trap 'rm -f "$CRITERIA_FILE"' EXIT
-HERE="$(cd "$(dirname "$0")" && pwd)"
 
 # Short, oppositional labels: a binary question must look like a coin, not a menu.
 declare -A LABEL=(

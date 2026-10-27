@@ -75,10 +75,8 @@ want_nodes="$(jq -r '.nodes' <<<"$want")"
 want_edges="$(jq -r '.edges' <<<"$want")"
 
 samples=()
-last=""
 for _ in $(seq 1 "$RUNS"); do
   out="$("$ELIXIR_BIN" --erl "-noinput" "$ENGINE" --build-only --repo "$REPO" 2>/dev/null | tail -1)"
-  last="$out"
   got_nodes="$(jq -r '.nodes' <<<"$out")"
   got_edges="$(jq -r '.edges' <<<"$out")"
   if [ "$got_nodes" != "$want_nodes" ] || [ "$got_edges" != "$want_edges" ]; then

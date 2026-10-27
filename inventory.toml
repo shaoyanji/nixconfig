@@ -643,7 +643,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "I/O Diet Lightweight Workstation"
 category = "workstation"
-desktop_environment = "dwl (suckless Wayland) on a niri-parity keymap, foot + wmenu"
+desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` on a niri-parity keymap — foot, fleet-menu, waybar, waylock; tuigreet greeter"
 users = ["devji"]
 notes = ["Lightweight dwl desktop (suckless Wayland, niri-parity keymap) on a Fujitsu ESPRIMO D556 (i5-6500, 8 GB, 128 GB f2fs SSD). Formerly a Steam Remote Play kiosk, then a niri desktop; dwl since 2026-10.", "f2fs has no subvolumes, so the btrfs impermanence module is NOT used: the host config puts every heavy-write dir on tmpfs (zram 100%, journald volatile, fstrim, noatime).", "Legacy BIOS boot: GRUB on /dev/sda, systemd-boot disabled."]
 
@@ -662,7 +662,7 @@ ssh_alias = "scratch"
 [hosts.scratch.software]
 module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["dwl Wayland desktop (greetd autologin, tuigreet greeter)", "zram 100% swap (zero disk swap)", "tmpfs mounts for /var/log, /tmp, /var/tmp, /var/cache, ~/.cache", "volatile journald (RAM only, core dumps disabled)", "weekly fstrim + noatime"]
+key_services = ["dwl Wayland desktop from `profiles.dwlDesktop` (greetd autologin, tuigreet greeter, fleet-menu launcher, waybar)", "zram 100% swap (zero disk swap)", "tmpfs mounts for /var/log, /tmp, /var/tmp, /var/cache, ~/.cache", "volatile journald (RAM only, core dumps disabled)", "weekly fstrim + noatime"]
 traits = ["strict-io-diet", "f2fs", "legacy-bios", "zram-100", "tmpfs-caches", "suckless-dwl", "small-screen", "tpm-identity"]
 
 [hosts.scratch.persona]
@@ -716,10 +716,10 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Alice's Travel Netbook (Fleet nixpkgs, Scripted Initrd)"
 category = "laptop"
-desktop_environment = "Niri + greetd"
+desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` — greetd autologin, foot, fleet-menu, waybar"
 users = ["alice"]
 flake = true
-notes = ["Flake host on the fleet nixpkgs; the ONE pin is the initrd implementation (`boot.initrd.systemd.enable = false`), not the kernel. NixOS 26.11 made systemd-initrd the default, so generation 50 reached no stage-2 on this eMMC (no journal entry, blank console at loglevel=3) while the same kernel 6.18.56 with the scripted stage-1 boots clean (gen 51, 0 failed units).", "Deploy is push-based: frieren builds the closure (nixbuild.net for x86_64) and `nix copy`s it over the LAN, because the netbook cannot pull a closure it does not already have from harmonia. `task infra:apply:host:netbook`."]
+notes = ["Flake host on the fleet nixpkgs; the ONE pin is the initrd implementation (`boot.initrd.systemd.enable = false`), not the kernel. NixOS 26.11 made systemd-initrd the default, so generation 50 reached no stage-2 on this eMMC (no journal entry, blank console at loglevel=3) while the same kernel 6.18.56 with the scripted stage-1 boots clean (gen 51, 0 failed units).", "Deploy is push-based: frieren builds the closure (nixbuild.net for x86_64) and `nix copy`s it over the LAN, because the netbook cannot pull a closure it does not already have from harmonia. `task infra:apply:host:netbook`.", "Desktop moved from niri to the shared dwl profile (2026-10-27): the session, launcher, bar and idle/lock are `profiles.dwlDesktop`, so the Celeron runs dwl + waybar instead of niri + DMS. The compositor is the smaller half of the change; the point is that alice's desktop is now a fleet module rather than `~/.dotfiles` alone."]
 
 [hosts.netbook.hardware]
 model = "Intel Celeron Netbook"
@@ -736,8 +736,8 @@ ssh_alias = "netbook"
 [hosts.netbook.software]
 module_chain = "Own configuration only (no global chain), fleet nixpkgs"
 impermanence = false
-key_services = ["Niri Compositor", "greetd", "Pipewire", "NFS client automount"]
-traits = ["alice-user", "celeron-n3060", "fleet-nixpkgs", "scripted-initrd", "f2fs", "ultra-low-spec", "gpu-low"]
+key_services = ["dwl Wayland desktop from `profiles.dwlDesktop` (foot, fleet-menu, waybar, waylock)", "greetd autologin as alice", "Pipewire", "NFS client automount"]
+traits = ["alice-user", "celeron-n3060", "fleet-nixpkgs", "scripted-initrd", "f2fs", "ultra-low-spec", "gpu-low", "suckless-dwl"]
 
 [hosts.netbook.persona]
 title = "Alice's Travel Companion"

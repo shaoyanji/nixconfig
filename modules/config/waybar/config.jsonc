@@ -1,0 +1,47 @@
+// The fleet bar. Modules are deliberately limited to what a compositor does not
+// have to advertise: dwl in nixpkgs ships without the dwl-ipc / foreign-toplevel
+// protocols, so `dwl/tags`, `wlr/workspaces` and `wlr/taskbar` have nothing to
+// read here and are left out rather than shown empty.
+{
+  "layer": "top",
+  "position": "top",
+  "height": 28,
+  "spacing": 8,
+  "gtk-layer-shell": true,
+  "modules-left": ["clock"],
+  "modules-right": ["cpu", "memory", "pulseaudio", "network", "battery", "tray"],
+  "clock": {
+    "format": "{:%a %d %b  %H:%M}"
+  },
+  "cpu": {
+    "format": "cpu {usage}%",
+    "interval": 5
+  },
+  "memory": {
+    "format": "mem {percentage}%",
+    "interval": 10
+  },
+  "pulseaudio": {
+    "format": "{volume}%",
+    "format-muted": "muted",
+    "scroll-step": 5
+  },
+  "network": {
+    "format-wifi": "{essid}",
+    "format-ethernet": "wired",
+    "format-disconnected": "offline",
+    "tooltip-format": "{ifname} {ipaddr}"
+  },
+  "battery": {
+    "format": "{capacity}%",
+    "format-charging": "+{capacity}%",
+    "states": {
+      "warning": 30,
+      "critical": 15
+    }
+  },
+  "tray": {
+    "icon-size": 14,
+    "spacing": 10
+  }
+}

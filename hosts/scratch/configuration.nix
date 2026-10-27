@@ -1,35 +1,28 @@
-# scratch — Fujitsu ESPRIMO D556 (i5-6500) niri desktop.
+# scratch — Fujitsu ESPRIMO D556 (i5-6500) dwl desktop on the shared profile.
 {
   lib,
   pkgs,
   ...
 }: let
   user = import ../../modules/global/user.nix;
-
-  # Suckless Wayland: dwl with Catppuccin Mocha sensible defaults
-  customDwl = pkgs.dwl.override {
-    configH = builtins.readFile ../../modules/config/dwl/config.h;
-  };
-
-  # greetd launches the session with XDG_SESSION_TYPE=tty, which is what a
-  # greeter is, not what a compositor is: clients that branch on it (portals,
-  # GTK, screencast) then take the TTY path. niri exports these itself; dwl
-  # does not, so the session gets a wrapper. Both the autologin session and
-  # tuigreet's --cmd use it, so a manual login is identical to the autologin.
-  dwlSession = pkgs.writeShellScript "dwl-session" ''
-    export XDG_SESSION_TYPE=wayland
-    export XDG_SESSION_DESKTOP=dwl
-    export XDG_CURRENT_DESKTOP=dwl
-    exec ${customDwl}/bin/dwl "$@"
-  '';
 in {
   # Fork, not inheritance: see [[flake/policies.nix#desktop-fork-not-disable]].
   imports = [
     ./hardware-configuration.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/boot.nix
+    ../../modules/profiles/dwl-desktop.nix
     ../../modules/profiles/nas-client.nix
   ];
+
+  # The compositor, keybinds, launcher, bar, wallpaper and idle/lock all come from
+  # the profile (modules/profiles/dwl-desktop.nix); this host only chooses which
+  # of them it wants.
+  profiles.dwlDesktop = {
+    enable = true;
+    bar.enable = true;
+    greeter.enable = true;
+  };
 
   # Replaces the fleet userland default; see [[flake/policies.nix#desktop-fork-not-disable]].
   fleet.hmUserModules = [
@@ -49,64 +42,10 @@ in {
     device = "/dev/sda"; # legacy BIOS MBR install — adjust if the disk is not sda
   };
 
-  # Media keys in config.h spawn wpctl/playerctl.
   services.displayManager.sddm.enable = false;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-  };
-  security.rtkit.enable = true;
 
   # Reachability is infrastructure, not part of the desktop.
   services.tailscale.enable = true;
-
-  # Needed by appimage-launchers' .desktop entries.
-  programs.appimage = {
-    enable = true;
-    binfmt = true;
-  };
-
-  # dwl/foot/wmenu name the font, they do not ship it.
-  fonts = {
-    packages = [pkgs.nerd-fonts.jetbrains-mono];
-    fontconfig.defaultFonts.monospace = ["JetBrainsMono Nerd Font Mono" "JetBrainsMono NFM"];
-  };
-
-  programs.foot = {
-    enable = true;
-    theme = "catppuccin-mocha";
-    settings = {
-      main = {
-        font = "JetBrainsMono NFM:size=11";
-        pad = "12x12 center";
-        dpi-aware = "yes";
-      };
-      cursor = {
-        style = "beam";
-        blink = "yes";
-      };
-      # foot 1.28 rejects the old single [colors] section.
-      colors-dark = {
-        alpha = "0.95";
-      };
-    };
-  };
-
-  security.pam.services.waylock = {};
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${dwlSession}";
-        user = "greeter";
-      };
-      initial_session = {
-        command = "${dwlSession}";
-        user = user.name;
-      };
-    };
-  };
 
   documentation.enable = false;
   documentation.nixos.enable = false;
@@ -170,24 +109,12 @@ in {
   boot.consoleLogLevel = 3;
   nix.optimise.automatic = true;
 
+  # The desktop's own packages come from the profile; this host adds the rest.
   environment.systemPackages = with pkgs; [
-    btop
-    customDwl
-    foot
-    wmenu
-    j4-dmenu-desktop
-    waylock
-    wl-clipboard
-    imv
-    grim
-    slurp
-    playerctl
-    brightnessctl
     age-plugin-tpm
+    btop
     tpm2-tools
   ];
-  # Referenced by config.h: j4-dmenu-desktop (Mod+A/Mod+Space), grim+slurp
-  # (Mod+S/Mod+Print), playerctl/brightnessctl (media keys).
 
   # TPM-only recipient; base-node's sshKeyPaths would need an `&scratchhost`
   # entry that deliberately does not exist. See docs/sops-rekey.md.

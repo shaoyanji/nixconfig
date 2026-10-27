@@ -29,6 +29,25 @@ Rows carrying a command were re-measured 2026-10-22 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-27 — the VIP is back: minyx is the backup, and the takeover was observed
+- `8d271c31` declared the group again with the address rules that were missing the first time: VIP
+  `192.168.3.50` (static block, not `.25`, not the peer's `.3`, and not `.53` — an option `example` the router
+  was already leasing to the board), `unicastPeers` asserted by the module, minyx's role bound to **`wlan0`**
+  because `enu1u1` is DOWN (verified on the box), and minyx promoted off `preserved`.
+- Deployed: minyx by closure push from delphi (`--target-host devji@192.168.3.3`), frieren by
+  `nixos-rebuild switch --flake github:…#frieren`. The first frieren run reused a cached tarball and built the
+  previous generation — pinned to the exact revision, which is the reliable form.
+- **Observed, both directions:** frieren preempted at 09:52:33 (`received lower priority (1) advert from
+  192.168.3.3 - discarding` → MASTER); stopping keepalived on frieren moved `.50` to minyx in ~4 s and
+  `dig @192.168.3.50 photos.frieren.lan` still answered `192.168.3.25` while `doubleclick.net` stayed `0.0.0.0`;
+  restarting frieren pulled it back (`Master received advert … higher priority 200` → BACKUP on minyx). One
+  transition each way after 09:52, no flapping. `.25` was never touched, so clients saw no outage.
+- The 04:00 failure class did not recur: frieren's switch reloaded `firewall.service` and finished `running`.
+  The track script loads on both nodes (`VRRP_Script(dns) succeeded`, zero "track script dns not found").
+- Open, and neither is Nix: the router still hands out `.25` + `9.9.9.9` (`.50` is proven free by ARP
+  duplicate-address detection but is not yet served to clients), and **poseidon declares `.3` statically** for
+  its dock NIC while minyx holds it by reservation — the peer address frieren advertises to.
+
 ### 2026-10-27 — the minyx VIP is withdrawn, and the reason the 04:00 switch failed
 - `f021660a` made minyx the P1 (priority 1) DNS failover behind a floating `192.168.3.53`. It was wrong on three
   counts and is reverted: the host is inventory `status = "preserved"` (so the closure was never pushed and only the

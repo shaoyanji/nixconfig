@@ -77,6 +77,7 @@ movie/audio releases.
 | Task                      | What                                                                   |
 | :------------------------ | :--------------------------------------------------------------------- |
 | `task data:audit`         | taxonomy, permissions, `arr/` hygiene, sentinels, metadata noise        |
+| `task data:sort`          | sort finished staging items into their kind's tree (dry-run unless `--apply`; `--classify` asks a model when the rules cannot place an item) |
 | `task data:protect:private` | writes `0700` and plants `.nomedia` + `.plexignore`                  |
 | `task data:clean:downloads` | orphaned control files and empty staging directories                 |
 | `task data:clean:metadata`  | `._*`, `.DS_Store`, `@eaDir`                                          |

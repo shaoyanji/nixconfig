@@ -37,7 +37,7 @@ both hostnames, `/microvm/stirling/` on the tailnet only (public answers 302).
 ## Install (moved)
 
 The fresh-install walkthrough — phases 0 to 5, including the OCI security-list
-traps and the HTTPS/autoUpgrade path — is [`docs/delphi-install.md`](../../docs/delphi-install.md).
+traps and the HTTPS/autoUpgrade path — is [`docs/delphi-install.md`](../../../docs/delphi-install.md).
 What a running delphi needs instead is below: the guest layer, the tailnet mounts,
 the compiled surfaces, and the traps.
 

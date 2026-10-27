@@ -148,7 +148,7 @@ while read -r kind host; do
     # for a host whose arch differs from the caller's.
     host_arch="$ARCH"
     if [ -z "$host_arch" ]; then
-      host_arch="$(timeout 30 nix eval --raw "${REF}#inventory.hosts.\"${host}\".arch" 2>/dev/null || true)"
+      host_arch="$(timeout 30 nix eval --raw "${REF}?submodules=1#inventory.hosts.\"${host}\".arch" 2>/dev/null || true)"
       host_arch="${host_arch:-x86_64-linux}"
     fi
     build_flags=(--builders "")
@@ -162,7 +162,7 @@ while read -r kind host; do
     # tee on stdout, not a process substitution: PIPESTATUS gives the guard's
     # status after tee has flushed, so the classification below reads the whole log.
     bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "host-check ${host}" -- \
-      nix build --no-link -L "${build_flags[@]}" "${REF}#hostChecks.${host_arch}.${host}" 2>&1 | tee "$log" >&2
+      nix build --no-link -L "${build_flags[@]}" "${REF}?submodules=1#hostChecks.${host_arch}.${host}" 2>&1 | tee "$log" >&2
     rc=${PIPESTATUS[0]}
     # A cache miss and a failed assertion both exit 1; only the first deserves the
     # warm-it advice, so classify by what nix said.
@@ -189,7 +189,7 @@ while read -r kind host; do
     # (frieren-canary) and bare Nix attr names may not.
     EXPR=$(printf 'c: let bad = builtins.filter (a: !a.assertion) c.assertions; in if bad != [] then throw ("assertion(s) failed: " + builtins.concatStringsSep " | " (map (a: a.message) bad)) else { hostname = c.fleet.inventory.hosts."%s".hostname; registry = builtins.length (builtins.attrNames c.fleet.inventory.hosts); assertions = builtins.length c.assertions; }' "$host")
     bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "eval ${host}" -- \
-      nix eval --json "${REF}#${attr}.config" --apply "$EXPR"
+      nix eval --json "${REF}?submodules=1#${attr}.config" --apply "$EXPR"
     rc=$?
   fi
   case "$rc" in

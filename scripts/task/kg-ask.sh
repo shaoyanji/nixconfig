@@ -4,7 +4,7 @@
 # Why this shape
 # --------------
 # `nix eval` already compiles the graph into a static JSON document
-# (`.#knowledgeGraph.graph`, ~50 KB). That is *better* than a Cypher server for
+# (`.?submodules=1#knowledgeGraph.graph`, ~50 KB). That is *better* than a Cypher server for
 # this fleet: no JVM, no page-cache competition on an 11 GiB NAS, and every
 # question is a `jq` filter over a file that is already in the store. The one
 # thing a static file cannot do is guess *which* filter the question wants.

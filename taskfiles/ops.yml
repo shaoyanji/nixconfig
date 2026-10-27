@@ -148,7 +148,7 @@ tasks:
       SYSTEM:
         sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
-      - nix build -L --no-link --builders "" .#checks.{{.SYSTEM}}."skills-schema" .#checks.{{.SYSTEM}}."skills-task-mirror"
+      - nix build -L --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}."skills-schema" .?submodules=1#checks.{{.SYSTEM}}."skills-task-mirror"
 
   ops:skills:tags:
     desc: Print the skill tag cloud
@@ -340,14 +340,14 @@ tasks:
       MERGE statements for an *external* Neo4j. Deliberately not a service on
       frieren (JVM heap competes with the NAS page cache); the graph is ~10^3
       nodes and `jq` is enough. Import with:
-      `nix run nixpkgs#cypher-shell -- -f <(nix eval --raw .#knowledgeGraph.cypher)`.
+      `nix run nixpkgs#cypher-shell -- -f <(nix eval --raw .?submodules=1#knowledgeGraph.cypher)`.
     cmds:
-      - nix eval --raw .#knowledgeGraph.cypher
+      - nix eval --raw .?submodules=1#knowledgeGraph.cypher
 
   ops:ask:
     desc: Ask the knowledge graph a question in English (Q=)
     summary: >
-      scripts/task/kg-ask.sh — front door to `.#knowledgeGraph`. Q= is the question.
+      scripts/task/kg-ask.sh — front door to `.?submodules=1#knowledgeGraph`. Q= is the question.
       Clean tree: cached per revision; dirty tree: re-evaluates, because a stale
       answer is worse than a slow one.
 
@@ -522,7 +522,7 @@ tasks:
       - |
         hyperfine --warmup 2 --runs 10 \
           --command-name "nix eval inventory.hosts.frieren.role" \
-            "nix eval --raw .#inventory.hosts.frieren.role" \
+            "nix eval --raw .?submodules=1#inventory.hosts.frieren.role" \
           --command-name "yq inventory.toml" \
             "yq -r '.hosts.frieren.role' inventory.toml" \
           --command-name "python tomllib" \
@@ -533,7 +533,7 @@ tasks:
   ops:notes:
     desc: List AGENTS.nix notes or find the ones near an intent
     summary: >
-      The human surface over `.#agentsNotes.json` (lib/agents-notes.nix). No args
+      The human surface over `.?submodules=1#agentsNotes.json` (lib/agents-notes.nix). No args
       lists every note; STATUS= and KIND= filter; FORMAT=json emits records. A note
       with refs is distilled, a leaf carries the original intent in prose. Starting
       something not in the repo yet? `ops:notes:near Q=<intent>` ranks notes against

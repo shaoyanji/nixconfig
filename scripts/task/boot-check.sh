@@ -130,12 +130,12 @@ fi
 
 # Registry facts first: a preserved host must not reach an eval, a cache query or
 # a build (AGENTS.md), and the arch decides which attribute set exists.
-status="$(nix eval --raw ".#inventory.hosts.\"$HOST\".status" 2>/dev/null)" || {
-  echo "boot-check: '$HOST' is not a host in .#inventory" >&2
+status="$(nix eval --raw ".?submodules=1#inventory.hosts.\"$HOST\".status" 2>/dev/null)" || {
+  echo "boot-check: '$HOST' is not a host in .?submodules=1#inventory" >&2
   exit 1
 }
 if [ -z "$ARCH" ]; then
-  ARCH="$(nix eval --raw ".#inventory.hosts.\"$HOST\".arch" 2>/dev/null)" || {
+  ARCH="$(nix eval --raw ".?submodules=1#inventory.hosts.\"$HOST\".arch" 2>/dev/null)" || {
     echo "boot-check: could not read the compiled arch for '$HOST'" >&2
     exit 1
   }
@@ -152,7 +152,7 @@ fi
 
 # A missing attribute is a clearer message here than nix's own path error, and
 # the lookup is cheap: attr names only, no host evaluation.
-if ! nix eval --json ".#hostBootChecks.\"$ARCH\"" --apply 'builtins.attrNames' 2>/dev/null |
+if ! nix eval --json ".?submodules=1#hostBootChecks.\"$ARCH\"" --apply 'builtins.attrNames' 2>/dev/null |
   tr -d '[]"' | tr ',' '\n' | grep -qx "$HOST"; then
   if [ "$SELF" = "1" ]; then
     # A pre-switch boot is insurance, not a gate on coverage: a host the matrix
@@ -211,7 +211,7 @@ report_cost() {
 }
 
 bash scripts/task/oom-guard.sh --timeout "$TIMEOUT" --label "boot ${HOST}" -- \
-  "${NICE[@]}" nix build --no-link -L --builders "" ".#hostBootChecks.${ARCH}.${HOST}" 2>&1 | tee "$log" >&2
+  "${NICE[@]}" nix build --no-link -L --builders "" ".?submodules=1#hostBootChecks.${ARCH}.${HOST}" 2>&1 | tee "$log" >&2
 rc=${PIPESTATUS[0]}
 
 case "$rc" in

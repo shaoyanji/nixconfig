@@ -62,7 +62,7 @@ bad() {
 say() { printf '\n== %s ==\n' "$1"; }
 
 say "build the site (local only, no remote builders)"
-SITE="$(cd "$REPO" && nix build --builders "" --no-link --print-out-paths .#sites.fleet-docs-site 2>/dev/null | tail -1)"
+SITE="$(cd "$REPO" && nix build --builders "" --no-link --print-out-paths .?submodules=1#sites.fleet-docs-site 2>/dev/null | tail -1)"
 if [ -n "$SITE" ] && [ -f "$SITE/index.html" ]; then
   ok "built $SITE"
 else
@@ -71,8 +71,8 @@ else
 fi
 
 say "data matches the compiled projection"
-want_nodes="$(cd "$REPO" && nix eval --json .#knowledgeGraph.graph --apply 'g: builtins.length g.nodes')"
-want_edges="$(cd "$REPO" && nix eval --json .#knowledgeGraph.graph --apply 'g: builtins.length g.edges')"
+want_nodes="$(cd "$REPO" && nix eval --json .?submodules=1#knowledgeGraph.graph --apply 'g: builtins.length g.nodes')"
+want_edges="$(cd "$REPO" && nix eval --json .?submodules=1#knowledgeGraph.graph --apply 'g: builtins.length g.edges')"
 got_nodes="$(jq -r '.nodes | length' "$SITE/data/kg-graph.json")"
 got_edges="$(jq -r '.edges | length' "$SITE/data/kg-graph.json")"
 want_docs="$(jq '[.nodes[] | select(.type == "doc")] | length' "$SITE/data/kg-graph.json")"

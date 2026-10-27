@@ -37,7 +37,7 @@ done
 cfg_json="$(
   nix eval --json --extra-experimental-features 'nix-command flakes' \
     --apply 'c: {inherit (c) enable configDir; mqtt = {inherit (c.mqtt) address port;};}' \
-    ".#nixosConfigurations.${HOST}.config.services.ha-stack" 2>/dev/null
+    ".?submodules=1#nixosConfigurations.${HOST}.config.services.ha-stack" 2>/dev/null
 )" || {
   echo "ERROR: nix eval failed for ${HOST}.config.services.ha-stack" >&2
   exit 2

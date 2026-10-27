@@ -74,7 +74,7 @@ materialize() {
 
   # The fleet key list has exactly one home (modules/config/authorized-keys.nix),
   # so an appliance reflash cannot drift from the hosts that may log in to it.
-  nix eval --json "$repo#nixosConfigurations.frieren.config.ssh.authorizedKeys.keys" 2>/dev/null |
+  nix eval --json "$repo?submodules=1#nixosConfigurations.frieren.config.ssh.authorizedKeys.keys" 2>/dev/null |
     jq -r '.[]' > "$inst/breakglass.authorized_keys"
 
   # Unattended tailscale auth only if a key exists in sops. Absent (the default),

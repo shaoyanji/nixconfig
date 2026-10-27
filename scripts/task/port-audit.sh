@@ -76,7 +76,7 @@ fi
 # --- declared surface (authoritative: the merged Nix option, not a grep) -----------------
 declared_json="$(
   nix eval --json --extra-experimental-features 'nix-command flakes' \
-    ".#nixosConfigurations.${HOST}.config.networking.firewall.interfaces.${IFACE}" 2>/dev/null
+    ".?submodules=1#nixosConfigurations.${HOST}.config.networking.firewall.interfaces.${IFACE}" 2>/dev/null
 )" || {
   echo "ERROR: nix eval failed for ${HOST} interface ${IFACE}" >&2
   echo "       (check the host name and interface, and that this is a scoped host)" >&2

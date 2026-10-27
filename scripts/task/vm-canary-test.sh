@@ -3,8 +3,8 @@
 # ssh and over the host's reverse proxy, stop it, prove the proxy stops answering.
 #
 # Every address and port is read from the flake, never typed here:
-#   lan ip        .#inventory.hosts.frieren-canary.network.lan_ip
-#   api port      .#nixosConfigurations.frieren-canary.config.systemd.services.canary-dummy-api.unitConfig.X-Canary-Api-Port
+#   lan ip        .?submodules=1#inventory.hosts.frieren-canary.network.lan_ip
+#   api port      .?submodules=1#nixosConfigurations.frieren-canary.config.systemd.services.canary-dummy-api.unitConfig.X-Canary-Api-Port
 #
 # The previous version hard-coded a Tailscale address that is not in the inventory
 # at all, asserted a 504 that nginx only returns on a read timeout, and used
@@ -28,8 +28,8 @@ cd "$REPO_DIR"
 
 # --- declared facts ----------------------------------------------------------
 say "reading the declared contract"
-LAN_IP="$(nix eval --raw ".#inventory.hosts.${NAME}.network.lan_ip")"
-API_PORT="$(nix eval --raw ".#nixosConfigurations.${NAME}.config.systemd.services.canary-dummy-api.unitConfig.X-Canary-Api-Port")"
+LAN_IP="$(nix eval --raw ".?submodules=1#inventory.hosts.${NAME}.network.lan_ip")"
+API_PORT="$(nix eval --raw ".?submodules=1#nixosConfigurations.${NAME}.config.systemd.services.canary-dummy-api.unitConfig.X-Canary-Api-Port")"
 [ -n "$LAN_IP" ] || fail "inventory has no lan_ip for ${NAME}"
 case "$API_PORT" in
   '' | *[!0-9]*) fail "canary-dummy-api declares no numeric port (got '${API_PORT}')" ;;

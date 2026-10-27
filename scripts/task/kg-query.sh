@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# kg-query.sh — the EXPLICIT query surface over .#knowledgeGraph.
+# kg-query.sh — the EXPLICIT query surface over .?submodules=1#knowledgeGraph.
 #
 # Six patterns, no inference. Each one is a fixed traversal of the graph
 # projection, i.e. the jq analogue of a Cypher MATCH:

@@ -1,3 +1,4 @@
+# himalaya mail CLI: account and IMAP wiring; the password is decrypted at runtime.
 {config, ...}: let
   user = import ./global/user.nix;
 in {

@@ -1,3 +1,4 @@
+# The desktop baseline: greetd session, keyring, portals and the fonts every GUI host needs.
 {
   pkgs,
   lib,

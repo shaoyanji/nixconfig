@@ -1,3 +1,4 @@
+# Zen browser: policies, the SearXNG search engine and the extension set from firefox-addons.
 {
   inputs,
   pkgs,

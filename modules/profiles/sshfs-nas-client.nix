@@ -1,3 +1,4 @@
+# /Volumes/data over sshfs, for a host that reaches the NAS by SSH instead of the LAN mount.
 {
   config,
   lib,

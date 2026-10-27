@@ -1,3 +1,4 @@
+# `services.go-backend`: the Go service unit, its environment and its health check.
 {
   config,
   lib,

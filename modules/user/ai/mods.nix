@@ -1,3 +1,4 @@
+# mods (charmbracelet): the CLI defaults and the ollama/API wiring.
 _: {
   programs.mods = {
     enable = true;

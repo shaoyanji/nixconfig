@@ -1,3 +1,4 @@
+# `dsh` desktop launchers: open the agent deck in the best terminal available.
 {
   pkgs,
   lib,

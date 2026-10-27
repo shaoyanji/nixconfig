@@ -1,3 +1,4 @@
+# `ssh.ca`: the fleet's SSH CA — host certificates, user-cert signing and the trust anchor.
 {
   config,
   lib,

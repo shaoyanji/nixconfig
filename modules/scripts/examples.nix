@@ -1,3 +1,4 @@
+# Example script packages and manifests, kept beside default.nix for reference.
 {pkgs, ...}: {
   imports = [
     #    ./duckduck.nix

@@ -1,3 +1,4 @@
+# kitty: font, theme and window settings shared by the desktops.
 _: {
   programs.kitty = {
     enable = true;

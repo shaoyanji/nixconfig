@@ -1,3 +1,4 @@
+# `profiles.serverHardening`: journald caps, tmp cleanup and /var bind-mounted to the data disk.
 {
   config,
   lib,

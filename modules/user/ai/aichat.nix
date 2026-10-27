@@ -1,3 +1,4 @@
+# aichat: model roles and providers, gated by `profiles.ai`.
 {
   lib,
   config,

@@ -1,3 +1,4 @@
+# `profiles.ai`: which AI tooling a host gets, declared once.
 {
   lib,
   pkgs,

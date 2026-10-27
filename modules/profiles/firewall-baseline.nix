@@ -1,3 +1,4 @@
+# Firewall baseline: default-deny inbound, TCP/22 only unless the host opens more.
 {lib, ...}: {
   # Baseline host firewall posture:
   # - enabled by default

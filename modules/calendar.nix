@@ -1,3 +1,4 @@
+# Google Calendar -> vdirsyncer -> khal, plus the sync service and DMS notifications.
 {
   config,
   pkgs,

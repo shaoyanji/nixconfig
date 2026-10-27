@@ -1,3 +1,4 @@
+# nushell: config, plugins and `nu-run`, the wrapper that makes `nu -c` predictable.
 {
   lib,
   pkgs,

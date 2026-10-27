@@ -1,3 +1,4 @@
+# NVIDIA: driver, session variables and the ollama serving defaults that depend on it.
 _: {
   hardware.graphics = {
     enable = true;

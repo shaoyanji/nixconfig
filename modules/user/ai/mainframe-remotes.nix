@@ -1,3 +1,4 @@
+# `programs.mainframe-remotes`: launchers that attach to the deck on delphi.
 {
   pkgs,
   lib,

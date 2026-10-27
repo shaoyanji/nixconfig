@@ -1,3 +1,4 @@
+# The script packages installed for the interactive user, from one list.
 {pkgs, ...}: {
   imports = [
     ./pb.nix

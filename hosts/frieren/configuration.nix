@@ -258,10 +258,19 @@ in {
     serverAliases = [
       "atuin.lan"
       "atuin.frieren.local"
-      # Clients whose DNS does not know the .lan names reach it by address; the
-      # client config uses the tailnet one because it works off the LAN too.
+      # Clients whose DNS does not know the .lan names reach it by address, and
+      # this is the one they use (modules/shell/atuin.nix sets
+      # sync_address = http://100.97.61.65): the tailnet address works on the
+      # LAN too, so it is the only address alias that earns its place.
       "100.97.61.65"
-      "192.168.3.25"
+      # The LAN address is deliberately NOT here. `frieren.lan` (the portal,
+      # default_server on :80 and :443) claims 192.168.3.25, and a server_name
+      # in two vhosts on one port is a conflict nginx resolves by *ignoring the
+      # later block* — atuin.frieren.lan serialises first, so the bare LAN
+      # address served atuin's 404 and the portal was unreachable by its own IP.
+      # Nothing needs atuin by address on the LAN: the names and the tailnet
+      # address cover every client. The duplicate is gated by an assertion in
+      # hosts/frieren/reverse-proxy.nix.
     ];
   };
 

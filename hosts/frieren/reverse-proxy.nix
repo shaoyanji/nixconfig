@@ -204,6 +204,27 @@ in {
     tlsVhosts = lib.filterAttrs (_: onTls) config.services.nginx.virtualHosts;
     certless = lib.filterAttrs (_: v: v.sslCertificate == null && v.useACMEHost == null) tlsVhosts;
     defaults = lib.filterAttrs (_: v: v.default or false) tlsVhosts;
+
+    # Every server_name is claimed by exactly one vhost per port. nginx answers
+    # a duplicate with `[warn] conflicting server name ... ignored` and keeps
+    # the block that serialises first, so the loser is silently unreachable by
+    # that name and `nginx -t` still passes (2026-10-28: atuin.frieren.lan
+    # claimed 192.168.3.25 on :80, which sorted before the portal, and the
+    # bare LAN address served atuin's 404 instead of the landing page).
+    claims = lib.concatMap (
+      vname: let
+        v = config.services.nginx.virtualHosts.${vname};
+        names = [vname] ++ (v.serverAliases or []);
+        ports = map (l: l.port or 80) (v.listen or [{port = 80;}]);
+      in
+        lib.concatMap (port: map (name: {inherit name port vname;}) names) ports
+    ) (builtins.attrNames config.services.nginx.virtualHosts);
+    byName = lib.groupBy (c: "${toString c.port}:${c.name}") claims;
+    contested =
+      lib.filterAttrs (
+        _: group: lib.length (lib.unique (map (c: c.vname) group)) > 1
+      )
+      byName;
   in [
     {
       assertion = certless == {};
@@ -212,6 +233,17 @@ in {
     {
       assertion = defaults != {};
       message = "nginx: no vhost is the default on :443, so a Host that matches nothing (the tailnet FQDN, vault.frieren.lan upgraded to https) is answered by whichever vhost serialises first. Give the portal `default = true`.";
+    }
+    {
+      assertion = contested == {};
+      message = "nginx: the same server_name is claimed by two vhosts on one port, so nginx keeps whichever serialises first and the other is unreachable by that name. Offenders (port:name → vhosts): ${
+        lib.concatStringsSep ", " (
+          lib.mapAttrsToList (
+            key: group: "${key} → ${lib.concatStringsSep " + " (lib.unique (map (c: c.vname) group))}"
+          )
+          contested
+        )
+      }";
     }
     {
       assertion = (config.services.nginx.virtualHosts.${tailnetName} or null) != null;
@@ -282,6 +314,16 @@ in {
         addSSL = true;
         sslCertificate = tlsCertificate;
         sslCertificateKey = tlsCertificateKey;
+        # Lancache discovery probes `/lancache-heartbeat` with the bare LAN
+        # address as `Host:` (not a `*.steamcontent.com` name), so it lands on
+        # this default vhost instead of the cache front. SteamPrefill refuses
+        # to prefill without a 200 here (measured: LancacheNotFoundException).
+        locations."= /lancache-heartbeat" = {
+          return = "200 \"OK\"";
+          extraConfig = ''
+            add_header X-LanCache-Processed-By "frieren" always;
+          '';
+        };
         locations."/" = {
           root = landingPage;
         };

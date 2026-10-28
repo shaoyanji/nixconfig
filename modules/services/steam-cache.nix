@@ -286,6 +286,17 @@ in {
       # No explicit Host header in either location: recommendedProxySettings
       # already sets it, and a second one makes nginx reject the upstream
       # request with 400 (measured: `400 Bad Request` from the cache itself).
+      # SteamPrefill (and every lancache client) proves a cache is here by this
+      # path, so it must answer on the front itself rather than through the
+      # backend — the backend would forward it to Valve, which 403s (measured).
+      # `X-LanCache-Processed-By` is the acceptance criterion, not the status:
+      # a 200 without it is rejected (measured, SteamPrefill 3.6.1).
+      locations."= /lancache-heartbeat" = {
+        return = "200 \"OK\"";
+        extraConfig = ''
+          add_header X-LanCache-Processed-By "frieren" always;
+        '';
+      };
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString cfg.port}";
         extraConfig = ''

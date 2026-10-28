@@ -178,6 +178,26 @@ successful — the front falls back by design. The run is capped by
 `prefill.maxRuntime`; prefill resumes where it stopped, so a closed window costs
 time, not progress.
 
+### The percentage is not a clock
+
+`--os` accepts several values in one run (`--os linux windows`), and the total it
+prints — 33.42 GiB for `linux`, 33.72 GiB for `linux windows` — is the *manifest*
+size of the selection, not what the run transfers. Measured 2026-10-29, adding
+Windows to a cache that already held Linux moved **7.7 GB** (cache 45 → 53 GB) in
+~46 min at ~3 MB/s: the content chunks are shared, only the platform depots
+(`_linux`, `_macos`) are not.
+
+The progress line counts chunks across the whole selection and the *new* chunks
+come first, so a fill reads as stalled while it does the only real work. That
+same run sat at 18 % for 46 minutes, was interrupted by a switch, and then — with
+everything already stored — walked all 33.72 GiB in **8:29 at 569 Mbit/s** off
+this cache. Judge a fill by cache growth and incoming bytes, never by `%`.
+
+`prefill.maxRuntime` on frieren is `6h` for the genuinely cold case: one full set
+is 33 GiB, which at the 2.7–5 MB/s this line gets from Valve is 2–3.4 h, so a 3 h
+cap would truncate a first fill every night. A steady-state run is deltas only
+(76 KB in / 14 KB out measured against 33 GiB cached) and stays in minutes.
+
 ### Run it when nobody is streaming, because it cannot be throttled
 
 SteamPrefill has no rate-limit flag (checked against 3.6.1's `prefill --help`) and

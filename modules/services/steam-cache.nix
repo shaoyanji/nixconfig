@@ -163,13 +163,26 @@ in {
         '';
       };
 
-      os = lib.mkOption {
-        type = lib.types.str;
-        default = "windows";
+      oses = lib.mkOption {
+        type = lib.types.listOf (
+          lib.types.enum [
+            "windows"
+            "linux"
+            "macos"
+          ]
+        );
+        default = ["windows"];
         description = ''
-          Platform depots to prefill (`windows`, `linux`, `macos`). Windows is
-          what most clients here are; add `linux` when a Steam Deck should be
-          served too, at the cost of a second depot set per title.
+          Platform depots to prefill, cheapest first in the order listed.
+
+          `--os` takes several values in one invocation (verified on 3.6.1). The
+          total it prints is the manifest size of the selection, not what the
+          run will transfer: Dota 2 reports 33.42 GiB for `linux` and 33.72 GiB
+          for `linux windows`, while adding the second platform to an already
+          filled cache moved 7.7 GB (measured 2026-10-29: cache 45 -> 53 GB) —
+          shared content chunks, distinct platform depots. Leave `macos` out
+          unless a Mac plays here: there is no client for it, so its depots are
+          pure cache pressure.
         '';
       };
 
@@ -340,7 +353,7 @@ in {
         # Belt and braces with the Condition above: a cache that is up but not
         # answering must not turn a prefill into a plain internet download.
         ExecCondition = "${pkgs.curl}/bin/curl -fsS -m 5 http://127.0.0.1:${toString cfg.port}/__health";
-        ExecStart = "${pkgs.steam-lancache-prefill}/bin/SteamPrefill prefill --no-ansi --os ${cfg.prefill.os}";
+        ExecStart = "${pkgs.steam-lancache-prefill}/bin/SteamPrefill prefill --no-ansi --os ${lib.concatStringsSep " " cfg.prefill.oses}";
         # A oneshot's default start timeout is 90 s, which would kill every run
         # mid-download, and `RuntimeMaxSec` is ignored for oneshot (measured:
         # "RuntimeMaxSec= has no effect in combination with Type=oneshot"), so

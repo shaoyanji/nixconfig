@@ -507,11 +507,25 @@ in {
       # costs a login and ~76 KB; only changed depots move.
       enable = true;
       calendar = "02:00";
-      maxRuntime = "3h";
-      # Linux depots, because that is what the cache holds (Dota 2, 33.42 GiB,
-      # filled 2026-10-28). A Windows-only client would want `windows` instead —
-      # one word, and it fetches a second depot set rather than evicting these.
-      os = "linux";
+      # Above one cold app, not just the nightly delta. A full set on this line is
+      # 33 GiB at the 2.7-5 MB/s it gets from Valve — 2 to 3.4 h — so a 3h cap
+      # truncates a genuinely cold fill every night without ever finishing it.
+      # Steady state is deltas and costs minutes; the ceiling is only reachable
+      # when that much is stored nowhere. 02:00 + 6h still ends before 08:00.
+      maxRuntime = "6h";
+      # Both platforms, because this LAN has both. One invocation covers each
+      # (`--os linux windows`, 13 depots). The 33.72 GiB it prints is the manifest
+      # size of the selection, not the transfer: measured 2026-10-29, adding
+      # windows to a cached linux set moved 7.7 GB (cache 45 -> 53 GB) in ~46 min,
+      # because the content chunks are shared and only the platform depots differ.
+      # The percentage is chunk count over the whole set with new chunks served
+      # first, so it crawls through the bytes that matter and then finishes the
+      # cached rest fast — that same run went on to walk all 33.72 GiB in 8:29 at
+      # 569 Mbit/s off this cache. Both sets are now stored.
+      oses = [
+        "linux"
+        "windows"
+      ];
     };
   };
 

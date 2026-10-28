@@ -10,6 +10,45 @@
 }: let
   cfg = config.services.steamCache;
 
+  # Where the cache front answers on the LAN. A prefill that pins the detection
+  # name to loopback would pass detection and still not store what a client
+  # fetches, so the default is the address clients use: this host's lan_ip from
+  # the compiled registry.
+  lanIp =
+    lib.attrByPath ["hosts" config.networking.hostName "network" "lan_ip"] "127.0.0.1"
+    config.fleet.inventory;
+  pinAddress =
+    if cfg.prefill.pinAddress != null
+    then cfg.prefill.pinAddress
+    else lanIp;
+  pinResolver =
+    if cfg.prefill.pinResolver != null
+    then cfg.prefill.pinResolver
+    else pinAddress;
+
+  # The prefill's DNS pin as store paths: nsswitch, host.conf, hosts, resolv.conf
+  # and an empty nscd directory. Being closure paths is the point — the unit
+  # cannot pick up a stale copy from /tmp, and the pin is reviewed with the rest
+  # of the config instead of in a shell script in a state directory.
+  pinFiles = {
+    nsswitch = pkgs.writeText "steam-prefill-nsswitch.conf" ''
+      hosts: files dns
+    '';
+    hostConf = pkgs.writeText "steam-prefill-host.conf" ''
+      multi off
+    '';
+    hosts = pkgs.writeText "steam-prefill-hosts" ''
+      127.0.0.1 localhost
+      ::1 localhost
+      ${pinAddress} lancache.steamcontent.com
+    '';
+    resolv = pkgs.writeText "steam-prefill-resolv.conf" ''
+      nameserver ${pinResolver}
+      options timeout:2 attempts:2 rotate
+    '';
+    nscd = pkgs.runCommandLocal "steam-prefill-empty-nscd" {} "mkdir -p $out";
+  };
+
   backendConf = pkgs.writeText "steam-cache-nginx.conf" ''
     user nginx;
     worker_processes 2;
@@ -154,6 +193,45 @@ in {
           here and must be writable.
         '';
       };
+
+      pin = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Point `lancache.steamcontent.com` at this host for the prefill process
+          only, through a private mount namespace.
+
+          SteamPrefill refuses to start unless that name resolves to a private
+          address (`LancacheNotFoundException`), and the fleet resolver answers
+          it publicly. The record that would fix it globally —
+          `address=/steamcontent.com/` — takes the whole zone, so it also points
+          Steam's matchmaking at this host; with it on, a Dota 2 match could not
+          be accepted (2026-10-28). The pin therefore must never outlive the
+          process, which is exactly what a unit-scoped namespace gives: nothing
+          on the host changes, and LAN DNS keeps resolving publicly.
+        '';
+      };
+
+      pinAddress = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Address the pinned name resolves to. Null means this host's
+          {option}`network.lan_ip` from the compiled inventory: a LAN client
+          asking for the name must land on the same front the prefill does.
+        '';
+      };
+
+      pinResolver = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Resolver the prefill uses for every other lookup. Null means
+          {option}`pinAddress` — the fleet resolver, deliberately: detection
+          reverse-resolves the cache address, and a public resolver NXDOMAINs a
+          LAN PTR. Never a public resolver, never empty.
+        '';
+      };
     };
 
     resolver = lib.mkOption {
@@ -212,8 +290,12 @@ in {
       "d ${cfg.prefill.stateDir} 0700 ${cfg.prefill.user} - -"
     ];
 
-    systemd.services.steam-prefill = lib.mkIf cfg.prefill.enable {
-      description = "SteamPrefill: fill the LAN Steam cache off-peak";
+    # The unit exists whenever the cache does, and `prefill.enable` only arms
+    # the timer. A fill is then one `systemctl start steam-prefill` that uses
+    # this recipe — the alternative was a hand-kept script in the state dir,
+    # which is the one copy nobody reviews and every host would restate.
+    systemd.services.steam-prefill = lib.mkIf cfg.enable {
+      description = "SteamPrefill: fill the LAN Steam cache";
       after = [
         "network-online.target"
         "steam-cache.service"
@@ -235,6 +317,26 @@ in {
         Type = "oneshot";
         User = cfg.prefill.user;
         WorkingDirectory = cfg.prefill.stateDir;
+        # The DNS pin, as mounts rather than a script: systemd puts the unit in
+        # its own mount namespace, so a prefill that crashes or is killed cannot
+        # leave the host resolving this name `address=`-style. Four files, each
+        # one a trap verified by removing it and watching the fill fail:
+        #   nsswitch — the host lists `resolve` before `files dns`, so a hosts
+        #              entry is otherwise never read;
+        #   host.conf — `multi off`, or glibc merges the public AAAA/A that DNS
+        #              returns with the pinned IPv4 and the client connects to
+        #              the public address (a 33 GiB download that stores nothing);
+        #   hosts     — the pin itself;
+        #   nscd      — an empty dir over /var/run/nscd, because nsncd answers
+        #              from its own cache and /etc/hosts would never be consulted.
+        PrivateMounts = true;
+        BindReadOnlyPaths = lib.optionals cfg.prefill.pin [
+          "${pinFiles.nsswitch}:/etc/nsswitch.conf"
+          "${pinFiles.hostConf}:/etc/host.conf"
+          "${pinFiles.hosts}:/etc/hosts"
+          "${pinFiles.resolv}:/etc/resolv.conf"
+          "${pinFiles.nscd}:/var/run/nscd"
+        ];
         # Belt and braces with the Condition above: a cache that is up but not
         # answering must not turn a prefill into a plain internet download.
         ExecCondition = "${pkgs.curl}/bin/curl -fsS -m 5 http://127.0.0.1:${toString cfg.port}/__health";

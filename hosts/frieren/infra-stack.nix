@@ -499,13 +499,19 @@ in {
     # client that wants the cache asks it by name; nothing is steered into it.
     dnsOverride = false;
     prefill = {
-      # Parked with the override. A prefill only writes to the cache if its own
-      # downloads are steered, and SteamPrefill refuses to start unless
-      # `lancache.steamcontent.com` resolves privately (measured: exit 1,
-      # "resolving to a public IP"). Warming it needs the same interception.
-      enable = false;
+      # Armed 2026-10-28. The pin a fill needs lives in the unit itself
+      # (`BindReadOnlyPaths` over the four resolver files, in this unit's mount
+      # namespace only), so this window no longer needs the zone-wide
+      # `address=` override that broke Dota matchmaking — LAN DNS is untouched
+      # before, during and after a run. A run that finds everything current
+      # costs a login and ~76 KB; only changed depots move.
+      enable = true;
       calendar = "02:00";
       maxRuntime = "3h";
+      # Linux depots, because that is what the cache holds (Dota 2, 33.42 GiB,
+      # filled 2026-10-28). A Windows-only client would want `windows` instead —
+      # one word, and it fetches a second depot set rather than evicting these.
+      os = "linux";
     };
   };
 

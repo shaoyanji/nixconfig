@@ -179,6 +179,14 @@
       StartLimitIntervalSec = 0;
     };
     serviceConfig.Restart = lib.mkDefault "always";
+    # Measured 2026-10-28: 13 threads × glibc's 64 MiB per-arena heap = 2.1 GB of
+    # address space in 12 heaps, 934 MB of it swapped out, for a resolver whose
+    # live set is ~840 MB (2.6 M queries FTL imports into memory at startup —
+    # `database.DBimport = false` and `maxDBdays = 1` are both ignored by 6.7.1,
+    # tested via a bind-mounted config). Two arenas put the peak at 1.10 GB and
+    # swap at zero; MemoryHigh is the guard against a future FTL outgrowing it.
+    environment.MALLOC_ARENA_MAX = "2";
+    serviceConfig.MemoryHigh = "1200M";
   };
 
   # --- eval-time guards for the resolver --------------------------------------
@@ -208,14 +216,42 @@
     wants = ["pihole-ftl.service"];
   };
 
-  # Work around upstream nixpkgs pihole-ftl queryLogDeleter systemd %s and quote escaping quirks:
-  # Using writeShellScript ensures the SQL query is passed intact with proper quotes and without systemd specifier substitution.
+  # Upstream's deleter (nixpkgs pihole-ftl.nix) is replaced because three
+  # things in it keep retention from meaning "7 days":
+  #
+  # 1. `date('now','-7 day')` is a *calendar* day in UTC, and the timer fires at
+  #    00:00 local. One run a day against a midnight cutoff leaves rows aged
+  #    7-8 days — measured 2026-10-28 the oldest row sat exactly on the previous
+  #    run's cutoff, 8.77 days old. Retention is now `now - 604800` (a rolling
+  #    window) and the timer runs hourly, so the overshoot is an hour, not a day.
+  # 2. Its `ConditionFileNotEmpty` is set in [Service], where systemd ignores it
+  #    (journal: "Unknown key ... ignoring"), so the guard against creating an
+  #    empty database never worked. The check is in the script instead.
+  # 3. Deleting rows does not shrink the file: SQLite keeps the freed pages for
+  #    reuse and FTL's insert rate consumes them, so the file holds its
+  #    high-water mark (measured: 603 MB across 147k pages, freelist 0). VACUUM
+  #    takes an exclusive lock and rewrites every page, so it is not worth a
+  #    nightly run — it fires only when the freelist is already large (a mass
+  #    delete), which is precisely when reclaiming matters.
   systemd.services.pihole-ftl-log-deleter = {
     serviceConfig.ExecStart = lib.mkForce (
       pkgs.writeShellScript "pihole-ftl-log-delete" ''
-        echo "Deleting query logs older than 7 days"
-        exec ${config.services.pihole-ftl.package}/bin/pihole-FTL sqlite3 "${config.services.pihole-ftl.settings.files.database}" \
-          "DELETE FROM query_storage WHERE timestamp <= CAST(strftime('%s', date('now', '-7 day')) AS INT); SELECT changes() FROM query_storage LIMIT 1;"
+        set -u
+        db='${config.services.pihole-ftl.settings.files.database}'
+        sql='${lib.getExe config.services.pihole-ftl.package}'
+        [ -s "$db" ] || { echo "$db absent or empty — nothing to delete"; exit 0; }
+
+        echo "Deleting query logs older than 7 days (rolling window)"
+        "$sql" sqlite3 "$db" \
+          "PRAGMA busy_timeout=60000; DELETE FROM query_storage WHERE timestamp <= CAST(strftime('%s','now') AS INT) - 604800; SELECT changes() FROM query_storage LIMIT 1;"
+
+        free=$("$sql" sqlite3 "$db" "PRAGMA freelist_count;")
+        if [ "''${free:-0}" -gt 4096 ]; then
+          echo "reclaiming $free free pages ($(( free * 4096 / 1024 / 1024 )) MiB) with VACUUM"
+          "$sql" sqlite3 "$db" "PRAGMA busy_timeout=60000; VACUUM;" || echo "VACUUM deferred (database busy)"
+        else
+          echo "''${free:-0} free pages — nothing to reclaim"
+        fi
       ''
     );
   };
@@ -227,8 +263,12 @@
     # Log containment: keep FTL.log lean and auto-purge old DB queries
     queryLogDeleter = {
       enable = true;
+      # `age` only feeds the message string: the ExecStart above owns the window.
       age = 7;
-      interval = "daily";
+      # Hourly, so a rolling 7-day cutoff is honoured within the hour. The run
+      # itself is one indexed DELETE plus a freelist_count read, and does nothing
+      # at all when there is nothing old to remove.
+      interval = "hourly";
     };
     lists = [
       {
@@ -242,11 +282,12 @@
     ];
   };
 
-  # Pi-hole admin UI. Bound to loopback (HC-7): the runbook's access path is a
-  # port-forward (`ssh -L 8080:localhost:8080 frieren` → http://localhost:8080/admin,
-  # docs/frieren-access.md), so the LAN hole on 8080 was never the intended way in.
-  # FTL's `webserver.port` accepts an interface prefix, which is how the bind is
-  # narrowed without a proxy.
+  # Pi-hole admin UI. The bind stays loopback (HC-7); the LAN reaches it through
+  # the `pihole.frieren.lan` vhost in reverse-proxy.nix, which is also the portal
+  # card. FTL's `webserver.port` accepts an interface prefix, which is how the
+  # bind is narrowed without a second listener. The UI itself cannot be turned
+  # off while `lists` is non-empty: nixpkgs loads those blocklists through the
+  # web API and asserts on `webserver.port = ""` plus lists.
   services.pihole-web = {
     enable = true;
     ports = ["127.0.0.1:8080"];

@@ -175,16 +175,14 @@
   };
 
   # --- eval-time guards for the resolver --------------------------------------
-  # The resolver is the fleet's single point of failure, so the things that make
-  # it survivable are asserted rather than remembered: a resolver host must have
-  # the watchdog, and the tailnet zone must be forwarded (without it, every
-  # *.ts.net URL is NXDOMAIN for anyone using this resolver — measured
-  # 2026-10-26).
+  # The resolver is the fleet's single point of failure, so what makes it
+  # survivable is asserted rather than remembered: the tailnet zone must be
+  # forwarded (without it, every *.ts.net URL is NXDOMAIN for anyone using this
+  # resolver — measured 2026-10-26). A local self-healing watchdog used to be
+  # asserted here too; it was removed 2026-10-28 — minyx now answers as the
+  # backup resolver, so a dead pihole degrades DNS instead of taking it away,
+  # and the loop cost a full core to prove what the peer already covers.
   assertions = [
-    {
-      assertion = config.services.pihole-ftl.enable -> (config.systemd.services ? dns-resolver-watchdog);
-      message = "dns: services.pihole-ftl.enable requires the dns-resolver-watchdog unit — an unattended resolver has to notice its own death.";
-    }
     {
       assertion =
         builtins.any (
@@ -195,70 +193,6 @@
     }
   ];
 
-  # --- resolver watchdog (2026-10-26) ---------------------------------------
-  # This host IS the fleet resolver: while pihole-ftl was stopped by a switch
-  # the whole LAN got "Server Not Found" and nothing said so. The watchdog asks
-  # the resolver the question a client asks, and restarts it after three
-  # consecutive failures — seconds of degradation instead of an outage that waits
-  # for a human. It refuses to act during a switch, where systemd is already
-  # starting/stopping the unit and a second actor would race it.
-  systemd.services.dns-resolver-watchdog = {
-    description = "Restart the local resolver when it stops answering DNS";
-    wantedBy = ["multi-user.target"];
-    after = [
-      "pihole-ftl.service"
-      "unbound.service"
-    ];
-    wants = ["pihole-ftl.service"];
-    path = with pkgs; [
-      coreutils
-      dnsutils
-      systemd
-      util-linux
-    ];
-    restartIfChanged = false;
-    unitConfig = {
-      X-Fleet-Role = "daemon";
-      StartLimitIntervalSec = 0;
-    };
-    serviceConfig = {
-      Type = "simple";
-      Restart = "always";
-      RestartSec = 10;
-      Nice = 10;
-      ExecStart = pkgs.writeShellScript "dns-resolver-watchdog" ''
-        set -u
-        # `dig` exits 0 on NXDOMAIN, so the answer must be non-empty: an empty
-        # reply is exactly the "Server Not Found" a client sees.
-        probe() {
-          [ -n "$(${pkgs.dnsutils}/bin/dig +short +time=2 +tries=1 @127.0.0.1 "$1" A 2>/dev/null)" ]
-        }
-        fail=0
-        while :; do
-          if probe vault.frieren.lan; then
-            fail=0
-            # Upstream reachability is a different fault: restarting the
-            # resolver cannot fix it, so it is only reported.
-            probe github.com || ${pkgs.util-linux}/bin/logger -t dns-watchdog "upstream probe failed (no restart)"
-          else
-            fail=$((fail + 1))
-            ${pkgs.util-linux}/bin/logger -t dns-watchdog "probe failed ($fail/3)"
-            if [ "$fail" -ge 3 ]; then
-              if ${pkgs.systemd}/bin/systemctl is-active --quiet nixos-rebuild-switch-to-configuration.service; then
-                ${pkgs.util-linux}/bin/logger -t dns-watchdog "switch in progress — leaving the unit alone"
-              else
-                ${pkgs.util-linux}/bin/logger -t dns-watchdog "resolver not answering — restarting pihole-ftl"
-                ${pkgs.systemd}/bin/systemctl restart pihole-ftl || true
-              fi
-              fail=0
-              ${pkgs.coreutils}/bin/sleep 10
-            fi
-          fi
-          ${pkgs.coreutils}/bin/sleep 5
-        done
-      '';
-    };
-  };
   systemd.services.pihole-ftl-setup = {
     after = [
       "tailscaled.service"

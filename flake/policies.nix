@@ -49,6 +49,50 @@
   # (`systemd.services.<n>.serviceConfig = …`) and a block with no sibling after it
   # both otherwise swallow unrelated lines and report a `Restart` that belongs to
   # another unit — a false positive, which is worse than no gate.
+  # --- library reads: the gate behind #library-content-is-not-scheduled ------
+  # A library on a network mount is metadata to anything automatic. Deleting the
+  # offender is not the gate; this predicate is.
+  netMounts = ["/Volumes/data" "/mnt/burgernas"];
+  contentExtractors = ["unsquashfs" "readelf"];
+  unitHosts = nixUnder "modules" ++ nixUnder "hosts";
+  libraryExtractors =
+    builtins.filter
+    (p: let
+      t = read p;
+    in
+      lib.any (m: lib.hasInfix m t) netMounts
+      && lib.any (r: lib.hasInfix r t) contentExtractors)
+    (shellScripts ++ unitHosts);
+  extractorNames = map (p: lib.removeSuffix ".sh" (builtins.baseNameOf p)) libraryExtractors;
+  # The unit's own file never contains the extractor — it names the script — so
+  # this is a name match against the scripts that do.
+  scheduledLibraryExtractions =
+    builtins.filter
+    (p: let
+      t = read p;
+    in
+      lib.hasInfix "systemd." t
+      && lib.any (n: lib.hasInfix n t) extractorNames)
+    unitHosts;
+  # A library's bytes are pulled by a LAUNCH and by nothing else: no timer, no
+  # login, no path unit watching for a fresh drop. A stale cache is flushed on
+  # the next launch — that is cheap and user-initiated; warming ahead of it is a
+  # LAN-wide congestion event nobody asked for.
+  libraryPathWatchers =
+    builtins.filter
+    (p: let
+      t = read p;
+    in
+      lib.any (m: lib.hasInfix m t) netMounts
+      && (lib.hasInfix "systemd.paths" t || lib.hasInfix "systemd.user.paths" t))
+    unitHosts;
+  # Named explicitly so a revert cannot pass by having no unit at all.
+  deletedLibraryIntegrators = builtins.filter (p: builtins.pathExists (root + "/${p}")) [
+    "scripts/task/appimage-integrate.sh"
+    "modules/scripts/appimage-integrate.nix"
+    "modules/user/desktop/appimage-launchers.nix"
+  ];
+
   indentOf = l: builtins.stringLength (builtins.head (builtins.match "([[:space:]]*).*" l));
   serviceBlocks = p: let
     lines = lib.splitString "\n" (read p);
@@ -780,6 +824,18 @@
       proof = "tools/library.nix rows that land in bin-aarch64/bin-x86";
       holds = unpinnedRows == [];
       detail = "rows with no pin for an arch dir: ${lib.concatStringsSep ", " unpinnedRows}";
+    };
+
+    library-content-is-not-scheduled = {      rule = "A library on a network mount is pulled by a LAUNCH and by nothing else: no timer, no login job, no path unit watching for a fresh drop, and no unit may open an image to read a `.desktop` file, a version or an icon out of it. A stale cache is flushed and re-fetched on the next launch — never warmed because the library changed, because that turns one upgrade into a LAN-wide congestion event.";
+      proof = "scripts/task/appimage-integrate.sh (deleted 2026-10-28) · the `appimage-launchers` user unit (login + hourly)";
+      holds =
+        scheduledLibraryExtractions == []
+        && libraryPathWatchers == []
+        && deletedLibraryIntegrators == [];
+      detail =
+        if deletedLibraryIntegrators != []
+        then "the AppImage integrator is back: ${lib.concatStringsSep ", " deletedLibraryIntegrators} — it opened every image in /Volumes/data/appimages with unsquashfs/readelf on a timer. Measured 2026-10-28: 61 images, 50 CPU-seconds and a 673 MiB peak per hourly run on frieren; ~300 MB of NFS reads on the netbook inside four minutes of boot, on a Celeron over wifi."
+        else "a scheduled unit names a script that extracts library content across a network mount: ${lib.concatStringsSep ", " scheduledLibraryExtractions}";
     };
 
     history-sync-is-one-server = {

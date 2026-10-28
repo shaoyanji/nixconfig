@@ -592,7 +592,7 @@ alejandra --check <file>                                                     # C
 ## Storage
 
 `/srv/data` on frieren → `/Volumes/data`: [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)
-[[flake/policies.nix#media-tree-isolation]]
+[[flake/policies.nix#media-tree-isolation]] [[flake/policies.nix#library-content-is-not-scheduled]]
 
 **Portable tool library** (`bin-*`, `appimages`) is what NON-Nix machines execute, so
 linkage is the contract, not size: `eget` hangs on its asset picker without `--asset`,
@@ -652,7 +652,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 
 | Namespace       | What                                                                                                         | Skill                                  |
 | --------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
-| `infra:*`       | Host lifecycle, secrets, SOPS, microVM guests (`microvm:*` declarative, `vm:canary:*` runner)                  | `.agents/skills/infra/SKILL.md`, `.agents/skills/microvm/SKILL.md` |
+| `infra:*`       | Host lifecycle, secrets, SOPS, detached jobs (`infra:job:*`), microVM guests (`microvm:*` declarative, `vm:canary:*` runner) | `.agents/skills/infra/SKILL.md`, `.agents/skills/microvm/SKILL.md` |
 | `agents:*`      | Operator menu, xs, OAuth                                                                                     | `.agents/skills/agents/SKILL.md`       |
 | `checks:*`      | Validation, smoke checks, nix lint                                                                           | `.agents/skills/checks/SKILL.md`       |
 | `dev:*`         | Git, flake, site, PRs, packages                                                                              | `.agents/skills/dev/SKILL.md`          |

@@ -254,6 +254,10 @@ tasks:
 
   infra:rebuild:nixos:
     desc: Rebuild local NixOS host and refresh ~/Taskfile.yml
+    summary: >
+      Minutes of work; run it detached with `task infra:job:start
+      RUN=infra:rebuild:nixos` and read the outcome from `infra:job:status`
+      instead of waiting on it.
     aliases: [nixos-rebuild]
     cmds:
       - task infra:switch:nixos
@@ -309,6 +313,71 @@ tasks:
           sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure
         fi
       - task infra:secrets:decrypt:detaskfile-home
+
+  infra:job:start:
+    desc: Run a long task detached and return at once; the job records its own exit code
+    summary: >
+      Blocking on a rebuild buys a timeout — too short (killed work) or dead
+      time. The job runs in its own tmux server (your session is untouched),
+      inherits this shell's environment (NOM=1, REMOTE_BUILD=1, …), and writes
+      its exit code when it ends. Var: RUN (no default — a default here would
+      start something else). Exit 0 = launched, 1 = could not launch,
+      2 = state directory unwritable.
+    vars:
+      RUN: '{{.RUN | default ""}}'
+      RUN_ARGS: '{{.RUN_ARGS | default ""}}'
+    cmds:
+      - |
+        [ -n "{{.RUN}}" ] || { echo "infra:job:start needs RUN=<task name>" >&2; exit 1; }
+        bash scripts/task/job.sh start task {{.RUN}} {{.RUN_ARGS}}
+
+  infra:job:status:
+    desc: Job table plus one NUDGE per job that finished since the last read
+    summary: >
+      Without ID this is a read that always exits 0: it prints a NUDGE line for
+      every job that ended since the last read, then clears it, so the nudge
+      arrives exactly once. With ID it reports that job's exit code, and the task
+      takes the same code. Exit 0 = clean, 1 = the job failed, 2 = unknown id,
+      3 = still running.
+    vars:
+      ID: '{{.ID | default ""}}'
+    cmds:
+      - bash scripts/task/job.sh status {{.ID}}
+
+  infra:job:wait:
+    desc: Wait on a job, bounded — returns the job's own exit code, not a timeout
+    summary: >
+      For when the answer is needed now but the work is not done yet. Polls until
+      the job exits or TIMEOUT seconds pass. Exit 0 = clean, 1 = the job failed,
+      2 = unknown id, 3 = timed out and it is still working (not lost).
+    vars:
+      ID: '{{.ID | default ""}}'
+      TIMEOUT: '{{.TIMEOUT | default "600"}}'
+    cmds:
+      - bash scripts/task/job.sh wait {{.ID}} --timeout {{.TIMEOUT}}
+
+  infra:job:logs:
+    desc: Tail a job's log (newest job when ID is empty)
+    vars:
+      ID: '{{.ID | default ""}}'
+    cmds:
+      - bash scripts/task/job.sh logs {{.ID}}
+
+  infra:job:stop:
+    desc: Stop a running job, keeping its log and exit record
+    summary: The only way to end a wedged rebuild short of a reboot; the log still
+      says what it had done.
+    vars:
+      ID: '{{.ID | default ""}}'
+    cmds:
+      - bash scripts/task/job.sh stop {{.ID}}
+
+  infra:job:prune:
+    desc: Drop finished job records older than DAYS (default 7)
+    vars:
+      DAYS: '{{.DAYS | default "7"}}'
+    cmds:
+      - bash scripts/task/job.sh prune {{.DAYS}}
 
   infra:switch:*:
     desc: Switch current host using a rebuild command (nixos|darwin)

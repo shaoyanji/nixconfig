@@ -23,7 +23,7 @@ in {
   # Replaces the fleet userland default; see [[flake/policies.nix#desktop-fork-not-disable]].
   fleet.hmUserModules = [
     ../../modules/user/base.nix
-    ../../modules/user/desktop/appimage-launchers.nix
+    ../../modules/user/desktop/appimage-menu.nix
   ];
 
   # /boot is ext4 (legacy BIOS + GRUB) — NOT a vfat ESP, so systemd-boot

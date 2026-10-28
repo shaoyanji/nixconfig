@@ -43,6 +43,11 @@
   # need its proxy edited, and the registry is what the docs site already reads.
   lanIp = name: config.fleet.inventory.hosts.${name}.network.lan_ip;
 
+  # FTL's admin UI binds loopback only (hosts/frieren/dns.nix). Read the address
+  # back from that declaration instead of repeating the port here, so the bind
+  # and this proxy cannot drift apart.
+  piholeUi = "http://${lib.head (lib.splitString "," config.services.pihole-web.ports)}";
+
   # The page is COMPILED from the service registry in `config`, not written
   # here: a hand-kept list outlives the services it names (this file still
   # advertised `pdf.frieren.lan` after Stirling moved to delphi). The
@@ -154,6 +159,13 @@ in {
         description = "Config-declared health checks (gatus) — service, cache and DNS liveness.";
         group = "Operations & Fleet Infrastructure";
         vhost = "monitors.frieren.lan";
+      };
+      pihole = {
+        title = "Pi-hole DNS";
+        description = "Resolver admin: query log, allow/deny lists, blocklist status and per-client stats.";
+        group = "Operations & Fleet Infrastructure";
+        vhost = "pihole.frieren.lan";
+        href = "https://pihole.frieren.lan/";
       };
     };
   };
@@ -570,6 +582,42 @@ in {
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString config.services.transmission.settings.rpc-port}";
           proxyWebsockets = true;
+        };
+      };
+
+      # Pi-hole admin UI (blocklists, query log, per-client stats). FTL binds
+      # `127.0.0.1:8080` and the bind is not widened: this vhost is the LAN path
+      # in, exactly like torrent.frieren.lan above. The UI stays enabled because
+      # `services.pihole-ftl.lists` is loaded through its API — a build assertion
+      # refuses the combination of lists with `webserver.port = ""`.
+      "pihole.frieren.lan" = {
+        serverAliases = ["pihole"];
+        addSSL = true;
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
+        ];
+        sslCertificate = tlsCertificate;
+        sslCertificateKey = tlsCertificateKey;
+        # FTL 6 serves the UI at `/` (webhome in [webserver.paths]), not at
+        # `/admin/` — that path is a 404 there. No path rewrite: `/` and `/api`
+        # both pass through unchanged.
+        locations."/" = {
+          proxyPass = piholeUi;
+          proxyWebsockets = true;
+          extraConfig = ''
+            proxy_set_header Host $host;
+            # Query-log pages stream a long table; buffering them makes the
+            # first paint wait for the whole response.
+            proxy_buffering off;
+          '';
         };
       };
 

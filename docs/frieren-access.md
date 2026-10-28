@@ -61,11 +61,11 @@ route on hosts that are physically on the LAN — their native path wins.
 | Scrutiny | 8124 | LAN + tailnet |
 | SMB / NFS | 445, 139 / 2049 | LAN + tailnet |
 
-### Loopback-only (no firewall opening — reach via SSH tunnel)
+### Loopback-only (no firewall opening)
 
 | Service | Port | Access |
 |---------|------|--------|
-| Pi-hole admin (FTL webserver) | 8080 | `ssh -L 8080:localhost:8080 frieren` then `http://localhost:8080/admin` |
+| Pi-hole admin (FTL webserver) | 8080 | `https://pihole.frieren.lan/admin` (nginx vhost, also a card on the portal); off-LAN via `ssh -L 8080:localhost:8080 frieren` then `http://localhost:8080/admin` |
 
 DNS itself is reachable by design: UDP/TCP 53 is open on `enp1s0` (LAN) and
 `tailscale0` (tailnet), so any client can use `192.168.3.25` or `100.97.61.65`

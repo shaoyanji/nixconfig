@@ -440,6 +440,7 @@ in {
     })
     ../../modules/services/fleet-monitors.nix
     ../../modules/services/downloads-sort.nix
+    ../../modules/services/steam-cache.nix
     ../../modules/services/agent-scheduler.nix
     ../../modules/services/btrfs-watchdog.nix
     ../../modules/services/uds-static-bridge.nix
@@ -478,12 +479,28 @@ in {
     classifyEnvironment = "/run/secrets/rendered/hermes.env";
   };
 
+  # Steam content cache on the USB flash tier: 331 MB/s sequential and 236 MB/s
+  # across 8 readers, against 76/67 on the spindle that serves Jellyfin — and
+  # the WAN it replaces measures 5-7 MB/s. 70 GB holds Dota 2 plus a season of
+  # deltas and leaves the tier's own scratch room.
+  services.steamCache = {
+    enable = true;
+    cacheDir = "/mnt/flash-cache/steam-cache";
+    maxSize = "70g";
+  };
+
   services.fleetMonitors = {
     enable = true;
     endpoints = [
       {
         name = "nginx portal";
         url = "http://127.0.0.1:80";
+        group = "frieren";
+        conditions = ["[STATUS] < 400"];
+      }
+      {
+        name = "steam cache";
+        url = "http://127.0.0.1:8081/__health";
         group = "frieren";
         conditions = ["[STATUS] < 400"];
       }

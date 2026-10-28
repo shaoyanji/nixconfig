@@ -160,6 +160,38 @@ patterns — which is why the `--print-roots` check belongs in the operator's ha
   evaluated unit set — so the failure names the unit, not a daemon that quietly
   stopped days later.
 
+## A mount to a sleeping peer must fail fast
+
+`mount.nfs` retries a failed mount for **2 minutes by default** (`retry=`, counted
+in minutes — a different knob from the data-path `retrans=`). A mount whose peer
+is off by design therefore pays up to that on *every* walk of the mount table, and
+one such mount blocks whole tools: they `statfs()` every entry before applying any
+filter.
+
+- **`duf` cannot be told to skip it.** `--hide-mp <exact>`, `--hide-mp` with a
+glob and `--hide-fs autofs` all still block (measured 2026-10-28), because the
+probe runs first. Its output is empty while it waits, which reads as a hang.
+- **`df` is not proof the mount is cheap.** It finished in 17 ms only because
+coreutils skips autofs entries without a statfs; name the path
+(`df /mnt/burgernas/peachcable`) and it blocks like everything else.
+- **`btop` and `updatedb` trip the same wire** — the journal fills with automount
+requests naming them.
+
+Measured cost before the fix: 90 s per probe, ending in `Result=timeout` because
+systemd's `DefaultTimeoutStartSec` had to kill `mount.nfs` mid-retry.
+
+A cold-vault mount carries two options: `retry=0` (the connect itself fails in
+under a second with "no route to host", so nothing is left to retry) and
+`x-systemd.mount-timeout=10s` as the backstop for the other hang class — peer
+reachable, handshake stuck. That lands at ~3 s per probe and `Result=exit-code`.
+They live in the profile that owns the mount, `profiles/burgernas-client.nix`, so
+a host that mounts the vault inherits them rather than rediscovering the default;
+the same rule applies to any new mount pointed at a machine that is normally off.
+
+Trade-off to state out loud: `retry=0` means one attempt, so a transient network
+blip fails the mount instead of retrying for two minutes. For an automount that
+is the right trade — the next access re-triggers it.
+
 ## CI quirk
 
 CI builds with `nix build -L .?submodules=1#…`: `?submodules=1` is what makes
@@ -215,8 +247,8 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     agent was supposed to avoid. Keep the constraint in the `.nix` and put the
     narrative in `docs/` or a skill, with one line pointing there. Restating
     what Nix already declares is worse: the DSM mount's `vers=4.1` fact lives in
-    `hosts/frieren/configuration.nix`, so repeating it in prose is a second home
-    that drifts. Gate: `task checks:nix:prose` (pre-commit, on added lines) —
+    `modules/profiles/burgernas-client.nix`, so repeating it in prose is a second
+    home that drifts. Gate: `task checks:nix:prose` (pre-commit, on added lines) —
     [[flake/policies.nix#nix-header-budget]].
 13. **An inherited `PS0` prints the preexec hook at every prompt.** `bash-preexec`
     (sourced by atuin's bash integration) hooks preexec by *appending* to `PS0`, and

@@ -491,11 +491,18 @@ in {
     # is still pulling and hand it misses for what it just fetched. 100 GB
     # leaves ~18 GB of the 118.5 GB tier for transcode/thumb scratch.
     maxSize = "100g";
-    # Off while `dnsOverride` is off (2026-10-28). Prefill fills the cache by
-    # downloading through it, so with no interception a 02:00 run would pull
-    # 100 GB from the WAN and write nothing — the timer is only switched on
-    # together with the override, and the one-time `select-apps` login.
+    # OFF, deliberately, and not because the cache is broken: the cache is a
+    # speed-up for a Dota download, and the interception that makes it work is
+    # the one thing that must not be on the LAN. `address=/steamcontent.com/`
+    # takes the whole zone, so it also points Steam's matchmaking traffic at this
+    # host — Dota 2 would not accept a match on 2026-10-28 while it was on. Any
+    # client that wants the cache asks it by name; nothing is steered into it.
+    dnsOverride = false;
     prefill = {
+      # Parked with the override. A prefill only writes to the cache if its own
+      # downloads are steered, and SteamPrefill refuses to start unless
+      # `lancache.steamcontent.com` resolves privately (measured: exit 1,
+      # "resolving to a public IP"). Warming it needs the same interception.
       enable = false;
       calendar = "02:00";
       maxRuntime = "3h";

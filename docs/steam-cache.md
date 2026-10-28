@@ -30,6 +30,31 @@ is steered to it. Re-enabling is a decision about the whole zone, not a
 performance tweak — and if a game is being played on the LAN while it is on,
 that game is the experiment.
 
+## The prefill is parked, and what blocks it
+
+`services.steamCache.prefill` is written and disabled. SteamPrefill refuses to
+run unless `lancache.steamcontent.com` resolves to an RFC1918 address (exit 1,
+`LancacheNotFoundException`), and on frieren that name reaches an application
+through a chain that defeats both a `resolv.conf` and an `/etc/hosts` pin:
+
+1. `/etc/nsswitch.conf` lists `resolve [!UNAVAIL=return]` **before** `files dns`,
+   so glibc asks systemd-resolved and never reads either file — verified by
+   binding both into a unit and still getting the router's answer.
+2. The WiFi link (`wlp2s0`) keeps `192.168.3.1` as its per-link upstream
+   (`~lan`, Default Route: yes), so resolved can answer with Valve's public
+   CNAME chain for a name `dig @127.0.0.1` returns `192.168.3.25` for.
+3. `pihole-FTL` serves its cached public CNAME chain for that exact name in
+   preference to `address=/steamcontent.com/`, and the `address=` lines do not
+   always survive the config write a switch performs (they answer correctly
+   after a manual `systemctl restart pihole-ftl`, then stop within the hour).
+
+Warming the cache therefore needs the same zone-wide interception that breaks
+matchmaking, which is why the feature is off rather than half-on. A run that is
+started anyway fails safely: `ConditionPathExists` on the selected-apps file and
+`ExecCondition` on the backend's `/__health` both have to pass first, and
+`TimeoutStartSec` (not `RuntimeMaxSec`, which a oneshot ignores) bounds it to
+`maxRuntime`.
+
 The split is deliberate. The cache lives on the **removable** USB flash tier
 (`nofail`), so its unit is gated on `ConditionPathIsMountPoint` and nothing else
 depends on it: when the stick is out the backend is simply not running, the

@@ -486,7 +486,20 @@ in {
   services.steamCache = {
     enable = true;
     cacheDir = "/mnt/flash-cache/steam-cache";
-    maxSize = "70g";
+    # Must exceed the largest single install, not just "most of it": at a cap
+    # below Dota 2's own size, the LRU would evict chunks of the build a client
+    # is still pulling and hand it misses for what it just fetched. 100 GB
+    # leaves ~18 GB of the 118.5 GB tier for transcode/thumb scratch.
+    maxSize = "100g";
+    # Fill the cache at 02:00 rather than on demand: a client pulling Dota 2 at
+    # 20:00 would otherwise spend the evening's WAN on a download the cache is
+    # about to hold anyway. The window is capped at 05:00 and the job is
+    # skipped entirely until the one-time `select-apps` login exists.
+    prefill = {
+      enable = true;
+      calendar = "02:00";
+      maxRuntime = "3h";
+    };
   };
 
   services.fleetMonitors = {

@@ -61,9 +61,11 @@ client still gets its bytes.
 - **No login is involved anywhere in the cache.** It caches CDN responses; the
   Steam account only matters to the client. Prefill is the sole exception (see
   below), and it is optional.
-- **70 GB cap** (`maxSize`): Dota 2 plus a season of deltas, and it leaves the
-  tier's own scratch (`jellyfin-transcode`, `immich-thumbs`, `nix-eval`) room.
-  When the cap is hit, least-recently-used objects are evicted.
+- **100 GB cap** (`maxSize`) on the 118.5 GB tier, leaving ~18 GB for its own
+  scratch (`jellyfin-transcode`, `immich-thumbs`, `nix-eval`). The cap has to
+  sit **above the largest single install**, not just near it: below that, LRU
+  eviction removes chunks of the build a client is still downloading and it
+  re-fetches what it just fetched. Dota 2 is over 70 GB, so 70 GB was wrong.
 - **Range responses are not cached** (no `slice` module): a client that asks for
   a byte range on a cold object is served from Valve. SteamPipe chunk fetches
   are whole objects, so this only costs the odd resume.
@@ -71,8 +73,49 @@ client still gets its bytes.
   get the public answer and silently skip the cache. The LAN hands out the VIP
   (`192.168.3.50`); the failover peer must carry the same `address=` lines or it
   answers with the public CDN (slower, still correct).
-- **Prefilling needs no GUI.** The cache itself needs no login at all — clients
-  log into Steam as usual. `pkgs.steam-lancache-prefill` (`steam-lancache-prefill
-  login <user>`) prompts for the password and Steam Guard code in a terminal and
-  caches the refresh token, so later runs are unattended; Dota 2 (570) is
-  free-to-play and downloads anonymously, so a prefill normally needs no account.
+
+## Nightly prefill (optional, off by default)
+
+The cache fills **on demand**, so a title nobody has asked for yet is empty when
+the first client wants it. `services.steamCache.prefill` adds a `02:00` run of
+[SteamPrefill](https://github.com/tpill90/steam-lancache-prefill) that fetches the
+selected apps *through this cache*, spending the idle line instead of the
+evening's.
+
+| Piece | Where |
+| :--- | :--- |
+| `steam-prefill.service` | `oneshot`, `User` from `prefill.user`, `WorkingDirectory` `prefill.stateDir` |
+| `steam-prefill.timer` | `OnCalendar` `prefill.calendar` (`02:00` on frieren), **not** persistent |
+| App list + Steam token | `/var/lib/steam-prefill/Config/` (`selectedAppsToPrefill.json`, `account.config`) |
+
+Gates, in order: the flash mount must be mounted, the app list must exist, and
+`127.0.0.1:8081/__health` must answer. Without the last two, a prefill through a
+dead cache would download from Valve at full speed, store nothing, and look
+successful — the front falls back by design. The run is capped by
+`prefill.maxRuntime`; prefill resumes where it stopped, so a closed window costs
+time, not progress.
+
+### One-time setup (needs a terminal, no GUI)
+
+Steam will only hand out depots to an **authenticated account that owns the app**
+— anonymity is not enough, even for free-to-play titles like Dota 2 (add it to
+the library first). The selection itself is interactive, so it is done once by
+hand:
+
+```bash
+# as devji — login (password + Steam Guard), then pick apps with space, enter to save
+cd /var/lib/steam-prefill && steam-lancache-prefill select-apps
+# size check for the current selection
+cd /var/lib/steam-prefill && steam-lancache-prefill select-apps status
+```
+
+The token and the selection live in `Config/` beside that working directory, so
+later runs need nothing: the timer prefills what was selected, skips apps that
+are already current, and pulls only deltas afterwards (`--force` is never used
+here).
+
+### What a run costs
+
+At 02:00 the WAN is 5–7 MB/s, so 100 GB would take ~4–5 h; the timer caps the run
+at 3 h on frieren and the next night continues. Each completed title leaves the
+stick write path (8–10 MB/s) as the LAN's ceiling, not the internet.

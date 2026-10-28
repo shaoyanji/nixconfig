@@ -1,0 +1,56 @@
+[8:10:39 AM] Starting login!
+[8:10:39 AM] Already disconnected from Steam
+[8:10:39 AM] System.InvalidOperationException: Failed to read input in non-interactive mode.
+   at Spectre.Console.DefaultInput.ReadKeyAsync(Boolean intercept, CancellationToken cancellationToken) in /_/src/Spectre.Console/Internal/DefaultInput.cs:line 36
+   at Spectre.Console.AnsiConsoleExtensions.ReadLine(IAnsiConsole console, Style style, Boolean secret, Nullable`1 mask, IEnumerable`1 items, CancellationToken cancellationToken) in /_/src/Spectre.Console/Extensions/AnsiConsoleExtensions.Input.cs:line 23
+   at Spectre.Console.TextPrompt`1.<>c__DisplayClass63_0.<<ShowAsync>b__0>d.MoveNext() in /_/src/Spectre.Console/Prompts/TextPrompt.cs:line 133
+--- End of stack trace from previous location ---
+   at Spectre.Console.Internal.DefaultExclusivityMode.RunAsync(Func`1 func) in /_/src/Spectre.Console/Internal/DefaultExclusivityMode.cs:line 40
+   at Spectre.Console.TextPrompt`1.ShowAsync(IAnsiConsole console, CancellationToken cancellationToken) in /_/src/Spectre.Console/Prompts/TextPrompt.cs:line 122
+   at Spectre.Console.TextPrompt`1.Show(IAnsiConsole console) in /_/src/Spectre.Console/Prompts/TextPrompt.cs:line 111
+   at Spectre.Console.AnsiConsoleExtensions.Prompt(IAnsiConsole console, IPrompt`1 prompt) in /_/src/Spectre.Console/Extensions/AnsiConsoleExtensions.Prompt.cs:line 24
+   at SteamPrefill.Settings.UserAccountStore.<>c__DisplayClass15_0.<PromptForUsernameAsync>b__0()
+   at System.Threading.Tasks.Task`1.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at SteamPrefill.Settings.UserAccountStore.PromptForUsernameAsync(IAnsiConsole ansiConsole)
+   at SteamPrefill.Settings.UserAccountStore.GetUsernameAsync(IAnsiConsole ansiConsole)
+   at SteamPrefill.Handlers.Steam.Steam3Session.ConfigureLoginDetailsAsync()
+   at SteamPrefill.Handlers.Steam.Steam3Session.LoginToSteamAsync()
+   at SteamPrefill.SteamManager.InitializeAsync()
+   at SteamPrefill.CliCommands.SelectAppsCommand.ExecuteAsync(IConsole console)
+   at CliFx.CliApplication.RunAsync(ApplicationSchema applicationSchema, CommandInput commandInput) in CliFx\CliApplication.cs:line 148
+   at CliFx.CliApplication.RunAsync(IReadOnlyList`1 commandLineArguments, IReadOnlyDictionary`2 environmentVariables) in CliFx\CliApplication.cs:line 190
+   at CliFx.CliApplication.RunAsync(IReadOnlyList`1 commandLineArguments) in CliFx\CliApplication.cs:line 202
+   at SteamPrefill.Program.Main()
+[8:12:03 AM] Starting login!
+[8:12:03 AM] Already disconnected from Steam
+[8:12:03 AM] System.InvalidOperationException: Failed to read input in non-interactive mode.
+   at Spectre.Console.DefaultInput.ReadKeyAsync(Boolean intercept, CancellationToken cancellationToken) in /_/src/Spectre.Console/Internal/DefaultInput.cs:line 36
+   at Spectre.Console.AnsiConsoleExtensions.ReadLine(IAnsiConsole console, Style style, Boolean secret, Nullable`1 mask, IEnumerable`1 items, CancellationToken cancellationToken) in /_/src/Spectre.Console/Extensions/AnsiConsoleExtensions.Input.cs:line 23
+   at Spectre.Console.TextPrompt`1.<>c__DisplayClass63_0.<<ShowAsync>b__0>d.MoveNext() in /_/src/Spectre.Console/Prompts/TextPrompt.cs:line 133
+--- End of stack trace from previous location ---
+   at Spectre.Console.Internal.DefaultExclusivityMode.RunAsync(Func`1 func) in /_/src/Spectre.Console/Internal/DefaultExclusivityMode.cs:line 40
+   at Spectre.Console.TextPrompt`1.ShowAsync(IAnsiConsole console, CancellationToken cancellationToken) in /_/src/Spectre.Console/Prompts/TextPrompt.cs:line 122
+   at Spectre.Console.TextPrompt`1.Show(IAnsiConsole console) in /_/src/Spectre.Console/Prompts/TextPrompt.cs:line 111
+   at Spectre.Console.AnsiConsoleExtensions.Prompt(IAnsiConsole console, IPrompt`1 prompt) in /_/src/Spectre.Console/Extensions/AnsiConsoleExtensions.Prompt.cs:line 24
+   at SteamPrefill.Settings.UserAccountStore.<>c__DisplayClass15_0.<PromptForUsernameAsync>b__0()
+   at System.Threading.Tasks.Task`1.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at SteamPrefill.Settings.UserAccountStore.PromptForUsernameAsync(IAnsiConsole ansiConsole)
+   at SteamPrefill.Settings.UserAccountStore.GetUsernameAsync(IAnsiConsole ansiConsole)
+   at SteamPrefill.Handlers.Steam.Steam3Session.ConfigureLoginDetailsAsync()
+   at SteamPrefill.Handlers.Steam.Steam3Session.LoginToSteamAsync()
+   at SteamPrefill.SteamManager.InitializeAsync()
+   at SteamPrefill.CliCommands.SelectAppsCommand.ExecuteAsync(IConsole console)
+   at CliFx.CliApplication.RunAsync(ApplicationSchema applicationSchema, CommandInput commandInput) in CliFx\CliApplication.cs:line 148
+   at CliFx.CliApplication.RunAsync(IReadOnlyList`1 commandLineArguments, IReadOnlyDictionary`2 environmentVariables) in CliFx\CliApplication.cs:line 190
+   at CliFx.CliApplication.RunAsync(IReadOnlyList`1 commandLineArguments) in CliFx\CliApplication.cs:line 202
+   at SteamPrefill.Program.Main()

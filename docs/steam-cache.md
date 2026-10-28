@@ -28,7 +28,9 @@ So `dnsOverride` defaults to `false` and the cache is inert for clients:
 frieren still answers any request that asks for the front by name, but nothing
 is steered to it. Re-enabling is a decision about the whole zone, not a
 performance tweak — and if a game is being played on the LAN while it is on,
-that game is the experiment.## Prefill without touching LAN DNS
+that game is the experiment.
+
+## Prefill without touching LAN DNS
 
 SteamPrefill refuses to run unless `lancache.steamcontent.com` resolves to an
 RFC1918 address (exit 1, `LancacheNotFoundException`). The LAN must keep
@@ -37,7 +39,9 @@ matchmaking — so the pin is given to **the prefill process only**, inside a
 private mount namespace. Measured working on frieren 2026-10-28; the fill then
 writes into the cache like any LAN client, with LAN DNS untouched throughout.
 
-Four traps, each one verified by removing it and watching the fill fail:
+The pin is five `BindReadOnlyPaths` in `modules/services/steam-cache.nix` —
+store paths in the closure, not files a script writes. Four of them are traps,
+each verified by removing it and watching the fill fail:
 
 1. **`/etc/nsswitch.conf` → `hosts: files dns`.** The host lists
    `mymachines mdns4_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] files …`,
@@ -45,29 +49,32 @@ Four traps, each one verified by removing it and watching the fill fail:
 2. **`/etc/host.conf` → `multi off`.** With `multi on` glibc merges the public
    AAAA/A that DNS returns with the pinned IPv4, and the client may connect to
    the public one — a 33 GiB download that stores nothing.
-3. **`/var/run/nscd` masked.** `nscd.service` (nsncd) is live on this host and
-   answers from its own cache, so `/etc/hosts` is never read at all. This is the
-   layer that made earlier attempts fail while every file looked correct.
+3. **`/var/run/nscd` masked by an empty directory.** `nscd.service` (nsncd) is
+   live on this host and answers from its own cache, so `/etc/hosts` is never
+   read at all. This is the layer that made earlier attempts fail while every
+   file looked correct.
 4. **`X-LanCache-Processed-By` on `/lancache-heartbeat`.** Detection is not
    satisfied by a 200: the front (and the default vhost, because the probe sends
    the bare LAN IP as `Host:`) must return that header.
 
 `resolv.conf` points at the fleet resolver, not `1.1.1.1`: detection reverse-
 resolves the cache address, and the public resolver NXDOMAINs a LAN PTR.
+`prefill.pinAddress` defaults to the host's `lan_ip` from the compiled
+inventory, so the prefill lands on the same front a LAN client does.
+
+Verifying the split takes one command — `getaddrinfo` is the API .NET uses:
 
 ```bash
-# one run, in tmux — a tool shell has no TTY and reaps a plain background job
-sudo tmux new-session -d -s steam-prefill \
-  "unshare -m /tmp/pf-run.sh 2>&1 | tee /tmp/prefill.log"
-sudo tmux capture-pane -p -t steam-prefill | tail -5   # live progress
-du -sm /mnt/flash-cache/steam-cache                    # the bytes actually stored
+systemctl show steam-prefill -p BindReadOnlyPaths --value   # the five mounts
+systemd-run --pipe -p PrivateMounts=yes \
+  -p "BindReadOnlyPaths=$(systemctl show steam-prefill -p BindReadOnlyPaths --value)" \
+  python3 -c 'import socket; print(socket.getaddrinfo("lancache.steamcontent.com", 80)[0][4])'
 ```
 
-`/tmp/pf-run.sh` is the namespace setup above followed by
-`setpriv --reuid=devji … SteamPrefill prefill --no-ansi --os windows`. It is
-ad-hoc on purpose for now: the scheduled window stays off until the same wrapper
-lives in `modules/services/steam-cache.nix` (open work — the recipe belongs in
-the unit, not in `/tmp`).
+Inside that namespace the name answers `192.168.3.25` and nothing else; on the
+host the same call returns Valve's public addresses. `getent hosts` is *not* a
+good probe here — with `multi off` it still prints the DNS AAAA while
+`getaddrinfo`, which is what the client calls, returns only the pin.
 
 The service-level gates still apply if the unit is ever enabled:
 `ConditionPathExists` on the selected-apps file, `ExecCondition` on the backend's
@@ -140,7 +147,7 @@ client still gets its bytes.
   (`192.168.3.50`); the failover peer must carry the same `address=` lines or it
   answers with the public CDN (slower, still correct).
 
-## Nightly prefill (optional, off by default)
+## Nightly prefill (unit always present; armed on frieren)
 
 The cache fills **on demand**, so a title nobody has asked for yet is empty when
 the first client wants it. `services.steamCache.prefill` adds a `02:00` run of
@@ -148,10 +155,20 @@ the first client wants it. `services.steamCache.prefill` adds a `02:00` run of
 selected apps *through this cache*, spending the idle line instead of the
 evening's.
 
+The unit exists whenever the cache does, and `prefill.enable` only arms the
+timer — armed on frieren since 2026-10-28 (next elapse `02:00` + up to 5 min of
+jitter). That split is what makes an ad-hoc fill one command: it runs the same
+recipe the timer would, so there is no second, unreviewed copy to drift.
+
+```bash
+sudo systemctl start steam-prefill     # one fill now; the timer stays parked
+```
+
 | Piece | Where |
 | :--- | :--- |
-| `steam-prefill.service` | `oneshot`, `User` from `prefill.user`, `WorkingDirectory` `prefill.stateDir` |
-| `steam-prefill.timer` | `OnCalendar` `prefill.calendar` (`02:00` on frieren), **not** persistent |
+| `steam-prefill.service` | `oneshot`, `User` from `prefill.user`, `WorkingDirectory` `prefill.stateDir`, present whenever `steamCache.enable` |
+| `steam-prefill.timer` | `OnCalendar` `prefill.calendar` (`02:00` on frieren), **not** persistent, only when `prefill.enable` |
+| DNS pin | `prefill.pin` (`BindReadOnlyPaths` over `nsswitch.conf`, `host.conf`, `hosts`, `resolv.conf` + an empty `/var/run/nscd`), store paths in the closure |
 | App list + Steam token | `/var/lib/steam-prefill/Config/` (`selectedAppsToPrefill.json`, `account.config`) |
 
 Gates, in order: the flash mount must be mounted, the app list must exist, and
@@ -182,15 +199,21 @@ SIGSTOP/SIGCONT duty cycle left throughput unchanged at 3.3 MB/s and the process
 never showed `T`, while `SIGINT` dropped the line to 8 KiB/s in 2 s. A signal
 that cannot stop it cannot pace it.
 
-State 2026-10-28 17:55: **paused at 41.7 GB, 82 % of Dota 2 (linux depots)**;
-WAN 3.1 MB/s → 8 KiB/s. The wrapper is `/var/lib/steam-prefill/pf-dota.sh` —
-self-contained (it builds its own dns-pin files), so unlike the old `/tmp` copy a
-reboot no longer breaks the resume. Start it again off-peak:
+State 2026-10-28 22:20: **complete.** Dota 2 linux depots, `Prefilled 1 apps
+totaling 33.42 GiB in 35:27.37`, cache `40 → 45 GB` on a 100 GB cap with 74 GB
+free on the tier. A run costs what it costs because it skips what the cache
+already holds: the first 88 % came off the LAN at ~168 MB/min, and only the tail
+fetched from Valve. Nothing needs to run again until the LRU evicts it.
 
-```bash
-sudo tmux new-session -d -s steam-prefill \
-  "unshare -m --propagation private /var/lib/steam-prefill/pf-dota.sh 2>&1 | tee /var/lib/steam-prefill/prefill.log"
-```
+State 2026-10-28 23:20: the same fill through the **unit** reports
+`Updated 0 │ Up To Date 1` in 5.9 s — the depots it prefill already carries are
+recognised, and the recipe that got there now lives in the module rather than in
+`/var/lib/steam-prefill/pf-dota.sh` (deleted).
+
+What a delta-only run costs, measured through the unit 2026-10-28 23:31 with the
+cache warm: `Prefilled 1 apps totaling 0 b`, **77.4 KB in / 13.6 KB out** over
+6.4 s. That is the number to expect at 02:00 whenever nothing on Valve's side has
+rolled — a login, a manifest comparison, and no depot bytes.
 
 ### One-time setup (needs a terminal, no GUI)
 

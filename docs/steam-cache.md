@@ -12,8 +12,23 @@ certificate, no client configuration.
 | :--- | :--- |
 | Front vhost (`:80`, always on) | `services.nginx.virtualHosts.steam-cache` — `modules/services/steam-cache.nix` |
 | Cache process (`127.0.0.1:8081`) | `systemd.services.steam-cache`, cache root `/mnt/flash-cache/steam-cache` |
-| DNS override | `hosts/frieren/dns.nix` — `address=/steamcontent.com/…` and `address=/steamcdn-a.akamaihd.net/…` |
+| DNS override (**off**) | `hosts/frieren/dns.nix`, gated on `services.steamCache.dnsOverride` |
 | Health | gatus endpoint `steam cache` → `http://127.0.0.1:8081/__health` |
+
+## The override is off, and why
+
+Steam's client resolves `lancache.steamcontent.com` to detect a cache, then
+fetches depots from the CDN hostname it is handed — all inside
+`steamcontent.com`. So making downloads cache requires an `address=` record for
+the **whole zone**, not just the detection name, and that zone is not
+cache-only traffic: with it on, a Dota 2 client could not complete a match
+accept (2026-10-28). There is no narrower record that keeps downloads cached.
+
+So `dnsOverride` defaults to `false` and the cache is inert for clients:
+frieren still answers any request that asks for the front by name, but nothing
+is steered to it. Re-enabling is a decision about the whole zone, not a
+performance tweak — and if a game is being played on the LAN while it is on,
+that game is the experiment.
 
 The split is deliberate. The cache lives on the **removable** USB flash tier
 (`nofail`), so its unit is gated on `ConditionPathIsMountPoint` and nothing else
@@ -103,11 +118,15 @@ the library first). The selection itself is interactive, so it is done once by
 hand:
 
 ```bash
-# as devji — login (password + Steam Guard), then pick apps with space, enter to save
-cd /var/lib/steam-prefill && steam-lancache-prefill select-apps
-# size check for the current selection
-cd /var/lib/steam-prefill && steam-lancache-prefill select-apps status
+# as devji, from the state dir — nixpkgs' build keeps `Config/` in the CWD,
+# so the directory matters: it is where the token and the app list are saved.
+cd /var/lib/steam-prefill
+nix run nixpkgs#steam-lancache-prefill -- select-apps          # login, then space+enter to save
+nix run nixpkgs#steam-lancache-prefill -- select-apps status   # total size of the selection
 ```
+
+A scheduled run fills nothing until that file exists — it is the timer's
+`ConditionPathExists`, and it is also the only way to know a login succeeded.
 
 The token and the selection live in `Config/` beside that working directory, so
 later runs need nothing: the timer prefills what was selected, skips apps that

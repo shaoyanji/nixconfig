@@ -88,6 +88,19 @@ in {
       description = "Evict an object after this long without a request.";
     };
 
+    dnsOverride = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Point `*.steamcontent.com` and the client-installer CDN at this host in
+        the fleet resolver. Off by default and not the same question as `enable`:
+        the cache serves anyone who asks it by name, while the override
+        *intercepts* the client. An `address=/steamcontent.com/` record is the
+        whole zone, so it also takes the names Steam uses for matchmaking —
+        Dota 2 refused to accept a match on 2026-10-28 while this was on.
+      '';
+    };
+
     prefill = {
       enable = lib.mkEnableOption "the nightly SteamPrefill run";
 

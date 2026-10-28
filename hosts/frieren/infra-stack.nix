@@ -491,12 +491,12 @@ in {
     # is still pulling and hand it misses for what it just fetched. 100 GB
     # leaves ~18 GB of the 118.5 GB tier for transcode/thumb scratch.
     maxSize = "100g";
-    # Fill the cache at 02:00 rather than on demand: a client pulling Dota 2 at
-    # 20:00 would otherwise spend the evening's WAN on a download the cache is
-    # about to hold anyway. The window is capped at 05:00 and the job is
-    # skipped entirely until the one-time `select-apps` login exists.
+    # Off while `dnsOverride` is off (2026-10-28). Prefill fills the cache by
+    # downloading through it, so with no interception a 02:00 run would pull
+    # 100 GB from the WAN and write nothing — the timer is only switched on
+    # together with the override, and the one-time `select-apps` login.
     prefill = {
-      enable = true;
+      enable = false;
       calendar = "02:00";
       maxRuntime = "3h";
     };

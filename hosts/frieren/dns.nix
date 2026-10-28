@@ -55,52 +55,59 @@
     virtualRouterId = 50;
     unicastPeers = ["192.168.3.3"];
     primaryPriority = 200;
-    extraDnsmasqLines = [
-      "interface=tailscale0"
-      "interface=wlp2s0"
-      "interface=enp0s20f0u2u1i5"
-      # eisen's local LLM API (llama.cpp OpenAI /v1) resolves to its stable
-      # tailnet address; LAN clients reach it over the tailnet.
-      "address=/eisen.lan/100.119.172.99"
-      # Laya decision model (Jev-compatible /v1/systemone) on eisen; same
-      # tailnet address, exposed as its own nginx vhost on :80.
-      "address=/laya.lan/100.119.172.99"
-      # Qwen3-TTS speech server on eisen (OpenAI-compatible /v1/audio/speech);
-      # nginx vhost on :80, tailscale serve :8444.
-      "address=/tts.lan/100.119.172.99"
-      # The gokrazy appliance has no LAN A record: its name lives in the
-      # tailnet. A conditional forward asks MagicDNS (served by the local
-      # tailscaled) instead of pinning an address, so `gok update` resolves the
-      # instance Hostname and the answer follows the node wherever it moves.
-      "server=/gok/100.100.100.100"
-      # Whole tailnet zone: every `*.cloudforest-kardashev.ts.net` name is
-      # answered by MagicDNS, which follows the node. Without this the fleet
-      # resolver returns NXDOMAIN for tailnet FQDNs, so any browser on the LAN
-      # gets "Server Not Found" for frieren.<tailnet>.ts.net (measured
-      # 2026-10-26: MagicDNS answered, pihole did not).
-      "server=/cloudforest-kardashev.ts.net/100.100.100.100"
-      # --- Steam content cache (services.steamCache) -----------------------
-      # Steam looks up lancache.steamcontent.com, and then fetches from the CDN
-      # hostname it is handed — so the whole zone points here. The cache's own
-      # upstream resolution uses 1.1.1.1, so this cannot loop, and its :80 front
-      # falls back to Valve when the cache is down. Comment these two lines to
-      # take the cache out of the path without touching the cache host.
-      "address=/steamcontent.com/192.168.3.25"
-      "address=/steamcdn-a.akamaihd.net/192.168.3.25"
-      # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
-      # Answer ONLY PXE clients on the LAN; never lease IPs — the Huawei router
-      # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode
-      # waits 2s for the real DHCP server's OFFER and only supplies the
-      # PXE boot options the router lacks.
-      "dhcp-range=192.168.3.25,proxy,255.255.255.0"
-      # /var/lib/misc is read-only on NixOS — without a writable lease file
-      # dnsmasq's DHCP subsystem aborts and UDP 67 never binds.
-      "dhcp-leasefile=/var/lib/pihole/dnsmasq.leases"
-      # Arch-specific boot file -> iVentoy's virtual loader names. The
-      # suffix (16000) must match iVentoy's HTTP PXE port.
-      "pxe-service=x86PC,\"Boot from network (BIOS)\",iventoy_loader_16000_bios,192.168.3.25"
-      "pxe-service=X86-64_EFI,\"Boot from network (UEFI)\",iventoy_loader_16000_uefi,192.168.3.25"
-    ];
+    extraDnsmasqLines =
+      [
+        "interface=tailscale0"
+        "interface=wlp2s0"
+        "interface=enp0s20f0u2u1i5"
+        # eisen's local LLM API (llama.cpp OpenAI /v1) resolves to its stable
+        # tailnet address; LAN clients reach it over the tailnet.
+        "address=/eisen.lan/100.119.172.99"
+        # Laya decision model (Jev-compatible /v1/systemone) on eisen; same
+        # tailnet address, exposed as its own nginx vhost on :80.
+        "address=/laya.lan/100.119.172.99"
+        # Qwen3-TTS speech server on eisen (OpenAI-compatible /v1/audio/speech);
+        # nginx vhost on :80, tailscale serve :8444.
+        "address=/tts.lan/100.119.172.99"
+        # The gokrazy appliance has no LAN A record: its name lives in the
+        # tailnet. A conditional forward asks MagicDNS (served by the local
+        # tailscaled) instead of pinning an address, so `gok update` resolves the
+        # instance Hostname and the answer follows the node wherever it moves.
+        "server=/gok/100.100.100.100"
+        # Whole tailnet zone: every `*.cloudforest-kardashev.ts.net` name is
+        # answered by MagicDNS, which follows the node. Without this the fleet
+        # resolver returns NXDOMAIN for tailnet FQDNs, so any browser on the LAN
+        # gets "Server Not Found" for frieren.<tailnet>.ts.net (measured
+        # 2026-10-26: MagicDNS answered, pihole did not).
+        "server=/cloudforest-kardashev.ts.net/100.100.100.100"
+        # --- Steam content cache (services.steamCache) -----------------------
+        # OFF since 2026-10-28, and opt-in from here on: `address=/steamcontent.com/`
+        # is the whole zone, not just the content hosts, so it also swallows the
+        # names Steam's client uses for non-download traffic — Dota 2 matchmaking
+        # would not complete an accept while every one of them pointed at the NAS.
+        # The cache itself is unaffected (its front still answers for a request
+        # that asks for it by name); only the interception is gone. Flip
+        # `services.steamCache.dnsOverride` back on to test a narrower list.
+      ]
+      ++ lib.optionals config.services.steamCache.dnsOverride [
+        "address=/steamcontent.com/192.168.3.25"
+        "address=/steamcdn-a.akamaihd.net/192.168.3.25"
+      ]
+      ++ [
+        # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
+        # Answer ONLY PXE clients on the LAN; never lease IPs — the Huawei router
+        # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode
+        # waits 2s for the real DHCP server's OFFER and only supplies the
+        # PXE boot options the router lacks.
+        "dhcp-range=192.168.3.25,proxy,255.255.255.0"
+        # /var/lib/misc is read-only on NixOS — without a writable lease file
+        # dnsmasq's DHCP subsystem aborts and UDP 67 never binds.
+        "dhcp-leasefile=/var/lib/pihole/dnsmasq.leases"
+        # Arch-specific boot file -> iVentoy's virtual loader names. The
+        # suffix (16000) must match iVentoy's HTTP PXE port.
+        "pxe-service=x86PC,\"Boot from network (BIOS)\",iventoy_loader_16000_bios,192.168.3.25"
+        "pxe-service=X86-64_EFI,\"Boot from network (UEFI)\",iventoy_loader_16000_uefi,192.168.3.25"
+      ];
   };
 
   # Tailnet DNS should stay manually managed after deployment:

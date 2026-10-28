@@ -313,12 +313,13 @@ tasks:
   infra:switch:*:
     desc: Switch current host using a rebuild command (nixos|darwin)
     summary: >
-      NO pre-switch eval: the rebuild evaluates and builds the closure, and a
-      boot test runs first on nixos (BOOT=0 skips). A host whose `hosts/<host>/`
-      `dns.nix` declares `profiles.dnsFailover` refuses unless REMOTE_BUILD=1
-      (builds with max-jobs = 0) — a resolver must not compile for itself, see the
-      resolver-never-breaks note — and after its switch the task proves the
-      resolver answers before exit 0. ROUTE_CHECK=1, NOM=1. Vars: OS (wildcard).
+      NO pre-switch eval: the rebuild evaluates and builds the closure. First,
+      `scripts/task/switch-preflight.sh` (no eval) refuses untracked files the
+      flake cannot see and decides the boot test: BOOT=auto boots the host only
+      when the pending diff can reach stage-1, BOOT=1 always, BOOT=0 never — a VM
+      boot is a full host build plus QEMU, not a per-edit step. A dnsFailover host
+      refuses unless REMOTE_BUILD=1, and proves the resolver answers after its
+      switch. ROUTE_CHECK=1, NOM=1. Vars: OS (wildcard).
     vars:
       OS: '{{index .MATCH 0}}'
     cmds:
@@ -348,11 +349,20 @@ tasks:
         if [ "${ROUTE_CHECK:-0}" = "1" ]; then
           bash scripts/task/warm-host.sh --check --best-effort "$host"
         fi
-        # Default ON for nixos: a headless box that will not come back cannot be
-        # diagnosed from anywhere, and the boot is the only pre-flight that runs the
-        # config. BOOT=0 is the escape hatch; darwin has no boot test to run.
-        if [ "${BOOT:-auto}" != "0" ] && [ "{{.OS}}" = "nixos" ]; then
-          bash scripts/task/boot-check.sh --self || exit $?
+        # Two pre-eval questions, answered in milliseconds: are there untracked
+        # files the flake cannot see (a whole wasted evaluation, or a build that
+        # silently omits the change), and can this diff even reach stage-1?
+        boot_decision="$(bash scripts/task/switch-preflight.sh --boot)" || exit $?
+        # A boot test is a full host build plus a QEMU run, and the switch then
+        # builds the same closure again — minutes to tens of minutes. It is the
+        # only pre-flight that RUNS the config, so it stays on for anything that
+        # can reach stage-1 (BOOT=auto), and BOOT=1 still forces it. BOOT=0 skips;
+        # darwin has no boot test to run.
+        if [ "{{.OS}}" = "nixos" ]; then
+          echo "infra:switch [$host] $boot_decision" >&2
+          case "$boot_decision" in
+            BOOT=run*) bash scripts/task/boot-check.sh --self || exit $? ;;
+          esac
         fi
         if [ "${REMOTE_BUILD:-0}" = "1" ]; then
           # Substitute or fail, never compile here. `max-jobs 0` alone still lets

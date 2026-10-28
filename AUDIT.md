@@ -29,6 +29,14 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 
 ## Ledger
 
+### 2026-10-28 — resolver holds no swap, keeps its 7 days; Steam cache warm; Pi-hole published
+- **Swap was glibc arenas, not query history.** 13 threads → 12 anonymous heaps of 64/128 MiB; `VmSize` 2.1 GB against `VmRSS` 132 MB and `VmSwap` 934 MB. `MALLOC_ARENA_MAX=2` + `MemoryHigh=1.2G` (`hosts/frieren/dns.nix`): VmSize 1,229 MB, swap **934 → 0 MB**, box swap 4.47 → 3.34 GB. `DBimport`/`maxDBdays` are ignored on 6.7.1 (measured), so the imported history is not a knob.
+- **Retention back to 7 days.** nixpkgs' deleter ran `date('now','-7 day')` nightly and carried `ConditionFileNotEmpty` in `[Service]` (*Unknown key, ignoring*); replaced by an hourly rolling window + `VACUUM` above 4096 free pages. Oldest row 7.04 days, DB 603 → 576 MB.
+- **`pihole.frieren.lan` publishes the admin UI** (was SSH-tunnel only) via `hosts/frieren/reverse-proxy.nix` plus a portal card. FTL 6 serves it at `/`, `/admin/` is a 404, and it stays enabled because `services.pihole-ftl.lists` loads blocklists through its API (module assertion). No password either way.
+- **Steam cache warm.** Dota 2 linux depots, 33.42 GiB in 35:27, cache 40 → 45 GB, DNS pin scoped to the prefill namespace (`dnsOverride` still false).
+- **The prefill recipe is code now.** `modules/services/steam-cache.nix` pins `lancache.steamcontent.com` with five `BindReadOnlyPaths` (`nsswitch.conf`, `host.conf`, `hosts`, `resolv.conf`, empty `/var/run/nscd`) built from store paths, and `prefill.enable` only arms the timer — the unit exists whenever the cache does, so a fill is `systemctl start steam-prefill`. `/var/lib/steam-prefill/pf-dota.sh` is deleted; the unit run reported `Up To Date 1` in 5.9 s and `getaddrinfo` inside its namespace returns `192.168.3.25` alone while the host still returns Valve's public set. The `02:00` window is armed (next elapse `02:01:27`), and a warm-cache run moves 77 KB in / 14 KB out.
+- Evidence: `pihole.frieren.lan/` 200 `<title>Pi-hole frieren</title>`, card in `/data/services.json`, `checks:host HOST=frieren` rc=0, all three switches exit 0 with the resolver probe green, gatus dns + steam cache ok.
+
 ### 2026-10-27 — the preexec hook printed itself in every new terminal
 - **The defect.** atuin's bash integration sources bash-preexec, which *appends* its preexec hook to PS0, and bash
 prints whatever PS0 holds outside that `${ …; }` form at every prompt with `$_` expanded — so a PS0 inherited from

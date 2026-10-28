@@ -4639,5 +4639,69 @@
         local run on the same commit; cold start measured on both hypervisors and written down.
       '';
     };
+
+    exp-127 = {
+      title = "EXP-127 — A menu is a directory listing, never a library read";
+      kind = "experiment";
+      status = "DELIVERED";
+      date = "2026-10-28";
+      links = ["portable-library"];
+      summary = "A login+hourly timer opened every AppImage in /Volumes/data/appimages with unsquashfs/readelf to write .desktop entries. On the netbook that was ~300 MB of NFS reads inside four minutes of boot on a Celeron over wifi; on frieren, 61 images and 50 CPU-seconds per run. It is deleted and gated: a launch is the only thing that may touch a library's bytes.";
+      refs = {
+        hosts = ["netbook" "frieren"];
+        modules = ["modules/scripts/appimage-menu.nix" "modules/user/desktop/appimage-menu.nix" "flake/policies.nix" "modules/profiles/burgernas-client.nix"];
+        tasks = ["checks:host" "checks:tasks"];
+      };
+      body = ''
+        **What was wrong.** A launcher menu derived its names, comments and icons by opening each
+        image's squashfs. That made a menu refresh a bulk read of a 6.9 GB library over NFS —
+        automatic, hourly, and on every client that mounted it. Nobody sees a menu job; everyone
+        sees the LAN and the TV stutter.
+
+        **What replaced it.** `appimage-menu`: a glob of `*.AppImage`, a picker (fuzzel, else
+        wmenu), `appimage-run` on the pick. No metadata, no cache, no timer. A stale icon cannot
+        exist because no icon is written; a launch reads the image it launches.
+
+        **The gate, not the deletion.** `#library-content-is-not-scheduled` fails the build when any
+        script pairs a network mount with `unsquashfs`/`readelf`, when any **systemd** file names
+        such a script, or when a `systemd.paths` watcher points at a library. Operator audits may
+        still hash and extract — a scheduled unit may not.
+
+        **Same shape, second instance.** `mnt-burgernas-peachcable.mount` sat in `activating` for
+        30 min 1.47 s against a sleeping NAS: `x-systemd.mount-timeout` bounds mount(8), not the
+        unit. The profile now sets `TimeoutStartSec = "10s"` on the unit itself.
+
+        **Learning.** A timer that reads a shared mount is a bandwidth decision made by whoever
+        wrote the unit, paid by every client on the LAN. Scheduled work may stat a library; only a
+        user action may read it.
+
+        **Exit.** Delivered: the unit is gone, `checks:host` is green on netbook/scratch/frieren,
+        and the netbook's idle rx dropped from 974 KB/s to 59 KB/s.
+      '';
+    };
+
+    open-manual-steam-fill = {
+      title = "The nightly prefill window is redundant once fills are operator-driven";
+      kind = "open";
+      status = "OPEN";
+      date = "2026-10-28";
+      priority = "P3";
+      links = ["exp-127"];
+      summary = "`steam-cache.prefill` fills the LAN cache at 02:00 by default (5 h cap), while the operator now fills by hand against the same cache. Two owners of one download window compete for the line.";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["modules/services/steam-cache.nix"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **Decision pending.** The operator fills Dota (and the next title) manually, watching the
+        line; the timer then only adds a second unattended window against the same WAN.
+
+        **Exit.** Either delete the timer (`prefill.enable = false` and the calendar) once manual
+        fills are the habit, or keep it and record why the unattended window still earns its
+        bandwidth. Not both: the measured cost of two fills racing is the Dota accept failure of
+        2026-10-28.
+      '';
+    };
   };
 }

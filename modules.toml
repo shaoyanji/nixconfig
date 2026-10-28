@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 14
+total_knobs = 15
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -73,6 +73,16 @@ path = "modules/profiles/desktop-client.nix"
 description = "Direct NFS and Samba mounts to frieren NAS data pools"
 default = false
 hosts = ["eisen", "poseidon", "fern", "kellerbench", "deckstation", "ares"]
+
+[knobs.burgernas-client]
+name = "BurgerNAS Cold Vault Mount"
+type = "profile"
+category = "storage"
+option = "profiles.burgernas-client.enable"
+path = "modules/profiles/burgernas-client.nix"
+description = "NFS automount of the powered-off-most-of-the-day BurgerNAS export, with retry=0 so a probe of a sleeping peer fails in seconds"
+default = false
+hosts = ["frieren"]
 
 [knobs.nvidia]
 name = "NVIDIA Proprietary Drivers"

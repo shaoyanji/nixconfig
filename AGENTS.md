@@ -132,6 +132,7 @@ modules/
     firewall-baseline.nix — Firewall on, only TCP/22 by default
     server-hardening.nix — Journald caps, tmp cleanup, /var bind-mount to data disk
     nas-client.nix — Automount /Volumes/data from the NAS server (frieren)
+    burgernas-client.nix — Automount the BurgerNAS cold-vault export, with the fail-fast NFS options a sleeping peer needs
     steamos.nix — Steam kiosk (greetd autologin + upstream gamescope-session, audio, 32-bit GL, Avahi)
     sunshine.nix — GameStream/Moonlight server (Sunshine on LAN, video/render/input groups)
     nixbuild-client.nix — Optional nixbuild.net remote builder (distributedBuilds, off by default)

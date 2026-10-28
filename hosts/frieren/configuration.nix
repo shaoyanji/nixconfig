@@ -44,6 +44,7 @@ in {
     ./hardware-configuration.nix
     ./hardware.nix
     ../../modules/profiles/base-node.nix
+    ../../modules/profiles/burgernas-client.nix
     ../../modules/profiles/hermes.nix
     ../../modules/profiles/server-hardening.nix
     ../../modules/profiles/laptop.nix
@@ -522,25 +523,12 @@ in {
     options = ["bind"];
   };
 
-  # BurgerNAS cold vault over NFS. The NAS is powered off most of the day, so this
-  # is an **automount**: a plain mount at boot would wait on a peer that is asleep
-  # by design, and a hard mount would hang anything that lists the directory while
-  # it is down. DSM's kernel has no NFSv4.2 (it answers "Protocol not supported"),
-  # so 4.1 is pinned rather than negotiated. The export is granted on the NAS side
-  # in /etc/exports — DSM 7 offers no CLI/API for NFS privileges, see the skill.
-  fileSystems."/mnt/burgernas/peachcable" = {
-    device = "192.168.3.92:/volume1/peachcable";
-    fsType = "nfs4";
-    options = [
-      "vers=4.1"
-      "soft"
-      "timeo=100"
-      "retrans=2"
-      "noauto"
-      "nofail"
-      "_netdev"
-    ];
-  };
+  # BurgerNAS cold vault: the mount, the automount and the fail-fast NFS options
+  # all live in profiles/burgernas-client.nix, so any host that mounts the vault
+  # inherits them instead of rediscovering that `mount.nfs` retries for 2 minutes.
+  # Export granted on the NAS side in /etc/exports — DSM 7 has no CLI/API for NFS
+  # privileges, see the skill.
+  profiles.burgernas-client.enable = true;
 
   # High-speed flash cache tier on USB 3.0 Samsung Flash Drive (F2FS + transparent ZSTD compression).
   # Ephemeral & acceleration tier: Nix evaluation cache, transcode scratch, gallery thumbnails, ISO staging.
@@ -560,22 +548,9 @@ in {
     ];
   };
 
-  # NixOS does not translate `x-systemd.automount` in fileSystems options into an
-  # automount unit (tasks/filesystems.nix only reads autoResize/autoFormat), so the
-  # unit is declared here: nothing mounts at boot, and the first access wakes the
-  # NAS instead of blocking local-fs.target behind it.
-  systemd.automounts = [
-    {
-      where = "/mnt/burgernas/peachcable";
-      wantedBy = ["multi-user.target"];
-      automountConfig.TimeoutIdleSec = "10min";
-    }
-  ];
-
   # Ensure directories exist
   systemd.tmpfiles.rules = [
     "d /nix/var/nix/gcroots/fleet 0755 root root -"
-    "d /mnt/burgernas 0755 root root -"
     "d /mnt/flash-cache 0755 root root -"
     "d /mnt/flash-cache/nix-eval 0755 ${user.name} users -"
     "d /mnt/flash-cache/staging 0755 ${user.name} users -"

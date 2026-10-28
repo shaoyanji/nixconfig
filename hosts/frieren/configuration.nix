@@ -279,6 +279,14 @@ in {
   # unauthenticated fallback can't shadow the secret-protected daemon.
   home-manager.users.devji.programs.aria2-user-fallback.enable = false;
 
+  # The AppImage launcher refresh is a desktop job: role:home gives this user the
+  # hourly timer that opens every image in /Volumes/data/appimages to write
+  # .desktop entries, but frieren's boot default declares no compositor. Measured
+  # 2026-10-28: 61 images, 50 CPU-seconds and a 673 MiB peak per run, hourly, and
+  # killed before it finished. No Install.WantedBy means home-manager installs no
+  # timers.target link, so the unit exists but nothing starts it.
+  home-manager.users.devji.systemd.user.timers.appimage-launchers.Install.WantedBy = lib.mkForce [];
+
   # Resurrected OpenClaw persona ("Vanta") for the hermes mainframe agent.
   home-manager.users.devji.programs.hermes-user = {
     enable = true;
@@ -371,11 +379,17 @@ in {
     AllowSuspendThenHibernate = "no";
   };
 
-  # --- Power management: auto-cpufreq handles governor switching ---
-  # Removed the charger → powersave override; laptop.nix defaults to
-  # performance on charger which is appropriate for 4K media center use.
+  # --- Power management: no auto-cpufreq on a 24/7 AC server ---
+  # laptop.nix enables it fleet-wide; on AC its charger profile pins all eight
+  # cores to 3.4 GHz with EPP=performance, which measured 2.93 W / 42 °C at idle
+  # on this box while the daemon itself used 0.7 % of a core. A fixed governor
+  # costs nothing to run: removal measured 2.46 W / 41 °C at an 800 MHz idle.
+  # `powersave` is intel_pstate's scaling governor in active mode — it still
+  # boosts on demand, it just stops holding the floor at max.
+  services.auto-cpufreq.enable = lib.mkForce false;
   powerManagement = {
     enable = true;
+    cpuFreqGovernor = "powersave";
     powerDownCommands = "";
   };
 

@@ -240,9 +240,10 @@ in {
         ExecCondition = "${pkgs.curl}/bin/curl -fsS -m 5 http://127.0.0.1:${toString cfg.port}/__health";
         ExecStart = "${pkgs.steam-lancache-prefill}/bin/SteamPrefill prefill --no-ansi --os ${cfg.prefill.os}";
         # A oneshot's default start timeout is 90 s, which would kill every run
-        # mid-download; the wall clock is bounded by maxRuntime instead.
-        TimeoutStartSec = "infinity";
-        RuntimeMaxSec = cfg.prefill.maxRuntime;
+        # mid-download, and `RuntimeMaxSec` is ignored for oneshot (measured:
+        # "RuntimeMaxSec= has no effect in combination with Type=oneshot"), so
+        # the window itself is the start timeout.
+        TimeoutStartSec = cfg.prefill.maxRuntime;
         # The flash tier is a USB BOT device with no NCQ: a prefill writing into
         # it must yield to Jellyfin reads rather than queue in front of them.
         Nice = 19;

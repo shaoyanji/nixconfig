@@ -5,16 +5,19 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 
 ## Canonical ownership
 - `Taskfile.yml` is the entrypoint; it loads the shards and hosts top-level helper menus (`deploy`, `logs`, `status`, `menu`).
-- `taskfiles/infra.yml` is the canonical host lifecycle surface (`infra:*`) for plan/apply/deploy/rollback/logs and secrets management.
+- `taskfiles/infra.yml` is the canonical host lifecycle surface (`infra:*`) for plan/apply/deploy/rollback/logs and secrets management, and it owns the detached job surface (`infra:job:*`) that long tasks are started through.
 - `taskfiles/agents.yml` holds operator helpers, xs runtime wrappers, and OAuth/session management.
 - `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep).
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
+- `taskfiles/data.yml` is the canonical NAS surface (`data:*`) for the `/Volumes/data` taxonomy, hygiene, permissions and the portable tool library.
+- `taskfiles/lifecycle.yml` owns host commissioning and decommissioning (`lifecycle:*`), which is provisioning a host, not operating one.
+- `taskfiles/services.yml` is an include-only aggregator: it flattens `services-core.yml` and `services-legacy.yml` and declares no tasks of its own.
 - `taskfiles/ops.yml` owns observation and the context plane: `ops:health`, `ops:ledger[:toon]`, `ops:sentinel:*`, `ops:skills*`, `ops:kg*`, `ops:ask[:jev]`, `ops:context`, `ops:docs:budget`, `ops:bench:evals`, `ops:bench:kg`. These read a live system or a compiled artifact; they are not build gates.
 
 ## File-by-file map
 - `Taskfile.yml` – entrypoint with top-level menus
-- `taskfiles/infra.yml` – host lifecycle, secrets, SOPS operations
+- `taskfiles/infra.yml` – host lifecycle, secrets, SOPS operations, and the detached job runner (`infra:job:*`, implemented by `scripts/task/job.sh`)
 - `taskfiles/agents.yml` – operator helpers, xs wrappers, OAuth management
 - `taskfiles/checks.yml` – validation and smoke checks (incl. `checks:tasks` task-graph gate, `checks:host`, `checks:flake:transitive`)
 - `taskfiles/dev.yml` – git workflows, flake updates, site deployment, and the generated docs pipeline (`docs:build` / `docs:site` / `docs:sync`)
@@ -26,6 +29,9 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/burgernas.yml` – Synology DS220j cold vault (BurgerNAS): WoL power, restic backup target, leech-only Transmission, aria2/AriaNg, and Gum menu
 - `taskfiles/apps.yml` – Job application workflow via `bin/appflow` (status updates, email radar, Typst builds, three-way sync, GitHub push/pull)
 - `taskfiles/bitlockerpremium.yml` – Windows 11 Pro (HP EliteBook 830 G7) over Tailscale OpenSSH, Scoop/Nushell shells, file transfers, and Gum menu
+- `taskfiles/data.yml` – NAS storage taxonomy and hygiene, permissions, media unindexing, portable tool library (`data:*`)
+- `taskfiles/lifecycle.yml` – commissioning a new host, decommission audit and cleanup (`lifecycle:*`)
+- `taskfiles/services.yml` – include-only aggregator for `services-core.yml` + `services-legacy.yml` (no tasks declared here)
 - `taskfiles/ops.yml` – sentinel/ledger, compiled skill index, knowledge graph, document budgets, eval benchmarks
 - `taskfiles/services-core.yml` – minimal compatibility wrappers
 - `taskfiles/services-legacy.yml` – deprecated aliases (marked `[deprecated]`)
@@ -38,10 +44,13 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 
 ## Common "where to look"
 - Host deployment/lifecycle → `taskfiles/infra.yml` (`infra:*`)
+- A rebuild or any long task → `task infra:job:start RUN=<task>`, then `infra:job:status` for its exit code
 - Operator helpers → `taskfiles/agents.yml` (`agents:menu`, legacy menus)
 - Validation checks → `taskfiles/checks.yml` (`checks:*`)
 - Observation, skills, knowledge graph → `taskfiles/ops.yml` (`ops:*`)
 - Git/flake workflows, site deployment → `taskfiles/dev.yml` (`dev:*`)
+- NAS storage taxonomy, hygiene, permissions, tool library → `taskfiles/data.yml` (`data:*`)
+- Commissioning or retiring a host → `taskfiles/lifecycle.yml` (`lifecycle:*`)
 - Moto (Termux) operations & transfer → `taskfiles/moto.yml` (`moto:*`)
 - Serv00 FreeBSD hosting & webserver → `taskfiles/serv00.yml` (`serv00:*`)
 - Alwaysdata Debian hosting & webserver → `taskfiles/dragoncourt.yml` (`dragoncourt:*`)

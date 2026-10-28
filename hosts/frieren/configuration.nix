@@ -289,14 +289,6 @@ in {
   # unauthenticated fallback can't shadow the secret-protected daemon.
   home-manager.users.devji.programs.aria2-user-fallback.enable = false;
 
-  # The AppImage launcher refresh is a desktop job: role:home gives this user the
-  # hourly timer that opens every image in /Volumes/data/appimages to write
-  # .desktop entries, but frieren's boot default declares no compositor. Measured
-  # 2026-10-28: 61 images, 50 CPU-seconds and a 673 MiB peak per run, hourly, and
-  # killed before it finished. No Install.WantedBy means home-manager installs no
-  # timers.target link, so the unit exists but nothing starts it.
-  home-manager.users.devji.systemd.user.timers.appimage-launchers.Install.WantedBy = lib.mkForce [];
-
   # Resurrected OpenClaw persona ("Vanta") for the hermes mainframe agent.
   home-manager.users.devji.programs.hermes-user = {
     enable = true;

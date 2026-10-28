@@ -30,7 +30,7 @@ in {
     # the build, on cassini.
     ../user/desktop/niri.nix
     ../user/desktop/multimedia.nix
-    ../user/desktop/appimage-launchers.nix
+    ../user/desktop/appimage-menu.nix
     ../user/kg-sidecar.nix
     ../kitty.nix
   ];

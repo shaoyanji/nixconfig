@@ -9,6 +9,7 @@
 }: let
   cfg = config.profiles.dwlDesktop;
   fleetMenu = import ../scripts/fleet-menu.nix {inherit pkgs;};
+  appimageMenu = import ../scripts/appimage-menu.nix {inherit pkgs;};
 
   # Spliced host entries go first, which is what makes them shadow the fleet bind
   # for the same key (`keybinding()` returns the first entry matching mod + keysym).
@@ -115,6 +116,7 @@ in {
     environment.systemPackages =
       [
         fleetMenu
+        appimageMenu
         pkgs.brightnessctl
         # The notifier a host's `autostart` starts. It is a package and a
         # baseline config rather than a service because a session daemon has to

@@ -76,6 +76,21 @@ in {
       ];
     };
 
+    # `x-systemd.mount-timeout` bounds the mount(8) call, not the unit: on
+    # 2026-10-28 `mnt-burgernas-peachcable.mount` sat in `activating` for 30 min
+    # 1.47 s before failing. The timeout is declared on the unit itself.
+    systemd.mounts = [
+      {
+        what = "${cfg.host}:${cfg.export}";
+        where = cfg.mountPoint;
+        overrideStrategy = "asDropin";
+        unitConfig = {
+          TimeoutStartSec = "10s";
+          TimeoutStopSec = "10s";
+        };
+      }
+    ];
+
     # NixOS does not translate `x-systemd.automount` in fileSystems options into an
     # automount unit (tasks/filesystems.nix only reads autoResize/autoFormat), so the
     # unit is declared here: nothing mounts at boot, and the first access wakes the

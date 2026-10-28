@@ -28,32 +28,58 @@ So `dnsOverride` defaults to `false` and the cache is inert for clients:
 frieren still answers any request that asks for the front by name, but nothing
 is steered to it. Re-enabling is a decision about the whole zone, not a
 performance tweak — and if a game is being played on the LAN while it is on,
-that game is the experiment.
+that game is the experiment.## Prefill without touching LAN DNS
 
-## The prefill is parked, and what blocks it
+SteamPrefill refuses to run unless `lancache.steamcontent.com` resolves to an
+RFC1918 address (exit 1, `LancacheNotFoundException`). The LAN must keep
+resolving that name publicly — the `address=` override is what broke Dota 2
+matchmaking — so the pin is given to **the prefill process only**, inside a
+private mount namespace. Measured working on frieren 2026-10-28; the fill then
+writes into the cache like any LAN client, with LAN DNS untouched throughout.
 
-`services.steamCache.prefill` is written and disabled. SteamPrefill refuses to
-run unless `lancache.steamcontent.com` resolves to an RFC1918 address (exit 1,
-`LancacheNotFoundException`), and on frieren that name reaches an application
-through a chain that defeats both a `resolv.conf` and an `/etc/hosts` pin:
+Four traps, each one verified by removing it and watching the fill fail:
 
-1. `/etc/nsswitch.conf` lists `resolve [!UNAVAIL=return]` **before** `files dns`,
-   so glibc asks systemd-resolved and never reads either file — verified by
-   binding both into a unit and still getting the router's answer.
-2. The WiFi link (`wlp2s0`) keeps `192.168.3.1` as its per-link upstream
-   (`~lan`, Default Route: yes), so resolved can answer with Valve's public
-   CNAME chain for a name `dig @127.0.0.1` returns `192.168.3.25` for.
-3. `pihole-FTL` serves its cached public CNAME chain for that exact name in
-   preference to `address=/steamcontent.com/`, and the `address=` lines do not
-   always survive the config write a switch performs (they answer correctly
-   after a manual `systemctl restart pihole-ftl`, then stop within the hour).
+1. **`/etc/nsswitch.conf` → `hosts: files dns`.** The host lists
+   `mymachines mdns4_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] files …`,
+   so a hosts entry is consulted *after* systemd-resolved.
+2. **`/etc/host.conf` → `multi off`.** With `multi on` glibc merges the public
+   AAAA/A that DNS returns with the pinned IPv4, and the client may connect to
+   the public one — a 33 GiB download that stores nothing.
+3. **`/var/run/nscd` masked.** `nscd.service` (nsncd) is live on this host and
+   answers from its own cache, so `/etc/hosts` is never read at all. This is the
+   layer that made earlier attempts fail while every file looked correct.
+4. **`X-LanCache-Processed-By` on `/lancache-heartbeat`.** Detection is not
+   satisfied by a 200: the front (and the default vhost, because the probe sends
+   the bare LAN IP as `Host:`) must return that header.
 
-Warming the cache therefore needs the same zone-wide interception that breaks
-matchmaking, which is why the feature is off rather than half-on. A run that is
-started anyway fails safely: `ConditionPathExists` on the selected-apps file and
-`ExecCondition` on the backend's `/__health` both have to pass first, and
-`TimeoutStartSec` (not `RuntimeMaxSec`, which a oneshot ignores) bounds it to
-`maxRuntime`.
+`resolv.conf` points at the fleet resolver, not `1.1.1.1`: detection reverse-
+resolves the cache address, and the public resolver NXDOMAINs a LAN PTR.
+
+```bash
+# one run, in tmux — a tool shell has no TTY and reaps a plain background job
+sudo tmux new-session -d -s steam-prefill \
+  "unshare -m /tmp/pf-run.sh 2>&1 | tee /tmp/prefill.log"
+sudo tmux capture-pane -p -t steam-prefill | tail -5   # live progress
+du -sm /mnt/flash-cache/steam-cache                    # the bytes actually stored
+```
+
+`/tmp/pf-run.sh` is the namespace setup above followed by
+`setpriv --reuid=devji … SteamPrefill prefill --no-ansi --os windows`. It is
+ad-hoc on purpose for now: the scheduled window stays off until the same wrapper
+lives in `modules/services/steam-cache.nix` (open work — the recipe belongs in
+the unit, not in `/tmp`).
+
+The service-level gates still apply if the unit is ever enabled:
+`ConditionPathExists` on the selected-apps file, `ExecCondition` on the backend's
+`/__health`, and `TimeoutStartSec` (not `RuntimeMaxSec`, which a oneshot ignores)
+as the bound.
+
+One cosmetic wrinkle: detection reports `localhost [127.0.0.1]` rather than the
+LAN address, because the probe sends the bare IP as `Host:` and the **atuin**
+vhost claims `192.168.3.25` in `server_name`, so that request lands on atuin and
+404s. The bytes still flow through this front, so the fill is correct; the
+conflicting vhost is separate open work (`nginx -t` does not flag it — the first
+block simply wins).
 
 The split is deliberate. The cache lives on the **removable** USB flash tier
 (`nofail`), so its unit is gated on `ConditionPathIsMountPoint` and nothing else
@@ -134,6 +160,26 @@ dead cache would download from Valve at full speed, store nothing, and look
 successful — the front falls back by design. The run is capped by
 `prefill.maxRuntime`; prefill resumes where it stopped, so a closed window costs
 time, not progress.
+
+### Run it when nobody is streaming, because it cannot be throttled
+
+SteamPrefill has no rate-limit flag (checked against 3.6.1's `prefill --help`) and
+takes the whole line:
+
+| measured 2026-10-28 | while filling | after `SIGSTOP` |
+| :--- | :--- | :--- |
+| LAN `rx` on `enp1s0` | 5099 KiB/s (≈ 40 Mbit, pinned) | 31 KiB/s |
+| `ping 1.1.1.1` | 33 % loss, 49 ms | 0 % loss, 12 ms |
+| a house device resolving a cold name | reads as "the DNS is down" | fine |
+
+The failure mode is worth naming because it does not look like bandwidth: the
+fill eats the upstream, un-cached lookups time out **upstream**, and a TV
+upstairs reports no internet while `dig @192.168.3.25 crunchyroll.com` answers
+normally on the box. `SIGSTOP` gives the line back in seconds and costs nothing —
+resume with `SIGCONT`, or just run prefill again; it skips what is cached.
+
+State 2026-10-28: **paused deliberately at 11 GB of 33.4 GiB** (Dota 2, windows
+depots). Resume outside viewing hours.
 
 ### One-time setup (needs a terminal, no GUI)
 

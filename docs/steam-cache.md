@@ -175,11 +175,22 @@ takes the whole line:
 The failure mode is worth naming because it does not look like bandwidth: the
 fill eats the upstream, un-cached lookups time out **upstream**, and a TV
 upstairs reports no internet while `dig @192.168.3.25 crunchyroll.com` answers
-normally on the box. `SIGSTOP` gives the line back in seconds and costs nothing —
-resume with `SIGCONT`, or just run prefill again; it skips what is cached.
+normally on the box. Stopping the run gives the line back in two seconds and
+costs nothing — `SIGINT` to the SteamPrefill pid, then start it again; it skips
+what is cached. Do **not** use `SIGSTOP` as a throttle: measured 2026-10-28, a
+SIGSTOP/SIGCONT duty cycle left throughput unchanged at 3.3 MB/s and the process
+never showed `T`, while `SIGINT` dropped the line to 8 KiB/s in 2 s. A signal
+that cannot stop it cannot pace it.
 
-State 2026-10-28: **paused deliberately at 11 GB of 33.4 GiB** (Dota 2, windows
-depots). Resume outside viewing hours.
+State 2026-10-28 17:55: **paused at 41.7 GB, 82 % of Dota 2 (linux depots)**;
+WAN 3.1 MB/s → 8 KiB/s. The wrapper is `/var/lib/steam-prefill/pf-dota.sh` —
+self-contained (it builds its own dns-pin files), so unlike the old `/tmp` copy a
+reboot no longer breaks the resume. Start it again off-peak:
+
+```bash
+sudo tmux new-session -d -s steam-prefill \
+  "unshare -m --propagation private /var/lib/steam-prefill/pf-dota.sh 2>&1 | tee /var/lib/steam-prefill/prefill.log"
+```
 
 ### One-time setup (needs a terminal, no GUI)
 

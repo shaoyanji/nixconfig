@@ -292,6 +292,11 @@ tasks:
     cmds:
       - bash scripts/task/qmd-docs-index.sh ensure nixconfig
 
+  dev:qmd:blog:refresh:
+    desc: (Re)index the published blog (shaoyanji.is-a.dev) into the local qmd collection
+    cmds:
+      - bash scripts/task/qmd-docs-index.sh ensure blog
+
   dev:qmd:sync:eisen:
     desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
     summary: >

@@ -12,6 +12,10 @@ VAULT_DIR="/Volumes/data/Obsidian-Git-Sync"
 if [ ! -d "$VAULT_DIR" ] && [ -d "$HOME/vaults/personal" ]; then
   VAULT_DIR="$(readlink -f "$HOME/vaults/personal" 2>/dev/null || echo "$HOME/vaults/personal")"
 fi
+# The published blog is a collection of its own: an article that shipped is a
+# fact someone will search for later, and it lives outside this repo.
+BLOG_DIR="/home/devji/Documents/shaoyanji.is-a.dev"
+[ -d "$BLOG_DIR" ] || BLOG_DIR="${BLOG_DIR/#\/home\/devji/$HOME}"
 QMD="${QMD_BIN:-qmd}"
 
 if ! command -v "$QMD" >/dev/null 2>&1; then
@@ -106,9 +110,13 @@ ensure | update)
   all)
     ensure_single "nixconfig" "${REPO}" "NixOS, Darwin, and Home Manager fleet documentation, runbooks and nix modules" "**/*.{nix,md}"
     ensure_single "vault" "${VAULT_DIR}" "Personal Obsidian knowledge base with zettels, schematics, and notes" "**/*.md"
+    ensure_single "blog" "${BLOG_DIR}" "Published articles on shaoyanji.is-a.dev: Jekyll posts, drafts and authoring notes" "**/*.md"
+    ;;
+  blog)
+    ensure_single "blog" "${BLOG_DIR}" "Published articles on shaoyanji.is-a.dev: Jekyll posts, drafts and authoring notes" "**/*.md"
     ;;
   *)
-    echo "Unknown target: $TARGET (use nixconfig|vault|all)" >&2
+    echo "Unknown target: $TARGET (use nixconfig|vault|blog|all)" >&2
     exit 2
     ;;
   esac
@@ -119,6 +127,7 @@ ensure | update)
   echo "Try searching:"
   echo "  qmd search 'query' -c vault       # search Obsidian vault"
   echo "  qmd search 'query' -c nixconfig   # search repo documentation"
+  echo "  qmd search 'query' -c blog        # search published articles"
   echo "  qmd search 'query'                # search across all collections"
   ;;
 check)
@@ -132,9 +141,13 @@ check)
   all)
     check_single "nixconfig" "${REPO}"
     check_single "vault" "${VAULT_DIR}"
+    check_single "blog" "${BLOG_DIR}"
+    ;;
+  blog)
+    check_single "blog" "${BLOG_DIR}"
     ;;
   *)
-    echo "Unknown target: $TARGET (use nixconfig|vault|all)" >&2
+    echo "Unknown target: $TARGET (use nixconfig|vault|blog|all)" >&2
     exit 2
     ;;
   esac

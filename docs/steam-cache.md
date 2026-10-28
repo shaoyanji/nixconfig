@@ -52,11 +52,15 @@ du -sh /mnt/flash-cache/steam-cache; systemctl status steam-cache
 ```
 
 `X-Steam-Cache: MISS` on the first request and `HIT` on the second is the
-end-to-end proof. `BYPASS` means the front fell back to Valve — the backend is
-down or the stick is missing.
+end-to-end proof. A response with **no** `X-Steam-Cache` header at all came from
+the `@valve` fallback — the backend is down or the stick is missing, and the
+client still gets its bytes.
 
 ## Limits worth knowing
 
+- **No login is involved anywhere in the cache.** It caches CDN responses; the
+  Steam account only matters to the client. Prefill is the sole exception (see
+  below), and it is optional.
 - **70 GB cap** (`maxSize`): Dota 2 plus a season of deltas, and it leaves the
   tier's own scratch (`jellyfin-transcode`, `immich-thumbs`, `nix-eval`) room.
   When the cap is hit, least-recently-used objects are evicted.

@@ -16,7 +16,9 @@
     error_log stderr warn;
     events { worker_connections 1024; }
     http {
-      access_log /dev/stdout;
+      # /dev/stdout is not openable in this unit's namespace (measured: open()
+      # failed 6: No such device or address), so access lines go to the journal.
+      access_log syslog:server=unix:/dev/log,facility=local0,tag=steamcache;
       proxy_cache_path ${cfg.cacheDir} levels=1:2 keys_zone=steam:100m
         max_size=${cfg.maxSize} inactive=${cfg.inactive} use_temp_path=off;
       server {
@@ -116,9 +118,13 @@ in {
       unitConfig.ConditionPathIsMountPoint = cfg.requireMount;
       serviceConfig = {
         Type = "simple";
-        # Root on purpose: the master binds the loopback port and drops to the
-        # nginx worker user, which needs to own the cache root (not its files).
-        ExecStartPre = "+${pkgs.coreutils}/bin/mkdir -p ${cfg.cacheDir} && ${pkgs.coreutils}/bin/chown nginx:nginx ${cfg.cacheDir}";
+        # Two entries, not one shell line: systemd word-splits ExecStartPre and
+        # would hand `&&` to mkdir as a path (measured: `mkdir: cannot create
+        # directory '.../bin/chown'`). Root is needed to bind and to chown.
+        ExecStartPre = [
+          "+${pkgs.coreutils}/bin/mkdir -p ${cfg.cacheDir}"
+          "+${pkgs.coreutils}/bin/chown nginx:nginx ${cfg.cacheDir}"
+        ];
         ExecStart = "${pkgs.nginx}/bin/nginx -c ${backendConf} -g 'daemon off;'";
         Restart = "on-failure";
         RestartSec = 5;
@@ -142,10 +148,12 @@ in {
       extraConfig = ''
         error_page 502 504 = @valve;
       '';
+      # No explicit Host header in either location: recommendedProxySettings
+      # already sets it, and a second one makes nginx reject the upstream
+      # request with 400 (measured: `400 Bad Request` from the cache itself).
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString cfg.port}";
         extraConfig = ''
-          proxy_set_header Host $host;
           proxy_http_version 1.1;
           proxy_read_timeout 300s;
         '';
@@ -154,7 +162,6 @@ in {
         proxyPass = "http://$host$request_uri";
         extraConfig = ''
           resolver ${cfg.resolver} valid=60s ipv6=off;
-          proxy_set_header Host $host;
           proxy_http_version 1.1;
           proxy_read_timeout 300s;
         '';

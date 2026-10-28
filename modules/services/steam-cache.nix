@@ -74,14 +74,73 @@ in {
 
     maxSize = lib.mkOption {
       type = lib.types.str;
-      default = "70g";
-      description = "Upper bound for the cache on disk.";
+      default = "100g";
+      description = ''
+        Upper bound for the cache on disk. Set it above the largest single
+        install: below that, LRU eviction removes chunks of the build a client
+        is still downloading, and it re-fetches what it just fetched.
+      '';
     };
 
     inactive = lib.mkOption {
       type = lib.types.str;
       default = "30d";
       description = "Evict an object after this long without a request.";
+    };
+
+    prefill = {
+      enable = lib.mkEnableOption "the nightly SteamPrefill run";
+
+      calendar = lib.mkOption {
+        type = lib.types.str;
+        default = "02:00";
+        description = ''
+          When to fill the cache from the internet. Off-peak by design: a
+          prefill is the one job here that spends WAN bandwidth, so it must not
+          run while the line is being used.
+        '';
+      };
+
+      maxRuntime = lib.mkOption {
+        type = lib.types.str;
+        default = "5h";
+        description = ''
+          Cap on one run. Prefill resumes where it stopped, so a window that
+          closes early costs time, not progress — and a stuck run cannot still
+          be pulling at breakfast.
+        '';
+      };
+
+      os = lib.mkOption {
+        type = lib.types.str;
+        default = "windows";
+        description = ''
+          Platform depots to prefill (`windows`, `linux`, `macos`). Windows is
+          what most clients here are; add `linux` when a Steam Deck should be
+          served too, at the cost of a second depot set per title.
+        '';
+      };
+
+      user = lib.mkOption {
+        type = lib.types.str;
+        default = "devji";
+        description = ''
+          Account the job runs as. SteamPrefill needs a Steam login, and the
+          token it saves is per-user, so this must be the account that ran the
+          one-time `select-apps`.
+        '';
+      };
+
+      stateDir = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/lib/steam-prefill";
+        description = ''
+          Working directory. nixpkgs patches SteamPrefill to keep `Config/` in
+          the current directory (upstream keeps it beside the binary, which is
+          read-only in the store), so the app list and the Steam token live
+          here and must be writable.
+        '';
+      };
     };
 
     resolver = lib.mkOption {
@@ -128,6 +187,68 @@ in {
         ExecStart = "${pkgs.nginx}/bin/nginx -c ${backendConf} -g 'daemon off;'";
         Restart = "on-failure";
         RestartSec = 5;
+      };
+    };
+
+    # --- nightly prefill -----------------------------------------------------
+    # The cache only fills on demand, so a title nothing has asked for yet is
+    # empty when the first client wants it. Prefill fetches the selected apps
+    # through this cache at 02:00, when the line is idle, instead of on the day
+    # a client happens to install.
+    systemd.tmpfiles.rules = lib.optionals cfg.prefill.enable [
+      "d ${cfg.prefill.stateDir} 0700 ${cfg.prefill.user} - -"
+    ];
+
+    systemd.services.steam-prefill = lib.mkIf cfg.prefill.enable {
+      description = "SteamPrefill: fill the LAN Steam cache off-peak";
+      after = [
+        "network-online.target"
+        "steam-cache.service"
+      ];
+      wants = [
+        "network-online.target"
+        "steam-cache.service"
+      ];
+      unitConfig = {
+        # A prefill through a missing cache would download from Valve at full
+        # speed and store nothing: the front falls back by design. Both the
+        # mount and the backend's health answer have to be true first.
+        ConditionPathIsMountPoint = cfg.requireMount;
+        # Written only by a successful one-time `select-apps`, which also saves
+        # the Steam token — the honest "is this configured yet" marker.
+        ConditionPathExists = "${cfg.prefill.stateDir}/Config/selectedAppsToPrefill.json";
+      };
+      serviceConfig = {
+        Type = "oneshot";
+        User = cfg.prefill.user;
+        WorkingDirectory = cfg.prefill.stateDir;
+        # Belt and braces with the Condition above: a cache that is up but not
+        # answering must not turn a prefill into a plain internet download.
+        ExecCondition = "${pkgs.curl}/bin/curl -fsS -m 5 http://127.0.0.1:${toString cfg.port}/__health";
+        ExecStart = "${pkgs.steam-lancache-prefill}/bin/SteamPrefill prefill --no-ansi --os ${cfg.prefill.os}";
+        # A oneshot's default start timeout is 90 s, which would kill every run
+        # mid-download; the wall clock is bounded by maxRuntime instead.
+        TimeoutStartSec = "infinity";
+        RuntimeMaxSec = cfg.prefill.maxRuntime;
+        # The flash tier is a USB BOT device with no NCQ: a prefill writing into
+        # it must yield to Jellyfin reads rather than queue in front of them.
+        Nice = 19;
+        IOSchedulingClass = "best-effort";
+        IOSchedulingPriority = 7;
+      };
+    };
+
+    systemd.timers.steam-prefill = lib.mkIf cfg.prefill.enable {
+      description = "Nightly SteamPrefill window";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnCalendar = cfg.prefill.calendar;
+        Unit = "steam-prefill.service";
+        RandomizedDelaySec = "5m";
+        # Not persistent: a window missed because the host was down must be
+        # skipped, not fired at 10:00 on the next boot where it would eat the
+        # line the whole day.
+        Persistent = false;
       };
     };
 

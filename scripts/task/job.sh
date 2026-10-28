@@ -117,7 +117,11 @@ cmd_start() {
   cat >"$d/run.sh" <<RUN
 #!/usr/bin/env bash
 set -u
-export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:/usr/local/bin:/usr/bin:/bin:\$PATH"
+# /run/wrappers/bin FIRST: `sudo` there is NixOS's setuid wrapper, while
+# /run/current-system/sw/bin/sudo is a plain symlink into the store. With the
+# store path ahead of the wrapper, every sudo in a job died with "must be owned
+# by uid 0 and have the setuid bit set" — including infra:rebuild:nixos.
+export PATH="/run/wrappers/bin:/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:/usr/local/bin:/usr/bin:/bin:\$PATH"
 cd "${JOB_CWD:-$PWD}" || exit 2
 set -o pipefail
 ${quoted}2>&1 | tee -a "$d/log"

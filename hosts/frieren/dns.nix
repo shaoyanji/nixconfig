@@ -79,6 +79,14 @@
       # gets "Server Not Found" for frieren.<tailnet>.ts.net (measured
       # 2026-10-26: MagicDNS answered, pihole did not).
       "server=/cloudforest-kardashev.ts.net/100.100.100.100"
+      # --- Steam content cache (services.steamCache) -----------------------
+      # Steam looks up lancache.steamcontent.com, and then fetches from the CDN
+      # hostname it is handed — so the whole zone points here. The cache's own
+      # upstream resolution uses 1.1.1.1, so this cannot loop, and its :80 front
+      # falls back to Valve when the cache is down. Comment these two lines to
+      # take the cache out of the path without touching the cache host.
+      "address=/steamcontent.com/192.168.3.25"
+      "address=/steamcdn-a.akamaihd.net/192.168.3.25"
       # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
       # Answer ONLY PXE clients on the LAN; never lease IPs — the Huawei router
       # (192.168.3.1) remains the sole DHCP server. dnsmasq proxy mode

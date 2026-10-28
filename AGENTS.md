@@ -904,6 +904,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/inventory-schema.md`](docs/inventory-schema.md)           | Inventory schema, compiled artifacts, and the automatic checks          |
 | [`docs/sops-rekey.md`](docs/sops-rekey.md)                  | Sops planes and files, `.sops.yaml` anchors, SSH CA, rekey procedure, fresh-host bootstrap |
 | [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |
+| [`docs/steam-cache.md`](docs/steam-cache.md)                | LAN Steam content cache: front/cache split, flash-tier measurements, how to disable |
 | [`docs/fleet-inventory.md`](docs/fleet-inventory.md)            | Pointer page — the catalog itself is `.#artifacts.docs` (`nix build .#artifacts.docs`), never committed |
 | [`docs/modules-registry.md`](docs/modules-registry.md)           | Pointer page — the knob registry is built from `modules.toml` at build time |
 | [`lib/aki-site.nix`](lib/aki-site.nix)                   | The rendered site (`.#sites.fleet-docs-site`): nav comes from the knowledge graph |

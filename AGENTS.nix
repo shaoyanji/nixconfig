@@ -4735,6 +4735,41 @@
       '';
     };
 
+    gemini-capsule = {
+      title = "fleet.frieren.lan answers over Gemini on 1965, from the same markdown";
+      kind = "open";
+      status = "DELIVERED";
+      date = "2026-10-29";
+      priority = "P3";
+      summary = "molly-brown serves the fleet docs as gemtext on `gemini.frieren.lan:1965`, projected by `lib/gemtext.nix` from the same markdown the HTTP site renders; CGI runs through a relative `CGIPaths` entry, so `/cgi-bin` executes inside the capsule store path.";
+      refs = {
+        hosts = ["frieren"];
+        modules = [
+          "hosts/frieren/gemini.nix"
+          "lib/gemtext.nix"
+          "overlays/molly-brown.nix"
+        ];
+        docs = ["docs/frieren-access.md"];
+      };
+      body = ''
+        **Upstream has no releases.** `tildegit.org/solderpunk/molly-brown` publishes zero tags and
+        zero releases, so `overlays/molly-brown.nix` pins master (`9627852`, 2026-05-25). The go module
+        set is unchanged from nixpkgs' 2023 pin, so only `src` and `version` move.
+
+        **`CGIPaths` must be relative.** `config.go` joins a relative entry to `DocBase` and leaves an
+        absolute one alone, then compares it against a resolved filesystem path — `/cgi-bin` can never
+        match a path under `DocBase`; `cgi-bin` does. Cost one smoke test to find.
+
+        **Projection, not a second tree.** `lib/gemtext.nix` converts `docs.generatedPages` plus the
+        repo's own markdown into `.gmi`, rewriting internal links to absolute capsule paths. md2gemini
+        is marked broken on python 3.14 in this nixpkgs, hence `lib/gemtext/md2gemtext.py`.
+
+        **Exit.** A client that verifies against `modules/config/tls/frieren-lan-ca.pem` gets
+        `20 text/gemini` from `/`, `20` with the echoed query from `/cgi-bin/hello?x=1`, `51` for a
+        missing page and `53` for a foreign host.
+      '';
+    };
+
     open-pihole-admin-path = {
       title = "`/admin` on the Pi-hole vhost is a 404, and every old link points there";
       kind = "open";

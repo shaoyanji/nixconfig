@@ -41,6 +41,7 @@
       {
         nixpkgs.overlays = [
           (import ../overlays/simplex-chat.nix)
+          (import ../overlays/molly-brown.nix)
           (final: _prev: {
             llm-agents = inputs.llm-agents.packages.${final.stdenv.hostPlatform.system};
             antigravity-cli = inputs.llm-agents.packages.${final.stdenv.hostPlatform.system}.antigravity-cli;

@@ -62,6 +62,7 @@ in {
     ./firewall-scope.nix
     ./infra-stack.nix
     ./reverse-proxy.nix
+    ./gemini.nix
     ../../modules/services/aria2-daemon.nix
     ../../modules/services/harmonia.nix
     ../../modules/services/fleet-sentinel.nix
@@ -214,11 +215,13 @@ in {
   # at modules/config/tls/frieren-lan-wildcard.pem and the signing CA at
   # modules/config/tls/frieren-lan-ca.pem (trusted fleet-wide via
   # security.pki in modules/profiles/base-node.nix). The nginx unit runs as
-  # User=nginx (CAP_NET_BIND_SERVICE), so the key must be nginx-readable.
+  # User=nginx (CAP_NET_BIND_SERVICE), so the key must be nginx-readable —
+  # group-readable, not world-readable, because molly-brown (DynamicUser)
+  # joins the nginx group for the Gemini capsule in gemini.nix.
   sops.secrets."tls-frieren-wildcard-key" = {
     owner = "nginx";
     group = "nginx";
-    mode = "0400";
+    mode = "0440";
   };
 
   # BurgerNAS sudo password for the `task burgernas:*` tooling (WoL, poweroff,

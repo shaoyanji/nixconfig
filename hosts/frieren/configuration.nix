@@ -93,6 +93,12 @@ in {
   # the episodic memory agents read. See modules/services/fleet-sentinel.nix.
   services.fleetSentinel = {
     enable = true;
+    # The one job here that measures itself: a prefill's own percentage is not
+    # evidence (it serves the new chunks first), so the ledger's newest run —
+    # cache growth and bytes pulled from Valve — rides in status.json, where
+    # `task ops:health` and gatus already look. One path, declared once: the
+    # producer owns it.
+    prefillRuns = config.services.steamCache.prefill.ledger;
     # The cold vault is powered on demand: its automount failing while BurgerNAS
     # sleeps is the design, not a fault, and counting it put the whole host in
     # "degraded" — which gatus then reported as a broken monitor.

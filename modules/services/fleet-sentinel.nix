@@ -43,7 +43,11 @@
       # --- failed units ------------------------------------------------------
       while IFS= read -r line; do
         [ -n "$line" ] || continue
-        unit="$(printf '%s' "$line" | awk '{print $2}')"
+        # Column 1, not 2: `--plain --no-legend` prints `UNIT LOAD ACTIVE SUB
+        # DESCRIPTION`, so $2 is the literal word `loaded` — which meant the
+        # `ignoreFailedUnits` list could never match and the ledger reported a
+        # unit named "loaded" (found 2026-10-29 via the BurgerNAS mount).
+        unit="$(printf '%s' "$line" | awk '{print $1}')"
         # The collector itself is allowed to be the only failed thing while it
         # is still starting; do not let a self-transition flap the loop.
         [ "$unit" = "fleet-sentinel.service" ] && continue
@@ -142,6 +146,22 @@
       [ -n "$IO_PSI" ] || IO_PSI="0.00"
       [ -n "$MEM_PSI" ] || MEM_PSI="0.00"
 
+      # --- last scheduled job that measures itself ---------------------------
+      # The Steam prefill writes one JSON object per run with the cache bytes it
+      # grew and the bytes it pulled from Valve. It is not copied into this
+      # ledger: at a 15-minute cadence the fill's numbers would be interleaved
+      # with 95 identical readings of them. Newest run is projected instead.
+      PREFILL_JSON="null"
+      ${lib.optionalString (cfg.prefillRuns != null) ''
+        if [ -r "${cfg.prefillRuns}" ]; then
+          last="$(tail -n 1 "${cfg.prefillRuns}" 2>/dev/null || true)"
+          # A half-written tail must not take the whole event down with it.
+          if [ -n "$last" ] && printf '%s' "$last" | jq -e . >/dev/null 2>&1; then
+            PREFILL_JSON="$last"
+          fi
+        fi
+      ''}
+
       # --- assemble ----------------------------------------------------------
       if [ "''${#REASONS[@]}" -eq 0 ]; then
         STATE="ok"
@@ -165,9 +185,11 @@
         --argjson disk "$DISK_JSON" \
         --argjson io_psi "$IO_PSI" \
         --argjson mem_psi "$MEM_PSI" \
+        --argjson prefill "$PREFILL_JSON" \
         '{schema: 1, ts: $ts, host: $host, state: $state, reasons: $reasons,
           failed_units: $failed_units, jobs: $jobs, generation_age_h: $gen_age_h,
-          disk_pct: $disk, psi: {io: $io_psi, memory: $mem_psi}}')"
+          disk_pct: $disk, psi: {io: $io_psi, memory: $mem_psi},
+          prefill: $prefill}')"
 
       printf '%s\n' "$EVENT" >> "$LEDGER"
       # Bounded history: ~100 days at the 15-minute default, enough to correlate
@@ -230,6 +252,17 @@ in {
       type = lib.types.ints.between 50 99;
       default = 90;
       description = "Degrade when any watched filesystem is at or above this percentage.";
+    };
+
+    prefillRuns = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = ''
+        JSONL file a self-measuring job appends to, one object per run; the
+        newest object is projected into `status.json` as `prefill`. Null means
+        no such job on this host. Point it at
+        {option}`services.steamCache.prefill.ledger` on a host that prefills.
+      '';
     };
 
     watchUnits = lib.mkOption {

@@ -49,6 +49,134 @@
     nscd = pkgs.runCommandLocal "steam-prefill-empty-nscd" {} "mkdir -p $out";
   };
 
+  # Per-run measurement. The prefill's own progress line counts chunks across the
+  # whole selection and serves the new chunks first, so it sat at 18 % for 46
+  # minutes while doing every byte of real work and finished the rest in 8:29 off
+  # the cache (2026-10-29). Two numbers are the honest instrument instead:
+  #
+  #   growth — apparent bytes in the cache tree, before vs after the run;
+  #   wan    — the cache backend's IPIngressBytes delta, i.e. Valve's reply
+  #            bodies. The front is local, so LAN hits land on the backend's
+  #            egress, not its ingress: this cannot mistake a cache hit for
+  #            bandwidth spent. (The prefill unit's own counter cannot do this —
+  #            it reported 34 GB incoming on a run that stored nothing, all of
+  #            it from this host.)
+  #
+  # Both live in a root unit because the cache tree is `0700 nginx` and the
+  # prefill runs as its own user. The baseline is a separate unit rather than an
+  # ExecStartPre for the same reason: systemd has no per-command user.
+  recorder = pkgs.writeShellApplication {
+    name = "steam-prefill-record";
+    runtimeInputs = with pkgs; [coreutils jq systemd];
+    text = ''
+      set -uo pipefail
+
+      phase="$1"
+      baseline="${cfg.prefill.stateDir}/run-baseline.json"
+      ledger="${cfg.prefill.ledger}"
+      cache="${cfg.cacheDir}"
+      # A baseline older than this is not this run's; see the record branch.
+      baseline_max_age=3600
+
+      now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
+
+      # Null rather than 0 when the tree is unreadable: an absent mount is "not
+      # measured", and 0 would read as "the cache did not grow".
+      cache_bytes() {
+        if [ -d "$1" ]; then
+          du -sb --apparent-size "$1" 2>/dev/null | cut -f1 || printf 'null'
+        else
+          printf 'null'
+        fi
+      }
+
+      wan_bytes() {
+        local v
+        v="$(systemctl show steam-cache.service -p IPIngressBytes --value 2>/dev/null || true)"
+        # An empty match is written as two double quotes, not the usual pair of
+        # single ones: in a Nix indented string that pair starts an escape and
+        # the file stops parsing.
+        case "$v" in
+          "" | *[!0-9]*) printf 'null' ;;
+          *) printf '%s' "$v" ;;
+        esac
+      }
+
+      if [ "$phase" = baseline ]; then
+        mkdir -p "$(dirname "$baseline")"
+        jq -n \
+          --arg ts "$(now)" \
+          --argjson cache "$(cache_bytes "$cache")" \
+          --argjson wan "$(wan_bytes)" \
+          '{ts: $ts, cache_bytes: $cache, wan_bytes: $wan}' > "$baseline"
+        exit 0
+      fi
+
+      recorded=true
+      reason=""
+      before=null
+      before_wan=null
+      age=null
+      if [ -r "$baseline" ]; then
+        b_ts="$(jq -r '.ts // empty' "$baseline" 2>/dev/null || true)"
+        before="$(jq -c '.cache_bytes // null' "$baseline" 2>/dev/null || printf 'null')"
+        before_wan="$(jq -c '.wan_bytes // null' "$baseline" 2>/dev/null || printf 'null')"
+        if [ -n "$b_ts" ] && b_epoch="$(date -d "$b_ts" +%s 2>/dev/null)"; then
+          age=$(( $(date +%s) - b_epoch ))
+        fi
+      else
+        recorded=false
+        reason="no-baseline"
+      fi
+      # The fill is skipped (mount gone, cache not answering) after a baseline was
+      # written; attributing the gap to this run would charge a night of client
+      # downloads to it.
+      if [ "$recorded" = true ] && { [ "$age" = null ] || [ "$age" -gt "$baseline_max_age" ]; }; then
+        recorded=false
+        reason="stale-baseline"
+      fi
+
+      after=null
+      after_wan=null
+      if [ "$recorded" = true ]; then
+        after="$(cache_bytes "$cache")"
+        after_wan="$(wan_bytes)"
+      fi
+
+      result="$(systemctl show steam-prefill.service -p Result --value 2>/dev/null || true)"
+      status="$(systemctl show steam-prefill.service -p ExecMainStatus --value 2>/dev/null || true)"
+      host="$(cut -d. -f1 /etc/hostname)"
+
+      mkdir -p "$(dirname "$ledger")"
+      jq -cn \
+        --arg ts "$(now)" \
+        --arg host "$host" \
+        --arg result "''${result:-unknown}" \
+        --arg status "$status" \
+        --arg reason "$reason" \
+        --argjson recorded "$recorded" \
+        --argjson age "$age" \
+        --argjson before "$before" \
+        --argjson after "$after" \
+        --argjson before_wan "$before_wan" \
+        --argjson after_wan "$after_wan" \
+        --argjson oses '${builtins.toJSON cfg.prefill.oses}' \
+        '{schema: 1, ts: $ts, host: $host, recorded: $recorded, reason: $reason,
+          result: $result, exit_status: ($status | if test("^[0-9]+$") then tonumber else null end),
+          oses: $oses, baseline_age_s: $age,
+          cache_bytes_before: $before, cache_bytes_after: $after,
+          cache_growth_bytes:
+            (if $before == null or $after == null then null else $after - $before end),
+          wan_bytes:
+            (if $before_wan == null or $after_wan == null or $after_wan < $before_wan then null
+             else $after_wan - $before_wan end),
+          wan_counter_reset: ($before_wan != null and $after_wan != null and $after_wan < $before_wan)}' \
+        >> "$ledger"
+      tail -n ${toString cfg.prefill.ledgerMaxLines} "$ledger" > "$ledger.tmp"
+      mv "$ledger.tmp" "$ledger"
+    '';
+  };
+
   backendConf = pkgs.writeText "steam-cache-nginx.conf" ''
     user nginx;
     worker_processes 2;
@@ -186,6 +314,29 @@ in {
         '';
       };
 
+      ledger = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/lib/steam-prefill/runs.jsonl";
+        description = ''
+          Append-only record of prefill runs, one JSON object per line: cache
+          bytes before/after, growth, and the bytes the cache backend pulled
+          from Valve. The nightly progress percentage is not evidence of
+          anything (it serves new chunks first), so this is what a fill is
+          judged by. Point a host's {option}`services.fleetSentinel.prefillRuns`
+          at the same path to surface the last run in `status.json`.
+        '';
+      };
+
+      ledgerMaxLines = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 1000;
+        description = ''
+          Rotate the run ledger to this many lines. A nightly job reaches 1000
+          entries in under three years; the file stays small enough to read
+          whole.
+        '';
+      };
+
       user = lib.mkOption {
         type = lib.types.str;
         default = "devji";
@@ -312,11 +463,19 @@ in {
       after = [
         "network-online.target"
         "steam-cache.service"
+        "steam-prefill-baseline.service"
       ];
       wants = [
         "network-online.target"
         "steam-cache.service"
+        "steam-prefill-baseline.service"
+        "steam-prefill-record.service"
       ];
+      # The record unit runs after this one, so it measures the run that just
+      # ended instead of racing it. Both are pulled in by the same transaction
+      # (a timer or a hand-started `systemctl start steam-prefill`), so an ad-hoc
+      # fill is measured exactly like the nightly one.
+      before = ["steam-prefill-record.service"];
       unitConfig = {
         # A prefill through a missing cache would download from Valve at full
         # speed and store nothing: the front falls back by design. Both the
@@ -364,6 +523,44 @@ in {
         Nice = 19;
         IOSchedulingClass = "best-effort";
         IOSchedulingPriority = 7;
+      };
+    };
+
+    # --- the two halves of a measurement -------------------------------------
+    # Root, unlike the fill itself: the cache tree is `0700 nginx`, so the
+    # account SteamPrefill runs as cannot size it. Same mount condition as the
+    # fill — with the stick out there is nothing to measure.
+    systemd.services.steam-prefill-baseline = lib.mkIf cfg.enable {
+      description = "Steam cache: size the cache before a prefill";
+      unitConfig.ConditionPathIsMountPoint = cfg.requireMount;
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${recorder}/bin/steam-prefill-record baseline";
+        ProtectSystem = "strict";
+        ReadWritePaths = [cfg.prefill.stateDir];
+        ProtectHome = true;
+        PrivateTmp = true;
+        NoNewPrivileges = true;
+      };
+    };
+
+    systemd.services.steam-prefill-record = lib.mkIf cfg.enable {
+      description = "Steam cache: record what the prefill moved";
+      # `After` only: the record must run whether the fill succeeded, failed or
+      # was skipped by its Conditions. A silent skip is a fact worth recording.
+      after = ["steam-prefill.service"];
+      unitConfig.ConditionPathIsMountPoint = cfg.requireMount;
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${recorder}/bin/steam-prefill-record record";
+        ProtectSystem = "strict";
+        ReadWritePaths = [
+          cfg.prefill.stateDir
+          (builtins.dirOf cfg.prefill.ledger)
+        ];
+        ProtectHome = true;
+        PrivateTmp = true;
+        NoNewPrivileges = true;
       };
     };
 

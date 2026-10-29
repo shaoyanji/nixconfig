@@ -269,16 +269,94 @@ in {
       description = "Evict an object after this long without a request.";
     };
 
-    dnsOverride = lib.mkOption {
+    dnsSteer = lib.mkOption {
+      type = lib.types.enum [
+        "off"
+        "content"
+        "zone"
+      ];
+      default = "off";
+      description = ''
+        Whether the fleet resolver *steers* clients into this cache. Not the
+        same question as `enable`: the front answers anyone who asks it by name,
+        while steering makes a client ask without knowing it exists.
+
+        `off` (default) — nothing is intercepted.
+
+        `content` — point only the *download* names at the cache:
+        `*.cdn.steampipe.steamcontent.com` (every CDN hostname Steam hands this
+        LAN: fastly, alibaba, edgenext, google2), the detection name
+        `lancache.steamcontent.com`, and the client-installer CDN. An allowlist
+        cannot touch a name it does not list, and that is the point:
+        `cm-01-fra1.steamcontent.com` is a **sibling** of the download names, not
+        a child, so no exclusion can carve it out of a zone record — and pointing
+        it at the NAS is what stopped a Dota 2 match accept on 2026-10-28. Names
+        from pi-hole's own query log, 2026-10-29: 524 detection lookups, 502
+        across the four `*.cdn.steampipe` hosts, one `cm-01-fra1`, one
+        `cache9-fra1`.
+
+        `zone` — the whole `steamcontent.com` zone, i.e. the shape that broke
+        matchmaking. Kept only so that experiment can be reproduced deliberately,
+        and gated on {option}`dnsSteerZoneAcknowledged`.
+
+        Whatever is chosen, a fill does not depend on it: the nightly prefill
+        pins the name inside its own mount namespace.
+      '';
+    };
+
+    dnsSteerDomains = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = ''
+        Extra suffixes steered when {option}`dnsSteer` is `content`. Add the exact
+        name Steam was *observed* to use — `cache9-fra1.steamcontent.com` appeared
+        once, so a client that downloads from Valve's own cache host instead of
+        these CDNs is covered by naming it here, not by widening the match to the
+        zone.
+      '';
+    };
+
+    dnsSteerZoneAcknowledged = lib.mkOption {
       type = lib.types.bool;
       default = false;
       description = ''
-        Point `*.steamcontent.com` and the client-installer CDN at this host in
-        the fleet resolver. Off by default and not the same question as `enable`:
-        the cache serves anyone who asks it by name, while the override
-        *intercepts* the client. An `address=/steamcontent.com/` record is the
-        whole zone, so it also takes the names Steam uses for matchmaking —
-        Dota 2 refused to accept a match on 2026-10-28 while this was on.
+        Second word required for {option}`dnsSteer` = `zone`. It exists so the
+        known-bad shape cannot be switched on by editing one value on a night the
+        cache looks quiet, and so the git history of a matchmaking outage always
+        contains two deliberate edits.
+      '';
+    };
+
+    dnsmasqLines = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      readOnly = true;
+      description = ''
+        The dnsmasq records this module wants in the fleet resolver, derived from
+        the options above so the policy has one home. A host splices them with
+        `extraDnsmasqLines`; it never restates the names.
+      '';
+      default = let
+        at = d: "address=/${d}/${cfg.dnsSteerAddress}";
+        content = [
+          "cdn.steampipe.steamcontent.com"
+          "lancache.steamcontent.com"
+          "steamcdn-a.akamaihd.net"
+        ];
+      in
+        if cfg.dnsSteer == "off"
+        then []
+        else if cfg.dnsSteer == "zone"
+        then [(at "steamcontent.com")]
+        else map at (content ++ cfg.dnsSteerDomains);
+    };
+
+    dnsSteerAddress = lib.mkOption {
+      type = lib.types.str;
+      default = lanIp;
+      description = ''
+        Address the steered names resolve to — this host's LAN address by
+        default, because that is the front every client can reach. Steer to a
+        tailnet address and only tailnet clients are cached.
       '';
     };
 
@@ -438,6 +516,20 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = cfg.dnsSteer != "zone" || cfg.dnsSteerZoneAcknowledged;
+        message = ''
+          services.steamCache.dnsSteer = "zone" points the whole
+          steamcontent.com zone at this cache, including cm-01-fra1.steamcontent.com
+          — a sibling of the download names, so it cannot be excluded — which
+          stopped a Dota 2 match accept on 2026-10-28. Use dnsSteer = "content"
+          for the download hosts only, or set dnsSteerZoneAcknowledged = true if
+          reproducing that experiment deliberately.
+        '';
+      }
+    ];
+
     systemd.services.steam-cache = {
       description = "LAN Steam content cache (nginx, flash tier)";
       after = ["network-online.target"];

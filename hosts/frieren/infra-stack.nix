@@ -491,13 +491,15 @@ in {
     # is still pulling and hand it misses for what it just fetched. 100 GB
     # leaves ~18 GB of the 118.5 GB tier for transcode/thumb scratch.
     maxSize = "100g";
-    # OFF, deliberately, and not because the cache is broken: the cache is a
-    # speed-up for a Dota download, and the interception that makes it work is
-    # the one thing that must not be on the LAN. `address=/steamcontent.com/`
-    # takes the whole zone, so it also points Steam's matchmaking traffic at this
-    # host — Dota 2 would not accept a match on 2026-10-28 while it was on. Any
-    # client that wants the cache asks it by name; nothing is steered into it.
-    dnsOverride = false;
+    # `off`, and the narrow form is what to try first, not the zone. A zone
+    # record takes `cm-01-fra1.steamcontent.com` too — the connection manager,
+    # whose name has no relationship to the download hosts — and Dota 2 stopped
+    # accepting matches on 2026-10-28 while it was on. `content` steers only the
+    # names this LAN actually downloads from (`*.cdn.steampipe.steamcontent.com`,
+    # the detection name, the installer CDN), so a name nobody listed keeps
+    # resolving publicly. pi-hole's query log is the evidence, and
+    # `dnsSteerDomains` covers a host seen afterwards without widening the match.
+    dnsSteer = "off";
     prefill = {
       # Armed 2026-10-28. The pin a fill needs lives in the unit itself
       # (`BindReadOnlyPaths` over the four resolver files, in this unit's mount

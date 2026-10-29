@@ -28,6 +28,18 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-29 — the fleet docs answer over Gemini on 1965
+- **One projection, two protocols.** `hosts/frieren/gemini.nix` runs molly-brown on
+  `gemini.frieren.lan:1965` serving `lib/gemtext.nix`'s conversion of the same markdown the HTTP site
+  renders (56 pages), with CGI under `/cgi-bin`; the firewall entry reads `services.molly-brown.port`
+  and the certificate is the existing `*.frieren.lan` wildcard, so nothing was re-issued.
+- **molly-brown is overlaid to master** (`9627852`, 2026-05-25): upstream publishes no tags or
+  releases, and the go module set is unchanged from nixpkgs' 2023 pin, so only `src`/`version` differ.
+- **`CGIPaths` is relative on purpose** — `config.go` joins a relative entry to `DocBase` and leaves
+  an absolute one alone, so `/cgi-bin` could never match and `cgi-bin` does.
+- Evidence: `20 text/gemini` on `/`, `20` with `query: x=1` on `/cgi-bin/hello?x=1`, `51` on a
+  missing page, `53` on a foreign host, TLS verified against the LAN CA; `hostChecks` green.
+
 ### 2026-10-29 — `/admin` on the Pi-hole vhost answers again, and FTL's bind stays closed
 - **The bookmark path works; a route FTL lacks still doesn't.** FTL 6.7.1 serves its UI at `/`
   (`webhome`), so `/admin` was FTL's own 404. `hosts/frieren/reverse-proxy.nix` rewrites `/admin[/…]`

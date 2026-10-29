@@ -86,7 +86,7 @@ in {
       # Heavy agent suite — ONLY installed when tier == "full"
       # Keeps ~2+ GB and bundled Chromium off light mobile clients like aristotle
       ++ lib.optionals (config.profiles.ai.tier == "full") [
-        pkgs.llm-agents.crush # Charmbracelet agent (MIT, source-built)
+        # pkgs.llm-agents.crush # Charmbracelet agent (MIT, source-built)
         pkgs.llm-agents.qmd # local hybrid markdown/code search
         pkgs.llm-agents.ai-memory # persistent cross-agent memory
         pkgs.llm-agents.toon # TOON format tooling

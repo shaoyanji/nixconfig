@@ -182,7 +182,7 @@ ssh_alias = "delphi"
 [hosts.delphi.software]
 module_chain = "globalModulesContainers"
 impermanence = false
-key_services = ["nginx :443 — Let's Encrypt TLS for the public dossier, /healthz, :80 redirect", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry NXDOMAIN, failover pair with frieren)", "Tailscale exit node, advertising the shared 10.99.0.53/32 route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "DeepSeek Harness, tailnet-only (:8443, dsh-web on loopback :3080)", "System One decision engine, tailnet-only (:8444, loopback :8091)", "Stirling PDF, tailnet-only (:8445, loopback :7351)", "Service console, tailnet-only (:8446, loopback :8082)", "Gatus fleet monitors — an out-of-LAN vantage", "OCI serial console logging"]
+key_services = ["nginx :443 — Let's Encrypt TLS for the public dossier, /healthz, :80 redirect", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry NXDOMAIN, failover pair with frieren)", "Tailscale exit node, advertising the shared 10.99.0.53/32 route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "DeepSeek Harness, tailnet-only (:8443, dsh-web on loopback :3080)", "System One decision engine, tailnet-only (:8444, loopback :8091)", "Stirling PDF, tailnet-only (:8445, loopback :7351)", "Service console, tailnet-only (:8446, loopback :8082)", "Gemini capsule on :1965 (portfolio as gemtext, resume.json/lebenslauf.json) and :1966 on the tailnet", "Gatus fleet monitors — an out-of-LAN vantage", "OCI serial console logging"]
 traits = ["cloud-server", "aarch64-arm", "11gb-ram", "tailscale-exit-node", "oci-always-free"]
 
 [hosts.delphi.persona]

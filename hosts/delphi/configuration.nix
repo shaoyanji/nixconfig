@@ -239,6 +239,7 @@
   freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 in {
   imports = [
+    ./gemini.nix
     ./gok-artifacts.nix
     ./hardware-configuration.nix
     ./infra-stack.nix

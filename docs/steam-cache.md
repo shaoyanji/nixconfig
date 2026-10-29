@@ -12,23 +12,48 @@ certificate, no client configuration.
 | :--- | :--- |
 | Front vhost (`:80`, always on) | `services.nginx.virtualHosts.steam-cache` — `modules/services/steam-cache.nix` |
 | Cache process (`127.0.0.1:8081`) | `systemd.services.steam-cache`, cache root `/mnt/flash-cache/steam-cache` |
-| DNS override (**off**) | `hosts/frieren/dns.nix`, gated on `services.steamCache.dnsOverride` |
+| DNS steering (**off**, opt-in) | `services.steamCache.dnsmasqLines`, spliced by `hosts/frieren/dns.nix` |
 | Health | gatus endpoint `steam cache` → `http://127.0.0.1:8081/__health` |
 
-## The override is off, and why
+## Steering, and the shape that broke matchmaking
 
 Steam's client resolves `lancache.steamcontent.com` to detect a cache, then
 fetches depots from the CDN hostname it is handed — all inside
-`steamcontent.com`. So making downloads cache requires an `address=` record for
-the **whole zone**, not just the detection name, and that zone is not
-cache-only traffic: with it on, a Dota 2 client could not complete a match
-accept (2026-10-28). There is no narrower record that keeps downloads cached.
+`steamcontent.com`. The first attempt pointed the **whole zone** at the NAS, and
+on 2026-10-28 Dota 2 stopped completing a match accept. pi-hole's own query log
+says what that zone held:
 
-So `dnsOverride` defaults to `false` and the cache is inert for clients:
-frieren still answers any request that asks for the front by name, but nothing
-is steered to it. Re-enabling is a decision about the whole zone, not a
-performance tweak — and if a game is being played on the LAN while it is on,
-that game is the experiment.
+| lookups (to 2026-10-29) | name | role |
+| ---: | :--- | :--- |
+| 524 | `lancache.steamcontent.com` | cache detection — must answer from here |
+| 502 | `{fastly,alibaba,edgenext,google2}.cdn.steampipe.steamcontent.com` | the download CDNs |
+| 1 | `cm-01-fra1.steamcontent.com` | **connection manager — matchmaking** |
+| 1 | `cache9-fra1.steamcontent.com` | Valve's own cache host |
+
+`cm-01-fra1` is a **sibling** of the download names, not their child, so no
+exclusion inside the zone can spare it while the zone is steered — "narrow the
+zone" was the wrong shape. An allowlist is the shape that works:
+
+| `dnsSteer` | writes | verdict |
+| :--- | :--- | :--- |
+| `off` (default) | nothing | cache inert for clients; only the prefill fills it |
+| `content` | `address=/cdn.steampipe.steamcontent.com/…`, `/lancache.steamcontent.com/…`, `/steamcdn-a.akamaihd.net/…` | steers downloads; `cm-*` and `cache9-*` cannot match because nobody listed them |
+| `zone` | `address=/steamcontent.com/…` | the 2026-10-28 shape; refused unless `dnsSteerZoneAcknowledged = true` |
+
+Verified against dnsmasq 2.93 before writing it: the suffix form answers for
+`fastly.` and `alibaba.cdn.steampipe.steamcontent.com` while `cache9-fra1` and
+`cm-01-fra1` keep resolving publicly. The assertion fires exactly once for
+`zone` without the acknowledgement, and not at all for `content` (measured).
+
+Not covered by the preset: `cache9-fra1.steamcontent.com`, Valve's own cache
+host, seen once. If a client is observed downloading from it instead of these
+CDNs, name that exact suffix in `dnsSteerDomains` — never widen to the zone,
+which is the edit that broke matchmaking. Frieren runs `off`; flipping to
+`content` is one value on one host, and the front's `X-Steam-Cache` header shows
+whether the traffic arrived.
+
+The prefill does not depend on steering either way: the fill pins the name
+inside its own mount namespace.
 
 ## Prefill without touching LAN DNS
 

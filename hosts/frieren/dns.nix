@@ -81,18 +81,15 @@
         # 2026-10-26: MagicDNS answered, pihole did not).
         "server=/cloudforest-kardashev.ts.net/100.100.100.100"
         # --- Steam content cache (services.steamCache) -----------------------
-        # OFF since 2026-10-28, and opt-in from here on: `address=/steamcontent.com/`
-        # is the whole zone, not just the content hosts, so it also swallows the
-        # names Steam's client uses for non-download traffic — Dota 2 matchmaking
-        # would not complete an accept while every one of them pointed at the NAS.
-        # The cache itself is unaffected (its front still answers for a request
-        # that asks for it by name); only the interception is gone. Flip
-        # `services.steamCache.dnsOverride` back on to test a narrower list.
+        # OFF since 2026-10-28: `address=/steamcontent.com/` is the whole zone, so
+        # it also swallowed `cm-01-fra1.steamcontent.com` — the connection manager,
+        # which no exclusion can carve back out because it is a *sibling* of the
+        # download names — and Dota 2 stopped accepting matches. The names and the
+        # reasoning live in the module (`steamCache.dnsmasqLines` derives them from
+        # `dnsSteer`); this file only splices them in, so the resolver policy has
+        # one home. Steering is off by default; `content` is the narrow form.
       ]
-      ++ lib.optionals config.services.steamCache.dnsOverride [
-        "address=/steamcontent.com/192.168.3.25"
-        "address=/steamcdn-a.akamaihd.net/192.168.3.25"
-      ]
+      ++ config.services.steamCache.dnsmasqLines
       ++ [
         # --- PXE proxyDHCP for iVentoy (ExternalNet mode on :16000/:69) ---
         # Answer ONLY PXE clients on the LAN; never lease IPs — the Huawei router

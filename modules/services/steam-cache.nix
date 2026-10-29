@@ -54,7 +54,13 @@
   # minutes while doing every byte of real work and finished the rest in 8:29 off
   # the cache (2026-10-29). Two numbers are the honest instrument instead:
   #
-  #   growth — apparent bytes in the cache tree, before vs after the run;
+  #   growth — used bytes on the flash tier, before vs after the run, read with
+  #            statvfs in 6 ms. Not a `du` of the cache tree: that costs 36 s
+  #            cold over 56 GB on a USB BOT device, twice a night, to record that
+  #            nothing changed. The cache is ~96 % of this filesystem, so the
+  #            other ~3 % (transcode/thumb scratch) can appear in the delta —
+  #            which is why the WAN number is reported beside it, as a second,
+  #            independent opinion;
   #   wan    — the cache backend's IPIngressBytes delta, i.e. Valve's reply
   #            bodies. The front is local, so LAN hits land on the backend's
   #            egress, not its ingress: this cannot mistake a cache hit for
@@ -80,14 +86,22 @@
 
       now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
 
-      # Null rather than 0 when the tree is unreadable: an absent mount is "not
+      # Null rather than 0 when the tier is unreadable: an absent mount is "not
       # measured", and 0 would read as "the cache did not grow".
-      cache_bytes() {
-        if [ -d "$1" ]; then
-          du -sb --apparent-size "$1" 2>/dev/null | cut -f1 || printf 'null'
-        else
+      #
+      # Arithmetic in the shell on purpose: `awk` is gawk, which is not in this
+      # unit's runtimeInputs, so `stat | awk` returned nothing and jq rejected the
+      # empty string as JSON (2026-10-29 — an empty baseline, a failed unit, no
+      # record). Anything this file pipes to must be listed in runtimeInputs.
+      used_bytes() {
+        local path="$1" blocks free size
+        [ -d "$path" ] || { printf 'null'; return; }
+        read -r blocks free size < <(stat -f -c '%b %f %S' "$path")
+        if [ -z "''${size:-}" ]; then
           printf 'null'
+          return
         fi
+        printf '%s' $(((blocks - free) * size))
       }
 
       wan_bytes() {
@@ -106,9 +120,9 @@
         mkdir -p "$(dirname "$baseline")"
         jq -n \
           --arg ts "$(now)" \
-          --argjson cache "$(cache_bytes "$cache")" \
+          --argjson used "$(used_bytes "$cache")" \
           --argjson wan "$(wan_bytes)" \
-          '{ts: $ts, cache_bytes: $cache, wan_bytes: $wan}' > "$baseline"
+          '{ts: $ts, tier_used_bytes: $used, wan_bytes: $wan}' > "$baseline"
         exit 0
       fi
 
@@ -119,7 +133,7 @@
       age=null
       if [ -r "$baseline" ]; then
         b_ts="$(jq -r '.ts // empty' "$baseline" 2>/dev/null || true)"
-        before="$(jq -c '.cache_bytes // null' "$baseline" 2>/dev/null || printf 'null')"
+        before="$(jq -c '.tier_used_bytes // null' "$baseline" 2>/dev/null || printf 'null')"
         before_wan="$(jq -c '.wan_bytes // null' "$baseline" 2>/dev/null || printf 'null')"
         if [ -n "$b_ts" ] && b_epoch="$(date -d "$b_ts" +%s 2>/dev/null)"; then
           age=$(( $(date +%s) - b_epoch ))
@@ -139,7 +153,7 @@
       after=null
       after_wan=null
       if [ "$recorded" = true ]; then
-        after="$(cache_bytes "$cache")"
+        after="$(used_bytes "$cache")"
         after_wan="$(wan_bytes)"
       fi
 
@@ -163,9 +177,9 @@
         --argjson oses '${builtins.toJSON cfg.prefill.oses}' \
         '{schema: 1, ts: $ts, host: $host, recorded: $recorded, reason: $reason,
           result: $result, exit_status: ($status | if test("^[0-9]+$") then tonumber else null end),
-          oses: $oses, baseline_age_s: $age,
-          cache_bytes_before: $before, cache_bytes_after: $after,
-          cache_growth_bytes:
+          oses: $oses, baseline_age_s: $age, measure: "statvfs",
+          tier_used_bytes_before: $before, tier_used_bytes_after: $after,
+          tier_growth_bytes:
             (if $before == null or $after == null then null else $after - $before end),
           wan_bytes:
             (if $before_wan == null or $after_wan == null or $after_wan < $before_wan then null
@@ -318,11 +332,11 @@ in {
         type = lib.types.str;
         default = "/var/lib/steam-prefill/runs.jsonl";
         description = ''
-          Append-only record of prefill runs, one JSON object per line: cache
-          bytes before/after, growth, and the bytes the cache backend pulled
-          from Valve. The nightly progress percentage is not evidence of
-          anything (it serves new chunks first), so this is what a fill is
-          judged by. Point a host's {option}`services.fleetSentinel.prefillRuns`
+          Append-only record of prefill runs, one JSON object per line: used
+          bytes on the flash tier before/after (statvfs, not a `du` walk),
+          their growth, and the bytes the cache backend pulled from Valve. The
+          nightly progress percentage is not evidence of anything (it serves
+          new chunks first), so this is what a fill is judged by. Point a host's {option}`services.fleetSentinel.prefillRuns`
           at the same path to surface the last run in `status.json`.
         '';
       };

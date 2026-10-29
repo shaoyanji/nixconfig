@@ -52,8 +52,8 @@ One JSON object per run:
   "generation_age_h": 5.2,
   "disk_pct": {"root": 42, "nix": 61, "data": 80},
   "psi": {"io": 1.2, "memory": 0.0},
-  "prefill": {"ts": "2026-10-28T23:59:37Z", "recorded": true,
-              "cache_growth_bytes": 0, "wan_bytes": 406}
+  "prefill": {"ts": "2026-10-28T23:59:37Z", "recorded": true, "measure": "statvfs",
+              "tier_growth_bytes": 0, "wan_bytes": 406}
 }
 ```
 
@@ -67,9 +67,12 @@ means no self-measuring job on this host. Read the whole history with
 **A job's own progress output is not a measurement.** The Steam prefill counted
 chunks across the whole selection and served the uncached ones first: it read
 18 % for 46 minutes, then finished all 33.72 GiB in 8:29 off the cache. Its
-`cache_growth_bytes` / `wan_bytes` are the instrument — 0 growth with a few
-hundred WAN bytes is a warm night, and a large `wan_bytes` with no growth is a
-fill that fetched and stored nothing (broken cache, wrong pin).
+`tier_growth_bytes` / `wan_bytes` are the instrument — 0 growth with a few hundred
+WAN bytes is a warm night, and a large `wan_bytes` with no growth is a fill that
+fetched and stored nothing (broken cache, wrong pin). The growth figure is the
+flash tier's `statvfs` delta (the cache is ~96 % of that filesystem), chosen over
+a `du` because that walk is 36 s cold on a USB stick; the two meters disagreeing
+is the signal that something other than the cache moved.
 
 `reasons` is the contract: each token is `class:detail`.
 

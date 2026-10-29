@@ -19,12 +19,20 @@
 # than the ~1 s a warm evaluation costs. KG_GRAPH (any caller's --graph) short
 # circuits both: the path is used as given, no eval, no cache.
 #
-# Requires: REPO exported by the caller (the repo root), plus git, nix and awk.
+# Requires: git, nix and awk. REPO (the repo root) is taken from the caller when
+# exported, and derived from this file's own location otherwise — kg-ask.sh never
+# set it, so `task ops:ask` died with "kg-graph: REPO is not set" at query time
+# while every other kg:* script worked. A path that is knowable here is not a
+# precondition to impose on nine callers.
 # kg_usage <path-to-script> — print that script's leading `#` comment block (the
 # shebang is skipped), one `# ` stripped. Each kg:* script used to hardcode a
 # line range for this, which silently truncates the help the moment a comment is
 # added above it. Pass "${BASH_SOURCE[0]}" from the caller: inside a function the
 # value would otherwise be this library's own path.
+if [ -z "${REPO:-}" ]; then
+  REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel 2>/dev/null || true)"
+fi
+
 kg_usage() {
   awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "${1:-/dev/null}"
 }

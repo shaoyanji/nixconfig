@@ -154,6 +154,45 @@ carries the same list for a TUI or a probe, and the asserts in
 card has no owner, two mounts share a port, an upstream is not loopback, or a
 `requires` names a unit that does not exist.
 
+## The Gemini capsule (`hosts/delphi/gemini.nix`)
+
+The portfolio is also a capsule, compiled by `lib/gemini-portal.nix` from the
+same `portfolio.json` the HTTPS page renders: `/index.gmi` and `/de/index.gmi`
+(the profile, work, stack and record sections the index page shows), one
+`/work/<slug>.gmi` per case study, and the two machine-readable documents
+`/resume.json` and `/lebenslauf.json`.
+
+| Name | Port | Certificate | Reachable from |
+| :--- | :--- | :--- | :--- |
+| `delphi.bountystash.com` | 1965 | the nginx vhost's ACME cert (`/var/lib/acme/delphi.bountystash.com`) | the internet (verified from frieren 2026-10-29; OCI's security list is console-side, so check it first if a client times out) |
+| `delphi.cloudforest-kardashev.ts.net` | 1966 | `tailscale cert`, issued by `gemini-tailnet-cert.service` and renewed by its timer | the tailnet only (a `tailscale0` firewall rule) |
+
+Two ports, not one: molly-brown's config has `Port` and `Hostname` but no listen
+address (measured on `56d8dde`), so a second name needs a second instance. The
+public one keeps the protocol's port.
+
+**`gemini://bountystash.com` is not this capsule.** The apex is a Cloudflare
+Pages site, so port 1965 there reaches an edge that does not speak Gemini. The
+capsule answers on the host's own name: it already resolves here and already has
+a certificate, while a `gemini.` label would need a new A record and a new ACME
+line.
+
+Verify from a client — the first line must be `20 text/gemini; charset=utf-8`:
+
+```bash
+printf 'gemini://delphi.bountystash.com/\r\n' |
+  nix shell nixpkgs#openssl -c openssl s_client -quiet \
+    -connect delphi.bountystash.com:1965 -servername delphi.bountystash.com | head -3
+printf 'gemini://delphi.bountystash.com/resume.json\r\n' |
+  nix shell nixpkgs#openssl -c openssl s_client -quiet \
+    -connect delphi.bountystash.com:1965 -servername delphi.bountystash.com | head -2
+```
+
+A renewed ACME certificate restarts `molly-brown` (`reloadServices`); the tailnet
+certificate is re-issued by the daily `gemini-tailnet-cert` timer, which only
+renews inside a 30-day window (`--min-validity=720h`). Logs:
+`/var/log/molly-brown/` and `/var/log/molly-brown-tailnet/`.
+
 ## The two surfaces: a dossier and a console (`lib/delphi-site.nix`)
 
 Delphi serves two documents, and they are two projections of ONE evaluated

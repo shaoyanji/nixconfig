@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Utility Layer Recon — small local models for the fleet</title>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --panel: #151b23;
+        --panel-2: #1b232d;
+        --line: #263140;
+        --ink: #d7dee8;
+        --ink-dim: #93a1b3;
+        --ink-faint: #6b7a8f;
+        --accent: #6ea8fe;
+        --ok: #3fb950;
+        --ok-bg: #12261a;
+        --warn: #d29922;
+        --warn-bg: #2a2213;
+        --bad: #f85149;
+        --bad-bg: #2a1618;
+        --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+        --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 15px;
+        line-height: 1.62;
+      }
+      .wrap {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        gap: 2.5rem;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 6rem;
+      }
+      nav.toc {
+        position: sticky;
+        top: 1.5rem;
+        align-self: start;
+        max-height: calc(100vh - 3rem);
+        overflow-y: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        padding: 1rem 0.9rem;
+        font-size: 0.83rem;
+      }
+      nav.toc h2 {
+        margin: 0 0 0.6rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 600;
+      }
+      nav.toc a {
+        display: block;
+        padding: 0.2rem 0.45rem;
+        color: var(--ink-dim);
+        text-decoration: none;
+        border-left: 2px solid transparent;
+        border-radius: 3px;
+      }
+      nav.toc a:hover { color: var(--accent); background: var(--panel-2); border-left-color: var(--accent); }
+      main { min-width: 0; }
+      header.hero { border-bottom: 1px solid var(--line); padding-bottom: 1.4rem; margin-bottom: 2rem; }
+      header.hero .kicker {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin: 0 0 0.5rem;
+      }
+      h1 { font-size: 2rem; line-height: 1.18; margin: 0 0 0.6rem; letter-spacing: -0.015em; }
+      .lede { color: var(--ink-dim); font-size: 1.02rem; margin: 0; max-width: 62ch; }
+      .meta {
+        margin-top: 1rem;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--ink-faint);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 1.25rem;
+      }
+      h2 {
+        font-size: 1.28rem;
+        margin: 2.6rem 0 0.9rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--line);
+        letter-spacing: -0.01em;
+      }
+      h3 { font-size: 1.02rem; margin: 1.7rem 0 0.6rem; color: #e8eef6; }
+      p { margin: 0.7rem 0; max-width: 78ch; }
+      ul, ol { max-width: 78ch; padding-left: 1.25rem; }
+      li { margin: 0.3rem 0; }
+      a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(110, 168, 254, 0.3); }
+      a:hover { border-bottom-color: var(--accent); }
+      code {
+        font-family: var(--mono);
+        font-size: 0.86em;
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 0.08em 0.32em;
+        color: #cfe0f5;
+        white-space: nowrap;
+      }
+      pre {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0.85rem 1rem;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        line-height: 1.55;
+        color: #cfe0f5;
+      }
+      pre code { background: none; border: 0; padding: 0; white-space: pre; }
+      .tablewrap { overflow-x: auto; margin: 1rem 0 1.4rem; border: 1px solid var(--line); border-radius: 8px; }
+      table { border-collapse: collapse; width: 100%; font-size: 0.84rem; }
+      th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th {
+        background: var(--panel-2);
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      tbody tr:last-child td { border-bottom: 0; }
+      tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.014); }
+      td.num { font-family: var(--mono); font-size: 0.8rem; white-space: nowrap; }
+      .badge {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 0.12rem 0.42rem;
+        border-radius: 999px;
+        border: 1px solid;
+        white-space: nowrap;
+        font-weight: 600;
+      }
+      .b-ok { color: var(--ok); background: var(--ok-bg); border-color: #1f4a2b; }
+      .b-warn { color: var(--warn); background: var(--warn-bg); border-color: #4a3a15; }
+      .b-bad { color: var(--bad); background: var(--bad-bg); border-color: #58201f; }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 0.95rem 1.1rem;
+        margin: 1.1rem 0;
+      }
+      .card.warn { border-left-color: var(--warn); }
+      .card.bad { border-left-color: var(--bad); }
+      .card.ok { border-left-color: var(--ok); }
+      .card h3 { margin-top: 0; }
+      .card p:last-child { margin-bottom: 0; }
+      .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem; margin: 1rem 0; }
+      .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.85rem 1rem; }
+      .stat .k { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+      .stat .v { font-size: 1.25rem; font-weight: 650; margin-top: 0.15rem; }
+      .stat .s { font-size: 0.79rem; color: var(--ink-dim); }
+      .muted { color: var(--ink-dim); }
+      .faint { color: var(--ink-faint); font-size: 0.82rem; }
+      footer { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); color: var(--ink-faint); font-size: 0.79rem; }
+      @media (max-width: 860px) {
+        .wrap { grid-template-columns: 1fr; gap: 1.5rem; padding-top: 1.25rem; }
+        nav.toc { position: static; max-height: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="toc">
+        <h2>Contents</h2>
+        <a href="#summary">Executive summary</a>
+        <a href="#corrections">Brief corrections</a>
+        <a href="#verification">Verification table</a>
+        <a href="#matrix">Size / speed matrix</a>
+        <a href="#vram">VRAM coexistence</a>
+        <a href="#order">Build order</a>
+        <a href="#integration">Integration sketches</a>
+        <a href="#older">Older-gen small models</a>
+        <a href="#open">Open questions</a>
+        <a href="#method">Method &amp; sources</a>
+      </nav>
+
+      <main>
+        <header class="hero">
+          <p class="kicker">Fleet recon · 2026-10-29</p>
+          <h1>The utility layer: seven candidates, checked against reality</h1>
+          <p class="lede">
+            A verification-first pass over the proposed small-model layer — shell ghost text,
+            offline wiki lookup, tool routing — against eisen’s 8&nbsp;GB RX&nbsp;5700, poseidon’s
+            4&nbsp;GB RTX&nbsp;3050&nbsp;Ti, and delphi’s 2&nbsp;OCPU ARM instance.
+          </p>
+          <div class="meta">
+            <span>verified on Hugging Face + GitHub</span>
+            <span>7/7 candidates resolve</span>
+            <span>2 are not what the brief assumed</span>
+            <span>1 model is six days old and off-list</span>
+          </div>
+        </header>
+
+        <h2 id="summary">Executive summary</h2>
+
+        <p>
+          Every candidate on the list exists. That is worth saying plainly, because the brief
+          expected the opposite: small-model names churn, and several of these are one-person
+          uploads with double-digit likes. All seven resolved to a real repository with real
+          weights, a real license and a real quant or runtime. None were hallucinations.
+        </p>
+
+        <p>Three findings change the build:</p>
+
+        <ol>
+          <li>
+            <strong>Needle 2 is not a GGUF and not a chat model.</strong> It is a 45M-parameter
+            tool-calling engine — a 14&nbsp;MB binary, 28&nbsp;MB session RAM — that emits
+            grammar-constrained JSON and carries a calibrated confidence head. It cannot be
+            dropped into <code>llama-server</code>, and it should not be asked to write prose.
+            As a <em>router</em> for a wiki agent it is the best thing on this list by a wide
+            margin; as an autocomplete model it is useless.
+          </li>
+          <li>
+            <strong>The strongest candidate is not on the list.</strong>
+            <code>LiquidAI/LFM3-1.7B</code> shipped <strong>2026-10-23</strong> — six days ago.
+            1.73B, 256K context, ~1&nbsp;GB at 4-bit, official GGUF, and post-trained
+            specifically for agentic harnesses “such as Hermes Agent, Pi, and OpenClaw” — which
+            is this fleet’s actual stack. Its family also ships vision, audio, omni and
+            <em>decision</em> variants, which is the decision-model thread from the earlier
+            discussion. The catch is the license: LFM Open License v1.0, not Apache-2.0.
+          </li>
+          <li>
+            <strong>Nothing in this layer may compete for eisen’s VRAM.</strong> Strata already
+            holds roughly 6.1&nbsp;GB of the 8&nbsp;GB card while the main model is resident. Any
+            utility model on eisen has to be CPU-pinned or you are choosing it over the model you
+            use. That constrains the build order more than model quality does.
+          </li>
+        </ol>
+
+        <p>
+          And one finding that changes the <em>shape</em> of the project rather than the model list:
+          <strong>the autocomplete integration named in the brief does not apply here.</strong>
+          <code>pi-shell-autocomplete</code> is a Pi-TUI package; there is no <code>pi</code> binary on
+          any host, and the editor is nixvim. The model side of ghost text is ready; the harness is
+          unwritten. That makes the router the only deployable first step, not merely the cheapest.
+        </p>
+
+        <div class="grid2">
+          <div class="stat">
+            <div class="k">Highest value / effort</div>
+            <div class="v">Needle 2 as router</div>
+            <div class="s">28 MB RAM, no GPU, an ARM64 binary that runs on delphi itself</div>
+          </div>
+          <div class="stat">
+            <div class="k">Ghost text, safe default</div>
+            <div class="v">Qwen2.5-Coder-3B</div>
+            <div class="s">Q4_K_M 1.80 GiB — the only size that fits poseidon's 4 GB with room for KV</div>
+          </div>
+          <div class="stat">
+            <div class="k">Best all-round 1.7B</div>
+            <div class="v">LFM3-1.7B</div>
+            <div class="s">~1 GB at 4-bit, 256K ctx, Hermes/Pi-trained</div>
+          </div>
+        </div>
+
+        <h2 id="corrections">Corrections to the brief</h2>
+
+        <p>
+          Five details in the prompt do not match the registry or the model cards. They matter
+          because two of them decide which backend is even available.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr><th>As stated</th><th>Actually</th><th>Why it matters</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AMD RX 5700 <strong>XT</strong>, 8 GB, “working ROCm patch”</td>
+                <td><code>inventory.toml</code>: <strong>RX 5700</strong> (Navi 10, 8 GB, VCN 2.0) — and the repo disagrees with itself about the compute path. <code>docs/eisen-llm-architecture.md</code> says <em>“No ROCm. Navi 10 (gfx1010) is not a ROCm-supported target; Vulkan/radv is the supported compute path.”</em> <code>hosts/eisen/strata.nix</code> describes the unit as “ROCm HIP gfx1010” with <code>ROCR_VISIBLE_DEVICES</code>.</td>
+                <td>Both are plausible (a patched gfx1010 ROCm build exists, and Strata runs in an isolated FHS env precisely to keep host Mesa away). But only one is true for the running unit, and it decides whether CUDA-only or ROCm-only tooling is a candidate at all.</td>
+              </tr>
+              <tr>
+                <td>64 GB <strong>DDR3</strong></td>
+                <td>64 GiB <strong>DDR4</strong> (Xeon E5-2673 v3, 12c/24t, AVX2).</td>
+                <td>Memory-bandwidth-bound MoE decoding: DDR4 quad-channel is the reason 22.5 GB of experts can stream at 17 tok/s.</td>
+              </tr>
+              <tr>
+                <td>“Qwen3.8-Next running at ~17 tok/s”</td>
+                <td><code>strata-coder-iq1_m.json</code> — i.e. the <strong>Coder</strong> variant of Qwen3.8-Flash-Next, served at <strong>IQ1_M (~1.5–1.8 bpw)</strong> by a Python engine, not llama.cpp.</td>
+                <td>17 tok/s is bought with the quant, not the architecture. At IQ1_M the weights carry roughly a tenth of Q8’s information: excellent breadth, fragile on exact formats. Fine-tune a different model, not this one.</td>
+              </tr>
+              <tr>
+                <td>“RTX 3050 Mobile, 4 GB”</td>
+                <td>RTX 3050 Ti <strong>Laptop</strong> + Radeon iGPU, 4 GB, 16 GiB RAM, Ryzen 7 8c/16t (poseidon).</td>
+                <td>4 GB is the binding constraint: a 3B at Q4_K_M (1.80 GiB) fits with ~1.3 GB left for KV at 8k. A 1.5B leaves comfortable headroom.</td>
+              </tr>
+              <tr>
+                <td>pi-shell-autocomplete as the autocomplete integration</td>
+                <td><strong>No consumer on this fleet.</strong> There is no <code>pi</code> binary on any host; <code>modules/config/shells/pi.nix</code> is a Raspberry&nbsp;Pi <em>devshell</em>, not the Pi TUI. The editor is <strong>nixvim</strong> (external <code>github:shaoyanji/kickstart.nixvim</code> input) and zsh already has <em>history-based</em> autosuggestions (<code>modules/shell/zsh.nix</code>) — no model behind it.</td>
+                <td>Binary-verified 2026-10-29 (<code>command -v pi</code> → not installed; no Pi package anywhere in the tree). Tier B as written has no insertion point: the ghost-text harness has to be written against nixvim or zsh, not installed.</td>
+              </tr>
+              <tr>
+                <td>“decision models … in the 35B-A3B sizing area”</td>
+                <td>Laya is <strong>~3.5 GiB RSS, CPU-only torch</strong> (<code>laya[serve]==0.4.1</code>); Kev-4B is a <strong>4B classifier</strong> at Q8_0. Decision models live at 0.6–4B, not 35B.</td>
+                <td>The 35B-A3B class is the chat tier. Decision models are cheap enough to fine-tune in an hour and are scored with accuracy, not taste.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="verification">Verification table</h2>
+
+        <p class="faint">
+          Confidence is about the <em>claim</em>, not the download count.
+          <span class="badge b-ok">verified</span> = artifact, license and format confirmed at the
+          source. <span class="badge b-warn">plausible</span> = real artifact, but a claim in the
+          brief is unsupported or the project is too small to trust unmeasured.
+          <span class="badge b-bad">could not verify</span> = the claim does not hold.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Candidate</th>
+                <th>Resolves to</th>
+                <th>License</th>
+                <th>Runtime / quant</th>
+                <th>Q4 size</th>
+                <th>Conf.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Qwen2.5-Coder-3B</strong><br /><span class="faint">shell/code completion workhorse</span></td>
+                <td><a href="https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct">Qwen/Qwen2.5-Coder-3B-Instruct</a><br /><span class="faint">GGUF: <a href="https://huggingface.co/bartowski/Qwen2.5-Coder-3B-Instruct-GGUF">bartowski</a></span></td>
+                <td>Apache-2.0</td>
+                <td>llama.cpp native (qwen2); Vulkan / CUDA / CPU all fine</td>
+                <td class="num">1.80 GiB<br /><span class="faint">1,929,903,360 B</span></td>
+                <td><span class="badge b-ok">verified</span></td>
+              </tr>
+              <tr>
+                <td><strong>kitty-bash-llm</strong><br /><span class="faint">~0.5B, CPU-oriented</span></td>
+                <td><a href="https://huggingface.co/sahellx/kitty-bash-llm">sahellx/kitty-bash-llm</a><br /><span class="faint">base: Qwen2.5-Coder-0.5B-Instruct</span></td>
+                <td>Apache-2.0</td>
+                <td>llama.cpp native; GGUF in-repo (f16/q8_0/q5_k_m/q4_k_m)</td>
+                <td class="num">379 MiB<br /><span class="faint">397,807,424 B</span></td>
+                <td><span class="badge b-warn">plausible</span></td>
+              </tr>
+              <tr>
+                <td><strong>ShellWhisperer-1.5B</strong><br /><span class="faint">shell-command specialist</span></td>
+                <td><a href="https://huggingface.co/fableforge-ai/ShellWhisperer-1.5B">fableforge-ai/ShellWhisperer-1.5B</a><br /><span class="faint">+ own <a href="https://huggingface.co/fableforge-ai/ShellWhisperer-1.5B-GGUF">-GGUF</a></span></td>
+                <td><strong>Inconsistent</strong>: Apache-2.0 on the base repo; MLX forks of it are tagged MIT</td>
+                <td>llama.cpp native (qwen2); imatrix quants</td>
+                <td class="num">940 MiB<br /><span class="faint">986,048,544 B</span></td>
+                <td><span class="badge b-warn">plausible</span></td>
+              </tr>
+              <tr>
+                <td><strong>NGARi-tool</strong><br /><span class="faint">1.5B, function calling</span></td>
+                <td><a href="https://huggingface.co/NGARiAI/ngari-tool">NGARiAI/ngari-tool</a><br /><span class="faint">LoRA over Qwen2.5-1.5B-Instruct, merged</span></td>
+                <td>Apache-2.0</td>
+                <td>llama.cpp native; q4_K_M GGUF in-repo; ships a 9.6 KB self-eval JSON</td>
+                <td class="num">940 MiB<br /><span class="faint">986,048,128 B</span></td>
+                <td><span class="badge b-warn">plausible</span></td>
+              </tr>
+              <tr>
+                <td><strong>Needle 2</strong><br /><span class="faint">~45M, structured extraction</span></td>
+                <td><a href="https://huggingface.co/Cactus-Compute/needle2">Cactus-Compute/needle2</a><br /><span class="faint">needle3 shipped 2026-09-16; <a href="https://github.com/cactus-compute/needle">source</a></span></td>
+                <td>Apache-2.0</td>
+                <td><strong>Not GGUF.</strong> Own engine (<code>cactus-needle</code>), prebuilt binaries per platform incl. <code>linux-arm64</code>, <code>linux-x86_64</code>, <code>wasm</code></td>
+                <td class="num">14 MB binary<br /><span class="faint">28 MB session RAM</span></td>
+                <td><span class="badge b-ok">verified</span> <span class="badge b-bad">not llama.cpp</span></td>
+              </tr>
+              <tr>
+                <td><strong>LFM3-1.7B</strong> <span class="faint">(not on the list)</span></td>
+                <td><a href="https://huggingface.co/LiquidAI/LFM3-1.7B">LiquidAI/LFM3-1.7B</a><br /><span class="faint">+ official <a href="https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF">-GGUF</a>, 2026-10-23/24</span></td>
+                <td><strong>LFM Open License v1.0</strong> — not Apache</td>
+                <td>llama.cpp; tri-hybrid (13 gated short-conv, 5 SWA, 6 global); 256K ctx; 128K vocab</td>
+                <td class="num">~1 GB<br /><span class="faint">vendor figure, 4-bit</span></td>
+                <td><span class="badge b-ok">verified</span> <span class="badge b-warn">license</span></td>
+              </tr>
+              <tr>
+                <td><strong>pi-shell-autocomplete</strong></td>
+                <td><a href="https://github.com/Termina1/pi-shell-autocomplete">Termina1/pi-shell-autocomplete</a><br /><span class="faint">npm: <code>pi-shell-autocomplete</code></span></td>
+                <td>Check repo (extension; not stated in README)</td>
+                <td>node-llama-cpp in-process; <strong>zsh only</strong>; runs inside the <strong>Pi TUI</strong></td>
+                <td class="num">n/a</td>
+                <td><span class="badge b-ok">verified</span> <span class="badge b-bad">no consumer</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>What each caveat actually means</h3>
+
+        <ul>
+          <li>
+            <strong>kitty-bash-llm</strong> is a single-person fine-tune of a 0.5B base: 5 likes,
+            941 downloads, no published evaluation, and the README makes capability claims without
+            numbers. Its GGUF is real and llama.cpp will load it. Treat it as “worth 379 MiB of
+            disk to try”, not as a shell specialist with evidence.
+          </li>
+          <li>
+            <strong>ShellWhisperer-1.5B</strong> is tagged <em>uncensored</em> and has no benchmark
+            section. The license field is genuinely ambiguous: the base repo says Apache-2.0, two
+            MLX derivatives say MIT. For personal fleet use that is inert; for anything shipped, read
+            the LICENSE file rather than the tag.
+          </li>
+          <li>
+            <strong>NGARi-tool</strong> is a LoRA adapter that has also been merged and quantised —
+            unlike Kev-4B, it needs no special build. It ships its own evaluation JSON, which is
+            more than the other two hobby projects do, but 109 downloads means no third-party
+            signal exists.
+          </li>
+          <li>
+            <strong>Needle 2</strong> is the one genuine architecture on the list: a Simple
+            Attention Network with a Hadamard MLP instead of an FFN, compressed to CQ2-bit, with a
+            byte-level grammar compiled from your declared tool schemas. The consequence cuts both
+            ways — it <em>cannot</em> free-form, and that is the point.
+          </li>
+          <li>
+            <strong>LFM3-1.7B</strong> is the only model here whose card states an intended harness
+            that this fleet runs. It also states its limits: “not recommended for agentic coding or
+            complex multi-step reasoning due to its small size.”
+          </li>
+          <li>
+            <strong>pi-shell-autocomplete</strong> is a <em>Pi package</em>, not a general terminal
+            plugin. It requires the Pi TUI, zsh with <code>compinit</code>, and
+            <code>node-llama-cpp</code>. On a bash/tmux/nushell fleet it does nothing until Pi is
+            the editor.
+          </li>
+        </ul>
+
+        <h2 id="matrix">Size / speed matrix</h2>
+
+        <p>
+          Footprints are measured from the repositories where a file exists, and computed from
+          parameter count and quant type where it does not. <strong>Speed columns are estimates</strong>
+          extrapolated from the fleet’s own measured numbers (eisen: 9.17 tok/s decode for a 35B-A3B
+          at 12 threads; 5.75/7.98 GiB VRAM while decoding) — they are for ordering decisions, not
+          for planning a demo.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Weights (Q4-class)</th>
+                <th>+ KV / runtime</th>
+                <th>eisen GPU (8 GB)</th>
+                <th>eisen CPU (12t)</th>
+                <th>poseidon GPU (4 GB)</th>
+                <th>delphi (2 OCPU ARM)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Qwen2.5-Coder-3B</td>
+                <td class="num">1.80 GiB</td>
+                <td class="num">~0.4 GiB @ 4k</td>
+                <td class="num">45–70 t/s<br /><span class="faint">but evicts Strata</span></td>
+                <td class="num">8–12 t/s</td>
+                <td class="num">50–70 t/s<br /><span class="faint">fits w/ ~1.3 GiB spare</span></td>
+                <td class="num">3–5 t/s<br /><span class="faint">not viable</span></td>
+              </tr>
+              <tr>
+                <td>kitty-bash-llm 0.5B</td>
+                <td class="num">379 MiB</td>
+                <td class="num">~0.1 GiB</td>
+                <td class="num">150–250 t/s</td>
+                <td class="num">35–55 t/s</td>
+                <td class="num">150–250 t/s</td>
+                <td class="num">12–18 t/s</td>
+              </tr>
+              <tr>
+                <td>ShellWhisperer 1.5B</td>
+                <td class="num">940 MiB</td>
+                <td class="num">~0.3 GiB</td>
+                <td class="num">80–120 t/s</td>
+                <td class="num">18–26 t/s</td>
+                <td class="num">90–130 t/s</td>
+                <td class="num">7–11 t/s</td>
+              </tr>
+              <tr>
+                <td>NGARi-tool 1.5B</td>
+                <td class="num">940 MiB</td>
+                <td class="num">~0.3 GiB</td>
+                <td class="num">80–120 t/s</td>
+                <td class="num">18–26 t/s</td>
+                <td class="num">90–130 t/s</td>
+                <td class="num">7–11 t/s</td>
+              </tr>
+              <tr>
+                <td>Needle 2 (45M)</td>
+                <td class="num">14 MB binary</td>
+                <td class="num">28 MB session</td>
+                <td class="num">n/a — no GPU path</td>
+                <td class="num">300–500 t/s</td>
+                <td class="num">n/a</td>
+                <td class="num">300–500 t/s<br /><span class="faint">native arm64 bin</span></td>
+              </tr>
+              <tr>
+                <td><strong>LFM3-1.7B</strong></td>
+                <td class="num">~1.0 GB</td>
+                <td class="num">~0.3 GiB @ 8k</td>
+                <td class="num">85–125 t/s</td>
+                <td class="num">20–30 t/s</td>
+                <td class="num">95–135 t/s</td>
+                <td class="num">9–13 t/s</td>
+              </tr>
+              <tr>
+                <td>Gemma-4-E4B QAT Q4<br /><span class="faint">reference from earlier thread</span></td>
+                <td class="num">~2.5–3 GiB</td>
+                <td class="num">~0.5 GiB</td>
+                <td class="num">35–55 t/s</td>
+                <td class="num">6–9 t/s</td>
+                <td class="num">40–60 t/s<br /><span class="faint">tight but fits</span></td>
+                <td class="num">2–4 t/s</td>
+              </tr>
+              <tr>
+                <td class="faint">for scale: Qwen3.8-Flash-Next-Coder IQ1_M (the main model)</td>
+                <td class="num faint">~23 GB</td>
+                <td class="num faint">~6.1 GiB VRAM</td>
+                <td class="num">17 t/s<br /><span class="faint">measured</span></td>
+                <td class="num">9 t/s<br /><span class="faint">measured, 2026-10-19</span></td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card warn">
+          <h3>The number that governs everything: 6.1 GiB</h3>
+          <p>
+            When eisen yields to a game, the guard frees “the resident expert arena plus the
+            6.1&nbsp;GiB of VRAM”. That is the utility layer’s entire headroom on that host, and it
+            is already spoken for by the thing you actually use. A 3B utility model on the card
+            means <em>choosing</em> it over the 125B, mid-session, which is exactly the failure the
+            brief asked to avoid.
+          </p>
+        </div>
+
+        <h2 id="vram">VRAM coexistence plan</h2>
+
+        <p>
+          Rank order, cheapest to most disruptive. The rule: the utility layer lives in RAM on
+          eisen, and in VRAM only on poseidon, which has no main model to protect.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr><th>Tier</th><th>What</th><th>eisen</th><th>poseidon</th><th>delphi</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>A</strong></td>
+                <td>Needle 2 router</td>
+                <td>Runs alongside Strata with no negotiation: 28 MB resident RAM, zero VRAM</td>
+                <td>Same</td>
+                <td><strong>Native</strong> — the <code>linux-arm64</code> binary</td>
+              </tr>
+              <tr>
+                <td><strong>B</strong></td>
+                <td>CPU autocomplete server (1.5–1.7B, <code>-ngl 0</code>)</td>
+                <td>Pin to 4 threads, <code>--parallel 2</code>, 2k ctx. Costs ~1.2 GB RAM and 1/3 of a core pair; never touches VRAM</td>
+                <td>Optional fallback; better to use the GPU</td>
+                <td>Viable but competes with the build budget — do not run during a rebuild</td>
+              </tr>
+              <tr>
+                <td><strong>C</strong></td>
+                <td>GPU autocomplete (3B, <code>-ngl 99</code>)</td>
+                <td><span class="badge b-bad">do not</span> — evicts Strata or OOMs</td>
+                <td><span class="badge b-ok">yes</span> — 1.8 GiB of 4, leaves ~1.3 GiB for KV</td>
+                <td>No GPU</td>
+              </tr>
+              <tr>
+                <td><strong>D</strong></td>
+                <td>Second llama-server under llama-swap</td>
+                <td>llama-swap is <strong>dormant</strong> since 2026-10-21 (superseded by Strata on :8085). Re-enabling it to host a utility model reintroduces the swap semantics you just retired</td>
+                <td>Fine — own port, own unit</td>
+                <td>Fine, but two models on 2 OCPU is a build-budget decision</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Practical consequence for eisen: the utility server is a <em>new standalone unit</em>
+          (own port, <code>--ngl 0</code>, <code>MemoryMax</code>), not a llama-swap child. Putting
+          it under llama-swap would make it a sibling of the model you deliberately moved off
+          llama-swap.
+        </p>
+
+        <pre><code># eisen: utility server, CPU-pinned, never a swap candidate
+llama-server \
+  --model /mnt/storage/models/LFM3-1.7B-Q4_K_M.gguf \
+  --host 127.0.0.1 --port 8092 \
+  --threads 4 --threads-batch 8 \
+  -ngl 0 --no-kv-offload \
+  --ctx-size 4096 --parallel 2 \
+  --jinja --metrics</code></pre>
+
+        <h2 id="order">Build order</h2>
+
+        <p>
+          Ordered by value per unit of risk, not by model quality. Each step is independently
+          useful and none of them touches the main model.
+        </p>
+
+        <div class="card ok">
+          <h3>1 · Needle 2 as the wiki/tool router <span class="badge b-ok">highest value</span></h3>
+          <p>
+            14 MB binary, 28 MB RAM, ARM64 build, grammar-compiled from your own JSON schemas, and a
+            calibrated confidence head you can threshold. It answers exactly one question —
+            <em>“is this a lookup, which tool, what argument”</em> — which is the whole decision the
+            archivist needs before retrieval begins. It runs on delphi, which has no GPU and is
+            always on. Nothing else on the list can be deployed there without cost.
+          </p>
+          <p class="faint">
+            Risk: no third-party evaluation in your domain; measure the confidence threshold on ~100
+            real fleet questions before wiring it in.
+          </p>
+        </div>
+
+        <div class="card warn">
+          <h3>2 · Ghost text — model first, harness second <span class="badge b-warn">blocked on harness</span></h3>
+          <p>
+            The model side is settled: LFM3-1.7B (≈1 GB, CPU-pinned <code>-ngl 0</code>), with
+            kitty-bash 0.5B as a 379 MiB latency probe to establish the floor. What is <em>not</em>
+            settled is the insertion point, because <strong>Pi is not installed on this fleet</strong>
+            and <code>pi-shell-autocomplete</code> therefore has no host to run on. Two real options:
+          </p>
+          <ul>
+            <li>
+              <strong>nixvim inline completion</strong> — Neovim’s LSP inline-completion handler
+              pointed at a tiny sidecar that speaks <code>textDocument/inlineCompletion</code> and
+              forwards to the CPU-pinned server. This is the only path that reaches the editor you
+              actually use daily; it is ~100 lines of glue that does not exist yet.
+            </li>
+            <li>
+              <strong>zsh ZLE widget</strong> — a model-backed ghost text beside the existing
+              history-based <code>zsh-autosuggestions</code>. Cheap to write, but the two compete for
+              the same region to the right of the cursor, so one has to yield.
+            </li>
+          </ul>
+          <p class="faint">
+            Consequence for ordering: if ghost text waits on glue, do step 1 (the router) first — it
+            is deployable today and needs no harness. That is a scope change from the brief, and it
+            is the correct one.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>3 · GPU ghost text on poseidon (Qwen2.5-Coder-3B, Q4_K_M)</h3>
+          <p>
+            The same model pi-shell-autocomplete recommends. On a 4 GB laptop card it is fully
+            resident, and this is the only host where the utility layer gets real VRAM without a
+            negotiation.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>4 · Decision model, once there are labels</h3>
+          <p>
+            Not part of this recon, but the natural successor: LFM3 ships a decision variant, and
+            Kev-4B proves the <code>/v1/systemone</code> shape works in llama.cpp. The gating fact is
+            not the model, it is that you need 2–5k labelled decisions to score against.
+          </p>
+        </div>
+
+        <h2 id="integration">Integration sketches</h2>
+
+        <h3>pi-shell-autocomplete, preferring one model <span class="badge b-bad">reference only</span></h3>
+
+        <p>
+          Kept for reference, not as a plan: this requires the Pi TUI, which this fleet does not run.
+          If Pi ever becomes the editor, the extension reads a priority list of GGUF paths and takes
+          the first that exists, so “configuring a model” is placing the file and ordering the list.
+        </p>
+
+        <pre><code>// in the Pi extension config
+ai: {
+  enabled: true,
+  modelPriority: [
+    "~/.pi/agent/models/LFM3-1.7B-Q4_K_M.gguf",          // preferred
+    "~/.pi/agent/models/qwen2.5-coder-3b-instruct-Q4_K_M.gguf",
+    "~/.pi/agent/models/kitty-bash-llm-q4_k_m.gguf",     // latency floor
+  ],
+  debounceMs: 400,
+  maxTokens: 40,
+  contextSize: 2048,
+  fileContext:     { enabled: true, maxFiles: 20 },   // disable on NFS/`/Volumes` paths
+  historyContext:  { enabled: true, maxEntries: 10, historyPath: "~/.zsh_history" },
+}</code></pre>
+
+        <p class="faint">
+          Model loading happens lazily on first <code>!</code> input, so the first completion after
+          a restart may stall. Ghost text silently disables if no model file is found — a missing
+          model looks like “AI is off”, not an error.
+        </p>
+
+        <h3>A wiki agent that decides before it searches</h3>
+
+        <p>
+          Two halves: a router that emits a constrained call, and a retrieval backend. The router
+          sees only schemas, never the corpus.
+        </p>
+
+        <pre><code>tools = [{
+  "name": "wiki_search",
+  "description": "Full-text search the offline Kiwix corpus (BM25). Use for factual or encyclopedic questions.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query":   {"type": "string",  "description": "keywords, not a sentence", "minLength": 2, "maxLength": 80},
+      "corpus":  {"type": "string",  "enum": ["wikipedia_en", "wikipedia_de", "wiktionary"]},
+      "limit":   {"type": "integer", "minimum": 1, "maximum": 10, "default": 5}
+    },
+    "required": ["query", "corpus"]
+  }
+}, {
+  "name": "repo_search",
+  "description": "Search this repository's docs and notes (qmd BM25) for fleet-specific facts.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query":    {"type": "string", "minLength": 2, "maxLength": 120},
+      "collection": {"type": "string", "enum": ["nixconfig", "vault", "skills"]}
+    },
+    "required": ["query", "collection"]
+  }
+}]</code></pre>
+
+        <p>
+          Backends already exist and should not be rewritten: <code>wikisearch</code> (Kiwix BM25 on
+          frieren) and <code>qmd search -c nixconfig</code>. The loop is: route → execute → feed the
+          top-k snippets back → answer <em>with</em> the retrieved record. The confidence head is
+          what makes it safe: below threshold, answer “I don’t know” instead of guessing, which is
+          the failure mode a 1.7B cannot self-detect.
+        </p>
+
+        <pre><code># shape of the loop, backend-agnostic
+route   = needle.complete(question)          # {"type":"call","function_calls":[...],"confidence":0.87}
+if route["confidence"] &lt; 0.6: return refuse(question)
+hits    = run(route["function_calls"][0])    # kiwix / qmd
+answer  = model.complete(question, context=hits[:5])   # the *big* model, or none at all</code></pre>
+
+        <h3>Where the utility model deserves to write prose (it mostly doesn’t)</h3>
+        <p>
+          Keep the 1.7B on the <em>classification and transformation</em> side of the line: pick a
+          tool, normalise a query, extract fields, decide whether a question needs retrieval at all.
+          Any answer synthesis that cites sources should be done by the model that can hold the
+          context — the main model — or by the retrieval layer itself.
+        </p>
+
+        <h2 id="older">Older-generation small models: where 0.5–3B is genuinely enough</h2>
+
+        <p>
+          The Qwen2.5-era weights (2024–25) are still the backbone of most of this list, and the
+          honest answer is that the <em>harness</em> decides whether they work, more than the
+          weights do. Concretely:
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr><th>Task</th><th>Verdict at 0.5–3B</th><th>Why</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Inline shell ghost text / FIM</td>
+                <td><span class="badge b-ok">sufficient</span></td>
+                <td>Short output (≤40 tokens), a strong local prior (directory listing + history), and a wrong suggestion costs one keystroke. This is the best-matched task on the list.</td>
+              </tr>
+              <tr>
+                <td>Fixed-label classification / routing</td>
+                <td><span class="badge b-ok">sufficient</span></td>
+                <td>3–12 labels, grammar-constrained to the label set, scored by accuracy. Model size stops mattering once the output space is closed.</td>
+              </tr>
+              <tr>
+                <td>Structured extraction into a schema</td>
+                <td><span class="badge b-ok">sufficient</span> <em>with a grammar</em></td>
+                <td>Needle’s whole thesis: a 45M model with a byte-level grammar compiled from the schema beats a 3B free-forming JSON. Without the grammar, both fail.</td>
+              </tr>
+              <tr>
+                <td>Choosing 1 of ~12 tools</td>
+                <td><span class="badge b-warn">borderline</span></td>
+                <td>Works when descriptions are distinctive. Degrades fast past ~12; the fix is a retrieval head (Needle ships one), not a bigger model.</td>
+              </tr>
+              <tr>
+                <td>Multi-step tool use (2+ dependent calls)</td>
+                <td><span class="badge b-bad">falls down</span></td>
+                <td>Error compounding: each step at 90% is 81% over two, 66% over four. LFM3’s own card disclaims complex multi-step reasoning outright.</td>
+              </tr>
+              <tr>
+                <td>World knowledge / “what is X”</td>
+                <td><span class="badge b-bad">falls down</span></td>
+                <td>Not a size problem to solve with training: retrieve instead. Which is why the router matters and the corpus lives in an index.</td>
+              </tr>
+              <tr>
+                <td>Long context (&gt;8k) summarisation</td>
+                <td><span class="badge b-bad">falls down</span></td>
+                <td>Effective attention collapses well before the advertised window; 2k ctx at 40 tokens is the honest operating point for ghost text.</td>
+              </tr>
+              <tr>
+                <td>Non-English (German)</td>
+                <td><span class="badge b-warn">varies wildly</span></td>
+                <td>Qwen2.5-era small models are English-first; LFM3 lists German among 16 languages, which is a genuine reason to prefer it for the German side of the portfolio.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          One rule worth keeping: <strong>at this size, the constraint layer carries the quality.</strong>
+          A 45M model with a compiled grammar and a confidence gate is more trustworthy than a 3B
+          model asked to produce JSON politely, because the small one <em>cannot</em> emit an invalid
+          call. That is also why the honest comparison on Needle’s card — trading wins with models
+          5–70× larger — is not marketing hype but a statement about how much of tool-calling is
+          schema adherence rather than reasoning.
+        </p>
+
+        <h2 id="open">Open questions</h2>
+
+        <ul>
+          <li>
+            <strong>ROCm or Vulkan on eisen?</strong> Two files in the repo disagree (see
+            corrections). Until one wins, any candidate that is CUDA-only or ROCm-only is
+            unresolvable, and the Strata unit’s own description may be aspirational.
+          </li>
+          <li>
+            <strong>Does Strata release VRAM on demand?</strong> The guard stops it on game start.
+            If there is no idle-release, tier C on eisen is permanently impossible and the CPU plan
+            is not a preference but a constraint.
+          </li>
+          <li>
+            <strong>Which ghost-text harness, now that Pi is out?</strong> Resolved that Pi is not
+            installed (see corrections); open is whether the first integration is nixvim inline
+            completion over a sidecar, or a zsh ZLE widget. The models do not change either way, and
+            the router does not wait on it.
+          </li>
+          <li>
+            <strong>LFM Open License v1.0 terms.</strong> Permissive-looking but not Apache: read
+            LICENSE before anything hosted or redistributed. Fine for local fleet use; the question
+            is the capsule and any public endpoint.
+          </li>
+          <li>
+            <strong>Needle’s calibration in this domain.</strong> The confidence head is trained
+            generally; the threshold that makes “refuse below 0.6” safe has to be measured on real
+            fleet questions, not assumed.
+          </li>
+          <li>
+            <strong>Does kitty-bash-llm actually beat its base?</strong> It is a 0.5B fine-tune with
+            no evaluation. A 30-question shell-completion probe against
+            <code>Qwen2.5-Coder-0.5B-Instruct</code> would settle it in ten minutes.
+          </li>
+        </ul>
+
+        <h2 id="method">Method &amp; sources</h2>
+
+        <p>
+          Every row was checked at the source on 2026-10-29: Hugging Face model API for existence,
+          tags, license, base model and file-level sizes (<code>/api/models/&lt;repo&gt;/tree/main</code>);
+          model cards for parameter counts, context and stated limitations; GitHub for the
+          extension’s real requirements. Sizes are byte-exact where a file exists and marked as
+          computed where they are not. Speed figures are <strong>estimates</strong> extrapolated from
+          this fleet’s measured baselines, not benchmarks.
+        </p>
+
+        <p class="faint">
+          Primary sources: <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct">Qwen2.5-Coder-3B-Instruct</a> ·
+          <a href="https://huggingface.co/bartowski/Qwen2.5-Coder-3B-Instruct-GGUF">bartowski GGUF</a> ·
+          <a href="https://huggingface.co/sahellx/kitty-bash-llm">kitty-bash-llm</a> ·
+          <a href="https://huggingface.co/fableforge-ai/ShellWhisperer-1.5B">ShellWhisperer-1.5B</a> ·
+          <a href="https://huggingface.co/NGARiAI/ngari-tool">ngari-tool</a> ·
+          <a href="https://huggingface.co/Cactus-Compute/needle2">needle2</a> ·
+          <a href="https://arxiv.org/abs/2607.18363">arXiv:2607.18363</a> ·
+          <a href="https://huggingface.co/LiquidAI/LFM3-1.7B">LFM3-1.7B</a> ·
+          <a href="https://github.com/Termina1/pi-shell-autocomplete">pi-shell-autocomplete</a>.
+          Fleet facts: <code>inventory.toml</code>, <code>docs/eisen-llm-architecture.md</code>,
+          <code>hosts/eisen/strata.nix</code>, <code>hosts/eisen/llm-server.nix</code>.
+        </p>
+
+        <footer>
+          Generated for the nixconfig fleet · served by delphi · no external assets, no
+          JavaScript, no build step. If a model name here stops resolving, the cache is the
+          problem — regenerate rather than trust a stale copy.
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

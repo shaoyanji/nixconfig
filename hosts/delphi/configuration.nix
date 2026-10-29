@@ -101,6 +101,23 @@
   # about how long a store path may be cached.
   staticCache = import ../../modules/config/nginx-static-cache.nix;
 
+  # The utility-layer recon report (hosts/delphi/reports/), published from the
+  # store so a regeneration is a rebuild rather than a file dropped on the box.
+  # `no-store` on purpose: the URL is stable and the content moves with the
+  # generation, so a cached copy would be a stale report about fast-moving models.
+  reconReport = pkgs.writeTextDir "index.html" (builtins.readFile ./reports/utility-layer-recon.html);
+  reconLocation = {
+    alias = "${reconReport}/";
+    extraConfig = ''
+      autoindex off;
+      add_header Cache-Control "no-store";
+    '';
+  };
+  # `/recon` without the slash matches no location prefix, so it fell through to
+  # the site root's `try_files` and answered 404. A named exact match redirects
+  # instead of relying on alias-implied 301 behaviour, which `alias` does not do.
+  reconRedirect = ''return 301 /recon/;'';
+
   # The gate that makes this name inert on the public internet even though the
   # tailnet vhost listens on the same 0.0.0.0:80: the client's 100.64/10
   # address on tailscale0 is the allow-list.
@@ -565,6 +582,8 @@ in {
               ''
               + siteHeader;
           };
+          locations."/recon/" = reconLocation;
+          locations."= /recon".extraConfig = reconRedirect;
         };
 
         # The tailnet console, loopback-only and reached through `tailscale
@@ -694,6 +713,8 @@ in {
                   ''
                   + siteHeader;
               };
+              "/recon/" = reconLocation;
+              "= /recon".extraConfig = reconRedirect;
             }
             // microvmProxyLocations false
             // stirlingPublicRedirect

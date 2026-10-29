@@ -624,9 +624,11 @@ in {
             proxy_buffering off;
           '';
         };
-        # A prefix location, so it also catches deep links: `/admin/settings`
-        # reaches `/settings` exactly as the UI would have linked it itself.
-        # `break` keeps the rewritten URI for proxyPass, which carries no path.
+        # A prefix location, so it also catches deep links: `/admin/queries`
+        # reaches `/queries` exactly as the UI would have linked it itself.
+        # A path FTL itself does not serve (`/settings` on 6.7.1) still 404s —
+        # the rewrite cannot invent a route. `break` keeps the rewritten URI for
+        # proxyPass, which carries no path.
         locations."/admin" = {
           proxyPass = piholeUi;
           proxyWebsockets = true;

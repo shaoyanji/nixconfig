@@ -4738,11 +4738,11 @@
     open-pihole-admin-path = {
       title = "`/admin` on the Pi-hole vhost is a 404, and every old link points there";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       date = "2026-10-29";
       priority = "P3";
       links = ["resolver-never-breaks"];
-      summary = "FTL 6 serves the admin UI at `/` (`webhome = \"/\"` in `/etc/pihole/pihole.toml`), so `pihole.frieren.lan/admin/` answers 404 while `/` answers 200. The resolver is healthy; the vhost just has no redirect for the Pi-hole 5 path every bookmark still uses.";
+      summary = "FTL 6 serves its UI at `/`, so the vhost rewrites `/admin[/…]` onto it rather than moving webhome (FTL's own redirect would emit an absolute URL and leak the loopback bind). `/admin`, `/admin/`, `/admin/queries` and `/admin/groups` answer 200; FTL stays on 127.0.0.1:8080.";
       refs = {
         hosts = ["frieren"];
         modules = ["hosts/frieren/reverse-proxy.nix"];
@@ -4750,14 +4750,17 @@
         tasks = ["checks:host"];
       };
       body = ''
-        **Measured 2026-10-29.** `https://pihole.frieren.lan/` 200, `/admin/` 404, and the same pair
-        on `127.0.0.1:8080`, so the 404 is FTL's path, not nginx's. `pihole-ftl` and `unbound` are
-        both active and `dig @192.168.3.25 pihole.frieren.lan` answers — a path bug, not the
+        **Measured 2026-10-29 (core 6.4.2, web 6.6, FTL 6.7.1).** `/admin` is a 404 straight from FTL
+        (`webhome = "/"`) while `/` is 200 and `/api/info/version` answers — a path bug, not the
         resolver.
 
-        **Exit.** The vhost 301s `/admin` and `/admin/` to `/`, and `curl -sk -o /dev/null -w
-        '%{http_code}' https://pihole.frieren.lan/admin/` prints 200 on the host. No listener change
-        and no widened bind: FTL stays on `127.0.0.1:8080` behind the proxy.
+        **Landed.** A prefix location rewrites `/admin[/…]` to the UI's own routes before `proxyPass`,
+        so a deep link lands where the UI itself would have linked (`/admin/queries` → `/queries`).
+        A path FTL does not serve (`/settings` on 6.7.1) stays a 404: no rewrite can invent a route.
+        The listener is unchanged — FTL keeps `127.0.0.1:8080`, and nothing widens the bind.
+
+        **Prove it.** `for p in /admin /admin/ /admin/queries; do curl -sk -o /dev/null -w "%{http_code} "
+        https://pihole.frieren.lan$p; done` prints `200 200 200`.
       '';
     };
   };

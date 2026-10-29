@@ -1,0 +1,74 @@
+[
+  {
+    "name": "repo_search",
+    "description": "Search this repository's markdown: runbooks, docs/, taskfiles and skills. Use for 'where is X documented', 'how do I do procedure Y', 'find the doc about Z', 'find the runbook for Z'. Returns file paths and snippets.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string", "description": "keywords, not a sentence"},
+        "collection": {"type": "string", "enum": ["nixconfig", "vault", "skills"]}
+      },
+      "required": ["query", "collection"]
+    }
+  },
+  {
+    "name": "host_fact",
+    "description": "Return one compiled registry field for a NAMED MACHINE. Use only when the question names a specific host and asks what it is or has: its role, cpu, gpu, ram, network address, or status. Never use for documentation, notes, or general knowledge.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "host": {"type": "string", "description": "hostname such as delphi, eisen, poseidon"},
+        "field": {"type": "string", "enum": ["role", "cpu", "gpu", "ram", "network", "status"]}
+      },
+      "required": ["host", "field"]
+    }
+  },
+  {
+    "name": "notes_lookup",
+    "description": "Search the decision-notes store: experiments, proposals, open todos and studies. Use for 'which experiments exist about X', 'find the proposal for X', 'open work on X', 'what notes mention X', 'find the study about X'. Never for documentation files.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string"},
+        "kind": {"type": "string", "enum": ["experiment", "proposal", "open", "study", "any"]}
+      },
+      "required": ["query", "kind"]
+    }
+  },
+  {
+    "name": "wiki_search",
+    "description": "Search an offline encyclopedia (a Wikipedia dump). Use for general world knowledge: people, science, history, geography, definitions, dates — anything that is not about this repository or its machines.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string"},
+        "corpus": {"type": "string", "enum": ["wikipedia_en", "wikipedia_de"]},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 10}
+      },
+      "required": ["query", "corpus"]
+    }
+  },
+  {
+    "name": "toon_encode",
+    "description": "Convert a JSON document into TOON notation. The input already contains the JSON text to convert.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "json": {"type": "string", "description": "the JSON document to convert"}
+      },
+      "required": ["json"]
+    }
+  },
+  {
+    "name": "checks_host",
+    "description": "Run the NixOS evaluation gate for one host: module system, assertions and registry. Use only when asked to verify, check, or gate that a host's configuration still evaluates.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "host": {"type": "string"},
+        "mode": {"type": "string", "enum": ["eval", "build"]}
+      },
+      "required": ["host", "mode"]
+    }
+  }
+]

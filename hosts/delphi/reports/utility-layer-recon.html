@@ -193,6 +193,7 @@
         <a href="#matrix">Size / speed matrix</a>
         <a href="#vram">VRAM coexistence</a>
         <a href="#order">Build order</a>
+        <a href="#measured">Needle 3, measured</a>
         <a href="#integration">Integration sketches</a>
         <a href="#older">Older-gen small models</a>
         <a href="#open">Open questions</a>
@@ -265,7 +266,7 @@
           <div class="stat">
             <div class="k">Highest value / effort</div>
             <div class="v">Needle 2 as router</div>
-            <div class="s">28 MB RAM, no GPU, an ARM64 binary that runs on delphi itself</div>
+            <div class="s">75 MB RAM, no GPU, runs on delphi itself — but 53% agreement, so not a decider</div>
           </div>
           <div class="stat">
             <div class="k">Ghost text, safe default</div>
@@ -383,10 +384,10 @@
               </tr>
               <tr>
                 <td><strong>Needle 2</strong><br /><span class="faint">~45M, structured extraction</span></td>
-                <td><a href="https://huggingface.co/Cactus-Compute/needle2">Cactus-Compute/needle2</a><br /><span class="faint">needle3 shipped 2026-09-16; <a href="https://github.com/cactus-compute/needle">source</a></span></td>
+                <td><a href="https://huggingface.co/Cactus-Compute/needle3">Cactus-Compute/needle3</a> <span class="faint">(current, 2026-09-16)</span><br /><span class="faint">older <a href="https://huggingface.co/Cactus-Compute/needle2">needle2</a> still ships for existing deployments</span></td>
                 <td>Apache-2.0</td>
-                <td><strong>Not GGUF.</strong> Own engine (<code>cactus-needle</code>), prebuilt binaries per platform incl. <code>linux-arm64</code>, <code>linux-x86_64</code>, <code>wasm</code></td>
-                <td class="num">14 MB binary<br /><span class="faint">28 MB session RAM</span></td>
+                <td><strong>Not GGUF.</strong> Own engine: 1.4 MB binary + 33.7 MB <code>.cact</code> weights (needle2 was a 14.8 MB fat binary); prebuilt per platform incl. <code>linux-arm64</code>, <code>wasm</code></td>
+                <td class="num">33.7 MB weights<br /><span class="faint">+ 1.4 MB engine</span></td>
                 <td><span class="badge b-ok">verified</span> <span class="badge b-bad">not llama.cpp</span></td>
               </tr>
               <tr>
@@ -629,7 +630,7 @@ llama-server \
         </p>
 
         <div class="card ok">
-          <h3>1 · Needle 2 as the wiki/tool router <span class="badge b-ok">highest value</span></h3>
+          <h3>1 · Needle 2 as the wiki/tool router <span class="badge b-warn">measured: suggester</span></h3>
           <p>
             14 MB binary, 28 MB RAM, ARM64 build, grammar-compiled from your own JSON schemas, and a
             calibrated confidence head you can threshold. It answers exactly one question —
@@ -638,8 +639,10 @@ llama-server \
             always on. Nothing else on the list can be deployed there without cost.
           </p>
           <p class="faint">
-            Risk: no third-party evaluation in your domain; measure the confidence threshold on ~100
-            real fleet questions before wiring it in.
+            Measured after deployment: 53 % tool agreement on Needle 3 (60 % on Needle 2), 99 %
+            schema validity, and it withholds 70 % of calls — see
+            <a href="#measured">Needle 3, measured</a>. It ships as a CLI (<code>needle-route</code>),
+            the only mode that measured cleanly.
           </p>
         </div>
 
@@ -688,6 +691,117 @@ llama-server \
             not the model, it is that you need 2–5k labelled decisions to score against.
           </p>
         </div>
+
+        <h2 id="measured">Needle 3, measured</h2>
+
+        <p>
+          Two generations exist and I first deployed the older one. The discrepancy matters because
+          the two ship in opposite shapes:
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th></th><th>Needle 2 (2026-07-29)</th><th>Needle 3 (2026-09-16)</th></tr></thead>
+            <tbody>
+              <tr><td>Parameters</td><td class="num">45 M</td><td class="num">121 M, most of it engram</td></tr>
+              <tr><td>Shipped as</td><td class="num">one 14.8 MB binary, model baked in</td><td class="num"><strong>1.4 MB engine + 33.7 MB <code>needle3.cact</code></strong></td></tr>
+              <tr><td>Architecture</td><td>Simple Attention Network</td><td>Laddered SAN: every depth 2–20 is a deployable rung</td></tr>
+              <tr><td>Extras</td><td>—</td><td><code>needle_embed</code> (tool retrieval), <code>suppressed_calls</code>, fine-tune checkpoint</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          The 2026-09-16 release also renames the distribution: the weights are a separate file the
+          engine maps in place, so “the model is a single binary” became “the model is a single
+          file”. Both generations still ship; <code>generation=2</code> keeps Needle 2 for existing
+          deployments, which is what made the earlier <code>needle2</code> hit plausible.
+        </p>
+
+        <p>
+          Packaging now follows <code>overlays/simplex-chat.nix</code> — <code>autoPatchelfHook</code>
+          with <code>buildInputs = [stdenv.cc.cc.lib]</code>, the same shape the SimpleX CLI and SMP
+          server use. The hand-run <code>patchelf</code> that rewrote a binary in
+          <code>~/.local/share</code> is gone; a store path that Nix built is the only artefact.
+        </p>
+
+        <h3>Routing, 100 fleet questions</h3>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Metric</th><th>Needle 2</th><th>Needle 3</th></tr></thead>
+            <tbody>
+              <tr><td>Tool proposal matches the operator’s</td><td class="num">60 %</td><td class="num">53 %</td></tr>
+              <tr><td>Schema valid</td><td class="num">98 %</td><td class="num">99 %</td></tr>
+              <tr><td>Actually acts (vs withholds)</td><td class="num">100 %</td><td class="num"><strong>30 %</strong></td></tr>
+              <tr><td>Refuses all 10 off-topic requests</td><td class="num">5 / 10</td><td class="num"><strong>10 / 10</strong></td></tr>
+              <tr><td>Latency per query</td><td class="num">1.9–3.8 s</td><td class="num">1.4 s</td></tr>
+              <tr><td>Memory (incl. 33.7 MB weights)</td><td class="num">27–82 MB</td><td class="num">75–82 MB</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Needle 3 is <strong>more honest and less useful</strong>: it proposes a call, then withholds
+          it in <code>suppressed_calls</code> unless it is sure — so it never fires on chit-chat, and
+          only acts on 30 % of real questions. Per tool in the 6-tool set: <code>toon_encode</code>
+          100 % · <code>host_fact</code> 80 % · <code>notes_lookup</code> 80 % ·
+          <code>repo_search</code> 40 % · <code>wiki_search</code> 30 % · <code>checks_host</code> 0 %.
+        </p>
+
+        <h3>The decisive experiment: fewer labels, not more</h3>
+
+        <p>
+          If the failure is label confusion, a 5-way router (graph / docs / inventory / world / none,
+          no free-form argument) should beat a 6-way one. It does not:
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Router</th><th>Labels</th><th>Match</th><th>Acts</th><th>Dominant error</th></tr></thead>
+            <tbody>
+              <tr><td>tool router</td><td class="num">6</td><td class="num">53 %</td><td class="num">30 %</td><td>repo ↔ wiki</td></tr>
+              <tr><td>plane router</td><td class="num">5</td><td class="num"><strong>30 %</strong></td><td class="num">4 %</td><td>inventory → world, 8 of 10</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          “What gpu does eisen have” is tagged <em>world knowledge</em>. The model does not know that
+          a hostname is a local object, and no amount of label reduction fixes that — it is a
+          vocabulary problem at 2.1 bits, not a decision problem. So the router idea does not fail
+          on its interface; it fails on the model.
+        </p>
+
+        <div class="card warn">
+          <h3>The router already exists, deterministically — and it was broken</h3>
+          <p>
+            <code>scripts/task/kg-ask.sh</code> is a three-step router: keyword rules → a
+            <em>bundle</em> (the question names a node, so return everything connected to it) →
+            UNKNOWN with a menu. Its header records the measurements that removed a model from this
+            path on 2026-10-19: rules 14/14 at 0 ms, paraphrase 6/10 → 10/10 with the bundle,
+            unnamed 4/9 versus a Jev model’s 7/9 whose two misses were <em>confidently wrong</em>
+            rather than visibly declined.
+          </p>
+          <p>
+            That is the same conclusion this page reached from the other direction, arrived at five
+            weeks earlier and with better evidence. The reason the BEAM went unused is not that it
+            is slow (28 ms on the socket versus 476 ms via jq) and not that a model should replace
+            it: it is that <strong><code>task ops:ask</code> was throwing
+            <code>kg-graph: REPO is not set</code> and exiting 1</strong>. Every agent that tried the
+            documented entry point got an error and reached for <code>grep</code> instead.
+            <code>kg-graph.sh</code> now derives <code>REPO</code> from its own location, so the
+            nine callers cannot forget it again.
+          </p>
+        </div>
+
+        <h3>Verdict</h3>
+        <p>
+          Keep qmd and the Elixir sidecar as the data plane. Route with the deterministic rules, and
+          put Needle where its grammar is the whole value — extraction, classification, and
+          constrained argument filling — not semantics. A 121M model at 2.1 bits cannot decide which
+          subsystem owns a question about a fleet it has never seen; a 14-line keyword table can.
+        </p>
 
         <h2 id="integration">Integration sketches</h2>
 

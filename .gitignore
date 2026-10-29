@@ -31,3 +31,7 @@ session-*.md
 # Local diff files
 *.diff
 
+# Runtime logs from local runs (app.log was a Steam login trace, committed by
+# accident in 06ce197b — a tracked log churns on every run and reads as source).
+*.log
+

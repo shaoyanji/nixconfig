@@ -28,6 +28,15 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-29 — `/admin` on the Pi-hole vhost answers again, and FTL's bind stays closed
+- **The bookmark path works; a route FTL lacks still doesn't.** FTL 6.7.1 serves its UI at `/`
+  (`webhome`), so `/admin` was FTL's own 404. `hosts/frieren/reverse-proxy.nix` rewrites `/admin[/…]`
+  onto the UI's own routes and leaves FTL on `127.0.0.1:8080`: `/admin`, `/admin/`, `/admin/queries` and
+  `/admin/groups` = 200, `/admin/login` = 302 (as `/login`). `/admin/settings` stays 404 because 6.7.1
+  has no `/settings` — the inline comment that claimed otherwise is corrected, and no rewrite can
+  invent a route.
+- Evidence: `curl -sk -o /dev/null -w '%{http_code}' https://pihole.frieren.lan/admin/` → `200`; the
+  note `open-pihole-admin-path` is now `DELIVERED`.
 
 ### 2026-10-28 — resolver holds no swap, keeps its 7 days; Steam cache warm; Pi-hole published
 - **Swap was glibc arenas, not query history.** 13 threads → 12 anonymous heaps of 64/128 MiB; `VmSize` 2.1 GB against `VmRSS` 132 MB and `VmSwap` 934 MB. `MALLOC_ARENA_MAX=2` + `MemoryHigh=1.2G` (`hosts/frieren/dns.nix`): VmSize 1,229 MB, swap **934 → 0 MB**, box swap 4.47 → 3.34 GB. `DBimport`/`maxDBdays` are ignored on 6.7.1 (measured), so the imported history is not a knob.
@@ -41,97 +50,6 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 - **Every fill now records itself.** `steam-prefill-baseline.service` (root, before) and `steam-prefill-record.service` (root, after) bracket whichever run happens — timer or `systemctl start steam-prefill` — and append one JSON line to `/var/lib/steam-prefill/runs.jsonl`: cache bytes before/after, growth, and the cache backend's `IPIngressBytes` delta (Valve's reply bodies; LAN hits are egress, so a hit can never read as bandwidth spent). Two root units because the tree is `0700 nginx` and systemd has no per-command user.
 - **Calibrated, not assumed.** A real 2 428 561-byte object fetched through the front moved 2372 KiB of cache and 2412 KiB from Valve; a warm fill recorded `tier_growth_bytes: 0, wan_bytes: 406`. Growth is the flash tier's `statvfs` delta (6 ms), not a `du` walk: that cost 36 s cold over 56 GB, twice a night, to report that nothing moved. The newest line rides in `/sentinel/status.json` as `prefill` (`services.fleetSentinel.prefillRuns` → `services.steamCache.prefill.ledger`).
 - **The sentinel had been reporting `failed_units: ["loaded"]`.** It parsed column 2 of `systemctl list-units --plain --no-legend`, which is the literal word `loaded`, so `ignoreFailedUnits` never matched and the BurgerNAS mount had no ignore. Fixed to column 1; frieren is `ok` with `failed_units: []`.
-
-### 2026-10-27 — the preexec hook printed itself in every new terminal
-- **The defect.** atuin's bash integration sources bash-preexec, which *appends* its preexec hook to PS0, and bash
-prints whatever PS0 holds outside that `${ …; }` form at every prompt with `$_` expanded — so a PS0 inherited from
-a parent shell printed the whole zoxide init at the first prompt of a fresh foot window. `modules/shell/atuin.nix`
-drops an inherited PS0 and its export attribute before bash-preexec installs its own.
-- **Evidence.** With a poisoned PS0 exported: the deployed `.bashrc` prints the blob, the new one prints nothing,
-PS0 reads back canonical, and a child shell's env carries no PS0. `checks:host` green for delphi, scratch `MODE=eval`.
-
-### 2026-10-27 — scratch is current again, and `activate-host` was broken without `TOP=`
-- **The defect.** `activate-host.sh` tested `$top` against each substituter ~30 lines before resolving it, so
-under `set -u` every caller that does not pass `TOP=` died at that loop — `infra:apply:host:*` and the fleet
-loop, the two paths that exist because they have no gate of their own to resolve it. Only `infra:deploy:host:*`
-worked. The cache block now sits after the toplevel, which also restores the preserved-host promise of no eval
-and no cache query before the status read, and `--check` runs for the first time.
-- **Scratch, five days behind** (generation 15, 2026-10-22), needed three things: its `trusted-public-keys`
-predated the shaoyanji cachix key, harmonia had no toplevel, and `nix copy --from` one cache cannot complete when
-a path (`nix-direnv`) lives only on `cache.nixos.org`. `nix-store --realise` of the toplevel **on frieren** (no
-compile) plus the normal deploy landed it, and the new generation carries the key.
-- **Evidence.** `checks:host HOST=scratch` 5.06 s / 697 MiB rc=0; deployed `6pz4lsqi` == current; 0 failed units;
-53 AppImage entries with `xdg-mime query default text/html` → `appimage-helium.desktop`.
-- **Docs debloat, same day.** Three runbooks were past the 400-line budget with nothing enumerating them
-(`docs/dns-failover.md` 618 → 399, `delphi.md` 520 → 267, `netbook.md` 449 → 399, detail to
-`docs/delphi-install.md` / `docs/netbook-rice-port.md`); `docs-budget.sh` derives the runbook class now.
-
-### 2026-10-27 — the netbook's rice runs fnott: daemon swap and userland in one deploy
-- **Why one deploy.** Two processes cannot own `org.freedesktop.Notifications`, so shipping the swap before the
-  cards were ported would have looked like a broken HUD: they identified themselves through `makoctl list`'s app
-  name, and fnott renders only `<b> <i> <u>`. `profiles.dwlDesktop` installs `pkgs.fnott` and ships
-  `/etc/xdg/fnott/fnott.ini` (fnott has no per-app sections, so the cards' border colours went with mako);
-  `hosts/netbook/configuration.nix` starts `fnott` and its mako/fuzzel/alacritty/swaylock block is gone.
-- **Her repos, edited in place (authorised 2026-10-27).** `~/mako-suite` `15e14a2`: dismiss and card liveness
-  moved from mako's app name to a unique summary (`fnottctl list` prints `id: <summary>`; `makofetch`'s title
-  gained its name), menus are `wmenu -p/-l/-P`, makobatt locks with `waylock -fork-on-lock`, and bodies pass
-  through a `strip_span` at the notification boundary. `~/.dotfiles` `feb8d6e`: the helpers launch
-  `wmenu`/`foot`, the installer stopped installing configs for the retired stack, and the niri config's spawn
-  lines moved with them.
-- **The bug a static read missed.** The first pass filtered `$body`, but makokill sends `body` and `footer` as
-  one argument — the operator saw literal `<span foreground=…>` XML on Mod+Alt+Backspace. Every `Notify` body
-  now filters at its own call site, and a grim capture of the card (the region, not the desktop) shows the
-  table and italic footer with no literal markup: the check is a rendering, not a grep of the source.
-- **Evidence.** `infra:apply:host:netbook` 3m24s, current == deployed, 0 failed units. Live: fnott owns the bus
-  name (`busctl --user status` → PID), a synthetic `Notify` reads back through `fnottctl list`, `📊 makotop`
-  appears and dismisses on the same chord, the four retired packages no longer resolve on the session PATH,
-  and `checks:host HOST=netbook` is green. Scratch shares the profile: closure warmed from `d77499af` by CI
-  (6m44s), deploy still pending.
-
-### 2026-10-27 — the netbook's session ran stock dwl; sessions are `programs.dwl` now
-- **The defect.** `profiles.dwlDesktop` handed the session to a hand-rolled `writeShellApplication`
-  that listed `pkgs.dwl` in `runtimeInputs` while the *keymap* build went to `systemPackages`. A wrapper's
-  PATH wins inside the session, so the deployed compositor was upstream's `config.h`: no bind in this repo
-  existed, on either host, and nothing looked wrong — stock dwl renders, spawns and tiles. Evidence:
-  `/proc/<dwl>/exe` was `3b7ph6qz…-dwl-0.9` (= plain `pkgs.dwl`), referenced only by `dwl-session`,
-  while the spliced `8rsfl73qq…` was referenced only by `system-path` — and evaluating
-  `pkgs.dwl.override {configH = <repo splice>}` from `modules/config/dwl/config.h` +
-  `hosts/netbook/dwl-keybinds.h` yields exactly `8rsfl73qq…`. So the host's own `Mod+D` did nothing.
-- **The fix is the declarative route.** The session is nixpkgs' `programs.dwl`: the profile passes
-  `package` (the spliced keymap) and `extraSessionCommands` (exports, wallpaper, idle/lock, the host's
-  autostart lines), and the module's `/etc/xdg/dwl-session` execs `lib.getExe cfg.package` — an absolute
-  store path no PATH can shadow. `modules/config/dwl/dwl-session.sh` is gone; one `dwl-0.9` remains in the
-  closure.
-- **A second defect, found by putting the first one live.** The clients start from a hook that runs
-  *before* dwl, so the wrapper waits for the socket — and a killed session leaves its socket **file**
-  behind. Restarting `getty@tty1` made it treat that file as proof: `swaybg`, `swayidle` and `mako` all
-  exited, while `makobatt -s` and `taildrop --daemon` survived. The wait now runs `swayidle` as a canary and
-  proceeds only if it is still up 0.3 s later.
-- Deployed as generation 71 (`0fyzq71w…`): current == deployed, loader default on it, 0 failed units,
-  4/1817 MiB RAM used, `/` 44 %. Session restarted and read back: compositor = the spliced path with the
-  host keymap in the binary, all five clients up, `WAYLAND_DISPLAY=wayland-0`, and a `Notify` through
-  their cards' call shape read back from `makoctl list` as `App name: buffy-check`.
-- **Scratch** shares this profile and was offline; its closure is warmed by CI (`d77499af`, 6m44s) and its
-  deploy is still pending.
-
-### 2026-10-27 — netbook and scratch: one dwl session, and the desktop's bloat measured out
-- `5f07866a` lifted the dwl session into `profiles.dwlDesktop`, so scratch stopped keeping a host-local copy
-  and netbook stopped running niri. Both now get the same keymap, launcher, wallpaper and lock; the launcher is
-  `fleet-menu` (XDG entries *and* `$PATH` in one menu — the `j4-dmenu-desktop` + `wmenu-run` pair each listed
-  half), and its first version dropped any entry carrying a `[Desktop Action …]` group, which is most real apps.
-- `ea152738` removed what measuring said was not needed: waybar (closure **1001 MiB** against dwl's 345 MiB —
-  it drags zenity at 902 MiB), gnome-keyring (**378 MiB**, no consumer: firefox keeps its own NSS store and
-  nautilus has no gvfs here), greetd + tuigreet (**111 MiB** to autologin one user). SDDM was already off on
-  both and is now vetoed in the profile, so no adopter can inherit it.
-- The session starts without a display manager: `getty` autologins tty1 (still a real logind session, seat and
-  runtime dir, through PAM) and `environment.loginShellInit` execs dwl. It has to be that option — NixOS's
-  `/etc/profile` reads `/etc/profile.local` and the `loginShellInit` slot and never `/etc/profile.d`, so the
-  obvious version of this fails silently. Verified by reading both hosts' generated `/etc/profile` and running
-  its guard against stubbed `id`/`tty`.
-- Evidence: `checks:host` green for both (1846 and 1541 assertions), `checks:quick` green, `.#checks.<sys>.knobs`
-  14/14 with `dwl-desktop` registered. **Not deployed: both hosts are offline** (netbook 2d, scratch 19h). CI is
-  warming both closures. The one thing eval cannot prove is the autologin itself; recovery if dwl never starts
-  is ssh, which never depended on a greeter.
 
 ## Open debt (`task ops:notes`)
 

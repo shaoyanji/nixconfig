@@ -206,11 +206,18 @@ append one JSON object to `prefill.ledger` (`/var/lib/steam-prefill/runs.jsonl`)
 
 ```json
 {"ts": "2026-10-28T23:59:37Z", "recorded": true, "result": "success",
- "oses": ["linux", "windows"], "cache_bytes_before": 56418864296,
- "cache_bytes_after": 56418864296, "cache_growth_bytes": 0, "wan_bytes": 406}
+ "oses": ["linux", "windows"], "measure": "statvfs",
+ "tier_used_bytes_before": 58305249280, "tier_used_bytes_after": 58305249280,
+ "tier_growth_bytes": 0, "wan_bytes": 406}
 ```
 
-`cache_growth_bytes` is the apparent size of the cache tree before vs after;
+`tier_growth_bytes` is the flash tier's used bytes before vs after, one `statvfs`
+call at each end (6 ms) — **not** a `du` of the cache tree: that walk costs 36 s
+cold over 56 GB on this USB BOT device, and paying it twice a night to record that
+nothing changed is a regression dressed as measurement. The cache is ~96 % of the
+tier, so ~3 % (transcode and thumbnail scratch) can leak into the delta, which is
+why it is reported next to a second, independent meter.
+
 `wan_bytes` is the cache backend's `IPIngressBytes` delta, i.e. Valve's reply
 bodies. LAN hits land on the backend's *egress*, so a cache hit can never be
 counted as bandwidth spent — which is exactly what the prefill unit's own counter
@@ -220,10 +227,15 @@ real object on 2026-10-29: 2 428 561 bytes fetched through the front produced
 
 Both halves are root units because the cache tree is `0700 nginx` and the fill
 runs as its own user; systemd has no per-command user, so the baseline cannot be
-an `ExecStartPre`. They cost one `du` over the tier each (~36 s for 56 GB), which
-is why the ledger is a record of runs, not a per-15-minute sample. The newest line
-is projected into `/sentinel/status.json` as `prefill` when a host points
-`services.fleetSentinel.prefillRuns` at the same path — frieren does.
+an `ExecStartPre`. A warm run is **7 s end to end** (baseline <1 s, fill 6 s,
+record 1 s) — the measurement itself is two `statvfs` calls.
+
+One trap paid for on the way: the script's `used_bytes` must not pipe through
+`awk`, which is gawk and therefore absent from `runtimeInputs`; the empty output
+then made `jq --argjson` reject it, and the unit failed with an empty baseline
+rather than a number. Anything the script shells out to has to be in that list.
+The newest line is projected into `/sentinel/status.json` as `prefill` when a host
+points `services.fleetSentinel.prefillRuns` at the same path — frieren does.
 
 ### Run it when nobody is streaming, because it cannot be throttled
 

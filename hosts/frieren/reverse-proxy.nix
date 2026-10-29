@@ -606,9 +606,14 @@ in {
         ];
         sslCertificate = tlsCertificate;
         sslCertificateKey = tlsCertificateKey;
-        # FTL 6 serves the UI at `/` (webhome in [webserver.paths]), not at
-        # `/admin/` — that path is a 404 there. No path rewrite: `/` and `/api`
-        # both pass through unchanged.
+        # FTL 6 serves the UI at `/`: nixpkgs pins webhome to "/" in
+        # [webserver.paths] (web-apps/pihole-web.nix assigns it, no option), so
+        # `/admin/` is a 404 straight from FTL. `/admin` is still the address
+        # docs/frieren-access.md advertises and every Pi-hole bookmark assumes,
+        # so the prefix is rewritten away HERE rather than by moving webhome:
+        # FTL's own `/` -> `/admin/` redirect would emit an absolute URL and
+        # leak the loopback bind (127.0.0.1:8080) to the browser behind this
+        # proxy. FTL only ever sees `/` and `/api`, unchanged.
         locations."/" = {
           proxyPass = piholeUi;
           proxyWebsockets = true;
@@ -616,6 +621,19 @@ in {
             proxy_set_header Host $host;
             # Query-log pages stream a long table; buffering them makes the
             # first paint wait for the whole response.
+            proxy_buffering off;
+          '';
+        };
+        # A prefix location, so it also catches deep links: `/admin/settings`
+        # reaches `/settings` exactly as the UI would have linked it itself.
+        # `break` keeps the rewritten URI for proxyPass, which carries no path.
+        locations."/admin" = {
+          proxyPass = piholeUi;
+          proxyWebsockets = true;
+          extraConfig = ''
+            rewrite ^/admin/?$ / break;
+            rewrite ^/admin/(.*)$ /$1 break;
+            proxy_set_header Host $host;
             proxy_buffering off;
           '';
         };

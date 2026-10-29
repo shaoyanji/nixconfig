@@ -4703,5 +4703,62 @@
         2026-10-28.
       '';
     };
+
+    open-steam-dns-steer-run = {
+      title = "The CDN-only steering allowlist is deployed off and has never been run";
+      kind = "open";
+      status = "OPEN";
+      date = "2026-10-29";
+      priority = "P3";
+      links = ["open-manual-steam-fill"];
+      summary = "`steamCache.dnsSteer` exists as an allowlist (`content`) because the 2026-10-28 zone override also caught `cm-01-fra1`, a matchmaking sibling. It ships as `off`: no client has yet downloaded through it, so nothing is known about whether the four `cdn.steampipe` names cover real chunk traffic.";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["modules/services/steam-cache.nix" "hosts/frieren/dns.nix"];
+        docs = ["docs/steam-cache.md"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **What is built.** `content` emits exactly `cdn.steampipe.steamcontent.com`,
+        `lancache.steamcontent.com`, `steamcdn-a.akamaihd.net`, plus `dnsSteerDomains`; every other
+        name in the zone, matchmaking included, resolves publicly by construction. `zone` refuses
+        without `dnsSteerZoneAcknowledged`.
+
+        **Why it is off.** The allowlist came from one window of resolver query history: 524 hits on
+        `lancache`, ~500 across four CDN names, one each on `cm-01-fra1` (matchmaking) and
+        `cache9-fra1` (Valve's own cache). One window does not prove chunk traffic uses those CDNs.
+
+        **Exit.** With `dnsSteer = "content"` on frieren: one client download shows up as a HIT at
+        the front (an `X-Steam-Cache` probe or `tier_growth_bytes`), a Dota match still accepts, and
+        the observed CDN set matches the allowlist — then flip the deployed default to `content`.
+        If `cache9-fra1` is where chunks come from, it is added by exact name, never by suffix.
+      '';
+    };
+
+    open-pihole-admin-path = {
+      title = "`/admin` on the Pi-hole vhost is a 404, and every old link points there";
+      kind = "open";
+      status = "OPEN";
+      date = "2026-10-29";
+      priority = "P3";
+      links = ["resolver-never-breaks"];
+      summary = "FTL 6 serves the admin UI at `/` (`webhome = \"/\"` in `/etc/pihole/pihole.toml`), so `pihole.frieren.lan/admin/` answers 404 while `/` answers 200. The resolver is healthy; the vhost just has no redirect for the Pi-hole 5 path every bookmark still uses.";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["hosts/frieren/reverse-proxy.nix"];
+        docs = ["docs/frieren-access.md"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **Measured 2026-10-29.** `https://pihole.frieren.lan/` 200, `/admin/` 404, and the same pair
+        on `127.0.0.1:8080`, so the 404 is FTL's path, not nginx's. `pihole-ftl` and `unbound` are
+        both active and `dig @192.168.3.25 pihole.frieren.lan` answers — a path bug, not the
+        resolver.
+
+        **Exit.** The vhost 301s `/admin` and `/admin/` to `/`, and `curl -sk -o /dev/null -w
+        '%{http_code}' https://pihole.frieren.lan/admin/` prints 200 on the host. No listener change
+        and no widened bind: FTL stays on `127.0.0.1:8080` behind the proxy.
+      '';
+    };
   };
 }

@@ -198,6 +198,33 @@ is 33 GiB, which at the 2.7–5 MB/s this line gets from Valve is 2–3.4 h, so 
 cap would truncate a first fill every night. A steady-state run is deltas only
 (76 KB in / 14 KB out measured against 33 GiB cached) and stays in minutes.
 
+### Every run records its own numbers
+
+`steam-prefill-baseline.service` (before) and `steam-prefill-record.service`
+(after) bracket **every** fill — timer or `systemctl start steam-prefill` — and
+append one JSON object to `prefill.ledger` (`/var/lib/steam-prefill/runs.jsonl`):
+
+```json
+{"ts": "2026-10-28T23:59:37Z", "recorded": true, "result": "success",
+ "oses": ["linux", "windows"], "cache_bytes_before": 56418864296,
+ "cache_bytes_after": 56418864296, "cache_growth_bytes": 0, "wan_bytes": 406}
+```
+
+`cache_growth_bytes` is the apparent size of the cache tree before vs after;
+`wan_bytes` is the cache backend's `IPIngressBytes` delta, i.e. Valve's reply
+bodies. LAN hits land on the backend's *egress*, so a cache hit can never be
+counted as bandwidth spent — which is exactly what the prefill unit's own counter
+gets wrong (34 GB "incoming" on a run that stored nothing). Calibrated against a
+real object on 2026-10-29: 2 428 561 bytes fetched through the front produced
+2372 KiB of growth and 2412 KiB from Valve.
+
+Both halves are root units because the cache tree is `0700 nginx` and the fill
+runs as its own user; systemd has no per-command user, so the baseline cannot be
+an `ExecStartPre`. They cost one `du` over the tier each (~36 s for 56 GB), which
+is why the ledger is a record of runs, not a per-15-minute sample. The newest line
+is projected into `/sentinel/status.json` as `prefill` when a host points
+`services.fleetSentinel.prefillRuns` at the same path — frieren does.
+
 ### Run it when nobody is streaming, because it cannot be throttled
 
 SteamPrefill has no rate-limit flag (checked against 3.6.1's `prefill --help`) and

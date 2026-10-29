@@ -51,9 +51,25 @@ One JSON object per run:
   },
   "generation_age_h": 5.2,
   "disk_pct": {"root": 42, "nix": 61, "data": 80},
-  "psi": {"io": 1.2, "memory": 0.0}
+  "psi": {"io": 1.2, "memory": 0.0},
+  "prefill": {"ts": "2026-10-28T23:59:37Z", "recorded": true,
+              "cache_growth_bytes": 0, "wan_bytes": 406}
 }
 ```
+
+`prefill` is the newest line of a job's own run ledger
+(`services.fleetSentinel.prefillRuns`, pointed at
+`services.steamCache.prefill.ledger` on frieren), projected rather than copied:
+at a 15-minute cadence the same numbers would be 95 identical readings. `null`
+means no self-measuring job on this host. Read the whole history with
+`tail -n 20 /var/lib/steam-prefill/runs.jsonl | jq -c .`.
+
+**A job's own progress output is not a measurement.** The Steam prefill counted
+chunks across the whole selection and served the uncached ones first: it read
+18 % for 46 minutes, then finished all 33.72 GiB in 8:29 off the cache. Its
+`cache_growth_bytes` / `wan_bytes` are the instrument — 0 growth with a few
+hundred WAN bytes is a warm night, and a large `wan_bytes` with no growth is a
+fill that fetched and stored nothing (broken cache, wrong pin).
 
 `reasons` is the contract: each token is `class:detail`.
 
@@ -61,6 +77,7 @@ One JSON object per run:
 | :--- | :--- | :--- |
 | `failed-units:N` | N units in `failed` state | `systemctl --failed`; inspect the named units in `failed_units` |
 | `unit-failed:<unit>:<result>` | a watched oneshot's last `Result` is not `success` | `journalctl -u <unit> -n 80`; check its inputs (disk, network, secrets) |
+| `failed-units` naming `loaded` (fixed 2026-10-29) | the collector read column 2 of `list-units --plain --no-legend` (the literal word `loaded`), so `ignoreFailedUnits` never matched | upgrade; verify with `systemctl --failed --no-legend --plain \| head` and that `status.json` names the unit |
 | `generation-stale:<h>h` | running system older than `generationAgeHours` (72) | check `nixos-upgrade` journal; confirm the flake input/autoUpgrade path |
 | `disk-high:<path>:<pct>%` | filesystem ≥ 90 % | `task dev:closure:size`; GC/snapshot prune; never delete `/srv/data` content ad hoc |
 

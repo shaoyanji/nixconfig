@@ -53,6 +53,7 @@
     amd64 = "sha256-Q9YfvvarRYuPYb5mWZqf8K7lfVoObE2MwrRn5nu9UIU=";
   };
 
+  user = import ../global/user.nix;
   stateDir = "/var/lib/${cfg.stateDirectory}";
   storePath = "${stateDir}/store";
   socketPath = "${storePath}/sock";
@@ -122,6 +123,55 @@ in {
       type = lib.types.package;
       default = xsPackage;
       description = "The xs binary to serve.";
+    };
+
+    backup = {
+      enable = lib.mkEnableOption "a nightly export of the store, optionally shipped to another host";
+
+      directory = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/backups/xs-agent-turns";
+        description = ''
+          Dated dump root. Each run writes one `YYYY-MM-DDTHHMM` directory holding
+          `frames.jsonl` and `cas/` — the shape `xs import` restores.
+        '';
+      };
+
+      startAt = lib.mkOption {
+        type = lib.types.str;
+        default = "*-*-* 03:05:00";
+        description = ''
+          When the export runs. Any host that copies these dumps has its own
+          snapshot to make, so this is earlier than the snapshots and later than
+          the previous day's load.
+        '';
+      };
+
+      retain = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 7;
+        description = "Days of local dumps to keep. A dump older than this is removed after a successful run.";
+      };
+
+      pushTo = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = ''
+          rsync destination (`user@host:/path/`) to ship the dump tree to, or empty
+          to keep the dumps on this host only. The destination is mirrored, so it
+          must exist for this dump tree alone: anything else there is deleted.
+        '';
+      };
+
+      pushKeyFile = lib.mkOption {
+        type = lib.types.str;
+        default = "/home/${user.name}/.ssh/id_ed25519";
+        description = ''
+          Key the push authenticates with. The unit runs as root because the store
+          is 0700 between two service users, and root reading the fleet key is one
+          credential decision instead of a second user owning half the store.
+        '';
+      };
     };
   };
 
@@ -222,6 +272,44 @@ in {
         PrivateTmp = true;
         NoNewPrivileges = true;
         MemoryMax = "256M";
+      };
+    };
+
+    systemd.services.xs-agent-turns-backup = lib.mkIf cfg.backup.enable {
+      description = "Export the agent-turn store and ship it to the backup host";
+      # No sandboxing beyond the default here: the unit reads the 0700 store as
+      # root, writes /var/backups and opens one outbound ssh. `ProtectHome` would
+      # hide the key it authenticates with.
+      path = [cfg.package pkgs.jq pkgs.rsync pkgs.openssh pkgs.findutils pkgs.coreutils pkgs.bash];
+      serviceConfig.Type = "oneshot";
+      # One run: dump, ship, prune — in that order, so a failed export cannot
+      # leave the far side holding a fresh timestamp over yesterday's frames.
+      script = ''
+        set -euo pipefail
+        dir="${cfg.backup.directory}"
+        out="$dir/$(date +%Y-%m-%dT%H%M)"
+
+        mkdir -p "$dir"
+        bash ${../../scripts/task/xs-agent-turns-export.sh} "$out"
+        ${lib.optionalString (cfg.backup.pushTo != "") ''
+          # `--delete` is safe because this destination is the mirror of this one
+          # tree; `--delay-updates` installs each file at the end of the transfer,
+          # so a snapshot taken mid-run cannot catch a half-written dump.
+          rsync -a --delete --delay-updates \
+            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${stateDir}/known_hosts -i ${cfg.backup.pushKeyFile}" \
+            "$dir/" "${cfg.backup.pushTo}"
+        ''}
+        find "$dir" -mindepth 1 -maxdepth 1 -type d -name '20??-*' -mtime "+${toString cfg.backup.retain}" -exec rm -rf {} +
+      '';
+    };
+
+    systemd.timers.xs-agent-turns-backup = lib.mkIf cfg.backup.enable {
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnCalendar = cfg.backup.startAt;
+        # A host asleep at 03:05 owes itself the dump, not a skipped night.
+        Persistent = true;
+        RandomizedDelaySec = "120s";
       };
     };
   };

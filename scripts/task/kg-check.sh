@@ -11,7 +11,8 @@
 #
 # Three layers, cheapest first:
 #   1. schema   — required fields, unique ids, endpoints resolve, edge shapes
-#                 (mentions: doc|skill -> host|skill; tagged: skill -> tag).
+#                 (mentions: doc|skill -> host|skill; tagged: skill -> tag;
+#                 references: doc -> doc).
 #   2. patterns — each of the six returns rows for an anchor DERIVED from the
 #                 graph, result ids are the expected node types, and the answer is
 #                 cross-checked: everything `doc X` returns must list `doc:X`
@@ -74,8 +75,22 @@ check "edge endpoints resolve to nodes" \
   '(.nodes | map({(.id): true}) | add) as $n
    | all(.edges[]; (.from as $f | .to as $t | $n[$f] != null and $n[$t] != null))'
 
-check "edge types are mentions|tagged" \
-  'all(.edges[]; .type == "mentions" or .type == "tagged")'
+check "edge types are mentions|tagged|references" \
+  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references")'
+
+# The doc-to-doc layer is the one relation that needs a parser rather than a token
+# scan, so it is the one that can silently return zero: a wrong regex, a changed
+# link style or a doc-set edit all leave every other check green. The floor is
+# measured at 61 edges; 30 fails on a collapsed parser without tripping on prose.
+check "references layer is populated (>=30 edges)" \
+  '([.edges[] | select(.type == "references")] | length) >= 30'
+
+check "references: doc -> doc" \
+  '(.nodes | map({(.id): .type}) | add) as $t
+   | all(.edges[];
+         if .type != "references" then true
+         else (.from as $f | .to as $to | $t[$f] == "doc" and $t[$to] == "doc")
+         end)'
 
 check "mentions: (doc|skill) -> (host|skill)" \
   '(.nodes | map({(.id): .type}) | add) as $t
@@ -153,7 +168,9 @@ expect_types "host" "$HOST_JSON" 'doc|skill'
 
 rows "doc AGENTS.md (living-doc anchor)" doc AGENTS.md
 DOC_JSON="$LAST"
-expect_types "doc" "$DOC_JSON" 'host|skill'
+# A doc now answers with three kinds of neighbour: the hosts and skills it
+# mentions, and the documents it links to (the `references` layer).
+expect_types "doc" "$DOC_JSON" 'host|skill|doc'
 
 if [ -n "$seed_skill" ]; then
   rows "skill $seed_skill (derived anchor)" skill "$seed_skill"

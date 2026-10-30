@@ -19,7 +19,7 @@ Protocol: `AGENTS.md` § "Agent turns", `docs/agent-context/HOME-PREAMBLE.md`.
 | Shim | Python 3 stdlib, bearer auth, schema + secret allowlist, dedup index | `127.0.0.1:8093`, `dedup.sqlite` beside the store |
 | Exposure | `tailscale serve --https=8449` → `http://127.0.0.1:8093` | `https://delphi.cloudforest-kardashev.ts.net:8449` |
 | Units | `xs-agent-turns.service`, `agent-turns-shim.service`, `tailscale-serve-agent-turns.service` | delphi |
-| Secrets | `agent-turns-token` (fleet) plus one per outside holder (`-netbook`, `-muse`, `-muse1`) in `modules/secrets.yaml` | 0400, owner `xs-agent-turns` |
+| Secrets | `agent-turns-token` (fleet) plus one per outside holder (`-netbook`, `-muse`, `-vesper`) in `modules/secrets.yaml` | 0400, owner `xs-agent-turns` |
 
 The store is never exposed. `xs serve` runs without `--expose`, inside
 `PrivateNetwork=true`, with `RestrictAddressFamilies = ["AF_UNIX"]`, so there is

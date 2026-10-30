@@ -1,0 +1,148 @@
+version: "3"
+
+# PythonAnywhere has no SSH on the free tier and no remote-command endpoint in
+# its REST API, so every task here is an HTTP call against api/v0 — the same
+# "ask over HTTP with a timeout, never open ssh in an unattended path" rule the
+# fleet applies to cache checks. The token lives in the sops apikeys file.
+#
+# What the API cannot do: run a shell. `git pull`, `pip install` and
+# `main.py db-upgrade` are Bash console actions; a code change reaches the host
+# as files-API writes plus a reload, which is what `pythonanywhere:push` is for.
+#
+# The `PYTHONANYWHERE.MYSQL.PASSWORD` entry in the same sops file is deliberately
+# unused: PythonAnywhere only accepts MySQL connections from inside its own
+# network, so no task here can reach the database directly — migrations run in a
+# console, and `pythonanywhere:status` reads the app's own /api/summary instead.
+vars:
+  PYANY_USER: "jisifu"
+  PYANY_DOMAIN: "jisifu.pythonanywhere.com"
+  PYANY_SITE: "https://jisifu.pythonanywhere.com"
+  PYANY_API: "https://www.pythonanywhere.com/api/v0/user/jisifu"
+  PYANY_ROOT: "/home/jisifu/pythonanywhere"
+
+tasks:
+  pythonanywhere:status:
+    desc: Health, web app state, CPU quota and expiry in one read-only pass
+    summary: >
+      GET /api/health plus api/v0 webapps, cpu and the .git ref of the deployed
+      checkout. Exits 1 when the health route is not 200 or the web app is
+      disabled; expiry, quota and commit drift are printed but do not fail,
+      because a lapsed date or a not-yet-pulled commit is a chore, not a fault.
+      Set PYANY_LOCAL=<path to the checkout> to compare the host commit against it.
+    cmds:
+      - |
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        echo "=== health ({{.PYANY_SITE}}/api/health) ==="
+        CODE=$(curl -sS -m 20 -o /tmp/pyany-health.$$ -w '%{http_code}' {{.PYANY_SITE}}/api/health)
+        cat /tmp/pyany-health.$$; echo " [HTTP $CODE]"; rm -f /tmp/pyany-health.$$
+        echo
+        echo "=== web app ($CODE) ==="
+        APP=$(curl -sS -m 20 -H "Authorization: Token $TOKEN" {{.PYANY_API}}/webapps/)
+        echo "$APP" | yq -r '.[0] | "  domain:     \(.domain_name)\n  enabled:    \(.enabled)\n  python:     \(.python_version)\n  source:     \(.source_directory)\n  expires:    \(.expiry)"'
+        VENV=$(echo "$APP" | yq -r '.[0].virtualenv_path')
+        if [ -z "$VENV" ]; then VENV="(none: system site-packages)"; fi
+        echo "  virtualenv: $VENV"
+        echo
+        echo "=== cpu quota ==="
+        curl -sS -m 20 -H "Authorization: Token $TOKEN" {{.PYANY_API}}/cpu/ | yq -r '"  \(.daily_cpu_total_usage_seconds) of \(.daily_cpu_limit_seconds) CPU-seconds used today, resets \(.next_reset_time)"'
+        echo
+        echo "=== deployed commit ==="
+        HEADREF=$(curl -sS -m 20 -H "Authorization: Token $TOKEN" "{{.PYANY_API}}/files/path{{.PYANY_ROOT}}/.git/HEAD?raw=1")
+        SHA=$(curl -sS -m 20 -H "Authorization: Token $TOKEN" "{{.PYANY_API}}/files/path{{.PYANY_ROOT}}/.git/$(echo "$HEADREF" | sed 's/^ref: //')?raw=1")
+        echo "  $(echo "$HEADREF" | sed 's/^ref: //') $SHA"
+        if [ -n "{{.PYANY_LOCAL | default ""}}" ]; then
+          WANT=$(git -C "{{.PYANY_LOCAL}}" rev-parse HEAD 2>/dev/null)
+          if [ "$SHA" = "$WANT" ]; then echo "  in sync with {{.PYANY_LOCAL}}"; else echo "  DRIFT: {{.PYANY_LOCAL}} is at $WANT"; fi
+        fi
+        echo
+        echo "=== error log, last 3 lines ==="
+        curl -sS -m 20 -H "Authorization: Token $TOKEN" "{{.PYANY_API}}/files/path/var/log/{{.PYANY_DOMAIN}}.error.log?raw=1" | tail -n 3
+        if [ "$CODE" != "200" ]; then exit 1; fi
+        if [ "$(echo "$APP" | yq -r '.[0].enabled')" != "true" ]; then
+          echo "web app is disabled"; exit 1
+        fi
+
+  pythonanywhere:reload:
+    desc: Reload the web app after a code or config change, then re-check health
+    summary: >
+      POST webapps/<domain>/reload/ then GET /api/health. Exits 1 when reload is
+      refused or health does not come back 200 — a reload that silently did not
+      take is the failure mode this pairs with.
+    cmds:
+      - |
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        echo "=== reload {{.PYANY_DOMAIN}} ==="
+        R=$(curl -sS -m 60 -X POST -H "Authorization: Token $TOKEN" -w '\n%{http_code}' {{.PYANY_API}}/webapps/{{.PYANY_DOMAIN}}/reload/)
+        BODY=$(echo "$R" | head -n -1); CODE=$(echo "$R" | tail -n 1)
+        echo "$BODY [HTTP $CODE]"
+        if [ "$CODE" != "200" ]; then exit 1; fi
+        echo "=== health after reload ==="
+        H=$(curl -sS -m 20 -o /dev/null -w '%{http_code}' {{.PYANY_SITE}}/api/health)
+        echo "HTTP $H"
+        if [ "$H" != "200" ]; then exit 1; fi
+
+  pythonanywhere:logs:
+    desc: Tail the web app log over the files API — PYANY_LOG=error|access|server, PYANY_LINES=40
+    summary: >
+      GET /files/path/var/log/<domain>.<PYANY_LOG>.log. Defaults to the error log,
+      the one that answers "why is the page blank"; PYANY_LOG=access for requests.
+    cmds:
+      - |
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        echo "=== {{.PYANY_DOMAIN}}.{{.PYANY_LOG | default "error"}}.log, last {{.PYANY_LINES | default "40"}} lines ==="
+        curl -sS -m 30 -H "Authorization: Token $TOKEN" "{{.PYANY_API}}/files/path/var/log/{{.PYANY_DOMAIN}}.{{.PYANY_LOG | default "error"}}.log?raw=1" | tail -n {{.PYANY_LINES | default "40"}}
+
+  pythonanywhere:files:
+    desc: List the remote tree under PYANY_PATH (default the project checkout)
+    summary: >
+      GET /files/tree/?path=PYANY_PATH. One path per line, directories trailing
+      a slash — the cheap way to confirm what the host actually has, since a
+      console `git pull` can leave stale modules behind a files-API sync.
+    cmds:
+      - |
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        echo "=== {{.PYANY_ROOT}} ==="
+        curl -sS -m 30 -H "Authorization: Token $TOKEN" "{{.PYANY_API}}/files/tree/?path={{.PYANY_ROOT}}" | yq -r '.[]'
+
+  pythonanywhere:push:
+    desc: Upload one local file over the files API — args are a local file, then an optional remote path
+    summary: >
+      POST /files/path/ multipart with the `content` field, which is the only
+      upload form the API accepts. Remote paths are filesystem-absolute and
+      writable only under /home/<user>; with no destination the file lands at
+      PYANY_ROOT under its own name. Nothing reloads: pair it with a reload.
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        SRC=$(echo "$ARGS" | awk '{print $1}')
+        DEST=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$SRC" ]; then
+          echo "usage: task pythonanywhere:push -- <local-file> [remote-path]"
+          echo "example: task pythonanywhere:push -- app/templates/layouts/base.html /home/jisifu/pythonanywhere/app/templates/layouts/base.html"
+          exit 1
+        fi
+        if [ ! -f "$SRC" ]; then echo "not a file: $SRC"; exit 1; fi
+        if [ -z "$DEST" ]; then DEST="{{.PYANY_ROOT}}/$(basename "$SRC")"; fi
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        echo "=== upload $SRC -> $DEST ==="
+        curl -sS -m 60 -X POST -H "Authorization: Token $TOKEN" -F "content=@$SRC" -w ' [HTTP %{http_code}]\n' "{{.PYANY_API}}/files/path${DEST}"
+
+  pythonanywhere:pull:
+    desc: Download one remote file over the files API — args are a remote path, then an optional local path
+    summary: >
+      GET /files/path/<remote>?raw=1. With no local path the file is written to
+      the current directory under its own name. Use it to diff what the host
+      serves against the checkout before overwriting anything.
+    cmds:
+      - |
+        ARGS="{{.CLI_ARGS}}"
+        REMOTE=$(echo "$ARGS" | awk '{print $1}')
+        LOCAL=$(echo "$ARGS" | awk '{print $2}')
+        if [ -z "$REMOTE" ]; then
+          echo "usage: task pythonanywhere:pull -- <remote-path> [local-path]"
+          exit 1
+        fi
+        if [ -z "$LOCAL" ]; then LOCAL=$(basename "$REMOTE"); fi
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        echo "=== download $REMOTE -> $LOCAL ==="
+        curl -sS -m 60 -H "Authorization: Token $TOKEN" -o "$LOCAL" -w '[HTTP %{http_code}]\n' "{{.PYANY_API}}/files/path${REMOTE}?raw=1"

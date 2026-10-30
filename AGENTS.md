@@ -754,7 +754,10 @@ Search order: vault → wiki (qmd BM25) → graph (`task ops:kg:*`) → mem0/sup
 
 ## qmd Search Operations
 
-Local hybrid search over markdown docs and notes via `qmd` (`pkgs.llm-agents.qmd`, installed fleet-wide). Three canonical collections:
+Local hybrid search over markdown docs and notes via `qmd` (`pkgs.llm-agents.qmd`;
+where it is not on PATH — `delphi`, measured 2026-10-30 — the tasks resolve the
+`flake.lock` pin themselves via `scripts/task/qmd-docs-index.sh`, and the `qmd`
+skill carries the bare-`qmd` one-liner). Three canonical collections:
 
 | Collection  | Target Path                                              | Content                                                                                 |
 | ----------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------- |

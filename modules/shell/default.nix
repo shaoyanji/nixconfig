@@ -20,6 +20,7 @@ in {
     ./starship.nix
     ./nushell.nix
     ./atuin.nix
+    ./home-not-a-repo.nix
     # ./zsh.nix
   ];
   programs = {
@@ -56,6 +57,21 @@ in {
             eval "$(jq -r 'to_entries | .[] | "export " + .key + "=" + (.value | @sh)' "$_sec_cache" 2>/dev/null)"
           fi
         fi
+
+        # starship: a repo on the NAS automount answers `git status` in seconds,
+        # and starship has no per-directory module switch. STARSHIP_CONFIG *is*
+        # that switch — starship re-reads it on every render — and
+        # starship_precmd_user_func runs inside starship's own precmd before it
+        # builds PS1, so the prompt after a `cd` already uses the right config
+        # (no one-prompt lag, and no PROMPT_COMMAND ordering to get wrong).
+        _starship_config_for_pwd() {
+          case "$PWD" in
+            /Volumes/data | /Volumes/data/*) STARSHIP_CONFIG="$HOME/.config/starship-no-git.toml" ;;
+            *) STARSHIP_CONFIG="$HOME/.config/starship.toml" ;;
+          esac
+          export STARSHIP_CONFIG
+        }
+        starship_precmd_user_func=_starship_config_for_pwd
 
         if [ -f "$HOME/.bash_aliases" ]; then
           source "$HOME/.bash_aliases"

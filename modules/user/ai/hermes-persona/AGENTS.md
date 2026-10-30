@@ -15,6 +15,11 @@ Default to helpful conversation. Default to disciplined execution. Warmth in ton
 6. Take the smallest effective next action.
 7. Verify on the real target, not an adjacent artifact.
 8. If blocked, stop and surface the blocker.
+9. Before work, read the fleet turn log for the repo and subject; if another agent
+   claimed the area or is in progress on the same subject, stop and report it.
+10. After work, append one summary of the turn (schema and commands in `AGENTS.md`
+   § "Agent turns"). Summaries only — never secrets, tokens or transcripts. A down
+   endpoint means queue and replay, never a lost turn.
 
 ## Execution Path
 Diagnosis → Repair → Verification.

@@ -268,6 +268,7 @@ in {
     ../../modules/profiles/operator-tools.nix
     ../../modules/profiles/sops-user-identity.nix
     ../../modules/net/dns/tailnet-address.nix
+    ../../modules/services/agent-turns.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
     ../../modules/services/service-portal.nix
@@ -815,6 +816,14 @@ in {
     };
   };
 
+  # --- Agent turn coordination store ----------------------------------------
+  # xs holds one summary per agent turn, so an agent can see who is working on
+  # what, from which base commit, before it starts a parallel edit. The module
+  # keeps the store on a Unix socket with no network namespace; the mount below
+  # is the entire exposed surface, and the bearer token comes from sops. The
+  # endpoint is coordination state, not a chat relay and not a merge authority.
+  services.agentTurns.enable = true;
+
   # --- Tailnet-only HTTPS mounts, from ONE registry --------------------------
   # Each mount is a `tailscale serve` https front for a loopback listener; the
   # portal card is generated from the same declaration, so the service list on
@@ -874,6 +883,16 @@ in {
         title = "Uptime Kuma";
         description = "External fleet and home WAN status monitor.";
         requires = ["uptime-kuma.service"];
+      };
+      # Machine-facing: POST /v1/events and GET /v1/events, bearer token, no
+      # browsing surface, so no card on the tailnet page.
+      agent-turns = {
+        port = 8449;
+        upstream = "http://127.0.0.1:${toString config.services.agentTurns.port}";
+        title = "Agent turns (xs)";
+        description = "Append-only agent-turn coordination store; bearer token required.";
+        requires = ["agent-turns-shim.service"];
+        hideCard = true;
       };
     };
     entries.gatus = {

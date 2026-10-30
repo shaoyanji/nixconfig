@@ -39,6 +39,25 @@
   verify with `task checks:build:route`.
 - **Secrets**: read via `task infra:sops:get:*`; never print a value.
 
+## Agent turns (before and after every turn, mandatory)
+
+A fleet turn log lives on delphi so agents can see who is working on what, from
+which base commit, before starting — and so a merge or test is checked against
+real turns, not a stale chat report. It does not authorize a merge.
+
+```bash
+X=https://delphi.cloudforest-kardashev.ts.net:8449   # tailnet only
+export AGENT_TURNS_TOKEN="$(sops -d ~/Documents/nixconfig/modules/secrets.yaml | yq -r '.["agent-turns-token"]')"
+curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?repo=<repo>&limit=20" | jq '.events'
+```
+
+Read those turns first; if another agent claimed the same area or is
+`in_progress` on the same subject, stop and report it instead of editing in
+parallel. After the turn, `POST $X/v1/events` with the schema in `AGENTS.md`
+§ "Agent turns" — summaries only, never secrets or transcripts. If the endpoint
+is down, retry once, queue the entry in `~/.local/state/agent-turns/queue.jsonl`,
+and replay it by UUID later.
+
 ## Closed loop (run this before blaming the config)
 
 ```bash

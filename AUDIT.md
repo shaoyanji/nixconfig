@@ -28,6 +28,24 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-30 — an Always Free OCI demo with a private database
+- **OCI ignores `cpu_core_count` and `data_storage_size_in_tbs` on a free database.** `is_free_tier`
+  is the switch and ECPU is the shape (2 ECPU = 1 OCPU), so `projects/oci-always-free-demo` pins it in
+  code with a validation instead of trusting a console checkbox.
+- **`subnet_id` on the ADB is what removes the public listeners.** SQL\*Net and ORDS stop answering
+  outside the VCN in place, so operator access moves to a bastion `create-port-forwarding` session,
+  and `scripts/adb-sql.sh` rewrites the descriptor host to the tunnel while keeping the wallet's
+  `ssl_server_cert_dn` so TLS identity stays pinned.
+- **Imported certificate material needs provider 9.x.** 7.32's `certificate_config` has no
+  `certificate_pem`, so the floor is `>= 9.0.0`; the default self-signed certificate is RSA because
+  the load balancer's default cipher suite will not negotiate ECDSA.
+- **APEX page metadata has no DDL equivalent.** `sql/apex/f100.sql` is wired but empty until one Page
+  Designer build and `--apex export`; `--apex-check` compares content rather than timestamps, because
+  importing an app bumps its `last_updated_on`.
+- **Evidence:** `terraform validate` clean on `oracle/oci` 9.11.0, shellcheck clean on four scripts,
+  the Flask app exercised under its test client. No `plan` has run against a tenancy, so the ACME DNS
+  hook, SQLcl `apex export` inside a script and the bastion flag names stay unproven.
+
 ### 2026-10-30 — a NixOS build tracker runs on Always-Free AWS alone
 - **The artifact is the reproducible unit, not the host.** `projects/nix-build-tracker/flake.nix`
   compiles the Go API to a static `linux/amd64` `bootstrap` in `installPhase` — `buildGoModule` pins

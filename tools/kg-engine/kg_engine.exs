@@ -629,6 +629,7 @@ defmodule KGEngine.Native do
     hosts = phase.("hosts", fn -> hosts(repo) end)
     skills = phase.("skills", fn -> skills(repo) end)
     docs = phase.("docs", fn -> docs(repo, hosts, skills) end)
+    ideas = phase.("ideas", fn -> ideas(repo, docs, hosts, skills) end)
     tags = phase.("graph", fn -> skills |> Enum.flat_map(& &1.tags) |> Enum.uniq() end)
 
     host_nodes =
@@ -657,6 +658,11 @@ defmodule KGEngine.Native do
 
     tag_nodes = Enum.map(tags, fn t -> %{"id" => "tag:" <> t, "type" => "tag", "label" => t} end)
 
+    idea_nodes =
+      Enum.map(ideas, fn i ->
+        %{"id" => i.id, "type" => "idea", "label" => i.label, "path" => i.path}
+      end)
+
     mention_edges =
       Enum.flat_map(docs, fn d ->
         Enum.map(d.hosts, &%{"from" => d.id, "to" => "host:" <> &1, "type" => "mentions"}) ++
@@ -677,15 +683,23 @@ defmodule KGEngine.Native do
         Enum.map(d.refs, &%{"from" => d.id, "to" => "doc:" <> &1, "type" => "references"})
       end)
 
-    edges = mention_edges ++ tag_edges ++ reference_edges
+    # `about`: idea -> doc|host|skill, from the draft's frontmatter. The edge is
+    # only emitted for an id that exists, the same filter the Nix side applies.
+    about_edges =
+      Enum.flat_map(ideas, fn i ->
+        Enum.map(i.about, &%{"from" => i.id, "to" => &1, "type" => "about"})
+      end)
+
+    edges = mention_edges ++ tag_edges ++ reference_edges ++ about_edges
 
     %{
-      "nodes" => host_nodes ++ skill_nodes ++ doc_nodes ++ tag_nodes,
+      "nodes" => host_nodes ++ skill_nodes ++ doc_nodes ++ tag_nodes ++ idea_nodes,
       "edges" => edges,
       "stats" => %{
         "hosts" => length(hosts),
         "skills" => length(skills),
         "docs" => length(docs),
+        "ideas" => length(ideas),
         "edges" => length(edges)
       }
     }
@@ -891,6 +905,74 @@ defmodule KGEngine.Native do
         refs: references(text, rel, rels)
       }
     end)
+  end
+
+  # Drafts: `ideas/<slug>.md`, with a frontmatter block naming the entities the
+  # piece is about. The grammar is three keys over six lines, parsed here exactly
+  # as `frontmatter`/`fmValue`/`fmList` parse it in lib/knowledge-graph.nix —
+  # `checks:kg:native` compares the two graphs, so a parser that understood one
+  # more shape would show up as an edge count that disagrees.
+  defp ideas(repo, docs, hosts, skills) do
+    known =
+      MapSet.new(
+        Enum.map(docs, & &1.id) ++
+          Enum.map(hosts, fn {n, _} -> "host:" <> n end) ++
+          Enum.map(skills, &("skill:" <> &1.name))
+      )
+
+    Enum.map(md_files(repo, ["ideas"]), fn path ->
+      rel = Path.relative_to(path, repo)
+      text = File.read!(path)
+      slug = Path.basename(rel, ".md")
+      title = frontmatter(text)["title"] || ""
+
+      %{
+        id: "idea:" <> slug,
+        path: rel,
+        label: if(title == "", do: slug, else: title),
+        about:
+          text
+          |> idea_about()
+          |> Enum.filter(&MapSet.member?(known, &1))
+          |> Enum.uniq()
+      }
+    end)
+  end
+
+  # The `about:` list, which the skill-frontmatter map above cannot carry: its
+  # values are single-line `key: value` pairs, while a draft's entities are a
+  # block list. Still not YAML — an operator can annotate a draft with keys
+  # neither implementation knows, and both ignore them.
+  defp idea_about(text) do
+    case String.split(text, "\n") do
+      [first | rest] when is_binary(first) ->
+        if String.starts_with?(first, "---") do
+          rest
+          |> Enum.take_while(&(&1 != "---"))
+          |> entries_after("about:")
+        else
+          []
+        end
+
+      _ ->
+        []
+    end
+  end
+
+  defp entries_after(lines, key) do
+    case Enum.find_index(lines, &(&1 == key)) do
+      nil ->
+        []
+
+      i ->
+        lines
+        |> Enum.drop(i + 1)
+        |> Enum.take_while(&(String.starts_with?(&1, "  - ") or String.starts_with?(&1, "- ")))
+        |> Enum.map(fn l ->
+          l |> String.replace_prefix("  - ", "") |> String.replace_prefix("- ", "") |> String.trim()
+        end)
+        |> Enum.reject(&(&1 == ""))
+    end
   end
 
   # `[text](path.md#frag)` — the twin of `linkTargets`/`referencesIn` in

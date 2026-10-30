@@ -75,8 +75,8 @@ check "edge endpoints resolve to nodes" \
   '(.nodes | map({(.id): true}) | add) as $n
    | all(.edges[]; (.from as $f | .to as $t | $n[$f] != null and $n[$t] != null))'
 
-check "edge types are mentions|tagged|references" \
-  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references")'
+check "edge types are mentions|tagged|references|about" \
+  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about")'
 
 # The doc-to-doc layer is the one relation that needs a parser rather than a token
 # scan, so it is the one that can silently return zero: a wrong regex, a changed
@@ -107,6 +107,39 @@ check "tagged: skill -> tag" \
          if .type != "tagged" then true
          else (.from as $f | .to as $to | $t[$f] == "skill" and $t[$to] == "tag")
          end)'
+
+# A draft names the entities it is about, and only those: the edge shape is the
+# whole point of the layer, so a stray `about -> tag:` or an idea pointing at an
+# idea fails here rather than answering a query nobody meant to ask.
+check "about: idea -> (doc|host|skill)" \
+  '(.nodes | map({(.id): .type}) | add) as $t
+   | all(.edges[];
+         if .type != "about" then true
+         else (.from as $f | .to as $to
+               | $t[$f] == "idea"
+                 and ($t[$to] == "doc" or $t[$to] == "host" or $t[$to] == "skill"))
+         end)'
+
+# A draft with no entities is a file the projection read and got nothing out of —
+# exactly the failure the frontmatter parser has. It is not a style opinion:
+# every draft `dev:blog:draft` writes has at least one seed.
+check "every idea names at least one entity" \
+  '(.nodes | map(select(.type == "idea") | .id) | sort) as $ideas
+   | ([.edges[] | select(.type == "about") | .from] | unique) as $linked
+   | ($ideas - $linked) | length == 0'
+
+# The file count is the independent witness: the graph says how many drafts it
+# parsed, the tree says how many exist. A parser that skipped a shape (a quoted
+# list item, a CRLF checkout) shows up as a number that disagrees, not as a
+# quietly smaller graph. The `.md` filter matches `ideas/*.md` only — the
+# projection is non-recursive, so neither is this.
+idea_files="$(ls "$REPO"/ideas/*.md 2>/dev/null | wc -l | tr -d ' ')"
+idea_nodes="$(jq -r '[.nodes[] | select(.type == "idea")] | length' "$G")"
+if [ "$idea_files" = "$idea_nodes" ]; then
+  ok "every ideas/*.md is a node ($idea_nodes)"
+else
+  bad "ideas/*.md on disk ($idea_files) != idea nodes in the graph ($idea_nodes)"
+fi
 
 check "stats agree with a recount of nodes and edges" \
   '(.nodes | map(select(.type == "host")) | length) as $h

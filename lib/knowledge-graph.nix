@@ -64,6 +64,21 @@
   # build output is checked out by hand.
   files = builtins.filter builtins.pathExists (rootDocs ++ docFiles);
 
+  # Drafts are NOT documents and are deliberately not in `docFiles`: a draft is
+  # not a page anyone routes by, so it must not answer for a finished one, and
+  # the site renders every doc. They are their own node type with their own
+  # edges (`about`), which is what lets `ops:kg:blast TARGET=host:frieren` list
+  # the unfinished pieces about that host instead of a second doc namespace.
+  ideaFiles =
+    if builtins.pathExists (root + "/ideas")
+    then
+      map (n: root + "/ideas/${n}") (
+        builtins.attrNames (
+          lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".md" n) (builtins.readDir (root + "/ideas"))
+        )
+      )
+    else [];
+
   rel = p: let
     s = toString p;
     r = toString root;
@@ -170,6 +185,85 @@
 
   docs = map mkDoc files;
 
+  # Draft frontmatter, parsed line-wise and mirrored in tools/kg-engine: the
+  # contract, and why it is not YAML, live in docs/blog-drafting.md.
+  takeUntil = pred: list: let
+    step = acc: x:
+      if acc.done || pred x
+      then acc // {done = true;}
+      else acc // {items = acc.items ++ [x];};
+  in
+    (builtins.foldl' step {
+        done = false;
+        items = [];
+      }
+      list)
+    .items;
+
+  frontmatter = content: let
+    lines = lib.splitString "\n" content;
+  in
+    if lines == [] || !(lib.hasPrefix "---" (builtins.head lines))
+    then []
+    else
+      takeUntil (l: l == "---") (
+        if builtins.length lines > 1
+        then lib.tail lines
+        else []
+      );
+
+  fmValue = content: key: let
+    lines = frontmatter content;
+    hits = builtins.filter (l: lib.hasPrefix "${key}:" l) lines;
+  in
+    if hits == []
+    then ""
+    else lib.trim (lib.removePrefix "${key}:" (builtins.head hits));
+
+  fmList = content: key: let
+    lines = frontmatter content;
+    idx = builtins.filter (i: i != null) (
+      lib.imap0 (i: l:
+        if l == "${key}:"
+        then i
+        else null)
+      lines
+    );
+  in
+    if idx == []
+    then []
+    else
+      map (l: lib.trim (lib.removePrefix "- " (lib.removePrefix "  - " l))) (
+        takeUntil (l: !(lib.hasPrefix "  - " l || lib.hasPrefix "- " l)) (
+          lib.drop ((builtins.head idx) + 1) lines
+        )
+      );
+
+  mkIdea = p: let
+    content = builtins.readFile p;
+    path = rel p;
+    slug = lib.removeSuffix ".md" (baseNameOf path);
+    title = fmValue content "title";
+  in {
+    id = "idea:${slug}";
+    type = "idea";
+    label =
+      if title == ""
+      then slug
+      else title;
+    inherit path;
+    about = builtins.filter (a: a != "") (fmList content "about");
+  };
+
+  ideas = map mkIdea ideaFiles;
+
+  # Every node id that exists, so an `about` entry naming a typo is an edge that
+  # does not resolve — which kg-check fails on — rather than an invented node.
+  knowableIds =
+    map (h: "host:${h}") hostNames
+    ++ map (s: "skill:${s}") skillNames
+    ++ map (d: "doc:${d}") docPaths;
+
   hostNodes =
     map (h: {
       id = "host:${h}";
@@ -197,7 +291,11 @@
     ++ map (d: {
       inherit (d) id type label path;
     })
-    docs;
+    docs
+    ++ map (i: {
+      inherit (i) id type label path;
+    })
+    ideas;
 
   edges =
     lib.concatMap (d:
@@ -227,7 +325,18 @@
         type = "tagged";
       })
       skills.skills.${n}.tags)
-    (builtins.attrNames skills.skills);
+    (builtins.attrNames skills.skills)
+    # A draft names the entities it is about; the edge is only emitted for an id
+    # that exists, so a typo in frontmatter surfaces as "edge endpoints resolve
+    # to nodes" in kg-check instead of quietly shrinking the graph.
+    ++ lib.concatMap (i:
+      map (a: {
+        from = i.id;
+        to = a;
+        type = "about";
+      })
+      (lib.unique (builtins.filter (a: builtins.elem a knowableIds) i.about)))
+    ideas;
 
   tagNodes = lib.unique (lib.concatMap (n: skills.skills.${n}.tags) (builtins.attrNames skills.skills));
 
@@ -247,6 +356,7 @@
       hosts = builtins.length hostNames;
       skills = builtins.length (builtins.attrNames skills.skills);
       docs = builtins.length docs;
+      ideas = builtins.length ideas;
       edges = builtins.length edges;
     };
   };
@@ -261,6 +371,8 @@
         then "Skill"
         else if n.type == "doc"
         then "Doc"
+        else if n.type == "idea"
+        then "Idea"
         else "Tag";
     in ''
       MERGE (${"n_${builtins.hashString "md5" n.id}"}:${label} {id: ${q n.id}})
@@ -274,6 +386,8 @@
       rel =
         if e.type == "tagged"
         then "TAGGED"
+        else if e.type == "about"
+        then "ABOUT"
         else "MENTIONS";
     in ''
       MATCH (${a}), (${b}) MERGE (${a})-[:${rel}]->(${b});

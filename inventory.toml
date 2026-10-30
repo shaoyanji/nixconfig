@@ -16,9 +16,9 @@ title = "Fleet Device & Host Inventory"
 description = "Canonical hardware, operational status, network, and agent persona registry for all fleet devices."
 version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_devices = 35
+total_devices = 36
 active_nix_devices = 13
-active_external_devices = 7
+active_external_devices = 8
 wip_devices = 0
 preserved_devices = 15
 
@@ -1086,6 +1086,42 @@ system_prompt_hint = "You are the ambassador to the Small Web pubnix community a
 compute_tier = "shared-pubnix"
 allowed_tasks = ["Public HTML website maintenance", "Gemini capsule page publishing", "Gopher hole navigation map updates", "Community pubnix interaction"]
 constraints = ["Non-Nix environment: standard Debian pubnix userland.", "Shared community server; abide by pubnix community etiquette and quota guidelines."]
+
+[hosts.pythonanywhere]
+hostname = "pythonanywhere"
+status = "active"
+status_detail = "In active production as a non-Nix PythonAnywhere Flask/CMS host, managed over the REST API rather than ssh."
+kind = "external"
+is_nix = false
+system_type = "non-nix"
+arch = "x86_64-linux"
+role = "PythonAnywhere Flask CMS Host"
+category = "hosting"
+desktop_environment = "headless"
+users = ["jisifu"]
+
+[hosts.pythonanywhere.hardware]
+model = "PythonAnywhere Free Web App (jisifu.pythonanywhere.com)"
+cpu = "Shared x86_64, Python 3.10, 100 CPU-seconds per day"
+ram = "Shared Web App Quota"
+storage_type = "Shared Storage"
+storage_layout = "/home/jisifu/pythonanywhere (git checkout); MySQL in the managed service"
+
+[hosts.pythonanywhere.network]
+domain = "https://jisifu.pythonanywhere.com"
+
+[hosts.pythonanywhere.software]
+module_chain = "PythonAnywhere Managed Python 3.10 + MySQL"
+impermanence = false
+key_services = ["Flask CMS web app (WSGI, system site-packages, no virtualenv)", "MySQL default database", "REST API v0: files, webapps, cpu, schedule"]
+traits = ["non-nix", "pythonanywhere", "flask", "mysql", "api-managed", "web-hosting"]
+
+[hosts.pythonanywhere.persona]
+title = "PythonAnywhere Web App Custodian"
+system_prompt_hint = "You maintain the PythonAnywhere Flask CMS. Verify through the HTTP health route and the REST API, reload after any code change, and read the error log before guessing at a fault."
+compute_tier = "shared-web-hosting"
+allowed_tasks = ["Web app reload and health checks over the REST API", "Remote error-log and CPU-quota inspection", "Single-file deployment through the files API"]
+constraints = ["Non-Nix environment: no nix, nixos-rebuild or nix store.", "The API cannot run shell commands; `git pull` and pip installs happen in a Bash console, or are replaced by files-API sync plus reload.", "Free tier grants 100 CPU-seconds per day and the web app expires unless it is renewed."]
 
 # ------------------------------------------------------------------------------
 # 7. CI RUNNERS, VMS & EPHEMERAL TOOLS

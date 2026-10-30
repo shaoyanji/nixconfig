@@ -25,6 +25,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/serv00.yml` – Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle (jisifu.serv00.net), and Gum menu
 - `taskfiles/dragoncourt.yml` – Alwaysdata Debian hosting, PHP/Wasm webserver (dragoncourt.alwaysdata.net), and Gum menu
 - `taskfiles/envs.yml` – Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline (jisifu.envs.net), and Gum menu
+- `taskfiles/pythonanywhere.yml` – PythonAnywhere Flask CMS (jisifu.pythonanywhere.com) over the REST API: health reload logs, single-file push/pull — no ssh
 - `taskfiles/bountystash.yml` – Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment, and Gum menu
 - `taskfiles/burgernas.yml` – Synology DS220j cold vault (BurgerNAS): WoL power, restic backup target, leech-only Transmission, aria2/AriaNg, and Gum menu
 - `taskfiles/apps.yml` – Job application workflow via `bin/appflow` (status updates, email radar, Typst builds, three-way sync, GitHub push/pull)
@@ -55,6 +56,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - Serv00 FreeBSD hosting & webserver → `taskfiles/serv00.yml` (`serv00:*`)
 - Alwaysdata Debian hosting & webserver → `taskfiles/dragoncourt.yml` (`dragoncourt:*`)
 - Envs.net Debian hosting & webserver → `taskfiles/envs.yml` (`envs:*`)
+- PythonAnywhere Flask CMS over the REST API → `taskfiles/pythonanywhere.yml` (`pythonanywhere:*`)
 - Windows 11 workstation over Tailscale OpenSSH → `taskfiles/bitlockerpremium.yml` (`bitlockerpremium:*`)
 - Bountystash Console & Cloudflare Pages → `taskfiles/bountystash.yml` (`bountystash:*`)
 - BurgerNAS cold vault (Synology DS220j) & Transmission → `taskfiles/burgernas.yml` (`burgernas:*`)

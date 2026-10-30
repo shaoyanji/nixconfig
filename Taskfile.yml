@@ -95,6 +95,10 @@ includes:
         taskfile: taskfiles/ops.yml
         dir: .
         flatten: true
+    pythonanywhere:
+        taskfile: taskfiles/pythonanywhere.yml
+        dir: .
+        flatten: true
     serv00:
         taskfile: taskfiles/serv00.yml
         dir: .

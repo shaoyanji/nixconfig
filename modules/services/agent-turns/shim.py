@@ -11,6 +11,10 @@ exactly two routes and answering 405 to every other method.
 
 Everything else is 404 (unknown path) or 405 (update/delete). The store is
 reached over its Unix socket only; this process never speaks TCP to xs.
+
+One token per holder, never one shared token: a revoked agent must not take the
+fleet's credential with it. AGENT_TURNS_TOKENS is `name=/path` pairs, colon
+separated, and the access log names the token that authenticated.
 """
 
 import base64
@@ -33,7 +37,8 @@ DEFAULT_LIMIT = 50
 MAX_LIMIT = 200
 
 SOCKET_PATH = os.environ.get("XS_SOCKET", "")
-TOKEN_FILE = os.environ.get("AGENT_TURNS_TOKEN_FILE", "")
+TOKEN_SPEC = os.environ.get("AGENT_TURNS_TOKENS", "")
+TOKEN_FILE = os.environ.get("AGENT_TURNS_TOKEN_FILE", "")  # one-token compatibility
 DB_PATH = os.environ.get("AGENT_TURNS_DB", "")
 BIND_HOST = os.environ.get("AGENT_TURNS_BIND", "127.0.0.1")
 BIND_PORT = int(os.environ.get("AGENT_TURNS_PORT", "8093"))
@@ -102,13 +107,29 @@ def load_token(path):
         with open(path, "r", encoding="utf-8") as fh:
             token = fh.read().strip()
     except OSError as exc:
-        raise SystemExit(f"agent-turns shim: cannot read token file: {exc}")
+        raise SystemExit(f"agent-turns shim: cannot read token file {path}: {exc}")
     if len(token) < 32:
-        raise SystemExit("agent-turns shim: token file is empty or too short; refusing to start")
+        raise SystemExit(f"agent-turns shim: token in {path} is empty or too short; refusing to start")
     return token
 
 
-TOKEN = load_token(TOKEN_FILE)
+def load_tokens(spec, legacy):
+    """Map token name to token value, from `name=/path` pairs."""
+    items = [item.strip() for item in spec.split(":") if item.strip()] if spec else []
+    if legacy:
+        items.append(legacy)
+    if not items:
+        raise SystemExit("agent-turns shim: no tokens configured (AGENT_TURNS_TOKENS); refusing to start")
+    tokens = {}
+    for item in items:
+        name, sep, path = item.partition("=")
+        if not sep:
+            name, path = os.path.basename(item), item
+        tokens[name] = load_token(path)
+    return tokens
+
+
+TOKENS = load_tokens(TOKEN_SPEC, TOKEN_FILE)
 
 
 class UnixConnection(http.client.HTTPConnection):
@@ -285,13 +306,22 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    token_name = None
+
     def _auth(self):
         header = self.headers.get("Authorization", "")
         if not header.startswith("Bearer "):
             raise AuthFailed("missing bearer token")
         presented = header[len("Bearer ") :].strip()
-        if not hmac.compare_digest(presented, TOKEN):
+        # No early exit: a constant-time miss on every token does not leak which
+        # slot matched, which matters once more than one holder exists.
+        matched = None
+        for name, token in TOKENS.items():
+            if hmac.compare_digest(presented, token):
+                matched = name
+        if matched is None:
             raise AuthFailed("bad bearer token")
+        self.token_name = matched
 
     def _read_body(self):
         try:
@@ -387,6 +417,11 @@ class Handler(BaseHTTPRequestHandler):
                     "SELECT frame_id FROM turn_dedup WHERE client_uuid = ?", (client_uuid,)
                 ).fetchone()
                 if row is not None:
+                    # Logged separately from a real append, so a replay does not
+                    # read like a second turn when an operator counts the log.
+                    sys.stderr.write(
+                        f"dedup token={self.token_name} client={client_uuid} frame={row[0]}\n"
+                    )
                     self._send(200, {"id": row[0], "client_uuid": client_uuid, "duplicate": True})
                     return
                 conn.execute(
@@ -411,6 +446,7 @@ class Handler(BaseHTTPRequestHandler):
             finally:
                 conn.close()
 
+        sys.stderr.write(f"append token={self.token_name} source={entry['source']} client={client_uuid}\n")
         self._send(201, {"id": frame_id, "client_uuid": client_uuid, "duplicate": False})
 
     def _readonly(self):

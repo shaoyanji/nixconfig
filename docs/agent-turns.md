@@ -128,11 +128,34 @@ in nginx points at it. From the open internet the port is closed.
 
 ## Export, restore, rollback
 
-The backup hook writes the dump shape `xs import` restores, and deliberately
-schedules nothing — cadence and target host are an open decision:
+The store exists on delphi only, so delphi exports it on a timer and ships the
+dumps to frieren, whose 03:28/03:30 restic snapshots carry them off the box.
+Everything sits inside frieren's 03:00–05:30 maintenance window:
+
+| Time | Host | What |
+| :--- | :--- | :--- |
+| 03:05 | delphi | `xs-agent-turns-backup`: dump to `/var/backups/xs-agent-turns/<stamp>`, rsync to `devji@frieren:/srv/backup/agent-turns/`, prune dumps older than 7 days |
+| 03:28 | frieren | BurgerNAS restic snapshot (cold vault) includes `/srv/backup/agent-turns` |
+| 03:30 | frieren | local restic snapshot (`--keep-daily 7 --keep-weekly 5 --keep-monthly 12`) |
+
+`services.agentTurns.backup` is the one knob (directory, `startAt`, `retain`,
+`pushTo`, `pushKeyFile`); delphi sets `pushTo` and nothing else. The unit runs as
+root — the store is 0700 between two service users — and authenticates the push
+with the fleet key, so a failed export stops the run and the far side keeps
+yesterday's frames instead of a fresh timestamp over an empty tree. Retention
+lives in two places on purpose: 7 dated dumps locally, and restic's own policy
+for history.
+
+One-shot export, same code path:
 
 ```bash
 task infra:xs:export OUT=/tmp/agent-turns-$(date +%F)   # on delphi
+```
+
+Restoring needs the dump on the host that will serve it:
+
+```bash
+rsync -a frieren:/srv/backup/agent-turns/<stamp>/ /var/backups/xs-agent-turns/
 ```
 
 Restore into a fresh store (order matters: contents first, then frames):
@@ -163,10 +186,13 @@ and `modules/user/ai/hermes-persona/AGENTS.md`, and nowhere else.
 
 ## Open decisions
 
-- Backup cadence and target (Joiu's nix).
 - Whether `xs` should be built from source instead of the pinned arm64 release
   asset; the asset is the project's own pipeline output and is hash-pinned, but
   a source build is the fleet's usual provenance argument.
+- Whether the dump should be encrypted before it leaves delphi. It is 0700 on
+  delphi and travelled over the tailnet into restic's encrypted repository, so
+  the transport and the archive are covered; the received copy on frieren is
+  plain text.
 - The preserved `agent.turns` topic grows without bound (`ttl: forever`); a
   retention sweep could use `ttl: last:<n>`, at the cost of losing claims that
   explain an old branch.

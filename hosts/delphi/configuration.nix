@@ -831,6 +831,14 @@ in {
     "agent-turns-token-muse"
     "agent-turns-token-vesper"
   ];
+  # The store is the fleet's shared memory and it lives only here, so it gets a
+  # nightly dump that leaves the host. 03:05 is inside frieren's maintenance
+  # window and ahead of its 03:28 BurgerNAS and 03:30 local restic snapshots —
+  # those are what actually carry the dumps off the box, this only lands them.
+  services.agentTurns.backup = {
+    enable = true;
+    pushTo = "${user.name}@${config.fleet.inventory.hosts.frieren.network.tailscale_hostname}:/srv/backup/agent-turns/";
+  };
 
   # --- Tailnet-only HTTPS mounts, from ONE registry --------------------------
   # Each mount is a `tailscale serve` https front for a loopback listener; the

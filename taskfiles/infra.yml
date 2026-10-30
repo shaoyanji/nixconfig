@@ -1243,13 +1243,16 @@ tasks:
       - scripts/task/run-canary.sh --status
 
   infra:xs:export:
-    desc: "Export the agent-turn xs store to a directory (OUT=/path; backup hook, cadence undecided)"
+    desc: "Export the agent-turn xs store to a directory now (OUT=/path; the nightly timer is declarative)"
     summary: >
       Writes `frames.jsonl` plus `cas/` from the store at
       /var/lib/xs-agent-turns/store — the dump shape `xs import` restores.
       OUT must not exist (exit 1 otherwise), so an export never overwrites an
-      earlier one; exit 2 without OUT. The cadence and the target host are an
-      open decision, so this task makes the hook callable and schedules nothing.
+      earlier one; exit 2 without OUT. The schedule is not this task: delphi's
+      xs-agent-turns-backup timer dumps at 03:05 into
+      /var/backups/xs-agent-turns, ships it to frieren:/srv/backup/agent-turns
+      and keeps 7 days, ahead of frieren's 03:28/03:30 restic snapshots
+      (docs/agent-turns.md). This is the same code path, by hand.
     requires:
       vars: [OUT]
     cmds:

@@ -651,6 +651,10 @@ in {
     "d /srv/backup 0755 root root -"
     "d /srv/backup/postgresql 0700 postgres postgres -"
     "d /srv/backup/vaultwarden 0700 vaultwarden vaultwarden -"
+    # delphi's agent-turn dumps land here over rsync, so the receiving side runs
+    # as devji and must own the directory — /srv/backup itself is root-owned and
+    # 0755, which is enough to traverse and not enough to create anything.
+    "d /srv/backup/agent-turns 0750 ${user.name} users -"
   ];
 
   services.postgresqlBackup = {
@@ -681,6 +685,9 @@ in {
       "/var/lib/audiobookshelf"
       "/srv/backup/postgresql"
       "/srv/backup/vaultwarden"
+      # Pushed from delphi at 03:05 and shipped by this snapshot 25 min later:
+      # the turn store has no other copy, and it is the fleet's shared memory.
+      "/srv/backup/agent-turns"
     ];
     # NOTE: /var/lib/postgresql intentionally excluded — see header.
     timerConfig = {
@@ -717,6 +724,7 @@ in {
       "/var/lib/paperless"
       "/srv/private/home-assistant"
       "/srv/private/zigbee2mqtt"
+      "/srv/backup/agent-turns"
     ];
     timerConfig = {
       OnCalendar = "*-*-* 03:28:00";

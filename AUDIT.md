@@ -30,9 +30,9 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 ## Ledger
 ### 2026-10-30 — agent turns: one token per holder, and the mirror that nearly ate them
 - **One token per holder, so a revocation is one holder.** `services.agentTurns.additionalTokens`
-  declares `-netbook`, `-muse` and `-muse1` beside the fleet token; the shim compares every name
+  declares `-netbook`, `-muse` and `-vesper` beside the fleet token; the shim compares every name
   without short-circuiting, and the append log names the one that authenticated
-  (`append token=agent-turns-token-muse1 source=vesper`), so a turn is attributable to a holder
+  (`append token=agent-turns-token-vesper source=vesper`), so a turn is attributable to a holder
   rather than to "someone with a token". Four distinct values, `0400 xs-agent-turns`, each reads
   `200`, a bogus bearer `401`.
 - **`modules/secrets.yaml` is a mirror, and writing to it fails silently.** `SECRETS=modules/secrets`
@@ -45,7 +45,8 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   `docs/agent-turns.md` had pointed rotation at the mirror, which is how it happened.
 - Evidence: drift gate green on 7 files including mirror-vs-source (both plaintexts
   `840dd35e76e570f9`); first turn from a non-fleet holder landed and read back —
-  `xs-endpoint:vesper-first-turn`, frame `9fa45743`, 21:13:54Z, authenticated by the muse1 token.
+  `xs-endpoint:vesper-first-turn`, frame `9fa45743`, 21:13:54Z, authenticated by vesper's token
+  (minted as `-muse1`, renamed once the holder turned out to post as `vesper`).
 
 ### 2026-10-30 — an Always Free OCI demo with a private database
 - **OCI ignores `cpu_core_count` and `data_storage_size_in_tbs` on a free database.** `is_free_tier`

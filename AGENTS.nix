@@ -4795,7 +4795,43 @@
         The listener is unchanged — FTL keeps `127.0.0.1:8080`, and nothing widens the bind.
 
         **Prove it.** `for p in /admin /admin/ /admin/queries; do curl -sk -o /dev/null -w "%{http_code} "
-        https://pihole.frieren.lan$p; done` prints `200 200 200`.
+        https://pihole.frieren.lan$p; done` prints        `200 200 200`.
+      '';
+    };
+    lfm3-shell-project = {
+      title = "lfm3-shell — a fine-tune measured up to the GPU and no further";
+      kind = "open";
+      status = "BLOCKED";
+      priority = "P2";
+      date = "2026-10-30";
+      summary = "A nushell next-command fine-tune in `~/work/lfm3-shell` on delphi: dataset, baselines, QLoRA and GGUF pipeline all run and measured, and the one missing piece is GPU time — every GPU limit reads 0 on this trial tenancy.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/sops.nix"];
+        docs = ["docs/sops-rekey.md"];
+      };
+      body = ''
+        **Where.** `~/work/lfm3-shell` on delphi, and deliberately not a git repo yet: the
+        artifact is the measurement, so the status is this note rather than a commit.
+
+        **Built and run.** `build_dataset.py` (atuin → 6,147 train / 300 eval300, redacted),
+        `run_score.sh` + `compare.py` (each model's own chat template, 300 held-out items),
+        `train_qlora.py --dry-run` (data path checked without torch), `make_gguf.sh`,
+        `orchestrate.sh` (launch → transfer → train → stop box → score here), `oci-gpu.sh`.
+
+        **What the numbers already settle.** LFM3-1.7B is the wrong base: 1.3 % exact against
+        4.0 % for a 0.5B Qwen2.5-Coder, at 1.8x the latency. A fine-tune has to clear 8.7 %
+        acceptable (the 0.5B base); under 4.7 % it loses to a BM25 `grep`.
+
+        **Blocker, named.** `oci limits value list` reports 0 for every GPU shape while
+        `standard-a1-core-count` reads 41, so the API answers and the quota is absent — no
+        trial tenancy rents a GPU. The A1 fallback measured 4 tok/s → 47 h/epoch, which makes
+        CPU a non-option rather than a slow one. Either the account upgrades to PAYG (an
+        operator UI action, not a code change) or the box is rented elsewhere.
+
+        **Exit.** A tuned Q4_K_M scored here on eval300 and reported next to base
+        (`./run_score.sh tuned-q4 … && python3 compare.py out/qwen05-base.json out/tuned-q4.json`);
+        if it lands under 8.7 % acceptable, set REJECTED with that number.
       '';
     };
   };

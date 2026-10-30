@@ -19,6 +19,11 @@ vars:
   PYANY_SITE: "https://jisifu.pythonanywhere.com"
   PYANY_API: "https://www.pythonanywhere.com/api/v0/user/jisifu"
   PYANY_ROOT: "/home/jisifu/pythonanywhere"
+  PYANY_DEPLOY_DESC: "pyany-deploy"
+  # PYANY_DEPLOY_HOUR is deliberately NOT declared here: a declared var shadows
+  # the CLI value, so `PYANY_DEPLOY_HOUR=15 task ...:install` silently created a
+  # 03:00 task. The cmd reads it with `| default "3"` instead.
+  PYANY_DEPLOY_CMD: "cd /home/jisifu/pythonanywhere && git fetch https://github.com/shaoyanji/pythonanywhere.git master && git merge --ff-only FETCH_HEAD && /home/jisifu/.local/bin/pa webapp reload"
 
 tasks:
   pythonanywhere:status:
@@ -146,3 +151,70 @@ tasks:
         TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
         echo "=== download $REMOTE -> $LOCAL ==="
         curl -sS -m 60 -H "Authorization: Token $TOKEN" -o "$LOCAL" -w '[HTTP %{http_code}]\n' "{{.PYANY_API}}/files/path${REMOTE}?raw=1"
+
+  pythonanywhere:schedule:install:
+    desc: Install the daily console-free deploy — git fetch + fast-forward + web app reload, on the host's own clock
+    summary: >
+      Creates a PythonAnywhere scheduled task (daily, PYANY_DEPLOY_HOUR UTC,
+      default 03:00) running PYANY_DEPLOY_CMD, replacing any task already
+      described as PYANY_DEPLOY_DESC so the command stays one fact. The fetch
+      uses the public HTTPS URL rather than origin: no deploy key to register
+      and no known_hosts dependency, which a non-interactive run cannot satisfy.
+      Free-tier tasks expire every 4 weeks — the extend URL is the web UI, not
+      an API route, so renewing is a browser click.
+    cmds:
+      - |
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        DESC="{{.PYANY_DEPLOY_DESC}}"
+        echo "=== removing any existing task described as $DESC ==="
+        for id in $(curl -sS -m 20 -H "Authorization: Token $TOKEN" {{.PYANY_API}}/schedule/ | jq -r --arg d "$DESC" '.[] | select(.description == $d) | .id'); do
+          curl -sS -m 20 -X DELETE -H "Authorization: Token $TOKEN" "{{.PYANY_API}}/schedule/$id/" -w "  removed $id [%{http_code}]\n"
+        done
+        echo "=== creating the daily task ==="
+        BODY=$(jq -nc --arg c '{{.PYANY_DEPLOY_CMD}}' --arg d "$DESC" --argjson h {{.PYANY_DEPLOY_HOUR | default "3"}} \
+          '{command: $c, enabled: true, interval: "daily", hour: $h, minute: 0, description: $d}')
+        OUT=$(curl -sS -m 20 -X POST -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d "$BODY" -w '\n%{http_code}' {{.PYANY_API}}/schedule/)
+        CODE=$(echo "$OUT" | tail -n 1); JSON=$(echo "$OUT" | head -n -1)
+        echo "HTTP $CODE"
+        if [ "$CODE" != "201" ]; then echo "$JSON"; exit 1; fi
+        echo "$JSON" | jq -r '"  id:        \(.id)\n  runs:      \(.printable_time) UTC, \(.interval)\n  expires:   \(.expiry)\n  log:       \(.logfile)\n  command:   \(.command)"'
+        echo
+        echo "Renew with the extend URL in the dashboard before the expiry date."
+
+  pythonanywhere:schedule:show:
+    desc: List scheduled tasks and tail the deploy task's own log
+    summary: >
+      GET /schedule/ plus the task's logfile over the files API. The log is the
+      only place a scheduled run reports itself: a pull that fails on a merge
+      conflict writes here and nowhere else, so a green web app proves nothing
+      about the last deploy attempt.
+    cmds:
+      - |
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        echo "=== scheduled tasks ==="
+        LIST=$(curl -sS -m 20 -H "Authorization: Token $TOKEN" {{.PYANY_API}}/schedule/)
+        echo "$LIST" | jq -r 'if length == 0 then "  none" else (.[] | "  \(.id)  \(.printable_time) \(.interval)  enabled=\(.enabled)  expires=\(.expiry)  \(.description)") end'
+        ID=$(echo "$LIST" | jq -r --arg d '{{.PYANY_DEPLOY_DESC}}' '.[] | select(.description == $d) | .id' | head -1)
+        if [ -z "$ID" ]; then
+          echo "no task described as {{.PYANY_DEPLOY_DESC}}"
+        else
+          echo
+          echo "=== deploy task log (id $ID), last {{.PYANY_LINES | default "40"}} lines ==="
+          curl -sS -m 30 -H "Authorization: Token $TOKEN" "{{.PYANY_API}}/files/path/var/log/schedule-log-$ID.log?raw=1" | tail -n {{.PYANY_LINES | default "40"}}
+        fi
+
+  pythonanywhere:schedule:remove:
+    desc: Delete the console-free deploy task, leaving the web app running
+    summary: >
+      DELETEs every scheduled task described as PYANY_DEPLOY_DESC. It removes
+      the deploy timer only: the checkout, the web app and the current code are
+      untouched, so this is the revert for a scheduled deploy you no longer want.
+    cmds:
+      - |
+        TOKEN=$(sops -d {{.SECRETS}}/{{.ENC_ENVS}} | yq -r '.PYTHONANYWHERE.API.TOKEN')
+        DESC="{{.PYANY_DEPLOY_DESC}}"
+        IDS=$(curl -sS -m 20 -H "Authorization: Token $TOKEN" {{.PYANY_API}}/schedule/ | jq -r --arg d "$DESC" '.[] | select(.description == $d) | .id')
+        if [ -z "$IDS" ]; then echo "no task described as $DESC"; exit 0; fi
+        for id in $IDS; do
+          curl -sS -m 20 -X DELETE -H "Authorization: Token $TOKEN" "{{.PYANY_API}}/schedule/$id/" -w "  removed $id [%{http_code}]\n"
+        done

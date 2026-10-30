@@ -79,36 +79,12 @@ is_alive() {
 # every other kg script, so this adds no new tool.
 enc() { jq -rn --arg s "$1" '$s | @uri'; }
 
-resolve_elixir() {
-  if [ -n "${KG_ELIXIR:-}" ]; then
-    printf '%s' "$KG_ELIXIR"
-    return 0
-  fi
-  if command -v elixir >/dev/null 2>&1; then
-    command -v elixir
-    return 0
-  fi
-  # --offline: fail fast instead of fetching; --builders "": never dispatch to a
-  # remote builder. A missing interpreter is reported, not compiled. `nix build
-  # --print-out-paths` prints the STORE DIRECTORY, so the binary is /bin/elixir
-  # inside it — handing the directory to `setsid nohup` fails with EACCES.
-  local out
-  # Already in the store (a previous run, or the devshell's environment): reuse
-  # it, so a warm machine never invokes nix at all. `--offline` makes this a pure
-  # lookup that fails fast instead of reaching the network.
-  local out
-  out="$(nix build --no-link --offline --builders "" --print-out-paths nixpkgs#beamPackages.elixir 2>/dev/null | head -1)"
-  if [ -z "$out" ]; then
-    # Not present yet: SUBSTITUTE it. Elixir is on cache.nixos.org, so this is a
-    # download; `--builders ""` is what stops a miss from becoming a build on
-    # someone's bill. `nix develop` in the repo does the same thing repeatedly,
-    # off the same store path.
-    say "elixir not in the store; substituting nixpkgs#beamPackages.elixir (one-off)"
-    out="$(nix build --no-link --builders "" --print-out-paths nixpkgs#beamPackages.elixir 2>/dev/null | head -1)"
-  fi
-  [ -n "$out" ] && printf '%s' "$out/bin/elixir"
-  return 0
-}
+# Sourcing the shared resolver instead of carrying a second copy: the copy
+# drifted once (the two agreed only because both were wrong in the same way),
+# and a GC-rooted out-link under ~/.cache/nixconfig-kg/ means a host without a
+# devshell pays nix once rather than on every query.
+# shellcheck source=lib/kg-elixir.sh
+. "$REPO/scripts/task/lib/kg-elixir.sh"
 
 wait_ready() {
   for _ in {1..75}; do
@@ -125,7 +101,7 @@ start_daemon() {
   fi
 
   local elixir_bin graph
-  elixir_bin="$(resolve_elixir)" || true
+  elixir_bin="$(kg_resolve_elixir)" || true
   if [ -z "$elixir_bin" ] || [ ! -x "$elixir_bin" ]; then
     say "no Elixir interpreter available offline (set KG_ELIXIR=/path/to/elixir)."
     say "Refusing to build one from a read path."

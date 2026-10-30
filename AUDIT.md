@@ -46,6 +46,19 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   a build over the public URL (`201`/`200`), `401` with no token and with a forged one, `400` on a bad
   hash, CORS preflight `200`, direct S3 `403` (OAC only), CloudFront serving the injected page.
 
+### 2026-10-30 — OCI CLI credentials come from sops, not a hand-made `~/.oci`
+- **The credential survives the instance.** `modules/sops.nix` renders `~/.oci/config` (0600)
+  from four `oci/*` secrets and writes `~/.oci/oci_api_key.pem` (0600), the same shape as
+  `~/.aws/credentials`, so a fresh host authenticates without a copy step.
+- **The five values are one unit** — a fingerprint from one keypair against another key file
+  reads as `NotAuthenticated` and names neither half — so the doc's rotation procedure
+  replaces both, in `modules/secrets.yaml` and the submodule mirror.
+- **The template is 0600** because the CLI warns "Permissions on <config> are too open" on
+  every command at 0644.
+- Evidence: authenticated from a config assembled only from decrypted sops values
+  (`oci iam region list`); PEM round-trips byte-identical to the key on disk; `task
+  checks:sops:drift` green with the mirror check; `task checks:host HOST=delphi` rc=0, 8.2 s.
+
 ### 2026-10-29 — the fleet docs answer over Gemini on 1965
 - **One projection, two protocols.** `hosts/frieren/gemini.nix` runs molly-brown on
   `gemini.frieren.lan:1965` serving `lib/gemtext.nix`'s conversion of the same markdown the HTTP site

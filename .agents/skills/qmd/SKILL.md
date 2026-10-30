@@ -82,7 +82,7 @@ The fleet maintains 9 indexed collections across `/Volumes/data`:
 
 | Collection | Target Path | Pattern | Description |
 |---|---|---|---|
-| `vault` | `/Volumes/data/projects/Obsidian-Git-Sync` | `**/*.md` | Personal Obsidian vault: zettels, schematics, notes, and research |
+| `vault` | `~/vaults/personal` (NAS link → `/Volumes/data/Obsidian-Git-Sync`; a `cloud` host gets a git checkout) | `**/*.md` | Personal Obsidian vault: zettels, schematics, notes, and research |
 | `nixconfig` | `/Volumes/data/projects/nixconfig` | `**/*.md` | Nix flake documentation, host architecture, and runbooks |
 | `offlinebooks` | `/Volumes/data/books/markdown` | `**/*.md` | Academic papers, textbooks, and technical books |
 | `skills` | `/home/devji/.hermes/skills` | `**/*.md` | Hermes and Antigravity agent operational skills |

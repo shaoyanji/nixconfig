@@ -762,7 +762,7 @@ skill carries the bare-`qmd` one-liner). Three canonical collections:
 | Collection  | Target Path                                              | Content                                                                                 |
 | ----------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `nixconfig` | `/srv/data/projects/nixconfig` (`~/Documents/nixconfig`) | This repo's documentation: README, AGENTS.md, runbooks, `docs/*`, `taskfiles/README.md` |
-| `vault`     | `/Volumes/data/Obsidian-Git-Sync` (`~/vaults/personal`)  | Personal Obsidian vault: zettels, schematics, notes                                     |
+| `vault`     | `~/vaults/personal` (NAS link → `/Volumes/data/Obsidian-Git-Sync`; a `cloud` host gets a git checkout of the same repo) | Personal Obsidian vault: zettels, schematics, notes |
 | `skills`    | `~/.hermes/skills/`                                      | Agent skills indexed for BM25 search                                                    |
 
 ### Index lifecycle

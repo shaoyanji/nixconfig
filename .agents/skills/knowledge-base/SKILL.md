@@ -23,7 +23,7 @@ why "I searched and found nothing" keeps happening.
 | **Compiled truth** | `inventory.toml`, `modules.toml`, `.agents/skills`, flake wiring | `nix eval .#…` (0.1–2 s) | exactly the deployed tree |
 | **Prose** | `AGENTS.md`, `MANUAL.md`, `docs/`, runbooks, skills | `qmd search` (BM25, `-c nixconfig`) | as of the last index |
 | **Episodic** | sentinel ledger, journald, generations, restic runs | `task ops:ledger`, `journalctl` | live |
-| **Personal** | Obsidian vault (`/Volumes/data/Obsidian-Git-Sync`) | `qmd search -c vault`, direct read | as of the last sync |
+| **Personal** | Obsidian vault (`~/vaults/personal`) | `qmd search -c vault`, direct read | as of the last sync |
 
 A **design record** sits beside these: `AGENTS.nix` (`.agents/notes`) and its
 lineage. It answers "has this been tried, and what did it come out of?" —
@@ -199,9 +199,10 @@ The diagnosis is **discoverability and write-path**, not search:
    vault. `ai-memory` captures pages, but nothing mirrors them to Obsidian.
 2. **Two vocabularies.** Repo docs say `HOST=`, `checks:host`; vault notes say
    "frieren rebuild". BM25 over one collection cannot bridge that.
-3. **The vault is mounted, not owned.** `/Volumes/data/Obsidian-Git-Sync` is
-   NFS; an agent writing there from a host without the mount silently fails or
-   writes to a local path.
+3. **The vault's route is `~/vaults/personal`, and it differs by host kind.** On
+   a NAS host it is a home-manager symlink onto NFS; on a `category = "cloud"`
+   host it is a git checkout of the same repo. Either way, hard-coding
+   `/Volumes/data` points an agent at a path that is not mounted there.
 
 The proposed fix (note `p2-vault-write-path`): a `vault-sync` timer that exports
 `ai-memory` pages + `docs/history/` into `Obsidian-Git-Sync/inbox/` with a

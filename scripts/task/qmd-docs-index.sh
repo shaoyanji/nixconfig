@@ -8,10 +8,15 @@ set -euo pipefail
 MODE="${1:-ensure}"
 TARGET="${2:-all}"
 REPO="$(git rev-parse --show-toplevel)"
-VAULT_DIR="/Volumes/data/Obsidian-Git-Sync"
-if [ ! -d "$VAULT_DIR" ] && [ -d "$HOME/vaults/personal" ]; then
-  VAULT_DIR="$(readlink -f "$HOME/vaults/personal" 2>/dev/null || echo "$HOME/vaults/personal")"
-fi
+# `~/vaults/personal` is the canonical route on every kind of host, and it is
+# declared rather than assumed:
+#   - a NAS host gets it as a home-manager symlink to /Volumes/data/Obsidian-Git-Sync
+#     (modules/nixoshmsymlinks.nix, which is off only for category = "cloud"),
+#   - a cloud host gets a git checkout of the same repo (delphi-seed-workspace).
+# /Volumes/data is the symlink's *target*, not the name to hard-code: naming the
+# NAS path first is what made the vault look absent on a host holding all 300
+# notes, and `readlink -f` on an unmounted link returns the target anyway.
+VAULT_DIR="$HOME/vaults/personal"
 # The published blog is a collection of its own: an article that shipped is a
 # fact someone will search for later, and it lives outside this repo.
 BLOG_DIR="/home/devji/Documents/shaoyanji.is-a.dev"
@@ -80,6 +85,9 @@ ensure_single() {
   local mask="${4:-**/*.md}"
   if [ ! -d "$path" ]; then
     echo "WARN  directory '$path' not found for collection '$name', skipping"
+    if [ -L "$path" ]; then
+      echo "       $path -> $(readlink "$path"): the declared link, whose NAS target is not mounted on this host"
+    fi
     return 0
   fi
   if have_collection "$name"; then
@@ -111,6 +119,9 @@ check_single() {
   local path="$2"
   if [ ! -d "$path" ]; then
     echo "WARN  directory '$path' not found for collection '$name'"
+    if [ -L "$path" ]; then
+      echo "       $path -> $(readlink "$path"): the declared link, whose NAS target is not mounted on this host"
+    fi
     return 0
   fi
   if ! have_collection "$name"; then

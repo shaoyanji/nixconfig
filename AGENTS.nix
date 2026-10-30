@@ -4869,5 +4869,57 @@
         on-demand shell and the Basic-auth header, because Chrome drops credentials in a URL).
       '';
     };
+    agent-turns-xs-endpoint = {
+      title = "agent.turns on delphi — a tailnet-only xs log the shim keeps append-only";
+      kind = "decision";
+      status = "DELIVERED";
+      date = "2026-10-30";
+      summary = "cablehead xs 0.14.2 on delphi, Unix socket only, behind a bearer-authenticated shim that owns dedup and forbids update/delete, mounted on the tailnet at 8449 so agents can check claims and base commits before they edit.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/services/agent-turns.nix" "modules/services/agent-turns/shim.py" "hosts/delphi/configuration.nix"];
+        docs = ["docs/agent-turns.md" "AGENTS.md"];
+        tasks = ["infra:xs:export" "checks:host"];
+      };
+      body = ''
+        **Why a shim and not xs directly.** xs 0.14.2 documents no Authorization
+        header and no 401, and it ships DELETE and `/import` on the same socket, so
+        an exposed xs would be a network-reachable erase. The shim is the only
+        surface: POST /v1/events and GET /v1/events, bearer token from sops, no
+        update or delete route at all (405), and the store is owner-only so no
+        local user can bypass it either.
+
+        **Dedup is ours.** xs generates frame ids and documents no client-UUID
+        key, so the shim keeps `uuid → frame id` in sqlite next to the store: a
+        retried post returns the stored id with 200 instead of a second entry.
+
+        **Schema.** `agent.turns` holds one small entry per turn, keyed by
+        filename `<repo>:<task-id>` in `subject` so `?repo=` filters without
+        scanning values; unknown keys are rejected, which is what keeps a
+        transcript out. Nothing about it changes merge authority.
+      '';
+    };
+    agent-turns-backup-cadence = {
+      title = "agent.turns backup — the export hook exists, the cadence is Joiu's call";
+      kind = "open";
+      status = "OPEN";
+      date = "2026-10-30";
+      summary = "`task infra:xs:export OUT=<dir>` writes frames.jsonl plus cas/ from the agent-turn store, the dump shape `xs import` restores; how often it runs and where it lands is undecided on purpose.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["scripts/task/xs-agent-turns-export.sh" "taskfiles/infra.yml"];
+        tasks = ["infra:xs:export"];
+      };
+      body = ''
+        The hook is callable and documented; it schedules nothing and picks no
+        target, because a guessed cadence is a promise nobody measured. OUT must
+        not exist, so a run can never overwrite an earlier export.
+
+        **Exit.** Either a timer with a target host, or a recorded REJECTED if the
+        store is deemed reproducible enough not to back up. `xs cat` needs a pipe
+        and `xs import` takes one frame per call — the restore loop is in the
+        script header.
+      '';
+    };
   };
 }

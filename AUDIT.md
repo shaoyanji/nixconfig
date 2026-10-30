@@ -28,6 +28,24 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-30 — a NixOS build tracker runs on Always-Free AWS alone
+- **The artifact is the reproducible unit, not the host.** `projects/nix-build-tracker/flake.nix`
+  compiles the Go API to a static `linux/amd64` `bootstrap` in `installPhase` — `buildGoModule` pins
+  `GOOS`/`GOARCH` to the build host and `go install` relocates a cross build to `bin/linux_amd64/` —
+  then zips it with normalised mtimes, so `nix build --rebuild` reproduces the same store path on
+  this aarch64 machine.
+- **A Function URL with `AuthType=NONE` still 403s without two resource-policy statements:**
+  `InvokeFunctionUrl` keyed on `lambda:FunctionUrlAuthType` and `InvokeFunction` keyed on
+  `InvokedViaFunctionUrl`. The CLI creates neither, and the first alone never reaches the function.
+- **This account cannot honour a reserved-concurrency guard.** Its Lambda ceiling is 10 in every
+  region (AWS default 1000) and a reservation may not leave fewer than 10 unreserved, so
+  `deploy.sh` reports the 5-execution guard as unapplied and exits 1 after finishing everything else;
+  Service Quotas refuses any value at or below the 1000 default, so only AWS support can lift it.
+- Evidence: `deploy.sh` run twice from `nix develop` and idempotent throughout (budget, table 5/5 ACTIVE,
+  pool/client/domain, role, function, bucket, distribution reused); a real Cognito user saved and listed
+  a build over the public URL (`201`/`200`), `401` with no token and with a forged one, `400` on a bad
+  hash, CORS preflight `200`, direct S3 `403` (OAC only), CloudFront serving the injected page.
+
 ### 2026-10-29 — the fleet docs answer over Gemini on 1965
 - **One projection, two protocols.** `hosts/frieren/gemini.nix` runs molly-brown on
   `gemini.frieren.lan:1965` serving `lib/gemtext.nix`'s conversion of the same markdown the HTTP site

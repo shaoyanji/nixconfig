@@ -75,10 +75,10 @@ in {
             RemainAfterExit = true;
             ExecStart = "${pkgs.writeShellScript "fleet-classification-check-${host}" ''
               set -uo pipefail
-              export NIX_CONFIG="experimental-features = nix-command flakes"
+              export NIX_CONFIG="experimental-features = nix-command flakes pipe-operators"
               # One fetch before the first deref: a network hiccup during the first
               # evaluation is not drift, and it failed a host on 2026-10-24.
-              nix flake metadata ${cfg.flakeRef} >/dev/null
+              ${config.nix.package}/bin/nix flake metadata ${cfg.flakeRef} >/dev/null
               # `--builders ""` because the check is a local echo and a gate must be
               # unable to spend remote build seconds (AGENTS.md).
               exec ${config.nix.package}/bin/nix build \

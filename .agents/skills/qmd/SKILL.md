@@ -18,16 +18,31 @@ Index once, search fast.
 
 ## Where the binary comes from
 
-qmd is packaged through **llm-agents.nix** (upstream: tobi/qmd) and is
-already installed fleet-wide — it is in `modules/user/ai/default.nix`
-as `pkgs.llm-agents.qmd` (CUDA explicitly disabled so ares's
-`cudaSupport = true` does not drag `cudaPackages` into every closure).
+qmd is packaged through **llm-agents.nix** (upstream: tobi/qmd) and is wired in
+`modules/user/ai/default.nix` as `pkgs.llm-agents.qmd` (CUDA explicitly disabled
+so ares's `cudaSupport = true` does not drag `cudaPackages` into every closure).
 No bun/npm install needed; the session-skill's `bun install -g` route
 does NOT apply on these hosts.
 
+**It is not on every host's PATH.** `delphi` carries the agents but not qmd
+(measured 2026-10-30), so `command: not found` is not an answer — the tasks
+resolve the binary themselves:
+
 ```bash
-nix build .#nixosConfigurations.<host>.pkgs.llm-agents.qmd   # build/refetch
-command -v qmd                                               # present on hosts
+task dev:qmd:docs:refresh   # register + index; resolves qmd, no PATH needed
+task checks:qmd:docs        # gate: resolvable, registered, index fresh
+```
+
+`scripts/task/qmd-docs-index.sh` is the single resolver: `QMD_BIN`, then PATH,
+then the **llm-agents revision pinned in `flake.lock`**, built once into
+`~/.cache/nixconfig-qmd/qmd` (GC-rooted, `--builders ""` so resolving a tool
+never spends remote build budget). For a bare `qmd` call outside those tasks,
+take it from a shell at the same pin — not `nix run …#qmd` at upstream HEAD,
+which drifts from the lock:
+
+```bash
+nix shell "$(jq -r '.nodes["llm-agents"].locked | "github:\(.owner)/\(.repo)/\(.rev)"' flake.lock)#qmd" \
+  -c qmd search "impermanence disko" -c nixconfig
 ```
 
 ## Memory hierarchy (decide by jev before acting)

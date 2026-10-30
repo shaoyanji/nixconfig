@@ -58,6 +58,16 @@ qmd search "zettel" -c vault
 Escalate only when the previous rung answered nothing: vault → wiki (qmd) →
 ai-memory (deep, jev-gated). Do not start at an LLM.
 
+`qmd: command not found` is not "no wiki" — not every host has it on PATH
+(`delphi`, measured 2026-10-30). The tasks resolve it
+(`scripts/task/qmd-docs-index.sh`: `QMD_BIN`, PATH, then the lock pin); for a
+bare search, take it from the same pin in a shell:
+
+```bash
+nix shell "$(jq -r '.nodes["llm-agents"].locked | "github:\(.owner)/\(.repo)/\(.rev)"' flake.lock)#qmd" \
+  -c qmd search "impermanence disko" -c nixconfig
+```
+
 ## 3. Structural search: the graph, not grep
 
 `.#knowledgeGraph` compiles nodes (hosts, skills, docs, tags) and edges

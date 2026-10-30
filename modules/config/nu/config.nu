@@ -30,3 +30,28 @@ $env.config = {
     }
   }
 }
+
+# starship: a repo on the NAS automount answers `git status` in seconds, and
+# starship has no per-directory module switch. STARSHIP_CONFIG is that switch —
+# the prompt re-reads it on every render — so point it at the config without
+# `git_status` while the cwd is under the mount. Bash twin:
+# modules/shell/default.nix.
+#
+# A `pre_prompt` hook, not `env_change.PWD`: it runs on every prompt (before
+# starship's PROMPT_COMMAND draws) so no `cd` hook has to fire and nothing can go
+# stale, and `load-env` inside a hook block is preserved — the direnv integration
+# in the generated config uses exactly this hook type and this call.
+def _starship_config_for [pwd: string] {
+  if $pwd == "/Volumes/data" or ($pwd | str starts-with "/Volumes/data/") {
+    $"($env.HOME)/.config/starship-no-git.toml"
+  } else {
+    $"($env.HOME)/.config/starship.toml"
+  }
+}
+
+$env.config.hooks = ($env.config.hooks? | default {})
+$env.config.hooks.pre_prompt = (
+  $env.config.hooks.pre_prompt?
+  | default []
+  | append {|| load-env {STARSHIP_CONFIG: (_starship_config_for $env.PWD)} }
+)

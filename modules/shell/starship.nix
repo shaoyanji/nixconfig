@@ -1,5 +1,10 @@
 # starship: one prompt config for every shell the fleet runs.
-{lib, ...}: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   programs.starship = {
     enable = true;
     # Configuration written to ~/.config/starship.toml
@@ -36,11 +41,14 @@
 
       add_newline = true;
       follow_symlinks = false;
-      # Repos that live on the NAS (/Volumes/data, NFS from a client) answer
-      # `git status` in seconds, not milliseconds: at the 1000 ms default Starship
-      # aborts with "Executing command \"git\" timed out" on every prompt there.
-      # 5 s is below a human noticing a slow prompt, above a cold NFS lookup.
-      command_timeout = 5000;
+      # 1 s per spawned module command, not the 5 s this used to allow.
+      # What it does NOT cover, measured on 1.26: `git_status` runs in-process
+      # with gitoxide — the only git subprocesses a prompt spawns are `git config`
+      # and `git for-each-ref` — so this value cannot bound a slow status walk.
+      # The NAS mount is handled by not running that module there at all
+      # (`starship-no-git.toml` below); this keeps the commands that *are* spawned
+      # from parking a prompt behind a hung mount.
+      command_timeout = 1000;
       continuation_prompt = "[∙ ](dimmed overlay0)";
 
       format = lib.concatStrings [
@@ -155,4 +163,17 @@
       };
     };
   };
+
+  # The one module that walks a worktree, projected out for the mounts where that
+  # walk is a network round trip per directory. Generated from the real settings
+  # so the two prompts can never drift; only `git_status` is dropped, so a NAS
+  # repo still shows its branch. Selected per directory by STARSHIP_CONFIG
+  # (bash hook: modules/shell/default.nix, nu hook: modules/config/nu/config.nu).
+  home.file.".config/starship-no-git.toml".source = let
+    settings = config.programs.starship.settings;
+  in
+    (pkgs.formats.toml {}).generate "starship-no-git.toml" (settings
+      // {
+        git_status = (settings.git_status or {}) // {disabled = true;};
+      });
 }

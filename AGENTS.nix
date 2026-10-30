@@ -4834,5 +4834,40 @@
         if it lands under 8.7 % acceptable, set REJECTED with that number.
       '';
     };
+    llm-agents-toolbox = {
+      title = "Agent CLIs come from llm-agents.nix — installed on the full tier, one nix shell away everywhere else";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-10-30";
+      summary = "`pkgs.llm-agents.<name>` (agent-browser, qmd, toon, pdfvision, reasonix, parallel-cli) is the source for agent tooling, installed only on the `full` AI tier because agent-browser drags in a ~700 MiB Chromium. \"Not installed\" is not \"not available\": the flake is prebuilt on cache.numtide.com, so `nix shell github:numtide/llm-agents.nix#<name>` is ~17 s cold and instant warm.";
+      refs = {
+        modules = ["modules/user/ai/default.nix" "flake/module-sets.nix"];
+        docs = [".agents/skills/agent-browser/SKILL.md"];
+      };
+      body = ''
+        The overlay is wired in `flake/module-sets.nix`; consumers name the package
+        `pkgs.llm-agents.<name>`, and `modules/user/ai/default.nix` gates the heavy half of the
+        suite on `profiles.ai.tier == "full"` so mobile clients (aristotle) keep the light set.
+
+        What that means for an agent, and the reason this note exists: a skill naming a tool is
+        not evidence the tool is on PATH. Check first, then run it from the flake instead of
+        substituting hand-rolled curl for the tool's own job — measured 2026-10-30, when
+        agent-browser was absent on this host but available in ~17 s (`agent-browser 0.41.0`).
+
+        ```bash
+        nix shell --option builders "" github:numtide/llm-agents.nix#agent-browser \
+          -c agent-browser open https://example.com
+        ```
+
+        `--option builders ""` matters: a cache hit is free, but the same command without it
+        can dispatch a compile to nixbuild.net and spend the month's budget.
+
+        The repo does not re-export the packages — `packages.<system>` is
+        `{artifacts, cli, servers, sites}` — so there is no `.#llm-agents.*` shortcut; ad-hoc
+        runs use the `github:` form while the `llm-agents` flake input keeps host closures on
+        the same revision. Tool procedures live in one skill each (`agent-browser` covers the
+        on-demand shell and the Basic-auth header, because Chrome drops credentials in a URL).
+      '';
+    };
   };
 }

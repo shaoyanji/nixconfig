@@ -91,6 +91,10 @@ includes:
         taskfile: taskfiles/moto.yml
         dir: .
         flatten: true
+    neocities:
+        taskfile: taskfiles/neocities.yml
+        dir: .
+        flatten: true
     ops:
         taskfile: taskfiles/ops.yml
         dir: .

@@ -22,6 +22,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/checks.yml` – validation and smoke checks (incl. `checks:tasks` task-graph gate, `checks:host`, `checks:flake:transitive`)
 - `taskfiles/dev.yml` – git workflows, flake updates, site deployment, and the generated docs pipeline (`docs:build` / `docs:site` / `docs:sync`)
 - `taskfiles/moto.yml` – Motorola Android (Termux) shell, file transfers, and Charmbracelet Wish/Gum menu
+- `taskfiles/neocities.yml` – dragoncourt.neocities.org: gum post authoring (new/edit/publish/draft/delete), listing + feed render, preview and deploy
 - `taskfiles/serv00.yml` – Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle (jisifu.serv00.net), and Gum menu
 - `taskfiles/dragoncourt.yml` – Alwaysdata Debian hosting, PHP/Wasm webserver (dragoncourt.alwaysdata.net), and Gum menu
 - `taskfiles/envs.yml` – Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline (jisifu.envs.net), and Gum menu

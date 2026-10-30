@@ -1,5 +1,0 @@
-// Copy to backend.hcl and fill in from `terraform -chdir=bootstrap output`.
-// bucket and namespace cannot come from environment variables.
-bucket    = "oafdemo-tfstate"
-namespace = "your-object-storage-namespace"
-region    = "us-ashburn-1"

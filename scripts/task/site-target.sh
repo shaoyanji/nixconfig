@@ -115,6 +115,10 @@ run_deploy() {
       echo "Deploying '$target' with rsync to '$deploy_target' from '$output_path/'"
       rsync -av --delete "$output_path"/ "$deploy_target"
       ;;
+    neocities)
+      echo "Deploying '$target' to Neocities site '$deploy_target' from '$output_path/'"
+      bash "$SCRIPT_DIR/neocities-push.sh" "$output_path"
+      ;;
     *)
       error "Unsupported deployMethod '$deploy_method' for target '$target'"
       exit 1

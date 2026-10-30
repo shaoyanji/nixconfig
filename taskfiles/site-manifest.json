@@ -26,6 +26,16 @@
       "deployMethod": "rsync",
       "deployTarget": "dragoncourt:~/www/"
     },
+    "neocities": {
+      "kind": "static",
+      "description": "Hand-written cyberpunk blog on dragoncourt.neocities.org",
+      "buildCommand": "bash scripts/task/neocities-push.sh --preflight",
+      "outputPath": "projects/neocities-dragoncourt/site",
+      "deployMethod": "neocities",
+      "deployTarget": "dragoncourt.neocities.org",
+      "previewBind": "127.0.0.1",
+      "previewPort": 8080
+    },
     "envs": {
       "kind": "nginx-spa",
       "description": "Envs.net Debian pubnix website (jisifu.envs.net)",

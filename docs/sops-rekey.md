@@ -33,6 +33,27 @@ Both files are sops-encrypted in the tree — `sops:` metadata plus `ENC[AES256_
 values — so a plaintext commit is a gate failure, not a review question:
 [[flake/policies.nix#secrets-are-encrypted]]
 
+## OCI CLI credentials
+
+`modules/sops.nix` renders `~/.oci/config` (0600) from `oci/{user,tenancy,fingerprint,region}`
+and writes the private key to `~/.oci/oci_api_key.pem` (0600), so a host has a working `oci`
+after activation — the same shape as `~/.aws/credentials`. Nothing in `~/.oci` is hand-made
+any more, and a file left there by hand is replaced (home-manager keeps it as `.hm-bak`).
+
+The five values are **one unit**. `fingerprint` names a specific keypair, and a fingerprint
+from one pair against a key file from another authenticates as `NotAuthenticated` without
+saying which half is wrong, so rotating the key replaces both — in both files:
+
+```bash
+jq -Rn --rawfile k ~/.oci/oci_api_key.pem '$k | rtrimstr("\n")' \
+  | sops set modules/secrets.yaml '["oci"]["api"]["key"]' --value-stdin
+sops set modules/secrets.yaml '["oci"]["fingerprint"]' '"<fingerprint from the console>"'
+# repeat both against modules/secrets/secrets.yaml, then:
+task checks:sops:drift      # fails when the submodule mirror was skipped
+```
+
+The fingerprint is the one *My profile → API keys* shows for the key, not one you compute.
+
 ## SSH CA
 
 Servers trust one CA public key (`modules/ssh-ca.nix`); `ssh.ca.enable = true` is

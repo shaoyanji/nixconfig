@@ -49,6 +49,18 @@ in {
       "gmail" = {};
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};
+      # OCI CLI credentials. The private half and the fingerprint that names it
+      # travel together: a fingerprint from one keypair against a key file from
+      # another authenticates as "NotAuthenticated" with no hint which of the
+      # two is wrong, so both are declared here and rendered into one profile.
+      "oci/api/key" = {
+        path = "${config.home.homeDirectory}/.oci/oci_api_key.pem";
+        mode = "0600";
+      };
+      "oci/user" = {};
+      "oci/tenancy" = {};
+      "oci/fingerprint" = {};
+      "oci/region" = {};
       "openmeteo/api/key" = {};
       "neocities" = {};
       # Google OAuth client for calendar sync. `key` names the nested path in the
@@ -117,6 +129,19 @@ in {
         live_mode = false
         compact = false
       '';
+      # 0600 for the CLI's own check: it warns "Permissions on <config> are too
+      # open" on every command at 0644, and the file names the key it trusts.
+      "ociconfig" = {
+        content = ''
+          [DEFAULT]
+          user = ${config.sops.placeholder."oci/user"}
+          fingerprint = ${config.sops.placeholder."oci/fingerprint"}
+          tenancy = ${config.sops.placeholder."oci/tenancy"}
+          region = ${config.sops.placeholder."oci/region"}
+          key_file = ${config.home.homeDirectory}/.oci/oci_api_key.pem
+        '';
+        mode = "0600";
+      };
       "awscredentials".content =
         /*
         toml
@@ -171,6 +196,9 @@ in {
       ++ lib.optional useTpm pkgs.age-plugin-tpm;
     file = {
       ".aws/credentials".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."awscredentials".path}";
+      # ~/.oci, not ~/.config/oci: `oci` reads $HOME/.oci/config, and the Cloud
+      # Shell snippets and the SDKs all default to the same path.
+      ".oci/config".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."ociconfig".path}";
     };
   };
 }

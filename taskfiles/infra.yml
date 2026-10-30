@@ -1241,3 +1241,16 @@ tasks:
       Exit 1 = no hypervisor process (the tap may still linger; --stop clears it).
     cmds:
       - scripts/task/run-canary.sh --status
+
+  infra:xs:export:
+    desc: "Export the agent-turn xs store to a directory (OUT=/path; backup hook, cadence undecided)"
+    summary: >
+      Writes `frames.jsonl` plus `cas/` from the store at
+      /var/lib/xs-agent-turns/store — the dump shape `xs import` restores.
+      OUT must not exist (exit 1 otherwise), so an export never overwrites an
+      earlier one; exit 2 without OUT. The cadence and the target host are an
+      open decision, so this task makes the hook callable and schedules nothing.
+    requires:
+      vars: [OUT]
+    cmds:
+      - sudo scripts/task/xs-agent-turns-export.sh "{{.OUT}}"

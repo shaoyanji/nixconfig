@@ -1,0 +1,136 @@
+# Agent turns: the xs coordination endpoint on delphi
+
+An agent could only learn who was working on what from a chat report, which goes
+stale the moment someone opens a branch. This endpoint is the replacement: one
+small summary per agent turn, queryable by repo, subject and agent, so a claim
+can be checked before work starts and a merge can be checked against the turns
+that actually landed. It authorizes nothing — a builder still does not merge
+unless a task says so.
+
+Code: `modules/services/agent-turns.nix`, `modules/services/agent-turns/shim.py`.
+Exposure: `hosts/delphi/configuration.nix` (`services.servicePortal.mounts`).
+Protocol: `AGENTS.md` § "Agent turns", `docs/agent-context/HOME-PREAMBLE.md`.
+
+## Shape
+
+| Layer | What | Where |
+| :--- | :--- | :--- |
+| Store | `xs` 0.14.2 (`cross-stream`), topic `agent.turns`, ttl `forever` | `/var/lib/xs-agent-turns/store`, Unix socket `store/sock` |
+| Shim | Python 3 stdlib, bearer auth, schema + secret allowlist, dedup index | `127.0.0.1:8093`, `dedup.sqlite` beside the store |
+| Exposure | `tailscale serve --https=8449` → `http://127.0.0.1:8093` | `https://delphi.cloudforest-kardashev.ts.net:8449` |
+| Units | `xs-agent-turns.service`, `agent-turns-shim.service`, `tailscale-serve-agent-turns.service` | delphi |
+| Secret | `sops.secrets."agent-turns-token"` in `modules/secrets.yaml` | 0400, owner `xs-agent-turns` |
+
+The store is never exposed. `xs serve` runs without `--expose`, inside
+`PrivateNetwork=true`, with `RestrictAddressFamilies = ["AF_UNIX"]`, so there is
+no address it could listen on even if a flag changed. `xs` has no authentication
+of its own (verified: a bogus `Authorization: Bearer` header is ignored and the
+append returns 200) and it does expose `DELETE /{id}` and `POST /import`, which
+is why append-only is enforced by the shim's route table rather than promised by
+the store.
+
+## Shim API
+
+| Route | Result |
+| :--- | :--- |
+| `POST /v1/events` | `201` + `{"id": <frame id>}`; `200` + stored id when that client UUID already exists |
+| `GET /v1/events?repo=&subject=&source=&limit=` | `200` + `{"count","scanned","events"}`, newest first, `limit` 1–200 (default 50) |
+| `GET /healthz` | `200` + `{"ok":true}`, no auth |
+| anything else with `PUT`/`PATCH`/`DELETE` | `405` + `Allow: GET, POST` |
+
+`repo=` matches the prefix of `subject` before the first `:`, because the fixed
+schema carries the repo inside `subject` (`<repo>:<task-id>`) rather than in a
+field of its own. Entries come back with `_frame` added: the xs frame id, for
+cross-checking against `xs get`.
+
+Rejections: `401` missing or wrong bearer; `400` unknown field, missing field,
+bad UUID or timestamp, bad `outcome`, a blocked/failed outcome without its note,
+oversized body (16 KiB) or field, credential-shaped free text, and key material
+in any field. Error bodies name the field, never the value.
+
+## Turn schema
+
+```json
+{
+  "id": "9f1d3c8e-1111-4a2b-8c3d-4e5f60718293",
+  "ts": "2026-10-30T18:20:00Z",
+  "source": "buffy",
+  "kind": "turn",
+  "subject": "nixconfig:agent-turns",
+  "action": "added the shim and the tailnet mount",
+  "rationale": "coordination state must be queryable",
+  "base_commit": "2754b781",
+  "branch": "feat/agent-turns-xs-delphi",
+  "files_changed": ["modules/services/agent-turns/shim.py"],
+  "commits": [],
+  "outcome": "in_progress",
+  "claims": ["modules/services/agent-turns"]
+}
+```
+
+`outcome` is `done`, `in_progress`, or `blocked: <note>` / `failed: <note>`.
+An unknown field is a 400, which is what keeps a transcript from being posted
+under an extra key. Prose fields are capped (action 500, rationale 1000) and
+scanned for credential shapes; `files_changed` and commit hashes are exempt from
+the word scan, since `modules/secrets.yaml` is a legitimate path.
+
+## Verification
+
+Run from a tailnet node that is not delphi. The token never goes on a command
+line, so read it into a variable:
+
+```bash
+X=https://delphi.cloudforest-kardashev.ts.net:8449
+export AGENT_TURNS_TOKEN="$(sops -d ~/Documents/nixconfig/modules/secrets.yaml | yq -r '.["agent-turns-token"]')"
+curl -sS "$X/healthz"
+curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?limit=5" | jq '.count'
+```
+
+A public probe must fail: the mount is `(tailnet only)` in `tailscale serve
+status`, port 8449 is not in `networking.firewall.allowedTCPPorts`, and nothing
+in nginx points at it. From the open internet the port is closed.
+
+## Export, restore, rollback
+
+The backup hook writes the dump shape `xs import` restores, and deliberately
+schedules nothing — cadence and target host are an open decision:
+
+```bash
+task infra:xs:export OUT=/tmp/agent-turns-$(date +%F)   # on delphi
+```
+
+Restore into a fresh store (order matters: contents first, then frames):
+
+```bash
+for f in "$DUMP"/cas/*; do xs cas-post /var/lib/xs-agent-turns/store < "$f"; done
+while IFS= read -r line; do
+  printf '%s' "$line" | xs import /var/lib/xs-agent-turns/store
+done < "$DUMP/frames.jsonl"
+```
+
+Two xs traps, measured on 0.14.2: `xs cat` fails with `Operation not permitted`
+when stdout is a regular file (pipe it, `| cat`), and `xs import` reads exactly
+one frame per invocation.
+
+Rollback of the endpoint itself:
+
+```bash
+sudo systemctl stop agent-turns-shim.service xs-agent-turns.service
+sudo systemctl disable agent-turns-shim.service xs-agent-turns.service
+sudo nixos-rebuild switch --rollback      # restores the previous generation
+```
+
+The state directory survives a rollback; removing it deletes the turn log, so
+export first. Reverting the AGENTS.md protocol is `git revert` of the commit
+that added it — the text lives in `AGENTS.md`, `docs/agent-context/HOME-PREAMBLE.md`
+and `modules/user/ai/hermes-persona/AGENTS.md`, and nowhere else.
+
+## Open decisions
+
+- Backup cadence and target (Joiu's nix).
+- Whether `xs` should be built from source instead of the pinned arm64 release
+  asset; the asset is the project's own pipeline output and is hash-pinned, but
+  a source build is the fleet's usual provenance argument.
+- The preserved `agent.turns` topic grows without bound (`ttl: forever`); a
+  retention sweep could use `ttl: last:<n>`, at the cost of losing claims that
+  explain an old branch.

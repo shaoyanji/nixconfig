@@ -53,6 +53,66 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
     by hand. Repair only the interface: `task dev:toon:fix` recounts `[n]`, and
     `checks:toon` / `checks:toon:surfaces` keep both rules true.
 
+## Agent turns: the xs coordination endpoint (mandatory)
+
+Every agent governed by this file produces and consumes the fleet turn log on
+**delphi**. It exists so an agent can see who is working on what, from which base
+commit and branch, before it starts, and so a merge or a test is checked against
+what actually landed instead of a stale chat report. It is coordination state,
+not a chat relay, and it changes no merge authority: a builder still does not
+merge unless a task says so.
+
+Endpoint: `https://delphi.cloudforest-kardashev.ts.net:8449`, tailnet only. A
+`tailscale serve` front on 8449 proxies the loopback shim; there is no public
+route and no other port. The token is a sops secret and is never written down:
+
+```bash
+X=https://delphi.cloudforest-kardashev.ts.net:8449
+export AGENT_TURNS_TOKEN="$(sops -d ~/Documents/nixconfig/modules/secrets.yaml | yq -r '.["agent-turns-token"]')"
+```
+
+**Before a turn** — read the recent turns for the repo, then the subject, and
+look for a live claim or an `in_progress` twin:
+
+```bash
+curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?repo=nixconfig&limit=20" | jq '.events'
+curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?subject=nixconfig:my-task" | jq '.events'
+```
+
+If another agent claimed the same area or is `in_progress` on the same subject,
+stop and report the collision; do not start a parallel edit that will conflict.
+
+**After a turn** — append one summary. `201` plus an entry id is success; `200`
+means that UUID is already stored and the post was a safe retry.
+
+```bash
+curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" -H 'Content-Type: application/json' \
+  -X POST --data @turn.json "$X/v1/events"
+```
+
+`turn.json` carries exactly these fields; the shim rejects unknown ones, which is
+what stops a transcript being posted as an extra key:
+
+- `id` client-generated UUID (the dedup key) · `ts` RFC 3339 · `source` agent name · `kind` `"turn"`
+- `subject` `<repo>:<task-id>` — the repo prefix is what `repo=` filters on · `action` one line
+- `rationale` string or `null` · `base_commit` git hash or `null` · `branch` name or `null`
+- `files_changed` list · `commits` list of hashes · `claims` list of areas or files claimed
+- `outcome` `done` | `in_progress` | `blocked: <one line>` | `failed: <one line>`
+
+Summaries and identifiers only: no secrets, tokens, passwords, private keys, mail,
+no full conversation text. The shim scans free text and refuses credential-shaped
+bodies with a 400, and there is no update or delete route (405 by design).
+
+If the endpoint is down or a post times out: retry once, then append the entry as
+one JSONL line to `~/.local/state/agent-turns/queue.jsonl`, continue the turn, and
+replay in order when the endpoint answers — a repeated UUID returns the stored id,
+so replay is idempotent. Report the queue depth in your turn report. Never post a
+turn copy to any other endpoint or publicly, and never use it in place of the
+structured prompt and report files you already use to hand work to another agent.
+
+Backup hook (cadence is an open decision, so nothing schedules it yet):
+`task infra:xs:export OUT=<dir>` on delphi writes `frames.jsonl` plus `cas/`.
+
 ## Home Initialization & Tautological Control Plane
 
 When an AI agent or developer session initializes from the home directory (`$HOME` / `~`):

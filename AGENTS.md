@@ -966,7 +966,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | ------------------------------------ | ---------------------------------------------------------------------- |
 | [`README.md`](README.md)                          | Full repo documentation, architecture, all workflows                   |
 | [`AGENTS.md`](AGENTS.md)                          | This file — canonical agent routing and codebase manual                |
-| [`inventory.toml`](inventory.toml)                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written) |
+| [`inventory.toml`](inventory.toml)                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written). `[repos.*]` lists the repos that are ours but not vendored here (their own CI and authoring) — `nix eval .#inventory.repos` |
 | [`docs/inventory-schema.md`](docs/inventory-schema.md)           | Inventory schema, compiled artifacts, and the automatic checks          |
 | [`docs/sops-rekey.md`](docs/sops-rekey.md)                  | Sops planes and files, `.sops.yaml` anchors, SSH CA, rekey procedure, fresh-host bootstrap |
 | [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |

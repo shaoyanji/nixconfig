@@ -11,7 +11,7 @@
   knobs = modules.knobs or {};
   modulesMeta = modules.metadata or {};
 
-  inherit (inventory) metadata derived nixHosts externalHosts;
+  inherit (inventory) metadata derived nixHosts externalHosts repos;
 
   # --- markdown helpers ------------------------------------------------------
   # Table cells must not contain a raw `|` or newline, or the table collapses.
@@ -111,6 +111,23 @@
       map
       (name: let h = nixHosts.${name}; in [name h.persona.title h.persona.compute_tier (lib.concatStringsSep ", " h.persona.allowed_tasks)])
       (lib.filter (n: nixHosts.${n}.persona.title != "") (lib.attrNames nixHosts));
+    # Ours by ownership, not by vendoring. Listed here because the page is the
+    # catalog a person reads; they are absent from every host table on purpose.
+    repoRows =
+      map
+      (name: let
+        r = repos.${name};
+      in [
+        r.url
+        r.status
+        (
+          if r.ci == ""
+          then "none"
+          else r.ci
+        )
+        r.deploy
+      ])
+      (lib.attrNames repos);
   in
     header "Fleet Device & Host Inventory" "`inventory.toml`"
     + ''
@@ -144,6 +161,16 @@
       ## Agent personas
 
       ${table ["host" "persona" "compute tier" "allowed tasks"] personaRows}
+    ''
+    + lib.optionalString (repoRows != []) ''
+
+      ## Repositories outside this tree
+
+      Registered in `inventory.toml` as `[repos.*]`: their own code, their own CI,
+      their own authoring method. They are not devices, so they appear in no host
+      table above and in no count.
+
+      ${table ["repo" "status" "ci" "deploy"] repoRows}
     '';
 
   # --- modules registry page -------------------------------------------------

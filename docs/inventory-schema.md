@@ -182,6 +182,33 @@ they are kept — but they are now *asserted* against the derived values rather
 than trusted. Adding a host without updating them fails `inventory-schema`. The
 same values are emitted under `derived` in the compiled artifact.
 
+## Repositories outside this tree (`[repos.*]`)
+
+A repo that is the operator's but is not this tree — a site or a profile whose
+code, CI and authoring method live in its own repository — gets a `[repos.<name>]`
+entry, not a `[hosts.<name>]` one:
+
+```toml
+[repos.shaoyanji-is-a-dev]
+url = "https://github.com/shaoyanji/shaoyanji.is-a.dev"
+default_branch = "main"
+status = "active"            # active | legacy | archived
+deploy = "GitHub Pages -> https://shaoyanji.is-a.dev/"
+ci = ".github/workflows/pages-deploy.yml (push to main or master)"
+authoring = "Jekyll with a gum-driven Taskfile CLI; procedure in BLOG_AUTHORING.md"
+notes = ["…"]
+```
+
+`authoring` and `ci` are the point: three repos with three different legacy
+workflows are indistinguishable from the outside, and "which one builds its own
+README" is not something to re-derive per session. `ci = ""` means none.
+
+Nothing in this section is a device: `derived` counts, the fleet catalog's host
+tables, deploy and warm paths all ignore it. The compiled artifact is
+`.#inventory.repos`, and the catalog lists them under *Repositories outside this
+tree*. Promote one to `[hosts.*]` only when a host-shaped thing — an address, a
+login, a box to reach — is what it actually is.
+
 ## Adding a host
 
 1. Add `[hosts.<name>]` to `inventory.toml` with at least `kind`, `arch` and

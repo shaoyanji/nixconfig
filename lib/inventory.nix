@@ -127,6 +127,29 @@
     };
   };
 
+  # A repository that belongs to the same person as the fleet but not to this
+  # tree: a site or profile whose code, CI and authoring method live in its own
+  # repo. Registered so "what else is ours" has one answer (`nix eval
+  # .#inventory.repos`) instead of a prose list that goes stale — and NOT a
+  # device: nothing here enters `derived`, the fleet catalog's host tables, or
+  # any deploy/warm path.
+  repoModule = {
+    options = {
+      url = str "";
+      default_branch = str "";
+      status = mkOption {type = types.enum ["active" "legacy" "archived"];};
+      # Where a push ends up, and the workflow that does it ("" = no CI).
+      deploy = str "";
+      ci = str "";
+      # How content is written, which is the part that differs per repo.
+      authoring = str "";
+      # A checkout held on the fleet, when one exists; "" when the repo is only
+      # cloned on demand.
+      local_path = str "";
+      notes = strs;
+    };
+  };
+
   metadataModule = {
     options = {
       title = str "";
@@ -166,10 +189,15 @@
         options = {
           metadata = mkOption {type = types.submodule metadataModule;};
           hosts = mkOption {type = types.attrsOf (types.submodule hostModule);};
+          repos = mkOption {
+            type = types.attrsOf (types.submodule repoModule);
+            default = {};
+          };
         };
         config = {
           metadata = raw.metadata or {};
           hosts = raw.hosts or {};
+          repos = raw.repos or {};
         };
       }
     ];
@@ -177,6 +205,7 @@
 
   hosts = evaluated.config.hosts;
   metadata = evaluated.config.metadata;
+  repos = evaluated.config.repos;
 
   # The cache decision, compiled from the same `category` the hosts carry. It is
   # exposed here so that `global.nix`, `activate-host.sh` and `warm-host.sh` read
@@ -245,7 +274,7 @@
 
   compiled = {
     metadata = metadata // declaredCounts;
-    inherit hosts derived;
+    inherit hosts derived repos;
   };
 in
   compiled
@@ -254,6 +283,7 @@ in
       names
       nixHosts
       externalHosts
+      repos
       derived
       issues
       ;

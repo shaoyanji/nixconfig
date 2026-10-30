@@ -1413,3 +1413,49 @@ module_chain = "microvm"
 impermanence = false
 key_services = ["nixos-rebuild switch smoke test (run-canary.sh)"]
 traits = ["microvm", "canary", "ephemeral"]
+
+# ------------------------------------------------------------------------------
+# REPOSITORIES OUTSIDE THIS TREE
+# ------------------------------------------------------------------------------
+# Ours by ownership, not by vendoring: each carries its own code, its own CI and
+# its own (legacy) authoring method. Registered so "what else is ours" is a
+# query (`nix eval .#inventory.repos`), not a memory. Not devices: no derived
+# count, no catalog row, no deploy or warm path. Promote one to a `[hosts.*]`
+# entry only if a host-shaped thing (an address, a login) is what it really is.
+
+[repos.shaoyanji-is-a-dev]
+url = "https://github.com/shaoyanji/shaoyanji.is-a.dev"
+default_branch = "main"
+status = "active"
+deploy = "GitHub Pages -> https://shaoyanji.is-a.dev/"
+ci = ".github/workflows/pages-deploy.yml (push to main or master; ignores README/LICENSE/.gitignore)"
+authoring = "Jekyll (_config.yml, _data, _includes, Gemfile) with a gum-driven authoring CLI in Taskfile.yml (jpost, jdraft, jserve, list-tags); procedure in BLOG_AUTHORING.md"
+notes = [
+  "The only one of the three under active authoring: last push 2026-10-28.",
+  "Also the mail domain the operator uses (Taskfile.yml EMAIL = e@mail.shaoyanji.is-a.dev).",
+  "indexed as the qmd `blog` collection when a checkout exists at ~/Documents/shaoyanji.is-a.dev.",
+]
+
+[repos.shaoyanji-github-io]
+url = "https://github.com/shaoyanji/shaoyanji.github.io"
+default_branch = "master"
+status = "legacy"
+deploy = "GitHub Pages -> https://shaoyanji.github.io/index.html"
+ci = ".github/workflows/static.yml (push to master; GitHub's stock 'deploy static content' job)"
+authoring = "hand-written index.html plus assets/ — no generator, no build step"
+notes = [
+  "Superseded in practice by shaoyanji.is-a.dev; last push 2026-03-25.",
+  "Its own description is 'Site-map static site gen from scratch'.",
+]
+
+[repos.shaoyanji-profile]
+url = "https://github.com/shaoyanji/shaoyanji"
+default_branch = "master"
+status = "legacy"
+deploy = "none — README.md renders as the GitHub profile page"
+ci = ""
+authoring = "README.md is generated from src/skills.yaml by compile_readme.sh (yq), then committed and pushed by `task` (default = compile + gitpush)"
+notes = [
+  "No workflows at all: the 'CI' is the Taskfile running on a workstation, which is why a generated README can go stale silently.",
+  "Last push 2026-06-04.",
+]

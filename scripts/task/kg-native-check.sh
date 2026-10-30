@@ -17,14 +17,23 @@
 # Also asserts parity: node/edge counts must equal the compiled projection, so
 # a faster builder cannot buy speed by answering from a smaller graph.
 #
-# Env: KG_ELIXIR (interpreter), RUNS (default 7), BUDGET_MS (default 20).
+# Env: KG_ELIXIR (interpreter), RUNS (default 7), BUDGET_MS (default 30).
 # Exit 0 = within budget and parity-clean; 1 = regression or divergence.
+#
+# The ceiling is 30 ms, not the 20 ms it started at, and the reason is measured
+# rather than tactical. 20 ms was a frieren figure; the same UNMODIFIED builder
+# reads 18.4–28.9 ms on delphi (9 runs, median 21.0), so a 20 ms ceiling failed
+# on a host whose code had not changed at all — a gate that reports the machine
+# instead of the code. 30 ms clears that spread with the median near 21 ms while
+# still failing the regression this gate exists for: the historical folklore
+# number was ~100 ms, and a builder that shells out or rescans the tree lands
+# there, not at 25.
 set -euo pipefail
 
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 ENGINE="$REPO/tools/kg-engine/kg_engine.exs"
 RUNS="${RUNS:-7}"
-BUDGET_MS="${BUDGET_MS:-20}"
+BUDGET_MS="${BUDGET_MS:-30}"
 
 fail=0
 ok() { printf 'ok    %s\n' "$1"; }
@@ -33,29 +42,10 @@ bad() {
   fail=1
 }
 
-resolve_elixir() {
-  if [ -n "${KG_ELIXIR:-}" ]; then
-    printf '%s' "$KG_ELIXIR"
-    return 0
-  fi
-  if command -v elixir >/dev/null 2>&1; then
-    command -v elixir
-    return 0
-  fi
-  # Same rule as kg-sidecar.sh: look up the store first (`--offline` never
-  # reaches the network), then substitute. `--builders ""` keeps a miss from
-  # turning into a remote build.
-  local out
-  out="$(nix build --no-link --offline --builders "" --print-out-paths nixpkgs#beamPackages.elixir 2>/dev/null | head -1)"
-  if [ -z "$out" ]; then
-    echo "kg-native-check: elixir not in the store; substituting (one-off)" >&2
-    out="$(nix build --no-link --builders "" --print-out-paths nixpkgs#beamPackages.elixir 2>/dev/null | head -1)"
-  fi
-  [ -n "$out" ] && printf '%s' "$out/bin/elixir"
-  return 0
-}
+# shellcheck source=lib/kg-elixir.sh
+. "$REPO/scripts/task/lib/kg-elixir.sh"
 
-ELIXIR_BIN="$(resolve_elixir)" || true
+ELIXIR_BIN="$(kg_resolve_elixir)" || true
 if [ -z "$ELIXIR_BIN" ] || [ ! -x "$ELIXIR_BIN" ]; then
   echo "kg-native-check: no Elixir interpreter (set KG_ELIXIR)" >&2
   exit 1
@@ -91,7 +81,7 @@ if [ "${#samples[@]}" -eq "$RUNS" ]; then
 fi
 
 echo
-echo "== cold bootstrap budget (< ${BUDGET_MS} ms median) =="
+echo "== cold bootstrap budget (< ${BUDGET_MS} ms median, on $(hostname)) =="
 if [ "${#samples[@]}" -gt 0 ]; then
   printf '%s\n' "${samples[@]}" | sort -n | awk -v budget="$BUDGET_MS" '
     { v[NR] = $1; seen = seen (NR > 1 ? ", " : "") $1 }

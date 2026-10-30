@@ -159,6 +159,23 @@ in {
         User = cfg.user;
         Group = cfg.user;
         StateDirectory = cfg.stateDirectory;
+        # `After=` is ordering, not readiness: xs prints its first frame before
+        # the socket is connectable, and a shim that exits on the race makes the
+        # whole switch fail (measured: status 4/NOPERMISSION).
+        ExecStartPre = pkgs.writeShellApplication {
+          name = "agent-turns-wait-socket";
+          runtimeInputs = [pkgs.coreutils];
+          text = ''
+            for _ in $(seq 1 60); do
+              if [ -S "${socketPath}" ]; then
+                exit 0
+              fi
+              sleep 1
+            done
+            echo "xs socket ${socketPath} missing after 60s" >&2
+            exit 1
+          '';
+        };
         ExecStart = "${pkgs.python3}/bin/python3 ${./agent-turns/shim.py}";
         Environment = [
           "XS_SOCKET=${socketPath}"

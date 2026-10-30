@@ -28,6 +28,25 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-30 — agent turns: one token per holder, and the mirror that nearly ate them
+- **One token per holder, so a revocation is one holder.** `services.agentTurns.additionalTokens`
+  declares `-netbook`, `-muse` and `-muse1` beside the fleet token; the shim compares every name
+  without short-circuiting, and the append log names the one that authenticated
+  (`append token=agent-turns-token-muse1 source=vesper`), so a turn is attributable to a holder
+  rather than to "someone with a token". Four distinct values, `0400 xs-agent-turns`, each reads
+  `200`, a bogus bearer `401`.
+- **`modules/secrets.yaml` is a mirror, and writing to it fails silently.** `SECRETS=modules/secrets`
+  plus `infra:secrets:sync` regenerate the parent file from the submodule, so a token set with
+  `sops set modules/secrets.yaml` survives until the next secrets edit and then disappears — and
+  because the shim loads its token set at start, the holder keeps working until the following
+  switch and then gets `401` with nothing in the diff to explain it. All four tokens were in the
+  mirror only, which the drift gate reports as *missing keys* rather than changed ones; they now
+  live in `modules/secrets/secrets.yaml` (`8e851f1`) and the mirror is regenerated from it.
+  `docs/agent-turns.md` had pointed rotation at the mirror, which is how it happened.
+- Evidence: drift gate green on 7 files including mirror-vs-source (both plaintexts
+  `840dd35e76e570f9`); first turn from a non-fleet holder landed and read back —
+  `xs-endpoint:vesper-first-turn`, frame `9fa45743`, 21:13:54Z, authenticated by the muse1 token.
+
 ### 2026-10-30 — an Always Free OCI demo with a private database
 - **OCI ignores `cpu_core_count` and `data_storage_size_in_tbs` on a free database.** `is_free_tier`
   is the switch and ECPU is the shape (2 ECPU = 1 OCPU), so `projects/oci-always-free-demo` pins it in

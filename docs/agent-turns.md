@@ -46,10 +46,13 @@ That produces `AGENT_TURNS_TOKENS=agent-turns-token=/run/secrets/agent-turns-tok
 it (`append token=agent-turns-token-netbook source=… client=…`; a replay logs
 `dedup` instead, so a retry does not read like a second turn).
 
-- **Rotate:** rewrite the value with `sops modules/secrets.yaml`, then
-  `nixos-rebuild switch`. `restartUnits` restarts the shim, because it reads its
-  tokens once at start — without it the new value lands in `/run/secrets` and
-  nothing uses it until a reboot.
+- **Rotate:** rewrite the value in `modules/secrets/secrets.yaml` — the submodule
+  file is the source and `modules/secrets.yaml` is a mirror that
+  `task infra:secrets:sync` regenerates, so a value written only into the mirror
+  is deleted by the next sync (`task infra:secrets:edit:secrets` does both and
+  commits) — then `nixos-rebuild switch`. `restartUnits` restarts the shim,
+  because it reads its tokens once at start — without it the new value lands in
+  `/run/secrets` and nothing uses it until a reboot.
 - **Revoke:** drop the name from `additionalTokens` and switch. The shim's set is
   rebuilt from the declaration, so a file sops leaves behind is no longer read.
 - **Deliver to a non-fleet machine:** sops-nix does not manage that host, so the

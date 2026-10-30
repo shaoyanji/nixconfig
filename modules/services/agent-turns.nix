@@ -123,8 +123,9 @@ in {
     systemd.services.xs-agent-turns = {
       description = "xs event stream store for agent turns (Unix socket only)";
       wantedBy = ["multi-user.target"];
-      after = ["sops-install-secrets.service"];
-      requires = ["sops-install-secrets.service"];
+      # No ordering on sops: on this fleet the secrets are installed by the
+      # activation script itself, not by a `sops-install-secrets` unit, so a
+      # `requires` on that name leaves the unit unstartable.
       serviceConfig = {
         Type = "simple";
         User = cfg.user;

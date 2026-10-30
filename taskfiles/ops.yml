@@ -262,9 +262,11 @@ tasks:
         fi
 
   ops:kg:doc:
-    desc: Print what one document mentions (DOC=)
+    desc: Print what one document mentions and links to (DOC=)
     summary: >
-      Outbound mentions for doc:<DOC> — the hosts and skills that file names.
+      Outbound edges for doc:<DOC> — the hosts and skills that file names, plus
+      the other documents it links to (the `references` layer; `ops:kg:blast
+      TARGET=doc:<DOC>` is who links back).
       DOC is a repo-relative path (`docs/task-control-plane.md`); the `doc:`
       prefix is optional. This is the reverse of ops:kg:host, which jq cannot
       reach without scanning the whole edge list — the reason both directions

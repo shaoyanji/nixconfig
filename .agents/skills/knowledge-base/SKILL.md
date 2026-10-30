@@ -70,10 +70,15 @@ nix shell "$(jq -r '.nodes["llm-agents"].locked | "github:\(.owner)/\(.repo)/\(.
 
 ## 3. Structural search: the graph, not grep
 
-`.#knowledgeGraph` compiles nodes (hosts, skills, docs, tags) and edges
-(`mentions` from docs/skills, `tagged` from skills) out of the files themselves.
-Mentions are **exact-token** matches, not substrings — `dev` does not match
-`devji` — so a count means "this name appears as a word in that file".
+`.#knowledgeGraph` compiles nodes (hosts, skills, docs, tags) and three edge
+kinds out of the files themselves: `mentions` (a doc's tokens name a host or
+skill), `references` (a doc's markdown link points at another **doc**, so the
+graph has paths between documents and not only spokes to entities) and `tagged`
+(skill → tag). Mentions are **exact-token** matches, not substrings — `dev` does
+not match `devji` — so a count means "this name appears as a word in that file".
+A `references` edge is only made when the link target is in the doc set: an
+external URL, a `.nix` path or a skill page stays a plain link, and
+`checks:docs:links` is what gates a link that resolves to nothing.
 
 **Query it explicitly, don't describe it in English.** The graph has six fixed
 traversals — the `jq` analogue of a Cypher `MATCH`. If you know which question
@@ -84,7 +89,7 @@ wrong (`scripts/task/kg-query.sh` is the single implementation).
 | :--- | :--- | :--- |
 | host | `ops:kg:host HOST=frieren` | docs and skills that mention the host |
 | skill | `ops:kg:skill SKILL=qmd` | inbound mentions **+** the skill's tags |
-| doc | `ops:kg:doc DOC=docs/x.md` | hosts and skills that document names (the reverse direction) |
+| doc | `ops:kg:doc DOC=docs/x.md` | hosts and skills the document names, **plus** the docs it links to (`ops:kg:blast TARGET=doc:docs/x.md` is who links back) |
 | tag | `ops:kg:tag TAG=nix` | `(Skill)-[:TAGGED]->(Tag)` |
 | comention | `ops:kg:comention HOST=cassini MIN=2` | two hops: hosts sharing documents, ranked |
 | stats | `ops:kg:stats` | counts by node type + edge total |

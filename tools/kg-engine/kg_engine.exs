@@ -668,7 +668,16 @@ defmodule KGEngine.Native do
         Enum.map(s.tags, &%{"from" => "skill:" <> s.name, "to" => "tag:" <> &1, "type" => "tagged"})
       end)
 
-    edges = mention_edges ++ tag_edges
+    # `references`: doc -> doc, from the markdown links the token scan cannot see.
+    # Same shape as the Nix projection's edge set — `checks:kg:native` compares
+    # counts, and `checks:kg:sidecar` compares answers, so a link parsed here but
+    # not there fails a gate instead of quietly changing the graph.
+    reference_edges =
+      Enum.flat_map(docs, fn d ->
+        Enum.map(d.refs, &%{"from" => d.id, "to" => "doc:" <> &1, "type" => "references"})
+      end)
+
+    edges = mention_edges ++ tag_edges ++ reference_edges
 
     %{
       "nodes" => host_nodes ++ skill_nodes ++ doc_nodes ++ tag_nodes,
@@ -866,6 +875,7 @@ defmodule KGEngine.Native do
     # dropping an edge.
     paths = roots ++ docs
     pattern = :binary.compile_pattern(host_names ++ skill_names)
+    rels = Enum.map(paths, &Path.relative_to(&1, repo))
 
     Enum.map(paths, fn path ->
       rel = Path.relative_to(path, repo)
@@ -877,9 +887,68 @@ defmodule KGEngine.Native do
         path: rel,
         label: first_heading(text),
         hosts: Enum.filter(host_names, &MapSet.member?(found, &1)),
-        skills: Enum.filter(skill_names, &MapSet.member?(found, &1))
+        skills: Enum.filter(skill_names, &MapSet.member?(found, &1)),
+        refs: references(text, rel, rels)
       }
     end)
+  end
+
+  # `[text](path.md#frag)` — the twin of `linkTargets`/`referencesIn` in
+  # lib/knowledge-graph.nix. Deliberately built the same way the Nix side builds
+  # it: split on "](", take up to the next ")", strip the fragment, keep only a
+  # relative `.md` target that names another doc. A regex here would be a second
+  # definition of the same syntax, and the two would drift on an edge case
+  # neither side anticipated — which is what parity gates exist to prevent.
+  defp references(text, rel, rels) do
+    dir =
+      case Path.dirname(rel) do
+        "." -> ""
+        d -> d
+      end
+
+    set = MapSet.new(rels)
+
+    targets =
+      case String.split(text, "](") do
+        [_ | rest] -> rest
+        [] -> []
+      end
+
+    targets
+    |> Enum.map(fn chunk -> chunk |> String.split(")") |> hd() end)
+    |> Enum.map(fn t -> t |> String.split("#") |> hd() end)
+    |> Enum.map(&strip_angle/1)
+    |> Enum.filter(&doc_link?/1)
+    |> Enum.map(fn t -> normalise_path(if dir == "", do: t, else: dir <> "/" <> t) end)
+    |> Enum.reject(&(&1 == rel))
+    |> Enum.filter(&MapSet.member?(set, &1))
+    |> Enum.uniq()
+  end
+
+  defp strip_angle(t) do
+    t
+    |> String.replace_prefix("<", "")
+    |> String.replace_suffix(">", "")
+  end
+
+  defp doc_link?(t) do
+    t != "" and String.ends_with?(t, ".md") and not String.starts_with?(t, "/") and
+      not String.starts_with?(t, "http") and not String.starts_with?(t, "mailto:")
+  end
+
+  # Segment-wise `..` and `.`, the same rule as `normalisePath` on the Nix side.
+  # `Path.expand` is not usable: it wants an absolute base and would turn a
+  # repo-relative target into a filesystem path.
+  defp normalise_path(path) do
+    path
+    |> String.split("/")
+    |> Enum.reduce([], fn
+      seg, acc when seg in ["", "."] -> acc
+      "..", [] -> []
+      "..", acc -> Enum.drop(acc, -1)
+      seg, acc -> acc ++ [seg]
+    end)
+    |> Enum.join("/")
   end
 
   # Regular `*.md` files directly inside each `dirs` entry, sorted — the Elixir

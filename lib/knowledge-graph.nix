@@ -89,6 +89,71 @@
 
   skillNames = builtins.attrNames skills.skills;
 
+  # Markdown inline links: the relation a token scan cannot see, and the source
+  # of `references`. Only a target that IS a doc becomes an edge, so a stale path
+  # cannot invent a node — `checks:docs:links` gates those. Extraction is a split
+  # on `](` (glibc ERE rejects `\]`); traps in `.agents/skills/knowledge-base` §3.
+  linkTargets = text: let
+    parts = lib.splitString "](" text;
+  in
+    if builtins.length parts <= 1
+    then []
+    else map (chunk: builtins.head (lib.splitString ")" chunk)) (builtins.tail parts);
+
+  cleanTarget = t: let
+    noFrag = builtins.head (lib.splitString "#" t);
+  in
+    lib.removeSuffix ">" (lib.removePrefix "<" noFrag);
+
+  dirOf = path: let
+    parts = lib.splitString "/" path;
+  in
+    if builtins.length parts <= 1
+    then ""
+    else lib.concatStringsSep "/" (lib.init parts);
+
+  # `..` and `.` resolved segment-wise. Not a regex or a builtin: the target is a
+  # repo-relative path, and the doc set is the only thing consulted after this.
+  normalisePath = path: let
+    segs = lib.splitString "/" path;
+    step = acc: seg:
+      if seg == "" || seg == "."
+      then acc
+      else if seg == ".."
+      then
+        (
+          if acc == []
+          then []
+          else lib.init acc
+        )
+      else acc ++ [seg];
+  in
+    lib.concatStringsSep "/" (builtins.foldl' step [] segs);
+
+  isDocLink = t:
+    t
+    != ""
+    && lib.hasSuffix ".md" t
+    && !(lib.hasPrefix "/" t)
+    && !(lib.hasPrefix "http" t)
+    && !(lib.hasPrefix "mailto:" t);
+
+  # Every path that will become a doc node, so a link resolves before nodes exist.
+  docPaths = map rel files;
+
+  referencesIn = id: content: let
+    dir = dirOf id;
+    targets = map (t:
+      normalisePath (
+        if dir == ""
+        then t
+        else "${dir}/${t}"
+      )) (
+      builtins.filter isDocLink (map cleanTarget (linkTargets content))
+    );
+  in
+    lib.unique (builtins.filter (t: t != id && builtins.elem t docPaths) targets);
+
   mkDoc = p: let
     content = builtins.readFile p;
     id = rel p;
@@ -100,6 +165,7 @@
     path = id;
     mentionsHosts = builtins.filter (h: builtins.elem h toks) hostNames;
     mentionsSkills = builtins.filter (s: builtins.elem s toks) skillNames;
+    references = referencesIn id content;
   };
 
   docs = map mkDoc files;
@@ -146,7 +212,13 @@
         to = "skill:${s}";
         type = "mentions";
       })
-      d.mentionsSkills)
+      d.mentionsSkills
+      ++ map (r: {
+        from = d.id;
+        to = "doc:${r}";
+        type = "references";
+      })
+      d.references)
     docs
     ++ lib.concatMap (n:
       map (t: {

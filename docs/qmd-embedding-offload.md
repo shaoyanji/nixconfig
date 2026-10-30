@@ -74,7 +74,7 @@ All collections are configured in `~/.config/qmd/index.yml`:
 
 | Collection | Path | Mask | Purpose |
 |---|---|---|---|
-| `vault` | `/Volumes/data/projects/Obsidian-Git-Sync` | `**/*.md` | Personal Obsidian knowledge base, zettels, schematics |
+| `vault` | `~/vaults/personal` (NAS link → `/Volumes/data/Obsidian-Git-Sync`) | `**/*.md` | Personal Obsidian knowledge base, zettels, schematics |
 | `nixconfig` | `/Volumes/data/projects/nixconfig` | `**/*.md` | Nix flake documentation, host architecture, and runbooks |
 | `offlinebooks` | `/Volumes/data/books/markdown` | `**/*.md` | Offline academic papers, textbooks, and technical books |
 | `skills` | `/home/devji/.hermes/skills` | `**/*.md` | Agent operational skills (Hermes and Antigravity) |

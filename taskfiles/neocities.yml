@@ -1,0 +1,83 @@
+version: "3"
+
+vars:
+  NEOCITIES_BLOG: "python3 scripts/task/neocities-blog.py"
+  NEOCITIES_PROJECT: "projects/neocities-dragoncourt"
+
+tasks:
+  neocities:menu:
+    desc: "Blog control plane (gum): write, edit, publish, delete, render, deploy"
+    summary: >
+      The one entry point for dragoncourt.neocities.org. Everything it offers is also a
+      task of its own below, so an unattended run never needs the menu. Posts are HTML
+      files in site/blog/ (published) or drafts/ (never uploaded), each carrying a
+      one-line <!--post {...}--> header that render reads; the listings, the home cards,
+      the feed and the entry count are projections of those headers, never hand-edited.
+    cmds:
+      - "{{.NEOCITIES_BLOG}} menu"
+
+  neocities:list:
+    desc: List blog entries with date, status and tags
+    cmds:
+      - "{{.NEOCITIES_BLOG}} list"
+
+  neocities:new:
+    desc: Write a new entry with gum forms (title, date, tags, summary, body)
+    summary: >
+      Writes drafts/<slug>.html and asks whether to publish it immediately. The slug is
+      derived from the title and editable; publishing moves the file into site/blog/,
+      which is the only place the push script will ever upload from.
+    cmds:
+      - "{{.NEOCITIES_BLOG}} new"
+
+  neocities:edit:
+    desc: Edit an entry's metadata, its body, or both
+    summary: >
+      Metadata goes through the same gum form as `new` and rewrites the header, the
+      <title>, the description, the canonical URL and the h1 together, so they cannot
+      drift. The body opens in $EDITOR. Offers an upload when it is done.
+    cmds:
+      - "{{.NEOCITIES_BLOG}} edit"
+
+  neocities:publish:
+    desc: Move a draft into site/blog and re-render the listings
+    cmds:
+      - "{{.NEOCITIES_BLOG}} publish"
+
+  neocities:draft:
+    desc: Move a published entry back to drafts/ and re-render the listings
+    cmds:
+      - "{{.NEOCITIES_BLOG}} draft"
+
+  neocities:delete:
+    desc: "[destructive] Delete an entry after a confirm prompt"
+    summary: >
+      Removes the file (from either site/blog/ or drafts/) and re-renders, so the card,
+      the row and the feed item disappear together. The confirm prompt is the gate: it
+      prints the path that is about to go.
+    cmds:
+      - "{{.NEOCITIES_BLOG}} delete"
+
+  neocities:render:
+    desc: Regenerate the log rows, home cards, feed and entry count from post headers
+    summary: >
+      The projection step. Idempotent: running it on a tree whose listings already match
+      writes the same bytes back. Prints the published entries it found, newest first.
+    cmds:
+      - "{{.NEOCITIES_BLOG}} render"
+
+  neocities:preview:
+    desc: Serve the site locally on 127.0.0.1:8080
+    cmds:
+      - task: dev:site:preview:neocities
+
+  neocities:deploy:
+    desc: Render, lint, upload the changed files and verify each one round-trips
+    summary: >
+      Three phases with one job each: render rebuilds the projections, the push script
+      lints every reference and asks the API which files differ, then downloads what it
+      uploaded and compares the SHA-1. Exit 1 means the round trip failed, even if the
+      upload said success.
+    cmds:
+      - "{{.NEOCITIES_BLOG}} render"
+      - task: dev:site:deploy:neocities

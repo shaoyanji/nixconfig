@@ -146,6 +146,11 @@ in {
         User = cfg.user;
         Group = cfg.user;
         StateDirectory = cfg.stateDirectory;
+        # Owner-only, socket included: xs has no auth on that socket, so a
+        # world-readable one would let any local user DELETE a frame and undo
+        # the append-only promise the shim makes.
+        StateDirectoryMode = "0700";
+        UMask = "0077";
         # `always`: an append that returned has reached the journal, so a turn
         # reported as stored cannot vanish in a power loss.
         ExecStart = "${cfg.package}/bin/xs serve ${storePath} --fsync always";
@@ -174,6 +179,7 @@ in {
         User = cfg.user;
         Group = cfg.user;
         StateDirectory = cfg.stateDirectory;
+        StateDirectoryMode = "0700";
         # `After=` is ordering, not readiness: xs prints its first frame before
         # the socket is connectable, and a shim that exits on the race makes the
         # whole switch fail (measured: status 4/NOPERMISSION).

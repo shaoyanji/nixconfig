@@ -297,6 +297,34 @@ tasks:
     cmds:
       - bash scripts/task/qmd-docs-index.sh ensure blog
 
+  dev:blog:draft:
+    desc: "Scaffold ideas/<slug>.md from the knowledge graph, citations attached"
+    summary: >
+      Walks the compiled graph two hops out from whatever node matches TOPIC and
+      writes a draft whose frontmatter names those entities, so the draft is a
+      node with edges the moment it exists (ops:kg:blast / ops:kg:host answer
+      for it). Hop 1 is the obvious citation; hop 2 is the page that shares a
+      host or a skill without linking to it, which is where disagreement lives.
+      Free text in TOPIC, no vault/qmd search (delphi carries no qmd — the
+      skeleton prints the two follow-up queries instead). Refuses to overwrite
+      an existing slug. FLAGS=--force replaces it.
+    cmds:
+      - bash scripts/task/blog-draft.sh "{{.TOPIC}}" {{.FLAGS}}
+
+  dev:blog:export:
+    desc: "Publish ideas/<slug>.md as a Jekyll post in the blog repo (never commits)"
+    summary: >
+      Converts a finished draft into the blog's own post front matter (layout,
+      title, date, author, categories: [Blog], tags) and copies the body into
+      BLOG_REPO/_posts/YYYY-MM-DD-<slug>.md. Default checkout is
+      ~/Documents/shaoyanji.is-a.dev; BLOG_REPO= points it elsewhere and
+      BLOG_AUTHOR= overrides the blog's `matt` default. It writes and stops: no
+      commit, no push, because that repo's CI deploys on push and publication
+      must stay an operator decision. Exit 2 when the checkout or the target
+      post is missing/already there (FLAGS=--force to replace).
+    cmds:
+      - bash scripts/task/blog-export.sh "{{.SLUG}}" {{.FLAGS}}
+
   dev:qmd:sync:eisen:
     desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
     summary: >

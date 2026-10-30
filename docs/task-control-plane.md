@@ -48,6 +48,13 @@ task dev:nixbuild:warm           # Remote-builder warm + cachix push (nixbuild.n
 task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 ```
 
+### Blog Drafts
+```bash
+task dev:blog:draft TOPIC="…"    # ideas/<slug>.md scaffolded from the knowledge graph
+task dev:blog:export SLUG=…      # publish it into the blog repo (never commits)
+```
+The draft layer and its `about:` edges: [blog-drafting.md](blog-drafting.md).
+
 ### Validation
 ```bash
 task checks:quick                # Narrow repo HYGIENE (no host config evaluated)

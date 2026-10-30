@@ -19,7 +19,7 @@ Protocol: `AGENTS.md` § "Agent turns", `docs/agent-context/HOME-PREAMBLE.md`.
 | Shim | Python 3 stdlib, bearer auth, schema + secret allowlist, dedup index | `127.0.0.1:8093`, `dedup.sqlite` beside the store |
 | Exposure | `tailscale serve --https=8449` → `http://127.0.0.1:8093` | `https://delphi.cloudforest-kardashev.ts.net:8449` |
 | Units | `xs-agent-turns.service`, `agent-turns-shim.service`, `tailscale-serve-agent-turns.service` | delphi |
-| Secret | `sops.secrets."agent-turns-token"` in `modules/secrets.yaml` | 0400, owner `xs-agent-turns` |
+| Secrets | `agent-turns-token` (fleet), `agent-turns-token-netbook` (one outside holder) in `modules/secrets.yaml` | 0400, owner `xs-agent-turns` |
 
 The store is never exposed. `xs serve` runs without `--expose`, inside
 `PrivateNetwork=true`, with `RestrictAddressFamilies = ["AF_UNIX"]`, so there is
@@ -28,6 +28,39 @@ of its own (verified: a bogus `Authorization: Bearer` header is ignored and the
 append returns 200) and it does expose `DELETE /{id}` and `POST /import`, which
 is why append-only is enforced by the shim's route table rather than promised by
 the store.
+
+## Tokens: one per holder, never shared
+
+A holder that is not a fleet agent (the netbook's agent, say) gets its own token,
+so revoking it cannot take the fleet credential with it. Each accepted token is a
+declared sops secret; the shim's token set is generated from that list, never
+scanned off a directory:
+
+```nix
+services.agentTurns.enable = true;
+services.agentTurns.additionalTokens = ["agent-turns-token-netbook"];
+```
+
+That produces `AGENT_TURNS_TOKENS=agent-turns-token=/run/secrets/agent-turns-token:…`
+(`name=/path`, colon separated), and every append logs the name that authenticated
+it (`append token=agent-turns-token-netbook source=… client=…`; a replay logs
+`dedup` instead, so a retry does not read like a second turn).
+
+- **Rotate:** rewrite the value with `sops modules/secrets.yaml`, then
+  `nixos-rebuild switch`. `restartUnits` restarts the shim, because it reads its
+  tokens once at start — without it the new value lands in `/run/secrets` and
+  nothing uses it until a reboot.
+- **Revoke:** drop the name from `additionalTokens` and switch. The shim's set is
+  rebuilt from the declaration, so a file sops leaves behind is no longer read.
+- **Deliver to a non-fleet machine:** sops-nix does not manage that host, so the
+  operator writes the file over the tailnet, from delphi, with the value on
+  stdin — never in argv and never in chat:
+
+```bash
+sops -d modules/secrets.yaml | yq -r '.["agent-turns-token-netbook"]' |
+  ssh alice@netbook 'umask 077; install -d -m 700 ~/.config/agent-turns &&
+    cat > ~/.config/agent-turns/token && chmod 600 ~/.config/agent-turns/token'
+```
 
 ## Shim API
 

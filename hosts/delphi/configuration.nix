@@ -823,6 +823,10 @@ in {
   # is the entire exposed surface, and the bearer token comes from sops. The
   # endpoint is coordination state, not a chat relay and not a merge authority.
   services.agentTurns.enable = true;
+  # A second, revocable token for the one holder outside this repo's agents: the
+  # netbook. It authenticates to the same shim and is revoked on its own, so a
+  # travel laptop never carries the fleet credential.
+  services.agentTurns.additionalTokens = ["agent-turns-token-netbook"];
 
   # --- Tailnet-only HTTPS mounts, from ONE registry --------------------------
   # Each mount is a `tailscale serve` https front for a loopback listener; the

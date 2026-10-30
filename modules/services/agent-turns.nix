@@ -100,9 +100,21 @@ in {
       type = lib.types.str;
       default = "agent-turns-token";
       description = ''
-        sops secret holding the shim bearer token. It is the only credential in
-        this design: xs has no authentication of its own, and the shim refuses to
-        start without a token file it can read.
+        sops secret holding the fleet shim bearer token. It is the only credential
+        in this design: xs has no authentication of its own, and the shim refuses
+        to start without a token file it can read.
+      '';
+    };
+
+    additionalTokens = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = ''
+        Extra sops secret names whose values are also accepted as bearer tokens,
+        one per holder that is not a fleet agent (the netbook's, for instance).
+        Separate tokens, not a shared one: revoking an agent removes its secret
+        from `sops.yaml`-backed config without touching the fleet credential, and
+        the shim's access log names which token authenticated each append.
       '';
     };
 
@@ -126,14 +138,19 @@ in {
       description = "Agent turn coordination store";
     };
 
-    sops.secrets.${cfg.tokenSecret} = {
+    # Every accepted token is a declared secret, so the shim's credential set is
+    # whatever this host activated — no directory scan, no unlabelled file.
+    sops.secrets = lib.genAttrs ([cfg.tokenSecret] ++ cfg.additionalTokens) (_: {
       owner = cfg.user;
       group = cfg.user;
       mode = "0400";
       # The NixOS plane's file; modules/profiles/base-node.nix sets the same
       # default, and naming it here keeps the secret's home visible at its use.
       sopsFile = ../../modules/secrets.yaml;
-    };
+      # The shim reads its tokens once, at start. Without this a rotated value
+      # reaches /run/secrets and nothing notices until the next reboot.
+      restartUnits = ["agent-turns-shim.service"];
+    });
 
     systemd.services.xs-agent-turns = {
       description = "xs event stream store for agent turns (Unix socket only)";
@@ -187,7 +204,11 @@ in {
         ExecStart = "${pkgs.python3}/bin/python3 ${./agent-turns/shim.py}";
         Environment = [
           "XS_SOCKET=${socketPath}"
-          "AGENT_TURNS_TOKEN_FILE=${config.sops.secrets.${cfg.tokenSecret}.path}"
+          "AGENT_TURNS_TOKENS=${
+            lib.concatStringsSep ":" (
+              map (name: "${name}=${config.sops.secrets.${name}.path}") ([cfg.tokenSecret] ++ cfg.additionalTokens)
+            )
+          }"
           "AGENT_TURNS_DB=${stateDir}/dedup.sqlite"
           "AGENT_TURNS_BIND=127.0.0.1"
           "AGENT_TURNS_PORT=${toString cfg.port}"

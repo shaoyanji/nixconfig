@@ -21,18 +21,21 @@ Truth: `modules/services/agent-turns.nix`, `modules/services/agent-turns/shim.py
 
 ```bash
 cd "${NIXCONFIG:-$HOME/Documents/nixconfig}" && git pull --ff-only
-X=https://delphi.cloudforest-kardashev.ts.net:8449
-export AGENT_TURNS_TOKEN="$(sops -d modules/secrets.yaml | yq -r '.["agent-turns-token"]')"
-
-curl -sS --max-time 10 -H "Authorization: Bearer $AGENT_TURNS_TOKEN" \
-  "$X/v1/events?repo=nixconfig&limit=20" | jq -r '.events[] | "\(.ts) \(.source) \(.subject) [\(.outcome)]"'
-curl -sS --max-time 10 -H "Authorization: Bearer $AGENT_TURNS_TOKEN" \
-  "$X/v1/events?subject=nixconfig:<task-id>" | jq '.events'
+task agents:xs:list REPO=nixconfig LIMIT=20
+task agents:xs:list SUBJECT=nixconfig:<task-id> CLAIM='taskfiles/agents.yml,scripts/task'
 ```
 
-Stop and report if another agent is `in_progress` on the same subject, or holds a
-claim on files you are about to edit. `base_commit` should be the commit you
-actually started from after the pull, not one you remembered.
+`agents:xs:list` resolves the auth itself and prints the turns newest first, the
+live claims, then a verdict. **Exit 1 is the collision**: someone is
+`in_progress` on your subject, or a live entry claims an area that overlaps
+`CLAIM` (either direction contains the other, so `scripts/task` matches a claim on
+`scripts/task/x.sh`). Stop and report it; do not start a parallel edit. With only
+`REPO` it lists and says so; it does not fail on other people's work.
+
+Liveness is per subject and decided by the NEWEST entry: an `in_progress` that a
+later `done` superseded is closed, which is why one entry per topic matters.
+`base_commit` should be the commit you actually started from after the pull, not
+one you remembered.
 
 **Never print the decrypted secrets file.** Read one key into a variable, as
 above. Piping the whole file to `head`, `grep` or a diff puts unrelated values in
@@ -104,9 +107,9 @@ What the template does that a hand-built body gets wrong: it fills `id`, `ts`,
 - `200` = that UUID already exists; the post was a safe retry.
 - `400` / `401` = rejected, nothing stored; the error line names the field or the
   token, never a value.
-- transport failure (`4` when the script is run directly) leaves the body at
-  `~/.local/state/agent-turns/last-turn.json`, which is exactly what the fallback
-  below appends.
+- transport failure (`4` when the script is run directly) queues the body itself;
+  the next successful run replays it. The body stays at
+  `~/.local/state/agent-turns/last-turn.json` if you need to read what was queued.
 - There is **no update and no delete** (`405` by design). A correction is a new
   entry, not an edit.
 
@@ -144,11 +147,16 @@ Measured on 2026-10-30 from delphi itself:
 | `https://<tailnet-ip>:8449` | TLS alert — the certificate is keyed to the DNS name, so use the name |
 
 `curl -sS "$X/healthz"` needs no auth and answers `{"ok":true}` when the shim is
-up; a `000` means transport, not auth. If the endpoint is still down: retry once,
-then append the body the task already left on disk as one JSONL line —
-`cat ~/.local/state/agent-turns/last-turn.json >> ~/.local/state/agent-turns/queue.jsonl`
-— continue the turn, and replay when it answers. Replay is idempotent because the
-UUID is the dedup key. Report the queue depth in the turn report.
+up; a `000` means transport, not auth.
+
+**The queue is the task's job now.** A post that cannot reach the endpoint appends
+its own body to `~/.local/state/agent-turns/queue.jsonl` and exits 4 having kept
+the turn; the next run that reaches the shim replays the queue oldest-first before
+posting, and replay is idempotent because the UUID is the dedup key. So: continue
+the turn, report the queue depth (`task agents:xs:post` prints it, and
+`grep -c . ~/.local/state/agent-turns/queue.jsonl` reads it), and the turn lands on
+someone's next post. Two lines that will never be accepted (a `400`, usually the
+credential word scan) move to `queue.rejected.jsonl` instead of blocking the rest.
 
 ## Rejections
 

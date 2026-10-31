@@ -45,11 +45,36 @@ let
   # `status` comes from the COMPILED registry, so the list is not a second copy.
   activeNixos = lib.filterAttrs (_: h: h.status == "active" && h.kind == "nixos") self.inventory.hosts;
 
+  # A boot VM has to hold the unit set the host actually runs. frieren is the
+  # case that proved it: it starts immich, plex, jellyfin, paperless,
+  # home-assistant, postgres and ~40 more, and in a 2 GiB guest it OOM-panicked at
+  # 786 s (`vm.panic_on_oom = 2` is the default for a test VM —
+  # nixos/modules/testing/test-instrumentation.nix — because a test that silently
+  # loses memory is not a test), so the 900 s console wait could only time out.
+  # The failure was the guest size, not the host's boot: measured 2026-10-30, run
+  # 41140278130, `Kernel panic - not syncing: Out of memory: compulsory
+  # panic_on_oom is enabled` while immich was still mapping routes.
+  #
+  # Hosts not listed keep the small default, because the same knob is what makes a
+  # TCG run on a 2-core, 8 GiB box survivable at all (see `cores` below).
+  sizing = {
+    frieren = {
+      memory = 4096;
+      cores = 2;
+    };
+  };
+  defaultSizing = {
+    memory = 2048;
+    cores = 1;
+  };
+
   bootVm = hostName: {
     config,
     lib,
     ...
-  }: {
+  }: let
+    size = sizing.${hostName} or defaultSizing;
+  in {
     # The host's root is on hardware QEMU does not have. The question here is
     # the stage-1 -> stage-2 handoff, not the disk layout, so the whole set is
     # replaced rather than merged — `mkForce` also beats the driver's default
@@ -99,12 +124,14 @@ let
     };
 
     virtualisation = {
-      memorySize = 2048;
-      # ONE vCPU, deliberately. The question is whether stage-1 hands off, which
-      # one core answers; on the 2-OCPU boxes that can run this by hand a second
-      # vCPU starves the nginx/ssh that share the machine (TCG is one thread per
-      # vCPU, so this is the difference between half the box and all of it).
-      cores = 1;
+      memorySize = size.memory;
+      # ONE vCPU, deliberately, for the hosts that keep the default: the question
+      # is whether stage-1 hands off, which one core answers, and on the 2-OCPU
+      # boxes that can run this by hand a second vCPU starves the nginx/ssh that
+      # share the machine (TCG is one thread per vCPU, so this is the difference
+      # between half the box and all of it). A host whose own units take minutes to
+      # converge needs the second core or the gate measures boot speed, not boot.
+      cores = size.cores;
       diskSize = 4096;
     };
   };

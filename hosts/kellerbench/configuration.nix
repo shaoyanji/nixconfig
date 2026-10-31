@@ -41,6 +41,16 @@ in {
   # enableSteam so enableSteam=false stays headless.
   services.xserver.enable = enableSteam;
 
+  # Disable speechd (accessibility TTS) to avoid pulling in speech-dispatcher,
+  # mbrola, and mbrola-voices (~1.2 GiB closure bloat on a gaming kiosk).
+  services.speechd.enable = false;
+
+  # Kiosk & headless benchmark node: strip doc/man pages (~700 MiB pipewire-doc/man).
+  documentation.enable = false;
+  documentation.nixos.enable = false;
+  documentation.man.enable = false;
+  documentation.doc.enable = false;
+
   environment.systemPackages = with pkgs; [jq];
 
   services.openssh.enable = true;

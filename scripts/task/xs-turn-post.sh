@@ -77,8 +77,14 @@ cap outcome "$outcome" 300
 # is on. Override them when the work landed on another branch or base.
 base_commit=${BASE_COMMIT:-$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)}
 branch=${BRANCH:-$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || true)}
+# A shape check is not enough: a hand-typed override with the right number of hex
+# digits records a base that does not exist, which is worse than none. Resolve it
+# against the object database when the hash is an override.
 if [ -n "$base_commit" ] && [[ ! $base_commit =~ ^[0-9a-f]{7,40}$ ]]; then
   fail 2 "BASE_COMMIT must be a git hash: $base_commit"
+fi
+if [ -n "${BASE_COMMIT:-}" ] && ! git -C "$ROOT" cat-file -e "$base_commit^{commit}" 2>/dev/null; then
+  fail 2 "BASE_COMMIT is not a commit in this clone: $base_commit"
 fi
 if [ -n "$branch" ] && [[ ! $branch =~ ^[A-Za-z0-9._/-]+$ ]]; then
   fail 2 "BRANCH must be a branch name: $branch"

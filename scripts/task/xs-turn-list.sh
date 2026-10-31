@@ -10,7 +10,7 @@
 #       claim overlapping CLAIM · 2 no usable token, bad LIMIT, or no answer
 set -euo pipefail
 
-ROOT=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
+ROOT=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 TEMPLATE=${XS_TURN_LIST_TEMPLATE:-$ROOT/scripts/task/xs-turn-list.jq}
 URL=${XS_TURNS_URL:-https://delphi.cloudforest-kardashev.ts.net:8449}
 

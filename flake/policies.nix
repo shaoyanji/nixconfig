@@ -826,10 +826,12 @@
       detail = "rows with no pin for an arch dir: ${lib.concatStringsSep ", " unpinnedRows}";
     };
 
-    library-content-is-not-scheduled = {      rule = "A library on a network mount is pulled by a LAUNCH and by nothing else: no timer, no login job, no path unit watching for a fresh drop, and no unit may open an image to read a `.desktop` file, a version or an icon out of it. A stale cache is flushed and re-fetched on the next launch — never warmed because the library changed, because that turns one upgrade into a LAN-wide congestion event.";
+    library-content-is-not-scheduled = {
+      rule = "A library on a network mount is pulled by a LAUNCH and by nothing else: no timer, no login job, no path unit watching for a fresh drop, and no unit may open an image to read a `.desktop` file, a version or an icon out of it. A stale cache is flushed and re-fetched on the next launch — never warmed because the library changed, because that turns one upgrade into a LAN-wide congestion event.";
       proof = "scripts/task/appimage-integrate.sh (deleted 2026-10-28) · the `appimage-launchers` user unit (login + hourly)";
       holds =
-        scheduledLibraryExtractions == []
+        scheduledLibraryExtractions
+        == []
         && libraryPathWatchers == []
         && deletedLibraryIntegrators == [];
       detail =

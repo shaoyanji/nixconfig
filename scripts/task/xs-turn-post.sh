@@ -14,7 +14,7 @@
 #       (the body is queued, not lost) · 5 the shim rejected the entry
 set -euo pipefail
 
-ROOT=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
+ROOT=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 TEMPLATE=${XS_TURN_TEMPLATE:-$ROOT/scripts/task/xs-turn.jq}
 URL=${XS_TURNS_URL:-https://delphi.cloudforest-kardashev.ts.net:8449}
 STATE_DIR=${XDG_STATE_HOME:-$HOME/.local/state}/agent-turns

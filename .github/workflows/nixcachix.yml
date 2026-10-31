@@ -1,4 +1,11 @@
 name: nixcachix
+# One run per ref. Without this, a burst of pushes starts a build per commit and
+# they queue behind each other (measured 2026-10-30: eleven runs in flight), so a
+# superseded build can occupy a runner for hours before it is cancelled. A new
+# push now cancels the run it supersedes instead of racing it.
+concurrency:
+  group: nixcachix-${{ github.ref }}
+  cancel-in-progress: true
 on:
   push:
   workflow_dispatch:
@@ -19,6 +26,7 @@ on:
 jobs:
   sops-drift:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Install Nix
         uses: cachix/install-nix-action@v30
@@ -51,6 +59,7 @@ jobs:
   # building a three-line artifact. It runs on every push, doc-only included.
   docs-budget:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Install Nix
         uses: cachix/install-nix-action@v30
@@ -77,6 +86,7 @@ jobs:
 
   plan:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       has_machines: ${{ steps.detect.outputs.has_machines }}
       affected_hosts: ${{ steps.detect.outputs.affected_hosts }}
@@ -132,6 +142,12 @@ jobs:
   build-machines:
     needs: plan
     if: needs.plan.outputs.has_machines == 'true'
+    # The runner's 6-hour maximum is not a budget. A warm host builds in ~5
+    # minutes and a cold aarch64 closure compiles for ~30; anything past an hour
+    # is a stall (measured 2026-10-30: a job sat on one derivation for 5.5 h and
+    # was only stopped by GitHub's hard cap), so fail fast and keep the runner
+    # for a run that can finish.
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
@@ -178,7 +194,12 @@ jobs:
           submodules: recursive
           token: "${{ secrets.GH_PAT }}"
 
+      # Push needs the token; substitution needs only the public cache URL
+      # already in extra_nix_config. Skipping the action when the secret is
+      # absent keeps the build honest (it still substitutes, it just cannot
+      # publish) instead of failing the whole run on missing auth.
       - uses: cachix/cachix-action@v14
+        if: ${{ secrets.CACHIX_AUTH_TOKEN != '' }}
         with:
           name: shaoyanji
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
@@ -216,7 +237,16 @@ jobs:
   # QEMU run — minutes per host, not a per-push cost.
   boot-canary:
     needs: [plan, build-machines]
-    if: needs.plan.outputs.has_machines == 'true' && needs.plan.outputs.services_changed == 'true'
+    # x86_64 only: GitHub's ubuntu-24.04-arm runners have no /dev/kvm (measured
+    # 2026-10-30 — the runner advertises `nixos-test` but not `kvm`, and the boot
+    # test then fails `a 'aarch64-linux' with features {kvm, nixos-test} is
+    # required`). A boot test under TCG is not a gate, so ARM hosts are booted
+    # from the host itself, not here.
+    if: >-
+      needs.plan.outputs.has_machines == 'true' &&
+      needs.plan.outputs.services_changed == 'true' &&
+      matrix.arch == 'x86_64-linux'
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
@@ -270,6 +300,7 @@ jobs:
           token: "${{ secrets.GH_PAT }}"
 
       - uses: cachix/cachix-action@v14
+        if: ${{ secrets.CACHIX_AUTH_TOKEN != '' }}
         with:
           name: shaoyanji
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"

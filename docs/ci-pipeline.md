@@ -98,7 +98,17 @@ nix build -L .?submodules=1#hostBootChecks.<arch>.<host>
 That is a NixOS VM test (`flake/boot-checks.nix`) over the host's own module
 list, asserting `multi-user.target` and PID 1 being systemd. It runs after
 `build-machines`, so the closure is already substituted, and it needs `/dev/kvm`
-(the job enables it).
+(the job enables it). The job is therefore **x86_64-only**: GitHub's
+`ubuntu-24.04-arm` runner has no `/dev/kvm` (measured 2026-10-30 — it advertises
+`nixos-test` but not `kvm`, and the build fails with `a 'aarch64-linux' with
+features {kvm, nixos-test} is required`), and TCG is not a gate. ARM hosts keep
+their boot test on the host (`task checks:boot HOST=<host>`).
+
+Every job has a `timeout-minutes` (60 for builds, 45 for boots, 15 for the
+cheap gates) and the workflow has a per-ref `concurrency` group with
+`cancel-in-progress`: a superseded push cancels its run instead of leaving a
+build on a runner until GitHub's 6-hour hard cap. One did exactly that on
+2026-10-30, which is what the cap is for and not a shape to rely on.
 
 Locally the same gate is `task checks:boot HOST=<host>`: one host, under the OOM
 watchdog, `--builders ""` so it can never spend nixbuild.net budget — and it

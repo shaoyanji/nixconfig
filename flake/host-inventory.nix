@@ -118,15 +118,14 @@ in {
   frieren = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules =
-      globalModulesNixos
-      ++ [
-        ../hosts/frieren/configuration.nix
-        # Declarative guests on the brlan bridge (microvm-host.nix is imported by
-        # infra-stack.nix). KVM is available here, so cloud-hypervisor: a guest
-        # boots in seconds off the shared store instead of building an image.
-        (import ../hosts/microvms/guests.nix {inherit inputs;})
-      ];
+    # No `microvm.vms.*` here: the guest this host runs is the out-of-band canary
+    # runner (`microvmRunners.frieren-canary`, started by scripts/task/run-canary.sh),
+    # not a declared VM. The `sandbox` guest that used to be imported here belongs
+    # to delphi — importing it declared dead `microvm@sandbox` units, an `Host
+    # sandbox` ssh alias and a `/var/lib/microvms/sandbox` state dir on the NAS that
+    # nothing started. The bridge and NAT the canary needs come from
+    # modules/profiles/microvm-host.nix, which infra-stack.nix imports directly.
+    modules = globalModulesNixos ++ [../hosts/frieren/configuration.nix];
   };
 
   ares = {

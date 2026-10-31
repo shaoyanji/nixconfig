@@ -208,9 +208,10 @@ tasks:
       source, base_commit and branch; values cross as environment variables, so
       prose with quotes stays literal and no caller builds JSON. Needs
       SUBJECT=<repo>:<task-id> and ACTION; optional RATIONALE, OUTCOME, SOURCE,
-      FILES/COMMITS/CLAIMS (comma-separated), ID (retry), BASE_COMMIT/BRANCH. Exit
-      2 = bad input (nothing sent), exit 3 = no token, exit 4 = transport (body kept
-      at ~/.local/state/agent-turns/last-turn.json), exit 5 = rejected.
+      FILES/COMMITS/CLAIMS (comma-separated), ID (retry), BASE_COMMIT/BRANCH. An
+      unreachable endpoint queues the body and the next successful run replays it.
+      Exit 2 = bad input (nothing sent), exit 3 = no token, exit 4 = transport (now
+      queued), exit 5 = rejected.
     requires:
       vars: [SUBJECT, ACTION]
     env:
@@ -227,6 +228,26 @@ tasks:
       BRANCH: "{{.BRANCH | default \"\"}}"
     cmds:
       - bash scripts/task/xs-turn-post.sh
+
+  agents:xs:list:
+    desc: "List recent xs turns (REPO, SUBJECT, SOURCE, LIMIT) and flag live claims"
+    summary: >
+      Reads the log before starting: newest turn first, then the live claims (the
+      newest entry per subject that says in_progress), then a verdict. REPO=,
+      SUBJECT= and SOURCE= filter; LIMIT= 1-200, default 20; CLAIM='area,file'
+      flags a live entry whose claims overlap yours; FORMAT=json prints the raw
+      events for `toon -e`. Exit 1 = a live claim on SUBJECT or an overlap with
+      CLAIM (stop and report the collision), exit 2 = no auth or the endpoint did
+      not answer.
+    env:
+      REPO: "{{.REPO | default \"\"}}"
+      SUBJECT: "{{.SUBJECT | default \"\"}}"
+      SOURCE: "{{.SOURCE | default \"\"}}"
+      LIMIT: "{{.LIMIT | default \"20\"}}"
+      CLAIM: "{{.CLAIM | default \"\"}}"
+      FORMAT: "{{.FORMAT | default \"table\"}}"
+    cmds:
+      - bash scripts/task/xs-turn-list.sh
 
   browse:
     desc: "[deprecated] Legacy browse menu - use direct commands"

@@ -15,7 +15,7 @@ taskfile: the tasks are the API, this page is the route to them.
 
 | Kind | Where | Lifecycle |
 | :--- | :--- | :--- |
-| Declarative guest (`microvm.vms.<name>`) | delphi: `sandbox` — `hosts/microvms/guests.nix`; frieren: `testvm` | a `microvm@<name>` systemd unit, `autostart` where declared |
+| Declarative guest (`microvm.vms.<name>`) | delphi only: `sandbox` — `hosts/microvms/guests.nix`. Frieren declares none: `testvm` and `frieren-canary` are their own host configs, not `microvm.vms` entries | a `microvm@<name>` systemd unit, `autostart` where declared |
 | Canary runner (`microvmRunners.frieren-canary`) | `hosts/microvms/frieren-canary.nix`, started by `scripts/task/run-canary.sh` | a transient unit, `frieren-canary-runner` |
 
 Base module: `hosts/microvms/base.nix` (shared store over virtiofs, one tap, one

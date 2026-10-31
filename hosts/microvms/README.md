@@ -73,6 +73,13 @@ canary SubZeroClaw
   -> llama-swap / Jev / Laya
 ```
 
+**Frieren declares no `microvm.vms`.** The canary is an out-of-band runner
+(`microvmRunners.frieren-canary`, started by `scripts/task/run-canary.sh`), so no
+`microvm@` unit is enabled for it, nothing starts it at boot, and the guest does
+not carry frieren's service tier — it is `base.nix` plus the canary's own dummy
+API. The bridge and NAT it needs come from `modules/profiles/microvm-host.nix`,
+which `infra-stack.nix` imports directly.
+
 On frieren, the `/eisen/` proxy is in `hosts/frieren/reverse-proxy.nix`
 (`frieren.lan` vhost `/eisen/` -> `http://192.168.3.87/router/` with
 **`proxy_set_header Host "eisen.lan"`** — required, because Eisen's nginx

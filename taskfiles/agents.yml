@@ -209,7 +209,7 @@ tasks:
       prose with quotes stays literal and no caller builds JSON. Needs
       SUBJECT=<repo>:<task-id> and ACTION; optional RATIONALE, OUTCOME, SOURCE,
       FILES/COMMITS/CLAIMS (comma-separated), ID (retry), BASE_COMMIT/BRANCH. An
-      unreachable endpoint queues the body and the next successful run replays it.
+      unreachable endpoint queues the body; the next successful post replays it.
       Exit 2 = bad input (nothing sent), exit 3 = no token, exit 4 = transport (now
       queued), exit 5 = rejected.
     requires:

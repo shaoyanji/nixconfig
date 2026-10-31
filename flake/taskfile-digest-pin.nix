@@ -2,5 +2,5 @@
 # commit; an accidental one fails `checks.<system>.taskfile-digest-pin`.
 {
   exec = "cdadeb024da4";
-  prose = "6eef782915c5";
+  prose = "80b22d01f6df";
 }

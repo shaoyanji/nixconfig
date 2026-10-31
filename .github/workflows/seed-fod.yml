@@ -47,17 +47,18 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import hashlib, json, os, urllib.request, urllib.error, time
+          import hashlib, http.client, json, os, urllib.request, urllib.error, time
 
           API = "https://archive.softwareheritage.org/api/1"
           RAW = "https://archive.softwareheritage.org/browse/content/sha1_git:"
           ROOT = "324fd3d29162100bf66731afba0f77d0a6af9f71"   # tree of 326252a1
           DEST = "/tmp/source"
+          UA = {"User-Agent": "nixconfig-seed/1.0"}
 
           def get(url, tries=6):
               for i in range(tries):
                   try:
-                      req = urllib.request.Request(url, headers={"User-Agent": "nixconfig-seed/1.0"})
+                      req = urllib.request.Request(url, headers=UA)
                       with urllib.request.urlopen(req, timeout=120) as r:
                           return r.read()
                   except urllib.error.HTTPError as e:
@@ -65,6 +66,32 @@ jobs:
                           time.sleep(3 * (i + 1))
                           continue
                       raise
+
+          # Multi-megabyte sound files get their connection cut mid-body; read in
+          # chunks and resume with a Range header from whatever arrived, since the
+          # browse route advertises Accept-Ranges: bytes.
+          def fetch(url, length):
+              buf = bytearray()
+              for attempt in range(8):
+                  headers = dict(UA)
+                  if buf:
+                      headers["Range"] = f"bytes={len(buf)}-"
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=180) as r:
+                          if buf and r.status != 206:
+                              buf = bytearray()
+                          while True:
+                              chunk = r.read(131072)
+                              if not chunk:
+                                  break
+                              buf += chunk
+                  except http.client.IncompleteRead as e:
+                      buf += e.partial
+                  except (urllib.error.URLError, TimeoutError, OSError):
+                      time.sleep(2 * (attempt + 1))
+                  if len(buf) >= length:
+                      break
+              return bytes(buf)
 
           files, stack = [], [("", ROOT)]
           while stack:
@@ -86,9 +113,9 @@ jobs:
           for n, f in enumerate(files, 1):
               out = os.path.join(DEST, f["path"])
               os.makedirs(os.path.dirname(out) or DEST, exist_ok=True)
-              data = get(f"{RAW}{f['sha1_git']}/raw/")
+              data = fetch(f"{RAW}{f['sha1_git']}/raw/", f["length"])
               if len(data) != f["length"] or hashlib.sha256(data).hexdigest() != f["sha256"]:
-                  raise SystemExit(f"content mismatch for {f['path']}")
+                  raise SystemExit(f"content mismatch for {f['path']}: {len(data)} != {f['length']}")
               with open(out, "wb") as fh:
                   fh.write(data)
               os.chmod(out, 0o755 if f["perms"] & 0o111 else 0o644)

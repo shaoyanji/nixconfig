@@ -28,7 +28,7 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
-### 2026-10-31 — Dux bump, and Ryoku piloted on fern (CI build blocked)
+### 2026-10-31 — Dux bump, and Ryoku piloted on fern: +11.57 GiB
 - **Shell inputs moved to Dux Labs.** `dms` → `github:duxlabs-dev/dux-shell/stable`, `dank-greeter` →
   `github:duxlabs-dev/dux-greeter` (DMS 2.0 rebrand, 2026-10-20). Option and flake-output names are
   compatibility-preserved (`programs.dank-material-shell`, `nixosModules.dank-material-shell`), so only
@@ -36,15 +36,28 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   rc=0, 1976 assertions (32.8 s / 1 415 MiB, before the Ryoku change).
 - **Ryoku pilot on fern, branch `ryoku-pilot-fern` (NOT deployed, main untouched).** Ryoku replaces the
   shell, so the host takes a new chain `globalModulesRyoku` (globalModulesNixos minus dms/dank-greeter) and
-  `fleet.dankShell.enable = false` keeps the DMS/niri home modules out of HM. Gate: `task checks:host
-  HOST=fern` rc=0, 1976 assertions, 112 s / 2 469 MiB (second nixpkgs in the graph).
-- **What broke:** Ryoku enables `power-profiles-daemon`, which the NixOS assertion refuses beside
-  `laptop.nix`'s `auto-cpufreq`; the profile resolves it in Ryoku's favour. Nothing else failed evaluation.
-- **Closure delta unmeasured: CI cannot fetch a fixed-output source.** `nixcachix` run 41192471687 fails
-  deterministically on `xaf4dh5an…-source.drv` (`github:neur0map/ryomotion@60ea129`) with codeload 404s,
-  for both `ryoku-keysounds` and `ryoku-hyprland-plugins`. The same URL answers 200 from frieren, so it is
-  runner-IP rate limiting, not a dead pin. Baseline (current DMS/niri fern, same commit) was built on
-  `fern-baseline` and measured from narinfo: **18.35 GiB NAR / 2 401 paths**.
+  `fleet.dankShell.enable = false` keeps the DMS/niri home modules out of HM. SDDM arrives `mkDefault`-on
+  (no other greeter) with `theme = mkOverride 900 "ryoku"`, so greetd autologin and `niri.nix` both leave
+  the host. Gate: `task checks:host HOST=fern` rc=0, 112 s / 2 469 MiB — the port's private nixpkgs.
+- **Measured, both sides by the same narinfo walk (hash-deduped NarSize, 100 % coverage, zero misses):**
+  main's fern **13.51 GiB / 2 400 paths** → Ryoku fern **25.08 GiB / 3 695 paths**, i.e. **+11.57 GiB
+  (+86 %)** from 13.90 GiB added and 2.33 GiB removed. The 18.35 GiB baseline recorded earlier came from
+  a walker that double-counted ~35 %; these numbers supersede it.
+- **What the delta is — not the shell.** The port ships a distro's `systemPackages`
+  (`system/packages/base.packages`): qemu-desktop + quickemu **1.97 GiB**, tesseract plus a 1.0 GiB
+  `tessdata` blob, docker/containerd/buildx 0.52 GiB, mise/deno/openvino/scipy/llvmlite 0.76 GiB; then
+  art (ryomotion 593 MiB, ryoku-desktop-data 350, bibata cursors 322, papirus 142) and its private nixpkgs
+  re-adding llvm 1.07 GiB (×2), mesa 553 MiB, electron, gcc, python3.
+- **Two leaks worth naming.** `ryoku-nix-update` is a wrapper whose env points at `${src}/nix/scripts/…`,
+  so the whole **421 MiB port source** enters the runtime closure; it also edits
+  `${RYOKU_NIX_FLAKE:-/etc/nixos}/flake.lock` and calls `nixos-rebuild`, a rebuild button outside
+  `infra:rebuild`. And the closure needs a GitHub FOD the runner cannot fetch: `nixcachix` builds fern
+  only after `seed-fod.yml` (branch `seed/fod-mechvibes`) pushes a locally reconstructed `ryomotion`
+  source whose NAR hash matched the pin — runner-IP 404s, not a dead pin.
+- **What breaks:** evaluation, nothing. At runtime: `laptop.nix`'s auto-cpufreq loses to Ryoku's
+  power-profiles-daemon (an asserted pair, `mkForce` off); autologin is gone; and `programs.niri.settings`
+  — binds, input, layout, fuzzel, portals, kdeglobals, kando — is replaced by Ryoku's materialized
+  `~/.config/niri`, so fern's compositor stops being declarative.
 - **Also observed:** `task checks:nix:format` is red at HEAD on `flake/policies.nix` (not touched here).
 
 ### 2026-10-30 — agent turns: one token per holder, and the mirror that nearly ate them

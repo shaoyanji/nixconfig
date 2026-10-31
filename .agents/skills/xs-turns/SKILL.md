@@ -151,12 +151,13 @@ up; a `000` means transport, not auth.
 
 **The queue is the task's job now.** A post that cannot reach the endpoint appends
 its own body to `~/.local/state/agent-turns/queue.jsonl` and exits 4 having kept
-the turn; the next run that reaches the shim replays the queue oldest-first before
-posting, and replay is idempotent because the UUID is the dedup key. So: continue
-the turn, report the queue depth (`task agents:xs:post` prints it, and
-`grep -c . ~/.local/state/agent-turns/queue.jsonl` reads it), and the turn lands on
-someone's next post. Two lines that will never be accepted (a `400`, usually the
-credential word scan) move to `queue.rejected.jsonl` instead of blocking the rest.
+the turn; the next `agents:xs:post` that reaches the shim replays the queue
+oldest-first before posting it (a read does not drain it), and replay is idempotent
+because the UUID is the dedup key. So: continue the turn, report the queue depth
+(`task agents:xs:post` prints it, and `grep -c .
+~/.local/state/agent-turns/queue.jsonl` reads it), and the turn lands on someone's
+next post. Two lines that will never be accepted (a `400`, usually the credential
+word scan) move to `queue.rejected.jsonl` instead of blocking the rest.
 
 ## Rejections
 

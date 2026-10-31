@@ -103,10 +103,10 @@ Summaries and identifiers only: no secrets, tokens, passwords, private keys, mai
 no full conversation text. The shim scans free text and refuses credential-shaped
 bodies with a 400, and there is no update or delete route (405 by design).
 
-If the endpoint is down or a post times out: retry once, then append the entry as
-one JSONL line to `~/.local/state/agent-turns/queue.jsonl`, continue the turn, and
-replay in order when the endpoint answers — a repeated UUID returns the stored id,
-so replay is idempotent. Report the queue depth in your turn report. Never post a
+If the endpoint is down or a post times out, `task agents:xs:post` appends the body
+to `~/.local/state/agent-turns/queue.jsonl` itself and the next successful post
+replays it in order — a repeated UUID returns the stored id, so replay is
+idempotent. Continue the turn and report the queue depth. Never post a
 turn copy to any other endpoint or publicly, and never use it in place of the
 structured prompt and report files you already use to hand work to another agent.
 

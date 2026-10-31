@@ -94,6 +94,7 @@ jobs:
       reason: ${{ steps.detect.outputs.reason }}
       services_changed: ${{ steps.services.outputs.changed }}
       boot_matrix: ${{ steps.boot.outputs.matrix }}
+      has_boot: ${{ steps.boot.outputs.any }}
     steps:
       - name: Sync repository
         uses: actions/checkout@v4
@@ -149,8 +150,14 @@ jobs:
         env:
           MATRIX: ${{ steps.detect.outputs.matrix }}
         run: |
-          matrix=$(jq -c '[.[] | select(.arch == "x86_64-linux")]' <<<"$MATRIX")
-          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          # The matrix is a GitHub matrix object ({"include": [...]}), not a bare
+          # array, and a job-level `if` can only test strings — hence `any`.
+          echo "matrix=$(jq -c '{include: [.include[] | select(.arch == "x86_64-linux")]}' <<<"$MATRIX")" >> "$GITHUB_OUTPUT"
+          if jq -e '[.include[] | select(.arch == "x86_64-linux")] | length > 0' <<<"$MATRIX" >/dev/null; then
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "any=false" >> "$GITHUB_OUTPUT"
+          fi
 
   build-machines:
     needs: plan
@@ -262,7 +269,7 @@ jobs:
     if: >-
       needs.plan.outputs.has_machines == 'true' &&
       needs.plan.outputs.services_changed == 'true' &&
-      needs.plan.outputs.boot_matrix != '[]'
+      needs.plan.outputs.has_boot == 'true'
     env:
       CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
     timeout-minutes: 45

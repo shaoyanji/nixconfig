@@ -28,6 +28,24 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-01 — the canary is a runbook sandbox, not a second frieren
+- **Stripped to what a runbook needs.** `hosts/microvms/frieren-canary.nix` lost the SubZeroClaw
+  derivation, its activation-time config seeding and `canary-dummy-api`. What remains is `base.nix`
+  plus a login, a tool set and a volume for `/var`; the evaluated unit set is base plumbing + `sshd`
+  (`nix eval …config.systemd.services`, 1.64 s / 242 MiB — no `canary-dummy-api`).
+- **The route went with the API.** frieren's `/canary/` location, the `canary.frieren.lan` vhost and
+  the `/eisen/` proxies on frieren and eisen were EXP-102 dogfooding; `curl 127.0.0.1/canary/` had
+  been answering `504` whenever the guest was down, which is its normal state. `vm:canary:agent`
+  went with the harness it drove.
+- **It cannot be left running.** `vm:canary:run` still boots a transient unit, now with
+  `RuntimeMaxSec` (`LIFETIME`, default `2h`) and the cap printed, so an abandoned sandbox stops
+  instead of holding 2 GiB of an 8 GiB NAS. `vm:canary:test` asserts the sandbox (hostname, declared
+  address, tool set, writable `/var`) and then that no hypervisor or tap survives.
+- Evidence: the eval above; `task checks:host HOST=frieren` 19.1 s rc=0, `HOST=eisen` 13.6 s rc=0,
+  `HOST=frieren-canary MODE=eval` 1484 assertions rc=0; `task checks:tasks` 497 tasks, parity exact.
+  Not run: `task vm:canary:test` — it boots an x86_64 guest, so it belongs on frieren, and it builds
+  the new closure there.
+
 ### 2026-10-30 — agent turns: one token per holder, and the mirror that nearly ate them
 - **One token per holder, so a revocation is one holder.** `services.agentTurns.additionalTokens`
   declares `-netbook`, `-muse` and `-vesper` beside the fleet token; the shim compares every name

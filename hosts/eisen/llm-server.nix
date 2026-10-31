@@ -394,23 +394,10 @@ in {
     };
   };
 
-  # --- Eisen router alias: /eisen/* -> /router/* (local) -----------------
-  # Lets the canary guest (192.168.83.10) use the SAME endpoint
-  # (http://192.168.83.1/eisen/...) whether the microVM runs on frieren
-  # (frieren's /eisen/ proxies to Eisen's /router/) or on Eisen itself
-  # (this rewrite, /eisen/ -> /router/ locally). Without it, a guest on
-  # Eisen would need a different config than a guest on frieren.
-  services.nginx.virtualHosts."eisen.lan".locations."/eisen/" = {
-    proxyPass = "http://127.0.0.1:80/router/";
-    proxyWebsockets = false;
-    extraConfig = sseProxy;
-  };
-
   # --- Router: http://eisen.lan/router/* -> 127.0.0.1:8000 ----------------
-  # Exposes the decision router on :80 (loopback-only otherwise) so LAN /
-  # bridged-subnet clients (e.g. the frieren-canary microVM, via frieren's
-  # /eisen/ proxy) can reach it. The /router/ prefix is stripped by the
-  # trailing slash, so the router sees /v1/chat/completions + /v1/decisions.
+  # Exposes the decision router on :80 (loopback-only otherwise) so LAN
+  # clients can reach it. The /router/ prefix is stripped by the trailing
+  # slash, so the router sees /v1/chat/completions + /v1/decisions.
   # Same pattern as parakeet /stt/.
   services.nginx.virtualHosts."eisen.lan".locations."/router/" = {
     proxyPass = "http://127.0.0.1:${toString config.services.llm-decision-router.port}/";

@@ -1391,10 +1391,10 @@ constraints = ["Non-Nix environment: do not run nix or nixos-rebuild.", "STRICT 
 [hosts.frieren-canary]
 hostname = "frieren-canary"
 status = "preserved"
-status_detail = "Ephemeral canary microVM used to smoke-test a built system closure (scripts/task/run-canary.sh)."
+status_detail = "On-demand sandbox microVM on frieren for running a runbook against a real systemd/ssh box. Nothing starts it: task vm:canary:run boots it under a capped transient unit, vm:canary:stop tears it down."
 kind = "nixos"
 arch = "x86_64-linux"
-role = "Frieren Canary MicroVM (closure smoke test)"
+role = "Frieren Canary MicroVM (on-demand runbook sandbox)"
 category = "microvm"
 users = ["devji"]
 
@@ -1411,8 +1411,8 @@ lan_ip = "192.168.83.10"
 [hosts.frieren-canary.software]
 module_chain = "microvm"
 impermanence = false
-key_services = ["nixos-rebuild switch smoke test (run-canary.sh)"]
-traits = ["microvm", "canary", "ephemeral"]
+key_services = ["openssh only: no fleet service module is imported, so the guest is base plumbing plus a tool set"]
+traits = ["microvm", "canary", "ephemeral", "sandbox", "on-demand"]
 
 # ------------------------------------------------------------------------------
 # REPOSITORIES OUTSIDE THIS TREE

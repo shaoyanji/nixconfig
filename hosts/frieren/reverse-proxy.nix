@@ -39,10 +39,6 @@
   # (modules/config/nginx-static-cache.nix) so the two servers cannot disagree.
   staticCache = import ../../modules/config/nginx-static-cache.nix;
 
-  # LAN addresses come from the compiled registry: a host that moves must not
-  # need its proxy edited, and the registry is what the docs site already reads.
-  lanIp = name: config.fleet.inventory.hosts.${name}.network.lan_ip;
-
   # FTL's admin UI binds loopback only (hosts/frieren/dns.nix). Read the address
   # back from that declaration instead of repeating the port here, so the bind
   # and this proxy cannot drift apart.
@@ -371,36 +367,11 @@ in {
             default_type text/plain;
           '';
         };
-        # EXP-102: Canary MicroVM Reverse Proxy Dogfood (Model B)
-        # Exposes dummy API from frieren-canary (192.168.83.10:8080) through hypervisor Nginx
-        locations."/canary/" = {
-          proxyPass = "http://${lanIp "frieren-canary"}:8080/";
-          extraConfig = ''
-            proxy_connect_timeout 2s;
-            proxy_read_timeout 5s;
-          '';
-        };
-
-        # SubZeroClaw-in-microVM: expose Eisen's decision router to the
-        # bridged subnet (Model B). The canary (192.168.83.10) talks only to
-        # the host (192.168.83.1); frieren proxies /eisen/ to Eisen's nginx
-        # /router/ (which strips to /v1/... on the router). The Host is
-        # forced to eisen.lan so Eisen's nginx matches its eisen.lan vhost
-        # (the canary's original Host, 192.168.83.1, would miss it).
-        # Isolation: the runner (SubZeroClaw, in the microVM) is on a
-        # different host from the model (Eisen); they connect only via this
-        # endpoint. The microVM has no direct LAN access to Eisen.
-        locations."/eisen/" = {
-          proxyPass = "http://${lanIp "eisen"}/router/";
-          extraConfig = ''
-            proxy_set_header Host "eisen.lan";
-            proxy_buffering off;
-            proxy_cache off;
-            proxy_read_timeout 3600s;
-            proxy_send_timeout 3600s;
-            client_max_body_size 0;
-          '';
-        };
+        # Deliberately no route to `frieren-canary`: the guest is a runbook
+        # sandbox that exists only while `task vm:canary:run` holds it, and a
+        # vhost for a dormant guest is a per-host surface answering 504. A test
+        # that needs HTTP runs its own listener inside the guest and reaches it
+        # over the host-local bridge.
       };
 
       "vault.frieren.lan" = {
@@ -637,26 +608,6 @@ in {
             rewrite ^/admin/(.*)$ /$1 break;
             proxy_set_header Host $host;
             proxy_buffering off;
-          '';
-        };
-      };
-
-      # EXP-102: Canary MicroVM Dedicated Virtual Host (Model B Dogfood)
-      "canary.frieren.lan" = {
-        serverAliases = [
-          "canary"
-        ];
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-          }
-        ];
-        locations."/" = {
-          proxyPass = "http://${lanIp "frieren-canary"}:8080/";
-          extraConfig = ''
-            proxy_connect_timeout 2s;
-            proxy_read_timeout 5s;
           '';
         };
       };

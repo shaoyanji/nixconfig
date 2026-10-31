@@ -1,6 +1,6 @@
 ---
 name: microvm
-description: "Guests on delphi (declarative sandbox) and frieren (canary runner): the task that boots each, how to get a shell in one, and the traps that make a healthy guest look unreachable."
+description: "Guests on delphi (declarative sandbox) and frieren (a capped, on-demand runbook sandbox): the task that boots each, how to get a shell in one, and the traps that make a healthy guest look unreachable."
 version: 0.1.0
 platforms: [linux]
 metadata:
@@ -16,7 +16,12 @@ taskfile: the tasks are the API, this page is the route to them.
 | Kind | Where | Lifecycle |
 | :--- | :--- | :--- |
 | Declarative guest (`microvm.vms.<name>`) | delphi only: `sandbox` — `hosts/microvms/guests.nix`. Frieren declares none: `testvm` and `frieren-canary` are their own host configs, not `microvm.vms` entries | a `microvm@<name>` systemd unit, `autostart` where declared |
-| Canary runner (`microvmRunners.frieren-canary`) | `hosts/microvms/frieren-canary.nix`, started by `scripts/task/run-canary.sh` | a transient unit, `frieren-canary-runner` |
+| Canary runner (`microvmRunners.frieren-canary`) | `hosts/microvms/frieren-canary.nix`, started by `scripts/task/run-canary.sh` | a transient unit, `frieren-canary-runner`, capped by `RuntimeMaxSec` |
+
+The canary is a **runbook sandbox**: a login, a tool set (gcc, git, jq, sqlite,
+python) and a writable `/var`. It imports no host chain, so its unit set is base
+plumbing plus `sshd` — nothing of frieren's service tier is duplicated there, and
+frieren carries no proxy route to it. Boot it, run the runbook, stop it.
 
 Base module: `hosts/microvms/base.nix` (shared store over virtiofs, one tap, one
 static address on `brlan`). Rationale, tiers and state volumes: `AGENTS.nix` note
@@ -30,10 +35,9 @@ static address on `brlan`). Rationale, tiers and state volumes: `AGENTS.nix` not
 | `task microvm:start NAME=<guest>` | start the unit, wait for ssh |
 | `task microvm:stop NAME=<guest>` | stop the unit |
 | `task microvm:ssh NAME=sandbox` | ssh in — `sandbox` resolves only on the host that runs it |
-| `task vm:canary:run` | boot the canary under a transient systemd unit, return once sshd answers |
+| `task vm:canary:run` | unit `frieren-canary-runner`, capped by `LIFETIME` (default `2h`) |
 | `task vm:canary:ssh` | shell inside the canary |
-| `task vm:canary:agent -- "<prompt>"` | run subzeroclaw inside the canary |
-| `task vm:canary:test` | **gate**: boot → ssh → guest API → host proxy → stop → teardown |
+| `task vm:canary:test` | **gate**: boot → ssh → declared address → tool set + `/var` → stop → teardown |
 | `task vm:canary:stop` | graceful shutdown, then shares and tap |
 
 ## Logging in
@@ -43,6 +47,8 @@ static address on `brlan`). Rationale, tiers and state volumes: `AGENTS.nix` not
   `ssh delphi.bountystash.com` is the **host** shell as `devji`.
 - **The canary**: `ssh frieren-canary` from frieren (alias and known-hosts entry in
   `hosts/frieren/infra-stack.nix`), `task vm:canary:ssh` from anywhere with the repo.
+  The guest stops itself at the unit's `RuntimeMaxSec` — that is the cap that keeps
+  a forgotten sandbox off frieren's 8 GiB, not a failure: boot it again.
 - **The sandbox shell**, from delphi: `task microvm:ssh NAME=sandbox` (root in the guest).
 
 ## Traps that look like a broken guest

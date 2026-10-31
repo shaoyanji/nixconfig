@@ -69,22 +69,12 @@ Eisen's RX 5700 has **8,176 MiB total VRAM**. Gamescope/X11 typically consumes ~
 
 ## 4. Driving the Model
 
-### A. SubZeroClaw Agent Harness
-Configure `~/.subzeroclaw/config`:
-```ini
-api_key = "apikey_..."
-endpoint = "http://127.0.0.1:8085/v1/chat/completions"
-request_extra = {"model":"qwen3.8-flash-next-coder-iq1_m"}
-skills_dir = "/home/devji/.subzeroclaw/skills"
-log_dir = "/home/devji/.subzeroclaw/logs"
-max_turns = 10
-```
-
-Execute a task through SubZeroClaw:
-```bash
-echo "write me a hello.txt in home directory" | subzeroclaw
-```
-Check execution trajectory in `~/.subzeroclaw/logs/`.
+### A. Any OpenAI-compatible agent harness
+The SubZeroClaw harness this section documented was packaged inside the
+`frieren-canary` microVM module and went with it when that guest was narrowed to a
+runbook sandbox (2026-11-01, `hosts/microvms/README.md`). The endpoint it used is
+what any harness needs: `http://127.0.0.1:8085/v1/chat/completions`, model
+`qwen3.8-flash-next-coder-iq1_m`, no API key for the local vhost.
 
 ### B. OpenAI-Compatible API (Python / Curl)
 ```bash

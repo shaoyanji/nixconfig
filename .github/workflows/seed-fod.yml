@@ -1,0 +1,125 @@
+name: seed-fod
+# ONE-OFF, delete after it has run (see AUDIT.md, 2026-10-31).
+#
+# `ryoku-keysounds` fetches hainguyents13/mechvibes at 326252a1, a commit that was
+# force-pushed out of every ref and every fork: codeload answers 404, so the
+# fixed-output derivation `/nix/store/xaf4dh5anfjdscr3grw4kx8akmwjddrn-source.drv`
+# can never be built by a normal fetcher. Software Heritage still has the revision
+# (and is the only archive that does), so this job restores the tree from there,
+# checks it against the pinned NAR hash, and lets the cache serve it from then on.
+#
+# The alternative — pushing from a workstation — needs a cachix write token, and
+# the one in sops (`CACHIX.AUTH`) is read-only: the API answers 403 "not authorized
+# to access binary cache shaoyanji". The repo secret is the only write credential,
+# so the seeding has to happen here.
+on:
+  push:
+    paths:
+      - .github/workflows/seed-fod.yml
+  workflow_dispatch:
+
+concurrency:
+  group: seed-fod-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+    steps:
+      - uses: cachix/install-nix-action@v30
+
+      - uses: cachix/cachix-action@v14
+        if: ${{ env.CACHIX_AUTH_TOKEN != '' }}
+        with:
+          name: shaoyanji
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          useDaemon: false
+          installCommand: nix profile install nixpkgs#cachix
+
+      # Reconstruct the tree file by file from Software Heritage. The directory
+      # API is rate limited (~120 requests / 50 min) so it is used only for the
+      # ~15 directory listings; contents come from the unthrottled browse route,
+      # which serves the same bytes with a binary content type.
+      - name: Restore mechvibes@326252a1 from Software Heritage
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, urllib.request, urllib.error, time
+
+          API = "https://archive.softwareheritage.org/api/1"
+          RAW = "https://archive.softwareheritage.org/browse/content/sha1_git:"
+          ROOT = "324fd3d29162100bf66731afba0f77d0a6af9f71"   # tree of 326252a1
+          DEST = "/tmp/source"
+
+          def get(url, tries=6):
+              for i in range(tries):
+                  try:
+                      req = urllib.request.Request(url, headers={"User-Agent": "nixconfig-seed/1.0"})
+                      with urllib.request.urlopen(req, timeout=120) as r:
+                          return r.read()
+                  except urllib.error.HTTPError as e:
+                      if e.code in (429, 500, 502, 503) and i < tries - 1:
+                          time.sleep(3 * (i + 1))
+                          continue
+                      raise
+
+          files, stack = [], [("", ROOT)]
+          while stack:
+              path, did = stack.pop()
+              for e in json.loads(get(f"{API}/directory/{did}/")):
+                  p = f"{path}/{e['name']}" if path else e["name"]
+                  if e["type"] == "dir":
+                      stack.append((p, e["target"]))
+                  elif e["type"] == "file":
+                      files.append({
+                          "path": p,
+                          "sha1_git": e["target"],
+                          "sha256": e["checksums"]["sha256"],
+                          "length": e["length"],
+                          "perms": e["perms"],
+                      })
+          print(f"entries: {len(files)} files")
+
+          for n, f in enumerate(files, 1):
+              out = os.path.join(DEST, f["path"])
+              os.makedirs(os.path.dirname(out) or DEST, exist_ok=True)
+              data = get(f"{RAW}{f['sha1_git']}/raw/")
+              if len(data) != f["length"] or hashlib.sha256(data).hexdigest() != f["sha256"]:
+                  raise SystemExit(f"content mismatch for {f['path']}")
+              with open(out, "wb") as fh:
+                  fh.write(data)
+              os.chmod(out, 0o755 if f["perms"] & 0o111 else 0o644)
+              if n % 40 == 0:
+                  print(f"  {n}/{len(files)}")
+          print("tree restored")
+          PY
+
+      # `--add-fixed` names the store path after the directory basename, so the
+      # tree has to be `source` for the hash to reproduce the pinned output path.
+      - name: Add as a fixed-output path
+        run: |
+          set -euo pipefail
+          nix-store --add-fixed sha256 --recursive /tmp/source
+
+      - name: Assert the path and the NAR hash are the pinned ones
+        run: |
+          set -euo pipefail
+          P=/nix/store/1ygqrjq8v7lwfl2ib2yxl10qcgs3h77q-source
+          test -d "$P" || { echo "unexpected output path"; exit 1; }
+          nix hash path "$P" | grep -qx 'sha256-+pEyeTzOLQXwGltFuRGGzTl0jFz8Jwbj2/u8Yiu6nmE=' \
+            || { echo "NAR hash mismatch"; exit 1; }
+
+      - name: Push to cachix
+        run: |
+          set -euo pipefail
+          test -n "${CACHIX_AUTH_TOKEN:-}" || { echo "no write token"; exit 1; }
+          cachix push shaoyanji /nix/store/1ygqrjq8v7lwfl2ib2yxl10qcgs3h77q-source
+
+      - name: Confirm the cache now serves it
+        run: |
+          set -euo pipefail
+          curl -sSf -o /dev/null "https://shaoyanji.cachix.org/1ygqrjq8v7lwfl2ib2yxl10qcgs3h77q.narinfo"
+          echo "narinfo present"

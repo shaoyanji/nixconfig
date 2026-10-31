@@ -14,6 +14,7 @@ It is not a second manual and it is not executable truth.
 | What happened | `AUDIT.md`, `docs/history/` |
 | A novel task, or "has this been tried?" | `task ops:notes:near Q="<the intent in your words>"` — ranked notes, each with its lineage and refs; `task ops:notes:lineage ID=<id>` for one note's ancestry |
 | An experiment | `task ops:notes KIND=experiment` (`exp-NNN` notes) |
+| A visual system for a new surface (page, deck, TUI skin) | `design/ryoku/DESIGN.md` — tokens, type scale, components, agent prompts |
 | Host-specific deploy notes | `deploy/README.md`, `deploy/hosts/*.md` |
 | A skill | `skills/<name>/SKILL.md` — index below is compiled |
 | Which tool owns a data format (TOML, YAML, Nix, JSON, TOON) | [`SCHEMA.md`](SCHEMA.md) §1, "Formats, and the tool that owns each" |

@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ryoku — design preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Noto+Sans+JP:wght@400&family=Space+Grotesk:wght@400;500&family=Space+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ---- tokens (DESIGN.md §2, §3, §5) -------------------------------- */
+      :root {
+        --paper: #000;
+        --paper-raised: #0a0a0a;
+        --ink: #cdc4ba;
+        --ink-dim: #b0a9a0;
+        --ink-muted: #958f87;
+        --ink-faint: #807a73;
+        --line-soft: color-mix(in srgb, var(--ink) 13%, transparent);
+        --line: color-mix(in srgb, var(--ink) 26%, transparent);
+        --line-strong: color-mix(in srgb, var(--ink) 42%, transparent);
+        --tint5: color-mix(in srgb, var(--ink) 5%, transparent);
+        --tint10: color-mix(in srgb, var(--ink) 10%, transparent);
+        --signal: #ce5e32;
+        --notice: #ce5e32;
+        --f-display: "Fraunces", ui-serif, Georgia, serif;
+        --f-sans: "Space Grotesk", system-ui, sans-serif;
+        --f-mono: "Space Mono", ui-monospace, monospace;
+        --f-jp: "Noto Sans JP", "Hiragino Sans", sans-serif;
+        --radius: 2px;
+        --max: 1240px;
+        --gutter: clamp(1.15rem, 4vw, 3rem);
+        --section-y: clamp(1.75rem, 4vw, 3rem);
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --s8: 64px;
+        --snap: 90ms;
+        --move: 0.17s;
+        --swap: 0.21s;
+        --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+        --ease-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--paper);
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink-dim);
+        font-family: var(--f-sans);
+        font-size: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* grain: the only texture in the system */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 var(--gutter) var(--s8);
+      }
+
+      /* ---- type ------------------------------------------------------- */
+      .eyebrow,
+      .label,
+      .micro {
+        font-family: var(--f-mono);
+        font-weight: 400;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+      }
+      .eyebrow {
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+      }
+      .micro {
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+      }
+      .label {
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-family: var(--f-display);
+        font-weight: 400;
+        color: var(--ink);
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(3.6rem, 8vw, 5.75rem);
+        line-height: 0.96;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.6rem);
+        line-height: 1;
+        letter-spacing: -0.02em;
+      }
+      h3 {
+        font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.6rem);
+        line-height: 1.08;
+      }
+      .lead {
+        font-size: clamp(1.2rem, 1rem + 0.9vw, 1.6rem);
+        color: var(--ink-dim);
+        max-width: 60ch;
+      }
+      p {
+        max-width: 68ch;
+        margin: 0 0 var(--s4);
+      }
+      .jp {
+        font-family: var(--f-jp);
+        letter-spacing: 0.16em;
+        color: var(--ink-faint);
+      }
+
+      /* ---- layout ----------------------------------------------------- */
+      header {
+        padding: var(--s8) 0 var(--s7);
+        border-bottom: 1px solid var(--line-strong);
+      }
+      .kicker {
+        display: flex;
+        gap: var(--s4);
+        align-items: baseline;
+        flex-wrap: wrap;
+        margin-bottom: var(--s5);
+      }
+      section {
+        border-top: 1px solid var(--line-strong);
+        padding: var(--section-y) 0 var(--s7);
+      }
+      section:first-of-type {
+        border-top: 0;
+      }
+      .sec-head {
+        display: grid;
+        grid-template-columns: 3.5rem 1fr auto;
+        gap: var(--s4);
+        align-items: baseline;
+        margin-bottom: var(--s6);
+      }
+      .sec-head .jp {
+        font-size: 1.5rem;
+      }
+      .split {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr);
+        gap: var(--s6);
+      }
+      @media (max-width: 860px) {
+        .split {
+          grid-template-columns: 1fr;
+        }
+        .sec-head {
+          grid-template-columns: 2.5rem 1fr;
+        }
+        .sec-head .jp {
+          display: none;
+        }
+      }
+
+      /* ---- editions --------------------------------------------------- */
+      .editions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1px;
+        background: var(--line-soft);
+        border: 1px solid var(--line-soft);
+      }
+      .edition {
+        background: var(--e-paper);
+        color: var(--e-ink);
+        padding: var(--s5);
+      }
+      .edition .edition-name {
+        font-family: var(--f-display);
+        font-size: 1.6rem;
+        color: var(--e-ink);
+        margin-bottom: var(--s1);
+      }
+      .edition .eyebrow {
+        color: var(--e-faint);
+      }
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--s2);
+        margin: var(--s4) 0;
+      }
+      .chip {
+        height: 34px;
+        border: 1px solid color-mix(in srgb, var(--e-ink) 20%, transparent);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--s3);
+        padding: 7px 0;
+        border-top: 1px solid color-mix(in srgb, var(--e-ink) 13%, transparent);
+        font-family: var(--f-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        color: var(--e-dim);
+      }
+      .row b {
+        font-weight: 400;
+        color: var(--e-ink);
+      }
+      .edition .bar {
+        margin-top: var(--s4);
+        padding: 6px 10px;
+        background: var(--e-signal);
+        color: #000;
+        font-family: var(--f-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        border-radius: var(--radius);
+        display: inline-block;
+      }
+
+      /* ---- type specimens -------------------------------------------- */
+      .spec {
+        display: grid;
+        grid-template-columns: 16rem 1fr;
+        gap: var(--s5);
+        align-items: baseline;
+        padding: var(--s4) 0;
+        border-top: 1px solid var(--line-soft);
+      }
+      .spec:first-child {
+        border-top: 0;
+      }
+      .spec .meta {
+        font-family: var(--f-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        line-height: 1.9;
+      }
+      @media (max-width: 860px) {
+        .spec {
+          grid-template-columns: 1fr;
+          gap: var(--s2);
+        }
+      }
+      .t-hero {
+        font-family: var(--f-display);
+        font-size: clamp(2.4rem, 5vw, 4.6rem);
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+      }
+      .t-sub {
+        font-family: var(--f-display);
+        font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.6rem);
+        line-height: 1.1;
+        color: var(--ink);
+      }
+      .t-lead {
+        font-family: var(--f-sans);
+        font-size: clamp(1.2rem, 1rem + 0.9vw, 1.6rem);
+        color: var(--ink-dim);
+      }
+      .t-body {
+        font-family: var(--f-sans);
+        font-size: clamp(1.02rem, 0.95rem + 0.4vw, 1.28rem);
+        color: var(--ink-dim);
+      }
+      .t-label {
+        font-family: var(--f-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+      .t-micro {
+        font-family: var(--f-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+
+      /* ---- components ------------------------------------------------- */
+      .comp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1px;
+        background: var(--line-soft);
+        border: 1px solid var(--line-soft);
+      }
+      .cell {
+        background: var(--paper);
+        padding: var(--s5);
+      }
+      .cell > .label {
+        display: block;
+        margin-bottom: var(--s4);
+        color: var(--ink-faint);
+      }
+      .btn {
+        display: inline-block;
+        border: 0;
+        border-radius: var(--radius);
+        padding: 0.7em 1.15em;
+        font-family: var(--f-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+          background var(--snap) var(--ease-out),
+          color var(--snap) var(--ease-out),
+          border-color var(--snap) var(--ease-out);
+      }
+      .btn-primary {
+        background: var(--signal);
+        color: #000;
+      }
+      .btn-primary:hover {
+        background: color-mix(in srgb, var(--signal) 90%, transparent);
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--ink-dim);
+      }
+      .btn-ghost:hover {
+        border-color: var(--ink);
+        color: var(--ink);
+        background: var(--tint5);
+      }
+      .btn-ghost:active,
+      .btn-primary:active {
+        background: var(--tint10);
+        color: var(--ink);
+      }
+      .btn-bone {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .btn-bone:hover {
+        background: color-mix(in srgb, #fff 92%, transparent);
+      }
+      .btn-row {
+        display: flex;
+        gap: var(--s3);
+        flex-wrap: wrap;
+      }
+
+      a {
+        color: var(--ink);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+        transition: text-decoration-color var(--snap) var(--ease-quad);
+      }
+      a:hover {
+        text-decoration-color: var(--signal);
+      }
+
+      .sheet {
+        border-top: 1px solid var(--line);
+      }
+      .sheet-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--s4);
+        padding: var(--s3) 0;
+        border-bottom: 1px solid var(--line-soft);
+        transition: background var(--snap) var(--ease-out);
+      }
+      .sheet-row:hover {
+        background: var(--tint5);
+      }
+      .sheet-row .k {
+        font-family: var(--f-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+      }
+      .sheet-row .v {
+        font-variant-numeric: tabular-nums;
+        color: var(--ink);
+      }
+
+      input[type="text"] {
+        width: 100%;
+        background: var(--paper-raised);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 10px 12px;
+        color: var(--ink);
+        font-family: var(--f-mono);
+        font-size: 0.8rem;
+        outline: none;
+        transition: border-color var(--snap) var(--ease-out);
+      }
+      input[type="text"]::placeholder {
+        color: var(--ink-faint);
+        letter-spacing: 0.08em;
+      }
+      input[type="text"]:focus {
+        border-color: var(--line-strong);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        text-align: left;
+        font-family: var(--f-mono);
+        font-size: 0.75rem;
+        font-weight: 400;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        padding: 0 0 var(--s2);
+        border-bottom: 1px solid var(--line-strong);
+      }
+      td {
+        padding: 9px 0;
+        border-bottom: 1px solid var(--line-soft);
+        color: var(--ink-dim);
+        font-variant-numeric: tabular-nums;
+      }
+      th.num,
+      td.num {
+        text-align: right;
+      }
+
+      .badge {
+        font-family: var(--f-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+      }
+      .badge i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+        background: var(--ink-faint);
+      }
+      .badge.live i {
+        background: var(--signal);
+      }
+      .badge.fail i {
+        background: var(--notice);
+      }
+
+      .well {
+        background: var(--paper-raised);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        height: 120px;
+        display: grid;
+        place-items: center;
+        font-family: var(--f-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+
+      /* ---- depth / layout --------------------------------------------- */
+      .ladder {
+        border-top: 1px solid var(--line-soft);
+        padding: var(--s3) 0;
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s4);
+        font-family: var(--f-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+      }
+      .scale {
+        display: grid;
+        gap: 6px;
+      }
+      .scale div {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        font-family: var(--f-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        color: var(--ink-muted);
+      }
+      .scale span {
+        height: 10px;
+        background: var(--ink-faint);
+      }
+      .bone {
+        background: var(--ink);
+        color: var(--paper);
+        padding: var(--s6);
+        border-radius: var(--radius);
+        margin-top: var(--s6);
+      }
+      .bone .eyebrow {
+        color: color-mix(in srgb, var(--paper) 62%, transparent);
+      }
+      .bone h3 {
+        color: var(--paper);
+        max-width: 22ch;
+      }
+      .donts {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1px;
+        background: var(--line-soft);
+        border: 1px solid var(--line-soft);
+      }
+      .donts li {
+        background: var(--paper);
+        padding: var(--s3) var(--s4);
+        font-size: 0.95rem;
+        color: var(--ink-muted);
+      }
+      .donts li::before {
+        content: "✕ ";
+        font-family: var(--f-mono);
+        color: var(--notice);
+      }
+      footer {
+        border-top: 1px solid var(--line-strong);
+        padding-top: var(--s6);
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s4);
+        flex-wrap: wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="kicker">
+          <span class="eyebrow">Design preview · 力</span>
+          <span class="micro">DESIGN.md §1–§9</span>
+        </div>
+        <h1>Power in the system.<br />Beauty in the surface.</h1>
+        <p class="lead" style="margin-top: var(--s5)">
+          Every token on this page is read from
+          <span style="font-family: var(--f-mono); color: var(--ink)"
+            >.agents/design/ryoku/DESIGN.md</span
+          >. Warm ink on near-black paper, hairline rules instead of boxes, a serif
+          voice against geometric sans, mono signage, one signal colour.
+        </p>
+        <div class="kicker" style="margin-top: var(--s5)">
+          <span class="label">Fraunces · Space Grotesk · Space Mono</span>
+          <span class="label">radius 2px</span>
+          <span class="label">measure 1240px</span>
+          <span class="label">no shadows</span>
+        </div>
+      </header>
+
+      <section>
+        <div class="sec-head">
+          <span class="eyebrow">02</span>
+          <h2>Color</h2>
+          <span class="jp">色</span>
+        </div>
+        <p>
+          Four editions share one structure and differ only in paper tint, ink cast
+          and signal. Pick one per surface; layout, type and spacing never move.
+        </p>
+        <div class="editions" style="margin-top: var(--s6)">
+          <div
+            class="edition"
+            style="
+              --e-paper: #000000;
+              --e-raised: #0a0a0a;
+              --e-ink: #cdc4ba;
+              --e-dim: #b0a9a0;
+              --e-muted: #958f87;
+              --e-faint: #807a73;
+              --e-signal: #ce5e32;
+            "
+          >
+            <div class="eyebrow">Edition</div>
+            <div class="edition-name">Default</div>
+            <div class="swatches">
+              <div class="chip" style="background: #000000"></div>
+              <div class="chip" style="background: #0a0a0a"></div>
+              <div class="chip" style="background: #ce5e32"></div>
+            </div>
+            <div class="row"><span>paper</span><b>#000000</b></div>
+            <div class="row"><span>raised</span><b>#0a0a0a</b></div>
+            <div class="row"><span>ink</span><b>#cdc4ba</b></div>
+            <div class="row"><span>signal</span><b>#ce5e32</b></div>
+            <span class="bar">Primary</span>
+          </div>
+
+          <div
+            class="edition"
+            style="
+              --e-paper: #0b0c1b;
+              --e-raised: #131527;
+              --e-ink: #c4c6d2;
+              --e-dim: #aaacb6;
+              --e-muted: #90929d;
+              --e-faint: #80828d;
+              --e-signal: #9299d3;
+            "
+          >
+            <div class="eyebrow">Edition</div>
+            <div class="edition-name">NixOS</div>
+            <div class="swatches">
+              <div class="chip" style="background: #0b0c1b"></div>
+              <div class="chip" style="background: #131527"></div>
+              <div class="chip" style="background: #9299d3"></div>
+            </div>
+            <div class="row"><span>paper</span><b>#0b0c1b</b></div>
+            <div class="row"><span>raised</span><b>#131527</b></div>
+            <div class="row"><span>ink</span><b>#c4c6d2</b></div>
+            <div class="row"><span>signal</span><b>#9299d3</b></div>
+            <span class="bar">Primary</span>
+          </div>
+
+          <div
+            class="edition"
+            style="
+              --e-paper: #05110a;
+              --e-raised: #0b1a12;
+              --e-ink: #c1cac4;
+              --e-dim: #a6afaa;
+              --e-muted: #8d9590;
+              --e-faint: #7c8580;
+              --e-signal: #6daf8c;
+            "
+          >
+            <div class="eyebrow">Edition</div>
+            <div class="edition-name">Void</div>
+            <div class="swatches">
+              <div class="chip" style="background: #05110a"></div>
+              <div class="chip" style="background: #0b1a12"></div>
+              <div class="chip" style="background: #6daf8c"></div>
+            </div>
+            <div class="row"><span>paper</span><b>#05110a</b></div>
+            <div class="row"><span>raised</span><b>#0b1a12</b></div>
+            <div class="row"><span>ink</span><b>#c1cac4</b></div>
+            <div class="row"><span>signal</span><b>#6daf8c</b></div>
+            <span class="bar">Primary</span>
+          </div>
+
+          <div
+            class="edition"
+            style="
+              --e-paper: #030f19;
+              --e-raised: #081824;
+              --e-ink: #bfc9d1;
+              --e-dim: #a5aeb5;
+              --e-muted: #8b949b;
+              --e-faint: #7b848b;
+              --e-signal: #6ea5cf;
+            "
+          >
+            <div class="eyebrow">Edition</div>
+            <div class="edition-name">Fedora</div>
+            <div class="swatches">
+              <div class="chip" style="background: #030f19"></div>
+              <div class="chip" style="background: #081824"></div>
+              <div class="chip" style="background: #6ea5cf"></div>
+            </div>
+            <div class="row"><span>paper</span><b>#030f19</b></div>
+            <div class="row"><span>raised</span><b>#081824</b></div>
+            <div class="row"><span>ink</span><b>#bfc9d1</b></div>
+            <div class="row"><span>signal</span><b>#6ea5cf</b></div>
+            <span class="bar">Primary</span>
+          </div>
+        </div>
+
+        <div class="ladder" style="margin-top: var(--s6)">
+          <span>--line-soft 13% ink</span>
+          <span>--line 26%</span>
+          <span>--line-strong 42%</span>
+          <span>--tint5 / --tint10</span>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-head">
+          <span class="eyebrow">03</span>
+          <h2>Typography</h2>
+          <span class="jp">字</span>
+        </div>
+        <div class="spec">
+          <div class="meta">
+            Hero<br />Fraunces 400<br />clamp(3.6rem, 8vw, 5.75rem)<br />-0.02em
+          </div>
+          <div class="t-hero">A desktop, not a pile of dotfiles.</div>
+        </div>
+        <div class="spec">
+          <div class="meta">
+            Sub-head<br />Fraunces 400<br />clamp(1.6rem, 1.2rem+1.8vw, 2.6rem)
+          </div>
+          <div class="t-sub">Change anything. Reinstall nothing.</div>
+        </div>
+        <div class="spec">
+          <div class="meta">
+            Lead<br />Space Grotesk 400<br />clamp(1.2rem, 1rem+0.9vw, 1.6rem)
+          </div>
+          <div class="t-lead">
+            The same desktop sits on a different system foundation.
+          </div>
+        </div>
+        <div class="spec">
+          <div class="meta">
+            Body<br />Space Grotesk 400<br />clamp(1.02rem, .95rem+.4vw, 1.28rem)
+          </div>
+          <div class="t-body">
+            Structure is drawn with 1 px rules at 13, 26 and 42 percent of the ink
+            colour. Fills are the exception; hairlines are the rule.
+          </div>
+        </div>
+        <div class="spec">
+          <div class="meta">
+            Eyebrow<br />Space Mono 400<br />0.75rem · 0.14em · uppercase
+          </div>
+          <div class="t-label">01 · See it running · 見</div>
+        </div>
+        <div class="spec">
+          <div class="meta">
+            Micro<br />Space Mono 400<br />0.7rem · 0.28em · uppercase
+          </div>
+          <div class="t-micro">6 / 6 · ROSE 12:35</div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-head">
+          <span class="eyebrow">04</span>
+          <h2>Components</h2>
+          <span class="jp">品</span>
+        </div>
+        <div class="comp-grid">
+          <div class="cell">
+            <span class="label">Buttons / 2px radius, mono</span>
+            <div class="btn-row">
+              <button class="btn btn-primary">Install</button>
+              <button class="btn btn-ghost">Read the manual</button>
+              <button class="btn btn-bone">Sponsor</button>
+            </div>
+            <p style="margin: var(--s5) 0 0; font-size: 0.9rem; color: var(--ink-muted)">
+              Signal is spent once per view. Ghost is the default; bone is the
+              inversion, used at most once per page.
+            </p>
+          </div>
+
+          <div class="cell">
+            <span class="label">Links</span>
+            <p style="margin: 0">
+              A link is ink with a
+              <a href="#0">1 px underline at 3 px offset</a>, never signal. Hover
+              moves the underline, not the text colour.
+            </p>
+          </div>
+
+          <div class="cell">
+            <span class="label">Input</span>
+            <div class="label" style="margin-bottom: var(--s2)">Host name</div>
+            <input type="text" placeholder="frieren.lan" />
+            <p style="margin: var(--s4) 0 0; font-size: 0.85rem; color: var(--ink-faint)">
+              Focus raises the border. No glow, no outline colour.
+            </p>
+          </div>
+
+          <div class="cell">
+            <span class="label">Badges</span>
+            <div style="display: flex; gap: var(--s5); flex-wrap: wrap">
+              <span class="badge live"><i></i>live</span>
+              <span class="badge"><i></i>dormant</span>
+              <span class="badge fail"><i></i>failed</span>
+            </div>
+            <p style="margin: var(--s5) 0 0; font-size: 0.85rem; color: var(--ink-faint)">
+              A dot at 50 % radius beside a mono word. No pills.
+            </p>
+          </div>
+
+          <div class="cell">
+            <span class="label">Media well</span>
+            <div class="well">screenshot · grayscale(1) contrast(1.05)</div>
+          </div>
+
+          <div class="cell">
+            <span class="label">Table</span>
+            <table>
+              <thead>
+                <tr>
+                  <th>Host</th>
+                  <th class="num">Gen</th>
+                  <th class="num">GiB</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>frieren</td>
+                  <td class="num">412</td>
+                  <td class="num">34.9</td>
+                </tr>
+                <tr>
+                  <td>fern</td>
+                  <td class="num">57</td>
+                  <td class="num">9.1</td>
+                </tr>
+                <tr>
+                  <td>poseidon</td>
+                  <td class="num">208</td>
+                  <td class="num">21.4</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="split" style="margin-top: var(--s6)">
+          <div>
+            <span class="label">Sheet rows — the signature component</span>
+            <div class="sheet" style="margin-top: var(--s3)">
+              <div class="sheet-row">
+                <span class="k">Compositor</span>
+                <span class="v">niri ⇄ hyprland</span>
+              </div>
+              <div class="sheet-row">
+                <span class="k">Shell</span>
+                <span class="v">Quickshell on Go IPC</span>
+              </div>
+              <div class="sheet-row">
+                <span class="k">Theming</span>
+                <span class="v">matugen, from wallpaper</span>
+              </div>
+              <div class="sheet-row">
+                <span class="k">Bar styles</span>
+                <span class="v">7</span>
+              </div>
+              <div class="sheet-row">
+                <span class="k">Settings</span>
+                <span class="v">230</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <span class="label">Spacing scale</span>
+            <div class="scale" style="margin-top: var(--s3)">
+              <div><span style="width: 4px"></span>s1 · 4</div>
+              <div><span style="width: 8px"></span>s2 · 8</div>
+              <div><span style="width: 12px"></span>s3 · 12</div>
+              <div><span style="width: 16px"></span>s4 · 16</div>
+              <div><span style="width: 24px"></span>s5 · 24</div>
+              <div><span style="width: 32px"></span>s6 · 32</div>
+              <div><span style="width: 48px"></span>s7 · 48</div>
+              <div><span style="width: 64px"></span>s8 · 64</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-head">
+          <span class="eyebrow">06</span>
+          <h2>Depth</h2>
+          <span class="jp">層</span>
+        </div>
+        <p>
+          Four levels, none of them a shadow: paper, tint wash, raised well, inverted
+          bone. Grain is the only texture; motion is 90 / 170 / 210 ms with no
+          bounce.
+        </p>
+        <div class="bone">
+          <div class="eyebrow">Keep it going · 支</div>
+          <h3 style="margin-top: var(--s3)">
+            One bone band per page. It is the loudest thing here.
+          </h3>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-head">
+          <span class="eyebrow">07</span>
+          <h2>Don'ts</h2>
+          <span class="jp">禁</span>
+        </div>
+        <ul class="donts">
+          <li>Shadows, glows, blur panels</li>
+          <li>Radii above 2 px, pills, chips</li>
+          <li>A second accent colour</li>
+          <li>Light mode</li>
+          <li>Uppercase serif, mono paragraphs</li>
+          <li>Zebra tables, three-stat dashboards</li>
+          <li>Gradients, neon, glassmorphism</li>
+          <li>Kanji as the only label</li>
+        </ul>
+      </section>
+
+      <footer>
+        <span class="eyebrow">Ryoku · design preview</span>
+        <span class="micro">Tokens extracted 2026-10-31 · ryoku.dev</span>
+        <span class="eyebrow">力と美のために</span>
+      </footer>
+    </div>
+  </body>
+</html>

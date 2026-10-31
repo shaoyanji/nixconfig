@@ -22,6 +22,10 @@ on:
           - all
           - none
         default: "anchor"
+      boot_host:
+        description: "Boot this host on purpose (needs the same host= above); empty keeps the canary tied to modules/services diffs"
+        required: false
+        default: ""
 
 jobs:
   sops-drift:
@@ -95,6 +99,7 @@ jobs:
       services_changed: ${{ steps.services.outputs.changed }}
       boot_matrix: ${{ steps.boot.outputs.matrix }}
       has_boot: ${{ steps.boot.outputs.any }}
+      force_boot: ${{ steps.boot.outputs.forced }}
     steps:
       - name: Sync repository
         uses: actions/checkout@v4
@@ -145,19 +150,41 @@ jobs:
       # is expanded), so the boot canary's host list is filtered here instead.
       # GitHub's ubuntu-24.04-arm runners have no /dev/kvm, and a boot test without
       # it is TCG, not a gate (measured 2026-10-30).
+      # `boot_host` is how the canary is re-run AFTER a change to
+      # flake/boot-checks.nix: no `modules/services` diff triggers it, so the
+      # sizing fix for frieren could otherwise only be proved by waiting for an
+      # unrelated services commit. It narrows the matrix to that one host and
+      # drops the diff gate, so the run is deliberate and costs one boot.
       - name: Boot-capable hosts (KVM runners only)
         id: boot
         env:
           MATRIX: ${{ steps.detect.outputs.matrix }}
+          BOOT_HOST: ${{ inputs.boot_host }}
         run: |
           # The matrix is a GitHub matrix object ({"include": [...]}), not a bare
           # array, and a job-level `if` can only test strings — hence `any`.
-          echo "matrix=$(jq -c '{include: [.include[] | select(.arch == "x86_64-linux")]}' <<<"$MATRIX")" >> "$GITHUB_OUTPUT"
-          if jq -e '[.include[] | select(.arch == "x86_64-linux")] | length > 0' <<<"$MATRIX" >/dev/null; then
-            echo "any=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "any=false" >> "$GITHUB_OUTPUT"
+          if [ -n "$BOOT_HOST" ]; then
+            if ! jq -e --arg h "$BOOT_HOST" '[.include[] | select(.host == $h)] | length > 0' <<<"$MATRIX" >/dev/null; then
+              echo "::error::boot_host=$BOOT_HOST is not in the detected matrix — dispatch with host=$BOOT_HOST as well"
+              {
+                echo "any=false"
+                echo "forced=false"
+              } >>"$GITHUB_OUTPUT"
+              exit 0
+            fi
+            {
+              echo "matrix=$(jq -c --arg h "$BOOT_HOST" '{include: [.include[] | select(.host == $h)]}' <<<"$MATRIX")"
+              echo "any=true"
+              echo "forced=true"
+            } >>"$GITHUB_OUTPUT"
+            exit 0
           fi
+          EMU=$(jq -c '{include: [.include[] | select(.arch == "x86_64-linux")]}' <<<"$MATRIX")
+          {
+            echo "forced=false"
+            echo "matrix=$EMU"
+            if jq -e '[.include[] | select(.arch == "x86_64-linux")] | length > 0' <<<"$MATRIX" >/dev/null; then echo "any=true"; else echo "any=false"; fi
+          } >>"$GITHUB_OUTPUT"
 
   build-machines:
     needs: plan
@@ -268,8 +295,8 @@ jobs:
     # from the host itself, not here; `plan` filters those out of boot_matrix.
     if: >-
       needs.plan.outputs.has_machines == 'true' &&
-      needs.plan.outputs.services_changed == 'true' &&
-      needs.plan.outputs.has_boot == 'true'
+      needs.plan.outputs.has_boot == 'true' &&
+      (needs.plan.outputs.services_changed == 'true' || needs.plan.outputs.force_boot == 'true')
     env:
       CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
     timeout-minutes: 45

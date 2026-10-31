@@ -201,6 +201,33 @@ tasks:
           exit) exit 0 ;;
         esac
 
+  agents:xs:post:
+    desc: "Post one xs turn from a template (SUBJECT, ACTION, RATIONALE - no JSON)"
+    summary: >
+      Renders scripts/task/xs-turn.jq - the schema - and posts it, filling id, ts,
+      source, base_commit and branch; values cross as environment variables, so
+      prose with quotes stays literal and no caller builds JSON. Needs
+      SUBJECT=<repo>:<task-id> and ACTION; optional RATIONALE, OUTCOME, SOURCE,
+      FILES/COMMITS/CLAIMS (comma-separated), ID (retry), BASE_COMMIT/BRANCH. Exit
+      2 = bad input (nothing sent), exit 3 = no token, exit 4 = transport (body kept
+      at ~/.local/state/agent-turns/last-turn.json), exit 5 = rejected.
+    requires:
+      vars: [SUBJECT, ACTION]
+    env:
+      SUBJECT: "{{.SUBJECT}}"
+      ACTION: "{{.ACTION}}"
+      RATIONALE: "{{.RATIONALE | default \"\"}}"
+      OUTCOME: "{{.OUTCOME | default \"done\"}}"
+      SOURCE: "{{.SOURCE | default \"\"}}"
+      FILES: "{{.FILES | default \"\"}}"
+      COMMITS: "{{.COMMITS | default \"\"}}"
+      CLAIMS: "{{.CLAIMS | default \"\"}}"
+      ID: "{{.ID | default \"\"}}"
+      BASE_COMMIT: "{{.BASE_COMMIT | default \"\"}}"
+      BRANCH: "{{.BRANCH | default \"\"}}"
+    cmds:
+      - bash scripts/task/xs-turn-post.sh
+
   browse:
     desc: "[deprecated] Legacy browse menu - use direct commands"
     cmds:

@@ -9,7 +9,9 @@ in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/profiles/base-desktop-environment.nix
+    # Ryoku pilot (2026-10-31): replaces base-desktop-environment, which would
+    # enable niri and expect the DMS greeter under greetd.
+    ../../modules/profiles/ryoku-desktop.nix
     ../../modules/profiles/laptop.nix
     ../../modules/profiles/base-node.nix
   ];
@@ -41,21 +43,11 @@ in {
     };
   };
 
-  # --- Desktop (scratch-style): niri compositor + DMS greeter, no Steam ---
-  # base-desktop-environment already enables autoLogin as devji; pin the
-  # session to niri so autologin has an unambiguous target. The DMS
-  # greeter module runs the resolved session; if it exits, greetd falls
-  # back to the greeter login screen.
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
-  };
-  services.displayManager.defaultSession = "niri";
-  programs.dms-greeter = {
-    enable = true;
-    compositor.name = "niri";
-    configHome = user.home; # Sync themes with user's DankMaterialShell config
-  };
+  # --- Desktop: Ryoku (niri provider), pilot 2026-10-31 ---
+  # No DMS greeter and no greetd: with no other display manager enabled,
+  # Ryoku's module turns on SDDM (Wayland) and owns its theme, so login happens
+  # at Ryoku's own greeter and `defaultCompositor = "niri"` picks the session.
+  # Autologin is gone on purpose; it hid the greeter the pilot needs to test.
 
   # Antigravity CLI (agy) crashes on fern due to Ryzen 3 3250U broken RDRAND
   # ("RDRAND is not reliable on this platform; disabling"), which causes BoringSSL's

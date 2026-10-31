@@ -12,6 +12,7 @@
     globalModulesImpermanence
     globalModulesMacos
     globalModulesNixos
+    globalModulesRyoku
     # The microVM hosts below build their own module list instead of using a
     # global chain, so they take the inventory injection explicitly. Without it
     # they have no `config.fleet.inventory`; `checks.<system>.inventory-modules`
@@ -167,8 +168,11 @@ in {
     system = "x86_64-linux";
     # Role/hardware/history are COMPILED, not commented: inventory.toml
     # `[hosts.fern] notes`, surfaced by `task dev:inventory:feed`.
+    # Ryoku pilot (2026-10-31): the desktop chain is swapped, not extended.
+    # globalModulesRyoku carries no dms/dank-greeter modules, and the host sets
+    # `fleet.dankShell.enable = false` so the DMS/niri home modules stay out too.
     modules =
-      globalModulesNixos
+      globalModulesRyoku
       ++ [
         inputs.disko.nixosModules.default
         ../hosts/fern/configuration.nix

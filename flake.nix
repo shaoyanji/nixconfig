@@ -109,21 +109,29 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
 
-    # The greeter lives in its own repo since 2026-09 (imported via
-    # module-sets as inputs.dank-greeter.nixosModules.default →
-    # programs.dms-greeter). See danklinux.com/docs/dankgreeter/nixos-flake.
+    # DMS 2.0 is Dux Shell: Dank Linux rebranded to Dux Labs on 2026-10-20, and
+    # the greeter moved to its own repo in 2026-09 (imported via module-sets as
+    # inputs.dank-greeter.nixosModules.default → programs.dms-greeter). Both keep
+    # their old flake output and option names (`nixosModules.dank-material-shell`,
+    # `programs.dank-material-shell`) so the consumers needed only a URL bump.
     dms = {
-      url = "github:AvengeMedia/DankMaterialShell/stable";
+      url = "github:duxlabs-dev/dux-shell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "flake-compat";
     };
     dank-greeter = {
-      url = "github:AvengeMedia/dank-greeter";
+      url = "github:duxlabs-dev/dux-greeter";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     niri = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Ryoku desktop pilot (fern). Deliberately no `nixpkgs.follows`: the port
+    # keeps its own fixed package universe (ryokuPackagesNixpkgs) so Hyprland
+    # plugin ABI and its QML stack stay matched to Ryoku, not to our nixpkgs.
+    ryoku = {
+      url = "github:Ryoku-dev/Ryoku-on-NixOS";
     };
     microvm = {
       url = "github:microvm-nix/microvm.nix";

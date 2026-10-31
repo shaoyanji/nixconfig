@@ -93,6 +93,7 @@ jobs:
       matrix: ${{ steps.detect.outputs.matrix }}
       reason: ${{ steps.detect.outputs.reason }}
       services_changed: ${{ steps.services.outputs.changed }}
+      boot_matrix: ${{ steps.boot.outputs.matrix }}
     steps:
       - name: Sync repository
         uses: actions/checkout@v4
@@ -139,9 +140,25 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # A job-level `if` cannot read `matrix` (it is evaluated before the matrix
+      # is expanded), so the boot canary's host list is filtered here instead.
+      # GitHub's ubuntu-24.04-arm runners have no /dev/kvm, and a boot test without
+      # it is TCG, not a gate (measured 2026-10-30).
+      - name: Boot-capable hosts (KVM runners only)
+        id: boot
+        env:
+          MATRIX: ${{ steps.detect.outputs.matrix }}
+        run: |
+          matrix=$(jq -c '[.[] | select(.arch == "x86_64-linux")]' <<<"$MATRIX")
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
   build-machines:
     needs: plan
     if: needs.plan.outputs.has_machines == 'true'
+    # Secrets are not readable from an `if`; a job env is. It is empty when the
+    # secret is absent, which is what the cachix step tests.
+    env:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
     # The runner's 6-hour maximum is not a budget. A warm host builds in ~5
     # minutes and a cold aarch64 closure compiles for ~30; anything past an hour
     # is a stall (measured 2026-10-30: a job sat on one derivation for 5.5 h and
@@ -199,7 +216,7 @@ jobs:
       # absent keeps the build honest (it still substitutes, it just cannot
       # publish) instead of failing the whole run on missing auth.
       - uses: cachix/cachix-action@v14
-        if: ${{ secrets.CACHIX_AUTH_TOKEN != '' }}
+        if: ${{ env.CACHIX_AUTH_TOKEN != '' }}
         with:
           name: shaoyanji
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
@@ -241,15 +258,17 @@ jobs:
     # 2026-10-30 — the runner advertises `nixos-test` but not `kvm`, and the boot
     # test then fails `a 'aarch64-linux' with features {kvm, nixos-test} is
     # required`). A boot test under TCG is not a gate, so ARM hosts are booted
-    # from the host itself, not here.
+    # from the host itself, not here; `plan` filters those out of boot_matrix.
     if: >-
       needs.plan.outputs.has_machines == 'true' &&
       needs.plan.outputs.services_changed == 'true' &&
-      matrix.arch == 'x86_64-linux'
+      needs.plan.outputs.boot_matrix != '[]'
+    env:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
     timeout-minutes: 45
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.plan.outputs.boot_matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Maximize build disk space (Linux only)
@@ -300,7 +319,7 @@ jobs:
           token: "${{ secrets.GH_PAT }}"
 
       - uses: cachix/cachix-action@v14
-        if: ${{ secrets.CACHIX_AUTH_TOKEN != '' }}
+        if: ${{ env.CACHIX_AUTH_TOKEN != '' }}
         with:
           name: shaoyanji
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"

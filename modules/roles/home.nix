@@ -4,6 +4,9 @@
   lib,
   pkgs,
   osConfig ? {},
+  # Set by `fleet.dankShell.enable` through modules/global/nixos.nix. Default
+  # true keeps every darwin/demo/home host on the DMS imports.
+  dankShell ? true,
   ...
 }: let
   user = import ../global/user.nix;
@@ -16,24 +19,26 @@
     pkgs.stdenv.hostPlatform.isLinux
     && (osConfig.programs.niri.enable or false);
 in {
-  imports = [
-    ./minimal.nix
-    ../shell
-    ../dev.nix
-    ../user/ai/antigravity-cli.nix
-    ../systemd-policy.nix
-    ../zen.nix
+  imports =
+    [
+      ./minimal.nix
+      ../shell
+      ../dev.nix
+      ../user/ai/antigravity-cli.nix
+      ../systemd-policy.nix
+      ../zen.nix
+      ../user/desktop/multimedia.nix
+      ../user/desktop/appimage-menu.nix
+      ../user/kg-sidecar.nix
+      ../kitty.nix
+    ]
     # Imported unconditionally (a `pkgs`-dependent import reads `config` and
     # recurses); niri.nix gates its own body with mkIf on Linux, because a
     # Wayland compositor has no aarch64-darwin counterpart and its swayidle
     # dependency is not packaged for darwin — which failed EVALUATION, not just
-    # the build, on cassini.
-    ../user/desktop/niri.nix
-    ../user/desktop/multimedia.nix
-    ../user/desktop/appimage-menu.nix
-    ../user/kg-sidecar.nix
-    ../kitty.nix
-  ];
+    # the build, on cassini. A Ryoku host owns the compositor, so it drops this
+    # module rather than redefining the same options twice.
+    ++ lib.optionals dankShell [../user/desktop/niri.nix];
 
   programs = {
     home-manager.enable = true;

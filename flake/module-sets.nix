@@ -73,9 +73,25 @@ in rec {
       inputs.sops-nix.nixosModules.sops
       inputs.nix-index-database.nixosModules.nix-index
       inputs.dms.nixosModules.dank-material-shell
-      # Greeter split out of the dms flake into AvengeMedia/dank-greeter
-      # (2026-09): option is programs.dms-greeter now.
+      # Greeter lives in its own repo (duxlabs-dev/dux-greeter, ex-
+      # AvengeMedia/dank-greeter): option is programs.dms-greeter.
       inputs.dank-greeter.nixosModules.default
+    ];
+  # Ryoku replaces the shell, not the system: it owns its compositor build,
+  # session packages, portals, keyring and greeter preference. So this chain is
+  # `globalModulesNixos` minus dms/dank-greeter (they would be a second
+  # Quickshell shell in the same session), plus `modules/profiles/ryoku-desktop.nix`
+  # in the host, which sets `fleet.dankShell.enable = false` to keep the DMS
+  # home modules out of HM as well.
+  globalModulesRyoku =
+    globalModules
+    ++ [
+      ../modules/global/nixos.nix
+      ../modules/global/determinate-nix.nix
+      inputs.home-manager.nixosModules.default
+      inputs.sops-nix.nixosModules.sops
+      inputs.nix-index-database.nixosModules.nix-index
+      inputs.ryoku.nixosModules.default
     ];
   globalModulesImpermanence =
     globalModulesNixos

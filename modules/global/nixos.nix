@@ -34,6 +34,9 @@
       extraSpecialArgs = {
         inherit inputs self;
         fleetHost = config.networking.hostName;
+        # Lets a home module choose its imports by shell capability instead of
+        # mkForce-ing inside a role (see `roles/home.nix`, Ryoku pilot).
+        dankShell = config.fleet.dankShell.enable;
       };
     };
   };

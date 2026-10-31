@@ -1,7 +1,7 @@
 ---
 name: xs-turns
 description: "Pick me before and after a turn that touches shared work: read the fleet turn log for a live claim, then post one resumable summary. Covers the token, the exact schema, subjects, reachability and the queue fallback."
-version: 0.1.0
+version: 0.2.0
 platforms: [linux]
 metadata:
   hermes:
@@ -59,28 +59,54 @@ transcript being posted under an extra key):
 | `claims` | list of areas or files |
 | `outcome` | `done` \| `in_progress` \| `blocked: <one line>` \| `failed: <one line>` |
 
-Build the body with `jq` so quoting cannot corrupt it, and keep apostrophes out of
-the prose — a stray `'` inside a shell-quoted `--arg` is the one thing that has
-actually broken this.
+`task agents:xs:post` builds the body from `scripts/task/xs-turn.jq` — the
+template is the schema — and posts it. You supply prose and never type JSON, and
+the values cross as environment variables, so a quote, a backtick or a `$( )` in
+a rationale stays literal. (Hand-built JSON is what kept breaking here: a stray
+`'` inside a `jq --arg`.)
 
 ```bash
-body=$(jq -n \
-  --arg id "$(cat /proc/sys/kernel/random/uuid)" \
-  --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-  --arg action "one line: what landed" \
-  --arg rationale "why, and the exact next step for whoever continues this" \
-  '{id:$id, ts:$ts, source:"<agent>", kind:"turn", subject:"nixconfig:<task-id>",
-    action:$action, rationale:$rationale, base_commit:"<sha>", branch:"<branch>",
-    files_changed:[], commits:[], claims:[], outcome:"done"}')
-
-curl -sS --max-time 15 -H "Authorization: Bearer $AGENT_TURNS_TOKEN" \
-  -H 'Content-Type: application/json' -X POST --data "$body" \
-  "$X/v1/events" -o /tmp/xs-resp.json -w 'http=%{http_code}\n'
-jq -c '{id, duplicate}' /tmp/xs-resp.json
+cd "${NIXCONFIG:-$HOME/Documents/nixconfig}"
+task agents:xs:post \
+  SUBJECT=nixconfig:<task-id> \
+  ACTION='one line: what landed, and where' \
+  RATIONALE='why it was needed, and the exact next step for whoever continues this' \
+  OUTCOME=done \
+  FILES='taskfiles/agents.yml,scripts/task/xs-turn.jq' \
+  COMMITS='c75d2baa' \
+  CLAIMS='taskfiles/agents.yml'
 ```
 
-- `201` = stored, `id` is the xs frame id.
+```
+http      201
+frame     03h5e0d5wc1gxp1ycyc2oaysa
+client    712e6b6f-fe1e-48be-8496-62f1ee085740
+subject   nixconfig:<task-id>
+outcome   done
+```
+
+| var | default | |
+| :--- | :--- | :--- |
+| `SUBJECT` | required | `<repo>:<task-id>`; the half before `:` is what `repo=` filters on |
+| `ACTION` | required | one line, ≤500 characters |
+| `RATIONALE` | `""` | ≤1000; the diagnosis and the continuation belong here |
+| `OUTCOME` | `done` | also `in_progress`, `blocked: why`, `failed: why` |
+| `SOURCE` | `$USER` | short agent name |
+| `FILES` `COMMITS` `CLAIMS` | `[]` | comma- or newline-separated |
+| `ID` | a fresh UUID | pass the old one to retry; the shim dedups on it |
+| `BASE_COMMIT` `BRANCH` | `git HEAD`, current branch | override when the work landed elsewhere |
+
+What the template does that a hand-built body gets wrong: it fills `id`, `ts`,
+`source` and `kind`, and renders `rationale`, `base_commit` and `branch` as real
+`null` when empty rather than `""` — which the shim refuses on a hash.
+
+- `201` = stored, and `frame` is the xs frame id.
 - `200` = that UUID already exists; the post was a safe retry.
+- `400` / `401` = rejected, nothing stored; the error line names the field or the
+  token, never a value.
+- transport failure (`4` when the script is run directly) leaves the body at
+  `~/.local/state/agent-turns/last-turn.json`, which is exactly what the fallback
+  below appends.
 - There is **no update and no delete** (`405` by design). A correction is a new
   entry, not an edit.
 
@@ -119,10 +145,10 @@ Measured on 2026-10-30 from delphi itself:
 
 `curl -sS "$X/healthz"` needs no auth and answers `{"ok":true}` when the shim is
 up; a `000` means transport, not auth. If the endpoint is still down: retry once,
-then append the same body as one JSONL line to
-`~/.local/state/agent-turns/queue.jsonl`, continue the turn, and replay when it
-answers. Replay is idempotent because the UUID is the dedup key. Report the queue
-depth in the turn report.
+then append the body the task already left on disk as one JSONL line —
+`cat ~/.local/state/agent-turns/last-turn.json >> ~/.local/state/agent-turns/queue.jsonl`
+— continue the turn, and replay when it answers. Replay is idempotent because the
+UUID is the dedup key. Report the queue depth in the turn report.
 
 ## Rejections
 

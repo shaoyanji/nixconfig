@@ -28,6 +28,25 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-10-31 — Dux bump, and Ryoku piloted on fern (CI build blocked)
+- **Shell inputs moved to Dux Labs.** `dms` → `github:duxlabs-dev/dux-shell/stable`, `dank-greeter` →
+  `github:duxlabs-dev/dux-greeter` (DMS 2.0 rebrand, 2026-10-20). Option and flake-output names are
+  compatibility-preserved (`programs.dank-material-shell`, `nixosModules.dank-material-shell`), so only
+  URLs moved; `dms/dank-qml-common` is still the transitive pin name. Evidence: `task checks:host HOST=fern`
+  rc=0, 1976 assertions (32.8 s / 1 415 MiB, before the Ryoku change).
+- **Ryoku pilot on fern, branch `ryoku-pilot-fern` (NOT deployed, main untouched).** Ryoku replaces the
+  shell, so the host takes a new chain `globalModulesRyoku` (globalModulesNixos minus dms/dank-greeter) and
+  `fleet.dankShell.enable = false` keeps the DMS/niri home modules out of HM. Gate: `task checks:host
+  HOST=fern` rc=0, 1976 assertions, 112 s / 2 469 MiB (second nixpkgs in the graph).
+- **What broke:** Ryoku enables `power-profiles-daemon`, which the NixOS assertion refuses beside
+  `laptop.nix`'s `auto-cpufreq`; the profile resolves it in Ryoku's favour. Nothing else failed evaluation.
+- **Closure delta unmeasured: CI cannot fetch a fixed-output source.** `nixcachix` run 41192471687 fails
+  deterministically on `xaf4dh5an…-source.drv` (`github:neur0map/ryomotion@60ea129`) with codeload 404s,
+  for both `ryoku-keysounds` and `ryoku-hyprland-plugins`. The same URL answers 200 from frieren, so it is
+  runner-IP rate limiting, not a dead pin. Baseline (current DMS/niri fern, same commit) was built on
+  `fern-baseline` and measured from narinfo: **18.35 GiB NAR / 2 401 paths**.
+- **Also observed:** `task checks:nix:format` is red at HEAD on `flake/policies.nix` (not touched here).
+
 ### 2026-10-30 — agent turns: one token per holder, and the mirror that nearly ate them
 - **One token per holder, so a revocation is one holder.** `services.agentTurns.additionalTokens`
   declares `-netbook`, `-muse` and `-vesper` beside the fleet token; the shim compares every name

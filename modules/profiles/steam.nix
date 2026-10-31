@@ -86,10 +86,10 @@
           /run/wrappers/bin/sudo systemctl restart greetd.service 2>/dev/null || true
         fi
       elif ! pgrep -x gamescope >/dev/null 2>&1; then
-        # Standalone fallback: launch gamescope-session directly if in TTY
-        if command -v gamescope-session >/dev/null 2>&1; then
-          echo "Launching gamescope-session directly..."
-          exec gamescope-session
+        # Standalone fallback: launch the gamescope Steam session if in TTY
+        if command -v steam-gamescope >/dev/null 2>&1; then
+          echo "Launching steam-gamescope directly..."
+          exec steam-gamescope
         fi
       fi
 

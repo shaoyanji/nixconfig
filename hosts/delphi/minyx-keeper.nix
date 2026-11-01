@@ -26,6 +26,7 @@
           coreutils
           dnsutils
           git
+          nix
           nixos-rebuild
           openssh
         ];

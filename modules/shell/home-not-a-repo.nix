@@ -1,16 +1,6 @@
-# $HOME is not a git repository, by construction.
-#
-# A coding agent started in ~ sometimes runs `git init` there. That makes
-# starship's git_status walk the whole home tree on every prompt — seconds per
-# prompt on a home with .cache/.local/npm trees — and it is why an ssh login
-# felt broken after such a session. Starship 1.x has no per-directory module
-# switch, so the cheap fix is at the source: ~/.git is a symlink into /proc,
-# where nothing can be created. `git status` in ~ then answers "not a git
-# repository" in milliseconds, and `git init` in ~ fails instead of silently
-# arming the trap.
-#
-# Repositories *below* home (~/Documents/nixconfig) are untouched: git finds
-# their own .git before it ever walks up to ~.
+# $HOME is not a git repository, by construction: ~/.git is a symlink into /proc,
+# so `git init` in ~ fails instead of arming starship's whole-tree git_status walk,
+# and repositories below home are untouched. Rationale: docs/nix-patterns.md.
 {lib, ...}: let
   sentinel = "/proc/nixconfig-home-is-not-a-git-repository";
 in {

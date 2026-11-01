@@ -1,10 +1,6 @@
-# molly-brown from upstream master instead of nixpkgs' 2023-02-10 snapshot.
-#
-# Upstream (`tildegit.org/solderpunk/molly-brown`) publishes neither tags nor
-# releases — both lists are empty, measured 2026-10-29 — so "the newest release"
-# can only be the tip of master. The go module set has not moved since nixpkgs'
-# pin: `vendorHash` here is the one already in nixpkgs, verified by building this
-# override locally, so only `src` and `version` differ from stock.
+# molly-brown from upstream master: no tags or releases exist upstream (both lists
+# empty, measured 2026-10-29), so master is the only "newest", and `vendorHash` is
+# nixpkgs' own — only `src` and `version` differ. docs/nix-patterns.md (no tags).
 _: prev: {
   molly-brown = prev.molly-brown.overrideAttrs (_: {
     version = "0-unstable-2026-05-25";

@@ -536,6 +536,7 @@ in {
       wants = ["network-online.target"];
       wantedBy = ["multi-user.target"];
       unitConfig.ConditionPathIsMountPoint = cfg.requireMount;
+      unitConfig.X-Fleet-Role = "daemon";
       serviceConfig = {
         Type = "simple";
         # Two entries, not one shell line: systemd word-splits ExecStartPre and

@@ -1120,10 +1120,17 @@ in {
           echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
           mkdir -p "$HOME/Documents" "$HOME/vaults"
 
-          # Ensure git rewrites SSH URLs to HTTPS and uses gh credential helper without failing on read-only ~/.config/git/config
+          # SSH URLs are rewritten to HTTPS here. The credential helper is NOT set
+          # here: home-manager's `programs.gh` already renders an absolute-path
+          # helper into ~/.config/git/config, and a second PATH-dependent `!gh`
+          # entry in ~/.gitconfig shadowed it — under a thin PATH every git fetch
+          # logged `gh: command not found` before the absolute helper still
+          # authenticated (delphi, minyx-keeper journal). Unset rather than skip,
+          # so a host that already carries the stale pair converges.
           git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
-          git config --file "$HOME/.gitconfig" credential."https://github.com".helper "!gh auth git-credential"
-          git config --file "$HOME/.gitconfig" credential."https://gist.github.com".helper "!gh auth git-credential"
+          for scope in github.com gist.github.com; do
+            git config --file "$HOME/.gitconfig" --unset-all "credential.https://$scope.helper" || true
+          done
 
           if [ ! -d "$HOME/Documents/nixconfig/.git" ]; then
             echo "--> Cloning nixconfig to ~/Documents/nixconfig (with recursive submodules)..."

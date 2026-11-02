@@ -85,11 +85,11 @@
     echo "Total Critical Failures: $FAILURES"
     echo "Search Benchmark Errors: $SEARCH_ERRORS"
 
-    if [ "$FAILURES" -gt 0 ] || ([ "$SEARCH_ERRORS" -gt 0 ] && [ "${
+    if [ "$FAILURES" -gt 0 ] || { [ "$SEARCH_ERRORS" -gt 0 ] && [ "${
       if cfg.failOnSearchError
       then "1"
       else "0"
-    }" = "1" ]); then
+    }" = "1" ]; }; then
       echo "CRITICAL: Kiwix offline knowledge library reported errors!" >&2
       exit 1
     fi

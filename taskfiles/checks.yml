@@ -49,6 +49,7 @@ tasks:
       - task checks:kg
       - task checks:kg:native
       - task checks:nix:lint
+      - task checks:nix:shell
       - task checks:sops:drift
       - task checks:modules:validate
 
@@ -476,6 +477,19 @@ tasks:
       warning fires on the house style).
     cmds:
       - bash scripts/task/nix-fmt.sh --check --all --tools deadnix,statix
+
+  checks:nix:shell:
+    desc: "[gate] Shell inside Nix strings: no expansion read as interpolation, shellcheck clean"
+    summary: >
+      Two checks over all 61 scripts behind writeShellApplication,
+      writeShellScriptBin and writeShellScript. A `${x:-y}` in an indented string
+      is Nix interpolation, and Nix parses `x:-y` as a URI literal — the script
+      then ships a literal where an expansion was meant, with no eval error.
+      That is a hard failure. Each script is then shellchecked with Nix values
+      stubbed, which is the build-time coverage the two helpers other than
+      writeShellApplication never had. ~0.4 s, no host eval, no network.
+    cmds:
+      - bash scripts/task/nix-shell-lint.sh
 
   checks:nix:prose:
     desc: "[gate] Nix comments must cite a home (docs/, skill, policy), not explain in place"

@@ -31,21 +31,28 @@ die() {
 
 inventory() { gh cs list --limit 100 --json name,state,repository; }
 
-# CS names a codespace explicitly; otherwise the single Available one is used.
-# Two Available codespaces is ambiguous, and guessing is how the wrong machine
-# gets stopped or reset.
+# CS names a codespace explicitly. Otherwise: one codespace in the account is
+# used whatever its state, because `gh cs ssh` starts a shutdown one on demand;
+# with several, the single Available one wins and anything else is ambiguous —
+# a guess is how the wrong machine gets stopped or reset.
 resolve() {
   if [ -n "$CS" ]; then
     printf '%s\n' "$CS"
     return
   fi
-  local names count
-  names=$(inventory | jq -r '[.[] | select(.state == "Available") | .name] | .[]')
-  count=$(printf '%s' "$names" | grep -c . || true)
-  case "$count" in
-    0) die "no Available codespace — start one, or set CS=<name> (task codespace:list)" ;;
-    1) printf '%s\n' "$names" ;;
-    *) die "$count codespaces are Available — set CS=<name> (task codespace:list)" ;;
+  local all total avail n_avail
+  all=$(inventory | jq -r '.[].name')
+  total=$(printf '%s' "$all" | grep -c . || true)
+  if [ "$total" -eq 1 ]; then
+    printf '%s\n' "$all"
+    return
+  fi
+  avail=$(inventory | jq -r '[.[] | select(.state == "Available") | .name] | .[]')
+  n_avail=$(printf '%s' "$avail" | grep -c . || true)
+  case "$n_avail" in
+    1) printf '%s\n' "$avail" ;;
+    0) die "$total codespaces, none Available — set CS=<name> (task codespace:list)" ;;
+    *) die "$n_avail codespaces are Available — set CS=<name> (task codespace:list)" ;;
   esac
 }
 
@@ -67,9 +74,12 @@ cmd_list() {
 }
 
 cmd_exec() {
-  local remote="$*"
+  local remote="$*" c
   [ -n "$remote" ] || die 'usage: task codespace:exec -- "<command>"'
-  gh cs ssh -c "$(resolve)" -- "$remote"
+  # Assigned, not inlined: a `die` inside `$(...)` exits the substitution, and
+  # the gh call would then run with an empty -c and try to prompt.
+  c=$(resolve)
+  gh cs ssh -c "$c" -- "$remote"
 }
 
 # Is this codespace safe to stop? Dirty tree or commits that exist nowhere else
@@ -158,12 +168,20 @@ cmd_sync() {
   c=$(resolve)
   body=$(
     cat <<'EOS'
+git rev-parse -q --verify "origin/$BRANCH" >/dev/null 2>&1 || {
+  echo "origin/$BRANCH does not exist on the remote — nothing to sync to" >&2
+  exit 1
+}
 DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
 if [ "$DIRTY" -ne 0 ] && [ "${FORCE:-}" != "1" ]; then
   echo "refusing: $DIRTY uncommitted path(s) — commit, or FORCE=1 to discard them" >&2
   exit 1
 fi
-git fetch -q origin "$BRANCH"
+# Every remote-tracking ref, not just $BRANCH: `status` compares against
+# origin/$BRANCH, and a fetch of one name leaves the others as stale as the
+# clone, which reports an already-pushed commit as "ahead" and refuses a stop
+# for no reason.
+git fetch -q --prune origin
 git reset --hard "origin/$BRANCH"
 # A hard reset leaves untracked files alone, so a tree dirtied by a stray file
 # stayed dirty and the checkout could not clean itself. Only FORCE removes them.

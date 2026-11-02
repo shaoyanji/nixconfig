@@ -82,8 +82,15 @@ unpushed commit on that disk is not stored anywhere.
 
 An old codespace clone is dangerous rather than merely stale after an upstream
 rewrite: it still contains the objects that were purged and would put them back
-on its next push. `codespace:sync` fetches and resets it onto `origin/<branch>`,
-refusing a dirty tree unless `FORCE=1`.
+on its next push. `codespace:sync` fetches every remote-tracking ref with
+`--prune`, then resets onto `origin/<branch>`, refusing a dirty tree unless
+`FORCE=1`.
+
+That fetch is also what makes the `ahead` count trustworthy. `codespace:status`
+compares against `origin/<branch>` as the clone last saw it, so after work lands
+elsewhere an unrefreshed clone reports those commits as local-only and calls the
+stop UNSAFE. When someone else may have pushed, `codespace:sync` before
+`codespace:status`.
 
 Truth: `taskfiles/codespace.yml` — the executable contract; `scripts/task/codespace.sh`
 is the implementation, and this page is the procedure and the measured traps.

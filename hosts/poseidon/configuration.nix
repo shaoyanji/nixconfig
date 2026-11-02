@@ -18,7 +18,12 @@ in {
     ./hardware-configuration.nix
     ./nvidia.nix
     ../../modules/profiles/steam.nix
-    ../../modules/profiles/base-desktop-environment.nix
+    # Ryoku is the high-end desktop tier (2026-11-02). It replaces
+    # base-desktop-environment: Ryoku owns the compositor build, the session
+    # packages, the portals and the SDDM theme, so importing both would put two
+    # shells in one session and let this profile's mkForce'd portal config win
+    # over Ryoku's.
+    ../../modules/profiles/ryoku-desktop.nix
     ../../modules/profiles/laptop.nix
     # microVM DISABLED (2026-08): testvm no longer runs on poseidon.
     # Re-enable by uncommenting the microvm host module + microvm-host.nix
@@ -176,15 +181,16 @@ in {
   # services.avahi.publish.enable = true;
   # services.avahi.publish.userServices = true;
 
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
-  };
-
-  programs.dms-greeter = {
+  # --- Desktop: Ryoku (high-end tier) ---
+  # No SDDM setting here: with no other greeter enabled, Ryoku turns SDDM on
+  # (mkDefault) and owns its theme, and `defaultCompositor = "niri"` in the
+  # profile picks the `ryoku-niri` session.
+  #
+  # Login stays automatic, as it was under the DMS greeter this replaces — the
+  # Ryoku greeter is what you get after a logout.
+  services.displayManager.autoLogin = {
     enable = true;
-    compositor.name = "niri";
-    configHome = user.home; # Sync themes with user's DankMaterialShell config
+    user = user.name;
   };
 
   networking.firewall = {

@@ -10,7 +10,12 @@ in {
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
     ../../modules/profiles/steam.nix
-    ../../modules/profiles/base-desktop-environment.nix
+    # Ryoku is the high-end desktop tier (2026-11-02). It replaces
+    # base-desktop-environment: Ryoku owns the compositor build, the session
+    # packages, the portals and the SDDM theme, so importing both would put two
+    # shells in one session and let this profile's mkForce'd portal config win
+    # over Ryoku's.
+    ../../modules/profiles/ryoku-desktop.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/nas-client.nix
     ../../modules/profiles/sunshine.nix
@@ -23,30 +28,21 @@ in {
     ./strata.nix
   ];
 
-  # --- Desktop (poseidon-style): niri compositor + DankMaterialShell greeter ---
-  # The previous cage-kiosk specialisation and greetd dual-session experiments
-  # both hung boot at graphical.target, so the DMS greeter path (as on
-  # poseidon) is used instead of greetd auto-login.
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
-  };
-
+  # --- Desktop: Ryoku (high-end tier) ---
+  # No SDDM setting here: with no other greeter enabled, Ryoku turns SDDM on
+  # (mkDefault) and owns its theme, and `defaultCompositor = "niri"` in the
+  # profile picks the `ryoku-niri` session.
+  #
   # Autologin: boot straight into Steam Big Picture under gamescope-session so
-  # Steam Link / Moonlight work with zero interaction after power-on. greetd's
-  # initial_session (DMS greeter module) runs the resolved session; if it exits,
-  # greetd falls back to the DMS greeter login screen.
+  # Steam Link / Moonlight work with zero interaction after power-on.
   services.displayManager.autoLogin = {
     enable = true;
     user = user.name;
   };
-  services.displayManager.defaultSession = "steam";
-
-  programs.dms-greeter = {
-    enable = true;
-    compositor.name = "niri";
-    configHome = user.home; # Sync themes with user's DankMaterialShell config
-  };
+  # Ryoku pins its own session at priority 900 (`ryoku-niri`). This host's
+  # first session is gamescope, so the pin has to be overridden rather than
+  # merely set — a plain definition loses to it.
+  services.displayManager.defaultSession = lib.mkForce "steam";
 
   # --- Steam under gamescope ---
   # The RX 5700's modern Vulkan ICD fully supports gamescope's compositor

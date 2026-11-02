@@ -158,7 +158,8 @@ flake.nix → flake/outputs.nix (the one assembly node)
 
 | Chain                            | What it includes                                                                       | Used by                                                                            |
 | -------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `globalModulesNixos`             | global + nixos + home-manager-shared + sops + nix-index + dms + dank-greeter (desktop) | poseidon, aristotle, aceofspades, ancientace, eisen, frieren, scratch, stark, fern |
+| `globalModulesNixos`             | global + nixos + home-manager-shared + sops + nix-index + dms + dank-greeter (Dux desktop, medium tier) | aristotle, stark, aceofspades, ancientace, frieren, scratch |
+| `globalModulesRyoku`             | global + nixos + sops + nix-index + ryoku (no dms/dank-greeter: one shell per session) | poseidon, eisen, fern (high-end tier; fern is the floor) |
 | `globalModulesImpermanence`      | globalModulesNixos + impermanence + disko                                              | schneeeule                                                                         |
 | containers + impermanence (ares) | globalModulesContainers + impermanence + disko                                         | ares (Steam kiosk)                                                                 |
 | `globalModulesContainers`        | global + noDE + sops + home-manager + nix-index (no dms/niri desktop)                  | mtfuji, kellerbench, applevalley, sledgehammer, guckloch (WSL), deckstation        |

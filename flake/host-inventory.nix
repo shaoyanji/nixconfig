@@ -35,7 +35,11 @@ in {
   poseidon = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [../hosts/poseidon/configuration.nix];
+    # Ryoku is the high-end desktop tier (2026-11-02): the chain carries
+    # inputs.ryoku instead of dms/dank-greeter, and the host imports
+    # ryoku-desktop.nix, which sets `fleet.dankShell.enable = false` to keep the
+    # DMS home modules out of HM.
+    modules = globalModulesRyoku ++ [../hosts/poseidon/configuration.nix];
   };
 
   mtfuji = {
@@ -102,7 +106,9 @@ in {
     system = "x86_64-linux";
     # Role/hardware/history are COMPILED, not commented: inventory.toml
     # `[hosts.eisen] notes`, surfaced by `task dev:inventory:feed`.
-    modules = globalModulesNixos ++ [../hosts/eisen/configuration.nix];
+    # Ryoku is the high-end desktop tier (2026-11-02): the chain carries
+    # inputs.ryoku instead of dms/dank-greeter.
+    modules = globalModulesRyoku ++ [../hosts/eisen/configuration.nix];
   };
 
   applevalley = {

@@ -75,17 +75,25 @@
         fi
       fi
 
-      # 2. Trigger return to Gamescope via greetd autologin if greetd is active
-      if systemctl is-active --quiet greetd.service 2>/dev/null; then
-        echo "Restarting greetd to boot into Gamescope initial session..."
-        if [ "''${EUID:-$(id -u)}" -eq 0 ]; then
-          systemctl restart greetd.service 2>/dev/null || true
-        elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
-          sudo systemctl restart greetd.service 2>/dev/null || true
-        elif [ -x /run/wrappers/bin/sudo ] && /run/wrappers/bin/sudo -n true 2>/dev/null; then
-          /run/wrappers/bin/sudo systemctl restart greetd.service 2>/dev/null || true
+      # 2. Trigger return to Gamescope through the display manager's autologin:
+      #    greetd on the Dux tier, sddm on the Ryoku tier (2026-11-02). A
+      #    greetd-only check made this a no-op on a host whose greeter is SDDM.
+      dm_restarted=0
+      for dm in greetd sddm; do
+        if systemctl is-active --quiet "$dm.service" 2>/dev/null; then
+          echo "Restarting $dm to boot into Gamescope initial session..."
+          if [ "''${EUID:-$(id -u)}" -eq 0 ]; then
+            systemctl restart "$dm.service" 2>/dev/null || true
+          elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+            sudo systemctl restart "$dm.service" 2>/dev/null || true
+          elif [ -x /run/wrappers/bin/sudo ] && /run/wrappers/bin/sudo -n true 2>/dev/null; then
+            /run/wrappers/bin/sudo systemctl restart "$dm.service" 2>/dev/null || true
+          fi
+          dm_restarted=1
+          break
         fi
-      elif ! pgrep -x gamescope >/dev/null 2>&1; then
+      done
+      if [ "$dm_restarted" -eq 0 ] && ! pgrep -x gamescope >/dev/null 2>&1; then
         # Standalone fallback: launch the gamescope Steam session if in TTY
         if command -v steam-gamescope >/dev/null 2>&1; then
           echo "Launching steam-gamescope directly..."

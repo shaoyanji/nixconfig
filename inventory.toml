@@ -204,7 +204,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Primary High-Performance Laptop Workstation"
 category = "workstation"
-desktop_environment = "Niri + DankMaterialShell greeter"
+desktop_environment = "Ryoku desktop (niri compositor, Ryoku SDDM greeter) — high-end tier"
 users = ["devji"]
 
 [hosts.poseidon.hardware]
@@ -221,9 +221,9 @@ tailscale_hostname = "poseidon"
 ssh_alias = "poseidon"
 
 [hosts.poseidon.software]
-module_chain = "globalModulesNixos"
+module_chain = "globalModulesRyoku"
 impermanence = false
-key_services = ["Niri Wayland Compositor", "DankMaterialShell Greeter", "Steam (full gaming suite)", "Ollama (CUDA acceleration with lfm2.5)", "NVIDIA proprietary drivers (open kernel module)", "NAS client automount"]
+key_services = ["Ryoku desktop shell (quickshell) on the niri compositor", "Ryoku SDDM greeter", "Steam (full gaming suite)", "Ollama (CUDA acceleration with lfm2.5)", "NVIDIA proprietary drivers (open kernel module)", "NAS client automount"]
 traits = ["flagship-workstation", "cuda-compute", "laptop-profile", "optimus-prime", "dual-gpu", "niri-desktop", "steam-gaming", "ai-full", "dev-full", "tpm-identity"]
 
 [hosts.poseidon.persona]
@@ -279,9 +279,9 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node"
 category = "workstation"
-desktop_environment = "Niri + DankMaterialShell greeter / Gamescope Session"
+desktop_environment = "Ryoku desktop (niri compositor) / Gamescope Session — high-end tier"
 users = ["devji"]
-notes = ["Converted from a cage-based Steam kiosk into a full desktop (poseidon-style): globalModulesNixos brings in niri + DankMaterialShell plus the sops/nix-index HM modules.", "Steam runs under the upstream gamescope-session, which is safe on the RX 5700's modern Vulkan ICD (unlike kellerbench's Kepler card).", "History: the previous cage-kiosk specialisation and greetd dual-session experiments hung at graphical.target, so the DMS greeter path (as on poseidon) is used instead of greetd auto-login."]
+notes = ["Converted from a cage-based Steam kiosk into a full desktop (poseidon-style); since 2026-11-02 the Ryoku tier: globalModulesRyoku brings in the Ryoku shell on niri plus the sops/nix-index HM modules.", "Steam runs under the upstream gamescope-session, which is safe on the RX 5700's modern Vulkan ICD (unlike kellerbench's Kepler card).", "History: the previous cage-kiosk specialisation and greetd dual-session experiments hung at graphical.target, so the DMS greeter path (as on poseidon) is used instead of greetd auto-login."]
 
 [hosts.eisen.hardware]
 model = "Custom Multi-Core Gaming Rig"
@@ -299,9 +299,9 @@ lan_ip = "192.168.3.91"
 mac = "00:e0:22:1c:bb:ed"
 
 [hosts.eisen.software]
-module_chain = "globalModulesNixos"
+module_chain = "globalModulesRyoku"
 impermanence = false
-key_services = ["Niri Wayland Desktop + DMS Greeter", "Steam (gamescope-session)", "Sunshine GameStream server (Moonlight LAN host)", "RX 5700 VCN 2.0 hardware video encode", "NAS client automount", "llama-swap model router on :8080 (OpenAI /v1 via nginx on eisen.lan:80 and tailscale serve; model 'qwen' = qwen3.6-35b-a3b)", "Qwen3.6-35B-A3B on Vulkan/radv llama.cpp with DFlash2 speculative decoding (+40% decode, measured) and expert tensors kept in CPU RAM", "llama-swap-gaming-guard: suspends the LLM while a Steam game runs, freeing ~21 GiB RAM + 5.4 GiB VRAM, and resumes on exit", "Kolibri-1 (78B A3B, German/English) weights staged at /mnt/storage/models but not loadable: stock llama.cpp lacks the kolibri1 architecture", "Laya decision model (421M, CPU-only) on 127.0.0.1:8090 behind nginx on laya.lan:80 and tailscale serve :8443, exposing the Jev-compatible POST /v1/systemone (choice/score/noul) — holds no VRAM, so it keeps answering while a game runs"]
+key_services = ["Ryoku desktop shell (quickshell) on the niri compositor", "Ryoku SDDM greeter", "Steam (gamescope-session)", "Sunshine GameStream server (Moonlight LAN host)", "RX 5700 VCN 2.0 hardware video encode", "NAS client automount", "llama-swap model router on :8080 (OpenAI /v1 via nginx on eisen.lan:80 and tailscale serve; model 'qwen' = qwen3.6-35b-a3b)", "Qwen3.6-35B-A3B on Vulkan/radv llama.cpp with DFlash2 speculative decoding (+40% decode, measured) and expert tensors kept in CPU RAM", "llama-swap-gaming-guard: suspends the LLM while a Steam game runs, freeing ~21 GiB RAM + 5.4 GiB VRAM, and resumes on exit", "Kolibri-1 (78B A3B, German/English) weights staged at /mnt/storage/models but not loadable: stock llama.cpp lacks the kolibri1 architecture", "Laya decision model (421M, CPU-only) on 127.0.0.1:8090 behind nginx on laya.lan:80 and tailscale serve :8443, exposing the Jev-compatible POST /v1/systemone (choice/score/noul) — holds no VRAM, so it keeps answering while a game runs"]
 traits = ["12-core-24-thread", "64gb-ram", "amd-gpu", "sunshine-streaming", "steam-gaming", "llm-inference", "llm-model-router", "moe-expert-offload", "speculative-decoding", "game-aware-yield", "vulkan-compute", "decision-model", "jev-compatible", "cpu-inference", "ai-full", "dev-full"]
 
 [hosts.eisen.persona]
@@ -320,7 +320,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "ThinkPad T440 Mobile Laptop Workstation"
 category = "laptop"
-desktop_environment = "Niri + DankMaterialShell greeter"
+desktop_environment = "Niri + DankMaterialShell greeter — medium tier (Dux)"
 users = ["devji"]
 notes = [
   "Lenovo ThinkPad T440 (20B7S06N00) laptop: lightweight Niri Wayland desktop via programs.dms-greeter autologin as devji.",
@@ -445,7 +445,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Living Room All-in-One Gaming Terminal"
 category = "gaming-kiosk"
-desktop_environment = "Gamescope Session (Steam Big Picture) / Niri + DMS"
+desktop_environment = "Gamescope Session (Steam Big Picture) / Niri + DMS — medium tier (Dux)"
 users = ["devji"]
 notes = ["Dell Inspiron 24 3477 AIO (i5-7200U Kaby Lake-U, 16 GiB) Steam Big Picture desktop mirroring eisen: globalModulesNixos brings in niri + DankMaterialShell greeter + role:heim userland.", "autoLogin drops devji into the upstream gamescope-session (steam -gamepadui) with the DMS greeter as fallback.", "The MX110 (Maxwell GM108M sm_50) dGPU needs the legacy_580 driver and is muxless Optimus: PRIME render offload with the HD 620 iGPU driving the panel, so games opt in via 'nvidia-offload %command%'.", "Dual-disk disko uses persistent by-id paths: SK hynix SATA SSD for system + 1 TB Seagate HDD as the btrfs Steam library at /mnt/steam. Persistent (no impermanence) — eisen-style."]
 
@@ -596,10 +596,10 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Lightweight Daily-Driver Laptop"
 category = "laptop"
-desktop_environment = "Niri + DankMaterialShell greeter"
+desktop_environment = "Ryoku desktop (niri compositor, Ryoku SDDM greeter) — high-end tier, the floor of the rollout"
 users = ["devji"]
 notes = [
-  "HP 15 laptop (Ryzen 3 3250U Picasso, Vega 3 iGPU, 8 GB): lightweight Niri desktop mirroring scratch — globalModulesNixos (Niri + DankMaterialShell greeter + role:heim userland), autoLogin into devji.",
+  "HP 15 laptop (Ryzen 3 3250U Picasso, Vega 3 iGPU, 8 GB): globalModulesRyoku — the Ryoku shell on niri with Ryoku's SDDM greeter (no autologin since 2026-11-01) — plus role:heim userland.",
   "Deliberately NO Steam (contrast stark/eisen). modules/profiles/laptop.nix layers auto-cpufreq + libinput.",
   "Single-disk disko (ESP + 8G swap + btrfs /root,/nix). NVMe (KIOXIA KBG40ZNV256G) on /dev/nvme0n1; SATA M.2 variants enumerate as /dev/sda.",
   "Hardware quirk (USB-C data-only): HP 15s-eq Type-C port is SuperSpeed USB 3.1 Gen 1 data-only (5 Gbps) without DisplayPort Alt Mode pins. External displays (Samsung 4K TV via Dell D6000 dock) require DisplayLink EVDI via profiles.dell-dock.enable.",
@@ -622,9 +622,9 @@ tailscale_hostname = "fern"
 ssh_alias = "fern"
 
 [hosts.fern.software]
-module_chain = "globalModulesNixos"
+module_chain = "globalModulesRyoku"
 impermanence = false
-key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "Dell D6000 Dock (DisplayLink / EVDI)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NAS client automount (/Volumes/data from frieren)", "NO Steam (deliberately omitted)"]
+key_services = ["Ryoku desktop shell (quickshell) on the niri compositor", "Ryoku SDDM greeter (no autologin)", "Ryoku phone integration (KDE Connect + scrcpy, phone.json)", "Dell D6000 Dock (DisplayLink / EVDI)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NAS client automount (/Volumes/data from frieren)", "NO Steam (deliberately omitted)"]
 traits = ["battery-optimized", "lightweight-desktop", "no-steam", "laptop-profile", "btrfs", "dell-dock", "tpm-identity"]
 
 [hosts.fern.persona]
@@ -643,7 +643,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "I/O Diet Lightweight Workstation"
 category = "workstation"
-desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` on a niri-parity keymap — foot, fleet-menu, waylock; getty autologin on tty1, no display manager"
+desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` on a niri-parity keymap — foot, fleet-menu, waylock; getty autologin on tty1, no display manager; low-end tier, the floor of the dwl regime"
 users = ["devji"]
 notes = ["Lightweight dwl desktop (suckless Wayland, niri-parity keymap) on a Fujitsu ESPRIMO D556 (i5-6500, 8 GB, 128 GB f2fs SSD). Formerly a Steam Remote Play kiosk, then a niri desktop; dwl since 2026-10.", "f2fs has no subvolumes, so the btrfs impermanence module is NOT used: the host config puts every heavy-write dir on tmpfs (zram 100%, journald volatile, fstrim, noatime).", "Legacy BIOS boot: GRUB on /dev/sda, systemd-boot disabled."]
 
@@ -716,7 +716,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Alice's Travel Netbook (Fleet nixpkgs, Scripted Initrd)"
 category = "laptop"
-desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` — getty autologin on tty1, foot, fleet-menu"
+desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` — getty autologin on tty1, foot, fleet-menu; low-end tier (dwl)"
 users = ["alice"]
 flake = true
 notes = ["Flake host on the fleet nixpkgs; the ONE pin is the initrd implementation (`boot.initrd.systemd.enable = false`), not the kernel. NixOS 26.11 made systemd-initrd the default, so generation 50 reached no stage-2 on this eMMC (no journal entry, blank console at loglevel=3) while the same kernel 6.18.56 with the scripted stage-1 boots clean (gen 51, 0 failed units).", "Deploy is push-based: frieren builds the closure (nixbuild.net for x86_64) and `nix copy`s it over the LAN, because the netbook cannot pull a closure it does not already have from harmonia. `task infra:apply:host:netbook`.", "Desktop moved from niri to the shared dwl profile (2026-10-27): the session, launcher and idle/lock are `profiles.dwlDesktop` — the compositor and its wrapper are NixOS's `programs.dwl`, driven with this host's spliced keymap as its package, so `/etc/xdg/dwl-session` execs one absolute store path — so the Celeron runs dwl (345 MiB) instead of niri (695 MiB). No bar: waybar measured 1001 MiB — a status line over three times the compositor. The display-manager layer went the same way: tty1 autologins through getty and `/etc/profile` execs the session, so greetd + tuigreet (111 MiB together) and gnome-keyring (378 MiB, with nothing to unlock — firefox keeps its own store and nautilus has no gvfs here) are out of the closure. The compositor is the smaller half of the change; the point is that alice's desktop is now a fleet module rather than `~/.dotfiles` alone. Phase 1 keeps fuzzel, mako and alacritty installed as bridges, and starts mako as the session's notifier, because her scripts still call them — the `netbook-desktop-phase-2` note owns that port."]

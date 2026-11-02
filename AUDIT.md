@@ -28,6 +28,31 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-02 — Ryoku leaves the pilot: a desktop tier ladder
+- **Three regimes, one cutoff each.** Ryoku is the high-end tier — **poseidon, eisen, fern**, with fern the
+  floor; Dux (`globalModulesNixos`, DMS + greetd) stays the medium tier — aristotle, stark; `profiles.dwlDesktop`
+  stays the low end — scratch, netbook, with scratch the ceiling. The ladder is recorded in
+  `inventory.toml` (`desktop_environment` + `module_chain`), which is the only place it is written down.
+- **The chain swap is the whole change.** `globalModulesRyoku` carries `inputs.ryoku` and no dms/dank-greeter,
+  and both hosts import `ryoku-desktop.nix` in place of `base-desktop-environment.nix`. Not alongside it:
+  that profile `mkForce`s `xdg.portal.config.niri` to the GTK backend, so keeping both would silently take
+  portals away from the shell that owns them, on top of two shells in one session.
+- **`sddm.enable = false` was the trap.** Ryoku turns SDDM on with `mkDefault`, so an explicit `false` (left
+  over from the DMS-greeter era, where greetd was the DM) wins and the host boots to no display manager at
+  all. Both blocks are gone; the module owns the greeter and its theme now.
+- **Ryoku pins its session at priority 900** (`ryoku-niri`). poseidon keeps its old flow — autologin into
+  niri; eisen keeps its console behaviour with `lib.mkForce "steam"`, because a plain definition loses.
+- **`deck-session-switch` restarted greetd only**, so switching back to Gamescope would have become a no-op
+  on an SDDM host. It now restarts whichever of greetd/sddm is active (stark keeps greetd).
+- **Evidence:** module system + assertions green on every touched host — `checks:host MODE=eval HOST=eisen`
+  2019 assertions rc=0 (152 s / 2643 MiB), `poseidon` 2014 rc=0 (307 s / 2668 MiB), `stark` 2002 rc=0 (the
+  shared steam profile), `fern` 1979 rc=0 (67 s); `inventory-schema`, `inventory-hosts`, `inventory-modules` build
+  clean. Behaviour read back by leaf eval: eisen `{ryoku, sddm, theme="ryoku", session="steam", autologin}`,
+  poseidon identical with `session="ryoku-niri"`, fern `session="ryoku-niri", autologin=false`. Build mode
+  was not used: on frieren under load it aborted at io pressure 60.9 % after 540 s, and MODE=eval is the
+  same evaluation without substituting a closure.
+- **Not done:** no host was switched — these are configs; `infra:deploy:host:<host>` is the operator's call.
+
 ### 2026-11-01 — the canary is a runbook sandbox, not a second frieren
 - **Stripped to what a runbook needs.** `hosts/microvms/frieren-canary.nix` lost the SubZeroClaw
   derivation, its activation-time config seeding and `canary-dummy-api`. What remains is `base.nix`

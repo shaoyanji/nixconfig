@@ -62,7 +62,8 @@ Add an entry to `flake/host-inventory.nix`:
 ```
 
 Pick the right module chain:
-- `globalModulesNixos` — desktop with display manager + niri
+- `globalModulesRyoku` — high-end desktop: Ryoku shell on niri, Ryoku SDDM greeter (poseidon, eisen, fern)
+- `globalModulesNixos` — medium desktop: Dux shell (DMS) with greetd/niri (aristotle, stark)
 - `globalModulesImpermanence` — desktop + impermanence + disko
 - `globalModulesContainers` — headless server (no desktop) — most common for servers
 - `globalModulesMacos` — nix-darwin on macOS

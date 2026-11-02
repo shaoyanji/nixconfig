@@ -361,7 +361,9 @@ sync)
     fi
     # push owns dedupe, the budget refusal and the read-back. Its refusal is the
     # signal to collect, not a bug.
-    if bash "$0" push "$out" 2>&1 | sed 's/^/    /' | tail -8; then
+    # No `tail`: under the monthly unit the journal is the log, and a buffered
+    # pipe is how the first real run looked silent while it was uploading.
+    if bash "$0" push "$out" 2>&1 | sed 's/^/    /'; then
       echo "  $host ($arch): pushed"
     else
       echo "  $host ($arch): PUSH REFUSED (budget) — run: task dev:nixcache:gc -- --delete"

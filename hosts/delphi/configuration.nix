@@ -263,7 +263,6 @@ in {
     ./infra-stack.nix
     ./minyx-keeper.nix
     ./needle-router.nix
-    ./offload-tunnel.nix
     ./paperless.nix
     ./vaultwarden.nix
     ../../modules/profiles/base-node.nix

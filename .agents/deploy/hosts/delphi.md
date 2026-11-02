@@ -174,12 +174,11 @@ systemd credential rather than a plaintext option. The unit's `LoadCredential`
 line is the proof it is wired: `systemctl show -p LoadCredential anki-sync-server`.
 The old placeholder was `bob`/`password` and is rejected (403 on `/sync/hostKey`).
 
-`offload-tunnel.service` (`hosts/delphi/offload-tunnel.nix`) is **transitional**:
-it forwards frieren's loopback 28981/8222/3012/27701 back here until frieren is
-rebuilt with vhosts that name this host's tailnet address. sshd's default
-`GatewayPorts no` binds those remote ports on frieren's loopback, which is fine for
-nginx and not enough for anki's old `host:27701` habit — that is why anki gained a
-vhost in the same change. Delete the file and its import after that rebuild.
+The move is complete (2026-11-02): frieren's closure carries the three vhosts,
+proxying `docs`/`vault`/`anki.frieren.lan` straight to this host's tailnet
+address, and the transitional `offload-tunnel` service is deleted. Nothing binds
+those ports on frieren any more — if a client still complains about
+`host:27701`, it is pointing at the NAS instead of `anki.frieren.lan`.
 
 Nightly, `offload-bridge-push.timer` (03:10) mirrors the three trees to
 `frieren:/srv/backup/offload/` with each SQLite database replaced by a

@@ -75,10 +75,10 @@ Ask in this order; the first "no" usually decides.
 nix build ".#nixosConfigurations.delphi.config.system.build.toplevel?submodules=1"
 # 2. Switch. The services come up empty; the dataset is still on the NAS.
 sudo nixos-rebuild switch --flake .#delphi
-# 3. Free the source's name and ports, then release the transitional tunnel.
+# 3. Free the source's name and ports. Nothing on the receiver to restart: the
+#    vhost on the NAS names this host's tailnet address directly.
 ssh frieren 'sudo systemctl stop paperless-web paperless-task-queue paperless-consumer \
              paperless-scheduler vaultwarden anki-sync-server'
-ssh delphi 'sudo systemctl restart offload-tunnel'
 # 4. Move the state, twice. The second run proves idempotency.
 sudo bash scripts/task/offload-migrate.sh paperless
 sudo bash scripts/task/offload-migrate.sh paperless
@@ -90,10 +90,10 @@ sudo bash scripts/task/offload-bridge.sh push
 ssh frieren 'sudo du -sh /srv/backup/offload/*'
 ```
 
-Step 3 leaves frieren's repo config ahead of its closure until
-`task infra:deploy:host:frieren` runs: the two vhosts already name delphi's
-tailnet address, and `offload-tunnel` exists only to cover the gap. Deleting
-`hosts/delphi/offload-tunnel.nix` and its import is the last step of the move.
+Step 3 only works once frieren's closure carries the new vhosts, because the
+repo config runs ahead of it until `task infra:deploy:host:frieren` lands. That
+deploy is done (2026-11-02), and the transitional `offload-tunnel` on delphi is
+deleted — the vhosts proxy straight to this host's tailnet address.
 
 ## Switching back
 
@@ -105,7 +105,11 @@ The NAS never stopped being the shelter, so "back" is a restore, not a rewrite:
    both are in frieren's restic snapshots, which is why the old paths were kept.
 3. Re-enable the block in `hosts/frieren/` (paperless: one import; vaultwarden:
    the commented struct in `infra-stack.nix`; anki: one block in `media-stack.nix`).
-4. Rebuild frieren, delete the tunnel import on delphi.
+4. Rebuild frieren, then point its vhosts back at `127.0.0.1` in
+   `hosts/frieren/reverse-proxy.nix`.
+
+There is no tunnel to reinstate: the vhost's upstream address is the only
+coupling, and it points at delphi or at the NAS's own loopback.
 
 ## Known edges
 

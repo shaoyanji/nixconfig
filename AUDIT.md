@@ -51,9 +51,9 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   Nothing was compiled on frieren; its config evaluates to a toplevel drvPath (81 s / 4.8 GiB) and is
   unapplied by design.
 - **The names stayed.** `docs.frieren.lan`, `vault.frieren.lan` and `anki.frieren.lan` are still frieren's
-  vhosts; `offload-tunnel.service` on delphi carries frieren's loopback ports back here until frieren is
-  rebuilt with proxy targets that name delphi's tailnet address. Deleting the tunnel file is the last step.
-- **Evidence:** `checks:host HOST=delphi` 1945 assertions rc=0; state migrated by
+  vhosts, now proxying delphi's tailnet address directly. Frieren was deployed (2026-11-02) and the
+  transitional `offload-tunnel` on delphi is deleted, so the move no longer depends on a live ssh session.
+- **Evidence:** `checks:host HOST=delphi` 1947 assertions rc=0; state migrated by
   `scripts/task/offload-migrate.sh` (flock, manifest, `integrity_check`, row-count match, health URL), run
   twice to show the second run is a no-op; the shelter copy verified under `/srv/backup/offload`.
 

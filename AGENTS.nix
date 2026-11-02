@@ -4058,17 +4058,19 @@
 
         **What is left.** hermes is the last unit, 226 MiB of state in
         `~/.hermes`: one bot token cannot be polled twice, so it waits on an
-        agreed window — copy state, enable on delphi, stop frieren, measure. The
-        tunnel in `hosts/delphi/offload-tunnel.nix` then goes, and deleting it is
-        the last step of the move rather than a follow-up idea. One dependency
-        the move cannot remove: a name that lives on frieren needs frieren's
-        nginx.
+        agreed window — copy state, enable on delphi, stop frieren, measure. One
+        dependency the move cannot remove: a name that lives on frieren needs
+        frieren's nginx.
+
+        **The tunnel is gone.** Frieren was deployed on 2026-11-02 with vhosts
+        that name delphi's tailnet address; `offload-tunnel` was stopped first and
+        all three names still answered with frieren holding no loopback listeners,
+        so the cutover was proved before the file and its import were deleted.
 
         **Exit.** Each moved unit is gone from frieren's system.slice, serves from
         delphi over the tailnet, and `systemctl show -p MemoryCurrent` on frieren
         shows the release; the shelter copy is under `/srv/backup/offload` and
-        inside a restic snapshot; the tunnel file is deleted after the frieren
-        rebuild.
+        inside a restic snapshot; the tunnel file is deleted — all met.
       '';
     };
     exp-114 = {

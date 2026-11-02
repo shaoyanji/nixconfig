@@ -906,6 +906,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/task-control-plane.md`](docs/task-control-plane.md)         | Task namespace policy and workflow examples                            |
 | [`docs/ci-pipeline.md`](docs/ci-pipeline.md)                | CI: inventory-driven host selection, path rules, the two builds per host |
 | [`docs/nix-patterns.md`](docs/nix-patterns.md)               | yq/format traps, non-obvious Nix, build-budget traps, store reclaim (GC roots), agent failure modes |
+| [`docs/nix-cache-edge.md`](docs/nix-cache-edge.md)               | Public R2-backed cache: the three substituter tiers, why the edge never signs, the S3 upload path, the 10 GiB budget |
 | [`docs/mail-agent.md`](docs/mail-agent.md)                   | mail-agent on delphi: the tool assessment, measured routing accuracy, the sender trust list, operations |
 | [`docs/email-archive.md`](docs/email-archive.md)              | NpgsqlRest email archive: schema, endpoints, the Drive mirror checklist, what is not done |
 | [`docs/agent-contract.md`](docs/agent-contract.md)            | What "done" means per kind of work: playbook exits, evidence objects, frame discipline |

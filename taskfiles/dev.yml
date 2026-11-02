@@ -654,6 +654,51 @@ tasks:
     cmds:
       - bash scripts/task/nixbuild-warm.sh warm {{.CLI_ARGS}}
 
+  dev:nixcache:check:
+    desc: "[gate] Validate the edge cache offline: worker tests + wrangler bundle, no token and no bucket"
+    summary: >
+      The Worker's own tests run under node with types stripped, so there is no
+      npm tree and no build step, and wrangler then bundles it for real. A
+      protocol regression (a range answered 200, a PUT answered 404) is caught
+      here instead of by a client that silently rebuilds.
+    cmds:
+      - bash scripts/task/nixcache.sh check
+
+  dev:nixcache:deploy:
+    desc: "[destructive] Create the R2 bucket if absent and deploy the edge cache Worker from delphi"
+    summary: >
+      Reads CLOUDFLARE.API.TOKEN and CLOUDFLARE.ACCOUNT.ID from the sops apikeys
+      plane at run time; no rebuild and no credential in the store. The Worker
+      serves GET/HEAD only — uploads go through the bucket's S3 API.
+    cmds:
+      - bash scripts/task/nixcache.sh deploy
+
+  dev:nixcache:size:
+    desc: "Report R2 bucket bytes against the 10 GiB free-tier budget (exit 1 at the cap)"
+    summary: >
+      R2 bills storage and has no per-bucket quota, so the budget is measured
+      rather than declared: a bucket past BUDGET_GIB fails, which is what stops
+      a fill loop from turning free into a monthly charge.
+    cmds:
+      - bash scripts/task/nixcache.sh size
+
+  dev:nixcache:keygen:
+    desc: "Generate the edge cache signing key once: secret to sops, public key printed"
+    summary: >
+      KEY_NAME is the prefix of every signature and cannot be changed later
+      without republishing the cache. Refuses when sops already holds a key, so
+      a second identity cannot replace a live one by accident.
+    cmds:
+      - bash scripts/task/nixcache.sh keygen
+
+  dev:nixcache:push:
+    desc: "Push one store path through the R2 S3 API, signed locally (the path CI uses)"
+    summary: >
+      The signing key travels in NIX_CONFIG, never on the command line. This is
+      the same write path CI takes, so a local push is a real rehearsal of it.
+    cmds:
+      - bash scripts/task/nixcache.sh push {{.CLI_ARGS}}
+
   dev:config:hash-update:
     desc: Refresh sha256 checksums for all modules/config/*.json files (nu.json, authorized-keys.json, fetches.json)
     cmds:

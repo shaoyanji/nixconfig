@@ -1,0 +1,26 @@
+# The fleet's public Nix cache edge. Wrangler reads TOML/JSON/JSONC — never YAML.
+#
+# account_id is deliberately absent: it is CLOUDFLARE.ACCOUNT.ID in the sops
+# apikeys plane and scripts/task/nixcache.sh exports CLOUDFLARE_ACCOUNT_ID from
+# there, so a literal here would be a second copy of a fact that already has a
+# home. Same for every credential: nothing secret is in this file.
+name = "nix-cache-edge"
+main = "src/worker.ts"
+compatibility_date = "2026-10-01"
+
+# workers.dev is the initial front because it needs no DNS or zone work and the
+# URL is stable; a [[routes]] block with custom_domain replaces it once the cache
+# has a name. A custom domain is a routing decision, not a correctness one.
+workers_dev = true
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "nix-cache"
+
+[vars]
+# Substitute priority: harmonia (LAN, 10) wins on a LAN host, this sits after it.
+# Lower wins in nix; the ordering that matters lives in lib/cache-registry.nix.
+PRIORITY = "30"
+
+[observability.logs]
+enabled = true

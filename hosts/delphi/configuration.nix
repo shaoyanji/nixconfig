@@ -258,6 +258,7 @@ in {
   imports = [
     ./anki-sync.nix
     ./email-archive.nix
+    ./nix-cache-edge.nix
     ./gemini.nix
     ./gok-artifacts.nix
     ./hardware-configuration.nix

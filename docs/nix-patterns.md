@@ -239,6 +239,35 @@ the submodule is already checked out — and CI cannot drop it
 [[flake/policies.nix#ci-builds-config-and-gate]]. Pipeline itself:
 [`ci-pipeline.md`](./ci-pipeline.md).
 
+## `git push` dies on the secrets submodule
+
+`submodule.recurse = true` makes `git push` ask every submodule whether it can
+push **the superproject's refspec source**. This repo is on `main`, the secrets
+submodule is a detached HEAD tracking `origin/master`, so the check is:
+
+```
+cd modules/secrets; GIT_DIR=.git git submodule--helper push-check refs/heads/main origin main
+fatal: src refspec 'main' must name a ref
+fatal: process for submodule 'modules/secrets' failed
+```
+
+and the superproject push never happens — rc=128, nothing sent, measured
+2026-11-02. It is easy to misread as an auth or mirror problem: the submodule
+pushes fine on its own, over https, from inside. What fails is the *check*, on a
+branch name the submodule does not have.
+
+- `submodule.<name>.branch = master` does **not** fix it (still `refs/heads/main`)
+  — that option is for `git submodule update --remote`.
+- `--recurse-submodules=on-demand` does not either; the source ref comes from the
+  push refspec, not from the submodule's config.
+- `git push --no-recurse-submodules` works, but silently leaves a dangling pointer
+  when the submodule has commits of its own.
+
+Use `scripts/task/git-push.sh [--dry-run] [remote] [branch]`, which pushes each
+submodule's missing commits to its remote's default branch first (`HEAD:refs/heads/<master>`,
+since a submodule has no `@{u}`), then the superproject with recursion off. Every
+`dev:git:*` push task and `services:build` already call it.
+
 ## Agent failure modes
 
 Failure modes that do not exist on an FHS distro, in the order they cost time:

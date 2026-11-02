@@ -46,7 +46,7 @@ tasks:
     cmds:
       - task dev:git:stage
       - git commit -m "nix-build was successful on {{.HOST}}"
-      - git push
+      - bash scripts/task/git-push.sh
 
   services:rollback:apply:host:*:
     desc: Alias for infra:rollback:apply:host:*

@@ -8,7 +8,7 @@ tasks:
         if ! git diff --quiet || ! git diff --cached --quiet; then
           git add -u
           gmc -a --yes
-          git push
+          bash scripts/task/git-push.sh
         else
           echo "No changes to commit"
         fi
@@ -24,7 +24,7 @@ tasks:
       - |
         if ! git diff --cached --quiet; then
           gmc -a --yes
-          git push
+          bash scripts/task/git-push.sh
         else
           echo "No changes to commit"
         fi
@@ -56,7 +56,7 @@ tasks:
     cmds:
       - git add -u
       - gmc -a --yes
-      - git push
+      - bash scripts/task/git-push.sh
 
   dev:git:quick-pull:
     desc: Pull with submodules
@@ -192,7 +192,7 @@ tasks:
           echo "Error: Merge failed - resolve conflicts manually"
           exit 1
         fi
-      - git push origin main
+      - bash scripts/task/git-push.sh origin main
       - git branch -d update
       - echo "Update branch merged and deleted"
 
@@ -238,7 +238,7 @@ tasks:
           echo "Error: Merge failed - resolve conflicts manually"
           exit 1
         fi
-      - git push origin main
+      - bash scripts/task/git-push.sh origin main
       - git branch -d update
       - echo "Flake update completed successfully"
 

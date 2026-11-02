@@ -28,6 +28,27 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-02 — the fleet's public cache: R2 behind a GET-only Worker, as a buffer
+- **Third tier, not a replacement.** `harmonia` stays the LAN cache and `cachix` the 5 GB WAN cache;
+  delphi adds a 10 GiB R2 bucket served by `modules/services/nix-cache-edge/` at
+  `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`, generated once into
+  `secrets.yaml`). It is registered immediately after `cachix` in `lib/cache-registry.nix`,
+  `lib/cache-policy.nix` and `flake.nix`, and `checks:flake:cache` proves the copy agrees.
+- **A buffer means dedupe first.** `dev:nixcache:push` asks cachix, then cache.nixos.org, then the
+  bucket, one HEAD per path, and uploads only what none of them has — a `hello.drv` closure reported
+  `2/342 unique` and uploaded two narinfos plus two nars. Over the budget it refuses the whole run
+  before writing (`refusing the push — it would take the bucket … over the 10 GiB limit`).
+- **The edge never signs.** narinfo is signed by the pusher (`secret-key=` on a `file://` staging
+  cache) and uploaded with rclone; the Worker has one R2 binding and cannot write.
+- **Four traps, all measured.** `nix copy` is recursive by default; `--no-recursive` alone is refused
+  because a binary cache wants its references valid (stubs satisfy it and are never uploaded);
+  `nix copy --to s3://` against a freshly recreated bucket exits 0 having written nothing;
+  `rclone purge` deletes the bucket itself. A client that saw a 404 before the push keeps saying
+  "not a valid path" until `--refresh`.
+- **Evidence:** `checks:nixcache:probe` green on the live URL (info fields, HEAD, 404 miss, 405 write,
+  signed narinfo); `nix path-info --store <edge> <path>` accepts the signature; `dev:nixcache:size`
+  reports 0.00/10 GiB. docs/nix-cache-edge.md.
+
 ### 2026-11-02 — email archive: NpgsqlRest over PostgreSQL on delphi, tailnet-only
 - **The SQL file is the API.** `modules/services/email-archive.nix` packages the v3.21.0 NativeAOT
   `npgsqlrest-linux-arm64` binary (fetchurl + autoPatchelf; no .NET runtime, no container), enables

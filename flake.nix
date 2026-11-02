@@ -19,6 +19,7 @@
       "http://192.168.3.25:5000"
       "http://100.97.61.65:5000"
       "https://shaoyanji.cachix.org"
+      "https://nix-cache-edge.jisifu.workers.dev"
       "https://nix-community.cachix.org"
       "https://nix-gaming.cachix.org"
       "https://cache.numtide.com"
@@ -28,6 +29,7 @@
     extra-trusted-public-keys = [
       "frieren.lan-1:BUg+1UmfYlF0XCbC0+ZyWQOY1DpQJhj/wa2q76NTFOg="
       "shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0="
+      "delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="

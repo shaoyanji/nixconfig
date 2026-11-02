@@ -4727,43 +4727,38 @@
     nix-cache-edge = {
       title = "NIX-CACHE-EDGE — a third cache tier that reads, and never signs";
       kind = "decision";
-      status = "IN FLIGHT";
+      status = "DELIVERED";
       date = "2026-11-02";
       refs = {
         docs = ["docs/nix-cache-edge.md"];
-        tasks = ["dev:nixcache:check" "dev:nixcache:deploy" "checks:nixcache:probe"];
+        tasks = ["dev:nixcache:check" "dev:nixcache:deploy" "dev:nixcache:push" "checks:nixcache:probe"];
         hosts = ["delphi" "frieren"];
       };
-      summary = "harmonia stays the LAN cache and cachix the 5 GB WAN cache; delphi adds a 10 GiB R2 bucket behind a GET-only Worker for CI and off-LAN hosts. Uploads go through the bucket's S3 API where nix itself signs, so the edge holds no secret and the public route cannot write.";
+      summary = "harmonia stays the LAN cache and cachix the 5 GB WAN cache; delphi adds a 10 GiB R2 bucket behind a GET-only Worker, registered after cachix. A push asks cachix and cache.nixos.org first and uploads only what neither has, then refuses the whole run if it would cross the budget — a buffer for fleet builds, not a mirror of nixpkgs.";
       body = ''
-        **Why a third tier.** CI deliberately refuses the LAN cache (`nixcachix.yml`, measured: it
-        spends a connect timeout per path), so a runner cannot substitute what frieren or delphi
-        already built. R2 charges no egress, which is the only reason a public read path is
-        affordable; 10 GiB of storage is the free tier.
+        **Why a third tier.** CI refuses the LAN cache by design, so a runner cannot substitute what
+        frieren or delphi built. R2 charges no egress; 10 GiB is the free tier.
 
-        **The spec that arrived had the signing at the wrong layer.** A narinfo is signed by whoever
-        writes it, and that is `nix copy` with `secret-key=`, so a Worker with a private key would
-        only reimplement Nix's fingerprint. `CACHE_AUTH_TOKEN` on a PUT route was refused for the same
-        kind of reason: `nix copy` has no `--header`, so no client could present it. The KV metrics
-        namespace was refused too — a counter write per GET for numbers Workers analytics already
-        report.
+        **The edge never signs.** narinfo is signed by the pusher (`secret-key=`), so a Worker with a
+        private key would only reimplement Nix's fingerprint. `CACHE_AUTH_TOKEN` was refused for the
+        same kind of reason: `nix copy` has no `--header`, so no client could present it.
 
-        **Credentials were already in sops.** `CLOUDFLARE.ACCOUNT.ID`, `API.TOKEN`, the R2 S3 pair and
-        `S3.API.ENDPOINT` existed for the Pages deploys; nothing new was declared, and nothing is
-        declared in Nix, so no activation can fail on a key that does not exist.
+        **A buffer, not a mirror.** Every path is HEADed against cachix, then cache.nixos.org, then the
+        bucket; only the misses upload, and a push that would cross 10 GiB is refused before writing.
+        That is also why the entry sits immediately after `cachix` in every order.
 
-        **Evidence.** 17 worker tests (stubbed R2, no npm tree) and a real wrangler bundle pass; a
-        `wrangler dev --local` instance answered `nix store ping` and, after seeding one signed
-        narinfo through the local bucket, a real `nix copy --from http://127.0.0.1:8787` fetched narinfo
-        and nar, verified the signature and wrote the path. Two defects that proof found: a whole read
-        answered 206 because R2 reports range metadata on every get, and `secret-key-files` in
-        NIX_CONFIG produces an unsigned narinfo on Nix 2.35.3 while the `secret-key=<path>` store
-        parameter signs it.
+        **Evidence.** Live at `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`);
+        `checks:nixcache:probe` green; a `hello.drv` closure reported `2/342 unique` and uploaded two;
+        `nix path-info --store <edge>` accepts the signature; `checks:flake:cache` proves flake.nix and
+        the registry agree.
 
-        **Open.** R2 is not enabled on the account (`code 10042`), so the bucket and the public URL do
-        not exist yet; `dev:nixcache:deploy` is unchanged and re-runs after the dashboard click. The
-        substituter entry in `lib/cache-registry.nix` stays out until `checks:nixcache:probe` passes,
-        because an unreachable substituter costs a timeout on every path of every build.
+        **Four traps, measured.** `nix copy` is recursive by default; `--no-recursive` is refused
+        without valid references (stubs fix that and are never uploaded); `nix copy --to s3://` wrote
+        nothing against a fresh bucket and exited 0; `rclone purge` deletes the bucket itself. A client
+        that saw a 404 before the push needs `--refresh`.
+
+        **Open.** No gc — emptying is `rclone delete`, never `purge`. CI's buffer step is inert until
+        `NIXCACHE_SIGNING_KEY` and the three `NIXCACHE_R2_*` repository secrets exist.
       '';
     };
 

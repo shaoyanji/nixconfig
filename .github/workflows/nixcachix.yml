@@ -193,6 +193,8 @@ jobs:
     # secret is absent, which is what the cachix step tests.
     env:
       CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      # Same reason as CACHIX_AUTH_TOKEN: a step's `if` cannot read its own env.
+      NIXCACHE_SIGNING_KEY: ${{ secrets.NIXCACHE_SIGNING_KEY }}
     # The runner's 6-hour maximum is not a budget. A warm host builds in ~5
     # minutes and a cold aarch64 closure compiles for ~30; anything past an hour
     # is a stall (measured 2026-10-30: a job sat on one derivation for 5.5 h and
@@ -282,6 +284,26 @@ jobs:
             echo "::group::nix build $attr"
             nix build -L ".#${attr}"
             echo "::endgroup::"
+          done
+
+      # The buffer. `nixcache.sh push` asks cachix and cache.nixos.org first and
+      # uploads only paths neither has, then refuses the whole push if it would
+      # take the R2 bucket past 10 GiB. So this is a no-op on a cache that already
+      # holds everything, and it fills the bucket exactly when cachix cannot — which
+      # is the point of a buffer. `continue-on-error` because a full bucket must
+      # never fail a build that succeeded.
+      - name: Buffer unique paths in the R2 edge cache
+        if: ${{ env.NIXCACHE_SIGNING_KEY != '' }}
+        continue-on-error: true
+        env:
+          NIXCACHE_R2_ACCESS_KEY_ID: ${{ secrets.NIXCACHE_R2_ACCESS_KEY_ID }}
+          NIXCACHE_R2_SECRET_ACCESS_KEY: ${{ secrets.NIXCACHE_R2_SECRET_ACCESS_KEY }}
+          NIXCACHE_R2_ENDPOINT: ${{ secrets.NIXCACHE_R2_ENDPOINT }}
+        run: |
+          set -euo pipefail
+          command -v rclone >/dev/null || nix profile install nixpkgs#rclone
+          for attr in ${{ join(matrix.attrs, ' ') }}; do
+            bash scripts/task/nixcache.sh push ".#${attr}"
           done
 
       # Per-host eval gate: module system + every assertion + the compiled

@@ -680,16 +680,17 @@ tasks:
       rather than declared: a bucket past BUDGET_GIB fails, which is what stops
       a fill loop from turning free into a monthly charge.
     cmds:
-      - bash scripts/task/nixcache.sh size
+      - bash scripts/task/nixcache.sh size {{.CLI_ARGS}}
 
   dev:nixcache:keygen:
     desc: "Generate the edge cache signing key once: secret to sops, public key printed"
     summary: >
-      KEY_NAME is the prefix of every signature and cannot be changed later
-      without republishing the cache. Refuses when sops already holds a key, so
-      a second identity cannot replace a live one by accident.
+      The name (`task dev:nixcache:keygen -- delphi.edge-1`) is the prefix of
+      every signature and cannot change later without republishing the cache.
+      It refuses when sops already holds a key, so a second identity cannot
+      replace a live one by accident.
     cmds:
-      - bash scripts/task/nixcache.sh keygen
+      - bash scripts/task/nixcache.sh keygen {{.CLI_ARGS}}
 
   dev:nixcache:push:
     desc: "Push one store path through the R2 S3 API, signed locally (the path CI uses)"

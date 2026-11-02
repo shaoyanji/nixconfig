@@ -9,8 +9,13 @@
   urlOf = names: map (n: registry.${n}.url) names;
   keysOf = names: map (n: registry.${n}.key) names;
 
-  lanOrder = ["harmonia" "cachix" "nixos" "numtide" "nixCommunity" "nixGaming" "determinate"];
-  wanOrder = ["cachix" "nixos" "numtide" "nixCommunity" "determinate" "nixGaming"];
+  # `edge` sits immediately after `cachix` in both orders: the bucket is the
+  # buffer for what cachix cannot hold, so a cachix hit always wins and the last
+  # WAN tier is asked before the community/upstream ones. The overlap is empty by
+  # construction anyway — `dev:nixcache:push` refuses to upload a path that
+  # cachix or cache.nixos.org already has.
+  lanOrder = ["harmonia" "cachix" "edge" "nixos" "numtide" "nixCommunity" "nixGaming" "determinate"];
+  wanOrder = ["cachix" "edge" "nixos" "numtide" "nixCommunity" "determinate" "nixGaming"];
 
   # A `key = null` entry mirrors another cache and reuses its key, so the key list
   # is deduplicated rather than repeating frieren.lan-1 for the tailnet mirror.

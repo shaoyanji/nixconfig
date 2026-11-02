@@ -22,6 +22,16 @@
       key = "shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0=";
       role = "wan";
     };
+    # The buffer: what cachix's 5 GB cannot hold and harmonia cannot reach. It is
+    # pushed only with paths already missing from cachix and cache.nixos.org
+    # (`dev:nixcache:push`), so it never duplicates a public object, and it sits
+    # after cachix in every order — a cachix hit is cheaper than a bucket object.
+    # docs/nix-cache-edge.md.
+    edge = {
+      url = "https://nix-cache-edge.jisifu.workers.dev";
+      key = "delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=";
+      role = "wan";
+    };
     nixos = {
       url = "https://cache.nixos.org/";
       key = "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=";
@@ -53,6 +63,7 @@
     "harmonia"
     "harmoniaTailnet"
     "cachix"
+    "edge"
     "nixCommunity"
     "nixGaming"
     "numtide"

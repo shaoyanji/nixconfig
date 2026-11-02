@@ -21,12 +21,10 @@ in {
     ./nushell.nix
     ./atuin.nix
     ./home-not-a-repo.nix
-    # ./zsh.nix
+    ./zsh.nix
   ];
   programs = {
-    # zsh = {
-    #   shellAliases = myAliases;
-    # };
+    zsh.shellAliases = myAliases;
     bash = {
       enable = true;
       shellAliases = myAliases;

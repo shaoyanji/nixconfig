@@ -28,118 +28,41 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
-### 2026-10-31 — Dux bump, and Ryoku piloted on fern: +11.57 GiB
-- **Shell inputs moved to Dux Labs.** `dms` → `github:duxlabs-dev/dux-shell/stable`, `dank-greeter` →
-  `github:duxlabs-dev/dux-greeter` (DMS 2.0 rebrand, 2026-10-20). Option and flake-output names are
-  compatibility-preserved (`programs.dank-material-shell`, `nixosModules.dank-material-shell`), so only
-  URLs moved; `dms/dank-qml-common` is still the transitive pin name. Evidence: `task checks:host HOST=fern`
-  rc=0, 1976 assertions (32.8 s / 1 415 MiB, before the Ryoku change).
-- **Ryoku pilot on fern, branch `ryoku-pilot-fern` (NOT deployed, main untouched).** Ryoku replaces the
-  shell, so the host takes a new chain `globalModulesRyoku` (globalModulesNixos minus dms/dank-greeter) and
-  `fleet.dankShell.enable = false` keeps the DMS/niri home modules out of HM. SDDM arrives `mkDefault`-on
-  (no other greeter) with `theme = mkOverride 900 "ryoku"`, so greetd autologin and `niri.nix` both leave
-  the host. Gate: `task checks:host HOST=fern` rc=0, 112 s / 2 469 MiB — the port's private nixpkgs.
-- **Measured, both sides by the same narinfo walk (hash-deduped NarSize, 100 % coverage, zero misses):**
-  main's fern **13.51 GiB / 2 400 paths** → Ryoku fern **25.08 GiB / 3 695 paths**, i.e. **+11.57 GiB
-  (+86 %)** from 13.90 GiB added and 2.33 GiB removed. The 18.35 GiB baseline recorded earlier came from
-  a walker that double-counted ~35 %; these numbers supersede it.
-- **What the delta is — not the shell.** The port ships a distro's `systemPackages`
-  (`system/packages/base.packages`): qemu-desktop + quickemu **1.97 GiB**, tesseract plus a 1.0 GiB
-  `tessdata` blob, docker/containerd/buildx 0.52 GiB, mise/deno/openvino/scipy/llvmlite 0.76 GiB; then
-  art (ryomotion 593 MiB, ryoku-desktop-data 350, bibata cursors 322, papirus 142) and its private nixpkgs
-  re-adding llvm 1.07 GiB (×2), mesa 553 MiB, electron, gcc, python3.
-- **Two leaks worth naming.** `ryoku-nix-update` is a wrapper whose env points at `${src}/nix/scripts/…`,
-  so the whole **421 MiB port source** enters the runtime closure; it also edits
-  `${RYOKU_NIX_FLAKE:-/etc/nixos}/flake.lock` and calls `nixos-rebuild`, a rebuild button outside
-  `infra:rebuild`. And the closure needs a GitHub FOD the runner cannot fetch: `nixcachix` builds fern
-  only after `seed-fod.yml` (branch `seed/fod-mechvibes`) pushes a locally reconstructed `ryomotion`
-  source whose NAR hash matched the pin — runner-IP 404s, not a dead pin.
-- **What breaks:** evaluation, nothing. At runtime: `laptop.nix`'s auto-cpufreq loses to Ryoku's
-  power-profiles-daemon (an asserted pair, `mkForce` off); autologin is gone; and `programs.niri.settings`
-  — binds, input, layout, fuzzel, portals, kdeglobals, kando — is replaced by Ryoku's materialized
-  `~/.config/niri`, so fern's compositor stops being declarative.
-- **Also observed:** `task checks:nix:format` is red at HEAD on `flake/policies.nix` (not touched here).
-
-### 2026-10-30 — agent turns: one token per holder, and the mirror that nearly ate them
-- **One token per holder, so a revocation is one holder.** `services.agentTurns.additionalTokens`
-  declares `-netbook`, `-muse` and `-vesper` beside the fleet token; the shim compares every name
-  without short-circuiting, and the append log names the one that authenticated
-  (`append token=agent-turns-token-vesper source=vesper`), so a turn is attributable to a holder
-  rather than to "someone with a token". Four distinct values, `0400 xs-agent-turns`, each reads
-  `200`, a bogus bearer `401`.
-- **`modules/secrets.yaml` is a mirror, and writing to it fails silently.** `SECRETS=modules/secrets`
-  plus `infra:secrets:sync` regenerate the parent file from the submodule, so a token set with
-  `sops set modules/secrets.yaml` survives until the next secrets edit and then disappears — and
-  because the shim loads its token set at start, the holder keeps working until the following
-  switch and then gets `401` with nothing in the diff to explain it. All four tokens were in the
-  mirror only, which the drift gate reports as *missing keys* rather than changed ones; they now
-  live in `modules/secrets/secrets.yaml` (`8e851f1`) and the mirror is regenerated from it.
-  `docs/agent-turns.md` had pointed rotation at the mirror, which is how it happened.
-- Evidence: drift gate green on 7 files including mirror-vs-source (both plaintexts
-  `840dd35e76e570f9`); first turn from a non-fleet holder landed and read back —
-  `xs-endpoint:vesper-first-turn`, frame `9fa45743`, 21:13:54Z, authenticated by vesper's token
-  (minted as `-muse1`, renamed once the holder turned out to post as `vesper`).
-
-### 2026-10-30 — an Always Free OCI demo with a private database
-- **OCI ignores `cpu_core_count` and `data_storage_size_in_tbs` on a free database.** `is_free_tier`
-  is the switch and ECPU is the shape (2 ECPU = 1 OCPU), so `projects/oci-always-free-demo` pins it in
-  code with a validation instead of trusting a console checkbox.
-- **`subnet_id` on the ADB is what removes the public listeners.** SQL\*Net and ORDS stop answering
-  outside the VCN in place, so operator access moves to a bastion `create-port-forwarding` session,
-  and `scripts/adb-sql.sh` rewrites the descriptor host to the tunnel while keeping the wallet's
-  `ssl_server_cert_dn` so TLS identity stays pinned.
-- **Imported certificate material needs provider 9.x.** 7.32's `certificate_config` has no
-  `certificate_pem`, so the floor is `>= 9.0.0`; the default self-signed certificate is RSA because
-  the load balancer's default cipher suite will not negotiate ECDSA.
-- **APEX page metadata has no DDL equivalent.** `sql/apex/f100.sql` is wired but empty until one Page
-  Designer build and `--apex export`; `--apex-check` compares content rather than timestamps, because
-  importing an app bumps its `last_updated_on`.
-- **Evidence:** `terraform validate` clean on `oracle/oci` 9.11.0, shellcheck clean on four scripts,
-  the Flask app exercised under its test client. No `plan` has run against a tenancy, so the ACME DNS
-  hook, SQLcl `apex export` inside a script and the bastion flag names stay unproven.
-
-### 2026-10-30 — a NixOS build tracker runs on Always-Free AWS alone
-- **The artifact is the reproducible unit, not the host.** `projects/nix-build-tracker/flake.nix`
-  compiles the Go API to a static `linux/amd64` `bootstrap` in `installPhase` — `buildGoModule` pins
-  `GOOS`/`GOARCH` to the build host and `go install` relocates a cross build to `bin/linux_amd64/` —
-  then zips it with normalised mtimes, so `nix build --rebuild` reproduces the same store path on
-  this aarch64 machine.
-- **A Function URL with `AuthType=NONE` still 403s without two resource-policy statements:**
-  `InvokeFunctionUrl` keyed on `lambda:FunctionUrlAuthType` and `InvokeFunction` keyed on
-  `InvokedViaFunctionUrl`. The CLI creates neither, and the first alone never reaches the function.
-- **This account cannot honour a reserved-concurrency guard.** Its Lambda ceiling is 10 in every
-  region (AWS default 1000) and a reservation may not leave fewer than 10 unreserved, so
-  `deploy.sh` reports the 5-execution guard as unapplied and exits 1 after finishing everything else;
-  Service Quotas refuses any value at or below the 1000 default, so only AWS support can lift it.
-- Evidence: `deploy.sh` run twice from `nix develop` and idempotent throughout (budget, table 5/5 ACTIVE,
-  pool/client/domain, role, function, bucket, distribution reused); a real Cognito user saved and listed
-  a build over the public URL (`201`/`200`), `401` with no token and with a forged one, `400` on a bad
-  hash, CORS preflight `200`, direct S3 `403` (OAC only), CloudFront serving the injected page.
-
-### 2026-10-30 — OCI CLI credentials come from sops, not a hand-made `~/.oci`
-- **The credential survives the instance.** `modules/sops.nix` renders `~/.oci/config` (0600)
-  from four `oci/*` secrets and writes `~/.oci/oci_api_key.pem` (0600), the same shape as
-  `~/.aws/credentials`, so a fresh host authenticates without a copy step.
-- **The five values are one unit** — a fingerprint from one keypair against another key file
-  reads as `NotAuthenticated` and names neither half — so the doc's rotation procedure
-  replaces both, in `modules/secrets.yaml` and the submodule mirror.
-- **The template is 0600** because the CLI warns "Permissions on <config> are too open" on
-  every command at 0644.
-- Evidence: authenticated from a config assembled only from decrypted sops values
-  (`oci iam region list`); PEM round-trips byte-identical to the key on disk; `task
-  checks:sops:drift` green with the mirror check; `task checks:host HOST=delphi` rc=0, 8.2 s.
-
-
-## Open debt (`task ops:notes`)
-
-1. `cassini`'s darwin assertion (`xdg.desktopEntries`) — dormant, reproducible
-   with `MODE=eval`; `minyx`'s kernel conflict is gone (the board evaluates,
-   passes its gate and is active since 2026-10-27).
-2. Tailnet DNS lists `10.99.0.53`, which eisen/fern/aristotle cannot route
-   (`--accept-routes=false` is deliberate), so their failover is nominal; list both
-   resolver node addresses instead (`ops:tailnet:dns` reports the set).
-3. MQTT broker has no publisher/subscriber (HC-5); 7 of 11 `extraComponents`
-   entries are dormant Python dependencies, not enabled components.
-4. Sentinel is frieren-local; fleet push is P1 in `ARCHITECTURE.md`.
-5. `compile-llm-specs.py` still generates the offline fleet-matrix table (not the
-   home card; `~/AGENTS.md` is now `.#homeAgents.<host>`).
+### 2026-11-01 — Ryoku landed on fern; dock ethernet declarative; zsh baseline; CPU off the powersave floor
+- **Ryoku is live.** `xb9qmd8c…` is `/run/current-system` on fern (the 2026-10-31 entry recorded the port as
+  undeployed). Presentation-stage `switch-to-configuration` reported 101 from post-restart units only: the
+  `activate-fern` unit, `pipewire` (core-dump in `mod.x11-bell` when X went away at greetd→SDDM) and
+  `tailscale-systray`. The switch itself completed.
+- **Dock ethernet is declarative and works without `ip`.** `dock-ethernet` came up at `192.168.3.249/24`,
+  pinned to `enp4s0f3u1u1i5`, metric 100, proved reachable while Wi-Fi was down. The live generation predates
+  `usbEthernetGateway`, so it installs no default route: `ip route get 1.1.1.1` answered "Network is
+  unreachable" with the dock up and `wlo1` disconnected.
+- **NM does not retry a failed Wi-Fi activation after its own restart.** `wlo1` sat `disconnected` with
+  `Activation: failed for connection 'Obi LAN Kenobi'` and exhausted retries; `nmcli connection up` restored
+  `.23` and the metric-600 default in seconds. The same post-start path runs `nmcli connection up
+  dock-ethernet` for a NIC that is absent at boot — the `No suitable device found … lo` line in the journal.
+- **zsh had no configuration at all.** `~/.zshrc` was a 5-line `zsh-newuser-install` stub on a host whose login
+  shell is zsh, because `modules/shell/zsh.nix` was commented out of the shell baseline and atuin's zsh
+  integration needs `programs.zsh`. Now enabled with 13 aliases and `enableZshIntegration`; `.zshrc` moves
+  aside as `.hm-backup`.
+- **The APU was pinned at its floor.** `power-profiles-daemon` left `acpi-cpufreq` on `powersave` (1396 MHz of
+  2600) on AC with `balanced` selected — `auto-cpufreq` is `mkForce false` on this chain. Measured, 3M-iteration
+  loop: **powersave 0.891 s · schedutil 0.476 s · performance 0.469 s**. `cpuFreqGovernor = "schedutil"` with
+  `cpufreq.after = [power-profiles-daemon.service]` (ppd does not re-apply on restart — verified).
+- **RAM:** the Ryoku shell is `quickshell` at **1512 MiB**, 1677 MiB for the whole desktop set, of 3.4 GiB used.
+- **Deployed: fern is on `14cvlhr8…`** (system and HM), switch exit 0, `systemctl --failed` 0. Live proof:
+  governor `schedutil` at 2591 MHz with the same 3M loop at **0.469 s**; two defaults, dock `.1` metric 100
+  over Wi-Fi's 600; `~/.zshrc` a store symlink carrying atuin and starship; manual `l`/`ls` resolve to eza.
+- **Two deploy-time defects, both fixed in the same generation.** The first switch left **HM failed**: `btop.conf`
+  and `kando/menus.json` are rewritten at runtime, so their second `.hm-backup` collided with the first (moved
+  aside, re-activation green). And `environment.etc."ryoku/phone.json".text` is `types.lines`, so our definition
+  **concatenated** with the one phone.nix always writes (`enabled = cfg.enable`) into a two-object file that would
+  not parse — now `mkForce`, and `/etc/ryoku/phone.json` parses as one object.
+- **Ryoku phone integration, on trial.** `programs.ryoku.phone.enable` cannot evaluate at all: it sets
+  `services.udev.packages = [ ryokuNixpkgs.android-udev-rules ]`, `ryokuNixpkgs` is Ryoku's own pin, and that pin
+  removed the package ("superseded by built-in systemd uaccess rules"). Wired the same four things directly —
+  KDE Connect (ports 1714-1764 open), Avahi, `scrcpy`/`android-tools`/`qt6.qttools` — so the QML's `phone.json`
+  is the only state it needs. `phone.webcam.enable` (v4l2loopback) left off: it collides with the dock's
+  `boot.extraModprobeConfig`.
+- **Gate:** `nix build .#hostChecks.x86_64-linux.fern` rc=0, **1979 assertions** each time (1 m 55 s; cached for
+the `mkForce` rebuild).

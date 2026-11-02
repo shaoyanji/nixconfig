@@ -49,6 +49,30 @@ in {
   # at Ryoku's own greeter and `defaultCompositor = "niri"` picks the session.
   # Autologin is gone on purpose; it hid the greeter the pilot needs to test.
 
+  # Ryoku phone integration, on trial. `programs.ryoku.phone.enable` itself
+  # cannot be used: phone.nix does `services.udev.packages = [
+  # ryokuNixpkgs.android-udev-rules ]`, ryokuNixpkgs is Ryoku's OWN pinned
+  # nixpkgs (flake.nix there: `ryokuNixpkgs = pkgs`), and that pin removed the
+  # package — "superseded by built-in systemd uaccess rules" — so the option
+  # throws during evaluation. This is the same four things it turns on, from
+  # this tree's pkgs, minus the package that no longer exists: the QML side
+  # reads /etc/ryoku/phone.json, which is the only state it needs.
+  #
+  # Kept out on purpose: the module's `phone.webcam.enable` half adds
+  # v4l2loopback through boot.extraModprobeConfig, which the dock profile
+  # already sets for btusb.
+  # mkForce, not a plain definition: phone.nix writes this same path for every
+  # `programs.ryoku.enable` host with `enabled = cfg.enable`, and `.text` is
+  # `types.lines`, so two definitions CONCATENATE into `{"enabled":true…}\n{
+  # "enabled":false…}` — a file that is not valid JSON, measured on the first
+  # switch 2026-11-01.
+  environment.etc."ryoku/phone.json".text = lib.mkForce (builtins.toJSON {
+    enabled = true;
+    webcam = false;
+  });
+  programs.kdeconnect.enable = true;
+  services.avahi.enable = lib.mkDefault true;
+
   # Antigravity CLI (agy) crashes on fern due to Ryzen 3 3250U broken RDRAND
   # ("RDRAND is not reliable on this platform; disabling"), which causes BoringSSL's
   # CRNGT self-test to abort. Exclude local agy from the closure; agy-remote is still
@@ -63,7 +87,53 @@ in {
   hardware.enableRedistributableFirmware = true;
 
   # Dell D6000 Universal Dock (DisplayLink / EVDI)
-  profiles.dell-dock.enable = true;
+  #
+  # The dock's RJ45 is a CDC-NCM port (`cdc_ncm`) the profile leaves unmanaged
+  # by default. Enabled here because the cable terminates on the same
+  # 192.168.3.0/24 segment as Wi-Fi, and it is the faster link: 6.2 MB/s against
+  # Wi-Fi's 2.6 (5 GHz pinned) and 1.8 (2.4 GHz) — the AP above this desk is a
+  # wireless mesh point, so the radio, not the powerline backbone (225/319 Mbps
+  # link rate), is the ceiling.
+  #
+  # The three failure modes recorded for this knob (AGENTS.nix,
+  # poseidon-tpm-luks-dock) are each closed: a pinned interface name so NM cannot
+  # rewrite the profile into a second UUID-named copy; a static address so the
+  # hostname-keyed DHCP lease cannot trade places with Wi-Fi's; and the ARP
+  # sysctls below so the two NICs cannot answer for each other's address.
+  profiles.dell-dock = {
+    enable = true;
+    manageUsbEthernet = true;
+    usbEthernetInterface = "enp4s0f3u1u1i5";
+    usbEthernetAddress = "192.168.3.249/24";
+    # The router, so the cable carries a default route as well as the LAN
+    # prefix. Without it a dock-only session — Wi-Fi down, or its activation
+    # failed after an NM restart — has no route off the segment at all
+    # (measured 2026-11-01: `ip route get 1.1.1.1` answered "Network is
+    # unreachable" while the dock was up and Wi-Fi was not).
+    usbEthernetGateway = "192.168.3.1";
+    # Below Wi-Fi's 600, so the cable is the preferred default while plugged in
+    # and Wi-Fi takes it back on unplug.
+    usbEthernetRouteMetric = 100;
+  };
+
+  # Two interfaces on 192.168.3.0/24 (see above): without this each NIC answers
+  # ARP for the other's address, and the flux tears down live SSH sessions.
+  boot.kernel.sysctl = {
+    "net.ipv4.conf.all.arp_ignore" = 1;
+    "net.ipv4.conf.all.arp_announce" = 2;
+  };
+
+  # --- CPU frequency: off the powersave floor ---
+  # Ryoku's power-profiles-daemon leaves acpi-cpufreq on `powersave`, which pins
+  # this Picasso APU at its 1400 MHz floor while `balanced` is selected and the
+  # machine is on AC. Measured on fern 2026-11-01, 3M-iteration loop:
+  #   powersave 1396 MHz 0.891 s · schedutil 2586 MHz 0.476 s · performance 0.469 s
+  # schedutil scales the same 1.4-2.6 GHz range and is power-aware, so it is the
+  # whole 2x without the heat. The ordering matters: cpufreq's oneshot runs off
+  # systemd-modules-load, ppd starts later, and ppd itself does not re-apply on
+  # restart (verified) — so the oneshot has to be the last word.
+  powerManagement.cpuFreqGovernor = "schedutil";
+  systemd.services.cpufreq.after = ["power-profiles-daemon.service"];
 
   # --- Logind: prevent fatal ACPI suspend freeze on lid close ---
   # Ryzen 3 3250U (Picasso APU) has a known kernel display engine hang on ACPI
@@ -104,6 +174,11 @@ in {
     btop # system monitor
     age-plugin-tpm
     tpm2-tools
+    # Ryoku phone integration's package half (see the phone block above).
+    scrcpy
+    android-tools
+    avahi
+    qt6.qttools
   ];
 
   system.stateVersion = "26.05";

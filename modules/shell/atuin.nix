@@ -1,11 +1,18 @@
-# atuin on every host, pointed at the one server; bash and nushell both get the
-# Ctrl-R UI. Key: modules/sops.nix · server: modules/services/atuin-server.nix ·
-# login/import procedure: .agents/skills/atuin/SKILL.md
+# atuin on every host, pointed at the one server; bash, zsh and nushell all get
+# the Ctrl-R UI. Key: modules/sops.nix · server:
+# modules/services/atuin-server.nix · login/import procedure:
+# .agents/skills/atuin/SKILL.md
+#
+# The zsh half only takes effect where programs.zsh is enabled
+# (modules/shell/zsh.nix). A host that logs in to zsh without it keeps zsh's
+# new-user stub and gets no history integration at all — measured on fern
+# 2026-11-01: a 5-line ~/.zshrc, no atuin, no starship, no aliases.
 {lib, ...}: {
   programs.atuin = {
     enable = true;
     enableBashIntegration = true;
     enableNushellIntegration = true;
+    enableZshIntegration = true;
 
     # The tailnet address, not atuin.frieren.lan: the .lan names only resolve
     # against frieren's resolver, while tailscale works off the LAN. Plain http

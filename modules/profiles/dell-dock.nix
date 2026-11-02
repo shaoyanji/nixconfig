@@ -78,6 +78,21 @@ in {
       example = "192.168.3.1";
       description = "Default gateway for the static dock uplink (ignored while usbEthernetAddress is null).";
     };
+
+    usbEthernetRouteMetric = lib.mkOption {
+      type = lib.types.int;
+      default = 600;
+      description = ''
+        Route metric of the dock uplink, which decides whether the cable or
+        Wi-Fi carries LAN traffic once both are up on the same subnet.
+
+        600 is Wi-Fi's own NetworkManager default, so the default here keeps the
+        dock a fallback (an absent Wi-Fi leaves it the only route) rather than a
+        competing primary. Lower it — 100 is NM's wired default — on a host where
+        the cable is deliberately the faster link, so it takes over when plugged
+        and Wi-Fi resumes when it is unplugged.
+      '';
+    };
   };
 
   # Generic alias option so hosts can enable either profiles.dell-dock or profiles.docking-station
@@ -144,8 +159,8 @@ in {
     # poseidon/.74 answering from two MACs. One matched profile renews the
     # same lease instead, so the dock can move between hosts without churn.
     #
-    # Hosts where the port is spare (frieren, fern) keep it unmanaged: no
-    # lease at all beats a stale third default route.
+    # Hosts where the port is spare (frieren) keep it unmanaged: no lease at all
+    # beats a stale third default route.
     networking.networkmanager.unmanaged = lib.mkIf (!cfg.manageUsbEthernet) [
       "driver:cdc_ncm"
     ];
@@ -178,11 +193,11 @@ in {
         ipv4 =
           {
             dns = "192.168.3.25";
-            # A metric above Wi-Fi's. Two equal-metric defaults let this cable win
-            # the default route, so a flaky dock uplink takes browsing and DNS down
-            # with it. At 600 the dock is a fallback for when Wi-Fi is absent, not a
-            # competing primary.
-            route-metric = 600;
+            # See usbEthernetRouteMetric: two equal-metric defaults let this cable
+            # win the default route, so a flaky dock uplink takes browsing and DNS
+            # down with it. At the default 600 the dock is a fallback for when
+            # Wi-Fi is absent, not a competing primary.
+            route-metric = cfg.usbEthernetRouteMetric;
           }
           // (
             if cfg.usbEthernetAddress == null
@@ -196,7 +211,7 @@ in {
             gateway = cfg.usbEthernetGateway;
           };
         ipv6.method = "auto";
-        ipv6.route-metric = 600;
+        ipv6.route-metric = cfg.usbEthernetRouteMetric;
       };
     };
 

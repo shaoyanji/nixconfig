@@ -126,27 +126,35 @@ sudo -u postgres psql -d email_archive \
 Only SQL files are published; there is no auth layer in front of them, which is
 why the tailnet is the boundary and the bind is loopback.
 
-## Google Drive mirror (off until a token exists)
+## Google Drive mirror (skipped until a remote exists)
 
-The sync is one-way — Drive holds a mirror, never the source of truth — and it
-is declared but **disabled** in `hosts/delphi/email-archive.nix`: a sops template
-whose key is missing fails activation, so the token has to exist first.
+The sync is one-way — Drive holds a mirror, never the source of truth. The timer
+is on from the first boot; the unit carries `ConditionPathExists` on
+`/var/lib/npgsqlrest/rclone.conf`, so it is **skipped, not failed**, until that
+file exists. This is the calendar's rule
+(`modules/calendar.nix`): the OAuth client is declared, the **token is state**,
+and the unit's condition is the dependency. There is no archive-specific
+credential — the same `googleDrive/clientId` + `clientSecret` pair drives both.
 
 ```bash
-# 1. on a machine with a browser, authorize the archive remote
+# 1. on a machine with a browser, authorize a Drive remote
 rclone authorize drive            # prints a JSON token blob
 
-# 2. store it (paste the blob as the JSON value)
-sops set modules/secrets.yaml '["email-archive"]["gdrive-token"]' '"{\"access_token\":…}"'
+# 2. write the remote for the service user, reusing the declared client
+sudo -u npgsqlrest rclone --config /var/lib/npgsqlrest/rclone.conf \
+  config create gdrive-email drive scope=drive \
+  client_id="$(sops -d modules/secrets.yaml | yq -r '.["googleDrive"]["clientId"]')" \
+  client_secret="$(sops -d modules/secrets.yaml | yq -r '.["googleDrive"]["clientSecret"]')" \
+  token="$(cat token.json)"        # the blob from step 1
 
-# 3. flip gdrive.enable = true in hosts/delphi/email-archive.nix, rebuild, then
+# 3. nothing to flip and no rebuild — the next hourly tick picks it up
 sudo systemctl start email-archive-gdrive-sync.service
 systemctl list-timers email-archive-gdrive-sync.timer
 ```
 
-The client id and secret already exist in sops (`googleDrive/clientId`,
-`googleDrive/clientSecret`) and `scripts/drive-auth.sh auth` runs the same
-handshake with the funnel for a headless host.
+The token is a file next to the mail mirror, not a sops key, so rotating it is
+`rclone config reconnect` and no rebuild. Revoking access is `rm` of the conf
+plus a remote stop — the unit returns to *skipped*.
 
 ## Not done here
 

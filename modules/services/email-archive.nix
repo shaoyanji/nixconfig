@@ -9,6 +9,13 @@
 }: let
   cfg = config.services.emailArchive;
 
+  # The rclone remote is state, not config, for the same reason the calendar's
+  # OAuth token is (modules/calendar.nix): a token exists only after a consent
+  # flow, so no declaration can carry it. Nix owns the unit and the condition;
+  # the operator owns one file, and the remote's client id/secret are the pair
+  # already in sops (`googleDrive/*`) rather than a second credential.
+  rcloneConfig = "${cfg.stateDir}/rclone.conf";
+
   # Upstream publishes one self-contained NativeAOT binary per arch; it links
   # only libc/libm, so autoPatchelfHook is the whole packaging story.
   npgsqlrest = pkgs.stdenv.mkDerivation rec {
@@ -160,7 +167,7 @@ in {
       remote = lib.mkOption {
         type = lib.types.str;
         default = "gdrive-email";
-        description = "rclone remote name, rendered into the generated rclone.conf.";
+        description = "rclone remote name, defined by the operator in the service user's rclone.conf.";
       };
 
       folder = lib.mkOption {
@@ -264,35 +271,19 @@ in {
       };
     };
 
-    # The sync is one-way by design: Drive holds a mirror, never the source of
-    # truth. No token in the store — the template renders from sops at activation.
-    sops.secrets."email-archive/gdrive-token" = lib.mkIf cfg.gdrive.enable {
-      sopsFile = ../secrets.yaml;
-      mode = "0400";
-    };
-
-    sops.templates."email-archive-rclone" = lib.mkIf cfg.gdrive.enable {
-      content = ''
-        [${cfg.gdrive.remote}]
-        type = drive
-        scope = drive
-        token = ${config.sops.placeholder."email-archive/gdrive-token"}
-      '';
-      owner = cfg.userName;
-      mode = "0400";
-    };
-
+    # One-way by design: Drive holds a mirror, never the source of truth. The
+    # unit is skipped — not failed — on a host with no remote yet, so the timer
+    # ticks from the first boot and the mirror starts the moment a token exists.
     systemd.services.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable {
       description = "Mirror email attachments to Google Drive";
       after = ["network-online.target"];
       wants = ["network-online.target"];
+      unitConfig.ConditionPathExists = rcloneConfig;
       serviceConfig = {
         Type = "oneshot";
         User = cfg.userName;
         Group = cfg.userName;
-        ExecStart = "${pkgs.rclone}/bin/rclone --config ${
-          config.sops.templates."email-archive-rclone".path
-        } sync ${cfg.stateDir}/attachments ${cfg.gdrive.remote}:${cfg.gdrive.folder} --create-empty-src-dirs --log-level INFO --stats-one-line";
+        ExecStart = "${pkgs.rclone}/bin/rclone --config ${rcloneConfig} sync ${cfg.stateDir}/attachments ${cfg.gdrive.remote}:${cfg.gdrive.folder} --create-empty-src-dirs --log-level INFO --stats-one-line";
       };
     };
 

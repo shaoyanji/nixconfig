@@ -42,8 +42,9 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   rides the shipped `{!PGPASSWORD}` placeholder with `AddEnvironmentVariables=false`.
 - **Evidence:** `checks:host HOST=delphi` rc=0; `/health` 200 with the database check; `GET
   /api/list-emails?lim=2` and `GET /api/emails-search?q=invoice` 200 against an inserted row, through the
-  tailnet name on `:8450`; `emails_search_idx` GIN present. Mirror is declared but off until a token
-  exists: `docs/email-archive.md`.
+  tailnet name on `:8450`; `emails_search_idx` GIN present. The mirror reuses the calendar's rule rather
+  than a second credential: `ConditionPathExists` on the service user's `rclone.conf`, timer on from boot,
+  unit skipped until it exists: `docs/email-archive.md`.
 
 ### 2026-11-02 — the mail sweep decides by rule; needle3 keeps only tool calling
 - **A label is a decision, not a tool call.** `mail-agent-sort-tools.json` asked needle3 for a keep/archive

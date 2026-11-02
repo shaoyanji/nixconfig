@@ -5,9 +5,9 @@
 
   services.emailArchive = {
     enable = true;
-    # Flipped on once the OAuth token exists — see the checklist in
-    # docs/email-archive.md. A template without its sops key fails activation,
-    # so the mirror stays declared-but-off until then.
-    gdrive.enable = false;
+    # The timer runs from the first boot; the sync unit is skipped until the
+    # operator writes the rclone remote (docs/email-archive.md). Same rule as the
+    # calendar's token: `ConditionPathExists` on state, never a sops key.
+    gdrive.enable = true;
   };
 }

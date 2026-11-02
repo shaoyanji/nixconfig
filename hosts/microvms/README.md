@@ -1,15 +1,19 @@
-# MicroVM SubZeroClaw — operating documentation
+# frieren-canary — the runbook sandbox
 
-> **This guest is a sandbox, not the fleet's promotion gate.** It boots its own
-> kernel and root, so it can never fail for the host being deployed. The gate that
-> boots a host's real module graph is `task checks:boot HOST=<host>`
-> (`flake/boot-checks.nix`); CI runs it for `modules/services/**` changes.
+> **A sandbox, not a gate and not a second frieren.** It boots its own kernel and
+> root, so it can never fail for the host being deployed (that is
+> `task checks:boot HOST=<host>`), and it imports no host chain, so it carries none
+> of frieren's service tier.
 
-Run SubZeroClaw inside an isolated microVM (the `frieren-canary` guest) while the
-LLM inference stays on the host (Eisen). The guest talks only to its host
-(`192.168.83.1`), never directly to the LAN. Frieren is the example host
-(the canary was proven on Eisen; the same layout applies on frieren, whose
-pi-hole maps only bare names).
+An agent boots this guest to run a runbook against a real systemd/ssh machine —
+package installs, unit ordering, ssh/PAM behaviour, a script that expects
+`systemctl` — and then throws the guest away.
+
+```bash
+task vm:canary:run          # transient unit, returns once sshd answers
+task vm:canary:ssh          # run the runbook here
+task vm:canary:stop         # guest poweroff, then shares and tap
+```
 
 ## Layout
 
@@ -20,108 +24,71 @@ pi-hole maps only bare names).
 | vsock | cid 10 |
 | Tap | `microvm1` (MAC `02:00:00:00:00:01`) on host bridge `brlan` |
 | Guest IP | `192.168.83.10/24`, gateway `192.168.83.1` (the host), DNS 1.1.1.1 / 8.8.8.8 |
-| Virtiofs | host `/nix/store` -> `/nix/.ro-store` (ro) + `/var/lib/microvms/frieren-canary/ssh-host-keys` -> `/etc/ssh/host-keys` (persistent host keys) |
-| `/var` | volume (`var.img`, 2,048 MB), writableStoreOverlay `/nix/.rw-store` |
-| Kernel | `linuxPackages_6_12`; guest firewall disabled |
+| Virtiofs | host `/nix/store` -> `/nix/.ro-store` (ro) + `/var/lib/microvms/frieren-canary/ssh-host-keys` -> `/etc/ssh/host-keys` (persistent identity) |
+| `/var` | volume (`var.img`, 2,048 MB): survives a restart, unlike `/` |
+| Kernel | `linuxPackages_6_12`; guest firewall disabled (it sits behind the host's NAT) |
 | SSH | openssh, ed25519 host key from the share, `PermitRootLogin prohibit-password` |
-| User | `devji` (wheel, passwordless sudo, authorizedKeys from config + hardcoded `devji@nixos` key) |
-| Guest packages | gcc, gnumake, git, curl, jq, sqlite, procps, htop, python3, file, binutils |
-| Dummy API | `canary-dummy-api` (Python HTTP on `0.0.0.0:8080`, JSON health) for Model B reverse-proxy verification |
+| User | `devji` (wheel, passwordless sudo, keys from `config.ssh.authorizedKeys` + the workstation key the alias uses) |
+| Packages | gcc, gnumake, git, curl, jq, sqlite, procps, htop, python3, file, binutils |
 
-SubZeroClaw in the guest is a Nix derivation in the same file
-(`genlayerlabs/subzeroclaw` rev `6b6b5ad`, `$CC -O2 src/subzeroclaw.c src/cJSON.c -lm`).
-The activation script `subzeroclawSetup` seeds `~/.subzeroclaw/{skills,logs}`,
-`skills/sandbox.md`, and copies sources to `~/workspace/subzeroclaw`.
+There is no service in this list on purpose. The guest's whole unit set is base
+plumbing plus `sshd`; check it rather than trusting this page:
+
+```bash
+nix eval --json '.?submodules=1#nixosConfigurations.frieren-canary.config.systemd.services' \
+  --apply 's: builtins.attrNames s' | jq -r '.[]' | grep -v '^systemd-'
+```
+
+## Not always on
+
+Frieren declares no `microvm.vms.frieren-canary` (that is delphi's `sandbox`,
+`hosts/microvms/guests.nix`), so no `microvm@` unit is enabled, nothing starts the
+canary at boot, and no timer boots it. It exists only while the transient unit
+holds it:
+
+- `task vm:canary:run` runs `scripts/task/run-canary.sh` under
+  `frieren-canary-runner`, with `RuntimeMaxSec` (`LIFETIME`, default `2h`) so an
+  abandoned sandbox expires instead of sitting on 2 GiB of an 8 GiB NAS.
+- `vm:canary:stop` is the explicit exit: guest poweroff through the runner's own
+  `microvm-shutdown`, then SIGTERM to the supervisord group, then `tap-down`.
+
+Frieren carries **no proxy route** to it. The `/canary/` location and
+`canary.frieren.lan` vhost were EXP-102 dogfooding; a vhost for a guest that is
+usually down is a per-host surface answering 504. A test that needs HTTP runs its
+own listener inside the guest and reaches it over the host-local bridge.
 
 ## Tasks (`taskfiles/infra.yml`)
 
 | Task | What it does |
 | :--- | :--- |
 | `vm:canary:build` | builds `.#microvmRunners.frieren-canary` and prints the store path — no `./result-*` symlink |
-| `vm:canary:run` | `sudo scripts/task/run-canary.sh` (run dir `/var/lib/microvms/frieren-canary/run`) |
-| `vm:canary:test` | `scripts/task/vm-canary-test.sh`: boot → ssh → guest API → host proxy → stop → teardown |
+| `vm:canary:run` | boots under `frieren-canary-runner`; run dir `/var/lib/microvms/frieren-canary/run` |
+| `vm:canary:test` | **gate**: boot → ssh → hostname + declared address → tool set and `/var` → stop → teardown |
 | `vm:canary:status` | hypervisor + tap state (`run-canary.sh --status`) |
 | `vm:canary:ssh` | SSH into the guest |
-| `vm:canary:agent` | `ssh -t frieren-canary subzeroclaw <prompt>` (default: "echo Hello World from inside the MicroVM sandbox") |
-| `vm:canary:stop` | `run-canary.sh --stop`: guest poweroff, then shares + tap |
+| `vm:canary:stop` | `run-canary.sh --stop`: poweroff, then shares + tap |
 
-SSH alias `frieren-canary` is defined in `hosts/frieren/infra-stack.nix`
-(-> `192.168.83.10`, `UserKnownHostsFile ~/.ssh/known_hosts_canary` — a
-user-writable file, so the pin works for a non-root login).
-`infra-stack.nix` imports `modules/profiles/microvm-host.nix`.
+The `frieren-canary` ssh alias lives in `hosts/frieren/infra-stack.nix`
+(-> `192.168.83.10`, `UserKnownHostsFile ~/.ssh/known_hosts_canary`, a
+user-writable file so the pin works for a non-root login). `infra-stack.nix`
+imports `modules/profiles/microvm-host.nix` for the bridge and NAT.
 
 ## Host prerequisites (runtime, not repo)
 
 The runner asserts these before it touches the host:
+
 - root, `/dev/kvm`, and the `brlan` bridge (`192.168.83.1/24`, networkd).
 - **The guest subnet is owned by `brlan` alone.** A second interface carrying
   `192.168.83.0/24` steals the route: on 2026-10-24 a stale hand-made `microbr`
-  did exactly that and every packet went to a DOWN bridge while the guest booted
-  happily and sshd listened. `run-canary.sh` now refuses to start in that case and
-  names the offending interface.
+  did exactly that, and every packet went to a DOWN bridge while the guest booted
+  happily and sshd listened. `run-canary.sh` refuses to start and names the
+  offending interface.
 - `microvm1` tap: created and torn down by the runner's own `tap-up`/`tap-down`.
 - `/var/lib/microvms/frieren-canary/ssh-host-keys`: created, with a fresh ed25519
-  key, by the runner on first boot — it is the guest's persistent identity.
+  key, by the runner on first boot — the guest's persistent identity.
 
-## Endpoint chain
+## Removing it
 
-```
-canary SubZeroClaw
-  -> http://192.168.83.1/eisen/v1/chat/completions
-  -> host nginx /eisen/ -> /router/ (local rewrite on Eisen)
-  -> Eisen nginx /router/ -> router 127.0.0.1:8000
-  -> llama-swap / Jev / Laya
-```
-
-On frieren, the `/eisen/` proxy is in `hosts/frieren/reverse-proxy.nix`
-(`frieren.lan` vhost `/eisen/` -> `http://192.168.3.87/router/` with
-**`proxy_set_header Host "eisen.lan"`** — required, because Eisen's nginx
-routes on the Host header). On Eisen itself, `/eisen/` rewrites to `/router/`
-locally (so the same guest config works on either host).
-
-Existing Model B proxy (`hosts/frieren/reverse-proxy.nix`):
-`frieren.lan` vhost `/canary/` -> `http://192.168.83.10:8080/`;
-vhost `canary.frieren.lan` -> same. Frieren DNS maps only bare names.
-
-## Isolation model
-
-Runner (microVM) and model (Eisen) on different hosts. The microVM talks
-only to its host (`192.168.83.1`), never directly to the LAN. The guest has
-no direct access to the LAN, the tailnet, or the host's services except the
-`/eisen/` endpoint the host nginx exposes.
-
-## Config management
-
-The guest's SubZeroClaw config is written **unconditionally** by the
-activation script (the canary is ephemeral; config is managed, not user-edited):
-
-- endpoint `http://192.168.83.1/eisen/v1/chat/completions`
-- `request_extra = {"model":"policy:auto"}` (router default = Kolibri)
-- `api_key = "none"` — the router forwards it to Jev, Jev rejects it, and
-  the router falls back to Laya. Fine for the hi test. A real Jev key needs
-  a secret, never in the repo.
-
-## Pre-warm guidance
-
-Pre-warm Kolibri before running SubZeroClaw in the guest. A cold load
-(~4-5 min) can exceed SubZeroClaw's 120s curl cap. Warm it by sending a
-tiny chat request for Kolibri and waiting for a real generation, then run
-the guest.
-
-## Proof (2026-10-17, on Eisen)
-
-- Canary runner built; bridge + run dir + ssh-host-keys + `microvm` user created.
-- Guest booted, `192.168.83.10` pinged, SSH worked, SubZeroClaw config verified.
-- Inside the guest, `subzeroclaw "just say hi"` exited 0 with `Hi! 👋`
-  (session: USER -> tool `echo hi` -> `hi` -> ASST `Hi! 👋`).
-  No literal `TURN_COMPLETE` string in the captured output; clean exit 0
-  after the final assistant message is the turn completing. Decision fell
-  back to Laya as expected (`api_key "none"`).
-- Stopped cleanly (`poweroff` via SSH, guest down).
-
-## Teardown
-
-`vm:canary:stop` (poweroff via SSH). The bridge, run dir, and ssh-host-keys
-persist on the host for the next run (they are runtime state, not repo).
-To fully remove the guest: delete `/var/lib/microvms/frieren-canary/` and
-the `brlan` bridge.
+`vm:canary:stop`, then delete `/var/lib/microvms/frieren-canary/`. The `brlan`
+bridge belongs to `modules/profiles/microvm-host.nix`, not to this guest: leave it
+if anything else on the host uses the bridge.

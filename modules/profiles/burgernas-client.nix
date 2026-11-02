@@ -1,23 +1,6 @@
-# BurgerNAS cold vault (Synology DS220j) as an automount.
-#
-# One home for the mount *and* for how it is allowed to fail. The NAS is powered
-# off for most of the day, so anything that walks the mount table — `duf`, `btop`,
-# `updatedb`, a `findmnt -a` — probes a peer that is not there, and the default
-# NFS mount behaviour makes that probe expensive:
-#
-#   * `mount.nfs` retries a failed mount for **2 minutes** by default (`retry=`,
-#     counted in minutes; it is not the data-path `retrans`). With the peer off
-#     the connect itself fails in under a second ("No route to host"), so `retry=0`
-#     removes the entire wait.
-#   * Without it, each probe held systemd for 90 s until `DefaultTimeoutStartSec`
-#     killed `mount.nfs` (measured 2026-10-28, `Result=timeout` in the journal).
-#     `duf` looked hung and printed nothing, because it `statfs()`es every mount
-#     before it applies any `--hide-*` filter; `df` survived only because it skips
-#     autofs entries without a statfs (17 ms against a blocking probe).
-#
-# The options therefore belong to the mount, not to a host: a host that enables
-# this profile gets a mount that fails in seconds, and no disk tool can be blocked
-# by a sleeping NAS.
+# BurgerNAS cold vault (Synology DS220j) as an automount: `retry=0` plus a mount
+# timeout, so a probe of a powered-off peer fails in seconds instead of holding
+# systemd for 90 s. Options and measurements: docs/nix-patterns.md (sleeping peer).
 {
   config,
   lib,

@@ -103,10 +103,10 @@ Summaries and identifiers only: no secrets, tokens, passwords, private keys, mai
 no full conversation text. The shim scans free text and refuses credential-shaped
 bodies with a 400, and there is no update or delete route (405 by design).
 
-If the endpoint is down or a post times out: retry once, then append the entry as
-one JSONL line to `~/.local/state/agent-turns/queue.jsonl`, continue the turn, and
-replay in order when the endpoint answers — a repeated UUID returns the stored id,
-so replay is idempotent. Report the queue depth in your turn report. Never post a
+If the endpoint is down or a post times out, `task agents:xs:post` appends the body
+to `~/.local/state/agent-turns/queue.jsonl` itself and the next successful post
+replays it in order — a repeated UUID returns the stored id, so replay is
+idempotent. Continue the turn and report the queue depth. Never post a
 turn copy to any other endpoint or publicly, and never use it in place of the
 structured prompt and report files you already use to hand work to another agent.
 
@@ -274,61 +274,21 @@ task infra:rebuild:home-manager  # home-manager switch (local) + refresh ~/Taskf
 
 ### Client OS Maintenance & Debugging Runbooks
 
-#### 1. Dry Run & Evaluation
-
-Before deploying changes to any client OS, evaluate its configuration:
-
 ```bash
-task infra:plan:host:<host>   # substitute the closure, apply nothing
+task infra:plan:host:<host>               # substitute the closure, apply nothing
+task infra:logs:host:<host> UNIT=<unit>   # tail journald (UNIT defaults to go-backend)
+task infra:rollback:host:<host>           # roll back a remote generation
+sudo nixos-rebuild --rollback switch      # local NixOS rollback
+nas-recover                               # /Volumes/data automount recovery
+scripts/task/sops-drift-check.sh          # every encrypted file decrypts cleanly
+task infra:sops:update-keys               # rekey every file after .sops.yaml changes
 ```
 
-That is the pre-build instrument. A toplevel `.drvPath` eval instantiates the
-whole graph (>120 s, CI-only) and a switch forces it anyway — Agent Verification
-Protocol below. `.config.networking.hostName` proves nothing at all.
-
-#### 2. Deploying Remote Hosts
-
-The same two tasks as Host Lifecycle above: `infra:deploy:*` = gate → plan →
-apply → validate, `infra:apply:*` applies an already-planned closure.
-
-#### 3. Remote Log & Service Inspection
-
-Diagnose failing units or check live output:
-
-```bash
-task infra:logs:host:<host> UNIT=<unit>   # Tail journald for UNIT (defaults to go-backend)
-ssh <host> systemctl status <unit>        # Inspect unit status on remote host
-ssh <host> journalctl -b -p err           # View system errors from current boot
-```
-
-#### 4. Rollback Runbook
-
-If a deployment degrades a host:
-
-```bash
-task infra:rollback:host:<host>           # Roll back remote host generation
-# For local recovery:
-sudo nixos-rebuild --rollback switch      # Local NixOS rollback
-```
-
-#### 5. NAS Client Automount Recovery (fern & clients)
-
-If `/Volumes/data` fails to mount due to early-boot network timing (causing `StartLimitBurst` hit):
-
-```bash
-nas-recover                               # Canonical recovery tool
-# Or manually restart the automount unit:
-sudo systemctl restart Volumes-data.automount
-```
-
-#### 6. SOPS Secrets & Key Verification
-
-Verify decryption across all hosts and rotate recipient keys:
-
-```bash
-scripts/task/sops-drift-check.sh          # Verify all encrypted files decrypt cleanly
-task infra:sops:update-keys               # Rekey all files when .sops.yaml changes
-```
+`infra:plan` is the pre-build instrument; a toplevel `.drvPath` eval forces the
+whole graph a switch forces anyway (Agent Verification Protocol below).
+`infra:deploy:*` = gate → plan → apply → validate. Rollback, journald `UNIT`
+defaults and automount recovery: the `infra` skill and `.agents/deploy/hosts/*.md`;
+sops state: [`docs/sops-rekey.md`](docs/sops-rekey.md).
 
 #### 7. frieren (NAS) Rebuild Topology
 
@@ -641,7 +601,7 @@ task agents:menu                 # Interactive operator control plane
 
 ```bash
 nix build .#nixosConfigurations.<host>.config.system.build.toplevel          # Build host closure
-nix build .?submodules=1#nixosConfigurations.<host>.config.system.build.toplevel  # With submodules (CI)
+nix build .?submodules=1#nixosConfigurations.<host>.config.system.build.toplevel  # With submodules — NEVER drop ?submodules=1 [[flake/policies.nix#host-path-pinned-to-submodules]]
 nix build .#hostChecks.x86_64-linux.frieren                                  # ONE host eval gate (~700 MiB)
 bash scripts/task/oom-guard.sh --timeout 3 -- nix eval --raw .#inventory.hosts.fern.role  # leaf read, no host eval
 nix build .#devShells.x86_64-linux.default                                   # Enter dev shell
@@ -765,31 +725,19 @@ skill carries the bare-`qmd` one-liner). Three canonical collections:
 | `vault`     | `~/vaults/personal` (NAS link → `/Volumes/data/Obsidian-Git-Sync`; a `cloud` host gets a git checkout of the same repo) | Personal Obsidian vault: zettels, schematics, notes |
 | `skills`    | `~/.hermes/skills/`                                      | Agent skills indexed for BM25 search                                                    |
 
-### Index lifecycle
-
 ```bash
-task dev:qmd:refresh             # Register (if missing) and reindex both collections
-task dev:qmd:vault:refresh       # Reindex the Obsidian vault only
-task dev:qmd:docs:refresh        # Reindex nixconfig docs only
-task checks:qmd:docs             # Verify nixconfig collection registered + index fresh
-task checks:qmd:vault            # Verify vault collection registered + index fresh
+task dev:qmd:refresh             # register (if missing) + reindex both collections
+task dev:qmd:vault:refresh       # vault only
+task dev:qmd:docs:refresh        # nixconfig docs only
+task checks:qmd:docs             # verify registered + index fresh (exit 1 when stale)
+qmd search "impermanence disko" -c nixconfig   # one collection
+qmd search "query" --json | toon -e            # all collections, agent-friendly
+qmd get "#docid"; qmd status; qmd update        # fetch / health / incremental reindex
 ```
 
-The `checks:qmd:*` tasks exit 1 when a collection is missing or any `.md` file is newer than the index; run them after doc edits.
-
-### Querying
-
-```bash
-qmd search "impermanence disko" -c nixconfig   # repo docs only
-qmd search "zettel topic" -c vault             # vault only
-qmd search "query"                             # all collections
-qmd search "query" --json | toon -e                      # agent-friendly output
-qmd get "#docid"                               # fetch a full document from search results
-qmd status                                     # index health and file counts
-qmd update                                     # incremental reindex (fast, BM25)
-```
-
-Prefer BM25 `qmd search` (instant); `qmd embed` (semantic vectors) is optional and slower. Prefer qmd over raw `grep` when locating concepts or runbooks across repo docs and the vault — it is ranked and collection-scoped.
+Prefer BM25 `qmd search` over raw `grep` for concepts and runbooks — it is ranked
+and collection-scoped; `qmd embed` (vectors) is optional and slower. Run the
+`checks:qmd:*` pair after doc edits.
 
 The `nixconfig` collection masks `**/*.{nix,md}`, so a `nix eval`-time comment and
 the page that explains it are one query apart — which is why a `.nix` header no
@@ -890,32 +838,10 @@ claiming success on a tree the commit gate would still reject.
 | Stop | **`task checks:nix:watch:stop`** — signals the watcher by pid and verifies it exited (or Ctrl+C in the foreground) |
 | Watch interval | `interval: '500ms'` at the root of `Taskfile.yml` — coalesces a multi-file save into one run (task's default is 100ms and duplicate events were observed) |
 
-Three behaviours that bit us, all confirmed against
-[task's watch docs](https://taskfile.dev/docs/guide/watch):
-
-- **Stopping it is not "kill the shell that started it".** Watch mode is known to
-  leave children running, and the watcher is a *grandchild* of whatever launched
-  it — killing the launching shell left a live `task checks:nix:watch` formatting
-  the repo for ~8 minutes, and it looked stopped because the parent PID was gone.
-  Use `task checks:nix:watch:stop`: it matches the watcher cmdline exactly (so it
-  can never signal the shell that launched it, or its own shell), signals it,
-  waits, and **verifies** it is gone rather than assuming the signal landed. If
-  you must do it by hand, `pkill -x task` then check `pgrep -x task`.
-- **A task's `cmds` run in task's own restricted shell, not bash.** `kill` is an
-  "unsupported builtin" there and silently does nothing — the stop task looked
-  like it succeeded while the watcher kept running. Any builtin that is not plain
-  POSIX may be missing, so drop to a real shell for it:
-  `bash -c 'kill "$1"' _ "$pid"`.
-- **`--dry` does not suppress `watch: true`.** `task --dry checks:nix:watch` starts
-  a real watcher and blocks; it timed out a probe here. There is no dry run for a
-  watch task.
-- **`watch: true` only applies to CLI invocations.** Called from another task's
-  `cmds`/`deps` it does *not* start a watcher, so it cannot be pulled in as a
-  dependency and quietly hang a pipeline.
-
-`sources` drives both change detection *and* the up-to-date check. This task has
-no `generates`, so it re-runs on every change — correct for a formatter, and it
-writes nothing when there is nothing to change, which is what keeps it stable.
+Four watch-mode traps: killing the launching shell does not stop the watcher (it
+is a grandchild), task's restricted shell has no `kill`, `--dry` still starts one,
+and `watch: true` is CLI-only. Always stop with `task checks:nix:watch:stop`,
+which verifies the pid is gone: [`docs/task-control-plane.md`](docs/task-control-plane.md).
 
 ## External Package Registry
 
@@ -981,6 +907,8 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/task-control-plane.md`](docs/task-control-plane.md)         | Task namespace policy and workflow examples                            |
 | [`docs/ci-pipeline.md`](docs/ci-pipeline.md)                | CI: inventory-driven host selection, path rules, the two builds per host |
 | [`docs/nix-patterns.md`](docs/nix-patterns.md)               | yq/format traps, non-obvious Nix, build-budget traps, store reclaim (GC roots), agent failure modes |
+| [`docs/agent-turns.md`](docs/agent-turns.md)                | Agent turns (xs): endpoint, schema, tokens, dedup, restore procedure    |
+| [`docs/delphi-install.md`](docs/delphi-install.md)              | Dated install walkthrough for delphi, plus the autoUpgrade path      |
 | [`docs/NUSHELL.md`](docs/NUSHELL.md)                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |
 | [`docs/frieren-access.md`](docs/frieren-access.md)             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
 | [`docs/dns-failover.md`](docs/dns-failover.md)                | Resolver pair, route vs node failover, why the `/32` cannot fail over |

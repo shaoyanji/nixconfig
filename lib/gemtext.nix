@@ -1,15 +1,6 @@
-# lib/gemtext.nix — the fleet documentation as a Gemini capsule.
-#
-# A projection, not a second tree: callers hand in the same markdown the docs
-# pipeline and site already render (lib/docs.nix `generatedPages` plus the repo's
-# own `.md`), and this turns each page into the `.gmi` page it becomes. The
-# converter lives in ./gemtext/md2gemtext.py rather than in a '' string here, so
-# it is linted and diffed like any other code.
-#
-# `cgi` scripts are installed under $out/cgi-bin as executable store files:
-# molly-brown only executes a CGI when the resolved path is under a CGIPaths
-# entry (and relative entries are joined to DocBase), so the capsule must own
-# the directory it serves from.
+# lib/gemtext.nix — markdown to gemtext for the capsule, a projection of the same
+# pages the docs artifact renders. Converter: ./gemtext/md2gemtext.py. CGI installs
+# under $out/cgi-bin — molly-brown runs only what a CGIPaths entry resolves to.
 {
   lib,
   pkgs,

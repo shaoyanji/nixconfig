@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# End-to-end test of the frieren-canary microVM: boot it, prove it answers over
-# ssh and over the host's reverse proxy, stop it, prove the proxy stops answering.
+# End-to-end test of the frieren-canary microVM: boot it, prove it is a usable
+# sandbox over ssh, stop it, and prove the teardown left nothing running.
 #
-# Every address and port is read from the flake, never typed here:
-#   lan ip        .?submodules=1#inventory.hosts.frieren-canary.network.lan_ip
-#   api port      .?submodules=1#nixosConfigurations.frieren-canary.config.systemd.services.canary-dummy-api.unitConfig.X-Canary-Api-Port
+# The guest is a runbook sandbox, not a web service: it declares no API and frieren
+# carries no route to it (both were EXP-102 dogfooding, removed when the guest was
+# narrowed to what a runbook needs). So what is asserted here is the sandbox —
+# a login, the declared address, the tool set running, a real /var — and that
+# `vm:canary:stop` really stops it.
 #
-# The previous version hard-coded a Tailscale address that is not in the inventory
-# at all, asserted a 504 that nginx only returns on a read timeout, and used
-# `curl -f` on the response it expected to fail. This one asserts the guest's
-# identity, not just that something answered.
+# The address is read from the flake, never typed here:
+#   lan ip  .?submodules=1#inventory.hosts.frieren-canary.network.lan_ip
 set -euo pipefail
 
 NAME="frieren-canary"
@@ -29,12 +29,8 @@ cd "$REPO_DIR"
 # --- declared facts ----------------------------------------------------------
 say "reading the declared contract"
 LAN_IP="$(nix eval --raw ".?submodules=1#inventory.hosts.${NAME}.network.lan_ip")"
-API_PORT="$(nix eval --raw ".?submodules=1#nixosConfigurations.${NAME}.config.systemd.services.canary-dummy-api.unitConfig.X-Canary-Api-Port")"
 [ -n "$LAN_IP" ] || fail "inventory has no lan_ip for ${NAME}"
-case "$API_PORT" in
-  '' | *[!0-9]*) fail "canary-dummy-api declares no numeric port (got '${API_PORT}')" ;;
-esac
-say "guest ${LAN_IP}:${API_PORT}"
+say "guest ${LAN_IP}"
 
 # --- boot --------------------------------------------------------------------
 say "booting (log: ${LOGFILE})"
@@ -64,27 +60,36 @@ for waited in $(seq 1 90); do
   sleep 1
 done
 
-# --- guest identity ----------------------------------------------------------
+# --- the guest is the declared one ------------------------------------------
 GUEST_HOST="$(ssh "${SSH_OPTS[@]}" "${NAME}" hostname)"
 [ "$GUEST_HOST" = "$NAME" ] || fail "guest hostname is '${GUEST_HOST}', expected '${NAME}'"
 say "guest hostname: ${GUEST_HOST}"
 
-# --- api, direct -------------------------------------------------------------
-say "probing the dummy API directly on ${LAN_IP}:${API_PORT}"
-DIRECT="$(curl -sS --max-time 5 "http://${LAN_IP}:${API_PORT}/")" || fail "no answer from the guest API"
-printf '%s' "$DIRECT" | grep -q '"service": "canary-dummy-api"' || fail "guest API returned unexpected JSON: ${DIRECT}"
-printf '%s' "$DIRECT" | grep -q "\"vm\": \"${NAME}\"" || fail "guest API does not identify as ${NAME}: ${DIRECT}"
-say "direct API: healthy"
+# The declared address, not the alias: `frieren-canary` is a stanza in the host's
+# ssh_config, so answering there proves the alias; reaching the inventory value
+# directly proves the address the guest was configured with.
+ssh "${SSH_OPTS[@]}" "devji@${LAN_IP}" true 2>/dev/null ||
+  fail "no answer at the declared address devji@${LAN_IP}"
+say "guest address: ${LAN_IP}"
 
-# --- api, through the host proxy --------------------------------------------
-# 127.0.0.1 on frieren: the path prefix and the vhost are both host-local, so the
-# test does not depend on the tailnet being up or on any address not in the repo.
-say "probing /canary/ through the host proxy"
-PROXIED="$(curl -sS --max-time 5 "http://127.0.0.1/canary/")" || fail "proxy did not reach the guest"
-printf '%s' "$PROXIED" | grep -q '"service": "canary-dummy-api"' || fail "proxy returned unexpected JSON: ${PROXIED}"
-VHOST="$(curl -sS --max-time 5 -H "Host: canary.frieren.lan" "http://127.0.0.1/")" || fail "canary.frieren.lan vhost did not answer"
-printf '%s' "$VHOST" | grep -q '"service": "canary-dummy-api"' || fail "vhost returned unexpected JSON: ${VHOST}"
-say "proxy path and vhost: healthy"
+# --- a runbook can run here --------------------------------------------------
+# The tool set is what the guest is FOR: a compiler and the query tools a runbook
+# reaches for. /var is a real volume rather than the tmpfs overlay, so a runbook
+# that writes state does not lose it on a restart and does not silently fill RAM.
+# `command -v` is a shell builtin, so this asserts the declared packages are on PATH
+# rather than whatever convenience binary happens to exist. One connection, not four.
+say "asserting the sandbox's tool set"
+ssh "${SSH_OPTS[@]}" "${NAME}" 'for t in jq git gcc make python3 sqlite3; do command -v "$t" >/dev/null || { echo "missing: $t"; exit 1; }; done' ||
+  fail "the guest's declared tool set is incomplete (see the loop's output)"
+ssh "${SSH_OPTS[@]}" "${NAME}" 'git --version' | grep -q '^git version' ||
+  fail "git does not execute in the guest"
+say "tools: jq git gcc make python3 sqlite3"
+
+# Pure redirection, so this needs no coreutils in the guest PATH: a writable /var
+# volume is what keeps a runbook's state off the tmpfs overlay.
+ssh "${SSH_OPTS[@]}" "${NAME}" 'echo ok > /var/tmp/canary-probe && [ "$(< /var/tmp/canary-probe)" = ok ]' ||
+  fail "the guest's /var volume is not writable"
+say "writable state: /var/tmp/canary-probe"
 
 # --- teardown ----------------------------------------------------------------
 say "stopping the guest"
@@ -92,12 +97,11 @@ trap - EXIT INT TERM
 sudo "$REPO_DIR/scripts/task/run-canary.sh" --stop
 wait "$RUNNER_PID" 2>/dev/null || true
 
-say "asserting the proxy no longer serves the guest"
-CODE="$(curl -s -o /dev/null -m 5 -w '%{http_code}' "http://127.0.0.1/canary/" || echo 000)"
-case "$CODE" in
-  502 | 503 | 504 | 000) say "proxy returns ${CODE} after teardown (expected)" ;;
-  200) fail "proxy still returns 200 after the guest stopped — the VM is still running" ;;
-  *) fail "unexpected proxy status after teardown: ${CODE}" ;;
-esac
+say "asserting the teardown left nothing running"
+STATUS="$(scripts/task/run-canary.sh --status 2>&1 || true)"
+printf '%s\n' "$STATUS" | grep -q 'hypervisor: not running' ||
+  fail "a hypervisor is still running after teardown: ${STATUS}"
+printf '%s\n' "$STATUS" | grep -q "tap ${NAME}: absent" ||
+  fail "the tap outlived the guest: ${STATUS}"
 
-say "canary passed: boot, ssh, guest API, host proxy, teardown"
+say "canary passed: boot, ssh, declared address, sandbox tooling, teardown"

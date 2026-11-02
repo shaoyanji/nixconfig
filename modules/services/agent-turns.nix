@@ -1,8 +1,6 @@
-# Agent turn coordination: a local xs store plus the only network surface in
-# front of it. The store has no network namespace and no address it may bind;
-# the shim holds the bearer token, validates the turn schema and answers 405 to
-# every write that is not an append, because xs itself has DELETE and /import.
-# Design, API, verification and restore procedure: docs/agent-turns.md.
+# Agent turn coordination: a local xs store, and the shim in front of it is the
+# only network surface — it holds the bearer token, validates the turn schema and
+# answers 405 to anything but an append (xs itself has DELETE). docs/agent-turns.md
 {
   config,
   lib,
@@ -205,6 +203,7 @@ in {
     systemd.services.xs-agent-turns = {
       description = "xs event stream store for agent turns (Unix socket only)";
       wantedBy = ["multi-user.target"];
+      unitConfig.X-Fleet-Role = "daemon";
       # No ordering on sops: on this fleet the secrets are installed by the
       # activation script itself, not by a `sops-install-secrets` unit, so a
       # `requires` on that name leaves the unit unstartable.
@@ -239,6 +238,7 @@ in {
     systemd.services.agent-turns-shim = {
       description = "Authenticated append-only shim in front of the agent-turn store";
       wantedBy = ["multi-user.target"];
+      unitConfig.X-Fleet-Role = "daemon";
       after = ["xs-agent-turns.service"];
       requires = ["xs-agent-turns.service"];
       serviceConfig = {

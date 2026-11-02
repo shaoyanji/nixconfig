@@ -43,7 +43,10 @@ job_dir() {
 # The newest job, by the epoch prefix every id carries. Used when no id is given
 # so the common case ("the thing I just started") needs no copy-paste.
 newest() {
-  ls -1 "$state" 2>/dev/null | grep -E '^[0-9]+-' | sort -n | tail -n1
+  local f
+  for f in "$state"/[0-9]*; do
+    [ -e "$f" ] && printf '%s\n' "${f##*/}"
+  done | sort -n | tail -n1
 }
 
 resolve() {

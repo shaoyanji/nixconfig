@@ -61,15 +61,16 @@ Serving is one-at-a-time (llama-swap swaps) because RAM forbids all three loaded
 
 **Default** — for requests with no model, or a `policy:`-prefixed model, the router uses `services.llm-decision-router.defaultModel` (Nix option, default `qwen3.6-35b-a3b`; Eisen sets `kolibri-1` in `hosts/eisen/configuration.nix`). Change it there + rebuild/activate.
 
-**SubZeroClaw** follows the default: its `~/.subzeroclaw/config` sends `request_extra = {"model":"policy:auto", ...}`, so the router normalizes it to the Nix default. To pin SubZeroClaw to a specific model, set `request_extra`'s `model` to that model's id — but the default is the intended path; keep it on `policy:auto`.
-
 **Check which model is loaded**:
 
 ```bash
 curl -s http://127.0.0.1:8080/v1/models   # status: running / unloaded per model
 ```
 
-**Cold-load times** (approx, off HDD): Kolibri ~4–5 min, Qwen ~2–3 min, Bonsai ~1 min. A request during a swap waits (llama-swap queues it) or times out: router 110s timeout, SubZeroClaw `--max-time 120`. Switching to a cold model can therefore exceed SubZeroClaw's cap — **pre-warm the model first** (send a request for it, wait for it to load) before running SubZeroClaw. The router does not return a "model loading" 503; fail-fast + retry is the current behavior.
+**Cold-load times** (approx, off HDD): Kolibri ~4–5 min, Qwen ~2–3 min, Bonsai ~1 min. A request during a swap waits (llama-swap queues it) or times out: the router's
+own timeout is 110s, and a cold load can exceed it — **pre-warm the model first**
+(send a request for it, wait for it to load). The router does not return a "model
+loading" 503; fail-fast + retry is the current behavior.
 
 **Concurrency**: one generation slot (router, `--parallel 1` upstream). A second concurrent generation gets `429 {"error":{"code":"llm_busy","message":"LLM generation slot busy; retry later"}}`. A disconnected client frees the slot (slot fix, `76bab63`) — no more 90s slot holds from a dead client.
 
@@ -160,15 +161,17 @@ https://eisen.<tailnet>.ts.net:8445/v1/images…  (tailscale serve, oneshot)
 
 ---
 
-## MicroVM SubZeroClaw (canary, VERIFIED 2026-10-17)
+## MicroVM canary (retrenched 2026-11-01)
 
-SubZeroClaw inside the `frieren-canary` microVM, model on Eisen. Full operating docs: [`hosts/microvms/README.md`](../microvms/README.md) (frieren as the example).
+`frieren-canary` is now a plain runbook sandbox — a login, a tool set and a
+writable `/var` — with no agent harness, no dummy API and no host proxy route
+(the `/canary/`, `canary.frieren.lan` and `/eisen/` surfaces are gone). Operating
+doc: [`hosts/microvms/README.md`](../microvms/README.md).
 
-- Guest: `hosts/microvms/frieren-canary.nix` (microvm.nix, cloud-hypervisor/KVM, 2 vCPU, 2 GB RAM, vsock cid 10). Tap `microvm1` on host bridge `microbr`. Guest `192.168.83.10/24`, gateway `192.168.83.1`.
-- Guest SubZeroClaw config (activation-script-seeded, unconditional): endpoint `http://192.168.83.1/eisen/v1/chat/completions`, `request_extra = {"model":"policy:auto"}` (router default = Kolibri), `api_key = "none"` (router forwards to Jev -> Jev rejects -> Laya fallback, fine for the hi test; real Jev needs a real key via a secret, never in the repo).
-- Endpoint chain: canary -> `http://192.168.83.1/eisen/v1/chat/completions` -> host nginx `/eisen/` -> `/router/` -> router :8000 -> llama-swap/Jev/Laya. On frieren, `/eisen/` proxies to Eisen with **`proxy_set_header Host "eisen.lan"`** (required). On Eisen, `/eisen/` rewrites to `/router/` locally.
-- **Proof (2026-10-17, on Eisen)**: canary built, booted, SSH worked, `subzeroclaw "just say hi"` exited 0 with `Hi! 👋`. Decision fell back to Laya as expected. Stopped cleanly. Runtime prerequisites created: `microbr` bridge, `/var/lib/microvms/frieren-canary/` + `ssh-host-keys`, `microvm` system user.
-- **Pre-warm Kolibri first** (cold load ~4-5 min can exceed SubZeroClaw's 120s cap).
+The SubZeroClaw-in-microVM experiment was verified on 2026-10-17 and retired with
+that narrowing: the harness's only packaging lived in the guest module, so it is
+no longer built anywhere. What it proved — a bridged guest reaching the router
+through the host — is still how a guest would reach it if one needs to.
 
 ---
 

@@ -1,9 +1,6 @@
-# gemini.frieren.lan — the fleet documentation as a Gemini capsule.
-#
-# One projection, not a second tree: the pages are the same markdown the docs
-# artifact (`.#artifacts.docs`) and the HTTP site are built from, converted to
-# gemtext by lib/gemtext.nix. The certificate is the existing `*.frieren.lan`
-# wildcard, so nothing new is issued and no ACME path is involved.
+# gemini.frieren.lan — the fleet documentation as a Gemini capsule: the same
+# markdown the docs artifact and the HTTP site render, converted by
+# lib/gemtext.nix. The `*.frieren.lan` wildcard covers it; no ACME path is involved.
 {
   config,
   lib,

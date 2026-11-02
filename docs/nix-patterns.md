@@ -262,5 +262,20 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     its hook; a live session is cleaned with `export -n PS0` plus one re-assignment
     to bash-preexec's own string.
 
+14. **A `git init` in `$HOME` makes every prompt walk the home tree.** Once `~`
+    is a repository starship's `git_status` runs there, and Starship 1.x has no
+    per-directory switch; the login after such a session feels broken for
+    minutes. `modules/shell/home-not-a-repo.nix` points `~/.git` at `/proc`, so
+    `git init` in `~` fails instead of arming the trap, and repositories below
+    home are untouched.
+
+## An upstream with no tags
+
+`tildegit.org/solderpunk/molly-brown` publishes neither tags nor releases (both
+lists empty, measured 2026-10-29), so "the newest release" can only be the tip of
+master. `overlays/molly-brown.nix` pins `src` to master and keeps nixpkgs' own
+`vendorHash` — the go module set has not moved since nixpkgs' 2023-02-10 pin —
+verified by building the override locally. Only `src` and `version` differ.
+
 Longer-form procedure for the operational half: [`../AGENTS.md`](../AGENTS.md)
 (routing) and the `infra` skill (deploy, rebuild, rollback).

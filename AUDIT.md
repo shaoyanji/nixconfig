@@ -28,6 +28,24 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-01 — the canary is a runbook sandbox, not a second frieren
+- **Stripped to what a runbook needs.** `hosts/microvms/frieren-canary.nix` lost the SubZeroClaw
+  derivation, its activation-time config seeding and `canary-dummy-api`. What remains is `base.nix`
+  plus a login, a tool set and a volume for `/var`; the evaluated unit set is base plumbing + `sshd`
+  (`nix eval …config.systemd.services`, 1.64 s / 242 MiB — no `canary-dummy-api`).
+- **The route went with the API.** frieren's `/canary/` location, the `canary.frieren.lan` vhost and
+  the `/eisen/` proxies on frieren and eisen were EXP-102 dogfooding; `curl 127.0.0.1/canary/` had
+  been answering `504` whenever the guest was down, which is its normal state. `vm:canary:agent`
+  went with the harness it drove.
+- **It cannot be left running.** `vm:canary:run` still boots a transient unit, now with
+  `RuntimeMaxSec` (`LIFETIME`, default `2h`) and the cap printed, so an abandoned sandbox stops
+  instead of holding 2 GiB of an 8 GiB NAS. `vm:canary:test` asserts the sandbox (hostname, declared
+  address, tool set, writable `/var`) and then that no hypervisor or tap survives.
+- Evidence: the eval above; `task checks:host HOST=frieren` 19.1 s rc=0, `HOST=eisen` 13.6 s rc=0,
+  `HOST=frieren-canary MODE=eval` 1484 assertions rc=0; `task checks:tasks` 497 tasks, parity exact.
+  Not run: `task vm:canary:test` — it boots an x86_64 guest, so it belongs on frieren, and it builds
+  the new closure there.
+
 ### 2026-11-01 — Ryoku landed on fern; dock ethernet declarative; zsh baseline; CPU off the powersave floor
 - **Ryoku is live.** `xb9qmd8c…` is `/run/current-system` on fern (the 2026-10-31 entry recorded the port as
   undeployed). Presentation-stage `switch-to-configuration` reported 101 from post-restart units only: the
@@ -66,3 +84,17 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   `boot.extraModprobeConfig`.
 - **Gate:** `nix build .#hostChecks.x86_64-linux.fern` rc=0, **1979 assertions** each time (1 m 55 s; cached for
 the `mkForce` rebuild).
+
+## Open debt (`task ops:notes`)
+
+1. `cassini`'s darwin assertion (`xdg.desktopEntries`) — dormant, reproducible
+   with `MODE=eval`; `minyx`'s kernel conflict is gone (the board evaluates,
+   passes its gate and is active since 2026-10-27).
+2. Tailnet DNS lists `10.99.0.53`, which eisen/fern/aristotle cannot route
+   (`--accept-routes=false` is deliberate), so their failover is nominal; list both
+   resolver node addresses instead (`ops:tailnet:dns` reports the set).
+3. MQTT broker has no publisher/subscriber (HC-5); 7 of 11 `extraComponents`
+   entries are dormant Python dependencies, not enabled components.
+4. Sentinel is frieren-local; fleet push is P1 in `ARCHITECTURE.md`.
+5. `compile-llm-specs.py` still generates the offline fleet-matrix table (not the
+   home card; `~/AGENTS.md` is now `.#homeAgents.<host>`).

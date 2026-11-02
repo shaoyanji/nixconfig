@@ -104,6 +104,9 @@ in any field. Error bodies name the field, never the value.
 }
 ```
 
+`task agents:xs:post` renders this body from `scripts/task/xs-turn.jq`: the JSON
+above documents the shape, it is not something an agent assembles by hand.
+
 `outcome` is `done`, `in_progress`, or `blocked: <note>` / `failed: <note>`.
 An unknown field is a 400, which is what keeps a transcript from being posted
 under an extra key. Prose fields are capped (action 500, rationale 1000) and

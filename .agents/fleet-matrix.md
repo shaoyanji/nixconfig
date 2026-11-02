@@ -6,7 +6,7 @@
 ## Fleet Status Breakdown
 
 - **Active Production Nix Hosts (13)**: `aristotle`, `delphi`, `eisen`, `fern`, `frieren`, `guckloch`, `kali`, `kellerbench`, `minyx`, `netbook`, `poseidon`, `scratch`, `stark`
-- **Active External Non-Nix Hosts (7)**: `bitlockerpremium`, `burgernas`, `dragoncourt`, `envs`, `gok`, `moto`, `serv00`
+- **Active External Non-Nix Hosts (8)**: `bitlockerpremium`, `burgernas`, `dragoncourt`, `envs`, `gok`, `moto`, `pythonanywhere`, `serv00`
 - **Preserved Architecture Patterns (15)**: `aceofspades`, `alarm`, `ancientace`, `applevalley`, `ares`, `cassini`, `deckstation`, `demo`, `frieren-canary`, `garnixMachine`, `mtfuji`, `penguin`, `schneeeule`, `sledgehammer`, `testvm`
 
 ---
@@ -56,7 +56,7 @@
 | 🟢 **`envs`** | `active` | No (Ext) | `x86_64-linux` | `shared-pubnix` | Intel Xeon, Shared Pubnix Quota | Envs.net Multi-Protocol Pubnix Node |
 | 🟢 **`fern`** | `active` | Yes | `x86_64-linux` | `lightweight-laptop` | AMD Ryzen 3 3250U, 8 GB DDR4, AMD Radeon Vega 3 iGPU | Lightweight Daily-Driver Laptop |
 | 🟢 **`frieren`** | `active` | Yes | `x86_64-linux` | `server-heavy-io-sensitive` | Intel Core i5-8250U, 11.47 GiB DDR4 (4GB soldered, Intel UHD Graphics 620 @ 1.10 GHz | Central NAS Mainframe, Kitchen Light Workstation & Fleet Server |
-| ⚪ **`frieren-canary`** | `preserved` | Yes | `x86_64-linux` | `standard` | host-provided vCPU, host-provided | Frieren Canary MicroVM (closure smoke test) |
+| ⚪ **`frieren-canary`** | `preserved` | Yes | `x86_64-linux` | `standard` | host-provided vCPU, host-provided | Frieren Canary MicroVM (on-demand runbook sandbox) |
 | ⚪ **`garnixMachine`** | `preserved` | Yes | `x86_64-linux` | `ci-cloud` | x86_64 Cloud vCPU, Cloud Allocated | Garnix CI Runner & Bountystash Host |
 | 🟢 **`gok`** | `active` | No (Ext) | `aarch64-linux` | `standard` | ,  | gokrazy Appliance (Pi 3B SD card, not NixOS) |
 | 🟢 **`guckloch`** | `active` | Yes | `x86_64-linux` | `wsl2-container` | Host CPU, WSL2 Dynamic Allocation | Windows Subsystem for Linux (WSL2) Container |
@@ -68,6 +68,7 @@
 | 🟢 **`netbook`** | `active` | Yes | `x86_64-linux` | `strictly-constrained-cpu` | Intel Celeron N3060, 2 to 4 GB RAM, Intel HD Graphics 400 | Alice's Travel Netbook (Fleet nixpkgs, Scripted Initrd) |
 | ⚪ **`penguin`** | `preserved` | Yes | `x86_64-linux` | `container-client` | Intel x86_64, Shared with ChromeOS, VirtIO GPU with nixGL wrapper | Chromebook Linux Container (Crostini) |
 | 🟢 **`poseidon`** | `active` | Yes | `x86_64-linux` | `flagship-compute` | AMD Ryzen 7 Mobile, 16 GiB DDR4, NVIDIA GeForce RTX 3050 Ti Laptop GPU | Primary High-Performance Laptop Workstation |
+| 🟢 **`pythonanywhere`** | `active` | No (Ext) | `x86_64-linux` | `shared-web-hosting` | Shared x86_64, Python 3.10, 100 CPU-seconds per day, Shared Web App Quota | PythonAnywhere Flask CMS Host |
 | ⚪ **`schneeeule`** | `preserved` | Yes | `x86_64-linux` | `standard-laptop` | Intel 64-bit multi-core, 16 GiB, Intel iGPU + NVIDIA GeForce | Impermanent Desktop Laptop |
 | 🟢 **`scratch`** | `active` | Yes | `x86_64-linux` | `lightweight-io-diet` | Intel Core i5-6500, 8 GB DDR4, Intel HD Graphics 530 | I/O Diet Lightweight Workstation |
 | 🟢 **`serv00`** | `active` | No (Ext) | `x86_64-freebsd` | `shared-freebsd-quota` | Intel Xeon, 512 MB Process Memory Limit (devil info limits) | FreeBSD Web Hosting & Daemon Node |

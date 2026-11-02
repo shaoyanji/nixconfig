@@ -53,7 +53,7 @@ task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 task dev:blog:draft TOPIC="…"    # ideas/<slug>.md scaffolded from the knowledge graph
 task dev:blog:export SLUG=…      # publish it into the blog repo (never commits)
 ```
-The draft layer and its `about:` edges: [blog-drafting.md](blog-drafting.md).
+The draft layer and its `about:` edges: [blog-drafting.md](./blog-drafting.md).
 
 ### Validation
 ```bash
@@ -112,6 +112,30 @@ move the text to `summary` — never `internal: true`.
 `task 'infra:plan:host:*'` fails with `slice index out of range` (no `.MATCH` to
 bind — this applies to agents invoking wildcards too). Use the concrete name
 (`task infra:plan:host:poseidon`); the menu prompts for the value and splices it.
+
+### Watch mode: stopping it is its own task
+
+Watch mode leaves children running: the watcher is a *grandchild* of whatever
+launched it. Killing the launching shell left a live `task checks:nix:watch`
+formatting the repo for ~8 minutes, and it looked stopped because the parent PID
+was gone. `task checks:nix:watch:stop` matches the watcher cmdline exactly (so it
+can never signal the shell that launched it, or its own), signals it, waits, and
+**verifies** it is gone instead of assuming the signal landed; by hand it is
+`pkill -x task`, then `pgrep -x task`. Four traps, confirmed against task's own
+watch docs:
+
+- **A task's `cmds` run in task's restricted shell, not bash.** `kill` is an
+  "unsupported builtin" there and silently does nothing — the stop task looked
+  like it succeeded while the watcher kept running. Drop to a real shell for any
+  non-POSIX builtin: `bash -c 'kill "$1"' _ "$pid"`.
+- **`--dry` does not suppress `watch: true`.** `task --dry checks:nix:watch`
+  starts a real watcher and blocks; there is no dry run for a watch task.
+- **`watch: true` only applies to CLI invocations.** From another task's
+  `cmds`/`deps` it does not start a watcher, so it cannot be pulled in as a
+  dependency and quietly hang a pipeline.
+- **`sources` drives change detection *and* the up-to-date check.** The watcher
+  has no `generates`, so it re-runs on every change — correct for a formatter,
+  and it writes nothing when there is nothing to change, which keeps it stable.
 
 ## The task graph, compiled (`lib/taskfile.nix`)
 

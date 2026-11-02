@@ -65,7 +65,9 @@ fi
 
 # Ownership is declared, not assumed: only the named builder deploys this host.
 declared=$(nix eval --raw ".?submodules=1#inventory.hosts.${HOST}.builder" 2>/dev/null || true)
-me=$(hostname)
+# The kernel's own name, not hostname(1): the unit runs with a PATH-only
+# environment and must not depend on a package being in runtimeInputs.
+me=$(</proc/sys/kernel/hostname)
 if [ -n "$declared" ] && [ "$declared" != "$me" ]; then
   echo "minyx-keeper: inventory names '$declared' as $HOST's builder, not '$me'" >&2
   exit 1

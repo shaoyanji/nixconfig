@@ -1,6 +1,5 @@
-# Needle 3 engine and weights, pinned once for every consumer. The binary is a
-# prebuilt Hugging Face release: packaging follows overlays/simplex-chat.nix
-# (autoPatchelfHook, never patchelf by hand). Rationale and measurements:
+# Needle 3 engine and weights, pinned once for every consumer. Packaging follows
+# overlays/simplex-chat.nix: autoPatchelfHook, never patchelf by hand.
 # docs/mail-agent.md.
 {pkgs}: let
   version = "3";

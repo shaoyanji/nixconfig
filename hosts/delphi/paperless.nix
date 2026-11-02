@@ -1,34 +1,6 @@
-# paperless-ngx on delphi — offloaded from frieren 2026-11-02.
-#
-# Why this moves and stirling did not need to: the archive is 722 MB of SQLite
-# plus media and never touches the NAS's disks, while four Python units plus
-# tika plus gotenberg hold ~520 MiB resident. Memory is the thing delphi has
-# (8 GiB idle of 11) and frieren rents from a laptop.
-#
-# Three deliberate differences from `hosts/frieren/paperless.nix`:
-#
-#  - **Stock `paperless-ngx`, not the narrowed-tesseract override.** That
-#    override exists on frieren to keep one 1 GiB tessdata FOD out of the
-#    closure. Here it would turn a substitutable Python package into a local
-#    build on a 2-core ARM VM, and `AGENTS.md`'s rule is that delphi substitutes
-#    rather than compiles. OCR still gets deu+eng; it just also ships the
-#    languages nobody asks for.
-#  - **It binds every interface, reachable only on the tailnet.** delphi has no
-#    LAN to serve: `docs.frieren.lan` stays the name and frieren's nginx is
-#    the front, so the only client is one tailnet hop away. 28981 is absent from
-#    the global `allowedTCPPorts` and present only on `tailscale0` — the same
-#    posture `services.fleetMonitors` already uses here.
-#  - **`PAPERLESS_URL` is declared.** The Host header arrives from frieren's
-#    proxy, so Django needs the name it will be addressed by; a fresh install
-#    defaults to its own listen address and mints links nobody can open.
-#
-# One overlay, measured. `paperless-ngx` pulls `wandb` in through its optional
-# AI/classifier extras, and no substituter carries an aarch64 build of it: the
-# local build ran its own suite and died 7 minutes in on
-# `test_agent_basic` ("worker 'gw0' crashed") with 3485 tests passing — a
-# failure in the test harness, not in the wheel paperless imports. Building a
-# runtime dependency with its checks off is the smaller lie than shipping no
-# paperless; the package contents are unchanged by `doCheck`.
+# paperless-ngx on delphi, offloaded from frieren 2026-11-02: SQLite plus media,
+# and four Python units that held ~520 MiB resident on the NAS.
+# The three deliberate differences from frieren and the wandb overlay: docs/service-offload.md.
 {
   pkgs,
   lib,

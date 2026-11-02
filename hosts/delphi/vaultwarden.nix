@@ -1,11 +1,6 @@
-# Vaultwarden — offloaded from frieren 2026-11-02 (docs/service-offload.md).
-#
-# 4.2 MB and 36 MiB resident: this is not about resources, it is about a password
-# manager not depending on a laptop. 8222 and 3012 are opened on `tailscale0` alone;
-# the only client is frieren's `vault.frieren.lan` vhost.
-#
-# DOMAIN is unchanged on purpose. It is the origin WebAuthn registers against, so a
-# new name would silently invalidate every passkey already enrolled.
+# Vaultwarden on delphi, offloaded from frieren 2026-11-02. DOMAIN is unchanged
+# because it is the origin passkeys were enrolled against; 8222/3012 are tailnet-only.
+# docs/service-offload.md.
 {...}: {
   services.vaultwarden = {
     enable = true;

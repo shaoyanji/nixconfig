@@ -10,6 +10,7 @@
 in {
   imports = [
     ../../modules/config/authorized-keys.nix
+    ../../modules/services/flake-gc-root.nix
     ../../modules/ssh-ca.nix
     inputs.sops-nix.nixosModules.sops
     ./firewall-baseline.nix

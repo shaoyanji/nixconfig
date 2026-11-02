@@ -261,11 +261,26 @@ jobs:
       # that includes `sdImage`, whose Raspberry Pi kernel is not on
       # cache.nixos.org. Warming only the toplevel is what left image builds
       # compiling from source on every attempt.
+      # Warm the tree the HOST evaluates, not the submodule tree in this checkout.
+      #
+      # A host upgrades from `github:shaoyanji/nixconfig#<host>` — a tarball whose
+      # submodules are gitlinks. `?submodules=1` is not even a legal parameter on a
+      # `github:` ref (measured: "contains unknown parameter 'submodules'"); it
+      # only exists on `git+` refs, and it produces a tree WITH submodule contents.
+      # Two different trees are two different source paths, so a build from one is
+      # worth nothing to an evaluation of the other: at 2026-11-02 frieren rebuilt
+      # 34 derivations on its 04:00 upgrade of a commit this job had already built.
+      #
+      # A git tree and a tarball at the same commit resolve to ONE source path
+      # (measured: same /nix/store/…-source from a worktree and from `github:`), so
+      # `.#` here warms exactly what the host asks for. Submodule contents stay in
+      # the checkout for the steps that need them (`checks.*` read
+      # modules/secrets) — those keep `?submodules=1`.
       - run: |
           set -euo pipefail
           for attr in ${{ join(matrix.attrs, ' ') }}; do
             echo "::group::nix build $attr"
-            nix build -L ".?submodules=1#${attr}"
+            nix build -L ".#${attr}"
             echo "::endgroup::"
           done
 

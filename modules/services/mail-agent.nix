@@ -1,7 +1,6 @@
-# Mail agent: natural-language mail actions through himalaya, routed by Needle 3,
-# plus a nightly sweep that archives bulk mail. Home-manager module because the
-# himalaya config and the sops mail secret are both user state. Design, accuracy
-# and the rejected alternatives: docs/mail-agent.md.
+# Mail agent: plain-English mail actions through himalaya, routed by Needle 3,
+# plus a nightly sweep of bulk mail. Home-manager module because the himalaya
+# config and the sops mail secret are user state. docs/mail-agent.md.
 {
   config,
   lib,

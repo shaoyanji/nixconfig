@@ -1,24 +1,6 @@
-# The shelter side of a service offload: state that lives on a cloud host still
-# gets a copy the household can reach, and the ingest door the humans already
-# use keeps pointing somewhere.
-#
-# The premise is the `open-frieren-offload` note in AGENTS.nix: a service can
-# leave the NAS, but "leave" must mean "the NAS is now a shelter", not "the only
-# copy is in a datacentre". Three guarantees, one declaration:
-#
-#   - `sets`   — every tree is mirrored to `<root>/<set>/` on the shelter host
-#                nightly, with each SQLite database replaced by a consistent
-#                `sqlite3 .backup` copy (a WAL-mode database copied file-by-file
-#                restores into a service that starts and then answers wrong).
-#   - `ingest` — a directory the service no longer hosts (the scanner's drop
-#                folder) is pulled here on a timer, so moving the service does
-#                not silently break the way documents arrive.
-#   - `migrate` — the units to stop on each side, and the assertion that proves
-#                the cutover, so the move is one repeatable script instead of a
-#                remembered sequence.
-#
-# docs/service-offload.md is the procedure; scripts/task/offload-{bridge,migrate}.sh
-# are the two verbs.
+# The shelter side of an offload: nightly mirrored state, the ingest door the
+# humans still use, and the stop/verify facts a cutover needs, in one declaration.
+# Procedure and measurements: docs/service-offload.md.
 {
   config,
   lib,

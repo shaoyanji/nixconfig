@@ -22,13 +22,7 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
    module Nix → taskfiles → docs. A table that exists twice is a liability.
 4. **Facts are evaluated, not guessed.** `nix eval .#inventory…` (~0.2 s) or
    `nix eval .#agentSkills…` (~1.2 s). Never evaluate a full host to answer a
-   fact question; never run `nix flake check` on this host.
-5. **Verification is phased:** eval to catch a config error · build to prove a
-   closure · size to plan a build. **Never run a check before a local rebuild**
-   except the boot — the switch already evaluates and builds, so a pre-flight
-   check re-instantiates the whole toplevel for no extra proof. A boot is the
-   thing a switch cannot prove before it happens: `checks:boot:self` on nixos
-   (BOOT=1, default) runs the config; `checks:boot` is the CI path for others.
+   fact question; never run `nix flake check` on this host.5. **Verification is phased:** eval to catch a config error · build to prove a closure · size to plan a build. **Never run a check before a local rebuild** except the boot — the switch already evaluates and builds, so a pre-flight check re-instantiates the whole toplevel for no extra proof. A boot is the thing a switch cannot prove before it happens: `checks:boot:self` on nixos (BOOT=1, default) runs the config; `checks:boot` is the CI path for others. **A fix's gate is `checks:host` plus `warm-host.sh --check`** — the cache proves the closure before anyone builds it; a real build is for a change that adds derivations (a Python package, model weights, a Rust/Go binary). Building the wrong *tree* voids the cache: `docs/nix-patterns.md` §"The gate for a fleet fix".
 6. **This is a live host.** Bounded gates only, one host per process, no
    top-level evals during the 03:00–05:30 window, and no ssh in unattended
    paths. Watch `task ops:health` before blaming the config.

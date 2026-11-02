@@ -591,17 +591,21 @@
     };
 
     ci-builds-config-and-gate = {
-      rule = "CI builds the closure and the module-system gate for each affected host, both with `?submodules=1`.";
+      rule = "CI builds each affected host's closure from the tree that host will evaluate (the bare git tree, which is the same source path as its `github:` tarball) and the module-system gate from `?submodules=1`.";
       proof = ".github/workflows/nixcachix.yml";
+      # Build from `.#`, not `.?submodules=1#`: submodule contents make a second
+      # tree, and a host's `github:` ref cannot even take the parameter
+      # ("contains unknown parameter 'submodules'"). Measured 2026-11-02: frieren
+      # rebuilt 34 derivations on a commit CI had already built.
       holds =
-        has ".github/workflows/nixcachix.yml" "nix build -L .?submodules=1#"
-        && has ".github/workflows/nixcachix.yml" "hostChecks."
+        has ".github/workflows/nixcachix.yml" "nix build -L \".#\${attr}\""
+        && has ".github/workflows/nixcachix.yml" "?submodules=1#hostChecks."
         && has ".github/workflows/nixcachix.yml" "pipe-operators";
-      detail = "the workflow stopped building hostChecks, lost ?submodules=1, or dropped pipe-operators";
+      detail = "the workflow stopped building host closures from the host's tree (.#attr), lost the submodule hostChecks gate, or dropped pipe-operators";
     };
 
     host-path-pinned-to-submodules = {
-      rule = "Every task-surface reference to a host closure carries `?submodules=1`, so the path a switch evaluates is the path a warm built.";
+      rule = "Every task-surface reference to a host closure carries `?submodules=1` for a LOCAL tree, so the path a local switch evaluates is the path a warm built. A remote host's ref is a `github:` tarball, which takes no such parameter: warming for it means building the same bare tree (see `docs/nix-patterns.md`).";
       proof = "scripts/task/warm-host.sh, scripts/task/activate-host.sh, scripts/task/host-check-sweep.sh, scripts/task/boot-check.sh, taskfiles/infra.yml";
       # A warm built `.#frieren` (v3xykfhr…); the switch evaluated
       # `.?submodules=1#frieren` (fpmxv4fn…), 34 derivations apart, so the cache

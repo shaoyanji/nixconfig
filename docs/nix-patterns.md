@@ -74,6 +74,45 @@ next to the code that would break: `hosts/frieren/paperless.nix` (§Tika,
 Before deploying anything referencing Java (Maven/Gradle), Go or Rust, run
 `nix build --dry-run` and confirm the closure is substitutable.
 
+### The gate for a fleet fix, and the exception
+
+A fix costs what it changes. Measured on frieren 2026-11-02, the nightly upgrade
+took **13 min 37 s** for a commit that changed documentation — 5 min 46 s of CPU
+on a 2-core NAS — and none of it was a compile:
+
+1. **03:15** `nix-gc` (NixOS's default `nix.gc.dates`) deleted **90** `-source`
+   paths. A flake's inputs are unreferenced the moment its evaluation ends, so
+   nothing protects them.
+2. **04:00** `autoUpgrade` re-copied ~20 of them from the binary caches:
+   04:00:16 → 04:08:46, **8.5 of the 13 minutes**, before the first build started.
+3. The remaining work was 34 generated derivations (`nixos-version`, `etc`,
+   `activate`, unit files, `home-manager-generation`) — the per-commit churn a
+   revision string causes, ~96 s of symlink-and-text.
+
+Two fixes, both in force: `services.flakeGcRoot` roots the deployed flake and
+its inputs at 05:00 (`nix flake archive --out-link`), so the 03:15 GC cannot take
+them; and CI builds host closures from `.#`, not `.?submodules=1#`.
+
+**That second one is the trap worth remembering.** A submodule tree is a
+*different source path* from the same commit's GitHub tarball, so a warm from one
+is worth nothing to an evaluation of the other — which is why frieren rebuilt 34
+derivations on a commit CI had already built. `?submodules=1` is not even a legal
+parameter on a `github:` ref: `contains unknown parameter 'submodules'`. A plain
+git tree and the tarball at one commit *do* resolve to one `/nix/store/…-source`,
+so `.#` is the ref to warm for a host that upgrades from `github:`.
+
+So the gate for a fleet fix is cheap, and stays cheap:
+
+```bash
+nix build --builders "" .#hostChecks.<arch>.<host>   # the config evaluates
+bash scripts/task/warm-host.sh --check <host>        # the cache already serves the closure
+```
+
+A real build — on CI, never on the NAS — is for a change that **adds
+derivations**: a new Python package, model weights, a Rust or Go binary. Anything
+else is a fix, and a fix that needs a closure rebuild is a fix built on the wrong
+tree.
+
 ## Reclaiming store space: the collect is only half the job
 
 GC frees paths that **no root reaches**. A generation is one kind of root, not

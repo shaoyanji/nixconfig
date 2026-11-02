@@ -682,6 +682,18 @@ tasks:
     cmds:
       - bash scripts/task/nixcache.sh size {{.CLI_ARGS}}
 
+  dev:nixcache:gc:
+    desc: "[destructive with -- --delete] Collect the oldest cache paths until the bucket is under target"
+    summary: >
+      Cachix's shape, as far as R2 allows: sort by age, delete the oldest until
+      under 75%. Cachix sorts by last access because it sees every request; this
+      Worker cannot — narinfo is served immutable, so Cloudflare answers the
+      repeats and the origin only observes misses — so upload age stands in, and
+      a re-push refreshes a path. Dry run unless `-- --delete`; a narinfo and its
+      nar always leave together; one run stops at GC_LIMIT paths.
+    cmds:
+      - bash scripts/task/nixcache.sh gc {{.CLI_ARGS}}
+
   dev:nixcache:keygen:
     desc: "Generate the edge cache signing key once: secret to sops, public key printed"
     summary: >
@@ -693,8 +705,11 @@ tasks:
       - bash scripts/task/nixcache.sh keygen {{.CLI_ARGS}}
 
   dev:nixcache:push:
-    desc: "Push one store path through the R2 S3 API, signed locally (the path CI uses)"
+    desc: "Push the unique part of a closure through the R2 S3 API, signed locally (the path CI uses)"
     summary: >
+      Dedupes against every non-LAN cache in lib/cache-registry.nix first, so a
+      system closure uploads its delta (771 MiB of 18.48 GiB, measured) rather
+      than the closure. Refuses before writing when it would cross BUDGET_GIB.
       The signing key travels in NIX_CONFIG, never on the command line. This is
       the same write path CI takes, so a local push is a real rehearsal of it.
     cmds:

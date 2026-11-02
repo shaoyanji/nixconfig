@@ -11,10 +11,17 @@ of R2 that CI can fill and anyone can read.
 | cachix | `shaoyanji.cachix.org` | WAN hosts | 5 GB |
 | edge | `https://nix-cache-edge.jisifu.workers.dev`, Worker over R2 | CI, any host, no tailnet | 10 GiB (free tier), hard |
 
-It is a **buffer, not a mirror**: only paths that neither cachix nor
-cache.nixos.org already serves are uploaded, so the 10 GiB holds fleet build
-output rather than a second copy of nixpkgs. `dev:nixcache:push` refuses the whole
-upload if it would cross the budget — the gate is the refusal, not a warning.
+It is a **buffer, not a mirror**: only paths that no other substituter already
+serves are uploaded, so the 10 GiB holds fleet build output rather than a second
+copy of nixpkgs. `dev:nixcache:push` refuses the upload if it would cross the
+budget — the gate is the refusal, not a warning.
+
+**It does not hold a system closure, and it is not supposed to.** See
+[Why a system closure fits](#why-a-system-closure-fits) for the measurement: an
+18 GiB NixOS closure contributes well under 1 GiB here, because a cache that
+stores the delta and leaves the rest to nixpkgs is the only kind that fits in a
+bucket. A cache that stored whole closures would need ~100 GiB for this fleet —
+that is a cost decision, not a technical one, and it is the wrong one.
 
 | Layer | Home |
 | :--- | :--- |
@@ -77,7 +84,7 @@ prefix of every signature, so rotating it means republishing the cache. The
 secret lands in sops at `NIXCACHE.SIGNING.KEY`; the public half is what belongs in
 `lib/cache-registry.nix` and every client's `trusted-public-keys`.
 
-## Pushing: cachix first, then the budget
+## Pushing: every substituter first, then the budget
 
 ```bash
 task dev:nixcache:push -- /nix/store/<hash>-<name>   # or .#<flake-attr>
@@ -86,13 +93,19 @@ task dev:nixcache:size                              # exits 1 at the limit
 
 Four rules, in this order:
 
-1. **Dedupe.** Every path in the closure gets one HEAD against cachix, then
-   cache.nixos.org, then this bucket. Anything present anywhere is dropped before
-   `nix copy` sees it. A run over `hello.drv`'s 342-path closure reported
-   `2/342 path(s) are unique` and uploaded 2.
+1. **Dedupe against the whole registry.** Every path in the closure gets one HEAD
+   per cache in `lib/cache-registry.nix` that is not `role = "lan"`: cachix, this
+   bucket, cache.nixos.org, numtide, nix-community, nix-gaming, determinate.
+   Anything found anywhere is dropped before `nix copy` sees it, and the run
+   prints which substituter absorbed how many paths. Two runs, for scale: a
+   `hello.drv` closure reported `2/342 path(s) are unique`; delphi's 2728-path
+   system closure reported `365/2728` (table below).
 2. **Budget.** The nar sizes of the survivors plus the bucket's measured bytes are
-   compared against `BUDGET_GIB` (10). Over the line it exits before writing:
-   `refusing the push — it would take the bucket … over the 10 GiB limit by …`.
+   compared against `BUDGET_GIB` (10). The run prints the five largest survivors,
+   because in practice a handful of paths decide the total, and over the line it
+   exits before writing: `refusing the push — it would take the bucket … over the
+   10 GiB limit by …`. A single path larger than the whole budget says so by name
+   instead, since gc cannot make room for it.
 3. **Sign into a staging cache.** `nix copy --to file://stage` with
    `secret-key=` writes the signed narinfo locally. Two traps live here:
    `nix copy` is recursive by default (a two-path push uploaded 342 objects), and
@@ -102,12 +115,92 @@ Four rules, in this order:
    path goes up with its real narinfo and its own nar, and nothing else.
 4. **Upload with rclone.** `nix copy --to s3://…` against a freshly recreated
    bucket exited 0 having written nothing at all — silent, which is the worst
-   failure for a cache. rclone reports what it moved.
+   failure for a cache. rclone reports what it moved, and the script then HEADs
+   the first object through the public edge: a push nobody can read is not a
+   push.
 
 CI runs the same script per built attribute with repository secrets
 (`NIXCACHE_SIGNING_KEY`, `NIXCACHE_R2_ACCESS_KEY_ID`, `NIXCACHE_R2_SECRET_ACCESS_KEY`,
 `NIXCACHE_R2_ENDPOINT`) and `continue-on-error`, so a full bucket never fails a
 build that succeeded, and a run where cachix took everything uploads nothing.
+
+## Why a system closure fits
+
+This is the question the 10 GiB budget raises first, so here is the measurement
+rather than the reassurance. Delphi's live system closure, 2026-11-02:
+
+```bash
+nix path-info --recursive --json /run/current-system   # 2728 paths, 18.48 GiB nar
+```
+
+One HEAD per path per cache, in registry order, sorted the paths into four groups:
+
+| Where the path already lives | Paths | nar |
+| :--- | ---: | ---: |
+| cache.nixos.org | 2158 | 16.09 GiB |
+| `shaoyanji.cachix.org` | 167 | 142 MiB |
+| `cache.numtide.com` | 27 | **1.40 GiB** |
+| `nix-community.cachix.org` | 11 | 135 MiB |
+| nowhere (uploaded here) | 365 | **771 MiB** |
+
+The numtide row is the one that matters most and is easy to miss: the fleet's own
+agent CLIs — `dsh` at 685 MiB, `antigravity-cli` at 256 MiB, `hermes-agent` at
+193 MiB, `freebuff` at 130 MiB — are built from `llm-agents.nix` and published to
+numtide's cache. They are the fleet's packages but not the fleet's *unique*
+output, so uploading them here would spend 1.4 GiB of a 10 GiB bucket on bytes
+any host already has (and 18 % of the whole closure's unique set). The dedupe
+only worked that out once it asked every substituter, not three of them: with the
+old hardcoded triple the same push would have uploaded 2.39 GiB.
+
+What is left is real: `stirling-pdf` 334 MiB, `atuin` 76 MiB, `llama-index-core`
+46 MiB, `npgsqlrest` 36 MiB, plus a long tail of wrappers and config files. At
+771 MiB per system, 10 GiB holds **about thirteen full systems** — or more once
+consecutive generations share paths, which they do for everything except the
+toplevel and the packages that changed.
+
+So the answer to "a NixOS closure is 18 GiB, how does this fit" is that a
+closure is never stored; a *delta* is. A client substitutes the toplevel from the
+edge and its references from whichever cache has them, which is what every
+substituter list in `lib/cache-registry.nix` exists for. The consequence to
+respect: **the edge is not self-contained.** A host that lists only the edge
+cannot fetch a system from it. A host that lists the registry can.
+
+## Retention and collection
+
+Two mechanisms, because they answer different questions.
+
+**The lifecycle rule is the backstop** (`expire-buffer`, applied by
+`dev:nixcache:deploy`, so it is a property of the bucket and not of a dashboard
+visit): objects expire **365 days after upload**, bucket-wide. One rule for both
+prefixes on purpose — a narinfo and its nar are written in the same second and
+must expire in the same second. A narinfo whose nar is gone is a hard client
+failure; a missing narinfo is only a cache miss. Cloudflare's own
+`Default Multipart Abort Rule` (7 days) stays alongside it.
+
+A year, and not cachix's 90 days, because here the lifecycle is not the
+collector. Cachix expires on **90 days without a request**, which it can see
+because it serves every fetch; this Worker cannot (below). Age-on-upload is the
+proxy, and a proxy that fires early deletes by calendar rather than by need — so
+it is set where the claim "nobody re-pushed this" becomes true of the path, and
+`gc` is what actually reclaims space.
+
+**The gc task is cachix's shape** (`dev:nixcache:gc`, dry run unless
+`-- --delete`): sort by age, delete the oldest until the bucket is back under 75%
+of 10 GiB, at most 50 paths per run, always a narinfo with its nar.
+
+```bash
+task dev:nixcache:gc                  # what would go, oldest first, with sizes
+task dev:nixcache:gc -- --delete      # actually collect
+```
+
+One difference from cachix is deliberate and worth stating: cachix sorts by
+**last access** because it sees every request. This Worker cannot — narinfo is
+served `Cache-Control: immutable`, so Cloudflare answers the repeats and the
+origin only ever observes misses, which would make a recorded "last access" a
+measurement of cache misses rather than of use. **Upload age is the honest stand-in**,
+and it self-corrects: a path a build still needs gets re-pushed, which refreshes
+it. The two mechanisms also compose with the push gate — when `push` refuses
+because the bucket is at 10 GiB, `gc -- --delete` is what makes room.
 
 ## Substituter order
 
@@ -167,11 +260,17 @@ suspecting the Worker.
 
 ## Not done here
 
-- **No garbage collection.** R2 has no lifecycle rule for "what a closure
-  references"; the budget refusal is the only limit, so a full bucket must be
-  emptied by hand — `rclone delete r2:nix-cache` (objects) and **not**
-  `rclone purge`, which deletes the bucket itself and leaves `nix copy` failing
-  silently (measured 2026-11-02; `dev:nixcache:deploy` recreates it).
+- **`gc` is not scheduled.** Nothing runs it; the trigger is a `push` refusal or
+  a look at `dev:nixcache:size`. A weekly job on delphi would close that loop, and
+  it is not wired yet.
+- **Emptying by hand is a footgun.** `rclone delete r2:nix-cache` removes objects;
+  **not** `rclone purge`, which deletes the bucket itself and leaves `nix copy`
+  failing silently (measured 2026-11-02; `dev:nixcache:deploy` recreates it).
+- **A bigger budget is a cost knob, not a code change.** 10 GiB is the R2 free
+  tier; past it R2 bills $0.015/GiB-month, so a 50 GiB bucket is about $0.60 a
+  month and would hold ~65 systems at the measured 771 MiB each. Raise
+  `BUDGET_GIB` when the refusal starts costing more in rebuild time than the
+  storage does.
 - **CI secrets are not set.** The workflow's buffer step is inert until
   `NIXCACHE_SIGNING_KEY` and the three `NIXCACHE_R2_*` values exist as repository
   secrets; `dev:nixcache:keygen` prints the `gh secret set` line for the key.

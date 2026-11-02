@@ -4731,10 +4731,10 @@
       date = "2026-11-02";
       refs = {
         docs = ["docs/nix-cache-edge.md"];
-        tasks = ["dev:nixcache:check" "dev:nixcache:deploy" "dev:nixcache:push" "checks:nixcache:probe"];
+        tasks = ["dev:nixcache:check" "dev:nixcache:deploy" "dev:nixcache:push" "dev:nixcache:gc" "dev:nixcache:size" "checks:nixcache:probe"];
         hosts = ["delphi" "frieren"];
       };
-      summary = "harmonia stays the LAN cache and cachix the 5 GB WAN cache; delphi adds a 10 GiB R2 bucket behind a GET-only Worker, registered after cachix. A push asks cachix and cache.nixos.org first and uploads only what neither has, then refuses the whole run if it would cross the budget — a buffer for fleet builds, not a mirror of nixpkgs.";
+      summary = "harmonia stays the LAN cache and cachix the 5 GB WAN cache; delphi adds a 10 GiB R2 bucket behind a GET-only Worker, registered after cachix. A push asks every non-LAN substituter in the registry first and uploads only what none of them has, then refuses the run if it would cross the budget — a buffer for the fleet's delta, not a mirror of nixpkgs and not a store for system closures.";
       body = ''
         **Why a third tier.** CI refuses the LAN cache by design, so a runner cannot substitute what
         frieren or delphi built. R2 charges no egress; 10 GiB is the free tier.
@@ -4743,9 +4743,18 @@
         private key would only reimplement Nix's fingerprint. `CACHE_AUTH_TOKEN` was refused for the
         same kind of reason: `nix copy` has no `--header`, so no client could present it.
 
-        **A buffer, not a mirror.** Every path is HEADed against cachix, then cache.nixos.org, then the
-        bucket; only the misses upload, and a push that would cross 10 GiB is refused before writing.
-        That is also why the entry sits immediately after `cachix` in every order.
+        **A buffer, not a mirror.** Every path is HEADed against every non-LAN cache in the registry
+        (cachix, the bucket, cache.nixos.org, numtide, nix-community, nix-gaming, determinate); only the
+        misses upload, and a push that would cross 10 GiB is refused before writing, naming its five
+        largest paths. That is also why the entry sits immediately after `cachix` in every order.
+
+        **A closure is never stored; a delta is.** Delphi's system closure is 2728 paths / 18.48 GiB. Of
+        the 570 paths cache.nixos.org lacks, 167 are on cachix, 11 on nix-community, and 27 — 1.40 GiB,
+        the llm-agents tools (`dsh` 685 MiB, `antigravity-cli`, `hermes-agent`, `freebuff`) — are on
+        `cache.numtide.com`. That leaves 365 paths / 771 MiB unique, so 10 GiB holds ~13 systems, not
+        one. The hardcoded-three-cache dedupe would have uploaded 2.39 GiB of the same closure. The
+        consequence to keep: the edge is not self-contained — a client substituting a system needs the
+        rest of the registry, which is what `lib/cache-registry.nix` is for.
 
         **Evidence.** Live at `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`);
         `checks:nixcache:probe` green; a `hello.drv` closure reported `2/342 unique` and uploaded two;
@@ -4757,8 +4766,15 @@
         nothing against a fresh bucket and exited 0; `rclone purge` deletes the bucket itself. A client
         that saw a 404 before the push needs `--refresh`.
 
-        **Open.** No gc — emptying is `rclone delete`, never `purge`. CI's buffer step is inert until
-        `NIXCACHE_SIGNING_KEY` and the three `NIXCACHE_R2_*` repository secrets exist.
+        **Retention.** Two mechanisms, because they answer different questions: `dev:nixcache:gc`
+        (cachix's shape — delete the oldest until under 75 % of the budget, 50 paths per run, always a
+        narinfo with its nar) is the collector, and the R2 lifecycle rule is a backstop at **365 days**,
+        not cachix's 90 — age-on-upload is a proxy, since the Worker cannot see a request Cloudflare
+        already answered, so a short rule would delete by calendar rather than by need.
+
+        **Open.** `gc` is not scheduled yet; a weekly job on delphi would close that loop. Emptying by
+        hand is `rclone delete`, never `purge` (which deletes the bucket). CI's buffer step is inert
+        until `NIXCACHE_SIGNING_KEY` and the three `NIXCACHE_R2_*` repository secrets exist.
       '';
     };
 

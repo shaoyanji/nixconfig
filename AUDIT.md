@@ -34,10 +34,24 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`, generated once into
   `secrets.yaml`). It is registered immediately after `cachix` in `lib/cache-registry.nix`,
   `lib/cache-policy.nix` and `flake.nix`, and `checks:flake:cache` proves the copy agrees.
-- **A buffer means dedupe first.** `dev:nixcache:push` asks cachix, then cache.nixos.org, then the
-  bucket, one HEAD per path, and uploads only what none of them has — a `hello.drv` closure reported
-  `2/342 unique` and uploaded two narinfos plus two nars. Over the budget it refuses the whole run
-  before writing (`refusing the push — it would take the bucket … over the 10 GiB limit`).
+- **A buffer means dedupe first — against the whole registry.** `dev:nixcache:push` asks every
+  non-LAN cache in `lib/cache-registry.nix` (cachix, the bucket, nixos, numtide, nix-community,
+  nix-gaming, determinate), one HEAD per path, and uploads only what none of them has. Measured over
+  delphi's **2728-path / 18.48 GiB** system closure: 2158 on nixos, 167 on cachix, 11 on
+  nix-community, **27 on `cache.numtide.com` for 1.40 GiB** (the llm-agents tools — `dsh` 685 MiB,
+  `antigravity-cli` 256 MiB, `hermes-agent` 193 MiB, `freebuff` 130 MiB), leaving **365 paths /
+  771 MiB** unique. With the old hardcoded triple the same push uploaded 2.39 GiB; the report now
+  prints per-cache hit counts and the five largest survivors, and refuses before writing when the
+  total would cross `BUDGET_GIB` (a single path larger than the whole budget is named as such).
+- **A closure is never stored, a delta is.** That measurement is the answer to "a system closure is
+  18 GiB": 10 GiB holds ~13 systems at 771 MiB each, and a client gets the toplevel from the edge and
+  the references from whichever cache has them. The edge is therefore not self-contained — a host
+  substitutes a system only with the rest of the registry configured.
+- **Retention: a collector by size, a backstop by age.** `dev:nixcache:gc` is cachix's shape (delete
+  the oldest until under 75 % of the budget, 50 paths per run, always a narinfo with its nar), and the
+  R2 lifecycle `expire-buffer` is set to **365 days**, not cachix's 90: upload age is a proxy, since
+  `Cache-Control: immutable` means Cloudflare answers repeats and the origin only sees misses, so a
+  short rule deletes by calendar rather than by need.
 - **The edge never signs.** narinfo is signed by the pusher (`secret-key=` on a `file://` staging
   cache) and uploaded with rclone; the Worker has one R2 binding and cannot write.
 - **Four traps, all measured.** `nix copy` is recursive by default; `--no-recursive` alone is refused

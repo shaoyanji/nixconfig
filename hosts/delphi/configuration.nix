@@ -1127,24 +1127,57 @@ in {
           # logged `gh: command not found` before the absolute helper still
           # authenticated (delphi, minyx-keeper journal). Unset rather than skip,
           # so a host that already carries the stale pair converges.
-          git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
+          # `git config` rewrites the file even when the value already matches,
+          # so the rewrite is written only when it is absent.
+          if [ "$(git config --file "$HOME/.gitconfig" --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
+            git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
+          fi
           for scope in github.com gist.github.com; do
             git config --file "$HOME/.gitconfig" --unset-all "credential.https://$scope.helper" || true
           done
 
-          if [ ! -d "$HOME/Documents/nixconfig/.git" ]; then
-            echo "--> Cloning nixconfig to ~/Documents/nixconfig (with recursive submodules)..."
+          REPO="$HOME/Documents/nixconfig"
+          if [ ! -d "$REPO/.git" ]; then
+            echo "--> Cloning nixconfig to $REPO (with recursive submodules)..."
             if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-              gh repo clone https://github.com/shaoyanji/nixconfig "$HOME/Documents/nixconfig" -- --recurse-submodules
+              gh repo clone https://github.com/shaoyanji/nixconfig "$REPO" -- --recurse-submodules
             else
-              git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$HOME/Documents/nixconfig"
+              git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$REPO"
             fi
           else
-            echo "--> ~/Documents/nixconfig already exists. Pulling latest..."
-            git -C "$HOME/Documents/nixconfig" config url."https://github.com/".insteadOf "git@github.com:"
-            git -C "$HOME/Documents/nixconfig" pull --recurse-submodules || true
-            git -C "$HOME/Documents/nixconfig" submodule sync --recursive || true
-            git -C "$HOME/Documents/nixconfig" submodule update --init --recursive || true
+            # Same read-before-write as the vault below: compare with origin
+            # first (ls-remote writes nothing) and pull only on real drift, so a
+            # checkout already at origin/main costs no fetch.
+            if [ "$(git -C "$REPO" config --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
+              git -C "$REPO" config url."https://github.com/".insteadOf "git@github.com:"
+            fi
+            branch=$(git -C "$REPO" branch --show-current)
+            here=$(git -C "$REPO" rev-parse HEAD)
+            there=$(git -C "$REPO" ls-remote origin "refs/heads/$branch" 2>/dev/null | cut -f1)
+            if [ -z "$branch" ]; then
+              echo "--> $REPO has no branch checked out (detached HEAD); not pulling" >&2
+            elif [ -z "$there" ]; then
+              echo "--> could not read origin ($branch) to compare; leaving $REPO as-is" >&2
+            elif [ "$here" = "$there" ]; then
+              echo "--> $REPO is current at $(printf '%.8s' "$here") ($branch)"
+            elif [ "$there" = "$(git -C "$REPO" rev-parse "refs/remotes/origin/$branch" 2>/dev/null || true)" ]; then
+              # origin has not moved since the last fetch, so the only commits
+              # here are local ones: a pull could not bring anything in.
+              echo "--> $REPO is ahead of origin/$branch (local $(printf '%.8s' "$here")); not pulling"
+            else
+              echo "--> $REPO drifted: local $(printf '%.8s' "$here") -> origin $(printf '%.8s' "$there"); pulling"
+              git -C "$REPO" pull --recurse-submodules ||
+                echo "--> pull did not complete cleanly (see above); $REPO left as-is" >&2
+            fi
+            # `submodule sync` and `update` rewrite every submodule's config
+            # even when nothing is out of place, so they run only when one is
+            # missing or pinned wrong ('-' uninitialised, '+' out of sync).
+            pending=$(git -C "$REPO" submodule status --recursive 2>/dev/null | grep -c '^[-+]' || true)
+            if [ "$pending" -gt 0 ]; then
+              git -C "$REPO" submodule sync --recursive || true
+              git -C "$REPO" submodule update --init --recursive ||
+                echo "--> submodule update failed; $REPO may be missing a submodule" >&2
+            fi
           fi
 
           # The vault is a repo, not a directory: an earlier version only

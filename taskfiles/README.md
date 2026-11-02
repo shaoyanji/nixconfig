@@ -8,6 +8,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/infra.yml` is the canonical host lifecycle surface (`infra:*`) for plan/apply/deploy/rollback/logs and secrets management, and it owns the detached job surface (`infra:job:*`) that long tasks are started through.
 - `taskfiles/agents.yml` holds operator helpers, xs runtime wrappers, and OAuth/session management.
 - `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep).
+- `taskfiles/codespace.yml` owns GitHub Codespaces as a mode (`codespace:*`) for work that runs in someone else's remote devcontainer: the file transport `gh codespace cp` cannot do, a push that happens on the host holding the git auth, a reset for the post-rewrite clone, and a stop that waits for `Shutdown`.
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
 - `taskfiles/data.yml` is the canonical NAS surface (`data:*`) for the `/Volumes/data` taxonomy, hygiene, permissions and the portable tool library.
@@ -20,6 +21,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/infra.yml` – host lifecycle, secrets, SOPS operations, and the detached job runner (`infra:job:*`, implemented by `scripts/task/job.sh`)
 - `taskfiles/agents.yml` – operator helpers, xs wrappers, OAuth management
 - `taskfiles/checks.yml` – validation and smoke checks (incl. `checks:tasks` task-graph gate, `checks:host`, `checks:flake:transitive`)
+- `taskfiles/codespace.yml` – GitHub Codespaces over `gh cs ssh` (list, exec, file transport, repo-matched push, sync, stop, delete), implemented by `scripts/task/codespace.sh`
 - `taskfiles/dev.yml` – git workflows, flake updates, site deployment, and the generated docs pipeline (`docs:build` / `docs:site` / `docs:sync`)
 - `taskfiles/moto.yml` – Motorola Android (Termux) shell, file transfers, and Charmbracelet Wish/Gum menu
 - `taskfiles/neocities.yml` – dragoncourt.neocities.org: gum post authoring (new/edit/publish/draft/delete), listing + feed render, preview and deploy
@@ -49,6 +51,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - A rebuild or any long task → `task infra:job:start RUN=<task>`, then `infra:job:status` for its exit code
 - Operator helpers → `taskfiles/agents.yml` (`agents:menu`, legacy menus)
 - Validation checks → `taskfiles/checks.yml` (`checks:*`)
+- A GitHub Codespace → `taskfiles/codespace.yml` (`codespace:*`), procedure in `.agents/skills/codespace`
 - Observation, skills, knowledge graph → `taskfiles/ops.yml` (`ops:*`)
 - Git/flake workflows, site deployment → `taskfiles/dev.yml` (`dev:*`)
 - NAS storage taxonomy, hygiene, permissions, tool library → `taskfiles/data.yml` (`data:*`)

@@ -1,0 +1,103 @@
+version: "3"
+
+# GitHub Codespaces as a repeatable mode, not a one-off. The flags and
+# transports that each cost a failed attempt live in scripts/task/codespace.sh;
+# the procedure and the measured traps are .agents/skills/codespace.
+#
+# Nothing here is declarative: a codespace is a remote disk that can be deleted
+# without a trace, so the only durable truth is what has been pushed out of it.
+#
+# CS, BRANCH, CSDIR, FORCE and CONFIRM are read from the environment by the
+# script and deliberately NOT declared as taskfile vars — a declared var shadows
+# the CLI value, the trap taskfiles/pythonanywhere.yml records for
+# PYANY_DEPLOY_HOUR. Pass them as `task codespace:stop CS=<name>`.
+
+tasks:
+  codespace:list:
+    desc: List codespaces with their state and repository
+    summary: >
+      `gh codespace list` projected to state, name, repository. State is the
+      field that decides what is possible: Available is the only one that
+      accepts ssh, and Shutdown (never "Stopped") is where a stop ends up.
+    cmds:
+      - bash scripts/task/codespace.sh list
+
+  codespace:exec:
+    desc: Run a shell command inside the codespace over gh cs ssh
+    summary: >
+      `task codespace:exec -- "<command>"`. The command must follow `--`:
+      `gh codespace ssh` has no -q or -i flags of its own, so a bare first word
+      is parsed as a gh flag and fails with "unknown shorthand flag". The words
+      are re-joined with single spaces, so a quote-sensitive command belongs in a
+      file that is run by path instead of inline.
+    cmds:
+      - bash scripts/task/codespace.sh exec {{.CLI_ARGS}}
+
+  codespace:status:
+    desc: Report the codespace checkout and whether it is safe to stop
+    summary: >
+      Branch, HEAD, dirty paths, and commits ahead of or behind origin/<branch>.
+      The script exits 1 — go-task reports that as 201 — when the tree is dirty
+      or when commits exist only inside the codespace, the two ways a stop loses
+      work; pair it as `task codespace:status && task codespace:stop`.
+    cmds:
+      - bash scripts/task/codespace.sh status
+
+  codespace:put:
+    desc: Copy a local file into the codespace as base64 over ssh
+    summary: >
+      `task codespace:put -- <local> [remote-path]`, remote defaulting to
+      /tmp/<basename>. `gh codespace cp` failed in both directions during the
+      first codespace session, so the file crosses as base64 on stdin and the far
+      side asserts the byte count — a truncated pipe is otherwise silent.
+    cmds:
+      - bash scripts/task/codespace.sh put {{.CLI_ARGS}}
+
+  codespace:get:
+    desc: Copy a file out of the codespace as base64 over ssh
+    summary: >
+      `task codespace:get -- <remote-path> [local-path]`, local defaulting to the
+      basename in the current directory. Same transport as put, for the same
+      reason: gh codespace cp is not usable here.
+    cmds:
+      - bash scripts/task/codespace.sh get {{.CLI_ARGS}}
+
+  codespace:push:
+    desc: Push the codespace's commits from this checkout, which holds the git auth
+    summary: >
+      A codespace's clone had no credential helper, so `git push` inside it
+      failed; this transports the branch out as a bundle and pushes from the
+      clone whose origin matches the codespace's repository. Fast-forward only —
+      a divergent branch fails instead of forcing, so nothing is overwritten
+      silently. Run it from the checkout of that repo, not from this one.
+    cmds:
+      - bash scripts/task/codespace.sh push
+
+  codespace:sync:
+    desc: Point the codespace clone at origin/<branch>, refusing a dirty tree
+    summary: >
+      The step after an upstream history rewrite: an old clone still holds the
+      purged objects and would restore them on its next push. The script exits 1
+      — 201 through go-task — when the tree is dirty, because the reset discards
+      uncommitted work; FORCE=1 discards it, untracked files included.
+    cmds:
+      - bash scripts/task/codespace.sh sync
+
+  codespace:stop:
+    desc: Stop the codespace and wait until it reports Shutdown
+    summary: >
+      `gh codespace stop`, then poll `gh codespace list` every 5 s for up to
+      300 s, printing each state it passes through. Exits 1 if Shutdown is never
+      reached. Stopping is reversible and the disk survives, so this is not a
+      cleanup — it is how the billing clock stops.
+    cmds:
+      - bash scripts/task/codespace.sh stop
+
+  codespace:delete:
+    desc: Delete the codespace for good, guarded by CONFIRM=1
+    summary: >
+      Destroys the disk: anything not pushed is gone and cannot be recovered.
+      Refuses without CONFIRM=1, so the deliberate form is
+      `task codespace:delete CONFIRM=1` — run `codespace:status` first.
+    cmds:
+      - bash scripts/task/codespace.sh delete

@@ -4949,5 +4949,35 @@
         script header.
       '';
     };
+    codespace-mode = {
+      title = "A codespace is a mode: the gh-cs traps live in tasks, not in a session log";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-02";
+      summary = "Working in a GitHub Codespace cost four failed attempts — `ssh -q`, `gh cs cp`, `git push` inside the clone, and a poll for a state that does not exist. They are now `codespace:*` tasks over one script, so the next session starts from the trap list instead of rediscovering it.";
+      refs = {
+        modules = ["taskfiles/codespace.yml" "scripts/task/codespace.sh"];
+        tasks = ["codespace:exec" "codespace:put" "codespace:push" "codespace:stop"];
+        docs = [".agents/skills/codespace/SKILL.md"];
+      };
+      body = ''
+        The mode is not fleet infrastructure: a codespace is absent from
+        `inventory.toml`, nothing here configures it, and GitHub deletes its disk
+        on a retention window. So the note keeps the transport decisions and the
+        skill keeps the procedure.
+
+        The load-bearing ones: files cross as base64 over the ssh channel because
+        `gh codespace cp` failed in both directions; a commit leaves as a bundle
+        and is pushed from the clone whose origin matches the codespace's
+        repository, because that clone had no credential helper of its own; and
+        `stop` polls for `Shutdown`, the only terminal state `gh codespace list`
+        reports. A stale codespace clone is a hazard after an upstream rewrite,
+        not just stale — it still holds the purged objects.
+
+        **Exit.** `checks:tasks` names all nine tasks and `skills-schema` passes.
+        A later session that needs another flag adds it to the script, never to a
+        transcript.
+      '';
+    };
   };
 }

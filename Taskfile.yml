@@ -63,6 +63,10 @@ includes:
         taskfile: taskfiles/checks.yml
         dir: .
         flatten: true
+    codespace:
+        taskfile: taskfiles/codespace.yml
+        dir: .
+        flatten: true
     data:
         taskfile: taskfiles/data.yml
         dir: .

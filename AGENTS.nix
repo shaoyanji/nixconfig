@@ -4731,7 +4731,7 @@
       date = "2026-11-02";
       refs = {
         docs = ["docs/nix-cache-edge.md"];
-        tasks = ["dev:nixcache:check" "dev:nixcache:deploy" "dev:nixcache:push" "dev:nixcache:gc" "dev:nixcache:size" "checks:nixcache:probe"];
+        tasks = ["dev:nixcache:check" "dev:nixcache:deploy" "dev:nixcache:push" "dev:nixcache:gc" "dev:nixcache:size" "dev:nixcache:sync" "checks:nixcache:probe" "checks:nixcache:fleet" "checks:invalidation"];
         hosts = ["delphi" "frieren"];
       };
       summary = "harmonia stays the LAN cache and cachix the 5 GB WAN cache; delphi adds a 10 GiB R2 bucket behind a GET-only Worker, registered after cachix. A push asks every non-LAN substituter in the registry first and uploads only what none of them has, then refuses the run if it would cross the budget — a buffer for the fleet's delta, not a mirror of nixpkgs and not a store for system closures.";
@@ -4772,9 +4772,19 @@
         not cachix's 90 — age-on-upload is a proxy, since the Worker cannot see a request Cloudflare
         already answered, so a short rule would delete by calendar rather than by need.
 
-        **Open.** `gc` is not scheduled yet; a weekly job on delphi would close that loop. Emptying by
-        hand is `rclone delete`, never `purge` (which deletes the bucket). CI's buffer step is inert
-        until `NIXCACHE_SIGNING_KEY` and the three `NIXCACHE_R2_*` repository secrets exist.
+        **Scheduled, and routed by arch.** `dev:nixcache:sync` builds each **active** host only
+        (`preserved`/`legacy` are dormant), natively where the arch owns the officials caches — delphi
+        compiles aarch64, itself and minyx, so only the delta compiles — and with `--max-jobs 0` against
+        `/etc/nix/machines` otherwise, printing SKIPPED rather than compiling an x86_64 closure on 2 OCPU.
+        `nixcache-sync.timer` on delphi (user unit: the keys decrypt with the operator's age key) collects
+        with `gc` first, then syncs `delphi,minyx`. `checks:nixcache:fleet` holds the enablement line: the
+        edge after cachix in every active host's substituters, its key trusted, one host eval proving the
+        policy reaches `nix.settings`, and the live URL answering.
+
+        **A microfix now has a price.** `checks:invalidation` scopes a diff to the hosts it can reach and
+        counts what `nix build --dry-run --builders ""` would compile (1–3 is a fix, hundreds is an
+        overlay change), failing over `MAX_BUILDS` and naming the derivations — the answer to "the edit
+        was one line and the whole cache went cold".
       '';
     };
 

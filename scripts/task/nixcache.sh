@@ -298,6 +298,133 @@ PY
   echo "nix-cache: deleted $(wc -l <"$tmp/delete.txt") object(s); bucket now $(bucket_bytes | python3 -c 'import sys; print(f"{int(sys.stdin.read())/1024**3:.2f} GiB")')"
   ;;
 
+sync)
+  # The monthly handoff, one host at a time: build what the fleet needs on the
+  # machine that should build it, then let `push` apply the three rules. Routing,
+  # not caching — the rules stay in one place.
+  #
+  # Arch decides the builder, and the choice is about the *inputs*, not the output:
+  # a natively built path is the same bytes either way (the drv content-addresses
+  # it), but on the arch that owns the official caches those inputs are already
+  # local, so the unique delta this bucket exists for is what actually gets built.
+  # That is why delphi compiles aarch64 (itself and minyx) and x86_64 goes to a
+  # configured remote builder instead of a 2-OCPU ARM box.
+  shift
+  hosts=()
+  dry=0
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+    --hosts)
+      # shellcheck disable=SC2206 # a comma list on purpose, so task CLI_ARGS stays one word
+      hosts=(${2//,/ })
+      shift
+      ;;
+    --dry-run) dry=1 ;;
+    *) die "sync: unknown argument $1" ;;
+    esac
+    shift
+  done
+
+  export NIX_CONFIG="experimental-features = nix-command flakes pipe-operators${NIX_CONFIG:+ $NIX_CONFIG}"
+  current="$(nix eval --raw --impure --expr builtins.currentSystem)"
+  if [ "${#hosts[@]}" -eq 0 ]; then
+    mapfile -t hosts < <(nix eval --json '.#inventory.hosts' |
+      jq -r 'to_entries[] | select(.value.kind == "nixos" and .value.status == "active") | .key')
+  fi
+  echo "nixcache: sync on $current — ${#hosts[@]} host(s)"
+
+  failed=0
+  for host in "${hosts[@]}"; do
+    arch="$(nix eval --raw ".#inventory.hosts.$host.arch" 2>/dev/null || echo unknown)"
+    attr=".#nixosConfigurations.$host.config.system.build.toplevel"
+    route=()
+    where="native"
+    if [ "$arch" != "$current" ]; then
+      # `--max-jobs 0` is "offload or fail": compiling an x86_64 closure locally is
+      # the mistake, and /etc/nix/machines is where the answer lives.
+      route=(--max-jobs 0)
+      where="remote builders"
+      if [ ! -s /etc/nix/machines ]; then
+        echo "  $host ($arch): SKIPPED — no /etc/nix/machines here; build it on CI or a host that has one"
+        continue
+      fi
+    fi
+    if [ "$dry" = 1 ]; then
+      echo "  $host ($arch): would build $where, then push its delta"
+      continue
+    fi
+    # Deliberate build, never a check: this is the job the schedule exists for.
+    if ! out="$(nix build --no-link --print-out-paths "${route[@]}" "$attr" 2>/dev/null)"; then
+      echo "  $host ($arch): BUILD FAILED"
+      failed=1
+      continue
+    fi
+    # push owns dedupe, the budget refusal and the read-back. Its refusal is the
+    # signal to collect, not a bug.
+    if bash "$0" push "$out" 2>&1 | sed 's/^/    /' | tail -8; then
+      echo "  $host ($arch): pushed"
+    else
+      echo "  $host ($arch): PUSH REFUSED (budget) — run: task dev:nixcache:gc -- --delete"
+      failed=1
+    fi
+  done
+  exit "$failed"
+  ;;
+
+fleet)
+  # The enablement check a cache needs once: is the edge actually in every host's
+  # substituter list, in the right place, with the key clients verify against? The
+  # compiled policy answers for every host in 0.2 s; one host eval then proves the
+  # policy reaches `config.nix.settings` rather than sitting in an output nobody
+  # reads.
+  edge_url="$(nix eval --raw '.#cacheRegistry.caches.edge.url')"
+  edge_key="$(nix eval --raw '.#cacheRegistry.caches.edge.key')"
+  nix eval --json '.#inventory.hosts' >"${TMPDIR:-/tmp}/nixcache-fleet-hosts.json"
+  nix eval --json '.#inventory.cache' >"${TMPDIR:-/tmp}/nixcache-fleet-cache.json"
+  python3 - "$edge_url" "$edge_key" <<'PY'
+import json, os, sys
+edge, key = sys.argv[1], sys.argv[2]
+tmp = os.environ.get("TMPDIR", "/tmp")
+hosts = json.load(open(f"{tmp}/nixcache-fleet-hosts.json"))
+cache = json.load(open(f"{tmp}/nixcache-fleet-cache.json"))
+bad = []
+for name, host in sorted(hosts.items()):
+    if host.get("kind") != "nixos" or host.get("status") != "active":
+        continue
+    policy = cache.get(name, {})
+    subs = policy.get("substituters") or []
+    if edge not in subs:
+        bad.append(f"{name}: edge missing from substituters")
+        continue
+    if key not in (policy.get("trustedKeys") or []):
+        bad.append(f"{name}: edge key not trusted")
+    if "cachix" in str(subs) and subs.index(edge) < next(
+            (i for i, u in enumerate(subs) if "cachix.org" in u), 99):
+        bad.append(f"{name}: edge is ordered before cachix")
+print(f"fleet: {len(bad)} problem(s) across the active NixOS hosts")
+for line in bad:
+    print("  " + line)
+sys.exit(1 if bad else 0)
+PY
+  fleet_rc=$?
+
+  # One host eval: the policy is only real if it lands in the setting.
+  eff="$(nix eval --json '.#nixosConfigurations.delphi.config.nix.settings.substituters' 2>/dev/null || echo '[]')"
+  if grep -qF "$edge_url" <<<"$eff"; then
+    echo "wiring: delphi's nix.settings.substituters carries the edge (host eval)"
+  else
+    echo "wiring: delphi's nix.settings.substituters does NOT carry the edge" >&2
+    fleet_rc=1
+  fi
+
+  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "${edge_url%/}/nix-cache-info")"
+  [ "$code" = "200" ] && echo "live: $edge_url answers /nix-cache-info 200" || {
+    echo "live: $edge_url answered $code" >&2
+    fleet_rc=1
+  }
+  exit "$fleet_rc"
+  ;;
+
 keygen)
   # One cache identity, generated once. The secret goes to sops so it is not a
   # file on one machine; the public half is what lib/cache-registry.nix carries.
@@ -348,8 +475,15 @@ push)
   # LAN caches (harmonia) are excluded on purpose, and that is a policy, not an
   # oversight: a path only on harmonia is invisible to a WAN host, so skipping
   # it here would starve the edge of exactly what makes it worth having.
+  #
+  # Ordered by hit rate, not by substitution preference: cache.nixos.org answers
+  # for ~79 % of a system closure (2158/2728), so asking it first costs most paths
+  # one HEAD instead of four. The list is still the registry's — only the order it
+  # is *asked* in changes, and the report still names the cache that had it.
   nix eval --json '.#cacheRegistry.caches' |
-    jq -r 'to_entries[] | select(.value.role != "lan") | .value.url | rtrimstr("/")' >"$tmp/public.txt"
+    jq -r '[to_entries[] | select(.value.role != "lan")]
+           | sort_by(if .key == "nixos" then 0 else 1 end) | .[]
+           | .value.url | rtrimstr("/")' >"$tmp/public.txt"
 
   # The closure, with nar sizes: what could be pushed and what it would cost.
   nix path-info --recursive --json "$@" >"$tmp/closure.json"
@@ -372,7 +506,9 @@ push)
   }
   export -f check_public
   export tmp
-  cut -f1 "$tmp/all.tsv" | xargs -r -P 16 -I{} bash -c 'check_public "$@"' _ {} >"$tmp/where.tsv"
+  # 32 at a time: a HEAD costs a round trip, and the fleet's own paths are the
+  # ones that fail every cache (measured 2026-11-02: 2728 paths in ~65 s at 32).
+  cut -f1 "$tmp/all.tsv" | xargs -r -P 32 -I{} bash -c 'check_public "$@"' _ {} >"$tmp/where.tsv"
   awk -F'\t' '$2 == "MISS" {print $1}' "$tmp/where.tsv" >"$tmp/missing.txt"
 
   total="$(wc -l <"$tmp/all.tsv")"

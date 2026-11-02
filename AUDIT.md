@@ -27,6 +27,32 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-02 — the cache becomes a schedule: monthly sync, arch routing, and a build-cost gate
+- **The handoff is scheduled, not remembered.** `dev:nixcache:sync` loops the
+  **active** NixOS hosts only (`preserved`/`legacy` are dormant: a build-second spent on them buys nothing),
+  builds each closure where its arch belongs, and hands the path to `push` — routing only, so dedupe,
+  the budget refusal and the read-back stay in one place. `nixcache-sync.timer` on delphi is a **user**
+  unit (the R2 and signing keys decrypt with the operator's age key), monthly, `Persistent`, 3 h timeout,
+  and it runs `gc -- --delete` first because a refused push is the budget gate working.
+- **Arch decides the builder.** aarch64 (delphi, minyx) builds **natively on delphi** — the arch the
+  official aarch64 caches came from, so the inputs are local and only the delta compiles; x86_64 gets
+  `/etc/nix/machines` with `--max-jobs 0` (offload or fail), and a box with no machines file prints
+  SKIPPED rather than compiling that closure on 2 OCPU. Dedupe now asks cache.nixos.org first (79 % of a
+  closure), which halved the HEAD phase: 2728 paths in 120 s; the survivors are 342 paths / 693 MiB.
+- **The fleet enablement gate.** `checks:nixcache:fleet`: the compiled policy must carry the edge —
+  **after cachix** — in every active host's `substituters` with its key in `trustedKeys` (0.2 s, no host
+  eval), delphi's evaluated `config.nix.settings.substituters` must carry it too, and the live URL must
+  answer `nix-cache-info` 200. All three green.
+- **A microfix has a price, and now a gate.** `checks:invalidation` scopes a diff to the hosts it can
+  reach (`hosts/<h>/` is that host; a shared module is chain-wide and sampled) and counts the
+  derivations `nix build --dry-run --json --builders ""` would build on each: 1–3 is a microfix,
+  hundreds is an overlay/stdenv change, and over `MAX_BUILDS` (5) it fails **naming the derivations**.
+  Measured on delphi: 48 s, `1 to build` for a 37-file diff; the gate names
+  `nixos-system-delphi-26.11.20261016.f20cd90`.
+- **Evidence:** `checks:nixcache:fleet` rc=0 (0 problems, wiring, live 200); `checks:host HOST=delphi`
+  rc=0 (6.58 s); `dev:nixcache:sync -- --dry-run` routes delphi/minyx native and skips aristotle with a
+  reason; the invalidation gate fails at `--max-builds 0`. docs/nix-cache-edge.md.
+
 ### 2026-11-02 — the fleet's public cache: R2 behind a GET-only Worker, as a buffer
 - **Third tier, not a replacement.** `harmonia` stays the LAN cache and `cachix` the 5 GB WAN one;
   delphi adds a 10 GiB R2 bucket served by `modules/services/nix-cache-edge/` at
@@ -84,55 +110,6 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 - **Evidence.** The unit ran 2.6 s / 86 MB and archived 7, all of which left the inbox (one restored from
   All Mail on demand). `~/.local/state/mail-agent/audit.jsonl` records `message-id`, because Gmail
   reassigns uids per mailbox (310172 in INBOX, 621165 in All Mail); 0 failed units on delphi.
-
-### 2026-11-02 — paperless, vaultwarden and anki move off the NAS; the NAS becomes the shelter
-- **The shape of an offload is now a module.** `services.offloadBridge` declares what a moved service
-  still owes the NAS: a nightly mirror to `/srv/backup/offload` with each SQLite database replaced by a
-  `sqlite3 .backup` snapshot (a WAL-mode `db.sqlite3` rsync'd beside a stale `-wal` restores into a
-  service that answers wrong), an ingest pull for the drop folder, and the cutover facts.
-  `docs/service-offload.md` is the procedure.
-- **Measured before moving.** paperless ~520 MiB RSS across four units plus tika and gotenberg, 722 MB of
-  SQLite + media and no postgres — a file copy plus one consistent dump. vaultwarden 36 MiB / 4.2 MB,
-  `DOMAIN` unchanged so passkeys survive. anki-sync-server held **430 MiB resident for a 4 KB empty
-  store**; its placeholder account was plaintext `bob`/`password` in the store, now a 32-character sops
-  password via `passwordFile` (a systemd credential), proved on the live server: `/sync/hostKey` returns
-  an hkey for the sops password and 403 for `password`.
-- **delphi is the only host that built.** paperless needed 20 derivations no substituter carries on
-  aarch64 plus 559 MiB fetched: **~41 min on 2 OCPU**, because spacy pulls thinc/blis and those compile
-  C++. `wandb` fails its own suite on this arch and is built with checks off via paperless'
-  `extraPythonPackageOverrides`; the shared `modules/services/paperless-fork.nix` avoids upstream's
-  tesseract narrowing, re-applied on every definition. Nothing compiled on frieren: its config evaluates
-  to a toplevel drvPath (81 s / 4.8 GiB) and is unapplied by design.
-- **The names stayed.** `docs.frieren.lan`, `vault.frieren.lan` and `anki.frieren.lan` are still
-  frieren's vhosts, now proxying delphi's tailnet address; frieren was deployed (2026-11-02), and
-  `offload-tunnel` is gone.
-- **Evidence:** `checks:host HOST=delphi` 1947 assertions rc=0; state migrated by
-  `scripts/task/offload-migrate.sh` (flock, manifest, `integrity_check`, row-count match, health URL),
-  run twice to show the second is a no-op; the shelter copy verified under `/srv/backup/offload`.
-
-### 2026-11-02 — Ryoku leaves the pilot: a desktop tier ladder
-- **Three regimes, one cutoff each.** Ryoku is the high-end tier — **poseidon, eisen, fern** (fern the
-  floor); Dux (`globalModulesNixos`, DMS + greetd) the medium — aristotle, stark; `profiles.dwlDesktop`
-  the low end — scratch, netbook. The ladder lives in `inventory.toml` (`desktop_environment` +
-  `module_chain`) and nowhere else.
-- **The chain swap is the whole change.** `globalModulesRyoku` carries `inputs.ryoku` and no
-  dms/dank-greeter, and both hosts import `ryoku-desktop.nix` in place of
-  `base-desktop-environment.nix` — not alongside it: that profile `mkForce`s `xdg.portal.config.niri` to
-  the GTK backend, so keeping both would strip portals from the shell that owns them.
-- **`sddm.enable = false` was the trap.** Ryoku turns SDDM on with `mkDefault`, so a leftover explicit
-  `false` wins and the host boots to no display manager. Both blocks are gone; the module owns the
-  greeter and its theme.
-- **Ryoku pins its session at priority 900** (`ryoku-niri`); poseidon keeps autologin into niri, eisen
-  keeps `lib.mkForce "steam"`. `deck-session-switch` restarted greetd only — now whichever of
-  greetd/sddm is active (stark keeps greetd).
-- **Evidence:** `checks:host MODE=eval` green on every touched host — eisen 2019 assertions (152 s /
-  2643 MiB), poseidon 2014 (307 s / 2668 MiB), stark 2002, fern 1979 (67 s); `inventory-schema`,
-  `inventory-hosts`, `inventory-modules` build clean. Read back by leaf eval: eisen
-  `{ryoku, sddm, theme="ryoku", session="steam", autologin}`, poseidon identical with
-  `session="ryoku-niri"`, fern `session="ryoku-niri", autologin=false`. Build mode was not used: it
-  aborted at io pressure 60.9 % after 540 s on frieren.
-- **Not done:** no host was switched — `infra:deploy:host:<host>` is the operator's call.
-
 ## Open debt (`task ops:notes`)
 
 1. `cassini`'s darwin assertion (`xdg.desktopEntries`) — dormant, reproducible

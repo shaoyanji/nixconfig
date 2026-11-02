@@ -165,6 +165,67 @@ substituter list in `lib/cache-registry.nix` exists for. The consequence to
 respect: **the edge is not self-contained.** A host that lists only the edge
 cannot fetch a system from it. A host that lists the registry can.
 
+## Monthly sync: who builds what
+
+```bash
+task dev:nixcache:sync -- --hosts delphi,minyx      # build + push, on the right machine
+task dev:nixcache:sync -- --dry-run                # the plan, nothing built
+```
+
+`sync` is routing; `push` keeps the three rules. For each host it evaluates the
+system, builds it **where its arch belongs**, then hands the path to `push`:
+
+| Hosts | Arch | Builder | Why |
+| :--- | :--- | :--- | :--- |
+| delphi, minyx | aarch64 | **delphi, native** | delphi already owns the bucket, the key and the gc, and it is the arch the official aarch64 caches were built from — so the inputs are local and only the delta this bucket exists for is compiled |
+| the x86_64 hosts | x86_64 | CI runner, or a host with `/etc/nix/machines` | a 2-OCPU ARM box cannot compile that closure; `--max-jobs 0` means "offload or fail" and a box with no machines file is reported **SKIPPED**, never compiled locally |
+
+Two rules the schedule depends on:
+
+**Only `status = "active"` hosts are targets.** `inventory.toml` has active,
+legacy and preserved; a dormant host's closure is not worth a build-second, and a
+preserved one is not even guaranteed to evaluate. Every loop filters on active,
+so reviving a host is the deliberate act that puts it back in scope.
+
+**The timer collects before it pushes.** A refused push is the budget gate doing
+its job, so the monthly unit runs `dev:nixcache:gc -- --delete` first and
+`--hosts delphi,minyx` second — delphi's own aarch64 half. x86_64 is CI's half:
+it has a runner per arch and maps host→runner from the same inventory.
+
+On delphi the schedule is a **user** unit (`hosts/delphi/nix-cache-edge.nix`),
+because the R2 keys and the signing key are decrypted with the operator's age
+key: `nixcache-sync.timer`, monthly, `Persistent=true`, 3 h start timeout.
+
+```bash
+systemctl --user list-timers nixcache-sync.timer
+journalctl --user -u nixcache-sync --since -1month
+```
+
+## A microfix that rebuilds the fleet
+
+The complaint this answers: an agent edits one module, every host's toplevel
+becomes a different derivation, and the next switch stops being a substitution.
+The edit was small; the bill was a closure.
+
+```bash
+task checks:invalidation                        # against origin/main
+task checks:invalidation -- HEAD~1 --hosts delphi --max-builds 0
+```
+
+It scopes the diff to the hosts it can reach — a `hosts/<h>/` edit is that host,
+anything else in the module tree is chain-wide and is **sampled** (`--full` for
+all) — then asks Nix how many derivations would be built:
+
+```
+nix build --dry-run --json --builders "" .#nixosConfigurations.<host>.config.system.build.toplevel
+```
+
+`--dry-run` builds nothing and `--builders ""` means the question cannot reach
+nixbuild.net and spend the month's budget. The count is the chore: 1–3 is a
+microfix, hundreds is a new stdenv or an overlay change. Over `MAX_BUILDS` (5)
+the check fails and **names the derivations**, which is what tells an agent which
+layer the edit reached.
+
 ## Retention and collection
 
 Two mechanisms, because they answer different questions.
@@ -222,9 +283,16 @@ edge = {
 
 ```bash
 task dev:nixcache:check                                               # offline gate
+task checks:nixcache:fleet                                           # every active host asks it, and it answers
 task checks:nixcache:probe -- https://nix-cache-edge.jisifu.workers.dev <hash>  # live, with a narinfo
 curl -s https://nix-cache-edge.jisifu.workers.dev/nix-cache-info       # three fields
 ```
+
+`checks:nixcache:fleet` is the enablement gate: the compiled policy must carry
+the edge — **after cachix** — in every active host's `substituters` and its key in
+`trustedKeys` (0.2 s, no host eval), one host's evaluated
+`config.nix.settings.substituters` must carry it too (the policy is only real if
+it reaches the setting), and the live URL must answer `nix-cache-info` with 200.
 
 The whole read path can be proved without a Cloudflare account, which is what
 `wrangler dev --local` is for — Miniflare serves the real Worker against a local

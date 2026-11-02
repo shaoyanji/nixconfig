@@ -1,10 +1,6 @@
-# Ryoku desktop baseline (pilot). The desktop-client services a graphical host
-# needs, without `base-desktop-environment.nix` — that profile enables niri and
-# assumes the DMS greeter runs under greetd, both of which Ryoku replaces.
-#
-# Ryoku owns its compositor build (mkForce on programs.niri.package), its session
-# packages, portals, keyring, fonts and SDDM theme, so this profile deliberately
-# declares none of those: the point of the pilot is to measure what Ryoku brings.
+# Ryoku desktop baseline (pilot): the graphical-host services without
+# `base-desktop-environment.nix`, whose niri build and DMS greeter Ryoku replaces.
+# What the fork owns, and why: docs/nix-patterns.md item 11.
 {
   pkgs,
   lib,
@@ -15,8 +11,8 @@
     ./boot.nix
   ];
 
-  # No dms/dank-greeter modules in the chain (globalModulesRyoku), and no DMS
-  # home modules either: two Quickshell shells cannot share one session.
+  # No dms/dank-greeter modules in the chain or in home: two Quickshell shells
+  # cannot share one session.
   fleet.dankShell.enable = false;
 
   programs.ryoku = {
@@ -29,14 +25,12 @@
     shell = "zsh";
   };
 
-  # Ryoku enables power-profiles-daemon (mkDefault true) and NixOS asserts it
-  # cannot coexist with auto-cpufreq, which `laptop.nix` turns on for fern.
-  # Ryoku's power surface is the one this desktop exposes, so the daemon pair
-  # resolves in its favour; a host that keeps auto-cpufreq has to drop Ryoku.
+  # Ryoku's power-profiles-daemon cannot coexist with `laptop.nix`'s auto-cpufreq;
+  # the profile wins, so a host that keeps auto-cpufreq has to drop Ryoku.
   services.auto-cpufreq.enable = lib.mkForce false;
 
-  # Ryoku sets up gnome-keyring and gvfs itself; the PAM wiring it does not do,
-  # and without it the keyring stays locked for secret-service clients (agy).
+  # Ryoku wires gnome-keyring and gvfs but not the PAM half, and without it the
+  # keyring stays locked for secret-service clients (agy).
   services.gnome.gnome-keyring.enable = true;
   security.pam.services.login.enableGnomeKeyring = true;
   security.pam.services.sddm.enableGnomeKeyring = true;

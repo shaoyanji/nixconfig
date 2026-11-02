@@ -240,6 +240,15 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     instead — enforced by [[flake/policies.nix#desktop-fork-not-disable]], which
     also catches dropping infrastructure the profile carried (tailscaled, the NAS
     mount behind `~/Documents/nixconfig`).
+
+    `modules/profiles/ryoku-desktop.nix` is that fork: it imports
+    `desktop-client` and declares none of the compositor build, session packages,
+    portals, keyring, fonts or SDDM theme, because `programs.ryoku` supplies them —
+    the pilot exists to measure what Ryoku actually brings into the closure
+    (`docs/closure-reduction.md`). It also settles the two daemons that cannot
+    coexist with Ryoku: power-profiles-daemon is Ryoku's, so auto-cpufreq is
+    forced off for hosts such as fern, and gnome-keyring gets the PAM wiring that
+    Ryoku does not do for secret-service clients.
 12. **A comment is not a home for a fact.** Nothing compiles a `#` block:
     `.#knowledgeGraph`, qmd and the skills index are built from `docs/*.md`,
     `.agents/skills/*` and the compiled registry, so an explanation written
@@ -268,6 +277,14 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     minutes. `modules/shell/home-not-a-repo.nix` points `~/.git` at `/proc`, so
     `git init` in `~` fails instead of arming the trap, and repositories below
     home are untouched.
+
+15. **A shell fragment is inert without the shell module.** `programs.atuin`
+    sets `enableZshIntegration = true` on every host, but the `.zshrc` half is
+    only linked where `programs.zsh` is enabled (`modules/shell/zsh.nix`); a host
+    that logs in to zsh without it keeps zsh's new-user stub and gets no history
+    integration at all. Measured on fern 2026-11-01: a 5-line `~/.zshrc`, no
+    atuin, no starship, no aliases. The `.nix` keeps the constraint and points
+    here (item 12); the missing half is `modules/shell/zsh.nix`.
 
 ## An upstream with no tags
 

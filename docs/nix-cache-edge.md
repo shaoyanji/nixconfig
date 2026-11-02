@@ -158,6 +158,12 @@ What is left is real: `stirling-pdf` 334 MiB, `atuin` 76 MiB, `llama-index-core`
 consecutive generations share paths, which they do for everything except the
 toplevel and the packages that changed.
 
+The budget is also counted high on purpose: `BUDGET_GIB` compares against
+**uncompressed** nar sizes while the bucket stores compressed nars. The first real
+sync of delphi's system put **342 paths / 693 MiB of nar** in the bucket as
+**0.44 GiB / 694 objects** — a ~35 % margin in the refusal's favour, so a bucket
+that reports under budget is under budget.
+
 So the answer to "a NixOS closure is 18 GiB, how does this fit" is that a
 closure is never stored; a *delta* is. A client substitutes the toplevel from the
 edge and its references from whichever cache has them, which is what every

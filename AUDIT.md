@@ -49,9 +49,14 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
   hundreds is an overlay/stdenv change, and over `MAX_BUILDS` (5) it fails **naming the derivations**.
   Measured on delphi: 48 s, `1 to build` for a 37-file diff; the gate names
   `nixos-system-delphi-26.11.20261016.f20cd90`.
+- **First real run, on delphi.** `sync --hosts delphi`: 342 paths / 693 MiB of nar went in as **0.44 GiB /
+  694 objects** (the budget compares uncompressed nars, so the refusal errs ~35 % high), and the toplevel,
+  `stirling-pdf` and `atuin` all answer `nix path-info --store <edge>` — the fleet's own system is now
+  substitutable from the bucket. 8 m 56 s wall, 2.6 GiB peak.
 - **Evidence:** `checks:nixcache:fleet` rc=0 (0 problems, wiring, live 200); `checks:host HOST=delphi`
   rc=0 (6.58 s); `dev:nixcache:sync -- --dry-run` routes delphi/minyx native and skips aristotle with a
-  reason; the invalidation gate fails at `--max-builds 0`. docs/nix-cache-edge.md.
+  reason; the invalidation gate fails at `--max-builds 0`; `dev:nixcache:sync` served the paths above.
+  docs/nix-cache-edge.md.
 
 ### 2026-11-02 — the fleet's public cache: R2 behind a GET-only Worker, as a buffer
 - **Third tier, not a replacement.** `harmonia` stays the LAN cache and `cachix` the 5 GB WAN one;

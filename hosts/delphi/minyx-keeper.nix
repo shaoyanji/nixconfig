@@ -25,6 +25,7 @@
           bash
           coreutils
           dnsutils
+          gh
           git
           nix
           nixos-rebuild

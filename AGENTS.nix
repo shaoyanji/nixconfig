@@ -4678,6 +4678,52 @@
       '';
     };
 
+    exp-128 = {
+      title = "EXP-128 — A mail manager on a 121M-param router, gated by trust rather than confidence";
+      kind = "experiment";
+      status = "DELIVERED";
+      date = "2026-11-02";
+      links = ["exp-115"];
+      summary = "Needle 3 routes plain-English mail commands to himalaya on delphi: 10/11 on the shipped battery, one model call per bulk candidate at ~40 ms. Its confidence head does not separate a good archive from a bad one, so the nightly sweep archives only from a declared sender allowlist and holds everything else.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/services/mail-agent.nix" "modules/services/mail-agent.py" "modules/scripts/needle-model.nix" "hosts/delphi/configuration.nix"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **What was built.** `mail-agent` on delphi: a sentence in, a himalaya action out, dispatched
+        by the needle3 binary the host already ran. Three tools — `search_mail`, `archive_mail`,
+        `mark_read` — and a 06:30 user timer that sweeps bulk mail. Engine and weights moved to
+        `modules/scripts/needle-model.nix` so the pinned hash has one home.
+
+        **The candidates.** neverest+pimdir fits a large corpus and not this one: Gmail answers
+        `envelope search` server-side in ~1 s at this volume, so a sync daemon and a store would be a
+        moving part bought before the need. mxr is unpackaged and owns the same index role.
+        mailbox-autopilot was rejected as a service and copied as a policy (dry run, audit log,
+        reversible actions). himalaya-mcp adds a Node runtime and a listening surface for what a CLI
+        plus a timer already does. needle3 adopted; himalaya 2.2.1 as-is.
+
+        **Two findings shaped it.** A `trash_mail` tool was never selected — "delete the spam" went
+        to `mark_read` twice out of two — so delete was removed from the schema rather than gated.
+        And a dry run approved 13 messages including a Dropbox "connected a new app", a GitHub "new
+        SSH key", a Stripe "unrecognized device" and a real classifieds inquiry, at 0.22–0.47. No
+        threshold admitting honest newsletters excludes those, so the sweep fails closed against
+        `sweep.trustedSenders` (six marketing senders, each earned in a dry run) and prints why every
+        held message was held.
+
+        **Confidence is not the gate.** It is the joint probability of the model's own output, so it
+        falls as the schema grows: 0.10 with a `period` enum, 0.33 without. Verb-first one-line tool
+        descriptions lifted the battery from 7/11 to 10/11; the miss is a read-only search returning
+        nothing. Mutations are dry-run until `--apply`, and a caller the router merely *suppressed*
+        also needs `--force`.
+
+        **Evidence.** `--self-test` 10/11; the unit ran 2.6 s / 86 MB peak and archived 7, all seven
+        left the inbox, one restored from All Mail on demand. The audit stores `message-id`, not the
+        uid, because Gmail reassigns uids per mailbox (310172 in INBOX, 621165 in All Mail).
+        Operations: docs/mail-agent.md. Open: neverest stays deferred, revisit past ~1k envelopes.
+      '';
+    };
+
     open-manual-steam-fill = {
       title = "The nightly prefill window is redundant once fills are operator-driven";
       kind = "open";

@@ -1,0 +1,39 @@
+[
+  {
+    "name": "search_mail",
+    "description": "Search email: show and list mail in the inbox, with subject, sender and date.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string", "description": "keywords from the subject, such as newsletter, invoice, receipt"},
+        "sender": {"type": "string", "description": "who sent it, such as a person, company or domain"},
+        "period": {"type": "string", "enum": ["today", "yesterday", "last_week", "last_month", "any"], "description": "when the mail arrived"},
+        "unread": {"type": "boolean", "description": "only mail still unread"}
+      }
+    }
+  },
+  {
+    "name": "archive_mail",
+    "description": "Archive email: move it out of the inbox into the Archive mailbox, still readable.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string", "description": "keywords from the subject, such as newsletter, invoice, receipt"},
+        "sender": {"type": "string", "description": "who sent it, such as a person, company or domain"},
+        "period": {"type": "string", "enum": ["today", "yesterday", "last_week", "last_month", "any"], "description": "when the mail arrived"}
+      }
+    }
+  },
+  {
+    "name": "mark_read",
+    "description": "Mark email read: add the seen flag where the mail is, without moving it.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string", "description": "keywords from the subject, such as newsletter, invoice, receipt"},
+        "sender": {"type": "string", "description": "who sent it, such as a person, company or domain"},
+        "period": {"type": "string", "enum": ["today", "yesterday", "last_week", "last_month", "any"], "description": "when the mail arrived"}
+      }
+    }
+  }
+]

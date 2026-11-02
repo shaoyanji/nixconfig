@@ -28,6 +28,19 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-02 — mail-agent: Needle 3 routes mail commands on delphi
+- **A sentence in, a himalaya action out.** `mail-agent` (module, harness and tool schemas under
+  `modules/services/`) dispatches `search_mail` / `archive_mail` / `mark_read` with the needle3 binary
+  delphi already ran for repo routing; a 06:30 systemd user timer sweeps bulk mail. Engine and weights now
+  live in `modules/scripts/needle-model.nix`, one hash for both consumers. Design: `docs/mail-agent.md`.
+- **Measured, then designed.** Routing battery 10/11 (`mail-agent --self-test`); a `trash_mail` tool was
+  never selected, so delete was removed from the schema instead of gated; a dry run over the real inbox
+  approved a Dropbox "connected a new app" and a GitHub "new SSH key" at 0.22–0.47, so the sweep archives
+  only from `sweep.trustedSenders` and holds everything else with a printed reason.
+- **Evidence.** The unit ran 2.6 s / 86 MB peak and archived 7; all seven left the inbox, one was restored
+  from All Mail on demand. Audit log `~/.local/state/mail-agent/audit.jsonl` records `message-id`, because
+  Gmail reassigns uids per mailbox (310172 in INBOX, 621165 in All Mail). 0 failed units on delphi.
+
 ### 2026-11-02 — paperless, vaultwarden and anki move off the NAS; the NAS becomes the shelter
 - **The shape of an offload is now a module, not a memory.** `services.offloadBridge`
   (`modules/services/offload-bridge.nix`) declares what a moved service still owes the NAS: a nightly

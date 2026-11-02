@@ -201,6 +201,7 @@ modules/
     nixbuild-client.nix — Optional nixbuild.net remote builder (distributedBuilds, off by default)
   services/        — Service modules
     aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)
+    mail-agent.nix    — natural-language mail actions (needle3 + himalaya) and the nightly bulk sweep
   roles/           — User role assemblers (minimal, home, demo)
   user/            — User module domains
     base/          — CLI/editor/env base
@@ -910,6 +911,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/task-control-plane.md`](docs/task-control-plane.md)         | Task namespace policy and workflow examples                            |
 | [`docs/ci-pipeline.md`](docs/ci-pipeline.md)                | CI: inventory-driven host selection, path rules, the two builds per host |
 | [`docs/nix-patterns.md`](docs/nix-patterns.md)               | yq/format traps, non-obvious Nix, build-budget traps, store reclaim (GC roots), agent failure modes |
+| [`docs/mail-agent.md`](docs/mail-agent.md)                   | mail-agent on delphi: the tool assessment, measured routing accuracy, the sender trust list, operations |
 | [`docs/agent-turns.md`](docs/agent-turns.md)                | Agent turns (xs): endpoint, schema, tokens, dedup, restore procedure    |
 | [`docs/delphi-install.md`](docs/delphi-install.md)              | Dated install walkthrough for delphi, plus the autoUpgrade path      |
 | [`docs/NUSHELL.md`](docs/NUSHELL.md)                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |

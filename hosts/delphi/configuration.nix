@@ -1077,8 +1077,28 @@ in {
   # install Chromium/qmd/crush. The gateway units follow `enable` (set by
   # profiles.hermes); seeding the persona is this host's own declaration.
   home-manager.users.${user.name} = {
+    imports = [../../modules/services/mail-agent.nix];
     programs.hermes-user = {
       persona = true;
+    };
+    # Plain-English triage over the himalaya account, plus a nightly sweep of
+    # bulk mail. Dry run unless --apply; no delete tool exists. docs/mail-agent.md
+    programs.mailAgent = {
+      enable = true;
+      account = "jisifu";
+      sweep = {
+        mode = "apply";
+        # Marketing senders only. A dry run over the real inbox is what earned
+        # each one; anything not listed is held for review, never archived.
+        trustedSenders = [
+          "mail.gocity.com"
+          "hello@ollama.com"
+          "steampowered.com"
+          "redditmail.com"
+          "email.openai.com"
+          "tryhackme.com"
+        ];
+      };
     };
     # Delphi uses HTTPS with GitHub CLI token credentials rather than host SSH keys.
     programs.gh.settings.git_protocol = lib.mkForce "https";

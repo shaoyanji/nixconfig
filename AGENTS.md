@@ -908,6 +908,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/nix-patterns.md`](docs/nix-patterns.md)               | yq/format traps, non-obvious Nix, build-budget traps, store reclaim (GC roots), agent failure modes |
 | [`docs/mail-agent.md`](docs/mail-agent.md)                   | mail-agent on delphi: the tool assessment, measured routing accuracy, the sender trust list, operations |
 | [`docs/email-archive.md`](docs/email-archive.md)              | NpgsqlRest email archive: schema, endpoints, the Drive mirror checklist, what is not done |
+| [`docs/agent-contract.md`](docs/agent-contract.md)            | What "done" means per kind of work: playbook exits, evidence objects, frame discipline |
 | [`docs/agent-turns.md`](docs/agent-turns.md)                | Agent turns (xs): endpoint, schema, tokens, dedup, restore procedure    |
 | [`docs/delphi-install.md`](docs/delphi-install.md)              | Dated install walkthrough for delphi, plus the autoUpgrade path      |
 | [`docs/NUSHELL.md`](docs/NUSHELL.md)                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |

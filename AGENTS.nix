@@ -4724,6 +4724,44 @@
       '';
     };
 
+    agent-contract = {
+      title = "AGENT-CONTRACT — done is an exit predicate, not a sentence";
+      kind = "decision";
+      status = "DELIVERED";
+      date = "2026-11-02";
+      refs = {
+        docs = ["docs/agent-contract.md"];
+        tasks = ["checks:host"];
+      };
+      summary = "One exit predicate per kind of change, one evidence record per predicate: FEATURE is checks:host plus the behaviour exercised, DEBLOAT is no consumers plus a negative closure delta, DESLOP is format and lint unchanged, INVESTIGATE is a graph path plus an evaluated attribute. Task citations on the page are gated against the compiled graph.";
+      body = ''
+        **Adopted.** `docs/agent-contract.md` names the predicate that makes a turn
+        finished, because "done" in prose drifts within twenty turns. The page is a
+        normative doc, so its `[[flake/policies.nix#…]]` citations are checked, and
+        `contract-tasks-resolve` fails any `task <name>` it names that the compiled
+        graph does not have (wildcards resolve by prefix).
+
+        **Refused, with the instrument that replaces each.** A `nix flake check`
+        exit is the memory-gated force on an 11 GiB host, so DEBLOAT ends at
+        `checks:host` plus `dev:closure:diff`. A sha256 of `config` as the DESLOP
+        predicate is the whole-toplevel force (>120 s with swap), so DESLOP ends at
+        the format and lint gates plus `checks:host` before and after. A `nix:eval`
+        catch-all task was refused too: it is the shortest path to both of the
+        above, and the ladder in `task-plane` says eval the attribute you need.
+
+        **No deny hooks.** A `PreToolUse` hook on grep/cat binds one client and no
+        other, and this tree has none; the durable form is the read rule scoped to
+        *structure* (graph and evaluation, not prose) plus a gate. `prove:*` was not
+        created either — every predicate above already has a `checks:*` task, and a
+        second namespace would be a second home.
+
+        **Frames stay as they are.** xs has `outcome` (`done`/`in_progress`/`blocked:`
+        /`failed:`) and `claims`, and no update or delete route: a live claim is read
+        from the tail, never mutated. A role/status machine on top is a service change,
+        not a doc change.
+      '';
+    };
+
     open-manual-steam-fill = {
       title = "The nightly prefill window is redundant once fills are operator-driven";
       kind = "open";

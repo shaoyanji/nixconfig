@@ -159,6 +159,7 @@
     "AUDIT.md"
     ".agents/SCHEMA.md"
     ".agents/README.md"
+    "docs/agent-contract.md"
     "docs/ci-pipeline.md"
     "docs/nix-patterns.md"
     "docs/sops-rekey.md"
@@ -367,6 +368,22 @@
     builtins.length (builtins.filter (s: s != "" && !(isBanner s)) bodies);
   longHeaders = map (p: lib.removePrefix "${toString root}/" (toString p)) (builtins.filter (p: headerLines p > 3) nixFiles);
 
+  # A backticked `task <name>` on the contract page is a promise that the name
+  # exists; a wildcard shard (`find:*`) resolves by its static prefix.
+  taskNames = (import ../lib/taskfile.nix {inherit lib;}).names;
+  wildcardTasks = builtins.filter (n: lib.hasInfix "*" n) taskNames;
+  resolvesTask = n:
+    builtins.elem n taskNames
+    || lib.any (w: lib.hasPrefix (builtins.head (lib.splitString "*" w)) n) wildcardTasks;
+  codeSpans = p: builtins.filter builtins.isString (builtins.split "`" (read p));
+  contractCites = map (s: lib.head (lib.splitString " " (lib.removePrefix "task " s))) (
+    builtins.filter (s: lib.hasPrefix "task " s) (codeSpans "docs/agent-contract.md")
+  );
+  contractUnknown =
+    builtins.filter
+    (n: n != "" && !(lib.hasPrefix "-" n) && !(resolvesTask n))
+    contractCites;
+
   # A compositor swap inside `base-desktop-environment` is two configs fighting:
   # niri/DMS are force-disabled while the profile that installed them, and their
   # whole userland (zen, nautilus, portals, gnome-keyring), stays in the closure.
@@ -421,6 +438,13 @@
       proof = "systemd.services blocks in modules/ and hosts/ that set Restart; lib/systemd-policy.nix markedSystemViolations";
       holds = unclassifiedDaemons == [];
       detail = "system services with Restart and no X-Fleet-Role:\n    ${lib.concatStringsSep "\n    " unclassifiedDaemons}";
+    };
+
+    contract-tasks-resolve = {
+      rule = "A page that tells an agent what to run names only tasks the compiled graph has: an exact name, or a wildcard shard whose prefix matches (`find:<word>` → `find:*`, `infra:warm:host:<host>` → `infra:warm:host:*`). A citation nobody can run is worse than no citation — it makes the door look closed, which is the drift the contract page exists to stop.";
+      proof = "backticked `task …` citations in docs/agent-contract.md vs lib/taskfile.nix `names`";
+      holds = contractUnknown == [];
+      detail = "citations that name no task: ${lib.concatStringsSep ", " contractUnknown}";
     };
 
     root-markdown-closed = {

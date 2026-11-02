@@ -181,16 +181,7 @@ in {
   };
   users.users.audiobookshelf.extraGroups = ["users"];
 
-  # --- Anki sync ---
-  services.anki-sync-server = {
-    enable = true;
-    address = "0.0.0.0";
-    openFirewall = true;
-    users = [
-      {
-        username = "bob";
-        password = "password";
-      }
-    ];
-  };
+  # Anki sync moved to delphi 2026-11-02 (hosts/delphi/anki-sync.nix); this host
+  # keeps the `anki.frieren.lan` vhost. A second copy here is not a spare: it
+  # binds 27701 on every interface and the vhost would answer whichever won.
 }

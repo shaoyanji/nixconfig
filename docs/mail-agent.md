@@ -5,6 +5,14 @@ week"` on delphi, with the intent routed by Needle 3 (121M params, CPU-only,
 74 MB resident) and the action executed by the himalaya account the fleet already
 has. A nightly timer sweeps bulk mail.
 
+**One rule about model roles, because it decides the schemas.** Needle 3 is a
+tool caller: it captures a sentence into a tool name plus typed arguments, and
+that is the only job it gets here. A *classification* — one label out of a set,
+with a threshold — is a different question and does not go to a tool-caller
+model; it goes to a decision model (Jev, Laya, Julia-1) and, in this fleet's
+policy, to a rule first. The mail sweep is the case that proved it: all three
+models answer the keep/archive question at 3/10, so the sweep asks none of them.
+
 The design was chosen after measuring the alternatives, not before. Everything
 below was run on delphi against the live account on 2026-11-02.
 
@@ -13,7 +21,7 @@ below was run on delphi against the live account on 2026-11-02.
 | Layer | Home |
 | :--- | :--- |
 | module, options, timer, package | `modules/services/mail-agent.nix` |
-| tool schemas the model may call | `modules/services/mail-agent-tools.json`, `mail-agent-sort-tools.json` |
+| tool schema the model may call | `modules/services/mail-agent-tools.json` |
 | harness | `modules/services/mail-agent.py` |
 | engine + weights (one hash, shared) | `modules/scripts/needle-model.nix` |
 | this host's trust list and limits | `hosts/delphi/configuration.nix` (`programs.mailAgent`) |
@@ -56,6 +64,28 @@ with a `period` enum present and 0.33 without. It separates senders it knows
 cannot tell a good `archive_mail` at 0.20 from a bad one at 0.36. So:
 `--apply` is the human gate for commands, and the sweep uses a trust list.
 
+**No model classifies mail, measured 2026-11-02.** A ten-item labelled battery
+(four marketing newsletters, six must-keep: a security alert, an SSH-key notice,
+a new-app notice, an order, a classifieds inquiry, a statement) was put to the
+keep/archive question three ways. needle3's `sort_mail` tool called everything
+archive but one at 0.12–0.34; `systemone-decision --type classify` (julia-1) and
+laya each called nine of ten archive, and got Go City *wrong in the other
+direction* at 0.71/0.84. **All three: 3/10.** needle3 is a tool caller, so asking
+it for a label was a role error; the decision models are a lexical scorer on this
+host, so the label was noise. Both schemas are gone and the sweep decides by
+rule — the bulk-sender pattern, the `PROTECTED` subject guard, and the declared
+sender allowlist, which was always the real gate:
+
+| decision | owner | why |
+| :--- | :--- | :--- |
+| which tool, which arguments | needle3 (`mail-agent-tools.json`) | schema capture, 10/11 on the dispatch battery |
+| keep or archive one message | rule: `BULK_*`, `PROTECTED`, `sweep.trustedSenders` | every model tested scored 3/10 |
+| a label that genuinely needs judgement | Jev → Laya → Julia-1 (`decide`, `/v1/systemone`) | typed decision, one forward pass, calibrated |
+
+Widening this is a schema edit plus a measurement, in that order: a label tool
+comes back only with a battery it passes and a threshold that separates its own
+correct calls from its incorrect ones.
+
 **The sweep needed a trust list, not a better prompt.** A dry run over the real
 inbox approved 13 messages, among them a Dropbox "you connected a new app", a
 GitHub "a new SSH authentication key was added", a Stripe "unrecognized device
@@ -66,8 +96,8 @@ did not fix it; changing the default did. The sweep now archives **only** from
 
 ```
 sweep: scanned 60, bulk candidates 22, protected 21, approved 7, held 15
-  ARCHIVE 0.39  2026-10-30  Go City     A Halloween treat for longer trips
-  held          2026-11-01  Stripe      Unrecognized device signed in ...  model says archive at 0.18
+  ARCHIVE  2026-10-30  Go City     A Halloween treat for longer trips
+  held     2026-11-01  Stripe      Unrecognized device signed in ...  sender not in sweep.trustedSenders
 ```
 
 `sweep.mode` defaults to `report`; delphi sets `apply` with six marketing senders
@@ -122,8 +152,8 @@ himalaya message move -f '[Gmail]/All Mail' -t inbox "$id"
 
 - **The model misroutes roughly one sentence in ten**, so `--apply` on a sentence
   the router merely *suppressed* is the risky path and asks for `--force` too.
-- **`--limit` is what bounds a run.** The timer scans 25 envelopes and does one
-  model call per bulk candidate (~40 ms each), so a sweep is seconds, not minutes.
+- **`--limit` is what bounds a run.** The timer scans 25 envelopes and calls no
+  model at all, so a sweep is one himalaya query plus moves.
 - **No send, no reply, no delete.** If you want those, they are new tools and a
   new trust decision, not a flag.
 - **`[Gmail]/All Mail` is Gmail-specific.** `archiveMailbox` and `inbox` are

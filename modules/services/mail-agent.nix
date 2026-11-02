@@ -1,6 +1,6 @@
 # Mail agent: plain-English mail actions through himalaya, routed by Needle 3,
-# plus a nightly sweep of bulk mail. Home-manager module because the himalaya
-# config and the sops mail secret are user state. docs/mail-agent.md.
+# plus a nightly sweep decided by rule — a label is a classification and needle3
+# is a tool caller. docs/mail-agent.md.
 {
   config,
   lib,
@@ -15,7 +15,6 @@
     mkdir -p $out
     install -m 0644 ${./mail-agent.py} $out/mail-agent.py
     install -m 0644 ${./mail-agent-tools.json} $out/mail-agent-tools.json
-    install -m 0644 ${./mail-agent-sort-tools.json} $out/mail-agent-sort-tools.json
   '';
 
   package = pkgs.writeShellApplication {
@@ -29,7 +28,6 @@
       export MAIL_AGENT_AUDIT="${cfg.auditFile}"
       ${lib.optionalString (cfg.account != "") "export MAIL_AGENT_ACCOUNT=${lib.escapeShellArg cfg.account}"}
       export MAIL_AGENT_TRUSTED=${lib.escapeShellArg (lib.concatStringsSep "," cfg.sweep.trustedSenders)}
-      export MAIL_AGENT_MIN_CONF=${toString cfg.minConfidence}
       exec ${pkgs.python3}/bin/python3 ${src}/mail-agent.py "$@"
     '';
   };
@@ -58,16 +56,6 @@ in {
       '';
     };
 
-    minConfidence = lib.mkOption {
-      type = lib.types.float;
-      default = 0.2;
-      description = ''
-        Sweep threshold on the model's confidence. Measured on Needle 3, honest
-        archive calls land at 0.14–0.32, so 0.5 would never fire; `mail-agent
-        --self-test` is what re-calibrates this.
-      '';
-    };
-
     limit = lib.mkOption {
       type = lib.types.ints.positive;
       default = 25;
@@ -93,9 +81,8 @@ in {
         description = ''
           `report` lists what it would archive and changes nothing; `apply`
           archives the approved set. Only senders in
-          {option}`sweep.trustedSenders` are ever approved, because on a dry run
-          over the real inbox the model approved a Dropbox "new app connected"
-          and a GitHub "new SSH key" (docs/mail-agent.md).
+          {option}`sweep.trustedSenders` are ever approved: no model labels a
+          message here (docs/mail-agent.md carries the 3/10 measurements).
         '';
       };
 
@@ -121,7 +108,7 @@ in {
 
     systemd.user.services.mail-agent-sweep = lib.mkIf cfg.sweep.enable {
       Unit = {
-        Description = "Archive bulk mail (Needle 3 gate on the deterministic bulk rule)";
+        Description = "Archive bulk mail from sweep.trustedSenders";
         After = ["network-online.target"];
         Wants = ["network-online.target"];
       };

@@ -28,6 +28,16 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-02 — the mail sweep decides by rule; needle3 keeps only tool calling
+- **A label is a decision, not a tool call.** `mail-agent-sort-tools.json` asked needle3 for a keep/archive
+  *classification*. A ten-item labelled battery scored needle3, julia-1 and laya at **3/10 each** (nine of
+  ten archive; Go City wrong in the other direction at 0.71/0.84), so the schema is deleted and the sweep
+  archives on `BULK_*` + `PROTECTED` + `sweep.trustedSenders` alone; `minConfidence` and `--min-confidence`
+  went with it. `hosts/delphi/needle-tools.json` no longer forces a note-kind classification either.
+- **Evidence:** `mail-agent --self-test` 10/11 (dispatch unchanged), `mail-agent --sweep` prints `ARCHIVE` /
+  `held … sender not in sweep.trustedSenders` with no model call, `checks:host HOST=delphi` green.
+  Design: `docs/mail-agent.md`, `AGENTS.nix` exp-128.
+
 ### 2026-11-02 — mail-agent: Needle 3 routes mail commands on delphi
 - **A sentence in, a himalaya action out.** `mail-agent` (module, harness and tool schemas under
   `modules/services/`) dispatches `search_mail` / `archive_mail` / `mark_read` with the needle3 binary

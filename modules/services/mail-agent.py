@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Natural-language mail actions on top of himalaya, dispatched by Needle 3.
 
-The design, the measured accuracy and the reasons each alternative tool was
-rejected are in docs/mail-agent.md. Two properties are enforced here rather than
-documented: there is no delete capability in the tool schema at all, and every
-mutation is dry-run until --apply.
+Needle is a tool caller and is used only as one: it picks a tool and fills its
+arguments. Nothing here asks it to label a message, because a label is a
+classification and that question belongs to a decision model — measured, three
+of them answered it worse than chance, so the sweep decides by rule instead.
+The design, the measurements and the rejected alternatives are in
+docs/mail-agent.md. Two properties are enforced here rather than documented:
+there is no delete capability in the tool schema at all, and every mutation is
+dry-run until --apply.
 """
 
 import argparse
@@ -19,7 +23,6 @@ from datetime import datetime, timedelta, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DISPATCH_TOOLS = os.path.join(HERE, "mail-agent-tools.json")
-SORT_TOOLS = os.path.join(HERE, "mail-agent-sort-tools.json")
 
 NEEDLE = os.environ.get("MAIL_AGENT_NEEDLE", "needle")
 WEIGHTS = os.environ.get("MAIL_AGENT_WEIGHTS", "")
@@ -35,7 +38,8 @@ AUDIT = os.path.expanduser(
 
 # Archive is for bulk mail a human never answers. Anything that could be a
 # receipt, a credential, or a person's request is out of scope for the sweep,
-# whatever the model says: it called a contract review "archive" at 0.23.
+# whatever the sender allowlist says: a model called a contract review
+# "archive" at 0.23, which is why no model gets a vote here.
 BULK_SENDER = re.compile(
     r"^(no-?reply|do-?not-?reply|newsletter|news|digest|marketing|offers?|deals?|"
     r"promo\w*|notifications?|updates?|hello|team|mailer-daemon)@",
@@ -289,7 +293,7 @@ def trusted(addr):
     return any(t in addr.lower() for t in TRUSTED)
 
 
-def sweep(apply, limit, min_conf):
+def sweep(apply, limit):
     scanned = envelopes("", limit=limit)
     candidates, protected = [], 0
     for e in scanned:
@@ -300,25 +304,21 @@ def sweep(apply, limit, min_conf):
         if BULK_SENDER.search(sender_addr(e)) or BULK_SUBJECT.search(subject):
             candidates.append(e)
 
+    # The trust list is the whole gate, by measurement: needle3, julia-1 and laya
+    # each scored 3/10 on a labelled keep/archive battery, so the sender allowlist
+    # and the PROTECTED guard decide, and everything else is held.
     approved, held = [], []
     for e in candidates:
-        reply = ask_needle(f"From: {sender_of(e)} <{sender_addr(e)}>\nSubject: {e.get('subject')}",
-                           SORT_TOOLS)
-        call = call_of(reply)
-        action = (call or {}).get("arguments", {}).get("action")
-        conf = reply.get("confidence", 0.0)
-        if action != "archive" or conf < min_conf:
-            held.append((e, f"model says {action or 'nothing'} at {conf:.2f}"))
-        elif not trusted(sender_addr(e)):
-            held.append((e, f"archive {conf:.2f}, sender not trusted"))
+        if trusted(sender_addr(e)):
+            approved.append(e)
         else:
-            approved.append((e, conf))
+            held.append((e, "sender not in sweep.trustedSenders"))
 
     print(f"sweep: scanned {len(scanned)}, bulk candidates {len(candidates)}, "
           f"protected {protected}, approved {len(approved)}, held {len(held)} "
-          f"(min-confidence {min_conf:.2f}, trusted senders {len(TRUSTED)})")
-    for e, conf in approved:
-        print(f"  ARCHIVE {conf:.2f}  {human_date(e.get('date'))}  {sender_of(e)[:26]:<26}  "
+          f"(trusted senders {len(TRUSTED)})")
+    for e in approved:
+        print(f"  ARCHIVE  {human_date(e.get('date'))}  {sender_of(e)[:26]:<26}  "
               f"{(e.get('subject') or '')[:58]}")
     for e, why in held:
         print(f"  held           {human_date(e.get('date'))}  {sender_of(e)[:26]:<26}  "
@@ -329,15 +329,16 @@ def sweep(apply, limit, min_conf):
         return 0
     if not approved:
         audit({"mode": "sweep", "scanned": len(scanned), "approved": 0,
-               "held": len(held), "moved": [], "applied": True})
+               "held": len(held), "moved": [], "gate": "trustedSenders",
+               "applied": True})
         return 0
 
-    ids = [e["id"] for e, _ in approved]
+    ids = [e["id"] for e in approved]
     himalaya(["message", "move", "-f", INBOX, "-t", ARCHIVE] + ids)
     print(f"\narchived {len(ids)} into {ARCHIVE}")
     audit({"mode": "sweep", "scanned": len(scanned), "approved": len(approved),
-           "held": len(held), "moved": [e.get("message-id") for e, _ in approved],
-           "confidence": [round(c, 4) for _, c in approved], "applied": True})
+           "held": len(held), "moved": [e.get("message-id") for e in approved],
+           "gate": "trustedSenders", "applied": True})
     return 0
 
 
@@ -383,23 +384,20 @@ def main():
                     "through himalaya, routed by Needle 3. Dry run unless --apply.")
     ap.add_argument("request", nargs="*", help="what to do, in plain English")
     ap.add_argument("--sweep", action="store_true",
-                    help="nightly policy: archive bulk mail the model also calls archive")
+                    help="nightly policy: archive bulk mail from sweep.trustedSenders")
     ap.add_argument("--self-test", action="store_true",
                     help="run the routing battery and report accuracy")
     ap.add_argument("--apply", action="store_true", help="actually change the mailbox")
     ap.add_argument("--force", action="store_true",
                     help="accept a mutation the router suppressed rather than emitted")
     ap.add_argument("--limit", type=int, default=25, help="envelopes to consider (default 25)")
-    ap.add_argument("--min-confidence", type=float,
-                    default=float(os.environ.get("MAIL_AGENT_MIN_CONF", "0.2")),
-                    help="sweep threshold (default 0.2)")
     opts = ap.parse_args()
 
     try:
         if opts.self_test:
             return self_test()
         if opts.sweep:
-            return sweep(opts.apply, opts.limit, opts.min_confidence)
+            return sweep(opts.apply, opts.limit)
         if not opts.request:
             ap.print_help()
             return 2

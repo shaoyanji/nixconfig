@@ -25,14 +25,14 @@
   },
   {
     "name": "notes_lookup",
-    "description": "Search the decision-notes store: experiments, proposals, open todos and studies. Use for 'which experiments exist about X', 'find the proposal for X', 'open work on X', 'what notes mention X', 'find the study about X'. Never for documentation files.",
+    "description": "Search the decision-notes store: experiments, proposals, open todos and studies. Use for 'which experiments exist about X', 'find the proposal for X', 'open work on X', 'what notes mention X', 'find the study about X'. Never for documentation files. Search every kind unless the question already names one.",
     "parameters": {
       "type": "object",
       "properties": {
         "query": {"type": "string"},
-        "kind": {"type": "string", "enum": ["experiment", "proposal", "open", "study", "any"]}
+        "kind": {"type": "string", "enum": ["experiment", "proposal", "open", "study", "any"], "description": "optional; pass only when the question names the kind, otherwise omit"}
       },
-      "required": ["query", "kind"]
+      "required": ["query"]
     }
   },
   {

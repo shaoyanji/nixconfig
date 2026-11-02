@@ -4711,11 +4711,11 @@
         `sweep.trustedSenders` (six marketing senders, each earned in a dry run) and prints why every
         held message was held.
 
-        **Confidence is not the gate.** It is the joint probability of the model's own output, so it
-        falls as the schema grows: 0.10 with a `period` enum, 0.33 without. Verb-first one-line tool
-        descriptions lifted the battery from 7/11 to 10/11; the miss is a read-only search returning
-        nothing. Mutations are dry-run until `--apply`, and a caller the router merely *suppressed*
-        also needs `--force`.
+        **Needle is a tool caller, not a classifier.** Verb-first one-line descriptions lifted the
+        dispatch battery from 7/11 to 10/11; the miss is a read-only search. A label is a decision and
+        is not its job: a keep/archive battery scored needle3, julia-1 and laya at 3/10 each (nine of
+        ten archive), so that tool schema is deleted and the sweep decides by rule. Mutations are
+        dry-run until `--apply`, and a caller the router merely *suppressed* also needs `--force`.
 
         **Evidence.** `--self-test` 10/11; the unit ran 2.6 s / 86 MB peak and archived 7, all seven
         left the inbox, one restored from All Mail on demand. The audit stores `message-id`, not the

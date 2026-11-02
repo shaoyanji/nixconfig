@@ -678,6 +678,7 @@ See [Task Control Plane](docs/task-control-plane.md) for full namespace definiti
 | `infra:*`       | Host lifecycle, secrets, SOPS, detached jobs (`infra:job:*`), microVM guests (`microvm:*` declarative, `vm:canary:*` runner) | `.agents/skills/infra/SKILL.md`, `.agents/skills/microvm/SKILL.md` |
 | `agents:*`      | Operator menu, xs, OAuth                                                                                     | `.agents/skills/agents/SKILL.md`       |
 | `checks:*`      | Validation, smoke checks, nix lint                                                                           | `.agents/skills/checks/SKILL.md`       |
+| `codespace:*`   | GitHub Codespaces over `gh cs ssh`: exec, file transport, repo-matched push, ref refresh, stop                 | `.agents/skills/codespace/SKILL.md`    |
 | `dev:*`         | Git, flake, site, PRs, packages                                                                              | `.agents/skills/dev/SKILL.md`          |
 | `data:*`        | NAS storage taxonomy, hygiene, permissions, media unindexing                                                 | `.agents/skills/data/SKILL.md`         |
 | `moto:*`        | Motorola Android (Termux) shell, file push/pull, Wish/Gum menu                                               | `.agents/skills/moto/SKILL.md`         |

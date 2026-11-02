@@ -4047,60 +4047,28 @@
         tasks = ["checks:host"];
       };
       body = ''
-        **Measured on frieren.** system.slice totals about 2.4 GiB: paperless
-        task-queue 389 MiB, immich-server 292 MiB, stirling-pdf 188 MiB, jellyfin
-        105 MiB, home-assistant 82 MiB, influxdb 77 MiB. In the user slice the
-        persistent outlier is hermes at 340 MiB; the 1.3 GiB and 600 MiB entries
-        are the agent and browser of the current session, not services.
-
-        **Settled by the operator (2026-10-21).** paperless and immich stay: the
-        personal data and the family users are on frieren, and a move would mean
-        re-doing that setup by hand. The rule that falls out is sharper than
-        "move stateless services": move what has no library and no shared logins.
-
-        **stirling-pdf moved (2026-10-21).** Stateless, so it was the one service
-        worth moving: the unit is gone from this host's system.slice, delphi
-        serves it on tailnet 8445, and frieren's closure fell 1005 MiB
-        (31.88 → 30.82 GB) with 87 MiB of cgroup going with it. Its aarch64
-        closure is not on cache.nixos.org, so the first build ran on two A1
-        cores (~40 min) and delphi needs ~60 s of JVM warmup before the mount
-        answers 200 rather than 502. `pdf.frieren.lan` no longer serves it.
-
-        **Candidates left.** hermes, 342 MiB and 226 MiB of state in `~/.hermes`,
-        needs a cutover decision: one bot token cannot be polled twice, so the
-        sequence is copy state, enable on delphi, stop frieren, and measure.
-
-        **Second wave (2026-11-02): paperless, vaultwarden, anki.** The operator
-        overrode "paperless stays", and the override holds: what the first rule
-        protected was the archive and the family's habits, not the laptop. Both
-        survive the move because the *name* and the *copy* stay behind —
-        `docs.frieren.lan`, `vault.frieren.lan` and `anki.frieren.lan` are still
-        frieren's vhosts, and `services.offloadBridge` mirrors every tree to
+        **The rule.** Move what has no library and no shared logins, and keep the
+        name and the copy behind. stirling-pdf went on 2026-10-21; paperless,
+        vaultwarden and anki on 2026-11-02, over an earlier "paperless stays":
+        what that rule protected was the archive and the family's habits, not the
+        laptop. `docs.`, `vault.` and `anki.frieren.lan` are still frieren's
+        vhosts, and `services.offloadBridge` mirrors every tree to
         `/srv/backup/offload` at 03:10, inside the window that already carries
-        those copies to BurgerNAS. Paperless' 722 MB is SQLite plus media
-        (no postgres), so the move is a file copy and one consistent snapshot;
-        anki held 430 MiB resident for an empty 4 KB store and a placeholder
-        account, which makes it the best ratio in the fleet. delphi's aarch64
-        answer is 20 derivations that no substituter carries, and the wall clock
-        was **~41 min on 2 OCPU**: the packages are Python installs, but spacy
-        drags in thinc/blis and those compile C++ (cc1plus observed at 97 % for
-        most of a quarter hour). It finished; a Rust or LLVM closure would not
-        have. One dependency (`wandb`) failed its own test suite on aarch64 and
-        is built with checks off through paperless' `extraPythonPackageOverrides`.
+        those copies to BurgerNAS.
 
-        **What is left, and why it is honest.** The tunnel in
-        `hosts/delphi/offload-tunnel.nix` carries frieren's loopback ports here
-        until frieren is rebuilt with the vhosts pointing at delphi's tailnet
-        address; deleting it is the last step of the move, not a follow-up idea.
-        The dependency that remains is one the move cannot remove: a name that
-        lives on frieren needs frieren's nginx. hermes is still the last unit,
-        and still only with an agreed window.
+        **What is left.** hermes is the last unit, 226 MiB of state in
+        `~/.hermes`: one bot token cannot be polled twice, so it waits on an
+        agreed window — copy state, enable on delphi, stop frieren, measure. The
+        tunnel in `hosts/delphi/offload-tunnel.nix` then goes, and deleting it is
+        the last step of the move rather than a follow-up idea. One dependency
+        the move cannot remove: a name that lives on frieren needs frieren's
+        nginx.
 
         **Exit.** Each moved unit is gone from frieren's system.slice, serves from
         delphi over the tailnet, and `systemctl show -p MemoryCurrent` on frieren
-        shows the release; the shelter copy is present under
-        `/srv/backup/offload` and inside a restic snapshot; and the tunnel file is
-        deleted after the frieren rebuild.
+        shows the release; the shelter copy is under `/srv/backup/offload` and
+        inside a restic snapshot; the tunnel file is deleted after the frieren
+        rebuild.
       '';
     };
     exp-114 = {

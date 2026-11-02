@@ -256,12 +256,16 @@
   freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 in {
   imports = [
+    ./anki-sync.nix
     ./gemini.nix
     ./gok-artifacts.nix
     ./hardware-configuration.nix
     ./infra-stack.nix
     ./minyx-keeper.nix
     ./needle-router.nix
+    ./offload-tunnel.nix
+    ./paperless.nix
+    ./vaultwarden.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/firewall-baseline.nix
     ../../modules/profiles/hermes.nix
@@ -271,6 +275,8 @@ in {
     ../../modules/services/agent-turns.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
+    ../../modules/services/offload-bridge.nix
+    ../../modules/services/paperless-watchdog.nix
     ../../modules/services/service-portal.nix
     ../../modules/services/systemone-decision.nix
   ];
@@ -446,6 +452,13 @@ in {
     allowedTCPPorts = [
       53
       8181
+      # The three services that moved off the NAS. frieren's nginx is their only
+      # client, over the tailnet; nothing here is public, and the global
+      # allowedTCPPorts above still holds just 22/80/443.
+      28981 # paperless-ngx
+      8222 # vaultwarden web
+      3012 # vaultwarden websocket
+      27701 # anki sync
     ];
   };
 
@@ -838,6 +851,69 @@ in {
   services.agentTurns.backup = {
     enable = true;
     pushTo = "${user.name}@${config.fleet.inventory.hosts.frieren.network.tailscale_hostname}:/srv/backup/agent-turns/";
+  };
+
+  # --- Shelter for the services that moved off the NAS ------------------------
+  # Paperless, Vaultwarden and Anki now run here; frieren keeps the copy that
+  # makes a switch-back cheap. Three declarations, one per guarantee: mirror the
+  # state nightly (a consistent SQLite snapshot, never rsync'd bytes), keep
+  # pulling the scanner's drop folder that stayed on the NAS share, and record
+  # what a cutover has to stop and what proves it worked.
+  #
+  # The push lands in frieren's restic window on purpose: 03:10 is after the
+  # agent-turn export (03:05) and before the 03:28 BurgerNAS and 03:30 local
+  # snapshots, so the same nightly chain that protects the NAS protects these.
+  # `docs/service-offload.md` is the procedure; the note is `open-frieren-offload`.
+  # The ingestion probe followed its service: it asserts the four paperless units
+  # are active and that nothing has sat unconsumed past the stall threshold. It
+  # matters more here than it did on frieren, because the drop folder is now
+  # reached over the bridge (`ingest`) rather than being local.
+  services.paperlessWatchdog = {
+    enable = true;
+    consumeDir = "/var/lib/paperless/consume";
+  };
+
+  services.offloadBridge = {
+    enable = true;
+    host = "${user.name}@${config.fleet.inventory.hosts.frieren.network.tailscale_hostname}";
+
+    sets = {
+      paperless = {
+        path = "/var/lib/paperless";
+        sqlite = ["db.sqlite3"];
+      };
+      vaultwarden = {
+        path = "/var/lib/vaultwarden";
+        sqlite = ["db.sqlite3"];
+      };
+      # The vault's own sqlite-consistent dump, written by its backup unit.
+      vaultwarden-backup.path = "/var/backup/vaultwarden";
+      anki.path = "/var/lib/anki-sync-server";
+    };
+
+    ingest.paperless = {
+      from = "${user.name}@${config.fleet.inventory.hosts.frieren.network.tailscale_hostname}:/srv/data/paperless/consume/";
+      to = "/var/lib/paperless/consume/";
+    };
+
+    migrate = {
+      paperless = {
+        stopSource = ["paperless-web" "paperless-task-queue" "paperless-consumer" "paperless-scheduler"];
+        stopTarget = ["paperless-web" "paperless-task-queue" "paperless-consumer" "paperless-scheduler"];
+        countSql = "select count(*) from documents_document";
+        healthUrl = "http://127.0.0.1:28981/";
+      };
+      vaultwarden = {
+        stopSource = ["vaultwarden"];
+        stopTarget = ["vaultwarden"];
+        countSql = "select count(*) from users";
+        healthUrl = "http://127.0.0.1:8222/alive";
+      };
+      anki = {
+        stopSource = ["anki-sync-server"];
+        stopTarget = ["anki-sync-server"];
+      };
+    };
   };
 
   # --- Tailnet-only HTTPS mounts, from ONE registry --------------------------

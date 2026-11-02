@@ -38,14 +38,14 @@ route on hosts that are physically on the LAN — their native path wins.
 |---------|-----------------------------------|----------------|---------|
 | Portal landing page | `http://frieren.lan` (also `nas.frieren.lan`, `nas.lan`, `frieren`) | `100.97.61.65:80` | static page |
 | Immich | `http://photos.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:2283` |
-| Paperless-ngx | `http://docs.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:28981` |
+| Paperless-ngx | `http://docs.frieren.lan` | `100.97.61.65:80` | delphi `:28981` over the tailnet (moved 2026-11-02) |
 | Jellyfin | `http://media.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:8096` |
 | Stirling PDF | `http://pdf.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:7351` |
 | AriaNg | `http://aria.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:6801` |
 | Home Assistant | `http://ha.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:8123` |
 | Uptime Kuma | `http://status.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:3001` |
 | Scrutiny | `http://smart.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:8124` |
-| Vaultwarden | `http://vault.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:8222` |
+| Vaultwarden | `http://vault.frieren.lan` | `100.97.61.65:80` | delphi `:8222` over the tailnet (moved 2026-11-02) |
 | Harmonia (nix cache) | `http://cache.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:5000` |
 
 ### Direct ports (bypass nginx; firewall-open per `configuration.nix` / stack modules)
@@ -53,7 +53,7 @@ route on hosts that are physically on the LAN — their native path wins.
 | Service | Port | Reachable from |
 |---------|------|----------------|
 | Jellyfin | 8096 | LAN + tailnet (device discovery / DLNA prefer the raw port) |
-| Paperless-ngx | 28981 | LAN + tailnet (mail callbacks expect non-proxied traffic) |
+| Paperless-ngx | 28981 | **delphi** only, tailnet (moved 2026-11-02) |
 | Stirling PDF | 7351 | LAN + tailnet (declared in `hosts/frieren/networking.nix`) |
 | Home Assistant | 8123 | LAN + tailnet |
 | AriaNg | 6801 | LAN + tailnet |

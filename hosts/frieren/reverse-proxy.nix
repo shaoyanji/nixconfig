@@ -391,16 +391,29 @@ in {
         ];
         sslCertificate = tlsCertificate;
         sslCertificateKey = tlsCertificateKey;
+        # Vaultwarden moved to delphi 2026-11-02. The name, the TLS cert and the
+        # DOMAIN the passkeys were enrolled against all stay here; only the
+        # upstream crosses the tailnet. Ports are literal because the service
+        # that owned them is no longer in this host's config.
         locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT}";
+          proxyPass = "http://100.123.145.53:8222";
           proxyWebsockets = true;
         };
         locations."/notifications/hub" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.vaultwarden.config.WEBSOCKET_PORT}";
+          proxyPass = "http://100.123.145.53:3012";
           proxyWebsockets = true;
         };
         locations."/notifications/hub/negotiate" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT}";
+          proxyPass = "http://100.123.145.53:8222";
+        };
+      };
+
+      # Anki sync moved to delphi 2026-11-02. Until it moved, the client URL was
+      # `anki.frieren.lan:27701` — a hostname and a hole, no vhost. A vhost is
+      # what survives a move, so the URL becomes the name alone.
+      "anki.frieren.lan" = {
+        locations."/" = {
+          proxyPass = "http://100.123.145.53:27701";
         };
       };
 

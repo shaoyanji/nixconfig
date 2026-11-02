@@ -103,12 +103,19 @@ in {
       tcp-9696 = {port = 9696;};
       iventoy-http = {port = 16000;};
       tcp-26000 = {port = 26000;};
-      tcp-27701 = {port = 27701;};
+      # 27701 (anki sync) pruned 2026-11-02 — the service moved to delphi, and
+      # `anki.frieren.lan` is now a vhost there instead of a bare port here.
       paperless = {
+        # Offloaded to delphi 2026-11-02. The vhost keeps the name; the hole and
+        # the local upstream do not follow it. `upstream` is the tailnet address
+        # of the host that runs it now (`open-frieren-offload` in AGENTS.nix).
         port = 28981;
+        lan = false;
+        tailnet = false;
         proxy = {
           name = "docs.frieren.lan";
           websockets = true;
+          upstream = "http://100.123.145.53:28981";
         };
       };
       plex = {port = 32400;};

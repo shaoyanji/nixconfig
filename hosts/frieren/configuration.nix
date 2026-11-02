@@ -56,7 +56,9 @@ in {
     ./dns.nix
     ./media-stack.nix
     ./transmission.nix
-    ./paperless.nix
+    # ./paperless.nix — offloaded to delphi 2026-11-02; the module is kept in the
+    # tree so a switch-back is one import plus the shelter copy. See
+    # `open-frieren-offload` in AGENTS.nix and docs/service-offload.md.
     ./tools.nix
     ./networking.nix
     ./firewall-scope.nix

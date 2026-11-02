@@ -154,6 +154,47 @@ carries the same list for a TUI or a probe, and the asserts in
 card has no owner, two mounts share a port, an upstream is not loopback, or a
 `requires` names a unit that does not exist.
 
+## Offloaded services (2026-11-02)
+
+Three services moved up from the NAS. They are **not** portal mounts and they are
+not public: each binds every interface but is opened on `tailscale0` only, and
+their only client is frieren's nginx one hop away. The names (`docs.frieren.lan`,
+`vault.frieren.lan`, `anki.frieren.lan`) stayed on frieren, which is what makes
+the move reversible — `docs/service-offload.md` is the procedure.
+
+| Port | Service | State | Reached as |
+| :--- | :--- | :--- | :--- |
+| 28981 | paperless-ngx (`hosts/delphi/paperless.nix`) | `/var/lib/paperless`, SQLite + media | `http://docs.frieren.lan` |
+| 8222 / 3012 | vaultwarden (`hosts/delphi/vaultwarden.nix`) | `/var/lib/vaultwarden`, SQLite | `https://vault.frieren.lan` |
+| 27701 | anki sync (`hosts/delphi/anki-sync.nix`) | `/var/lib/anki-sync-server` | `http://anki.frieren.lan` |
+
+anki's only account takes its password from sops (`anki-sync/password`, read with
+`sops -d modules/secrets.yaml | yq -r '.anki-sync.password'`), rendered as a
+systemd credential rather than a plaintext option. The unit's `LoadCredential`
+line is the proof it is wired: `systemctl show -p LoadCredential anki-sync-server`.
+The old placeholder was `bob`/`password` and is rejected (403 on `/sync/hostKey`).
+
+`offload-tunnel.service` (`hosts/delphi/offload-tunnel.nix`) is **transitional**:
+it forwards frieren's loopback 28981/8222/3012/27701 back here until frieren is
+rebuilt with vhosts that name this host's tailnet address. sshd's default
+`GatewayPorts no` binds those remote ports on frieren's loopback, which is fine for
+nginx and not enough for anki's old `host:27701` habit — that is why anki gained a
+vhost in the same change. Delete the file and its import after that rebuild.
+
+Nightly, `offload-bridge-push.timer` (03:10) mirrors the three trees to
+`frieren:/srv/backup/offload/` with each SQLite database replaced by a
+`sqlite3 .backup` snapshot, and `offload-bridge-ingest.timer` (every 10 min) pulls
+`/srv/data/paperless/consume` — the scanner still drops into the NAS share.
+
+Two traps: the first `nixos-rebuild switch` after a move starts the services on
+an **empty** dataset (the archive arrives from `offload-migrate.sh`, which stops
+them, copies, verifies and starts them again), and an aarch64 paperless build is
+**~41 minutes** on this box — 20 derivations nothing substitutes, with spacy's
+thinc/blis compiling C++ for a quarter of an hour. That is also why nothing here
+narrows tesseract's languages: upstream's paperless module would re-apply the
+narrowing to `package`, so both hosts import `modules/services/paperless-fork.nix`
+instead.
+
 ## The Gemini capsule (`hosts/delphi/gemini.nix`)
 
 The portfolio is also a capsule, compiled by `lib/gemini-portal.nix` from the

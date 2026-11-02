@@ -7,8 +7,10 @@ with lib; let
   paperlessDataDir = "/srv/data/paperless";
 in {
   imports = [
-    # Use local fork without tesseract override.apply to avoid uncached builds
-    ./paperless-fork.nix
+    # Upstream's module re-applies a tesseract narrowing to `package`; this fork
+    # drops that so the package stays cached. Shared with delphi since 2026-11-02,
+    # which is why it lives under modules/ instead of beside this host.
+    ../../modules/services/paperless-fork.nix
   ];
 
   services.paperless = {

@@ -28,6 +28,35 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-02 — paperless, vaultwarden and anki move off the NAS; the NAS becomes the shelter
+- **The shape of an offload is now a module, not a memory.** `services.offloadBridge`
+  (`modules/services/offload-bridge.nix`) declares what a moved service still owes the NAS: a nightly
+  mirror of every tree to `/srv/backup/offload` with each SQLite database replaced by a `sqlite3 .backup`
+  snapshot (a WAL-mode `db.sqlite3` rsync'd beside a stale `-wal` restores into a service that starts and
+  answers wrong), an ingest pull for the drop folder the service no longer hosts, and the stop/verify facts
+  a cutover needs. `docs/service-offload.md` is the ladder and the procedure.
+- **Measured before moving.** paperless ~520 MiB RSS across four units plus tika and gotenberg, 722 MB of
+  SQLite + media and **no postgres** (the DB is SQLite) — so the move is a file copy plus one consistent
+  dump. vaultwarden 36 MiB / 4.2 MB, `DOMAIN` unchanged so enrolled passkeys survive. anki-sync-server held
+  **430 MiB resident for a 4 KB empty store**: the best ratio in the fleet. Its placeholder account was
+  plaintext `bob`/`password` in the Nix store; it now reads a 32-character password from sops via
+  `passwordFile` (a systemd credential, so no value reaches the store). Proved on the live server:
+  `/sync/hostKey` returns an hkey (200) for the sops password and 403 for `password`.
+- **delphi is the only host that built.** paperless needed 20 derivations no substituter carries on aarch64
+  plus 559 MiB fetched: **~41 min of wall clock on 2 OCPU**, because spacy pulls thinc/blis and those compile
+  C++. `wandb` also failed its own suite on this arch and is built with checks off via paperless'
+  `extraPythonPackageOverrides` — an overlay that redefines `python3` recurses forever instead. The target
+  uses the shared `modules/services/paperless-fork.nix` (moved out of `hosts/frieren/`), because upstream's
+  module re-applies a tesseract narrowing on every definition and that would have compiled tesseract too.
+  Nothing was compiled on frieren; its config evaluates to a toplevel drvPath (81 s / 4.8 GiB) and is
+  unapplied by design.
+- **The names stayed.** `docs.frieren.lan`, `vault.frieren.lan` and `anki.frieren.lan` are still frieren's
+  vhosts; `offload-tunnel.service` on delphi carries frieren's loopback ports back here until frieren is
+  rebuilt with proxy targets that name delphi's tailnet address. Deleting the tunnel file is the last step.
+- **Evidence:** `checks:host HOST=delphi` 1945 assertions rc=0; state migrated by
+  `scripts/task/offload-migrate.sh` (flock, manifest, `integrity_check`, row-count match, health URL), run
+  twice to show the second run is a no-op; the shelter copy verified under `/srv/backup/offload`.
+
 ### 2026-11-02 — Ryoku leaves the pilot: a desktop tier ladder
 - **Three regimes, one cutoff each.** Ryoku is the high-end tier — **poseidon, eisen, fern**, with fern the
   floor; Dux (`globalModulesNixos`, DMS + greetd) stays the medium tier — aristotle, stark; `profiles.dwlDesktop`

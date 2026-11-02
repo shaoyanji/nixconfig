@@ -4040,7 +4040,7 @@
       status = "OPEN";
       priority = "P3";
       date = "2026-10-21";
-      summary = "frieren's persistent footprint is small and named; stirling-pdf moves (stateless), hermes waits on a cutover, and paperless plus immich stay by operator decision — their data and their family users live there.";
+      summary = "Compute leaves the NAS and the NAS keeps the name and the copy: stirling (2026-10-21) then paperless, vaultwarden and anki (2026-11-02) now run on delphi behind frieren's vhosts, with a nightly state mirror into its restic window; hermes waits on a bot-token cutover and immich stays because its 1.4 TB is the NAS.";
       refs = {
         hosts = ["frieren" "delphi"];
         modules = ["hosts/frieren/infra-stack.nix" "modules/profiles/service-exposure.nix"];
@@ -4070,9 +4070,37 @@
         needs a cutover decision: one bot token cannot be polled twice, so the
         sequence is copy state, enable on delphi, stop frieren, and measure.
 
+        **Second wave (2026-11-02): paperless, vaultwarden, anki.** The operator
+        overrode "paperless stays", and the override holds: what the first rule
+        protected was the archive and the family's habits, not the laptop. Both
+        survive the move because the *name* and the *copy* stay behind —
+        `docs.frieren.lan`, `vault.frieren.lan` and `anki.frieren.lan` are still
+        frieren's vhosts, and `services.offloadBridge` mirrors every tree to
+        `/srv/backup/offload` at 03:10, inside the window that already carries
+        those copies to BurgerNAS. Paperless' 722 MB is SQLite plus media
+        (no postgres), so the move is a file copy and one consistent snapshot;
+        anki held 430 MiB resident for an empty 4 KB store and a placeholder
+        account, which makes it the best ratio in the fleet. delphi's aarch64
+        answer is 20 derivations that no substituter carries, and the wall clock
+        was **~41 min on 2 OCPU**: the packages are Python installs, but spacy
+        drags in thinc/blis and those compile C++ (cc1plus observed at 97 % for
+        most of a quarter hour). It finished; a Rust or LLVM closure would not
+        have. One dependency (`wandb`) failed its own test suite on aarch64 and
+        is built with checks off through paperless' `extraPythonPackageOverrides`.
+
+        **What is left, and why it is honest.** The tunnel in
+        `hosts/delphi/offload-tunnel.nix` carries frieren's loopback ports here
+        until frieren is rebuilt with the vhosts pointing at delphi's tailnet
+        address; deleting it is the last step of the move, not a follow-up idea.
+        The dependency that remains is one the move cannot remove: a name that
+        lives on frieren needs frieren's nginx. hermes is still the last unit,
+        and still only with an agreed window.
+
         **Exit.** Each moved unit is gone from frieren's system.slice, serves from
         delphi over the tailnet, and `systemctl show -p MemoryCurrent` on frieren
-        shows the release. hermes is the last one, and only with an agreed window.
+        shows the release; the shelter copy is present under
+        `/srv/backup/offload` and inside a restic snapshot; and the tunnel file is
+        deleted after the frieren rebuild.
       '';
     };
     exp-114 = {

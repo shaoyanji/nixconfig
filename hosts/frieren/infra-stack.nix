@@ -446,7 +446,7 @@ in {
     ../../modules/services/uds-static-bridge.nix
     ../../modules/services/ups-simulation-drill.nix
     ../../modules/services/sqlite-maintenance.nix
-    ../../modules/services/paperless-watchdog.nix
+    # paperless-watchdog followed paperless to delphi (hosts/delphi/configuration.nix)
     ../../modules/services/kiwix-watchdog.nix
     ../../modules/services/postgres-pgvector-audit.nix
     ../../modules/services/fleet-session-reaper.nix
@@ -559,8 +559,11 @@ in {
         conditions = ["[STATUS] < 400"];
       }
       {
-        name = "paperless";
-        url = "http://127.0.0.1:28981";
+        # Paperless moved to delphi; the monitor follows the service over the
+        # tailnet instead of this host's loopback. Green here now means "frieren
+        # can reach delphi", which is exactly what the vhost depends on.
+        name = "paperless (delphi)";
+        url = "http://100.123.145.53:28981";
         group = "frieren";
         conditions = ["[STATUS] < 400"];
       }
@@ -627,21 +630,19 @@ in {
   # not a wildcard.
   services.influxdb2.settings.http-bind-address = "127.0.0.1:8086";
 
-  # --- Vaultwarden (Bitwarden Compatible Password & TOTP Vault) ---
-  services.vaultwarden = {
-    enable = true;
-    config = {
-      ROCKET_ADDRESS = "127.0.0.1";
-      ROCKET_PORT = 8222;
-      # Declared rather than defaulted: the reverse proxy interpolates this value
-      # (vault.frieren.lan /notifications/hub), and before this line :3012 existed
-      # exactly once in the tree — inside the nginx config, as a literal.
-      WEBSOCKET_PORT = 3012;
-      DOMAIN = "http://vault.frieren.lan";
-      SIGNUPS_ALLOWED = true;
-    };
-    backupDir = "/srv/backup/vaultwarden";
-  };
+  # --- Vaultwarden: offloaded to delphi 2026-11-02 ----------------------------
+  # The vault now runs on delphi (hosts/delphi/vaultwarden.nix) behind this
+  # host's `vault.frieren.lan` vhost. Kept as a note rather than an option: the
+  # module is one block to restore, `DOMAIN` must stay identical for enrolled
+  # passkeys, and the live data arrives from /srv/backup/offload/vaultwarden.
+  #
+  #   services.vaultwarden = {
+  #     enable = true;
+  #     config = { ROCKET_ADDRESS = "127.0.0.1"; ROCKET_PORT = 8222;
+  #                WEBSOCKET_PORT = 3012; DOMAIN = "http://vault.frieren.lan";
+  #                SIGNUPS_ALLOWED = true; };
+  #     backupDir = "/srv/backup/vaultwarden";
+  #   };
 
   # --- PostgreSQL daily pg_dump for Immich & Paperless ---
   systemd.tmpfiles.rules = [
@@ -688,6 +689,11 @@ in {
       # Pushed from delphi at 03:05 and shipped by this snapshot 25 min later:
       # the turn store has no other copy, and it is the fleet's shared memory.
       "/srv/backup/agent-turns"
+      # The live copies of the services that moved to delphi: paperless, the
+      # vault and anki, pushed at 03:10 by services.offloadBridge there. The
+      # trees above still hold the pre-move state, which is what a switch-back
+      # restores from — keeping both is the point.
+      "/srv/backup/offload"
     ];
     # NOTE: /var/lib/postgresql intentionally excluded — see header.
     timerConfig = {
@@ -725,6 +731,7 @@ in {
       "/srv/private/home-assistant"
       "/srv/private/zigbee2mqtt"
       "/srv/backup/agent-turns"
+      "/srv/backup/offload"
     ];
     timerConfig = {
       OnCalendar = "*-*-* 03:28:00";
@@ -1020,8 +1027,8 @@ in {
   # Declarative SQLite WAL checkpoint & integrity dispatcher (Consolidated into fleetGovernor)
   services.sqliteMaintenance.enable = false;
 
-  # Declarative Paperless-ngx document ingestion watchdog (Consolidated into fleetGovernor)
-  services.paperlessWatchdog.enable = false;
+  # Paperless' ingestion watchdog moved with the service to delphi
+  # (hosts/delphi/configuration.nix); there is nothing here left to probe.
 
   # Declarative Kiwix offline library integrity & search probe (Consolidated into fleetGovernor)
   services.kiwixWatchdog.enable = false;

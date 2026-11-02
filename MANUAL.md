@@ -60,13 +60,13 @@
 | Plex | `plex` | 32400 | `plex.frieren.lan`* |
 | Audiobookshelf | `audiobookshelf` | 13378 | `audiobooks.frieren.lan`* |
 | Immich | `immich-server`, `immich-machine-learning`, `redis-immich` | 2283 | `photos.frieren.lan`* |
-| Paperless-ngx | `paperless-web`, `-consumer`, `-scheduler`, `-task-queue`, `redis-paperless` | 28981 | `docs.frieren.lan`* |
-| Gotenberg / Tika | `gotenberg`, `tika` | loopback | Paperless helpers |
+| Paperless-ngx | `paperless-web`, `-consumer`, `-scheduler`, `-task-queue` on **delphi** | 28981 tailnet | `docs.frieren.lan`* (moved off frieren 2026-11-02; frieren keeps the vhost and the shelter copy) |
+| Gotenberg / Tika | `gotenberg`, `tika` on **delphi** | loopback | Paperless helpers, now beside paperless |
 | Stirling PDF | `stirling-pdf` on **delphi** | 7351 loopback / 8445 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8445` (moved off frieren 2026-10-21; `pdf.frieren.lan` no longer serves it) |
 | *arr stack | `sonarr`, `radarr`, `lidarr`, `readarr`, `prowlarr` | 8989/7878/8686/8787/9696 | LAN, library hygiene |
 | Transmission | `transmission` | 9091 loopback | `torrent.frieren.lan`* (leech-only) |
 | aria2 | `aria2` | 6800/6801 loopback | `aria.frieren.lan`* |
-| Anki sync | `anki-sync-server` | 27701 | `anki.frieren.lan`* |
+| Anki sync | `anki-sync-server` on **delphi** | 27701 tailnet | `anki.frieren.lan`* (moved 2026-11-02; was `anki.frieren.lan:27701`) |
 
 ### Knowledge, automation, fleet
 
@@ -80,7 +80,7 @@
 | Fleet sentinel | `fleet-sentinel.timer` | via nginx | `sentinel.frieren.lan`* → `/sentinel/` |
 | Pastebin | `nginx` + `/var/lib/paste` | 80 | `paste.frieren.lan`* |
 | iVentoy (PXE/ISO) | `iventoy` | 26000, 10809 | `pxe.frieren.lan`* |
-| Vaultwarden | `vaultwarden` | 8222 loopback | `vault.frieren.lan`* |
+| Vaultwarden | `vaultwarden` on **delphi** | 8222 + 3012 tailnet | `vault.frieren.lan`* (moved 2026-11-02; DOMAIN unchanged so passkeys survive) |
 | SimpleX SMP relay | `smp-server` | 5223/5225/5226 | inter-agent messaging |
 | Atuin history sync | `atuin` | 8888 loopback | `atuin.frieren.lan`*; one account, sign-ups closed [[flake/policies.nix#history-sync-is-one-server]] |
 | Ollama | `ollama` | 11434 | local inference (if enabled) |

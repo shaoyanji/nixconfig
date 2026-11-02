@@ -1150,16 +1150,34 @@ in {
           # The vault is a repo, not a directory: an earlier version only
           # mkdir'd this path, so a reseeded host came up with an empty vault
           # and every note was "missing" until someone cloned it by hand
-          # (delphi 2026-10-26). Clone it when it is absent, and — the part that
-          # was missing — fast-forward it when it is already there, so a seed is
-          # a sync and not just a first-run clone.
+          # (delphi 2026-10-26). Clone it when it is absent, and fast-forward it
+          # when it is behind — a seed is a sync, not just a first-run clone —
+          # while a current vault is left with .git byte-identical.
           VAULT="$HOME/vaults/personal"
           VAULT_REPO=shaoyanji/Obsidian-Git-Sync
           if [ -d "$VAULT/.git" ]; then
-            echo "--> $VAULT already exists. Fast-forwarding from $VAULT_REPO..."
-            git -C "$VAULT" config url."https://github.com/".insteadOf "git@github.com:"
-            git -C "$VAULT" pull --ff-only --quiet ||
-              echo "--> vault pull did not fast-forward (local commits or dirty tree); left as-is" >&2
+            # `git config` rewrites .git/config even when the value already
+            # matches, so the rewrite is only written when it is absent.
+            if [ "$(git -C "$VAULT" config --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
+              git -C "$VAULT" config url."https://github.com/".insteadOf "git@github.com:"
+            fi
+            branch=$(git -C "$VAULT" branch --show-current)
+            here=$(git -C "$VAULT" rev-parse HEAD)
+            # ls-remote only reads: no FETCH_HEAD, ORIG_HEAD or config is
+            # written. Counting commits behind would need the objects a fetch
+            # writes, so drift is reported as the two revisions.
+            there=$(git -C "$VAULT" ls-remote origin "refs/heads/$branch" 2>/dev/null | cut -f1)
+            if [ -z "$branch" ]; then
+              echo "--> $VAULT has no branch checked out (detached HEAD); left as-is" >&2
+            elif [ -z "$there" ]; then
+              echo "--> could not read $VAULT_REPO ($branch) to compare; $VAULT left as-is" >&2
+            elif [ "$here" = "$there" ]; then
+              echo "--> $VAULT is current at $(printf '%.8s' "$here") ($branch)"
+            else
+              echo "--> $VAULT drifted: local $(printf '%.8s' "$here") -> remote $(printf '%.8s' "$there"); fast-forwarding"
+              git -C "$VAULT" pull --ff-only --quiet ||
+                echo "--> vault pull did not fast-forward (local commits or dirty tree); left as-is" >&2
+            fi
           elif [ -d "$VAULT" ] && [ -n "$(ls -A "$VAULT" 2>/dev/null)" ]; then
             # Never clone over notes. This happens when the old mkdir-only path
             # (or Obsidian itself, pointed here by nixoshmsymlinks) left files

@@ -257,6 +257,7 @@
 in {
   imports = [
     ./anki-sync.nix
+    ./email-archive.nix
     ./gemini.nix
     ./gok-artifacts.nix
     ./hardware-configuration.nix
@@ -974,6 +975,13 @@ in {
         title = "Uptime Kuma";
         description = "External fleet and home WAN status monitor.";
         requires = ["uptime-kuma.service"];
+      };
+      email-archive = {
+        port = 8450;
+        upstream = "http://127.0.0.1:8080";
+        title = "Email archive";
+        description = "NpgsqlRest over the mail archive: full-text search, uploads, file-system handlers.";
+        requires = ["npgsqlrest.service"];
       };
       # Machine-facing: POST /v1/events and GET /v1/events, bearer token, no
       # browsing surface, so no card on the tailnet page.

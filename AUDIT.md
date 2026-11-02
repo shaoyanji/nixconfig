@@ -28,6 +28,23 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-02 — email archive: NpgsqlRest over PostgreSQL on delphi, tailnet-only
+- **The SQL file is the API.** `modules/services/email-archive.nix` packages the v3.21.0 NativeAOT
+  `npgsqlrest-linux-arm64` binary (fetchurl + autoPatchelf; no .NET runtime, no container), enables
+  PostgreSQL with database `email_archive` and role `npgsqlrest`, and binds loopback `:8080` behind a
+  `tailscale serve` mount on **8450** with a portal card. `email-archive-db-init` re-asserts the role
+  password from a sops credential, sets database ownership (not `ensureDBOwnership` — that only accepts a
+  database named after the role), then applies `email-archive.sql` **as the role over TCP**, so a bad
+  `pg_hba` line fails activation instead of the API. Table CRUD was removed upstream in 3.14, so the
+  endpoints are three annotated files under `email-archive-endpoints/`.
+- **Config keys the examples get wrong.** Uploads are `NpgsqlRest.UploadOptions.UploadHandlers.FileSystemPath`
+  (+ `UploadOptions.Enabled`, `FileSystemUseUniqueFileName`), not `NpgsqlRest.FileSystemPath`; the password
+  rides the shipped `{!PGPASSWORD}` placeholder with `AddEnvironmentVariables=false`.
+- **Evidence:** `checks:host HOST=delphi` rc=0; `/health` 200 with the database check; `GET
+  /api/list-emails?lim=2` and `GET /api/emails-search?q=invoice` 200 against an inserted row, through the
+  tailnet name on `:8450`; `emails_search_idx` GIN present. Mirror is declared but off until a token
+  exists: `docs/email-archive.md`.
+
 ### 2026-11-02 — the mail sweep decides by rule; needle3 keeps only tool calling
 - **A label is a decision, not a tool call.** `mail-agent-sort-tools.json` asked needle3 for a keep/archive
   *classification*. A ten-item labelled battery scored needle3, julia-1 and laya at **3/10 each** (nine of

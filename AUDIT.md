@@ -1,15 +1,14 @@
 # AUDIT — current state and change ledger
 
 > Newest first. One entry per landed change: what, where, evidence. Entries older
-> than the current day are archived in
-> [`docs/history/audit-2026-10.md`](docs/history/audit-2026-10.md); design rationale
-> lives in [`AGENTS.nix`](AGENTS.nix) (`task ops:notes`).
-> Budget: 150 lines (`.agents/SCHEMA.md` §2).
+> than the current day roll into `docs/history/audit-<YYYY-MM>.md`; design
+> rationale lives in [`AGENTS.nix`](AGENTS.nix) (`task ops:notes`). Budget: 150
+> lines (`.agents/SCHEMA.md` §2).
 
 ## Current state (2026-10-27)
 
-Rows carrying a command were re-measured 2026-10-27 with it. The live-system rows
-(observation, knowledge, backups, DNS, tailnet) were last confirmed 2026-10-20.
+Rows with a command were re-measured 2026-10-27; live-system rows (observation,
+knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 
 | Area | State | Evidence |
 | :--- | :--- | :--- |
@@ -29,57 +28,39 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
 
 ## Ledger
 ### 2026-11-02 — the fleet's public cache: R2 behind a GET-only Worker, as a buffer
-- **Third tier, not a replacement.** `harmonia` stays the LAN cache and `cachix` the 5 GB WAN cache;
+- **Third tier, not a replacement.** `harmonia` stays the LAN cache and `cachix` the 5 GB WAN one;
   delphi adds a 10 GiB R2 bucket served by `modules/services/nix-cache-edge/` at
-  `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`, generated once into
-  `secrets.yaml`). It is registered immediately after `cachix` in `lib/cache-registry.nix`,
-  `lib/cache-policy.nix` and `flake.nix`, and `checks:flake:cache` proves the copy agrees.
-- **A buffer means dedupe first — against the whole registry.** `dev:nixcache:push` asks every
-  non-LAN cache in `lib/cache-registry.nix` (cachix, the bucket, nixos, numtide, nix-community,
-  nix-gaming, determinate), one HEAD per path, and uploads only what none of them has. Measured over
-  delphi's **2728-path / 18.48 GiB** system closure: 2158 on nixos, 167 on cachix, 11 on
-  nix-community, **27 on `cache.numtide.com` for 1.40 GiB** (the llm-agents tools — `dsh` 685 MiB,
-  `antigravity-cli` 256 MiB, `hermes-agent` 193 MiB, `freebuff` 130 MiB), leaving **365 paths /
-  771 MiB** unique. With the old hardcoded triple the same push uploaded 2.39 GiB; the report now
-  prints per-cache hit counts and the five largest survivors, and refuses before writing when the
-  total would cross `BUDGET_GIB` (a single path larger than the whole budget is named as such).
-- **A closure is never stored, a delta is.** That measurement is the answer to "a system closure is
-  18 GiB": 10 GiB holds ~13 systems at 771 MiB each, and a client gets the toplevel from the edge and
-  the references from whichever cache has them. The edge is therefore not self-contained — a host
-  substitutes a system only with the rest of the registry configured.
-- **Retention: a collector by size, a backstop by age.** `dev:nixcache:gc` is cachix's shape (delete
-  the oldest until under 75 % of the budget, 50 paths per run, always a narinfo with its nar), and the
-  R2 lifecycle `expire-buffer` is set to **365 days**, not cachix's 90: upload age is a proxy, since
-  `Cache-Control: immutable` means Cloudflare answers repeats and the origin only sees misses, so a
-  short rule deletes by calendar rather than by need.
-- **The edge never signs.** narinfo is signed by the pusher (`secret-key=` on a `file://` staging
-  cache) and uploaded with rclone; the Worker has one R2 binding and cannot write.
-- **Four traps, all measured.** `nix copy` is recursive by default; `--no-recursive` alone is refused
-  because a binary cache wants its references valid (stubs satisfy it and are never uploaded);
-  `nix copy --to s3://` against a freshly recreated bucket exits 0 having written nothing;
-  `rclone purge` deletes the bucket itself. A client that saw a 404 before the push keeps saying
-  "not a valid path" until `--refresh`.
-- **Evidence:** `checks:nixcache:probe` green on the live URL (info fields, HEAD, 404 miss, 405 write,
-  signed narinfo); `nix path-info --store <edge> <path>` accepts the signature; `dev:nixcache:size`
-  reports 0.00/10 GiB. docs/nix-cache-edge.md.
+  `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`), registered after `cachix` in
+  `lib/cache-registry.nix`, `lib/cache-policy.nix` and `flake.nix` (`checks:flake:cache` proves it).
+- **The bucket holds a delta, never a closure.** `dev:nixcache:push` HEADs every path against every
+  non-LAN registry cache first: delphi's 2728-path / 18.48 GiB system closure leaves **365 paths /
+  771 MiB** unique (2158 nixos, 167 cachix, 11 nix-community, **27 / 1.40 GiB numtide** — the llm-agents
+  tools), so 10 GiB holds ~13 systems. Over `BUDGET_GIB` it refuses before writing and prints the five
+  largest survivors.
+- **The edge never signs.** narinfo is signed by the pusher (`secret-key=` on a `file://` staging cache)
+  and moved with rclone; the Worker reads, so every trap is the pusher's: `nix copy` is recursive by
+  default, `--no-recursive` needs valid references (stubs satisfy it, never uploaded), `--to s3://` wrote
+  nothing against a fresh bucket and exited 0, `rclone purge` deletes the bucket.
+- **Size collects, age only expires.** `dev:nixcache:gc` deletes the oldest until under 75 % of the
+  budget; the lifecycle rule is a 365-day backstop that `deploy` reconciles. gc is not scheduled yet.
+- **Evidence:** `checks:nixcache:probe` green (info, HEAD, 404, 405, signed narinfo); `nix path-info
+  --store <edge> <path>` accepts the signature; `dev:nixcache:check` 17/17. docs/nix-cache-edge.md.
 
 ### 2026-11-02 — email archive: NpgsqlRest over PostgreSQL on delphi, tailnet-only
 - **The SQL file is the API.** `modules/services/email-archive.nix` packages the v3.21.0 NativeAOT
-  `npgsqlrest-linux-arm64` binary (fetchurl + autoPatchelf; no .NET runtime, no container), enables
-  PostgreSQL with database `email_archive` and role `npgsqlrest`, and binds loopback `:8080` behind a
-  `tailscale serve` mount on **8450** with a portal card. `email-archive-db-init` re-asserts the role
-  password from a sops credential, sets database ownership (not `ensureDBOwnership` — that only accepts a
-  database named after the role), then applies `email-archive.sql` **as the role over TCP**, so a bad
-  `pg_hba` line fails activation instead of the API. Table CRUD was removed upstream in 3.14, so the
-  endpoints are three annotated files under `email-archive-endpoints/`.
-- **Config keys the examples get wrong.** Uploads are `NpgsqlRest.UploadOptions.UploadHandlers.FileSystemPath`
-  (+ `UploadOptions.Enabled`, `FileSystemUseUniqueFileName`), not `NpgsqlRest.FileSystemPath`; the password
-  rides the shipped `{!PGPASSWORD}` placeholder with `AddEnvironmentVariables=false`.
-- **Evidence:** `checks:host HOST=delphi` rc=0; `/health` 200 with the database check; `GET
-  /api/list-emails?lim=2` and `GET /api/emails-search?q=invoice` 200 against an inserted row, through the
-  tailnet name on `:8450`; `emails_search_idx` GIN present. The mirror reuses the calendar's rule rather
-  than a second credential: `ConditionPathExists` on the service user's `rclone.conf`, timer on from boot,
-  unit skipped until it exists: `docs/email-archive.md`.
+  `npgsqlrest-linux-arm64` binary (fetchurl + autoPatchelf, no .NET runtime), enables PostgreSQL with
+  database `email_archive` and role `npgsqlrest`, and binds loopback `:8080` behind a `tailscale serve`
+  mount on **8450**. `email-archive-db-init` re-asserts the role password from sops, sets database
+  ownership itself (`ensureDBOwnership` only accepts a role-named database), then applies
+  `email-archive.sql` **as the role over TCP**, so a bad `pg_hba` fails activation. Table CRUD left
+  upstream in 3.14, hence the three annotated files under `email-archive-endpoints/`.
+- **Two keys the examples get wrong.** Uploads are
+  `NpgsqlRest.UploadOptions.UploadHandlers.FileSystemPath` (+ `UploadOptions.Enabled`,
+  `FileSystemUseUniqueFileName`), not `NpgsqlRest.FileSystemPath`; the password rides the shipped
+  `{!PGPASSWORD}` placeholder with `AddEnvironmentVariables=false`.
+- **Evidence:** `checks:host HOST=delphi` rc=0; `/health` 200; `api/list-emails` and `api/emails-search`
+  200 through the tailnet name on `:8450`; `emails_search_idx` GIN present. The mirror reuses the
+  calendar's `ConditionPathExists` rule rather than a second credential. `docs/email-archive.md`.
 
 ### 2026-11-02 — the mail sweep decides by rule; needle3 keeps only tool calling
 - **A label is a decision, not a tool call.** `mail-agent-sort-tools.json` asked needle3 for a keep/archive
@@ -87,133 +68,70 @@ Rows carrying a command were re-measured 2026-10-27 with it. The live-system row
   ten archive; Go City wrong in the other direction at 0.71/0.84), so the schema is deleted and the sweep
   archives on `BULK_*` + `PROTECTED` + `sweep.trustedSenders` alone; `minConfidence` and `--min-confidence`
   went with it. `hosts/delphi/needle-tools.json` no longer forces a note-kind classification either.
-- **Evidence:** `mail-agent --self-test` 10/11 (dispatch unchanged), `mail-agent --sweep` prints `ARCHIVE` /
-  `held … sender not in sweep.trustedSenders` with no model call, `checks:host HOST=delphi` green.
-  Design: `docs/mail-agent.md`, `AGENTS.nix` exp-128.
+- **Evidence:** `mail-agent --self-test` 10/11 (dispatch unchanged), `mail-agent --sweep` prints `ARCHIVE`
+  / `held … sender not in sweep.trustedSenders` with no model call, `checks:host HOST=delphi` green
+  (`docs/mail-agent.md`, `AGENTS.nix` exp-128).
 
 ### 2026-11-02 — mail-agent: Needle 3 routes mail commands on delphi
 - **A sentence in, a himalaya action out.** `mail-agent` (module, harness and tool schemas under
   `modules/services/`) dispatches `search_mail` / `archive_mail` / `mark_read` with the needle3 binary
-  delphi already ran for repo routing; a 06:30 systemd user timer sweeps bulk mail. Engine and weights now
-  live in `modules/scripts/needle-model.nix`, one hash for both consumers. Design: `docs/mail-agent.md`.
-- **Measured, then designed.** Routing battery 10/11 (`mail-agent --self-test`); a `trash_mail` tool was
-  never selected, so delete was removed from the schema instead of gated; a dry run over the real inbox
-  approved a Dropbox "connected a new app" and a GitHub "new SSH key" at 0.22–0.47, so the sweep archives
-  only from `sweep.trustedSenders` and holds everything else with a printed reason.
-- **Evidence.** The unit ran 2.6 s / 86 MB peak and archived 7; all seven left the inbox, one was restored
-  from All Mail on demand. Audit log `~/.local/state/mail-agent/audit.jsonl` records `message-id`, because
-  Gmail reassigns uids per mailbox (310172 in INBOX, 621165 in All Mail). 0 failed units on delphi.
+  delphi already ran for repo routing; a 06:30 systemd user timer sweeps bulk mail. Engine and weights
+  live in `modules/scripts/needle-model.nix`, one hash for both consumers.
+- **Measured, then designed.** Routing battery 10/11; a `trash_mail` tool was never selected, so delete
+  left the schema instead of gaining a gate; a dry run over the real inbox approved a Dropbox "connected
+  a new app" and a GitHub "new SSH key" at 0.22–0.47, so the sweep archives only from
+  `sweep.trustedSenders` and holds the rest with a printed reason.
+- **Evidence.** The unit ran 2.6 s / 86 MB and archived 7, all of which left the inbox (one restored from
+  All Mail on demand). `~/.local/state/mail-agent/audit.jsonl` records `message-id`, because Gmail
+  reassigns uids per mailbox (310172 in INBOX, 621165 in All Mail); 0 failed units on delphi.
 
 ### 2026-11-02 — paperless, vaultwarden and anki move off the NAS; the NAS becomes the shelter
-- **The shape of an offload is now a module, not a memory.** `services.offloadBridge`
-  (`modules/services/offload-bridge.nix`) declares what a moved service still owes the NAS: a nightly
-  mirror of every tree to `/srv/backup/offload` with each SQLite database replaced by a `sqlite3 .backup`
-  snapshot (a WAL-mode `db.sqlite3` rsync'd beside a stale `-wal` restores into a service that starts and
-  answers wrong), an ingest pull for the drop folder the service no longer hosts, and the stop/verify facts
-  a cutover needs. `docs/service-offload.md` is the ladder and the procedure.
+- **The shape of an offload is now a module.** `services.offloadBridge` declares what a moved service
+  still owes the NAS: a nightly mirror to `/srv/backup/offload` with each SQLite database replaced by a
+  `sqlite3 .backup` snapshot (a WAL-mode `db.sqlite3` rsync'd beside a stale `-wal` restores into a
+  service that answers wrong), an ingest pull for the drop folder, and the cutover facts.
+  `docs/service-offload.md` is the procedure.
 - **Measured before moving.** paperless ~520 MiB RSS across four units plus tika and gotenberg, 722 MB of
-  SQLite + media and **no postgres** (the DB is SQLite) — so the move is a file copy plus one consistent
-  dump. vaultwarden 36 MiB / 4.2 MB, `DOMAIN` unchanged so enrolled passkeys survive. anki-sync-server held
-  **430 MiB resident for a 4 KB empty store**: the best ratio in the fleet. Its placeholder account was
-  plaintext `bob`/`password` in the Nix store; it now reads a 32-character password from sops via
-  `passwordFile` (a systemd credential, so no value reaches the store). Proved on the live server:
-  `/sync/hostKey` returns an hkey (200) for the sops password and 403 for `password`.
-- **delphi is the only host that built.** paperless needed 20 derivations no substituter carries on aarch64
-  plus 559 MiB fetched: **~41 min of wall clock on 2 OCPU**, because spacy pulls thinc/blis and those compile
-  C++. `wandb` also failed its own suite on this arch and is built with checks off via paperless'
-  `extraPythonPackageOverrides` — an overlay that redefines `python3` recurses forever instead. The target
-  uses the shared `modules/services/paperless-fork.nix` (moved out of `hosts/frieren/`), because upstream's
-  module re-applies a tesseract narrowing on every definition and that would have compiled tesseract too.
-  Nothing was compiled on frieren; its config evaluates to a toplevel drvPath (81 s / 4.8 GiB) and is
-  unapplied by design.
-- **The names stayed.** `docs.frieren.lan`, `vault.frieren.lan` and `anki.frieren.lan` are still frieren's
-  vhosts, now proxying delphi's tailnet address directly. Frieren was deployed (2026-11-02) and the
-  transitional `offload-tunnel` on delphi is deleted, so the move no longer depends on a live ssh session.
+  SQLite + media and no postgres — a file copy plus one consistent dump. vaultwarden 36 MiB / 4.2 MB,
+  `DOMAIN` unchanged so passkeys survive. anki-sync-server held **430 MiB resident for a 4 KB empty
+  store**; its placeholder account was plaintext `bob`/`password` in the store, now a 32-character sops
+  password via `passwordFile` (a systemd credential), proved on the live server: `/sync/hostKey` returns
+  an hkey for the sops password and 403 for `password`.
+- **delphi is the only host that built.** paperless needed 20 derivations no substituter carries on
+  aarch64 plus 559 MiB fetched: **~41 min on 2 OCPU**, because spacy pulls thinc/blis and those compile
+  C++. `wandb` fails its own suite on this arch and is built with checks off via paperless'
+  `extraPythonPackageOverrides`; the shared `modules/services/paperless-fork.nix` avoids upstream's
+  tesseract narrowing, re-applied on every definition. Nothing compiled on frieren: its config evaluates
+  to a toplevel drvPath (81 s / 4.8 GiB) and is unapplied by design.
+- **The names stayed.** `docs.frieren.lan`, `vault.frieren.lan` and `anki.frieren.lan` are still
+  frieren's vhosts, now proxying delphi's tailnet address; frieren was deployed (2026-11-02), and
+  `offload-tunnel` is gone.
 - **Evidence:** `checks:host HOST=delphi` 1947 assertions rc=0; state migrated by
-  `scripts/task/offload-migrate.sh` (flock, manifest, `integrity_check`, row-count match, health URL), run
-  twice to show the second run is a no-op; the shelter copy verified under `/srv/backup/offload`.
+  `scripts/task/offload-migrate.sh` (flock, manifest, `integrity_check`, row-count match, health URL),
+  run twice to show the second is a no-op; the shelter copy verified under `/srv/backup/offload`.
 
 ### 2026-11-02 — Ryoku leaves the pilot: a desktop tier ladder
-- **Three regimes, one cutoff each.** Ryoku is the high-end tier — **poseidon, eisen, fern**, with fern the
-  floor; Dux (`globalModulesNixos`, DMS + greetd) stays the medium tier — aristotle, stark; `profiles.dwlDesktop`
-  stays the low end — scratch, netbook, with scratch the ceiling. The ladder is recorded in
-  `inventory.toml` (`desktop_environment` + `module_chain`), which is the only place it is written down.
-- **The chain swap is the whole change.** `globalModulesRyoku` carries `inputs.ryoku` and no dms/dank-greeter,
-  and both hosts import `ryoku-desktop.nix` in place of `base-desktop-environment.nix`. Not alongside it:
-  that profile `mkForce`s `xdg.portal.config.niri` to the GTK backend, so keeping both would silently take
-  portals away from the shell that owns them, on top of two shells in one session.
-- **`sddm.enable = false` was the trap.** Ryoku turns SDDM on with `mkDefault`, so an explicit `false` (left
-  over from the DMS-greeter era, where greetd was the DM) wins and the host boots to no display manager at
-  all. Both blocks are gone; the module owns the greeter and its theme now.
-- **Ryoku pins its session at priority 900** (`ryoku-niri`). poseidon keeps its old flow — autologin into
-  niri; eisen keeps its console behaviour with `lib.mkForce "steam"`, because a plain definition loses.
-- **`deck-session-switch` restarted greetd only**, so switching back to Gamescope would have become a no-op
-  on an SDDM host. It now restarts whichever of greetd/sddm is active (stark keeps greetd).
-- **Evidence:** module system + assertions green on every touched host — `checks:host MODE=eval HOST=eisen`
-  2019 assertions rc=0 (152 s / 2643 MiB), `poseidon` 2014 rc=0 (307 s / 2668 MiB), `stark` 2002 rc=0 (the
-  shared steam profile), `fern` 1979 rc=0 (67 s); `inventory-schema`, `inventory-hosts`, `inventory-modules` build
-  clean. Behaviour read back by leaf eval: eisen `{ryoku, sddm, theme="ryoku", session="steam", autologin}`,
-  poseidon identical with `session="ryoku-niri"`, fern `session="ryoku-niri", autologin=false`. Build mode
-  was not used: on frieren under load it aborted at io pressure 60.9 % after 540 s, and MODE=eval is the
-  same evaluation without substituting a closure.
-- **Not done:** no host was switched — these are configs; `infra:deploy:host:<host>` is the operator's call.
-
-### 2026-11-01 — the canary is a runbook sandbox, not a second frieren
-- **Stripped to what a runbook needs.** `hosts/microvms/frieren-canary.nix` lost the SubZeroClaw
-  derivation, its activation-time config seeding and `canary-dummy-api`. What remains is `base.nix`
-  plus a login, a tool set and a volume for `/var`; the evaluated unit set is base plumbing + `sshd`
-  (`nix eval …config.systemd.services`, 1.64 s / 242 MiB — no `canary-dummy-api`).
-- **The route went with the API.** frieren's `/canary/` location, the `canary.frieren.lan` vhost and
-  the `/eisen/` proxies on frieren and eisen were EXP-102 dogfooding; `curl 127.0.0.1/canary/` had
-  been answering `504` whenever the guest was down, which is its normal state. `vm:canary:agent`
-  went with the harness it drove.
-- **It cannot be left running.** `vm:canary:run` still boots a transient unit, now with
-  `RuntimeMaxSec` (`LIFETIME`, default `2h`) and the cap printed, so an abandoned sandbox stops
-  instead of holding 2 GiB of an 8 GiB NAS. `vm:canary:test` asserts the sandbox (hostname, declared
-  address, tool set, writable `/var`) and then that no hypervisor or tap survives.
-- Evidence: the eval above; `task checks:host HOST=frieren` 19.1 s rc=0, `HOST=eisen` 13.6 s rc=0,
-  `HOST=frieren-canary MODE=eval` 1484 assertions rc=0; `task checks:tasks` 497 tasks, parity exact.
-  Not run: `task vm:canary:test` — it boots an x86_64 guest, so it belongs on frieren, and it builds
-  the new closure there.
-
-### 2026-11-01 — Ryoku landed on fern; dock ethernet declarative; zsh baseline; CPU off the powersave floor
-- **Ryoku is live.** `xb9qmd8c…` is `/run/current-system` on fern (the 2026-10-31 entry recorded the port as
-  undeployed). Presentation-stage `switch-to-configuration` reported 101 from post-restart units only: the
-  `activate-fern` unit, `pipewire` (core-dump in `mod.x11-bell` when X went away at greetd→SDDM) and
-  `tailscale-systray`. The switch itself completed.
-- **Dock ethernet is declarative and works without `ip`.** `dock-ethernet` came up at `192.168.3.249/24`,
-  pinned to `enp4s0f3u1u1i5`, metric 100, proved reachable while Wi-Fi was down. The live generation predates
-  `usbEthernetGateway`, so it installs no default route: `ip route get 1.1.1.1` answered "Network is
-  unreachable" with the dock up and `wlo1` disconnected.
-- **NM does not retry a failed Wi-Fi activation after its own restart.** `wlo1` sat `disconnected` with
-  `Activation: failed for connection 'Obi LAN Kenobi'` and exhausted retries; `nmcli connection up` restored
-  `.23` and the metric-600 default in seconds. The same post-start path runs `nmcli connection up
-  dock-ethernet` for a NIC that is absent at boot — the `No suitable device found … lo` line in the journal.
-- **zsh had no configuration at all.** `~/.zshrc` was a 5-line `zsh-newuser-install` stub on a host whose login
-  shell is zsh, because `modules/shell/zsh.nix` was commented out of the shell baseline and atuin's zsh
-  integration needs `programs.zsh`. Now enabled with 13 aliases and `enableZshIntegration`; `.zshrc` moves
-  aside as `.hm-backup`.
-- **The APU was pinned at its floor.** `power-profiles-daemon` left `acpi-cpufreq` on `powersave` (1396 MHz of
-  2600) on AC with `balanced` selected — `auto-cpufreq` is `mkForce false` on this chain. Measured, 3M-iteration
-  loop: **powersave 0.891 s · schedutil 0.476 s · performance 0.469 s**. `cpuFreqGovernor = "schedutil"` with
-  `cpufreq.after = [power-profiles-daemon.service]` (ppd does not re-apply on restart — verified).
-- **RAM:** the Ryoku shell is `quickshell` at **1512 MiB**, 1677 MiB for the whole desktop set, of 3.4 GiB used.
-- **Deployed: fern is on `14cvlhr8…`** (system and HM), switch exit 0, `systemctl --failed` 0. Live proof:
-  governor `schedutil` at 2591 MHz with the same 3M loop at **0.469 s**; two defaults, dock `.1` metric 100
-  over Wi-Fi's 600; `~/.zshrc` a store symlink carrying atuin and starship; manual `l`/`ls` resolve to eza.
-- **Two deploy-time defects, both fixed in the same generation.** The first switch left **HM failed**: `btop.conf`
-  and `kando/menus.json` are rewritten at runtime, so their second `.hm-backup` collided with the first (moved
-  aside, re-activation green). And `environment.etc."ryoku/phone.json".text` is `types.lines`, so our definition
-  **concatenated** with the one phone.nix always writes (`enabled = cfg.enable`) into a two-object file that would
-  not parse — now `mkForce`, and `/etc/ryoku/phone.json` parses as one object.
-- **Ryoku phone integration, on trial.** `programs.ryoku.phone.enable` cannot evaluate at all: it sets
-  `services.udev.packages = [ ryokuNixpkgs.android-udev-rules ]`, `ryokuNixpkgs` is Ryoku's own pin, and that pin
-  removed the package ("superseded by built-in systemd uaccess rules"). Wired the same four things directly —
-  KDE Connect (ports 1714-1764 open), Avahi, `scrcpy`/`android-tools`/`qt6.qttools` — so the QML's `phone.json`
-  is the only state it needs. `phone.webcam.enable` (v4l2loopback) left off: it collides with the dock's
-  `boot.extraModprobeConfig`.
-- **Gate:** `nix build .#hostChecks.x86_64-linux.fern` rc=0, **1979 assertions** each time (1 m 55 s; cached for
-the `mkForce` rebuild).
+- **Three regimes, one cutoff each.** Ryoku is the high-end tier — **poseidon, eisen, fern** (fern the
+  floor); Dux (`globalModulesNixos`, DMS + greetd) the medium — aristotle, stark; `profiles.dwlDesktop`
+  the low end — scratch, netbook. The ladder lives in `inventory.toml` (`desktop_environment` +
+  `module_chain`) and nowhere else.
+- **The chain swap is the whole change.** `globalModulesRyoku` carries `inputs.ryoku` and no
+  dms/dank-greeter, and both hosts import `ryoku-desktop.nix` in place of
+  `base-desktop-environment.nix` — not alongside it: that profile `mkForce`s `xdg.portal.config.niri` to
+  the GTK backend, so keeping both would strip portals from the shell that owns them.
+- **`sddm.enable = false` was the trap.** Ryoku turns SDDM on with `mkDefault`, so a leftover explicit
+  `false` wins and the host boots to no display manager. Both blocks are gone; the module owns the
+  greeter and its theme.
+- **Ryoku pins its session at priority 900** (`ryoku-niri`); poseidon keeps autologin into niri, eisen
+  keeps `lib.mkForce "steam"`. `deck-session-switch` restarted greetd only — now whichever of
+  greetd/sddm is active (stark keeps greetd).
+- **Evidence:** `checks:host MODE=eval` green on every touched host — eisen 2019 assertions (152 s /
+  2643 MiB), poseidon 2014 (307 s / 2668 MiB), stark 2002, fern 1979 (67 s); `inventory-schema`,
+  `inventory-hosts`, `inventory-modules` build clean. Read back by leaf eval: eisen
+  `{ryoku, sddm, theme="ryoku", session="steam", autologin}`, poseidon identical with
+  `session="ryoku-niri"`, fern `session="ryoku-niri", autologin=false`. Build mode was not used: it
+  aborted at io pressure 60.9 % after 540 s on frieren.
+- **Not done:** no host was switched — `infra:deploy:host:<host>` is the operator's call.
 
 ## Open debt (`task ops:notes`)
 

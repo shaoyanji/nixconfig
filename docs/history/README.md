@@ -5,6 +5,7 @@ Superseded narrative, kept for provenance. **Nothing here is current truth.**
 | File | What it was | Replaced by |
 | :--- | :--- | :--- |
 | `audit-2026-10.md` | The monolithic audit (April–October 2026): AI-module teardown, lint convergence, service extraction, per-host eval history | `AUDIT.md` (current state + ledger) |
+| `audit-2026-11.md` | Ledger entries rolled out of `AUDIT.md`'s 150-line budget (2026-11-01 onward), verbatim | `AUDIT.md` for anything current; the git log for the rest |
 | `todo-2026-10.md` | The long TODO/HANDOFF hybrid: HC-1…HC-8 delivery notes, fleet optimizations, follow-up queues | `TODO.md` + `HANDOFF.md` (bounded queues), `ARCHITECTURE.md` (proposals) |
 | `handoff-2026-10.md` | The 784-line strategic handoff: host disambiguation, audit findings, completed maintenance | `HANDOFF.md` (queue) |
 | `handoff-dsh-remote-2026-10-21.md` | The unfinished remote-harness launcher: what worked, what was unproven | `modules/user/ai/dsh-launcher.nix` (the launcher itself) + the 2026-10-21 `AUDIT.md` entry |
@@ -13,7 +14,8 @@ Rules:
 
 1. Do not link to these files as if they were current. If a fact still matters,
    copy the **rule**, not the narrative, into a living document.
-2. Do not append to them. New history is the git log plus one line in
-   `AUDIT.md`.
+2. Do not append to the closed monoliths above. New history is the git log plus
+   one entry in `AUDIT.md`; an `audit-<YYYY-MM>.md` receives only what leaves
+   `AUDIT.md`'s budget that month, verbatim.
 3. The classification is enforced socially, not by a check: a living document
    that grows without bound is the failure this directory exists to prevent.

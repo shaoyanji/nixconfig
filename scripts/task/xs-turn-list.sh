@@ -20,7 +20,8 @@ repo=${REPO:-}
 subject=${SUBJECT:-}
 source_name=${SOURCE:-}
 claim=${CLAIM:-}
-format=${FORMAT:-table}
+# TOON is the default because the reader is an agent; a person asks for table.
+format=${FORMAT:-toon}
 
 unreadable() {
   printf 'xs-list: %s\n' "$*" >&2
@@ -32,8 +33,8 @@ case $limit in
 esac
 [ "$limit" -ge 1 ] && [ "$limit" -le 200 ] || unreadable "LIMIT must be between 1 and 200: $limit"
 case $format in
-table | json) ;;
-*) unreadable "FORMAT must be table or json: $format" ;;
+table | json | toon) ;;
+*) unreadable "FORMAT must be toon, table or json: $format" ;;
 esac
 
 query=$(jq -rn \
@@ -64,11 +65,11 @@ rendered=$(jq -r -f "$TEMPLATE" --arg subject "$subject" --arg claim "$claim" <<
 
 status=$(printf '%s\n' "$rendered" | sed -n 's/^status\t//p')
 
-if [ "$format" = "json" ]; then
-  jq '.count, .events' <<<"$resp"
-else
-  printf '%s\n' "$rendered" | sed '/^status\t/d'
-fi
+case $format in
+json) jq -c '{count, events}' <<<"$resp" ;;
+toon) jq -c '{count, events}' <<<"$resp" | toon -e ;;
+*) printf '%s\n' "$rendered" | sed '/^status\t/d' ;;
+esac
 
 case $status in
 live) exit 1 ;;

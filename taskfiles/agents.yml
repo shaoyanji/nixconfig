@@ -287,22 +287,22 @@ tasks:
       - bash scripts/task/xs-turn-post.sh
 
   agents:xs:list:
-    desc: "List recent xs turns (REPO, SUBJECT, SOURCE, LIMIT) and flag live claims"
+    desc: "List recent xs turns (REPO, SUBJECT, SOURCE, LIMIT) and flag live claims — TOON, FORMAT=table for a person"
     summary: >
       Reads the log before starting: newest turn first, then the live claims (the
       newest entry per subject that says in_progress), then a verdict. REPO=,
       SUBJECT= and SOURCE= filter; LIMIT= 1-200, default 20; CLAIM='area,file'
-      flags a live entry whose claims overlap yours; FORMAT=json prints the raw
-      events for `toon -e`. Exit 1 = a live claim on SUBJECT or an overlap with
-      CLAIM (stop and report the collision), exit 2 = no auth or the endpoint did
-      not answer.
+      flags a live entry whose claims overlap yours. Output is TOON by default
+      (JSON is the same payload, table is for a person). Exit 1 = a live claim on
+      SUBJECT or an overlap with CLAIM (stop and report the collision), exit 2 =
+      no auth or the endpoint did not answer.
     env:
       REPO: "{{.REPO | default \"\"}}"
       SUBJECT: "{{.SUBJECT | default \"\"}}"
       SOURCE: "{{.SOURCE | default \"\"}}"
       LIMIT: "{{.LIMIT | default \"20\"}}"
       CLAIM: "{{.CLAIM | default \"\"}}"
-      FORMAT: "{{.FORMAT | default \"table\"}}"
+      FORMAT: "{{.FORMAT | default \"toon\"}}"
     cmds:
       - bash scripts/task/xs-turn-list.sh
 

@@ -97,10 +97,13 @@ tasks:
     desc: Deploy canonical modules/config/vimrc to serv00, dragoncourt, and envs
     cmds:
       - |
+        # Transport goes through each shard's push/exec, which own the connection
+        # details (user@host, non-22 ports). A bare hostname here resolved only
+        # while a hand-written ~/.ssh/config alias existed.
         for host in serv00 dragoncourt envs; do
           echo "Syncing vimrc to $host..."
-          scp modules/config/vimrc "$host:~/.vimrc"
-          ssh "$host" "mkdir -p ~/.vim/undo && chmod 700 ~/.vim ~/.vim/undo && chmod 644 ~/.vimrc"
+          task "$host:push" -- modules/config/vimrc .vimrc
+          task "$host:exec" -- 'mkdir -p ~/.vim/undo && chmod 700 ~/.vim ~/.vim/undo && chmod 644 ~/.vimrc'
         done
         echo "✅ Unified vimrc deployed to all 3 remotes."
 

@@ -3,31 +3,37 @@ version: "3"
 vars:
   SERV00_HOST: "s13.serv00.com"
   SERV00_USER: "jisifu"
-  SERV00_ALIAS: "serv00"
+  # ssh destination, not an ssh-config alias: ~/.ssh/config is Home Manager
+  # generated and carries only `Host *`, so an alias would not resolve.
+  SERV00_TARGET: "{{.SERV00_USER}}@{{.SERV00_HOST}}"
   SERV00_PORT: "49613"
   SERV00_DOMAIN: "jisifu.serv00.net"
+  SERV00_DB_HOST: "pgsql13.serv00.com"
+  SERV00_DB_USER: "p6325_thirtythre"
+  SERV00_DB_NAME: "p6325_thirtythre"
+  SERV00_DB_PSQL: "psql -h {{.SERV00_DB_HOST}} -U {{.SERV00_DB_USER}} -d {{.SERV00_DB_NAME}}"
 
 tasks:
   serv00:ssh:
     desc: Open interactive SSH shell into Serv00 FreeBSD host
     cmds:
-      - ssh {{.SERV00_ALIAS}}
+      - ssh {{.SERV00_TARGET}}
 
   serv00:exec:
     desc: Run command on Serv00 via SSH (agent-friendly)
     cmds:
-      - ssh {{.SERV00_ALIAS}} -- {{.CLI_ARGS}}
+      - ssh {{.SERV00_TARGET}} -- {{.CLI_ARGS}}
 
   serv00:devil:
     desc: Run Devil CLI command on Serv00 (e.g. task serv00:devil -- port list)
     cmds:
-      - ssh {{.SERV00_ALIAS}} -- devil {{.CLI_ARGS}}
+      - ssh {{.SERV00_TARGET}} -- devil {{.CLI_ARGS}}
 
   serv00:server:start:
     desc: Start background webserver on port 49613 using FreeBSD daemon
     cmds:
       - |
-        ssh {{.SERV00_ALIAS}} "
+        ssh {{.SERV00_TARGET}} "
           if pgrep -f webserver >/dev/null; then
             echo 'Webserver already running on port {{.SERV00_PORT}} (PID: \$(cat ~/webserver.pid 2>/dev/null)).'
           else
@@ -41,7 +47,7 @@ tasks:
     desc: Stop background webserver on Serv00
     cmds:
       - |
-        ssh {{.SERV00_ALIAS}} "
+        ssh {{.SERV00_TARGET}} "
           if [ -f ~/webserver.pid ]; then
             kill \$(cat ~/webserver.pid 2>/dev/null) 2>/dev/null || true
             rm -f ~/webserver.pid
@@ -66,7 +72,7 @@ tasks:
     cmds:
       - |
         echo "=== Process & Port Status ==="
-        ssh {{.SERV00_ALIAS}} "ps aux | grep [w]ebserver || echo 'Process: NOT RUNNING'"
+        ssh {{.SERV00_TARGET}} "ps aux | grep [w]ebserver || echo 'Process: NOT RUNNING'"
         echo ""
         echo "=== HTTP Health Check (https://{{.SERV00_DOMAIN}}) ==="
         curl -Is https://{{.SERV00_DOMAIN}} | head -n 5
@@ -74,13 +80,13 @@ tasks:
   serv00:server:build:
     desc: Rebuild webserver Go binary on Serv00
     cmds:
-      - ssh {{.SERV00_ALIAS}} "go build -o webserver server.go && ls -lh webserver"
+      - ssh {{.SERV00_TARGET}} "go build -o webserver server.go && ls -lh webserver"
 
   serv00:cron:enable:
     desc: Install crontab keep-alive for webserver on Serv00
     cmds:
       - |
-        ssh {{.SERV00_ALIAS}} "
+        ssh {{.SERV00_TARGET}} "
           crontab -l 2>/dev/null | grep -v 'webserver' > /tmp/cron.tmp || true
           echo '*/5 * * * * pgrep -f webserver >/dev/null || /usr/sbin/daemon -f -r -p /usr/home/{{.SERV00_USER}}/webserver.pid -o /usr/home/{{.SERV00_USER}}/webserver.log /usr/home/{{.SERV00_USER}}/webserver' >> /tmp/cron.tmp
           echo '@reboot /usr/sbin/daemon -f -r -p /usr/home/{{.SERV00_USER}}/webserver.pid -o /usr/home/{{.SERV00_USER}}/webserver.log /usr/home/{{.SERV00_USER}}/webserver' >> /tmp/cron.tmp
@@ -93,7 +99,7 @@ tasks:
     desc: Remove keep-alive cron job from Serv00
     cmds:
       - |
-        ssh {{.SERV00_ALIAS}} "
+        ssh {{.SERV00_TARGET}} "
           crontab -l 2>/dev/null | grep -v 'webserver' > /tmp/cron.tmp || true
           crontab /tmp/cron.tmp && rm -f /tmp/cron.tmp
           echo 'Keep-alive cron job removed.'
@@ -102,12 +108,12 @@ tasks:
   serv00:ports:
     desc: List reserved TCP/UDP ports via devil
     cmds:
-      - ssh {{.SERV00_ALIAS}} "devil port list"
+      - ssh {{.SERV00_TARGET}} "devil port list"
 
   serv00:www:
     desc: List web domains and proxy configurations via devil
     cmds:
-      - ssh {{.SERV00_ALIAS}} "devil www list"
+      - ssh {{.SERV00_TARGET}} "devil www list"
 
   serv00:push:
     desc: Upload file to Serv00 (e.g. task serv00:push -- myfile.html [dest])
@@ -123,8 +129,8 @@ tasks:
         if [ -z "$DEST" ]; then
           DEST="~/"
         fi
-        echo "Pushing $SRC -> {{.SERV00_ALIAS}}:$DEST ..."
-        scp -r "$SRC" "{{.SERV00_ALIAS}}:$DEST"
+        echo "Pushing $SRC -> {{.SERV00_TARGET}}:$DEST ..."
+        scp -r "$SRC" "{{.SERV00_TARGET}}:$DEST"
         echo "Transfer complete."
 
   serv00:pull:
@@ -141,8 +147,8 @@ tasks:
         if [ -z "$DEST" ]; then
           DEST="."
         fi
-        echo "Pulling {{.SERV00_ALIAS}}:$SRC -> $DEST ..."
-        scp -r "{{.SERV00_ALIAS}}:$SRC" "$DEST"
+        echo "Pulling {{.SERV00_TARGET}}:$SRC -> $DEST ..."
+        scp -r "{{.SERV00_TARGET}}:$SRC" "$DEST"
         echo "Transfer complete."
 
   serv00:info:
@@ -150,19 +156,19 @@ tasks:
     cmds:
       - |
         echo "=== System Info ==="
-        ssh {{.SERV00_ALIAS}} "uname -a; uptime"
+        ssh {{.SERV00_TARGET}} "uname -a; uptime"
         echo ""
         echo "=== Account Quota & BinExec ==="
-        ssh {{.SERV00_ALIAS}} "devil binexec on >/dev/null; devil info 2>/dev/null || quota -v"
+        ssh {{.SERV00_TARGET}} "devil binexec on >/dev/null; devil info 2>/dev/null || quota -v"
         echo ""
         echo "=== Running User Processes ==="
-        ssh {{.SERV00_ALIAS}} "ps aux | grep {{.SERV00_USER}}"
+        ssh {{.SERV00_TARGET}} "ps aux | grep {{.SERV00_USER}}"
 
   serv00:harden:
     desc: Enforce secure permissions on Serv00 (~/.ssh, ~/domains, logs/pid)
     cmds:
       - |
-        ssh {{.SERV00_ALIAS}} "
+        ssh {{.SERV00_TARGET}} "
           chmod 700 ~/.ssh
           chmod 600 ~/.ssh/authorized_keys ~/.ssh/id_ed25519 2>/dev/null || true
           chmod 644 ~/.ssh/*.pub 2>/dev/null || true
@@ -177,29 +183,29 @@ tasks:
     cmds:
       - |
         echo "=== 1. System & Uptime ==="
-        ssh {{.SERV00_ALIAS}} "uname -a; uptime"
+        ssh {{.SERV00_TARGET}} "uname -a; uptime"
         echo ""
         echo "=== 2. Resource Utilization & Limits ==="
-        ssh {{.SERV00_ALIAS}} "devil info limits"
+        ssh {{.SERV00_TARGET}} "devil info limits"
         echo ""
         echo "=== 3. Daemon Process Status ==="
-        ssh {{.SERV00_ALIAS}} "ps aux | grep -v '\[.*\]' | grep -E 'webserver|sshd'"
+        ssh {{.SERV00_TARGET}} "ps aux | grep -v '\[.*\]' | grep -E 'webserver|sshd'"
         echo ""
         echo "=== 4. Keepalive Crontab ==="
-        ssh {{.SERV00_ALIAS}} "crontab -l"
+        ssh {{.SERV00_TARGET}} "crontab -l"
         echo ""
         echo "=== 5. File Permissions Audit ==="
-        ssh {{.SERV00_ALIAS}} "ls -ld ~/.ssh ~/.ssh/* ~/domains ~/webserver* 2>/dev/null"
+        ssh {{.SERV00_TARGET}} "ls -ld ~/.ssh ~/.ssh/* ~/domains ~/webserver* 2>/dev/null"
 
   serv00:limits:
     desc: Display resource quotas (RAM, processes, disk) via devil info limits
     cmds:
-      - ssh {{.SERV00_ALIAS}} "devil info limits"
+      - ssh {{.SERV00_TARGET}} "devil info limits"
 
   serv00:logs:
     desc: Tail webserver supervisor logs (~/webserver.log)
     cmds:
-      - ssh {{.SERV00_ALIAS}} "tail -n 50 ~/webserver.log"
+      - ssh {{.SERV00_TARGET}} "tail -n 50 ~/webserver.log"
 
   serv00:backup:
     desc: Download compressed backup of webserver, source code, and configuration
@@ -207,11 +213,99 @@ tasks:
       - |
         BACKUP_FILE="serv00-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
         echo "Creating remote archive..."
-        ssh {{.SERV00_ALIAS}} "tar -czf ~/$BACKUP_FILE --exclude='*.log' ~/server.go ~/webserver ~/domains 2>/dev/null || true"
+        ssh {{.SERV00_TARGET}} "tar -czf ~/$BACKUP_FILE --exclude='*.log' ~/server.go ~/webserver ~/domains 2>/dev/null || true"
         echo "Downloading $BACKUP_FILE..."
-        scp {{.SERV00_ALIAS}}:~/$BACKUP_FILE ./
-        ssh {{.SERV00_ALIAS}} "rm -f ~/$BACKUP_FILE"
+        scp {{.SERV00_TARGET}}:~/$BACKUP_FILE ./
+        ssh {{.SERV00_TARGET}} "rm -f ~/$BACKUP_FILE"
         echo "Backup saved locally to ./$BACKUP_FILE"
+
+  # --- Agent PostgreSQL interface ------------------------------------------
+  # muse (triage) and vesper (briefing) write their decisions here:
+  # triage_packets, judge_decisions, briefing_rulings.
+  #
+  # psql has to run ON serv00: pgsql13.serv00.com is plain TCP (no SSL) and its
+  # pg_hba.conf has no entry for the fleet's public IP, so a direct connection
+  # from here is refused. From s13 the connection is allowed and the password
+  # comes from the remote ~/.pgpass (mode 600), so no secret enters this repo or
+  # crosses the wire.
+  serv00:db:psql:
+    desc: Interactive psql console on the serv00 agent database
+    cmds:
+      - ssh -t {{.SERV00_TARGET}} "{{.SERV00_DB_PSQL}}"
+
+  serv00:db:tables:
+    desc: List the agent tables (triage_packets, judge_decisions, briefing_rulings)
+    cmds:
+      - printf '%s\n' '\dt' | ssh {{.SERV00_TARGET}} "{{.SERV00_DB_PSQL}}"
+
+  serv00:db:schema:
+    desc: "Describe the agent tables (optionally one: task serv00:db:schema -- triage_packets)"
+    cmds:
+      - |
+        target="{{.CLI_ARGS}}"
+        # go-task returns CLI_ARGS verbatim, quotes included: strip one matching pair.
+        case "$target" in
+          \'*\'|\"*\") target="${target#?}"; target="${target%?}" ;;
+        esac
+        if [ -n "$target" ]; then
+          case "$target" in
+            *[!a-z_]*) echo "table name must be lowercase letters and underscores: $target" >&2; exit 1 ;;
+          esac
+          printf '\\d+ %s\n' "$target" | ssh {{.SERV00_TARGET}} "{{.SERV00_DB_PSQL}}"
+        else
+          printf '\\d+ triage_packets\n\\d+ judge_decisions\n\\d+ briefing_rulings\n' | ssh {{.SERV00_TARGET}} "{{.SERV00_DB_PSQL}}"
+        fi
+
+  serv00:db:query:
+    desc: "Run SQL on the serv00 agent database (task serv00:db:query -- 'select ...')"
+    cmds:
+      - |
+        sql="{{.CLI_ARGS}}"
+        # go-task returns CLI_ARGS verbatim, quotes included: strip one matching pair.
+        case "$sql" in
+          \'*\'|\"*\") sql="${sql#?}"; sql="${sql%?}" ;;
+        esac
+        if [ -z "$sql" ]; then
+          echo "Usage: task serv00:db:query -- '<SQL>'" >&2
+          exit 1
+        fi
+        printf '%s\n' "$sql" | ssh {{.SERV00_TARGET}} "{{.SERV00_DB_PSQL}}"
+
+  serv00:db:recent:
+    desc: Latest decisions written by the triage and briefing agents (LIMIT defaults to 10)
+    cmds:
+      - |
+        limit="{{.CLI_ARGS | default "10"}}"
+        case "$limit" in
+          \'*\'|\"*\") limit="${limit#?}"; limit="${limit%?}" ;;
+        esac
+        case "$limit" in
+          ''|*[!0-9]*) echo "LIMIT must be a number, got: $limit" >&2; exit 1 ;;
+        esac
+        ssh {{.SERV00_TARGET}} "{{.SERV00_DB_PSQL}}" <<SQL
+        select 'triage' as source, created_at, item, decision, confidence::text as confidence
+          from triage_packets
+        union all
+        select 'judge', created_at, task, decision, confidence::text
+          from judge_decisions
+        union all
+        select 'ruling', created_at, item, coalesce(user_decision, model_raw), model_conf::text
+          from briefing_rulings
+        order by created_at desc nulls last
+        limit $limit;
+        SQL
+
+  serv00:db:info:
+    desc: Server version, database size, per-table rows and live connections
+    cmds:
+      - |
+        ssh {{.SERV00_TARGET}} "{{.SERV00_DB_PSQL}}" <<'SQL'
+        select version();
+        select current_database() as database, pg_size_pretty(pg_database_size(current_database())) as size;
+        select relname as table, n_live_tup as rows, pg_size_pretty(pg_total_relation_size(relid)) as size
+          from pg_stat_user_tables order by n_live_tup desc;
+        select count(*) as connections from pg_stat_activity;
+        SQL
 
   serv00:menu:
     desc: Interactive Charmbracelet Gum / Wish menu for Serv00 FreeBSD host
@@ -228,6 +322,10 @@ tasks:
           "stop: Stop webserver" \
           "restart: Restart webserver" \
           "backup: Download full backup tarball" \
+          "db: Agent PostgreSQL console (psql)" \
+          "db-tables: Agent tables" \
+          "db-recent: Latest agent decisions" \
+          "db-info: Database size, rows & connections" \
           "build: Rebuild Go webserver binary" \
           "cron: Enable keep-alive cron job" \
           "www: List devil WWW domains" \
@@ -259,23 +357,6 @@ tasks:
             ;;
           "backup"*)
             task serv00:backup
-            ;;
-          "build: Rebuild Go webserver binary" \
-          "cron: Enable keep-alive cron job" \
-          "www: List devil WWW domains" \
-          "ports: List devil reserved ports" \
-          "info: System info & quota" \
-          "push: Upload file to Serv00" \
-          "pull: Download file from Serv00" \
-          "wishlist: Open Wishlist SSH directory" \
-          "exit: Quit" | gum choose --header "😈 Serv00 FreeBSD (jisifu.serv00.net) Menu")
-
-        case "$action" in
-          "ssh"*)
-            task serv00:ssh
-            ;;
-          "status"*)
-            task serv00:server:status
             ;;
           "start"*)
             task serv00:server:start
@@ -312,6 +393,18 @@ tasks:
             if [ -n "$remotepath" ]; then
               task serv00:pull -- "$remotepath"
             fi
+            ;;
+          "db-tables"*)
+            task serv00:db:tables
+            ;;
+          "db-recent"*)
+            task serv00:db:recent
+            ;;
+          "db-info"*)
+            task serv00:db:info
+            ;;
+          "db:"*)
+            task serv00:db:psql
             ;;
           "wishlist"*)
             nix-shell -p wishlist --run wishlist

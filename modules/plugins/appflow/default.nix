@@ -37,7 +37,8 @@
     "recruitee.com"
     "smartrecruiters"
     "teamtailor"
-    "workable.com"
+    "workable"
+    "applytojob.com"
     "icims"
     "successfactors"
   ];
@@ -110,6 +111,8 @@ in {
             "application status"
             "application:"
             "job application"
+            "resume received"
+            "thank you for applying"
           ];
           tier = "action";
           owner = "agent:apps";

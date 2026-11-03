@@ -201,6 +201,7 @@
         --pointers ${lib.escapeShellArg "${pointers}"} \
         --engine-url ${lib.escapeShellArg cfg.triage.engineUrl} \
         --second-engine-url ${lib.escapeShellArg cfg.triage.secondEngineUrl} \
+        --second-classifier ${lib.escapeShellArg cfg.triage.secondClassifier} \
         --margin ${toString cfg.triage.margin} \
         --expire-days ${toString cfg.triage.expireDays} \
         "$@"
@@ -496,6 +497,16 @@ in {
           verdict is trusted; below it the message becomes `review`, which is
           surfaced to a person rather than hidden. A margin, not an absolute
           probability: julia-1 reports low probabilities even when right.
+        '';
+      };
+
+      secondClassifier = lib.mkOption {
+        type = lib.types.str;
+        default = "second-pass";
+        description = ''
+          Name recorded on the second model's verdicts. Like `classifier`, it is
+          half the primary key: bump it when what the pass *means* changes, so the
+          archive is re-read under the new rule instead of keeping old answers.
         '';
       };
 

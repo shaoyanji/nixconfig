@@ -24,6 +24,32 @@ Every task named on this page resolves against the compiled graph
 ([[flake/policies.nix#contract-tasks-resolve]]) — a citation to a task nobody
 defines fails the policy gate, so this table cannot drift into a wish list.
 
+### Where a lookup goes — name the pattern, or ask for one
+
+**A typed lookup is the default, and the edge caller is not it.** Measured
+2026-11-02: `task ops:kg:host HOST=fern` costs 145 ms, emits 40 bytes and is
+exact; `task agents:call Q="what touches fern"` costs 1073 ms, emits 54 bytes and
+reads 605 against 217, and gets the typed call right 3 times in 6 — the rest are
+answered by the deterministic router that the caller falls back to anyway. If you
+know the pattern, call it.
+
+The caller earns its place only where the *phrasing* is what you don't know — and
+then the Pareto split decides what belongs to you:
+
+| the request is | it goes to | verdict |
+| :--- | :--- | :--- |
+| one lookup whose pattern you cannot name from the question | `task agents:call Q=` | `needle3` |
+| more than one ask in the sentence | **you** split it, then send each part | `decompose` |
+| a judgement or an operation (`why`, `how do I`, anything that builds) | **you**, with a budget | `reason` |
+
+Exit 2 is the caller naming your quadrant, not a failure: read `pareto:` in the
+body and act on it. For a run of prompts with no agent in the loop,
+`task agents:call:batch` takes them on stdin and emits one JSON line per call
+with its own `ms` and `gate` — that pipeline is the caller's justified use, and
+why a slow step is named instead of fatal to the run.
+[[flake/policies.nix#edge-caller-before-reasoning]]
+[[flake/policies.nix#daemon-clears-kelly]]
+
 **There is no generic `nix:eval` task, on purpose.** The ladder in the
 `task-plane` skill is eval → jq → Nix lib → check → task → script → Go; a
 catch-all eval task would be the shortest path to the whole-toplevel force that
@@ -124,7 +150,8 @@ scope, stop and report the collision instead of editing in parallel.
 ## Subagents
 
 **Needle 3 is a tool caller.** It captures a sentence into a tool name plus typed
-arguments (10/11 on the dispatch battery) and nothing more. A *label* — keep or
+arguments (10/11 on the dispatch battery) and nothing more — the three quadrants
+above are the only ones it may enter, and the rest is yours. A *label* — keep or
 archive, tier 1 or 2 — is a classification, and it is not its job: three models
 scored 3/10 on the keep/archive battery, so that decision is made by a rule and,
 where judgement is genuinely needed, by Jev → Laya → Julia-1 (`decide`,

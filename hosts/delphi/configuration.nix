@@ -1087,6 +1087,13 @@ in {
   # profiles.hermes); seeding the persona is this host's own declaration.
   home-manager.users.${user.name} = {
     imports = [../../modules/services/mail-agent.nix];
+    # `programs.edgeCaller` is NOT enabled here, and the reason is arithmetic, not
+    # taste: flake/daemons.nix scores it ev = -1.1 s (p=0.5, save=-1.0, cost=1.2)
+    # against the agent naming the pattern itself, and
+    # [[flake/policies.nix#daemon-clears-kelly]] refuses a resident helper whose
+    # best case is a loss. It was activated here on 2026-11-02 and switched off the
+    # same day; the module stays for the pipeline path (agents:call:batch).
+    # `nix eval --json .#daemons.daemons` prints the current numbers.
     programs.hermes-user = {
       persona = true;
     };

@@ -1,0 +1,11 @@
+{"prompt": "what touches fern", "expect": "ops:kg:host", "pareto": "needle3", "args": {"HOST": "fern"}}
+{"prompt": "which documents mention the qmd skill", "expect": "ops:kg:skill", "pareto": "needle3", "args": {"SKILL": "qmd"}}
+{"prompt": "skills tagged nix", "expect": "ops:kg:tag", "pareto": "needle3", "args": {"TAG": "nix"}}
+{"prompt": "where is nix-eval used", "expect": "ops:kg:skill", "pareto": "needle3", "args": {"SKILL": "nix-eval"}}
+{"prompt": "what shares docs with eisen", "expect": "ops:kg:comention", "pareto": "needle3", "args": {"HOST": "eisen"}}
+{"prompt": "list the skills carrying the sops tag", "expect": "ops:kg:tag", "pareto": "needle3", "args": {"TAG": "sops"}}
+{"prompt": "what touches fern and what shares docs with eisen", "expect": "none", "pareto": "decompose", "args": {}}
+{"prompt": "why is the fleet slow", "expect": "none", "pareto": "reason", "args": {}}
+{"prompt": "how do I deploy eisen", "expect": "none", "pareto": "reason", "args": {}}
+{"prompt": "why is the sky blue", "expect": "none", "pareto": "reason", "args": {}}
+{"prompt": "write me a poem about the ocean", "expect": "none", "pareto": "reason", "args": {}}

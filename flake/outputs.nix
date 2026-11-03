@@ -112,6 +112,11 @@ in {
   # derivation and without `task` installed.
   taskfileGraph = taskfileCtl;
 
+  # Resident helpers and their Kelly arithmetic: `nix eval --json .#daemons`. The
+  # registry is the decision AND its proof, so a daemon cannot be enabled by
+  # memory — the policy above compares the two.
+  daemons = import ./daemons.nix {inherit lib;};
+
   # The rules as data, looked up by id: `nix eval .#policies.ids`. The derived
   # queries (citedIds, danglingCitations, uncitedPolicies, unenforcedHardRules)
   # stay inside `flake/checks.nix`, which is their only consumer — exporting

@@ -271,15 +271,34 @@ tasks:
       - task infra:secrets:decrypt:detaskfile-home
 
   infra:rebuild:home-manager:
-    desc: Rebuild local Home Manager profile
+    desc: Rebuild local Home Manager profile (standalone home hosts only)
     summary: >
       The switch IS the check: it evaluates and builds the profile. Do not run
       `task checks:*` first — that is extra evaluation for no proof. `NOM=1`
       pipes through nom for the human TUI; agents leave it unset.
+      Refuses on a host whose home is EMBEDDED in the NixOS config (the container
+      chains: delphi, frieren, mtfuji, …) — there the profile comes from
+      `nixos-rebuild switch`, and running this one evaluates the whole system
+      first and fails at the end. Exit 64 = no standalone home profile here;
+      run `task infra:rebuild:nixos`.
     aliases: [home-manager-switch]
+    vars:
+      STANDALONE:
+        sh: |
+          nix eval --json .?submodules=1#homeConfigurations --apply 'c: builtins.attrNames c' 2>/dev/null \
+            | grep -Fxq -- "\"$(hostname)\"" && echo yes || echo no
     cmds:
       - |
         set -o pipefail
+        # Membership, not a hostname list: the flake output is the truth about
+        # which hosts have a standalone profile, and asking it costs ~0.2 s. The
+        # failure this replaces costs a full system evaluation and reads like a
+        # config error, not like a wrong task.
+        if [ "{{.STANDALONE}}" != "yes" ]; then
+          echo "home-manager: $(hostname) has no standalone home profile — its home is EMBEDDED in the NixOS config." >&2
+          echo "  run: task infra:rebuild:nixos   (there the switch is the activation)" >&2
+          exit 64
+        fi
         if [ "${NOM:-0}" = "1" ]; then
           home-manager switch --flake .?submodules=1#$(hostname) 2>&1 | nom
         else
@@ -294,10 +313,15 @@ tasks:
     cmds:
       - |
         set -o pipefail
+        # Substitutes are ON by default, so wanting them is not a flag — the old
+        # --use-substitutes here rendered nothing under the envelope. Builders box
+        # the compile: WSL is a container, so it never dispatches.
+        flags="$(REBUILD_BUILDERS="${REBUILD_BUILDERS:-local}" bash scripts/task/rebuild-flags.sh --flavour nixos-rebuild)"
+        # shellcheck disable=SC2086 # the renderer prints flags
         if [ "${NOM:-0}" = "1" ]; then
-          sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes 2>&1 | nom
+          sudo nixos-rebuild switch $flags --flake .?submodules=1#guckloch 2>&1 | nom
         else
-          sudo nixos-rebuild switch --flake .?submodules=1#guckloch --use-substitutes
+          sudo nixos-rebuild switch $flags --flake .?submodules=1#guckloch
         fi
 
   infra:rebuild:orb:
@@ -307,10 +331,14 @@ tasks:
     cmds:
       - |
         set -o pipefail
+        # OrbStack needs impurity (it reads /proc and the container's mount table),
+        # which under the envelope is ONE axis value, not a stray flag.
+        flags="$(REBUILD_FLAKES="${REBUILD_FLAKES:-impure}" bash scripts/task/rebuild-flags.sh --flavour nixos-rebuild)"
+        # shellcheck disable=SC2086 # the renderer prints flags
         if [ "${NOM:-0}" = "1" ]; then
-          sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure 2>&1 | nom
+          sudo nixos-rebuild switch $flags --flake .?submodules=1#$(hostname) 2>&1 | nom
         else
-          sudo nixos-rebuild switch --flake .?submodules=1#$(hostname) --impure
+          sudo nixos-rebuild switch $flags --flake .?submodules=1#$(hostname)
         fi
       - task infra:secrets:decrypt:detaskfile-home
 
@@ -433,24 +461,20 @@ tasks:
             BOOT=run*) bash scripts/task/boot-check.sh --self || exit $? ;;
           esac
         fi
-        if [ "${REMOTE_BUILD:-0}" = "1" ]; then
-          # Substitute or fail, never compile here. `max-jobs 0` alone still lets
-          # Nix dispatch to a configured remote builder, which uploads the whole
-          # closure before it starts (hours on a 20 Mbit line) — `builders ""` is
-          # what makes it a refusal instead of a relay. A resolver host either has
-          # its closure in the cache already or this stops and says which path is
-          # missing.
-          if [ "${NOM:-0}" = "1" ]; then
-            sudo {{.OS}}-rebuild switch --option max-jobs 0 --option builders "" --flake .?submodules=1#"$host" 2>&1 | nom
-          else
-            sudo {{.OS}}-rebuild switch --option max-jobs 0 --option builders "" --flake .?submodules=1#"$host"
-          fi
+        # WHO COMPILES IS THE ENVELOPE'S DECISION, not this block's. Three axes,
+        # one renderer: builders / substitutes / flakes (scripts/task/rebuild-flags.sh).
+        # REMOTE_BUILD=1 is the historical spelling of "substitute or fail, never
+        # compile here" — kept because scripts and muscle memory use it, mapped in
+        # one line rather than re-derived inline.
+        if [ "${REMOTE_BUILD:-0}" = "1" ] && [ -z "${REBUILD_BUILDERS:-}" ]; then
+          export REBUILD_BUILDERS=none
+        fi
+        flags="$(bash scripts/task/rebuild-flags.sh --flavour "{{.OS}}-rebuild")"
+        # shellcheck disable=SC2086 # the renderer prints flags, so word splitting is the point
+        if [ "${NOM:-0}" = "1" ]; then
+          sudo {{.OS}}-rebuild switch $flags --flake .?submodules=1#"$host" 2>&1 | nom
         else
-          if [ "${NOM:-0}" = "1" ]; then
-            sudo {{.OS}}-rebuild switch --flake .?submodules=1#"$host" 2>&1 | nom
-          else
-            sudo {{.OS}}-rebuild switch --flake .?submodules=1#"$host"
-          fi
+          sudo {{.OS}}-rebuild switch $flags --flake .?submodules=1#"$host"
         fi
         # A switch restarts the resolver. Prove it answers before claiming success.
         if [ "$resolver" = "1" ]; then

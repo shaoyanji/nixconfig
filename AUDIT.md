@@ -28,6 +28,20 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-03 — the Vivid reply went out, and a draft without `From:` could not
+- **Sent, not drafted.** The BESS Construction Manager reply to Ally Freeman (Vivid) left the
+  `jisifu` Gmail account as `Matt Ji <matt@bountystash.com>` with the tailored CV and German
+  Anschreiben attached, threaded on her subject. Verified by posting the same message to the account
+  itself: the delivered copy carries `From:`, both PDFs and a decodable body, while the copy
+  `himalaya message send --save` appends to Sent is serialized **without** `From:` — the local copy
+  loses a header the recipient never misses. 81 KiB on the wire, both attachments intact.
+- **Drafts now carry a sender.** `appflow-sync` saved drafts with no `From:`, so a saved draft could
+  not be sent as-is: himalaya takes the SMTP envelope sender from that header. `draft_message` sets
+  `SENDER` (`APPFLOW_SENDER`, default `Matt Ji <matt@bountystash.com>`).
+- **Record and queue agree.** `vivid-construction-manager-bess-2027` is `applied` — *CV + letter sent
+  03.11.2026, awaiting reply* — and her mail row is resolved (7 verdicts), so the row leaves the human
+  queue while the reply is outstanding.
+
 ### 2026-11-03 — triage routes by rule, and two models may disagree
 - **The 511 was a routing inversion, not a backlog.** `machine sender:` fired on `noreply@`/`mailings@`
   and returned `action`/`human`, and `PROTECTED` forbade the second model from closing verification and

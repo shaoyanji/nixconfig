@@ -700,6 +700,11 @@ def report(api: str, as_json: bool = False) -> None:
         print(f"  {row['stage']:<10} {row['company'][:34]:<34} {row['subject'][:48]}")
 
 
+# A draft needs a From: himalaya takes the SMTP envelope sender from that header
+# and refuses to send without it, so a draft saved without one can never be sent
+# as-is. Which address is a property of the mailbox, not of the letter.
+SENDER = os.environ.get("APPFLOW_SENDER", "Matt Ji <matt@bountystash.com>")
+
 # A subject is the only part of a letter that can be defaulted safely: the body
 # is prose a person signed, so it is always an input, never a template.
 DRAFT_SUBJECTS = {
@@ -714,6 +719,7 @@ def draft_message(
     language = (application.get("language") or "en").strip().lower()
     template = DRAFT_SUBJECTS["de"] if language.startswith(("de", "ger")) else DRAFT_SUBJECTS["en"]
     message = EmailMessage()
+    message["From"] = SENDER
     # A reply keeps the thread's subject; only a fresh application gets the
     # generated one, because a reply that starts a new thread reads as bulk.
     message["Subject"] = subject or template.format(

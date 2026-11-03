@@ -49,6 +49,18 @@ tasks:
           ] | @tsv' inventory.toml | awk -F'\t' '{printf "%-14s [%-7s | %-15s | %-9s] %s\n", $1, $2, $3, $4, $5}' | gum filter --placeholder "Select active host to SSH...")
         [ -z "$selected" ] && exit 0
         host=$(echo "$selected" | awk '{print $1}')
+        kind=$(yq -r ".hosts[\"$host\"].kind" inventory.toml)
+        # External shards own their connection details (user@host, non-22 ports).
+        # network.ssh_alias is a label there, not an ~/.ssh/config entry: that file
+        # is Home Manager generated and only carries `Host *`, so `ssh serv00`
+        # cannot resolve. Dispatch to <host>:ssh instead of reconstructing it here.
+        if [ "$kind" = "external" ]; then
+          if task --list-all 2>/dev/null | grep -qE "^\* ${host}:ssh:"; then
+            exec task "${host}:ssh"
+          fi
+          echo "$host has no SSH surface (no ${host}:ssh task)."
+          exit 0
+        fi
         # Use network.ssh_alias, not the inventory key: external hosts can need an
         # explicit remote user (bitlockerpremium -> benutzer@bitlockerpremium).
         # For every other active host the alias equals the key, so this is a no-op.

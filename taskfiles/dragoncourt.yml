@@ -3,7 +3,8 @@ version: "3"
 vars:
   DRAGON_HOST: "ssh-dragoncourt.alwaysdata.net"
   DRAGON_USER: "dragoncourt"
-  DRAGON_ALIAS: "dragoncourt"
+  # ssh destination, not an ssh-config alias (Home Manager owns ~/.ssh/config).
+  DRAGON_TARGET: "{{.DRAGON_USER}}@{{.DRAGON_HOST}}"
   DRAGON_DOMAIN: "dragoncourt.alwaysdata.net"
   DRAGON_WWW: "/home/dragoncourt/www"
 
@@ -11,12 +12,12 @@ tasks:
   dragoncourt:ssh:
     desc: Open interactive SSH shell into Alwaysdata host
     cmds:
-      - ssh {{.DRAGON_ALIAS}}
+      - ssh {{.DRAGON_TARGET}}
 
   dragoncourt:exec:
     desc: Run command on Alwaysdata via SSH (agent-friendly)
     cmds:
-      - ssh {{.DRAGON_ALIAS}} -- {{.CLI_ARGS}}
+      - ssh {{.DRAGON_TARGET}} -- {{.CLI_ARGS}}
 
   dragoncourt:status:
     desc: Health check on Alwaysdata website (https://dragoncourt.alwaysdata.net)
@@ -26,13 +27,13 @@ tasks:
         curl -Is https://{{.DRAGON_DOMAIN}} | head -n 6
         echo ""
         echo "=== Disk & Home Directory Usage ==="
-        ssh {{.DRAGON_ALIAS}} "df -h /home/{{.DRAGON_USER}}"
+        ssh {{.DRAGON_TARGET}} "df -h /home/{{.DRAGON_USER}}"
 
   dragoncourt:build:
     desc: Rebuild static/Comrak templates in ~/www
     cmds:
       - |
-        ssh {{.DRAGON_ALIAS}} "
+        ssh {{.DRAGON_TARGET}} "
           if [ -f {{.DRAGON_WWW}}/build.sh ]; then
             cd {{.DRAGON_WWW}} && bash build.sh
             echo 'Build script executed successfully.'
@@ -56,8 +57,8 @@ tasks:
         if [ -z "$DEST" ]; then
           DEST="www/"
         fi
-        echo "Pushing $SRC -> {{.DRAGON_ALIAS}}:$DEST ..."
-        scp -r "$SRC" "{{.DRAGON_ALIAS}}:$DEST"
+        echo "Pushing $SRC -> {{.DRAGON_TARGET}}:$DEST ..."
+        scp -r "$SRC" "{{.DRAGON_TARGET}}:$DEST"
         echo "Transfer complete."
 
   dragoncourt:pull:
@@ -74,8 +75,8 @@ tasks:
         if [ -z "$DEST" ]; then
           DEST="."
         fi
-        echo "Pulling {{.DRAGON_ALIAS}}:$SRC -> $DEST ..."
-        scp -r "{{.DRAGON_ALIAS}}:$SRC" "$DEST"
+        echo "Pulling {{.DRAGON_TARGET}}:$SRC -> $DEST ..."
+        scp -r "{{.DRAGON_TARGET}}:$SRC" "$DEST"
         echo "Transfer complete."
 
   dragoncourt:info:
@@ -83,19 +84,19 @@ tasks:
     cmds:
       - |
         echo "=== System & OS ==="
-        ssh {{.DRAGON_ALIAS}} "uname -a; cat /etc/os-release | grep PRETTY_NAME"
+        ssh {{.DRAGON_TARGET}} "uname -a; cat /etc/os-release | grep PRETTY_NAME"
         echo ""
         echo "=== Installed Runtimes ==="
-        ssh {{.DRAGON_ALIAS}} "php -v | head -n 1; node -v; python3 --version; go version 2>/dev/null || true"
+        ssh {{.DRAGON_TARGET}} "php -v | head -n 1; node -v; python3 --version; go version 2>/dev/null || true"
         echo ""
         echo "=== Webroot Files (www/) ==="
-        ssh {{.DRAGON_ALIAS}} "ls -lh ~/www"
+        ssh {{.DRAGON_TARGET}} "ls -lh ~/www"
 
   dragoncourt:harden:
     desc: Enforce secure permissions on Alwaysdata (~/.ssh, ~/www, ~/.local/bin)
     cmds:
       - |
-        ssh {{.DRAGON_ALIAS}} "
+        ssh {{.DRAGON_TARGET}} "
           chmod 700 ~/.ssh
           chmod 600 ~/.ssh/authorized_keys 2>/dev/null || true
           chmod 750 ~/www
@@ -108,22 +109,22 @@ tasks:
     cmds:
       - |
         echo "=== 1. System & Uptime ==="
-        ssh {{.DRAGON_ALIAS}} "uname -a; uptime"
+        ssh {{.DRAGON_TARGET}} "uname -a; uptime"
         echo ""
         echo "=== 2. Disk Quota & Usage ==="
-        ssh {{.DRAGON_ALIAS}} "df -h /home/{{.DRAGON_USER}}"
+        ssh {{.DRAGON_TARGET}} "df -h /home/{{.DRAGON_USER}}"
         echo ""
         echo "=== 3. Web Service HTTP Status ==="
         curl -Is https://{{.DRAGON_DOMAIN}} | head -n 8
         echo ""
         echo "=== 4. Permissions Audit ==="
-        ssh {{.DRAGON_ALIAS}} "ls -ld ~/.ssh ~/.ssh/* ~/www ~/.local/bin 2>/dev/null"
+        ssh {{.DRAGON_TARGET}} "ls -ld ~/.ssh ~/.ssh/* ~/www ~/.local/bin 2>/dev/null"
 
   dragoncourt:logs:
     desc: Tail live Apache HTTP access/error logs from ~/admin/logs/sites/
     cmds:
       - |
-        ssh {{.DRAGON_ALIAS}} "
+        ssh {{.DRAGON_TARGET}} "
           YEAR=\$(date +%Y)
           TODAY=\$(date +%Y-%m-%d)
           LOGFILE=~/admin/logs/sites/\$YEAR/sites-\$TODAY.log
@@ -140,10 +141,10 @@ tasks:
       - |
         BACKUP_FILE="dragoncourt-backup-$(date +%Y%m%d-%H%M%S).tar.gz"
         echo "Creating remote archive..."
-        ssh {{.DRAGON_ALIAS}} "tar -czf ~/$BACKUP_FILE --exclude='*.log' ~/www 2>/dev/null || true"
+        ssh {{.DRAGON_TARGET}} "tar -czf ~/$BACKUP_FILE --exclude='*.log' ~/www 2>/dev/null || true"
         echo "Downloading $BACKUP_FILE..."
-        scp {{.DRAGON_ALIAS}}:~/$BACKUP_FILE ./
-        ssh {{.DRAGON_ALIAS}} "rm -f ~/$BACKUP_FILE"
+        scp {{.DRAGON_TARGET}}:~/$BACKUP_FILE ./
+        ssh {{.DRAGON_TARGET}} "rm -f ~/$BACKUP_FILE"
         echo "Backup saved locally to ./$BACKUP_FILE"
 
   dragoncourt:menu:

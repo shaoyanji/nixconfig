@@ -4,18 +4,18 @@ vars:
   MOTO_HOST: "100.75.49.73"
   MOTO_PORT: "8022"
   MOTO_USER: "u0_a301"
-  MOTO_ALIAS: "moto"
+  MOTO_TARGET: "{{.MOTO_USER}}@{{.MOTO_HOST}}"
 
 tasks:
   moto:ssh:
     desc: Open interactive SSH shell into Termux on moto
     cmds:
-      - ssh {{.MOTO_ALIAS}}
+      - ssh -p {{.MOTO_PORT}} {{.MOTO_TARGET}}
 
   moto:exec:
     desc: Run command on moto via SSH (agent-friendly)
     cmds:
-      - ssh {{.MOTO_ALIAS}} -- {{.CLI_ARGS}}
+      - ssh -p {{.MOTO_PORT}} {{.MOTO_TARGET}} -- {{.CLI_ARGS}}
 
   moto:push:
     desc: Transfer local file/folder to moto (defaults to Android Downloads)
@@ -32,8 +32,8 @@ tasks:
         if [ -z "$DEST" ]; then
           DEST="storage/downloads/"
         fi
-        echo "Pushing $SRC -> {{.MOTO_ALIAS}}:$DEST ..."
-        scp -r "$SRC" "{{.MOTO_ALIAS}}:$DEST"
+        echo "Pushing $SRC -> {{.MOTO_TARGET}}:$DEST ..."
+        scp -P {{.MOTO_PORT}} -r "$SRC" "{{.MOTO_TARGET}}:$DEST"
         echo "Transfer complete."
 
   moto:pull:
@@ -51,8 +51,8 @@ tasks:
         if [ -z "$DEST" ]; then
           DEST="."
         fi
-        echo "Pulling {{.MOTO_ALIAS}}:$SRC -> $DEST ..."
-        scp -r "{{.MOTO_ALIAS}}:$SRC" "$DEST"
+        echo "Pulling {{.MOTO_TARGET}}:$SRC -> $DEST ..."
+        scp -P {{.MOTO_PORT}} -r "{{.MOTO_TARGET}}:$SRC" "$DEST"
         echo "Transfer complete."
 
   moto:status:
@@ -65,23 +65,23 @@ tasks:
     cmds:
       - |
         echo "=== Device & Uptime ==="
-        ssh {{.MOTO_ALIAS}} "uname -a; uptime"
+        ssh -p {{.MOTO_PORT}} {{.MOTO_TARGET}} "uname -a; uptime"
         echo ""
         echo "=== Storage (/data) ==="
-        ssh {{.MOTO_ALIAS}} "df -h /data"
+        ssh -p {{.MOTO_PORT}} {{.MOTO_TARGET}} "df -h /data"
         echo ""
         echo "=== Termux Storage Shortcuts ==="
-        ssh {{.MOTO_ALIAS}} "ls -l ~/storage 2>/dev/null || true"
+        ssh -p {{.MOTO_PORT}} {{.MOTO_TARGET}} "ls -l ~/storage 2>/dev/null || true"
 
   moto:obsidian:status:
     desc: Check Obsidian git status on moto
     cmds:
-      - ssh {{.MOTO_ALIAS}} "cd ~/storage/shared/my-obsidian-vault && git status --short"
+      - ssh -p {{.MOTO_PORT}} {{.MOTO_TARGET}} "cd ~/storage/shared/my-obsidian-vault && git status --short"
 
   moto:obsidian:sync:
     desc: Pull latest Obsidian notes on moto
     cmds:
-      - ssh {{.MOTO_ALIAS}} "cd ~/storage/shared/my-obsidian-vault && git pull --rebase"
+      - ssh -p {{.MOTO_PORT}} {{.MOTO_TARGET}} "cd ~/storage/shared/my-obsidian-vault && git pull --rebase"
 
   moto:menu:
     desc: Interactive Charmbracelet Gum / Wish menu for Moto operations

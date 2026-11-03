@@ -42,8 +42,13 @@ task agents:hub                                    # every plugin's queue depth
 
 Drafts are the safe half of sending: `--draft` writes into the mailbox's Drafts
 folder, where a person reads, edits or discards it, and reports the attachment it
-carried. No verb here can send mail. Reporting tasks take `JSON=1` for a machine,
-or `TOON=1` to project that JSON through `toon` for an agent to read cheaply.
+carried. No verb here can send mail. Reporting tasks print TOON, which is what an
+agent reads; `FORMAT=text` gives a person a table and `FORMAT=json` a machine.
+
+**The queue drains itself.** `appflow-sync.timer` runs `--sync --apply` hourly
+(11 minutes after the classifier files the mail at :49), so a status update or a
+new application does not wait for someone to type the task. `sync.enable = false`
+turns the drainer off and leaves the verbs above.
 
 ## Personal data
 

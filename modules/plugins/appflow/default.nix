@@ -68,6 +68,22 @@ in {
         description = "Match archived mail to applications on every import run.";
       };
     };
+
+    # A queue with no drainer is a backlog with extra steps: the triage files
+    # application mail here hourly, and this is what reads it. On by default, and
+    # a run with an empty queue exits in a second.
+    sync = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Advance the pipeline from the agent queue on a timer.";
+      };
+      schedule = lib.mkOption {
+        type = lib.types.str;
+        default = "hourly";
+        description = "OnCalendar expression for the sync timer.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -117,6 +133,34 @@ in {
         OnCalendar = cfg.import.schedule;
         Persistent = true;
         RandomizedDelaySec = "10m";
+      };
+    };
+
+    # The drainer: same verbs an operator runs by hand, on a schedule, so the
+    # queue is empty when a person looks instead of waiting for someone to notice.
+    systemd.services.appflow-sync = lib.mkIf cfg.sync.enable {
+      description = "Advance the job pipeline from ATS mail and close what it read";
+      after = ["npgsqlrest.service"];
+      requires = ["npgsqlrest.service"];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${sync}/bin/appflow-sync --sync --apply --ledger /var/lib/appflow-sync/apps-sync.jsonl";
+        StateDirectory = "appflow-sync";
+        User = "root";
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        ProtectHome = "read-only";
+      };
+    };
+
+    systemd.timers.appflow-sync = lib.mkIf cfg.sync.enable {
+      description = "Hourly job pipeline sync";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnCalendar = cfg.sync.schedule;
+        Persistent = true;
+        RandomizedDelaySec = "5m";
       };
     };
   };

@@ -31,8 +31,10 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
    `task ops:notes:lineage ID=<id>` — so an idea attaches to the one it grew out
    of (`from`) instead of restating it. Then: proposal and open work → an
    `AGENTS.nix` note (`task ops:notes`; authoring: `agents-notes` skill); what
-   happened → `AUDIT.md`; history → `docs/history/`; procedure → `docs/` or a
-   skill. No new root markdown file [[flake/policies.nix#root-markdown-closed]].
+   happened → a dated `AUDIT.md` line, which `task ops:audit:roll` moves into the
+   agent turn log once it is a week old; superseded narrative → `docs/history/`;
+   procedure → `docs/` or a skill. No new root markdown file
+   [[flake/policies.nix#root-markdown-closed]].
 8. **Do not read `AGENTS.nix` in full.** It is a ~3,500-line compiled data store;
    reading it whole wastes context. Query it with `task ops:notes[:host|:show|:search]`
    or `nix eval .#agentsNotes…` (0.2 s). Structural "what touches X" questions go to
@@ -924,4 +926,4 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`MANUAL.md`](MANUAL.md)                          | Operator manual: services, ports, closed loop, DMS integration         |
 | [`.agents/SCHEMA.md`](.agents/SCHEMA.md)                  | Documentation/skill contract: budgets, status vocabulary, one fact one home |
 | [`docs/history/`](docs/history/)                      | Superseded narrative (audit/TODO/HANDOFF) — never linked as current    |
-| [`AUDIT.md`](AUDIT.md)                           | Current state + dated change ledger                                    |
+| [`AUDIT.md`](AUDIT.md)                           | Current state + the recent ledger; older entries roll into the turn log |

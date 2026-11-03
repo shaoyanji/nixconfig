@@ -27,7 +27,7 @@ Machine-enforced where possible:
 | What is executable | `taskfiles/*.yml` | `AGENTS.md`, skills |
 | What a host runs | `hosts/<host>/*.nix` | `MANUAL.md` (service map) |
 | Why a design exists, and what is still open | `AGENTS.nix` notes (`task ops:notes`) | `.#agentsNotes`, `.#artifacts.docs` |
-| What happened | `AUDIT.md` (ledger) + `docs/history/` | commit messages |
+| What happened | the agent turn log (xs); `AUDIT.md` holds current state + the recent ledger and `task ops:audit:roll` moves old entries there | commit messages |
 | How to operate | `MANUAL.md`, `.agents/deploy/` | skills |
 | How an agent should route | `AGENTS.md`, `.agents/README.md` | skills |
 | What a skill can do | `.agents/skills/<name>/SKILL.md` | `.#agentSkills` index |
@@ -80,7 +80,7 @@ a skill instead of the manual.
 | **Manual** | `AGENTS.md`, `MANUAL.md` | 1 200 lines each | routing, invariants, operator procedure |
 | **Notes** | `AGENTS.nix` | data file | decisions, proposals, open work, design studies: status + refs + a distilled body (≤30 lines), or a leaf with verbose intent |
 | **Stubs** | `ARCHITECTURE.md`, `TODO.md`, `HANDOFF.md`, `EXPERIMENTS.md` | 10 lines | a pointer to `AGENTS.nix`; content creeping back fails `docs-budget` |
-| **Ledger** | `AUDIT.md` | 300 lines | current state + dated entries, newest first |
+| **Ledger** | `AUDIT.md` | 300 lines | current state + dated entries, newest first; entries older than a week roll into the turn log |
 | **Runbook** | `.agents/deploy/**`, `docs/*.md` | 400 lines | repeatable procedure |
 | **Skill** | `.agents/skills/*/SKILL.md` | 400 lines | routing + procedure, not a novel |
 | **History** | `docs/history/*.md` | unlimited | superseded narrative, never linked as current |
@@ -218,7 +218,9 @@ Authoring contract, field rules, templates and the verification commands:
 
 - Is this fact already in `inventory.toml`, `modules.toml`, or a taskfile?
   Link instead of repeating.
-- Is this history? Put it in `docs/history/` and add one ledger line in `AUDIT.md`.
+- Is this history? Then it is a turn: `task ops:audit:roll` moves the ledger entry
+  into the agent turn log and the full text stays in the commit that wrote it.
+  `docs/history/` is for superseded narrative, not for the ledger.
 - Is this a proposal or open work? An `AGENTS.nix` note with an exit criterion
   and refs to the nodes it affects (or a verbose leaf if none exist yet).
 - Does it grow out of something that already exists? Add `from`. An idea with no

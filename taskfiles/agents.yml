@@ -363,6 +363,46 @@ tasks:
   # --- mail triage: who owns an incoming message --------------------------
   # The verdicts live in `email_triage` (delphi); these tasks read and write it
   # through the loopback API. docs/email-archive.md.
+  agents:mail:resolve:
+    desc: "Mark one message done for a person: ID= is the message id a queue row carries"
+    vars:
+      ID: '{{.ID | default ""}}'
+    cmds:
+      - |
+        [ -n "{{.ID}}" ] || { echo "agents:mail:resolve: ID is required (take it from agents:mail:attention)" >&2; exit 2; }
+        curl -fsS --max-time 20 -X POST -H 'content-type: application/json' \
+          -d "$(jq -nc --arg m "{{.ID}}" '{messageId: $m}')" \
+          "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/triage-resolve" >/dev/null
+        echo "resolved {{.ID}}"
+
+  agents:ci:drain:
+    desc: "Close CI notices that are stale or superseded by a newer one (TOON; FORMAT=text for a person, FULL=1 for every id, DRY=1, DAYS=14)"
+    summary: >
+      The queue's drainer, also run as the triage unit's ExecStartPost. A notice
+      older than DAYS is stale; within a repo+workflow group only the newest
+      survives, because the earlier ones describe a replaced state. Output is a
+      count plus five rows — a 237-id list is not a report.
+    vars:
+      DAYS: '{{.DAYS | default "14"}}'
+      DRY: '{{.DRY | default "0"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
+      FULL: '{{.FULL | default "0"}}'
+    cmds:
+      - |
+        # The packaged binary is the deployed copy; the repo file is the same
+        # commit and is what you have before a switch.
+        drain=(email-archive-ci-drain)
+        command -v "${drain[0]}" >/dev/null 2>&1 || drain=(python3 modules/services/email-ci-drain.py)
+        args=(--days "{{.DAYS}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        [ "{{.FULL}}" = "1" ] && args+=(--full)
+        if [ "{{.FORMAT}}" = "text" ]; then
+          "${drain[@]}" "${args[@]}"
+        else
+          "${drain[@]}" --json "${args[@]}" |
+            { if [ "{{.FORMAT}}" = "json" ]; then cat; else toon -e; fi; }
+        fi
+
   agents:mail:triage:
     desc: "Classify archived mail into tiers and owners; CLI_ARGS passes --report, --dry-run, --no-engine"
     cmds:
@@ -375,32 +415,47 @@ tasks:
         fi
 
   agents:mail:attention:
-    desc: "What needs a person: person, action and review, unresolved, newest first (LIM=20)"
+    desc: "What needs a person: person, action and review, unresolved, newest first (TOON; FORMAT=text for a table, LIM=20)"
     vars:
       LIM: '{{.LIM | default "20"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/attention?lim={{.LIM}}" \
-          | jq -r '.[]? | "\(.sentAt[0:16])  \(.tier)  \(.subject[0:70])"'
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/attention?lim={{.LIM}}")"
+        case "{{.FORMAT}}" in
+          text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:16])  \(.tier)  \(.subject[0:70])"' ;;
+          json) printf '%s' "$rows" ;;
+          *) printf '%s' "$rows" | toon -e ;;
+        esac
 
   agents:mail:digest:
-    desc: "The newsletter batch: digest-tier mail from the last DAYS days (LIM=200)"
+    desc: "The newsletter batch: digest-tier mail from the last DAYS days (TOON; FORMAT=text for a table, LIM=200)"
     vars:
       DAYS: '{{.DAYS | default "7"}}'
       LIM: '{{.LIM | default "200"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/triage-digest?days={{.DAYS}}&lim={{.LIM}}" \
-          | jq -r '.[]? | "\(.sentAt[0:10])  \(.sender[0:40])  \(.subject[0:70])"'
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/triage-digest?days={{.DAYS}}&lim={{.LIM}}")"
+        case "{{.FORMAT}}" in
+          text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:10])  \(.sender[0:40])  \(.subject[0:70])"' ;;
+          json) printf '%s' "$rows" ;;
+          *) printf '%s' "$rows" | toon -e ;;
+        esac
 
   agents:ci:queue:
-    desc: "Unresolved CI and robot mail an agent owns — the loop's own inbox (LIM=50)"
+    desc: "Unresolved CI and robot mail an agent owns — the loop's own inbox (TOON; FORMAT=text for a table, LIM=50)"
     vars:
       LIM: '{{.LIM | default "50"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent&lim={{.LIM}}" \
-          | jq -r '.[]? | "\(.sentAt[0:16])  \(.owner)  \(.subject[0:60])  \(.messageId)"'
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent&lim={{.LIM}}")"
+        case "{{.FORMAT}}" in
+          text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:16])  \(.owner)  \(.subject[0:60])  \(.messageId)"' ;;
+          json) printf '%s' "$rows" ;;
+          *) printf '%s' "$rows" | toon -e ;;
+        esac
 
   agents:ci:fix:
     desc: "Launch a subagent on one failing CI run (RUN=12345, MESSAGE_ID optional; DRY=1 writes the prompt only)"
@@ -439,19 +494,16 @@ tasks:
         appflow-sync "${args[@]}"
 
   agents:apps:pipeline:
-    desc: "Pipeline by stage, plus the applications whose mail nobody has dealt with (JSON=1 for a machine; TOON=1 converts it with the toon binary)"
+    desc: "Pipeline by stage, plus applications whose mail nobody dealt with (TOON; FORMAT=text|json, the row set is the same)"
     vars:
-      JSON: '{{.JSON | default "0"}}'
-      TOON: '{{.TOON | default "0"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        args=(--report)
-        if [ "{{.JSON}}" = "1" ] || [ "{{.TOON}}" = "1" ]; then args+=(--json); fi
-        if [ "{{.TOON}}" = "1" ]; then
-          appflow-sync "${args[@]}" | toon -e
-        else
-          appflow-sync "${args[@]}"
-        fi
+        case "{{.FORMAT}}" in
+          text) appflow-sync --report ;;
+          json) appflow-sync --report --json ;;
+          *) appflow-sync --report --json | toon -e ;;
+        esac
 
   agents:apps:set:
     desc: "Record a pipeline change from mail (ID=, STATUS=, NEXT=; the stage is derived where the sync derives it)"
@@ -465,20 +517,31 @@ tasks:
         appflow-sync --update "{{.ID}}" --status "{{.STATUS}}" --next "{{.NEXT}}"
 
   agents:hub:
-    desc: "The mail hub: every plugin owner, how much of the archive is waiting for it, and when it last acted"
+    desc: "The mail hub: every plugin owner, how much of the archive waits for it, when it last acted (TOON; FORMAT=text for a table)"
+    vars:
+      FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/plugins" \
-          | jq -r '.[]? | "\(.owner)  \(.kind)\topen \(.open)\tresolved \(.resolved)\tlast \(.lastDecision[0:16] // "-")"' | column -t -s$'\t'
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/plugins")"
+        case "{{.FORMAT}}" in
+          text) printf '%s' "$rows" | jq -r '.[]? | "\(.owner)  \(.kind)\topen \(.open)\tresolved \(.resolved)\tlast \(.lastDecision[0:16] // "-")"' | column -t -s$'\t' ;;
+          json) printf '%s' "$rows" ;;
+          *) printf '%s' "$rows" | toon -e ;;
+        esac
 
   agents:apps:discovered:
-    desc: "Applications the mail hub found on its own — not in the workflow's JSON (LIM=20)"
+    desc: "Applications the mail hub found on its own — not in the workflow's JSON (TOON; FORMAT=text, LIM=20)"
     vars:
       LIM: '{{.LIM | default "20"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/applications-discovered?lim={{.LIM}}" \
-          | jq -r '.[]? | "\(.createdAt[0:10])  \(.company[0:32])  \(.status[0:40])"'
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/applications-discovered?lim={{.LIM}}")"
+        case "{{.FORMAT}}" in
+          text) printf '%s' "$rows" | jq -r '.[]? | "\(.createdAt[0:10])  \(.company[0:32])  \(.status[0:40])"' ;;
+          json) printf '%s' "$rows" ;;
+          *) printf '%s' "$rows" | toon -e ;;
+        esac
 
   agents:apps:packet:
     desc: "Build a packet through nix: a store path with the CV and letter PDFs (ID=, or EXAMPLE=1 for the fictional fixture; RESUME=, LETTER=, OUT=link)"
@@ -519,16 +582,16 @@ tasks:
         appflow-sync "${args[@]}"
 
   agents:apps:drafts:
-    desc: "What is sitting in the Drafts folder: subjects and dates, newest first (TOON=1 for an agent)"
+    desc: "What is sitting in the Drafts folder: subjects and dates, newest first (TOON; FORMAT=text)"
     vars:
-      TOON: '{{.TOON | default "0"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        if [ "{{.TOON}}" = "1" ]; then
-          appflow-sync --drafts --json | toon -e
-        else
-          appflow-sync --drafts
-        fi
+        case "{{.FORMAT}}" in
+          text) appflow-sync --drafts ;;
+          json) appflow-sync --drafts --json ;;
+          *) appflow-sync --drafts --json | toon -e ;;
+        esac
 
   agents:apps:export:
     desc: "Regenerate applications.json from the database, in the workflow's own shape (OUT=path or - for stdout)"
@@ -549,18 +612,18 @@ tasks:
         appflow-sync "${args[@]}"
 
   agents:apps:queue:
-    desc: "Application mail an agent owns — the pipeline's inbox (LIM=20, TOON=1 for an agent)"
+    desc: "Application mail an agent owns — the pipeline's inbox (TOON; FORMAT=text for a table, LIM=20)"
     vars:
       LIM: '{{.LIM | default "20"}}'
-      TOON: '{{.TOON | default "0"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        if [ "{{.TOON}}" = "1" ]; then
-          curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent:apps&lim={{.LIM}}" | toon -e
-        else
-          curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent:apps&lim={{.LIM}}" \
-            | jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"'
-        fi
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent:apps&lim={{.LIM}}")"
+        case "{{.FORMAT}}" in
+          text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"' ;;
+          json) printf '%s' "$rows" ;;
+          *) printf '%s' "$rows" | toon -e ;;
+        esac
 
   agents:ci:preflight:
     desc: "Run the two gates the CI docs-budget job runs, locally: no digest drift, no document over budget"

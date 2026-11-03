@@ -170,9 +170,7 @@ the CLI and the database cannot disagree.
 **Direction: the database writes, the JSON is exported.** `agents:apps:sync` moves a status only
 forward (`received < follow-up < interview < rejected`, oldest message first), refuses a message that
 names no tracked employer, and picks by role then recency when one employer has several records,
-recording the alternatives in the ledger. Measured on the live queue: 4 updates (WattFox applied →
-follow-up → interview; adorsys applied → follow-up → rejected), 23 messages left for a person because
-they named an employer the pipeline does not track (AmRest, Lease a Bike) or carried no status at all.
+recording the alternatives in the ledger.
 
 A link is evidence, not a verdict: `matched_by` and `confidence` say how it was
 made, links are never deleted, and a record whose `company` is really a role name
@@ -190,7 +188,10 @@ had given it ~30.
 log into one bounded prompt and starts a `hermes` subagent in a detached tmux
 session; when the run is green, `task agents:ci:resolve MESSAGE_ID=<id>` sets
 `resolved_at` and the message leaves the queue. Nothing is deleted: the body
-stays searchable and the resolution is the record.
+stays searchable and the resolution is the record. The triage unit's
+`ExecStartPost` then runs `task agents:ci:drain`: a notice older than 14 days is
+stale and only the newest per repo+workflow survives, which closed 234 of 237 on
+the first run. A queue nobody drains is a mailbox with a nicer name.
 
 ## Verify
 
@@ -203,14 +204,7 @@ curl -s http://127.0.0.1:8080/health          # Healthy + database check
 # from a tailnet client
 curl -s 'https://delphi.cloudforest-kardashev.ts.net:8450/api/list-emails?lim=5' | jq
 curl -s 'https://delphi.cloudforest-kardashev.ts.net:8450/api/emails-search?q=invoice' | jq
-
-# full-text, in psql
-sudo -u postgres psql -d email_archive \
-  -c "SELECT subject FROM emails WHERE search_vector @@ to_tsquery('english','invoice') LIMIT 5;"
 ```
-
-Only SQL files are published; there is no auth layer in front of them, which is
-why the tailnet is the boundary and the bind is loopback.
 
 ```bash
 task agents:mail:attention              # what needs a person, newest first
@@ -219,14 +213,15 @@ task agents:mail:triage CLI_ARGS=--dry-run  # verdicts without writing them
 task agents:ci:queue                    # unresolved CI an agent owns
 ```
 
+Every one of these prints TOON: `toon -e` of the API's own JSON, which is what an
+agent reads. `FORMAT=text` gives a person the table it printed yesterday.
+
 ## What it can and cannot do
+
+Beyond the four core routes at the top:
 
 | Capability | State |
 | :--- | :--- |
-| list newest N | `GET /api/list-emails?lim=N` |
-| full-text search | `GET /api/emails-search?q=…` over PostgreSQL's generated `tsvector` + GIN index, with `<<snippet>>` highlighting |
-| ingest one message | `POST /api/add-email`, nine keys, upsert on `messageId` |
-| machine-readable contract | `GET /openapi.json` (OpenAPI 3.0.3, generated from the SQL files at startup) |
 | what needs a person | `GET /api/attention?lim=N` — person, action, review; unresolved; VIPs first |
 | an agent's own inbox | `GET /api/agent-queue?owner=agent&lim=N` |
 | the newsletter batch | `GET /api/triage-digest?days=7&lim=N` |
@@ -237,11 +232,8 @@ task agents:ci:queue                    # unresolved CI an agent owns
 | auth | none; tailnet membership is the gate |
 | MCP / agent tool | none; an agent calls the HTTP API, or reads `/openapi.json` |
 
-Search is the database's own full-text search — himalaya is the **ingest
-transport only** and sits nowhere in the query path. What this system adds over
-the mailbox is a queryable index with stable field shapes and an ingest upsert;
-what it adds over a dedicated archiver is nothing except being the one that
-happened to be built first.
+himalaya is the **ingest transport only**; the query path is PostgreSQL's own
+full-text search, over a schema whose field shapes an agent can rely on.
 
 ## The hub: plugins, and the rival on 8451
 
@@ -289,11 +281,9 @@ p95 geomean     8.82 ms
 score           113.33
 ```
 
-Read the score as *relative to this machine and this dataset only* — 400 rows
-fit in memory, so these numbers say almost nothing about a 5 TB archive. The
-point of keeping the battery fixed is that the same 15 checks run against a
-rival, and the JSON (`--out`) carries every sample so a disagreement can be
-checked instead of argued.
+The score is *relative to this machine and this dataset*: 400 rows fit in memory.
+What makes it comparable is the fixed battery — the same 15 checks run against a
+rival, and `--out` carries every sample, so a disagreement is checked, not argued.
 
 ## The importer
 
@@ -309,9 +299,12 @@ root with `ProtectHome=read-only` rather than as the archive user.
   in the archive yet and stops, so successive runs walk further back through the
   mailbox until it is exhausted. Message identity, not a timestamp, is the
   dedupe: the endpoint upserts and the known set comes from `list-emails`.
-- **Bounded per run.** Envelope pages are cheap, a body is one IMAP read, so
-  `limit` (200 on delphi), `maxPages` and `pageSize` are the only knobs, and
-  `TimeoutStartSec` is 45 min because a backfill is hundreds of reads.
+- **Bounded per run, derived from the archive.** Envelope pages are cheap, a body
+  is one IMAP read. `limit` (200 on delphi) is what a run takes; the scan depth
+  follows the known-id set (`--max-pages 0`), so a run never stops at a window
+  smaller than the archive — the bug that made the importer exit 0 while finding
+  only known mail. `TimeoutStartSec` is 45 min because a backfill is hundreds of
+  reads.
 - **Attachments** land in
   `/var/lib/npgsqlrest/attachments/<sha256(message_id)[:16]>/`, are chowned to the
   archive user, and `attachment_path` names that directory. An existing
@@ -367,20 +360,16 @@ sudo -u npgsqlrest rclone --config /var/lib/npgsqlrest/rclone.conf \
 sudo systemctl start email-archive-gdrive-sync   # 3. no rebuild; the next tick keeps it
 ```
 
-## Plugins: the hub's contract, and where a guest lives
+## Where a guest lives
 
-A plugin declares four things — `rules` (what mail it claims), `sql` (endpoints the
-archive publishes for it), `schema` (DDL applied after the core schema), `packages`
-(tools its commands need) — and the hub knows nothing else about it. A plugin's own
-module lives under `modules/plugins/<name>/` with its README, its tables and its
-code; removing the import removes its routing, its endpoints and its schema in one
-edit, with no orphan rule left pointing at nothing.
+A plugin declares four things — `rules` (mail it claims), `sql` (endpoints), `schema`
+(DDL applied after the core schema), `packages` — and the hub knows nothing else.
+Its module lives under `modules/plugins/<name>/` with its README, tables and code;
+removing the import removes its routing, endpoints and schema in one edit.
 
-The first guest is `modules/plugins/appflow/` (the job pipeline, its importer and
-its packet build). It is deliberately not modeled on the upstream project: the
-JSON is a data source, and documents are a Nix build — `typst` from this flake's
-pin, one template per language, artifact is a store path — rather than sixty
-per-company Typst directories and a CLI with its own environment.
+The first guest is `modules/plugins/appflow/`, deliberately not modeled on the
+upstream project: the JSON is a data source, and documents are a Nix build —
+`typst` from this flake's pin, one template per language, artifact is a store path.
 
 The token is a file next to the mail mirror, not a sops key, so rotating it is
 `rclone config reconnect` and no rebuild. Revoking access is `rm` of the conf

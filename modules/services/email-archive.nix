@@ -199,6 +199,18 @@
     '';
   };
 
+  # The queue's drainer: it runs after the classifier, so a CI notice never waits
+  # for a person who was never going to act on it.
+  ciDrain = pkgs.writeShellApplication {
+    name = "email-archive-ci-drain";
+    runtimeInputs = [pkgs.python3];
+    text = ''
+      exec ${pkgs.python3}/bin/python3 ${./email-ci-drain.py} \
+        --api ${lib.escapeShellArg "http://127.0.0.1:${toString cfg.port}"} \
+        "$@"
+    '';
+  };
+
   dbInit = pkgs.writeShellScript "email-archive-db-init" ''
     set -euo pipefail
     export PATH="${lib.makeBinPath [config.services.postgresql.finalPackage pkgs.coreutils]}:$PATH"
@@ -478,6 +490,7 @@ in {
     environment.systemPackages =
       lib.optional cfg.importer.enable html2markdown
       ++ lib.optional cfg.triage.enable classifier
+      ++ lib.optional cfg.triage.enable ciDrain
       ++ lib.concatMap (plugin: plugin.packages) (lib.attrValues cfg.plugins);
 
     services.postgresql = {
@@ -650,6 +663,10 @@ in {
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${classifier}/bin/email-archive-triage";
+        # Judging and draining are the same hour's work: the classifier fills the
+        # queues, this closes the CI notices no person will ever read. Prefixed
+        # `-`: a drain that cannot reach the API must not mark the classifier red.
+        ExecStartPost = "-${ciDrain}/bin/email-archive-ci-drain";
         StateDirectory = "email-archive-triage";
         User = "root";
         NoNewPrivileges = true;

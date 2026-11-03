@@ -1,9 +1,10 @@
 # AUDIT — current state and change ledger
 
-> Newest first. One entry per landed change: what, where, evidence. Entries older
-> than the current day roll into `docs/history/audit-<YYYY-MM>.md`; design
-> rationale lives in [`AGENTS.nix`](AGENTS.nix) (`task ops:notes`). Budget: 150
-> lines (`.agents/SCHEMA.md` §2).
+> Newest first. One entry per landed change: what, where, evidence. An entry older
+> than a week rolls into the agent turn log — `task ops:audit:roll` posts it as an
+> xs event and removes it here, because what happened is a turn, not a document.
+> Design rationale lives in [`AGENTS.nix`](AGENTS.nix) (`task ops:notes`). Budget:
+> 300 lines (`.agents/SCHEMA.md` §2).
 
 ## Current state (2026-10-27)
 
@@ -119,36 +120,6 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
   went **22 → 4** in one pass.
 - **The hub counted double and was fixed:** `plugins.sql` first reported 1399 open for 1100 messages,
   because both classifiers hold a verdict. It reads the newest verdict per message, like `/api/attention`.
-
-### 2026-11-03 — mail triage: a tier, an owner, and CI that closes its own loop
-- **The CI noise is one gate, not the fleet.** Seven of the last eight runs on `main` failed and in five the
-  only failing job was `docs-budget`; `affected_hosts: []` means **no host was built at all**. Per-host
-  detection is intact — what leaked is the digest pin and the document budget, checked only *after* the
-  push. `.githooks/pre-push` now runs both locally (an eval and a script, no build budget).
-- **Triage is a verdict, not a column.** `email_triage` is keyed `(message_id, classifier)` and carries
-  `resolved_at`, so two classifiers disagree without rewriting either and a dealt-with notice leaves the
-  queue without losing its searchable body. Rules first; the residue goes to `julia-1` on loopback, and a
-  verdict that does not lead the runner-up by `triage.margin` becomes `review` — surfaced, never hidden.
-- **`run failed:` mail goes to an agent, not a human.** `agents:ci:fix RUN=<id>` builds one bounded prompt
-  from the failing job and its log, starts a `hermes` subagent in detached tmux; `agents:ci:resolve`
-  clears the row when the run is green. A `robot` verdict needs CI evidence — without it the engine filed
-  a university newsletter as `robot` (0.34) and 250 rows would have been buried.
-- **Measured on 1100 messages in 3.0 s:** `action` 464, `review` 250, `robot/agent:ci` 237, `digest` 143.
-  Two NpgsqlRest traps: request bodies are **camelCased** (`messageId`), and a comment line starting with
-  `keys:` is parsed as an annotation and prefixes the JSON body.
-
-### 2026-11-03 — email archive: the endpoint takes a whole message, and something fills it
-- **`add-email` was a four-column stub.** Only four of the nine columns were insertable, so `sent_at`,
-  `thread_id`, `recipients`, `labels` and `attachment_path` were unreachable. It now carries all nine and
-  upserts, so a re-sent batch updates instead of 500ing. A JSON array cannot bind to `text[]` ("…`List`1<Object>'
-  is not supported…"), so `recipients`/`labels` cross comma-separated; a **missing** body key is a 404.
-- **The importer fills the empty archive.** `email-archive-import.py` and its hourly timer walk the inbox
-  through himalaya, POST each new message, and fetch attachments; no watermark, so successive runs walk
-  further back. Root (`ProtectHome=read-only`) because the himalaya config is the login user's. HTML-only
-  bodies go through the Go `html2markdown`, gated by `checks:email:bodies` (900/900 after `--refill`).
-- **Evidence:** repeat POST returns the same `id` with the other columns preserved, missing key 404;
-  `/openapi.json` serves the contract; `dev:email:bench` 15/15, 8.82 ms p95 geomean; after `--refill`
-  repaired 112 HTML-only rows, `checks:email:bodies` PASSED with 900/900 rows carrying text.
 
 ## Open debt (`task ops:notes`)
 

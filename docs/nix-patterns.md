@@ -58,48 +58,30 @@ Better still: `inventory.toml` is compiled by `lib/inventory.nix` — read it wi
 ## Build-budget traps
 
 A module that overrides a package re-derives it, misses the binary cache, and
-spends the month's build budget. Two are fixed in place and must stay fixed:
-
-Both live in one file, and **that file's comment is the home** — the rationale is
-next to the code that would break: `hosts/frieren/paperless.nix` (§Tika,
-§Gotenberg). The index is all this page keeps:
-
-| Where | Trap |
-| :--- | :--- |
-| `hosts/frieren/paperless.nix` | module-level `tika` override → uncached Maven build |
-| `hosts/frieren/paperless.nix` | real chromium (~300 MiB) for a route Paperless never uses |
-
-[[flake/policies.nix#paperless-closure-traps]]
+spends the month's build budget. Both known traps live in one file, and **that
+file's comment is the home** — the rationale sits next to the code that would
+break: `hosts/frieren/paperless.nix` (§Tika: a module-level `tika` override →
+uncached Maven build; §Gotenberg: real chromium, ~300 MiB, for a route Paperless
+never uses) [[flake/policies.nix#paperless-closure-traps]].
 
 Before deploying anything referencing Java (Maven/Gradle), Go or Rust, run
 `nix build --dry-run` and confirm the closure is substitutable.
 
 ### The gate for a fleet fix, and the exception
 
-A fix costs what it changes. Measured on frieren 2026-11-02, the nightly upgrade
-took **13 min 37 s** for a commit that changed documentation — 5 min 46 s of CPU
-on a 2-core NAS — and none of it was a compile:
+A fix costs what it changes. A frieren nightly upgrade measured **13 min 37 s**
+for a commit that changed documentation — 5 min 46 s of CPU on a 2-core NAS, none
+of it a compile: the 03:15 `nix-gc` deleted 90 `-source` paths (a flake's inputs
+are unreferenced the moment its evaluation ends), and 04:00 `autoUpgrade` spent
+8.5 of those minutes re-copying ~20 of them. `services.flakeGcRoot` now roots the
+deployed flake and its inputs at 05:00, so the GC cannot take them.
 
-1. **03:15** `nix-gc` (NixOS's default `nix.gc.dates`) deleted **90** `-source`
-   paths. A flake's inputs are unreferenced the moment its evaluation ends, so
-   nothing protects them.
-2. **04:00** `autoUpgrade` re-copied ~20 of them from the binary caches:
-   04:00:16 → 04:08:46, **8.5 of the 13 minutes**, before the first build started.
-3. The remaining work was 34 generated derivations (`nixos-version`, `etc`,
-   `activate`, unit files, `home-manager-generation`) — the per-commit churn a
-   revision string causes, ~96 s of symlink-and-text.
-
-Two fixes, both in force: `services.flakeGcRoot` roots the deployed flake and
-its inputs at 05:00 (`nix flake archive --out-link`), so the 03:15 GC cannot take
-them; and CI builds host closures from `.#`, not `.?submodules=1#`.
-
-**That second one is the trap worth remembering.** A submodule tree is a
-*different source path* from the same commit's GitHub tarball, so a warm from one
-is worth nothing to an evaluation of the other — which is why frieren rebuilt 34
-derivations on a commit CI had already built. `?submodules=1` is not even a legal
-parameter on a `github:` ref: `contains unknown parameter 'submodules'`. A plain
-git tree and the tarball at one commit *do* resolve to one `/nix/store/…-source`,
-so `.#` is the ref to warm for a host that upgrades from `github:`.
+**The trap worth remembering** is the other fix: a submodule tree is a *different
+source path* from the same commit's GitHub tarball, so a warm from one is worth
+nothing to an evaluation of the other — which is why frieren rebuilt 34
+derivations on a commit CI had already built. `?submodules=1` is not even legal on
+a `github:` ref; a plain git tree and the tarball at one commit *do* resolve to
+one `/nix/store/…-source`, so `.#` is the ref to warm.
 
 So the gate for a fleet fix is cheap, and stays cheap:
 
@@ -110,19 +92,16 @@ bash scripts/task/warm-host.sh --check <host>        # the cache already serves 
 
 A real build — on CI, never on the NAS — is for a change that **adds
 derivations**: a new Python package, model weights, a Rust or Go binary. Anything
-else is a fix, and a fix that needs a closure rebuild is a fix built on the wrong
-tree.
+else is a fix, and a fix that needs a closure rebuild was built on the wrong tree.
+Long form: [`../AGENTS.md`](../AGENTS.md) §5.
 
 ## Reclaiming store space: the collect is only half the job
 
-GC frees paths that **no root reaches**. A generation is one kind of root, not
-the only kind: a `result` symlink from a build nobody uses, a per-user
-home-manager gcroots link, `/run/booted-system`, a `nix profile` entry — each one
-pins a whole closure. `nix-collect-garbage` then reports success and frees
-nothing, which reads as "GC is broken" when the answer is "something is still
-alive".
-
-**The tell: generations deleted, store size unchanged.**
+GC frees paths that **no root reaches**, and a generation is one kind of root: a
+stale `result` symlink, a per-user home-manager gcroots link, `/run/booted-system`,
+a `nix profile` entry each pins a whole closure. `nix-collect-garbage` then reports
+success and frees nothing, which reads as "GC is broken" when the answer is
+"something is still alive". **The tell: generations deleted, store size unchanged.**
 
 ```bash
 sudo nix-store --gc --print-roots | grep -v -e /proc/ -e /sys/      # 2 s
@@ -135,15 +114,11 @@ nix path-info -Sh /run/current-system      # what the running closure costs
 Store ≈ current system + booted system is healthy. A store several GiB larger
 than those two is rooted garbage, not data.
 
-Measured on netbook 2026-10-22, after pruning to a single generation: 15 GiB in
-`/nix/store` against a 6.7 GiB running closure, and three roots held the gap.
-Removing them and collecting again freed **7.2 GiB / 14,702 paths**.
-
-| Root | Held |
-| :--- | :--- |
-| `/etc/nixos/result` (a `nixos-rebuild build` from Sep 30) | 5.9 GiB |
-| `~devji/.local/state/home-manager/gcroots/current-home` | 3.8 GiB |
-| `~alice/.local/state/home-manager/gcroots/current-home` | 380 MiB |
+Measured on netbook 2026-10-22 after pruning to one generation: 15 GiB in
+`/nix/store` against a 6.7 GiB running closure, and three roots held the gap —
+`/etc/nixos/result` (a September `nixos-rebuild build`, 5.9 GiB) and two
+home-manager gcroots links (3.8 GiB, 380 MiB). Removing the symlinks and
+collecting again freed **7.2 GiB / 14,702 paths**.
 
 Remove the **symlink**, never the store path it points at, then collect:
 

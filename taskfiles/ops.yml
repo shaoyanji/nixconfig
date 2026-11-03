@@ -597,6 +597,30 @@ tasks:
     cmds:
       - bash scripts/task/tailnet-policy.sh --apply
 
+  ops:audit:roll:
+    desc: Move ledger entries older than DAYS into the agent turn log (TOON; FORMAT=text for a person, DRY=1 to preview)
+    summary: >
+      AUDIT.md keeps the current state and the recent ledger; what happened is a
+      turn. Each rolled entry becomes one xs event (subject
+      `nixconfig:ledger-<date>-<slug>`) and leaves the file, so the ledger stops
+      being a history document and stops earning a markdown budget. The full text
+      stays in the commit that wrote it; the turn log is where an agent looks for
+      who did what. Needs AGENT_TURNS_TOKEN or sops keys; DAYS defaults to 7.
+    vars:
+      DAYS: '{{.DAYS | default "7"}}'
+      DRY: '{{.DRY | default "0"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
+      MAX: '{{.MAX | default "20"}}'
+    cmds:
+      - |
+        args=(--days "{{.DAYS}}" --max "{{.MAX}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        case "{{.FORMAT}}" in
+          text) python3 scripts/task/audit-roll.py "${args[@]}" ;;
+          json) python3 scripts/task/audit-roll.py --json "${args[@]}" ;;
+          *) python3 scripts/task/audit-roll.py --json "${args[@]}" | toon -e ;;
+        esac
+
   ops:docs:budget:
     desc: Check living documents against the SCHEMA.md budgets (stubs stay stubs)
     summary: >

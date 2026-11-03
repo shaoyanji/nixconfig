@@ -11,6 +11,12 @@
 #      `git add -N <file>`. Only extensions the evaluator actually reads are fatal;
 #      anything else is a warning, because a scratch note should not block a switch.
 #
+#   1b. A DIRTY TREE. Nix only warns about uncommitted changes, so a switch can
+#      build a generation that no commit describes — measured twice in one day,
+#      which makes "what is running" a question only the session remembers.
+#      Refused unless ALLOW_DIRTY=1, and then the commit, the diff hash and the
+#      timestamp are written to `~/.local/state/nixconfig-dirty-rev`.
+#
 #   2. THE BOOT TEST. `task infra:switch:nixos` boots the host in a VM before it
 #      switches (policy: a bad stage-1 cannot be diagnosed from outside). That is
 #      a full host build plus a QEMU boot — minutes to tens of minutes, and the
@@ -28,7 +34,9 @@
 #
 # Usage: switch-preflight.sh [--boot]
 #   --boot   also print exactly one line: `BOOT=run reason=…` or `BOOT=skip reason=…`
-# Exits 1 when an evaluator-readable file is untracked (the fix is in the message).
+# Exits 1 when an evaluator-readable file is untracked, or when tracked files are
+# modified (the fix is in the message; ALLOW_DIRTY=1 overrides the second).
+# `--boot` prints the boot line after those checks, so a refusal never reaches it.
 set -uo pipefail
 
 show_boot=0
@@ -74,6 +82,36 @@ if [ -n "$fatal_untracked" ]; then
     printf '  git add -N %s\n' $fatal_untracked
   } >&2
   exit 1
+fi
+
+# --- 1b. uncommitted changes -------------------------------------------------
+# Tracked files only: an untracked evaluator-readable file was already fatal
+# above, and an untracked note is not part of what the switch deploys.
+dirty="$(git status --porcelain --untracked-files=no | grep -v '^??' || true)"
+if [ -n "$dirty" ]; then
+  if [ "${ALLOW_DIRTY:-0}" != "1" ]; then
+    {
+      echo "switch-preflight: REFUSED — the tree has uncommitted changes."
+      echo
+      printf '  %s\n' $(printf '%s\n' "$dirty" | awk '{print $2}' | head -10)
+      echo
+      echo "  Nix only warns, so this would build a generation that no commit"
+      echo "  describes: the host answers 'what is running' with your memory of"
+      echo "  the session. Commit it, or deploy that exact tree on purpose:"
+      echo
+      echo "  ALLOW_DIRTY=1 task infra:switch:nixos"
+    } >&2
+    exit 1
+  fi
+  stamp="${XDG_STATE_HOME:-$HOME/.local/state}/nixconfig-dirty-rev"
+  mkdir -p "$(dirname "$stamp")"
+  {
+    echo "commit=$(git rev-parse HEAD)"
+    echo "diff_sha256=$(git diff HEAD | sha256sum | cut -d' ' -f1)"
+    echo "at=$(date -Is)"
+    echo "tracked_changes=$(printf '%s\n' "$dirty" | wc -l | tr -d ' ')"
+  } > "$stamp"
+  echo "switch-preflight: ALLOW_DIRTY=1 — deploying an uncommitted tree; record: $stamp" >&2
 fi
 
 # --- 2. does the pending change reach stage-1? -------------------------------

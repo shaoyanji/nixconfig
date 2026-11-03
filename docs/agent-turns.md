@@ -70,7 +70,7 @@ sops -d modules/secrets.yaml | yq -r '.["agent-turns-token-netbook"]' |
 | Route | Result |
 | :--- | :--- |
 | `POST /v1/events` | `201` + `{"id": <frame id>}`; `200` + stored id when that client UUID already exists |
-| `GET /v1/events?repo=&subject=&source=&limit=` | `200` + `{"count","scanned","events"}`, newest first, `limit` 1–200 (default 50) |
+| `GET /v1/events?repo=&subject=&source=&limit=` | `200` + `{"count","scanned","truncated","events"}`, newest first, `limit` 1–200 (default 50) |
 | `GET /healthz` | `200` + `{"ok":true}`, no auth |
 | anything else with `PUT`/`PATCH`/`DELETE` | `405` + `Allow: GET, POST` |
 
@@ -78,6 +78,20 @@ sops -d modules/secrets.yaml | yq -r '.["agent-turns-token-netbook"]' |
 schema carries the repo inside `subject` (`<repo>:<task-id>`) rather than in a
 field of its own. Entries come back with `_frame` added: the xs frame id, for
 cross-checking against `xs get`.
+
+**A filter is a question about the log, not about one page.** An unfiltered read
+returns the newest `limit` frames; a query carrying `subject=`, `repo=` or
+`source=` scans up to `MAX_SCAN` (2000) frames and returns the newest `limit`
+matches, so a turn from last month is still found and `resumability` is not a
+claim about the last fifty entries. `count` is every match, `scanned` the frames
+read, and `truncated: true` says the scan hit its cap and older matches may exist.
+Until 2026-11-03 the filter ran over the page instead, and `?subject=…` answered
+`count: 0` for a subject that was in the store — measured against a 113-turn log.
+
+The read side (`agents:xs:list`) adds the one rule the shim cannot know: an
+`in_progress` whose newest entry is older than `STALE_DAYS` (7) is **stale** —
+printed, and not a failed check, because an agent that died mid-turn must not red
+the gate forever.
 
 Rejections: `401` missing or wrong bearer; `400` unknown field, missing field,
 bad UUID or timestamp, bad `outcome`, a blocked/failed outcome without its note,

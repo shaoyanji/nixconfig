@@ -37,6 +37,16 @@ later `done` superseded is closed, which is why one entry per topic matters.
 Unresolved is not only `in_progress` — a `blocked` subject is a decision waiting
 on a human and a `failed` one needs a second attempt, so both stay live until a
 `done` lands on top of them.
+
+`LIMIT=` is display only, never the search window: a filtered query scans the log
+(the shim caps the scan at 2000 frames and says `truncated` when it hits it), so a
+subject from last month is still found. `LIVE=1` prints only the claim table — the
+"who is working now" question. `STALE_DAYS=` (default 7) is when an unresolved
+subject with no newer entry stops counting as live: `in_progress`, `blocked` or
+`failed`, all three are printed as **stale** and none of them fails the run,
+because a crashed agent's claim would otherwise red the gate forever and teach
+everyone to ignore it. If the stale claim is yours, post an update on that subject
+instead of editing in parallel.
 `base_commit` should be the commit you actually started from after the pull, not
 one you remembered.
 
@@ -137,7 +147,10 @@ curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?source=buff
 
 Events come back newest first with `_frame` added, which is the xs frame id for
 cross-checking against `xs get` on delphi. `repo=`, `subject=`, `source=` and
-`limit=` combine and are all filters on the same fixed schema.
+`limit=` combine and are all filters on the same fixed schema. `count` is every
+match, `events` the newest `limit` of them, and `scanned` is how many frames the
+filter had to read — so `count: 50, scanned: 2000, truncated: true` means "there
+may be older matches" and `count: 3` means "three, and that is all".
 
 ## When the endpoint does not answer
 
@@ -156,11 +169,11 @@ up; a `000` means transport, not auth.
 its own body to `~/.local/state/agent-turns/queue.jsonl` and exits 4 having kept
 the turn; the next `agents:xs:post` that reaches the shim replays the queue
 oldest-first before posting it (a read does not drain it), and replay is idempotent
-because the UUID is the dedup key. So: continue the turn, report the queue depth
-(`task agents:xs:post` prints it, and `grep -c .
-~/.local/state/agent-turns/queue.jsonl` reads it), and the turn lands on someone's
-next post. Two lines that will never be accepted (a `400`, usually the credential
-word scan) move to `queue.rejected.jsonl` instead of blocking the rest.
+because the UUID is the dedup key. So: continue the turn, report the depth with
+`task agents:xs:queue` (depth, oldest entry and its subject, plus the last body a
+`400` refused), and the turn lands on someone's next post. Two lines that will
+never be accepted — usually the credential word scan — move to
+`queue.rejected.jsonl` instead of blocking the rest, and that task names them.
 
 ## Rejections
 

@@ -20,8 +20,14 @@ repo=${REPO:-}
 subject=${SUBJECT:-}
 source_name=${SOURCE:-}
 claim=${CLAIM:-}
+stale_days=${STALE_DAYS:-7}
+live_only=${LIVE:-}
 # TOON is the default because the reader is an agent; a person asks for table.
 format=${FORMAT:-toon}
+# The scan is always the endpoint's cap, not the display limit: a live claim older
+# than the last 20 turns is exactly the one that hurts, and the shim scans the log
+# for a filtered query. LIMIT= is how many rows to show.
+scan=200
 
 unreadable() {
   printf 'xs-list: %s\n' "$*" >&2
@@ -32,13 +38,21 @@ case $limit in
 '' | *[!0-9]*) unreadable "LIMIT must be a number 1-200: $limit" ;;
 esac
 [ "$limit" -ge 1 ] && [ "$limit" -le 200 ] || unreadable "LIMIT must be between 1 and 200: $limit"
+case $stale_days in
+'' | *[!0-9]*) unreadable "STALE_DAYS must be a number: $stale_days" ;;
+esac
+[ "$stale_days" -ge 1 ] || unreadable "STALE_DAYS must be at least 1: $stale_days"
+case $live_only in
+'' | 0 | 1) ;;
+*) unreadable "LIVE must be 1 or empty: $live_only" ;;
+esac
 case $format in
 table | json | toon) ;;
 *) unreadable "FORMAT must be toon, table or json: $format" ;;
 esac
 
 query=$(jq -rn \
-  --arg limit "$limit" --arg repo "$repo" --arg subject "$subject" --arg source "$source_name" '
+  --arg limit "$scan" --arg repo "$repo" --arg subject "$subject" --arg source "$source_name" '
   "limit=\($limit)"
   + (if $repo != "" then "&repo=\($repo | @uri)" else "" end)
   + (if $subject != "" then "&subject=\($subject | @uri)" else "" end)
@@ -60,14 +74,18 @@ case $resp in
 *) unreadable "the endpoint did not return a JSON object: $(printf '%s' "$resp" | head -c 120)" ;;
 esac
 
-rendered=$(jq -r -f "$TEMPLATE" --arg subject "$subject" --arg claim "$claim" <<<"$resp") ||
+cutoff=$(date -u -d "-${stale_days} days" +%Y-%m-%dT%H:%M:%SZ)
+rendered=$(jq -r -f "$TEMPLATE" \
+  --arg subject "$subject" --arg claim "$claim" \
+  --argjson display "$limit" --arg cutoff "$cutoff" \
+  --arg staleDays "$stale_days" --arg liveonly "$live_only" <<<"$resp") ||
   unreadable 'could not render the response; is xs-turn-list.jq intact?'
 
 status=$(printf '%s\n' "$rendered" | sed -n 's/^status\t//p')
 
 case $format in
-json) jq -c '{count, events}' <<<"$resp" ;;
-toon) jq -c '{count, events}' <<<"$resp" | toon -e ;;
+json) jq -c '{count, scanned, truncated, events}' <<<"$resp" ;;
+toon) jq -c '{count, scanned, truncated, events}' <<<"$resp" | toon -e ;;
 *) printf '%s\n' "$rendered" | sed '/^status\t/d' ;;
 esac
 

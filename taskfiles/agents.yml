@@ -286,22 +286,37 @@ tasks:
     cmds:
       - bash scripts/task/xs-turn-post.sh
 
+  agents:xs:queue:
+    desc: "The unposted turn queue: depth, oldest entry, and what was rejected (read-only)"
+    summary: >
+      A post that cannot reach the endpoint keeps its body in
+      ~/.local/state/agent-turns/queue.jsonl, and the next successful post replays
+      it oldest-first. This reports what is waiting: depth, the oldest ts and its
+      subject, and the last body a 400 refused (kept in queue.rejected.jsonl, not
+      retried). Read-only — draining is agents:xs:post's job. Exit 0 with an empty
+      queue is an answer; exit 2 means a file exists but does not parse.
+    cmds:
+      - bash scripts/task/xs-turn-queue.sh
+
   agents:xs:list:
     desc: "List recent xs turns (REPO, SUBJECT, SOURCE, LIMIT) and flag live claims — TOON, FORMAT=table for a person"
     summary: >
-      Reads the log before starting: newest turn first, then the live claims (the
-      newest entry per subject that says in_progress), then a verdict. REPO=,
-      SUBJECT= and SOURCE= filter; LIMIT= 1-200, default 20; CLAIM='area,file'
-      flags a live entry whose claims overlap yours. Output is TOON by default
-      (JSON is the same payload, table is for a person). Exit 1 = a live claim on
-      SUBJECT or an overlap with CLAIM (stop and report the collision), exit 2 =
-      no auth or the endpoint did not answer.
+      Reads the log before starting: newest first, then the live claims (newest
+      entry per subject that says in_progress), then a verdict. REPO=, SUBJECT= and
+      SOURCE= filter the whole log, so an old subject is still found; LIMIT=
+      (1-200, default 20) is how many rows to show. CLAIM='area,file' flags a live
+      entry whose claims overlap yours. STALE_DAYS=7: an in_progress with no newer
+      entry stops counting as live — printed as stale, not a failure. LIVE=1 prints
+      only the claim table. TOON by default (table for a person). Exit 1 = a
+      collision on SUBJECT or CLAIM, exit 2 = no auth or no answer.
     env:
       REPO: "{{.REPO | default \"\"}}"
       SUBJECT: "{{.SUBJECT | default \"\"}}"
       SOURCE: "{{.SOURCE | default \"\"}}"
       LIMIT: "{{.LIMIT | default \"20\"}}"
       CLAIM: "{{.CLAIM | default \"\"}}"
+      STALE_DAYS: "{{.STALE_DAYS | default \"7\"}}"
+      LIVE: "{{.LIVE | default \"\"}}"
       FORMAT: "{{.FORMAT | default \"toon\"}}"
     cmds:
       - bash scripts/task/xs-turn-list.sh

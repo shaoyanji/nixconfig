@@ -35,6 +35,11 @@ TOPIC = "agent.turns"
 MAX_BODY = 16 * 1024
 DEFAULT_LIMIT = 50
 MAX_LIMIT = 200
+# A filter is a question about the log, not about one page of it: `subject=` must
+# find a turn older than the newest 50 or the resumability promise is false (it
+# was, measured 2026-11-03 — count 0 for a subject that exists). Filtered reads
+# therefore scan up to this many frames and say so when they hit the cap.
+MAX_SCAN = 2000
 
 SOCKET_PATH = os.environ.get("XS_SOCKET", "")
 TOKEN_SPEC = os.environ.get("AGENT_TURNS_TOKENS", "")
@@ -359,8 +364,12 @@ class Handler(BaseHTTPRequestHandler):
         want_repo = params.get("repo", [None])[0]
         want_source = params.get("source", [None])[0]
 
+        filtered = bool(want_subject or want_repo or want_source)
+        # Unfiltered stays one page; filtered scans the log so an old subject is
+        # found. `truncated` is the honest answer when the scan hit its cap.
+        scan = MAX_SCAN if filtered else limit
         try:
-            frames = xs_last(limit)
+            frames = xs_last(scan)
         except Exception as exc:  # noqa: BLE001 - a dead store is a 502, not a crash
             self._send(502, {"error": f"store unavailable: {exc}"})
             return
@@ -384,7 +393,18 @@ class Handler(BaseHTTPRequestHandler):
             events.append(entry)
 
         events.reverse()
-        self._send(200, {"count": len(events), "scanned": len(frames), "events": events})
+        matches = len(events)
+        # `count` is every match, `events` the newest `limit` of them, so a caller
+        # can tell "50 of 113" from "50, and that is all there is".
+        self._send(
+            200,
+            {
+                "count": matches,
+                "scanned": len(frames),
+                "truncated": filtered and len(frames) >= MAX_SCAN,
+                "events": events[:limit],
+            },
+        )
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)

@@ -502,11 +502,16 @@ in {
 
       secondClassifier = lib.mkOption {
         type = lib.types.str;
-        default = "second-pass";
+        # Carries the first classifier's name so one bump re-reads both. Without
+        # that, a bumped first pass writes new verdicts over rows the second pass
+        # believes it already judged, and the queue grows by the difference.
+        default = "second:${cfg.triage.classifier}";
+        defaultText = lib.literalExpression ''"second:''${config.services.emailArchive.triage.classifier}"'';
         description = ''
           Name recorded on the second model's verdicts. Like `classifier`, it is
-          half the primary key: bump it when what the pass *means* changes, so the
-          archive is re-read under the new rule instead of keeping old answers.
+          half the primary key: a change to what the pass *means* re-reads the
+          archive, and the default ties it to `classifier` so the pair moves
+          together.
         '';
       };
 

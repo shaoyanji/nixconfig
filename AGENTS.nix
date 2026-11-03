@@ -4807,6 +4807,36 @@
       '';
     };
 
+    appwrite-dragon-court-abandoned = {
+      title = "An abandoned hosted backend is allowed to die, not restored";
+      kind = "decision";
+      status = "DELIVERED";
+      date = "2026-11-03";
+      summary = "Appwrite project \"dragon court\" (org bountystash, created 2024-04-21, id 6624819f34aa833c8925) expires 2026-11-17 and was left to go: no file in this tree, no shaoyanji or Bountystash repo and no sops key mentions Appwrite, so there is no consumer to break, and restoring only re-arms the inactivity timer that produced the warning.";
+      body = ''
+        **What it was.** A Cloud project in the `bountystash` organisation, created
+        2024-04-21 from its id timestamp and never wired to anything after the trial.
+        The one local thing called `dragoncourt` is a Neocities site whose `site/` is
+        the artifact (`projects/neocities-dragoncourt`), with no fetch and no backend.
+
+        **Evidence of no dependency (the reason this is a decision, not a guess).**
+        `grep -rni appwrite` over `.nix`/`.md`/`.toml`/`.yml`/`.py`/`.sh` returns
+        nothing; `gh search code appwrite --owner shaoyanji` and `--owner Bountystash`
+        both return `[]`; `sops -d modules/secrets.yaml | yq -r 'keys[]' | grep -i
+        appwrite` returns nothing. A backend with no caller, no key and no CI job has
+        no blast radius when it goes.
+
+        **Why not restore.** Restoring stops the clock, not the question: the project
+        pauses again on inactivity and mails the same 14-day warning, so the record
+        would keep a decision that was only deferred. Look-then-decide (restore,
+        browse databases and storage, export, then delete) was offered and declined.
+
+        **What would reopen it.** A new Appwrite-backed project starts as a module
+        that names the project and a task that reaches it, never as a resurrection of
+        this id: an account nobody can point at from the tree is not a host.
+      '';
+    };
+
     open-manual-steam-fill = {
       title = "The nightly prefill window is redundant once fills are operator-driven";
       kind = "open";
@@ -5203,8 +5233,7 @@
 
         **Exit.** Build the deterministic grammar first (p=1) and let the model only
         front it. Ship only if answered-case p >= 0.3 at S >= 3 s AND refusal <= 100 ms
-        AND the Kelly entry in flake/daemons.nix clears with `wanted = true`. If the
-        grammar is learnable in one session, S amortises to zero and the answer is no.
+        AND the Kelly entry in flake/daemons.nix clears with `wanted = true`. If the grammar is learnable in one session, S amortises to zero and the answer is no.
       '';
     };
 

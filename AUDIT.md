@@ -28,6 +28,14 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-03 — the Appwrite project expires on purpose
+- **`dragon court` is abandoned, not restored.** Appwrite Cloud (org `bountystash`, created 2024-04-21)
+  warned that the paused project is deleted on **2026-11-17**. Nothing in this tree, in any `shaoyanji`
+  or `Bountystash` repo, or in sops names Appwrite, so no caller, key or CI job breaks when it goes.
+- **Restoring was the alternative and was refused:** it stops the clock, not the question — the project
+  pauses again on inactivity and mails the same 14-day warning. Look-then-decide (restore, browse, export,
+  delete) was offered and declined. Record: `appwrite-dragon-court-abandoned`.
+
 ### 2026-11-03 — the Vivid reply went out, and a draft without `From:` could not
 - **Sent, not drafted.** The BESS Construction Manager reply to Ally Freeman (Vivid) left the
   `jisifu` Gmail account as `Matt Ji <matt@bountystash.com>` with the tailored CV and German

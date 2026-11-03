@@ -62,14 +62,14 @@ in {
     # `x-systemd.mount-timeout` bounds the mount(8) call, not the unit: on
     # 2026-10-28 `mnt-burgernas-peachcable.mount` sat in `activating` for 30 min
     # 1.47 s before failing. The timeout is declared on the unit itself.
+    # Note: in a mount unit, timeouts belong in `[Mount]` (mountConfig), not `[Unit]`.
     systemd.mounts = [
       {
         what = "${cfg.host}:${cfg.export}";
         where = cfg.mountPoint;
         overrideStrategy = "asDropin";
-        unitConfig = {
-          TimeoutStartSec = "10s";
-          TimeoutStopSec = "10s";
+        mountConfig = {
+          TimeoutSec = "10s";
         };
       }
     ];

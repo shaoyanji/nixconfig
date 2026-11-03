@@ -28,6 +28,21 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-03 — triage routes by rule, and two models may disagree
+- **The 511 was a routing inversion, not a backlog.** `machine sender:` fired on `noreply@`/`mailings@`
+  and returned `action`/`human`, and `PROTECTED` forbade the second model from closing verification and
+  security-alert mail — 203 + 104 rows manufactured by two lines. Rules now run deadline → record →
+  one-shot → machine sender, so the same mail is `action`, `digest`, `robot`, `digest`.
+- **`julia` and `laya` override each other** in both directions; only a tie keeps the assigned tier, and a
+  sender that keeps writing with no deadline is a feed → `digest`. `triage.expireDays` resolves `review`
+  rows untouched for 30 days; `triage.pointers` (gumball) is exempt and expires at 7.
+- **Application mail reaches the pipeline.** A plugin may claim by subject, so `Bewerbung`/`application:`
+  from an employer's own mailbox goes to `agent:apps` instead of a person: 68 rows, 9 statuses written,
+  5 applications discovered on the first sync.
+- **`task agents:mail:sweep`** resolves a block by selector (`SENDER=`, `OLDER=`, `TIER=`), dry by
+  default and refusing to run with no selector. Human queue 511 → 123 in one pass: 247 re-routed, 128
+  expired, 39 consumed by the pipeline; 235 CI notices closed by the drain.
+
 ### 2026-11-03 — the queues drain themselves, and the ledger rolls into the turn log
 - **Every queue now has a consumer.** `agent:ci` held 237 open and 0 resolved ever: the triage unit's
   `ExecStartPost` runs `email-ci-drain.py` (`-` prefixed, so a drain failure cannot mark the classifier

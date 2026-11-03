@@ -20,6 +20,8 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections import Counter
+from datetime import datetime, timedelta, timezone
 from email.utils import parseaddr
 
 # A margin over the runner-up, not an absolute probability: julia-1 is a 144M
@@ -107,43 +109,73 @@ BULK_SIGNALS = (
     "bewerten",
 )
 
-TRANSACTIONAL_SIGNALS = (
+# A deadline that survives the mail. This is the only robot-written class that
+# stays in front of a person: a domain about to expire is not stale in a week.
+ACTIONABLE_SIGNALS = (
+    "expiring",
+    "expires",
+    "läuft ab",
+    "action required",
+    "deadline",
+    "frist",
+    "kündigung",
+    "insufficient",
+    "suspended",
+    "failed payment",
+)
+
+# A record you keep and search, never a queue item: money and shipping. It stays
+# archived and full-text searchable, it just does not sit in front of a person.
+DURABLE_SIGNALS = (
+    "statement",
     "invoice",
+    "rechnung",
     "receipt",
+    "quittung",
     "your order",
     "order confirmation",
+    "bestellung",
     "shipped",
     "shipping",
+    "versand",
     "delivery",
     "tracking",
     "payment",
+    "zahlung",
     "paid",
     "refund",
     "subscription",
+    "abo",
     "renewal",
-    "expires",
-    "expiring",
-    "verify",
+    "tax",
+    "steuer",
+)
+
+# Mail whose value ends when it is read: a code, a sign-in alert, a password
+# reset. Measured on the 2026-11-03 queue, 67 rows a person was holding were one
+# of these — a verification code is useless the minute it is read.
+EPHEMERAL_SIGNALS = (
     "verification",
-    "security alert",
-    "new sign-in",
+    "verify",
+    "passcode",
+    "bestätigungscode",
+    "verification code",
     "password",
+    "passwort",
+    "security alert",
+    "sicherheitshinweis",
+    "new sign-in",
+    "sign-in",
+    "anmeldung",
     "two-factor",
     "2fa",
-    "sign-in",
     "confirmation",
-    "application received",
-    "your application",
-    "interview",
-    "booking",
-    "reservation",
-    "appointment",
-    "ticket",
-    "statement",
-    "tax",
-    "insufficient",
-    "error",
 )
+
+# The signals a second model may not close: an application is the pipeline's
+# whole input, and a deadline is the one thing whose expiry has consequences.
+# Everything else is fair game, in either direction.
+PROTECTED_SIGNALS = ("bewerbung", "einladung", "vertrag") + ACTIONABLE_SIGNALS
 
 
 # NpgsqlRest publishes column names as camelCase in JSON responses, while the
@@ -216,7 +248,8 @@ def load_plugins(path: str) -> list[dict]:
     for name, plugin in (raw or {}).items():
         for rule in plugin.get("rules") or []:
             senders = [str(sender).lower() for sender in rule.get("senders") or [] if sender]
-            if not senders:
+            subjects = [str(subject).lower() for subject in rule.get("subjects") or [] if subject]
+            if not senders and not subjects:
                 continue
             plugins.append(
                 {
@@ -224,13 +257,29 @@ def load_plugins(path: str) -> list[dict]:
                     "owner": rule.get("owner") or f"agent:{name}",
                     "tier": rule.get("tier") or "action",
                     "senders": senders,
+                    "subjects": subjects,
                 }
             )
     return plugins
 
 
+def load_pointers(path: str) -> set[str]:
+    """Addresses of agents that send a regular pointer, one per day at most.
+
+    A pointer is a person-facing action item that a machine writes: exempt from
+    the feed rules, and never closed by the second model.
+    """
+    if not path or not os.path.exists(path):
+        return set()
+    with open(path, encoding="utf-8") as handle:
+        return {address(line) or line.strip().lower() for line in handle if line.strip()}
+
+
 def classify_rules(
-    message: dict, vip: set[str], plugins: list[dict] | None = None
+    message: dict,
+    vip: set[str],
+    plugins: list[dict] | None = None,
+    pointers: set[str] | None = None,
 ) -> tuple[str, str, str, float] | None:
     """(tier, owner, reason, confidence), or None when no rule fires."""
     addr = address(message.get("sender"))
@@ -238,9 +287,15 @@ def classify_rules(
     low_subject = subject.lower()
     labels = message.get("labels") or []
     label_text = " ".join(labels).lower()
+    pointers = pointers or set()
 
     if addr and addr in vip:
         return "person", "human", "VIP address", 0.99
+
+    # A declared pointer is an agent's daily "look here": regular by design, so
+    # the feed rules below never touch it, and the second model cannot close it.
+    if addr in pointers:
+        return "action", "human", f"pointer: {addr}", 0.95
 
     if addr and (addr in CI_SENDERS or addr.endswith("@github.com")):
         if CI_SUBJECT.search(subject):
@@ -252,22 +307,40 @@ def classify_rules(
         return "robot", "agent:ci", "CI sender", 0.9
 
     # Host-declared plugins, after the built-ins so a plugin cannot silently
-    # outrank CI or the pipeline: adding one is config, not a patch.
+    # outrank CI or the pipeline: adding one is config, not a patch. A plugin may
+    # claim by sender or by subject, which is how application mail from a
+    # company's own mailbox reaches the pipeline instead of a person.
     for plugin in plugins or []:
-        if any(marker in addr for marker in plugin["senders"]):
+        if any(marker in addr for marker in plugin["senders"]) or any(
+            marker in low_subject for marker in plugin["subjects"]
+        ):
             return plugin["tier"], plugin["owner"], f"plugin {plugin['name']}", 0.9
 
     hit = next((signal for signal in BULK_SIGNALS if signal in low_subject), None)
     if hit:
         return "digest", "none", f"bulk signal: {hit}", 0.85
 
-    hit = next((signal for signal in TRANSACTIONAL_SIGNALS if signal in low_subject), None)
+    # A deadline survives the read; a record does not need a person; a code is
+    # over. Checked in that order because "order confirmation" contains
+    # "confirmation", and a booking is a record, not a one-shot.
+    hit = next((signal for signal in ACTIONABLE_SIGNALS if signal in low_subject), None)
     if hit:
-        return "action", "human", f"transactional signal: {hit}", 0.85
+        return "action", "human", f"deadline signal: {hit}", 0.8
+
+    hit = next((signal for signal in DURABLE_SIGNALS if signal in low_subject), None)
+    if hit:
+        return "digest", "none", f"record signal: {hit}", 0.8
+
+    hit = next((signal for signal in EPHEMERAL_SIGNALS if signal in low_subject), None)
+    if hit:
+        return "robot", "none", f"one-shot signal: {hit}", 0.8
 
     local = addr.split("@")[0] if "@" in addr else addr
     if any(local == machine or local.startswith(machine + "-") for machine in MACHINE_LOCALS):
-        return "action", "human", f"machine sender: {local}", 0.7
+        # A robot wrote it, so a robot's inbox: the reason said "machine sender"
+        # while the tier said "a person's action item", which is where 203 of the
+        # 511 rows in the queue came from.
+        return "digest", "none", f"machine sender: {local}", 0.7
 
     return None
 
@@ -324,16 +397,13 @@ def classify_engine(message: dict, engine_url: str, margin: float) -> tuple[str,
     return tier, owner, f"engine: {choice} ({top:.2f})", top
 
 
-# What the second architecture may do to a message a person is already holding:
-# call it bulk and close it, or leave it alone. Nothing it says can put mail in
-# front of a person, so a second opinion can only take work away.
-DEMOTABLE = ("digest", "robot")
+# What a second model's verdict may replace: anything. The two architectures
+# override each other in both directions, because a disagreement is information
+# and the queue is what pays for a tie. The only bar is a declared pointer.
+CLOSING = ("digest", "robot")
 
-# …except about these. A receipt demoted to a digest is a record nobody reads,
-# and an application acknowledgement is the pipeline's whole input: measured on
-# the first run, 16 of 500 demotions were one of the two. The markers are the
-# first pass's own evidence, so the second model cannot overrule them.
-PROTECTED = TRANSACTIONAL_SIGNALS + ("bewerbung", "einladung", "vertrag", "kündigung")
+# How long a declared pointer stays in front of a person. It is a daily thing.
+POINTER_DAYS = 7
 
 
 def second_pass(
@@ -342,8 +412,16 @@ def second_pass(
     classifier: str,
     margin: float,
     dry_run: bool,
-) -> tuple[int, int, int]:
-    """Ask the second model about unresolved human mail. (demoted, kept, skipped)."""
+    pointers: set[str] | None = None,
+) -> tuple[int, int, int, int]:
+    """Ask the second model about unresolved human mail.
+
+    (closed, reopened, kept, skipped). The two architectures override each other:
+    a definite verdict replaces the other one in either direction, and a tie falls
+    back to the tier `julia` already assigned. The bias is towards deciding —
+    `review` is for a message neither model can place, not a parking spot.
+    """
+    pointers = pointers or set()
     try:
         get(f"{engine_url.rstrip('/')}/health", timeout=5.0)
     except (urllib.error.URLError, TimeoutError, ValueError) as error:
@@ -351,11 +429,16 @@ def second_pass(
             f"triage: second engine unreachable at {engine_url} ({error}); pass skipped",
             file=sys.stderr,
         )
-        return 0, 0, 0
+        return 0, 0, 0, 0
 
     attention = [normalize(row) for row in (get(f"{api}/api/attention?lim=100000") or [])]
     if not attention:
-        return 0, 0, 0
+        return 0, 0, 0, 0
+
+    # A sender that keeps writing with no deadline in sight is a feed: recurring
+    # mail is the shape of a newsletter, and the addressing rules cannot see the
+    # difference between one pointer and a thousand "Daily Chew"s.
+    per_sender = Counter(address(row.get("sender")) for row in attention)
 
     # `triage-pending` answers the complement: every message this classifier has
     # not judged. Intersecting it with attention is what keeps the pass to the
@@ -371,23 +454,37 @@ def second_pass(
     }
     targets = [row for row in attention if row.get("message_id") in unjudged]
 
-    demoted = kept = skipped = 0
+    closed = reopened = kept = skipped = 0
     for message in targets:
         verdict = classify_engine(message, engine_url, margin)
         if verdict is None:
             skipped += 1
             continue
-        tier, _owner, reason, confidence = verdict
+        tier, owner, reason, confidence = verdict
 
         subject = (message.get("subject") or "").lower()
-        protected = any(marker in subject for marker in PROTECTED)
-        if tier in DEMOTABLE and not protected:
+        addr = address(message.get("sender"))
+        current_tier = message.get("tier") or "review"
+        protected = addr in pointers or any(marker in subject for marker in PROTECTED_SIGNALS)
+        feed = per_sender.get(addr, 0) > 1 and not any(
+            marker in subject for marker in ACTIONABLE_SIGNALS
+        )
+
+        if protected:
+            new_tier, new_owner = "action", "human"
+        elif tier != "review":
+            # Either direction: a definite verdict wins over the other model's.
+            new_tier, new_owner = tier, owner
+        elif feed:
             new_tier, new_owner = "digest", "none"
-            demoted += 1
         else:
-            # Keep the tier a person was already given: the second model can say
-            # "agreed", it cannot re-label review as action behind their back.
-            new_tier, new_owner = message.get("tier") or "review", "human"
+            new_tier, new_owner = current_tier, "human"
+
+        if new_tier in CLOSING:
+            closed += 1
+        elif current_tier == "review" and new_tier in ("person", "action"):
+            reopened += 1
+        else:
             kept += 1
 
         if dry_run:
@@ -410,10 +507,52 @@ def second_pass(
         )
         # Bulk mail that is closed is mail nobody has to look at twice; leaving it
         # open would move the queue rather than shorten it.
-        if new_tier == "digest":
+        if new_tier in CLOSING:
             post(f"{api}/api/triage-resolve", {"messageId": message["message_id"]})
 
-    return demoted, kept, skipped
+    return closed, reopened, kept, skipped
+
+
+def expire(
+    api: str, days: int, pointers: set[str] | None = None, dry_run: bool = False
+) -> int:
+    """Resolve `review` rows older than `days`.
+
+    A message neither model can place, that nobody has touched for a month, is a
+    rolling window's job: it stays archived and searchable, it just stops being
+    parked in front of a person. `person`, `action` and a declared pointer are
+    never expired, and `resolved_at` is one update away from being undone.
+    """
+    if days <= 0:
+        return 0
+    pointers = pointers or set()
+    now = datetime.now(timezone.utc)
+    attention = [normalize(row) for row in (get(f"{api}/api/attention?lim=100000") or [])]
+    expired = 0
+    for row in attention:
+        tier = row.get("tier") or ""
+        addr = address(row.get("sender"))
+        # A pointer is consumed, not kept: today's supersedes yesterday's, and a
+        # week-old "look here" is a link to a moment that has passed.
+        if addr in pointers:
+            cutoff = now - timedelta(days=min(days, POINTER_DAYS))
+        elif tier == "review":
+            cutoff = now - timedelta(days=days)
+        else:
+            continue
+        if any(marker in (row.get("subject") or "").lower() for marker in ACTIONABLE_SIGNALS):
+            continue
+        sent = row.get("sent_at") or ""
+        try:
+            when = datetime.fromisoformat(sent[:19]).replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+        if when >= cutoff:
+            continue
+        if not dry_run:
+            post(f"{api}/api/triage-resolve", {"messageId": row["message_id"]})
+        expired += 1
+    return expired
 
 
 def main() -> int:
@@ -423,6 +562,13 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=500, help="messages to classify in this run")
     parser.add_argument("--vip-file", default="", help="file of always-person addresses, one per line")
     parser.add_argument("--plugins", default="", help="JSON of host-declared sender rules")
+    parser.add_argument("--pointers", default="", help="file of agent addresses whose mail is a pointer")
+    parser.add_argument(
+        "--expire-days",
+        type=int,
+        default=0,
+        help="resolve `review` rows older than this; 0 keeps them forever",
+    )
     parser.add_argument("--engine-url", default=os.environ.get("SYSTEMONE_URL", "http://127.0.0.1:8091"))
     parser.add_argument("--margin", type=float, default=DEFAULT_MARGIN)
     parser.add_argument("--no-engine", action="store_true", help="rules only; residue goes to review")
@@ -458,6 +604,7 @@ def main() -> int:
 
     vip = load_vip(args.vip_file)
     plugins = load_plugins(args.plugins)
+    pointers = load_pointers(args.pointers)
     pending = [
         normalize(row)
         for row in get(
@@ -474,7 +621,7 @@ def main() -> int:
     owners: dict[str, int] = {}
     written = 0
     for message in pending:
-        verdict = classify_rules(message, vip, plugins)
+        verdict = classify_rules(message, vip, plugins, pointers)
         if verdict is None and not args.no_engine:
             verdict = classify_engine(message, args.engine_url, args.margin)
         if verdict is None:
@@ -509,17 +656,23 @@ def main() -> int:
     print("owners: " + " ".join(f"{owner}={count}" for owner, count in sorted(owners.items())))
 
     if not args.no_second:
-        demoted, kept, skipped = second_pass(
+        closed, reopened, kept, skipped = second_pass(
             api,
             args.second_engine_url,
             args.second_classifier,
             args.margin,
             args.dry_run,
+            pointers,
         )
         print(
-            f"second pass: {demoted} closed as bulk, {kept} left for a person, "
-            f"{skipped} without an answer"
+            f"second pass: {closed} closed, {reopened} moved to a person, "
+            f"{kept} kept, {skipped} without an answer"
         )
+
+    expired = expire(api, args.expire_days, pointers, args.dry_run)
+    if args.expire_days > 0:
+        state = "would expire" if args.dry_run else "expired"
+        print(f"expiry: {state} {expired} review rows older than {args.expire_days}d")
     return 0
 
 

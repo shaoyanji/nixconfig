@@ -74,12 +74,10 @@ literal because `ts_headline` plus two bind parameters fails inside Npgsql
 (500, `The value cannot be an empty string (Parameter 'key')`).
 
 **The upload settings are `NpgsqlRest.UploadOptions.UploadHandlers.*`.** A
-top-level `NpgsqlRest.FileSystemPath` (as some examples show) is silently
-ignored; both `UploadOptions.Enabled` and
-`UploadHandlers.FileSystemCreatePathIfNotExists` have to be set, and
-`FileSystemUseUniqueFileName` is what keeps two attachments from the same mail
-from colliding. The path is configured and empty; serving uploads needs a
-routine annotated `@upload`, which does not exist yet.
+top-level `FileSystemPath` (as some examples show) is silently ignored; both
+`Enabled` and `FileSystemCreatePathIfNotExists` have to be set, and
+`UseUniqueFileName` keeps two attachments from one mail apart. The path is empty
+because serving uploads needs a routine annotated `@upload`, which does not exist.
 
 **Ownership is asserted by the init unit, not `ensureDBOwnership`.**
 `ensureDBOwnership` only accepts a database *named after the role*, and this one
@@ -134,13 +132,27 @@ and so re-classifying never rewrites the archive.
 | `confidence` | rule confidence, or the engine's top probability |
 | `resolved_at` | set by whatever dealt with it; an unresolved row is the queue |
 
-The classifier (`modules/services/email-triage.py`) runs rules first: the VIP
-list, GitHub CI notices, machine senders, bulk and transactional signals. The
-residue reaches the engine this host serves (`julia-1` on loopback, 3 ms per
-question); a verdict that does not lead the runner-up by `triage.margin` becomes
-**`review`**. Then a second architecture (`laya`, on `serve.secondary`'s port)
-re-reads what a person is holding: bulk it is sure about is closed, invoice and
-application subjects are protected from it, and it can never add to the queue.
+The classifier (`modules/services/email-triage.py`) runs rules first, in an
+order that decides the queue: VIP, declared pointers, CI, plugin claims (sender
+**or** subject), deadline signals → `action`, records → `digest`, one-shot codes
+and alerts → `robot`, machine senders → `digest`. The residue reaches `julia-1`
+(3 ms per question); a verdict that does not lead the runner-up by
+`triage.margin` becomes **`review`**. The second architecture (`laya`) then
+overrides it in **either direction** — a definite verdict replaces the other
+model's, and only a tie keeps `julia`'s tier — so the queue pays for a
+classification, not for a tie. A sender that writes repeatedly with no deadline
+is a feed and becomes `digest`; a declared **pointer** (`triage.pointers`, one a
+day from an assistant) is exempt and stays in front of a person for a week.
+`triage.expireDays` resolves `review` rows nobody touched in 30 days; `person`,
+`action` and pointers are never expired.
+
+**One decision per sender, not per message.** `task agents:mail:sweep
+SENDER=<substring> DRY=1` counts what a selector matches (by tier and sender)
+and `DRY=0` resolves the block through `/api/triage-resolve`. At least one
+selector is required, so a typo cannot empty the queue. Measured 2026-11-03: the
+rules took the human queue from 511 to 136 in one run — 203 rows were a machine
+sender filed as a person's action item, and 128 were review rows older than 30
+days.
 
 **The VIP list is encrypted config, not state.** `modules/secrets.yaml` carries
 `email-archive.vip-senders`; sops-nix lands it as a 0400 file at `triage.vipFile`,
@@ -343,12 +355,10 @@ curl -s 'http://127.0.0.1:8080/api/list-emails?lim=5' | jq
 ## Google Drive mirror (skipped until a remote exists)
 
 The sync is one-way — Drive holds a mirror, never the source of truth. The timer
-is on from the first boot; the unit carries `ConditionPathExists` on
-`/var/lib/npgsqlrest/rclone.conf`, so it is **skipped, not failed**, until that
-file exists. This is the calendar's rule
-(`modules/calendar.nix`): the OAuth client is declared, the **token is state**,
-and the unit's condition is the dependency. There is no archive-specific
-credential — the same `googleDrive/clientId` + `clientSecret` pair drives both.
+runs from first boot and the unit carries `ConditionPathExists` on
+`/var/lib/npgsqlrest/rclone.conf`: **skipped, not failed**, until that file
+exists. That is the calendar's rule — the OAuth client is declared, the **token is
+state** — and the same `googleDrive/clientId` + `clientSecret` pair drives both.
 
 ```bash
 rclone authorize drive                  # 1. on a browser machine: prints a token blob
@@ -371,9 +381,8 @@ The first guest is `modules/plugins/appflow/`, deliberately not modeled on the
 upstream project: the JSON is a data source, and documents are a Nix build —
 `typst` from this flake's pin, one template per language, artifact is a store path.
 
-The token is a file next to the mail mirror, not a sops key, so rotating it is
-`rclone config reconnect` and no rebuild. Revoking access is `rm` of the conf
-plus a remote stop — the unit returns to *skipped*.
+The token is state, not sops: rotating it is `rclone config reconnect` with no
+rebuild, and `rm` of the conf plus a remote stop returns the unit to *skipped*.
 
 ## Not done here
 

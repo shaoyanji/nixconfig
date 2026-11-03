@@ -381,6 +381,41 @@ tasks:
         [ "$n" -gt 0 ] || { echo "agents:mail:resolve: nothing open for {{.ID}}" >&2; exit 1; }
         echo "resolved {{.ID}} ($n verdict(s))"
 
+  agents:mail:sweep:
+    desc: "Resolve a block of the human queue by selector (SENDER= DOMAIN= SUBJECT= TIER= OLDER= NEWER=; dry run unless DRY=0)"
+    summary: >
+      One decision per sender, not 511 per message. Selectors combine with AND
+      and at least one is required, so a mistyped command cannot empty the queue.
+      Prints what matched, by tier and by sender, before anything is written;
+      DRY=0 resolves every match through /api/triage-resolve, which only sets
+      `resolved_at` — the mail stays archived and searchable. FORMAT=json and
+      FORMAT=text exist; TOON is the default because an agent is the reader.
+    vars:
+      SENDER: '{{.SENDER | default ""}}'
+      DOMAIN: '{{.DOMAIN | default ""}}'
+      SUBJECT: '{{.SUBJECT | default ""}}'
+      TIER: '{{.TIER | default ""}}'
+      OLDER: '{{.OLDER | default ""}}'
+      NEWER: '{{.NEWER | default ""}}'
+      LIMIT: '{{.LIMIT | default "0"}}'
+      DRY: '{{.DRY | default "1"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    cmds:
+      - |
+        [ -n "{{.SENDER}}{{.DOMAIN}}{{.SUBJECT}}{{.TIER}}{{.OLDER}}{{.NEWER}}" ] || {
+          echo "agents:mail:sweep: a selector is required (SENDER= DOMAIN= SUBJECT= TIER= OLDER= NEWER=)" >&2
+          exit 2; }
+        args=(--sender "{{.SENDER}}" --domain "{{.DOMAIN}}" --subject "{{.SUBJECT}}"
+              --tier "{{.TIER}}" --limit "{{.LIMIT}}")
+        [ -n "{{.OLDER}}" ] && args+=(--older "{{.OLDER}}")
+        [ -n "{{.NEWER}}" ] && args+=(--newer "{{.NEWER}}")
+        [ "{{.DRY}}" != "1" ] && args+=(--apply)
+        case "{{.FORMAT}}" in
+          text) python3 scripts/task/email-sweep.py "${args[@]}" ;;
+          json) python3 scripts/task/email-sweep.py --json "${args[@]}" ;;
+          *) python3 scripts/task/email-sweep.py --json "${args[@]}" | toon -e ;;
+        esac
+
   agents:ci:drain:
     desc: "Close CI notices that are stale or superseded by a newer one (TOON; FORMAT=text for a person, FULL=1 for every id, DRY=1, DAYS=14)"
     summary: >

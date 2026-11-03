@@ -94,8 +94,23 @@ in {
       packages = [sync];
       rules = [
         {
-          # Application mail is the pipeline's: the tracker moves with it.
+          # Application mail is the pipeline's: the tracker moves with it. A
+          # recruiter answers from the employer's own mailbox, so the sender list
+          # cannot be the only door — 42 of the 511 rows in the human queue were
+          # application mail that named the company but not an ATS.
           senders = atsSenders;
+          subjects = [
+            "bewerbung"
+            "bewerbungsprozess"
+            "lebenslauf"
+            "kandidat"
+            "eeo self-identification"
+            "your application"
+            "application received"
+            "application status"
+            "application:"
+            "job application"
+          ];
           tier = "action";
           owner = "agent:apps";
         }

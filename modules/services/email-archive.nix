@@ -162,7 +162,7 @@
             if rule.owner != ""
             then rule.owner
             else "agent:${name}";
-          inherit (rule) tier senders;
+          inherit (rule) tier senders subjects;
         })
         plugin.rules;
     })
@@ -182,6 +182,12 @@
 
   pluginSchemas = lib.concatMap (plugin: plugin.schema) (lib.attrValues cfg.plugins);
 
+  # Declared pointers: an agent's regular "look here", one file the classifier
+  # reads. Empty by default, so a host that wants none carries no state.
+  pointers = pkgs.writeText "email-archive-pointers" (
+    lib.concatStringsSep "\n" cfg.triage.pointers + "\n"
+  );
+
   classifier = pkgs.writeShellApplication {
     name = "email-archive-triage";
     runtimeInputs = [pkgs.python3];
@@ -192,9 +198,11 @@
         --plugins ${lib.escapeShellArg "${pluginRules}"} \
         --limit ${toString cfg.triage.limit} \
         --vip-file ${lib.escapeShellArg cfg.triage.vipFile} \
+        --pointers ${lib.escapeShellArg "${pointers}"} \
         --engine-url ${lib.escapeShellArg cfg.triage.engineUrl} \
         --second-engine-url ${lib.escapeShellArg cfg.triage.secondEngineUrl} \
         --margin ${toString cfg.triage.margin} \
+        --expire-days ${toString cfg.triage.expireDays} \
         "$@"
     '';
   };
@@ -355,6 +363,15 @@ in {
                   default = [];
                   description = "Addresses or domains this rule claims (substring of the sender).";
                 };
+                subjects = lib.mkOption {
+                  type = lib.types.listOf lib.types.str;
+                  default = [];
+                  description = ''
+                    Subject markers this rule claims, lowercased substrings. A
+                    plugin that owns a conversation needs this: a recruiter
+                    answers from the company's own mailbox, not from the ATS.
+                  '';
+                };
                 owner = lib.mkOption {
                   type = lib.types.str;
                   default = "";
@@ -465,9 +482,9 @@ in {
         default = "http://127.0.0.1:8092";
         description = ''
           The second architecture (`services.systemoneDecision.serve.secondary`).
-          The triage asks both, and only lets the second one *demote*: mail it is
-          sure is bulk leaves the human queue, and nothing it says can put mail in
-          front of a person. An unreachable second engine skips the pass.
+          The triage asks both and they override each other: a definite verdict
+          replaces the other model's in either direction, and only a tie keeps the
+          tier `julia` assigned. An unreachable second engine skips the pass.
         '';
       };
 
@@ -479,6 +496,28 @@ in {
           verdict is trusted; below it the message becomes `review`, which is
           surfaced to a person rather than hidden. A margin, not an absolute
           probability: julia-1 reports low probabilities even when right.
+        '';
+      };
+
+      pointers = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        description = ''
+          Addresses whose mail is an agent's regular pointer: tier `action`, owner
+          `human`, exempt from the feed rule and never closed by the second model.
+          One email a day that says "look here" is not bulk; a thousand of them is
+          what this exemption would look like if it were misused.
+        '';
+      };
+
+      expireDays = lib.mkOption {
+        type = lib.types.ints.unsigned;
+        default = 30;
+        description = ''
+          Resolve `review` rows older than this many days. A message neither model
+          can place, untouched for a month, stays archived and searchable; it just
+          stops being parked in front of a person. `person`, `action` and a
+          declared pointer are never expired. 0 keeps them forever.
         '';
       };
     };

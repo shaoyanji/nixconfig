@@ -26,7 +26,13 @@
     # and the newest verdict per message is the one every read uses.
     triage = {
       enable = true;
-      classifier = "rules+engine+apps";
+      # Bumped because the routing changed: a new name re-judges the archive, and
+      # the newest verdict per message is the one every read uses.
+      classifier = "rules+engine+apps+pointer";
+      # The Gumloop assistant writes one daily digest. It is an agent pointing at
+      # what it thinks matters — regular, not bulk — so it stays in front of a
+      # person and the feed rule may not close it.
+      pointers = ["gumball@gumloop.ai"];
     };
   };
 

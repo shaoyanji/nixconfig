@@ -108,6 +108,9 @@ in any field. Error bodies name the field, never the value.
 above documents the shape, it is not something an agent assembles by hand.
 
 `outcome` is `done`, `in_progress`, or `blocked: <note>` / `failed: <note>`.
+On the read side the newest entry per subject decides, and only `done` closes it:
+`in_progress`, `blocked` and `failed` all count as live, because a subject waiting
+on an operator decision is open work rather than history.
 An unknown field is a 400, which is what keeps a transcript from being posted
 under an extra key. Prose fields are capped (action 500, rationale 1000) and
 scanned for credential shapes; `files_changed` and commit hashes are exempt from

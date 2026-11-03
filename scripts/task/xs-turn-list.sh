@@ -3,7 +3,8 @@
 # verdict for the subject or the areas you are about to touch.
 #
 # Rendering lives in scripts/task/xs-turn-list.jq, which also states the rule for
-# "live" once: the NEWEST entry per subject that says in_progress.
+# "live" once: the NEWEST entry per subject that is in_progress, blocked or
+# failed. A blocked subject is a decision waiting on a human, so it is open work.
 #
 # Task: agents:xs:list · protocol: docs/agent-turns.md · skill: xs-turns
 # Exit: 0 nothing live for what was asked · 1 a live claim on SUBJECT, or a live

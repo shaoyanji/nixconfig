@@ -34,6 +34,9 @@ live claims, then a verdict. **Exit 1 is the collision**: someone is
 
 Liveness is per subject and decided by the NEWEST entry: an `in_progress` that a
 later `done` superseded is closed, which is why one entry per topic matters.
+Unresolved is not only `in_progress` — a `blocked` subject is a decision waiting
+on a human and a `failed` one needs a second attempt, so both stay live until a
+`done` lands on top of them.
 `base_commit` should be the commit you actually started from after the pull, not
 one you remembered.
 

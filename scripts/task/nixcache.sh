@@ -336,7 +336,7 @@ sync)
   failed=0
   for host in "${hosts[@]}"; do
     arch="$(nix eval --raw ".#inventory.hosts.$host.arch" 2>/dev/null || echo unknown)"
-    attr=".#nixosConfigurations.$host.config.system.build.toplevel"
+    attr=".?submodules=1#nixosConfigurations.$host.config.system.build.toplevel"
     route=()
     where="native"
     if [ "$arch" != "$current" ]; then
@@ -411,7 +411,7 @@ PY
   fleet_rc=$?
 
   # One host eval: the policy is only real if it lands in the setting.
-  eff="$(nix eval --json '.#nixosConfigurations.delphi.config.nix.settings.substituters' 2>/dev/null || echo '[]')"
+  eff="$(nix eval --json '.?submodules=1#nixosConfigurations.delphi.config.nix.settings.substituters' 2>/dev/null || echo '[]')"
   if grep -qF "$edge_url" <<<"$eff"; then
     echo "wiring: delphi's nix.settings.substituters carries the edge (host eval)"
   else

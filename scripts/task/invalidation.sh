@@ -109,7 +109,7 @@ for host in "${targets[@]}"; do
   # --builders "" is the difference between asking a question and spending money:
   # a dry run that reaches nixbuild.net bills for whatever it decides to build.
   if ! plan="$(nix build --dry-run --json --builders "" \
-    ".#nixosConfigurations.$host.config.system.build.toplevel" 2>/dev/null)"; then
+    ".?submodules=1#nixosConfigurations.$host.config.system.build.toplevel" 2>/dev/null)"; then
     printf '%-12s %-14s %s\n' "$host" "$arch" "EVAL FAILED (not this check's verdict)"
     fail=1
     continue

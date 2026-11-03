@@ -75,7 +75,9 @@ index_path() {
 }
 
 collection_mask() {
-  "$QMD" collection show "$1" 2>/dev/null | sed -n 's/^  Pattern:  //p' | head -1
+  # `sed -n 1p`, never `head -1`: under `set -o pipefail` an early exit SIGPIPEs
+  # the producer (141) and kills the gate before it can report anything.
+  "$QMD" collection show "$1" 2>/dev/null | sed -n 's/^  Pattern:  //p' | sed -n '1p'
 }
 
 ensure_single() {
@@ -134,7 +136,7 @@ check_single() {
     echo "STALE  cannot locate the qmd index file ('qmd status' parse failed)"
     exit 1
   fi
-  stale="$(find "${path}" \( -name '*.md' -o -name '*.nix' \) -not -path '*/.git/*' -not -path '*/.trash/*' -newer "$idxfile" 2>/dev/null | head -5)"
+  stale="$(find "${path}" \( -name '*.md' -o -name '*.nix' \) -not -path '*/.git/*' -not -path '*/.trash/*' -newer "$idxfile" 2>/dev/null | sed -n '1,5p')"
   if [ -n "$stale" ]; then
     echo "STALE  markdown in '${name}' changed after the last qmd index update:"
     echo "${stale}" | sed 's/^/       /'

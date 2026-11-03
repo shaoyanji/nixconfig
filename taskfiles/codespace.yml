@@ -76,13 +76,14 @@ tasks:
   codespace:sync:
     desc: Point the codespace clone at origin/<branch>, refusing a dirty tree
     summary: >
-      Refreshes every remote-tracking ref, not just the branch, so the `ahead`
-      count in `codespace:status` cannot report an already-pushed commit as
-      local-only against a stale origin. The step after an upstream history
-      rewrite too: an old clone still holds the purged objects and would restore
-      them on its next push. The script exits 1 — 201 through go-task — when the
-      tree is dirty, because the reset discards uncommitted work; FORCE=1
-      discards it, untracked files included.
+      Refreshes every remote-tracking ref, not just the branch, so `codespace:status`
+      cannot call an already-pushed commit local-only against a stale origin. Also the
+      step after an upstream history rewrite: an old clone still holds the purged objects.
+
+      Exits 1 — 201 through go-task — on a dirty tree (the reset discards work; FORCE=1
+      discards it, untracked files included), and when the fetch fails: a codespace clone
+      has no credential helper, so https cannot authenticate, nothing is reset, and the
+      message names the unchanged HEAD plus the bundle workaround (`codespace:put`).
     cmds:
       - bash scripts/task/codespace.sh sync
 

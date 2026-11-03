@@ -92,5 +92,12 @@ elsewhere an unrefreshed clone reports those commits as local-only and calls the
 stop UNSAFE. When someone else may have pushed, `codespace:sync` before
 `codespace:status`.
 
+**`sync` needs credentials it does not have**, which is why it must fail loudly:
+the clone inside a codespace has no credential helper, so `git fetch` over https
+dies on the missing username. It now exits 1, resets nothing, and names the
+credential-free path — bundle the commits on the host, `codespace:put` the bundle,
+then `git fetch /tmp/sync.bundle <branch> && git reset --hard FETCH_HEAD` and move
+`refs/remotes/origin/<branch>` so `status` stops calling the clone ahead.
+
 Truth: `taskfiles/codespace.yml` — the executable contract; `scripts/task/codespace.sh`
 is the implementation, and this page is the procedure and the measured traps.

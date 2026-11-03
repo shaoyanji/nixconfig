@@ -150,9 +150,11 @@ day from an assistant) is exempt and stays in front of a person for a week.
 SENDER=<substring> DRY=1` counts what a selector matches (by tier and sender)
 and `DRY=0` resolves the block through `/api/triage-resolve`. At least one
 selector is required, so a typo cannot empty the queue. Measured 2026-11-03: the
-rules took the human queue from 511 to 136 in one run — 203 rows were a machine
-sender filed as a person's action item, and 128 were review rows older than 30
-days.
+human queue went 511 → 50 in one pass. 203 rows were a machine sender filed as a
+person's action item and 104 were one-shot codes or records; the 30-day expiry
+took the old review tail, and the two consumers took their own (235 CI notices,
+43 application mails to the pipeline). What is left is 21 action rows, 2 people
+and 27 reviews.
 
 **The VIP list is encrypted config, not state.** `modules/secrets.yaml` carries
 `email-archive.vip-senders`; sops-nix lands it as a 0400 file at `triage.vipFile`,

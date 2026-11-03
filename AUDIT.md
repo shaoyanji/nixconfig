@@ -40,8 +40,12 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
   from an employer's own mailbox goes to `agent:apps` instead of a person: 68 rows, 9 statuses written,
   5 applications discovered on the first sync.
 - **`task agents:mail:sweep`** resolves a block by selector (`SENDER=`, `OLDER=`, `TIER=`), dry by
-  default and refusing to run with no selector. Human queue 511 → 123 in one pass: 247 re-routed, 128
-  expired, 39 consumed by the pipeline; 235 CI notices closed by the drain.
+  default and refusing to run with no selector. Human queue **511 → 50** in one pass: 307 rows re-tiered
+  by rule, ~150 old review rows expired, 235 CI notices closed by the drain, 43 application mails taken
+  by the pipeline. The 50 left are 21 action, 2 person and 27 review — readable in one sitting.
+- **A classifier bump has to move the second opinion with it.** Bumping only the first name left rows
+  the second pass believed it had judged and the queue grew 47 → 83; the second name is now derived from
+  the first. Each run also takes 500 messages, so a new name needs three hourly runs to finish the archive.
 
 ### 2026-11-03 — the queues drain themselves, and the ledger rolls into the turn log
 - **Every queue now has a consumer.** `agent:ci` held 237 open and 0 resolved ever: the triage unit's

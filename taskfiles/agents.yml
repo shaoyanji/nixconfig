@@ -364,16 +364,22 @@ tasks:
   # The verdicts live in `email_triage` (delphi); these tasks read and write it
   # through the loopback API. docs/email-archive.md.
   agents:mail:resolve:
-    desc: "Mark one message done for a person: ID= is the message id a queue row carries"
+    desc: "Mark one message done for a person: ID= is the message id a queue row carries (exit 1 when nothing was open)"
+    summary: >
+      The endpoint returns the rows it changed, so an id with no open verdict is
+      not a success: a task that printed "resolved" for anything would make the
+      queue look handled while nothing moved.
     vars:
       ID: '{{.ID | default ""}}'
     cmds:
       - |
         [ -n "{{.ID}}" ] || { echo "agents:mail:resolve: ID is required (take it from agents:mail:attention)" >&2; exit 2; }
-        curl -fsS --max-time 20 -X POST -H 'content-type: application/json' \
+        changed="$(curl -fsS --max-time 20 -X POST -H 'content-type: application/json' \
           -d "$(jq -nc --arg m "{{.ID}}" '{messageId: $m}')" \
-          "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/triage-resolve" >/dev/null
-        echo "resolved {{.ID}}"
+          "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/triage-resolve")"
+        n="$(jq 'length' <<<"$changed")"
+        [ "$n" -gt 0 ] || { echo "agents:mail:resolve: nothing open for {{.ID}}" >&2; exit 1; }
+        echo "resolved {{.ID}} ($n verdict(s))"
 
   agents:ci:drain:
     desc: "Close CI notices that are stale or superseded by a newer one (TOON; FORMAT=text for a person, FULL=1 for every id, DRY=1, DAYS=14)"

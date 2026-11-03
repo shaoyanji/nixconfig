@@ -28,6 +28,25 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-03 — the queues drain themselves, and the ledger rolls into the turn log
+- **Every queue now has a consumer.** `agent:ci` held 237 open and 0 resolved ever: the triage unit's
+  `ExecStartPost` runs `email-ci-drain.py` (`-` prefixed, so a drain failure cannot mark the classifier
+  red) and closed 234 — a notice older than 14 days is stale, and only the newest per repo+workflow
+  survives. The 3 left are the newest of nixconfig/nixcachix, Obsidian-Git-Sync/CI, .dotfiles/tests.
+- **The pipeline sync stopped being a reflex.** `appflow-sync.timer` runs `--sync --apply` hourly at :00,
+  11 minutes after the classifier files at :49; an empty queue exits in 222 ms.
+- **The ledger is not a document.** `task ops:audit:roll` posts each entry older than a week as an xs
+  event (subject `nixconfig:ledger-<date>-<slug>`, whole body, id derived from the subject so a retry is
+  the same event) and removes it; `AUDIT.md` keeps current state plus the recent week. Two entries rolled
+  on the first run, read back from the log.
+- **A switch refuses a written tree.** `switch-preflight.sh` fails on tracked modifications unless
+  `ALLOW_DIRTY=1`, which then stamps commit, diff hash and time into `~/.local/state/nixconfig-dirty-rev`:
+  generation 160/161 were built from trees no commit describes.
+- **Agents read TOON.** Reporting and queue tasks print TOON by default (`FORMAT=text` for a person,
+  `FORMAT=json` for a machine), including the xs list; the CI drain reports a count and five rows, not
+  237 ids. `docs/email-archive.md` 400 → 383 and `docs/nix-patterns.md` 400 → 375, so neither sits at
+  the wall that fails the next paragraph.
+
 ### 2026-11-03 — the importer's window was the bug, and a second model takes work off a person
 - **The stall had a fixed cause.** `maxPages × pageSize` bounded both the scan and the `known` set, so from
   2000 archived messages on a run found only known mail and still exited 0. `known` is now complete

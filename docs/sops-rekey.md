@@ -33,6 +33,41 @@ Both files are sops-encrypted in the tree — `sops:` metadata plus `ENC[AES256_
 values — so a plaintext commit is a gate failure, not a review question:
 [[flake/policies.nix#secrets-are-encrypted]]
 
+## Exposure gates
+
+Every rule below is a predicate in `flake/policies.nix`, so breaking one fails
+`checks.policies` instead of asking someone to remember a paragraph. Each answers
+a distinct way a secret leaves the encrypted store, and each one replaces a
+rotation rather than scheduling another:
+
+| How it escapes | Gate | Instead of that |
+| :--- | :--- | :--- |
+| written to one copy of the pair | [[flake/policies.nix#secrets-mirror-is-a-copy]] | `task infra:secrets:sync`; never edit the mirror |
+| a new encrypted file nobody scans | [[flake/policies.nix#secrets-files-are-registered]] | add its path to `sopsFiles` |
+| committed into a tracked file | [[flake/policies.nix#credentials-never-land-in-a-tracked-file]] | keep the value in sops |
+| baked into `/nix/store` at eval time | [[flake/policies.nix#secrets-are-not-decrypted-at-eval]] | `passwordCommand`, or activation |
+| printed by a comparison | [[flake/policies.nix#decrypted-documents-are-compared-not-printed]] | `cmp -s <(sops -d a) <(sops -d b)` |
+
+Two properties are deliberate, and both are about not leaking in the gate itself:
+a failure names the file and line and never quotes the match, and the mirror gate
+compares ciphertext, so it decrypts nothing.
+
+### Moving a rule here
+
+A rule earns a policy once the same mistake has cost a rotation twice. The order is
+not negotiable, because each step is what makes the next one meaningful:
+
+1. **Predicate first** — a `let` binding over the tree returning offenders as
+   `file:line`: `hitsWhere`, `anyLine`, `read`, `nixUnder`. No probe, no network,
+   no key.
+2. **Then the entry** — `rule` (why, and what it replaces), `proof` (the files it
+   reads), `holds`, `detail` (offenders, never values).
+3. **Then a citation** in the page that states the procedure. An uncited policy is
+   an invisible gate and `checks.policies` fails on it; a citation to a missing id
+   fails too.
+4. **Then delete the prose it replaced.** A rule kept in both homes drifts, and the
+   doc is the copy nothing tests.
+
 ## OCI CLI credentials
 
 `modules/sops.nix` renders `~/.oci/config` (0600) from `oci/{user,tenancy,fingerprint,region}`
@@ -45,11 +80,12 @@ from one pair against a key file from another authenticates as `NotAuthenticated
 saying which half is wrong, so rotating the key replaces both — in both files:
 
 ```bash
+SUB=modules/secrets/secrets.yaml        # the canonical file: edit this one
 jq -Rn --rawfile k ~/.oci/oci_api_key.pem '$k | rtrimstr("\n")' \
-  | sops set modules/secrets.yaml '["oci"]["api"]["key"]' --value-stdin
-sops set modules/secrets.yaml '["oci"]["fingerprint"]' '"<fingerprint from the console>"'
-# repeat both against modules/secrets/secrets.yaml, then:
-task checks:sops:drift      # fails when the submodule mirror was skipped
+  | sops set "$SUB" '["oci"]["api"]["key"]' --value-stdin
+sops set "$SUB" '["oci"]["fingerprint"]' '"<fingerprint from the console>"'
+task infra:secrets:sync     # the mirror is a copy, never a second edit
+task checks:sops:drift
 ```
 
 The fingerprint is the one *My profile → API keys* shows for the key, not one you compute.
@@ -275,8 +311,8 @@ SOPS_AGE_KEY_FILE=… sops -d "$STORE" | sha256sum             # == the pulled c
 - **New recipients do not propagate backwards.** Adding a recipient does nothing to
   existing files until `sops updatekeys` runs on each one.
 - **Mirrors drift.** `modules/secrets.yaml` is a tracked mirror of
-  `modules/secrets/secrets.yaml`. `task infra:secrets:sync` is the only correct way
-  to refresh it; `checks:quick` includes the drift check for exactly this.
+  `modules/secrets/secrets.yaml`, and the copy is a gate rather than a habit:
+  [[flake/policies.nix#secrets-mirror-is-a-copy]].
 - **A store copy is not a checkout.** On a host where `~/Documents/nixconfig` is a
   home-manager store symlink, `git rev-parse` there reports the *generation's* commit,
   not what you pulled — and it cannot be pulled at all. The clone is elsewhere

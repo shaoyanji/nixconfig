@@ -47,6 +47,9 @@ in {
       "cloak".path = "${config.home.homeDirectory}/.cloak/accounts";
       "ghsudo" = {};
       "gmail" = {};
+      # envs.net pubnix mail (mail.envs.net). Same shape as `gmail`: one string,
+      # consumed by himalaya's passwordCommand.
+      "envsmail" = {};
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};
       # OCI CLI credentials. The private half and the fingerprint that names it

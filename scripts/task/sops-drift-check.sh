@@ -144,14 +144,17 @@ done
 MIRROR="modules/secrets.yaml"
 SUBMODULE="modules/secrets/secrets.yaml"
 if [ -f "$MIRROR" ] && [ -f "$SUBMODULE" ] && command -v sops >/dev/null 2>&1; then
-  if sops -d "$MIRROR" 2>/dev/null | diff - <(sops -d "$SUBMODULE" 2>/dev/null) >/dev/null; then
+  # `cmp -s`, never `diff`: diff prints both decrypted documents the moment they
+  # disagree, which is exactly when someone is reading the failure
+  # ([[flake/policies.nix#decrypted-documents-are-compared-not-printed]]).
+  if cmp -s <(sops -d "$MIRROR" 2>/dev/null) <(sops -d "$SUBMODULE" 2>/dev/null); then
     echo "OK   $MIRROR matches its submodule source ($SUBMODULE)"
   else
     fail=1
     echo "FAIL $MIRROR and $SUBMODULE decrypt to different content."
     echo "     A secret landed in one file but not the other. Reconcile with:"
     echo "       sops set <file> '[\"<key>\"]' '<json value>'   (for each drifting key)"
-    echo "     then verify: diff <(sops -d $MIRROR) <(sops -d $SUBMODULE)"
+    echo "     then verify: cmp -s <(sops -d $MIRROR) <(sops -d $SUBMODULE)"
   fi
   checked=$((checked + 1))
 fi

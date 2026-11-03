@@ -113,6 +113,20 @@ tasks:
       - bash scripts/task/taskfile-graph.sh
     silent: true
 
+  checks:codespace:
+    desc: "[gate] Every codespace is Shutdown, so nothing is on the billing clock"
+    summary: >
+      Lists every codespace with its state and last use, then fails when any is not
+      Shutdown — a codespace bills while it runs, and one left Available overnight
+      is silent. Read-only: it starts, stops and resolves nothing, so it cannot cost
+      a boot or a build minute.
+
+      Exit 0 = all Shutdown (or no codespaces), 1 = at least one is billing and the
+      line names `codespace:stop CS=<name>`, 2 = gh is absent or the query failed,
+      which is no answer rather than a clean one. Needs gh auth; not in checks:quick.
+    cmds:
+      - bash scripts/task/codespace.sh check
+
   checks:codespace:sync:
     desc: "[gate] Codespace sync body: a failed fetch exits 1 and resets nothing"
     summary: >

@@ -19,7 +19,10 @@
 
 set -euo pipefail
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+# Builtins only: `dirname` is external, and `check` must answer even on a bare
+# PATH — a lookup that dies here would report the wrong reason for the failure.
+SCRIPT_DIR=${BASH_SOURCE[0]%/*}
+[ "$SCRIPT_DIR" != "${BASH_SOURCE[0]}" ] || SCRIPT_DIR=.
 
 CS="${CS:-}"
 BRANCH="${BRANCH:-main}"
@@ -199,6 +202,43 @@ cmd_delete() {
   echo "deleted: $c"
 }
 
+# A codespace bills while it is not Shutdown, and the mistake is silent: nothing
+# notices one left Available overnight, and the account keeps paying. This is the
+# gate that answers "is anything on the clock?". Read-only — it starts, stops and
+# resolves nothing — so it is safe in a checks sweep and never spends a build
+# minute or a boot of its own.
+#
+# Exit: 0 every codespace is Shutdown (or there are none) · 1 something is billing
+#       · 2 gh is absent or the query failed, i.e. no answer rather than a clean one
+cmd_check() {
+  local rows total billing state name repo used
+  command -v gh >/dev/null 2>&1 || {
+    echo "checks:codespace: gh is not on PATH" >&2
+    exit 2
+  }
+  rows=$(gh cs list --limit 100 --json name,state,repository,lastUsedAt 2>/dev/null) || {
+    echo "checks:codespace: could not list codespaces (gh auth status?)" >&2
+    exit 2
+  }
+  total=$(printf '%s' "$rows" | jq 'length')
+  if [ "$total" -eq 0 ]; then
+    echo "no codespaces"
+    return 0
+  fi
+  printf '%-13s %-34s %-30s %s\n' STATE NAME REPOSITORY 'LAST USED'
+  printf '%s' "$rows" |
+    jq -r '.[] | [.state, .name, .repository, ((.lastUsedAt // "unknown")[0:19])] | @tsv' |
+    while IFS=$'\t' read -r state name repo used; do
+      printf '%-13s %-34s %-30s %s\n' "$state" "$name" "$repo" "$used"
+    done
+  billing=$(printf '%s' "$rows" | jq '[.[] | select(.state != "Shutdown")] | length')
+  if [ "$billing" -ne 0 ]; then
+    echo "billing: $billing of $total not Shutdown — task codespace:stop CS=<name>" >&2
+    return 1
+  fi
+  echo "nothing billing: all $total codespace(s) are Shutdown"
+}
+
 case "${1:-}" in
   list) cmd_list ;;
   exec) shift && cmd_exec "$@" ;;
@@ -209,8 +249,9 @@ case "${1:-}" in
   sync) cmd_sync ;;
   stop) cmd_stop ;;
   delete) cmd_delete ;;
+  check) cmd_check ;;
   *)
-    echo "usage: codespace.sh {list|exec|status|put|get|push|sync|stop|delete}" >&2
+    echo "usage: codespace.sh {list|exec|status|put|get|push|sync|stop|delete|check}" >&2
     exit 1
     ;;
 esac

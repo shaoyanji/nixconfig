@@ -47,8 +47,14 @@ set -euo pipefail
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 SOCKET="${KG_SOCKET:-${RUNTIME_DIR}/kg.sock}"
-PIDFILE="${RUNTIME_DIR}/kg-engine.pid"
-LOG="${RUNTIME_DIR}/kg-engine.log"
+# Socket, pidfile and log are ONE instance and are named from the socket, so a
+# caller that overrides KG_SOCKET (the parity gate, a second engine) cannot stop
+# the login engine: `stop` reads this pidfile, and while the pidfile was a fixed
+# path, running `checks:kg:sidecar` left the fast path dead until the next login
+# (measured 2026-11-02: kg-query 26 ms -> ~700 ms, nothing said why).
+INSTANCE="${SOCKET%.sock}"
+PIDFILE="${INSTANCE}.pid"
+LOG="${INSTANCE}.log"
 ENGINE_SCRIPT="${REPO}/tools/kg-engine/kg_engine.exs"
 
 cmd="${1:-status}"

@@ -12,12 +12,20 @@
 # its two failure modes ("the graph is stale" and "the graph is slow") each get
 # picked silently by whichever copy you happen to call.
 #
-# The rule, stated once. The graph is compiled FROM THE WORKING TREE, so:
-#   clean tree  -> reuse the cache, keyed by revision
-#   dirty tree  -> always re-evaluate
-# Answering about the last commit while the operator is editing the tree is worse
-# than the ~1 s a warm evaluation costs. KG_GRAPH (any caller's --graph) short
-# circuits both: the path is used as given, no eval, no cache.
+# The rule, stated once. The graph is compiled FROM THE WORKING TREE, so what
+# invalidates it is a change to the tree's CONTENT, not the existence of a diff:
+#   key = HEAD + sha1(git diff HEAD)
+#   same key  -> reuse the cache
+#   new key   -> evaluate, then store under that key
+# Answering about the last commit while the operator is editing the tree is still
+# worse than an evaluation — a changed tree always re-evaluates. What changed on
+# 2026-11-02 is the dirty case: keying on "is dirty" re-evaluated on every call
+# (~680 ms each) even when the tree had not moved between calls, which is most of
+# why `ops:ask:plan` cost ~1 s. Measured: routing+jq over the compiled graph is
+# 77 ms, `git diff | sha1sum` is 27 ms, one `nix eval` is ~680 ms on this host.
+# KG_GRAPH (any caller's --graph) short circuits both: used as given, no eval, no
+# cache. The sidecar cannot serve this: it holds the graph of the COMMITTED tree,
+# which is exactly the answer this file refuses to give for a dirty one.
 #
 # Requires: git, nix and awk. REPO (the repo root) is taken from the caller when
 # exported, and derived from this file's own location otherwise — kg-ask.sh never
@@ -50,12 +58,15 @@ kg_graph_path() {
 
   cache="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig"
   rev="$(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || echo untracked)"
-  path="$cache/kg-$rev.json"
+  # Content, not the dirty bit. `HEAD` covers staged+unstaged; untracked files are
+  # irrelevant because a git flake does not see them either.
+  digest="clean"
+  if ! git -C "$REPO" diff HEAD --quiet -- . 2>/dev/null; then
+    digest="$(git -C "$REPO" diff HEAD -- . 2>/dev/null | sha1sum | cut -c1-12)"
+  fi
+  path="$cache/kg-$rev-$digest.json"
 
-  dirty=0
-  git -C "$REPO" diff --quiet -- . 2>/dev/null || dirty=1
-
-  if [ "$refresh" = 1 ] || [ "$dirty" = 1 ] || [ ! -s "$path" ]; then
+  if [ "$refresh" = 1 ] || [ ! -s "$path" ]; then
     mkdir -p "$cache"
     # temp file + rename: a reader that races the eval would otherwise see a
     # half-written JSON, and jq would report a parse error rather than a miss.
@@ -65,6 +76,9 @@ kg_graph_path() {
       return 1
     fi
     mv "$path.tmp" "$path"
+    # One file per distinct working-tree content: bounded by a week, so an
+    # afternoon of editing cannot leave a directory of graphs nobody will read.
+    find "$cache" -maxdepth 1 -name 'kg-*.json' -type f -mtime +7 -delete 2>/dev/null || true
   fi
 
   printf '%s' "$path"

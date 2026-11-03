@@ -10,8 +10,13 @@
 #   1. parity    — node/edge/type counts must equal the compiled graph exactly.
 #                  A stale in-memory copy and a correct one are indistinguishable
 #                  from a query alone.
-#   2. answers   — blast-radius must equal the jq reverse-edge answer, and
-#                  neighbors must contain its own centre.
+#   2. answers   — blast-radius must equal the jq reverse CLOSURE (both the id
+#                  set and its size), and neighbors must contain its own centre.
+#                  The assertion used to count direct inbound edges only, so it
+#                  failed a correct engine: `host:schneeeule` is 2 direct, 7
+#                  transitively. It also went unmeasured that kg-preflight's own
+#                  fallback returned 10 for the same question — every caller now
+#                  reads scripts/task/lib/kg-closure.jq.
 #   3. interface — an unknown id must NOT be a success (it returned 200 OK), a
 #                  missing parameter must be a usage error, and a multi-word
 #                  query must arrive intact (it was truncated to its first word
@@ -25,7 +30,13 @@ set -euo pipefail
 
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 SIDE="$REPO/scripts/task/kg-sidecar.sh"
-
+# Boot on a PRIVATE socket. The `stop` assertions below remove the socket they were
+# given, and the default one belongs to the login sidecar — so running this gate
+# left the fast path dead until the next login (measured 2026-11-02: kg-query went
+# from 26 ms to ~700 ms and nothing said why). The lifecycle checks still test
+# start/readiness/stop; they do not need the production path name to do it.
+export KG_SOCKET="${XDG_RUNTIME_DIR:-/tmp}/kg-check-$$.sock"
+trap 'rm -f "$KG_SOCKET"' EXIT
 fail=0
 ok() { printf 'ok    %s\n' "$1"; }
 bad() {
@@ -36,6 +47,7 @@ bad() {
 . "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
 G="$(kg_graph_path)" || exit 1
 export KG_GRAPH="$G"
+CLOSURE="$REPO/scripts/task/lib/kg-closure.jq"
 
 say() { printf '\n== %s ==\n' "$1"; }
 
@@ -78,12 +90,22 @@ say "answers agree with jq"
 seed_host="$(jq -r '[.edges[] | select(.to | startswith("host:")) | .to]
   | group_by(.) | sort_by(-length) | last | .[0] // "" | sub("^host:"; "")' "$G")"
 if [ -n "$seed_host" ]; then
-  want_impact="$(jq -r --arg h "host:$seed_host" \
-    '[.edges[] | select(.to == $h) | .from] | unique | length' "$G")"
-  got_impact="$("$SIDE" blast-radius "host:$seed_host" | jq -r '.impacted_count')"
-  [ "$got_impact" = "$want_impact" ] &&
-    ok "blast-radius host:$seed_host = $got_impact (matches jq)" ||
-    bad "blast-radius host:$seed_host: engine $got_impact vs jq $want_impact"
+  # The whole impacted SET, not the count: two answers can agree on 7 and name
+  # different nodes, and the set is what a caller acts on.
+  want_set="$(jq -r --arg root "host:$seed_host" -f "$CLOSURE" "$G" | jq -r 'join(" ")')"
+  got_json="$("$SIDE" blast-radius "host:$seed_host")"
+  got_set="$(jq -r '[.impacted_entities[].id] | sort | join(" ")' <<<"$got_json")"
+  got_impact="$(jq -r '.impacted_count' <<<"$got_json")"
+  if [ -z "$want_set" ]; then
+    bad "blast-radius host:$seed_host: the jq closure is empty, so this proves nothing"
+  elif [ "$got_set" = "$want_set" ]; then
+    ok "blast-radius host:$seed_host = $(wc -w <<<"$want_set") node(s), same set as jq"
+  else
+    bad "blast-radius host:$seed_host: engine [$got_set] vs jq [$want_set]"
+  fi
+  [ "$got_impact" = "$(wc -w <<<"$got_set")" ] &&
+    ok "impacted_count matches the entities it returns" ||
+    bad "impacted_count $got_impact vs $(wc -w <<<"$got_set") entities"
 
   center="$("$SIDE" neighbors "host:$seed_host" 2 | jq -r '.nodes | map(.id) | index("host:'"$seed_host"'")')"
   [ "$center" != "null" ] && ok "neighbors depth 2 includes its centre" || bad "neighbors dropped its centre"

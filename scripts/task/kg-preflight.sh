@@ -82,21 +82,13 @@ anchor_for() {
   esac
 }
 
-# jq fallback: reverse-edge closure, the same walk blast_radius does. Array
-# subtraction keeps the frontier finite on a graph with shared documents.
+# jq fallback: the same reverse closure blast_radius walks, from ONE definition
+# (lib/kg-closure.jq) so a fallback answer and a socket answer cannot disagree.
+# The version here accumulated each frontier into `seen` without deduplicating,
+# so a node reached by two paths was counted twice: 10 where the engine and the
+# truth are 7 (measured 2026-11-02, host:schneeeule).
 closure_jq() {
-  # Parenthesise the whole state object before `until`: without the parens the
-  # `|` binds inside the object literal and until() receives an array, which
-  # fails with "Cannot index array with string (\"frontier\")".
-  jq -r --arg a "$1" '
-    .edges as $E
-    | ({ seen: [$a], frontier: [$a] }
-       | until(.frontier == [];
-           .frontier as $f
-           | ([ $E[] | select(.to as $t | $f | index($t)) | .from ] | unique) as $n
-           | { frontier: ($n - .seen), seen: (.seen + $n) }))
-    | (.seen - [$a]) | length
-  ' "$G"
+  jq -r --arg root "$1" -f "${BASH_SOURCE[0]%/*}/lib/kg-closure.jq" "$G" | jq 'length'
 }
 
 impacted_of() {

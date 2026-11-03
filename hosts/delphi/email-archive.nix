@@ -28,7 +28,7 @@
       enable = true;
       # Bumped because the routing changed: a new name re-judges the archive, and
       # the newest verdict per message is the one every read uses.
-      classifier = "rules+engine+apps+pointer";
+      classifier = "rules+engine+apps+v3";
       # Same reason on the second opinion: the pass may now override in both
       # directions and closes a repeat sender, so every row is re-read under it.
       secondClassifier = "second-pass+feed";

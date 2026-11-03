@@ -35,8 +35,15 @@ task agents:apps:sync                              # write status from ATS mail 
 task agents:apps:export OUT=data/applications.json # the DB as the workflow's JSON
 task agents:apps:packet ID=<application>           # build a packet through nix
 task agents:apps:packet EXAMPLE=1                  # fictional data, proves the toolchain
+task agents:apps:draft ID=<app> BODY=<file> ATTACH=<pdf>   # a DRAFT in the mailbox, never sent
+task agents:apps:drafts                            # what sits in Drafts
 task agents:hub                                    # every plugin's queue depth
 ```
+
+Drafts are the safe half of sending: `--draft` writes into the mailbox's Drafts
+folder, where a person reads, edits or discards it, and reports the attachment it
+carried. No verb here can send mail. Reporting tasks take `JSON=1` for a machine,
+or `TOON=1` to project that JSON through `toon` for an agent to read cheaply.
 
 ## Personal data
 

@@ -8,13 +8,17 @@
   ...
 }: let
   cfg = config.services.appflowPlugin;
+  user = import ../../global/user.nix;
 
   sync = pkgs.writeShellApplication {
+    # himalaya is here for drafts only: a draft is written into the mailbox's
+    # Drafts folder, and nothing in this plugin can send mail.
     name = "appflow-sync";
-    runtimeInputs = [pkgs.python3];
+    runtimeInputs = [pkgs.python3 pkgs.himalaya];
     text = ''
       exec ${pkgs.python3}/bin/python3 ${./sync.py} \
         --api ${lib.escapeShellArg "http://127.0.0.1:${toString config.services.emailArchive.port}"} \
+        --himalaya-config ${lib.escapeShellArg "${user.home}/.config/himalaya/config.toml"} \
         "$@"
     '';
   };

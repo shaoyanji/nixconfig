@@ -13,12 +13,16 @@ as a command) and write access to the attachment tree.
 Backfill is bounded per run rather than by a watermark: the newest `--limit`
 messages not yet in the archive are imported, then the run stops. Successive
 runs therefore walk further back through the mailbox until it is exhausted,
-without a state file to drift or a timestamp to trust.
+without a state file to drift or a timestamp to trust. How far back a run may
+then look is derived from the archive size (`--max-pages 0`), because a fixed
+window stops finding new mail the moment the archive fills it — and reports
+success while doing so. Ran with no flags, one run makes progress.
 """
 
 import argparse
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -107,9 +111,13 @@ class Importer:
             return json.load(response)
 
     def load_known(self):
-        # The archive answers with the newest rows; asking for as many as the
-        # scan can reach is enough to skip the ones a run would otherwise re-read.
-        limit = max(self.args.page_size * self.args.max_pages, self.args.limit)
+        # Every archived id, not just as many as one scan could reach. A `known`
+        # set clipped at the scan window is what made the importer stop for good
+        # once the archive filled it: at the old defaults the window was 20x100,
+        # so from 2000 archived messages on, every run found only known mail and
+        # reported success. Measured on delphi: a run with `--limit 5000` stopped
+        # at 700 new, at the window edge, while the INBOX held 6397.
+        limit = self.args.known_limit
         try:
             rows = self.api_get(f"/api/list-emails?lim={limit}")
         except (urllib.error.URLError, json.JSONDecodeError) as exc:
@@ -273,10 +281,20 @@ class Importer:
 
     # -- run --------------------------------------------------------------
 
+    def pages_for(self, known: int) -> int:
+        """Envelope pages needed to reach past the archive.
+
+        The frontier sits `known` messages back from the newest, and a run reads
+        up to `limit` new ones beyond it. Two extra pages cover the messages that
+        arrived since the last run and pushed the frontier down.
+        """
+        return max(1, math.ceil((known + self.args.limit) / self.args.page_size) + 2)
+
     def run(self):
         self.load_known()
+        pages = self.args.max_pages or self.pages_for(len(self.known))
         scanned = 0
-        for page in range(1, self.args.max_pages + 1):
+        for page in range(1, pages + 1):
             envelopes = self.envelopes(page)
             if not envelopes:
                 break
@@ -314,8 +332,15 @@ class Importer:
         log(
             f"imported {self.imported}, refilled {self.refilled}, "
             f"html-converted {self.converted}, already archived {self.skipped}, "
-            f"failed {self.failed}, newly seen {scanned}"
+            f"failed {self.failed}, newly seen {scanned}, pages {pages}"
         )
+        # A run that stops on the window instead of on the mailbox looks exactly
+        # like a caught-up archive. Say so rather than reporting success.
+        if self.imported == 0 and len(self.known) >= pages * self.args.page_size:
+            log(
+                f"warning: no new mail inside {pages} pages while {len(self.known)} are "
+                f"archived — the scan window, not the mailbox, is the limit"
+            )
         return 1 if self.failed else 0
 
 
@@ -333,8 +358,19 @@ def main():
         help="also revisit archived messages whose stored body is empty",
     )
     parser.add_argument("--limit", type=int, default=100, help="new messages per run")
-    parser.add_argument("--max-pages", type=int, default=20)
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=0,
+        help="envelope pages to scan; 0 derives it from the archive size",
+    )
     parser.add_argument("--page-size", type=int, default=100)
+    parser.add_argument(
+        "--known-limit",
+        type=int,
+        default=50000,
+        help="cap on the archived-id set; must exceed the archive or the scan stalls",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     try:

@@ -439,12 +439,22 @@ tasks:
         appflow-sync "${args[@]}"
 
   agents:apps:pipeline:
-    desc: "Pipeline by stage, plus the applications whose mail nobody has dealt with"
+    desc: "Pipeline by stage, plus the applications whose mail nobody has dealt with (JSON=1 for a machine; TOON=1 converts it with the toon binary)"
+    vars:
+      JSON: '{{.JSON | default "0"}}'
+      TOON: '{{.TOON | default "0"}}'
     cmds:
-      - appflow-sync --report
+      - |
+        args=(--report)
+        if [ "{{.JSON}}" = "1" ] || [ "{{.TOON}}" = "1" ]; then args+=(--json); fi
+        if [ "{{.TOON}}" = "1" ]; then
+          appflow-sync "${args[@]}" | toon -e
+        else
+          appflow-sync "${args[@]}"
+        fi
 
   agents:apps:set:
-    desc: "Record a pipeline change from mail (ID=, STATUS=, NEXT=; stage derived with the apps:overview rules)"
+    desc: "Record a pipeline change from mail (ID=, STATUS=, NEXT=; the stage is derived where the sync derives it)"
     vars:
       ID: '{{.ID | default ""}}'
       STATUS: '{{.STATUS | default ""}}'
@@ -452,18 +462,7 @@ tasks:
     cmds:
       - |
         [ -n "{{.ID}}" ] && [ -n "{{.STATUS}}" ] || { echo "agents:apps:set: ID and STATUS are required" >&2; exit 2; }
-        stage=$(printf '%s' "{{.STATUS}}" | tr 'A-Z' 'a-z' | awk '
-          /interview|trial|warteliste/ {print "interview"; exit}
-          /^rejected/ {print "rejected"; exit}
-          /^applied/ {print "applied"; exit}
-          /^lead|^rezi/ {print "lead"; exit}
-          /screening|follow-up required/ {print "screening"; exit}
-          /draft|packet|jd/ {print "prep"; exit}
-          {print "other"}')
-        curl -fsS --max-time 20 -H 'content-type: application/json' -X POST \
-          -d "$(jq -nc --arg i "{{.ID}}" --arg s "{{.STATUS}}" --arg st "$stage" --arg n "{{.NEXT}}" \
-            '{id: $i, status: $s, stage: $st, nextAction: $n}')" \
-          "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/application-update" | jq -c '.[0]'
+        appflow-sync --update "{{.ID}}" --status "{{.STATUS}}" --next "{{.NEXT}}"
 
   agents:hub:
     desc: "The mail hub: every plugin owner, how much of the archive is waiting for it, and when it last acted"
@@ -501,6 +500,36 @@ tasks:
           echo "agents:apps:packet: ID is required (or EXAMPLE=1)" >&2; exit 2; }
         bash scripts/task/appflow-packet.sh "${args[@]}"
 
+  agents:apps:draft:
+    desc: "Save a reply as a mailbox DRAFT — nothing is sent (ID=, BODY=file, ATTACH=file, TO=addr, DRY=1 to print only)"
+    vars:
+      ID: '{{.ID | default ""}}'
+      BODY: '{{.BODY | default ""}}'
+      ATTACH: '{{.ATTACH | default ""}}'
+      TO: '{{.TO | default ""}}'
+      DRY: '{{.DRY | default "0"}}'
+    cmds:
+      - |
+        [ -n "{{.ID}}" ] && [ -n "{{.BODY}}" ] || {
+          echo "agents:apps:draft: ID and BODY are required (BODY is prose a person signed; there is no template)" >&2; exit 2; }
+        args=(--draft "{{.ID}}" --body "{{.BODY}}")
+        [ -n "{{.TO}}" ] && args+=(--to "{{.TO}}")
+        [ -n "{{.ATTACH}}" ] && args+=(--attach "{{.ATTACH}}")
+        [ "{{.DRY}}" != "1" ] && args+=(--apply)
+        appflow-sync "${args[@]}"
+
+  agents:apps:drafts:
+    desc: "What is sitting in the Drafts folder: subjects and dates, newest first (TOON=1 for an agent)"
+    vars:
+      TOON: '{{.TOON | default "0"}}'
+    cmds:
+      - |
+        if [ "{{.TOON}}" = "1" ]; then
+          appflow-sync --drafts --json | toon -e
+        else
+          appflow-sync --drafts
+        fi
+
   agents:apps:export:
     desc: "Regenerate applications.json from the database, in the workflow's own shape (OUT=path or - for stdout)"
     vars:
@@ -520,13 +549,18 @@ tasks:
         appflow-sync "${args[@]}"
 
   agents:apps:queue:
-    desc: "Application mail an agent owns — the pipeline's inbox (LIM=20)"
+    desc: "Application mail an agent owns — the pipeline's inbox (LIM=20, TOON=1 for an agent)"
     vars:
       LIM: '{{.LIM | default "20"}}'
+      TOON: '{{.TOON | default "0"}}'
     cmds:
       - |
-        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent:apps&lim={{.LIM}}" \
-          | jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"'
+        if [ "{{.TOON}}" = "1" ]; then
+          curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent:apps&lim={{.LIM}}" | toon -e
+        else
+          curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent:apps&lim={{.LIM}}" \
+            | jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"'
+        fi
 
   agents:ci:preflight:
     desc: "Run the two gates the CI docs-budget job runs, locally: no digest drift, no document over budget"

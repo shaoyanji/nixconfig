@@ -27,6 +27,21 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-03 — the importer's window was the bug, and a second model takes work off a person
+- **The stall had a fixed cause.** `maxPages × pageSize` bounded both the scan and the `known` set, so from
+  2000 archived messages on a run found only known mail and still exited 0. `known` is now complete
+  (`--known-limit`) and the scan depth derived (`--max-pages 0`): `--limit 800` imported 800 across 25 pages
+  where the old code stopped at 700 of a 5000-message request.
+- **A second architecture re-reads the human queue.** `serve.secondary` serves `laya` on 8092 in the same
+  sandbox (~24 MiB); the triage asks it about what a person is holding and only lets it demote. First run:
+  427 of 872 closed as bulk, with invoice and application subjects protected (16 of 500 would have been
+  money or candidacy mail). Human queue 872 → 511; `agent:apps` returned to 0.
+- **Drafts, not sends.** `--draft` writes an RFC 5322 draft with its attachments into Drafts through
+  himalaya; verified by downloading the 24,791-byte PDF back out of the draft, then deleting the test.
+  `agents:apps:set` now calls the plugin's own stage ladder instead of an awk copy that already disagreed.
+- **Agents read TOON.** `JSON=1` on the reporting tasks, `TOON=1` projects it through the `toon` binary;
+  text stays the default, so the tasks read the same to a person as before.
+
 ### 2026-11-03 — the pipeline queue stops refilling: acknowledgements count, alerts leave
 - **German acknowledgements and already-held events kept mail open**, so the same message returned every
   run; both close now with the reason in the ledger, and "Application Received" maps to `applied`.

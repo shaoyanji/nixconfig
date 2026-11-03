@@ -16,6 +16,11 @@ Three verbs, all idempotent:
   reappearing on the next run.
 * `--report` prints the pipeline and the applications whose mail is still open.
 
+A draft is the safe half of sending: `--draft` writes a message into the
+mailbox's Drafts folder, where a person reads, edits or discards it. Nothing here
+can send mail, so an agent may draft freely and report that a draft exists with
+its attachment rather than claiming anything was mailed.
+
 The importer talks to the loopback API only. It never touches the mailbox and
 never edits the workflow's JSON: docs/email-archive.md.
 """
@@ -26,10 +31,13 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from email.message import EmailMessage
+from email.utils import formatdate, make_msgid
 
 # A record whose `company` is really a role ("AI Generative Engineer German") would
 # otherwise match every recruiter reply, because those words are in the subject of
@@ -661,16 +669,130 @@ def export_json(api: str, destination: str) -> int:
     return 0
 
 
-def report(api: str) -> None:
+def report(api: str, as_json: bool = False) -> None:
     pipeline = get(f"{api}/api/application-pipeline") or []
     total = sum(row.get("applications") or 0 for row in pipeline)
+    attention = get(f"{api}/api/application-attention?lim=10") or []
+    if as_json:
+        print(
+            json.dumps(
+                {
+                    "applications": total,
+                    "stages": [
+                        {
+                            "stage": row.get("stage"),
+                            "count": row.get("applications"),
+                            "withNextAction": row.get("withNextAction", 0),
+                        }
+                        for row in pipeline
+                    ],
+                    "open_mail": len(attention),
+                },
+                ensure_ascii=False,
+            )
+        )
+        return
     print(f"applications: {total}")
     for row in pipeline:
         print(f"  {row['stage']:<10} {row['applications']:>4}  (next action: {row.get('withNextAction', 0)})")
-    attention = get(f"{api}/api/application-attention?lim=10") or []
     print(f"open mail on an application: {len(attention)} (showing 10)")
     for row in attention[:10]:
         print(f"  {row['stage']:<10} {row['company'][:34]:<34} {row['subject'][:48]}")
+
+
+# A subject is the only part of a letter that can be defaulted safely: the body
+# is prose a person signed, so it is always an input, never a template.
+DRAFT_SUBJECTS = {
+    "de": "Bewerbung – {role} bei {company}",
+    "en": "Application – {role} at {company}",
+}
+
+
+def draft_message(application: dict, body: str, to: str, attachments: list[str]) -> EmailMessage:
+    language = (application.get("language") or "en").strip().lower()
+    template = DRAFT_SUBJECTS["de"] if language.startswith(("de", "ger")) else DRAFT_SUBJECTS["en"]
+    message = EmailMessage()
+    message["Subject"] = template.format(
+        role=application.get("role") or "—", company=application.get("company") or "—"
+    )
+    if to:
+        message["To"] = to
+    message["Date"] = formatdate(localtime=True)
+    message["Message-ID"] = make_msgid()
+    message.set_content(body)
+    for path in attachments:
+        with open(path, "rb") as handle:
+            data = handle.read()
+        name = os.path.basename(path)
+        maintype, subtype = ("application", "pdf") if name.lower().endswith(".pdf") else (
+            "application",
+            "octet-stream",
+        )
+        message.add_attachment(data, maintype=maintype, subtype=subtype, filename=name)
+    return message
+
+
+def save_draft(
+    api: str,
+    himalaya_config: str,
+    mailbox: str,
+    application_id: str,
+    body_path: str,
+    to: str,
+    attachments: list[str],
+    dry_run: bool,
+) -> dict:
+    rows = get(f"{api}/api/application-get?id={urllib.parse.quote(application_id)}") or []
+    if not rows:
+        raise RuntimeError(f"no application {application_id}")
+    application = rows[0]
+    body = sys.stdin.read() if body_path == "-" else open(body_path, encoding="utf-8").read()
+    recipient = to or application.get("recruiterEmail") or application.get("gmail") or ""
+    message = draft_message(application, body, recipient, attachments)
+    raw = message.as_string()
+    result = {
+        "application": application_id,
+        "mailbox": mailbox,
+        "subject": message["Subject"],
+        "to": message.get("To", ""),
+        "attachments": [os.path.basename(path) for path in attachments],
+        "bytes": len(raw.encode()),
+        "saved": False,
+    }
+    if dry_run:
+        return result
+    cmd = ["himalaya", "-c", himalaya_config, "message", "add", "-m", mailbox, "-f", "draft"]
+    proc = subprocess.run(cmd, input=raw, capture_output=True, text=True, timeout=120)
+    if proc.returncode != 0:
+        raise RuntimeError(f"himalaya message add failed: {(proc.stderr or proc.stdout).strip()[:300]}")
+    result["saved"] = True
+    return result
+
+
+def list_drafts(himalaya_config: str, mailbox: str, limit: int) -> list[dict]:
+    cmd = [
+        "himalaya", "-c", himalaya_config, "--json", "envelope", "list",
+        "-m", mailbox, "-s", str(limit),
+    ]
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    if proc.returncode != 0:
+        raise RuntimeError(f"himalaya envelope list failed: {(proc.stderr or proc.stdout).strip()[:300]}")
+    # himalaya answers `{"queued": n, "envelopes": […]}` when --json is set, not
+    # a bare array: reading it as one is an AttributeError, not an empty folder.
+    payload = json.loads(proc.stdout or "{}")
+    rows = payload.get("envelopes") if isinstance(payload, dict) else payload
+    drafts = []
+    for row in rows or []:
+        drafts.append(
+            {
+                "id": row.get("id"),
+                "subject": row.get("subject") or "",
+                "date": row.get("date") or "",
+                "flags": row.get("flags") or [],
+                "has_attachment": row.get("has-attachment"),
+            }
+        )
+    return drafts
 
 
 def main() -> int:
@@ -687,6 +809,25 @@ def main() -> int:
     parser.add_argument(
         "--ledger",
         default=os.path.expanduser("~/.local/state/email-archive/apps-sync.jsonl"),
+    )
+    parser.add_argument("--update", default="", help="application id whose status changes")
+    parser.add_argument("--status", default="", help="with --update: the new status text")
+    parser.add_argument("--next", default="", help="with --update: the next action")
+    parser.add_argument("--draft", default="", help="application id to draft a reply for")
+    parser.add_argument("--body", default="-", help="draft body file, or - for stdin")
+    parser.add_argument("--to", default="", help="recipient; defaults to the record's recruiter or gmail")
+    parser.add_argument("--attach", action="append", default=[], help="file to attach (repeatable)")
+    parser.add_argument("--drafts", action="store_true", help="list the mailbox's drafts")
+    parser.add_argument(
+        "--himalaya-config",
+        default=os.path.expanduser("~/.config/himalaya/config.toml"),
+        help="himalaya config; the account password lives there as a command",
+    )
+    parser.add_argument("--draft-mailbox", default="Drafts")
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="structured output; pipe through `toon -e` for an agent",
     )
     args = parser.parse_args()
 
@@ -712,7 +853,59 @@ def main() -> int:
         sync(api, args.apply, args.sync_limit, args.ledger)
 
     if args.report:
-        report(api)
+        report(api, args.json)
+
+    if args.update:
+        if not args.status:
+            print("appflow-sync: --update needs --status", file=sys.stderr)
+            return 2
+        stage = stage_of(args.status)
+        post(
+            f"{api}/api/application-update",
+            {
+                "id": args.update,
+                "status": args.status,
+                "stage": stage,
+                "nextAction": args.next,
+            },
+        )
+        if args.json:
+            print(json.dumps({"id": args.update, "status": args.status, "stage": stage}))
+        else:
+            print(f"{args.update}  stage={stage}  status={args.status}")
+
+    if args.draft:
+        result = save_draft(
+            api,
+            args.himalaya_config,
+            args.draft_mailbox,
+            args.draft,
+            args.body,
+            args.to,
+            args.attach,
+            dry_run=not args.apply,
+        )
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False))
+        else:
+            state = "saved" if result["saved"] else "would save"
+            attachments = ", ".join(result["attachments"]) or "no attachment"
+            print(
+                f"{state} draft  {result['application']}\n"
+                f"  mailbox  {result['mailbox']}\n"
+                f"  to       {result['to'] or '(no recipient)'}\n"
+                f"  subject  {result['subject']}\n"
+                f"  attached {attachments}"
+            )
+
+    if args.drafts:
+        drafts = list_drafts(args.himalaya_config, args.draft_mailbox, 20)
+        if args.json:
+            print(json.dumps(drafts, ensure_ascii=False))
+        else:
+            print(f"{len(drafts)} draft(s) in {args.draft_mailbox}")
+            for row in drafts:
+                print(f"  {(row['date'] or '')[:10]:<10} {row['subject'][:70]}")
 
     return 0
 

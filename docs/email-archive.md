@@ -135,16 +135,17 @@ and so re-classifying never rewrites the archive.
 | `resolved_at` | set by whatever dealt with it; an unresolved row is the queue |
 
 The classifier (`modules/services/email-triage.py`) runs rules first: the VIP
-list, GitHub CI notices, machine senders, bulk and transactional signals. Only
-the residue reaches the decision engine this host already serves (`julia-1` on
-loopback, 3 ms per question), and a verdict that does not lead the runner-up by
-`triage.margin` becomes **`review`**: surfaced to a person, never hidden.
+list, GitHub CI notices, machine senders, bulk and transactional signals. The
+residue reaches the engine this host serves (`julia-1` on loopback, 3 ms per
+question); a verdict that does not lead the runner-up by `triage.margin` becomes
+**`review`**. Then a second architecture (`laya`, on `serve.secondary`'s port)
+re-reads what a person is holding: bulk it is sure about is closed, invoice and
+application subjects are protected from it, and it can never add to the queue.
 
 **The VIP list is encrypted config, not state.** `modules/secrets.yaml` carries
-`email-archive.vip-senders` (commas or newlines between addresses); sops-nix lands
-it as a 0400 file and `triage.vipFile` points at that path by default. A family
-address in this public tree would be a leak, and a plaintext state file is a
-second thing to remember — a `sops --set` plus a rebuild is the whole edit.
+`email-archive.vip-senders`; sops-nix lands it as a 0400 file at `triage.vipFile`,
+so a family address in this public tree is a leak and a plaintext state file is a
+second thing to remember. A `sops --set` plus a rebuild is the whole edit.
 
 ## The job pipeline lives here too
 

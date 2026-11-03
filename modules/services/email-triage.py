@@ -324,6 +324,98 @@ def classify_engine(message: dict, engine_url: str, margin: float) -> tuple[str,
     return tier, owner, f"engine: {choice} ({top:.2f})", top
 
 
+# What the second architecture may do to a message a person is already holding:
+# call it bulk and close it, or leave it alone. Nothing it says can put mail in
+# front of a person, so a second opinion can only take work away.
+DEMOTABLE = ("digest", "robot")
+
+# …except about these. A receipt demoted to a digest is a record nobody reads,
+# and an application acknowledgement is the pipeline's whole input: measured on
+# the first run, 16 of 500 demotions were one of the two. The markers are the
+# first pass's own evidence, so the second model cannot overrule them.
+PROTECTED = TRANSACTIONAL_SIGNALS + ("bewerbung", "einladung", "vertrag", "kündigung")
+
+
+def second_pass(
+    api: str,
+    engine_url: str,
+    classifier: str,
+    margin: float,
+    dry_run: bool,
+) -> tuple[int, int, int]:
+    """Ask the second model about unresolved human mail. (demoted, kept, skipped)."""
+    try:
+        get(f"{engine_url.rstrip('/')}/health", timeout=5.0)
+    except (urllib.error.URLError, TimeoutError, ValueError) as error:
+        print(
+            f"triage: second engine unreachable at {engine_url} ({error}); pass skipped",
+            file=sys.stderr,
+        )
+        return 0, 0, 0
+
+    attention = [normalize(row) for row in (get(f"{api}/api/attention?lim=100000") or [])]
+    if not attention:
+        return 0, 0, 0
+
+    # `triage-pending` answers the complement: every message this classifier has
+    # not judged. Intersecting it with attention is what keeps the pass to the
+    # human queue, and to mail that a run has not already asked about.
+    unjudged = {
+        normalize(row).get("message_id")
+        for row in (
+            get(
+                f"{api}/api/triage-pending?classifier={urllib.parse.quote(classifier)}&lim=100000"
+            )
+            or []
+        )
+    }
+    targets = [row for row in attention if row.get("message_id") in unjudged]
+
+    demoted = kept = skipped = 0
+    for message in targets:
+        verdict = classify_engine(message, engine_url, margin)
+        if verdict is None:
+            skipped += 1
+            continue
+        tier, _owner, reason, confidence = verdict
+
+        subject = (message.get("subject") or "").lower()
+        protected = any(marker in subject for marker in PROTECTED)
+        if tier in DEMOTABLE and not protected:
+            new_tier, new_owner = "digest", "none"
+            demoted += 1
+        else:
+            # Keep the tier a person was already given: the second model can say
+            # "agreed", it cannot re-label review as action behind their back.
+            new_tier, new_owner = message.get("tier") or "review", "human"
+            kept += 1
+
+        if dry_run:
+            print(
+                f"second {new_tier:<7} {new_owner:<6} {confidence:.2f}  "
+                f"{message.get('subject', '')[:70]}"
+            )
+            continue
+
+        post(
+            f"{api}/api/triage-upsert",
+            {
+                "messageId": message["message_id"],
+                "classifier": classifier,
+                "tier": new_tier,
+                "owner": new_owner,
+                "reason": f"second model: {reason}",
+                "confidence": confidence,
+            },
+        )
+        # Bulk mail that is closed is mail nobody has to look at twice; leaving it
+        # open would move the queue rather than shorten it.
+        if new_tier == "digest":
+            post(f"{api}/api/triage-resolve", {"messageId": message["message_id"]})
+
+    return demoted, kept, skipped
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--api", default=os.environ.get("EMAIL_ARCHIVE_API", "http://127.0.0.1:8080"))
@@ -334,6 +426,21 @@ def main() -> int:
     parser.add_argument("--engine-url", default=os.environ.get("SYSTEMONE_URL", "http://127.0.0.1:8091"))
     parser.add_argument("--margin", type=float, default=DEFAULT_MARGIN)
     parser.add_argument("--no-engine", action="store_true", help="rules only; residue goes to review")
+    parser.add_argument(
+        "--second-engine-url",
+        default=os.environ.get("SYSTEMONE_SECOND_URL", "http://127.0.0.1:8092"),
+        help="second architecture; the pass is skipped when it does not answer",
+    )
+    parser.add_argument(
+        "--second-classifier",
+        default="second-pass",
+        help="classifier name the second model's verdicts are stored under",
+    )
+    parser.add_argument(
+        "--no-second",
+        action="store_true",
+        help="skip the second pass over human mail (default: run it)",
+    )
     parser.add_argument("--dry-run", action="store_true", help="print verdicts, write nothing")
     parser.add_argument("--report", action="store_true", help="print tier counts from the API and exit")
     args = parser.parse_args()
@@ -358,9 +465,10 @@ def main() -> int:
         )
         or []
     ]
+    # Nothing unjudged is not the same as nothing to do: the second pass runs
+    # over mail the first one already filed, so it must run on an idle hour too.
     if not pending:
         print("triage: nothing pending")
-        return 0
 
     counts: dict[str, int] = {tier: 0 for tier in TIERS}
     owners: dict[str, int] = {}
@@ -399,6 +507,19 @@ def main() -> int:
     summary = " ".join(f"{tier}={count}" for tier, count in counts.items() if count)
     print(f"triage: {len(pending)} pending, {written} written, {summary}")
     print("owners: " + " ".join(f"{owner}={count}" for owner, count in sorted(owners.items())))
+
+    if not args.no_second:
+        demoted, kept, skipped = second_pass(
+            api,
+            args.second_engine_url,
+            args.second_classifier,
+            args.margin,
+            args.dry_run,
+        )
+        print(
+            f"second pass: {demoted} closed as bulk, {kept} left for a person, "
+            f"{skipped} without an answer"
+        )
     return 0
 
 

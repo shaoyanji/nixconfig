@@ -193,6 +193,7 @@
         --limit ${toString cfg.triage.limit} \
         --vip-file ${lib.escapeShellArg cfg.triage.vipFile} \
         --engine-url ${lib.escapeShellArg cfg.triage.engineUrl} \
+        --second-engine-url ${lib.escapeShellArg cfg.triage.secondEngineUrl} \
         --margin ${toString cfg.triage.margin} \
         "$@"
     '';
@@ -444,6 +445,17 @@ in {
         description = ''
           The decision engine the residue goes to (services.systemoneDecision).
           Loopback by default, so mail metadata stays on this host.
+        '';
+      };
+
+      secondEngineUrl = lib.mkOption {
+        type = lib.types.str;
+        default = "http://127.0.0.1:8092";
+        description = ''
+          The second architecture (`services.systemoneDecision.serve.secondary`).
+          The triage asks both, and only lets the second one *demote*: mail it is
+          sure is bulk leaves the human queue, and nothing it says can put mail in
+          front of a person. An unreachable second engine skips the pass.
         '';
       };
 

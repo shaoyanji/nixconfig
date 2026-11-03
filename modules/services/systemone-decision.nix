@@ -85,6 +85,30 @@ in {
         default = null;
         description = "Architecture to serve; null follows defaultModel.";
       };
+
+      # A second architecture beside the first, so a caller can ask both and act
+      # only on agreement. The engine is pure Python with no weights to load, so
+      # the pair costs roughly what one browser tab does (24 MiB measured).
+      secondary = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = config.services.systemoneDecision.serve.enable;
+          defaultText = lib.literalExpression "services.systemoneDecision.serve.enable";
+          description = "Serve a second architecture on `port`, for a second opinion.";
+        };
+
+        port = lib.mkOption {
+          type = lib.types.port;
+          default = 8092;
+          description = "Bind port for the second architecture (loopback, like the first).";
+        };
+
+        model = lib.mkOption {
+          type = lib.types.enum ["julia-1" "laya"];
+          default = "laya";
+          description = "Architecture served on `port`; laya is the larger, sharper one.";
+        };
+      };
     };
   };
 
@@ -118,6 +142,28 @@ in {
         ProtectHome = true;
         RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
         # Measured at 24 MiB; the cap is the runaway guard, not the expectation.
+        MemoryMax = "256M";
+      };
+    };
+
+    # Same sandbox, second architecture. A caller that wants a second opinion
+    # should not have to trust one model's temperature: the envelope is the same,
+    # only the profile differs.
+    systemd.services.systemone-decision-serve-secondary = lib.mkIf (cfg.serve.enable && cfg.serve.secondary.enable) {
+      unitConfig.X-Fleet-Role = "daemon";
+      description = "System One decision envelope (/v1/systemone) on ${cfg.serve.host}:${toString cfg.serve.secondary.port} (${cfg.serve.secondary.model})";
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${cfg.pythonPackage}/bin/python3 ${systemoneSrc}/engine.py --model ${cfg.serve.secondary.model} serve --host ${cfg.serve.host} --port ${toString cfg.serve.secondary.port}";
+        Restart = "always";
+        RestartSec = 2;
+        DynamicUser = true;
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
         MemoryMax = "256M";
       };
     };

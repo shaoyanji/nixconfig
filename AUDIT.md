@@ -27,94 +27,114 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
-### 2026-11-02 — the cache becomes a schedule: monthly sync, arch routing, and a build-cost gate
-- **The handoff is scheduled, not remembered.** `dev:nixcache:sync` loops the
-  **active** NixOS hosts only (`preserved`/`legacy` are dormant: a build-second spent on them buys nothing),
-  builds each closure where its arch belongs, and hands the path to `push` — routing only, so dedupe,
-  the budget refusal and the read-back stay in one place. `nixcache-sync.timer` on delphi is a **user**
-  unit (the R2 and signing keys decrypt with the operator's age key), monthly, `Persistent`, 3 h timeout,
-  and it runs `gc -- --delete` first because a refused push is the budget gate working.
-- **Arch decides the builder.** aarch64 (delphi, minyx) builds **natively on delphi** — the arch the
-  official aarch64 caches came from, so the inputs are local and only the delta compiles; x86_64 gets
-  `/etc/nix/machines` with `--max-jobs 0` (offload or fail), and a box with no machines file prints
-  SKIPPED rather than compiling that closure on 2 OCPU. Dedupe now asks cache.nixos.org first (79 % of a
-  closure), which halved the HEAD phase: 2728 paths in 120 s; the survivors are 342 paths / 693 MiB.
-- **The fleet enablement gate.** `checks:nixcache:fleet`: the compiled policy must carry the edge —
-  **after cachix** — in every active host's `substituters` with its key in `trustedKeys` (0.2 s, no host
-  eval), delphi's evaluated `config.nix.settings.substituters` must carry it too, and the live URL must
-  answer `nix-cache-info` 200. All three green.
-- **A microfix has a price, and now a gate.** `checks:invalidation` scopes a diff to the hosts it can
-  reach (`hosts/<h>/` is that host; a shared module is chain-wide and sampled) and counts the
-  derivations `nix build --dry-run --json --builders ""` would build on each: 1–3 is a microfix,
-  hundreds is an overlay/stdenv change, and over `MAX_BUILDS` (5) it fails **naming the derivations**.
-  Measured on delphi: 48 s, `1 to build` for a 37-file diff; the gate names
-  `nixos-system-delphi-26.11.20261016.f20cd90`.
-- **First real run, on delphi.** `sync --hosts delphi`: 342 paths / 693 MiB of nar went in as **0.44 GiB /
-  694 objects** (the budget compares uncompressed nars, so the refusal errs ~35 % high), and the toplevel,
-  `stirling-pdf` and `atuin` all answer `nix path-info --store <edge>` — the fleet's own system is now
-  substitutable from the bucket. 8 m 56 s wall, 2.6 GiB peak.
-- **Evidence:** `checks:nixcache:fleet` rc=0 (0 problems, wiring, live 200); `checks:host HOST=delphi`
-  rc=0 (6.58 s); `dev:nixcache:sync -- --dry-run` routes delphi/minyx native and skips aristotle with a
-  reason; the invalidation gate fails at `--max-builds 0`; `dev:nixcache:sync` served the paths above.
-  docs/nix-cache-edge.md.
+### 2026-11-03 — the pipeline queue stops refilling: acknowledgements count, alerts leave
+- **German acknowledgements and already-held events kept mail open**, so the same message returned every
+  run; both close now with the reason in the ledger, and "Application Received" maps to `applied`.
+- **An alert is not an application**: relays send alerts from the same address as application mail, so
+  "Vollzeitstelle in Freiburg" reached `agent:apps` with a body whose "interview" looked like evidence, and
+  discovery could mint a record from it. The subject decides unless it states an event.
+- **Evidence**: queue 4 → 1, no status rewritten, a second run closes 0, deployed `sync.py` equals the repo
+  file; the one left is Tibber's note, naming no employer in its subject.
 
-### 2026-11-02 — the fleet's public cache: R2 behind a GET-only Worker, as a buffer
-- **Third tier, not a replacement.** `harmonia` stays the LAN cache and `cachix` the 5 GB WAN one;
-  delphi adds a 10 GiB R2 bucket served by `modules/services/nix-cache-edge/` at
-  `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`), registered after `cachix` in
-  `lib/cache-registry.nix`, `lib/cache-policy.nix` and `flake.nix` (`checks:flake:cache` proves it).
-- **The bucket holds a delta, never a closure.** `dev:nixcache:push` HEADs every path against every
-  non-LAN registry cache first: delphi's 2728-path / 18.48 GiB system closure leaves **365 paths /
-  771 MiB** unique (2158 nixos, 167 cachix, 11 nix-community, **27 / 1.40 GiB numtide** — the llm-agents
-  tools), so 10 GiB holds ~13 systems. Over `BUDGET_GIB` it refuses before writing and prints the five
-  largest survivors.
-- **The edge never signs.** narinfo is signed by the pusher (`secret-key=` on a `file://` staging cache)
-  and moved with rclone; the Worker reads, so every trap is the pusher's: `nix copy` is recursive by
-  default, `--no-recursive` needs valid references (stubs satisfy it, never uploaded), `--to s3://` wrote
-  nothing against a fresh bucket and exited 0, `rclone purge` deletes the bucket.
-- **Size collects, age only expires.** `dev:nixcache:gc` deletes the oldest until under 75 % of the
-  budget; the lifecycle rule is a 365-day backstop that `deploy` reconciles. gc is not scheduled yet.
-- **Evidence:** `checks:nixcache:probe` green (info, HEAD, 404, 405, signed narinfo); `nix path-info
-  --store <edge> <path>` accepts the signature; `dev:nixcache:check` 17/17. docs/nix-cache-edge.md.
+### 2026-11-03 — delphi activates the guest plugin, and the boot test stops firing on a pin
+- **The plugin is live**: generation 160 at 13:26 carries `services.appflowPlugin.enable`. Evidence from the
+  running system, not the exit code: `/api/plugins` lists `agent:apps` (open 4, resolved 23), the 12
+  application routes appear in `/openapi.json`, `applications`/`application_mail` exist with 151/78 rows, and
+  `appflow-sync` resolves on PATH so `task agents:apps:pipeline` prints the stage counts.
+- **The boot test fired on a taskfile pin.** `switch-preflight.sh` treated every `flake/*` file as stage-1
+  input, so moving `flake/taskfile-digest-pin.nix` started a full VM boot — under TCG, because this OCI
+  instance exports no `/dev/kvm` (`accel=kvm:tcg` logs "failed to initialize kvm" and boots anyway). The
+  task plane is now excluded, `BOOT=auto` skips with `reason=no /dev/kvm`, and `BOOT=1` still forces it.
+  Verified three ways: auto on this host skips, a real `flake/devshells.nix` edit still says `BOOT=run`, and
+  `BOOT=1` overrides.
+- **Two gates were red, both from this work.** `nix-header-budget` flagged the comment essays atop
+  `modules/plugins/appflow/{default,packet}.nix` and `modules/scripts/html2markdown.nix` (now three lines
+  each, rationale only in the plugin README); `secrets-mirror-is-a-copy` caught
+  `email-archive.vip-senders` written only into the mirror, which moved into the submodule and re-synced.
 
-### 2026-11-02 — email archive: NpgsqlRest over PostgreSQL on delphi, tailnet-only
-- **The SQL file is the API.** `modules/services/email-archive.nix` packages the v3.21.0 NativeAOT
-  `npgsqlrest-linux-arm64` binary (fetchurl + autoPatchelf, no .NET runtime), enables PostgreSQL with
-  database `email_archive` and role `npgsqlrest`, and binds loopback `:8080` behind a `tailscale serve`
-  mount on **8450**. `email-archive-db-init` re-asserts the role password from sops, sets database
-  ownership itself (`ensureDBOwnership` only accepts a role-named database), then applies
-  `email-archive.sql` **as the role over TCP**, so a bad `pg_hba` fails activation. Table CRUD left
-  upstream in 3.14, hence the three annotated files under `email-archive-endpoints/`.
-- **Two keys the examples get wrong.** Uploads are
-  `NpgsqlRest.UploadOptions.UploadHandlers.FileSystemPath` (+ `UploadOptions.Enabled`,
-  `FileSystemUseUniqueFileName`), not `NpgsqlRest.FileSystemPath`; the password rides the shipped
-  `{!PGPASSWORD}` placeholder with `AddEnvironmentVariables=false`.
-- **Evidence:** `checks:host HOST=delphi` rc=0; `/health` 200; `api/list-emails` and `api/emails-search`
-  200 through the tailnet name on `:8450`; `emails_search_idx` GIN present. The mirror reuses the
-  calendar's `ConditionPathExists` rule rather than a second credential. `docs/email-archive.md`.
+### 2026-11-03 — the packet is a plugin's Nix build, and one JSON Resume is the base
+- **The PDF step left the runtime entirely.** `modules/plugins/appflow/packet.nix` is a derivation: `typst`
+  0.15.1 from this flake's pin, Libertinus bundled with it, two templates and `strings.json` copied into the
+  sandbox. `nix build` returns the packet; `task agents:apps:packet` only writes the JSON inputs. No Node, no
+  uv, no venv, no font package, no network, and nothing installed on the host.
+- **A guest, not a resident.** The pipeline's tables, endpoints, importer and packet moved from
+  `modules/services/` to `modules/plugins/appflow/`; the mail hub declares only `rules`, `sql`, `schema`,
+  `packages`, and delphi opts in with `services.appflowPlugin.enable`. Deleting the directory removes every
+  trace; nothing in the hub imports it by name.
+- **One base file.** The base is a JSON Resume, not two bespoke documents: `~/.config/appflow/resume.json`
+  holds the contact block, work, education and skills, and the CV template walks those arrays. It is operator
+  state because the upstream repo is private and carries a date of birth and a street address. Language is a
+  field, not a second document: the application record picks `de`/`en` and headings plus month names come
+  from `strings.json`.
+- **A sandbox clock is not a clock.** The first render dated the letter *1 January 1980* — a Nix build runs
+  with `SOURCE_DATE_EPOCH=1980-01-01`, so `datetime.today()` is the epoch. The date is now an input the task
+  passes in, which also makes it part of the build hash. Verified by reading the artefact, not the exit code:
+  `pdftotext` on a real record (`adorsys-gmbh-ai-engineer-m-w-d`) shows the real header, `3. November 2026`,
+  the German letter body and the CV sections.
 
-### 2026-11-02 — the mail sweep decides by rule; needle3 keeps only tool calling
-- **A label is a decision, not a tool call.** `mail-agent-sort-tools.json` asked needle3 for a keep/archive
-  *classification*. A ten-item labelled battery scored needle3, julia-1 and laya at **3/10 each** (nine of
-  ten archive; Go City wrong in the other direction at 0.71/0.84), so the schema is deleted and the sweep
-  archives on `BULK_*` + `PROTECTED` + `sweep.trustedSenders` alone; `minConfidence` and `--min-confidence`
-  went with it. `hosts/delphi/needle-tools.json` no longer forces a note-kind classification either.
-- **Evidence:** `mail-agent --self-test` 10/11 (dispatch unchanged), `mail-agent --sweep` prints `ARCHIVE`
-  / `held … sender not in sweep.trustedSenders` with no model call, `checks:host HOST=delphi` green
-  (`docs/mail-agent.md`, `AGENTS.nix` exp-128).
+### 2026-11-03 — the pipeline moves next to the mail, and the VIP list becomes declarative
+- **`applications` + `application_mail` in the archive database.** The workflow's schema (149 records) imports
+  as-is with `stage` derived from `task apps:overview`'s rules beside the freeform `status`; the join table
+  carries `matched_by` and `confidence`, so a company match is recorded as evidence and never overwrites.
+  Token matching was removed after it gave one record whose `company` is a role name ~30 mails from
+  unrelated employers; the phrase rule links 74 and that record 0.
+- **`owner = agent:apps`** routes ATS mail to the pipeline (`greenhouse`, `personio`, `join.com`, …) and job
+  alerts to `digest`. `/api/attention` now excludes every `agent:*` owner — the person queue was showing the
+  pipeline's 27 ATS mails, which is exactly the pollution a queue dies of.
+- **The VIP list is sops, not state.** `email-archive.vip-senders` in `modules/secrets.yaml`, landed 0400 by
+  sops-nix; the tmpfiles state file it replaced is gone. Verified end to end: the VIP's mail reads
+  `person / VIP address` in the queue, and the classifier's comma-split handles one sops line.
+- **Evidence:** 149/149 records imported (prep 62, applied 34, lead 22, rejected 22), 1100 messages re-judged
+  in 2.9 s under `rules+engine+apps` (agent:ci 236, agent:apps 27, person 4, review 239).
+- **The database writes, the JSON is exported** (the sunset direction chosen 2026-11-03). `agents:apps:sync`
+  writes status from ATS mail — monotonic (`received < follow-up < interview < rejected`, oldest message
+  first, so a September acknowledgement cannot overwrite an October interview), one application per message,
+  ledger with alternatives — then resolves the mail. First live run: 4 updates (WattFox applied → follow-up
+  → interview, adorsys applied → follow-up → rejected), queue 27 → 23. `agents:apps:export` regenerates
+  `applications.json` key-for-key from `/api/applications-export` (verified: 149 rows, identical key set).
+  What is left is the workflow repo becoming a client (its `bin/` still reads the JSON).
+- **The hub is plugins, and it hydrates the tracker.** `services.emailArchive.plugins` turns a sender list,
+  a tier and an owner into routing (`GET /api/plugins` reports every owner's depth; `task agents:hub` prints
+  it), so a third plugin is config. Verified by loading a rule set directly: a `gatus@` sender routed to
+  `agent:fleet`, an unknown sender fell through to the engine.
+- **Mail discovers applications.** A message naming an employer the pipeline lacks creates a row with
+  `origin = 'discovered'` and its `message_id` ("Willkommen bei AmRest", "Deine Bewerbung bei Lease a Bike"),
+  then the same monotonic write applies — AmRest landed as `Rejected (email 2026-09-23)`, Lease a Bike as
+  `Follow-up Required`. ATS boilerplate with no status resolves as noise, ledger intact: the pipeline queue
+  went **22 → 4** in one pass.
+- **The hub counted double and was fixed:** `plugins.sql` first reported 1399 open for 1100 messages,
+  because both classifiers hold a verdict. It reads the newest verdict per message, like `/api/attention`.
 
-### 2026-11-02 — mail-agent: Needle 3 routes mail commands on delphi
-- **A sentence in, a himalaya action out.** `mail-agent` (module, harness and tool schemas under
-  `modules/services/`) dispatches `search_mail` / `archive_mail` / `mark_read` with the needle3 binary
-  delphi already ran for repo routing; a 06:30 systemd user timer sweeps bulk mail. Engine and weights
-  live in `modules/scripts/needle-model.nix`, one hash for both consumers.
-- **Measured, then designed.** Routing battery 10/11; a `trash_mail` tool was never selected, so delete
-  left the schema instead of gaining a gate; a dry run over the real inbox approved a Dropbox "connected
-  a new app" and a GitHub "new SSH key" at 0.22–0.47, so the sweep archives only from
-  `sweep.trustedSenders` and holds the rest with a printed reason.
-- **Evidence.** The unit ran 2.6 s / 86 MB and archived 7, all of which left the inbox (one restored from
-  All Mail on demand). `~/.local/state/mail-agent/audit.jsonl` records `message-id`, because Gmail
-  reassigns uids per mailbox (310172 in INBOX, 621165 in All Mail); 0 failed units on delphi.
+### 2026-11-03 — mail triage: a tier, an owner, and CI that closes its own loop
+- **The CI noise is one gate, not the fleet.** Seven of the last eight runs on `main` failed and in five the
+  only failing job was `docs-budget`; `affected_hosts: []` means **no host was built at all**. Per-host
+  detection is intact — what leaked is the digest pin and the document budget, checked only *after* the
+  push. `.githooks/pre-push` now runs both locally (an eval and a script, no build budget).
+- **Triage is a verdict, not a column.** `email_triage` is keyed `(message_id, classifier)` and carries
+  `resolved_at`, so two classifiers disagree without rewriting either and a dealt-with notice leaves the
+  queue without losing its searchable body. Rules first; the residue goes to `julia-1` on loopback, and a
+  verdict that does not lead the runner-up by `triage.margin` becomes `review` — surfaced, never hidden.
+- **`run failed:` mail goes to an agent, not a human.** `agents:ci:fix RUN=<id>` builds one bounded prompt
+  from the failing job and its log, starts a `hermes` subagent in detached tmux; `agents:ci:resolve`
+  clears the row when the run is green. A `robot` verdict needs CI evidence — without it the engine filed
+  a university newsletter as `robot` (0.34) and 250 rows would have been buried.
+- **Measured on 1100 messages in 3.0 s:** `action` 464, `review` 250, `robot/agent:ci` 237, `digest` 143.
+  Two NpgsqlRest traps: request bodies are **camelCased** (`messageId`), and a comment line starting with
+  `keys:` is parsed as an annotation and prefixes the JSON body.
+
+### 2026-11-03 — email archive: the endpoint takes a whole message, and something fills it
+- **`add-email` was a four-column stub.** Only four of the nine columns were insertable, so `sent_at`,
+  `thread_id`, `recipients`, `labels` and `attachment_path` were unreachable. It now carries all nine and
+  upserts, so a re-sent batch updates instead of 500ing. A JSON array cannot bind to `text[]` ("…`List`1<Object>'
+  is not supported…"), so `recipients`/`labels` cross comma-separated; a **missing** body key is a 404.
+- **The importer fills the empty archive.** `email-archive-import.py` and its hourly timer walk the inbox
+  through himalaya, POST each new message, and fetch attachments; no watermark, so successive runs walk
+  further back. Root (`ProtectHome=read-only`) because the himalaya config is the login user's. HTML-only
+  bodies go through the Go `html2markdown`, gated by `checks:email:bodies` (900/900 after `--refill`).
+- **Evidence:** repeat POST returns the same `id` with the other columns preserved, missing key 404;
+  `/openapi.json` serves the contract; `dev:email:bench` 15/15, 8.82 ms p95 geomean; after `--refill`
+  repaired 112 HTML-only rows, `checks:email:bodies` PASSED with 900/900 rows carrying text.
+
 ## Open debt (`task ops:notes`)
 
 1. `cassini`'s darwin assertion (`xdg.desktopEntries`) — dormant, reproducible

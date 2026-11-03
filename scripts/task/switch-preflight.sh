@@ -15,13 +15,16 @@
 #      switches (policy: a bad stage-1 cannot be diagnosed from outside). That is
 #      a full host build plus a QEMU boot — minutes to tens of minutes, and the
 #      switch then builds the same closure again. It is the right gate for a change
-#      that can reach stage-1, and pure waste for one that cannot: an nginx vhost
-#      cannot break the initrd. So the default (`BOOT=auto`) runs it only when the
-#      pending diff touches a stage-1 input; BOOT=1 forces it, BOOT=0 skips it.
+#      that can reach stage-1, and pure waste for one that cannot: an nginx vhost# cannot break the initrd. So the default (`BOOT=auto`) runs it only when the
+# pending diff touches a stage-1 input; BOOT=1 forces it, BOOT=0 skips it.
 #
 # Stage-1 inputs are decided by file AND by content: a `fileSystems` entry or a
 # `boot.*` option can live in any module, so a changed .nix file that mentions one
-# counts. The rule only ever errs toward running the boot test.
+# counts. The rule only ever errs toward running the boot test, with two limits:
+# the task plane is not a boot input (a digest pin cannot break an initrd), and
+# without `/dev/kvm` QEMU falls back to TCG — tens of minutes on the machine that
+# answers DNS for the fleet, so `BOOT=auto` skips and says why. `BOOT=1` still
+# forces it: an explicit request is not a default.
 #
 # Usage: switch-preflight.sh [--boot]
 #   --boot   also print exactly one line: `BOOT=run reason=…` or `BOOT=skip reason=…`
@@ -94,6 +97,15 @@ case "${BOOT:-auto}" in
     ;;
 esac
 
+# Measured on the OCI instance: the driver starts with `accel=kvm:tcg`, prints
+# "failed to initialize kvm" and then boots anyway, slowly. That is not a gate,
+# it is a stall on the host the fleet resolves through. An absent KVM is an
+# environment limit, so it is reported like any other skip.
+if [ ! -e /dev/kvm ]; then
+  echo "BOOT=skip reason=no /dev/kvm (boot test would run under TCG)"
+  exit 0
+fi
+
 # Staged and unstaged both count: a switch evaluates the work tree, and a staged
 # file is what most flows leave behind.
 changed="$(
@@ -111,6 +123,9 @@ fi
 # Whole classes of file that only ever matter at boot.
 while IFS= read -r file; do
   case "$file" in
+    # The task plane is not a boot input. `flake/taskfile-digest-pin.nix` moving
+    # one digest spent a full TCG boot on a switch that changed no initrd.
+    flake/taskfile*.nix) ;;
     flake/*)
       echo "BOOT=run reason=flake wiring ($file)"
       exit 0

@@ -266,11 +266,132 @@
     )
     (builtins.attrNames library.tools);
 
+  # --- exposure: the general gates that retire the rotation chore -------------
+  # A secret rarely leaks by being pasted. It *moves*: into the second copy of a
+  # file, into a tracked source file, into a store path at eval time, or onto a
+  # terminal by a comparison that prints. Each of those is a predicate over the
+  # tree, so the answer to a leak is a gate rather than one more paragraph and one
+  # more rotation.
+  secretsMirror = "modules/secrets.yaml";
+  secretsSubmodule = "modules/secrets/secrets.yaml";
+  secretsDir = "modules/secrets";
   sopsFiles = [
     "modules/secrets.yaml"
     "modules/ssh-ca-key.yaml"
+    "modules/secrets/apikeys.yaml"
+    "modules/secrets/DE-Taskfile.yaml"
+    "modules/secrets/fullsecrets.yaml"
+    "modules/secrets/secrets.yaml"
   ];
-  plaintextSecrets = lib.concatMap (f: map (l: "${f}: ${l}") (plaintextValues f)) sopsFiles;
+  # The registry is only real if it is complete: an encrypted file nobody lists is
+  # also a file `plaintextValues` never reads.
+  encryptedInSecretsDir =
+    if builtins.pathExists (root + "/${secretsDir}")
+    then
+      map (n: "${secretsDir}/${n}") (
+        builtins.attrNames (
+          lib.filterAttrs
+          (n: t: t == "regular" && !(lib.hasPrefix "." n) && lib.hasSuffix ".yaml" n)
+          (builtins.readDir (root + "/${secretsDir}"))
+        )
+      )
+    else [];
+  unregisteredSops = builtins.filter (f: !(lib.elem f sopsFiles)) encryptedInSecretsDir;
+  # A clone without the submodule checked out must still evaluate: the files that
+  # are here are scanned, the ones that are not are reported by the registry gate
+  # the moment they appear.
+  presentSopsFiles = builtins.filter (f: builtins.pathExists (root + "/${f}")) sopsFiles;
+  plaintextSecrets = lib.concatMap (f: map (l: "${f}: ${l}") (plaintextValues f)) presentSopsFiles;
+  # The mirror is a `cp` of the submodule (`task infra:secrets:sync`), so identity
+  # is the invariant. A value written to one copy only decrypts on the machine that
+  # wrote it and is absent everywhere after the next sync.
+  mirrorDrift =
+    builtins.pathExists (root + "/${secretsMirror}")
+    && builtins.pathExists (root + "/${secretsSubmodule}")
+    && read secretsMirror != read secretsSubmodule;
+
+  # Positions of matching lines. Report the FILE AND LINE, never the line: a gate
+  # failure is printed into a terminal, a CI log or a transcript, so quoting what
+  # it found would re-publish the thing it is protecting.
+  hitsWhere = p: pred: let
+    lines = lib.splitString "\n" (read p);
+    idx = builtins.filter (i: pred (builtins.elemAt lines i)) (lib.range 0 (builtins.length lines - 1));
+  in
+    map (i: "${p}:${toString (i + 1)}") idx;
+
+  # Shapes the issuers reserve. A value cannot be matched, so match the prefix:
+  # the same test a scanner runs, over every tracked text file.
+  textSuffixes = [".md" ".nix" ".sh" ".yml" ".yaml" ".toml" ".json"];
+  credentialShapes = [
+    "ghp_[A-Za-z0-9]{30,}"
+    "github_pat_[A-Za-z0-9_]{20,}"
+    "AKIA[0-9A-Z]{16}"
+    "-----BEGIN [A-Z ]*PRIVATE KEY-----"
+    "sk-[A-Za-z0-9_-]{20,}"
+    "xox[baprs]-[A-Za-z0-9-]{10,}"
+    "AIza[0-9A-Za-z_-]{35}"
+    "nvapi-[A-Za-z0-9_-]{20,}"
+    "gsk_[A-Za-z0-9]{30,}"
+  ];
+  # Every tracked text file. `.git` is not in a flake source and `node_modules` is
+  # ignored, but both are skipped explicitly so a dirty tree cannot make the walk
+  # read a vendored tree.
+  textFiles = let
+    walk = d: let
+      entries = builtins.readDir (root + "/${d}");
+      rel = n:
+        if d == "."
+        then n
+        else "${d}/${n}";
+      step = n: let
+        r = rel n;
+      in
+        if entries.${n} == "directory"
+        then
+          if n == ".git" || n == "node_modules"
+          then []
+          else walk r
+        else lib.optional (lib.any (s: lib.hasSuffix s n) textSuffixes) r;
+    in
+      lib.concatMap step (builtins.attrNames entries);
+  in
+    walk ".";
+  credentialHits =
+    lib.concatMap (
+      p: hitsWhere p (l: lib.any (s: builtins.match ".*${s}.*" l != null) credentialShapes)
+    )
+    textFiles;
+
+  # Decryption during evaluation writes the plaintext into /nix/store: world
+  # readable, and it survives every rotation of the credential itself.
+  # The registry itself is excepted: stating this rule means naming the idiom.
+  nixSources =
+    builtins.filter (
+      p: p != "flake/policies.nix"
+    )
+    (nixUnder "modules" ++ nixUnder "hosts" ++ nixUnder "flake" ++ nixUnder "lib");
+  # A trailing comment that mentions the idiom is not the idiom; netbook's `sops #
+  # \`sops -d\` …` line is prose about a root-only path, not an eval-time decrypt.
+  codePart = l: builtins.head (lib.splitString "#" l);
+  decryptAtEval =
+    lib.concatMap (
+      p: hitsWhere p (l: lib.hasInfix "sops -d" (codePart l))
+    )
+    nixSources;
+
+  # `diff` over two decrypted documents prints both copies the moment they
+  # disagree — which is exactly when someone is reading. `cmp -s` answers the same
+  # question and prints nothing.
+  printedDiff =
+    lib.concatMap (
+      p:
+        hitsWhere p (
+          l:
+            lib.hasInfix "sops -d" l
+            && (lib.hasInfix "| diff" l || lib.hasInfix "diff -" l || lib.hasInfix "diff <(" l)
+        )
+    )
+    (shellScripts ++ taskfiles);
 
   # --- user access: one source of keys, no host-local key literals ----------
   # Not "no keys at all" — `config.ssh.authorizedKeys.keys` is the fleet's
@@ -476,6 +597,96 @@
       detail = "AGENTS.md ${toString agentsLines}/928 lines, skills ${toString skillLines}/5526 — over budget means delete or an audited `Truth:` extension, not a renumber";
     };
 
+    rebuild-flags-are-finite = {
+      rule = "Every rebuild answers exactly three questions and nothing else: who compiles (local | none | remote), whether Nix may substitute (on | off), and the flake posture (accept | impure). The host, the flake ref and the action are ARGUMENTS. The set is closed — a typo must be a usage error, not a silent local build — and defaults (local, on, accept) render nothing, because a flag is only worth printing when a decision was made. Before this, the same three decisions were spelled five ways inside `infra:switch:*` alone: `REMOTE_BUILD=1` meaning \"never compile here\", `--option max-jobs 0 --option builders \"\"` typed inline, `--impure` in one task, `--use-substitutes` in another, and nothing in the third.";
+      proof = "scripts/task/rebuild-flags.sh · taskfiles/infra.yml (infra:switch:*, infra:rebuild:wsl, infra:rebuild:orb) · taskfiles/checks.yml (checks:rebuild)";
+      holds =
+        has "scripts/task/rebuild-flags.sh" "--self-test"
+        && has "scripts/task/rebuild-flags.sh" "max-jobs 0 --option builders"
+        && has "scripts/task/rebuild-flags.sh" "REBUILD_BUILDERS"
+        && has "scripts/task/rebuild-flags.sh" "REBUILD_SUBSTITUTES"
+        && has "scripts/task/rebuild-flags.sh" "REBUILD_FLAKES"
+        # Adopted, not merely available: every switch path must render its flags.
+        && builtins.length (lib.splitString "rebuild-flags.sh" (read "taskfiles/infra.yml")) > 3
+        && has "taskfiles/checks.yml" "checks:rebuild";
+      detail = "a rebuild path went back to spelling its own flags: the envelope lost its axes, its self-test, or one of the switch tasks stopped rendering from it";
+    };
+
+    daemon-clears-kelly = let
+      d = import ./daemons.nix {inherit lib;};
+      report = lib.concatStringsSep "\n  " (lib.mapAttrsToList (
+          n: v: "${n}: p=${toString v.p} save=${toString v.save}s cost=${toString v.cost}s ev=${toString v.ev}s clears=${lib.boolToString v.clears} wanted=${lib.boolToString v.wanted}"
+        )
+        d.daemons);
+    in {
+      rule = "Anything that runs RESIDENT must be strictly worth more than zero, measured against what the counterfactual costs an agent rather than against a cold start. The counterfactual is generation at ~50 tokens/s, where any sub-second local round trip is free: a daemon that answers correctly saves only the tokens of naming the argument, so the bar is `ev = p * save - (1 - p) * cost > 0` with `save > 0` as well. `save` may be negative — correct and still slower is the normal failure — and a daemon with `ev == 0` is off, because it pays rent in memory, surface and maintenance for a coin flip. Enabling is a measured claim, so every entry carries the command that measured it; a daemon whose best case is a loss cannot be rescued by accuracy.";
+      proof = "flake/daemons.nix · docs/nix-patterns.md · modules/roles/home.nix (kgSidecar, selectorDaemon) · hosts/delphi/configuration.nix (edgeCaller) · checks:edge:resident and checks:selector:sidecar for the p they use";
+      holds =
+        d.failing
+        == {}
+        && d.unmeasured == {}
+        # The formula is the stated one, not a constant someone computed by hand.
+        && has "flake/daemons.nix" "d.p * d.save - (1.0 - d.p) * d.cost"
+        && has "flake/daemons.nix" "d.save > 0.0 && ev > 0.0"
+        # Adoption, in both directions: the daemon the arithmetic refuses must not
+        # be enabled by a host, and the one it justifies must not be silently off.
+        && !(has "hosts/delphi/configuration.nix" "programs.edgeCaller.enable = true")
+        && !(has "modules/roles/home.nix" "edgeCaller.enable = true")
+        && has "modules/roles/home.nix" "kgSidecar.enable"
+        && has "modules/roles/home.nix" "selectorDaemon.enable"
+        && has "docs/nix-patterns.md" "A daemon must clear the Kelly gate";
+      detail = "a resident helper is enabled without a strictly positive Kelly score, or its measurement is missing:\n  ${report}";
+    };
+
+    edge-caller-before-reasoning = {
+      rule = "Dispatch goes cheapest-first, on a Pareto frontier rather than a wish: needle3 (8-29 MB, on-device, calibrated confidence) takes the quadrant that is SMALL and NON-REDUCIBLE — one deterministic lookup whose answer is a value or a set it need not decompose, the class of call a reasoning model makes most often — and executes it all day. REDUCIBLE requests (two independent asks) are refused for the reasoning agent to split; LARGE requests (a judgement, an operation, or anything whose body can BUILD) are refused for it to do, and a task with a build verb is removed from the tool surface structurally rather than by a reviewer's memory. Only a low-confidence or empty answer escalates to a reasoning model. The class comes before the score — a READ-ONLY tool prefetches on any validated call, because a graph lookup cannot change anything and its answer is the question's neighbourhood; anything off that allowlist needs one call at or above ACT, may be shown for approval above CONFIRM, and declines below it. A single threshold either makes the caller decorative or dangerous. An invented tool is refused before confidence is consulted, the argument's TYPE is repaired from the graph rather than trusted, a decline from the graph router is a decline whatever its exit code, and telemetry is off in the shipped binary by default so the dispatcher sets it explicitly.";
+      proof = "scripts/task/toolcall.sh · scripts/task/edge-sidecar.sh · scripts/task/edge-check.sh · scripts/task/toolcall-battery.jsonl · taskfiles/agents.yml (agents:call, agents:edge) · taskfiles/checks.yml (checks:toolcall, checks:edge)";
+      holds =
+        has "scripts/task/toolcall.sh" "taskfileGraph"
+        && has "scripts/task/toolcall.sh" "confidence"
+        && has "scripts/task/toolcall.sh" ''decision: "confirm"''
+        && has "scripts/task/toolcall.sh" "NEEDLE_TELEMETRY=0"
+        # the prefetch class is an allowlist, so a mutating task added to the
+        # surface later is gated by construction instead of by someone's memory
+        && has "scripts/task/toolcall.sh" "TOOLCALL_READ_ONLY:-^(ops:kg:|ops:ask$)"
+        && has "scripts/task/toolcall.sh" "node_exists"
+        && has "scripts/task/toolcall.sh" "intent[[:space:]]*: UNKNOWN"
+        && has "scripts/task/toolcall-battery.sh" "unsafe"
+        # The Pareto split is executable: a build verb removes a task from the
+        # surface, a compound request is refused before the engine, and every
+        # verdict is emitted so the caller knows which quadrant it is in.
+        && has "scripts/task/toolcall.sh" "HEAVY_RE"
+        && has "scripts/task/toolcall.sh" "JUDGEMENT_RE"
+        && has "scripts/task/toolcall.sh" "pareto: \"decompose\""
+        && has "scripts/task/toolcall-battery.sh" "pareto_bad"
+        # Bounded, timed, one line per call: the piping contract that replaces a
+        # blanket `timeout` around a long pipeline.
+        && has "scripts/task/toolcall.sh" "TOOLCALL_STEP_S"
+        && has "scripts/task/edge-check.sh" "gate\":\"timeout"
+        && has "taskfiles/agents.yml" "agents:call:batch"
+        # The resident caller is optional by construction: the dispatcher must keep
+        # the one-shot fallback and its own switch, or a dead daemon becomes an
+        # outage rather than 600 ms of extra latency.
+        && has "scripts/task/toolcall.sh" "TOOLCALL_ONE_SHOT"
+        && has "scripts/task/edge-sidecar.sh" "--serve"
+        && has "scripts/task/edge-sidecar.sh" "/reset"
+        # Parity is a gate, not a hope: same call both ways, timed.
+        && has "scripts/task/edge-check.sh" "function_calls"
+        && has "taskfiles/agents.yml" "agents:call"
+        && has "taskfiles/agents.yml" "agents:edge"
+        && has "taskfiles/checks.yml" "checks:toolcall"
+        && has "taskfiles/checks.yml" "checks:edge"
+        && builtins.pathExists (root + "/scripts/task/toolcall-battery.jsonl");
+      detail = "the edge-caller path lost its derived tool set, its read-only prefetch allowlist, its confidence bands, its graph-side type repair, its telemetry opt-out, its battery gate, or the task that exposes it";
+    };
+
+    taskfiles-aggregators-declare-nothing = {
+      rule = "An include-only shard is `version:` plus `includes:` and nothing else: `taskfiles/services.yml` flattens `services-core.yml` and `services-legacy.yml` so `services:*` resolves through one file. A task declared in the aggregator is invisible to the ownership map and vanishes the moment the file is read as a flatten of its children, which is why the rule is a predicate instead of a sentence stated twice.";
+      proof = "taskfiles/services.yml · taskfiles/README.md";
+      holds = !(lib.hasInfix "tasks:" (read "taskfiles/services.yml"));
+      detail = "taskfiles/services.yml grew a `tasks:` section — declare it in services-core.yml or services-legacy.yml";
+    };
+
     channels-have-a-task = {
       rule = "Every discovery channel keeps an entry point: a fleet fact is read with `task dev:inventory:feed`, a note with `ops:notes:show`, a durable doc with `docs:build`, and a rule with the policy check. A category with no entry point is a fact nobody can reach, which is how prose becomes the only home.";
       proof = "taskfiles/dev.yml (inventory:feed, docs:build), taskfiles/ops.yml (ops:notes:show), flake/checks.nix (policyFailures)";
@@ -559,10 +770,8 @@
       rule = "Every sops file in the tree is encrypted (`ENC[AES256_GCM` values plus `sops:` metadata); a plaintext commit fails rather than being reviewed.";
       proof = "modules/secrets.yaml, modules/ssh-ca-key.yaml";
       holds =
-        lib.all (
-          f: builtins.pathExists (root + "/${f}") && anyLine f (l: lib.hasPrefix "sops:" l)
-        )
-        sopsFiles
+        lib.all (f: builtins.pathExists (root + "/${f}")) [secretsMirror "modules/ssh-ca-key.yaml"]
+        && lib.all (f: anyLine f (l: lib.hasPrefix "sops:" l)) presentSopsFiles
         && plaintextSecrets == [];
       detail = "plaintext value(s) in a sops file: ${lib.concatStringsSep "; " plaintextSecrets}";
     };
@@ -574,6 +783,41 @@
         has ".gitmodules" ''[submodule "modules/secrets"]''
         && has "docs/sops-rekey.md" "modules/secrets.yaml";
       detail = ".gitmodules lost the secrets submodule, or the rekey page stopped naming the mirror";
+    };
+
+    secrets-mirror-is-a-copy = {
+      rule = "`modules/secrets.yaml` is a byte copy of the `modules/secrets/secrets.yaml` submodule, produced only by `task infra:secrets:sync`. A value written to one copy decrypts on the machine that wrote it and is missing on every host after the next sync, where it surfaces days later as a host that cannot decrypt, with nothing in the diff to explain it. Identity is also the cheapest possible proof: the two files are compared as ciphertext, so the gate never decrypts anything.";
+      proof = "modules/secrets.yaml · modules/secrets/secrets.yaml · taskfiles/infra.yml (infra:secrets:sync)";
+      holds = !mirrorDrift;
+      detail = "the mirror and the submodule are no longer the same bytes — run `task infra:secrets:sync`, and never edit the mirror";
+    };
+
+    secrets-files-are-registered = {
+      rule = "Every encrypted file is named in the sops registry, because that registry is what the plaintext scan reads: an encrypted file outside it is a file whose plaintext nobody checks. New secret material therefore costs one line in `sopsFiles`, not a new scan.";
+      proof = "flake/policies.nix (sopsFiles) · modules/secrets/*.yaml";
+      holds = unregisteredSops == [];
+      detail = "encrypted file(s) the plaintext gate never reads: ${lib.concatStringsSep ", " unregisteredSops}";
+    };
+
+    credentials-never-land-in-a-tracked-file = {
+      rule = "No tracked text file carries a credential shape — a provider prefix or a private-key header. A secret that is committed is the one that has to be rotated everywhere it is used, and rotation is the chore this gate exists to stop repeating. Values cannot be matched, so the gate matches what the issuers reserve, over every tracked markdown, Nix, shell, YAML, TOML and JSON file; it reports the file and line and never quotes the match, because a gate failure is printed into a terminal or a transcript.";
+      proof = "every tracked *.md, *.nix, *.sh, *.yml, *.yaml, *.toml, *.json (encrypted blobs contain no such shape)";
+      holds = credentialHits == [];
+      detail = "credential-shaped text at: ${lib.concatStringsSep ", " credentialHits}";
+    };
+
+    secrets-are-not-decrypted-at-eval = {
+      rule = "Nothing decrypts during evaluation: `sops -d` in a `.nix` file writes the plaintext into `/nix/store`, where it is world-readable and survives every rotation of the credential. Decryption belongs to activation (sops-nix) or to a runtime `passwordCommand`, both of which keep the value outside the store.";
+      proof = "modules/**/*.nix · hosts/**/*.nix · flake/**/*.nix · lib/**/*.nix, non-comment lines";
+      holds = decryptAtEval == [];
+      detail = "eval-time decryption at: ${lib.concatStringsSep ", " decryptAtEval}";
+    };
+
+    decrypted-documents-are-compared-not-printed = {
+      rule = "A decrypted document is compared with `cmp -s`, never `diff`, because `diff` prints both copies the moment they disagree — precisely when someone is reading the output. The question is identical and the output is empty, so a drifting mirror cannot become a transcript of both secrets.";
+      proof = "scripts/task/*.sh · taskfiles/*.yml";
+      holds = printedDiff == [];
+      detail = "decrypt-then-diff at: ${lib.concatStringsSep ", " printedDiff}";
     };
 
     ssh-ca-declarative = {
@@ -785,6 +1029,20 @@
         )
         shellScripts;
       detail = "a script edits a .toml with sed -i";
+    };
+
+    agent-boundary-is-toon = {
+      rule = "An agent's boundary is TOON in both directions: it reads a TOON document and it writes a TOON document, and the converter owns every quote, delimiter and `[n]` row count. JSON stays the linking layer a PROGRAM consumes (jq, a flake output, an API body) and TOML, YAML and Nix stay source of truth crossing in their own tool. Hand-writing JSON or YAML at the agent boundary is where tabs, quotes and counts get mangled, repeatedly; so the surface is compiled rather than typed — every agent-facing answer is encoded by `toon -e`, every agent-authored table is a `.toon` document that strict-decodes. There is no third path: a surface that concatenates its own output, or parses its own input with a hand-rolled reader, is the bug this rule names.";
+      proof = "scripts/task/q.sh · scripts/task/selector-battery.toon · scripts/task/selector-check.sh · taskfiles/ops.yml (ops:q) · taskfiles/checks.yml (checks:selector, checks:toon, checks:toon:surfaces) · .agents/SCHEMA.md §Formats";
+      holds =
+        has "scripts/task/q.sh" "| toon -e"
+        && has "scripts/task/q.sh" "toon -d"
+        && has "scripts/task/selector-check.sh" "toon -d"
+        && has "taskfiles/ops.yml" "ops:q"
+        && has "taskfiles/checks.yml" "checks:selector"
+        && has "taskfiles/checks.yml" "checks:toon"
+        && has ".agents/SCHEMA.md" "never becomes the record of machine state";
+      detail = "an agent-facing surface formats its own output or parses its own input instead of letting the converter cross the boundary; the `[n]`, the quoting and the delimiter drift one edit later.";
     };
 
     generated-not-tracked = {

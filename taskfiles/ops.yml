@@ -227,7 +227,7 @@ tasks:
   #   stats     counts (+ top out-degree)
 
   ops:kg:host:
-    desc: Print everything the graph connects to HOST
+    desc: 'Docs and skills that mention a host'
     summary: >
       Inbound edges for host:<HOST> (docs and skills that mention it). HOST is
       required. Reads the graph projection, not a config. An unmentioned host is
@@ -244,7 +244,7 @@ tasks:
         fi
 
   ops:kg:skill:
-    desc: Print everything the graph connects to SKILL
+    desc: 'Docs and skills naming a skill, plus its tags'
     summary: >
       Inbound mentions (docs and skills that name it) plus its outbound tags, so
       "where is nix-eval used" is one query instead of a grep. SKILL is required;
@@ -262,7 +262,7 @@ tasks:
         fi
 
   ops:kg:doc:
-    desc: Print what one document mentions and links to (DOC=)
+    desc: 'Hosts and skills a document mentions, plus the docs it links to'
     summary: >
       Outbound edges for doc:<DOC> — the hosts and skills that file names, plus
       the other documents it links to (the `references` layer; `ops:kg:blast
@@ -284,7 +284,7 @@ tasks:
         fi
 
   ops:kg:tag:
-    desc: Print the skills carrying TAG
+    desc: 'Skills carrying a tag'
     summary: >
       Inbound `tagged` edges for tag:<TAG>. TAG is required and is the bare tag
       (`nix`, not `tag:nix`). The graph is authoritative for tags because they
@@ -302,7 +302,7 @@ tasks:
         fi
 
   ops:kg:comention:
-    desc: Print hosts that share documents with HOST (with the shared count)
+    desc: 'Hosts that share documents with a host'
     summary: >
       Two hops without a join operator: the documents naming host:<HOST>, then
       every OTHER host those same documents name, ranked by how many documents
@@ -346,8 +346,82 @@ tasks:
     cmds:
       - nix eval --raw .?submodules=1#knowledgeGraph.cypher
 
+  # --- the selector (docs/selector-daemon-predesign.md) ----------------------
+  # Stages 2-4: a query OBJECT over the compiled registries, validated against
+  # the schema, executed with jq, answered in TOON with pointers. Stage 1 (an
+  # English question -> the object) is tools/selector: a classifier that routes
+  # the registry, then a scan of the compiled vocabulary for the constraints —
+  # which is how a compound question becomes several filter entries.
+
+  ops:q:
+    desc: "Query object over the compiled registries -> TOON answer with pointers, or a refusal"
+    summary: >
+      scripts/task/q.sh over inventory, notes, graph, tasks and ledger — the
+      compiled truth, never a copy. REGISTRY= is required; STATUS= KIND= TYPE=
+      NAME= TOUCHES= filter, plus any registry field via CLI_ARGS. TOUCHES
+      searches only the fields a registry NAMES a thing in, never a note body,
+      so every answer is pointable. FIELDS=, LIMIT= 1..20 (default 5),
+      SHOW=<registry>.<id> verifies a pointer. Default output is TOON
+      ([[flake/policies.nix#agent-boundary-is-toon]]), FORMAT=json for programs.
+      Exit 0 answer, 1 registry unavailable, 2 invalid query, 3 refused.
+    env:
+      Q_REGISTRY: "{{.REGISTRY | default \"\"}}"
+      Q_NAME: "{{.NAME | default \"\"}}"
+      Q_STATUS: "{{.STATUS | default \"\"}}"
+      Q_KIND: "{{.KIND | default \"\"}}"
+      Q_TYPE: "{{.TYPE | default \"\"}}"
+      Q_TOUCHES: "{{.TOUCHES | default \"\"}}"
+      Q_FIELDS: "{{.FIELDS | default \"\"}}"
+      Q_LIMIT: "{{.LIMIT | default \"\"}}"
+      Q_SHOW: "{{.SHOW | default \"\"}}"
+      Q_QUESTION: "{{.Q | default \"\"}}"
+      Q_FORMAT: "{{.FORMAT | default \"\"}}"
+    # The answer is the output: echoing twelve lines of argument assembly would
+    # cost more tokens than the query saves.
+    silent: true
+    cmds:
+      - |
+        args=()
+        if [ -n "$Q_REGISTRY" ]; then args+=("--registry=$Q_REGISTRY"); fi
+        if [ -n "$Q_NAME" ]; then args+=("--name=$Q_NAME"); fi
+        if [ -n "$Q_STATUS" ]; then args+=("--status=$Q_STATUS"); fi
+        if [ -n "$Q_KIND" ]; then args+=("--kind=$Q_KIND"); fi
+        if [ -n "$Q_TYPE" ]; then args+=("--type=$Q_TYPE"); fi
+        if [ -n "$Q_TOUCHES" ]; then args+=("--touches=$Q_TOUCHES"); fi
+        if [ -n "$Q_FIELDS" ]; then args+=("--fields=$Q_FIELDS"); fi
+        if [ -n "$Q_LIMIT" ]; then args+=("--limit=$Q_LIMIT"); fi
+        if [ -n "$Q_SHOW" ]; then args+=("--show=$Q_SHOW"); fi
+        if [ -n "$Q_QUESTION" ]; then args+=("--question=$Q_QUESTION"); fi
+        if [ "$Q_FORMAT" = "json" ]; then args+=(--json); fi
+        bash scripts/task/q.sh "${args[@]}" {{.CLI_ARGS}}
+
+  ops:q:sidecar:
+    desc: "Resident selector stage 1: start, stop, status, or ask a question"
+    summary: >
+      scripts/task/selector-sidecar.sh — the unit behind selector.service
+      (modules/user/selector-daemon.nix). It holds the trained model so
+      `ops:q Q=...` does not pay interpreter start per question; q.sh falls back
+      to the interpreter when the socket is absent, so this is a speed setting.
+      CLI_ARGS is the subcommand: start|stop|restart|status, or
+      `ask <question>` for the query object alone (stage 1, no executor).
+    cmds:
+      - bash scripts/task/selector-sidecar.sh {{.CLI_ARGS}}
+
+  ops:q:train:
+    desc: "Build stage 1 from the compiled registries and print its held-out numbers"
+    summary: >
+      tools/selector/build.sh — dumps the four registries through `q.sh --data`
+      (the same cache the query reads), templates questions from them, trains the
+      classifier, and writes the artifact to ~/.cache/nixconfig/selector.
+      Splits are by entity and 20 % of the pairs abstain, so the number printed is
+      a held-out one. Pure Python, no torch, seconds on a 2-core host; the
+      heavier path (fine-tune a small encoder, export ONNX) is
+      tools/selector/train_encoder.py, which needs eisen and was not run here.
+    cmds:
+      - bash tools/selector/build.sh
+
   ops:ask:
-    desc: Ask the knowledge graph a question in English (Q=)
+    desc: 'Whole English question for the graph router'
     summary: >
       scripts/task/kg-ask.sh — front door to `.?submodules=1#knowledgeGraph`. Q= is the question.
       Clean tree: cached per revision; dirty tree: re-evaluates, because a stale
@@ -367,6 +441,29 @@ tasks:
           bash scripts/task/kg-ask.sh --json "{{.Q}}"
         else
           bash scripts/task/kg-ask.sh "{{.Q}}"
+        fi
+
+  ops:ask:plan:
+    desc: "Two-step ask: the graph resolves the subject, one leaf nix eval fills the values (Q=)"
+    summary: >
+      scripts/task/kg-values.sh — step 1: ops:ask's router (cached graph; the
+      sidecar answers kg-query in ~28 ms when live). Step 2: ONE directed eval of
+      the subject's attr — `inventory.hosts.<h>` (0.13 s) or `agentSkills.skills.<s>`
+      (0.10 s). FORMAT=json for machines.
+
+      Emits the values, the vars a command reads (HOST/ARCH/STATUS, SKILL_PATH…)
+      and the owning task. Never a host config (13 s / 700 MiB,
+      [[flake/policies.nix#no-fleet-default]]): `nixosConfigurations` is refused by
+      name. Uncompiled host → `managed: false`; external box → a read, no invented
+      deploy.
+    requires:
+      vars: [Q]
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-values.sh --q "{{.Q}}" --json
+        else
+          bash scripts/task/kg-values.sh --q "{{.Q}}" --human
         fi
 
   ops:ask:jev:

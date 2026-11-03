@@ -11,10 +11,23 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/codespace.yml` owns GitHub Codespaces as a mode (`codespace:*`) for work that runs in someone else's remote devcontainer: the file transport `gh codespace cp` cannot do, a push that happens on the host holding the git auth, a reset for the post-rewrite clone, and a stop that waits for `Shutdown`.
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
+- Rebuild flags have exactly one home: `scripts/task/rebuild-flags.sh` renders
+  builders / substitutes / flakes and nothing else, so a switch task states the host and
+  the flake ref, never a flag. [[flake/policies.nix#rebuild-flags-are-finite]]
 - `taskfiles/data.yml` is the canonical NAS surface (`data:*`) for the `/Volumes/data` taxonomy, hygiene, permissions and the portable tool library.
 - `taskfiles/lifecycle.yml` owns host commissioning and decommissioning (`lifecycle:*`), which is provisioning a host, not operating one.
 - `taskfiles/services.yml` is an include-only aggregator: it flattens `services-core.yml` and `services-legacy.yml` and declares no tasks of its own.
-- `taskfiles/ops.yml` owns observation and the context plane: `ops:health`, `ops:ledger[:toon]`, `ops:sentinel:*`, `ops:skills*`, `ops:kg*`, `ops:ask[:jev]`, `ops:context`, `ops:docs:budget`, `ops:bench:evals`, `ops:bench:kg`. These read a live system or a compiled artifact; they are not build gates.
+  [[flake/policies.nix#taskfiles-aggregators-declare-nothing]]
+- The task surface is also the **edge caller's tool set**: `agents:call` derives its tools
+  from `.#taskfileGraph`, so a callable verb is a task, not a second registry. Read-only
+  verbs prefetch on any validated call (TOON out), the graph repairs the argument's type,
+  `ops:ask` answers when the call names nothing, and a reasoning model is the *last* hop.
+  [[flake/policies.nix#edge-caller-before-reasoning]]
+- **Which quadrant goes where** (`agents:call` emits it as `pareto:`): small and
+  non-reducible → needle3, a lookup; reducible → `decompose`, refused before the engine so
+  no tool can half-answer it; large (a judgement, an operation, or a task whose body can
+  build) → `reason`, and such a task is never on the surface at all.
+- `taskfiles/ops.yml` owns observation and the context plane: `ops:health`, `ops:ledger[:toon]`, `ops:sentinel:*`, `ops:skills*`, `ops:kg*`, `ops:ask[:jev]`, `ops:q`, `ops:context`, `ops:docs:budget`, `ops:bench:evals`, `ops:bench:kg`. These read a live system or a compiled artifact; they are not build gates.
 
 ## File-by-file map
 - `Taskfile.yml` – entrypoint with top-level menus

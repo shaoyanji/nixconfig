@@ -1,0 +1,31 @@
+[30]{prompt,args,rows,refuse,direct,direct_bytes,weak}:
+  "which active hosts are in the laptop category","--registry inventory --status active --category laptop",aristotle|fern|netbook,no,"nix eval --json .#inventory.hosts",75376,no
+  "which hosts are in the hosting category","--registry inventory --category hosting",dragoncourt|envs|pythonanywhere|serv00,no,"nix eval --json .#inventory.hosts",75376,no
+  "which registered host runs macOS","--registry inventory --kind darwin",cassini,no,"nix eval --json .#inventory.hosts",75376,no
+  "which active nixos hosts this flake manages","--registry inventory --status active --kind nixos --managed true --limit 20",aristotle|eisen|fern|frieren|guckloch|minyx|poseidon|scratch|stark,no,"nix eval --json .#inventory.hosts",75376,no
+  "which hosts have CI disabled","--registry inventory --ci false",gok|kali|kellerbench|minyx|stark,no,"nix eval --json .#inventory.hosts",75376,no
+  "which host is the mobile device","--registry inventory --category mobile",moto,no,"nix eval --json .#inventory.hosts",75376,no
+  "which host is a microvm guest","--registry inventory --category microvm",frieren-canary,no,"nix eval --json .#inventory.hosts",75376,no
+  "what is frieren's role","--registry inventory --name frieren --fields role",frieren,no,"nix eval --raw .#inventory.hosts.frieren.role",63,no
+  "which notes are handoffs","--registry notes --kind handoff",handoff-closed-2026-10|handoff-live-host-file|queue-rules,no,"nix eval --json .#agentsNotes.notes",325412,no
+  "which notes were rejected","--registry notes --status REJECTED",d4-no-neo4j|needle3-resident-at-login|needle3-single-tool-surface,no,"nix eval --json .#agentsNotes.notes",325412,no
+  "which notes are blocked","--registry notes --status BLOCKED",dns-second-resolver|lfm3-shell-project|mqtt-bus,no,"nix eval --json .#agentsNotes.notes",325412,no
+  "which proposal notes are about a daemon","--registry notes --kind proposal --touches daemon",daemon-earns-it-by-compression|p5-dms-widget,no,"nix eval --json .#agentsNotes.notes",325412,no
+  "which notes reference the selector predesign","--registry notes --refs.docs docs/selector-daemon-predesign.md",daemon-earns-it-by-compression,no,"nix eval --json .#agentsNotes.notes",325412,no
+  "what is the status of the daemon note","--registry notes --name daemon-earns-it-by-compression",daemon-earns-it-by-compression,no,"nix eval --json .#agentsNotes.notes",325412,no
+  "which notes mention mqtt","--registry notes --touches mqtt",exp-007|exp-047|exp-112|mqtt-bus,no,"nix eval --json .#agentsNotes.notes",325412,no
+  "which tasks live in the codespace shard","--registry tasks --shard taskfiles/codespace.yml --limit 20",codespace:list|codespace:exec|codespace:status|codespace:put|codespace:get|codespace:push|codespace:sync|codespace:stop|codespace:delete,no,"task --list-all --json",274574,no
+  "which tasks are retired","--registry tasks --retired true --limit 20",browse|edit-config|update|new|switch:*|boot:*|push-rpi-rebuild|services:deploy:thinsandy|push-thin-rebuild|push-fuji-rebuild|rebuild,no,"task --list-all --json",274574,no
+  "which wildcard tasks live in the infra shard","--registry tasks --wildcards 1 --shard taskfiles/infra.yml --limit 20",infra:api:get:*|infra:sops:get:*|infra:switch:*|infra:boot:*|infra:plan:host:*|infra:apply:host:*|infra:warm:host:*|infra:cache:push:host:*|infra:deploy:host:*|infra:rollback:apply:host:*|infra:rollback:host:*|infra:generations:host:*|infra:logs:host:*,no,"task --list-all --json",274574,no
+  "which task is the selector grammar","--registry tasks --name ops:q",ops:q,no,"task --list-all --json",274574,no
+  "which hosts are graph hubs with at least twenty inbound edges","--registry graph --type host --in 20",host:delphi|host:eisen|host:frieren,no,"nix eval --json .#knowledgeGraph.graph",103002,no
+  "which skills are named by at least ten documents","--registry graph --type skill --in 10 --limit 20",skill:agents|skill:checks|skill:correct|skill:data|skill:dev|skill:infra|skill:qmd|skill:services,no,"nix eval --json .#knowledgeGraph.graph",103002,no
+  "which documents link to at least thirty nodes","--registry graph --type doc --out 30",doc:.agents/README.md|doc:.agents/fleet-matrix.md|doc:AGENTS.md|doc:hosts/eisen/HANDOFF.md,no,"nix eval --json .#knowledgeGraph.graph",103002,no
+  "which jobs succeeded on this host","--registry ledger --result success --limit 3",,no,"tail -n 50 /var/lib/fleet-sentinel/ledger.jsonl",25626,yes
+  "which units does the sentinel ledger record","--registry ledger --limit 3",,no,"tail -n 50 /var/lib/fleet-sentinel/ledger.jsonl",25626,yes
+  "what is frieren's CPU temperature","--registry inventory --temperature 95",,schema,"nix eval --json .#inventory.hosts",75376,no
+  "which hosts are in the banana category","--registry inventory --category banana",,empty,"nix eval --json .#inventory.hosts",75376,no
+  "which notes mention kubernetes","--registry notes --touches kubernetes",,empty,"nix eval --json .#agentsNotes.notes",325412,no
+  "what is the closure size of each host","--registry inventory --closure_size 1",,schema,"nix eval --json .#inventory.hosts",75376,no
+  "which tasks failed last night","--registry tasks --status failed",,schema,"nix eval --json .#taskfileGraph",1562221,no
+  "which hosts have a serial number","--registry inventory --serial ABC123",,schema,"nix eval --json .#inventory.hosts",75376,no

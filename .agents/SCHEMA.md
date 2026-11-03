@@ -49,10 +49,13 @@ it. This table is the place to look before touching data in place.
 | Nix | `*.nix`, `flake.nix` | editor plus `alejandra`; read a value with `nix eval` instead of re-parsing it | `task checks:nix:format`, `checks:nix:lint` |
 | JSON | flake outputs, API bodies, anything feeding `jq` | `jq` | none: a program consumes it |
 | JSONL | `/var/lib/fleet-sentinel/ledger.jsonl` | append-only; filter with `jq` | `fleet-sentinel` |
-| TOON | nowhere on disk. It is the agent's projection of JSON | `toon -e` / `toon -d`; recount `[n]` with `task dev:toon:fix` | `task checks:toon`, `checks:toon:surfaces` |
+| TOON | the agent boundary: an answer an agent reads, a table an agent authors (`scripts/task/selector-battery.toon`) | `toon -e` / `toon -d` only, never a hand-built string; recount `[n]` with `task dev:toon:fix` | `task checks:toon`, `checks:toon:surfaces`, `checks:selector` |
 
-TOON never becomes a source of truth. An agent consumes and emits TOON; the
-converter crosses to the format that owns the data (`master-toon` skill).
+TOON never becomes the record of machine state — the ledger, a flake output and
+an API body stay JSON/JSONL. It does carry what an agent consumes and emits, and
+the converter is the only thing allowed to format it: hand-written JSON, YAML or
+`[n]` counts are where tabs, quotes and row totals get mangled. That split is
+[[flake/policies.nix#agent-boundary-is-toon]] (`master-toon` skill).
 
 ### Rules are predicates, not prose
 

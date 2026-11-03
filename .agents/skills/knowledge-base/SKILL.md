@@ -198,22 +198,10 @@ a 30-second operation, not a service.
 
 ## 4. Why agent learnings do not reach the vault
 
-The diagnosis is **discoverability and write-path**, not search:
-
-1. **No automatic write path.** Sessions end; nothing summarizes them into the
-   vault. `ai-memory` captures pages, but nothing mirrors them to Obsidian.
-2. **Two vocabularies.** Repo docs say `HOST=`, `checks:host`; vault notes say
-   "frieren rebuild". BM25 over one collection cannot bridge that.
-3. **The vault's route is `~/vaults/personal`, and it differs by host kind.** On
-   a NAS host it is a home-manager symlink onto NFS; on a `category = "cloud"`
-   host it is a git checkout of the same repo. Either way, hard-coding
-   `/Volumes/data` points an agent at a path that is not mounted there.
-
-The proposed fix (note `p2-vault-write-path`): a `vault-sync` timer that exports
-`ai-memory` pages + `docs/history/` into `Obsidian-Git-Sync/inbox/` with a
-stable frontmatter block (`source`, `host`, `date`, `status`), then Git commits.
-The rule: **agents write to one inbox, a timer curates; nobody hand-maintains a
-second vault.**
+Diagnosis (write path, not search) and the proposed `vault-sync` timer live in
+note `p2-vault-write-path` — `task ops:notes:show ID=p2-vault-write-path`. The
+rule it carries: **agents write to one inbox, a timer curates; nobody
+hand-maintains a second vault.**
 
 ## 5. Where to record something
 

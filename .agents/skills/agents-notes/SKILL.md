@@ -121,15 +121,12 @@ part that turns an idea into something a future agent can find from the code.
 > point at the file you will **modify** (a host module, `flake/checks.nix`), or
 > write a leaf instead — never invent a path, the gate will reject it.
 
-### Leaf experiment (no code exists yet)
+### Leaf experiment and open todo
+
+Both are the same attrset with deltas:
 
 ```nix
-    exp-200 = {
-      title = "…";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "One sentence; no path exists yet, so the body carries the intent.";
+    exp-200 = {                          # kind = "experiment", no refs yet
       body = ''
         Intent: what this buys, for whom, on which host class.
         Constraints: hardware, power, existing services it would replace.
@@ -139,34 +136,16 @@ part that turns an idea into something a future agent can find from the code.
         Exit: … .
       '';
     };
-```
-
-A leaf is a debt of one commit: the moment the first artifact exists, add
-`refs` and cut the body to ≤30 lines. A leaf that survives two cycles is rot —
-either promote it or mark it `REJECTED` with the reason.
-
-### Open todo
-
-```nix
-    open-thing = {
-      title = "…";
-      kind = "open";
-      status = "OPEN";          # or BLOCKED — and then name the blocker in the body
-      priority = "P2";          # P0..P6
-      date = "2026-10-19";
-      summary = "One outcome. If it has two exits, it is two notes.";
-      refs = {
-        hosts = ["eisen"];
-        modules = ["hosts/eisen/llm-server.nix"];
-        tasks = ["checks:host"];
-      };
-      body = ''
-        Exit: `task checks:host HOST=eisen MODE=eval` exits 0 and the flag is deployed.
-      '';
+    open-thing = {                       # kind = "open", status OPEN (or BLOCKED
+      priority = "P2";                   # + the blocker in body), priority P0..P6
     };
 ```
 
-No checkboxes. State is `status`, not `- [x]`, or the same item has two truths.
+A leaf is a debt of one commit: the moment the first artifact exists, add `refs`
+and cut the body to ≤30 lines. A leaf that survives two cycles is rot — promote
+it or mark it `REJECTED` with the reason. An open todo is **one outcome**: two
+exits is two notes with a `links` edge. No checkboxes — state is `status`, not
+`- [x]`, or the same item has two truths.
 
 ### Handoff and proposal
 
@@ -240,25 +219,19 @@ task ops:notes:show ID=<id>                        # the note as the compiler se
 nix eval --json .#agentsNotes.issues | toon -e               # [] = clean (0.2 s, no host eval)
 nix build --builders "" .#checks.x86_64-linux.agents-notes-schema   # the gate
 task ops:notes:lineage ID=<id>                     # from / supersedes / descendants / replacedBy
-task ops:notes:module PATH=<path in refs.modules>  # reverse lookup: which notes touch this file
-task ops:notes:task TASK=<task in refs.tasks>      # reverse lookup: why this task exists
-task ops:notes:doc DOC=<path in refs.docs>         # reverse lookup: why this contract looks like this
 ```
 
 All four reverse indexes (`:host`, `:module`, `:task`, `:doc`) are compiled from
-the same `refs` block, so there is nothing to keep in sync by hand.
+the same `refs` block, so there is nothing to keep in sync by hand: `:module`
+answers which notes touch a file, `:task` why a task exists, `:doc` why a
+contract looks like this.
 
 **Common trap:** a skill or runbook path stored under `refs.docs` is not found by
 `ops:notes:module` — that task reads `refs.modules`. Keep the classification
 honest: `refs.modules` is code you could edit; `refs.docs` is the contract that
 explains it.
 
-Then check the surfaces actually updated:
-
-```bash
-nix build --builders "" .#artifacts.docs          # docs/generated/agents-notes/<id>.md
-nix build .#sites.fleet-docs-site             # data/agents-notes/<id>.json (site page)
-```
+Then check the surfaces actually updated: `task docs:build` and `task docs:site`.
 
 ## Where it renders
 

@@ -30,6 +30,7 @@ in {
       ../user/desktop/multimedia.nix
       ../user/desktop/appimage-menu.nix
       ../user/kg-sidecar.nix
+      ../user/selector-daemon.nix
       ../kitty.nix
     ]
     # Imported unconditionally (a `pkgs`-dependent import reads `config` and
@@ -48,6 +49,11 @@ in {
     # path (it falls back to jq when the socket is absent, so this is a speed
     # setting, not a correctness one).
     kgSidecar.enable = lib.mkDefault true;
+
+    # The same bargain for the selector: `q.sh --question` asks the resident
+    # stage 1 and falls back to the interpreter, so a host without it answers the
+    # same question ~70 ms slower instead of not answering.
+    selectorDaemon.enable = lib.mkDefault true;
 
     # Gate GPU-heavy Zed editor on hardware tier (GPUI/Vulkan unstable on legacy Haswell/low tier)
     zed-editor.enable = lib.mkDefault (graphicsTier != "low");

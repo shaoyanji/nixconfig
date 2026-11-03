@@ -4738,53 +4738,34 @@
       body = ''
         **Why a third tier.** CI refuses the LAN cache by design, so a runner cannot substitute what
         frieren or delphi built. R2 charges no egress; 10 GiB is the free tier.
-
-        **The edge never signs.** narinfo is signed by the pusher (`secret-key=`), so a Worker with a
-        private key would only reimplement Nix's fingerprint. `CACHE_AUTH_TOKEN` was refused for the
-        same kind of reason: `nix copy` has no `--header`, so no client could present it.
-
-        **A buffer, not a mirror.** Every path is HEADed against every non-LAN cache in the registry
-        (cachix, the bucket, cache.nixos.org, numtide, nix-community, nix-gaming, determinate); only the
-        misses upload, and a push that would cross 10 GiB is refused before writing, naming its five
-        largest paths. That is also why the entry sits immediately after `cachix` in every order.
-
-        **A closure is never stored; a delta is.** Delphi's system closure is 2728 paths / 18.48 GiB. Of
-        the 570 paths cache.nixos.org lacks, 167 are on cachix, 11 on nix-community, and 27 — 1.40 GiB,
-        the llm-agents tools (`dsh` 685 MiB, `antigravity-cli`, `hermes-agent`, `freebuff`) — are on
-        `cache.numtide.com`. That leaves 365 paths / 771 MiB unique, so 10 GiB holds ~13 systems, not
-        one. The hardcoded-three-cache dedupe would have uploaded 2.39 GiB of the same closure. The
-        consequence to keep: the edge is not self-contained — a client substituting a system needs the
-        rest of the registry, which is what `lib/cache-registry.nix` is for.
-
-        **Evidence.** Live at `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`);
-        `checks:nixcache:probe` green; a `hello.drv` closure reported `2/342 unique` and uploaded two;
-        `nix path-info --store <edge>` accepts the signature; `checks:flake:cache` proves flake.nix and
-        the registry agree.
-
-        **Four traps, measured.** `nix copy` is recursive by default; `--no-recursive` is refused
-        without valid references (stubs fix that and are never uploaded); `nix copy --to s3://` wrote
-        nothing against a fresh bucket and exited 0; `rclone purge` deletes the bucket itself. A client
-        that saw a 404 before the push needs `--refresh`.
-
-        **Retention.** Two mechanisms, because they answer different questions: `dev:nixcache:gc`
-        (cachix's shape — delete the oldest until under 75 % of the budget, 50 paths per run, always a
-        narinfo with its nar) is the collector, and the R2 lifecycle rule is a backstop at **365 days**,
-        not cachix's 90 — age-on-upload is a proxy, since the Worker cannot see a request Cloudflare
-        already answered, so a short rule would delete by calendar rather than by need.
-
-        **Scheduled, and routed by arch.** `dev:nixcache:sync` builds each **active** host only
-        (`preserved`/`legacy` are dormant), natively where the arch owns the officials caches — delphi
-        compiles aarch64, itself and minyx, so only the delta compiles — and with `--max-jobs 0` against
-        `/etc/nix/machines` otherwise, printing SKIPPED rather than compiling an x86_64 closure on 2 OCPU.
-        `nixcache-sync.timer` on delphi (user unit: the keys decrypt with the operator's age key) collects
-        with `gc` first, then syncs `delphi,minyx`. `checks:nixcache:fleet` holds the enablement line: the
-        edge after cachix in every active host's substituters, its key trusted, one host eval proving the
-        policy reaches `nix.settings`, and the live URL answering.
-
-        **A microfix now has a price.** `checks:invalidation` scopes a diff to the hosts it can reach and
-        counts what `nix build --dry-run --builders ""` would compile (1–3 is a fix, hundreds is an
-        overlay change), failing over `MAX_BUILDS` and naming the derivations — the answer to "the edit
-        was one line and the whole cache went cold".
+        **The edge never signs.** narinfo is signed by the pusher (`secret-key=`), so a Worker key would
+        reimplement Nix's fingerprint; `CACHE_AUTH_TOKEN` was refused because `nix copy` has no `--header`.
+        **A buffer, not a mirror.** Each path is HEADed against every non-LAN cache in the registry
+        (cachix, the bucket, cache.nixos.org, numtide, nix-community, nix-gaming, determinate); only
+        misses upload, and a push crossing 10 GiB is refused before writing, naming its five largest
+        paths — hence the entry sits immediately after `cachix` in every order.
+        **A closure is never stored; a delta is.** Delphi's closure is 2728 paths / 18.48 GiB; of the 570
+        cache.nixos.org lacks, 167 are on cachix, 11 on nix-community, and 27 — 1.40 GiB, the llm-agents
+        tools (`dsh` 685 MiB, `antigravity-cli`, `hermes-agent`, `freebuff`) — on `cache.numtide.com`,
+        leaving 365 paths / 771 MiB unique: 10 GiB holds ~13 systems where a hardcoded three-cache dedupe
+        would have uploaded 2.39 GiB of the same closure. So the edge is not self-contained — a client
+        substituting a system needs the rest of the registry (`lib/cache-registry.nix`).
+        **Evidence.** Live at `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`), where a
+        `hello.drv` closure reported `2/342 unique` and `nix path-info --store <edge>` accepts the signature.
+        **Traps, measured.** `nix copy` is recursive by default; `--no-recursive` needs valid references
+        (stubs fix that and are never uploaded); `nix copy --to s3://` wrote nothing against a fresh bucket
+        and exited 0; `rclone purge` deletes the bucket; a 404 seen before a push needs `--refresh`.
+        **Retention.** `dev:nixcache:gc` collects in cachix's shape (oldest first until under 75 %, 50 paths
+        a run, never a narinfo without its nar); the R2 lifecycle rule is a backstop at **365 days**, not
+        cachix's 90 — age-on-upload is a proxy, since the Worker never sees a cached request.
+        **Scheduled, routed by arch.** `dev:nixcache:sync` builds **active** hosts only, natively where the
+        arch owns the official caches (delphi compiles aarch64, itself and minyx), else `--max-jobs 0`
+        against `/etc/nix/machines`, printing SKIPPED rather than compiling x86_64 on 2 OCPU;
+        `nixcache-sync.timer` (user unit: keys decrypt with the operator's age key) then syncs
+        `delphi,minyx`, and `checks:nixcache:fleet` holds the enablement line.
+        **A microfix has a price.** `checks:invalidation` scopes a diff to the hosts it can reach and counts
+        what `nix build --dry-run --builders ""` would compile (1–3 a fix, hundreds an overlay change),
+        failing over `MAX_BUILDS` and naming the derivations.
       '';
     };
 
@@ -5095,6 +5076,163 @@
         **Exit.** `checks:tasks` names all nine tasks and `skills-schema` passes.
         A later session that needs another flag adds it to the script, never to a
         transcript.
+      '';
+    };
+
+    needle3-resident-at-login = {
+      title = "The edge caller works at login and is still off: its win case is a loss";
+      kind = "decision";
+      status = "REJECTED";
+      date = "2026-11-02";
+      summary = "Built, activated on delphi and switched off the same day: `programs.edgeCaller` works and `checks:edge:resident` answers 11/11 with nothing started by the check, but `flake/daemons.nix` scores it ev = -1.1 s against the agent naming the pattern itself, and the Kelly gate refuses a resident helper whose best case is a loss.";
+      refs = {
+        modules = ["modules/user/edge-caller.nix" "scripts/task/edge-serve.sh" "scripts/task/edge-sidecar.sh" "scripts/task/edge-check.sh"];
+        hosts = ["delphi"];
+        tasks = ["checks:edge" "checks:edge:resident"];
+        docs = ["docs/agent-contract.md"];
+      };
+      body = ''
+        The unit works: enabled at login, it owns the daemon's lifecycle, and
+        `checks:edge:resident` answers 11/11 with nothing started by the check. It is
+        off anyway, and the arithmetic is why.
+
+        **The gate that decided it.** `flake/daemons.nix` scores a resident helper
+        ev = p*save - (1-p)*cost against what the agent would do instead, at 50 tok/s:
+
+          p 0.5   save -1.0 s   cost 1.2 s   ev -1.1 s
+
+        `save` is negative because the dispatcher's call is 54 B generated against 40,
+        its answer 605 B read against 217, and its round trip 1073 ms against 145 — the
+        WIN case is a loss. No accuracy rescues that; the single-tool experiment
+        (needle3-single-tool-surface) is the measurement of why accuracy does not
+        matter here.
+
+        **What the diagnosis cost, and what it found.** Activation failed twice for
+        real reasons — the flake path is CWD-relative and systemd starts in $HOME, and
+        the surface cache pruned with `xargs`, which the unit's bounded PATH lacks —
+        and then the gate read 1/11: `*-needle-[0-9]*` matched a leftover needle-2, so
+        the one-shot half of the comparison ran a different model than the unit.
+        Pinned to `*-needle-3`, 11/11.
+
+        **What survives.** `edge-serve.sh`, `EDGE_REQUIRE_UP=1`, `checks:edge:resident`
+        and the module stay: the pipeline path (`agents:call:batch`) has no alternative
+        to NL→lookup, and the Pareto refusal gate is model-free. Enabling it for an
+        agent would need `ev > 0`, which this arithmetic cannot reach while the typed
+        task exists.
+      '';
+    };
+
+    needle3-single-tool-surface = {
+      title = "One generic graph tool buys 50 ms and costs the specific description";
+      kind = "experiment";
+      status = "REJECTED";
+      date = "2026-11-02";
+      summary = "Rejected on the build the tree actually pins: needle-3 scores the same on both surfaces (top-1 8/11, model-exact 3/6) and costs 50 ms more for six tools, so the 4x saving and the 1-of-6 collapse that motivated this were both measured on a leftover needle-2.";
+      refs = {
+        modules = ["scripts/task/toolcall.sh"];
+        tasks = ["checks:toolcall"];
+        docs = ["docs/agent-contract.md"];
+      };
+      body = ''
+        Measured 2026-11-02 on delphi, on the build `modules/scripts/needle-model.nix`
+        pins. `TOOLCALL_SINGLE=1` reproduces:
+
+          surface           engine    top-1   model-exact   answered
+          six typed tools   223 ms    8/11    3/6           6/6
+          one entity tool   171 ms    8/11    3/6           6/6
+
+        **The first run said something else, and it was the wrong engine.** Those
+        numbers were needle-2: 861 ms for six tools, and one tool returning an EMPTY
+        call list for two of three prompts. `*-needle-[0-9]*` matched both builds and
+        `tail -1` picked needle-2, so the rejection was first recorded against a model
+        the tree does not pin.
+
+        **On needle-3 there is nothing to reject.** Both surfaces score the same, and
+        the 4x advantage goes with it: six schemas cost ~50 ms more, not 650. The typed
+        surface still wins on one property the battery cannot see — each tool describes
+        a specific lookup, so the caller's choice is inspectable, while
+        `graph_lookup(entity)` leaves the pattern to the graph.
+
+        Six tools stay. The lesson worth keeping is not about the surface: a
+        measurement is only as good as the binary it ran, and this one ran a stale one.
+        See needle3-resident-at-login for the gate that made it visible.
+
+        `TOOLCALL_SINGLE=1` stays, off by default, as this measurement's recipe.
+      '';
+    };
+
+    daemon-earns-it-by-compression = {
+      title = "A winning daemon replaces an 18 KB read, not a 145 ms question";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      priority = "P2";
+      date = "2026-11-02";
+      summary = "The Kelly break-even is p* = cost/(save+cost), so a daemon wins by making `save` big: naming an argument saves ~3 tokens and needs p > 0.88, while not reading an 18 KB blast listing needs p > 0.29. Design: NL to a schema-checked query object over compiled registries, answered in <=80 tokens with pointers, refusing on invalid or empty.";
+      refs = {
+        modules = ["flake/daemons.nix" "scripts/task/toolcall.sh" "scripts/task/q.sh"];
+        tasks = ["ops:ask" "ops:q" "ops:q:sidecar" "checks:toolcall" "checks:selector" "checks:selector:sidecar"];
+        docs = ["docs/nix-patterns.md" "docs/selector-daemon-predesign.md"];
+      };
+      body = ''
+        Handoff packet: docs/selector-daemon-predesign.md.
+
+        Measured 2026-11-03, criteria met: executor p 1.0, S 942.94 s, refusal 71 ms;
+        stage 1 p 1.0 on all 21 scored questions it answered (coverage 21/28), 6/6
+        abstain declined, held-out 0.978 at 0.92. `selector.service` is the resident
+        unit behind `wanted = true`, and `checks:selector:sidecar` proves it answers
+        the same bytes: 180 ms vs 250 ms answered, 37 ms vs 105 ms refused. One
+        battery question refuses — a task named only by its description.
+
+        Measured 2026-11-02: the deterministic keyword router resolves 6/6 graph
+        lookups in 265 ms with no model, so the whole class the edge caller aimed at
+        has no niche left. The wide reads are where an agent actually pays:
+        `ops:kg:blast` 18,025 B, `ops:ledger` 22,538 B, `docs/inventory-schema.md`
+        13,230 B, `task --list-all --json` 274,574 B.
+
+        **Shape.** Choose a task class where GROUND TRUTH IS COMPILED, so p can be
+        scored offline by executing the intended query. The model emits a query
+        object from a closed vocabulary (registry + filter + fields), never prose; the
+        daemon validates it against the compiled schema, executes it, and returns <=80
+        tokens with pointers an agent can verify in one cheap call.
+
+        **Refusal is the accuracy mechanic.** Invalid query or empty result is a
+        refusal, not an answer, so p is measured over ANSWERED cases. That only works
+        if refusal is cheap: two stages, a lexical shortlist at ~5 ms and the 29M
+        model only on a hit, because a refusal costing 800 ms against a 145 ms direct
+        call is itself a loss.
+
+        **Exit.** Build the deterministic grammar first (p=1) and let the model only
+        front it. Ship only if answered-case p >= 0.3 at S >= 3 s AND refusal <= 100 ms
+        AND the Kelly entry in flake/daemons.nix clears with `wanted = true`. If the
+        grammar is learnable in one session, S amortises to zero and the answer is no.
+      '';
+    };
+
+    needle3-surface-widening = {
+      title = "Put the read-only lookups an agent actually makes on the tool surface";
+      kind = "proposal";
+      status = "PROPOSED";
+      priority = "P3";
+      date = "2026-11-02";
+      summary = "Six graph lookups are callable while notes, blast radius, closure size and the ledger are not, so the most common questions still go back to a shell and a reasoning round.";
+      refs = {
+        modules = ["scripts/task/toolcall.sh" "scripts/task/toolcall-battery.jsonl"];
+        tasks = ["checks:toolcall" "checks:edge"];
+        docs = ["docs/agent-contract.md"];
+      };
+      body = ''
+        The surface is a regex over the compiled task graph, so widening is one line
+        plus battery cases. The heavy exclusion keeps anything that builds off it by
+        construction, which is why `checks:host` cannot appear by accident.
+
+        Candidates, each one lookup and read-only: `ops:notes:show`,
+        `ops:kg:blast`, `dev:closure:size`, `ops:ledger`.
+
+        A tool that fans out or needs a human choice stays off the surface — the
+        quadrant rule, not a taste judgement.
+
+        **Exit.** `checks:toolcall` covers at least 15 prompts with unsafe 0, and
+        `checks:edge` still reports same-call parity for every one of them.
       '';
     };
   };

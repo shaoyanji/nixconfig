@@ -1058,6 +1058,87 @@ tasks:
       - systemctl --user unset-environment FORCE_RUN
       - journalctl --user -u agy-nightly-system.service -n 30 --no-pager
 
+  checks:toolcall:
+    desc: "[gate] Edge caller never ACTS on a wrong tool (accuracy is reported)"
+    summary: >
+      Runs scripts/task/toolcall-battery.jsonl through agents:call. Fails on the one
+      property that must not regress: a wrong MUTATING tool reaching the act band
+      (read-only tools prefetch, so a wrong one is a wasted query). Three numbers are
+      printed, not gated: top-1, model-exact lookups, and lookups answered by the
+      model OR the graph router without a reasoner. Measured 2026-11-02 after the
+      prefetch split and the type repair: 8/9, 6/7, 7/7, unsafe 0.
+      Exit 0 = no unsafe act, 1 = an unsafe act, 2 = the dispatcher is unavailable.
+    cmds:
+      - bash scripts/task/toolcall-battery.sh
+
+  checks:selector:
+    desc: "[gate] Selector answers the TOON battery: p, coverage, S, refusal ms, ev"
+    summary: >
+      scripts/task/selector-check.sh: the executor's own self-test, then
+      scripts/task/selector-battery.toon (30 questions with gold query objects
+      and row sets), then stage 1 built fresh into a temp dir and asked the same
+      English prompts. Prints p, coverage, S, refusal ms, ev for the executor and
+      the held-out p for the model. Fails on a wrong row set, an answered abstain,
+      an unavailable registry on a scored case, a battery that does not
+      strict-decode (repair: task dev:toon:fix), or stage 1 below the 0.3 floor.
+      Exit 0 = all of it holds, 1 = a failure, 2 = no battery/executor.
+    cmds:
+      - bash scripts/task/selector-check.sh
+
+  checks:selector:sidecar:
+    desc: "[gate] Resident stage 1 answers byte-identically to the interpreter"
+    summary: >
+      scripts/task/selector-sidecar-check.sh: lifecycle (start waits for readiness,
+      a second start is a no-op, stop removes the socket and leaves status failing),
+      then parity — q.sh --question over the selector.service socket vs
+      Q_NO_SIDECAR=1, compared on stdout, stderr and exit code for one question per
+      registry plus a refusal and an abstain. A faster daemon that answers
+      differently is worse than none, and no query alone would show it. Speed is
+      printed, not asserted. A private socket, so it cannot leave the login unit
+      dead. Exit 0 = parity, 1 = drift or lifecycle.
+    cmds:
+      - bash scripts/task/selector-sidecar-check.sh
+
+  checks:rebuild:
+    desc: "[gate] Rebuild flags come from the 3-axis envelope, every combination"
+    summary: >
+      scripts/task/rebuild-flags.sh --self-test — the finite envelope behind every
+      rebuild, proven without building: builders (local|none|remote) x substitutes
+      (on|off) x flakes (accept|impure), all 12 rendered against a table, plus a closed
+      set (a typo like `--builders everywhere` is a usage error, not a silent local
+      build). Defaults render NOTHING because local/on/accept is what Nix does anyway.
+      Exit 0 = every combination renders what it says, 1 = drift.
+    cmds:
+      - bash scripts/task/rebuild-flags.sh --self-test
+
+  checks:edge:
+    desc: "[gate] Resident edge caller makes the same call as one-shot (and is faster)"
+    summary: >
+      scripts/task/edge-check.sh — the property a cache must not break: the same
+      prompt makes the same CALL both ways. The call, not the confidence: needle3
+      samples, so one prompt scored 0.6384 and 0.9078 in two runs, and a gate on the
+      number would flake. Drift is printed, timings are printed, and the tool name
+      plus filled arguments are asserted. Measured 2026-11-02: 9/9 same call, ~0.85 s
+      resident vs ~1.3 s one-shot per invocation.
+      Exit 0 = same calls, 1 = a disagreement or the sidecar would not start, 2 = no
+      engine.
+    cmds:
+      - bash scripts/task/edge-check.sh
+
+  checks:edge:resident:
+    desc: "[gate] The edge caller is ALREADY resident — the check starts nothing"
+    summary: >
+      scripts/task/edge-check.sh with EDGE_REQUIRE_UP=1 — the same-call gate, but
+      the daemon must be up before the first ask and must still be the SAME process
+      afterwards. Without this mode the check starts what it tests, so "resident"
+      is inaudible and every run passes whether or not anything starts the caller
+      at login. The pid comparison is the surface assertion: a restart means the
+      unit booted a tool set a call does not ask for.
+      Exit 0 = resident and same calls, 1 = nothing listening or the server was
+      replaced, 2 = no engine.
+    cmds:
+      - EDGE_REQUIRE_UP=1 bash scripts/task/edge-check.sh
+
   checks:audit:handoff:
     desc: Trigger strategic handoff execution on HANDOFF.md on-demand (FORCE_RUN=1)
     summary: >

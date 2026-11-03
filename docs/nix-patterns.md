@@ -364,3 +364,37 @@ verified by building the override locally. Only `src` and `version` differ.
 
 Longer-form procedure for the operational half: [`../AGENTS.md`](../AGENTS.md)
 (routing) and the `infra` skill (deploy, rebuild, rollback).
+
+## A daemon must clear the Kelly gate
+
+A resident helper is a bet, and the stake is a unit, memory, a surface someone has
+to reason about, and a failure mode that appears after a logout — so it must beat
+what the counterfactual costs an agent, not a cold start. Tokens generate at
+~50/s, so a sub-second local round trip is free: a correct answer saves only the
+tokens of *naming the argument*, a handful. So:
+
+```
+ev   = p * save - (1 - p) * cost        seconds; save may be NEGATIVE
+p      measured probability it answers the way the direct call would
+save   what one correct answer saves the agent
+cost   what one wrong answer costs: the wasted round trip plus the retry
+```
+
+Enable only if `save > 0` **and** `ev > 0`. `ev == 0` is off: a coin flip that
+pays rent is not enabled, it is tolerated. `save <= 0` cannot be rescued by
+accuracy at any `p < 1`.
+
+`flake/daemons.nix` is the registry, `nix eval --json .#daemons.daemons` prints the
+arithmetic, and `[[flake/policies.nix#daemon-clears-kelly]]` requires decision and
+numbers to agree both ways — including that a justified daemon is not silently off.
+
+Two entries from 2026-11-02, and they are why the rule is worth having:
+
+| daemon | p | save | cost | ev | verdict |
+| :--- | ---: | ---: | ---: | ---: | :--- |
+| `kg-sidecar` | 1.0 | +0.409 s | 0 | **+0.409** | enable: deterministic, byte-identical fallback, 441 ms → 32 ms |
+| `edge-caller` | 0.5 | **−1.0 s** | 1.2 | **−1.1** | disable: the *win case* is a loss |
+
+The second row is the lesson: the dispatcher's call is 54 bytes against 40, its
+answer 605 against 217, its round trip 1073 ms against 145 — so it loses even when
+it is right. A latency claim means nothing against the alternative.

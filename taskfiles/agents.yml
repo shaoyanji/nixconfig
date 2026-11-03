@@ -605,11 +605,12 @@ tasks:
         bash scripts/task/appflow-packet.sh "${args[@]}"
 
   agents:apps:draft:
-    desc: "Save a reply as a mailbox DRAFT — nothing is sent (ID=, BODY=file, ATTACH=file, TO=addr, DRY=1 to print only)"
+    desc: "Save a reply as a mailbox DRAFT — nothing is sent (ID=, BODY=file, ATTACH=a.pdf,b.pdf, SUBJECT=, TO=, DRY=1 to print only)"
     vars:
       ID: '{{.ID | default ""}}'
       BODY: '{{.BODY | default ""}}'
       ATTACH: '{{.ATTACH | default ""}}'
+      SUBJECT: '{{.SUBJECT | default ""}}'
       TO: '{{.TO | default ""}}'
       DRY: '{{.DRY | default "0"}}'
     cmds:
@@ -618,7 +619,11 @@ tasks:
           echo "agents:apps:draft: ID and BODY are required (BODY is prose a person signed; there is no template)" >&2; exit 2; }
         args=(--draft "{{.ID}}" --body "{{.BODY}}")
         [ -n "{{.TO}}" ] && args+=(--to "{{.TO}}")
-        [ -n "{{.ATTACH}}" ] && args+=(--attach "{{.ATTACH}}")
+        [ -n "{{.SUBJECT}}" ] && args+=(--subject "{{.SUBJECT}}")
+        if [ -n "{{.ATTACH}}" ]; then
+          IFS=',' read -ra files <<< "{{.ATTACH}}"
+          for f in "${files[@]}"; do args+=(--attach "$f"); done
+        fi
         [ "{{.DRY}}" != "1" ] && args+=(--apply)
         appflow-sync "${args[@]}"
 

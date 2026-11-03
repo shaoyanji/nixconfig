@@ -708,11 +708,15 @@ DRAFT_SUBJECTS = {
 }
 
 
-def draft_message(application: dict, body: str, to: str, attachments: list[str]) -> EmailMessage:
+def draft_message(
+    application: dict, body: str, to: str, attachments: list[str], subject: str = ""
+) -> EmailMessage:
     language = (application.get("language") or "en").strip().lower()
     template = DRAFT_SUBJECTS["de"] if language.startswith(("de", "ger")) else DRAFT_SUBJECTS["en"]
     message = EmailMessage()
-    message["Subject"] = template.format(
+    # A reply keeps the thread's subject; only a fresh application gets the
+    # generated one, because a reply that starts a new thread reads as bulk.
+    message["Subject"] = subject or template.format(
         role=application.get("role") or "—", company=application.get("company") or "—"
     )
     if to:
@@ -741,6 +745,7 @@ def save_draft(
     to: str,
     attachments: list[str],
     dry_run: bool,
+    subject: str = "",
 ) -> dict:
     rows = get(f"{api}/api/application-get?id={urllib.parse.quote(application_id)}") or []
     if not rows:
@@ -748,7 +753,7 @@ def save_draft(
     application = rows[0]
     body = sys.stdin.read() if body_path == "-" else open(body_path, encoding="utf-8").read()
     recipient = to or application.get("recruiterEmail") or application.get("gmail") or ""
-    message = draft_message(application, body, recipient, attachments)
+    message = draft_message(application, body, recipient, attachments, subject)
     raw = message.as_string()
     result = {
         "application": application_id,
@@ -819,6 +824,11 @@ def main() -> int:
     parser.add_argument("--attach", action="append", default=[], help="file to attach (repeatable)")
     parser.add_argument("--drafts", action="store_true", help="list the mailbox's drafts")
     parser.add_argument(
+        "--subject",
+        default="",
+        help="with --draft: the thread's subject; empty generates one from the record",
+    )
+    parser.add_argument(
         "--himalaya-config",
         default=os.path.expanduser("~/.config/himalaya/config.toml"),
         help="himalaya config; the account password lives there as a command",
@@ -884,6 +894,7 @@ def main() -> int:
             args.to,
             args.attach,
             dry_run=not args.apply,
+            subject=args.subject,
         )
         if args.json:
             print(json.dumps(result, ensure_ascii=False))

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Pre-push: the two gates the CI `docs-budget` job runs, run here instead.
+#
+# Every red run on main costs a mail and a context switch, and on this tree the
+# failing job is almost always `docs-budget`: a taskfile shard moved without
+# `flake/taskfile-digest-pin.nix`, or a living document over budget. Both cost
+# seconds to check locally and both are cheap to fix *before* the push. CI keeps
+# running them (a `--no-verify` push must still be caught), this only moves the
+# answer to where the change is still in hand.
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+status=0
+
+if [ -f scripts/task/docs-budget.sh ]; then
+  if ! bash scripts/task/docs-budget.sh >/tmp/pre-push-docs-budget.log 2>&1; then
+    echo "pre-push: a living document is over budget:"
+    sed 's/^/  /' /tmp/pre-push-docs-budget.log | tail -20
+    status=1
+  fi
+fi
+
+# The digest pin is a throw at eval time, so this is an eval, not a build: it
+# forces no closure and spends no build budget.
+if command -v nix >/dev/null 2>&1; then
+  if ! nix eval --impure --raw "path:$REPO_ROOT#checks.x86_64-linux.taskfile-digest-pin.outPath" >/dev/null 2>&1; then
+    echo "pre-push: the task graph moved and flake/taskfile-digest-pin.nix was not updated."
+    echo "  task checks:tasks prints both digests; write the new pair into that file."
+    status=1
+  fi
+else
+  echo "pre-push: nix not on PATH — the digest pin was not checked."
+fi
+
+if [ "$status" -ne 0 ]; then
+  echo
+  echo "Push refused. This is the same gate CI runs as 'docs-budget'; fixing it here"
+  echo "is one line instead of one failed run. Bypass deliberately with --no-verify."
+fi
+
+exit "$status"

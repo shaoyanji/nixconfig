@@ -1,0 +1,85 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Lena Beispiel",
+    "label": "Platform Engineer",
+    "email": "lena.beispiel@example.org",
+    "phone": "+49 30 0000000",
+    "url": "https://example.org",
+    "summary": "Platform engineer with ten years in reproducible build systems and small services. Fictional data: this file exists so the packet build can be tested without the operator's own resume.",
+    "location": {
+      "address": "Beispielweg 1",
+      "postalCode": "10115",
+      "city": "Berlin",
+      "countryCode": "DE",
+      "region": "Berlin"
+    },
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "lena-beispiel",
+        "url": "https://github.com/lena-beispiel"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "Beispiel GmbH",
+      "position": "Platform Engineer",
+      "url": "https://example.org",
+      "startDate": "2022-04",
+      "summary": "Declarative infrastructure for a forty-host fleet.",
+      "highlights": [
+        "Moved every host onto one flake with per-host module chains.",
+        "Cut rebuild time by replacing shell glue with compiled task definitions."
+      ]
+    },
+    {
+      "name": "Muster AG",
+      "position": "Backend Developer",
+      "startDate": "2016-01",
+      "endDate": "2022-03",
+      "summary": "PostgreSQL-backed services behind a Nginx front.",
+      "highlights": [
+        "Built the mail archive's search pipeline: import, full-text index, typed endpoints."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Technische Universität Beispiel",
+      "area": "Informatik",
+      "studyType": "B.Sc.",
+      "startDate": "2011-10",
+      "endDate": "2015-09",
+      "score": "1.7"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Packet build",
+      "description": "Typst templates plus a database record produce the documents; the artifact is a store path.",
+      "url": "https://example.org/packet"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Infrastructure",
+      "keywords": ["Nix", "systemd", "PostgreSQL", "Nginx"]
+    },
+    {
+      "name": "Programming",
+      "keywords": ["Python", "Rust", "Bash", "SQL"]
+    }
+  ],
+  "languages": [
+    {
+      "language": "German",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "English",
+      "fluency": "Fluent"
+    }
+  ]
+}

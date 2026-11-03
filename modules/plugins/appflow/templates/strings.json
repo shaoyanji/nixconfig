@@ -1,0 +1,48 @@
+{
+  "de": {
+    "experience": "Berufserfahrung",
+    "education": "Ausbildung",
+    "skills": "Kenntnisse",
+    "projects": "Projekte",
+    "languages": "Sprachen",
+    "present": "heute",
+    "generated": "Erzeugt aus der Bewerbungsdatenbank",
+    "months": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ]
+  },
+  "en": {
+    "experience": "Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "projects": "Projects",
+    "languages": "Languages",
+    "present": "present",
+    "generated": "Generated from the application database",
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
+  }
+}

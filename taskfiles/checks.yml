@@ -385,6 +385,17 @@ tasks:
     cmds:
       - SSH_DIR="{{.SSH_DIR | default ""}}" bash scripts/task/ssh-key-modes.sh
 
+  checks:email:bodies:
+    desc: Gate — HTML-only mail converts to text and archived rows carry it (SAMPLE=n)
+    summary: >
+      Runs html2markdown over the newest SAMPLE envelopes' HTML parts, the same
+      extraction the importer uses, and asserts every body part yields text;
+      then asks the API whether those messages were archived with a non-zero
+      body. Exits non-zero on an empty conversion or an archived empty body.
+      Run on delphi (needs himalaya's config and the archive API).
+    cmds:
+      - python3 scripts/task/email-body-gate.py {{if .SAMPLE}}--sample {{.SAMPLE}}{{end}}
+
   checks:restic:drill:
     desc: Verify frieren's restic repository and restore a sample (HC-2)
     summary: >

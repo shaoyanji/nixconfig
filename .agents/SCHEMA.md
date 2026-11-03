@@ -80,7 +80,7 @@ a skill instead of the manual.
 | **Manual** | `AGENTS.md`, `MANUAL.md` | 1 200 lines each | routing, invariants, operator procedure |
 | **Notes** | `AGENTS.nix` | data file | decisions, proposals, open work, design studies: status + refs + a distilled body (≤30 lines), or a leaf with verbose intent |
 | **Stubs** | `ARCHITECTURE.md`, `TODO.md`, `HANDOFF.md`, `EXPERIMENTS.md` | 10 lines | a pointer to `AGENTS.nix`; content creeping back fails `docs-budget` |
-| **Ledger** | `AUDIT.md` | 150 lines | current state + dated entries, newest first |
+| **Ledger** | `AUDIT.md` | 300 lines | current state + dated entries, newest first |
 | **Runbook** | `.agents/deploy/**`, `docs/*.md` | 400 lines | repeatable procedure |
 | **Skill** | `.agents/skills/*/SKILL.md` | 400 lines | routing + procedure, not a novel |
 | **History** | `docs/history/*.md` | unlimited | superseded narrative, never linked as current |

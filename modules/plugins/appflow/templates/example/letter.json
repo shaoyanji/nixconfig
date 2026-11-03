@@ -1,0 +1,9 @@
+{
+  "salutation": "Sehr geehrte Damen und Herren,",
+  "subject": "Bewerbung als Platform Engineer (m/w/d)",
+  "paragraphs": [
+    "dies ist ein Beispielanschreiben. Es existiert, damit der Paket-Build ohne private Daten geprüft werden kann: die Absätze kommen aus dieser Datei, Kopfzeile und Sprache aus dem Lebenslauf und dem Bewerbungsdatensatz.",
+    "Der Bau läuft in der Sandbox: typst aus dem Flake-Pin, Schriften mitgeliefert, kein Netzwerk. Dasselbe Eingabepaare erzeugt dieselben Bytes."
+  ],
+  "closing": "Mit freundlichen Grüßen"
+}

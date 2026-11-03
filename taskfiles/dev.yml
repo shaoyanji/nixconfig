@@ -592,6 +592,14 @@ tasks:
     cmds:
       - bash scripts/task/closure-analysis.sh diff {{.FROM}} {{.TO | default "/run/current-system"}}
 
+  # The uniform contract: a rival answers the same four routes and is measured
+  # by the same battery, so a second architecture competes on latency and
+  # correctness instead of on being the one that got built first.
+  dev:email:bench:
+    desc: Benchmark an email-archive API against the uniform contract (BASE=url, N=iterations, OUT=json)
+    cmds:
+      - python3 scripts/task/email-bench.py {{if .BASE}}--base {{.BASE}}{{end}} {{if .N}}--iterations {{.N}}{{end}} {{if .OUT}}--out {{.OUT}}{{end}}
+
   # Extract nixosConfigurations hostnames from flake
   dev:flake:get-hosts:
     desc: Print every nixosConfigurations host name (attr names only — no config forced)

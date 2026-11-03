@@ -413,8 +413,9 @@ tasks:
       NO pre-switch eval: the rebuild evaluates and builds the closure. First,
       `scripts/task/switch-preflight.sh` (no eval) refuses untracked files the
       flake cannot see and decides the boot test: BOOT=auto boots the host only
-      when the pending diff can reach stage-1, BOOT=1 always, BOOT=0 never — a VM
-      boot is a full host build plus QEMU, not a per-edit step. A dnsFailover host
+      when the pending diff can reach stage-1 AND `/dev/kvm` exists, BOOT=1
+      always, BOOT=0 never — a VM boot is a full host build plus QEMU, not a
+      per-edit step, and TCG is not a gate. A dnsFailover host
       refuses unless REMOTE_BUILD=1, and proves the resolver answers after its
       switch. ROUTE_CHECK=1, NOM=1. Vars: OS (wildcard).
     vars:
@@ -480,7 +481,12 @@ tasks:
         if [ "$resolver" = "1" ]; then
           ok=0
           for _ in 1 2 3 4 5 6 7 8 9 10; do
-            if dig +short +time=2 +tries=1 @127.0.0.1 vault.frieren.lan A 2>/dev/null | grep -q .; then
+            # Either name answers the question "is this host resolving at all".
+            # The LAN name is the one that matters where pihole runs; a host
+            # without that zone resolves the public name and nothing else, and
+            # probing only the LAN name failed a switch that had fully landed.
+            if dig +short +time=2 +tries=1 @127.0.0.1 vault.frieren.lan A 2>/dev/null | grep -q . \
+              || dig +short +time=2 +tries=1 @127.0.0.1 example.com A 2>/dev/null | grep -q .; then
               ok=1
               break
             fi
@@ -488,7 +494,8 @@ tasks:
           done
           if [ "$ok" != "1" ]; then
             echo "infra:switch [$host] FAILED — the local resolver is not answering." >&2
-            echo "  recover now:  sudo systemctl start pihole-ftl" >&2
+            echo "  recover now:  sudo systemctl start pihole-ftl   (on a host that runs pihole)" >&2
+            echo "  or:           sudo systemctl restart systemd-resolved tailscaled" >&2
             exit 1
           fi
           echo "infra:switch [$host] resolver answering after switch"

@@ -760,7 +760,7 @@ Host deployment flows use `infra:*` tasks directly. See `.agents/deploy/README.m
 
 ## Git Hooks Setup
 
-Pre-commit hooks in `.githooks/` run deadnix (hard gate), statix (advisory), and a formatting check accepting either alejandra or nixpkgs-fmt (hard gate). Tools missing from PATH are fetched via nix from the nixpkgs revision pinned in `flake.lock`, so the checks are machine-independent. Enable with:
+Pre-commit hooks in `.githooks/` run deadnix (hard gate), statix (advisory), and a formatting check accepting either alejandra or nixpkgs-fmt (hard gate). `.githooks/pre-push` runs the two gates CI's `docs-budget` job runs — `scripts/task/docs-budget.sh` and the task-graph digest pin (an eval, never a build) — because on this tree that job is what fails on `main`, and a refused push costs a line where a red run costs a mail and a context switch. Tools missing from PATH are fetched via nix from the nixpkgs revision pinned in `flake.lock`, so the checks are machine-independent. Enable with:
 
 ```bash
 bash .git-hooks-setup.sh    # sets core.hooksPath to .githooks/

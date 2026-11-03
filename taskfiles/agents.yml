@@ -347,3 +347,179 @@ tasks:
     desc: Run a sudo-login command from encrypted server command list
     cmds:
       - ssh $(sops -d --extract '["server"]["commands"]' {{.SECRETS}}/{{.ENC_SECRETS}} | gum choose)
+
+  # --- mail triage: who owns an incoming message --------------------------
+  # The verdicts live in `email_triage` (delphi); these tasks read and write it
+  # through the loopback API. docs/email-archive.md.
+  agents:mail:triage:
+    desc: "Classify archived mail into tiers and owners; CLI_ARGS passes --report, --dry-run, --no-engine"
+    cmds:
+      - |
+        if command -v email-archive-triage >/dev/null 2>&1; then
+          email-archive-triage {{.CLI_ARGS}}
+        else
+          echo "email-archive-triage is not on PATH: the archive lives on delphi (ssh delphi, then this task)" >&2
+          exit 1
+        fi
+
+  agents:mail:attention:
+    desc: "What needs a person: person, action and review, unresolved, newest first (LIM=20)"
+    vars:
+      LIM: '{{.LIM | default "20"}}'
+    cmds:
+      - |
+        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/attention?lim={{.LIM}}" \
+          | jq -r '.[]? | "\(.sentAt[0:16])  \(.tier)  \(.subject[0:70])"'
+
+  agents:mail:digest:
+    desc: "The newsletter batch: digest-tier mail from the last DAYS days (LIM=200)"
+    vars:
+      DAYS: '{{.DAYS | default "7"}}'
+      LIM: '{{.LIM | default "200"}}'
+    cmds:
+      - |
+        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/triage-digest?days={{.DAYS}}&lim={{.LIM}}" \
+          | jq -r '.[]? | "\(.sentAt[0:10])  \(.sender[0:40])  \(.subject[0:70])"'
+
+  agents:ci:queue:
+    desc: "Unresolved CI and robot mail an agent owns — the loop's own inbox (LIM=50)"
+    vars:
+      LIM: '{{.LIM | default "50"}}'
+    cmds:
+      - |
+        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent&lim={{.LIM}}" \
+          | jq -r '.[]? | "\(.sentAt[0:16])  \(.owner)  \(.subject[0:60])  \(.messageId)"'
+
+  agents:ci:fix:
+    desc: "Launch a subagent on one failing CI run (RUN=12345, MESSAGE_ID optional; DRY=1 writes the prompt only)"
+    vars:
+      RUN: '{{.RUN | default ""}}'
+      MESSAGE_ID: '{{.MESSAGE_ID | default ""}}'
+      DRY: '{{.DRY | default "0"}}'
+    cmds:
+      - |
+        args=(dispatch)
+        [ -n "{{.RUN}}" ] && args+=(--run "{{.RUN}}")
+        [ -n "{{.MESSAGE_ID}}" ] && args+=(--mail "{{.MESSAGE_ID}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        bash scripts/task/ci-fix-dispatch.sh "${args[@]}"
+
+  agents:ci:resolve:
+    desc: "Mark the mail that reported a CI failure resolved, so it leaves the agent queue (MESSAGE_ID)"
+    vars:
+      MESSAGE_ID: '{{.MESSAGE_ID | default ""}}'
+    cmds:
+      - bash scripts/task/ci-fix-dispatch.sh resolve --mail "{{.MESSAGE_ID}}"
+
+  # --- the job pipeline, in the same database as the mail that moves it -------
+  # While the workflow's JSON is still the source of truth, FILE points at it
+  # (`-` reads stdin, so `gh api … | base64 -d | task … FILE=-` works).
+  agents:apps:import:
+    desc: "Load applications.json into the archive DB and link it to mail (FILE=path or -, LINK=0 to skip)"
+    vars:
+      FILE: '{{.FILE | default ""}}'
+      LINK: '{{.LINK | default "1"}}'
+    cmds:
+      - |
+        [ -n "{{.FILE}}" ] || { echo "agents:apps:import: FILE is required (path, or - for stdin)" >&2; exit 2; }
+        args=(--file "{{.FILE}}")
+        [ "{{.LINK}}" = "1" ] && args+=(--link)
+        appflow-sync "${args[@]}"
+
+  agents:apps:pipeline:
+    desc: "Pipeline by stage, plus the applications whose mail nobody has dealt with"
+    cmds:
+      - appflow-sync --report
+
+  agents:apps:set:
+    desc: "Record a pipeline change from mail (ID=, STATUS=, NEXT=; stage derived with the apps:overview rules)"
+    vars:
+      ID: '{{.ID | default ""}}'
+      STATUS: '{{.STATUS | default ""}}'
+      NEXT: '{{.NEXT | default ""}}'
+    cmds:
+      - |
+        [ -n "{{.ID}}" ] && [ -n "{{.STATUS}}" ] || { echo "agents:apps:set: ID and STATUS are required" >&2; exit 2; }
+        stage=$(printf '%s' "{{.STATUS}}" | tr 'A-Z' 'a-z' | awk '
+          /interview|trial|warteliste/ {print "interview"; exit}
+          /^rejected/ {print "rejected"; exit}
+          /^applied/ {print "applied"; exit}
+          /^lead|^rezi/ {print "lead"; exit}
+          /screening|follow-up required/ {print "screening"; exit}
+          /draft|packet|jd/ {print "prep"; exit}
+          {print "other"}')
+        curl -fsS --max-time 20 -H 'content-type: application/json' -X POST \
+          -d "$(jq -nc --arg i "{{.ID}}" --arg s "{{.STATUS}}" --arg st "$stage" --arg n "{{.NEXT}}" \
+            '{id: $i, status: $s, stage: $st, nextAction: $n}')" \
+          "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/application-update" | jq -c '.[0]'
+
+  agents:hub:
+    desc: "The mail hub: every plugin owner, how much of the archive is waiting for it, and when it last acted"
+    cmds:
+      - |
+        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/plugins" \
+          | jq -r '.[]? | "\(.owner)  \(.kind)\topen \(.open)\tresolved \(.resolved)\tlast \(.lastDecision[0:16] // "-")"' | column -t -s$'\t'
+
+  agents:apps:discovered:
+    desc: "Applications the mail hub found on its own — not in the workflow's JSON (LIM=20)"
+    vars:
+      LIM: '{{.LIM | default "20"}}'
+    cmds:
+      - |
+        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/applications-discovered?lim={{.LIM}}" \
+          | jq -r '.[]? | "\(.createdAt[0:10])  \(.company[0:32])  \(.status[0:40])"'
+
+  agents:apps:packet:
+    desc: "Build a packet through nix: a store path with the CV and letter PDFs (ID=, or EXAMPLE=1 for the fictional fixture; RESUME=, LETTER=, OUT=link)"
+    vars:
+      ID: '{{.ID | default ""}}'
+      EXAMPLE: '{{.EXAMPLE | default "0"}}'
+      OUT: '{{.OUT | default ""}}'
+      RESUME: '{{.RESUME | default ""}}'
+      LETTER: '{{.LETTER | default ""}}'
+    cmds:
+      - |
+        args=()
+        [ -n "{{.ID}}" ] && args+=(--id "{{.ID}}")
+        [ "{{.EXAMPLE}}" = "1" ] && args+=(--example)
+        [ -n "{{.OUT}}" ] && args+=(--out "{{.OUT}}")
+        [ -n "{{.RESUME}}" ] && args+=(--resume "{{.RESUME}}")
+        [ -n "{{.LETTER}}" ] && args+=(--letter "{{.LETTER}}")
+        [ -n "{{.ID}}" ] || [ "{{.EXAMPLE}}" = "1" ] || {
+          echo "agents:apps:packet: ID is required (or EXAMPLE=1)" >&2; exit 2; }
+        bash scripts/task/appflow-packet.sh "${args[@]}"
+
+  agents:apps:export:
+    desc: "Regenerate applications.json from the database, in the workflow's own shape (OUT=path or - for stdout)"
+    vars:
+      OUT: '{{.OUT | default "-"}}'
+    cmds:
+      - appflow-sync --export "{{.OUT}}"
+
+  agents:apps:sync:
+    desc: "Write the pipeline from ATS mail: status + next action per provable message, then close the mail (DRY=1 to preview)"
+    vars:
+      DRY: '{{.DRY | default "0"}}'
+      LIM: '{{.LIM | default "50"}}'
+    cmds:
+      - |
+        args=(--sync --sync-limit "{{.LIM}}")
+        [ "{{.DRY}}" != "1" ] && args+=(--apply)
+        appflow-sync "${args[@]}"
+
+  agents:apps:queue:
+    desc: "Application mail an agent owns — the pipeline's inbox (LIM=20)"
+    vars:
+      LIM: '{{.LIM | default "20"}}'
+    cmds:
+      - |
+        curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent:apps&lim={{.LIM}}" \
+          | jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"'
+
+  agents:ci:preflight:
+    desc: "Run the two gates the CI docs-budget job runs, locally: no digest drift, no document over budget"
+    cmds:
+      - |
+        bash scripts/task/docs-budget.sh
+        nix eval --impure --raw "path:$(pwd)#checks.x86_64-linux.taskfile-digest-pin.outPath" \
+          >/dev/null && echo "task graph pinned"

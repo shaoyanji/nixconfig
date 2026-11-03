@@ -34,9 +34,15 @@ live claims, then a verdict. **Exit 1 is the collision**: someone is
 
 Liveness is per subject and decided by the NEWEST entry: an `in_progress` that a
 later `done` superseded is closed, which is why one entry per topic matters.
-Unresolved is not only `in_progress` — a `blocked` subject is a decision waiting
-on a human and a `failed` one needs a second attempt, so both stay live until a
-`done` lands on top of them.
+Unresolved is not only `in_progress` — a `blocked` subject cannot proceed without
+something the agent cannot supply and a `failed` one needs a second attempt, so
+both stay live until a `done` lands on top of them.
+
+**Blocked is a claim about capability, not about preference.** Work that keeps
+going — asynchronously, or past a choice the operator has not made yet — is
+`in_progress` with the open question in `rationale`. Reserved for `blocked`:
+missing credentials, a host action only a person can take, or a decision that
+changes what gets built, i.e. the next step cannot start at all.
 
 `LIMIT=` is display only, never the search window: a filtered query scans the log
 (the shim caps the scan at 2000 frames and says `truncated` when it hits it), so a
@@ -107,7 +113,7 @@ outcome   done
 | `ACTION` | required | one line, ≤500 characters |
 | `RATIONALE` | `""` | ≤1000; the diagnosis and the continuation belong here |
 | `OUTCOME` | `done` | also `in_progress`, `blocked: why`, `failed: why` |
-| `SOURCE` | `$USER` | short agent name |
+| `SOURCE` | `$AGENT_SOURCE`, else `$USER` | short agent name — **pass it**: an agent runs as the operator, so the fallback attributes the turn to a person and prints a warning |
 | `FILES` `COMMITS` `CLAIMS` | `[]` | comma- or newline-separated |
 | `ID` | a fresh UUID | pass the old one to retry; the shim dedups on it |
 | `BASE_COMMIT` `BRANCH` | `git HEAD`, current branch | override when the work landed elsewhere |

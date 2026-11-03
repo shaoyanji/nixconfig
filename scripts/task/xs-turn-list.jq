@@ -4,10 +4,11 @@
 # resumability is keyed on, so liveness is decided per subject by its NEWEST entry:
 # an older `in_progress` that a later `done` superseded is closed, not a live claim.
 #
-# Unresolved is not only in_progress. `blocked` is a decision waiting on a human
-# and `failed` is a run that needs a second attempt, so a rule that counts only
-# in_progress renders both as closed work and the operator's queue becomes
-# invisible at exactly the moment an agent reads the log before starting.
+# Unresolved is not only in_progress. `blocked` is work whose next step cannot
+# start and `failed` is a run that needs a second attempt, so a rule that counts
+# only in_progress renders both as closed work and the operator's queue becomes
+# invisible at exactly the moment an agent reads the log before starting. Neither
+# word covers a preference: work that continues asynchronously is in_progress.
 #
 # Two further rules this file owns, so they exist once:
 #   * fresh vs stale — an unresolved entry whose newest appearance is older than

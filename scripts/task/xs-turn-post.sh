@@ -43,7 +43,14 @@ subject=${SUBJECT:-}
 action=${ACTION:-}
 rationale=${RATIONALE:-}
 outcome=${OUTCOME:-done}
-source_name=${SOURCE:-$(whoami)}
+# `source` is the agent's name, and on the fleet an agent runs as the operator, so
+# `whoami` alone attributes an agent's turn to a person (measured 2026-11-03: three
+# posts read as devji). AGENT_SOURCE is the environment's answer; the fallback is
+# for a human posting by hand, and it says so on stderr rather than pretending.
+source_name=${SOURCE:-${AGENT_SOURCE:-$(whoami)}}
+if [ -z "${SOURCE:-${AGENT_SOURCE:-}}" ] && [ ! -t 0 ]; then
+  printf 'xs-post: source defaults to %s (the OS user) — an agent should pass SOURCE=<agent>\n' "$source_name" >&2
+fi
 files=${FILES:-}
 commits=${COMMITS:-}
 claims=${CLAIMS:-}

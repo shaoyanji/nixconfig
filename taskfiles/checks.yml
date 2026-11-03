@@ -113,6 +113,22 @@ tasks:
       - bash scripts/task/taskfile-graph.sh
     silent: true
 
+  checks:codespace:sync:
+    desc: "[gate] Codespace sync body: a failed fetch exits 1 and resets nothing"
+    summary: >
+      Offline cases for the body `codespace:sync` sends over ssh
+      (scripts/task/codespace-sync-test.sh): an unreachable origin, a dirty tree,
+      FORCE, a fast-forward, and a branch the remote lacks — all against local
+      repositories, so no codespace, gh or network is involved.
+
+      The regression it locks: a failed fetch fell through to `git reset --hard
+      origin/$BRANCH`, moved to the stale ref and printed "now at <old commit>" with
+      exit 0. CODESPACE_SYNC_BODY=<path> points the cases at another body, which is
+      how the test is proved to fail on the bug. Exit 0 = every case held, 1 = one
+      did not.
+    cmds:
+      - bash scripts/task/codespace-sync-test.sh
+
   checks:kg:
     desc: "[gate] Knowledge-graph schema and all six query patterns still agree"
     summary: >

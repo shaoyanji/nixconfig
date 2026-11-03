@@ -99,5 +99,11 @@ credential-free path — bundle the commits on the host, `codespace:put` the bun
 then `git fetch /tmp/sync.bundle <branch> && git reset --hard FETCH_HEAD` and move
 `refs/remotes/origin/<branch>` so `status` stops calling the clone ahead.
 
+That body is `scripts/task/codespace-sync-body.sh`, not a heredoc, so the failure
+is testable without a codespace: `task checks:codespace:sync` runs it against local
+repositories (unreachable origin, dirty tree, FORCE, fast-forward, missing branch).
+It converts a regression that once reported success on an unauthenticated fetch
+into five named assertions.
+
 Truth: `taskfiles/codespace.yml` — the executable contract; `scripts/task/codespace.sh`
 is the implementation, and this page is the procedure and the measured traps.

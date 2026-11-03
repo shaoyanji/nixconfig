@@ -232,8 +232,6 @@ agent reads. `FORMAT=text` gives a person the table it printed yesterday.
 
 ## What it can and cannot do
 
-Beyond the four core routes at the top:
-
 | Capability | State |
 | :--- | :--- |
 | what needs a person | `GET /api/attention?lim=N` — person, action, review; unresolved; VIPs first |
@@ -247,7 +245,7 @@ Beyond the four core routes at the top:
 | MCP / agent tool | none; an agent calls the HTTP API, or reads `/openapi.json` |
 
 himalaya is the **ingest transport only**; the query path is PostgreSQL's own
-full-text search, over a schema whose field shapes an agent can rely on.
+full-text search over a schema an agent can rely on.
 
 ## The hub: plugins, and the rival on 8451
 
@@ -393,8 +391,7 @@ rebuild, and `rm` of the conf plus a remote stop returns the unit to *skipped*.
 - **No auth on the API.** Tailnet membership is the only gate; the generated
   endpoints are open to any tailnet peer.
 - **Only the inbox is imported.** `importer.mailbox` is one folder; sent mail and
-  Gmail's All Mail are not walked, and labels are the source folder rather than
-  the account's full label set.
+  Gmail's All Mail are not walked, and labels are the source folder only.
 - **No HTML source kept.** The converted text is stored; the original `text/html`
   part is not, so a better converter later means re-reading the mailbox, not a
   migration.

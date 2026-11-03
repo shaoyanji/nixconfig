@@ -318,6 +318,28 @@ NIX_CONFIG="trusted-public-keys = probe-1:<public>" \
   nix copy --from http://127.0.0.1:8787 --to file:///tmp/verify /nix/store/<that-path>
 ```
 
+**This preview is for editing the Worker; the deployed edge needs none of it.**
+Run it in tmux — a tool shell owns its process group, so `&`/`nohup` orphan the
+server rather than keep it (a detached one ran 4 h 42 m unnoticed on delphi,
+2026-11-02):
+
+```bash
+tmux new-session -d -s agent-wrangler -c modules/services/nix-cache-edge -- \
+  bash -lc 'exec wrangler dev --local --port 8787'
+tmux attach -t agent-wrangler
+tmux kill-session -t agent-wrangler        # teardown — do it when the editing stops
+```
+
+Idle `wrangler dev` burns a real core: **~42 %** on delphi, 206-213 ticks per 5 s,
+1 h 52 m of CPU accrued over 4 h 42 m wall. The cost is esbuild, not this Worker —
+its watch mode polls the filesystem instead of using inotify
+([workers-sdk#11469](https://github.com/cloudflare/workers-sdk/issues/11469), still
+open 2026-07). A freshly started process spins identically, so restarting does not
+help; `--no-bundle` cannot skip it (workerd rejects the TypeScript entry:
+`Uncaught SyntaxError: Unexpected strict mode reserved word at worker.ts:13`); and
+esbuild holds a dirfd on `/nix/store`, which is why this host sits at the top of
+the 28-41 % range other reporters see. Start it to edit, stop it after.
+
 A client that asked about a path **before** it was pushed keeps answering "not a
 valid path" afterwards, because nix caches the miss in
 `/nix/var/nix/binary-cache-v*.sqlite`. `nix path-info --refresh --store <url>

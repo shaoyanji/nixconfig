@@ -19,17 +19,20 @@ the **`sandbox` microVM guest** that `/microvm/*` is served from.
 lands on **Tailscale SSH**, which demands a browser check per client: measured
 2026-11-04 from frieren, `devji@delphi.cloudforest-kardashev.ts.net`,
 `devji@100.123.145.53` and `root@…` all answered *"requires an additional
-check"* and blocked. The door that works is the public IP the install used, with
-the fleet user certificate — `devji@92.5.115.103`, BatchMode-safe, NOPASSWD sudo,
-and `devji` is in `wheel` so it is a trusted user for `nix copy`.
+check"* and blocked. The door that works is the **public name** the install
+used — `devji@delphi.bountystash.com`, BatchMode-safe over 22, with the fleet
+user certificate, NOPASSWD sudo, and `devji` in `wheel` so it is a trusted user
+for `nix copy`. Use the name, not the IP it resolves to: `inventory.toml` records
+the public IP as ephemeral, so an address that works today can move without a
+config change.
 
 delphi is `warmOn = "self"` (`inventory.cache.delphi`): it builds its own
 fleet-specific derivations and substitutes the rest from cachix, so no builder is
 involved and no push is needed:
 
 ```bash
-nix flake archive --to ssh://devji@92.5.115.103 '.?submodules=1'   # ~1 min
-ssh devji@92.5.115.103 'sudo nixos-rebuild switch --flake /nix/store/<src>#delphi'
+nix flake archive --to ssh://devji@delphi.bountystash.com '.?submodules=1'   # ~1 min
+ssh devji@delphi.bountystash.com 'sudo nixos-rebuild switch --flake /nix/store/<src>#delphi'
 ```
 
 Run the switch **detached** (`systemd-run --unit=… --collect`) so a dropped

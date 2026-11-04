@@ -95,6 +95,25 @@ derivations**: a new Python package, model weights, a Rust or Go binary. Anythin
 else is a fix, and a fix that needs a closure rebuild was built on the wrong tree.
 Long form: [`../AGENTS.md`](../AGENTS.md) §5.
 
+### A config-only delta does not need the CI round trip
+
+The gate answers "is this closure servable", which is the right question when a
+change adds derivations and the wrong one when it only alters generated text.
+Measured on delphi 2026-11-04 (a SearXNG `search.formats` line): **18
+config-generated derivations, 9 s to build** — where the CI path would have spent
+a push, a runner, a cachix upload and a cache round trip on the same 18 files.
+Compare a real addition: an aarch64 paperless build is 20 derivations, ~41 min.
+
+So measure the pending set and decide on its **contents**:
+
+```bash
+nix build --dry-run --json --builders "" <host toplevel>   # counts, builds nothing
+```
+
+When every entry is config-generated, build on the target and skip CI. The test is
+that list, never the diff size: a one-line module edit can pull a new package, and
+that one belongs in CI.
+
 ## Reclaiming store space: the collect is only half the job
 
 GC frees paths that **no root reaches**, and a generation is one kind of root: a

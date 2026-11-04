@@ -57,6 +57,10 @@ A quote is the **best-matching section**, heading included, never the lead: the
 lead is what a summary is, the section is what an answer is. `--budget N` caps
 the tokens (default 1200), `--archive <substring>` narrows the fan-out.
 
+`wiki-ask --list` prints the shelf itself (title, coverage, vintage, GiB, path)
+as JSON or `--toon` — read it before choosing a shelf, rather than trusting a
+skill line that ages.
+
 **Abstention is the feature.** A below-0.38 verdict returns titles and no text,
 which is the honest answer when the archives do not cover the question — quote
 such a result as `verdict: abstain`, never as a fact.

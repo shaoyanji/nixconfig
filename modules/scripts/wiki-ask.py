@@ -74,9 +74,17 @@ def load_archives():
         out.append({
             "name": book.get("name", ""),
             "title": book.get("title", ""),
+            "description": book.get("description", ""),
+            "language": book.get("language", ""),
+            "date": book.get("date", ""),
+            "flavour": book.get("flavour", ""),
+            "articles": int(book.get("articleCount", "0") or 0),
             "path": path,
             "book": os.path.basename(path)[: -len(".zim")] if path.endswith(".zim") else os.path.basename(path),
-            "size": int(book.get("size", "0") or 0),
+            # library.xml's `size` is KiB, not bytes: the full Wikipedia entry
+            # reads 51455768, which is 49 GiB.
+            "size_kib": int(book.get("size", "0") or 0),
+            "tags": [t for t in book.get("tags", "").split(";") if t and not t.startswith("_")],
         })
     return out
 
@@ -393,7 +401,8 @@ def to_toon(obj):
 
 def main():
     ap = argparse.ArgumentParser(prog="wiki-ask", description="fan-out ZIM retrieval with a token gate")
-    ap.add_argument("query", nargs="+")
+    ap.add_argument("query", nargs="*")
+    ap.add_argument("--list", action="store_true", help="print the archive catalog (JSON) and exit")
     ap.add_argument("--budget", type=int, default=1200, help="token cap for quoted text (chars/4)")
     ap.add_argument("--candidates", type=int, default=8)
     ap.add_argument("--archive", action="append", default=[], help="only archives whose name contains this")
@@ -408,6 +417,33 @@ def main():
     query = " ".join(args.query)
     started = time.time()
     archives = load_archives()
+
+    # The shelf, as data: an agent choosing where to look needs the coverage, the
+    # vintage and the cost per lookup, none of which a skill line can carry
+    # without going stale.
+    if args.list:
+        catalog = {
+            "library": LIBRARY,
+            "serve": SERVE,
+            "archives": [
+                {
+                    "name": a["name"], "title": a["title"], "description": a["description"],
+                    "language": a["language"], "date": a["date"], "flavour": a["flavour"],
+                    "articles": a["articles"], "gib": round(a["size_kib"] / 1024 / 1024, 2),
+                    "topics": a["tags"], "path": a["path"],
+                }
+                for a in archives
+            ],
+            "cost": "local Xapian, no network, no quota",
+        }
+        if args.toon:
+            return to_toon(catalog)
+        print(json.dumps(catalog, indent=2))
+        return 0
+
+    if not query:
+        print("wiki-ask: a query is required (or --list for the catalog)", file=sys.stderr)
+        return 2
     if args.archive:
         archives = [a for a in archives if any(s in a["name"] for s in args.archive)]
     if not archives:

@@ -707,8 +707,13 @@ observation tasks → `taskfiles/ops.yml`.
 | Vault              | Fast working memory — offline, personal       | First stop for context                         |
 | qmd wiki           | Resource — docs, runbooks, codebase           | Concept/location queries                       |
 | mem0 / supermemory | Deep consult — when vault + wiki insufficient | Decided by jev (min-prob 0.8, min-margin 0.15) |
+| ZIM shelf          | World knowledge — 4 archives, ~49.4 GiB, no quota | A question about the world, not about this fleet |
 
-Search order: vault → wiki (qmd BM25) → graph (`task ops:kg:*`) → mem0/supermemory (jev-decided) → web. Skills: `qmd search "<topic>" -c skills --format json`.
+Search order: vault → wiki (qmd BM25) → graph (`task ops:kg:*`) → mem0/supermemory (jev-decided) → **ZIM shelf** (`task ops:wiki:ask Q=…`, then the rate-limited web). Skills: `qmd search "<topic>" -c skills --format json`.
+
+The shelf is the one rung that answers *and* costs nothing per lookup, so an
+en.wikipedia/SO-shaped question goes there before an API call — `wiki-ask --list`
+prints what is actually on it (coverage, vintage, size) rather than a claim.
 
 ---
 

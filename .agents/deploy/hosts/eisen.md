@@ -315,6 +315,20 @@ $FHS -c 'source /mnt/storage/strata/.venv/bin/activate && python \
 
 Finish with `sudo systemctl stop strata-probe && sudo systemctl start strata`.
 
+**What upstream already knows (checked 2026-11-04).** Our engine is `0.1.46.2`;
+public Strata 0.2.10 ships engine **0.1.56**, so ten point releases are untested here.
+The family is tracked, not novel: #3807 reports the same guard on 0.1.46/0.1.47 and
+names the silent respawn as the thing that hides it; #4566 is the gfx10
+batched-prefill thread. Its 2026-11-03 comment (same Coder IQ1_M pack, gfx1031)
+reports a working mitigation on 0.1.56 — **`--adapt-swaps 0` plus
+`STRATA_VERIFY_COHERENT=1`** — after a `verify: timed out at layer 37` variant. That
+was a verify-path stall, ours is inside a batched chunk read, so test it rather
+than assume it: one flag pair, the same suite, and the stall sites tell you.
+
+**DFlash2 does not apply to this card.** 0.2.10 makes DFlash2 the default drafter
+for Qwen3.8 on CUDA 8.6/8.9/12.0/12.1, Radeon gfx1100/gfx1151/gfx1201, Metal and
+Arc — gfx1010 is not in that list, so MTP stays the drafter here.
+
 ## Operational Notes
 
 - **Build and eval eisen ON eisen, over ssh** (`ssh eisen 'bash -l -c …'`, repo at

@@ -34,6 +34,9 @@ LINUX_DIR="${LINUX_DIR:-$ISO_DIR/linux}"
 APPIMAGE_DIR="${APPIMAGE_DIR:-$DATA_ROOT/appimages}"
 DEVICE_DIR="${DEVICE_DIR:-$DATA_ROOT/devices}"
 SOFTWARE_DIR="${SOFTWARE_DIR:-$DATA_ROOT/software}"
+# Weights are not installers: a .gguf is worth tens of gigabytes and belongs on
+# its own shelf, never in the flat software/ pile and never model-classified.
+MODELS_DIR="${MODELS_DIR:-$SOFTWARE_DIR/models}"
 PAPERLESS_CONSUME="${PAPERLESS_CONSUME:-$DATA_ROOT/paperless/consume}"
 REJECTED="${REJECTED:-$DOWNLOADS/.rejected}"
 
@@ -112,6 +115,8 @@ moved_books=0
 moved_other=0
 pending=0
 inflight=0
+stale=0
+sidecars=0
 unknown=0
 released=0
 
@@ -129,6 +134,9 @@ rel_of() { printf '%s\n' "${1#"$DATA_ROOT"/}"; }
 declare -A ACTIVE=()
 declare -A SEEDING=()
 RPC_SECRET=""
+# Whether aria2 actually answered. Without it a control file is the only
+# evidence there is, and no download may be called dead on no evidence.
+RPC_OK=0
 load_active() {
   local json method gid path seeder completed total
   RPC_SECRET="$(cat "$RPC_SECRET_FILE" 2>/dev/null || sudo -n cat "$RPC_SECRET_FILE" 2>/dev/null || true)"
@@ -146,6 +154,7 @@ load_active() {
         -d "{\"jsonrpc\":\"2.0\",\"id\":\"sort\",\"method\":\"aria2.$method\",\"params\":[\"token:$RPC_SECRET\",[\"gid\",\"files\",\"seeder\",\"completedLength\",\"totalLength\"]]}" || true)"
     fi
     [ -n "$json" ] || continue
+    RPC_OK=1
     # Tab-separated: a downloaded path may contain spaces, so a space-delimited
     # read would split one file into several fields.
     while IFS=$'\t' read -r gid path seeder completed total; do
@@ -536,6 +545,14 @@ classify() {
       place "$file" "$APPLIANCE_DIR/$(basename "$file")" 0644 other
       return 0
       ;;
+    *.gguf)
+      # Model weights, not an installer. Without this rule the classifier is the
+      # only thing left, and it answers "software" for a 40 GB shard — which is
+      # how a live download job once had its shards moved out of staging
+      # mid-run (2026-11-04).
+      place "$file" "$MODELS_DIR/$(basename "$file")" 0644 other
+      return 0
+      ;;
     # Compound suffixes belong here, not in the extension case below: `${f##*.}`
     # on `tool-1.2.tar.gz` is `gz`, so a `.tar.gz` rule there never matches.
     *.tar.gz | *.tgz | *.tar.xz | *.tar.zst | *.tar.bz2 | *.tar)
@@ -625,16 +642,37 @@ for item in "$DOWNLOADS"/*; do
   name=$(basename "$item")
   case "$name" in
     *.aria2 | *.sh | .*) continue ;;
+    # A download job's own companion files: the checksums a payload is verified
+    # against and the log the job writes. They are never the payload, and a
+    # model asked to place one answers "documents" or "software" at random, so
+    # they are named and left where the job put them.
+    *SUMS | *.sha256 | *.sha512 | *.md5 | *.log)
+      say "SIDECAR  $name — a download job's companion file, not payload"
+      sidecars=$((sidecars + 1))
+      continue
+      ;;
   esac
+  payload=$(payload_of "$item")
+  held=0
+  [ -n "$payload" ] && [ -n "${ACTIVE["$payload"]:-}" ] && held=1
   # In-flight is not a decision for a human: a timer must keep exiting 0 while
   # something downloads, or the check pages every time the pool is busy.
   if [ -e "$item.aria2" ]; then
-    say "INFLIGHT $name — control file present, still downloading"
-    inflight=$((inflight + 1))
+    if [ "$held" = 1 ] || [ "$RPC_OK" != 1 ]; then
+      say "INFLIGHT $name — control file present, still downloading"
+      inflight=$((inflight + 1))
+      continue
+    fi
+    # aria2 writes `<file>.aria2` beside a download and deletes it on success,
+    # so one that outlives the download is a corpse: preallocated, partly
+    # written, and held by nobody. Calling it in flight keeps the staging dir
+    # "busy" forever and the unit red for a decision no one can make from the
+    # sorter — the same failure it would report for a real download, once.
+    say "STALLED  $name — control file with no aria2 record; the download died"
+    stale=$((stale + 1))
     continue
   fi
-  payload=$(payload_of "$item")
-  if [ -n "$payload" ] && [ -n "${ACTIVE["$payload"]:-}" ]; then
+  if [ "$held" = 1 ]; then
     if [ -n "${SEEDING["$payload"]:-}" ] && [ "$KEEP_SEED" != 1 ]; then
       # A complete seed is a finished download: keeping it would leave the item
       # staged forever, because seed-ratio 0 never releases it on its own.
@@ -670,8 +708,8 @@ fi
 say ""
 if [ "$APPLY" = 1 ]; then verb=moved; else verb=planned; fi
 if [ "$APPLY" = 1 ]; then seed_verb=released; else seed_verb="to release"; fi
-say "$verb: $moved_other other, $moved_media media, $moved_books books · seeds $seed_verb: $released · inflight: $inflight · pending: $pending · unknown: $unknown"
-if ((unknown > 0 || pending > 0)); then
+say "$verb: $moved_other other, $moved_media media, $moved_books books · seeds $seed_verb: $released · inflight: $inflight · stalled: $stale · sidecars: $sidecars · pending: $pending · unknown: $unknown"
+if ((unknown > 0 || pending > 0 || stale > 0)); then
   say "needs a human decision before this staging dir is empty"
   exit 1
 fi

@@ -75,7 +75,13 @@ def post(endpoint: str, bearer: str, event: dict) -> None:
         with urllib.request.urlopen(request, timeout=20) as response:
             response.read()
     except urllib.error.HTTPError as error:
-        raise SystemExit(f"audit-roll: the turn log refused {event['subject']} ({error.code})")
+        # The shim says why it refused (a credential-shaped body, an unknown
+        # field); a bare status code sends the next reader to the wrong place.
+        detail = error.read().decode("utf-8", "replace").strip()[:400]
+        raise SystemExit(
+            f"audit-roll: the turn log refused {event['subject']} ({error.code})"
+            + (f": {detail}" if detail else "")
+        )
 
 
 def blocks(lines: list[str]) -> list[tuple[int, int, str, str]]:
@@ -114,7 +120,11 @@ def summary(text: str) -> str:
             continue
         body.append(stripped.lstrip("- ").replace("**", ""))
     flat = " · ".join(body)
-    return (flat[:2000].rstrip() + "…") if len(flat) > 2000 else flat
+    # 1000 is the shim's cap on `rationale` (docs/agent-turns.md); this function
+    # used to cut at 2000 and the turn log refused every entry over 1000 with a
+    # 400, which is why the ledger roll stopped working.
+    limit = 1000
+    return (flat[: limit - 1].rstrip() + "…") if len(flat) > limit else flat
 
 
 def main() -> int:

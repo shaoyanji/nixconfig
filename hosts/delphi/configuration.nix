@@ -284,10 +284,8 @@ in {
   ];
 
   # --- YouTube relay: fetch where the peering is good, serve over the tailnet ---
-  # Home pulls Google at 1.5-2.3 Mbit; this host reaches it at gigabit and
-  # crosses back to frieren at a measured 11.4 Mbit over WireGuard. The cookie
-  # jar is a hand-provisioned credential at 0600 (never in the store), so with
-  # none present `yt-get` fails loudly rather than being silently refused.
+  # Why, and what is still unproven (the home-side figure was measured while the
+  # uplink was saturated): `docs/media-relay.md`.
   services.media-relay.enable = true;
 
   # 10.99.0.53 on lo + the /32 advertised below form one half of the failover

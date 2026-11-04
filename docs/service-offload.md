@@ -114,6 +114,10 @@ coupling, and it points at delphi or at the NAS's own loopback.
 
 ## Known edges
 
+- **A relay offloads the fetch, not the file.** `media-relay` on delphi pulls
+  YouTube on its own line and serves the tailnet; whether that beats pulling
+  directly is still unproven — [docs/media-relay.md](./media-relay.md) records
+  what would settle it.
 - **The proxy is a dependency.** Both the transitional tunnel and the eventual
   vhosts mean frieren's nginx must be up for `docs.frieren.lan` and
   `vault.frieren.lan` to resolve. What was removed is the *state* and the *CPU*,

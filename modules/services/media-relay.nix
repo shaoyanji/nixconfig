@@ -1,34 +1,6 @@
-# media-relay — fetch YouTube over a fast uplink, serve H.264/AAC MP4 with Range.
-#
-# Why it exists: fetch where the peering is good, serve where the client is.
-# delphi pulls a 10-minute 1080p video in 12.4 s (a gigabit) and serves it back
-# over WireGuard at a measured 11.4 Mbit.
-#
-# Its ADVANTAGE OVER PULLING DIRECTLY IS NOT PROVEN, and the numbers that
-# suggested one were contaminated: every home-side measurement on 2026-11-04 ran
-# while a 20 GB download held the uplink at ~19-21 Mbit, so "Google gives this
-# house 1.5-2.3 Mbit" was really "the line was full". The decisive experiment is
-# one curl against googlevideo and one against this relay on a quiet line; until
-# that exists, treat the throughput case as open and the value as packaging (one
-# URL a client bookmarks, plus the frame-rate rule below).
-#
-# Two rules the format string encodes, and they are not preferences:
-#   * vcodec^=avc1  — H.264. An iPad Air 1 on iOS 12 decodes nothing else, and
-#                     the netbook's Gen8 iGPU has no VP9/AV1 engine.
-#   * acodec^=mp4a  — AAC. Opus (format 251) is the default "bestaudio" and
-#                     cannot play in an old Safari <video>.
-#
-# A third rule comes from measurement, not taste: the frame rate is capped at
-# 30. On the netbook (Celeron N3060, Gen8 iGPU) 8 s of playback dropped 273
-# frames of 1080p60, 64 with `profile=fast` and 100 with bilinear scaling — the
-# box renders below 60 fps no matter how cheap the shader, so 1080p60 stutters
-# there and no client setting fixes it. The same 1080p at 30 fps dropped 9.
-# Height and rate are ceilings, not targets: `--height/--fps` raise them per
-# fetch when the client is a TV, and the fps filter falls back to the uncapped
-# chain rather than failing when a video has no ≤30 fps format.
-#
-# `-c copy` + `+faststart` means nothing is ever re-encoded: the fetch is a
-# copy, and seeking over HTTP works because the moov atom is at the front.
+# media-relay — fetch YouTube on delphi's uplink, serve H.264/AAC MP4 with Range.
+# Why it exists, what is still unproven, and the three format rules it encodes:
+# `docs/media-relay.md`.
 {
   config,
   lib,

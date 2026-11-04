@@ -427,7 +427,17 @@
   lineCount = p: builtins.length (lib.splitString "\n" (builtins.readFile p)) - 1;
   agentsLines = lineCount (root + "/AGENTS.md");
   skillFiles = builtins.filter (p: lib.hasSuffix "/SKILL.md" (toString p)) treeFiles;
-  skillLines = builtins.foldl' (acc: p: acc + lineCount p) 0 skillFiles;
+  # Frontmatter is compiled metadata, not prose: `lib/skills.nix` turns it into the
+  # one-line index an agent carries (`name` + `description`), so 647 of the 5927
+  # raw SKILL.md lines were budgeted as context they never occupy. What a skill
+  # costs is the body loaded when it is opened, and that is what is counted.
+  frontmatterLines = p: let
+    lines = lib.splitString "\n" (builtins.readFile p);
+  in
+    if lines == [] || lib.trim (builtins.head lines) != "---"
+    then 0
+    else builtins.length (takeWhile (l: lib.trim l != "---") (builtins.tail lines)) + 2;
+  skillLines = builtins.foldl' (acc: p: acc + lineCount p - frontmatterLines p) 0 skillFiles;
 
   # Truth, as a skill may cite it: a backticked repo path that RESOLVES, or a
   # policy citation. Prose that describes a mechanism without naming the file
@@ -587,14 +597,19 @@
     };
 
     agent-prose-budget = {
-      rule = "AGENTS.md (928 lines) and every tracked SKILL.md (5526 lines today) are shrink-only — they are read into context on every turn, so a cleanup lowers the number here in the same commit. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability.";
-      proof = "line counts of AGENTS.md and every tracked SKILL.md";
+      rule = "AGENTS.md (927 lines) and the body of every tracked SKILL.md (5280 lines today) are shrink-only — they are the prose an agent carries or loads, so a cleanup lowers the number here in the same commit. A skill's frontmatter is NOT counted: `lib/skills.nix` compiles it into the one-line index, so it is metadata, not context. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability.";
+      proof = "line counts of AGENTS.md and of every tracked SKILL.md minus its frontmatter block";
       # Audited 2026-10-21: 215 lines removed by collapsing the shadowed
       # `.agents/skills/simplex-admin` copy (the module is canonical and the
       # installer prefers it), 60 lines added as one `Truth:` pointer per skill
       # that had none. Net −155, cap lowered 5546 → 5526 in the same change.
-      holds = agentsLines <= 928 && skillLines <= 5526;
-      detail = "AGENTS.md ${toString agentsLines}/928 lines, skills ${toString skillLines}/5526 — over budget means delete or an audited `Truth:` extension, not a renumber";
+      # Audited 2026-11-04: the skills figure counted YAML frontmatter (647 of
+      # 5927 lines across 63 files), which the index compiles away, so the cap was
+      # measuring the wrong thing — bodies are 5280, and the cap is that number.
+      # AGENTS.md 941 → 927 by deleting the namespace table, a third copy of
+      # docs/task-control-plane.md, .agents/README.md and `task --list-all`.
+      holds = agentsLines <= 927 && skillLines <= 5280;
+      detail = "AGENTS.md ${toString agentsLines}/927 lines, skill bodies ${toString skillLines}/5280 — over budget means delete or an audited `Truth:` extension, not a renumber";
     };
 
     rebuild-flags-are-finite = {

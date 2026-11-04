@@ -1,17 +1,6 @@
-# The inference face of eisen: a TTY, the model, and the network. No greeter, no
-# compositor, no gamescope, no Steam, no capture server.
-#
-# Applied by `specialisation.server` (configuration.nix); the boot default stays
-# the Ryoku/gamescope gaming desktop. Both toplevels live in one generation, so
-# picking this persona needs no rebuild: choose the "specialisation server" entry
-# in the systemd-boot menu, or `nixos-rebuild switch --specialisation server` on
-# a running box.
-#
-# Everything below subtracts, because that is where this host's inference value
-# is: the desktop stack's ~450-500 MiB of idle VRAM (hosts/eisen/MANUAL.md §3,
-# which Strata would rather spend on resident experts), the Steam client +
-# gamescope + greeter's few GiB of RAM (page cache for the mmapped expert
-# arena), and the threads they leave idle between frames.
+# The inference persona: a TTY, the model, and the network. What is subtracted and
+# why, plus how to pick it at boot: `.agents/deploy/hosts/eisen.md` ("Boot
+# personas").
 {lib, ...}: {
   # --- No graphical target ---------------------------------------------
   # Even with every session package gone, a stray `services.displayManager.enable`

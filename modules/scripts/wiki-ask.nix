@@ -1,14 +1,5 @@
-# wiki-ask — gated fan-out retrieval over the local ZIM archives.
-#
-# The engine already exists (kiwix-serve's Xapian index plus kiwix-search); this
-# wrapper adds the three things the archive cannot do for itself: query
-# relaxation (Xapian ANDs its terms, so a five-word incident query returns zero
-# titles), cross-archive fusion, and a token gate so an agent gets ~300 tokens
-# of the section that matched instead of ten titles or a whole article.
-#
-# Measured against `wikisearch` on frieren 2026-11-04: `wikisearch "btrfs scrub
-# repair EIO"` returns F2FS; `wiki-ask` returns Btrfs → "Checking and recovery"
-# in ~0.3 s. The gap is the fan-out, not the index.
+# wiki-ask — gated fan-out retrieval over the local ZIM archives. What it adds to
+# `wikisearch`, and the measured comparison: `.agents/skills/wikisearch/SKILL.md`.
 {pkgs, ...}:
 pkgs.writeShellApplication {
   name = "wiki-ask";

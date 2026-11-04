@@ -678,24 +678,10 @@ For provisioning a new server:
 
 See [Task Control Plane](docs/task-control-plane.md) for full namespace definitions and workflow examples.
 
-| Namespace       | What                                                                                                         | Skill                                  |
-| --------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
-| `infra:*`       | Host lifecycle, secrets, SOPS, detached jobs (`infra:job:*`), microVM guests (`microvm:*` declarative, `vm:canary:*` runner) | `.agents/skills/infra/SKILL.md`, `.agents/skills/microvm/SKILL.md` |
-| `agents:*`      | Operator menu, xs, OAuth                                                                                     | `.agents/skills/agents/SKILL.md`       |
-| `checks:*`      | Validation, smoke checks, nix lint                                                                           | `.agents/skills/checks/SKILL.md`       |
-| `codespace:*`   | GitHub Codespaces over `gh cs ssh`: exec, file transport, repo-matched push, ref refresh, stop                 | `.agents/skills/codespace/SKILL.md`    |
-| `dev:*`         | Git, flake, site, PRs, packages                                                                              | `.agents/skills/dev/SKILL.md`          |
-| `data:*`        | NAS storage taxonomy, hygiene, permissions, media unindexing                                                 | `.agents/skills/data/SKILL.md`         |
-| `moto:*`        | Motorola Android (Termux) shell, file push/pull, Wish/Gum menu                                               | `.agents/skills/moto/SKILL.md`         |
-| `serv00:*`      | Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle                                                       | `.agents/skills/serv00/SKILL.md`       |
-| `dragoncourt:*` | Alwaysdata Debian hosting, PHP/Wasm webserver                                                                | `.agents/skills/dragoncourt/SKILL.md`  |
-| `envs:*`        | Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline                                       | `.agents/skills/envs/SKILL.md`         |
-| `bountystash:*` | Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment                                | `.agents/skills/bountystash/SKILL.md`  |
-| `apps:*`        | Job application workflow (appflow): status updates, email flow, sync, builds                                 | `.agents/skills/apps/SKILL.md`         |
-| `services:*`    | Legacy wrappers (canonical: `infra:*`)                                                                       | `.agents/skills/services/SKILL.md`     |
-| `google-drive`  | Google Drive OAuth setup, rclone, tailscale funnel                                                           | `.agents/skills/google-drive/SKILL.md` |
-| `antigravity`   | Delegate coding to Antigravity CLI (Google's agent) with `--dangerously-skip-permissions` and `--jsonschema` | `.agents/skills/antigravity/SKILL.md`  |
-| `crush`         | Delegate coding to Crush CLI (Charm's agent) with `--yolo` and structured output                             | `.agents/skills/crush/SKILL.md`        |
+The namespaces themselves are defined in
+[`docs/task-control-plane.md`](docs/task-control-plane.md); which skill owns which
+shard is the index in [`.agents/README.md`](.agents/README.md); the tasks are
+`task --list-all --json`. A third table here was a copy of all three.
 
 ---## Taskfile as the Agent Contract
 

@@ -506,10 +506,10 @@
         tasks = ["ops:wiki:ask" "dev:qmd:refresh" "checks:qmd:docs"];
       };
       body = ''
-        Built 2026-11-04, the half that was missing: a retrieval tool an agent can
-        afford, rather than the semantic layer this note was waiting for.
-        `modules/scripts/wiki-ask.py` behind `task ops:wiki:ask`, on frieren where
-        the ZIMs live.
+        Built 2026-11-04: `modules/scripts/wiki-ask.py` behind `task ops:wiki:ask`,
+        on frieren where the ZIMs live. Eight-claim self-audit the same day: 4
+        supported with the right section, 1 right article/wrong section, 3 silent
+        (two of those are lexical misses, not coverage).
 
         Measured the same day, four archives: `wikisearch "btrfs scrub repair EIO"`
         -> one hit, F2FS; `wiki-ask` -> Btrfs, "Checking and recovery", ~250 tokens,
@@ -529,11 +529,16 @@
         90 MB of weights to rerank eight candidates — buying paraphrase recall that
         better relaxation may supply for free.
 
-        Exit: a week of verdicts in which the misses are REAL misses (the archives
-        have no such thing) rather than paraphrase misses — the second kind is a
-        relaxation bug, not an embedding argument. If paraphrase dominates, the fix
-        is synonyms in `subqueries`, and this note closes as REJECTED with the count.
-        Until then `qmd embed` stays optional and nothing on the ZIM path embeds.
+        The job is not retrieval, it is BELIEF REPAIR: an agent checks a claim it is
+        confident about, and the shelf either supports it or says nothing. Silence
+        is not disagreement — a frozen 2026-06 archive cannot falsify a 2026-11
+        change, so this rung may only repair stable facts (formats, defaults,
+        attribution, history). Teaching it to "contradict" would swap one bias for
+        another.
+
+        KILL CRITERION: no claim-shaped call in the verdict log after two weeks →
+        delete `modules/scripts/wiki-ask.*` and close this REJECTED with the count.
+        A tool nobody calls is not a decision to keep; `qmd embed` stays optional.
       '';
     };
     closure-budget-coverage = {

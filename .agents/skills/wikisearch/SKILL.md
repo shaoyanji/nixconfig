@@ -68,6 +68,11 @@ tokens (default 1200), `--archive <substring>` narrows the fan-out.
 Context cost, measured: an `answer` is ~250–650 tokens, an `abstain` is ~110
 (three titles, no provenance, no text) — silence is the cheap outcome by design.
 
+**It is a tool, not a rung.** Structural facts are supposed to calcify into
+`.#knowledgeGraph` — compiled, counted, no tokens. A pass that can only produce a
+prose passage never graduates to a routing rule; it stays a bounded tool with a
+kill date, and the graph remains the thing that survives.
+
 **Its ceiling, measured.** Every `## Claim` in the vault run verbatim (141
 claims, 2026-11-04): **1 supported, 22 expand, 118 silent** — 0.7%. The shelf is a
 specialist for concrete software entities (`btrfs scrub`, `niri` config, WireGuard

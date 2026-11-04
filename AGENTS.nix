@@ -527,9 +527,9 @@
         The job is not retrieval, it is BELIEF REPAIR: an agent checks a claim it is
         confident about, and the shelf either supports it or says nothing. Silence
         is not disagreement — a frozen 2026-06 archive cannot falsify a 2026-11
-        change, so this rung may only repair stable facts (formats, defaults,
-        attribution, history). Teaching it to "contradict" would swap one bias for
-        another.
+        change, so only stable facts (formats, defaults, attribution, history).
+        DIRECTION: structural facts calcify into `.#knowledgeGraph`; a pass that can
+        only produce prose stays a tool with a kill date, never a rung to consult.
 
         KILL CRITERION: no claim-shaped call in the verdict log after two weeks →
         delete `modules/scripts/wiki-ask.*` and close this REJECTED with the count.

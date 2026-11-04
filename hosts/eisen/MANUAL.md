@@ -210,7 +210,9 @@ no progress for 60 s during a request (reading the prompt (batched):
 
 The engine's own stall guard fires during *prefill*, the wrapper restarts it, and
 the session resumes — which is why the earlier tier runs looked like "froze at
-turn 0" with no CPU and no disk. The same stall hit a 16,384-token prompt at
+turn 0" with no CPU and no disk. Reported upstream as
+[Niko1221/Strata#5229](https://github.com/Niko1221/Strata/issues/5229) (with a
+pointer from the closed #29, whose guard message our build still prints). The same stall hit a 16,384-token prompt at
 `--max-context 32768`, so it tracks prompt length (~9k–16k), not the KV budget and
 not the quantisation. `engine/BUILD.json` reads `0.1.46.2` and the binary is dated
 2026-10-21 — the same build that ran the suite clean that day, so this is

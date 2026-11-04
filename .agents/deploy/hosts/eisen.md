@@ -283,8 +283,10 @@ too)` — the PLE table lives inside the native shard, so there is no ~28 GB pie
   served pack at 16384 stalls the same way: all three 2026-11-04 agent runs lost
   the engine at turn 3 of 6, `no progress for 60 s during a request (reading the
   prompt (batched): layer 1 of the prompt chunk from token 9076)` — the engine's
-  own guard, issue #29 upstream. It fires during **prefill** at ~9k–16k prompt
-  tokens, at 32768 too, so it is one engine bug and not a property of the tier.
+  own guard, [upstream #5229](https://github.com/Niko1221/Strata/issues/5229), now
+  filed with the repro, the numbers and the build fingerprint. It fires during
+  **prefill** at ~9k–16k prompt tokens, at 32768 too, so it is one engine bug and
+  not a property of the tier.
   The served config is therefore back at `--max-context 32768`; do not "save KV"
   by lowering it while this is open.
 

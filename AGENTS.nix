@@ -500,7 +500,7 @@
       status = "OPEN";
       priority = "P2";
       date = "2026-11-04";
-      summary = "BM25 is instant and good enough until measured misses say otherwise — so the lexical gate shipped first (`ops:wiki:ask`, 0.62/0.38, verdict log) and an all-MiniLM rerank waits on that log rather than on a model download.";
+      summary = "BM25 is instant and good enough until measured misses say otherwise — so the lexical gate shipped (`ops:wiki:ask`, 0.62/0.38, verdict log) and the rerank was rejected on that basis: 740 MiB of closure to rerank eight candidates buys paraphrase recall, which relaxation may supply for free.";
       refs = {
         modules = ["modules/scripts/wiki-ask.py" "modules/services/kiwix.nix"];
         tasks = ["ops:wiki:ask" "dev:qmd:refresh" "checks:qmd:docs"];
@@ -526,16 +526,18 @@
         fix" becomes a query. Abstention is a real answer: below 0.38 the tool
         returns titles and no text.
 
-        Next rung, approved and NOT built: all-MiniLM-L6-v2 RERANK over the fused
-        pool. An embedding index over 19M articles is impossible (19M x 384 float32
-        ~ 29 GB); a rerank over 8 candidates is ~20 ms on the 2 vCPU. It waits
-        because the log has to say the lexical gate misses first — otherwise the
-        rerank is a model dependency bought with a guess.
+        NO RERANK (operator call, 2026-11-04): the tool is the lexical fan-out, not
+        a model in front of it. Two measurements stand behind that — an embedding
+        index over 19M articles is impossible (19M x 384 float32 ~ 29 GB), and a
+        local ONNX path is a 740 MiB closure plus 90 MB of weights to rerank eight
+        candidates. The cost that buys is paraphrase recall, which better query
+        relaxation may supply for nothing; the log says which it is.
 
-        Exit: a week of verdicts in which the lexical gate's misses are real misses
-        (the archives have no such thing), plus a MiniLM rerank that fixes a measured
-        share of them. Until then `qmd embed` stays optional and nothing on the ZIM
-        path embeds.
+        Exit: a week of verdicts in which the misses are REAL misses (the archives
+        have no such thing) rather than paraphrase misses — the second kind is a
+        relaxation bug, not an embedding argument. If paraphrase dominates, the fix
+        is synonyms in `subqueries`, and this note closes as REJECTED with the count.
+        Until then `qmd embed` stays optional and nothing on the ZIM path embeds.
       '';
     };
     closure-budget-coverage = {

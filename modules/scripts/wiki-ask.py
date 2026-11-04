@@ -360,6 +360,14 @@ def best_passages(rows, terms, idf, limit_chars, top=2, require=None, title=""):
             continue
         if require and require not in low and require not in head:
             continue
+        # Two shared terms is a match; one is a coincidence. `zfs scrub repair
+        # errors redundancy` quoted "Type I and type II errors" because the
+        # generic word `errors` was, by pool IDF, the rarest term in the
+        # candidate set. A passage that answers the question shares more than a
+        # single axis of it.
+        shared = [t for t in terms if t in low or t in head]
+        if len(shared) < min(2, len(terms)):
+            continue
         hit = sum(
             term_weight(t) * idf.get(t, 1.0) * (1.0 + (low.count(t) > 1))
             for t in terms

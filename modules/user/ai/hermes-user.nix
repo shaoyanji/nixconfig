@@ -206,30 +206,11 @@
     ];
 
     # --- Messaging gateway (Telegram, Discord, …) ------------------------
-    # Declared here instead of leaving it to `hermes gateway install`, because
-    # that generator cannot produce a working unit under a Nix install: it bakes
-    # sys.executable — the bare nix interpreter — into ExecStart, and that
-    # interpreter has neither hermes_cli nor the gateway extras on sys.path, so
-    # the unit crash-loops with ModuleNotFoundError (seen 2026-10-07: restart
-    # counter 466). The llm-agents wrapper puts the entire dependency set on
-    # sys.path itself and exports HERMES_PYTHON for child processes, so
-    # ExecStart is just the wrapper.
-    #
-    # Do NOT run `hermes gateway install` on this host: it rewrites
-    # ~/.config/systemd/user/hermes-gateway.service and clobbers this unit.
-    #
-    # The generated unit's ExecStop/ExecStopPost hooks
-    # (`python -m gateway.systemd_stop_mark` / `gateway.cgroup_cleanup`) are
-    # deliberately omitted: they are `-`-prefixed (non-fatal) and only maintain
-    # a cosmetic stop marker in gateway_state.json, while llm-agents does not
-    # export the dependency-bearing interpreter they need. KillMode=mixed still
-    # tears the cgroup down on stop, and the gateway clears a stale marker on
-    # next start.
-    # If `hermes gateway install` ran anyway, it writes a raw (non-store)
-    # unit over the declarative one and HM's checkLinkTargets then aborts
-    # the whole switch with "would be clobbered" (seen 2026-10-08 on the
-    # service file and its default.target.wants enable-symlink). Clear any
-    # non-store copy before the link check so the declarative unit wins.
+    # Declared here, never via `hermes gateway install`: the generator bakes the
+    # bare nix interpreter into ExecStart (no hermes_cli on sys.path, so it
+    # crash-loops) and writes a non-store unit that aborts the switch at
+    # `checkLinkTargets`. Its stop hooks are -prefixed cosmetics; KillMode=mixed
+    # already tears the cgroup down. Checklist: `.agents/deploy/hosts/frieren.md`.
     home.activation.hermesGatewayUnitCleanup = lib.hm.dag.entryBefore ["checkLinkTargets"] ''
       for f in \
         "$HOME/.config/systemd/user/hermes-gateway.service" \

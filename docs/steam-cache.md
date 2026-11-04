@@ -171,6 +171,9 @@ client still gets its bytes.
   get the public answer and silently skip the cache. The LAN hands out the VIP
   (`192.168.3.50`); the failover peer must carry the same `address=` lines or it
   answers with the public CDN (slower, still correct).
+- **Never set `Host` explicitly on a proxied location.** `recommendedProxySettings`
+  already sets one, and a second makes nginx reject the upstream request — a
+  `400` that comes from the cache itself (measured).
 
 ## Nightly prefill (unit always present; armed on frieren)
 

@@ -20,10 +20,6 @@
   policy = config.fleet.inventory.cache.${hostName} or null;
   harmoniaUrl = "http://192.168.3.25:5000";
 
-  # Active substituters ordered by network tier:
-  # - LAN hosts: Harmonia LAN first (gigabit local transfer), followed by Cachix and upstreams.
-  # - Cloud/Remote hosts (Delphi): Cachix and fast WAN upstreams first. Harmonia LAN is
-  #   excluded (or deprioritized to bottom) to prevent WAN timeouts and asymmetric uplink saturation.
   # `policy.substituters` is already ordered for this host: harmonia first on the
   # LAN, absent for a cloud host. The two options stay as deliberate overrides —
   # preferCloud forces the WAN order, includeHarmonia re-adds the LAN cache — but

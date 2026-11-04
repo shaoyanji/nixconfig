@@ -37,18 +37,12 @@
   # the user lands back on the kernel TTY.
   services.seatd.enable = true;
 
-  # Auto-login directly into the gamescope Steam session as devji. greetd
-  # runs default_session as the target user without showing a login prompt
-  # when user+command are both set, eliminating the tuigreet step
-  # entirely. After the Steam Big Picture session exits, greetd
-  # re-launches the same session, giving permanent auto-login behavior.
-  #
-  # The command is `steam-gamescope`, the wrapper `programs.steam.
-  # gamescopeSession.enable` (set in ./steam.nix) puts on PATH. The older
-  # upstream `gamescope-session` script no longer exists in nixpkgs, and
-  # naming it here is a hard failure rather than a fallback: greetd's
-  # session exits immediately, the unit burns its start limit and the kiosk
-  # comes back from a reboot on a bare TTY with no Steam at all.
+  # Auto-login: with user+command both set, greetd runs the session as devji
+  # with no login prompt and relaunches it when Steam exits. The command must
+  # be `steam-gamescope`, the wrapper `programs.steam.gamescopeSession.enable`
+  # puts on PATH — nixpkgs no longer ships `gamescope-session`, and naming it
+  # is a hard failure: the unit burns its start limit and the kiosk returns to
+  # a bare TTY with no Steam.
   services.greetd = {
     enable = true;
     settings.default_session = {

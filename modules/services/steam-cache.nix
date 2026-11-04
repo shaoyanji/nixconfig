@@ -49,28 +49,8 @@
     nscd = pkgs.runCommandLocal "steam-prefill-empty-nscd" {} "mkdir -p $out";
   };
 
-  # Per-run measurement. The prefill's own progress line counts chunks across the
-  # whole selection and serves the new chunks first, so it sat at 18 % for 46
-  # minutes while doing every byte of real work and finished the rest in 8:29 off
-  # the cache (2026-10-29). Two numbers are the honest instrument instead:
-  #
-  #   growth — used bytes on the flash tier, before vs after the run, read with
-  #            statvfs in 6 ms. Not a `du` of the cache tree: that costs 36 s
-  #            cold over 56 GB on a USB BOT device, twice a night, to record that
-  #            nothing changed. The cache is ~96 % of this filesystem, so the
-  #            other ~3 % (transcode/thumb scratch) can appear in the delta —
-  #            which is why the WAN number is reported beside it, as a second,
-  #            independent opinion;
-  #   wan    — the cache backend's IPIngressBytes delta, i.e. Valve's reply
-  #            bodies. The front is local, so LAN hits land on the backend's
-  #            egress, not its ingress: this cannot mistake a cache hit for
-  #            bandwidth spent. (The prefill unit's own counter cannot do this —
-  #            it reported 34 GB incoming on a run that stored nothing, all of
-  #            it from this host.)
-  #
-  # Both live in a root unit because the cache tree is `0700 nginx` and the
-  # prefill runs as its own user. The baseline is a separate unit rather than an
-  # ExecStartPre for the same reason: systemd has no per-command user.
+  # Growth and WAN per run, and why the progress line and `du` are not them:
+  # `docs/steam-cache.md` ("Every run records its own numbers").
   recorder = pkgs.writeShellApplication {
     name = "steam-prefill-record";
     runtimeInputs = with pkgs; [coreutils jq systemd];
@@ -596,18 +576,9 @@ in {
         Type = "oneshot";
         User = cfg.prefill.user;
         WorkingDirectory = cfg.prefill.stateDir;
-        # The DNS pin, as mounts rather than a script: systemd puts the unit in
-        # its own mount namespace, so a prefill that crashes or is killed cannot
-        # leave the host resolving this name `address=`-style. Four files, each
-        # one a trap verified by removing it and watching the fill fail:
-        #   nsswitch — the host lists `resolve` before `files dns`, so a hosts
-        #              entry is otherwise never read;
-        #   host.conf — `multi off`, or glibc merges the public AAAA/A that DNS
-        #              returns with the pinned IPv4 and the client connects to
-        #              the public address (a 33 GiB download that stores nothing);
-        #   hosts     — the pin itself;
-        #   nscd      — an empty dir over /var/run/nscd, because nsncd answers
-        #              from its own cache and /etc/hosts would never be consulted.
+        # The pin as mounts, so a killed prefill cannot leave the host resolving
+        # `address=`-style. The four files and the trap each one closes:
+        # `docs/steam-cache.md` ("Prefill without touching LAN DNS").
         PrivateMounts = true;
         BindReadOnlyPaths = lib.optionals cfg.prefill.pin [
           "${pinFiles.nsswitch}:/etc/nsswitch.conf"
@@ -702,14 +673,9 @@ in {
       extraConfig = ''
         error_page 502 504 = @valve;
       '';
-      # No explicit Host header in either location: recommendedProxySettings
-      # already sets it, and a second one makes nginx reject the upstream
-      # request with 400 (measured: `400 Bad Request` from the cache itself).
-      # SteamPrefill (and every lancache client) proves a cache is here by this
-      # path, so it must answer on the front itself rather than through the
-      # backend — the backend would forward it to Valve, which 403s (measured).
-      # `X-LanCache-Processed-By` is the acceptance criterion, not the status:
-      # a 200 without it is rejected (measured, SteamPrefill 3.6.1).
+      # No explicit Host header (a second is a 400 from the cache), and the
+      # heartbeat must answer on the front: the backend forwards it to Valve,
+      # which 403s. `X-LanCache-Processed-By` is the criterion, not the status.
       locations."= /lancache-heartbeat" = {
         return = "200 \"OK\"";
         extraConfig = ''

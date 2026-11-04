@@ -6,23 +6,9 @@ _: {
     capSysAdmin = true;
   };
 
-  # Pin note (nixpkgs 6cdc7fc76e8bf7fde9fa43a849fcaaa70e230dee):
-  # nixpkgs services.sunshine in this pin DOES NOT auto-declare the
-  # sunshine system user or group. Without the block below, importing
-  # this profile produces two failed assertions on a host:
-  #   - "Exactly one of users.users.sunshine.isSystemUser and
-  #      users.users.sunshine.isNormalUser must be set."
-  #   - "users.users.sunshine.group is unset. This used to default to
-  #      nogroup, but this is unsafe."
-  # Both surface as a toplevel build error (kellerbench system rebuild
-  # fails) and as per-host evaluation check failures on multihost eval
-  # (hostChecks.<arch>.<host>; this is what deckstation hit before the
-  # defensive group add).
-  #
-  # We declare the user as a daemon (long-lived background service, no
-  # login, no shell) which is the right shape for Sunshine. UID/GID
-  # auto-assigned by NixOS at activation (no fixed numbers needed;
-  # hard-coded ones would clash across hosts).
+  # This pin's services.sunshine declares no user or group, so the profile
+  # fails two assertions without the block below. A daemon user, no fixed
+  # UID/GID: a hard-coded id is what clashes across hosts.
   users.users.sunshine = {
     isSystemUser = true;
     group = "sunshine";

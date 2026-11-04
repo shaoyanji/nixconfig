@@ -20,14 +20,6 @@ in {
               _launch = true;
               name = "gemma4";
             };
-            # "deepseek-v4-flash:cloud" = {
-            #   _launch = true;
-            #   name = "deepseek-v4-flash:cloud";
-            #   limit = {
-            #     context = 1000000;
-            #     output = 327680;
-            #   };
-            # };
             "minimax-m3:cloud" = {
               _launch = true;
               name = "minimax-m3:cloud";
@@ -39,7 +31,6 @@ in {
           };
         };
       };
-      # theme = "tokyonight";
       formatter."alejandra" = {
         command = ["alejandra"];
         extensions = [".nix"];

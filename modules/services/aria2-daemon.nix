@@ -11,25 +11,13 @@
   ariang = (import ../../lib/fetches-extra.nix {inherit pkgs;}).fetch "ariang";
 
   # Bootstrap config rendered into the served site at runtime: pre-seeds the
-  # AriaNg RPC connection (host/port from the browser's location, secret
-  # base64-encoded as AriaNg's getCurrentRpcSecret expects). The placeholder
-  # is replaced by ariang-site.service from the sops-rendered secret file.
-  # Storage facts read from the bundled minified source: AriaNg persists its
-  # settings via angular-local-storage (setPrefix("AriaNg")) under the key
-  # "Options", i.e. localStorage "AriaNg.Options", with the RPC fields held
-  # DIRECTLY on that object (rpcAlias/rpcHost/rpcPort/secret base64) plus an
-  # extendRpcServers array — there is no "AriaNgSettings"/rpcList key.
-  #
-  # `language` is not decoration. AriaNg only merges its defaults into a stored
-  # object lazily, per key, at read time (ariaNgSettingService: k() backfills
-  # o[key]); the one read that runs BEFORE that path is the language guard in
-  # b(): `t && !languages[t.language] && (t.language = normalize(t.language))`.
-  # A seeded object without `language` therefore reaches normalize(undefined)
-  # and throws `Cannot read properties of undefined (reading 'toLowerCase')`
-  # inside getCurrentRpcUrl — the whole app dies before the first RPC call, so
-  # a fresh browser shows a blank pane and "not connecting" while an older tab
-  # (whose stored object AriaNg completed itself) keeps working. 'en' is
-  # AriaNg's own default, so this matches a first-run install.
+  # RPC connection, base64 secret as AriaNg's getCurrentRpcSecret expects. The
+  # placeholder is replaced by ariang-site.service from the sops secret.
+  # AriaNg stores this object at localStorage `AriaNg.Options` (fields directly
+  # on it, no rpcList key), and `language` is load-bearing: its language guard
+  # runs before the per-key default backfill, so an object without it throws in
+  # getCurrentRpcUrl and the app dies before the first RPC call — a blank pane
+  # on a fresh browser while an old tab keeps working.
   ariangConfigTemplate = pkgs.writeText "ariang-config.js" ''
     // Managed: rendered by ariang-site.service — edits are overwritten.
     // Pre-seeds the AriaNg RPC connection to this vhost's /jsonrpc proxy.

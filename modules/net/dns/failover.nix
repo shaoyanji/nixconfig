@@ -229,17 +229,12 @@ in {
           };
         };
         database.maxDBdays = 31;
-        # FTL 6 is also an NTP client and server, and 6.7.1 has no single switch:
-        # the keys are `ntp.ipv4.active`, `ntp.ipv6.active` and `ntp.sync.active`
-        # (`pihole-FTL --config ntp` — an `ntp.active` is silently ignored, which
-        # is how the first attempt at this changed nothing). Measured 2026-10-28 it
-        # held `udp 0.0.0.0:123` + `udp [::]:123` and three of its thirteen
-        # threads (ntp-server4, ntp-server6, ntp-client) for them. No firewall rule
-        # in the fleet opens 123 on any interface, so both servers answer nobody;
-        # and the sync client only duplicates systemd-timesyncd, which every NixOS
-        # host here runs by default (timedatectl: "System clock synchronized: yes").
-        # A host that turns its own NTP client off must turn `ntp.sync.active` back
-        # on — a resolver is a poor clock, but an unsynchronised one is worse.
+        # FTL 6 is an NTP client and server, and 6.7.1 has no single switch: the
+        # keys are `ntp.ipv4.active`, `ntp.ipv6.active`, `ntp.sync.active` (a bare
+        # `ntp.active` is silently ignored). Nothing in the fleet opens 123, so
+        # the servers answer nobody, and the client only duplicates
+        # systemd-timesyncd. A host that drops timesyncd must re-enable
+        # `ntp.sync.active`: an unsynchronised resolver is the worse clock.
         ntp = {
           ipv4.active = false;
           ipv6.active = false;

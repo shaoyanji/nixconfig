@@ -25,48 +25,10 @@ in {
     # over Ryoku's.
     ../../modules/profiles/ryoku-desktop.nix
     ../../modules/profiles/laptop.nix
-    # microVM DISABLED (2026-08): testvm no longer runs on poseidon.
-    # Re-enable by uncommenting the microvm host module + microvm-host.nix
-    # profile import below and the microvm.vms block further down.
-    # inputs.microvm.nixosModules.host
-    # (import ../../modules/profiles/microvm-host.nix {
-    #   inherit pkgs;
-    #   natExternalInterface = "wlp4s0";
-    # })
   ];
 
   ssh.ca.enableClient = true;
-  # --- microVM testvm DISABLED (2026-08): no longer runs on poseidon. ---
-  # Commented out for easy re-enable. The microbr bridge/NAT wiring is also
-  # commented out above (microvm.nixosModules.host + microvm-host.nix import).
-  # microvm.vms = {
-  #   testvm = {
-  #     config = {
-  #       imports = [
-  #         inputs.microvm.nixosModules.microvm
-  #         (import ../microvms/testvm.nix {
-  #           workspaceSource = "${user.home}/workspace";
-  #           agentsSource = "${user.home}/.agents";
-  #           configureNetworkd = true;
-  #           useDevNixDefaults = true;
-  #           authorizedKeys = config.ssh.authorizedKeys.keys;
-  #         })
-  #       ];
-  #       microvm.hypervisor = "cloud-hypervisor";
-  #       microvm.vsock.cid = 10;
-  #
-  #       environment.systemPackages = with pkgs; [
-  #         curl
-  #         git
-  #         jq
-  #         yq-go
-  #         go
-  #         skills
-  #         worktrunk
-  #       ];
-  #     };
-  #   };
-  # };
+
   boot = {
     kernelPackages = lib.mkForce pkgs.linuxPackages;
     kernelModules = [];
@@ -126,21 +88,12 @@ in {
     usbEthernetGateway = "192.168.3.1";
   };
 
-  # --- Battery longevity: pack at 48 % of design capacity (measured 2026-10-23) ---
-  # Dell G15 5515, `BAT1`: charge_full 2.36 Ah against 4.91 Ah design, sitting
-  # Full at 100 % SoC on AC -- the state that ages a cell fastest. Sustained
-  # partial charge also guards against the swelling that comes with it.
-  #
-  # This model has NO software ceiling: BAT1 exposes no
-  # charge_control_end_threshold, `dell-wmi-sysman` refuses to load (No such
-  # device), and there is no /dev/smi for smbios-battery-ctl. The ceiling that
-  # actually holds is the BIOS one, which the EC keeps across OSes and updates:
-  # F2 -> Power Management -> Battery Charge Configuration -> Custom (start 50,
-  # stop 80) or Primarily AC Use. Configured there on 2026-10-23 as Custom with a
-  # 50/80 window. This profile is the probe, not the enforcement -- it writes the
-  # ceiling on hardware that exposes one and reports once per boot when it does
-  # not (`journalctl -u battery-charge-limit`). The EC does not discharge down to
-  # a newly set ceiling, so the setting binds on the first charge from below it.
+  # Pack is at 48 % of design capacity after sitting Full on AC.
+  # No software ceiling on this model: BAT1 exposes no
+  # charge_control_end_threshold, dell-wmi-sysman refuses to load. The ceiling
+  # that holds is the BIOS one (F2 -> Power Management -> Custom 50/80, set
+  # 2026-10-23); this profile is the probe and reports once per boot when the
+  # hardware offers nothing (`journalctl -u battery-charge-limit`).
   profiles.batteryChargeLimit = {
     enable = true;
     endThreshold = 80;
@@ -172,14 +125,7 @@ in {
     };
   };
 
-  # users.groups.libvirtd.members = [ "devji" ];
-  # virtualisation.libvirtd.enable = true;
-  # virtualisation.spiceUSBRedirection.enable = true;
-  # users.users.devji.extraGroups = [ "adbusers" "kvm" "libvirtd" ];
   services.udev.packages = [];
-
-  # services.avahi.publish.enable = true;
-  # services.avahi.publish.userServices = true;
 
   # --- Desktop: Ryoku (high-end tier) ---
   # No SDDM setting here: with no other greeter enabled, Ryoku turns SDDM on

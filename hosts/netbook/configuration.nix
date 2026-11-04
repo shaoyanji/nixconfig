@@ -55,19 +55,11 @@ in {
   services.fstrim.enable = true;
   services.tailscale.enable = true;
 
-  # Keep the NAS probe out of the boot path. `nas-path-governor` is
-  # WantedBy nix-gc.service so that GC's root guard runs with the mount up, and
-  # nix-gc runs at boot via `nix.gc.persistent` — which meant every boot waited
-  # for a NAS probe: 0.3 s on-LAN, 12.1 s measured when the link was still
-  # coming up, and worse off-LAN on a travel machine. This host has **no gcroots
-  # under /Volumes/data** (checked 2026-10-22: `nix-store --gc --print-roots |
-  # grep -c Volumes/data` = 0), so the guard has nothing to protect here. The
-  # timer (`OnBootSec=15s`, every 5 min) and the NetworkManager dispatcher still
-  # drive the governor, and /Volumes/data still mounts on first access.
-  # The pull is declared on nix-gc's side (`Wants=` + `After=`), so clearing the
-  # governor's own `wantedBy` only empties its [Install] section and changes
-  # nothing — verified by building and reading the unit. This is the line that
-  # actually takes it out of the boot transaction.
+  # Out of the boot transaction: this host has no gcroots under /Volumes/data
+  # (`nix-store --gc --print-roots`), so GC's root guard has nothing to protect
+  # and every boot was paying a NAS probe. Clearing `wantedBy` is what empties
+  # the unit's [Install] section; nix-gc's own `Wants=`/`After=` still pulls it
+  # once the mount is up. The timer and the NM dispatcher are untouched.
   systemd.services.nix-gc.wants = lib.mkForce [];
   systemd.services.nas-path-governor.wantedBy = lib.mkForce [];
 
@@ -105,7 +97,6 @@ in {
   # `/nix/var/nix/profiles/per-user/root/channels` to NIX_PATH, which this host
   # no longer populates, so every `<nixpkgs>` lookup warned it did not exist.
   nix.channel.enable = false;
-  # nix.optimise.interval = "weekly";
   nix.gc = {
     automatic = true;
     persistent = true;
@@ -174,39 +165,11 @@ in {
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
-  # users.users.root.initialPassword = "nixos";
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true; # use xkb.options in tty.
-  # };
-
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
-
-  # Configure keymap in X11
-  # services.xserver.xkb.layout = "us";
-  # services.xserver.xkb.options = "eurosign:e,caps:escape";
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound.
-  # services.pulseaudio.enable = true;
-  # OR
   services.pipewire = {
     enable = true;
     pulse.enable = true;
   };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   # Firmware TPM (Intel PTT, ACPI MSFT0101) — the netbook's sops identity. The
@@ -278,23 +241,13 @@ in {
     wget
     eget
     sqlite
-    # The AppImage integrator is gone (abffdde9, 2026-10-28) and this reference
-    # outlived it, leaving the whole list unevaluable; the launcher is the
-    # profile's appimage-menu now, a directory listing rather than a scan.
-    # Dev tooling is deliberately not here (2026-10-27): uv, typst, nixd and
-    # nixfmt cost 326 MiB of exclusive closure between them on a 1.8 GiB Celeron,
-    # and nano is the editor this host actually keeps.
-    # The compositor, terminal, launcher, wallpaper, notifications, idle and lock
-    # come from profiles.dwlDesktop — including the nerd font, since dwl and foot
-    # name it rather than ship it.
+    # Only what dwlDesktop does not own — it carries the compositor, terminal,
+    # launcher, wallpaper, notifications, idle, lock and the nerd font. Keep
+    # this list small: 326 MiB of dev tooling was measured out of it on a 1.8 GiB
+    # Celeron, and pcmanfm is here at 4.7 MiB instead of nautilus.
     pavucontrol
     polkit_gnome
     bibata-cursors
-    # nautilus is gone (2026-10-27): it was only 14 MiB exclusive — its GTK and
-    # portal deps are here for other clients — but so is pcmanfm, which keeps a
-    # menu-launchable file manager for 4.7 MiB of new paths (measured against
-    # this host's 1318-path closure). nnn is 0.4 MiB if a terminal picker is
-    # enough; yazi is 98 MiB of Rust runtime and is the one not to reach for.
     pcmanfm
     # crush
     btop
@@ -369,16 +322,6 @@ in {
   # Keep ~/.local/bin on PATH for the session and login shells.
   environment.localBinInPath = true;
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
@@ -387,33 +330,6 @@ in {
     };
   };
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
-  # This option defines the first version of NixOS you have installed on this particular machine,
-  # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
-  #
-  # Most users should NEVER change this value after the initial install, for any reason,
-  # even if you've upgraded your system to a new NixOS release.
-  #
-  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
-  # so changing it will NOT upgrade your system - see https://nixos.org/manual/nixos/stable/#sec-upgrading for how
-  # to actually do that.
-  #
-  # This value being lower than the current NixOS release does NOT mean your system is
-  # out of date, out of support, or vulnerable.
-  #
-  # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
-  # and migrated your data accordingly.
-  #
-  # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
-  system.stateVersion = "25.11"; # Did you read the comment?
+  # Never bump: it gates state migrations, not the package set.
+  system.stateVersion = "25.11";
 }

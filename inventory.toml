@@ -279,15 +279,15 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node"
 category = "workstation"
-desktop_environment = "Ryoku desktop (niri compositor) / Gamescope Session — high-end tier"
+desktop_environment = "Ryoku desktop (niri compositor) / Gamescope Session — high-end tier; the `server` specialisation is TTY-only (no greeter, compositor, Steam or Sunshine)"
 users = ["devji"]
-notes = ["Converted from a cage-based Steam kiosk into a full desktop (poseidon-style); since 2026-11-02 the Ryoku tier: globalModulesRyoku brings in the Ryoku shell on niri plus the sops/nix-index HM modules.", "Steam runs under the upstream gamescope-session, which is safe on the RX 5700's modern Vulkan ICD (unlike kellerbench's Kepler card).", "History: the previous cage-kiosk specialisation and greetd dual-session experiments hung at graphical.target, so the DMS greeter path (as on poseidon) is used instead of greetd auto-login."]
+notes = ["Converted from a cage-based Steam kiosk into a full desktop (poseidon-style); since 2026-11-02 the Ryoku tier: globalModulesRyoku brings in the Ryoku shell on niri plus the sops/nix-index HM modules.", "Steam runs under the upstream gamescope-session, which is safe on the RX 5700's modern Vulkan ICD (unlike kellerbench's Kepler card).", "History: the previous cage-kiosk specialisation and greetd dual-session experiments hung at graphical.target, so the DMS greeter path (as on poseidon) is used instead of greetd auto-login.", "Boot personas since 2026-11-03: the default generation is the gaming desktop; hosts/eisen/server.nix is `specialisation.server`, a TTY-only inference persona (no greeter, compositor, gamescope, Steam, Sunshine or gaming guard, and no forced HDMI-A-1 mode) that frees the desktop's idle VRAM and RAM for expert slots and page cache. Picked from the systemd-boot menu or `nixos-rebuild switch --specialisation server`; procedure in .agents/deploy/hosts/eisen.md."]
 
 [hosts.eisen.hardware]
 model = "Custom Multi-Core Gaming Rig"
 cpu = "Intel Xeon E5-2673 v3 (Haswell-EP, 12c/24t, no iGPU)"
 gpu = "AMD Radeon RX 5700 (Navi 10, 8 GB VRAM, VCN 2.0)"
-ram = "64 GiB DDR4"
+ram = "64 GiB DDR3-1600 (4 x 16 GiB Hynix unbuffered, dual channel; DDR3 X99 board)"
 storage_type = "NVMe SSD + SATA SSD + SATA HDD"
 storage_layout = "119GB NVMe SSD (btrfs @root, @nix, @persist, @log, @snapshots) + 931GB SSD /mnt/steam (btrfs+zstd) + 14.6TB HDD /mnt/storage (btrfs+zstd, LLM weights)"
 

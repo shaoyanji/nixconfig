@@ -10,7 +10,7 @@ This manual documents the architecture, operations, tuning, and API consumption 
 | :--- | :--- | :--- |
 | **GPU** | **AMD Radeon RX 5700** (Navi 10 / `gfx1010`, 8 GB GDDR6, PCIe 4.0 x16) | HIP backend: Attention projections, layer norms, router, top-k gates, and ~600+ expert slices cached directly in VRAM. |
 | **CPU** | **Intel Xeon E5-2673 v3** (12 cores / 24 threads @ 2.40 GHz, AVX2, 30 MB L3) | Multi-threaded CPU expert pool for remaining experts (`--pool-workers 11`). |
-| **System RAM** | **64 GiB DDR4 Quad-Channel** | Holds resident MoE expert arena in page-locked host memory (~23–32 GiB for `IQ1_M`). |
+| **System RAM** | **64 GiB DDR3-1600** (4 × 16 GiB unbuffered, dual-channel) | Holds resident MoE expert arena in page-locked host memory (~23–32 GiB for `IQ1_M`). ~25.6 GB/s peak: this, not capacity, sets decode speed. |
 | **Storage** | **14.6 TB btrfs `/mnt/storage`** | Engine source/binaries at `/mnt/storage/strata`, model shards and packs at `/mnt/storage/strata-data`. |
 
 ### Zero-Pollution FHS Container Isolation
@@ -114,9 +114,9 @@ Strata's reference card reaches 40–50 tok/s on 16 GB by combining four optimiz
    - `--spec-min-p 0.5` ensures the engine accepts speculative drafts only when model confidence exceeds 50%.
 2. **Quantized Expert Placement**:
    - `IQ1_M` (Coder) retains 256 of 512 experts selected specifically for code, math, and instruction following.
-   - The hottest ~607 experts reside in RX 5700 GDDR6 VRAM; the rest reside in 4-channel DDR4 RAM.
+   - The hottest ~607 experts reside in RX 5700 GDDR6 VRAM; the rest reside in dual-channel DDR3-1600 RAM.
 3. **Adaptive Asynchronous Swaps (`--adapt-async 1`)**:
-   - Swaps expert slices between host DDR4 RAM and GPU VRAM asynchronously across verification windows without stalling generation.
+   - Swaps expert slices between host DDR3-1600 RAM and GPU VRAM asynchronously across verification windows without stalling generation.
 4. **Pool Worker Affinity (`--pool-workers 11 --host-core first`)**:
    - Binds the host event loop to Core 0 while worker threads utilize remaining physical Haswell-EP cores for expert dot-products.
 

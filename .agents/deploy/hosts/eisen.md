@@ -9,13 +9,20 @@ Every command lives here; that page explains the choices.
 
 | Path | URL | Mechanism |
 | :--- | :--- | :--- |
-| LAN | `http://eisen.lan/v1` | nginx `:80` → `127.0.0.1:8080` (`serverAliases = [ "eisen" "192.168.3.76" ]`) |
+| LAN | `http://eisen.lan/v1` | nginx `:80` → `127.0.0.1:8080` (`serverAliases = [ "eisen" "192.168.3.91" ]`) |
 | Tailnet | `https://eisen.<tailnet>.ts.net/v1` | `services.tailscale.serve`, `endpoints."tcp:443"` → `http://127.0.0.1:8080` |
 | Direct | `http://eisen:8080/v1` | llama-swap listening on `0.0.0.0` |
 | LAN (Laya) | `http://laya.lan/v1/systemone` | nginx `:80` → `127.0.0.1:8090` (vhost `laya.lan`) |
 | Tailnet (Laya) | `https://eisen.<tailnet>.ts.net:8443/v1/systemone` | `tailscale serve --bg --https=8443` → `http://127.0.0.1:8090` |
 
 nginx sets `proxy_buffering off` (never buffer SSE token streams) and `proxy_read_timeout/proxy_send_timeout 3600s` (model swaps are slow). `networking.firewall.allowedTCPPorts = [ 80 8080 ]`.
+
+> **The LAN address is DHCP and it drifts.** It moved from `192.168.3.76` to
+> `192.168.3.91` (found 2026-11-03), which left this page and the nginx `serverAliases` stale while
+> `inventory.toml` was already right. Read the live value from the compiled inventory before trusting
+> any address below — `nix eval --raw .#inventory.hosts.eisen.network.lan_ip` (0.15 s, no host eval) —
+> or address the host by name (`eisen.lan`, tailnet) and let DNS move with it. A DHCP reservation is
+> the durable fix; hand-editing an alias is not.
 
 **DNS**: `eisen.lan` is served by frieren's pi-hole via `hosts/frieren/dns.nix` (`misc.dnsmasq_lines`):
 
@@ -106,7 +113,7 @@ ssh eisen 'systemctl status llama-swap nginx eisen-llm-qwen eisen-llm-kolibri'
 
 # endpoint reachability (all three paths)
 curl -s http://eisen.lan/v1/models | jq -r '.data[].id'
-curl -s http://192.168.3.76/v1/models | jq -r '.data[].id'
+curl -s http://192.168.3.91/v1/models | jq -r '.data[].id'
 ssh eisen 'tailscale serve status'
 
 # a real completion (first call loads the weights — allow minutes)
@@ -214,6 +221,46 @@ download.
 - Threads: `--threads 8` onnxruntime intra-op, deliberately below the LLM's
   budget; requests are serialised by a lock, so bursts queue rather than
   oversubscribe the box.
+
+## Boot personas: gaming desktop (default) and `server`
+
+The default generation is the Ryoku/gamescope desktop. `hosts/eisen/server.nix` is
+`specialisation.server`: the same system with the whole display stack subtracted —
+no SDDM, no niri/Ryoku, no gamescope, no Steam, no Sunshine, no gaming guard, and
+no `video=HDMI-A-1:1920x1080@60` (that mode exists only so gamescope has a known
+output; the persona writes to the console and does not care whether anything is
+plugged in). It exists because the desktop holds ~450–500 MiB of VRAM at idle
+(`hosts/eisen/MANUAL.md` §3) and several GiB of RAM that an mmapped expert arena
+would rather have as page cache.
+
+Both toplevels are built and shipped inside one generation, so the persona needs no
+separate rebuild:
+
+```bash
+# at the power button: systemd-boot lists "NixOS - Configuration <n> - specialisation server"
+bootctl list | grep -i specialisation
+
+# live, without a reboot (switches /run/current-system to the specialisation)
+sudo /run/current-system/specialisation/server/bin/switch-to-configuration switch
+
+# back to the gaming desktop: the *profile* still points at the base toplevel
+sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
+```
+
+Three things that bite:
+
+- **A specialisation is boot-time state, not profile state.** Activating one leaves
+  `/nix/var/nix/profiles/system` on the base config, which is what makes the switch
+  back a one-liner. A reboot boots the *base* entry unless you pick the
+  specialisation again; make it sticky with `sudo bootctl set-default <entry-id>`
+  from `bootctl list`.
+- **`nixos-rebuild` as root cannot evaluate this flake** (2026-11-03: dirty git dir
+  owned by `devji`). Build as `devji`, stage as root:
+  `nixos-rebuild build --flake .#eisen` → `sudo nix-env -p /nix/var/nix/profiles/system --set ./result`
+  → `sudo ./result/bin/switch-to-configuration boot`. The boot entries (base *and*
+  specialisation) come from that last step.
+- **The persona cannot be flipped by editing the running generation.** Any change to
+  `server.nix` needs a build and a switch/boot to stage it, like any other.
 
 ## Operational Notes
 

@@ -222,7 +222,7 @@
     ctxSize ? 32768,
     experts ? true,
     # CPU threads for generation. Default 12 = eisen's Xeon E5-2673 v3
-    # physical cores; a MoE model that keeps its expert FFNs in DDR4 is
+    # physical cores; a MoE model that keeps its expert FFNs in DDR3-1600 is
     # memory-bandwidth bound, so hyperthreads help only up to the point the
     # two siblings contend for the same cache lines. Measured on Kolibri
     # 2026-10-19: tg128 9.17 t/s at 12 threads vs 8.42 at 24.
@@ -379,7 +379,9 @@ in {
     enable = true;
     recommendedProxySettings = true;
     virtualHosts."eisen.lan" = {
-      serverAliases = ["eisen" "192.168.3.76"];
+      # The bare IP is a convenience for clients that skip DNS, and it is DHCP:
+      # it moved .76 -> .91 on 2026-11-03, so the name is the durable one.
+      serverAliases = ["eisen" "192.168.3.91"];
       listen = [
         {
           addr = "0.0.0.0";

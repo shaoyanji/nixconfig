@@ -1,6 +1,6 @@
 # eisen — LLM Inference Architecture & Handoff
 
-Detailed architecture specification for running local MoE LLMs on Eisen's Xeon E5-2673 v3 (12c/24t) + 62 GiB DDR4 + AMD Radeon RX 5700 (8 GiB VRAM, **Vulkan/radv** — Navi 10 has no ROCm target).
+Detailed architecture specification for running local MoE LLMs on Eisen's Xeon E5-2673 v3 (12c/24t) + 62.7 GiB DDR3-1600 + AMD Radeon RX 5700 (8 GiB VRAM, **Vulkan/radv** — Navi 10 has no ROCm target).
 
 **Canonical Documentation**: [`.agents/deploy/hosts/eisen.md`](../../.agents/deploy/hosts/eisen.md)
 **Implementation**: [`hosts/eisen/llm-server.nix`](llm-server.nix) (generative LLM), [`hosts/eisen/decision-models.nix`](decision-models.nix) (Laya), [`modules/services/llm-decision-router.nix`](../../modules/services/llm-decision-router.nix) (router)

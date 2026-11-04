@@ -21,7 +21,14 @@
   };
 in {
   systemd.services.strata = {
-    unitConfig.X-Fleet-Role = "daemon";
+    unitConfig = {
+      X-Fleet-Role = "daemon";
+      # Card off the bus = nothing to serve. Without this the unit reloads the
+      # model every 11 s for as long as the GPU is absent (2026-11-03).
+      ConditionPathExists = "/dev/dri/renderD128";
+      StartLimitBurst = 3;
+      StartLimitIntervalSec = 300;
+    };
     description = "Strata MoE LLM Inference Engine (ROCm HIP gfx1010)";
     after = ["network-online.target"];
     wants = ["network-online.target"];

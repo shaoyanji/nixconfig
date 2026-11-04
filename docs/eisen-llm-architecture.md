@@ -6,7 +6,7 @@ This page is why the stack looks like this and what it measured; it is not a pro
 ---
 
 ## Scope
-High-core gaming desktop, Sunshine GameStream server, and high-RAM local AI inference host (`Intel Xeon E5-2673 v3`, `64 GiB DDR4`, `AMD Radeon RX 5700 8 GB VRAM`).
+High-core gaming desktop, Sunshine GameStream server, and high-RAM local AI inference host (`Intel Xeon E5-2673 v3`, `64 GiB DDR3-1600`, `AMD Radeon RX 5700 8 GB VRAM`).
 
 **Implementation lives in [`hosts/eisen/llm-server.nix`](../hosts/eisen/llm-server.nix) (generative LLM) and [`hosts/eisen/decision-models.nix`](../hosts/eisen/decision-models.nix) (Laya, the CPU-only Jev-compatible decision model).** This page is the rationale for both; every command lives in the runbook linked above.
 
@@ -17,10 +17,10 @@ High-core gaming desktop, Sunshine GameStream server, and high-RAM local AI infe
 | Component | Specification | AI Inference Role |
 | :--- | :--- | :--- |
 | **CPU** | Intel Xeon E5-2673 v3 (Haswell-EP, 12c/24t @ 2.40 GHz, 30MB L3) | AVX2 + FMA3 multi-threaded expert FFN math (`--threads 12`; Kolibri 12 gen / 24 prompt) |
-| **RAM** | **62 GiB DDR4 Quad-Channel** + 31 GiB swap | Holds the resident MoE expert pool; the binding constraint for model sizing |
+| **RAM** | **62.7 GiB DDR3-1600, dual-channel** (4 × 16 GiB unbuffered Hynix on a DDR3 X99 board) + 31 GiB swap | Holds the resident MoE expert pool; the binding constraint for model sizing. Peak ~25.6 GB/s, so MoE decode is bandwidth-bound long before capacity runs out |
 | **GPU** | **AMD Radeon RX 5700** (Navi 10, **8 GB GDDR6**, PCIe 4.0 x16, radv **Vulkan**) | Attention/norms/gate + q8_0 KV cache (`--n-gpu-layers 99`) |
 | **Storage** | 119 GB NVMe (`/`, `/nix`, `/persist`) + 931 GB btrfs `/mnt/steam` + **14.6 TB btrfs `/mnt/storage`** | Model repository at `/mnt/storage/models/*.gguf` |
-| **Network** | Gigabit LAN `192.168.3.76` (DHCP, `enp9s0`) + Tailscale `100.119.172.99` | Serves a fleet-wide OpenAI-compatible API |
+| **Network** | Gigabit LAN `192.168.3.91` (DHCP on `enp9s0`, so it moves — `.76` before 2026-11-03) + Tailscale `100.119.172.99` | Serves a fleet-wide OpenAI-compatible API |
 
 > **No ROCm.** Navi 10 (gfx1010) is not a ROCm-supported target; Vulkan/radv is the supported compute path on this card.
 
@@ -57,7 +57,7 @@ Shared per-model flags:
 ```
 
 - **`--n-gpu-layers 99`** moves every non-expert tensor (attention, norms, embeddings, router/gate) into the 8 GiB VRAM.
-- **`--override-tensor exps=CPU`** keeps the sparse expert FFN tensors in DDR4, so only the ~3B active parameters per token touch the GPU.
+- **`--override-tensor exps=CPU`** keeps the sparse expert FFN tensors in host RAM (DDR3-1600), so only the ~3B active parameters per token touch the GPU.
 - **`q8_0` KV cache + `--flash-attn on`** keep the attention working set inside 8 GiB.
 - **`--jinja`** is required for the models' tool-call / chat templates.
 - **Threads are split per phase** (`mkCmd { threads = …; threadsBatch = …; }`): generation runs on **12 physical cores** for every model, and Kolibri additionally runs prompt processing on **24** (`--threads-batch`). Measured 2026-10-19 on the patched build (45 GiB GGUF, CPU path because no DRM node): tg128 **9.17 t/s at 12 vs 8.42 at 24**, pp256 **47.41 vs 64.70**. Generation is bandwidth-bound (SMT hurts), prompt processing is compute-bound (SMT helps). Re-run `llama-bench -m /mnt/storage/models/Kolibri-1-Q4_K_M.gguf -t 12 -t 24 -p 256 -n 128 -r 3 -ngl 99 -ot exps=CPU` if the GPU returns.
@@ -204,7 +204,7 @@ First real completions after the initial switch, all served through the declarat
 | Prompt processing | 14–30 tok/s |
 | GPU VRAM in use while decoding | **5.75 GiB of 7.98 GiB** (2.65 GiB without the draft head) |
 
-Decoding is **CPU-bound, not VRAM-bound**: offload is engaged (5.75 GiB of 7.98 GiB resident with the draft head), so the per-token cost is the sparse expert FFN reads from DDR4, not the GPU. Levers: `--threads` (generation stays at 12 for every model; Kolibri's prompt path uses 24, measured 2026-10-19) and a smaller target quant.
+Decoding is **CPU-bound, not VRAM-bound**: offload is engaged (5.75 GiB of 7.98 GiB resident with the draft head), so the per-token cost is the sparse expert FFN reads from DDR3-1600 host RAM, not the GPU. Levers: `--threads` (generation stays at 12 for every model; Kolibri's prompt path uses 24, measured 2026-10-19) and a smaller target quant.
 
 > **There is no spare VRAM to shift experts onto the GPU.** An earlier note suggested relaxing `--override-tensor exps=CPU` using ~5 GiB of headroom; that measurement (2.65 GiB) predated the DFlash2 draft head, which now claims most of the free VRAM. Only ~2.2 GiB is unallocated while decoding.
 

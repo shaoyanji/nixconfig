@@ -300,8 +300,8 @@
               </tr>
               <tr>
                 <td>64 GB <strong>DDR3</strong></td>
-                <td>64 GiB <strong>DDR4</strong> (Xeon E5-2673 v3, 12c/24t, AVX2).</td>
-                <td>Memory-bandwidth-bound MoE decoding: DDR4 quad-channel is the reason 22.5 GB of experts can stream at 17 tok/s.</td>
+                <td>64 GiB <strong>DDR3-1600</strong> (Xeon E5-2673 v3, 12c/24t, AVX2) — 4 × 16 GiB unbuffered Hynix, dual channel, on a DDR3 X99 board. The repo said DDR4 quad-channel until 2026-11-03; <code>dmidecode -t 17</code> and EDAC (<code>Unbuffered-DDR3</code>) settle it.</td>
+                <td>Memory-bandwidth-bound MoE decoding: DDR3-1600 dual channel peaks near 25.6 GB/s, so streaming 22.5 GB of experts at 17 tok/s is already close to the wall — a bigger expert pool does not scale by capacity alone.</td>
               </tr>
               <tr>
                 <td>“Qwen3.8-Next running at ~17 tok/s”</td>

@@ -28,6 +28,52 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-03 — eisen gets a TTY-only `server` persona
+- **The gaming desktop is no longer the only way eisen boots.** `hosts/eisen/server.nix` is
+  `specialisation.server` (declared in `configuration.nix`): it subtracts SDDM, niri/Ryoku,
+  gamescope, Steam, gamemode, Sunshine, the gaming guard's `/proc` walk, and the
+  `video=HDMI-A-1:1920x1080@60` mode that exists only so gamescope has a known output. Both
+  toplevels ride in one generation, so systemd-boot lists the persona and nothing is rebuilt to
+  pick it — `bootctl list` on the next boot, or
+  `/run/current-system/specialisation/server/bin/switch-to-configuration switch` live.
+- **Why subtraction and not a new service:** the desktop stack holds ~450–500 MiB of VRAM at idle
+  (`hosts/eisen/MANUAL.md` §3) on an 8.18 GiB card, which is resident expert slots, plus the Steam
+  client's RAM that an mmapped 68 GB expert arena would rather see as page cache.
+- **The one trap:** `services.displayManager.defaultSession` is forced to `steam` in the base and
+  nixpkgs asserts it names a real session, so the persona must override it — `lib.mkForce null`
+  *conflicts* with the base's mkForce (an option cannot be both types), hence `lib.mkOverride 10`.
+- **Verified:** `checks:host HOST=eisen` green (module system + 2020 assertions, 262 s / 2.6 GiB on
+  frieren); the specialisation's own module system evaluates with zero failed assertions, and the
+  overrides are the ones the module claims (`sddm`/`xserver`/`steam`/`gamescope`/`ryoku`/`sunshine`
+  false, `defaultSession = null`, `defaultUnit = multi-user.target`, guard disabled, kernel params
+  without the HDMI mode); compiled inventory + `checks:inventory:compiled` green.
+- **Not verified — and it is what the boot menu needs:** the specialisation toplevel has not been
+  built. eisen was off the network for the whole turn (`arp FAILED`, `tailscale ping` timeout,
+  `ssh: No route to host`) and frieren must not instantiate a host closure. The first
+  `nixos-rebuild boot` on eisen builds it; `bootctl list` must then show the `specialisation
+  server` entry.
+
+### 2026-11-03 — eisen generation 30 landed; a third of it came over the LAN, and the box is DDR3
+- **The two-week drift deploy is live**: `nixos-system-eisen-26.11.20261016.f20cd90`, toplevel
+  `gxjdavda…`. `nixos-rebuild` (as `devji`) built the whole closure and then failed at the profile
+  symlink — root cannot eval this flake's git dir and `devji` cannot write the system profile, so the
+  fix is `nix-env -p /nix/var/nix/profiles/system --set <built>` + `switch-to-configuration switch` as
+  root. Same for the next one: build as `devji`, activate as root.
+- **Substitution sources, measured from the unit journal** (narSize sums): `192.168.3.25:5000` 761
+  paths / **9.89 GB**, numtide 1611 / 10.68 GB, cache.nixos.org 469 / 5.28 GB, `eu.nixbuild.net` 200 /
+  3.40 GB, cachix 143 / 0.21 GB — **29.5 GB total, 34 % of it LAN**. The remaining ~19.6 GB over a
+  measured ~2.6 MB/s WAN *is* the 1 h 59 m wall clock; the gigabit hop was never the constraint, but
+  "nothing came from the LAN" was wrong (a 10-path sample drawn from the log tail, i.e. exactly the
+  paths frieren lacks).
+- **eisen is DDR3-1600, not DDR4 quad-channel.** `dmidecode -t 17`: 4 × 16 GiB Hynix rank-2
+  **DDR3 1600 MT/s**; EDAC `dimm_mem_type` = `Unbuffered-DDR3`; 62.7 GiB usable on a Machinist X99
+  PR8-H DDR3 board. Corrected in `inventory.toml` (compiled truth), `docs/eisen-llm-architecture.md`,
+  `hosts/eisen/MANUAL.md`, `HANDOFF.md`, the `llm-server.nix` threads comment, the regenerated
+  `.agents/fleet-matrix.md`, and the open cell in `hosts/delphi/reports/utility-layer-recon.html`.
+- **`strata.service` now stops instead of looping**: `ConditionPathExists=/dev/dri/renderD128` with
+  `StartLimitBurst=3`/`StartLimitIntervalSec=300`, verified live (`ConditionResult=yes`, unit back and
+  serving `qwen3.8-flash-next-coder-iq1_m` on `:8085` after a ~130 s load).
+
 ### 2026-11-03 — the Appwrite project expires on purpose
 - **`dragon court` is abandoned, not restored.** Appwrite Cloud (org `bountystash`, created 2024-04-21)
   warned that the paused project is deleted on **2026-11-17**. Nothing in this tree, in any `shaoyanji`

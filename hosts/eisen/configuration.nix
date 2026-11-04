@@ -66,6 +66,16 @@ in {
     "HDMI-A-1"
   ];
 
+  # --- Boot persona: gaming desktop by default, inference server on demand ---
+  # This file is the boot default (Ryoku + gamescope). `specialisation.server`
+  # (server.nix) is the TTY-only persona: no greeter, no compositor, no Steam,
+  # nothing competing with the model for the card. It ships in the same generation, so
+  # the systemd-boot menu has it and `nixos-rebuild switch --specialisation
+  # server` reaches it without rebuilding.
+  specialisation.server.configuration = {
+    imports = [./server.nix];
+  };
+
   # --- Bluetooth (wireless controllers in Steam) ---
   hardware.bluetooth.enable = true;
 

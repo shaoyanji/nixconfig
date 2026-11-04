@@ -235,12 +235,12 @@ in {
 
   security.sudo.wheelNeedsPassword = false;
 
-  # programs.firefox.enable = true;
-
   profiles.voiceDictate.enable = true;
   profiles.dwlDesktop = {
     enable = true;
     user = "alice";
+    # A 1024x600 panel: the profile's default 11 is two rows of text short.
+    font = "JetBrainsMono NFM:size=9";
     # The wallpaper their niri rice used. swaybg renders it, and it is a file of
     # theirs rather than a package — absent, the session simply has no wallpaper.
     wallpaper = "/home/alice/Pictures/wallpapers/catppuccin-mocha.png";
@@ -278,7 +278,9 @@ in {
     wget
     eget
     sqlite
-    appimageIntegrate # also the unit's ExecStart; on PATH so she can --dry-run it
+    # The AppImage integrator is gone (abffdde9, 2026-10-28) and this reference
+    # outlived it, leaving the whole list unevaluable; the launcher is the
+    # profile's appimage-menu now, a directory listing rather than a scan.
     # Dev tooling is deliberately not here (2026-10-27): uv, typst, nixd and
     # nixfmt cost 326 MiB of exclusive closure between them on a 1.8 GiB Celeron,
     # and nano is the editor this host actually keeps.
@@ -297,10 +299,11 @@ in {
     # crush
     btop
     fastfetch
-    # firefox is gone (2026-10-27): ~590 MiB once the ML runtimes it pulls alone
-    # are counted. The NAS library still carries browsers, launched by hand.
-    # `xdg-desktop-portal` stays (17 MiB): it owns the file-attach and
-    # screen-share dialogs.
+    # firefox is back as a package, not as the module (2026-11-04): the ~590 MiB
+    # measured on 2026-10-27 was the NixOS module pulling ML runtimes, and
+    # `programs.firefox` stays off for that reason. `xdg-desktop-portal` stays
+    # (17 MiB): it owns the file-attach and screen-share dialogs.
+    firefox
     tmux
     lowfi
     grim

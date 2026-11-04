@@ -94,6 +94,16 @@ in {
       '';
     };
 
+    font = lib.mkOption {
+      type = lib.types.str;
+      default = "JetBrainsMono NFM:size=11";
+      description = ''
+        foot's `font` setting, in fontconfig form. The family is the one
+        `fonts.packages` installs; the size is a host's call, because the same
+        11 is cramped on a 1024x600 panel and stingy on a 1440p monitor.
+      '';
+    };
+
     autostart = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];
@@ -190,7 +200,7 @@ in {
       theme = "catppuccin-mocha";
       settings = {
         main = {
-          font = "JetBrainsMono NFM:size=11";
+          font = cfg.font;
           pad = "12x12 center";
           dpi-aware = "yes";
         };

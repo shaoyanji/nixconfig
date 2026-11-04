@@ -372,7 +372,9 @@
         better than the desktop — the gap is page cache, not the desktop's idle footprint.
         Ingestion holds at 157–158 against 167.
 
-        The agent suite is where the tiers actually part, and it is size-shaped: IQ3_XXS lost
+        The agent suite is where the loss shows up, and the 2026-11-04 baseline of the SERVED
+        pack closed the loophole: IQ1_M loses the engine there too when the context is small.
+        IQ3_XXS lost
         the engine at turn 0 (SIGABRT after 364 s, and a no-CPU-no-disk freeze killed by the
         stall guard at 360 s on `server`), IQ2_XS froze the same way, and IQ1_M ran the whole
         session on 2026-10-21 — turn 5 at 11818 of 14637 prompt tokens reused from cache. No
@@ -392,10 +394,23 @@
         7.3, which would "lose" to its own warm baseline. Only compare tiers on a server that
         has been answering for a while; the agent column is not affected the same way.
 
-        Result: IQ1_M stays served, tuned for the 16K context an agent session actually fills
-        (`--max-context 16384`, `--kv int8`, MTP on, 24 engine threads) — the larger packs stay
-        on the host, so a retest after an engine fix is one line plus a restart. Numbers:
-        hosts/eisen/MANUAL.md §7.
+        The stall is the engine's own guard, not the kernel and not the tier — it fires during
+        PREFILL ("reading the prompt (batched): layer 1 of the prompt chunk from token 9076",
+        issue #29), the wrapper restarts the engine, and the session resumes, which is exactly
+        what "froze at turn 0 with no CPU and no disk" looked like from outside. It tracks
+        prompt length (~9k-16k tokens), not the KV budget: at `--max-context 16384` all three
+        IQ1_M agent runs stalled at turn 3 of 6, and a 16,384-token prompt stalled at 32768.
+        `engine/BUILD.json` is 0.1.46.2 with a 2026-10-21 binary — the build that ran clean
+        that day — so it is intermittent, not a regression of the engine install.
+
+        16K baseline of the served pack (2026-11-04, `--runs 3`, warm): chat decode median
+        11.30 (7.60-19.90), 4K prompt 166.8 tok/s, agent cache hit 55.8%, per-turn first token
+        93.77 s (60.42-176.68), agent decode 8.40 tok/s. Agent cost is prefill, not decode.
+
+        Result: IQ1_M stays served at `--max-context 32768` (`--kv int8`, MTP on, 24 engine
+        threads) — 16384 was tried and reverted because it truncates the session at turn 3.
+        The larger packs stay on the host, so a retest after an engine fix is one line plus a
+        restart. Numbers: hosts/eisen/MANUAL.md §7.
 
         Side effect worth keeping: one of those aborts spooled a core so large that / went
         from 44 GB to 94 GB used for five minutes (the kernel streams the address space into

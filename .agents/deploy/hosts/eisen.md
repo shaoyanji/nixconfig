@@ -277,9 +277,16 @@ Both are blocked by an engine abort, not by memory, and neither short lever work
 - **`--no-ple` is refused.** `--native requires --ple-gguf (the PLE key is native
 too)` — the PLE table lives inside the native shard, so there is no ~28 GB piece to
   drop. Passing `--no-ple` next to `--native` exits 2 at load with that message.
-- **A smaller context does not help.** IQ2_XS at `--max-context 16384` loaded fine
-  (636 MiB VRAM free, 50.9 GB RSS) and aborted on the *4K prompt* stage after ~7k
-  tokens of chat traffic with `exit code -6` and no assertion in the engine log.
+- **A smaller context does not help — it makes it worse.** IQ2_XS at
+  `--max-context 16384` loaded fine (636 MiB VRAM free, 50.9 GB RSS) and aborted on
+  the *4K prompt* stage after ~7k tokens of chat traffic with `exit code -6`. The
+  served pack at 16384 stalls the same way: all three 2026-11-04 agent runs lost
+  the engine at turn 3 of 6, `no progress for 60 s during a request (reading the
+  prompt (batched): layer 1 of the prompt chunk from token 9076)` — the engine's
+  own guard, issue #29 upstream. It fires during **prefill** at ~9k–16k prompt
+  tokens, at 32768 too, so it is one engine bug and not a property of the tier.
+  The served config is therefore back at `--max-context 32768`; do not "save KV"
+  by lowering it while this is open.
 
 To measure a tier without touching the generation, run it as a transient unit
 beside the real one (stop `strata` first — both want `:8085`):

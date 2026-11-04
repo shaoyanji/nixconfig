@@ -71,9 +71,11 @@ in {
       # are what actually get read after a crash.
       LimitCORE = "0";
       # Context is host state, in the config the wrapper reads: IQ1_M runs
-      # `--max-context 16384` with `--kv int8`, MTP (`--mtp …/mtp/rt`) and 24
-      # engine threads — 16K is what the agent sessions actually fill, and the
-      # KV it saves is page cache the expert arena can use.
+      # `--max-context 32768` with `--kv int8`, MTP (`--mtp …/mtp/rt`) and 24
+      # engine threads. 16384 was tried on 2026-11-04 and reverted: at that
+      # context every agent run stalled in prefill at turn 3 of 6 (the engine's
+      # own no-progress guard, issue #29, ~9k prompt tokens), so the KV it saves
+      # costs the turns an agent session needs.
     };
   };
 

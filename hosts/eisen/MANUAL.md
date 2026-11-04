@@ -178,12 +178,15 @@ after a restart and scored 13.8 / 7.0 / 7.3, which would "lose" to its own
 2026-10-21 warm run. Page cache, not quantisation, sets that floor. Compare tiers
 only on a server that has been up and answering for a while.
 
-The agent column is not confounded in the same way, and there the split is
-clean and size-shaped: 58 GB finishes the suite (turn 5 at 11818 of 14637 prompt
-tokens reused), while 68 GB and 76 GB both lose the engine at turn 0 — never
-OOM-killed (`oom_kill 0`, no kernel line, no coredump payload), just frozen with
-no CPU and no disk until the stall guard kills it. That is why the served tier
-went back to IQ1_M.
+The agent column is not confounded in the same way, but it is **not** a size
+split, which is what the 2026-11-04 baseline settled: 58 GB finishes the suite
+(turn 5 at 11818 of 14637 prompt tokens reused) *and* loses the engine on long
+prefill when the context is small enough to make turns 4–5 impossible, while
+68 GB and 76 GB lose it earlier. Every loss has the same signature — `oom_kill
+0`, no kernel line, no coredump payload, frozen with no CPU and no disk until the
+engine's own stall guard kills it during *prefill*. That is one engine bug (#29),
+not a tier property, and it is why the served tier went back to IQ1_M: it is the
+pack that gets furthest before the stall and answers fastest between them.
 
 **Two hypotheses were tested and both are dead.** *Context*: IQ2 re-run at
 `--max-context 16384` loaded with **636 MiB of VRAM free** and 50.9 GB RSS, and
@@ -195,8 +198,43 @@ it under `--native` because the PLE key is itself native (`--native requires
 flag is the lever; an engine fix is. Both packs and configs stay on the host, so
 a retest is one line and a restart.
 
-**Served config (2026-11-04):** IQ1_M at `--max-context 16384` with `--kv int8`,
-MTP on (`--mtp …/mtp/rt`, `--spec 4 --spec-min-p 0.5`) and the engine's 24
-threads. 16K is what an agent session actually fills (the suite's largest turn was
-14637 prompt tokens), and the KV it saves is page cache the expert arena can use.
+**And the failure is not size at all — IQ1_M does it too.** A 16K-context run of
+the served pack on 2026-11-04 lost the engine in **all three** agent runs, at the
+same place each time:
+
+```
+no progress for 60 s during a request (reading the prompt (batched):
+  layer 1 of the prompt chunk from token 9076) - stopping the engine so the
+  server starts it again (issue #29)
+```
+
+The engine's own stall guard fires during *prefill*, the wrapper restarts it, and
+the session resumes — which is why the earlier tier runs looked like "froze at
+turn 0" with no CPU and no disk. The same stall hit a 16,384-token prompt at
+`--max-context 32768`, so it tracks prompt length (~9k–16k), not the KV budget and
+not the quantisation. `engine/BUILD.json` reads `0.1.46.2` and the binary is dated
+2026-10-21 — the same build that ran the suite clean that day, so this is
+intermittent in *when* it fires, not a build that changed overnight.
+
+**16K-context baseline of the served pack, 2026-11-04** (`--runs 3`, warm server):
+
+| Stage | Result |
+| :--- | :--- |
+| chat decode | median **11.30 tok/s** (7.60 – 19.90, n=9) |
+| chat first token | 2.22 s |
+| 4K prompt | 166.8 tok/s, first token 24.17 s |
+| agent cache hit | 55.8 % |
+| agent first token per turn | 93.77 s (60.42 – 176.68, n=9) |
+| agent decode | **8.40 tok/s** (7.90 – 10.50, n=9) |
+| failures | 3 requests lost to the stall; the 16K prompt stage skipped (context was 16384) |
+
+So the agent turn cost is dominated by prefill, not decode: 90+ s to first token
+for a ~9k-token turn against 8.4 tok/s once it starts. The stall truncates the
+session at turn 3 of 6, which is why `--max-context 16384` was **reverted to
+32768** — the KV saving buys nothing an agent session can use if turns 4–5 never
+arrive.
+
+**Served config (2026-11-04, final):** IQ1_M at `--max-context 32768` with
+`--kv int8`, MTP on (`--mtp …/mtp/rt`, `--spec 4 --spec-min-p 0.5`) and the
+engine's 24 threads.
 

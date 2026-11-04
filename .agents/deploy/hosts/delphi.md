@@ -13,6 +13,34 @@ Four jobs: **webserver** (nginx + `/healthz`), **hermes agent** (CLI + gateway,
 own Telegram bot), **tailnet resolver** (crab-hole on the shared `10.99.0.53`), and
 the **`sandbox` microVM guest** that `/microvm/*` is served from.
 
+## Switching this host from the NAS
+
+`ssh delphi` does not resolve on frieren, and every tailnet form of the name now
+lands on **Tailscale SSH**, which demands a browser check per client: measured
+2026-11-04 from frieren, `devji@delphi.cloudforest-kardashev.ts.net`,
+`devji@100.123.145.53` and `root@…` all answered *"requires an additional
+check"* and blocked. The door that works is the public IP the install used, with
+the fleet user certificate — `devji@92.5.115.103`, BatchMode-safe, NOPASSWD sudo,
+and `devji` is in `wheel` so it is a trusted user for `nix copy`.
+
+delphi is `warmOn = "self"` (`inventory.cache.delphi`): it builds its own
+fleet-specific derivations and substitutes the rest from cachix, so no builder is
+involved and no push is needed:
+
+```bash
+nix flake archive --to ssh://devji@92.5.115.103 '.?submodules=1'   # ~1 min
+ssh devji@92.5.115.103 'sudo nixos-rebuild switch --flake /nix/store/<src>#delphi'
+```
+
+Run the switch **detached** (`systemd-run --unit=… --collect`) so a dropped
+connection cannot kill activation mid-way — and give that unit a PATH:
+`--setenv=PATH=/run/current-system/sw/bin:/run/wrappers/bin`. Without it
+`nixos-rebuild`'s Python dies on `[Errno 2] No such file or directory: 'test'`
+**after** a successful build, so the closure is ready and the switch never
+happened (measured 2026-11-04; the retry took 9 s because everything was warm).
+Check the delta first with `nix build --dry-run --json --builders ""`: an aarch64
+paperless rebuild is ~41 minutes, a config-only change is ~18 small derivations.
+
 ## Guest layer — the `sandbox` microVM
 
 Declared in `hosts/microvms/guests.nix`; rationale and the traps that shaped it are

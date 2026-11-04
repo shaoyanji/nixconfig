@@ -78,7 +78,11 @@
           offline = false;
           metered = "upstream";
           fanout = true;
-          needs = "hosts/delphi/configuration.nix: search.formats includes json (html-only SearXNG answers 403 to format=json)";
+          # Live since 2026-11-04: delphi switched with `search.formats =
+          # ["html" "json"]`, and `format=json` answers 200 with results from
+          # this fleet (measured from frieren; it answered 403 html-only before).
+          # A route that cannot answer is declared with `needs`, not assumed to
+          # work — this one no longer needs anything.
         };
         "web-search" = {
           how = "web_search, then read the page";

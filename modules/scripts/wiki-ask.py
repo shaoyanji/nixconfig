@@ -524,8 +524,12 @@ def main():
         # Nothing on the shelf is about this question: say so, and spend nothing.
         verdict, p = "abstain", min(p, round(EXPAND_P - 0.01, 3))
 
-    want = 2 if verdict == "answer" else (1 if verdict == "expand" else 0)
-    per_chars = (220 if verdict == "answer" else 160) * 4
+    # `expand` quotes nothing. Measured over the 141-claim vault corpus: 22 of 22
+    # expand passages were unrelated articles (a SOPS claim quoted "Victoria's
+    # Secret", an LLM-agent claim quoted "Bagua"), for 2.7 k tokens of poison.
+    # At that precision the only defensible quote is one from an `answer`.
+    want = 2 if verdict == "answer" else 0
+    per_chars = 220 * 4
     by_name = {a["name"]: a for a in archives}
     quoted, spent = [], 0
     for c in quote_order[:4]:

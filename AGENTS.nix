@@ -507,9 +507,10 @@
       };
       body = ''
         Built 2026-11-04: `modules/scripts/wiki-ask.py` behind `task ops:wiki:ask`,
-        on frieren where the ZIMs live. Eight-claim self-audit the same day: 4
-        supported with the right section, 1 right article/wrong section, 3 silent
-        (two of those are lexical misses, not coverage).
+        on frieren where the ZIMs live. Benchmark = every `## Claim` in the vault
+        run verbatim (141): 1 supported, 22 expand, 118 silent — 0.7%, 83 tokens
+        once `expand` stopped quoting (22/22 of its passages were unrelated: a SOPS
+        claim quoted "Victoria's Secret"). Specialist shelf, not an oracle.
 
         The index was never the problem: `wikisearch "btrfs scrub repair EIO"` returns
         one hit, F2FS, because Xapian ANDs its terms, returns ten titles and no text,

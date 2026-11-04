@@ -68,6 +68,13 @@ tokens (default 1200), `--archive <substring>` narrows the fan-out.
 Context cost, measured: an `answer` is ~250–650 tokens, an `abstain` is ~110
 (three titles, no provenance, no text) — silence is the cheap outcome by design.
 
+**Its ceiling, measured.** Every `## Claim` in the vault run verbatim (141
+claims, 2026-11-04): **1 supported, 22 expand, 118 silent** — 0.7%. The shelf is a
+specialist for concrete software entities (`btrfs scrub`, `niri` config, WireGuard
+5.6), not a general oracle, and it does not validate abstract method claims. `expand`
+never quotes: 22 of 22 expand passages were unrelated articles, so an expand is a
+list of titles and a hint that the question needs a sharper subject.
+
 `wiki-ask --list` prints the shelf itself (title, coverage, vintage, GiB, path)
 as JSON or `--toon` — read it before choosing a shelf, rather than trusting a
 skill line that ages.

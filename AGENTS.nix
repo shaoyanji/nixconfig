@@ -342,80 +342,67 @@
         docs = [".agents/deploy/hosts/eisen.md" "hosts/eisen/MANUAL.md"];
       };
       body = ''
-        Served today is ISTA-DASLab's Coder pack at IQ1_M: 29.61 + 28.80 = 58.41 GB, pruned to
-        256 of 512 experts (config strata-coder-iq1_m.json). That tier was never chosen — it was
-        what fit while the card was off the bus, and it is the lossiest quant in the family.
-        Candidate: ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF at rev 99bb8f7 — same MoE
-        base, Swift post-train (63.4% fewer thinking tokens, which is wall clock at 17 tok/s),
-        all 512 experts. Four tiers: IQ3_S 83.74, IQ3_XXS 75.97, IQ2_XS 68.15, Q2_0 66.55 GB.
-        The constraint is not bits, it is page cache: 62.7 GiB RAM plus 8 GB VRAM, Strata mmaps
-        the GGUF and keeps a ~23–32 GiB expert arena, so 58 GB is effectively fully resident and
-        76 GB sends ~10–15% of expert reads to the spinning /mnt/storage array. The Coder repo
-        ships no quant above IQ1_M, so a better Coder pack cannot be had.
-        Order: IQ2_XS first (the tier the model card calls its standout), IQ3_XXS paused at 9 GB
-        and resumed only if the smaller pack leaves headroom. Fetched by frieren's aria2 RPC
-        daemon (2.7 MB/s measured vs eisen's 1.45), then checked against the repo's SHA256SUMS
-        and exact byte counts before the LAN copy — the local setup.sh table knows neither.
-        Exit: a warm load of IQ2_XS reports decode tok/s and MemAvailable against the IQ1_M
-        baseline of 14.6–21.0 tok/s (hosts/eisen/MANUAL.md §7); strata.nix ExecStart points at
-        the new JSON; checks:host HOST=eisen is green. Measure in both boot personas: the
-        TTY-only `server` specialisation (hosts/eisen/server.nix) gives back the desktop's idle
-        VRAM and the Steam client's RAM, so a pack that is tight on the desktop may hold its
-        page cache in server mode. If IQ2_XS decodes below that baseline, mark REJECTED with the
-        number and IQ1_M stays.
+        Served is ISTA-DASLab's Coder pack at IQ1_M: 29.61 + 28.80 = 58.41 GB pruned to 256 of
+        512 experts. That tier was never chosen — it was what fit — and it is the lossiest quant
+        in the family. The candidate family (Swift 1.5, same MoE base, all 512 experts) is 66.55
+        to 83.74 GB against 62.7 GiB RAM, and Strata mmaps the GGUF with a ~23–32 GiB expert
+        arena, so page cache, not bit width, sets decode speed.
 
-        Measured, both tiers, 2026-11-04. Shards verified against the publisher's SHA256SUMS
-        (75.97 and 68.15 GB, all 512 experts); packs built by tools/iq_pack.py, 96 exact
-        conversions and 0 rounded. IQ3_XXS: chat decode 7.4–20.8 tok/s, median 12.2 on the
-        desktop persona and 10.4 on the TTY-only `server` one. IQ2_XS: 7.2–20.3, median 13.0.
-        Both sit under IQ1_M's 14.6–21.0, and the persona that was supposed to help is no
-        better than the desktop — the gap is page cache, not the desktop's idle footprint.
-        Ingestion holds at 157–158 against 167.
+        Measured 2026-11-04, shards verified against the publisher's SHA256SUMS and packs built
+        by tools/iq_pack.py (96 exact conversions, 0 rounded): IQ3_XXS 75.97 GB decodes 7.4–20.8
+        tok/s (median 12.2 desktop, 10.4 `server`), IQ2_XS 68.15 GB 7.2–20.3 (median 13.0) — both
+        under IQ1_M's 14.6–21.0, and the TTY persona does not close the gap.
 
-        The agent suite is where the loss shows up, and the 2026-11-04 baseline of the SERVED
-        pack closed the loophole: IQ1_M loses the engine there too when the context is small.
-        IQ3_XXS lost
-        the engine at turn 0 (SIGABRT after 364 s, and a no-CPU-no-disk freeze killed by the
-        stall guard at 360 s on `server`), IQ2_XS froze the same way, and IQ1_M ran the whole
-        session on 2026-10-21 — turn 5 at 11818 of 14637 prompt tokens reused from cache. No
-        OOM was involved at any point: `oom_kill` is 0 and the kernel log has no kill line, so
-        this is an engine stall on the larger arenas, not the kernel reclaiming memory.
-        IQ2_XS was then retested at `--max-context 16384` on 2026-11-04 (636 MiB VRAM free,
-        50.9 GB RSS) and aborted on the *4K prompt* stage after ~7k tokens of chat traffic,
-        which settles the context hypothesis too.
+        They also lose the agent suite, and so does IQ1_M once the engine's prefill guard fires:
+        "no progress for 60 s ... reading the prompt (batched): layer 1 of the prompt chunk from
+        token 9076", the wrapper restarts the engine and the session resumes — `oom_kill` 0, no
+        kernel line. `--no-ple` is refused under `--native`, so PLE is not a separable shard, and
+        16384 context made it worse rather than better. That is an engine version, not a tier:
+        see strata-engine-bump-retest.
 
-        `--no-ple` is not a lever here: the engine refuses it under `--native` ("the PLE key
-        is native too"), so the PLE table in IQ2/IQ3 is not a separable ~28 GB shard that can
-        be dropped to make the larger tiers fit. Retesting those tiers needs an engine fix,
-        not a flag.
+        Also a measurement trap: the chat medians are cold/warm, not tier — IQ1_M re-measured
+        right after a restart scores 13.8 / 7.0 / 7.3 against its own 14.6 warm baseline. Compare
+        tiers only on a server that has been answering for a while.
 
-        Also a measurement trap worth not repeating: the chat-decode medians above are
-        cold/warm, not tier. Re-measured right after a restart, IQ1_M itself scores 13.8 / 7.0 /
-        7.3, which would "lose" to its own warm baseline. Only compare tiers on a server that
-        has been answering for a while; the agent column is not affected the same way.
-
-        The stall is the engine's own guard, not the kernel and not the tier — it fires during
-        PREFILL ("reading the prompt (batched): layer 1 of the prompt chunk from token 9076",
-        issue #29), the wrapper restarts the engine, and the session resumes, which is exactly
-        what "froze at turn 0 with no CPU and no disk" looked like from outside. It tracks
-        prompt length (~9k-16k tokens), not the KV budget: at `--max-context 16384` all three
-        IQ1_M agent runs stalled at turn 3 of 6, and a 16,384-token prompt stalled at 32768.
-        `engine/BUILD.json` is 0.1.46.2 with a 2026-10-21 binary — the build that ran clean
-        that day — so it is intermittent, not a regression of the engine install.
-
-        16K baseline of the served pack (2026-11-04, `--runs 3`, warm): chat decode median
-        11.30 (7.60-19.90), 4K prompt 166.8 tok/s, agent cache hit 55.8%, per-turn first token
-        93.77 s (60.42-176.68), agent decode 8.40 tok/s. Agent cost is prefill, not decode.
-
-        Result: IQ1_M stays served at `--max-context 32768` (`--kv int8`, MTP on, 24 engine
-        threads) — 16384 was tried and reverted because it truncates the session at turn 3.
-        The larger packs stay on the host, so a retest after an engine fix is one line plus a
-        restart. Numbers: hosts/eisen/MANUAL.md §7.
-
-        Side effect worth keeping: one of those aborts spooled a core so large that / went
-        from 44 GB to 94 GB used for five minutes (the kernel streams the address space into
-        systemd-coredump before ProcessSizeMax is consulted). strata.service now sets
-        LimitCORE=0.
+        Exit: IQ1_M stays served (`--max-context 32768`, `--kv int8`, MTP, 24 threads); the larger
+        packs stay on the host for a retest. Table and full numbers: hosts/eisen/MANUAL.md §7.
+      '';
+    };
+    strata-engine-bump-retest = {
+      title = "Strata 0.1.56 on gfx1010: the prefill rework is what the agent loop waits for";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-04";
+      summary = "The served engine is 0.1.46.2 while 0.2.10 ships 0.1.56, and 0.1.48+ carries a chunked prompt read, a ~34% long-prompt skip and exact AVX2 CPU rows. Rebuild locally for gfx1010 and re-run the same suite: 93.8 s per-turn prefill is the number to beat.";
+      from = ["strata-quant-tier"];
+      refs = {
+        hosts = ["eisen"];
+        modules = ["hosts/eisen/strata.nix"];
+        tasks = ["checks:host"];
+        docs = [".agents/deploy/hosts/eisen.md" "hosts/eisen/MANUAL.md"];
+      };
+      body = ''
+        The pack question is settled (IQ1_M, strata-quant-tier); this is the engine, which is
+        ten point releases behind ours. Everything below is newer than 0.1.46.2 per the
+        upstream changelog: 0.2.4 reads long prompts layer by layer in big chunks instead of 16
+        tokens at a time (8K prompts reach 231 tok/s); 0.2.4 skips work the last 20 layers
+        cannot use on prompts over ~3,700 tokens (~34% at 16K, same top choice in 99.5% of 799
+        positions); 0.2.4 adds exact AVX2 rows for the experts the CPU computes (+25% decode and
+        +26% prompt read on their test box — the Haswell here is that branch); 0.2.9 has
+        STRATA_COALESCE_PREFILL, off by default; 0.2.8 reads slightly malformed tool calls at
+        98.3% against 92.9% over 1,462 agent turns. Nothing else in 0.2.x touches this host:
+        DFlash2 needs gfx1100+, the NUMA split is a two-socket feature, DSpark stays off on
+        CPU-bound boxes, and the split engine is multi-GPU.
+        Build it as the local HIP engine for gfx1010 — the packaged rx9070 binary will not run
+        here — and read BUILD.json back before measuring, since that version is the result.
+        Also A/B the pair #4566 reports as a stall mitigation on 0.1.56 (`--adapt-swaps 0` with
+        STRATA_VERIFY_COHERENT=1): our stall is in a chunk read rather than the verify path, so
+        it is a test, not an assumption.
+        Exit: `tools/strata_bench.py --runs 3` on a warm server beats the 2026-11-04 baseline
+        (chat median 11.30 tok/s, 4K prompt 166.8, agent 8.40, per-turn first token 93.77 s) and
+        reports its stall count; MANUAL §7 and upstream #5229 carry the numbers; checks:host
+        HOST=eisen is green. No gain means the note keeps the number and the answer stands.
       '';
     };
     doc-budget-ci = {

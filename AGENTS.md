@@ -48,6 +48,13 @@ Use this document to orient yourself to the routing map; follow `taskfiles/READM
     tools (`yq -p toml -o json`, `nix eval --json`, `toon -d | yq -o yaml`), never
     by hand. Repair only the interface: `task dev:toon:fix` recounts `[n]`, and
     `checks:toon` / `checks:toon:surfaces` keep both rules true.
+11. **Whether a source may settle a claim is compiled, not scored.**
+    `nix eval --json .#epistemics.table | toon -e` (0.1 s) says which source can
+    settle which kind of claim, which cannot and why, and what to read instead;
+    `task ops:claim:check KIND=…` runs the same table with a token budget. Word
+    overlap is not authority — `ops:wiki:ask KIND=` refuses before it spends a
+    token. An encyclopedia shelf cannot settle `personal-method`, which is what
+    the vault is for.
 
 ## Agent turns: the xs coordination endpoint (mandatory)
 

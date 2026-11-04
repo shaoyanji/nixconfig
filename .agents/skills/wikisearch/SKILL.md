@@ -1,7 +1,7 @@
 ---
 name: wikisearch
 description: "Offline Wikipedia/Kiwix search on frieren: `wikisearch` for a title, `wiki-ask` for a gated, section-level answer an agent can afford."
-version: 0.2.0
+version: 0.3.0
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
 platforms: [linux]
@@ -83,6 +83,30 @@ list of titles and a hint that the question needs a sharper subject.
 `wiki-ask --list` prints the shelf itself (title, coverage, vintage, GiB, path)
 as JSON or `--toon` — read it before choosing a shelf, rather than trusting a
 skill line that ages.
+
+### 0a. First: may this source settle the claim at all?
+
+The 0.7% is a category error, not a ranking failure: those claims are about a
+person's method, and no encyclopedia can settle one. That is declared data, so
+ask it before searching (`flake/epistemics.nix`):
+
+```bash
+task ops:claim:check KIND=personal-method TEXT="a flat todo list is lowest friction"
+#   read: vault-claims   price: 80   next: the `## Claim` sections of ~/vaults/personal
+#   never: repo-docs (no authority), zim-shelf (no authority), web (no authority)
+
+nix eval --json .#epistemics.table | toon -e    # the whole table, 0.1 s, no tokens
+```
+
+`KIND` comes from `nix eval --json .#epistemics.kindIds`. The table answers
+three things no score can: which sources **may** settle that kind, whether a
+frozen snapshot is even **allowed** to speak about a moving fact, and who is
+accountable. `ops:wiki:ask KIND=` runs the same compile and **refuses before
+searching** when the shelf has no authority, printing the source that does.
+
+Permission is not coverage: a permitted shelf that returns nothing has not
+falsified the claim. And do not classify by regex — if you cannot name the kind,
+escaping to `expand` titles is cheaper than a confident wrong quote.
 
 **Abstention is the feature.** A below-0.38 verdict returns titles and no text,
 which is the honest answer when the archives do not cover the question — quote

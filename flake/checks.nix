@@ -7,6 +7,7 @@
   skillsCtl,
   agentsNotesCtl,
   policiesCtl,
+  epistemicsCtl,
   taskfileCtl,
 }:
 # CHEAP CHECKS ONLY — `checks.<system>` MUST NOT force a host configuration.
@@ -289,6 +290,39 @@ lib.genAttrs systems.work (
         shellcheck -f gcc -S warning "''${files[@]}" | tee "$out"
         echo "shellcheck: ''${#files[@]} files, no error or warning" >> "$out"
       '';
+
+      # --- the epistemics table is complete, in both directions --------------
+      # Two silent failures live in a hand-declared authority table, and neither
+      # shows up as a bad answer: a `settles` entry with a typo drops that
+      # source's authority over a kind nobody notices, and a kind no source
+      # settles makes "read: nowhere" look like a search failure. Both are
+      # cheap to prove here because the table is pure data.
+      epistemics = let
+        knownKinds = epistemicsCtl.kindIds;
+        declaredSources = builtins.attrNames epistemicsCtl.sources;
+        badSettles =
+          lib.concatMap (
+            n: map (k: "${n}.settles names unknown kind '${k}'") (builtins.filter (k: !(builtins.elem k knownKinds)) epistemicsCtl.sources.${n}.settles)
+          )
+          declaredSources;
+        badStanding = builtins.filter (n: !(builtins.elem epistemicsCtl.sources.${n}.standing ["authored" "snapshot" "unvetted"])) declaredSources;
+        unreadable = builtins.filter (k: epistemicsCtl.table.${k}.read == null) knownKinds;
+        unlisted =
+          lib.subtractLists declaredSources epistemicsCtl.sourceIds
+          ++ lib.subtractLists epistemicsCtl.sourceIds declaredSources;
+        issues =
+          badSettles
+          ++ map (n: "${n}.standing is not authored/snapshot/unvetted") badStanding
+          ++ map (k: "no declared source may settle '${k}' — every kind needs an authority, even if it is 'ask a person'") unreadable
+          ++ map (n: "${n} is missing from sourceIds (or declared twice) — ordering would be undefined") unlisted;
+      in
+        if issues != []
+        then builtins.throw "epistemics table is inconsistent (flake/epistemics.nix):\n  ${lib.concatStringsSep "\n  " issues}"
+        else
+          pkgs.runCommand "epistemics" {} ''
+            echo "epistemics: ${toString (builtins.length declaredSources)} sources x ${toString (builtins.length knownKinds)} claim kinds, every kind settled, every settles entry resolves"
+            touch $out
+          '';
 
       # --- registry and flake outputs agree, both directions ----------------
       inventory-hosts = assert (coverage.missing == []) || throw "inventory.toml declares flake hosts the flake does not build: ${builtins.toString coverage.missing}";

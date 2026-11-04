@@ -117,27 +117,87 @@ tasks:
           | jq -s . \
           | toon -e --stats
 
+  ops:claim:check:
+    desc: Whether a claim is worth reading for, per source (KIND=; TEXT=, BUDGET=)
+    summary: >
+      The compiled go/no-go: `nix eval .#epistemics.table` (flake/epistemics.nix)
+      says which source may SETTLE a claim kind, which cannot, and what to do
+      instead — one leaf read, no search, no model. KIND is one of
+      `.#epistemics.kindIds`; BUDGET (default 400) only filters `order`, so a
+      price refusal is not an authority refusal. `never` carries the reason, since
+      "no" without one is a score with manners. Exit 2 on an unknown kind, listing
+      the valid ones. Emits TOON; FORMAT=json for a program. A permitted source
+      that returns nothing does not falsify the claim — permission is not coverage.
+    requires:
+      vars: [KIND]
+    vars:
+      BUDGET: '{{.BUDGET | default 400}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
+      # Optional vars take the rename trick (as Q_KIND below): an undeclared
+      # `{{.TEXT}}` renders as a literal and the claim comes back as "<no value>".
+      CLAIM_TEXT: '{{.TEXT | default ""}}'
+    silent: true
+    cmds:
+      - |
+        table="$(nix eval --json .#epistemics.table)"
+        if ! printf '%s' "$table" | jq -e --arg k "{{.KIND}}" 'has($k)' >/dev/null; then
+          printf '%s' "$table" | jq -c --arg k "{{.KIND}}" \
+            '{error: "no such claim kind", kind: $k, kinds: (keys)}' \
+            | { if [ "{{.FORMAT}}" = json ]; then cat; else toon -e; fi; } >&2
+          exit 2
+        fi
+        printf '%s' "$table" | jq -c --arg k "{{.KIND}}" --arg t "{{.CLAIM_TEXT}}" \
+          --argjson b "{{.BUDGET}}" '
+            .[$k]
+            | (.order | map(select(.cost <= $b))) as $aff
+            | (.order | map(select(.cost > $b))) as $over
+            | {claim: {text: $t, kind: $k},
+               read: (if ($aff|length) > 0 then $aff[0].name else null end),
+               price: (if ($aff|length) > 0 then $aff[0].cost else null end),
+               next: (if ($aff|length) > 0 then .next
+                      else "nothing permitted fits BUDGET=\($b); \($over[0].name) would serve it for \($over[0].cost)" end),
+               order: $aff,
+               over_budget: $over,
+               never: .never}' \
+          | { if [ "{{.FORMAT}}" = json ]; then cat; else toon -e; fi; }
+
   ops:wiki:ask:
     desc: Ask the local ZIM archives a question (Q=; gated fan-out, budgeted)
     summary: >
-      `wiki-ask` over the kiwix library (Wikipedia, ArchWiki, Alpine): relaxed
-      sub-queries fanned out, fused by reciprocal rank, gated at 0.62/0.38 —
-      >=0.62 answers with two quoted sections, >=0.38 one, below abstains with
-      zero tokens. Fixes `wikisearch`'s measured failures: Xapian ANDs terms
-      ("btrfs scrub repair EIO" returns zero titles) and it prints titles with
-      no text; the quote here is the best-matching SECTION. JSON is the wire
-      format, FORMAT=json emits it, default projects through `toon -e`.
-      Verdicts append to ~/.local/state/wiki-ask/verdicts.jsonl. On frieren.
-      BUDGET=N caps quoted tokens.
+      `wiki-ask` over the kiwix library: relaxed sub-queries fanned out, fused by
+      reciprocal rank, gated at 0.62/0.38 — >=0.62 answers with two quoted
+      sections, >=0.38 one, below abstains with zero tokens. The quote is the
+      best-matching SECTION, which `wikisearch` lacks. Emits TOON; FORMAT=json for
+      a program. Verdicts append to ~/.local/state/wiki-ask/verdicts.jsonl. On
+      frieren. BUDGET=N caps tokens. KIND= adds the epistemic gate: if the shelf
+      cannot settle that kind of claim the task refuses before searching (exit 2)
+      and names the source that can; omit KIND to explore.
     requires:
       vars: [Q]
     vars:
       FORMAT: '{{.FORMAT | default "toon"}}'
+      WIKI_KIND: '{{.KIND | default ""}}'
     # The answer is the output; echoing the case block spends the tokens the
     # gate just saved.
     silent: true
     cmds:
       - |
+        # Empty WIKI_KIND means "exploring, not settling a claim" — the gate is
+        # opt-in so an ad-hoc search still works.
+        if [ -n "{{.WIKI_KIND}}" ]; then
+          judge="$(nix eval --json .#epistemics.table)"
+          if ! printf '%s' "$judge" | jq -e --arg k "{{.WIKI_KIND}}" 'has($k)' >/dev/null; then
+            printf 'epistemics: no claim kind %s; valid: %s\n' "{{.WIKI_KIND}}" \
+              "$(printf '%s' "$judge" | jq -r 'keys | join(", ")')" >&2
+            exit 2
+          fi
+          if ! printf '%s' "$judge" | jq -e --arg k "{{.WIKI_KIND}}" \
+              '.[$k].order | map(.name) | index("zim-shelf") != null' >/dev/null; then
+            printf '%s' "$judge" | jq -r --arg k "{{.WIKI_KIND}}" \
+              '"epistemics: the shelf cannot settle a \($k) claim (\(.[$k].never[] | select(.name=="zim-shelf") | .why)); read \(.[$k].read) — \(.[$k].next)"' >&2
+            exit 2
+          fi
+        fi
         case "{{.FORMAT}}" in
           json) wiki-ask "{{.Q}}" ;;
           *) wiki-ask "{{.Q}}" | toon -e ;;

@@ -536,6 +536,43 @@
         A tool nobody calls is not a decision to keep; `qmd embed` stays optional.
       '';
     };
+    epistemics-declared = {
+      title = "Which source may settle a claim is declared, not scored";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P1";
+      date = "2026-11-04";
+      from = ["semantic-search"];
+      summary = "A retrieval score measures word overlap, not authority. Sources now declare which claim kinds they may settle, whether a snapshot can speak about a moving fact, and who is accountable — compiled in flake/epistemics.nix, so the go/no-go costs one leaf read and no tokens.";
+      refs = {
+        modules = ["flake/epistemics.nix" "modules/scripts/wiki-ask.py"];
+        tasks = ["ops:claim:check" "ops:wiki:ask"];
+      };
+      body = ''
+        The 141-claim benchmark was read as a ranking failure for one turn; it is
+        a category error. Those claims are `personal-method`, which no encyclopedia
+        article can settle. ``nix eval --json .#epistemics.table | toon -e`` answers
+        that before a search, in a document an agent can act on.
+
+        Four attributes, each doing one job: `settles` (authority over a KIND of
+        knowledge — absence is a refusal, never a low score), `volatility`
+        (frozen/live, crossed with the claim's own to decide freshness), `standing`
+        (authored > snapshot > unvetted) and `cost` (the tie-break, never the
+        reason). The compile is ordinal: which source to read first, and why each
+        other one is not worth the tokens. No score, because a threshold is what
+        this replaces — `ops:wiki:ask KIND=` now refuses before spending a token.
+
+        Measured: `.#epistemics.table` is 0.1 s, `checks.<system>.epistemics`
+        proves every `settles` entry resolves and every kind has an authority.
+        A permitted source that returns nothing does not falsify the claim:
+        permission is not coverage.
+
+        Open: the vault's claim schema carries `status` but no `kind`, so the
+        kinds are authored per check instead of read from the zettel. Until it
+        does, `ops:claim:check` asks the caller for the kind rather than guessing
+        it from the text — a regex that guesses is the thing this replaces.
+      '';
+    };
     closure-budget-coverage = {
       title = "Closure budgets for every measured host";
       kind = "open";

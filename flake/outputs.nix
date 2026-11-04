@@ -83,6 +83,10 @@
   # The rules the docs state, as predicates (flake/policies.nix). Compiled once
   # and asserted by `checks.policies`; docs cite an id instead of explaining it.
   policiesCtl = import ./policies.nix {inherit lib;};
+  # Which source may settle which claim, as data (flake/epistemics.nix). Pure:
+  # no pkgs, no host eval, no filesystem — the whole table is 120 lines of
+  # declared attributes, so `nix eval .#epistemics.review` is a leaf read.
+  epistemicsCtl = import ./epistemics.nix {inherit lib;};
   # The task graph as data (lib/taskfile.nix): names, include edges, violations
   # and a content digest. Pure — no pkgs, no host eval — so
   # `nix eval .#taskfileGraph.version` is a 4 s leaf read, and the same compile
@@ -105,7 +109,7 @@ in {
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
-    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl taskfileCtl;
+    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl epistemicsCtl taskfileCtl;
   };
 
   # `nix eval --json .#taskfileGraph.names` / `.version` — the graph, without a
@@ -116,6 +120,11 @@ in {
   # registry is the decision AND its proof, so a daemon cannot be enabled by
   # memory — the policy above compares the two.
   daemons = import ./daemons.nix {inherit lib;};
+
+  # Authority, volatility and status per source, and the go/no-go per claim:
+  # `nix eval --json .#epistemics.all | toon -e`. This is the answer to "is it
+  # worth reading the wiki article" that a match score cannot give.
+  epistemics = epistemicsCtl;
 
   # The rules as data, looked up by id: `nix eval .#policies.ids`. The derived
   # queries (citedIds, danglingCitations, uncitedPolicies, unenforcedHardRules)

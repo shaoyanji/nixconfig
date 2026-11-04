@@ -162,3 +162,23 @@ it is the interactive constraint — a 500-token reply takes 25–35 s to stream
 persistent server is what makes the 69.4% cache-hit row pay off; a restart pays
 the prefix again.
 
+### Tier comparison, 2026-11-04 (`tools/strata_bench.py`, same host)
+
+| Tier | Size | Experts | Decode (chat, 9 runs) | Ingestion | Agent session |
+| :--- | ---: | :--- | :--- | :--- | :--- |
+| IQ1_M pruned Coder — the table above | 58.41 GB | 256 of 512 | **14.6 – 21.0** tok/s | 167 tok/s | 19.4 tok/s |
+| IQ3_XXS Swift 1.5 — `strata-coder-iq3_xxs.json` | 75.97 GB | all 512 | 7.4 – 20.8, median 12.2 desktop / 10.4 `server` | 157 tok/s | **engine lost at turn 0** |
+
+The second row is the whole argument against it. 76 GB cannot be resident in
+62.7 GiB, so decode becomes a page-cache lottery: a 20.8 tok/s sample is a warm
+expert blob, an 8.6 one is a read off the array. The TTY-only `server` persona is
+in the same band and no better (10.4 median), which is the interesting result —
+subtracting Steam and the compositor does not close a 17 GB gap.
+
+It is also less stable at the same task. Both personas lost the engine on the
+first turn of the agent suite: SIGABRT on the desktop (`exit code -6`, 364 s),
+and on `server` a freeze with no CPU or disk until the stall guard killed it at
+360 s. Chat and 4K/16K prompts answered normally in both; the agent workload is
+what breaks it. IQ1_M's JSON is still on the host, so reverting is one line in
+`hosts/eisen/strata.nix`.
+

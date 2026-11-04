@@ -363,6 +363,17 @@
         VRAM and the Steam client's RAM, so a pack that is tight on the desktop may hold its
         page cache in server mode. If IQ2_XS decodes below that baseline, mark REJECTED with the
         number and IQ1_M stays.
+
+        Measured: IQ3_XXS, 2026-11-04. Both shards verified against the publisher's SHA256SUMS
+        (75.97 GB, all 512 experts), pack built by tools/iq_pack.py with 96 exact conversions
+        and 0 rounded. Chat decode 7.4–20.8 tok/s, median 12.2 on the desktop persona and 10.4
+        on the TTY-only `server` one — below IQ1_M's 14.6–21.0 and not rescued by subtracting
+        the desktop, which is the point the tier was supposed to test. Ingestion 157 tok/s
+        against 167, first token 1.6–2.6 s. Then the agent suite lost the engine on turn 0 in
+        BOTH personas: SIGABRT after 364 s, and on `server` a freeze with no CPU or disk that
+        the stall guard killed at 360 s. Slower and less stable, so IQ2_XS is the tier still
+        worth measuring and its pack is not built yet. IQ3_XXS is in place because it was asked
+        for, not because it cleared the exit criterion; MANUAL.md §7 carries the numbers.
       '';
     };
     doc-budget-ci = {

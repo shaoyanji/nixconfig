@@ -262,6 +262,14 @@ Three things that bite:
 - **The persona cannot be flipped by editing the running generation.** Any change to
   `server.nix` needs a build and a switch/boot to stage it, like any other.
 
+**What the persona does and does not buy (measured 2026-11-04).** It is worth
+using for a benchmark — it is the same `strata.service`, same ExecStart, same
+config, so the only variable is the desktop — but it does not make the IQ3_XXS
+tier viable: chat decode median 12.2 tok/s on the desktop and 10.4 on `server`
+against IQ1_M's 14.6–21.0, and the agent-suite first turn lost the engine in
+both personas (SIGABRT on the desktop, a freeze on `server`). Numbers:
+`hosts/eisen/MANUAL.md` §7.
+
 ## Operational Notes
 
 - **Build and eval eisen ON eisen, over ssh** (`ssh eisen 'bash -l -c …'`, repo at
@@ -274,3 +282,9 @@ Three things that bite:
 - **Rebuilds on this host exit 4 and that is not your change.** `home-manager-devji.service` fails because *user*-scope `sops-nix` cannot decrypt (`0 successful groups required, got 0`) — a pre-existing condition since the 2026-09-29 boot. The system generation still switches; verify with `readlink -f /run/current-system` and `systemctl --failed` rather than trusting the exit status.
 - **`task infra:deploy:host:eisen`** is the fleet-consistent entrypoint; it wraps the same `nixos-rebuild ... #eisen` switch.
 - Model swap latency is real (tens of seconds to minutes for 21–44 GiB off btrfs); `ttl = 900` amortises this for conversational use.
+- **Strata's served tier is a host file, not a Nix option.** `hosts/eisen/strata.nix`
+  ExecStart names the config (`strata-coder-iq3_xxs.json`, IQ1_M's beside it); the
+  pack and weights are under `/mnt/storage/strata-data`. Changing the config needs a
+  `systemctl restart strata` and a four-minute expert load, not a rebuild; changing
+  the *config path* needs a switch. Both JSONs load with the engine in `strata/`, so
+  a revert is one line plus a restart.

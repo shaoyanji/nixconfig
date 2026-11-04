@@ -511,15 +511,12 @@
         `modules/scripts/wiki-ask.py` behind `task ops:wiki:ask`, on frieren where
         the ZIMs live.
 
-        Measured the same day, four archives (Wikipedia 19M / top / ArchWiki / Alpine):
-          `wikisearch "btrfs scrub repair EIO"` -> one hit, F2FS.
-          `wiki-ask`, same query -> Btrfs, "Checking and recovery", ~250 tokens, 0.3 s.
-          `systemd 203/EXEC failed unit` -> Systemd + Systemd/Sandboxing (wikisearch: TCP port list).
-          `how to configure niri window manager` -> the Niri article's config section.
-        The index was never the problem: Xapian ANDs its terms (a four-term incident
-        query returns zero titles), it returns ten titles and no text, and
-        `kiwix-search -s` costs 6-13 s on the 19M-article ZIM. Relaxation, fan-out
-        and reciprocal-rank fusion fix recall; section-level extraction fixes tokens.
+        Measured the same day, four archives: `wikisearch "btrfs scrub repair EIO"`
+        -> one hit, F2FS; `wiki-ask` -> Btrfs, "Checking and recovery", ~250 tokens,
+        0.3 s; `systemd 203/EXEC failed unit` -> Systemd + Systemd/Sandboxing;
+        `how to configure niri window manager` -> the Niri article's config section.
+        The index was never the problem: Xapian ANDs its terms, returns ten titles
+        and no text, and `kiwix-search -s` costs 6-13 s on the 19M-article ZIM.
 
         The gate is 0.62 / 0.38 (the max-entropy pair) and every verdict appends to
         ~/.local/state/wiki-ask/verdicts.jsonl, so "which misses would embeddings
@@ -527,11 +524,10 @@
         returns titles and no text.
 
         NO RERANK (operator call, 2026-11-04): the tool is the lexical fan-out, not
-        a model in front of it. Two measurements stand behind that — an embedding
-        index over 19M articles is impossible (19M x 384 float32 ~ 29 GB), and a
-        local ONNX path is a 740 MiB closure plus 90 MB of weights to rerank eight
-        candidates. The cost that buys is paraphrase recall, which better query
-        relaxation may supply for nothing; the log says which it is.
+        a model in front of it. An embedding index over 19M articles is impossible
+        (19M x 384 float32 ~ 29 GB) and a local ONNX path is a 740 MiB closure plus
+        90 MB of weights to rerank eight candidates — buying paraphrase recall that
+        better relaxation may supply for free.
 
         Exit: a week of verdicts in which the misses are REAL misses (the archives
         have no such thing) rather than paraphrase misses — the second kind is a

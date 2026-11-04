@@ -276,11 +276,19 @@ in {
     ../../modules/services/agent-turns.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
+    ../../modules/services/media-relay.nix
     ../../modules/services/offload-bridge.nix
     ../../modules/services/paperless-watchdog.nix
     ../../modules/services/service-portal.nix
     ../../modules/services/systemone-decision.nix
   ];
+
+  # --- YouTube relay: fetch where the peering is good, serve over the tailnet ---
+  # Home pulls Google at 1.5-2.3 Mbit; this host reaches it at gigabit and
+  # crosses back to frieren at a measured 11.4 Mbit over WireGuard. The cookie
+  # jar is a hand-provisioned credential at 0600 (never in the store), so with
+  # none present `yt-get` fails loudly rather than being silently refused.
+  services.media-relay.enable = true;
 
   # 10.99.0.53 on lo + the /32 advertised below form one half of the failover
   # group; frieren runs the same module and advertises the same route.

@@ -279,6 +279,25 @@
         - A completed item is `DELIVERED` with a path, not "done".
       '';
     };
+    download-route-bulk = {
+      title = "Bulk downloads go through aria2: frieren's daemon, delphi's gigabit";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-04";
+      summary = "Anything over 5 GiB is an aria2 job, never curl or wget, and the route follows the bottleneck: frieren's system RPC daemon for anything that lands on /srv/data, delphi's one-shot aria2c when the CDN is throttling the WAN path.";
+      refs = {
+        hosts = ["frieren" "delphi"];
+        modules = ["modules/services/aria2-daemon.nix" "modules/aria2.nix" "modules/user/base.nix"];
+        docs = ["docs/storage-taxonomy.md"];
+      };
+      body = ''
+        - Threshold: over 5 GiB is `aria2c -x16 -s16 -k1M`, not `curl -O` or `wget`. Metadata and API reads stay curl.
+        - Route: frieren runs the system `services.aria2-daemon` on :6800 (sops `aria2-rpc-secret`, session in /var/lib/aria2) and is the default for anything that ends up on /srv/data. delphi has only the BINARY (role:minimal -> user/base.nix ships `aria2`); `modules/aria2.nix` is the zen persona and is NOT on the containers chain, so there is no RPC daemon there. One-shot `aria2c` on delphi, then rsync to frieren.
+        - Why delphi at all: its uplink is gigabit while HuggingFace measured 2.7 MB/s from frieren and 1.45 MB/s from eisen (2026-11-03). The bottleneck is per-connection CDN throttling, not the LAN, so the cloud host is the right fetcher for a big pull even though every byte then crosses the tailnet once.
+        - Trap that cost a verification pass: aria2 names a file after the FINAL url segment, so a HF `resolve/...` url that redirects to `cdn-lfs` lands as a 64-hex filename. `stat` on the expected name reads 0, and a completion watcher then reports a perfect download as a size mismatch. Take `files[].path` from `aria2.tellStatus`; never assume the name.
+        - `complete` means "wrote the bytes it was told to": check the exact byte length AND the publisher's SHA-256 (HF repos ship SHA256SUMS) before anything is copied, moved into a model dir, or loaded.
+      '';
+    };
     open-strata-eisen-rx5700 = {
       title = "Implement Strata MoE inference on eisen's RX 5700";
       kind = "open";
@@ -307,6 +326,43 @@
         SubZeroClaw Harness: ~/.subzeroclaw/config pointed to :8085, successfully executing end-to-end agent tool loops.
         Performance: Benchmarked at 167 tok/s prompt ingestion, 14.6–21.0 tok/s decode, and 87.5% MTP speculative drafting acceptance rate (70/80 tokens accepted) with 32K context and INT8 KV cache. Documented in hosts/eisen/MANUAL.md.
         Gaming Guard: llama-swap-gaming-guard unit updated to suspend strata.service when Steam games launch, returning 100% VRAM to Proton/Gamescope.
+      '';
+    };
+    strata-quant-tier = {
+      title = "The Strata pack tier is a page-cache question, not a bit-width one";
+      kind = "experiment";
+      status = "IN FLIGHT";
+      date = "2026-11-03";
+      summary = "IQ1_M Coder (58.41 GB) is the lossiest quant in the family and was never a choice — it was what fit. Every Swift 1.5 tier of the same base is 66–84 GB against 62.7 GiB RAM, so the page-cache miss rate decides decode speed, not the KLD table.";
+      from = ["open-strata-eisen-rx5700"];
+      refs = {
+        hosts = ["eisen"];
+        modules = ["hosts/eisen/strata.nix" "hosts/eisen/server.nix"];
+        tasks = ["infra:status:eisen" "checks:host"];
+        docs = [".agents/deploy/hosts/eisen.md" "hosts/eisen/MANUAL.md"];
+      };
+      body = ''
+        Served today is ISTA-DASLab's Coder pack at IQ1_M: 29.61 + 28.80 = 58.41 GB, pruned to
+        256 of 512 experts (config strata-coder-iq1_m.json). That tier was never chosen — it was
+        what fit while the card was off the bus, and it is the lossiest quant in the family.
+        Candidate: ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF at rev 99bb8f7 — same MoE
+        base, Swift post-train (63.4% fewer thinking tokens, which is wall clock at 17 tok/s),
+        all 512 experts. Four tiers: IQ3_S 83.74, IQ3_XXS 75.97, IQ2_XS 68.15, Q2_0 66.55 GB.
+        The constraint is not bits, it is page cache: 62.7 GiB RAM plus 8 GB VRAM, Strata mmaps
+        the GGUF and keeps a ~23–32 GiB expert arena, so 58 GB is effectively fully resident and
+        76 GB sends ~10–15% of expert reads to the spinning /mnt/storage array. The Coder repo
+        ships no quant above IQ1_M, so a better Coder pack cannot be had.
+        Order: IQ2_XS first (the tier the model card calls its standout), IQ3_XXS paused at 9 GB
+        and resumed only if the smaller pack leaves headroom. Fetched by frieren's aria2 RPC
+        daemon (2.7 MB/s measured vs eisen's 1.45), then checked against the repo's SHA256SUMS
+        and exact byte counts before the LAN copy — the local setup.sh table knows neither.
+        Exit: a warm load of IQ2_XS reports decode tok/s and MemAvailable against the IQ1_M
+        baseline of 14.6–21.0 tok/s (hosts/eisen/MANUAL.md §7); strata.nix ExecStart points at
+        the new JSON; checks:host HOST=eisen is green. Measure in both boot personas: the
+        TTY-only `server` specialisation (hosts/eisen/server.nix) gives back the desktop's idle
+        VRAM and the Steam client's RAM, so a pack that is tight on the desktop may hold its
+        page cache in server mode. If IQ2_XS decodes below that baseline, mark REJECTED with the
+        number and IQ1_M stays.
       '';
     };
     doc-budget-ci = {
@@ -3741,6 +3797,47 @@
 
         **Exit.** Ten videos are fetched both ways and the end-to-end wall clock is
         recorded; if the home path is not at least 3x slower, REJECTED with the number.
+
+        **2026-11-04, contended line.** Single stream, done while a download held
+        the uplink: googlevideo 3.3 MB/s at home against 6.2 MB/s from the relay,
+        i.e. 1.9x — under this note's bar. A quiet-line run decides it.
+      '';
+    };
+    gigabit-seams = {
+      title = "Which of delphi's gigabit is a seam, and for whom";
+      kind = "proposal";
+      status = "PROPOSED";
+      date = "2026-11-04";
+      summary = "A delphi fetch only pays when the consumer is delphi itself, when the source is slower than the home line, or when the pull needs many connections; everything else is bytes moved, not bytes widened.";
+      from = ["exp-119" "download-route-bulk"];
+      refs = {
+        hosts = ["delphi" "frieren"];
+        modules = ["modules/services/media-relay.nix"];
+        docs = ["docs/storage-taxonomy.md"];
+      };
+      body = ''
+        **The rule.** The supply side is not the constraint: delphi pulls googlevideo
+        at 297 MB/s and Hugging Face at 208 MB/s sustained (measured 2026-11-04 with
+        `curl -r 0-… -w '%{speed_download}'`, and the same range from frieren for the
+        home side: 3.3 and 5.9 MB/s, 6.2 from the relay). So a fetch here wins only if
+        the consumer sits on delphi, the source is slower than the ~50 Mbps home line,
+        or the pull needs many connections at once.
+
+        **Candidates, in the order they pay.** (1) Consumers on delphi — a ZIM plus
+        index, an HF weight cache, a corpus the agents query where it lands; gigabit
+        with no return trip. (2) A many-connection farm — aria2 RPC on delphi
+        (`modules/services/aria2-daemon.nix` exists for frieren; delphi has the binary
+        only) feeding the relay vhost, which already serves Range. (3) A cold shelf
+        under the relay's prune: 123 GiB free, 10 TB/month egress free. (4) Media for
+        clients that are not at home, the one case where the relay is not overhead.
+
+        **Host discipline.** Do the trying on delphi. frieren is the NAS with a shared
+        line and 2 OCPU that compile nothing; NixOS makes the host irrelevant anyway —
+        ssh plus `nix build .#hostChecks.<arch>.delphi` is the same edit either way.
+
+        **Exit.** With the line quiet, 8 parallel streams fix the home ceiling; a source
+        within 1.5x of it is not a seam and stays direct. First artifact: one ZIM
+        queried from the sandbox microVM, which needs no home bytes at all.
       '';
     };
     exp-120 = {

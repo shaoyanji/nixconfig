@@ -511,17 +511,11 @@
         supported with the right section, 1 right article/wrong section, 3 silent
         (two of those are lexical misses, not coverage).
 
-        Measured the same day, four archives: `wikisearch "btrfs scrub repair EIO"`
-        -> one hit, F2FS; `wiki-ask` -> Btrfs, "Checking and recovery", ~250 tokens,
-        0.3 s; `systemd 203/EXEC failed unit` -> Systemd + Systemd/Sandboxing;
-        `how to configure niri window manager` -> the Niri article's config section.
-        The index was never the problem: Xapian ANDs its terms, returns ten titles
-        and no text, and `kiwix-search -s` costs 6-13 s on the 19M-article ZIM.
-
-        The gate is 0.62 / 0.38 (the max-entropy pair) and every verdict appends to
-        ~/.local/state/wiki-ask/verdicts.jsonl, so "which misses would embeddings
-        fix" becomes a query. Abstention is a real answer: below 0.38 the tool
-        returns titles and no text.
+        The index was never the problem: `wikisearch "btrfs scrub repair EIO"` returns
+        one hit, F2FS, because Xapian ANDs its terms, returns ten titles and no text,
+        and `kiwix-search -s` costs 6-13 s on the 19M-article ZIM. The gate is
+        0.62 / 0.38 and every verdict appends to ~/.local/state/wiki-ask/verdicts.jsonl,
+        so "which misses matter" is a query rather than an argument.
 
         NO RERANK (operator call, 2026-11-04): the tool is the lexical fan-out, not
         a model in front of it. An embedding index over 19M articles is impossible

@@ -17,6 +17,16 @@
   lanOrder = ["harmonia" "cachix" "edge" "nixos" "numtide" "nixCommunity" "nixGaming" "determinate"];
   wanOrder = ["cachix" "edge" "nixos" "numtide" "nixCommunity" "determinate" "nixGaming"];
 
+  # Two caches are declared by modules this tree imports, not by the list above:
+  # nixpkgs' `nix` module appends cache.nixos.org with `mkAfter` on every host,
+  # and `modules/global/determinate-nix.nix` declares DN's cache because DN's
+  # binaries are not on cache.nixos.org. A host that also listed them got each
+  # URL twice in `nix.conf` — invisible, and a second owner for one address.
+  # They stay in the orders for VERIFICATION, which asks "could this path be
+  # fetched" and must not care who declares the substituter.
+  platformAppended = ["nixos" "determinate"];
+  ownOrder = order: builtins.filter (n: !(builtins.elem n platformAppended)) order;
+
   # A `key = null` entry mirrors another cache and reuses its key, so the key list
   # is deduplicated rather than repeating frieren.lan-1 for the tailnet mirror.
   allKeys = lib.unique (builtins.filter (k: k != null) (keysOf (lib.attrNames registry)));
@@ -35,7 +45,7 @@
       if cloud
       then "wan"
       else "lan";
-    substituters = urlOf available;
+    substituters = urlOf (ownOrder available);
     trustedSubstituters = urlOf (lib.attrNames registry);
     trustedKeys = allKeys;
     # Where this host's closure is expected to be warmed, and by whom.
@@ -57,7 +67,7 @@
       else urlOf (["harmonia"] ++ wanOrder);
   };
 in {
-  inherit registry forHost lanOrder wanOrder;
+  inherit registry forHost lanOrder wanOrder platformAppended;
 
   # Convenience for callers holding the whole inventory.
   forHosts = hosts: lib.mapAttrs (_: forHost) hosts;

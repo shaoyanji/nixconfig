@@ -62,6 +62,28 @@
         };
       };
     };
+    "upstream-repo" = {
+      what = "a third-party repository's own files at a pinned rev, read through the GitHub API rather than a rendered page";
+      standing = "authored";
+      volatility = "live";
+      vintage = asOf;
+      settles = ["upstream-declaration" "software-behaviour" "config-syntax" "current-release"];
+      routes = {
+        # The route is a REPO-WIDE search on purpose. "Ryoku ships no cache" was
+        # answered from one fetch of its flake.nix, where nixConfig would have
+        # listed it — but the substituter is declared in a module and in the
+        # installer, so the answer was wrong and the host's actual value
+        # (`programs.ryoku.binaryCache.enable = true`) went unchecked. A search
+        # across the repository costs one request and cannot miss a module.
+        "repo-search" = {
+          how = "gh api -X GET search/code -f q='<term> repo:<owner>/<repo>' — then read the file at the rev that matched";
+          cost = 80;
+          offline = false;
+          metered = "upstream";
+          fanout = true;
+        };
+      };
+    };
     "web" = {
       what = "the live internet — unversioned, unattributed, and somebody's quota";
       standing = "unvetted";
@@ -94,7 +116,7 @@
       };
     };
   };
-  sourceIds = ["repo-docs" "vault-claims" "zim-shelf" "web"];
+  sourceIds = ["repo-docs" "vault-claims" "zim-shelf" "upstream-repo" "web"];
 
   # --- precedence ------------------------------------------------------------
   # Epistemics outranks policy: a policy is a JUDGMENT ("this protects
@@ -163,8 +185,13 @@
       what = "a compiled fact about these hosts";
       persist = "the compiled source (inventory.toml or the module), never a prose copy";
     };
+    "upstream-declaration" = {
+      volatility = "moving";
+      what = "what a third-party project declares or omits — a substituter, a default, a pin — and what our host therefore inherits by using it. An ABSENCE is the claim that needs the most care: one file answering 'no' is not evidence, because the declaration is usually in a module the flake does not mention";
+      persist = "an AGENTS.nix note only when it changes what this fleet does; cite the rev, because the project's own file is the record and it moves";
+    };
   };
-  kindIds = ["software-behaviour" "config-syntax" "definition" "historical-fact" "current-release" "personal-method" "decision" "project-fact" "procedure" "fleet-fact"];
+  kindIds = ["software-behaviour" "config-syntax" "definition" "historical-fact" "current-release" "personal-method" "decision" "project-fact" "procedure" "fleet-fact" "upstream-declaration"];
 
   standingTier = {
     authored = 0;

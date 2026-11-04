@@ -126,7 +126,9 @@ in {
   # worth reading the wiki article" that a match score cannot give.
   epistemics = epistemicsCtl;
 
-  # The rules as data, looked up by id: `nix eval .#policies.ids`. The derived
+  # The rules as data, looked up by id — the output IS the attrset, so an id with
+  # a dash needs quotes: `nix eval .#policies."<id>".holds`, and the id list is
+  # `nix eval --json .#policies --apply builtins.attrNames`. The derived
   # queries (citedIds, danglingCitations, uncitedPolicies, unenforcedHardRules)
   # stay inside `flake/checks.nix`, which is their only consumer — exporting
   # them here was four root outputs nothing read.

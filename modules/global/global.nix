@@ -143,6 +143,18 @@ in {
       };
     };
 
+    # A cache listed twice is a second declaration, not redundancy: the module
+    # that already owns it is invisible from `nix.conf`, and the duplicate was
+    # written because the existing value was never evaluated. Cheap per host
+    # because the list is already forced. [[flake/policies.nix#desktop-cache-declared-once]]
+    assertions = let
+      subs = config.nix.settings.substituters;
+    in
+      lib.optional (lib.isList subs) {
+        assertion = lib.length subs == lib.length (lib.unique subs);
+        message = "nix.settings.substituters lists a cache more than once — another module already declares it; read the host's value before adding one, and declare a cache in the module that owns it.";
+      };
+
     # Prevent missed maintenance timers from bursting during daytime production hours.
     systemd.timers = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux && config.nix.optimise.automatic) {
       nix-optimise.timerConfig.Persistent = lib.mkDefault false;

@@ -17,6 +17,11 @@
 
   programs.ryoku = {
     enable = true;
+    # Stated, not inherited: this is what makes Ryoku's own module add
+    # `ryotunes.cachix.org`, and its default is upstream's to change whenever.
+    # Declaring the URL here instead would show the cache twice in nix.conf.
+    # [[flake/policies.nix#desktop-cache-declared-once]]
+    binaryCache.enable = true;
     # niri, not Hyprland: this fleet's sessions are niri-shaped.
     defaultCompositor = "niri";
     # Browser ownership stays with the host (zen is the fleet browser role).

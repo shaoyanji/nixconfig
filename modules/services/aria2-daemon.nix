@@ -139,6 +139,12 @@ in {
       settings = {
         dir = cfg.downloadDir;
         "save-session" = cfg.sessionFile;
+        # A saved queue that is never read back is not persisted, it is just
+        # written down: on 2026-11-04 a reboot silently dropped two multi-hour
+        # downloads because only `save-session` was set. The tmpfiles rule below
+        # keeps the file present, because aria2 exits at startup when
+        # `input-file` names a path it cannot open.
+        "input-file" = cfg.sessionFile;
         "rpc-listen-port" = cfg.rpcPort;
         "listen-port" = [
           {
@@ -189,6 +195,13 @@ in {
         disable-ipv6 = true;
       };
     };
+
+    # `input-file` must exist before the daemon reads it; aria2 refuses to
+    # start on an unopenable session path, so create it rather than trusting a
+    # previous clean shutdown to have left one.
+    systemd.tmpfiles.rules = [
+      "f ${cfg.sessionFile} 0600 ${cfg.user} -"
+    ];
 
     # Ensure downloads are world-readable so NFS/SMB clients can access them.
     # The native services.aria2 module already sets UMask=0022; we use mkDefault

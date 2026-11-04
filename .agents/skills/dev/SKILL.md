@@ -19,7 +19,7 @@ metadata:
 task --list-all --json | jq -r '.tasks[] | select(.name|startswith("dev:")) | "\(.name)\t\(.desc)"'
 ```
 
-This page keeps only the four traps that a description cannot warn about.
+This page keeps only the traps a description cannot warn about.
 
 ## Git
 
@@ -43,6 +43,17 @@ This page keeps only the four traps that a description cannot warn about.
 `scripts/task/site-target.sh`); its `list`/`show`/`preview`/`deploy` name a target
 from that file. The **fleet docs site** is not in it: that is `task docs:site`
 (`.#sites.fleet-docs-site`) and `task docs:build` (`.#artifacts.docs`).
+
+## CI is a dispatch, not a wait
+
+`dev:ci:trigger:<host>` prints the run URL and exits; a system closure takes
+minutes on a runner and polling it spends a whole turn proving nothing new.
+Capture the run id, do the next piece of unrelated work, and read the conclusion
+**once** at the end (`gh run view <id> --json status,conclusion`) — never
+`gh run watch`. Local builds follow the same rule: `infra:job:*` detaches it and
+reports the exit code on a later read. A push and a dispatch for the same host
+share one concurrency slot, so one cancels the other; that is expected, not a
+failure.
 
 ## Closure analysis is not verification
 

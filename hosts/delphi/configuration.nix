@@ -826,6 +826,11 @@ in {
       server.bind_address = "127.0.0.1";
       server.secret_key = "delphi-searxng-salt-secret";
       search.safe_search = 0;
+      # `json` is the agent-facing route: flake/epistemics.nix declares the
+      # tailnet SearXNG as the unmetered, fan-out transport for `web`, and a
+      # program cannot read the HTML page. NixOS defaults to html only, which is
+      # why the endpoint answered 403 on `format=json` until this line.
+      search.formats = ["html" "json"];
     };
   };
 

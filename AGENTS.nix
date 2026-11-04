@@ -554,23 +554,31 @@
         article can settle. ``nix eval --json .#epistemics.table | toon -e`` answers
         that before a search, in a document an agent can act on.
 
-        Four attributes, each doing one job: `settles` (authority over a KIND of
-        knowledge — absence is a refusal, never a low score), `volatility`
-        (frozen/live, crossed with the claim's own to decide freshness), `standing`
-        (authored > snapshot > unvetted) and `cost` (the tie-break, never the
-        reason). The compile is ordinal: which source to read first, and why each
-        other one is not worth the tokens. No score, because a threshold is what
-        this replaces — `ops:wiki:ask KIND=` now refuses before spending a token.
+        A source is an AUTHORITY: `settles` (kinds it may settle — absence is a
+        refusal, never a low score), `standing` (authored > snapshot > unvetted),
+        `volatility` (may it speak about a moving fact). A ROUTE is a transport to
+        it: `cost` in tokens, `offline`, `metered` (whose quota), `fanout` (may it
+        be asked many times at once). Cheap first, and a search engine is a route
+        to `web`, never an authority of its own — SearXNG on delphi:8447 is the
+        unmetered fan-out route, one `web_search` is not.
 
-        Measured: `.#epistemics.table` is 0.1 s, `checks.<system>.epistemics`
-        proves every `settles` entry resolves and every kind has an authority.
+        `spend` is a MEASURED p per (source, kind) and `ev` is
+        flake/daemons.nix's Kelly expression, reused rather than restated. The
+        0.7% above is now ev -242.65 against 250 tokens: the arithmetic that would
+        have saved 140 runs. An unmeasured p is null, never invented.
+
+        `persist` per kind says where a settled answer is filed, which is what
+        makes the ladder cheaper over time instead of a treadmill.
+
+        Measured: `.#epistemics.table` 0.1 s; `checks.<system>.epistemics` proves
+        every `settles` entry resolves, every kind is settled and persistable,
+        every route is labelled, and the Kelly sign is right in both directions.
         A permitted source that returns nothing does not falsify the claim:
         permission is not coverage.
 
         Open: the vault's claim schema carries `status` but no `kind`, so the
         kinds are authored per check instead of read from the zettel. Until it
-        does, `ops:claim:check` asks the caller for the kind rather than guessing
-        it from the text — a regex that guesses is the thing this replaces.
+        does, `ops:claim:check` asks the caller rather than guessing from text.
       '';
     };
     closure-budget-coverage = {

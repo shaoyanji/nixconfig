@@ -98,15 +98,15 @@ task ops:claim:check KIND=personal-method TEXT="a flat todo list is lowest frict
 nix eval --json .#epistemics.table | toon -e    # the whole table, 0.1 s, no tokens
 ```
 
-`KIND` comes from `nix eval --json .#epistemics.kindIds`. The table answers
-three things no score can: which sources **may** settle that kind, whether a
-frozen snapshot is even **allowed** to speak about a moving fact, and who is
-accountable. `ops:wiki:ask KIND=` runs the same compile and **refuses before
-searching** when the shelf has no authority, printing the source that does.
+`KIND` comes from `.#epistemics.kindIds`: the table says which sources **may**
+settle that kind, whether a frozen snapshot may speak about a moving fact, who is
+accountable, and — from the route it picked — whether the read is `offline` and
+unmetered (the shelf before the search; `…:8447/search?format=json` before one
+`web_search`), with `persist` naming where a settled answer is filed.
 
-Permission is not coverage: a permitted shelf that returns nothing has not
-falsified the claim. And do not classify by regex — if you cannot name the kind,
-escaping to `expand` titles is cheaper than a confident wrong quote.
+`ops:wiki:ask KIND=` runs the same compile and refuses before searching when the
+shelf has no authority. Permission is not coverage: an empty answer does not
+falsify the claim, and an unnamable kind is a reason to abstain, not to guess.
 
 **Abstention is the feature.** A below-0.38 verdict returns titles and no text,
 which is the honest answer when the archives do not cover the question — quote

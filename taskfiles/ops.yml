@@ -156,6 +156,7 @@ tasks:
                price: (if ($aff|length) > 0 then $aff[0].cost else null end),
                next: (if ($aff|length) > 0 then .next
                       else "nothing permitted fits BUDGET=\($b); \($over[0].name) would serve it for \($over[0].cost)" end),
+               persist: .persist,
                order: $aff,
                over_budget: $over,
                never: .never}' \

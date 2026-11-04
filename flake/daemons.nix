@@ -6,16 +6,19 @@
   # to justify, which is the correct direction.
   tokenRate = 50.0;
   bytesPerToken = 4.0;
+  # The one Kelly expression in the tree: a second consumer (flake/epistemics.nix,
+  # which gates a lookup by its measured settle rate) must not restate it.
+  ev = p: save: cost: p * save - (1.0 - p) * cost;
   mk = d: let
-    ev = d.p * d.save - (1.0 - d.p) * d.cost;
+    evd = ev d.p d.save d.cost;
   in
     d
     // {
-      inherit ev;
-      clears = d.save > 0.0 && ev > 0.0;
+      ev = evd;
+      clears = d.save > 0.0 && evd > 0.0;
     };
 in rec {
-  inherit tokenRate;
+  inherit tokenRate ev;
 
   tokens = bytes: bytes / bytesPerToken;
   seconds = toks: toks / tokenRate;

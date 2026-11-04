@@ -626,8 +626,12 @@
         == {}
         && d.unmeasured == {}
         # The formula is the stated one, not a constant someone computed by hand.
-        && has "flake/daemons.nix" "d.p * d.save - (1.0 - d.p) * d.cost"
-        && has "flake/daemons.nix" "d.save > 0.0 && ev > 0.0"
+        # It is one exported function since 2026-11-04 (flake/epistemics.nix is the
+        # second consumer), so the judgement follows the fact: the expression must
+        # exist, and every daemon must be gated by applying it to its own numbers.
+        && has "flake/daemons.nix" "p * save - (1.0 - p) * cost"
+        && has "flake/daemons.nix" "ev d.p d.save d.cost"
+        && has "flake/daemons.nix" "d.save > 0.0 && evd > 0.0"
         # Adoption, in both directions: the daemon the arithmetic refuses must not
         # be enabled by a host, and the one it justifies must not be silently off.
         && !(has "hosts/delphi/configuration.nix" "programs.edgeCaller.enable = true")

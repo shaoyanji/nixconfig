@@ -177,16 +177,44 @@ lib.genAttrs systems.work (
         )
         mirrorWarnings;
 
-      policyFailures = builtins.filter (id: !policiesCtl.policies.${id}.holds) policiesCtl.ids;
+      # A policy is a judgment, a fact is not, so epistemics outranks policy
+      # (flake/epistemics.nix §precedence): a rule that protects nothing real is
+      # overturned by the fact that says so, never by lowering the rule. What
+      # fails is filtered through `overturns`, so an overturned policy stops
+      # failing the gate while its text and the fact that overturned it both stay
+      # in the record. A failure with no override keeps failing, which is why this
+      # is precedence and not an exemption.
+      policyFailing = builtins.filter (id: !policiesCtl.policies.${id}.holds) policiesCtl.ids;
+      policyFailures = epistemicsCtl.overturns policyFailing;
+      policyOverturned = builtins.filter (id: epistemicsCtl.overrides ? ${id}) policyFailing;
       policyReport =
         lib.concatMapStrings (
           id: ''
             ✗ ${id} — ${policiesCtl.policies.${id}.rule}
                proof: ${policiesCtl.policies.${id}.proof}
                now:   ${policiesCtl.policies.${id}.detail}
+               if a declared epistemic fact shows this rule protects nothing here, record it
+               in `.#epistemics.overrides` with its `because` and `evidence` — a fact may
+               overturn a judgment, a convenience may not.
           ''
         )
         policyFailures;
+      overturnIssues = lib.concatMap (id: let
+        o = epistemicsCtl.overrides.${id};
+      in
+        lib.optional (!(builtins.elem id policiesCtl.ids)) "epistemics.overrides.${id} names no policy — a dead override is a silenced gate"
+        ++ lib.optional (o.because or "" == "") "epistemics.overrides.${id}.because is empty — say what the rule fails to protect"
+        ++ lib.optional (o.evidence or "" == "") "epistemics.overrides.${id}.evidence is empty — an override without evidence is a preference"
+        ++ lib.optional (!(o ? since)) "epistemics.overrides.${id}.since is missing (the date the fact was established)")
+      (builtins.attrNames epistemicsCtl.overrides);
+      overturnReport =
+        lib.concatMapStrings (
+          id: ''
+            ⇢ ${id} overturned — ${epistemicsCtl.overrides.${id}.because}
+               evidence: ${epistemicsCtl.overrides.${id}.evidence} (${epistemicsCtl.overrides.${id}.since})
+          ''
+        )
+        policyOverturned;
       dangling = map (c: "${c.doc} -> ${c.id}") policiesCtl.danglingCitations;
       unenforced = policiesCtl.unenforcedHardRules;
     in {
@@ -222,7 +250,9 @@ lib.genAttrs systems.work (
       # from the document that states it, in both directions, so neither the
       # prose nor the gate can drift into being decorative.
       policies =
-        if policyFailures != []
+        if overturnIssues != []
+        then builtins.throw "epistemics override is not a fact (flake/epistemics.nix):\n  ${lib.concatStringsSep "\n  " overturnIssues}"
+        else if policyFailures != []
         then builtins.throw "policy violated:\n${policyReport}"
         else if dangling != []
         then builtins.throw "a doc cites a policy that does not exist:\n  ${lib.concatStringsSep "\n  " dangling}"
@@ -231,10 +261,16 @@ lib.genAttrs systems.work (
         else if unenforced != []
         then builtins.throw "HARD RULE without a [[flake/policies.nix#id]] citation — state the rule in the registry and cite it, or delete it:\n  ${lib.concatStringsSep "\n  " unenforced}"
         else
-          pkgs.runCommand "policies" {} ''
-            echo "${toString (builtins.length policiesCtl.ids)} policies hold; every citation resolves; every id is cited"
-            touch $out
-          '';
+          pkgs.runCommand "policies" {}
+          (''
+              echo "${toString (builtins.length policiesCtl.ids)} policies hold; every citation resolves; every id is cited"
+            ''
+            + lib.optionalString (policyOverturned != []) ''
+              printf '%s\n' ${lib.escapeShellArg overturnReport}
+            ''
+            + ''
+              touch $out
+            '');
 
       # --- the compiled registry is internally consistent --------------------
       inventory-schema =
@@ -310,17 +346,70 @@ lib.genAttrs systems.work (
         unlisted =
           lib.subtractLists declaredSources epistemicsCtl.sourceIds
           ++ lib.subtractLists epistemicsCtl.sourceIds declaredSources;
+        # A route is a transport: it must say how to use it, what it spends, whose
+        # quota that is, and whether it may be fanned out. An unlabelled route is
+        # how a metered surface gets used by accident.
+        routeIssues = lib.concatMap (n: let
+          rts = epistemicsCtl.sources.${n}.routes;
+        in
+          lib.concatMap (r: let
+            rt = rts.${r};
+          in
+            lib.optional (rt.how or "" == "") "${n}.routes.${r}.how is empty — a route nobody can invoke"
+            ++ lib.optional (!(rt ? cost) || rt.cost <= 0) "${n}.routes.${r}.cost must be a positive token count"
+            ++ lib.optional (!(builtins.elem (rt.metered or "") ["none" "upstream" "quota" "paid"])) "${n}.routes.${r}.metered must be none/upstream/quota/paid"
+            ++ lib.optional (!(rt ? fanout) || !builtins.isBool rt.fanout) "${n}.routes.${r}.fanout must be a bool (may it be asked many times at once?)"
+            ++ lib.optional (!(rt ? offline) || !builtins.isBool rt.offline) "${n}.routes.${r}.offline must be a bool")
+          (builtins.attrNames rts))
+        declaredSources;
+        # A measured `p` without the sentence that measured it is a number with
+        # no provenance, which is the thing this file exists to stop.
+        spendIssues = lib.concatMap (n: let
+          rows = epistemicsCtl.spend.${n};
+        in
+          lib.optional (!(builtins.elem n declaredSources)) "spend.${n} names an undeclared source"
+          ++ lib.concatMap (k: let
+            row = rows.${k};
+          in
+            lib.optional (!(builtins.elem k knownKinds)) "spend.${n}.${k} names an unknown claim kind"
+            ++ lib.optional (row.measured or "" == "") "spend.${n}.${k}.p has no `measured` — an unmeasured probability is what this replaces"
+            ++ lib.optional (row.p <= 0.0 || row.p > 1.0) "spend.${n}.${k}.p must be in (0,1]")
+          (builtins.attrNames rows))
+        (builtins.attrNames epistemicsCtl.spend);
+        # The Kelly wiring, proved by sign rather than by reading: a 0.7% settle
+        # rate cannot pay for 250 tokens, and a hand-picked 50% can. If the
+        # formula's arguments were ever swapped, both flip.
+        kelly = epistemicsCtl.judge "personal-method" "zim-shelf";
+        kellyGood = epistemicsCtl.judge "software-behaviour" "zim-shelf";
+        # `or` inside a string interpolation does not parse in this Nix (`unexpected
+        # 'in', expecting 'inherit'`), so the value is bound before it is printed.
+        kellyEv =
+          if kelly.ev == null
+          then 0.0
+          else kelly.ev;
+        kellyGoodEv =
+          if kellyGood.ev == null
+          then 0.0
+          else kellyGood.ev;
+        kellyIssues =
+          lib.optional (kelly.ev == null || kellyEv >= 0.0) "the measured 0.7% shelf hit rate must produce a NEGATIVE Kelly ev; got ${lib.strings.floatToString kellyEv}"
+          ++ lib.optional (kellyGood.ev == null || kellyGoodEv <= 0.0) "the 50% software-behaviour rate must produce a POSITIVE Kelly ev; got ${lib.strings.floatToString kellyGoodEv}";
+        persistIssues = map (k: "${k}.persist is empty — an answer with nowhere to live is researched forever") epistemicsCtl.persistable;
         issues =
           badSettles
           ++ map (n: "${n}.standing is not authored/snapshot/unvetted") badStanding
           ++ map (k: "no declared source may settle '${k}' — every kind needs an authority, even if it is 'ask a person'") unreadable
-          ++ map (n: "${n} is missing from sourceIds (or declared twice) — ordering would be undefined") unlisted;
+          ++ map (n: "${n} is missing from sourceIds (or declared twice) — ordering would be undefined") unlisted
+          ++ routeIssues
+          ++ spendIssues
+          ++ kellyIssues
+          ++ persistIssues;
       in
         if issues != []
         then builtins.throw "epistemics table is inconsistent (flake/epistemics.nix):\n  ${lib.concatStringsSep "\n  " issues}"
         else
           pkgs.runCommand "epistemics" {} ''
-            echo "epistemics: ${toString (builtins.length declaredSources)} sources x ${toString (builtins.length knownKinds)} claim kinds, every kind settled, every settles entry resolves"
+            echo "epistemics: ${toString (builtins.length declaredSources)} sources x ${toString (builtins.length knownKinds)} claim kinds, every kind settled and persistable, every route labelled, Kelly sign correct"
             touch $out
           '';
 

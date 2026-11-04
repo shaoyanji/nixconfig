@@ -1,184 +1,275 @@
-# flake/epistemics.nix — which source may settle which claim, as data.
-#
-# The question a regex cannot answer is "is it worth reading the wiki article?"
-# A match score measures textual overlap between a claim and a title, and those
-# are different things. Whether a source is ENTITLED to settle a claim is a
-# property of the source and of the claim — authority over a kind of knowledge,
-# whether the answer can move under the source's feet, and who is accountable
-# if it is wrong. So it is declared here and compiled, and the agent receives
-# an ordinal answer in TOON (`toon -e` at the boundary, per
-# [[flake/policies.nix#agent-boundary-is-toon]]) instead of a confidence number
-# it has to interpret.
-#
-# The measurement that forced this into data. Every `## Claim` in the vault was
-# run verbatim through the ZIM shelf on 2026-11-04: 1 of 141 supported, 22
-# spurious passages (a SOPS claim quoted "Victoria's Secret"). The cause was not
-# ranking. Those claims are `personal-method` — assertions about how a person
-# works — and no encyclopedia article can settle one. That is a `go: false`
-# knowable before a single token is spent, and 141 runs to learn it was 140 too
-# many.
-#
-# Deliberately NOT here: a score. A number would be a guess with a version
-# number, and the failure mode this replaces is exactly a threshold nobody can
-# justify. The decision is ordinal — which source to read, in what order — and
-# the only quantity is cost, which is measurable.
+# Authority over a claim, as data: `settles` per source, a route per transport, a
+# measured `spend` per claim kind. Rationale: AGENTS.nix `epistemics-declared`;
+# reader `task ops:claim:check`, gate `checks.<system>.epistemics`.
 {
   lib,
-  # Where the snapshot was cut. A frozen source's ability to settle a claim about
+  # Where a snapshot was cut. A frozen source's ability to settle a claim about
   # "now" ends here, and that is a property of the archive, not of the question.
   asOf ? "2026-11-04",
+  # The Kelly arithmetic is not restated here: flake/daemons.nix owns the formula
+  # and this is its second consumer. Same expression, different unit (tokens
+  # earned against tokens spent, where a daemon earns seconds).
+  daemons ? import ./daemons.nix {inherit lib;},
 }: let
-  # --- the sources -----------------------------------------------------------
-  # volatility  frozen: a cut snapshot, cannot speak about what changed since
-  #             live:   maintained, can be stale, can be read as current
-  # standing    authored: a person asserts it and is accountable
-  #             snapshot: a copy of someone else's text, no one to ask
-  #             unvetted: fetched live, unattributed, unversioned
-  # settles     the claim KINDS this source is authoritative for. Absence is a
-  #             refusal, not a low score: no amount of extra matching words
-  #             buys authority a source does not have.
-  # cost        tokens to consult. The tie-break among permitted sources, never
-  #             the reason one is permitted.
-  #
-  # `settles` is a permission, not a coverage promise. A permitted source that
-  # comes back empty does not falsify the claim; it means the imperative
-  # question ("does this text contain it") is still open.
   sources = {
     "repo-docs" = {
       what = "this tree — docs/, skills, AGENTS.nix, modules/*.nix";
       standing = "authored";
       volatility = "live";
       vintage = asOf;
-      cost = 40;
-      how = "grep/qmd this tree";
       settles = ["fleet-fact" "procedure" "decision" "software-behaviour"];
+      routes = {
+        local = {
+          how = "grep/qmd this tree";
+          cost = 40;
+          offline = true;
+          metered = "none";
+          fanout = true;
+        };
+      };
     };
     "vault-claims" = {
       what = "the zettelkasten's `## Claim` sections, carrying their own status";
       standing = "authored";
       volatility = "live";
       vintage = asOf;
-      cost = 80;
-      how = "the `## Claim` sections of ~/vaults/personal";
       settles = ["personal-method" "decision" "project-fact"];
+      routes = {
+        local = {
+          how = "the `## Claim` sections of ~/vaults/personal";
+          cost = 80;
+          offline = true;
+          metered = "none";
+          fanout = true;
+        };
+      };
     };
     "zim-shelf" = {
       what = "Kiwix ZIM archives on frieren (Wikipedia nopic, ArchWiki, Alpine)";
       standing = "snapshot";
       volatility = "frozen";
       vintage = "2026-06";
-      cost = 250;
-      how = "task ops:wiki:ask Q=... (one archive, one passage)";
       settles = ["software-behaviour" "config-syntax" "definition" "historical-fact"];
+      routes = {
+        frieren = {
+          how = "task ops:wiki:ask Q=... (one archive, one passage)";
+          cost = 250;
+          # No internet egress: the shelf is a store path. That is why it is the
+          # first thing to try when a metered surface would otherwise be asked.
+          offline = true;
+          metered = "none";
+          fanout = true;
+        };
+      };
     };
     "web" = {
-      what = "the live internet, unversioned and rate-limited";
+      what = "the live internet — unversioned, unattributed, and somebody's quota";
       standing = "unvetted";
       volatility = "live";
       vintage = asOf;
-      cost = 800;
-      how = "web_search, then read the page";
       settles = ["current-release" "historical-fact" "definition" "software-behaviour" "config-syntax"];
+      routes = {
+        # Self-hosted SearXNG on the tailnet: ours to fan out, but the engines
+        # behind it throttle delphi's address, so the label is `upstream`, not
+        # `none` — there is no free search, only one nobody bills us for.
+        "searx-tailnet" = {
+          how = "curl -s 'https://delphi.cloudforest-kardashev.ts.net:8447/search?q=<urlencoded>&format=json'";
+          cost = 120;
+          offline = false;
+          metered = "upstream";
+          fanout = true;
+          needs = "hosts/delphi/configuration.nix: search.formats includes json (html-only SearXNG answers 403 to format=json)";
+        };
+        "web-search" = {
+          how = "web_search, then read the page";
+          cost = 800;
+          offline = false;
+          metered = "quota";
+          fanout = false;
+        };
+      };
     };
   };
   sourceIds = ["repo-docs" "vault-claims" "zim-shelf" "web"];
 
+  # --- precedence ------------------------------------------------------------
+  # Epistemics outranks policy: a policy is a JUDGMENT ("this protects
+  # something"), a fact is not, so a fact can invalidate a judgment and never the
+  # reverse. The override is itself a fact — `because` says what the rule fails to
+  # protect, `evidence` is what makes that true — so it cannot silence a gate: the
+  # failure is still reported, with the fact attached.
+  # Rationale: AGENTS.nix `epistemics-declared`.
+  overrides = {};
+
   # --- the claim shapes ------------------------------------------------------
-  # `volatility` here is a property of the CLAIM: does the answer move on its
-  # own? "niri reads config.kdl" stays true for years; "the newest systemd
-  # release drops SysV" is false within a month.
+  # `volatility` is a property of the CLAIM: does the answer move on its own?
+  #
+  # `persist` is where the distilled answer is FILED, and it is the reason the
+  # ladder gets cheaper over time: an expensive read that lands in an authored
+  # source is a cheap read forever after. A finding with nowhere to go is a
+  # finding that will be researched again.
   kinds = {
     "software-behaviour" = {
       volatility = "stable";
       what = "how a program behaves, its flags and formats";
+      persist = "a vault claim citing the passage, or a skill line if it changes what an agent does";
     };
     "config-syntax" = {
       volatility = "stable";
       what = "the shape of a config file or directive";
+      persist = "a vault claim citing the passage — the syntax is the claim";
     };
     "definition" = {
       volatility = "stable";
       what = "what a term means";
+      persist = "a vault claim, so the next question is a lookup";
     };
     "historical-fact" = {
       volatility = "stable";
       what = "what happened, and when";
+      persist = "a vault claim with the date and the source";
     };
     "current-release" = {
       volatility = "moving";
       what = "the version, default or state of something today";
+      persist = "nothing durable — record the date and version in the answer, not the corpus";
     };
     "personal-method" = {
       volatility = "stable";
       what = "how I work, and why";
+      persist = "a new `## Claim` in the vault, with its status";
     };
     "decision" = {
       volatility = "stable";
       what = "what this fleet chose to do";
+      persist = "an AGENTS.nix note (kind=decision) plus the doc the decision governs";
     };
     "project-fact" = {
       volatility = "stable";
       what = "a fact about my own projects";
+      persist = "a `## Claim` in the vault";
     };
     "procedure" = {
       volatility = "stable";
       what = "the steps to accomplish something here";
+      persist = "docs/ or a skill — a procedure an agent cannot follow is a paragraph";
     };
     "fleet-fact" = {
       volatility = "stable";
       what = "a compiled fact about these hosts";
+      persist = "the compiled source (inventory.toml or the module), never a prose copy";
     };
   };
   kindIds = ["software-behaviour" "config-syntax" "definition" "historical-fact" "current-release" "personal-method" "decision" "project-fact" "procedure" "fleet-fact"];
 
-  # Evidence quality, and the only ordering the compile imposes.
   standingTier = {
     authored = 0;
     snapshot = 1;
     unvetted = 2;
   };
+  # Whose quota a consultation spends. This is the resource axis: `none` costs
+  # nothing but our own CPU, and everything else has a ceiling somebody enforces.
+  meteredTier = {
+    none = 0;
+    upstream = 1;
+    quota = 2;
+    paid = 3;
+  };
 
-  # --- the three refusals ----------------------------------------------------
-  # Each returns a reason, because "no-go" without one is a score with better
-  # manners. `never` is a fact about the source; the caller's budget is applied
-  # after this compile, by whoever holds the budget.
+  # --- measured settling rates ----------------------------------------------
+  # Only where somebody ran the measurement. `save` is what going elsewhere would
+  # have cost, so `ev` is in tokens: expected tokens saved minus expected tokens
+  # spent on a miss. A negative `ev` is a source that looks authoritative and is
+  # not worth the money, which is exactly what a 0.7% hit rate is.
+  spend = {
+    "zim-shelf" = {
+      "personal-method" = {
+        p = 0.007;
+        save = 800.0;
+        measured = "2026-11-04 · every `## Claim` in the vault run verbatim (141): 1 supported";
+      };
+      "software-behaviour" = {
+        # Selection-biased: eight concrete queries were picked because the shelf
+        # was expected to cover them. Recorded as an upper bound, not a rate.
+        p = 0.5;
+        save = 800.0;
+        measured = "2026-11-04 · 8 concrete software queries, hand-picked (biased high): 4 supported";
+      };
+    };
+  };
+
+  # --- routes ----------------------------------------------------------------
+  # Cheapest route first: unmetered before metered, then price. A source is only
+  # ever consulted through its preferred route unless a caller overrides it.
+  # `or 99` rather than a crash: an unlabelled `metered` is a mistake the check
+  # reports by name (`routes.<r>.metered must be none/upstream/quota/paid`), and a
+  # missing-attribute error at the sort would hide that message.
+  preferredRoute = src: let
+    ranked = lib.sort (a: b: let
+      ka = (meteredTier.${a.metered} or 99) * 10000 + a.cost;
+      kb = (meteredTier.${b.metered} or 99) * 10000 + b.cost;
+    in
+      ka < kb)
+    (map (n: src.routes.${n} // {name = n;}) (builtins.attrNames src.routes));
+  in
+    builtins.head ranked;
+
+  spendFor = name: kind:
+    (spend.${name} or {}).${kind} or null;
+
+  # --- the four refusals -----------------------------------------------------
   judge = kind: name: let
     src = sources.${name};
     k = kinds.${kind};
+    route = preferredRoute src;
+    s = spendFor name kind;
+    ev =
+      if s == null
+      then null
+      else daemons.ev s.p s.save route.cost;
+    base = {
+      inherit name;
+      inherit (route) cost offline metered fanout how;
+      ev = ev;
+    };
   in
     if !(builtins.elem kind src.settles)
-    then {
-      inherit name;
-      inherit (src) cost;
-      go = false;
-      why = "no authority over ${kind}";
-    }
+    then
+      base
+      // {
+        go = false;
+        why = "no authority over ${kind}";
+      }
     else if k.volatility == "moving" && src.volatility == "frozen"
-    then {
-      inherit name;
-      inherit (src) cost;
-      go = false;
-      # Its silence and its agreement are equally uninformative here.
-      why = "frozen at ${src.vintage}; a snapshot cannot settle a moving fact";
-    }
-    else {
-      inherit name;
-      inherit (src) cost how;
-      go = true;
-      # Standing decides the tier, price decides within it. Authored outranks
-      # a snapshot (someone is accountable) which outranks the open web (nobody
-      # is, and it is the dearest); a cheap permitted source wins only against
-      # one of equal standing.
-      key = standingTier.${src.standing} * 10000 + src.cost;
-      why = "${src.standing}, ${src.volatility}";
-    };
+    then
+      base
+      // {
+        go = false;
+        # Its silence and its agreement are equally uninformative here.
+        why = "frozen at ${src.vintage}; a snapshot cannot settle a moving fact";
+      }
+    else if ev != null && ev <= 0.0
+    then
+      base
+      // {
+        go = false;
+        why = "kelly ${lib.strings.floatToString ev}: measured p ${lib.strings.floatToString s.p} does not pay for ${toString route.cost} tokens";
+      }
+    else
+      base
+      // {
+        go = true;
+        # Standing first (who is accountable), then whose quota, then price.
+        key = standingTier.${src.standing} * 1000000 + meteredTier.${route.metered} * 10000 + route.cost;
+        why = "${src.standing}, ${src.volatility}, ${route.metered}";
+      };
 
-  # One kind -> an ordinal answer. This is the whole product surface: which
-  # source to read first, and why every other one is not worth the tokens.
   forKind = kind: let
     verdicts = map (judge kind) sourceIds;
     permitted = lib.sort (a: b: a.key < b.key) (builtins.filter (v: v.go) verdicts);
-    strip = v: {inherit (v) name cost why;};
+    strip = v: {
+      inherit (v) name cost why offline metered fanout ev;
+    };
     first =
       if permitted == []
       then null
@@ -189,12 +280,13 @@
       if first == null
       then null
       else first.name;
-    # What to actually do to consult it — so the answer and the command are one
-    # document, not a decision the agent has to translate.
     next =
       if first == null
       then "nothing declared can settle this: ask a person, or measure it"
       else first.how;
+    # Where the answer goes once it is known — the step that makes the next
+    # lookup an offline one.
+    inherit (kinds.${kind}) persist;
     order = map strip permitted;
     never = map strip (builtins.filter (v: !v.go) verdicts);
   };
@@ -205,14 +297,8 @@
     })
     kindIds);
 
-  # Programmatic entry: a claim as data in, the same answer plus the text it was
-  # asked about. `task ops:claim:check` reads `table` and applies a budget, so
-  # this exists for a caller that already has a claim object — it is not a
-  # second rule.
   review = claim: (table.${claim.kind} or (throw "epistemics: unknown claim kind '${claim.kind}', known: ${lib.concatStringsSep ", " kindIds}")) // {inherit (claim) text;};
 
-  # Sample claims, so the compile is inspectable without inventing an input:
-  # `nix eval --json .#epistemics.all | toon -e`.
   samples = [
     {
       text = "btrfs scrub repairs from redundancy using checksums";
@@ -240,10 +326,19 @@
     }
   ];
 in {
-  inherit sources kinds judge table review samples sourceIds kindIds asOf;
+  inherit sources kinds judge table review samples sourceIds kindIds asOf spend;
+  inherit overrides;
+  # The precedence as a function, so the gate applies it rather than re-deriving
+  # "is this overridden" in a second place.
+  overturns = ids: lib.filter (id: !(overrides ? ${id})) ids;
+  overturnedBy = id: overrides.${id} or null;
+  overturned = builtins.attrNames overrides;
   all = map review samples;
-  # A kind that no declared source can settle is not a retrieval failure, and
-  # naming it is the reason this is data: the answer is "ask a person", which
-  # no search tool can return.
+  # The resource ladder, independent of any claim: which transports exist, what
+  # they spend, and whether they may be asked many times at once.
+  routes = lib.mapAttrs (_: s: lib.mapAttrs (_: r: r) s.routes) sources;
   unsettleable = map (k: k.kind) (builtins.filter (k: k.order == []) (builtins.attrValues table));
+  # A kind that can be settled but whose answer has nowhere to live is researched
+  # forever; this is empty by construction, and the check keeps it that way.
+  persistable = map (k: k.kind) (builtins.filter (k: k.persist == "") (builtins.attrValues table));
 }

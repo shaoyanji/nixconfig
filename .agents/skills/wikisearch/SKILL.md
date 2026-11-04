@@ -1,7 +1,7 @@
 ---
 name: wikisearch
-description: "Offline Wikipedia/Kiwix BM25 search on frieren."
-version: 0.1.0
+description: "Offline Wikipedia/Kiwix search on frieren: `wikisearch` for a title, `wiki-ask` for a gated, section-level answer an agent can afford."
+version: 0.2.0
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
 platforms: [linux]
@@ -29,6 +29,42 @@ A fast, low-overhead offline knowledge retrieval system using Kiwix and embedded
 ---
 
 ## 2. CLI Usage (`wikisearch`)
+
+Two entry points, one index. `wikisearch` is what an operator types; `wiki-ask`
+is what an agent calls.
+
+### 0. Ask a question — `wiki-ask` (pick this first)
+
+```bash
+task ops:wiki:ask Q="btrfs scrub repair EIO"            # TOON, gated
+task ops:wiki:ask Q="how to configure niri" FORMAT=json  # wire format
+```
+
+Fan-out over every archive, fused by reciprocal rank, gated at **0.62 / 0.38**:
+`answer` quotes two sections, `expand` one, below that it **abstains and spends
+zero tokens**. Verdicts append to `~/.local/state/wiki-ask/verdicts.jsonl`.
+
+Why not `wikisearch`: Xapian ANDs its terms, so a real question returns nothing,
+and results are titles with no text. Measured on frieren 2026-11-04:
+
+| query | `wikisearch` | `wiki-ask` |
+| :--- | :--- | :--- |
+| `btrfs scrub repair EIO` | one hit, **F2FS** | Btrfs → "Checking and recovery", ~250 tokens |
+| `systemd 203/EXEC failed unit` | `List of TCP and UDP port numbers` | Systemd + Systemd/Sandboxing |
+| `how to configure niri window manager` | (titles only) | Niri → its config binding section |
+
+A quote is the **best-matching section**, heading included, never the lead: the
+lead is what a summary is, the section is what an answer is. `--budget N` caps
+the tokens (default 1200), `--archive <substring>` narrows the fan-out.
+
+**Abstention is the feature.** A below-0.38 verdict returns titles and no text,
+which is the honest answer when the archives do not cover the question — quote
+such a result as `verdict: abstain`, never as a fact.
+
+`wikisearch` is still right for: listing archives, resolving one exact title,
+and a human reading the served page. Run `wiki-ask` from frieren, or ssh first.
+
+---
 
 `wikisearch` is a universal CLI client that queries any ZIM archive in the library or directory.
 

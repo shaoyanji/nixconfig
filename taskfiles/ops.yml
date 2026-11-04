@@ -117,6 +117,32 @@ tasks:
           | jq -s . \
           | toon -e --stats
 
+  ops:wiki:ask:
+    desc: Ask the local ZIM archives a question (Q=; gated fan-out, budgeted)
+    summary: >
+      `wiki-ask` over the kiwix library (Wikipedia, ArchWiki, Alpine): relaxed
+      sub-queries fanned out, fused by reciprocal rank, gated at 0.62/0.38 —
+      >=0.62 answers with two quoted sections, >=0.38 one, below abstains with
+      zero tokens. Fixes `wikisearch`'s measured failures: Xapian ANDs terms
+      ("btrfs scrub repair EIO" returns zero titles) and it prints titles with
+      no text; the quote here is the best-matching SECTION. JSON is the wire
+      format, FORMAT=json emits it, default projects through `toon -e`.
+      Verdicts append to ~/.local/state/wiki-ask/verdicts.jsonl. On frieren.
+      BUDGET=N caps quoted tokens.
+    requires:
+      vars: [Q]
+    vars:
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    # The answer is the output; echoing the case block spends the tokens the
+    # gate just saved.
+    silent: true
+    cmds:
+      - |
+        case "{{.FORMAT}}" in
+          json) wiki-ask "{{.Q}}" ;;
+          *) wiki-ask "{{.Q}}" | toon -e ;;
+        esac
+
   ops:skills:
     desc: Print the compiled skill index (name, version, tags)
     summary: >

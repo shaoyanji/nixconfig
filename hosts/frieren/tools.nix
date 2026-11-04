@@ -9,6 +9,11 @@
 
   wikisearch = import ../../modules/scripts/wikisearch.nix {inherit pkgs;};
 
+  # Retrieval an agent can afford: fan-out + fusion + a token gate, over the
+  # same archives `wikisearch` queries. Both stay — `wikisearch` is the raw
+  # Kiwix CLI an operator types, `wiki-ask` is what an agent calls.
+  wikiAsk = import ../../modules/scripts/wiki-ask.nix {inherit pkgs;};
+
   freebuff-headless = import ../../modules/scripts/freebuff-headless.nix {inherit pkgs;};
 
   qmdEisenEmbedSync = import ../../modules/scripts/qmd-eisen-embed-sync.nix {inherit pkgs;};
@@ -90,6 +95,7 @@
 
   lightTools = with pkgs; [
     wikisearch
+    wikiAsk
     freebuff-headless
     qmdEisenEmbedSync
     # TOON is the agent-facing projection for the sentinel ledger and other

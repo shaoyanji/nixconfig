@@ -497,15 +497,45 @@
     semantic-search = {
       title = "Semantic search only if it earns its keep";
       kind = "open";
-      status = "PROPOSED";
+      status = "OPEN";
       priority = "P2";
-      date = "2026-10-19";
-      summary = "BM25 is instant and good enough until measured misses say otherwise. Enabling embeddings by default would add a model dependency to every search.";
+      date = "2026-11-04";
+      summary = "BM25 is instant and good enough until measured misses say otherwise — so the lexical gate shipped first (`ops:wiki:ask`, 0.62/0.38, verdict log) and an all-MiniLM rerank waits on that log rather than on a model download.";
       refs = {
-        tasks = ["dev:qmd:refresh" "checks:qmd:docs"];
+        modules = ["modules/scripts/wiki-ask.py" "modules/services/kiwix.nix"];
+        tasks = ["ops:wiki:ask" "dev:qmd:refresh" "checks:qmd:docs"];
       };
       body = ''
-        Exit: a measured set of BM25 misses that embeddings fix. Until then `qmd embed` is optional.
+        Built 2026-11-04, the half that was missing: a retrieval tool an agent can
+        afford, rather than the semantic layer this note was waiting for.
+        `modules/scripts/wiki-ask.py` behind `task ops:wiki:ask`, on frieren where
+        the ZIMs live.
+
+        Measured the same day, four archives (Wikipedia 19M / top / ArchWiki / Alpine):
+          `wikisearch "btrfs scrub repair EIO"` -> one hit, F2FS.
+          `wiki-ask`, same query -> Btrfs, "Checking and recovery", ~250 tokens, 0.3 s.
+          `systemd 203/EXEC failed unit` -> Systemd + Systemd/Sandboxing (wikisearch: TCP port list).
+          `how to configure niri window manager` -> the Niri article's config section.
+        The index was never the problem: Xapian ANDs its terms (a four-term incident
+        query returns zero titles), it returns ten titles and no text, and
+        `kiwix-search -s` costs 6-13 s on the 19M-article ZIM. Relaxation, fan-out
+        and reciprocal-rank fusion fix recall; section-level extraction fixes tokens.
+
+        The gate is 0.62 / 0.38 (the max-entropy pair) and every verdict appends to
+        ~/.local/state/wiki-ask/verdicts.jsonl, so "which misses would embeddings
+        fix" becomes a query. Abstention is a real answer: below 0.38 the tool
+        returns titles and no text.
+
+        Next rung, approved and NOT built: all-MiniLM-L6-v2 RERANK over the fused
+        pool. An embedding index over 19M articles is impossible (19M x 384 float32
+        ~ 29 GB); a rerank over 8 candidates is ~20 ms on the 2 vCPU. It waits
+        because the log has to say the lexical gate misses first — otherwise the
+        rerank is a model dependency bought with a guess.
+
+        Exit: a week of verdicts in which the lexical gate's misses are real misses
+        (the archives have no such thing), plus a MiniLM rerank that fixes a measured
+        share of them. Until then `qmd embed` stays optional and nothing on the ZIM
+        path embeds.
       '';
     };
     closure-budget-coverage = {

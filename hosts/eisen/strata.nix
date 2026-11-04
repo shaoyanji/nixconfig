@@ -47,7 +47,10 @@ in {
       Group = "users";
       SupplementaryGroups = ["video" "render"];
       WorkingDirectory = strataDir;
-      ExecStart = "${strataEnv}/bin/strata-fhs -c 'source ${strataDir}/.venv/bin/activate && python -m serve.server --engine strata --config ${strataDir}/strata-coder-iq1_m.json --port ${toString port}'";
+      # IQ3_XXS (75.97 GB, all 512 experts) over IQ1_M's 58.41 GB pruned pack — the
+      # tier swap AGENTS.nix `strata-quant-tier` describes. The page-cache miss rate
+      # decides decode, not the bit width, so the measurement is what closes it.
+      ExecStart = "${strataEnv}/bin/strata-fhs -c 'source ${strataDir}/.venv/bin/activate && python -m serve.server --engine strata --config ${strataDir}/strata-coder-iq3_xxs.json --port ${toString port}'";
       Restart = "on-failure";
       RestartSec = 10;
     };

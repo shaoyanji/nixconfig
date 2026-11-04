@@ -248,11 +248,19 @@ def fuse(streams, terms):
 
 # ------------------------------------------------------------ article text ----
 class Sections(HTMLParser):
-    """Article body as (heading, anchor, paragraph) triples."""
+    """Article body as (heading, anchor, block) triples.
+
+    Blocks are markdown, not flattened text: a `<pre>` keeps its newlines inside a
+    fence and a list item keeps its bullet. Flattening was the thing that turned
+    the Niri config example into one long line, and a code block an agent cannot
+    read is worth less than no quote at all.
+    """
 
     def __init__(self):
         super().__init__()
         self.skip = 0
+        self.pre = 0
+        self.mode = "p"
         self.heading = "Lead"
         self.anchor = ""
         self.buf = []
@@ -266,9 +274,15 @@ class Sections(HTMLParser):
         elif tag in ("h1", "h2", "h3", "h4"):
             self.flush()
             self.pending_id = d.get("id", "")
-            self.buf = [f"\x00heading\x00"]
+            self.buf = ["\x00heading\x00"]
+            self.mode = "h"
+        elif tag == "pre":
+            self.flush()
+            self.pre += 1
+            self.mode = "pre"
         elif tag in ("p", "li"):
             self.flush()
+            self.mode = "li" if tag == "li" else "p"
 
     def handle_endtag(self, tag):
         if tag in ("script", "style", "table", "nav") and self.skip:
@@ -278,6 +292,11 @@ class Sections(HTMLParser):
             if text:
                 self.heading, self.anchor = text, self.pending_id
             self.buf = []
+            self.mode = "p"
+        elif tag == "pre":
+            self.flush()
+            self.pre = max(0, self.pre - 1)
+            self.mode = "p"
         elif tag in ("p", "li"):
             self.flush()
 
@@ -287,10 +306,17 @@ class Sections(HTMLParser):
 
     def flush(self):
         raw = "".join(self.buf).replace("\x00heading\x00", "")
-        self.buf = []
+        mode, self.buf = self.mode, []
+        if mode == "h":
+            return
+        if mode == "pre":
+            code = raw.strip("\n")
+            if len(code) >= 20:
+                self.rows.append((self.heading, self.anchor, "```\n" + code + "\n```"))
+            return
         text = re.sub(r"\s+", " ", raw).strip()
         if len(text) > 40:
-            self.rows.append((self.heading, self.anchor, text))
+            self.rows.append((self.heading, self.anchor, f"- {text}" if mode == "li" else text))
 
 
 def article_sections(book, raw_title):
@@ -347,14 +373,19 @@ def best_passages(rows, terms, idf, limit_chars, top=2, require=None, title=""):
         seen.add(low)
         scored.append((hit, heading, anchor, text))
     scored.sort(key=lambda r: -r[0])
-    return [
-        {"section": h, "anchor": a, "text": t[:limit_chars], "score": round(s, 2)}
-        for s, h, a, t in scored[:top]
-    ]
+    out = []
+    for s, h, a, t in scored[:top]:
+        if len(t) > limit_chars:
+            t = t[:limit_chars]
+            # A fence cut in half is worse than a shorter one.
+            if t.startswith("```"):
+                t += "\n```"
+        out.append({"section": h, "anchor": a, "text": t, "score": round(s, 2)})
+    return out
 
 
 # -------------------------------------------------------------------- gate ----
-def gate(cands, terms):
+def gate(cands, terms, anchored=True):
     if not cands:
         return 0.0, "abstain"
     top = cands[0]["score"]
@@ -362,7 +393,11 @@ def gate(cands, terms):
     margin = (top - second) / top if top else 0.0
     agreement = min(len(cands[0]["archives"]), 2) / 2
     tset = set(re.findall(r"[a-z0-9]+", cands[0]["title"].casefold()))
-    covered = len(set(terms) & tset) / max(len(terms), 1)
+    # No anchored term means no article is about this question: the titles merely
+    # share a generic word. Eyeballing `what is the capital of ausa` — a typo the
+    # shelf cannot cover — that credit alone pushed it to `expand` and quoted a
+    # disambiguation stub, which is the poisoning this gate exists to prevent.
+    covered = (len(set(terms) & tset) / max(len(terms), 1)) if anchored else 0.0
     p = 0.45 * margin + 0.30 * agreement + 0.25 * min(covered * 2, 1.0)
     p = max(0.0, min(1.0, p))
     verdict = "answer" if p >= ANSWER_P else ("expand" if p >= EXPAND_P else "abstain")
@@ -456,7 +491,7 @@ def main():
     # the entity page can sit at rank 10 behind generic pages that win on
     # stream count.
     cands = ranked[: args.candidates]
-    p, verdict = gate(ranked, terms)
+
     # Whole-word title hits only: substring matching anchored `scrub` onto
     # "RAF Wormwood Scrubs". And `eio` appears in no title, so requiring it
     # would reject every passage on principle.
@@ -475,6 +510,11 @@ def main():
     anchored = [c for c in ranked if anchor_term and in_title(anchor_term, c["title"])]
     quote_order = anchored + [c for c in ranked if c not in anchored]
     require = anchor_term or rare
+
+    p, verdict = gate(ranked, terms, anchored=anchor_term is not None)
+    if anchor_term is None:
+        # Nothing on the shelf is about this question: say so, and spend nothing.
+        verdict, p = "abstain", min(p, round(EXPAND_P - 0.01, 3))
 
     want = 2 if verdict == "answer" else (1 if verdict == "expand" else 0)
     per_chars = (220 if verdict == "answer" else 160) * 4
@@ -524,11 +564,18 @@ def main():
         "tokens": spent,
         "budget": args.budget,
         "archives": [a["name"] for a in archives],
-        "titles": [
-            {"title": c["title"], "score": c["score"], "coverage": c["coverage"],
-             "archives": c["archives"], "matched": c["queries"]}
-            for c in cands
-        ],
+        # An abstain is only free if it is cheap: eight titles with their matched
+        # sub-queries is ~300 tokens of "nothing found", which is context poisoning
+        # with extra steps. Three titles, no provenance.
+        "titles": (
+            [{"title": c["title"], "archives": c["archives"]} for c in cands[:3]]
+            if verdict == "abstain"
+            else [
+                {"title": c["title"], "score": c["score"], "coverage": c["coverage"],
+                 "archives": c["archives"], "matched": c["queries"]}
+                for c in cands
+            ]
+        ),
         "quoted": quoted,
     }
 

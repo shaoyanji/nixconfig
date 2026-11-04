@@ -49,13 +49,24 @@ and results are titles with no text. Measured on frieren 2026-11-04:
 
 | query | `wikisearch` | `wiki-ask` |
 | :--- | :--- | :--- |
-| `btrfs scrub repair EIO` | one hit, **F2FS** | Btrfs → "Checking and recovery", ~250 tokens |
-| `systemd 203/EXEC failed unit` | `List of TCP and UDP port numbers` | Systemd + Systemd/Sandboxing |
-| `how to configure niri window manager` | (titles only) | Niri → its config binding section |
+| `btrfs scrub repair EIO` | one hit, **F2FS** | `answer`, Btrfs → "Checking and recovery", 250 tok |
+| `how to configure niri keymap` | (titles only) | `answer`, Niri → its config section, 153 tok |
+| `systemd 203/EXEC failed unit` | `List of TCP and UDP port numbers` | `abstain`, 0 tok — no article on the shelf names that code |
+| `what is ersatz capitalism` | — | `abstain` — both articles are 276-byte stubs |
+
+The last two lines are the point: a quote that explains *systemd in general* for
+a `203/EXEC` failure is poisoning with extra steps. The gate needs a **rare-term
+anchor** — a query term that names ≤2 retrieved titles — before it will spend
+anything, so "topic present, specifics absent" comes back as silence.
 
 A quote is the **best-matching section**, heading included, never the lead: the
-lead is what a summary is, the section is what an answer is. `--budget N` caps
-the tokens (default 1200), `--archive <substring>` narrows the fan-out.
+lead is what a summary is, the section is what an answer is. It is **markdown**,
+so a `<pre>` stays a fenced code block and a list keeps its bullets — flattened
+HTML turned config examples into one unreadable line. `--budget N` caps the
+tokens (default 1200), `--archive <substring>` narrows the fan-out.
+
+Context cost, measured: an `answer` is ~250–650 tokens, an `abstain` is ~110
+(three titles, no provenance, no text) — silence is the cheap outcome by design.
 
 `wiki-ask --list` prints the shelf itself (title, coverage, vintage, GiB, path)
 as JSON or `--toon` — read it before choosing a shelf, rather than trusting a

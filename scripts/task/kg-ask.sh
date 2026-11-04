@@ -431,7 +431,11 @@ case "$intent" in
     intent="UNKNOWN"
     results="$(jq -c '[.edges[] | select(.type == "mentions" and (.to | startswith("skill:"))) | .to]
       | group_by(.) | map({id: .[0], docs: length}) | sort_by(-.docs) | .[:5]' "$graph")"
-    note="no query matched. Try \"what touches <host>\", \"which docs mention <skill>\", \"skills tagged <tag>\", \"what is related to <host>\", or \"graph stats\"."
+    # The decline is the moment a caller needs the next rung, so it names the one
+    # rung that costs no tokens when it misses: the local ZIM shelf. Adoption is a
+    # routing problem, not a documentation one — a skill nobody loads is a skill
+    # nobody calls, and this lands where the question already is.
+    note="no query matched. Try \"what touches <host>\", \"which docs mention <skill>\", \"skills tagged <tag>\", \"what is related to <host>\", or \"graph stats\". For world knowledge rather than this repo: task ops:wiki:ask Q=\"...\" reads the local ZIM shelf and abstains at zero tokens."
     ;;
 esac
 

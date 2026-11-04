@@ -97,6 +97,21 @@ tasks:
     cmds:
       - bash scripts/task/repo-paths.sh
 
+  checks:submodules:
+    desc: "[gate] Every submodule pin is the head of the branch it tracks"
+    summary: >
+      A gitlink is a revision nothing watches: the project's repository moves on
+      and nixconfig points at an older commit. Compares the COMMITTED pin
+      (`git ls-tree HEAD`) with the head of the branch the remote reports
+      (`.gitmodules` `branch =`, else its default branch): one `git ls-remote`,
+      no fetch, no mutation. Not in `checks:quick` — it needs the network, and
+      ssh remotes are probed with `BatchMode=yes` and a 10 s timeout so an
+      unattended run fails instead of prompting. Vars: FETCH=1 adds behind N /
+      ahead / diverged. Exit 0 = current, 1 = drifted, 2 = unreachable.
+    cmds:
+      - bash scripts/task/submodule-drift.sh
+    silent: true
+
   checks:tasks:
     desc: "[gate] Task graph: Nix compiles it, go-task confirms the name set"
     summary: >

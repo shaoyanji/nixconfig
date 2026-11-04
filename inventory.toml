@@ -1448,6 +1448,30 @@ notes = [
   "Its own description is 'Site-map static site gen from scratch'.",
 ]
 
+[repos.nix-build-tracker]
+url = "https://github.com/shaoyanji/nix-build-tracker"
+default_branch = "main"
+status = "active"
+deploy = "AWS: ./deploy.sh converges S3 + CloudFront + Cognito + DynamoDB + one Lambda behind a Function URL, all inside the free tier (ALERT_EMAIL required)"
+ci = "none — the deploy is ./deploy.sh run from the checkout, and `nix build .#lambda-zip` is the reproducible artifact"
+authoring = "Go lambda in lambda/ with a Nix flake that builds and zips it, plus a static frontend/ page; `nix develop` carries awscli2, go, jq, zip"
+notes = [
+  "Withdrawn from projects/ on 2026-11-04: nothing in nixconfig opened the path — no Nix, no workflow, no task — so the gitlink was a pin with no consumer and no gate on it. The repository is unchanged and still active.",
+  "Was pinned at 71013a1 when the gitlink was retired; keep the checkout outside this tree (`/Volumes/data/projects/nix-build-tracker`) rather than as a second checkout inside it.",
+]
+
+[repos.oci-always-free-demo]
+url = "https://github.com/shaoyanji/oci-always-free-demo"
+default_branch = "main"
+status = "active"
+deploy = "terraform apply against an OCI tenancy, remote state in an OCI object-storage bucket — reviewed and validated, not yet applied to a tenancy"
+ci = ".github/workflows/oci-demo.yml — static (fmt, validate, shell syntax, shellcheck) on push and PR; live and drift jobs on dispatch only"
+authoring = "Terraform, one file per concern, with scripts/*.sh, sql/ and a Flask app in app/"
+notes = [
+  "Withdrawn from projects/ on 2026-11-04 for the same reason as nix-build-tracker: no consumer in this tree, so the gitlink recorded a revision nothing acted on.",
+  "Was pinned at fcbf134 when the gitlink was retired.",
+]
+
 [repos.shaoyanji-profile]
 url = "https://github.com/shaoyanji/shaoyanji"
 default_branch = "master"

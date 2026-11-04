@@ -266,9 +266,45 @@ Three things that bite:
 using for a benchmark — it is the same `strata.service`, same ExecStart, same
 config, so the only variable is the desktop — but it does not close a page-cache
 gap: at IQ3_XXS the chat-decode median was 12.2 tok/s on the desktop and 10.4 on
-`server`, against IQ1_M's 14.6–21.0. The agent-suite failure that appeared there
-is not a tier property either: it reproduces at IQ2_XS with the current engine.
-Numbers and the open question: `hosts/eisen/MANUAL.md` §7.
+`server`. It also does not rescue that tier: the agent-suite turn 0 was lost in
+both personas, and at IQ2_XS too, while IQ1_M finished the same suite. Size, not
+the desktop, is the variable. Numbers: `hosts/eisen/MANUAL.md` §7.
+
+### Retesting a larger tier (IQ2_XS / IQ3_XXS)
+
+Both are blocked by an engine abort, not by memory, and neither short lever works:
+
+- **`--no-ple` is refused.** `--native requires --ple-gguf (the PLE key is native
+too)` — the PLE table lives inside the native shard, so there is no ~28 GB piece to
+  drop. Passing `--no-ple` next to `--native` exits 2 at load with that message.
+- **A smaller context does not help.** IQ2_XS at `--max-context 16384` loaded fine
+  (636 MiB VRAM free, 50.9 GB RSS) and aborted on the *4K prompt* stage after ~7k
+  tokens of chat traffic with `exit code -6` and no assertion in the engine log.
+
+To measure a tier without touching the generation, run it as a transient unit
+beside the real one (stop `strata` first — both want `:8085`):
+
+```bash
+FHS=/nix/store/*-strata-fhs/bin/strata-fhs     # from `systemctl cat strata`
+sudo systemctl stop strata
+sudo systemd-run --unit=strata-probe --property=User=devji --property=Group=users \
+  --property=SupplementaryGroups="video render" --property=WorkingDirectory=/mnt/storage/strata \
+  --property=LimitCORE=0 --property=StandardOutput=append:/mnt/storage/strata/probe.out \
+  -E ROCR_VISIBLE_DEVICES=0 -E HIP_VISIBLE_DEVICES=0 -E "STRATA_ALLOWED_HOSTS=*" \
+  $FHS -c 'source /mnt/storage/strata/.venv/bin/activate && python -m serve.server \
+    --engine strata --config /mnt/storage/strata/strata-coder-iq2_xs.json --port 8085'
+```
+
+Read the RSS with `systemctl show strata-probe -p MemoryCurrent`, then run the
+suite **inside the FHS env** — `.venv/bin/python` is dynamically linked and exits
+127 with the NixOS stub-ld message on its own:
+
+```bash
+$FHS -c 'source /mnt/storage/strata/.venv/bin/activate && python \
+  tools/strata_bench.py --url http://127.0.0.1:8085'
+```
+
+Finish with `sudo systemctl stop strata-probe && sudo systemctl start strata`.
 
 ## Operational Notes
 
@@ -283,11 +319,11 @@ Numbers and the open question: `hosts/eisen/MANUAL.md` §7.
 - **`task infra:deploy:host:eisen`** is the fleet-consistent entrypoint; it wraps the same `nixos-rebuild ... #eisen` switch.
 - Model swap latency is real (tens of seconds to minutes for 21–44 GiB off btrfs); `ttl = 900` amortises this for conversational use.
 - **Strata's served tier is a host file, not a Nix option.** `hosts/eisen/strata.nix`
-  ExecStart names the config (`strata-coder-iq2_xs.json`; IQ1_M's and IQ3_XXS's sit
-  beside it); the packs and weights are under `/mnt/storage/strata-data`. Changing the
-  config needs a `systemctl restart strata` and a ~4 minute expert load, not a
-  rebuild; changing the *config path* needs a switch. A revert is one line plus a
-  restart.
+  ExecStart names the config (`strata-coder-iq1_m.json` — the only tier that finishes
+  an agent session; IQ2_XS's and IQ3_XXS's sit beside it with their packs under
+  `/mnt/storage/strata-data/packs/`). Changing the config needs a `systemctl restart
+  strata` and a ~4 minute expert load, not a rebuild; changing the *config path*
+  needs a switch. A swap between tiers is one line plus a restart.
 - **A crash of `strata` can eat the root filesystem for five minutes.** The kernel
   streams the dying process's address space into systemd-coredump's spool *before*
   `ProcessSizeMax` is checked, so one abort on 2026-11-04 took `/` from 44 GB to 94 GB

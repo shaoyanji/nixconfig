@@ -47,11 +47,19 @@ in {
       Group = "users";
       SupplementaryGroups = ["video" "render"];
       WorkingDirectory = strataDir;
-      # IQ2_XS (68.15 GB, all 512 experts) — the tier the model card calls its
-      # standout, and the last candidate `strata-quant-tier` was holding open.
-      # IQ3_XXS measured at median 12.2 tok/s against IQ1_M's 14.6-21.0 and lost
-      # the engine on the agent suite; this is the one that fits the cache budget.
-      ExecStart = "${strataEnv}/bin/strata-fhs -c 'source ${strataDir}/.venv/bin/activate && python -m serve.server --engine strata --config ${strataDir}/strata-coder-iq2_xs.json --port ${toString port}'";
+      # IQ1_M (58.41 GB, 256 of 512 experts) is the served tier and the one the
+      # agent loop uses: it is the only pack that finishes an agent session on
+      # this card (2026-10-21, 19.4 tok/s, 11818 of 14637 prompt tokens reused).
+      # IQ3_XXS (75.97) and IQ2_XS (68.15) lose the engine every time — SIGABRT
+      # on the desktop persona, a silent freeze on `server` — and it is not
+      # memory: IQ2 at `--max-context 16384` (636 MiB VRAM free, 50.9 GB RSS)
+      # aborted on the *4K prompt* stage after ~7k tokens of chat traffic, with
+      # no assertion line in the engine log and `oom_kill 0` in the journal.
+      # `--no-ple` cannot be used to shrink them: the engine refuses it under
+      # `--native` ("the PLE key is native too"), so PLE in IQ2/IQ3 is not a
+      # separable 28 GB shard. The three configs stay on /mnt/storage, so a
+      # retest after an engine fix is one ExecStart line and a restart.
+      ExecStart = "${strataEnv}/bin/strata-fhs -c 'source ${strataDir}/.venv/bin/activate && python -m serve.server --engine strata --config ${strataDir}/strata-coder-iq1_m.json --port ${toString port}'";
       Restart = "on-failure";
       RestartSec = 10;
       # Never dump core. The kernel streams a crashing process's whole address
@@ -62,6 +70,10 @@ in {
       # the wrapper's "the engine had stopped (exit code -6)" line and the journal
       # are what actually get read after a crash.
       LimitCORE = "0";
+      # Context is host state, in the config the wrapper reads: IQ1_M runs
+      # `--max-context 16384` with `--kv int8`, MTP (`--mtp …/mtp/rt`) and 24
+      # engine threads — 16K is what the agent sessions actually fill, and the
+      # KV it saves is page cache the expert arena can use.
     };
   };
 

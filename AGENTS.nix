@@ -372,13 +372,30 @@
         better than the desktop — the gap is page cache, not the desktop's idle footprint.
         Ingestion holds at 157–158 against 167.
 
-        The agent suite's turn 0 lost the engine at BOTH tiers (SIGABRT after 364 s; two
-        no-CPU-no-disk freezes that the stall guard killed at 360 s) while chat and 4K/16K
-        prompts answered normally. IQ1_M completed that same suite on 2026-10-21, so this is
-        an engine or workload regression and it is OPEN — it is not an argument about
-        quantisation, and it is why the agent column cannot be used to pick a tier yet. IQ2_XS
-        is served because it is the one that fits 62.7 GiB and the operator chose it; what it
-        has not done is clear the decode floor. Numbers: hosts/eisen/MANUAL.md §7.
+        The agent suite is where the tiers actually part, and it is size-shaped: IQ3_XXS lost
+        the engine at turn 0 (SIGABRT after 364 s, and a no-CPU-no-disk freeze killed by the
+        stall guard at 360 s on `server`), IQ2_XS froze the same way, and IQ1_M ran the whole
+        session on 2026-10-21 — turn 5 at 11818 of 14637 prompt tokens reused from cache. No
+        OOM was involved at any point: `oom_kill` is 0 and the kernel log has no kill line, so
+        this is an engine stall on the larger arenas, not the kernel reclaiming memory.
+        IQ2_XS was then retested at `--max-context 16384` on 2026-11-04 (636 MiB VRAM free,
+        50.9 GB RSS) and aborted on the *4K prompt* stage after ~7k tokens of chat traffic,
+        which settles the context hypothesis too.
+
+        `--no-ple` is not a lever here: the engine refuses it under `--native` ("the PLE key
+        is native too"), so the PLE table in IQ2/IQ3 is not a separable ~28 GB shard that can
+        be dropped to make the larger tiers fit. Retesting those tiers needs an engine fix,
+        not a flag.
+
+        Also a measurement trap worth not repeating: the chat-decode medians above are
+        cold/warm, not tier. Re-measured right after a restart, IQ1_M itself scores 13.8 / 7.0 /
+        7.3, which would "lose" to its own warm baseline. Only compare tiers on a server that
+        has been answering for a while; the agent column is not affected the same way.
+
+        Result: IQ1_M stays served, tuned for the 16K context an agent session actually fills
+        (`--max-context 16384`, `--kv int8`, MTP on, 24 engine threads) — the larger packs stay
+        on the host, so a retest after an engine fix is one line plus a restart. Numbers:
+        hosts/eisen/MANUAL.md §7.
 
         Side effect worth keeping: one of those aborts spooled a core so large that / went
         from 44 GB to 94 GB used for five minutes (the kernel streams the address space into

@@ -164,24 +164,39 @@ the prefix again.
 
 ### Tier comparison, 2026-11-04 (`tools/strata_bench.py`, same host)
 
-| Tier | Size | Experts | Decode (chat, 9 runs) | Ingestion | Agent session |
+| Tier | Size | Experts | Decode (chat) | Ingestion | Agent session |
 | :--- | ---: | :--- | :--- | :--- | :--- |
-| IQ1_M pruned Coder — the table above | 58.41 GB | 256 of 512 | **14.6 – 21.0** tok/s | 167 tok/s | 19.4 tok/s |
-| IQ2_XS Swift 1.5 — `strata-coder-iq2_xs.json`, served | 68.15 GB | all 512 | 7.2 – 20.3, median **13.0** | 158 tok/s | froze at turn 0 |
-| IQ3_XXS Swift 1.5 — `strata-coder-iq3_xxs.json` | 75.97 GB | all 512 | 7.4 – 20.8, median 12.2 desktop / 10.4 `server` | 157 tok/s | crashed / froze at turn 0 |
+| IQ1_M pruned Coder — `strata-coder-iq1_m.json`, served | 58.41 GB | 256 of 512 | 14.6 – 21.0 warm (2026-10-21) · 13.8 / 7.0 / 7.3 cold (2026-11-04) | 167 tok/s | **completes**, 19.4 tok/s, 81% prefix reuse |
+| IQ2_XS Swift 1.5 — `strata-coder-iq2_xs.json` | 68.15 GB | all 512 | 7.2 – 20.3, median 13.0 | 158 tok/s | froze at turn 0 |
+| IQ2_XS again at `--max-context 16384` — `strata-coder-iq2_xs-16k.json` | 68.15 GB | all 512 | 7.5 – 20.8, median 11.7 | — | SIGABRT on the 4K prompt stage |
+| IQ3_XXS Swift 1.5 — `strata-coder-iq3_xxs.json` | 75.97 GB | all 512 | 7.4 – 20.8, median 12.2 desktop / 10.4 `server` | 157 tok/s | aborted / froze at turn 0 |
 
-Read the medians, not the ranges: every tier shows the same 7 tok/s floor on a
-cold expert blob and the same ~20 tok/s ceiling once it is warm, and the spread
-is page cache, not arithmetic. What separates them is how often the floor comes
-up. 58 GB is effectively resident in 62.7 GiB, 68 GB mostly is, 76 GB is not —
-IQ3's `server` persona (10.4) is no better than its desktop one (12.2), so
-subtracting Steam and the compositor does not close a page-cache gap.
+**The decode medians here are not a fair fight, and the raw column above is
+why.** The first two questions after a load answer at ~7 tok/s and the same
+questions warm answer at 14–20: IQ1_M was re-measured on 2026-11-04 immediately
+after a restart and scored 13.8 / 7.0 / 7.3, which would "lose" to its own
+2026-10-21 warm run. Page cache, not quantisation, sets that floor. Compare tiers
+only on a server that has been up and answering for a while.
 
-The agent-session column is **not a tier property**. Turn 0 of that suite lost
-the engine at IQ3_XXS on both personas (SIGABRT after 364 s; a no-CPU-no-disk
-freeze killed by the stall guard at 360 s) and again at IQ2_XS (the same freeze),
-while chat and 4K/16K prompts answered normally everywhere. IQ1_M completed the
-same suite on 2026-10-21, so the regression is in the engine or the workload, not
-in the quant — it is open work, and the tier choice above is a decode decision
-only.
+The agent column is not confounded in the same way, and there the split is
+clean and size-shaped: 58 GB finishes the suite (turn 5 at 11818 of 14637 prompt
+tokens reused), while 68 GB and 76 GB both lose the engine at turn 0 — never
+OOM-killed (`oom_kill 0`, no kernel line, no coredump payload), just frozen with
+no CPU and no disk until the stall guard kills it. That is why the served tier
+went back to IQ1_M.
+
+**Two hypotheses were tested and both are dead.** *Context*: IQ2 re-run at
+`--max-context 16384` loaded with **636 MiB of VRAM free** and 50.9 GB RSS, and
+still aborted (`exit code -6`) — this time on the **4K prompt** stage, after only
+~7k tokens of chat traffic, so it is not a long-context or KV-footprint wall.
+*PLE*: `--no-ple` cannot be used to shrink the pack at all — the engine rejects
+it under `--native` because the PLE key is itself native (`--native requires
+--ple-gguf … no shard of the model holds per_layer_token_embd.weight`). Neither
+flag is the lever; an engine fix is. Both packs and configs stay on the host, so
+a retest is one line and a restart.
+
+**Served config (2026-11-04):** IQ1_M at `--max-context 16384` with `--kv int8`,
+MTP on (`--mtp …/mtp/rt`, `--spec 4 --spec-min-p 0.5`) and the engine's 24
+threads. 16K is what an agent session actually fills (the suite's largest turn was
+14637 prompt tokens), and the KV it saves is page cache the expert arena can use.
 

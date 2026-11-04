@@ -54,6 +54,14 @@ in {
       ExecStart = "${strataEnv}/bin/strata-fhs -c 'source ${strataDir}/.venv/bin/activate && python -m serve.server --engine strata --config ${strataDir}/strata-coder-iq2_xs.json --port ${toString port}'";
       Restart = "on-failure";
       RestartSec = 10;
+      # Never dump core. The kernel streams a crashing process's whole address
+      # space into systemd-coredump's spool *before* ProcessSizeMax is consulted:
+      # one 2026-11-04 abort of this unit drove / from 44 GB to 94 GB used for
+      # five minutes, until the dump unit hit its runtime limit and was killed and
+      # the spool file went with it. RLIMIT_CORE=0 means the dump never starts;
+      # the wrapper's "the engine had stopped (exit code -6)" line and the journal
+      # are what actually get read after a crash.
+      LimitCORE = "0";
     };
   };
 

@@ -364,16 +364,26 @@
         page cache in server mode. If IQ2_XS decodes below that baseline, mark REJECTED with the
         number and IQ1_M stays.
 
-        Measured: IQ3_XXS, 2026-11-04. Both shards verified against the publisher's SHA256SUMS
-        (75.97 GB, all 512 experts), pack built by tools/iq_pack.py with 96 exact conversions
-        and 0 rounded. Chat decode 7.4–20.8 tok/s, median 12.2 on the desktop persona and 10.4
-        on the TTY-only `server` one — below IQ1_M's 14.6–21.0 and not rescued by subtracting
-        the desktop, which is the point the tier was supposed to test. Ingestion 157 tok/s
-        against 167, first token 1.6–2.6 s. Then the agent suite lost the engine on turn 0 in
-        BOTH personas: SIGABRT after 364 s, and on `server` a freeze with no CPU or disk that
-        the stall guard killed at 360 s. Slower and less stable, so IQ2_XS is the tier still
-        worth measuring and its pack is not built yet. IQ3_XXS is in place because it was asked
-        for, not because it cleared the exit criterion; MANUAL.md §7 carries the numbers.
+        Measured, both tiers, 2026-11-04. Shards verified against the publisher's SHA256SUMS
+        (75.97 and 68.15 GB, all 512 experts); packs built by tools/iq_pack.py, 96 exact
+        conversions and 0 rounded. IQ3_XXS: chat decode 7.4–20.8 tok/s, median 12.2 on the
+        desktop persona and 10.4 on the TTY-only `server` one. IQ2_XS: 7.2–20.3, median 13.0.
+        Both sit under IQ1_M's 14.6–21.0, and the persona that was supposed to help is no
+        better than the desktop — the gap is page cache, not the desktop's idle footprint.
+        Ingestion holds at 157–158 against 167.
+
+        The agent suite's turn 0 lost the engine at BOTH tiers (SIGABRT after 364 s; two
+        no-CPU-no-disk freezes that the stall guard killed at 360 s) while chat and 4K/16K
+        prompts answered normally. IQ1_M completed that same suite on 2026-10-21, so this is
+        an engine or workload regression and it is OPEN — it is not an argument about
+        quantisation, and it is why the agent column cannot be used to pick a tier yet. IQ2_XS
+        is served because it is the one that fits 62.7 GiB and the operator chose it; what it
+        has not done is clear the decode floor. Numbers: hosts/eisen/MANUAL.md §7.
+
+        Side effect worth keeping: one of those aborts spooled a core so large that / went
+        from 44 GB to 94 GB used for five minutes (the kernel streams the address space into
+        systemd-coredump before ProcessSizeMax is consulted). strata.service now sets
+        LimitCORE=0.
       '';
     };
     doc-budget-ci = {

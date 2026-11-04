@@ -167,18 +167,21 @@ the prefix again.
 | Tier | Size | Experts | Decode (chat, 9 runs) | Ingestion | Agent session |
 | :--- | ---: | :--- | :--- | :--- | :--- |
 | IQ1_M pruned Coder — the table above | 58.41 GB | 256 of 512 | **14.6 – 21.0** tok/s | 167 tok/s | 19.4 tok/s |
-| IQ3_XXS Swift 1.5 — `strata-coder-iq3_xxs.json` | 75.97 GB | all 512 | 7.4 – 20.8, median 12.2 desktop / 10.4 `server` | 157 tok/s | **engine lost at turn 0** |
+| IQ2_XS Swift 1.5 — `strata-coder-iq2_xs.json`, served | 68.15 GB | all 512 | 7.2 – 20.3, median **13.0** | 158 tok/s | froze at turn 0 |
+| IQ3_XXS Swift 1.5 — `strata-coder-iq3_xxs.json` | 75.97 GB | all 512 | 7.4 – 20.8, median 12.2 desktop / 10.4 `server` | 157 tok/s | crashed / froze at turn 0 |
 
-The second row is the whole argument against it. 76 GB cannot be resident in
-62.7 GiB, so decode becomes a page-cache lottery: a 20.8 tok/s sample is a warm
-expert blob, an 8.6 one is a read off the array. The TTY-only `server` persona is
-in the same band and no better (10.4 median), which is the interesting result —
-subtracting Steam and the compositor does not close a 17 GB gap.
+Read the medians, not the ranges: every tier shows the same 7 tok/s floor on a
+cold expert blob and the same ~20 tok/s ceiling once it is warm, and the spread
+is page cache, not arithmetic. What separates them is how often the floor comes
+up. 58 GB is effectively resident in 62.7 GiB, 68 GB mostly is, 76 GB is not —
+IQ3's `server` persona (10.4) is no better than its desktop one (12.2), so
+subtracting Steam and the compositor does not close a page-cache gap.
 
-It is also less stable at the same task. Both personas lost the engine on the
-first turn of the agent suite: SIGABRT on the desktop (`exit code -6`, 364 s),
-and on `server` a freeze with no CPU or disk until the stall guard killed it at
-360 s. Chat and 4K/16K prompts answered normally in both; the agent workload is
-what breaks it. IQ1_M's JSON is still on the host, so reverting is one line in
-`hosts/eisen/strata.nix`.
+The agent-session column is **not a tier property**. Turn 0 of that suite lost
+the engine at IQ3_XXS on both personas (SIGABRT after 364 s; a no-CPU-no-disk
+freeze killed by the stall guard at 360 s) and again at IQ2_XS (the same freeze),
+while chat and 4K/16K prompts answered normally everywhere. IQ1_M completed the
+same suite on 2026-10-21, so the regression is in the engine or the workload, not
+in the quant — it is open work, and the tier choice above is a decode decision
+only.
 

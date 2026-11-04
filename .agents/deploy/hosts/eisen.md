@@ -264,11 +264,11 @@ Three things that bite:
 
 **What the persona does and does not buy (measured 2026-11-04).** It is worth
 using for a benchmark — it is the same `strata.service`, same ExecStart, same
-config, so the only variable is the desktop — but it does not make the IQ3_XXS
-tier viable: chat decode median 12.2 tok/s on the desktop and 10.4 on `server`
-against IQ1_M's 14.6–21.0, and the agent-suite first turn lost the engine in
-both personas (SIGABRT on the desktop, a freeze on `server`). Numbers:
-`hosts/eisen/MANUAL.md` §7.
+config, so the only variable is the desktop — but it does not close a page-cache
+gap: at IQ3_XXS the chat-decode median was 12.2 tok/s on the desktop and 10.4 on
+`server`, against IQ1_M's 14.6–21.0. The agent-suite failure that appeared there
+is not a tier property either: it reproduces at IQ2_XS with the current engine.
+Numbers and the open question: `hosts/eisen/MANUAL.md` §7.
 
 ## Operational Notes
 
@@ -283,8 +283,16 @@ both personas (SIGABRT on the desktop, a freeze on `server`). Numbers:
 - **`task infra:deploy:host:eisen`** is the fleet-consistent entrypoint; it wraps the same `nixos-rebuild ... #eisen` switch.
 - Model swap latency is real (tens of seconds to minutes for 21–44 GiB off btrfs); `ttl = 900` amortises this for conversational use.
 - **Strata's served tier is a host file, not a Nix option.** `hosts/eisen/strata.nix`
-  ExecStart names the config (`strata-coder-iq3_xxs.json`, IQ1_M's beside it); the
-  pack and weights are under `/mnt/storage/strata-data`. Changing the config needs a
-  `systemctl restart strata` and a four-minute expert load, not a rebuild; changing
-  the *config path* needs a switch. Both JSONs load with the engine in `strata/`, so
-  a revert is one line plus a restart.
+  ExecStart names the config (`strata-coder-iq2_xs.json`; IQ1_M's and IQ3_XXS's sit
+  beside it); the packs and weights are under `/mnt/storage/strata-data`. Changing the
+  config needs a `systemctl restart strata` and a ~4 minute expert load, not a
+  rebuild; changing the *config path* needs a switch. A revert is one line plus a
+  restart.
+- **A crash of `strata` can eat the root filesystem for five minutes.** The kernel
+  streams the dying process's address space into systemd-coredump's spool *before*
+  `ProcessSizeMax` is checked, so one abort on 2026-11-04 took `/` from 44 GB to 94 GB
+  used until the dump unit hit its runtime limit. `serviceConfig.LimitCORE = "0"` in
+  `strata.nix` is the fix (RLIMIT_CORE=0, so the dump never starts); do not "fix" a
+  full disk on this host by deleting store paths until you have read `df` *and*
+  `du -x`: `/nix` and `/home` are separate mounts (`/home` held 13 GB of `uv` cache,
+  16 GB total, and `/nix/store/.links` 31 GB).

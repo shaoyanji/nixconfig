@@ -46,7 +46,7 @@
           def log_message(self, format, *args):
               pass
 
-      server = http.server.HTTPServer(("127.0.0.1", ${toString cfg.alerting.port}), AlertHandler)
+      server = http.server.HTTPServer(("${cfg.alerting.address}", ${toString cfg.alerting.port}), AlertHandler)
       server.serve_forever()
     '';
 
@@ -87,6 +87,17 @@
 in {
   options.services.fleetMonitors = {
     enable = lib.mkEnableOption "config-declared fleet monitors (gatus backend)";
+
+    gatus.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Run the gatus backend and this host's `endpoints` here. False keeps the
+        alert sink (`alerting`) and nothing else: the shape for a host whose
+        checks moved to a peer that posts its alerts back to this one. That
+        peer is the only host with an identity behind the SimpleX bridge.
+      '';
+    };
 
     address = lib.mkOption {
       type = lib.types.str;
@@ -130,7 +141,28 @@ in {
       port = lib.mkOption {
         type = lib.types.port;
         default = 5226;
-        description = "Loopback port for the local fleet monitoring alert bridge.";
+        description = "Port for the fleet monitoring alert bridge.";
+      };
+
+      address = lib.mkOption {
+        type = lib.types.str;
+        default = "127.0.0.1";
+        description = ''
+          Address the bridge binds. Loopback keeps it to this host's own gatus;
+          `"0.0.0.0"` makes it a sink a peer's gatus can post to, which is only
+          safe when the firewall scopes the port (frieren's exposure registry
+          opens 5226 on tailscale0 and nowhere else).
+        '';
+      };
+
+      url = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Where this host's gatus posts alerts. null is the local bridge
+          (`http://127.0.0.1:<port>/alert`); a peer's bridge is set by URL, so a
+          host with checks but no SimpleX identity still delivers.
+        '';
       };
     };
 
@@ -192,7 +224,7 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    services.gatus = {
+    services.gatus = lib.mkIf cfg.gatus.enable {
       enable = true;
       inherit (cfg) openFirewall;
       settings = {
@@ -201,7 +233,10 @@ in {
         };
         alerting = lib.mkIf cfg.alerting.enable {
           custom = {
-            url = "http://127.0.0.1:" + toString cfg.alerting.port + "/alert";
+            url =
+              if cfg.alerting.url != null
+              then cfg.alerting.url
+              else "http://127.0.0.1:" + toString cfg.alerting.port + "/alert";
             method = "POST";
             body = "{\"endpoint\": \"[ENDPOINT_NAME]\", \"group\": \"[ENDPOINT_GROUP]\", \"description\": \"[ALERT_DESCRIPTION]\"}";
           };

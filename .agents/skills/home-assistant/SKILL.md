@@ -20,7 +20,7 @@ enabled in `hosts/frieren/configuration.nix`. Editing any other file does nothin
 | :--- | :--- |
 | Web | `http://ha.frieren.lan/` (nginx vhost) or `127.0.0.1:8123` |
 | MQTT | `127.0.0.1:1883`, Mosquitto, loopback, `allow_anonymous = true` |
-| Status | `http://status.frieren.lan/` (Uptime-Kuma, port 3001) |
+| Status | `http://100.123.145.53:8181/` (delphi's gatus; the local Uptime-Kuma was retired 2026-11-04) |
 | State | `configDir` → `/srv/private/home-assistant` |
 
 The port is declared once (`services.ha-stack.port`) and the nginx vhost and

@@ -55,13 +55,15 @@
       import uuid
       import websockets
 
-      endpoint = "http://127.0.0.1:8181/api/v1/endpoints/statuses"
+      # delphi's gatus answers here since frieren's own was retired on
+      # 2026-11-04; loopback on this host now has no monitor UI behind it.
+      endpoint = "http://100.123.145.53:8181/api/v1/endpoints/statuses"
       try:
           req = urllib.request.Request(endpoint, headers={"User-Agent": "FleetGatusReporter/1.0"})
           with urllib.request.urlopen(req, timeout=5) as resp:
               data = json.loads(resp.read().decode())
       except Exception as e:
-          msg = "⚠️ [Fleet Monitoring Alert - 05:00 AM] Gatus API unreachable at %s: %s\nHost: frieren (192.168.3.25)" % (endpoint, str(e))
+          msg = "⚠️ [Fleet Monitoring Alert - 05:00 AM] Gatus API unreachable at %s: %s\nGatus: delphi (100.123.145.53)" % (endpoint, str(e))
           print("FAILED: 1")
           print(msg)
           sys.exit(1)
@@ -73,7 +75,7 @@
       else:
           header = "📊 [Fleet Monitoring Scorecard - 05:00 AM] All %d services NOMINAL." % total
 
-      lines = [header, "Host: frieren (192.168.3.25)"]
+      lines = [header, "Gatus: delphi (100.123.145.53)"]
       for d in data:
           name = d.get("name")
           group = d.get("group", "fleet")
@@ -458,11 +460,10 @@ in {
   ];
 
   # --- monitors as code (HC-6) ---
-  # Nothing was watched before this: Uptime-Kuma had 0 monitors and Kuma's own
-  # monitors cannot be declared (its HTTP API is read-only), so the list lives in
-  # the repo instead and gatus consumes it. Every endpoint probes loopback, so no
-  # firewall entry is needed and the UI is reached at monitors.frieren.lan through
-  # nginx (reverse-proxy.nix).
+  # The checks are declarative on delphi since 2026-11-04 (`services.fleetMonitors`
+  # in hosts/delphi/configuration.nix); this host's gatus, its vhost and its
+  # uptime-kuma are gone, and what remains here is the alert sink (see the
+  # `services.fleetMonitors` block below).
   # Staging is a waiting room, not a home: everything downloaded lands in
   # /srv/data/downloads and is sorted into the taxonomy by scripts/task/
   # sort-downloads.sh (also `task data:sort`). The timer keeps it from becoming
@@ -531,80 +532,15 @@ in {
     };
   };
 
+  # gatus is retired here as of 2026-11-04. Its checks moved to delphi's
+  # `services.fleetMonitors` and are probed across the tailnet; this host keeps
+  # only the alert sink. The SimpleX identity that receives the fleet's messages
+  # lives in this host's `~/.simplex`, so the bridge stays and binds the tailnet
+  # address space — the exposure registry opens 5226 on tailscale0 alone.
   services.fleetMonitors = {
     enable = true;
-    endpoints = [
-      {
-        name = "nginx portal";
-        url = "http://127.0.0.1:80";
-        group = "frieren";
-        conditions = ["[STATUS] < 400"];
-      }
-      {
-        name = "steam cache";
-        url = "http://127.0.0.1:8081/__health";
-        group = "frieren";
-        conditions = ["[STATUS] < 400"];
-      }
-      {
-        name = "jellyfin";
-        url = "http://127.0.0.1:8096";
-        group = "frieren";
-        conditions = ["[STATUS] < 400"];
-      }
-      {
-        name = "immich";
-        url = "http://127.0.0.1:2283";
-        group = "frieren";
-        conditions = ["[STATUS] < 400"];
-      }
-      {
-        # Paperless moved to delphi; the monitor follows the service over the
-        # tailnet instead of this host's loopback. Green here now means "frieren
-        # can reach delphi", which is exactly what the vhost depends on.
-        name = "paperless (delphi)";
-        url = "http://100.123.145.53:28981";
-        group = "frieren";
-        conditions = ["[STATUS] < 400"];
-      }
-      {
-        name = "home assistant";
-        url = "http://127.0.0.1:8123";
-        group = "frieren";
-        conditions = ["[STATUS] < 400"];
-      }
-      {
-        name = "harmonia cache";
-        url = "http://127.0.0.1:5000";
-        group = "frieren";
-        conditions = ["[STATUS] < 400"];
-      }
-      # The clearest previously-unwatched failure mode: a connecting probe proves
-      # the resolver socket is up. A full resolution assertion needs a dns://
-      # endpoint (see the `resolver-independence` note in AGENTS.nix).
-      {
-        name = "dns (pihole-ftl)";
-        url = "tcp://127.0.0.1:53";
-        group = "dns";
-        conditions = ["[CONNECTED] == true"];
-      }
-      {
-        name = "audiobookshelf";
-        url = "http://127.0.0.1:13378";
-        group = "frieren";
-        conditions = ["[STATUS] < 400"];
-      }
-      # The closed loop: not "is nginx up" (the endpoint above) but "did the
-      # nightly jobs succeed, is the generation fresh, is the NAS under
-      # pressure". Body is JSON, so the condition asserts the sentinel's own
-      # verdict rather than a 200 from a static file.
-      {
-        name = "fleet sentinel";
-        url = "http://127.0.0.1:80/sentinel/status.json";
-        group = "frieren";
-        conditions = ["[BODY].state == ok"];
-      }
-    ];
+    gatus.enable = false;
+    alerting.address = "0.0.0.0";
   };
 
   # --- SMART monitoring ---
@@ -681,7 +617,6 @@ in {
       "/srv/private/zigbee2mqtt"
       "/var/lib/immich"
       "/var/lib/paperless"
-      "/var/lib/uptime-kuma"
       "/var/lib/vaultwarden"
       "/var/lib/audiobookshelf"
       "/srv/backup/postgresql"

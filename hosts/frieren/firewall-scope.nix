@@ -45,12 +45,13 @@ in {
           websockets = true;
         };
       };
-      uptime-kuma = {
-        port = config.services.ha-stack.uptime-kuma.port;
-        proxy = {
-          name = "status.frieren.lan";
-          websockets = true;
-        };
+      # 3001 (uptime-kuma) pruned 2026-11-04 with the service: the dashboard
+      # held no monitors on either host, and the checks live in gatus.
+      # The alert bridge stays on this host because its SimpleX identity does;
+      # delphi's gatus posts its alerts here, so the port is tailnet-only.
+      fleet-alert-bridge = {
+        port = config.services.fleetMonitors.alerting.port;
+        lan = false;
       };
       harmonia = {
         port = config.services.harmonia-fleet.port;

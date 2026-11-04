@@ -4250,7 +4250,7 @@
       status = "OPEN";
       priority = "P3";
       date = "2026-10-21";
-      summary = "Compute leaves the NAS and the NAS keeps the name and the copy: stirling (2026-10-21) then paperless, vaultwarden and anki (2026-11-02) now run on delphi behind frieren's vhosts, with a nightly state mirror into its restic window; hermes waits on a bot-token cutover and immich stays because its 1.4 TB is the NAS.";
+      summary = "Compute leaves the NAS and the NAS keeps the name and the copy: stirling (2026-10-21) then paperless, vaultwarden and anki (2026-11-02) run on delphi behind frieren's vhosts, with a nightly state mirror into its restic window; the monitor pair followed on 2026-11-04, hermes stays resident on both hosts by decision, and immich stays because its 1.4 TB is the NAS.";
       refs = {
         hosts = ["frieren" "delphi"];
         modules = ["hosts/frieren/infra-stack.nix" "modules/profiles/service-exposure.nix"];
@@ -4266,11 +4266,14 @@
         `/srv/backup/offload` at 03:10, inside the window that already carries
         those copies to BurgerNAS.
 
-        **What is left.** hermes is the last unit, 226 MiB of state in
-        `~/.hermes`: one bot token cannot be polled twice, so it waits on an
-        agreed window — copy state, enable on delphi, stop frieren, measure. One
-        dependency the move cannot remove: a name that lives on frieren needs
-        frieren's nginx.
+        **What is left is a decision.** hermes stays resident on both hosts: each
+        gateway polls its own bot token (`hermes` here, `delphi-telegram` there),
+        so the 226 MiB in `~/.hermes` buys two agents, not a conflict. The monitor
+        pair did move (2026-11-04): frieren's gatus and its empty uptime-kuma are
+        gone, the checks run in delphi's `services.fleetMonitors` over the
+        tailnet, and alerts post back to frieren's SimpleX bridge — the only host
+        with an identity to deliver them. One dependency the move cannot remove:
+        a name that lives on frieren needs frieren's nginx.
 
         **The tunnel is gone.** Frieren was deployed on 2026-11-02 with vhosts
         that name delphi's tailnet address; `offload-tunnel` was stopped first and

@@ -259,8 +259,14 @@ in {
     btListenPort = 51414;
   };
 
-  # Home Assistant IoT and device stack (modules/services/home-assistant.nix)
-  services.ha-stack.enable = true;
+  # Home Assistant IoT and device stack (modules/services/home-assistant.nix).
+  # uptime-kuma is off as of 2026-11-04: its database here held zero monitors
+  # (so did delphi's), and the checks that mattered are declarative gatus, now
+  # served by delphi — see `services.fleetMonitors` in infra-stack.nix.
+  services.ha-stack = {
+    enable = true;
+    uptime-kuma.enable = false;
+  };
 
   # Shell-history sync (modules/services/atuin-server.nix). The one account is
   # registered; leaving signup open would let anyone who reaches the vhost write

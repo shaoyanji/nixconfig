@@ -525,8 +525,60 @@ in {
         };
         conditions = ["[BODY].state == ok"];
       }
+      # The NAS's own services, probed across the tailnet since frieren's gatus
+      # was retired on 2026-11-04. Each port is one frieren's
+      # `profiles.serviceExposure` registry already opens on tailscale0, so a
+      # probe cannot outlive the hole it needs; audiobookshelf has no exposed
+      # port, only its vhost, and is probed by name.
+      {
+        name = "frieren jellyfin";
+        url = "http://100.97.61.65:8096";
+        group = "frieren";
+      }
+      {
+        name = "frieren immich";
+        url = "http://100.97.61.65:2283";
+        group = "frieren";
+      }
+      {
+        name = "frieren home assistant";
+        url = "http://100.97.61.65:8123";
+        group = "frieren";
+      }
+      {
+        name = "frieren harmonia";
+        url = "http://100.97.61.65:5000";
+        group = "frieren";
+      }
+      {
+        name = "frieren audiobookshelf";
+        url = "http://100.97.61.65/";
+        group = "frieren";
+        headers = {
+          Host = "audiobooks.frieren.lan";
+        };
+      }
+      # paperless came off the NAS; its check moves from frieren's retired list
+      # to the host that serves it.
+      {
+        name = "paperless";
+        url = "http://127.0.0.1:28981";
+        group = "delphi";
+      }
+      # Two of frieren's checks do not survive the move, and no probe can carry
+      # them: the Steam cache binds loopback only (`/__health` on 127.0.0.1:8081,
+      # no exposure entry, no vhost), and the resolver check names 10.99.0.53 —
+      # the failover address THIS host also serves, so a probe from here would
+      # only prove delphi to itself. Both stay host-local concerns; the sentinel
+      # ledger (`[BODY].state`, above) is what reports the NAS's own pressure.
     ];
   };
+
+  # Alerts are delivered by the only host that has an identity behind the
+  # bridge: frieren's SimpleX profile posts to its #Fleet group, and this host's
+  # bridge has no daemon to talk to (see `alerting.address` in
+  # modules/services/fleet-monitors.nix and the exposure registry there).
+  services.fleetMonitors.alerting.url = "http://100.97.61.65:5226/alert";
 
   # crab-hole owns port 53, so resolved must not squat on it: the wildcard bind
   # in `downstream` collides with the 127.0.0.53 stub and the unit fails with

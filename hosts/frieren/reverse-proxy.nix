@@ -101,11 +101,10 @@ in {
         group = "Operations & Fleet Infrastructure";
         scheme = "https";
       };
-      uptime-kuma = {
-        title = "Uptime Kuma";
-        description = "Fleet service monitoring, uptime dashboards, and ping health metrics.";
-        group = "Operations & Fleet Infrastructure";
-      };
+      # `status.frieren.lan` (uptime-kuma) and `monitors.frieren.lan` (gatus) are
+      # gone as of 2026-11-04: both dashboards were retired from this host. The
+      # fleet's checks run on delphi's gatus, whose alert webhook posts back to
+      # this host's SimpleX bridge.
       scrutiny = {
         title = "Scrutiny";
         description = "Hard drive S.M.A.R.T. monitoring and drive health analysis dashboard.";
@@ -149,12 +148,6 @@ in {
         description = "Aki hypermedia docs, host inventory & Nix closure explorer.";
         group = "Operations & Fleet Infrastructure";
         vhost = "fleet.frieren.lan";
-      };
-      monitors = {
-        title = "Fleet Monitors";
-        description = "Config-declared health checks (gatus) — service, cache and DNS liveness.";
-        group = "Operations & Fleet Infrastructure";
-        vhost = "monitors.frieren.lan";
       };
       pihole = {
         title = "Pi-hole DNS";
@@ -494,30 +487,8 @@ in {
         };
       };
 
-      # Monitors UI (gatus, HC-6). Written out here rather than through
-      # `profiles.serviceExposure`: the backend binds loopback, and a registry
-      # entry would also open its port on the LAN interface — a hole with only a
-      # loopback listener behind it is the REDUNDANT class `checks:ports` flags.
-      "monitors.frieren.lan" = {
-        addSSL = true;
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-          }
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-          }
-        ];
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.fleetMonitors.port}";
-          proxyWebsockets = true;
-        };
-      };
+      # `monitors.frieren.lan` was retired with this host's gatus on 2026-11-04;
+      # the fleet's monitor UI is delphi's (http://100.123.145.53:8181/).
 
       # Fleet sentinel dashboard (static, reads status.json client-side).
       "sentinel.frieren.lan" = {
@@ -547,7 +518,7 @@ in {
       # Transmission web UI (leech-only torrent client). RPC binds loopback
       # only (hosts/frieren/transmission.nix); this vhost is the sole path in,
       # so no raw :9091 LAN hole is opened. Same rationale as
-      # monitors.frieren.lan above: not a profiles.serviceExposure entry.
+      # vault.frieren.lan: not a profiles.serviceExposure entry.
       "torrent.frieren.lan" = {
         addSSL = true;
         listen = [

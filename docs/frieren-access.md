@@ -43,7 +43,7 @@ route on hosts that are physically on the LAN — their native path wins.
 | Stirling PDF | `http://pdf.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:7351` |
 | AriaNg | `http://aria.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:6801` |
 | Home Assistant | `http://ha.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:8123` |
-| Uptime Kuma | `http://status.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:3001` |
+| Fleet monitors (gatus) | `http://100.123.145.53:8181/` (delphi, tailnet only) | — | moved off this host 2026-11-04 |
 | Scrutiny | `http://smart.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:8124` |
 | Vaultwarden | `http://vault.frieren.lan` | `100.97.61.65:80` | delphi `:8222` over the tailnet (moved 2026-11-02) |
 | Harmonia (nix cache) | `http://cache.frieren.lan` | `100.97.61.65:80` | `127.0.0.1:5000` |
@@ -57,7 +57,7 @@ route on hosts that are physically on the LAN — their native path wins.
 | Stirling PDF | 7351 | LAN + tailnet (declared in `hosts/frieren/networking.nix`) |
 | Home Assistant | 8123 | LAN + tailnet |
 | AriaNg | 6801 | LAN + tailnet |
-| Uptime Kuma | 3001 | LAN + tailnet |
+| Fleet monitors (gatus) | 8181 | delphi, tailnet only (no equivalent port here since 2026-11-04) |
 | Scrutiny | 8124 | LAN + tailnet |
 | SMB / NFS | 445, 139 / 2049 | LAN + tailnet |
 

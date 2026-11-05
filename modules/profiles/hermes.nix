@@ -32,47 +32,13 @@ in {
       description = "HERMES_AGENT_TIMEOUT setting (0 for unlimited).";
     };
 
-    # Flexible options for shared model and display settings
-    model = {
-      provider = lib.mkOption {
-        type = lib.types.str;
-        default = "nous";
-        description = "Primary model provider in Hermes YAML config.";
-      };
-      default = lib.mkOption {
-        type = lib.types.str;
-        default = "inclusionai/ling-3.0-flash-sante:free";
-        description = "Default model identifier in Hermes YAML config.";
-      };
-    };
-
-    fallbackProviders = lib.mkOption {
-      type = lib.types.listOf lib.types.attrs;
-      default = [
-        {
-          provider = "openrouter";
-          model = "thinkingmachines/inkling:free";
-        }
-        {
-          provider = "deepseek";
-          model = "deepseek-flash";
-        }
-      ];
-      description = "Fallback model providers and models in Hermes YAML config.";
-    };
-
-    display = {
-      interface = lib.mkOption {
-        type = lib.types.enum ["cli" "tui"];
-        default = "cli";
-        description = "Hermes display interface (cli forces classic REPL, fixing Hermes 0.22 TUI breakdown).";
-      };
-      toolProgress = lib.mkOption {
-        type = lib.types.str;
-        default = "all";
-        description = "Tool execution progress preview mode in Hermes YAML config.";
-      };
-    };
+    # Model, display, fallback and arbitrary YAML settings are deliberately not
+    # options here. The YAML is authored in modules/user/ai/hermes-persona/
+    # config.yaml and symlinked to ~/.hermes/config.yaml by hermes-user.nix, so
+    # an option naming a YAML key would write no file: `model`, `display`,
+    # `fallbackProviders` and `extraYamlConfig` existed in that shape and were
+    # read by nobody. Edit the persona file. (Removed 2026-11-05; `hermes
+    # doctor` now reports that file as v51, which is the version to keep.)
 
     gateway = {
       enable = lib.mkOption {
@@ -93,12 +59,6 @@ in {
         default = 5225;
         description = "Port for the simplex-chat WebSocket daemon.";
       };
-    };
-
-    extraYamlConfig = lib.mkOption {
-      type = lib.types.attrs;
-      default = {};
-      description = "Arbitrary extra YAML configuration options to merge into Hermes config.";
     };
   };
 

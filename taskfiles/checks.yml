@@ -344,6 +344,21 @@ tasks:
     cmds:
       - bash scripts/task/modules-menu.sh validate
 
+  checks:hermes:
+    desc: "[gate] hermes surface: call-site flags, gateway, secret bridge, config version"
+    summary: >
+      Token-free and local — no model call, no ssh, no writes. Four questions
+      the 03:00 job cannot answer out loud: does every top-level hermes call site
+      use a flag `hermes --help` publishes (Tier 3 passed `-q`, a `hermes chat`
+      option, to the top-level CLI and exited 2 before any model call until
+      2026-11-05); is the gateway active with no platform flagged
+      needs_attention; is every rendered secret key present in the ~/.hermes/.env
+      bridge (names only, never values); and does `hermes doctor` call the
+      persona config current. Runtime sections skip on a host without hermes.
+      Exit 0 = clean, 1 = defect.
+    cmds:
+      - bash scripts/task/hermes-check.sh
+
   checks:build:route:
     desc: "[gate] This host must not compile its own closure — report derivations that would build locally (EXP-107)"
     summary: >

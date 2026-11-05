@@ -31,19 +31,24 @@
       fi
 
       # Tier 3: Hermes Agent (Nous Research agent with ~/.hermes / hermes.env)
+      # `-q`/`--oneshot` are `hermes chat` options, not top-level ones: the
+      # old `hermes -q "$prompt" --oneshot` form exited 2 on argparse before
+      # any model call. Same fix as frieren; see that file for the measurement.
       if command -v hermes >/dev/null 2>&1 || [ -x "/run/current-system/sw/bin/hermes" ]; then
         echo "=== [$(date)] Agent Cascade: Attempting Tier 3 (hermes) ==="
         local hermes_bin
         hermes_bin="$(command -v hermes 2>/dev/null || echo "/run/current-system/sw/bin/hermes")"
 
-        if [ -f "${user.home}/.hermes/.env" ]; then
-          set -a
-          # shellcheck disable=SC1091
-          source "${user.home}/.hermes/.env" 2>/dev/null || true
-          set +a
-        fi
+        for hermes_env in "${user.home}/.hermes/.env" "${user.home}/.config/hermes/hermes.env"; do
+          if [ -f "$hermes_env" ]; then
+            set -a
+            # shellcheck disable=SC1090
+            source "$hermes_env" 2>/dev/null || true
+            set +a
+          fi
+        done
 
-        if "$hermes_bin" -q "$prompt" --oneshot; then
+        if "$hermes_bin" chat -q "$prompt" --oneshot -Q --run-budget 600; then
           echo "=== [$(date)] Agent Cascade: Tier 3 (hermes) succeeded. ==="
           return 0
         fi

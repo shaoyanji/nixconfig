@@ -58,10 +58,11 @@ that needs judgement. Archives to `~/.agents/system/` and also preserves the fil
 
 ### The agent cascade (same for both jobs)
 
-Tier 1 `agy` → Tier 2 `freebuff-headless` → Tier 3 `hermes --oneshot` → Tier 4
-`crush run --quiet`. The first tier that exits 0 wins; agy fails on credit
-exhaustion, so the fallbacks are not theoretical. Tier 3 sources its API keys from
-`~/.hermes/.env` or `~/.config/hermes/hermes.env`.
+Tier 1 `agy` → Tier 2 `freebuff-headless` → Tier 3 `hermes chat -q … --oneshot`
+→ Tier 4 `crush run --quiet`. The first tier that exits 0 wins; agy fails on
+credit exhaustion, so the fallbacks are not theoretical. Tier 3 sources both
+`~/.hermes/.env` and `~/.config/hermes/hermes.env`, rendered file last so a
+rotated sops secret is not shadowed by a stale `~/.hermes/.env`.
 
 ## Dispatch something now
 
@@ -82,7 +83,12 @@ so two of them do not share a log or a `HANDOFF.md`.
 
 Agent CLI flags worth knowing: `agy` needs `--dangerously-skip-permissions` in any
 detached session (there is no TTY to approve a prompt, so it would block forever);
-`hermes` wants `--oneshot`; `crush` `run --quiet`.
+`crush` `run --quiet`. For hermes the query flags hang off the subcommand:
+`hermes chat -q "$prompt" --oneshot -Q --run-budget 600`. A top-level
+`hermes -q … --oneshot` exits 2 without running anything (it was the cascade's
+Tier 3 until 2026-11-05, so that tier never worked); `-Q` is what keeps the
+banner and session footer out of the job log. Hermes tool calls need no `--yolo`
+under a non-TTY: measured, a terminal-tool prompt completed and exited 0.
 
 ## Watching it
 

@@ -8,7 +8,21 @@
   # modules/global/nixos.nix). This module only mirrors that link into
   # ~/.hermes/ for the gateway daemon.
   ...
-}: {
+}: let
+  # ~/.hermes/.env is DERIVED: the rendered credential file plus the keys only
+  # this host defines (see scripts/task/hermes-env-sync.sh for why a plain file
+  # shadowing a symlink was worse than either option alone).
+  hermesEnvSync = pkgs.writeShellApplication {
+    name = "hermes-env-sync";
+    runtimeInputs = with pkgs; [
+      coreutils
+      diffutils
+      gawk
+      gnugrep
+    ];
+    text = builtins.readFile ../../../scripts/task/hermes-env-sync.sh;
+  };
+in {
   options.programs.hermes-user = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -145,28 +159,45 @@
       if [ ! -e "$HOME/.hermes/openclaw-archive" ] && [ -d /Volumes/data/openclaw ]; then
         run ln -s /Volumes/data/openclaw $HOME/.hermes/openclaw-archive
       fi
-      # Hermes reads credentials exclusively from $HERMES_HOME/.env
-      # (hermes_cli/config.py get_env_path). The sops template renders to
-      # ~/.config/hermes/hermes.env (modules/profiles/hermes.nix envPath), so
-      # bridge it here. Deleting this symlink on every switch is what broke
-      # the gateway on 2026-10-09: it started without TELEGRAM_BOT_TOKEN,
-      # exited 78, and RestartPreventExitStatus stopped systemd from
-      # retrying. Only bridge when the target exists and .env is absent —
-      # never clobber a real hermes-managed .env (auth flows write there).
-      if [ ! -e "$HOME/.hermes/.env" ] && [ -e "$HOME/.config/hermes/hermes.env" ]; then
-        run ln -s "$HOME/.config/hermes/hermes.env" "$HOME/.hermes/.env"
-      fi
+      # ~/.hermes/.env is not created here any more. The old block symlinked
+      # the sops-rendered file only when `.env` was ABSENT — a guard against
+      # clobbering a hermes-managed token that produced the opposite failure: a
+      # host that had once run an auth flow kept a plain `.env` that shadowed
+      # every later rotation, while hermes reads exactly `$HERMES_HOME/.env`.
+      # home.activation.hermesEnvSync below re-derives the file instead, and
+      # keeps this host's non-rendered keys in ~/.hermes/.env.local.
       if [ ! -e "$HOME/.hermes/skills/agents-sync" ] && [ -d "$HOME/.agents/skills" ]; then
         run mkdir -p "$HOME/.hermes/skills"
         run ln -sf "$HOME/.agents/skills" "$HOME/.hermes/skills/agents-sync"
       fi
     '';
 
+    # Derived credential file. Runs for every host that enables the program,
+    # persona or not: hermes' own dotenv load (and therefore the gateway's
+    # SimpleX/telegram keys, which the unit's EnvironmentFile does not carry)
+    # reads this path regardless of which persona files were seeded.
+    home.activation.hermesEnvSync = lib.hm.dag.entryAfter ["writeBoundary"] (
+      let
+        rendered =
+          if config.programs.hermes-user.envFile != null
+          then config.programs.hermes-user.envFile
+          else "${config.home.homeDirectory}/.config/hermes/hermes.env";
+      in
+        lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
+          if [ -e ${lib.escapeShellArg rendered} ]; then
+            run ${hermesEnvSync}/bin/hermes-env-sync
+          else
+            echo "hermes-env-sync: ${rendered} is not rendered on this host; ~/.hermes/.env left alone"
+          fi
+        ''
+    );
+
     # Port of the old agent's handoff-restore discipline: hermes sessions
     # already capture scrollback; this helper restores the *operational*
     # state (persona pointers + latest archive savepoint) into a new chat.
     home.packages = [
       pkgs.llm-agents.hermes-agent
+      hermesEnvSync
       (pkgs.writeShellApplication {
         name = "hermes-handoff";
         runtimeInputs = with pkgs; [

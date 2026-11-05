@@ -1,5 +1,13 @@
 # Hermes Agent Configuration — Vanta persona
 # Sensitive tokens (e.g. TELEGRAM_BOT_TOKEN) loaded from ~/.hermes/.env
+#
+# `_config_version` is written by hermes' own migrator. Keep it current: with
+# v0 stamped, every `hermes doctor` reported "Config version outdated (v0 →
+# v51)" and the retired `security.tirith_enabled` key sat in the file. Both
+# were fixed on 2026-11-05 by migrating a copy under HERMES_HOME=/tmp/hh and
+# taking the diff (nothing else changed). Next hermes that bumps the schema:
+# `cp config.yaml /tmp/hh/config.yaml && HERMES_HOME=/tmp/hh hermes doctor
+# --fix && diff -u config.yaml /tmp/hh/config.yaml`.
 terminal:
   backend: local
   timeout: 180
@@ -34,8 +42,7 @@ stt:
   provider: local
   local:
     model: base
-security:
-  tirith_enabled: false
+security: {}
 auxiliary:
   title_generation:
     model: nous/inclusionai/ling-3.0-flash-sante:free
@@ -61,3 +68,4 @@ telemetry:
     enabled: false
     send: false
     offer_version: 2
+_config_version: 51

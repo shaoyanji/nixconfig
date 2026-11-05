@@ -5477,5 +5477,55 @@
         `checks:edge` still reports same-call parity for every one of them.
       '';
     };
+    hermes-tier3-never-ran = {
+      title = "The cascade's Tier 3 never ran — a flag in the wrong parser";
+      kind = "experiment";
+      status = "DELIVERED";
+      priority = "P2";
+      date = "2026-11-05";
+      summary = "Tier 3 ran `hermes -q … --oneshot`; `-q` is a `hermes chat` option, so argparse exited 2 before any model call and every job that reached Tier 3 fell through to Tier 4. Fixed in both hosts, with a token-free gate that reads the CLI's own help.";
+      refs = {
+        modules = [
+          "hosts/frieren/infra-stack.nix"
+          "hosts/delphi/infra-stack.nix"
+          "scripts/task/hermes-check.sh"
+          "modules/user/ai/hermes-persona/config.yaml"
+        ];
+        tasks = ["checks:hermes"];
+        docs = [".agents/skills/frieren-offload/SKILL.md"];
+      };
+      body = ''
+        Found while auditing the hermes surface: a dead tier logs the same WARN line as a tier that was never needed.
+
+        **What was wrong.** `hosts/{frieren,delphi}/infra-stack.nix` ran
+        `hermes -q "$prompt" --oneshot`. Top-level `-q` does not exist, so hermes
+        exited 2 ("'…' is not a `hermes` command") before any model call — `-q` and
+        `--oneshot` are `hermes chat` options. The tier also had no time ceiling
+        where Tier 2 passes `-t 600`.
+
+        **Measured, hermes 0.22.5, trivial prompt, frieren:**
+
+        | form | exit | wall |
+        | :--- | :--- | :--- |
+        | `hermes -q … --oneshot` (old) | 2 | 0.0 s, argparse, no call |
+        | `hermes chat -q … --oneshot` | 0 | 30.3 s |
+        | `… -Q --run-budget 600` | 0 | 21.4 s |
+
+        `-z` took 32.0 s for the same prompt; a non-TTY terminal-tool turn without
+        `--yolo` 23.2 s, exit 0. `-Q` keeps the session footer out of a job log; the
+        fixed Tier 3 branch exited 0 end to end in 33.4 s.
+
+        **Also.** Both env files are sourced now, rendered last: the module never
+        clobbers a real `~/.hermes/.env`, so a rotated key could lose to the older
+        file. The persona config was v0 to the migrator ("outdated (v0 → v51)") with
+        a retired `security.tirith` key; a copy migrated under `HERMES_HOME=/tmp/hh`
+        gave a two-line diff, which landed. `task checks:hermes` gates the rest: a
+        top-level flag `hermes --help` does not publish (it caught both hosts before
+        the fix), the gateway's `needs_attention`, rendered-env KEY NAMES (never
+        values) against the `.env` bridge, and `hermes doctor` on the config — 5 s,
+        no model call. The hosts pick this up on their next rebuild; the deployed
+        units still carry the old form.
+      '';
+    };
   };
 }

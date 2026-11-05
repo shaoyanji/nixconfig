@@ -226,25 +226,33 @@
       fi
 
       # Tier 3: Hermes Agent (Nous Research agent with ~/.hermes / hermes.env)
+      #
+      # `-q`/`--oneshot` are options of the `chat` subcommand, not of `hermes`.
+      # Called as `hermes -q "$prompt" --oneshot` (what this tier did until
+      # 2026-11-05) argparse exits 2 before any model call — "'<prompt>' is not
+      # a `hermes` command" — so every run that reached Tier 3 failed and fell
+      # through to Tier 4. Verified against hermes 0.22.5: `chat -q <prompt>
+      # --oneshot -Q --run-budget N` answers and exits 0. -Q keeps the banner
+      # and session footer out of the job log; --run-budget is the ceiling
+      # Tier 2 already gets from `-t 600`.
       if command -v hermes >/dev/null 2>&1 || [ -x "/run/current-system/sw/bin/hermes" ]; then
         echo "=== [$(date)] Agent Cascade: Attempting Tier 3 (hermes) ==="
         local hermes_bin
         hermes_bin="$(command -v hermes 2>/dev/null || echo "/run/current-system/sw/bin/hermes")"
 
-        # Source hermes API keys & env directly from ~/.hermes/.env
-        if [ -f "${user.home}/.hermes/.env" ]; then
-          set -a
-          # shellcheck disable=SC1091
-          source ${user.home}/.hermes/.env 2>/dev/null || true
-          set +a
-        elif [ -f "${user.home}/.config/hermes/hermes.env" ]; then
-          set -a
-          # shellcheck disable=SC1091
-          source ${user.home}/.config/hermes/hermes.env 2>/dev/null || true
-          set +a
-        fi
+        # Source both env files, rendered LAST so the sops-owned one wins:
+        # ~/.hermes/.env is a plain file a stale auth flow leaves behind, and
+        # sourcing it last would shadow a rotated secret.
+        for hermes_env in "${user.home}/.hermes/.env" "${user.home}/.config/hermes/hermes.env"; do
+          if [ -f "$hermes_env" ]; then
+            set -a
+            # shellcheck disable=SC1090
+            source "$hermes_env" 2>/dev/null || true
+            set +a
+          fi
+        done
 
-        if "$hermes_bin" -q "$prompt" --oneshot; then
+        if "$hermes_bin" chat -q "$prompt" --oneshot -Q --run-budget 600; then
           echo "=== [$(date)] Agent Cascade: Tier 3 (hermes) succeeded. ==="
           return 0
         fi

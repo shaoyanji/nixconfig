@@ -111,7 +111,7 @@ which pages exist.
    9 s build, not a NAS rebuild. Removes F9.
 6. ~~**Retire `docs-site/`**~~ **DONE 2026-10-19:** the pre-condition was met by
    widening the projection instead of the page list — `lib/knowledge-graph.nix`
-   now compiles `.agents/{README,SCHEMA,fleet-matrix}.md`, `.agents/deploy/**`
+   now compiles `.agents/{README,SCHEMA}.md`, `.agents/deploy/**`
    and `taskfiles/*.md` as document nodes (**22 → 35**), which is everything the
    Python page list carried and more. Then: `docs-site/` deleted,
    `.#docs-site` + `.#docsSite` and the `docs-site` flake check removed,

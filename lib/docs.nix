@@ -70,8 +70,16 @@
         ++ lib.optional (hw.gpu != "") ["gpu" hw.gpu]
         ++ lib.optional (hw.ram != "") ["ram" hw.ram]
         ++ lib.optional (hw.storage_layout != "") ["storage" hw.storage_layout]
+        ++ lib.optional (h.desktop_environment != "") ["desktop" h.desktop_environment]
+        ++ lib.optional (hw.display != "") ["display" hw.display]
+        ++ lib.optional (hw.battery != "") ["power" hw.battery]
         ++ lib.optional (net.lan_ip != "") ["lan" net.lan_ip]
         ++ lib.optional (net.tailscale_ip != "") ["tailnet" net.tailscale_ip]
+        ++ lib.optional (net.tailscale_hostname != "") ["tailscale" net.tailscale_hostname]
+        ++ lib.optional (net.ssh_alias != "") ["ssh" "`${net.ssh_alias}`"]
+        ++ lib.optional (net.domain != "") ["domain" net.domain]
+        ++ lib.optional (net.gemini_url != "") ["gemini" net.gemini_url]
+        ++ lib.optional (net.gopher_url != "") ["gopher" net.gopher_url]
         ++ lib.optional (p.title != "") ["persona" "${p.title} (tier: ${p.compute_tier})"]
         ++ lib.optional (p.system_prompt_hint != "") ["persona hint" p.system_prompt_hint]);
   in
@@ -216,13 +224,124 @@
     + moduleSections
     + "\n";
 
+  # --- fleet LLM matrix ------------------------------------------------------
+  # A prompt-sized view of the registry: who is live, what each host may not do,
+  # and the one-line spec. It is read out of `inventory.toml` — status, category
+  # and constraints — because the Python generator this replaces had the category
+  # prose typed into it, and kept claiming a host was WIP after it went live.
+  allHosts = inventory.hosts;
+  isNixHost = h: h.kind != "external";
+  namesWhere = pred: lib.sort lib.lessThan (lib.attrNames (lib.filterAttrs (_: h: pred h) allHosts));
+  ticks = names: lib.concatMapStringsSep ", " (n: "`${n}`") names;
+
+  statusLines = let
+    active = namesWhere (h: h.status == "active");
+    activeNix = lib.filter (n: isNixHost allHosts.${n}) active;
+    activeExt = lib.filter (n: !isNixHost allHosts.${n}) active;
+    wip = namesWhere (h: h.status == "wip");
+    kept = namesWhere (h: h.status == "preserved");
+  in
+    [
+      "- **Active production, Nix (${toString (lib.length activeNix)})**: ${ticks activeNix}"
+      "- **Active, external non-Nix (${toString (lib.length activeExt)})**: ${ticks activeExt}"
+    ]
+    ++ lib.optional (wip != []) "- **Work in progress (${toString (lib.length wip)})**: ${ticks wip} — not live"
+    ++ lib.optional (kept != []) "- **Preserved archetypes (${toString (lib.length kept)})**: ${ticks kept}";
+
+  fleetCategories = lib.sort lib.lessThan (
+    lib.unique (lib.filter (c: c != "") (lib.mapAttrsToList (_: h: h.category) allHosts))
+  );
+
+  categoryBlock = c: let
+    members = lib.sort lib.lessThan (lib.attrNames (lib.filterAttrs (_: h: h.category == c) allHosts));
+    entry = n: let
+      h = allHosts.${n};
+      tier = lib.optionalString (h.persona.compute_tier != "") " (tier `${h.persona.compute_tier}`)";
+      role =
+        if h.role == ""
+        then "no role declared"
+        else h.role;
+      cons = lib.optionalString (h.persona.constraints != []) (
+        "\n" + lib.concatMapStringsSep "\n" (x: "  - ${x}") h.persona.constraints
+      );
+    in
+      "- **`${n}`**${tier} — ${role}" + cons;
+  in ''
+    ## ${c} (${toString (lib.length members)})
+
+    ${lib.concatMapStringsSep "\n" entry members}
+  '';
+
+  builderNames = lib.sort lib.lessThan (lib.attrNames (lib.filterAttrs (_: h: h.builder != "") allHosts));
+  builderTable = lib.optionalString (builderNames != []) (
+    table ["host" "builder"] (map (n: ["`${n}`" "`${allHosts.${n}.builder}`"]) builderNames)
+  );
+
+  specRows =
+    map
+    (n: let
+      h = allHosts.${n};
+      hw = h.hardware;
+    in [
+      "`${n}`"
+      h.status
+      (
+        if isNixHost h
+        then "yes"
+        else "no"
+      )
+      h.arch
+      (
+        if h.persona.compute_tier == ""
+        then "—"
+        else h.persona.compute_tier
+      )
+      (lib.concatStringsSep ", " (lib.filter (s: s != "") [hw.cpu hw.ram hw.gpu]))
+      h.role
+    ])
+    (lib.sort lib.lessThan (lib.attrNames allHosts));
+
+  fleetMatrix =
+    header "Fleet LLM context matrix" "`inventory.toml`"
+    + ''
+      Dense machine context for an agent prompt: who is live, what each host may
+      not do, and the one-line spec. Every row is read out of the registry, so a
+      host that changes status changes here.
+
+      ## Status breakdown
+
+      ${lib.concatStringsSep "\n" statusLines}
+
+    ''
+    + lib.optionalString (fleetCategories != []) ''
+      ## Operational constraints by category
+
+      ${lib.concatMapStringsSep "\n\n" categoryBlock fleetCategories}
+    ''
+    + lib.optionalString (builderTable != "") ''
+      ## Cross-architecture builds
+
+      Built on the declared builder and substituted everywhere else; a host with a
+      builder is not a CI target.
+
+      ${builderTable}
+    ''
+    + ''
+      ## Quick host spec
+
+      ${table ["host" "status" "nix" "arch" "tier" "cpu / ram / gpu" "role"] specRows}
+    '';
+
   # --- page set (paths inside the derivation) --------------------------------
   generatedPages =
     {
       "docs/generated/fleet-inventory.md" = fleetInventory;
+      "docs/generated/fleet-matrix.md" = fleetMatrix;
       "docs/generated/modules-registry.md" = modulesRegistry;
     }
-    // lib.mapAttrs' (name: h: lib.nameValuePair "docs/generated/hosts/${name}.md" (hostPage name h)) nixHosts
+    # Every registered host, external ones included: `envs` and `serv00` are the
+    # hosts an agent is most likely to be handed without a checkout to read.
+    // lib.mapAttrs' (name: h: lib.nameValuePair "docs/generated/hosts/${name}.md" (hostPage name h)) allHosts
     // notes;
 
   # There is no `nav` value any more: the only consumer of one was the Python

@@ -177,9 +177,8 @@ gate — previously it was reachable only from `nix flake check` and
 
 `metadata.total_devices`, `active_nix_devices`, `active_external_devices`,
 `wip_devices` and `preserved_devices` are still read by
-`scripts/task/compile-llm-specs.py` and `scripts/task/inventory-menu.sh`, so
-they are kept — but they are now *asserted* against the derived values rather
-than trusted. Adding a host without updating them fails `inventory-schema`. The
+`scripts/task/inventory-menu.sh`, so they are kept — but they are now *asserted*
+against the derived values rather than trusted. Adding a host without updating them fails `inventory-schema`. The
 same values are emitted under `derived` in the compiled artifact.
 
 ## Repositories outside this tree (`[repos.*]`)

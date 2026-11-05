@@ -458,7 +458,7 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 - `hosts/sledgehammer/USB.md` - Sledgehammer live USB creation guide
 
 ### Development
-- `.agents/fleet-matrix.md` - Compact fleet context matrix for LLMs
+- `docs/generated/fleet-matrix.md` - Compact fleet context matrix for LLMs (built by `task docs:build`, never committed)
 - `docs/userland-package-ownership.md` - Package ownership and role wiring
 
 ### Historical

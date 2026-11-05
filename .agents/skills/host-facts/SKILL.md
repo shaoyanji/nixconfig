@@ -24,7 +24,7 @@ cost 0.15–0.35 s and force **no** `nixosConfiguration`.
 | Agent-facing digest | `task dev:inventory:feed` (store-cached build) | first call only |
 | Host names the flake builds | `task dev:flake:get-hosts` | 2.4 s cold / 0.08 s warm |
 | Repo-side notes, per host | `.agents/deploy/hosts/<host>.md`, `hosts/<host>/` | file read |
-| Cross-host summary table | `.agents/fleet-matrix.md` | file read |
+| Cross-host table, one host's card | `.#artifacts.docs` → `docs/generated/{fleet-matrix,hosts/<h>}.md` | 4 s build, then cached |
 
 `task dev:inventory:host HOST=<h>` wraps the first row. Do **not** answer these
 with `nix eval .#nixosConfigurations.<h>.config.*` — that is the whole module

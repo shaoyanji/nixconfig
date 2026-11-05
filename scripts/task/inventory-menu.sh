@@ -212,7 +212,7 @@ main_menu() {
         read -r -p "Press Enter to continue..." || true
         ;;
       "validate"*)
-        (cd "$REPO_ROOT" && nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --check")
+        (cd "$REPO_ROOT" && task checks:inventory:compiled)
         echo ""
         read -r -p "Press Enter to continue..." || true
         ;;

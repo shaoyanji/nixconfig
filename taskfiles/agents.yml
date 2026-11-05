@@ -140,7 +140,7 @@ tasks:
         case "$choice" in
           quick) task checks:quick ;;
           modules) task checks:modules:validate ;;
-          inventory) task checks:inventory:sync ;;
+          inventory) task checks:inventory:compiled ;;
           # Per-host eval + assertion gate, one host at a time (the fleet-wide
           # `host-architecture` check this replaced evaluated all 23 hosts in one
           # process and was SIGKILLed at 6078 MiB).

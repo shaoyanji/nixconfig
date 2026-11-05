@@ -309,7 +309,7 @@ for an orphan before retrying.
 - `minyx` passes its gate and is active, but its power supply is short:
   `dmesg` shows continuous under-voltage (see `.agents/deploy/hosts/minyx.md`).
 - Uptime Kuma still has zero monitors; gatus is the declarative monitor.
-- `~/AGENTS.md` is `.#homeAgents.<host>` (a store symlink); the offline fleet-matrix table still uses `compile-llm-specs.py`.
+- `~/AGENTS.md` is `.#homeAgents.<host>` (a store symlink); the fleet matrix and the per-host cards are pages in `.#artifacts.docs`, and there is no Python generator left to keep in sync.
 
 ## 8. Where to go next
 

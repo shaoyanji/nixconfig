@@ -126,9 +126,9 @@ and stop at the first rung that works:
 
 Anti-patterns found in this repo (do not repeat):
 
-- **Python for glue that Nix already computes.** `compile-llm-specs.py` re-parses
-  `inventory.toml` even though `lib/inventory.nix` has already compiled it. New
-  context generation belongs in Nix; Python is legacy here.
+- **Python for glue that Nix already computes.** `compile-llm-specs.py` re-parsed
+  `inventory.toml` though `lib/inventory.nix` had compiled it, and is deleted: the
+  fleet matrix is a page in `lib/docs.nix`. New context generation belongs in Nix.
 - **A check that shells out to `nix build`.** It spends build budget as a side
   effect of looking. Use `nix eval --raw "<attr>.outPath"` + a cache query.
 - **A task that fans out to the fleet by default.** `checks:hosts` requires a

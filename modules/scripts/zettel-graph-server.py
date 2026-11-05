@@ -7,6 +7,7 @@ change something are the whole API.
   GET  /api/health        what is being served (note/link counts, vault HEAD)
   GET  /api/note/<id>     raw markdown of one note
   PUT  /api/note/<id>     write it back, commit, re-export the graph, push
+  POST /api/new           create a note through the vault's create_note.py
   POST /api/publish       render PDFs through the vault's own publish_md.py
   POST /api/reload        re-export the graph from the working tree
   GET  /publish/<name>    one rendered PDF
@@ -45,6 +46,11 @@ from urllib.parse import unquote, urlsplit
 ID_RE = re.compile(r"^(?:zettels|010 - MOCs|journal)/[^/\\\x00]+$")
 PDF_RE = re.compile(r"^[^/\\\x00]+\.pdf$")
 MAX_NOTE = 512 * 1024
+
+# The types whose `create_note.py` target is a directory this service writes to.
+# `note`/`idea`/`reference` land in `zettels/notes` and `zettels/ideas`, which
+# the id shape here does not cover; offering them would be a button that 400s.
+CREATE_TYPES = ("zettel", "moc")
 
 MUTATE = threading.Lock()
 CONFIG: dict = {}
@@ -149,6 +155,27 @@ def push() -> tuple[bool, str]:
         Path(creds).unlink(missing_ok=True)
 
 
+def record(relative: str, message: str) -> dict:
+    """Commit one path and push, unless the host was configured otherwise."""
+    result = {"committed": False, "pushed": False}
+    if not CONFIG["commit"]:
+        return result
+    vault("add", "--", relative)
+    if vault("diff", "--cached", "--quiet", "--", relative).returncode == 0:
+        return result
+    committed = vault(
+        "-c", f"user.name={CONFIG['git_name']}",
+        "-c", f"user.email={CONFIG['git_email']}",
+        "commit", "--quiet", "--only", "-m", message, "--", relative,
+    )
+    if committed.returncode != 0:
+        raise Refused(500, "commit failed: " + (committed.stderr.strip() or committed.stdout.strip())[-400:])
+    result["committed"] = True
+    if CONFIG["push"]:
+        result["pushed"], result["push_error"] = push()
+    return result
+
+
 def write_note(note_id: str, text: str) -> dict:
     relative, path = note_file(note_id)
     if not path.is_file():
@@ -162,21 +189,44 @@ def write_note(note_id: str, text: str) -> dict:
     os.chmod(tmp, mode)
     os.replace(tmp, path)
 
-    result = {"id": relative, "bytes": path.stat().st_size, "committed": False, "pushed": False}
-    if CONFIG["commit"]:
-        vault("add", "--", relative)
-        staged = vault("diff", "--cached", "--quiet", "--", relative)
-        if staged.returncode != 0:
-            committed = vault(
-                "-c", f"user.name={CONFIG['git_name']}",
-                "-c", f"user.email={CONFIG['git_email']}",
-                "commit", "--quiet", "--only", "-m", f"zettel-graph: edit {relative}", "--", relative,
-            )
-            if committed.returncode != 0:
-                raise Refused(500, "commit failed: " + (committed.stderr.strip() or committed.stdout.strip())[-400:])
-            result["committed"] = True
-    if CONFIG["push"] and result["committed"]:
-        result["pushed"], result["push_error"] = push()
+    result = {"id": relative, "bytes": path.stat().st_size}
+    result.update(record(relative, f"zettel-graph: edit {relative}"))
+    result["meta"] = reexport()
+    return result
+
+
+def create_note(spec: dict) -> dict:
+    """Create through the vault's script, so frontmatter is the vault's own."""
+    title = " ".join(str(spec.get("title") or "").split())
+    if not title:
+        raise Refused(400, "a note needs a title")
+    if len(title) > 120:
+        raise Refused(400, "a title over 120 characters is a paragraph, not a name")
+    kind = str(spec.get("type") or "zettel")
+    if kind not in CREATE_TYPES:
+        raise Refused(400, f"type is one of {list(CREATE_TYPES)}")
+    tags = " ".join(str(spec.get("tags") or "").replace(",", " ").split())
+
+    args = [sys.executable, "scripts/create_note.py", "--title", title, "--type", kind, "--root", "."]
+    if tags:
+        args += ["--tags", tags.replace(" ", ",")]
+    proc = subprocess.run(args, cwd=str(CONFIG["vault"]), capture_output=True, text=True, timeout=60)
+    if proc.returncode != 0:
+        raise Refused(
+            500,
+            "create_note.py failed: " + (proc.stderr.strip() or proc.stdout.strip())[-600:],
+        )
+
+    # The script prints the vault-relative path first; the rest is commentary.
+    created = next((line.strip() for line in proc.stdout.splitlines() if line.strip().endswith(".md")), "")
+    if not created:
+        raise Refused(500, "create_note.py wrote nothing it can name: " + proc.stdout.strip()[-300:])
+    relative, path = note_file(created)
+    if not path.is_file():
+        raise Refused(500, f"create_note.py reported {relative}, which is not there")
+
+    result = {"path": relative, "id": relative[:-3], "bytes": path.stat().st_size}
+    result.update(record(relative, f"zettel-graph: add {relative}"))
     result["meta"] = reexport()
     return result
 
@@ -298,6 +348,12 @@ class Handler(BaseHTTPRequestHandler):
                     raise Refused(400, "body is {text: <markdown>}")
                 with MUTATE:
                     self.send_json(200, write_note(path[len("/api/note/"):], body["text"]))
+                return
+            if path == "/api/new" and method == "POST":
+                self.guard_write()
+                spec = read_body(self)
+                with MUTATE:
+                    self.send_json(201, create_note(spec))
                 return
             if path == "/api/reload" and method == "POST":
                 self.guard_write()

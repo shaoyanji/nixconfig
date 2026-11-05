@@ -78,7 +78,9 @@ in {
 
     tailnetPort = lib.mkOption {
       type = lib.types.port;
-      default = 8452;
+      # 8452 is taken by another project on this host; the mounts are a
+      # sequential namespace and this one starts at 8453.
+      default = 8453;
       description = ''
         The `tailscale serve` port the mount binds. It is not the loopback port:
         the browser's Origin is `https://<tailnetHost>:<this>`, and the portal

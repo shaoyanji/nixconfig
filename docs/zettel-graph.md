@@ -5,7 +5,7 @@ force-directed web, a fuzzy finder over the whole box — plus write and publish
 when the page is served by this host rather than opened as a folder.
 
 ```
-https://delphi.cloudforest-kardashev.ts.net:8452        # tailnet only
+https://delphi.cloudforest-kardashev.ts.net:8453        # tailnet only
 ```
 
 Why it is here and not in the vault: the reader is a private repo, the vault is
@@ -33,6 +33,7 @@ mount card and the write guard cannot disagree.
                   link resolution and cluster rules, not a second copy of them
 /api/health       {notes, links, vault HEAD, write, publish}
 /api/note/<id>    the real file, frontmatter included
+/api/new          POST {title, type, tags} -> the vault's create_note.py
 /publish/<x>.pdf  a rendered PDF
 ```
 
@@ -42,6 +43,13 @@ directories are `zettels/`, `010 - MOCs/` and `journal/`; anything else is
 refused, as is a path that resolves outside the vault.
 
 ## Writing
+
+`POST api/new` captures a note: the form sends a title (and optionally a type and
+tags), the vault's `create_note.py` decides the timestamped filename and the
+schema-v2 frontmatter, and the result is committed and pushed like an edit
+before the page opens it for writing. Only `zettel` and `moc` are offered — the
+other types target `zettels/notes` and `zettels/ideas`, which the id shape this
+service writes does not cover, and a button that 400s is worse than two buttons.
 
 `PUT api/note/<id>` with `{"text": "<whole file>"}` writes atomically, commits
 in the checkout (`zettel-graph: edit <path>`), pushes to the vault branch, and
@@ -74,9 +82,10 @@ what makes a page write land on the other machines.
 
 ## Traps
 
-- **`Origin` carries the mount port, not the loopback one.** 8452 is the
+- **`Origin` carries the mount port, not the loopback one.** 8453 is the
   `tailscale serve` port; the service listens on 8083. The module takes both,
   and the portal mount reads `tailnetPort` rather than repeating the literal.
+  (8452 was the first choice and is occupied by another project.)
 - **The sync must never `reset --hard` the vault.** A page write leaves a local
   commit; the timer merges forward, or pushes when the tree is ahead. A tree
   that has diverged is left alone and named in the journal — losing a note to a

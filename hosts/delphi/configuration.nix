@@ -422,6 +422,16 @@ in {
       # DoT upstreams, IPv4 only: OCI free-tier instances have no IPv6 uplink,
       # and a resolver that prefers IPv6 root/upstream servers SERVFAILs every
       # lookup (the 2026-10-14 frieren outage, same failure class).
+      #
+      # Third is envs.net (157.180.15.214, Hetzner DE): the only upstream here
+      # that publishes that it keeps no query log, and a host this fleet already
+      # trusts with mail. Measured 2026-11-05 from this box — 21 ms RTT, DNSSEC
+      # validating (dnssec-failed.org SERVFAILs), no filtering (doubleclick.net
+      # resolves to its real addresses), so it blocks nothing the blocklist
+      # below does not and needs no exemption. Ordered last on purpose: the
+      # anycast primaries answer in ~1 ms and cache misses are the only traffic
+      # that reaches any of these, so it is a privacy and diversity fallback,
+      # not a primary. A fourth would start costing failover time, not buying it.
       upstream.name_servers = [
         {
           protocol = "tls";
@@ -433,6 +443,12 @@ in {
           protocol = "tls";
           socket_addr = "9.9.9.9:853";
           tls_dns_name = "dns.quad9.net";
+          trust_nx_responses = false;
+        }
+        {
+          protocol = "tls";
+          socket_addr = "157.180.15.214:853";
+          tls_dns_name = "dns.envs.net";
           trust_nx_responses = false;
         }
       ];

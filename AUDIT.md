@@ -28,6 +28,24 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-05 — zettel graph landed on delphi: the vault as a reader
+- **Reviewed, not rubber-stamped.** `feat/zettel-graph-service` was rebased onto `main` by hand
+  after a conflict in `AGENTS.md` (both lines kept: the atlas and this). Three inconsistencies
+  went before the merge: the knob in `modules.toml` advertised `:8452`, which is the atlas's
+  port (the mount is 8453); the sync timer carried `OnBootSec` + `OnCalendar` +
+  `OnUnitActiveSec`, so half the runs landed at activation + 15 min; and `guard_write` demanded
+  a JSON content type even for a bodyless `POST /api/reload`, which the page sends.
+- **Two bugs only the deploy could find.** `path = [...]` inside `serviceConfig` is not a
+  systemd directive, so it is dropped: the sync unit's `#!/usr/bin/env bash` died at exec with
+  status 127, and the reader unit would have surfaced the same as ENOENT for `git` and `typst`
+  on the first write or publish. Then the sync script called `@python@`, the env directory,
+  instead of `@python@/bin/python3` (status 126, "Is a directory"). The host gate passed both
+  times: an eval cannot start a unit.
+- **Verified on the live host:** sync rc=0 (vault 260 notes, 1168 links, head `170d546`), reader
+  active on `:8083`, `:8453` and the atlas on `:8452` both 200; `GET /api/note` 200, a
+  same-content `PUT` 200 with `committed: false` (git add and diff ran through the fixed PATH,
+  vault tree still clean), `POST /api/reload` 200, and an unauthenticated write refused 403.
+
 ### 2026-11-05 — mail atlas, sixth pass: the mailbox decides the inbox
 - **The box only knew what the page was told.** Mail archived from a phone or the web client
   never reached `mail_box`, so it kept counting as inbox. `mail-atlas-reconcile` now reads the

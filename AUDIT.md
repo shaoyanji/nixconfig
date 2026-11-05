@@ -28,6 +28,143 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-05 — mail atlas, sixth pass: the mailbox decides the inbox
+- **The box only knew what the page was told.** Mail archived from a phone or the web client
+  never reached `mail_box`, so it kept counting as inbox. `mail-atlas-reconcile` now reads the
+  Message-IDs of the IMAP Inbox through `himalaya` (500 a page, 13 pages for 6394 envelopes)
+  and writes the difference through two new endpoints, `/api/atlas-boxes` and
+  `/api/atlas-box-set`: absent from the Inbox and `inbox` → `archived`, `queued` → `gone`, and
+  present again →  `inbox`. `mail-atlas-reconcile.timer` runs it nightly at `04:20`, before the 06:30
+  bulk sweep, so the sweep decides against a set that already knows what left the Inbox.
+- **Both directions, measured on the live account:** 7 letters archived in Gmail became
+  `archived` (inbox 2007 → 2000); a letter forced to `archived` while still in the Inbox came
+  back as `restored: 1`; a second pass changed 0 rows. A walk stopped at the page cap exits 2
+  and writes nothing (verified with `--max-pages 3`), because a partial set would empty the
+  working set.
+- **Box history.** `mail_box_event` is append-only: every move records `from_box`,
+  `box`, a reason (`decision archive`, `drain done`, `left the inbox`) and a time, from
+  all three writers. The handled list shows the last line with its age (`trashed · 1 h
+  ago`), the reader the last four (`queued 3 h ago → trashed 1 h ago`), and existing
+  boxes were backfilled as `recorded` from `changed_at`. A no-op write appends nothing
+  (verified `changed: 1` then `0`). Postgres renders `+00`, which V8 rejects once there
+  are microseconds — `parseTime` is why every `now()` timestamp stopped arriving blank.
+- **The reader and the frame, tightened.** A modal `<dialog>` with `display: flex` renders when
+  it is closed (an author rule outranks the UA sheet) — `dialog#reader:not([open])` is why a
+  closed letter no longer leaves a slab at the foot of the page; the dialog is `height:
+  fit-content` (the UA's `inset: 0` turns `auto` into a viewport stretch) and sizes to the
+  letter. Bodies split into paragraphs across blank lines, one-sentence-per-line and hard
+  wraps; subject clamps to two lines, snippet to one (rows 139 → 79-101 px); the page itself
+  never scrolls, panels do; below 1180 px the field folds instead of the gates becoming a
+  cramped strip over the list.
+- **Verified:** three switches on delphi; `mail-atlas-reconcile.service` rc=0 in 15.5 s; served
+  `style.css`/`app.js`/`index.html` md5-identical to source; the header reads `2000 INBOX`;
+  `docs-budget` rc=0 (`mail-atlas.md` 303/400, this file 213/300); alejandra clean; task digest
+  pin updated (569 tasks, parity exact).
+
+### 2026-11-05 — mail atlas, fifth pass: the list is an inbox
+- **A decided letter leaves the list.** `mail_box` (`inbox` / `queued` / `archived` /
+  `trashed` / `gone`) is the working set; `/api/atlas-act` writes `queued` in the same
+  statement that records the decision, `/api/atlas-close` records the outcome, and the page
+  drops the row locally. Measured through CDP: mark → `a` took the list from 48 to 47, the
+  header from 2037 to 2036 inbox and 0 to 1 queued, and the letter appeared under `queued`.
+- **The page is an inbox, not a browse.** The list is the wide column (the field is 29 % and
+  folds away, which also stops the particle simulation and survives a reload); tabs
+  `inbox / queued / handled / all`; the header counts the working set; `more letters` pages
+  with a new `off` parameter (verified 48 → 96 rows). Tag chips no longer appear when there
+  is no query.
+- **One command for Hermes.** `H` or the header button opens a sentence box with no letter
+  behind it; it writes `mail_command`, read by `task agents:mail:atlas` beside the per-letter
+  rows and closed with `/api/atlas-command-close`. Nothing executes it — no auto-drain for
+  `hermes`/commands, by decision.
+- **Verified:** six switches on delphi; `atlas-search` box filter and `atlas-stats`
+  (`inbox`/`queued`/`commands`); command POST → row 1; four test rows and two test commands
+  removed, queue empty; task digest pin updated (568 tasks, parity exact).
+
+### 2026-11-05 — mail atlas, fourth pass: the queue is executed, batches answer
+- **The timer had never executed anything.** `mail-atlas-drain` resolved a Message-ID with
+  `envelope search 'subject "…"'`; a real subject (`[shaoyanji/nixconfig] Run failed: nixcachix -
+  main (047f44a)`) is not a valid query, the oldest pending row threw, and the oneshot died before
+  reaching the rest. The run also missed `cat` on the unit's `PATH`, so himalaya could not read its
+  password. Resolution is now: `date` of the message, its two neighbouring days (the `Date:` header
+  carries the sender's offset), one alphanumeric token of the subject — the header still decides —
+  and a miss closes the row `dismissed "not in inbox"`. `coreutils` joined the script's runtime.
+- **Proof, measured:** three live rows executed — `moved uid 308188`, `trashed uid 309635`,
+  `trashed uid 310174` — and two rows queued against already-archived mail closed as `not in inbox`.
+  A run that resolves costs ~7 s; the old full-mailbox fallback (`--deep-scan`, 60 pages) cost **74 s**
+  on this 6000-envelope inbox. The timer fires on its own every 5 min (`*:0/5`, 20 s jitter,
+  persistent) — observed at 13:15:42 with `pending: 0`.
+- **Batch decisions did nothing.** `space` marked rows but `x`/`a` posted the row `id` where
+  `/api/atlas-act` binds `messageId`; every insert failed the foreign key and the page reported "the
+  archive did not answer". Selection and the queued badge are keyed by Message-ID now, and two marked
+  newsletters queued in one gesture (verified through CDP key events, `2 queued · delete`).
+- **The list's keys:** `space` marks (click on the row's box too), `a`/`x` apply to the marked set or
+  the focused row, `x` twice queues, `Esc` clears the marks.
+
+### 2026-11-05 — mail atlas, third pass: decisions, clean text, no pointer-driven frames
+- **A letter can be decided.** The reader carries `archive`, `queue deletion` and `send to Hermes`
+  (`a` / `x` / `h`); deletion asks twice, and Hermes takes a free-text instruction. They write
+  `mail_action` rows — requests, never effects — read by `task agents:mail:atlas` and closed through
+  `/api/atlas-close`. Posting one also resolves the message's open `email_triage` verdicts.
+- **The page stopped printing markup.** Escapes (`\u00E4`, `ma\_77`), HTML entities (`&ldquo;`),
+  double-escaped tags, headings, rules, link and image syntax are reduced to text at render; the
+  stored body is untouched. Over all **2051** archived bodies no delimiter, entity or escape
+  survives outside tokens (`WPC__Kg`, a masked phone number).
+- **The particle field was drawing scratches.** `particles.wat` pushed velocities to ~6 px *per frame*
+  (≈375 px/s), so every comet tail — a frame count times that velocity — became a line 300–1000 px
+  long across the page. The push constant is now `0.0105` (measured **43 px/s** at rest, **79 px/s** at
+  3.4 amplitude) and the tail is capped at 12 frames, so a fast particle reads as a short stroke.
+- **The pointer no longer times the animation.** The graph's loop used to stop at rest, so a mousemove
+  was the only thing painting a settled graph and every move re-phased the sweep and the sparks.
+  The loop now always requests a frame (half rate when settled) and nothing outside it draws.
+- **Enter works with the caret in the search box,** as long as that box still holds the query the
+  list was built on; arrows and Enter were re-tested through CDP key events, not by calling handlers.
+- **Verified:** two switches on delphi; headless Chromium against the running vhost with the cache
+  disabled — `↵` opens the reader, `Kühler`/`#id#` render without escapes or brackets, the three
+  buttons read `queued` after posting and still read it when the letter is reopened, 11 rows of test
+  decisions were removed afterwards, `task agents:mail:atlas` prints the queue, no console errors.
+
+### 2026-11-05 — mail atlas, second pass: the search drives the instruments
+- **Tofu, fixed at the root.** The Han glyphs (title, seal, ten gate glyphs) came from whatever CJK
+  font the reader's OS happened to have, and a machine without one drew boxes. `han.woff` is a
+  build-time `pyftsubset` of Noto CJK TC covering the 28 glyphs the page writes — **11.9 kB**, served
+  same-origin with `font/woff`; the canvas labels name the family explicitly because canvas has no
+  fallback chain beyond what you pass it.
+- **The graph now carries the answer.** Every node has a heat from the result set: gate gauges show
+  the share of the answer a gate claims, tag diamonds and letter dots scale with it, unclaimed gates
+  stay faint, hot links carry travelling sparks and the outer ring sweeps. Positions persist across
+  keystrokes, so typing moves the field instead of rebuilding it. `data-hot`/`data-layout` expose the
+  state the way the page renders it (17/52 for `?q=invoice`).
+- **The WASM field moves with the query.** `mood(amp, swirl)` is the only channel from page to
+  simulation; measured on the built module, mean particle speed goes **4.65 → 11.24 px/s** at
+  amp 3.4 and settles back, and a dry query tints the current gold. The page schedules the impulses:
+  an inhale at the search box on submit, a ripple per keystroke, a heartbeat at the graph centre
+  when results land. `data-state` is `found`/`void`/`seeking` from that, not from a CSS class.
+- **One fuzzy classifier, two renderers.** Exact substrings get a solid `mark`, subsequence matches a
+  dotted one, and canvas labels draw the same runs in gold. Snippets drop markdown images and
+  tracking URLs before rendering. Mobile thins labels by heat instead of shrinking them.
+- **Verified:** switch landed; `han.woff` `font/woff` 11900 B, `particles.wasm` `application/wasm`,
+  `/openapi.json` `200` through the new route; headless Chromium on `:8085` reported `found`/17 hits,
+  `void`/0 for `?q=zzqx`, 48 letters for `?q=kleinanzeig`, **no console errors**, and 390×844 renders
+  without overlap.
+
+### 2026-11-05 — mail atlas: the archive gets a reading surface
+- **A taxonomy, not a folder.** `mail_category` (10 domains, glyph + stance), `mail_tag`,
+  `mail_tag_rule` and `email_tag(message_id, tag, source)` in `email_archive`; the rules pass
+  (`mail_atlas_autotag`, hourly at `:50` via `mail-atlas-tag.timer`) placed 1536 of 2050 messages
+  on the first run in 0.47 s and adds 0 on a second. `pg_trgm` is created by db-init as `postgres`
+  because the plugin schema runs as the archive role.
+- **Fuzzy finding is three signals**: `ts_rank` on the body, trigram `similarity` on subject and
+  sender, and tag similarity; `coalesce(:q,'')`/`coalesce(:cat,'')` because an empty query-string
+  value arrives as `NULL` and every unfiltered search answered `[]` with a `200` until it did.
+- **The page** (`modules/services/mail-atlas/site/`) is one nginx vhost on `127.0.0.1:8085` with
+  `/api/` proxied same-origin, mounted at `https://delphi.cloudforest-kardashev.ts.net:8452` by the
+  portal registry (8451 stays reserved for the archive rival). A flow-field particle simulation is
+  compiled from `particles.wat` by `wabt` at build time (918 B of real WASM); the relation graph is
+  a spring simulation over query → categories → tags → letters.
+- **Verified:** `hostChecks aarch64-linux.delphi` 1974/1974 assertions; switch landed; page `200`,
+  `particles.wasm` served as `application/wasm`; headless Chromium rendered 48 letters for
+  `?q=kleinanzeig` and 12 for `?q=invoice` with `<mark>` highlights, no console errors.
+
 ### 2026-11-04 — downloads-sort stops calling a dead download "in flight"
 - **The unit was red for a bug, not a decision.** `strata-probe.bin` (39.7 GB, preallocated, one
   `IQ3_XXS-00001` header and none of its bytes) carried an `.aria2` control file from 11-03 that

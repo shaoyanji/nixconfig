@@ -233,6 +233,11 @@
     psql -v ON_ERROR_STOP=1 -v pw="$password" -d postgres <<'SQL'
     ALTER ROLE ${cfg.userName} WITH LOGIN PASSWORD :'pw';
     ALTER DATABASE ${cfg.database} OWNER TO ${cfg.userName};
+    -- Trigram matching is superuser-only to create, and the plugin schemas
+    -- below run as the archive role: it has to exist before they are applied.
+    -- Idempotent, so a rebuild on an archive that already has it is a no-op.
+    \connect ${cfg.database}
+    CREATE EXTENSION IF NOT EXISTS pg_trgm;
     SQL
 
     # Connect the way the app connects, so a wrong pg_hba rule fails here rather

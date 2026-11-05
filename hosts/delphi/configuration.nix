@@ -1047,6 +1047,16 @@ in {
         description = "NpgsqlRest over the mail archive: full-text search, uploads, file-system handlers.";
         requires = ["npgsqlrest.service"];
       };
+      # 8451 stays reserved for the rival archive benchmark; this is the reading
+      # surface over the same database, with its own loopback vhost so `/api` is
+      # same-origin for the browser.
+      mail-atlas = {
+        port = 8452;
+        upstream = "http://127.0.0.1:${toString config.services.mailAtlas.port}";
+        title = "Mail atlas";
+        description = "The archive as a field: fuzzy finding, a tag taxonomy and a relation graph.";
+        requires = ["nginx.service"];
+      };
       # Machine-facing: POST /v1/events and GET /v1/events, bearer token, no
       # browsing surface, so no card on the tailnet page.
       agent-turns = {

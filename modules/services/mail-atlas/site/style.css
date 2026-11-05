@@ -1,0 +1,2069 @@
+/* 信海圖 — the mail sea, charted.
+ *
+ * Two registers on one surface: the console (mono, hairlines, telemetry, tabular
+ * numbers) and the scroll (Han glyphs, seals, breathing space). Turquoise is the
+ * current running through both; gold marks what a person should notice; cinnabar
+ * appears once, on the seal, and nowhere else.
+ *
+ * The palette is deliberately narrow — one hue family plus a warm accent — so
+ * heat, not colour, carries the meaning: the graph and the result list both
+ * speak in the same jade-to-gold ramp, which is the search's own score.
+ */
+
+@font-face {
+  font-family: "Atlas Han";
+  /* Subset of Noto Sans CJK TC, built beside this stylesheet: only the glyphs
+     the page actually writes, so the file is ~20 kB instead of ~20 MB. */
+  src: url("/han.woff") format("woff");
+  font-display: swap;
+  font-weight: 300 900;
+}
+
+:root {
+  --ink: #030b0b;
+  --ink-2: #051513;
+  --ink-3: #072320;
+  --panel-a: rgba(8, 30, 27, 0.78);
+  --panel-b: rgba(4, 17, 16, 0.9);
+  --line: #12453f;
+  --line-2: rgba(62, 240, 221, 0.16);
+  --foam: #e4fbf6;
+  --muted: #85b3a8;
+  --faint: #4d7a72;
+  --jade: #3ef0dd;
+  --jade-2: #16b6a6;
+  --jade-ghost: rgba(62, 240, 221, 0.08);
+  --gold: #f0c987;
+  --gold-ghost: rgba(240, 201, 135, 0.1);
+  --cinnabar: #d2503c;
+  --mono: ui-monospace, SFMono-Regular, "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Source Han Serif SC", "Times New Roman", serif;
+  --han: "Atlas Han", "PingFang TC", "Noto Sans CJK TC", "Songti TC", serif;
+  --shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
+  --radius: 4px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  background: var(--ink);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  /* The page is the frame, not a document: nothing scrolls but a panel. On a
+     small screen the panels stack and the page scrolls again (see the 860px
+     media query). */
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--foam);
+  background:
+    radial-gradient(1200px 700px at 8% -12%, rgba(62, 240, 221, 0.11), transparent 60%),
+    radial-gradient(900px 620px at 106% 6%, rgba(240, 201, 135, 0.07), transparent 58%),
+    radial-gradient(900px 800px at 50% 120%, rgba(22, 182, 166, 0.08), transparent 60%),
+    linear-gradient(180deg, #030b0b 0%, #041312 45%, #030b0b 100%);
+  background-attachment: fixed;
+}
+
+#qi-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.8s ease;
+  /* Fade under the header type: the field should pass behind the console, not
+     through its smallest labels. */
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, #000 9%, #000 100%);
+}
+
+#qi-field[data-state="seeking"] {
+  opacity: 0.95;
+}
+
+#qi-field[data-state="void"] {
+  opacity: 0.75;
+}
+
+/* Survey grid plus a faint scan: the "chart" half of the metaphor. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(to right, rgba(62, 240, 221, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(62, 240, 221, 0.05) 1px, transparent 1px),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.012) 0 1px,
+      transparent 1px 3px
+    );
+  background-size:
+    84px 84px,
+    84px 84px,
+    auto;
+  mask-image: radial-gradient(130% 100% at 50% -10%, #000 24%, transparent 82%);
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow: inset 0 0 170px 30px rgba(2, 8, 8, 0.55);
+}
+
+body > header,
+body > main,
+.search-band,
+footer {
+  position: relative;
+  z-index: 2;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- header ------------------------------------------------------- */
+
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding: 0.85rem clamp(1rem, 3.2vw, 2.2rem) 0.8rem;
+  background: linear-gradient(180deg, rgba(3, 11, 11, 0.94), rgba(3, 11, 11, 0.45));
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+
+/* A single sheen that travels the header rule, once every half minute. Not a
+   loading bar: a current, moving at the speed of a tide. */
+.hud::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(62, 240, 221, 0) 30%,
+    rgba(62, 240, 221, 0.75) 50%,
+    rgba(62, 240, 221, 0) 70%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  animation: shear 14s linear infinite;
+  opacity: 0.55;
+}
+
+@keyframes shear {
+  from {
+    background-position: 160% 0;
+  }
+  to {
+    background-position: -60% 0;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.seal {
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  flex: 0 0 auto;
+  background: linear-gradient(160deg, #e2664f, var(--cinnabar) 55%, #a83a2b);
+  color: #fff2e8;
+  font-family: var(--han);
+  font-size: 1.4rem;
+  line-height: 1;
+  border-radius: 3px;
+  transform: rotate(-4deg);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 220, 0.4),
+    inset 0 0 14px rgba(90, 20, 10, 0.5),
+    0 0 30px rgba(210, 80, 60, 0.3);
+  text-shadow: 0 1px 0 rgba(120, 26, 14, 0.55);
+}
+
+.brand-text {
+  min-width: 0;
+}
+
+.brand h1 {
+  margin: 0;
+  font-family: var(--han);
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0.36em;
+  color: #effffb;
+  text-shadow:
+    0 0 26px rgba(62, 240, 221, 0.45),
+    0 0 2px rgba(62, 240, 221, 0.6);
+}
+
+.kicker {
+  margin: 0.22rem 0 0;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.hud-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.34rem;
+  padding-left: 1.15rem;
+  border-left: 1px solid var(--line-2);
+}
+
+.stat:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.hud-stats .num {
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.84rem;
+  text-shadow: 0 0 14px rgba(62, 240, 221, 0.4);
+}
+
+.dim {
+  color: var(--faint);
+}
+
+.mono-xs {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.link-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--faint);
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--faint);
+  transition: background 0.3s ease;
+}
+
+.dot.live {
+  background: var(--jade);
+  animation: pulse 2.8s ease-out infinite;
+}
+
+.dot.down {
+  background: var(--cinnabar);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(62, 240, 221, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(62, 240, 221, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(62, 240, 221, 0);
+  }
+}
+
+/* ---------- search ------------------------------------------------------- */
+
+.search-band {
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: clamp(0.9rem, 2vw, 1.5rem) clamp(1rem, 3.2vw, 2.2rem) 0.75rem;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.55rem 0.9rem 0.55rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(10, 38, 34, 0.92), rgba(5, 21, 19, 0.94));
+  box-shadow:
+    inset 0 1px 0 rgba(120, 255, 240, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    var(--shadow);
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+  position: relative;
+}
+
+.search::before,
+.search::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(62, 240, 221, 0.4);
+  transition: border-color 0.22s ease;
+}
+
+.search::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.search::after {
+  right: -1px;
+  bottom: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.search:focus-within {
+  border-color: var(--jade-2);
+  box-shadow:
+    inset 0 1px 0 rgba(120, 255, 240, 0.1),
+    0 0 0 1px rgba(62, 240, 221, 0.25),
+    0 0 46px rgba(62, 240, 221, 0.14),
+    var(--shadow);
+}
+
+.search:focus-within::before,
+.search:focus-within::after {
+  border-color: var(--jade);
+}
+
+.search-glyph {
+  font-family: var(--han);
+  font-size: 1.45rem;
+  line-height: 1;
+  color: var(--jade);
+  opacity: 0.9;
+  flex: 0 0 auto;
+  text-shadow: 0 0 18px rgba(62, 240, 221, 0.55);
+  translate: 0 -1px;
+}
+
+.search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--foam);
+  font-family: var(--mono);
+  font-size: 1.06rem;
+  letter-spacing: 0.005em;
+  padding: 0.5rem 0;
+}
+
+.search input::-webkit-search-cancel-button {
+  filter: invert(0.6) sepia(0.4) saturate(3) hue-rotate(120deg);
+}
+
+.search input::placeholder {
+  color: #40706a;
+}
+
+.readout {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--line-2);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.ro-hits {
+  color: var(--jade);
+  font-size: 0.82rem;
+}
+
+.ro-ms,
+.ro-sep {
+  color: var(--faint);
+}
+
+.ro-dim {
+  color: #3c625c;
+  text-transform: uppercase;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+}
+
+body[data-void="1"] .ro-hits {
+  color: var(--gold);
+}
+
+.search kbd {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  color: var(--faint);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.1rem 0.4rem;
+  background: rgba(3, 11, 11, 0.75);
+}
+
+.under-search {
+  display: flex;
+  align-items: center;
+  gap: 1rem 1.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.55rem;
+  min-height: 1.7rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.38rem;
+  min-height: 1.55rem;
+}
+
+.chips:empty {
+  display: none;
+}
+
+.chips .label {
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #537d76;
+  margin-right: 0.15rem;
+}
+
+.chip {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--jade);
+  background: rgba(6, 26, 24, 0.88);
+  border: 1px solid rgba(62, 240, 221, 0.26);
+  border-radius: 2px;
+  padding: 0.14rem 0.5rem;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  letter-spacing: 0.02em;
+}
+
+.chip:hover {
+  background: rgba(62, 240, 221, 0.16);
+  border-color: var(--jade);
+  color: #f2fffc;
+}
+
+.chip .n {
+  color: #3c625c;
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip.gold {
+  color: var(--gold);
+  background: var(--gold-ghost);
+  border-color: rgba(240, 201, 135, 0.24);
+}
+
+.chip.gold:hover {
+  border-color: var(--gold);
+  background: rgba(240, 201, 135, 0.18);
+}
+
+.hint {
+  margin: 0 0 0 auto;
+  font-size: 0.64rem;
+  color: #3c625c;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- workspace ---------------------------------------------------- */
+
+.workspace {
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3.2vw, 2.2rem) 0.6rem;
+  display: grid;
+  /* Reading is the job: the list gets the wide column and the field is the
+     instrument beside it, not the other way round. */
+  grid-template-columns: 232px minmax(0, 1fr) minmax(300px, 29%);
+  grid-template-areas: "rail letters graph";
+  gap: 0.85rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(165deg, var(--panel-a), var(--panel-b));
+  backdrop-filter: blur(7px);
+  box-shadow:
+    inset 0 1px 0 rgba(120, 255, 240, 0.045),
+    0 16px 46px rgba(0, 0, 0, 0.42);
+  overflow: hidden;
+}
+
+/* Corner brackets instead of a full box: the frame reads as an instrument,
+   and leaves the edges open for the field behind. */
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  border: 1px solid rgba(62, 240, 221, 0.35);
+  z-index: 3;
+}
+
+.panel::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.panel::after {
+  right: -1px;
+  bottom: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  padding: 0.62rem 0.85rem;
+  border-bottom: 1px solid var(--line-2);
+  background: linear-gradient(180deg, rgba(62, 240, 221, 0.045), transparent);
+}
+
+.panel-head.slim {
+  padding: 0.6rem 0.75rem;
+}
+
+.panel-head h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-head h2 span {
+  font-family: var(--han);
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--gold);
+  text-transform: none;
+  text-shadow: 0 0 16px rgba(240, 201, 135, 0.3);
+}
+
+.panel-head h2 .count {
+  color: var(--jade);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  margin-left: 0.15rem;
+}
+
+/* ---------- rail --------------------------------------------------------- */
+
+.rail {
+  overflow: hidden;
+}
+
+.cat-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0.45rem;
+  gap: 1px;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+/* The rail's second register: what the current answer is actually made of.
+   The taxonomy above says what the archive is; this says what the query found. */
+.view-tags {
+  flex: 0 0 auto;
+  padding: 0.55rem 0.55rem 0.6rem;
+  border-top: 1px solid var(--line-2);
+  background: linear-gradient(180deg, rgba(62, 240, 221, 0.035), transparent);
+}
+
+.vt-head {
+  margin: 0 0 0.35rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #3c625c;
+}
+
+.vt-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.vt {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.1rem 0.34rem;
+  border: 1px solid rgba(62, 240, 221, 0.14);
+  border-radius: 2px;
+  background: rgba(3, 11, 11, 0.45);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  cursor: pointer;
+  transition:
+    color 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.vt:hover {
+  color: var(--jade);
+  border-color: rgba(62, 240, 221, 0.45);
+}
+
+.vt .n {
+  color: #3c625c;
+  font-variant-numeric: tabular-nums;
+}
+
+.vt.empty-tag {
+  border-style: dashed;
+  color: #3c625c;
+  cursor: default;
+}
+
+.cat {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.45rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: #cfeae4;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+.cat:hover {
+  background: var(--jade-ghost);
+  color: #f4fffd;
+}
+
+.cat.active {
+  background: linear-gradient(90deg, rgba(62, 240, 221, 0.14), transparent 80%);
+  color: #ffffff;
+}
+
+.cat.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--jade);
+  box-shadow: 0 0 10px rgba(62, 240, 221, 0.8);
+}
+
+.cat .glyph {
+  font-family: var(--han);
+  font-size: 0.98rem;
+  color: var(--gold);
+  text-align: center;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.cat.active .glyph {
+  opacity: 1;
+  text-shadow: 0 0 12px rgba(240, 201, 135, 0.5);
+}
+
+.cat .n {
+  font-size: 0.64rem;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.cat.active .n {
+  color: var(--jade);
+}
+
+.rail .foot {
+  margin: 0;
+  flex: 0 0 auto;
+  padding: 0.55rem 0.75rem 0.6rem;
+  border-top: 1px solid var(--line-2);
+  font-size: 0.58rem;
+  line-height: 1.5;
+  color: #345852;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- graph -------------------------------------------------------- */
+
+/* The graph panel is deliberately more open than the others: the qi field runs
+   behind it, so the current is visible underneath the network it is feeding. */
+.graph-panel {
+  min-height: 0;
+  background: linear-gradient(165deg, rgba(8, 30, 27, 0.62), rgba(4, 17, 16, 0.76));
+}
+
+.graph-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.58rem;
+  color: var(--faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.legend i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend .c {
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(240, 201, 135, 0.7);
+}
+
+.legend .t {
+  background: var(--jade);
+  box-shadow: 0 0 8px rgba(62, 240, 221, 0.6);
+}
+
+.legend .e {
+  background: var(--foam);
+  opacity: 0.6;
+}
+
+.legend.dist {
+  border-left: 1px solid var(--line-2);
+  padding-left: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.graph-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  background:
+    radial-gradient(60% 65% at 50% 46%, rgba(62, 240, 221, 0.075), transparent 72%),
+    radial-gradient(90% 90% at 50% 100%, rgba(240, 201, 135, 0.04), transparent 70%);
+}
+
+#atlas-graph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.graph-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.graph-empty.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.ge-glyph {
+  font-family: var(--han);
+  font-size: 2.6rem;
+  color: rgba(62, 240, 221, 0.22);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.ge-copy {
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #3c625c;
+}
+
+.graph-tip {
+  position: absolute;
+  pointer-events: none;
+  display: none;
+  max-width: 300px;
+  transform: translate(-50%, -114%);
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--jade-2);
+  border-left: 2px solid var(--jade);
+  border-radius: 2px;
+  background: rgba(4, 20, 18, 0.97);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  color: var(--foam);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  z-index: 6;
+  white-space: normal;
+}
+
+.graph-tip .tip-kind {
+  display: block;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 0.15rem;
+}
+
+.graph-tip .tip-sub {
+  display: block;
+  font-family: var(--serif);
+  font-size: 0.82rem;
+  color: #f4fffd;
+  margin-bottom: 0.15rem;
+}
+
+.graph-tip .tip-meta {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--muted);
+}
+
+.graph-tip .tip-tags {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--jade);
+  margin-top: 0.2rem;
+}
+
+/* ---------- letters ------------------------------------------------------ */
+
+/* Reading is the one thing the field must never interfere with. */
+.letters-panel {
+  min-height: 0;
+  background: linear-gradient(165deg, rgba(6, 24, 22, 0.95), rgba(3, 14, 13, 0.97));
+}
+
+#results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  scrollbar-gutter: stable;
+}
+
+.letter {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.95rem 1.9rem minmax(0, 1fr);
+  gap: 0.55rem;
+  padding: 0.72rem 0.85rem 0.8rem;
+  border-bottom: 1px solid rgba(62, 240, 221, 0.08);
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.letter:last-child {
+  border-bottom: 0;
+}
+
+.letter:hover {
+  background: linear-gradient(90deg, rgba(62, 240, 221, 0.07), transparent 78%);
+}
+
+.letter.focus {
+  background: linear-gradient(90deg, rgba(62, 240, 221, 0.11), transparent 78%);
+}
+
+.letter.focus::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--jade);
+  box-shadow: 0 0 12px rgba(62, 240, 221, 0.8);
+}
+
+/* The mark a space bar sets. A checkbox that is only a box until it is marked:
+   the row is already a target, so the control does not need to shout. */
+.letter .check {
+  width: 0.72rem;
+  height: 0.72rem;
+  margin-top: 0.32rem;
+  border: 1px solid rgba(62, 240, 221, 0.28);
+  border-radius: 1px;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.letter .check:hover {
+  border-color: rgba(62, 240, 221, 0.65);
+}
+
+.letter[data-selected] .check {
+  background: var(--jade);
+  border-color: var(--jade);
+  box-shadow: 0 0 8px rgba(62, 240, 221, 0.5);
+}
+
+.letter[data-selected] {
+  background: rgba(62, 240, 221, 0.07);
+}
+
+/* Queued rows keep their mark after the selection clears, so a batch leaves a
+   ledger of what it did instead of an empty list. */
+.letter[data-queued] .check {
+  border-color: rgba(232, 192, 122, 0.8);
+  background: rgba(232, 192, 122, 0.35);
+}
+
+.batch-state {
+  color: var(--gold, #e8c07a);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  margin-left: auto;
+  margin-right: 0.7rem;
+  text-align: right;
+}
+
+.batch-state.live {
+  opacity: 1;
+}
+
+.batch-state.armed {
+  color: #ff9b8a;
+}
+
+.letter .idx {
+  font-size: 0.58rem;
+  color: #3c625c;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+  padding-top: 0.28rem;
+  text-align: right;
+}
+
+.letter.top .idx {
+  color: var(--gold);
+}
+
+.letter .top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin-bottom: 0.14rem;
+}
+
+.cgate {
+  font-family: var(--han);
+  font-size: 0.82rem;
+  line-height: 1;
+  color: var(--gold);
+  opacity: 0.75;
+  flex: 0 0 auto;
+  translate: 0 1px;
+}
+
+.letter .sender {
+  font-size: 0.64rem;
+  color: var(--jade-2);
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.letter .when {
+  font-size: 0.6rem;
+  color: #3c625c;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.letter .subject {
+  font-family: var(--serif);
+  font-size: 0.93rem;
+  line-height: 1.3;
+  letter-spacing: 0.002em;
+  color: #f2fffc;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.letter .snippet {
+  margin: 0.26rem 0 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+mark {
+  background: rgba(240, 201, 135, 0.2);
+  color: var(--gold);
+  border-radius: 1px;
+  padding: 0 0.1em;
+  box-shadow: inset 0 -1px 0 rgba(240, 201, 135, 0.4);
+}
+
+/* A fuzzy hit (a subsequence, or a one-letter-off match) gets a dotted rule
+   instead of a highlight: the letter is right, the shape is approximate. */
+mark.fz {
+  background: none;
+  color: #ffe6b8;
+  box-shadow: none;
+  border-bottom: 1px dotted rgba(240, 201, 135, 0.65);
+}
+
+.letter .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin-top: 0.36rem;
+}
+
+.tag {
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border: 1px solid rgba(62, 240, 221, 0.13);
+  border-radius: 2px;
+  padding: 0.04rem 0.34rem;
+  background: rgba(3, 11, 11, 0.5);
+}
+
+.tag.hot {
+  color: var(--gold);
+  border-color: rgba(240, 201, 135, 0.4);
+  background: rgba(240, 201, 135, 0.08);
+}
+
+.letter .heat {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: rgba(62, 240, 221, 0.05);
+}
+
+.letter .heat i {
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, var(--jade), rgba(240, 201, 135, 0.7));
+  transform-origin: left center;
+  opacity: 0.75;
+}
+
+.empty {
+  padding: 2.6rem 1.2rem;
+  text-align: center;
+  color: #3c625c;
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
+
+.spinner {
+  display: inline-block;
+  width: 0.62rem;
+  height: 0.62rem;
+  border: 1px solid var(--jade);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: -1px;
+  margin-right: 0.35rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- reader ------------------------------------------------------- */
+
+dialog#reader {
+  /* A letter is read, not glanced at: the dialog is a column of text with a
+     fixed head and foot, and the body is the only part that scrolls. The
+     height follows the letter, so a four-line reply is not given a screenful
+     of empty page. */
+  width: min(880px, 94vw);
+  /* `height: auto` on a modal dialog is a stretch, not a fit: the UA sets
+     `inset: 0`, and an auto height against both edges fills the viewport. */
+  height: fit-content;
+  max-height: min(86vh, 880px);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--jade-2);
+  border-radius: 3px;
+  background: linear-gradient(175deg, #08211e, #04100f);
+  color: var(--foam);
+  box-shadow:
+    0 0 0 1px rgba(62, 240, 221, 0.16),
+    0 40px 120px rgba(0, 0, 0, 0.75);
+  position: relative;
+}
+
+/* The UA hides a closed dialog with `dialog:not([open])`, and an author
+   `display` outranks the UA sheet — without this rule a closed letter renders
+   as a slab at the foot of the page. */
+dialog#reader:not([open]) {
+  display: none;
+}
+
+dialog#reader::backdrop {
+  background: rgba(2, 8, 7, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.reader-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.reader-head {
+  flex: 0 0 auto;
+  padding: 1rem 1.5rem 0.8rem;
+  border-bottom: 1px solid var(--line-2);
+  background: linear-gradient(180deg, rgba(62, 240, 221, 0.05), transparent);
+}
+
+.reader-kicker {
+  margin: 0 0 0.32rem;
+  font-size: 0.52rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.reader-head .subject {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 400;
+  line-height: 1.24;
+  letter-spacing: -0.005em;
+  margin: 0 0 0.45rem;
+  padding-right: 2.4rem;
+  text-wrap: balance;
+  color: #e8fbf6;
+}
+
+.reader-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.75rem;
+  font-size: 0.64rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.reader-meta b {
+  color: var(--jade);
+  font-weight: 500;
+}
+
+.reader-meta .rtag {
+  color: var(--gold);
+}
+
+.reader-body {
+  flex: 1 1 auto;
+  padding: 1.15rem 1.5rem 1.4rem;
+  overflow-y: auto;
+  min-height: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+  line-height: 1.68;
+  color: #c6e4dd;
+  max-width: 68ch;
+}
+
+/* One paragraph per block of the stored text, its own line breaks preserved: a
+   support reply is a wall of text, and a wall is the one thing this dialog
+   cannot fix. */
+.reader-body p {
+  margin: 0 0 0.72em;
+  white-space: pre-wrap;
+}
+
+.reader-body p:first-child {
+  font-size: 0.93rem;
+  color: #dcf2ec;
+}
+
+.reader-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* The decisions live where the letter is read: the dialog is the one place a
+   person has the whole message in front of them. */
+.reader-actions {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--line-2);
+  padding: 0.7rem 1.5rem 0.8rem;
+  background: linear-gradient(180deg, rgba(62, 240, 221, 0.04), rgba(3, 11, 11, 0.4));
+}
+
+.act-row {
+  display: grid;
+  grid-template-columns: repeat(3, max-content) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.38rem;
+  padding: 0.42rem 0.85rem;
+  border: 1px solid rgba(62, 240, 221, 0.2);
+  border-radius: 2px;
+  background: rgba(6, 26, 24, 0.75);
+  color: #cfeae4;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition:
+    border-color 0.14s ease,
+    color 0.14s ease,
+    background 0.14s ease;
+}
+
+.act:hover {
+  border-color: var(--jade);
+  color: #f2fffc;
+  background: rgba(62, 240, 221, 0.1);
+}
+
+.act-glyph {
+  font-family: var(--han);
+  font-size: 0.86rem;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.act kbd,
+.instruct kbd {
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  color: #4d7a72;
+  border: 1px solid rgba(62, 240, 221, 0.16);
+  border-radius: 2px;
+  padding: 0 0.24rem;
+}
+
+/* Armed, then confirmed: deletion is the one button that asks twice. */
+.act[data-armed="1"] {
+  border-color: var(--cinnabar);
+  color: #ffd9cf;
+  background: rgba(210, 80, 60, 0.16);
+}
+
+.act[data-status="pending"] {
+  border-color: rgba(240, 201, 135, 0.55);
+  color: var(--gold);
+  background: rgba(240, 201, 135, 0.1);
+}
+
+.act[data-status="done"] {
+  opacity: 0.55;
+}
+
+.act-state {
+  justify-self: end;
+  min-width: 6.5rem;
+  text-align: right;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #4d7a72;
+}
+
+.act-state.live {
+  color: var(--jade);
+}
+
+.instruct {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+
+.instruct[hidden] {
+  display: none;
+}
+
+.instruct label {
+  grid-column: 1 / -1;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #4d7a72;
+}
+
+.instruct textarea {
+  resize: vertical;
+  min-height: 2.2rem;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(3, 11, 11, 0.8);
+  color: var(--foam);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.instruct textarea:focus {
+  outline: 1px solid var(--jade-2);
+  outline-offset: 0;
+}
+
+.instruct button {
+  align-self: end;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(240, 201, 135, 0.35);
+  border-radius: 2px;
+  background: rgba(240, 201, 135, 0.12);
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  cursor: pointer;
+}
+
+.instruct button:hover {
+  border-color: var(--gold);
+}
+
+.reader-close {
+  position: absolute;
+  top: 0.72rem;
+  right: 0.72rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: #4d7a72;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.reader-close:hover {
+  color: var(--foam);
+  border-color: var(--jade);
+}
+
+/* ---------- footer ------------------------------------------------------- */
+
+footer {
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 0.35rem clamp(1rem, 3.2vw, 2.2rem) 0.65rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #33554f;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+footer a {
+  color: #4d7a72;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(62, 240, 221, 0.2);
+}
+
+footer a:hover {
+  color: var(--jade);
+}
+
+/* ---------- responsive --------------------------------------------------- */
+
+/* Laptop widths: the letters column earns the space before the rail and the
+   graph do, because a subject that wraps to five lines is the worse trade. */
+@media (max-width: 1360px) {
+  .workspace {
+    grid-template-columns: 208px minmax(0, 1fr) minmax(360px, 34%);
+  }
+  .graph-meta .dist {
+    display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .workspace {
+    grid-template-columns: 196px minmax(0, 1fr) minmax(330px, 34%);
+  }
+}
+
+@media (max-width: 860px) {
+  body {
+    display: block;
+    height: auto;
+    overflow: auto;
+  }
+  .workspace,
+  .workspace[data-field="folded"],
+  .workspace[data-field="open"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(360px, 72vh);
+    grid-template-areas:
+      "rail"
+      "letters";
+  }
+  .rail,
+  .letters-panel {
+    grid-column: 1;
+  }
+  .rail {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .rail .panel-head {
+    display: none;
+  }
+  .readout {
+    display: none;
+  }
+  .hud-stats .stat:nth-child(2) {
+    display: none;
+  }
+  dialog#reader {
+    width: 94vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud::after,
+  .dot.live {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------- scrollbars --------------------------------------------------- */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #12443e;
+  border-radius: 4px;
+  border: 2px solid rgba(3, 11, 11, 0.9);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1a5b53;
+}
+
+:focus-visible {
+  outline: 1px solid var(--jade);
+  outline-offset: 1px;
+}
+
+/* ---------- the inbox chrome --------------------------------------------- */
+
+/* The header numbers are the ones a person clears mail with: what is left in
+   the working set, and what has been asked for. */
+.stat .dim {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(240, 201, 135, 0.32);
+  border-radius: 2px;
+  background: rgba(240, 201, 135, 0.05);
+  color: var(--gold, #f0c987);
+  font-family: inherit;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.ghost:hover {
+  background: rgba(240, 201, 135, 0.12);
+  border-color: rgba(240, 201, 135, 0.6);
+}
+
+.ghost kbd {
+  opacity: 0.7;
+}
+
+/* One bar for the whole decision vocabulary: the count on the left, the three
+   verbs on the right, always visible so the letters are never a guess. */
+.letters-head {
+  gap: 0.8rem;
+}
+
+.box-tabs {
+  display: inline-flex;
+  gap: 1px;
+  margin-left: auto;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.box-tabs button {
+  padding: 0.24rem 0.55rem;
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.box-tabs button:hover {
+  color: var(--muted);
+  background: rgba(62, 240, 221, 0.06);
+}
+
+.box-tabs button[aria-selected="true"] {
+  color: var(--foam, #e4fbf6);
+  background: rgba(62, 240, 221, 0.14);
+  box-shadow: inset 0 -2px 0 var(--jade);
+}
+
+.action-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.34rem 0.85rem;
+  border-bottom: 1px solid var(--line-2);
+  background: rgba(3, 16, 15, 0.55);
+}
+
+.action-bar .state {
+  color: var(--faint);
+  transition: color 0.16s ease;
+}
+
+.action-bar .state.live {
+  color: var(--gold, #e8c07a);
+}
+
+.action-bar .state.armed {
+  color: #ff9b8a;
+}
+
+.ab-actions {
+  display: inline-flex;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.ab-actions button {
+  padding: 0.22rem 0.5rem;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease;
+}
+
+.ab-actions button:hover {
+  color: var(--foam, #e4fbf6);
+  border-color: rgba(62, 240, 221, 0.45);
+  background: rgba(62, 240, 221, 0.08);
+}
+
+.ab-actions button[data-kind="delete"]:hover {
+  color: #ffb3a6;
+  border-color: rgba(255, 155, 138, 0.5);
+  background: rgba(255, 155, 138, 0.08);
+}
+
+.ab-actions button[data-kind="clear"]:hover {
+  color: var(--gold, #e8c07a);
+  border-color: rgba(240, 201, 135, 0.4);
+}
+
+/* Where a letter sits, when the list is not the inbox. */
+.boxmark {
+  padding: 0.06rem 0.34rem;
+  border: 1px solid rgba(240, 201, 135, 0.35);
+  border-radius: 2px;
+  color: var(--gold, #e8c07a);
+  font-family: var(--mono, monospace);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.boxmark.trashed,
+.boxmark.gone {
+  color: #a8b6b3;
+  border-color: rgba(168, 182, 179, 0.28);
+}
+
+.letter[data-box="queued"] {
+  opacity: 0.82;
+}
+
+/* Rows are read, not inspected: one line of sender, one of subject, one of
+   text, and the heat is a whisper at the right edge. */
+.letter {
+  padding: 0.66rem 0.9rem 0.7rem;
+}
+
+.letter .sender {
+  letter-spacing: 0.01em;
+}
+
+.letter .subject {
+  line-height: 1.32;
+}
+
+.letter .snippet {
+  max-height: 2.6em;
+  overflow: hidden;
+}
+
+/* The command box: a dialog that is a form, not a page change. */
+dialog#command {
+  width: min(620px, 92vw);
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  background: linear-gradient(160deg, rgba(7, 26, 24, 0.99), rgba(3, 12, 12, 0.99));
+  color: var(--foam, #e4fbf6);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+}
+
+dialog#command::backdrop {
+  background: rgba(1, 8, 8, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.command-form {
+  position: relative;
+  display: grid;
+  gap: 0.7rem;
+  padding: 1.3rem 1.4rem 1.1rem;
+}
+
+.command-form .subject {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.command-form textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--foam, #e4fbf6);
+  font-family: inherit;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.command-form textarea:focus {
+  outline: 1px solid rgba(62, 240, 221, 0.55);
+  outline-offset: 0;
+}
+
+.command-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.command-foot .act-state {
+  color: var(--gold, #e8c07a);
+  font-family: var(--mono, monospace);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.command-foot .act-state.live {
+  opacity: 1;
+}
+
+.command-foot button[type="submit"] {
+  margin-left: auto;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid rgba(62, 240, 221, 0.5);
+  border-radius: 2px;
+  background: rgba(62, 240, 221, 0.12);
+  color: var(--jade);
+  font-family: inherit;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.command-foot button[type="submit"]:hover {
+  background: rgba(62, 240, 221, 0.2);
+}
+
+/* The three columns, named: the grid says where each panel lives, so the rail
+   can stay first in the document and the list can still be the middle. */
+.rail {
+  grid-area: rail;
+}
+
+.letters-panel {
+  grid-area: letters;
+}
+
+.graph-panel {
+  grid-area: graph;
+}
+
+/* The field is a luxury on a small machine: folding it keeps the search, the
+   rail and the letters, and stops the particle simulation from running. */
+.workspace[data-field="folded"] {
+  grid-template-columns: 232px minmax(0, 1fr);
+  grid-template-areas: "rail letters";
+}
+
+.workspace[data-field="folded"] .graph-panel {
+  display: none;
+}
+
+.ghost.tiny {
+  padding: 0.18rem 0.42rem;
+  font-size: 0.54rem;
+  letter-spacing: 0.1em;
+}
+
+.action-bar .state {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1100px) {
+  .workspace {
+    grid-template-columns: 210px minmax(0, 1fr) minmax(260px, 26%);
+  }
+}
+
+@media (max-width: 860px) {
+  .workspace,
+  .workspace[data-field="folded"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "rail" "graph" "letters";
+  }
+  /* Stacked, the panels are taller than any phone: give the page its scroll
+     back and let each panel size to its content. */
+  body {
+    height: auto;
+    overflow: auto;
+  }
+  .workspace {
+    min-height: 420px;
+  }
+}
+
+/* The list is the inbox, so it has to be able to get longer than one screen. */
+.more {
+  flex: 0 0 auto;
+  padding: 0.65rem;
+  border: 0;
+  border-top: 1px solid var(--line-2);
+  background: rgba(62, 240, 221, 0.035);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.more:hover {
+  background: rgba(62, 240, 221, 0.09);
+  color: var(--foam, #e4fbf6);
+}
+
+/* ---------- rows, second pass -------------------------------------------- */
+
+/* One rhythm for every row: sender, a two-line subject, a single clamped line
+   of the letter, then tags. The date sits hard right so a column of them scans,
+   and the two clamps are what keep a long subject from making one row taller
+   than the three around it. */
+.letter {
+  grid-template-columns: 0.9rem 1.55rem minmax(0, 1fr);
+  gap: 0.6rem;
+  padding: 0.62rem 0.95rem 0.66rem;
+}
+
+.letter .top {
+  gap: 0.4rem;
+  margin-bottom: 0.1rem;
+}
+
+.letter .when {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+}
+
+.letter .subject {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.letter .snippet {
+  margin-top: 0.24rem;
+  font-size: 0.68rem;
+  color: #7fa79f;
+  -webkit-line-clamp: 1;
+  max-height: 1.5em;
+}
+
+.letter .tags {
+  margin-top: 0.3rem;
+}
+
+.tag {
+  font-size: 0.55rem;
+  padding: 0.03rem 0.3rem;
+}
+
+/* The heat line is a hint, not a progress bar: keep it under the row edge. */
+.letter .heat i {
+  opacity: 0.45;
+}
+
+/* The last move and its age: the box says what happened, the age says whether
+   it is still worth waiting for. */
+.boxmark {
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.reader-meta .rtrail {
+  color: #7fa79f;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Below 1180 the field is a luxury and the letters are the job: the graph folds
+   away and the rail keeps its column. The gates as a horizontal strip ate the
+   top of the list on exactly the screens that have the least to spare. */
+@media (max-width: 1180px) {
+  .workspace,
+  .workspace[data-field="folded"],
+  .workspace[data-field="open"] {
+    grid-template-columns: 216px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: "rail letters";
+  }
+  .graph-panel {
+    display: none;
+  }
+  .hint {
+    display: none;
+  }
+  /* The rail's prose is for a wide column: on a laptop the gates themselves
+     need the height more than the explanation of what a gate is. */
+  .rail .foot {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .act-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .act-state {
+    text-align: left;
+    min-width: 0;
+  }
+}

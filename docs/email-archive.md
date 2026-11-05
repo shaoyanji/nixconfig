@@ -12,6 +12,7 @@ the host's MagicDNS name, where tailscaled terminates TLS.
 | `GET /api/emails-search?q=invoice` | `websearch_to_tsquery` over the generated vector, with `<<…>>` snippets |
 | `POST /api/add-email` | one message in: nine camelCase keys, `recipients`/`labels` comma-separated, upserts on `messageId` |
 | `GET /openapi.json` | the machine-readable contract (OpenAPI 3.0.3, generated from the SQL files) |
+| [`mail-atlas`](mail-atlas.md) | browser reading surface over the same rows: fuzzy search, tags, graph (tailnet 8452) |
 
 | Layer | Home |
 | :--- | :--- |

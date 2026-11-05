@@ -499,6 +499,65 @@ tasks:
           *) printf '%s' "$rows" | toon -e ;;
         esac
 
+  agents:mail:atlas:
+    desc: "The atlas queues: per-letter decisions and the general commands a person wrote in the reader (TOON; FORMAT=text, STATUS=pending, LIM=50)"
+    vars:
+      STATUS: '{{.STATUS | default "pending"}}'
+      LIM: '{{.LIM | default "50"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    cmds:
+      - |
+        # `letters` is what archive/delete/hermes rows are, `commands` is the
+        # mailbox-wide instruction with no message behind it. One document, so
+        # an agent reads the whole handoff in one call.
+        base="${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}"
+        letters="$(curl -fsS --max-time 20 "$base/api/atlas-actions?status={{.STATUS}}&lim={{.LIM}}")"
+        commands="$(curl -fsS --max-time 20 "$base/api/atlas-commands?status={{.STATUS}}&lim={{.LIM}}")"
+        rows="$(jq -nc --argjson l "$letters" --argjson c "$commands" '{letters: $l, commands: $c}')"
+        case "{{.FORMAT}}" in
+          text)
+            printf '%s' "$rows" | jq -r '.letters[]? | "\(.requestedAt[0:16])  letter  \(.kind)  \(.subject[0:50])  \(.instruction // "")"'
+            printf '%s' "$rows" | jq -r '.commands[]? | "\(.requestedAt[0:16])  command  —  \(.instruction[0:80])"'
+            ;;
+          json) printf '%s' "$rows" ;;
+          *) printf '%s' "$rows" | toon -e ;;
+        esac
+
+  agents:mail:atlas:drain:
+    desc: "Execute the atlas decision queue now (APPLY=1 moves mail; default is a dry run that names the uid)"
+    vars:
+      APPLY: '{{.APPLY | default "0"}}'
+    cmds:
+      - |
+        if ! command -v mail-atlas-drain >/dev/null 2>&1; then
+          echo "mail-atlas-drain is not on PATH: the archive lives on delphi (ssh delphi, then this task)" >&2
+          exit 1
+        fi
+        if [ "{{.APPLY}}" = "1" ]; then
+          mail-atlas-drain
+        else
+          mail-atlas-drain --dry-run
+        fi
+
+  agents:mail:atlas:reconcile:
+    desc: "Compare the atlas inbox with the real mailbox and write the difference (APPLY=1 applies; default is a dry run that names the box changes)"
+    vars:
+      APPLY: '{{.APPLY | default "0"}}'
+    cmds:
+      - |
+        # The mailbox decides where a letter is; the atlas only records it. A
+        # letter archived on a phone never reaches `mail_box`, so the working set
+        # keeps counting mail the person already handled until this runs.
+        if ! command -v mail-atlas-reconcile >/dev/null 2>&1; then
+          echo "mail-atlas-reconcile is not on PATH: the archive lives on delphi (ssh delphi, then this task)" >&2
+          exit 1
+        fi
+        if [ "{{.APPLY}}" = "1" ]; then
+          mail-atlas-reconcile
+        else
+          mail-atlas-reconcile --dry-run
+        fi
+
   agents:ci:queue:
     desc: "Unresolved CI and robot mail an agent owns — the loop's own inbox (TOON; FORMAT=text for a table, LIM=50)"
     vars:

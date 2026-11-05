@@ -206,6 +206,7 @@ modules/
     aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)
     mail-agent.nix    — natural-language mail actions (needle3 + himalaya) and the nightly bulk sweep
     email-archive.nix — NpgsqlRest over a full-text mailbox: tailnet-only API, declared schema, disk attachments
+    mail-atlas.nix    — fuzzy finding, tag taxonomy and relation graph over the archive (tailnet 8452)
   roles/           — User role assemblers (minimal, home, demo)
   user/            — User module domains
     base/          — CLI/editor/env base
@@ -909,6 +910,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/nix-cache-edge.md`](docs/nix-cache-edge.md)               | Public R2-backed cache: the three substituter tiers, why the edge never signs, the S3 upload path, the 10 GiB budget |
 | [`docs/mail-agent.md`](docs/mail-agent.md)                   | mail-agent on delphi: the tool assessment, measured routing accuracy, the sender trust list, operations |
 | [`docs/email-archive.md`](docs/email-archive.md)              | NpgsqlRest email archive: schema, endpoints, the Drive mirror checklist, what is not done |
+| [`docs/mail-atlas.md`](docs/mail-atlas.md)                   | The archive as a field: tag taxonomy, fuzzy search contract, the WASM particle field and graph |
 | [`docs/agent-contract.md`](docs/agent-contract.md)            | What "done" means per kind of work: playbook exits, evidence objects, frame discipline |
 | [`docs/selector-daemon-predesign.md`](docs/selector-daemon-predesign.md)         | Handoff packet for a selector daemon: scope, query schema, synthetic data, model and compute plan, Kelly gate |
 | [`docs/agent-turns.md`](docs/agent-turns.md)                | Agent turns (xs): endpoint, schema, tokens, dedup, restore procedure    |

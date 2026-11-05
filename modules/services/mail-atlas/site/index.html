@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="dark" />
+    <title>信海圖 · Mail Atlas</title>
+    <link rel="preload" href="/han.woff" as="font" type="font/woff" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <canvas id="qi-field" aria-hidden="true" data-state="idle"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <header class="hud">
+      <div class="brand">
+        <span class="seal" aria-hidden="true">郵</span>
+        <div class="brand-text">
+          <h1>信海圖</h1>
+          <p class="kicker">Mail Atlas · the archive as a living field</p>
+        </div>
+      </div>
+      <div class="hud-stats">
+        <span class="stat"
+          ><span class="num" id="stat-inbox">—</span><span class="dim">inbox</span></span
+        >
+        <span class="stat"
+          ><span class="num" id="stat-queued">—</span><span class="dim">queued</span></span
+        >
+        <span class="stat"><span class="num" id="stat-letters">—</span><span class="dim">letters</span></span>
+        <button type="button" class="ghost" id="hermes-open" title="a command about the mailbox, not one letter">
+          使 <span>command Hermes</span> <kbd>H</kbd>
+        </button>
+        <span class="link-state"><i class="dot" id="link-dot"></i><span id="link-state">connecting</span></span>
+      </div>
+    </header>
+
+    <section class="search-band">
+      <form class="search" id="search-form" role="search" autocomplete="off">
+        <span class="search-glyph" aria-hidden="true">尋</span>
+        <label class="sr-only" for="q">Search the archive</label>
+        <input
+          id="q"
+          name="q"
+          type="search"
+          placeholder="ask the sea — invoice, kleinanzeig, ci failure, 面試"
+          spellcheck="false"
+          autocapitalize="off"
+          enterkeyhint="search"
+        />
+        <div class="readout" id="readout" aria-live="polite">
+          <span class="ro-hits" id="ro-hits">—</span>
+          <span class="ro-dim">hits</span>
+          <span class="ro-sep">·</span>
+          <span class="ro-ms" id="ro-ms">—</span>
+          <span class="ro-dim">ms</span>
+        </div>
+        <kbd>/</kbd>
+      </form>
+      <div class="under-search">
+        <div class="chips" id="chips"></div>
+        <p class="hint" id="hint">typing is a query · misspellings are forgiven · ↑↓ to walk, ↵ to read</p>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <aside class="rail panel">
+        <div class="panel-head slim">
+          <h2><span>門</span> Ten gates</h2>
+        </div>
+        <nav class="cat-list" id="categories" aria-label="Categories"></nav>
+        <div class="view-tags" id="view-tags-block">
+          <p class="vt-head">in the field</p>
+          <div class="vt-list" id="view-tags"></div>
+        </div>
+        <p class="foot">
+          a category is a stance toward the mail, not a folder it lives in. the numbers are what
+          the last pass placed.
+        </p>
+      </aside>
+
+      <section class="panel graph-panel">
+        <div class="panel-head">
+          <h2><span>網</span> Field of relations</h2>
+          <div class="graph-meta">
+            <span class="legend"><i class="c"></i>gate</span>
+            <span class="legend"><i class="t"></i>tag</span>
+            <span class="legend"><i class="e"></i>letter</span>
+            <span class="legend dist" id="graph-note">—</span>
+            <button type="button" class="ghost tiny" id="field-fold" title="fold the field away">
+              fold
+            </button>
+          </div>
+        </div>
+        <div class="graph-wrap">
+          <canvas id="atlas-graph" aria-label="Relation graph of the search results" data-hot="0"></canvas>
+          <div class="graph-empty" id="graph-empty">
+            <span class="ge-glyph">靜</span>
+            <span class="ge-copy">type, and the field draws itself</span>
+          </div>
+          <div class="graph-tip" id="graph-tip"></div>
+        </div>
+      </section>
+
+      <section class="panel letters-panel">
+        <div class="panel-head letters-head">
+          <h2><span>卷</span> <span id="box-title">Inbox</span> <span class="count" id="result-count"></span></h2>
+          <div class="box-tabs" id="box-tabs" role="tablist" aria-label="Which letters">
+            <button type="button" role="tab" data-box="inbox" aria-selected="true">inbox</button>
+            <button type="button" role="tab" data-box="queued" aria-selected="false">queued</button>
+            <button type="button" role="tab" data-box="done" aria-selected="false">handled</button>
+            <button type="button" role="tab" data-box="all" aria-selected="false">all</button>
+          </div>
+          <span class="dim mono-xs" id="result-meta">newest first</span>
+        </div>
+        <div class="action-bar" id="action-bar">
+          <span class="mono-xs state" id="batch-state">space marks a letter · a archive · x delete</span>
+          <div class="ab-actions">
+            <button type="button" data-kind="archive">archive <kbd>A</kbd></button>
+            <button type="button" data-kind="delete">delete <kbd>X</kbd></button>
+            <button type="button" data-kind="clear">clear <kbd>esc</kbd></button>
+          </div>
+        </div>
+        <ol id="results" class="letters"></ol>
+        <button type="button" class="more" id="more" hidden>more letters</button>
+      </section>
+    </main>
+
+    <footer>
+      <span>信海圖 · tailnet only · no telemetry, no third-party origins</span>
+      <span><a href="/openapi.json">api contract</a> · <a href="/api/list-emails?lim=5">raw</a></span>
+    </footer>
+
+    <dialog id="reader">
+      <div class="reader-inner">
+        <button class="reader-close" id="reader-close" aria-label="Close">×</button>
+        <div class="reader-head">
+          <p class="reader-kicker" id="reader-kicker"></p>
+          <h2 class="subject" id="reader-subject"></h2>
+          <div class="reader-meta" id="reader-meta"></div>
+        </div>
+        <div class="reader-body" id="reader-body"></div>
+        <div class="reader-actions">
+          <div class="act-row">
+            <button type="button" class="act" id="act-archive" data-kind="archive">
+              <span class="act-glyph" aria-hidden="true">歸</span><span class="act-label">archive</span
+              ><kbd>A</kbd>
+            </button>
+            <button type="button" class="act" id="act-delete" data-kind="delete">
+              <span class="act-glyph" aria-hidden="true">焚</span
+              ><span class="act-label">queue deletion</span><kbd>X</kbd>
+            </button>
+            <button type="button" class="act" id="act-hermes" data-kind="hermes">
+              <span class="act-glyph" aria-hidden="true">使</span
+              ><span class="act-label">send to Hermes</span><kbd>H</kbd>
+            </button>
+            <span class="act-state" id="act-state"></span>
+          </div>
+          <form class="instruct" id="instruct-form" hidden>
+            <label for="instruction">instruction for Hermes</label>
+            <textarea
+              id="instruction"
+              rows="2"
+              placeholder="archive after the refund lands · delete once the renewal is cancelled"
+            ></textarea>
+            <button type="submit">queue <kbd>⌘↵</kbd></button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="command">
+      <form class="command-form" id="command-form">
+        <button class="reader-close" id="command-close" type="button" aria-label="Close">×</button>
+        <p class="reader-kicker">general command · not tied to one letter</p>
+        <h2 class="subject">Tell Hermes what to do with the mailbox</h2>
+        <textarea
+          id="command-text"
+          rows="3"
+          placeholder="every newsletter older than a month can go · unsubscribe from the ATS senders"
+        ></textarea>
+        <div class="command-foot">
+          <span class="act-state" id="command-state"></span>
+          <button type="submit">queue <kbd>⌘↵</kbd></button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

@@ -8,9 +8,9 @@
 # Everything else a rebuild needs is the host, the flake ref and the action, and
 # those are arguments — not flags. Before this file the same three decisions were
 # spelled five ways inside `infra:switch:*` alone (`REMOTE_BUILD=1` meaning "never
-# compile here", `--option max-jobs 0 --option builders ""` typed inline, `--impure`
-# in one task, `--use-substitutes` in another, nothing at all in the third), so the
-# rule lived in prose and the flags lived in copies.
+# compile here", `--option max-jobs 0` typed inline, `--impure` in one task,
+# `--use-substitutes` in another, nothing at all in the third), so the rule lived
+# in prose and the flags lived in copies.
 #
 # Defaults are the cheap, safe ones: local / on / accept, which render NOTHING
 # because they are what Nix does anyway. A flag only appears when a decision was
@@ -94,8 +94,17 @@ render() { # builders substitutes flakes flavour
   none)
     # Substitute or fail. `max-jobs 0` alone still lets Nix dispatch to a
     # configured remote builder, which uploads the whole closure before it starts
-    # — `builders ""` is what makes it a refusal instead of a relay.
-    out="$out --option max-jobs 0 --option builders \"\""
+    # — clearing the builder list is what makes it a refusal instead of a relay.
+    #
+    # The empty list is spelled `;`, not `""`. This string is word-split by the
+    # caller (`nixos-rebuild switch $flags`), so an empty argv element cannot
+    # exist in it; the literal two quotes used to reach Nix as the value `""`,
+    # which it parses as the builder `ssh://""` and dies on ("Cannot parse Nix
+    # store 'ssh://\"\"'") before it looks at a single derivation. Machine specs
+    # are separated by `;`, so a lone separator is a list of no machines —
+    # measured 2026-11-05: `;` reports "local builds are disabled (max-jobs = 0)"
+    # while a real spec attempts its SSH connection.
+    out="$out --option max-jobs 0 --option builders ;"
     ;;
   remote)
     # Dispatch deliberately, and say NOTHING about the builders list: it comes from
@@ -107,8 +116,11 @@ render() { # builders substitutes flakes flavour
     ;;
   esac
 
-  # Substitutes default ON, so only the exception is worth a flag.
-  [ "$s" = "off" ] && out="$out --option substituters \"\""
+  # Substitutes default ON, so only the exception is worth a flag. The boolean
+  # master switch, for the same reason as the builder list: `substituters ""`
+  # would have to be one empty word, and the quoted spelling reaches Nix as the
+  # store `""` ("Cannot parse Nix store").
+  [ "$s" = "off" ] && out="$out --option substitute false"
 
   # `accept` is Nix's default posture; only impurity is a decision.
   [ "$f" = "impure" ] && out="$out --impure"
@@ -145,16 +157,16 @@ if [ "$SELF_TEST" = 1 ]; then
   echo "== the envelope, every combination =="
   check "" local on accept
   check "--impure" local on impure
-  check "--option substituters \"\"" local off accept
-  check "--option substituters \"\" --impure" local off impure
-  check "--option max-jobs 0 --option builders \"\"" none on accept
-  check "--option max-jobs 0 --option builders \"\" --impure" none on impure
-  check "--option max-jobs 0 --option builders \"\" --option substituters \"\"" none off accept
-  check "--option max-jobs 0 --option builders \"\" --option substituters \"\" --impure" none off impure
+  check "--option substitute false" local off accept
+  check "--option substitute false --impure" local off impure
+  check "--option max-jobs 0 --option builders ;" none on accept
+  check "--option max-jobs 0 --option builders ; --impure" none on impure
+  check "--option max-jobs 0 --option builders ; --option substitute false" none off accept
+  check "--option max-jobs 0 --option builders ; --option substitute false --impure" none off impure
   check "--option max-jobs 0" remote on accept
   check "--option max-jobs 0 --impure" remote on impure
-  check "--option max-jobs 0 --option substituters \"\"" remote off accept
-  check "--option max-jobs 0 --option substituters \"\" --impure" remote off impure
+  check "--option max-jobs 0 --option substitute false" remote off accept
+  check "--option max-jobs 0 --option substitute false --impure" remote off impure
 
   echo "== the envelope is closed =="
   for bad in "--builders everywhere" "--substitutes maybe" "--flakes loose" "--flavour make"; do

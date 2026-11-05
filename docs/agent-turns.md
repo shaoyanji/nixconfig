@@ -93,6 +93,53 @@ The read side (`agents:xs:list`) adds the one rule the shim cannot know: an
 printed, and not a failed check, because an agent that died mid-turn must not red
 the gate forever.
 
+## Query: `Q=` is the grep, TOON is the shape
+
+The turn log replaced the markdown ledger (`AUDIT.md`, retired 2026-11-05), and a
+log only replaces a file if finding something in it is as cheap as grepping that
+file. `scripts/task/xs-turn-query.jq` is the read model; the task renders it three
+ways and never prints a raw event to an agent.
+
+| | |
+| :--- | :--- |
+| `Q="tika heap"` | every word must appear somewhere in the turn (AND), case-insensitive. Subject hits weigh 3, action/claims/files 2, outcome/rationale/source 1; matches rank by weight then recency |
+| `ID=03h6jhaj` | one turn by frame id or client UUID; a prefix is enough |
+| `REPO=`, `SUBJECT=`, `SOURCE=` | pushed to the shim, which scans 2000 frames on a filtered read |
+| `LIVE=1` | the open queue: one row per subject (the newest unresolved turn), intersected with `Q=` |
+| `CLAIM='a,b'` | exit 1 when a live claim overlaps an area you are about to touch |
+| `FORMAT=toon` (default) · `text` · `json` | compact rows for an agent · a person · the whole model for a program |
+
+A row is `ts, src, subj, out, act, claims, files, id` plus `hit` (the fields that
+matched) and `snip` (a word-aligned window around the first match), and the
+payload always ends with `live`, `stale` and `verdict`:
+
+```bash
+$ task agents:xs:list Q="tika heap" LIMIT=3
+q: {repo: "", subject: "", text: tika heap, ...}
+scanned: 168
+truncated: false
+matched: 2
+stored: 168
+stale_days: 7
+turns[2]{ts,src,subj,out,act,claims,files,id,hit,snip}:
+  "2026-11-05T15:19",buffy,"nixconfig:delphi-microvm-cleanup",done,"Deployed the tika heap-flag fix on delphi…",hosts/delphi,0,03h6jighuo0twatcedwx3d1vt,action,"…"
+  "2026-11-05T15:13",buffy,"nixconfig:checks-units",done,"Added checks:units (systemd-analyze verify…","taskfiles/checks.yml,scripts/task/unit-gate.sh",7,03h6jhajs277mthu4nlc3ld0g,action,"…"
+live[3]{ts,subj,src,kind,text}:
+  …
+verdict:
+  state: note
+  text: live claims exist; pass SUBJECT= or CLAIM= to test your own work
+```
+
+`FORMAT=text` lays the same model out for a person — two lines per turn, the
+matched field in brackets, then the claims and the verdict. `snip` is suppressed
+there when the match is only in `action`/`subject`, which the row already prints.
+
+The row is deliberately not the event: `rationale` (up to 1000 characters), the
+full file list and the commit hashes stay in `FORMAT=json` and in the store. An
+agent reading twelve rows should be able to answer "did someone already do this,
+and where is it written" without spending twelve kilobytes.
+
 Rejections: `401` missing or wrong bearer; `400` unknown field, missing field,
 bad UUID or timestamp, bad `outcome`, a blocked/failed outcome without its note,
 oversized body (16 KiB) or field, credential-shaped free text, and key material

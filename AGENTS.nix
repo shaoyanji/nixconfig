@@ -809,7 +809,7 @@
       kind = "handoff";
       status = "DELIVERED";
       date = "2026-10-19";
-      summary = "The queue items that landed this cycle; the ledger in AUDIT.md keeps the dates.";
+      summary = "The queue items that landed this cycle; the xs turn log keeps the dates.";
       refs = {
         modules = ["lib/home-agents.nix" "lib/knowledge-graph.nix" "modules/profiles/nas-client.nix"];
         docs = [".agents/SCHEMA.md"];
@@ -4360,7 +4360,7 @@
         - 17 `checks:decision:*` tasks wrap `ensemble.py`, which had no `sys.exit`.
         - 39 checkout-path occurrences in 15 tracked files, on a fleet of 34.
         - 91 broken doc links (88 absolute `file:///`); 5,220 comment lines in 236 `.nix`
-          files (17%), 66 banner rules, 86 dated narratives outside `AUDIT.md`.
+          files (17%), 66 banner rules, 86 dated narratives outside the turn log.
 
         **Landed.** `checks:repo:paths` fails on a hardcoded checkout path and runs in
         `checks:quick`; the paths it named now resolve from `git rev-parse`, `../..`, or
@@ -4646,7 +4646,7 @@
         is `lib.getExe cfg.package` and no PATH shadows it. niri, waybar, greetd and
         gnome-keyring left the closure; her layer is `hosts/netbook/dwl-keybinds.h`,
         spliced *first* because dwl takes the first match. Two defects came from that
-        deploy (AUDIT.md): it ran stock dwl for one deploy — a wrapper listed `pkgs.dwl`
+        deploy: it ran stock dwl for one deploy — a wrapper listed `pkgs.dwl`
         beside the keymap build, and a wrapper's PATH wins inside the session — then its
         clients raced a socket FILE a killed session left behind.
 
@@ -4679,7 +4679,7 @@
       refs = {
         hosts = ["scratch" "frieren"];
         modules = ["modules/zen.nix"];
-        docs = ["AUDIT.md"];
+        docs = ["docs/history/audit-2026-11.md"];
       };
       body = ''
         Measured on scratch 2026-10-22: 31 add-ons in `extensions.json`, 9 active, 22 `userDisabled`,

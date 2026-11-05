@@ -430,7 +430,7 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 
 **2026-09-17 — scratch: Steam Remote Play kiosk converted to an eisen-style niri desktop.** The Fujitsu ESPRIMO D556 now runs the `globalModulesNixos` chain (niri + DankMaterialShell greeter, autoLogin, role:heim userland) via `base-desktop-environment.nix`; Steam, the cage kiosk wrapper and the greetd autologin are gone, while the tmpfs/zram IO diet (zram 100%, journald volatile, ~/.cache on tmpfs, fstrim, gentle writeback sysctls) is kept verbatim for the shaky f2fs SSD. Legacy BIOS boot with GRUB on /dev/sda is unchanged. See `.agents/deploy/hosts/scratch.md`.
 
-**2026-09-17 — verntil/orb-cassini host files removed; thinsandy references purged.** Orphaned `hosts/verntil.nix` and `hosts/orb-cassini/` (never registered in the host inventory) were deleted, and remaining live references to the long-decommissioned `thinsandy` were replaced with `frieren` (the current NAS): deploy/logs menus, nas-client skip-list, heim's anki sync URL, nixoshmsymlinks skip-list, pi-hole DNS comments, the stale `checks:nullclaw:smoke:thinsandy` task, and the thinsandy age keys in `.sops.yaml`. Historical migration notes (HANDOFF.md, AUDIT.md) intentionally keep their thinsandy mentions.
+**2026-09-17 — verntil/orb-cassini host files removed; thinsandy references purged.** Orphaned `hosts/verntil.nix` and `hosts/orb-cassini/` (never registered in the host inventory) were deleted, and remaining live references to the long-decommissioned `thinsandy` were replaced with `frieren` (the current NAS): deploy/logs menus, nas-client skip-list, heim's anki sync URL, nixoshmsymlinks skip-list, pi-hole DNS comments, the stale `checks:nullclaw:smoke:thinsandy` task, and the thinsandy age keys in `.sops.yaml`. Historical migration notes in `docs/history/` intentionally keep their thinsandy mentions.
 
 **2026-08-03 — Poseidon microVM disabled; frieren daily self-upgrade; scratch real disk UUIDs + GRUB; GC consolidation.** The `testvm` microVM on `poseidon` no longer runs — the microvm imports and the `microvm.vms` block in `hosts/poseidon/configuration.nix` are commented out for easy re-enable (microbr bridge/NAT profile included). `frieren` (the NAS) now self-upgrades every morning at 04:00 via the canonical `system.autoUpgrade` module (no hand-rolled timer): it stages `nixos-rebuild boot` from `github:shaoyanji/nixconfig#frieren` first, then reboots into the new generation only if kernel/initrd/kernel-modules changed (`allowReboot`, reached only after a successful boot), otherwise applies a live `switch`. Persistent timer catches up if the NAS was off. `scratch` got its real disk UUIDs from the original machine gist (f2fs root + ext4 /boot) and now boots with GRUB (legacy BIOS) instead of systemd-boot; its redundant 14-day GC was dropped in favour of the global 10-day GC. See `.agents/deploy/hosts/frieren.md` and `.agents/deploy/hosts/scratch.md`.
 
@@ -438,7 +438,7 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 
 **2026-04-30 — Task system consolidation.** Deprecated legacy task aliases and menus, directing users to new `infra:` and `dev:` prefixed tasks. Simplified `checks:nullclaw:smoke` tasks and enhanced `dev:git` tasks with AI commit integration.
 
-**2026-04-23 — Manifest and dead-code cleanup.** The AI-host manifest system (`taskfiles/ai-host-manifest.json`, `scripts/task/ai-host-*.sh`, and `taskfiles/services-ai-hosts.yml`) was removed. Host menus and validation tasks now use static host lists and direct smoke checks. The `modules/user/ai/` directory and `modules/goodies.nix` were also removed; nothing in active host configs imported them. See `AUDIT.md` for the full decision log.
+**2026-04-23 — Manifest and dead-code cleanup.** The AI-host manifest system (`taskfiles/ai-host-manifest.json`, `scripts/task/ai-host-*.sh`, and `taskfiles/services-ai-hosts.yml`) was removed. Host menus and validation tasks now use static host lists and direct smoke checks. The `modules/user/ai/` directory and `modules/goodies.nix` were also removed; nothing in active host configs imported them. See the git log for the full decision.
 
 ## Documentation
 
@@ -462,7 +462,6 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 - `docs/userland-package-ownership.md` - Package ownership and role wiring
 
 ### Historical
-- `AUDIT.md` - AI module cleanup audit (April/October 2026)
 - `AGENTS.nix` - Decisions, open work, handoffs and experiments as notes (`task ops:notes`)
 
 ### Site Management

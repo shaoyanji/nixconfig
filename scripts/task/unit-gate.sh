@@ -36,7 +36,7 @@ trap 'rm -rf "$tmp"' EXIT
 # far less than a toplevel force.
 raw="$tmp/eval.out"
 if ! bash scripts/task/oom-guard.sh --timeout "$timeout" -- \
-  nix eval --json ".#nixosConfigurations.$host.config.systemd.units" \
+  nix eval --json ".?submodules=1#nixosConfigurations.$host.config.systemd.units" \
   --apply 'us: builtins.mapAttrs (n: u: u.text) us' >"$raw" 2>"$tmp/eval.err"; then
   echo "unit-gate: $host does not evaluate — this is an eval failure, not a unit failure" >&2
   tail -5 "$tmp/eval.err" >&2

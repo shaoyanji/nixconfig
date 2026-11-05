@@ -13,7 +13,8 @@
 
   # Spliced host entries go first, which is what makes them shadow the fleet bind
   # for the same key (`keybinding()` returns the first entry matching mod + keysym).
-  # Handed to `programs.dwl.package`, never added to a PATH: see AUDIT.md 2026-10-27.
+  # Handed to `programs.dwl.package`, never added to a PATH: the deploy that shipped
+  # a wrapper around `pkgs.dwl` ran stock dwl and answered no keybind.
   dwl = pkgs.dwl.override {
     configH =
       builtins.replaceStrings

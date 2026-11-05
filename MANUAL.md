@@ -2,7 +2,8 @@
 
 > The manual for the live fleet mainframe: what is running, how to reach it, what
 > is new, and how to tell whether the config actually worked. Design rationale is
-> in `ARCHITECTURE.md`; per-change history is in `AUDIT.md`; agent routing is in
+> in `ARCHITECTURE.md`; per-change history is the agent turn log
+> (`task agents:xs:list`); agent routing is in
 > `AGENTS.md`.
 
 ## 1. Identity and access
@@ -189,7 +190,6 @@ task ops:sentinel:status   # timer + last run
 | `AGENTS.md` | agent invariants + verification protocol |
 | `MANUAL.md` | this operator guide |
 | `ARCHITECTURE.md` | proposals, ADRs, rejected options |
-| `AUDIT.md` | current state + change ledger |
 | `TODO.md` / `HANDOFF.md` | bounded open-work queues |
 | `EXPERIMENTS.md` | archived design studies + status index |
 | `docs/history/` | superseded narrative (audit/TODO/HANDOFF) |
@@ -316,7 +316,7 @@ for an orphan before retrying.
 | Question | Command / file |
 | :--- | :--- |
 | Is anything degraded? | `task ops:health` |
-| What happened recently? | `task ops:ledger`, `AUDIT.md` |
+| What happened recently? | `task agents:xs:list LIMIT=20`, `task ops:ledger` |
 | What is being proposed? | `ARCHITECTURE.md` |
 | What is open? | `TODO.md`, `HANDOFF.md` |
 | What can an agent do? | `task ops:skills`, `.agents/README.md` |

@@ -60,7 +60,6 @@ stub() {
 
 check AGENTS.md 1200
 check MANUAL.md 1200
-check AUDIT.md 300
 stub ARCHITECTURE.md
 stub TODO.md
 stub HANDOFF.md

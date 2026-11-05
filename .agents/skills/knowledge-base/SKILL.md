@@ -209,7 +209,7 @@ hand-maintains a second vault.**
 | :--- | :--- |
 | A durable rule | `.agents/SCHEMA.md` or the owning manual |
 | A host fact | `inventory.toml` (`notes`) via `task dev:inventory:menu` |
-| An operational event | the sentinel ledger (automatic) + `AUDIT.md` line |
+| An operational event | the sentinel ledger (automatic) + one xs turn |
 | A design decision | an `AGENTS.nix` note with `refs`, plus `from` naming what it grew out of (`task ops:notes:near` first) |
 | A one-off finding | the commit message / PR; promote only if it changes a rule |
 | A procedure | `docs/` or a skill |

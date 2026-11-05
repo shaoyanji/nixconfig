@@ -77,7 +77,7 @@ generation; `generation-stale` in the ledger is the signal that catches it.
 | :--- | :--- |
 | A proposal / decision | an `AGENTS.nix` note (`task ops:notes`) |
 | Open work | an `AGENTS.nix` note with `kind = "open"` / `"handoff"` |
-| What happened | `AUDIT.md` (one line) |
+| What happened | one xs turn (`task agents:xs:list Q="…"` to read them) |
 | History | `docs/history/` |
 | A procedure | `docs/` or a skill |
 | A host fact | `inventory.toml` (`notes`) via `task dev:inventory:menu` |

@@ -58,8 +58,8 @@ jobs:
 
   # Doc-only changes allocate zero build runners (the detector ignores *.md),
   # so without this job a runaway living document lands green. The gate is
-  # `checks.<system>.docs-budget`: line counts for AGENTS.md / MANUAL.md /
-  # AUDIT.md and the four root stubs (SCHEMA.md §2), evaluated at eval time and
+  # `checks.<system>.docs-budget`: line counts for AGENTS.md / MANUAL.md and the
+  # four root stubs (SCHEMA.md §2), evaluated at eval time and
   # building a three-line artifact. It runs on every push, doc-only included.
   docs-budget:
     runs-on: ubuntu-latest

@@ -36,7 +36,7 @@ git diff main... -- . | head -400     # or: git diff --staged, git diff <files>
 
 4. **Encode before deleting.** A constraint in a comment is a constraint no check enforces. Give it one owner: a Nix assertion, a `checks:` gate, a shared `lib/` derivation, or a value read from the one place that owns it. Then delete the comment. If the encoding is out of scope, delete the comment anyway and report the constraint as open.
 
-5. **History is not a comment.** A dated incident narrative belongs in `AUDIT.md`. Banner rules (`# =====`) carry no information: delete on sight.
+5. **History is not a comment.** A dated incident narrative belongs in a turn (`task agents:xs:post`). Banner rules (`# =====`) carry no information: delete on sight.
 
 6. **Report** the deletion count, what you kept and the proof it is about something you cannot change, the encodings, and the constraints left open.
 
@@ -44,6 +44,6 @@ git diff main... -- . | head -400     # or: git diff --staged, git diff <files>
 
 - 5,220 comment lines in 236 `.nix` files, 17% of non-blank Nix.
 - 66 banner rules across 19 files.
-- 86 dated incident narratives in `.nix`/`.sh` while `AUDIT.md` is the ledger.
+- 86 dated incident narratives in `.nix`/`.sh` while the record is the turn log.
 
 Start with the diff in front of you. Do not sweep the tree in one pass.

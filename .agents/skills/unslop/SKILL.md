@@ -65,7 +65,7 @@ Scan for the patterns, then rewrite. Match the tone of the file you are editing.
 
 ## Where it applies here
 
-`AGENTS.md`, `MANUAL.md`, `docs/*.md`, `.agents/skills/*/SKILL.md`, `AGENTS.nix` note bodies, `AUDIT.md` entries, commit messages, and the reply you are about to send.
+`AGENTS.md`, `MANUAL.md`, `docs/*.md`, `.agents/skills/*/SKILL.md`, `AGENTS.nix` note bodies, xs turn rationales, commit messages, and the reply you are about to send.
 
 Apply it to text you write and to text you already touch. Do not open a rewrite of a file just to satisfy rule 13.
 

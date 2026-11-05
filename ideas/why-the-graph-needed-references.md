@@ -6,7 +6,6 @@ about:
   - doc:docs/delphi-install.md
   - doc:AGENTS.md
   - doc:MANUAL.md
-  - doc:AUDIT.md
   - doc:README.md
   - doc:docs/NUSHELL.md
   - host:aceofspades
@@ -23,7 +22,6 @@ about:
 
 - [AGENTS.md](../AGENTS.md)
 - [frieren — Operator Manual](../MANUAL.md)
-- [AUDIT — current state and change ledger](../AUDIT.md)
 - [nixconfig](../README.md)
 - [NUSHELL.md — shell layer, secrets, LLM and decision models](../docs/NUSHELL.md)
 - [Agent turns: the xs coordination endpoint on delphi](../docs/agent-turns.md)

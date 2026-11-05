@@ -166,7 +166,7 @@ leaf experiment (no refs, verbose intent)
   → proposal/ACCEPTED (+ priority)                     ← design agreed
   → IN FLIGHT (+ refs.modules = what landed so far)    ← partial, be specific
   → DELIVERED (+ refs.modules = the landed module, refs.tasks = the gate)
-  → one line in AUDIT.md, note stays as the design record
+  → one xs turn, note stays as the design record
   → someone writes a note with from = [this]           ← provenance, not a tombstone
 ```
 
@@ -199,7 +199,7 @@ code:
 - **Never graduate a note into a new markdown file.** `ARCHITECTURE.md`,
   `TODO.md`, `HANDOFF.md`, `EXPERIMENTS.md` are one-line stubs on purpose;
   `ops:docs:budget` fails if content creeps back. Delivered means
-  `refs.modules` + `AUDIT.md` line.
+  `refs.modules` + one xs turn.
 - **Do not restate the code.** A traceable note gets ≤30 lines: the *why* and
   the exit. Option names, defaults and types belong in the module.
 - **Do not paste measurements.** Keep the command that reproduces the number

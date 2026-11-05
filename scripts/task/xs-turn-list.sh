@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
-# Read side of the xs turn log: recent turns, the live claims among them, and a
-# verdict for the subject or the areas you are about to touch.
+# Read side of the xs turn log: find turns (Q= is the grep the ledger used to
+# give), see the live claims among them, and get a verdict for the subject or the
+# areas you are about to touch.
 #
-# Rendering lives in scripts/task/xs-turn-list.jq, which also states the rule for
-# "live" once: the NEWEST entry per subject that is in_progress, blocked or
-# failed. A blocked subject is a decision waiting on a human, so it is open work.
+# One renderer, three shapes: `toon` (the agent default, compact rows), `text`
+# (a person: two lines per turn), `json` (the whole model, for a program).
+# Editing lives in scripts/task/xs-turn-query.jq, which also states the "live"
+# rule once: the NEWEST entry per subject that is in_progress, blocked or failed.
 #
 # Task: agents:xs:list · protocol: docs/agent-turns.md · skill: xs-turns
 # Exit: 0 nothing live for what was asked · 1 a live claim on SUBJECT, or a live
-#       claim overlapping CLAIM · 2 no usable token, bad LIMIT, or no answer
+#       claim overlapping CLAIM · 2 no usable token, bad input, or no answer
 set -euo pipefail
 
 ROOT=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
-TEMPLATE=${XS_TURN_LIST_TEMPLATE:-$ROOT/scripts/task/xs-turn-list.jq}
+TEMPLATE=${XS_TURN_QUERY_TEMPLATE:-$ROOT/scripts/task/xs-turn-query.jq}
 URL=${XS_TURNS_URL:-https://delphi.cloudforest-kardashev.ts.net:8449}
 
 limit=${LIMIT:-20}
@@ -20,13 +22,14 @@ repo=${REPO:-}
 subject=${SUBJECT:-}
 source_name=${SOURCE:-}
 claim=${CLAIM:-}
+q=${Q:-}
+id=${ID:-}
 stale_days=${STALE_DAYS:-7}
 live_only=${LIVE:-}
-# TOON is the default because the reader is an agent; a person asks for table.
+# TOON is the default because the reader is an agent; a person asks for text.
 format=${FORMAT:-toon}
-# The scan is always the endpoint's cap, not the display limit: a live claim older
-# than the last 20 turns is exactly the one that hurts, and the shim scans the log
-# for a filtered query. LIMIT= is how many rows to show.
+# The scan is the endpoint's cap, not the display limit: a turn from last month
+# is exactly the one that is missed. LIMIT= is how many rows to show.
 scan=200
 
 unreadable() {
@@ -47,10 +50,12 @@ case $live_only in
 *) unreadable "LIVE must be 1 or empty: $live_only" ;;
 esac
 case $format in
-table | json | toon) ;;
-*) unreadable "FORMAT must be toon, table or json: $format" ;;
+text | json | toon) ;;
+*) unreadable "FORMAT must be toon, text or json: $format" ;;
 esac
 
+# A filtered read is how an old turn is found at all; the shim scans 2000 frames
+# for a query carrying a filter, so pass one even when Q= is the only restriction.
 query=$(jq -rn \
   --arg limit "$scan" --arg repo "$repo" --arg subject "$subject" --arg source "$source_name" '
   "limit=\($limit)"
@@ -75,21 +80,52 @@ case $resp in
 esac
 
 cutoff=$(date -u -d "-${stale_days} days" +%Y-%m-%dT%H:%M:%SZ)
-rendered=$(jq -r -f "$TEMPLATE" \
-  --arg subject "$subject" --arg claim "$claim" \
+model=$(jq -c -f "$TEMPLATE" \
+  --arg repo "$repo" --arg subject "$subject" --arg source "$source_name" \
+  --arg q "$q" --arg id "$id" --arg claim "$claim" \
   --argjson display "$limit" --arg cutoff "$cutoff" \
   --arg staleDays "$stale_days" --arg liveonly "$live_only" <<<"$resp") ||
-  unreadable 'could not render the response; is xs-turn-list.jq intact?'
-
-status=$(printf '%s\n' "$rendered" | sed -n 's/^status\t//p')
+  unreadable 'could not render the response; is xs-turn-query.jq intact?'
 
 case $format in
-json) jq -c '{count, scanned, truncated, events}' <<<"$resp" ;;
-toon) jq -c '{count, scanned, truncated, events}' <<<"$resp" | toon -e ;;
-*) printf '%s\n' "$rendered" | sed '/^status\t/d' ;;
+json) printf '%s\n' "$model" ;;
+toon) printf '%s\n' "$model" | toon -e ;;
+text)
+  # A person reads the header, one two-line block per turn, then the claims and
+  # the verdict — the same model, laid out instead of encoded.
+  printf '%s\n' "$model" | jq -r '
+    "\(.turns | length) shown · \(.matched) matched · \(.stored) stored"
+      + (if .q.text != "" then "  q=\"\(.q.text)\"" else "" end)
+      + (if .q.subject != "" then "  subject=\(.q.subject)" else "" end)
+      + (if .q.claim != "" then "  claim=\(.q.claim)" else "" end)
+      + "  scanned \(.scanned)"
+      + (if .truncated then "  SCAN CAPPED — older turns were not examined" else "" end),
+    "",
+    (if (.turns | length) == 0
+     then "  (nothing matches — widen REPO, drop SUBJECT, or use fewer words in Q)"
+     else (.turns[] |
+       "\(.ts)  \(.src)  \(.out)  \(.subj)",
+       ("  " + .act),
+       (if .snip != "" and (.hit | test("rationale|claims|files|outcome"))
+        then ("  [" + .hit + "] " + .snip) else empty end),
+       (if .claims != "" then ("  claims: " + .claims) else empty end),
+       (if .files > 0 then ("  files: \(.files)") else empty end))
+     end),
+    "",
+    "== live claims (newest entry per subject unresolved, inside \(.stale_days) days)",
+    (if (.live | length) == 0 then "  none"
+     else (.live[] | "  \(.ts)  \(.subj)  \(.src)  \(.kind)  \(.text)") end),
+    (if (.stale | length) == 0 then empty else
+      "== stale (unresolved with no newer entry; abandoned until someone posts an update)",
+      (.stale[] | "  \(.ts)  \(.subj)  \(.src)  \(.kind)  \(.text)") end),
+    "",
+    "== verdict",
+    "\(.verdict.state)  \(.verdict.text)"
+  '
+  ;;
 esac
 
-case $status in
+case $(printf '%s\n' "$model" | jq -r '.verdict.state') in
 live) exit 1 ;;
 *) exit 0 ;;
 esac

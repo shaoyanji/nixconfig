@@ -156,7 +156,6 @@
     "AGENTS.md"
     "README.md"
     "MANUAL.md"
-    "AUDIT.md"
     ".agents/SCHEMA.md"
     ".agents/README.md"
     "docs/agent-contract.md"
@@ -187,7 +186,6 @@
   knownRootMd = [
     "AGENTS.md"
     "ARCHITECTURE.md"
-    "AUDIT.md"
     "EXPERIMENTS.md"
     "HANDOFF.md"
     "MANUAL.md"

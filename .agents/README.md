@@ -11,7 +11,7 @@ It is not a second manual and it is not executable truth.
 | How to operate the fleet | `AGENTS.md`, `MANUAL.md` |
 | Why a design exists / what is next | `AGENTS.nix` notes — `task ops:notes` (`:host`, `:module`, `:search`) |
 | How to author or promote a note | `skills/agents-notes/SKILL.md` (templates + promotion ladder) |
-| What happened | `AUDIT.md`, `docs/history/` |
+| What happened | the agent turn log (xs): `task agents:xs:list Q="…"`, `docs/history/` |
 | A novel task, or "has this been tried?" | `task ops:notes:near Q="<the intent in your words>"` — ranked notes, each with its lineage and refs; `task ops:notes:lineage ID=<id>` for one note's ancestry |
 | An experiment | `task ops:notes KIND=experiment` (`exp-NNN` notes) |
 | A visual system for a new surface (page, deck, TUI skin) | `design/ryoku/DESIGN.md` — tokens, type scale, components, agent prompts |

@@ -1,9 +1,5 @@
-# 信海圖 — the mail archive as a field: fuzzy finding, a taxonomy, and a relation
-# graph that draws itself as you type. It is a guest of the mail hub, not a second
-# archive: `services.emailArchive.plugins` declares its tables and routes, so the
-# hub applies the schema and publishes the endpoints on every activation, and
-# removing this module removes them. Design, endpoints and measurements:
-# docs/mail-atlas.md
+# 信海圖 — the archive as a field: a reading surface, not a second mail store.
+# Plugins are declared through `services.emailArchive.plugins`. docs/mail-atlas.md
 {
   config,
   lib,

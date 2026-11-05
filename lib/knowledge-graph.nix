@@ -16,7 +16,6 @@
   rootDocs = map (f: root + "/${f}") [
     "AGENTS.md"
     "MANUAL.md"
-    "AUDIT.md"
     "README.md"
   ];
 

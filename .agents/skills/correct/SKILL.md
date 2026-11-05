@@ -17,7 +17,7 @@ Adapted from pstack (`correct`, MIT, cursor/plugins). Every contributor here is 
 
 ## 1. Find the mistake classes
 
-Read the evidence, not the vibes: `git log --oneline -50`, `git log --grep=revert`, `AUDIT.md`, `task ops:notes KIND=open`, and every comment that explains a workaround.
+Read the evidence, not the vibes: `git log --oneline -50`, `git log --grep=revert`, `task agents:xs:list Q="<the symptom>"`, `task ops:notes KIND=open`, and every comment that explains a workaround.
 
 Group them into classes. A class counts once it has happened twice.
 

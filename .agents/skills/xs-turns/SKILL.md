@@ -46,13 +46,13 @@ changes what gets built, i.e. the next step cannot start at all.
 
 `LIMIT=` is display only, never the search window: a filtered query scans the log
 (the shim caps the scan at 2000 frames and says `truncated` when it hits it), so a
-subject from last month is still found. `LIVE=1` prints only the claim table — the
-"who is working now" question. `STALE_DAYS=` (default 7) is when an unresolved
-subject with no newer entry stops counting as live: `in_progress`, `blocked` or
-`failed`, all three are printed as **stale** and none of them fails the run,
-because a crashed agent's claim would otherwise red the gate forever and teach
-everyone to ignore it. If the stale claim is yours, post an update on that subject
-instead of editing in parallel.
+subject from last month is still found. `Q="tika heap"` is the grep: every word
+must appear, subject hits rank first. `LIVE=1` is the open queue, one row per
+unresolved subject, and it takes `Q=`. `STALE_DAYS=` (default 7) is when an
+unresolved subject with no newer entry stops counting as live: `in_progress`, `blocked` or
+`failed`, all three print as **stale** and none fails the run, because a crashed
+agent's claim would otherwise red the gate forever and teach everyone to ignore
+it; if the stale claim is yours, post an update instead of editing in parallel.
 `base_commit` should be the commit you actually started from after the pull, not
 one you remembered.
 

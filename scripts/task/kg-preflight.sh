@@ -71,7 +71,7 @@ anchor_for() {
       # non-recursive, matching lib/knowledge-graph.nix
       case "${f#docs/}" in */*) : ;; *) printf 'doc:%s' "$f" ;; esac
       ;;
-    AGENTS.md | MANUAL.md | AUDIT.md | README.md)
+    AGENTS.md | MANUAL.md | README.md)
       printf 'doc:%s' "$f"
       ;;
     # The retired root narratives are one-line stubs and not graph nodes; the

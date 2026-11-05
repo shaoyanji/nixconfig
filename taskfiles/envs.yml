@@ -32,38 +32,61 @@ tasks:
         ssh {{.ENVS_TARGET}} "df -h /home/{{.ENVS_USER}}"
 
   envs:build:
-    desc: Rebuild public_html JSON & routes from markdown sources
+    desc: Build all four transports from the site repo (markdown → HTML, gemtext, gopher, plan)
+    summary: >
+      The site is its own private repository, not a directory of this one:
+      `~/Documents/envsdotnet`, overridable with ENVS_SITE_REPO. The PHP
+      pipeline that used to run on the host is retired. This runs the builder
+      locally, where the assertions and the 14 KiB page budget can fail before
+      anything is uploaded. No ssh. Exit 2 = no site repo at that path.
     cmds:
       - |
-        ssh {{.ENVS_TARGET}} "
-          cd {{.ENVS_WEB}}
-          echo '=== Generating JSON ==='
-          php generate_json.php
-          echo '=== Validating Tags ==='
-          php validate_tags.php
-          echo '=== Exporting SRS ==='
-          php srs-export.php public/srs-cards.json
-          echo '=== Generating SPA routes ==='
-          php generate_routes.php
-          echo '=== Build Complete ==='
-        "
+        repo="${ENVS_SITE_REPO:-$HOME/Documents/envsdotnet}"
+        if [ ! -x "$repo/build.sh" ]; then
+          echo "envs:build: no site repo at $repo (set ENVS_SITE_REPO)" >&2
+          exit 2
+        fi
+        cd "$repo"
+        ./build.sh --strict
 
-  envs:validate:
-    desc: Validate HTML tag balance and equation schemas
+  envs:publish:
+    desc: Build strict, then publish all four targets (web, Gemini, Gopher, finger)
+    summary: >
+      The release command. `build.sh --strict` writes public/ and public-text/,
+      then `publish.sh` moves the web root aside to `public_html.bak-<stamp>`,
+      syncs the new one, and rsyncs the capsule, the gopher hole and ~/.plan.
+      Building and publishing stay separate so a build can be inspected first.
+      Exit 2 = no site repo at ENVS_SITE_REPO.
     cmds:
       - |
-        ssh {{.ENVS_TARGET}} "
-          cd {{.ENVS_WEB}}
-          php validate-equations.php
-          echo ''
-          php validate_tags.php
-        "
+        repo="${ENVS_SITE_REPO:-$HOME/Documents/envsdotnet}"
+        if [ ! -x "$repo/publish.sh" ]; then
+          echo "envs:publish: no site repo at $repo (set ENVS_SITE_REPO)" >&2
+          exit 2
+        fi
+        cd "$repo"
+        ./publish.sh
 
-  envs:test:
-    desc: Run test suite on public_html
+  envs:report:
+    desc: Assertions and the heaviest pages from the last build (read-only)
+    summary: >
+      Reads `public/build-report.json`, which `envs:build` writes: every
+      assertion with its verdict, then the ten heaviest pages against the
+      budget. It answers "did the gates pass, and what is close to the edge"
+      without rebuilding or touching the host.
     cmds:
       - |
-        ssh {{.ENVS_TARGET}} "cd {{.ENVS_WEB}} && php test.php"
+        repo="${ENVS_SITE_REPO:-$HOME/Documents/envsdotnet}"
+        report="$repo/public/build-report.json"
+        if [ ! -f "$report" ]; then
+          echo "envs:report: no build yet at $report — run task envs:build" >&2
+          exit 1
+        fi
+        jq -r '.assertions[] |
+          (if .ok then "ok   " else "FAIL " end) + .name +
+          (if .ok then "" else ": " + .detail end)' "$report"
+        echo
+        jq -r '.pages[:10][] | "\(.bytes/1024|floor) KiB  \(.route)"' "$report"
 
   envs:push:
     desc: Upload file to Envs.net (defaults to ~/public_html/)
@@ -181,8 +204,9 @@ tasks:
           "status: Check https://{{.ENVS_DOMAIN}} health" \
           "audit: Security, quota & permissions audit" \
           "harden: Enforce 700/600 permissions" \
-          "build: Rebuild public_html (generate JSON & SPA routes)" \
-          "validate: Validate equations and HTML tags" \
+          "build: Build the four transports (strict)" \
+          "publish: Build and publish to all four targets" \
+          "report: Assertions and page weights from the last build" \
           "backup: Download content & gemini backup tarball" \
           "clean: Remove stale .un~ undo files" \
           "info: System info, runtimes & git status" \
@@ -213,8 +237,11 @@ tasks:
           "build"*)
             task envs:build
             ;;
-          "validate"*)
-            task envs:validate
+          "publish"*)
+            task envs:publish
+            ;;
+          "report"*)
+            task envs:report
             ;;
           "info"*)
             task envs:info

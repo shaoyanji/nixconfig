@@ -37,11 +37,12 @@
       "previewPort": 8080
     },
     "envs": {
-      "kind": "nginx-spa",
-      "description": "Envs.net Debian pubnix website (jisifu.envs.net)",
+      "kind": "static",
+      "description": "Envs.net pubnix site: one markdown corpus over HTTPS, Gemini, Gopher and finger (jisifu.envs.net)",
       "buildCommand": "task envs:build",
+      "deployCommand": "task envs:publish",
       "deployMethod": "rsync",
-      "deployTarget": "envs:~/public_html/"
+      "deployTarget": "envs:~/public_html/ ~/public_gemini/ ~/public_gopher/ ~/.plan"
     }
   }
 }

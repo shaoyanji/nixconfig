@@ -566,6 +566,20 @@ in {
         url = "http://127.0.0.1:28981";
         group = "delphi";
       }
+      # The console's own ledger is the assertion, probed on loopback because
+      # delphi runs `--accept-dns=false` and the tailnet mount fronts this same
+      # listener. `remote_count > 0` is the half that proves the blog is
+      # reachable: a dead token renders a ledger too, just with nothing in it.
+      # docs/mataroa-console.md#monitoring
+      {
+        name = "mataroa console";
+        url = "http://127.0.0.1:8095/api/state";
+        group = "delphi";
+        conditions = [
+          "[BODY].ok == true"
+          "[BODY].remote_count > 0"
+        ];
+      }
       # Two of frieren's checks do not survive the move, and no probe can carry
       # them: the Steam cache binds loopback only (`/__health` on 127.0.0.1:8081,
       # no exposure entry, no vhost), and the resolver check names 10.99.0.53 —

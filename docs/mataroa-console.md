@@ -15,6 +15,8 @@ what the blog holds.
 - host: `hosts/delphi/mataroa-console.nix` · unit `mataroa-console.service`
 - loopback **:8095**, tailnet mount **:8454** (`tailscale-serve-mataroa`), card on
   the tailnet service portal
+- watched by this host's gatus, endpoint `mataroa console` in
+  `hosts/delphi/configuration.nix` where the check is declared
 - state: `/var/lib/mataroa-console/posts/`, a git repository the service commits to
 
 ## The model
@@ -67,9 +69,12 @@ at.
 
 ## The token
 
-The bearer token lives in `modules/secrets.yaml` under `mataroa/api/key` — the
+The bearer token lives in `modules/secrets.yaml` under `mataroa_api_key` — the
 tracked fleet file, not `modules/secrets/apikeys.yaml`, whose directory is a
-submodule outside the flake and therefore absent from a `github:` build. It
+submodule outside the flake and therefore absent from a `github:` build. One flat
+segment, not `mataroa/api/key`: sops-nix resolves `key` as a path, so a slash
+names a top-level `mataroa` that does not exist and the system build fails with
+`the key 'mataroa' cannot be found`. It
 reaches the process through `LoadCredential`, is read from
 `$CREDENTIALS_DIRECTORY/mataroa-token`, and is never rendered, logged, or written
 into a post file. Rotation is an edit of that key plus a restart.
@@ -77,6 +82,23 @@ into a post file. Rotation is an edit of that key plus a restart.
 The console reports a rejected token on the ledger page rather than inventing an
 empty blog: `Not authorized.` in the header is mataroa answering 403, and the fix
 is a fresh key from the blog's settings.
+
+## Monitoring
+
+delphi's gatus probes `http://127.0.0.1:8095/api/state` every 60 s in the
+`delphi` group, and three consecutive failures page the SimpleX bridge. Two
+conditions, because the ledger fails politely:
+
+- `[BODY].ok == true` — the process assembled a state at all.
+- `[BODY].remote_count > 0` — the API answered with posts. A dead or rotated
+token still returns `200` with `ok: true` and every row `local-only`, so a green
+monitor over an empty ledger is not the console working.
+
+Loopback, not the tailnet mount, for the same reason every other check on that
+host is loopback: delphi runs `--accept-dns=false`, so the MagicDNS name does not
+resolve there, and the mount fronts the very listener being probed. What this
+does not prove is the `tailscale serve` front itself: a broken mount over a
+healthy unit shows as a dead card on the portal, not as a page.
 
 ## Operator recipes
 

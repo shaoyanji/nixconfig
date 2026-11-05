@@ -75,8 +75,8 @@ check "edge endpoints resolve to nodes" \
   '(.nodes | map({(.id): true}) | add) as $n
    | all(.edges[]; (.from as $f | .to as $t | $n[$f] != null and $n[$t] != null))'
 
-check "edge types are mentions|tagged|references|about" \
-  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about")'
+check "edge types are mentions|tagged|references|about|imports" \
+  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports")'
 
 # The doc-to-doc layer is the one relation that needs a parser rather than a token
 # scan, so it is the one that can silently return zero: a wrong regex, a changed
@@ -111,6 +111,20 @@ check "tagged: skill -> tag" \
 # A draft names the entities it is about, and only those: the edge shape is the
 # whole point of the layer, so a stray `about -> tag:` or an idea pointing at an
 # idea fails here rather than answering a query nobody meant to ask.
+check "imports: module -> module" \
+  '(.nodes | map({(.id): .type}) | add) as $t
+   | all(.edges[];
+         if .type != "imports" then true
+         else (.from as $f | .to as $to | $t[$f] == "module" and $t[$to] == "module")
+         end)'
+
+# The import layer is the one that can return zero without anything else looking
+# wrong: a changed path style (quoted interpolation, an `imports = map (…)`) leaves
+# every other check green. Measured at 448 edges on this tree; the floor is what
+# makes a silent parser collapse fail.
+check "imports layer is populated (>=100 edges)" \
+  '([.edges[] | select(.type == "imports")] | length) >= 100'
+
 check "about: idea -> (doc|host|skill)" \
   '(.nodes | map({(.id): .type}) | add) as $t
    | all(.edges[];
@@ -145,7 +159,9 @@ check "stats agree with a recount of nodes and edges" \
   '(.nodes | map(select(.type == "host")) | length) as $h
    | (.nodes | map(select(.type == "skill")) | length) as $s
    | (.nodes | map(select(.type == "doc")) | length) as $d
+   | (.nodes | map(select(.type == "module")) | length) as $m
    | .stats.hosts == $h and .stats.skills == $s and .stats.docs == $d
+     and .stats.modules == $m
      and .stats.edges == (.edges | length)'
 
 echo "== patterns =="
@@ -194,6 +210,8 @@ seed_skill="$(jq -r '[.edges[] | select(.type == "mentions" and (.to | startswit
   | group_by(.) | sort_by(-length) | last | .[0] // "" | sub("^skill:"; "")' "$G")"
 seed_tag="$(jq -r '[.edges[] | select(.type == "tagged") | .to]
   | group_by(.) | sort_by(-length) | last | .[0] // "" | sub("^tag:"; "")' "$G")"
+seed_module="$(jq -r '[.edges[] | select(.type == "imports") | .to]
+  | group_by(.) | sort_by(-length) | last | .[0] // "" | sub("^module:"; "")' "$G")"
 
 rows "host frieren (inventory anchor)" host frieren
 HOST_JSON="$LAST"
@@ -221,6 +239,13 @@ if [ -n "$seed_tag" ]; then
 else
   bad "tag: no tagged edge in the graph (cannot derive an anchor)"
   TAG_JSON=""
+fi
+
+if [ -n "$seed_module" ]; then
+  rows "module $seed_module (derived anchor)" module "$seed_module"
+  expect_types "module" "$LAST" 'module'
+else
+  bad "module: no imports edge in the graph (cannot derive an anchor)"
 fi
 
 if [ -n "$seed_host" ]; then
@@ -289,7 +314,7 @@ echo "== surface =="
 # Taskfile and the surface check fails for a reason that has nothing to do with
 # the graph (caught by running the drift tests from /tmp).
 if task --dir "$REPO" --list-all --json >"$work/tasks.json" 2>/dev/null; then
-  for t in host skill doc tag comention stats; do
+  for t in host skill doc tag module comention stats; do
     if jq -e --arg n "ops:kg:$t" '.tasks | map(.name) | index($n)' "$work/tasks.json" >/dev/null 2>&1; then
       ok "task ops:kg:$t exists"
     else
@@ -327,7 +352,7 @@ fi
 
 echo
 if [ "$fail" = 0 ]; then
-  echo "kg-check: ok — schema, six patterns, and the task surface all agree"
+  echo "kg-check: ok — schema, patterns, and the task surface all agree"
 else
   echo "kg-check: DRIFT — see the FAIL lines above"
 fi

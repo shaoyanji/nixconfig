@@ -95,7 +95,7 @@ defmodule KGEngine.Store do
 
   def exists?(id), do: :ets.member(@nodes_table, id)
 
-  @patterns ~w(host skill doc tag comention stats)
+  @patterns ~w(host skill doc tag module comention stats)
   def valid_pattern?(p), do: p in @patterns
 
   def get_node(id) do
@@ -125,7 +125,7 @@ defmodule KGEngine.Store do
     end
   end
 
-  # --- the six traversals of `scripts/task/kg-query.sh` -----------------------
+  # --- the traversals of `scripts/task/kg-query.sh` ---------------------------
   # Same questions as the jq programs there, answered from ETS. This is a second
   # implementation of those semantics by construction (jq over a file vs Elixir
   # over tables), so `checks:kg:sidecar` compares every pattern's answer against
@@ -137,6 +137,16 @@ defmodule KGEngine.Store do
 
   def pattern("skill", id, _min, _top),
     do: (inbound_ids(id) ++ outbound_ids(id)) |> Enum.uniq() |> Enum.sort()
+
+  # The one pattern whose inbound edges have a single kind, so it filters by type
+  # instead of returning every arrival: a module is imported, never mentioned.
+  def pattern("module", id, _min, _top) do
+    :ets.lookup(@edges_in, id)
+    |> Enum.filter(fn {_to, _from, type} -> type == "imports" end)
+    |> Enum.map(fn {_to, from, _type} -> from end)
+    |> Enum.uniq()
+    |> Enum.sort()
+  end
 
   def pattern("comention", id, min, _top) do
     docs = id |> inbound_ids() |> Enum.uniq() |> MapSet.new()
@@ -169,6 +179,7 @@ defmodule KGEngine.Store do
       "skills" => Map.get(types, "skill", 0),
       "docs" => Map.get(types, "doc", 0),
       "tags" => Map.get(types, "tag", 0),
+      "modules" => Map.get(types, "module", 0),
       "edges" => s.edges
     }
 
@@ -462,7 +473,7 @@ defmodule KGEngine.Server do
               "/neighbors?id=<node_id>&depth=<1-4>",
               "/blast-radius?id=<node_id>",
               "/query?q=<term>",
-              "/pattern?p=<host|skill|doc|tag|comention|stats>&name=<id>&min=<n>&top=<n>"
+              "/pattern?p=<host|skill|doc|tag|module|comention|stats>&name=<id>&min=<n>&top=<n>"
             ]
           }
       end
@@ -630,6 +641,7 @@ defmodule KGEngine.Native do
     skills = phase.("skills", fn -> skills(repo) end)
     docs = phase.("docs", fn -> docs(repo, hosts, skills) end)
     ideas = phase.("ideas", fn -> ideas(repo, docs, hosts, skills) end)
+    modules = phase.("modules", fn -> modules(repo) end)
     tags = phase.("graph", fn -> skills |> Enum.flat_map(& &1.tags) |> Enum.uniq() end)
 
     host_nodes =
@@ -690,19 +702,78 @@ defmodule KGEngine.Native do
         Enum.map(i.about, &%{"from" => i.id, "to" => &1, "type" => "about"})
       end)
 
-    edges = mention_edges ++ tag_edges ++ reference_edges ++ about_edges
+    module_nodes =
+      Enum.map(modules, fn m -> %{"id" => m.id, "type" => "module", "label" => m.id} end)
+
+    import_edges =
+      Enum.flat_map(modules, fn m ->
+        Enum.map(m.imports, &%{"from" => m.id, "to" => "module:" <> &1, "type" => "imports"})
+      end)
+
+    edges = mention_edges ++ tag_edges ++ reference_edges ++ about_edges ++ import_edges
 
     %{
-      "nodes" => host_nodes ++ skill_nodes ++ doc_nodes ++ tag_nodes ++ idea_nodes,
+      "nodes" => host_nodes ++ skill_nodes ++ doc_nodes ++ tag_nodes ++ idea_nodes ++ module_nodes,
       "edges" => edges,
       "stats" => %{
         "hosts" => length(hosts),
         "skills" => length(skills),
         "docs" => length(docs),
         "ideas" => length(ideas),
+        "modules" => length(modules),
         "edges" => length(edges)
       }
     }
+  end
+
+  @nix_roots ~w(modules hosts flake lib)
+
+  # The Elixir twin of the module walk in lib/knowledge-graph.nix: same roots,
+  # same relative-path token split, same "only a path that is itself a node"
+  # filter. `checks:kg:native` compares counts and `checks:kg:sidecar` compares
+  # answers, so a divergence fails a gate instead of answering from a graph that
+  # quietly disagrees with the compiled one.
+  defp modules(repo) do
+    files =
+      Enum.flat_map(@nix_roots, fn dir ->
+        path = Path.join(repo, dir)
+        if File.dir?(path), do: Path.wildcard(Path.join(path, "**/*.nix")), else: []
+      end)
+
+    known = MapSet.new(files, &Path.relative_to(&1, repo))
+
+    # 289 opens dominate this phase after the module walk exists (~200 ms serial
+    # on a warm local checkout); the reads are independent, so they run in
+    # parallel without changing a byte of the result. `ordered: true` keeps the
+    # node order identical to the Nix projection's, which the count comparison
+    # and the stable graph digest both depend on.
+    files
+    |> Task.async_stream(&module_node(&1, repo, known),
+      max_concurrency: 8,
+      ordered: true,
+      timeout: 5_000
+    )
+    |> Enum.map(fn {:ok, node} -> node end)
+  end
+
+  defp module_node(file, repo, known) do
+    id = Path.relative_to(file, repo)
+    dir = Path.dirname(id)
+
+    imports =
+      file
+      |> File.read!()
+      |> String.split(~r{[^A-Za-z0-9_./-]+}, trim: true)
+      |> Enum.filter(fn t ->
+        String.ends_with?(t, ".nix") and
+          (String.starts_with?(t, "./") or String.starts_with?(t, "../"))
+      end)
+      |> Enum.map(&normalise_path(Path.join(dir, &1)))
+      |> Enum.filter(&MapSet.member?(known, &1))
+      |> Enum.uniq()
+      |> Enum.reject(&(&1 == id))
+
+    %{id: "module:" <> id, imports: imports}
   end
 
   # Only `[hosts.<name>]` starts a host; a sub-table (`[hosts.x.hardware]`) ends

@@ -17,23 +17,27 @@
 # Also asserts parity: node/edge counts must equal the compiled projection, so
 # a faster builder cannot buy speed by answering from a smaller graph.
 #
-# Env: KG_ELIXIR (interpreter), RUNS (default 7), BUDGET_MS (default 30).
+# Env: KG_ELIXIR (interpreter), RUNS (default 7), BUDGET_MS (default 400).
 # Exit 0 = within budget and parity-clean; 1 = regression or divergence.
 #
-# The ceiling is 30 ms, not the 20 ms it started at, and the reason is measured
-# rather than tactical. 20 ms was a frieren figure; the same UNMODIFIED builder
-# reads 18.4–28.9 ms on delphi (9 runs, median 21.0), so a 20 ms ceiling failed
-# on a host whose code had not changed at all — a gate that reports the machine
-# instead of the code. 30 ms clears that spread with the median near 21 ms while
-# still failing the regression this gate exists for: the historical folklore
-# number was ~100 ms, and a builder that shells out or rescans the tree lands
-# there, not at 25.
+# The ceiling moved 20 -> 30 ms because 20 was a frieren number: the same builder
+# read 21.0 ms median on delphi, so the gate reported the machine. It moved
+# 30 -> 400 ms on 2026-11-05 for a real reason rather than a slower machine: the
+# graph gained the module-import layer, and the native twin now OPENS AND SCANS
+# every tracked `.nix` file (289 here) instead of only the 57 documents. That is
+# 210-235 ms median on a warm local checkout, measured with the walk in place and
+# with 8-way parallel reads (which bought ~10 ms — the opens, not the CPU).
+#
+# 400 ms is still a regression gate, not a rubber stamp: the failure it exists for
+# is a builder that shells out to `nix eval` (1-3 s) or rescans on every query,
+# and both land far above it. Per-phase timing is one env var away —
+# `KG_NATIVE_DEBUG=1` prints `[kg-native] modules: … ms`.
 set -euo pipefail
 
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 ENGINE="$REPO/tools/kg-engine/kg_engine.exs"
 RUNS="${RUNS:-7}"
-BUDGET_MS="${BUDGET_MS:-30}"
+BUDGET_MS="${BUDGET_MS:-400}"
 
 fail=0
 ok() { printf 'ok    %s\n' "$1"; }

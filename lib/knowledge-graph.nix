@@ -256,6 +256,60 @@
 
   ideas = map mkIdea ideaFiles;
 
+  # --- Nix module graph ------------------------------------------------------
+  # The one structural question the doc graph could not answer: "who imports
+  # `modules/services/x.nix`" was a grep across relative paths, and a grep is the
+  # token cost a graph exists to remove. Every tracked `.nix` file under these
+  # roots is a node; every relative `.nix` path it names is an `imports` edge.
+  # `ops:kg:module` reads the importers, `ops:kg:blast` the transitive closure.
+  #
+  # Extraction is a token split, not a parser: a path only becomes an edge when
+  # it resolves to a file that is itself a node, so a stale reference cannot
+  # invent one. `imports = [./x.nix]`, `import ./x.nix` and a bare string path all
+  # look the same to it, which is why it covers the whole tree in one walk.
+  nixRoots = ["modules" "hosts" "flake" "lib"];
+  nixRootFiles =
+    lib.concatMap (
+      d: let
+        p = root + "/${d}";
+      in
+        if builtins.pathExists p
+        then lib.filesystem.listFilesRecursive p
+        else []
+    )
+    nixRoots;
+  nixFiles = builtins.filter (p: lib.hasSuffix ".nix" (toString p)) nixRootFiles;
+  nixPaths = map rel nixFiles;
+  pathTokens = text:
+    builtins.filter (
+      t:
+        builtins.isString t
+        && (lib.hasPrefix "./" t || lib.hasPrefix "../" t)
+        && lib.hasSuffix ".nix" t
+    )
+    (builtins.split "[^A-Za-z0-9_./-]+" text);
+  importsIn = id: let
+    dir = dirOf id;
+    targets = map (
+      t:
+        normalisePath (
+          if dir == ""
+          then t
+          else "${dir}/${t}"
+        )
+    ) (pathTokens (builtins.readFile (root + "/${id}")));
+  in
+    lib.unique (builtins.filter (t: t != id) targets);
+  modules =
+    map (p: {
+      id = "module:${rel p}";
+      type = "module";
+      label = rel p;
+      path = rel p;
+      imports = importsIn (rel p);
+    })
+    nixFiles;
+
   # Every node id that exists, so an `about` entry naming a typo is an edge that
   # does not resolve — which kg-check fails on — rather than an invented node.
   knowableIds =
@@ -294,7 +348,11 @@
     ++ map (i: {
       inherit (i) id type label path;
     })
-    ideas;
+    ideas
+    ++ map (m: {
+      inherit (m) id type label path;
+    })
+    modules;
 
   edges =
     lib.concatMap (d:
@@ -335,7 +393,17 @@
         type = "about";
       })
       (lib.unique (builtins.filter (a: builtins.elem a knowableIds) i.about)))
-    ideas;
+    ideas
+    # Only a path that IS a module node becomes an edge, so the importer list is
+    # always answerable; the filter is what makes the extraction safe to be rough.
+    ++ lib.concatMap (m:
+      map (r: {
+        from = m.id;
+        to = "module:${r}";
+        type = "imports";
+      })
+      (builtins.filter (r: builtins.elem r nixPaths) m.imports))
+    modules;
 
   tagNodes = lib.unique (lib.concatMap (n: skills.skills.${n}.tags) (builtins.attrNames skills.skills));
 
@@ -356,6 +424,7 @@
       skills = builtins.length (builtins.attrNames skills.skills);
       docs = builtins.length docs;
       ideas = builtins.length ideas;
+      modules = builtins.length modules;
       edges = builtins.length edges;
     };
   };
@@ -372,6 +441,8 @@
         then "Doc"
         else if n.type == "idea"
         then "Idea"
+        else if n.type == "module"
+        then "Module"
         else "Tag";
     in ''
       MERGE (${"n_${builtins.hashString "md5" n.id}"}:${label} {id: ${q n.id}})
@@ -387,6 +458,8 @@
         then "TAGGED"
         else if e.type == "about"
         then "ABOUT"
+        else if e.type == "imports"
+        then "IMPORTS"
         else "MENTIONS";
     in ''
       MATCH (${a}), (${b}) MERGE (${a})-[:${rel}]->(${b});

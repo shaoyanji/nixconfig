@@ -370,6 +370,26 @@ tasks:
           bash scripts/task/kg-query.sh doc "{{.DOC}}"
         fi
 
+  ops:kg:module:
+    desc: 'Which Nix files import a module'
+    summary: >
+      Inbound `imports` edges for module:<PATH> — the files that name it, so "who
+      uses modules/services/x.nix" is one query instead of a grep across relative
+      paths. PATH is repo-relative (`modules/services/zettel-graph.nix`) and the
+      `modules/ hosts/ flake/ lib/` prefixes are recognised as paths without it.
+      Direct importers only; `ops:kg:blast TARGET=module:<PATH>` is the transitive
+      closure up to the flake files. Empty is a real answer: nothing imports it.
+      FORMAT=json emits {pattern, arg, count, results:[ids]}.
+    requires:
+      vars: [PATH]
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-query.sh module "{{.PATH}}" --json
+        else
+          bash scripts/task/kg-query.sh module "{{.PATH}}"
+        fi
+
   ops:kg:tag:
     desc: 'Skills carrying a tag'
     summary: >
@@ -516,7 +536,7 @@ tasks:
 
       ROUTING IS DETERMINISTIC AND OFFLINE: keyword rules; else, if the question
       names a node, return that node's context bundle (route=bundle, `related` =
-      neighbours); else intent=UNKNOWN listing the six patterns. Naming no node is
+      neighbours); else intent=UNKNOWN listing the patterns. Naming no node is
       the blind spot: UNKNOWN, a visible decline rather than a confident guess.
       KG_DECIDE_ALWAYS=1 adds a model as a check (`ops:ask:jev`); scores and
       caveats: `ops:bench:kg`.

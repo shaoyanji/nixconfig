@@ -18,8 +18,8 @@ here — `.agents/SCHEMA.md` §1.
    `.#agentSkills` (1.2 s), `.#agentsNotes`, `.#knowledgeGraph`, `task --list-all --json`,
    `nix build .#artifacts.docs`. Two copies of a fact disagree within a month.
 4. **Structural questions are the graph.** `task ops:kg:host HOST=`, `:skill`, `:doc`, `:tag`,
-   `:comention` and `:blast` answer "what touches X" from `.#knowledgeGraph`; `ops:kg:blast` is
-   the reverse closure. Do not grep for structure.
+   `:module`, `:comention` and `:blast` answer "what touches X" from `.#knowledgeGraph`;
+   `ops:kg:blast` is the reverse closure. Do not grep for structure.
 5. **Facts are evaluated, not guessed.** Never evaluate a full host to answer a fact question;
    never run `nix flake check` on this host.
 6. **Verification is phased:** eval to catch a config error · build to prove a closure · size to
@@ -128,7 +128,7 @@ impermanence) and `minyx` (global + determinate-nix + sops + raspberry-pi-3, no 
 `modules-registry.md`. Ask it instead of walking the tree:
 
 ```bash
-task ops:kg:doc DOC=modules/services/<name>.nix   # who is documented in this file
+task ops:kg:module PATH=modules/services/<name>.nix   # who imports it
 nix eval --json .#inventory.hosts.<h>.software    # what this host actually runs
 ```
 

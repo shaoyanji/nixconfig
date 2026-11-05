@@ -175,7 +175,7 @@ tasks:
     desc: "[gate] Knowledge-graph schema and all six query patterns still agree"
     summary: >
       The schema gate under the graph query surface (scripts/task/kg-check.sh):
-      required fields, unique ids, endpoints and edge shapes; all six patterns
+      required fields, unique ids, endpoints and edge shapes; every pattern
       return rows of the right types and agree in reverse, which catches a one-sided
       rename; and the six `ops:kg:*` tasks exist with a typo still exiting 2
       (`no_such_node`).
@@ -210,7 +210,7 @@ tasks:
       jq surface reads (scripts/task/kg-sidecar-check.sh): node/edge counts equal
       the graph, blast-radius equals the jq reverse answer, the engine answers 404
       for an unknown node and 400 for a missing argument (not an empty 200), a
-      multi-word term arrives intact, all six patterns match jq byte for byte, and
+      multi-word term arrives intact, every pattern matches jq byte for byte, and
       start/stop own the socket.
 
       Cost 2-4 s (one BEAM boot), so not in `checks:quick`: run it when
@@ -220,15 +220,14 @@ tasks:
       - bash scripts/task/kg-sidecar-check.sh
 
   checks:kg:native:
-    desc: "[gate] Cold native graph build: median under 20 ms, zero subprocess, parity"
+    desc: "[gate] Cold native graph build: median under 400 ms, zero subprocess, parity"
     summary: >
       scripts/task/kg-native-check.sh — keeps the sidecar's own graph builder
-      honest. Runs `--build-only` 7 times and takes the MEDIAN (a single sample on
-      this NAS-mounted repo is dominated by read jitter), failing above BUDGET_MS
-      (default 20). Also asserts statically that KGEngine.Native holds no subprocess
-      primitive — a fallback that shells out to nix cannot pass — and that its
-      node/edge counts equal the compiled projection, so speed cannot be bought with
-      a smaller graph.
+      honest: `--build-only` 7 times, MEDIAN of the samples, failing above
+      BUDGET_MS (400 since the module walk made it open every `.nix` file; the
+      shell-out it exists to catch costs 1-3 s). Statically asserts KGEngine.Native
+      holds no subprocess primitive, and that its node/edge counts equal the
+      compiled projection — speed cannot be bought with a smaller graph.
 
       Exit 0 = within budget, 1 = too slow or diverged.
     cmds:

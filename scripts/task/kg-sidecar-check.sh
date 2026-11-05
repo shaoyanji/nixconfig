@@ -141,7 +141,7 @@ encoded="$("$SIDE" search 'a&b=c d' | jq -r '.query')"
 [ "$encoded" = 'a&b=c d' ] && ok "reserved characters survive encoding" ||
   bad "reserved characters mangled: '$encoded'"
 
-say "six-pattern parity with the jq surface"
+say "pattern parity with the jq surface"
 # kg-query.sh prefers this socket; KG_NO_SIDECAR=1 forces its jq path. Both must
 # answer byte-identically for every pattern, or the fast path becomes a second,
 # quieter source of truth — the exact failure this gate exists to catch. Names
@@ -151,8 +151,10 @@ seed_skill="$(jq -r '[.edges[] | select(.to | startswith("skill:")) | .to]
   | group_by(.) | sort_by(-length) | last | .[0] // "" | sub("^skill:"; "")' "$G")"
 seed_doc="$(jq -r '[.nodes[] | select(.type == "doc")][0].id // "" | sub("^doc:"; "")' "$G")"
 seed_tag="$(jq -r '[.nodes[] | select(.type == "tag")][0].id // "" | sub("^tag:"; "")' "$G")"
+seed_module="$(jq -r '[.edges[] | select(.type == "imports") | .to]
+  | group_by(.) | sort_by(-length) | last | .[0] // "" | sub("^module:"; "")' "$G")"
 
-for spec in "host ${seed_host:-}" "skill ${seed_skill:-}" "doc ${seed_doc:-}" "tag ${seed_tag:-}" "comention ${seed_host:-}" "stats "; do
+for spec in "host ${seed_host:-}" "skill ${seed_skill:-}" "doc ${seed_doc:-}" "tag ${seed_tag:-}" "module ${seed_module:-}" "comention ${seed_host:-}" "stats "; do
   set -- $spec
   pattern="$1"
   name="${2:-}"

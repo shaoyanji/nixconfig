@@ -7,6 +7,7 @@
 #   host <h>        (Doc|Skill)-[:MENTIONS]->(Host)      "what touches frieren"
 #   skill <s>       (Doc|Skill)-[:MENTIONS]->(Skill)     "where is nix-eval used"
 #                   + (Skill)-[:TAGGED]->(Tag)
+#   module <p>      (Module)-[:IMPORTS]->(Module)        "who imports modules/x.nix"
 #   doc <p>         (Doc)-[:MENTIONS]->(Host|Skill)      "what does MANUAL.md name"
 #   tag <t>         (Skill)-[:TAGGED]->(Tag)             "skills tagged nix"
 #   comention <h>   (Doc)->(Host) and the same (Doc)->(Host')
@@ -29,7 +30,7 @@
 # Fast path: when a sidecar socket is live, the question is answered from its
 # in-memory graph (`/pattern`) instead of resolving the graph and running jq —
 # 28 ms vs 476 ms on a dirty tree, 17x. Both paths return the same bytes for the
-# same question; `checks:kg:sidecar` asserts that for all six patterns, so the
+# same question; `checks:kg:sidecar` asserts that for every pattern, so the
 # fast path cannot become a second, quieter answer. An unknown node is NOT
 # answered on the fast path: it falls through to the jq path so the typo exit
 # code and its suggestions keep exactly one implementation.
@@ -52,7 +53,7 @@ while [ "$#" -gt 0 ]; do
     --json) JSON=1; shift ;;
     --top) TOP="${2:-0}"; shift 2 ;;
     --min) MIN="${2:-1}"; shift 2 ;;
-    -h | --help) sed -n '2,33p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h | --help) sed -n '2,34p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     -*) echo "kg-query: unknown option $1" >&2; exit 2 ;;
     *)
       [ -z "$NAME" ] || { echo "kg-query: only one name per pattern" >&2; exit 2; }
@@ -85,11 +86,13 @@ done
 node_id() {
   local kind="$1" n="$2"
   case "$kind:$n" in
-    *:host:* | *:skill:* | *:doc:* | *:tag:*) printf '%s' "$n" ;;
+    *:host:* | *:skill:* | *:doc:* | *:tag:* | *:module:*) printf '%s' "$n" ;;
     host:*) printf 'host:%s' "$n" ;;
     skill:*) printf 'skill:%s' "$n" ;;
     doc:*) printf 'doc:%s' "$n" ;;
     tag:*) printf 'tag:%s' "$n" ;;
+    module:*) printf 'module:%s' "$n" ;;
+    modules/* | hosts/* | flake/* | lib/*) printf 'module:%s' "$n" ;;
   esac
 }
 
@@ -163,6 +166,14 @@ case "$PATTERN" in
     ID="$(node_id tag "$NAME")"
     JQ='[.edges[] | select(.to == $a) | .from] | unique | sort'
     ;;
+  module)
+    require_name module
+    ID="$(node_id module "$NAME")"
+    # Inbound `imports` only: the one edge kind a module can have pointing at it.
+    # A file is not "mentioned" by prose, so an empty answer here is a real
+    # answer — nothing imports this file.
+    JQ='[.edges[] | select(.type == "imports" and .to == $a) | .from] | unique | sort'
+    ;;
   comention)
     require_name comention
     ID="$(node_id host "$NAME")"
@@ -189,15 +200,16 @@ case "$PATTERN" in
           skills: (.nodes | map(select(.type == "skill")) | length),
           docs: (.nodes | map(select(.type == "doc")) | length),
           tags: (.nodes | map(select(.type == "tag")) | length),
+          modules: (.nodes | map(select(.type == "module")) | length),
           edges: (.edges | length)
         }]'
     ;;
   "" | -h | --help)
-    sed -n '2,33p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '2,34p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     exit 0
     ;;
   *)
-    echo "kg-query: unknown pattern '$PATTERN' (host|skill|doc|tag|comention|stats)" >&2
+    echo "kg-query: unknown pattern '$PATTERN' (host|skill|doc|tag|module|comention|stats)" >&2
     exit 2
     ;;
 esac
@@ -225,14 +237,14 @@ if [ -z "${KG_GRAPH:-}" ] && [ "${KG_NO_SIDECAR:-0}" != 1 ] && [ -S "$SOCKET" ];
       if [ "$PATTERN" = "stats" ]; then
         # The counts object is re-ordered too: the engine's encoder sorts keys,
         # and the jq path emits them in a fixed order.
-        jq -c '.results[0] as $r | {pattern: .pattern, arg: .arg, count: .count, results: [{nodes: $r.nodes, hosts: $r.hosts, skills: $r.skills, docs: $r.docs, tags: $r.tags, edges: $r.edges}]}' <<<"$fast"
+        jq -c '.results[0] as $r | {pattern: .pattern, arg: .arg, count: .count, results: [{nodes: $r.nodes, hosts: $r.hosts, skills: $r.skills, docs: $r.docs, tags: $r.tags, modules: $r.modules, edges: $r.edges}]}' <<<"$fast"
       else
         jq -c '{pattern: .pattern, arg: .arg, count: .count, results: .results}' <<<"$fast"
       fi
       exit 0
     fi
     if [ "$PATTERN" = "stats" ]; then
-      jq -r '.results[0] | "nodes: \(.hosts) hosts, \(.skills) skills, \(.docs) docs, \(.tags) tags; edges: \(.edges)"' <<<"$fast"
+      jq -r '.results[0] | "nodes: \(.hosts) hosts, \(.skills) skills, \(.docs) docs, \(.tags) tags, \(.modules) modules; edges: \(.edges)"' <<<"$fast"
       if jq -e '(.top // []) | length > 0' >/dev/null 2>&1 <<<"$fast"; then
         jq -r '.top[] | "\(.n)\t\(.id)"' <<<"$fast" | column -t -s$'\t'
       fi
@@ -259,7 +271,7 @@ if [ "$JSON" = 1 ]; then
 fi
 
 if [ "$PATTERN" = "stats" ]; then
-  jq -r '.[0] | "nodes: \(.hosts) hosts, \(.skills) skills, \(.docs) docs, \(.tags) tags; edges: \(.edges)"' \
+  jq -r '.[0] | "nodes: \(.hosts) hosts, \(.skills) skills, \(.docs) docs, \(.tags) tags, \(.modules) modules; edges: \(.edges)"' \
     <<<"$RESULT"
   if [ "$TOP" -gt 0 ] 2>/dev/null; then
     # Out-degree is the cheap "how central is this" measure; in-degree is what

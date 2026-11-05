@@ -64,7 +64,7 @@ trap 'rm -f "$creds" "$tmp"' EXIT
 
 # Export to a temporary name and move it into place, so a failed export leaves
 # the previous graph.json serving instead of a half-written one.
-(cd "@vaultDir@" && "@python@" scripts/export_graph.py --out "$tmp")
+(cd "@vaultDir@" && "@python@/bin/python3" scripts/export_graph.py --out "$tmp")
 mv -f "$tmp" "@wwwDir@/graph.json"
 
 install -m 0644 "@frontendDir@/index.html" "@wwwDir@/index.html"

@@ -106,6 +106,21 @@
           # A route that cannot answer is declared with `needs`, not assumed to
           # work — this one no longer needs anything.
         };
+        # The same search on envs.net's public instance, for the case the route
+        # above cannot cover at all: delphi down, or a client with no tailnet,
+        # where today there is no search here. HTML ONLY (measured 2026-11-05:
+        # `format=json` is 403 on that instance, the page is 200 with ~23
+        # results in 0.15 s, `a.url_header` and `h3` carry URL and title), so the
+        # caller pays for a parse and the cost says so.
+        "searx-envs" = {
+          how = "curl -s 'https://searx.envs.net/search?q=<urlencoded>' and read the result links (a.url_header, h3) — this instance serves no format=json";
+          cost = 220;
+          offline = false;
+          metered = "upstream";
+          # Sequential only: a community instance, and a fallback asking it in
+          # parallel is a fallback that gets the fleet throttled.
+          fanout = false;
+        };
         "web-search" = {
           how = "web_search, then read the page";
           cost = 800;

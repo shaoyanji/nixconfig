@@ -42,6 +42,17 @@ mount card and the write guard cannot disagree.
 directories are `zettels/`, `010 - MOCs/` and `journal/`; anything else is
 refused, as is a path that resolves outside the vault.
 
+## The page
+
+The page carries no data and no link rules: `graph.json` is the whole input, so
+the web looks the same served from delphi, from a laptop folder, or from a
+demo export (`?data=demo/graph.json`). Three rules make it hold at 260 notes
+rather than 28: nodes are seeded after the fetch, not at parse time; the camera
+fits the whole web until the reader zooms or pans (`Centre in web` takes the
+camera and comes up to a readable size); and a node is named only when it is the
+selection, its neighbour, hovered, or in the top ~4 % by degree — and only where
+that name does not overlap one already placed.
+
 ## Writing
 
 `POST /api/new` captures a note: the form sends a title (and optionally a type and

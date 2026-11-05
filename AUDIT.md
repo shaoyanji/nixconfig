@@ -28,6 +28,26 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-05 — zettel reader: the web drew nothing until the data arrived
+- **Symptom, then cause.** The live page showed a blank canvas: `nodes` was
+  seeded from `NOTES` at parse time, when `NOTES` is still empty because the data comes
+  from `graph.json` by fetch. Every one of 801 edges then pointed at
+  `nodes.get(undefined)`, the first physics step threw `Cannot read properties of
+  undefined (reading 'x')` and the frame loop died before it drew anything. The demo hid
+  it: a baked-in array was non-empty at parse. Seeding moved into a `seedNodes()` that
+  runs after `applyGraph`.
+- **Two things a 260-note vault exposed.** Degree was recomputed per node per frame, and
+  each call rescanned every note body for `[[links]]` — one pass on load now, recorded on
+  both ends (61 fps measured, was a stalled loop). And the view was fixed at zoom 1 with
+  every node named: the physics spreads the web to about ±500 units whatever its size, so
+  a real vault arrived as a cropped smear of overlapping labels. The camera fits the web
+  until the reader zooms or pans, and names are drawn in priority order with a collision
+  check (260-note vault: 11 names at fit zoom; the 28-note demo: 7).
+- **Where:** `shaoyanji/zettel-graph` `ac21d84` + `58251fa`, pulled by `zettel-graph-sync`
+  (www `1ba866eb…` md5-identical to the working tree). Verified live over the tailnet:
+  260 nodes, 801 edges, 0 unresolved endpoints, 61 fps, fit zoom 0.31; `npm run check`
+  passes on both the real export and the demo.
+
 ### 2026-11-05 — zettel graph landed on delphi: the vault as a reader
 - **Reviewed, not rubber-stamped.** `feat/zettel-graph-service` was rebased onto `main` by hand
   after a conflict in `AGENTS.md` (both lines kept: the atlas and this). Three inconsistencies

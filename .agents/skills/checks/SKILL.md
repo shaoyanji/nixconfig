@@ -37,27 +37,19 @@ Run validation and health checks for host configs and Nix code quality.
 | `checks:kg:native` | Cold native graph build: median < 20 ms over 7 runs, **no subprocess in `KGEngine.Native`**, node/edge parity with the compiled projection |
 | `checks:kg:canvas` | Builds `.#sites.fleet-docs-site` locally and proves the knowledge-graph canvas works: every node has a slice, no dangling slice links, and headless Chrome **clicks a node** and must land on `fleet / knowledge-graph / host:frieren` |
 
-**Preserved hosts are a warning, not a check.** A host with
-`status = "preserved"` in `inventory.toml` is dormant, and some are known-broken
-(cassini: a `homeDirectory` conflict that predates the current tree).
-`warm-host.sh --check`, `checks:build:route`, `infra:deploy:host:*` and
-`infra:apply:host:*` print the status and exit 0 **without evaluating anything**
-— no `drvPath`, no `outPath`, no dry-run, no ssh. Do not "fix" a preserved host
-because a check you ran on it failed; check or revive one only when the user
-names it (`ALLOW_PRESERVED=1` for deploy).
+**Preserved hosts are a warning, not a check.** `status = "preserved"` is dormant, and
+some are known-broken (cassini's `homeDirectory` conflict predates this tree).
+`warm-host.sh --check`, `checks:build:route`, `infra:deploy` and `infra:apply` exit 0 before evaluating; revive one with `ALLOW_PRESERVED=1` only when the user names it.
 
-**Never run `nix flake check` on a small host.** It evaluates every flake output — all
-23 `nixosConfigurations` — in ONE process: measured 339.78 s, 6078.5 MiB peak, SIGKILL
-(exit 137) on the 11 GiB NAS, leaving it at 62 % IO-stall. Memory is O(hosts forced in
-one process); use `task checks:hosts` (sequential) and wrap anything heavy in
-`scripts/task/oom-guard.sh`, which watches `/proc/vmstat oom_kill` and PSI every 10 s.
+**Never run `nix flake check` on a small host.** It evaluates every output in one
+process: 339.78 s / 6078.5 MiB, SIGKILL on the 11 GiB NAS. `checks:flake` refuses
+below 16 GiB; use `checks:host`/`checks:hosts` under `scripts/task/oom-guard.sh`.
 
 ## Nix linting & formatting
 
-`checks:nix:lint` is read-only and fails on deadnix, reports statix.
-`checks:nix:fix` writes; `checks:nix:format` is `alejandra --check` alone. All
-three run `scripts/task/nix-fmt.sh --tools …`, so they resolve tool versions from
-the `flake.lock` pin rather than whatever is on `PATH`.
+`checks:nix:lint` is read-only and fails on deadnix, reports statix. `checks:nix:fix`
+writes; `checks:nix:format` is `alejandra --check`. All three run
+`scripts/task/nix-fmt.sh --tools …`, resolving versions from the `flake.lock` pin.
 
 ### experimental-features global wiring
 

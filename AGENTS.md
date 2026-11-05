@@ -1,928 +1,482 @@
 # AGENTS.md
 
-**Nixconfig** — Personal Nix flake managing NixOS, nix-darwin, and Home Manager across the hosts registered in `inventory.toml`.
+**Nixconfig** — a Nix flake for NixOS, nix-darwin and Home Manager, across the hosts registered
+in `inventory.toml`.
 
-`Taskfile.yml` plus the `taskfiles/*` shards are the canonical entrypoint for every executable task.
+`Taskfile.yml` plus the `taskfiles/*` shards are the only executable truth. This file routes: it
+says where a fact lives and what gate proves it. A fact with a compiler is queried, never copied
+here — `.agents/SCHEMA.md` §1.
 
-Use this document to orient yourself to the routing map; follow `taskfiles/README.md` for ownership and `.agents/README.md` for quick helper lookups.
+## Agent entry contract
 
-`.agents/*` is guidance-only and never replaces the Taskfile truth. Each taskfile shard has a corresponding skill under `.agents/skills/<name>/SKILL.md` — see `.agents/README.md` for the full index.
+1. **Start from intent.** `task help` → `task find:<word>` → the owning shard. Never invent a
+   task name; a new one walks the ladder in the `task-plane` skill (eval → jq → Nix lib → check
+   → task → script → Go).
+2. **Truth order:** compiled data (`inventory.toml`, `modules.toml`) → host and module Nix →
+   taskfiles → docs.
+3. **Ask the compiler, not a pasted table.** `nix eval --json .#inventory.hosts` (0.15 s),
+   `.#agentSkills` (1.2 s), `.#agentsNotes`, `.#knowledgeGraph`, `task --list-all --json`,
+   `nix build .#artifacts.docs`. Two copies of a fact disagree within a month.
+4. **Structural questions are the graph.** `task ops:kg:host HOST=`, `:skill`, `:doc`, `:tag`,
+   `:comention` and `:blast` answer "what touches X" from `.#knowledgeGraph`; `ops:kg:blast` is
+   the reverse closure. Do not grep for structure.
+5. **Facts are evaluated, not guessed.** Never evaluate a full host to answer a fact question;
+   never run `nix flake check` on this host.
+6. **Verification is phased:** eval to catch a config error · build to prove a closure · size to
+   plan a build. Never run a check before a local rebuild — the switch is the check. The boot is
+   the one thing a switch cannot prove: `checks:boot:self` on nixos, `checks:boot` for the rest.
+   A fix's gate is `checks:host` plus `warm-host.sh --check`; a real build is for a change that
+   adds derivations. Building the wrong *tree* voids the cache: `docs/nix-patterns.md` §"The gate
+   for a fleet fix".
+7. **This is a live host.** Bounded gates only, one host per process, no top-level evals during
+   03:00–05:30, and no ssh in unattended paths. `task ops:health` before blaming the config.
+8. **Ask the record before you write.** `task ops:notes:near Q="<intent>"`, then
+   `ops:notes:lineage ID=<id>`, so an idea attaches to the one it grew out of. Then: proposal and
+   open work → an `AGENTS.nix` note (`agents-notes` skill); what happened → one xs turn;
+   superseded narrative → `docs/history/`; procedure → `docs/` or a skill. No new root markdown
+   file [[flake/policies.nix#root-markdown-closed]].
+9. **Do not read `AGENTS.nix` in full.** It is a ~5,500-line compiled data store. Query it:
+   `task ops:notes[:host|:show|:search]`, `nix eval .#agentsNotes…` (0.2 s).
+10. **The closed loop is real:** `fleet-sentinel` records jobs, generation age, disk and PSI
+    every 15 min; gatus pages on `[BODY].state != ok`. A green socket is not a successful job —
+    read the ledger.
+11. **TOON is the IR.** JSON links the tools; TOON is its projection for an agent. TOML, YAML and
+    Nix cross the boundary in their own tools (`yq -p toml -o json`, `nix eval --json`), never by
+    hand. `task dev:toon:fix` recounts `[n]`; `checks:toon` and `checks:toon:surfaces` keep both
+    rules true.
+12. **A source may settle only the claims it is compiled for.** `nix eval --json
+    .#epistemics.table | toon -e` (0.1 s) says which source can settle which claim kind, what to
+    read instead, and where a settled answer is filed. Word overlap is not authority
+    (`ops:wiki:ask KIND=` refuses before it spends a token). Epistemics outranks policy.
 
----
+## Agent turns: the xs endpoint (mandatory)
 
-## Agent entry contract (read this first)
+The fleet turn log on **delphi** is coordination state, not a chat relay: it records who worked
+on what, from which base commit, and what landed. It changes no merge authority.
 
-1. **This file is the manual, not the rulebook.** The documentation contract is
-   [`.agents/SCHEMA.md`](.agents/SCHEMA.md): one fact one home, budgets, status
-   vocabulary, skill frontmatter. Every living doc is bounded on purpose.
-2. **Start from intent.** `task help` → `task find:<word>` → the owning shard.
-   Never invent a task name; never add one before walking the ladder in the
-   `task-plane` skill (eval → jq → Nix lib → check → task → script → Go).
-3. **Truth order:** compiled data (`inventory.toml`, `modules.toml`) → host and
-   module Nix → taskfiles → docs. A table that exists twice is a liability.
-4. **Facts are evaluated, not guessed.** `nix eval .#inventory…` (~0.2 s) or
-   `nix eval .#agentSkills…` (~1.2 s). Never evaluate a full host to answer a
-   fact question; never run `nix flake check` on this host.5. **Verification is phased:** eval to catch a config error · build to prove a closure · size to plan a build. **Never run a check before a local rebuild** except the boot — the switch already evaluates and builds, so a pre-flight check re-instantiates the whole toplevel for no extra proof. A boot is the thing a switch cannot prove before it happens: `checks:boot:self` on nixos (BOOT=1, default) runs the config; `checks:boot` is the CI path for others. **A fix's gate is `checks:host` plus `warm-host.sh --check`** — the cache proves the closure before anyone builds it; a real build is for a change that adds derivations (a Python package, model weights, a Rust/Go binary). Building the wrong *tree* voids the cache: `docs/nix-patterns.md` §"The gate for a fleet fix".
-6. **This is a live host.** Bounded gates only, one host per process, no
-   top-level evals during the 03:00–05:30 window, and no ssh in unattended
-   paths. Watch `task ops:health` before blaming the config.
-7. **Ask the record before you write.** A novel task starts with `task ops:notes:near
-   Q="<intent>"` and `task ops:notes:lineage ID=<id>`, so an idea attaches to the one it
-   grew out of (`from`) instead of restating it. Then: proposal and open work → an
-   `AGENTS.nix` note (`ops:notes`; authoring: `agents-notes` skill); what happened →
-   one xs turn (`agents:xs:post`; read back with `agents:xs:list Q="<words>"`); superseded
-   narrative → `docs/history/`; procedure → `docs/` or a skill. No new root markdown file [[flake/policies.nix#root-markdown-closed]].
-8. **Do not read `AGENTS.nix` in full.** It is a ~3,500-line compiled data store;
-   reading it whole wastes context. Query it with `task ops:notes[:host|:show|:search]`
-   or `nix eval .#agentsNotes…` (0.2 s). Structural "what touches X" questions go to
-   the knowledge graph (`task ops:kg[:host|:skill|:doc|:blast]`), not `grep`.
-9. **The closed loop is real:** `fleet-sentinel` records jobs, generation age,
-   disk and PSI every 15 min; gatus pages on `[BODY].state != ok`. A green
-   socket is not a successful job — read the ledger.
-10. **TOON is the IR: consume it, emit it, and let the machine own the formats.**
-    JSON is the linking layer a program consumes; TOON is its projection for an
-    agent. TOML, YAML and Nix are source truth and cross the boundary in their own
-    tools (`yq -p toml -o json`, `nix eval --json`, `toon -d | yq -o yaml`), never
-    by hand. Repair only the interface: `task dev:toon:fix` recounts `[n]`, and
-    `checks:toon` / `checks:toon:surfaces` keep both rules true.
-11. **Whether a source may settle a claim is compiled, not scored.**
-    `nix eval --json .#epistemics.table | toon -e` (0.1 s): which source can settle
-    which claim kind, which cannot and why, what to read instead — offline and
-    unmetered routes first, the tailnet SearXNG on delphi:8447 for fan-out, a
-    measured Kelly `ev` able to veto a lookup, and where a settled answer is filed.
-    Word overlap is not authority (`ops:wiki:ask KIND=` refuses before it spends a
-    token), and epistemics outranks policy: a fact may overturn a judgment.
-
-## Agent turns: the xs coordination endpoint (mandatory)
-
-Every agent governed by this file produces and consumes the fleet turn log on
-**delphi**. It exists so an agent can see who is working on what, from which base
-commit and branch, before it starts, and so a merge or a test is checked against
-what actually landed instead of a stale chat report. It is coordination state,
-not a chat relay, and it changes no merge authority: a builder still does not
-merge unless a task says so.
-
-Endpoint: `https://delphi.cloudforest-kardashev.ts.net:8449`, tailnet only. A
-`tailscale serve` front on 8449 proxies the loopback shim; there is no public
-route and no other port. The token is a sops secret and is never written down:
+`https://delphi.cloudforest-kardashev.ts.net:8449`, tailnet only; the token is a sops secret.
 
 ```bash
-X=https://delphi.cloudforest-kardashev.ts.net:8449
-export AGENT_TURNS_TOKEN="$(sops -d ~/Documents/nixconfig/modules/secrets.yaml | yq -r '.["agent-turns-token"]')"
+task agents:xs:list Q="<words>"      # before: is someone else on this?
+task agents:xs:post SUBJECT=nixconfig:<task-id> ACTION="one line" OUTCOME=done
 ```
 
-**Before a turn** — read the recent turns for the repo, then the subject, and
-look for a live claim or an `in_progress` twin:
+A post needs `SUBJECT`, `ACTION` and `OUTCOME` (`done` | `in_progress` | `blocked: …` |
+`failed: …`); `RATIONALE`, `FILES`, `COMMITS`, `CLAIMS` and `SOURCE` are optional and `SOURCE`
+should name the agent. An unreachable endpoint queues the body and replays it oldest-first; a
+repeated UUID is a safe retry. Summaries and identifiers only — the shim refuses
+credential-shaped bodies, and there is no update or delete route. Field schema, the curl form and
+the restore procedure: [`docs/agent-turns.md`](docs/agent-turns.md).
 
-```bash
-curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?repo=nixconfig&limit=20" | jq '.events'
-curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?subject=nixconfig:my-task" | jq '.events'
-```
+## Home initialization
 
-If another agent claimed the same area or is `in_progress` on the same subject,
-stop and report the collision; do not start a parallel edit that will conflict.
+When a session starts from `$HOME`:
 
-**After a turn** — append one summary. `201` plus an entry id is success; `200`
-means that UUID is already stored and the post was a safe retry.
+1. **Repository root.** `~/Documents/nixconfig` (on `frieren`, a symlink to
+   `/Volumes/data/projects/nixconfig`). `readlink -f` it before trusting it: where Home Manager
+   owns the path it is a read-only store copy whose `git rev-parse` reports the active generation.
+2. **`~/Taskfile.yml` is decrypted, not authored.** It comes from the tracked
+   `modules/secrets/DE-Taskfile.yaml` via `task infra:secrets:decrypt:detaskfile-home`, which
+   every `infra:rebuild:*` also runs. It must stay a pure forwarder: a duplicate task name makes
+   task reject the file (exit 203), and a `NIX_CONFIG` line there breaks every `nix` call. Until
+   the decrypt has run on a host, use `task -t ~/Documents/nixconfig/Taskfile.yml …`.
+   Declarative ownership is open work (`AGENTS.nix` note `taskfile-plane-handmade`).
+3. **Guidance is materialized, not copied.** `~/.agents/` holds the skills and deploy notes. The
+   host card plus persona is `.#homeAgents.<host>` (`lib/home-agents.nix`), linked to
+   `~/AGENTS.md` by activation; refresh with `task dev:inventory:home-agents`.
+4. **Secrets:** two encrypted files, two identity planes, one CA —
+   [`docs/sops-rekey.md`](docs/sops-rekey.md).
 
-```bash
-curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" -H 'Content-Type: application/json' \
-  -X POST --data @turn.json "$X/v1/events"
-```
+## Architecture
 
-`turn.json` carries exactly these fields; the shim rejects unknown ones, which is
-what stops a transcript being posted as an extra key:
-
-- `id` client-generated UUID (the dedup key) · `ts` RFC 3339 · `source` agent name · `kind` `"turn"`
-- `subject` `<repo>:<task-id>` — the repo prefix is what `repo=` filters on · `action` one line
-- `rationale` string or `null` · `base_commit` git hash or `null` · `branch` name or `null`
-- `files_changed` list · `commits` list of hashes · `claims` list of areas or files claimed
-- `outcome` `done` | `in_progress` | `blocked: <one line>` | `failed: <one line>`
-
-Summaries and identifiers only: no secrets, tokens, passwords, private keys, mail,
-no full conversation text. The shim scans free text and refuses credential-shaped
-bodies with a 400, and there is no update or delete route (405 by design).
-
-If the endpoint is down or a post times out, `task agents:xs:post` appends the body
-to `~/.local/state/agent-turns/queue.jsonl` itself and the next successful post
-replays it in order — a repeated UUID returns the stored id, so replay is
-idempotent. Continue the turn and report the queue depth. Never post a
-turn copy to any other endpoint or publicly, and never use it in place of the
-structured prompt and report files you already use to hand work to another agent.
-
-Backup hook (cadence is an open decision, so nothing schedules it yet):
-`task infra:xs:export OUT=<dir>` on delphi writes `frames.jsonl` plus `cas/`.
-
-## Home initialization & tautological control plane
-
-When an AI agent or developer session initializes from the home directory (`$HOME` / `~`):
-
-1. **Repository Root & Provenance**:
-   - The canonical path is `~/Documents/nixconfig` (`frieren`: symlink to `/Volumes/data/projects/nixconfig`; a NAS client on other hosts — `readlink -f` it before trusting it, because where home-manager owns the path it is a read-only store copy whose `git rev-parse` reports the active generation, not your pull).
-2. **Taskfile Control Plane — versioned source, imperative landing**:
-   - `~/Taskfile.yml` is **not** hand-made: it is decrypted from the repo's encrypted `modules/secrets/DE-Taskfile.yaml` by `task infra:secrets:decrypt:detaskfile-home` (and as the second half of every `infra:rebuild:*`), so its source of truth is tracked. Landing it is still a task, not activation, so a host keeps a stale copy until that step runs — `scratch` exits **100** on `task` from `$HOME` for exactly that reason (no file).
-   - The file must stay a pure forwarder: `include` the repo Taskfile flattened and define nothing else. A duplicate task name makes task reject the whole file (`Found multiple tasks (load-env)`, exit **203**) — measured on delphi 2026-10-29, and the reason frieren reported the same 203 from 2026-10-22. Setting `NIX_CONFIG` there is worse than useless: the var reaches the command environment and every `nix` call fails with "syntax error in configuration line".
-   - Consequence: `task` from `$HOME` works only after the decrypt step has run on that host. Until it has, use `task -t ~/Documents/nixconfig/Taskfile.yml <cmd>` or run inside the clone, never `task -g`.
-   - Making it declarative is open work — `AGENTS.nix` note `taskfile-plane-handmade`. Until then this is context, not an invariant.
-3. **Agent Guidance & Skills Materialization**:
-   - `~/.agents/` (`~/.agents/skills/`, `~/.agents/deploy/`, `~/.agents/README.md`) provides guidance and skill shards.
-   - The canonical fleet operational manual is `AGENTS.md`. The local host system card + persona is the flake output `.#homeAgents.<host>` (`lib/home-agents.nix`), linked to `~/AGENTS.md` by activation; refresh manually with `task dev:inventory:home-agents`.
-4. **Secrets & SOPS State**: two encrypted files, two identity planes, one CA —
-   the state and its rekey procedure are [`docs/sops-rekey.md`](docs/sops-rekey.md).
-
----
-
-## Architecture overview
-
-### Flake output assembly
+### Flake assembly
 
 ```
 flake.nix → flake/outputs.nix (the one assembly node)
-  ├── nixosConfigurations  ← mkNixosHost (lib/mk-nixos-host.nix), inline
-  ├── darwinConfigurations ← darwinSystem, inline
-  ├── homeConfigurations   ← homeManagerConfiguration, inline
-  ├── packages            ← flake/packages.nix
-  ├── checks              ← flake/checks.nix
-  ├── devShells           ← flake/devshells.nix
-  ├── docs                ← lib/docs.nix (generated markdown tree)
-  └── fleet-docs-site     ← lib/aki-site.nix (the rendered site)
+  ├── nixosConfigurations  ← mkNixosHost (lib/mk-nixos-host.nix)
+  ├── darwinConfigurations ← darwinSystem
+  ├── homeConfigurations   ← homeManagerConfiguration
+  ├── packages             ← flake/packages.nix (sites · artifacts · servers · cli)
+  ├── checks · devShells   ← flake/checks.nix · flake/devshells.nix
+  └── docs · sites         ← lib/docs.nix · lib/aki-site.nix
 ```
 
-**Host registration flow**:
+A host registers once in `flake/host-inventory.nix` (`kind`, `system`, chain, module paths);
+`outputs.nix` projects it by `kind`, so nothing is wired by hand.
 
-1. One entry per host in `flake/host-inventory.nix`: defines `kind` (nixos/darwin/home), `system`, module chain, and host module path
-2. `outputs.nix` projects inventory by `kind` — the kind picks the assembler, nothing is wired by hand
-3. `flake/module-sets.nix` defines the 5 global module chains used as baselines
+### Module chains
 
-### Module chains (defined in `flake/module-sets.nix`)
+Seven baselines in `flake/module-sets.nix`; which host uses which is compiled, not tabled:
+`nix eval --json .#inventory.hosts | jq '… .software.module_chain'`.
 
-| Chain                            | What it includes                                                                       | Used by                                                                            |
-| -------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `globalModulesNixos`             | global + nixos + home-manager-shared + sops + nix-index + dms + dank-greeter (Dux desktop, medium tier) | aristotle, stark, aceofspades, ancientace, frieren, scratch |
-| `globalModulesRyoku`             | global + nixos + sops + nix-index + ryoku (no dms/dank-greeter: one shell per session) | poseidon, eisen, fern (high-end tier; fern is the floor) |
-| `globalModulesImpermanence`      | globalModulesNixos + impermanence + disko                                              | schneeeule                                                                         |
-| containers + impermanence (ares) | globalModulesContainers + impermanence + disko                                         | ares (Steam kiosk)                                                                 |
-| `globalModulesContainers`        | global + noDE + sops + home-manager + nix-index (no dms/niri desktop)                  | mtfuji, kellerbench, applevalley, sledgehammer, guckloch (WSL), deckstation        |
-| own chain (see `flake/host-inventory.nix`) | global + determinate-nix + sops + `raspberry-pi-3` — no noDE, so no Home Manager | minyx |
-| `globalModulesMacos`             | global + macos + nix-homebrew + home-manager + sops                                    | cassini (darwin)                                                                   |
-| `globalModulesDemo`              | global + demo + home-manager (no sops)                                                 | demo (NixOS demo VM)                                                               |
-| `globalModulesHome`              | standalone HM sharedModules + allowUnfree                                              | penguin, alarm, kali (standalone home-manager)                                     |
+| Chain | What it is |
+| :--- | :--- |
+| `globalModulesNixos` | global + nixos + shared HM + sops + nix-index + dms + dank-greeter |
+| `globalModulesRyoku` | global + nixos + sops + nix-index + ryoku (one shell per session) |
+| `globalModulesContainers` | global + noDE + sops + Home Manager + nix-index (no desktop) |
+| `globalModulesImpermanence` | `globalModulesNixos` + impermanence + disko |
+| `globalModulesMacos` | global + macos + nix-homebrew + Home Manager + sops |
+| `globalModulesDemo` | global + demo + Home Manager, no sops |
+| `globalModulesHome` | standalone HM sharedModules + allowUnfree |
 
-### Complete client OS fleet inventory
+Two hosts compose their own chain in `flake/host-inventory.nix`: `ares` (containers +
+impermanence) and `minyx` (global + determinate-nix + sops + raspberry-pi-3, no Home Manager).
 
-> **No table here — by design.** The fleet registry has exactly one home:
-> [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
-> with `nix eval --json .#inventory.hosts | jq` (0.15 s, no host eval) or the catalog
-> in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`). A pasted
-> table disagrees with itself within a month — `.agents/SCHEMA.md` §1, `docs/docs-pipeline-audit.md` F4.
+### Where the modules are
 
-### Module layout
+`modules.toml` is the registry of profiles, services and knobs; `.#artifacts.docs` renders it as
+`modules-registry.md`. Ask it instead of walking the tree:
 
+```bash
+task ops:kg:doc DOC=modules/services/<name>.nix   # who is documented in this file
+nix eval --json .#inventory.hosts.<h>.software    # what this host actually runs
 ```
-modules/
-  global/          — Global NixOS/Darwin/Home-Manager module chains
-    user.nix       — Canonical user constants (user = devji, import this, not hardcode)
-    global.nix     — Nix config: experimental features, substituters, GC
-    nixos.nix      — NixOS HM embedded: overlays, home-manager-shared, role:home
-    noDE.nix       — Container host HM: role:minimal + shell
-    macos.nix      — Darwin HM: role:home
-    impermanence.nix — Persistence rules for devji user
-    demo.nix       — Demo HM: role:demo, no sops
-    home-manager-shared.nix — sharedModules for embedded HM (sops, nixvim, nix-index, niri, dms)
-  profiles/        — Reusable host profiles
-    base-node.nix  — Common NixOS baseline (kernel, SSH, keyd, networkmanager, sops, user devji)
-    boot.nix       — Boot loader profile (systemd-boot/EFI defaults)
-    firewall-baseline.nix — Firewall on, only TCP/22 by default
-    server-hardening.nix — Journald caps, tmp cleanup, /var bind-mount to data disk
-    nas-client.nix — Automount /Volumes/data from the NAS server (frieren)
-    burgernas-client.nix — Automount the BurgerNAS cold-vault export, with the fail-fast NFS options a sleeping peer needs
-    steamos.nix — Steam kiosk (greetd autologin + upstream gamescope-session, audio, 32-bit GL, Avahi)
-    sunshine.nix — GameStream/Moonlight server (Sunshine on LAN, video/render/input groups)
-    nixbuild-client.nix — Optional nixbuild.net remote builder (distributedBuilds, off by default)
-  services/        — Service modules
-    aria2-daemon.nix  — aria2 RPC + AriaNg web UI via nginx (delegates to native services.aria2)
-    mail-agent.nix    — natural-language mail actions (needle3 + himalaya) and the nightly bulk sweep
-    email-archive.nix — NpgsqlRest over a full-text mailbox: tailnet-only API, declared schema, disk attachments
-    mail-atlas.nix    — fuzzy finding, tag taxonomy and relation graph over the archive (tailnet 8452)
-    zettel-graph.nix  — the private vault as a tailnet reader, with write-back through the vault's own scripts
-  roles/           — User role assemblers (minimal, home, demo)
-  user/            — User module domains
-    base/          — CLI/editor/env base
-    ai/            — AI tools (aichat, antigravity-cli, codex, mods, opencode)
-    desktop/       — Niri compositor integration
-  shell/           — Shell baseline (`base.nix`: bash+tmux) on top of nu/starship/zsh
-  config/          — Config data (authorized-keys, fetches.json, shells/*.nix)
-    shells/        — Dev shell definitions (flaskpy, jekyll, yarn, pdf, yt, kali, pi, etc.)
-  lib/             — Internal library functions
-```
+
+Directories by role: `modules/global/` (chains), `modules/profiles/` (reusable host pieces),
+`modules/services/` (a service and its unit), `modules/roles/` (user roles: minimal, home, demo),
+`modules/user/` (base, ai, desktop), `modules/shell/`, `modules/config/` (data and dev shells).
+`modules/global/user.nix` holds the canonical user constants — import it, never hardcode `devji`.
 
 ### Packages
 
-Custom packages built from the flake:
+`.{sites,artifacts,servers,cli}` — no custom packages; the old `pkgs/` tree is gone.
 
-- (none — the `pkgs/` directory and agent-era packages were removed in 2026-09/10; the `packages` output is `{}`)
+## Commands
 
----
-
-## Essential commands
-
-### Taskfile entrypoints
+### Routing
 
 ```bash
-task help                        # List all tasks
-task --list-all                  # Same, unfiltered
-task status                      # git status + hostname
+task help                    # tasks grouped by namespace
+task --list-all --json       # the discovery API: desc, summary, aliases, vars
+task find:<word>             # tasks whose name or description matches
+task status                  # git status + hostname
 ```
 
-### Knowledge graph & notes queries (AGENTS.nix & ops:kg)
+A task's `summary` carries its variable and exit-code contract. `internal: true` is banned (it
+hides the task from the JSON API), wildcards are not invocable, and the compiled graph must match
+`task --list-all --json` — `checks:tasks` asserts both.
+
+### Notes and graph
 
 ```bash
-# --- AGENTS.nix Queries (Decisions, Proposals, Open Todos) ---
-# Do NOT read AGENTS.nix (3,500+ lines) directly into context.
-task ops:notes:host HOST=<host>         # Notes affecting a host (e.g. eisen, frieren)
-task ops:notes:show ID=<id>             # Inspect one note by ID (summary, refs, exit criteria)
-task ops:notes KIND=open STATUS=OPEN    # List active open backlog across fleet
-task ops:notes:module PATH=<path>       # Reverse lookup: which notes touch this module
-task ops:notes:task TASK=<task>         # Reverse lookup: why does this task exist
-task ops:notes:search Q="<phrase>"      # Fast substring search across all notes
-nix eval --json .#agentsNotes.byHost.<h> | toon -e # Machine-readable note IDs for host (0.2s)
-nix eval --json .#agentsNotes.open | toon -e      # All open note IDs (0.2s)
-
-# --- Knowledge Graph Queries (Hosts x Skills x Docs) ---
-# Do NOT raw-grep for structural relationships. Query the compiled graph.
-task ops:kg                             # Graph summary stats & highest-degree hub nodes
-task ops:kg:host HOST=<host>            # Inbound edges: skills and docs touching this host
-task ops:kg:skill SKILL=<name>          # Inbound mentions + skill tags
-task ops:kg:doc DOC=<path>              # Reverse lookup: hosts & skills documented in file
-task ops:kg:blast TARGET=<id>           # Blast radius: transitive dependents before breaking edits
-task ops:kg:comention HOST=<h> MIN=2    # Multi-hop co-mentioned hosts sharing docs
-task ops:ask Q="what touches <host>"    # Natural language query routed to graph
+task ops:notes:host HOST=<host>      # notes affecting a host
+task ops:notes:show ID=<id>          # one note: summary, refs, exit criteria
+task ops:notes KIND=open             # open backlog
+task ops:notes:module PATH=<path>    # which notes touch this module
+task ops:notes:task TASK=<task>      # why does this task exist
+task ops:notes:search Q="<phrase>"
+task ops:kg                          # graph stats and hubs
+task ops:kg:host HOST=<host>         # inbound edges: skills and docs
+task ops:kg:skill SKILL=<name>
+task ops:kg:doc DOC=<path>           # hosts and skills documented in this file
+task ops:kg:blast TARGET=<id>        # transitive dependents before a breaking edit
+task ops:ask Q="what touches <host>"
 ```
 
-### Host lifecycle
+### Host lifecycle and maintenance
 
 ```bash
-task infra:plan:host:<host>      # Build/evaluate host closure (dry run)
-task infra:apply:host:<host>     # Apply configuration to remote host
-task infra:deploy:host:<host>    # Plan + apply + validate
-task infra:rollback:host:<host>  # Roll back to previous generation
-task infra:logs:host:<host>      # View remote journald logs
+task infra:plan:host:<host>       # substitute the closure; apply nothing
+task infra:apply:host:<host>      # apply to the host
+task infra:deploy:host:<host>     # gate → plan → apply → validate
+task infra:rollback:host:<host>
+task infra:logs:host:<host> UNIT=<unit>
+task infra:sops:update-keys       # rekey every file after .sops.yaml changes
+bash scripts/task/sops-drift-check.sh
 ```
+
+Rollback, journald `UNIT` defaults and NAS automount recovery live in the `infra` skill and
+`.agents/deploy/hosts/*.md`. `frieren` has its own rebuild topology (nightly window, one rebuild
+at a time, origin-vs-local trap): `.agents/deploy/hosts/frieren.md`.
 
 ### Local rebuilds
 
 ```bash
-task infra:rebuild:nixos         # switch IS the build; no pre-flight checks (NOM=1 for TUI)
-task infra:rebuild:darwin        # darwin-rebuild switch (local) + refresh ~/Taskfile.yml
-task infra:rebuild:home-manager  # home-manager switch (local) + refresh ~/Taskfile.yml
+task infra:rebuild:nixos          # switch IS the build; NOM=1 for the TUI
+task infra:rebuild:darwin
+task infra:rebuild:home-manager
 ```
 
-### Client OS maintenance & debugging runbooks
+### Git and flake
 
 ```bash
-task infra:plan:host:<host>               # substitute the closure, apply nothing
-task infra:logs:host:<host> UNIT=<unit>   # tail journald (UNIT defaults to go-backend)
-task infra:rollback:host:<host>           # roll back a remote generation
-sudo nixos-rebuild --rollback switch      # local NixOS rollback
-nas-recover                               # /Volumes/data automount recovery
-scripts/task/sops-drift-check.sh          # every encrypted file decrypts cleanly
-task infra:sops:update-keys               # rekey every file after .sops.yaml changes
+task dev:git:quick-push           # stage tracked, AI commit, push
+task dev:git:ai-commit-push
+task dev:git:quick-pull           # with submodules
+task dev:flake:update-complete
+task dev:flake:update-transitive  # inputs a root update misses
+task dev:nixbuild:plan            # build/fetch gaps per host
+task dev:nixbuild:warm            # build gaps on the builder, push to cachix (budget!)
+task dev:closure:menu             # closure explorer (gum)
+task dev:closure:reduce
+task dev:qmd:refresh              # reindex docs + vault
 ```
 
-`infra:plan` is the pre-build instrument; a toplevel `.drvPath` eval forces the
-whole graph a switch forces anyway (Agent Verification Protocol below).
-`infra:deploy:*` = gate → plan → apply → validate. Rollback, journald `UNIT`
-defaults and automount recovery: the `infra` skill and `.agents/deploy/hosts/*.md`;
-sops state: [`docs/sops-rekey.md`](docs/sops-rekey.md).
-
-#### 7. frieren (NAS) Rebuild Topology
-
-Host-specific procedure lives in
-[`.agents/deploy/hosts/frieren.md`](.agents/deploy/hosts/frieren.md#rebuild-topology-read-before-rebuilding-this-host):
-the nightly window, the origin-vs-local trap, one rebuild at a time, and how to
-tell load from deadlock.
-
-### frieren: wiki stack, cache-warm, hermes, SSH CA
-
-Also in that runbook: kiwix is declarative, uncached fleet builds go through
-`task infra:update:fleet`, never run `hermes gateway install` there, and every
-host can sign certs.
-
-### Git & flake
+### Data and storage
 
 ```bash
-task dev:git:quick-push          # Stage tracked, AI-commit, push
-task dev:git:ai-commit           # Stage + interactive AI commit
-task dev:git:ai-commit-push      # Stage + AI commit + push
-task dev:git:build-push          # AI commit after successful build
-task dev:git:quick-pull          # Pull with submodules
-task dev:flake:update-complete   # Full flake update workflow
-task dev:flake:update:bountystash # Update single input
-task dev:flake:update-transitive # Update transitive inputs a root update misses
-task dev:nixbuild:plan           # Report build/fetch gaps per host vs substituters
-task dev:nixbuild:warm           # Build gaps on remote builder + cachix push (budget!)
-task dev:closure:menu            # Traversable closure explorer (gum TUI; subcommand after --)
-task dev:closure:reduce          # Closure reduction report: duplicate groups + every concrete copy
-task dev:closure:attribution     # Attribute closure bytes to owners (services, package farms)
-task dev:qmd:refresh             # (Re)index markdown docs (repo docs + personal vault) into qmd
-task dev:qmd:vault:refresh       # (Re)index personal Obsidian vault into qmd
+task data:audit                   # taxonomy, permissions, media hygiene
+task data:clean:metadata          # ._*, .DS_Store
+task data:clean:downloads
+task data:protect:private         # 0700 and .nomedia shields
+task data:index:refresh
 ```
 
-### Data & storage lifecycle
+### Closure analysis
+
+Reads the store DB via `nix path-info`, no eval; `HOST=<name>` reads a remote host's store.
 
 ```bash
-task data:audit                  # Audit NAS storage taxonomy, permissions, media hygiene
-task data:clean:metadata         # Scan and remove macOS metadata artifacts (._*, .DS_Store)
-task data:clean:downloads        # Cleanup orphaned control files and empty staging dirs
-task data:protect:private        # Enforce 0700 permissions and .nomedia shields
-task data:index:refresh          # Refresh qmd docs and vault search indices
+task dev:closure:size HOST=<name>     dev:closure        # total, then by subsystem
+task dev:closure:top N=20             dev:closure:graph
+task dev:closure:toml OUT=…           dev:closure:diff FROM=<old> TO=<new>
+task dev:closure:native:diff       # [gate] Nix-native output == shell output
 ```
 
-### Closure analysis (store-DB, no eval)
-
-Cheap "what is actually in this system" analysis: it reads the store database via
-`nix path-info` instead of evaluating Nix — the fix for `checks:quick` having
-stopped being quick. Targets the local `/run/current-system` by default,
-`HOST=<name>` (SSH-resolves a remote host and reads *its* store DB), or an
-explicit store path.
-
-```bash
-task dev:closure:size HOST=<name>          # total size + path count
-task dev:closure HOST=<name>               # subsystem breakdown
-task dev:closure:top N=20 HOST=<name>      # biggest contributors by own size
-task dev:closure:graph HOST=<name>         # terminal ASCII graph (Graphviz -> graph-easy)
-task dev:closure:toml HOST=<name> OUT=...  # 3-level tree for handoff / agent reports
-task dev:closure:tui                       # interactive host + view picker
-task dev:closure:diff FROM=<old> TO=<new>  # closure deltas (module-reduction scoreboard)
-task dev:closure:native                    # same breakdown, computed natively by Nix (prototype)
-task dev:closure:native:diff               # [gate] Nix-native output == shell output, byte-for-byte
-```
-
-Backed by `scripts/task/closure-analysis.sh`. Generated report trees are **not
-tracked** (`docs/closures/` is gitignored) — they are point-in-time and stale
-after any rebuild. Regenerate on demand; use `dev:closure:diff` to compare
-generations.
-
-**Nix-native prototype.** `lib/closure-graph.nix` computes the same five views
-from Nix's own store graph (`pkgs.closureInfo` → `exportReferencesGraph`) instead
-of the store DB, and `scripts/task/closure-graph-diff.sh` proves parity — on
-frieren all five views are byte-identical for a 3949-path system closure, an
-older generation, and a 141-path package closure. Two things to know if you
-touch it:
-
-- `closureInfo` needs its roots *declared*. `builtins.storePath "/nix/store/…"`
-  for a live path, or a derivation attribute; a bare `/run/current-system`
-  symlink is not in the input closure and `exportReferencesGraph` refuses it.
-- It is **local-store only** (no `HOST=<name>`): `closureInfo` builds locally.
-
-Rationale and the eval-speed trade-off: `docs/control-plane-vision.md` §4/§6.
+`lib/closure-graph.nix` is the Nix-native prototype (`pkgs.closureInfo` →
+`exportReferencesGraph`); it is local-store only, and its roots must be declared. Report trees are
+gitignored and stale after any rebuild. Rationale: `docs/control-plane-vision.md` §4/§6.
 
 ### Validation
 
 ```bash
-task checks:quick                # Bounded: cheap inventory checks, one host eval each, lint
-task checks:host:HOST=<host>     # [gate] ONE host (name required): module system + assertions + registry
-task checks:hosts:HOSTS="a b"    # [gate] a NAMED set, one at a time — no default, never the fleet
-task checks:flake                # [gate] run `nix flake check` only on a machine that can hold it
-task checks:flake:transitive     # Sweep transitive flake pins vs upstream (read-only)
-task checks:qmd:docs             # qmd repo-docs collection registered + index fresh
-task checks:qmd:vault            # qmd Obsidian vault collection registered + index fresh
-nix build .#hostChecks.x86_64-linux.<host> -L                     # ONE host gate (~13 s, ~700 MiB)
-nix eval .#inventory.hosts.<host>.role                            # Compiled registry (0.15 s, no host eval)
-nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath  # full-config check, ONE host
-#   ^ this one instantiates the whole system derivation graph (>120 s here, and the
-#     reason the old fleet-wide host-eval checks were fatal). ONE host per invocation.
+task checks:quick                # repo hygiene; evaluates no host config
+task checks:host HOST=<host>     # [gate] module system + assertions, ~13 s / 720 MiB
+task checks:hosts HOSTS="a b"    # a named set, one at a time
+task checks:flake                # only where the machine can hold it
+task checks:prose                # docs and skills carry no unslop vocabulary
 task checks:nix:lint             # deadnix (fail) + statix (advisory)
-task checks:prose                # [gate] docs and skills carry no unslop vocabulary
+nix build .#hostChecks.<system>.<host> -L   # the same gate by attribute
 ```
 
-#### HARD RULE [[flake/policies.nix#flake-check-memory-gated]]: no `nix flake check` on a small host
+### The flake-check memory rule
 
-It evaluates **every flake output** in one process — 23 NixOS configs, measured
-2026-10-15 at 339.78 s / 6078.5 MiB / SIGKILL 137 on this 11 GiB host, which then
-sat at 62 % IO-stall with 5.4 GiB swapped. `task checks:flake` refuses below
-16384 MiB. Check **one** host (`checks:host HOST=`, 13 s / 720 MiB)
-[[flake/policies.nix#no-fleet-default]] or a named set under the watchdog
-[[flake/policies.nix#sweeps-under-watchdog]]; `MODE=eval` checks an
-aarch64/darwin host from here. The fleet is CI's job.
+HARD RULE [[flake/policies.nix#flake-check-memory-gated]]: `nix flake check` evaluates every flake
+output in one process — measured 339.78 s / 6078.5 MiB / SIGKILL on this 11 GiB host.
+`task checks:flake` refuses below 16384 MiB. Check one host
+[[flake/policies.nix#no-fleet-default]] or a named set under `scripts/task/oom-guard.sh`
+[[flake/policies.nix#sweeps-under-watchdog]], which polls `oom_kill`, memory/IO PSI and
+`MemAvailable` over the whole process group and kills the run on pressure.
 
-`scripts/task/oom-guard.sh` is what makes a sweep safe: it polls `oom_kill`,
-memory/io PSI and `MemAvailable` every 10 s over the whole **process group**
-(a 4.9 MiB direct-child peak hid a 6 GiB grandchild) and kills the run on
-pressure instead of taking the host down.
+### Verification protocol
 
-#### Agent verification protocol (compute discipline)
+**Phase 1 — pre-build: one bounded gate.** `nix build .#hostChecks.<system>.<host>` runs the
+module system and every assertion (13.16 s / 720 MiB). A one-option eval proves nothing; a
+toplevel `.drvPath` instantiates the whole graph (>120 s here) and is a CI instrument, not a
+per-edit step. On a local rebuild, run no check first — the switch forces the same graph.
 
-Verification is **phased, and each phase has exactly one job.** Confusing the
-phases is what produces both failure modes at once: cheap per-option evals run as
-ritual (proving nothing) while the build that would have caught the error is
-never run.
-
-**Phase 1 — Pre-build: one bounded gate, not a toplevel force.**
-`nix eval .#nixosConfigurations.<host>.config.networking.hostName` proves nothing
-(one option, no type checking). `nix build .#hostChecks.<system>.<host>` runs the
-module system and every assertion — 13.16 s / 720 MiB on frieren — and is the
-normal pre-build gate.
-
-The whole-toplevel force (`…toplevel.drvPath`) instantiates the entire derivation
-graph: **>120 s with swap on frieren**, O(hosts) in memory. It is a **CI / operator
-instrument**, never a per-edit or pre-rebuild step. `nixos-rebuild switch` forces
-the same graph, so a `.drvPath` eval first is duplicate work for no extra proof.
-On a local rebuild, run **no** check first — the switch is the check.
-
-- **Cheaper first.** `hostChecks` catches the option-conflict / bad-value / policy
-  class without instantiating the closure. Reach for `.drvPath` only when the
-  change is derivation-level wiring and CI cannot cover it.
-- **Budget it, and run it under the guard.**
-  `bash scripts/task/oom-guard.sh --timeout 180 -- nix eval --raw …` kills the run on
-  10 s OOM/PSI polling instead of dragging the host into swap death. Use
-  `--timeout 3` for the leaf registry reads (`.#inventory.*`), which cost 0.15 s.
-  The guard samples a **baseline** before the command starts and aborts only above
-  `max(threshold, baseline + 5)`: on a host already saturated by unrelated work
-  (frieren, io full avg10 44-61 %) an absolute threshold aborted a 1.1 s run, which
-  makes the gate unrunnable rather than protective. Its result line prints the
-  baseline, so "peak" is never confused with "this command caused it".
-- **Preserved hosts are not check targets.** `status = "preserved"` is dormant,
-  and some are *known-broken* (cassini's `homeDirectory` conflict predates this
-  tree). `warm-host.sh --check`, `infra:deploy:*` and `infra:apply:*` warn and
-  exit 0 **before any eval, cache query, ssh or validate** — a dormant failure
-  is not this run's regression. Revive with `ALLOW_PRESERVED=1`; never sweep
-  preserved hosts into a fleet check.
-- **Scope to what the change reaches, never the fleet:** host-local edit → that
-  host; chain module (`modules/global/*`, `modules/profiles/*`, `modules/roles/*`)
-  → one representative host per chain affected; `flake/` wiring → one host per
-  kind (nixos, darwin, home) — **active** hosts only.
-- **Batch into ONE bash loop**, not one tool call per host.
-- **A whole-system sweep is for wiring changes, not a habit.** Eval a whole system
-  sparingly; eval the closure you changed often.
-- **Keyless environments (fresh clones, sandboxes).** Evaluation needs no sops
-  keys — sops-nix only declares paths. Safe: `nix eval`, `alejandra --check`,
-  `deadnix`, `statix check`. Not keyless: `checks:quick` (sops drift), `infra:*`
-  secret tasks. Stock Nix also needs the `pipe-operators` flag (see below).
-
-**Phase 2 — Build: the build IS the test.** Once a change alters the closure,
-evaluation is no longer evidence. Build it — never on the target host:
+**Phase 2 — build: the build is the test.** Once a change alters the closure, evaluation is no
+longer evidence. Never build on the target host:
 
 ```bash
-task infra:warm:host:<host>      # build on the builder; verify the cache serves it
-task infra:deploy:host:<host>    # ONE intended host: gate → plan → apply → validate
-# checks:build:route is CI/operator-only: it forces the toplevel. Do not chain
-# it in front of a rebuild; invoke it deliberately when routing is in doubt.
+task infra:warm:host:<host>     # build elsewhere, verify the cache serves it
+task infra:deploy:host:<host>   # one intended host: gate → plan → apply → validate
 ```
 
-Fleet-wide building is a **schedule**, not an ad-hoc action (`fleet-warm-cache`
-runs weekly on `frieren`). A host that is needed now is deployed out of schedule
-with `infra:deploy:host:<host>` — one intended host, never the fleet.
+Fleet-wide building is a schedule (`fleet-warm-cache`, weekly on `frieren`), never an ad-hoc
+sweep.
 
-**Phase 3 — Size/shape analysis is build preparation, not verification.**
-`dev:closure:top`, `dev:closure:size`, `dev:closure:reduce` answer *"what is big,
-what will be fetched, what is duplicated"* — questions you ask to decide **how** to
-build. They read the store DB and verify nothing. Use them before a build; never
-in place of one.
+**Phase 3 — size and shape are build preparation,** not verification: `dev:closure:top`, `:size`
+and `:reduce` answer "what is big, what will be fetched" and prove nothing.
 
-> **eval to catch a config error · build to prove a closure · size to plan a
-> build.** Never build without cause — but never mistake an eval for one.
+**A check must not spend build budget.** `frieren` has `eu.nixbuild.net` configured, billed per
+build-second against 25 h/month. Never call `nix build` in a gate; when a check must, pass
+`--builders ""` (as `warm-host.sh` and `checks:host` do). `nix eval --raw "<attr>.outPath"` plus
+`nix path-info --store <cache> <path>` asks the cache without building.
 
-**A check must not be able to spend build budget.** `frieren` configures
-`eu.nixbuild.net` as a distributed builder (`/etc/nix/machines`), and nixbuild.net
-bills **per build-second** against a 25 h/month free tier — so any `nix build`
-that reaches a missing derivation spends money, wherever it is run from. Two
-rules follow:
+**What offloading buys:** almost nothing for evaluation. Measured on frieren 2026-10-20: the host
+gate is 10.56 s / 958 MiB locally and 12.68 s / 746 MiB offloaded, of which the remote build is
+746 ms — the cost is the local module system and its 1961 assertions. Only a whole-gate CI run
+(`task dev:ci:trigger:<host>`, which builds the host and its `hostChecks` and pushes both to
+cachix) actually moves the memory. `checks:host`'s flags: default `--builders ""`;
+`STRICT=1` substitute-or-fail; `OFFLOAD=1` dispatch deliberately.
 
-- **Never call `nix build` in a check/gate path.** `nix build --dry-run` does not
-  build, but it is one edit away from not being a dry run — on 2026-10-15 a
-  `--check` that used `nix build --print-out-paths` dispatched full closures (incl.
-  stark's NVIDIA closure) to the remote builder and consumed the month's budget.
-  Prefer `nix eval --raw "<attr>.outPath"` (forces the path, builds nothing) plus
-  `nix path-info --store <cache> <path>` (asks the cache).
-- **If a check must shell out to nix build, pass `--builders ""`** so it cannot
-  dispatch even if the dry-run flag is lost. `scripts/task/warm-host.sh` does this
-  in `pending_count()` and so does `checks:host` (its default flags are
-  `--builders ""`, so the gate can compile its own three-line artifact and still
-  never reach nixbuild).
+**Never put ssh in an unattended path** — a browser check on Tailscale SSH hung a run for five
+minutes. Ask the cache over HTTP instead (`scripts/task/warm-host.sh`). **When a build is needed,
+warm it elsewhere:** a `nixos-rebuild build` on a 2c/4t host was killed at load 9.4; the same
+closure on CI took 6m53s and left a substitution-only rebuild. Per-host limits are declared in
+`inventory.toml` (`compute_tier`, `allowed_tasks`). This is `exp-107`/`exp-113`; the gate is
+`task checks:build:route`.
 
-Budget is spent deliberately, by `task dev:nixbuild:warm` — never as a side effect
-of looking.
+- **Preserved hosts are not check targets** (`status = "preserved"`): a dormant failure is not
+  this run's regression. `warm-host.sh --check`, `infra:deploy` and `infra:apply` exit 0 before
+  any eval; `ALLOW_PRESERVED=1` revives.
+- **Scope to the change:** host edit → that host; chain module → one host per affected chain;
+  `flake/` wiring → one host per kind, active only. Batch into one bash loop.
+- **Keyless environments** can eval: `nix eval`, `alejandra --check`, `deadnix`, `statix check`.
+  Not keyless: `checks:quick` (sops drift), any `infra:*` secret task.
 
-**What offloading a check can and cannot buy.** Measure before adding a flag,
-because the answer is not intuitive and it was measured on frieren 2026-10-20:
-
-```
-task checks:host HOST=fern            10.56 s   958 MiB   local compile, no builders
-offloaded (OFFLOAD=1)                12.68 s   746 MiB   remote build itself: 746 ms
-```
-
-**nixbuild.net runs derivations; it does not evaluate.** The host gate's cost is
-the module system + 1961 assertions, i.e. a local `nix eval`; the derivation it
-finally builds is a three-line `runCommand` that echoes a summary. So sending
-that derivation to the builder saves ~0.7 s of a 10.6 s gate and recovers
-nothing of the 958 MiB. The same asymmetry holds one level up: `task
-infra:warm:host:<host>` offloads a closure's **compilation**, while its
-evaluation stays local.
-
-- **Cannot be offloaded:** evaluation, assertions, `MODE=eval`, `checks:flake` —
-  the memory and CPU they cost are yours. Bound them (one host per process, under
-  `oom-guard.sh`) and keep them out of the nightly window.
-- **Can be offloaded:** closure builds (`dev:nixbuild:warm`, `infra:deploy`
-  warming) and — the only real offload for evaluation — **the whole gate to CI**,
-  where each host gets its own runner: `task dev:ci:trigger:<host>` builds
-  `nixosConfigurations.<host>` **and** `hostChecks.<arch>.<host>` and pushes both
-  to cachix. A host whose artifacts are there needs no local gate at all.
-- **`checks:host`'s three routing flags**, one question each: default
-  `--builders ""` (compile here, never spend budget) · `STRICT=1`
-  (`--max-jobs 0 --builders ""`, substitute-or-fail: "is this host warmed?") ·
-  `OFFLOAD=1` (`--max-jobs 0` + `/etc/nix/machines`: dispatch deliberately).
-
-**Never put ssh in an unattended path.** A pre-switch hook that opens ssh can
-block on an interactive auth prompt: Tailscale SSH added a browser check on `fern`
-and silently hung an unattended run for 5 minutes. Use the LAN address
-(`TARGET=user@<lan-ip>`) or, better, ask a question the binary cache can answer
-over plain HTTP with a timeout (`scripts/task/warm-host.sh` does exactly this).
-
-**When a build IS needed, never run it *on* the target host — warm it
-elsewhere first.** A `nixos-rebuild build --flake .#<host>` executed on a
-   lightweight host saturates it (measured: load ~9.4 on fern's 2c/4t, killed
-   after 30 min), while the same closure built on a CI runner and pushed to
-   cachix took **6m53s** and left the host a substitution-only rebuild. The
-   constraint is already declared per host in `inventory.toml`
-   (`compute_tier`, `allowed_tasks`) — e.g. fern: *"15W dual-core processor and
-   8GB RAM; avoid heavy compilation loops"*. Burn CPU on builders, not on the
-   machine that asked for the config.
-   - **Preferred — CI** (free, already wired, maps host→runner arch from
-     `inventory.toml` and pushes to the `shaoyanji` cache):
-     `task dev:ci:trigger:<host>` (= `gh workflow run nixcachix.yml -f host=<host>`).
-   - **Or the remote builder** (nixbuild.net free tier = 25 build-hours/month,
-     so budget it): `task dev:nixbuild:plan` to report the gaps, then
-     `task dev:nixbuild:warm` (builds with `--max-jobs 0`, pushing to cachix).
-   - **Verify the warm landed** before touching the host:
-     `task checks:build:route` must report READY (it asks the cache directly,
-     over HTTP, with no ssh) — `task dev:nixbuild:plan` is the nixbuild.net view.
-   - This is `exp-107`/`exp-113` in `AGENTS.nix`; the enforcement gate is
-     `task checks:build:route`, implemented by `scripts/task/warm-host.sh`.
-
-````
-### Secrets & SOPS
+### Secrets and SOPS
 
 ```bash
-task infra:secrets:edit:secrets  # Edit sops secrets file
-task infra:secrets:edit:apikeys  # Edit API keys env file
-task infra:secrets:edit:taskfile # Edit encrypted Taskfile
-task infra:sops:get:*            # Query a secret value
-task infra:sops:fzf              # Select env entries interactively
-task infra:sops:update-keys      # Rotate SOPS recipient keys
-````
-
-### SMTP auth
-
-```bash
-task infra:smtp:auth             # Interactive SMTP auth for hosts (using app passwords)
-# Prompts for: host, username, app-password; outputs MSMTP/MUTT config for the host
+task infra:secrets:edit:secrets   # sops secrets file
+task infra:secrets:edit:apikeys
+task infra:secrets:edit:taskfile
+task infra:sops:get:*             # query one value
+task infra:sops:fzf               # pick an env entry
+task infra:sops:update-keys       # rotate recipients
 ```
 
-### Site (`docs-site/` retired 2026-10-19; the site is `.#sites.fleet-docs-site`)
+Planes, anchors, CA and the rekey procedure: [`docs/sops-rekey.md`](docs/sops-rekey.md)
+[[flake/policies.nix#secrets-are-encrypted]] [[flake/policies.nix#ca-only-user-access]].
 
-Nix-native `lib/aki-site.nix` served by frieren, nav from the knowledge graph
-(`docs/docs-pipeline-audit.md`); the publisher site (`dev:site:*`) is separate.
+### Publishing
+
+Every publishing surface is driven from this repo's taskfiles; none is edited on the host.
 
 ```bash
-task docs:build   # markdown tree (nix build .#artifacts.docs)   ·   task docs:site   # rendered site
+task dev:site:list                # deployment targets from the manifest
+task dev:site:deploy -- <target>  # build + deploy one
+task neocities:menu               # blog control plane; neocities:deploy verifies round-trips
+task envs:build                   # markdown → HTML, gemtext, gopher, finger (strict)
+task envs:publish                 # all four targets, old web root moved aside
+task dev:blog:mataroa             # mataroa console ledger, local markdown vs the blog
+task docs:build                   # generated markdown tree (store path only)
+task docs:site                    # the rendered docs site
 ```
+
+`envs:build`/`envs:publish` read the site repo (`~/Documents/envsdotnet`, `ENVS_SITE_REPO` to
+override) and build locally; nothing builds on the pubnix any more. `dev:blog:export` writes a Jekyll
+post into the blog repo and never commits.
 
 ### TOTP (cloak)
 
 ```bash
-task dev:cloak:view              # Pick TOTP from list (gum filter)
-task dev:cloak:view:github       # Direct by name
-task dev:cloak:edit              # Edit TOTP accounts file
-task dev:cloak:sync-bw -- ./export.json  # Import from Bitwarden export
+task dev:cloak:list               # accounts
+task dev:cloak:view               # pick one and print the code
+task dev:cloak:edit
+task dev:cloak:sync-bw -- ./export.json
 ```
 
-### Operator helpers
+### Operator menu
 
 ```bash
-task agents:menu                 # Interactive operator control plane
+task agents:menu                  # operator control plane
+task menu                         # the whole Taskfile as a gum TUI
 ```
 
-### Nix raw commands
+A task is never `internal: true` — that breaks the JSON surface
+[[flake/policies.nix#task-surface-visible]].
+
+### Raw Nix
 
 ```bash
-nix build .#nixosConfigurations.<host>.config.system.build.toplevel          # Build host closure
-nix build .?submodules=1#nixosConfigurations.<host>.config.system.build.toplevel  # With submodules — NEVER drop ?submodules=1 [[flake/policies.nix#host-path-pinned-to-submodules]]
-nix build .#hostChecks.x86_64-linux.frieren                                  # ONE host eval gate (~700 MiB)
-bash scripts/task/oom-guard.sh --timeout 3 -- nix eval --raw .#inventory.hosts.fern.role  # leaf read, no host eval
-nix build .#devShells.x86_64-linux.default                                   # Enter dev shell
-alejandra <file>                                                             # Format Nix file
-alejandra --check <file>                                                     # Check formatting
+nix build .?submodules=1#nixosConfigurations.<host>.config.system.build.toplevel  # NEVER drop ?submodules=1 [[flake/policies.nix#host-path-pinned-to-submodules]]
+nix build .#hostChecks.<system>.<host> -L
+bash scripts/task/oom-guard.sh --timeout 3 -- nix eval --raw .#inventory.hosts.fern.role
+nix build .#devShells.<system>.default
+alejandra <file> || alejandra --check <file>
 ```
-
----
 
 ## Storage
 
-`/srv/data` on frieren → `/Volumes/data`: [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)
+`/srv/data` on `frieren` → `/Volumes/data`: [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)
 [[flake/policies.nix#media-tree-isolation]] [[flake/policies.nix#library-content-is-not-scheduled]]
 
-**Portable tool library** (`bin-*`, `appimages`) is what NON-Nix machines execute, so
-linkage is the contract, not size: `eget` hangs on its asset picker without `--asset`,
-a fetch is static-only [[flake/policies.nix#library-fetch-is-static]], and the tree
+The portable tool library (`bin-*`, `appimages`) is what non-Nix machines execute, so linkage is
+the contract: a fetch is static-only [[flake/policies.nix#library-fetch-is-static]], and the tree
 mirrors to BurgerNAS [[flake/policies.nix#library-crosses-the-wire]] (`task data:library`).
-
----
-
-## Secrets
-
-Sops planes, files, CA, rekey: [`docs/sops-rekey.md`](docs/sops-rekey.md)
-[[flake/policies.nix#secrets-are-encrypted]]
-[[flake/policies.nix#ca-only-user-access]]
-
----
 
 ## CI
 
 Inventory-driven, no matrix: [`docs/ci-pipeline.md`](docs/ci-pipeline.md)
-[[flake/policies.nix#ci-matrix-is-inventory]]
-
----
+[[flake/policies.nix#ci-matrix-is-inventory]]. CI builds each host and its `hostChecks` and pushes
+both to cachix; the fleet is CI's job, not this host's.
 
 ## Nix gotchas
 
-Traps, patterns, agent failure modes: [`docs/nix-patterns.md`](docs/nix-patterns.md)
+Traps, patterns and agent failure modes: [`docs/nix-patterns.md`](docs/nix-patterns.md).
 
-HARD RULE [[flake/policies.nix#toml-through-a-tool]]: TOML through a format-aware
-tool; `yq -i -f script.yq` applies nothing, so verify the compiled result.
+HARD RULE [[flake/policies.nix#toml-through-a-tool]]: TOML through a format-aware tool;
+`yq -i -f script.yq` applies nothing, so verify the compiled result.
 
----
+## Adding a host
 
-## Adding a new host
+1. Module under `hosts/<name>/configuration.nix` (or `hosts/<name>.nix`), with hardware or a
+   profile import as needed.
+2. Register in `flake/host-inventory.nix`: `kind` (nixos/darwin/home), `system`, chain, module
+   paths, `specialArgs` as needed.
+3. The `kind` projection assembles it; build with `task infra:plan:host:<name>`.
 
-1. Create host module under `hosts/<name>/configuration.nix` (or `hosts/<name>.nix` for simple cases)
-2. Add hardware/storage as needed (e.g., `hardware-configuration.nix`, `disko.nix`, or profile imports)
-3. Register in `flake/host-inventory.nix` with:
-   - `kind` (`nixos`, `darwin`, or `home`)
-   - `system` (e.g., `"x86_64-linux"`)
-   - Module chain (`globalModulesNixos`, `globalModulesImpermanence`, `globalModulesContainers`, etc.)
-   - Host module path(s)
-   - `specialArgs` or `extraSpecialArgs` as needed
-4. Output assembly is automatic via the `kind` projection in `flake/outputs.nix`
-5. Build: `task infra:plan:host:<name>` or `nix build .#nixosConfigurations.<name>.config.system.build.toplevel`
+A new server's age key (from `ssh_host_ed25519_key`) must be in `.sops.yaml` before
+`hashedPassword` decrypts; `ssh.ca.enable` is inherited from `base-node.nix`.
 
-For provisioning a new server:
+## Memory and search
 
-- The host's age key (from `ssh_host_ed25519_key`) must already be in `.sops.yaml` for `hashedPassword` decryption
-- `ssh.ca.enable = true` is inherited from `base-node.nix`
-- SSH in using a cert from your workstation
-
----
-
-## Task namespace summary
-
-See [Task Control Plane](docs/task-control-plane.md) for full namespace definitions and workflow examples.
-
-The namespaces themselves are defined in
-[`docs/task-control-plane.md`](docs/task-control-plane.md); which skill owns which
-shard is the index in [`.agents/README.md`](.agents/README.md); the tasks are
-`task --list-all --json`. A third table here was a copy of all three.
-
----## Taskfile as the Agent Contract
-
-`task --list-all --json` is the discovery API (`desc`, `summary`, aliases): `summary`
-carries the variable/exit-code contract, `internal: true` is banned (it hides the task
-from JSON), and wildcards are not invocable — call the concrete name. The graph is
-compiled (`lib/taskfile.nix`), so `checks:tasks` asserts it *and* its parity with
-`task --list-all --json`. Authoring: `docs/task-control-plane.md`, `task-plane` skill,
-observation tasks → `taskfiles/ops.yml`.
-
-## Memory hierarchy (jev decides escalation)
-
-| Layer              | Role                                          | When used                                      |
-| ------------------ | --------------------------------------------- | ---------------------------------------------- |
-| MEMORY.md          | Boot — persists across sessions               | Always loaded                                  |
-| Vault              | Fast working memory — offline, personal       | First stop for context                         |
-| qmd wiki           | Resource — docs, runbooks, codebase           | Concept/location queries                       |
-| mem0 / supermemory | Deep consult — when vault + wiki insufficient | Decided by jev (min-prob 0.8, min-margin 0.15) |
-| ZIM shelf          | World knowledge — 4 archives, ~49.4 GiB, no quota | A question about the world, not about this fleet |
-
-Search order: vault → wiki (qmd BM25) → graph (`task ops:kg:*`) → mem0/supermemory (jev-decided) → **ZIM shelf** (`task ops:wiki:ask Q=…`, then the rate-limited web). Skills: `qmd search "<topic>" -c skills --format json`.
-
-The shelf is the one rung that answers *and* costs nothing per lookup, so an
-en.wikipedia/SO-shaped question goes there before an API call — `wiki-ask --list`
-prints what is actually on it (coverage, vintage, size) rather than a claim.
-
----
-
-## qmd search operations
-
-Local hybrid search over markdown docs and notes via `qmd` (`pkgs.llm-agents.qmd`;
-where it is not on PATH — `delphi`, measured 2026-10-30 — the tasks resolve the
-`flake.lock` pin themselves via `scripts/task/qmd-docs-index.sh`, and the `qmd`
-skill carries the bare-`qmd` one-liner). Three canonical collections:
-
-| Collection  | Target Path                                              | Content                                                                                 |
-| ----------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `nixconfig` | `/srv/data/projects/nixconfig` (`~/Documents/nixconfig`) | This repo's documentation: README, AGENTS.md, runbooks, `docs/*`, `taskfiles/README.md` |
-| `vault`     | `~/vaults/personal` (NAS link → `/Volumes/data/Obsidian-Git-Sync`; a `cloud` host gets a git checkout of the same repo) | Personal Obsidian vault: zettels, schematics, notes |
-| `skills`    | `~/.hermes/skills/`                                      | Agent skills indexed for BM25 search                                                    |
-
-```bash
-task dev:qmd:refresh             # register (if missing) + reindex both collections
-task dev:qmd:vault:refresh       # vault only
-task dev:qmd:docs:refresh        # nixconfig docs only
-task checks:qmd:docs             # verify registered + index fresh (exit 1 when stale)
-qmd search "impermanence disko" -c nixconfig   # one collection
-qmd search "query" --json | toon -e            # all collections, agent-friendly
-qmd get "#docid"; qmd status; qmd update        # fetch / health / incremental reindex
-```
-
-Prefer BM25 `qmd search` over raw `grep` for concepts and runbooks — it is ranked
-and collection-scoped; `qmd embed` (vectors) is optional and slower. Run the
-`checks:qmd:*` pair after doc edits.
-
-The `nixconfig` collection masks `**/*.{nix,md}`, so a `nix eval`-time comment and
-the page that explains it are one query apart — which is why a `.nix` header no
-longer has to carry the essay. Vector-embedding offload to Eisen:
-[`docs/qmd-embedding-offload.md`](docs/qmd-embedding-offload.md).
-
-**Structural queries are the graph, not `grep`.** `.#knowledgeGraph` compiles hosts × skills × docs, with three edge kinds: `mentions` (a doc's tokens name a host or skill), `references` (a doc's markdown links point at another doc — the layer that makes it a lattice, `ops:kg:doc` answers with it) and `tagged` (skill → tag); `task ops:kg:*` are the six fixed traversals for "what touches X". The Elixir sidecar is the DEFAULT path: `kg-query.sh` answers from its socket when live (32 ms vs 441 ms for the same question through jq on this tree; `task ops:kg:speed` re-measures both), falls back to jq byte-identically, and `checks:kg:sidecar` proves both agree — it starts at login (`programs.kgSidecar`) from the COMPILED graph. `--native` is the parity experiment (`checks:kg:native`, part of `checks:quick`), not the query path; `ops:kg:blast` is the reverse closure that jq has no one-liner for.
-
----
-
-## Key operator helpers
-
-- `agents:menu` is the interactive operator control plane
-- `task menu` is the whole-Taskfile gum TUI; `menu:list` / `menu:json` are its
-  machine surfaces. A task is never `internal: true`
-  [[flake/policies.nix#task-surface-visible]] — that breaks the agent endpoint.
-- NAS client recovery logic lives under `modules/profiles/nas-client.nix`
-
-## Deployment guidance
-
-Host deployment flows use `infra:*` tasks directly. See `.agents/deploy/README.md` for host-specific deployment notes. Per-host quirks live in `.agents/deploy/hosts/*.md` — a host is not only its own config: delphi runs the service-tier `sandbox` microVM (`hosts/microvms/guests.nix`) behind `/microvm/*` and the terminal deck, where `ssh slides@delphi.bountystash.com` is the deck, `task microvm:ssh NAME=sandbox` (from delphi) is the guest shell, and plain `ssh delphi.bountystash.com` is the host shell as `devji`; frieren's `frieren-canary` guest is proved end to end by `task vm:canary:test` (boot → ssh → guest API → host proxy → stop → teardown). Guest mechanics: `hosts/microvms/README.md`.
-
-## Git hooks setup
-
-Pre-commit hooks in `.githooks/` run deadnix (hard gate), statix (advisory), and a formatting check accepting either alejandra or nixpkgs-fmt (hard gate). `.githooks/pre-push` runs the two gates CI's `docs-budget` job runs — `scripts/task/docs-budget.sh` and the task-graph digest pin (an eval, never a build) — because on this tree that job is what fails on `main`, and a refused push costs a line where a red run costs a mail and a context switch. Tools missing from PATH are fetched via nix from the nixpkgs revision pinned in `flake.lock`, so the checks are machine-independent. Enable with:
-
-```bash
-bash .git-hooks-setup.sh    # sets core.hooksPath to .githooks/
-```
-
-## Nixpkgs formatting
-
-**alejandra is the canonical formatter** — every tracked `.nix` file is
-aljandra-clean, and `dev:fmt`, `checks:nix:fix` and the pre-commit hook all run
-it. The hook is a thin wrapper over `scripts/task/nix-fmt.sh`, so it uses the same
-versions and the same cache as the tasks and no longer accepts `nixpkgs-fmt`.
-**Never run `nixpkgs-fmt` repo-wide — it would rewrite ~170 of 187 files**, and it
-is no longer installed: `base-node.nix` ships `alejandra`, `deadnix` and `statix`
-instead, which also lets `nix-fmt.sh` take its PATH branch and skip the first-run
-`nix build`. `task checks:nix:lint` is the deadnix/statix pass, not a formatter
-check.
-
-`scripts/task/nix-fmt.sh` is the **single implementation** behind every Nix
-format/lint path, so the watcher can never use different tool versions than the
-gate that judges the commit:
-
-| Task | What |
-| :--- | :--- |
-| `task checks:nix:fix` | one-shot fix — the hard gates (deadnix + alejandra), all paths |
-| `task dev:fmt` | alias of `checks:nix:fix` |
-| `task checks:nix:lint` | **read-only gate** — deadnix (fails) + statix (advisory) |
-| `task checks:nix:format` | **read-only gate** — `alejandra --check` |
-| `task checks:nix:watch` | **the watch hook** — auto-formats on every save |
-| `task checks:toml:lint` | every tracked `.toml` parses (the `yq` rule's guard) |
-
-The script takes `--tools LIST` (a comma-separated subset of
-`deadnix,statix,alejandra`), which is how the read-only gates keep their exact
-tool sets — `checks:nix:lint` is deadnix+statix and `checks:nix:format` is
-aljandra — **without** introducing a second place that resolves tool versions.
-Add a new Nix tool task by passing `--tools`, never by calling
-`nix-shell -p alejandra` (or deadnix/statix) directly.
-
-The default tool set is the **hard gates, `deadnix` and `alejandra`** — the ones
-that make the commit fail. statix is advisory and never auto-applied
-[[flake/policies.nix#statix-advisory]] — its W20 warning fires on the house style,
-so `checks:nix:lint` only *reports* it. To write its suggestions deliberately,
-pass it by name:
-`bash scripts/task/nix-fmt.sh --fix --all --tools deadnix,statix,alejandra`.
-
-The toolchain resolves from the **nixpkgs revision pinned in `flake.lock`** — the
-same versions `.githooks/pre-commit` uses — and is cached as GC-rooted out-links
-under `~/.cache/nixconfig-nixfmt/`, so a save costs ~70 ms instead of re-resolving
-a shell. The pin is re-resolved when `flake.lock` changes.
-
-**Auto-format hook (no manual tool calls).** Start it once and leave it:
-
-```bash
-task checks:nix:watch
-```
-
-It watches `**/*.nix` via task's `watch` flag and formats only the files git
-reports as dirty, so a save touches one file. It writes only when a file actually
-changes — deadnix/statix/alejandra are idempotent (verified) — so it cannot
-re-trigger itself into a loop. Verified end to end: a misformatted file is fixed
-in under 1 s, and a pure indentation change is restored byte-identical.
-
-One caveat it reports rather than hides: **deadnix will not strip the last lambda
-argument**, so `{pkgs}: …` with an unused `pkgs` stays flagged. `--fix` re-verifies
-after writing and exits non-zero on residue the tools cannot rewrite, instead of
-claiming success on a tree the commit gate would still reject.
-
-#### Operating the watcher (read this before backgrounding it)
-
-| | |
-| :--- | :--- |
-| Start | `task checks:nix:watch` |
-| Status | `task checks:nix:watch:status` — pid + elapsed, or "not running" |
-| Stop | **`task checks:nix:watch:stop`** — signals the watcher by pid and verifies it exited (or Ctrl+C in the foreground) |
-| Watch interval | `interval: '500ms'` at the root of `Taskfile.yml` — coalesces a multi-file save into one run (task's default is 100ms and duplicate events were observed) |
-
-Four watch-mode traps: killing the launching shell does not stop the watcher (it
-is a grandchild), task's restricted shell has no `kill`, `--dry` still starts one,
-and `watch: true` is CLI-only. Always stop with `task checks:nix:watch:stop`,
-which verifies the pid is gone: [`docs/task-control-plane.md`](docs/task-control-plane.md).
-
-## External package registry
-
-External fetched dependencies are registered in `modules/config/fetches.json` and resolved through `lib/fetches-extra.nix`. Update hashes with:
-
-```bash
-task dev:config:hash-update    # runs nix-hash-update.sh
-```
-
-## Documentation & site compilation
-
-Documentation is markdown or data that Nix compiles into a store path; the store
-path is the artifact. Nothing derived is committed, and no second renderer is
-allowed beside the first.
-
-| Layer | Owner | Rule |
+| Layer | Role | When |
 | :--- | :--- | :--- |
-| content | `*.md`, `AGENTS.nix`, `inventory.toml`, `modules.toml` | hand-written only, never generated |
-| projection | `lib/inventory.nix`, `lib/docs.nix`, `lib/knowledge-graph.nix`, `lib/skills.nix` | one pure Nix compiler per projection |
-| artifact | `.#artifacts.docs` (generated markdown), `.#sites.fleet-docs-site` (the rendered site) | store paths, never repo copies |
-| serving | `hosts/frieren/reverse-proxy.nix`, `modules/services/uds-static-bridge.nix` | serve the path; never re-derive content in a host module |
+| `MEMORY.md` | boot memory, persists | always loaded |
+| vault | fast working memory, offline | first stop |
+| qmd wiki | docs, runbooks, codebase | concept/location queries |
+| mem0 / supermemory | deep consult | jev decides (min-prob 0.8, min-margin 0.15) |
+| ZIM shelf | world knowledge, no quota | a question about the world |
 
-- **Never commit a derivative** [[flake/policies.nix#generated-not-tracked]]:
-  `docs/generated/` is `nix build .#artifacts.docs`, and a committed copy is a second
-  source of truth. The path is gitignored so a copy cannot return; with no drift gate
-  to maintain, build output is never duplicated.
-- **Content is not code.** CSS/JS/HTML go in files the derivation reads, not `''`
-  literals in a `.nix` file (90 % of `lib/aki-site.nix` is such literals): literals
-  cannot be linted or reviewed, and every byte re-evaluates a module that imports
-  the knowledge graph.
-- **One instantiation.** Build the site once (`.#sites.fleet-docs-site`) and pass the
-  path to every vhost/socket; three `import`s with identical args are three evals.
-- **A rendered surface is compiled** [[flake/policies.nix#surfaces-are-compiled]]:
-  one registry emits pages, mounts and `data/services.json`; an ownerless card fails the gate.
-- **Publishing must not need a system switch.** If a `.md` edit lands inside a
-  host's closure, the docs are as live as the last `nixos-rebuild`.
-- **Eval-time `builtins.readFile` is flake-scoped.** An untracked `.md` does not
-  exist to the evaluator — `git add` before you eval or serve.
-- **An unlinked page is a page nothing routes to.** A `docs/*.md` earns its place
-  by being named from a living document; deleting it is the other valid answer.
-  [[flake/policies.nix#no-orphan-docs]]
+Search order: vault → qmd BM25 → graph → mem0 (jev-decided) → ZIM shelf
+(`task ops:wiki:ask Q=…`, then the rate-limited web).
 
-Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
+```bash
+task dev:qmd:refresh             # docs + vault
+task checks:qmd:docs             # registered and fresh
+qmd search "impermanence disko" -c nixconfig
+qmd search "query" --json | toon -e
+```
 
-## Documentation map
+The `nixconfig` collection masks `**/*.{nix,md}`, so a code comment and the page explaining it are
+one query apart. Vectors are optional: [`docs/qmd-embedding-offload.md`](docs/qmd-embedding-offload.md).
 
-| File                                 | Content                                                                |
-| ------------------------------------ | ---------------------------------------------------------------------- |
-| [`README.md`](README.md)                          | Full repo documentation, architecture, all workflows                   |
-| [`AGENTS.md`](AGENTS.md)                          | This file — canonical agent routing and codebase manual                |
-| [`inventory.toml`](inventory.toml)                     | Canonical fleet device registry; compiled by `lib/inventory.nix` (counts derived, not written). `[repos.*]` lists the repos that are ours but not vendored here (their own CI and authoring) — `nix eval .#inventory.repos` |
-| [`docs/inventory-schema.md`](docs/inventory-schema.md)           | Inventory schema, compiled artifacts, and the automatic checks          |
-| [`docs/sops-rekey.md`](docs/sops-rekey.md)                  | Sops planes and files, `.sops.yaml` anchors, SSH CA, rekey procedure, fresh-host bootstrap |
-| [`docs/storage-taxonomy.md`](docs/storage-taxonomy.md)            | `/srv/data` layout, permissions/sentinels, media-scanner rules, ingest doors |
-| [`docs/service-offload.md`](docs/service-offload.md)             | Moving a service off frieren: the candidate ladder, the shelter guarantees, cutover and switch-back |
-| [`docs/steam-cache.md`](docs/steam-cache.md)                | LAN Steam content cache: front/cache split, flash-tier measurements, how to disable |
-| [`docs/fleet-inventory.md`](docs/fleet-inventory.md)            | Pointer page — the catalog itself is `.#artifacts.docs` (`nix build .#artifacts.docs`), never committed |
-| [`docs/modules-registry.md`](docs/modules-registry.md)           | Pointer page — the knob registry is built from `modules.toml` at build time |
-| [`lib/aki-site.nix`](lib/aki-site.nix)                   | The rendered site (`.#sites.fleet-docs-site`): nav comes from the knowledge graph |
-| [`docs/docs-pipeline-audit.md`](docs/docs-pipeline-audit.md)        | Docs/site pipeline audit: duplicated artifacts, content-in-Nix, remediation order |
-| [`docs/closure-reduction.md`](docs/closure-reduction.md)          | Closure size levers, evidence chains, and the runtime/interactive/one-shot tiers |
-| [`docs/closure-debloat.md`](docs/closure-debloat.md)            | Tiered debloat plan: exclusive/shared/core attribution and a realistic floor |
-| [`.agents/fleet-matrix.md`](.agents/fleet-matrix.md)            | Compact fleet context matrix for LLMs and agent prompts                |
-| [`docs/task-control-plane.md`](docs/task-control-plane.md)         | Task namespace policy and workflow examples                            |
-| [`docs/ci-pipeline.md`](docs/ci-pipeline.md)                | CI: inventory-driven host selection, path rules, the two builds per host |
-| [`docs/nix-patterns.md`](docs/nix-patterns.md)               | yq/format traps, non-obvious Nix, build-budget traps, store reclaim (GC roots), agent failure modes |
-| [`docs/nix-cache-edge.md`](docs/nix-cache-edge.md)               | Public R2-backed cache: the three substituter tiers, why the edge never signs, the S3 upload path, the 10 GiB budget |
-| [`docs/mail-agent.md`](docs/mail-agent.md)                   | mail-agent on delphi: the tool assessment, measured routing accuracy, the sender trust list, operations |
-| [`docs/email-archive.md`](docs/email-archive.md)              | NpgsqlRest email archive: schema, endpoints, the Drive mirror checklist, what is not done |
-| [`docs/mail-atlas.md`](docs/mail-atlas.md)                   | The archive as a field: tag taxonomy, fuzzy search contract, the WASM particle field and graph |
-| [`docs/zettel-graph.md`](docs/zettel-graph.md)               | The private vault as a tailnet reader: the two units, what is served, the write guard, the token |
-| [`docs/agent-contract.md`](docs/agent-contract.md)            | What "done" means per kind of work: playbook exits, evidence objects, frame discipline |
-| [`docs/selector-daemon-predesign.md`](docs/selector-daemon-predesign.md)         | Handoff packet for a selector daemon: scope, query schema, synthetic data, model and compute plan, Kelly gate |
-| [`docs/agent-turns.md`](docs/agent-turns.md)                | Agent turns (xs): endpoint, schema, tokens, dedup, restore procedure    |
-| [`docs/delphi-install.md`](docs/delphi-install.md)              | Dated install walkthrough for delphi, plus the autoUpgrade path      |
-| [`docs/NUSHELL.md`](docs/NUSHELL.md)                    | Shell layer: `nu -c` config trap, secrets loader, LLM/decision commands, extras verdicts |
-| [`docs/frieren-access.md`](docs/frieren-access.md)             | frieren service-access runbook (LAN/tailnet matrix, DNS, direct ports) |
-| [`docs/dns-failover.md`](docs/dns-failover.md)                | Resolver pair, route vs node failover, why the `/32` cannot fail over |
-| [`docs/userland-package-ownership.md`](docs/userland-package-ownership.md) | Package ownership and role wiring                                      |
-| [`docs/eisen-llm-architecture.md`](docs/eisen-llm-architecture.md) | eisen LLM stack: design rationale, model roster, measured performance (runbook: `.agents/deploy/hosts/eisen.md`) |
-| [`taskfiles/README.md`](taskfiles/README.md)                | Taskfile ownership map and shard reference                             |
-| [`hosts/sledgehammer/USB.md`](hosts/sledgehammer/USB.md)          | Sledgehammer live USB creation guide                                   |
-| [`AGENTS.nix`](AGENTS.nix)                         | Decisions, proposals, open work and design studies as queryable notes |
-| [`MANUAL.md`](MANUAL.md)                          | Operator manual: services, ports, closed loop, DMS integration         |
-| [`.agents/SCHEMA.md`](.agents/SCHEMA.md)                  | Documentation/skill contract: budgets, status vocabulary, one fact one home |
-| [`docs/history/`](docs/history/)                      | Superseded narrative (audit/TODO/HANDOFF) — never linked as current    |
+## Compiled documentation
+
+There is no hand-kept file map here: the compiled surfaces are the map.
+
+| Asked for | Read |
+| :--- | :--- |
+| fleet catalog | `nix build .#artifacts.docs` → `docs/generated/fleet-inventory.md` |
+| knobs and profiles | same artifact → `modules-registry.md` (`modules.toml` is the source) |
+| notes, decisions, open work | `task ops:notes` (source: `AGENTS.nix`) |
+| structure: what touches what | `task ops:kg` (source: `.#knowledgeGraph`) |
+| the task contract | `task --list-all --json` (source: `lib/taskfile.nix`) |
+| what happened | `task agents:xs:list` (source: the xs store) |
+| a procedure | `docs/*.md` or a skill |
+| a superseded narrative | `docs/history/` |
+
+Start points that are procedures rather than facts: [`.agents/SCHEMA.md`](.agents/SCHEMA.md)
+(doc and skill contract), [`docs/task-control-plane.md`](docs/task-control-plane.md),
+[`docs/agent-contract.md`](docs/agent-contract.md), [`docs/nix-patterns.md`](docs/nix-patterns.md),
+[`docs/agent-turns.md`](docs/agent-turns.md), [`README.md`](README.md),
+[`MANUAL.md`](MANUAL.md), [`hosts/microvms/README.md`](hosts/microvms/README.md).
+
+Documentation is content that Nix compiles into a store path: one pure projection per artifact, no
+second renderer, nothing generated committed [[flake/policies.nix#generated-not-tracked]]. Content
+stays in markdown, CSS/JS in files the derivation reads, and a rendered surface is compiled from
+one registry [[flake/policies.nix#surfaces-are-compiled]]. Eval-time `readFile` is flake-scoped:
+`git add` an untracked `.md` before evaluating it.
+
+## Formatting and hooks
+
+`alejandra` is canonical; `statix` is advisory and never auto-applied
+[[flake/policies.nix#statix-advisory]]. `scripts/task/nix-fmt.sh` is the single implementation
+behind `dev:fmt`, `checks:nix:fix`, `checks:nix:lint`, `checks:nix:format` and the watcher — it
+takes `--tools deadnix,statix,alejandra` and resolves versions from the `flake.lock` pin, cached
+under `~/.cache/nixconfig-nixfmt/`.
+
+```bash
+task checks:nix:fix      # deadnix + alejandra, write
+task checks:nix:lint     # read-only gate: deadnix fails, statix reports
+task checks:nix:format   # read-only: alejandra --check
+task checks:nix:watch    # auto-format dirty files; stop with checks:nix:watch:stop
+```
+
+Four watch traps: killing the launching shell does not stop a grandchild watcher, task's shell has
+no `kill`, `--dry` still starts one, and `watch: true` is CLI-only. Always
+`task checks:nix:watch:stop`.
+
+`.githooks/pre-commit` runs the hard gates; `.githooks/pre-push` runs what CI's doc job runs
+(`scripts/task/docs-budget.sh`, `scripts/task/prose-tells.sh`, the digest pin). Enable once with
+`bash .git-hooks-setup.sh`. A missing tool is fetched from the pinned nixpkgs, so the hook behaves
+the same on every machine.
+
+## Fetched dependencies
+
+External fetches are registered in `modules/config/fetches.json` and resolved by
+`lib/fetches-extra.nix`; update hashes with `task dev:config:hash-update` (it runs
+`scripts/task/nix-hash-update.sh`).

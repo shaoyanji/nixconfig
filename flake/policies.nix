@@ -416,10 +416,7 @@
     )
     nixFiles;
 
-  # `docs/` is the site's navigation source, so an unreferenced page has no
-  # parent and no reader. A page earns its place by being linked from a living
-  # document — the same rule that keeps prose out of a `.nix` header.
-  docsFiles = filesWithSuffix "docs" ".md"; # The agent-facing prose surfaces: the manual and every skill are read into
+  # The agent-facing prose surfaces: the manual and every skill are read into
   # context on each turn, so their size is a cost, not an aesthetic. Shrink-only:
   # a cleanup lowers the number here in the same commit, and nothing may raise it.
   lineCount = p: builtins.length (lib.splitString "\n" (builtins.readFile p)) - 1;
@@ -469,21 +466,10 @@
   totalJudged = builtins.length (builtins.filter (l: lib.hasInfix "\"target\"" l) ledgerLines);
   disagreeCount = totalJudged - agreeCount;
 
-  # One blob of every .md/.nix in the tree, so "linked from somewhere" is one scan.
-  # A *link* counts (`](docs/x.md)` from the manual, `](./x.md)` from a sibling
-  # page); plain prose naming a file routes nobody to it.
-  treeText = lib.concatStringsSep "\n" (map builtins.readFile textSources);
-  links = base:
-    builtins.length (lib.splitString "](docs/${base})" treeText)
-    + builtins.length (lib.splitString "](./${base})" treeText)
-    - 2;
-  orphanDocs = builtins.filter (doc: links (baseNameOf doc) < 1) docsFiles;
-
   # Every tracked .nix / .md file, walked once: a header budget that only saw the
   # top level would miss the module tree, which is where the 30-line essays were.
   treeFiles = lib.filesystem.listFilesRecursive root;
   nixFiles = builtins.filter (p: lib.hasSuffix ".nix" (toString p)) treeFiles;
-  textSources = builtins.filter (p: let s = toString p; in lib.hasSuffix ".md" s || lib.hasSuffix ".nix" s) treeFiles;
   takeWhile = pred: xs:
     if xs == [] || !(pred (builtins.head xs))
     then []
@@ -595,7 +581,7 @@
     };
 
     agent-prose-budget = {
-      rule = "AGENTS.md (927 lines) and the body of every tracked SKILL.md (5280 lines today) are shrink-only — they are the prose an agent carries or loads, so a cleanup lowers the number here in the same commit. A skill's frontmatter is NOT counted: `lib/skills.nix` compiles it into the one-line index, so it is metadata, not context. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability.";
+      rule = "AGENTS.md (482 lines) and the body of every tracked SKILL.md (5280 lines today) are shrink-only — they are the prose an agent carries or loads, so a cleanup lowers the number here in the same commit. A skill's frontmatter is NOT counted: `lib/skills.nix` compiles it into the one-line index, so it is metadata, not context. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability.";
       proof = "line counts of AGENTS.md and of every tracked SKILL.md minus its frontmatter block";
       # Audited 2026-10-21: 215 lines removed by collapsing the shadowed
       # `.agents/skills/simplex-admin` copy (the module is canonical and the
@@ -606,8 +592,15 @@
       # measuring the wrong thing — bodies are 5280, and the cap is that number.
       # AGENTS.md 941 → 927 by deleting the namespace table, a third copy of
       # docs/task-control-plane.md, .agents/README.md and `task --list-all`.
-      holds = agentsLines <= 927 && skillLines <= 5280;
-      detail = "AGENTS.md ${toString agentsLines}/927 lines, skill bodies ${toString skillLines}/5280 — over budget means delete or an audited `Truth:` extension, not a renumber";
+      # Audited 2026-11-05: AGENTS.md 927 → 482. The manual had grown a second copy
+      # of every surface that now compiles one: the xs endpoint (docs/agent-turns.md),
+      # the verification protocol (docs/nix-patterns.md, the checks skill), the module
+      # tree and the documentation map (.#knowledgeGraph, .#artifacts.docs), the
+      # formatter table (scripts/task/nix-fmt.sh) and a packages section that claimed
+      # the output was {}. What remains routes. The map is gone, so `no-orphan-docs`
+      # went with it: reachability is the site index compiled from the graph.
+      holds = agentsLines <= 482 && skillLines <= 5280;
+      detail = "AGENTS.md ${toString agentsLines}/482 lines, skill bodies ${toString skillLines}/5280 — over budget means delete or an audited `Truth:` extension, not a renumber";
     };
 
     rebuild-flags-are-finite = {
@@ -955,13 +948,6 @@
         && has "scripts/task/data-ops.sh" "chmod 600"
         && has "scripts/task/data-ops.sh" ".nomedia";
       detail = "protect-private stopped widening-restoring to 0700/0600 or stopped planting sentinels";
-    };
-
-    no-orphan-docs = {
-      rule = "A `docs/*.md` page is reachable by a markdown link from the manual or a sibling page; an unlinked page is a page nothing routes to.";
-      proof = "docs/*.md against inbound `](…x.md)` links in AGENTS.md, README.md and sibling pages";
-      holds = orphanDocs == [];
-      detail = "docs nothing links to: ${lib.concatStringsSep ", " orphanDocs}";
     };
 
     surfaces-are-compiled = {

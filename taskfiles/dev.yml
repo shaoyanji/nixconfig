@@ -369,14 +369,15 @@ tasks:
       - bash scripts/task/inventory-menu.sh
 
   dev:inventory:sync:
-    desc: Synchronize AGENTS.md + fleet matrix (LLM cards) and build the generated docs
+    desc: Synchronize the compiled LLM cards (fleet matrix) and build the generated docs
     summary: >
       Three owners, run together: lib/home-agents.nix owns ~/AGENTS.md (a store
       symlink, no Python), compile-llm-specs.py owns the fleet matrix
       (.agents/fleet-matrix.md), and lib/docs.nix owns every generated doc page —
       which exists only as a store path (no repo copy to refresh), so that step is
-      a print. `#artifacts.docs` is in both architectures' package set, so the
-      docs step runs everywhere the repo is checked out.
+      a print. The repo AGENTS.md is hand-written routing and no step rewrites it.
+      `#artifacts.docs` is in both architectures' package set, so the docs step runs
+      everywhere the repo is checked out.
       Exit 0 = every owner refreshed and the docs path printed.
     cmds:
       - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --compile-fleet"

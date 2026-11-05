@@ -2,6 +2,43 @@
 {
   schemaVersion = 1;
   notes = {
+    dendritic-flake = {
+      title = "Dendritic flake — `self` as the only import root";
+      kind = "proposal";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-05";
+      summary = "Move to flake-parts with the dendritic pattern: every module, host and package is a flake output imported by name through `self`, so no file list is hand-maintained and finding a module's users is a graph query, not a grep across relative paths.";
+      from = ["d1-compiled-context"];
+      refs = {
+        modules = ["flake/outputs.nix" "flake/module-sets.nix" "flake/host-inventory.nix"];
+        tasks = ["checks:host" "checks:tasks"];
+        docs = ["docs/nix-patterns.md"];
+      };
+      body = ''
+        Problem: `flake/outputs.nix` assembles by hand. Hosts list their modules in
+        `flake/host-inventory.nix`, chains in `flake/module-sets.nix`, and a module
+        reaches a sibling with `import ../profiles/x.nix`. "Who uses this file" is a
+        grep across paths, which is the token cost the graph exists to remove.
+
+        Shape: `flake-parts` (`inputs.flake-parts` from hercules-ci/flake-parts — the
+        repo already speaks flakes, so this is one input, not a new framework). Each
+        `modules/**.nix` becomes a flake-parts module whose `config.flake.modules.nixos.<name>`
+        (and `.homeManager.<name>`) is imported by name through `self`. A host declares
+        `imports = [self.modules.nixos.base …]`, and `flake/host-inventory.nix` keeps
+        only `kind`, `system` and the host path.
+
+        Gate: one representative host per chain evaluates to the same toplevel
+        `drvPath` before and after, `checks:host HOST=<rep>` is green, and
+        `grep -rn 'import ../' modules | wc -l` falls to the files that import
+        data they own. Publishing already follows this rule (neocities, envs and
+        mataroa run from `taskfiles/`); the flake is the last surface that does not.
+
+        Exit: the three flake wiring files shrink to projections, and the note gains
+        `refs.modules` naming what landed. Until then the module wiring is beta: a
+        hand-wired import is what comes apart when a path moves.
+      '';
+    };
     d1-compiled-context = {
       title = "D1 — compile context, never hand-maintain a table";
       kind = "decision";

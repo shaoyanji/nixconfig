@@ -75,7 +75,7 @@ publication stays an operator decision, and an unattended run cannot make it.
   node, so a draft's *title* appears on the fleet docs site; its body does not
   (only `doc` and `skill` nodes carry text). Keep an unpublished headline out of
   `title:` if that matters — the slug is used when the title is blank.
-- **A draft is not a doc, and the gates know it.** `no-orphan-docs` covers
-  `docs/*.md`, `ops:docs:budget` covers the living documents, and the link scan
-  treats a draft as one more markdown file. `ideas/` is outside the first two on
-  purpose: nothing has to link to a draft for the tree to stay green.
+- **A draft is not a doc, and the gates know it.** `ops:docs:budget` covers the
+  living documents and the link scan treats a draft as one more markdown file.
+  Reachability is the compiled site index now, which lists every graph node, so
+  nothing has to link to a draft for the tree to stay green.

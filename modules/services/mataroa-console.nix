@@ -88,12 +88,17 @@ in {
 
     tokenSopsKey = lib.mkOption {
       type = lib.types.str;
-      default = "mataroa/api/key";
+      default = "mataroa_api_key";
       description = ''
         Key in `modules/secrets.yaml` the token secret reads. The tracked fleet
         file, not `modules/secrets/apikeys.yaml`: that directory is a submodule
         outside the flake, so a `sopsFile` pointing there is a path that does not
         exist in the store.
+
+        One flat segment, because sops-nix resolves `key` as a path: a key
+        written as `mataroa/api/key` makes the installer look for a top-level
+        `mataroa` and fail with "the key 'mataroa' cannot be found", which is a
+        build failure before activation, not a runtime one.
       '';
     };
 

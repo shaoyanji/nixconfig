@@ -144,13 +144,22 @@ def git_commit(message: str) -> None:
     if not CONFIG.get("commit"):
         return
     repo = str(state_dir())
+    # Identity on the command line, not in a config: the unit has no login shell
+    # and its HOME is the state directory, so `git commit` found no user.name and
+    # exited 128 — ten imported posts, an empty `git log`, and the edit trail the
+    # docs promise did not exist (measured 2026-11-05).
+    ident = [
+        "-c", "user.name=mataroa-console",
+        "-c", "user.email=mataroa-console@localhost",
+        "-c", "commit.gpgsign=false",
+    ]
     try:
         if not (state_dir() / ".git").is_dir():
             subprocess.run(["git", "init", "-q", repo], check=True, timeout=10)
         subprocess.run(["git", "-C", repo, "add", "-A"], check=True, timeout=10)
         run = subprocess.run(["git", "-C", repo, "diff", "--cached", "--quiet"], timeout=10)
         if run.returncode != 0:
-            subprocess.run(["git", "-C", repo, "commit", "-q", "-m", message],
+            subprocess.run(["git", "-C", repo, *ident, "commit", "-q", "-m", message],
                            check=True, timeout=10)
     except (OSError, subprocess.SubprocessError) as exc:
         sys.stderr.write(f"mataroa-console: git commit skipped ({exc})\n")
@@ -261,6 +270,9 @@ def pull() -> dict:
             continue
         write_post(slug, rp.get("title") or slug, rp.get("body") or "", rp.get("published_at") or "")
         imported.append(slug)
+    # Also on a pull that imported nothing: a repo whose earlier commits failed
+    # still has files and no history, and this is the one call that repairs it.
+    git_commit("pull: import remote posts")
     return {"imported": sorted(imported)}
 
 

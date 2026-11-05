@@ -11,7 +11,7 @@ metadata:
     related_skills: ['infra', 'checks']
 ---
 
-# `paste` — Fleet Pastebin (`pb`) Runbook
+# `paste` — fleet pastebin (`pb`) runbook
 
 Operational runbook and command reference for `pb`, the zero-configuration private fleet pastebin hosted on `frieren.lan` and served at `http://paste.frieren.lan`.
 
@@ -95,14 +95,14 @@ pb url a1b2c3d4
 
 The same `pb` utility works from any fleet machine (`netbook`, `poseidon`, `eisen`, `cassini`) that has SSH access to `frieren`.
 
-### Configuration via Environment Variables
+### Configuration via environment variables
 
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
 | `PASTE_SSH_TARGET` | `devji@192.168.3.25` | SSH target for uploads (can be set to `devji@frieren-ts` or `devji@100.97.61.65`) |
 | `PASTE_BASE_URL` | `http://paste.frieren.lan` | Base URL printed by `pb` |
 
-### Example: Running from Off-LAN or Remote Machine over Tailscale
+### Example: running from off-LAN or remote machine over Tailscale
 ```bash
 export PASTE_SSH_TARGET="devji@100.97.61.65"
 cat /var/log/syslog | pb

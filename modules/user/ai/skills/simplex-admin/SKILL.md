@@ -6,13 +6,13 @@ description: >-
   issue invitations, and route encrypted messages between autonomous host agents and human users.
 ---
 
-# SimpleX Admin Skill
+# SimpleX admin skill
 
 Declarative fleet administration and inter-agent communication protocol powered by **SimpleX Chat**.
 
-SimpleX Chat is an asynchronous, privacy-preserving messaging protocol that uses unilateral message queues (SMP protocol) without user identifiers, phone numbers, or central servers. In the homelab fleet, it serves as the zero-trust communication bus connecting autonomous host agents (`frieren`/Hermes, `guckloch`/Antigravity, future node agents) and human users (`devji`).
+SimpleX Chat is an asynchronous, privacy-preserving messaging protocol that uses unilateral message queues (SMP protocol) without user identifiers, phone numbers, or central servers. In this fleet it is the zero-trust bus between autonomous host agents (`frieren`/Hermes, `guckloch`/Antigravity, future node agents) and human users (`devji`).
 
-## Architecture & Fleet Topology
+## Architecture & fleet topology
 
 ```text
                ┌────────────────────────────────────────────────────────┐
@@ -46,7 +46,7 @@ SimpleX Chat is an asynchronous, privacy-preserving messaging protocol that uses
 
 ---
 
-## Declarative NixOS Setup
+## Declarative NixOS setup
 
 All dependencies and daemon configurations are defined declaratively in `nixconfig`.
 
@@ -73,7 +73,7 @@ rejects one.
 
 ---
 
-## Hermes Agent Integration & Environment Configuration
+## Hermes agent integration & environment configuration
 
 Reference: [Hermes SimpleX Guide](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/simplex)
 
@@ -95,11 +95,11 @@ Hermes communicates with the SimpleX Chat daemon via WebSocket JSON-RPC. Platfor
 
 ---
 
-## WebSocket JSON-RPC Protocol
+## WebSocket JSON-RPC protocol
 
 When `simplex-chat -p <port>` is running, clients communicate over a WebSocket connection using JSON frames:
 
-### Request Frame
+### Request frame
 ```json
 {
   "corrId": "req-1",
@@ -107,7 +107,7 @@ When `simplex-chat -p <port>` is running, clients communicate over a WebSocket c
 }
 ```
 
-### Response Frame
+### Response frame
 ```json
 {
   "corrId": "req-1",
@@ -119,7 +119,7 @@ When `simplex-chat -p <port>` is running, clients communicate over a WebSocket c
 }
 ```
 
-### Key Daemon Commands
+### Key daemon commands
 * `/groups`: List known groups.
 * `/members #<group>`: Inspect members and connection states.
 * `#<group> <message>`: Send a message to a group.
@@ -130,7 +130,7 @@ When `simplex-chat -p <port>` is running, clients communicate over a WebSocket c
 
 ---
 
-## Inter-Agent Communication (`simplex-rpc.py`)
+## Inter-Agent communication (`simplex-rpc.py`)
 
 A bundled helper script is provided at `scripts/simplex-rpc.py`:
 
@@ -148,7 +148,7 @@ python3 scripts/simplex-rpc.py --send-contact "@frieren" "ping: offloading nixos
 python3 scripts/simplex-rpc.py "/groups"
 ```
 
-### Headless CLI Mode (Without Daemon Port)
+### Headless CLI mode (without daemon port)
 On nodes running the standalone client without an open WebSocket port, use the `-e` flag:
 ```bash
 simplex-chat -e "#Fleet guckloch ready for pair-programming."
@@ -156,7 +156,7 @@ simplex-chat -e "#Fleet guckloch ready for pair-programming."
 
 ---
 
-## Adding Future Host Agents
+## Adding future host agents
 
 To onboard a new host agent (e.g. `nas`, `serv00`, `air`):
 1. **Include Package**: Add `simplex-chat` and `python3.withPackages [ websockets ]` to the host's configuration.
@@ -167,7 +167,7 @@ To onboard a new host agent (e.g. `nas`, `serv00`, `air`):
 
 ---
 
-## Self-Hosted Private SMP Server (`smp-server`)
+## Self-hosted private SMP server (`smp-server`)
 
 To eliminate reliance on public relays (`smp5.simplex.im`, etc.), the fleet runs a dedicated private SMP message broker on `frieren` via `modules/services/simplex-smp-server.nix`.
 

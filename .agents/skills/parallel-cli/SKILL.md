@@ -11,7 +11,7 @@ metadata:
     related_skills: []
 ---
 
-# `parallel-cli` — Web Search / Research / Monitoring for Agents
+# `parallel-cli` — web search / research / monitoring for agents
 
 Managed web-intelligence CLI: AI search, open-ended deep research, clean
 markdown extraction from URLs, entity discovery, and change monitoring.

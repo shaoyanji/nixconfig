@@ -1,4 +1,4 @@
-# CI Pipeline
+# CI pipeline
 
 One workflow, `.github/workflows/nixcachix.yml`, builds the fleet on GitHub
 runners and pushes to the `shaoyanji` cache. There is **no build matrix to

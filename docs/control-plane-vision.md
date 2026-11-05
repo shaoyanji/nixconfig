@@ -1,4 +1,4 @@
-# Control Plane — Vision (Nix-as-generator)
+# Control plane — vision (Nix-as-generator)
 
 > **Status:** vision / north-star document. Aspirational, not a committed design.
 > Companion to [`control-plane-architecture.md`](./control-plane-architecture.md),
@@ -79,7 +79,7 @@ drop, more of the site can move *into* Nix evaluation, including:
 - Lazy-trees benefit is **flake source scoping**; it is not a blanket "eval is
   now fast". Measure against *our* tree before betting on it.
 - Adopting Determinate Nix is a **fleet-wide change** to the Nix binary
-  (upgrade path, channel/compat, NixOS module interplay) — a milestone, not a
+  (upgrade path, channel/compat, how modules interact) — a milestone, not a
   drop-in.
 - Upstream and Lix may converge on equivalent mechanisms later; the vision
   should depend on the *capability* (cheap eval over a big tree), not a vendor.
@@ -98,7 +98,7 @@ The architecture doc's split is not a compromise — it is the correct seam give
 So: **Nix compiles the world's facts; Go serves them and lets you act on them.**
 The "dynamic site" is Go; the "site about Nix" is Nix.
 
-## 6. Closure traversal as a Nix primitive
+## 6. Closure traversal as a Nix function
 
 Today closure analysis is a shell tool reading the store DB (`closure-analysis.sh`)
 because it is cheap and needs no eval. The vision closes that loop: a Nix
@@ -140,16 +140,16 @@ Findings worth keeping:
   `--round=up` sizing (not round-to-nearest) and GNU `sort`'s two different
   tie-break orders. Numbers matching is the easy half.
 
-The remaining gap to a true *primitive* is the one §4 describes: passing
+The remaining gap is the one §4 describes: passing
 `config.system.build.toplevel` straight in, so no store path is named by hand and
 no nixpkgs import is paid outside the flake's own evaluation.
 
-## 7. The Hyper-Minimal Static SPA via Aki (~270 B Hypermedia)
+## 7. A static SPA from aki (~270 B)
 
-### The Concept
-While dynamic control actions (rebuilding, restarting units, SSE telemetry) eventually benefit from a runtime server (Go + Datastar in §5), **browsing, closure exploration, subsystem filtering, and doc traversal are read-only operations**.
+### Why it fits
+Rebuilding a host, restarting a unit and streaming SSE telemetry need a runtime server (Go + Datastar in §5). Browsing, closure exploration, subsystem filtering and doc traversal are read-only.
 
-The research round into **[`vilgacx/aki`](https://github.com/vilgacx/aki)** reveals an ultra-minimal hypermedia primitive (~270 bytes minified) that completely eliminates the need for any runtime server or client framework for interactive exploration:
+**[`vilgacx/aki`](https://github.com/vilgacx/aki)** is 270 bytes minified and needs no runtime server or client framework:
 ```javascript
 window.onload = () => {
   document.querySelectorAll('[url][fn]').forEach((element) => {
@@ -169,7 +169,7 @@ window.onload = () => {
 };
 ```
 
-### Feasibility Proof: Nix as the Compiler of Effects
+### Nix generates the payloads
 1. **The Contract**: `aki` executes a declarative JSON payload targeting CSS selectors:
    ```json
    {
@@ -182,7 +182,7 @@ window.onload = () => {
      }
    }
    ```
-2. **Pure Nix Generation**: Nix generates both the shell and the entire universe of interactive transitions at build time:
+2. **Pure Nix generation**: Nix generates the shell and every interactive payload at build time:
    ```nix
    # Pure derivation emits index.html, aki.min.js, and static data/ slice files
    pkgs.writeTextDir "site/data/closure/speech-dispatcher.json" (builtins.toJSON {
@@ -198,38 +198,37 @@ window.onload = () => {
    - Every node in the closure tree or host in the inventory is rendered as:
      `<button url="data/closure/${node.hash}.json" fn="onclick">${node.name}</button>`
    - When clicked, `aki` fetches the static pre-compiled JSON slice and updates the DOM in place.
-   - One static `index.html` file can traverse an entire 3,900-node NixOS closure, switch between host inventories, and toggle subsystem views with zero server daemon, zero Node/Vite build steps, and zero client hydration overhead.
-4. **Hosting**: Serves directly from frieren's existing Nginx (`docs.frieren.lan`), GitHub Pages, or local filesystem viewing.
+   - One static `index.html` traverses a 3,900-node NixOS closure, switches host inventories and toggles subsystem views, with no server daemon, no Node/Vite build and no client hydration.
+4. **Hosting**: Nginx on frieren (`docs.frieren.lan`), GitHub Pages, or a local file.
 
 ---
 
-## 8. Scale Migration to Resource-Managed MicroVM Services (Model B)
+## 8. Moving services into resource-capped MicroVMs (Model B)
 
-A fundamental tension on `frieren` has been the explosion of bare-metal background daemons (watchdogs, audits, scrapers, vector indexers, and services) competing for limited host RAM (11.5 GB) and I/O. Traditionally, mitigating this required building complex System 0/1/2 polling daemons and memory governors to prevent host starvation.
+Background daemons on `frieren` (watchdogs, audits, scrapers, vector indexers) compete for 11.5 GB of RAM and the same disk. Preventing host starvation used to mean System 0/1/2 polling daemons and memory governors.
 
-**The Model B Paradigm Shift:**
-Instead of polling and managing processes on bare metal, services are progressively migrated into dedicated, resource-capped MicroVMs (`cloud-hypervisor` via `microvm.nix` and `virtiofs`):
+Model B moves services off bare metal into dedicated, resource-capped MicroVMs (`cloud-hypervisor` via `microvm.nix` and `virtiofs`):
 
-1. **Kernel-Enforced Resource Capping:**
+1. **Resource capping in the kernel:**
    - Every service or cluster runs inside an isolated microVM with strict vCPU and memory ceilings (e.g. 2 vCPUs, 2048 MB RAM).
-   - CPU contention and memory pressure are arrested at the hypervisor barrier; runaway workloads cannot starve bare-metal NAS storage (`btrfs`), video streaming (`jellyfin`), or host networking.
-   - Daemons no longer need proactive polling loops to monitor memory pressure—the hypervisor boundary enforces it statically.
+   - The hypervisor cap stops CPU contention and memory pressure there, so a runaway workload cannot starve NAS storage (`btrfs`), video streaming (`jellyfin`) or host networking.
+   - Daemons no longer need polling loops to watch memory pressure.
 
-2. **Zero-Copy Nix Store Sharing over Virtiofs:**
+2. **Store sharing over virtiofs:**
    - Guest MicroVMs share the host's `/nix/store` read-only via `virtiofs` (`ro-store`) with a minimal copy-on-write overlay (`/nix/.rw-store`).
-   - Disk consumption is negligible (< 10 MB overlay overhead per instance), eliminating the heavy disk duplication of traditional full-system VMs or duplicate Docker image layers.
-   - Boot latency is sub-4 seconds; teardown is instantaneous and free of unmount deadlocks (`DefaultDependencies = false`).
+   - The overlay costs under 10 MB per instance, where a full-system VM or a duplicated Docker image would copy the disk.
+   - Boot takes under 4 seconds; teardown does not block on unmount (`DefaultDependencies = false`).
 
-3. **Hypervisor Ingress & Tailscale Subnet Continuity:**
+3. **Ingress and Tailscale reach:**
    - Services inside the MicroVM bind internal virtual interfaces on the host bridge (`brlan` on `192.168.83.1/24`).
-   - The bare-metal host's Nginx acts as the single reverse proxy ingress point, mapping virtual hosts and paths (e.g. `service.frieren.lan` or `/service/`) to guest IPs.
-   - Remote clients access these services transparently over Tailscale (`100.97.61.65` or MagicDNS), with zero requirement for fragile Tailscale subnet route advertising.
-   - **Teardown Resiliency:** If a MicroVM is stopped or rebuilt, Nginx cleanly returns `504 Gateway Time-out`. Upon VM boot, connections immediately and automatically restore with zero reload or route flap.
+   - The host's Nginx is the single ingress, mapping virtual hosts and paths (e.g. `service.frieren.lan` or `/service/`) to guest IPs.
+   - Remote clients reach these services over Tailscale (`100.97.61.65` or MagicDNS) without subnet route advertising.
+   - **Teardown:** If a MicroVM stops or rebuilds, Nginx returns `504 Gateway Time-out`; when it boots again, connections restore with no reload and no route flap.
 
-4. **Phased Migration Roadmap:**
-   - **Phase 1 (Canary Sandbox - Complete):** Validated in EXP-102 via `frieren-canary` with automated boot, persistent SSH key recognition, and dummy service Tailscale verification.
-   - **Phase 2 (Auxiliary & Non-Stateful Services):** Migrate standalone services such as Kiwix offline library, Gatus monitoring backend, Paperless worker queues, and isolated HTTP bridges into microVMs.
-   - **Phase 3 (Consolidated Fleet Workloads):** Transition heavy, memory-bursting workloads (e.g. Immich ML inference, local AI helpers) into bounded VM containers while keeping primary storage datasets on the host Btrfs pools.
+4. **Phases:**
+   - **Phase 1 (canary sandbox, complete):** EXP-102 proved it with `frieren-canary`: automated boot, persistent SSH key recognition and dummy-service Tailscale verification.
+   - **Phase 2 (auxiliary, stateless services):** Kiwix, Gatus, the Paperless worker queues and isolated HTTP bridges.
+   - **Phase 3 (fleet workloads):** heavy, memory-bursting workloads such as Immich ML inference and local AI helpers, with primary datasets left on the host Btrfs pools.
 
 ---
 
@@ -254,5 +253,5 @@ Instead of polling and managing processes on bare metal, services are progressiv
 
 - No per-request evaluation of the flake — that is the wall this vision respects.
 - No vendored web build chain (no Node/npm); `aki.js` is 270 bytes; Datastar is one fetched file.
-- No hand-maintained second source of truth — everything is a primitive.
+- No hand-maintained second source of truth; every page comes from the compiled data.
 - Don't couple the vision to one Nix distribution; target the *capability*.

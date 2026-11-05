@@ -12,7 +12,7 @@ High-core gaming desktop, Sunshine GameStream server, and high-RAM local AI infe
 
 ---
 
-## Hardware Sizing & Memory Topology
+## Hardware sizing & memory topology
 
 | Component | Specification | AI Inference Role |
 | :--- | :--- | :--- |
@@ -26,7 +26,7 @@ High-core gaming desktop, Sunshine GameStream server, and high-RAM local AI infe
 
 ---
 
-## Serving Design: `llama-swap` in front of native `llama-server`
+## Serving design: `llama-swap` in front of native `llama-server`
 
 **Why `llama-swap` instead of plain `services.llama-cpp`?** The two models cannot co-reside in 62 GiB (21 GiB + 44 GiB > 62 GiB). `llama-swap` exposes **one** OpenAI-compatible endpoint (`:8080`) and starts/unloads a `llama-server` child per requested model, so the fleet never has to know which model is currently resident.
 
@@ -62,7 +62,7 @@ Shared per-model flags:
 - **`--jinja`** is required for the models' tool-call / chat templates.
 - **Threads are split per phase** (`mkCmd { threads = …; threadsBatch = …; }`): generation runs on **12 physical cores** for every model, and Kolibri additionally runs prompt processing on **24** (`--threads-batch`). Measured 2026-10-19 on the patched build (45 GiB GGUF, CPU path because no DRM node): tg128 **9.17 t/s at 12 vs 8.42 at 24**, pp256 **47.41 vs 64.70**. Generation is bandwidth-bound (SMT hurts), prompt processing is compute-bound (SMT helps). Re-run `llama-bench -m /mnt/storage/models/Kolibri-1-Q4_K_M.gguf -t 12 -t 24 -p 256 -n 128 -r 3 -ngl 99 -ot exps=CPU` if the GPU returns.
 
-### Speculative Decoding (Qwen only, measured)
+### Speculative decoding (Qwen only, measured)
 
 `qwen3.6-35b-a3b` runs with a **DFlash2** block-diffusion draft head (`aminya/Qwen3.6-35B-A3B-DFlash2-GGUF`, Q8_0, 570 MB) fully resident in VRAM:
 
@@ -87,7 +87,7 @@ What does **not** work here — recorded so it is not re-litigated:
 - **n-gram speculation is a wash on this workload:** `ngram-simple` 13.79, `ngram-map-k4v` 13.52, `ngram-cache` 12.54 tok/s against a 13.76 baseline — free-form reasoning and code leave it nothing to copy.
 - **Kolibri-1 has no draft head**, so it runs at the plain baseline rate.
 
-### Model Weights (fetched, not vendored)
+### Model weights (fetched, not vendored)
 
 Both GGUFs live on the persistent `/mnt/storage` array and are fetched by two idempotent, resumable oneshot units:
 
@@ -103,11 +103,11 @@ Both use `unitConfig.ConditionPathExists = "!<file>"` and `curl -fL --retry 5 -C
 
 ---
 
-## Model Roster
+## Model roster
 
 | Model | Total / Active | Quant | Aliases | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| 🌟 **Qwen3.6-35B-A3B** | 35B / **~3B** | `Q4_K_M` (22.5 GB) | `qwen3.6-35b-a3b`, `qwen` | Primary champion: 2026 agentic coding/thinking-preservation MoE. Whole expert pool fits with ~40 GiB RAM to spare. |
+| **Qwen3.6-35B-A3B** | 35B / **~3B** | `Q4_K_M` (22.5 GB) | `qwen3.6-35b-a3b`, `qwen` | Primary champion: 2026 agentic coding/thinking-preservation MoE. Whole expert pool fits with ~40 GiB RAM to spare. |
 | **Aleph-Alpha Kolibri-1** | 78B / **3.46B** | `Q4_K_M` (44.2 GB) | `kolibri-1`, `kolibri`, `aleph` | German + English MoE (Apache 2.0, ctx up to 262144). Loads via the patched llama.cpp build — see Serving Design above. |
 
 Larger Kolibri quants exist (`Q3_K_M` ≈ 37.5 GB, `Q5_K_M` split in two parts) but `Q4_K_M` is the best fit for 62 GiB alongside the OS and Steam.
@@ -138,7 +138,7 @@ A completion smoke test is in the runbook: `Deploy & Validate` in
 
 ---
 
-## Decision Model: Laya (`laya.lan`, CPU-only)
+## Decision model: Laya (`laya.lan`, CPU-only)
 
 A 421M "System One" decision model that answers typed questions about one document and returns **no text** — just calibrated probabilities over options supplied at request time. It implements the same `POST /v1/systemone` contract as TypeSafe's hosted Jev, so a Jev client works by changing the base URL; this fleet has no hosted Jev, which is why it exists here.
 
@@ -182,7 +182,7 @@ Do not hand-run `laya-serve`: the declarative unit owns `:8090` (the same rule a
 
 ---
 
-## Gaming Coexistence (auto-yield)
+## Gaming coexistence (auto-yield)
 
 eisen is a gaming desktop first, so `llama-swap-gaming-guard.service` **stops `llama-swap` while a Steam game is running** and restarts it when the game exits. That returns the model's RAM (21 GiB Qwen / 44 GiB Kolibri) and, measured with Qwen loaded, **5,367 MiB of the 8 GiB VRAM** to the game — a model left resident would hold roughly two-thirds of the GPU while the game fights it for the rest. While yielded, the API answers connection-refused rather than that half-starved state.
 
@@ -192,7 +192,7 @@ Verified on 2026-10-09: no false positive with Steam idle and the full game libr
 
 ---
 
-## Measured Performance (2026-10-09, generation 10)
+## Measured performance (2026-10-09, generation 10)
 
 First real completions after the initial switch, all served through the declarative stack (llama-swap → nginx / tailscale serve):
 

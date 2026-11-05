@@ -32,7 +32,7 @@ Requires the crush CLI.
 - Must run inside a git repository — Crush requires git context
 - Use `pty=true` in terminal calls — Crush is an interactive terminal app
 
-## Key Flags
+## Key flags
 
 | Flag | Description |
 |------|-------------|
@@ -43,7 +43,7 @@ Requires the crush CLI.
 | `--verbose` | Show logs |
 | `--reasoning-effort <level>` | Set reasoning effort (high/medium/low) |
 
-## One-Shot Tasks
+## One-shot tasks
 
 ```bash
 terminal(command="crush run --yolo 'Add dark mode toggle to settings'", workdir="~/project", pty=true)
@@ -54,7 +54,7 @@ For scratch work:
 terminal(command="cd $(mktemp -d) && git init && crush run --yolo 'Build a snake game in Python'", pty=true)
 ```
 
-## Background Mode (Long Tasks)
+## Background mode (long tasks)
 
 ```bash
 # Start in background with PTY
@@ -72,7 +72,7 @@ process(action="submit", session_id="<id>", data="yes")
 process(action="kill", session_id="<id>")
 ```
 
-## Verification Protocol
+## Verification protocol
 
 Before deploying, always verify:
 1. `git status` is clean

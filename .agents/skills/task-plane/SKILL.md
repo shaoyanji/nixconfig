@@ -122,7 +122,7 @@ and stop at the first rung that works:
 | 5 | a `checks:*` gate | ~13 s (one host) | a regression that must fail a build |
 | 6 | a task in an existing shard | seconds | a repeatable operator workflow |
 | 7 | a shell script in `scripts/task/` | — | only the body of rung 6, never an entrypoint |
-| 8 | a packaged Go binary | build | the thing ships to hosts or needs concurrency/robust parsing |
+| 8 | a packaged Go binary | build | the thing ships to hosts or needs concurrency or strict parsing |
 
 Anti-patterns found in this repo (do not repeat):
 

@@ -375,20 +375,13 @@ tasks:
       symlink, no Python), compile-llm-specs.py owns the fleet matrix
       (.agents/fleet-matrix.md), and lib/docs.nix owns every generated doc page —
       which exists only as a store path (no repo copy to refresh), so that step is
-      a print. It skips on a system whose artifact set does not carry
-      `#artifacts.docs` (flake/packages.nix builds it on x86_64-linux, where the
-      pages are served): asking delphi for it failed an otherwise-complete sync.
-      Exit 0 = every owner refreshed, docs printed or explicitly skipped.
+      a print. `#artifacts.docs` is in both architectures' package set, so the
+      docs step runs everywhere the repo is checked out.
+      Exit 0 = every owner refreshed and the docs path printed.
     cmds:
       - nix-shell -p python3 --run "python3 scripts/task/compile-llm-specs.py --compile-fleet"
       - task dev:inventory:home-agents
-      - cmd: |-
-          sys="$(nix eval --impure --raw --expr builtins.currentSystem)"
-          if nix eval --json ".?submodules=1#packages.${sys}.artifacts" --apply builtins.attrNames 2>/dev/null | grep -q '"docs"'; then
-            task docs:build
-          else
-            echo "docs:build skipped on ${sys}: #artifacts.docs is not in this system's set (flake/packages.nix gates it to the host that serves the pages), and the tree is a store path, so the repo has nothing to refresh"
-          fi
+      - task docs:build
 
   dev:inventory:counts:
     desc: Recompute inventory.toml's derived [metadata] counts from .hosts
@@ -658,10 +651,11 @@ tasks:
   # checked in (docs/generated/ used to be, which is why a drift gate had to
   # exist — see docs/docs-pipeline-audit.md §4).
   docs:build:
-    desc: Build the generated docs tree + nav from compiled metadata (nix build .?submodules=1#artifacts.docs)
+    desc: Build the generated docs tree from compiled metadata (nix build .?submodules=1#artifacts.docs)
     summary: >
       Prints the store path of the generated docs: fleet-inventory.md,
-      modules-registry.md, hosts/<h>.md and nav.json (the site manifest).
+      modules-registry.md, hosts/<h>.md and the AGENTS.nix note pages. There is
+      no nav file — the site derives navigation from the knowledge graph.
       Nothing in the repo is written; read the pages from that path, or from
       the served site (`.?submodules=1#sites.fleet-docs-site`).
     cmds:

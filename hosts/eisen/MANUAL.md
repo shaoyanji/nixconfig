@@ -1,4 +1,4 @@
-# Eisen Strata MoE Inference Manual: Qwen3.8-Flash-Next on RX 5700 (Navi 10 / gfx1010)
+# Eisen Strata MoE inference manual: Qwen3.8-Flash-Next on RX 5700 (Navi 10 / gfx1010)
 
 This manual documents the architecture, operations, tuning, and API consumption for running **Qwen3.8-Flash-Next** (125B MoE) on Eisen's AMD Radeon RX 5700 via **Strata**'s HIP backend.
 
@@ -13,7 +13,7 @@ This manual documents the architecture, operations, tuning, and API consumption 
 | **System RAM** | **64 GiB DDR3-1600** (4 × 16 GiB unbuffered, dual-channel) | Holds resident MoE expert arena in page-locked host memory (~23–32 GiB for `IQ1_M`). ~25.6 GB/s peak: this, not capacity, sets decode speed. |
 | **Storage** | **14.6 TB btrfs `/mnt/storage`** | Engine source/binaries at `/mnt/storage/strata`, model shards and packs at `/mnt/storage/strata-data`. |
 
-### Zero-Pollution FHS Container Isolation
+### Zero-Pollution FHS container isolation
 Host Mesa and RADV Vulkan drivers remain 100% clean and unpolluted. No system-wide ROCm packages are installed.
 Strata compiles and executes inside a hermetic Nix `buildFHSEnv` (`strata-fhs`) providing standard glibc/libstdc++ headers alongside official AMD TheRock ROCm 7.14 `gfx101X-dgpu` wheels in `/mnt/storage/strata/.venv`.
 
@@ -21,7 +21,7 @@ Strata compiles and executes inside a hermetic Nix `buildFHSEnv` (`strata-fhs`) 
 
 ## 2. Service Endpoints & Network Access
 
-Strata serves an OpenAI- and Anthropic-compatible API on **port 8085**, seamlessly integrated into Eisen's reverse proxy and Tailnet topology:
+Strata serves an OpenAI- and Anthropic-compatible API on **port 8085**; Eisen's reverse proxy exposes it on the tailnet:
 
 ```
 [Local Host]        ──> http://127.0.0.1:8085/v1/chat/completions (Direct engine)
@@ -31,7 +31,7 @@ Strata serves an OpenAI- and Anthropic-compatible API on **port 8085**, seamless
 [Decision Router]   ──> http://eisen.lan/router/                 (Nginx :80 -> :8000)
 ```
 
-### Health & Model Discovery
+### Health & model discovery
 ```bash
 # Check service health
 curl -s http://127.0.0.1:8085/health
@@ -118,13 +118,13 @@ Strata's reference card reaches 40–50 tok/s on 16 GB by combining four optimiz
 3. **Adaptive Asynchronous Swaps (`--adapt-async 1`)**:
    - Swaps expert slices between host DDR3-1600 RAM and GPU VRAM asynchronously across verification windows without stalling generation.
 4. **Pool Worker Affinity (`--pool-workers 11 --host-core first`)**:
-   - Binds the host event loop to Core 0 while worker threads utilize remaining physical Haswell-EP cores for expert dot-products.
+   - Binds the host event loop to Core 0 while worker threads use the remaining physical Haswell-EP cores for expert dot-products.
 
 ---
 
 ## 6. Service Management & Gaming Guard
 
-### Lifecycle Commands
+### Lifecycle commands
 ```bash
 # Check Strata systemd service status
 systemctl status strata.service
@@ -136,7 +136,7 @@ journalctl -u strata.service -f
 sudo systemctl restart strata.service
 ```
 
-### Automatic Gaming Yield
+### Automatic gaming yield
 The `llama-swap-gaming-guard` unit polls `/proc/[0-9]*/exe` every 15 seconds. If any process executes under `*/steamapps/common/*`, the guard automatically suspends `strata.service` to release 100% of GPU VRAM to Steam/Gamescope/Proton, and resumes Strata once the game exits.
 
 ---

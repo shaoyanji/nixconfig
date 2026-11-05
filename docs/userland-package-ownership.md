@@ -1,4 +1,4 @@
-# Userland Package Ownership
+# Userland package ownership
 
 Who guarantees what, so a host does not re-declare a package its role already
 owns. The path is the module that owns the property; hosts are consumers.

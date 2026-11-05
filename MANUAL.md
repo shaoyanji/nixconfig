@@ -1,4 +1,4 @@
-# frieren — Operator Manual
+# frieren — operator manual
 
 > The manual for the live fleet mainframe: what is running, how to reach it, what
 > is new, and how to tell whether the config actually worked. Design rationale is

@@ -11,7 +11,7 @@ metadata:
     related_skills: []
 ---
 
-# `wikisearch` — Universal Kiwix & Offline Wiki Search Runbook
+# `wikisearch` — universal Kiwix & offline wiki search runbook
 
 A fast, low-overhead offline knowledge retrieval system using Kiwix and embedded Xapian BM25 indices on `frieren.lan`.
 
@@ -170,20 +170,20 @@ wikisearch --status
 
 To expand the knowledge base with any new wiki (e.g. Wikivoyage, DevDocs, ArchWiki, StackExchange, PubMed):
 
-### Step 1: Add the ZIM declaratively
+### Step 1: add the ZIM declaratively
 Add a `fetchurl` entry to `zims` in `modules/services/kiwix.nix` (use `nurl <url>`
 for the hash) and add it to the `kiwix-manage`-equivalent book list in the
 `kiwixLibrary` writeText. Rebuild — `kiwix-manage` is no longer used manually.
 
-### Step 2: Add it to the declarative library
+### Step 2: add it to the declarative library
 Append a matching book entry to the `kiwixLibrary` writeText in the same file
 (id can be any unique UUID; `articleCount`/`size` are display-only). Never run
 `kiwix-manage` by hand — the declarative library.xml overwrites it.
 
-### Step 3: Automatic Hot-Reload
+### Step 3: automatic hot-reload
 `kiwix-serve.service` runs with the `-M` flag, which watches `library.xml` and reloads immediately without restarting or dropping connections.
 
-### Step 4: Verify and Query Immediately
+### Step 4: verify and query immediately
 ```bash
 # Confirm both declared archives (Wikipedia + ArchWiki) are served:
 wikisearch --list

@@ -34,7 +34,7 @@ task ops:kg:blast TARGET=host:frieren            # includes the drafts about fri
 task ops:kg:sidecar COMMAND=node ID=idea:<slug>  # a draft's neighbourhood, both ways
 ```
 
-## Scaffolding one
+## Creating one
 
 ```bash
 task dev:blog:draft TOPIC="why the graph needed references"

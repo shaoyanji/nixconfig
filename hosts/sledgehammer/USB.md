@@ -1,4 +1,4 @@
-# Sledgehammer USB Creation Guide
+# Sledgehammer USB creation guide
 
 ## Overview
 Sledgehammer is a purpose-built NixOS live USB for headless fleet provisioning. It includes:
@@ -15,7 +15,7 @@ This guide walks through creating a bootable Sledgehammer USB from your NixOS fl
 - Local clone of this repository
 - SSH key pair for authentication (your public key needs to be authorized for SSH access to the live USB)
 
-## ⚠️ Critical Safety Warnings
+## ⚠️ critical safety warnings
 1. **ALL DATA ON THE USB DRIVE WILL BE PERMANENTLY ERASED.** Backup any important files first.
 2. Double-check the USB device path (e.g., `/dev/sdX`) before running any destructive commands. Using the wrong device can destroy your system's data.
 3. Disable Secure Boot on target machines before booting from the USB.
@@ -23,7 +23,7 @@ This guide walks through creating a bootable Sledgehammer USB from your NixOS fl
 
 ---
 
-## Step 1: Identify Your USB Device
+## Step 1: identify your USB device
 Insert your USB drive, then list block devices to find its path:
 ```bash
 lsblk
@@ -42,7 +42,7 @@ sdc      8:32   1  14.9G  0 disk   # This is your USB (note path: /dev/sdc)
 
 ---
 
-## Step 2: Update USB Device Path in Config
+## Step 2: update USB device path in config
 The Sledgehammer config hardcodes the USB device as `/dev/sdb`. Update this to your actual USB path:
 
 1. Open the Sledgehammer configuration:
@@ -63,7 +63,7 @@ nano hosts/sledgehammer/configuration.nix
 
 ---
 
-## Step 3: Partition USB with Disko
+## Step 3: partition USB with disko
 Disko will create a GPT partition table with:
 - 1MB BIOS boot partition (type EF02)
 - 512MB EFI System Partition (ESP, vfat)
@@ -80,7 +80,7 @@ sudo nix run github:nix-community/disko -- \
 
 ---
 
-## Step 4: Mount Partitions for Installation
+## Step 4: mount partitions for installation
 After Disko finishes, mount the new partitions to `/mnt`:
 ```bash
 # Replace /dev/sdX with your USB device (e.g., /dev/sdc)
@@ -97,7 +97,7 @@ lsblk /dev/sdX
 
 ---
 
-## Step 5: Install NixOS to USB
+## Step 5: install NixOS to USB
 Run the NixOS installer using your flake config:
 ```bash
 sudo nixos-install \
@@ -114,7 +114,7 @@ During installation:
 
 ---
 
-## Step 6: Unmount and Finalize
+## Step 6: unmount and finalize
 After installation completes:
 ```bash
 sudo umount /mnt/boot
@@ -126,7 +126,7 @@ Remove the USB drive from your system.
 
 ---
 
-## Step 7: Boot from Sledgehammer USB
+## Step 7: boot from Sledgehammer USB
 1. Insert USB into target machine
 2. Power on and enter boot menu (usually F12, F2, or Del during startup)
 3. Disable Secure Boot in BIOS/UEFI settings
@@ -135,7 +135,7 @@ Remove the USB drive from your system.
 
 ---
 
-## Step 8: Access the Live USB
+## Step 8: access the live USB
 SSH into the running USB (headless operation):
 ```bash
 ssh root@<usb-ip-address>
@@ -145,7 +145,7 @@ ssh root@<usb-ip-address>
 
 ---
 
-## Included Tools
+## Included tools
 Sledgehammer comes pre-installed with:
 - **Secrets**: `sops`, `age`, `ssh-to-age`, `yq`
 - **Version Control**: `git`, `openssh`
@@ -163,7 +163,7 @@ Sledgehammer comes pre-installed with:
 
 ---
 
-## Cleanup (Optional)
+## Cleanup (optional)
 If you modified `hosts/sledgehammer/configuration.nix` in Step 2, revert the device path:
 ```bash
 sed -i 's|device = "/dev/sdX"|device = "/dev/sdb"|' hosts/sledgehammer/configuration.nix
@@ -172,7 +172,7 @@ sed -i 's|device = "/dev/sdX"|device = "/dev/sdb"|' hosts/sledgehammer/configura
 
 ---
 
-## Technical Notes
+## Technical notes
 - Uses GRUB with `efiInstallAsRemovable = true` for cross-machine booting
 - f2fs filesystem for better flash media longevity (reduces write wear)
 - No graphical environment, tty-only for minimal resource usage

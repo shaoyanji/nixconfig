@@ -1,9 +1,9 @@
-# frieren Exceptions
+# frieren exceptions
 
 ## Scope
 NAS server (Samba, NFS, Jellyfin, Paperless-ngx, Unbound DNS + Pi-hole, aria2) and 4K media center (Ideapad). Built in CI by default.
 
-## Key Differences
+## Key differences
 - **Two boot personas**: the default generation is headless (no compositor, greeter, or DisplayLink); the niri media centre is `specialisation.desktop` (`hosts/frieren/desktop.nix`). Self-upgrade stages both, so switching persona needs no rebuild — pick it in the systemd-boot menu.
   - A specialisation is **boot-time only**. `nixos-rebuild switch` (what the 04:00 self-upgrade does when the kernel is unchanged) activates the *headless* toplevel even while the desktop session is running, so a desktop-stack edit needs `nixos-rebuild boot` plus a reboot, then selecting the `desktop` entry.
   - Jellyfin's QuickSync does **not** depend on the persona: VA-API (`hardware.graphics`, `intel-media-driver`, `LIBVA_DRIVER_NAME=iHD`) lives in the base `hosts/frieren/hardware.nix`, and `media-stack.nix` puts the `jellyfin` user in `video`/`render` so `/dev/dri/renderD128` is reachable without relying on a 0666 device node.
@@ -21,7 +21,7 @@ NAS server (Samba, NFS, Jellyfin, Paperless-ngx, Unbound DNS + Pi-hole, aria2) a
   - Verify: `ip route get 8.8.8.8` and `ip route get <lan-host>` must name `enp1s0`; `iperf3` to a wired peer should reach ~940 Mbit/s.
   - The `enp1s0` dispatcher below is unaffected — when the wire drops it floats `192.168.3.25` to `wlp2s0` and the Wi-Fi default route (600) takes over.
 
-## Deploy Checklist
+## Deploy checklist
 - [ ] **Fleet flake update?** Run `task infra:update:fleet` (update → warm
   harmonia → apply) so NVIDIA-580 clients (stark/ares/kellerbench/poseidon)
   never hit uncached builds. Closures built elsewhere: `task
@@ -72,7 +72,7 @@ sudo /nix/store/*-nginx-1*/bin/nginx -t -c "$CONF"   # want: "syntax is ok"
 A pid-file error (`/run/nginx/nginx.pid`) after `syntax is ok` is expected when
 run outside systemd; a syntax or `ssl_certificate` error is real.
 
-## Operational Interpretation
+## Operational interpretation
 - Prefer the canonical host deploy flow (`infra:deploy:host:frieren`).
 - After the daily autoUpgrade lands, `infra:deploy:host:frieren` is still fine for immediate/manual deploys — the timer just catches drift the next morning.
 
@@ -93,7 +93,7 @@ to prevent.
 | 03:30 (+10m jitter)     | `restic-backups-frieren-local`         | local                                                          |
 | Sun 01:30 (+30m jitter) | `fleet-warm-cache`                     | **`github:shaoyanji/nixconfig`** — builds 7 active host closures |
 | 04:00                   | `nixos-upgrade` (`system.autoUpgrade`) | **`github:shaoyanji/nixconfig#frieren`**                       |
-| 05:00 (Daily) / Sun     | `agy-nightly-system` (user)            | Trigger-gated `~/SYSTEM.md`: Mon-Sat quiet reflex (bypasses LLM if nominal), Sunday comprehensive scorecard, or on-demand (`task checks:audit:system`) |
+| 05:00 (Daily) / Sun     | `agy-nightly-system` (user)            | Trigger-gated `~/SYSTEM.md`: Mon-Sat quiet reflex (bypasses LLM if nominal), Sunday full scorecard, or on-demand (`task checks:audit:system`) |
 | Sun 06:00               | `nix-optimise`                         | weekly hardlink deduplication across live store paths          |
 
 **The origin-vs-local trap (this is the one that bites):**

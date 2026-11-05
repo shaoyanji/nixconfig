@@ -11,7 +11,7 @@ metadata:
     related_skills: []
 ---
 
-# `ai-memory` — Shared Agent Memory Store
+# `ai-memory` — shared agent memory store
 
 Long-term memory for coding agents: a flat-file wiki (`wiki/`) indexed into
 SQLite (FTS5), capturable from agent sessions, exposed over stdio/HTTP MCP.

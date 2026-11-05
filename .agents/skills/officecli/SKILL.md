@@ -11,7 +11,7 @@ metadata:
     related_skills: [pdfvision]
 ---
 
-# `officecli` — Office Suite for AI Agents
+# `officecli` — Office suite for AI agents
 
 Reads, edits, and automates Word, Excel, and PowerPoint files. Single
 binary, no Office/LibreOffice dependency. Includes an MCP server

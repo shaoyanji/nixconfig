@@ -52,7 +52,7 @@ into this guest. The tailnet name is the guest directly, on 2222.
 
 ---
 
-## Service Placement (Lane Decisions)
+## Service placement (lane decisions)
 
 - DeepSeek Harness (`dsh-web`) is pinned to the **Native Host Lane**: running an active
   interactive coding agent inside QEMU TCG software emulation on OCI A1 incurs massive

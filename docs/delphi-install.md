@@ -183,7 +183,7 @@ Diagnose with the server-selection test, not with DNS:
 must answer `301`; a `200` means the default vhost is catching the request and
 ACME can never succeed.
 
-## Phase 4b — rebuilding from the pushed flake (the autoUpgrade path)
+## Phase 4b — rebuilding from the pushed flake (the autoupgrade path)
 
 Once a change is on `main`, the host can update itself exactly the way the daily
 job will:

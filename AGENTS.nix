@@ -3257,14 +3257,14 @@
       kind = "experiment";
       status = "PROPOSED";
       date = "2026-10-19";
-      summary = "Mode: Julia-1 interface traffic and broadcast domain classification gating selective avahi mDNS reflection across Tailscale tunnels. Status: proposed design study. Motivated by seamless cross-device discovery between residential LAN devices and roaming Tailscale nodes.";
+      summary = "Mode: Julia-1 interface traffic and broadcast domain classification gating selective avahi mDNS reflection across Tailscale tunnels. Status: proposed design study. Motivated by cross-device discovery between residential LAN devices and roaming Tailscale nodes.";
       body = ''
         **Mode:** Julia-1 interface traffic and broadcast domain classification gating selective avahi mDNS reflection across Tailscale tunnels.
-        **Status:** proposed design study. Motivated by seamless cross-device discovery between residential LAN devices and roaming Tailscale nodes.
+        **Status:** proposed design study. Motivated by cross-device discovery between residential LAN devices and roaming Tailscale nodes.
 
         **Use case.** Frieren is connected to both physical LAN (`enp1s0`, `192.168.3.25`) and the fleet mesh (`tailscale0`). When devices are away from home on 5G/WAN, standard mDNS (Avahi/Bonjour) does not cross the Layer 3 Tailscale boundary, making local media casts (AirPlay/Chromecast) and `.frieren.lan` service discovery fail. `services.fleetMdnsReflector`:
         * Julia-1 monitors local Avahi service announcements and Tailscale peer states.
-        * Selectively reflects designated service records (HTTP, AirPlay, SSH) onto the Tailscale interface using unicast DNS pointers, providing transparent LAN-like service discovery everywhere in the world.
+        * Selectively reflects designated service records (HTTP, AirPlay, SSH) onto the Tailscale interface as unicast DNS pointers, so LAN-style service discovery works across the tailnet.
 
         **Module shape.**
 

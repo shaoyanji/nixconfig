@@ -11,7 +11,7 @@ metadata:
     related_skills: ['nix-eval', 'agent-browser']
 ---
 
-# `agent-browser` — Headless Browser Automation for Agents
+# `agent-browser` — headless browser automation for agents
 
 Rust CLI over headless Chrome built for AI agents. Instead of CSS selectors,
 it takes accessibility-tree **snapshots** and addresses elements by stable
@@ -40,7 +40,7 @@ ad-hoc run still goes through `github:`. On a `full`-tier host it is simply
 `--option builders ""` keeps the invocation off nixbuild.net: a cache hit costs
 nothing, a compile would bill the free tier.
 
-### Authenticated pages (Basic auth)
+### Authenticated pages (basic auth)
 
 Chrome drops credentials embedded in a URL, so send the header yourself. It is
 scoped to that origin for the session:

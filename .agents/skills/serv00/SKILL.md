@@ -11,7 +11,7 @@ metadata:
     related_skills: []
 ---
 
-# serv00 — FreeBSD hosting
+# serv00 — freeBSD hosting
 
 | | |
 | :--- | :--- |

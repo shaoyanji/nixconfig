@@ -11,7 +11,7 @@ metadata:
     related_skills: [officecli]
 ---
 
-# `pdfvision` — PDF Understanding for Agent Pipelines
+# `pdfvision` — PDF understanding for agent pipelines
 
 Extract text, images, metadata, and layout from PDFs for AI agents. Reports
 per-page quality and names the next flag to use when the default pass is not

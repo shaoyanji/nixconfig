@@ -1,4 +1,4 @@
-# Agent Context — Start Here
+# Agent context — start here
 
 This directory is the **agent context plane**: a router, a schema, and skills.
 It is not a second manual and it is not executable truth.

@@ -1,9 +1,9 @@
-# Fleet LLM Context Matrix
+# Fleet LLM context matrix
 
 > Dense machine context matrix optimized for LLM token budgets and prompt injection.
 > Source of truth: [`inventory.toml`](../inventory.toml).
 
-## Fleet Status Breakdown
+## Fleet status breakdown
 
 - **Active Production Nix Hosts (13)**: `aristotle`, `delphi`, `eisen`, `fern`, `frieren`, `guckloch`, `kali`, `kellerbench`, `minyx`, `netbook`, `poseidon`, `scratch`, `stark`
 - **Active External Non-Nix Hosts (8)**: `bitlockerpremium`, `burgernas`, `dragoncourt`, `envs`, `gok`, `moto`, `pythonanywhere`, `serv00`
@@ -11,31 +11,31 @@
 
 ---
 
-## LLM Operational Constraints by Host Category
+## LLM operational constraints by host category
 
-### 1. Mainframe & Core Server (`frieren`)
+### 1. Mainframe & core server (`frieren`)
 - **Sensitive Window**: 03:00-05:30 CET nightly backup and handoff window. Never schedule rebuilds here.
 - **Rebuild Rule**: At most ONE rebuild at a time; always commit and push to origin/main or autoUpgrade will revert next morning at 04:00.
 - **Declarative Services**: Kiwix (/var/lib/kiwix) is strictly declarative; never hand-edit.
 
-### 2. Workstations & Kiosks (`poseidon`, `eisen`, `stark`, `kellerbench`)
+### 2. Workstations & kiosks (`poseidon`, `eisen`, `stark`, `kellerbench`)
 - **GPU Drivers**: NVIDIA hosts (`poseidon`: RTX 3050 Ti Laptop open; `stark`: MX110 legacy_580 offload; `kellerbench`: GTX 750 Ti legacy_580). AMD hosts (`eisen`: RX 5700 Navi 10 Mesa).
 - **UI Priority**: Keep interactive desktop smooth on `poseidon` during heavy inference.
 
-### 3. Lightweight Terminals (`fern`, `scratch`, `netbook`)
+### 3. Lightweight terminals (`fern`, `scratch`, `netbook`)
 - **Thermal & CPU Caps**: Low-power dual-core CPUs. Offload compilation to `frieren` or remote builders.
 - **Scratch Disk Diet**: Shaky f2fs SSD; tmpfs logs and zram RAM-only swap.
 
-### 4. Non-Nix Shared Hosting (`serv00`, `dragoncourt`, `envs`)
+### 4. Non-Nix shared hosting (`serv00`, `dragoncourt`, `envs`)
 - **Strict Warning**: NON-NIX. NEVER run `nixos-rebuild`, `nix`, or NixOS commands.
 - **Serv00 Quota**: Strict 512 MB RAM limit. Violators killed by FreeBSD kernel. Manage via Devil CLI.
 
-### 5. Cross-Architecture Builds (`minyx`)
+### 5. Cross-architecture builds (`minyx`)
 - **Builder**: `minyx` → `delphi`. Built there and substituted here; a host with a declared builder is not a CI target.
 
 ---
 
-## Quick Host Spec Reference
+## Quick host spec reference
 
 | Host | Status | Nix? | Arch | Compute Tier | CPU / RAM / GPU | Primary Role |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |

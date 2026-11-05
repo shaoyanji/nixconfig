@@ -1,10 +1,10 @@
-# MEMORY.md (Unified Architecture)
+# MEMORY.md (unified architecture)
 
 ## Scope
 
 Governs memory operations, heartbeat checks, and logging flows across all tiers with BM25 hybrid search.
 
-## Silent Replies
+## Silent replies
 
 Reply ONLY `NO_REPLY` when a command explicitly asks for a silent memory/logging response.
 
@@ -22,7 +22,7 @@ Reply ONLY `NO_REPLY` when a command explicitly asks for a silent memory/logging
 
 - `HEARTBEAT_OK`
 
-## Memory Tiers (Unified)
+## Memory tiers (unified)
 
 | Tier            | Purpose                                                 | Search Method    | Latency | Retention          | Indexing        |
 | --------------- | ------------------------------------------------------- | ---------------- | ------- | ------------------ | --------------- |
@@ -32,9 +32,9 @@ Reply ONLY `NO_REPLY` when a command explicitly asks for a silent memory/logging
 | **mem0**        | Structured TOON format (`infer:false` preserves format) | BM25 exact-match | <150ms  | Permanent          | Live BM25 index |
 | **grep**        | Session recovery (fallback)                             | Regex + grep     | <500ms  | 30 days            | None            |
 
-## Retrieval Strategy (Tiered + Hybrid Search)
+## Retrieval strategy (tiered + hybrid search)
 
-### Phase 1: Direct Lookup (ctx only)
+### Phase 1: direct lookup (ctx only)
 
 ```
 Query → ctx snapshot (orientation)
@@ -42,7 +42,7 @@ Query → ctx snapshot (orientation)
   ↓ (if miss) → Phase 2
 ```
 
-### Phase 2: Parallel BM25 Search (qmd + supermemory + mem0)
+### Phase 2: parallel BM25 search (qmd + supermemory + mem0)
 
 ```
 Query → BM25 index across:
@@ -54,7 +54,7 @@ Query → BM25 index across:
   ↓ (if low confidence) → Phase 3
 ```
 
-### Phase 3: Fallback (grep and wikisearch)
+### Phase 3: fallback (grep and wikisearch)
 
 ```
 Query → grep local files (YYYY-MM-DD.md)
@@ -62,7 +62,7 @@ Query → grep local files (YYYY-MM-DD.md)
   ↓ return results
 ```
 
-## BM25 Configuration
+## BM25 configuration
 
 | Parameter        | Value                                | Rationale                             |
 | ---------------- | ------------------------------------ | ------------------------------------- |
@@ -73,9 +73,9 @@ Query → grep local files (YYYY-MM-DD.md)
 | Refresh interval | 5 minutes                            | Balance freshness vs. performance     |
 | Stale threshold  | 1 hour                               | Alert if index not updated            |
 
-## Logging Rules
+## Logging rules
 
-### What to Log & Where
+### What to log & where
 
 | Event                | Tier        | Format              | BM25 Indexing          |
 | -------------------- | ----------- | ------------------- | ---------------------- |
@@ -86,7 +86,7 @@ Query → grep local files (YYYY-MM-DD.md)
 | Error encountered    | grep        | `YYYY-MM-DD.md`     | No (recovery only)     |
 | Philosophy/framework | supermemory | Prose essay         | Yes (semantic tokens)  |
 
-### TOON Format Example (mem0)
+### TOON format example (mem0)
 
 ```
 [TASK] User requested memory architecture redesign
@@ -97,7 +97,7 @@ Query → grep local files (YYYY-MM-DD.md)
 [CONFIDENCE] 0.92
 ```
 
-### qmd Entry Example
+### qmd entry example
 
 ```
 # Personal Query: When should I use vector vs BM25?
@@ -112,7 +112,7 @@ Hybrid approach: BM25 for filtering, vector for ranking.
 [INDEXED] 2024-01-15T10:42Z
 ```
 
-### supermemory Entry Example
+### supermemory entry example
 
 ```
 # Philosophy: Memory as Layered Cognition
@@ -125,7 +125,7 @@ Each layer serves a different cognitive function. xs is reactive, qmd is reflect
 [SEMANTIC_TAGS] memory-architecture, consciousness, layers
 ```
 
-## Eviction & Consistency
+## Eviction & consistency
 
 **ctx → grep Migration:**
 
@@ -145,7 +145,7 @@ Each layer serves a different cognitive function. xs is reactive, qmd is reflect
 - Link related entries with `[RELATED_TO]` tags
 - Consolidate duplicate concept entries in supermemory quarterly
 
-## Recovery Procedures
+## Recovery procedures
 
 | Scenario               | Action                                       | Fallback                   |
 | ---------------------- | -------------------------------------------- | -------------------------- |
@@ -155,7 +155,7 @@ Each layer serves a different cognitive function. xs is reactive, qmd is reflect
 | All indexed tiers down | Use grep local files + xs snapshot           | Batch retry on recovery    |
 | BM25 staleness >1h     | Force refresh; log heartbeat alert           | Continue with cached index |
 
-## Quota Management
+## Quota management
 
 | Tier        | Limit                  | Alert Threshold   |
 | ----------- | ---------------------- | ----------------- |
@@ -165,9 +165,9 @@ Each layer serves a different cognitive function. xs is reactive, qmd is reflect
 | mem0        | Unlimited (indexed)    | Index size >500MB |
 | grep        | 100MB (30-day rolling) | 85% (85MB)        |
 
-## Search Examples
+## Search examples
 
-### Example 1: Simple Query
+### Example 1: simple query
 
 ```
 Query: "What's my preference on async logging?"
@@ -178,7 +178,7 @@ Query: "What's my preference on async logging?"
 → Return qmd result (highest confidence)
 ```
 
-### Example 2: Complex Query
+### Example 2: complex query
 
 ```
 Query: "Integrate BM25 into memory architecture"
@@ -190,7 +190,7 @@ Query: "Integrate BM25 into memory architecture"
 → Merge top 3 results with relevance ranking
 ```
 
-### Example 3: Fallback Query
+### Example 3: fallback query
 
 ```
 Query: "Session from 2024-01-10"
@@ -202,7 +202,7 @@ Query: "Session from 2024-01-10"
 
 ---
 
-## Persistent Boot Facts & Local Tooling
+## Persistent boot facts & local tooling
 
 Environment / tool facts (not user identity — see USER.md for persona/preferences):
 - CLI: `agy` at `/etc/profiles/per-user/devji/bin/agy` v1.2.16 (syntax: `--dangerously-skip-permissions --json-schema <path> --print='...' --mode plan --output-format json`).
@@ -212,7 +212,7 @@ Environment / tool facts (not user identity — see USER.md for persona/preferen
 - Skill `jev-email-cleansing` (agents-sync) is the governing skill for this class: smoke-test, frozen/live samples, criteria JSON, no mailbox mutation without agreement.
 - Wrapper binary for jev: `askjev` (shell wrapper at `~/.local/bin/askjev`, wraps `jev-decide classify --provider typesafe`). Real call returns `jev_called: true`, `transport: typesafe`. User-preferred openrouter model: `inception/mercury-decide:free` (not applied by askjev wrapper — call `jev-decide` directly for openrouter).
 
-### Official Skills with Wrappers:
+### Official skills with wrappers:
 1. The wrapper (`askjev`) loads keys from `~/.config/hermes/hermes.env`, exports `OPENROUTER_API_KEY` + `TYPESAFE_API_KEY`, builds a temp criteria JSON, then calls `jev-decide classify --provider typesafe --text "$QUESTION" --criteria`.
 2. To make an official skill with a wrapper: define `SKILL.md` with trigger/description; add a `scripts/` wrapper that validates inputs (check `--help` before invoking), loads env, builds evidence files (not strings), and calls the underlying binary with `--dry-run` first.
 3. Never invent invocation shapes — read the wrapper source (`cat /path/to/wrapper`) and the underlying binary's `--help` before writing the skill.

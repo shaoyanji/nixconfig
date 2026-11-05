@@ -1,4 +1,4 @@
-# Deploy Routing
+# Deploy routing
 
 ## Scope
 Operator deploy activity means `infra:*` for host lifecycle flows.

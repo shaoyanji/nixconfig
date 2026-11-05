@@ -22,7 +22,7 @@ tasks:
         mkdir -p "hosts/{{.HOST}}"
         echo "✅ Created hosts/{{.HOST}}/"
         echo ""
-        echo "Next steps (see README.md → Host Lifecycle for details):"
+        echo "Next steps (see README.md → Host lifecycle for details):"
         echo ""
         echo "  1. Create configuration.nix + copy hardware-configuration.nix from the host"
         echo "  2. Register in flake/host-inventory.nix"

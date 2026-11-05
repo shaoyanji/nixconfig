@@ -9,7 +9,7 @@ metadata:
     related_skills: ['tmux', 'confirm-before-destructive', 'paste']
 ---
 
-# codespace — GitHub Codespaces as a mode, not a one-off
+# codespace — GitHub codespaces as a mode, not a one-off
 
 | | |
 | :--- | :--- |

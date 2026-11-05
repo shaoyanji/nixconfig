@@ -11,7 +11,7 @@ metadata:
     related_skills: ['infra', 'data']
 ---
 
-# burgernas — DS220j Cold Vault Control Plane
+# burgernas — DS220j cold vault control plane
 
 Operate BurgerNAS, the fleet's secondary cold backup vault and storage extension
 (a Synology DiskStation **DS220j**, DSM 7.4.1, aarch64, **512 MiB RAM**).

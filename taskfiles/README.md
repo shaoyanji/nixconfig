@@ -1,4 +1,4 @@
-# Taskfile Map
+# Taskfile map
 
 ## Scope
 Quick reference to who owns each taskfile and where to go for lifecycle, deployment, and operator queries.

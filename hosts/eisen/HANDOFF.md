@@ -1,4 +1,4 @@
-# eisen — LLM Inference Architecture & Handoff
+# eisen — LLM inference architecture & handoff
 
 Detailed architecture specification for running local MoE LLMs on Eisen's Xeon E5-2673 v3 (12c/24t) + 62.7 GiB DDR3-1600 + AMD Radeon RX 5700 (8 GiB VRAM, **Vulkan/radv** — Navi 10 has no ROCm target).
 
@@ -9,7 +9,7 @@ Updated **2026-10-17 (final)**. Main tip `7a9b2c70` (union merge: pre-integratio
 
 ---
 
-## Serving Topology
+## Serving topology
 
 One OpenAI-compatible endpoint, **three** models, swapped on demand by `services.llama-swap` (they cannot co-reside: ~21 GiB + ~44 GiB + ~6 GiB = ~71 GiB > 62 GiB RAM).
 
@@ -88,7 +88,7 @@ Go binary, port 8000, env-only config. Routes chat → llama-swap, decisions →
 
 ---
 
-## Decision Models: Jev (cloud) + Laya (local fallback)
+## Decision models: Jev (cloud) + Laya (local fallback)
 
 SubZeroClaw's decisions go to the router's `/v1/decisions` → TypeSafe Jev (cloud, `DEFAULT_DECISION_MODEL=jev-latest`, 25s timeout) with fallback to local Laya on Jev failure. The router forwards the client's auth to Jev (it does not hold the key itself).
 
@@ -132,7 +132,7 @@ Runtime `ServeurpersoCom/qwentts.cpp` (C++17/GGML, MIT) built from source with `
 
 ---
 
-## Visual Generation: Qwen-Image-2.1 (persistent sd-server, VERIFIED 2026-10-17)
+## Visual generation: Qwen-Image-2.1 (persistent sd-server, VERIFIED 2026-10-17)
 
 Offline, OpenAI-compatible text-to-image generation. Pipeline: **stable-diffusion.cpp** (leejet) + Qwen-Image-2.1-Turbo weights (designated storage, NOT the store).
 

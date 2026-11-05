@@ -3,11 +3,11 @@ name: wiki-decision-recommend
 description: Offline article and technical manual recommendations powered by System One decision models (Julia-1 and Laya) linked to Kiwix offline knowledge bases. Classifies technical incidents and gates article retrieval based on calibrated confidence thresholds.
 ---
 
-# Wiki Decision Recommender
+# Wiki decision recommender
 
 An intelligent offline knowledge retrieval skill combining **System One decision models** (`julia-1` / `laya`) with **Kiwix offline knowledge libraries** (`archlinux_en_all`, `wikipedia_en_all`) hosted on `frieren` at `http://wiki.frieren.lan/`.
 
-## Architecture & Threshold Gating
+## Architecture & threshold gating
 1. **Incident Domain Classification (`choice` / `classify`):**
    Evaluates error messages or technical inquiries across domains: `filesystem_storage`, `database_systems`, `network_dns_tls`, `linux_kernel_systemd`, `nixos_declarative`.
 2. **Calibrated Confidence Threshold (`noul`):**
@@ -17,7 +17,7 @@ An intelligent offline knowledge retrieval skill combining **System One decision
 4. **Sub-second Article Retrieval:**
    Queries Kiwix REST search (`http://127.0.0.1:8088`), filters English articles, and formats clickable local URLs.
 
-## Usage Guide
+## Usage guide
 
 ```bash
 # Recommend articles for a Btrfs incident

@@ -1,4 +1,4 @@
-# Control Plane — Site & Dashboard Architecture (redesign)
+# Control plane — site & dashboard architecture (redesign)
 
 > **Status:** partly implemented (2026-10-17); the Go/Datastar runtime below is
 > still a proposal.

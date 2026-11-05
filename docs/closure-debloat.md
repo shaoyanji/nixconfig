@@ -40,8 +40,8 @@ file. Two mechanics matter:
   both `system-path` and `home-manager-path`; the store dedupes them. That is
   listed in the tool's output only to stop anyone "fixing" it as waste.
 
-The practical consequence: **you cannot reach the ~16 GiB of shared substrate by
-removing services one at a time.** Glibc, Python, LLVM, GTK and Mesa are shared
+The practical consequence: **you cannot remove ~16 GiB of shared store paths one
+service at a time.** Glibc, Python, LLVM, GTK and Mesa are shared
 precisely because many owners need them. Per-owner savings are capped by that
 owner's exclusive bytes.
 
@@ -169,8 +169,8 @@ the service earns its closure:
 
 Two observations rather than recommendations: **there are three JVM-based
 document/PDF services** (stirling-pdf, gotenberg, tika) costing ~1.4 GiB between
-them, and **Plex and Jellyfin coexist** (Jellyfin's cost is inside the shared
-substrate, Plex's 212.6 MiB is exclusive).
+them, and **Plex and Jellyfin coexist** (Jellyfin's cost sits in shared store
+paths, Plex's 212.6 MiB is exclusive).
 
 To that total add **T1-5's `intel-compute-runtime-legacy1` at 264.5 MiB**, which was
 reclassified here from Tier 1 once `hosts/frieren/hardware.nix` turned out to add
@@ -213,8 +213,8 @@ Also in this tier: `home-manager-files` carries
 
 ## 7. Realistic projection
 
-Arithmetic, not optimism — exclusive bytes are the ceiling per owner and the 16.2
-GiB shared substrate does not move piecemeal:
+Arithmetic, not optimism: exclusive bytes are the ceiling per owner, and the 16.2
+GiB of shared store paths does not move piecemeal.
 
 | Step | Projected total |
 | --- | --- |

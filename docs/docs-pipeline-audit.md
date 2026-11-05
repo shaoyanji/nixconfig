@@ -1,4 +1,4 @@
-# Nix-Idiom Audit — docs pipeline & hardcoded config
+# Nix idiom audit — docs pipeline & hardcoded config
 
 Status: **IN FLIGHT** — audit + policy only (2026-10-19). Nothing here is a rewrite.
 

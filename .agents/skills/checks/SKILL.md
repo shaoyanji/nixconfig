@@ -11,7 +11,7 @@ metadata:
     related_skills: []
 ---
 
-# checks — Validation & Health Checks
+# checks — validation & health checks
 
 Run validation and health checks for host configs and Nix code quality.
 

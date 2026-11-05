@@ -693,5 +693,14 @@ lib.genAttrs systems.work (
         bash scripts/task/docs-budget.sh
         touch $out
       '';
+
+      # The machine-checkable half of the unslop vocabulary. Same script
+      # `task checks:prose` runs, and the same CI job as docs-budget: prose is
+      # exactly the class of change that arrives with no host to build.
+      prose-tells = pkgs.runCommand "prose-tells" {} ''
+        cd ${../.}
+        bash scripts/task/prose-tells.sh
+        touch $out
+      '';
     }
 )

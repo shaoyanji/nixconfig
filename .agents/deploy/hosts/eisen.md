@@ -1,4 +1,4 @@
-# eisen Deployment & Operations
+# eisen deployment & operations
 
 Rationale, design and measurements: [`docs/eisen-llm-architecture.md`](../../../docs/eisen-llm-architecture.md).
 Every command lives here; that page explains the choices.
@@ -66,7 +66,7 @@ config without loading any weights.
 
 ---
 
-## Fleet Client Integration
+## Fleet client integration
 
 Point any OpenAI-compatible client at `http://eisen.lan/v1` (LAN/tailnet) with model `qwen` or `kolibri`.
 
@@ -102,7 +102,7 @@ export OPENAI_API_KEY="none"
 
 ---
 
-## Deploy & Validate
+## Deploy & validate
 
 ```bash
 # from the repo (dirty tree is fine; activation needs the secrets submodule)
@@ -179,7 +179,7 @@ curl -X POST http://127.0.0.1:8181/v1/audio/speech -H 'Content-Type: application
 
 **Before first build**, pin the runtime rev + hash in `modules/services/qwen-tts.nix` (the derivation ships `lib.fakeHash` so an unpinned build fails on purpose): `nix-prefetch-git --fetch-submodules https://github.com/ServeurpersoCom/qwentts.cpp.git`.
 
-## Speech to text: Parakeet Redux (`/stt`)
+## Speech to text: Parakeet redux (`/stt`)
 
 Moondream's 1.58-bit ternary export of NVIDIA `parakeet-tdt-0.6b-v3` (600M, 25
 languages incl. German), CPU-only ONNX. Implementation:
@@ -329,7 +329,7 @@ than assume it: one flag pair, the same suite, and the stall sites tell you.
 for Qwen3.8 on CUDA 8.6/8.9/12.0/12.1, Radeon gfx1100/gfx1151/gfx1201, Metal and
 Arc — gfx1010 is not in that list, so MTP stays the drafter here.
 
-## Operational Notes
+## Operational notes
 
 - **Build and eval eisen ON eisen, over ssh** (`ssh eisen 'bash -l -c …'`, repo at
   `/Volumes/data/projects/nixconfig`): 24 threads, 59 GiB free, and `inventory.toml`

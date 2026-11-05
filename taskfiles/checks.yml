@@ -42,6 +42,7 @@ tasks:
       - task checks:inventory:sync
       - task checks:repo:paths
       - task checks:docs:links
+      - task checks:prose
       - task checks:yaml:lint
       - task checks:toon
       - task checks:toon:surfaces
@@ -63,6 +64,19 @@ tasks:
       carries `link-ok: <reason>` on its line. ~0.1 s, no network, no eval.
     cmds:
       - bash scripts/task/docs-links.sh
+
+  checks:prose:
+    desc: "[gate] Docs and skills carry none of the unslop vocabulary"
+    summary: >
+      The machine-checkable half of `.agents/skills/unslop`: the AI vocabulary
+      list (rule 7), fancy ways to say "is" (8), curly quotes (19), chatbot
+      phrases (20), filler (23), abstract metaphor nouns (26) and the plain-word
+      list (31). Fenced code is skipped, so an example may contain the word.
+      A line where the word IS the concrete one carries `prose-tell-ok: <reason>`.
+      docs/history/, the unslop skill itself and the persona SOUL files are out
+      of scope (archive voice, the list, a character's voice). ~0.3 s, no eval.
+    cmds:
+      - bash scripts/task/prose-tells.sh
 
   checks:toon:surfaces:
     desc: "[gate] Agent-facing docs pipe JSON into toon, never into the reader"

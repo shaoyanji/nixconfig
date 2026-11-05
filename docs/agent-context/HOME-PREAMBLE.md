@@ -1,4 +1,4 @@
-# Host Agent Contract
+# Host agent contract
 
 > This preamble is prepended to the host card and persona. It is generated from
 > `docs/agent-context/HOME-PREAMBLE.md` so every host in the fleet starts from

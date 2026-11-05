@@ -31,7 +31,7 @@ curl -s http://eisen.lan/images/v1/images/generations \
 - `n`: 1 (one generation at a time; the service serializes requests).
 - `response_format`: `b64_json` (base64 PNG in the response) or `url` (a `data:` URL).
 
-## The Turbo schedule is fixed — do not override it
+## The turbo schedule is fixed — do not override it
 
 The service always runs **8 steps, CFG 1.0, euler, `--sigmas qwen-image-2.1-turbo`**. This is the Turbo checkpoint's schedule. Do not ask for more steps or a different CFG — the Turbo weights are tuned for this schedule, and changing it degrades quality. If you need the 40-step base schedule, that is a different model (base Qwen-Image-2.1), not a parameter.
 

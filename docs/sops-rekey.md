@@ -127,7 +127,7 @@ Anchors are **cosmetic**: recipients are stored by value inside each encrypted
 file, so renaming an anchor changes nothing until the next `sops updatekeys`.
 Only the `key_groups` list decides who can decrypt.
 
-## A host with no user keypair (CA-only hosts, cloud VMs)
+## A host with no user keypair (ca-only hosts, cloud VMs)
 
 Do not copy another host's `keys.txt` onto it — that hands the box every secret
 for no reason. `ssh-to-age` is deterministic, so derive the user-plane identity

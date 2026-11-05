@@ -1,9 +1,9 @@
-# scratch Exceptions
+# scratch exceptions
 
 ## Scope
 Lightweight dwl desktop (Fujitsu ESPRIMO D556, i5-6500, 8 GB RAM, shaky 128 GB f2fs SSD).
 
-## Key Differences
+## Key differences
 - **Desktop chain** — `globalModulesNixos` (role:heim userland) plus `base-node.nix`, `boot.nix` and **`profiles.dwlDesktop`** (`modules/profiles/dwl-desktop.nix`) — the same profile netbook adopts, so the desktop is one module with per-host switches rather than two drifted copies. The profile owns the compositor, session wrapper, launcher, wallpaper, idle/lock, portals, pipewire, upower, appimage, the nerd font and the way the session starts; this host keeps only its boot layout, NAS client and userland. `base-desktop-environment.nix` is **not** imported: it carries niri, DMS and the KDE/GNOME portal stack, and `programs.niri.enable` / `programs.dms-greeter.enable` are asserted off by the fork rule.
 - **dwl** — `modules/config/dwl/config.h`, built by the profile as `pkgs.dwl.override { configH = …; }`; the keymap is no longer host-local.
 - **No display manager at all** — `services.getty.autologinUser = "devji"` logs tty1 in, which is what gives the session a real logind/seat through PAM, and `environment.loginShellInit` execs the compositor from that login shell. Two traps are baked into that hook: NixOS's `/etc/profile` reads **`/etc/profile.local` and the `environment.loginShellInit` slot, not `/etc/profile.d`** (verified against the generated file), and the snippet is guarded on `id -un`, `/dev/tty1` and an empty `WAYLAND_DISPLAY`, so ssh, a root console and a shell inside the desktop are untouched. The cost of a logout is a respawn rather than a login prompt. Recovery if dwl ever fails to start: ssh still works, since sshd never depended on a greeter.
@@ -72,7 +72,7 @@ Also: **`~/Taskfile.yml` does not exist on this host**, so the tautological task
 plane described in `AGENTS.md` is not present here — `task` must be run from
 `~/nixconfig`.
 
-## Initial Deploy (first boot from NixOS ISO)
+## Initial deploy (first boot from NixOS ISO)
 ```bash
 # 1. Partition manually (f2fs root + ext4 /boot), or use disko (not yet written)
 # 2. nixos-install --flake .#scratch
@@ -83,6 +83,6 @@ plane described in `AGENTS.md` is not present here — `task` must be run from
 # 5. Rebuild to pick up the decrypted hashedPassword
 ```
 
-## Operational Interpretation
+## Operational interpretation
 - Prefer canonical host deploy flow (`infra:deploy:host:scratch`).
 - CI **is** enabled (the compiled registry's `ci` defaults to true and this host carries no `ci = false`): `task dev:ci:trigger:scratch` builds `nixosConfigurations.scratch` and `hostChecks.x86_64-linux.scratch` and pushes them to cachix, which is how a closure this host must not compile locally gets warmed.

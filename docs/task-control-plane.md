@@ -1,8 +1,8 @@
-# Task Control Plane
+# Task control plane
 
 This repository uses a simplified task namespace for predictable operator workflows.
 
-## Current Namespace Structure
+## Current namespace structure
 
 - `infra:*`: Host lifecycle operations (plan/apply/deploy/rollback/logs), secrets management, SOPS operations
 - `agents:*`: Operator helpers and legacy operator menus
@@ -10,7 +10,7 @@ This repository uses a simplified task namespace for predictable operator workfl
 - `dev:*`: Git workflows, flake updates, site deployment, and local development tasks
 - `services:*`: Legacy compatibility wrappers (routes to `infra:*` tasks)
 
-## Taskfile Organization
+## Taskfile organization
 
 - `Taskfile.yml`: Main entrypoint with top-level menus (deploy, logs, status, menu)
 - `taskfiles/infra.yml`: Host lifecycle, secrets, SOPS operations
@@ -21,23 +21,23 @@ This repository uses a simplified task namespace for predictable operator workfl
 - `taskfiles/services-core.yml`: Minimal compatibility wrappers
 - `taskfiles/services-legacy.yml`: Deprecated aliases (marked `[deprecated]`)
 
-## Common Workflows
+## Common workflows
 
-### Host Deployment
+### Host deployment
 ```bash
 task infra:deploy:host:<host>    # Plan + apply + validate
 task infra:plan:host:<host>      # Build/evaluate only
 task infra:apply:host:<host>     # Apply configuration only
 ```
 
-### Local Rebuilds
+### Local rebuilds
 ```bash
 task infra:rebuild:nixos         # Rebuild local NixOS host
 task infra:rebuild:darwin        # Rebuild local Darwin host
 task infra:rebuild:home-manager  # Rebuild Home Manager profile
 ```
 
-### Git & Flakes
+### Git & flakes
 ```bash
 task dev:git:quick-push          # Commit/push with AI-generated message
 task dev:flake:update-complete   # Complete flake update workflow
@@ -48,7 +48,7 @@ task dev:nixbuild:warm           # Remote-builder warm + cachix push (nixbuild.n
 task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 ```
 
-### Blog Drafts
+### Blog drafts
 ```bash
 task dev:blog:draft TOPIC="…"    # ideas/<slug>.md scaffolded from the knowledge graph
 task dev:blog:export SLUG=…      # publish it into the blog repo (never commits)
@@ -67,7 +67,7 @@ task checks:flake:transitive     # Read-only transitive flake pin sweep (exit 1 
 task checks:qmd:docs             # qmd docs collection exists + index fresh
 ```
 
-### Operator Helpers
+### Operator helpers
 ```bash
 task menu                        # Task control-plane TUI (human view, gum)
 task menu:operator               # Same plane, flat operator view
@@ -78,7 +78,7 @@ task inventory                   # Fleet inventory TUI
 task modules                     # Control-knobs TUI
 ```
 
-## Task Control-Plane TUI (`task menu`)
+## Task control-plane TUI (`task menu`)
 
 `task menu` opens a Charmbracelet Gum TUI over the **whole Taskfile**. Both front
 ends read one control-plane source — the Taskfile itself, via
@@ -312,7 +312,7 @@ Still hand-written, by design: the gating tasks. The generated artifact is data
 (`graph.json` + `version` + `prose`), not a Taskfile — replacing the hand-written
 YAML with generated YAML is the next stage, and it needs this parity layer first.
 
-## Closure Analysis (`dev:closure*`)
+## Closure analysis (`dev:closure*`)
 
 Store-DB only — **no `nix eval`**, so it is cheap and works on any reachable host.
 Targets the local `/run/current-system` by default, a remote host with `HOST=<name>`
@@ -352,6 +352,6 @@ from both implementations and diffs them. Parity is exact, not approximate —
 including `numfmt`'s `--round=up` sizing and GNU `sort`'s tie-break rules, both
 of which had to be reproduced deliberately.
 
-## Legacy Migration
+## Legacy migration
 
 Many tasks in `services-legacy.yml` are marked `[deprecated]` and route to canonical `infra:*` or `dev:*` tasks. Prefer using the canonical namespaces directly for new workflows.

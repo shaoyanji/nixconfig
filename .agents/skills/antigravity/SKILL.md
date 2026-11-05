@@ -34,7 +34,7 @@ Requires the antigravity CLI.
 - Must run inside a git repository (`/tmp/antigravity_task` used as scratch workspace).
 - Use `pty=true` in terminal calls — `agy` hangs without PTY.
 
-## Key Flags
+## Key flags
 
 | Flag | Description |
 |------|-------------|
@@ -45,7 +45,7 @@ Requires the antigravity CLI.
 || `--output-format json` | Structured JSON output |
 || `--sandbox` | Sandbox mode (syntax may differ from old `--sandbox danger-full-access`) |
 
-## One-Shot Tasks
+## One-shot tasks
 
 ```bash
 # Verified syntax for agy installed version (NOT antigravity binary)
@@ -57,7 +57,7 @@ For scratch work (requires `.git` directory):
 terminal(command="cd $(mktemp -d) && git init && agy --dangerously-skip-permissions --print='Build a test script' --mode plan --output-format json", workdir="/tmp/project", pty=true)
 ```
 
-## Background Mode (Long Tasks)
+## Background mode (long tasks)
 
 ```bash
 # Background mode (verified syntax for agy installed version; binary NOT migrated)
@@ -78,7 +78,7 @@ process(action="submit", session_id="<id>", data="yes")
 process(action="kill", session_id="<id>")
 ```
 
-## Verification Protocol (required before mailbox mutation)
+## Verification protocol (required before mailbox mutation)
 
 Before deploying any archive/deletion action:
 1. Read `HANDOFF.md` at `/home/devji/.hermes/cache/scratch/email-cleansing/HANDOFF.md`.

@@ -3,11 +3,11 @@ name: system-triage-decision
 description: Autonomous system triage and architectural handover prioritization powered by System One decision models (Julia-1 and Laya). Evaluates SYSTEM.md and HANDOFF.md with calibrated confidence scoring, TIER 1/2 categorization, and threshold-gated remediation routing.
 ---
 
-# System Triage Decision (System One AI Decision Models)
+# System triage decision (System One AI decision models)
 
-A specialized agent skill utilizing **System One decision models** (`julia-1` and `laya`) to perform structured, non-autoregressive triage across NixOS systems.
+An agent skill that uses **System One decision models** (`julia-1` and `laya`) for structured, non-autoregressive triage across NixOS systems.
 
-## What Are System One Decision Models?
+## What are System One decision models?
 Unlike autoregressive language models that generate unconstrained text tokens, System One decision models evaluate the decision space in a single fast forward pass, returning typed answers with calibrated probability distributions:
 1. **`choice`**: Picks one option from a defined set with probabilities.
 2. **`score`**: Places the input on an ordered numerical scale with confidence.
@@ -15,7 +15,7 @@ Unlike autoregressive language models that generate unconstrained text tokens, S
 4. **`classify`**: Assigns category labels from a fixed taxonomy.
 5. **`route`**: Directs input to an action handler with confidence rationale.
 
-### Model Characteristics & Benchmark Limits on `frieren`
+### Model characteristics & benchmark limits on `frieren`
 - **Julia-1 (Supersonic Labs):**
   - **Parameters:** 144M (`jhu-clsp/mmbert-small` encoder).
   - **Context Window:** Up to 8,192 tokens.
@@ -28,7 +28,7 @@ Unlike autoregressive language models that generate unconstrained text tokens, S
   - **Measured CPU Latency:** ~0.41 ms per decision (~2,410 decisions/sec).
   - **Best For:** High-precision option marker scoring, low-entropy decision routing.
 
-## Usage Guide
+## Usage guide
 
 The skill provides an executable CLI:
 `~/.agents/skills/system-triage-decision/scripts/system-triage.sh`

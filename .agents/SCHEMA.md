@@ -1,4 +1,4 @@
-# Documentation & Skill Schema
+# Documentation & skill schema
 
 The repo's context was accumulating four failure modes at once: the same fact in
 three files, history mixed into living docs, no budget on agent-facing prose, and

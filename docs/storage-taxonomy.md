@@ -1,4 +1,4 @@
-# Storage Taxonomy
+# Storage taxonomy
 
 The persistent pool is `/srv/data` on `frieren`, mounted fleet-wide at
 `/Volumes/data` by [`modules/profiles/nas-client.nix`](../modules/profiles/nas-client.nix).

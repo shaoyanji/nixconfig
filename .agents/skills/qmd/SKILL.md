@@ -11,7 +11,7 @@ metadata:
     related_skills: []
 ---
 
-# qmd — Quick Markdown Search (nix-managed)
+# qmd — quick Markdown search (nix-managed)
 
 Local search engine for Markdown notes, docs, and knowledge bases.
 Index once, search fast.
@@ -76,7 +76,7 @@ Routes to jev if context is insufficient. Fewer tool calls, always context-rich.
 - Prefer `qmd search` (BM25 keyword). It is typically instant and is
   the default; embeddings (`qmd embed`) are optional and slower.
 
-## Canonical Collections
+## Canonical collections
 
 The fleet maintains 9 indexed collections across `/Volumes/data`:
 
@@ -105,7 +105,7 @@ task checks:qmd:docs        # check nixconfig collection index
 task checks:qmd:vault       # check Obsidian vault collection index
 ```
 
-## Multi-Floor Compute Discipline (Eisen Offload)
+## Multi-Floor compute discipline (Eisen offload)
 
 Frieren (Fleet Mainframe, 15W quad-core `i5-8250U`, 11.5 GB RAM) must **never** run batch vector embeddings:
 - Embedding thousands of chunks on Frieren causes thermal throttling, memory pressure, and I/O lockup.
@@ -116,7 +116,7 @@ Frieren (Fleet Mainframe, 15W quad-core `i5-8250U`, 11.5 GB RAM) must **never** 
   3. Eisen executes multi-threaded embedding (`qmd embed`) purely against local NVMe.
   4. The updated `index.sqlite` and model weights are synced back to Frieren.
 
-## Automated Monthly Synchronization (No LLM in the Loop)
+## Automated monthly synchronization (no LLM in the loop)
 
 The entire sync pipeline is packaged as a hermetic `pkgs.writeShellApplication`
 ([`modules/scripts/qmd-eisen-embed-sync.nix`](../../../modules/scripts/qmd-eisen-embed-sync.nix))

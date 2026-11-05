@@ -10,7 +10,7 @@ Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style containe
 - `modules/user/*`, `modules/roles/*`, and `modules/shell/*`: user and role commitments.
 - `docs/*`: operator and architecture references.
 
-## Quick Start
+## Quick start
 
 1. **Prerequisites**: NixOS/Darwin system with flakes enabled
 2. **Clone repo**: `git clone <repo-url> && cd nixconfig`
@@ -30,7 +30,7 @@ duplicated here.
 `base-node.nix` (profile) provides the common NixOS baseline: kernel packages, SSH, keyd, networkmanager, console, sops, user `devji`, common dev packages, and boot loader defaults (systemd-boot + EFI). Container and desktop hosts import it via `globalModulesContainers` or `desktop-client.nix`.
 `base-node.nix` also imports `modules/profiles/firewall-baseline.nix`, which enables the firewall and only opens TCP/22 by default. Hosts should add service/interface-specific allowances explicitly.
 
-## Host Lifecycle
+## Host lifecycle
 
 ### Commission a new host
 
@@ -305,7 +305,7 @@ sudo nixos-install --flake /path/to/flake#hostname
 
 Disko handles partitioning, formatting, and mounting — no manual `fdisk`/`mkfs` needed. Device paths are parameterised per-host (e.g. `disko.nix {device = "/dev/sda";}`).
 
-## Supported Hosts
+## Supported hosts
 
 The fleet roster — 31 devices across NixOS, nix-darwin, standalone Home Manager,
 external non-Nix nodes, preserved and WIP machines — is defined once in
@@ -436,13 +436,13 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 
 **2026-09-17 — Agent-era tooling removed.** All agent-era modules (`ai-host`, `hermes-defaults`, `ollama-cloud-defaults`, `nullclaw`/`zeroclaw` + deployment wrappers, `pancakes-harness`, `hermes-ai-mounts`, `ai-services-*`), packages (`nullclaw`, `pancakes-harness`, `qwen-code`, `xs`, `xs-helper`, `xs-materializer`), their scripts/taskfiles/smoke-checks, and the fleet-pattern docs were deleted. `hosts/mtfuji/ai.nix` now only mounts the ollama data subvols and enables ollama; poseidon/garnixMachine/kellerbench agent blocks are gone; the `nullclawFleetContract` check and the `xs-helper` app output were dropped. The tailscale DNS target moved from the decommissioned thinsandy pi-hole IP to frieren's `100.97.61.65`.
 
-**2026-04-30 — Task system consolidation.** Deprecated legacy task aliases and menus, directing users to new `infra:` and `dev:` prefixed tasks. Simplified `checks:nullclaw:smoke` tasks and enhanced `dev:git` tasks with AI commit integration.
+**2026-04-30 — Task system consolidation.** Deprecated legacy task aliases and menus, directing users to new `infra:` and `dev:` prefixed tasks. Simplified `checks:nullclaw:smoke` tasks and extended `dev:git` tasks with AI commit integration.
 
 **2026-04-23 — Manifest and dead-code cleanup.** The AI-host manifest system (`taskfiles/ai-host-manifest.json`, `scripts/task/ai-host-*.sh`, and `taskfiles/services-ai-hosts.yml`) was removed. Host menus and validation tasks now use static host lists and direct smoke checks. The `modules/user/ai/` directory and `modules/goodies.nix` were also removed; nothing in active host configs imported them. See the git log for the full decision.
 
 ## Documentation
 
-### Quick Reference
+### Quick reference
 - `AGENTS.md` - Agent routing helpers and task namespace summary
 - `inventory.toml` - Canonical 31-device fleet inventory source of truth
 - `docs/fleet-inventory.md`, `docs/modules-registry.md` - pointer pages; the generated
@@ -464,5 +464,5 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 ### Historical
 - `AGENTS.nix` - Decisions, open work, handoffs and experiments as notes (`task ops:notes`)
 
-### Site Management
+### Site management
 Manage site targets with `task dev:site:list`; build/preview/deploy the default target with `task dev:site:build`, `task dev:site:preview`, and `task dev:site:deploy`.

@@ -7,13 +7,13 @@ description: >-
   Use when the user requests ultrafast browser automation, rapid form filling, or quick web goal navigation.
 ---
 
-# Jev Ultrafast Browser Skill
+# Jev ultrafast browser skill
 
 Low-latency, vision-free browser automation combining **Browser Use** design patterns with **TypeSafe Jev System One** structured prediction.
 
 Unlike traditional screenshot-based vision agents that take several seconds per step, Jev transforms the visible page DOM into an indexed table of interactive controls and makes a single speculative API call to determine the operation and target element in ~50–100ms.
 
-## Native Windows `chrome.exe` Integration
+## Native Windows `chrome.exe` integration
 
 On WSL2 / `guckloch`, this skill automatically drives the host's native Windows Google Chrome (`C:\Program Files\Google\Chrome\Application\chrome.exe` or `msedge.exe`):
 - **Zero Linux Chromium required**: No large browser binaries or shared library dependencies needed in the Nix store.
@@ -39,7 +39,7 @@ Page → Action Table  │ Operation (CLICK, TYPE, ...)  │
 2. **Speculative Decision**: The System One endpoint (`https://api.typesafe.ai/v1/systemone`) evaluates operation selection (`CLICK`, `TYPE_TEXT`, `SELECT`, `SCROLL_UP`, `SCROLL_DOWN`, `WAIT`, `DONE`, `BLOCKED`) and candidate target heads simultaneously.
 3. **Execution**: Playwright triggers native browser events on the exact matching DOM node in Windows Chrome.
 
-## Environment & Prerequisites
+## Environment & prerequisites
 
 The skill automatically sources API keys in the following priority order:
 1. Active environment variables (`process.env`)
@@ -52,7 +52,7 @@ Required key:
 Optional text generation keys (for `TYPE_TEXT` values):
 * `DEEPSEEK_API_KEY`, `OPENROUTER_API_KEY`, or `GEMINI_API_KEY`.
 
-## CLI Usage
+## CLI usage
 
 Run a browser automation goal directly from the WSL terminal:
 
@@ -105,7 +105,7 @@ await executeAction(page, decision);
 await browser.close();
 ```
 
-## Verification & Smoke Testing
+## Verification & smoke testing
 
 To verify the skill installation and end-to-end operation driving Windows `chrome.exe` from `guckloch`:
 

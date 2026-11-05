@@ -1,4 +1,4 @@
-# frieren Service Access Runbook
+# frieren service access runbook
 
 How to reach the services on `frieren` (NAS / core services host) from each network
 context. Source of truth for the wiring: `hosts/frieren/reverse-proxy.nix` (nginx

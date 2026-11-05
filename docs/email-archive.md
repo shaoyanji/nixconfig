@@ -353,7 +353,7 @@ systemctl list-timers email-archive-import     # next elapse
 curl -s 'http://127.0.0.1:8080/api/list-emails?lim=5' | jq
 ```
 
-## Google Drive mirror (skipped until a remote exists)
+## Google drive mirror (skipped until a remote exists)
 
 The sync is one-way — Drive holds a mirror, never the source of truth. The timer
 runs from first boot and the unit carries `ConditionPathExists` on

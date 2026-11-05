@@ -223,10 +223,12 @@ in {
       inherit (host) modules;
     });
 
-  # The generated markdown tree and the skills bundle are per-system packages,
-  # and x86_64-linux only: `nix build .#artifacts.docs` compiles them on the host
-  # that serves them, and aarch64 hosts simply do not carry the attribute. The
-  # rendered site is `.#sites.fleet-docs-site` (lib/aki-site.nix).
+  # The generated markdown tree, the skills bundle and the two JSON documents
+  # are per-system packages on both Linux architectures: they are bash plus
+  # writeText over already-compiled values, so `nix build .#artifacts.docs`
+  # works wherever the repo is checked out instead of asking an aarch64 host for
+  # a foreign x86_64 attribute. The rendered site is `.#sites.fleet-docs-site`
+  # (lib/aki-site.nix).
 
   # Fast, cached entry point: `nix eval .#inventory.hosts.<host>.role` reads the
   # compiled registry WITHOUT evaluating a single host configuration.

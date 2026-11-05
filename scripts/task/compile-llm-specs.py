@@ -158,7 +158,7 @@ def generate_fleet_matrix_markdown(data):
     cross = sorted(h for h, i in hosts.items() if i.get("builder"))
     cross_section = (
         [
-            f"### 5. Cross-Architecture Builds ({tick(cross)})",
+            f"### 5. Cross-architecture builds ({tick(cross)})",
             "- **Builder**: "
             + ", ".join(f"`{h}` → `{hosts[h]['builder']}`" for h in cross)
             + ". Built there and substituted here; a host with a declared builder is not a CI target.",
@@ -169,40 +169,40 @@ def generate_fleet_matrix_markdown(data):
     )
 
     doc = [
-        "# Fleet LLM Context Matrix",
+        "# Fleet LLM context matrix",
         "",
         "> Dense machine context matrix optimized for LLM token budgets and prompt injection.",
         "> Source of truth: [`inventory.toml`](../inventory.toml).",
         "",
-        "## Fleet Status Breakdown",
+        "## Fleet status breakdown",
         "",
         *status_lines,
         "",
         "---",
         "",
-        "## LLM Operational Constraints by Host Category",
+        "## LLM operational constraints by host category",
         "",
-        "### 1. Mainframe & Core Server (`frieren`)",
+        "### 1. Mainframe & core server (`frieren`)",
         "- **Sensitive Window**: 03:00-05:30 CET nightly backup and handoff window. Never schedule rebuilds here.",
         "- **Rebuild Rule**: At most ONE rebuild at a time; always commit and push to origin/main or autoUpgrade will revert next morning at 04:00.",
         "- **Declarative Services**: Kiwix (/var/lib/kiwix) is strictly declarative; never hand-edit.",
         "",
-        "### 2. Workstations & Kiosks (`poseidon`, `eisen`, `stark`, `kellerbench`)",
+        "### 2. Workstations & kiosks (`poseidon`, `eisen`, `stark`, `kellerbench`)",
         "- **GPU Drivers**: NVIDIA hosts (`poseidon`: RTX 3050 Ti Laptop open; `stark`: MX110 legacy_580 offload; `kellerbench`: GTX 750 Ti legacy_580). AMD hosts (`eisen`: RX 5700 Navi 10 Mesa).",
         "- **UI Priority**: Keep interactive desktop smooth on `poseidon` during heavy inference.",
         "",
-        "### 3. Lightweight Terminals (`fern`, `scratch`, `netbook`)",
+        "### 3. Lightweight terminals (`fern`, `scratch`, `netbook`)",
         "- **Thermal & CPU Caps**: Low-power dual-core CPUs. Offload compilation to `frieren` or remote builders.",
         "- **Scratch Disk Diet**: Shaky f2fs SSD; tmpfs logs and zram RAM-only swap.",
         "",
-        "### 4. Non-Nix Shared Hosting (`serv00`, `dragoncourt`, `envs`)",
+        "### 4. Non-Nix shared hosting (`serv00`, `dragoncourt`, `envs`)",
         "- **Strict Warning**: NON-NIX. NEVER run `nixos-rebuild`, `nix`, or NixOS commands.",
         "- **Serv00 Quota**: Strict 512 MB RAM limit. Violators killed by FreeBSD kernel. Manage via Devil CLI.",
         "",
         *cross_section,
         "---",
         "",
-        "## Quick Host Spec Reference",
+        "## Quick host spec reference",
         "",
         "| Host | Status | Nix? | Arch | Compute Tier | CPU / RAM / GPU | Primary Role |",
         "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |"
@@ -236,7 +236,7 @@ def generate_fleet_matrix_markdown(data):
 # deliberately deleted in favour of `.agents/fleet-matrix.md` (generated below)
 # and `docs/generated/fleet-inventory.md` (built by lib/docs.nix), so this module
 # now only asserts that the pointer is intact. `--sync` keeps it byte-stable.
-AGENTS_INVENTORY_SECTION = """### Complete Client OS Fleet Inventory
+AGENTS_INVENTORY_SECTION = """### Complete client OS fleet inventory
 
 > **No table here — by design.** The fleet registry has exactly one home:
 > [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
@@ -244,8 +244,8 @@ AGENTS_INVENTORY_SECTION = """### Complete Client OS Fleet Inventory
 > in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`). A pasted
 > table disagrees with itself within a month — `.agents/SCHEMA.md` §1, `docs/docs-pipeline-audit.md` F4."""
 
-AGENTS_START = "### Complete Client OS Fleet Inventory"
-AGENTS_END = "### Module Layout"
+AGENTS_START = "### Complete client OS fleet inventory"
+AGENTS_END = "### Module layout"
 
 
 def update_agents_md(data=None):

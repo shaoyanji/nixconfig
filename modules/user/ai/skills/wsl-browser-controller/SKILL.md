@@ -5,7 +5,7 @@ description: >-
   Enumerate open tabs, inspect active tab, switch tabs, open URLs, and close tabs without requiring browser flags or remote debugging ports.
 ---
 
-# WSL Browser Controller Skill
+# WSL browser controller skill
 
 Drive and inspect active Windows host browsers (**Google Chrome**, **Microsoft Edge**) directly from inside **WSL2** using native Windows UI Automation over the WSL interop boundary.
 
@@ -20,7 +20,7 @@ Unlike CDP-based tools that require starting Chrome with special debug flags (`-
 - **URL Launching**: Open new URLs in the default Windows host browser directly from WSL.
 - **Agent-Ready JSON Mode**: Emit structured JSON (`--json`) for automated tool calling and agent policies.
 
-## CLI Usage
+## CLI usage
 
 The skill provides the `wsl-browser.sh` utility under `scripts/`:
 
@@ -46,15 +46,15 @@ wsl-browser.sh close 15
 wsl-browser.sh close "Stirling"
 ```
 
-## How It Works
+## How it works
 
 WSL2 communicates across the Windows interop boundary (`powershell.exe`) with the Windows `UIAutomationClient` framework:
 1. Queries running browser processes (`chrome.exe`, `msedge.exe`) with active main window handles.
 2. Traverses the browser's native UI tree to find `TabStrip` / `TabContainerView` control panes.
 3. Reads `SelectionItemPattern` on each tab item to determine selection status.
-4. Invokes `.Select()` on the target `AutomationElement` and calls `SetForegroundWindow` via Win32 API to seamlessly bring the tab into focus.
+4. Invokes `.Select()` on the target `AutomationElement` and calls `SetForegroundWindow` through the Win32 API to bring the tab into focus.
 
-## JSON Schema Output
+## JSON schema output
 
 `wsl-browser list --json` outputs:
 

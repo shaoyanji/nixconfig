@@ -1,4 +1,4 @@
-# Rollback Routing
+# Rollback routing
 
 ## Scope
 Explain rollback in terms of the existing `infra:*` tasks without creating new procedures.

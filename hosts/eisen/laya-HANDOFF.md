@@ -1,4 +1,4 @@
-# eisen — Laya Final Verification Handoff
+# eisen — Laya final verification handoff
 
 Close-out checklist for the Laya decision-model deployment (`hosts/eisen/decision-models.nix`),
 the last piece of the offline **qwen + laya tandem**. Everything below is a *final check* —

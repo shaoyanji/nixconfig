@@ -1,4 +1,4 @@
-# Closure Reduction — measured levers and the move toward `nix shell`
+# Closure reduction — measured levers and the move toward `nix shell`
 
 Measured on **frieren** against `/run/current-system` on **2026-10-10**
 (`nixos-system-frieren-26.11.20261005.aa48d34`).
@@ -85,7 +85,7 @@ task dev:closure:menu -- why zed-editor
 
 ## 4. Levers, ranked
 
-### L1 — Two full Chromiums for one purpose · **APPLIED, measured 703.2 MiB**
+### L1 — two full Chromiums for one purpose · **APPLIED, measured 703.2 MiB**
 
 `modules/user/ai/default.nix` installs **both** `pkgs.chromium` and
 `pkgs.llm-agents.agent-browser`, on the belief stated in its own comment
@@ -186,7 +186,7 @@ belongs on the machine that requests it.
 task dev:closure:menu -- why libreoffice
 ```
 
-### L6 — Duplicate versions across subsystems · **5.1 GiB optimistic / 675 groups**
+### L6 — duplicate versions across subsystems · **5.1 GiB optimistic / 675 groups**
 
 Two copies of one package in one closure buys nothing. The report ranks groups by
 the size of the redundant copy (total minus the largest member), so the figure is
@@ -213,7 +213,7 @@ task dev:closure:menu -- reduce 15
 task dev:closure:menu -- members electron-unwrapped
 ```
 
-### L7 — The `other` bucket is not a subsystem · **analysis lever**
+### L7 — the `other` bucket is not a subsystem · **analysis lever**
 
 66.8% of the closure (2688 packages) lands in `other` because
 `subsystemOf`'s ordered pattern list has no rule for it. That is fine for a
@@ -254,7 +254,9 @@ There is currently **no `nix run` path at all**, so a tool used once a month mus
 be installed permanently. That is the concrete blocker to the `nix shell`
 direction, and the cheapest thing to fix.
 
-### First moveThe tree exists now: `flake/cli.nix` holds the CLI families, `packages.<system>.cli`
+### First move
+
+The tree exists now: `flake/cli.nix` holds the CLI families, `packages.<system>.cli`
 is the store path and `apps.<system>.cli` the run target, so `nix run .#cli.search.qmd`
 resolves from the store — on a warm host, effectively immediate. The next move is
 family by family: drop what a host does not run continuously from `home.packages`
@@ -305,7 +307,7 @@ budget = baseline_bytes × (1 + headroom_pct/100)
 
 `baseline_bytes` is a *measurement* written by `task dev:closure:budget:adopt`, which
 records it in the managed `# >>> baseline` block at the bottom of the file. That is the
-whole ratchet: debloat → deploy → adopt → the smaller closure is now the ceiling. Nothing
+whole cycle: debloat, deploy, adopt, and the smaller closure becomes the ceiling. Nothing
 is hand-maintained, so a stale number cannot quietly make the gate meaningless. It did:
 a hand-written `37373908571` (34.9 GiB) ceiling sat **5.0 GiB** above a real 29.9 GiB
 closure, and the gate stayed green through every drift.

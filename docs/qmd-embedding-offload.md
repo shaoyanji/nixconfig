@@ -1,4 +1,4 @@
-# QMD Vector Embedding Remote Offload & Synchronization
+# QMD vector embedding remote offload & synchronization
 
 Architecture and operational runbook for offloading QMD vector embeddings from
 Frieren (NAS) to Eisen (Compute Workstation) across network floors.
@@ -12,7 +12,7 @@ knowledge bases, repositories, and archives. While full-text BM25 search
 (`qmd search`) runs instantaneously with negligible CPU, generating dense vector
 embeddings (`qmd embed` using Gemma-300M) requires extensive matrix math.
 
-### The Host Compute Asymmetry
+### The host compute asymmetry
 
 * **Frieren (`i5-8250U`, 15W TDP, 11.5 GiB RAM):**
   Central NAS mainframe and media server. Running batch embeddings on Frieren
@@ -23,7 +23,7 @@ embeddings (`qmd embed` using Gemma-300M) requires extensive matrix math.
   Workstation and local LLM host. Easily processes embedding batches at ~6 dedicated
   worker threads without memory pressure or thermal throttling.
 
-### The Multi-Floor NFS Latency Trap
+### The multi-floor NFS latency trap
 
 Naively running `qmd embed` on Eisen against NFS-mounted storage (`/Volumes/data`
 mounted over 3 floors of building network) causes severe performance degradation:
@@ -60,7 +60,7 @@ sequenceDiagram
     F->>F: qmd vsearch / qmd search (local inference in ~150ms)
 ```
 
-### Vector Invalidation Rule
+### Vector invalidation rule
 Embeddings stored in `content_vectors` are keyed by SHA-256 document content hashes
 and model identifiers. They are **never invalidated** by transferring the SQLite
 database between hosts. Once embedded by Eisen, Frieren reuses the vectors
@@ -90,7 +90,7 @@ All collections are configured in `~/.config/qmd/index.yml`:
 
 The entire offload pipeline is fully deterministic and requires **zero interactive LLM assistance**.
 
-### Package & Script
+### Package & script
 Packaged as a hermetic Nix application via `pkgs.writeShellApplication` at
 [`modules/scripts/qmd-eisen-embed-sync.nix`](../modules/scripts/qmd-eisen-embed-sync.nix)
 and installed into system PATH on Frieren via `hosts/frieren/tools.nix`.
@@ -103,7 +103,7 @@ provides:
 * **Status Mode (`--status`):** Inspects vector counts and Eisen power state.
 * **Dry-Run Mode (`--dry-run`):** Simulates WoL, rsync, and embed steps without mutating state.
 
-### CLI Usage & Flags
+### CLI usage & flags
 ```bash
 qmd-eisen-embed-sync --check           # preflight check
 qmd-eisen-embed-sync --status          # view index & Eisen power state
@@ -114,7 +114,7 @@ qmd-eisen-embed-sync --no-poweroff     # leave Eisen powered on after sync
 qmd-eisen-embed-sync --poweroff        # force poweroff after sync
 ```
 
-### Taskfile Tasks
+### Taskfile tasks
 ```bash
 task dev:qmd:sync:eisen -- --check    # Pass flags through to the sync runner
 task dev:qmd:sync:eisen               # Canonical task
@@ -122,7 +122,7 @@ task ops:qmd:sync:eisen               # Ops plane alias
 task data:qmd:sync:eisen              # Data plane alias
 ```
 
-### Declarative Systemd Unit on Frieren
+### Declarative systemd unit on Frieren
 Defined in `hosts/frieren/infra-stack.nix`:
 * **Package:** `${qmdEisenEmbedSync}/bin/qmd-eisen-embed-sync`
 * **Service:** `systemd.services.qmd-eisen-embed-sync`

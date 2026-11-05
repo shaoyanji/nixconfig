@@ -113,7 +113,7 @@ structured prompt and report files you already use to hand work to another agent
 Backup hook (cadence is an open decision, so nothing schedules it yet):
 `task infra:xs:export OUT=<dir>` on delphi writes `frames.jsonl` plus `cas/`.
 
-## Home Initialization & Tautological Control Plane
+## Home initialization & tautological control plane
 
 When an AI agent or developer session initializes from the home directory (`$HOME` / `~`):
 
@@ -132,9 +132,9 @@ When an AI agent or developer session initializes from the home directory (`$HOM
 
 ---
 
-## Architecture Overview
+## Architecture overview
 
-### Flake Output Assembly
+### Flake output assembly
 
 ```
 flake.nix → flake/outputs.nix (the one assembly node)
@@ -154,7 +154,7 @@ flake.nix → flake/outputs.nix (the one assembly node)
 2. `outputs.nix` projects inventory by `kind` — the kind picks the assembler, nothing is wired by hand
 3. `flake/module-sets.nix` defines the 5 global module chains used as baselines
 
-### Module Chains (defined in `flake/module-sets.nix`)
+### Module chains (defined in `flake/module-sets.nix`)
 
 | Chain                            | What it includes                                                                       | Used by                                                                            |
 | -------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -168,7 +168,7 @@ flake.nix → flake/outputs.nix (the one assembly node)
 | `globalModulesDemo`              | global + demo + home-manager (no sops)                                                 | demo (NixOS demo VM)                                                               |
 | `globalModulesHome`              | standalone HM sharedModules + allowUnfree                                              | penguin, alarm, kali (standalone home-manager)                                     |
 
-### Complete Client OS Fleet Inventory
+### Complete client OS fleet inventory
 
 > **No table here — by design.** The fleet registry has exactly one home:
 > [`inventory.toml`](inventory.toml), compiled once by `lib/inventory.nix`. Read it
@@ -176,7 +176,7 @@ flake.nix → flake/outputs.nix (the one assembly node)
 > in `docs/generated/fleet-inventory.md` (`nix build .#artifacts.docs`). A pasted
 > table disagrees with itself within a month — `.agents/SCHEMA.md` §1, `docs/docs-pipeline-audit.md` F4.
 
-### Module Layout
+### Module layout
 
 ```
 modules/
@@ -224,9 +224,9 @@ Custom packages built from the flake:
 
 ---
 
-## Essential Commands
+## Essential commands
 
-### Taskfile Entrypoints
+### Taskfile entrypoints
 
 ```bash
 task help                        # List all tasks
@@ -234,7 +234,7 @@ task --list-all                  # Same, unfiltered
 task status                      # git status + hostname
 ```
 
-### Knowledge Graph & Notes Queries (AGENTS.nix & ops:kg)
+### Knowledge graph & notes queries (AGENTS.nix & ops:kg)
 
 ```bash
 # --- AGENTS.nix Queries (Decisions, Proposals, Open Todos) ---
@@ -259,7 +259,7 @@ task ops:kg:comention HOST=<h> MIN=2    # Multi-hop co-mentioned hosts sharing d
 task ops:ask Q="what touches <host>"    # Natural language query routed to graph
 ```
 
-### Host Lifecycle
+### Host lifecycle
 
 ```bash
 task infra:plan:host:<host>      # Build/evaluate host closure (dry run)
@@ -269,7 +269,7 @@ task infra:rollback:host:<host>  # Roll back to previous generation
 task infra:logs:host:<host>      # View remote journald logs
 ```
 
-### Local Rebuilds
+### Local rebuilds
 
 ```bash
 task infra:rebuild:nixos         # switch IS the build; no pre-flight checks (NOM=1 for TUI)
@@ -277,7 +277,7 @@ task infra:rebuild:darwin        # darwin-rebuild switch (local) + refresh ~/Tas
 task infra:rebuild:home-manager  # home-manager switch (local) + refresh ~/Taskfile.yml
 ```
 
-### Client OS Maintenance & Debugging Runbooks
+### Client OS maintenance & debugging runbooks
 
 ```bash
 task infra:plan:host:<host>               # substitute the closure, apply nothing
@@ -308,7 +308,7 @@ Also in that runbook: kiwix is declarative, uncached fleet builds go through
 `task infra:update:fleet`, never run `hermes gateway install` there, and every
 host can sign certs.
 
-### Git & Flake
+### Git & flake
 
 ```bash
 task dev:git:quick-push          # Stage tracked, AI-commit, push
@@ -328,7 +328,7 @@ task dev:qmd:refresh             # (Re)index markdown docs (repo docs + personal
 task dev:qmd:vault:refresh       # (Re)index personal Obsidian vault into qmd
 ```
 
-### Data & Storage Lifecycle
+### Data & storage lifecycle
 
 ```bash
 task data:audit                  # Audit NAS storage taxonomy, permissions, media hygiene
@@ -338,7 +338,7 @@ task data:protect:private        # Enforce 0700 permissions and .nomedia shields
 task data:index:refresh          # Refresh qmd docs and vault search indices
 ```
 
-### Closure Analysis (store-DB, no eval)
+### Closure analysis (store-DB, no eval)
 
 Cheap "what is actually in this system" analysis: it reads the store database via
 `nix path-info` instead of evaluating Nix — the fix for `checks:quick` having
@@ -393,6 +393,7 @@ nix eval --raw .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath
 #   ^ this one instantiates the whole system derivation graph (>120 s here, and the
 #     reason the old fleet-wide host-eval checks were fatal). ONE host per invocation.
 task checks:nix:lint             # deadnix (fail) + statix (advisory)
+task checks:prose                # [gate] docs and skills carry no unslop vocabulary
 ```
 
 #### HARD RULE [[flake/policies.nix#flake-check-memory-gated]]: no `nix flake check` on a small host
@@ -410,7 +411,7 @@ memory/io PSI and `MemAvailable` every 10 s over the whole **process group**
 (a 4.9 MiB direct-child peak hid a 6 GiB grandchild) and kills the run on
 pressure instead of taking the host down.
 
-#### Agent Verification Protocol (compute discipline)
+#### Agent verification protocol (compute discipline)
 
 Verification is **phased, and each phase has exactly one job.** Confusing the
 phases is what produces both failure modes at once: cheap per-option evals run as
@@ -571,7 +572,7 @@ task infra:sops:fzf              # Select env entries interactively
 task infra:sops:update-keys      # Rotate SOPS recipient keys
 ````
 
-### SMTP Auth
+### SMTP auth
 
 ```bash
 task infra:smtp:auth             # Interactive SMTP auth for hosts (using app passwords)
@@ -596,13 +597,13 @@ task dev:cloak:edit              # Edit TOTP accounts file
 task dev:cloak:sync-bw -- ./export.json  # Import from Bitwarden export
 ```
 
-### Operator Helpers
+### Operator helpers
 
 ```bash
 task agents:menu                 # Interactive operator control plane
 ```
 
-### Nix Raw Commands
+### Nix raw commands
 
 ```bash
 nix build .#nixosConfigurations.<host>.config.system.build.toplevel          # Build host closure
@@ -652,7 +653,7 @@ tool; `yq -i -f script.yq` applies nothing, so verify the compiled result.
 
 ---
 
-## Adding a New Host
+## Adding a new host
 
 1. Create host module under `hosts/<name>/configuration.nix` (or `hosts/<name>.nix` for simple cases)
 2. Add hardware/storage as needed (e.g., `hardware-configuration.nix`, `disko.nix`, or profile imports)
@@ -673,7 +674,7 @@ For provisioning a new server:
 
 ---
 
-## Task Namespace Summary
+## Task namespace summary
 
 See [Task Control Plane](docs/task-control-plane.md) for full namespace definitions and workflow examples.
 
@@ -709,7 +710,7 @@ prints what is actually on it (coverage, vintage, size) rather than a claim.
 
 ---
 
-## qmd Search Operations
+## qmd search operations
 
 Local hybrid search over markdown docs and notes via `qmd` (`pkgs.llm-agents.qmd`;
 where it is not on PATH — `delphi`, measured 2026-10-30 — the tasks resolve the
@@ -745,7 +746,7 @@ longer has to carry the essay. Vector-embedding offload to Eisen:
 
 ---
 
-## Key Operator Helpers
+## Key operator helpers
 
 - `agents:menu` is the interactive operator control plane
 - `task menu` is the whole-Taskfile gum TUI; `menu:list` / `menu:json` are its
@@ -753,11 +754,11 @@ longer has to carry the essay. Vector-embedding offload to Eisen:
   [[flake/policies.nix#task-surface-visible]] — that breaks the agent endpoint.
 - NAS client recovery logic lives under `modules/profiles/nas-client.nix`
 
-## Deployment Guidance
+## Deployment guidance
 
 Host deployment flows use `infra:*` tasks directly. See `.agents/deploy/README.md` for host-specific deployment notes. Per-host quirks live in `.agents/deploy/hosts/*.md` — a host is not only its own config: delphi runs the service-tier `sandbox` microVM (`hosts/microvms/guests.nix`) behind `/microvm/*` and the terminal deck, where `ssh slides@delphi.bountystash.com` is the deck, `task microvm:ssh NAME=sandbox` (from delphi) is the guest shell, and plain `ssh delphi.bountystash.com` is the host shell as `devji`; frieren's `frieren-canary` guest is proved end to end by `task vm:canary:test` (boot → ssh → guest API → host proxy → stop → teardown). Guest mechanics: `hosts/microvms/README.md`.
 
-## Git Hooks Setup
+## Git hooks setup
 
 Pre-commit hooks in `.githooks/` run deadnix (hard gate), statix (advisory), and a formatting check accepting either alejandra or nixpkgs-fmt (hard gate). `.githooks/pre-push` runs the two gates CI's `docs-budget` job runs — `scripts/task/docs-budget.sh` and the task-graph digest pin (an eval, never a build) — because on this tree that job is what fails on `main`, and a refused push costs a line where a red run costs a mail and a context switch. Tools missing from PATH are fetched via nix from the nixpkgs revision pinned in `flake.lock`, so the checks are machine-independent. Enable with:
 
@@ -765,7 +766,7 @@ Pre-commit hooks in `.githooks/` run deadnix (hard gate), statix (advisory), and
 bash .git-hooks-setup.sh    # sets core.hooksPath to .githooks/
 ```
 
-## Nixpkgs Formatting
+## Nixpkgs formatting
 
 **alejandra is the canonical formatter** — every tracked `.nix` file is
 aljandra-clean, and `dev:fmt`, `checks:nix:fix` and the pre-commit hook all run
@@ -840,7 +841,7 @@ is a grandchild), task's restricted shell has no `kill`, `--dry` still starts on
 and `watch: true` is CLI-only. Always stop with `task checks:nix:watch:stop`,
 which verifies the pid is gone: [`docs/task-control-plane.md`](docs/task-control-plane.md).
 
-## External Package Registry
+## External package registry
 
 External fetched dependencies are registered in `modules/config/fetches.json` and resolved through `lib/fetches-extra.nix`. Update hashes with:
 
@@ -848,7 +849,7 @@ External fetched dependencies are registered in `modules/config/fetches.json` an
 task dev:config:hash-update    # runs nix-hash-update.sh
 ```
 
-## Documentation & Site Compilation
+## Documentation & site compilation
 
 Documentation is markdown or data that Nix compiles into a store path; the store
 path is the artifact. Nothing derived is committed, and no second renderer is
@@ -883,7 +884,7 @@ allowed beside the first.
 
 Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 
-## Documentation Map
+## Documentation map
 
 | File                                 | Content                                                                |
 | ------------------------------------ | ---------------------------------------------------------------------- |

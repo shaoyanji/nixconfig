@@ -11,7 +11,7 @@ metadata:
     related_skills: ['infra', 'checks', 'data']
 ---
 
-# `iventoy` — PXE Network Boot & Bare-Metal OS Provisioning Runbook
+# `iventoy` — PXE network boot & bare-metal OS provisioning runbook
 
 Operational runbook and administration guide for `iVentoy`, the bare-metal network boot server running on `frieren.lan` that serves the `/Volumes/data/isos` collection over the local network.
 
@@ -48,7 +48,7 @@ Operational runbook and administration guide for `iVentoy`, the bare-metal netwo
 Access the web interface from any machine on the LAN:
 * **URL:** `http://frieren.lan:26000` or `http://192.168.3.25:26000`
 
-### Initial / Persistent Configuration
+### Initial / persistent configuration
 Settings are saved to `/srv/iventoy/data/iventoy.dat`. The `-R` startup flag automatically restores them on boot:
 1. **DHCP Server Mode:** Must be set to **`ProxyNet`** (indicates iVentoy runs on Linux while router DHCP runs externally).
 2. **Server IP:** `192.168.3.25` on interface `enp1s0`.
@@ -97,7 +97,7 @@ To install or recover any machine on the LAN (`scratch`, `stark`, `eisen`, `kell
 
 ## 6. Service Management & Health Checks
 
-### Check Status & Listeners
+### Check status & listeners
 ```bash
 # Check systemd service
 systemctl status iventoy
@@ -109,12 +109,12 @@ ss -tulpn | grep -E ':(16000|26000|67|69|4011)'
 curl -sI http://127.0.0.1:26000/ | head -n 1
 ```
 
-### Restarting the Daemon
+### Restarting the daemon
 ```bash
 sudo systemctl restart iventoy
 ```
 
-### Reading Service Logs
+### Reading service logs
 ```bash
 sudo tail -n 50 /srv/iventoy/log/log.txt
 ```

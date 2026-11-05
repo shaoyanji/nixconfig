@@ -1,9 +1,9 @@
-# stark Exceptions
+# stark exceptions
 
 ## Scope
 Dell Inspiron 24 3477 All-in-One (i5-7200U Kaby Lake-U, HD 620 + MX110 Optimus, 16 GB RAM) — Steam Big Picture desktop (eisen-style, persistent, no impermanence).
 
-## Key Differences
+## Key differences
 - **Desktop chain** — `globalModulesNixos` (niri + DankMaterialShell greeter + role:heim userland) via `base-desktop-environment.nix`. `autoLogin` as devji into `steam` (upstream gamescope-session); DMS greeter is the fallback after the session exits.
 - **Steam + gamescope** — `modules/profiles/steam.nix` (programs.steam + gamescopeSession) and `programs.gamescope.enable = true`, eisen-style. NOT the noDE steamos.nix kiosk path (ares).
 - **MX110 = Pascal (sm_61)** — `nvidiaPackages.legacy_580` (final series for Pascal), `open = false`, persistenced disabled (nixpkgs bug), same as ares/kellerbench. `cudaSupport` stays OFF (nothing needs it; avoids source builds).
@@ -12,7 +12,7 @@ Dell Inspiron 24 3477 All-in-One (i5-7200U Kaby Lake-U, HD 620 + MX110 Optimus, 
 - **SOPS**: not yet registered in `.sops.yaml`. The `hashedPassword` secret will not decrypt until the host's age key is added and `task infra:sops:update-keys` is run from a workstation holding an authorized key.
 - **hardware-configuration.nix is hand-written** (disko owns fileSystems); revisit the initrd module list after a real `nixos-generate-config` scan on the metal.
 
-## Initial Deploy (first boot from NixOS ISO)
+## Initial deploy (first boot from NixOS ISO)
 ```bash
 # 0. Verify disk ordering: SSD (SK hynix SC311) must be /dev/sdb, 1 TB
 #    HDD /dev/sda. If lsblk disagrees, adjust the devices in
@@ -31,6 +31,6 @@ task infra:sops:update-keys
 sudo chown devji:users /mnt/steam
 ```
 
-## Operational Interpretation
+## Operational interpretation
 - Prefer canonical host deploy flow (`infra:deploy:host:stark`).
 - No CI build enabled by default — add to Cachix workflows only if this host needs remote cache coverage.

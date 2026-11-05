@@ -1,4 +1,4 @@
-# HANDOFF.md — Strategic & Architectural Handover Items
+# HANDOFF.md — strategic & architectural handover items
 
 > **Target Identity:** frieren (Fleet Mainframe & Storage Steward)  
 > **Generated:** 2026-10-17 05:15 CEST  
@@ -10,7 +10,7 @@
 
 ---
 
-## ⚠ Disambiguation of Handoff Documents
+## ⚠ disambiguation of handoff documents
 
 | Document | Location | Authority & Scope | Read/Write Lifecycle |
 | :--- | :--- | :--- | :--- |
@@ -19,7 +19,7 @@
 
 ---
 
-## Strategic Queue & Recommendations
+## Strategic queue & recommendations
 
 ### 1. DNS Failover Secondary Resolver Node Provisioning (HC-3)
 * **Status:** `OPEN` (Documented Architectural Dependency)
@@ -115,7 +115,7 @@
     5. **Safe Reboot:** Reboot host cleanly into `sda`.
 
 * **Hardware Replacement & Declarative Restoration Runbook:**
-  - **Recommended Replacement:** Standard 2.5" SATA III Internal SSD (e.g., Crucial MX500 1TB/2TB or Samsung 870 EVO 1TB). Replacing the mechanical hybrid drive will significantly improve boot times, nix evaluation latency, and eliminate spinning disk failure modes on root.
+  - **Recommended Replacement:** Standard 2.5" SATA III Internal SSD (e.g., Crucial MX500 1TB/2TB or Samsung 870 EVO 1TB). Replacing the mechanical hybrid drive will shorten boot times and nix evaluation latency, and remove spinning-disk failure modes on root.
   - **Step-by-Step Replacement Workflow:**
     1. **Pre-Poweroff Check:** Verify git state in `/Volumes/data/projects/nixconfig` is committed and pushed (`git status --short`).
     2. **Graceful Shutdown:** `sudo systemctl poweroff`. Disconnect power and battery.
@@ -567,7 +567,7 @@
   1. **Catalog & Database:** `/home/devji/.local/share/Libation/LibationContext.db` contains **2,318 audiobooks** cataloged.
   2. **Conversion Progress:** **63 audiobooks** (89 `.m4b` files, including multi-part titles) have been fully downloaded and decrypted to DRM-free `.m4b` format with associated `.jpg` cover art, `.json` metadata, cue sheets, and `.pdf` booklets in `/srv/data/audiobooks/Books/` (occupying **46 GB**).
   3. **Error Status:** **0 failures** recorded in `DownloadAttemptFailures` table.
-  4. **Interruption Root Cause:** Download process stopped at 05:00 CEST when the host executed scheduled daily maintenance / configuration reload. One in-progress partial file (`The Laws of Human Nature`, ASIN `B07DKVMMRZ`, 266 MB `.aaxc`) remains in `/srv/data/audiobooks/.inprogress/DownloadsInProgress/` and will resume seamlessly upon next launch.
+  4. **Interruption Root Cause:** Download process stopped at 05:00 CEST when the host executed scheduled daily maintenance / configuration reload. One in-progress partial file (`The Laws of Human Nature`, ASIN `B07DKVMMRZ`, 266 MB `.aaxc`) remains in `/srv/data/audiobooks/.inprogress/DownloadsInProgress/` and resumes on the next launch.
   5. **Media Center Integration:** **Not currently integrated.** Jellyfin (`/srv/private/jellyfin/root/default/`) has libraries for Movies, Shows, Anime, and Music, but no "Audiobooks" or "Books" library mapped to `/srv/data/audiobooks/Books`. Plex is also unconfigured for audiobooks.
 * **Critical Storage Warning (CRITICAL CAPACITY LIMIT):**
   - Average storage requirement per converted audiobook: **~730 MB**.
@@ -654,7 +654,7 @@
     - Consequently, all outbound connections initiated by Frieren (567 MB TX recorded) have been exiting via the USB-C dock as `192.168.3.253`, while inbound service traffic arrives on `enp1s0` (`192.168.3.25`).
     - Furthermore, `enp0s20f0u2u1i5` is NOT declared in `firewall-scope.nix`, so incoming connections to `.253` are dropped by iptables.
   - **Failover Status:**
-    - **Outbound (Internet access from Frieren):** Automatic failover works via kernel route metrics (100 -> 101 -> 600). If both Ethernet cables are unplugged, outbound traffic seamlessly fails over to Wi-Fi (`wlp2s0`). When Ethernet is reconnected, NetworkManager detects carrier and restores Ethernet priority immediately.
+    - **Outbound (Internet access from Frieren):** Automatic failover works via kernel route metrics (100 -> 101 -> 600). If both Ethernet cables are unplugged, outbound traffic fails over to Wi-Fi (`wlp2s0`). When Ethernet is reconnected, NetworkManager detects carrier and restores Ethernet priority immediately.
     - **Inbound (LAN Services & DNS):** **No transparent failover exists.** If `enp1s0` is unplugged, `192.168.3.25` is unreachable because Wi-Fi holds `.98` and the USB-C dock holds `.253`. Furthermore, `pihole-FTL` is restricted to `interface=enp1s0` and `interface=tailscale0`, so DNS fails for all LAN clients if `enp1s0` is unplugged.
   - **Architectural Recommendations:**
     1. **Primary Recommendation:** Keep `192.168.3.25` on `enp1s0` as the dedicated LAN server backbone. Unplug the redundant Ethernet cable from the USB-C docking station (or assign it metric 200) to eliminate asymmetric routing.
@@ -693,7 +693,7 @@
 * **Context & Audit Findings:**
   1. **Previous Daytime Run (11:30 CEST):** Verified via journal logs that between 11:30 and 12:29 CEST, **50 audiobooks were liberated cleanly** into `/srv/data/audiobooks/Books/` (library expanded from 89 to 139 `.m4b` files). The user believed nothing was done because the desktop experienced zero lag and the completion notification failed silently due to `${pkgs.python3}` lacking the `websockets` library.
   2. **Notification Fix:** Updated `makeAudibleBatchLiberation` to use `pkgs.python3.withPackages (ps: [ps.websockets])` when calling `simplex-rpc.py`. Live-tested message delivery to `#Fleet` (item ID 42 and 43 succeeded).
-  3. **Uncapped Governor ("Let it Rip"):** Per operator directive, removed `CPUQuota = "250%"` and adjusted process nice level to `nice = 10` with `IOSchedulingClass = "best-effort"`. This permits ffmpeg and Libation to utilize all 8 CPU threads without artificial throttling while preserving responsiveness for desktop tasks.
+  3. **Uncapped Governor ("Let it Rip"):** Per operator directive, removed `CPUQuota = "250%"` and adjusted process nice level to `nice = 10` with `IOSchedulingClass = "best-effort"`. This lets ffmpeg and Libation use all 8 CPU threads without artificial throttling, while desktop tasks keep their responsiveness.
   4. **Immediate 50 GB Batch Run:**
      - Deployed `/home/devji/.local/bin/audible-batch-immediate-50gb.sh` running `libationcli liberate --limit-gb 50` under the `/tmp/audible-liberation.lock` mutex.
      - Launched under transient systemd unit `audible-immediate-50gb.service`.
@@ -726,7 +726,7 @@
 * **Status:** `COMPLETED & LIVE ON GEMINI`
 * **Capsule URL:** `gemini://envs.net/~jisifu/aria2c-mobile-anywhere-settings-and-tailscale-rpc.gmi`
 * **Actions Taken:**
-  - Authored a comprehensive Gemtext (`.gmi`) guide explaining the reverse proxy architecture, port 6800 loopback binding vs port 6801 proxy, the port 443 default host trap (Home Assistant SNI fallback), plain HTTP requirements, and exact mobile client settings.
+  - Authored a Gemtext (`.gmi`) guide explaining the reverse proxy architecture, port 6800 loopback binding vs port 6801 proxy, the port 443 default host trap (Home Assistant SNI fallback), plain HTTP requirements, and exact mobile client settings.
   - Uploaded to `/home/jisifu/public_gemini/` on `envs.net` via SSH (`envs`).
   - Executed `python3 update_gmi_links.py` to regenerate the link index in `index.gmi`.
   - Verified live over the Gemini protocol (port 1965 TLS, returned `20 text/gemini`).
@@ -770,7 +770,7 @@
   - `frieren` moved from living room 4K TV to the kitchen as a combined light workstation and fleet server.
   - Connected to Dell D6000 Universal Dock (DisplayLink DL-6950) driving an external Samsung U28E590 28" 4K monitor (`3840x2160 @ 60 Hz`, 1.5x scale in Niri compositor).
   - Internal laptop display (`eDP-1`) is disabled in favor of the external 4K monitor.
-  - Dedicated Gigabit Ethernet on `enp1s0` (`192.168.3.25`) stays active for 24/7 server workloads, allowing the Dell dock to be safely unplugged/plugged for other laptops without causing server downtime or network disruption.
+  - Dedicated Gigabit Ethernet on `enp1s0` (`192.168.3.25`) stays active for 24/7 server workloads, so the Dell dock can be unplugged and plugged into another laptop without server downtime or network disruption.
 * **GUI Debloat:**
   - Disabled `element-desktop` (`element-desktop.enable = false;` in [`modules/roles/home.nix`](../../modules/roles/home.nix)), shedding unused Electron runtime and memory footprint.
   - Confirmed `ghostty` terminal emulator disabled (commented out in [`modules/roles/home.nix`](../../modules/roles/home.nix)), standardizing on Kitty as the single GPU-accelerated terminal.
@@ -781,4 +781,4 @@
 * **Unified Out-of-Store Kando Configuration:**
   - Seeded [`modules/config/kando/menus.json`](../../modules/config/kando/menus.json) in `nixconfig`.
   - Configured out-of-store symlinks in [`modules/user/desktop/niri.nix`](../../modules/user/desktop/niri.nix) mapping `~/.config/kando/menus.json` and `~/.config/kando/menu.json` to `${config.home.homeDirectory}/Documents/nixconfig/modules/config/kando/menus.json`.
-  - In-GUI menu changes now sync directly into the git repository for seamless propagation across all DMS hosts.
+  - In-GUI menu changes now sync directly into the git repository, so they propagate to every DMS host.

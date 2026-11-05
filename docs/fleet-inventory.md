@@ -1,4 +1,4 @@
-# Fleet Device & Host Inventory
+# Fleet device & host inventory
 
 > **Moved — this page is generated now.**
 >

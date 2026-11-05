@@ -1,4 +1,4 @@
-# eisen — Offline Qwen3-TTS Speech Server (`tts.lan`)
+# eisen — offline Qwen3-TTS speech server (`tts.lan`)
 
 OpenAI-compatible text-to-speech, fully offline, on eisen's RX 5700 (Navi 10 —
 **Vulkan, not ROCm**). The implementation is

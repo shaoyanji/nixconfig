@@ -1,4 +1,4 @@
-# Fleet Modular Control Knob Registry
+# Fleet modular control knob registry
 
 > **Moved — this page is generated now.**
 >

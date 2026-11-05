@@ -11,7 +11,7 @@ metadata:
     related_skills: []
 ---
 
-# data — NAS Storage Taxonomy & Hygiene
+# data — NAS storage taxonomy & hygiene
 
 Manage `/srv/data` (mirrored to `/Volumes/data` across the fleet) folder taxonomy, permissions, media server isolation, and data hygiene.
 
@@ -29,7 +29,7 @@ when extension and kind rules cannot place an item, `jev-decide` picks one label
 from a fixed destination list at >= 0.8 probability — never a media title. The
 rest are named for what they do.
 
-## Canonical Storage Taxonomy
+## Canonical storage taxonomy
 
 | Directory | Purpose | Access & Indexing Policy |
 |-----------|---------|--------------------------|

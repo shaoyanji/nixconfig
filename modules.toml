@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 16
+total_knobs = 17
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -174,5 +174,15 @@ category = "knowledge"
 option = "services.zettelGraph.enable"
 path = "modules/services/zettel-graph.nix"
 description = "The private vault as a tailnet reader (:8453) with write-back and PDF publishing"
+default = false
+hosts = ["delphi"]
+
+[knobs.mataroa-console]
+name = "Mataroa Console"
+type = "service"
+category = "writing"
+option = "services.mataroaConsole.enable"
+path = "modules/services/mataroa-console.nix"
+description = "A mataroa.blog blog as markdown files (:8454): ledger, editor, publish and unpublish"
 default = false
 hosts = ["delphi"]

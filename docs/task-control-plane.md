@@ -52,8 +52,11 @@ task dev:qmd:refresh             # (Re)index repo markdown docs into local qmd
 ```bash
 task dev:blog:draft TOPIC="…"    # ideas/<slug>.md scaffolded from the knowledge graph
 task dev:blog:export SLUG=…      # publish it into the blog repo (never commits)
+task dev:blog:mataroa            # the mataroa.blog ledger: local files vs the blog
 ```
 The draft layer and its `about:` edges: [blog-drafting.md](./blog-drafting.md).
+The mataroa.blog console (files first, the blog as a target):
+[mataroa-console.md](./mataroa-console.md).
 
 ### Validation
 ```bash

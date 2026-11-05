@@ -328,6 +328,31 @@ tasks:
     cmds:
       - bash scripts/task/blog-export.sh "{{.SLUG}}" {{.FLAGS}}
 
+  dev:blog:mataroa:
+    desc: "The mataroa console's ledger: local markdown files against the blog (TOON; FORMAT=text, CONSOLE=url)"
+    summary: >
+      Reads /api/state from the console and prints one row per post with the
+      state that matters: in-sync, differs, local-only, remote-only. The console
+      is loopback on delphi (:8095) and proxied on the tailnet (:8454), so
+      CONSOLE= picks the address and defaults to the tailnet mount, which works
+      from any host on the tailnet. Read-only: it starts nothing, writes nothing,
+      and spends no build budget. Exit 0 = the console answered, 1 = it did not
+      (a down unit, or this host is not on the tailnet).
+    vars:
+      CONSOLE: '{{.CONSOLE | default "https://delphi.cloudforest-kardashev.ts.net:8454"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    cmds:
+      - |
+        if ! state="$(curl -fsS --max-time 20 "{{.CONSOLE}}/api/state")"; then
+          echo "mataroa: no answer from {{.CONSOLE}} — the unit runs on delphi (mataroa-console.service), and the mount is tailnet-only" >&2
+          exit 1
+        fi
+        case "{{.FORMAT}}" in
+          json) printf '%s\n' "$state" ;;
+          text) printf '%s' "$state" | jq -r '.posts[] | "\(.state)\t\(.published_at // "draft")\t\(.slug)"' ;;
+          *) printf '%s' "$state" | toon -e ;;
+        esac
+
   dev:qmd:sync:eisen:
     desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
     summary: >

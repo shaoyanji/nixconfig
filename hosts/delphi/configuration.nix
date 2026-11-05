@@ -263,6 +263,7 @@ in {
     ./gok-artifacts.nix
     ./hardware-configuration.nix
     ./infra-stack.nix
+    ./mataroa-console.nix
     ./minyx-keeper.nix
     ./needle-router.nix
     ./paperless.nix
@@ -277,6 +278,7 @@ in {
     ../../modules/services/agent-turns.nix
     ../../modules/services/dsh-web.nix
     ../../modules/services/fleet-monitors.nix
+    ../../modules/services/mataroa-console.nix
     ../../modules/services/media-relay.nix
     ../../modules/services/offload-bridge.nix
     ../../modules/services/paperless-watchdog.nix
@@ -1078,6 +1080,17 @@ in {
         title = "Zettel graph";
         description = "The vault as a reader: notes, their web, edits and PDF publishing.";
         requires = ["zettel-graph.service"];
+      };
+      # The blog as files: the ledger, the editor, and a publish that is a
+      # deployment rather than the only copy. Same shape as the zettel mount —
+      # the port is the module's, because the origin a write is checked against
+      # is `https://<tailnetHost>:<port>`.
+      mataroa = {
+        port = config.services.mataroaConsole.tailnetPort;
+        upstream = "http://127.0.0.1:${toString config.services.mataroaConsole.port}";
+        title = "Mataroa console";
+        description = "Posts as markdown files; publish and unpublish against mataroa.blog.";
+        requires = ["mataroa-console.service"];
       };
     };
     entries.gatus = {

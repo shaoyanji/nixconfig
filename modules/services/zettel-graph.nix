@@ -189,6 +189,11 @@ in {
       wantedBy = ["multi-user.target"];
       wants = ["network-online.target"];
       after = ["network-online.target"];
+      # A unit gets no login PATH and `path` is a service option, not a
+      # serviceConfig directive — written inside serviceConfig it is dropped and
+      # the script dies at exec with status 127. The script's shebang is
+      # `#!/usr/bin/env bash` and its body runs git and coreutils.
+      path = [pkgs.bash pkgs.git pkgs.coreutils];
       serviceConfig = {
         Type = "oneshot";
         User = cfg.user;
@@ -197,11 +202,6 @@ in {
         StateDirectoryMode = "0750";
         LoadCredential = "github-token:${tokenSecret}";
         ExecStart = sync;
-        # The script's shebang is `#!/usr/bin/env bash` and its body runs git,
-        # coreutils and nothing else; a unit gets no login PATH, so without this
-        # list it dies at exec with status 127 (the gok-artifacts receiver hit
-        # the same wall).
-        path = [pkgs.bash pkgs.git pkgs.coreutils];
         # A cold clone of the vault is smaller than this by two orders of
         # magnitude; the timeout exists so a hung fetch cannot hold boot.
         TimeoutStartSec = 300;
@@ -242,6 +242,10 @@ in {
         X-Fleet-Role = "daemon";
         StartLimitIntervalSec = 0;
       };
+      # The publisher is a subprocess of this unit: typst compiles the PDF, and
+      # git both commits and pushes what the page wrote. Set on the service, not
+      # in serviceConfig, or it is silently dropped.
+      path = [python pkgs.typst pkgs.git pkgs.coreutils pkgs.bash];
       serviceConfig = {
         Type = "simple";
         User = cfg.user;
@@ -265,9 +269,6 @@ in {
           "PYTHONUNBUFFERED=1"
           "PYTHONDONTWRITEBYTECODE=1"
         ];
-        # The publisher is a subprocess of this unit: typst compiles the PDF, and
-        # git both commits and pushes what the page wrote.
-        path = [python pkgs.typst pkgs.git pkgs.coreutils pkgs.bash];
         Restart = "always";
         RestartSec = 5;
         RestartSteps = 10;

@@ -267,6 +267,7 @@ in {
     ./needle-router.nix
     ./paperless.nix
     ./vaultwarden.nix
+    ./zettel-graph.nix
     ../../modules/profiles/base-node.nix
     ../../modules/profiles/firewall-baseline.nix
     ../../modules/profiles/hermes.nix
@@ -1066,6 +1067,17 @@ in {
         description = "Append-only agent-turn coordination store; bearer token required.";
         requires = ["agent-turns-shim.service"];
         hideCard = true;
+      };
+      # Read, write and publish. The service is loopback; this mount, behind the
+      # tailnet, is the whole exposure. The port is the module's, because the
+      # origin a write is checked against is `https://<tailnetHost>:<port>` and a
+      # second literal here is how that check starts rejecting the open page.
+      zettel = {
+        port = config.services.zettelGraph.tailnetPort;
+        upstream = "http://127.0.0.1:${toString config.services.zettelGraph.port}";
+        title = "Zettel graph";
+        description = "The vault as a reader: notes, their web, edits and PDF publishing.";
+        requires = ["zettel-graph.service"];
       };
     };
     entries.gatus = {

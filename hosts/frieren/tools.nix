@@ -178,6 +178,9 @@ in {
         "proc"
         "sysfs"
         "devpts"
+        "nfs"
+        "nfs4"
+        "cifs"
       ];
       pruneNames = [
         ".git"
@@ -190,6 +193,8 @@ in {
         "/var/tmp"
         "/nix/store"
         "/.snapshots"
+        "/mnt"
+        "/Volumes"
       ];
     };
   };

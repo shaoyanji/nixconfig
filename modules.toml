@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 15
+total_knobs = 16
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -166,3 +166,13 @@ path = "modules/services/aria2-daemon.nix"
 description = "Headless aria2 RPC daemon (:6801) with AriaNg web UI frontend"
 default = false
 hosts = ["frieren"]
+
+[knobs.zettel-graph]
+name = "Zettel Graph"
+type = "service"
+category = "knowledge"
+option = "services.zettelGraph.enable"
+path = "modules/services/zettel-graph.nix"
+description = "The private vault as a tailnet reader (:8453) with write-back and PDF publishing"
+default = false
+hosts = ["delphi"]

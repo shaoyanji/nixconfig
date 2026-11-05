@@ -207,6 +207,7 @@ modules/
     mail-agent.nix    — natural-language mail actions (needle3 + himalaya) and the nightly bulk sweep
     email-archive.nix — NpgsqlRest over a full-text mailbox: tailnet-only API, declared schema, disk attachments
     mail-atlas.nix    — fuzzy finding, tag taxonomy and relation graph over the archive (tailnet 8452)
+    zettel-graph.nix  — the private vault as a tailnet reader, with write-back through the vault's own scripts
   roles/           — User role assemblers (minimal, home, demo)
   user/            — User module domains
     base/          — CLI/editor/env base
@@ -911,6 +912,7 @@ Audit, evidence and remediation order: `docs/docs-pipeline-audit.md`.
 | [`docs/mail-agent.md`](docs/mail-agent.md)                   | mail-agent on delphi: the tool assessment, measured routing accuracy, the sender trust list, operations |
 | [`docs/email-archive.md`](docs/email-archive.md)              | NpgsqlRest email archive: schema, endpoints, the Drive mirror checklist, what is not done |
 | [`docs/mail-atlas.md`](docs/mail-atlas.md)                   | The archive as a field: tag taxonomy, fuzzy search contract, the WASM particle field and graph |
+| [`docs/zettel-graph.md`](docs/zettel-graph.md)               | The private vault as a tailnet reader: the two units, what is served, the write guard, the token |
 | [`docs/agent-contract.md`](docs/agent-contract.md)            | What "done" means per kind of work: playbook exits, evidence objects, frame discipline |
 | [`docs/selector-daemon-predesign.md`](docs/selector-daemon-predesign.md)         | Handoff packet for a selector daemon: scope, query schema, synthetic data, model and compute plan, Kelly gate |
 | [`docs/agent-turns.md`](docs/agent-turns.md)                | Agent turns (xs): endpoint, schema, tokens, dedup, restore procedure    |

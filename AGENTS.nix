@@ -5,13 +5,13 @@
     dendritic-flake = {
       title = "Dendritic flake — `self` as the only import root";
       kind = "proposal";
-      status = "ACCEPTED";
+      status = "IN FLIGHT";
       priority = "P2";
       date = "2026-11-05";
       summary = "Move to flake-parts with the dendritic pattern: every module, host and package is a flake output imported by name through `self`, so no file list is hand-maintained and finding a module's users is a graph query, not a grep across relative paths.";
       from = ["d1-compiled-context"];
       refs = {
-        modules = ["flake/outputs.nix" "flake/module-sets.nix" "flake/host-inventory.nix"];
+        modules = ["flake.nix" "flake/outputs.nix" "flake/module-sets.nix" "flake/host-inventory.nix"];
         tasks = ["checks:host" "checks:tasks"];
         docs = ["docs/nix-patterns.md"];
       };
@@ -33,6 +33,15 @@
         `grep -rn 'import ../' modules | wc -l` falls to the files that import
         data they own. Publishing already follows this rule (neocities, envs and
         mataroa run from `taskfiles/`); the flake is the last surface that does not.
+
+        Landed 2026-11-05: `flake.nix` calls `flake-parts.lib.mkFlake`; the output set
+        comes from one `flake` attribute, and 32 output names, frieren/eisen/guckloch
+        toplevel `drvPath` and penguin's HM generation are all unchanged.
+        `configurationRevision` carries `<commit>-dirty`, so that comparison holds
+        within one git state, not across a commit.
+
+        Next rung: `flake.modules.nixos.<name>` from the module tree, hosts importing
+        by name through `self`, then `import ../` falls to the files that own their data.
 
         Exit: the three flake wiring files shrink to projections, and the note gains
         `refs.modules` naming what landed. Until then the module wiring is beta: a

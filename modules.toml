@@ -173,6 +173,6 @@ type = "service"
 category = "knowledge"
 option = "services.zettelGraph.enable"
 path = "modules/services/zettel-graph.nix"
-description = "The private vault as a tailnet reader (:8452) with write-back and PDF publishing"
+description = "The private vault as a tailnet reader (:8453) with write-back and PDF publishing"
 default = false
 hosts = ["delphi"]

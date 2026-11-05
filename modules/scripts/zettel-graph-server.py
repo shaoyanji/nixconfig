@@ -306,8 +306,12 @@ class Handler(BaseHTTPRequestHandler):
         origin = self.headers.get("Origin")
         if origin and origin != CONFIG["origin"]:
             raise Refused(403, f"origin {origin} is not {CONFIG['origin']}")
-        if (self.headers.get("Content-Type") or "").split(";")[0].strip() != "application/json":
-            raise Refused(415, "body must be application/json")
+        # Only a request that carries a body has a content type to judge: a
+        # bodyless `/api/reload` sent by `fetch` without one is not a form post,
+        # and rejecting it would be a guard against nothing.
+        if self.headers.get("Content-Length", "0") != "0":
+            if (self.headers.get("Content-Type") or "").split(";")[0].strip() != "application/json":
+                raise Refused(415, "body must be application/json")
 
     # ---- routes ----------------------------------------------------------
     def do_GET(self) -> None:

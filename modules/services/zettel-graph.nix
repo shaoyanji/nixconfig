@@ -219,8 +219,10 @@ in {
       description = "Keep the served zettel tree within a quarter hour of both repos";
       wantedBy = ["timers.target"];
       timerConfig = {
+        # One schedule, not three: an early run after boot, then the calendar.
+        # `OnUnitActiveSec` alongside `OnCalendar` fires at activation + 15 min
+        # as well, which puts half the runs off the quarter hour for no gain.
         OnBootSec = "2min";
-        OnUnitActiveSec = "15min";
         OnCalendar = cfg.syncInterval;
         # False on purpose: this is a cache of two remotes, and a run missed
         # while the host was off is not owed.

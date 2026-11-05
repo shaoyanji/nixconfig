@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # One run = one generation of @wwwDir@: the private reader's page and a
 # graph.json exported by the vault's own exporter. The token arrives as a
-# systemd credential, is written into a store file for this run only, and never
-# reaches argv, .git/config or the journal.
+# systemd credential, is written into a 0600 temp file for this run only, and
+# never reaches argv, .git/config or the journal.
 set -euo pipefail
 
 export HOME="@stateDir@"

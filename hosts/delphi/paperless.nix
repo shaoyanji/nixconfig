@@ -53,10 +53,15 @@ in {
     description = "Apache Tika Server";
     wantedBy = ["multi-user.target"];
     after = ["network.target"];
+    # The unit-level attrset escapes the value; the same string in
+    # `serviceConfig.Environment` is written raw, systemd splits it on the space
+    # and drops `-Xmx128m` as an invalid assignment — half the heap limit lost.
+    environment = {
+      JAVA_TOOL_OPTIONS = "-Xms32m -Xmx128m";
+    };
     serviceConfig = {
       Type = "simple";
       ExecStart = "${lib.getExe pkgs.tika} -noFork --host 127.0.0.1 --port 9998";
-      Environment = "JAVA_TOOL_OPTIONS=-Xms32m -Xmx128m";
       MemoryHigh = "192M";
       MemoryMax = "256M";
       DynamicUser = true;

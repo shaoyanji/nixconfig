@@ -28,6 +28,30 @@ knowledge, backups, DNS, tailnet) last confirmed 2026-10-20.
 | Tailnet DNS | global `10.99.0.53, 100.97.61.65`, split `frieren.lan → frieren`, Override on | `ops:tailnet:dns` (rc=0) |
 
 ## Ledger
+### 2026-11-05 — `checks:units`: a switch's exec failures, caught before the switch
+- **Two units passed `checks:host` and then died at exec.** `path = [...]` written inside
+  `serviceConfig` is not a systemd directive, so systemd dropped it and the unit failed with
+  status 127; a `@python@` substitution pointed at a directory (126). An eval cannot see
+  either. `systemd-analyze verify` reads the unit text as systemd will and names both:
+  `Unknown key 'Path' in section [Service]` and `is not executable: Is a directory`.
+- **The gate.** `task checks:units HOST=<host>` (`scripts/task/unit-gate.sh`) evals
+  `config.systemd.units` once (~36 s / 2.6 GiB on delphi), writes the complete units and
+  runs one `systemd-analyze verify` over them, then classifies: unknown key/section/lvalue,
+  parse errors and non-executable `ExecStart` fail; a store path this generation has not
+  built, a templated instance path and a dependency missing from the set are warnings. It
+  proves the FILE — the switch still proves the start. Fragments (NixOS's overrides of
+  vendor units) and every `microvm*` unit are skipped; the guest test has no `/dev/kvm` on
+  delphi and is not to be started (`.agents/deploy/hosts/delphi.md`).
+- **What it found on the way.** `tika.service` set `Environment = "JAVA_TOOL_OPTIONS=-Xms32m
+  -Xmx128m"` raw, so systemd split it on the space and dropped `-Xmx128m` — half the heap
+  limit, silently, on delphi and frieren; both now set it through the unit-level
+  `environment` attrset, which escapes it. And the upstream
+  `ConditionFileNotEmpty` in `pihole-ftl.nix:414` sits in `[Service]` where it is ignored;
+  that one is reported as a warning with its upstream line rather than hidden.
+- **Verified:** `checks:units` 140 units on delphi and 173 on frieren, 0 problems each;
+  `checks:hosts HOSTS="delphi frieren"` rc=0 both; the task-graph pin moved to exec
+  `fec47359245c` / prose `6553a686f202` and `.#checks.aarch64-linux.taskfile-digest-pin` builds.
+
 ### 2026-11-05 — zettel reader: the web drew nothing until the data arrived
 - **Symptom, then cause.** The live page showed a blank canvas: `nodes` was
   seeded from `NOTES` at parse time, when `NOTES` is still empty because the data comes

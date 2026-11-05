@@ -375,3 +375,10 @@ delphi is the only member today — frieren binds its own tailnet address only �
 - **User lingering was undeclared fleet-wide** (frieren had `loginctl enable-linger` by
   hand). `users.users.devji.linger = true` on delphi is what lets `hermes-gateway`
   survive logout and start at boot.
+
+## Never on this host
+
+- **The microVM guest test.** It needs `/dev/kvm`, this host has none, and the attempt is a
+  known failure; `microvm@test_instance` and its runtime paths are not a fault to chase.
+  `checks:units` skips every `microvm*` unit for this reason — leave them alone, do not
+  start them to "see what happens".

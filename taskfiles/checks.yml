@@ -249,6 +249,30 @@ tasks:
     cmds:
       - bash scripts/task/host-check-sweep.sh --hosts "{{.HOST}}" --mode {{.MODE | default "build"}} --arch "{{.ARCH}}" --timeout {{.TIMEOUT | default "120"}}
 
+  checks:units:
+    desc: "[gate] systemd understands every unit ONE host's config installs, and can exec each ExecStart (HOST=name)"
+    summary: >
+      The gate an eval cannot be: `systemd-analyze verify` reads the unit text as
+      systemd will, so a directive it does not know fails here, not at the next
+      switch. On 2026-11-05 two units passed `checks:host` and died at exec: `path`
+      inside `serviceConfig` is dropped (127), a `@python@` pointed at a directory
+      (126).
+
+      One host eval (~36 s on delphi), so a pre-switch instrument: it proves the
+      FILE, and the switch proves the start. Fragments and microVM units are
+      skipped. Vars: HOST= (required), EVAL_TIMEOUT=240. Exit 0 = clean, 1 = a
+      problem, 2 = the host did not evaluate.
+    vars:
+      HOST: '{{.HOST}}'
+    cmds:
+      - |
+        if [ -z "{{.HOST}}" ]; then
+          echo "checks:units needs HOST=<host>: one host per eval, never the fleet." >&2
+          echo "  e.g.  task checks:units HOST=delphi" >&2
+          exit 2
+        fi
+        HOST="{{.HOST}}" bash scripts/task/unit-gate.sh
+
   checks:hosts:
     desc: "[gate] Evaluate a NAMED SET of hosts, ONE AT A TIME, under the OOM watchdog"
     summary: >

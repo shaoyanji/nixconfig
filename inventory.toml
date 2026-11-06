@@ -225,6 +225,14 @@ port = 8453
 label = "Mataroa console"
 port = 8454
 
+[[hosts.delphi.network.links]]
+label = "Miniflux"
+port = 8455
+
+[[hosts.delphi.network.links]]
+label = "Umami"
+port = 8456
+
 # Gatus listens on every interface and the tailscale0 firewall rule is the only
 # way in, so this one is plain http on the node address.
 [[hosts.delphi.network.links]]

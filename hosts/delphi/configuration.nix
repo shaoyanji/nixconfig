@@ -927,6 +927,55 @@ in {
     };
   };
 
+  # --- Miniflux: the reading, not the mail queue -----------------------------
+  # Every newsletter that publishes a feed belongs here instead of the inbox:
+  # subscribing is a click, unsubscribing is a sender gone from the list, and
+  # nothing arrives that has to be triaged. BASE_URL is the tailnet origin (not
+  # the loopback port) because Miniflux puts it in feed URLs and login links.
+  # The database is created by the module (`createDatabaseLocally`) on the
+  # postgres this host already runs for the mail archive.
+  sops.secrets."miniflux/admin_password" = {
+    sopsFile = ../../modules/secrets.yaml;
+    mode = "0400";
+  };
+  # `EnvironmentFile` format is ADMIN_USERNAME=… / ADMIN_PASSWORD=…, which is
+  # why this is a template and not the raw secret.
+  sops.templates."miniflux-admin.env" = {
+    mode = "0400";
+    content = ''
+      ADMIN_USERNAME=admin
+      ADMIN_PASSWORD=${config.sops.placeholder."miniflux/admin_password"}
+    '';
+  };
+  services.miniflux = {
+    enable = true;
+    config = {
+      LISTEN_ADDR = "127.0.0.1:8093";
+      # 8453/8454 are zettel-graph and mataroa; the mounts are a sequential
+      # namespace, so the reading pair continues at 8455.
+      BASE_URL = "https://${tailnetHost}:8455";
+    };
+    adminCredentialsFile = config.sops.templates."miniflux-admin.env".path;
+  };
+
+  # --- Umami: first-party analytics for the fleet's own pages ----------------
+  # Small enough to sit beside the other tailnet services, and it replaces a
+  # third-party script on pages we own. APP_SECRET signs sessions; it is a sops
+  # secret rather than a literal so the store never holds the signing key.
+  sops.secrets."umami/app-secret" = {
+    sopsFile = ../../modules/secrets.yaml;
+    mode = "0400";
+  };
+  services.umami = {
+    enable = true;
+    settings = {
+      HOSTNAME = "127.0.0.1";
+      PORT = 8094;
+      APP_SECRET_FILE = config.sops.secrets."umami/app-secret".path;
+      DISABLE_TELEMETRY = true;
+    };
+  };
+
   # --- Agent turn coordination store ----------------------------------------
   # xs holds one summary per agent turn, so an agent can see who is working on
   # what, from which base commit, before it starts a parallel edit. The module
@@ -1073,6 +1122,20 @@ in {
         title = "Uptime Kuma";
         description = "External fleet and home WAN status monitor.";
         requires = ["uptime-kuma.service"];
+      };
+      miniflux = {
+        port = 8455;
+        upstream = "http://127.0.0.1:8093";
+        title = "Miniflux";
+        description = "Feed reader: the newsletters that do not need to be mail.";
+        requires = ["miniflux.service"];
+      };
+      umami = {
+        port = 8456;
+        upstream = "http://127.0.0.1:8094";
+        title = "Umami";
+        description = "First-party analytics for pages we own; no third-party script.";
+        requires = ["umami.service"];
       };
       email-archive = {
         port = 8450;

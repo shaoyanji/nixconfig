@@ -10,13 +10,6 @@
 }: let
   cfg = config.services.turnsDashboard;
 
-  # Datastar is pinned and served from this origin: a tailnet page that needs a
-  # CDN to render is a page that is blank when the tailnet is all you have.
-  datastar = pkgs.fetchurl {
-    url = "https://cdn.jsdelivr.net/npm/@starfederation/datastar@1.0.0-beta.11/dist/datastar.js";
-    hash = "sha256-/EfStM/qnmzck9KHoNs4suiU2BOqHokuEd4b5SZiA3I=";
-  };
-
   package = pkgs.buildGoModule {
     pname = "turns-dashboard";
     version = "0.1.0";
@@ -30,12 +23,13 @@
     };
   };
 
+  # No client library: app.js reads the same text frames main.go writes, so the
+  # page has no dependency to pin, mirror or keep in step with the server.
   site = pkgs.runCommand "turns-dashboard-site" {} ''
     mkdir -p $out
     cp ${./turns-dashboard/web/index.html} $out/index.html
     cp ${./turns-dashboard/web/style.css} $out/style.css
     cp ${./turns-dashboard/web/app.js} $out/app.js
-    cp ${datastar} $out/datastar.js
   '';
 
   home = config.users.users.${cfg.user}.home;

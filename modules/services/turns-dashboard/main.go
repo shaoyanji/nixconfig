@@ -54,7 +54,6 @@ type rowView struct {
 	Rationale    string
 	Files        []string
 	FilesMore    int
-	Signal       string
 	Branch       string
 	Commit       string
 }
@@ -241,11 +240,14 @@ func (s *server) broadcast(chunk string) {
 	}
 }
 
-// patch formats one Datastar element patch. Every line of the HTML needs its own
-// `data: elements` line, and the block ends with a blank line.
+// patch formats one element patch for web/app.js, which is the only reader of
+// this format: every line of the HTML needs its own `data: elements` line, and
+// the block ends with a blank line. It is deliberately plain text — the client
+// parses it in forty lines and no library version can silently disagree with
+// the writer.
 func patch(mode, selector, html string) string {
 	var b strings.Builder
-	b.WriteString("event: datastar-patch-elements\n")
+	b.WriteString("event: patch\n")
 	if selector != "" {
 		fmt.Fprintf(&b, "data: selector %s\n", selector)
 	}
@@ -267,7 +269,6 @@ func (s *server) view(t turn) rowView {
 	v := rowView{
 		turn:         t,
 		When:         when,
-		Signal:       strings.NewReplacer("-", "", ":", "").Replace(t.ID),
 		OutcomeClass: outcomeClass(t.Outcome),
 	}
 	if t.Rationale != nil {

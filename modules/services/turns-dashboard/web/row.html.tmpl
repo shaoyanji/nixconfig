@@ -15,8 +15,8 @@
 {{if .FilesMore}}<span class="file more">+{{.FilesMore}} more</span>{{end}}
 </div>
 <div class="ask">
-<textarea id="p-{{.ID}}" rows="1" data-bind="ask_{{.Signal}}" placeholder="instruct hermes on this turn…" spellcheck="false"></textarea>
-<button type="button" class="go" data-on:click="@post('/api/prompt', {payload: {row: '{{.ID}}', prompt: $ask_{{.Signal}}}})">▸ hermes</button>
+<textarea id="p-{{.ID}}" rows="1" placeholder="instruct hermes on this turn…" spellcheck="false"></textarea>
+<button type="button" class="go" data-prompt-for="{{.ID}}">▸ hermes</button>
 </div>
 <div class="req" id="req-{{.ID}}"></div>
 </article>

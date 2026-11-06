@@ -69,7 +69,11 @@ auth() {
   # the browser step has to happen inside this window. It writes the token
   # itself when consent lands — that file is the success signal, not the exit
   # code, because the process can also end by being interrupted.
-  vdirsyncer discover "$ACCOUNT" >"$log" 2>&1 &
+  # stdin is /dev/null on purpose: this process also prints "Should vdirsyncer
+  # attempt to create it?" and would otherwise eat the redirect URL the operator
+  # pastes below. It exits at that prompt once the token is written, which is
+  # exactly when its job is done; collections are created afterwards.
+  vdirsyncer discover "$ACCOUNT" >"$log" 2>&1 </dev/null &
   pid=$!
   cleanup() {
     kill "$pid" 2>/dev/null || true
@@ -131,6 +135,19 @@ EOF
     waited=$((waited + 1))
   done
   [ -s "$TOKEN" ] || die "no token after ${WAIT}s — the redirect never reached localhost:$PORT"
+
+  # A token is not a working pair. `discover` creates each local collection only
+  # by asking, and its prompt had no TTY (or was answered no), so the local side
+  # stayed empty and `sync` paired nothing — the failure read "no collection
+  # synced", which looks like a dead token but is an empty directory (delphi,
+  # 2026-11-06). Answer yes deterministically, then pull display names so khal's
+  # `default_calendar` resolves; both are advisory, because a server that cannot
+  # do either still syncs events.
+  echo "calendar-auth: creating the local collections for $ACCOUNT …" >&2
+  timeout 120 vdirsyncer discover "$ACCOUNT" < <(yes y) >/dev/null 2>&1 ||
+    echo "calendar-auth: collection discovery reported an error — continuing, sync will say what is missing" >&2
+  timeout 120 vdirsyncer metasync >/dev/null 2>&1 ||
+    echo "calendar-auth: metasync skipped (the server may not support it); khal will show collection ids instead of names" >&2
   verify
 }
 

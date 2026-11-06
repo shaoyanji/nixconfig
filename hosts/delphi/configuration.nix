@@ -1021,6 +1021,8 @@ in {
     description = "ntfy push notification server";
     wantedBy = ["multi-user.target"];
     after = ["network.target"];
+    # A push server has to come back on its own; it is not a job that retires.
+    unitConfig."X-Fleet-Role" = "daemon";
     serviceConfig = {
       ExecStart = lib.concatStringsSep " " [
         "${lib.getExe pkgs.ntfy-sh} serve"

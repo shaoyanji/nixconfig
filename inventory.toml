@@ -18,9 +18,9 @@ version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
 total_devices = 36
 active_nix_devices = 13
-active_external_devices = 8
+active_external_devices = 7
 wip_devices = 0
-preserved_devices = 15
+preserved_devices = 16
 
 # ------------------------------------------------------------------------------
 # 1. CORE SERVERS & INFRASTRUCTURE

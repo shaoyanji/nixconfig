@@ -11,9 +11,16 @@
 # under /srv/data, or registered in modules/config/fetches.json and downloaded
 # by URL at build time, so the store owns the bytes and git only owns the hash.
 #
-# Two modes, because the two moments differ:
+# Three modes, because the moments differ:
 #   --index    staged blobs. Runs in .githooks/pre-commit, before the blob exists.
-#   --history  every blob reachable from any ref. Runs in pre-push and as a check.
+#   --push     only the blobs the push would add: reachable from the pushed
+#              commits and not already on the remote. Runs in .githooks/pre-push,
+#              which pipes git's pre-push lines (local ref, local sha, remote
+#              ref, remote sha) in on stdin.
+#   --history  every blob reachable from any ref. The audit gate. It stays red
+#              on the two legacy blobs above until a rewrite removes them, which
+#              is the point: no push can fix them, and failing every push for
+#              them only teaches --no-verify.
 #
 # Threshold is 512 KiB, MAX= to change it. Headroom over the largest legitimate
 # file here (AGENTS.nix, ~342 KiB); the wallpaper that started this would have
@@ -33,12 +40,13 @@ mode=""
 case "${1:---history}" in
   --index) mode=index ;;
   --history) mode=history ;;
+  --push) mode=push ;;
   -h | --help)
-    sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+    awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"
     exit 0
     ;;
   *)
-    echo "usage: repo-blobs.sh [--index|--history]   MAX=<bytes> ALLOW=<globs>" >&2
+    echo "usage: repo-blobs.sh [--index|--push|--history]   MAX=<bytes> ALLOW=<globs>" >&2
     exit 2
     ;;
 esac
@@ -64,14 +72,39 @@ sizeof_blobs() {
   rm -f "$rows"
 }
 
+list_blobs() {
+  # stdin: `git rev-list --objects` lines. stdout: "<path>\t<size>".
+  awk 'NF>1{print substr($0, index($0, " ")+1)"\t"$1}' | sizeof_blobs
+}
+
 if [ "$mode" = index ]; then
   # Index objects, not working-tree files: what would be committed.
   rows=$(git ls-files -s -- | awk '$1=="120000" || $1=="160000"{next} {print $4"\t"$2}' | sizeof_blobs)
   label="index"
+elif [ "$mode" = push ]; then
+  # One line per ref, as git sends them. A deleted ref (local sha all zeros)
+  # adds nothing; a new branch (no remote sha) starts from nothing.
+  locals=()
+  excludes=()
+  while read -r _lref lsha _rref rsha; do
+    [ -n "${lsha//0/}" ] || continue
+    locals+=("$lsha")
+    [ -n "${rsha:-}" ] && [ -n "${rsha//0/}" ] && excludes+=("$rsha")
+  done
+  if [ "${#locals[@]}" -eq 0 ]; then
+    echo "push: no ref to send, no blob checked"
+    exit 0
+  fi
+  # --remotes as well as the sent shas: a branch built here out of commits the
+  # remote already holds carries no new objects either.
+  if ! rows=$(git rev-list --objects "${locals[@]}" \
+    --not ${excludes[@]+"${excludes[@]}"} --remotes | list_blobs); then
+    echo "blobs: could not list the objects this push would add" >&2
+    exit 2
+  fi
+  label="push"
 else
-  rows=$(git rev-list --objects --all |
-    awk 'NF>1{print substr($0, index($0, " ")+1)"\t"$1}' |
-    sizeof_blobs)
+  rows=$(git rev-list --objects --all | list_blobs)
   label="history"
 fi
 

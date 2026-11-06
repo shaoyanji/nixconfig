@@ -12,6 +12,13 @@ set -euo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
+# git writes the refs being pushed here (local ref, local sha, remote ref, remote
+# sha). Captured once, up front: the blob gate needs them, and a gate that runs
+# before it must not be able to eat them.
+refs=$(mktemp)
+trap 'rm -f "$refs"' EXIT
+cat >"$refs"
+
 status=0
 
 if [ -f scripts/task/docs-budget.sh ]; then
@@ -24,12 +31,14 @@ fi
 
 # Blobs are checked here as well as in pre-commit: `--no-verify` on a commit, an
 # amend after the hook, or a branch built elsewhere all reach the push with an
-# index the commit hook never saw.
+# index the commit hook never saw. Only what this push adds counts. The legacy
+# blobs already on the server are the `--history` audit's business: no push can
+# remove them, and refusing every push over them just teaches --no-verify.
 if [ -f scripts/task/repo-blobs.sh ]; then
-  if ! bash scripts/task/repo-blobs.sh --history >/tmp/pre-push-blobs.log 2>&1; then
-    echo "pre-push: a blob over 512 KiB is reachable in this history:"
-    grep -E 'OVER|history:' /tmp/pre-push-blobs.log | sed 's/^/  /'
-    echo "  task checks:repo:blobs explains the rule; removing one needs a rewrite."
+  if ! bash scripts/task/repo-blobs.sh --push <"$refs" >/tmp/pre-push-blobs.log 2>&1; then
+    echo "pre-push: a blob over 512 KiB would enter the remote with this push:"
+    grep -E 'OVER|push:' /tmp/pre-push-blobs.log | sed 's/^/  /'
+    echo "  task checks:repo:blobs explains the rule; removing a pushed blob needs a rewrite."
     status=1
   fi
 fi

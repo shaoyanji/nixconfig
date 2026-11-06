@@ -137,13 +137,21 @@ coupling, and it points at delphi or at the NAS's own loopback.
   the sops password and 403 for `password`.
 - **An upload replaces the whole collection**, and the served copy is schema 18
   (the server migrates on upload), so the base for a merge is the original
-  schema-11 `.apkg`, not the download. Cards are authored in `decks/*.toml` and
-  compiled by `anki-author` (`.#cli.learn.anki-author`):
-  `anki-author build --deck decks/b2.toml --base B1_Wortliste….apkg --out merged.anki2`.
-  The sequence that worked on 2026-11-06: download the server's copy to
-  `/srv/data/german/anki-backups/`, build with `--base`, POST the merged file to
-  `/sync/upload` (v11 header plus a zstd body — a 200 with a one-word body is
-  success), then download again and count `notes`/`cards` and
-  `select id,name from decks`. Expect 5,366 cards over four decks after the B2
-  merge. Extending the deck means editing `decks/b2.toml` and repeating the
-  build; a file built without `--base` would take the 5,264 B1 cards with it.
+  schema-11 `.apkg`, not the download. Cards are authored in `decks/*.toml` —
+  `b2.toml` (connectors, drills, telc briefing), `b2-schreiben-mock.toml` — and
+  compiled by `anki-author` (`.#cli.learn.anki-author`), with
+  `scripts/german/anki-push.sh --base B1_Wortliste….apkg decks/*.toml` doing the
+  whole round trip: download for a backup, build each file over the previous
+  output, upload, download again and print what is served. 2026-11-06: 5,376
+  cards over six decks, 40 of them carrying a `req-` tag.
+
+  **That upload discards review history**, because the build starts from the
+  schema-11 base and the served collection is what accumulates reviews; the
+  script refuses when the served copy has any card at `type != 0` unless
+  `FORCE=1`. A file built without `--base` would take the 5,264 B1 cards with it.
+
+  Protocol facts, all learned from `400`s: a v11 request is one `anki-sync` JSON
+  header (`v`/`k`/`c`/`s`) plus a **zstd** body, `k` carries the hkey and empty on
+  `hostKey`; `hostKey` wants `{"u":…,"p":…}` (not `username`/`password`) and
+  `download` wants `{}`. With the header missing or the body uncompressed the
+  server answers a bare `400`; a bad hkey is a `403`.

@@ -211,10 +211,10 @@ was empty until 2026-11-06 — what a server looks like when no desktop has ever
 synced to it. It was seeded by posting the 2018 schema-11 `collection.anki2`
 from `/srv/data/german/audio/B1_Wortliste_DTZ_Goethe_vocabsentensesaudiotranslation.apkg`
 to `/sync/upload`; the download now serves `B1_Wortliste_DTZ_Goethe` (5,264
-cards, no media — every `[sound:…]` resolves to nothing). The three
-`Deutsch::B2::*` decks (102 cards) were merged over that collection by
-`anki-author build --base`, since an upload replaces everything; the sequence
-is in `docs/service-offload.md`.
+cards, no media — every `[sound:…]` resolves to nothing). `decks/*.toml` —
+connectors, drills, telc briefing, timed mock — are compiled by `anki-author`
+and merged over it by `scripts/german/anki-push.sh --base <apkg> decks/…`: six
+decks, 5,376 cards on 2026-11-06. Sequence and traps: `docs/service-offload.md`.
 
 Protocol note for a scripted client: version 11 is one `anki-sync` JSON header
 (`v`/`k`/`c`/`s`) plus a zstd body, and `meta` needs `{"v":11,"cv":…}`. A bare

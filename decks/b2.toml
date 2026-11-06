@@ -5,6 +5,7 @@
 [notetype]
 id = 1700000000
 name = "B2 (Vorne/Hinten)"
+requires_label = "Setzt voraus"
 
 [[deck]]
 id = 1700000001
@@ -25,6 +26,8 @@ tags = "konnektoren gegensatz adverb"
 front = "dennoch"
 back = "<b>Funktion:</b> wie „trotzdem“, aber schriftlich und gehoben.<br><b>Satzstellung:</b> Adverb → Position 1 oder nach dem Verb; Verb an Position 2.<br><b>Beispiel:</b> <i>Das Angebot war günstig. Dennoch habe ich abgelehnt.</i><br><b>Tipp:</b> In Beschwerdebriefen sehr passend; im Gespräch klingt „trotzdem“ natürlicher."
 tags = "konnektoren gegensatz adverb schreiben"
+requires = "trotzdem"
+
 
 [[deck.card]]
 front = "zwar … aber"
@@ -65,11 +68,15 @@ tags = "konnektoren folge adverb"
 front = "deswegen"
 back = "<b>Funktion:</b> = deshalb (gleiche Bedeutung und Stellung).<br><b>Satzstellung:</b> Adverb → Position 1, Verb an Position 2.<br><b>Beispiel:</b> <i>Der Zug fiel aus, deswegen kam ich zu spät.</i><br><b>Tipp:</b> Austauschbar mit „deshalb“; im Brief „deshalb“ oder „daher“ bevorzugen."
 tags = "konnektoren folge adverb"
+requires = "deshalb"
+
 
 [[deck.card]]
 front = "daher"
 back = "<b>Funktion:</b> Folge, schriftlicher als „deshalb“.<br><b>Satzstellung:</b> Adverb → Position 1, Verb an Position 2.<br><b>Beispiel:</b> <i>Die Preise sind gestiegen; daher bleiben viele Kunden aus.</i><br><b>Tipp:</b> Sehr passend in der Argumentation eines Briefes oder Aufsatzes."
 tags = "konnektoren folge adverb schreiben"
+requires = "deshalb"
+
 
 [[deck.card]]
 front = "folglich"
@@ -175,6 +182,11 @@ tags = "konnektoren bedingung subjunktion schreiben"
 front = "wenn … dann"
 back = "<b>Funktion:</b> Bedingung mit Nachdruck auf der Folge.<br><b>Satzstellung:</b> Nebensatz mit „wenn“, danach „dann“ auf Position 1 des Hauptsatzes (Verb an Position 2).<br><b>Beispiel:</b> <i>Wenn die Lieferung nicht kommt, dann storniere ich die Bestellung.</i><br><b>Tipp:</b> „dann“ ist optional, macht die Folge aber klar — gut in Beschwerden."
 tags = "konnektoren bedingung zweiteilig"
+
+[[deck.card]]
+front = "ob (indirekte Frage)"
+back = "<b>Funktion:</b> leitet eine indirekte Ja/Nein-Frage ein.<br><b>Satzstellung:</b> Subjunktion → Nebensatz, Verb am Ende.<br><b>Beispiel:</b> <i>Ich weiß noch nicht, ob ich am Kurs teilnehmen kann.</i><br><b>Tipp:</b> „wenn“ leitet eine Bedingung oder Wiederholung ein, „ob“ die offene Frage — „Ich weiß nicht, wenn der Kurs beginnt“ ist falsch."
+tags = "konnektoren nebensatz frage"
 
 [[deck.card]]
 front = "damit"
@@ -290,166 +302,228 @@ tags = "konnektoren meinung schreiben"
 front = "obgleich / obschon"
 back = "<b>Funktion:</b> = obwohl, gehoben und schriftlich.<br><b>Satzstellung:</b> Subjunktion → Nebensatz, Verb am Ende.<br><b>Beispiel:</b> <i>Obgleich die Zeit knapp war, hat sie alle Punkte bearbeitet.</i><br><b>Tipp:</b> In Prüfungen ein Zeichen für Wortschatzbreite; Bedeutung identisch mit „obwohl“."
 tags = "konnektoren gegensatz subjunktion schreiben"
+requires = "obwohl"
 
 [[deck]]
 id = 1700000002
 name = "Deutsch::B2::Konnektoren üben"
 tags = ["telc-b2", "b2"]
 
+
 [[deck.card]]
 front = "____ ich seit drei Jahren Deutsch lerne, mache ich noch Fehler bei den Konnektoren."
 back = "Obwohl<br><i>Obwohl ich seit drei Jahren Deutsch lerne, mache ich noch Fehler.</i><br>Einräumung → Subjunktion, Verb am Ende (lerne)."
 tags = "ueben luecke gegensatz"
+requires = "obwohl"
+
 
 [[deck.card]]
 front = "Es regnete in Strömen. ____ beschlossen wir, zu Fuß zu gehen."
 back = "Trotzdem<br><i>Trotzdem beschlossen wir, zu Fuß zu gehen.</i><br>Adverb auf Position 1, Verb (beschlossen) an Position 2."
 tags = "ueben luecke gegensatz"
+requires = "trotzdem"
+
 
 [[deck.card]]
 front = "Ich habe den Vertrag nicht unterschrieben, ____ ich einige Punkte nicht verstanden habe."
 back = "weil<br><i>…, weil ich einige Punkte nicht verstanden habe.</i><br>Grund im Nebensatz → Verb am Ende."
 tags = "ueben luecke grund"
+requires = "weil"
+
 
 [[deck.card]]
 front = "Ich habe einige Punkte nicht verstanden, ____ habe ich den Vertrag nicht unterschrieben."
 back = "deshalb<br><i>…, deshalb habe ich den Vertrag nicht unterschrieben.</i><br>Folge auf Position 1, Verb an Position 2."
 tags = "ueben luecke folge"
+requires = "deshalb"
+
 
 [[deck.card]]
 front = "____ der hohen Kosten hat die Firma das Projekt fortgesetzt."
 back = "Trotz<br><i>Trotz der hohen Kosten hat die Firma das Projekt fortgesetzt.</i><br>Präposition mit Genitiv — kein Nebensatz, deshalb „hat“ an Position 2."
 tags = "ueben luecke gegensatz genitiv"
+requires = "trotz"
+
 
 [[deck.card]]
 front = "____ des schlechten Wetters fand das Fest im Garten statt."
 back = "Trotz<br><i>Trotz des schlechten Wetters fand das Fest im Garten statt.</i><br>„Wegen“ würde einen Grund nennen; hier ist es ein Gegensatz."
 tags = "ueben luecke gegensatz genitiv"
+requires = "trotz"
+
 
 [[deck.card]]
 front = "Ich spreche langsam, ____ Sie mich besser verstehen."
 back = "damit<br><i>…, damit Sie mich besser verstehen.</i><br>Verschiedene Subjekte (ich / Sie) → „damit“, nicht „um … zu“."
 tags = "ueben luecke ziel"
+requires = "damit"
+
 
 [[deck.card]]
 front = "Ich lerne jeden Tag, ____ die Prüfung zu bestehen."
 back = "um<br><i>…, um die Prüfung zu bestehen.</i><br>Gleiches Subjekt → Infinitivkonstruktion."
 tags = "ueben luecke ziel infinitiv"
+requires = "um … zu"
+
 
 [[deck.card]]
 front = "Er hat mir geholfen, ____ ich ihn nicht darum gebeten hatte."
 back = "obwohl<br><i>…, obwohl ich ihn nicht darum gebeten hatte.</i><br>Einräumung im Nebensatz."
 tags = "ueben luecke gegensatz"
+requires = "obwohl"
+
 
 [[deck.card]]
 front = "Die Prüfung war schwer, ____ haben fast alle Teilnehmer bestanden."
 back = "dennoch<br><i>…, dennoch haben fast alle Teilnehmer bestanden.</i><br>Gegensatz als Adverb; „trotzdem“ passt hier ebenso."
 tags = "ueben luecke gegensatz"
+requires = "dennoch"
+
 
 [[deck.card]]
 front = "Ich weiß noch nicht, ____ ich am Kurs teilnehmen kann."
 back = "ob<br><i>…, ob ich am Kurs teilnehmen kann.</i><br>Indirekte Frage → „ob“, nicht „wenn“."
 tags = "ueben luecke nebensatz"
+requires = "ob (indirekte Frage)"
+
 
 [[deck.card]]
 front = "____ Sie Fragen haben, können Sie mich jederzeit anrufen."
 back = "Falls<br><i>Falls Sie Fragen haben, können Sie mich jederzeit anrufen.</i><br>Unsichere Bedingung; „Wenn“ wäre auch korrekt, „Falls“ ist vorsichtiger."
 tags = "ueben luecke bedingung"
+requires = "falls"
+
 
 [[deck.card]]
 front = "____ die Ware bis Freitag eintrifft, halten wir den Termin."
 back = "Sofern<br><i>Sofern die Ware bis Freitag eintrifft, halten wir den Termin.</i><br>Formelle Bedingung, Verb im Nebensatz am Ende (eintrifft)."
 tags = "ueben luecke bedingung"
+requires = "sofern"
+
 
 [[deck.card]]
 front = "Es war so kalt, ____ wir die Heizung den ganzen Tag laufen ließen."
 back = "dass<br><i>Es war so kalt, dass wir die Heizung … laufen ließen.</i><br>„so“ + Adjektiv im Hauptsatz, „dass“ im Nebensatz."
 tags = "ueben luecke folge"
+requires = "so … dass"
+
 
 [[deck.card]]
 front = "Sie sprach sehr leise, ____ ich sie kaum verstand."
 back = "sodass<br><i>…, sodass ich sie kaum verstand.</i><br>Folge ohne Gradangabe → „sodass“ (ein Wort)."
 tags = "ueben luecke folge"
+requires = "sodass"
+
 
 [[deck.card]]
 front = "____ ich die Ergebnisse habe, schreibe ich Ihnen."
 back = "Sobald<br><i>Sobald ich die Ergebnisse habe, schreibe ich Ihnen.</i><br>Unmittelbar nach dem Zeitpunkt; im Brief sehr üblich."
 tags = "ueben luecke temporal schreiben"
+requires = "sobald"
+
 
 [[deck.card]]
 front = "____ ich in Berlin wohne, fahre ich fast täglich Rad."
 back = "Seitdem<br><i>Seitdem ich in Berlin wohne, fahre ich fast täglich Rad.</i><br>Beginn in der Vergangenheit, Wirkung bis jetzt."
 tags = "ueben luecke temporal"
+requires = "seitdem"
+
 
 [[deck.card]]
 front = "Je mehr ich lese, ____ besser verstehe ich die Texte."
 back = "desto<br><i>Je mehr ich lese, desto besser verstehe ich die Texte.</i><br>„desto“ + Komparativ auf Position 1, Verb danach."
 tags = "ueben luecke steigerung"
+requires = "je … desto"
+
 
 [[deck.card]]
 front = "Ich habe ____ Zeit ____ Geld für einen zweiten Kurs."
 back = "weder … noch<br><i>Ich habe weder Zeit noch Geld für einen zweiten Kurs.</i><br>Doppelte Verneinung; kein zusätzliches „nicht“."
 tags = "ueben luecke zweiteilig"
+requires = "weder … noch"
+
 
 [[deck.card]]
 front = "____ die Lehrerin ____ die Gruppe waren sehr geduldig."
 back = "Sowohl … als auch<br><i>Sowohl die Lehrerin als auch die Gruppe waren sehr geduldig.</i><br>Beides zusammen; das Verb richtet sich nach dem zweiten Teil (waren)."
 tags = "ueben luecke zweiteilig"
+requires = "sowohl … als auch"
+
 
 [[deck.card]]
 front = "Schreibe mit „obwohl“: Es regnete stark. Wir machten einen Ausflug."
 back = "Obwohl es stark regnete, machten wir einen Ausflug.<br>Nebensatz zuerst, dann Verb des Hauptsatzes direkt nach dem Komma."
 tags = "ueben umschreiben gegensatz"
+requires = "obwohl"
+
 
 [[deck.card]]
 front = "Schreibe mit „trotzdem“: Obwohl es stark regnete, machten wir einen Ausflug."
 back = "Es regnete stark. Trotzdem machten wir einen Ausflug.<br>Zwei Hauptsätze; „trotzdem“ auf Position 1, Verb an Position 2."
 tags = "ueben umschreiben gegensatz"
+requires = "trotzdem"
+
 
 [[deck.card]]
 front = "Schreibe mit „trotz“: Obwohl das Wetter schlecht war, fand das Fest statt."
 back = "Trotz des schlechten Wetters fand das Fest statt.<br>Nomen statt Nebensatz: „trotz“ + Genitiv."
 tags = "ueben umschreiben gegensatz genitiv"
+requires = "trotz"
+
 
 [[deck.card]]
 front = "Schreibe mit „deshalb“: Ich konnte nicht kommen, weil ich krank war."
 back = "Ich war krank, deshalb konnte ich nicht kommen.<br>Grund → Folge; Verb bleibt an Position 2."
 tags = "ueben umschreiben folge"
+requires = "deshalb"
+
 
 [[deck.card]]
 front = "Schreibe mit „weil“: Wegen des Streiks kam der Bus nicht."
 back = "Der Bus kam nicht, weil es einen Streik gab.<br>Die Präposition wird zum Nebensatz mit Verb am Ende."
 tags = "ueben umschreiben grund"
+requires = "weil"
+
 
 [[deck.card]]
 front = "Schreibe mit „um … zu“: Ich lerne Deutsch, damit ich in Deutschland studieren kann."
 back = "Ich lerne Deutsch, um in Deutschland studieren zu können.<br>Gleiches Subjekt → Infinitivkonstruktion, „zu“ vor dem Infinitiv am Ende."
 tags = "ueben umschreiben ziel infinitiv"
+requires = "um … zu"
+
 
 [[deck.card]]
 front = "Schreibe mit „obwohl“: Er hatte wenig Zeit. Er half mir trotzdem."
 back = "Obwohl er wenig Zeit hatte, half er mir.<br>„trotzdem“ fällt weg, weil „obwohl“ den Gegensatz schon trägt."
 tags = "ueben umschreiben gegensatz"
+requires = "obwohl"
+
 
 [[deck.card]]
 front = "Schreibe mit „dennoch“: Zwar war der Kurs teuer, aber er hat sich gelohnt."
 back = "Der Kurs war teuer. Dennoch hat er sich gelohnt.<br>Formeller als „aber“; zwei Hauptsätze."
 tags = "ueben umschreiben gegensatz schreiben"
+requires = "dennoch"
+
 
 [[deck.card]]
 front = "Schreibe mit „während“: Die einen sparen. Die anderen geben viel Geld aus."
 back = "Während die einen sparen, geben die anderen viel Geld aus.<br>Kontrastiver Gebrauch; Verb im Nebensatz am Ende (sparen)."
 tags = "ueben umschreiben gegensatz"
+requires = "während (kontrastiv)"
+
 
 [[deck.card]]
 front = "Schreibe mit „falls“: Wenn Sie Fragen haben, rufen Sie mich an."
 back = "Falls Sie Fragen haben, rufen Sie mich bitte an.<br>„falls“ für eine unsichere Bedingung; höflicher im Brief."
 tags = "ueben umschreiben bedingung schreiben"
+requires = "falls"
 
 [[deck]]
 id = 1700000003
 name = "Deutsch::B2::Schreiben (telc)"
 tags = ["telc-b2", "b2"]
+
 
 [[deck.card]]
 front = "Wie ist ein telc-B2-Brief aufgebaut? (5 Teile)"

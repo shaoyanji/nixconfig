@@ -3,10 +3,13 @@
 client that reviews (deutsch-srs) and the server that stores (anki-sync-server).
 
 A deck file is one `[notetype]`, then `[[deck]]` blocks, each holding
-`[[deck.card]]` entries with `front`, `back` and `tags`. `check` validates the
-file and prints what it would build; `build` writes a schema-11 collection that
-Anki and the sync server both accept, either standalone or merged over an
-existing collection so the cards already on the server survive.
+`[[deck.card]]` entries with `front`, `back` and `tags`, plus an optional
+`requires` naming the card this one tests: the drill's prerequisite, and the
+card to re-read when the drill keeps failing. `check` validates the file and
+prints what it would build; `build` writes a schema-11 collection that Anki and
+the sync server both accept, either standalone or merged over an existing
+collection. Merging reconciles by guid, so re-running a build after a card was
+edited updates that note instead of adding a second copy.
 
 Examples:
   anki-author check --deck decks/b2.toml
@@ -17,9 +20,10 @@ Examples:
 
 import argparse
 import hashlib
+import html
 import json
 import os
-import random
+import re
 import shutil
 import sqlite3
 import string
@@ -37,6 +41,9 @@ except ModuleNotFoundError:  # pragma: no cover - python < 3.11
 SCHEMA_VERSION = 11
 
 FIRST_NOTE_ID = 1_700_000_000_000
+
+# What a `requires` edge looks like on the card, when the notetype does not say.
+DEFAULT_REQUIRES_LABEL = "Requires"
 
 DEFAULT_CONF = {
     "activeDecks": [1],
@@ -119,8 +126,13 @@ class DeckError(Exception):
 
 
 def load(path):
-    with open(path, "rb") as handle:
-        data = tomllib.load(handle)
+    try:
+        with open(path, "rb") as handle:
+            data = tomllib.load(handle)
+    except OSError as err:
+        raise DeckError(str(err)) from err
+    except tomllib.TOMLDecodeError as err:
+        raise DeckError(f"{path}: {err}") from err
     if "notetype" not in data:
         raise DeckError("missing [notetype] block (id, name)")
     for key in ("id", "name"):
@@ -157,6 +169,77 @@ def validate(data):
         report.append((deck["name"], len(cards)))
         total += len(cards)
     return report, total
+
+
+def slug(text):
+    """`zwar … aber` -> `zwar-aber`, `während (kontrastiv)` -> `waehrend-kontrastiv`.
+
+    Used for the `req-` tag, so it has to survive umlauts: tags are ASCII."""
+    folded = text.lower().translate(
+        str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"})
+    )
+    return re.sub(r"[^a-z0-9]+", "-", folded).strip("-")
+
+
+def prerequisites(data):
+    """front -> the front it requires. Validated once, used by check and build."""
+    by_front = {}
+    for deck in data["deck"]:
+        for card in deck["card"]:
+            by_front.setdefault(card["front"], []).append(card)
+
+    edges = {}
+    for front, cards in by_front.items():
+        for card in cards:
+            target = card.get("requires")
+            if target is None:
+                continue
+            if not isinstance(target, str) or not target.strip():
+                raise DeckError(f"{front!r}: requires must name a card front")
+            if target == front:
+                raise DeckError(f"{front!r}: requires itself")
+            matches = by_front.get(target) or []
+            if not matches:
+                near = sorted(
+                    f
+                    for f in by_front
+                    if target.lower() in f.lower() or f.lower() in target.lower()
+                )
+                hint = f" — did you mean: {', '.join(repr(n) for n in near[:3])}" if near else ""
+                raise DeckError(f"{front!r}: requires {target!r}, which is not a card here{hint}")
+            if len(matches) > 1:
+                raise DeckError(
+                    f"{front!r}: requires {target!r}, which names {len(matches)} cards — "
+                    "a prerequisite has to be unambiguous"
+                )
+            edges[front] = target
+
+    # A prerequisite chain has to end somewhere, and it has to end at a card.
+    for start in edges:
+        seen, step = [start], edges[start]
+        while step in edges:
+            if step in seen:
+                raise DeckError("requires cycle: " + " -> ".join([*seen, step]))
+            seen.append(step)
+            step = edges[step]
+    return edges
+
+
+def render_back(card, data, edges):
+    """The authored back, then the rule this card tests."""
+    target = edges.get(card["front"])
+    if target is None:
+        return card["back"]
+    label = html.escape(data["notetype"].get("requires_label", DEFAULT_REQUIRES_LABEL))
+    return f"{card['back']}<br><br><b>{label}:</b> <i>{html.escape(target)}</i>"
+
+
+def note_tags(card, edges):
+    tags = [t for t in str(card.get("tags", "")).split() if t]
+    target = edges.get(card["front"])
+    if target is not None:
+        tags.append("req-" + slug(target))
+    return f" {' '.join(tags)} " if tags else ""
 
 
 def plain(html):
@@ -298,58 +381,92 @@ def open_collection(path, base, now):
     return con
 
 
-def insert(con, data, now):
-    now_ms = now
+def guid_for(deck_id, front):
+    """The identity of a card: same deck and front, same note, on every build."""
+    return hashlib.sha1(f"{deck_id}\x00{front}".encode("utf-8")).hexdigest()[:16]
+
+
+def insert(con, data, now, edges):
+    """Add the notes this file does not have yet, update the ones it does.
+
+    Rebuilding over the collection this tool produced has to be an edit, not a
+    second copy: a drill that just gained a prerequisite keeps its review
+    history, and a corrected back replaces the old one.
+    """
     now_s = now // 1000
-    rng = random.Random(FIRST_NOTE_ID)
+    key = str(data["notetype"]["id"])
 
     models = json.loads(con.execute("select models from col").fetchone()[0])
     decks = json.loads(con.execute("select decks from col").fetchone()[0])
-    models[str(data["notetype"]["id"])] = notetype_json(data, now_ms)
+    if key in models:
+        fields = models[key].get("flds") or []
+        if len(fields) != 2:
+            raise DeckError(
+                f"the collection's notetype {key} has {len(fields)} fields, but this tool "
+                "writes two (Vorne/Hinten) — give the deck file a new notetype id"
+            )
+    else:
+        models[key] = notetype_json(data, now)
     for deck in data["deck"]:
-        decks[str(deck["id"])] = deck_json(deck, now_s)
+        entry = deck_json(deck, now_s)
+        old = decks.get(str(deck["id"]))
+        if old:
+            # Keep a filtered deck filtered; the name and description still come
+            # from the file, because renaming a deck is the author's decision.
+            entry["conf"] = old.get("conf", 1)
+            entry["dyn"] = old.get("dyn", 0)
+        decks[str(deck["id"])] = entry
     con.execute(
         "update col set models = ?, decks = ?, mod = ?, usn = 1",
-        (json.dumps(models, ensure_ascii=False), json.dumps(decks, ensure_ascii=False), now_ms),
+        (json.dumps(models, ensure_ascii=False), json.dumps(decks, ensure_ascii=False), now),
     )
 
-    max_note = con.execute("select max(id) from notes").fetchone()[0] or 0
-    due = (con.execute("select max(due) from cards").fetchone()[0] or 0) + 1
-    if max_note >= FIRST_NOTE_ID:
-        raise DeckError(f"collection already uses ids above {FIRST_NOTE_ID}; refusing to collide")
+    existing = dict(con.execute("select guid, id from notes").fetchall())
+    # Ids and card ids share one counter above both tables, so a merge can never
+    # hand out an id that the base collection already uses.
+    counter = (
+        max(
+            con.execute("select coalesce(max(id), 0) from notes").fetchone()[0],
+            con.execute("select coalesce(max(id), 0) from cards").fetchone()[0],
+            FIRST_NOTE_ID - 1,
+        )
+        + 1
+    )
+    due = (con.execute("select coalesce(max(due), 0) from cards").fetchone()[0] or 0) + 1
 
-    index = 0
+    added = updated = 0
     for deck in data["deck"]:
         for card in deck["card"]:
-            note_id = FIRST_NOTE_ID + index
-            front, back = card["front"], card["back"]
+            front = card["front"]
             sfld = plain(front)
-            tags = " " + " ".join(t for t in str(card.get("tags", "")).split() if t) + " "
-            guid = hashlib.sha1(f"{deck['id']}\x00{front}".encode("utf-8")).hexdigest()[:16]
+            flds = front + "\x1f" + render_back(card, data, edges)
+            tags = note_tags(card, edges)
+            guid = guid_for(deck["id"], front)
+            existing_id = existing.get(guid)
+            if existing_id is not None:
+                con.execute(
+                    "update notes set mod = ?, usn = 0, tags = ?, flds = ?, sfld = ?, csum = ?"
+                    " where id = ?",
+                    (now_s, tags, flds, sfld, csum(sfld), existing_id),
+                )
+                updated += 1
+                continue
+            note_id = counter
             con.execute(
                 "insert into notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data)"
                 " values (?,?,?,?,?,?,?,?,?,0,'')",
-                (
-                    note_id,
-                    guid,
-                    data["notetype"]["id"],
-                    now_s,
-                    0,
-                    tags,
-                    front + "\x1f" + back,
-                    sfld,
-                    csum(sfld),
-                ),
+                (note_id, guid, data["notetype"]["id"], now_s, 0, tags, flds, sfld, csum(sfld)),
             )
             con.execute(
                 "insert into cards (id,nid,did,ord,mod,usn,type,queue,due,ivl,factor,reps,lapses,"
                 "left,odue,odid,flags,data)"
                 " values (?,?,?,?,?,?,0,0,?,0,0,0,0,0,0,0,0,'')",
-                (note_id + 1, note_id, deck["id"], 0, now_s, 0, due),
+                (counter + 1, note_id, deck["id"], 0, now_s, 0, due),
             )
-            index += 1
+            added += 1
+            counter += 2
             due += 1
-    return index
+    return added, updated
 
 
 def write_apkg(anki2, out):
@@ -361,16 +478,20 @@ def write_apkg(anki2, out):
 def cmd_check(args):
     data = load(args.deck)
     report, total = validate(data)
+    edges = prerequisites(data)
     print(f"{args.deck}: notetype {data['notetype']['name']} ({data['notetype']['id']})")
     for name, count in report:
         print(f"  {count:4d}  {name}")
     print(f"  {total:4d}  cards, {len(report)} decks — ok")
+    if edges:
+        print(f"  {len(edges):4d}  require another card of this file")
     return 0
 
 
 def cmd_build(args):
     data = load(args.deck)
     report, total = validate(data)
+    edges = prerequisites(data)
     now = int(time.time() * 1000)
 
     out = args.out
@@ -382,7 +503,7 @@ def cmd_build(args):
 
     con = open_collection(work, args.base, now)
     try:
-        added = insert(con, data, now)
+        added, updated = insert(con, data, now, edges)
         con.commit()
         con.execute("vacuum")
         con.commit()
@@ -398,7 +519,10 @@ def cmd_build(args):
     for name, count in report:
         print(f"{count:4d}  {name}")
     base_note = "standalone" if not args.base else f"merged over {args.base}"
-    print(f"{added} cards authored, {base_note}; collection now {notes} notes / {cards} cards -> {out}")
+    print(
+        f"{added} added, {updated} updated, {base_note}; "
+        f"collection now {notes} notes / {cards} cards -> {out}"
+    )
     return 0
 
 
@@ -413,7 +537,10 @@ def main(argv=None):
     build = sub.add_parser("build", help="write an .anki2 (or .apkg) from a deck file")
     build.add_argument("--deck", required=True)
     build.add_argument("--out", required=True)
-    build.add_argument("--base", help="existing collection to merge into (required to keep server cards)")
+    build.add_argument(
+        "--base",
+        help="existing collection to merge into (edits reconcile by guid, new cards are added)",
+    )
     build.add_argument("--format", choices=("anki2", "apkg"), default="anki2")
     build.set_defaults(func=cmd_build)
 

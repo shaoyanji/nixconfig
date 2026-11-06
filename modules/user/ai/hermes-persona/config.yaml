@@ -15,15 +15,35 @@ telegram:
   reactions: false
 model:
   provider: nous
-  default: inclusionai/ling-3.0-flash-sante:free
+  default: stepfun/step-3.7-flash:free
+  base_url: https://inference-api.nousresearch.com/v1
 agent:
   max_turns: 150
+  reasoning_effort: medium
 display:
   interface: cli
   tool_progress: all
+# Fallback chain: one capable model across three independent free quotas, then
+# the single paid endpoint. Nous stays primary even though the portal
+# rate-limits (its pool was in a 429 cooldown when this was written); a nous
+# fallback would share that limiter and add nothing. Matched models, not matched
+# vendors, on purpose: nemotron-3-ultra is the strongest free tool-calling model
+# this fleet can reach, so a failover does not trade away capability. Each entry
+# ran a one-shot `hermes chat` turn on 2026-11-06.
+#
+# Why the chain is short, and what stays out of it: every extra entry is another
+# id that gets retired (gemini-2.5-flash-lite answered "no longer available to
+# new users" the same day). Deliberately absent — groq (hermes' provider registry
+# has no entry; `--provider groq` is "Unknown provider"), cerebras (402, paid
+# only), aihubmix (free models past the trial cap), opencode-zen (expired key),
+# gemini (its terms sit badly with agent work; it does aux tasks below instead).
 fallback_providers:
+  - provider: nvidia
+    model: nvidia/nemotron-3-ultra-550b-a55b
   - provider: openrouter
-    model: thinkingmachines/inkling:free
+    model: nvidia/nemotron-3-ultra-550b-a55b:free
+  - provider: ollama-cloud
+    model: nemotron-3-ultra
   - provider: deepseek
     model: deepseek-flash
 tts:
@@ -42,10 +62,19 @@ stt:
   provider: local
   local:
     model: base
-security: {}
+# Gemini is kept out of the agent chain (its terms sit badly with agent work) but
+# is a sane aux lane: titling and conversation compression are single-shot text
+# tasks. `free_only` keeps every other aux call off OpenRouter's paid default
+# lane, so the only billable route in this file is the deepseek fallback.
 auxiliary:
+  free_only: true
+  openrouter_model: nvidia/nemotron-3-ultra-550b-a55b:free
   title_generation:
-    model: nous/inclusionai/ling-3.0-flash-sante:free
+    provider: gemini
+    model: gemini-3.5-flash-lite
+  compression:
+    provider: gemini
+    model: gemini-3.5-flash-lite
 skills:
   trusted_project_dirs:
     - /Volumes/data/projects/nixconfig

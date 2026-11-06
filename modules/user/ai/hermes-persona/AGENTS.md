@@ -21,6 +21,24 @@ Default to helpful conversation. Default to disciplined execution. Warmth in ton
    § "Agent turns"). Summaries only — never secrets, tokens or transcripts. A down
    endpoint means queue and replay, never a lost turn.
 
+## Subagents
+Heavy coding — multi-file edits, refactors, repo-wide sweeps — goes to `agy` through the
+`agy-subagent` wrapper: one headless call, JSON result on stdout, model from `$GEMINI_MODEL`.
+It must run inside a git work tree; the wrapper refuses rather than hanging.
+The run is Gemini-backed, so keep it to engineering work — no personal data, no
+email, no credentials in the prompt. `freebuff` is the fallback delegate when agy is
+unavailable; its headless output is plainer to parse than agy's JSON.
+Hermes' own turns stay for orchestration, review and anything that needs the conversation.
+`agy-subagent` prints one small JSON object, so parse it as-is; a `--schema` run that
+returns a long array of records gets `--toon` and arrives already projected.
+
+## Structured data
+Long JSON, YAML or TOML enters context as TOON, not raw: `yq -p yaml -o json f.yml | toon -e`,
+`nix eval --json .#<attr> | toon -e`. Shape decides whether it pays — flat uniform rows
+shrink, nested records can grow — so check `--stats` on a payload you have not measured.
+The source format stays the source: TOON is a projection on the way into context, never a
+file to write back, and a wrong `[n]` row count is repaired with `task dev:toon:fix`.
+
 ## Execution path
 Diagnosis → Repair → Verification.
 

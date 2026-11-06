@@ -302,6 +302,15 @@ in {
           "HERMES_SUPERVISED_CHILD=1"
           "HOME=${config.home.homeDirectory}"
           "USER=${config.home.username}"
+          # agy is the subagent a hermes turn shells out to. Home Manager's
+          # sessionVariables never reach a systemd unit, so without these the
+          # daemon calls the local agy with no model and may attempt a
+          # self-update against the read-only store. The model comes from the
+          # antigravity module, not a second literal.
+          "AGY_CLI_DISABLE_AUTO_UPDATE=true"
+          "GEMINI_MODEL=${
+            lib.attrByPath ["antigravity-cli" "defaultModel"] "gemini-3.8-flash" config.programs
+          }"
           # /run/wrappers/bin MUST come first: it holds the setuid sudo
           # wrapper. A pkgs.sudo pulled into ~/.nix-profile (e.g. via the
           # hermes-agent dependency tree) is a plain store binary without

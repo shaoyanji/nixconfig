@@ -70,6 +70,78 @@
       AGY_CLI_DISABLE_AUTO_UPDATE = "true";
     };
 
+    # Hermes' main subagent runner. One headless agy call, JSON on stdout, so a
+    # parent turn parses a result instead of scraping a TUI. Every flag here is
+    # one the skill proves by hand; the point of the wrapper is that the model
+    # comes from GEMINI_MODEL (the same knob the gateway unit exports) and that
+    # the git-work-tree precondition fails with a message rather than a hang.
+    home.packages = lib.mkIf config.programs.antigravity-cli.enable [
+      (pkgs.writeShellApplication {
+        name = "agy-subagent";
+        runtimeInputs = [config.programs.antigravity-cli.package pkgs.git pkgs.llm-agents.toon];
+        text = ''
+          usage() {
+            cat <<'EOF'
+          agy-subagent — run agy headless as a Hermes subagent; JSON on stdout
+
+            agy-subagent '<prompt>' [--schema FILE] [--mode plan|auto|accept-edits] [--dir DIR] [--toon]
+
+            --schema FILE   JSON schema (path or inline JSON) the final answer must satisfy
+            --mode MODE     agent execution mode for the session
+            --dir DIR       working directory (default: $PWD); must be a git work tree
+            --toon          project the result to TOON (stdout); the size stat goes to stderr
+
+          Env:
+            GEMINI_MODEL          model for the run (default: gemini-3.8-flash)
+            AGY_SUBAGENT_TIMEOUT  print-mode time limit in seconds (default: 900)
+          EOF
+          }
+
+          prompt=""
+          schema=""
+          mode=""
+          dir="$PWD"
+          toon=0
+          while [ $# -gt 0 ]; do
+            case "$1" in
+              --schema) schema="$2"; shift 2 ;;
+              --mode) mode="$2"; shift 2 ;;
+              --dir) dir="$2"; shift 2 ;;
+              --toon) toon=1; shift ;;
+              -h | --help) usage; exit 0 ;;
+              -*) echo "agy-subagent: unknown flag $1" >&2; exit 2 ;;
+              *) prompt="''${prompt:+$prompt }$1"; shift ;;
+            esac
+          done
+
+          if [ -z "$prompt" ]; then
+            usage >&2
+            exit 2
+          fi
+          if [ ! -d "$dir" ]; then
+            echo "agy-subagent: no such directory: $dir" >&2
+            exit 2
+          fi
+
+          cd "$dir" || exit 2
+          if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            echo "agy-subagent: $dir is not a git work tree — agy refuses to start outside one" >&2
+            exit 2
+          fi
+
+          args=(--model "''${GEMINI_MODEL:-gemini-3.8-flash}" --dangerously-skip-permissions --print "$prompt" --output-format json --print-timeout "''${AGY_SUBAGENT_TIMEOUT:-900}s")
+          if [ -n "$schema" ]; then args+=(--json-schema "$schema"); fi
+          if [ -n "$mode" ]; then args+=(--mode "$mode"); fi
+
+          if [ "$toon" = 1 ]; then
+            agy "''${args[@]}" | toon -e --stats
+          else
+            agy "''${args[@]}"
+          fi
+        '';
+      })
+    ];
+
     # Antigravity standalone project fallback to avoid project store read failures
     # when starting sessions without an explicit active workspace project.
     # Prevent Home Manager activation collisions when agy mutates settings.json at runtime

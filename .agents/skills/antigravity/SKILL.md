@@ -33,8 +33,16 @@ Requires the antigravity CLI.
 - Never `npm install -g antigravity-cli` — different binary name, and it writes
   outside the store (see the `nix-toolchain` skill).
 - Default model on this fleet is set by the module (`$GEMINI_MODEL`), currently
-  `gemini-3.8-flash`; read the module rather than assuming a model id.
-- No Google OAuth (`antigravity auth`) required for `agy` CLI operation.
+  `gemini-3.8-flash`; read the module rather than assuming a model id. `agy` has no
+  model env var of its own — pass `--model "$GEMINI_MODEL"` explicitly.
+- Auth is the per-user OAuth token already in `$HOME`
+  (`~/.gemini/antigravity-cli/antigravity-oauth-token`), so a local-user hermes
+  reuses it instead of re-authenticating. Measured 2026-11-06: with only
+  `GEMINI_API_KEY` and a clean `$HOME`, `agy` ignores the key and blocks on the
+  browser OAuth flow — do not treat the API key as agy auth. A second host
+  reuses that token (`install -m600` or a symlink) instead of signing in again.
+- Under the hermes gateway the unit exports `AGY_CLI_DISABLE_AUTO_UPDATE` and
+  `GEMINI_MODEL` itself; a login shell gets them from Home Manager.
 - Must run inside a git repository (`/tmp/antigravity_task` used as scratch workspace).
 - Use `pty=true` in terminal calls — `agy` hangs without PTY.
 
@@ -51,9 +59,26 @@ Requires the antigravity CLI.
 
 ## One-shot tasks
 
+Prefer the wrapper — it is the delegated-subagent entry point Hermes is told to use, and
+the only place the flags are pinned:
+
+```bash
+agy-subagent 'Add a dark mode toggle to settings' --mode plan --dir ~/project
+agy-subagent 'Summarise the failing tests' --schema /tmp/schema.json --dir ~/repo
+```
+
+It exits 2 with a message outside a git work tree, defaults to `$GEMINI_MODEL`
+(`gemini-3.8-flash`), caps the run at `$AGY_SUBAGENT_TIMEOUT` (900 s) and writes agy's JSON
+(`status`, `response`, `usage`) to stdout. That result is one small object, so read it as
+JSON; when a schema makes `response` a long array of records, add `--toon` —
+`agy-subagent … --schema s.json --toon` — and the wrapper projects the document through
+`toon -e`, printing the size stat on stderr. Measured on a one-line reply: TOON is 15 %
+*more* tokens for this single nested object, and 14 % fewer on the flat `task --list-all`
+table, so the flag is for record arrays, not for every call. Raw form for anything the wrapper does not cover:
+
 ```bash
 # Verified syntax for agy installed version (NOT antigravity binary)
-terminal(command="agy --dangerously-skip-permissions --json-schema /tmp/antigravity_task/schema.json --print='Add dark mode toggle to settings' --mode plan --output-format json", workdir="~/project", pty=true)
+terminal(command="agy --model \"$GEMINI_MODEL\" --dangerously-skip-permissions --json-schema /tmp/antigravity_task/schema.json --print='Add dark mode toggle to settings' --mode plan --output-format json", workdir="~/project", pty=true)
 ```
 
 For scratch work (requires `.git` directory):

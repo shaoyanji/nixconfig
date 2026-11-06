@@ -46,6 +46,14 @@ fallback_providers:
     model: nemotron-3-ultra
   - provider: deepseek
     model: deepseek-flash
+# chatplayground is deliberately NOT a provider here. Its chat endpoint takes
+# exactly one message of at most 15,000 characters, while a hermes turn sends
+# ~29,000 characters of system prompt and tool schemas, so every
+# `--provider chatplayground` turn did the work and then fell back. It is used
+# as a CLI advice lane instead: `.agents/skills/cpg-advice` (skill) over
+# `cpg chat`, a self-contained client that needs no unit and no shim.
+# The loopback shim on 127.0.0.1:8799 still exists for aichat's
+# `openai-compatible` client (`programs.hermes-user.chatplayground`).
 tts:
   primary: speechify
   speechify:
@@ -97,4 +105,4 @@ telemetry:
     enabled: false
     send: false
     offer_version: 2
-_config_version: 51
+_config_version: 52

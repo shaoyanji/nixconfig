@@ -314,6 +314,10 @@ in {
     gateway.enable = true;
     simplex.daemon = true;
     envFile = "/run/secrets/rendered/hermes.env";
+    # The free buffet: chatplayground's web chat models behind an OpenAI-shaped
+    # /v1 on loopback, so hermes' `custom:chatplayground` provider is one hop
+    # from the same session a browser uses.
+    chatplayground.enable = true;
   };
 
   # --- Boot parameters for GPU power saving ---

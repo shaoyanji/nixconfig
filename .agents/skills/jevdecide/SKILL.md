@@ -1,82 +1,101 @@
 ---
 name: jevdecide
-description: "Jev-gated inbox cleaning: classify envelope metadata; delete only >=0.8; fetch bodies only when unsure."
-tags: [email, triage, inbox, jev, gating]
+description: Jev decisions for hermes — classify or choose with jev-decide, route a lane on calibrated probabilities, never let a model authorise an action.
+version: 2.0.0
+tags: [jev, decision, routing, gating, triage]
+platforms: [linux, macos]
 ---
 
-# jevdecide — Jev-gated inbox cleaning
+# jevdecide — the decision lane
 
-Jev (TypeSafe `jev-decide`) decides what to delete. The agent supplies **envelope
-metadata first** and escalates to message bodies **only** for mail Jev is unsure about.
+Jev answers one kind of question: given a state and a set of described options,
+which option — with a probability. One forward pass, no generated text, about a
+second and ~400 input tokens per call (measured 2026-11-06, TypeSafe).
 
-## Contract
-- Metadata-only by default. Never fetch a body unless Jev returns a non-DELETE choice,
-  a `DELETE` below the threshold, or a `REVIEW` label.
-- Delete only when Jev says `DELETE` with `probability >= 0.8`.
-- Bias to KEEP. Financial, security, legal, account, personal, and job/application mail
-  is never deleted on metadata alone; when in doubt, keep.
-- Trashing is recoverable (~30 days) but treat it as destructive.
+Use it where a decision repeats, is cheap to encode, and is worth an audit trail.
+Do not use it to write, summarise, plan or explain: it returns a label.
 
-## Canonical Jev tooling (do not reinvent)
-- CLI: `jev-decide` (implemented in the `jev` skill at `scripts/jev.py`; provider
-  `typesafe` or `openrouter`). `--min-probability 0.8` is the gate.
-- Related skills: `jev`, `jev-triage` (generic record triage + review queues), and
-  `email/email-inbox-triage` (prioritise/draft — NOT for deleting).
+## The call, in its three shapes
 
-## Key setup (once per shell)
-```sh
-set -a; . "$HOME/.config/hermes/hermes.env"; set +a
+Always name the provider. The CLI's default is OpenRouter, which answers HTTP 402
+without credit; a silent default turns a decision into a payment error.
+
+```bash
+# 1. Classify one text against described labels
+jev-decide classify --provider typesafe --text "…" --criteria /tmp/labels.json
+
+# 2. Answer several questions about one state in one pass
+jev-decide decide --provider typesafe /tmp/request.json
+
+# 3. Validate that request without spending a call
+jev-decide decide --provider typesafe --dry-run /tmp/request.json
 ```
 
-## Criteria file (write once)
-`/tmp/jev_inbox_criteria.json`:
+`--text-file -` reads the text from stdin, which is what makes a pipeline work:
+
+```bash
+cpg chat -m gpt-6-luna -s advice-review "…" \
+  | jev-decide classify --provider typesafe --text-file - --criteria /tmp/labels.json
+```
+
+## What comes back
+
 ```json
-{
-  "KEEP": "personal or human correspondence; security alerts and sign-in notices; financial statements, broker/order alerts, tax; legal or terms changes tied to a real account; receipts and shipping for goods actually ordered; job-application, recruiter, interview or ATS mail; government and admin notices; anything time-sensitive or requiring a reply",
-  "DELETE": "marketing, promotional, newsletters, digests, retail sales, loyalty/hotel rewards, event or conference promo, webinar invites, job-board blasts and bulk match notifications, vendor product updates, social-media digests, breaking-news alerts",
-  "REVIEW": "unclear from subject and sender alone"
-}
+{"decisions": {"category": {"status": "selected", "value": "review_my_work",
+                            "probability": 1.0, "margin": 0.86}}}
 ```
 
-## Step 1 — metadata only
-```sh
-himalaya envelope list -s <N> -w 200      # id, flags, subject, from, date, size
-```
-No bodies.
+- `status` is `selected` or `needs_review`, and the exit code mirrors it:
+  **0 selected, 2 needs review, 1 error**. Branch on the code, not on the text.
+- `probability` is the top choice's share and `margin` the gap to the runner-up.
+  Gate on both: a 0.82 with a 0.03 margin is nearly a tie.
+- A `false` on a `noul` question means "no", not "missing".
+- `usage.output_tokens` is 0. There is no prose to read, so do not ask for any.
 
-## Step 2 — classify each on subject + sender only
-```sh
+## Thresholds, and what they are not
+
+- `--min-probability 0.8` and `--min-margin 0.15` are the fleet defaults; below
+  either, the answer comes back `needs_review`.
+- The probability is the model's own distribution, not a calibrated confidence,
+  and it does not transfer between providers or models. Fit a threshold on your
+  own data before gating anything that matters.
+- A decision is a signal, never an authorisation. Delete, deploy, push and send
+  still go through `confirm-before-destructive`.
+
+## Routing: the lane, not the model
+
+The useful pattern is to let Jev choose which lane a request belongs to, then
+carry that lane out yourself:
+
+```bash
 jev-decide classify --provider typesafe \
-  --text "<subject> — from <sender>" \
-  --criteria /tmp/jev_inbox_criteria.json \
-  --min-probability 0.8 --review-label REVIEW
-```
-OpenRouter answers HTTP 402 without credit; TypeSafe is the tested provider.
-Read `.decisions.category.value` and `.decisions.category.probability`. One
-`jev-decide` invocation per message; loop to batch.
-
-## Step 3 — act
-- `DELETE` with `probability >= 0.8` -> queue for Trash. **Do not fetch the body.**
-- anything else -> fetch the body and re-classify with it appended:
-  ```sh
-  himalaya message read <id> --json \
-    | jq -r '[.text_body[] as $i | .parts[$i].body.Text // .parts[$i].body.Html // ""] | join("\n")'
-  ```
-  Delete only if the body-inclusive call still returns `DELETE` with `probability >= 0.8`.
-
-## Step 4 — trash
-```sh
-himalaya message move --to "[Gmail]/Trash" <id> <id> ...
-```
-Report the counts, the deleted list, and anything left as `REVIEW`.
-
-## Bundled runner
-`assets/jev_inbox.py` implements this end to end: report-only by default; `--limit N`
-sets the window; `--apply` moves confirmed `DELETE>=0.8` ids to `[Gmail]/Trash`. A
-`GUARD` list force-keeps obvious financial/security/application mail even if Jev says
-DELETE. Run with:
-```sh
-nix-shell -p python3 --run "python3 ~/.agents/skills/jevdecide/assets/jev_inbox.py --limit 150"
+  --text "Should I ask another model to review this module before switching?" \
+  --criteria /tmp/advice-lane.json
+# selected ask_another_model at 0.91 → then make the cpg call
 ```
 
-Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.
+What it cannot do is choose the model or provider that answers an agent turn:
+that is `fallback_providers` in the hermes config, resolved by the agent, and
+there is no hook for it. For graph-intent routing ("what touches frieren") the
+measured answer is keyword rules plus a context bundle, no model at all — the
+numbers are in `decision-picker`.
+
+## Fail closed
+
+- A paywall, a 402, a timeout or an unparseable body is a refusal, never a
+  partial result. Report it; do not act on a defaulted label.
+- No CLI or no key: say so and mark the judgement as simulation
+  (`jev_called: false`, `probability: null`). Never invent Jev output.
+- Keys live in `~/.hermes/.env`, which a hermes turn already loads. In a bare
+  shell: `set -a; . ~/.hermes/.env; set +a`.
+- `jev-decide setup` reports key presence without a network call. Check presence,
+  never print a value.
+
+## Where the procedure lives
+
+- Inbox cleanup — metadata first, bodies only when Jev is unsure, delete only a
+  confident `DELETE`: `references/inbox-cleanup.md` and `assets/jev_inbox.py`.
+- The fleet engine contract and the categoriser's error gate:
+  `scripts/task/categorize.sh`, `flake/policies.nix#decision-engine-routing`.
+- Choosing among Jev, Laya and Kev-4B: `decision-picker`.
+- The text lane to pipe in: `cpg-advice`.

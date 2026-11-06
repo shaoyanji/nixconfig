@@ -22,6 +22,45 @@
     ];
     text = builtins.readFile ../../../scripts/task/hermes-env-sync.sh;
   };
+
+  # chatplayground: the `cpg` client. Three consumers, one binary — the advice
+  # lane (`cpg chat`, `.agents/skills/cpg-advice`), image generation
+  # (`cpg image`, `.agents/skills/cpg-image`), and the `serve` shim aichat
+  # points at. No unit is needed for the first two: the thread lives server
+  # side and only the new prompt is ever sent.
+  #
+  # Session credential: ~/.chatplayground/auth.json (0600), written by
+  # `chatplayground-go login` or harvested from a signed-in browser. It is NOT a
+  # secret managed here — the Clerk session behind it rotates, and a sops copy
+  # would go stale silently. Every request mints a 60 s token from the
+  # long-lived `__client` cookie, so an idle client pays nothing.
+  #
+  # buildGo127Module, not buildGoModule: the default Go here is 1.26.8 and
+  # go.mod asks for 1.27.1, which fails the vendor FOD with "go.mod requires go
+  # >= 1.27.1 (running go 1.26.8)". nixpkgs carries go_1_27 (1.27.2).
+  chatplaygroundCli = pkgs.buildGo127Module rec {
+    pname = "chatplayground-go";
+    version = "1.2.1";
+    src = pkgs.fetchFromGitHub {
+      owner = "shaoyanji";
+      repo = "chatplayground-go";
+      rev = "8365f0947551a981984e52d24e8ab6cc51929e39";
+      hash = "sha256-WBgqj+ND9A5C2Lg4mcHPVrcu/KTzvHoTphk4ztboS0w=";
+    };
+    vendorHash = "sha256-t1Bqg6w5O1AT7NGqIfptbTQsjY/X4NosMxRlz+VBxiw=";
+    subPackages = ["."];
+    ldflags = ["-s" "-w" "-X main.Version=1.2.1"];
+    # `cpg` is the name that gets typed; the upstream binary keeps its own name
+    # for the shim's ExecStart and for anyone following the project's docs.
+    postInstall = ''
+      ln -s chatplayground-go $out/bin/cpg
+    '';
+    meta = {
+      description = "chatplayground client: self-contained `cpg chat`, plus an OpenAI-compatible serve mode";
+      mainProgram = "cpg";
+      license = pkgs.lib.licenses.mit;
+    };
+  };
 in {
   options.programs.hermes-user = {
     enable = lib.mkOption {
@@ -63,6 +102,34 @@ in {
         type = lib.types.port;
         default = 5225;
         description = "Port for the simplex-chat WebSocket daemon.";
+      };
+    };
+
+    chatplayground = {
+      enable = lib.mkEnableOption ''
+        the chatplayground-serve shim on 127.0.0.1:8799 — an OpenAI-compatible
+        /v1 endpoint over the chatplayground web chat models, for the hermes
+        `custom:chatplayground` provider
+      '';
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8799;
+        description = ''
+          Loopback port to serve on. Deliberately not 8787: the *arr stack's
+          readarr already listens there on this fleet.
+        '';
+      };
+
+      toolsEmulate = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Let the shim emulate OpenAI tool calls. The chatplayground wire format
+          has no tool-calling support at all: the shim advertises the caller's
+          tools in the prompt, parses a fenced JSON block out of the reply and
+          returns it as `tool_calls`. Off is the honest chat-only mode.
+        '';
       };
     };
 
@@ -195,46 +262,52 @@ in {
     # Port of the old agent's handoff-restore discipline: hermes sessions
     # already capture scrollback; this helper restores the *operational*
     # state (persona pointers + latest archive savepoint) into a new chat.
-    home.packages = [
-      pkgs.llm-agents.hermes-agent
-      hermesEnvSync
-      (pkgs.writeShellApplication {
-        name = "hermes-handoff";
-        runtimeInputs = with pkgs; [
-          coreutils
-          gnugrep
-          gnused
-        ];
-        text = ''
-          # hermes-handoff: print a resume-brief for the resurrected Vanta
-          # persona from the OpenClaw archive + live ~/.hermes state.
-          set -euo pipefail
-          ARCHIVE="''${HERMES_ARCHIVE:-$HOME/.hermes/openclaw-archive}"
+    home.packages =
+      [
+        pkgs.llm-agents.hermes-agent
+        hermesEnvSync
+      ]
+      # The client is installed whenever hermes-user is on, not only when the
+      # shim is: `cpg chat` is the part that works with no service running.
+      ++ lib.optional pkgs.stdenv.hostPlatform.isLinux chatplaygroundCli
+      ++ [
+        (pkgs.writeShellApplication {
+          name = "hermes-handoff";
+          runtimeInputs = with pkgs; [
+            coreutils
+            gnugrep
+            gnused
+          ];
+          text = ''
+            # hermes-handoff: print a resume-brief for the resurrected Vanta
+            # persona from the OpenClaw archive + live ~/.hermes state.
+            set -euo pipefail
+            ARCHIVE="''${HERMES_ARCHIVE:-$HOME/.hermes/openclaw-archive}"
 
-          latest_savepoint() {
-            find "$ARCHIVE/memory" -name '*.md' -type f 2>/dev/null | sort | tail -"''${1:-1}" | head -1
-          }
+            latest_savepoint() {
+              find "$ARCHIVE/memory" -name '*.md' -type f 2>/dev/null | sort | tail -"''${1:-1}" | head -1
+            }
 
-          echo "# Hermes handoff brief — $(date '+%Y-%m-%d %H:%M %Z')"
-          echo
-          echo "## Persona pointers"
-          for f in SOUL.md AGENTS.md USER.md MEMORY.md; do
-            if [ -f "$HOME/.hermes/$f" ]; then
-              echo "- $f: $HOME/.hermes/$f ($(wc -l < "$HOME/.hermes/$f") lines)"
-            fi
-          done
-          echo
-          echo "## Latest archive savepoints"
-          find "$ARCHIVE/memory" -name '*.md' -type f 2>/dev/null | sort | tail -3 | while read -r f; do
-            echo "- $(basename "$f")  ($(head -1 "$f" | cut -c1-72))"
-          done
-          echo
-          echo "## Restore"
-          echo "hermes chat -z \"Read ~/.hermes/SOUL.md and \"
-            \"\$($HOME/.hermes/openclaw-archive/handoffs/BOOT.md 2>/dev/null || echo 'the archive BOOT notes')\""
-        '';
-      })
-    ];
+            echo "# Hermes handoff brief — $(date '+%Y-%m-%d %H:%M %Z')"
+            echo
+            echo "## Persona pointers"
+            for f in SOUL.md AGENTS.md USER.md MEMORY.md; do
+              if [ -f "$HOME/.hermes/$f" ]; then
+                echo "- $f: $HOME/.hermes/$f ($(wc -l < "$HOME/.hermes/$f") lines)"
+              fi
+            done
+            echo
+            echo "## Latest archive savepoints"
+            find "$ARCHIVE/memory" -name '*.md' -type f 2>/dev/null | sort | tail -3 | while read -r f; do
+              echo "- $(basename "$f")  ($(head -1 "$f" | cut -c1-72))"
+            done
+            echo
+            echo "## Restore"
+            echo "hermes chat -z \"Read ~/.hermes/SOUL.md and \"
+              \"\$($HOME/.hermes/openclaw-archive/handoffs/BOOT.md 2>/dev/null || echo 'the archive BOOT notes')\""
+          '';
+        })
+      ];
 
     # --- Messaging gateway (Telegram, Discord, …) ------------------------
     # Declared here, never via `hermes gateway install`: the generator bakes the
@@ -276,6 +349,77 @@ in {
         StandardError = "journal";
       };
       Install.WantedBy = ["default.target"];
+    };
+
+    # chatplayground-serve: loopback only. It holds a live web-chat session, so
+    # it is never exposed beyond 127.0.0.1 — the hermes child agents on this host
+    # are the only intended client.
+    systemd.user.services.chatplayground-serve = lib.mkIf (config.programs.hermes-user.chatplayground.enable && pkgs.stdenv.hostPlatform.isLinux) {
+      Unit = {
+        Description = "chatplayground-serve — OpenAI-compatible shim over chatplayground web chat";
+        After = ["network-online.target"];
+        Wants = ["network-online.target"];
+        StartLimitIntervalSec = 0;
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = let
+          c = config.programs.hermes-user.chatplayground;
+        in
+          "${chatplaygroundCli}/bin/chatplayground-go serve --addr 127.0.0.1:${toString c.port}"
+          + lib.optionalString c.toolsEmulate " --tools-emulate";
+        WorkingDirectory = config.home.homeDirectory;
+        Environment = [
+          "HOME=${config.home.homeDirectory}"
+          "USER=${config.home.username}"
+        ];
+        # The auth file can be rewritten under it (a login, a rotation); the
+        # process reads it per request, so a restart is not needed. Only a dead
+        # port is: the unit is cheap, so let it restart rather than linger sick.
+        Restart = "always";
+        RestartSec = 5;
+        StandardOutput = "journal";
+        StandardError = "journal";
+      };
+      Install.WantedBy = ["default.target"];
+    };
+
+    # The session lives in a browser cookie. When it dies, chat, image
+    # generation and the advice lane die together, and nothing says so until a
+    # request fails. One mint an hour keeps the 60-second token fresh and makes
+    # a dead session a failed unit within the hour. It cannot resurrect one:
+    # that needs `chatplayground-go login` in a real browser.
+    systemd.user.services.chatplayground-refresh = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+      Unit = {
+        Description = "chatplayground session keepalive — mint a Clerk token from the stored client cookie";
+        # No auth file, no job: a host that never logged in is not a failure.
+        ConditionPathExists = "${config.home.homeDirectory}/.chatplayground/auth.json";
+        After = ["network-online.target"];
+        Wants = ["network-online.target"];
+        StartLimitIntervalSec = 0;
+      };
+      Service = {
+        Type = "oneshot";
+        # --json plus a non-zero exit on a dead session: that is the signal.
+        ExecStart = "${chatplaygroundCli}/bin/cpg refresh --json";
+        Environment = [
+          "HOME=${config.home.homeDirectory}"
+          "USER=${config.home.username}"
+        ];
+        StandardOutput = "journal";
+        StandardError = "journal";
+      };
+    };
+
+    systemd.user.timers.chatplayground-refresh = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+      Unit.Description = "Hourly chatplayground session keepalive";
+      Timer = {
+        OnCalendar = "hourly";
+        Persistent = true;
+        RandomizedDelaySec = "5min";
+        AccuracySec = "1min";
+      };
+      Install.WantedBy = ["timers.target"];
     };
 
     systemd.user.services.hermes-gateway = lib.mkIf (config.programs.hermes-user.gateway.enable && pkgs.stdenv.hostPlatform.isLinux) {

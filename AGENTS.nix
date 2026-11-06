@@ -5613,5 +5613,51 @@
         scorecard to #Fleet and took the quiet gate for 0 tokens.
       '';
     };
+
+    clanker-offload-fixture = {
+      title = "clanker: the offload VM, and what may live there";
+      kind = "proposal";
+      status = "ACCEPTED";
+      date = "2026-11-06";
+      priority = "P3";
+      links = ["exp-021" "exp-115"];
+      summary = "A 4 vCPU / 8 GiB Instabox VM is permanent as of 2026-11-06, so work measured in minutes — a closure build, a Go binary, a tool trial — moves off the host that asked for it, and the monthly cache diff gains a machine that can compute it.";
+      refs = {
+        hosts = ["clanker"];
+        modules = ["hosts/clanker.nix" "modules/roles/lean.nix" "scripts/task/clanker.sh"];
+        tasks = ["clanker:profile" "clanker:nix" "clanker:job" "clanker:wait"];
+        docs = [".agents/skills/instabox/SKILL.md"];
+      };
+      body = ''
+        **What it is.** Instabox VM: 4 vCPU, 8 GiB, `/data` 20 GiB, 120 min per run,
+        suspend after 30 idle. Not a fleet host — the image owns boot, kernel and
+        accounts, and we own `~/.nix-profile` plus `/data`. Registered `kind = "home"`
+        because that is the layer we actually own; `role:lean` is what we put there.
+
+        **What may go there.** Bounded, restartable work with a result we copy back: a
+        closure build, a Go binary, a `nix flake update` trial, a tool being tested before
+        it lands in a host's closure. A job is a directory (`cmd.sh`, `log`, `exit`), so it
+        outlives the ssh channel that started it, and "running" means no `exit` file yet —
+        no pid file to go stale when the box suspends.
+
+        **What may not.** State. No sops or age key, no cachix write key, nothing that must
+        answer. A build here warms nothing; the box holds no destination credential, and
+        adding one is a deliberate temporary exception, not a default.
+
+        **The cache trial this enables** (extends exp-021, whose warmer fills the LAN cache
+        from frieren): a monthly `nix flake update` diff built here and pushed to the
+        Cloudflare R2 cache — 10 GiB there against 20 GiB of box disk — so a laptop fetches
+        a diff rather than a closure. It needs the one thing the box deliberately lacks, an
+        R2 write credential, so it is a scheduled job with a scoped token.
+
+        **Ephemeral services, later.** A restore test, a mail-archive reindex, a Stirling
+        trial: work whose value is the answer, not the uptime. Each must be copy-back shaped
+        before it moves, because the box can vanish mid-job by design.
+
+        **Exit.** Three months with no job that needed babysitting, and one cache diff a
+        laptop actually substituted from; then this note is DELIVERED and the next
+        ephemeral service moves.
+      '';
+    };
   };
 }

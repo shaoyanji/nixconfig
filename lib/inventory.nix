@@ -37,6 +37,24 @@
     };
   };
 
+  # A tailnet endpoint a reader can click. The host part is derived from
+  # `tailscale_hostname` + `tailnet_domain`, so a link never retypes a name, and
+  # `port` is the fact: `modules/services/service-portal.nix` asserts that every
+  # port named here is a mount on that host, which is what stops this list
+  # advertising a port nothing serves.
+  linkModule = {
+    options = {
+      label = str "";
+      port = mkOption {type = types.port;};
+      scheme = mkOption {
+        type = types.enum ["http" "https"];
+        default = "https";
+      };
+      path = str "";
+      note = str "";
+    };
+  };
+
   networkModule = {
     options = {
       lan_ip = str "";
@@ -50,9 +68,15 @@
       domain = str "";
       ssh_alias = str "";
       tailscale_hostname = str "";
+      # The fleet's tailnet suffix, declared only by hosts that publish links.
+      tailnet_domain = str "";
       gemini_url = str "";
       gopher_url = str "";
       tailscale = bool false;
+      links = mkOption {
+        type = types.listOf (types.submodule linkModule);
+        default = [];
+      };
     };
   };
 
@@ -203,7 +227,34 @@
     ];
   };
 
-  hosts = evaluated.config.hosts;
+  # `url` is built here, once: a renderer prints `link.url` and must not
+  # reassemble the string, because two formats for one address is how a link
+  # starts pointing at a host that never existed.
+  withLinkUrls = host: let
+    net = host.network;
+    hasName = net.tailscale_hostname != "" && net.tailnet_domain != "";
+  in
+    host
+    // {
+      network =
+        net
+        // {
+          links =
+            map (
+              l:
+                l
+                // {
+                  url =
+                    if hasName
+                    then "${l.scheme}://${net.tailscale_hostname}.${net.tailnet_domain}:${toString l.port}${l.path}"
+                    else null;
+                }
+            )
+            net.links;
+        };
+    };
+
+  hosts = builtins.mapAttrs (_: withLinkUrls) evaluated.config.hosts;
   metadata = evaluated.config.metadata;
   repos = evaluated.config.repos;
 

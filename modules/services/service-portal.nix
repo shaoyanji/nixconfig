@@ -505,6 +505,63 @@ in {
         assertion = builtins.all (c: builtins.elem c.group cfg.groups) visible;
         message = "services.servicePortal: a card's `group` is not declared in `groups` — it would render in no section.";
       }
+      # The docs site cannot evaluate this host, so its clickable list lives in
+      # `inventory.toml` (`network.links`). This is the direction that can drift
+      # silently — a link to a port nothing serves — so it is the one asserted.
+      # A host without the compiled inventory injected has no list to check.
+      {
+        assertion =
+          !(config.fleet ? inventory)
+          || (
+            let
+              h = config.fleet.inventory.hosts.${config.networking.hostName} or null;
+              links =
+                if h == null
+                then []
+                else (h.network.links or []);
+              # An `external` card names its own href, so its port is the one in
+              # that href rather than a mount's.
+              externalPorts = builtins.concatMap (
+                n: let
+                  e = cfg.entries.${n};
+                  m = builtins.match ".*:([0-9]+).*" (e.href or "");
+                in
+                  lib.optional e.external (
+                    if m == null
+                    then 0
+                    else lib.toInt (builtins.head m)
+                  )
+              ) (builtins.attrNames cfg.entries);
+              served = mountPorts ++ map (s: s.port) (builtins.attrValues exposed) ++ externalPorts;
+            in
+              builtins.all (l: builtins.elem l.port served) links
+          );
+        message = ''
+          inventory.toml network.links names a port this host does not serve: the docs page would link a dead endpoint. Declare a mount (or an exposure row) for it, or drop the link.'';
+      }
+      # The other direction: a card on this host's portal that the docs page
+      # does not link is a service a reader still has to remember a port for.
+      # `hideCard` is the explicit opt-out.
+      {
+        assertion =
+          !(config.fleet ? inventory)
+          || (
+            let
+              h = config.fleet.inventory.hosts.${config.networking.hostName} or null;
+              linked =
+                map (l: l.port)
+                (
+                  if h == null
+                  then []
+                  else (h.network.links or [])
+                );
+              shown = map (m: m.port) (builtins.attrValues (lib.filterAttrs (_: m: !m.hideCard) cfg.mounts));
+            in
+              builtins.all (p: builtins.elem p linked) shown
+          );
+        message = ''
+          a visible portal mount has no inventory.toml network.links row: the docs page would leave that service out, so a reader still has to remember its port. Add the link, or set `hideCard = true` on the mount.'';
+      }
       {
         assertion = !cfg.includeExposure || builtins.all (n: cfg.entries ? ${n}) exposedKeys;
         message = "services.servicePortal: an exposed proxy has no portal entry (${toString (lib.subtractLists (builtins.attrNames cfg.entries) exposedKeys)}); add `entries.<key>` or name it in `hiddenServices`.";

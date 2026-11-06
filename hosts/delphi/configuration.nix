@@ -1080,6 +1080,9 @@ in {
         title = "Email archive";
         description = "NpgsqlRest over the mail archive: full-text search, uploads, file-system handlers.";
         requires = ["npgsqlrest.service"];
+        # NpgsqlRest has no page at `/` (404), so it is not a card: the archive is
+        # browsed through `mail-atlas`, and the endpoint is machine-facing.
+        hideCard = true;
       };
       # 8451 stays reserved for the rival archive benchmark; this is the reading
       # surface over the same database, with its own loopback vhost so `/api` is

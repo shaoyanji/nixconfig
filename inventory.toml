@@ -176,8 +176,62 @@ storage_layout = "200 GB ext4/btrfs boot disk"
 domain = "delphi.bountystash.com"
 tailscale = true
 tailscale_hostname = "delphi"
+tailnet_domain = "cloudforest-kardashev.ts.net"
 tailscale_ip = "100.123.145.53"
 ssh_alias = "delphi"
+
+# Clickable tailnet endpoints. The URL is compiled from `tailscale_hostname`,
+# `tailnet_domain` and the port, so nothing here retypes the address, and the
+# service portal asserts each port is a mount on this host. Descriptions stay in
+# `key_services` below; this list is only what a reader clicks.
+[[hosts.delphi.network.links]]
+label = "DeepSeek Harness"
+port = 8443
+note = "agent loop, bash, model calls, workspaces"
+
+[[hosts.delphi.network.links]]
+label = "System One decisions"
+port = 8444
+note = "POST /v1/systemone"
+
+[[hosts.delphi.network.links]]
+label = "Stirling PDF"
+port = 8445
+
+[[hosts.delphi.network.links]]
+label = "Service console"
+port = 8446
+note = "this host's portal: every tailnet service, one page"
+
+[[hosts.delphi.network.links]]
+label = "SearXNG"
+port = 8447
+
+[[hosts.delphi.network.links]]
+label = "Uptime Kuma"
+port = 8448
+
+# The archive on :8450 is NpgsqlRest — an API with no page at `/` (404), so it is
+# not a clickable card. Mail atlas is the browsing surface over the same database.
+[[hosts.delphi.network.links]]
+label = "Mail atlas"
+port = 8452
+
+[[hosts.delphi.network.links]]
+label = "Zettel graph"
+port = 8453
+
+[[hosts.delphi.network.links]]
+label = "Mataroa console"
+port = 8454
+
+# Gatus listens on every interface and the tailscale0 firewall rule is the only
+# way in, so this one is plain http on the node address.
+[[hosts.delphi.network.links]]
+label = "Fleet monitors"
+port = 8181
+scheme = "http"
+note = "Gatus, watching frieren from outside its LAN"
 
 [hosts.delphi.software]
 module_chain = "globalModulesContainers"

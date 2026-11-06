@@ -404,6 +404,19 @@
       </table>
     '';
 
+    # The tailnet endpoints, as links: `network.links` is the registry fact and
+    # the URL is compiled from it (`lib/inventory.nix`), so this page never
+    # spells a host or a port of its own.
+    linkRows =
+      lib.concatMapStrings (
+        l: ''<tr><th><a href="${escH (l.url or "")}">${escH l.label}</a></th><td>${
+            escH (l.note or "")
+          }${
+            lib.optionalString ((l.note or "") != "") " &middot; "
+          }<code>${toString l.port}</code></td></tr>''
+      )
+      (builtins.filter (l: l.url or null != null) (net.links or []));
+
     statusBadge =
       if (info.status or "") == "active"
       then "badge-green"
@@ -437,6 +450,13 @@
             else "<table><tbody>" + netRows + swRows + "</tbody></table>"
           }
             </div>
+            ${
+            lib.optionalString (linkRows != "")
+            ''              <div class="card">
+                            <h4>Tailnet links</h4>
+                            <table><tbody>${linkRows}</tbody></table>
+                          </div>''
+          }
           </div>
 
           ${

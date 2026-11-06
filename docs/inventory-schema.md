@@ -46,8 +46,15 @@ reads `hosts.<h>.network.mac` from the compiled artifact.
 | `[metadata]` | `title`, `description`, `version`, `canonical_repo`, plus the derived counts (see below) |
 | `[hosts.<name>]` | `hostname` (defaults to the key), `kind` (`nixos`/`darwin`/`home`/`external`), `arch`, `status` (`active`/`preserved`/`wip`), `role`, `category`, `users`, `flake`, `managed`, `builder`, `ci`, `is_nix`, `system_type`, `notes` |
 | `[hosts.<name>.hardware]` | `model`, `cpu`, `gpu`, `ram`, `display`, `battery`, `storage_type`, `storage_layout` |
-| `[hosts.<name>.network]` | `lan_ip`, `mac`, `tailscale_ip`, `tailscale_hostname`, `ssh_alias`, `domain`, `gemini_url`, `gopher_url`, `tailscale` |
+| `[hosts.<name>.network]` | `lan_ip`, `mac`, `tailscale_ip`, `tailscale_hostname`, `tailnet_domain`, `ssh_alias`, `domain`, `gemini_url`, `gopher_url`, `tailscale`, `links` |
+| `[[hosts.<name>.network.links]]` | `label`, `port`, `scheme` (`http`/`https`, default `https`), `path`, `note` — a clickable tailnet endpoint |
 | `[hosts.<name>.software]` | `module_chain`, `impermanence`, `key_services`, `traits` |
+
+A `network.links` row is what the docs site and the service portal render as a
+clickable card; the URL is compiled from `tailscale_hostname` + `tailnet_domain` +
+`port`, so no page spells an address. The port is checked where it can be: on a
+host with `services.servicePortal`, an assertion fails if a link names a port no
+mount, exposure row or `external` card serves.
 
 `builder` names the one host allowed to build and deploy this one, by hostname.
 It exists because a cross-architecture member has exactly one builder in this

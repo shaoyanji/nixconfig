@@ -336,6 +336,17 @@ in {
     modules = globalModulesHome ++ [../hosts/kali.nix];
   };
 
+  # The Instabox VM. `kind = "home"` is the honest projection: we own only the
+  # user profile there, not a system. It joins `globalModulesHome` so a profile
+  # edit and a fleet host are one code path, and `hosts/clanker.nix` re-points
+  # `home.username` at Instabox's own account.
+  clanker = {
+    kind = "home";
+    system = "x86_64-linux";
+    extraSpecialArgs = {inherit inputs self;};
+    modules = globalModulesHome ++ [../hosts/clanker.nix];
+  };
+
   cassini = {
     kind = "darwin";
     system = "aarch64-darwin";

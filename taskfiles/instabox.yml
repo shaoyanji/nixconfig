@@ -99,3 +99,104 @@ tasks:
     desc: List a machine's published ports
     cmds:
       - bash scripts/task/instabox.sh ports {{.CLI_ARGS}}
+
+  # ── clanker as a fleet offload box ──────────────────────────────────────────
+  # Permanent since 2026-11-06: 4 vCPU / 8 GiB, `/data` 20 GiB, 120 minutes per
+  # run, suspended after 30 idle. A job is a directory on the box (`cmd.sh`, `log`,
+  # `exit`) so it survives the ssh channel that started it — and the absence of
+  # `exit` is what "running" means, which is why there is no pid file to go stale
+  # when the box suspends. Plan: AGENTS.nix `clanker-offload-fixture`.
+
+  clanker:up:
+    desc: Install Nix on clanker (single-user), write its nix.conf, make job dirs
+    summary: >
+      Idempotent. Single-user Nix — no daemon, no root — with the fleet's
+      substituters and the task's own ceiling (`max-jobs = 4`, `cores = 1`,
+      `sandbox = false`): a shared box, not a builder that starves itself. Run it
+      once per image; it also repairs nix.conf after a box reset.
+    cmds:
+      - bash scripts/task/clanker.sh up
+
+  clanker:status:
+    desc: Box, Nix, disk and job state on clanker
+    cmds:
+      - bash scripts/task/clanker.sh status
+
+  clanker:profile:
+    desc: Build and activate the lean home-manager profile on clanker
+    summary: >
+      Sends the tree and activates `.#homeConfigurations.clanker`
+      (`role:lean`: git, gh, go, go-task, ripgrep, jq, yq, tmux, direnv, rsync,
+      shellcheck — no desktop, no AI stack, no sops, no age key). Pinned to this
+      tree's home-manager, so the CLI cannot drift from the library. Runs as a
+      job: `--wait` tails it, and the job id is what to poll if the ssh channel
+      drops.
+    cmds:
+      - bash scripts/task/clanker.sh profile {{.CLI_ARGS}}
+
+  clanker:nix:
+    desc: Build one flake attribute on clanker in the background
+    summary: >
+      `task clanker:nix -- '.#hostChecks.x86_64-linux.fern' --wait`. The tree is
+      sent with `git archive HEAD` (so commit first — uncommitted work does not
+      travel), and the build runs detached from the ssh channel. This box has no
+      version of the fleet's cache write keys: a build here warms nothing until
+      `nix copy` is given a destination deliberately.
+    cmds:
+      - bash scripts/task/clanker.sh nix {{.CLI_ARGS}}
+
+  clanker:go:
+    desc: Build a Go package on clanker and fetch the binary
+    summary: >
+      `task clanker:go -- ./modules/services/turns-dashboard --wait`. Measured
+      2026-11-06: the 14 MB `turns-dashboard` binary back from a 4 vCPU box while
+      this host stayed idle.
+    cmds:
+      - bash scripts/task/clanker.sh go {{.CLI_ARGS}}
+
+  clanker:job:
+    desc: Start a detached shell command on clanker and print its job id
+    summary: >
+      `task clanker:job -- 'nix flake update'`. The `--` is required: go-task
+      reads a bare word as a task name. The command runs in `/data/jobs/<id>`,
+      its output in `log`, its status in `exit`; it keeps running when the ssh
+      channel closes, and the box suspends it after 30 idle minutes.
+    cmds:
+      - bash scripts/task/clanker.sh job {{.CLI_ARGS}}
+
+  clanker:jobs:
+    desc: List every job on clanker with its exit status
+    cmds:
+      - bash scripts/task/clanker.sh jobs
+
+  clanker:logs:
+    desc: Tail one job's log
+    summary: "`task clanker:logs -- <id> 100`. `no log yet` means the wrapper has not opened it."
+    cmds:
+      - bash scripts/task/clanker.sh logs {{.CLI_ARGS}}
+
+  clanker:wait:
+    desc: Block until a job exits and return its status
+    summary: >
+      `task clanker:wait -- <id> [seconds]`, default 7200. Polls the API every
+      5 s, so no ssh session is held open across a long build.
+    cmds:
+      - bash scripts/task/clanker.sh wait {{.CLI_ARGS}}
+
+  clanker:result:
+    desc: Fetch a job's output directory back as a tar
+    summary: >
+      `task clanker:result -- <id>` lands in `.clanker-out/<id>/` (gitignored).
+      The box has no rsync, so the return trip is one tar over ssh.
+    cmds:
+      - bash scripts/task/clanker.sh result {{.CLI_ARGS}}
+
+  clanker:cancel:
+    desc: Kill a job's process group and mark it cancelled
+    cmds:
+      - bash scripts/task/clanker.sh cancel {{.CLI_ARGS}}
+
+  clanker:ssh:
+    desc: Open a shell on clanker through the job-box script
+    cmds:
+      - bash scripts/task/clanker.sh ssh {{.CLI_ARGS}}

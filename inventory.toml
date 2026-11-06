@@ -864,6 +864,47 @@ compute_tier = "container-client"
 allowed_tasks = ["Configuration pattern reference"]
 constraints = ["Preserved host; do not target for live deployment."]
 
+[hosts.clanker]
+hostname = "clanker"
+status = "active"
+status_detail = "Permanent since 2026-11-06: an Instabox VM (4 vCPU / 8 GiB, 20 GiB /data) run as a background job box. Nix single-user inside the guest; the profile is `role:lean`, not a NixOS host."
+kind = "home"
+arch = "x86_64-linux"
+role = "Offload VM (Instabox)"
+category = "vm"
+desktop_environment = "headless"
+users = ["user"]
+notes = [
+  "Owned by Instabox, not by this flake: boot, kernel and accounts are the image's. We own ~/.nix-profile and nothing else.",
+  "Auto-suspends 30 min after the last API call; max run 120 min. A job there is bounded by that ceiling, not by the host.",
+  "Tools: `task clanker:*` (scripts/task/clanker.sh) — exec, detached jobs, `nix build` and `go build` sent from this repo.",
+]
+
+[hosts.clanker.hardware]
+model = "Instabox microVM"
+cpu = "AMD EPYC, 4 vCPU"
+gpu = "none"
+ram = "8 GiB"
+storage_type = "Virtual disk"
+storage_layout = "/data 20 GiB"
+
+[hosts.clanker.network]
+tailscale = false
+ssh_alias = "clanker"
+
+[hosts.clanker.software]
+module_chain = "globalModulesHome"
+impermanence = false
+key_services = ["Nix (single-user)", "Go build jobs", "Nix builds in the background"]
+traits = ["vm", "instabox", "offload", "background-builds", "standalone-home-manager", "lean-profile"]
+
+[hosts.clanker.persona]
+title = "Offload VM (clanker)"
+system_prompt_hint = "You represent a 4 vCPU / 8 GiB Instabox VM that runs bounded background jobs: Go builds, Nix builds, and tools being tried before they reach a fleet host."
+compute_tier = "offload"
+allowed_tasks = ["Nix builds", "Go builds", "Tool trials", "Ephemeral service offload"]
+constraints = ["Never the source of truth: the repo, the caches and the fleet hosts are. A job here is disposable.", "Hold no fleet secret: no sops age key, no cachix signing key. A token that can push is a deliberate, temporary exception."]
+
 # ------------------------------------------------------------------------------
 # 5. EMBEDDED, SECURITY & MOBILE DEVICES
 # ------------------------------------------------------------------------------

@@ -35,3 +35,6 @@ session-*.md
 # accident in 06ce197b — a tracked log churns on every run and reads as source).
 *.log
 
+# Job output fetched from clanker (scripts/task/clanker.sh result): a copy of a
+# build artifact, never source.
+.clanker-out/

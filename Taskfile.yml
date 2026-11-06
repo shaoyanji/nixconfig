@@ -91,6 +91,10 @@ includes:
         taskfile: taskfiles/lifecycle.yml
         dir: .
         flatten: true
+    mail:
+        taskfile: taskfiles/mail.yml
+        dir: .
+        flatten: true
     moto:
         taskfile: taskfiles/moto.yml
         dir: .

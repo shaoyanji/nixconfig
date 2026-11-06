@@ -16,6 +16,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
   the flake ref, never a flag. [[flake/policies.nix#rebuild-flags-are-finite]]
 - `taskfiles/data.yml` is the canonical NAS surface (`data:*`) for the `/Volumes/data` taxonomy, hygiene, permissions and the portable tool library.
 - `taskfiles/lifecycle.yml` owns host commissioning and decommissioning (`lifecycle:*`), which is provisioning a host, not operating one.
+- `taskfiles/mail.yml` owns forwarding aliases on the ImprovMX domain (`mail:*`): a disposable address per service, its declared expiry in `modules/config/mail-aliases.toml`, and the drift check between the two. It needs the network and a sops key, so it is operator surface, never a build gate.
 - `taskfiles/services.yml` is an include-only aggregator: it flattens `services-core.yml` and `services-legacy.yml` and declares no tasks of its own.
   [[flake/policies.nix#taskfiles-aggregators-declare-nothing]]
 - The task surface is also the **edge caller's tool set**: `agents:call` derives its tools
@@ -48,6 +49,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/bitlockerpremium.yml` – Windows 11 Pro (HP EliteBook 830 G7) over Tailscale OpenSSH, Scoop/Nushell shells, file transfers, and Gum menu
 - `taskfiles/data.yml` – NAS storage taxonomy and hygiene, permissions, media unindexing, portable tool library (`data:*`)
 - `taskfiles/lifecycle.yml` – commissioning a new host, decommission audit and cleanup (`lifecycle:*`)
+- `taskfiles/mail.yml` – ImprovMX forwarding aliases: temporary per-service addresses, expiry pruning, registry drift (`mail:*`), implemented by `scripts/task/mail-alias.sh`
 - `taskfiles/services.yml` – include-only aggregator for `services-core.yml` + `services-legacy.yml` (no tasks declared here)
 - `taskfiles/ops.yml` – sentinel/ledger, compiled skill index, knowledge graph, document budgets, eval benchmarks
 - `taskfiles/services-core.yml` – minimal compatibility wrappers

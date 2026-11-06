@@ -1,0 +1,50 @@
+# Declared aliases for the ImprovMX forwarding domain.
+#
+# This file is intent, not state: the live list is api.improvmx.com and
+# `task mail:aliases` shows both. `task mail:alias:drift` fails when they
+# disagree, which is the only way a registry like this stays honest.
+#
+# kind     permanent | temporary | legacy
+# expires  YYYY-MM-DD for a temporary alias; `task mail:alias:prune` deletes
+#          the ones past it. ISO dates compare as strings, so no clock skew.
+# note     why the alias exists — the field that makes a leak traceable.
+#
+# Writes go through scripts/task/mail-alias.sh (it appends and removes whole
+# table blocks, so this comment survives) and every edit is re-parsed before
+# the command is allowed to succeed. `task checks:toml:lint` is the outer gate.
+
+[domain]
+# The dot is load-bearing: the API answers a bare 404 for a spelling it does not
+# know, so `is-a-dev` here would look like an outage instead of a typo.
+name = "mail.shaoyanji.is-a.dev"
+forward = "jisifu@gmail.com"
+
+[aliases."e"]
+kind = "permanent"
+forward = "jisifu@gmail.com"
+note = "primary operator address; the EMAIL var in Taskfile.yml points here"
+
+[aliases."github"]
+kind = "permanent"
+forward = "jisifu@gmail.com"
+note = "github account address"
+
+[aliases."linkedin"]
+kind = "permanent"
+forward = "jisifu@gmail.com"
+note = "linkedin account address"
+
+[aliases."matt"]
+kind = "permanent"
+forward = "jisifu@gmail.com"
+note = "first alias on the domain, kept for continuity"
+
+[aliases."social"]
+kind = "permanent"
+forward = "jisifu@gmail.com"
+note = "catch-all bucket for social signups"
+
+[aliases."test"]
+kind = "legacy"
+forward = "jisifu@gmail.com"
+note = "pre-registry probe alias, no known consumer — safe to delete"

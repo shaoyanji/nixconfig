@@ -1,0 +1,98 @@
+version: "3"
+
+# Mail forwarding on ImprovMX (mail.shaoyanji.is-a-dev → jisifu@gmail.com).
+#
+# Why a shard: the alias set is a disposable-address policy, not a host config.
+# A per-service address is what makes a leak traceable and a signup revocable,
+# and that only pays off if creating and deleting one is cheaper than handing
+# out the real address. Implementation is scripts/task/mail-alias.sh — one
+# place that knows the API, the domain resolution and the registry format.
+#
+# These talk to a live API, so they are operator commands, never build gates.
+# The one check-shaped task is `mail:alias:drift`, and it needs the network.
+
+tasks:
+  mail:aliases:
+    desc: List forwarding aliases, live plus their declared kind and expiry
+    summary: >
+      Reads the live alias list and annotates each row from
+      modules/config/mail-aliases.toml. Prints counts and the free-plan
+      headroom (25 aliases). ALIAS_ARGS="--json" for machine output.
+    cmds:
+      - bash scripts/task/mail-alias.sh list {{.ALIAS_ARGS}}
+
+  mail:alias:tmp:
+    desc: Create a temporary alias for a signup (LABEL=service, DAYS=30)
+    summary: >
+      Creates <label>-<6 hex>@mail.shaoyanji.is-a-dev with kind=temporary and an
+      expiry DAYS from today (default 30), records it in the registry, and
+      prints the revoke command. Use it instead of the real address wherever a
+      service asks for email: when mail starts arriving from somewhere you did
+      not expect, the local part names the culprit. FORWARD= overrides the
+      default destination. Exit 2 when the create cannot be proven live.
+    cmds:
+      - bash scripts/task/mail-alias.sh tmp "{{.LABEL}}" --days "{{.DAYS | default 30}}" {{if .FORWARD}}--forward "{{.FORWARD}}"{{end}}
+
+  mail:alias:add:
+    desc: Create a forwarding alias (NAME= required)
+    summary: >
+      NAME is the local part only. FORWARD= defaults to jisifu@gmail.com.
+      KIND=permanent|temporary, EXPIRES=YYYY-MM-DD, NOTE= free text. Creates      on the API first and only then records the registry, so a failed create
+      leaves no phantom declaration. Exit 2 when the alias is not live
+      afterwards (a duplicate, a malformed local part, an unreachable API).
+    cmds:
+      - |
+        bash scripts/task/mail-alias.sh add "{{.NAME}}" \
+          {{if .FORWARD}}--forward "{{.FORWARD}}"{{end}} \
+          {{if .KIND}}--kind "{{.KIND}}"{{end}} \
+          {{if .EXPIRES}}--expires "{{.EXPIRES}}"{{end}} \
+          {{if .NOTE}}--note "{{.NOTE}}"{{end}}
+
+  mail:alias:rm:
+    desc: Delete a forwarding alias and its registry entry (NAME= required)
+    summary: >
+      Asks for confirmation unless YES=1. Deletes by name, then re-reads the
+      live list to prove the alias is gone instead of trusting the status code:
+      the API answers a bare 404 both for "gone" and for "this route does not
+      exist". Exit 1 when you answer no.
+    cmds:
+      - bash scripts/task/mail-alias.sh rm "{{.NAME}}" {{if eq .YES "1"}}--yes{{end}}
+
+  mail:alias:prune:
+    desc: Delete aliases whose declared expiry has passed
+    summary: >
+      Lists what it would delete and exits 1 unless YES=1, then deletes each
+      one through the same path as `mail:alias:rm`. Exit 0 when nothing is
+      expired.
+    cmds:
+      - bash scripts/task/mail-alias.sh prune {{if eq .YES "1"}}--yes{{end}}
+
+  mail:alias:drift:
+    desc: Fail when the declared registry and the live alias list disagree
+    summary: >
+      Network check: compares modules/config/mail-aliases.toml against
+      api.improvmx.com. Prints "live, undeclared" (created in the dashboard and
+      forgotten) and "declared, not live" (deleted upstream, still promised
+      here). Exit 0 when they agree, 1 on drift, 2 when the API cannot be
+      reached. Deliberately outside checks:quick — it needs a key and a network.
+    cmds:
+      - bash scripts/task/mail-alias.sh drift
+
+  mail:alias:verify:
+    desc: Ask ImprovMX whether the domain's MX, SPF, DKIM and DMARC records pass
+    summary: >
+      Runs the domain verification call, then resolves the same four records
+      from DNS because that is the truth mail servers see. Exit 1 when MX, SPF
+      or DMARC does not resolve — DMARC is missing today: that record lives
+      upstream on is-a.dev's nameservers, not in this repo.
+    cmds:
+      - bash scripts/task/mail-alias.sh verify
+
+  mail:alias:doctor:
+    desc: Auth, plan, alias count, DNS records and registry drift in one report
+    summary: >
+      One read-only call per fact: account (plan + limit), live aliases, record
+      verification, registry parse, drift. Exit 2 when the key is missing or
+      the API cannot be reached; drift is reported, not failed, here.
+    cmds:
+      - bash scripts/task/mail-alias.sh doctor

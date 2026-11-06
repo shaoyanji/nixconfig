@@ -57,6 +57,7 @@ directory — there is no table to update, so there is no table to forget.
 | Fleet services | `fleet-sentinel`, `home-assistant`, `paste`, `wikisearch`, `iventoy`, `burgernas` |
 | Media & AI | `eisen-status`, `decision-picker`, `voice-loop`, `image-generate`, `stt` |
 | Hosting | `moto`, `serv00`, `dragoncourt`, `envs`, `bountystash`, `apps`, `google-drive` |
+| Mail | `mail-alias` (disposable forwarding addresses, `mail:*`) |
 | Method | `confirm-before-destructive`, `nixos-deploy`, `nix-preflight-editor`, `correct`, `no-comments`, `unslop`, `prove-it-works` (pstack, adapted), `tmux` |
 
 ## Materialization (fleet-wide)

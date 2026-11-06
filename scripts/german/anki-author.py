@@ -176,7 +176,8 @@ def validate(data):
 def slug(text):
     """`zwar … aber` -> `zwar-aber`, `während (kontrastiv)` -> `waehrend-kontrastiv`.
 
-    Used for the `req-` tag, so it has to survive umlauts: tags are ASCII."""
+    The readable half of a card key, so it has to survive umlauts: tags are
+    ASCII."""
     folded = text.lower().translate(
         str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"})
     )

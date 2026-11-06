@@ -75,7 +75,7 @@ The `blocky` path was validated before it had a host: `blocky --config … valid
 accepted the rendered YAML, and that config served the zone, the custom records and
 the two blocklists on a spare port. minyx declares it now (*Current state*).
 
-fern briefly ran the same stack as `role = "secondary"`; `8bd17500` (2026-10-15)
+fern briefly ran the same stack as `role = "secondary"`; `55c1477c` (2026-10-15)
 removed pihole-ftl, unbound and dns-failover from it, so a roaming laptop stops
 carrying a resolver it cannot serve.
 

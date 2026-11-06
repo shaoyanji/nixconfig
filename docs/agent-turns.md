@@ -156,7 +156,7 @@ in any field. Error bodies name the field, never the value.
   "subject": "nixconfig:agent-turns",
   "action": "added the shim and the tailnet mount",
   "rationale": "coordination state must be queryable",
-  "base_commit": "2754b781",
+  "base_commit": "3a47a215",
   "branch": "feat/agent-turns-xs-delphi",
   "files_changed": ["modules/services/agent-turns/shim.py"],
   "commits": [],

@@ -158,7 +158,7 @@ shell as `devji`: a dedicated user without a `~/.ssh` is the next step.
 2026-10-21): 172 MB/s down (~1.38 Gbps), 54 MB/s up (~430 Mbps), 101 MB/s sync
 disk write — but only 50/20 Mbps over WireGuard to frieren. Never point this
 host's substituters at the LAN cache: pull from upstream at line rate and push to
-Cachix, which is also why `01e9906e` decoupled it.
+Cachix, which is also why `8f7cd042` decoupled it.
 
 `tailscale serve` cannot take 443 on the tailnet address while nginx holds
 `0.0.0.0:443` (`bind: address already in use`, measured 2026-10-21), which is why

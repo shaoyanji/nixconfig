@@ -196,7 +196,7 @@ multipart/form-data fails. 25 MB cap, 600 s nginx timeouts, response is
 `{"text", "duration_seconds", "segments"}`. `/health` answers only after the
 ONNX sessions load.
 
-**Deployment state (2026-10-19):** the module landed 2026-10-17 (`507b8b51`),
+**Deployment state (2026-10-19):** the module landed 2026-10-17 (`6578c91b`),
 but the running generation is 2026-10-13, so `parakeet-stt.service` does **not**
 exist on the host and nothing listens on `:8091`. The six ONNX files are already
 fetched into `/mnt/storage/parakeet` (425 MB), so the first switch needs no

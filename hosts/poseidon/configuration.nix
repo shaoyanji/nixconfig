@@ -73,7 +73,7 @@ in {
     # carrier up, no address, `nmcli device connect` refuses it. Re-enabled
     # 2026-10-23 because the cable terminates on the parent 192.168.3.0/24 (its
     # lease is .3, alongside Wi-Fi's .2) and not behind a cascaded mesh node, so
-    # this does not put two subnets on one host -- the trap commit 87e967cc
+    # this does not put two subnets on one host -- the trap commit 661397fa
     # reverted for. The profile pins the interface and keeps route-metric 600,
     # so Wi-Fi stays the primary uplink and the dock is the fallback.
     manageUsbEthernet = true;

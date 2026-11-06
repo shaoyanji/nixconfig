@@ -196,14 +196,14 @@ ssh delphi 'sudo nixos-rebuild switch --refresh --flake github:shaoyanji/nixconf
 with the tarball fetcher, which caches branch→rev for `tarball-ttl` (1 h). A rebuild
 that was started and then killed leaves the cache pointing at the OLD rev, so the
 next run rebuilds the old tree and reports *its* failures. Measured 2026-10-20: a
-run after pushing `90f4bc7d` rebuilt `c109d65a` and failed on `AGENTS-delphi.md.drv`,
+run after pushing `42011edb` rebuilt `914af3d1` and failed on `AGENTS-delphi.md.drv`,
 an x86_64-pinned derivation that was already fixed — a false failure that costs an
 hour of looking in the wrong place. Prefer an explicit rev
 (`--flake github:shaoyanji/nixconfig/<rev>#delphi`) when what you want to prove is
 "does the pushed tree build"; use `--refresh` for an ordinary update.
 
 A healthy switch ends at generation N with the pushed rev as the configuration
-revision — `90f4bc7d` here, 0 failed units, `/healthz` 200 on both loopback and the
+revision — `42011edb` here, 0 failed units, `/healthz` 200 on both loopback and the
 public IP.
 
 ## Phase 5 — verification

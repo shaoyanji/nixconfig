@@ -2,7 +2,7 @@
 
 Close-out checklist for the Laya decision-model deployment (`hosts/eisen/decision-models.nix`),
 the last piece of the offline **qwen + laya tandem**. Everything below is a *final check* —
-the wiring itself is committed (`29383b4`) and was already proven working on 2026-10-09
+the wiring itself is committed (`fb749f5`) and was already proven working on 2026-10-09
 when eisen was last up.
 
 **Canonical docs**: [`.agents/deploy/hosts/eisen.md`](../../.agents/deploy/hosts/eisen.md) ·
@@ -37,7 +37,7 @@ ssh -o BatchMode=yes eisen true && echo REACHABLE
 ## Step 1 — deployed generation really contains Laya (settles the hash question)
 
 The earlier mismatch (`nix eval outPath` ≠ `/run/current-system`) is the clean-vs-dirty
-source-tree artifact, **not** config drift — the later commit `3f84739` changed the flake
+source-tree artifact, **not** config drift — the later commit `0c98736` changed the flake
 source tree after the last eisen build. Prove it by content, not by hash:
 
 ```bash
@@ -141,7 +141,7 @@ uptime is undisturbed.
 sudo systemctl stop laya-serve tailscale-serve-laya
 ssh eisen 'sudo rm -f /mnt/storage/decision/.laya-ready && sudo systemctl restart eisen-laya-bootstrap'  # forced rebuild
 # full revert of the host change:
-git revert 29383b4   # then task infra:deploy:host:eisen
+git revert fb749f5   # then task infra:deploy:host:eisen
 ```
 
 ## Acceptance summary

@@ -27,13 +27,13 @@
         representative chain, `checks:host` green.
 
         DELIVERED in four commits (2026-11-05/06), in order:
-        `0cd2dac3` flake-parts owns the outputs — 32 names, three chain toplevels
+        `47b6ad8b` flake-parts owns the outputs — 32 names, three chain toplevels
         and penguin's HM generation unchanged at one git state.
-        `0cdd1092` `lib/nix-files.nix` walks all 301 tracked `.nix` files, and dev
+        `b21456bc` `lib/nix-files.nix` walks all 301 tracked `.nix` files, and dev
         shells move to `perSystem` (11 identical `drvPath`s, both arches).
-        `622c6bee` `.#modules` names every file under `modules/`; chains, 33 host
+        `d739cf8f` `.#modules` names every file under `modules/`; chains, 33 host
         files and 43 host sub-modules name their imports — 136 entries.
-        `c0e59754` 21 files under `modules/` name their own 66 imports, so a
+        `091098b1` 21 files under `modules/` name their own 66 imports, so a
         sibling is not reached by path from anywhere; the graph reads name edges on
         both sides and `checks.<system>.nix-registry` fails a duplicate or a name
         that resolves to no file.
@@ -514,7 +514,7 @@
         docs = ["docs/dns-failover.md"];
       };
       body = ''
-        Measured 2026-10-22: there is NO secondary. `8bd17500` (2026-10-15) removed
+        Measured 2026-10-22: there is NO secondary. `55c1477c` (2026-10-15) removed
         pihole-ftl, unbound and dns-failover from fern, and `docs/dns-failover.md`
         kept claiming fern was the second member until this pass corrected it.
         `rg 'role = "secondary"' hosts/ modules/` returns nothing, `checks:dns:failover`
@@ -4535,7 +4535,7 @@
 
         Verified on scratch 2026-10-22: `hashedPassword` installed, user unit `Result=success` with
         `Environment=PATH=<age-plugin-tpm>`, CA key present, `switch-to-configuration` exit 0. After a
-        genuine pull (`0dfff23c`, submodule `7a35ad4` matching frieren byte-for-byte) the store file
+        genuine pull (`a1b56c8d`, submodule `7a35ad4` matching frieren byte-for-byte) the store file
         decrypts on both planes to the same digest as the checkout and the mirror (sha256 `5042298e…`
         encrypted, `436f477d…` plaintext), with the no-identity control at exit 128. Upstream's `p256tag
         unsupported` report is stale for sops 3.13.3 / age 1.3.2: encrypt, `updatekeys` and decrypt all
@@ -5559,7 +5559,7 @@
         **Two more bugs surfaced on the way.** `hermes-env-sync` could not create
         `~/.hermes/.env` from scratch — `grep -oE … file` exits 1 on no match and
         `pipefail` made that the whole diff's status — which failed home-manager
-        activation on delphi (`4/NOPERMISSION`); `35f45867` fixes that plus a swapped
+        activation on delphi (`4/NOPERMISSION`); `92b200e6` fixes that plus a swapped
         `comm` (added and dropped printed the same list) and two `NR == FNR` guards.
         The triage counters had the same shape (`grep … | wc -l || echo 0`, `||`
         binding to `wc`), now `( … || true) | wc -l`.
@@ -5601,7 +5601,7 @@
         cascade then restarted pihole-ftl, tailscale-cert and fleet-sentinel: units that
         were still legitimately activating.
 
-        **Fix (74462a68).** `modules/services/agent-scheduler.nix` runs jobs through a
+        **Fix (c83c5a18).** `modules/services/agent-scheduler.nix` runs jobs through a
         wrapper that maps flock's conflict code to a logged skip (exit 0) and passes any
         other status through untouched; the audit runner waits for 600 s of uptime
         before Step 1. A normal 05:00 run is hours past boot and waits not at all.

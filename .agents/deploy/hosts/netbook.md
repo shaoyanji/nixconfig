@@ -17,7 +17,7 @@ What is pinned is the **initrd implementation**:
 boot.initrd.systemd.enable = false; # scripted stage-1, not systemd-initrd
 ```
 
-NixOS 26.11 defaults that option to `true`. Commit `e673777e` (2026-10-22)
+NixOS 26.11 defaults that option to `true`. Commit `22bc1f40` (2026-10-22)
 dropped the old `inputs.nixpkgs_25_11` pin in favour of the fleet nixpkgs (the
 input and its `flake.lock` node were pruned the same day, once nothing
 referenced them), which silently changed **two** things at once — kernel 7.1.2 → 6.18.56 *and* scripted

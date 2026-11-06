@@ -95,7 +95,7 @@ task agents:xs:post \
   RATIONALE='why it was needed, and the exact next step for whoever continues this' \
   OUTCOME=done \
   FILES='taskfiles/agents.yml,scripts/task/xs-turn.jq' \
-  COMMITS='c75d2baa' \
+  COMMITS='22cd2232' \
   CLAIMS='taskfiles/agents.yml'
 ```
 

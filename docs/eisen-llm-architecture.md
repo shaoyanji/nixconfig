@@ -225,7 +225,7 @@ node, so greetd's greeter exits and gamescope falls back to llvmpipe.
 
 **This is not the build and not OOM**: `journalctl -k` since 2026-10-18 20:00
 has no `Out of memory` / `oom-kill` line, and the desktop was running until the
-poweroff. `nix.settings.max-jobs = 8` (commit `6d1eaac6`) is the build-side fix
+poweroff. `nix.settings.max-jobs = 8` (commit `1f6b6259`) is the build-side fix
 and is live.
 
 A warm reboot, `echo 1 > /sys/bus/pci/rescan` and a link retrain on the CPU root

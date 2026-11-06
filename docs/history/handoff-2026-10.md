@@ -88,7 +88,7 @@
   - **Data Loss Risk:** **Zero risk to core application data or NixOS fleet code.** The OS is completely reproducible from `/Volumes/data/projects/nixconfig`. The sole unique runtime state on `/dev/sdb` was `/home/devji` (SSH keys and SOPS age decryption keys).
 
 * **Immediate Precautionary Actions Executed (2026-10-14 08:32 CEST):**
-  1. **Declarative Security Vault Bind-Mount Activated (Generation 115, `9b55ba6`):**
+  1. **Declarative Security Vault Bind-Mount Activated (Generation 115, `ec41c25`):**
      - Bound `/home/devji/security` directly to `/srv/data/security` on `/dev/sda2`.
      - Migrated active SSH keys (`~/.ssh/id_ed25519`) and SOPS age secret key (`~/.config/sops/age/keys.txt`) to the persistent 2TB pool and symlinked into userspace.
      - Rebuilt and activated cleanly with zero downtime. All runtime cryptographic credentials now live on the healthy disk `/dev/sda2`.
@@ -163,7 +163,7 @@
     9. **Reboot:** `reboot`. System will boot into exact Generation configuration with all encrypted SOPS secrets intact and services resuming immediately. Total downtime: ~15 minutes.
 
 ### 7. [x] Declarative Agent Scheduler Module with Flock Rebuild Locks (EXP-016)
-* **Status:** `COMPLETED & VERIFIED` (Committed `f89228f`, Switched to Generation 86)
+* **Status:** `COMPLETED & VERIFIED` (Committed `4cd7ee6`, Switched to Generation 86)
 * **Actions Taken:**
   - Created reusable service module [`modules/services/agent-scheduler.nix`](../../modules/services/agent-scheduler.nix) (`services.agentScheduler`).
   - Consolidated ad-hoc user units in [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) into typed job declarations for `agy-nightly-handoff` and `agy-nightly-system`.
@@ -172,7 +172,7 @@
   - Verified active systemd user timers (`agy-nightly-handoff`, `agy-nightly-system`) and 0 failed units.
 
 ### 6. [x] Declarative Btrfs Silent Corruption & Device Error Watchdog (EXP-022)
-* **Status:** `COMPLETED & VERIFIED` (Committed `7cf0196`, Switched to Generation 87)
+* **Status:** `COMPLETED & VERIFIED` (Committed `deafdca`, Switched to Generation 87)
 * **Actions Taken:**
   - Created reusable service module [`modules/services/btrfs-watchdog.nix`](../../modules/services/btrfs-watchdog.nix) (`services.btrfsWatchdog`).
   - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) to inspect `/` (`/dev/sdb3` SSD) and `/Volumes/data` (`/dev/sda2` HDD) hourly.
@@ -180,7 +180,7 @@
   - Verified 0 hardware errors across all Btrfs pools and active timer `btrfs-watchdog.timer`.
 
 ### 7. [x] Zero-TCP Static Documentation Bridge via UNIX Domain Sockets (EXP-024)
-* **Status:** `COMPLETED & VERIFIED` (Committed `f5da68e`, Switched to Generation 88)
+* **Status:** `COMPLETED & VERIFIED` (Committed `ad9bc48`, Switched to Generation 88)
 * **Actions Taken:**
   - Created service module [`modules/services/uds-static-bridge.nix`](../../modules/services/uds-static-bridge.nix) (`services.udsStaticBridge`).
   - Wired into [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) serving `lib/aki-site.nix` over `unix:/run/uds-docs/docs.sock`.
@@ -321,7 +321,7 @@
   - Verified remaining subvolumes on `/dev/sda2` strictly match the active NAS pool (`data`, `public`, `private`, `transmission`).
 
 ### 23. [x] Systemd User Daemons Upgrade with System One Triage & Ollama Service Activation (Generation 99)
-* **Status:** `COMPLETED & VERIFIED` (Switched to Generation 99, Committed `64dbf58`)
+* **Status:** `COMPLETED & VERIFIED` (Switched to Generation 99, Committed `e4394d0`)
 * **Actions Taken:**
   - Upgraded `agyHandoffRunner` (03:00 `agy-nightly-handoff.service`) in [`hosts/frieren/infra-stack.nix`](../../hosts/frieren/infra-stack.nix) to pre-triage `HANDOFF.md` into `/tmp/systemone-handoff-triage.json` without modifying or deleting the markdown document.
   - Upgraded `agySystemRunner` (05:00 `agy-nightly-system.service`) to pre-triage `SYSTEM.md` into `/tmp/systemone-system-triage.json` and pass TIER 1 findings to the agent prompt.
@@ -330,7 +330,7 @@
   - Switched cleanly to NixOS Generation 99 with 0 failed units.
 
 ### 24. [x] System 1 & System 2 Pre-Harness Ensemble Service Architecture (Generation 101, EXP-065)
-* **Status:** `COMPLETED & VERIFIED` (Switched to Generation 101, Committed `f212e25`)
+* **Status:** `COMPLETED & VERIFIED` (Switched to Generation 101, Committed `6c1e0db`)
 * **Actions Taken:**
   - Designed and deployed closed-loop pre-harness ensemble engine [`modules/services/systemone/ensemble.py`](../../modules/services/systemone/ensemble.py).
   - Wired System 1 (Julia-1 144M) for sub-millisecond reflex triage across 10 core services (Gatus, Paperless, Disk QoS, Postgres, SimpleX, Restic, QuickSync, Sessions, Flake, Btrfs), measuring 5.43 ms total for all 10 services.
@@ -351,7 +351,7 @@
 
 
 ### 25. [x] Ephemeral MicroVM Deployment Sandbox & Model B Service Migration (EXP-102)
-* **Status:** `COMPLETED & VERIFIED` (Tested live on frieren, Committed `b11b5e9`)
+* **Status:** `COMPLETED & VERIFIED` (Tested live on frieren, Committed `7e12954`)
 * **Actions Taken:**
   - Designed and deployed `hosts/microvms/frieren-canary.nix` with zero-copy `/nix/store` sharing over `virtiofs`, ephemeral writable overlay, and hard resource bounds (2 vCPUs, 2048 MB RAM).
   - Seeded persistent ed25519 host key in `/var/lib/microvms/frieren-canary/ssh-host-keys` and host `UserKnownHostsFile /var/lib/microvms/.known_hosts`, permanently solving host SSH key churn (0 prompts, 0 collisions).
@@ -367,8 +367,8 @@
   - Configured hourly S0/S1/S2 escalation router with Kelly consensus gating and strict System 2 token protection (`allowSystem2 = false`).
   - Verified live execution on `fleet-governor.timer`: S0 deterministic sweep executed in 372 ms consuming 0 LLM tokens, successfully truncated idle WAL across 2 SQLite databases, and validated all components (kiwix, harmonia, paperless_consume, sqlite, thermal, memory_psi, btrfs_integrity) at NOMINAL status.
 
-### 27. [x] Subzeroclaw Agent Sandbox & Local Nemotron Endpoint (EXP-102, 4230527)
-* **Status:** `COMPLETED & VERIFIED` (Committed `4230527`, Switched to Generation 114)
+### 27. [x] Subzeroclaw Agent Sandbox & Local Nemotron Endpoint (EXP-102, 15e1f91)
+* **Status:** `COMPLETED & VERIFIED` (Committed `15e1f91`, Switched to Generation 114)
 * **Actions Taken:**
   - Extended Canary MicroVM with dedicated Subzeroclaw agent sandbox wired directly to local `nemotron-3-ultra` endpoint on `frieren`.
   - Added Taskfile workflow `task vm:canary:agent` allowing zero-prompt prompt execution in isolated microVM sandbox.
@@ -380,14 +380,14 @@
 * **Current Posture:** Zero filesystem corruption present. Physical drive degradation of `/dev/sdb` (SMART status 2 pre-fail indicator) is actively monitored under item 6 above.
 
 ### 29. [x] TPM 2.0 Hardware Key Migration & SOPS Credential Isolation (2026-10-16 03:00–04:00 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `338eb5f`, `3b5a8fe`, `f2c1f53`, `547cf72`)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `02559b9`, `c680246`, `4c551bd`, `1833d1a`)
 * **Context & Motivation:** Passwordless SSH keys and unencrypted `keys.txt` presented an attack surface if physical or offline storage was accessed. Migrated to TPM 2.0 hardware-sealed asymmetric keys (`age-plugin-tpm`) so secrets cannot be decrypted outside the physical machines.
 * **Actions Taken (03:00–04:00 Window):**
-  1. **TPM 2.0 Subsystem Enabled on `frieren` (`338eb5f`):** Enabled `security.tpm2.enable = true;`, added `devji` to group `tss`, and added `pkgs.age-plugin-tpm` in `hosts/frieren/hardware.nix`.
+  1. **TPM 2.0 Subsystem Enabled on `frieren` (`02559b9`):** Enabled `security.tpm2.enable = true;`, added `devji` to group `tss`, and added `pkgs.age-plugin-tpm` in `hosts/frieren/hardware.nix`.
   2. **Identity Generation:** Generated hardware-bound key `~/.config/sops/age/tpm-identity.txt` (recipient `age1tag1qd42em4jfvxlxkvz8zrmrynxmdvl4q4pgj5keqn2ldujzngzn2e2vk4hfzp`) and registered `&tpmfrieren` in `.sops.yaml`.
   3. **Emergency Snapshot Secret Recovery:** Diagnosed dangling symlink on `keys.txt` caused by archiving `/Volumes/data/security/secrets/`. Restored physical 75-byte `keys.txt` from pre-fail Btrfs snapshot `/.snapshots/home-20261014-prefail-check/devji/.config/sops/age/keys.txt` with mode `0400`. Corrected `tpm-identity.txt` ownership to `devji:users 0400` and verified live decryption.
-  4. **Declarative Home Manager Isolation (`3b5a8fe`):** Configured `modules/sops.nix` with host detection (`tpmHosts`) to dynamically use `tpm-identity.txt` on TPM nodes while safely preserving software `keys.txt` on non-TPM nodes (`eisen`).
-  5. **Fleet Expansion to `fern` (`f2c1f53`, `547cf72`):** Verified AMD fTPM on `fern` (`/dev/tpm0`, `/dev/tpmrm0`), enabled TPM subsystem, registered `&tpmfern` (`age1tag1qfys3rjfsl2vlcy4xk0v7kvz0ugaflmuqwrg0fsj4wwcwe9l9kfuu8g2e39`), rekeyed `modules/secrets.yaml`, and pushed `547cf72` to `origin/main`.
+  4. **Declarative Home Manager Isolation (`c680246`):** Configured `modules/sops.nix` with host detection (`tpmHosts`) to dynamically use `tpm-identity.txt` on TPM nodes while safely preserving software `keys.txt` on non-TPM nodes (`eisen`).
+  5. **Fleet Expansion to `fern` (`4c551bd`, `1833d1a`):** Verified AMD fTPM on `fern` (`/dev/tpm0`, `/dev/tpmrm0`), enabled TPM subsystem, registered `&tpmfern` (`age1tag1qfys3rjfsl2vlcy4xk0v7kvz0ugaflmuqwrg0fsj4wwcwe9l9kfuu8g2e39`), rekeyed `modules/secrets.yaml`, and pushed `1833d1a` to `origin/main`.
 * **Current Operational Posture:**
   - `frieren` and `fern` have dual decrypt capability (TPM hardware key + backup age key).
   - `keys.txt` retained until after `system.autoUpgrade` / manual switch post-05:30 makes `age-plugin-tpm` available in system `$PATH`.
@@ -402,7 +402,7 @@
   - **Fleet Governor (EXP-100/101):** S0 deterministic sweep executed at 05:00:55 CEST in 794ms (0 LLM tokens), truncated idle WAL across 2 SQLite databases; all components reporting NOMINAL status.
 
 ### 31. [x] NixOS Rebuild Switch & Zoxide Shell Integration Fixed (2026-10-16 05:45 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `124b724`, `ee282a4`, Booted Generation 130)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `58db7e0`, `9d405d8`, Booted Generation 130)
 * **Context & Root Cause Analysis:**
   - `nixos-rebuild switch` failed during generation of `zoxide-nushell-config.nu` with:
     `error: the argument '--cmd <CMD>' cannot be used multiple times`
@@ -412,23 +412,23 @@
   1. Pruned redundant `programs.zoxide` block and manual `eval "$(zoxide init bash --cmd cd)"` from `modules/shell/bash.nix`, letting `modules/shell/default.nix` serve as the single source of truth.
   2. Removed the broken dynamic `source $local_nu` block from `modules/shell/nushell.nix`.
   3. Preflight verified both Nix expressions with `nix-preflight.sh verify`.
-  4. Committed and pushed cleanly to `origin/main` (`124b724`, `ee282a4`).
+  4. Committed and pushed cleanly to `origin/main` (`58db7e0`, `9d405d8`).
   5. Successfully rebuilt and switched to NixOS Generation 130 (`7yvsnjnbwsn0gd0cgbb6iq86w1bdk51j`).
   6. Verified `zoxide` integration: `cd` and `cdi` are active functions in Bash and active aliases (`export alias cd = __zoxide_z`, `export alias cdi = __zoxide_zi`) in Nushell without any startup warnings or parser errors.
 
 ### 32. [x] Host fern Patch Audit & Fleet-Wide pb Utility Deployment (2026-10-16 06:36 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `49da8a6`, Tested on fern)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `ddde33e`, Tested on fern)
 * **Context & Motivation:** Operator requested inspection of `~/gitpatch/fern-install-changes.patch` on `fern` and queried why `fern` lacked the `pb` utility that uploads to `frieren`'s pastebin (`paste.frieren.lan`).
 * **Actions Taken:**
-  1. Inspected `~/gitpatch/fern-install-changes.patch` on `fern`: confirmed its disko device `/dev/nvme0n1` and `antigravity-cli` `doInstallCheck = false` overlay (for Ryzen 3 3250U broken RDRAND) were already declared in `nixconfig` on 2026-10-01 (`b179467`) with `OPENSSL_ia32cap="0:~0"` wrapper. User confirmed antigravity patch section was not needed.
+  1. Inspected `~/gitpatch/fern-install-changes.patch` on `fern`: confirmed its disko device `/dev/nvme0n1` and `antigravity-cli` `doInstallCheck = false` overlay (for Ryzen 3 3250U broken RDRAND) were already declared in `nixconfig` on 2026-10-01 (`e44e599`) with `OPENSSL_ia32cap="0:~0"` wrapper. User confirmed antigravity patch section was not needed.
   2. Extracted `pb` bash wrapper out of frieren-only `modules/services/paste.nix` into a new declarative script module [`modules/scripts/pb.nix`](../../modules/scripts/pb.nix).
   3. Imported `pb.nix` in `modules/scripts/default.nix`, making `pb` available across all desktop, container, and standalone home hosts.
   4. Deployed binary to `fern:~/.local/bin/pb`.
   5. Live upload test: Uploaded test content from `fern` to `http://paste.frieren.lan/test-from-fern.txt`, verified curl retrieval, and cleanly deleted test paste using `pb rm`.
-  6. Committed and pushed `49da8a6` to `origin/main`.
+  6. Committed and pushed `ddde33e` to `origin/main`.
 
 ### 33. [x] BurgerNAS Wake-on-LAN Diagnostic, Standby Power Management & Restic Vault Audit (2026-10-16 06:45 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `49da8a6`, `8ae4376`, `78feec3`, Standby Armed)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `ddde33e`, `91a9545`, `2db00c0`, Standby Armed)
 * **Context & Root Cause Analysis:**
   - BurgerNAS (Synology DS220j, `192.168.3.92`, cold vault) was not woken up for the nightly backup window.
   - Three distinct root causes identified:
@@ -436,14 +436,14 @@
     2. **Multi-Homed Broadcast Routing:** Magic packets were being broadcast to `255.255.255.255:9` across multi-homed interfaces (`enp1s0` wired + `wlp2s0` Wi-Fi where `wlp2s0` ARP was STALE), causing the kernel or switch to misroute/drop packets.
     3. **Poweroff Standby State:** Prior shutdown scripts called raw `sudo /sbin/poweroff` instead of Synology's hardware power management daemon `sudo /usr/syno/sbin/synopoweroff`. Raw `poweroff` completely shuts down the system without arming the Realtek RTL8111H PHY for low-power WoL listening.
 * **Actions Taken:**
-  1. Updated `hosts/frieren/infra-stack.nix` and `taskfiles/burgernas.yml` to use subnet-directed broadcast `192.168.3.255:9` for Wake-on-LAN (`49da8a6`).
-  2. Updated poweroff commands to `sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff` (allowed passwordlessly in `sudoers`) (`8ae4376`).
-  3. Added `wakeonlan` to Frieren `environment.systemPackages` (`78feec3`) for interactive CLI and Taskfile execution.
+  1. Updated `hosts/frieren/infra-stack.nix` and `taskfiles/burgernas.yml` to use subnet-directed broadcast `192.168.3.255:9` for Wake-on-LAN (`ddde33e`).
+  2. Updated poweroff commands to `sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff` (allowed passwordlessly in `sudoers`) (`91a9545`).
+  3. Added `wakeonlan` to Frieren `environment.systemPackages` (`2db00c0`) for interactive CLI and Taskfile execution.
   4. Verified BurgerNAS boot status after physical power on: confirmed `Supports Wake-on: pumbg` and `Wake-on: g` is armed on `eth0`.
   5. Verified Restic repository on BurgerNAS (`sftp:devji@192.168.3.92:/volume1/backup/frieren/restic`): both snapshots (`ca3022ff` and `ce946da9` - 818.5 GiB baseline seed) are verified intact.
 
 ### 34. [x] BurgerNAS WoL Removal, Daily 03:28 Backup Window Coordination & Architecture Evaluation (2026-10-16 07:10 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `5b7253a`, Generation 131 Booted)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `d37ddcc`, Generation 131 Booted)
 * **Context & Motivation:** Operator enabled daily hardware power-on at 03:25 AM and shutoff at 04:00 AM in Synology DSM Control Panel. Operator requested removing Wake-on-LAN hooks and raised the question of restic pull vs push given BurgerNAS's strict memory limitations.
 * **Architecture Analysis (Pull vs Push):**
   - **BurgerNAS Memory Constraint:** Synology DS220j has an RTD1296 ARM64 CPU with **512 MB total RAM** (~146 MB available at idle).
@@ -453,13 +453,13 @@
 * **Actions Taken:**
   1. Completely removed Wake-on-LAN hooks (`backupPrepareCommand` and `backupCleanupCommand`) and `ethtool` commands from `hosts/frieren/infra-stack.nix` and `taskfiles/burgernas.yml`.
   2. Coordinated backup timer: Retargeted `services.restic.backups.frieren-burgernas.timer` to run daily at **03:28:00 CEST** (`*-*-* 03:28:00`), 3 minutes after DSM powers on at 03:25 and comfortably before DSM powers off at 04:00.
-  3. Committed and pushed commit `5b7253a` to `origin/main`.
+  3. Committed and pushed commit `d37ddcc` to `origin/main`.
   4. Switched to NixOS Generation 131 (`xvkh9fk6ws8hw58k83k8kj9mf84h32ls-nixos-system-frieren-26.11.20261005.aa48d34`).
   5. Restarted timer and verified `Trigger: Sat 2026-10-17 03:28:00 CEST`.
   6. Verified live incremental backup executed and finished cleanly.
 
 ### 35. [x] BurgerNAS Static aarch64 Binary Sync Deployment & Taskfile Packaging (2026-10-16 07:25 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `10ff65e`, `c1e4374`, Generation 132 Booted)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `1ebf3de`, `f869d19`, Generation 132 Booted)
 * **Context & Motivation:** Operator requested a weekly synchronization of static compiled ARM64 binaries between Frieren's `/Volumes/data/bin-aarch64/` and BurgerNAS's `/volume1/Shared Library/bin-aarch64/`.
 * **Technical Considerations & Synology DSM Rsync Nuances:**
   - Remote shell invocations of rsync on DSM require `--rsync-path=/usr/bin/rsync` to bypass DSM's restricted non-login wrapper which returns `Permission denied`.
@@ -472,33 +472,33 @@
   4. Switched cleanly to NixOS Generation 132 (`l3kaaf3j1vprkmlsgla9dclsahdsgcrn`).
   5. Tested live systemd unit execution (`sudo systemctl start burgernas-bin-sync.service`): finished in 2.2s with `Deactivated successfully`.
   6. Verified timer activation: `systemctl status burgernas-bin-sync.timer` active, trigger `Sun 2026-10-18 03:32:00 CEST`.
-  7. Committed and pushed commits `10ff65e` and `c1e4374` to `origin/main`.
+  7. Committed and pushed commits `1ebf3de` and `f869d19` to `origin/main`.
 
 ### 36. [x] Tmux Status Bar Restoration & Kitty Window Title Bar Removal (2026-10-16 07:47 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `d355727`, Generation 133 Booted)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `087030b`, Generation 133 Booted)
 * **Context & Root Cause Analysis:**
   - Operator reported that tmux had become completely plain and lost its status bar due to an erroneous change intended to remove the top Kitty GUI window title bar.
-  - In commit `e5c4cb4`, `set -g status off`, `set -g set-titles off`, and `set -g pane-border-status off` were added to `modules/shell/tmux.nix`, disabling tmux's own status bar, window names, and Catppuccin Mocha theme.
+  - In commit `371d993`, `set -g status off`, `set -g set-titles off`, and `set -g pane-border-status off` were added to `modules/shell/tmux.nix`, disabling tmux's own status bar, window names, and Catppuccin Mocha theme.
   - The operator's actual request was to remove the top GUI window title bar displayed by the Kitty terminal emulator (`kitty -- tmux`).
 * **Actions Taken:**
   1. Reverted `modules/shell/tmux.nix` to remove `status off`, `set-titles off`, and `pane-border-status off`.
   2. Added `hide_window_decorations = "yes"` to `programs.kitty.settings` in [`modules/kitty.nix`](../../modules/kitty.nix) to remove the top GUI title bar and window decorations from Kitty under Wayland/X11.
   3. Preflight verified Nix AST syntax via `nix-instantiate --parse`.
-  4. Committed and pushed `d355727` to `origin/main`.
+  4. Committed and pushed `087030b` to `origin/main`.
   5. Successfully rebuilt and switched to NixOS Generation 133 (`px28k7jav07j5jymrrf9mp1161lx1lgb-nixos-system-frieren-26.11.20261005.aa48d34`).
   6. Verified live: `~/.config/kitty/kitty.conf` has `hide_window_decorations yes`, `~/.config/tmux/tmux.conf` has no debloat overrides, and `tmux show-options -g status` reports `status on` with full Catppuccin Mocha theme.
 
 ### 37. [x] Applevalley System Refresh, Cache Invalidation & Keybase FUSE Root Cause Fix (2026-10-16 11:10 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `59561bc`, `dd21271`, Applevalley Generation 14 Booted)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commits `4dc1968`, `d3bafb0`, Applevalley Generation 14 Booted)
 * **Context & Motivation:** Operator requested a refresh of `applevalley` (`192.168.3.97`, ThinkPad T420) to eliminate defunct Garnix Cachix lookups, explain cache invalidation commands, and fix the broken `keybasefs` FUSE mount (`/home/devji/keybase`).
 * **Root Cause Analysis (Keybase FUSE Failure):**
   1. **Missing Setuid Fusermount Helper (`203/EXEC`):** `nixos/modules/services/network-filesystems/kbfs.nix` executes `${wrapperDir}/fusermount` (`/run/wrappers/bin/fusermount`) in `ExecStartPre` and `ExecStop`, and `kbfsfuse` requires a setuid-root `fusermount` binary to mount without root privileges. In modern NixOS, `security.wrappers.fusermount` is only generated when `programs.fuse.enable = true;`. Because `programs.fuse.enable` was false, `/run/wrappers/bin/fusermount` did not exist on `applevalley`, causing `kbfs.service` to abort on startup.
   2. **Mount Namespace Isolation (`Operation not permitted` / `EPERM`):** Upstream NixOS `kbfs.nix` sets `PrivateTmp = true;` in `systemd.user.services.kbfs.serviceConfig`. In modern systemd, `PrivateTmp = true` in an unprivileged user session creates a private mount namespace. In Linux, setuid binaries (`fusermount`) cannot perform mounts inside an unprivileged mount namespace, resulting in `mount("/dev/fuse", ...): Operation not permitted (EPERM)`. Furthermore, any mount created inside a private namespace is completely hidden from the user's interactive session. Upstream Keybase's own systemd unit does not enable `PrivateTmp`.
 * **Actions Taken:**
   1. **Cache Invalidation & Fleet Cache Alignment:** Cleaned stale SQLite evaluation and binary cache databases (`rm -rf ~/.cache/nix /root/.cache/nix`), eliminated defunct `cache.garnix.io` and `cuda-maintainers` caches from `applevalley`'s `/etc/nix/nix.conf`, and aligned it to Frieren's LAN binary cache (`http://192.168.3.25:5000`, Harmonia).
-  2. **Declarative FUSE Wrapper Enablement (`59561bc`):** Added `programs.fuse = { enable = true; userAllowOther = true; };` to [`modules/profiles/desktop-client.nix`](../../modules/profiles/desktop-client.nix), generating `/run/wrappers/bin/fusermount` (mode `4755`) and `/etc/fuse.conf`.
-  3. **Declarative Mount Namespace Sandboxing Fix (`dd21271`):** Added `systemd.user.services.kbfs.serviceConfig.PrivateTmp = lib.mkForce false;` in [`modules/profiles/desktop-client.nix`](../../modules/profiles/desktop-client.nix).
-  4. **Pushed & Activated Generation 14:** Committed and pushed `59561bc` and `dd21271` to `origin/main`. Built system closure on Frieren (`/nix/store/6dzwcnxr9ww0i0wgl9awzckjms0gndsn-nixos-system-applevalley-26.11.20261005.aa48d34`), copied closure to `root@applevalley`, and activated cleanly via `switch-to-configuration switch`.
+  2. **Declarative FUSE Wrapper Enablement (`4dc1968`):** Added `programs.fuse = { enable = true; userAllowOther = true; };` to [`modules/profiles/desktop-client.nix`](../../modules/profiles/desktop-client.nix), generating `/run/wrappers/bin/fusermount` (mode `4755`) and `/etc/fuse.conf`.
+  3. **Declarative Mount Namespace Sandboxing Fix (`d3bafb0`):** Added `systemd.user.services.kbfs.serviceConfig.PrivateTmp = lib.mkForce false;` in [`modules/profiles/desktop-client.nix`](../../modules/profiles/desktop-client.nix).
+  4. **Pushed & Activated Generation 14:** Committed and pushed `4dc1968` and `d3bafb0` to `origin/main`. Built system closure on Frieren (`/nix/store/6dzwcnxr9ww0i0wgl9awzckjms0gndsn-nixos-system-applevalley-26.11.20261005.aa48d34`), copied closure to `root@applevalley`, and activated cleanly via `switch-to-configuration switch`.
   5. **Verified Live Target:**
      - `systemctl --user -M devji@ status kbfs.service`: active (running), Main PID 58714, both `ExecStartPre` tasks exited `status=0/SUCCESS`.
      - Mount active: `/dev/fuse on /home/devji/keybase type fuse (rw,nosuid,nodev,relatime,user_id=1000,group_id=100)`.
@@ -611,10 +611,10 @@
      - Verified `curl -IL http://audiobooks.frieren.lan/` returns `HTTP/1.1 200 OK`.
      - Verified Gatus scorecard: all 8 services reporting green/nominal.
      - Verified `fleet-alert-bridge.service` active under `systemd --user`.
-     - Pushed all commits (`30b0883e`, `11473410`, `0b052408`) to `origin/main`.
+     - Pushed all commits (`f987d750`, `69fd820c`, `c34d5833`) to `origin/main`.
 
 ### 44. [x] Audible Phased Liberation Unpaused with Daytime (11:30–13:00) & Nightly (00:00–02:50) Timers (2026-10-18 09:24 CEST)
-* **Status:** `COMPLETED & LIVE ARMED` (Commit `8b3414d3`, Timers Active)
+* **Status:** `COMPLETED & LIVE ARMED` (Commit `baf3a047`, Timers Active)
 * **Context & Motivation:** Operator unpaused download actions and requested a managed daytime run between 11:30 AM and 1:00 PM for today, followed by the regular nightly window (00:00–03:00 CEST).
 * **Actions Taken:**
   1. **Download Managers Unpaused:** Issued `aria2.unpauseAll` via RPC and `transmission-remote -t all --start` for BitTorrent.
@@ -631,10 +631,10 @@
      - Verified with `systemctl --user list-timers`:
        - `audible-daytime-liberation.timer`: Next trigger `Sun 2026-10-18 11:30:00 CEST` (~2h left).
        - `audible-phased-liberation.timer`: Next trigger `Mon 2026-10-19 00:00:00 CEST` (~14h left).
-     - Pushed commit `8b3414d3` to `origin/main`.
+     - Pushed commit `baf3a047` to `origin/main`.
 
 ### 45. [x] Audible Liberation Resource Governor & 3-Interface Network Architecture Investigation (2026-10-18 11:05 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `90cd71fe`, CGroup Limits Enforced)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `6121f586`, CGroup Limits Enforced)
 * **Part 1: Conversion Tax & Desktop Freeze Remediation:**
   - **Root Cause Analysis:** During unthrottled liberation, Libation's child `ffmpeg` spawned 8 concurrent worker threads (saturating 100% of the i5-8250U's 4c/8t CPU) while writing multi-gigabyte M4B streams to `/srv/data` (`/dev/sda2`, mechanical spinning HDD). The resulting disk I/O queue thrashing pushed the kernel into dirty-page sync D-state stalls, starving the Wayland compositor (`niri`), `dbus-broker`, and `greetd`. This rendered the 65" 4K display unresponsive to keyboard/mouse wake events.
   - **Remediation Implemented:**
@@ -661,7 +661,7 @@
     2. **Optional Inbound Wi-Fi Failover:** If physical cable unplug protection is required, implement a declarative NetworkManager dispatcher script to re-bind `192.168.3.25/24` to `wlp2s0` with gratuitous ARP (`arping -A`) and listen on all interfaces in Pi-hole.
 
 ### 46. [x] Network Route Metric Inversion Fix, Declarative Inbound Wi-Fi Failover & USB Autosuspend Prevention (2026-10-18 11:20 CEST)
-* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `08582d50`, Generation 142 Booted)
+* **Status:** `COMPLETED & LIVE VERIFIED` (Commit `7d94036d`, Generation 142 Booted)
 * **Context & Motivation:** Operator selected Option B (correct routing metrics to prefer primary wired connection) and Option 2 (declarative inbound Wi-Fi failover with gratuitous ARP), and requested committing and pushing the `hardware.nix` DisplayLink / USB autosuspend changes.
 * **Actions Taken:**
   1. **Option B (Metric Hierarchy Resolved):**
@@ -682,14 +682,14 @@
      - Switched cleanly to configuration `/nix/store/08zb0yib9chllbjnhfvy7qdz5rahvd5m-nixos-system-frieren-26.11.20261005.aa48d34`.
      - Live routing verified: `default via 192.168.3.1 dev enp1s0 metric 50` > `dock metric 150` > `wifi metric 600`.
      - Pi-hole verified active and answering queries for `frieren.lan`.
-     - Pushed commit `08582d50` to `origin/main`.
+     - Pushed commit `7d94036d` to `origin/main`.
 
 
 
 
 
 ### 47. [x] Daytime Liberation Verification, SimpleX Notification Fix & 50 GB Batch Execution (2026-10-18 15:40 CEST)
-* **Status:** `COMPLETED & ACTIVE IN BACKGROUND` (Commits `8270192c`, `9181b07b`, System Generation 144)
+* **Status:** `COMPLETED & ACTIVE IN BACKGROUND` (Commits `ef5c7ec9`, `90245632`, System Generation 144)
 * **Context & Audit Findings:**
   1. **Previous Daytime Run (11:30 CEST):** Verified via journal logs that between 11:30 and 12:29 CEST, **50 audiobooks were liberated cleanly** into `/srv/data/audiobooks/Books/` (library expanded from 89 to 139 `.m4b` files). The user believed nothing was done because the desktop experienced zero lag and the completion notification failed silently due to `${pkgs.python3}` lacking the `websockets` library.
   2. **Notification Fix:** Updated `makeAudibleBatchLiberation` to use `pkgs.python3.withPackages (ps: [ps.websockets])` when calling `simplex-rpc.py`. Live-tested message delivery to `#Fleet` (item ID 42 and 43 succeeded).
@@ -749,7 +749,7 @@
      - Available storage on `/srv/data`: **782 GB free** (comfortably above the 250 GB minimum headroom threshold).
 
 ### 51. [x] Kitty Font Configuration & JetBrainsMono NFM Restoration for LF Ligatures (2026-10-19 00:44 CEST)
-* **Status:** `COMPLETED & LIVE APPLIED` (Commit `2ce56dc3`, Generation 146)
+* **Status:** `COMPLETED & LIVE APPLIED` (Commit `e8eead90`, Generation 146)
 * **Problem & Root Cause:**
   1. The user noted that `kitty.conf` had `JetBrains Mono Nerd Font`, but `lf` icons and ligatures in `lfrc` were failing to render properly.
   2. Inspection revealed two compounding causes:
@@ -762,7 +762,7 @@
   4. **Verification:**
      - Verified `fc-match monospace` and `fc-match "JetBrainsMono NFM"` cleanly resolve to `JetBrainsMonoNerdFontMono-Regular.ttf`.
      - Verified `~/.config/kitty/kitty.conf` on disk reflects `font_family JetBrainsMono NFM`.
-     - Pushed commit `2ce56dc3` to `origin/main`.
+     - Pushed commit `e8eead90` to `origin/main`.
 
 ### 52. [x] Frieren Kitchen Workstation Setup, GUI Debloat & Unified Kando Configuration (2026-10-19 01:10 CEST)
 * **Status:** `COMPLETED & VERIFIED`

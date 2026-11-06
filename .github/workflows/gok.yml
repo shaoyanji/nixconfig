@@ -33,8 +33,39 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish:
+  # Preserved is a fact in inventory.toml, so the gate reads it there instead of
+  # duplicating the decision: gok was deactivated 2026-11-06 and a push touching
+  # its files must cost nothing. A dispatch still builds — that is how a reflash
+  # artifact is made on purpose.
+  preflight:
     runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.status.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          token: ${{ secrets.GH_PAT }}
+      - id: status
+        run: |
+          set -eu
+          status=$(python3 -c "import tomllib;print(tomllib.load(open('inventory.toml','rb'))['hosts']['gok'].get('status','active'))")
+          echo "gok status: $status (event: $GITHUB_EVENT_NAME)"
+          if [ "$status" = preserved ] && [ "$GITHUB_EVENT_NAME" != workflow_dispatch ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::gok is preserved — skipping the build; dispatch this workflow to build one deliberately"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    needs: preflight
+    if: needs.preflight.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    # The 2026-11-06 run sat in `nix shell nixpkgs#gokrazy nixpkgs#go` for two
+    # hours: `|| true` keeps that step from failing but not from hanging. Bound
+    # the job, and the warm step on its own, so a stall ends as a red run.
+    timeout-minutes: 30
     env:
       # The receiver is hosts/delphi/gok-artifacts.nix: a 2-minute timer pulls
       # whatever Taildrop queued, verifies it, unpacks it and serves it back at
@@ -83,6 +114,7 @@ jobs:
       # `-i gok --parent_dir` and looked for the instance at ~/gokrazy/hello,
       # which is how a 4-minute build failed with "no such file or directory".
       - name: Warm gok and Go
+        timeout-minutes: 10
         run: nix shell nixpkgs#gokrazy nixpkgs#go -c gok version || true
 
       # Go's caches are what take the build from minutes to seconds; they live
@@ -109,6 +141,7 @@ jobs:
       # run after the first a silent no-op on the receiving side.
       - name: Build the appliance artifact
         id: build
+        timeout-minutes: 20
         env:
           GOK_HTTP_PASSWORD: ${{ secrets.GOK_HTTP_PASSWORD }}
           # Optional. TS_AUTH_KEY is the runner's own ephemeral tag:ci key and must

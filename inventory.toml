@@ -841,8 +841,11 @@ constraints = ["Preserved host; do not target for live deployment."]
 # ------------------------------------------------------------------------------
 [hosts.gok]
 hostname = "gok"
-status = "active"
-status_detail = "gokrazy (Go appliance OS) on the spare SD card, flashed from the nixpkgs gok CLI; the image is written and the card has never been booted."
+status = "preserved"
+# Deactivated 2026-11-06: the appliance is off and nothing targets it. Preserved is
+# what stops CI and the infra tasks from spending a runner on a dormant device —
+# .github/workflows/gok.yml reads this field and skips on push.
+status_detail = "gokrazy (Go appliance OS) on the spare SD card, flashed from the nixpkgs gok CLI; deactivated 2026-11-06 — the device is off, the card is out of service, and the build path is kept as a record rather than a deployment target."
 kind = "external"
 arch = "aarch64-linux"
 role = "gokrazy Appliance (Pi 3B SD card, not NixOS)"

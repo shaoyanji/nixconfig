@@ -206,10 +206,15 @@ line is the proof it is wired: `systemctl show -p LoadCredential anki-sync-serve
 
 That account is **`devji`** and it is the only one. `bob` was the plaintext
 placeholder and answers `403` on `/sync/hostKey` (measured 2026-11-06), so a
-client still configured with `bob` fails at login, not at sync. The same probe
-shows the collection is empty: the download yields the `Default` deck with no
-cards, which means no desktop has ever uploaded through this server. Point the
-desktop at `anki.frieren.lan` and let it sync once before expecting cards here.
+client still configured with `bob` fails at login, not at sync. The collection was empty
+until 2026-11-06, which is what a server looks like when no desktop has ever
+synced to it: the download served the `Default` deck with no cards. It was
+seeded that day by posting the 2018 schema-11 `collection.anki2` from
+`/srv/data/german/audio/B1_Wortliste_DTZ_Goethe_vocabsentensesaudiotranslation.apkg`
+to `/sync/upload`; the server migrated it, and the download now serves
+`B1_Wortliste_DTZ_Goethe` with 5,264 new cards. Media did not travel with it,
+so the `[sound:…]` references in that deck resolve to nothing. A desktop sync
+is still the only way to get a personal collection here.
 
 Protocol note for a scripted client: version 11 is one `anki-sync` JSON header
 (`v`/`k`/`c`/`s`) plus a zstd body, and `meta` needs `{"v":11,"cv":…}`. A bare

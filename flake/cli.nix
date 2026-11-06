@@ -102,6 +102,11 @@
         linux = true;
       };
     };
+    # Tools this flake builds rather than borrows; the only family where `pkg`
+    # is a local derivation instead of a nixpkgs attribute.
+    learn = {
+      deutsch-srs.pkg = pkgs.callPackage ./deutsch-srs.nix {};
+    };
   };
 
   # One pipe, one predicate: an entry with `linux = true` survives only on

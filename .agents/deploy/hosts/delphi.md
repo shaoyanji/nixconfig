@@ -206,15 +206,15 @@ line is the proof it is wired: `systemctl show -p LoadCredential anki-sync-serve
 
 That account is **`devji`** and it is the only one. `bob` was the plaintext
 placeholder and answers `403` on `/sync/hostKey` (measured 2026-11-06), so a
-client still configured with `bob` fails at login, not at sync. The collection was empty
-until 2026-11-06, which is what a server looks like when no desktop has ever
-synced to it: the download served the `Default` deck with no cards. It was
-seeded that day by posting the 2018 schema-11 `collection.anki2` from
-`/srv/data/german/audio/B1_Wortliste_DTZ_Goethe_vocabsentensesaudiotranslation.apkg`
-to `/sync/upload`; the server migrated it, and the download now serves
-`B1_Wortliste_DTZ_Goethe` with 5,264 new cards. Media did not travel with it,
-so the `[sound:…]` references in that deck resolve to nothing. A desktop sync
-is still the only way to get a personal collection here.
+client still configured with `bob` fails at login, not at sync. The collection
+was empty until 2026-11-06 — what a server looks like when no desktop has ever
+synced to it. It was seeded by posting the 2018 schema-11 `collection.anki2`
+from `/srv/data/german/audio/B1_Wortliste_DTZ_Goethe_vocabsentensesaudiotranslation.apkg`
+to `/sync/upload`; the download now serves `B1_Wortliste_DTZ_Goethe` (5,264
+cards, no media — every `[sound:…]` resolves to nothing). The three
+`Deutsch::B2::*` decks (102 cards) were merged over that collection by
+`scripts/german/b2-deck.py`, since an upload replaces everything; the sequence
+is in `docs/service-offload.md`.
 
 Protocol note for a scripted client: version 11 is one `anki-sync` JSON header
 (`v`/`k`/`c`/`s`) plus a zstd body, and `meta` needs `{"v":11,"cv":…}`. A bare

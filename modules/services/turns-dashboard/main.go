@@ -195,8 +195,9 @@ func (s *server) watch() {
 	// A failure here is not fatal: the shim may start after this unit, and a
 	// dashboard that exits on the first refused read never shows the reason.
 	backoff := time.Second
+	// Poll first, sleep after: a page opened during a quiet hour must not wait
+	// for the first tick to learn that the log already has turns in it.
 	for {
-		time.Sleep(3 * time.Second)
 		fresh, err := s.poll()
 		if err != nil {
 			log.Printf("turns-dashboard: read: %v", err)
@@ -215,6 +216,7 @@ func (s *server) watch() {
 			}
 			s.broadcast(patch("prepend", "#log", html))
 		}
+		time.Sleep(time.Second)
 	}
 }
 
@@ -248,8 +250,10 @@ func patch(mode, selector, html string) string {
 		fmt.Fprintf(&b, "data: selector %s\n", selector)
 	}
 	fmt.Fprintf(&b, "data: mode %s\n", mode)
-	for _, line := range strings.Split(html, "\n") {
-		fmt.Fprintf(&b, "data: elements %s\n", line)
+	if html != "" {
+		for _, line := range strings.Split(html, "\n") {
+			fmt.Fprintf(&b, "data: elements %s\n", line)
+		}
 	}
 	b.WriteString("\n")
 	return b.String()
@@ -330,16 +334,30 @@ func (s *server) stream(w http.ResponseWriter, r *http.Request) {
 		}
 		b.WriteString(html)
 	}
-	io.WriteString(w, patch("inner", "#log", b.String()))
-	flusher.Flush()
+	// An empty `elements` line is not a no-op to parse: it is a patch with no
+	// fragment, and Datastar drops the stream after one. A reader that arrives
+	// before the first poll therefore gets no frame here and keeps the page's
+	// own placeholder until the first turn is prepended.
+	if b.Len() > 0 {
+		io.WriteString(w, patch("inner", "#log", b.String()))
+		flusher.Flush()
+	}
 
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
+	waiting := b.Len() == 0
 	for {
 		select {
 		case <-r.Context().Done():
 			return
 		case chunk := <-ch:
+			// The page's placeholder is a child of #log, so a prepend would
+			// leave it stranded at the bottom of a log that is no longer
+			// empty. One remove, then never again on this connection.
+			if waiting {
+				io.WriteString(w, patch("remove", "#waiting", ""))
+				waiting = false
+			}
 			io.WriteString(w, chunk)
 			flusher.Flush()
 		case <-ticker.C:

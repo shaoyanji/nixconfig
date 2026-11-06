@@ -1,6 +1,6 @@
-# Vaultwarden on delphi, offloaded from frieren 2026-11-02. DOMAIN is unchanged
-# because it is the origin passkeys were enrolled against; 8222/3012 are tailnet-only.
-# docs/service-offload.md.
+# Vaultwarden on delphi, offloaded from frieren 2026-11-02. The host in DOMAIN
+# is the one passkeys were enrolled against and must not move; 8222 is
+# tailnet-only. docs/service-offload.md.
 {...}: {
   services.vaultwarden = {
     enable = true;

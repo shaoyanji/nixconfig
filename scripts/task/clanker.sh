@@ -147,7 +147,6 @@ done'
 done'
     ;;
   job)
-    err=$?
     [ "${1:-}" = "--" ] && shift
     [ $# -gt 0 ] || usage
     id="$(new_id)"

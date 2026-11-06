@@ -15,15 +15,17 @@ telegram:
   reactions: false
 model:
   provider: nous
-  default: inclusionai/ling-3.0-flash-sante:free
+  default: stepfun/step-3.7-flash:free
+  base_url: https://inference-api.nousresearch.com/v1
 agent:
   max_turns: 150
+  reasoning_effort: medium
 display:
   interface: cli
   tool_progress: all
 fallback_providers:
   - provider: openrouter
-    model: thinkingmachines/inkling:free
+    model: nvidia/nemotron-3-ultra-550b-a55b:free
   - provider: deepseek
     model: deepseek-flash
 tts:
@@ -42,7 +44,6 @@ stt:
   provider: local
   local:
     model: base
-security: {}
 auxiliary:
   title_generation:
     model: nous/inclusionai/ling-3.0-flash-sante:free

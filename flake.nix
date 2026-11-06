@@ -146,11 +146,15 @@
   };
 
   # flake-parts is the assembly root, not a framework layered on top: it owns the
-  # `outputs` function and the flake's attribute names come from one `flake`
-  # attribute. Today that attribute is the same projection `flake/outputs.nix`
-  # evaluated before this change, which is the point of the first rung — the
-  # wiring moves, the outputs do not. The dendritic step (modules imported by
-  # name through `self`) lands on top of this and is recorded as
+  # `outputs` function, `perSystem` builds the dev shells, and the flake's
+  # attribute names come from one `flake` attribute. That attribute is the same
+  # projection `flake/outputs.nix` evaluated before this change, which is the
+  # point — the wiring moves, the outputs do not.
+  #
+  # `.#nixFiles` and `.#modules.<kind>` (flake/nix-registry.nix) are the named
+  # module tree: every tracked `.nix` file by path, and the importable tree per
+  # host kind, walked from the files instead of listed. Hosts still import by
+  # relative path; switching them to these names is the next rung, recorded as
   # `dendritic-flake` in AGENTS.nix.
   outputs = inputs @ {
     self,
@@ -160,6 +164,7 @@
     projected = import ./flake/outputs.nix {
       inherit inputs self nixpkgs;
     };
+    systemsCtl = import ./flake/systems.nix {inherit nixpkgs;};
   in
     # `packages` stays on the outer attrset because flake-parts types
     # `flake.packages.<system>` as `attrsOf package`, while the artifact namespace
@@ -167,6 +172,15 @@
     # identical to the pre-flake-parts output set; flattening the artifacts is its
     # own change, not wiring.
     (inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+      systems = systemsCtl.systems.work;
+      # Dev shells are `perSystem`'s business: one body, fanned out to the
+      # declared systems by flake-parts instead of by a hand-written genAttrs.
+      perSystem = {system, ...}: {
+        devShells = import ./flake/devshells.nix {
+          pkgs = systemsCtl.pkgsFor system;
+          root = ./.;
+        };
+      };
       flake = builtins.removeAttrs projected ["packages"];
     })
     // {inherit (projected) packages;};

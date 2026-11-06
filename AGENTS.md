@@ -92,22 +92,24 @@ When a session starts from `$HOME`:
 ### Flake assembly
 
 ```
-flake.nix → flake/outputs.nix (the one assembly node)
+flake.nix → flake-parts mkFlake (root; systems from flake/systems.nix) → flake/outputs.nix
   ├── nixosConfigurations  ← mkNixosHost (lib/mk-nixos-host.nix)
   ├── darwinConfigurations ← darwinSystem
   ├── homeConfigurations   ← homeManagerConfiguration
   ├── packages             ← flake/packages.nix (sites · artifacts · servers · cli)
-  ├── checks · devShells   ← flake/checks.nix · flake/devshells.nix
+  ├── checks · devShells   ← flake/checks.nix · perSystem → flake/devshells.nix
+  ├── nixFiles · modules   ← flake/nix-registry.nix (every .nix, by path and by import name)
   └── docs · sites         ← lib/docs.nix · lib/aki-site.nix
 ```
 
 A host registers once in `flake/host-inventory.nix` (`kind`, `system`, chain, module paths);
-`outputs.nix` projects it by `kind`, so nothing is wired by hand.
+`outputs.nix` projects it by `kind`, so nothing is wired by hand. The module tree is
+`.#nixFiles` (every tracked `.nix`, by path) and `.#modules.<kind>` (the same files named by
+import closure), both walked in `lib/nix-files.nix` and gated by `checks.<system>.nix-registry`.
 
 ### Module chains
 
-Seven baselines in `flake/module-sets.nix`; which host uses which is compiled, not tabled:
-`nix eval --json .#inventory.hosts | jq '… .software.module_chain'`.
+Seven baselines in `flake/module-sets.nix`; which host uses which: `nix eval --json .#inventory.hosts | jq '… .software.module_chain'`.
 
 | Chain | What it is |
 | :--- | :--- |
@@ -118,9 +120,6 @@ Seven baselines in `flake/module-sets.nix`; which host uses which is compiled, n
 | `globalModulesMacos` | global + macos + nix-homebrew + Home Manager + sops |
 | `globalModulesDemo` | global + demo + Home Manager, no sops |
 | `globalModulesHome` | standalone HM sharedModules + allowUnfree |
-
-Two hosts compose their own chain in `flake/host-inventory.nix`: `ares` (containers +
-impermanence) and `minyx` (global + determinate-nix + sops + raspberry-pi-3, no Home Manager).
 
 ### Where the modules are
 

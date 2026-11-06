@@ -120,8 +120,8 @@ check "imports: module -> module" \
 
 # The import layer is the one that can return zero without anything else looking
 # wrong: a changed path style (quoted interpolation, an `imports = map (…)`) leaves
-# every other check green. Measured at 448 edges on this tree; the floor is what
-# makes a silent parser collapse fail.
+# every other check green. Measured at 460 imports edges on this tree; the floor
+# is what makes a silent parser collapse fail.
 check "imports layer is populated (>=100 edges)" \
   '([.edges[] | select(.type == "imports")] | length) >= 100'
 

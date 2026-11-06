@@ -11,37 +11,37 @@
       summary = "Move to flake-parts with the dendritic pattern: every module, host and package is a flake output imported by name through `self`, so no file list is hand-maintained and finding a module's users is a graph query, not a grep across relative paths.";
       from = ["d1-compiled-context"];
       refs = {
-        modules = ["flake.nix" "flake/outputs.nix" "flake/module-sets.nix" "flake/host-inventory.nix"];
+        modules = ["flake.nix" "flake/outputs.nix" "flake/nix-registry.nix" "lib/nix-files.nix" "flake/systems.nix" "flake/module-sets.nix" "flake/host-inventory.nix"];
         tasks = ["checks:host" "checks:tasks"];
         docs = ["docs/nix-patterns.md"];
       };
       body = ''
-        Problem: `flake/outputs.nix` assembles by hand. Hosts list their modules in
+        Problem: `flake/outputs.nix` assembled by hand; hosts list modules in
         `flake/host-inventory.nix`, chains in `flake/module-sets.nix`, and a module
-        reaches a sibling with `import ../profiles/x.nix`. "Who uses this file" is a
-        grep across paths, which is the token cost the graph exists to remove.
+        reaches a sibling with `import ../profiles/x.nix`. "Who uses this file" was a
+        grep across paths — the token cost the graph exists to remove.
 
-        Shape: `flake-parts` (`inputs.flake-parts` from hercules-ci/flake-parts — the
-        repo already speaks flakes, so this is one input, not a new framework). Each
-        `modules/**.nix` becomes a flake-parts module whose `config.flake.modules.nixos.<name>`
-        (and `.homeManager.<name>`) is imported by name through `self`. A host declares
-        `imports = [self.modules.nixos.base …]`, and `flake/host-inventory.nix` keeps
-        only `kind`, `system` and the host path.
+        Shape: `flake-parts` (one input; the repo already speaks flakes). Each
+        `modules/**.nix` gains `config.flake.modules.nixos.<name>`, imported by name
+        through `self`; `flake/host-inventory.nix` keeps `kind`, `system`, host path.
 
-        Gate: one representative host per chain evaluates to the same toplevel
-        `drvPath` before and after, `checks:host HOST=<rep>` is green, and
-        `grep -rn 'import ../' modules | wc -l` falls to the files that import
-        data they own. Publishing already follows this rule (neocities, envs and
-        mataroa run from `taskfiles/`); the flake is the last surface that does not.
+        Gate: same toplevel `drvPath` per representative chain and `checks:host` green.
 
-        Landed 2026-11-05: `flake.nix` calls `flake-parts.lib.mkFlake`; the output set
-        comes from one `flake` attribute, and 32 output names, frieren/eisen/guckloch
-        toplevel `drvPath` and penguin's HM generation are all unchanged.
-        `configurationRevision` carries `<commit>-dirty`, so that comparison holds
-        within one git state, not across a commit.
+        Landed 2026-11-05: `mkFlake` owns the outputs; 32 names, three chain
+        toplevels and penguin's HM generation unchanged (within one git state:
+        `configurationRevision` is `<commit>-dirty`).
 
-        Next rung: `flake.modules.nixos.<name>` from the module tree, hosts importing
-        by name through `self`, then `import ../` falls to the files that own their data.
+        Landed 2026-11-06: `lib/nix-files.nix` walks all 301 tracked `.nix` files —
+        the four-root walk missed `flake.nix`, the overlays and `tools/` — and
+        `flake/nix-registry.nix` publishes `.#nixFiles` by path and `.#modules.<kind>`
+        as each kind's import closure (`services.zettel-graph`).
+        `checks.<system>.nix-registry` proves one name per file: `listToAttrs` drops a
+        collision silently, and stripping `.nix` merged `flake.nix` into `flake/`.
+        Dev shells now live in `perSystem` (`flake/systems.nix` shared) with 11
+        identical `drvPath`s on both arches.
+
+        Next rung: hosts importing by name through `self`; then `import ../` falls to
+        the files that own their data, and `refs.modules` gains what landed.
 
         Exit: the three flake wiring files shrink to projections, and the note gains
         `refs.modules` naming what landed. Until then the module wiring is beta: a

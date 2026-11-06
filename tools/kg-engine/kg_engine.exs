@@ -726,27 +726,52 @@ defmodule KGEngine.Native do
     }
   end
 
-  @nix_roots ~w(modules hosts flake lib)
+  # The Elixir twin of the walk in lib/nix-files.nix: the whole tree, not a root
+  # list, so `flake.nix`, the overlays and `tools/` are nodes on both sides.
+  # Ordering matters (the count comparison and the graph digest both read it), so
+  # entries are sorted at every level and directories recurse depth-first, which
+  # is what Nix's `listFilesRecursive` does. Symlinks are not followed: the
+  # `result-*` links point at store closures full of `.nix` files the flake
+  # source does not contain.
+  defp nix_files(repo) do
+    walk = fn walk, dir ->
+      case File.ls(dir) do
+        {:ok, entries} ->
+          entries
+          |> Enum.sort()
+          |> Enum.flat_map(fn name ->
+            path = Path.join(dir, name)
 
-  # The Elixir twin of the module walk in lib/knowledge-graph.nix: same roots,
-  # same relative-path token split, same "only a path that is itself a node"
-  # filter. `checks:kg:native` compares counts and `checks:kg:sidecar` compares
-  # answers, so a divergence fails a gate instead of answering from a graph that
-  # quietly disagrees with the compiled one.
+            case File.lstat(path) do
+              {:ok, %File.Stat{type: :directory}} -> walk.(walk, path)
+              {:ok, %File.Stat{type: :regular}} -> if String.ends_with?(name, ".nix"), do: [path], else: []
+              _ -> []
+            end
+          end)
+
+        _ ->
+          []
+      end
+    end
+
+    walk.(walk, repo)
+  end
+
+  # The Elixir twin of the module layer's import extraction: same relative-path
+  # token split, same "only a path that is itself a node" filter.
+  # `checks:kg:native` compares counts and `checks:kg:sidecar` compares answers,
+  # so a divergence fails a gate instead of answering from a graph that quietly
+  # disagrees with the compiled one.
   defp modules(repo) do
-    files =
-      Enum.flat_map(@nix_roots, fn dir ->
-        path = Path.join(repo, dir)
-        if File.dir?(path), do: Path.wildcard(Path.join(path, "**/*.nix")), else: []
-      end)
+    files = nix_files(repo)
 
     known = MapSet.new(files, &Path.relative_to(&1, repo))
 
-    # 289 opens dominate this phase after the module walk exists (~200 ms serial
-    # on a warm local checkout); the reads are independent, so they run in
-    # parallel without changing a byte of the result. `ordered: true` keeps the
-    # node order identical to the Nix projection's, which the count comparison
-    # and the stable graph digest both depend on.
+    # 301 opens dominate this phase (~200 ms serial on a warm local checkout);
+    # the reads are independent, so they run in parallel without changing a byte
+    # of the result. `ordered: true` keeps the node order identical to the Nix
+    # projection's, which the count comparison and the stable graph digest both
+    # depend on.
     files
     |> Task.async_stream(&module_node(&1, repo, known),
       max_concurrency: 8,

@@ -24,9 +24,16 @@
 # read 21.0 ms median on delphi, so the gate reported the machine. It moved
 # 30 -> 400 ms on 2026-11-05 for a real reason rather than a slower machine: the
 # graph gained the module-import layer, and the native twin now OPENS AND SCANS
-# every tracked `.nix` file (289 here) instead of only the 57 documents. That is
-# 210-235 ms median on a warm local checkout, measured with the walk in place and
-# with 8-way parallel reads (which bought ~10 ms — the opens, not the CPU).
+# every tracked `.nix` file instead of only the 57 documents. That is 210-235 ms
+# median on a warm local checkout, measured with the walk in place and with
+# 8-way parallel reads (which bought ~10 ms — the opens, not the CPU).
+#
+# The walk covers the WHOLE tree on both sides (`lib/nix-files.nix` and the
+# Elixir twin), which is 301 files here: the four-root version missed `flake.nix`,
+# the overlays and `tools/`. Real cost of the wider walk: 275 ms median on delphi
+# (measured 2026-11-06, quiet host), still under the same budget. Symlinks are
+# not followed — `result-*` points into store closures full of `.nix` files the
+# flake source does not contain.
 #
 # 400 ms is still a regression gate, not a rubber stamp: the failure it exists for
 # is a builder that shells out to `nix eval` (1-3 s) or rescans on every query,

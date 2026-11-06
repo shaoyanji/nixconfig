@@ -259,56 +259,24 @@
   # --- Nix module graph ------------------------------------------------------
   # The one structural question the doc graph could not answer: "who imports
   # `modules/services/x.nix`" was a grep across relative paths, and a grep is the
-  # token cost a graph exists to remove. Every tracked `.nix` file under these
-  # roots is a node; every relative `.nix` path it names is an `imports` edge.
-  # `ops:kg:module` reads the importers, `ops:kg:blast` the transitive closure.
+  # token cost a graph exists to remove. The walk and the edge extraction live in
+  # `lib/nix-files.nix` because the flake registry (`flake/nix-registry.nix`)
+  # names the same files; this is the graph's view of that one list. `ops:kg:module`
+  # reads the importers, `ops:kg:blast` the transitive closure.
   #
-  # Extraction is a token split, not a parser: a path only becomes an edge when
-  # it resolves to a file that is itself a node, so a stale reference cannot
-  # invent one. `imports = [./x.nix]`, `import ./x.nix` and a bare string path all
-  # look the same to it, which is why it covers the whole tree in one walk.
-  nixRoots = ["modules" "hosts" "flake" "lib"];
-  nixRootFiles =
-    lib.concatMap (
-      d: let
-        p = root + "/${d}";
-      in
-        if builtins.pathExists p
-        then lib.filesystem.listFilesRecursive p
-        else []
-    )
-    nixRoots;
-  nixFiles = builtins.filter (p: lib.hasSuffix ".nix" (toString p)) nixRootFiles;
-  nixPaths = map rel nixFiles;
-  pathTokens = text:
-    builtins.filter (
-      t:
-        builtins.isString t
-        && (lib.hasPrefix "./" t || lib.hasPrefix "../" t)
-        && lib.hasSuffix ".nix" t
-    )
-    (builtins.split "[^A-Za-z0-9_./-]+" text);
-  importsIn = id: let
-    dir = dirOf id;
-    targets = map (
-      t:
-        normalisePath (
-          if dir == ""
-          then t
-          else "${dir}/${t}"
-        )
-    ) (pathTokens (builtins.readFile (root + "/${id}")));
-  in
-    lib.unique (builtins.filter (t: t != id) targets);
+  # The walk is the whole tree, so `flake.nix` — the file every blast radius ends
+  # at — and the overlays are nodes instead of the old four fixed roots.
+  nixFilesCtl = import ./nix-files.nix {inherit lib root;};
+  nixPaths = nixFilesCtl.paths;
   modules =
     map (p: {
-      id = "module:${rel p}";
+      id = "module:${p}";
       type = "module";
-      label = rel p;
-      path = rel p;
-      imports = importsIn (rel p);
+      label = p;
+      path = p;
+      imports = nixFilesCtl.importsOfPath p;
     })
-    nixFiles;
+    nixPaths;
 
   # Every node id that exists, so an `about` entry naming a typo is an edge that
   # does not resolve — which kg-check fails on — rather than an invented node.

@@ -1,48 +1,40 @@
+# The per-system dev shells, as the body of flake-parts' `perSystem`; the flake
+# declares `systems = systems.work`, so this file only names shells. `root` is the
+# source path `openwrt` reads (`scripts/openwrt/openwrt.sh`).
 {
-  lib,
-  systems,
-  pkgsFor,
-  self,
-}:
-lib.genAttrs systems.work (
-  system: let
-    pkgs = pkgsFor system;
-    # Import shells using the flake's root path
-    shellsDir = "${self.outPath}/modules/config/shells";
-  in {
-    default = pkgs.mkShell {
-      nativeBuildInputs = [
-        pkgs.bashInteractive
-        pkgs.nodejs
-        pkgs.go
-        pkgs.gopls
-        # The knowledge-graph sidecar (tools/kg-engine) is Elixir. Declaring it
-        # here is the difference between `task ops:kg:sidecar` working offline in
-        # the repo and it resolving a store path on every invocation: inside a
-        # `nix develop` (or the repo's `.envrc` via direnv) `elixir` is on PATH
-        # and scripts/task/kg-sidecar.sh never calls nix at all.
-        pkgs.beamPackages.elixir
-        pkgs.beamPackages.erlang
-        # scripts/ is 73 files of bash; `nix build .#checks.<system>.scripts-shellcheck` is the gate, but
-        # the binary has to be reachable to fix what it finds. It was absent from
-        # every host before this, which is why the audit could only run patterns.
-        pkgs.shellcheck
-      ];
-    };
+  pkgs,
+  root ? ../.,
+}: let
+  shellsDir = root + "/modules/config/shells";
+in {
+  default = pkgs.mkShell {
+    nativeBuildInputs = [
+      pkgs.bashInteractive
+      pkgs.nodejs
+      pkgs.go
+      pkgs.gopls
+      # tools/kg-engine is Elixir: with it on PATH, `task ops:kg:sidecar` runs
+      # offline instead of resolving a store path per invocation.
+      pkgs.beamPackages.elixir
+      pkgs.beamPackages.erlang
+      # The gate is `checks.<system>.scripts-shellcheck`; this makes the binary
+      # reachable to fix what it finds.
+      pkgs.shellcheck
+    ];
+  };
 
-    # Development shells - import directly with pkgs
-    flaskpy = (import "${shellsDir}/flaskpy.nix") {inherit pkgs;};
-    jekyll = (import "${shellsDir}/jekyll.nix") {inherit pkgs;};
-    yarn = (import "${shellsDir}/yarn.nix") {inherit pkgs;};
-    pdf = (import "${shellsDir}/pdf.nix") {inherit pkgs;};
-    yt = (import "${shellsDir}/yt.nix") {inherit pkgs;};
-    shell = (import "${shellsDir}/shell.nix") {inherit pkgs;};
-    kali = (import "${shellsDir}/kali.nix") {inherit pkgs;};
-    pi = (import "${shellsDir}/pi.nix") {inherit pkgs;};
-    replit = (import "${shellsDir}/replit.nix") {inherit pkgs;};
-    openwrt = (import "${shellsDir}/openwrt.nix") {
-      inherit pkgs;
-      root = self.outPath;
-    };
-  }
-)
+  # Development shells - import directly with pkgs
+  flaskpy = (import (shellsDir + "/flaskpy.nix")) {inherit pkgs;};
+  jekyll = (import (shellsDir + "/jekyll.nix")) {inherit pkgs;};
+  yarn = (import (shellsDir + "/yarn.nix")) {inherit pkgs;};
+  pdf = (import (shellsDir + "/pdf.nix")) {inherit pkgs;};
+  yt = (import (shellsDir + "/yt.nix")) {inherit pkgs;};
+  shell = (import (shellsDir + "/shell.nix")) {inherit pkgs;};
+  kali = (import (shellsDir + "/kali.nix")) {inherit pkgs;};
+  pi = (import (shellsDir + "/pi.nix")) {inherit pkgs;};
+  replit = (import (shellsDir + "/replit.nix")) {inherit pkgs;};
+  openwrt = (import (shellsDir + "/openwrt.nix")) {
+    inherit pkgs;
+    root = toString root;
+  };
+}

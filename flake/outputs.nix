@@ -10,39 +10,11 @@
   # per host kind), each a dozen lines with exactly one consumer: this file.
   # A file whose whole body is wiring between one node and another is not a
   # module, it is a hop — and a hop is what makes a grep lie about what exists.
-  # The systems this flake produces shells, packages, apps and checks for. It
-  # used to be flake-utils' defaultSystems, which includes both darwin entries:
-  # the root then advertised two macOS devshells and a macOS package set, so any
-  # surface that walks the outputs (flake show/check, an editor, a completion
-  # helper) instantiated darwin nixpkgs on a Linux-only host. The one darwin
-  # machine is configuration-only and stays reachable by name through
-  # `darwinConfigurations`; nothing else fans out to it.
-  systems = {
-    work = ["x86_64-linux" "aarch64-linux"];
-    # Both Linux architectures the fleet runs, because `checks.<system>` is repo
-    # hygiene (inventory, policies, task graph, skills) and forces no host config —
-    # the budget rule that keeps this set cheap is in flake/checks.nix. It was
-    # x86_64-only, which made every consumer of "the checks for THIS system"
-    # unrunnable on the fleet's ARM hosts: `task checks:quick` (a platform mismatch
-    # on delphi), `taskfile-graph.sh --artifact` (resolves builtins.currentSystem
-    # and then asks for an attribute that did not exist), and the skills gate.
-    # Cost is one more cheap evaluation when something walks both systems
-    # (`nix flake check`); CI pins `checks.x86_64-linux.*` explicitly, so it is
-    # unaffected. darwin is still absent on purpose — see the note above.
-    checks = ["x86_64-linux" "aarch64-linux"];
-  };
-
-  overlays = [
-    (import ../overlays/simplex-chat.nix)
-    (import ../overlays/nvidia-persistenced-fix.nix)
-    (import ../overlays/nushell-plugins-compat.nix)
-    # kickstart.nixvim treesitter.nix still references the tmux grammar
-    # that nvim-treesitter dropped upstream
-    (import ../overlays/nvim-treesitter-tmux.nix)
-    # molly-brown is newer than nixpkgs' 2023 snapshot (upstream has no tags)
-    (import ../overlays/molly-brown.nix)
-  ];
-  pkgsFor = system: import nixpkgs {inherit system overlays;};
+  # Systems, overlays and the package set live in flake/systems.nix because
+  # `flake.nix` needs them too: flake-parts' `systems` option drives `perSystem`,
+  # which is where the dev shells are now built.
+  systemsCtl = import ./systems.nix {inherit nixpkgs;};
+  inherit (systemsCtl) systems pkgsFor;
 
   # The assembler is bound to a nixpkgs at construction time, so a host that
   # pins its own (netbook, on the 25.11 rev it boots) needs its own instance —
@@ -92,6 +64,11 @@
   # `nix eval .#taskfileGraph.version` is a 4 s leaf read, and the same compile
   # feeds the flake check, the parity gate and any future generator.
   taskfileCtl = import ../lib/taskfile.nix {inherit lib;};
+  # Every tracked `.nix` file as data (lib/nix-files.nix), and the names the flake
+  # publishes for them (flake/nix-registry.nix). The walk is shared with the
+  # knowledge graph, so "what exists" and "who imports it" cannot disagree.
+  nixFilesCtl = import ../lib/nix-files.nix {inherit lib;};
+  nixRegistry = import ./nix-registry.nix {inherit lib hostInventory nixFilesCtl;};
   # The CLI table is compiled once here and projected into both namespaces:
   # `packages.<system>.cli` for a store path, `apps.<system>.cli` for `nix run`.
   cliFor = system:
@@ -172,10 +149,6 @@ in {
     inherit lib inputs systems pkgsFor self hostInventory;
   };
 
-  devShells = import ./devshells.nix {
-    inherit lib systems pkgsFor self;
-  };
-
   # `nix fmt` = the repo's canonical formatter, so the tool is reachable through
   # the flake instead of only through the task script that wraps it. alejandra,
   # never nixpkgs-fmt: the latter would rewrite ~170 of the 187 tracked files.
@@ -233,6 +206,18 @@ in {
   # Fast, cached entry point: `nix eval .#inventory.hosts.<host>.role` reads the
   # compiled registry WITHOUT evaluating a single host configuration.
   inherit inventory;
+
+  # --- the .nix tree as flake outputs ---------------------------------------
+  # `nixFiles` is the walk (every tracked file, nested by directory, path-valued)
+  # and `modules` names the importable tree per host kind. Pure data: naming a
+  # file evaluates no host, and `nix eval .#nixFiles.modules.services.zettel-graph`
+  # is a leaf read.
+  inherit (nixRegistry) nixFiles modules;
+
+  # `.#nixFileRegistry` is the diagnostic surface for the two above: how many
+  # files the walk found, how many each namespace names, and what would break a
+  # name (`duplicates`, `dangling`). Read by `checks.<system>.nix-registry`.
+  nixFileRegistry = nixRegistry.registry;
 
   # --- agent context plane --------------------------------------------------
   # `nix eval .#agentSkills.count` / `.#agentSkills.byTag.nix` are the live

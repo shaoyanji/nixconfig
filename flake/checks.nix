@@ -218,6 +218,34 @@ lib.genAttrs systems.work (
       dangling = map (c: "${c.doc} -> ${c.id}") policiesCtl.danglingCitations;
       unenforced = policiesCtl.unenforcedHardRules;
     in {
+      # flake/nix-registry.nix: one name per file, and no module name claimed
+      # twice — `listToAttrs` silently keeps the last of a collision (stripping
+      # `.nix` from the leaf once lost 17 files to `flake.nix` vs `flake/`).
+      nix-registry = let
+        reg = self.nixFileRegistry;
+        countLeaves = x:
+          if builtins.isAttrs x
+          then builtins.foldl' (a: v: a + (countLeaves v)) 0 (builtins.attrValues x)
+          else if builtins.isPath x
+          then 1
+          else 0;
+        leaves = countLeaves self.nixFiles;
+        problems =
+          lib.optional (leaves != reg.count)
+          ".#nixFiles names ${toString leaves} files, the walk found ${toString reg.count} — a name collision dropped one"
+          ++ map (n: "duplicate module name: ${n}") reg.duplicates
+          ++ lib.optional (reg.namespaced.nixos == 0)
+          "modules.nixos is empty — the nixos host roots stopped resolving"
+          ++ lib.optional (reg.namespaced.homeManager == 0)
+          "modules.homeManager is empty — the home host roots stopped resolving";
+      in
+        if problems != []
+        then builtins.throw "nix file registry is inconsistent:\n  ${lib.concatStringsSep "\n  " problems}"
+        else
+          pkgs.runCommand "nix-registry" {} ''
+            echo "nix files: ${toString reg.count} (nixos ${toString reg.namespaced.nixos} modules, homeManager ${toString reg.namespaced.homeManager}, darwin ${toString reg.namespaced.darwin})"
+            touch $out
+          '';
       # --- pkgs.txt: the format a human will actually edit -------------------
       pkg-list = assert pkgFixture == pkgExpected;
       assert (pkgList.parse "") == [];

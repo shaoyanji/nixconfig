@@ -97,8 +97,8 @@
     if command -v systemone-decision >/dev/null 2>&1; then
       echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
       systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" > "$TRIAGE_REPORT" || true
-      OPEN_ITEMS=$(grep -o '"status": "OPEN"' "$TRIAGE_REPORT" | wc -l || echo 0)
-      ACTIONABLE_COUNT=$(grep -o '"category": "AUTONOMOUS_PROMOTION_CANDIDATE"' "$TRIAGE_REPORT" | wc -l || echo 0)
+      OPEN_ITEMS=$( (grep -o '"status": "OPEN"' "$TRIAGE_REPORT" || true) | wc -l)
+      ACTIONABLE_COUNT=$( (grep -o '"category": "AUTONOMOUS_PROMOTION_CANDIDATE"' "$TRIAGE_REPORT" || true) | wc -l)
       echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found, $ACTIONABLE_COUNT actionable autonomous candidates)."
     fi
 
@@ -140,8 +140,8 @@
 
     # --- STEP 1: Deterministic Health & Self-Repair (0 API tokens consumed) ---
     echo "=== [$(date)] Step 1: Performing deterministic service checks ==="
-    FAILED_SYS=$(systemctl --failed --no-pager --plain --quiet | grep -v "0 loaded" | wc -l || echo 0)
-    FAILED_USER=$(systemctl --user --failed --no-pager --plain --quiet | grep -v "0 loaded" | wc -l || echo 0)
+    FAILED_SYS=$( (systemctl --failed --no-pager --plain --quiet | grep -v "0 loaded" || true) | wc -l)
+    FAILED_USER=$( (systemctl --user --failed --no-pager --plain --quiet | grep -v "0 loaded" || true) | wc -l)
 
     if [ "$FAILED_SYS" -gt 0 ]; then
       echo "Detected failed system units. Attempting reset-failed..."
@@ -198,7 +198,7 @@
     TIER1_COUNT=0
     if command -v systemone-decision >/dev/null 2>&1; then
       systemone-decision --model julia-1 triage-system "$SYSTEM_FILE" > "$TRIAGE_REPORT" || true
-      TIER1_COUNT=$(grep -o '"protocol": "TIER_1_IMMEDIATE_REPAIR"' "$TRIAGE_REPORT" | wc -l || echo 0)
+      TIER1_COUNT=$( (grep -o '"protocol": "TIER_1_IMMEDIATE_REPAIR"' "$TRIAGE_REPORT" || true) | wc -l)
       echo "System One System Triage: Evaluated scorecard with $TIER1_COUNT potential TIER 1 immediate repair item(s)."
     fi
 

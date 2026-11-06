@@ -1,9 +1,13 @@
-{pkgs, ...}: {
+{
+  self,
+  pkgs,
+  ...
+}: {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/profiles/desktop-client.nix
-    ../../modules/profiles/laptop.nix
+    self.modules."profiles.desktop-client"
+    self.modules."profiles.laptop"
   ];
   environment.systemPackages = with pkgs; [
     btrfs-progs

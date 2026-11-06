@@ -1,13 +1,13 @@
 # ares — Steam Big Picture kiosk (i5-6500 Skylake + GTX 750 Ti).
-_: {
+{self, ...}: {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia-gt-750-ti.nix
     # Impermanence root rotation + /persist/system persistence.
-    ../../modules/profiles/impermanence.nix
-    ../../modules/profiles/steamos.nix
-    ../../modules/profiles/base-node.nix
+    self.modules."profiles.impermanence"
+    self.modules."profiles.steamos"
+    self.modules."profiles.base-node"
   ];
 
   # X server is required so XWayland can host legacy X11-only windows

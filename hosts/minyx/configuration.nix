@@ -2,6 +2,7 @@
 # Roles beside this file: dns.nix, tunnel.nix (hardware-configuration.nix is
 # sd-image generated). Budget, medium and deploy: .agents/deploy/hosts/minyx.md
 {
+  self,
   config,
   lib,
   pkgs,
@@ -13,8 +14,8 @@ in {
     ./dns.nix
     ./hardware-configuration.nix
     ./tunnel.nix
-    ../../modules/config/authorized-keys.nix
-    ../../modules/ssh-ca.nix
+    self.modules."config.authorized-keys"
+    self.modules."ssh-ca"
   ];
 
   system.stateVersion = "24.11";

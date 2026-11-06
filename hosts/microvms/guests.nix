@@ -3,6 +3,9 @@
 # deck login. Rationale: AGENTS.nix `microvm-guests`.
 {
   inputs,
+  # Passed in by the caller: this file is a function applied with a record, not
+  # a module, so the module-system args (`self` included) do not reach it.
+  self,
   hypervisor ? "cloud-hypervisor",
   # A KVM-less host (delphi: OCI A1 does not expose EL2) names a CPU ("max") so
   # the runner uses TCG. cloud-hypervisor has no TCG backend, so such a host
@@ -326,6 +329,7 @@ in {
         imports = [
           inputs.microvm.nixosModules.microvm
           (import ./base.nix {
+            inherit self;
             hostName = "sandbox";
             ipAddress = address;
             inherit hypervisor cpu tapId sshHostKeys mem;

@@ -1,4 +1,5 @@
 {
+  self,
   pkgs,
   lib,
   ...
@@ -6,7 +7,7 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/profiles/base-desktop-environment.nix
+    self.modules."profiles.base-desktop-environment"
     (import ../../modules/profiles/grub-boot.nix {
       inherit lib;
       device = "/dev/sda";

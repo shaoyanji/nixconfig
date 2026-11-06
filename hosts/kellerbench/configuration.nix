@@ -1,4 +1,5 @@
 {
+  self,
   lib,
   pkgs,
   ...
@@ -21,17 +22,17 @@ in {
       ./nvidia-gt-750-ti.nix
     ]
     ++ lib.optionals enableSteam [
-      ../../modules/profiles/steamos.nix
+      self.modules."profiles.steamos"
     ]
     ++ [
-      ../../modules/profiles/base-node.nix
+      self.modules."profiles.base-node"
       # Sunshine GameStream/Moonlight server: Moonlight clients on the LAN
       # launch/control games running under kellerbench. Composes on top of
       # base-node + steamos (which provides the gamescope+steam stack Sunshine
       # captures from). To disable Sunshine streaming while keeping the
       # gaming rig functional, set enableSunshine = false in the host
       # config and remove this import.
-      ../../modules/profiles/sunshine.nix
+      self.modules."profiles.sunshine"
     ];
 
   # X server is required so XWayland can host any legacy X11-only windows

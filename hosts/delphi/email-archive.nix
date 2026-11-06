@@ -1,14 +1,14 @@
 # The email archive on delphi: NpgsqlRest on loopback, tailnet-only through the
 # `tailscale serve` mount in the portal registry. docs/email-archive.md.
-{...}: {
+{self, ...}: {
   imports = [
-    ../../modules/services/email-archive.nix
+    self.modules."services.email-archive"
     # The reading surface: fuzzy search and a relation graph over the same
     # archive, served on loopback and mounted on the tailnet by the portal.
-    ../../modules/services/mail-atlas.nix
+    self.modules."services.mail-atlas"
     # A guest plugin: it declares its own tables, endpoints and routing through
     # services.emailArchive.plugins. modules/plugins/appflow/README.md.
-    ../../modules/plugins/appflow
+    self.modules."plugins.appflow"
   ];
 
   services.mailAtlas.enable = true;

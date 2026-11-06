@@ -1,7 +1,11 @@
 # Demo — travel netbook.
-{lib, ...}: {
+{
+  self,
+  lib,
+  ...
+}: {
   imports = [
-    ../../modules/profiles/laptop.nix
+    self.modules."profiles.laptop"
   ];
 
   # Placeholder root file system — REQUIRED for evaluation (hostChecks / per-host gate).

@@ -1,9 +1,13 @@
-{inputs, ...}: {
+{
+  self,
+  inputs,
+  ...
+}: {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/profiles/base-node.nix
-    ../../modules/profiles/nas-client.nix
+    self.modules."profiles.base-node"
+    self.modules."profiles.nas-client"
     inputs.sops-nix.nixosModules.sops
     ./ai.nix
   ];

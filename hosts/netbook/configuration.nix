@@ -2,6 +2,7 @@
 # mount this eMMC root), no global chain, deployed by push. Rationale and the
 # boot test: `.agents/deploy/hosts/netbook.md`.
 {
+  self,
   lib,
   pkgs,
   ...
@@ -22,16 +23,16 @@ in {
     # `nas-client.nix` owns /Volumes/data: LAN first, tailnet fallback, a
     # recovery timer and the gc-root guard — strictly more than the two-line
     # fstab entry it replaces, and what a travel laptop actually needs.
-    ../../modules/profiles/boot.nix
+    self.modules."profiles.boot"
     # The dwl session: keybinds, launcher, wallpaper, idle/lock. This host
     # ran niri, whose stock config was what it got — no fleet keybinds, and a
     # compositor sized for a desktop rather than for 2 GB and a Celeron.
-    ../../modules/profiles/dwl-desktop.nix
-    ../../modules/profiles/nas-client.nix
+    self.modules."profiles.dwl-desktop"
+    self.modules."profiles.nas-client"
     # Voice dictation as a packaged script: the body is shellcheck-gated at
     # build and the Groq key is decrypted from the fleet sops plane at use time
     # with this host's TPM identity, instead of a plaintext file in $HOME.
-    ../../modules/profiles/voice-dictate.nix
+    self.modules."profiles.voice-dictate"
   ];
 
   profiles.boot.efi = false;

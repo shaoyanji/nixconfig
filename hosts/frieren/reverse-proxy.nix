@@ -1,4 +1,5 @@
 {
+  self,
   pkgs,
   lib,
   config,
@@ -52,7 +53,7 @@
   # owner.
   landingPage = config.services.servicePortal.pages.lan;
 in {
-  imports = [../../modules/services/service-portal.nix];
+  imports = [self.modules."services.service-portal"];
 
   # --- Service portal: the page, from the registry ----------------------------
   # One entry per card. Keys under `exposed` services (immich, paperless, …) are

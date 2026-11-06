@@ -1,6 +1,7 @@
 # A microVM guest with one job: boot, and let root in over ssh.
 # Anything else is closure you pay for on every start.
 {
+  self,
   hostName,
   ipAddress,
   tapId,
@@ -24,7 +25,7 @@
   ...
 }: {
   # The fleet's one key list — the same file every host uses, so no second copy.
-  imports = [../../modules/config/authorized-keys.nix];
+  imports = [self.modules."config.authorized-keys"];
 
   networking.hostName = hostName;
   system.stateVersion = "25.11";

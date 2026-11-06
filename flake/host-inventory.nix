@@ -2,6 +2,10 @@
   inputs,
   moduleSets,
   self,
+  # Names for the module files a host adds outside a chain
+  # (flake/nix-registry.nix). A host's own config stays a path: it is not under
+  # modules/ and no other host imports it.
+  moduleFiles,
 }: let
   inherit
     (moduleSets)
@@ -84,7 +88,7 @@ in {
         # exits with `no supported hypervisor` in 33 ms. So this host names qemu
         # with cpu = "max" (TCG): slow, but it boots. frieren keeps CH.
         (import ../hosts/microvms/guests.nix {
-          inherit inputs;
+          inherit inputs self;
           hypervisor = "qemu";
           cpu = "max";
           # Retired from autostart on 2026-10-25: OCI A1 lacks KVM hardware acceleration
@@ -145,7 +149,7 @@ in {
       ++ [
         inputs.impermanence.nixosModules.impermanence
         inputs.disko.nixosModules.default
-        ../modules/global/impermanence.nix
+        moduleFiles."global.impermanence"
         ../hosts/ares/configuration.nix
         (import ../hosts/common/disko.nix {device = "/dev/sda";})
       ];
@@ -259,7 +263,7 @@ in {
     modules =
       globalModules
       ++ [
-        ../modules/global/determinate-nix.nix
+        moduleFiles."global.determinate-nix"
         inputs.sops-nix.nixosModules.sops
         ../hosts/minyx/configuration.nix
         inputs.nixos-hardware.nixosModules.raspberry-pi-3

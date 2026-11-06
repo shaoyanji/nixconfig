@@ -1,82 +1,46 @@
 # The flake registry: `.#nixFiles` (every tracked `.nix`, by path) and
-# `.#modules.<kind>` (the import closure of that kind's hosts, named for import).
-# Why a closure: AGENTS.nix `dendritic-flake`; usage: AGENTS.md.
+# `.#modules` (every file under `modules/`, named). Pure: the walk only, so a
+# chain can use these names without depending on the flake outputs.
 {
   lib,
-  hostInventory,
   nixFilesCtl,
 }: let
-  inherit (nixFilesCtl) paths byPath relPath;
-  importsOf = p: nixFilesCtl.importsOfPath p;
+  inherit (nixFilesCtl) paths byPath;
+  moduleFiles = builtins.filter (p: lib.hasPrefix "modules/" p) paths;
 
-  # `lib.subtractLists seen xs` is `xs` minus `seen` (the library's first argument
-  # is the list being removed); reversed, the walk re-adds files and never ends.
-  reachable = start: let
-    step = frontier: builtins.concatLists (map importsOf frontier);
-    go = seen: frontier:
-      if frontier == []
-      then seen
-      else let
-        next = lib.unique (lib.subtractLists seen (step frontier));
-      in
-        go (seen ++ next) next;
+  # `modules/profiles/base-node.nix` -> `profiles.base-node`;
+  # `modules/global/global.nix` -> `global` (a file named after its directory
+  # does not repeat the word) and `modules/net/dns/default.nix` -> `net.dns`.
+  nameOf = p: let
+    parts = lib.splitString "/" (lib.removePrefix "modules/" (lib.removeSuffix ".nix" p));
+    n = builtins.length parts;
+    stem = builtins.elemAt parts (n - 1);
   in
-    go (lib.unique start) (lib.unique start);
+    if n > 1 && (stem == "default" || stem == builtins.elemAt parts (n - 2))
+    then lib.concatStringsSep "." (lib.init parts)
+    else lib.concatStringsSep "." parts;
 
-  # Roots are the path entries in a host's module list; `inputs.x.nixosModules.*`,
-  # inline lambdas and already-applied imports are not files this walk knows.
-  rootsFor = kind:
-    lib.concatMap
-    (h: map relPath (builtins.filter builtins.isPath (h.modules or [])))
-    (lib.attrValues (lib.filterAttrs (_: h: h.kind == kind) hostInventory));
-
-  nameOf = p:
-    lib.replaceStrings ["/"] ["."]
-    (lib.removeSuffix ".nix" (lib.removePrefix "modules/" p));
-
-  namespace = kind: let
-    modulePaths =
-      builtins.filter (p: lib.hasPrefix "modules/" p && builtins.elem p paths)
-      (reachable (rootsFor kind));
-    names = map nameOf modulePaths;
-  in {
-    files = builtins.listToAttrs (map (p: {
-        name = nameOf p;
-        value = byPath.${p};
-      })
-      modulePaths);
-    # `listToAttrs` keeps the last of a collision silently; the check asserts
-    # this is empty instead.
-    duplicates = lib.subtractLists (lib.unique names) names;
-    count = builtins.length modulePaths;
-    inherit names;
-  };
-
-  nixos = namespace "nixos";
-  homeManager = namespace "home";
-  darwin = namespace "darwin";
+  names = map nameOf moduleFiles;
 in {
   nixFiles = nixFilesCtl.tree;
 
-  modules = {
-    nixos = nixos.files;
-    homeManager = homeManager.files;
-    darwin = darwin.files;
-  };
+  modules = builtins.listToAttrs (map (p: {
+      name = nameOf p;
+      value = byPath.${p};
+    })
+    moduleFiles);
 
   # Read by `checks.<system>.nix-registry`; `dangling` is prose as often as it is
   # a broken import, so it is reported, not gated.
   registry = {
     count = nixFilesCtl.count;
-    namespaced = {
-      nixos = nixos.count;
-      homeManager = homeManager.count;
-      darwin = darwin.count;
-    };
-    duplicates = nixos.duplicates ++ homeManager.duplicates ++ darwin.duplicates;
+    modules = builtins.length moduleFiles;
+    # `listToAttrs` keeps the last of a collision silently; the check asserts
+    # this is empty instead.
+    duplicates = lib.subtractLists (lib.unique names) names;
     dangling = lib.unique (
       builtins.filter (p: !(builtins.elem p paths)) (
-        builtins.concatLists (map importsOf paths)
+        builtins.concatLists (map nixFilesCtl.importsOfPath paths)
       )
     );
   };

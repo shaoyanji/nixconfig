@@ -1,5 +1,6 @@
 # Firewall scoping: every open service port is reachable ONLY on the LAN NICs
 {
+  self,
   config,
   lib,
   ...
@@ -11,7 +12,7 @@
     "tailscale0"
   ];
 in {
-  imports = [../../modules/profiles/service-exposure.nix];
+  imports = [self.modules."profiles.service-exposure"];
 
   # Every port frieren exposes on the scoped interfaces, declared once. Keys
   # are named after the owning service where known; `tcp-<port>`/`udp-<port>`

@@ -1,10 +1,14 @@
 # The kitchen-workstation face of frieren: niri media centre on the Samsung 4K,
 # driven through the Dell D6000 dock. Only applied by `specialisation.desktop`;
 # the boot default is the headless server config in configuration.nix.
-{lib, ...}: let
+{
+  self,
+  lib,
+  ...
+}: let
   user = import ../../modules/global/user.nix;
 in {
-  imports = [../../modules/profiles/base-desktop-environment.nix];
+  imports = [self.modules."profiles.base-desktop-environment"];
 
   # nixpkgs' graphical-desktop module mkDefault-enables speechd for any desktop,
   # which drags in speech-dispatcher -> mbrola voices (~650 MiB, measured

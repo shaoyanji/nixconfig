@@ -1,5 +1,6 @@
 # scratch — Fujitsu ESPRIMO D556 (i5-6500) dwl desktop on the shared profile.
 {
+  self,
   lib,
   pkgs,
   ...
@@ -9,10 +10,10 @@ in {
   # Fork, not inheritance: see [[flake/policies.nix#desktop-fork-not-disable]].
   imports = [
     ./hardware-configuration.nix
-    ../../modules/profiles/base-node.nix
-    ../../modules/profiles/boot.nix
-    ../../modules/profiles/dwl-desktop.nix
-    ../../modules/profiles/nas-client.nix
+    self.modules."profiles.base-node"
+    self.modules."profiles.boot"
+    self.modules."profiles.dwl-desktop"
+    self.modules."profiles.nas-client"
   ];
 
   # The compositor, keybinds, launcher, wallpaper and idle/lock all come from the
@@ -22,8 +23,8 @@ in {
 
   # Replaces the fleet userland default; see [[flake/policies.nix#desktop-fork-not-disable]].
   fleet.hmUserModules = [
-    ../../modules/user/base.nix
-    ../../modules/user/desktop/appimage-menu.nix
+    self.modules."user.base"
+    self.modules."user.desktop.appimage-menu"
   ];
 
   # /boot is ext4 (legacy BIOS + GRUB) — NOT a vfat ESP, so systemd-boot

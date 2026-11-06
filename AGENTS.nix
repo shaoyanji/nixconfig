@@ -21,9 +21,8 @@
         reaches a sibling with `import ../profiles/x.nix`. "Who uses this file" was a
         grep across paths — the token cost the graph exists to remove.
 
-        Shape: `flake-parts` (one input; the repo already speaks flakes). Each
-        `modules/**.nix` gains `config.flake.modules.nixos.<name>`, imported by name
-        through `self`; `flake/host-inventory.nix` keeps `kind`, `system`, host path.
+        Shape: `flake-parts`; each `modules/**.nix` gains a name imported through
+        `self`, and `flake/host-inventory.nix` keeps `kind`, `system`, host path.
 
         Gate: same toplevel `drvPath` per representative chain and `checks:host` green.
 
@@ -31,21 +30,26 @@
         toplevels and penguin's HM generation unchanged (within one git state:
         `configurationRevision` is `<commit>-dirty`).
 
-        Landed 2026-11-06: `lib/nix-files.nix` walks all 301 tracked `.nix` files —
-        the four-root walk missed `flake.nix`, the overlays and `tools/` — and
-        `flake/nix-registry.nix` publishes `.#nixFiles` by path and `.#modules.<kind>`
-        as each kind's import closure (`services.zettel-graph`).
-        `checks.<system>.nix-registry` proves one name per file: `listToAttrs` drops a
-        collision silently, and stripping `.nix` merged `flake.nix` into `flake/`.
-        Dev shells now live in `perSystem` (`flake/systems.nix` shared) with 11
-        identical `drvPath`s on both arches.
+        Landed 2026-11-06: `lib/nix-files.nix` walks all 301 tracked `.nix` files
+        (the four-root walk missed `flake.nix`, overlays, `tools/`) and
+        `flake/nix-registry.nix` names every file under `modules/` as
+        `.#modules."profiles.base-node"` — one flat namespace, because a closure of
+        the chains cannot be the vocabulary those chains import. Chains, all 33
+        host files and 43 host sub-modules (dns, reverse-proxy, microvms) import
+        by name — 136 entries. `import ../modules` survives only where the import
+        is a load, not a module list: the `global/user.nix` constant record, and
+        `grub-boot`/`microvm-host`/`base.nix` applied with arguments. Dev shells
+        moved to `perSystem`; 11 identical `drvPath`s both arches.
+        `checks.<system>.nix-registry` proves one name per file — stripping `.nix`
+        once merged `flake.nix` into `flake/`.
 
-        Next rung: hosts importing by name through `self`; then `import ../` falls to
-        the files that own their data, and `refs.modules` gains what landed.
+        Next rung: intra-module `imports = [./x.nix]` by name. `self` already
+        reaches every module (specialArgs on nixos/darwin, extraSpecialArgs in all
+        four HM embedders), so it is mechanical except at the applied-function
+        call sites, which need `self` passed in the record (`guests.nix`,
+        `base.nix`).
 
-        Exit: the three flake wiring files shrink to projections, and the note gains
-        `refs.modules` naming what landed. Until then the module wiring is beta: a
-        hand-wired import is what comes apart when a path moves.
+        Exit: wiring files shrink to projections; `refs.modules` names what landed.
       '';
     };
     d1-compiled-context = {

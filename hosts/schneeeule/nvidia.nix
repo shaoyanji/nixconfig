@@ -1,11 +1,12 @@
 {
+  self,
   config,
   lib,
   pkgs,
   ...
 }: {
   imports = [
-    ../../modules/profiles/nvidia.nix
+    self.modules."profiles.nvidia"
   ];
 
   # extraPackages = with pkgs; [nvidia-vaapi-driver];

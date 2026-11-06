@@ -1,10 +1,11 @@
 {
+  self,
   config,
   lib,
   ...
 }: {
   imports = [
-    ../../modules/profiles/nvidia.nix
+    self.modules."profiles.nvidia"
   ];
   services.xserver.videoDrivers = [
     "amdgpu"

@@ -1,4 +1,5 @@
 {
+  self,
   inputs,
   config,
   pkgs,
@@ -8,12 +9,12 @@
   user = import ../../modules/global/user.nix;
 in {
   imports = [
-    ../../modules/config/authorized-keys.nix
+    self.modules."config.authorized-keys"
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/profiles/base-desktop-environment.nix
-    ../../modules/profiles/laptop.nix
-    ../../modules/global/microvm-network.nix
+    self.modules."profiles.base-desktop-environment"
+    self.modules."profiles.laptop"
+    self.modules."global.microvm-network"
     inputs.microvm.nixosModules.host
     (import ../../modules/profiles/microvm-host.nix {
       inherit pkgs;

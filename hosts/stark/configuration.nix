@@ -1,14 +1,18 @@
 # stark — Dell Inspiron 24 3477 All-in-One Steam desktop.
-{pkgs, ...}: let
+{
+  self,
+  pkgs,
+  ...
+}: let
   user = import ../../modules/global/user.nix;
 in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia-mx110.nix
-    ../../modules/profiles/steam.nix
-    ../../modules/profiles/base-desktop-environment.nix
-    ../../modules/profiles/base-node.nix
+    self.modules."profiles.steam"
+    self.modules."profiles.base-desktop-environment"
+    self.modules."profiles.base-node"
   ];
 
   # --- Desktop (eisen-style): niri compositor + DankMaterialShell greeter ---

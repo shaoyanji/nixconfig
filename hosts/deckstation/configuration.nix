@@ -1,10 +1,10 @@
-_: {
+{self, ...}: {
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700-xt.nix
-    ../../modules/profiles/base-node.nix
-    ../../modules/profiles/steamos.nix
-    ../../modules/profiles/sunshine.nix
+    self.modules."profiles.base-node"
+    self.modules."profiles.steamos"
+    self.modules."profiles.sunshine"
   ];
 
   # X server is required by greetd so XWayland can host any legacy

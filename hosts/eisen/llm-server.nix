@@ -1,5 +1,6 @@
 # eisen — offline MoE LLM inference (native llama.cpp, Vulkan/radv).
 {
+  self,
   config,
   lib,
   pkgs,
@@ -270,7 +271,7 @@
   };
 in {
   imports = [
-    ../../modules/profiles/nixbuild-client.nix
+    self.modules."profiles.nixbuild-client"
   ];
 
   # Remote builder client for nixbuild.net (enables distributed builds initiated from eisen in the basement)

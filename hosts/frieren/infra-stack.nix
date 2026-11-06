@@ -1,5 +1,6 @@
 # Infrastructure monitoring + backups for frieren.
 {
+  self,
   pkgs,
   config,
   lib,
@@ -465,23 +466,23 @@ in {
       natExternalInterface = "enp1s0";
       bridgeAddress = "192.168.83.1/24";
     })
-    ../../modules/services/fleet-monitors.nix
-    ../../modules/services/downloads-sort.nix
-    ../../modules/services/steam-cache.nix
-    ../../modules/services/agent-scheduler.nix
-    ../../modules/services/btrfs-watchdog.nix
-    ../../modules/services/uds-static-bridge.nix
-    ../../modules/services/ups-simulation-drill.nix
-    ../../modules/services/sqlite-maintenance.nix
+    self.modules."services.fleet-monitors"
+    self.modules."services.downloads-sort"
+    self.modules."services.steam-cache"
+    self.modules."services.agent-scheduler"
+    self.modules."services.btrfs-watchdog"
+    self.modules."services.uds-static-bridge"
+    self.modules."services.ups-simulation-drill"
+    self.modules."services.sqlite-maintenance"
     # paperless-watchdog followed paperless to delphi (hosts/delphi/configuration.nix)
-    ../../modules/services/kiwix-watchdog.nix
-    ../../modules/services/postgres-pgvector-audit.nix
-    ../../modules/services/fleet-session-reaper.nix
-    ../../modules/services/postgres-backup-drill.nix
-    ../../modules/services/flake-advisory-audit.nix
-    ../../modules/services/tls-cert-watchdog.nix
-    ../../modules/services/systemone-decision.nix
-    ../../modules/services/fleet-governor.nix
+    self.modules."services.kiwix-watchdog"
+    self.modules."services.postgres-pgvector-audit"
+    self.modules."services.fleet-session-reaper"
+    self.modules."services.postgres-backup-drill"
+    self.modules."services.flake-advisory-audit"
+    self.modules."services.tls-cert-watchdog"
+    self.modules."services.systemone-decision"
+    self.modules."services.fleet-governor"
   ];
 
   # --- monitors as code (HC-6) ---

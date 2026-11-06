@@ -1,16 +1,16 @@
-{...}: {
+{self, ...}: {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia.nix
-    ../../modules/profiles/steam.nix
-    ../../modules/profiles/impermanence.nix
+    self.modules."profiles.steam"
+    self.modules."profiles.impermanence"
     # dms/niri greeter — schneeeule has dms in its closure (desktop chain),
     # so it can define programs.dank-material-shell.  noDE kiosks must not
     # import this.
-    ../../modules/profiles/impermanence-greeter.nix
-    ../../modules/profiles/base-desktop-environment.nix
-    ../../modules/profiles/laptop.nix
+    self.modules."profiles.impermanence-greeter"
+    self.modules."profiles.base-desktop-environment"
+    self.modules."profiles.laptop"
   ];
 
   fileSystems."/persist/data" = {

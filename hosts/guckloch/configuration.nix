@@ -1,4 +1,5 @@
 {
+  self,
   pkgs,
   config,
   lib,
@@ -7,8 +8,8 @@
   user = import ../../modules/global/user.nix;
 in {
   imports = [
-    ../../modules/profiles/sshfs-nas-client.nix
-    ../../modules/config/authorized-keys.nix
+    self.modules."profiles.sshfs-nas-client"
+    self.modules."config.authorized-keys"
   ];
 
   wsl.enable = true;
@@ -42,8 +43,8 @@ in {
 
   home-manager.users.${user.name} = {
     imports = [
-      ../../modules/user/ai/skills
-      ../../modules/user/ai/antigravity-cli.nix
+      self.modules."user.ai.skills"
+      self.modules."user.ai.antigravity-cli"
     ];
 
     # The fleet syncs shell history over the tailnet, which this host is not on

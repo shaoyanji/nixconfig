@@ -1,4 +1,5 @@
 {
+  self,
   inputs,
   config,
   pkgs,
@@ -10,7 +11,7 @@ in {
   garnix.server.enable = true;
 
   imports = [
-    ../modules/config/authorized-keys.nix
+    self.modules."config.authorized-keys"
     inputs.sops-nix.nixosModules.sops
   ];
 

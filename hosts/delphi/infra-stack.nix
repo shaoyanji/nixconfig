@@ -1,5 +1,6 @@
 # Delphi Infrastructure Stack — Health Sentinel, Autonomous Agent Schedulers, and Resource Regulation
 {
+  self,
   pkgs,
   lib,
   ...
@@ -264,8 +265,8 @@
   '';
 in {
   imports = [
-    ../../modules/services/fleet-sentinel.nix
-    ../../modules/services/agent-scheduler.nix
+    self.modules."services.fleet-sentinel"
+    self.modules."services.agent-scheduler"
   ];
 
   # --- Closed-loop observation ledger & health endpoint ----------------------

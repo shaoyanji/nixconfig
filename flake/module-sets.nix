@@ -3,6 +3,9 @@
   self,
   lib,
   inventory,
+  # Every file under modules/, named (flake/nix-registry.nix). Chains name
+  # modules instead of pointing at them; the walk is the one list.
+  moduleFiles,
 }: let
   # Compiled fleet inventory (lib/inventory.nix), injected into EVERY chain so
   # every host kind — nixos, darwin, containers/demo, standalone home-manager —
@@ -34,7 +37,7 @@
       {
         system.configurationRevision = self.rev or self.dirtyRev or null;
       }
-      ../modules/global/global.nix
+      moduleFiles.global
       # llm-agents.nix: prebuilt AI agent CLI packages under pkgs.llm-agents.<name>
       # Exposing the flake's packages attribute set directly ensures 100% cache hits
       # from https://cache.numtide.com instead of compiling from source.
@@ -58,17 +61,17 @@
       inputs.nix-index-database.homeModules.nix-index
       # ~/AGENTS.md from `.#homeAgents.<host>`; standalone HM configs get
       # `fleetHost` from the home assembler in flake/outputs.nix.
-      ../modules/user/ai/home-agents.nix
+      moduleFiles."user.ai.home-agents"
     ];
 in rec {
   inherit globalModules hmSharedModulesHome inventoryModules;
   globalModulesNixos =
     globalModules
     ++ [
-      ../modules/global/nixos.nix
+      moduleFiles."global.nixos"
       # Determinate Nix: one Nix binary for every NixOS host (rollback = the
       # generation). See the module header for the priority and registry traps.
-      ../modules/global/determinate-nix.nix
+      moduleFiles."global.determinate-nix"
       inputs.home-manager.nixosModules.default
       inputs.sops-nix.nixosModules.sops
       inputs.nix-index-database.nixosModules.nix-index
@@ -86,8 +89,8 @@ in rec {
   globalModulesRyoku =
     globalModules
     ++ [
-      ../modules/global/nixos.nix
-      ../modules/global/determinate-nix.nix
+      moduleFiles."global.nixos"
+      moduleFiles."global.determinate-nix"
       inputs.home-manager.nixosModules.default
       inputs.sops-nix.nixosModules.sops
       inputs.nix-index-database.nixosModules.nix-index
@@ -96,14 +99,14 @@ in rec {
   globalModulesImpermanence =
     globalModulesNixos
     ++ [
-      ../modules/global/impermanence.nix
+      moduleFiles."global.impermanence"
       inputs.impermanence.nixosModules.impermanence
       inputs.disko.nixosModules.default
     ];
   globalModulesMacos =
     globalModules
     ++ [
-      ../modules/global/macos.nix
+      moduleFiles."global.macos"
       inputs.nix-homebrew.darwinModules.nix-homebrew
       inputs.home-manager.darwinModules.default
       inputs.sops-nix.darwinModules.sops
@@ -111,8 +114,8 @@ in rec {
   globalModulesContainers =
     globalModules
     ++ [
-      ../modules/global/noDE.nix
-      ../modules/global/determinate-nix.nix
+      moduleFiles."global.noDE"
+      moduleFiles."global.determinate-nix"
       inputs.sops-nix.nixosModules.sops
       inputs.home-manager.nixosModules.default
       inputs.nix-index-database.nixosModules.nix-index
@@ -120,8 +123,8 @@ in rec {
   globalModulesDemo =
     globalModules
     ++ [
-      ../modules/global/demo.nix
-      ../modules/global/determinate-nix.nix
+      moduleFiles."global.demo"
+      moduleFiles."global.determinate-nix"
       inputs.home-manager.nixosModules.default
     ];
   # Standalone-home chain. These hosts build their own pkgs outside the

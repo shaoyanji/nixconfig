@@ -1,4 +1,5 @@
 {
+  self,
   pkgs,
   lib,
   ...
@@ -17,14 +18,14 @@ in {
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia.nix
-    ../../modules/profiles/steam.nix
+    self.modules."profiles.steam"
     # Ryoku is the high-end desktop tier (2026-11-02). It replaces
     # base-desktop-environment: Ryoku owns the compositor build, the session
     # packages, the portals and the SDDM theme, so importing both would put two
     # shells in one session and let this profile's mkForce'd portal config win
     # over Ryoku's.
-    ../../modules/profiles/ryoku-desktop.nix
-    ../../modules/profiles/laptop.nix
+    self.modules."profiles.ryoku-desktop"
+    self.modules."profiles.laptop"
   ];
 
   ssh.ca.enableClient = true;

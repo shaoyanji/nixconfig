@@ -1,8 +1,12 @@
 # minyx — DNS failover for *.frieren.lan: blocky answers the zone, keepalived
 # floats the VIP at priority 1 so it can only take over from a dead primary.
 # Preconditions (reserved addresses, narrowed pool) and test: docs/dns-failover.md.
-{lib, ...}: {
-  imports = [../../modules/net/dns/failover.nix];
+{
+  self,
+  lib,
+  ...
+}: {
+  imports = [self.modules."net.dns.failover"];
 
   profiles.dnsFailover = {
     enable = true;

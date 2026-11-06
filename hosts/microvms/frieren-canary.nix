@@ -2,6 +2,7 @@
 # systemd/ssh machine, then throws away. ./base.nix supplies the skeleton; this
 # file is a login, a tool set and an ephemeral /var.
 {
+  self,
   config,
   lib,
   pkgs,
@@ -11,6 +12,7 @@
 in {
   imports = [
     (import ./base.nix {
+      inherit self;
       hostName = "frieren-canary";
       ipAddress = "192.168.83.10";
       tapId = "microvm1";

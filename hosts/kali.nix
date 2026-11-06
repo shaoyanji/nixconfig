@@ -1,4 +1,8 @@
-{pkgs, ...}:
+{
+  self,
+  pkgs,
+  ...
+}:
 # Kali Home Manager profile
 # Targets: Raspberry Pi (aarch64) + OnePlus 6 NetHunter Pro (chroot aarch64)
 # Contract: mobile-first security starter pack. Everything here must build on
@@ -11,8 +15,8 @@
 
   imports = [
     # ../modules/shell/nushell.nix
-    ../modules/shell/starship.nix
-    ../modules/roles/minimal.nix
+    self.modules."shell.starship"
+    self.modules."roles.minimal"
   ];
 
   home.packages = with pkgs; [

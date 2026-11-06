@@ -1,4 +1,5 @@
 {
+  self,
   lib,
   pkgs,
   ...
@@ -8,8 +9,8 @@ in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/profiles/base-desktop-environment.nix
-    ../../modules/profiles/laptop.nix
+    self.modules."profiles.base-desktop-environment"
+    self.modules."profiles.laptop"
   ];
 
   boot.supportedFilesystems = ["nfs"];

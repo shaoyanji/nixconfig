@@ -1,4 +1,5 @@
 {
+  self,
   pkgs,
   lib,
   ...
@@ -10,7 +11,7 @@ in {
     # Upstream's module re-applies a tesseract narrowing to `package`; this fork
     # drops that so the package stays cached. Shared with delphi since 2026-11-02,
     # which is why it lives under modules/ instead of beside this host.
-    ../../modules/services/paperless-fork.nix
+    self.modules."services.paperless-fork"
   ];
 
   services.paperless = {

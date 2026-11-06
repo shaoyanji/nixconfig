@@ -230,20 +230,19 @@ lib.genAttrs systems.work (
           then 1
           else 0;
         leaves = countLeaves self.nixFiles;
+        named = builtins.length (builtins.attrNames self.modules);
         problems =
           lib.optional (leaves != reg.count)
           ".#nixFiles names ${toString leaves} files, the walk found ${toString reg.count} — a name collision dropped one"
           ++ map (n: "duplicate module name: ${n}") reg.duplicates
-          ++ lib.optional (reg.namespaced.nixos == 0)
-          "modules.nixos is empty — the nixos host roots stopped resolving"
-          ++ lib.optional (reg.namespaced.homeManager == 0)
-          "modules.homeManager is empty — the home host roots stopped resolving";
+          ++ lib.optional (named != reg.modules)
+          ".#modules has ${toString named} names for ${toString reg.modules} files under modules/ — a duplicate collapsed two";
       in
         if problems != []
         then builtins.throw "nix file registry is inconsistent:\n  ${lib.concatStringsSep "\n  " problems}"
         else
           pkgs.runCommand "nix-registry" {} ''
-            echo "nix files: ${toString reg.count} (nixos ${toString reg.namespaced.nixos} modules, homeManager ${toString reg.namespaced.homeManager}, darwin ${toString reg.namespaced.darwin})"
+            echo "nix files: ${toString reg.count}; modules named: ${toString reg.modules}"
             touch $out
           '';
       # --- pkgs.txt: the format a human will actually edit -------------------

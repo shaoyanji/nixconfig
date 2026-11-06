@@ -1,5 +1,6 @@
 # eisen — Xeon E5-2673 v3 + RX 5700 + 64 GB RAM gaming desktop.
 {
+  self,
   pkgs,
   lib,
   ...
@@ -9,18 +10,18 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
-    ../../modules/profiles/steam.nix
+    self.modules."profiles.steam"
     # Ryoku is the high-end desktop tier (2026-11-02). It replaces
     # base-desktop-environment: Ryoku owns the compositor build, the session
     # packages, the portals and the SDDM theme, so importing both would put two
     # shells in one session and let this profile's mkForce'd portal config win
     # over Ryoku's.
-    ../../modules/profiles/ryoku-desktop.nix
-    ../../modules/profiles/base-node.nix
-    ../../modules/profiles/nas-client.nix
-    ../../modules/profiles/sunshine.nix
-    ../../modules/services/qwen-tts.nix
-    ../../modules/services/llm-decision-router.nix
+    self.modules."profiles.ryoku-desktop"
+    self.modules."profiles.base-node"
+    self.modules."profiles.nas-client"
+    self.modules."profiles.sunshine"
+    self.modules."services.qwen-tts"
+    self.modules."services.llm-decision-router"
     ./llm-server.nix
     ./parakeet.nix
     ./decision-models.nix

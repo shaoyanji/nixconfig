@@ -1,12 +1,13 @@
 # Sledgehammer — NixOS USB stick for fleet provisioning.
 {
+  self,
   lib,
   pkgs,
   ...
 }: {
   imports = [
     (import ./disko.nix {device = "/dev/sdb";})
-    ../../modules/profiles/base-node.nix
+    self.modules."profiles.base-node"
   ];
 
   boot.loader = {

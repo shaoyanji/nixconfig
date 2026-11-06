@@ -1,7 +1,11 @@
-{pkgs, ...}: {
+{
+  self,
+  pkgs,
+  ...
+}: {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/profiles/firewall-baseline.nix
+    self.modules."profiles.firewall-baseline"
   ];
 
   # No sops, no secrets — use plain password for demo/travel box

@@ -1,4 +1,5 @@
 {
+  self,
   config,
   pkgs,
   lib,
@@ -43,16 +44,16 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./hardware.nix
-    ../../modules/profiles/base-node.nix
-    ../../modules/profiles/burgernas-client.nix
-    ../../modules/profiles/hermes.nix
-    ../../modules/profiles/server-hardening.nix
-    ../../modules/profiles/laptop.nix
+    self.modules."profiles.base-node"
+    self.modules."profiles.burgernas-client"
+    self.modules."profiles.hermes"
+    self.modules."profiles.server-hardening"
+    self.modules."profiles.laptop"
     # desktop-client is infrastructure, not the desktop: it owns avahi/resolved/
     # tailscale/fuse and the NAS mounts. The graphical stack lives in desktop.nix,
     # which only the `desktop` specialisation imports.
-    ../../modules/profiles/boot.nix
-    ../../modules/profiles/desktop-client.nix
+    self.modules."profiles.boot"
+    self.modules."profiles.desktop-client"
     ./dns.nix
     ./media-stack.nix
     ./transmission.nix
@@ -65,17 +66,17 @@ in {
     ./infra-stack.nix
     ./reverse-proxy.nix
     ./gemini.nix
-    ../../modules/services/aria2-daemon.nix
-    ../../modules/services/harmonia.nix
-    ../../modules/services/fleet-sentinel.nix
-    ../../modules/services/fleet-classification-gate.nix
-    ../../modules/services/home-assistant.nix
-    ../../modules/services/kiwix.nix
-    ../../modules/services/paste.nix
-    ../../modules/services/atuin-server.nix
-    ../../modules/services/iventoy.nix
-    ../../modules/services/simplex-smp-server.nix
-    ../../modules/profiles/nixbuild-client.nix
+    self.modules."services.aria2-daemon"
+    self.modules."services.harmonia"
+    self.modules."services.fleet-sentinel"
+    self.modules."services.fleet-classification-gate"
+    self.modules."services.home-assistant"
+    self.modules."services.kiwix"
+    self.modules."services.paste"
+    self.modules."services.atuin-server"
+    self.modules."services.iventoy"
+    self.modules."services.simplex-smp-server"
+    self.modules."profiles.nixbuild-client"
   ];
 
   # Frieren signs SSH user certificates like the workstations (aristotle,

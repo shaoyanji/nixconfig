@@ -2,13 +2,14 @@
 # and four Python units that held ~520 MiB resident on the NAS.
 # The three deliberate differences from frieren and the wandb overlay: docs/service-offload.md.
 {
+  self,
   pkgs,
   lib,
   ...
 }: let
   dataDir = "/var/lib/paperless";
 in {
-  imports = [../../modules/services/paperless-fork.nix];
+  imports = [self.modules."services.paperless-fork"];
 
   services.paperless = {
     enable = true;

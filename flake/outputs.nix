@@ -23,8 +23,18 @@
   # Compiled fleet inventory (lib/inventory.nix). Parsed once here and shared
   # into module chains, checks and packages — hosts never re-parse inventory.toml.
   inventory = import ../lib/inventory.nix {inherit lib;};
-  moduleSets = import ./module-sets.nix {inherit inputs self lib inventory;};
-  hostInventory = import ./host-inventory.nix {inherit inputs moduleSets self;};
+  # The names a chain uses (`moduleFiles.<name>`) come from the walk, not from
+  # this file's outputs, so the chains can be named without a cycle.
+  nixFilesCtl = import ../lib/nix-files.nix {inherit lib;};
+  nixRegistry = import ./nix-registry.nix {inherit lib nixFilesCtl;};
+  moduleSets = import ./module-sets.nix {
+    inherit inputs self lib inventory;
+    moduleFiles = nixRegistry.modules;
+  };
+  hostInventory = import ./host-inventory.nix {
+    inherit inputs moduleSets self;
+    moduleFiles = nixRegistry.modules;
+  };
   # Fleet-wide gates (per-host eval checks + the all-in-one aggregate). One binding
   # because both outputs come from the same computation.
   fleetCtl = import ./fleet-checks.nix {inherit lib systems pkgsFor self inventory;};
@@ -64,11 +74,8 @@
   # `nix eval .#taskfileGraph.version` is a 4 s leaf read, and the same compile
   # feeds the flake check, the parity gate and any future generator.
   taskfileCtl = import ../lib/taskfile.nix {inherit lib;};
-  # Every tracked `.nix` file as data (lib/nix-files.nix), and the names the flake
-  # publishes for them (flake/nix-registry.nix). The walk is shared with the
-  # knowledge graph, so "what exists" and "who imports it" cannot disagree.
-  nixFilesCtl = import ../lib/nix-files.nix {inherit lib;};
-  nixRegistry = import ./nix-registry.nix {inherit lib hostInventory nixFilesCtl;};
+  # nixFilesCtl / nixRegistry are bound above the chains: `flake/nix-registry.nix`
+  # is the walk's naming layer, shared with the knowledge graph.
   # The CLI table is compiled once here and projected into both namespaces:
   # `packages.<system>.cli` for a store path, `apps.<system>.cli` for `nix run`.
   cliFor = system:

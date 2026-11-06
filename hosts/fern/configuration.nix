@@ -1,5 +1,6 @@
 # fern — HP 15 laptop (Ryzen 3 3250U) niri desktop.
 {
+  self,
   pkgs,
   lib,
   ...
@@ -11,9 +12,9 @@ in {
     ./hardware-configuration.nix
     # Ryoku pilot (2026-10-31): replaces base-desktop-environment, which would
     # enable niri and expect the DMS greeter under greetd.
-    ../../modules/profiles/ryoku-desktop.nix
-    ../../modules/profiles/laptop.nix
-    ../../modules/profiles/base-node.nix
+    self.modules."profiles.ryoku-desktop"
+    self.modules."profiles.laptop"
+    self.modules."profiles.base-node"
   ];
 
   # --- Tailscale: keep the native LAN path ---

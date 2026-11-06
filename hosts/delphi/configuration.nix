@@ -1,5 +1,6 @@
 # delphi — Oracle Cloud Infrastructure (OCI) Ampere A1 ARM64 headless server.
 {
+  self,
   pkgs,
   config,
   lib,
@@ -269,21 +270,21 @@ in {
     ./paperless.nix
     ./vaultwarden.nix
     ./zettel-graph.nix
-    ../../modules/profiles/base-node.nix
-    ../../modules/profiles/firewall-baseline.nix
-    ../../modules/profiles/hermes.nix
-    ../../modules/profiles/operator-tools.nix
-    ../../modules/profiles/sops-user-identity.nix
-    ../../modules/net/dns/tailnet-address.nix
-    ../../modules/services/agent-turns.nix
-    ../../modules/services/dsh-web.nix
-    ../../modules/services/fleet-monitors.nix
-    ../../modules/services/mataroa-console.nix
-    ../../modules/services/media-relay.nix
-    ../../modules/services/offload-bridge.nix
-    ../../modules/services/paperless-watchdog.nix
-    ../../modules/services/service-portal.nix
-    ../../modules/services/systemone-decision.nix
+    self.modules."profiles.base-node"
+    self.modules."profiles.firewall-baseline"
+    self.modules."profiles.hermes"
+    self.modules."profiles.operator-tools"
+    self.modules."profiles.sops-user-identity"
+    self.modules."net.dns.tailnet-address"
+    self.modules."services.agent-turns"
+    self.modules."services.dsh-web"
+    self.modules."services.fleet-monitors"
+    self.modules."services.mataroa-console"
+    self.modules."services.media-relay"
+    self.modules."services.offload-bridge"
+    self.modules."services.paperless-watchdog"
+    self.modules."services.service-portal"
+    self.modules."services.systemone-decision"
   ];
 
   # --- YouTube relay: fetch where the peering is good, serve over the tailnet ---
@@ -1214,7 +1215,7 @@ in {
   # install Chromium/qmd/crush. The gateway units follow `enable` (set by
   # profiles.hermes); seeding the persona is this host's own declaration.
   home-manager.users.${user.name} = {
-    imports = [../../modules/services/mail-agent.nix];
+    imports = [self.modules."services.mail-agent"];
     # `programs.edgeCaller` is NOT enabled here, and the reason is arithmetic, not
     # taste: flake/daemons.nix scores it ev = -1.1 s (p=0.5, save=-1.0, cost=1.2)
     # against the agent naming the pattern itself, and

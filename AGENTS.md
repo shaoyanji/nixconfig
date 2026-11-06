@@ -98,14 +98,15 @@ flake.nix → flake-parts mkFlake (root; systems from flake/systems.nix) → fla
   ├── homeConfigurations   ← homeManagerConfiguration
   ├── packages             ← flake/packages.nix (sites · artifacts · servers · cli)
   ├── checks · devShells   ← flake/checks.nix · perSystem → flake/devshells.nix
-  ├── nixFiles · modules   ← flake/nix-registry.nix (every .nix, by path and by import name)
+  ├── nixFiles · modules   ← flake/nix-registry.nix (every .nix by path; modules/ by name)
   └── docs · sites         ← lib/docs.nix · lib/aki-site.nix
 ```
 
 A host registers once in `flake/host-inventory.nix` (`kind`, `system`, chain, module paths);
 `outputs.nix` projects it by `kind`, so nothing is wired by hand. The module tree is
-`.#nixFiles` (every tracked `.nix`, by path) and `.#modules.<kind>` (the same files named by
-import closure), both walked in `lib/nix-files.nix` and gated by `checks.<system>.nix-registry`.
+`.#nixFiles` (every tracked `.nix`, by path) and `.#modules` (every file under `modules/`, keyed
+`profiles.base-node`), walked in `lib/nix-files.nix`; chains and hosts name modules —
+`self.modules."profiles.base-node"` — and `checks.<system>.nix-registry` proves one name per file.
 
 ### Module chains
 

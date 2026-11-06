@@ -1,8 +1,12 @@
 # The zettel reader on delphi: the private front end and an export of the
 # private vault behind one tailnet mount. The service is loopback; the mount in
 # configuration.nix is the only route in. docs/zettel-graph.md
-{config, ...}: {
-  imports = [../../modules/services/zettel-graph.nix];
+{
+  self,
+  config,
+  ...
+}: {
+  imports = [self.modules."services.zettel-graph"];
 
   services.zettelGraph = {
     enable = true;

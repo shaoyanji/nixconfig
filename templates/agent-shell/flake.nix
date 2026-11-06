@@ -62,6 +62,9 @@
             test -s "$out"
             printf 'wrote %s (%s bytes)\n' "$out" "$(wc -c < "$out")"
           }
+          # Exported: `nix develop -c bash -c 'browse …'` starts a child bash that
+          # does not inherit an unexported function.
+          export -f browse shot
           echo "agent-shell: $(agent-browser --version 2>/dev/null | head -1)"
           echo "  browse <url>        bounded open + accessibility snapshot"
           echo "  shot <url> <png>    headless screenshot, then close"

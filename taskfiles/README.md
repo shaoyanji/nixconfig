@@ -10,6 +10,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep).
 - `taskfiles/codespace.yml` owns GitHub Codespaces as a mode (`codespace:*`) for work that runs in someone else's remote devcontainer: the file transport `gh codespace cp` cannot do, a push that happens on the host holding the git auth, a reset for the post-rewrite clone, and a stop that waits for `Shutdown`.
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
+- `taskfiles/instabox.yml` owns InstaBox machines (`instabox:*`) as a dependency-free surface: the HTTP API with the sops key, an SSH token minted through it for a plain `ssh`, and `exec` when no shell is needed. Skill: `.agents/skills/instabox`.
 - `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
 - Rebuild flags have exactly one home: `scripts/task/rebuild-flags.sh` renders
   builders / substitutes / flakes and nothing else, so a switch task states the host and

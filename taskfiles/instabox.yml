@@ -1,0 +1,101 @@
+version: "3"
+
+# InstaBox machines as a fleet surface: the HTTP API and plain ssh, no provider
+# CLI and nothing it installs. scripts/task/instabox.sh holds every call; the
+# key's home, the token mechanics and the measured traps are .agents/skills/
+# instabox.
+#
+# The machine is named positionally, and go-task reads a bare word after the
+# task name as a TASK name, not an argument: every call goes through `--`,
+# `task instabox:ssh -- clanker`, and a command after it is one more word.
+
+tasks:
+  instabox:ls:
+    desc: List InstaBox machines with state, size and auto-suspend
+    summary: >
+      One row per machine in the key's workspace: name, state, vCPUs, memory,
+      persistent disk, the auto-suspend window and the `m_…` id. The id is what
+      a token line and every API path speak; the name is only how you find it.
+    cmds:
+      - bash scripts/task/instabox.sh ls
+
+  instabox:get:
+    desc: Print one machine's full record as JSON
+    summary: >
+      `task instabox:get -- clanker`. Spec, storage, runtime readiness, run clock
+      and the free-tier flags. `jq -r .state` is the one field to watch after
+      start, suspend or wake.
+    cmds:
+      - bash scripts/task/instabox.sh get {{.CLI_ARGS}}
+
+  instabox:ssh:
+    desc: Open a shell on a machine, using a minted SSH token (no CLI, no key)
+    summary: >
+      `task instabox:ssh -- clanker`, or `task instabox:ssh -- clanker 'uname -a'`
+      for one command. The gateway terminates SSH: the login is a token
+      (`ibssh_…`) minted through the API and cached for seven days, and the
+      gateway's host key is pinned into ~/.cache/nixconfig-instabox/known_hosts
+      on first use. No key is placed on the machine and no agent forwarding is
+      available.
+    cmds:
+      - bash scripts/task/instabox.sh ssh {{.CLI_ARGS}}
+
+  instabox:run:
+    desc: Run one command on a machine over ssh
+    summary: >
+      `task instabox:run -- clanker 'nproc; df -h /data'`. Same token path as
+      `instabox:ssh`; use it when the answer is text, and `instabox:exec` when
+      the command returns an exit status you want to branch on.
+    cmds:
+      - bash scripts/task/instabox.sh run {{.CLI_ARGS}}
+
+  instabox:exec:
+    desc: Run one command through the HTTP API — no ssh, no token
+    summary: >
+      `task instabox:exec -- clanker 'go version'`. The narrowest path: one
+      API call, stdout and stderr back as JSON, and the command's own exit
+      status as the task's. It needs no ssh client, no known_hosts and mints
+      nothing, so it is what an unattended agent should reach for first.
+    cmds:
+      - bash scripts/task/instabox.sh exec {{.CLI_ARGS}}
+
+  instabox:token:
+    desc: Print a machine's ssh line (minted; cached for seven days)
+    summary: >
+      The line is `ssh -p <port> <token>@ssh.instabox.sh`, and the token is the
+      credential — anyone holding it has a shell. It is printed so it can be
+      pasted into a terminal or a tool that cannot read sops; revoke every token
+      of a machine from the dashboard, or with
+      `DELETE /v1/machines/<id>/ssh-tokens`.
+    cmds:
+      - bash scripts/task/instabox.sh token {{.CLI_ARGS}}
+
+  instabox:start:
+    desc: Start a machine (answers an operation id at once)
+    cmds:
+      - bash scripts/task/instabox.sh start {{.CLI_ARGS}}
+
+  instabox:stop:
+    desc: Stop a machine; its persistent disk survives
+    cmds:
+      - bash scripts/task/instabox.sh stop {{.CLI_ARGS}}
+
+  instabox:suspend:
+    desc: Suspend a machine (the API's "pause")
+    cmds:
+      - bash scripts/task/instabox.sh suspend {{.CLI_ARGS}}
+
+  instabox:resume:
+    desc: Resume a suspended machine
+    cmds:
+      - bash scripts/task/instabox.sh resume {{.CLI_ARGS}}
+
+  instabox:wake:
+    desc: Wake a machine that auto-suspended itself
+    cmds:
+      - bash scripts/task/instabox.sh wake {{.CLI_ARGS}}
+
+  instabox:ports:
+    desc: List a machine's published ports
+    cmds:
+      - bash scripts/task/instabox.sh ports {{.CLI_ARGS}}

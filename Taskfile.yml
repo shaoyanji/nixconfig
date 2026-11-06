@@ -87,6 +87,10 @@ includes:
         taskfile: taskfiles/infra.yml
         dir: .
         flatten: true
+    instabox:
+        taskfile: taskfiles/instabox.yml
+        dir: .
+        flatten: true
     lifecycle:
         taskfile: taskfiles/lifecycle.yml
         dir: .

@@ -33,6 +33,50 @@ fan-out the plan serves without queueing.
 - Jev grading is not a prompt: it is a Typesafe call, ~1 s, and its input is the
   candidates (2,000 characters each).
 
+## The context packet — these models have no tools
+
+A lane is a chat completion: no filesystem, no clock, no repository, no memory
+of this conversation. Anything it is not told, it invents. So the round takes a
+packet, and the packet is the whole world the model gets:
+
+```bash
+speculate.sh --label "storybook dedication" --context /tmp/sb-context.md "…"
+```
+
+The script prepends it as `CONTEXT — facts you cannot look up; treat as given`.
+Rules that keep it useful:
+
+- **Under 1,500 characters.** The prompt cap is 15,000 per lane; a packet that
+  fills it leaves no room to answer. Facts only — names, invariants, the current
+  state, the constraints. No instructions (those belong in the question).
+- **State today's date and the host** when the question can turn on them.
+  "Latest release" without a date is a hallucination with a timestamp.
+- **Restate what the model cannot see**: the repo's conventions, the schema it
+  must satisfy, the audience. A model that is told the audience writes for it.
+- **One packet per project, reused across rounds.** Rewriting it per round is
+  how two lanes end up answering different questions.
+
+This is the lever that makes a cheap lane worth its prompt: the packet supplies
+what the model lacks, so its quality — not its context window — is what shows.
+
+## The winner ledger
+
+Every graded round appends one JSONL row (default
+`~/.local/state/cpg-speculate/winners.jsonl`):
+
+```bash
+jq -r '[.label, .winner_model, .probability, .status] | @tsv' \
+  ~/.local/state/cpg-speculate/winners.jsonl | sort | uniq -c | sort -rn | head
+```
+
+That table is the only answer to "which model should write this?" that survives
+more than a week. `CPG_SPECULATE_LEDGER` or `--ledger PATH` retargets it;
+`--no-ledger` is for experiments that would pollute the record.
+
+`--xs SUBJECT` also posts one fleet turn per round (`SOURCE=cpg-speculate.<model>`),
+so the winners are visible to the other agents. Use it for rounds that produced
+work; skip it for smoke tests, or the turn log becomes a prompt dump.
+
 ## What the grader is, and is not
 
 The script grades with `jev-decide decide` over a `choice` question whose

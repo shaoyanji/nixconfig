@@ -108,6 +108,29 @@ cpg chat -m gpt-6-luna -s advice-review "Critique this plan in three bullets: �
 probability means "read it yourself", never "discard it". The full decision
 contract is the `jevdecide` skill.
 
+## Borrowing a better writer than yourself
+
+A fast local agent is good at tools and truth and often worse at prose and
+long-chain reasoning. The lane is the fix, but only if the split is honest:
+
+- **The agent owns facts, the lane owns voice.** Anything checkable — a path, a
+  version, a count — the agent verifies and puts in the packet; the lane gets
+  "write this". A lane that is asked to recall facts writes confident fiction.
+- **Send the material, not a reference to it.** "Review the module in
+  modules/foo.nix" is unanswerable; paste the module. Under 15,000 characters,
+  and say so when you had to cut.
+- **Ask for the shape you will consume.** "Three bullets, no preamble", "one
+  sentence", "JSON with keys a,b" — a lane's default is an essay, and an essay
+  costs the local agent more context than writing it would have.
+- **Draft wide, then narrow.** For anything with a taste component, use
+  `cpg-speculate` (four cheap drafts, one graded winner) rather than asking one
+  model twice; the winner comes back as text you can edit.
+- **Edit, do not adopt.** The reply is a draft with no access to the repo. Read
+  it, check every claim, keep the sentences that are better than yours.
+- **Record what won.** `speculate.sh` appends a ledger row per round; over a
+  week that table says which model writes which kind of thing on this account
+  far better than any benchmark does.
+
 ## Use it for
 
 - A design choice you are 60/40 on, where a second model's objection would change the decision.

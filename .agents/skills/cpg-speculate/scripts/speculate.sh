@@ -7,17 +7,42 @@
 set -euo pipefail
 
 json=0
-if [ "${1:-}" = "--json" ]; then
-  json=1
-  shift
-fi
+context_file=""
+round_label=""
+xs_subject=""
+ledger="${CPG_SPECULATE_LEDGER:-$HOME/.local/state/cpg-speculate/winners.jsonl}"
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --json) json=1; shift ;;
+    --context) context_file=${2:-}; shift 2 ;;
+    --label) round_label=${2:-}; shift 2 ;;
+    --ledger) ledger=${2:-}; shift 2 ;;
+    --no-ledger) ledger=""; shift ;;
+    --xs) xs_subject=${2:-}; shift 2 ;;
+    --) shift; break ;;
+    -*) echo "speculate: unknown flag $1" >&2; exit 64 ;;
+    *) break ;;
+  esac
+done
 
 question=${1:-}
 if [ -z "$question" ]; then
-  echo 'usage: speculate.sh [--json] "question" [model ...]' >&2
+  echo 'usage: speculate.sh [--json] [--context FILE] [--label NAME] "question" [model ...]' >&2
   exit 64
 fi
 shift || true
+
+# A chat model has no tools, no clock and no repository: the packet is the only
+# context it will ever get, so it is sent once, labelled as given.
+prompt=$question
+if [ -n "$context_file" ]; then
+  if [ ! -r "$context_file" ]; then
+    echo "speculate: cannot read context file $context_file" >&2
+    exit 66
+  fi
+  prompt=$(printf 'CONTEXT — facts you cannot look up; treat as given, do not restate them:\n%s\n\nTASK:\n%s' "$(cat "$context_file")" "$question")
+fi
 
 models=("$@")
 if [ ${#models[@]} -eq 0 ]; then
@@ -32,7 +57,7 @@ trap 'rm -rf "$tmp"' EXIT
 i=0
 for m in "${models[@]}"; do
   (
-    cpg chat -m "$m" -s "spec-$$-$i" "$question" >"$tmp/$i.out" 2>"$tmp/$i.err"
+    cpg chat -m "$m" -s "spec-$$-$i" "$prompt" >"$tmp/$i.out" 2>"$tmp/$i.err"
     echo $? >"$tmp/$i.rc"
   ) &
   i=$((i + 1))
@@ -126,6 +151,30 @@ prob=$(printf '%s' "$decision" | jq -r '(.decisions.best.probability // "-") | i
 margin=$(printf '%s' "$decision" | jq -r '(.decisions.best.margin // "-") | if type == "number" then (.*100|round/100) else . end' 2>/dev/null || echo -)
 
 echo "speculate: ${#labels[@]} lanes, Jev chose $chosen ($model) p=$prob m=$margin [$status]" >&2
+
+# The long-term record: which model wins which kind of question. This is the
+# only way a round is worth more than the answer it produced.
+if [ -n "$ledger" ]; then
+  mkdir -p "$(dirname "$ledger")"
+  lanes=$(printf '%s\n' "${kept_models[@]}" | jq -R . | jq -sc .)
+  jq -cn --arg ts "$(date -u +%FT%TZ)" --arg label "${round_label:-$question}" \
+    --arg q "${question:0:300}" --arg w "$chosen" --arg wm "$model" \
+    --argjson lanes "$lanes" --arg p "$prob" --arg m "$margin" --arg st "$status" \
+    '{ts: $ts, label: $label, question: $q, winner_label: $w, winner_model: $wm,
+      lanes: $lanes, probability: $p, margin: $m, status: $st}' >>"$ledger"
+fi
+
+# One turn per round when asked: the fleet log is where a winner becomes a
+# trail, and SOURCE carries the model so a later reader can score the lanes.
+if [ -n "$xs_subject" ]; then
+  task -t "$HOME/Documents/nixconfig/Taskfile.yml" agents:xs:post \
+    SUBJECT="$xs_subject" \
+    ACTION="cpg round '${round_label:-$question}': ${#labels[@]} lanes -> $model (p=$prob m=$margin)" \
+    OUTCOME=done \
+    SOURCE="cpg-speculate.$(printf %s "$model" | tr -c "[:alnum:]._-" ".")" \
+    CLAIMS="winner=$model prob=$prob margin=$margin" >/dev/null 2>&1 \
+    || echo "speculate: xs post failed (queued by the shim)" >&2
+fi
 
 if [ "$json" -eq 1 ]; then
   jq -n --arg q "$question" --argjson d "${decision:-null}" --arg l "$chosen" --arg m "$model" \

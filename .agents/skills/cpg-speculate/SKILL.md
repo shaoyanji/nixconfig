@@ -1,0 +1,91 @@
+---
+name: cpg-speculate
+description: Speculative rounds — four cheap models answer in parallel, Jev grades, one winner comes back. Uses the prompt budget, not the image allowance.
+version: 1.0.0
+tags: [ai, chatplayground, jev, sampling, routing]
+platforms: [linux, macos]
+---
+
+# cpg-speculate
+
+A speculative round: N cheap lanes answer the same question at once, Jev picks
+the best, and the caller reads one answer. The main agent spends its context on
+the winner instead of on four drafts.
+
+```bash
+.agents/skills/cpg-speculate/scripts/speculate.sh \
+  "In two sentences: when should a NixOS module use mkDefault instead of mkForce?"
+# → the winning answer, nothing else
+# stderr: speculate: 4 lanes, Jev chose c0 (gpt-6-luna) p=0.94 m=0.88 [selected]
+```
+
+`--json` returns `{question, candidates, decision, winner:{label,model,text}}`.
+
+## Why the budget allows it
+
+Measured with `cpg usage` (2026-11-06): 50 prompts per 10 minutes, 300 per hour,
+4 concurrent streams. One four-lane round is four prompts and zero image
+allowance, and the concurrency cap is exactly four — so a round is the largest
+fan-out the plan serves without queueing.
+
+- 300/h ÷ 4 = **75 rounds an hour**, one every 48 seconds sustained.
+- 50/10m caps a burst at **12 rounds** in any ten minutes.
+- Jev grading is not a prompt: it is a Typesafe call, ~1 s, and its input is the
+  candidates (2,000 characters each).
+
+## What the grader is, and is not
+
+The script grades with `jev-decide decide` over a `choice` question whose
+criteria are the candidate labels. That is a classifier, not a model writing a
+review: it returns a label, a probability and a margin.
+
+`needs_review` is a draft signal, not a veto — the script still emits that top
+choice and says so on stderr. Read the `p=`/`m=` line before trusting a round
+where the winner was close.
+
+A "Sonnet 5.5 grader" is not available on this plan: 10 of the 11 premium ids
+answer `403 only available to active subscribers` on the lifetime pool, and
+`claude-sonnet-5-5` is one of them. The only premium id measured to answer is
+`gemini-3.8-flash`, and adding it as a fifth lane costs a prompt while leaving
+Jev as the decider. Re-test when the plan changes (`cpg usage`).
+
+## Default lanes
+
+`gpt-6-luna`, `mimo-v2.6-pro`, `gemini-3.8-flash-l`, `deepseek-v4-pro` — all
+basic-tier, all served on this account, deliberately different vendors. Override
+by passing model ids after the question; a lane that 403s or times out is
+dropped and the round continues on the rest.
+
+Pick lanes for disagreement, not for a leaderboard: the value is that four
+different models rarely fail the same way.
+
+## When to run a round
+
+- A design trade-off where a wrong, confident answer is expensive.
+- Diagnoses with several plausible causes: four independent reads are a cheap
+  differential.
+- Naming, wording and framing, where the first idea is usually the obvious one.
+
+Not for: anything needing tools, files or the web (no lane has them), a question
+you can settle yourself, or a long document — the 15,000-character prompt cap is
+per lane and the script does not chunk.
+
+## Pacing a long project
+
+Rounds are the unit to plan in, not prompts:
+
+- 200 rounds is about 2.7 hours at 75/h, ignoring burst windows.
+- A burst of 12 rounds (48 prompts) exhausts the ten-minute window; space rounds
+  or accept the wait instead of retrying into a 429.
+- Check the window before a batch: `cpg usage --json | jq '.entitlement.rateLimits.prompt'`.
+  The counters there are prompts sent, not rounds.
+
+## Failure behaviour
+
+- One lane dies → dropped, round continues (`speculate: <model> produced nothing …`).
+- All lanes die → exit 1, nothing emitted.
+- One lane survives → emitted as-is, no Jev call spent on a one-option choice.
+- Jev fails → the first surviving lane is returned with a warning on stderr.
+
+Related: `cpg-advice` (single lane), `cpg-image` (the other budget), `jevdecide`
+(the grader's contract).

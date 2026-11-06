@@ -49,7 +49,11 @@ if [ -L "$TARGET" ]; then
   rm -f "$TARGET"
 fi
 
-keys_of() { grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' "$1" 2>/dev/null | tr -d '=' | sort -u; }
+# `|| true` is load-bearing: grep exits 1 when a file has no keys at all, and
+# under `set -o pipefail` that became the function's status — so the very case
+# this script exists for (a host with no ~/.hermes/.env yet) aborted the run at
+# the first diff instead of building the file. Measured on delphi 2026-11-06.
+keys_of() { { grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' "$1" 2>/dev/null || true; } | tr -d '=' | sort -u; }
 
 # --- seed .env.local once, from the keys the rendered file does not define ----
 if [ ! -e "$LOCAL" ] && [ -f "$TARGET" ]; then
@@ -66,7 +70,7 @@ if [ ! -e "$LOCAL" ] && [ -f "$TARGET" ]; then
       exit 1
     fi
     # Match on the key, keep the whole line: values are never parsed here.
-    awk -F= 'NR == FNR { keep[$0] = 1; next } ($1 in keep) { print }' \
+    awk -F= 'FILENAME == ARGV[1] { keep[$0] = 1; next } ($1 in keep) { print }' \
       "$keyfile.extras" "$TARGET" >"$localfile"
     install -m 0600 "$localfile" "$LOCAL"
     printf 'hermes-env-sync: seeded %s with %s key(s) the rendered file does not define: %s\n' \
@@ -94,11 +98,17 @@ fi
 current="$(mktemp)"
 trap 'rm -f "$desired" "$current"' EXIT
 [ -f "$TARGET" ] && cat "$TARGET" >"$current"
-added="$(keys_of "$desired" | comm -13 <(keys_of "$current") - | tr '\n' ' ')"
-removed="$(keys_of "$current" | comm -23 <(keys_of "$desired") - | tr '\n' ' ')"
+# Both files, not one file and stdin: `comm -13 a -` reads its second input
+# from the pipe, and a redirection mistake there silently swapped the two
+# sides — reported as "added" and "dropped" being the same list (2026-11-06).
+added="$(comm -13 <(keys_of "$current") <(keys_of "$desired") | tr '\n' ' ')"
+removed="$(comm -23 <(keys_of "$current") <(keys_of "$desired") | tr '\n' ' ')"
 # Same key, different value: the rotation case the old bridge could not see.
 # Key names only — awk compares whole lines in memory and prints the first field.
-changed="$(awk -F= 'NR == FNR { v[$1] = substr($0, length($1) + 2); next }
+# `FILENAME == ARGV[1]`, not `NR == FNR`: when the first file is EMPTY (no
+# .env yet) FNR still equals NR on the first line of the second file, so the
+# desired file's own first key was filed as a "current" value.
+changed="$(awk -F= 'FILENAME == ARGV[1] { v[$1] = substr($0, length($1) + 2); next }
   { if (($1 in v) && v[$1] != substr($0, length($1) + 2)) print $1 }' "$current" "$desired" | tr '\n' ' ')"
 
 if [ "$MODE" = "check" ]; then

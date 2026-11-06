@@ -51,6 +51,46 @@
     amd64 = "sha256-Q9YfvvarRYuPYb5mWZqf8K7lfVoObE2MwrRn5nu9UIU=";
   };
 
+  # A token's holder is not always this module's user: the turns dashboard runs
+  # as the login user (it is the one whose Hermes credentials a prompt uses), so
+  # it authenticates with its own secret rather than borrowing the store's.
+  tokenSpec = lib.types.submodule {
+    options = {
+      name = lib.mkOption {
+        type = lib.types.str;
+        description = "sops secret name holding this token.";
+      };
+      owner = lib.mkOption {
+        type = lib.types.str;
+        description = "User that reads the token file — the process that authenticates with it.";
+      };
+      group = lib.mkOption {
+        type = lib.types.str;
+        default = "users";
+        description = ''
+          Group that reads the token file. The shim reads every token file at
+          start, so a token held by another user needs this module's group and
+          a group-readable mode, or the shim cannot start at all.
+        '';
+      };
+      mode = lib.mkOption {
+        type = lib.types.str;
+        default = "0400";
+        description = "File mode; `0440` when both the holder and the shim read it.";
+      };
+    };
+  };
+
+  normToken = t:
+    if builtins.isString t
+    then {
+      name = t;
+      owner = cfg.user;
+      group = cfg.user;
+      mode = "0400";
+    }
+    else {mode = "0400";} // t;
+
   user = import ../global/user.nix;
   stateDir = "/var/lib/${cfg.stateDirectory}";
   storePath = "${stateDir}/store";
@@ -106,14 +146,15 @@ in {
     };
 
     additionalTokens = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
+      type = lib.types.listOf (lib.types.either lib.types.str tokenSpec);
       default = [];
       description = ''
-        Extra sops secret names whose values are also accepted as bearer tokens,
-        one per holder that is not a fleet agent (the netbook's, for instance).
+        Extra sops secrets whose values are also accepted as bearer tokens, one
+        per holder that is not a fleet agent (the netbook's, for instance).
         Separate tokens, not a shared one: revoking an agent removes its secret
         from `sops.yaml`-backed config without touching the fleet credential, and
-        the shim's access log names which token authenticated each append.
+        the shim's access log names which token authenticated each append. A bare
+        string is owned by this module's user; an attrset names another reader.
       '';
     };
 
@@ -188,17 +229,28 @@ in {
 
     # Every accepted token is a declared secret, so the shim's credential set is
     # whatever this host activated — no directory scan, no unlabelled file.
-    sops.secrets = lib.genAttrs ([cfg.tokenSecret] ++ cfg.additionalTokens) (_: {
-      owner = cfg.user;
-      group = cfg.user;
-      mode = "0400";
-      # The NixOS plane's file; modules/profiles/base-node.nix sets the same
-      # default, and naming it here keeps the secret's home visible at its use.
-      sopsFile = ../../modules/secrets.yaml;
-      # The shim reads its tokens once, at start. Without this a rotated value
-      # reaches /run/secrets and nothing notices until the next reboot.
-      restartUnits = ["agent-turns-shim.service"];
-    });
+    sops.secrets =
+      {
+        ${cfg.tokenSecret} = {
+          owner = cfg.user;
+          group = cfg.user;
+          mode = "0400";
+          # The NixOS plane's file; modules/profiles/base-node.nix sets the same
+          # default, and naming it here keeps the secret's home visible at its use.
+          sopsFile = ../../modules/secrets.yaml;
+          # The shim reads its tokens once, at start. Without this a rotated value
+          # reaches /run/secrets and nothing notices until the next reboot.
+          restartUnits = ["agent-turns-shim.service"];
+        };
+      }
+      // lib.listToAttrs (map (t:
+        lib.nameValuePair t.name {
+          owner = t.owner;
+          group = t.group;
+          mode = t.mode;
+          sopsFile = ../../modules/secrets.yaml;
+          restartUnits = ["agent-turns-shim.service"];
+        }) (map normToken cfg.additionalTokens));
 
     systemd.services.xs-agent-turns = {
       description = "xs event stream store for agent turns (Unix socket only)";
@@ -256,7 +308,9 @@ in {
           "XS_SOCKET=${socketPath}"
           "AGENT_TURNS_TOKENS=${
             lib.concatStringsSep ":" (
-              map (name: "${name}=${config.sops.secrets.${name}.path}") ([cfg.tokenSecret] ++ cfg.additionalTokens)
+              map (t: "${t.name}=${config.sops.secrets.${t.name}.path}") (
+                [{name = cfg.tokenSecret;}] ++ map normToken cfg.additionalTokens
+              )
             )
           }"
           "AGENT_TURNS_DB=${stateDir}/dedup.sqlite"

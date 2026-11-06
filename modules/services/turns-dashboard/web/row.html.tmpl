@@ -1,0 +1,22 @@
+<article class="turn" id="turn-{{.ID}}">
+<div class="shard" aria-hidden="true"></div>
+<header class="head">
+<span class="out {{.OutcomeClass}}">{{.Outcome}}</span>
+<span class="src">{{.Source}}</span>
+<span class="when">{{.When}}</span>
+</header>
+<h2 class="subject">{{.Subject}}</h2>
+<p class="action">{{.Action}}</p>
+{{if .Rationale}}<p class="why">{{.Rationale}}</p>{{end}}
+<div class="meta">
+{{if .Branch}}<span class="tag">branch {{.Branch}}</span>{{end}}
+{{if .Commit}}<span class="tag">base {{.Commit}}</span>{{end}}
+{{range .Files}}<span class="file">{{.}}</span>{{end}}
+{{if .FilesMore}}<span class="file more">+{{.FilesMore}} more</span>{{end}}
+</div>
+<div class="ask">
+<textarea id="p-{{.ID}}" rows="1" data-bind="ask_{{.Signal}}" placeholder="instruct hermes on this turn…" spellcheck="false"></textarea>
+<button type="button" class="go" data-on:click="@post('/api/prompt', {payload: {row: '{{.ID}}', prompt: $ask_{{.Signal}}}})">▸ hermes</button>
+</div>
+<div class="req" id="req-{{.ID}}"></div>
+</article>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>turns · delphi</title>
+<link rel="stylesheet" href="/style.css">
+<script type="module" src="/datastar.js"></script>
+</head>
+<body data-on:load="@get('/api/stream', {openWhenHidden: true})">
+<div class="grid" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<header class="topline">
+<span class="mark" aria-hidden="true">◤◢</span>
+<h1>agent <em>turns</em></h1>
+<span class="hint">wheel to travel · <kbd>/</kbd> jump to top</span>
+<span class="pulse" title="live stream from the xs store">live</span>
+</header>
+<main id="log" class="log" aria-live="polite"><div class="waiting">◢ listening for turns ◣</div></main>
+<script type="module" src="/app.js"></script>
+</body>
+</html>

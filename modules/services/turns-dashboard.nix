@@ -1,0 +1,145 @@
+# The agent-turn log as a reading surface, not a table: one panel per turn,
+# pushed to every open browser with Datastar SSE. Each panel can hand a prompt
+# to Hermes, whose answer lands in that panel. The shim stays the only holder of
+# the store's contract; this service is a reader with its own token.
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.services.turnsDashboard;
+
+  # Datastar is pinned and served from this origin: a tailnet page that needs a
+  # CDN to render is a page that is blank when the tailnet is all you have.
+  datastar = pkgs.fetchurl {
+    url = "https://cdn.jsdelivr.net/npm/@starfederation/datastar@1.0.0-beta.11/dist/datastar.js";
+    hash = "sha256-/EfStM/qnmzck9KHoNs4suiU2BOqHokuEd4b5SZiA3I=";
+  };
+
+  package = pkgs.buildGoModule {
+    pname = "turns-dashboard";
+    version = "0.1.0";
+    src = ./turns-dashboard;
+    # Standard library only: the SSE wire format is nine lines and a dependency
+    # to write it would be a dependency to audit.
+    vendorHash = null;
+    meta = {
+      description = "Live reading surface over the agent-turn store";
+      mainProgram = "turns-dashboard";
+    };
+  };
+
+  site = pkgs.runCommand "turns-dashboard-site" {} ''
+    mkdir -p $out
+    cp ${./turns-dashboard/web/index.html} $out/index.html
+    cp ${./turns-dashboard/web/style.css} $out/style.css
+    cp ${./turns-dashboard/web/app.js} $out/app.js
+    cp ${datastar} $out/datastar.js
+  '';
+
+  home = config.users.users.${cfg.user}.home;
+in {
+  options.services.turnsDashboard = {
+    enable = lib.mkEnableOption "the agent-turn dashboard (live SSE log with per-turn hermes prompts)";
+
+    port = lib.mkOption {
+      type = lib.types.port;
+      default = 8099;
+      description = ''
+        Loopback port the dashboard listens on. It is published only through
+        `services.servicePortal.mounts`, which is the single declaration of what
+        is reachable on the tailnet.
+      '';
+    };
+
+    user = lib.mkOption {
+      type = lib.types.str;
+      default = "devji";
+      description = ''
+        The account the service runs as. It is the login user on purpose: a
+        Hermes prompt is the operator's own turn, and Hermes reads its
+        credentials (and writes its sessions) from that home. It also means the
+        process can read its own token secret at 0400.
+      '';
+    };
+
+    tokenSecret = lib.mkOption {
+      type = lib.types.str;
+      default = "agent-turns-token-dashboard";
+      description = ''
+        sops secret holding this service's bearer token for the agent-turn shim.
+        It must also be listed in `services.agentTurns.additionalTokens` with
+        `owner = "${cfg.user}"`, or the shim refuses the read.
+      '';
+    };
+
+    hermesPackage = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = pkgs.llm-agents.hermes-agent;
+      description = ''
+        Hermes binary a panel prompt runs through (`hermes -z <prompt>`). Null
+        leaves the prompt form in place but answers "not configured", so the log
+        still reads on a host without an agent.
+      '';
+    };
+
+    stateDirectory = lib.mkOption {
+      type = lib.types.str;
+      default = "turns-dashboard";
+      description = "systemd StateDirectory holding the append-only prompt log.";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = config.services.agentTurns.enable;
+        message = "services.turnsDashboard reads the turn store: enable services.agentTurns on this host.";
+      }
+    ];
+
+    systemd.services.turns-dashboard = {
+      description = "Live agent-turn dashboard with per-turn Hermes prompts";
+      wantedBy = ["multi-user.target"];
+      unitConfig.X-Fleet-Role = "daemon";
+      after = ["agent-turns-shim.service" "network.target"];
+      wants = ["agent-turns-shim.service"];
+      serviceConfig = {
+        Type = "simple";
+        User = cfg.user;
+        Group = "users";
+        StateDirectory = cfg.stateDirectory;
+        WorkingDirectory = "%S/${cfg.stateDirectory}";
+        ExecStart = lib.concatStringsSep " " [
+          "${lib.getExe package}"
+          "-addr 127.0.0.1:${toString cfg.port}"
+          "-shim http://127.0.0.1:${toString config.services.agentTurns.port}"
+          "-token-file ${config.sops.secrets.${cfg.tokenSecret}.path}"
+          "-prompt-log /var/lib/${cfg.stateDirectory}/prompts.jsonl"
+          "-site ${site}"
+          "-hermes-home ${home}"
+          "-limit 120"
+          (lib.optionalString (cfg.hermesPackage != null) "-hermes ${lib.getExe cfg.hermesPackage}")
+        ];
+        Environment = [
+          "HOME=${home}"
+          # Hermes shells out to its subagents from PATH, and the wrapper
+          # directory is where the setuid sudo lives.
+          "PATH=/run/wrappers/bin:${home}/.nix-profile/bin:/etc/profiles/per-user/${cfg.user}/bin:/run/current-system/sw/bin"
+        ];
+        Restart = "always";
+        RestartSec = 3;
+
+        # Not `NoNewPrivileges`: a prompt is an operator turn, and Hermes'
+        # subagents escalate through the setuid sudo wrapper.
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        ProtectHome = false;
+        ReadWritePaths = ["/var/lib/${cfg.stateDirectory}"];
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+        MemoryMax = "512M";
+      };
+    };
+  };
+}

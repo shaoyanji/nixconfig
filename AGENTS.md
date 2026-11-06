@@ -442,7 +442,7 @@ There is no hand-kept file map here: the compiled surfaces are the map.
 Start points that are procedures rather than facts: [`.agents/SCHEMA.md`](.agents/SCHEMA.md)
 (doc and skill contract), [`docs/task-control-plane.md`](docs/task-control-plane.md),
 [`docs/agent-contract.md`](docs/agent-contract.md), [`docs/nix-patterns.md`](docs/nix-patterns.md),
-[`docs/agent-turns.md`](docs/agent-turns.md), [`README.md`](README.md),
+[`docs/agent-turns.md`](docs/agent-turns.md), [`docs/turns-dashboard.md`](docs/turns-dashboard.md), [`README.md`](README.md),
 [`MANUAL.md`](MANUAL.md), [`hosts/microvms/README.md`](hosts/microvms/README.md).
 
 Documentation is content that Nix compiles into a store path: one pure projection per artifact, no

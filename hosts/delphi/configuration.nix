@@ -285,6 +285,7 @@ in {
     self.modules."services.paperless-watchdog"
     self.modules."services.service-portal"
     self.modules."services.systemone-decision"
+    self.modules."services.turns-dashboard"
   ];
 
   # --- YouTube relay: fetch where the peering is good, serve over the tailnet ---
@@ -950,7 +951,10 @@ in {
   services.miniflux = {
     enable = true;
     config = {
-      LISTEN_ADDR = "127.0.0.1:8093";
+      # 8093 belongs to the agent-turns shim: miniflux bound it first and then
+      # lost every start to EADDRINUSE once the shim held it (2026-11-06). 8098
+      # is the next free loopback port in this block.
+      LISTEN_ADDR = "127.0.0.1:8098";
       # 8453/8454 are zettel-graph and mataroa; the mounts are a sequential
       # namespace, so the reading pair continues at 8455.
       BASE_URL = "https://${tailnetHost}:8455";
@@ -997,17 +1001,26 @@ in {
       server.hosts = ["127.0.0.1:5232"];
       auth = {
         type = "htpasswd";
-        htpasswd_filename = "/var/lib/radicale/users";
+        # A runtime file, not a state file: it is rendered from sops on every
+        # start, so it belongs in the directory systemd hands the unit writable.
+        htpasswd_filename = "/run/radicale/users";
         htpasswd_encryption = "bcrypt";
       };
       rights.type = "owner_only";
     };
   };
+  # The unit runs with a read-only /, so the htpasswd render needs a directory
+  # it owns: `/var/lib/radicale` is root-owned and the module's StateDirectory
+  # claims only the collections below it (measured 2026-11-06: the preStart died
+  # with `Read-only file system`, then `Permission denied`, on every start).
+  systemd.services.radicale.serviceConfig = {
+    RuntimeDirectory = "radicale";
+    RuntimeDirectoryMode = "0700";
+  };
   systemd.services.radicale.preStart = lib.mkBefore ''
     umask 077
     ${lib.getExe' pkgs.apacheHttpd "htpasswd"} -nbB ${user.name} \
-      "$(cat ${config.sops.secrets."radicale/password".path})" > /var/lib/radicale/users
-    chown ${config.services.radicale.user}:${config.services.radicale.group} /var/lib/radicale/users
+      "$(cat ${config.sops.secrets."radicale/password".path})" > /run/radicale/users
   '';
 
   # --- ntfy: the fleet's alerts, on a phone ----------------------------------
@@ -1075,6 +1088,14 @@ in {
   };
   services.vikunja = {
     enable = true;
+    # Upstream's own test suites are not this host's regression surface; the
+    # binary is. Running them cost the aarch64 CI job its whole 60-minute cap
+    # twice (2026-11-06), with the frontend suite still going. Building here
+    # with them off is the same artifact without the wait.
+    package = pkgs.vikunja.overrideAttrs (_final: prev: {
+      doCheck = false;
+      frontend = prev.frontend.overrideAttrs (_: {doCheck = false;});
+    });
     environmentFiles = [config.sops.templates."vikunja.env".path];
     frontendScheme = "https";
     frontendHostname = "${tailnetHost}:8459";
@@ -1096,7 +1117,24 @@ in {
     "agent-turns-token-netbook"
     "agent-turns-token-muse"
     "agent-turns-token-vesper"
+    # The dashboard is the one reader that runs as the login user: its prompts
+    # are that operator's Hermes turns, so it reads a token of its own rather
+    # than the store's (which stays 0400 between two service users).
+    {
+      name = "agent-turns-token-dashboard";
+      owner = user.name;
+      group = config.services.agentTurns.user;
+      # Both ends read this file: the shim loads every token at start, and the
+      # dashboard presents this one. Owner-only would leave the shim unable to
+      # boot (measured 2026-11-06: start-limit-hit, exit 1, no log line).
+      mode = "0440";
+    }
   ];
+
+  # --- The turn log as a reading surface ------------------------------------
+  # Read-only over the shim, plus one prompt box per turn that runs the same
+  # `hermes -z` an operator would type. The mount below is the whole exposure.
+  services.turnsDashboard.enable = true;
   # The store is the fleet's shared memory and it lives only here, so it gets a
   # nightly dump that leaves the host. 03:05 is inside frieren's maintenance
   # window and ahead of its 03:28 BurgerNAS and 03:30 local restic snapshots —
@@ -1231,7 +1269,7 @@ in {
       };
       miniflux = {
         port = 8455;
-        upstream = "http://127.0.0.1:8093";
+        upstream = "http://127.0.0.1:8098";
         title = "Miniflux";
         description = "Feed reader: the newsletters that do not need to be mail.";
         requires = ["miniflux.service"];
@@ -1286,6 +1324,13 @@ in {
       };
       # Machine-facing: POST /v1/events and GET /v1/events, bearer token, no
       # browsing surface, so no card on the tailnet page.
+      turns = {
+        port = 8460;
+        upstream = "http://127.0.0.1:${toString config.services.turnsDashboard.port}";
+        title = "Agent turns";
+        description = "The turn log as a field: one panel per turn, live, with a Hermes prompt on each.";
+        requires = ["turns-dashboard.service"];
+      };
       agent-turns = {
         port = 8449;
         upstream = "http://127.0.0.1:${toString config.services.agentTurns.port}";

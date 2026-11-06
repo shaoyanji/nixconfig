@@ -453,7 +453,15 @@ in {
           # antigravity module, not a second literal.
           "AGY_CLI_DISABLE_AUTO_UPDATE=true"
           "GEMINI_MODEL=${
-            lib.attrByPath ["antigravity-cli" "defaultModel"] "gemini-3.8-flash" config.programs
+            # A null attr is not a missing one: attrByPath returns the value it
+            # finds, so an unset model coerced here and failed the whole switch
+            # (measured 2026-11-06 on delphi). Fall back rather than crash.
+            let
+              model = config.programs.antigravity-cli.defaultModel or null;
+            in
+              if model == null
+              then "gemini-3.8-flash"
+              else model
           }"
           # /run/wrappers/bin MUST come first: it holds the setuid sudo
           # wrapper. A pkgs.sudo pulled into ~/.nix-profile (e.g. via the

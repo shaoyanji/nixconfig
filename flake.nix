@@ -151,10 +151,11 @@
   # projection `flake/outputs.nix` evaluated before this change, which is the
   # point — the wiring moves, the outputs do not.
   #
-  # `.#nixFiles` and `.#modules.<kind>` (flake/nix-registry.nix) are the named
-  # module tree: every tracked `.nix` file by path, and the importable tree per
-  # host kind, walked from the files instead of listed. Hosts still import by
-  # relative path; switching them to these names is the next rung, recorded as
+  # `.#nixFiles` and `.#modules` (flake/nix-registry.nix) are the named module
+  # tree: every tracked `.nix` file by path, and every file under `modules/` by
+  # the name an import uses, walked from the files instead of listed. Chains,
+  # hosts and modules import through it, so following an edge is a graph query
+  # (`ops:kg:module`) rather than a grep for a relative path. Record:
   # `dendritic-flake` in AGENTS.nix.
   outputs = inputs @ {
     self,

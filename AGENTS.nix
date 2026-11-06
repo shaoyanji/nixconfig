@@ -5,66 +5,44 @@
     dendritic-flake = {
       title = "Dendritic flake — `self` as the only import root";
       kind = "proposal";
-      status = "IN FLIGHT";
+      status = "DELIVERED";
       priority = "P2";
       date = "2026-11-05";
-      summary = "Move to flake-parts with the dendritic pattern: every module, host and package is a flake output imported by name through `self`, so no file list is hand-maintained and finding a module's users is a graph query, not a grep across relative paths.";
+      summary = "flake-parts owns the outputs and every file under `modules/` is a named flake output imported through `self`, so no file list is hand-maintained and finding a module's users is a graph query, not a grep across relative paths.";
       from = ["d1-compiled-context"];
       refs = {
-        modules = ["flake.nix" "flake/outputs.nix" "flake/nix-registry.nix" "lib/nix-files.nix" "flake/systems.nix" "flake/module-sets.nix" "flake/host-inventory.nix"];
-        tasks = ["checks:host" "checks:tasks"];
-        docs = ["docs/nix-patterns.md"];
+        modules = ["flake.nix" "flake/outputs.nix" "flake/systems.nix" "flake/devshells.nix" "flake/checks.nix" "flake/nix-registry.nix" "flake/module-sets.nix" "flake/host-inventory.nix" "lib/nix-files.nix" "lib/knowledge-graph.nix" "tools/kg-engine/kg_engine.exs"];
+        tasks = ["checks:host" "checks:tasks" "ops:kg:module"];
+        docs = ["README.md" "docs/nix-patterns.md"];
       };
       body = ''
-        Problem: `flake/outputs.nix` assembled by hand; hosts list modules in
+        Problem: `flake/outputs.nix` was assembled by hand, hosts listed modules in
         `flake/host-inventory.nix`, chains in `flake/module-sets.nix`, and a module
-        reaches a sibling with `import ../profiles/x.nix`. "Who uses this file" was a
-        grep across paths — the token cost the graph exists to remove.
+        reached a sibling by relative path. "Who uses this file" was a grep across
+        paths — the token cost the graph exists to remove.
 
-        Shape: `flake-parts`; each `modules/**.nix` gains a name imported through
-        `self`, and `flake/host-inventory.nix` keeps `kind`, `system`, host path.
+        Shape: `flake-parts` owns the outputs; every file under `modules/` gains a
+        name imported through `self`; `flake/host-inventory.nix` keeps `kind`,
+        `system` and the host path. Gate: the same toplevel `drvPath` per
+        representative chain, `checks:host` green.
 
-        Gate: same toplevel `drvPath` per representative chain and `checks:host` green.
+        DELIVERED in four commits (2026-11-05/06), in order:
+        `0cd2dac3` flake-parts owns the outputs — 32 names, three chain toplevels
+        and penguin's HM generation unchanged at one git state.
+        `0cdd1092` `lib/nix-files.nix` walks all 301 tracked `.nix` files, and dev
+        shells move to `perSystem` (11 identical `drvPath`s, both arches).
+        `622c6bee` `.#modules` names every file under `modules/`; chains, 33 host
+        files and 43 host sub-modules name their imports — 136 entries.
+        `c0e59754` 21 files under `modules/` name their own 66 imports, so a
+        sibling is not reached by path from anywhere; the graph reads name edges on
+        both sides and `checks.<system>.nix-registry` fails a duplicate or a name
+        that resolves to no file.
 
-        Landed 2026-11-05: `mkFlake` owns the outputs; 32 names, three chain
-        toplevels and penguin's HM generation unchanged (within one git state:
-        `configurationRevision` is `<commit>-dirty`).
-
-        Landed 2026-11-06: `lib/nix-files.nix` walks all 301 tracked `.nix` files
-        (the four-root walk missed `flake.nix`, overlays, `tools/`) and
-        `flake/nix-registry.nix` names every file under `modules/` as
-        `.#modules."profiles.base-node"` — one flat namespace, because a closure of
-        the chains cannot be the vocabulary those chains import. Chains, all 33
-        host files and 43 host sub-modules (dns, reverse-proxy, microvms) import
-        by name — 136 entries. `import ../modules` survives only where the import
-        is a load, not a module list: the `global/user.nix` constant record, and
-        `grub-boot`/`microvm-host`/`base.nix` applied with arguments. Dev shells
-        moved to `perSystem`; 11 identical `drvPath`s both arches.
-        `checks.<system>.nix-registry` proves one name per file — stripping `.nix`
-        once merged `flake.nix` into `flake/`.
-
-        Landed 2026-11-06 (intra-module): 21 files under `modules/` name their
-        own imports — 66 entries — so a module no longer points at a sibling by
-        relative path either: `roles/home.nix` imports `self.modules."roles.minimal"`
-        and `self.modules."user.desktop.niri"`, and the same holds inside
-        `sharedModules` and the `fleet.hmUserModules` default. Following an import
-        no longer requires knowing which directory the importer sits in. `self`
-        was already reaching every module (specialArgs on nixos/darwin,
-        extraSpecialArgs in all four HM embedders); `modules/global/nixos.nix`
-        keeps `listOf types.path`, since a name is still a path. The only path
-        imports left under `modules/` are loads: `config/shells/*` builders
-        (`callPackage`), `services/go-backend.nix`'s removed `pkgs/` path, and the
-        `global/user.nix` constant.
-
-        The graph reads the same vocabulary: `lib/nix-files.nix` turns a
-        `self.modules."x"` / `moduleFiles."x"` reference into an edge, its Elixir
-        twin does the same, and `checks.<system>.nix-registry` fails on a name
-        that resolves to no file — so a rename cannot leave an edge silently
-        missing on one side only. The note store itself yields no name edges:
-        a module named here is being discussed, and one rule (`nameRefsOf`)
-        decides that for the edges and the dangling-name scan alike.
-
-        Exit: wiring files shrink to projections; `refs.modules` names what landed.
+        Exit: met. `flake/outputs.nix` projects from `inventory.toml` and the walk
+        (`project = kind: fn:`), so neither a file list nor a host list is
+        hand-maintained. Wiring line counts did not fall — `flake.nix` +31 for the
+        flake-parts body, `checks.nix` +28 for the new gate — the lists did.
+        Remaining path imports are loads with arguments, not module lists.
       '';
     };
     d1-compiled-context = {
@@ -5590,7 +5568,8 @@
         `hermes --help` does not publish (it caught both hosts before the fix), the
         gateway's `needs_attention`, rendered-env KEY NAMES against `.env`, and
         `hermes doctor` on the persona config — 5 s, no model call, no ssh.
-      '';    };
+      '';
+    };
 
     nightly-timer-boot-catchup = {
       title = "A power cut caught the nightly audit up into its own boot";
@@ -5632,6 +5611,7 @@
         old form: exit 1, silent). Deployed 09:47 (`9y7m7akh`, runner `fmvr394`, wrapper
         `ww3hi46`); the live run at 09:48 saw all 11 services NOMINAL, dispatched the 05:00
         scorecard to #Fleet and took the quiet gate for 0 tokens.
-      '';    };
+      '';
+    };
   };
 }

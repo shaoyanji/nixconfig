@@ -34,8 +34,7 @@ a deploy of frieren, not a second cron.
 | `agy-nightly-system` | 05:00 | `agySystemRunner` on `~/SYSTEM.md` |
 | `audible-phased-liberation` | 00:00 | batch download, 50 GB cap, hard stop 02:50 |
 
-Read the definitions before relying on a schedule: `rg -n "agentScheduler" -A40
-hosts/frieren/infra-stack.nix`.
+Read the definitions first: `rg -n "agentScheduler" -A40 hosts/frieren/infra-stack.nix`.
 
 ### The 03:00 handoff runner
 
@@ -59,14 +58,12 @@ that needs judgement. Archives to `~/.agents/system/` and also preserves the fil
 ### The agent cascade (same for both jobs)
 
 Tier 1 `agy` → Tier 2 `freebuff-headless` → Tier 3 `hermes chat -q … --oneshot`
-→ Tier 4 `crush run --quiet`. The first tier that exits 0 wins; agy fails on
-credit exhaustion, so the fallbacks are not theoretical. Tier 3 sources both
-`~/.hermes/.env` and `~/.config/hermes/hermes.env`, rendered file last so a
-rotated sops secret is not shadowed by a stale `~/.hermes/.env`.
+→ Tier 4 `crush run --quiet`; the first exit 0 wins, and agy fails on credit
+exhaustion, so the fallbacks are real.
 
 ## Dispatch something now
 
-The old `agy-offload` helper is gone; do not look for it. Two routes:
+Two routes (the old `agy-offload` helper is gone — do not look for it):
 
 ```bash
 # a) queue it for 03:00 — survives logout, costs nothing until triage says go
@@ -81,14 +78,11 @@ Use `/var/lib/<job>` for the working directory, not `$HOME`: hardened units with
 `DynamicUser` + `ProtectHome` cannot read `/home`. Give each job its own directory
 so two of them do not share a log or a `HANDOFF.md`.
 
-Agent CLI flags worth knowing: `agy` needs `--dangerously-skip-permissions` in any
-detached session (there is no TTY to approve a prompt, so it would block forever);
-`crush` `run --quiet`. For hermes the query flags hang off the subcommand:
-`hermes chat -q "$prompt" --oneshot -Q --run-budget 600`. A top-level
-`hermes -q … --oneshot` exits 2 without running anything (it was the cascade's
-Tier 3 until 2026-11-05, so that tier never worked); `-Q` is what keeps the
-banner and session footer out of the job log. Hermes tool calls need no `--yolo`
-under a non-TTY: measured, a terminal-tool prompt completed and exited 0.
+Agent CLI flags: `agy` needs `--dangerously-skip-permissions` in a detached session
+(no TTY to approve a prompt, so it would block forever); `crush` `run --quiet`;
+hermes hangs them on the subcommand — `chat -q "$p" --oneshot -Q --run-budget 600`,
+`-Q` keeping banner and footer out of the log, and tools need no `--yolo` under a
+non-TTY (measured). Top-level `hermes -q … --oneshot` exits 2 without running.
 
 ## Watching it
 
@@ -99,7 +93,7 @@ ssh frieren "ls -lt ~/.agents/handoffs/ | head"
 ssh frieren "grep -c '\"status\": \"OPEN\"' /tmp/systemone-handoff-triage.json"
 ```
 
-A tier success line in the journal is the evidence; a green timer only says the
-timer fired. That distinction is the `fleet-sentinel` lesson applied here.
+A tier success line in the journal is the evidence; a green timer only says it fired
+(`fleet-sentinel`).
 
 Truth: `hosts/frieren/infra-stack.nix` — the jobs and their runners; this page is the procedure.

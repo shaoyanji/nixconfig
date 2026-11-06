@@ -216,9 +216,10 @@ in {
 
   # --- the .nix tree as flake outputs ---------------------------------------
   # `nixFiles` is the walk (every tracked file, nested by directory, path-valued)
-  # and `modules` names the importable tree per host kind. Pure data: naming a
-  # file evaluates no host, and `nix eval .#nixFiles.modules.services.zettel-graph`
-  # is a leaf read.
+  # and `modules` names every file under `modules/` for import
+  # (`profiles.base-node`), the vocabulary the chains, hosts and modules use. Pure
+  # data: naming a file evaluates no host, and
+  # `nix eval .#nixFiles.modules.services.zettel-graph` is a leaf read.
   inherit (nixRegistry) nixFiles modules;
 
   # `.#nixFileRegistry` is the diagnostic surface for the two above: how many

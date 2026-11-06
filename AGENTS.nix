@@ -5526,5 +5526,47 @@
         gateway's `needs_attention`, rendered-env KEY NAMES against `.env`, and
         `hermes doctor` on the persona config — 5 s, no model call, no ssh.
       '';    };
+
+    nightly-timer-boot-catchup = {
+      title = "A power cut caught the nightly audit up into its own boot";
+      kind = "experiment";
+      status = "DELIVERED";
+      priority = "P2";
+      date = "2026-11-06";
+      summary = "Both agent timers are Persistent, so the 06 Nov power cut fired them 30 s into boot: the handoff lost the shared flock and failed silently, and the audit judged services that were still starting — every Gatus row at its 10 s timeout, the 05:00 dispatch refused. Contention is a logged skip now and the audit waits out a boot settle.";
+      refs = {
+        hosts = ["frieren"];
+        modules = [
+          "hosts/frieren/infra-stack.nix"
+          "modules/services/agent-scheduler.nix"
+        ];
+      };
+      body = ''
+        The laptop was off from 00:19 to 07:53, so the 03:00 handoff and the 05:00
+        audit both missed their slot and both caught up in the same second of boot —
+        `Persistent=true` working as designed. What each did with that second is not.
+
+        **Handoff: a silent failure.** `flock -w 60` exits 1 and prints nothing when it
+        cannot get `/tmp/agent-scheduler.lock`, which the audit had just taken; 61 s in,
+        the unit was "Failed to start". A failed user unit is itself a trigger for the
+        next audit, so the outage became a repair run.
+
+        **Audit: judging a host mid-boot.** At 07:53:47 every frieren Gatus row was UP at
+        10000 ms — its own timeout — fleet sentinel was DOWN, and the dispatch died on
+        `[Errno 111]` to 127.0.0.1:5225 because simplex-chat was not listening yet. The
+        cascade then restarted pihole-ftl, tailscale-cert and fleet-sentinel: units that
+        were still legitimately activating.
+
+        **Fix (74462a68).** `modules/services/agent-scheduler.nix` runs jobs through a
+        wrapper that maps flock's conflict code to a logged skip (exit 0) and passes any
+        other status through untouched; the audit runner waits for 600 s of uptime
+        before Step 1. A normal 05:00 run is hours past boot and waits not at all.
+
+        **Measured.** Gate: 120 s uptime waits the exact 2 s delta to 122, 90000 s waits
+        0 ms. Lock: job status 7 → 7, held lock → logged skip, exit 0, job not run (the
+        old form: exit 1, silent). Deployed 09:47 (`9y7m7akh`, runner `fmvr394`, wrapper
+        `ww3hi46`); the live run at 09:48 saw all 11 services NOMINAL, dispatched the 05:00
+        scorecard to #Fleet and took the quiet gate for 0 tokens.
+      '';    };
   };
 }

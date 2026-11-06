@@ -1,7 +1,7 @@
 ---
 name: envs
 description: "Envs.net Debian hosting: SSH, web, Gemini, Gopher."
-version: 0.1.2
+version: 0.1.3
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
 platforms: [linux]
@@ -52,6 +52,53 @@ address in `src/capsule-redirects.tsv` so `/name.gmi` keeps resolving.
 `task envs:exec -- "<cmd>"` is the agent entry point; `envs:ssh` is interactive.
 Permissions matter here (pubnix): `envs:harden` enforces SSH 700/600 and
 `public_html` 750.
+
+## twtxt
+
+| | |
+| :--- | :--- |
+| Feed | `https://envs.net/~jisifu/twtxt.txt` (also `https://jisifu.envs.net/twtxt.txt`), `text/plain` |
+| File | `~/twtxt.txt` authoritative, copied to `~/public_html/twtxt.txt` |
+| Client | `twtxt` 1.3.1 on the host (`/usr/local/bin/twtxt` → `/opt/services/twtxt/venv`), config `~/.config/twtxt/config`, mode 600 |
+| Registries | `https://twtxt.envs.net` (getwtxt v0.5.0) and `https://registry.twtxt.org` |
+
+The feed lives in the home directory, not in `public_html`: `envs:publish` swaps
+the web root, so a feed kept only there dies at the next publish. The client's
+`post_tweet_hook` refreshes the published copy after every tweet:
+
+    post_tweet_hook = "install -m 644 {twtfile} ~/public_html/twtxt.txt"
+
+Keep the quotes. The client runs `shlex.split(hook)` and then
+`subprocess(…, shell=True)`, which executes only the first split element: an
+unquoted hook collapses to a bare `install` and fails with `missing file
+operand`, while the quoted string survives as one element and the shell sees the
+whole command (measured 2026-11-06). If a publish dropped the copy,
+`install -m 644 ~/twtxt.txt ~/public_html/twtxt.txt` restores it.
+
+Register with both registries, `nickname` alongside `url`, sent as
+`--data-urlencode` so the path is not mangled:
+
+    curl -X POST --get 'https://twtxt.envs.net/api/plain/users' \
+      --data-urlencode 'url=https://envs.net/~jisifu/twtxt.txt' \
+      --data-urlencode 'nickname=jisifu'
+
+Query by nickname. `?q=jisifu` answers on both, while `?url=…` does not filter:
+the envs instance returns an empty body for a feed it holds, and the global one
+returns the full user list (18 KB) because it is an Express app, not getwtxt,
+and advertises no `/api/plain/version` (404). Registration is immediate on both;
+ingestion is not. The envs registry lists a new tweet under
+`/api/plain/tweets?q=jisifu` within about 20 s, while the global registry had
+not indexed the same feed eight minutes after its `200 OK` (all measured
+2026-11-06) — check the feed itself before reporting a tweet as indexed.
+
+Post and read on the host; nothing in this repository wraps the client yet:
+
+    twtxt tweet "text"
+    twtxt timeline --limit 20
+    twtxt follow <nick> <url>    # [following] starts empty
+
+The file carries the optional header (`# nick`, `# url`, `# avatar`); the avatar
+is `https://envs.net/~jisifu/icon.svg`.
 
 ## Known issues
 

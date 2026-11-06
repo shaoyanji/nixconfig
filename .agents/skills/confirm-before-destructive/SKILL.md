@@ -1,6 +1,7 @@
 ---
 name: confirm-before-destructive
 description: The shared confirmation policy for destructive actions — confirm before delete, overwrite, send, deploy, push, stop, or restart. Reference this skill from every skill that has a destructive step.
+tags: [policy, safety, destructive, workflow]
 ---
 
 # confirm-before-destructive

@@ -1,6 +1,7 @@
 ---
 name: jevdecide
 description: "Jev-gated inbox cleaning: classify envelope metadata; delete only >=0.8; fetch bodies only when unsure."
+tags: [email, triage, inbox, jev, gating]
 ---
 
 # jevdecide — Jev-gated inbox cleaning

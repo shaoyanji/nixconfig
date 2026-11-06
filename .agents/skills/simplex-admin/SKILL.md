@@ -1,6 +1,7 @@
 ---
 name: simplex-admin
 description: SimpleX Chat fleet administration lives in a module — see modules/user/ai/skills/simplex-admin.
+tags: [simplex, chat, rpc, daemon, coordination]
 ---
 
 # SimpleX admin: one home

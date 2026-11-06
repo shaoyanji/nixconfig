@@ -321,10 +321,8 @@ func (s *server) stream(w http.ResponseWriter, r *http.Request) {
 	s.mu.Unlock()
 
 	var b strings.Builder
-	// Rows are newest-first; the page reads top-down, so emit oldest first.
-	for i, j := 0, len(history)-1; i < j; i, j = i+1, j-1 {
-		history[i], history[j] = history[j], history[i]
-	}
+	// Newest first, top of the DOM: a later turn arrives by prepend, so the
+	// first paint must read the same way or the log jumps on the next event.
 	for _, v := range history {
 		html, err := s.render(v)
 		if err != nil {

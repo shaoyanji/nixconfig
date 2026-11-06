@@ -586,13 +586,14 @@ in {
   # --- Vaultwarden: offloaded to delphi 2026-11-02 ----------------------------
   # The vault now runs on delphi (hosts/delphi/vaultwarden.nix) behind this
   # host's `vault.frieren.lan` vhost. Kept as a note rather than an option: the
-  # module is one block to restore, `DOMAIN` must stay identical for enrolled
-  # passkeys, and the live data arrives from /srv/backup/offload/vaultwarden.
+  # module is one block to restore, `DOMAIN` is the identity URL clients are
+  # handed (https, or mobile refuses it), and the live data arrives from
+  # /srv/backup/offload/vaultwarden.
   #
   #   services.vaultwarden = {
   #     enable = true;
   #     config = { ROCKET_ADDRESS = "127.0.0.1"; ROCKET_PORT = 8222;
-  #                WEBSOCKET_PORT = 3012; DOMAIN = "http://vault.frieren.lan";
+  #                DOMAIN = "https://vault.frieren.lan";
   #                SIGNUPS_ALLOWED = true; };
   #     backupDir = "/srv/backup/vaultwarden";
   #   };

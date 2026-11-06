@@ -1,6 +1,6 @@
 ---
 name: decision-picker
-description: Pick a decision model on Eisen: Laya (fast, ≤500 tokens), Kev-4B (longer inputs), or TypeSafe Jev (cloud, most accurate). Routing rules, confidence caveats, and when not to gate a destructive action.
+description: "Pick a decision model on Eisen — Laya (fast, ≤500 tokens), Kev-4B (longer inputs), or TypeSafe Jev (cloud, most accurate). Routing rules, confidence caveats, and when not to gate a destructive action."
 ---
 
 # decision-picker

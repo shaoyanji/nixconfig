@@ -1,6 +1,6 @@
 ---
 name: nixos-deploy
-description: Rebuild and activate a NixOS configuration on Eisen (or any fleet host) over SSH — the systemd-run detachment, done-file polling, and the polkit activation workaround. Encodes the traps: no pgrep, no nohup, no direct activation over SSH.
+description: "Rebuild and activate a NixOS configuration on Eisen (or any fleet host) over SSH — the systemd-run detachment, done-file polling, and the polkit activation workaround. Encodes the traps: no pgrep, no nohup, no direct activation over SSH."
 ---
 
 # nixos-deploy

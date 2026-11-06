@@ -7,9 +7,8 @@ license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
-  default_model: "gemini-4-argon"
     tags: [Coding-Agent, Antigravity, Google, AI-Agent, Delegation]
-    related_skills: [claude-code, hermes-agent]
+    related_skills: [claude-code, hermes-agent, nix-toolchain]
 ---
 
 # Antigravity CLI
@@ -28,8 +27,13 @@ Requires the antigravity CLI.
 
 ## Prerequisites
 
-- `agy` installed: binary at `/etc/profiles/per-user/devji/bin/agy` (installed version). NOT installed in this repo; binary NOT migrated into git-controlled parts.
-- NOT installed via `npm install -g antigravity-cli` (different binary name).
+- `agy` available: declared by `modules/user/ai/antigravity-cli.nix` as
+  `pkgs.llm-agents.antigravity-cli` (on a nixconfig host: `/etc/profiles/per-user/devji/bin/agy`,
+  measured 1.5.1). Anywhere else: `nix run github:numtide/llm-agents.nix#antigravity-cli -- <args>`.
+- Never `npm install -g antigravity-cli` — different binary name, and it writes
+  outside the store (see the `nix-toolchain` skill).
+- Default model on this fleet is set by the module (`$GEMINI_MODEL`), currently
+  `gemini-3.8-flash`; read the module rather than assuming a model id.
 - No Google OAuth (`antigravity auth`) required for `agy` CLI operation.
 - Must run inside a git repository (`/tmp/antigravity_task` used as scratch workspace).
 - Use `pty=true` in terminal calls — `agy` hangs without PTY.

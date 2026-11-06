@@ -134,46 +134,23 @@ cite**:
 nix eval --json .#knowledgeGraph.graph > /tmp/kg.json
 ```
 
-**1. What touches X** (inbound mentions — "what should I read before editing
-this host"):
+Inbound mentions and a document's outbound edges are `ops:kg:host` and
+`ops:kg:doc`; the two below are the ones no pattern answers.
 
-```bash
-jq -r --arg n host:frieren '.edges[] | select(.to == $n) | .from' /tmp/kg.json | sort -u
-```
-
-**2. What one document names** (outbound — the question `ops:kg:doc` also
-answers, useful when you have the file open):
-
-```bash
-jq -r --arg n doc:docs/task-control-plane.md '.edges[] | select(.from == $n) | .to' /tmp/kg.json | sort -u
-```
-
-**3. Orphan documents** — named by nobody, so no query will ever reach them:
+**1. Orphan documents** — named by nobody, so no query will ever reach them:
 
 ```bash
 jq -r '[.edges[].from] as $from | .nodes[]
   | select(.type == "doc") | select(.id as $i | $from | index($i) | not) | .id' /tmp/kg.json
 ```
 
-**4. Skills no document mentions** — the invisible half of the roster:
+**2. Skills no document mentions** — the invisible half of the roster:
 
 ```bash
 jq -r '[.edges[] | select(.to | startswith("skill:")) | .to] as $seen
   | .nodes[] | select(.type == "skill")
   | select(.id as $i | $seen | index($i) | not) | .id' /tmp/kg.json
 ```
-
-**5. Host blast radius** — how many docs and skills a change to that host's
-configuration can invalidate:
-
-```bash
-jq -r '. as $g | $g.nodes[] | select(.type == "host") | .id as $h
-  | [$h, ([$g.edges[] | select(.to == $h)] | length)] | @tsv' /tmp/kg.json | sort -k2 -nr
-```
-
-The `. as $g` binding in 5 is load-bearing: inside `.nodes[]` the current value
-is the node, so `.edges` there would be null and every count would print 0 — a
-wrong answer that looks like a tidy result.
 
 Read "skills no document mentions" as "no doc names this exactly", not "nobody
 uses it". Only the four root living documents and non-recursive `docs/*.md` are

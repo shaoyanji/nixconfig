@@ -13,26 +13,13 @@ metadata:
 
 # Crush — retired
 
-Crush is no longer part of this fleet. The free credits that made it the last
-cascade tier are gone, so a call to it burns a turn and fails rather than doing
-work. Do not install it, do not add it to a cascade, and do not offer it as an
-alternative.
+Crush is no longer part of this fleet: the free credits that made it the last
+cascade tier are gone, so a call burns a turn and fails rather than doing work.
+Do not install it, do not add it to a cascade, do not offer it as an alternative.
 
-## What to use instead
-
-| Need | Agent |
-| :--- | :--- |
-| first tier — one-shot or interactive coding | `agy` (`nix run github:numtide/llm-agents.nix#antigravity-cli`) |
-| second tier — zero-prompt batch work | `freebuff-headless -C <dir> -t <seconds> "<prompt>"` |
-| third tier — fleet persona with tools | `hermes chat -q "<prompt>" --oneshot -Q --run-budget 600` |
-| a different third-party agent | `reasonix`, `opencode`, `claude-code`, `codex` (see `nix-toolchain`) |
-
-The tier order and the verified flags for each live in the `frieren-offload`
-skill and `hosts/frieren/infra-stack.nix` (`run_agent_cascade`), which no longer
-carries a Crush step.
-
-## Why the page still exists
-
-`skill: crush` is written into older sessions, handoffs and history notes. Keeping
-a stub means that reference resolves to "retired, use agy" instead of a usage
-guide that would send an agent at a dead quota.
+`skill: crush` is written into older sessions, handoffs and history notes, so
+this page stays to land that reference on "retired" instead of a usage guide
+that would send an agent at a dead quota. The cascade that replaced it, with its
+tier order and verified flags, is the `frieren-offload` skill and
+`hosts/frieren/infra-stack.nix` (`run_agent_cascade`), which no longer carries a
+Crush step.

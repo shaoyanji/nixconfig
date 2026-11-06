@@ -581,7 +581,7 @@
     };
 
     agent-prose-budget = {
-      rule = "AGENTS.md (482 lines) and the body of every tracked SKILL.md (5280 lines today) are shrink-only — they are the prose an agent carries or loads, so a cleanup lowers the number here in the same commit. A skill's frontmatter is NOT counted: `lib/skills.nix` compiles it into the one-line index, so it is metadata, not context. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability.";
+      rule = "AGENTS.md (482 lines) and the body of every tracked SKILL.md (5270 lines today) are shrink-only — they are the prose an agent carries or loads, so a cleanup lowers the number here in the same commit. A skill's frontmatter is NOT counted: `lib/skills.nix` compiles it into the one-line index, so it is metadata, not context. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability.";
       proof = "line counts of AGENTS.md and of every tracked SKILL.md minus its frontmatter block";
       # Audited 2026-10-21: 215 lines removed by collapsing the shadowed
       # `.agents/skills/simplex-admin` copy (the module is canonical and the
@@ -592,6 +592,13 @@
       # measuring the wrong thing — bodies are 5280, and the cap is that number.
       # AGENTS.md 941 → 927 by deleting the namespace table, a third copy of
       # docs/task-control-plane.md, .agents/README.md and `task --list-all`.
+      # Audited 2026-11-06: the corpus had drifted to 5371 — `mail-alias` and
+      # `envs` landed whole after the 2026-11-04 freeze and nobody paid for the
+      # lines. Paid now, out of prose that duplicated a compiled surface: the
+      # retired `crush` page shrank to its tombstone, knowledge-base dropped the
+      # jq cookbook entries `ops:kg:host`/`:doc` already answer, and wikisearch,
+      # envs, mail-alias and agents-notes lost their repeated measurements and
+      # restated rules. 5371 → 5270, cap lowered with it.
       # Audited 2026-11-05: AGENTS.md 927 → 482. The manual had grown a second copy
       # of every surface that now compiles one: the xs endpoint (docs/agent-turns.md),
       # the verification protocol (docs/nix-patterns.md, the checks skill), the module
@@ -599,8 +606,8 @@
       # formatter table (scripts/task/nix-fmt.sh) and a packages section that claimed
       # the output was {}. What remains routes. The map is gone, so `no-orphan-docs`
       # went with it: reachability is the site index compiled from the graph.
-      holds = agentsLines <= 482 && skillLines <= 5280;
-      detail = "AGENTS.md ${toString agentsLines}/482 lines, skill bodies ${toString skillLines}/5280 — over budget means delete or an audited `Truth:` extension, not a renumber";
+      holds = agentsLines <= 482 && skillLines <= 5270;
+      detail = "AGENTS.md ${toString agentsLines}/482 lines, skill bodies ${toString skillLines}/5270 — over budget means delete or an audited `Truth:` extension, not a renumber";
     };
 
     rebuild-flags-are-finite = {

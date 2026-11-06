@@ -68,12 +68,10 @@ the web root, so a feed kept only there dies at the next publish. The client's
 
     post_tweet_hook = "install -m 644 {twtfile} ~/public_html/twtxt.txt"
 
-Keep the quotes. The client runs `shlex.split(hook)` and then
-`subprocess(…, shell=True)`, which executes only the first split element: an
-unquoted hook collapses to a bare `install` and fails with `missing file
-operand`, while the quoted string survives as one element and the shell sees the
-whole command (measured 2026-11-06). If a publish dropped the copy,
-`install -m 644 ~/twtxt.txt ~/public_html/twtxt.txt` restores it.
+Keep the quotes. The client runs `shlex.split(hook)` then `subprocess(…,
+ shell=True)`, which executes only the first element: unquoted, the hook
+collapses to a bare `install` (measured 2026-11-06). If a publish dropped the
+copy, `install -m 644 ~/twtxt.txt ~/public_html/twtxt.txt` restores it.
 
 Register with both registries, `nickname` alongside `url`, sent as
 `--data-urlencode` so the path is not mangled:
@@ -82,14 +80,11 @@ Register with both registries, `nickname` alongside `url`, sent as
       --data-urlencode 'url=https://envs.net/~jisifu/twtxt.txt' \
       --data-urlencode 'nickname=jisifu'
 
-Query by nickname. `?q=jisifu` answers on both, while `?url=…` does not filter:
-the envs instance returns an empty body for a feed it holds, and the global one
-returns the full user list (18 KB) because it is an Express app, not getwtxt,
-and advertises no `/api/plain/version` (404). Registration is immediate on both;
-ingestion is not. The envs registry lists a new tweet under
-`/api/plain/tweets?q=jisifu` within about 20 s, while the global registry had
-not indexed the same feed eight minutes after its `200 OK` (all measured
-2026-11-06) — check the feed itself before reporting a tweet as indexed.
+Query by nickname: `?q=jisifu` answers on both registries, `?url=…` filters on
+neither (the global one is an Express app, not getwtxt, and lists every user).
+Registration is immediate, ingestion is not — the envs instance caught a tweet in
+about 20 s, the global one had not after eight minutes (measured 2026-11-06), so
+check the feed itself before reporting a tweet as indexed.
 
 Post and read on the host; nothing in this repository wraps the client yet:
 

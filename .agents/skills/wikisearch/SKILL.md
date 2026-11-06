@@ -166,52 +166,23 @@ wikisearch --status
 
 ---
 
-## 3. Adding Any New Wiki Archive to Kiwix (Universal Shape)
+## 3. Adding Any New Wiki Archive to Kiwix
 
-To expand the knowledge base with any new wiki (e.g. Wikivoyage, DevDocs, ArchWiki, StackExchange, PubMed):
+One edit in `modules/services/kiwix.nix`: a `fetchurl` entry in `zims` (hash from
+`nurl <url>`) plus a matching book in the `kiwixLibrary` writeText (any unique
+UUID; `articleCount`/`size` are display-only). Rebuild. Never run `kiwix-manage`
+by hand — the declarative `library.xml` overwrites it.
 
-### Step 1: add the ZIM declaratively
-Add a `fetchurl` entry to `zims` in `modules/services/kiwix.nix` (use `nurl <url>`
-for the hash) and add it to the `kiwix-manage`-equivalent book list in the
-`kiwixLibrary` writeText. Rebuild — `kiwix-manage` is no longer used manually.
-
-### Step 2: add it to the declarative library
-Append a matching book entry to the `kiwixLibrary` writeText in the same file
-(id can be any unique UUID; `articleCount`/`size` are display-only). Never run
-`kiwix-manage` by hand — the declarative library.xml overwrites it.
-
-### Step 3: automatic hot-reload
-`kiwix-serve.service` runs with the `-M` flag, which watches `library.xml` and reloads immediately without restarting or dropping connections.
-
-### Step 4: verify and query immediately
-```bash
-# Confirm both declared archives (Wikipedia + ArchWiki) are served:
-wikisearch --list
-
-# Query the new wiki by name substring:
-wikisearch -w "<archive_keyword>" "<search query>"
-```
+`kiwix-serve.service` runs with `-M`, so it reloads `library.xml` without a
+restart. Verify with `wikisearch --list`, then query the archive by name
+substring: `wikisearch -w "<archive_keyword>" "<search query>"`.
 
 ---
 
-## 4. Querying from Remote Clients (e.g. `netbook`)
+## 4. Querying from Remote Clients
 
-### A. Via SSH Wrapper
-On `netbook`, `~/.local/bin/wikisearch` transparently proxies queries over SSH to `frieren.lan`:
-```bash
-wikisearch "Okapi BM25"
-wikisearch -w top "Ada Lovelace"
-```
+`netbook` runs the same `wikisearch` and proxies over SSH to `frieren.lan`, so the
+command is identical there. Any LAN or tailnet client can skip the wrapper and
+ask the daemon: `http://frieren.lan:8088/search?pattern=<q>`,
+`/suggest?term=<t>`, and the reader at `http://wiki.frieren.lan`.
 
-### B. Via HTTP API
-Any client on the LAN or Tailscale network can query Kiwix directly:
-```bash
-# Search across all books:
-curl -s "http://frieren.lan:8088/search?pattern=quantum"
-
-# Autocomplete suggestions:
-curl -s "http://frieren.lan:8088/suggest?term=Anti"
-
-# Interactive Web Reader:
-http://frieren.lan:8088/
-```

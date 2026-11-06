@@ -123,29 +123,14 @@ part that turns an idea into something a future agent can find from the code.
 
 ### Leaf experiment and open todo
 
-Both are the same attrset with deltas:
+Same attrset, no `refs`: a `body` stating intent, constraints, what was already
+rejected and the first artifact, plus `priority` (P0–P6) for `kind = "open"`.
+A leaf is a debt of one commit: the moment the artifact exists, add `refs` and
+cut the body to ≤30 lines.
 
-```nix
-    exp-200 = {                          # kind = "experiment", no refs yet
-      body = ''
-        Intent: what this buys, for whom, on which host class.
-        Constraints: hardware, power, existing services it would replace.
-        Already rejected: … (and the reason).
-        First artifact: create `modules/services/x.nix` behind `services.x.enable`,
-          wire one host, then replace this leaf with a refs note in the same commit.
-        Exit: … .
-      '';
-    };
-    open-thing = {                       # kind = "open", status OPEN (or BLOCKED
-      priority = "P2";                   # + the blocker in body), priority P0..P6
-    };
-```
-
-A leaf is a debt of one commit: the moment the first artifact exists, add `refs`
-and cut the body to ≤30 lines. A leaf that survives two cycles is rot — promote
-it or mark it `REJECTED` with the reason. An open todo is **one outcome**: two
-exits is two notes with a `links` edge. No checkboxes — state is `status`, not
-`- [x]`, or the same item has two truths.
+A leaf that survives two cycles is rot: promote it or mark it `REJECTED` with
+the reason. An open todo is one outcome — two exits is two notes with a `links`
+edge, and state is `status`, never `- [x]`, or the same item has two truths.
 
 ### Handoff and proposal
 
@@ -200,16 +185,11 @@ code:
   `TODO.md`, `HANDOFF.md`, `EXPERIMENTS.md` are one-line stubs on purpose;
   `ops:docs:budget` fails if content creeps back. Delivered means
   `refs.modules` + one xs turn.
-- **Do not restate the code.** A traceable note gets ≤30 lines: the *why* and
-  the exit. Option names, defaults and types belong in the module.
-- **Do not paste measurements.** Keep the command that reproduces the number
-  (in `body` or the deploy note), not a table that goes stale.
-- **One outcome per note.** Two exit criteria = two notes with a `links` edge.
+- **Do not paste measurements.** Keep the command that reproduces the number,
+  not a table that goes stale.
 - **`summary` sells the decision, not the topic.** It is what `ops:notes`
   prints; "Investigate X" tells the next agent nothing.
 - **Related notes use ids**, never titles — a rename must not orphan the edge.
-- **Do not restate lineage in prose.** "This supersedes X" in `body` is a claim
-  the gate cannot check; `supersedes = ["X"]` is the same sentence, checked.
 - **Update `date` when status changes.** It is the only recency signal.
 
 ## Verify before you commit

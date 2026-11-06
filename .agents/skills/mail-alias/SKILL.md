@@ -15,11 +15,9 @@ An alias is per-service on purpose. When mail starts arriving from somewhere you
 never signed up for, the local part names the service that leaked or sold it, and
 revoking one address is a single command.
 
-## Why not just give the real address
-
-`jisifu@gmail.com` cannot be un-given. A per-service alias can, and the act of
-revoking it is a record of what went wrong. This is the whole policy: any service
-that is not a primary identity gets an alias, not the inbox.
+`jisifu@gmail.com` cannot be un-given; a per-service alias can, and revoking it
+is a record of what leaked. Any service that is not a primary identity gets an
+alias, not the inbox.
 
 ## Before you add an alias
 
@@ -45,13 +43,11 @@ task mail:alias:prune                         # lists expired; YES=1 deletes
 ```
 
 `tmp` is the default choice: it stamps `kind = "temporary"`, an `expires` date and
-a `note` naming the service, then prints the address and its own revoke command.
-`add` is the same call without the expiry — for something you mean to keep.
-
-Everything lands in `modules/config/mail-aliases.toml`, which is the declared
-side of the drift check. Writes go through the script because it appends and
-removes whole TOML tables, re-parsing the file after every edit and restoring the
-backup if the edit would leave it unreadable.
+a `note` naming the service, then prints the revoke command for that address.
+`add` is the same call without the expiry. Everything lands in
+`modules/config/mail-aliases.toml`, the declared side of the drift check; writes
+go through `scripts/task/mail-alias.sh` because it re-parses the file after every
+table it appends or removes, and restores its backup if the edit broke it.
 
 ## Verify a change actually happened
 
@@ -73,18 +69,11 @@ task mail:alias:verify    # API verdict, then the same four records from DNS
 task mail:alias:doctor    # auth, plan, counts, records, drift in one report
 ```
 
-MX and SPF pass. **DMARC is missing** — the API expects `v=DMARC1; p=reject;` on
-`_dmarc.mail.shaoyanji.is-a.dev` and finds nothing. That record is not in this
-repo: `is-a.dev` has its own nameservers (`ns1.is-a.dev` …) and its records are
-JSON files in the `is-a-dev/register` repo, merged by PR. The missing piece is
-one file, `domains/_dmarc.mail.shaoyanji.json`:
-
-```json
-{ "owner": { "username": "shaoyanji" },
-  "records": { "TXT": ["v=DMARC1; p=reject;"] } }
-```
-
-DKIM has no expected value on this plan and is not configured either.
+MX and SPF pass. **DMARC is missing**: the record belongs to `is-a.dev`, whose
+nameservers serve JSON files from the `is-a-dev/register` repo. The open PR adds
+one file, `domains/_dmarc.mail.shaoyanji.json`, holding `"TXT": ["v=DMARC1;
+p=reject;"]` under `records` and the owner's username. DKIM has no expected
+value on this plan.
 
 ## The key
 

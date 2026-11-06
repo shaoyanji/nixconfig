@@ -80,6 +80,26 @@ reinvented.
 3. **Every flagged spread, re-rolled while budget remains** — a named defect
    (`Toad's waistcoat changed colour`) is re-rollable; "make it nicer" is not.
 
+## Running it detached, and restarting it
+
+```bash
+systemd-run --user --unit storybook-steady --collect \
+  -p WorkingDirectory=$HOME/Documents/storybook/<book> \
+  /usr/bin/env python3 …/storybook.py run --min-interval 320
+systemctl --user stop storybook-steady
+pgrep -af 'storybook[.]py' || echo clear   # a stop returns before the child does
+```
+
+The printer takes an exclusive `flock` on `state/printer.lock`, so a second
+printer exits instead of racing for the hourly window. It also treats a spread
+as done when a plate exists on disk, not when the ledger says so — a ledger row
+outlives an archived style, and resuming from it silently skips pages.
+
+`review.sh` is one review pass for a timer: it lists the spreads that have
+plates but no choice, hands them to an agent with the judging order, and lets it
+`choose`. A vision tool that answers 429 means the pass judges nothing; it must
+leave spreads unchosen and say so, never pick blind.
+
 ## Failure behaviour
 
 - `401`: the session died. `cpg status --json`; this needs a browser login, not

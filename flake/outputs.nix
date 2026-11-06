@@ -76,8 +76,10 @@
   taskfileCtl = import ../lib/taskfile.nix {inherit lib;};
   # nixFilesCtl / nixRegistry are bound above the chains: `flake/nix-registry.nix`
   # is the walk's naming layer, shared with the knowledge graph.
-  # The CLI table is compiled once here and projected into both namespaces:
-  # `packages.<system>.cli` for a store path, `apps.<system>.cli` for `nix run`.
+  # The CLI table is compiled once and projected into `packages.<system>.cli`
+  # only: a flake app must be a leaf and the tree is two levels deep, so an
+  # `apps.cli` projection made `nix run .#cli.<family>.<tool>` fail rather than
+  # fall through. `meta.mainProgram` carries the executable instead.
   cliFor = system:
     import ./cli.nix {
       inherit lib inputs system;
@@ -88,7 +90,9 @@ in {
     inherit lib systems pkgsFor inventory cliFor docsGen skillsCtl agentsNotesCtl knowledgeGraphCtl self;
   };
 
-  apps = lib.genAttrs systems.work (system: {cli = (cliFor system).apps;});
+  # No apps: the CLI tree lives in `packages.<system>.cli` and `nix run` falls
+  # through to it (flake/apps must be leaves; see flake/cli.nix).
+  apps = lib.genAttrs systems.work (_: {});
 
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).

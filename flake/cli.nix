@@ -117,24 +117,29 @@
     |> lib.mapAttrs (_: lib.filterAttrs (_: t: isLinux || !(t.linux or false)));
 
   toolName = name: tool: tool.bin or name;
-in rec {
-  # `packages.cli.<family>.<tool>` — the derivation, for `nix build` and for a
-  # host that wants the store path.
-  packages =
-    families
-    |> lib.mapAttrs (_: lib.mapAttrs (_: t: t.pkg));
 
-  # `apps.cli.<family>.<tool>` — the same tree as run targets, so the two
-  # namespaces can never disagree about which tools exist.
-  apps =
+  # A flake app must be a leaf, so `apps.<system>.cli.<family>.<tool>` cannot
+  # exist: `nix run` finds the `cli` attrset, asks it for `.program` and fails
+  # instead of falling through to `packages`. One namespace replaces the two:
+  # `nix run .#cli.<family>.<tool>` resolves through `packages`, and
+  # `meta.mainProgram` is what picks the executable. Without it nix guesses from
+  # the derivation name (`bind` for `dnsutils`, `gnused` for `sed`).
+  #
+  # meta-only override: the derivation and its store path are untouched, so the
+  # cache still serves it.
+  runnable = program: pkg:
+    pkg.overrideAttrs (old: {
+      meta = (old.meta or {}) // {mainProgram = program;};
+    });
+in rec {
+  # `packages.cli.<family>.<tool>` — the derivation, for `nix build`, for a host
+  # that wants the store path, and for `nix run` (see `runnable` above).
+  packages =
     families
     |> lib.mapAttrs (
       _family: tools:
         tools
-        |> lib.mapAttrs (name: t: {
-          type = "app";
-          program = "${t.pkg}/bin/${toolName name t}";
-        })
+        |> lib.mapAttrs (name: t: runnable (toolName name t) t.pkg)
     );
 
   inherit families;

@@ -5617,7 +5617,7 @@
     clanker-offload-fixture = {
       title = "clanker: the offload VM, and what may live there";
       kind = "proposal";
-      status = "ACCEPTED";
+      status = "IN FLIGHT";
       date = "2026-11-06";
       priority = "P3";
       links = ["exp-021" "exp-115"];
@@ -5630,33 +5630,34 @@
       };
       body = ''
         **What it is.** Instabox VM: 4 vCPU, 8 GiB, `/data` 20 GiB, 120 min per run,
-        suspend after 30 idle. Not a fleet host — the image owns boot, kernel and
-        accounts, and we own `~/.nix-profile` plus `/data`. Registered `kind = "home"`
-        because that is the layer we actually own; `role:lean` is what we put there.
+        suspend after 30 idle. Not a host — the image owns boot, kernel and accounts; we
+        own `~/.nix-profile` and `/data`, registered `kind = "home"` with `role:lean`.
 
-        **What may go there.** Bounded, restartable work with a result we copy back: a
-        closure build, a Go binary, a `nix flake update` trial, a tool being tested before
-        it lands in a host's closure. A job is a directory (`cmd.sh`, `log`, `exit`), so it
-        outlives the ssh channel that started it, and "running" means no `exit` file yet —
-        no pid file to go stale when the box suspends.
+        **Tiers.** Always-on services stay on delphi and frieren (dsh-web is delphi's
+        unit); clanker is the burst tier — browser work, authenticated sessions, artifact
+        compilation, a tool tried before it reaches a host's closure. A job is a directory
+        (`cmd.sh`, `log`, `exit`), so it survives the channel that started it and
+        "running" means no `exit` yet.
 
-        **What may not.** State. No sops or age key, no cachix write key, nothing that must
-        answer. A build here warms nothing; the box holds no destination credential, and
-        adding one is a deliberate temporary exception, not a default.
+        **Measured 2026-11-06.** `clanker:devshell` sent the tree and ran
+        `templates/agent-shell`: agent-browser 0.41.2 substituted from `cache.numtide.com`,
+        opened example.com, returned its accessibility snapshot with refs. `page-check`
+        wrote a verdict and a 1280x633 PNG, fetched back with `clanker:result`. A tmux
+        service reached only by `ssh -L` answered HTTP 200 with nothing published; dsh
+        runs there and answers its auth fence through the tunnel (its token exchange is
+        the open gap, not the reach).
 
-        **The cache trial this enables** (extends exp-021, whose warmer fills the LAN cache
-        from frieren): a monthly `nix flake update` diff built here and pushed to the
-        Cloudflare R2 cache — 10 GiB there against 20 GiB of box disk — so a laptop fetches
-        a diff rather than a closure. It needs the one thing the box deliberately lacks, an
-        R2 write credential, so it is a scheduled job with a scoped token.
+        **What may not.** State: no sops or age key, no cache write key, nothing that must
+        answer. The cache trial (extends exp-021) is the deliberate exception — a monthly
+        `nix flake update` diff built here into R2's 10 GiB against the box's 20, so a
+        laptop fetches a diff.
 
-        **Ephemeral services, later.** A restore test, a mail-archive reindex, a Stirling
-        trial: work whose value is the answer, not the uptime. Each must be copy-back shaped
-        before it moves, because the box can vanish mid-job by design.
-
-        **Exit.** Three months with no job that needed babysitting, and one cache diff a
-        laptop actually substituted from; then this note is DELIVERED and the next
-        ephemeral service moves.
+        **Pinwheel profiles.** Each flake devShell is a disposable environment — new tree,
+        new shell, nothing installed on the host, `nix flake init -t .#agent-shell` for
+        the next box. With `gh` and a wasm toolchain this tier compiles what the fleet
+        cannot afford locally.
+        **Exit.** Three months with no babysat job, a cache diff a laptop substituted
+        from, and one authenticated session (LinkedIn, Gmail) read back as a snapshot.
       '';
     };
   };

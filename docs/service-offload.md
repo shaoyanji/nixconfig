@@ -142,8 +142,12 @@ coupling, and it points at delphi or at the NAS's own loopback.
   compiled by `anki-author` (`.#cli.learn.anki-author`), with
   `scripts/german/anki-push.sh --base B1_Wortliste….apkg decks/*.toml` doing the
   whole round trip: download for a backup, build each file over the previous
-  output, upload, download again and print what is served. 2026-11-06: 5,376
-  cards over six decks, 40 of them carrying a `req-` tag.
+  output, upload, download again and print what is served. 2026-11-06: 5,381
+  cards over seven decks; 45 of them carry a `req-` tag, which is half of the
+  edge a drill uses to name the rule it tests. The other half is the `id-` tag on
+  that rule, so the TUI resolves the pair by tag and `r` opens it — the key
+  itself (`slug(front)` plus a short digest) is built in `anki-author` and never
+  re-derived by a reader.
 
   **That upload discards review history**, because the build starts from the
   schema-11 base and the served collection is what accumulates reviews; the

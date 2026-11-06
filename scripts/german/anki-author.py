@@ -5,8 +5,10 @@ client that reviews (deutsch-srs) and the server that stores (anki-sync-server).
 A deck file is one `[notetype]`, then `[[deck]]` blocks, each holding
 `[[deck.card]]` entries with `front`, `back` and `tags`, plus an optional
 `requires` naming the card this one tests: the drill's prerequisite, and the
-card to re-read when the drill keeps failing. `check` validates the file and
-prints what it would build; `build` writes a schema-11 collection that Anki and
+card to re-read when the drill keeps failing. Each card also carries an
+`id-`/`req-` tag pair, which is how a reader resolves the edge without ids.
+`check` validates the file and prints what it would build; `build` writes a
+schema-11 collection that Anki and
 the sync server both accept, either standalone or merged over an existing
 collection. Merging reconciles by guid, so re-running a build after a card was
 edited updates that note instead of adding a second copy.
@@ -181,6 +183,25 @@ def slug(text):
     return re.sub(r"[^a-z0-9]+", "-", folded).strip("-")
 
 
+# How much of the readable slug a card key keeps. Long enough to recognise in
+# Anki's tag list, short enough that a paragraph-long task front stays a tag
+# rather than a copy of the card.
+CARD_KEY_HEAD = 40
+
+
+def card_key(front):
+    """The tag pair that makes a prerequisite edge walkable in the client.
+
+    A card carries `id-<key>`, a drill carries `req-<key>`, so following the
+    edge is a tag lookup — the reader never has to re-derive this function.
+    The readable head says what the card is about; the digest keeps two long
+    fronts that open the same way from colliding.
+    """
+    digest = hashlib.sha1(front.encode("utf-8")).hexdigest()[:6]
+    head = slug(front)[:CARD_KEY_HEAD].rstrip("-")
+    return f"{head}-{digest}" if head else digest
+
+
 def prerequisites(data):
     """front -> the front it requires. Validated once, used by check and build."""
     by_front = {}
@@ -235,10 +256,11 @@ def render_back(card, data, edges):
 
 
 def note_tags(card, edges):
-    tags = [t for t in str(card.get("tags", "")).split() if t]
+    tags = ["id-" + card_key(card["front"])]
+    tags += [t for t in str(card.get("tags", "")).split() if t]
     target = edges.get(card["front"])
     if target is not None:
-        tags.append("req-" + slug(target))
+        tags.append("req-" + card_key(target))
     return f" {' '.join(tags)} " if tags else ""
 
 

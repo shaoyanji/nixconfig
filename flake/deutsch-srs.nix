@@ -6,7 +6,7 @@
   pkgs,
   ...
 }: let
-  version = "0.2.0";
+  version = "0.3.0";
 in
   pkgs.buildGoModule {
     pname = "deutsch-srs";
@@ -16,7 +16,7 @@ in
       owner = "shaoyanji";
       repo = "deutsch-srs";
       rev = "v${version}";
-      hash = "sha256-VkP1f0uRwYSVoz/rm56muYoY0hZwR1WOBICA68qj8VQ=";
+      hash = "sha256-4eLJsFib6Cl1wTltZ/nCioo/oWTGuq9mbgnBXJxIfPw=";
     };
 
     vendorHash = "sha256-ZnYW1pKdV0yjKwvHz5JZJkwheK4WjCr6Ts3IQr+piJQ=";

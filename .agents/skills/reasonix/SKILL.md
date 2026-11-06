@@ -8,7 +8,7 @@ platforms: [linux, macos]
 metadata:
   hermes:
     tags: [Coding-Agent, Reasonix, AI-Agent, Delegation]
-    related_skills: [crush, dev, agents]
+    related_skills: [dev, agents]
 ---
 
 # reasonix — coding-agent delegation

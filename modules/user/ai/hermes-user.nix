@@ -78,7 +78,7 @@ in {
   };
 
   # Deliberately NOT gated on `profiles.ai.enable`: that flag also decides
-  # whether the heavy agent suite (Chromium, qmd, crush) is installed, and
+  # whether the heavy agent suite (Chromium, qmd, agent-browser) is installed, and
   # host containers turn it off. Hermes has its own `enable`, set by
   # profiles/hermes.nix — coupling the two meant a cloud host had to install
   # the whole AI stack to get one agent.

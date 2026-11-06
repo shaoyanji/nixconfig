@@ -57,9 +57,10 @@ that needs judgement. Archives to `~/.agents/system/` and also preserves the fil
 
 ### The agent cascade (same for both jobs)
 
-Tier 1 `agy` → Tier 2 `freebuff-headless` → Tier 3 `hermes chat -q … --oneshot`
-→ Tier 4 `crush run --quiet`; the first exit 0 wins, and agy fails on credit
-exhaustion, so the fallbacks are real.
+Tier 1 `agy` → Tier 2 `freebuff-headless` → Tier 3 `hermes chat -q … --oneshot`;
+the first exit 0 wins, and agy fails on credit exhaustion, so the fallbacks are
+real. Tier 4 was `crush`, retired 2026-11-06 when its free credits ran out — it
+is not a tier any more and the skill is a deprecation stub.
 
 ## Dispatch something now
 
@@ -79,7 +80,7 @@ Use `/var/lib/<job>` for the working directory, not `$HOME`: hardened units with
 so two of them do not share a log or a `HANDOFF.md`.
 
 Agent CLI flags: `agy` needs `--dangerously-skip-permissions` in a detached session
-(no TTY to approve a prompt, so it would block forever); `crush` `run --quiet`;
+(no TTY to approve a prompt, so it would block forever);
 hermes hangs them on the subcommand — `chat -q "$p" --oneshot -Q --run-budget 600`,
 `-Q` keeping banner and footer out of the log, and tools need no `--yolo` under a
 non-TTY (measured). Top-level `hermes -q … --oneshot` exits 2 without running.

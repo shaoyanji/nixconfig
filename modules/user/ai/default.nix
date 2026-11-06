@@ -44,8 +44,10 @@ in {
         - "none": disables AI tools entirely.
         - "light": lightweight client tools (antigravity-cli, geminicommit, tgpt, aichat).
                    Excludes heavy agent-browser (700MB Chromium), qmd embeddings, and batched runner daemons.
-        - "full": complete fleet agent suite (crush, qmd, agent-browser, ai-memory, toon,
+        - "full": complete fleet agent suite (qmd, agent-browser, ai-memory, toon,
                   pdfvision, parallel-cli, reasonix). Default for frieren, eisen, poseidon.
+                  `crush` is retired (free credits exhausted, 2026-11-06) and is not
+                  part of any tier.
       '';
     };
   };
@@ -87,7 +89,8 @@ in {
       # Heavy agent suite — ONLY installed when tier == "full"
       # Keeps ~2+ GB and bundled Chromium off light mobile clients like aristotle
       ++ lib.optionals (config.profiles.ai.tier == "full") [
-        # pkgs.llm-agents.crush # Charmbracelet agent (MIT, source-built)
+        # pkgs.llm-agents.crush — retired 2026-11-06 (free credits exhausted); do
+        # not re-add without a paid quota. See `.agents/skills/crush`.
         pkgs.llm-agents.qmd # local hybrid markdown/code search
         pkgs.llm-agents.ai-memory # persistent cross-agent memory
         pkgs.llm-agents.toon # TOON format tooling

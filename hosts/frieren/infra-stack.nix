@@ -232,7 +232,7 @@
       # Called as `hermes -q "$prompt" --oneshot` (what this tier did until
       # 2026-11-05) argparse exits 2 before any model call — "'<prompt>' is not
       # a `hermes` command" — so every run that reached Tier 3 failed and fell
-      # through to Tier 4. Verified against hermes 0.22.5: `chat -q <prompt>
+      # through to the next tier. Verified against hermes 0.22.5: `chat -q <prompt>
       # --oneshot -Q --run-budget N` answers and exits 0. -Q keeps the banner
       # and session footer out of the job log; --run-budget is the ceiling
       # Tier 2 already gets from `-t 600`.
@@ -257,21 +257,12 @@
           echo "=== [$(date)] Agent Cascade: Tier 3 (hermes) succeeded. ==="
           return 0
         fi
-        echo "=== [$(date)] WARN: hermes failed. Attempting Tier 4 fallback... ===" >&2
+        echo "=== [$(date)] WARN: hermes failed. ===" >&2
       fi
 
-      # Tier 4: Crush CLI agent (Charmbracelet agent)
-      if command -v crush >/dev/null 2>&1 || [ -x "${user.home}/.local/bin/crush" ]; then
-        echo "=== [$(date)] Agent Cascade: Attempting Tier 4 (crush) ==="
-        local crush_bin
-        crush_bin="$(command -v crush 2>/dev/null || echo "${user.home}/.local/bin/crush")"
-        if "$crush_bin" run --quiet "$prompt"; then
-          echo "=== [$(date)] Agent Cascade: Tier 4 (crush) succeeded. ==="
-          return 0
-        fi
-        echo "=== [$(date)] WARN: crush failed. ===" >&2
-      fi
-
+      # Tier 4 was Crush. Retired 2026-11-06: its free credits are exhausted, so a
+      # call there burned a turn and failed. Three tiers is the cascade now — do not
+      # add Crush back without a paid quota (see `.agents/skills/crush`).
       echo "=== [$(date)] ERROR: All agent execution tiers in cascade failed. ===" >&2
       return 1
     }

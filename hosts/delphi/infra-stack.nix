@@ -53,21 +53,11 @@
           echo "=== [$(date)] Agent Cascade: Tier 3 (hermes) succeeded. ==="
           return 0
         fi
-        echo "=== [$(date)] WARN: hermes failed. Attempting Tier 4 fallback... ===" >&2
+        echo "=== [$(date)] WARN: hermes failed. ===" >&2
       fi
 
-      # Tier 4: Crush CLI agent (Charm's AI coding agent)
-      if command -v crush >/dev/null 2>&1 || [ -x "${user.home}/.local/bin/crush" ]; then
-        echo "=== [$(date)] Agent Cascade: Attempting Tier 4 (crush) ==="
-        local crush_bin
-        crush_bin="$(command -v crush 2>/dev/null || echo "${user.home}/.local/bin/crush")"
-        if "$crush_bin" run --quiet "$prompt"; then
-          echo "=== [$(date)] Agent Cascade: Tier 4 (crush) succeeded. ==="
-          return 0
-        fi
-        echo "=== [$(date)] WARN: crush failed. ===" >&2
-      fi
-
+      # Tier 4 was Crush, retired 2026-11-06 (free credits exhausted). Same change
+      # as hosts/frieren/infra-stack.nix — keep the two cascades in step.
       echo "=== [$(date)] ERROR: All agent execution tiers in cascade failed. ===" >&2
       return 1
     }

@@ -1,92 +1,38 @@
 ---
 name: crush
-description: "Delegate coding to Crush CLI (Charm's AI coding agent). Uses --yolo and structured output flags."
-version: 0.1.0
+description: "DEPRECATED 2026-11-06 — do not delegate to Crush. Its free credits are exhausted. Use agy (Tier 1), freebuff-headless (Tier 2) or hermes (Tier 3) instead; this page is kept so an old reference lands on the explanation."
+version: 0.2.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
-    tags: [Coding-Agent, Crush, Charm, AI-Agent, Delegation]
-    related_skills: [antigravity, codex, hermes-agent]
+    tags: [Deprecated, Crush, Charm, Coding-Agent]
+    related_skills: [antigravity, hermes-agent, frieren-offload, reasonix]
 ---
 
-# Crush CLI
+# Crush — retired
 
-Delegate coding tasks to [Crush](https://github.com/charmbracelet/crush) via the Hermes terminal. Crush is CharmBracelet's terminal AI coding agent (spiritual successor to OpenCode).
+Crush is no longer part of this fleet. The free credits that made it the last
+cascade tier are gone, so a call to it burns a turn and fails rather than doing
+work. Do not install it, do not add it to a cascade, and do not offer it as an
+alternative.
 
-## When to use
+## What to use instead
 
-- Building features
-- Refactoring
-- PR reviews
-- Batch issue fixing
-- TUI-based coding sessions
+| Need | Agent |
+| :--- | :--- |
+| first tier — one-shot or interactive coding | `agy` (`nix run github:numtide/llm-agents.nix#antigravity-cli`) |
+| second tier — zero-prompt batch work | `freebuff-headless -C <dir> -t <seconds> "<prompt>"` |
+| third tier — fleet persona with tools | `hermes chat -q "<prompt>" --oneshot -Q --run-budget 600` |
+| a different third-party agent | `reasonix`, `opencode`, `claude-code`, `codex` (see `nix-toolchain`) |
 
-Requires the crush CLI.
+The tier order and the verified flags for each live in the `frieren-offload`
+skill and `hosts/frieren/infra-stack.nix` (`run_agent_cascade`), which no longer
+carries a Crush step.
 
-## Prerequisites
+## Why the page still exists
 
-- Crush installed: `npm install -g @charmland/crush` or via nix: `nix shell nixpkgs#crush`
-- Google auth configured: `crush auth` (OAuth flow via browser)
-- Must run inside a git repository — Crush requires git context
-- Use `pty=true` in terminal calls — Crush is an interactive terminal app
-
-## Key flags
-
-| Flag | Description |
-|------|-------------|
-| `-y` / `--yolo` | Auto-accept all permissions (dangerous; use with care). **Crush cannot do sudo** — use this flag for delegation |
-| `--continue` | Continue the most recent session |
-| `--session <id>` | Continue a specific session |
-| `--quiet` | Hide the spinner |
-| `--verbose` | Show logs |
-| `--reasoning-effort <level>` | Set reasoning effort (high/medium/low) |
-
-## One-shot tasks
-
-```bash
-terminal(command="crush run --yolo 'Add dark mode toggle to settings'", workdir="~/project", pty=true)
-```
-
-For scratch work:
-```bash
-terminal(command="cd $(mktemp -d) && git init && crush run --yolo 'Build a snake game in Python'", pty=true)
-```
-
-## Background mode (long tasks)
-
-```bash
-# Start in background with PTY
-terminal(command="crush run --yolo --verbose 'Refactor the auth module'", workdir="~/project", background=true, pty=true)
-# Returns session_id
-
-# Monitor progress
-process(action="poll", session_id="<id>")
-process(action="log", session_id="<id>")
-
-# Send input if Crush asks a question
-process(action="submit", session_id="<id>", data="yes")
-
-# Kill if needed
-process(action="kill", session_id="<id>")
-```
-
-## Verification protocol
-
-Before deploying, always verify:
-1. `git status` is clean
-2. `git diff` shows only intended changes
-3. Tests pass: `pytest` or equivalent
-4. No untracked secrets in workspace
-
-## Rules
-
-1. **Always use `--yolo`** for agent execution — this is the standard delegation mode (auto-accepts all permissions)
-2. **Use `--continue`** to pick up where Crush left off
-3. **Always use `pty=true`** — Crush is an interactive terminal app and hangs without a PTY
-4. **Git repo required** — Crush won't run outside a git directory. Use `mktemp -d && git init` for scratch work
-5. **Don't interfere** — monitor with `poll`/`log`, be patient with long-running tasks
-6. **Always clean up** — kill background processes, remove temp directories, and verify workspace hygiene
-
-Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.
+`skill: crush` is written into older sessions, handoffs and history notes. Keeping
+a stub means that reference resolves to "retired, use agy" instead of a usage
+guide that would send an agent at a dead quota.

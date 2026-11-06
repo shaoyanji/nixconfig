@@ -25,7 +25,7 @@ git diff main... -- . | head -400     # or: git diff --staged, git diff <files>
 
 ## Steps
 
-1. **Review blind.** Give the diff to a fresh context with only the questions in step 2. If a delegate agent is available (`skill: crush`, `skill: reasonix`), hand it the diff and forbid writes; otherwise do a separate read-only pass yourself, after a gap, reading only the diff. Do not let the pass see your intent.
+1. **Review blind.** Give the diff to a fresh context with only the questions in step 2. If a delegate agent is available (`skill: reasonix`), hand it the diff and forbid writes; otherwise do a separate read-only pass yourself, after a gap, reading only the diff. Do not let the pass see your intent.
 
 2. **Verdict per comment: KEEP, KILL, or ENCODE.**
    - KEEP only: a license header, a doc comment on a public API, a link that explains what the code cannot, or behaviour forced by an external dependency you cannot change.

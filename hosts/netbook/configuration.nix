@@ -250,7 +250,6 @@ in {
     polkit_gnome
     bibata-cursors
     pcmanfm
-    # crush
     btop
     fastfetch
     # firefox is back as a package, not as the module (2026-11-04): the ~590 MiB

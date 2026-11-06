@@ -1212,7 +1212,7 @@ in {
 
   # globalModulesContainers (noDE) switches the AI CLI stack OFF for container
   # hosts, and that stays off here: hermes is the exception, not a reason to
-  # install Chromium/qmd/crush. The gateway units follow `enable` (set by
+  # install Chromium/qmd/agent-browser. The gateway units follow `enable` (set by
   # profiles.hermes); seeding the persona is this host's own declaration.
   home-manager.users.${user.name} = {
     imports = [self.modules."services.mail-agent"];

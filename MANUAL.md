@@ -84,6 +84,8 @@
 | Vaultwarden | `vaultwarden` on **delphi** | 8222 + 3012 tailnet | `vault.frieren.lan`* (moved 2026-11-02; DOMAIN unchanged so passkeys survive) |
 | SimpleX SMP relay | `smp-server` | 5223/5225/5226 | inter-agent messaging |
 | Atuin history sync | `atuin` | 8888 loopback | `atuin.frieren.lan`*; one account, sign-ups closed [[flake/policies.nix#history-sync-is-one-server]] |
+| Miniflux | `miniflux` on **delphi** | 8093 loopback / 8455 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8455` — feeds, not mail (added 2026-11-06) |
+| Umami | `umami` on **delphi** | 8094 loopback / 8456 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8456` — first-party analytics, tailnet-only by decision: it cannot collect from public pages |
 | Ollama | `ollama` | 11434 | local inference (if enabled) |
 | LLM decision router | `llm-decision-router` | 8080-ish | `eisen` upstream, not on frieren |
 | Antigravity remote control | `antigravity-cli-daemon` (user) | — | 24/7 remote operator |

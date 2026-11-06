@@ -108,6 +108,16 @@
     then []
     else builtins.filter (n: n != null) (map refIn (builtins.tail chunks));
 
+  # `AGENTS.nix` is the note store: prose in a Nix string, not a config. A
+  # module named there is being discussed, not imported, and counting it made
+  # `ops:kg:module` report the note as an importer — and made a placeholder in a
+  # design note read as a dangling name. One rule, used by the edges and by the
+  # registry's dangling-name scan, so the two cannot disagree.
+  nameRefsOf = p:
+    if p == "AGENTS.nix"
+    then []
+    else nameRefs (builtins.readFile (root + "/${p}"));
+
   importsOf = p: let
     dir = dirOf p;
     text = builtins.readFile (root + "/${p}");
@@ -121,7 +131,7 @@
           )
       )
       (pathTokens text)
-      ++ map (n: rel byName.${n}) (builtins.filter (n: builtins.hasAttr n byName) (nameRefs text));
+      ++ map (n: rel byName.${n}) (builtins.filter (n: builtins.hasAttr n byName) (nameRefsOf p));
   in
     lib.unique (builtins.filter (t: t != p) targets);
 
@@ -135,7 +145,7 @@
   importsOfPath = p: edges.${p} or [];
 in {
   inherit files paths tree edges importsOfPath;
-  inherit moduleFiles nameOf byPath byName nameRefs;
+  inherit moduleFiles nameOf byPath byName nameRefs nameRefsOf;
   relPath = rel;
   count = builtins.length files;
 }

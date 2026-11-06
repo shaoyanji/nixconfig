@@ -5,7 +5,7 @@
   lib,
   nixFilesCtl,
 }: let
-  inherit (nixFilesCtl) paths byPath nameOf byName nameRefs moduleFiles;
+  inherit (nixFilesCtl) paths nameOf byName nameRefsOf moduleFiles;
   names = map nameOf moduleFiles;
 in {
   nixFiles = nixFilesCtl.tree;
@@ -22,7 +22,7 @@ in {
     # this is empty instead.
     duplicates = lib.subtractLists (lib.unique names) names;
     unknownNames = lib.unique (
-      builtins.concatMap (p: builtins.filter (n: !(builtins.hasAttr n byName)) (nameRefs (builtins.readFile (byPath.${p})))) paths
+      builtins.concatMap (p: builtins.filter (n: !(builtins.hasAttr n byName)) (nameRefsOf p)) paths
     );
     dangling = lib.unique (
       builtins.filter (p: !(builtins.elem p paths)) (

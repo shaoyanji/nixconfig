@@ -828,16 +828,22 @@ defmodule KGEngine.Native do
       |> Enum.map(&normalise_path(Path.join(dir, &1)))
 
     # Both vocabularies: `moduleFiles."x"` in a chain, `self.modules."x"` in a
-    # module; quoted names only, which is the convention on this tree.
+    # module; quoted names only, which is the convention on this tree. The note
+    # store is prose, so a module named there is discussed rather than imported
+    # (`lib/nix-files.nix` says the same thing).
     name_targets =
-      ~r{(?:self\.modules\.|moduleFiles\.)(?:"([A-Za-z0-9_.-]+)"|([A-Za-z0-9_.-]+))}
-      |> Regex.scan(code)
-      |> Enum.map(fn
-        [_, "", name] -> name
-        [_, name | _] -> name
-      end)
-      |> Enum.map(&Map.get(by_name, &1))
-      |> Enum.reject(&is_nil/1)
+      if id == "AGENTS.nix" do
+        []
+      else
+        ~r{(?:self\.modules\.|moduleFiles\.)(?:"([A-Za-z0-9_.-]+)"|([A-Za-z0-9_.-]+))}
+        |> Regex.scan(code)
+        |> Enum.map(fn
+          [_, "", name] -> name
+          [_, name | _] -> name
+        end)
+        |> Enum.map(&Map.get(by_name, &1))
+        |> Enum.reject(&is_nil/1)
+      end
 
     imports =
       (path_targets ++ name_targets)

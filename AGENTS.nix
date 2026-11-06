@@ -60,7 +60,9 @@
         `self.modules."x"` / `moduleFiles."x"` reference into an edge, its Elixir
         twin does the same, and `checks.<system>.nix-registry` fails on a name
         that resolves to no file — so a rename cannot leave an edge silently
-        missing on one side only.
+        missing on one side only. The note store itself yields no name edges:
+        a module named here is being discussed, and one rule (`nameRefsOf`)
+        decides that for the edges and the dangling-name scan alike.
 
         Exit: wiring files shrink to projections; `refs.modules` names what landed.
       '';

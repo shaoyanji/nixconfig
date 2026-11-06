@@ -39,6 +39,7 @@ usage: clanker.sh <command> [args]
   nix <attr> [--wait]    send the tree, `nix build .#<attr>` on the box, print the path
   go <pkg> [--wait]      send the tree, `go build` on the box, fetch the binary
   profile [--wait]       send the tree, build and activate homeConfigurations.clanker
+  devshell <path[#shell]> [cmd]  send the tree, run a command inside that devShell
   serve <name> <port> <cmd>   run a service in a detached tmux session on the box
   services               which tmux services are up, and on which port
   stop-serve <name>      end one service's session
@@ -225,6 +226,33 @@ ls \"\$HOME/.nix-profile/bin\" | head -40
 echo '== identity'
 git config --global --get user.email || true
 go version || true" >/dev/null
+    printf '%s\n' "$id"
+    if [ "${1:-}" = "--wait" ]; then
+      bash "$here/clanker.sh" wait "$id" || true
+      bash "$here/clanker.sh" logs "$id" 200
+    fi
+    ;;
+  devshell)
+    # Codespace-shaped without an image: the tree travels, the flake's devShell is
+    # the environment, and the command runs there. `path#shell` selects a template
+    # or another flake in the tree; no `#` means `.#default`.
+    flake="${1:-}"
+    shift || true
+    cmd="${1:-bash -l}"
+    [ -n "$flake" ] || usage
+    case "$flake" in
+      *'#'*) ;;
+      *) flake="$flake#default" ;;
+    esac
+    id="$(new_id)"
+    push_tree "$id"
+    start_job "$id" "set -eu
+export PATH=\"\$HOME/.nix-profile/bin:\$PATH\"
+cd /data/src/$id
+# bash -c, not -lc: a login shell re-sources /etc/profile and drops the
+# devShell PATH, which turns a working shell into command-not-found (measured
+# 2026-11-06).
+nix develop --accept-flake-config '$flake' --command bash -c '$cmd'" >/dev/null
     printf '%s\n' "$id"
     if [ "${1:-}" = "--wait" ]; then
       bash "$here/clanker.sh" wait "$id" || true

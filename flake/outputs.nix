@@ -94,6 +94,20 @@ in {
   # through to it (flake/apps must be leaves; see flake/cli.nix).
   apps = lib.genAttrs systems.work (_: {});
 
+  # `nix flake init -t .#agent-shell` — the two entry points in templates/ that
+  # turn a box into a browser-shaped agent worker without making it a host
+  # (`templates/agent-shell` for an interactive shell, `agent-job` for a job).
+  templates = {
+    agent-shell = {
+      path = ../templates/agent-shell;
+      description = "Browser-shaped agent shell: agent-browser from llm-agents, numtide substituter";
+    };
+    agent-job = {
+      path = ../templates/agent-job;
+      description = "One-shot browser check that writes a JSON verdict (shaped for a clanker job)";
+    };
+  };
+
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {

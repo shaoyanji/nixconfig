@@ -40,8 +40,29 @@
           pkgs.nodejs_22
           pkgs.python3
         ];
+        # Shell functions, not packages: `nix develop -c` runs the command inside
+        # this environment, so a function here is reachable where a package's
+        # PATH entry is not. Both verbs are bounded — a chatty `open` is the
+        # known failure — and both close the browser on the way out.
         shellHook = ''
-          echo "agent-shell: agent-browser $(agent-browser --version 2>/dev/null | head -1)"
+          browse() {
+            set -euo pipefail
+            url="''${1:?usage: browse <url>}"
+            trap 'agent-browser close >/dev/null 2>&1 || true' EXIT
+            timeout 120 agent-browser open "$url"
+            timeout 60 agent-browser snapshot
+          }
+          shot() {
+            set -euo pipefail
+            url="''${1:?usage: shot <url> <png>}"
+            out="''${2:?usage: shot <url> <png>}"
+            trap 'agent-browser close >/dev/null 2>&1 || true' EXIT
+            timeout 120 agent-browser open "$url"
+            timeout 60 agent-browser screenshot "$out"
+            test -s "$out"
+            printf 'wrote %s (%s bytes)\n' "$out" "$(wc -c < "$out")"
+          }
+          echo "agent-shell: $(agent-browser --version 2>/dev/null | head -1)"
           echo "  browse <url>        bounded open + accessibility snapshot"
           echo "  shot <url> <png>    headless screenshot, then close"
         '';

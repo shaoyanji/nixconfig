@@ -154,6 +154,20 @@ tasks:
     cmds:
       - bash scripts/task/clanker.sh go {{.CLI_ARGS}}
 
+  clanker:devshell:
+    desc: Run a command inside a flake devShell on clanker (no local build)
+    summary: >
+      `task clanker:devshell -- ./templates/agent-shell#default 'agent-browser --version'`.
+      The Codespace analogue without an image: the tree travels as `git archive
+      HEAD`, the flake's devShell is the environment, and only the command's output
+      comes back. `--accept-flake-config` is what lets the template's numtide
+      substituter apply, so the ~700 MiB Chromium is a download rather than a
+      compile on a 4-core box. A bare `path` means `#default`; anything with a `#`
+      is used as written. The command runs in a job, so the box keeps going when
+      the ssh channel closes.
+    cmds:
+      - bash scripts/task/clanker.sh devshell {{.CLI_ARGS}}
+
   clanker:serve:
     desc: Run a service on clanker in a detached tmux session (no published port)
     summary: >

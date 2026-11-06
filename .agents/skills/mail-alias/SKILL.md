@@ -75,9 +75,16 @@ task mail:alias:doctor    # auth, plan, counts, records, drift in one report
 
 MX and SPF pass. **DMARC is missing** — the API expects `v=DMARC1; p=reject;` on
 `_dmarc.mail.shaoyanji.is-a.dev` and finds nothing. That record is not in this
-repo: `is-a.dev` has its own nameservers (`ns1.is-a.dev` …), so the record goes
-upstream through the is-a.dev registration process, not through a host switch.
-DKIM has no expected value on this plan and is not configured.
+repo: `is-a.dev` has its own nameservers (`ns1.is-a.dev` …) and its records are
+JSON files in the `is-a-dev/register` repo, merged by PR. The missing piece is
+one file, `domains/_dmarc.mail.shaoyanji.json`:
+
+```json
+{ "owner": { "username": "shaoyanji" },
+  "records": { "TXT": ["v=DMARC1; p=reject;"] } }
+```
+
+DKIM has no expected value on this plan and is not configured either.
 
 ## The key
 

@@ -13,7 +13,11 @@
       ROCKET_PORT = 8222;
       # Declared, not defaulted: frieren's proxy names the websocket port.
       WEBSOCKET_PORT = 3012;
-      DOMAIN = "http://vault.frieren.lan";
+      # https, not http: the scheme here is what /api/config advertises to clients,
+      # and Bitwarden mobile refuses a non-https identity URL, so the phone failed
+      # at login while the browser (which follows http happily) worked. The host is
+      # unchanged, so the WebAuthn RP id stays vault.frieren.lan.
+      DOMAIN = "https://vault.frieren.lan";
       SIGNUPS_ALLOWED = true;
     };
   };

@@ -393,8 +393,11 @@ in {
           proxyPass = "http://100.123.145.53:8222";
           proxyWebsockets = true;
         };
+        # 8222, not 3012: vaultwarden 1.30 removed the separate websocket
+        # listener, and this host runs 1.37.4 — the old port refused every
+        # /notifications/hub connection, which left live sync dead.
         locations."/notifications/hub" = {
-          proxyPass = "http://100.123.145.53:3012";
+          proxyPass = "http://100.123.145.53:8222";
           proxyWebsockets = true;
         };
         locations."/notifications/hub/negotiate" = {

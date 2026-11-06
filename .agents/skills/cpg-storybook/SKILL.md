@@ -95,10 +95,28 @@ printer exits instead of racing for the hourly window. It also treats a spread
 as done when a plate exists on disk, not when the ledger says so — a ledger row
 outlives an archived style, and resuming from it silently skips pages.
 
+`publish.py` builds the browsable book.
+
 `review.sh` is one review pass for a timer: it lists the spreads that have
 plates but no choice, hands them to an agent with the judging order, and lets it
 `choose`. A vision tool that answers 429 means the pass judges nothing; it must
 leave spreads unchosen and say so, never pick blind.
+
+## Publishing a finished book
+
+```bash
+python3 …/storybook.py finalize      # finals/ + book.md
+python3 …/publish.py --project $PWD  # site/index.html + web JPEGs
+python3 -m http.server 8899 --bind <tailnet-ip> --directory site
+```
+
+`publish.py` prefers `finals/`, falls back to the chosen candidate, re-encodes
+1400 px JPEGs (a 1536×1024 PNG per spread is 3 MB, so a book of them is a
+download), and writes `site/READY` only when every spread has a plate — the
+exit status is the contract, the partial `index.html` is a preview.
+
+Binding the server to the Tailscale address is what keeps a demo on the tailnet:
+no `0.0.0.0`, no `tailscale serve`, no firewall rule to forget.
 
 ## Failure behaviour
 

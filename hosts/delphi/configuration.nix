@@ -976,6 +976,110 @@ in {
     };
   };
 
+  # --- Radicale: calendar and contacts without a third-party token -----------
+  # vdirsyncer, khal and DAVx5 already speak CalDAV, so this replaces the Google
+  # OAuth round trip rather than competing with it. `owner_only` keeps every
+  # principal inside its own collections; the htpasswd file is rendered at start
+  # from a sops value, so no password hash lives in the store either.
+  sops.secrets."radicale/password" = {
+    sopsFile = ../../modules/secrets.yaml;
+    mode = "0400";
+    # The unit's ExecStartPre runs as this user (`User=` applies to it too), so
+    # root-owned 0400 would make the htpasswd render fail every start.
+    owner = config.services.radicale.user;
+    group = config.services.radicale.group;
+  };
+  services.radicale = {
+    enable = true;
+    settings = {
+      # Loopback only — the `tailscale serve` mount is the whole exposure. The
+      # module's default would bind 0.0.0.0:5232 and rely on the firewall alone.
+      server.hosts = ["127.0.0.1:5232"];
+      auth = {
+        type = "htpasswd";
+        htpasswd_filename = "/var/lib/radicale/users";
+        htpasswd_encryption = "bcrypt";
+      };
+      rights.type = "owner_only";
+    };
+  };
+  systemd.services.radicale.preStart = lib.mkBefore ''
+    umask 077
+    ${lib.getExe' pkgs.apacheHttpd "htpasswd"} -nbB ${user.name} \
+      "$(cat ${config.sops.secrets."radicale/password".path})" > /var/lib/radicale/users
+    chown ${config.services.radicale.user}:${config.services.radicale.group} /var/lib/radicale/users
+  '';
+
+  # --- ntfy: the fleet's alerts, on a phone ----------------------------------
+  # Gatus and fleet-sentinel could only toast on a desktop. Topics are guessed
+  # easily, so the mount stays on the tailnet and `base-url` is the tailnet
+  # origin: the phone subscribes there, not to ntfy.sh.
+  # There is no `services.ntfy-sh` in this nixpkgs pin, so the unit is declared
+  # here. Flags rather than a config file: the whole configuration is four
+  # values, and a YAML file generated into the store would say nothing more.
+  systemd.services.ntfy = {
+    description = "ntfy push notification server";
+    wantedBy = ["multi-user.target"];
+    after = ["network.target"];
+    serviceConfig = {
+      ExecStart = lib.concatStringsSep " " [
+        "${lib.getExe pkgs.ntfy-sh} serve"
+        "--listen-http 127.0.0.1:8096"
+        "--base-url https://${tailnetHost}:8458"
+        # TLS ends at tailscaled, so the forwarded headers are the only truth
+        # about scheme and client address.
+        "--behind-proxy"
+        "--cache-file /var/lib/ntfy/cache.db"
+        "--attachment-cache-dir /var/lib/ntfy/attachments"
+      ];
+      DynamicUser = true;
+      StateDirectory = "ntfy";
+      StateDirectoryMode = "0700";
+      Restart = "always";
+      IPAddressAllow = "localhost";
+      IPAddressDeny = "any";
+      NoNewPrivileges = true;
+      PrivateDevices = true;
+      PrivateTmp = true;
+      ProtectHome = true;
+      ProtectSystem = "strict";
+      RestrictAddressFamilies = [
+        "AF_INET"
+        "AF_INET6"
+        "AF_UNIX"
+      ];
+      RestrictNamespaces = true;
+      RestrictSUIDSGID = true;
+      UMask = "0077";
+    };
+  };
+
+  # --- Vikunja: tasks, with an API the agents can drive ---------------------
+  # Replaces a paid subscription and speaks CalDAV, so due dates sit beside the
+  # events in the same client. SQLite on the service's own state directory; the
+  # JWT secret is an environment file, because `settings` is rendered into the
+  # world-readable store.
+  sops.secrets."vikunja/jwt-secret" = {
+    sopsFile = ../../modules/secrets.yaml;
+    mode = "0400";
+  };
+  # Root-owned 0400 is fine here: systemd reads `EnvironmentFile` before it
+  # drops into the dynamic user, so the app never opens this path itself.
+  sops.templates."vikunja.env" = {
+    mode = "0400";
+    content = ''
+      VIKUNJA_SERVICE_JWTSECRET=${config.sops.placeholder."vikunja/jwt-secret"}
+    '';
+  };
+  services.vikunja = {
+    enable = true;
+    environmentFiles = [config.sops.templates."vikunja.env".path];
+    frontendScheme = "https";
+    frontendHostname = "${tailnetHost}:8459";
+    address = "127.0.0.1";
+    port = 8097;
+  };
+
   # --- Agent turn coordination store ----------------------------------------
   # xs holds one summary per agent turn, so an agent can see who is working on
   # what, from which base commit, before it starts a parallel edit. The module
@@ -1136,6 +1240,27 @@ in {
         title = "Umami";
         description = "First-party analytics for pages we own; no third-party script.";
         requires = ["umami.service"];
+      };
+      radicale = {
+        port = 8457;
+        upstream = "http://127.0.0.1:5232";
+        title = "Radicale";
+        description = "CalDAV and CardDAV: calendars and contacts without a third-party token.";
+        requires = ["radicale.service"];
+      };
+      ntfy = {
+        port = 8458;
+        upstream = "http://127.0.0.1:8096";
+        title = "ntfy";
+        description = "Push notifications for gatus and fleet-sentinel, straight to the phone.";
+        requires = ["ntfy.service"];
+      };
+      vikunja = {
+        port = 8459;
+        upstream = "http://127.0.0.1:8097";
+        title = "Vikunja";
+        description = "Tasks with CalDAV and a REST API, in place of a paid service.";
+        requires = ["vikunja.service"];
       };
       email-archive = {
         port = 8450;

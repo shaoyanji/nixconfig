@@ -40,16 +40,16 @@
   # >= 1.27.1 (running go 1.26.8)". nixpkgs carries go_1_27 (1.27.2).
   chatplaygroundCli = pkgs.buildGo127Module rec {
     pname = "chatplayground-go";
-    version = "1.2.1";
+    version = "1.2.2";
     src = pkgs.fetchFromGitHub {
       owner = "shaoyanji";
       repo = "chatplayground-go";
-      rev = "8365f0947551a981984e52d24e8ab6cc51929e39";
-      hash = "sha256-WBgqj+ND9A5C2Lg4mcHPVrcu/KTzvHoTphk4ztboS0w=";
+      rev = "09a6c618f2c1b35f4e104a09e5d2f9b284f7a0ce";
+      hash = "sha256-kT6OgWjMb4LuSodeGn/04/x7w/S8KJCJ5ca93OtkXGA=";
     };
     vendorHash = "sha256-t1Bqg6w5O1AT7NGqIfptbTQsjY/X4NosMxRlz+VBxiw=";
     subPackages = ["."];
-    ldflags = ["-s" "-w" "-X main.Version=1.2.1"];
+    ldflags = ["-s" "-w" "-X main.Version=1.2.2"];
     # `cpg` is the name that gets typed; the upstream binary keeps its own name
     # for the shim's ExecStart and for anyone following the project's docs.
     postInstall = ''

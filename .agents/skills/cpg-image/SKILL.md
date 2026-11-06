@@ -46,6 +46,32 @@ supported`).
 
 `1024x1024` (default), `1536x1024` wide, `1024x1536` tall.
 
+## Budget and pacing
+
+`cpg usage` on 2026-11-06 reports a `lifetime-pool` plan whose name is
+"unlimited", and the image lane still has hard numbers: **an allowance of 100
+generations** (3 used that day) and a rate of **25 per hour, 250 per day**.
+Prompts are rate-limited separately at 50 per 10 minutes and 300 per hour.
+
+Plan a long project against the smaller number, not the word "unlimited":
+
+- At 25/hour the ceiling is one image every 2.4 minutes. A 200-illustration
+  book is eight hours of wall clock even when nothing fails.
+- Check before a batch and between batches:
+  ```bash
+  cpg usage --json | jq '{used: .usage.imageGenerationsCount,
+    allowance: .entitlement.limits.imageGenerations,
+    hour: .entitlement.rateLimits.image}'
+  ```
+- Spend generations on what only a model can do. Cropping, resizing, colour
+  grading, text overlays and repetition are local work for an image tool.
+- One composed prompt beats three variations. Re-roll on a named defect ("the
+  cube is off-centre"), never to shop for a better idea.
+- On 429, wait out the window — up to an hour at 25/h. The CLI has no queue, and
+  a retry loop spends the next window too.
+- If a project needs more than the allowance, say so before it starts and
+  propose the split. Do not discover the ceiling at image 101 in a nightly job.
+
 ## Where the file goes
 
 - `-o PATH` downloads the PNG and is the only way to get a local file; without

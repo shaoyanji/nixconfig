@@ -52,23 +52,41 @@ budget, summarise it yourself first, or split it into two questions; do not trun
 
 ## Choosing a model
 
-`cpg models` lists what the session can see (34 ids on 2026-11-06). Only the free tier answers:
-premium ids (`gpt-6.1-sol`, `claude-sonnet-5-5`, `kimi-k3`, `qwen3.8-max`, `glm-5.3`) return
-`403 only available to active subscribers`, so listing one is a trap.
+`cpg models` lists 34 ids (2026-11-06). `premium_only` is a **global** flag, not an
+answer about this account: this one holds a lifetime pool, and 10 of the 11 premium
+ids still answered `403 only available to active subscribers` — `gpt-6.1-sol`,
+`claude-sonnet-5-5`, `claude-opus-5-5`, `kimi-k3`, `qwen3.8-max`, `glm-5.3` and the
+two perplexity ids among them. `gemini-3.8-flash` was the single exception that
+worked. So treat `premium_only` as unavailable and re-test when the plan changes.
+`cpg usage` is the authority on the plan; the catalog is not.
 
 The value here is independence, not a ranking. Pick a different vendor from the model you are
-running on, and stay with an id whose answer you have already judged. Ids exercised on the free
-tier on 2026-11-06: `gpt-6-luna`, `claude-haiku-5-5`, `deepseek-v4.1-flash`, `gemini-3.8-flash-l`,
+running on, and stay with an id whose answer you have already judged. Ids exercised on
+2026-11-06: `gpt-6-luna`, `claude-haiku-5-5`, `deepseek-v4.1-flash`, `gemini-3.8-flash-l`,
 `kimi-k2.6`, `qwen3.7-plus`, `glm-5.3-flash`, `grok-4.7`.
+
+## Budget: prompts are rate-limited, not metered
+
+Measured 2026-11-06 on the lifetime pool (`cpg usage`): `basicQueries` and
+`advancedQueries` are 0, meaning no quota counter to exhaust, but the rate limits
+are real — **50 prompts per 10 minutes and 300 per hour**, 4 concurrent streams.
+That is the pacing constraint for a long session:
+
+- One question, one call. A three-model `compare` costs three prompts, and a
+  fan-out over every free id spends a tenth of the hour for one answer.
+- 300/hour is 5 a minute sustained; a review loop that fires 50 calls in a burst
+  hits the window before it hits any quota.
+- On a 429, wait for the window (10 minutes for the burst limit) rather than
+  retrying; the CLI has no queue.
 
 ## Machine surfaces
 
-`models --json` and `status --json` are the parseable forms. The catalog keeps
-the entitlement fields, so the free tier is a filter instead of a memory:
+`models --json`, `status --json` and `usage --json` are the parseable forms:
 
 ```bash
 cpg models --json | jq -r '.[] | select(.premium_only | not) | .id'
 cpg status --json | jq -e '.authenticated'
+cpg usage --json | jq '.entitlement.rateLimits.prompt'
 ```
 
 A one-shot `cpg chat` writes bare text when stdout is not a TTY — no prompt

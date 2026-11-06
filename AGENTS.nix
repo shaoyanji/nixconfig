@@ -5489,43 +5489,42 @@
           "hosts/frieren/infra-stack.nix"
           "hosts/delphi/infra-stack.nix"
           "scripts/task/hermes-check.sh"
+          "scripts/task/hermes-env-sync.sh"
+          "modules/user/ai/hermes-user.nix"
           "modules/user/ai/hermes-persona/config.yaml"
         ];
         tasks = ["checks:hermes"];
         docs = [".agents/skills/frieren-offload/SKILL.md"];
       };
       body = ''
-        Found while auditing the hermes surface: a dead tier logs the same WARN line as a tier that was never needed.
+        Tier 3 logged the same WARN line as a tier that was never needed, so nothing
+        showed it had never made a model call.
 
-        **What was wrong.** `hosts/{frieren,delphi}/infra-stack.nix` ran
-        `hermes -q "$prompt" --oneshot`. Top-level `-q` does not exist, so hermes
-        exited 2 ("'…' is not a `hermes` command") before any model call — `-q` and
-        `--oneshot` are `hermes chat` options. The tier also had no time ceiling
-        where Tier 2 passes `-t 600`.
+        **Wrong form.** Both host cascades ran `hermes -q "$prompt" --oneshot`; the
+        top-level parser has no `-q`, so hermes exited 2 ("is not a `hermes` command")
+        before any call. Measured on 0.22.5, trivial prompt, frieren: old form exit 2
+        in 0.0 s; `hermes chat -q … --oneshot` exit 0 in 30.3 s; `… -Q --run-budget
+        600` exit 0 in 21.4 s. Fixed Tier 3 ran end to end in 33.4 s.
 
-        **Measured, hermes 0.22.5, trivial prompt, frieren:**
+        **Deployed 2026-11-06.** frieren `infra:rebuild:nixos` (08:34, runner
+        `j3v4h1…` line 87) and delphi `nixos-rebuild switch --refresh --flake
+        github:shaoyanji/nixconfig#delphi` (08:23, runner `51gy7r…` line 78). Live
+        Tier 3 on delphi: exit 0 in 20 s, produced `TIER3_LIVE_OK`. delphi's deploy
+        ran that command by hand because `activate-host.sh` gates on the *toplevel*
+        being in a substituter and nothing caches a cloud host's own toplevel.
 
-        | form | exit | wall |
-        | :--- | :--- | :--- |
-        | `hermes -q … --oneshot` (old) | 2 | 0.0 s, argparse, no call |
-        | `hermes chat -q … --oneshot` | 0 | 30.3 s |
-        | `… -Q --run-budget 600` | 0 | 21.4 s |
+        **Two more bugs surfaced on the way.** `hermes-env-sync` could not create
+        `~/.hermes/.env` from scratch — `grep -oE … file` exits 1 on no match and
+        `pipefail` made that the whole diff's status — which failed home-manager
+        activation on delphi (`4/NOPERMISSION`); `35f45867` fixes that plus a swapped
+        `comm` (added and dropped printed the same list) and two `NR == FNR` guards.
+        The triage counters had the same shape (`grep … | wc -l || echo 0`, `||`
+        binding to `wc`), now `( … || true) | wc -l`.
 
-        `-z` took 32.0 s for the same prompt; a non-TTY terminal-tool turn without
-        `--yolo` 23.2 s, exit 0. `-Q` keeps the session footer out of a job log; the
-        fixed Tier 3 branch exited 0 end to end in 33.4 s.
-
-        **Also.** Both env files are sourced now, rendered last: the module never
-        clobbers a real `~/.hermes/.env`, so a rotated key could lose to the older
-        file. The persona config was v0 to the migrator ("outdated (v0 → v51)") with
-        a retired `security.tirith` key; a copy migrated under `HERMES_HOME=/tmp/hh`
-        gave a two-line diff, which landed. `task checks:hermes` gates the rest: a
-        top-level flag `hermes --help` does not publish (it caught both hosts before
-        the fix), the gateway's `needs_attention`, rendered-env KEY NAMES (never
-        values) against the `.env` bridge, and `hermes doctor` on the config — 5 s,
-        no model call. The hosts pick this up on their next rebuild; the deployed
-        units still carry the old form.
-      '';
-    };
+        **Gate.** `task checks:hermes` fails any top-level call site using a flag
+        `hermes --help` does not publish (it caught both hosts before the fix), the
+        gateway's `needs_attention`, rendered-env KEY NAMES against `.env`, and
+        `hermes doctor` on the persona config — 5 s, no model call, no ssh.
+      '';    };
   };
 }

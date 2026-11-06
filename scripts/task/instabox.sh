@@ -28,6 +28,7 @@ usage: instabox.sh <command> [args]
   ls                      machines in this key's workspace
   get  <name|id>          one machine's full record
   token <name|id>         print the machine's ssh line (minted, cached, 7 days)
+  forward <name|id> <port> [remote]  foreground loopback forward (no remote cmd)
   ssh  <name|id> [-- cmd] interactive shell, or one command
   run  <name|id> -- cmd   one command over ssh
   exec <name|id> -- cmd   one command through the API (no ssh, no token)
@@ -167,6 +168,25 @@ case "$cmd" in
     shift || true
     [ "${1:-}" = "--" ] && shift
     ssh_on "$id" "$@"
+    ;;
+  forward)
+    # A loopback forward and nothing else: the only reachability a service on
+    # this machine has, since nothing here publishes a port.
+    id="$(resolve "${1:-}")"
+    local_port="${2:-}"
+    remote_port="${3:-$local_port}"
+    [ -n "$local_port" ] || usage
+    line="$(ssh_line "$id")"
+    split_line "$line"
+    exec ssh -N \
+      -p "$PORT" \
+      -L "127.0.0.1:$local_port:127.0.0.1:$remote_port" \
+      -o ExitOnForwardFailure=yes \
+      -o StrictHostKeyChecking=accept-new \
+      -o "UserKnownHostsFile=$cache/known_hosts" \
+      -o ConnectTimeout=25 \
+      -o ServerAliveInterval=30 \
+      "$HOSTARG"
     ;;
   run)
     id="$(resolve "${1:-}")"

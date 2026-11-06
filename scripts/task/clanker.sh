@@ -39,6 +39,10 @@ usage: clanker.sh <command> [args]
   nix <attr> [--wait]    send the tree, `nix build .#<attr>` on the box, print the path
   go <pkg> [--wait]      send the tree, `go build` on the box, fetch the binary
   profile [--wait]       send the tree, build and activate homeConfigurations.clanker
+  serve <name> <port> <cmd>   run a service in a detached tmux session on the box
+  services               which tmux services are up, and on which port
+  stop-serve <name>      end one service's session
+  forward <port> [remote]  foreground loopback forward to a service (no publish)
 EOF
   exit 2
 }
@@ -226,6 +230,46 @@ go version || true" >/dev/null
       bash "$here/clanker.sh" wait "$id" || true
       bash "$here/clanker.sh" logs "$id" 200
     fi
+    ;;
+  serve)
+    # A service is a tmux session: nothing is published, so reachability is a
+    # forward (`forward`) and the session outlives the channel that started it.
+    name="${1:-}"
+    port="${2:-2666}"
+    shift 2 || true
+    cmd="${1:-}"
+    [ -n "$name" ] && [ -n "$cmd" ] || usage
+    box "set -e
+export PATH=\"\$HOME/.nix-profile/bin:\$PATH\"
+mkdir -p /data/svc
+tmux has-session -t 'svc-$name' 2>/dev/null && { echo 'already running: svc-$name' >&2; exit 1; }
+tmux new-session -d -s 'svc-$name' '$cmd'
+printf '%s\n' '$port' > /data/svc/$name.port
+sleep 1
+tmux has-session -t 'svc-$name' >/dev/null && echo 'started svc-$name on the box at 127.0.0.1:$port'
+tmux capture-pane -p -t 'svc-$name' | tail -5"
+    ;;
+  services)
+    box 'set +e
+export PATH="$HOME/.nix-profile/bin:$PATH"
+for f in /data/svc/*.port; do
+  [ -e "$f" ] || continue
+  n=$(basename "$f" .port)
+  if tmux has-session -t "svc-$n" 2>/dev/null; then st=up; else st=down; fi
+  printf "%-16s %-6s %s\n" "$n" "$(cat "$f")" "$st"
+done
+[ -e /data/svc ] && [ -z "$(ls -A /data/svc)" ] && echo "no services"
+exit 0'
+    ;;
+  forward)
+    port="${1:-}"
+    [ -n "$port" ] || usage
+    exec bash "$here/instabox.sh" forward "$BOX" "$port" "${2:-$port}"
+    ;;
+  stop-serve)
+    name="${1:-}"
+    [ -n "$name" ] || usage
+    box "export PATH=\"\$HOME/.nix-profile/bin:\$PATH\"; tmux kill-session -t 'svc-$name' 2>/dev/null && echo 'stopped svc-$name' || echo 'not running: svc-$name'; rm -f /data/svc/$name.port"
     ;;
   go)
     pkg="${1:-}"

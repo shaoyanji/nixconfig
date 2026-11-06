@@ -154,6 +154,36 @@ tasks:
     cmds:
       - bash scripts/task/clanker.sh go {{.CLI_ARGS}}
 
+  clanker:serve:
+    desc: Run a service on clanker in a detached tmux session (no published port)
+    summary: >
+      `task clanker:serve -- web 8099 'python3 -m http.server 8099 --bind 127.0.0.1'`.
+      The service is a tmux session `svc-<name>`; nothing is exposed, so the only
+      way in is `clanker:forward`, which tunnels the loopback port through the
+      minted ssh token. That is the whole offload: the box's CPU and memory run
+      the service, this host keeps the browser tab and the credential.
+    cmds:
+      - bash scripts/task/clanker.sh serve {{.CLI_ARGS}}
+
+  clanker:services:
+    desc: Which services run on clanker, on which port, and whether they are up
+    cmds:
+      - bash scripts/task/clanker.sh services
+
+  clanker:forward:
+    desc: Foreground loopback forward to a service on clanker
+    summary: >
+      `task clanker:forward -- 8099`. Opens `ssh -N -L 127.0.0.1:8099:…`, so
+      `http://127.0.0.1:8099` is the service on the box. Ctrl-C ends the forward,
+      not the service — the tmux session keeps running until the box suspends.
+    cmds:
+      - bash scripts/task/clanker.sh forward {{.CLI_ARGS}}
+
+  clanker:stop-serve:
+    desc: End one service's tmux session on clanker
+    cmds:
+      - bash scripts/task/clanker.sh stop-serve {{.CLI_ARGS}}
+
   clanker:job:
     desc: Start a detached shell command on clanker and print its job id
     summary: >

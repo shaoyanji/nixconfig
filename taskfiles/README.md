@@ -41,7 +41,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/neocities.yml` – dragoncourt.neocities.org: gum post authoring (new/edit/publish/draft/delete), listing + feed render, preview and deploy
 - `taskfiles/serv00.yml` – Serv00 FreeBSD hosting, Devil CLI, webserver lifecycle (jisifu.serv00.net), and Gum menu
 - `taskfiles/dragoncourt.yml` – Alwaysdata Debian hosting, PHP/Wasm webserver (dragoncourt.alwaysdata.net), and Gum menu
-- `taskfiles/envs.yml` – Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline (jisifu.envs.net), and Gum menu
+- `taskfiles/envs.yml` – Envs.net Debian hosting, public_html / Gemini / Gopher, build pipeline (jisifu.envs.net), the git.envs.net forge (`envs:git:*`, implemented by `scripts/task/gitenvs.sh`), and Gum menu
 - `taskfiles/pythonanywhere.yml` – PythonAnywhere Flask CMS (jisifu.pythonanywhere.com) over the REST API: health reload logs, single-file push/pull — no ssh
 - `taskfiles/bountystash.yml` – Bountystash Console (<14KB TCP budget), preview & Cloudflare Pages deployment, and Gum menu
 - `taskfiles/burgernas.yml` – Synology DS220j cold vault (BurgerNAS): WoL power, restic backup target, leech-only Transmission, aria2/AriaNg, and Gum menu

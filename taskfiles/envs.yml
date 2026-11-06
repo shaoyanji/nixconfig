@@ -125,6 +125,63 @@ tasks:
         scp -r "{{.ENVS_TARGET}}:$SRC" "$DEST"
         echo "Transfer complete."
 
+  # git.envs.net is a Forgejo instance, not another ssh host: these verbs speak
+  # its REST API with the token from sops, so the forge is scriptable without a
+  # browser. Code still moves over git; `repo:create` prints the remote to add.
+  envs:git:whoami:
+    desc: "git.envs.net token identity: account, admin flag, reachable repo count"
+    cmds:
+      - bash scripts/task/gitenvs.sh whoami
+
+  envs:git:repos:
+    desc: "Repositories on git.envs.net (FORMAT=json for the untouched API objects)"
+    vars:
+      FORMAT: '{{.FORMAT | default "text"}}'
+    cmds:
+      - bash scripts/task/gitenvs.sh repos "{{.FORMAT}}"
+
+  envs:git:repo:show:
+    desc: "One repository: clone URLs, branch, size and open issues (NAME=...)"
+    vars:
+      NAME: '{{.NAME | default ""}}'
+    cmds:
+      - bash scripts/task/gitenvs.sh show "{{.NAME}}"
+
+  envs:git:repo:create:
+    desc: "Create a repository (NAME=..., PUBLIC=1, DESCRIPTION=...), README initialised"
+    summary: >
+      Private unless PUBLIC=1. auto_init writes the first commit, so the repo has
+      a default branch to clone instead of an empty remote that rejects the first
+      push. Prints the https and ssh remotes. A refusal (name taken, or a token
+      without write scope) prints the forge's own message and fails the task.
+    vars:
+      NAME: '{{.NAME | default ""}}'
+      PUBLIC: '{{.PUBLIC | default "0"}}'
+      DESCRIPTION: '{{.DESCRIPTION | default ""}}'
+    cmds:
+      - bash scripts/task/gitenvs.sh create "{{.NAME}}" "{{.PUBLIC}}" "{{.DESCRIPTION}}"
+
+  envs:git:repo:delete:
+    desc: "Delete a repository; CONFIRM=<name> repeats NAME so a typo cannot delete"
+    summary: >
+      The forge drops the repository with its issues and wiki, and keeps no
+      trash. CONFIRM must equal NAME exactly, which makes the destructive
+      argument a second, deliberate keystroke. A missing or mismatched CONFIRM,
+      an unknown repo, or a forge refusal prints why and fails the task.
+    vars:
+      NAME: '{{.NAME | default ""}}'
+      CONFIRM: '{{.CONFIRM | default ""}}'
+    cmds:
+      - bash scripts/task/gitenvs.sh delete "{{.NAME}}" "{{.CONFIRM}}"
+
+  envs:git:api:
+    desc: "Raw Forgejo call: task envs:git:api -- GET '/user/repos?limit=5'"
+    summary: >
+      The escape hatch for anything without a verb: METHOD, path, optional json
+      body, against https://git.envs.net/api/v1. Output is pretty-printed JSON.
+    cmds:
+      - bash scripts/task/gitenvs.sh api {{.CLI_ARGS}}
+
   envs:info:
     desc: Query Envs.net Debian system info, runtimes, and public_html git status
     cmds:

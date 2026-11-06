@@ -203,7 +203,18 @@ anki's only account takes its password from sops (`anki-sync/password`, read wit
 `sops -d modules/secrets.yaml | yq -r '.anki-sync.password'`), rendered as a
 systemd credential rather than a plaintext option. The unit's `LoadCredential`
 line is the proof it is wired: `systemctl show -p LoadCredential anki-sync-server`.
-The old placeholder was `bob`/`password` and is rejected (403 on `/sync/hostKey`).
+
+That account is **`devji`** and it is the only one. `bob` was the plaintext
+placeholder and answers `403` on `/sync/hostKey` (measured 2026-11-06), so a
+client still configured with `bob` fails at login, not at sync. The same probe
+shows the collection is empty: the download yields the `Default` deck with no
+cards, which means no desktop has ever uploaded through this server. Point the
+desktop at `anki.frieren.lan` and let it sync once before expecting cards here.
+
+Protocol note for a scripted client: version 11 is one `anki-sync` JSON header
+(`v`/`k`/`c`/`s`) plus a zstd body, and `meta` needs `{"v":11,"cv":…}`. A bare
+JSON body without the header is rejected with an unexplained `400`.
+`deutsch-srs -backend anki-sync` implements exactly that read path.
 
 The move is complete (2026-11-02): frieren's closure carries the three vhosts,
 proxying `docs`/`vault`/`anki.frieren.lan` straight to this host's tailnet

@@ -59,11 +59,15 @@ in {
     # Gate GPU-heavy Zed editor on hardware tier (GPUI/Vulkan unstable on legacy Haswell/low tier)
     zed-editor.enable = lib.mkDefault (graphicsTier != "low");
 
+    # The sync server moved to delphi on 2026-11-02 and kept the name: the
+    # client URL is the vhost `anki.frieren.lan` (port 80), never the old
+    # `frieren.lan:27701` hole, which now refuses connections on the NAS. The
+    # only account is `devji`; the pre-move placeholder `bob` answers 403.
     anki = {
       enable = true;
       profiles."User 1".sync = {
-        username = "bob";
-        url = "http://frieren.lan:27701";
+        username = "devji";
+        url = "http://anki.frieren.lan";
       };
     };
 

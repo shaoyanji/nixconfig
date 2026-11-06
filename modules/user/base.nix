@@ -17,6 +17,7 @@ in {
     self.modules."shell"
     self.modules."sops"
     self.modules."helix"
+    self.modules."lynx"
   ];
 
   home = {

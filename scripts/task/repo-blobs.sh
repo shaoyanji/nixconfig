@@ -95,6 +95,22 @@ elif [ "$mode" = push ]; then
     echo "push: no ref to send, no blob checked"
     exit 0
   fi
+  # A ref the server moved to after our last fetch is not in this object
+  # database, and `rev-list --not <missing>` dies with "bad object" — which
+  # refused a legitimate push twice in a row while another turn was pushing.
+  # Keep the bases this clone can resolve, say so about the rest, and let the
+  # range against the refs we do have speak for itself.
+  resolvable=()
+  if [ "${#excludes[@]}" -gt 0 ]; then
+    for base in "${excludes[@]}"; do
+      if git cat-file -e "$base^{commit}" 2>/dev/null; then
+        resolvable+=("$base")
+      else
+        echo "push: base $base is not in this clone (behind the server); checking against the refs we have" >&2
+      fi
+    done
+  fi
+  excludes=("${resolvable[@]+"${resolvable[@]}"}")
   # --remotes as well as the sent shas: a branch built here out of commits the
   # remote already holds carries no new objects either.
   if ! rows=$(git rev-list --objects "${locals[@]}" \

@@ -1,13 +1,13 @@
 ---
 name: instabox
-description: "Pick me to reach an InstaBox machine without their CLI: the API key in sops, an SSH token minted through the API, and `exec` when no ssh is needed."
-version: 0.1.0
+description: "Pick me to reach an InstaBox machine without their CLI, and to use clanker as the fleet's offload box: the API key in sops, an SSH token minted through the API, `exec` when no ssh is needed, and detached jobs for background builds."
+version: 0.2.0
 author: Shaoyan Ji (shaoyanji), Buffy
 platforms: [linux]
 metadata:
   hermes:
-    tags: ['instabox', 'vps', 'ssh', 'api', 'builder', 'agent-vm']
-    related_skills: ['codespace', 'infra', 'tmux']
+    tags: ['instabox', 'vps', 'ssh', 'api', 'builder', 'agent-vm', 'offload']
+    related_skills: ['codespace', 'infra', 'tmux', 'task-plane']
 ---
 
 # instabox — machines over HTTP and plain ssh
@@ -76,11 +76,40 @@ instead of a prompt that would hang an unattended run.
 - **Commands are one shell string** (`bash -lc`), so a quote-sensitive command
   belongs in a file on the machine, not inline.
 
+## clanker as a job box (`task clanker:*`)
+
+`clanker` is a permanent fleet fixture as of 2026-11-06 (plan:
+`AGENTS.nix` note `clanker-offload-fixture`), driven by
+`scripts/task/clanker.sh`. It is a 4 vCPU / 8 GiB Instabox VM, so it takes the
+work that is measured in minutes and has a result to copy back — not state.
+
+| What | How |
+| :--- | :--- |
+| One-time bring-up | `task clanker:up` — single-user Nix at `$HOME/.nix-profile`, `nix.conf` with the fleet substituters, `max-jobs = 4`, `cores = 1`, `sandbox = false` |
+| The toolbox | `task clanker:profile` — sends the tree, builds `.#homeConfigurations.clanker` (`role:lean`: git, gh, go, go-task, ripgrep, jq, yq, tmux, direnv, rsync, shellcheck) and runs the generation's own `activate` |
+| A closure build | `task clanker:nix -- '.#hostChecks.x86_64-linux.fern' --wait` |
+| A Go binary | `task clanker:go -- ./modules/services/turns-dashboard --wait` |
+| Anything else | `task clanker:job -- '<cmd>'`, then `clanker:wait`, `clanker:logs`, `clanker:result` |
+
+**The job is a directory**, not a process: `/data/jobs/<id>/{cmd.sh,log,exit}`. The
+wrapper writes `exit` last, so the *absence* of `exit` is what "running" means — a
+pid file would go stale across the suspend the box does to itself. `setsid` starts
+it, so closing the ssh channel does not kill it; the 120-minute run clock does, and
+that is why long work is written to resume from its log.
+
+**The tree travels as `git archive HEAD`**, so a build uses the last commit, not
+what is in your working tree. Commit first, or the box builds yesterday.
+
+**No credential goes there that can write to a cache.** Measured 2026-11-06: a
+build on clanker warms nothing, because the box holds no cachix or R2 key, and a
+result comes back only through `clanker:result` (a tar, since the image has no
+rsync). Giving it one is a deliberate temporary exception, never a default.
+
 ## What is on the box
 
-Measured 2026-11-06 on `clanker`: `docker`, `go`, `node`, `python3`, `git` are
-present; **no nix, no nix-shell, no rsync**. A nix build there means installing
-Nix first (a daemon and a store, i.e. the dependency the fleet does not want on
-an ephemeral VM) — for fleet builds the answer stays `task dev:ci:trigger:<host>`
-or `task infra:warm:*`, and this box is for the work that is not a closure
-(an agent session, a container, a Go or Node build).
+Measured 2026-11-06 on `clanker`, after `clanker:up` + `clanker:profile`: Ubuntu,
+4 vCPU / 8 GiB, home `$HOME=/data/home` (on the `/data` disk — activation refuses
+any other `homeDirectory`), single-user Nix at `/data/home/.nix-profile` with a
+3.3 GiB store, and the lean profile's `gh`, `go`, `go-task`, `jq`, `yq`, `tmux`,
+`ripgrep`, `rsync`, `direnv`. **`rsync` exists only through the profile** — the
+image itself ships docker, go, node and python3 but no rsync and no nix.

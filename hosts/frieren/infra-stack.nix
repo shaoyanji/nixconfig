@@ -334,6 +334,23 @@
       exit 0
     fi
 
+    # --- BOOT-SETTLE GATE: never audit a host that is still coming up ---
+    # The timer is Persistent=true, so after a power cut it catches up the instant
+    # the user manager starts — seconds into boot. On 2026-11-06 that meant every
+    # Gatus probe hit its 10s timeout, the 05:00 dispatch was refused because
+    # simplex-chat was not yet listening on 127.0.0.1:5225, and the cascade
+    # "repaired" units that were still legitimately activating. Judge the host
+    # only once it has settled. A normal 05:00 run is hours past boot and waits
+    # not at all.
+    SETTLE_SECS=''${AGY_BOOT_SETTLE_SECS:-600}
+    UPTIME_FILE=''${AGY_UPTIME_FILE:-/proc/uptime}
+    UPTIME_SECS=$(cut -d. -f1 "$UPTIME_FILE")
+    if [ "$UPTIME_SECS" -lt "$SETTLE_SECS" ]; then
+      WAIT_SECS=$((SETTLE_SECS - UPTIME_SECS))
+      echo "=== [$(date)] Boot catch-up at ''${UPTIME_SECS}s uptime; waiting ''${WAIT_SECS}s for services to settle before auditing ==="
+      sleep "$WAIT_SECS"
+    fi
+
     echo "=== [$(date)] Found $SYSTEM_FILE. Preparing execution... ==="
     ARCHIVE_DIR="${user.home}/.agents/system"
     mkdir -p "$ARCHIVE_DIR"

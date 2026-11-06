@@ -8,6 +8,25 @@
   cfg = config.services.agentScheduler;
   user = import ../global/user.nix;
 
+  # A locked oneshot. `flock -w` exits 1 and prints nothing when it cannot get
+  # the lock, so a job that deferred to a run already in progress reads as a
+  # unit failure — and a failed unit is itself a trigger condition for the next
+  # audit cascade. Contention is a skip: say so and exit 0. Any other status is
+  # the job's own and passes through untouched.
+  lockExec = pkgs.writeShellScript "agent-scheduler-lock-exec" ''
+    set -uo pipefail
+    lock=$1
+    waitSecs=$2
+    shift 2
+    "${pkgs.util-linux}/bin/flock" -w "$waitSecs" -E 75 "$lock" "$@"
+    rc=$?
+    if [ "$rc" -eq 75 ]; then
+      echo "agent-scheduler: $lock held by another run; skipped this trigger after ''${waitSecs}s."
+      exit 0
+    fi
+    exit "$rc"
+  '';
+
   jobType = lib.types.submodule ({name, ...}: {
     options = {
       name = lib.mkOption {
@@ -130,7 +149,7 @@ in {
             ];
             ExecStart =
               if job.lockFile != null
-              then "${pkgs.util-linux}/bin/flock -w 60 ${job.lockFile} ${job.command}"
+              then "${lockExec} ${job.lockFile} 60 ${job.command}"
               else "${job.command}";
             StandardOutput = "journal";
             StandardError = "journal";

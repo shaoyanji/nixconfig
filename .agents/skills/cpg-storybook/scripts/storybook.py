@@ -18,6 +18,7 @@ killed at image 60 resumes at 61 and never re-spends a spent generation.
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
 import os
 import shutil
@@ -169,16 +170,12 @@ def cmd_budget(_: argparse.Namespace) -> int:
 def cmd_status(_: argparse.Namespace) -> int:
     m = manifest()
     rows = ledger_rows()
-    ok = [r for r in rows if r.get("ok")]
-    per = {}
-    for r in ok:
-        per.setdefault(r["spread"], []).append(r)
     print(f"book     {m.get('title', '?')}")
     print(f"spreads  {len(m['spreads'])}")
-    print(f"spent    {len(rows)} attempts, {len(ok)} images this project")
+    print(f"spent    {len(rows)} attempts, {sum(1 for r in rows if r.get('ok'))} images this project")
     print(f"states   {sum(1 for s in m['spreads'] if s.get('chosen'))} chosen")
     for s in m["spreads"]:
-        got = len(per.get(s["id"], []))
+        got = len(list((CANDIDATES / s["id"]).glob("*.png")))
         mark = f"chosen c{s['chosen']}" if s.get("chosen") else f"{got}/{s.get('candidates', m.get('candidates', 3))}"
         print(f"  {s['id']:>4}  {mark}")
     b = budget()
@@ -223,16 +220,23 @@ def cmd_gen(args: argparse.Namespace) -> int:
 
 def cmd_run(args: argparse.Namespace) -> int:
     m = manifest()
-    done = {r["spread"] for r in ledger_rows() if r.get("ok")}
+    # A ledger row can outlive its plate (an archived style, a deleted file), so
+    # what counts as done is the file on disk, not the record of spending.
+    done = {s["id"] for s in m["spreads"] if any((CANDIDATES / s["id"]).glob("*.png"))}
     pending = [s for s in m["spreads"] if s["id"] not in done]
     if not pending:
         print("storybook: every spread already has candidates")
         return 0
     if args.limit is not None:
         pending = pending[: args.limit]
-    for spread in pending:
+    want = args.candidates or manifest().get("candidates", 3)
+    for idx, spread in enumerate(pending):
+        left = len(pending) - idx
+        # Every spread gets a plate even if the allowance runs short: share what
+        # is left across the spreads still to come instead of front-loading.
+        share = max(1, budget()["remaining"] // left)
         cmd_gen(argparse.Namespace(
-            spread=spread["id"], candidates=args.candidates,
+            spread=spread["id"], candidates=min(want, share),
             limit=None, min_interval=args.min_interval, dry_run=args.dry_run,
         ))
     return 0
@@ -280,6 +284,17 @@ def cmd_finalize(_: argparse.Namespace) -> int:
     return 0
 
 
+def take_lock():
+    """Two printers would each think they own the hourly window."""
+    STATE.parent.mkdir(parents=True, exist_ok=True)
+    handle = (STATE.parent / "printer.lock").open("w")
+    try:
+        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        sys.exit("storybook: another printer holds the lock; stop it first")
+    return handle
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="storybook")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -309,6 +324,8 @@ def main() -> int:
     choose.set_defaults(fn=cmd_choose)
 
     args = parser.parse_args()
+    if args.cmd in ("gen", "run"):  # read-only commands report on a live printer
+        lock = take_lock()  # noqa: F841 — held for the life of the process
     return args.fn(args)
 
 

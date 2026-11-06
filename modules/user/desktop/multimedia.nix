@@ -139,7 +139,7 @@ in {
       enable = true;
       settings = lib.mkMerge [
         {
-          output = "%(title)s [%(id)s].%(ext)s";
+          output = "\"%(title)s [%(id)s].%(ext)s\"";
           embed-metadata = true;
           embed-thumbnail = true;
           concurrent-fragments = 4;

@@ -140,7 +140,14 @@ func main() {
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, _ *http.Request) {
 		io.WriteString(w, "ok\n")
 	})
-	mux.Handle("/", http.FileServer(http.Dir(*site)))
+	// A reader keeps this page open for hours, so a stale app.js is a stale
+	// reader: a deploy would be invisible to it. The site is four small files on
+	// loopback — revalidate them, never serve them from heuristic freshness.
+	static := http.FileServer(http.Dir(*site))
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache")
+		static.ServeHTTP(w, r)
+	}))
 
 	go s.watch()
 	log.Printf("turns-dashboard: %s, shim %s, hermes %q", *addr, s.shim, s.hermes)

@@ -213,7 +213,7 @@ from `/srv/data/german/audio/B1_Wortliste_DTZ_Goethe_vocabsentensesaudiotranslat
 to `/sync/upload`; the download now serves `B1_Wortliste_DTZ_Goethe` (5,264
 cards, no media — every `[sound:…]` resolves to nothing). The three
 `Deutsch::B2::*` decks (102 cards) were merged over that collection by
-`scripts/german/b2-deck.py`, since an upload replaces everything; the sequence
+`anki-author build --base`, since an upload replaces everything; the sequence
 is in `docs/service-offload.md`.
 
 Protocol note for a scripted client: version 11 is one `anki-sync` JSON header

@@ -135,13 +135,15 @@ coupling, and it points at delphi or at the NAS's own loopback.
   `sops -d modules/secrets.yaml | yq -r '.anki-sync.password'` reads or rotates it.
   Verified against the live server: `/sync/hostKey` answers 200 with an hkey for
   the sops password and 403 for `password`.
-- **An upload replaces the whole collection.** So the authored decks are merged
-  into the B1 file, never posted as a file of their own: `scripts/german/b2-deck.py
-  --b1 <b1 collection.anki2> --out <merged>` adds the notetype, the decks and the
-  notes to a copy of the B1 collection. The sequence that worked on 2026-11-06:
-  download the server's copy to `/srv/data/german/anki-backups/`, run the merge,
-  POST the merged file to `/sync/upload` (v11 header plus a zstd body — a 200 with
-  a one-word body is success), then download again and count `notes`/`cards` and
+- **An upload replaces the whole collection**, and the served copy is schema 18
+  (the server migrates on upload), so the base for a merge is the original
+  schema-11 `.apkg`, not the download. Cards are authored in `decks/*.toml` and
+  compiled by `anki-author` (`.#cli.learn.anki-author`):
+  `anki-author build --deck decks/b2.toml --base B1_Wortliste….apkg --out merged.anki2`.
+  The sequence that worked on 2026-11-06: download the server's copy to
+  `/srv/data/german/anki-backups/`, build with `--base`, POST the merged file to
+  `/sync/upload` (v11 header plus a zstd body — a 200 with a one-word body is
+  success), then download again and count `notes`/`cards` and
   `select id,name from decks`. Expect 5,366 cards over four decks after the B2
-  merge. Extending the deck means editing the lists in that script and repeating
-  the merge; a file built from scratch would take the 5,264 B1 cards with it.
+  merge. Extending the deck means editing `decks/b2.toml` and repeating the
+  build; a file built without `--base` would take the 5,264 B1 cards with it.

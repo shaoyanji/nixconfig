@@ -106,6 +106,7 @@
     # is a local derivation instead of a nixpkgs attribute.
     learn = {
       deutsch-srs.pkg = pkgs.callPackage ./deutsch-srs.nix {};
+      anki-author.pkg = pkgs.callPackage ./anki-author.nix {};
     };
   };
 

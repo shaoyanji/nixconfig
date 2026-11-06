@@ -20,12 +20,24 @@ Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style containe
 
 ## Module chains
 
-The chains themselves (`globalModulesNixos`, `globalModulesImpermanence`,
-`globalModulesContainers`, `globalModulesMacos`, `globalModulesHome`,
-`globalModulesDemo`) are defined in [`flake/module-sets.nix`](flake/module-sets.nix)
-and tabulated — with the hosts that use each — in
-[`AGENTS.md`](AGENTS.md) §Module Chains. That table is canonical, so it is not
-duplicated here.
+The chains themselves (`globalModulesNixos`, `globalModulesRyoku`,
+`globalModulesImpermanence`, `globalModulesContainers`, `globalModulesMacos`,
+`globalModulesHome`, `globalModulesDemo`) are defined in
+[`flake/module-sets.nix`](flake/module-sets.nix) and tabulated — with the hosts
+that use each — in [`AGENTS.md`](AGENTS.md) §Module Chains. That table is
+canonical, so it is not duplicated here; which host runs which chain is
+`nix eval --json .#inventory.hosts` (`software.module_chain`), not a list in a
+second place.
+
+**A module is imported by name, not by path.** `flake/nix-registry.nix` exposes
+every file under `modules/` as `.#modules`, so `modules/profiles/base-node.nix`
+is `self.modules."profiles.base-node"` — a chain, a host file and another module
+all name it that way, and following an import no longer depends on which
+directory the importer sits in. A relative path survives only where the import
+is a load with arguments (a `callPackage` builder, the `global/user.nix`
+constant). `checks.<system>.nix-registry` fails on a duplicate name or on a name
+that resolves to no file, and `task ops:kg:module PATH=<file>` answers who
+imports it.
 
 `base-node.nix` (profile) provides the common NixOS baseline: kernel packages, SSH, keyd, networkmanager, console, sops, user `devji`, common dev packages, and boot loader defaults (systemd-boot + EFI). Container and desktop hosts import it via `globalModulesContainers` or `desktop-client.nix`.
 `base-node.nix` also imports `modules/profiles/firewall-baseline.nix`, which enables the firewall and only opens TCP/22 by default. Hosts should add service/interface-specific allowances explicitly.
@@ -61,13 +73,17 @@ Add an entry to `flake/host-inventory.nix`:
 };
 ```
 
-Pick the right module chain:
-- `globalModulesRyoku` — high-end desktop: Ryoku shell on niri, Ryoku SDDM greeter (poseidon, eisen, fern)
-- `globalModulesNixos` — medium desktop: Dux shell (DMS) with greetd/niri (aristotle, stark)
+Pick the right module chain; membership is `inventory.toml`, not this list:
+- `globalModulesRyoku` — high-end desktop: Ryoku shell on niri, Ryoku SDDM greeter
+- `globalModulesNixos` — medium desktop: Dux shell (DMS) with greetd/niri
 - `globalModulesImpermanence` — desktop + impermanence + disko
 - `globalModulesContainers` — headless server (no desktop) — most common for servers
 - `globalModulesMacos` — nix-darwin on macOS
 - `globalModulesHome` — standalone home-manager only
+- `globalModulesDemo` — the demo VM, no sops
+
+A module outside the chain is named in the same entry, not pathed:
+`modules = globalModulesContainers ++ [ moduleFiles."profiles.nvidia" ../hosts/<name>/configuration.nix ];`.
 
 #### 3. Add SOPS key
 

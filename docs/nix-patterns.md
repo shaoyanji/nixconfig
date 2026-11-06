@@ -49,6 +49,10 @@ Better still: `inventory.toml` is compiled by `lib/inventory.nix` — read it wi
   `boot.loader.*`.
 - **The user is a constant**: import `modules/global/user.nix`; do not hardcode a
   path or the login name.
+- **Modules import by name**: `self.modules."profiles.base-node"`, never a sibling
+  path. `.#modules` keys every file under `modules/`
+  (`flake/nix-registry.nix`); `checks.<system>.nix-registry` fails a duplicate
+  or a name that resolves to nothing.
 - **Two modules on one key is a build error, not a merge**: home-manager
   asserts when fzf and atuin both bind Ctrl-R, and the message only appears at
   evaluation of the affected host's system. Pick the owner in the same module

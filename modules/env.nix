@@ -1,6 +1,7 @@
 # Interactive environment for the fleet's user: editor, shell, git identity and the
 # CLI defaults every host shares (host-specific knobs come from the inventory).
 {
+  self,
   lib,
   pkgs,
   config,
@@ -27,9 +28,9 @@
   user = import ./global/user.nix;
 in {
   imports = [
-    ./nixoshmsymlinks.nix
-    ./himalaya.nix
-    ./calendar.nix
+    self.modules."nixoshmsymlinks"
+    self.modules."himalaya"
+    self.modules."calendar"
   ];
 
   options.profiles.git = {

@@ -43,11 +43,24 @@
         `checks.<system>.nix-registry` proves one name per file — stripping `.nix`
         once merged `flake.nix` into `flake/`.
 
-        Next rung: intra-module `imports = [./x.nix]` by name. `self` already
-        reaches every module (specialArgs on nixos/darwin, extraSpecialArgs in all
-        four HM embedders), so it is mechanical except at the applied-function
-        call sites, which need `self` passed in the record (`guests.nix`,
-        `base.nix`).
+        Landed 2026-11-06 (intra-module): 21 files under `modules/` name their
+        own imports — 66 entries — so a module no longer points at a sibling by
+        relative path either: `roles/home.nix` imports `self.modules."roles.minimal"`
+        and `self.modules."user.desktop.niri"`, and the same holds inside
+        `sharedModules` and the `fleet.hmUserModules` default. Following an import
+        no longer requires knowing which directory the importer sits in. `self`
+        was already reaching every module (specialArgs on nixos/darwin,
+        extraSpecialArgs in all four HM embedders); `modules/global/nixos.nix`
+        keeps `listOf types.path`, since a name is still a path. The only path
+        imports left under `modules/` are loads: `config/shells/*` builders
+        (`callPackage`), `services/go-backend.nix`'s removed `pkgs/` path, and the
+        `global/user.nix` constant.
+
+        The graph reads the same vocabulary: `lib/nix-files.nix` turns a
+        `self.modules."x"` / `moduleFiles."x"` reference into an edge, its Elixir
+        twin does the same, and `checks.<system>.nix-registry` fails on a name
+        that resolves to no file — so a rename cannot leave an edge silently
+        missing on one side only.
 
         Exit: wiring files shrink to projections; `refs.modules` names what landed.
       '';

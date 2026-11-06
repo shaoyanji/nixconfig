@@ -15,7 +15,7 @@ in
       backupFileExtension = "hm-backup";
       users.${userName} = {
         imports = [
-          ../roles/demo.nix
+          self.modules."roles.demo"
         ];
         home.username = userName;
         home.homeDirectory = userHome;
@@ -28,7 +28,7 @@ in
         inputs.dms.homeModules.dank-material-shell
         inputs.dms.homeModules.niri
         # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (user "user").
-        ../user/ai/home-agents.nix
+        self.modules."user.ai.home-agents"
       ];
       extraSpecialArgs = {
         inherit inputs self;

@@ -1,5 +1,6 @@
 # Base node configuration for all NixOS hosts.
 {
+  self,
   config,
   lib,
   pkgs,
@@ -9,14 +10,14 @@
   user = import ../global/user.nix;
 in {
   imports = [
-    ../../modules/config/authorized-keys.nix
-    ../../modules/services/flake-gc-root.nix
-    ../../modules/ssh-ca.nix
+    self.modules."config.authorized-keys"
+    self.modules."services.flake-gc-root"
+    self.modules."ssh-ca"
     inputs.sops-nix.nixosModules.sops
-    ./firewall-baseline.nix
-    ./boot.nix
-    ./dell-dock.nix
-    ./battery-charge-limit.nix
+    self.modules."profiles.firewall-baseline"
+    self.modules."profiles.boot"
+    self.modules."profiles.dell-dock"
+    self.modules."profiles.battery-charge-limit"
   ];
 
   boot = {

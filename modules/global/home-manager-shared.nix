@@ -1,5 +1,6 @@
 # Canonical home-manager sharedModules baseline for embedded (NixOS) configs.
 {
+  self,
   inputs,
   lib,
   config,
@@ -23,7 +24,7 @@
       # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (lib/home-agents.nix).
       # Shared by every embedded NixOS/darwin HM config; needs self + fleetHost
       # in that host's extraSpecialArgs (modules/global/{nixos,macos}.nix).
-      ../user/ai/home-agents.nix
+      self.modules."user.ai.home-agents"
     ]
     ++ lib.optionals config.fleet.dankShell.enable [
       inputs.niri.homeModules.niri

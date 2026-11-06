@@ -1,7 +1,11 @@
 # The script packages installed for the interactive user, from one list.
-{pkgs, ...}: {
+{
+  self,
+  pkgs,
+  ...
+}: {
   imports = [
-    ./pb.nix
+    self.modules."scripts.pb"
     # ./examples.nix
   ];
   home.packages = with pkgs; [

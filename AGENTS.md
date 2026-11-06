@@ -129,7 +129,7 @@ Seven baselines in `flake/module-sets.nix`; which host uses which: `nix eval --j
 
 ```bash
 task ops:kg:module PATH=modules/services/<name>.nix   # who imports it
-nix eval --json .#inventory.hosts.<h>.software    # what this host actually runs
+nix eval --json .#inventory.hosts.<h>.software    # json-ok: field reference, pipe to toon -e
 ```
 
 Directories by role: `modules/global/` (chains), `modules/profiles/` (reusable host pieces),
@@ -147,7 +147,7 @@ Directories by role: `modules/global/` (chains), `modules/profiles/` (reusable h
 
 ```bash
 task help                    # tasks grouped by namespace
-task --list-all --json       # the discovery API: desc, summary, aliases, vars
+task --list-all --json       # json-ok: the discovery API: desc, summary, aliases, vars
 task find:<word>             # tasks whose name or description matches
 task status                  # git status + hostname
 ```

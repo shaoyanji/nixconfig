@@ -1,7 +1,11 @@
 # SteamOS-style kiosk profile for headless Steam clients.
-{lib, ...}: {
+{
+  self,
+  lib,
+  ...
+}: {
   imports = [
-    ./steam.nix
+    self.modules."profiles.steam"
   ];
 
   # 32-bit graphics packages for legacy OpenGL Steam games. mkForce so

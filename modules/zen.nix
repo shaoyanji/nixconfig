@@ -1,5 +1,6 @@
 # Zen browser: policies, the SearXNG search engine and the extension set from firefox-addons.
 {
+  self,
   inputs,
   pkgs,
   config,
@@ -8,7 +9,7 @@
 }: {
   imports = [
     inputs.zen-browser.homeModules.beta
-    ./aria2.nix
+    self.modules."aria2"
   ];
 
   # Zen expects profiles under ~/.zen on Linux, but the flake's Home Manager

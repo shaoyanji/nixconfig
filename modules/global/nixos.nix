@@ -7,13 +7,13 @@
   ...
 }: {
   imports = [
-    ./home-manager-shared.nix
+    self.modules."global.home-manager-shared"
   ];
 
   # `imports` is a module argument, so a fork has to be an option, not mkForce.
   options.fleet.hmUserModules = lib.mkOption {
     type = lib.types.listOf lib.types.path;
-    default = [../roles/home.nix];
+    default = [self.modules."roles.home"];
     description = "Home-manager modules for the embedded `devji` user.";
   };
 

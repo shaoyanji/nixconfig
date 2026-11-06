@@ -8,7 +8,7 @@
   user = import ../global/user.nix;
 in {
   imports = [
-    ./home-manager-shared.nix
+    self.modules."global.home-manager-shared"
   ];
 
   home-manager = {
@@ -17,7 +17,7 @@ in {
     backupFileExtension = "hm-backup"; #for rebuild
     users.${user.name} = {
       imports = [
-        ../roles/home.nix
+        self.modules."roles.home"
       ];
     }; # staging point for roles/home.nix commons
     extraSpecialArgs = {

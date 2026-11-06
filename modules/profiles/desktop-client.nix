@@ -1,5 +1,6 @@
 # Desktop client layer: base-node plus fuse/kbfs and the user services a graphical host runs.
 {
+  self,
   pkgs,
   lib,
   ...
@@ -9,8 +10,8 @@
   # for desktop client functionality. To disable NAS mounts, configure
   # profiles.nas-client.enable = false in nas-client.nix itself.
   imports = [
-    ./base-node.nix
-    ./nas-client.nix
+    self.modules."profiles.base-node"
+    self.modules."profiles.nas-client"
   ];
 
   # Enable FUSE so kbfsfuse can call /run/wrappers/bin/fusermount

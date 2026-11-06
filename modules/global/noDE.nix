@@ -14,8 +14,8 @@ in
       backupFileExtension = "hm-backup";
       users.${user.name} = {
         imports = [
-          ../roles/minimal.nix
-          ../shell
+          self.modules."roles.minimal"
+          self.modules."shell"
         ];
         # Headless container hosts: skip the AI CLI stack (crush, freebuff,
         # qmd, agy, aichat, ...) to keep closures small.
@@ -28,7 +28,7 @@ in
         inputs.kickstart-nixvim.homeManagerModules.default
         inputs.nix-index-database.homeModules.nix-index
         # Per-host ~/AGENTS.md from `.#homeAgents.<host>`.
-        ../user/ai/home-agents.nix
+        self.modules."user.ai.home-agents"
       ];
       extraSpecialArgs = {
         inherit inputs self;

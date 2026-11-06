@@ -1,5 +1,6 @@
 # `profiles.ai`: which AI tooling a host gets, declared once.
 {
+  self,
   lib,
   pkgs,
   config,
@@ -52,13 +53,13 @@ in {
   imports = [
     # ./codex.nix
     # ./mods.nix
-    ./aichat.nix
-    ./antigravity-cli.nix
-    ./skills
-    ./freebuff-remote.nix
-    ./dsh-launcher.nix
-    ./mainframe-remotes.nix
-    ./zed-mcp.nix
+    self.modules."user.ai.aichat"
+    self.modules."user.ai.antigravity-cli"
+    self.modules."user.ai.skills"
+    self.modules."user.ai.freebuff-remote"
+    self.modules."user.ai.dsh-launcher"
+    self.modules."user.ai.mainframe-remotes"
+    self.modules."user.ai.zed-mcp"
     # ./opencode.nix
   ];
 

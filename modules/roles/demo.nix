@@ -1,12 +1,13 @@
 # `role:demo`: the throwaway NixOS VM — niri and foot, no sops, nothing fleet-owned.
 {
+  self,
   pkgs,
   lib,
   ...
 }: {
   imports = [
-    ../shell
-    ../user/desktop/niri.nix
+    self.modules."shell"
+    self.modules."user.desktop.niri"
   ];
 
   home.packages = with pkgs; [

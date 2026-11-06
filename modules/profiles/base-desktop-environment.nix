@@ -1,5 +1,6 @@
 # The desktop baseline: greetd session, keyring, portals and the fonts every GUI host needs.
 {
+  self,
   pkgs,
   lib,
   ...
@@ -7,8 +8,8 @@
   user = import ../global/user.nix;
 in {
   imports = [
-    ./desktop-client.nix
-    ./boot.nix
+    self.modules."profiles.desktop-client"
+    self.modules."profiles.boot"
   ];
 
   services = {

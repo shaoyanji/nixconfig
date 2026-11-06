@@ -1,5 +1,9 @@
 # The shell baseline: aliases and the bash+tmux layer every host gets before zsh/nu.
-{pkgs, ...}: let
+{
+  self,
+  pkgs,
+  ...
+}: let
   myAliases = {
     l = "${pkgs.eza}/bin/eza -lahF --color=auto --icons --sort=size --group-directories-first";
     lss = "${pkgs.eza}/bin/eza -hF --color=auto --icons --sort=size --group-directories-first";
@@ -17,11 +21,11 @@ in {
   # concept — bash + tmux — and every consumer that wanted only that half
   # imported a file whose whole body was two imports.
   imports = [
-    ./starship.nix
-    ./nushell.nix
-    ./atuin.nix
-    ./home-not-a-repo.nix
-    ./zsh.nix
+    self.modules."shell.starship"
+    self.modules."shell.nushell"
+    self.modules."shell.atuin"
+    self.modules."shell.home-not-a-repo"
+    self.modules."shell.zsh"
   ];
   programs = {
     zsh.shellAliases = myAliases;

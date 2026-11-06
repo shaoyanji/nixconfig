@@ -236,7 +236,8 @@ lib.genAttrs systems.work (
           ".#nixFiles names ${toString leaves} files, the walk found ${toString reg.count} — a name collision dropped one"
           ++ map (n: "duplicate module name: ${n}") reg.duplicates
           ++ lib.optional (named != reg.modules)
-          ".#modules has ${toString named} names for ${toString reg.modules} files under modules/ — a duplicate collapsed two";
+          ".#modules has ${toString named} names for ${toString reg.modules} files under modules/ — a duplicate collapsed two"
+          ++ map (n: ''self.modules."${n}" names no file under modules/'') reg.unknownNames;
       in
         if problems != []
         then builtins.throw "nix file registry is inconsistent:\n  ${lib.concatStringsSep "\n  " problems}"

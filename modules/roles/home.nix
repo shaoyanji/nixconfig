@@ -1,5 +1,6 @@
 # Unified user desktop role (merged home.nix and heim.nix)
 {
+  self,
   config,
   lib,
   pkgs,
@@ -21,17 +22,17 @@
 in {
   imports =
     [
-      ./minimal.nix
-      ../shell
-      ../dev.nix
-      ../user/ai/antigravity-cli.nix
-      ../systemd-policy.nix
-      ../zen.nix
-      ../user/desktop/multimedia.nix
-      ../user/desktop/appimage-menu.nix
-      ../user/kg-sidecar.nix
-      ../user/selector-daemon.nix
-      ../kitty.nix
+      self.modules."roles.minimal"
+      self.modules."shell"
+      self.modules."dev"
+      self.modules."user.ai.antigravity-cli"
+      self.modules."systemd-policy"
+      self.modules."zen"
+      self.modules."user.desktop.multimedia"
+      self.modules."user.desktop.appimage-menu"
+      self.modules."user.kg-sidecar"
+      self.modules."user.selector-daemon"
+      self.modules."kitty"
     ]
     # Imported unconditionally (a `pkgs`-dependent import reads `config` and
     # recurses); niri.nix gates its own body with mkIf on Linux, because a
@@ -39,7 +40,7 @@ in {
     # dependency is not packaged for darwin — which failed EVALUATION, not just
     # the build, on cassini. A Ryoku host owns the compositor, so it drops this
     # module rather than redefining the same options twice.
-    ++ lib.optionals dankShell [../user/desktop/niri.nix];
+    ++ lib.optionals dankShell [self.modules."user.desktop.niri"];
 
   programs = {
     home-manager.enable = true;

@@ -2,13 +2,14 @@
 # `base-desktop-environment.nix`, whose niri build and DMS greeter Ryoku replaces.
 # What the fork owns, and why: docs/nix-patterns.md item 11.
 {
+  self,
   pkgs,
   lib,
   ...
 }: {
   imports = [
-    ./desktop-client.nix
-    ./boot.nix
+    self.modules."profiles.desktop-client"
+    self.modules."profiles.boot"
   ];
 
   # No dms/dank-greeter modules in the chain or in home: two Quickshell shells

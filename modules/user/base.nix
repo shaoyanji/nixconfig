@@ -1,5 +1,6 @@
 # The user environment: packages, shell integration and XDG files shared by every HM host.
 {
+  self,
   pkgs,
   lib,
   ...
@@ -10,12 +11,12 @@
   readPkgList = path: pkgList.resolve {inherit pkgs path;};
 in {
   imports = [
-    ../scripts
-    ../lf.nix
-    ../env.nix
-    ../shell
-    ../sops.nix
-    ../helix.nix
+    self.modules."scripts"
+    self.modules."lf"
+    self.modules."env"
+    self.modules."shell"
+    self.modules."sops"
+    self.modules."helix"
   ];
 
   home = {

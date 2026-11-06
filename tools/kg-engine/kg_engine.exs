@@ -766,6 +766,10 @@ defmodule KGEngine.Native do
     files = nix_files(repo)
 
     known = MapSet.new(files, &Path.relative_to(&1, repo))
+    by_name =
+      known
+      |> Enum.filter(&String.starts_with?(&1, "modules/"))
+      |> Map.new(&{module_name(&1), &1})
 
     # 301 opens dominate this phase (~200 ms serial on a warm local checkout);
     # the reads are independent, so they run in parallel without changing a byte
@@ -773,7 +777,7 @@ defmodule KGEngine.Native do
     # projection's, which the count comparison and the stable graph digest both
     # depend on.
     files
-    |> Task.async_stream(&module_node(&1, repo, known),
+    |> Task.async_stream(&module_node(&1, repo, known, by_name),
       max_concurrency: 8,
       ordered: true,
       timeout: 5_000
@@ -781,19 +785,62 @@ defmodule KGEngine.Native do
     |> Enum.map(fn {:ok, node} -> node end)
   end
 
-  defp module_node(file, repo, known) do
+  # `modules/profiles/base-node.nix` -> `profiles.base-node`, the one naming rule
+  # (lib/nix-files.nix `nameOf`, mirrored here). A file named after its directory
+  # does not repeat the word and `default.nix` is its directory, so
+  # `modules/global/global.nix` is `global` and `modules/net/dns/default.nix` is
+  # `net.dns`.
+  defp module_name(rel) do
+    parts =
+      rel
+      |> String.replace_prefix("modules/", "")
+      |> String.replace_suffix(".nix", "")
+      |> String.split("/")
+
+    n = length(parts)
+
+    if n > 1 and (List.last(parts) == "default" or List.last(parts) == Enum.at(parts, n - 2)) do
+      parts |> Enum.drop(-1) |> Enum.join(".")
+    else
+      Enum.join(parts, ".")
+    end
+  end
+
+  defp module_node(file, repo, known, by_name) do
     id = Path.relative_to(file, repo)
     dir = Path.dirname(id)
+    text = File.read!(file)
 
-    imports =
-      file
-      |> File.read!()
+    # A name in a comment is not an edge; the Nix side strips comments too.
+    code =
+      text
+      |> String.split("\n")
+      |> Enum.map(&(&1 |> String.split("#") |> hd()))
+      |> Enum.join("\n")
+
+    path_targets =
+      text
       |> String.split(~r{[^A-Za-z0-9_./-]+}, trim: true)
       |> Enum.filter(fn t ->
         String.ends_with?(t, ".nix") and
           (String.starts_with?(t, "./") or String.starts_with?(t, "../"))
       end)
       |> Enum.map(&normalise_path(Path.join(dir, &1)))
+
+    # Both vocabularies: `moduleFiles."x"` in a chain, `self.modules."x"` in a
+    # module; quoted names only, which is the convention on this tree.
+    name_targets =
+      ~r{(?:self\.modules\.|moduleFiles\.)(?:"([A-Za-z0-9_.-]+)"|([A-Za-z0-9_.-]+))}
+      |> Regex.scan(code)
+      |> Enum.map(fn
+        [_, "", name] -> name
+        [_, name | _] -> name
+      end)
+      |> Enum.map(&Map.get(by_name, &1))
+      |> Enum.reject(&is_nil/1)
+
+    imports =
+      (path_targets ++ name_targets)
       |> Enum.filter(&MapSet.member?(known, &1))
       |> Enum.uniq()
       |> Enum.reject(&(&1 == id))

@@ -1,5 +1,6 @@
 # Reusable NixOS profile for Hermes agent environment, flexible YAML config, and secret templating.
 {
+  self,
   config,
   lib,
   ...
@@ -96,7 +97,7 @@ in {
 
     # 3. Exclusively share home-manager module with hosts that enable profiles.hermes
     home-manager.sharedModules = [
-      ../user/ai/hermes-user.nix
+      self.modules."user.ai.hermes-user"
     ];
 
     home-manager.users.${user.name} = {

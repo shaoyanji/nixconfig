@@ -22,6 +22,18 @@ if [ -f scripts/task/docs-budget.sh ]; then
   fi
 fi
 
+# Blobs are checked here as well as in pre-commit: `--no-verify` on a commit, an
+# amend after the hook, or a branch built elsewhere all reach the push with an
+# index the commit hook never saw.
+if [ -f scripts/task/repo-blobs.sh ]; then
+  if ! bash scripts/task/repo-blobs.sh --history >/tmp/pre-push-blobs.log 2>&1; then
+    echo "pre-push: a blob over 512 KiB is reachable in this history:"
+    grep -E 'OVER|history:' /tmp/pre-push-blobs.log | sed 's/^/  /'
+    echo "  task checks:repo:blobs explains the rule; removing one needs a rewrite."
+    status=1
+  fi
+fi
+
 # The digest pin is a throw at eval time, so this is an eval, not a build: it
 # forces no closure and spends no build budget.
 if command -v nix >/dev/null 2>&1; then

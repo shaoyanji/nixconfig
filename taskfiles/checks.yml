@@ -110,6 +110,19 @@ tasks:
     cmds:
       - bash scripts/task/repo-paths.sh
 
+  checks:repo:blobs:
+    desc: "[gate] No blob over 512 KiB in the index or reachable in history"
+    summary: >
+      A blob outlives its file: the 26.5 MiB STL and the 829 KiB wallpaper sat
+      in this history for a year after deletion, and removing them cost a
+      rewrite of every commit on every branch. --index screens what would be
+      committed (~0.3 s); --history every blob reachable from any ref (~0.6 s).
+      Headroom is over AGENTS.nix's 342 KiB. MAX= bytes, ALLOW= comma-separated
+      globs for a deliberate exception, which the run prints. Exit 0 = clean,
+      1 = a blob is over, 2 = bad usage.
+    cmds:
+      - bash scripts/task/repo-blobs.sh --history
+
   checks:submodules:
     desc: "[gate] Every submodule pin is the head of the branch it tracks"
     summary: >

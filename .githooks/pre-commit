@@ -23,6 +23,8 @@
 #                       fires on this repo's house style
 #   prose     HARD      added comment lines must cite a home, not explain in
 #                       place (scripts/task/nix-prose-lint.sh, on the diff)
+#   blobs     HARD      a staged blob over 512 KiB is refused
+#                       (scripts/task/repo-blobs.sh --index)
 #   checks:kg HARD      graph schema + all six patterns, when they are affected
 #
 # Fail-closed: if the formatter cannot be resolved, nix-fmt.sh exits non-zero and
@@ -58,6 +60,24 @@ affects_graph() {
   done <<<"${1:-}"
   return 1
 }
+
+BLOB_GATE="$REPO_ROOT/scripts/task/repo-blobs.sh"
+
+# A blob is permanent: deleting the file later leaves the object and costs a
+# rewrite of every commit. This is the only moment the cost is zero, so it runs
+# on every commit that stages anything, not just the Nix ones.
+if [ -n "$STAGED" ]; then
+  if [ ! -f "$BLOB_GATE" ]; then
+    echo "pre-commit: $BLOB_GATE is missing; refusing to skip the blob gate." >&2
+    exit 1
+  fi
+  if ! bash "$BLOB_GATE" --index; then
+    echo
+    echo "Commit refused: a staged blob is over the size gate."
+    echo "  Rule: task checks:repo:blobs   (MAX= / ALLOW= for a deliberate exception)"
+    exit 1
+  fi
+fi
 
 if [ -n "$STAGED_NIX" ]; then
   if [ ! -f "$NIX_FMT" ]; then

@@ -392,10 +392,10 @@ exists for, the tree you are editing. The middle row is why the file cache stays
 one eval serves callers that read the graph several times (`ops:ask` routing, then
 the query).
 
-`iets` is **eval only**. It deliberately ignores a flake's `nixConfig`, so a build
+`iets` is **eval only**: it deliberately ignores a flake's `nixConfig`, so a build
 through it would lose the LAN and substituter set and compile what the cache
-serves; every build path keeps `nix`. `checks:kg:iets` evaluates the graph and two
-leaf registries through both with `--no-cache` on the iets side and compares the
-bytes — a faster evaluator that renders a different value is a quieter answer,
-not a faster one. Resolve it with `scripts/task/lib/iets.sh` (IETS_BIN, PATH, then
-the `flake.lock` pin built once into a GC-rooted out-link).
+serves, so every build path keeps `nix`. `checks:kg:iets` evaluates the graph and
+two leaf registries through both with `--no-cache` on the iets side and compares
+the bytes — a faster evaluator that renders a different value is a quieter
+answer, not a faster one. `scripts/task/lib/iets.sh` resolves it (IETS_BIN, PATH,
+then the `flake.lock` pin built once into a GC-rooted out-link).

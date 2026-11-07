@@ -144,20 +144,33 @@ case "$MODE" in
                 | [(scan("[a-z0-9][a-z0-9:_./-]*")), (scan("[a-z0-9]+"))]
                 | unique
                 | map(. as $t | select(stop | has($t) | not));
-      # A strong field is matched WITHOUT tokenising it: a query word is a match
-      # when it starts a word in the field (`\b`) or when a 4+ char prefix of it
-      # is a whole word there. That is the same relation the token version
-      # computed — token equal, one token a prefix of the other, both 4+ — and
-      # measured 2026-11-07 it is the whole cost of the query removed: 349 ms
-      # against 130 ms for the heaviest intent, byte-identical on a 20-query
-      # corpus. `gsub("_"; " ")` because `\b` counts `_` as a word character and
-      # the token class does not.
-      def rx: gsub("(?<c>[.\\\\+*?\\[\\](){}|^$/])"; "\\\\\\(.c)");
+      # A field token equal to a query token, or one a 4+ char prefix of the
+      # other: `near_tok` is that relation, and it is applied only to query
+      # tokens that CONTAIN a separator (a path, a note id, `ops:notes`). Those
+      # are the tokens `\b` cannot see exactly — `\bnix\-cache` also matches
+      # inside `nix-cache-info`, which no field token ever did — and tokenising
+      # the four fields costs 350 ms, which a prose intent does not pay because
+      # it has no such token.
+      # The replacement needs THREE backslashes before the capture
+      # (`\\\(.c)`): with two the separator is replaced by the literal text
+      # `\\(.c)` and every path token silently stops matching.
+      def rx: gsub("(?<c>[.\\+*?\\[\\](){}|^$/])"; "\\\(.c)");
+      def sep($t): $t | test("[:_./-]");
+      def near_tok($q; $t):
+        ($q | length) as $ql | ($t | length) as $tl
+        | ($t == $q)
+          or ($ql >= 4 and $tl >= 4 and (($t | startswith($q)) or ($q | startswith($t))));
       def pre($t):
         if ($t | length) > 4
         then [range(4; ($t | length)) as $n | $t[:$n]]
              | map(. as $p | select(stop | has($p) | not))
         else [] end;
+      # For a PLAIN word token the relation above IS `\b`: every `[a-z0-9]+` run
+      # is a token, so a match at a word start is a field token that starts with
+      # it, and `pre` covers a field token the query token starts with. Measured
+      # 2026-11-07: the tokeniser removed from this path is the whole cost of the
+      # query, 349 ms against 130 ms for the heaviest intent. `gsub("_"; " ")` in
+      # `fields` because `\b` counts `_` as a word character and `toks` does not.
       def strong_hit($s; $t):
         (if ($t | length) >= 4
          then ($s | test("\\b" + ($t | rx); "i"))
@@ -176,13 +189,20 @@ case "$MODE" in
       [2, 3, 2, 3] as $w
       | . as $d
       | ($q | toks) as $qt
+      # Token sets are built only when the query has a separator token: the
+      # same condition that decides which scorer a token gets.
+      | ($qt | map(select(sep(.)))) as $compound
       | [ .notes | to_entries[]
           | .key as $id | .value as $n
           | fields($id; $n) as $f
+          | (if ($compound | length) > 0 then [$f[] | toks] else [] end) as $sets
           | $n.body as $body
           | ([ $qt[] as $t | ($t | rx) as $r
                | ([ range(0; 4) as $i
-                    | select(strong_hit($f[$i]; $t))
+                    | select(
+                        if sep($t)
+                        then any($sets[$i][]; near_tok($t; .))
+                        else strong_hit($f[$i]; $t) end)
                     | $w[$i] ] + (if ($body | test($r; "i")) then [1] else [] end)) as $hits
                | select(($hits | length) > 0)
                | {t: $t, w: ($hits | max)} ]) as $m

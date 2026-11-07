@@ -48,6 +48,7 @@ tasks:
       - task checks:tasks
       - task checks:kg
       - task checks:kg:iets
+      - task checks:entry
       - task checks:nix:lint
       - task checks:nix:shell
       - task checks:sops:drift
@@ -214,6 +215,19 @@ tasks:
       full evals, no cache on either side), so not in `checks:quick`.
     cmds:
       - bash scripts/task/kg-iets-check.sh
+
+  checks:entry:
+    desc: "[gate] Entry reads stay on their cache layer (min-of-3 timing budgets)"
+    summary: >
+      scripts/task/kg-speed.sh --gate: the reads a turn makes before it knows
+      anything, timed three times each against budgets sized on delphi and
+      frieren. It gates the layer, not the milliseconds — `near` is budgeted as
+      `show + 300` because it shares show's eval, and `iets` must be at most
+      half the nix floor. `task help` at 2.3 s and `near` at 546 ms are the
+      regressions this exists for. A host slower than frieren raises the budget
+      in one place: the script. Exit 0 = every read on its layer.
+    cmds:
+      - bash scripts/task/kg-speed.sh --gate
 
   checks:blast:
     desc: "[report] Pre-flight blast radius for changed paths (FILES='a b' or STAGED=1)"

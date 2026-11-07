@@ -383,15 +383,15 @@ The last row is why the daemon went: it could not answer for the tree you are
 editing, which is what the file cache exists for. The middle row is why that file
 cache stays: one eval serves every caller.
 
-Two reads sat outside both layers and were the two an agent makes first.
+Two reads sat outside both layers and are the two an agent makes first.
 `task help` / `find:` ran go-task's 2.3 s parse twice through a *nested* `task
 --list-all --json`, and `notes.sh` re-evaluated a 1 MB document per query. Both
-take the cache now (`taskfile-list.sh` keys on the taskfile tree plus the binary;
-`iets_eval_json` picks the evaluator). A cache answers an eval, not the read, so
-the jq behind `near` came next: tokenising four fields per note and downcasing
-every body cost 350 ms of a 546 ms query, and a word-boundary regex answers it
-identically in 215 ms. `taskfile-graph.sh` reads `.#taskfileGraph.report` because
-`--apply` cannot be cached at all, so the gate paid an evaluation per push.
+take the cache now (`taskfile-list.sh`; `iets_eval_json`). A cache answers an
+eval, not the read: 350 ms of `near`'s 546 ms was tokenising four fields and
+downcasing every body, which a word-boundary regex does in 130 ms — exact for a
+plain word (every `[a-z0-9]+` run is a token), not for one with a separator
+(`\bnix\-cache` matches inside `nix-cache-info`), so those keep the token
+comparison. 547 generated queries rank identically, scores included.
 
 `iets` is **eval only**: it ignores a flake's `nixConfig`, so a build through it
 would lose the LAN and substituter set and compile what the cache serves; every

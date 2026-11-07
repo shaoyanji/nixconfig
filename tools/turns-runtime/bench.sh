@@ -22,7 +22,10 @@
 set -uo pipefail
 
 HERE=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel)
+# On clanker the tree arrives as `git archive`, which is not a repository, so the
+# git lookup is a hint and the path is the fallback.
+ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null || true)
+[ -n "$ROOT" ] || ROOT=$(CDPATH='' cd -- "$HERE/../.." && pwd)
 SITE="$ROOT/modules/services/turns-dashboard/web"
 FIXTURE="$HERE/fixture/turns.json"
 WORK=${WORK:-/tmp/turns-runtime-bench}

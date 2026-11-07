@@ -39,6 +39,21 @@ A second, prompt-less reader is the public mount at
 - **No scrollbar.** The log is a wheel: rows snap, the top and bottom fade, and
   scrolling past either end wraps to the other.
 
+## Reading it
+
+- `j` / `k` move card to card and outline the one you are on; `g` is the top,
+  `G` the bottom, and `Shift`+arrows do the same for people who do not live in
+  vim. The movement keys are inert while a prompt box has focus.
+- `/` focuses the fuzzy finder. Every token has to land inside a word of a card —
+  `umami` finds the umami turn, `trn` still finds `turn` — a subsequence over the
+  whole card is not a finder (it matched 40/40), and the count reads
+  `matched/total`. `esc` clears, `enter` jumps to the first match.
+- `▲ jump to top` is a real link (`href="#top"`). The anchor is re-attached after
+  the history frame, which replaces every other child of `#log`.
+- A turn that arrives while you are further down is announced as a toast (source,
+  subject, first line); clicking it travels to that card. The scroll position is
+  carried across the insert, so a new turn never yanks the page under you.
+
 ## Operating it
 
 ```bash

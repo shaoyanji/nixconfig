@@ -58,13 +58,19 @@ html, body {
   z-index: 5;
   display: flex;
   align-items: baseline;
-  gap: 1.1rem;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.1rem;
   padding: 1.4rem clamp(1rem, 4vw, 3.4rem);
   font-size: 0.72rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--dim);
+  /* The header sits over a scrolling surface: let clicks through everywhere
+     except on the controls themselves. */
+  pointer-events: none;
 }
+
+.topline > * { pointer-events: auto; }
 
 .topline h1 {
   margin: 0;
@@ -315,7 +321,131 @@ body[data-stream="connecting"] .pulse {
   margin-bottom: 0.35rem;
 }
 
+/* `hidden` is how the finder removes a card, and `.turn` sets its own display. */
+[hidden] { display: none !important; }
+
+/* --- finder ---------------------------------------------------------------- */
+.find {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 11rem;
+  max-width: 18rem;
+  flex: 0 1 16rem;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid var(--line-hi);
+}
+.find:focus-within { border-bottom-color: var(--emerald); }
+.find-mark { color: var(--teal); letter-spacing: 0; }
+
+.find input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  outline: none;
+  padding: 0.1rem 0;
+}
+.find input::placeholder { color: #3f6a66; text-transform: uppercase; letter-spacing: 0.18em; }
+.find input::-webkit-search-cancel-button { display: none; }
+
+.count { color: var(--emerald); letter-spacing: 0.1em; white-space: nowrap; }
+.count:empty { display: none; }
+
+/* --- jump to top, as a link that looks like one ---------------------------- */
+.totop {
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line-hi);
+  padding-bottom: 0.1rem;
+  cursor: pointer;
+}
+.totop:hover,
+.totop:focus-visible { color: var(--emerald); border-bottom-color: var(--emerald); outline: none; }
+
+/* --- the card the reader is on -------------------------------------------- */
+.turn[data-current] {
+  border-left-color: var(--emerald);
+  background: linear-gradient(100deg, rgba(10, 34, 32, 0.62), rgba(3, 10, 12, 0.15) 60%, transparent);
+}
+.turn[data-current] .subject { filter: brightness(1.12); }
+
+/* Outside the log on purpose: `mode inner` replaces every child of #log, and a
+   notice that is wiped by the first frame is a notice nobody sees. */
+.nomatch {
+  position: fixed;
+  inset: 42% 0 auto 0;
+  margin: 0;
+  text-align: center;
+  color: var(--dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  pointer-events: none;
+}
+
+/* --- toasts: a turn arrived ------------------------------------------------ */
+.toasts {
+  position: fixed;
+  right: clamp(0.8rem, 2.4vw, 2rem);
+  bottom: clamp(0.8rem, 2.4vw, 2rem);
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(26rem, calc(100vw - 2rem));
+}
+
+.toast {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem 0.9rem 0.7rem;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: rgba(6, 22, 22, 0.92);
+  border: 1px solid var(--line-hi);
+  border-left: 2px solid var(--teal);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  animation: toast-in 0.22s ease both;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 0.7rem), calc(100% - 0.7rem) 100%, 0 100%);
+}
+.toast.done { border-left-color: var(--emerald); }
+.toast.bad { border-left-color: var(--bad); }
+.toast:hover,
+.toast:focus-visible { border-color: var(--emerald); outline: none; }
+.toast.out { animation: toast-out 0.22s ease both; }
+
+.toast .t-src { font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--teal); }
+.toast .t-sub { font-size: 0.86rem; letter-spacing: 0.01em; color: var(--ink); }
+.toast .t-act {
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@keyframes toast-in { from { opacity: 0; transform: translateY(0.5rem); } }
+@keyframes toast-out { to { opacity: 0; transform: translateY(0.5rem); } }
+
+@media (max-width: 900px) {
+  .hint { display: none; }
+  .find { flex: 1 1 9rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .grid { animation: none; }
   .pulse::before, .req .live { animation: none; }
+  .toast, .toast.out { animation: none; }
 }

@@ -12,10 +12,21 @@
 <header class="topline">
 <span class="mark" aria-hidden="true">◤◢</span>
 <h1>agent <em>turns</em></h1>
-<span class="hint">wheel to travel · <kbd>/</kbd> jump to top</span>
+<label class="find">
+  <span class="find-mark" aria-hidden="true">⌕</span>
+  <input id="find" type="search" placeholder="find a turn" autocomplete="off" spellcheck="false" aria-label="fuzzy search over the turns">
+  <span id="count" class="count" aria-live="polite"></span>
+</label>
+<a id="totop" class="totop" href="#top" title="back to the newest turn">▲ jump to top</a>
+<span class="hint"><kbd>j</kbd><kbd>k</kbd> move · <kbd>g</kbd> top · <kbd>/</kbd> find · <kbd>esc</kbd> clear</span>
 <span class="pulse" title="live stream from the xs store">live</span>
 </header>
-<main id="log" class="log" aria-live="polite"><div id="waiting" class="waiting">◢ listening for turns ◣</div></main>
+<main id="log" class="log" aria-live="polite">
+<span id="top"></span>
+<div id="waiting" class="waiting">◢ listening for turns ◣</div>
+</main>
+<p id="nomatch" class="nomatch" hidden>nothing matches — <kbd>esc</kbd> clears the finder</p>
+<div id="toasts" class="toasts" aria-live="polite" aria-label="new turns"></div>
 <script type="module" src="app.js"></script>
 </body>
 </html>

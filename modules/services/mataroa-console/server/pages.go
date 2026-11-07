@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html"
 	"strings"
 )
 
@@ -41,7 +40,19 @@ button.ghost{background:transparent;color:var(--ink)}
 .actions{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.2rem 0}
 `
 
-func esc(value any) string { return html.EscapeString(fmt.Sprint(value)) }
+// esc is Python's html.escape(quote=True), not Go's EscapeString: the two agree
+// on & < > and differ on the quotes (`&quot;` and `&#x27;` against `&#34;` and
+// `&#39;`), and the console's pages are compared byte for byte against the
+// Python it replaced (``/e/<slug>`` carries markdown with both quotes in it).
+func esc(value any) string {
+	return strings.NewReplacer(
+		"&", "&amp;",
+		"<", "&lt;",
+		">", "&gt;",
+		"\"", "&quot;",
+		"'", "&#x27;",
+	).Replace(fmt.Sprint(value))
+}
 
 func (c *config) page(title, body string) []byte {
 	blog := c.blogURL

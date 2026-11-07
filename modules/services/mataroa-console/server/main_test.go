@@ -244,3 +244,15 @@ func TestNoTokenIsAnErrorOnTheLedgerAndA503OnPublish(t *testing.T) {
 		t.Fatalf("publish without a token: %v", payload)
 	}
 }
+
+// The pages are compared byte for byte against the Python console they replace,
+// so escaping has to be `html.escape(quote=True)` and not Go's default: the two
+// differ only on the quote characters, which is exactly what a post body
+// carries.
+func TestEscapingMatchesThePythonConsole(t *testing.T) {
+	got := esc(`a "b" 'c' & <d>`)
+	want := "a &quot;b&quot; &#x27;c&#x27; &amp; &lt;d&gt;"
+	if got != want {
+		t.Fatalf("esc = %q, want %q", got, want)
+	}
+}

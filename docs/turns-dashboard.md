@@ -16,10 +16,18 @@ pushed live, with a prompt box on every row.
   `services.agentTurns.additionalTokens` with the shim's group and mode `0440`:
   both ends read that file, because the shim loads every token at start and dies
   without it (measured 2026-11-06: `start-limit-hit`, exit 1, no log line).
-- **Push, not poll.** The page is static; every turn arrives as a Datastar SSE
-  patch (`datastar-patch-elements`, `mode inner` on connect, `mode prepend`
-  after). Datastar is pinned in Nix and served from the same origin — a page
-  that needs a CDN is blank exactly when the tailnet is all you have.
+- **Push, not poll.** The page is static and carries no turn markup; every turn
+  arrives as an SSE patch (`mode inner` on connect, `mode prepend` after, `mode
+  remove` for the placeholder). The wire is plain text and `web/app.js` is its
+  whole reader — forty lines, no library, so the writer in `main.go` and the
+  reader cannot drift behind a release note.
+- **Why not Datastar.** It was the first client here and it never applied a
+  frame: the pinned v1 beta speaks a binary SSE format, so hand-written text
+  patches are delivered and discarded (measured 2026-11-07 in the browser: the
+  page opened the stream and a raw `EventSource` in the same page received the
+  frame, while the log stayed on its placeholder).
+- **The site revalidates.** `Cache-Control: no-cache` on every static file: a
+  page left open for hours would otherwise keep an old `app.js` across a deploy.
 - **One prompt per row.** Each panel posts `{row, prompt}` to `/api/prompt`,
   which runs `hermes -z` as the login user with the turn's own context prepended
   to the instruction. The answer is pushed into that row; nothing reloads. The
@@ -54,5 +62,8 @@ sudo wrapper.
 
 - No authentication beyond the tailnet. The page can spend agent budget; the
   mount is the fence.
-- The log carries the newest 120 turns at connect; older history is the store's
+- The log carries the newest turns at connect; older history is the store's
   (`agents:xs:list`), not a second paging protocol here.
+- No gate for the browser path yet: the live-update proof is a run, not a test
+  (`clanker` serves the page against a mock shim; a row appended to the mock
+  file appears in the open page).

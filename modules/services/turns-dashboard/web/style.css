@@ -84,6 +84,15 @@ kbd {
   font: inherit;
 }
 
+body[data-stream="retrying"] .pulse {
+  opacity: 0.35;
+  animation: none;
+}
+
+body[data-stream="connecting"] .pulse {
+  opacity: 0.55;
+}
+
 .pulse {
   color: var(--emerald);
   position: relative;

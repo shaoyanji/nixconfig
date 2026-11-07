@@ -7,26 +7,33 @@ const EDGE = 4;
 
 // --- wire ------------------------------------------------------------------
 // A frame is `selector <css>`, `mode <inner|outer|prepend|append|remove>` and
-// zero or more `elements <html>` lines; the frame ends with a blank line.
-function frameFrom(block) {
+// zero or more `elements <html>` lines. Over EventSource the browser has
+// already stripped the `data:` prefixes and hands over the payload; a fetch
+// body still has them, so `sseData` does that one job for the prompt reader.
+function fields(payload) {
   const data = {mode: "inner", elements: ""};
   const elements = [];
-  for (const line of block.split("\n")) {
+  for (const line of payload.split("\n")) {
     if (!line || line.startsWith(":")) continue;
-    const colon = line.indexOf(":");
-    if (colon < 0) continue;
-    const field = line.slice(0, colon);
-    let value = line.slice(colon + 1);
-    if (value.startsWith(" ")) value = value.slice(1);
-    if (field !== "data") continue;
-    const space = value.indexOf(" ");
-    const key = space < 0 ? value : value.slice(0, space);
-    const rest = space < 0 ? "" : value.slice(space + 1);
-    if (key === "elements") elements.push(rest);
-    else data[key] = rest;
+    const space = line.indexOf(" ");
+    const key = space < 0 ? line : line.slice(0, space);
+    const value = space < 0 ? "" : line.slice(space + 1);
+    if (key === "elements") elements.push(value);
+    else if (key === "selector" || key === "mode") data[key] = value;
   }
   if (elements.length) data.elements = elements.join("\n");
   return data;
+}
+
+function sseData(block) {
+  const lines = [];
+  for (const line of block.split("\n")) {
+    if (!line.startsWith("data:")) continue;
+    let value = line.slice(5);
+    if (value.startsWith(" ")) value = value.slice(1);
+    lines.push(value);
+  }
+  return lines.join("\n");
 }
 
 function applyPatch(data) {
@@ -46,26 +53,38 @@ function applyPatch(data) {
   else target.append(nodes);
 }
 
-// A fetch body and an EventSource carry the same frames, so one reader serves
-// the log stream and a prompt's answer.
-function reader(onFrame) {
+// One reader for both carriers: the log stream and a prompt's answer body.
+function reader(onPayload) {
   let buffer = "";
   return (chunk) => {
     buffer += chunk;
     let cut;
     while ((cut = buffer.indexOf("\n\n")) >= 0) {
-      onFrame(frameFrom(buffer.slice(0, cut)));
+      onPayload(sseData(buffer.slice(0, cut)));
       buffer = buffer.slice(cut + 2);
     }
   };
 }
 
+// --- stream ----------------------------------------------------------------
+// The header's dot is the stream's own state, not a decoration: a reader can
+// tell a quiet log from a disconnected one without opening a console.
+const pulse = document.querySelector(".pulse");
+function streamState(state) {
+  document.body.dataset.stream = state;
+  if (pulse) pulse.dataset.state = state;
+}
+
+streamState("connecting");
 const es = new EventSource("/api/stream");
-es.onmessage = (event) => applyPatch(frameFrom(event.data));
-es.addEventListener("patch", (event) => applyPatch(frameFrom(event.data)));
-es.onerror = () => {
-  log.dataset.state = "retrying";
+es.onopen = () => streamState("live");
+const onPayload = (payload) => {
+  streamState("live");
+  applyPatch(fields(payload));
 };
+es.onmessage = (event) => onPayload(event.data);
+es.addEventListener("patch", (event) => onPayload(event.data));
+es.onerror = () => streamState("retrying");
 
 // --- prompts ---------------------------------------------------------------
 async function ask(row, prompt) {
@@ -80,33 +99,29 @@ async function ask(row, prompt) {
     if (box) box.textContent = await res.text();
     return;
   }
-  const read = reader(applyPatch);
+  const read = reader((payload) => applyPatch(fields(payload)));
   const decoder = new TextDecoder();
   for await (const chunk of res.body) read(decoder.decode(chunk, {stream: true}));
 }
 
-log.addEventListener("click", (event) => {
-  const button = event.target.closest("button[data-prompt-for]");
-  if (!button) return;
-  const row = button.dataset.promptFor;
+function send(row) {
   const field = document.getElementById(`p-${row}`);
   const prompt = field ? field.value.trim() : "";
   if (!prompt) return;
   field.value = "";
   field.style.height = "auto";
   ask(row, prompt);
+}
+
+log.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-prompt-for]");
+  if (button) send(button.dataset.promptFor);
 });
 
 log.addEventListener("keydown", (event) => {
   if (event.key !== "Enter" || !(event.metaKey || event.ctrlKey)) return;
-  const field = event.target;
-  if (field.tagName !== "TEXTAREA") return;
-  const row = field.id.replace(/^p-/, "");
-  const prompt = field.value.trim();
-  if (!prompt) return;
-  field.value = "";
-  field.style.height = "auto";
-  ask(row, prompt);
+  if (event.target.tagName !== "TEXTAREA") return;
+  send(event.target.id.replace(/^p-/, ""));
 });
 
 // --- reading ---------------------------------------------------------------

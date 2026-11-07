@@ -21,6 +21,23 @@
   # publisher's config reader. typst is what publish_md.py shells out to.
   python = pkgs.python3.withPackages (ps: [ps.pyyaml]);
 
+  # The reader is a Go service and the vault's scripts stay the vault's: one
+  # static binary serves the page and shells out to `export_graph.py`,
+  # `create_note.py` and `publish_md.py` under the interpreter above. Nothing
+  # here parses markdown — a second copy of those rules is how the page and the
+  # gate start disagreeing.
+  serverPackage = pkgs.buildGoModule {
+    pname = "zettel-graph";
+    version = "0.1.0";
+    src = ./zettel-graph/server;
+    # Standard library only.
+    vendorHash = null;
+    meta = {
+      description = "Zettel reader and vault write surface";
+      mainProgram = "zettel-graph";
+    };
+  };
+
   # `fetch --quiet origin <ref>` creates FETCH_HEAD, so the ref may be a branch
   # or a commit; a pinned sha is how a reader regression gets held back without
   # editing this module again.
@@ -254,19 +271,19 @@ in {
         StateDirectoryMode = "0750";
         LoadCredential = "github-token:${tokenSecret}";
         ExecStart = lib.concatStringsSep " " ([
-            "${python}/bin/python3 ${../scripts/zettel-graph-server.py}"
+            "${lib.getExe serverPackage}"
             "--www ${wwwDir}"
             "--vault ${vaultDir}"
             "--port ${toString cfg.port}"
             "--origin https://${cfg.tailnetHost}:${toString cfg.tailnetPort}"
             "--ref ${cfg.vault.ref}"
+            "--python ${python}/bin/python3"
           ]
           ++ lib.optional cfg.commit "--commit"
           ++ lib.optional cfg.push "--push"
           ++ lib.optional cfg.publish "--publish");
         Environment = [
           "HOME=${stateDir}"
-          "PYTHONUNBUFFERED=1"
           "PYTHONDONTWRITEBYTECODE=1"
         ];
         Restart = "always";

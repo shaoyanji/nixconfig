@@ -118,4 +118,17 @@ nix eval --json .#nixosConfigurations.delphi.config.assertions \
 ```
 
 The same code runs by hand against a scratch vault:
-`modules/scripts/zettel-graph-server.py --www … --vault … --origin …`.
+`nix build .#nixosConfigurations.delphi.pkgs.zettel-graph` is not how you test a
+reader, so the module's package runs directly —
+`modules/services/zettel-graph/server`, built with
+`go build ./modules/services/zettel-graph/server`:
+
+```bash
+zettel-graph --www … --vault … --origin … --port 8191
+```
+
+Measured 2026-11-07 on the netbook, 500 keep-alive `GET /api/health` calls
+against the same scratch vault: Python 26.1 MB resident, p50 44.0 ms, p99
+48.0 ms; Go 8.8 MB, p50 0.23 ms, p99 0.81 ms. The 44 ms is the Python server's
+split header/body write meeting delayed ACK, not a cache miss — the same page
+answered 300 sequential requests in 2.75 s under `curl`.

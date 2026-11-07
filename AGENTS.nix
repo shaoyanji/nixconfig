@@ -5700,11 +5700,12 @@
         job does) and do not port a model server (torch and transformers are the work; eisen's
         parakeet, qwen-image and decision-model servers stay Python by nature, not by inertia).
 
-        **The queue, sized.** `zettel-graph-server.py` 444 lines at 8453 (vault reader, write
-        guard through the vault's own scripts) and `mataroa-console.py` 599 lines (HTTP console,
-        git and comrak glue) are the two long-running readers left. Everything else in the list
-        is a timer or a CLI: mail-atlas drain/reconcile, email-archive import/triage/ci-drain,
-        mail-agent, wiki-ask, tls-cert-watchdog, fleet-session-reaper, flake-advisory-audit.
+        **The queue, sized.** `mataroa-console.py` 599 lines (HTTP console, git and comrak
+        glue) is the one long-running reader left; `zettel-graph` was ported the same day, at
+        26.1 MB / 44 ms p50 against 8.8 MB / 0.23 ms p50 for the Go reader. Everything else in
+        the list is a timer or a CLI: mail-atlas drain/reconcile, email-archive
+        import/triage/ci-drain, mail-agent, wiki-ask, tls-cert-watchdog, fleet-session-reaper,
+        flake-advisory-audit.
 
         **How a port is gated.** Keep the wire contract byte-compatible, port the tests before
         the handler (`main_test.go` is the pattern: real Unix socket, fake store, one case per

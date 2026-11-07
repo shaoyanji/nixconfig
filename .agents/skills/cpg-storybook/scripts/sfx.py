@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import time
@@ -148,7 +149,10 @@ def cmd_fetch(args) -> int:
         raw.unlink(missing_ok=True)
         dur = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
                               "-of", "csv=p=0", str(wav)], capture_output=True, text=True).stdout.strip()
-        credits[cue] = {"title": hit["title"], "creator": hit.get("creator", "unknown"),
+        # Freesound titles often carry the container extension; a credits table
+        # reading "Soft Wind Ambience.wav" looks like a filename, not a work.
+        title = re.sub(r"\.(wav|mp3|flac|ogg|aiff?)$", "", hit["title"].strip(), flags=re.I)
+        credits[cue] = {"title": title, "creator": hit.get("creator", "unknown"),
                         "license": hit.get("license", "cc0"), "provider": hit.get("provider", ""),
                         "source": hit.get("foreign_landing_url") or hit.get("url", ""),
                         "seconds": round(float(dur), 2), "file": f"audio/sfx/{cue}.wav"}

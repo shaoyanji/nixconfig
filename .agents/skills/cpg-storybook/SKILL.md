@@ -52,11 +52,22 @@ The allowance has a second place to read it: the dashboard at
 `www.chatplayground.ai`, on the subscription page. Read by hand on 2026-11-07 at
 14:00 UTC, on this account:
 
-| Row | Value |
-| :--- | :--- |
-| Plan | Lifetime · RedemptionActive · never expires |
-| Credits (as the dashboard labels it) | 257 / 99,999 · resets 2026-11-15 |
-| Images today | 100 / 100 · resets 00:00 UTC — 01:00 local, this host is UTC+1 |
+| Row | Value | Pays for |
+| :--- | :--- | :--- |
+| Plan | Lifetime · RedemptionActive · never expires | nothing is metered by the plan itself |
+| Credits | 257 / 99,999 · resets 2026-11-15 | **chat turns**, charged at the model's `creditWeight` — live weights are in `cpg models --json`, and the client's fixture prices a basic model at 1 and an advanced one at 5 |
+| Images today | 100 / 100 · resets 00:00 UTC — 01:00 local, this host is UTC+1 | **image generations only**, one per call whatever the model; this is the counter that stops a book |
+
+That middle label is an inference, and it is the only one the account supports:
+the catalog hangs a `creditWeight` on every model and nothing else on the account
+is priced per model, while no page on the site documents a credit at all. The
+dashboard prints the pool without a unit, so read it as the request budget and
+treat a model's weight as what one message draws from it.
+
+The practical reading for this skill: an `adapt.py` chunk is four chat turns, a
+round of four chunks is sixteen — noise against 99,999 — while one book of three
+candidates per spread is 84 image calls and the whole day's 100. Credited turns
+are never the constraint here; the image counter is.
 
 Two questions that page answers when the client cannot:
 

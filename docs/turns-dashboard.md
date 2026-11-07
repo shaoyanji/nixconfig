@@ -48,6 +48,14 @@ A second, prompt-less reader is the public mount at
   `umami` finds the umami turn, `trn` still finds `turn` — a subsequence over the
   whole card is not a finder (it matched 40/40), and the count reads
   `matched/total`. `esc` clears, `enter` jumps to the first match.
+- `?` opens the key list (and a `?` button in the header does the same); while it
+  is open, movement keys are inert and `esc` closes it. The list is generated from
+  no data — it is nine rows of static markup, so a new binding is a second edit in
+  the same commit.
+- The finder lives in the URL: `?q=umami` is the same filtered view, applied when
+  the history frame arrives, so a reload or a pasted link lands on it. It is
+  `history.replaceState`, not `pushState` — typing must not fill the back button —
+  and the query is relative, so it stays on whichever mount served the page.
 - `▲ jump to top` is a real link (`href="#top"`). The anchor is re-attached after
   the history frame, which replaces every other child of `#log`.
 - A turn that arrives while you are further down is announced as a toast (source,

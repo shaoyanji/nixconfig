@@ -19,6 +19,7 @@
 </label>
 <a id="totop" class="totop" href="#top" title="back to the newest turn">▲ jump to top</a>
 <span class="hint"><kbd>j</kbd><kbd>k</kbd> move · <kbd>g</kbd> top · <kbd>/</kbd> find · <kbd>esc</kbd> clear</span>
+<button id="help-open" class="help-open" type="button" aria-haspopup="dialog" aria-label="key bindings" title="key bindings">?</button>
 <span class="pulse" title="live stream from the xs store">live</span>
 </header>
 <main id="log" class="log" aria-live="polite">
@@ -27,6 +28,27 @@
 </main>
 <p id="nomatch" class="nomatch" hidden>nothing matches — <kbd>esc</kbd> clears the finder</p>
 <div id="toasts" class="toasts" aria-live="polite" aria-label="new turns"></div>
+<div id="help" class="help" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+<div class="help-card">
+  <header class="help-head">
+    <h2 id="help-title">keys</h2>
+    <button id="help-close" class="help-close" type="button" aria-label="close key bindings">esc</button>
+  </header>
+  <dl class="help-keys">
+    <div><dt><kbd>j</kbd></dt><dd>next card</dd></div>
+    <div><dt><kbd>k</kbd></dt><dd>previous card</dd></div>
+    <div><dt><kbd>g</kbd></dt><dd>jump to the top</dd></div>
+    <div><dt><kbd>G</kbd></dt><dd>jump to the bottom</dd></div>
+    <div><dt><kbd>⇧</kbd><kbd>↓</kbd> <kbd>⇧</kbd><kbd>↑</kbd></dt><dd>same as <kbd>j</kbd> / <kbd>k</kbd></dd></div>
+    <div><dt><kbd>/</kbd></dt><dd>focus the finder</dd></div>
+    <div><dt><kbd>esc</kbd></dt><dd>clear the finder, close this</dd></div>
+    <div><dt><kbd>⏎</kbd></dt><dd>jump to the first match</dd></div>
+    <div><dt><kbd>⌘</kbd><kbd>⏎</kbd></dt><dd>send a prompt box</dd></div>
+    <div><dt><kbd>?</kbd></dt><dd>this list</dd></div>
+  </dl>
+  <p class="help-foot">The finder lives in the URL: <code>?q=</code> is the same filtered view, shareable and reload-safe.</p>
+</div>
+</div>
 <script type="module" src="app.js"></script>
 </body>
 </html>

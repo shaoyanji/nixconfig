@@ -110,6 +110,24 @@ function applyFilter() {
   nomatch.hidden = !(q && shown === 0);
   count.textContent = q ? `${shown}/${all.length}` : "";
   document.body.classList.toggle("filtering", Boolean(q));
+  remember(find.value.trim());
+}
+
+// --- the finder is in the URL ----------------------------------------------
+// A filtered view is worth sharing: `?q=umami` survives a reload and a paste
+// into another reader. `replaceState`, not `pushState` — a reader typing must
+// not fill the back button with one entry per keystroke — and the query is
+// relative, so it stays on whichever mount (tailnet or public) served the page.
+function remember(q) {
+  try {
+    const url = new URL(location.href);
+    if (q) url.searchParams.set("q", q);
+    else url.searchParams.delete("q");
+    if (url.href !== location.href) history.replaceState(null, "", url);
+  } catch {
+    // A page opened as a bare store path has no history to replace; the finder
+    // still filters, it just cannot be pasted elsewhere.
+  }
 }
 
 function mark(card) {
@@ -197,6 +215,9 @@ function applyPatch(data) {
     // spread, and the anchor is re-attached as a node rather than as text.
     if (topAnchor && target === log) target.replaceChildren(topAnchor, ...nodes.childNodes);
     else target.replaceChildren(nodes);
+    // The history frame is the first time there are cards: a `?q=` restored
+    // before the stream opened had nothing to filter until now.
+    applyFilter();
     return;
   }
   if (data.mode === "outer" || data.mode === "replace") {
@@ -264,6 +285,31 @@ find.addEventListener("keydown", (event) => {
   }
 });
 
+// A shared link is the whole feature: the query in the address bar is applied
+// once the cards exist, so a reload lands on the same filtered view.
+const startQuery = new URLSearchParams(location.search).get("q");
+if (startQuery) {
+  find.value = startQuery;
+  applyFilter();
+}
+
+// --- help ------------------------------------------------------------------
+const help = document.getElementById("help");
+const helpOpen = document.getElementById("help-open");
+const helpClose = document.getElementById("help-close");
+
+function showHelp(on) {
+  help.hidden = !on;
+  document.body.classList.toggle("helping", on);
+  (on ? helpClose : helpOpen).focus();
+}
+
+helpOpen.addEventListener("click", () => showHelp(true));
+helpClose.addEventListener("click", () => showHelp(false));
+help.addEventListener("click", (event) => {
+  if (event.target === help) showHelp(false);
+});
+
 // Instant, not smooth: a reader who asks for the top of a 40-card log wants the
 // top, not a four-second tour through every snap point on the way.
 document.getElementById("totop").addEventListener("click", (event) => {
@@ -278,6 +324,15 @@ const typing = (el) =>
 
 addEventListener("keydown", (event) => {
   if (event.metaKey || event.ctrlKey || event.altKey) return;
+  // The overlay is modal for keys, not for the stream: while it is open only
+  // `esc` and `?` do anything, so a stray `j` cannot scroll behind it.
+  if (!help.hidden) {
+    if (event.key === "Escape" || event.key === "?") {
+      event.preventDefault();
+      showHelp(false);
+    }
+    return;
+  }
   const el = document.activeElement;
   if (typing(el)) {
     if (event.key === "Escape" && el.tagName === "TEXTAREA") el.blur();
@@ -305,6 +360,10 @@ addEventListener("keydown", (event) => {
       event.preventDefault();
       find.focus();
       find.select();
+      break;
+    case "?":
+      event.preventDefault();
+      showHelp(true);
       break;
     case "Escape":
       if (find.value) {

@@ -370,6 +370,76 @@ body[data-stream="connecting"] .pulse {
 .totop:hover,
 .totop:focus-visible { color: var(--emerald); border-bottom-color: var(--emerald); outline: none; }
 
+/* --- the ? button and the key list it opens -------------------------------- */
+.help-open {
+  padding: 0 0.45em;
+  font: inherit;
+  letter-spacing: 0;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line-hi);
+  cursor: pointer;
+}
+.help-open:hover,
+.help-open:focus-visible { color: var(--emerald); border-color: var(--emerald); outline: none; }
+
+.help {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: rgba(3, 8, 10, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.help-card {
+  width: min(30rem, calc(100vw - 2rem));
+  padding: 1.1rem 1.3rem 1.2rem;
+  background: rgba(6, 22, 22, 0.96);
+  border: 1px solid var(--line-hi);
+  border-left: 2px solid var(--emerald);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1rem), calc(100% - 1rem) 100%, 0 100%);
+}
+
+.help-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.help-head h2 {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--emerald);
+}
+
+.help-close {
+  padding: 0.1em 0.5em;
+  font: inherit;
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: none;
+  border: 1px solid var(--line-hi);
+  cursor: pointer;
+}
+.help-close:hover,
+.help-close:focus-visible { color: var(--emerald); border-color: var(--emerald); outline: none; }
+
+.help-keys {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.42rem 1rem;
+  margin: 0.95rem 0 0;
+  font-size: 0.78rem;
+}
+.help-keys > div { display: contents; }
+.help-keys dt { text-align: right; color: var(--ink); white-space: nowrap; }
+.help-keys dd { margin: 0; color: var(--dim); }
+
+.help-foot { margin: 0.95rem 0 0; font-size: 0.68rem; line-height: 1.5; color: var(--dim); }
+.help-foot code { color: var(--teal); }
+
 /* --- the card the reader is on -------------------------------------------- */
 .turn[data-current] {
   border-left-color: var(--emerald);

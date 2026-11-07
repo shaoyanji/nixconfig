@@ -12,7 +12,10 @@
   imports = [
     self.modules."profiles.base-node"
     self.modules."profiles.nas-client"
+    self.modules."profiles.nas-media"
   ];
+
+  profiles.nasMedia.enable = lib.mkDefault true;
 
   # Enable FUSE so kbfsfuse can call /run/wrappers/bin/fusermount
   programs.fuse = {

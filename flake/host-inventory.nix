@@ -214,6 +214,12 @@ in {
     modules = globalModulesNixos ++ [../hosts/aristotle/configuration.nix];
   };
 
+  diogenes = {
+    kind = "nixos";
+    system = "x86_64-linux";
+    modules = globalModulesNixos ++ [../hosts/diogenes/configuration.nix];
+  };
+
   # netbook carries no global module chain — its own configuration is the whole
   # system — and it follows the fleet's nixpkgs like every other host. What it
   # pins instead is the KERNEL: `boot.kernelPackages = pkgs.linuxPackages` (LTS)

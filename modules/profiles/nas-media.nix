@@ -364,7 +364,8 @@ in {
       default =
         if
           (builtins.elem "gpu-low" (config.fleet.inventory.hosts.${config.networking.hostName}.software.traits or []))
-          || (config.networking.hostName == "aristotle")
+          || (builtins.elem "thinkpad-t440" (config.fleet.inventory.hosts.${config.networking.hostName}.software.traits or []))
+          || (builtins.elem "thinkpad-l440" (config.fleet.inventory.hosts.${config.networking.hostName}.software.traits or []))
         then "fast"
         else "default";
       description = "Default MPV profile for playback ('fast' on low-power hardware, 'default' otherwise)";

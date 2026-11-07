@@ -16,8 +16,8 @@ title = "Fleet Device & Host Inventory"
 description = "Canonical hardware, operational status, network, and agent persona registry for all fleet devices."
 version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_devices = 37
-active_nix_devices = 14
+total_devices = 38
+active_nix_devices = 15
 active_external_devices = 7
 wip_devices = 0
 preserved_devices = 16
@@ -441,6 +441,54 @@ system_prompt_hint = "You are the ThinkPad T440 mobile laptop companion. Priorit
 compute_tier = "lightweight-laptop"
 allowed_tasks = ["Everyday coding and markdown notes", "NFS synchronization with NAS", "Lightweight desktop productivity", "Battery lifecycle management"]
 constraints = ["15W dual-core Haswell i5-4300U processor and 8GB RAM; avoid heavy compilation loops. Always substitute closures from frieren LAN cache."]
+
+[hosts.diogenes]
+hostname = "diogenes"
+status = "active"
+status_detail = "In active production on LAN as a docked ThinkPad L440 multi-monitor workstation & auxiliary node."
+managed = true
+kind = "nixos"
+arch = "x86_64-linux"
+role = "ThinkPad L440 Docked Multi-Monitor Workstation"
+category = "laptop"
+desktop_environment = "Niri + DankMaterialShell greeter — medium tier (Dux)"
+users = ["devji"]
+notes = [
+  "Lenovo ThinkPad L440 (20ASS1D900) docked workstation driving multi-monitor setup.",
+  "Intel Core i5-4300M (Haswell, 2c/4t, 2.60 GHz base / 3.30 GHz turbo, 37 W), Intel HD Graphics 4600.",
+  "Storage: 59.6GB Innodisk M.2 (S42) 3ME4 SSD (/dev/sdb2 btrfs @root, @home, @nix; /dev/sdb1 vfat /boot) + NFS /Volumes/data mount from frieren.",
+  "Network: enp0s25 wired Gigabit Ethernet (192.168.3.29, MAC 54:ee:75:1e:b3:44) and wlp2s0 Wi-Fi (MAC 28:b2:bd:08:a5:c5). Tailscale enabled.",
+  "Docking: ThinkPad Pro/Ultra Dock (CS13) driving multi-monitor outputs; lid switch set to ignore so it operates seamlessly with lid closed."
+]
+
+[hosts.diogenes.hardware]
+model = "Lenovo ThinkPad L440 (20ASS1D900)"
+cpu = "Intel Core i5-4300M (Haswell, 2c/4t, 2.60 GHz base / 3.30 GHz turbo, 37 W)"
+gpu = "Intel HD Graphics 4600 (Haswell Integrated)"
+ram = "3.7 GiB DDR3L (upgradeable to 8-16 GB via 2 SODIMM slots) + zram swap"
+display = "Internal 14\" LCD (line on screen, docked lid-closed mode) + external dock monitors"
+battery = "ThinkPad 6-cell/9-cell Li-ion (acts as hardware UPS)"
+storage_type = "M.2 2242 SATA SSD"
+storage_layout = "59.6GB Innodisk M.2 (S42) 3ME4 SSD (/dev/sdb) btrfs + NFS /Volumes/data mount"
+
+[hosts.diogenes.network]
+lan_ip = "192.168.3.29"
+tailscale = true
+tailscale_hostname = "diogenes"
+ssh_alias = "diogenes"
+
+[hosts.diogenes.software]
+module_chain = "globalModulesNixos"
+impermanence = false
+key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "auto-cpufreq", "NFS client automount (/Volumes/data from frieren)", "SSH CA Client"]
+traits = ["thinkpad-l440", "laptop-profile", "niri-desktop", "nfs-client", "battery-optimized", "btrfs", "docked-workstation"]
+
+[hosts.diogenes.persona]
+title = "Cynical ThinkPad L440 Docked Workhorse"
+system_prompt_hint = "You are the ThinkPad L440 docked workstation companion (Diogenes). Prioritize reliable multi-monitor desktop operation, quiet docked performance, and clean fleet integration."
+compute_tier = "lightweight-laptop"
+allowed_tasks = ["Everyday coding and markdown notes", "NFS synchronization with NAS", "Lightweight desktop productivity", "Battery lifecycle management"]
+constraints = ["37W dual-core Haswell i5-4300M processor and 4GB RAM (upgradeable to 8GB); avoid heavy compilation loops. Always substitute closures from frieren LAN cache."]
 
 [hosts.aceofspades]
 hostname = "aceofspades"

@@ -124,6 +124,14 @@ exit status is the contract, the partial `index.html` is a preview.
 Binding the server to the Tailscale address is what keeps a demo on the tailnet:
 no `0.0.0.0`, no `tailscale serve`, no firewall rule to forget.
 
+Books live on the pool, `/Volumes/data/projects/storybook/<book>` (the
+`projects/` tree in [`docs/storage-taxonomy.md`](../../../docs/storage-taxonomy.md)),
+with `~/Documents/storybook` a symlink to it — 500 MB of plates is not home
+storage. `readlink -f` the project dir before trusting a path: the symlink is
+invisible to `pwd`, and a unit that pins `%h/Documents/...` keeps working while
+an `rm -rf` of the home tree is not a backup. `storybook-serve` (8899) and
+`storybook-pips-serve` (8898) run the demos from the canonical path.
+
 ## Probing the wall on purpose
 
 ```bash

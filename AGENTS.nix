@@ -5660,5 +5660,62 @@
         from, and one authenticated session (LinkedIn, Gmail) read back as a snapshot.
       '';
     };
+    go-for-python-services = {
+      title = "Long-running services go to Go; timers and model servers stay Python";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-07";
+      summary = "Three runtimes were built for the turns read path and measured at 1000 SSE readers; Go won on the edit loop (42 ms warm rebuild) and the idle process (12.6 MB), and the turns shim followed it off Python. The rule that falls out: a long-running service with I/O the fleet owns is a Go port; a timer-sized one-shot or a model server is not.";
+      refs = {
+        hosts = ["delphi" "eisen" "frieren"];
+        modules = [
+          "modules/services/agent-turns.nix"
+          "modules/services/agent-turns/shim"
+          "modules/services/turns-dashboard"
+          "modules/services/zettel-graph.nix"
+          "modules/services/mataroa-console.nix"
+        ];
+        docs = ["docs/agent-turns.md" "docs/turns-dashboard.md"];
+        tasks = ["checks:host" "clanker:devshell"];
+      };
+      body = ''
+        **Measured 2026-11-07 on clanker, 1000 SSE readers, 20 000 frames.** Full table:
+        `tools/turns-runtime/README.md`. Go 6 284/42 ms build, 8.9 MB, 32 ms start, 12.6 MB idle.
+        Rust 14 403/2 186 ms, 2.1 MB, 8 ms, 6.4 MB, 67 crates. Elixir 7 084/553 ms, 24.3 MB,
+        472 ms, 181.8 MB. p50 10.7-11.8 ms and p99 20.2-21.7 ms across all three: the stream
+        does not separate them, so the stream is not what chooses.
+
+        **What chooses.** Warm rebuild (the loop a person lives in, 50x apart), idle RSS (a
+        viewer idles most of the day), and pins (0 against 3 and 67 to keep building in the
+        flake). Rust's 2.1 MB artifact and 6.4 MB resident are real and still lose to a 2.2 s
+        edit loop on a read-only view.
+
+        **The rule.** Port a service when all three hold: it is long-running, its I/O is the
+        fleet's own (a store, a vault, a mail archive), and its Python cost is paid
+        continuously — resident MB, an interpreter in the closure, a restart that answers late.
+        Contest the language only when the read path is hard enough to be worth a benchmark;
+        otherwise stdlib Go, because the fleet now has two services in that shape.
+        Do not port a timer-sized one-shot (its Python start is a rounding error on what the
+        job does) and do not port a model server (torch and transformers are the work; eisen's
+        parakeet, qwen-image and decision-model servers stay Python by nature, not by inertia).
+
+        **The queue, sized.** `zettel-graph-server.py` 444 lines at 8453 (vault reader, write
+        guard through the vault's own scripts) and `mataroa-console.py` 599 lines (HTTP console,
+        git and comrak glue) are the two long-running readers left. Everything else in the list
+        is a timer or a CLI: mail-atlas drain/reconcile, email-archive import/triage/ci-drain,
+        mail-agent, wiki-ask, tls-cert-watchdog, fleet-session-reaper, flake-advisory-audit.
+
+        **How a port is gated.** Keep the wire contract byte-compatible, port the tests before
+        the handler (`main_test.go` is the pattern: real Unix socket, fake store, one case per
+        refusal), prove the legacy state file opens as-is — the shim's `dedup.sqlite` cutover
+        test is the shape — then `checks:host`, then a live smoke before freezing the old
+        implementation.
+
+        **Exit.** The shim runs on delphi with `agents:xs:post` answering 201 through it; then
+        each queued reader is either ported under the same gate or struck from the queue with a
+        reason.
+      '';
+    };
   };
 }

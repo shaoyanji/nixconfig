@@ -112,6 +112,27 @@ A temporary Tailscale Funnel was the first way this was demonstrated (read-only
 reader on loopback, `tailscale funnel --https=10000`, removed and verified gone).
 It worked and it is no longer needed now that the public vhost exists.
 
+## The full suite, on a host outside the fleet
+
+`scripts/task/turns-ui-suite.sh` asserts the page a person uses — posture,
+movement, the key list, the finder, `?q=` and one new turn arriving — through a
+real Chromium, and it runs anywhere `agent-browser` is on PATH.
+
+`task agents:xs:suite` runs it where the demo is worth something: on `clanker`,
+an Instabox VM with no tailnet, no xs token and no way to prompt, inside
+`templates/agent-shell`. Only the post is privileged, and it stays here: the
+suite prints `PHASE toast-watch`, this host watches the box's job log for that
+line, posts one turn through the publisher `agents:xs:post` uses, and the toast
+is then proved on a reader that could not have caused it. Measured 2026-11-07:
+38 checks, 0 failures, from the box against the public mount.
+
+The tree travels as `git archive HEAD`, so commit the suite before running it —
+the wrapper says so rather than testing yesterday's assertions.
+
+```bash
+task agents:xs:suite      # clanker, public mount, one real post
+```
+
 ## Not done
 
 - The public mount has no authentication: it is readable by anyone with the URL,

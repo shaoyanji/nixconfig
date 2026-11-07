@@ -7,7 +7,7 @@ can be checked before work starts and a merge can be checked against the turns
 that actually landed. It authorizes nothing — a builder still does not merge
 unless a task says so.
 
-Code: `modules/services/agent-turns.nix`, `modules/services/agent-turns/shim.py`.
+Code: `modules/services/agent-turns.nix`, `modules/services/agent-turns/shim/` (Go).
 Exposure: `hosts/delphi/configuration.nix` (`services.servicePortal.mounts`).
 Protocol: `AGENTS.md` § "Agent turns", `docs/agent-context/HOME-PREAMBLE.md`.
 
@@ -16,10 +16,18 @@ Protocol: `AGENTS.md` § "Agent turns", `docs/agent-context/HOME-PREAMBLE.md`.
 | Layer | What | Where |
 | :--- | :--- | :--- |
 | Store | `xs` 0.14.2 (`cross-stream`), topic `agent.turns`, ttl `forever` | `/var/lib/xs-agent-turns/store`, Unix socket `store/sock` |
-| Shim | Python 3 stdlib, bearer auth, schema + secret allowlist, dedup index | `127.0.0.1:8093`, `dedup.sqlite` beside the store |
+| Shim | Go stdlib + pure-Go sqlite, bearer auth, schema + secret allowlist, dedup index | `127.0.0.1:8093`, `dedup.sqlite` beside the store |
 | Exposure | `tailscale serve --https=8449` → `http://127.0.0.1:8093` | `https://delphi.cloudforest-kardashev.ts.net:8449` |
 | Units | `xs-agent-turns.service`, `agent-turns-shim.service`, `tailscale-serve-agent-turns.service` | delphi |
 | Secrets | `agent-turns-token` (fleet) plus one per outside holder (`-netbook`, `-muse`, `-vesper`) in `modules/secrets.yaml` | 0400, owner `xs-agent-turns` |
+
+The shim was Python until 2026-11-07. The read-path benchmark
+(`tools/turns-runtime/README.md`) picked Go for the turns stack on the edit loop
+(42 ms warm rebuild against 553 ms for Elixir) and the idle process (12.6 MB
+against 182 MB), and the shim followed: same routes, same field rules, same
+`dedup.sqlite` — so the first replay after the cutover still lands on the frame
+the Python shim stored, which is what `main_test.go`'s legacy-database test
+pins. It is one static binary with no interpreter to ship.
 
 The store is never exposed. `xs serve` runs without `--expose`, inside
 `PrivateNetwork=true`, with `RestrictAddressFamilies = ["AF_UNIX"]`, so there is
@@ -158,7 +166,7 @@ in any field. Error bodies name the field, never the value.
   "rationale": "coordination state must be queryable",
   "base_commit": "3a47a215",
   "branch": "feat/agent-turns-xs-delphi",
-  "files_changed": ["modules/services/agent-turns/shim.py"],
+  "files_changed": ["modules/services/agent-turns/shim/main.go"],
   "commits": [],
   "outcome": "in_progress",
   "claims": ["modules/services/agent-turns"]

@@ -5290,7 +5290,7 @@
       summary = "cablehead xs 0.14.2 on delphi, Unix socket only, behind a bearer-authenticated shim that owns dedup and forbids update/delete, mounted on the tailnet at 8449 so agents can check claims and base commits before they edit.";
       refs = {
         hosts = ["delphi"];
-        modules = ["modules/services/agent-turns.nix" "modules/services/agent-turns/shim.py" "hosts/delphi/configuration.nix"];
+        modules = ["modules/services/agent-turns.nix" "modules/services/agent-turns/shim" "hosts/delphi/configuration.nix"];
         docs = ["docs/agent-turns.md" "AGENTS.md"];
         tasks = ["infra:xs:export" "checks:host"];
       };

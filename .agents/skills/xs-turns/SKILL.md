@@ -15,7 +15,7 @@ The turn log is coordination state, not chat: one entry per agent turn, keyed by
 `<repo>:<task-id>`, queryable before you start and after you land. It authorizes
 nothing — a builder still does not merge unless a task says so.
 
-Truth: `modules/services/agent-turns.nix`, `modules/services/agent-turns/shim.py`, `hosts/delphi/configuration.nix`; protocol and store in `docs/agent-turns.md`.
+Truth: `modules/services/agent-turns.nix`, `modules/services/agent-turns/shim/`, `hosts/delphi/configuration.nix`; protocol and store in `docs/agent-turns.md`.
 
 ## Before a turn: pull, then read
 

@@ -1,6 +1,6 @@
 # The xs turn body, rendered by `jq -n -f` from `task agents:xs:post`.
 #
-# This file is the schema. The shim (modules/services/agent-turns/shim.py) fixes
+# This file is the schema. The shim (modules/services/agent-turns/shim/validate.go) fixes
 # the field set and rejects an unknown key, so a field is added here once and no
 # caller ever assembles JSON by hand. Every value arrives as a `--arg` string,
 # which is why prose with quotes cannot corrupt the body.

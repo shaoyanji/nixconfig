@@ -39,6 +39,21 @@
     };
   };
 
+  # The shim is the only holder of the append-only contract, and it is a Go
+  # service: the store's client is a unix-socket DialContext and the dedup file
+  # is the same sqlite the Python shim kept, so a replay lands on the frame the
+  # first append produced (the cutover test in main_test.go pins that).
+  shimPackage = pkgs.buildGoModule {
+    pname = "agent-turns-shim";
+    version = "0.1.0";
+    src = ./agent-turns/shim;
+    vendorHash = "sha256-n+WU7qcF6NauBw9DFU4VG1fnDQ387+nibJ/uzApqehk=";
+    meta = {
+      description = "Authenticated append-only shim in front of the agent-turn store";
+      mainProgram = "agent-turns-shim";
+    };
+  };
+
   sys = pkgs.stdenv.hostPlatform.system;
   arch =
     if sys == "aarch64-linux"
@@ -303,7 +318,7 @@ in {
         # the socket is connectable, and a shim that exits on the race makes the
         # whole switch fail (measured: status 4/NOPERMISSION).
         ExecStartPre = "${waitForSocket}/bin/agent-turns-wait-socket";
-        ExecStart = "${pkgs.python3}/bin/python3 ${./agent-turns/shim.py}";
+        ExecStart = "${lib.getExe shimPackage}";
         Environment = [
           "XS_SOCKET=${socketPath}"
           "AGENT_TURNS_TOKENS=${

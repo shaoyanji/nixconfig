@@ -166,9 +166,11 @@ sleep 1
 ok finder-focused "$(ev 'document.activeElement.id')" find
 ab keyboard type "umami" >/dev/null
 sleep 1
-shown=$(ev "document.querySelectorAll('article.turn:not([hidden])').length")
-okne finder-narrows "$([ "${shown:-0}" -gt 0 ] && [ "${shown:-0}" -lt "$total" ] && echo yes)" ""
-ok finder-count "$(ev 'document.getElementById("count").textContent')" "$shown/$total"
+# Read the two counts and the label in ONE eval, and compare them to each other.
+# A live log grows during the run: `2/41` measured before a turn arrived and
+# `2/43` a few seconds later is not a finder bug (measured on clanker, 2026-11-07).
+ok finder-narrows "$(ev "(() => { const a = document.querySelectorAll('article.turn').length; const v = document.querySelectorAll('article.turn:not([hidden])').length; return v > 0 && v < a; })()")" true
+ok finder-count "$(ev "(() => { const a = document.querySelectorAll('article.turn').length; const v = document.querySelectorAll('article.turn:not([hidden])').length; return document.getElementById('count').textContent === v + '/' + a; })()")" true
 ok url-carries-query "$(ev 'location.search')" "?q=umami"
 ab keyboard type "zzqqxx" >/dev/null
 sleep 1
@@ -176,7 +178,7 @@ ok nomatch-shown "$(ev 'document.getElementById("nomatch").hidden === false')" t
 ok nomatch-zero "$(ev "document.querySelectorAll('article.turn:not([hidden])').length")" 0
 ab press Escape >/dev/null
 sleep 1
-ok esc-clears "$(ev "document.querySelectorAll('article.turn:not([hidden])').length")" "$total"
+ok esc-clears "$(ev "document.querySelectorAll('article.turn[hidden]').length")" 0
 ok esc-clears-url "$(ev 'location.search')" ""
 
 section "shareable view"
@@ -191,7 +193,8 @@ for i in $(seq 1 20); do
   [ "${shared:-0}" -gt 0 ] && break
   sleep 0.5
 done
-ok shared-filtered "$shared" "$shown"
+ok shared-filtered "$(ev "(() => { const a = document.querySelectorAll('article.turn').length; const v = document.querySelectorAll('article.turn:not([hidden])').length; return v > 0 && v < a; })()")" true
+ok shared-label "$(ev "(() => { const a = document.querySelectorAll('article.turn').length; const v = document.querySelectorAll('article.turn:not([hidden])').length; return document.getElementById('count').textContent === v + '/' + a; })()")" true
 
 if [ "$WATCH" = 1 ]; then
   section "toast on a new turn"

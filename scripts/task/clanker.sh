@@ -167,7 +167,11 @@ done'
     limit="${2:-7200}"
     waited=0
     while :; do
-      state="$(api_exec "cat $JOBS/$1/exit 2>/dev/null || echo running" | tr -d '\r' | tail -1)"
+      # The exec API ends its output with a blank line, so `tail -1` alone reads
+      # empty and a finished job looks like one in the instant between the file
+      # existing and its value arriving — i.e. it never returns (measured
+      # 2026-11-07: an exited job reported "still running" for its whole limit).
+      state="$(api_exec "cat $JOBS/$1/exit 2>/dev/null || echo running" | tr -d '\r' | awk 'NF' | tail -1)"
       # Empty is not an exit status: it is the instant between the file existing
       # and the wrapper's value arriving.
       if [ -n "$state" ] && [ "$state" != "running" ]; then

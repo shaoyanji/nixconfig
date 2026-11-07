@@ -107,6 +107,7 @@
     yt-dlp \
       --ignore-config \
       --format-sort "vcodec:h264,res:1080,acodec:m4a" \
+      --recode-video mp4 \
       --merge-output-format mp4 \
       --concurrent-fragments 4 \
       --embed-metadata \
@@ -128,7 +129,7 @@
 
     if [[ "$auto_play" -eq 1 ]]; then
       echo "==> Auto-playing in mpv..."
-      exec ${pkgs.mpv}/bin/mpv "$filepath"
+      exec ${pkgs.mpv}/bin/mpv --profile=fast "$filepath"
     fi
 
     # Send interactive notification via libnotify
@@ -144,7 +145,7 @@
     case "$action" in
       play|default|0)
         echo "==> Notification clicked: launching mpv..."
-        exec ${pkgs.mpv}/bin/mpv "$filepath"
+        exec ${pkgs.mpv}/bin/mpv --profile=fast "$filepath"
         ;;
       folder|1)
         exec xdg-open "$(dirname "$filepath")"
@@ -301,12 +302,12 @@
 
   ytPlay = pkgs.writers.writeBashBin "yt-play" ''
     if [[ $# -gt 0 ]]; then
-      exec ${pkgs.mpv}/bin/mpv "$@"
+      exec ${pkgs.mpv}/bin/mpv --profile=fast "$@"
     fi
     latest=$(ls -td /Volumes/data/video/yt/mp4/* 2>/dev/null | grep -E '\.(mp4|mkv|webm)$' | head -n 1 || true)
     if [[ -n "$latest" && -f "$latest" ]]; then
       echo "Playing newest download: $latest"
-      exec ${pkgs.mpv}/bin/mpv "$latest"
+      exec ${pkgs.mpv}/bin/mpv --profile=fast "$latest"
     else
       echo "No videos found in /Volumes/data/video/yt/mp4"
       exit 1

@@ -68,11 +68,12 @@ in {
     # Declarative mpv with hardware-tier acceleration and Wayland integration
     programs.mpv = {
       enable = true;
-      scripts = with pkgs.mpvScripts; [
-        mpris # Media key and playerctl integration with Niri / Wayland
-        uosc # Modern, lightweight, fast Wayland-friendly UI
-        thumbfast # Fast on-the-fly thumbnail generation
-      ];
+      scripts = with pkgs.mpvScripts;
+        [
+          mpris # Media key and playerctl integration with Niri / Wayland
+          uosc # Modern, lightweight, fast Wayland-friendly UI
+        ]
+        ++ lib.optional (cfg.tier != "low") pkgs.mpvScripts.thumbfast;
 
       # Tier-differentiated mpv.conf settings
       config = lib.mkMerge [
@@ -90,19 +91,25 @@ in {
         # --- Low Tier (Haswell / Intel HD 4400: Aristotle) ---
         # Haswell Gen 7.5 has hardware VA-API for H.264/AVC, VC-1, MPEG-2.
         # It has NO hardware decode for VP9 or AV1.
-        # CRUCIAL: ytdl-format forces H.264 (avc1) <= 1080p so YouTube streams are hardware-decoded
-        # by the VA-API engine instead of melting the 15W dual-core i5-4300U CPU with software VP9/AV1 decoding.
+        # CRUCIAL: profile=fast + bilinear scaling + thumbfast disabled prevents CPU bombs and GPU shader stalls.
+        # ytdl-format prefers 1080p H.264, capping VP9/AV1 at 720p.
         (lib.mkIf (cfg.tier == "low") {
+          profile = "fast";
           vo = "gpu";
           gpu-context = "wayland";
           hwdec = "vaapi";
           hwdec-codecs = "all";
-          scale = "spline36";
-          dscale = "mitchell";
+          scale = "bilinear";
           cscale = "bilinear";
+          dscale = "bilinear";
+          dither = "no";
+          correct-downscaling = "no";
+          linear-downscaling = "no";
+          sigmoid-upscaling = "no";
+          hdr-compute-peak = "no";
           interpolation = "no";
           deband = "no";
-          ytdl-format = "bestvideo[vcodec^=avc1][height<=?1080]+bestaudio/best[vcodec^=avc1][height<=?1080]/best[height<=?1080]";
+          ytdl-format = "bestvideo[vcodec^=avc1][height<=?1080]+bestaudio/best[vcodec^=avc1][height<=?1080]/bestvideo[height<=?720]+bestaudio/best[height<=?720]";
         })
 
         # --- Medium Tier (Kaby Lake R / UHD 620: Frieren & Fern) ---

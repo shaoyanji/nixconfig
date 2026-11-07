@@ -48,10 +48,17 @@ supported`).
 
 ## Budget and pacing
 
-`cpg usage` on 2026-11-06 reports a `lifetime-pool` plan whose name is
-"unlimited", and the image lane still has hard numbers: **an allowance of 100
-generations** (3 used that day) and a rate of **25 per hour, 250 per day**.
-Prompts are rate-limited separately at 50 per 10 minutes and 300 per hour.
+`cpg usage` reports a `lifetime-pool` plan whose name is "unlimited", and the
+image lane still has hard numbers: **100 generations per day**, resetting at
+00:00 UTC (measured 2026-11-07: the counter read 98 at 00:05Z after 100 had been
+spent the previous day, with `lastDailyImageDate` on the new date), and a rate of
+**25 per hour**. Prompts are rate-limited separately at 50 per 10 minutes and 300
+per hour.
+
+The reset is easy to misread as a lifetime cap: the plan's `periodEnd` is 2146
+and `unlimited.imageGenerations` is `false`, so the counter only reveals itself
+as daily when it goes *up*. Check `lastDailyImageDate` before planning a
+multi-day project.
 
 Plan a long project against the smaller number, not the word "unlimited":
 

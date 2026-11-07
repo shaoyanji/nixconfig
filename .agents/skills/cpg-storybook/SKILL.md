@@ -25,20 +25,26 @@ python3 …/storybook.py finalize                # finals/ + book.md
 `STORYBOOK_DIR` overrides the project directory when the script is not run from
 inside it.
 
-## The budget is lifetime, not daily
+## The budget is daily, and it resets quietly
 
-Measured 2026-11-06 on the `unlimited` lifetime plan:
+Measured on the `unlimited` lifetime plan:
 
 | Number | Value | Meaning |
 | :--- | :--- | :--- |
-| `limits.imageGenerations` | 100 | total, for the life of the plan |
-| `usage.imageGenerationsCount` | counts up | spent so far |
-| rate | 25/1h, 250/1d | the 1d figure is not a refill |
-| `unlimited.imageGenerations` | `false` | explicitly not unlimited |
+| `limits.imageGenerations` | 100 | per day |
+| `usage.imageGenerationsCount` | counts up | spent since 00:00 UTC |
+| `usage.lastDailyImageDate` | date | the day the counter belongs to |
+| rate | 25/1h, 250/1d | 25/h is the real pacing constraint |
 
-So a 100-image book is a **one-shot artefact**: there is no tomorrow's batch.
-Read `budget` before every pass; the script refuses to generate once
-`remaining` is 0. Never spend a generation on a test when a spread needs it.
+2026-11-07, 00:05 UTC: the counter that had reached 100 read 98 after two
+generations on the new date. Nothing in the entitlement says "daily" — the
+`periodEnd` is 2146 and `unlimited.imageGenerations` is `false` — so a run that
+crosses midnight sees `remaining` jump, and a run that plans as if it were
+one-shot leaves most of a day unused.
+
+Plan the *day*, not the artefact: 100 generations, 25 an hour, and no
+carry-over. `budget` reads the counter every call, so it is correct on both
+sides of midnight.
 
 ## Manifest
 

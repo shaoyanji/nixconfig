@@ -100,6 +100,13 @@ def cpg(*args: str, timeout: float = 300.0) -> subprocess.CompletedProcess:
 def budget() -> dict:
     """The allowance is the account's, so it is asked, never remembered."""
     proc = cpg("usage", "--json", timeout=60)
+    for _ in range(3):
+        if proc.returncode == 0:
+            break
+        # The usage endpoint is a separate request; one timeout must not kill a
+        # two-hour print run at image 83.
+        time.sleep(15)
+        proc = cpg("usage", "--json", timeout=60)
     if proc.returncode != 0:
         sys.exit(f"storybook: cpg usage failed: {proc.stderr.strip()[:300]}")
     usage = json.loads(proc.stdout)

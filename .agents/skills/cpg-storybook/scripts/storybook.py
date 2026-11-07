@@ -92,9 +92,13 @@ def append_ledger(row: dict) -> None:
 
 
 def cpg(*args: str, timeout: float = 300.0) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        ["cpg", *args], capture_output=True, text=True, timeout=timeout
-    )
+    # A timeout is a failed request, not an exception that ends a print run.
+    try:
+        return subprocess.run(
+            ["cpg", *args], capture_output=True, text=True, timeout=timeout
+        )
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess(["cpg", *args], 124, "", "timeout")
 
 
 def budget() -> dict:
@@ -229,14 +233,16 @@ def cmd_run(args: argparse.Namespace) -> int:
     m = manifest()
     # A ledger row can outlive its plate (an archived style, a deleted file), so
     # what counts as done is the file on disk, not the record of spending.
-    done = {s["id"] for s in m["spreads"] if any((CANDIDATES / s["id"]).glob("*.png"))}
-    pending = [s for s in m["spreads"] if s["id"] not in done]
+    want = args.candidates or m.get("candidates", 3)
+    # A spread is finished when it has its candidates, not when it has one: a run
+    # that stopped at plate 2 of 3 must be resumable.
+    have = {s["id"]: len(list((CANDIDATES / s["id"]).glob("*.png"))) for s in m["spreads"]}
+    pending = [s for s in m["spreads"] if have[s["id"]] < want]
     if not pending:
         print("storybook: every spread already has candidates")
         return 0
     if args.limit is not None:
         pending = pending[: args.limit]
-    want = args.candidates or manifest().get("candidates", 3)
     for idx, spread in enumerate(pending):
         left = len(pending) - idx
         # Every spread gets a plate even if the allowance runs short: share what

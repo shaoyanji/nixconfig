@@ -124,6 +124,25 @@ exit status is the contract, the partial `index.html` is a preview.
 Binding the server to the Tailscale address is what keeps a demo on the tailnet:
 no `0.0.0.0`, no `tailscale serve`, no firewall rule to forget.
 
+## Probing the wall on purpose
+
+```bash
+python3 …/limit-probe.py --project $PWD --candidates 5 --attempts 40
+```
+
+`limit-probe.py` paces nothing. It issues generations back to back, using the
+next missing candidate of each spread so the plates stay usable, and records
+every response in `state/probe-<stamp>.jsonl`: rc, seconds, and the endpoint's
+own error text. It stops after three consecutive failures and prints one JSON
+summary — attempted, ok, failed, the usage counter before and after, and the
+first refusal.
+
+The refusal is the result. A `429` with a rate message before the counter reaches
+the allowance means the hourly window binds first; a failure only after the
+counter hits `limits.imageGenerations` means the daily allowance does. Record
+either in an xs turn: a limit that was never hit is a limit you cannot plan
+against.
+
 ## Failure behaviour
 
 - `401`: the session died. `cpg status --json`; this needs a browser login, not

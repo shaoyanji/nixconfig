@@ -69,6 +69,21 @@ run_build() {
   bash -lc "$build_command"
 }
 
+# The preview server, resolved from this flake rather than the host's PATH: one
+# Go binary (`.#cli.serve.static-serve`) answers Range, so a <video> in a preview
+# can be seeked. `python3 -m http.server` ignores Range and re-sends the whole
+# file on every scrub. Built locally only (`--builders ""`), and cached: a
+# second preview is a store lookup.
+resolve_preview_server() {
+  local out
+  if ! out="$(cd "$SCRIPT_DIR/../.." && nix build --builders "" --no-link --print-out-paths .?submodules=1#cli.serve.static-serve 2>&1)"; then
+    error "could not build .#cli.serve.static-serve:"
+    printf '%s\n' "$out" >&2
+    return 1
+  fi
+  printf '%s\n' "$out" | tail -n1
+}
+
 run_preview() {
   local target="$1"
   run_build "$target"
@@ -86,8 +101,10 @@ run_preview() {
   if [ -z "$preview_bind" ]; then
     preview_bind="127.0.0.1"
   fi
+  local server
+  server="$(resolve_preview_server)" || exit 1
   echo "Previewing '$target' from '$output_path' at http://$preview_bind:$preview_port"
-  python3 -m http.server "$preview_port" --bind "$preview_bind" --directory "$output_path"
+  exec "$server/bin/static-serve" -dir "$output_path" -addr "$preview_bind:$preview_port"
 }
 
 run_deploy() {

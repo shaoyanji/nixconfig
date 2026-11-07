@@ -404,9 +404,9 @@ def mix_variant(book: dict, dest: Path, site: Path, video: Path, plan: dict,
     final = video / f"{stem}.mp4"
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0",
                     "-i", str(listing), "-c", "copy", "-movflags", "+faststart", str(final)], check=True)
-    # The demo server is python's http.server: no Range support, so a <video>
-    # cannot seek until the whole file has arrived. 28 MB at full quality is a
-    # 30 s wait on a phone; the web cut is what the page points at.
+    # 28 MB at full quality is a 30 s wait on a phone, so the page points at
+    # the web cut. The demo server (.#cli.serve.static-serve) answers Range, so
+    # the full master stays seekable for anyone who opens it directly.
     web = video / f"{stem}.web.mp4"
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(final),
                     "-vf", "scale=960:-2", "-c:v", "libx264", "-preset", "slow", "-crf", "26",

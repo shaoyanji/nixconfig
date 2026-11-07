@@ -155,7 +155,7 @@ leave spreads unchosen and say so, never pick blind.
 ```bash
 python3 …/storybook.py finalize      # finals/ + book.md
 python3 …/publish.py --project $PWD  # site/index.html + web JPEGs
-python3 -m http.server 8899 --bind <tailnet-ip> --directory site
+nix run --builders "" .#cli.serve.static-serve -- -dir site -addr <tailnet-ip>:8899
 ```
 
 `publish.py` prefers `finals/`, falls back to the chosen candidate, re-encodes
@@ -164,7 +164,18 @@ download), and writes `site/READY` only when every spread has a plate — the
 exit status is the contract, the partial `index.html` is a preview.
 
 Binding the server to the Tailscale address is what keeps a demo on the tailnet:
-no `0.0.0.0`, no `tailscale serve`, no firewall rule to forget.
+no `0.0.0.0`, no firewall rule to forget. The address is a port, and it is easy
+to mistype: 8899 and 8898 get typed as 8099 and 8098, and a wrong port reads as
+a dead server rather than a typo.
+
+Do not fix that by mounting the books on `tailscale serve`.
+`frieren.<tailnet>.ts.net:443` belongs to nginx — it is the fleet portal,
+declared in `hosts/frieren/reverse-proxy.nix` and proxying to loopback — and a
+serve mount on 443 takes the whole listener away from it, so the portal and
+every vhost behind that name answer with the book instead. `frieren.lan` is not
+a way round it either: the name resolves to a link-local IPv6 address, which
+these servers do not bind. A book that is served at all gets its own port, and
+the port is the whole address.
 
 Books live on the pool, `/Volumes/data/projects/storybook/<book>` (the
 `projects/` tree in [`docs/storage-taxonomy.md`](../../../docs/storage-taxonomy.md)),
@@ -172,7 +183,9 @@ with `~/Documents/storybook` a symlink to it — 500 MB of plates is not home
 storage. `readlink -f` the project dir before trusting a path: the symlink is
 invisible to `pwd`, and a unit that pins `%h/Documents/...` keeps working while
 an `rm -rf` of the home tree is not a backup. `storybook-serve` (8899) and
-`storybook-pips-serve` (8898) run the demos from the canonical path.
+`storybook-pips-serve` (8898) are hand-written user units over that path, and both
+were disabled on 2026-11-07 because nothing was reading them; `systemctl --user
+enable --now` one to bring a book back.
 
 ## Narration: voices on clanker, mixing here
 
@@ -221,9 +234,9 @@ Traps that cost a run:
   text bug before blaming the voice.
 - **`amix` divides by its input count.** The first mix measured −22.7 dB mean
   against the −16 the narration was normalised to; `normalize=0` is required.
-- **`http.server` has no Range.** A master cannot be seeked until the whole file
-  arrives, so the page points at the 960 px web cut (7.3 MB for `pip`, 40 MB for
-  a 9.5-minute lantern book — the cut is a courtesy, not a guarantee).
+- **Range belongs to the server.** `flake/cli.nix` builds `static-serve`, which
+  answers it, so a master seeks; `python3 -m http.server` re-sent from byte zero.
+  The 960 px web cut (7.3 MB for `pip`) stays a bandwidth saving, not a workaround.
 - **A 28-spread narration is 4 minutes of clanker work, not 40 seconds.** One
   job, 29 lines: 4m04s wall for 528 s of speech at 134 wpm (`--length_scale
   1.5`).

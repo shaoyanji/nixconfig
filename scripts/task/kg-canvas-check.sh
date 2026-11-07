@@ -49,8 +49,10 @@ set -euo pipefail
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 # An ephemeral port, not a "nice round" one: 8787 was already serving Readarr on
 # this host, so the gate silently drove a browser at somebody else's UI. It also
-# asserts the served page is this site before touching it.
-PORT="${PORT:-$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')}"
+# asserts the served page is this site before touching it. `0` hands the choice
+# to the server, which prints the port it actually bound — no probe-free-port,
+# close, rebind race.
+PORT="${PORT:-0}"
 
 fail=0
 ok() { printf 'ok    %s\n' "$1"; }
@@ -268,14 +270,38 @@ elif ! command -v agent-browser >/dev/null 2>&1; then
   echo "skip  agent-browser not installed (static half still ran)"
 else
   server_pid=""
+  server_log=""
   cleanup() {
     [ -n "$server_pid" ] && kill "$server_pid" 2>/dev/null || true
+    [ -n "$server_log" ] && rm -f "$server_log"
     agent-browser close >/dev/null 2>&1 || true
   }
   trap cleanup EXIT
 
-  (cd "$SITE" && python3 -m http.server "$PORT" --bind 127.0.0.1 >/dev/null 2>&1) &
+  # The same Go stdlib server `site-target.sh preview` runs, so a preview and
+  # this gate cannot disagree about what a request means. Built locally only
+  # (`--builders ""`), like the site above.
+  server_bin="$(cd "$REPO" && nix build --builders "" --no-link --print-out-paths .?submodules=1#cli.serve.static-serve 2>/dev/null | tail -1 || true)"
+  if [ -z "$server_bin" ]; then
+    bad "cannot build .#cli.serve.static-serve; browser half skipped"
+    exit 1
+  fi
+  server_log="$(mktemp)"
+  "$server_bin/bin/static-serve" -dir "$SITE" -addr "127.0.0.1:$PORT" -quiet >"$server_log" 2>&1 &
   server_pid=$!
+  if [ "$PORT" = 0 ]; then
+    for _ in $(seq 1 50); do
+      PORT="$(sed -n 's|.*http://127\.0\.0\.1:\([0-9]\{1,\}\).*|\1|p' "$server_log" | head -1)"
+      if [ -n "$PORT" ]; then
+        break
+      fi
+      sleep 0.05
+    done
+    if [ -z "$PORT" ]; then
+      bad "static-serve never reported a port"
+      exit 1
+    fi
+  fi
   served=0
   for _ in $(seq 1 25); do
     if curl -sf "http://127.0.0.1:$PORT/" 2>/dev/null | grep -q 'Fleet Control Plane'; then

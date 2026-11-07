@@ -7,48 +7,20 @@
 }: let
   cfg = config.services.fleetMonitors;
 
-  alertBridge =
-    pkgs.writers.writePython3Bin "fleet-alert-bridge" {
-      libraries = [pkgs.python3Packages.websockets];
-      flakeIgnore = ["E501" "E302" "E305" "E203" "W503"];
-    } ''
-      import asyncio
-      import http.server
-      import json
-      import sys
-      import uuid
-      import websockets
-
-      async def send_to_simplex(msg):
-          corr_id = str(uuid.uuid4())[:8]
-          req = {"corrId": corr_id, "cmd": "#Fleet " + msg}
-          async with websockets.connect("ws://127.0.0.1:5225") as ws:
-              await ws.send(json.dumps(req))
-              await asyncio.wait_for(ws.recv(), timeout=5.0)
-
-      class AlertHandler(http.server.BaseHTTPRequestHandler):
-          def do_POST(self):
-              content_length = int(self.headers.get("Content-Length", 0))
-              body = self.rfile.read(content_length).decode("utf-8")
-              try:
-                  data = json.loads(body)
-                  ep = data.get("endpoint", "Unknown Service")
-                  grp = data.get("group", "fleet")
-                  desc = data.get("description", "Failure")
-                  msg = "🚨 [Fleet Alert] %s (%s): %s" % (ep, grp, desc)
-                  asyncio.run(send_to_simplex(msg))
-              except Exception as e:
-                  sys.stderr.write("Alert bridge error: %s\n" % str(e))
-              self.send_response(200)
-              self.end_headers()
-              self.wfile.write(b"OK\n")
-
-          def log_message(self, format, *args):
-              pass
-
-      server = http.server.HTTPServer(("${cfg.alerting.address}", ${toString cfg.alerting.port}), AlertHandler)
-      server.serve_forever()
-    '';
+  # Go stdlib only: the HTTP route and a hand-rolled RFC 6455 client in
+  # `./fleet-alert-bridge` pull no third-party module. The Python it replaced
+  # carried `websockets` for one text frame per alert.
+  alertBridge = pkgs.buildGoModule {
+    pname = "fleet-alert-bridge";
+    version = "0.1.0";
+    src = ./fleet-alert-bridge;
+    vendorHash = null;
+    env.CGO_ENABLED = 0;
+    meta = {
+      description = "Gatus custom alert to SimpleX #Fleet message bridge";
+      mainProgram = "fleet-alert-bridge";
+    };
+  };
 
   # gatus requires at least one condition per endpoint. If none are specified,
   # supply type-appropriate defaults based on the URL scheme.
@@ -250,7 +222,7 @@ in {
       after = ["network.target"];
       wantedBy = ["default.target"];
       serviceConfig = {
-        ExecStart = "${alertBridge}/bin/fleet-alert-bridge";
+        ExecStart = "${alertBridge}/bin/fleet-alert-bridge --addr ${cfg.alerting.address} --port ${toString cfg.alerting.port}";
         Restart = "on-failure";
         RestartSec = "5s";
       };

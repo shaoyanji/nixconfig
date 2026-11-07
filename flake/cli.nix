@@ -102,11 +102,24 @@
         linux = true;
       };
     };
-    # Tools this flake builds rather than borrows; the only family where `pkg`
-    # is a local derivation instead of a nixpkgs attribute.
+    # Tools this flake builds rather than borrows: the families where `pkg` is a
+    # local derivation instead of a nixpkgs attribute.
     learn = {
       deutsch-srs.pkg = pkgs.callPackage ./deutsch-srs.nix {};
       anki-author.pkg = pkgs.callPackage ./anki-author.nix {};
+    };
+    # The preview server every `site-target.sh preview` and the kg-canvas gate
+    # run: Go stdlib, so it answers Range (a video can be seeked) and needs no
+    # interpreter. It replaced `python3 -m http.server`, which ignores Range.
+    serve = {
+      static-serve.pkg = pkgs.buildGoModule {
+        pname = "static-serve";
+        version = "0.1.0";
+        src = ../tools/static-serve;
+        vendorHash = null;
+        env.CGO_ENABLED = 0;
+        meta.description = "Static file server with Range support (Go stdlib, no dependencies)";
+      };
     };
   };
 

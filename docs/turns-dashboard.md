@@ -58,12 +58,33 @@ second credential plane for no isolation the tailnet does not already give. The
 unit therefore keeps no `NoNewPrivileges`: subagents escalate through the setuid
 sudo wrapper.
 
+## Off the tailnet, for one bounded run
+
+The page was first verified against a mock store and a browser on a tailnet host,
+which proves the client and not the path. `task agents:xs:demo` proves the path
+with the deployed binary and the real store:
+
+```bash
+task agents:xs:demo          # reader + funnel + one post + browser assert + teardown
+task agents:xs:demo KEEP=1   # leave the funnel up to look at it
+task agents:xs:demo SUB=off  # take down a run that was left behind
+```
+
+The reader runs with `-read-only`: the rows carry no prompt form and
+`POST /api/prompt` answers 403, so a public URL cannot spend an agent turn. The
+funnel is `tailscale funnel --https=10000` (Tailscale allows 443, 8443 and 10000,
+and 8443 is already a serve mount here). It is removed in a trap, and the script
+asks the public URL again to prove it is gone instead of trusting the removal.
+
+The assertion is two-sided: a stream opened *before* the post must carry the
+frame, and the browser must grow the row while a `window` marker set before the
+post survives — a page that navigated would have cleared it.
+
 ## Not done
 
 - No authentication beyond the tailnet. The page can spend agent budget; the
-  mount is the fence.
+  mount is the fence, and `-read-only` is the fence for a temporary funnel.
 - The log carries the newest turns at connect; older history is the store's
   (`agents:xs:list`), not a second paging protocol here.
-- No gate for the browser path yet: the live-update proof is a run, not a test
-  (`clanker` serves the page against a mock shim; a row appended to the mock
-  file appears in the open page).
+- The demo is a run, not a CI gate: it needs delphi, sudo and a public hostname,
+  so it stays an operator instrument (`agents:xs:demo`).

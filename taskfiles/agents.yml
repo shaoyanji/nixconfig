@@ -286,6 +286,25 @@ tasks:
     cmds:
       - bash scripts/task/xs-turn-post.sh
 
+  agents:xs:demo:
+    desc: "Prove publish -> live push off-tailnet: a read-only reader behind a temporary Tailscale Funnel, one real turn posted, the row asserted, the funnel torn down"
+    summary: >
+      The cheap end-to-end proof on delphi: the deployed dashboard serves the real
+      store -read-only on loopback, `tailscale funnel --https=10000` exposes it, a
+      browser opens that URL, one turn is posted with the publisher agents use, and
+      the row must appear without a reload (a marker set before the post survives)
+      while the public stream carries the frame. The funnel is torn down in a trap
+      and its absence verified against the URL. SUB=off, KEEP=1, PORT=, BROWSER=0.
+      Exit 0 = proved and down, 1 = the row never arrived, 2 = preflight, 3 = no funnel.
+    env:
+      SUB: '{{.SUB | default "run"}}'
+      PORT: '{{.PORT | default "8071"}}'
+      FUNNEL_PORT: '{{.FUNNEL_PORT | default "10000"}}'
+      KEEP: '{{.KEEP | default ""}}'
+      BROWSER: '{{.BROWSER | default "1"}}'
+    cmds:
+      - bash scripts/task/turns-funnel-demo.sh
+
   agents:xs:queue:
     desc: "The unposted turn queue: depth, oldest entry, and what was rejected (read-only)"
     summary: >

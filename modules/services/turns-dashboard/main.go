@@ -56,6 +56,7 @@ type rowView struct {
 	FilesMore    int
 	Branch       string
 	Commit       string
+	Promptable   bool
 }
 
 type promptRequest struct {
@@ -78,6 +79,7 @@ type server struct {
 	limit      int
 	hermes     string
 	hermesHome string
+	readOnly   bool
 	promptLog  string
 	site       string
 	row        *template.Template
@@ -102,7 +104,8 @@ func main() {
 	hermes := flag.String("hermes", "", "hermes binary for a row prompt; empty disables the prompt form")
 	hermesHome := flag.String("hermes-home", "", "HOME for the hermes child, which reads its credentials there")
 	promptLog := flag.String("prompt-log", "prompts.jsonl", "append-only record of prompts and their outcomes")
-	site := flag.String("site", "", "directory holding index.html, style.css, app.js and datastar.js")
+	site := flag.String("site", "", "directory holding index.html, style.css and app.js")
+	readOnly := flag.Bool("read-only", false, "serve the log without prompts: the posture for any exposure outside the tailnet")
 	flag.Parse()
 
 	if *site == "" {
@@ -124,6 +127,7 @@ func main() {
 		limit:      *limit,
 		hermes:     *hermes,
 		hermesHome: *hermesHome,
+		readOnly:   *readOnly,
 		promptLog:  *promptLog,
 		site:       *site,
 		row:        tmpl,
@@ -150,7 +154,7 @@ func main() {
 	}))
 
 	go s.watch()
-	log.Printf("turns-dashboard: %s, shim %s, hermes %q", *addr, s.shim, s.hermes)
+	log.Printf("turns-dashboard: %s, shim %s, hermes %q, read-only %v", *addr, s.shim, s.hermes, s.readOnly)
 	srv := &http.Server{Addr: *addr, Handler: mux, ReadHeaderTimeout: 10 * time.Second}
 	log.Fatal(srv.ListenAndServe())
 }
@@ -277,6 +281,7 @@ func (s *server) view(t turn) rowView {
 		turn:         t,
 		When:         when,
 		OutcomeClass: outcomeClass(t.Outcome),
+		Promptable:   s.hermes != "" && !s.readOnly,
 	}
 	if t.Rationale != nil {
 		v.Rationale = *t.Rationale
@@ -387,6 +392,13 @@ func (s *server) prompt(w http.ResponseWriter, r *http.Request) {
 	req.Prompt = strings.TrimSpace(req.Prompt)
 	if !rowPattern.MatchString(req.Row) || req.Prompt == "" || len(req.Prompt) > 4000 {
 		http.Error(w, "row or prompt rejected", http.StatusBadRequest)
+		return
+	}
+	// A reader exposed beyond the tailnet must never be able to spend an agent
+	// turn: the mount is the fence on the fleet, and this flag is the fence when
+	// the mount is a temporary Funnel.
+	if s.readOnly {
+		http.Error(w, "read-only: this reader cannot run a prompt", http.StatusForbidden)
 		return
 	}
 	if s.hermes == "" {

@@ -179,24 +179,96 @@ Traps that cost a run:
   text bug before blaming the voice.
 - **`amix` divides by its input count.** The first mix measured −22.7 dB mean
   against the −16 the narration was normalised to; `normalize=0` is required.
-- **`http.server` has no Range.** A 28 MB master cannot be seeked until the whole
-  file arrives, so the page points at the 960 px web cut (7.3 MB).
+- **`http.server` has no Range.** A master cannot be seeked until the whole file
+  arrives, so the page points at the 960 px web cut (7.3 MB for `pip`, 40 MB for
+  a 9.5-minute lantern book — the cut is a courtesy, not a guarantee).
+- **A 28-spread narration is 4 minutes of clanker work, not 40 seconds.** One
+  job, 29 lines: 4m04s wall for 528 s of speech at 134 wpm (`--length_scale
+  1.5`).
 - A spread whose wav is much longer than its words suggests is not a slow voice —
   measure `silencedetect` before inventing a `--length_scale` for it.
 
 ### Sound, for real
 
 ```bash
-python3 …/sfx.py fetch --project $PWD     # 9 CC0 clips into audio/sfx/ + credits
+python3 …/sfx.py fetch --project $PWD     # 12 CC0 clips into audio/sfx/ + credits
 python3 …/sfx.py cues  --project $PWD     # sfx.json: which clip sits on which page
-python3 …/media.py mix --project $PWD …   # picks up sfx.json by itself
+python3 …/sfx.py music --project $PWD     # a 60 s CC0 music bed, audio/music/bed.wav
+python3 …/media.py mix --project $PWD …   # picks up sfx.json and the bed by itself
 ```
 
 The clips come from Freesound through the **Openverse** API filtered to `cc0`,
 so a published book needs no licence argument — and `credits.json` plus
 `site/sfx.html` are written anyway, because "CC0" is a claim about a file and a
-credit line is what a reader can check. The shelf is nine cues: river, crickets,
-wind, owl, birdsong, page turn, glass chime, snow footsteps, wood creak.
+credit line is what a reader can check. The shelf is twelve cues: river,
+crickets, wind, owl, birdsong, page turn, glass chime, snow footsteps, wood
+creak, fireplace, oars, small bell.
+
+**The cue plan belongs to the book, not to the shelf.** `CUES` in `sfx.py`
+numbers pages `s01`–`s10` and names one book's scenes; a second book that
+inherits it puts crickets on a snowdrift. `sfx.py cues` therefore reads
+`<book>/sfx.plan.json` first — `{sid: [[cue, at, gain], …]}`, the same shape as
+`CUES`, hand-editable — and falls back to the built-in plan only when that file
+is absent. A page turn is still appended to every spread but the first.
+
+## The music bed, and the A/B
+
+```bash
+python3 …/sfx.py music --project $PWD
+python3 …/sfx.py music --project ../other-book --source ../this-book/audio/music/bed.wav
+python3 …/media.py mix --project $PWD --lang de --slug lantern          # both cuts
+python3 …/media.py mix --project $PWD … --only music                   # bed tweak only
+```
+
+`mix` renders two books from one command: the cue-only cut and the same book
+with the bed (`-music` suffix). Same narration, same cues, one variable — which
+is what an A/B is. `publish.py` serves the music cut, links `mix.html` beside
+it, and that page plays both with the measured difference between them.
+
+A series should sound like a series: `--source` copies another book's shaped
+bed and its credit instead of re-running the query and hoping for the same
+top hit.
+
+The bed is ducked by the narration itself rather than by a hand-drawn volume
+envelope: `sidechaincompress` keyed on the voice, 3:1 above 0.05. Measured on
+the lantern book's delivered web cut (gain 0.22 on a −20 LUFS music box):
+
+| Window | Plain | With bed |
+| :--- | :--- | :--- |
+| 0.7 s pre-roll before the first word, s01 | −48.1 dBFS | −33.8 dBFS |
+| the same pre-roll on s07 / s14 / s21 / s28 | −48.1 / −45.5 / −55.2 / −40.9 | −34.0 / −34.3 / −34.8 / −35.1 |
+| inside speech (s01, 1.2–3.2 s) | −15.3 dBFS | −15.3 dBFS |
+
+So the bed is ~20 dB under the voice in the pauses, present at every spread of a
+573 s book (the loop is per spread, not one pass over the book), and 0.0 dB
+inside the words. The first attempt at gain 0.07 measured −42.8 dBFS and a 6:1
+duck erased it entirely: a bed you can only hear between sentences reads as a
+hole, not a bed. `mix-<lang>-<voice>.json` keeps both windows, so the numbers on
+`mix.html` are measurements of the files the browser gets.
+
+The masters are large — 129 MB for 28 spreads at crf 20, 40 MB for the 960 px
+web cut — which is why the page serves the web cut and the A/B page does too.
+
+## Adapting a book that is longer than one round
+
+```bash
+python3 …/adapt.py --project $PWD --lang de --chunk 7 \
+  --title "Die Laterne, die stromabwärts fuhr" --subtitle "…"
+```
+
+`adapt.py` runs one `cpg-speculate` round per chunk of spreads and merges the
+winners into `script.<lang>.json`. Chunks matter: `speculate.sh` grades only the
+first 2000 characters of each lane, so a whole-book prompt is judged on its
+opening and accepted on faith after that. The previous chunk is carried into the
+next prompt to keep the voice from restarting every seven pages, and the
+chunk→winner map in `state/adapt-<lang>.json` makes a rerun resume rather than
+re-spend.
+
+The round needs `cpg`. On 2026-11-07 `app.chatplayground.ai` answered
+**NXDOMAIN** from two independent networks (`www.chatplayground.ai` still served
+200, so this is the API host being withdrawn, not a resolver fault) and the
+lantern adaptation was written in the agent instead. Check that host before
+planning a round.
 
 Traps, all measured:
 

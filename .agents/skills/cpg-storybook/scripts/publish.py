@@ -87,6 +87,95 @@ def web_image(src: Path, dst: Path) -> bool:
     return proc.returncode == 0
 
 
+def video_lang(stem: str) -> str:
+    """`lantern-de-de_DE-thorsten-high` -> `de`; unknown -> `""`."""
+    m = re.search(r"-([a-z]{2})-[A-Za-z]", stem)
+    return m.group(1) if m else ""
+
+
+def video_cuts(root: Path) -> dict[tuple[str, bool], Path]:
+    """Book stems -> the file to serve, preferring the `.web` cut.
+
+    Sorted order puts `-music` before the plain stem and the full file before
+    its `.web` cut, so a later web cut replaces an earlier full one and nothing
+    else is overwritten.
+    """
+    served: dict[tuple[str, bool], Path] = {}
+    for v in sorted((root / "video").glob("*.mp4")):
+        if re.search(r"-s\d+\.mp4$", v.name):
+            continue
+        stem = v.stem
+        # `.web` is the container suffix and comes off first: "x-music.web" is a
+        # music variant, and stripping `-music` before it would key the web cut
+        # of one variant as the other variant's full file.
+        is_web = stem.endswith(".web")
+        if is_web:
+            stem = stem[:-len(".web")]
+        has_music = stem.endswith("-music")
+        if has_music:
+            stem = stem[:-len("-music")]
+        key = (stem, has_music)
+        if key in served and not is_web:
+            continue
+        served[key] = v
+    return served
+
+
+def write_mix_page(root: Path, site: Path, manifest: dict,
+                   served: dict[tuple[str, bool], Path], lang: str) -> None:
+    """The A/B: one book, two mixes, the measured difference between them."""
+    esc = html.escape
+    plain_label, bed_label = (("ohne Musik", "mit Musik (geduckt)") if lang == "de"
+                              else ("cues only", "with the music bed"))
+    credits = {}
+    cfile = root / "audio" / "sfx" / "credits.json"
+    if cfile.exists():
+        credits = json.loads(cfile.read_text())
+    music = credits.get("music", {})
+    stems = [s for s in sorted({k[0] for k in served})
+             if (s, True) in served and (s, False) in served
+             and video_lang(s) == (lang or "en")]
+    cards = []
+    notes = []
+    for stem in stems:
+        plain, withbed = served[(stem, False)], served[(stem, True)]
+        for name, label in ((plain, plain_label), (withbed, bed_label)):
+            cards.append(
+                '<figure class="ab"><figcaption>' + esc(label) + '</figcaption>'
+                f'<video controls preload="metadata" src="{esc(name.name)}"></video>'
+                f'<small>{esc(name.name)}</small></figure>')
+        mix = {}
+        for mj in (root / "video").glob("mix-*.json"):
+            data = json.loads(mj.read_text())
+            if f"{data.get('slug')}-{data.get('lang')}-{data.get('voice')}" == stem:
+                mix = data
+        duck = (mix.get("variants") or {}).get("duck", {})
+        if duck:
+            notes.append(
+                f"<li>bed gain <b>{mix.get('music_gain')}</b> linear on a −20 LUFS track, "
+                f"ducking at threshold {mix.get('duck_threshold')}; measured "
+                f"<b>{duck.get('bed_window_delta_db')} dB</b> in the 0.6 s before the "
+                f"words and <b>{duck.get('speech_window_delta_db')} dB</b> inside them</li>")
+    (site / "mix.html").write_text(
+        '<!doctype html><meta charset="utf-8"><title>A/B — music bed</title>'
+        '<style>body{background:#f4ecd8;color:#2c2620;font-family:Georgia,serif;margin:0;padding:6vh 6vw}'
+        'h1{font-size:1.5rem}p{max-width:70ch}figure.ab{margin:0 0 2rem}'
+        'figure.ab video{width:100%;border-radius:6px;background:#1b1712}'
+        'figcaption{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;opacity:.5;margin-bottom:.4rem}'
+        'small{opacity:.4;font-size:.74rem}li{margin:.4rem 0}</style>'
+        f'<h1>A/B — {esc(manifest.get("title", ""))}</h1>'
+        + ('<p>Zwei Schnitte derselben Lesung mit denselben Geräuschen. Der einzige '
+           'Unterschied ist die Musik, also ist der Vergleich genau eine Variable breit.</p>'
+           if lang == "de" else
+           '<p>Two cuts of the same narration and the same cues. The only difference is '
+           'the music bed, so the comparison is one variable wide.</p>')
+        + "\n".join(cards)
+        + (f'<p>Music: <b>{esc(music.get("title", ""))}</b> — {esc(music.get("creator", ""))} '
+           f'({esc(music.get("license", ""))}), credited on the <a href="sfx.html">sound page</a>.</p>'
+           if music else "")
+        + ("<ul>" + "".join(notes) + "</ul>" if notes else ""))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project", default=os.environ.get("STORYBOOK_DIR", "."))
@@ -158,20 +247,35 @@ def main() -> int:
     # A narrated cut is optional: when `media.py mix` has produced one, the page
     # opens with it, because a book with sound is a different artifact and the
     # reader should not have to find the file.
-    # `-sNN.mp4` is one spread's clip; the book is the file without that suffix,
-    # and the `.web.mp4` cut, when present, is the one to serve.
-    books = {v.stem: v for v in sorted((root / "video").glob("*.mp4"))
-             if not re.search(r"-s\d+\.mp4$", v.name)}
-    for stem, vid in books.items():
-        if f"{stem}.web.mp4" in (p.name for p in books.values()):
+    # `-sNN.mp4` is one spread's clip; the book is the file without that suffix.
+    # Two variants can exist — the cue-only mix and the one with the music bed —
+    # so the page serves the music cut and links the A/B to the other.
+    served = video_cuts(root)
+    for stem in sorted({k[0] for k in served}):
+        # A narration is in one language: the German cut does not belong on the
+        # English page, where it would look like the book read itself aloud.
+        if video_lang(stem) != (lang or "en"):
             continue
-        dst = site / vid.name
-        if not dst.exists() or dst.stat().st_mtime < vid.stat().st_mtime:
-            shutil.copy2(vid, dst)
+        plain, withbed = served.get((stem, False)), served.get((stem, True))
+        vid = (withbed or plain)
+        for cut in (plain, withbed):
+            if cut is None:
+                continue
+            dst = site / cut.name
+            if not dst.exists() or dst.stat().st_mtime < cut.stat().st_mtime:
+                shutil.copy2(cut, dst)
+        ab = ((' · <a href="mix.html">A/B die Musik</a>' if lang == "de"
+               else ' · <a href="mix.html">A/B the music</a>')
+              if withbed and plain else "")
+        heading = "Hörbuch" if lang == "de" else "Audiobook"
         parts.insert(parts.index("<main>"), (
-            '<section class="film"><h2>Hörbuch</h2>'
+            f'<section class="film"><h2>{heading}</h2>'
             f'<video controls preload="metadata" src="{esc(vid.name)}"></video>'
-            f'<p class="meta">{esc(vid.stem)}</p></section>'))
+            f'<p class="meta">{esc(vid.stem)}{ab}</p></section>'))
+
+    if any((stem, True) in served and (stem, False) in served
+           and video_lang(stem) == (lang or "en") for stem, _ in list(served)):
+        write_mix_page(root, site, manifest, served, lang)
 
     credits = (' · <a href="sfx.html">sound credits</a>'
                if (site / "sfx.html").exists() else "")

@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -51,7 +52,19 @@ SHELF = {
     "chime":      {"q": "glass chime", "want": "glass chimes", "seconds": 5.0},
     "snowsteps":  {"q": "footsteps snow", "want": "footsteps snow", "seconds": 6.0},
     "creak":      {"q": "wood creak", "want": "wood creak single", "seconds": 2.0},
+    "fire":       {"q": "fireplace crackle", "want": "fireplace crackling", "seconds": 10.0, "bed": True,
+                   "avoid": ["burning", "aachen", "stove", "bonfire"]},
+    # There is no CC0 "oars" clip worth having: the river recordings with a
+    # paddle in them are kayaks, and a kayak stroke is the same sound as an oar.
+    "oars":       {"q": "rowing oars water", "want": "kayaking in calm", "seconds": 12.0, "bed": True},
+    "bell":       {"q": "small bell ring", "want": "small bell ringing", "seconds": 4.0},
 }
+
+# The bed under everything, once per book. A music box is chosen over a piano
+# recording because its spectrum sits above a voice: the melody survives at a
+# level low enough that no word is fought.
+MUSIC = {"q": "music box lullaby", "want": "music box lullaby", "seconds": 60.0,
+         "avoid": ["clip", "christmas", "brahms", "field recording"]}
 
 # Page -> cues. `at` is seconds into the spread, `gain` is a linear multiplier on
 # a clip already normalised to -20 LUFS. The narration sits at -16, so a bed at
@@ -170,7 +183,7 @@ def write_credits_page(root: Path, credits: dict) -> None:
     if not site.exists():
         return
     rows = "\n".join(
-        f'<tr><td>{c["file"].split("/")[-1]}</td><td>{c["title"]}</td><td>{c["creator"]}</td>'
+        f'<tr><td>{display_name(c)}</td><td>{c["title"]}</td><td>{c["creator"]}</td>'
         f'<td>{c["license"]}</td><td><a href="{c["source"]}">{c["provider"] or c["source"]}</a></td></tr>'
         for c in credits.values())
     (site / "sfx.html").write_text(f"""<!doctype html><meta charset="utf-8">
@@ -187,19 +200,107 @@ fetched with <code>sfx.py</code>. They are credited here anyway.</p>
 {rows}</table>""")
 
 
+def display_name(cue: dict) -> str:
+    """`bed.wav` says nothing; the credits table names the thing, not its file."""
+    if cue.get("kind") == "music":
+        return "music bed"
+    return cue["file"].split("/")[-1]
+
+
+def load_plan(root: Path, explicit: str) -> dict:
+    """A book's own cue plan, else the built-in one for the counting book.
+
+    The built-in plan numbers pages s01-s10 with one book's scenes, so a second
+    book must not inherit it: `sfx.plan.json` in the project is read first, and
+    its shape is `{sid: [[cue, at, gain], ...]}` — same as CUES, hand-editable.
+    """
+    path = Path(explicit) if explicit else root / "sfx.plan.json"
+    if not path.exists():
+        return CUES
+    return json.loads(path.read_text())
+
+
 def cmd_cues(args) -> int:
     root = Path(args.project).resolve()
     have = {p.stem for p in (root / "audio" / "sfx").glob("*.wav")}
     book = json.loads((root / f"script.{args.lang}.json").read_text())
     ids = [s["id"] for s in book["spreads"]]
+    source = load_plan(root, args.plan)
     plan = {}
     for i, sid in enumerate(ids):
-        cues = [{"cue": c, "at": at, "gain": g} for c, at, g in CUES.get(sid, []) if c in have]
+        cues = [{"cue": c, "at": at, "gain": g} for c, at, g in source.get(sid, []) if c in have]
         if i and "page" in have:
             cues.append({"cue": "page", "at": PAGE_TURN_AT, "gain": PAGE_TURN_GAIN})
         plan[sid] = cues
     (root / "sfx.json").write_text(json.dumps(plan, indent=1))
-    print(json.dumps({"pages": len(plan), "cues_used": sorted({c["cue"] for v in plan.values() for c in v})}))
+    print(json.dumps({"pages": len(plan),
+                      "cues_used": sorted({c["cue"] for v in plan.values() for c in v})}))
+    return 0
+
+
+def cmd_music(args) -> int:
+    """One CC0 track, shaped to a 60 s loop at -20 LUFS.
+
+    The mix loops it per spread and ducks it under the narration, so only the
+    first minute is needed; a 3-minute track would be a download and a licence
+    line for audio that is never heard.
+    """
+    root = Path(args.project).resolve()
+    out = root / "audio" / "music"
+    out.mkdir(parents=True, exist_ok=True)
+    dst = out / "bed.wav"
+    cfile = root / "audio" / "sfx" / "credits.json"
+    credits = json.loads(cfile.read_text()) if cfile.exists() else {}
+    if args.source:
+        # A series should sound like a series: the second book reuses the first
+        # book's bed, credit line included, instead of gambling on the top hit
+        # of the same query being the same recording.
+        src = Path(args.source).resolve()
+        if not src.exists():
+            sys.exit(f"music: no bed at {src}")
+        if not dst.exists() or args.force:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+        try:
+            entry = json.loads((src.parents[2] / "audio" / "sfx" / "credits.json").read_text()).get("music")
+        except (OSError, json.JSONDecodeError):
+            entry = None
+        if entry:
+            credits["music"] = entry
+        print(f"music: reused {src}", file=sys.stderr)
+    elif dst.exists() and not args.force:
+        print(f"music: bed already there ({dst})", file=sys.stderr)
+    else:
+        data = api(MUSIC["q"])
+        hits = [h for h in data.get("results", [])
+                if MUSIC["want"] in h["title"].lower()
+                and not any(bad in h["title"].lower() for bad in MUSIC["avoid"])]
+        if not hits:
+            sys.exit("music: no CC0 hit matching 'music box lullaby'")
+        hit = hits[0]
+        raw = out / "bed.src"
+        download(hit["url"], raw)
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(raw),
+                        "-af", f"atrim=0:{MUSIC['seconds']},asetpts=N/SR/TB,"
+                               "loudnorm=I=-20:TP=-3:LRA=9,aresample=44100",
+                        "-ar", "44100", "-ac", "1", "-c:a", "pcm_s16le", str(dst)], check=True)
+        raw.unlink(missing_ok=True)
+        dur = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                              "-of", "csv=p=0", str(dst)], capture_output=True, text=True).stdout.strip()
+        title = re.sub(r"\.(wav|mp3|flac|ogg|aiff?)$", "", hit["title"].strip(), flags=re.I)
+        credits["music"] = {"title": title, "creator": hit.get("creator", "unknown"),
+                            "license": hit.get("license", "cc0"), "provider": hit.get("provider", ""),
+                            "source": hit.get("foreign_landing_url") or hit.get("url", ""),
+                            "seconds": round(float(dur), 2), "file": "audio/music/bed.wav",
+                            "kind": "music"}
+        print(f"music: <- {hit['title'][:40]} ({hit.get('creator','?')}) {dur}s", file=sys.stderr)
+    # Written outside the fetch branch: a reused bed adds a credit too, and the
+    # page is rendered from this file, so a missing write is a missing row.
+    if credits:
+        cfile.parent.mkdir(parents=True, exist_ok=True)
+        cfile.write_text(json.dumps(credits, indent=1, ensure_ascii=False))
+    write_credits_page(root, credits)
+    print(json.dumps({"bed": str(dst), "credits": display_name(credits.get("music", {"file": "", "kind": "music"}))}))
     return 0
 
 
@@ -213,7 +314,14 @@ def main() -> int:
     c = sub.add_parser("cues")
     c.add_argument("--project", default=".")
     c.add_argument("--lang", default="de")
+    c.add_argument("--plan", default="", help="cue plan JSON (default: <project>/sfx.plan.json)")
     c.set_defaults(fn=cmd_cues)
+    m = sub.add_parser("music")
+    m.add_argument("--project", default=".")
+    m.add_argument("--force", action="store_true")
+    m.add_argument("--source", default="",
+                   help="reuse another book's bed (audio/music/bed.wav) and its credit")
+    m.set_defaults(fn=cmd_music)
     args = ap.parse_args()
     return args.fn(args)
 

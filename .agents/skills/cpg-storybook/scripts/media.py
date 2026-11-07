@@ -224,16 +224,92 @@ def cues_for(project: Path) -> dict:
     return json.loads(p.read_text()) if p.exists() else {}
 
 
+def mean_volume(path: Path, start: float, dur: float) -> float | None:
+    """Mean level of one window, in dBFS, from ffmpeg's own detector.
+
+    The A/B verdict on a music bed is a difference between two files, and this
+    is how the difference gets a number instead of an adjective.
+    """
+    proc = subprocess.run(["ffmpeg", "-loglevel", "info", "-ss", str(start), "-t", str(dur),
+                           "-i", str(path), "-af", "volumedetect", "-f", "null", "-"],
+                          capture_output=True, text=True)
+    m = re.search(r"mean_volume: (-?[0-9.]+) dB", proc.stderr)
+    return round(float(m.group(1)), 1) if m else None
+
+
 def cmd_mix(args) -> int:
     book = load_script(args.project, args.lang)
     voice = args.voice
-    dest = Path(args.project) / "audio" / args.lang / voice
+    project = Path(args.project)
+    dest = project / "audio" / args.lang / voice
     if not dest.exists():
         sys.exit(f"media: no narration for {voice}; run `say` first")
-    site = Path(args.project) / "site"
-    video = Path(args.project) / "video"
+    site = project / "site"
+    video = project / "video"
     video.mkdir(parents=True, exist_ok=True)
-    plan = {} if args.dry_bed else cues_for(args.project)
+    slug = args.slug or project.name
+    plan = {} if args.dry_bed else cues_for(project)
+    bed = None
+    if not args.dry_bed:
+        want = Path(args.music) if args.music else project / "audio" / "music" / "bed.wav"
+        if want.exists():
+            bed = want
+        elif args.music:
+            sys.exit(f"media: no music bed at {want}; run `sfx.py music` first")
+
+    # Two cuts of one book, from one command: the cue-only mix and the mix with
+    # the music bed. Both are the same narration and the same cues, so the only
+    # variable a listener hears is the bed — which is what an A/B needs.
+    # `--only music` is what a bed tweak costs: the cue-only cut is unchanged,
+    # so re-rendering it would be 28 encodes for nothing.
+    if args.only == "plain":
+        variants = [("", None)]
+    elif args.only == "music":
+        if not bed:
+            sys.exit("media: --only music needs a bed (audio/music/bed.wav or --music)")
+        variants = [("-music", bed)]
+    else:
+        variants = [("", None)]
+        if bed:
+            variants.append(("-music", bed))
+    report: dict = {}
+    for suffix, music in variants:
+        stem = f"{slug}-{args.lang}-{voice}{suffix}"
+        report[suffix or "plain"] = mix_variant(
+            book, dest, site, video, plan, args, stem, music)
+
+    # A one-variant run must not erase the other variant's measurements: the
+    # A/B page reads both, and `--only music` is the cheap way to retune a bed.
+    mixfile = video / f"mix-{args.lang}-{voice}.json"
+    prior = json.loads(mixfile.read_text()) if mixfile.exists() else {}
+    merged = {k: v for k, v in (prior.get("variants") or {}).items() if k != "duck"}
+    merged.update(report)
+    if merged.get("plain") and merged.get("-music"):
+        merged["duck"] = {
+            "bed_window_delta_db": _delta(merged["plain"], merged["-music"], "bed_window"),
+            "speech_window_delta_db": _delta(merged["plain"], merged["-music"], "speech_window"),
+        }
+    mixfile.write_text(json.dumps({
+        "slug": slug, "lang": args.lang, "voice": voice,
+        "spreads": len(book["spreads"]),
+        "music": str(bed) if bed else prior.get("music"),
+        "music_gain": args.music_gain, "duck_threshold": args.duck,
+        "duck_ratio": args.duck_ratio, "variants": merged,
+    }, indent=1))
+    print(json.dumps({k: {"book": v.get("book"), "web": v.get("web")}
+                      for k, v in report.items() if isinstance(v, dict) and "book" in v}
+                     | {"mix": f"video/mix-{args.lang}-{voice}.json"}, indent=1))
+    return 0
+
+
+def _delta(plain: dict | None, withbed: dict | None, key: str) -> float | None:
+    if not plain or not withbed or plain.get(key) is None or withbed.get(key) is None:
+        return None
+    return round(withbed[key] - plain[key], 1)
+
+
+def mix_variant(book: dict, dest: Path, site: Path, video: Path, plan: dict,
+                args, stem: str, music: Path | None) -> dict:
     parts = []
     for spread in book["spreads"]:
         sid = spread["id"]
@@ -247,7 +323,7 @@ def cmd_mix(args) -> int:
         total = round(dur + 1.6, 2)
         frames = int(total * 25)
         tail = round(total - 1.1, 2)
-        out = video / f"{args.lang}-{voice}-{sid}.mp4"
+        out = video / f"{stem}-{sid}.mp4"
 
         # Real cues when `sfx.py` has been through, the synthesised bed when it
         # has not: the graph shape is the only thing that changes, so a book
@@ -255,12 +331,16 @@ def cmd_mix(args) -> int:
         cues = [c for c in plan.get(sid, [])
                 if (Path(args.project) / "audio" / "sfx" / f"{c['cue']}.wav").exists()]
         inputs = ["-loop", "1", "-i", str(plate), "-i", str(narr)]
+        # The narration is both a mix input and the sidechain key for the music
+        # duck, so it is split once here rather than decoded twice.
         graph = [
             f"[0:v]scale=1600:-2,zoompan=z='min(zoom+0.00035,1.07)':x='iw/2-(iw/zoom/2)':"
             f"y='ih/2-(ih/zoom/2)':d={frames}:s=1280x854:fps=25,setsar=1[v]",
-            "[1:a]adelay=700|700,apad[nar]",
+            "[1:a]adelay=700|700,apad,asplit=2[nar][key]" if music
+            else "[1:a]adelay=700|700,apad[nar]",
         ]
         mix_in = ["[nar]"]
+        n_in = 2
         if cues:
             for k, cue in enumerate(cues):
                 path = Path(args.project) / "audio" / "sfx" / f"{cue['cue']}.wav"
@@ -268,13 +348,27 @@ def cmd_mix(args) -> int:
                 at = float(cue.get("at", 0))
                 delay = int((at if at >= 0 else total + at) * 1000)
                 graph.append(
-                    f"[{2 + k}:a]volume={cue.get('gain', 0.15)},atrim=0:{total},"
+                    f"[{n_in}:a]volume={cue.get('gain', 0.15)},atrim=0:{total},"
                     f"asetpts=N/SR/TB,adelay={delay}|{delay}[s{k}]")
                 mix_in.append(f"[s{k}]")
+                n_in += 1
         else:
             inputs += ["-f", "lavfi", "-t", str(total), "-i", AMBIENCE]
-            graph.append(f"[2:a]lowpass=f=750,highpass=f=70,volume=0.09[amb]")
+            graph.append(f"[{n_in}:a]lowpass=f=750,highpass=f=70,volume=0.09[amb]")
             mix_in.append("[amb]")
+            n_in += 1
+        if music:
+            # Ducking is the difference between a bed and a bed that fights the
+            # voice: the music is compressed by the narration itself, ~6:1 at a
+            # low threshold, so it is present in the gaps and steps back under
+            # every word without a hand-drawn volume envelope.
+            inputs += ["-stream_loop", "-1", "-i", str(music)]
+            graph.append(f"[{n_in}:a]atrim=0:{total},asetpts=N/SR/TB,"
+                         f"volume={args.music_gain}[musraw]")
+            graph.append(f"[musraw][key]sidechaincompress=threshold={args.duck}:"
+                         f"ratio={args.duck_ratio}:attack=15:release=400[mus]")
+            mix_in.append("[mus]")
+            n_in += 1
         # normalize=0: amix divides by its input count by default, which threw
         # 6 dB away and left the book at -22.7 dB mean against the -16 the
         # narration was normalised to.
@@ -295,25 +389,29 @@ def cmd_mix(args) -> int:
                         "-movflags", "+faststart", str(out)], check=True)
         parts.append(out)
         print(f"media: {out.name} {total}s", file=sys.stderr)
-    listing = video / f"concat-{args.lang}-{voice}.txt"
+    listing = video / f"concat-{stem}.txt"
     listing.write_text("".join(f"file '{p.name}'\n" for p in parts))
-    final = video / f"pip-{args.lang}-{voice}.mp4"
+    final = video / f"{stem}.mp4"
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0",
                     "-i", str(listing), "-c", "copy", "-movflags", "+faststart", str(final)], check=True)
     # The demo server is python's http.server: no Range support, so a <video>
     # cannot seek until the whole file has arrived. 28 MB at full quality is a
     # 30 s wait on a phone; the web cut is what the page points at.
-    web = video / f"pip-{args.lang}-{voice}.web.mp4"
+    web = video / f"{stem}.web.mp4"
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(final),
                     "-vf", "scale=960:-2", "-c:v", "libx264", "-preset", "slow", "-crf", "26",
                     "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "96k",
                     "-movflags", "+faststart", str(web)], check=True)
-    print(json.dumps({"book": str(final), "web": str(web), "spreads": len(parts),
-                      "seconds": round(sum(float(subprocess.run(
-                          ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
-                           str(p)], capture_output=True, text=True).stdout.strip()) for p in parts), 1)},
-                     indent=1))
-    return 0
+    seconds = round(sum(float(subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
+         str(p)], capture_output=True, text=True).stdout.strip()) for p in parts), 1)
+    # Two windows of the first spread: before the words start, and inside them.
+    # Their difference between the plain mix and the music mix is the bed's
+    # level and the duck's depth, measured rather than asserted.
+    first = parts[0]
+    return {"book": str(final), "web": str(web), "spreads": len(parts),
+            "seconds": seconds, "bed_window": mean_volume(first, 0.0, 0.6),
+            "speech_window": mean_volume(first, 1.2, 2.0)}
 
 
 def main() -> int:
@@ -332,6 +430,19 @@ def main() -> int:
         if name == "mix":
             p.add_argument("--synth-bed", action="store_true", dest="dry_bed",
                            help="ignore sfx.json and mix the synthesised noise bed instead")
+            p.add_argument("--slug", default="",
+                           help="output stem (default: the project directory name)")
+            p.add_argument("--music", default="",
+                           help="music bed wav (default: <project>/audio/music/bed.wav when it exists)")
+            p.add_argument("--music-gain", type=float, default=0.22,
+                           help="linear gain on the -20 LUFS bed, before ducking "
+                                "(0.22 measures ~21 dB under the voice in the gaps)")
+            p.add_argument("--duck", type=float, default=0.05,
+                           help="sidechain threshold; lower is a firmer duck")
+            p.add_argument("--duck-ratio", type=float, default=3.0,
+                           help="sidechain ratio; 6 buries the bed, 3 steps it back")
+            p.add_argument("--only", choices=["both", "plain", "music"], default="both",
+                           help="render one cut only (a bed tweak does not need both)")
         p.set_defaults(fn=fn)
     args = ap.parse_args()
     return args.fn(args)

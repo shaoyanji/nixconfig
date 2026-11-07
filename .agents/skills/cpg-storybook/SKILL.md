@@ -46,6 +46,37 @@ Plan the *day*, not the artefact: 100 generations, 25 an hour, and no
 carry-over. `budget` reads the counter every call, so it is correct on both
 sides of midnight.
 
+### When `cpg usage` cannot answer
+
+The allowance has a second place to read it: the dashboard at
+`www.chatplayground.ai`, on the subscription page. Read by hand on 2026-11-07 at
+14:00 UTC, on this account:
+
+| Row | Value |
+| :--- | :--- |
+| Plan | Lifetime · RedemptionActive · never expires |
+| Credits (as the dashboard labels it) | 257 / 99,999 · resets 2026-11-15 |
+| Images today | 100 / 100 · resets 00:00 UTC — 01:00 local, this host is UTC+1 |
+
+Two questions that page answers when the client cannot:
+
+- **A dead host is not an empty allowance.** That day `app.chatplayground.ai`
+  answered NXDOMAIN while the dashboard showed an active lifetime plan, a live
+  session (`cpg status` → `authenticated: true`, credential age under an hour)
+  and images that were simply spent. The two failures do not look alike before
+  anything leaves the machine: a spent allowance is an HTTP `429 … reached your
+  daily limit`, an unreachable host is `lookup … no such host`. Reading the
+  dashboard first is what keeps a DNS outage from being planned as if it were
+  tomorrow's budget.
+- **The reset is 00:00 UTC, not local midnight.** At UTC+1 the new allowance
+  starts at 01:00, so a run planned for "tonight" has an hour more than the
+  clock on the wall suggests — or an hour less, depending on which side of it
+  you are sitting.
+
+The dashboard is the fallback, not a second source of truth: it is a page read
+by hand, the client is the JSON the scripts consume, and while both answered
+they agreed with each other.
+
 ## Manifest
 
 ```json

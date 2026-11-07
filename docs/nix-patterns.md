@@ -335,8 +335,7 @@ lists empty, 2026-10-29), so "the newest release" can only be the tip of master.
 `vendorHash` — the go module set has not moved since nixpkgs' 2023-02-10 pin —
 verified by building the override locally. Only `src` and `version` differ.
 
-Longer-form procedure for the operational half: [`../AGENTS.md`](../AGENTS.md)
-(routing) and the `infra` skill (deploy, rebuild, rollback).
+Operational half: [`../AGENTS.md`](../AGENTS.md) routing, `infra` skill (deploy, rebuild, rollback).
 
 ## A daemon must clear the Kelly gate
 

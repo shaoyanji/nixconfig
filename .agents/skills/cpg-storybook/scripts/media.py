@@ -218,6 +218,12 @@ def cmd_say(args) -> int:
 AMBIENCE = "anoisesrc=color=brown:r=44100:a=0.5"
 
 
+def cues_for(project: Path) -> dict:
+    """`sfx.json` if `sfx.py cues` has written one, else nothing."""
+    p = Path(project) / "sfx.json"
+    return json.loads(p.read_text()) if p.exists() else {}
+
+
 def cmd_mix(args) -> int:
     book = load_script(args.project, args.lang)
     voice = args.voice
@@ -227,6 +233,7 @@ def cmd_mix(args) -> int:
     site = Path(args.project) / "site"
     video = Path(args.project) / "video"
     video.mkdir(parents=True, exist_ok=True)
+    plan = {} if args.dry_bed else cues_for(args.project)
     parts = []
     for spread in book["spreads"]:
         sid = spread["id"]
@@ -241,21 +248,47 @@ def cmd_mix(args) -> int:
         frames = int(total * 25)
         tail = round(total - 1.1, 2)
         out = video / f"{args.lang}-{voice}-{sid}.mp4"
-        filt = (
+
+        # Real cues when `sfx.py` has been through, the synthesised bed when it
+        # has not: the graph shape is the only thing that changes, so a book
+        # without sound files still mixes.
+        cues = [c for c in plan.get(sid, [])
+                if (Path(args.project) / "audio" / "sfx" / f"{c['cue']}.wav").exists()]
+        inputs = ["-loop", "1", "-i", str(plate), "-i", str(narr)]
+        graph = [
             f"[0:v]scale=1600:-2,zoompan=z='min(zoom+0.00035,1.07)':x='iw/2-(iw/zoom/2)':"
-            f"y='ih/2-(ih/zoom/2)':d={frames}:s=1280x854:fps=25,setsar=1[v];"
-            f"[2:a]lowpass=f=750,highpass=f=70,volume=0.09,afade=t=in:st=0:d=1.2[amb];"
-            f"[1:a]adelay=700|700,apad[nar];"
-            # normalize=0: amix divides by its input count by default, which threw
-            # 6 dB away and left the book at -22.7 dB mean against the -16 the
-            # narration was normalised to.
-            f"[amb][nar]amix=inputs=2:duration=longest:dropout_transition=0:normalize=0,"
-            f"atrim=0:{total},afade=t=out:st={tail}:d=1.1[a]"
-        )
-        subprocess.run(["ffmpeg", "-loglevel", "error", "-y",
-                        "-loop", "1", "-i", str(plate),
-                        "-i", str(narr),
-                        "-f", "lavfi", "-t", str(total), "-i", AMBIENCE,
+            f"y='ih/2-(ih/zoom/2)':d={frames}:s=1280x854:fps=25,setsar=1[v]",
+            "[1:a]adelay=700|700,apad[nar]",
+        ]
+        mix_in = ["[nar]"]
+        if cues:
+            for k, cue in enumerate(cues):
+                path = Path(args.project) / "audio" / "sfx" / f"{cue['cue']}.wav"
+                inputs += ["-i", str(path)]
+                at = float(cue.get("at", 0))
+                delay = int((at if at >= 0 else total + at) * 1000)
+                graph.append(
+                    f"[{2 + k}:a]volume={cue.get('gain', 0.15)},atrim=0:{total},"
+                    f"asetpts=N/SR/TB,adelay={delay}|{delay}[s{k}]")
+                mix_in.append(f"[s{k}]")
+        else:
+            inputs += ["-f", "lavfi", "-t", str(total), "-i", AMBIENCE]
+            graph.append(f"[2:a]lowpass=f=750,highpass=f=70,volume=0.09[amb]")
+            mix_in.append("[amb]")
+        # normalize=0: amix divides by its input count by default, which threw
+        # 6 dB away and left the book at -22.7 dB mean against the -16 the
+        # narration was normalised to.
+        # A 0.6 s fade-in on the mix swallowed the page turn that opens the
+        # spread (measured -47.7 dB mean, -31 dB peak across the first 600 ms):
+        # the cue is *supposed* to be the first thing heard. 50 ms is enough to
+        # stop a click, and the limiter is what keeps a stacked cue off the ceiling.
+        graph.append(
+            f"{''.join(mix_in)}amix=inputs={len(mix_in)}:duration=longest:"
+            f"dropout_transition=0:normalize=0,atrim=0:{total},"
+            f"afade=t=in:st=0:d=0.05,afade=t=out:st={tail}:d=1.1,"
+            f"alimiter=limit=0.85:level=false[a]")
+        filt = ";".join(graph)
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", *inputs,
                         "-filter_complex", filt, "-map", "[v]", "-map", "[a]",
                         "-t", str(total), "-c:v", "libx264", "-preset", "medium", "-crf", "20",
                         "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
@@ -296,6 +329,9 @@ def main() -> int:
                        help="piper length_scale; 1.0 is the model's own, faster than a bedtime read")
         if name == "bakeoff":
             p.add_argument("--line", default="")
+        if name == "mix":
+            p.add_argument("--synth-bed", action="store_true", dest="dry_bed",
+                           help="ignore sfx.json and mix the synthesised noise bed instead")
         p.set_defaults(fn=fn)
     args = ap.parse_args()
     return args.fn(args)

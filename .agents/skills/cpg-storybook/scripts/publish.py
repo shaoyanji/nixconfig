@@ -173,11 +173,13 @@ def main() -> int:
             f'<video controls preload="metadata" src="{esc(vid.name)}"></video>'
             f'<p class="meta">{esc(vid.stem)}</p></section>'))
 
+    credits = (' · <a href="sfx.html">sound credits</a>'
+               if (site / "sfx.html").exists() else "")
     parts += [
         "</main>", "<footer>",
         f"<p>The End</p>",
         f'<p class="meta">{printed} of {len(manifest["spreads"])} plates · '
-        f'{title} · a Riverbank tale after Kenneth Grahame</p>',
+        f'{title} · a Riverbank tale after Kenneth Grahame{credits}</p>',
         "</footer></body></html>",
     ]
     page = site / (f"index.{lang}.html" if lang else "index.html")

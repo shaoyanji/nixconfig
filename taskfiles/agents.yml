@@ -303,6 +303,20 @@ tasks:
     cmds:
       - bash scripts/task/turns-live-demo.sh
 
+  agents:xs:suite:
+    desc: "Full browser suite for the turns dashboard, run on clanker against the public mount (the live-demo pattern)"
+    summary: >
+      The page is the public mount and the browser is a host outside the fleet:
+      clanker, through `templates/agent-shell`, with no tailnet and no token.
+      Only the post is privileged, and it happens here when the suite prints
+      `PHASE toast-watch` — so the toast is proved on a reader that could not
+      have caused it. Covers posture, movement, the key list, the finder, `?q=`
+      in the URL and one new turn. The tree travels as `git archive HEAD`:
+      commit the suite first. Env: TARGET=, BOX=, TIMEOUT=. Exit 0 = all passed,
+      1 = a check failed, 2 = preflight (nothing ran, nothing was posted).
+    cmds:
+      - bash scripts/task/turns-ui-clanker.sh
+
   agents:xs:queue:
     desc: "The unposted turn queue: depth, oldest entry, and what was rejected (read-only)"
     summary: >

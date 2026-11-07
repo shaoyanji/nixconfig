@@ -22,7 +22,7 @@
 
   # The server is Go since 2026-11-07: one static binary, no interpreter in the
   # closure, and the reader of the posts is the same program that writes them.
-  # Measured against the Python it replaced in tools/pyweb-runtime/README.md.
+  # Measured against the Python it replaced in tools/turns-runtime/README.md.
   goPackage = pkgs.buildGoModule {
     pname = "mataroa-console";
     version = "0.1.0";

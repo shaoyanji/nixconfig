@@ -96,3 +96,24 @@ They are frozen: the refactor is Go, and `go/main.go` is its starting point.
 
 The decision this feeds weighted build and deploy ergonomics; the stream numbers
 are reported alongside so the next reader can re-weigh them.
+
+## The same test, applied to every other Python web server
+
+A port is only worth its risk when the runtime is what a caller waits on, so each
+remaining Python HTTP listener was measured on its own read path before it was
+touched. Delphi, 2026-11-07, one box, one fixture per server.
+
+| server | shape | measured | verdict |
+| :--- | :--- | :--- | :--- |
+| `agent-turns` shim | SSE store front, always on | — | **Go** (ported 2026-11-07) |
+| `zettel-graph` reader | vault page reads, always on | 26.1 MB / 44.0 ms p50 → 8.8 MB / 0.23 ms | **Go** (ported) |
+| `mataroa-console` | post ledger + editor, always on | 29.2 → 6.8 MB idle, 183 → 41 ms start, 2.38 → 0.68 ms ledger p50, 299 → 1753 rps @ c8 | **Go** (ported) |
+| `systemone-decision` serve | `/v1/systemone` compute on loopback | 0.25 ms model, 0.71 ms `http.server`, 0.96 ms decided | Python: the transport is 74 % of a sub-millisecond call, and a port re-derives calibrated probabilities |
+| selector sidecar | stage-1 classifier on a unix socket | 1 MB pure-Python model, one question per invocation, residency already removes the 80 ms import | Python |
+| fleet alert bridge | one POST per alert, then a websocket round trip | the round trip is the work; Go stdlib has no websocket client | Python |
+| eisen parakeet / qwen-image / laya | model servers | torch, CUDA and llama.cpp are the work | Python |
+
+`mataroa`'s per-post page did not move (4.1 → 3.5 ms) and that is the honest
+result: both servers wait on one `comrak` process, so the render, not the
+runtime, is the cost. The ledger — the page a person actually lands on — and the
+concurrency ceiling are where the port paid.

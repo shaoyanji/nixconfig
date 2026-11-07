@@ -5675,8 +5675,9 @@
           "modules/services/turns-dashboard"
           "modules/services/zettel-graph.nix"
           "modules/services/mataroa-console.nix"
+          "modules/services/mataroa-console/server"
         ];
-        docs = ["docs/agent-turns.md" "docs/turns-dashboard.md"];
+        docs = ["docs/agent-turns.md" "docs/turns-dashboard.md" "docs/mataroa-console.md" "docs/zettel-graph.md"];
         tasks = ["checks:host" "clanker:devshell"];
       };
       body = ''
@@ -5700,12 +5701,24 @@
         job does) and do not port a model server (torch and transformers are the work; eisen's
         parakeet, qwen-image and decision-model servers stay Python by nature, not by inertia).
 
-        **The queue, sized.** `mataroa-console.py` 599 lines (HTTP console, git and comrak
-        glue) is the one long-running reader left; `zettel-graph` was ported the same day, at
-        26.1 MB / 44 ms p50 against 8.8 MB / 0.23 ms p50 for the Go reader. Everything else in
-        the list is a timer or a CLI: mail-atlas drain/reconcile, email-archive
+        **The queue, sized and closed the same day.** `mataroa-console.py` 599 lines (HTTP
+        console, git and comrak glue) was the last long-running reader; it is Go now, measured
+        on one 20-post fixture: idle 29.2 -> 6.8 MB, startup 183 -> 41 ms, ledger p50 2.38 ->
+        0.68 ms, 299 -> 1753 rps at concurrency 8. `/p/<slug>` barely moved (4.1 -> 3.5 ms)
+        because both wait on one comrak process: the render is the cost, not the server.
+        `zettel-graph` went the day before, 26.1 MB / 44 ms p50 against 8.8 MB / 0.23 ms.
+
+        **What the same test says about the rest — and why it stays.** `systemone-decision`
+        serve (`:8091`/`:8092`) spends 0.25 ms in its model and 0.71 ms in `http.server`
+        around it, and its caller asks a handful of questions per triage run; a Go port
+        re-derives calibrated probabilities to save a fraction of a millisecond nobody waits
+        for. The selector sidecar is a 1 MB pure-Python classifier on a unix socket, once per
+        question, the cold start already solved by residency. The fleet alert bridge is one
+        POST per alert and then a websocket round trip Python's library already speaks (Go
+        stdlib has no client for it). eisen's parakeet, qwen-image and laya servers are the
+        model. The remaining list is timers and CLIs: mail-atlas drain/reconcile, email-archive
         import/triage/ci-drain, mail-agent, wiki-ask, tls-cert-watchdog, fleet-session-reaper,
-        flake-advisory-audit.
+        flake-advisory-audit — one-shots where the interpreter is a rounding error.
 
         **How a port is gated.** Keep the wire contract byte-compatible, port the tests before
         the handler (`main_test.go` is the pattern: real Unix socket, fake store, one case per

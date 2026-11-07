@@ -1158,12 +1158,10 @@ in {
   # Read-only over the shim, plus one prompt box per turn that runs the same
   # `hermes -z` an operator would type. The mount below is the whole exposure.
   services.turnsDashboard.enable = true;
-  # The public vhost publishes the log at /turns/. It proxies a second reader that
-  # runs -read-only and has no Hermes, so the public page cannot prompt: the
-  # tailnet mount (`turns` in servicePortal below) is still the only place an
-  # agent turn can be started from a browser. 8070 is loopback and otherwise
-  # unused on this host.
-  services.turnsDashboard.publicPort = 8070;
+  # Public mount OFF: the exploration-phase demo, not a requirement. 8070 brings
+  # back the unit and its nginx location together.
+  # [[docs/turns-dashboard.md]]
+  services.turnsDashboard.publicPort = null;
   # The store is the fleet's shared memory and it lives only here, so it gets a
   # nightly dump that leaves the host. 03:05 is inside frieren's maintenance
   # window and ahead of its 03:28 BurgerNAS and 03:30 local restic snapshots —

@@ -974,7 +974,11 @@ in {
     enable = true;
     settings = {
       HOSTNAME = "127.0.0.1";
-      PORT = 8094;
+      # NOT 8094: media-relay's vhost binds 0.0.0.0:8094 on this host, and an
+      # umami on the loopback of the same port made nginx fail at bind — every
+      # vhost on delphi was down for as long as this unit was up (measured
+      # 2026-11-07: `bind() to 0.0.0.0:8094 failed (98)`, nginx start-limit-hit).
+      PORT = 8061;
       APP_SECRET_FILE = config.sops.secrets."umami/app-secret".path;
       DISABLE_TELEMETRY = true;
     };
@@ -1276,7 +1280,7 @@ in {
       };
       umami = {
         port = 8456;
-        upstream = "http://127.0.0.1:8094";
+        upstream = "http://127.0.0.1:8061";
         title = "Umami";
         description = "First-party analytics for pages we own; no third-party script.";
         requires = ["umami.service"];

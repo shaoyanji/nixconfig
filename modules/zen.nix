@@ -99,6 +99,14 @@
           # Without these, profile-scope XPIs arrive userDisabled=true.
           "extensions.autoDisableScopes" = 0;
           "extensions.enabledScopes" = 15;
+
+          # Hardware video decoding via VA-API
+          "media.ffmpeg.vaapi.enabled" = true;
+          "media.hardware-video-decoding.force-enabled" = true;
+          "gfx.webrender.all" = true;
+          # Disable AV1: older laptop APUs/CPUs lack AV1 ASICs and drop frames under software decode;
+          # forcing VP9/H.264 offloads decoding entirely to GPU hardware.
+          "media.av1.enabled" = false;
         };
         extensions.packages = with inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system}; [
           ublock-origin

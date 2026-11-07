@@ -143,6 +143,15 @@ counter hits `limits.imageGenerations` means the daily allowance does. Record
 either in an xs turn: a limit that was never hit is a limit you cannot plan
 against.
 
+Measured 2026-11-07, `gpt-image-2.5-sunburst`, unpaced: 25 attempts, 21 plates,
+615 s, counter 78 → 100. The last three returned
+`429 image generation failed with status 429: "You've reached your daily limit of
+100 image generations"` within 1 s each — the quota refuses instantly, so a
+probe that is out of budget costs seconds, not minutes. The daily counter binds
+long before the 25/h window can (the burst ran at ~150/h and was never
+throttled), and the entitlement's `250/1d` rate is not the number that stops a
+run.
+
 ## Failure behaviour
 
 - `401`: the session died. `cpg status --json`; this needs a browser login, not

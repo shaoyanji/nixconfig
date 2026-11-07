@@ -91,10 +91,21 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project", default=os.environ.get("STORYBOOK_DIR", "."))
     parser.add_argument("--out", default="site")
+    parser.add_argument("--lang", default="",
+                        help="publish the adapted edition from script.<lang>.json as index.<lang>.html")
     args = parser.parse_args()
 
     root = Path(args.project).resolve()
     manifest = json.loads((root / "manifest.json").read_text())
+    lang = args.lang
+    if lang:
+        adapted = json.loads((root / f"script.{lang}.json").read_text())
+        manifest["title"] = adapted.get("title", manifest["title"])
+        manifest["subtitle"] = adapted.get("subtitle", manifest.get("subtitle", ""))
+        manifest["dedication"] = adapted.get("dedication", manifest.get("dedication", ""))
+        captions = {s["id"]: s["text"] for s in adapted["spreads"]}
+        for spread in manifest["spreads"]:
+            spread["text"] = captions.get(spread["id"], spread.get("text", ""))
     site = root / args.out
     (site / "img").mkdir(parents=True, exist_ok=True)
 
@@ -117,13 +128,17 @@ def main() -> int:
     dedication = esc(manifest.get("dedication", ""))
 
     parts = [
-        "<!doctype html>", '<html lang="en"><head><meta charset="utf-8">',
+        "<!doctype html>", f'<html lang="{lang or "en"}"><head><meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         f"<title>{title}</title>", f"<style>{CSS}</style></head><body>",
         '<header class="title">', f"<h1>{title}</h1>",
         f'<p class="sub">{subtitle}</p>' if subtitle else "",
         f'<p class="dedication">{dedication}</p>' if dedication else "",
-        '<p class="hint">scroll to read</p>', "</header>", "<main>",
+        '<p class="hint">scroll to read</p>',
+        (f'<p class="hint"><a href="index.html">English edition</a></p>' if lang
+         else ('<p class="hint"><a href="index.de.html">Deutsche Ausgabe</a></p>'
+               if (site / "index.de.html").exists() else "")),
+        "</header>", "<main>",
     ]
 
     for spread in manifest["spreads"]:
@@ -165,13 +180,14 @@ def main() -> int:
         f'{title} · a Riverbank tale after Kenneth Grahame</p>',
         "</footer></body></html>",
     ]
-    (site / "index.html").write_text("\n".join(p for p in parts if p))
+    page = site / (f"index.{lang}.html" if lang else "index.html")
+    page.write_text("\n".join(p for p in parts if p))
 
     if missing:
         print(f"publish: {len(missing)} spreads without a plate: {', '.join(missing)}", file=sys.stderr)
         return 1
     (site / "READY").write_text("complete\n")
-    print(f"publish: {printed} plates -> {site / 'index.html'}")
+    print(f"publish: {printed} plates -> {page}")
     return 0
 
 

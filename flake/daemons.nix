@@ -24,16 +24,10 @@ in rec {
   seconds = toks: toks / tokenRate;
 
   daemons = lib.mapAttrs (_: mk) {
-    kg-sidecar = {
-      unit = "kg-sidecar.service";
-      replaces = "the same graph query through jq (441 ms), byte-identical";
-      p = 1.0;
-      save = 0.409;
-      cost = 0.0;
-      wanted = true;
-      measured = "2026-11-02 · task ops:kg:speed · checks:kg:sidecar";
-      note = "deterministic, so this is a latency comparison with p = 1";
-    };
+    # `kg-sidecar` (Elixir, 27 MB resident, 1383 lines) is gone as of 2026-11-07:
+    # re-measured at 28 ms against jq's 53 ms over the content-keyed graph file,
+    # so its 25 ms bought a resident BEAM and a parity gate. `task ops:kg:speed`
+    # is the harness; the numbers are in docs/nix-patterns.md.
 
     selector = {
       # Wanted, per the exit criterion in AGENTS.nix `daemon-earns-it-by-

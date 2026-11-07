@@ -22,10 +22,11 @@
 # 2026-11-02 is the dirty case: keying on "is dirty" re-evaluated on every call
 # (~680 ms each) even when the tree had not moved between calls, which is most of
 # why `ops:ask:plan` cost ~1 s. Measured: routing+jq over the compiled graph is
-# 77 ms, `git diff | sha1sum` is 27 ms, one `nix eval` is ~680 ms on this host.
-# KG_GRAPH (any caller's --graph) short circuits both: used as given, no eval, no
-# cache. The sidecar cannot serve this: it holds the graph of the COMMITTED tree,
-# which is exactly the answer this file refuses to give for a dirty one.
+# 77 ms, `git diff | sha1sum` is 27 ms, and the eval on a miss was ~1.7 s with
+# `nix eval` — 820 ms cold / 25 ms warm once the eval goes through `iets`
+# (lib/iets.sh). KG_GRAPH (any caller's --graph) short circuits both: used as
+# given, no eval, no cache. A resident daemon used to serve this and could not
+# answer for a dirty tree at all; the eval cache answers for both.
 #
 # Requires: git, nix and awk. REPO (the repo root) is taken from the caller when
 # exported, and derived from this file's own location otherwise — kg-ask.sh never
@@ -43,6 +44,20 @@ fi
 
 kg_usage() {
   awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "${1:-/dev/null}"
+}
+
+# The graph itself. `iets` when it resolves (25 ms warm, same bytes as nix —
+# `checks:kg:iets` compares them), nix otherwise. Both read the same flake
+# attribute, so the cache file below is identical whichever answered.
+kg_eval_graph() {
+  local bin
+  # shellcheck source=lib/iets.sh
+  . "${BASH_SOURCE[0]%/*}/iets.sh"
+  if bin="$(resolve_iets "$REPO")" && [ -n "$bin" ]; then
+    "$bin" eval --json .#knowledgeGraph.graph
+  else
+    nix eval --json .#knowledgeGraph.graph
+  fi
 }
 
 kg_graph_path() {
@@ -70,9 +85,9 @@ kg_graph_path() {
     mkdir -p "$cache"
     # temp file + rename: a reader that races the eval would otherwise see a
     # half-written JSON, and jq would report a parse error rather than a miss.
-    if ! (cd "$REPO" && nix eval --json .#knowledgeGraph.graph) >"$path.tmp" 2>/dev/null; then
+    if ! (cd "$REPO" && kg_eval_graph) >"$path.tmp" 2>/dev/null; then
       rm -f "$path.tmp"
-      echo "kg-graph: nix eval .#knowledgeGraph.graph failed" >&2
+      echo "kg-graph: evaluating .#knowledgeGraph.graph failed" >&2
       return 1
     fi
     mv "$path.tmp" "$path"

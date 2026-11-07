@@ -63,6 +63,16 @@
       url = "github:natsukium/mcp-servers-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # iets — numtide's Nix client, whose eval cache traces the files an eval
+    # reads, so a warm `iets eval` answers a flake attribute in ~25 ms where
+    # `nix eval` spends 0.15-1.7 s and never answers from cache. Used by the
+    # knowledge-graph reads (scripts/task/lib/iets.sh); not a build path — it
+    # ignores a flake's nixConfig, so substituters would be lost — see
+    # docs/nix-patterns.md §"The eval the graph reads".
+    iets = {
+      url = "github:numtide/iets";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     disko = {

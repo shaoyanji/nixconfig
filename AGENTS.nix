@@ -11,7 +11,7 @@
       summary = "flake-parts owns the outputs and every file under `modules/` is a named flake output imported through `self`, so no file list is hand-maintained and finding a module's users is a graph query, not a grep across relative paths.";
       from = ["d1-compiled-context"];
       refs = {
-        modules = ["flake.nix" "flake/outputs.nix" "flake/systems.nix" "flake/devshells.nix" "flake/checks.nix" "flake/nix-registry.nix" "flake/module-sets.nix" "flake/host-inventory.nix" "lib/nix-files.nix" "lib/knowledge-graph.nix" "tools/kg-engine/kg_engine.exs"];
+        modules = ["flake.nix" "flake/outputs.nix" "flake/systems.nix" "flake/devshells.nix" "flake/checks.nix" "flake/nix-registry.nix" "flake/module-sets.nix" "flake/host-inventory.nix" "lib/nix-files.nix" "lib/knowledge-graph.nix"];
         tasks = ["checks:host" "checks:tasks" "ops:kg:module"];
         docs = ["README.md" "docs/nix-patterns.md"];
       };

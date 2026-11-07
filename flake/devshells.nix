@@ -13,10 +13,6 @@ in {
       pkgs.nodejs
       pkgs.go
       pkgs.gopls
-      # tools/kg-engine is Elixir: with it on PATH, `task ops:kg:sidecar` runs
-      # offline instead of resolving a store path per invocation.
-      pkgs.beamPackages.elixir
-      pkgs.beamPackages.erlang
       # The gate is `checks.<system>.scripts-shellcheck`; this makes the binary
       # reachable to fix what it finds.
       pkgs.shellcheck

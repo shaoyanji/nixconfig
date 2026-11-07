@@ -30,8 +30,8 @@ any other markdown. They are `idea:` nodes with `about:` edges, which is what
 makes these work:
 
 ```bash
-task ops:kg:blast TARGET=host:frieren            # includes the drafts about frieren
-task ops:kg:sidecar COMMAND=node ID=idea:<slug>  # a draft's neighbourhood, both ways
+task ops:kg:blast TARGET=host:frieren                # includes the drafts about frieren
+task ops:kg:blast TARGET=doc:docs/nix-patterns.md    # and the drafts about that page
 ```
 
 ## Creating one

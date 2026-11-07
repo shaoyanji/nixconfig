@@ -13,6 +13,9 @@
 #   comention <h>   (Doc)->(Host) and the same (Doc)->(Host')
 #                                                        "who shares docs with X"
 #   stats           counts, plus top out-degree with --top N
+#   blast <id>      (Module|Doc|Skill|Host)-[:*]->(...)*        "who breaks with it"
+#                   reverse closure, prefixed id (host:, skill:, doc:, tag:,
+#                   module:); the one pattern the forward scans cannot answer
 #
 # The point is that a caller who knows which question it is asking never needs a
 # classifier: `ops:ask` is sugar in front of these, not the other way round.
@@ -25,15 +28,13 @@
 #   --top N  stats only: list the N nodes with the most outbound edges
 #   --min N  comention only: drop hosts sharing fewer than N documents (default 1)
 #   KG_GRAPH=<path>  use an existing graph JSON instead of evaluating
-#   KG_NO_SIDECAR=1  force the jq path (the parity gate compares the two)
 #
-# Fast path: when a sidecar socket is live, the question is answered from its
-# in-memory graph (`/pattern`) instead of resolving the graph and running jq —
-# 28 ms vs 476 ms on a dirty tree, 17x. Both paths return the same bytes for the
-# same question; `checks:kg:sidecar` asserts that for every pattern, so the
-# fast path cannot become a second, quieter answer. An unknown node is NOT
-# answered on the fast path: it falls through to the jq path so the typo exit
-# code and its suggestions keep exactly one implementation.
+# One traversal path, not two. A resident Elixir sidecar used to answer these
+# from a socket in 28 ms; measured 2026-11-07 the file-cache path answers in
+# 53 ms (49 ms on `stats`), and the eval that fills the cache now goes through
+# `iets` at 820 ms cold / 25 ms warm instead of `nix eval`'s 1.7 s. A daemon and
+# a byte-parity gate to buy 25 ms did not clear its own rent, so it went. The
+# frontier and the numbers: docs/nix-patterns.md, `task ops:kg:speed`.
 #
 # Exit: 0 = answer (possibly empty); 1 = graph unavailable; 2 = usage, or the
 # named node does not exist. "Empty" and "typo" are deliberately different exit
@@ -191,6 +192,18 @@ case "$PATTERN" in
         | map(select(.shared >= $min))
         | sort_by(-.shared, .id)'
     ;;
+  blast)
+    # The reverse closure: the one traversal the forward scans above cannot
+    # answer. It reads lib/kg-closure.jq — ONE definition, because the two
+    # hand-written copies that used to exist disagreed (direct edges only in
+    # one, a double-counted frontier in the other) and made a correct engine
+    # look like drift. Needs a prefixed id (host:, skill:, doc:, tag:,
+    # module:); a bare name is not guessed, because "who depends on qmd" and
+    # "who depends on the qmd doc" are different graphs.
+    require_name blast
+    ID="$(node_id blast "$NAME")"
+    BLAST=1
+    ;;
   stats)
     # Kept as a one-object result so --json is stable; text mode below prints
     # the same line ops:kg has always printed.
@@ -214,53 +227,31 @@ case "$PATTERN" in
     ;;
 esac
 
-# --- fast path --------------------------------------------------------------
-# A live sidecar already holds the compiled projection, so the same question is
-# one socket round-trip instead of a graph resolution plus jq. Consulted only
-# when it ANSWERS (no `.error`): an unknown node falls through to the jq path so
-# the typo contract and its suggestions stay in one implementation, and
-# KG_NO_SIDECAR=1 forces the jq path for the parity gate in checks:kg:sidecar.
-SOCKET="${KG_SOCKET:-${XDG_RUNTIME_DIR:-/tmp}/kg.sock}"
-# KG_GRAPH means "answer about THIS graph", so the socket (which holds whichever
-# graph it was started with) is never consulted — that is what keeps checks:kg
-# deterministic instead of path-dependent.
-if [ -z "${KG_GRAPH:-}" ] && [ "${KG_NO_SIDECAR:-0}" != 1 ] && [ -S "$SOCKET" ]; then
-  fast="$(curl -sS -m 5 --unix-socket "$SOCKET" \
-    "http://localhost/pattern?p=${PATTERN}&name=$(jq -rn --arg s "${ID:-}" '$s | @uri')&min=${MIN}&top=${TOP}" \
-    2>/dev/null)" || fast=""
-
-  if [ -n "$fast" ] && ! jq -e 'has("error")' >/dev/null 2>&1 <<<"$fast"; then
-    # Rebuild the envelope in the documented key order. The engine's encoder
-    # sorts keys and `stats --top` carries a `top` sibling, so a raw passthrough
-    # would differ from the jq path byte-for-byte even with identical answers.
-    if [ "$JSON" = 1 ]; then
-      if [ "$PATTERN" = "stats" ]; then
-        # The counts object is re-ordered too: the engine's encoder sorts keys,
-        # and the jq path emits them in a fixed order.
-        jq -c '.results[0] as $r | {pattern: .pattern, arg: .arg, count: .count, results: [{nodes: $r.nodes, hosts: $r.hosts, skills: $r.skills, docs: $r.docs, tags: $r.tags, modules: $r.modules, edges: $r.edges}]}' <<<"$fast"
-      else
-        jq -c '{pattern: .pattern, arg: .arg, count: .count, results: .results}' <<<"$fast"
-      fi
-      exit 0
-    fi
-    if [ "$PATTERN" = "stats" ]; then
-      jq -r '.results[0] | "nodes: \(.hosts) hosts, \(.skills) skills, \(.docs) docs, \(.tags) tags, \(.modules) modules; edges: \(.edges)"' <<<"$fast"
-      if jq -e '(.top // []) | length > 0' >/dev/null 2>&1 <<<"$fast"; then
-        jq -r '.top[] | "\(.n)\t\(.id)"' <<<"$fast" | column -t -s$'\t'
-      fi
-      exit 0
-    fi
-    jq -r '.results[] | if type == "object" then [.id, (.shared | tostring)] | @tsv else . end' <<<"$fast" |
-      if [ "$PATTERN" = "comention" ]; then column -t -s$'\t'; else cat; fi
-    exit 0
-  fi
-fi
-
-# --- graph (only reached when the fast path could not answer) ----------------
+# --- graph ------------------------------------------------------------------
 . "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
 GRAPH="$(kg_graph_path)" || exit 1
 
 if [ -n "${ID:-}" ]; then check_exists "$ID" "$NAME"; fi
+
+if [ "${BLAST:-0}" = 1 ]; then
+  # One process, and lib/kg-closure.jq stays the only definition: the file emits
+  # the impacted ARRAY, so `.[]` is appended to the filter rather than to the
+  # graph (piping the array through -r prints `[` and `]` as lines).
+  closure_filter="$(cat "${BASH_SOURCE[0]%/*}/lib/kg-closure.jq")"
+  mapfile -t impacted < <(jq -r --arg root "$ID" "$closure_filter | .[]" "$GRAPH")
+  if [ "$JSON" = 1 ]; then
+    if [ "${#impacted[@]}" -eq 0 ]; then
+      jq -cn --arg a "$ID" '{target: $a, impacted_count: 0, impacted_entities: [], backend: "jq"}'
+    else
+      printf '%s\n' "${impacted[@]}" |
+        jq -Rsc --arg a "$ID" '{target: $a, impacted_count: (split("\n") | map(select(. != "")) | length), impacted_entities: (split("\n") | map(select(. != "")) | map({id: .})), backend: "jq"}'
+    fi
+    exit 0
+  fi
+  printf '%s impacted node(s) for %s\n' "${#impacted[@]}" "$ID"
+  [ "${#impacted[@]}" -eq 0 ] || printf '  %s\n' "${impacted[@]}"
+  exit 0
+fi
 
 RESULT="$(jq -c --arg a "${ID:-}" --argjson min "$MIN" "$JQ" "$GRAPH")"
 

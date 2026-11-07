@@ -47,7 +47,7 @@ tasks:
       - task checks:toon:surfaces
       - task checks:tasks
       - task checks:kg
-      - task checks:kg:native
+      - task checks:kg:iets
       - task checks:nix:lint
       - task checks:nix:shell
       - task checks:sops:drift
@@ -200,6 +200,21 @@ tasks:
     cmds:
       - bash scripts/task/kg-check.sh
 
+  checks:kg:iets:
+    desc: "[gate] The graph's fast evaluator renders what nix renders, byte for byte"
+    summary: >
+      scripts/task/kg-iets-check.sh — evaluates the compiled graph and two leaf
+      registries through `iets --no-cache` and through `nix eval`, and compares
+      the bytes. iets is why the graph does not need a resident daemon (1.7 s →
+      820 ms cold, 25 ms warm), and a faster evaluator that renders a different
+      value would be a quieter answer rather than a faster one.
+
+      Skips with exit 0 and says so where iets cannot be resolved, because the nix
+      path is still correct; it never skips a real disagreement. Cost ~3 s (two
+      full evals, no cache on either side), so not in `checks:quick`.
+    cmds:
+      - bash scripts/task/kg-iets-check.sh
+
   checks:blast:
     desc: "[report] Pre-flight blast radius for changed paths (FILES='a b' or STAGED=1)"
     summary: >
@@ -210,41 +225,11 @@ tasks:
       (modules/, flake/, taskfiles/) are UNMAPPED on purpose — they have closures,
       not edges.
 
-      Backend: the sidecar if listening, else the same reverse-edge closure in jq
-      (`checks:kg:sidecar` proves they agree). Advisory by default; STAGED=1 reads
+      Backend: the reverse-edge closure in jq (lib/kg-closure.jq, the same
+      definition `ops:kg:blast` uses). Advisory by default; STAGED=1 reads
       `git diff --cached`. Exit 0 = reported.
     cmds:
       - bash scripts/task/kg-preflight.sh {{if eq .STAGED "1"}}--staged{{end}} {{.FILES | default ""}}
-
-  checks:kg:sidecar:
-    desc: "[gate] Sidecar parity: engine counts, answers, error codes, arg encoding, lifecycle"
-    summary: >
-      Boots the Elixir engine and proves it answers from the SAME compiled graph the
-      jq surface reads (scripts/task/kg-sidecar-check.sh): node/edge counts equal
-      the graph, blast-radius equals the jq reverse answer, the engine answers 404
-      for an unknown node and 400 for a missing argument (not an empty 200), a
-      multi-word term arrives intact, every pattern matches jq byte for byte, and
-      start/stop own the socket.
-
-      Cost 2-4 s (one BEAM boot), so not in `checks:quick`: run it when
-      tools/kg-engine/**, kg-query.sh or kg-sidecar.sh changes. KG_GRAPH= skips
-      graph resolution. Exit 0 = clean, 1 = drift.
-    cmds:
-      - bash scripts/task/kg-sidecar-check.sh
-
-  checks:kg:native:
-    desc: "[gate] Cold native graph build: median under 400 ms, zero subprocess, parity"
-    summary: >
-      scripts/task/kg-native-check.sh — keeps the sidecar's own graph builder
-      honest: `--build-only` 7 times, MEDIAN of the samples, failing above
-      BUDGET_MS (400 since the module walk made it open every `.nix` file; the
-      shell-out it exists to catch costs 1-3 s). Statically asserts KGEngine.Native
-      holds no subprocess primitive, and that its node/edge counts equal the
-      compiled projection — speed cannot be bought with a smaller graph.
-
-      Exit 0 = within budget, 1 = too slow or diverged.
-    cmds:
-      - bash scripts/task/kg-native-check.sh
 
   checks:kg:canvas:
     desc: "[gate] Knowledge-graph canvas: slices resolve, and a real node click navigates"

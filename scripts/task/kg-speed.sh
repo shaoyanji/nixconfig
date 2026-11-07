@@ -1,49 +1,68 @@
 #!/usr/bin/env bash
-# Measure one graph question on both traversal paths.
+# Measure the knowledge-graph read paths, one column per candidate.
 #
-# The claim this exists for: "the sidecar is faster than the jq surface". That
-# is true only while the socket is live, and only for repeated questions; a
-# number without a harness is a claim nobody can check. This runs the same
-# query N times each way through kg-query.sh (the exact surface the tasks call)
-# and prints the mean wall time, so the doc can cite a command instead of a
-# memory.
+# The claim this exists for: "a resident sidecar is worth its rent". That was
+# true on 2026-11-02 (28 ms against jq's 441 ms) and stopped being true when the
+# graph read became a content-keyed file plus an eval cache: measured 2026-11-07
+# the same question answers in 28 ms from a socket and 53 ms from the file, so
+# the daemon bought 25 ms for 27 MB of BEAM, a 1383-line engine and a parity
+# gate. It is gone. This harness is what makes that re-checkable rather than a
+# memory: it times the surface the tasks actually call, and both evaluators.
 #
-# Usage: kg-speed.sh [NODE]        RUNS=N to change the sample (default 5)
-# Exit:  0 = measured; 1 = kg-query failed
+# Usage: kg-speed.sh [NODE]        RUNS=N (default 5, evals at least 2)
+# Exit:  0 = measured; 1 = a path failed
 set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
 NODE="${1:-frieren}"
 RUNS="${RUNS:-5}"
-SOCKET="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/kg.sock"
 
-run_path() {
-  local mode="$1" i start end total=0
-  for ((i = 0; i < RUNS; i++)); do
-    start=$(date +%s%N)
-    if [ "$mode" = "jq" ]; then
-      KG_NO_SIDECAR=1 bash scripts/task/kg-query.sh host "$NODE" >/dev/null
-    else
-      bash scripts/task/kg-query.sh host "$NODE" >/dev/null
-    fi
-    end=$(date +%s%N)
-    total=$((total + (end - start) / 1000000))
+now() { date +%s%N; }
+
+mean() {
+  local label="$1" runs="$2"
+  shift 2
+  local i start total=0
+  for ((i = 0; i < runs; i++)); do
+    start="$(now)"
+    "$@" >/dev/null 2>&1 || {
+      echo "kg-speed: '$label' failed" >&2
+      return 1
+    }
+    total=$((total + ($(now) - start) / 1000000))
   done
-  echo $((total / RUNS))
+  printf '%s' "$((total / runs))"
 }
 
-if [ ! -S "$SOCKET" ]; then
-  echo "sidecar socket not live ($SOCKET): both columns will be the jq path." >&2
-  echo "start it with: task ops:kg:sidecar start" >&2
-fi
+one() {
+  local start
+  start="$(now)"
+  "$@" >/dev/null 2>&1 || {
+    echo "fail" >&2
+    return 1
+  }
+  printf '%s' "$((($(now) - start) / 1000000))"
+}
 
-sidecar_ms=$(run_path sidecar)
-jq_ms=$(run_path jq)
+# shellcheck source=lib/iets.sh
+. scripts/task/lib/iets.sh
+IETS="$(resolve_iets "$PWD" || true)"
 
-echo "query: host $NODE   runs: $RUNS"
-printf '  sidecar %4s ms\n' "$sidecar_ms"
-printf '  jq      %4s ms\n' "$jq_ms"
-if [ "$sidecar_ms" -gt 0 ] && [ "$sidecar_ms" -lt "$jq_ms" ]; then
-  printf '  ratio   %4sx faster\n' "$((jq_ms / sidecar_ms))"
+printf 'graph read: %s   runs: %s\n' "$NODE" "$RUNS"
+printf '  query host    %5s ms   kg-query.sh over the graph file + jq\n' \
+  "$(mean query "$RUNS" bash scripts/task/kg-query.sh host "$NODE")"
+printf '  query stats   %5s ms   the same file, the widest traversal\n' \
+  "$(mean stats "$RUNS" bash scripts/task/kg-query.sh stats)"
+
+if [ -n "$IETS" ]; then
+  printf '  eval warm     %5s ms   iets eval .#knowledgeGraph.graph (traced cache)\n' \
+    "$(mean iets-warm "$RUNS" "$IETS" eval --json .#knowledgeGraph.graph)"
+  printf '  eval no-cache %5s ms   the same eval with --no-cache, once\n' \
+    "$(one "$IETS" eval --no-cache --json .#knowledgeGraph.graph)"
+else
+  printf '  eval warm        n/a   iets did not resolve (IETS_BIN, PATH, flake.lock pin)\n'
 fi
+printf '  eval nix      %5s ms   nix eval, which never answers from a cache, %s run(s)\n' \
+  "$(mean nix-eval "$([ "$RUNS" -lt 2 ] && echo 2 || echo "$RUNS")" nix eval --json .#knowledgeGraph.graph)" \
+  "$([ "$RUNS" -lt 2 ] && echo 2 || echo "$RUNS")"

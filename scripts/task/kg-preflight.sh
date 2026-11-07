@@ -13,10 +13,9 @@
 # would produce a confident zero. Those are reported as unmapped, with the tool
 # that can actually answer for them.
 #
-# Backends: the sidecar when it is already running (0.2-0.9 ms per query), else
-# a jq transitive closure over the same graph — identical answer, ~40 ms, no
-# daemon. A commit hook must not start a daemon, and this must work before one
-# has ever been started.
+# Backend: one jq transitive closure over the compiled graph (~40 ms). It used
+# to prefer a live daemon's socket for the same answer; that daemon is gone
+# (docs/nix-patterns.md), and this must still work where one never started.
 #
 # Usage: kg-preflight.sh [--staged] [--advisory] [FILE...]
 #        --staged    use `git diff --cached --name-only`
@@ -25,7 +24,6 @@
 set -euo pipefail
 
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
-SOCKET="${KG_SOCKET:-${XDG_RUNTIME_DIR:-/tmp}/kg.sock}"
 staged=0
 advisory=1 # reporting by default; blocking is opt-in via --strict
 files=()
@@ -92,14 +90,9 @@ closure_jq() {
 }
 
 impacted_of() {
-  local anchor="$1"
-  if [ -S "$SOCKET" ] && curl -s -m 2 --unix-socket "$SOCKET" http://localhost/stats >/dev/null 2>&1; then
-    curl -s -m 30 --unix-socket "$SOCKET" "http://localhost/blast-radius?id=$(jq -rn --arg s "$anchor" '$s|@uri')"
-  else
-    local n
-    n="$(closure_jq "$anchor")"
-    jq -cn --arg a "$anchor" --argjson n "$n" '{target: $a, impacted_count: $n, backend: "jq"}'
-  fi
+  local anchor="$1" n
+  n="$(closure_jq "$anchor")"
+  jq -cn --arg a "$anchor" --argjson n "$n" '{target: $a, impacted_count: $n, backend: "jq"}'
 }
 
 echo "kg-preflight: ${#files[@]} file(s); graph $(basename "$G")"
@@ -134,7 +127,7 @@ for f in "${files[@]}"; do
   res="$(impacted_of "$anchor")"
   n="$(jq -r '.impacted_count' <<<"$res")"
   us="$(jq -r '._latency_us // empty' <<<"$res")"
-  how="$(jq -r '.backend // "sidecar"' <<<"$res")"
+  how="$(jq -r '.backend // "jq"' <<<"$res")"
   if [ -n "$us" ]; then
     printf '  %-46s %-22s %3s impacted (%s, %s µs)\n' "$f" "$anchor" "$n" "$how" "$us"
   else

@@ -386,13 +386,42 @@ accuracy at any `p < 1`.
 arithmetic, and `[[flake/policies.nix#daemon-clears-kelly]]` requires decision and
 numbers to agree both ways — including that a justified daemon is not silently off.
 
-Two entries from 2026-11-02, and they are why the rule is worth having:
-
 | daemon | p | save | cost | ev | verdict |
 | :--- | ---: | ---: | ---: | ---: | :--- |
-| `kg-sidecar` | 1.0 | +0.409 s | 0 | **+0.409** | enable: deterministic, byte-identical fallback, 441 ms → 32 ms |
 | `edge-caller` | 0.5 | **−1.0 s** | 1.2 | **−1.1** | disable: the *win case* is a loss |
 
-The second row is the lesson: the dispatcher's call is 54 bytes against 40, its
-answer 605 against 217, its round trip 1073 ms against 145 — so it loses even when
-it is right. A latency claim means nothing against the alternative.
+That row is the lesson: the dispatcher's call is 54 bytes against 40, its answer
+605 against 217, its round trip 1073 ms against 145 — it loses even when it is
+right. A latency claim means nothing against the alternative.
+
+`kg-sidecar` cleared the same gate on 2026-11-02 (441 ms → 28 ms, `p = 1`) and was
+removed on 2026-11-07 because the counterfactual moved: the jq path answers in
+53 ms from a content-keyed file, and the eval that refills it is now ~25 ms warm.
+25 ms does not pay 27 MB resident, 1383 lines of engine, a socket protocol and a
+byte-parity gate. `save` is a claim about *today's* alternative, so
+`task ops:kg:speed` re-measures it rather than restating it.
+
+## The eval the graph reads
+
+`nix eval` never answers from its cache: every graph read was a full evaluation
+(1.7 s for `.#knowledgeGraph.graph` on delphi). The caches that fix that are not
+interchangeable:
+
+| layer | keys on | answers in | answers when |
+| :--- | :--- | ---: | :--- |
+| `kg-graph.sh` file | `HEAD` + `sha1(git diff HEAD)` | ~53 ms, jq included | same tree content |
+| `iets` tracing cache | the files an eval read | ~25 ms warm, 820 ms cold | none of them changed |
+| a resident daemon | the committed graph | ~28 ms | never, on a dirty tree |
+
+The last row is why the daemon went: it could not answer the case the file cache
+exists for, the tree you are editing. The middle row is why the file cache stays:
+one eval serves callers that read the graph several times (`ops:ask` routing, then
+the query).
+
+`iets` is **eval only**. It deliberately ignores a flake's `nixConfig`, so a build
+through it would lose the LAN and substituter set and compile what the cache
+serves; every build path keeps `nix`. `checks:kg:iets` evaluates the graph and two
+leaf registries through both with `--no-cache` on the iets side and compares the
+bytes — a faster evaluator that renders a different value is a quieter answer,
+not a faster one. Resolve it with `scripts/task/lib/iets.sh` (IETS_BIN, PATH, then
+the `flake.lock` pin built once into a GC-rooted out-link).

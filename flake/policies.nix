@@ -633,7 +633,7 @@
         d.daemons);
     in {
       rule = "Anything that runs RESIDENT must be strictly worth more than zero, measured against what the counterfactual costs an agent rather than against a cold start. The counterfactual is generation at ~50 tokens/s, where any sub-second local round trip is free: a daemon that answers correctly saves only the tokens of naming the argument, so the bar is `ev = p * save - (1 - p) * cost > 0` with `save > 0` as well. `save` may be negative — correct and still slower is the normal failure — and a daemon with `ev == 0` is off, because it pays rent in memory, surface and maintenance for a coin flip. Enabling is a measured claim, so every entry carries the command that measured it; a daemon whose best case is a loss cannot be rescued by accuracy.";
-      proof = "flake/daemons.nix · docs/nix-patterns.md · modules/roles/home.nix (kgSidecar, selectorDaemon) · hosts/delphi/configuration.nix (edgeCaller) · checks:edge:resident and checks:selector:sidecar for the p they use";
+      proof = "flake/daemons.nix · docs/nix-patterns.md · modules/roles/home.nix (selectorDaemon) · hosts/delphi/configuration.nix (edgeCaller) · checks:edge:resident and checks:selector:sidecar for the p they use";
       holds =
         d.failing
         == {}
@@ -649,7 +649,6 @@
         # be enabled by a host, and the one it justifies must not be silently off.
         && !(has "hosts/delphi/configuration.nix" "programs.edgeCaller.enable = true")
         && !(has "modules/roles/home.nix" "edgeCaller.enable = true")
-        && has "modules/roles/home.nix" "kgSidecar.enable"
         && has "modules/roles/home.nix" "selectorDaemon.enable"
         && has "docs/nix-patterns.md" "A daemon must clear the Kelly gate";
       detail = "a resident helper is enabled without a strictly positive Kelly score, or its measurement is missing:\n  ${report}";

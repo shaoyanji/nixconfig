@@ -46,12 +46,13 @@ in {
     home-manager.enable = true;
     nix-your-shell.enable = true;
 
-    # Keep the knowledge-graph sidecar warm so `kg-query.sh` takes its socket
-    # path (it falls back to jq when the socket is absent, so this is a speed
-    # setting, not a correctness one).
-    kgSidecar.enable = lib.mkDefault true;
+    # The knowledge-graph used to keep a resident Elixir sidecar here so
+    # `kg-query.sh` could answer from a socket. Measured 2026-11-07: the sidecar
+    # answered in 28 ms against jq's 53 ms over the content-keyed graph file, so
+    # the 25 ms it bought cost 27 MB of BEAM, a 1383-line engine and a parity
+    # gate. Removing it dropped both; `iets` covers the 1.7 s eval-on-miss.
 
-    # The same bargain for the selector: `q.sh --question` asks the resident
+    # The selector's bargain: `q.sh --question` asks the resident
     # stage 1 and falls back to the interpreter, so a host without it answers the
     # same question ~70 ms slower instead of not answering.
     selectorDaemon.enable = lib.mkDefault true;

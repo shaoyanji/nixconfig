@@ -122,6 +122,21 @@
         "type": "github"
       }
     },
+    "crane": {
+      "locked": {
+        "lastModified": 1792350552,
+        "narHash": "sha256-292lvpvxTGKryKxh3/3tcIVi85CwYGdl4oOi113Sob8=",
+        "owner": "ipetkov",
+        "repo": "crane",
+        "rev": "e675a36b7377bebe41d548388a2501cbb16d380d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ipetkov",
+        "repo": "crane",
+        "type": "github"
+      }
+    },
     "dank-greeter": {
       "inputs": {
         "dank-qml-common": "dank-qml-common",
@@ -592,6 +607,27 @@
         "owner": "hyprnux",
         "ref": "v0.7.0",
         "repo": "hyprglass",
+        "type": "github"
+      }
+    },
+    "iets": {
+      "inputs": {
+        "crane": "crane",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794002605,
+        "narHash": "sha256-RdC/th6UsZ+QBbtgrs2nFXhFX3sY/lAxTbd4B+vhDz8=",
+        "owner": "numtide",
+        "repo": "iets",
+        "rev": "5e9589e7570bfdf7997e5583d08533f0b95b5393",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "iets",
         "type": "github"
       }
     },
@@ -1292,6 +1328,7 @@
         "flake-parts": "flake-parts_2",
         "garnix-lib": "garnix-lib",
         "home-manager": "home-manager",
+        "iets": "iets",
         "impermanence": "impermanence",
         "kickstart-nixvim": "kickstart-nixvim",
         "llm-agents": "llm-agents",

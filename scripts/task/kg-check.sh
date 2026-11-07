@@ -314,7 +314,7 @@ echo "== surface =="
 # Taskfile and the surface check fails for a reason that has nothing to do with
 # the graph (caught by running the drift tests from /tmp).
 if task --dir "$REPO" --list-all --json >"$work/tasks.json" 2>/dev/null; then
-  for t in host skill doc tag module comention stats; do
+  for t in host skill doc tag module comention stats blast; do
     if jq -e --arg n "ops:kg:$t" '.tasks | map(.name) | index($n)' "$work/tasks.json" >/dev/null 2>&1; then
       ok "task ops:kg:$t exists"
     else

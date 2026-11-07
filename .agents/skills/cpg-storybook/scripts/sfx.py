@@ -113,7 +113,11 @@ def cmd_fetch(args) -> int:
     root = Path(args.project).resolve()
     out = root / "audio" / "sfx"
     out.mkdir(parents=True, exist_ok=True)
-    credits = {}
+    # A rerun fetches only what is missing, so the credits have to start from the
+    # file on disk: rebuilding them from this run alone silently dropped every
+    # clip that was already there (6 rows for 9 clips).
+    cfile = out / "credits.json"
+    credits = json.loads(cfile.read_text()) if cfile.exists() else {}
     for cue, spec in SHELF.items():
         wav = out / f"{cue}.wav"
         if wav.exists() and not args.force:
@@ -151,7 +155,7 @@ def cmd_fetch(args) -> int:
         print(f"sfx: {cue} <- {hit['title'][:40]} ({hit.get('creator','?')}) {dur}s", file=sys.stderr)
         time.sleep(1.2)
 
-    (out / "credits.json").write_text(json.dumps(credits, indent=1, ensure_ascii=False))
+    cfile.write_text(json.dumps(credits, indent=1, ensure_ascii=False))
     write_credits_page(root, credits)
     print(json.dumps({"cues": list(credits), "dir": str(out)}, indent=1))
     return 0 if credits else 1

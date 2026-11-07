@@ -1,7 +1,7 @@
 # Nix patterns & gotchas
 
-The things that bit this tree once and would bite it again. Each entry says what
-fails, why, and the fix that is actually in the repo.
+The things that bit this tree once and would bite it again: what fails, why, and
+the fix that is actually in the repo.
 
 ## Formats go through tools, not text edits
 
@@ -17,8 +17,8 @@ correct; hand the same expression `/tmp/inv.test` and yq falls back to YAML, rea
 **yq's TOML output collapses multi-line arrays**, so *any* yq write reformats
 `inventory.toml` — formatting, not data loss.
 
-**`yq -i -f script.yq file.toml` silently ignores the script** (found 2026-10-15,
-yq v4.54.1): exits 0, rewrites the file, applies nothing — the identity transform,
+**`yq -i -f script.yq file.toml` silently ignores the script** (2026-10-15, yq
+v4.54.1): exits 0, rewrites the file, applies nothing — the identity transform,
 which is why `git diff` looks like it worked. `yq --from-file script.yq -i
 file.toml` applies. Prefer an inline expression, put `--from-file` before `-i`, and
 verify the *effect* (`nix eval --raw .#inventory.json` before/after), not the diff.
@@ -74,18 +74,18 @@ Before deploying anything referencing Java (Maven/Gradle), Go or Rust, run
 ### The gate for a fleet fix, and the exception
 
 A fix costs what it changes. A frieren nightly upgrade measured **13 min 37 s**
-for a commit that changed documentation — 5 min 46 s of CPU on a 2-core NAS, none
-of it a compile: the 03:15 `nix-gc` deleted 90 `-source` paths (a flake's inputs
-are unreferenced the moment its evaluation ends), and 04:00 `autoUpgrade` spent
-8.5 of those minutes re-copying ~20 of them. `services.flakeGcRoot` now roots the
+for a documentation commit — 5 min 46 s of CPU on a 2-core NAS, none of it a
+compile: the 03:15 `nix-gc` deleted 90 `-source` paths (a flake's inputs are
+unreferenced the moment its evaluation ends) and 04:00 `autoUpgrade` spent 8.5 of
+those minutes re-copying ~20 of them. `services.flakeGcRoot` now roots the
 deployed flake and its inputs at 05:00, so the GC cannot take them.
 
 **The trap worth remembering** is the other fix: a submodule tree is a *different
 source path* from the same commit's GitHub tarball, so a warm from one is worth
 nothing to an evaluation of the other — which is why frieren rebuilt 34
 derivations on a commit CI had already built. `?submodules=1` is not even legal on
-a `github:` ref; a plain git tree and the tarball at one commit *do* resolve to
-one `/nix/store/…-source`, so `.#` is the ref to warm.
+a `github:` ref; a plain git tree and the tarball at one commit *do* resolve to one
+`/nix/store/…-source`, so `.#` is the ref to warm.
 
 So the gate for a fleet fix is cheap, and stays cheap:
 
@@ -128,22 +128,17 @@ success and frees nothing, which reads as "GC is broken" when the answer is
 
 ```bash
 sudo nix-store --gc --print-roots | grep -v -e /proc/ -e /sys/      # 2 s
-
 df -h /nix                                 # what is actually left
 sudo du -sh /nix/store                     # what the store holds
 nix path-info -Sh /run/current-system      # what the running closure costs
 ```
 
-Store ≈ current system + booted system is healthy. A store several GiB larger
-than those two is rooted garbage, not data.
-
-Measured on netbook 2026-10-22 after pruning to one generation: 15 GiB in
-`/nix/store` against a 6.7 GiB running closure, and three roots held the gap —
-`/etc/nixos/result` (a September `nixos-rebuild build`, 5.9 GiB) and two
-home-manager gcroots links (3.8 GiB, 380 MiB). Removing the symlinks and
-collecting again freed **7.2 GiB / 14,702 paths**.
-
-Remove the **symlink**, never the store path it points at, then collect:
+Store ≈ current system + booted system is healthy; several GiB more is rooted
+garbage, not data. Measured on netbook 2026-10-22: 15 GiB in `/nix/store` against
+a 6.7 GiB running closure, and three roots held the gap — `/etc/nixos/result` (a
+September `nixos-rebuild build`, 5.9 GiB) and two home-manager gcroots links
+(3.8 GiB, 380 MiB). Removing the symlinks and collecting again freed **7.2 GiB /
+14,702 paths**. Remove the **symlink**, never the store path, then collect:
 
 ```bash
 sudo rm /etc/nixos/result
@@ -152,18 +147,16 @@ sudo nix-collect-garbage -d        # deletes old generations, then collects
 sudo nix store gc                  # or collect without touching generations
 ```
 
-A dangling `gcroots/auto` link is pruned by GC itself; a root that is still
-valid stays until the symlink goes. Never `rm -rf` inside `/nix/store` — GC is
-the only safe deleter, because only it walks the reference graph.
+A dangling `gcroots/auto` link is pruned by GC itself. Never `rm -rf` inside
+`/nix/store`: GC is the only safe deleter, because only it walks the reference
+graph. **A small reclaim is not a failed reclaim** — ten same-nixpkgs generations
+on netbook returned 140 MiB because they share almost every path, so compare
+store size against the closure, not the generation count.
 
-**A small reclaim is not a failed reclaim.** Ten same-nixpkgs generations on
-netbook returned 140 MiB: they share almost every path, so there was little to
-free. Compare store size against the closure, not against the generation count.
-
-Fleet defaults that do the routine half: `nix.gc` runs `--delete-older-than 10d`
+Fleet defaults do the routine half: `nix.gc` runs `--delete-older-than 10d`
 (`modules/global/global.nix`) and `nas-client.nix` prunes roots that live on an
 absent NAS before `nix-gc` starts. Neither touches a root outside those two
-patterns — which is why the `--print-roots` check belongs in the operator's hands.
+patterns, which is why `--print-roots` belongs in the operator's hands.
 
 ## Service module conventions
 
@@ -186,55 +179,47 @@ patterns — which is why the `--print-roots` check belongs in the operator's ha
   `programs.niri.enable` for anything bound to `graphical-session.target`, a
   systemd `Condition*` for a file nobody declares — and the compositor's
   `spawn-at-startup` starts that target and imports `WAYLAND_DISPLAY`, so
-  session units are pulled in by a session instead of by home-manager activation.
+  session units are pulled in by a session, not by home-manager activation.
 - **A daemon states its crash-loop class where it is declared**
   [[flake/policies.nix#systemd-daemons-declare-their-class]]:
   `unitConfig.X-Fleet-Role = "daemon"` (must come back: `Restart` set, and
   `StartLimitIntervalSec = 0` with `RestartSteps`/`RestartMaxDelaySec` so the
-  default 5-starts-in-10s limit cannot retire it) or `"bounded"` (retiring is the
-  point, so carry an explicit `StartLimitBurst`). Both the class and its
-  consequence are asserted per host by `modules/systemd-policy.nix`, over the
-  evaluated unit set — so the failure names the unit, not a daemon that quietly
-  stopped days later.
+  default 5-starts-in-10s limit cannot retire it) or `"bounded"` (carry an
+  explicit `StartLimitBurst`). `modules/systemd-policy.nix` asserts both the
+  class and its consequence over the evaluated unit set, so the failure names
+  the unit rather than a daemon that quietly stopped days later.
 
 ## A mount to a sleeping peer must fail fast
 
 `mount.nfs` retries a failed mount for **2 minutes by default** (`retry=`, counted
 in minutes — a different knob from the data-path `retrans=`). A mount whose peer
-is off by design therefore pays up to that on *every* walk of the mount table, and
-one such mount blocks whole tools: they `statfs()` every entry before applying any
-filter.
+is off by design pays up to that on *every* walk of the mount table, and one such
+mount blocks whole tools: they `statfs()` every entry before applying any filter.
 
 - **`duf` cannot be told to skip it.** `--hide-mp <exact>`, `--hide-mp` with a
 glob and `--hide-fs autofs` all still block (measured 2026-10-28), because the
-probe runs first. Its output is empty while it waits, which reads as a hang.
+probe runs first, and its output is empty while it waits.
 - **`df` is not proof the mount is cheap.** It finished in 17 ms only because
-coreutils skips autofs entries without a statfs; name the path
-(`df /mnt/burgernas/peachcable`) and it blocks like everything else.
+coreutils skips autofs entries without a statfs; name the path and it blocks.
 - **`btop` and `updatedb` trip the same wire** — the journal fills with automount
 requests naming them.
 
 Measured cost before the fix: 90 s per probe, ending in `Result=timeout` because
-systemd's `DefaultTimeoutStartSec` had to kill `mount.nfs` mid-retry.
-
-A cold-vault mount carries two options: `retry=0` (the connect itself fails in
+systemd's `DefaultTimeoutStartSec` killed `mount.nfs` mid-retry. A cold-vault
+mount carries two options: `retry=0` (the connect itself fails in
 under a second with "no route to host", so nothing is left to retry) and
 `x-systemd.mount-timeout=10s` as the backstop for the other hang class — peer
-reachable, handshake stuck. That lands at ~3 s per probe and `Result=exit-code`.
-They live in the profile that owns the mount, `profiles/burgernas-client.nix`, so
-a host that mounts the vault inherits them rather than rediscovering the default;
-the same rule applies to any new mount pointed at a machine that is normally off.
-
-Trade-off to state out loud: `retry=0` means one attempt, so a transient network
-blip fails the mount instead of retrying for two minutes. For an automount that
-is the right trade — the next access re-triggers it.
+reachable, handshake stuck. That lands at ~3 s per probe and `Result=exit-code`,
+in `profiles/burgernas-client.nix` so a host that mounts the vault inherits them.
+The trade: `retry=0` fails on a transient blip instead of retrying for two
+minutes, which for an automount is right — the next access re-triggers it.
 
 ## CI quirk
 
-CI builds with `nix build -L .?submodules=1#…`: `?submodules=1` is what makes
-`modules/secrets` visible to the evaluator. A local build does not need it because
-the submodule is already checked out — and CI cannot drop it
-[[flake/policies.nix#ci-builds-config-and-gate]]. Pipeline itself:
+CI builds with `nix build -L .?submodules=1#…`: `?submodules=1` makes
+`modules/secrets` visible to the evaluator. A local build does not need it (the
+submodule is checked out) and CI cannot drop it
+[[flake/policies.nix#ci-builds-config-and-gate]]. Pipeline:
 [`ci-pipeline.md`](./ci-pipeline.md).
 
 ## `git push` dies on the secrets submodule
@@ -258,13 +243,13 @@ branch name the submodule does not have.
   — that option is for `git submodule update --remote`.
 - `--recurse-submodules=on-demand` does not either; the source ref comes from the
   push refspec, not from the submodule's config.
-- `git push --no-recurse-submodules` works, but silently leaves a dangling pointer
-  when the submodule has commits of its own.
 
-Use `scripts/task/git-push.sh [--dry-run] [remote] [branch]`, which pushes each
-submodule's missing commits to its remote's default branch first (`HEAD:refs/heads/<master>`,
-since a submodule has no `@{u}`), then the superproject with recursion off. Every
-`dev:git:*` push task and `services:build` already call it.
+Use `scripts/task/git-push.sh [--dry-run] [remote] [branch]`: it pushes each
+submodule's missing commits to its remote's default branch (`HEAD:refs/heads/<master>`,
+since a submodule has no `@{u}`), then the superproject with recursion off. A bare
+`--no-recurse-submodules` skips that first step and leaves a dangling pointer
+whenever the submodule has commits of its own. Every `dev:git:*` push task and
+`services:build` call the script.
 
 ## Agent failure modes
 
@@ -304,17 +289,10 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     portal/keyring stack installed behind whatever WM you added; the session
     changes and nothing it opens does. Fork the profile and the HM module list
     instead — enforced by [[flake/policies.nix#desktop-fork-not-disable]], which
-    also catches dropping infrastructure the profile carried (tailscaled, the NAS
-    mount behind `~/Documents/nixconfig`).
-
-    `modules/profiles/ryoku-desktop.nix` is that fork: it imports
-    `desktop-client` and declares none of the compositor build, session packages,
-    portals, keyring, fonts or SDDM theme, because `programs.ryoku` supplies them —
-    the pilot exists to measure what Ryoku actually brings into the closure
-    (`docs/closure-reduction.md`). It also settles the two daemons that cannot
-    coexist with Ryoku: power-profiles-daemon is Ryoku's, so auto-cpufreq is
-    forced off for hosts such as fern, and gnome-keyring gets the PAM wiring that
-    Ryoku does not do for secret-service clients.
+    also catches dropping infrastructure the profile carried. That fork is
+    `modules/profiles/ryoku-desktop.nix`: it imports `desktop-client` and declares
+    nothing `programs.ryoku` supplies, and settles the two daemons that cannot
+    coexist with it (auto-cpufreq forced off, gnome-keyring's PAM wiring kept).
 12. **A comment is not a home for a fact.** Nothing compiles a `#` block:
     `.#knowledgeGraph`, qmd and the skills index are built from `docs/*.md`,
     `.agents/skills/*` and the compiled registry, so an explanation written
@@ -326,16 +304,13 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     home that drifts. Gate: `task checks:nix:prose` (pre-commit, on added lines) —
     [[flake/policies.nix#nix-header-budget]].
 13. **An inherited `PS0` prints the preexec hook at every prompt.** `bash-preexec`
-    (sourced by atuin's bash integration) hooks preexec by *appending* to `PS0`, and
-    bash prints whatever `PS0` holds outside that `${ …; }` form at every prompt,
-    with `$_` expanded — so a `PS0` inherited from a parent shell reprints itself in
-    every new terminal. Measured 2026-10-27: a fresh foot window's first prompt
-    printed the entire zoxide init script (`$_` is the last argument of the
-    `.bashrc` eval that initializes zoxide) followed by `>&2; }`, and each prompt
-    after it reprinted the previous command's last argument. `modules/shell/atuin.nix`
-    clears an inherited `PS0` and its export attribute before bash-preexec installs
-    its hook; a live session is cleaned with `export -n PS0` plus one re-assignment
-    to bash-preexec's own string.
+    (sourced by atuin's bash integration) appends to `PS0`, and bash prints whatever
+    else `PS0` holds at every prompt, with `$_` expanded — so a `PS0` inherited from
+    a parent shell reprints itself in every new terminal. Measured 2026-10-27: a
+    fresh foot window printed the whole zoxide init script (`$_` was the last
+    argument of the `.bashrc` eval) plus `>&2; }`, then the previous command's last
+    argument at each prompt. `modules/shell/atuin.nix` clears an inherited `PS0`
+    before bash-preexec installs its hook; a live session needs `export -n PS0`.
 
 14. **A `git init` in `$HOME` makes every prompt walk the home tree.** Once `~`
     is a repository starship's `git_status` runs there, and Starship 1.x has no
@@ -355,8 +330,8 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
 ## An upstream with no tags
 
 `tildegit.org/solderpunk/molly-brown` publishes neither tags nor releases (both
-lists empty, measured 2026-10-29), so "the newest release" can only be the tip of
-master. `overlays/molly-brown.nix` pins `src` to master and keeps nixpkgs' own
+lists empty, 2026-10-29), so "the newest release" can only be the tip of master.
+`overlays/molly-brown.nix` pins `src` to master and keeps nixpkgs' own
 `vendorHash` — the go module set has not moved since nixpkgs' 2023-02-10 pin —
 verified by building the override locally. Only `src` and `version` differ.
 
@@ -400,7 +375,6 @@ removed on 2026-11-07 because the counterfactual moved: the jq path answers in
 25 ms does not pay 27 MB resident, 1383 lines of engine, a socket protocol and a
 byte-parity gate. `save` is a claim about *today's* alternative, so
 `task ops:kg:speed` re-measures it rather than restating it.
-
 ## The eval the graph reads
 
 `nix eval` never answers from its cache: every graph read was a full evaluation

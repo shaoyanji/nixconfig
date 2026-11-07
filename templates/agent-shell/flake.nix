@@ -18,6 +18,11 @@
     ];
   };
 
+  # `flake.lock` is tracked here, unlike a lock-free template, because the fleet
+  # runs this shell BY PATH (`task clanker:devshell -- ./templates/agent-shell#default`)
+  # and a missing lock makes every run resolve branch heads and write the file
+  # back into the tree — an untracked file that then refuses a host switch.
+  # Refresh it on purpose: `nix flake lock ./templates/agent-shell`.
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     llm-agents.url = "github:numtide/llm-agents.nix";

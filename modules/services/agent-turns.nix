@@ -14,7 +14,7 @@
   # is the same artefact the project's own pipeline produces, pinned by hash.
   xsPackage = pkgs.stdenvNoCC.mkDerivation rec {
     pname = "cross-stream";
-    version = "0.14.2";
+    version = "0.15.0";
 
     src = pkgs.fetchurl {
       url = "https://github.com/cablehead/xs/releases/download/v${version}/cross-stream-v${version}-linux-${arch}.tar.gz";
@@ -62,8 +62,8 @@
     then "amd64"
     else sys;
   hashes = {
-    arm64 = "sha256-APkEWINzhrdG+IjpdQf0e4gyN/yDsDOtpwoptZrKCeE=";
-    amd64 = "sha256-Q9YfvvarRYuPYb5mWZqf8K7lfVoObE2MwrRn5nu9UIU=";
+    arm64 = "sha256-fRL78QplIHKoqKHMEwdluMhSNKjshmkhd1cfiTWC1/w=";
+    amd64 = "sha256-TziugggKvu0Poaz1m4M1ykBVsR9ISeMC/vE9hTgCYIQ=";
   };
 
   # A token's holder is not always this module's user: the turns dashboard runs

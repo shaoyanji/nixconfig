@@ -15,7 +15,7 @@ Protocol: `AGENTS.md` § "Agent turns", `docs/agent-context/HOME-PREAMBLE.md`.
 
 | Layer | What | Where |
 | :--- | :--- | :--- |
-| Store | `xs` 0.14.2 (`cross-stream`), topic `agent.turns`, ttl `forever` | `/var/lib/xs-agent-turns/store`, Unix socket `store/sock` |
+| Store | `xs` 0.15.0 (`cross-stream`), topic `agent.turns`, ttl `forever` | `/var/lib/xs-agent-turns/store`, Unix socket `store/sock` |
 | Shim | Go stdlib + pure-Go sqlite, bearer auth, schema + secret allowlist, dedup index | `127.0.0.1:8093`, `dedup.sqlite` beside the store |
 | Exposure | `tailscale serve --https=8449` → `http://127.0.0.1:8093` | `https://delphi.cloudforest-kardashev.ts.net:8449` |
 | Units | `xs-agent-turns.service`, `agent-turns-shim.service`, `tailscale-serve-agent-turns.service` | delphi |

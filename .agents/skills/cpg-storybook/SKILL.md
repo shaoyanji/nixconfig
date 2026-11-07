@@ -184,8 +184,41 @@ Traps that cost a run:
 - A spread whose wav is much longer than its words suggests is not a slow voice —
   measure `silencedetect` before inventing a `--length_scale` for it.
 
-Ambience is synthesised (`anoisesrc` → lowpass → fade), so nothing in a published
-book is a licensed sample. Real SFX and a second language are open work.
+### Sound, for real
+
+```bash
+python3 …/sfx.py fetch --project $PWD     # 9 CC0 clips into audio/sfx/ + credits
+python3 …/sfx.py cues  --project $PWD     # sfx.json: which clip sits on which page
+python3 …/media.py mix --project $PWD …   # picks up sfx.json by itself
+```
+
+The clips come from Freesound through the **Openverse** API filtered to `cc0`,
+so a published book needs no licence argument — and `credits.json` plus
+`site/sfx.html` are written anyway, because "CC0" is a claim about a file and a
+credit line is what a reader can check. The shelf is nine cues: river, crickets,
+wind, owl, birdsong, page turn, glass chime, snow footsteps, wood creak.
+
+Traps, all measured:
+
+- **Openverse answers 403 without a `User-Agent`** and rate-limits anonymous
+  callers, so requests are spaced and the UA says who is asking.
+- What it returns for a Freesound hit is the **preview mp3**, not the original
+  upload. Fine for a CC0 sound, and it is what makes the fetch keyless.
+- **The title filter needs an avoid list.** The top CC0 result for "river
+  ambience" is `City river ambience 2 (chatter)` — people, not water.
+- **One-shots carry lead-in room tone.** A page turn placed at 0.12 s measured
+  −27.9 dB at the head of the page: the sound arrived late. Download-time
+  `silenceremove` plus a cue position that matches where the recording actually
+  peaks is the fix.
+- **A page turn peaks at its plop, not its rustle.** The cue carries a negative
+  `at` (−1.6 s) and lands on the cut, which is where a page actually turns.
+- **Stacking cues needs a limiter.** Beds at 0.06–0.12 and one-shots at 0.20–0.40
+  against narration normalised to −16 LUFS put the first mix at −0.9 dB peak;
+  `alimiter=limit=0.85` keeps the ceiling while the mean stays −16.7.
+- `--synth-bed` still mixes the generated noise bed, for a book with no sfx files.
+
+A second language is open work: the harness takes `--lang` and a voice per
+language, and only German has a script.
 
 ## Probing the wall on purpose
 

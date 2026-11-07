@@ -5696,7 +5696,8 @@
         fleet's own (a store, a vault, a mail archive), and its Python cost is paid
         continuously — resident MB, an interpreter in the closure, a restart that answers late.
         Contest the language only when the read path is hard enough to be worth a benchmark;
-        otherwise stdlib Go, because the fleet now has two services in that shape.
+        otherwise stdlib Go, because the fleet now has three services in that shape
+        (the turns shim, the zettel reader, this console).
         Do not port a timer-sized one-shot (its Python start is a rounding error on what the
         job does) and do not port a model server (torch and transformers are the work; eisen's
         parakeet, qwen-image and decision-model servers stay Python by nature, not by inertia).

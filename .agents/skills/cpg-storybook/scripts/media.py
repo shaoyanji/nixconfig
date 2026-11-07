@@ -244,8 +244,17 @@ def cmd_mix(args) -> int:
     dest = project / "audio" / args.lang / voice
     if not dest.exists():
         sys.exit(f"media: no narration for {voice}; run `say` first")
+    # An audition is two spreads, not a book: `--spreads` with `--out` renders a
+    # clip somewhere else, so a level test costs seconds and cannot be mistaken
+    # by `publish.py` for another edition of the book.
+    if args.spreads:
+        wanted = [s.strip() for s in args.spreads.split(",") if s.strip()]
+        kept = [s for s in book["spreads"] if s["id"] in wanted]
+        if len(kept) != len(wanted):
+            sys.exit(f"media: no such spread(s): {args.spreads}")
+        book = {**book, "spreads": kept}
     site = project / "site"
-    video = project / "video"
+    video = (Path(args.out) if args.out else project / "video").resolve()
     video.mkdir(parents=True, exist_ok=True)
     slug = args.slug or project.name
     plan = {} if args.dry_bed else cues_for(project)
@@ -281,7 +290,7 @@ def cmd_mix(args) -> int:
     # A one-variant run must not erase the other variant's measurements: the
     # A/B page reads both, and `--only music` is the cheap way to retune a bed.
     mixfile = video / f"mix-{args.lang}-{voice}.json"
-    prior = json.loads(mixfile.read_text()) if mixfile.exists() else {}
+    prior = json.loads(mixfile.read_text()) if (mixfile.exists() and not args.out) else {}
     merged = {k: v for k, v in (prior.get("variants") or {}).items() if k != "duck"}
     merged.update(report)
     if merged.get("plain") and merged.get("-music"):
@@ -289,13 +298,14 @@ def cmd_mix(args) -> int:
             "bed_window_delta_db": _delta(merged["plain"], merged["-music"], "bed_window"),
             "speech_window_delta_db": _delta(merged["plain"], merged["-music"], "speech_window"),
         }
-    mixfile.write_text(json.dumps({
-        "slug": slug, "lang": args.lang, "voice": voice,
-        "spreads": len(book["spreads"]),
-        "music": str(bed) if bed else prior.get("music"),
-        "music_gain": args.music_gain, "duck_threshold": args.duck,
-        "duck_ratio": args.duck_ratio, "variants": merged,
-    }, indent=1))
+    if not args.out:
+        mixfile.write_text(json.dumps({
+            "slug": slug, "lang": args.lang, "voice": voice,
+            "spreads": len(book["spreads"]),
+            "music": str(bed) if bed else prior.get("music"),
+            "music_gain": args.music_gain, "duck_threshold": args.duck,
+            "duck_ratio": args.duck_ratio, "variants": merged,
+        }, indent=1))
     print(json.dumps({k: {"book": v.get("book"), "web": v.get("web")}
                       for k, v in report.items() if isinstance(v, dict) and "book" in v}
                      | {"mix": f"video/mix-{args.lang}-{voice}.json"}, indent=1))
@@ -443,6 +453,11 @@ def main() -> int:
                            help="sidechain ratio; 6 buries the bed, 3 steps it back")
             p.add_argument("--only", choices=["both", "plain", "music"], default="both",
                            help="render one cut only (a bed tweak does not need both)")
+            p.add_argument("--spreads", default="",
+                           help="comma-separated spread ids to render as a clip, e.g. s01,s02")
+            p.add_argument("--out", default="",
+                           help="write the render somewhere other than <project>/video "
+                                "(used with --spreads for an audition)")
         p.set_defaults(fn=fn)
     args = ap.parse_args()
     return args.fn(args)

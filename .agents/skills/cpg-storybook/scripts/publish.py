@@ -173,7 +173,10 @@ def write_mix_page(root: Path, site: Path, manifest: dict,
         + (f'<p>Music: <b>{esc(music.get("title", ""))}</b> — {esc(music.get("creator", ""))} '
            f'({esc(music.get("license", ""))}), credited on the <a href="sfx.html">sound page</a>.</p>'
            if music else "")
-        + ("<ul>" + "".join(notes) + "</ul>" if notes else ""))
+        + ("<ul>" + "".join(notes) + "</ul>" if notes else "")
+        + (('<p><a href="bed.html">Zwei Pegel der Musik zum Vergleich</a> — '
+            'die Spieluhr leise und präsent auf denselben zwei Seiten.</p>')
+           if (site / "bed.html").exists() else ""))
 
 
 def main() -> int:

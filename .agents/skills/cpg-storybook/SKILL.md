@@ -218,7 +218,12 @@ python3 …/sfx.py music --project $PWD
 python3 …/sfx.py music --project ../other-book --source ../this-book/audio/music/bed.wav
 python3 …/media.py mix --project $PWD --lang de --slug lantern          # both cuts
 python3 …/media.py mix --project $PWD … --only music                   # bed tweak only
+python3 …/media.py mix --project $PWD … --only music --music-gain 0.30 --spreads s01,s02 --out /tmp/aud
 ```
+
+The third form is the audition: two spreads instead of a book, into a directory
+of its own, so a level trial is 40 seconds of encoding and cannot be mistaken for
+another edition by `publish.py`.
 
 `mix` renders two books from one command: the cue-only cut and the same book
 with the bed (`-music` suffix). Same narration, same cues, one variable — which
@@ -231,20 +236,33 @@ top hit.
 
 The bed is ducked by the narration itself rather than by a hand-drawn volume
 envelope: `sidechaincompress` keyed on the voice, 3:1 above 0.05. Measured on
-the lantern book's delivered web cut (gain 0.22 on a −20 LUFS music box):
+the lantern book's delivered web cut, 0.05–0.55 s in — a window with music and
+cues but no words, so it isolates the bed:
 
-| Window | Plain | With bed |
+| Gain | Pre-roll, s01 | Under the voice (1.2–3.2 s) |
 | :--- | :--- | :--- |
-| 0.7 s pre-roll before the first word, s01 | −48.1 dBFS | −33.8 dBFS |
-| the same pre-roll on s07 / s14 / s21 / s28 | −48.1 / −45.5 / −55.2 / −40.9 | −34.0 / −34.3 / −34.8 / −35.1 |
-| inside speech (s01, 1.2–3.2 s) | −15.3 dBFS | −15.3 dBFS |
+| none (cues only) | −48.1 dBFS | −15.4 dBFS |
+| 0.16 (shipped) | −36.4 dBFS | −15.4 dBFS |
+| 0.22 | −33.8 dBFS | −15.3 dBFS |
+| 0.30 | −31.1 dBFS | −15.4 dBFS |
 
-So the bed is ~20 dB under the voice in the pauses, present at every spread of a
-573 s book (the loop is per spread, not one pass over the book), and 0.0 dB
-inside the words. The first attempt at gain 0.07 measured −42.8 dBFS and a 6:1
-duck erased it entirely: a bed you can only hear between sentences reads as a
-hole, not a bed. `mix-<lang>-<voice>.json` keeps both windows, so the numbers on
-`mix.html` are measurements of the files the browser gets.
+The duck is what makes the last column flat: the bed is 16 to 25 dB under the
+voice depending on the gain, and 0.0 dB of it survives under a word. So the gain
+only decides how much is heard in the pauses, and one dial tunes the whole book.
+The loop is per spread: the same pre-roll measured −34.0 / −34.3 / −34.8 / −35.1
+at 0.22 on s07 / s14 / s21 / s28 of a 573 s book.
+
+The default is **0.16**, chosen by the rule for a book read at bedtime: the bed
+should be findable, not followable. Where the two failure modes are "too quiet"
+(a listener turns it up, nothing is lost) and "too present" (a listener stops
+playing it), a level picked without an ear in the loop goes low. `site/bed.html`
+on the lantern serves both 0.16 and 0.30 on the same two spreads with the numbers
+above, so the pick can be overturned in one command rather than an argument.
+
+History, because both mistakes are cheap to repeat: gain 0.07 measured −42.8 dBFS
+and a 6:1 duck erased it entirely; that reads as a hole, not a bed.
+`mix-<lang>-<voice>.json` keeps both windows, so the numbers on `mix.html` are
+measurements of the files the browser gets, not of the filter.
 
 The masters are large — 129 MB for 28 spreads at crf 20, 40 MB for the 960 px
 web cut — which is why the page serves the web cut and the A/B page does too.
@@ -267,7 +285,16 @@ re-spend.
 The round needs `cpg`. On 2026-11-07 `app.chatplayground.ai` answered
 **NXDOMAIN** from two independent networks (`www.chatplayground.ai` still served
 200, so this is the API host being withdrawn, not a resolver fault) and the
-lantern adaptation was written in the agent instead. Check that host before
+lantern adaptation was written in the agent instead. Everything except the model
+call was proved with stand-ins on `PATH` — a fake `cpg` printing one chunk's JSON
+and a fake `jev-decide` choosing `c1` — which exercised the prompt, the four
+lanes, the parse, the merge and the resume in `state/adapt-<lang>.json`.
+
+`CHATPLAYGROUND_BASE_URL` is read by `chat.go`, but the catalog, the image path
+and the entitlement call hardcode `app.`; a base-URL switch only helps if the
+host answers `/api/chat/azure`. On 2026-11-07 `web.chatplayground.ai` answered
+`/api/models` 200 and `/api/chat/azure` 404, so the chat route had moved too and
+the switch bought nothing. Check that host before
 planning a round.
 
 Traps, all measured:
@@ -319,6 +346,25 @@ probe that is out of budget costs seconds, not minutes. The daily counter binds
 long before the 25/h window can (the burst ran at ~150/h and was never
 throttled), and the entitlement's `250/1d` rate is not the number that stops a
 run.
+
+## Comparing an adaptation with a hand-written edition
+
+`adapt.py` writes `script.<lang>.json` where a hand edition may already live, so
+a comparison is a copy, not a destructive run:
+
+```bash
+cp script.de.json script.de.hand.json             # keep the hand edition
+python3 …/adapt.py  --project $PWD --lang de      # writes script.de.json
+python3 …/compare.py --project $PWD --lang de     # hand vs round, page by page
+python3 …/compare.py … --html site/adapt.html     # the same, side by side
+```
+
+`compare.py` prints chars, sentence count and the flags that say where a reading
+is needed: `longer ×1.44` / `shorter ×0.61` (length drift past a third), `digits`
+(a read-aloud voice says "12" in the wrong language), `name:Kröte` (a character
+word the glossary pins vanished from a page), `missing` / `empty`. It does not
+rank the editions — which is better is a reading — and it compares the files it
+is given, so a rerun never destroys the hand text it is judging.
 
 ## Failure behaviour
 

@@ -81,6 +81,14 @@ in {
         path = "${config.home.homeDirectory}/.local/share/atuin/key";
         mode = "0600";
       };
+      "atuin-password" = {
+        key = "atuin/password";
+        mode = "0600";
+      };
+      "atuin-mnemonic" = {
+        key = "atuin/key";
+        mode = "0600";
+      };
       "gemini/api/key" = {};
       # "todoist" = {
       #   sopsFile = ./secrets.json;

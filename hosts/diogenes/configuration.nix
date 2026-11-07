@@ -10,9 +10,28 @@ in {
     ./hardware-configuration.nix
     self.modules."profiles.base-desktop-environment"
     self.modules."profiles.laptop"
+    self.modules."profiles.sops-user-identity"
   ];
 
   networking.hostName = "diogenes";
+
+  # User-plane sops identity derived from host key (/etc/ssh/ssh_host_ed25519_key)
+  profiles.sopsUserIdentity.enable = true;
+
+  # Low-memory desktop optimizations: 100% zram and aggressive swappiness
+  zramSwap = {
+    enable = true;
+    memoryPercent = lib.mkForce 100;
+    algorithm = "zstd";
+    priority = 100;
+  };
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 180;
+    "vm.watermark_boost_factor" = 0;
+    "vm.watermark_scale_factor" = 125;
+    "vm.page-cluster" = 0;
+  };
+  services.fstrim.enable = true;
 
   boot.supportedFilesystems = ["btrfs" "nfs"];
   ssh.ca.enableClient = true;

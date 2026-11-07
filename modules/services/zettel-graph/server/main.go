@@ -291,7 +291,9 @@ func (s *server) static(w http.ResponseWriter, requestPath string) error {
 	}
 	info, err := os.Stat(candidate)
 	if err != nil || info.IsDir() {
-		return refuse(404, "not found")
+		// The Python server answered `<name> is not there` from send_file; the
+		// name is part of what a caller saw, so the port keeps it.
+		return refuse(404, "%s is not there", filepath.Base(candidate))
 	}
 	ctypes := map[string]string{
 		".html": "text/html; charset=utf-8",

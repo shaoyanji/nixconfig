@@ -117,3 +117,27 @@ touched. Delphi, 2026-11-07, one box, one fixture per server.
 result: both servers wait on one `comrak` process, so the render, not the
 runtime, is the cost. The ledger — the page a person actually lands on — and the
 concurrency ceiling are where the port paid.
+
+## The cutover, checked against the live host
+
+A measurement says what is faster; it says nothing about a route that answers
+differently now. So delphi was captured before the switch (Python) and after it
+(Go) on the same request list — every page, every JSON view, and the refusals
+(`401`, `400`, `404`, `405`) — and the bodies compared byte for byte.
+
+| | result |
+| :--- | :--- |
+| pages (`/`, a post, the editor, both 404 pages, `zettel`'s 66 KB index) | **byte-identical** |
+| JSON views | equal after parsing; Go emits `{"k":v}` where Python emitted `{"k": v}`, and sorts object keys |
+| `graph.json` (591 KB, produced by the Python exporter) | identical apart from `meta.generated` |
+| `GET /v1/events?limit=5` | 4 of 5 events field-for-field identical; the fifth is a turn another agent appended between the two captures |
+
+The comparison earned its keep: it caught a porting slip the tests did not —
+`zettel`'s 404 answered `not found` where Python had named the file
+(`nope is not there`). Same status, same content-type, different sentence.
+
+Landing it: `REMOTE_BUILD=1 task infra:switch:nixos` failed first, because
+delphi's tree is substitutable except for 18 per-host glue derivations (`etc`,
+`activate`, `system-path`, `home-manager-generation` — no package compiles) and
+`max-jobs 0` forbids building those too. Pre-building the toplevel took 10 s and
+the switch then substituted and activated.

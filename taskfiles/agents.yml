@@ -287,23 +287,21 @@ tasks:
       - bash scripts/task/xs-turn-post.sh
 
   agents:xs:demo:
-    desc: "Prove publish -> live push off-tailnet: a read-only reader behind a temporary Tailscale Funnel, one real turn posted, the row asserted, the funnel torn down"
+    desc: "Prove publish -> live push on the public mount: one real turn posted, the row asserted in an open browser, no funnel and no rebuild"
     summary: >
-      The cheap end-to-end proof on delphi: the deployed dashboard serves the real
-      store -read-only on loopback, `tailscale funnel --https=10000` exposes it, a
-      browser opens that URL, one turn is posted with the publisher agents use, and
-      the row must appear without a reload (a marker set before the post survives)
-      while the public stream carries the frame. The funnel is torn down in a trap
-      and its absence verified against the URL. SUB=off, KEEP=1, PORT=, BROWSER=0.
-      Exit 0 = proved and down, 1 = the row never arrived, 2 = preflight, 3 = no funnel.
+      The cheap end-to-end proof on delphi. The public mount
+      `https://delphi.bountystash.com/turns/` proxies a read-only reader, so it
+      renders rows and no prompt form; this asserts that posture, opens the page,
+      posts one turn through the publisher agents use, and requires the row in the
+      open page while a window marker set before the post survives, plus the frame
+      on the public stream. No rebuild, no exposure for the run. PUBLIC_URL=,
+      BROWSER=0, AGENT_BROWSER=. Exit 0 = push proved, 1 = the row never arrived,
+      2 = preflight (nothing was posted).
     env:
-      SUB: '{{.SUB | default "run"}}'
-      PORT: '{{.PORT | default "8071"}}'
-      FUNNEL_PORT: '{{.FUNNEL_PORT | default "10000"}}'
-      KEEP: '{{.KEEP | default ""}}'
+      PUBLIC_URL: '{{.PUBLIC_URL | default ""}}'
       BROWSER: '{{.BROWSER | default "1"}}'
     cmds:
-      - bash scripts/task/turns-funnel-demo.sh
+      - bash scripts/task/turns-live-demo.sh
 
   agents:xs:queue:
     desc: "The unposted turn queue: depth, oldest entry, and what was rejected (read-only)"

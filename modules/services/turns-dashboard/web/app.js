@@ -76,7 +76,10 @@ function streamState(state) {
 }
 
 streamState("connecting");
-const es = new EventSource("/api/stream");
+// Relative on purpose: the same files are served at `/` on the tailnet mount and
+// at `/turns/` on the public one, and an absolute `/api/stream` would leave the
+// public page streaming from the site root instead of the dashboard.
+const es = new EventSource("api/stream");
 es.onopen = () => streamState("live");
 const onPayload = (payload) => {
   streamState("live");
@@ -90,7 +93,7 @@ es.onerror = () => streamState("retrying");
 async function ask(row, prompt) {
   const box = document.getElementById(`req-${row}`);
   if (box) box.textContent = "▸ dispatched";
-  const res = await fetch("/api/prompt", {
+  const res = await fetch("api/prompt", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({row, prompt}),

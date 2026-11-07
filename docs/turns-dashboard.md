@@ -5,7 +5,9 @@ pushed live, with a prompt box on every row.
 
 `modules/services/turns-dashboard.nix` serves it on loopback `:8099`; the mount
 `turns` in `hosts/delphi/configuration.nix` publishes it at
-`https://delphi.cloudforest-kardashev.ts.net:8460` and is the only exposure.
+`https://delphi.cloudforest-kardashev.ts.net:8460`, where the prompt box works.
+A second, prompt-less reader is the public mount at
+`https://delphi.bountystash.com/turns/` (see below).
 
 ## What it is
 
@@ -58,33 +60,40 @@ second credential plane for no isolation the tailnet does not already give. The
 unit therefore keeps no `NoNewPrivileges`: subagents escalate through the setuid
 sudo wrapper.
 
-## Off the tailnet, for one bounded run
+## The public mount, and why it cannot prompt
 
-The page was first verified against a mock store and a browser on a tailnet host,
-which proves the client and not the path. `task agents:xs:demo` proves the path
-with the deployed binary and the real store:
+`https://delphi.bountystash.com/turns/` is the same log for a reader with no
+tailnet. nginx proxies a second reader (`services.turnsDashboard.publicPort`, a
+loopback port) that runs `-read-only` and has no Hermes: its rows carry no prompt
+form and `POST /api/prompt` answers 403, so that mount publishes the field and
+cannot spend an agent turn. The tailnet mount on `:8460` stays the only browser
+surface where a prompt can start.
+
+Both mounts serve the same files, so the page's assets and stream are relative
+(`style.css`, `api/stream`): an absolute `/api/stream` would leave the public page
+streaming from the site root.
+
+`task agents:xs:demo` is the proof, and it is cheap — no rebuild, no funnel:
 
 ```bash
-task agents:xs:demo          # reader + funnel + one post + browser assert + teardown
-task agents:xs:demo KEEP=1   # leave the funnel up to look at it
-task agents:xs:demo SUB=off  # take down a run that was left behind
+task agents:xs:demo              # posture + one post + browser assert
 ```
 
-The reader runs with `-read-only`: the rows carry no prompt form and
-`POST /api/prompt` answers 403, so a public URL cannot spend an agent turn. The
-funnel is `tailscale funnel --https=10000` (Tailscale allows 443, 8443 and 10000,
-and 8443 is already a serve mount here). It is removed in a trap, and the script
-asks the public URL again to prove it is gone instead of trusting the removal.
+It asserts the public posture first (rows present, no prompt form), opens the
+page, posts one turn through the publisher `agents:xs:post` uses, and then
+requires the frame on the public stream *and* the row in the open page while a
+`window` marker set before the post survives — a page that navigated would have
+cleared it.
 
-The assertion is two-sided: a stream opened *before* the post must carry the
-frame, and the browser must grow the row while a `window` marker set before the
-post survives — a page that navigated would have cleared it.
+A temporary Tailscale Funnel was the first way this was demonstrated (read-only
+reader on loopback, `tailscale funnel --https=10000`, removed and verified gone).
+It worked and it is no longer needed now that the public vhost exists.
 
 ## Not done
 
-- No authentication beyond the tailnet. The page can spend agent budget; the
-  mount is the fence, and `-read-only` is the fence for a temporary funnel.
+- The public mount has no authentication: it is readable by anyone with the URL,
+  and it is read-only by construction rather than by policy.
 - The log carries the newest turns at connect; older history is the store's
   (`agents:xs:list`), not a second paging protocol here.
-- The demo is a run, not a CI gate: it needs delphi, sudo and a public hostname,
-  so it stays an operator instrument (`agents:xs:demo`).
+- The demo is a run, not a CI gate: it needs delphi (the store and the token), so
+  it stays an operator instrument (`agents:xs:demo`).

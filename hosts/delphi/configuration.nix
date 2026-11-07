@@ -825,6 +825,25 @@ in {
               "/recon/" = reconLocation;
               "= /recon".extraConfig = reconRedirect;
             }
+            # The agent-turn log, readable by anyone with the URL: the row carries
+            # no prompt form and /api/prompt answers 403 there, so this mount can
+            # publish the field and spend nothing.
+            // lib.optionalAttrs (config.services.turnsDashboard.publicPort != null) {
+              "/turns/" = {
+                proxyPass = "http://127.0.0.1:${toString config.services.turnsDashboard.publicPort}/";
+                extraConfig = ''
+                  proxy_http_version 1.1;
+                  proxy_set_header Connection "";
+                  # SSE is the page: a buffering proxy delivers the log in bursts
+                  # or not at all, and a short read timeout drops an idle stream.
+                  proxy_buffering off;
+                  proxy_cache off;
+                  proxy_read_timeout 1h;
+                  add_header Cache-Control "no-store";
+                '';
+              };
+              "= /turns".extraConfig = "return 301 /turns/;";
+            }
             // microvmProxyLocations false
             // stirlingPublicRedirect
             // lib.optionalAttrs slidesEnabled (slideshowLocations false);
@@ -1139,6 +1158,12 @@ in {
   # Read-only over the shim, plus one prompt box per turn that runs the same
   # `hermes -z` an operator would type. The mount below is the whole exposure.
   services.turnsDashboard.enable = true;
+  # The public vhost publishes the log at /turns/. It proxies a second reader that
+  # runs -read-only and has no Hermes, so the public page cannot prompt: the
+  # tailnet mount (`turns` in servicePortal below) is still the only place an
+  # agent turn can be started from a browser. 8070 is loopback and otherwise
+  # unused on this host.
+  services.turnsDashboard.publicPort = 8070;
   # The store is the fleet's shared memory and it lives only here, so it gets a
   # nightly dump that leaves the host. 03:05 is inside frieren's maintenance
   # window and ahead of its 03:28 BurgerNAS and 03:30 local restic snapshots —

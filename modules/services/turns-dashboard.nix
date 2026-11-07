@@ -33,6 +33,65 @@
   '';
 
   home = config.users.users.${cfg.user}.home;
+
+  # One unit shape for both readers: the tailnet one can prompt, the public one
+  # cannot. Sharing it keeps the hardening, the token file and the site from
+  # drifting between two surfaces that are meant to differ in one flag.
+  unit = {
+    port,
+    description,
+    readOnly ? false,
+    extraArgs ? [],
+  }: {
+    description = description;
+    wantedBy = ["multi-user.target"];
+    unitConfig.X-Fleet-Role = "daemon";
+    after = ["agent-turns-shim.service" "network.target"];
+    wants = ["agent-turns-shim.service"];
+    serviceConfig = {
+      Type = "simple";
+      User = cfg.user;
+      Group = "users";
+      StateDirectory = cfg.stateDirectory;
+      WorkingDirectory = "%S/${cfg.stateDirectory}";
+      ExecStart = lib.concatStringsSep " " (
+        [
+          "${lib.getExe package}"
+          "-addr"
+          "127.0.0.1:${toString port}"
+          "-shim"
+          "http://127.0.0.1:${toString config.services.agentTurns.port}"
+          "-token-file"
+          config.sops.secrets.${cfg.tokenSecret}.path
+          "-prompt-log"
+          "/var/lib/${cfg.stateDirectory}/prompts.jsonl"
+          "-site"
+          site
+          "-limit"
+          "120"
+        ]
+        ++ lib.optional readOnly "-read-only"
+        ++ extraArgs
+      );
+      Environment = [
+        "HOME=${home}"
+        # Hermes shells out to its subagents from PATH, and the wrapper
+        # directory is where the setuid sudo lives.
+        "PATH=/run/wrappers/bin:${home}/.nix-profile/bin:/etc/profiles/per-user/${cfg.user}/bin:/run/current-system/sw/bin"
+      ];
+      Restart = "always";
+      RestartSec = 3;
+
+      # Not `NoNewPrivileges`: a prompt is an operator turn, and Hermes'
+      # subagents escalate through the setuid sudo wrapper.
+      PrivateTmp = true;
+      ProtectSystem = "strict";
+      ProtectHome = false;
+      ReadWritePaths = ["/var/lib/${cfg.stateDirectory}"];
+      RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+      MemoryMax = "512M";
+    };
+  };
 in {
   options.services.turnsDashboard = {
     enable = lib.mkEnableOption "the agent-turn dashboard (live SSE log with per-turn hermes prompts)";
@@ -78,6 +137,17 @@ in {
       '';
     };
 
+    publicPort = lib.mkOption {
+      type = lib.types.nullOr lib.types.port;
+      default = null;
+      description = ''
+        A second, prompt-less reader on loopback, for an exposure outside the
+        tailnet. It runs with `-read-only` and no Hermes, so the public page has
+        no prompt form and `POST /api/prompt` answers 403: whatever mount sits in
+        front of this port can publish the log and nothing else.
+      '';
+    };
+
     stateDirectory = lib.mkOption {
       type = lib.types.str;
       default = "turns-dashboard";
@@ -93,47 +163,22 @@ in {
       }
     ];
 
-    systemd.services.turns-dashboard = {
+    systemd.services.turns-dashboard = unit {
+      port = cfg.port;
       description = "Live agent-turn dashboard with per-turn Hermes prompts";
-      wantedBy = ["multi-user.target"];
-      unitConfig.X-Fleet-Role = "daemon";
-      after = ["agent-turns-shim.service" "network.target"];
-      wants = ["agent-turns-shim.service"];
-      serviceConfig = {
-        Type = "simple";
-        User = cfg.user;
-        Group = "users";
-        StateDirectory = cfg.stateDirectory;
-        WorkingDirectory = "%S/${cfg.stateDirectory}";
-        ExecStart = lib.concatStringsSep " " [
-          "${lib.getExe package}"
-          "-addr 127.0.0.1:${toString cfg.port}"
-          "-shim http://127.0.0.1:${toString config.services.agentTurns.port}"
-          "-token-file ${config.sops.secrets.${cfg.tokenSecret}.path}"
-          "-prompt-log /var/lib/${cfg.stateDirectory}/prompts.jsonl"
-          "-site ${site}"
-          "-hermes-home ${home}"
-          "-limit 120"
-          (lib.optionalString (cfg.hermesPackage != null) "-hermes ${lib.getExe cfg.hermesPackage}")
-        ];
-        Environment = [
-          "HOME=${home}"
-          # Hermes shells out to its subagents from PATH, and the wrapper
-          # directory is where the setuid sudo lives.
-          "PATH=/run/wrappers/bin:${home}/.nix-profile/bin:/etc/profiles/per-user/${cfg.user}/bin:/run/current-system/sw/bin"
-        ];
-        Restart = "always";
-        RestartSec = 3;
-
-        # Not `NoNewPrivileges`: a prompt is an operator turn, and Hermes'
-        # subagents escalate through the setuid sudo wrapper.
-        PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = false;
-        ReadWritePaths = ["/var/lib/${cfg.stateDirectory}"];
-        RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
-        MemoryMax = "512M";
-      };
+      extraArgs =
+        ["-hermes-home" home]
+        ++ lib.optional (cfg.hermesPackage != null) "-hermes ${lib.getExe cfg.hermesPackage}";
     };
+
+    # The public mount's reader: same store, same page, no prompt surface. Not
+    # `-hermes ""` on the tailnet unit and not a 403 in front of it — a separate
+    # process means the public page cannot prompt even if the proxy is later
+    # edited by someone who has not read this file.
+    systemd.services.turns-dashboard-public = lib.mkIf (cfg.publicPort != null) (unit {
+      port = cfg.publicPort;
+      description = "Read-only agent-turn dashboard for a non-tailnet mount";
+      readOnly = true;
+    });
   };
 }

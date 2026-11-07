@@ -165,9 +165,11 @@ func validate(entry map[string]any) error {
 	}
 
 	for _, key := range []string{"source", "subject", "action", "rationale", "outcome"} {
-		value, present := entry[key]
+		value := entry[key]
 		if value == nil {
-			if key == "rationale" && present {
+			// `rationale` is the one field that may be absent or null: an agent
+			// posting the minimal body is the common case.
+			if key == "rationale" {
 				continue
 			}
 			return reject("%s must not be null", key)

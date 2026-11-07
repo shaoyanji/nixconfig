@@ -229,6 +229,26 @@ func TestAppendStoresCanonicalAndReplays(t *testing.T) {
 	}
 }
 
+// TestMinimalBody is the shape every agent actually posts: no rationale key at
+// all. It caught a bug the httptest suite could not see, because the fixture
+// carried a rationale (`go run` against the built binary, 2026-11-07).
+func TestMinimalBody(t *testing.T) {
+	h := newHarness(t)
+	entry := map[string]any{
+		"id":      uuid(7),
+		"ts":      "2026-11-07T10:00:00Z",
+		"source":  "buffY",
+		"kind":    "turn",
+		"subject": "nixconfig:minimal",
+		"action":  "posted the seven required fields and nothing else",
+		"outcome": "done",
+	}
+	recorder := h.do(t, "POST", "/v1/events", entry, testToken)
+	if recorder.Code != http.StatusCreated {
+		t.Fatalf("status %d body %s, want 201", recorder.Code, recorder.Body.String())
+	}
+}
+
 func TestValidationRefusals(t *testing.T) {
 	cases := []struct {
 		name   string

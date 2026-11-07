@@ -50,12 +50,17 @@ fi
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-# One evaluation, one round-trip: asking for four attributes separately would
-# pay the flake startup four times. stderr is kept OUT of the capture — the
-# "Git tree has uncommitted changes" warning is not JSON and used to break jq.
+# One evaluation, one round-trip: asking for the six separately would pay the
+# flake startup six times. `.#taskfileGraph.report` IS that projection as an
+# attribute (lib/taskfile.nix), which is what lets the read go through the eval
+# cache — `nix eval --apply` cannot, so this gate paid a full evaluation
+# (726 ms) on every push where a warm traced read is 18 ms. stderr is kept OUT
+# of the capture: the "Git tree has uncommitted changes" warning is not JSON and
+# used to break jq.
+# shellcheck source=lib/iets.sh
+. scripts/task/lib/iets.sh
 if ! report=$(
-  nix eval --json .#taskfileGraph \
-    --apply 't: {inherit (t) names files version proseVersion violations gateFailures gateBuckets;}' 2>"$work/nix.err"
+  iets_eval_json .#taskfileGraph.report 2>"$work/nix.err"
 ); then
   echo "taskfile-graph: nix eval failed" >&2
   cat "$work/nix.err" >&2
@@ -72,7 +77,10 @@ printf '%s' "$report" | jq -r '.names[]' | sort >"$work/nix"
 drift=0
 task_count=0
 if command -v task >/dev/null 2>&1; then
-  task --list-all --json 2>/dev/null | jq -r '.tasks[].name' | sort >"$work/task" || true
+  # --refresh: the oracle is the LIVE name set, and this run is also what rewrites
+  # the cache `task help` / `task find:` read (taskfile-list.sh), so a stale list
+  # cannot survive a push.
+  bash scripts/task/taskfile-list.sh --refresh 2>/dev/null | jq -r '.tasks[].name' | sort >"$work/task" || true
   task_count=$(wc -l <"$work/task" | tr -d ' ')
   comm -23 "$work/nix" "$work/task" >"$work/only-nix"
   comm -13 "$work/nix" "$work/task" >"$work/only-task"

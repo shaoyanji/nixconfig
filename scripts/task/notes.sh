@@ -26,7 +26,13 @@ shift 2>/dev/null || true
 err="$(mktemp)"
 trap 'rm -f "$err"' EXIT
 
-if ! data="$(nix eval --json .?submodules=1#agentsNotes 2>"$err")"; then
+# Through the eval cache: this is the first thing a novel task reads (`near`,
+# `:host`, `:module`), the document is 1 MB, and a full evaluation was 231 ms on
+# delphi where a warm traced read is 17 ms. The value is identical —
+# `checks:kg:iets` includes this attribute.
+# shellcheck source=lib/iets.sh
+. scripts/task/lib/iets.sh
+if ! data="$(iets_eval_json .?submodules=1#agentsNotes 2>"$err")"; then
   cat "$err" >&2
   echo "notes: could not evaluate .?submodules=1#agentsNotes" >&2
   exit 1

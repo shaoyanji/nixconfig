@@ -50,14 +50,9 @@ kg_usage() {
 # `checks:kg:iets` compares them), nix otherwise. Both read the same flake
 # attribute, so the cache file below is identical whichever answered.
 kg_eval_graph() {
-  local bin
   # shellcheck source=lib/iets.sh
   . "${BASH_SOURCE[0]%/*}/iets.sh"
-  if bin="$(resolve_iets "$REPO")" && [ -n "$bin" ]; then
-    "$bin" eval --json .#knowledgeGraph.graph
-  else
-    nix eval --json .#knowledgeGraph.graph
-  fi
+  iets_eval_json .#knowledgeGraph.graph
 }
 
 kg_graph_path() {

@@ -611,6 +611,14 @@
     parsed;
   proseVersion = builtins.substring 0 12 (builtins.hashString "sha256" (builtins.toJSON proseSurface));
 in {
+  # The gate's whole input in one leaf: `scripts/task/taskfile-graph.sh` used
+  # `nix eval --apply` to project exactly these, and a projection cannot go
+  # through the eval cache (iets implements no `--apply`), so the gate paid a
+  # full evaluation on every push. As an attribute it is a 16 ms warm read.
+  report = {
+    inherit names files version proseVersion violations gateFailures gateBuckets;
+  };
+
   inherit
     parsed
     names

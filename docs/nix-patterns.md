@@ -63,10 +63,10 @@ Better still: `inventory.toml` is compiled by `lib/inventory.nix` — read it wi
 
 A module that overrides a package re-derives it, misses the binary cache, and
 spends the month's build budget. Both known traps live in one file, and **that
-file's comment is the home** — the rationale sits next to the code that would
-break: `hosts/frieren/paperless.nix` (§Tika: a module-level `tika` override →
-uncached Maven build; §Gotenberg: real chromium, ~300 MiB, for a route Paperless
-never uses) [[flake/policies.nix#paperless-closure-traps]].
+file's comment is the home**: `hosts/frieren/paperless.nix` (§Tika: a
+module-level `tika` override → uncached Maven build; §Gotenberg: real chromium,
+~300 MiB, for a route Paperless never uses)
+[[flake/policies.nix#paperless-closure-traps]].
 
 Before deploying anything referencing Java (Maven/Gradle), Go or Rust, run
 `nix build --dry-run` and confirm the closure is substitutable.
@@ -83,8 +83,8 @@ deployed flake and its inputs at 05:00, so the GC cannot take them.
 **The trap worth remembering** is the other fix: a submodule tree is a *different
 source path* from the same commit's GitHub tarball, so a warm from one is worth
 nothing to an evaluation of the other — which is why frieren rebuilt 34
-derivations on a commit CI had already built. `?submodules=1` is not even legal on
-a `github:` ref; a plain git tree and the tarball at one commit *do* resolve to one
+derivations on a commit CI had already built. `?submodules=1` is not legal on a
+`github:` ref; a plain git tree and the tarball at one commit *do* resolve to one
 `/nix/store/…-source`, so `.#` is the ref to warm.
 
 So the gate for a fleet fix is cheap, and stays cheap:
@@ -95,8 +95,8 @@ bash scripts/task/warm-host.sh --check <host>        # the cache already serves 
 ```
 
 A real build — on CI, never on the NAS — is for a change that **adds
-derivations**: a new Python package, model weights, a Rust or Go binary. Anything
-else is a fix, and a fix that needs a closure rebuild was built on the wrong tree.
+derivations**: a Python package, model weights, a Rust or Go binary. Anything else
+is a fix, and a fix that needs a closure rebuild was built on the wrong tree.
 Long form: [`../AGENTS.md`](../AGENTS.md) §5.
 
 ### A config-only delta does not need the CI round trip
@@ -138,7 +138,7 @@ garbage, not data. Measured on netbook 2026-10-22: 15 GiB in `/nix/store` agains
 a 6.7 GiB running closure, and three roots held the gap — `/etc/nixos/result` (a
 September `nixos-rebuild build`, 5.9 GiB) and two home-manager gcroots links
 (3.8 GiB, 380 MiB). Removing the symlinks and collecting again freed **7.2 GiB /
-14,702 paths**. Remove the **symlink**, never the store path, then collect:
+14,702 paths** — remove the **symlink**, never the store path it points at:
 
 ```bash
 sudo rm /etc/nixos/result
@@ -149,14 +149,14 @@ sudo nix store gc                  # or collect without touching generations
 
 A dangling `gcroots/auto` link is pruned by GC itself. Never `rm -rf` inside
 `/nix/store`: GC is the only safe deleter, because only it walks the reference
-graph. **A small reclaim is not a failed reclaim** — ten same-nixpkgs generations
-on netbook returned 140 MiB because they share almost every path, so compare
-store size against the closure, not the generation count.
+graph. **A small reclaim is not a failed reclaim**: ten same-nixpkgs generations
+returned 140 MiB because they share almost every path, so compare store size
+against the closure, not the generation count.
 
 Fleet defaults do the routine half: `nix.gc` runs `--delete-older-than 10d`
-(`modules/global/global.nix`) and `nas-client.nix` prunes roots that live on an
-absent NAS before `nix-gc` starts. Neither touches a root outside those two
-patterns, which is why `--print-roots` belongs in the operator's hands.
+(`modules/global/global.nix`) and `nas-client.nix` prunes roots on an absent NAS
+before `nix-gc` starts. Neither touches a root outside those two patterns, which
+is why `--print-roots` belongs in the operator's hands.
 
 ## Service module conventions
 
@@ -170,31 +170,30 @@ patterns, which is why `--print-roots` belongs in the operator's hands.
   `gpu-high`, `small-screen`, `tpm-identity`, `nas-server`) and the machine's
   `category` (`cloud`, `laptop`, `workstation`); a host that gains a capability
   states it in `inventory.toml`, next to the hardware that justifies it.
-  `checks.policies` fails on `builtins.elem hostName`, on `hostName ==`, and on
-  any comparison against a quoted hostname — `hostName != "frieren"` was the same
-  list in the negative, hiding in the profile the NAS server also imports.
+  `checks.policies` fails on `builtins.elem hostName`, `hostName ==`, and any
+  comparison against a quoted hostname — `hostName != "frieren"` was the same list
+  in the negative, hiding in the profile the NAS server also imports.
 - **A unit exists because a capability is declared, not because a hostname is
   listed** [[flake/policies.nix#systemd-units-are-capability-gated]]. The
-  capability is the option that installs the thing the unit needs —
+  capability is the option that installs what the unit needs —
   `programs.niri.enable` for anything bound to `graphical-session.target`, a
   systemd `Condition*` for a file nobody declares — and the compositor's
-  `spawn-at-startup` starts that target and imports `WAYLAND_DISPLAY`, so
-  session units are pulled in by a session, not by home-manager activation.
+  `spawn-at-startup` starts that target and imports `WAYLAND_DISPLAY`, so session
+  units are pulled in by a session, not by home-manager activation.
 - **A daemon states its crash-loop class where it is declared**
   [[flake/policies.nix#systemd-daemons-declare-their-class]]:
   `unitConfig.X-Fleet-Role = "daemon"` (must come back: `Restart` set, and
   `StartLimitIntervalSec = 0` with `RestartSteps`/`RestartMaxDelaySec` so the
   default 5-starts-in-10s limit cannot retire it) or `"bounded"` (carry an
-  explicit `StartLimitBurst`). `modules/systemd-policy.nix` asserts both the
-  class and its consequence over the evaluated unit set, so the failure names
-  the unit rather than a daemon that quietly stopped days later.
+  explicit `StartLimitBurst`). `modules/systemd-policy.nix` asserts both over the
+  evaluated unit set, so the failure names the unit, not a daemon that quietly
+  stopped days later.
 
 ## A mount to a sleeping peer must fail fast
 
-`mount.nfs` retries a failed mount for **2 minutes by default** (`retry=`, counted
-in minutes — a different knob from the data-path `retrans=`). A mount whose peer
-is off by design pays up to that on *every* walk of the mount table, and one such
-mount blocks whole tools: they `statfs()` every entry before applying any filter.
+`mount.nfs` retries a failed mount for **2 minutes by default** (`retry=`, in
+minutes — not the data-path `retrans=`), and a mount whose peer is off by design
+pays that on *every* walk of the table, blocking tools that `statfs()` each entry.
 
 - **`duf` cannot be told to skip it.** `--hide-mp <exact>`, `--hide-mp` with a
 glob and `--hide-fs autofs` all still block (measured 2026-10-28), because the
@@ -204,23 +203,20 @@ coreutils skips autofs entries without a statfs; name the path and it blocks.
 - **`btop` and `updatedb` trip the same wire** — the journal fills with automount
 requests naming them.
 
-Measured cost before the fix: 90 s per probe, ending in `Result=timeout` because
-systemd's `DefaultTimeoutStartSec` killed `mount.nfs` mid-retry. A cold-vault
-mount carries two options: `retry=0` (the connect itself fails in
-under a second with "no route to host", so nothing is left to retry) and
-`x-systemd.mount-timeout=10s` as the backstop for the other hang class — peer
+Before the fix a probe took 90 s and ended in `Result=timeout` (systemd killed
+`mount.nfs` mid-retry). A cold-vault mount carries two options: `retry=0` (the
+connect itself fails in under a second with "no route to host", so nothing is left
+to retry) and `x-systemd.mount-timeout=10s` for the other hang class — peer
 reachable, handshake stuck. That lands at ~3 s per probe and `Result=exit-code`,
-in `profiles/burgernas-client.nix` so a host that mounts the vault inherits them.
-The trade: `retry=0` fails on a transient blip instead of retrying for two
-minutes, which for an automount is right — the next access re-triggers it.
+in `profiles/burgernas-client.nix`. The trade: `retry=0` fails on a transient blip
+instead of retrying for two minutes, which for an automount is right.
 
 ## CI quirk
 
 CI builds with `nix build -L .?submodules=1#…`: `?submodules=1` makes
 `modules/secrets` visible to the evaluator. A local build does not need it (the
 submodule is checked out) and CI cannot drop it
-[[flake/policies.nix#ci-builds-config-and-gate]]. Pipeline:
-[`ci-pipeline.md`](./ci-pipeline.md).
+[[flake/policies.nix#ci-builds-config-and-gate]] — [`ci-pipeline.md`](./ci-pipeline.md).
 
 ## `git push` dies on the secrets submodule
 
@@ -295,30 +291,26 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     coexist with it (auto-cpufreq forced off, gnome-keyring's PAM wiring kept).
 12. **A comment is not a home for a fact.** Nothing compiles a `#` block:
     `.#knowledgeGraph`, qmd and the skills index are built from `docs/*.md`,
-    `.agents/skills/*` and the compiled registry, so an explanation written
-    inside a module is answerable only by reading that module — the thing the
-    agent was supposed to avoid. Keep the constraint in the `.nix` and put the
-    narrative in `docs/` or a skill, with one line pointing there. Restating
-    what Nix already declares is worse: the DSM mount's `vers=4.1` fact lives in
-    `modules/profiles/burgernas-client.nix`, so repeating it in prose is a second
-    home that drifts. Gate: `task checks:nix:prose` (pre-commit, on added lines) —
-    [[flake/policies.nix#nix-header-budget]].
+    `.agents/skills/*` and the registry, so an explanation inside a module is
+    answerable only by reading that module. Keep the constraint in the `.nix`
+    and put the narrative in `docs/` or a skill, with one line pointing there;
+    restating what Nix declares is a second home that drifts (the DSM mount's
+    `vers=4.1` lives in `modules/profiles/burgernas-client.nix`). Gate:
+    `task checks:nix:prose` — [[flake/policies.nix#nix-header-budget]].
 13. **An inherited `PS0` prints the preexec hook at every prompt.** `bash-preexec`
-    (sourced by atuin's bash integration) appends to `PS0`, and bash prints whatever
-    else `PS0` holds at every prompt, with `$_` expanded — so a `PS0` inherited from
-    a parent shell reprints itself in every new terminal. Measured 2026-10-27: a
-    fresh foot window printed the whole zoxide init script (`$_` was the last
-    argument of the `.bashrc` eval) plus `>&2; }`, then the previous command's last
-    argument at each prompt. `modules/shell/atuin.nix` clears an inherited `PS0`
-    before bash-preexec installs its hook; a live session needs `export -n PS0`.
-
+    (sourced by atuin) appends to `PS0`, and bash prints whatever else `PS0` holds
+    at every prompt, with `$_` expanded — so one inherited from a parent shell
+    reprints itself in every new terminal. Measured 2026-10-27: a fresh foot window
+    printed the whole zoxide init script plus `>&2; }`, then the previous command's
+    last argument at each prompt. `modules/shell/atuin.nix` clears an inherited
+    `PS0` before bash-preexec installs its hook; a live session needs
+    `export -n PS0`.
 14. **A `git init` in `$HOME` makes every prompt walk the home tree.** Once `~`
     is a repository starship's `git_status` runs there, and Starship 1.x has no
     per-directory switch; the login after such a session feels broken for
     minutes. `modules/shell/home-not-a-repo.nix` points `~/.git` at `/proc`, so
     `git init` in `~` fails instead of arming the trap, and repositories below
     home are untouched.
-
 15. **A shell fragment is inert without the shell module.** `programs.atuin`
     sets `enableZshIntegration = true` on every host, but the `.zshrc` half is
     only linked where `programs.zsh` is enabled (`modules/shell/zsh.nix`); a host
@@ -369,32 +361,40 @@ That row is the lesson: the dispatcher's call is 54 bytes against 40, its answer
 right. A latency claim means nothing against the alternative.
 
 `kg-sidecar` cleared the same gate on 2026-11-02 (441 ms → 28 ms, `p = 1`) and was
-removed on 2026-11-07 because the counterfactual moved: the jq path answers in
-53 ms from a content-keyed file, and the eval that refills it is now ~25 ms warm.
-25 ms does not pay 27 MB resident, 1383 lines of engine, a socket protocol and a
-byte-parity gate. `save` is a claim about *today's* alternative, so
-`task ops:kg:speed` re-measures it rather than restating it.
+removed on 2026-11-07 because the counterfactual moved: 25 ms saved does not pay
+27 MB resident, 1383 lines of engine, a socket protocol and a byte-parity gate.
+`save` is a claim about *today's* alternative, so `task ops:kg:speed` re-measures
+it rather than restating it.
 ## The eval the graph reads
 
-`nix eval` never answers from its cache: every graph read was a full evaluation
-(1.7 s for `.#knowledgeGraph.graph` on delphi). The caches that fix that are not
-interchangeable:
+`nix eval` never answers from its cache, and the evaluation is the cost: on delphi
+(2026-11-07, min of 3) `.#knowledgeGraph.graph` is 1686 ms, `.#taskfileGraph`
+726 ms, `.#policies` 5004 ms — and every one of them is 15-18 ms warm through
+`iets`, which caches by the files an evaluation read. Two layers, and they are
+not interchangeable:
 
 | layer | keys on | answers in | answers when |
 | :--- | :--- | ---: | :--- |
 | `kg-graph.sh` file | `HEAD` + `sha1(git diff HEAD)` | ~53 ms, jq included | same tree content |
-| `iets` tracing cache | the files an eval read | ~25 ms warm, 820 ms cold | none of them changed |
+| `iets` tracing cache | the files an eval read | ~16 ms warm, nix-equal cold | none of them changed |
 | a resident daemon | the committed graph | ~28 ms | never, on a dirty tree |
 
-The last row is why the daemon went: it could not answer the case the file cache
-exists for, the tree you are editing. The middle row is why the file cache stays:
-one eval serves callers that read the graph several times (`ops:ask` routing, then
-the query).
+The last row is why the daemon went: it could not answer for the tree you are
+editing, which is the case the file cache exists for. The middle row is why the
+file cache stays: one eval serves callers that read the graph several times.
 
-`iets` is **eval only**: it deliberately ignores a flake's `nixConfig`, so a build
-through it would lose the LAN and substituter set and compile what the cache
-serves, so every build path keeps `nix`. `checks:kg:iets` evaluates the graph and
-two leaf registries through both with `--no-cache` on the iets side and compares
-the bytes — a faster evaluator that renders a different value is a quieter
-answer, not a faster one. `scripts/task/lib/iets.sh` resolves it (IETS_BIN, PATH,
-then the `flake.lock` pin built once into a GC-rooted out-link).
+Two reads sat outside both layers and were the two an agent makes first.
+`task help` / `find:` ran go-task's 2.3 s parse through a *nested* `task
+--list-all --json`, and `notes.sh` re-evaluated a 1 MB document per query. Both
+take the cache now: `taskfile-list.sh` keys on the taskfile tree plus the go-task
+binary (2.6 s → 0.25 s), and `iets_eval_json` in `lib/iets.sh` is the one place
+that picks the evaluator (`ops:notes:*` 520 ms → 300 ms). `taskfile-graph.sh`
+reads `.#taskfileGraph.report` for the same reason the attribute exists: a
+projection through `--apply` cannot be cached at all, so the gate paid an
+evaluation per push.
+
+`iets` is **eval only**: it ignores a flake's `nixConfig`, so a build through it
+would lose the LAN and substituter set and compile what the cache serves; every
+build path keeps `nix`. `checks:kg:iets` compares the bytes of every attribute
+`lib/iets.sh` serves with `--no-cache` on the iets side — a faster evaluator that
+renders a different value is a quieter answer, not a faster one.

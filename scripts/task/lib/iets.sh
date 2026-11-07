@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# iets.sh — find numtide's `iets` evaluator, or report that it is unavailable.
+# iets.sh — find numtide's `iets` evaluator and evaluate through it.
 # Not executable; source it.
 #
 #   . "$(dirname "${BASH_SOURCE[0]}")/lib/iets.sh"
 #   bin="$(resolve_iets)" || bin=""      # empty means "use nix eval"
+#   iets_eval_json .#inventory.hosts      # the rule, in one place
 #
 # Why an evaluator of its own, when nix is right there: **Nix never answers
 # `nix eval` from its eval cache.** Every graph read therefore pays a full
@@ -51,4 +52,24 @@ resolve_iets() {
   fi
   [ -x "$IETS_CACHE/iets/bin/iets" ] || return 1
   printf '%s\n' "$IETS_CACHE/iets/bin/iets"
+}
+
+# iets_eval_json ATTR [ARGS...] — `nix eval --json` with the tracing cache in
+# front when that is possible, so the decision lives here instead of in each
+# caller. It is the same value either way (checks:kg:iets compares the bytes), so
+# a reader cannot tell which answered except by the clock.
+#
+# `--apply` is the one flag iets does not implement: a projected read falls back
+# to nix rather than silently dropping the projection, which would hand the
+# caller the whole 1.8 MB document and a different answer.
+iets_eval_json() {
+  local bin
+  case " $* " in
+    *" --apply "*) nix eval --json "$@" ; return ;;
+  esac
+  if bin="$(resolve_iets "${REPO:-$PWD}")" && [ -n "$bin" ]; then
+    "$bin" eval --json "$@"
+  else
+    nix eval --json "$@"
+  fi
 }

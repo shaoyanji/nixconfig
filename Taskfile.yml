@@ -227,7 +227,9 @@ tasks:
             - |
               echo
               echo "NAMESPACES (live, from task --list-all --json)"
-              task --list-all --json \
+              # Cached by taskfile tree + go-task binary: the parse behind this
+              # list is 2.3 s for 616 tasks, and the map is the way in.
+              bash scripts/task/taskfile-list.sh \
                 | jq -r '
                     ([.tasks[].name | select(contains(":")) | split(":")[0]]
                       | group_by(.) | map("\(.[0])\t\(length)") | .[]),
@@ -247,7 +249,7 @@ tasks:
         cmds:
             - |
               q='{{index .MATCH 0}}'
-              task --list-all --json \
+              bash scripts/task/taskfile-list.sh \
                 | jq -r --arg q "$q" '
                     .tasks[]
                     | select((.name | ascii_downcase | contains($q | ascii_downcase))

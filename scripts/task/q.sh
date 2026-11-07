@@ -458,7 +458,9 @@ q_eval() {
   path="$CACHE/q-$name-$(tree_key).json"
   if [ ! -s "$path" ]; then
     mkdir -p "$CACHE"
-    if ! (cd "$REPO" && nix eval --json ".?submodules=1#$attr") >"$path.tmp" 2>/dev/null; then
+    # shellcheck source=lib/iets.sh
+    . "$REPO/scripts/task/lib/iets.sh"
+    if ! (cd "$REPO" && iets_eval_json ".?submodules=1#$attr") >"$path.tmp" 2>/dev/null; then
       rm -f "$path.tmp"
       say "cannot evaluate .#$attr"
       return 1

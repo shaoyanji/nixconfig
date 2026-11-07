@@ -53,7 +53,11 @@ compare() {
   fi
 }
 
+# Every attribute `iets_eval_json` (lib/iets.sh) now serves, because the gate is
+# only worth having over the reads that actually take the fast path.
 compare "knowledgeGraph.graph" ".#knowledgeGraph.graph" --json
+compare "agentsNotes" ".?submodules=1#agentsNotes" --json
+compare "taskfileGraph.report" ".#taskfileGraph.report" --json
 compare "inventory.hosts.delphi.role" ".#inventory.hosts.delphi.role" --raw
 compare "epistemics.table" ".#epistemics.table" --json
 
@@ -61,4 +65,4 @@ compare "epistemics.table" ".#epistemics.table" --json
   echo "kg-iets: $fails disagreement(s) — the fast eval may not carry a different value" >&2
   exit 1
 }
-echo "kg-iets: PASS — iets renders the same values as nix on all three attributes"
+echo "kg-iets: PASS — iets renders the same values as nix on every attribute it serves"

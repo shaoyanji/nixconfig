@@ -19,6 +19,18 @@
   tokenPath = config.sops.secrets.${cfg.tokenSecret}.path;
 
   origin = "https://${cfg.tailnetHost}:${toString cfg.tailnetPort}";
+
+  # The server is Go since 2026-11-07: one static binary, no interpreter in the
+  # closure, and the reader of the posts is the same program that writes them.
+  # Measured against the Python it replaced in tools/pyweb-runtime/README.md.
+  goPackage = pkgs.buildGoModule {
+    pname = "mataroa-console";
+    version = "0.1.0";
+    src = ./mataroa-console/server;
+    vendorHash = null;
+    env.CGO_ENABLED = "0";
+    meta.mainProgram = "mataroa-console";
+  };
 in {
   options.services.mataroaConsole = {
     enable = lib.mkEnableOption "the mataroa console, served on this host's tailnet";
@@ -156,9 +168,9 @@ in {
       };
       # A unit gets no login PATH and `path` is a service option, not a
       # serviceConfig directive — written inside serviceConfig it is dropped and
-      # the script dies at exec with status 127. The script shells out to git for
+      # the binary dies at exec with status 127. The server shells out to git for
       # its commits and to comrak to render markdown.
-      path = [pkgs.python3 pkgs.git pkgs.comrak pkgs.coreutils pkgs.bash];
+      path = [pkgs.git pkgs.comrak pkgs.coreutils pkgs.bash];
       serviceConfig = {
         Type = "simple";
         User = cfg.user;
@@ -167,7 +179,7 @@ in {
         StateDirectoryMode = "0750";
         LoadCredential = "mataroa-token:${tokenPath}";
         ExecStart = lib.concatStringsSep " " ([
-            "${pkgs.python3}/bin/python3 ${../scripts/mataroa-console.py}"
+            "${goPackage}/bin/mataroa-console"
             "--state ${stateDir}"
             "--port ${toString cfg.port}"
             "--origin ${origin}"
@@ -176,11 +188,7 @@ in {
           ]
           ++ lib.optional (cfg.blogUrl != "") "--blog-url ${cfg.blogUrl}"
           ++ lib.optional (!cfg.commit) "--no-commit");
-        Environment = [
-          "HOME=${stateDir}"
-          "PYTHONUNBUFFERED=1"
-          "PYTHONDONTWRITEBYTECODE=1"
-        ];
+        Environment = ["HOME=${stateDir}"];
         Restart = "always";
         RestartSec = 5;
         RestartSteps = 10;

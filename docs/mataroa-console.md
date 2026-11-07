@@ -11,7 +11,12 @@ PATCH against mataroa, and the console keeps a ledger of which files differ from
 what the blog holds.
 
 - module: `modules/services/mataroa-console.nix` (`services.mataroaConsole`)
-- program: `modules/scripts/mataroa-console.py` (stdlib only, no dependencies)
+- program: `modules/services/mataroa-console/server/` (Go, standard library
+  only). Measured against the Python it replaced on 2026-11-07, same 20-post
+  fixture, same comrak: idle RSS 6.8 MB against 29.2 MB, startup 41 ms against
+  183 ms, ledger p50 0.68 ms against 2.38 ms, and 1753 rps against 299 at
+  concurrency 8. `/p/<slug>` is the exception — 3.5 ms against 4.1 ms — because
+  both wait on one comrak process, which is the render, not the server.
 - host: `hosts/delphi/mataroa-console.nix` · unit `mataroa-console.service`
 - loopback **:8095**, tailnet mount **:8454** (`tailscale-serve-mataroa`), card on
   the tailnet service portal

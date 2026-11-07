@@ -76,11 +76,24 @@ wait_live() {
   printf '%s' "$state"
 }
 
+# `live` is the stream, not the rows: the history frame is one big inner patch
+# and over a WAN it lands a beat later. Counting cards the instant the socket
+# opens reads 0 from a box outside the fleet (measured on clanker, 2026-11-07).
+wait_cards() {
+  local i n=0
+  for i in $(seq 1 40); do
+    n=$(ev "document.querySelectorAll('article.turn').length")
+    [ "${n:-0}" -gt 30 ] && break
+    sleep 0.5
+  done
+  printf '%s' "$n"
+}
+
 section "posture at $TARGET"
 ab open "$TARGET" >/dev/null
 state=$(wait_live)
 ok stream "$state" live
-ok cards-present "$(ev "document.querySelectorAll('article.turn').length > 30")" true
+ok cards-present "$([ "$(wait_cards)" -gt 30 ] && echo true || echo false)" true
 # Everything below is meaningless on an empty page, and an empty page makes
 # several comparisons pass by accident ("0 turns" equals "0 turns").
 [ "$state" = live ] || die "the page at $TARGET never reported a live stream"
@@ -170,6 +183,7 @@ section "shareable view"
 ab open "${TARGET%/}/?q=umami" >/dev/null
 state=$(wait_live)
 ok shared-stream "$state" live
+wait_cards >/dev/null
 ok shared-value "$(ev 'document.getElementById("find").value')" "umami"
 shared=0
 for i in $(seq 1 20); do

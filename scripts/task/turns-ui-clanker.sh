@@ -46,7 +46,7 @@ id=$(timeout 180 task clanker:devshell -- \
   ./templates/agent-shell#default "TARGET=$TARGET bash scripts/task/turns-ui-suite.sh" |
   tail -1)
 case $id in
-*[!0-9TZ-]*) die "clanker:devshell did not return a job id (got '$id')" ;;
+'' | *[!0-9A-Za-z-]*) die "clanker:devshell did not return a job id (got '$id')" ;;
 esac
 say job "$id"
 
@@ -56,7 +56,7 @@ posted=0
 finished=0
 deadline=$((SECONDS + TIMEOUT))
 while [ "$SECONDS" -lt "$deadline" ]; do
-  log=$(task clanker:logs "$id" 200 2>/dev/null || true)
+  log=$(task clanker:logs -- "$id" 200 2>/dev/null || true)
   case $log in
   *"checks="*) finished=1; break ;;
   *"PHASE toast-watch"*)
@@ -77,10 +77,10 @@ done
 
 [ "$posted" = 1 ] || say publish "not reached: the suite did not announce toast-watch within ${TIMEOUT}s"
 
-[ "$finished" = 1 ] || task clanker:wait "$id" "$((WATCH_SECONDS + 300))" >/dev/null 2>&1 || true
+[ "$finished" = 1 ] || task clanker:wait -- "$id" "$((WATCH_SECONDS + 300))" >/dev/null 2>&1 || true
 
 printf '\n--- job %s log\n' "$id"
-log=$(task clanker:logs "$id" 400 2>/dev/null || true)
+log=$(task clanker:logs -- "$id" 400 2>/dev/null || true)
 printf '%s\n' "$log"
 summary=$(printf '%s\n' "$log" | grep -o 'checks=[0-9]* fail=[0-9]*' | tail -1)
 failures=$(printf '%s\n' "$summary" | sed -n 's/.*fail=\([0-9]*\).*/\1/p')

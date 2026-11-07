@@ -18,9 +18,8 @@ about:
 ---
 ```
 
-Three keys, parsed line-wise by `lib/knowledge-graph.nix` and mirrored in
-`tools/kg-engine/kg_engine.exs` (`checks:kg:native` compares the two graphs, so
-the two parsers grow together or the gate fails). `about` entries are node ids —
+Three keys, parsed line-wise by `lib/knowledge-graph.nix` (the only parser since
+the Elixir engine was retired, 2026-11-07). `about` entries are node ids —
 `doc:<repo path>`, `host:<name>`, `skill:<name>` — and an id that does not exist
 is not an edge: `edge endpoints resolve to nodes` in `kg-check` reports it.
 

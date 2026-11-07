@@ -260,15 +260,16 @@ tasks:
       - bash scripts/task/kg-query.sh stats --top {{.TOP | default 12}}
 
   ops:kg:speed:
-    desc: Measure every graph read path (file cache + jq, iets eval, nix eval)
+    desc: Measure every read path (graph file, iets eval, nix eval, entry rows)
     summary: >
       Times the surface the tasks actually call: `kg-query.sh host|stats` over
-      the content-keyed graph file, then the graph eval itself through `iets`
-      (warm, and `--no-cache` for the cold cost) and through `nix eval`, which
-      never answers from a cache. This is the harness the resident sidecar was
-      removed by: 28 ms from its socket against 53 ms from the file left 25 ms
-      to pay 27 MB and 1383 lines for. NODE defaults to frieren; RUNS=5, evals
-      at least 2. Exits 0 = measured.
+      the content-keyed graph file, the graph eval through `iets` (warm, and
+      `--no-cache` for the cold cost), `nix eval` which never answers from a
+      cache, and the entry reads a turn makes first (`task help`, `find:`,
+      `notes near|show|host`, a leaf read) so "the frontier is here" is a
+      number. It is the harness the resident sidecar was removed by, and the one
+      that found the jq inside `near` once the cache had answered the eval.
+      NODE defaults to frieren; RUNS=5, evals at least 2. Exits 0 = measured.
     cmds:
       - RUNS={{.RUNS | default "5"}} bash scripts/task/kg-speed.sh {{.NODE | default "frieren"}}
 

@@ -184,8 +184,8 @@
 
   docs = map mkDoc files;
 
-  # Draft frontmatter, parsed line-wise and mirrored in tools/kg-engine: the
-  # contract, and why it is not YAML, live in docs/blog-drafting.md.
+  # Draft frontmatter, parsed line-wise: the contract, and why it is not YAML,
+  # live in docs/blog-drafting.md.
   takeUntil = pred: list: let
     step = acc: x:
       if acc.done || pred x

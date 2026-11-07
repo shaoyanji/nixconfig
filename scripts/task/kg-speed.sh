@@ -66,3 +66,27 @@ fi
 printf '  eval nix      %5s ms   nix eval, which never answers from a cache, %s run(s)\n' \
   "$(mean nix-eval "$([ "$RUNS" -lt 2 ] && echo 2 || echo "$RUNS")" nix eval --json .#knowledgeGraph.graph)" \
   "$([ "$RUNS" -lt 2 ] && echo 2 || echo "$RUNS")"
+
+# The entry surfaces, i.e. what a turn reads before it knows anything. Every row
+# here was late enough once to be worth a cache, and each names the layer that
+# moved it, so "the frontier is here" is a number rather than a feeling:
+# `task help` was go-task's parse (2.3 s, via the panel's nested --list-all), the
+# notes rows were a full 1 MB evaluation per query, and the leaf rows show where
+# `nix eval` floors out (~150 ms of flake resolution) against iets.
+printf '\nagent entry (three runs each, task startup included)\n'
+printf '  task help     %5s ms   intent map + namespaces (taskfile-list.sh cache)\n' \
+  "$(mean help 3 task help)"
+printf '  find:<word>   %5s ms   over the same cached list\n' \
+  "$(mean find 3 task find:graph)"
+printf '  notes near    %5s ms   agentsNotes (iets) + jq ranking, the novel-task entry\n' \
+  "$(mean near 3 bash scripts/task/notes.sh near "cache the graph read")"
+printf '  notes show    %5s ms   one note out of the same cached document\n' \
+  "$(mean show 3 bash scripts/task/notes.sh show taskfile-plane-handmade)"
+printf '  notes host    %5s ms   byHost index, no ranking\n' \
+  "$(mean nhost 3 bash scripts/task/notes.sh host frieren)"
+printf '  leaf nix      %5s ms   .#inventory.hosts.fern.role, the nix floor\n' \
+  "$(mean leaf-nix 3 nix eval --raw .#inventory.hosts.fern.role)"
+printf '  leaf iets     %5s ms   the same leaf through the tracing cache\n' \
+  "$(mean leaf-iets 3 bash -c '. scripts/task/lib/iets.sh; iets_eval_json .#inventory.hosts.fern')"
+printf '\nRead it as a budget: an entry that is already under ~200 ms is paying\n'
+printf 'process startup, not this tree. Re-run after changing a cache layer.\n'

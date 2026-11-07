@@ -365,36 +365,36 @@ removed on 2026-11-07 because the counterfactual moved: 25 ms saved does not pay
 27 MB resident, 1383 lines of engine, a socket protocol and a byte-parity gate.
 `save` is a claim about *today's* alternative, so `task ops:kg:speed` re-measures
 it rather than restating it.
+
 ## The eval the graph reads
 
 `nix eval` never answers from its cache, and the evaluation is the cost: on delphi
 (2026-11-07, min of 3) `.#knowledgeGraph.graph` is 1686 ms, `.#taskfileGraph`
-726 ms, `.#policies` 5004 ms — and every one of them is 15-18 ms warm through
-`iets`, which caches by the files an evaluation read. Two layers, and they are
-not interchangeable:
+726 ms, `.#policies` 5004 ms — every one 15-18 ms warm through `iets`, which
+caches by the files an evaluation read. Two layers, not interchangeable:
 
 | layer | keys on | answers in | answers when |
 | :--- | :--- | ---: | :--- |
-| `kg-graph.sh` file | `HEAD` + `sha1(git diff HEAD)` | ~53 ms, jq included | same tree content |
-| `iets` tracing cache | the files an eval read | ~16 ms warm, nix-equal cold | none of them changed |
+| `kg-graph.sh` file | `HEAD` + `sha1(git diff HEAD)` | ~53 ms with jq | same tree content |
+| `iets` tracing cache | the files an eval read | ~16 ms warm | none of them changed |
 | a resident daemon | the committed graph | ~28 ms | never, on a dirty tree |
 
 The last row is why the daemon went: it could not answer for the tree you are
-editing, which is the case the file cache exists for. The middle row is why the
-file cache stays: one eval serves callers that read the graph several times.
+editing, which is what the file cache exists for. The middle row is why that file
+cache stays: one eval serves every caller.
 
 Two reads sat outside both layers and were the two an agent makes first.
-`task help` / `find:` ran go-task's 2.3 s parse through a *nested* `task
+`task help` / `find:` ran go-task's 2.3 s parse twice through a *nested* `task
 --list-all --json`, and `notes.sh` re-evaluated a 1 MB document per query. Both
-take the cache now: `taskfile-list.sh` keys on the taskfile tree plus the go-task
-binary (2.6 s → 0.25 s), and `iets_eval_json` in `lib/iets.sh` is the one place
-that picks the evaluator (`ops:notes:*` 520 ms → 300 ms). `taskfile-graph.sh`
-reads `.#taskfileGraph.report` for the same reason the attribute exists: a
-projection through `--apply` cannot be cached at all, so the gate paid an
-evaluation per push.
+take the cache now (`taskfile-list.sh` keys on the taskfile tree plus the binary;
+`iets_eval_json` picks the evaluator). A cache answers an eval, not the read, so
+the jq behind `near` came next: tokenising four fields per note and downcasing
+every body cost 350 ms of a 546 ms query, and a word-boundary regex answers it
+identically in 215 ms. `taskfile-graph.sh` reads `.#taskfileGraph.report` because
+`--apply` cannot be cached at all, so the gate paid an evaluation per push.
 
 `iets` is **eval only**: it ignores a flake's `nixConfig`, so a build through it
 would lose the LAN and substituter set and compile what the cache serves; every
-build path keeps `nix`. `checks:kg:iets` compares the bytes of every attribute
-`lib/iets.sh` serves with `--no-cache` on the iets side — a faster evaluator that
-renders a different value is a quieter answer, not a faster one.
+build path keeps `nix`. `checks:kg:iets` compares its bytes against `--no-cache`
+— a faster evaluator that renders a different value is a quieter answer, not a
+faster one.

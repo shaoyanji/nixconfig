@@ -30,7 +30,6 @@ in {
       self.modules."zen"
       self.modules."user.desktop.multimedia"
       self.modules."user.desktop.appimage-menu"
-      self.modules."user.kg-sidecar"
       self.modules."user.selector-daemon"
       self.modules."kitty"
     ]
@@ -46,11 +45,9 @@ in {
     home-manager.enable = true;
     nix-your-shell.enable = true;
 
-    # The knowledge-graph used to keep a resident Elixir sidecar here so
-    # `kg-query.sh` could answer from a socket. Measured 2026-11-07: the sidecar
-    # answered in 28 ms against jq's 53 ms over the content-keyed graph file, so
-    # the 25 ms it bought cost 27 MB of BEAM, a 1383-line engine and a parity
-    # gate. Removing it dropped both; `iets` covers the 1.7 s eval-on-miss.
+    # No resident knowledge-graph sidecar: it answered 25 ms faster than the
+    # content-keyed graph file and cost 27 MB of BEAM to do it, so it is gone
+    # (flake/daemons.nix, docs/nix-patterns.md). `iets` covers the eval-on-miss.
 
     # The selector's bargain: `q.sh --question` asks the resident
     # stage 1 and falls back to the interpreter, so a host without it answers the

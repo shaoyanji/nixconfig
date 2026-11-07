@@ -13,6 +13,7 @@ import argparse
 import html
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -45,6 +46,10 @@ figure.spread figcaption {
 figure.spread .page { display: block; font-size: .78rem; letter-spacing: .2em;
   text-transform: uppercase; opacity: .38; margin-bottom: .7rem; }
 main { max-width: 1200px; margin: 0 auto; padding: 0 0 8vh; }
+section.film { max-width: 1200px; margin: 0 auto 6vh; padding: 0 6vw; }
+section.film h2 { font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; opacity: .45; }
+section.film video { width: 100%; border-radius: 6px; background: #1b1712; }
+section.film .meta { font-size: .74rem; opacity: .4; margin: .4rem 0 0; }
 footer { text-align: center; padding: 10vh 8vw 16vh; font-style: italic; opacity: .7; }
 footer .meta { font-style: normal; font-size: .78rem; opacity: .6; margin-top: 2rem; }
 @media print {
@@ -135,6 +140,24 @@ def main() -> int:
         ]
 
     printed = len(plates)
+    # A narrated cut is optional: when `media.py mix` has produced one, the page
+    # opens with it, because a book with sound is a different artifact and the
+    # reader should not have to find the file.
+    # `-sNN.mp4` is one spread's clip; the book is the file without that suffix,
+    # and the `.web.mp4` cut, when present, is the one to serve.
+    books = {v.stem: v for v in sorted((root / "video").glob("*.mp4"))
+             if not re.search(r"-s\d+\.mp4$", v.name)}
+    for stem, vid in books.items():
+        if f"{stem}.web.mp4" in (p.name for p in books.values()):
+            continue
+        dst = site / vid.name
+        if not dst.exists() or dst.stat().st_mtime < vid.stat().st_mtime:
+            shutil.copy2(vid, dst)
+        parts.insert(parts.index("<main>"), (
+            '<section class="film"><h2>Hörbuch</h2>'
+            f'<video controls preload="metadata" src="{esc(vid.name)}"></video>'
+            f'<p class="meta">{esc(vid.stem)}</p></section>'))
+
     parts += [
         "</main>", "<footer>",
         f"<p>The End</p>",

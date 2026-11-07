@@ -132,6 +132,61 @@ invisible to `pwd`, and a unit that pins `%h/Documents/...` keeps working while
 an `rm -rf` of the home tree is not a backup. `storybook-serve` (8899) and
 `storybook-pips-serve` (8898) run the demos from the canonical path.
 
+## Narration: voices on clanker, mixing here
+
+An English book is adapted first, then spoken, then mixed. The adaptation is a
+`cpg-speculate` round in the target language landing as `script.<lang>.json`
+(the same shape as `book.md`, one `id` per spread), because the pictures already
+fix the count and the nouns: the translator's job is to sound German, not to
+re-decide the page.
+
+```bash
+python3 …/media.py voices                       # the speech shelf and what each voice is
+python3 …/media.py bakeoff  --project $PWD --lang de --line "<a line with umlauts>"
+python3 …/media.py say      --project $PWD --lang de --voice de_DE-thorsten-high
+python3 …/media.py mix      --project $PWD --lang de --voice de_DE-thorsten-high
+```
+
+`bakeoff` writes `site/voices.html` — every German voice on one line, in the
+browser, because a voice is chosen by ear and a duration table cannot do it.
+`say` synthesises every spread plus the title and pulls the wavs back;
+`mix` puts narration over its plate with a slow zoom and a noise-derived river
+bed, then concatenates. Outputs: `audio/<lang>/<voice>/`, `video/<book>.mp4`
+(full) and `.web.mp4` (960 px, for a demo page).
+
+**The speech is offline VITS on `clanker`, and that is deliberate.** piper is
+minutes of CPU work with a file as the result, it spends no model quota, and
+`instabox` already carries a job box with a 120-minute clock. This box keeps the
+plates and runs `ffmpeg`. One job pushes every line, not one ssh per spread:
+ten round trips is ten chances to lose the clock.
+
+Measured on `de_DE-thorsten-high`, 2026-11-07:
+
+| | |
+| :--- | :--- |
+| piper 1.8.0 from nixpkgs | `nix profile add nixpkgs#piper-tts`, substituted not built |
+| voices | downloaded from `rhasspy/piper-voices` (the `.onnx` *is* the model) |
+| `--length_scale 1.0` | 4.8 s for a 16-word spread — 200 wpm, a news bulletin |
+| `--length_scale 1.5` | 6.2 s — about 150 wpm, the default here |
+| sample rate | 22050 Hz on `high`, 16000 on `low`/`x_low`; mix normalises to 44.1 kHz |
+
+Traps that cost a run:
+
+- **A JSON string is not a shell string.** `json.dumps("müde")` is `"m\u00fcde"`,
+  and piper reads the escape out loud: every umlaut word came back spelled letter
+  by letter, at durations that looked like a broken model. Quote with
+  `shlex.quote`, and read a duration that disagrees with the word count as a
+  text bug before blaming the voice.
+- **`amix` divides by its input count.** The first mix measured −22.7 dB mean
+  against the −16 the narration was normalised to; `normalize=0` is required.
+- **`http.server` has no Range.** A 28 MB master cannot be seeked until the whole
+  file arrives, so the page points at the 960 px web cut (7.3 MB).
+- A spread whose wav is much longer than its words suggests is not a slow voice —
+  measure `silencedetect` before inventing a `--length_scale` for it.
+
+Ambience is synthesised (`anoisesrc` → lowpass → fade), so nothing in a published
+book is a licensed sample. Real SFX and a second language are open work.
+
 ## Probing the wall on purpose
 
 ```bash

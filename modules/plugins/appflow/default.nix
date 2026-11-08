@@ -5,10 +5,10 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
   cfg = config.services.appflowPlugin;
-  user = import ../../global/user.nix;
 
   sync = pkgs.writeShellApplication {
     # himalaya is here for drafts only: a draft is written into the mailbox's

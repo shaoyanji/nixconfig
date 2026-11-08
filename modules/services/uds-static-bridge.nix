@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  self,
   ...
 }: let
   cfg = config.services.udsStaticBridge;
@@ -16,7 +17,7 @@
 
   # Same cache policy the HTTP vhost uses (modules/config/nginx-static-cache.nix):
   # one store path, one set of cache directives.
-  staticCache = import ../config/nginx-static-cache.nix;
+  staticCache = import self.modules."config.nginx-static-cache";
 in {
   options.services.udsStaticBridge = {
     enable = lib.mkEnableOption "declarative zero-TCP static documentation bridge via UNIX domain sockets";

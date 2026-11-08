@@ -9,7 +9,7 @@
   cfg = config.services.udsStaticBridge;
   # Same site, same evaluated inputs as the HTTP vhost: the compiled registry and
   # this host's own name, so the served bytes cannot disagree with nginx's copy.
-  akiDocs = import ../../lib/aki-site.nix {
+  akiDocs = import self.nixFiles.lib."aki-site.nix" {
     inherit pkgs;
     inventory = config.fleet.inventory;
     host = config.networking.hostName;

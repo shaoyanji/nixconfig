@@ -2,6 +2,7 @@
 # role, attachments on disk and an optional Google Drive mirror.
 # docs/email-archive.md.
 {
+  self,
   config,
   lib,
   pkgs,
@@ -21,7 +22,7 @@
 
   # HTML-only mail is the majority of bulk mail; without a converter the row
   # stores a null body and is unsearchable. The same binary backs the gate.
-  html2markdown = import ../scripts/html2markdown.nix {inherit pkgs;};
+  html2markdown = import self.modules."scripts.html2markdown" {inherit pkgs;};
 
   # Upstream publishes one self-contained NativeAOT binary per arch; it links
   # only libc/libm, so autoPatchelfHook is the whole packaging story.

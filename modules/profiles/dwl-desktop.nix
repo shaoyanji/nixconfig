@@ -2,6 +2,7 @@
 # clients. Keybinds `modules/config/dwl/config.h`, launcher `modules/scripts/fleet-menu.sh`,
 # host procedure `.agents/deploy/hosts/netbook.md`.
 {
+  self,
   config,
   lib,
   pkgs,
@@ -9,8 +10,8 @@
   ...
 }: let
   cfg = config.profiles.dwlDesktop;
-  fleetMenu = import ../scripts/fleet-menu.nix {inherit pkgs;};
-  appimageMenu = import ../scripts/appimage-menu.nix {inherit pkgs;};
+  fleetMenu = import self.modules."scripts.fleet-menu" {inherit pkgs;};
+  appimageMenu = import self.modules."scripts.appimage-menu" {inherit pkgs;};
 
   # Spliced host entries go first, which is what makes them shadow the fleet bind
   # for the same key (`keybinding()` returns the first entry matching mod + keysym).

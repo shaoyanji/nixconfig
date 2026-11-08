@@ -189,6 +189,10 @@
       perSystem = {system, ...}: {
         devShells = import ./flake/devshells.nix {
           pkgs = systemsCtl.pkgsFor system;
+          # `self` for the module registry: a shell is addressed by the name every
+          # other import uses (`self.modules."config.shells.flaskpy"`) instead of
+          # a path assembled in one more file.
+          inherit self;
           root = ./.;
         };
       };

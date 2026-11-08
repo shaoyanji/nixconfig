@@ -2,13 +2,14 @@
 # plus a nightly sweep decided by rule — a label is a classification and needle3
 # is a tool caller. docs/mail-agent.md.
 {
+  self,
   config,
   lib,
   pkgs,
   ...
 }: let
   cfg = config.programs.mailAgent;
-  needle = import ../scripts/needle-model.nix {inherit pkgs;};
+  needle = import self.modules."scripts.needle-model" {inherit pkgs;};
 
   # One directory, so the harness finds its sibling tool schemas in the store.
   src = pkgs.runCommand "mail-agent-src" {} ''

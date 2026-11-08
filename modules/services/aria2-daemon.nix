@@ -1,5 +1,6 @@
 # aria2-daemon — network RPC download service with AriaNg web UI.
 {
+  self,
   config,
   lib,
   pkgs,
@@ -8,7 +9,7 @@
   cfg = config.services.aria2-daemon;
 
   # Pre-built AriaNg static files — avoids npm build failures from nixpkgs.
-  ariang = (import ../../lib/fetches-extra.nix {inherit pkgs;}).fetch "ariang";
+  ariang = (import self.nixFiles.lib."fetches-extra.nix" {inherit pkgs;}).fetch "ariang";
 
   # Bootstrap config rendered into the served site at runtime: pre-seeds the
   # RPC connection, base64 secret as AriaNg's getCurrentRpcSecret expects. The

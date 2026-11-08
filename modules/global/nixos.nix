@@ -19,7 +19,7 @@
 
   config = {
     nixpkgs.overlays = [
-      (import ../../overlays/nushell-plugins-compat.nix)
+      (import self.nixFiles.overlays."nushell-plugins-compat.nix")
     ];
 
     home-manager = {

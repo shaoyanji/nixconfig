@@ -1,5 +1,6 @@
 # `dsh` desktop launchers: open the agent deck in the best terminal available.
 {
+  self,
   pkgs,
   lib,
   config,
@@ -22,7 +23,7 @@
   # its own TLS ingress at /deepseek/; this is the client half. Shared with the
   # hosts that install it directly (frieren), so there is one definition of what
   # `dsh-remote` means and one place to change it.
-  dshRemote = import ../../scripts/dsh-remote.nix {inherit pkgs;};
+  dshRemote = import self.modules."scripts.dsh-remote" {inherit pkgs;};
 
   # Local entry, only where the harness is actually installed (tier "full").
   dshLocal = pkgs.writeShellApplication {

@@ -42,7 +42,26 @@
         (`project = kind: fn:`), so neither a file list nor a host list is
         hand-maintained. Wiring line counts did not fall — `flake.nix` +31 for the
         flake-parts body, `checks.nix` +28 for the new gate — the lists did.
-        Remaining path imports are loads with arguments, not module lists.
+
+        Finished 2026-11-08: the "loads with arguments" condition no longer holds
+        for `modules/`. The 13 such loads name their file
+        (`import self.modules."scripts.needle-model" {inherit pkgs;}`, and
+        `self.nixFiles.lib."pkg-list.nix"` for the five that are not modules), so
+        `grep 'import \.\./' modules/` answers nothing; what remains is
+        `builtins.readFile` of data, not an import. `flake/devshells.nix` asks for
+        its ten shells by name too, which is what makes the walk record an edge
+        from a flake file into `modules/config/shells/`.
+
+        Two files were dead on arrival and are gone: `modules/services/go-backend.nix`
+        (its package went with `pkgs/`, so the default could only fail) and
+        `modules/scripts/examples.nix` (a prototype nothing imported; its own
+        commented import pointed at a file that does not exist). The go-backend
+        gate stays in `flake/host-check.nix` as "no host declares that unit".
+
+        Checked at one git state: `checks:host MODE=eval` green on delphi, eisen,
+        frieren, penguin and clanker (containers, nixos, home and the lean role);
+        `.#devShells.aarch64-linux` names unchanged; registry 313 files, 160 names,
+        0 duplicates, 0 unknown names, and no dangling path is left.
       '';
     };
     d1-compiled-context = {

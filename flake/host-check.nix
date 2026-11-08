@@ -37,9 +37,8 @@ in
   else if hasGoBackend
   then
     throw ''
-      host-architecture: services.go-backend is enabled on ${host}, which is not a
-      go-backend host (the legacy go backend lives in modules/services/go-backend.nix
-      and is expected to be enabled by no host). Remove it from
+      host-architecture: a `go-backend` systemd service is declared on ${host},
+      and no host is meant to run one. Remove it from
       hosts/${host}/configuration.nix or from its chain in flake/host-inventory.nix.
     ''
   else

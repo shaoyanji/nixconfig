@@ -126,7 +126,7 @@ Reads the compiled registry and the flake's output attr **names**. Measured 1.08
 
 | Check | Proves | Cost (frieren / mtfuji) |
 | :--- | :--- | :--- |
-| `hostChecks.<arch>.<host>` | The module system evaluates and **all assertions pass** (2035 / 1620), the host **compiles `inventory.toml`** (`config.fleet.inventory.hosts.<self>` resolves and is printed), and `services.go-backend` is not enabled on it. | 13.16 s / 720 MiB — 11.42 s / 646 MiB |
+| `hostChecks.<arch>.<host>` | The module system evaluates and **all assertions pass** (2035 / 1620), the host **compiles `inventory.toml`** (`config.fleet.inventory.hosts.<self>` resolves and is printed), and no host declares a `go-backend` systemd service. | 13.16 s / 720 MiB — 11.42 s / 646 MiB |
 
 The behavioural half — a host's module system *really* resolving the registry —
 lives here, because it is the only place it can be checked without paying for every
@@ -176,8 +176,8 @@ they are run one at a time. `task checks:flake` therefore refuses below 16 GiB a
 points at `task checks:hosts`. Every bounded run goes through
 `scripts/task/oom-guard.sh`, which polls `/proc/vmstat oom_kill`, memory/io PSI and
 `MemAvailable` every 10 s and aborts on pressure. CI runs tier 2 for affected hosts
-only, which is also how the `services.go-backend` policy finally became an enforced
-gate — previously it was reachable only from `nix flake check` and
+only, which is also how the go-backend rule (no host declares that unit) became an
+enforced gate — previously it was reachable only from `nix flake check` and
 `task checks:quick`, neither of which CI ran.
 
 ### The declared counts are assertions

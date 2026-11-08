@@ -6,7 +6,6 @@
 }: {
   imports = [
     self.modules."scripts.pb"
-    # ./examples.nix
   ];
   home.packages = with pkgs; [
     # NOTE: `nvidia-offload` used to live here, which shipped it to EVERY host

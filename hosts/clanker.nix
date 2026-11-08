@@ -1,8 +1,8 @@
 # clanker — the Instabox VM, fleet fixture since 2026-11-06: Ubuntu, account
 # `user`, home `/data/home`, own boot/kernel/users, the lean role built for that
 # home. Driving it: .agents/skills/instabox/SKILL.md.
-{
-  imports = [../modules/roles/lean.nix];
+{self, ...}: {
+  imports = [self.modules."roles.lean"];
 
   home = {
     username = "user";

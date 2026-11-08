@@ -2,13 +2,14 @@
 # unit universally, system units that declare X-Fleet-Role. Runs inside every host
 # evaluation; contract in docs/nix-patterns.md "Service module conventions".
 {
+  self,
   config,
   lib,
   pkgs,
   osConfig ? null,
   ...
 }: let
-  policy = import ../lib/systemd-policy.nix {inherit lib;};
+  policy = import self.nixFiles.lib."systemd-policy.nix" {inherit lib;};
 
   # The capability that makes session units meaningful: the profile that installs
   # the compositor (modules/profiles/base-desktop-environment.nix) sets it, and a

@@ -1,6 +1,10 @@
 # opencode: the agent CLI and its model configuration.
-{lib, ...}: let
-  localAgents = import ../ai/agents.nix {inherit lib;};
+{
+  self,
+  lib,
+  ...
+}: let
+  localAgents = import self.modules."user.ai.agents" {inherit lib;};
   agentsJsonPath = ../../config/agents.json;
   remoteAgentsList =
     if builtins.pathExists agentsJsonPath

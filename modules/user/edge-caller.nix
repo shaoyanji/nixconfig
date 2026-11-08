@@ -2,13 +2,14 @@
 # Disabled by default and refused on hosts where the Kelly gate disagrees:
 # [[flake/policies.nix#daemon-clears-kelly]] · docs/nix-patterns.md.
 {
+  self,
   config,
   lib,
   pkgs,
   ...
 }: let
   cfg = config.programs.edgeCaller;
-  needle = import ../scripts/needle-model.nix {inherit pkgs;};
+  needle = import self.modules."scripts.needle-model" {inherit pkgs;};
   host = pkgs.stdenv.hostPlatform;
 in {
   options.programs.edgeCaller = {

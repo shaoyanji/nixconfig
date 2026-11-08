@@ -1,6 +1,7 @@
 # lib/gemini-mail.nix — the email archive as a Gemini capsule fragment: a landing
-# page plus three CGI scripts that query the archive API on loopback. The
-# program is ./gemini-mail/mail.py; this file only decides where it lives.
+# page plus the CGI scripts that query the archive API on loopback — search,
+# newest, one message, the attention queue and an attachment notice. The program
+# is ./gemini-mail/mail.py; this file only decides where it lives.
 #
 # Mounting rule (hosts/delphi/gemini.nix): the fragment goes on the TAILNET
 # instance. The public capsule keeps no `CGIPaths` and no mail tree, so the
@@ -34,6 +35,7 @@
 
     => /cgi-bin/email search — words, "a phrase", OR, -excluded
     => /cgi-bin/latest the newest 30 messages
+    => /cgi-bin/attention what needs a person
 
     ## What is in here
 
@@ -41,8 +43,18 @@
     other folders are not served yet, and a message the importer saw only as an
     envelope says so when you open it.
 
-    An attachment is named on the message that carried it and never served: the
-    capsule mirrors no files, so reading mail here cannot grow the store.
+    An attachment is a link to a notice saying where the file lives, never the
+    file: the capsule mirrors no bytes, so reading mail here cannot grow the
+    store.
+
+    ## What needs a person
+
+    The attention queue is the other reading order: every message still open in
+    the person, review or action tier, a person's mail first, each with the
+    classifier's reason. A message an agent already owns is in that agent's
+    queue instead, so this page stays about people. Resolving is a write, and a
+    capsule read does not write; `task agents:mail:resolve` and
+    `agents:mail:sweep` do that on the host.
 
     ## How the search works
 
@@ -70,12 +82,14 @@ in {
 
   fragment =
     pkgs.runCommand "gemini-mail" {
-      meta.description = "The mail archive as a Gemini capsule fragment: /mail/ and /cgi-bin/{email,latest,read}";
+      meta.description = "The mail archive as a Gemini capsule fragment: /mail/ and /cgi-bin/{email,latest,read,attention,attachment}";
     } ''
       install -Dm644 ${landing} $out/mail/index.gmi
       install -Dm755 ${cgi "email" "search"} $out/cgi-bin/email
       install -Dm755 ${cgi "latest" "latest"} $out/cgi-bin/latest
       install -Dm755 ${cgi "read" "read"} $out/cgi-bin/read
+      install -Dm755 ${cgi "attention" "attention"} $out/cgi-bin/attention
+      install -Dm755 ${cgi "attachment" "attachment"} $out/cgi-bin/attachment
     '';
 
   # The fragment copied onto an existing capsule. `cp`, not a symlink join:
@@ -92,5 +106,7 @@ in {
       install -Dm755 ${cgi "email" "search"} $out/cgi-bin/email
       install -Dm755 ${cgi "latest" "latest"} $out/cgi-bin/latest
       install -Dm755 ${cgi "read" "read"} $out/cgi-bin/read
+      install -Dm755 ${cgi "attention" "attention"} $out/cgi-bin/attention
+      install -Dm755 ${cgi "attachment" "attachment"} $out/cgi-bin/attachment
     '';
 }

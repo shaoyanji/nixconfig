@@ -1,20 +1,22 @@
 # gemini-mail — the email archive as a Gemini capsule
 
 `gemini://delphi.cloudforest-kardashev.ts.net:1966/mail/` is the archive as a
-capsule: search, the newest messages, and one message at a time, from a Gemini
-client. It reads the same PostgreSQL rows the tailnet HTTP API on 8450 publishes,
-so it is the first capsule here that answers from a live database rather than
-serving files — frieren's docs capsule has a CGI too, but `hello` only proves the
-wiring.
+capsule: search, the newest messages, what needs a person, and one message at a
+time, from a Gemini client. It reads the same PostgreSQL rows the tailnet HTTP
+API on 8450 publishes, so it is the first capsule here that answers from a live
+database rather than serving files — frieren's docs capsule has a CGI too, but
+`hello` only proves the wiring.
 
 | | |
 | :--- | :--- |
 | Landing page | `/mail/` — what the archive holds, how the search works |
 | Search | `/cgi-bin/email` with no query answers `10`, so the client asks for one; `?words` answers up to 30 hits with a snippet |
 | Newest | `/cgi-bin/latest` — the newest 30 |
-| One message | `/cgi-bin/read?<id>` — envelope, attachment name, body in a preformatted block (48 KiB cap); `51` when the archive has no such id |
-| Program | `lib/gemini-mail/mail.py` (three modes, one program) |
-| Capsule fragment | `lib/gemini-mail.nix` — `/mail/` and `cgi-bin/{email,latest,read}` |
+| One message | `/cgi-bin/read?<id>` — envelope, attachment link, body in a preformatted block (48 KiB cap); `51` when the archive has no such id |
+| Needs a person | `/cgi-bin/attention` — the unresolved person, review and action tiers, a person's mail first, each row carrying the classifier's reason; agents' queues are excluded; `?N` sets the count (20 default, 100 max) |
+| Attachment notice | `/cgi-bin/attachment?<id>` — where a message's files live, why the capsule does not serve them; `51` for an unknown id |
+| Program | `lib/gemini-mail/mail.py` (five modes, one program) |
+| Capsule fragment | `lib/gemini-mail.nix` — `/mail/` and `cgi-bin/{email,latest,read,attention,attachment}` |
 | Mount | `hosts/delphi/gemini.nix` — the 1966 instance only |
 
 **Not a generated page.** Mail arrives hourly, so a capsule compiled at deploy
@@ -45,6 +47,13 @@ The archive is tailnet-only, and so is this reader: 1966 is reached through a
 2026-11-08 after the switch — on the public 1965, `/` answers `20` while `/mail/`
 and every `/cgi-bin/*` path answer `51`.
 
+**A read, never a write.** The attention queue is the page a person triages
+from, and it stops at reading: resolving sets a row's `resolved_at` through
+`POST /api/triage-resolve`, and a GET is the wrong verb for a mutation, so the
+capsule only names the tasks (`agents:mail:resolve ID=<id>` for one message,
+`agents:mail:sweep` for a block). The queue page states the same thing where a
+reader will see it.
+
 ## Verify
 
 `openssl s_client -quiet` prints nothing for a request this server answers on the
@@ -71,7 +80,11 @@ probe $H 1966 /mail/ | head -3                 # 20 text/gemini + the landing pa
 probe $H 1966 /cgi-bin/email | head -1         # 10 — the client's query prompt
 probe $H 1966 '/cgi-bin/email?invoice' | head -1   # 20 + hits
 probe $H 1966 /cgi-bin/latest | grep -c '^=> /cgi-bin/read?'   # 30
+probe $H 1966 /cgi-bin/attention | head -2     # 20 + "# N messages need a person"
+probe $H 1966 '/cgi-bin/attention?5' | head -2  # the same at five rows
+probe $H 1966 '/cgi-bin/attachment?<id>' | sed -n 1,3p   # the notice, no file
 probe delphi.bountystash.com 1965 /cgi-bin/email | head -1     # 51 — not there
+probe delphi.bountystash.com 1965 /cgi-bin/attention | head -1 # 51 — not there
 ```
 
 The prompt, a hit list, a body inside a preformatted block, `51` for an unknown
@@ -80,10 +93,15 @@ rebuild; each was exercised against the live archive before the first deploy.
 
 ## What it is not
 
-- **Not an attachment mirror, by decision.** An attachment is named on the
-  message that carried it and never served: the archive holds the file, and a
-  capsule copy would be a second home for storage that does not belong in a
-  store path. Opening mail here cannot grow the capsule.
+- **Not an attachment mirror, by decision.** The attachment line on a message
+  links to a notice: the directory the files live in, the fact that the tree is
+  `0750` and belongs to the archive's service user, and the `sudo -u` command
+  that reads it on the host. No bytes are served, so a capsule copy cannot
+  become a second home for storage that does not belong in a store path, and
+  opening mail here cannot grow the capsule. The notice describes the archive's
+  real shape: one directory per message (`<sha256(message_id)[:16]>/`) holding
+  every file that arrived with it — `attachment_path` names that directory, not
+  a file, so the label on the read page is the directory's name.
 - **Not the whole mailbox.** The importer walks the inbox; sent mail and other
   folders are absent until something posts them, and a message stored as an
   envelope says so when opened.

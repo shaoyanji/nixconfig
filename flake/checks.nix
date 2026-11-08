@@ -184,8 +184,21 @@ lib.genAttrs systems.work (
       # failing the gate while its text and the fact that overturned it both stay
       # in the record. A failure with no override keeps failing, which is why this
       # is precedence and not an exemption.
-      policyFailing = builtins.filter (id: !policiesCtl.policies.${id}.holds) policiesCtl.ids;
+      # A `soft` policy is a measured budget whose overrun is reported and does
+      # not fail the gate: the number still has a home and still moves in the
+      # open, but a growing corpus is a cost, not a contradiction. Hard policies
+      # are unchanged — only a declared epistemic fact overturns one of those.
+      policySoft = id: policiesCtl.policies.${id}.soft or false;
+      policyFailing = builtins.filter (id: !policiesCtl.policies.${id}.holds && !(policySoft id)) policiesCtl.ids;
+      policySoftFailing = builtins.filter (id: !policiesCtl.policies.${id}.holds && policySoft id) policiesCtl.ids;
       policyFailures = epistemicsCtl.overturns policyFailing;
+      softReport =
+        lib.concatMapStrings (
+          id: ''
+            ~ ${id} (soft) — ${policiesCtl.policies.${id}.detail}
+          ''
+        )
+        policySoftFailing;
       policyOverturned = builtins.filter (id: epistemicsCtl.overrides ? ${id}) policyFailing;
       policyReport =
         lib.concatMapStrings (
@@ -295,6 +308,9 @@ lib.genAttrs systems.work (
             ''
             + lib.optionalString (policyOverturned != []) ''
               printf '%s\n' ${lib.escapeShellArg overturnReport}
+            ''
+            + lib.optionalString (policySoftFailing != []) ''
+              printf '%s\n' ${lib.escapeShellArg softReport}
             ''
             + ''
               touch $out

@@ -10,7 +10,8 @@ platforms: [linux, macos]
 
 `cpg image` renders a prompt to PNG through chatplayground's image endpoint and
 returns its CDN URL, plus the local file when you ask for one. One call, one
-image: no server, no browser, no queue.
+image: no server, no browser, no queue. The client is declared in
+`modules/user/ai/hermes-user.nix`.
 
 ```bash
 cpg image --json -o "$HOME/Pictures/cpg/icon.png" \

@@ -10,7 +10,8 @@ platforms: [linux, macos]
 
 A speculative round: N cheap lanes answer the same question at once, Jev picks
 the best, and the caller reads one answer. The main agent spends its context on
-the winner instead of on four drafts.
+the winner instead of on four drafts. The client it drives is declared in
+`modules/user/ai/hermes-user.nix`.
 
 ```bash
 .agents/skills/cpg-speculate/scripts/speculate.sh \

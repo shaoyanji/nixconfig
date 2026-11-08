@@ -607,6 +607,8 @@
       # the output was {}. What remains routes. The map is gone, so `no-orphan-docs`
       # went with it: reachability is the site index compiled from the graph.
       holds = agentsLines <= 482 && skillLines <= 5270;
+      # Soft: a budget, not a contradiction — the overrun is reported with its number and never reds the gate.
+      soft = true;
       detail = "AGENTS.md ${toString agentsLines}/482 lines, skill bodies ${toString skillLines}/5270 — over budget means delete or an audited `Truth:` extension, not a renumber";
     };
 

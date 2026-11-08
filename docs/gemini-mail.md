@@ -48,11 +48,23 @@ and every `/cgi-bin/*` path answer `51`.
 ## Verify
 
 `openssl s_client -quiet` prints nothing for a request this server answers on the
-OpenSSL 3.5 the host ships (measured 2026-11-08), so probe with Python:
+OpenSSL 3.5 the host ships (measured 2026-11-08), so probe with Python. Read to
+EOF: one `recv` is not a response — the status line and a long body arrive in
+separate packets, and a single-recv probe printed only `20 text/gemini` for
+`/mail/` and `/turns/` while both pages were fine.
 
 ```bash
 probe() {
-  python3 -c 'import socket,ssl,sys;h,p,x=sys.argv[1],int(sys.argv[2]),sys.argv[3];c=ssl.create_default_context();c.check_hostname=False;c.verify_mode=ssl.CERT_NONE;s=c.wrap_socket(socket.create_connection(("127.0.0.1",p)),server_hostname=h);s.sendall(f"gemini://{h}:{p}{x}\r\n".encode());sys.stdout.write(s.recv(65536).decode())' "$@"
+  python3 -c 'import socket,ssl,sys
+h,p,x=sys.argv[1],int(sys.argv[2]),sys.argv[3]
+c=ssl.create_default_context();c.check_hostname=False;c.verify_mode=ssl.CERT_NONE
+s=c.wrap_socket(socket.create_connection(("127.0.0.1",p)),server_hostname=h)
+s.sendall(f"gemini://{h}:{p}{x}\r\n".encode()); s.settimeout(10); out=[]
+while True:
+    b=s.recv(65536)
+    if not b: break
+    out.append(b)
+sys.stdout.write(b"".join(out).decode())' "$@"
 }
 H=delphi.cloudforest-kardashev.ts.net
 probe $H 1966 /mail/ | head -3                 # 20 text/gemini + the landing page

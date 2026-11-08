@@ -5223,6 +5223,48 @@
       '';
     };
 
+    gemini-turns-reader = {
+      title = "The agent turn log answers over Gemini beside the mail reader";
+      kind = "open";
+      status = "DELIVERED";
+      date = "2026-11-08";
+      priority = "P3";
+      links = ["gemini-capsule" "gemini-mail-reader"];
+      summary = "`gemini://delphi.cloudforest-kardashev.ts.net:1966/turns/` shows the newest turns, a word search and the open claims from the same shim the agents write through — four wrappers over one program, linked from the portfolio index beside `/mail/`, on the tailnet instance only.";
+      refs = {
+        hosts = ["delphi"];
+        modules = [
+          "hosts/delphi/gemini.nix"
+          "lib/gemini-turns.nix"
+          "lib/gemini-turns/turns.py"
+        ];
+        docs = [
+          "docs/gemini-turns.md"
+          "docs/agent-turns.md"
+          ".agents/deploy/hosts/delphi.md"
+        ];
+        tasks = ["infra:deploy:host:delphi"];
+      };
+      body = ''
+        **A CGI gets no environment.** molly-brown sets `cmd.Env = []string{}` before exec,
+        so a unit's `EnvironmentFile` never reaches a capsule script — the obvious answer
+        does not work. The token is a sops template rendered to root:gemini 0440 under
+        `/run/secrets/rendered` (0751, so the group can traverse), and the wrapper carries
+        the path. The capsule's store path stays value-free; the cost is that it holds the
+        fleet token, which can append, because the shim has no read-only scope.
+
+        **Attachments stay unserved, by decision.** The mail page names an attachment and
+        never serves it: the archive holds the file, and a capsule copy would be a second
+        home for storage that does not belong in a store path.
+
+        **Exit.** Met on 2026-11-08 on 1966: `/turns/` 20 with the landing page;
+        `/cgi-bin/turns` 10 with no query and 12 hits for `gemini`; `turns-latest` and
+        `turns-live` (3 open claims) 20; `/cgi-bin/turn?<id>` 20 with its rationale in two
+        fences; 51 for an unknown id. On 1965 `/turns/` and `/cgi-bin/turns` answer 51 while
+        `/mail/` still serves 20 and the index links both readers.
+      '';
+    };
+
     open-pihole-admin-path = {
       title = "`/admin` on the Pi-hole vhost is a 404, and every old link points there";
       kind = "open";

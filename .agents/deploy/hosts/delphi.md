@@ -268,12 +268,12 @@ Verify from a client — the first line must be `20 text/gemini; charset=utf-8`.
 This host's OpenSSL prints nothing for `s_client -quiet` (measured 2026-11-08),
 so the working probe is the Python one in [`docs/gemini-mail.md`](../../docs/gemini-mail.md).
 
-### The mail reader, on the tailnet instance only
+### The two live readers, on the tailnet instance only
 
-The archive is also a capsule on 1966 — `/mail/` plus `/cgi-bin/{email,latest,read}`
-(`lib/gemini-mail.nix`, program `lib/gemini-mail/mail.py`). 1965 serves the
-portfolio alone: no mail tree, no `CGIPaths`. Procedure and the two mounting
-traps: [`docs/gemini-mail.md`](../../docs/gemini-mail.md).
+1966 is the portfolio plus two CGI readers, `/mail/` (`lib/gemini-mail.nix`) and
+`/turns/` (`lib/gemini-turns.nix`), both linked from the index; 1965 still serves
+the portfolio alone, with no trees and no `CGIPaths`. Mounting traps and the turn
+token: [`gemini-mail.md`](../../docs/gemini-mail.md), [`gemini-turns.md`](../../docs/gemini-turns.md).
 
 A renewed ACME certificate restarts `molly-brown` (`reloadServices`); the tailnet
 certificate is re-issued by the daily `gemini-tailnet-cert` timer, which only

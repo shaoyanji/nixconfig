@@ -96,6 +96,11 @@ read, and `truncated: true` says the scan hit its cap and older matches may exis
 Until 2026-11-03 the filter ran over the page instead, and `?subject=…` answered
 `count: 0` for a subject that was in the store — measured against a 113-turn log.
 
+A person without a shell reads the same log over Gemini:
+`gemini://delphi.cloudforest-kardashev.ts.net:1966/turns/` — newest turns, a
+word search and the open claims ([`gemini-turns.md`](gemini-turns.md)). It is a
+reader over this shim, so it adds no second store.
+
 The read side (`agents:xs:list`) adds the one rule the shim cannot know: an
 `in_progress` whose newest entry is older than `STALE_DAYS` (7) is **stale** —
 printed, and not a failed check, because an agent that died mid-turn must not red

@@ -37,9 +37,12 @@
 
     ## What is in here
 
-    The inbox, as the importer walks it: plain text, one mailbox. Sent mail,
-    other folders and attachments are not served yet, and a message the importer
-    saw only as an envelope says so when you open it.
+    The inbox, as the importer walks it: plain text, one mailbox. Sent mail and
+    other folders are not served yet, and a message the importer saw only as an
+    envelope says so when you open it.
+
+    An attachment is named on the message that carried it and never served: the
+    capsule mirrors no files, so reading mail here cannot grow the store.
 
     ## How the search works
 
@@ -51,7 +54,8 @@
     ## Elsewhere
 
     => / the portfolio
-    => gemini://gemini.frieren.lan/ the fleet's documentation over Gemini
+    => /turns/ the agent turn log
+    => gemini://gemini.frieren.lan/ the fleet's documentation over Gemini (LAN)
   '';
 in {
   # The gemtext a capsule's index appends to reach the reader. Passed to

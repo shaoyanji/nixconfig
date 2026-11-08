@@ -20,7 +20,8 @@ wiring.
 **Not a generated page.** Mail arrives hourly, so a capsule compiled at deploy
 time would answer yesterday's archive. The scripts query
 `EMAIL_ARCHIVE_API` (default `http://127.0.0.1:8080/api`) on request, which is
-why the reader is CGI and why the fragment exists only to carry `cgi-bin/`.
+why the reader is CGI and why the fragment exists only to carry `cgi-bin/`. The
+turn log is the second reader on the same capsule: [`gemini-turns.md`](gemini-turns.md).
 
 ## Two traps that decide whether it runs
 
@@ -67,8 +68,10 @@ rebuild; each was exercised against the live archive before the first deploy.
 
 ## What it is not
 
-- **Not an attachment mirror.** An attachment is named, not served: the file is
-  on the host, not in the capsule.
+- **Not an attachment mirror, by decision.** An attachment is named on the
+  message that carried it and never served: the archive holds the file, and a
+  capsule copy would be a second home for storage that does not belong in a
+  store path. Opening mail here cannot grow the capsule.
 - **Not the whole mailbox.** The importer walks the inbox; sent mail and other
   folders are absent until something posts them, and a message stored as an
   envelope says so when opened.

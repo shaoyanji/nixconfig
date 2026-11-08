@@ -156,7 +156,7 @@ def read(message_id):
     ]
     attachment = row.get("attachmentPath") or ""
     if attachment:
-        lines += [f"attachment: {os.path.basename(attachment)}", ""]
+        lines += [f"attachment: {os.path.basename(attachment)} (named only, not in the capsule)", ""]
     body = fence_safe(row.get("bodyPlain") or "")
     if body:
         lines += ["```text", body, "```"]

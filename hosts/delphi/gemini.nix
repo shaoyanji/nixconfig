@@ -13,14 +13,16 @@
 
   capsule = import ../../lib/gemini-portal.nix {inherit pkgs lib;};
   mail = import ../../lib/gemini-mail.nix {inherit pkgs lib;};
+  turns = import ../../lib/gemini-turns.nix {inherit pkgs lib;};
 
-  # The tailnet instance is the portfolio plus the mail archive reader, and it
-  # is the only one that names a CGI path. The public capsule has neither the
-  # mail tree nor `CGIPaths`, so port 1965 can never reach the archive.
-  tailnetCapsule = mail.capsule (import ../../lib/gemini-portal.nix {
+  # The tailnet instance is the portfolio plus the two live readers, and it is
+  # the only one that names a CGI path. The public capsule has neither the trees
+  # nor `CGIPaths`, so port 1965 can never reach the archive or the turn log.
+  # The readers link each other, and both are linked from the portfolio index.
+  tailnetCapsule = turns.capsule (mail.capsule (import ../../lib/gemini-portal.nix {
     inherit pkgs lib;
-    extra = mail.indexSection;
-  });
+    extra = mail.indexSection ++ turns.indexSection;
+  }));
 
   publicPort = 1965;
   tailnetPort = 1966;
@@ -83,6 +85,23 @@ in {
       RestartSec = 10;
     };
   };
+
+  # The turn reader presents a bearer token to the shim on loopback, and
+  # molly-brown starts a CGI with an empty environment (`cmd.Env = []string{}`
+  # in its dynamic.go), so the token cannot arrive through the unit's
+  # environment — it has to be a file the capsule's group can read. Rendering the
+  # existing secret through `sops.placeholder` keeps one credential rather than a
+  # second copy of it, and /run/secrets/rendered is group-traversable (0751).
+  sops.templates."gemini-turns-token" = {
+    content = config.sops.placeholder."agent-turns-token";
+    mode = "0440";
+    group = "gemini";
+  };
+
+  # A rotated token reaches the shim through its own restartUnits; the reader
+  # reads the file per request, but re-rendering replaces the inode, so it needs
+  # the same nudge.
+  sops.secrets."agent-turns-token".restartUnits = lib.mkAfter ["molly-brown-tailnet.service"];
 
   # tailscaled issues the MagicDNS name's certificate, so the tailnet capsule
   # needs no ACME line of its own.

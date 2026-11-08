@@ -838,10 +838,13 @@ in {
                 tryFiles = "$uri $uri/ =404";
                 # `rewrite … last` re-matches to the exact location below, so a
                 # client that will not follow a 302 (`curl` without `-L`) still
-                # gets the document in one request.
+                # gets the document in one request. Anchored to the root: an
+                # unanchored pattern served the terminal page in place of every
+                # 404 and every real subpath a CLI client asked for (measured
+                # 2026-11-08 on `/data/delphi.json`).
                 extraConfig =
                   ''
-                    if ($delphi_terminal) { rewrite ^ /terminal.txt last; }
+                    if ($delphi_terminal) { rewrite ^/$ /terminal.txt last; }
                   ''
                   + staticCache.html
                   + siteHeader;

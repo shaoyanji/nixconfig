@@ -76,9 +76,24 @@
     ];
 in rec {
   inherit globalModules hmSharedModulesHome inventoryModules;
-  globalModulesNixos =
-    globalModules
-    ++ [
+
+  # A host is a list of named features, not one of seven chains.
+  #
+  # The `globalModules*` names were seven hand-composed lists over the same eight
+  # groups of modules, so a host that differed by one module either forked a
+  # chain or grew a file of imports. Naming the groups makes the difference data:
+  # `features = ["base" "nixos" "dms"]` IS the desktop chain, in that order.
+  #
+  # The seven names below are derived, so `flake/host-inventory.nix` and every
+  # `hosts/*` file kept working unchanged — and `checks:drv-equality` shows the
+  # derivation of all 30 configurations did not move.
+  featureModules = {
+    # inventory injection + configurationRevision + modules/global/global.nix +
+    # the nixpkgs overlays (simplex-chat, molly-brown, llm-agents).
+    base = globalModules;
+
+    # The NixOS kernel of a desktop or VM host.
+    nixos = [
       moduleFiles."global.nixos"
       # Determinate Nix: one Nix binary for every NixOS host (rollback = the
       # generation). See the module header for the priority and registry traps.
@@ -86,69 +101,81 @@ in rec {
       inputs.home-manager.nixosModules.default
       inputs.sops-nix.nixosModules.sops
       inputs.nix-index-database.nixosModules.nix-index
+    ];
+
+    # Dux shell. Mutually exclusive with `ryoku` by intent: one shell per
+    # session, and two Quickshell sessions must not both start.
+    dms = [
       inputs.dms.nixosModules.dank-material-shell
       # Greeter lives in its own repo (duxlabs-dev/dux-greeter, ex-
       # AvengeMedia/dank-greeter): option is programs.dms-greeter.
       inputs.dank-greeter.nixosModules.default
     ];
-  # Ryoku replaces the shell, not the system: it owns its compositor build,
-  # session packages, portals, keyring and greeter preference. So this chain is
-  # `globalModulesNixos` minus dms/dank-greeter (they would be a second
-  # Quickshell shell in the same session), plus `modules/profiles/ryoku-desktop.nix`
-  # in the host, which sets `fleet.dankShell.enable = false` to keep the DMS
-  # home modules out of HM as well.
-  globalModulesRyoku =
-    globalModules
-    ++ [
-      moduleFiles."global.nixos"
-      moduleFiles."global.determinate-nix"
-      inputs.home-manager.nixosModules.default
-      inputs.sops-nix.nixosModules.sops
-      inputs.nix-index-database.nixosModules.nix-index
-      inputs.ryoku.nixosModules.default
-    ];
-  globalModulesImpermanence =
-    globalModulesNixos
-    ++ [
+
+    # Ryoku replaces the shell, not the system: it owns its compositor build,
+    # session packages, portals, keyring and greeter preference. A host on this
+    # feature carries `modules/profiles/ryoku-desktop.nix`, which sets
+    # `fleet.dankShell.enable = false` to keep the DMS home modules out of HM.
+    ryoku = [inputs.ryoku.nixosModules.default];
+
+    impermanence = [
       moduleFiles."global.impermanence"
       inputs.impermanence.nixosModules.impermanence
       inputs.disko.nixosModules.default
     ];
-  globalModulesMacos =
-    globalModules
-    ++ [
-      moduleFiles."global.macos"
-      inputs.nix-homebrew.darwinModules.nix-homebrew
-      inputs.home-manager.darwinModules.default
-      inputs.sops-nix.darwinModules.sops
-    ];
-  globalModulesContainers =
-    globalModules
-    ++ [
+
+    # A container/WSL host: home-manager without a shell, and no
+    # modules/global/nixos.nix.
+    containers = [
       moduleFiles."global.noDE"
       moduleFiles."global.determinate-nix"
       inputs.sops-nix.nixosModules.sops
       inputs.home-manager.nixosModules.default
       inputs.nix-index-database.nixosModules.nix-index
     ];
-  globalModulesDemo =
-    globalModules
-    ++ [
+
+    demo = [
       moduleFiles."global.demo"
       moduleFiles."global.determinate-nix"
       inputs.home-manager.nixosModules.default
     ];
-  # Standalone-home chain. These hosts build their own pkgs outside the
-  # NixOS module system, so modules/global/global.nix (which carries the
-  # repo-wide nixpkgs.config.allowUnfree = true policy) never applies.
-  # Restore the same policy here — without it the unfree antigravity-cli
-  # (pulled in via roles/minimal → user/ai) fails eval on alarm/kali.
-  globalModulesHome =
-    hmSharedModulesHome
-    ++ [
-      {
-        nixpkgs.config.allowUnfree = true;
-        nixpkgs.overlays = [inputs.llm-agents.overlays.shared-nixpkgs];
-      }
+
+    macos = [
+      moduleFiles."global.macos"
+      inputs.nix-homebrew.darwinModules.nix-homebrew
+      inputs.home-manager.darwinModules.default
+      inputs.sops-nix.darwinModules.sops
     ];
+
+    # Standalone home-manager. These hosts build their own pkgs outside the
+    # NixOS module system, so modules/global/global.nix (which carries the
+    # repo-wide nixpkgs.config.allowUnfree = true policy) never applies.
+    # Restore the same policy here — without it the unfree antigravity-cli
+    # (pulled in via roles/minimal → user/ai) fails eval on alarm/kali.
+    home =
+      hmSharedModulesHome
+      ++ [
+        {
+          nixpkgs.config.allowUnfree = true;
+          nixpkgs.overlays = [inputs.llm-agents.overlays.shared-nixpkgs];
+        }
+      ];
+  };
+
+  # `modules` is what a `hosts/*.nix` file used to contribute by hand.
+  mkHost = {
+    features,
+    modules ? [],
+  }:
+    lib.concatMap (f: featureModules.${f}) features ++ modules;
+
+  globalModulesNixos = mkHost {features = ["base" "nixos" "dms"];};
+  globalModulesRyoku = mkHost {features = ["base" "nixos" "ryoku"];};
+  globalModulesImpermanence = mkHost {
+    features = ["base" "nixos" "dms" "impermanence"];
+  };
+  globalModulesMacos = mkHost {features = ["base" "macos"];};
+  globalModulesContainers = mkHost {features = ["base" "containers"];};
+  globalModulesDemo = mkHost {features = ["base" "demo"];};
+  globalModulesHome = mkHost {features = ["home"];};
 }

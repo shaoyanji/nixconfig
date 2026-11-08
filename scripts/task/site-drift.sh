@@ -3,8 +3,9 @@
 # store path it read at activation, so a boot-only switch, a rollback and a flake
 # ref that never moved all look identical from outside. The site vhosts therefore
 # say which store path they are serving (`X-Site-Path`), and this compares that
-# answer with the tree's own host instantiation (`.#delphi-site`, which IS
-# `system.build.delphiSite` — not a second, card-less build).
+# answer with the tree's own host instantiation (`.#sites.delphi-site`, which IS
+# `system.build.delphiSite` — not a second, card-less build). The package lives
+# under `sites` (flake/packages.nix), so the bare `.#delphi-site` is not an attr.
 #
 # One HTTP request with a timeout and one eval: no ssh (a pre-switch hook that
 # opens ssh hung for five minutes on an interactive browser check), no journal,
@@ -22,7 +23,7 @@ set -uo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 2
 
-ATTR=${ATTR:-delphi-site}
+ATTR=${ATTR:-sites.delphi-site}
 HOST_HEADER=${HOST_HEADER:-delphi}
 URL=${URL:-http://127.0.0.1/}
 TIMEOUT=${TIMEOUT:-5}

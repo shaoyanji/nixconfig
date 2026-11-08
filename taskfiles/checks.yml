@@ -440,7 +440,7 @@ tasks:
       boot-only activation, a rollback, a flake ref that never moved — and from
       outside that looks like success. Each site vhost emits `X-Site-Path`; this
       asks the live server which store path it serves and compares it with
-      `.#delphi-site`, the host's `system.build.delphiSite`.
+      `.#sites.delphi-site`, the host's `system.build.delphiSite`.
 
       One request with a timeout plus one eval, under the OOM watchdog, no ssh.
       Vars: ATTR=, URL= (default http://127.0.0.1/), HOST_HEADER=, TIMEOUT=,

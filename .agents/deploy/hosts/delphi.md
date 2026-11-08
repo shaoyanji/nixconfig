@@ -72,7 +72,6 @@ traps and the HTTPS/autoUpgrade path — is [`docs/delphi-install.md`](../../../
 What a running delphi needs instead is below: the guest layer, the tailnet mounts,
 the compiled surfaces, and the traps.
 
-
 ## DeepSeek Harness (tailnet only)
 
 The harness runs **here** so a thin client can use this host's CPU, disk and
@@ -137,9 +136,8 @@ ssh delphi sudo systemctl disable dsh-web    # stays down across boots (it ships
 ssh delphi sudo systemctl restart dsh-web    # the EnvironmentFile is read at start
 ```
 
-Stopping `dsh-web` takes the app down for tailnet clients too; the front keeps
-listening and answers `502`. `sudo systemctl stop tailscale-serve-dsh` is what
-removes the entry point itself — the public vhost never carried it.
+Stopping `dsh-web` takes the app down for tailnet clients too, and the front then
+answers `502`; `sudo systemctl stop tailscale-serve-dsh` removes the entry point.
 
 **The name does not resolve by default, and that is the one client-side step.**
 The fleet resolver pins `~.` to its own DNS, so `*.ts.net` returns nothing
@@ -161,8 +159,8 @@ host's substituters at the LAN cache: pull from upstream at line rate and push t
 Cachix, which is also why `8f7cd042` decoupled it.
 
 `tailscale serve` cannot take 443 on the tailnet address while nginx holds
-`0.0.0.0:443` (`bind: address already in use`, measured 2026-10-21), which is why
-the front listens on 8443. That port is visible only inside the tailnet.
+`0.0.0.0:443` (`bind: address already in use`, 2026-10-21), hence 8443 — a port
+visible only inside the tailnet.
 
 ## Tailnet service mounts (one port per service)
 
@@ -177,9 +175,8 @@ terminates TLS, so there is no certificate to own per service.
 | 8445 | Stirling PDF | `tailscale-serve-pdf` | `127.0.0.1:7351` |
 | 8446 | Service console (the compiled tailnet portal) | `tailscale-serve-portal` | `127.0.0.1:8082` |
 
-Both the mounts and the console are compiled from `services.servicePortal` in
-`hosts/delphi/configuration.nix`: add a mount and its card appears, remove one and
-the card goes. Nothing on this page is hand-written — `data/services.json`
+Both the mounts and the console are compiled from `services.servicePortal`: add a
+mount and its card appears, remove one and the card goes. `data/services.json`
 carries the same list for a TUI or a probe, and the asserts in
 `modules/services/service-portal.nix` fail the build when a mount has no card, a
 card has no owner, two mounts share a port, an upstream is not loopback, or a
@@ -187,11 +184,10 @@ card has no owner, two mounts share a port, an upstream is not loopback, or a
 
 ## Offloaded services (2026-11-02)
 
-Three services moved up from the NAS. They are **not** portal mounts and they are
-not public: each binds every interface but is opened on `tailscale0` only, and
-their only client is frieren's nginx one hop away. The names (`docs.frieren.lan`,
-`vault.frieren.lan`, `anki.frieren.lan`) stayed on frieren, which is what makes
-the move reversible — `docs/service-offload.md` is the procedure.
+Three services moved up from the NAS. They are **not** portal mounts and not
+public: each binds every interface, is opened on `tailscale0` only, and its only
+client is frieren's nginx one hop away. The names stayed on frieren, which is what
+makes the move reversible — `docs/service-offload.md` is the procedure.
 
 | Port | Service | State | Reached as |
 | :--- | :--- | :--- | :--- |
@@ -199,10 +195,9 @@ the move reversible — `docs/service-offload.md` is the procedure.
 | 8222 / 3012 | vaultwarden (`hosts/delphi/vaultwarden.nix`) | `/var/lib/vaultwarden`, SQLite | `https://vault.frieren.lan` |
 | 27701 | anki sync (`hosts/delphi/anki-sync.nix`) | `/var/lib/anki-sync-server` | `http://anki.frieren.lan` |
 
-anki's only account takes its password from sops (`anki-sync/password`, read with
-`sops -d modules/secrets.yaml | yq -r '.anki-sync.password'`), rendered as a
-systemd credential rather than a plaintext option. The unit's `LoadCredential`
-line is the proof it is wired: `systemctl show -p LoadCredential anki-sync-server`.
+anki's only account takes its password from sops (`anki-sync/password`), rendered
+as a systemd credential, not a plaintext option; the proof is
+`systemctl show -p LoadCredential anki-sync-server`.
 
 That account is **`devji`** and it is the only one. `bob` was the plaintext
 placeholder and answers `403` on `/sync/hostKey` (measured 2026-11-06), so a
@@ -216,16 +211,15 @@ connectors, drills, telc briefing, timed mock — are compiled by `anki-author`
 and merged over it by `scripts/german/anki-push.sh --base <apkg> decks/…`: six
 decks, 5,376 cards on 2026-11-06. Sequence and traps: `docs/service-offload.md`.
 
-Protocol note for a scripted client: version 11 is one `anki-sync` JSON header
-(`v`/`k`/`c`/`s`) plus a zstd body, and `meta` needs `{"v":11,"cv":…}`. A bare
-JSON body without the header is rejected with an unexplained `400`.
-`deutsch-srs -backend anki-sync` implements exactly that read path.
+Protocol note for a scripted client: version 11 is an `anki-sync` JSON header
+(`v`/`k`/`c`/`s`) plus a zstd body, `meta` needs `{"v":11,"cv":…}`, and a bare
+JSON body is rejected with an unexplained `400` — what `deutsch-srs -backend
+anki-sync` implements.
 
-The move is complete (2026-11-02): frieren's closure carries the three vhosts,
-proxying `docs`/`vault`/`anki.frieren.lan` straight to this host's tailnet
-address, and the transitional `offload-tunnel` service is deleted. Nothing binds
-those ports on frieren any more — if a client still complains about
-`host:27701`, it is pointing at the NAS instead of `anki.frieren.lan`.
+Complete since 2026-11-02: frieren's closure carries the three vhosts, proxying
+`docs`/`vault`/`anki.frieren.lan` to this host's tailnet address, and
+`offload-tunnel` is deleted. Nothing binds those ports on frieren — a client still
+complaining about `host:27701` is pointing at the NAS instead of the name.
 
 Nightly, `offload-bridge-push.timer` (03:10) mirrors the three trees to
 `frieren:/srv/backup/offload/` with each SQLite database replaced by a
@@ -280,14 +274,15 @@ certificate is re-issued by the daily `gemini-tailnet-cert` timer, which only
 renews inside a 30-day window (`--min-validity=720h`). Logs:
 `/var/log/molly-brown/` and `/var/log/molly-brown-tailnet/`.
 
-## The two surfaces: a dossier and a console (`lib/delphi-site.nix`)
+## The compiled surfaces (`lib/delphi-site.nix`)
 
-Delphi serves two documents, and they are two projections of ONE evaluated
-structure — not two pages kept in step by hand:
+Delphi serves three documents, all projections of ONE evaluated structure — not
+pages kept in step by hand:
 
 | Surface | Address | What it is |
 | :--- | :--- | :--- |
 | Dossier | `https://delphi.bountystash.com` | The portfolio page: the project, the machine, what runs here, the operating envelope, and the fleet it belongs to |
+| Terminal | the same name, asked with `curl`/`wget`/`nushell`/… | The dossier as one ANSI `text/plain` document: same counts, no address |
 | Console | `https://delphi.cloudforest-kardashev.ts.net:8446` · `http://delphi.cloudforest-kardashev.ts.net/` | The tailnet service list: every mount, its port, and the unit it waits on |
 
 Where the values come from — all of them evaluated at build time:
@@ -322,19 +317,27 @@ Three rules the pages are built to keep:
   is what admits it, so the name is inert from the internet even though the
   listener is the same one the public vhost uses.
 
+### The terminal edition
+
+A command-line user agent (`curl`, `wget`, `httpie`, `xh`, `nushell`, `aria2`, the
+library defaults) gets `/` as one ANSI `text/plain` document from `terminalDoc`,
+rendered from the same `site`; every other client gets the HTML, because the match
+is positive — a crawler must not lose the page. The list is `terminalClients`,
+compiled into `$delphi_terminal` in `hosts/delphi/configuration.nix`:
+`curl -s -A curl/8 <name>/ | head -3`, and `-A 'Mozilla/5.0'` must answer `text/html`.
+
 Preview it without touching the host:
 
 ```bash
-nix eval --raw .#delphi-site.outPath    # the tree nginx serves, cards included
-nix build .#delphi-site --print-out-paths
+nix eval --raw .#sites.delphi-site.outPath    # the tree nginx serves, cards included
+nix build .#sites.delphi-site --print-out-paths
 ```
 
-`.#delphi-site` **is** `config.system.build.delphiSite` — the host's own
+`.#sites.delphi-site` **is** `config.system.build.delphiSite` — the host's own
 instantiation, with `services.servicePortal.cards` — so the preview cannot be a
-second page wearing the same name. It is defined for `aarch64-linux` only, and
-because it is a host evaluation it costs one to evaluate; building it needs an
-aarch64 builder (or this host). Without the card registry the compiler throws at
-eval instead of rendering a console with no services in it.
+second page wearing the same name. It is `aarch64-linux` only and costs one host
+evaluation; without the card registry the compiler throws at eval instead of
+rendering a console with no services in it.
 
 A deploy can still leave the previous tree serving (a boot-only activation, a
 rollback, a flake ref that did not move). The vhosts emit `X-Site-Path`, so ask
@@ -344,20 +347,18 @@ the server instead of trusting the log:
 task checks:site:path                   # exit 1 = the live tree is not this tree
 ```
 
-It sends one request with a timeout — no ssh, so it cannot hang on an interactive
-auth check — and compares the header with `nix eval --raw .#delphi-site.outPath`.
-Exit 2 means nobody answered or the serving generation predates the header.
+One request with a timeout, no ssh: it compares the header with
+`nix eval --raw .#sites.delphi-site.outPath` (exit 2 = nobody answered, or the
+serving generation predates the header).
 
 A port is the mount, not a path: `tailscale serve` proxies a whole origin, so a
-new service takes the next free number rather than a location under an existing
-one.
+new service takes the next free number rather than a location under an existing one.
 
 **Stirling is a JVM.** After a switch `stirling-pdf.service` reports `active`
-while `tailscale serve` still answers **502** for about a minute; measured
-2026-10-21, first 200 at ~60 s. Read the log for `Stirling-PDF Started.` rather
-than trusting `ActiveState`, and do not treat the 502 as a broken mount. It was
-moved off frieren because it is stateless — the old bookmark `pdf.frieren.lan`
-now points at a closed port on frieren, so the URL is the tailnet one above.
+while `tailscale serve` still answers **502** for about a minute (measured
+2026-10-21, first 200 at ~60 s): read the log for `Stirling-PDF Started.`, do not
+treat the 502 as a broken mount. It lives here because it is stateless — the old
+bookmark `pdf.frieren.lan` points at a closed port on frieren now.
 
 Verify the whole set at once:
 
@@ -375,9 +376,8 @@ a transformer inference — so it is a fallback for shape, not for Laya's accura
 
 ## DNS failover topology
 
-Why `10.99.0.53`, what a VIP buys and how the pair is approved: `docs/dns-failover.md`.
-delphi is the only member today — frieren binds its own tailnet address only — so the
-/32 is served by delphi alone.
+Why `10.99.0.53`, what a VIP buys, how the pair is approved: `docs/dns-failover.md`.
+delphi is the only member today, so the /32 is served by delphi alone.
 
 ## Fixed during this install (they were not config typos)
 

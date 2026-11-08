@@ -102,6 +102,32 @@
   # about how long a store path may be cached.
   staticCache = import ../../modules/config/nginx-static-cache.nix;
 
+  # The public name hands a command-line client the terminal edition of the
+  # dossier (`terminalDoc` in lib/delphi-site.nix) instead of the HTML, which a
+  # program can neither read usefully nor colour.
+  #
+  # A POSITIVE match on known clients, not "anything that is not Mozilla":
+  # invert the test and a crawler, a link unfurler or a monitoring probe also
+  # gets plain text, and those are most of the audience the HTML page exists for.
+  # A client not listed here gets the HTML, which is the safe default; curl and
+  # nushell are the two that made this worth doing, and the rest are the same
+  # kind of client met later.
+  terminalClients = [
+    "curl"
+    "wget"
+    "httpie"
+    "xh"
+    "nushell"
+    "aria2"
+    "python-requests"
+    "python-urllib"
+    "go-http-client"
+    "libwww-perl"
+    "node-fetch"
+    "deno"
+  ];
+  terminalUa = "~*(${lib.concatStringsSep "|" terminalClients})";
+
   # The utility-layer recon report (hosts/delphi/reports/), published from the
   # store so a regeneration is a rebuild rather than a file dropped on the box.
   # `no-store` on purpose: the URL is stable and the content moves with the
@@ -651,6 +677,16 @@ in {
     recommendedOptimisation = true;
     recommendedGzipSettings = true;
 
+    # `map` is an http-level directive, so it cannot live inside a vhost. The
+    # variable is read by the public vhost's root location, which is why the
+    # match list above is host-level and not location-level.
+    commonHttpConfig = ''
+      map $http_user_agent $delphi_terminal {
+        default 0;
+        "${terminalUa}" 1;
+      }
+    '';
+
     # One definition of `virtualHosts`, because a module may not set the same
     # attribute path twice: the TLS vhost is merged in with `//` rather than
     # declared as a second `services.nginx.virtualHosts = …`.
@@ -800,7 +836,28 @@ in {
               "/" = {
                 index = "index.html";
                 tryFiles = "$uri $uri/ =404";
-                extraConfig = staticCache.html + siteHeader;
+                # `rewrite … last` re-matches to the exact location below, so a
+                # client that will not follow a 302 (`curl` without `-L`) still
+                # gets the document in one request.
+                extraConfig =
+                  ''
+                    if ($delphi_terminal) { rewrite ^ /terminal.txt last; }
+                  ''
+                  + staticCache.html
+                  + siteHeader;
+              };
+              # The terminal edition itself. Listed even when a browser asks, so
+              # a person who wants the text can have it at the same address.
+              "= /terminal.txt" = {
+                root = "${publicPage}";
+                extraConfig =
+                  ''
+                    default_type "text/plain; charset=utf-8";
+                    gzip_static on;
+                    add_header Cache-Control "public, max-age=300" always;
+                    add_header X-Content-Type-Options "nosniff" always;
+                  ''
+                  + siteHeader;
               };
               # Same eight explicit hex classes as frieren's vhost: a `{8}` brace
               # quantifier is emitted SPLIT across lines by the config generator and

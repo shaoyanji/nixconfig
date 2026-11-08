@@ -431,9 +431,112 @@
     colophon = "The cards are the compiled <code>services.servicePortal</code> registry &mdash; the same declaration generates the <code>tailscale serve</code> units.";
     provenance = "lib/delphi-site.nix · services.servicePortal.cards · inventory.toml";
   };
+  # ---- surface 3: the terminal edition --------------------------------------
+  # The same compiled structure, projected for a client that asked with a
+  # program. nginx hands this document to a known command-line user agent on the
+  # PUBLIC vhost only (hosts/delphi/configuration.nix, `terminalClients`), so it
+  # is a public surface and withholds exactly what the dossier withholds: no
+  # tailnet address, no port, no href. The counts are `site`'s, so a registry
+  # field that moves moves here too.
+  ansi = builtins.fromJSON "\"\\u001b\"";
+  sgr = codes: "${ansi}[${codes}m";
+  bold = sgr "1";
+  dim = sgr "2";
+  reset = sgr "0";
+  termWidth = 76;
+  rule = lib.concatStrings (lib.genList (_: "─") termWidth);
+
+  # Fold words to `max` columns. A word longer than the line overflows rather
+  # than being cut, because a model name or a URL broken mid-token is worse.
+  fold = max: text: let
+    words = lib.filter (w: w != "") (lib.splitString " " (lib.replaceStrings ["\n"] [" "] text));
+    step = acc: w:
+      if acc == []
+      then [w]
+      else if lib.stringLength (lib.last acc) + 1 + lib.stringLength w <= max
+      then lib.init acc ++ ["${lib.last acc} ${w}"]
+      else acc ++ [w];
+  in
+    builtins.foldl' step [] words;
+
+  # Prose the page quotes verbatim, folded and indented two columns.
+  termParagraph = text: lib.concatStringsSep "\n" (map (l: "  ${l}") (fold (termWidth - 2) text));
+
+  # A gutter label and a value folded under it. Colour goes on the label only,
+  # so the fold counts visible columns instead of escape bytes.
+  termRow = label: value:
+    if value == ""
+    then ""
+    else let
+      pad = padRight 11 label;
+      lines = fold (termWidth - 13) value;
+      cont =
+        lib.optionalString (lib.length lines > 1)
+        ("\n" + lib.concatStringsSep "\n" (map (l: "             ${l}") (lib.tail lines)));
+    in "  ${dim}${pad}${reset} ${lib.head lines}${cont}";
+
+  padRight = width: s: s + lib.concatStrings (lib.genList (_: " ") (lib.max 0 (width - lib.stringLength s)));
+  termSection = title: rows: "\n${bold}${title}${reset}\n${lib.concatStringsSep "\n" (lib.filter (r: r != "") rows)}";
+
+  statusDot =
+    if (meta.status or "") == "active"
+    then "${sgr "32"}●${reset}"
+    else if (meta.status or "") == "wip"
+    then "${sgr "33"}●${reset}"
+    else "${dim}○${reset}";
+
+  terminalDoc = let
+    footer = [
+      (termParagraph "Every figure here is evaluated from inventory.toml, the knowledge graph and this host's compiled service registry at build time. Nothing is typed.")
+      (termParagraph "A browser asking the same address gets the HTML dossier. This is the terminal edition: one text/plain document, handed to curl, wget, httpie, xh and nushell.")
+    ];
+  in
+    lib.concatStringsSep "\n"
+    ([
+        "${bold}${host}${reset}${dim} · ${reset}${meta.role or ""}"
+        "${dim}${rule}${reset}"
+        "${statusDot} ${bold}${meta.status or "unknown"}${reset}${dim}  ·  ${n devices} devices  ·  ${n nixCount} Nix machines${reset}"
+        ""
+        (termParagraph (meta.status_detail or ""))
+      ]
+      ++ [
+        (termSection "MACHINE" [
+          (termRow "model" (hw.model or ""))
+          (termRow "cpu" (hw.cpu or ""))
+          (termRow "memory" (hw.ram or ""))
+          (termRow "arch" (meta.arch or ""))
+          (termRow "nixos" nixosVersion)
+          (termRow "tier" (persona.compute_tier or ""))
+          (termRow "chain" (sw.module_chain or ""))
+          (termRow "root" (
+            if sw.impermanence or false
+            then "ephemeral root, declared persistence"
+            else "mutable root"
+          ))
+        ])
+        (termSection "FLEET" [
+          (termRow "devices" "${n devices} registered")
+          (termRow "kinds" (orderedRow byKind))
+          (termRow "status" "active ${n activeCount} · wip ${n wipCount} · preserved ${n preservedCount}")
+          (termRow "nix" "${n nixCount} machines that build themselves")
+        ])
+        (termSection "KNOWLEDGE" [
+          (termRow "graph" "${n site.graph.nodes} nodes · ${n site.graph.edges} edges")
+          (termRow "split" "hosts ${n site.graph.hosts} · skills ${n site.graph.skills} · docs ${n site.graph.docs} · tags ${n site.graph.tags}")
+        ])
+        (termSection "SERVICES" [
+          (termRow "cards" "${n cardCount} compiled, ${n withheld} of them tailnet-only")
+          (termRow "names" (lib.concatStringsSep " · " (map (c: c.title) cardRegistry)))
+        ])
+        (termSection "READ" [
+          (termRow "public" publicUrl)
+        ])
+        ""
+      ]
+      ++ map (l: "${dim}${l}${reset}") footer);
 in
   pkgs.runCommand "delphi-site" {
-    meta.description = "delphi's compiled dossier (public) and service console (tailnet)";
+    meta.description = "delphi's compiled dossier (public), service console (tailnet) and terminal edition";
   } ''
     mkdir -p $out/public $out/tailnet $out/data
 
@@ -444,6 +547,13 @@ in
     cat > $out/tailnet/index.html <<'TAILNET'
     ${tailnetDoc}
     TAILNET
+
+    # The terminal edition, at a path a program can ask for directly. Served
+    # only to command-line user agents on the public vhost; a browser can still
+    # read it here if it wants the text.
+    cat > $out/public/terminal.txt <<'TERMINAL'
+    ${terminalDoc}
+    TERMINAL
 
     cp ${cssFile} $out/public/${cssFileName}
     cp ${cssFile} $out/tailnet/${cssFileName}
@@ -456,7 +566,7 @@ in
 
     # Pre-compressed for nginx `gzip_static` (modules/config/nginx-static-cache.nix):
     # the bytes are a store path, so this is paid once at build, never per request.
-    gzip -9k $out/public/index.html $out/public/*.css $out/public/*.js
+    gzip -9k $out/public/index.html $out/public/terminal.txt $out/public/*.css $out/public/*.js
     gzip -9k $out/tailnet/index.html $out/tailnet/*.css $out/tailnet/*.js
     gzip -9k $out/data/delphi.json
   ''

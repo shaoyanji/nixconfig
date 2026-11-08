@@ -1,7 +1,7 @@
 ---
 name: cpg-image
 description: Generate images with `cpg image` — free GPT Image 2.5 models, a JSON result, no daemon. For icons, illustrations and product shots.
-version: 1.0.0
+version: 1.1.0
 tags: [ai, image, chatplayground, media]
 platforms: [linux, macos]
 ---
@@ -21,83 +21,79 @@ cpg image --json -o "$HOME/Pictures/cpg/icon.png" \
 Result on stdout:
 
 ```json
-{"id":"cmw5h8w4q000rmt02e1c0hp4r","url":"https://cdn.chatplayground.ai/…png",
+{"id":"01a1ba8b-476a-7999-98a1-515d1e947e57",
+ "url":"https://web.chatplayground.ai/api/files/01a1ba8b-801a-71eb-af21-f36ffbd6bf1c",
  "prompt":"a flat red panda icon…","model":"gpt-image-2.5-sunburst",
  "size":"1024x1024","path":"/home/devji/Pictures/cpg/icon.png"}
 ```
 
 A failure prints `{"error":"image generation failed with status 400: …"}` and
-exits 1, so a script can branch on the exit status.
+exits 1, so a script can branch on the exit status. Measured 2026-11-08: a
+1024×1024 generation takes 13–16 s.
 
-## Models
+## Models and sizes
 
-The CLI omits `-m` safely: it resolves the first active, free image model from
-the live catalog. Two exist on 2026-11-06, both free — `gpt-image-2.5-sunburst`
-and `gpt-image-2.5-flare`. To see the current list:
+The CLI omits `-m` safely: it takes the first free image model from the live
+catalog. Two exist on 2026-11-08, both free — `gpt-image-2.5-sunburst` and
+`gpt-image-2.5-flare`:
 
 ```bash
 cpg models --json | jq -r '.[] | select(.group == "image") | .id'
 ```
 
 Naming one is fine; naming a retired one is not, which is why the default is
-resolved rather than hardcoded (`gpt-image-2` answered `400 The model is not
+resolved rather than hardcoded (`gpt-image-2` answers `400 The model is not
 supported`).
 
-## Sizes
+Sizes: `1024x1024` (default), `1536x1024` wide, `1024x1536` tall, and `auto`.
 
-`1024x1024` (default), `1536x1024` wide, `1024x1536` tall.
+## The allowance
 
-## Budget and pacing
+`cpg usage` reads the account rather than the plan's marketing name:
 
-`cpg usage` reports a `lifetime-pool` plan whose name is "unlimited", and the
-image lane still has hard numbers: **100 generations per day**, resetting at
-00:00 UTC (measured 2026-11-07: the counter read 98 at 00:05Z after 100 had been
-spent the previous day, with `lastDailyImageDate` on the new date), and a rate of
-**25 per hour**. Prompts are rate-limited separately at 50 per 10 minutes and 300
-per hour.
+```bash
+cpg usage --json | jq '{images: .usage.images, prompts: .usage.dailyQueries}'
+```
 
-The reset is easy to misread as a lifetime cap: the plan's `periodEnd` is 2146
-and `unlimited.imageGenerations` is `false`, so the counter only reveals itself
-as daily when it goes *up*. Check `lastDailyImageDate` before planning a
-multi-day project.
+Measured 2026-11-08 on the lifetime pool: **100 images per day**, resetting at
+00:00 UTC, and 350 prompts per day. No per-hour image rate appears in the
+payload any more, and four generations issued back to back ran at 13–15 s each
+with no 429 — the daily counter is the one that stops a batch.
 
-Plan a long project against the smaller number, not the word "unlimited":
-
-- At 25/hour the ceiling is one image every 2.4 minutes. A 200-illustration
-  book is eight hours of wall clock even when nothing fails.
-- Check before a batch and between batches:
-  ```bash
-  cpg usage --json | jq '{used: .usage.imageGenerationsCount,
-    allowance: .entitlement.limits.imageGenerations,
-    hour: .entitlement.rateLimits.image}'
-  ```
+- Read `usage.images.remaining` before a batch and between batches. A 429 means
+  the day is spent, not the hour; wait for 00:00 UTC instead of retrying.
 - Spend generations on what only a model can do. Cropping, resizing, colour
   grading, text overlays and repetition are local work for an image tool.
 - One composed prompt beats three variations. Re-roll on a named defect ("the
   cube is off-centre"), never to shop for a better idea.
-- On 429, wait out the window — up to an hour at 25/h. The CLI has no queue, and
-  a retry loop spends the next window too.
-- If a project needs more than the allowance, say so before it starts and
-  propose the split. Do not discover the ceiling at image 101 in a nightly job.
+- A day of 100 is a book of plates or a set of product shots, not a slideshow.
+  Say so before a project starts rather than at image 101.
 
 ## Where the file goes
 
-- `-o PATH` downloads the PNG and is the only way to get a local file; without
-  it you get the URL alone.
+- `-o PATH` downloads the PNG and is the only way to get a local file. The URL
+  the endpoint returns is session-gated, so a bare fetch of it answers 401.
 - For anything a human will look at, write under `~/Pictures/cpg/` and give the
   reply that path — hermes' platform send takes a file path, not a URL.
 - `/tmp` is right when the image is merely an input to the next step.
 
 ## When it fails
 
+- **401, `UNAUTHENTICATED`, or a bare `Sign in to continue`**: the session token
+  lives 60 seconds and is minted from the stored `__client` cookie. Run
+  `cpg refresh` first — it prints `Successfully refreshed Clerk token!` on
+  success — then retry the call once. Only when the refresh itself fails is the
+  session gone, which needs a real browser login (`chatplayground-go login`);
+  the hourly `chatplayground-refresh` timer keeps a live session warm but cannot
+  resurrect a dead one.
+- **522, `error code: 522`, or a connection timeout on every call**:
+  `app.chatplayground.ai` is retired and the API lives at
+  `https://web.chatplayground.ai`. An old build of this client answers 522
+  forever; that is the binary, not the account.
 - `400 … The model is not supported`: the id was retired. Re-read the catalog
   with the `jq` above; do not retry the same id.
-- `401`: the session is gone, not slow. `cpg status --json` reports
-  `authenticated`. A dead session needs a real browser login
-  (`chatplayground-go login`); the hourly `chatplayground-refresh` timer only
-  keeps a live one alive.
-- `429` or a 5xx: wait, then retry once. Do not loop on a paid or rate-limited
-  endpoint.
+- `429`: the daily image allowance is spent. `cpg usage --json | jq .usage.images`
+  says when it resets; there is no queue to join.
 
 ## What it is not
 
@@ -107,4 +103,5 @@ Plan a long project against the smaller number, not the word "unlimited":
 - **Not reproducible.** The same prompt returns different pixels, so a diff of
   two generations means nothing.
 
-Related: `cpg-advice` (the text lane over the same client).
+Related: `cpg-advice` (the text lane over the same client), `cpg-storybook`
+(plates for a finished book).

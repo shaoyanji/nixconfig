@@ -33,7 +33,8 @@ def usage() -> dict:
 
 def counter(u: dict) -> tuple[int, int]:
     try:
-        return (u["usage"]["imageGenerationsCount"], u["entitlement"]["limits"]["imageGenerations"])
+        images = u["usage"]["images"]
+        return (images["used"], images["limit"])
     except KeyError:
         return (-1, -1)
 

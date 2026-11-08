@@ -114,21 +114,18 @@ def budget() -> dict:
     if proc.returncode != 0:
         sys.exit(f"storybook: cpg usage failed: {proc.stderr.strip()[:300]}")
     usage = json.loads(proc.stdout)
-    limits = usage["entitlement"]["limits"]
-    used = usage["usage"]["imageGenerationsCount"]
-    total = limits["imageGenerations"]
-    rate = usage["entitlement"]["rateLimits"]["image"]
+    images = usage["usage"]["images"]
     return {
-        "total": total,
-        "used": used,
-        "remaining": max(0, total - used),
-        "rate": rate,
+        "total": images["limit"],
+        "used": images["used"],
+        "remaining": images["remaining"],
+        "period_end": images.get("periodEnd"),
         "plan": usage["entitlement"]["name"],
     }
 
 
 def pace(min_interval: float) -> None:
-    """Server rate limits are per hour; the local gap keeps a burst honest."""
+    """The window belongs to the server; the local gap keeps a burst honest."""
     state = load(STATE, {})
     wait = state.get("next_ok_ts", 0.0) - now()
     if wait > 0:
@@ -171,10 +168,7 @@ def spend(spread: dict, index: int, model: str, size: str) -> dict:
 
 
 def cmd_budget(_: argparse.Namespace) -> int:
-    b = budget()
-    rate_hour = next(num for num, unit in b["rate"] if unit == "1h")
-    hours = b["remaining"] / rate_hour if rate_hour else 0
-    print(json.dumps({**b, "hours_at_rate": round(hours, 2)}, indent=2))
+    print(json.dumps(budget(), indent=2))
     return 0
 
 

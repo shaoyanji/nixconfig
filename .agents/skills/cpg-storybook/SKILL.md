@@ -27,24 +27,22 @@ inside it.
 
 ## The budget is daily, and it resets quietly
 
-Measured on the `unlimited` lifetime plan:
+Measured on the lifetime plan, 2026-11-08 (`cpg usage` reads `/api/me` now):
 
 | Number | Value | Meaning |
 | :--- | :--- | :--- |
-| `limits.imageGenerations` | 100 | per day |
-| `usage.imageGenerationsCount` | counts up | spent since 00:00 UTC |
-| `usage.lastDailyImageDate` | date | the day the counter belongs to |
-| rate | 25/1h, 250/1d | 25/h is the real pacing constraint |
+| `entitlement.limits.imagesPerDay` | 100 | per day |
+| `usage.images.used` | counts up | spent since 00:00 UTC |
+| `usage.images.periodEnd` | timestamp | 00:00 UTC of the next day |
+| rate | none published | the old `/api/usage` 25/h is gone |
 
-2026-11-07, 00:05 UTC: the counter that had reached 100 read 98 after two
-generations on the new date. Nothing in the entitlement says "daily" — the
-`periodEnd` is 2146 and `unlimited.imageGenerations` is `false` — so a run that
-crosses midnight sees `remaining` jump, and a run that plans as if it were
-one-shot leaves most of a day unused.
+The earlier payload carried an hourly image rate and a `lastDailyImageDate`
+field; the account answers neither now, and four generations issued back to back
+ran at 13–15 s each with no 429. Pacing keeps a nightly job polite — it no longer
+dodges a throttle, because there is none to dodge.
 
-Plan the *day*, not the artefact: 100 generations, 25 an hour, and no
-carry-over. `budget` reads the counter every call, so it is correct on both
-sides of midnight.
+Plan the *day*, not the artefact: 100 generations and no carry-over. `budget`
+reads the counter every call, so it is correct on both sides of midnight.
 
 ### When `cpg usage` cannot answer
 
@@ -387,20 +385,16 @@ own error text. It stops after three consecutive failures and prints one JSON
 summary — attempted, ok, failed, the usage counter before and after, and the
 first refusal.
 
-The refusal is the result. A `429` with a rate message before the counter reaches
-the allowance means the hourly window binds first; a failure only after the
-counter hits `limits.imageGenerations` means the daily allowance does. Record
-either in an xs turn: a limit that was never hit is a limit you cannot plan
-against.
+The refusal is the result. A `429` before the counter reaches the allowance would
+mean a rate window binds first; a failure only after the counter hits
+`usage.images.limit` means the daily allowance does. Record either in an xs turn:
+a limit that was never hit is a limit you cannot plan against.
 
-Measured 2026-11-07, `gpt-image-2.5-sunburst`, unpaced: 25 attempts, 21 plates,
-615 s, counter 78 → 100. The last three returned
-`429 image generation failed with status 429: "You've reached your daily limit of
-100 image generations"` within 1 s each — the quota refuses instantly, so a
-probe that is out of budget costs seconds, not minutes. The daily counter binds
-long before the 25/h window can (the burst ran at ~150/h and was never
-throttled), and the entitlement's `250/1d` rate is not the number that stops a
-run.
+Measured 2026-11-07 on the old endpoint, `gpt-image-2.5-sunburst`, unpaced: 25
+attempts, 21 plates, 615 s, counter 78 → 100, the last three answering
+`429 … "You've reached your daily limit of 100 image generations"` within 1 s
+each. Measured again on 2026-11-08, four unpaced generations ran at 13–15 s with
+no refusal at all: the daily counter is the only one this account enforces.
 
 ## Comparing an adaptation with a hand-written edition
 

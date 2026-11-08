@@ -22,6 +22,7 @@ in
         home.stateVersion = config.system.stateVersion;
       };
       sharedModules = [
+        self.modules."global.hm-user"
         inputs.kickstart-nixvim.homeManagerModules.default
         inputs.nix-index-database.homeModules.nix-index
         inputs.niri.homeModules.niri

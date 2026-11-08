@@ -5,6 +5,7 @@
   lib,
   pkgs,
   config,
+  user,
   osConfig ? {},
   ...
 }: let
@@ -25,7 +26,6 @@
   # without naming it here.
   isLaptop = category == "laptop" || builtins.elem "small-screen" traits;
   defaultSideBySide = !isLaptop;
-  user = import ./global/user.nix;
 in {
   imports = [
     self.modules."nixoshmsymlinks"

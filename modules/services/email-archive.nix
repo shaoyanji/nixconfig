@@ -5,6 +5,7 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
   cfg = config.services.emailArchive;
@@ -21,11 +22,6 @@
   # HTML-only mail is the majority of bulk mail; without a converter the row
   # stores a null body and is unsearchable. The same binary backs the gate.
   html2markdown = import ../scripts/html2markdown.nix {inherit pkgs;};
-
-  # The importer reads the login user's himalaya config, because that is where
-  # the IMAP account and its password command live; nothing else in the module
-  # needs the user constants.
-  user = import ../global/user.nix;
 
   # Upstream publishes one self-contained NativeAOT binary per arch; it links
   # only libc/libm, so autoPatchelfHook is the whole packaging story.

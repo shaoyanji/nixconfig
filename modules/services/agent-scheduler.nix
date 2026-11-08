@@ -3,10 +3,10 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
   cfg = config.services.agentScheduler;
-  user = import ../global/user.nix;
 
   # A locked oneshot. `flock -w` exits 1 and prints nothing when it cannot get
   # the lock, so a job that deferred to a run already in progress reads as a

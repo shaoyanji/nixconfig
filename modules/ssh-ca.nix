@@ -3,11 +3,11 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }:
 with lib; let
   cfg = config.ssh.ca;
-  user = import ./global/user.nix;
   caPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMhAN2tuJ4f8kCbCWehJL+fp5VYrTUQpn2ZWK9RC7XM1 SSH User CA @ aristotle 20260706";
 
   # Timer-driven renewal: signs a fresh 90-day cert for the primary user

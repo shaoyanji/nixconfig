@@ -3,10 +3,9 @@
   inputs,
   config,
   self,
+  user,
   ...
-}: let
-  user = import ../global/user.nix;
-in {
+}: {
   imports = [
     self.modules."global.home-manager-shared"
   ];

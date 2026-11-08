@@ -1,6 +1,9 @@
 # Offline wiki stack: kiwix-serve (native NixOS module) + declarative ZIM
-{pkgs, ...}: let
-  user = import ../global/user.nix;
+{
+  pkgs,
+  user,
+  ...
+}: let
   # Per-archive ZIM sources. fetchurl for small archives; store path for the
   # huge ones (imported via `nix store add-file` to avoid re-downloads).
   zims = {

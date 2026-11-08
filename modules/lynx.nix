@@ -2,10 +2,9 @@
 {
   config,
   pkgs,
+  user,
   ...
 }: let
-  user = import ./global/user.nix;
-
   # The one editor source in the tree is `home.sessionVariables.EDITOR`.
   editor = config.home.sessionVariables.EDITOR or "hx";
 

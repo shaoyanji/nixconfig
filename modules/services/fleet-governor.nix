@@ -3,9 +3,9 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
-  user = import ../global/user.nix;
   cfg = config.services.fleetGovernor;
   # The ensemble CLI lives in a sibling directory. Interpolating the directory
   # (not `toString ../..`) gives the store reference a string context, so the

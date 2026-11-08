@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
   cfg = config.profiles.sopsUserIdentity;
@@ -22,7 +23,7 @@ in {
 
     user = lib.mkOption {
       type = lib.types.str;
-      default = (import ../global/user.nix).name;
+      default = user.name;
       description = "Owner of the derived identity — the Home Manager user.";
     };
   };

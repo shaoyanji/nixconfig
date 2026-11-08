@@ -18,6 +18,9 @@
 
   config.home-manager.sharedModules =
     [
+      # The constants module takes `user` as an argument; HM is a nested eval, so
+      # the value is injected there too (the file says why).
+      self.modules."global.hm-user"
       inputs.sops-nix.homeManagerModules.sops
       inputs.kickstart-nixvim.homeManagerModules.default
       inputs.nix-index-database.homeModules.nix-index

@@ -5,10 +5,9 @@
   lib,
   pkgs,
   inputs,
+  user,
   ...
-}: let
-  user = import ../global/user.nix;
-in {
+}: {
   imports = [
     self.modules."config.authorized-keys"
     self.modules."services.flake-gc-root"

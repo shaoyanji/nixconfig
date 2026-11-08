@@ -19,8 +19,19 @@
   # Two modules, not one: the module system rejects `_module` at the top level
   # of a module that also declares `options`/`config` ("unsupported attribute
   # `_module` … move all of them into the explicit `config` attribute").
+  #
+  # `user` is the same shape and arrives for the same reason: the constants in
+  # `modules/global/user.nix` used to be reached by relative path from 23
+  # modules, which is the one edge the registry could not name. A module takes
+  # `user` as an argument, so the file has one name (`.#modules."global.user"`)
+  # and a rename fails `checks.nix-registry` instead of an eval.
   inventoryModules = [
-    {_module.args.inventory = inventory;}
+    {
+      _module.args = {
+        inventory = inventory;
+        user = import moduleFiles."global.user";
+      };
+    }
     {
       options.fleet.inventory = lib.mkOption {
         type = lib.types.attrs;

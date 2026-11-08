@@ -3,10 +3,9 @@
   self,
   pkgs,
   lib,
+  user,
   ...
-}: let
-  user = import ../global/user.nix;
-in {
+}: {
   imports = [
     self.modules."profiles.desktop-client"
     self.modules."profiles.boot"

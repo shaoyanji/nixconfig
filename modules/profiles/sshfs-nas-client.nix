@@ -3,9 +3,9 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
-  user = import ../global/user.nix;
   sshKey = "/home/${user.name}/.ssh/id_ed25519";
   sshKnownHosts = "/home/${user.name}/.ssh/known_hosts";
   nasHost = "192.168.3.25";

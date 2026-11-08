@@ -3,10 +3,10 @@
   self,
   config,
   lib,
+  user,
   ...
 }: let
   cfg = config.profiles.hermes;
-  user = import ../global/user.nix;
 in {
   options.profiles.hermes = {
     enable = lib.mkEnableOption "Hermes agent environment and isolated secrets";

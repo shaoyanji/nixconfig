@@ -5,10 +5,9 @@
 {
   pkgs,
   lib,
+  user,
   ...
-}: let
-  user = import ../global/user.nix;
-in {
+}: {
   home = {
     # mkDefault: a host whose login account is not `devji` (clanker's is `user`)
     # overrides these two lines instead of redefining the toolbox.

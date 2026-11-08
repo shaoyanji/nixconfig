@@ -5,10 +5,10 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
   cfg = config.services.offloadBridge;
-  user = import ../global/user.nix;
 
   configFile = (pkgs.formats.json {}).generate "offload-bridge.json" {
     shelter = {

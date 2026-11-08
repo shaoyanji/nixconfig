@@ -4,13 +4,13 @@
   config,
   lib,
   pkgs,
+  user,
   osConfig ? {},
   # Set by `fleet.dankShell.enable` through modules/global/nixos.nix. Default
   # true keeps every darwin/demo/home host on the DMS imports.
   dankShell ? true,
   ...
 }: let
-  user = import ../global/user.nix;
   graphicsTier = config.profiles.graphics.tier or "medium";
   # Session daemons belong to a generation that declares a compositor:
   # modules/profiles/base-desktop-environment.nix sets `programs.niri.enable`, and

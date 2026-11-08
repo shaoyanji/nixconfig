@@ -1,7 +1,5 @@
 # Remote paste bin: pastes land on frieren over SSH, served read-only by
-_: let
-  user = import ../global/user.nix;
-in {
+{user, ...}: {
   # Paste storage + 30-day expiry (tmpfiles 'e' cleans files older than age).
   systemd.tmpfiles.rules = [
     "d /var/lib/paste 0755 ${user.name} users -"

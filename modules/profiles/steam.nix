@@ -2,10 +2,9 @@
 {
   pkgs,
   lib,
+  user,
   ...
 }: let
-  user = import ../global/user.nix;
-
   # Graceful session switching between Gamescope (Steam Big Picture)
   # and DankMaterialShell (Niri desktop) on Steam Deck and console hosts.
   deckSessionSwitch = pkgs.writeShellScriptBin "deck-session-switch" ''

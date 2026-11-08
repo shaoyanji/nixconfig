@@ -5,6 +5,7 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
   cfg = config.services.agentTurns;
@@ -105,8 +106,6 @@
       mode = "0400";
     }
     else {mode = "0400";} // t;
-
-  user = import ../global/user.nix;
   stateDir = "/var/lib/${cfg.stateDirectory}";
   storePath = "${stateDir}/store";
   socketPath = "${storePath}/sock";

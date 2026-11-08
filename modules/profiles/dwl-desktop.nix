@@ -5,6 +5,7 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
   cfg = config.profiles.dwlDesktop;
@@ -72,7 +73,7 @@ in {
 
     user = lib.mkOption {
       type = lib.types.str;
-      default = (import ../global/user.nix).name;
+      default = user.name;
       description = "Account the session autologins as.";
     };
 

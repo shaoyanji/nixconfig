@@ -70,11 +70,6 @@
   # no pkgs, no host eval, no filesystem — the whole table is 120 lines of
   # declared attributes, so `nix eval .#epistemics.review` is a leaf read.
   epistemicsCtl = import ./epistemics.nix {inherit lib;};
-  # The task graph as data (lib/taskfile.nix): names, include edges, violations
-  # and a content digest. Pure — no pkgs, no host eval — so
-  # `nix eval .#taskfileGraph.version` is a 4 s leaf read, and the same compile
-  # feeds the flake check, the parity gate and any future generator.
-  taskfileCtl = import ../lib/taskfile.nix {inherit lib;};
   # nixFilesCtl / nixRegistry are bound above the chains: `flake/nix-registry.nix`
   # is the walk's naming layer, shared with the knowledge graph.
   # The CLI table is compiled once and projected into `packages.<system>.cli`
@@ -112,12 +107,8 @@ in {
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
-    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl epistemicsCtl taskfileCtl;
+    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl epistemicsCtl;
   };
-
-  # `nix eval --json .#taskfileGraph.names` / `.version` — the graph, without a
-  # derivation and without `task` installed.
-  taskfileGraph = taskfileCtl;
 
   # Resident helpers and their Kelly arithmetic: `nix eval --json .#daemons`. The
   # registry is the decision AND its proof, so a daemon cannot be enabled by

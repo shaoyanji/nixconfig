@@ -51,6 +51,7 @@ tasks:
       - task: checks:toon
       - task: checks:toon:surfaces
       - task: checks:tasks
+      - task: checks:skills:mirror
       - task: checks:kg
       # `checks:kg:iets` stays out on purpose: it is two uncached full evals
       # (~3 s) for a parity experiment, and its own summary says so.
@@ -68,7 +69,7 @@ tasks:
     # TIMING gate with a min-of-3 budget, so it must never share a core: it goes
     # last, after the deps have finished and every other task has exited.
     cmds:
-      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules .?submodules=1#checks.{{.SYSTEM}}.knobs .?submodules=1#checks.{{.SYSTEM}}.site-assets .?submodules=1#checks.{{.SYSTEM}}.policies .?submodules=1#checks.{{.SYSTEM}}.taskfile-graph .?submodules=1#checks.{{.SYSTEM}}.taskfile-graph-selftest .?submodules=1#checks.{{.SYSTEM}}.skills-task-mirror
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules .?submodules=1#checks.{{.SYSTEM}}.knobs .?submodules=1#checks.{{.SYSTEM}}.site-assets .?submodules=1#checks.{{.SYSTEM}}.policies
       - task: checks:sops:drift
       - task: checks:entry
 
@@ -157,18 +158,31 @@ tasks:
       - bash scripts/task/submodule-drift.sh
     silent: true
 
-  checks:tasks:
-    desc: "[gate] Task graph: Nix compiles it, go-task confirms the name set"
+  checks:skills:mirror:
+    desc: "[gate] No skill table restates a task's own desc (three rows in one skill is an index)"
     summary: >
-      The task graph, compiled by lib/taskfile.nix and confirmed against go-task
-      itself. Nix asserts what the YAML parser silently accepts: duplicate keys,
-      dangling `task <name>` calls, include cycles, orphan shards, `internal: true`,
-      wildcard/MATCH arity, desc/summary budget, and an exit code a summary promises
-      that its script never emits. The name set must equal `task --list-all --json`.
+      scripts/task/skills-task-mirror.py: a skill table row whose cells restate a
+      task's `desc` (>= 70 % of its significant words, and no longer than 1.5x) is
+      a second copy of a fact go-task already serves, and it goes stale the first
+      time the task changes. Three such rows in one skill is a task index wearing
+      a skill's name. Reads `task --list-all --json` through taskfile-list.sh (the
+      120 ms warm cache), so no eval. Exit 0 = clean or warnings only, 1 = a skill
+      mirrors the surface, 2 = the task list or the skills tree is unreadable.
+    cmds:
+      - python3 scripts/task/skills-task-mirror.py
 
-      `--artifact` builds the minted graph (path, both digests, JSON hash);
-      OFFLOAD=1 dispatches that build, STRICT=1 builds nothing. Exit 0 = clean,
-      1 = hard violation or name drift, 2 = graph/build unreadable.
+  checks:tasks:
+    desc: "[gate] Task graph: yq compiles it, Python applies the rules, go-task confirms the name set"
+    summary: >
+      The graph, compiled by scripts/task/lib/taskfile_graph.py (yq parses; the
+      rules are the script). It asserts what YAML accepts silently: duplicate
+      keys, dangling `task <name>` calls, include cycles, orphan shards,
+      `internal: true`, MATCH arity, desc/summary budgets, and an exit code a
+      summary promises but its script never emits. The name set must equal
+      `task --list-all --json`, the fixture must fire every bucket, and every
+      `task <name>` citation on docs/agent-contract.md must resolve.
+
+      Exit 0 = clean, 1 = violation or drift, 2 = unreadable. ~1 s, no eval.
     cmds:
       - bash scripts/task/taskfile-graph.sh
     silent: true

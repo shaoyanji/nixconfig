@@ -83,7 +83,7 @@ Field vocabulary, taken from the compiled data rather than invented:
 | `inventory.hosts.<h>` | `role`, `kind`, `arch`, `status`, `status_detail`, `category`, `persona`, `managed`, `is_nix`, `system_type`, `desktop_environment`, `builder`, `ci`, `flake`, `network`, `hardware`, `software`, `users`, `notes` |
 | `agentsNotes.notes.<id>` | `kind`, `status`, `priority`, `date`, `title`, `summary`, `body`, `refs.{modules,tasks,docs,hosts}`, `from`, `supersedes`, `replacedBy` |
 | `knowledgeGraph` | node type (`host`, `skill`, `doc`, `tag`), edge kind (`mentions`, `references`, `tagged`), the six patterns |
-| `taskfileGraph` | `name`, `desc`, `vars`, `body` (build verbs), shard |
+| `taskfileGraph` (`taskfile_graph.py by-name`) | `name`, `desc`, `params`, `body` (build verbs), shard |
 | ledger | job name, host, exit, duration, age |
 
 ## 5. Data and ground truth

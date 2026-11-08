@@ -42,7 +42,7 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 
 | Tier | Examples | Cost |
 | :--- | :--- | :--- |
-| **free** | `task status`, `task help`, `task find:<x>`, `task checks:ports`, `dev:inventory:host`, `task checks:tasks` | < 1 s, local files; `checks:tasks` adds one `nix eval` of `.#taskfileGraph` (~1.2 s total) |
+| **free** | `task status`, `task help`, `task find:<x>`, `task checks:ports`, `dev:inventory:host`, `task checks:tasks` | < 1 s, local files; `checks:tasks` compiles the shards with yq (`taskfile_graph.py`, ~0.6 s) and adds the go-task name parity |
 | **cheap (eval)** | `dev:inventory:json`, `dev:flake:get-hosts` | 0.1–2.5 s, no host config |
 | **bounded (one host)** | `checks:host HOST=<h>` | ~13 s / 720 MiB per host, OOM-guarded |
 | **HTTP probe** | `checks:build:route`, `checks:dns:failover` | bounded network request, no compile |
@@ -53,7 +53,7 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 
 | Task | Proves | Does **not** prove |
 | :--- | :--- | :--- |
-| `checks:tasks` | The Nix-compiled graph (`lib/taskfile.nix`) has no duplicate keys, dangling refs, include cycles, orphan shards, `internal: true` or MATCH-arity mismatches, **and** its name set equals `task --list-all --json` exactly. Same rules as pure-Nix `checks.<system>.taskfile-graph`, which also runs in CI/keyless and self-tests every bucket against `tests/taskfile-graph` | That a task works; that go-task can run it |
+| `checks:tasks` | The compiled graph (`scripts/task/lib/taskfile_graph.py`: yq parses, the rules are the script) has no duplicate keys, dangling refs, include cycles, orphan shards, `internal: true` or MATCH-arity mismatches, **and** its name set equals `task --list-all --json` exactly. Every bucket must also fire where `tests/taskfile-graph/expected.json` says, and every `task <name>` citation on `docs/agent-contract.md` must resolve | That a task works; that go-task can run it |
 | `checks:quick` | Repo hygiene: compiled inventory checks, task graph, lint, sops drift, modules.toml | **Any host config** — it forces no `nixosConfiguration`; not a pre-rebuild step |
 | `checks:host HOST=<h>` | Module system + every assertion for ONE host (2035 assertions, ~13 s / 720 MiB) | That the closure builds |
 | `checks:build:route` | Whether THIS host would have to compile (EXP-107) | That a build succeeds |
@@ -90,7 +90,7 @@ else is the wrong shape:
 | Repeat a workflow a human would type twice a month | Add a task to the owning shard, with `desc` and a `summary` that names what it **does not** prove. |
 | Wrap an existing task | Use `aliases:` (no `*` in an alias) or a `services:*` wrapper. Never copy the body. |
 
-Task hygiene, enforced by `checks:tasks` (`lib/taskfile.nix` compiles the graph,
+Task hygiene, enforced by `checks:tasks` (`taskfile_graph.py` compiles the graph,
 `task --list-all --json` confirms the name set):
 
 - A duplicate key in the same shard is **silent** — YAML keeps the last one

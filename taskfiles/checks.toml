@@ -274,6 +274,10 @@ name = "checks:site:path"
 kind = "leaf"
 
 [[check]]
+name = "checks:skills:mirror"
+kind = "leaf"
+
+[[check]]
 name = "checks:sops:drift"
 kind = "leaf"
 

@@ -43,16 +43,17 @@ if [ -f scripts/task/repo-blobs.sh ]; then
   fi
 fi
 
-# The digest pin is a throw at eval time, so this is an eval, not a build: it
-# forces no closure and spends no build budget.
-if command -v nix >/dev/null 2>&1; then
-  if ! nix eval --impure --raw "path:$REPO_ROOT#checks.x86_64-linux.taskfile-digest-pin.outPath" >/dev/null 2>&1; then
-    echo "pre-push: the task graph moved and flake/taskfile-digest-pin.nix was not updated."
-    echo "  task checks:tasks prints both digests; write the new pair into that file."
+# The task graph gate: yq parses the shards, python applies the rules, go-task is
+# the oracle for the name set. ~1 s, no eval, no build, no host.
+if command -v yq >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
+  if ! bash scripts/task/taskfile-graph.sh >/tmp/pre-push-task-graph.log 2>&1; then
+    echo "pre-push: the task graph gate failed:"
+    sed 's/^/  /' /tmp/pre-push-task-graph.log | tail -25
+    echo "  task checks:tasks explains every bucket."
     status=1
   fi
 else
-  echo "pre-push: nix not on PATH — the digest pin was not checked."
+  echo "pre-push: yq or python3 not on PATH — the task graph gate was not run."
 fi
 
 if [ "$status" -ne 0 ]; then

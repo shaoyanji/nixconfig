@@ -1,0 +1,24 @@
+{
+  "duplicate": ["dup"],
+  "orphanShard": ["orphan.yml"],
+  "missingInclude": ["Taskfile.yml: gone -> taskfiles/typo.yml"],
+  "includeCycle": ["taskfiles/cycle.yml: root -> Taskfile.yml"],
+  "unflattened": ["Taskfile.yml: loose -> taskfiles/loose.yml"],
+  "internal": ["Taskfile.yml:hidden"],
+  "danglingRef": ["Taskfile.yml:broken -> ghost:run"],
+  "wildcardArity": ["Taskfile.yml:wild has 0 '*' but 1 MATCH refs [0]"],
+  "proseRef": ["Taskfile.yml:prose -> nowhere:real"],
+  "noDesc": ["Taskfile.yml:bare"],
+  "longDesc": ["Taskfile.yml:longdesc (446)"],
+  "longSummary": ["Taskfile.yml:longsum (849)"],
+  "nameGrammar": [],
+  "sourcesWithoutWatch": [],
+  "retiredRef": [],
+  "exitDrift": [
+    "Taskfile.yml:badexit claims exit 7; emits [3]",
+    "Taskfile.yml:badrange claims exit 130-137; emits [3]"
+  ],
+  "exitUnverified": [
+    "Taskfile.yml:badexit-missing claims exit 1 but scripts/task/not-here.sh is not in the tree"
+  ]
+}

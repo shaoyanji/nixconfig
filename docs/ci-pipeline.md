@@ -153,4 +153,4 @@ matrix is editing a list this pipeline does not read:
 [[flake/policies.nix#ci-dormant-hosts-excluded]]
 [[flake/policies.nix#ci-builds-config-and-gate]]
 [[flake/policies.nix#ci-doc-budget]]
-[[flake/policies.nix#ci-task-graph-pin]]
+[[flake/policies.nix#ci-task-graph]]

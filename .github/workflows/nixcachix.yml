@@ -87,8 +87,11 @@ jobs:
         run: nix build -L .?submodules=1#checks.x86_64-linux.docs-budget
       - name: Prose carries no unslop vocabulary
         run: nix build -L .?submodules=1#checks.x86_64-linux.prose-tells
-      - name: Task graph digests still pinned
-        run: nix build -L .?submodules=1#checks.x86_64-linux.taskfile-digest-pin
+      - name: Task graph gate (yq compiles it, go-task confirms the name set)
+        # The plane is shell-side now (scripts/task/lib/taskfile_graph.py): yq and
+        # go-task are the two tools it needs, and `nix shell` supplies both without
+        # a build. The gate is ~1 s and needs no host eval.
+        run: nix shell nixpkgs#yq nixpkgs#go-task -c bash scripts/task/taskfile-graph.sh
       - name: Module edges are named, not pathed
         run: bash scripts/task/modules-edges.sh
 

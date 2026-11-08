@@ -20,9 +20,10 @@ that rule allows.
 | what happened, what is open | `task ops:notes:search Q=`, `task ops:ledger`, `task ops:health` |
 | which turn is in flight | `task agents:xs:list` |
 
-Every task named on this page resolves against the compiled graph
-([[flake/policies.nix#contract-tasks-resolve]]) — a citation to a task nobody
-defines fails the policy gate, so this table cannot drift into a wish list.
+Every task named on this page resolves against the compiled graph: `task
+checks:tasks` fails any `task <name>` citation here that the graph does not have
+(wildcards resolve by their static prefix), so this table cannot drift into a
+wish list.
 
 ### Where a lookup goes — name the pattern, or ask for one
 

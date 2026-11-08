@@ -8,7 +8,6 @@
   agentsNotesCtl,
   policiesCtl,
   epistemicsCtl,
-  taskfileCtl,
 }:
 # CHEAP CHECKS ONLY — `checks.<system>` MUST NOT force a host configuration.
 #
@@ -96,87 +95,6 @@ lib.genAttrs systems.work (
         - helix  # editor
         - SomeAppImage.bin
       '';
-      # --- a skill is not an index of the task surface -----------------------
-      # `lib/taskfile.nix` compiles one `desc` per task and `task --list-all
-      # --json` serves it. A skill table row that restates that `desc` is a second
-      # copy of the same fact, and it goes stale the first time the task changes.
-      # Three such rows in one skill is a task index wearing a skill's name.
-      #
-      # A row is a mirror when BOTH hold, measured over alnum word tokens:
-      #   * >= 70 % of the desc's significant words (length > 3, not part of the
-      #     task name) appear in the row's non-name cells, and
-      #   * those cells are no longer than 1.5x the desc — a row that adds a
-      #     caveat is longer, which is the only reason to have the table.
-      # Reads both compiled projections: no host eval, no shell, keyless.
-      # `builtins.split` returns the matched separators as sub-lists, so the
-      # predicate needs `isString` — an empty-string test alone passes lists
-      # through and they fail later as "cannot coerce a list to a string".
-      skillWords = s: builtins.filter (w: builtins.isString w && w != "") (builtins.split "[^A-Za-z0-9]+" (lib.toLower s));
-      rowTaskName = cell: let
-        bare = lib.replaceStrings ["`"] [""] (lib.trim cell);
-        ws = builtins.filter (w: w != "") (lib.splitString " " bare);
-      in
-        if ws == []
-        then ""
-        else if builtins.head ws == "task" && builtins.length ws > 1
-        then builtins.elemAt ws 1
-        else builtins.head ws;
-      mirrorsOf = skill: let
-        row = line: let
-          cells = builtins.filter (c: lib.trim c != "") (lib.splitString "|" (lib.trim line));
-          name =
-            if cells == []
-            then ""
-            else rowTaskName (builtins.head cells);
-          task = taskfileCtl.byName.${name} or null;
-          rest =
-            if cells == []
-            then ""
-            else lib.concatStringsSep " " (builtins.tail cells);
-          # `or` only covers a missing attr: a task with `desc = null` (name
-          # only, e.g. `exit`) would hand null to skillWords and abort the gate.
-          desc =
-            if task == null
-            then ""
-            else if (task.desc or null) == null
-            then ""
-            else task.desc;
-          nameTokens = skillWords name;
-          descTokens =
-            builtins.filter (w: builtins.stringLength w > 3 && !(lib.elem w nameTokens)) (skillWords desc);
-          restTokens = skillWords rest;
-          hits = builtins.length (builtins.filter (w: lib.elem w restTokens) descTokens);
-          descNorm = lib.concatStringsSep " " (skillWords desc);
-          restNorm = lib.concatStringsSep " " restTokens;
-        in
-          if cells == [] || descTokens == [] || restTokens == []
-          then null
-          else if
-            hits
-            * 10
-            >= builtins.length descTokens * 7
-            && 2 * builtins.stringLength restNorm <= 3 * builtins.stringLength descNorm
-          then "${name}: ${lib.trim rest}"
-          else null;
-      in
-        builtins.filter (r: r != null) (map row skill.body);
-      skillMirrors = map (n: {
-        skill = n;
-        rows = mirrorsOf skillsCtl.skills.${n};
-      }) (builtins.attrNames skillsCtl.skills);
-      mirrorOffenders = builtins.filter (s: builtins.length s.rows >= 3) skillMirrors;
-      mirrorWarnings = builtins.filter (s: s.rows != [] && builtins.length s.rows < 3) skillMirrors;
-      mirrorReport =
-        lib.concatMapStrings (
-          s: "\n  ${s.skill}: ${toString (builtins.length s.rows)} row(s)\n" + lib.concatMapStrings (r: "    ${r}\n") s.rows
-        )
-        mirrorOffenders;
-      mirrorWarningReport =
-        lib.concatMapStrings (
-          s: "WARN ${s.skill}: ${toString (builtins.length s.rows)} task row(s) restate a `desc`\n"
-        )
-        mirrorWarnings;
-
       # A policy is a judgment, a fact is not, so epistemics outranks policy
       # (flake/epistemics.nix §precedence): a rule that protects nothing real is
       # overturned by the fact that says so, never by lowering the rule. What
@@ -509,29 +427,6 @@ lib.genAttrs systems.work (
             touch $out
           '';
 
-      # --- a skill must not mirror the task surface ---------------------------
-      skills-task-mirror =
-        if mirrorOffenders != []
-        then
-          builtins.throw ''
-            agent skill(s) mirror `task --list-all --json` — the task surface already
-            carries these `desc` lines, so the table is a second copy that goes stale:
-              ${mirrorReport}
-            Keep the row only when it says something the `desc` does not (a caveat, a
-            cost, a "does not prove"); otherwise name the task and drop the cell.
-          ''
-        else
-          # A quoted heredoc, not a bare interpolation: the warning lines carry
-          # backticks (`desc`), which bash would run as a command substitution.
-          pkgs.runCommand "skills-task-mirror" {} ''
-            echo "agent skills OK: ${toString skillsCtl.index.count} skills, ${toString (builtins.length skillMirrors)} tables read"
-            echo "  task rows mirroring a desc: 0"
-            cat <<'SKILL_MIRROR_WARN'
-            ${mirrorWarningReport}
-            SKILL_MIRROR_WARN
-            touch $out
-          '';
-
       # --- AGENTS.nix notes are traceable or verbose, never terse leaves -----
       agents-notes-schema =
         if !agentsNotesCtl.ok
@@ -543,110 +438,6 @@ lib.genAttrs systems.work (
         else
           pkgs.runCommand "agents-notes-schema" {} ''
             echo "AGENTS.nix OK: ${toString agentsNotesCtl.counts.total} notes (${toString agentsNotesCtl.counts.open} open, ${toString agentsNotesCtl.counts.leaves} leaves)"
-            touch $out
-          '';
-
-      # --- the task graph is data, and a gate mints it ----------------------
-      # lib/taskfile.nix parses Taskfile.yml + the include graph. What it cannot
-      # prove is that go-task agrees with the parse — that is
-      # `checks:taskfile:graph` (scripts/task/taskfile-graph.sh), which compares
-      # this name set against `task --list-all --json`. This check is the half
-      # that needs no `task` binary, so it runs in CI and on a keyless box.
-      #
-      # The derivation NAME carries the graph digest, so the artifact is
-      # addressable as a version: `nix build .#checks.x86_64-linux.taskfile-graph`
-      # mints one, and a kept path is a graph you can diff or fail back to.
-      taskfile-graph =
-        if taskfileCtl.gateFailures != []
-        then
-          builtins.throw ''
-            the task graph violates a hard rule (lib/taskfile.nix):
-              ${lib.concatStringsSep "\n  " taskfileCtl.gateFailures}
-
-            Hard buckets: ${lib.concatStringsSep ", " taskfileCtl.gateBuckets}
-            Advisory buckets (reported, never fatal): ${lib.concatStringsSep ", " (
-              builtins.filter (k: !(builtins.elem k taskfileCtl.gateBuckets)) (builtins.attrNames taskfileCtl.violations)
-            )}.
-          ''
-        else let
-          report = builtins.toJSON {
-            inherit (taskfileCtl) version proseVersion files names includes violations descBudget summaryBudget;
-            tasks = builtins.length taskfileCtl.parsed;
-            # The prose surface verbatim, not just findings *about* prose: a
-            # wording edit has no address in `version` (it is the execution
-            # surface on purpose), so the artifact carries what the summaries
-            # actually said. An old build can then be diffed against the new one.
-            prose = taskfileCtl.proseSurface;
-          };
-        in
-          # Both digests in the name: `<version>` is what executes, `p<digest>` is
-          # what an agent reads. Identical execution + edited prose is two paths,
-          # and the prefix says so before you open either.
-          pkgs.runCommand "taskfile-graph-${taskfileCtl.version}-p${taskfileCtl.proseVersion}" {} ''
-            mkdir -p $out
-            cp ${pkgs.writeText "taskfile-graph.json" report} $out/graph.json
-            printf '%s\n' '${taskfileCtl.version}' > $out/version
-            printf '%s\n' '${taskfileCtl.proseVersion}' > $out/prose
-            echo "task graph ${taskfileCtl.version} (prose ${taskfileCtl.proseVersion}): ${toString (builtins.length taskfileCtl.parsed)} tasks in ${toString (builtins.length taskfileCtl.files)} files, ${toString (builtins.length taskfileCtl.includes)} include edges"
-            echo "advisory: ${toString (builtins.length taskfileCtl.violations.longSummary)} summaries over ${toString taskfileCtl.summaryBudget} chars, ${toString (builtins.length taskfileCtl.violations.proseRef)} unresolved prose mentions, ${toString (builtins.length taskfileCtl.violations.exitUnverified)} exit claims unverifiable"
-          '';
-
-      # A gate that has only ever run on a clean tree is a gate nobody knows the
-      # shape of. The fixture violates every hard bucket exactly once, and names
-      # its expected verdicts here, so a bucket that stops firing (or starts
-      # firing on prose) fails this check instead of drifting silently.
-      taskfile-graph-selftest = let
-        fixture = import ../lib/taskfile.nix {
-          inherit lib;
-          root = ../tests/taskfile-graph;
-        };
-        expect = {
-          duplicate = ["dup"];
-          orphanShard = ["orphan.yml"];
-          unflattened = ["Taskfile.yml: loose -> taskfiles/loose.yml"];
-          missingInclude = ["Taskfile.yml: gone -> taskfiles/typo.yml"];
-          includeCycle = ["taskfiles/cycle.yml: root -> Taskfile.yml"];
-          internal = ["Taskfile.yml:hidden"];
-          danglingRef = ["Taskfile.yml:broken -> ghost:run"];
-          wildcardArity = ["Taskfile.yml:wild has 0 '*' but 1 MATCH refs [0]"];
-          proseRef = ["Taskfile.yml:prose -> nowhere:real"];
-          noDesc = ["Taskfile.yml:bare"];
-          longSummary = ["Taskfile.yml:longsum (${toString (builtins.stringLength fixture.byName.longsum.summary)})"];
-          longDesc = ["Taskfile.yml:longdesc (${toString (builtins.stringLength fixture.byName.longdesc.desc)})"];
-          # Deliberately empty: these tasks are well-formed, the flags task
-          # (`task --list-all`) is a flag, not a dangling reference, and the
-          # fixture's `desc`-only / `summary`-only tasks are legal shapes.
-          nameGrammar = [];
-          sourcesWithoutWatch = [];
-          retiredRef = [];
-          # `badexit` promises 7 against a script that only exits 3; `badrange`
-          # promises 130-137 against the same script, so a parser that kept only
-          # the left endpoint would still call 130 emitted and pass it. The
-          # passing twins (`rangeexit` 134, `two-digit` 42) are in the fixture and
-          # must stay out of this bucket. `badexit-missing` promises 1 and names a
-          # script the tree does not have, which is a report, not drift.
-          exitDrift = [
-            "Taskfile.yml:badexit claims exit 7; emits [3]"
-            "Taskfile.yml:badrange claims exit 130-137; emits [3]"
-          ];
-          exitUnverified = ["Taskfile.yml:badexit-missing claims exit 1 but scripts/task/not-here.sh is not in the tree"];
-        };
-        sorted = builtins.sort builtins.lessThan;
-        keySet = builtins.sort builtins.lessThan (builtins.attrNames fixture.violations);
-        expectedKeys = builtins.sort builtins.lessThan (builtins.attrNames expect);
-        mismatched = builtins.filter (k: sorted fixture.violations.${k} != sorted expect.${k}) (builtins.attrNames expect);
-        detail = lib.concatMapStrings (k: "\n  ${k}\n    expected: ${builtins.toJSON (sorted expect.${k})}\n    actual:   ${builtins.toJSON (sorted fixture.violations.${k})}") mismatched;
-      in
-        if mismatched != [] || keySet != expectedKeys
-        then
-          builtins.throw ''
-            tests/taskfile-graph asserts the task-graph buckets and disagrees:
-              ${lib.concatStringsSep "\n  " (lib.optionals (keySet != expectedKeys) ["bucket set changed: expected ${builtins.toJSON expectedKeys}, got ${builtins.toJSON keySet}"])}${detail}
-            Fix the detector or update the fixture's expectations in flake/checks.nix.
-          ''
-        else
-          pkgs.runCommand "taskfile-graph-selftest" {} ''
-            echo "fixture verdicts match: ${toString (builtins.length expectedKeys)} buckets, ${toString (builtins.length fixture.parsed)} tasks, ${toString (builtins.length (builtins.concatLists (builtins.attrValues expect)))} expected findings"
             touch $out
           '';
 
@@ -698,31 +489,6 @@ lib.genAttrs systems.work (
         else
           pkgs.runCommand "knobs-ok" {} ''
             echo "knobs: ${toString (builtins.length ids)} entries, every path exists, every host resolves; ${toString (builtins.length (lib.subtractLists noToggle readable))} of them point at a file that declares the toggle${lib.optionalString (noToggle != []) ", ${toString (builtins.length noToggle)} are wired to an option declared elsewhere: ${lib.concatStringsSep ", " noToggle}"}" > $out
-          '';
-
-      # --- the task graph is pinned, not just versioned ----------------------
-      # `version`/`proseVersion` are addresses; nothing compares them to a known
-      # value, so a reformatted shard or a script-rewritten summary changed what
-      # the fleet executes without a red build. The pin is the comparison: it
-      # moves only when someone edits `flake/taskfile-digest-pin.nix`, which makes
-      # every digest change a reviewed line instead of an accident.
-      taskfile-digest-pin = let
-        pin = import ./taskfile-digest-pin.nix;
-        moved =
-          lib.optional (pin.exec != taskfileCtl.version) "exec ${pin.exec} -> ${taskfileCtl.version}"
-          ++ lib.optional (pin.prose != taskfileCtl.proseVersion) "prose ${pin.prose} -> ${taskfileCtl.proseVersion}";
-      in
-        if moved != []
-        then
-          builtins.throw ''
-            The task graph moved: ${lib.concatStringsSep "; " moved}.
-            If the change is intentional, update flake/taskfile-digest-pin.nix in the same commit.
-            If it is not, find the shard that changed (`task checks:tasks` prints both digests).
-          ''
-        else
-          pkgs.runCommand "taskfile-digest-pin" {} ''
-            echo "task graph pinned: exec ${pin.exec}, prose ${pin.prose}"
-            touch $out
           '';
 
       # --- living documents have budgets (SCHEMA.md §2) ---------------------

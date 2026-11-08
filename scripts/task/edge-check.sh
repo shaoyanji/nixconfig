@@ -34,17 +34,16 @@ bad() {
 TOOLS="${EDGE_TOOLS:-}"
 if [ -z "$TOOLS" ]; then
   SURFACE_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-toolcall"
-  KEY="$(cat "$REPO"/taskfiles/*.yml "$REPO/lib/taskfile.nix" "$REPO/flake.lock" 2>/dev/null | sha1sum | cut -d' ' -f1)"
+  KEY="$(cat "$REPO"/taskfiles/*.yml "$REPO/scripts/task/lib/taskfile_graph.py" "$REPO/flake.lock" 2>/dev/null | sha1sum | cut -d' ' -f1)"
   TOOLS="$SURFACE_CACHE_DIR/engine-tools-$KEY.json"
   mkdir -p "$SURFACE_CACHE_DIR"
   if [ ! -s "$TOOLS" ]; then
-    nix eval --json ".?submodules=1#taskfileGraph.byName" 2>/dev/null |
+    python3 "$REPO/scripts/task/lib/taskfile_graph.py" by-name 2>/dev/null |
       jq '[to_entries[]
            | select(.key | test("^(ops:kg:[a-z]+|ops:ask)$"))
-           | select(.value.body | test("vars: \\[[A-Z]"))
+           | select((.value.params // []) | length > 0)
            | .key as $n
-           | (.value.body | capture("vars: \\[(?<v>[A-Z_, ]+)\\]")) as $c
-           | ($c.v | split(",") | map(gsub("^ +| +$"; "")) | map(select(length > 0))) as $vars
+           | (.value.params) as $vars
            | {name: ($n | gsub(":"; "_")),
               description: (.value.desc // $n | gsub("[[:space:]]+"; " ")),
               parameters: {type: "object",

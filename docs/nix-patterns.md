@@ -369,9 +369,9 @@ it rather than restating it.
 ## The eval the graph reads
 
 `nix eval` never answers from its cache, and the evaluation is the cost: on delphi
-(2026-11-07, min of 3) `.#knowledgeGraph.graph` is 1686 ms, `.#taskfileGraph`
-726 ms, `.#policies` 5004 ms — every one 15-18 ms warm through `iets`, which
-caches by the files an evaluation read. Two layers, not interchangeable:
+(2026-11-07, min of 3) `.#knowledgeGraph.graph` is 1686 ms, `.#policies` 5004 ms —
+each 15-18 ms warm through `iets`. The task graph left this table when it stopped
+being an eval: `taskfile_graph.py report` is 0.6 s cold, reading only the shards.
 
 | layer | keys on | answers in | answers when |
 | :--- | :--- | ---: | :--- |

@@ -57,7 +57,6 @@ compare() {
 # only worth having over the reads that actually take the fast path.
 compare "knowledgeGraph.graph" ".#knowledgeGraph.graph" --json
 compare "agentsNotes" ".?submodules=1#agentsNotes" --json
-compare "taskfileGraph.report" ".#taskfileGraph.report" --json
 compare "inventory.hosts.delphi.role" ".#inventory.hosts.delphi.role" --raw
 compare "epistemics.table" ".#epistemics.table" --json
 

@@ -11,7 +11,7 @@
 # cheap thing must run first and the expensive thing must be the FALLBACK.
 #
 # The tool set is NOT hand written here: it is derived from the compiled task
-# graph (`.#taskfileGraph.byName`), so a tool exists exactly when a task exists and
+# graph (`scripts/task/lib/taskfile_graph.py by-name`), so a tool exists exactly when a task exists and
 # every tool name maps back to a runnable `task <name>`. A model that invents a
 # tool is rejected, not executed (see `--list-tools` for the current surface).
 #
@@ -102,21 +102,21 @@ while [ $# -gt 0 ]; do
 done
 
 # The tool surface is compiled from those sources, so it is cached against their
-# CONTENT, not against "is the tree dirty": one `nix eval` here is ~430 ms on
-# every call, which is more than the lookup it enables. Keyed on the files the
-# compiler reads (taskfiles/*.yml + lib/taskfile.nix + the flake lock), so an edit
-# misses and every other call in a loop hits. TOOLCALL_REFRESH=1 skips the cache.
+# CONTENT, not against "is the tree dirty": one compile here is ~600 ms on every
+# call, which is more than the lookup it enables. Keyed on the files the compiler
+# reads (taskfiles/*.yml + the compiler + the flake lock), so an edit misses and
+# every other call in a loop hits. TOOLCALL_REFRESH=1 skips the cache.
 SURFACE_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-toolcall"
 # Computed in the parent shell: load_graph runs inside `$( )`, so anything it
 # assigns is gone by the time the caller needs it (TOOLS_FILE does).
-SURFACE_KEY="$(cat "$REPO"/taskfiles/*.yml "$REPO/lib/taskfile.nix" "$REPO/flake.lock" 2>/dev/null | sha1sum | cut -d' ' -f1)"
+SURFACE_KEY="$(cat "$REPO"/taskfiles/*.yml "$REPO/scripts/task/lib/taskfile_graph.py" "$REPO/flake.lock" 2>/dev/null | sha1sum | cut -d' ' -f1)"
 SURFACE_CACHE="$SURFACE_CACHE_DIR/surface-$SURFACE_KEY.json"
 load_graph() {
   if [ -z "${TOOLCALL_REFRESH:-}" ] && [ -s "$SURFACE_CACHE" ]; then
     cat "$SURFACE_CACHE"
     return 0
   fi
-  nix eval --json ".?submodules=1#taskfileGraph.byName" 2>/dev/null | {
+  python3 "$REPO/scripts/task/lib/taskfile_graph.py" by-name 2>/dev/null | {
     if ! out="$(cat)" || [ -z "$out" ]; then return 1; fi
     mkdir -p "$SURFACE_CACHE_DIR"
     printf '%s' "$out" >"$SURFACE_CACHE.tmp" && mv "$SURFACE_CACHE.tmp" "$SURFACE_CACHE"
@@ -151,12 +151,13 @@ fi
 # `checks:host` to SURFACE, it is excluded by its `nix build`, not by memory.)
 HEAVY_RE='nix build|nix-build|nixos-rebuild|darwin-rebuild|home-manager switch|nix flake check|disko|nix develop|make install'
 
-# A task is a tool when its name is on the call surface AND it declares vars: a
-# tool with no arguments cannot fill anything, so it is not a call target.
+# A task is a tool when its name is on the call surface AND it declares
+# `requires.vars`: a tool with no arguments cannot fill anything, so it is not a
+# call target. (The parameter surface is read as data, not as `vars: [X]` text.)
 SURFACE_ALL="$(jq -c --arg re "$SURFACE" --arg heavy "$HEAVY_RE" '
   to_entries
   | map(select(.key | test($re)))
-  | map(select(.value.body | test("vars: \\[[A-Z]")))
+  | map(select((.value.params // []) | length > 0))
   | map({task: .key, heavy: (.value.body | test($heavy; "i"))})
 ' <<<"$GRAPH")"
 HEAVY_TASKS="$(jq -r '[.[] | select(.heavy) | .task] | join(",")' <<<"$SURFACE_ALL")"
@@ -164,11 +165,10 @@ HEAVY_TASKS="$(jq -r '[.[] | select(.heavy) | .task] | join(",")' <<<"$SURFACE_A
 TOOLS="$(jq -c --arg re "$SURFACE" --arg heavy "$HEAVY_RE" '
   to_entries
   | map(select(.key | test($re)))
-  | map(select(.value.body | test("vars: \\[[A-Z]")))
+  | map(select((.value.params // []) | length > 0))
   | map(select(.value.body | test($heavy; "i") | not))
   | map(.key as $name
-      | (.value.body | capture("vars: \\[(?<vars>[A-Z_, ]+)\\]")) as $v
-      | ($v.vars | split(",") | map(gsub("^ +| +$"; "")) | map(select(length > 0))) as $vars
+      | (.value.params) as $vars
       | {
           name: ($name | gsub(":"; "_")),
           task: $name,

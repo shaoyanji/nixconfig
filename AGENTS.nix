@@ -18,10 +18,12 @@
           "scripts/task/drv-equality.py"
           "scripts/task/check.sh"
           "taskfiles/checks.toml"
-          "lib/taskfile.nix"
+          "scripts/task/lib/taskfile_graph.py"
+          "scripts/task/skills-task-mirror.py"
+          "tests/taskfile-graph/expected.json"
           "flake/checks.nix"
         ];
-        tasks = ["checks:drv-equality" "checks:host" "check:leaf" "check:list" "check:verify"];
+        tasks = ["checks:drv-equality" "checks:host" "checks:skills:mirror" "check:leaf" "check:list" "check:verify"];
         docs = ["docs/task-control-plane.md" "docs/nix-patterns.md" "AGENTS.md"];
       };
       body = ''
@@ -58,18 +60,14 @@
            implementation: deleting those names is a reference migration across
            ~50 files, and doing it in the same commit as the mechanism would make
            one red build hide which half broke.
-        5. Task plane: metadata in TOML for eval, commands in YAML for go-task.
-           NOT DONE, and the reason is structural. `.#taskfileGraph` is a public
-           interface, not only a check: `q.sh`, `toolcall.sh`, `edge-check.sh`,
-           `kg-iets-check.sh` and `taskfile-list.sh` read it, and `flake/checks.nix`
-           builds `taskfile-graph`, `-selftest`, `taskfile-digest-pin` and
-           `skills-task-mirror` from it. TOML metadata still has to reach go-task,
-           which reads YAML only — so either a committed generated shard (banned
-           by [[flake/policies.nix#generated-not-tracked]]) or `desc` leaves
-           `task --list`. Both are owner decisions; a half-move leaves two parsers,
-           the debt this note exists to pay. What is cheap and safe — deleting the
-           digest pin alone — was not taken either, because the pin is the only
-           thing that makes a graph change visible in review.
+        5. Task plane: LANDED, by a different route than planned. `desc` has to
+           live in YAML (go-task serves `--list`), so the TOML split would have
+           been a second home; yq reads both formats, so the PARSER moved instead:
+           `taskfile_graph.py` applies the same 17 buckets in 0.6 s, and
+           `lib/taskfile.nix`, the digest pin and three flake checks are gone.
+           Two rules that wanted eval time are now `checks:skills:mirror` and the
+           compiler's `citations` mode. Parity before deletion: identical buckets
+           and name set, fixture verdicts pinned in JSON. Why: the doc.
         6. Documents: generate every table that mirrors `inventory.toml`,
            `modules.toml`, the task plane or the graph. The chain table is
            `docs/generated/fleet-module-chains.md`. AGENTS.md is 477 -> 218 lines
@@ -5138,8 +5136,8 @@
         **Adopted.** `docs/agent-contract.md` names the predicate that makes a turn
         finished, because "done" in prose drifts within twenty turns. The page is a
         normative doc, so its `[[flake/policies.nix#…]]` citations are checked, and
-        `contract-tasks-resolve` fails any `task <name>` it names that the compiled
-        graph does not have (wildcards resolve by prefix).
+        `checks:tasks` fails any `task <name>` it names that the graph does not have
+        (wildcards resolve by prefix).
 
         **Refused, with the instrument that replaces each.** A `nix flake check`
         exit is the memory-gated force on an 11 GiB host, so DEBLOAT ends at

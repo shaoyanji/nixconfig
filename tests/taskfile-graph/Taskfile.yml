@@ -4,7 +4,8 @@
 # the reader measures indentation instead of assuming it (the first version
 # assumed a width and silently parsed zero root tasks).
 #
-# Expected verdicts are asserted in flake/checks.nix (`taskfile-graph-selftest`).
+# Expected verdicts are asserted in expected.json (`task checks:tasks` compares
+# them on every run, so a bucket that stops firing fails the gate).
 # Do not "fix" the defects here; each one is a gate case.
 version: "3"
 

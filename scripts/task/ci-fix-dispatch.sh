@@ -81,9 +81,10 @@ The two jobs that fail most often here, and what each one means:
 - \`docs-budget\` / "Living documents within budget" — \`bash scripts/task/docs-budget.sh\`
   from the repo root prints which document is over. Shorten the document, do not
   raise the budget.
-- \`docs-budget\` / "Task graph digests still pinned" — a taskfile shard changed and
-  \`flake/taskfile-digest-pin.nix\` was not updated in the same commit. \`task
-  checks:tasks\` prints both digests; write the new pair into that file.
+- \`docs-budget\` / "Task graph gate" — a shard violates a bucket (duplicate key,
+  dangling reference, include cycle, orphan shard, MATCH arity, exit-code drift)
+  or the name set disagrees with \`task --list-all --json\`. \`task checks:tasks\`
+  names the bucket; fix the shard, not the gate.
 
 Verification is phased and bounded: \`bash scripts/task/docs-budget.sh\` for a doc
 change, \`task checks:host HOST=<host>\` for the one host a config change reaches.

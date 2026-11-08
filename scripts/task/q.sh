@@ -32,7 +32,7 @@
 #   inventory  nix eval .#inventory.hosts            id = host name
 #   notes      nix eval .#agentsNotes.notes          id = note id
 #   graph      nix eval .#knowledgeGraph.graph       id = node id; in/out degree
-#   tasks      nix eval .#taskfileGraph              id = task name; build = body
+#   tasks      taskfile_graph.py by-name             id = task name; build = body
 #   ledger     /var/lib/fleet-sentinel/ledger.jsonl  id = unit (flattened jobs)
 # The three evals are cached per working-tree content (rev + sha1(git diff HEAD));
 # the graph goes through lib/kg-graph.sh, the same cache kg-query and the sidecar
@@ -475,6 +475,25 @@ q_eval() {
 # sidecar, `ops:kg:*` and this query cannot answer from three different graphs.
 . "$REPO/scripts/task/lib/kg-graph.sh"
 
+# The task plane's registry: one compile of the shards (yq, by way of
+# scripts/task/lib/taskfile_graph.py), reshaped into the `parsed` list the jq
+# program below already reads. Keyed like every other registry, on the tree.
+tasks_graph() {
+  local path="$CACHE/q-tasks-$(tree_key).json"
+  if [ ! -s "$path" ]; then
+    mkdir -p "$CACHE"
+    if ! python3 "$REPO/scripts/task/lib/taskfile_graph.py" by-name 2>/dev/null \
+      | jq '{parsed: (to_entries | map(.value))}' >"$path.tmp"; then
+      rm -f "$path.tmp"
+      say "cannot compile the task graph"
+      return 1
+    fi
+    mv "$path.tmp" "$path"
+    find "$CACHE" -maxdepth 1 -name 'q-tasks-*.json' -type f -mtime +7 -delete 2>/dev/null || true
+  fi
+  printf '%s' "$path"
+}
+
 ledger_file() {
   local f="${Q_LEDGER:-/var/lib/fleet-sentinel/ledger.jsonl}"
   [ -r "$f" ] || {
@@ -492,7 +511,7 @@ data_for() {
   case "$1" in
     inventory) q_eval inventory inventory.hosts ;;
     notes) q_eval notes agentsNotes.notes ;;
-    tasks) q_eval tasks taskfileGraph ;;
+    tasks) tasks_graph ;;
     graph) kg_graph_path ;;
     ledger)
       # The ledger is live JSONL, not a compiled artifact: flatten it into the

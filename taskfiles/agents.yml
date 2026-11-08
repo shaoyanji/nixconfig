@@ -216,8 +216,8 @@ tasks:
   agents:call:
     desc: "Edge caller: needle3 picks a graph lookup for Q= and prefetches it as TOON"
     summary: >
-      scripts/task/toolcall.sh — the tool set is DERIVED from `.#taskfileGraph`, so a
-      tool exists only when a task does. Class before score: READ-ONLY tools
+      scripts/task/toolcall.sh — the tool set is DERIVED from the compiled task
+      graph, so a tool exists only when a task does. Class before score: READ-ONLY tools
       (`ops:kg:*`, `ops:ask`) prefetch on any validated call, so context arrives in
       one call instead of a reasoning round; everything else keeps the bands
       (>= ACT runs, >= CONFIRM shows it, below declines). The argument's type is
@@ -779,9 +779,8 @@ tasks:
         esac
 
   agents:ci:preflight:
-    desc: "Run the two gates the CI docs-budget job runs, locally: no digest drift, no document over budget"
+    desc: "Run the gates the CI docs-budget job runs, locally: no document over budget, task graph clean"
     cmds:
       - |
         bash scripts/task/docs-budget.sh
-        nix eval --impure --raw "path:$(pwd)#checks.x86_64-linux.taskfile-digest-pin.outPath" \
-          >/dev/null && echo "task graph pinned"
+        bash scripts/task/taskfile-graph.sh >/dev/null && echo "task graph clean"

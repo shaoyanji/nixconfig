@@ -161,9 +161,9 @@ fi
 # Whole classes of file that only ever matter at boot.
 while IFS= read -r file; do
   case "$file" in
-    # The task plane is not a boot input. `flake/taskfile-digest-pin.nix` moving
-    # one digest spent a full TCG boot on a switch that changed no initrd.
-    flake/taskfile*.nix) ;;
+    # The task plane's data is not a boot input: a shard edit once spent a full
+    # TCG boot on a switch that changed no initrd.
+    taskfiles/*.yml | taskfiles/*.toml) ;;
     flake/*)
       echo "BOOT=run reason=flake wiring ($file)"
       exit 0

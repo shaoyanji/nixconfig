@@ -110,7 +110,7 @@ packages: `.#artifacts`, `.#sites`, `.#servers`, `.#cli` only.
 | module chains | same artifact → `fleet-module-chains.md` |
 | notes, decisions, open work | `task ops:notes` (source `AGENTS.nix`) |
 | what touches what | `task ops:kg` (source `.#knowledgeGraph`) |
-| the task contract | `task --list-all --json` (source `lib/taskfile.nix`) |
+| the task contract | `task --list-all --json` (source `taskfiles/*.yml`) |
 | what happened | `task agents:xs:list` |
 | a procedure | `docs/*.md` or a skill |
 | a superseded narrative | `docs/history/` |

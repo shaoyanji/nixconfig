@@ -24,7 +24,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/services.yml` is an include-only aggregator: it flattens `services-core.yml` and `services-legacy.yml` and declares no tasks of its own.
   [[flake/policies.nix#taskfiles-aggregators-declare-nothing]]
 - The task surface is also the **edge caller's tool set**: `agents:call` derives its tools
-  from `.#taskfileGraph`, so a callable verb is a task, not a second registry. Read-only
+  from `scripts/task/lib/taskfile_graph.py by-name`, so a callable verb is a task, not a second registry. Read-only
   verbs prefetch on any validated call (TOON out), the graph repairs the argument's type,
   `ops:ask` answers when the call names nothing, and a reasoning model is the *last* hop.
   [[flake/policies.nix#edge-caller-before-reasoning]]

@@ -152,52 +152,64 @@ watch docs:
   has no `generates`, so it re-runs on every change — correct for a formatter,
   and it writes nothing when there is nothing to change, which keeps it stable.
 
-## The task graph, compiled (`lib/taskfile.nix`)
+## The task graph, compiled (`scripts/task/lib/taskfile_graph.py`)
 
-Taskfiles are YAML, and YAML is a data format with a parser that **silently
-accepts** the failures a task graph actually has: a duplicate key keeps the last
-definition and discards the first, so an edit can vanish while every command
-exits 0 (it did — `dev:nixbuild:plan` and `dev:nixbuild:warm` were each defined
-twice). `yq <file>` only proves the file parses.
+Taskfiles are YAML, and YAML **silently accepts** the failures a task graph
+actually has: a duplicate key keeps the last definition and discards the first, so
+an edit can vanish while every command exits 0 (it did — `dev:nixbuild:plan` and
+`dev:nixbuild:warm` were each defined twice). `yq <file>` only proves the file
+parses.
 
-So the graph is compiled instead: `lib/taskfile.nix` turns `Taskfile.yml` plus the
-(nested) include graph into data — task names, `desc`/`summary`, `aliases`,
-`cmds`, wildcard arity, cross-task references, include edges — and everything
-else reads that one projection. `nix eval --json .#taskfileGraph.names` is the
-cheap read; `.#taskfileGraph.version` is a digest of names + `cmds`.
+So the graph is compiled instead. `scripts/task/lib/taskfile_graph.py` walks
+`Taskfile.yml` plus the nested include graph and emits one projection — task
+names, `desc`/`summary`, `aliases`, `cmds`, `requires.vars`, wildcard arity,
+cross-task references, include edges. **yq parses; the rules are the script.** No
+IFD, no committed derivative, and no second source of truth: the shards are the
+input and nothing is generated beside them.
+
+```bash
+python3 scripts/task/lib/taskfile_graph.py report   # names, files, every bucket
+python3 scripts/task/lib/taskfile_graph.py by-name  # the read dispatchers use
+python3 scripts/task/lib/taskfile_graph.py citations # contract page -> real tasks?
+bash scripts/task/taskfile-graph.sh                 # [gate] all of the above + parity
+```
+
+The graph used to be compiled by `lib/taskfile.nix`, a hand-written YAML line
+grammar, because `checks.<system>` needed it at eval time. That was a second
+parser for a tree go-task already parses; it cost ~0.7 s per read, it needed a
+committed digest pin before an edit was visible, and the two rules that genuinely
+wanted eval time (`skills-task-mirror`, the contract-page citations) do not need
+Nix at all. They are `scripts/task/skills-task-mirror.py` and the `citations`
+mode now, so yq and go-task are the only YAML parsers left in the tree.
 
 ### Two layers, deliberately
 
 | Layer | Owns | Why it must not move |
 | :--- | :--- | :--- |
-| Nix | the **graph**: names, fields, references, includes | typed, shared, cheap to `nix eval`, and it can assert |
-| go-task | the **moment**: `{{.HOST}}`, `{{index .MATCH 0}}`, `{{.CLI_ARGS}}`, `{{if}}` | runtime values — the host is not known at eval time |
+| the compiler | the **graph**: names, fields, references, includes | one parse, shared by the gate, the dispatcher and the registry |
+| go-task | the **moment**: `{{.HOST}}`, `{{index .MATCH 0}}`, `{{.CLI_ARGS}}`, `{{if}}` | runtime values — the host is not known ahead of time |
 
-596 template expressions live in this tree. Nix cannot evaluate any of them, and
-trying would replace them with escaped literals: the graph therefore carries them
-as opaque strings, and Nix-temporal vs go-task-temporal stays a hard split.
+596 template expressions live in this tree. Nothing in the compiler evaluates any
+of them: the graph carries them as opaque strings.
 
-### Why a line grammar, not a YAML library
+### The oracle: go-task's own name set
 
-This nixpkgs pin has no YAML *reader* (only `lib.generators.toYAML`), and
-import-from-derivation would make every eval that touches the graph build first.
-A line grammar is only defensible if drift is loud, so the gate has an oracle:
-`task checks:tasks` compares the parsed name set **and** the file list against
-`task --list-all --json`. The grammar is trusted exactly as far as `task` agrees
-with it — a name only Nix sees is parsed garbage, a name only go-task sees is a
-task the graph is missing.
+A YAML reader cannot report a duplicate key it silently discarded, and it cannot
+know which names go-task actually loads. So the gate has an oracle:
+`task checks:tasks` compares the compiled name set against
+`task --list-all --json`. The compiler is trusted exactly as far as `task` agrees
+with it — a name only the compiler sees is parsed garbage, a name only go-task
+sees is a task the graph is missing.
 
-Indentation is **measured**, never assumed: the root file indents 4, every shard
-indents 2, and a fixture in 2-space style exercises the root path. Assuming a
-fixed width was the first version's bug — it parsed zero root tasks and reported
-296 missing descriptions that were present all along.
+Duplicate keys are the one thing yq keeps hold of: it emits the pair stream, so
+the `duplicate` bucket reads the key twice before Python's `dict` collapses it.
 
 ### Buckets: hard vs advisory
 
 One flat list of "issues" is unreviewable, so violations are bucketed and each
-bucket is either fatal or reported (`gateBuckets` in the lib):
+bucket is either fatal or reported (`gateBuckets` in the compiler):
 
-| Hard (fails `checks:tasks` and the flake check) | Advisory (reported, never fatal) |
+| Hard (fails `checks:tasks`) | Advisory (reported, never fatal) |
 | :--- | :--- |
 | `duplicate` — same name defined twice | `nameGrammar` — outside `<ns>:<verb>[:<arg>]` |
 | `danglingRef` — a `task <name>` call that does not resolve | `proseRef` — a `task <name>` in prose that does not exist (a `ns:*` family mention is fine) |
@@ -209,23 +221,23 @@ bucket is either fatal or reported (`gateBuckets` in the lib):
 | `noDesc` — neither `desc` nor `summary`: invisible to both surfaces | |
 | `exitDrift` — a summary promises a code nothing in the task emits | `exitUnverified` — the claim rests on a `scripts/task/*.sh` not in the tree |
 | `missingInclude`, `unflattened`, `internal`, `wildcardArity`, `sourcesWithoutWatch` | |
+| a `task <name>` citation on `docs/agent-contract.md` that names nothing | |
 
 The three budget buckets were **advisory until the tree fit**, then promoted: 28
-summaries were over 600 characters (`checks:host` alone was 3400, and
-`ops:ask` 2629), which is a page an agent pays for on every
-`task --list-all --json` read. They were rewritten to the contract — purpose,
-`VAR=` names, exit codes, and what the gate does **not** prove — with the
-narrative dropped or left to `#` comments, and the buckets moved into
-`gateBuckets`. A budget that is only reported is a budget that drifts; `desc` is
-the one-line list label, `summary` is the contract, `#` comments are for whoever
-reads the YAML next.
+summaries were over 600 characters (`checks:host` alone was 3400, and `ops:ask`
+2629), which is a page an agent pays for on every `task --list-all --json` read.
+They were rewritten to the contract — purpose, `VAR=` names, exit codes, and what
+the gate does **not** prove — with the narrative dropped or left to `#` comments,
+and the buckets moved into `gateBuckets`. A budget that is only reported is a
+budget that drifts; `desc` is the one-line list label, `summary` is the contract,
+`#` comments are for whoever reads the YAML next.
 
 Two precision rules matter, both learned from a noisy first version that reported
 34 "dangling" refs of which ~30 were English:
 
-- A reference counts only in a **command position** — line start (after the YAML
-  dash), or after `$({`, `&&`, `||`, `;`, `|`. `task keys` inside a `summary` is
-  not a call. Prose mentions go to `proseRef`, which cannot fail a gate.
+- A reference counts only in a **command position** — line start, or after
+  `$({`, `&&`, `||`, `;`, `|`. `task keys` inside a `summary` is not a call. Prose
+  mentions go to `proseRef`, which cannot fail a gate.
 - Resolution peels fixed arguments and matches wildcards **segment-for-segment**:
   `task checks:host:HOST=minyx` resolves to `checks:host`, `task
   infra:deploy:host:fern` matches `infra:deploy:host:*`. A prefix test accepted
@@ -252,77 +264,15 @@ comparison a gate (`exitDrift`, fatal) without drowning it in false positives:
 
 What it deliberately cannot judge: a task whose command is `nix build …` inherits
 that tool's status. There is no code in the task to compare against, so the claim
-is `opaque` and passes — `checks:toml:lint` is exactly this shape. Membership in
-the tree is asked of `readDir`, not `builtins.pathExists`: on a lazy flake source
-`pathExists` answers false for a path that is merely unrealised, which made the
-first version report 20 existing scripts as missing.
+is `opaque` and passes — `checks:toml:lint` is exactly this shape.
 
-### Versioning: minted by a gate, addressable after
+### Every bucket is exercised
 
-```bash
-task checks:tasks                       # graph + parity, ~1.2 s, builds nothing
-nix eval --json .#taskfileGraph.version # digest of names + cmds (what executes)
-nix eval --json .#taskfileGraph.proseVersion # digest of desc + summary (what agents read)
-task checks:tasks ARTIFACT=1            # + the minted artifact (path, both digests, JSON hash)
-OFFLOAD=1 task checks:tasks ARTIFACT=1  # same, built on /etc/nix/machines
-STRICT=1 task checks:tasks ARTIFACT=1   # build nothing: "is this graph already built?"
-task checks:quick                       # includes the check (with the selftest)
-```
-
-The three mode names are `checks:host`'s, deliberately: default never spends build
-budget (`--builders ""`), `STRICT=1` is substitute-or-fail, `OFFLOAD=1` dispatches.
-Two runs agree when they print the same path **and** the same `sha256` of
-`graph.json` — an input-addressed derivation cannot yield two paths for one input,
-so a disagreement means the input set moved (or a builder is nondeterministic).
-
-The digests are **pinned** in [`flake/taskfile-digest-pin.nix`](../flake/taskfile-digest-pin.nix)
-and compared by `checks.<system>.taskfile-digest-pin`, which the `docs-budget` CI
-job builds on every push. A deliberate edit updates the pin in the same commit; an
-unintentional one — a shard reformatted by a menu, a summary rewritten in bulk —
-fails with both digests named instead of shipping as a silent change in what the
-fleet executes or what an agent reads.
-
-Measured 2026-10-21: the same graph minted here and on eu.nixbuild.net
-(`taskfile-graph-<digest>`) gives one path and one hash; a deliberate `cmds` edit
-produced a new digest, built cold on the builder in 2 s, and reverting returned
-the original path. `nix build --rebuild` is how you would compare two builds of
-the same derivation, and it **cannot be offloaded** — nix answers `local builds are
-disabled (max-jobs = 0)`, because a trustable comparison has to run in the
-reviewer's own sandbox. That is why the cross-machine claim rests on the path
-being a pure function of the tree, not on a remote rebuild.
-
-The name carries **both** digests — `taskfile-graph-<version>-p<prose>` — so what
-executes and what an agent reads are both addressable, and the prefix tells you
-which kind of change you are looking at. `version` excludes prose on purpose
-(editing a `summary` must not look like a change in behaviour); `proseVersion` is
-the same digest over `desc` + `summary`, so a prose-only edit still mints a
-distinct, buildable path under the unchanged version. Measured 2026-10-21, one
-summary reworded and reverted:
-
-| edit | `version` | `prose` | path |
-| :--- | :--- | :--- | :--- |
-| baseline | `cae1cdc7ca6d` | `c0e18535aacf` | `…-taskfile-graph-cae1cdc7ca6d-pc0e18535aacf` |
-| one summary reworded | `cae1cdc7ca6d` | `ce94226f319a` | `…-taskfile-graph-cae1cdc7ca6d-pce94226f319a` |
-| reverted | `cae1cdc7ca6d` | `c0e18535aacf` | the original path, byte for byte |
-
-`graph.json` now carries the prose surface **verbatim** (`prose`: name, shard,
-`desc`, `summary` per task) as well as `version`/`proseVersion`, so an old build can
-be diffed against a new one without a git checkout. Before that, the artifact held
-only *findings about* prose — a violation count cannot tell you what it said.
-A summary that trips a bucket (`proseRef`, `longSummary`) still mints a different
-path at the same versions, because `violations` is in the artifact too.
-`.#taskfileGraph` is pure (no `pkgs`, no host eval), so the same compile serves the
-flake check, the gate script and any future generator.
-
-The fixture `tests/taskfile-graph/` violates every hard bucket exactly once, and
-`checks.<system>.taskfile-graph-selftest` asserts the expected verdicts — a bucket
-that stops firing, or starts firing on prose, fails CI instead of drifting. That
-selftest is also what caught a nested include's cycle being dropped (only the
-root level was reporting) before it reached the tree.
-
-Still hand-written, by design: the gating tasks. The generated artifact is data
-(`graph.json` + `version` + `prose`), not a Taskfile — replacing the hand-written
-YAML with generated YAML is the next stage, and it needs this parity layer first.
+`tests/taskfile-graph/` violates every bucket exactly once, with its expected
+verdicts in `tests/taskfile-graph/expected.json`. `checks:tasks` runs the fixture
+on every invocation, so a bucket that stops firing — or starts firing on prose —
+fails the gate instead of drifting. That selftest is what caught a nested
+include's cycle being dropped (only the root level was reporting).
 
 ## Closure analysis (`dev:closure*`)
 

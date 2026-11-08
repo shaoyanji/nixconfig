@@ -483,22 +483,6 @@
     builtins.length (builtins.filter (s: s != "" && !(isBanner s)) bodies);
   longHeaders = map (p: lib.removePrefix "${toString root}/" (toString p)) (builtins.filter (p: headerLines p > 3) nixFiles);
 
-  # A backticked `task <name>` on the contract page is a promise that the name
-  # exists; a wildcard shard (`find:*`) resolves by its static prefix.
-  taskNames = (import ../lib/taskfile.nix {inherit lib;}).names;
-  wildcardTasks = builtins.filter (n: lib.hasInfix "*" n) taskNames;
-  resolvesTask = n:
-    builtins.elem n taskNames
-    || lib.any (w: lib.hasPrefix (builtins.head (lib.splitString "*" w)) n) wildcardTasks;
-  codeSpans = p: builtins.filter builtins.isString (builtins.split "`" (read p));
-  contractCites = map (s: lib.head (lib.splitString " " (lib.removePrefix "task " s))) (
-    builtins.filter (s: lib.hasPrefix "task " s) (codeSpans "docs/agent-contract.md")
-  );
-  contractUnknown =
-    builtins.filter
-    (n: n != "" && !(lib.hasPrefix "-" n) && !(resolvesTask n))
-    contractCites;
-
   # A compositor swap inside `base-desktop-environment` is two configs fighting:
   # niri/DMS are force-disabled while the profile that installed them, and their
   # whole userland (zen, nautilus, portals, gnome-keyring), stays in the closure.
@@ -553,13 +537,6 @@
       proof = "systemd.services blocks in modules/ and hosts/ that set Restart; lib/systemd-policy.nix markedSystemViolations";
       holds = unclassifiedDaemons == [];
       detail = "system services with Restart and no X-Fleet-Role:\n    ${lib.concatStringsSep "\n    " unclassifiedDaemons}";
-    };
-
-    contract-tasks-resolve = {
-      rule = "A page that tells an agent what to run names only tasks the compiled graph has: an exact name, or a wildcard shard whose prefix matches (`find:<word>` → `find:*`, `infra:warm:host:<host>` → `infra:warm:host:*`). A citation nobody can run is worse than no citation — it makes the door look closed, which is the drift the contract page exists to stop.";
-      proof = "backticked `task …` citations in docs/agent-contract.md vs lib/taskfile.nix `names`";
-      holds = contractUnknown == [];
-      detail = "citations that name no task: ${lib.concatStringsSep ", " contractUnknown}";
     };
 
     root-markdown-closed = {
@@ -660,7 +637,7 @@
       rule = "Dispatch goes cheapest-first, on a Pareto frontier rather than a wish: needle3 (8-29 MB, on-device, calibrated confidence) takes the quadrant that is SMALL and NON-REDUCIBLE — one deterministic lookup whose answer is a value or a set it need not decompose, the class of call a reasoning model makes most often — and executes it all day. REDUCIBLE requests (two independent asks) are refused for the reasoning agent to split; LARGE requests (a judgement, an operation, or anything whose body can BUILD) are refused for it to do, and a task with a build verb is removed from the tool surface structurally rather than by a reviewer's memory. Only a low-confidence or empty answer escalates to a reasoning model. The class comes before the score — a READ-ONLY tool prefetches on any validated call, because a graph lookup cannot change anything and its answer is the question's neighbourhood; anything off that allowlist needs one call at or above ACT, may be shown for approval above CONFIRM, and declines below it. A single threshold either makes the caller decorative or dangerous. An invented tool is refused before confidence is consulted, the argument's TYPE is repaired from the graph rather than trusted, a decline from the graph router is a decline whatever its exit code, and telemetry is off in the shipped binary by default so the dispatcher sets it explicitly.";
       proof = "scripts/task/toolcall.sh · scripts/task/edge-sidecar.sh · scripts/task/edge-check.sh · scripts/task/toolcall-battery.jsonl · taskfiles/agents.yml (agents:call, agents:edge) · taskfiles/checks.yml (checks:toolcall, checks:edge)";
       holds =
-        has "scripts/task/toolcall.sh" "taskfileGraph"
+        has "scripts/task/toolcall.sh" "taskfile_graph.py"
         && has "scripts/task/toolcall.sh" "confidence"
         && has "scripts/task/toolcall.sh" ''decision: "confirm"''
         && has "scripts/task/toolcall.sh" "NEEDLE_TELEMETRY=0"
@@ -922,11 +899,11 @@
       detail = "the workflow lost the docs-budget job; doc-only pushes now allocate nothing and gate nothing";
     };
 
-    ci-task-graph-pin = {
-      rule = "The task graph's exec and prose digests are pinned, and the pin is built on every push (doc-only included), so a silent shard rewrite cannot ship.";
-      proof = ".github/workflows/nixcachix.yml builds `checks.<system>.taskfile-digest-pin`";
-      holds = has ".github/workflows/nixcachix.yml" "checks.x86_64-linux.taskfile-digest-pin";
-      detail = "the workflow lost the task-graph pin step; digest drift now reaches a deploy unflagged";
+    ci-task-graph = {
+      rule = "The task graph is gated on every push, doc-only included: duplicate keys, dangling references, include cycles, orphan shards, MATCH arity and an exit code a summary promises but its script never emits are hard violations, the name set must equal `task --list-all --json`, and the fixture must violate every bucket where it says it does. A shard rewrite that no test covers then cannot ship silent.";
+      proof = ".github/workflows/nixcachix.yml (the `docs-budget` job runs scripts/task/taskfile-graph.sh)";
+      holds = has ".github/workflows/nixcachix.yml" "taskfile-graph.sh";
+      detail = "the workflow lost the task-graph step; shard drift now reaches a deploy unflagged";
     };
 
     taxonomy-one-home = {

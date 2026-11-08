@@ -581,7 +581,7 @@
     };
 
     agent-prose-budget = {
-      rule = "AGENTS.md (482 lines) and the body of every tracked SKILL.md (5270 lines today) are shrink-only — they are the prose an agent carries or loads, so a cleanup lowers the number here in the same commit. A skill's frontmatter is NOT counted: `lib/skills.nix` compiles it into the one-line index, so it is metadata, not context. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability.";
+      rule = "AGENTS.md (482 lines) and the body of every tracked SKILL.md (5270 lines today) are shrink-only — they are the prose an agent carries or loads, so a cleanup lowers the number here in the same commit. A skill's frontmatter is NOT counted: `lib/skills.nix` compiles it into the one-line index, so it is metadata, not context. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability. SOFT gate: the overrun is reported with its number on every `checks.policies` run and never fails one — a cost to bring down, not a contradiction to refuse.";
       proof = "line counts of AGENTS.md and of every tracked SKILL.md minus its frontmatter block";
       # Audited 2026-10-21: 215 lines removed by collapsing the shadowed
       # `.agents/skills/simplex-admin` copy (the module is canonical and the

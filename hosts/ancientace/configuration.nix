@@ -14,7 +14,8 @@ in {
     ./hardware-configuration.nix
     self.modules."profiles.base-desktop-environment"
     self.modules."profiles.laptop"
-    self.modules."global.microvm-network"
+    # microvm-host.nix below declares options.microvm.network; importing
+    # global.microvm-network as well declared it twice.
     inputs.microvm.nixosModules.host
     (import ../../modules/profiles/microvm-host.nix {
       inherit pkgs;

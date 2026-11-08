@@ -21,7 +21,11 @@
 #
 # TWO MODES (they answer different questions):
 #   build   realises hostChecks.<arch>.<host> — cached, substitutable, one host per
-#           attr. CI's path.
+#           attr. CI's path. Two hosts have no artifact this machine can make, and
+#           the sweep EVALUATES them instead of failing: a darwin/home host
+#           (hostChecks is NixOS-only) and one of another system. STRICT=1 keeps
+#           build mode for a foreign arch, because substituting a cached artifact
+#           is exactly the question STRICT asks.
 #   eval    evaluates <kind>Configurations.<host>.config — module system, EVERY
 #           assertion (throws on the first failure, so a broken host FAILS and the
 #           message names what broke) and the compiled registry. ARCH-INDEPENDENT
@@ -105,31 +109,35 @@ MSG
   exit 1
 fi
 
-# In eval mode we need each host's KIND to pick the right config set. Resolve it from
-# the flake's output attr NAMES only — three cheap reads (0.2 s, no host evaluation),
-# never by evaluating a host.
+# Every host's KIND is resolved in BOTH modes, from the flake's output attr NAMES
+# only — three cheap reads (0.2 s, no host evaluation), never by evaluating a host.
+# Build mode used to assume `nixos` for all of them, which sent a `home` or
+# `darwin` host at a `hostChecks.<arch>.<host>` attribute that does not exist:
+# the gate then failed on an attribute error instead of checking anything.
 KINDS=""
-if [ "$MODE" = eval ]; then
-  NAMES=""
-  for pair in "nixos nixosConfigurations" "darwin darwinConfigurations" "home homeConfigurations"; do
-    set -- $pair
-    n=$(timeout 30 nix eval --json "${REF}#$2" --apply 'builtins.attrNames' 2>/dev/null | tr -d '[]"' | tr ',' ' ')
-    NAMES="${NAMES}
+NAMES=""
+for pair in "nixos nixosConfigurations" "darwin darwinConfigurations" "home homeConfigurations"; do
+  set -- $pair
+  n=$(timeout 30 nix eval --json "${REF}#$2" --apply 'builtins.attrNames' 2>/dev/null | tr -d '[]"' | tr ',' ' ')
+  NAMES="${NAMES}
 $(for h in $n; do [ -n "$h" ] && echo "$1 $h"; done)"
-  done
-  for h in $HOSTS; do
-    kind=$(echo "$NAMES" | awk -v h="$h" '$2==h{print $1; exit}')
-    if [ -z "$kind" ]; then
-      echo "host-check-sweep: '$h' is not a host in this flake (nixos/darwin/home)" >&2
-      exit 1
-    fi
-    KINDS="${KINDS}
+done
+for h in $HOSTS; do
+  kind=$(echo "$NAMES" | awk -v h="$h" '$2==h{print $1; exit}')
+  if [ -z "$kind" ]; then
+    echo "host-check-sweep: '$h' is not a host in this flake (nixos/darwin/home)" >&2
+    exit 1
+  fi
+  KINDS="${KINDS}
 $kind $h"
-  done
-else
-  for h in $HOSTS; do KINDS="${KINDS}
-nixos $h"; done
-fi
+done
+
+# The machine running the gate. Read once (0.3 s): a foreign-arch artifact cannot
+# be compiled here, so build mode for one is 5 s of evaluation followed by
+# "platform mismatch" — a failure that names the wrong problem, five times over in
+# a mixed-arch sweep. Those hosts are checked in eval mode instead, which is the
+# proof they can actually give on this machine.
+LOCAL_SYSTEM="${LOCAL_SYSTEM:-$(timeout 30 nix eval --impure --raw --expr builtins.currentSystem 2>/dev/null || uname -m)}"
 
 count=$(echo "$HOSTS" | wc -w)
 echo "host-check-sweep: ${count} named host(s), mode=${MODE}, arch=${ARCH:-per-host}, one process each, watchdog every 10s"
@@ -141,7 +149,8 @@ while read -r kind host; do
   [ -n "${host:-}" ] || continue
   i=$((i + 1))
   printf '[%d/%d] ' "$i" "$count"
-  if [ "$MODE" = build ]; then
+  run_mode="$MODE"
+  if [ "$run_mode" = build ]; then
     # hostChecks is keyed by the HOST's arch, so an unset --arch has to be read
     # from the registry rather than assumed from `uname`. A bare
     # /run/current-system check would also be wrong: this gate must be callable
@@ -151,6 +160,23 @@ while read -r kind host; do
       host_arch="$(timeout 30 nix eval --raw "${REF}?submodules=1#inventory.hosts.\"${host}\".arch" 2>/dev/null || true)"
       host_arch="${host_arch:-x86_64-linux}"
     fi
+    # Two shapes have no artifact to realise here, and both used to spend the
+    # evaluation before failing on the attribute or the platform: a darwin/home
+    # host (hostChecks is NixOS-only) and a host of a different system. STRICT
+    # keeps build mode for a foreign arch — `--max-jobs 0` still substitutes a
+    # cached artifact, which is the question STRICT asks. OFFLOAD keeps it too:
+    # /etc/nix/machines may hold a builder for that system.
+    if [ "${STRICT:-0}" != "1" ] && [ "${OFFLOAD:-0}" != "1" ]; then
+      if [ "$kind" != nixos ]; then
+        echo "note: ${host} is a ${kind} host (hostChecks is NixOS-only) — eval mode" >&2
+        run_mode=eval
+      elif [ "$host_arch" != "$LOCAL_SYSTEM" ]; then
+        echo "note: ${host} is ${host_arch}, this machine is ${LOCAL_SYSTEM} — eval mode" >&2
+        run_mode=eval
+      fi
+    fi
+  fi
+  if [ "$run_mode" = build ]; then
     build_flags=(--builders "")
     if [ "${OFFLOAD:-0}" = "1" ]; then
       # /etc/nix/machines supplies the builders; nothing may run locally.

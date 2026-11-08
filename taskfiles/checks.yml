@@ -53,6 +53,7 @@ tasks:
       - task checks:nix:shell
       - task checks:sops:drift
       - task checks:modules:validate
+      - task checks:modules:edges
 
   checks:docs:links:
     desc: "[gate] Every markdown link resolves, and none points at a machine path"
@@ -367,6 +368,19 @@ tasks:
     desc: Verify modules.toml syntax and valid module paths on disk
     cmds:
       - bash scripts/task/modules-menu.sh validate
+
+  checks:modules:edges:
+    desc: "[gate] A module under modules/ is reached by name, never by relative path"
+    summary: >
+      The dendritic composition rule, as text: `import ../x.nix;` with no
+      arguments and a bare relative path sitting in an `imports` list are
+      refusals, because both keep working until somebody renames the file and
+      neither is visible to `.#modules`. Loads with arguments, asset reads
+      (readFile, src, sopsFile) and `nixpkgs.overlays` imports are dependencies,
+      not module edges, and stay allowed. ~0.5 s over ~160 files, no eval, no
+      network; the same script the CI docs-budget job runs.
+    cmds:
+      - bash scripts/task/modules-edges.sh
 
   checks:hermes:
     desc: "[gate] hermes surface: call-site flags, gateway, secret bridge, config version"

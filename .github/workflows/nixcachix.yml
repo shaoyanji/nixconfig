@@ -89,6 +89,8 @@ jobs:
         run: nix build -L .?submodules=1#checks.x86_64-linux.prose-tells
       - name: Task graph digests still pinned
         run: nix build -L .?submodules=1#checks.x86_64-linux.taskfile-digest-pin
+      - name: Module edges are named, not pathed
+        run: bash scripts/task/modules-edges.sh
 
   plan:
     runs-on: ubuntu-latest

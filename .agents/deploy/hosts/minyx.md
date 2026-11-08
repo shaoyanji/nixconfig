@@ -18,7 +18,10 @@ and the declaration is enforced rather than decorative:
   frieren's 04:00 window: fetch `origin/main`, compare with
   `/var/lib/minyx-keeper/deployed-rev`, and do nothing when they match. A change
   builds on delphi with `--builders ""`, pushes over the LAN, then requires `blocky`
-  and `keepalived` active and the zone to answer.
+  and `keepalived` active and the zone to answer. A board that does not answer on
+  the LAN is a *skip*, not a failure: the run exits 0 and writes
+  `skipped: … unreachable` to `/var/lib/minyx-keeper/status`, so a switched-off Pi
+  cannot hold delphi red while the deployment gap stays recorded.
 - `task infra:minyx:keep` runs the same script by hand; `DRY=1` reports only.
 
 Why delphi and not the board: a `nix-shell -p` on a 1 GiB single-core Pi is slower

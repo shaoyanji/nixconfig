@@ -10,6 +10,10 @@
 # Deliberate choices, each of which has already bitten this fleet:
 #   - ssh is LAN-only, BatchMode, short timeout. An unattended unit must fail,
 #     never block: the tailnet path has hung on an interactive prompt before.
+#   - A board that does not answer is a recorded skip, not a failure. The Pi's
+#     supply is its known weak point, and a nightly red for a switched-off board
+#     held delphi degraded for nine days (2026-10-29 to 11-08) — which is how a
+#     real failure stops being read. The gap goes to the status file instead.
 #   - `--builders ""`: a keeper must not spend nixbuild.net budget as a side
 #     effect of looking [[flake/policies.nix]].
 #   - No automatic rollback. Rollback on this board is a reflash (its runbook),
@@ -76,8 +80,8 @@ fi
 say "behind: deployed ${have:-<none>} -> main $want"
 
 if ! ssh -o BatchMode=yes -o ConnectTimeout=8 "$TARGET" true 2>/dev/null; then
-  echo "minyx-keeper: $TARGET is unreachable over the LAN — the failover member is not being updated" >&2
-  exit 1
+  say "skipped: $TARGET is unreachable over the LAN; deployed rev stays ${have:-<none>}, main is $want"
+  exit 0
 fi
 
 if [ "$DRY" = "1" ]; then

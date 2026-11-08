@@ -264,13 +264,6 @@ in {
   # Powers `task ops:health` and serves /var/lib/fleet-sentinel/www/status.json.
   services.fleetSentinel = {
     enable = true;
-    # minyx is the Pi 3B this host deploys to nightly, and it has been powered off
-    # since 2026-10-29 (documented failing 5 V supply). A keeper that cannot reach
-    # a board that is not there says nothing about delphi, but it failed the unit
-    # every night and held this host's health red, so the fleet's only degraded
-    # signal was a peer's power state. The failure stays in the journal and in
-    # /var/lib/minyx-keeper/status; powering the board is the repair.
-    ignoreFailedUnits = ["minyx-keeper.service"];
     watchUnits = [
       {unit = "nixos-upgrade.service";}
       {unit = "stirling-pdf.service";}

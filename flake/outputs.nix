@@ -49,6 +49,7 @@
   docsGen = import ../lib/docs.nix {
     inherit lib inventory;
     notes = agentsNotesCtl.pages;
+    inherit moduleSets;
   };
   # Skills are compiled the same way the inventory is: parsed once, validated
   # once, consumed by checks/tasks/bundles. No host config is evaluated.

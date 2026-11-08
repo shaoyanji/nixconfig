@@ -7,6 +7,9 @@
   # AGENTS.nix -> rendered note pages (lib/agents-notes.nix). Passed in so this
   # module stays a pure renderer of compiled data.
   notes ? {},
+  # flake/module-sets.nix. The chain table beside it in AGENTS.md was a second
+  # copy of the same facts; this renders it instead.
+  moduleSets ? null,
 }: let
   knobs = modules.knobs or {};
   modulesMeta = modules.metadata or {};
@@ -332,12 +335,68 @@
       ${table ["host" "status" "nix" "arch" "tier" "cpu / ram / gpu" "role"] specRows}
     '';
 
+  # --- module chains and features --------------------------------------------
+  # A chain IS a feature list, so the table is a projection: its rows are
+  # `chainFeatures`, its module counts come from `mkHost`, and nothing here can
+  # disagree with what a host is assembled from.
+  chainRows =
+    lib.mapAttrsToList (
+      name: features: [
+        "`${name}`"
+        (lib.concatMapStringsSep " " (f: "`${f}`") features)
+        (toString (lib.length (moduleSets.mkHost {inherit features;})))
+      ]
+    )
+    moduleSets.chainFeatures
+    ++ [
+      [
+        "`features = [...]`"
+        "any subset, any order"
+        "—"
+      ]
+    ];
+  featureRows =
+    lib.mapAttrsToList (name: mods: [
+      "`${name}`"
+      (toString (lib.length mods))
+    ])
+    moduleSets.featureModules;
+
+  moduleChains =
+    header "Fleet Module Chains" "`flake/module-sets.nix`"
+    + ''
+      A host is a list of named features; `mkHost` concatenates them in order, so
+      a chain is data rather than a hand-kept list. The seven `globalModules*`
+      names are derived from the feature lists below, which is why
+      `flake/host-inventory.nix` and every `hosts/*` file kept working when the
+      chains became features. Adding a host means naming its features, not
+      forking a chain.
+
+      ## Chains
+
+      ${table ["chain" "features" "modules"] chainRows}
+
+      ## Features
+
+      ${table ["feature" "modules"] featureRows}
+
+      ## Cost
+
+      A gate pays for the option surface its chain imports, not for its host
+      file: `task dev:eval:profile` measures a feature subset on a stub host and
+      reports peak RSS. Measured 2026-11-08, a desktop gate is ~78 % chain.
+    ''
+    + "\n";
+
   # --- page set (paths inside the derivation) --------------------------------
   generatedPages =
     {
       "docs/generated/fleet-inventory.md" = fleetInventory;
       "docs/generated/fleet-matrix.md" = fleetMatrix;
       "docs/generated/modules-registry.md" = modulesRegistry;
+    }
+    // lib.optionalAttrs (moduleSets != null) {
+      "docs/generated/fleet-module-chains.md" = moduleChains;
     }
     # Every registered host, external ones included: `envs` and `serv00` are the
     # hosts an agent is most likely to be handed without a checkout to read.

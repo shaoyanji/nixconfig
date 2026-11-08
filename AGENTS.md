@@ -110,17 +110,12 @@ A host registers once in `flake/host-inventory.nix` (`kind`, `system`, chain, mo
 
 ### Module chains
 
-Seven baselines in `flake/module-sets.nix`; which host uses which: `nix eval --json .#inventory.hosts | jq '… .software.module_chain'`.
-
-| Chain | What it is |
-| :--- | :--- |
-| `globalModulesNixos` | global + nixos + shared HM + sops + nix-index + dms + dank-greeter |
-| `globalModulesRyoku` | global + nixos + sops + nix-index + ryoku (one shell per session) |
-| `globalModulesContainers` | global + noDE + sops + Home Manager + nix-index (no desktop) |
-| `globalModulesImpermanence` | `globalModulesNixos` + impermanence + disko |
-| `globalModulesMacos` | global + macos + nix-homebrew + Home Manager + sops |
-| `globalModulesDemo` | global + demo + Home Manager, no sops |
-| `globalModulesHome` | standalone HM sharedModules + allowUnfree |
+A host is a list of named **features** (`base`, `nixos`, `dms`, `ryoku`, `containers`, `impermanence`,
+`macos`, `demo`, `home`), and `mkHost` concatenates them in order. The seven `globalModules*` names
+survive as derived aliases, so a host that differs by one module names its features instead of forking
+a chain. Which host uses which: `nix eval --json .#inventory.hosts | jq '… .software.module_chain'`.
+The chain/feature table, with module counts, is generated from the same file:
+`nix build .#artifacts.docs` → `docs/generated/fleet-module-chains.md`.
 
 ### Where the modules are
 

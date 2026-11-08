@@ -169,13 +169,25 @@ in rec {
   }:
     lib.concatMap (f: featureModules.${f}) features ++ modules;
 
-  globalModulesNixos = mkHost {features = ["base" "nixos" "dms"];};
-  globalModulesRyoku = mkHost {features = ["base" "nixos" "ryoku"];};
-  globalModulesImpermanence = mkHost {
-    features = ["base" "nixos" "dms" "impermanence"];
+  # The seven chain names as DATA: a chain is exactly its features, in order, and
+  # the docs table is a projection of this rather than a second copy of it
+  # (`docs/generated/fleet-module-chains.md`,
+  # [[flake/policies.nix#generated-not-tracked]]).
+  chainFeatures = {
+    globalModulesNixos = ["base" "nixos" "dms"];
+    globalModulesRyoku = ["base" "nixos" "ryoku"];
+    globalModulesImpermanence = ["base" "nixos" "dms" "impermanence"];
+    globalModulesMacos = ["base" "macos"];
+    globalModulesContainers = ["base" "containers"];
+    globalModulesDemo = ["base" "demo"];
+    globalModulesHome = ["home"];
   };
-  globalModulesMacos = mkHost {features = ["base" "macos"];};
-  globalModulesContainers = mkHost {features = ["base" "containers"];};
-  globalModulesDemo = mkHost {features = ["base" "demo"];};
-  globalModulesHome = mkHost {features = ["home"];};
+
+  globalModulesNixos = mkHost {features = chainFeatures.globalModulesNixos;};
+  globalModulesRyoku = mkHost {features = chainFeatures.globalModulesRyoku;};
+  globalModulesImpermanence = mkHost {features = chainFeatures.globalModulesImpermanence;};
+  globalModulesMacos = mkHost {features = chainFeatures.globalModulesMacos;};
+  globalModulesContainers = mkHost {features = chainFeatures.globalModulesContainers;};
+  globalModulesDemo = mkHost {features = chainFeatures.globalModulesDemo;};
+  globalModulesHome = mkHost {features = chainFeatures.globalModulesHome;};
 }

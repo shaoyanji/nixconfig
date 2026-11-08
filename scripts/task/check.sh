@@ -94,7 +94,7 @@ case "${1:-}" in
     [ -n "$name" ] || die "NAME=<task> is required (see: task check:list $kind)"
     # No `exit` in the awk: under `pipefail` an early reader closes the pipe and
     # yq dies with SIGPIPE (141), which made a correct dispatch look like a
-    # failure. The table is 93 rows, so scanning it whole costs nothing.
+    # failure. The table is 94 rows, so scanning it whole costs nothing.
     row=$(rows | awk -F'\t' -v n="$name" '$2 == n {print $1}')
     [ -n "$row" ] || die "$name is not in the check inventory (task check:list)"
     [ "$row" = "$kind" ] || die "$name is a $row check, not $kind"

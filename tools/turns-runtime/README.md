@@ -118,6 +118,32 @@ result: both servers wait on one `comrak` process, so the render, not the
 runtime, is the cost. The ledger — the page a person actually lands on — and the
 concurrency ceiling are where the port paid.
 
+### The rule that generalises
+
+Port a service when all three hold: it is **long-running**, its I/O is the
+fleet's own (a store, a vault, a mail archive), and its Python cost is paid
+**continuously** — resident MB, an interpreter in the closure, a restart that
+answers late. Otherwise stdlib Go: contest the language only when the read path
+is hard enough to be worth a benchmark, and never for its own sake.
+
+Two shapes are excluded on purpose. A **timer-sized one-shot** (mail-atlas
+drain/reconcile, email-archive import/triage, mail-agent, wiki-ask,
+tls-cert-watchdog, fleet-session-reaper, flake-advisory-audit) spends an
+interpreter start against a job that already takes minutes. A **model server**
+is torch, CUDA and llama.cpp; eisen's parakeet, qwen-image and laya stay Python
+by nature, not by inertia. The fleet alert bridge is a third: one POST per
+alert, then a websocket round trip Python's library already speaks and Go's
+standard library does not.
+
+### How a port is gated
+
+Keep the wire contract byte-compatible, port the tests **before** the handler
+(`main_test.go` is the pattern: a real Unix socket, a fake store, one case per
+refusal), prove the legacy state file opens as-is — the shim's `dedup.sqlite`
+cutover test is the shape — then `task checks:host`, then a live smoke on the
+host before the old implementation is frozen. The cutover section below is what
+that smoke compares.
+
 ## The cutover, checked against the live host
 
 A measurement says what is faster; it says nothing about a route that answers

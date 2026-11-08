@@ -24,60 +24,39 @@
           "flake/checks.nix"
         ];
         tasks = ["checks:drv-equality" "checks:host" "checks:skills:mirror" "check:leaf" "check:list" "check:verify"];
-        docs = ["docs/task-control-plane.md" "docs/nix-patterns.md" "AGENTS.md"];
+        docs = ["docs/task-control-plane.md" "docs/control-plane-vision.md" "docs/nix-patterns.md" "AGENTS.md"];
       };
       body = ''
         Claim: a gate's cost is its chain. Reproduce the split by evaluating the
         same host on a desktop chain and on the lean role — the difference is the
-        chain, and the host file's 700 lines are the smaller half. The scaffolding
+        chain, and a host file's 700 lines are the smaller half. The scaffolding
         (`nix flake check` forbidden, oom-guard, phased protocol) exists because
-        the fleet check inherits that floor once per configuration.
+        the fleet check inherits that floor per configuration.
 
-        Rungs, cheapest first, each with an executable exit:
-        1. Derivation equality as the refactor instrument: LANDED as
-           `checks:drv-equality` (snapshot/compare, DEEP=1 for the toplevel).
-        2. A host as a feature list: LANDED as `mkHost` + `chainFeatures`
-           (`flake/module-sets.nix`); the chains are derived, and all 30
-           configurations' derivations were unchanged across the landing.
-        3. Cut the chain: MEASURED and LANDED 2026-11-08. Stub host, assertions
-           forced: base 466 MiB, +nixos 654, +roles.minimal 766, +full user role
-           1246. Per feature: dms +10, nixvim +75, nix-index +0, shell/dev/ai +25
-           together, browser +36, media +32, desktop suite +22. The role was never
-           the cost: `systemd-policy` is +356 MiB, because its assertion reads
-           every user unit AND `osConfig.systemd.services` — a full-config force
-           inside every host gate. Every feature except that one evaluates at
-           897 MiB. So the role is a feature list now (`fleet.hmUserFeatures`;
-           an import not taken is not evaluated), default unchanged and proved by
-           `checks:drv-equality` on a desktop, a container and darwin. OPEN: the
-           desktop gate goes under 1 GiB when the classification gate moves out
-           of the host eval — it belongs beside `checks:units` (one force, two
-           verdicts), which is a safety decision, not a refactor.
-        4. Three verbs over one table: LANDED one stage. `taskfiles/checks.toml`
-           is the inventory (one row per gate, with its kind), `check:leaf`,
-           `check:host`, `check:cache` and `check:list` are the entry,
-           `check:verify` (in `checks:quick`) fails when a checks:* task has no
-           row or a row names no task. The 93 named tasks remain the
-           implementation: deleting those names is a reference migration across
-           ~50 files, and doing it in the same commit as the mechanism would make
-           one red build hide which half broke.
-        5. Task plane: LANDED, by a different route than planned. `desc` has to
-           live in YAML (go-task serves `--list`), so the TOML split would have
-           been a second home; yq reads both formats, so the PARSER moved instead:
-           `taskfile_graph.py` applies the same 17 buckets in 0.6 s, and
-           `lib/taskfile.nix`, the digest pin and three flake checks are gone.
-           Two rules that wanted eval time are now `checks:skills:mirror` and the
-           compiler's `citations` mode. Parity before deletion: identical buckets
-           and name set, fixture verdicts pinned in JSON. Why: the doc.
-        6. Documents: generate every table that mirrors `inventory.toml`,
-           `modules.toml`, the task plane or the graph. The chain table is
-           `docs/generated/fleet-module-chains.md`. AGENTS.md is 477 -> 218 lines
-           (every table it carried is compiled or deleted); ~120 needs the prose
-           to move, and the pages it would move into sit at their own budget
-           (docs/nix-patterns.md is 400/400), so the floor without deleting
-           knowledge is about 200.
+        Six rungs, cheapest first; all landed, three of them differently than
+        planned.
+        1. Derivation equality as the refactor instrument — `checks:drv-equality`.
+        2. A host as a feature list — `mkHost` + `chainFeatures`
+           (`flake/module-sets.nix`); 30 configurations unchanged across it.
+        3. Cut the chain — the role was never the cost: `systemd-policy` alone
+           was +356 MiB, and every feature now evaluates at 897 MiB. Table and
+           method: `docs/control-plane-vision.md` §"A gate's cost is its chain".
+        4. Three verbs over one table — `taskfiles/checks.toml` plus
+           `check:leaf|host|cache` and `check:list`, with `check:verify` in
+           `checks:quick`. The 94 named tasks stay the implementation: `check.sh`
+           dispatches `task <name>`, so a deleted name moves its command into a
+           TOML string. Why: `docs/task-control-plane.md`.
+        5. Task plane — the PARSER moved, not the data, because `desc` has to live
+           in YAML for go-task. yq + `taskfile_graph.py` replaced
+           `lib/taskfile.nix` and the digest pin; parity was proved before the
+           deletion.
+        6. Documents — every table that mirrored a source is compiled or gone;
+           AGENTS.md is 223 lines and its floor without deleting knowledge is ~200.
 
-        Not doing: IFD (1.8 s on every eval that touches it), splitting HM out
-        of hosts to shrink host eval, a second renderer beside the site.
+        OPEN: rung 3's last item — the classification gate out of the host eval,
+        beside `checks:units` — is a safety decision, not a refactor.
+        Not doing: IFD (1.8 s on every eval that touches it), splitting HM out of
+        hosts to shrink host eval, a second renderer beside the site.
       '';
     };
     dendritic-flake = {
@@ -96,50 +75,34 @@
       body = ''
         Problem: `flake/outputs.nix` was assembled by hand, hosts listed modules in
         `flake/host-inventory.nix`, chains in `flake/module-sets.nix`, and a module
-        reached a sibling by relative path. "Who uses this file" was a grep across
-        paths — the token cost the graph exists to remove.
+        reached a sibling by relative path — so "who uses this file" was a grep.
 
         Shape: `flake-parts` owns the outputs; every file under `modules/` gains a
         name imported through `self`; `flake/host-inventory.nix` keeps `kind`,
         `system` and the host path. Gate: the same toplevel `drvPath` per
         representative chain, `checks:host` green.
 
-        DELIVERED in four commits (2026-11-05/06), in order:
-        `47b6ad8b` flake-parts owns the outputs — 32 names, three chain toplevels
-        and penguin's HM generation unchanged at one git state.
-        `b21456bc` `lib/nix-files.nix` walks all 301 tracked `.nix` files, and dev
-        shells move to `perSystem` (11 identical `drvPath`s, both arches).
-        `d739cf8f` `.#modules` names every file under `modules/`; chains, 33 host
-        files and 43 host sub-modules name their imports — 136 entries.
-        `091098b1` 21 files under `modules/` name their own 66 imports, so a
-        sibling is not reached by path from anywhere; the graph reads name edges on
-        both sides and `checks.<system>.nix-registry` fails a duplicate or a name
-        that resolves to no file.
+        DELIVERED in four commits (2026-11-05/06): flake-parts owns the outputs
+        (32 names, three chain toplevels unchanged at one git state); then
+        `lib/nix-files.nix` walks the tree and dev shells move to `perSystem`;
+        then `.#modules` names every file under `modules/`, with chains, 33 host
+        files and 43 host sub-modules naming 136 imports; then 21 files name their
+        own 66 imports, so no sibling is reached by path from anywhere and the
+        graph reads name edges on both sides.
 
         Exit: met. `flake/outputs.nix` projects from `inventory.toml` and the walk
         (`project = kind: fn:`), so neither a file list nor a host list is
-        hand-maintained. Wiring line counts did not fall — `flake.nix` +31 for the
-        flake-parts body, `checks.nix` +28 for the new gate — the lists did.
+        hand-maintained, and `checks.<system>.nix-registry` fails a duplicate name
+        or one that resolves to no file. Line counts did not fall — `flake.nix` +31
+        for the flake-parts body, `checks.nix` +28 for the gate — the lists did.
 
-        Finished 2026-11-08: the "loads with arguments" condition no longer holds
-        for `modules/`. The 13 such loads name their file
-        (`import self.modules."scripts.needle-model" {inherit pkgs;}`, and
-        `self.nixFiles.lib."pkg-list.nix"` for the five that are not modules), so
-        `grep 'import \.\./' modules/` answers nothing; what remains is
-        `builtins.readFile` of data, not an import. `flake/devshells.nix` asks for
-        its ten shells by name too, which is what makes the walk record an edge
-        from a flake file into `modules/config/shells/`.
-
-        Two files were dead on arrival and are gone: `modules/services/go-backend.nix`
-        (its package went with `pkgs/`, so the default could only fail) and
-        `modules/scripts/examples.nix` (a prototype nothing imported; its own
-        commented import pointed at a file that does not exist). The go-backend
-        gate stays in `flake/host-check.nix` as "no host declares that unit".
-
-        Checked at one git state: `checks:host MODE=eval` green on delphi, eisen,
-        frieren, penguin and clanker (containers, nixos, home and the lean role);
-        `.#devShells.aarch64-linux` names unchanged; registry 313 files, 160 names,
-        0 duplicates, 0 unknown names, and no dangling path is left.
+        Finished 2026-11-08: the "loads with arguments" exception is gone too —
+        the 13 such loads name their file, so `grep 'import \.\./' modules/`
+        answers nothing and what remains is `builtins.readFile` of data. Two dead
+        files removed (`services/go-backend.nix`, `scripts/examples.nix`); the
+        go-backend gate stays in `flake/host-check.nix` as "no host declares that
+        unit". The rule the tree keeps is `self.modules."<name>"`, never a sibling
+        path (`docs/nix-patterns.md`); the commit log is the rest.
       '';
     };
     d1-compiled-context = {
@@ -5856,59 +5819,35 @@
           "modules/services/mataroa-console.nix"
           "modules/services/mataroa-console/server"
         ];
-        docs = ["docs/agent-turns.md" "docs/turns-dashboard.md" "docs/mataroa-console.md" "docs/zettel-graph.md"];
+        docs = ["docs/agent-turns.md" "docs/turns-dashboard.md" "docs/mataroa-console.md" "docs/zettel-graph.md" "tools/turns-runtime/README.md"];
         tasks = ["checks:host" "clanker:devshell"];
       };
       body = ''
-        **Measured 2026-11-07 on clanker, 1000 SSE readers, 20 000 frames.** Full table:
-        `tools/turns-runtime/README.md`. Go 6 284/42 ms build, 8.9 MB, 32 ms start, 12.6 MB idle.
-        Rust 14 403/2 186 ms, 2.1 MB, 8 ms, 6.4 MB, 67 crates. Elixir 7 084/553 ms, 24.3 MB,
-        472 ms, 181.8 MB. p50 10.7-11.8 ms and p99 20.2-21.7 ms across all three: the stream
-        does not separate them, so the stream is not what chooses.
+        **Measured 2026-11-07 on clanker, 1000 SSE readers, 20 000 frames.** Go 42 ms
+        warm build / 12.6 MB idle; Rust 2 186 ms / 6.4 MB with 67 crates; Elixir
+        553 ms / 181.8 MB. p50 10.7-11.8 ms and p99 20.2-21.7 ms across all three, so
+        the stream does not separate them and the stream is not what chooses. Table,
+        method and every other server: `tools/turns-runtime/README.md`.
 
-        **What chooses.** Warm rebuild (the loop a person lives in, 50x apart), idle RSS (a
-        viewer idles most of the day), and pins (0 against 3 and 67 to keep building in the
-        flake). Rust's 2.1 MB artifact and 6.4 MB resident are real and still lose to a 2.2 s
-        edit loop on a read-only view.
+        **What chooses:** the warm rebuild (50x apart, the loop a person lives in),
+        the idle process (a viewer idles most of the day), and pins. Rust's 2.1 MB
+        binary and 6.4 MB resident are real and still lose to a 2.2 s edit loop on a
+        read-only view.
 
-        **The rule.** Port a service when all three hold: it is long-running, its I/O is the
-        fleet's own (a store, a vault, a mail archive), and its Python cost is paid
-        continuously — resident MB, an interpreter in the closure, a restart that answers late.
-        Contest the language only when the read path is hard enough to be worth a benchmark;
-        otherwise stdlib Go, because the fleet now has three services in that shape
-        (the turns shim, the zettel reader, this console).
-        Do not port a timer-sized one-shot (its Python start is a rounding error on what the
-        job does) and do not port a model server (torch and transformers are the work; eisen's
-        parakeet, qwen-image and decision-model servers stay Python by nature, not by inertia).
+        **The rule.** Port when all three hold: long-running, I/O the fleet owns (a
+        store, a vault, a mail archive), and a Python cost paid continuously. Stdlib
+        Go unless the read path is hard enough to be worth a benchmark. Not a
+        timer-sized one-shot (the interpreter is a rounding error on the job) and
+        not a model server (torch and transformers are the work).
 
-        **The queue, sized and closed the same day.** `mataroa-console.py` 599 lines (HTTP
-        console, git and comrak glue) was the last long-running reader; it is Go now, measured
-        on one 20-post fixture: idle 29.2 -> 6.8 MB, startup 183 -> 41 ms, ledger p50 2.38 ->
-        0.68 ms, 299 -> 1753 rps at concurrency 8. `/p/<slug>` barely moved (4.1 -> 3.5 ms)
-        because both wait on one comrak process: the render is the cost, not the server.
-        `zettel-graph` went the day before, 26.1 MB / 44 ms p50 against 8.8 MB / 0.23 ms.
+        **Closed the same day:** `mataroa-console` (29.2 -> 6.8 MB idle, 2.38 ->
+        0.68 ms ledger p50, 299 -> 1753 rps) and `zettel-graph` (26.1 MB / 44 ms ->
+        8.8 MB / 0.23 ms) are Go; everything else was measured and stayed, with its
+        reason in the same README.
 
-        **What the same test says about the rest — and why it stays.** `systemone-decision`
-        serve (`:8091`/`:8092`) spends 0.25 ms in its model and 0.71 ms in `http.server`
-        around it, and its caller asks a handful of questions per triage run; a Go port
-        re-derives calibrated probabilities to save a fraction of a millisecond nobody waits
-        for. The selector sidecar is a 1 MB pure-Python classifier on a unix socket, once per
-        question, the cold start already solved by residency. The fleet alert bridge is one
-        POST per alert and then a websocket round trip Python's library already speaks (Go
-        stdlib has no client for it). eisen's parakeet, qwen-image and laya servers are the
-        model. The remaining list is timers and CLIs: mail-atlas drain/reconcile, email-archive
-        import/triage/ci-drain, mail-agent, wiki-ask, tls-cert-watchdog, fleet-session-reaper,
-        flake-advisory-audit — one-shots where the interpreter is a rounding error.
-
-        **How a port is gated.** Keep the wire contract byte-compatible, port the tests before
-        the handler (`main_test.go` is the pattern: real Unix socket, fake store, one case per
-        refusal), prove the legacy state file opens as-is — the shim's `dedup.sqlite` cutover
-        test is the shape — then `checks:host`, then a live smoke before freezing the old
-        implementation.
-
-        **Exit.** The shim runs on delphi with `agents:xs:post` answering 201 through it; then
-        each queued reader is either ported under the same gate or struck from the queue with a
-        reason.
+        **Gated by:** a byte-compatible wire contract, tests ported before the
+        handler, the legacy state file opening as-is, `checks:host`, then a live
+        smoke before the old implementation is frozen.
       '';
     };
   };

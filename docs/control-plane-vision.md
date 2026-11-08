@@ -53,6 +53,33 @@ quick, and flake evaluation re-scopes the source tree on every dirty change.
 For our scale it "might not be a big deal" — one evaluation per build, cached in
 the store — but it caps how dynamic the *Nix* half can be.
 
+### A gate's cost is its chain (measured 2026-11-08)
+
+The wall has a second half that is easy to miss: `nix flake check` is not slow
+because the fleet is large, it is slow because **each configuration pays its own
+chain**. A stub host with assertions forced, each chain addition evaluated on top
+of the last:
+
+| Chain | Peak RSS |
+| :--- | ---: |
+| base | 466 MiB |
+| + `nixos` | 654 MiB |
+| + `roles.minimal` | 766 MiB |
+| + the full user role | 1 246 MiB |
+
+Per feature, against the baseline: DMS +10 MiB, nixvim +75, nix-index +0,
+shell/dev/ai +25 together, browser +36, media +32, desktop suite +22. The role
+was never the cost. `systemd-policy` alone is +356 MiB, because its assertion
+reads every user unit **and** `osConfig.systemd.services` — a full-config force
+inside every host gate; every feature except that one evaluates at 897 MiB.
+
+So the role became a feature list (`fleet.hmUserFeatures`): an import that is not
+taken is not evaluated, and the default set is unchanged, proved by
+`task checks:drv-equality` on a desktop, a container and darwin. Open: the
+desktop gate goes under 1 GiB when the classification gate moves out of the host
+eval — beside `task checks:units`, one force and two verdicts — which is a safety
+decision, not a refactor.
+
 ## 4. The enabling path: faster evaluation (lazy trees)
 
 The evaluator bottleneck is being attacked, and the relevant lever for this repo
@@ -242,8 +269,10 @@ Model B moves services off bare metal into dedicated, resource-capped MicroVMs (
    persistent SSH host key recognition, and Nginx reverse-proxy ingress over Tailscale.
 4. **External manifest input** — move `site.toml` to its own repo, consume as a
    locked flake input; prove federation with a second consumer.
-5. **Eval budget** — measure full-tree eval; trial lazy trees (Determinate Nix)
-   and record the delta before committing to the upgrade.
+5. **Eval budget** — *done for the chain* ("A gate's cost is its chain" above):
+   the per-configuration floor is measured and the user role is a feature list.
+   The remaining half is lazy trees (Determinate Nix): trial them and record the
+   delta before committing to the upgrade.
 6. **Nix-native closure graph** — replace the shell traversal with a Nix
    function; compare output to `closure-analysis.sh`.
 7. **Dynamic dashboard** — the Go + Datastar control plane over the compiled,

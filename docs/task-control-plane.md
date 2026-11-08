@@ -79,6 +79,13 @@ runs in `checks:quick`'s deps and fails both ways (a `checks:*` task with no
 row, a row naming no task), which is what keeps the table from drifting after a
 rename.
 
+The 94 named `checks:*` tasks are still the **implementation**, deliberately.
+`check.sh` runs `task "$name"`, so a name is what holds the command: deleting
+the names would move every command into a TOML string, which is the second home
+the split was meant to avoid (no `deps`, no `{{.VAR}}`, nothing lintable). Three
+verbs are the *entry* surface, the names are the payload — shrinking
+`task --list` means deleting gates, not renaming them.
+
 ### Operator helpers
 ```bash
 task menu                        # Task control-plane TUI (human view, gum)

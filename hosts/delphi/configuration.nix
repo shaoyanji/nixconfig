@@ -56,9 +56,9 @@
   # 8443 on purpose. nginx owns 0.0.0.0:443 for the public landing page, and a
   # listener on the tailnet address at 443 fails while that bind exists
   # (measured: "bind: address already in use").
-  # The tailnet suffix is fleet-wide and typed once per host that needs it; the
-  # node name is a registry fact.
-  tailnetHost = "${hostMeta.network.tailscale_hostname}.cloudforest-kardashev.ts.net";
+  # Both halves are registry facts, the suffix included (`tailnet_domain`), so a
+  # host that moves domains cannot leave a literal behind in its own config.
+  tailnetHost = "${hostMeta.network.tailscale_hostname}.${hostMeta.network.tailnet_domain}";
   # Stable per node key, and the only address that works here: delphi runs
   # `--accept-dns=false` (a resolver must not resolve through the address it
   # serves), so a MagicDNS name does not resolve from inside this host.
@@ -154,6 +154,49 @@
     allow 100.64.0.0/10;
     deny all;
   '';
+
+  # The location fragments more than one vhost repeats, defined once. Each takes
+  # the tailnet gate as a parameter because a `location` inherits nothing from
+  # its server block, and the same path answering on one name but not another is
+  # how the dossier and the console start disagreeing.
+  # The trailing newline keeps the gated fragment's shape when it is
+  # concatenated in front of an indented string, so the generated config is
+  # byte-identical to the hand-written form this replaced.
+  gate = withGate: lib.optionalString withGate (tailnetOnly + "\n");
+  healthzLocation = withGate: {
+    "= /healthz".extraConfig =
+      gate withGate
+      + ''
+        default_type text/plain;
+        return 200 "ok";
+      '';
+  };
+  sentinelLocations = withGate: {
+    "/sentinel/" = {
+      alias = "/var/lib/fleet-sentinel/www/";
+      extraConfig =
+        gate withGate
+        + ''
+          autoindex off;
+          add_header Cache-Control "no-store";
+        ''
+        + siteHeader;
+    };
+  };
+  reconLocations = {
+    "/recon/" = reconLocation;
+    "= /recon".extraConfig = reconRedirect;
+  };
+  # Content-hashed assets are immutable, so they get the one-year policy
+  # (modules/config/nginx-static-cache.nix) rather than the HTML revalidate.
+  # Eight explicit hex classes: a `{8}` brace quantifier is emitted SPLIT across
+  # lines by the config generator and nginx rejects the whole server for it.
+  hashedAssets = root: {
+    "~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
+      inherit root;
+      extraConfig = staticCache.hashed;
+    };
+  };
 
   # Stub services in the sandbox microVM, generated from the guest declaration
   # (hosts/microvms/guests.nix) so the address and the port pair are not typed
@@ -341,6 +384,10 @@ in {
     {
       assertion = hostMeta.network.tailscale_hostname != "";
       message = "inventory.toml [hosts.delphi.network]: `tailscale_hostname` is required for the tailnet console's links.";
+    }
+    {
+      assertion = hostMeta.network.tailnet_domain != "";
+      message = "inventory.toml [hosts.delphi.network]: `tailnet_domain` is required — the MagicDNS name is `tailscale_hostname` + `tailnet_domain`.";
     }
     {
       assertion = hostMeta.network.tailscale_ip != "";
@@ -701,34 +748,20 @@ in {
             }
           ];
           root = "${publicPage}";
-          locations."/" = {
-            index = "index.html";
-            tryFiles = "$uri $uri/ =404";
-            extraConfig = staticCache.html + siteHeader;
-          };
-          # Content-hashed assets are immutable, so they get the one-year policy
-          # (modules/config/nginx-static-cache.nix) rather than the HTML revalidate.
-          locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
-            root = "${publicPage}";
-            extraConfig = staticCache.hashed;
-          };
-          # Plain-text liveness probe for gatus / curl / a browser tab.
-          locations."= /healthz".extraConfig = ''
-            default_type text/plain;
-            return 200 "ok";
-          '';
-          # Closed-loop fleet sentinel observation ledger & health
-          locations."/sentinel/" = {
-            alias = "/var/lib/fleet-sentinel/www/";
-            extraConfig =
-              ''
-                autoindex off;
-                add_header Cache-Control "no-store";
-              ''
-              + siteHeader;
-          };
-          locations."/recon/" = reconLocation;
-          locations."= /recon".extraConfig = reconRedirect;
+          # Liveness, the sentinel ledger, the recon report and hashed assets:
+          # the fragments every vhost shares, defined once above.
+          locations =
+            {
+              "/" = {
+                index = "index.html";
+                tryFiles = "$uri $uri/ =404";
+                extraConfig = staticCache.html + siteHeader;
+              };
+            }
+            // healthzLocation false
+            // sentinelLocations false
+            // reconLocations
+            // hashedAssets publicPage;
         };
 
         # The tailnet console, loopback-only and reached through `tailscale
@@ -742,15 +775,15 @@ in {
             }
           ];
           root = "${tailnetPage}";
-          locations."/" = {
-            index = "index.html";
-            tryFiles = "$uri $uri/ =404";
-            extraConfig = staticCache.html + siteHeader;
-          };
-          locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
-            root = "${tailnetPage}";
-            extraConfig = staticCache.hashed;
-          };
+          locations =
+            {
+              "/" = {
+                index = "index.html";
+                tryFiles = "$uri $uri/ =404";
+                extraConfig = staticCache.html + siteHeader;
+              };
+            }
+            // hashedAssets tailnetPage;
         };
 
         # The MagicDNS name at the root, tailnet-only by SOURCE ADDRESS.
@@ -779,21 +812,6 @@ in {
                 # and the gate reads the same header the mesh client would.
                 extraConfig = tailnetOnly + siteHeader;
               };
-              "= /healthz".extraConfig = ''
-                ${tailnetOnly}
-                default_type text/plain;
-                return 200 "ok";
-              '';
-              "/sentinel/" = {
-                alias = "/var/lib/fleet-sentinel/www/";
-                extraConfig =
-                  ''
-                    ${tailnetOnly}
-                    autoindex off;
-                    add_header Cache-Control "no-store";
-                  ''
-                  + siteHeader;
-              };
               # Taildrop's landing pad (hosts/delphi/gok-artifacts.nix), read by
               # `task infra:gok:deploy` and by a runner proving its artifact
               # arrived. Tailnet vhost only, deliberately: the appliance image has
@@ -811,6 +829,9 @@ in {
                   + siteHeader;
               };
             }
+            // healthzLocation true
+            // sentinelLocations true
+            // hashedAssets tailnetPage
             // microvmProxyLocations true
             // stirlingProxyLocations
             // lib.optionalAttrs slidesEnabled (slideshowLocations true);
@@ -862,29 +883,11 @@ in {
                   ''
                   + siteHeader;
               };
-              # Same eight explicit hex classes as frieren's vhost: a `{8}` brace
-              # quantifier is emitted SPLIT across lines by the config generator and
-              # nginx rejects the whole server for it.
-              "~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
-                root = "${publicPage}";
-                extraConfig = staticCache.hashed;
-              };
-              "= /healthz".extraConfig = ''
-                default_type text/plain;
-                return 200 "ok";
-              '';
-              "/sentinel/" = {
-                alias = "/var/lib/fleet-sentinel/www/";
-                extraConfig =
-                  ''
-                    autoindex off;
-                    add_header Cache-Control "no-store";
-                  ''
-                  + siteHeader;
-              };
-              "/recon/" = reconLocation;
-              "= /recon".extraConfig = reconRedirect;
             }
+            // hashedAssets publicPage
+            // healthzLocation false
+            // sentinelLocations false
+            // reconLocations
             # The agent-turn log, readable by anyone with the URL: the row carries
             # no prompt form and /api/prompt answers 403 there, so this mount can
             # publish the field and spend nothing.
@@ -956,18 +959,18 @@ in {
     };
   };
 
-  # --- Stirling PDF: the JVM lives in the sandbox guest, not on the host ------
-  # Native copy retired 2026-10-24. Heavy, stateless apps belong in the guest
-  # (hosts/microvms/guests.nix, `stirling = true`), which gives them a state
-  # volume and a restart that is a decision rather than a boot side effect.
-  # Running both meant two JVMs on one 2-core box: the guest's, plus this one,
-  # for a service that receives no traffic. The guest is the survivor and is
-  # served at /microvm/stirling/ (tailnet only).
+  # --- Stirling PDF: native here, the guest's copy is off ---------------------
+  # The history is the reason the shape looks odd. It ran natively from
+  # 2026-10-21, moved into the sandbox guest on 2026-10-24 with `stirling = true`
+  # (a state volume and a restart that is a decision, not a boot side effect),
+  # and came back the same week: OCI A1 has no KVM, so that guest runs under
+  # interpreted TCG, and a JVM there cost more CPU than the 2-OCPU box has.
+  # `flake/host-inventory.nix` now passes `stirling = false`, and this native
+  # copy is what answers — the portal's 8445 mount proxies it.
   #
-  # Kept disabled rather than deleted for posterity: this is the shape that ran
-  # natively 2026-10-21..24, and the reference for a host with no microvm layer.
-  # --- Native Services (Retiring QEMU TCG MicroVM bottleneck) ----------------
-  # Native Stirling PDF (ARM64 native execution, sub-second responses, ~450 MB RAM)
+  # So `stirlingProxyLocations` / `stirlingPublicRedirect` below are empty on
+  # this host: they are the guest path, kept for the host that flips the flag
+  # back, not a second live surface. The live one is the mount.
   services.stirling-pdf = {
     enable = true;
     environment = {
@@ -1409,8 +1412,8 @@ in {
         description = "The archive as a field: fuzzy finding, a tag taxonomy and a relation graph.";
         requires = ["nginx.service"];
       };
-      # Machine-facing: POST /v1/events and GET /v1/events, bearer token, no
-      # browsing surface, so no card on the tailnet page.
+      # A reading surface with a prompt box per turn, so it is a card: this is
+      # the page a person opens, and the inventory link points at the same port.
       turns = {
         port = 8460;
         upstream = "http://127.0.0.1:${toString config.services.turnsDashboard.port}";
@@ -1418,6 +1421,8 @@ in {
         description = "The turn log as a field: one panel per turn, live, with a Hermes prompt on each.";
         requires = ["turns-dashboard.service"];
       };
+      # Machine-facing: POST /v1/events and GET /v1/events, bearer token, no
+      # browsing surface, so no card on the tailnet page.
       agent-turns = {
         port = 8449;
         upstream = "http://127.0.0.1:${toString config.services.agentTurns.port}";

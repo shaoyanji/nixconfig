@@ -15,7 +15,20 @@ metadata:
 
 `/Volumes/data/projects/bountystash-console` (GitHub `shaoyanji/bountystash-console`),
 built by `node scripts/build.js` into `dist/index.html`, deployed to the
-`bountystash` Pages project (`bountystash.com`).
+`cv-resume` Pages project, whose custom domain is `bountystash.com`.
+
+The project name is a fact about the Cloudflare account, not a typo: its
+pages.dev subdomain is `cv-resume-40q.pages.dev` (Cloudflare appends the suffix
+when the bare name is taken), `bountystash.pages.dev` does not exist, and both
+live addresses serve the same `CV - Shaoyan (Matt) Ji` document (checked
+2026-11-08). `PROJECT_NAME` in `taskfiles/bountystash.yml` is the one place it
+appears; a deploy to a name nobody created would make a second project.
+
+The repo also renders a second, different page: `.#sites.bountystash-site`
+(`lib/bountystash-site.nix`, from `lib/bountystash/portfolio.json` — the same
+data the Gemini capsule serves). It is not what production runs. Its
+`bountystash:deploy:nix:*` tasks publish it on purpose, and a `main` deploy
+replaces the console until the next console deploy.
 
 ## The constraint that shapes everything
 

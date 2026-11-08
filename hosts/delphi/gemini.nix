@@ -9,7 +9,9 @@
 }: let
   hostMeta = config.fleet.inventory.hosts.delphi;
   publicHost = hostMeta.network.domain;
-  tailnetHost = "${hostMeta.network.tailscale_hostname}.cloudforest-kardashev.ts.net";
+  # The host's one tailnet name, not a second copy of the suffix: the portal's
+  # mounts, the console's links and this capsule's certificate must agree.
+  tailnetHost = config.services.servicePortal.tailnetHost;
 
   capsule = import ../../lib/gemini-portal.nix {inherit pkgs lib;};
   mail = import ../../lib/gemini-mail.nix {inherit pkgs lib;};

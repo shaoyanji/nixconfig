@@ -205,7 +205,7 @@ def load(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=["snapshot", "compare", "show"], nargs="?", default="compare")
-    ap.add_argument("--out", default=os.environ.get("OUT", DEFAULT_OUT))
+    ap.add_argument("--out", default=os.environ.get("OUT") or DEFAULT_OUT)
     args = ap.parse_args()
 
     hour = time.localtime().tm_hour

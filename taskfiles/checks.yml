@@ -295,10 +295,13 @@ tasks:
       may not change a host's `hostChecks` derivation or config fingerprint.
       MODE=snapshot writes the baseline (~/.cache/nixconfig/drv-baseline.json);
       MODE=compare re-evaluates every configuration, ONE PROCESS EACH under
-      oom-guard.sh, exiting 1 on any drift. A host that already failed compares by
-      its error text. DEEP=1 uses each toplevel derivation instead (25-45 s per
-      host; narrow with HOSTS=) — a config embedding the flake source changes it on
-      any tree edit. Not a pre-switch check. Refuses 03:00-05:30 unless FORCE=1.
+      oom-guard.sh, exiting 1 on any drift. A host already failing compares by its
+      error text. DEEP=1 uses each toplevel derivation instead (narrow with
+      HOSTS=); a config embedding the flake source changes it on any tree edit.
+      Refuses the 03:00-05:30 window unless FORCE=1.
+    env:
+      HOSTS: '{{.HOSTS}}'
+      DEEP: '{{.DEEP}}'
     cmds:
       - python3 scripts/task/drv-equality.py {{.MODE | default "compare"}}
 

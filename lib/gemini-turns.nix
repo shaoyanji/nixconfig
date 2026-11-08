@@ -1,11 +1,6 @@
 # lib/gemini-turns.nix — the agent turn log as a Gemini capsule fragment: a
-# landing page plus four CGI wrappers over ./gemini-turns/turns.py.
-#
-# Mounting rule (hosts/delphi/gemini.nix): the fragment goes on the TAILNET
-# instance, which is the only one with `CGIPaths`. The wrappers name the token's
-# path, never its value — a capsule store path is world-readable, and molly-brown
-# hands a CGI an empty environment, so the file is the only route a credential
-# could take into the script.
+# landing page plus four CGI wrappers over ./gemini-turns/turns.py. Mounting rule
+# and the token's path-never-value rule: docs/gemini-turns.md.
 {
   pkgs,
   lib ? pkgs.lib,

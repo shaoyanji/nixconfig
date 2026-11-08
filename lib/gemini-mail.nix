@@ -1,11 +1,6 @@
-# lib/gemini-mail.nix — the email archive as a Gemini capsule fragment: a landing
-# page plus the CGI scripts that query the archive API on loopback — search,
-# newest, one message, the attention queue and an attachment notice. The program
-# is ./gemini-mail/mail.py; this file only decides where it lives.
-#
-# Mounting rule (hosts/delphi/gemini.nix): the fragment goes on the TAILNET
-# instance. The public capsule keeps no `CGIPaths` and no mail tree, so the
-# archive never sits behind the internet-facing port.
+# lib/gemini-mail.nix — the mail archive as a Gemini capsule fragment: a landing
+# page plus CGI wrappers over ./gemini-mail/mail.py. Mounting rule and the query
+# contract: docs/gemini-mail.md.
 {
   pkgs,
   lib ? pkgs.lib,
